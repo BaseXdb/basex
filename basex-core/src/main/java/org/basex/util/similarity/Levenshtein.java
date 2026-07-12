@@ -17,13 +17,9 @@ import java.util.function.*;
 public final class Levenshtein {
   /** Maximum size for compared strings. */
   public static final int MAX_LENGTH = 10000;
-  /** Size of matrix (and maximum supported length for comparing tokens). */
-  private static final int SIZE = 128;
 
   /** Default number of allowed errors; dynamic calculation if value is 0. */
   private final int maxErrors;
-  /** Matrix for calculating Levenshtein distance. */
-  private final byte[][] matrix;
 
   /**
    * Constructor.
@@ -38,12 +34,6 @@ public final class Levenshtein {
    */
   public Levenshtein(final int maxErrors) {
     this.maxErrors = maxErrors;
-    matrix = new byte[SIZE + 2][SIZE + 2];
-    final int ml = matrix.length;
-    for(int m = 0; m < ml; ++m) {
-      matrix[0][m] = (byte) m;
-      matrix[m][0] = (byte) m;
-    }
   }
 
   /**
@@ -151,33 +141,14 @@ public final class Levenshtein {
     final int[] tkn = normalize(token), cmp = normalize(compare);
     final int tl = tkn.length, cl = cmp.length;
 
-    // use exact search for too short and too long values
-    final int dlen = Math.abs(cl - tl);
-    if(max == 0 && (tl < 4 || cl < 4) || tl > SIZE || cl > SIZE) {
-      return dlen == 0 && Arrays.equals(tkn, cmp) ? 0 : Integer.MAX_VALUE;
+    // use exact search for too short values
+    if(max == 0 && (tl < 4 || cl < 4)) {
+      return tl == cl && Arrays.equals(tkn, cmp) ? 0 : Integer.MAX_VALUE;
     }
 
-    // skip different tokens with too different lengths
     final int k = max == 0 ? Math.max(1, cl >> 2) : max;
-    if(dlen > k) return Integer.MAX_VALUE;
-
-    // compute distance
-    final byte[][] m = matrix;
-    for(int t = 0; t < tl; t++) {
-      final int tn = tkn[t];
-      int d = Integer.MAX_VALUE;
-      for(int c = 0; c < cl; c++) {
-        final int cn = cmp[c];
-        int cost = min(m[t][c + 1] + 1, m[t + 1][c] + 1, m[t][c] + (tn == cn ? 0 : 1));
-        if(t > 0 && c > 0 && tn == cmp[c - 1] && tkn[t - 1] == cn)
-          cost = Math.min(cost, m[t - 1][c - 1] + 1);
-        m[t + 1][c + 1] = (byte) cost;
-        d = Math.min(d, cost);
-      }
-      if(d > k) return Integer.MAX_VALUE;
-    }
-    final int d = m[tl][cl];
-    return d <= k ? d : Integer.MAX_VALUE;
+    final int dist = distance(tkn, cmp, k);
+    return dist == -1 ? Integer.MAX_VALUE : dist;
   }
 
   /**
@@ -193,7 +164,7 @@ public final class Levenshtein {
   }
 
   /**
-   * <p>Computes the full Damerau-Levenshtein distance for two codepoint arrays and returns a
+   * <p>Computes the edit distance for two codepoint arrays and returns a
    * double value (0.0 - 1.0), which represents the distance. The value is computed as follows:</p>
    *
    * <code>1.0 - distance / max(length of strings)</code>.
@@ -210,9 +181,8 @@ public final class Levenshtein {
   }
 
   /**
-   * Computes the full Damerau-Levenshtein distance for two codepoint arrays. If {@code max} is
-   * not negative, only the diagonal band of cells that can still yield a distance within this
-   * limit is computed, and the computation is aborted as soon as the limit is exceeded.
+   * Computes the edit distance for two codepoint arrays. If {@code max} is not negative, only the
+   * diagonal band of cells that can yield a distance within this limit is computed.
    * @param token first codepoints array
    * @param compare second codepoints array
    * @param max maximum distance ({@code -1}: unbounded)
@@ -220,10 +190,8 @@ public final class Levenshtein {
    */
   public static int distance(final int[] token, final int[] compare, final int max) {
     final int tl = token.length, cl = compare.length;
-    // the distance is at least as large as the difference of the string lengths
     if(max >= 0 && Math.abs(tl - cl) > max) return -1;
 
-    // width of the diagonal band; cells outside the band cannot yield a distance within the limit
     final int band = max >= 0 ? Math.min(max, Math.max(tl, cl)) : Math.max(tl, cl);
     final int inf = Integer.MAX_VALUE / 2;
 

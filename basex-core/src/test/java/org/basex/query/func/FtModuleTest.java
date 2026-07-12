@@ -77,6 +77,12 @@ public final class FtModuleTest extends SandboxTest {
     query(func.args("行イ音便", "serch", " { 'fuzzy': true() }"), false);
     query(func.args("serch", "行イ音便", " { 'fuzzy': true() }"), false);
 
+    // the length of fuzzy tokens is not limited
+    final String long1 = " string-join(replicate('ab', 100))";
+    final String long2 = long1 + " => substring(1, 199) || 'x'";
+    query(func.args(long1, long2, " { 'fuzzy': true(), 'errors': 2 }"), true);
+    query(func.args(long1, long2, " { 'fuzzy': true(), 'errors': 0 }"), true);
+
     // check buggy options
     error(func.args("x", "x", " { 'x': 'y' }"), INVALIDOPTION_X);
     error(func.args("x", "x", " { 'mode': '' }"), INVALIDOPTION_X);
