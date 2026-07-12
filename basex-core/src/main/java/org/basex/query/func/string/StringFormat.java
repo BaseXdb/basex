@@ -3,9 +3,12 @@ package org.basex.query.func.string;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -23,11 +26,12 @@ public final class StringFormat extends StandardFunc {
     final Object[] args = new Object[al - 1];
     for(int a = 1; a < al; a++) {
       final Item item = arg(a).item(qc, info);
-      args[a - 1] = item.isEmpty() ? null : item.type.isUntyped() ? string(item.string(info)) :
-        item.toJava();
+      if(item.isEmpty()) throw typeError(item, BasicType.ITEM, info);
+      args[a - 1] = item.type.isUntyped() ? string(item.string(info)) : item.toJava();
     }
     try {
-      return Str.get(String.format(pattern, args));
+      // fixed locale: the result must not depend on the system the query is run on
+      return Str.get(String.format(Locale.ENGLISH, pattern, args));
     } catch(final IllegalArgumentException ex) {
       throw STRING_FORMAT_X_X.get(info, Util.className(ex), ex);
     }
