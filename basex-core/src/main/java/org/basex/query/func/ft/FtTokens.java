@@ -8,7 +8,6 @@ import org.basex.query.func.*;
 import org.basex.query.func.index.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
-import org.basex.util.*;
 import org.basex.util.ft.*;
 
 /**
@@ -21,7 +20,7 @@ public final class FtTokens extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
-    byte[] prefix = defined(1) ? toToken(arg(1), qc) : Token.EMPTY;
+    byte[] prefix = toZeroToken(arg(1), qc);
     if(prefix.length != 0) {
       final FTLexer lexer = new FTLexer(new FTOpt().assign(data.meta));
       lexer.init(prefix);

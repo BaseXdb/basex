@@ -249,5 +249,8 @@ public final class FtModuleTest extends SandboxTest {
 
     entries = func.args(NAME, "a");
     query("count(" + entries + ')', 2);
+
+    // an empty search term returns all entries
+    query("count(" + func.args(NAME, " ()") + ')', 7);
   }
 }
