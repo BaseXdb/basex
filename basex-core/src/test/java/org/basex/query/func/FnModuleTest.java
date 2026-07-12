@@ -1602,6 +1602,13 @@ public final class FnModuleTest extends SandboxTest {
     check("for $f in #fn:position return (8, 9)[" + func.args(" $f", 0) + "()]",
         "8\n9", empty(func), exists(CachedFilter.class));
 
+    // variadic functions
+    query(func.args(" #fn:concat", 0) + "()", "");
+    query(func.args(" #fn:concat", 2) + "('a', 'b')", "ab");
+    query(func.args(" #string:format", 0), "");
+    query(func.args(" #string:format", 1) + "('x')", "x");
+    query(func.args(" #string:format", 3) + "('%s-%s', 'a', 'b')", "a-b");
+
     inline(true);
     check(func.args(" #fn:count", 1) + "((1, 2))", 2, root(Itr.class));
     check(func.args(" #fn:identity", 1) + "(1)", 1, root(Itr.class));

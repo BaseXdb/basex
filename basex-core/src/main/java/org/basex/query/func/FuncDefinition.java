@@ -127,14 +127,9 @@ public final class FuncDefinition {
    */
   FuncType type(final int arity, final AnnList anns) {
     final SeqType[] st = new SeqType[arity];
-    if(arity != 0 && variadic()) {
-      final int tl = types.length;
-      Array.copy(types, tl, st);
-      final SeqType var = types[tl - 1];
-      Arrays.fill(st, tl, arity, var);
-    } else {
-      Array.copy(types, arity, st);
-    }
+    final int tl = Math.min(types.length, arity);
+    Array.copy(types, tl, st);
+    if(variadic()) Arrays.fill(st, tl, arity, types[types.length - 1]);
     return FuncType.get(anns, seqType, st);
   }
 
