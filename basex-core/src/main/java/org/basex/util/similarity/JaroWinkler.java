@@ -3,13 +3,17 @@ package org.basex.util.similarity;
 /**
  * <p>Jaro-Winkler algorithm, developed by Matthew A. Jaro and William E. Winkler.</p>
  *
- * <p>The implementation has been inspired by the Apache Commons Text algorithms
- * (https://commons.apache.org/proper/commons-text/).</p>
- *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class JaroWinkler {
+  /** Maximum length of the common prefix that is rewarded. */
+  private static final int PREFIX = 4;
+  /** Scaling factor for the common prefix. */
+  private static final double SCALE = 0.1;
+  /** Minimum similarity for rewarding the common prefix. */
+  private static final double BOOST = 0.7;
+
   /** Private constructor, preventing instantiation. */
   private JaroWinkler() { }
 
@@ -58,11 +62,12 @@ public final class JaroWinkler {
     for(int i = 0; i < m; i++) {
       if(ms1[i] != ms2[i]) t++;
     }
+    // common prefix, limited to 4 characters
     int p = 0;
-    for(int i = 0; i < mn && min[i] == max[i]; i++) p++;
+    for(int i = 0; i < mn && i < PREFIX && min[i] == max[i]; i++) p++;
 
     final double d = m, j = (d / mn + d / mx + (d - (t >> 1)) / d) / 3;
-    final double jw = j < .7d ? j : j + Math.min(.1, 1d / mx) * p * (1 - j);
+    final double jw = j < BOOST ? j : j + SCALE * p * (1 - j);
     return Math.round(jw * 100) / 100d;
   }
 }

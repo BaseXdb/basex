@@ -142,10 +142,13 @@ public final class StringModuleTest extends SandboxTest {
     query(func.args("hippo", "elephant"), .44);
     query(func.args("hippo", "zzzzzzzz"), 0);
     query(func.args("hello", "hallo"), .88);
-    query(func.args("ABC Corporation", "ABC Corp"), .93);
+    query(func.args("ABC Corporation", "ABC Corp"), .91);
     query(func.args("D N H Enterprises Inc", "D &amp; H Enterprises, Inc."), .95);
-    query(func.args("My Gym Children's Fitness Center", "My Gym. Childrens Fitness"), .92);
-    query(func.args("PENNSYLVANIA", "PENNCISYLVNIA"), .88);
+    query(func.args("My Gym Children's Fitness Center", "My Gym. Childrens Fitness"), .94);
+    query(func.args("PENNSYLVANIA", "PENNCISYLVNIA"), .9);
+
+    // the common prefix is rewarded, but only up to 4 characters
+    query(func.args("abcdefgh", "abcdefghx"), .98);
   }
 
   /** Test method. */
