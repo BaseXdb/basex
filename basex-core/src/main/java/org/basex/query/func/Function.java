@@ -534,6 +534,9 @@ public enum Function implements AFunction {
   OUTERMOST(FnOutermost::new, "outermost(nodes)",
       params(GNODE_ZM), GNODE_ZM),
   /** XQuery function. */
+  PAD_STRING(FnPadString::new, "pad-string(value,length[,options])",
+      params(ANY_ATOMIC_TYPE_ZO, INTEGER_O, MAP_ZO), STRING_O),
+  /** XQuery function. */
   PARSE_CSV(FnParseCsv::new, "parse-csv(value[,options])",
       params(STRING_OR_BINARY_ZO, MAP_ZO),
       Records.PARSED_CSV_STRUCTURE.get().seqType(Occ.ZERO_OR_ONE)),

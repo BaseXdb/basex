@@ -2802,6 +2802,34 @@ return
   }
 
   /** Test method. */
+  @Test public void padString() {
+    final Function func = PAD_STRING;
+
+    query(func.args("abc", 6), "abc   ");
+    query(func.args("abc", 6, " { 'side': 'start' }"), "   abc");
+    query(func.args("abc", 7, " { 'side': 'both' }"), "  abc  ");
+    query(func.args("abc", 8, " { 'side': 'both' }"), "  abc   ");
+    query(func.args("abc", 10, " { 'fill': '-=' }"), "abc-=-=-=-");
+    query(func.args("Chapter", 10, " { 'fill': '.' }"), "Chapter...");
+    query(func.args(42, 6, " { 'fill': '0', 'side': 'start' }"), "000042");
+
+    // no padding, no truncation
+    query(func.args("abc", 3), "abc");
+    query(func.args("abc", -1), "abc");
+    query(func.args(" ()", 3, " { 'fill': '*' }"), "***");
+
+    // length is measured in characters, not in graphemes
+    query(func.args(" char(0x1F600)", 3, " { 'fill': '.' }"), new TokenBuilder().add(0x1F600).
+        add("..").toString());
+
+    check(func.args("abc", 6), "abc   ", empty(func));
+
+    error(func.args("abc", 6, " { 'fill': '' }"), INVALIDOPTION_X);
+    error(func.args("abc", 6, " { 'side': 'middle' }"), INVALIDOPTION_X);
+    error(func.args("abc", Long.MAX_VALUE), RANGE_X);
+  }
+
+  /** Test method. */
   @Test public void parseHtml() {
     final Function func = PARSE_HTML;
 
