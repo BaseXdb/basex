@@ -112,6 +112,33 @@ public final class StringModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void options() {
+    final Function lev = _STRING_LEVENSHTEIN;
+    final Function set = _STRING_TOKEN_SET_RATIO, sort = _STRING_TOKEN_SORT_RATIO;
+    final Function jw = _STRING_JARO_WINKLER, ngrams = _STRING_NGRAMS;
+
+    // default: strings are compared literally
+    query(lev.args("flower", "FLOWER"), 0);
+    query(lev.args("flower", "FLOWER", " {}"), 0);
+    query(lev.args("Munch", "Münch", " { 'diacritics': 'sensitive' }"), 0.8);
+
+    // full-text options
+    query(lev.args("flower", "FLOWER", " { 'case': 'insensitive' }"), 1);
+    query(lev.args("Munch", "Münch", " { 'diacritics': 'insensitive' }"), 1);
+    query(lev.args("HOUSES", "house", " { 'stemming': true(), 'case': 'insensitive' }"), 1);
+    query(jw.args("flower", "FLOWER", " { 'case': 'insensitive' }"), 1);
+    query(ngrams.args("Rüb", " ()", " { 'case': 'insensitive', 'diacritics': 'insensitive' }"),
+        "ru\nub");
+
+    // token ratios: full-text options also strip punctuation
+    query(set.args("Ruisdael, Jacob van", "Jacob van Ruisdael"), 0.9473684210526315);
+    query(set.args("Ruisdael, Jacob van", "Jacob van Ruisdael", " { 'case': 'insensitive' }"), 1);
+    query(sort.args("Gogh, Vincent van", "vincent van gogh", " { 'case': 'insensitive' }"), 1);
+
+    error(lev.args("a", "b", " { 'case': 'unknown' }"), INVALIDOPTION_X);
+  }
+
+  /** Test method. */
   @Test public void format() {
     final Function func = _STRING_FORMAT;
     query(func.args("x", "x"), "x");

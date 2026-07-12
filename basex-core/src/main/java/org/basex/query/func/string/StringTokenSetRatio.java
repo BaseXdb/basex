@@ -1,12 +1,9 @@
 package org.basex.query.func.string;
 
-import static org.basex.query.QueryError.*;
-import static org.basex.util.similarity.Levenshtein.*;
-
 import org.basex.query.*;
-import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
+import org.basex.util.ft.*;
 import org.basex.util.similarity.*;
 
 /**
@@ -15,14 +12,14 @@ import org.basex.util.similarity.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class StringTokenSetRatio extends StandardFunc {
+public final class StringTokenSetRatio extends StringFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final AStr value1 = toStr(arg(0), qc), value2 = toStr(arg(1), qc);
+    final FTOpt opt = ftOpt(toOptions(arg(2), new StringOptions(), qc));
 
-    final int[] cps1 = value1.codepoints(info), cps2 = value2.codepoints(info);
-    if(cps1.length > MAX_LENGTH || cps2.length > MAX_LENGTH)
-      throw STRING_BOUNDS_X.get(info, MAX_LENGTH);
-    return Dbl.get(TokenRatio.set(cps1, cps2));
+    checkLength(value1.codepoints(info));
+    checkLength(value2.codepoints(info));
+    return Dbl.get(TokenRatio.set(tokens(value1, opt), tokens(value2, opt)));
   }
 }

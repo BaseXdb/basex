@@ -15,26 +15,26 @@ public final class TokenRatio {
 
   /**
    * Computes the token sort ratio.
-   * @param cps1 first codepoints array
-   * @param cps2 second codepoints array
+   * @param tokens1 first tokens
+   * @param tokens2 second tokens
    * @return similarity (0.0 - 1.0)
    */
-  public static double sort(final int[] cps1, final int[] cps2) {
-    final String[] tokens1 = tokens(cps1), tokens2 = tokens(cps2);
-    Arrays.sort(tokens1);
-    Arrays.sort(tokens2);
-    return ratio(String.join(" ", tokens1), String.join(" ", tokens2));
+  public static double sort(final String[] tokens1, final String[] tokens2) {
+    final String[] sorted1 = tokens1.clone(), sorted2 = tokens2.clone();
+    Arrays.sort(sorted1);
+    Arrays.sort(sorted2);
+    return ratio(String.join(" ", sorted1), String.join(" ", sorted2));
   }
 
   /**
    * Computes the token set ratio.
-   * @param cps1 first codepoints array
-   * @param cps2 second codepoints array
+   * @param tokens1 first tokens
+   * @param tokens2 second tokens
    * @return similarity (0.0 - 1.0)
    */
-  public static double set(final int[] cps1, final int[] cps2) {
-    final TreeSet<String> set1 = new TreeSet<>(Arrays.asList(tokens(cps1)));
-    final TreeSet<String> set2 = new TreeSet<>(Arrays.asList(tokens(cps2)));
+  public static double set(final String[] tokens1, final String[] tokens2) {
+    final TreeSet<String> set1 = new TreeSet<>(Arrays.asList(tokens1));
+    final TreeSet<String> set2 = new TreeSet<>(Arrays.asList(tokens2));
     if(set1.isEmpty() && set2.isEmpty()) return 1;
     if(set1.isEmpty() || set2.isEmpty()) return 0;
 
@@ -67,7 +67,7 @@ public final class TokenRatio {
    * @param cps codepoints array
    * @return tokens (without empty strings)
    */
-  private static String[] tokens(final int[] cps) {
+  public static String[] tokens(final int[] cps) {
     final ArrayList<String> tokens = new ArrayList<>();
     final StringBuilder token = new StringBuilder();
     for(final int cp : cps) {
