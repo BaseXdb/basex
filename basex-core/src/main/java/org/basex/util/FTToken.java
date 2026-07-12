@@ -85,7 +85,7 @@ public final class FTToken {
   public static int noDiacritics(final int cp) {
     if(cp < 0xC0) return cp;
     if(cp < 0x500) return NORM_0000[cp - 0xC0];
-    if(cp > 0x1e00 && cp < 0x2000) return NORM_1E00[cp - 0x1E00];
+    if(cp >= 0x1E00 && cp < 0x2000) return NORM_1E00[cp - 0x1E00];
     final int c = NORM_XXXX.get(cp);
     return c == Integer.MIN_VALUE ? cp : c;
   }
@@ -339,7 +339,7 @@ public final class FTToken {
     NORM_0000 = norm;
 
     norm = new char[0x200];
-    for(int n = 0; n < 0x200; n++) norm[n] = (char) (n + 1.0E00);
+    for(int n = 0; n < 0x200; n++) norm[n] = (char) (n + 0x1E00);
     for(final char[] aNC : NC1E00) norm[aNC[0] - 0x1E00] = aNC[1];
     NORM_1E00 = norm;
 
