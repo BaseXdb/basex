@@ -123,7 +123,7 @@ public final class StringModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void jaroWinkler() {
     final Function func = _STRING_JARO_WINKLER;
-    query(func.args("", ""), 0);
+    query(func.args("", ""), 1);
     query(func.args("", "a"), 0);
     query(func.args("aaapppp", ""), 0);
     query(func.args("frog", "fog"), .93);

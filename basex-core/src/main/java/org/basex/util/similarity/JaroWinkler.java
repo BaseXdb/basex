@@ -31,6 +31,8 @@ public final class JaroWinkler {
    */
   private static double dst(final int[] min, final int[] max) {
     final int mn = min.length, mx = max.length, r = Math.max((mx >> 1) - 1, 0);
+    if(mx == 0) return 1;
+
     final boolean[] o1 = new boolean[mn], o2 = new boolean[mx];
     int m = 0;
     for(int i = 0; i < mn; i++) {
