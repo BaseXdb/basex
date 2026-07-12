@@ -206,26 +206,57 @@ public final class Levenshtein {
    * @return distance (0.0 - 1.0)
    */
   public static double distance(final int[] token, final int[] compare) {
-    final int tl = token.length, cl = compare.length, max = Math.max(tl, cl);
-    if(max == 0) return 1;
-    if(Math.abs(tl - cl) >= max) return 0;
+    final int max = Math.max(token.length, compare.length);
+    return max == 0 ? 1 : (double) (max - distance(token, compare, -1)) / max;
+  }
 
-    final char[][] m = new char[tl + 1][cl + 1];
-    for(int t = 0; t <= tl; t++) m[t][0] = (char) t;
-    for(int c = 0; c <= cl; c++) m[0][c] = (char) c;
+  /**
+   * Computes the full Damerau-Levenshtein distance for two codepoint arrays. If {@code max} is
+   * not negative, only the diagonal band of cells that can still yield a distance within this
+   * limit is computed, and the computation is aborted as soon as the limit is exceeded.
+   * @param token first codepoints array
+   * @param compare second codepoints array
+   * @param max maximum distance ({@code -1}: unbounded)
+   * @return distance, or {@code -1} if the distance exceeds {@code max}
+   */
+  public static int distance(final int[] token, final int[] compare, final int max) {
+    final int tl = token.length, cl = compare.length;
+    // the distance is at least as large as the difference of the string lengths
+    if(max >= 0 && Math.abs(tl - cl) > max) return -1;
+
+    // width of the diagonal band; cells outside the band cannot yield a distance within the limit
+    final int band = max >= 0 ? Math.min(max, Math.max(tl, cl)) : Math.max(tl, cl);
+    final int inf = Integer.MAX_VALUE / 2;
+
+    int[] prev = new int[cl + 2], curr = new int[cl + 2];
+    for(int c = 0; c <= cl + 1; c++) prev[c] = c <= band ? c : inf;
 
     for(int f = -1, g = -1, t = 0; t < tl; t++) {
       final int tn = token[t];
-      for(int c = 0; c < cl; c++) {
+      final int lo = Math.max(0, t - band), hi = Math.min(cl - 1, t + band);
+      curr[lo] = lo == 0 ? t + 1 : inf;
+
+      int rowMin = curr[lo];
+      for(int c = lo; c <= hi; c++) {
         final int cn = compare[c];
-        int cost = min(m[t][c + 1] + 1, m[t + 1][c] + 1, m[t][c] + (tn == cn ? 0 : 1));
-        if(tn == g && cn == f) cost = m[t][c];
-        m[t + 1][c + 1] = (char) cost;
+        int cost = min(prev[c + 1] + 1, curr[c] + 1, prev[c] + (tn == cn ? 0 : 1));
+        if(tn == g && cn == f) cost = prev[c];
+        curr[c + 1] = cost;
+        rowMin = Math.min(rowMin, cost);
         g = cn;
       }
+      // invalidate the cell after the band: it must not be read as a stale value in the next row
+      if(hi + 2 <= cl + 1) curr[hi + 2] = inf;
       f = tn;
+
+      // all subsequent distances will be at least as large as the minimum of the current row
+      if(max >= 0 && rowMin > max) return -1;
+      final int[] tmp = prev;
+      prev = curr;
+      curr = tmp;
     }
-    return (double) (max - m[tl][cl]) / max;
+    final int dist = prev[cl];
+    return max >= 0 && dist > max ? -1 : dist;
   }
 
   /**
