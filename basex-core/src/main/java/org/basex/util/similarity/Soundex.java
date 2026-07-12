@@ -22,15 +22,16 @@ public final class Soundex {
   private static final byte[] MAPPING = token("01230120022455012623010202");
 
   /**
-   * Computes the Soundex value for the specified codepoints.
-   * @param cps codepoint array
+   * Computes the Soundex value for the specified token.
+   * @param token token
    * @return Soundex value
    */
-  public static int[] encode(final int[] cps) {
+  public static int[] encode(final byte[] token) {
     // normalize input to ascii characters (ignore all others)
+    final int[] cps = cps(noDiacritics(token));
     final IntList tmp = new IntList(cps.length);
     for(final int cp : cps) {
-      final int c = uc(noDiacritics(cp));
+      final int c = uc(cp);
       if(c >= 'A' && c <= 'Z') tmp.add(c);
     }
 

@@ -14,6 +14,6 @@ import org.basex.util.similarity.*;
 public final class StringColognePhonetic extends StringFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return str(ColognePhonetic.encode(cps(toToken(arg(0), qc), null)));
+    return str(ColognePhonetic.encode(toToken(arg(0), qc)));
   }
 }

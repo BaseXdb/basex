@@ -330,10 +330,9 @@ final class JapaneseTokenizer extends Tokenizer {
       n = currToken.getBaseForm();
     }
     byte[] t = token(n);
-    final boolean a = ascii(t);
-    if(!a && !dc) t = noDiacritics(t);
-    if(cs == FTCase.UPPER) t = WesternTokenizer.upper(t, a);
-    else if(cs != FTCase.SENSITIVE) t = WesternTokenizer.lower(t, a);
+    if(!dc) t = noDiacritics(t);
+    if(cs == FTCase.UPPER) t = WesternTokenizer.upper(t);
+    else if(cs != FTCase.SENSITIVE) t = WesternTokenizer.lower(t);
     return toHankaku(t);
   }
 

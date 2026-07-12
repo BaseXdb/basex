@@ -40,6 +40,17 @@ public final class IOTest {
     assertTrue(io.url().endsWith("/x/🐾.txt"), "url: " + io.url());
   }
 
+  /** Database names, derived from file names. */
+  @Test public void dbName() {
+    assertEquals("x", new IOFile("x.xml").dbName());
+    // dots are invalid at the first and last position
+    assertEquals("x", new IOFile("x..xml").dbName());
+    // characters that denote multiple letters are expanded, all others are reduced
+    assertEquals("Strasse", new IOFile("Straße.xml").dbName());
+    assertEquals("THor", new IOFile("Þor.xml").dbName());
+    assertEquals("Malmo", new IOFile("Malmö.xml").dbName());
+  }
+
   /** URL construction. */
   @Test public void ioURL() {
     assertEquals("http:/"                   , new IOUrl("http:/").toString());

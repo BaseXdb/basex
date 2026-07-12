@@ -158,6 +158,24 @@ public final class FtModuleTest extends SandboxTest {
     query("'/' ! " + func.args(" ."), "/");
 
     query(_FT_NORMALIZE.args("a*", " { 'stemming': true(), 'language': 'de' }"), "a*");
+
+    // characters that denote multiple letters are expanded
+    query(func.args("straße"), "strasse");
+    query(func.args("STRAẞE"), "strasse");
+    query(func.args("Ærø"), "aero");
+    query(func.args("ǣ"), "ae");
+    query(func.args("Œuvre"), "oeuvre");
+    query(func.args("Þor"), "thor");
+    query(func.args("ĳssel"), "ijssel");
+    query(func.args("ﬁnance"), "finance");
+    query(func.args("ﬄue"), "fflue");
+
+    // modified letters are reduced to their base letter, not transliterated
+    query(func.args("Malmö Åre Guðmundur Łódź"), "malmo are gudmundur lodz");
+
+    // codepoints of the 1E00 block that are not mapped explicitly
+    query(func.args("Ḁ"), "a");
+    query(func.args("ẟ"), "ẟ");
   }
 
   /** Test method. */

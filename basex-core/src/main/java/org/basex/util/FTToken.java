@@ -46,16 +46,32 @@ public final class FTToken {
    * @return resulting token
    */
   public static byte[] noDiacritics(final byte[] token) {
-    final int tl = token.length;
-    final TokenBuilder tb = new TokenBuilder(tl);
+    if(Token.ascii(token)) return token;
+
+    final TokenBuilder tb = new TokenBuilder(token.length);
     Token.forEachCp(token, cp -> {
       if(cp < 0x80) {
         tb.add(cp);
       } else if(!isCombining(Character.getType(cp))) {
-        tb.add(noDiacritics(cp));
+        final byte[] letters = NORM_MULTI.get(cp);
+        if(letters != null) tb.add(letters);
+        else tb.add(noDiacritics(cp));
       }
     });
     return tb.finish();
+  }
+
+  /**
+   * Returns a codepoint without diacritics.
+   * @param cp codepoint to be normalized
+   * @return resulting character
+   */
+  private static int noDiacritics(final int cp) {
+    if(cp < 0xC0) return cp;
+    if(cp < 0x500) return NORM_0000[cp - 0xC0];
+    if(cp >= 0x1E00 && cp < 0x2000) return NORM_1E00[cp - 0x1E00];
+    final int c = NORM_XXXX.get(cp);
+    return c == Integer.MIN_VALUE ? cp : c;
   }
 
   /**
@@ -84,19 +100,6 @@ public final class FTToken {
       1 << Character.ENCLOSING_MARK |
       1 << Character.MODIFIER_LETTER
     )) != 0;
-  }
-
-  /**
-   * Returns a codepoint without diacritics.
-   * @param cp codepoint to be normalized
-   * @return resulting character
-   */
-  public static int noDiacritics(final int cp) {
-    if(cp < 0xC0) return cp;
-    if(cp < 0x500) return NORM_0000[cp - 0xC0];
-    if(cp >= 0x1E00 && cp < 0x2000) return NORM_1E00[cp - 0x1E00];
-    final int c = NORM_XXXX.get(cp);
-    return c == Integer.MIN_VALUE ? cp : c;
   }
 
   /** Codepoint mappings (basic). */
@@ -340,6 +343,20 @@ public final class FTToken {
     { '\uFB4C', '\u05D1'}, { '\uFB4D', '\u05DB'}, { '\uFB4E', '\u05E4'}
   };
 
+  /** Codepoint mappings for characters that denote more than a single letter. */
+  private static final String[][] NCMULTI = {
+    // ligatures and digraphs: AE, OE, IJ
+    { "Æ", "AE" }, { "æ", "ae" }, { "Ǣ", "AE" }, { "ǣ", "ae" }, { "Ǽ", "AE" }, { "ǽ", "ae" },
+    { "Œ", "OE" }, { "œ", "oe" }, { "Ĳ", "IJ" }, { "ĳ", "ij" },
+    // sharp s: mapped to ss/SS by Unicode full case folding
+    { "ß", "ss" }, { "ẞ", "SS" },
+    // thorn: no base letter to fall back to
+    { "Þ", "TH" }, { "þ", "th" },
+    // Latin presentation forms
+    { "ﬀ", "ff" }, { "ﬁ", "fi" }, { "ﬂ", "fl" }, { "ﬃ", "ffi" }, { "ﬄ", "ffl" }, { "ﬅ", "st" },
+    { "ﬆ", "st" }
+  };
+
   // lazy initialization
   static {
     char[] norm = new char[0x440];
@@ -355,6 +372,10 @@ public final class FTToken {
     final IntMap map = new IntMap();
     for(final char[] aNC : NCXXXX) map.put(aNC[0], aNC[1]);
     NORM_XXXX = map;
+
+    final IntObjectMap<byte[]> multi = new IntObjectMap<>();
+    for(final String[] aNC : NCMULTI) multi.put(aNC[0].codePointAt(0), Token.token(aNC[1]));
+    NORM_MULTI = multi;
   }
 
   /** Mapping table for codepoints from 0000-0500. */
@@ -363,4 +384,6 @@ public final class FTToken {
   private static final char[] NORM_1E00;
   /** Additionally mapped codepoints. */
   private static final IntMap NORM_XXXX;
+  /** Codepoints that are expanded to multiple letters. */
+  private static final IntObjectMap<byte[]> NORM_MULTI;
 }

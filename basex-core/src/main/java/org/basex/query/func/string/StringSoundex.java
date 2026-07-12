@@ -14,6 +14,6 @@ import org.basex.util.similarity.*;
 public final class StringSoundex extends StringFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return str(Soundex.encode(cps(toToken(arg(0), qc), null)));
+    return str(Soundex.encode(toToken(arg(0), qc)));
   }
 }

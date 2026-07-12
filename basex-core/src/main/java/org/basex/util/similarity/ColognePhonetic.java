@@ -38,21 +38,17 @@ public final class ColognePhonetic {
   private static final byte[] TDX = token("tdx");
 
   /**
-   * Encodes a codepoint array.
-   * @param cps input codepoints
+   * Encodes a token.
+   * @param token token
    * @return encoded codepoints
    */
-  public static int[] encode(final int[] cps) {
-    // normalize input; drop combining marks (they would be treated as separators)
-    final IntList tmp = new IntList(cps.length);
-    for(final int cp : cps) {
-      if(!combining(cp)) tmp.add(lc(noDiacritics(cp)));
-    }
+  public static int[] encode(final byte[] token) {
+    // normalize input; combining marks are dropped (they would be treated as separators)
+    final int[] in = cps(noDiacritics(token));
+    final int il = in.length;
+    for(int c = 0; c < il; c++) in[c] = lc(in[c]);
 
     final IntList out = new IntList();
-    final int[] in = tmp.finish();
-    final int il = in.length;
-
     int lastCp = '-', lastCode = '/';
     for(int ip = il; ip > 0;) {
       final int cp = in[il - ip--];

@@ -157,9 +157,10 @@ public final class Levenshtein {
    * @return normalized token
    */
   private static int[] normalize(final byte[] token) {
-    final int[] cps = cps(token);
+    // fold before lowercasing: expansions are case-preserving (ß -> ss, ẞ -> SS)
+    final int[] cps = cps(noDiacritics(token));
     final int cl = cps.length;
-    for(int c = 0; c < cl; c++) cps[c] = noDiacritics(lc(cps[c]));
+    for(int c = 0; c < cl; c++) cps[c] = lc(cps[c]);
     return cps;
   }
 

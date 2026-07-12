@@ -25,6 +25,9 @@ public final class StringModuleTest extends SandboxTest {
     colognePhonetic("ßüöä", "8");
     colognePhonetic("suoa", "8");
 
+    // characters that denote multiple letters are expanded
+    cologneEquals("straße", "strasse");
+
     colognePhonetic("Aabjoe", "01");
     colognePhonetic("Aaclan", "0856");
     colognePhonetic("Aychlmajr", "04567");
@@ -515,6 +518,10 @@ public final class StringModuleTest extends SandboxTest {
     query(func.args("Smith"), "S530");
     query(func.args("Smythe"), "S530");
     query(func.args("Williams"), "W452");
+
+    // characters that denote multiple letters are expanded
+    query(func.args("straße"), "S362");
+    query(func.args("Þor"), "T600");
 
     query(func.args("testing"), "T235");
     query(func.args("The"), "T000");

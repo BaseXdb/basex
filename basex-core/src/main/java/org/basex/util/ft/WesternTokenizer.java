@@ -122,11 +122,9 @@ public final class WesternTokenizer extends Tokenizer {
     byte[] t = token();
     if(original) return t;
 
-    final boolean a = ascii(t);
-    if(!a && !diacritics) t = noDiacritics(t);
-    final FTCase cs = casesens;
-    if(cs == FTCase.UPPER) t = upper(t, a);
-    else if(cs != FTCase.SENSITIVE) t = lower(t, a);
+    if(!diacritics) t = noDiacritics(t);
+    if(casesens == FTCase.UPPER) t = upper(t);
+    else if(casesens != FTCase.SENSITIVE) t = lower(t);
     return t;
   }
 
@@ -262,12 +260,11 @@ public final class WesternTokenizer extends Tokenizer {
   /**
    * Converts the specified token to upper case.
    * @param token token to be converted
-   * @param ascii ascii flag
    * @return the converted token
    */
-  static byte[] upper(final byte[] token, final boolean ascii) {
-    final int tl = token.length;
-    if(ascii) {
+  static byte[] upper(final byte[] token) {
+    if(ascii(token)) {
+      final int tl = token.length;
       for(int i = 0; i < tl; ++i) token[i] = (byte) uc(token[i]);
       return token;
     }
@@ -279,12 +276,11 @@ public final class WesternTokenizer extends Tokenizer {
   /**
    * Converts the specified token to lower case.
    * @param token token to be converted
-   * @param ascii ascii flag
    * @return the converted token
    */
-  static byte[] lower(final byte[] token, final boolean ascii) {
-    final int tl = token.length;
-    if(ascii) {
+  static byte[] lower(final byte[] token) {
+    if(ascii(token)) {
+      final int tl = token.length;
       for(int i = 0; i < tl; ++i) token[i] = (byte) lc(token[i]);
       return token;
     }
