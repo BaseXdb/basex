@@ -150,6 +150,7 @@ public final class FTIndex extends ValueIndex {
   @Override
   public EntryIterator entries(final IndexEntries entries) {
     final byte[] token = entries.token();
+    if(entries.errors >= 0) return fuzzyEntries(token, entries.errors);
 
     return new EntryIterator() {
       int p = token.length - 1, start, end, nr;
@@ -337,6 +338,57 @@ public final class FTIndex extends ValueIndex {
    */
   private int size(final long pt, final int lt) {
     return dataY.read4(pt + lt + 5);
+  }
+
+  /**
+   * Returns all index entries that are similar to the specified token.
+   * @param token token to look for
+   * @param errors number of allowed errors (dynamic calculation if the value is {@code 0})
+   * @return entry iterator
+   */
+  private EntryIterator fuzzyEntries(final byte[] token, final int errors) {
+    final int tokl = token.length, pl = positions.length;
+    final int k = errors > 0 ? errors : tokl >> 2;
+    final int last = Math.min(pl - 2, tokl + k);
+
+    return new EntryIterator() {
+      int s = Math.max(1, tokl - k) - 1, p, e, nr;
+
+      @Override
+      public byte[] next() {
+        synchronized(FTIndex.this) {
+          while(true) {
+            // loop through all entries with the same character length
+            if(p < e) {
+              final byte[] entry = dataY.readBytes(p, s);
+              final long pos = p;
+              p += s + ENTRY;
+              if(ls.similar(entry, token, k)) {
+                nr = FTIndex.this.size(pos, s);
+                return entry;
+              }
+            } else {
+              // find next group of entries
+              if(++s > last) return null;
+              p = positions[s];
+              if(p == -1) {
+                p = 0;
+                e = 0;
+              } else {
+                int c = s + 1;
+                e = -1;
+                while(c < pl && e == -1) e = positions[c++];
+              }
+            }
+          }
+        }
+      }
+
+      @Override
+      public int count() {
+        return nr;
+      }
+    };
   }
 
   /**

@@ -1,5 +1,6 @@
 package org.basex.query.func.ft;
 
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
@@ -20,13 +21,25 @@ public final class FtTokens extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
-    byte[] prefix = toZeroToken(arg(1), qc);
-    if(prefix.length != 0) {
+    final FtTokensOptions options = toOptions(arg(2), new FtTokensOptions(), qc);
+
+    byte[] token = toZeroToken(arg(1), qc);
+    if(token.length != 0) {
       final FTLexer lexer = new FTLexer(new FTOpt().assign(data.meta));
-      lexer.init(prefix);
-      prefix = lexer.nextToken();
+      lexer.init(token);
+      token = lexer.nextToken();
     }
-    return IndexFn.entries(data, new IndexEntries(prefix, IndexType.FULLTEXT), this);
+
+    final IndexEntries entries;
+    if(token.length != 0 && options.get(FtTokensOptions.FUZZY)) {
+      final int errors = options.contains(FtTokensOptions.ERRORS) ?
+        options.get(FtTokensOptions.ERRORS) : qc.context.options.get(MainOptions.LSERROR);
+      // negative values are treated like 0: the number of errors is computed dynamically
+      entries = new IndexEntries(token, Math.max(0, errors), IndexType.FULLTEXT);
+    } else {
+      entries = new IndexEntries(token, IndexType.FULLTEXT);
+    }
+    return IndexFn.entries(data, entries, this);
   }
 
   @Override

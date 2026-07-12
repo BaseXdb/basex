@@ -259,4 +259,34 @@ public final class FtModuleTest extends SandboxTest {
     // an empty search term returns all entries
     query("count(" + func.args(NAME, " ()") + ')', 7);
   }
+
+  /** Test method. */
+  @Test public void tokensFuzzy() {
+    final Function func = _FT_TOKENS;
+    final String fuzzy = " { 'fuzzy': true(), 'errors': 1 }";
+
+    // entries within the maximum number of errors are returned
+    query(func.args(NAME, "exercse", fuzzy) + "/text()", "exercise");
+    query(func.args(NAME, "xnl", fuzzy) + "/text()", "xml");
+    query("count(" + func.args(NAME, "zzzzzz", fuzzy) + ')', 0);
+
+    // the term is matched as a whole, not as a prefix
+    query("count(" + func.args(NAME, "exerc", fuzzy) + ')', 0);
+    query("count(" + func.args(NAME, "exerc") + ')', 1);
+    query(func.args(NAME, "exerc", " { 'fuzzy': true(), 'errors': 3 }") + "/text()", "exercise");
+
+    // the counts of the index are preserved
+    query(func.args(NAME, "exercse", fuzzy) + "/@count/string()", 2);
+
+    // dynamic number of errors; negative values are treated like 0
+    query(func.args(NAME, "exercse", " { 'fuzzy': true() }") + "/text()", "exercise");
+    query("count(" + func.args(NAME, "xnl", " { 'fuzzy': true() }") + ')', 0);
+    query(func.args(NAME, "exercse", " { 'fuzzy': true(), 'errors': 0 }") + "/text()", "exercise");
+    query(func.args(NAME, "exercse", " { 'fuzzy': true(), 'errors': -1 }") + "/text()", "exercise");
+
+    // without a search term, the option has no effect
+    query("count(" + func.args(NAME, " ()", " { 'fuzzy': true() }") + ')', 7);
+
+    error(func.args(NAME, "a", " { 'unknown': 1 }"), INVALIDOPTION_X);
+  }
 }

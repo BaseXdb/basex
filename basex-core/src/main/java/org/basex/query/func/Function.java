@@ -1605,8 +1605,8 @@ public enum Function implements AFunction {
   _FT_TOKENIZE(FtTokenize::new, "tokenize(value[,options])",
       params(STRING_ZO, MAP_ZO), STRING_ZM, FT_URI),
   /** XQuery function. */
-  _FT_TOKENS(FtTokens::new, "tokens(database[,prefix])",
-      params(STRING_O, STRING_ZO), ELEMENT_ZM, flag(NDT), FT_URI),
+  _FT_TOKENS(FtTokens::new, "tokens(database[,prefix,options])",
+      params(STRING_O, STRING_ZO, MAP_ZO), ELEMENT_ZM, flag(NDT), FT_URI),
 
   // HOF Module
 
