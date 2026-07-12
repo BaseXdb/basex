@@ -255,6 +255,37 @@ public final class StringModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void partialRatio() {
+    final Function func = _STRING_PARTIAL_RATIO;
+    // the shorter string is compared with the best matching substring of the longer one
+    query(func.args("Rembrandt", "Rembrandt van Rijn"), 1);
+    query(func.args("Rembrandt van Rijn", "Rembrandt"), 1);
+
+    // the measure is symmetric; strings of equal length yield the levenshtein similarity
+    query(func.args("bbc", "bdb"), 1e0 / 3);
+    query(func.args("bdb", "bbc"), 1e0 / 3);
+    query(func.args("night", "nacht"), 0.6);
+    query(func.args("van Rijn", "Rembrandt van Rijn"), 1);
+    query(func.args("Rembrant", "Rembrandt van Rijn"), 0.875);
+    // a transposition is a single edit
+    query(func.args("ba", "xxabxx"), 0.5);
+    query(func.args("abc", "abc"), 1);
+    query(func.args("", ""), 1);
+    query(func.args("", "abc"), 0);
+    query(func.args("abc", ""), 0);
+    query(func.args("xyz", "abc"), 0);
+    query(func.args("c", "abcdef"), 1);
+    query(func.args("abcdef", "cd"), 1);
+    query(func.args(" '&#x1D11E;'", " 'x&#x1D11E;y'"), 1);
+
+    // options
+    query(func.args("RÜBENS", "peter paul rubens",
+        " { 'case': 'insensitive', 'diacritics': 'insensitive' }"), 1);
+
+    error(func.args(" string-join(replicate('x', 10001))", "x"), STRING_BOUNDS_X);
+  }
+
+  /** Test method. */
   @Test public void ngramSimilarity() {
     final Function func = _STRING_NGRAM_SIMILARITY;
     // default n-gram length (2)

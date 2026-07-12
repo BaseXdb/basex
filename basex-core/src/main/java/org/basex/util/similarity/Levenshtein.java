@@ -228,6 +228,45 @@ public final class Levenshtein {
   }
 
   /**
+   * Compares the shorter of two codepoint arrays with the best matching substring of the longer
+   * one and returns a double value (0.0 - 1.0): {@code 1.0 - distance / length of shorter array}.
+   * @param cps1 first codepoints array
+   * @param cps2 second codepoints array
+   * @return similarity (0.0 - 1.0)
+   */
+  public static double partial(final int[] cps1, final int[] cps2) {
+    // strings of equal length: the best matching substring is the string itself
+    if(cps1.length == cps2.length) return distance(cps1, cps2);
+
+    final boolean swap = cps1.length > cps2.length;
+    final int[] pattern = swap ? cps2 : cps1, text = swap ? cps1 : cps2;
+    final int pl = pattern.length, tl = text.length;
+    if(pl == 0) return 0;
+
+    // the first row is zero: the pattern may start at any position of the text
+    int[] prev2 = new int[tl + 1], prev = new int[tl + 1], curr = new int[tl + 1];
+    for(int p = 1; p <= pl; p++) {
+      curr[0] = p;
+      for(int t = 1; t <= tl; t++) {
+        final int cost = pattern[p - 1] == text[t - 1] ? 0 : 1;
+        int cst = min(prev[t] + 1, curr[t - 1] + 1, prev[t - 1] + cost);
+        if(p > 1 && t > 1 && pattern[p - 1] == text[t - 2] && pattern[p - 2] == text[t - 1])
+          cst = Math.min(cst, prev2[t - 2] + 1);
+        curr[t] = cst;
+      }
+      final int[] tmp = prev2;
+      prev2 = prev;
+      prev = curr;
+      curr = tmp;
+    }
+
+    // the pattern may end at any position of the text
+    int dist = pl;
+    for(int t = 0; t <= tl; t++) dist = Math.min(dist, prev[t]);
+    return (double) (pl - dist) / pl;
+  }
+
+  /**
    * Gets the minimum of three values.
    * @param a 1st value
    * @param b 2nd value

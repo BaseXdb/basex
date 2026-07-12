@@ -1937,6 +1937,9 @@ public enum Function implements AFunction {
   _STRING_NGRAMS(StringNgrams::new, "ngrams(value[,n,options])",
       params(STRING_O, INTEGER_ZO, MAP_ZO), STRING_ZM, STRING_URI),
   /** XQuery function. */
+  _STRING_PARTIAL_RATIO(StringPartialRatio::new, "partial-ratio(value1,value2[,options])",
+      params(STRING_O, STRING_O, MAP_ZO), DOUBLE_O, STRING_URI),
+  /** XQuery function. */
   _STRING_SOUNDEX(StringSoundex::new, "soundex(value)",
       params(STRING_O), STRING_O, STRING_URI),
   /** XQuery function. */
