@@ -472,16 +472,17 @@ public class Options implements Iterable<Option<?>> {
   }
 
   /**
-   * Returns an error string for an unknown option.
+   * Returns an error string for an unknown option, followed by a similar or all allowed options.
    * @param option option
    * @param options options
    * @return error string
    */
   public static String similar(final Object option, final Map<String, Option<?>> options) {
-    final String similar = Levenshtein.similar(token(option),
-        options.keySet().toArray(String[]::new));
-    return similar != null ? Util.info(Text.UNKNOWN_OPT_SIMILAR_X_X, option, similar) :
-      unknown(option);
+    final String[] names = options.keySet().stream().sorted().toArray(String[]::new);
+    final String similar = Levenshtein.similar(token(option), names);
+    if(similar != null) return Util.info(Text.UNKNOWN_OPT_SIMILAR_X_X, option, similar);
+    return names.length == 0 ? unknown(option) :
+      Util.info(Text.UNKNOWN_OPT_ONEOF_X_X, option, list(names));
   }
 
   /**
@@ -699,15 +700,24 @@ public class Options implements Iterable<Option<?>> {
    * @return exception
    */
   public static String allowed(final Option<?> option, final String value, final Object... all) {
-    final TokenBuilder vals = new TokenBuilder();
-    for(final Object a : all) {
-      if(!vals.isEmpty()) vals.add(',');
-      vals.add(a);
-    }
-    return Util.info(Text.OPT_ONEOF_X_X_X, option.name(), value, vals);
+    return Util.info(Text.OPT_ONEOF_X_X_X, option.name(), value, list(all));
   }
 
   // PRIVATE METHODS ==============================================================================
+
+  /**
+   * Returns a comma-separated list of the specified values.
+   * @param values values
+   * @return list
+   */
+  private static String list(final Object... values) {
+    final TokenBuilder tb = new TokenBuilder();
+    for(final Object value : values) {
+      if(!tb.isEmpty()) tb.add(", ");
+      tb.add(value);
+    }
+    return tb.toString();
+  }
 
   /**
    * Returns all options from the specified class.

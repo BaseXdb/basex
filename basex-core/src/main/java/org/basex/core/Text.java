@@ -800,6 +800,8 @@ public interface Text {
   String UNKNOWN_OPTION_X = lang("unknown_option_%");
   /** Unknown command error. */
   String UNKNOWN_OPT_SIMILAR_X_X = lang("unknown_option_%") + ' ' + lang("similar_cmd_%");
+  /** Unknown option, followed by the allowed options. */
+  String UNKNOWN_OPT_ONEOF_X_X = lang("unknown_option_%") + " Allowed: %.";
 
   // INFO STRINGS =================================================================================
 
