@@ -40,9 +40,10 @@ public final class BaseXLayout {
   /** Flag for adding rendering hints. */
   private static boolean hints = true;
 
-  /** Shortcut string for meta key. */
-  private static final String META = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx() ==
-      InputEvent.CTRL_DOWN_MASK ? "ctrl" : "meta";
+  /** Shortcut string for meta key (short-circuited, for headless tests). */
+  private static final String META = GraphicsEnvironment.isHeadless() ||
+      Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx() == InputEvent.CTRL_DOWN_MASK ?
+      "ctrl" : "meta";
 
   /** Key listener for global shortcuts. */
   private static KeyListener keys;

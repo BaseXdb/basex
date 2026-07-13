@@ -100,8 +100,8 @@ public final class SyntaxXQueryTest {
     // a built-in function, addressed by its namespace
     check(fn + "count(1)", "S".repeat(fn.length()) + "KKKKK.N.");
     // the local name of a user-defined namespace is no keyword, even if a built-in shares it
-    check(uri + "count(1)", "S".repeat(uri.length()) + ".......N.");
-    check(uri + "f(1)", "S".repeat(uri.length()) + "...N.");
+    check(uri + "count(1)", "S".repeat(uri.length()) + "......N.");
+    check(uri + "f(1)", "S".repeat(uri.length()) + "..N.");
   }
 
   /** String literals. */

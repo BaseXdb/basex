@@ -622,7 +622,7 @@ public final class TextEditor {
     for(int p = 0; p < tl; p += cl(text, p)) {
       syntax.color(text, p, p + cl(text, p));
       final int cp = cp(text, p);
-      final boolean code = syntax.codeBefore() || syntax.codeAfter();
+      final boolean code = syntax.code();
       final int opening = Syntax.OPENING.indexOf(cp), closing = Syntax.CLOSING.indexOf(cp);
       // the caret is on no bracket, or on one that is no code: jump to the enclosing bracket
       if(p == caret && (!code || opening == -1 && closing == -1)) break;
