@@ -217,6 +217,8 @@ public final class GUIConstants {
   /** Cell color. */
   public static Color lightGray;
   /** Button color. */
+  public static Color softerGray;
+  /** Button color. */
   public static Color gray;
   /** Middle gray color. */
   public static Color middleGray;
@@ -363,6 +365,7 @@ public final class GUIConstants {
 
     paleGray = color(240, 240, 240);
     lightGray = color(224, 224, 224);
+    softerGray = color(192, 192, 192);
     gray = color(160, 160, 160);
     middleGray = color(128, 128, 128);
     darkGray = color(64, 64, 64);

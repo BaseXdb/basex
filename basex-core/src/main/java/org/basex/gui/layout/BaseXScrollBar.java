@@ -4,7 +4,6 @@ import java.awt.*;
 import java.awt.event.*;
 
 import org.basex.gui.*;
-import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -16,47 +15,33 @@ import org.basex.util.list.*;
  */
 public final class BaseXScrollBar extends BaseXPanel {
   /** Scrollbar width. */
-  private static final int SIZE = 18;
-  /** Maximum scrolling speed. */
-  private static final int MAXSTEP = 15;
-  /** Animated scrollbar zooming steps. */
-  private static final int[] STEPS = { -MAXSTEP, -14, -11, -8, -6, -4, -3,
-      -2, -1, -1, 0, 0, 1, 1, 2, 3, 4, 6, 8, 11, 14, MAXSTEP };
-  /** Minimum size for the scrollbar slider. */
-  private static final int MINSIZE = 20;
+  private static final int SIZE = 14;
+  /** Width of the slider. */
+  private static final int SLIDER = SIZE - 6;
+  /** Width of the active slider. */
+  private static final int SLIDER_ACTIVE = SIZE - 4;
+  /** Minimum height of the slider. */
+  private static final int MINSIZE = 28;
 
   /** Reference to the scrolled component. */
   private final BaseXPanel comp;
 
-  /** Current scrolling speed. */
-  private int step = STEPS.length / 2;
-  /** Flag reporting if the scrollbar animation is running. */
-  private boolean animated;
   /** Scrollbar height. */
   private int hh;
   /** Scrollbar slider position. */
   private int barPos;
   /** Scrollbar slider size. */
   private int barSize;
-  /** Scrollbar dragging position. */
+  /** Scrollbar dragging offset. */
   private int dragPos;
-  /** Flag for button clicks. */
-  private boolean button;
-  /** Flag for scrolling downward. */
-  private boolean down;
-  /** Flag for sliding the scrollbar. */
+  /** Flag for dragging the slider. */
   private boolean sliding;
-  /** Flag for moving upward. */
-  private boolean moving;
+  /** Flag for hovering the scrollbar. */
+  private boolean hover;
   /** Current panel position. */
   private int pos;
   /** Current panel height. */
   private int height;
-
-  /** Flag for scrolling upward. */
-  private boolean up;
-  /** Scrollbar slider offset. */
-  private int barOffset;
 
   /** Document-space y of the search hits ({@code null} if there are none). */
   private IntList markPos;
@@ -79,6 +64,7 @@ public final class BaseXScrollBar extends BaseXPanel {
     addMouseListener(this);
     addKeyListener(this);
     addMouseMotionListener(this);
+    addMouseWheelListener(this);
     setOpaque(false);
     refreshLayout();
   }
@@ -134,161 +120,106 @@ public final class BaseXScrollBar extends BaseXPanel {
   public void paintComponent(final Graphics g) {
     hh = getHeight();
     super.paintComponent(g);
+
+    // paint track: adopt the background of the scrolled component
+    g.setColor(comp.getBackground());
+    g.fillRect(0, 0, SIZE, hh);
     if(hh >= height) return;
 
-    // calculate bar size
-    final int barH = hh - (SIZE << 1) + 4;
-    final double factor = (barH - barOffset) / (double) height;
-    int size = (int) (hh * factor);
-    // define minimum size for scrollbar mover
-    barOffset = Math.max(0, MINSIZE - size);
-    size += barOffset;
-    barSize = Math.min(size, barH - 1);
-    barPos = (int) Math.max(0, Math.min(pos * factor, barH - barSize));
+    // calculate slider size and position
+    barSize = Math.min(hh, Math.max(MINSIZE, (int) ((long) hh * hh / height)));
+    final int travel = hh - barSize;
+    barPos = travel <= 0 ? 0 :
+      (int) ((long) Math.min(pos, height - hh) * travel / (height - hh));
 
-    // paint scrollbar background
-    g.setColor(GUIConstants.panelColor);
-    g.fillRect(0, 0, SIZE, hh);
+    paintMarks(g);
 
-    // draw the search hits below the slider
-    paintMarks(g, barH);
-
-    // draw scroll slider
-    int bh = SIZE - 2 + barPos;
-    BaseXLayout.drawCell(g, 0, SIZE, bh, bh + barSize, false);
-
-    final int d = 2;
-    bh += barSize / 2;
-    g.setColor(GUIConstants.darkGray);
-    g.drawLine(5, bh, SIZE - 6, bh);
-    g.drawLine(5, bh - d, SIZE - 6, bh - d);
-    g.drawLine(5, bh + d, SIZE - 6, bh + d);
+    // paint slider: grows and darkens while it is hovered or dragged
+    final boolean active = sliding || hover;
+    final int w = active ? SLIDER_ACTIVE : SLIDER;
+    g.setColor(active ? GUIConstants.color2A : GUIConstants.color3A);
     BaseXLayout.antiAlias(g);
-
-    // draw scroll buttons
-    drawButton(g, new int[][] { { 0, 6, 3 }, { 6, 6, 0 } }, 0, button && up);
-    drawButton(g, new int[][] { { 0, 6, 3 }, { 0, 0, 6 } }, hh - SIZE, button && down);
-
-    // paint scrollbar lines
-    g.setColor(GUIConstants.gray);
-    g.drawLine(0, 0, 0, hh);
-    g.drawLine(SIZE - 1, 0, SIZE - 1, hh);
+    g.fillRoundRect((SIZE - w) / 2, barPos, w, barSize, w / 2, w / 2);
   }
 
   /**
    * Draws a marker for each search hit, rasterized to the pixel rows of the slider track.
    * @param g graphics reference
-   * @param barH height of the slider track
    */
-  private void paintMarks(final Graphics g, final int barH) {
-    if(markPos == null || markPos.isEmpty() || barH < 1) return;
+  private void paintMarks(final Graphics g) {
+    if(markPos == null || markPos.isEmpty() || hh < 2) return;
 
-    if(markRows == null || markHeight != barH || markTotal != height) {
-      markHeight = barH;
+    if(markRows == null || markHeight != hh || markTotal != height) {
+      markHeight = hh;
       markTotal = height;
-      markRows = new boolean[barH];
+      markRows = new boolean[hh];
       final int ms = markPos.size();
-      for(int m = 0; m < ms; m++) markRows[row(markPos.get(m), barH)] = true;
+      for(int m = 0; m < ms; m++) markRows[row(markPos.get(m))] = true;
     }
     g.setColor(GUIConstants.color2);
-    for(int r = 0; r < barH; r++) {
-      if(markRows[r]) g.fillRect(3, markY(r), SIZE - 7, 2);
+    for(int r = 0; r < hh; r++) {
+      if(markRows[r]) g.fillRect(0, Math.min(r, hh - 2), SIZE, 2);
     }
-  }
-
-  /**
-   * Returns the screen y of a marker, clamped to stay clear of the scroll buttons.
-   * The slider track overlaps them by two pixels, and they are painted on top of the markers.
-   * @param r pixel row of the slider track
-   * @return screen y
-   */
-  private int markY(final int r) {
-    return Math.max(SIZE, Math.min(hh - SIZE - 2, SIZE - 2 + r));
   }
 
   /**
    * Returns the pixel row of the slider track that represents the specified document-space y.
-   * The slider scaling factor must not be used: {@link #barOffset} shrinks it.
    * @param y document-space y
-   * @param barH height of the slider track
    * @return pixel row
    */
-  private int row(final int y, final int barH) {
-    return Math.max(0, Math.min(barH - 1, (int) ((long) y * barH / height)));
+  private int row(final int y) {
+    return Math.max(0, Math.min(hh - 1, (int) ((long) y * hh / height)));
   }
 
   /**
-   * Draws the down/up button.
-   * @param g graphics reference
-   * @param pol polygons
-   * @param y vertical start value
-   * @param focus focus flag
+   * Moves the slider to the specified position and scrolls the component.
+   * @param barY new slider position
    */
-  private static void drawButton(final Graphics g, final int[][] pol, final int y,
-      final boolean focus) {
-    BaseXLayout.drawCell(g, 0, SIZE, y, y + SIZE, focus);
-    final int pl = pol[0].length;
-    for(int i = 0; i < pl; ++i) {
-      pol[0][i] += SIZE / 2 - 3;
-      pol[1][i] += y + SIZE / 2 - 3;
-    }
-    g.setColor(focus ? GUIConstants.textColor : GUIConstants.darkGray);
-    g.fillPolygon(pol[0], pol[1], 3);
+  private void scroll(final int barY) {
+    final int travel = hh - barSize;
+    barPos = Math.max(0, Math.min(travel, barY));
+    pos = travel <= 0 ? 0 : (int) ((long) barPos * (height - hh) / travel);
+    comp.repaint();
   }
 
   @Override
   public void mousePressed(final MouseEvent e) {
+    if(height <= hh) return;
+
+    // jump to the clicked position if the slider was not hit
     final int y = e.getY();
-    sliding = y > SIZE + barPos && y < SIZE + barPos + barSize;
-    moving = !sliding;
-    up = y < SIZE + barPos;
-    down = y > SIZE + barPos + barSize;
-    button = y < SIZE || y > hh - SIZE;
-    if(sliding) dragPos = barPos - y;
-
-    // start dragging
-    if(sliding || animated) return;
-
-    new Thread(() -> {
-      // scroll up/down/move slider
-      animated = moving;
-      while(animated) {
-        if(moving) step = Math.max(0, Math.min(STEPS.length - 1, step + (down ? 1 : -1)));
-        else step += step < STEPS.length / 2 ? 1 : -1;
-        int offset = STEPS[step];
-
-        if(!button) offset = offset * hh / MAXSTEP / 4;
-        pos = Math.max(0, Math.min(height - hh, pos + offset));
-        comp.repaint();
-        Performance.sleep(25);
-        animated = step != STEPS.length / 2;
-
-        if(y > SIZE + barPos && y < SIZE + barPos + barSize) {
-          dragPos = barPos - y;
-          animated = false;
-          sliding = true;
-          step = STEPS.length / 2;
-        }
-      }
-    }).start();
+    if(y < barPos || y >= barPos + barSize) scroll(y - barSize / 2);
+    dragPos = barPos - y;
+    sliding = true;
+    repaint();
   }
 
   @Override
   public void mouseReleased(final MouseEvent e) {
-    up = false;
-    down = false;
-    moving = false;
     sliding = false;
+    hover = contains(e.getX(), e.getY());
     comp.repaint();
   }
 
   @Override
   public void mouseDragged(final MouseEvent e) {
-    // no dragging...
-    if(!sliding) return;
+    if(sliding) scroll(e.getY() + dragPos);
+  }
 
-    pos = (int) ((long) (e.getY() + dragPos) * height / (hh - (SIZE << 1)));
-    pos = Math.max(0, Math.min(height - hh, pos));
-    comp.repaint();
+  @Override
+  public void mouseEntered(final MouseEvent e) {
+    hover = true;
+    repaint();
+  }
+
+  @Override
+  public void mouseExited(final MouseEvent e) {
+    hover = false;
+    repaint();
+  }
+
+  @Override
+  public void mouseWheelMoved(final MouseWheelEvent e) {
+    comp.mouseWheelMoved(e);
   }
 }
