@@ -78,7 +78,9 @@ public final class MapTest extends SandboxTest {
 
   /** GitHub bug (#1012). */
   @Test public void gh1012() {
-    error("{}(())", INVTYPE_X);
+    error("{}(())", INVKEY_X_X);
+    error("{ 'a': 1 }((1, 2))", INVKEY_X_X);
+    error("{ 'a': 1 }(void(()))", INVKEY_X_X);
   }
 
   /** GitHub bug (#1297). */

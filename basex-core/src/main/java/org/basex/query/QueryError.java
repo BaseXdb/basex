@@ -1124,6 +1124,8 @@ public enum QueryError {
   /** Error code. */
   RECORDFIELD_X_X(XPTY, 4, "% has no field named %."),
   /** Error code. */
+  INVKEY_X_X(XPTY, 4, "Single key expected for % lookup: %."),
+  /** Error code. */
   CALCTYPE_X_X_X_X_X(XPTY, 4, "Arithmetics not defined for % and %: % % %."),
   /** Error code. */
   INVFUNCITEM_X_X(XPTY, 4, "Function expected, % found: %."),

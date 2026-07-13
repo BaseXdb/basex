@@ -50,6 +50,10 @@ public final class ArrayTest extends SandboxTest {
 
     error("[1]?(string(<_>1</_>))", INVTYPE_X);
 
+    error("[ 1 ](())", INVKEY_X_X);
+    error("[ 1 ]((1, 2))", INVKEY_X_X);
+    error("[ 1 ](void(()))", INVKEY_X_X);
+
     error("[](0)", ARRAYEMPTY);
     error("[](1)", ARRAYEMPTY);
     error("[ 1 ](-5000000000)", ARRAYBOUNDS_X_X);

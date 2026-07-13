@@ -7,7 +7,6 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -108,11 +107,11 @@ public abstract class XQStruct extends FItem {
    * @return key
    * @throws QueryException query exception
    */
-  protected static Item key(final Value key, final QueryContext qc, final InputInfo ii)
+  protected final Item key(final Value key, final QueryContext qc, final InputInfo ii)
       throws QueryException {
-    final Item item = key.atomItem(qc, ii);
-    if(item == Empty.VALUE) throw typeError(item, BasicType.ITEM, ii);
-    return item;
+    final Value value = key.atomValue(qc, ii);
+    if(value.size() != 1) throw INVKEY_X_X.get(ii, description(), value);
+    return (Item) value;
   }
 
   @Override

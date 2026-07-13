@@ -93,15 +93,18 @@ public final class DynFuncCall extends FuncCall {
 
     // assign function type
     final int nargs = exprs.length - 1;
+    final Type ftype = func.seqType().type;
+    final boolean struct = ftype instanceof MapType || ftype instanceof ArrayType;
     final FuncType ft = func.funcType();
     if(ft != null) {
       if(ft.argTypes != null) {
         final int arity = ft.argTypes.length;
         if(nargs != arity) throw arityError(func, nargs, arity, false, info);
-        for(int a = 0; a < arity; ++a) {
-          final SeqType st = func.seqType().type instanceof MapType
-              ? Types.ANY_ATOMIC_TYPE_O : ft.argTypes[a];
-          exprs[a] = new TypeCheck(info, exprs[a], st).compile(cc);
+        // keys of maps and arrays are atomized and checked by the lookup itself
+        if(!struct) {
+          for(int a = 0; a < arity; ++a) {
+            exprs[a] = new TypeCheck(info, exprs[a], ft.argTypes[a]).compile(cc);
+          }
         }
       }
       if(!updating && ft.anns.contains(Annotation.UPDATING)) {
@@ -110,7 +113,7 @@ public final class DynFuncCall extends FuncCall {
       exprType.assign(ft.refinedType);
     }
 
-    if(func instanceof XQStruct) {
+    if(struct) {
       // lookup key must be atomic
       if(nargs == 1) arg(0, arg -> arg.simplifyFor(Simplify.DATA, cc));
       // pre-evaluation is safe as maps and arrays contain values

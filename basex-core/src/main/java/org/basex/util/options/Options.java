@@ -482,7 +482,7 @@ public class Options implements Iterable<Option<?>> {
     final String similar = Levenshtein.similar(token(option), names);
     if(similar != null) return Util.info(Text.UNKNOWN_OPT_SIMILAR_X_X, option, similar);
     return names.length == 0 ? unknown(option) :
-      Util.info(Text.UNKNOWN_OPT_ONEOF_X_X, option, list(names));
+      Util.info(Text.UNKNOWN_OPT_ONEOF_X_X, option, list((Object[]) names));
   }
 
   /**
