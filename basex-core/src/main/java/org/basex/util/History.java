@@ -9,8 +9,8 @@ import java.util.*;
  * @author Christian Gruen
  */
 public final class History {
-  /** Maximum size for storing entries in a history (currently: 10 MB). */
-  private static final long MAXBYTES = 100000000;
+  /** Maximum size for storing entries in a history. */
+  private static final long MAXBYTES = 100_000_000;
   /** Maximum number of entries to be stored. */
   private static final int MAX = 1024;
 

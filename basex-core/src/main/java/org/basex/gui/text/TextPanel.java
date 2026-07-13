@@ -804,6 +804,11 @@ public class TextPanel extends BaseXPanel {
 
   @Override
   public final void componentResized(final ComponentEvent e) {
+    if(isShowing()) resizeCode.invokeLater();
+  }
+
+  @Override
+  public final void componentShown(final ComponentEvent e) {
     resizeCode.invokeLater();
   }
 

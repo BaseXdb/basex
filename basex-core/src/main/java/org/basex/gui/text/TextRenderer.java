@@ -270,7 +270,7 @@ final class TextRenderer extends BaseXBack {
    * Computes the height of the text and updates the scroll bar.
    */
   void computeHeight() {
-    width = getWidth() - (offset >> 1);
+    width = getWidth() - OFFSET;
 
     // rebuild the line-offset cache while measuring the whole document
     final Graphics g = getGraphics();
