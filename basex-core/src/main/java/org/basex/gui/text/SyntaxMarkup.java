@@ -50,6 +50,12 @@ abstract class SyntaxMarkup extends Syntax {
   }
 
   @Override
+  boolean code(final int mode) {
+    // element content is no code: its brackets are literal text, its whitespace may be significant
+    return mode == TAG || mode == ETAG;
+  }
+
+  @Override
   Color color(final int mode) {
     return switch(mode) {
       case ATTR_D, ATTR_S -> brown;

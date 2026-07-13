@@ -23,10 +23,10 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 final class SyntaxXQuery extends SyntaxMarkup {
-  /** Opening brackets. */
-  private static final String OPENING = "{(";
-  /** Closing brackets. */
-  private static final String CLOSING = "})";
+  /** Opening brackets that are indented by {@link #format(byte[], byte[])}. */
+  private static final String FORMAT_OPENING = "{(";
+  /** Closing brackets that are unindented by {@link #format(byte[], byte[])}. */
+  private static final String FORMAT_CLOSING = "})";
   /** Reserved words and type names. */
   private static final HashSet<String> KEYWORDS = new HashSet<>();
   /** Names of built-in functions. */
@@ -86,6 +86,12 @@ final class SyntaxXQuery extends SyntaxMarkup {
   @Override
   int initialMode() {
     return CODE;
+  }
+
+  @Override
+  boolean code(final int mode) {
+    // tags are code as well (see SyntaxMarkup)
+    return mode == CODE || super.code(mode);
   }
 
   @Override
@@ -300,7 +306,7 @@ final class SyntaxXQuery extends SyntaxMarkup {
     int quoted = 0, comments = 0, indents = 0;
     for(int t = 0; t < tl; t++) {
       final byte curr = text[t];
-      final int open = OPENING.indexOf(curr), close = CLOSING.indexOf(curr);
+      final int open = FORMAT_OPENING.indexOf(curr), close = FORMAT_CLOSING.indexOf(curr);
       final int next = t + 1 < tl ? text[t + 1] : 0, prev = t > 0 ? text[t - 1] : 0;
       if(quoted != 0) {
         if(curr == quoted) quoted = 0;
@@ -314,14 +320,14 @@ final class SyntaxXQuery extends SyntaxMarkup {
         if(open != -1) {
           indents++;
           tb.addByte(curr);
-          if(next != '\n' && !matches(CLOSING.charAt(open), t, text, true)) {
+          if(next != '\n' && !matches(FORMAT_CLOSING.charAt(open), t, text, true)) {
             tb.add('\n');
             for(int i = 0; i < indents; i++) tb.add(spaces);
           }
           continue;
         } else if(close != -1) {
           indents--;
-          if(!endingWithWs(tb) && !matches(OPENING.charAt(close), t, text, false)) {
+          if(!endingWithWs(tb) && !matches(FORMAT_OPENING.charAt(close), t, text, false)) {
             tb.add('\n');
             for(int i = 0; i < indents; i++) tb.add(spaces);
           }

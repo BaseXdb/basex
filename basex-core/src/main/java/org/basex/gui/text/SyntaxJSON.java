@@ -23,6 +23,11 @@ final class SyntaxJSON extends Syntax {
   private static final int STRING = 1;
 
   @Override
+  boolean code(final int mode) {
+    return mode == VALUE;
+  }
+
+  @Override
   Color color(final int mode) {
     return mode == STRING ? brown : plain;
   }

@@ -311,7 +311,7 @@ public class TextPanel extends BaseXPanel {
    * Jumps to a matching bracket.
    */
   public final void bracket() {
-    setCaret(editor.bracket());
+    setCaret(editor.bracket(rend.getSyntax()));
   }
 
   /**

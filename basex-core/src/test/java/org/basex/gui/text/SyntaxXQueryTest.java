@@ -155,6 +155,42 @@ public final class SyntaxXQueryTest {
     check("1 < 2", "N...N");
   }
 
+  /** Only brackets in code are paired (see {@link TextRenderer}). */
+  @Test public void brackets() {
+    // the closing bracket of the string must not be paired with the opening one
+    brackets("(1, \")\")", "B......B");
+    brackets("'('", "...");
+    // the bracket in the comment is ignored; the comment delimiters pair with each other
+    brackets("(: ( :)1", "B.....B.");
+    // brackets in element content are literal text
+    brackets("<a>(x)</a>", "..........");
+    // brackets of an enclosed expression are code
+    brackets("<a>{1}</a>", "...B.B....");
+  }
+
+  /**
+   * Compares the brackets of a query that are recognized as code with the expected legend.
+   * @param query query string
+   * @param expected expected legend ({@code B}: bracket in code)
+   */
+  private static void brackets(final String query, final String expected) {
+    final TextEditor editor = new TextEditor(null);
+    editor.text(Token.token(query));
+    final TextIterator iter = new TextIterator(editor);
+    final Syntax syntax = new SyntaxXQuery();
+    syntax.init(PLAIN);
+
+    final StringBuilder sb = new StringBuilder();
+    while(iter.moreStrings(1000)) {
+      syntax.getColor(iter);
+      final boolean code = syntax.codeBefore() || syntax.codeAfter();
+      for(int p = iter.pos(); p < iter.posEnd(); p++) {
+        sb.append(code && "()[]{}".indexOf(query.charAt(p)) != -1 ? 'B' : '.');
+      }
+    }
+    assertEquals(expected, sb.toString(), query);
+  }
+
   /**
    * Compares the colors that are assigned to a query with the expected legend.
    * @param query query string

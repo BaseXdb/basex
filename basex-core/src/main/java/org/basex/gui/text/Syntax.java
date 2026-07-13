@@ -17,6 +17,11 @@ abstract class Syntax {
   /** Empty highlighter state. */
   private static final int[] NO_STATE = {};
 
+  /** Opening brackets. */
+  static final String OPENING = "{([";
+  /** Closing brackets. */
+  static final String CLOSING = "})]";
+
   /** State index: current mode. */
   static final int MODE = 0;
   /** State index: characters to be skipped (rest of a multi-character delimiter). */
@@ -32,6 +37,10 @@ abstract class Syntax {
   Color plain;
   /** Highlighter state; allows resuming mid-document (see {@link TextLineCache}). */
   int[] state = NO_STATE;
+  /** Mode before the last processed character. */
+  private int modeBefore;
+  /** Mode after the last processed character. */
+  private int modeAfter;
 
   /** Simple syntax: no highlighting, no state. */
   static final Syntax SIMPLE = new Syntax() {
@@ -75,10 +84,11 @@ abstract class Syntax {
    * @return color
    */
   final Color color(final byte[] text, final int pos, final int end) {
-    // stateless highlighter
+    // stateless highlighter: everything is code
     if(state.length == 0) return plain;
 
     final int mode = state[MODE];
+    final Color color;
     if(state[SKIP] > 0) {
       // remaining characters of a delimiter: keep the current color
       state[SKIP] = Math.max(0, state[SKIP] - (end - pos));
@@ -86,9 +96,29 @@ abstract class Syntax {
         state[MODE] = state[PENDING] - 1;
         state[PENDING] = 0;
       }
-      return color(mode);
+      color = color(mode);
+    } else {
+      color = mode(text, pos, end, cp(text, pos), mode);
     }
-    return mode(text, pos, end, cp(text, pos), mode);
+    modeBefore = mode;
+    modeAfter = state[MODE];
+    return color;
+  }
+
+  /**
+   * Indicates if code precedes the last processed character (it may close an enclosed expression).
+   * @return result of check
+   */
+  final boolean codeBefore() {
+    return code(modeBefore);
+  }
+
+  /**
+   * Indicates if code follows the last processed character (it may open an enclosed expression).
+   * @return result of check
+   */
+  final boolean codeAfter() {
+    return code(modeAfter);
   }
 
   /**
@@ -188,6 +218,18 @@ abstract class Syntax {
   @SuppressWarnings("unused")
   Color color(final int mode) {
     return plain;
+  }
+
+  /**
+   * Indicates if the specified mode is code. Brackets are only paired in code (see
+   * {@link TextRenderer} and {@link TextEditor#bracket(Syntax)}); a syntax with strings, comments
+   * or literal text must override this method, or their brackets will be paired as well.
+   * @param mode mode
+   * @return result of check
+   */
+  @SuppressWarnings("unused")
+  boolean code(final int mode) {
+    return true;
   }
 
   /**

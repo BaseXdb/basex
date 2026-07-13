@@ -483,20 +483,24 @@ final class TextRenderer extends BaseXBack {
   private void write(final TextIterator iter, final Graphics g) {
     if(x == offset) markLine(g);
 
-    // choose color for enabled text, depending on highlighting, link, or current syntax
+    // advance the highlighter, and choose color for enabled text, depending on highlighting or link
+    final Color syntaxColor = syntax.getColor(iter);
     final Color color = isEnabled() ? markNext ? GUIConstants.green : link ?
-      GUIConstants.color4 : syntax.getColor(iter) : GUIConstants.gray;
+      GUIConstants.color4 : syntaxColor : GUIConstants.gray;
     final int cp = iter.curr();
     markNext = cp == TokenBuilder.MARK;
 
     // retrieve first character of current token
     final int pos = iter.pos(), cpos = iter.caret();
 
-    // handle matching parentheses
-    if(cp == '(' || cp == '[' || cp == '{') {
+    // handle matching parentheses; ignore brackets in strings, comments and element content
+    final boolean code = syntax.codeBefore() || syntax.codeAfter();
+    final int opening = code ? Syntax.OPENING.indexOf(cp) : -1;
+    final int closing = code ? Syntax.CLOSING.indexOf(cp) : -1;
+    if(opening != -1) {
       parentheses.add(x).add(y).add(pos).add(cp);
-    } else if((cp == ')' || cp == ']' || cp == '}') && !parentheses.isEmpty()) {
-      final int open = cp == ')' ? '(' : cp == ']' ? '[' : '{';
+    } else if(closing != -1 && !parentheses.isEmpty()) {
+      final int open = Syntax.OPENING.charAt(closing);
       if(parentheses.peek() == open) {
         parentheses.pop();
         final int cr = parentheses.pop(), yy = parentheses.pop(), xx = parentheses.pop();

@@ -28,10 +28,6 @@ public final class TextEditor {
 
   /** Completion characters. */
   private static final char[] ALLOWED = { ':', '-' };
-  /** Opening brackets. */
-  private static final String OPENING = "{([";
-  /** Closing brackets. */
-  private static final String CLOSING = "})]";
 
   /** Start and end positions of search terms (initially empty). */
   IntList[] searchResults = { new IntList(), new IntList() };
@@ -604,51 +600,36 @@ public final class TextEditor {
   }
 
   /**
-   * Jumps to a matching bracket.
+   * Jumps to a matching bracket. Brackets in strings, comments and element content are ignored.
+   * @param syntax syntax highlighter
    * @return new caret position
    */
-  int bracket() {
-    final IntList parentheses = new IntList();
-    int cp = curr(), opening = OPENING.indexOf(cp), closing = CLOSING.indexOf(cp);
-    if(opening != -1) {
-      parentheses.add(opening);
-      while(pos() < size() && !parentheses.isEmpty()) {
-        next();
-        cp = curr();
-        opening = OPENING.indexOf(cp);
-        closing = CLOSING.indexOf(cp);
-        if(opening != -1) {
-          parentheses.add(opening);
-        } else if(closing == parentheses.peek()) {
-          parentheses.pop();
-        }
-      }
-    } else if(closing != -1) {
-      parentheses.add(closing);
-      while(pos() > 0 && !parentheses.isEmpty()) {
-        cp = prev();
-        opening = OPENING.indexOf(cp);
-        closing = CLOSING.indexOf(cp);
-        if(closing != -1) {
-          parentheses.add(closing);
-        } else if(opening == parentheses.peek()) {
-          parentheses.pop();
-        }
-      }
-    } else {
-      while(pos() > 0) {
-        cp = prev();
-        opening = OPENING.indexOf(cp);
-        closing = CLOSING.indexOf(cp);
-        if(opening != -1) {
-          if(parentheses.isEmpty()) break;
-          if(opening == parentheses.peek()) parentheses.pop();
-        } else if(closing != -1) {
-          parentheses.add(closing);
-        }
+  int bracket(final Syntax syntax) {
+    // the highlighter is a forward-only lexer: pair all brackets in a single pass
+    syntax.reset();
+    final IntList positions = new IntList();
+    final int caret = pos(), tl = size();
+
+    for(int p = 0; p < tl; p += cl(text, p)) {
+      syntax.color(text, p, p + cl(text, p));
+      final int cp = cp(text, p);
+      final boolean code = syntax.codeBefore() || syntax.codeAfter();
+      final int opening = Syntax.OPENING.indexOf(cp), closing = Syntax.CLOSING.indexOf(cp);
+      // the caret is on no bracket, or on one that is no code: jump to the enclosing bracket
+      if(p == caret && (!code || opening == -1 && closing == -1)) break;
+      if(!code) continue;
+
+      if(opening != -1) {
+        positions.add(p);
+      } else if(closing != -1 && !positions.isEmpty() &&
+          Syntax.OPENING.indexOf(cp(text, positions.peek())) == closing) {
+        final int open = positions.pop();
+        if(open == caret) return p;
+        if(p == caret) return open;
       }
     }
-    return pos;
+    // the caret is on no bracket: jump to the enclosing one
+    return positions.isEmpty() ? caret : positions.peek();
   }
 
   /**
@@ -843,8 +824,8 @@ public final class TextEditor {
    */
   int enter(final StringBuilder sb) {
     // indent after opening bracket
-    final boolean opening = pos > 0 && OPENING.indexOf(text[pos - 1]) != -1;
-    final boolean closing = pos < size() && CLOSING.indexOf(text[pos]) != -1;
+    final boolean opening = pos > 0 && Syntax.OPENING.indexOf(text[pos - 1]) != -1;
+    final boolean closing = pos < size() && Syntax.CLOSING.indexOf(text[pos]) != -1;
 
     final int ind = indent();
     int indent = open(), move = 0;
@@ -881,14 +862,14 @@ public final class TextEditor {
       final int curr = pos < size() ? text[pos] : 0;
       final int prev = pos > 0 ? text[pos - 1] : 0;
       final int pprv = pos > 1 ? text[pos - 2] : 0;
-      final int opening = OPENING.indexOf(ch);
+      final int opening = Syntax.OPENING.indexOf(ch);
       if(opening != -1) {
         // adds a closing to an opening bracket
-        if(CLOSING.indexOf(curr) != -1 || curr == 0 || ws(curr) || curr == '<') {
-          sb.append(CLOSING.charAt(opening));
+        if(Syntax.CLOSING.indexOf(curr) != -1 || curr == 0 || ws(curr) || curr == '<') {
+          sb.append(Syntax.CLOSING.charAt(opening));
           move = 1;
         }
-      } else if(CLOSING.indexOf(ch) != -1) {
+      } else if(Syntax.CLOSING.indexOf(ch) != -1) {
         // closing bracket: ignore if it equals next character
         if(ch == curr) {
           sb.setLength(0);
@@ -1004,8 +985,8 @@ public final class TextEditor {
           start++;
         } else {
           // remove closing bracket
-          final int open = OPENING.indexOf(prev);
-          if(open != -1 && CLOSING.indexOf(curr) == open) start++;
+          final int open = Syntax.OPENING.indexOf(prev);
+          if(open != -1 && Syntax.CLOSING.indexOf(curr) == open) start++;
         }
       }
     }

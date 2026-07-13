@@ -52,6 +52,11 @@ final class SyntaxJS extends Syntax {
   }
 
   @Override
+  boolean code(final int mode) {
+    return mode == CODE;
+  }
+
+  @Override
   Color color(final int mode) {
     return switch(mode) {
       case STRING_D, STRING_S, TEMPLATE, REGEX, CLASS -> brown;
