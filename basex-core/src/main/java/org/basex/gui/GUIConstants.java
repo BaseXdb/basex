@@ -217,13 +217,16 @@ public final class GUIConstants {
   /** Cell color. */
   public static Color lightGray;
   /** Button color. */
-  public static Color softerGray;
-  /** Button color. */
   public static Color gray;
   /** Middle gray color. */
   public static Color middleGray;
   /** Dark gray color. */
   public static Color darkGray;
+
+  /** Alpha color. */
+  public static Color grayA;
+  /** Transparent background color. */
+  public static Color middleGrayA;
 
   /** Cached color gradient. */
   private static final Color[] COLORS = new Color[100];
@@ -365,10 +368,11 @@ public final class GUIConstants {
 
     paleGray = color(240, 240, 240);
     lightGray = color(224, 224, 224);
-    softerGray = color(192, 192, 192);
     gray = color(160, 160, 160);
     middleGray = color(128, 128, 128);
     darkGray = color(64, 64, 64);
+    grayA = color(160, 160, 160, 128);
+    middleGrayA = color(128, 128, 128, 128);
 
     // create color array
     final int r = opts.get(GUIOptions.COLORRED);

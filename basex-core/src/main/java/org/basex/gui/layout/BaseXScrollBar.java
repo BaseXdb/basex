@@ -120,25 +120,19 @@ public final class BaseXScrollBar extends BaseXPanel {
   public void paintComponent(final Graphics g) {
     hh = getHeight();
     super.paintComponent(g);
-
-    // paint track: adopt the background of the scrolled component
-    g.setColor(comp.getBackground());
-    g.fillRect(0, 0, SIZE, hh);
     if(hh >= height) return;
 
     // calculate slider size and position
     barSize = Math.min(hh, Math.max(MINSIZE, (int) ((long) hh * hh / height)));
     final int travel = hh - barSize;
-    barPos = travel <= 0 ? 0 :
-      (int) ((long) Math.min(pos, height - hh) * travel / (height - hh));
-
+    barPos = travel <= 0 ? 0 : (int) ((long) Math.min(pos, height - hh) * travel / (height - hh));
     paintMarks(g);
 
     // paint slider: grows and darkens while it is hovered or dragged
+    BaseXLayout.antiAlias(g);
     final boolean active = sliding || hover;
     final int w = active ? SLIDER_ACTIVE : SLIDER;
-    g.setColor(active ? GUIConstants.color2A : GUIConstants.color3A);
-    BaseXLayout.antiAlias(g);
+    g.setColor(active ? GUIConstants.middleGrayA : GUIConstants.grayA);
     g.fillRoundRect((SIZE - w) / 2, barPos, w, barSize, w / 2, w / 2);
   }
 
