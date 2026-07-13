@@ -23,16 +23,32 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 final class SyntaxXQuery extends SyntaxMarkup {
-  /** Opening brackets that are indented by {@link #format(byte[], byte[])}. */
-  private static final String FORMAT_OPENING = "{(";
-  /** Closing brackets that are unindented by {@link #format(byte[], byte[])}. */
-  private static final String FORMAT_CLOSING = "})";
   /** Reserved words and type names. */
   private static final HashSet<String> KEYWORDS = new HashSet<>();
   /** Names of built-in functions. */
   private static final HashSet<String> FUNCTIONS = new HashSet<>();
   /** Maximum length of a keyword. */
   private static final int MAXKEY = 64;
+
+  /** Prolog declaration for boundary whitespace. */
+  private static final byte[] BOUNDARY = token("boundary-space");
+  /** Clauses of a FLWOR expression (without {@code return}). */
+  private static final HashSet<String> CLAUSES = new HashSet<>(Arrays.asList(
+    "count", "for", "group", "let", "order", "stable", "where", "window"));
+
+  /** Line type: no clause. */
+  private static final int NONE = 0;
+  /** Line type: clause that is followed by further clauses. */
+  private static final int CLAUSE = 1;
+  /** Line type: last clause of a FLWOR expression ({@code return}). */
+  private static final int FINAL = 2;
+  /** Operators that are followed by an expression (no asterisk: '/*', 'xs:string*'). */
+  private static final String OPERATORS = "=+-<>|!/";
+  /** Keywords that are followed by an expression. */
+  private static final HashSet<String> DANGLING = new HashSet<>(Arrays.asList(
+    "and", "as", "case", "cast", "castable", "default", "div", "else", "eq", "except", "ge", "gt",
+    "idiv", "in", "instance", "intersect", "is", "le", "lt", "mod", "ne", "of", "or", "otherwise",
+    "return", "satisfies", "then", "to", "treat", "union", "where"));
 
   /** Mode: code. */
   private static final int CODE = MODES;
@@ -300,73 +316,74 @@ final class SyntaxXQuery extends SyntaxMarkup {
   }
 
   @Override
-  public byte[] format(final byte[] text, final byte[] spaces) {
-    final TokenBuilder tb = new TokenBuilder();
-    final int tl = text.length;
-    int quoted = 0, comments = 0, indents = 0;
-    for(int t = 0; t < tl; t++) {
-      final byte curr = text[t];
-      final int open = FORMAT_OPENING.indexOf(curr), close = FORMAT_CLOSING.indexOf(curr);
-      final int next = t + 1 < tl ? text[t + 1] : 0, prev = t > 0 ? text[t - 1] : 0;
-      if(quoted != 0) {
-        if(curr == quoted) quoted = 0;
-      } else if("\"'`".indexOf(curr) != -1) {
-        quoted = curr;
-      } else if(curr == '(' && next == ':') {
-        comments++;
-      } else if(prev == ':' && curr == ')') {
-        comments--;
-      } else if(comments == 0) {
-        if(open != -1) {
-          indents++;
-          tb.addByte(curr);
-          if(next != '\n' && !matches(FORMAT_CLOSING.charAt(open), t, text, true)) {
-            tb.add('\n');
-            for(int i = 0; i < indents; i++) tb.add(spaces);
-          }
-          continue;
-        } else if(close != -1) {
-          indents--;
-          if(!endingWithWs(tb) && !matches(FORMAT_OPENING.charAt(close), t, text, false)) {
-            tb.add('\n');
-            for(int i = 0; i < indents; i++) tb.add(spaces);
-          }
-        }
-      }
-      tb.addByte(curr);
-    }
-    return tb.finish();
+  Indent indent(final byte[] text, final int pos, final int last, final int mode,
+      final int newlines, final Indent previous) {
+    // the attributes of a tag are indented, as in XML
+    if(tag()) return super.indent(text, pos, last, mode, newlines, previous);
+
+    final boolean code = mode == CODE;
+    final int type = clause(text, pos), ref = previous.reference();
+    // the commas of a clause separate its own operands, not the operands of an enclosing list
+    final boolean separates = type != CLAUSE;
+    if(continued(text, pos, last, code, newlines)) return new Indent(1, 1, type, separates);
+    // consecutive clauses are indented alike
+    if(type != NONE && previous.type() == CLAUSE) return new Indent(ref, ref, type, separates);
+    // further operands of a clause are indented; the clause remains the reference
+    if(code && prev(text, last) == ',' && previous.type() == CLAUSE)
+      return new Indent(ref + 1, ref, CLAUSE, false);
+    return new Indent(0, 0, type, separates);
   }
 
   /**
-   * Checks if the previous line contains only spaces.
+   * Checks if a line continues the expression of the previous one.
    * @param text text
+   * @param pos start of the line
+   * @param last position after the last character of the previous line
+   * @param code indicates if the previous line ends with code
+   * @param newlines number of line breaks between the two lines
    * @return result of check
    */
-  private static boolean endingWithWs(final TokenBuilder text) {
-    for(int t = text.size() - 1; t >= 0; t--) {
-      final byte c = text.get(t);
-      if(c == '\n') break;
-      if(!ws(c)) return false;
+  private boolean continued(final byte[] text, final int pos, final int last, final boolean code,
+      final int newlines) {
+    // annotations continue a declaration
+    if(cp(text, pos) == '%') return true;
+    if(newlines != 1 || !code) return false;
+    final int p = skipWsBack(text, last), ch = cp(text, p);
+    if(OPERATORS.indexOf(ch) != -1) return true;
+    return XMLToken.isNCChar(ch) && name(text, p) &&
+      DANGLING.contains(string(text, nameStart, nameEnd - nameStart));
+  }
+
+  /**
+   * Returns the type of the FLWOR clause that starts at the specified position.
+   * @param text text
+   * @param pos start of the line
+   * @return {@link #NONE}, {@link #CLAUSE} or {@link #FINAL}
+   */
+  private int clause(final byte[] text, final int pos) {
+    if(!name(text, pos) || nameStart != pos) return NONE;
+    final String name = string(text, nameStart, nameEnd - nameStart);
+    return "return".equals(name) ? FINAL : CLAUSES.contains(name) ? CLAUSE : NONE;
+  }
+
+  @Override
+  String separators() {
+    // colons are no separators: they occur in QNames, axes, map entries and ':='
+    return ",";
+  }
+
+  @Override
+  String lists() {
+    // curly braces enclose no lists: their commas may separate let clauses or map entries
+    return "([";
+  }
+
+  @Override
+  boolean boundarySpace(final byte[] text) {
+    // all occurrences are checked: the first one may be part of a comment or a string
+    for(int p = indexOf(text, BOUNDARY); p != -1; p = indexOf(text, BOUNDARY, p + 1)) {
+      if(startsWith(text, skipWs(text, p + BOUNDARY.length), "preserve")) return false;
     }
     return true;
-  }
-
-  /**
-   * Checks if the specified character is found near the current position.
-   * @param ch character to be found
-   * @param pos current position
-   * @param text text
-   * @param after search after or before the current position
-   * @return result of check
-   */
-  private static boolean matches(final char ch, final int pos, final byte[] text,
-      final boolean after) {
-    final int dist = after ? 3 : -3;
-    for(int d = 0; after ? d < dist : d > dist; d += after ? 1 : -1) {
-      final int p = pos + d;
-      if(p >= 0 && p < text.length && text[p] == ch) return true;
-    }
-    return false;
   }
 }

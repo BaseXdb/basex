@@ -28,6 +28,16 @@ final class SyntaxJSON extends Syntax {
   }
 
   @Override
+  String separators() {
+    return ",:";
+  }
+
+  @Override
+  String lists() {
+    return "{[";
+  }
+
+  @Override
   Color color(final int mode) {
     return mode == STRING ? brown : plain;
   }

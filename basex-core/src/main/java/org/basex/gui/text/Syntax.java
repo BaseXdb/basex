@@ -22,6 +22,18 @@ abstract class Syntax {
   /** Closing brackets. */
   static final String CLOSING = "})]";
 
+  /**
+   * Indentation of a line of code.
+   * @param extra additional levels this line is indented by
+   * @param reference additional levels of the expression this line belongs to
+   * @param type syntax-specific type of the line (XQuery: type of its FLWOR clause)
+   * @param separates the separators of the line separate the operands of the enclosing list
+   */
+  record Indent(int extra, int reference, int type, boolean separates) {
+    /** Line that is not indented. */
+    static final Indent NONE = new Indent(0, 0, 0, true);
+  }
+
   /** State index: current mode. */
   static final int MODE = 0;
   /** State index: characters to be skipped (rest of a multi-character delimiter). */
@@ -106,6 +118,30 @@ abstract class Syntax {
   }
 
   /**
+   * Returns the mode before the last processed character.
+   * @return mode
+   */
+  final int modeBefore() {
+    return modeBefore;
+  }
+
+  /**
+   * Returns the mode after the last processed character.
+   * @return mode
+   */
+  final int modeAfter() {
+    return modeAfter;
+  }
+
+  /**
+   * Indicates if the last processed character was code.
+   * @return result of check
+   */
+  final boolean code() {
+    return codeBefore() && codeAfter();
+  }
+
+  /**
    * Indicates if code precedes the last processed character (it may close an enclosed expression).
    * @return result of check
    */
@@ -119,6 +155,31 @@ abstract class Syntax {
    */
   final boolean codeAfter() {
     return code(modeAfter);
+  }
+
+  /**
+   * Indicates if the last processed character is element content.
+   * @return result of check
+   */
+  final boolean content() {
+    return content(modeBefore) && content(modeAfter);
+  }
+
+  /**
+   * Indicates if element content starts after the last processed character.
+   * @return result of check
+   */
+  final boolean contentStart() {
+    return !content(modeBefore) && content(modeAfter);
+  }
+
+  /**
+   * Indicates if element content ends with the last processed character (which opens a tag or an
+   * enclosed expression).
+   * @return result of check
+   */
+  final boolean contentEnd() {
+    return content(modeBefore) && !content(modeAfter);
   }
 
   /**
@@ -233,6 +294,93 @@ abstract class Syntax {
   }
 
   /**
+   * Returns the indentation of a line, relative to the expression that encloses it.
+   * @param text text
+   * @param pos start of the line (first character that is no whitespace)
+   * @param last position after the last character of the previous line ({@code -1}: none)
+   * @param mode mode of that character ({@code -1}: none)
+   * @param newlines number of line breaks between the two lines
+   * @param previous indentation of the previous line
+   * @return indentation
+   */
+  @SuppressWarnings("unused")
+  Indent indent(final byte[] text, final int pos, final int last, final int mode,
+      final int newlines, final Indent previous) {
+    return Indent.NONE;
+  }
+
+  /**
+   * Indicates if the boundary whitespace of element constructors may be indented.
+   * @param text text
+   * @return result of check
+   */
+  @SuppressWarnings("unused")
+  boolean boundarySpace(final byte[] text) {
+    return false;
+  }
+
+  /**
+   * Indicates if the last processed character opened an element (the {@code >} of a start tag).
+   * @param text text
+   * @param pos position of the character
+   * @return result of check
+   */
+  @SuppressWarnings("unused")
+  boolean elementOpen(final byte[] text, final int pos) {
+    return false;
+  }
+
+  /**
+   * Indicates if the last processed character closed an element (the {@code <} of an end tag).
+   * @return result of check
+   */
+  boolean elementClose() {
+    return false;
+  }
+
+  /**
+   * Indicates if the last processed character occurs in a tag.
+   * @return result of check
+   */
+  boolean tag() {
+    return false;
+  }
+
+  /**
+   * Indicates if the specified mode is element content.
+   * @param mode mode
+   * @return result of check
+   */
+  @SuppressWarnings("unused")
+  boolean content(final int mode) {
+    return false;
+  }
+
+  /**
+   * Indicates if the syntax can be formatted.
+   * @return result of check
+   */
+  boolean formatted() {
+    return !separators().isEmpty();
+  }
+
+  /**
+   * Returns the characters that separate the operands of an expression.
+   * @return separators (empty if the syntax has no code)
+   */
+  String separators() {
+    return "";
+  }
+
+  /**
+   * Returns the opening brackets of lists.
+   * @return brackets (empty if the language has no lists)
+   */
+  String lists() {
+    return "";
+  }
+
+  /**
    * Returns the start of a comment.
    * @return comment start
    */
@@ -249,14 +397,14 @@ abstract class Syntax {
   }
 
   /**
-   * Returns a formatted version of a string.
-   * @param string string to be formatted
-   * @param spaces spaces
-   * @return formatted string
+   * Returns a formatted version of the specified text.
+   * @param text text to be formatted
+   * @param spaces indentation of a single level
+   * @param margin line margin ({@code 0}: expressions will not be wrapped)
+   * @return formatted text
    */
-  @SuppressWarnings("unused")
-  public byte[] format(final byte[] string, final byte[] spaces) {
-    return string;
+  public final byte[] format(final byte[] text, final byte[] spaces, final int margin) {
+    return formatted() ? new Formatter(this, spaces, margin).format(text) : text;
   }
 
   // OPERANDS =====================================================================================

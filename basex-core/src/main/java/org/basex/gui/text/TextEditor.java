@@ -362,6 +362,15 @@ public final class TextEditor {
   }
 
   /**
+   * Returns the line margin, or {@code 0} if no margin is shown.
+   * @return margin
+   */
+  private int margin() {
+    return gui.gopts.get(GUIOptions.SHOWMARGIN) ?
+      Math.max(1, gui.gopts.get(GUIOptions.MARGIN)) : 0;
+  }
+
+  /**
    * Moves to the beginning of the line.
    * @param select selection flag
    * @return number of passed characters
@@ -694,7 +703,7 @@ public final class TextEditor {
     final boolean sel = isSelected();
     final int s = sel ? Math.min(start, end) : 0;
     final int e = sel ? Math.max(start, end) : size();
-    final byte[] format = syntax.format(Arrays.copyOfRange(text, s, e), spaces());
+    final byte[] format = syntax.format(Arrays.copyOfRange(text, s, e), spaces(), margin());
     final boolean changed = insert(format, s, e);
     select(s, s + format.length);
     return changed;

@@ -50,6 +50,40 @@ abstract class SyntaxMarkup extends Syntax {
   }
 
   @Override
+  final boolean elementOpen(final byte[] text, final int pos) {
+    // a slash indicates a self-closing tag, which opens no element
+    return modeBefore() == TAG && modeAfter() == CONTENT && prev(text, pos) != '/';
+  }
+
+  @Override
+  final boolean elementClose() {
+    return modeAfter() == ETAG && modeBefore() != ETAG;
+  }
+
+  @Override
+  Indent indent(final byte[] text, final int pos, final int last, final int mode,
+      final int newlines, final Indent previous) {
+    // the attributes of a tag are indented
+    return tag() ? new Indent(1, 1, 0, true) : Indent.NONE;
+  }
+
+  @Override
+  final boolean tag() {
+    return modeBefore() == TAG;
+  }
+
+  @Override
+  final boolean formatted() {
+    // markup has no separators, but its tags and its boundary whitespace are indented
+    return true;
+  }
+
+  @Override
+  boolean content(final int mode) {
+    return mode == CONTENT;
+  }
+
+  @Override
   boolean code(final int mode) {
     // element content is no code: its brackets are literal text, its whitespace may be significant
     return mode == TAG || mode == ETAG;
