@@ -15,8 +15,8 @@ import org.basex.util.similarity.*;
 public final class StringJaroWinkler extends StringFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final AStr value1 = toStr(arg(0), qc), value2 = toStr(arg(1), qc);
-    final FTOpt opt = ftOpt(toOptions(arg(2), new StringOptions(), qc));
+    final byte[] value1 = toToken(arg(0), qc), value2 = toToken(arg(1), qc);
+    final FTOpt opt = ftOpt(arg(2), qc);
 
     return Dbl.get(JaroWinkler.distance(cps(value1, opt), cps(value2, opt)));
   }

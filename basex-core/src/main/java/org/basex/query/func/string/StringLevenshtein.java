@@ -16,12 +16,12 @@ import org.basex.util.ft.*;
 public final class StringLevenshtein extends StringFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final AStr value1 = toStr(arg(0), qc), value2 = toStr(arg(1), qc);
-    final FTOpt opt = ftOpt(toOptions(arg(2), new StringOptions(), qc));
+    final byte[] value1 = toToken(arg(0), qc), value2 = toToken(arg(1), qc);
+    final FTOpt opt = ftOpt(arg(2), qc);
 
     final int[] cps1 = cps(value1, opt), cps2 = cps(value2, opt);
-    checkLength(cps1);
-    checkLength(cps2);
+    checkLength(cps1.length);
+    checkLength(cps2.length);
     return Dbl.get(distance(cps1, cps2));
   }
 }

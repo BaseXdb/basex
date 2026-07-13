@@ -41,13 +41,11 @@ public final class TokenRatio {
     // shared tokens, and tokens unique to either string (all sorted)
     final TreeSet<String> shared = new TreeSet<>(set1);
     shared.retainAll(set2);
-    final TreeSet<String> rest1 = new TreeSet<>(set1);
-    rest1.removeAll(shared);
-    final TreeSet<String> rest2 = new TreeSet<>(set2);
-    rest2.removeAll(shared);
+    set1.removeAll(shared);
+    set2.removeAll(shared);
 
     final String intersection = String.join(" ", shared);
-    final String combined1 = join(shared, rest1), combined2 = join(shared, rest2);
+    final String combined1 = join(shared, set1), combined2 = join(shared, set2);
     return Math.max(ratio(intersection, combined1),
         Math.max(ratio(intersection, combined2), ratio(combined1, combined2)));
   }
@@ -91,15 +89,8 @@ public final class TokenRatio {
    * @return joined string
    */
   private static String join(final Collection<String> tokens1, final Collection<String> tokens2) {
-    final StringBuilder sb = new StringBuilder();
-    for(final String token : tokens1) {
-      if(sb.length() != 0) sb.append(' ');
-      sb.append(token);
-    }
-    for(final String token : tokens2) {
-      if(sb.length() != 0) sb.append(' ');
-      sb.append(token);
-    }
-    return sb.toString();
+    final ArrayList<String> tokens = new ArrayList<>(tokens1);
+    tokens.addAll(tokens2);
+    return String.join(" ", tokens);
   }
 }

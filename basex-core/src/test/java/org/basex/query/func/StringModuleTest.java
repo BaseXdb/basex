@@ -127,8 +127,8 @@ public final class StringModuleTest extends SandboxTest {
     query(lev.args("Munch", "Münch", " { 'diacritics': 'insensitive' }"), 1);
     query(lev.args("HOUSES", "house", " { 'stemming': true(), 'case': 'insensitive' }"), 1);
     query(jw.args("flower", "FLOWER", " { 'case': 'insensitive' }"), 1);
-    query(dist.args("flower", "FLOWER", " ()", " { 'case': 'insensitive' }"), 0);
-    query(ngrams.args("Rüb", " ()", " { 'case': 'insensitive', 'diacritics': 'insensitive' }"),
+    query(dist.args("flower", "FLOWER", " { 'case': 'insensitive' }"), 0);
+    query(ngrams.args("Rüb", " { 'case': 'insensitive', 'diacritics': 'insensitive' }"),
         "ru\nub");
 
     // token ratios: full-text options also strip punctuation
@@ -241,17 +241,17 @@ public final class StringModuleTest extends SandboxTest {
     query(func.args(" 'a&#x1D11E;'", "a"), 1);
 
     // bounded computation: empty sequence if the distance exceeds the maximum
-    query(func.args("kitten", "sitting", 3), 3);
-    query(func.args("kitten", "sitting", 2), "");
-    query(func.args("a", "a", 0), 0);
-    query(func.args("a", "b", 0), "");
-    query(func.args("a", "a", -1), "");
+    query(func.args("kitten", "sitting", " { 'max': 3 }"), 3);
+    query(func.args("kitten", "sitting", " { 'max': 2 }"), "");
+    query(func.args("a", "a", " { 'max': 0 }"), 0);
+    query(func.args("a", "b", " { 'max': 0 }"), "");
+    query(func.args("a", "a", " { 'max': -1 }"), "");
 
     // the length is only limited if the distance is computed exhaustively
     final String long1 = " string-join(replicate('x', 10001))";
     error(func.args(long1, "x"), STRING_BOUNDS_X);
-    query(func.args(long1, long1 + " || 'yy'", 5), 2);
-    query(func.args(long1, long1 + " || 'yy'", 1), "");
+    query(func.args(long1, long1 + " || 'yy'", " { 'max': 5 }"), 2);
+    query(func.args(long1, long1 + " || 'yy'", " { 'max': 1 }"), "");
   }
 
   /** Test method. */
@@ -269,6 +269,9 @@ public final class StringModuleTest extends SandboxTest {
     query(func.args("Rembrant", candidates, " { 'limit': 0 }") + "?value",
         "Rembrandt\nRembrand\nRubens");
     query(func.args("x", " ('a', 'b')", " { 'limit': 0 }") + "?value", "a\nb");
+    // a single result is not sorted, but tracked while the candidates are scanned
+    query(func.args("x", " ('a', 'b')") + "?value", "a");
+    query(func.args("Rembrant", " ('Rubens', 'Rembrandt', 'Rembrand')") + "?value", "Rembrandt");
 
     // threshold
     query(func.args("Rembrant", candidates, " { 'limit': 0, 'threshold': 0.8 }") + "?value",
@@ -291,7 +294,14 @@ public final class StringModuleTest extends SandboxTest {
     query(func.args("night", " ('nacht')",
         " { 'measure': string:ngram-similarity#2 }") + "?similarity", 0.25);
     query(func.args("night", " ('nacht')",
-        " { 'measure': string:ngram-similarity(?, ?, 3) }") + "?similarity", 0);
+        " { 'measure': string:ngram-similarity(?, ?, { 'n': 3 }) }") + "?similarity", 0);
+
+    // n-gram options are passed on to the internally computed n-gram measure
+    query(func.args("night", " ('nacht')",
+        " { 'measure': string:ngram-similarity#2, 'n': 3 }") + "?similarity", 0);
+    query(func.args("night", " ('nacht')",
+        " { 'measure': string:ngram-similarity#2, 'padding': true() }") + "?similarity", 0.5);
+    error(func.args("a", " ('b')", " { 'n': 0 }"), STRING_NGRAM_X);
 
     // user-defined measures
     query(func.args("abc", " ('abd', 'xyz')",
@@ -365,15 +375,23 @@ public final class StringModuleTest extends SandboxTest {
     query(func.args("aaa", "aa"), 1);
 
     // explicit n-gram length
-    query(func.args("abcd", "abcd", 1), 1);
-    query(func.args("abc", "abc", 3), 1);
-    query(func.args("abc", "abd", 3), 0);
+    query(func.args("abcd", "abcd", " { 'n': 1 }"), 1);
+    query(func.args("abc", "abc", " { 'n': 3 }"), 1);
+    query(func.args("abc", "abd", " { 'n': 3 }"), 0);
     // strings shorter than n are treated as a single n-gram
-    query(func.args("ab", "ab", 5), 1);
-    query(func.args("ab", "cd", 5), 0);
+    query(func.args("ab", "ab", " { 'n': 5 }"), 1);
+    query(func.args("ab", "cd", " { 'n': 5 }"), 0);
 
-    error(func.args("a", "b", 0), STRING_NGRAM_X);
-    error(func.args("a", "b", -1), STRING_NGRAM_X);
+    // padding: common prefixes and suffixes are rewarded
+    query(func.args("night", "nacht", " { 'padding': true() }"), 0.5);
+    // padding: strings shorter than n are no longer disjoint from longer ones
+    query(func.args("ab", "abc", " { 'n': 3 }"), 0);
+    query(func.args("ab", "abc", " { 'n': 3, 'padding': true() }"), 0.4444444444444444);
+    query(func.args("", "", " { 'padding': true() }"), 1);
+    query(func.args("", "abc", " { 'padding': true() }"), 0);
+
+    error(func.args("a", "b", " { 'n': 0 }"), STRING_NGRAM_X);
+    error(func.args("a", "b", " { 'n': -1 }"), STRING_NGRAM_X);
   }
 
   /** Test method. */
@@ -388,26 +406,34 @@ public final class StringModuleTest extends SandboxTest {
     query("string-join(" + func.args("aaa") + ", '|')", "aa|aa");
 
     // explicit n-gram length
-    query("string-join(" + func.args("abc", 1) + ", '|')", "a|b|c");
-    query("string-join(" + func.args("abcd", 3) + ", '|')", "abc|bcd");
+    query("string-join(" + func.args("abc", " { 'n': 1 }") + ", '|')", "a|b|c");
+    query("string-join(" + func.args("abcd", " { 'n': 3 }") + ", '|')", "abc|bcd");
     // strings shorter than n yield a single n-gram with the whole string
-    query("string-join(" + func.args("ab", 5) + ", '|')", "ab");
-    query("count(" + func.args("", 5) + ")", 0);
+    query("string-join(" + func.args("ab", " { 'n': 5 }") + ", '|')", "ab");
+    query("count(" + func.args("", " { 'n': 5 }") + ")", 0);
+
+    // padding: the input is surrounded with n - 1 spaces
+    query("string-join(" + func.args("ab", " { 'padding': true() }") + ", '|')", " a|ab|b ");
+    query("string-join(" + func.args("ab", " { 'n': 3, 'padding': true() }") + ", '|')",
+        "  a| ab|ab |b  ");
+    query("count(" + func.args("", " { 'padding': true() }") + ")", 0);
+    // padding is irrelevant for unigrams
+    query("string-join(" + func.args("ab", " { 'n': 1, 'padding': true() }") + ", '|')", "a|b");
 
     // invariant: ngram-similarity is the Sørensen-Dice coefficient over the distinct n-grams
-    query("let $a := 'night', $b := 'nacht', $n := 2 "
-        + "let $g1 := distinct-values(" + func.args(" $a", " $n") + ") "
-        + "let $g2 := distinct-values(" + func.args(" $b", " $n") + ") "
+    query("let $a := 'night', $b := 'nacht', $o := { 'n': 2 } "
+        + "let $g1 := distinct-values(" + func.args(" $a", " $o") + ") "
+        + "let $g2 := distinct-values(" + func.args(" $b", " $o") + ") "
         + "return 2e0 * count($g1[. = $g2]) div (count($g1) + count($g2)) = "
-        + _STRING_NGRAM_SIMILARITY.args(" $a", " $b", " $n"), true);
+        + _STRING_NGRAM_SIMILARITY.args(" $a", " $b", " $o"), true);
 
     // codepoint-safe: characters outside the BMP are not split into surrogate halves
     query("let $s := codepoints-to-string((120094, 120095, 120096)) "
-        + "let $grams := " + func.args(" $s", 2)
+        + "let $grams := " + func.args(" $s", " { 'n': 2 }")
         + "return count($grams) = 2 and every($grams, fn { string-length() = 2 })", true);
 
-    error(func.args("a", 0), STRING_NGRAM_X);
-    error(func.args("a", -1), STRING_NGRAM_X);
+    error(func.args("a", " { 'n': 0 }"), STRING_NGRAM_X);
+    error(func.args("a", " { 'n': -1 }"), STRING_NGRAM_X);
   }
 
   /** Test method. */

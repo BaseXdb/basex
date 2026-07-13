@@ -27,7 +27,7 @@ import org.basex.util.similarity.*;
  */
 public final class StringClosest extends StringFn {
   /** Options. */
-  public static final class ClosestOptions extends StringOptions {
+  public static final class ClosestOptions extends NgramOptions {
     /** Similarity measure. */
     public static final ValueOption MEASURE = new ValueOption("measure", Types.FUNCTION_ZO);
     /** Minimum similarity. */
@@ -44,12 +44,14 @@ public final class StringClosest extends StringFn {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final AStr value = toStr(arg(0), qc);
+    final byte[] value = toToken(arg(0), qc);
     final Iter candidates = arg(1).atomIter(qc, info);
     final ClosestOptions options = toOptions(arg(2), new ClosestOptions(), qc);
 
     final double threshold = ((ANum) options.get(ClosestOptions.THRESHOLD)).dbl();
     final int limit = options.get(ClosestOptions.LIMIT);
+    final int n = n(options);
+    final boolean padding = options.get(NgramOptions.PADDING);
     final FTOpt opt = ftOpt(options);
 
     final Value func = options.get(ClosestOptions.MEASURE);
@@ -60,25 +62,35 @@ public final class StringClosest extends StringFn {
 
     final boolean tokenize = Enums.oneOf(measure, Measure.TOKEN_SORT_RATIO,
         Measure.TOKEN_SET_RATIO);
-    final boolean bounded = measure != null && measure != Measure.JARO_WINKLER &&
-        measure != Measure.NGRAM_SIMILARITY;
+    // all measures that are based on the edit distance are limited in length
+    final boolean bounded = Enums.oneOf(measure, Measure.LEVENSHTEIN, Measure.TOKEN_SORT_RATIO,
+        Measure.TOKEN_SET_RATIO, Measure.PARTIAL_RATIO);
     final int[] cps = cps(value, opt);
     final String[] tokens = tokenize ? tokens(value, opt) : null;
-    if(bounded) checkLength(cps);
+    if(bounded) checkLength(cps.length);
 
+    // a single result is requested: only the best candidate is cached
+    final boolean single = limit == 1;
     final TokenList values = new TokenList();
     final DoubleList similarities = new DoubleList();
     for(Item item; (item = qc.next(candidates)) != null;) {
       // candidates can be untyped (e.g. index entries returned by ft:tokens)
-      final AStr cand = item instanceof final AStr str ? str : Str.get(item.string(info));
+      final byte[] cand = toToken(item);
       final int[] cps2 = cps(cand, opt);
-      if(bounded) checkLength(cps2);
+      if(bounded) checkLength(cps2.length);
 
       final double similarity = measure == null ? invoke(function, cps, cps2, qc) :
         tokenize ? tokenRatio(tokens, tokens(cand, opt), measure) :
-        similarity(cps, cps2, measure, threshold);
+        similarity(cps, cps2, measure, threshold, n, padding);
+      // NaN thresholds discard all candidates: the check must not be inverted
       if(similarity >= threshold) {
-        values.add(cand.string(info));
+        if(single && !values.isEmpty()) {
+          // equal similarities are ignored: the first candidate wins
+          if(similarity <= similarities.get(0)) continue;
+          values.reset();
+          similarities.reset();
+        }
+        values.add(cand);
         similarities.add(similarity);
       }
     }
@@ -128,15 +140,6 @@ public final class StringClosest extends StringFn {
   }
 
   /**
-   * Returns a string item for a codepoints array.
-   * @param cps codepoints array
-   * @return string
-   */
-  private static Str str(final int[] cps) {
-    return Str.get(new String(cps, 0, cps.length));
-  }
-
-  /**
    * Computes a token-based similarity.
    * @param tokens1 first tokens
    * @param tokens2 second tokens
@@ -155,14 +158,16 @@ public final class StringClosest extends StringFn {
    * @param cps2 second codepoints array
    * @param measure similarity measure
    * @param threshold minimum similarity
+   * @param n n-gram length
+   * @param padding pad the input
    * @return similarity (0.0 - 1.0), or a negative value if the threshold cannot be reached
    */
   private static double similarity(final int[] cps1, final int[] cps2, final Measure measure,
-      final double threshold) {
+      final double threshold, final int n, final boolean padding) {
 
     return switch(measure) {
       case JARO_WINKLER     -> JaroWinkler.distance(cps1, cps2);
-      case NGRAM_SIMILARITY -> NGram.similarity(cps1, cps2, 2);
+      case NGRAM_SIMILARITY -> NGram.similarity(cps1, cps2, n, padding);
       case PARTIAL_RATIO    -> partial(cps1, cps2);
       default               -> {
         // a similarity of t allows at most (1 - t) * length errors
