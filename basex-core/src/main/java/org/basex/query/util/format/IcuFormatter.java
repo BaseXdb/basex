@@ -138,8 +138,8 @@ public final class IcuFormatter extends Formatter {
   protected byte[] word(final long n, final NumeralType numType, final byte[] modifier) {
     // format number using appropriate rule set
     final String formatted = spelloutFormat.format(n, ruleSet(numType, modifier));
-    // remove soft hyphen
-    final byte[] result = token(formatted.replace("\u00ad", ""));
+    // remove soft hyphen; clone token, as single ASCII characters are cached
+    final byte[] result = token(formatted.replace("\u00ad", "")).clone();
     // establish title case
     if(!eq(token(spelloutFormat.getLocale(ULocale.ACTUAL_LOCALE).getLanguage()), EN)) {
       result[0] = (byte) uc(result[0]);

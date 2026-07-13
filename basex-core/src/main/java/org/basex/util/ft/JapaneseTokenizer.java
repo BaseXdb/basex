@@ -76,9 +76,9 @@ final class JapaneseTokenizer extends Tokenizer {
   private Morpheme currToken;
 
   /** Case option. */
-  private final FTCase cs;
+  private final FTCase casesens;
   /** Diacritics flag. */
-  private final boolean dc;
+  private final boolean diacritics;
   /** Wildcard flag. */
   private final boolean wc;
   /** Stemming flag. */
@@ -138,9 +138,9 @@ final class JapaneseTokenizer extends Tokenizer {
    * @param fto (optional) full-text options
    */
   JapaneseTokenizer(final FTOpt fto) {
-    cs = fto != null && fto.cs != null ? fto.cs : FTCase.INSENSITIVE;
+    casesens = fto != null && fto.cs != null ? fto.cs : FTCase.INSENSITIVE;
     wc = fto != null && fto.is(WC);
-    dc = fto != null && fto.is(DC);
+    diacritics = fto != null && fto.is(DC);
     st = fto != null && fto.is(ST);
   }
 
@@ -330,9 +330,9 @@ final class JapaneseTokenizer extends Tokenizer {
       n = currToken.getBaseForm();
     }
     byte[] t = token(n);
-    if(!dc) t = noDiacritics(t);
-    if(cs == FTCase.UPPER) t = WesternTokenizer.upper(t);
-    else if(cs != FTCase.SENSITIVE) t = WesternTokenizer.lower(t);
+    if(!diacritics) t = noDiacritics(t);
+    if(casesens == FTCase.UPPER) t = upper(t);
+    else if(casesens != FTCase.SENSITIVE) t = lower(t);
     return toHankaku(t);
   }
 

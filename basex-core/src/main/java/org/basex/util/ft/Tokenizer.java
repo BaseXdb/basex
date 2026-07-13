@@ -1,6 +1,10 @@
 package org.basex.util.ft;
 
+import static org.basex.util.Token.*;
+
 import java.util.*;
+
+import org.basex.util.*;
 
 /**
  * Abstract tokenizer.
@@ -78,5 +82,45 @@ public abstract class Tokenizer extends LanguageImpl {
   @SuppressWarnings("unused")
   int pos(final int word, final FTUnit unit) {
     return 0;
+  }
+
+  /**
+   * Converts the specified token to upper case.
+   * @param token token to be converted
+   * @return the converted token
+   */
+  static byte[] upper(final byte[] token) {
+    final int tl = token.length;
+    if(ascii(token)) {
+      int i = -1;
+      while(++i < tl && token[i] == uc(token[i]));
+      if(i == tl) return token;
+      final byte[] tmp = token.clone();
+      for(; i < tl; ++i) tmp[i] = (byte) uc(tmp[i]);
+      return tmp;
+    }
+    final TokenBuilder tb = new TokenBuilder(tl);
+    forEachCp(token, cp -> tb.add(uc(cp)));
+    return tb.finish();
+  }
+
+  /**
+   * Converts the specified token to lower case.
+   * @param token token to be converted
+   * @return the converted token
+   */
+  static byte[] lower(final byte[] token) {
+    final int tl = token.length;
+    if(ascii(token)) {
+      int i = -1;
+      while(++i < tl && token[i] == lc(token[i]));
+      if(i == tl) return token;
+      final byte[] tmp = token.clone();
+      for(; i < tl; ++i) tmp[i] = (byte) lc(tmp[i]);
+      return tmp;
+    }
+    final TokenBuilder tb = new TokenBuilder(tl);
+    forEachCp(token, cp -> tb.add(lc(cp)));
+    return tb.finish();
   }
 }

@@ -275,15 +275,12 @@ public abstract class IO {
    */
   public final String dbName() {
     final TokenBuilder tb = new TokenBuilder();
-    byte[] token = token(name());
-    final int dot = lastIndexOf(token, '.');
-    token = noDiacritics(dot == -1 ? token : substring(token, 0, dot));
-    final int nl = token.length;
+    final byte[] token = noDiacritics(token(name()));
+    final int dot = lastIndexOf(token, '.'), nl = dot != -1 ? dot : token.length;
     for(int n = 0; n < nl; n += cl(token, n)) {
       final int ch = cp(token, n);
       if(Databases.validChar(ch, n == 0 || n + 1 == nl)) tb.add(ch);
     }
-    // return hash code if string is empty (mainly required for CHECK command)
     return tb.isEmpty() ? Integer.toString(hashCode()) : tb.toString();
   }
 
