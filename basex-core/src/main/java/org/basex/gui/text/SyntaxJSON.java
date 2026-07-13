@@ -16,32 +16,35 @@ import org.basex.util.hash.*;
 final class SyntaxJSON extends Syntax {
   /** Keywords. */
   private static final TokenSet KEYWORDS = new TokenSet("false", "true", "null");
-  /** State index: quoted flag. */
-  private static final int QUOTED = 0;
-  /** State index: backslash. */
-  private static final int BACK = 1;
+
+  /** Mode: value. */
+  private static final int VALUE = 0;
+  /** Mode: string. */
+  private static final int STRING = 1;
 
   @Override
-  public void init(final Color color) {
-    super.init(color);
-    state = new int[2];
+  Color color(final int mode) {
+    return mode == STRING ? brown : plain;
   }
 
   @Override
-  public Color getColor(final TextIterator iter) {
-    final int ch = iter.curr();
-    final boolean back = state[BACK] != 0;
-    final boolean quote = !back && ch == '"';
-
-    if(state[QUOTED] != 0) {
-      state[BACK] = !back && ch == '\\' ? 1 : 0;
-    } else {
+  Color mode(final byte[] text, final int pos, final int end, final int ch, final int mode) {
+    if(mode == VALUE) {
+      if(ch == '"') {
+        enter(STRING, 0);
+        return brown;
+      }
       if("{}[]:,".indexOf(ch) != -1) return cyan;
-      if(KEYWORDS.contains(token(iter.currString()))) return blue;
-      if(number(iter)) return purple;
+      if(ws(ch)) return plain;
+      if(KEYWORDS.contains(token(string(text, pos, end - pos)))) return blue;
+      // numbers are tokenized into several parts: '-', '1', '.', '5e', '-', '3'
+      if(digit(ch) || (ch == '-' || ch == '+' || ch == '.') && digit(cp(text, pos + 1)))
+        return purple;
+      // any other character is invalid
+      return red;
     }
-
-    if(quote) state[QUOTED] ^= 1;
-    return quote || state[QUOTED] != 0 ? brown : red;
+    if(ch == '\\') state[SKIP] = 1;
+    else if(ch == '"') close(0);
+    return brown;
   }
 }

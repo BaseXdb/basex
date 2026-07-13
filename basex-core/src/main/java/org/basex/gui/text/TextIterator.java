@@ -120,6 +120,14 @@ final class TextIterator {
   }
 
   /**
+   * Returns the text.
+   * @return text
+   */
+  byte[] text() {
+    return text;
+  }
+
+  /**
    * Returns the iterator position.
    * @return iterator position
    */

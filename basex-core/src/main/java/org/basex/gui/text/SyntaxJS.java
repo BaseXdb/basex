@@ -1,6 +1,7 @@
 package org.basex.gui.text;
 
 import static org.basex.gui.GUIConstants.*;
+import static org.basex.util.Token.*;
 
 import java.awt.*;
 import java.util.*;
@@ -16,14 +17,27 @@ import org.basex.util.*;
 final class SyntaxJS extends Syntax {
   /** Keywords. */
   private static final HashSet<String> KEYWORDS = new HashSet<>();
-  /** State index: comment. */
-  private static final int COMMENT = 0;
-  /** State index: quote. */
-  private static final int QUOTE = 1;
-  /** State index: variable flag. */
-  private static final int VAR = 2;
-  /** State index: backslash. */
-  private static final int BACK = 3;
+
+  /** Mode: code. */
+  private static final int CODE = 0;
+  /** Mode: double-quoted string. */
+  private static final int STRING_D = 1;
+  /** Mode: single-quoted string. */
+  private static final int STRING_S = 2;
+  /** Mode: template literal. */
+  private static final int TEMPLATE = 3;
+  /** Mode: line comment. */
+  private static final int LINE = 4;
+  /** Mode: block comment. */
+  private static final int BLOCK = 5;
+  /** Mode: regular expression. */
+  private static final int REGEX = 6;
+  /** Mode: character class of a regular expression. */
+  private static final int CLASS = 7;
+
+  /** Keywords that end an operand: they are followed by a division, not by a regular expression. */
+  private static final HashSet<String> OPERANDS = new HashSet<>(Arrays.asList(
+    "super", "this"));
 
   // initialize keywords
   static {
@@ -38,65 +52,96 @@ final class SyntaxJS extends Syntax {
   }
 
   @Override
-  public void init(final Color color) {
-    super.init(color);
-    state = new int[4];
+  Color color(final int mode) {
+    return switch(mode) {
+      case STRING_D, STRING_S, TEMPLATE, REGEX, CLASS -> brown;
+      case LINE, BLOCK -> cyan;
+      default -> plain;
+    };
   }
 
   @Override
-  public Color getColor(final TextIterator iter) {
-    final int ch = iter.curr();
+  Color mode(final byte[] text, final int pos, final int end, final int ch, final int mode) {
+    return switch(mode) {
+      case LINE -> {
+        if(ch == '\n') close(0);
+        yield cyan;
+      }
+      case BLOCK -> {
+        if(ch == '*' && cp(text, pos + 1) == '/') close(1);
+        yield cyan;
+      }
+      case STRING_D, STRING_S -> {
+        if(ch == '\\') state[SKIP] = 1;
+        else if(ch == (mode == STRING_D ? '"' : '\'')) close(0);
+        yield brown;
+      }
+      case TEMPLATE -> {
+        if(ch == '\\') {
+          state[SKIP] = 1;
+        } else if(ch == '`') {
+          close(0);
+        } else if(ch == '$' && cp(text, pos + 1) == '{') {
+          // substitution: '${ ... }'
+          enter(CODE, 1);
+        }
+        yield brown;
+      }
+      case REGEX -> {
+        // a character class may contain the delimiter: '/[/]/'
+        if(ch == '\\') state[SKIP] = 1;
+        else if(ch == '[') enter(CLASS, 0);
+        // a regular expression is limited to a single line
+        else if(ch == '/' || ch == '\n') close(0);
+        yield brown;
+      }
+      case CLASS -> {
+        if(ch == '\\') state[SKIP] = 1;
+        else if(ch == ']' || ch == '\n') close(0);
+        yield brown;
+      }
+      default -> {
+        if(ch == '/') {
+          final int next = cp(text, pos + 1);
+          if(next == '/' || next == '*') {
+            enter(next == '/' ? LINE : BLOCK, 1);
+            yield cyan;
+          }
+          if(!operand(text, pos)) {
+            enter(REGEX, 0);
+            yield brown;
+          }
+          yield plain;
+        }
+        if(ch == '"' || ch == '\'') {
+          enter(ch == '"' ? STRING_D : STRING_S, 0);
+          yield brown;
+        }
+        if(ch == '`') {
+          enter(TEMPLATE, 0);
+          yield brown;
+        }
+        if(ch == '{') {
+          enter(CODE, 0);
+          yield plain;
+        }
+        if(ch == '}') {
+          close(0);
+          yield plain;
+        }
+        if(Token.digit(ch)) yield purple;
+        if(!XMLToken.isNCStartChar(ch)) yield plain;
+        yield KEYWORDS.contains(string(text, pos, end - pos)) ? blue : plain;
+      }
+    };
+  }
 
-    // opened quote
-    if(state[QUOTE] != 0) {
-      if(state[BACK] != 0) state[BACK] = 0;
-      else if(ch == state[QUOTE]) state[QUOTE] = 0;
-      else state[BACK] = ch == '\\' ? 1 : 0;
-      return brown;
-    }
-
-    // comment: 1 = after '/', 2 = block, 3 = block after '*', 4 = line
-    switch(state[COMMENT]) {
-      case 1 -> state[COMMENT] = ch == '*' ? 2 : ch == '/' ? 4 : 0;
-      case 2 -> { if(ch == '*') state[COMMENT] = 3; }
-      case 3 -> state[COMMENT] = ch == '/' ? 0 : 2;
-      case 4 -> { if(ch == '\n') state[COMMENT] = 0; }
-      default -> { if(ch == '/') state[COMMENT] = 1; }
-    }
-    if(state[COMMENT] != 0) {
-      state[VAR] = 0;
-      return cyan;
-    }
-
-    // quotes
-    if(state[BACK] != 0) {
-      state[BACK] = 0;
-    } else if(ch == '\\') {
-      state[BACK] = 1;
-    } else if(ch == '"' || ch == '\'') {
-      state[QUOTE] = ch;
-      return brown;
-    }
-
-    // variables
-    if(ch == '$') {
-      state[VAR] = 1;
-      return green;
-    }
-    if(state[VAR] != 0) {
-      state[VAR] = XMLToken.isNCStartChar(ch) ? 1 : 0;
-      return green;
-    }
-
-    // digits (JS literals such as 0xFF are not full doubles, so match on the first digit)
-    if(Token.digit(ch)) return purple;
-    // special characters
-    if(!XMLToken.isNCStartChar(ch)) return cyan;
-    // check for keywords
-    if(KEYWORDS.contains(iter.currString())) return blue;
-
-    // standard text
-    return plain;
+  @Override
+  boolean operandName(final byte[] text, final int pos) {
+    // identifiers and numbers end an operand; keywords that expect an expression do not
+    final int start = nameStart(text, pos);
+    final String name = string(text, start, pos + cl(text, pos) - start);
+    return !KEYWORDS.contains(name) || OPERANDS.contains(name);
   }
 
   @Override

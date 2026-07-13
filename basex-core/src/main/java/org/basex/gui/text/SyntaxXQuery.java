@@ -13,6 +13,7 @@ import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -21,108 +22,265 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-final class SyntaxXQuery extends Syntax {
+final class SyntaxXQuery extends SyntaxMarkup {
   /** Opening brackets. */
   private static final String OPENING = "{(";
   /** Closing brackets. */
   private static final String CLOSING = "})";
-  /** Keywords. */
+  /** Reserved words and type names. */
   private static final HashSet<String> KEYWORDS = new HashSet<>();
-  /** State index: comment. */
-  private static final int COMMENT = 0;
-  /** State index: last quote. */
-  private static final int QUOTE = 1;
-  /** State index: variable flag. */
-  private static final int VAR = 2;
-  /** State index: element flag. */
-  private static final int ELEM = 3;
+  /** Names of built-in functions. */
+  private static final HashSet<String> FUNCTIONS = new HashSet<>();
+  /** Maximum length of a keyword. */
+  private static final int MAXKEY = 64;
+
+  /** Mode: code. */
+  private static final int CODE = MODES;
+  /** Mode: double-quoted string. */
+  private static final int STRING_D = MODES + 1;
+  /** Mode: single-quoted string. */
+  private static final int STRING_S = MODES + 2;
+  /** Mode: string template ({@code `...`}). */
+  private static final int TEMPLATE = MODES + 3;
+  /** Mode: string constructor ({@code ``[...]``}). */
+  private static final int CONSTRUCTOR = MODES + 4;
+  /** Mode: comment (nesting is tracked by the mode stack). */
+  private static final int COMMENT = MODES + 5;
+  /** Mode: pragma. */
+  private static final int PRAGMA = MODES + 6;
+  /** Mode: URI of an EQName ({@code Q{...}}). */
+  private static final int EQNAME = MODES + 7;
 
   // initialize keywords
   static {
     try {
-      // add query tokens
       for(final Field f : QueryText.class.getFields()) {
         if("IGNORE".equals(f.getName())) break;
-        Collections.addAll(KEYWORDS, ((String) f.get(null)).split("-"));
+        KEYWORDS.add((String) f.get(null));
+      }
+      for(final BasicType type : BasicType.values()) {
+        final QNm name = type.qname();
+        final byte[] prefix = NSGlobal.prefix(name.uri());
+        KEYWORDS.add((prefix.length != 0 ? string(prefix) + ':' : "") + string(name.local()));
+      }
+      for(final Axis axis : Axis.values()) KEYWORDS.add(axis.name);
+      for(final CmpOp op : CmpOp.values()) {
+        KEYWORDS.add(op.toValueString());
+        Collections.addAll(KEYWORDS, op.nodes);
       }
       for(final QNm name : Functions.BUILT_IN) {
-        Collections.addAll(KEYWORDS, string(name.local()).split("-"));
+        final String local = string(name.local());
+        final byte[] prefix = NSGlobal.prefix(name.uri());
+        if(prefix.length != 0) FUNCTIONS.add(string(prefix) + ':' + local);
+        // functions of the default function namespace can be addressed without prefix
+        if(eq(name.uri(), QueryText.FN_URI)) FUNCTIONS.add(local);
       }
-      for(final Axis a : Axis.values()) Collections.addAll(KEYWORDS, a.name);
-      for(final CmpOp op : CmpOp.values()) {
-        Collections.addAll(KEYWORDS, op.toString());
-        Collections.addAll(KEYWORDS, op.toValueString());
-        for(final String o : op.nodes) Collections.addAll(KEYWORDS, o);
-      }
-      final Atts ns = NSGlobal.NS;
-      for(int n = 0; n < ns.size(); n++) KEYWORDS.add(string(ns.name(n)));
     } catch(final Exception ex) {
       Util.stack(ex);
     }
   }
 
+  /** Indicates if the last resolved name is a keyword. */
+  private boolean nameKeyword;
+
   @Override
-  public void init(final Color color) {
-    super.init(color);
-    state = new int[4];
+  int initialMode() {
+    return CODE;
   }
 
   @Override
-  public Color getColor(final TextIterator iter) {
-    final int ch = iter.curr();
+  boolean quoteEscape() {
+    return true;
+  }
 
-    // opened quote
-    if(state[QUOTE] != 0) {
-      if(ch == state[QUOTE]) state[QUOTE] = 0;
+  @Override
+  Color color(final int mode) {
+    return switch(mode) {
+      case STRING_D, STRING_S, TEMPLATE, CONSTRUCTOR, EQNAME -> brown;
+      case COMMENT, PRAGMA -> cyan;
+      default -> super.color(mode);
+    };
+  }
+
+  @Override
+  Color mode(final byte[] text, final int pos, final int end, final int ch, final int mode) {
+    return switch(mode) {
+      case CODE -> code(text, pos, ch);
+      case COMMENT -> {
+        // comments nest: an inner comment pushes the outer one onto the mode stack
+        if(ch == '(' && cp(text, pos + 1) == ':') enter(COMMENT, 1);
+        else if(ch == ':' && cp(text, pos + 1) == ')') close(1);
+        yield cyan;
+      }
+      case PRAGMA -> {
+        if(ch == '#' && cp(text, pos + 1) == ')') close(1);
+        yield cyan;
+      }
+      case EQNAME -> {
+        if(ch == '}') close(0);
+        yield brown;
+      }
+      case STRING_D, STRING_S -> {
+        if(reference(text, pos)) yield purple;
+        final int quote = mode == STRING_D ? '"' : '\'';
+        if(ch == quote) {
+          // doubled quotes are escaped
+          if(cp(text, pos + 1) == quote) state[SKIP] = 1;
+          else close(0);
+        }
+        yield brown;
+      }
+      case TEMPLATE -> {
+        if(ch == '`') {
+          if(cp(text, pos + 1) == '`') state[SKIP] = 1;
+          else close(0);
+        } else if(enclosed(text, pos, TEMPLATE)) {
+          yield plain;
+        }
+        yield brown;
+      }
+      case CONSTRUCTOR -> {
+        if(ch == ']' && startsWith(text, pos, "]``")) close(2);
+        else if(ch == '`' && cp(text, pos + 1) == '{') enter(CODE, 1);
+        yield brown;
+      }
+      default -> super.mode(text, pos, end, ch, mode);
+    };
+  }
+
+  /**
+   * Determines the color of a character in code.
+   * @param text text
+   * @param pos position
+   * @param ch current character
+   * @return color
+   */
+  private Color code(final byte[] text, final int pos, final int ch) {
+    if(ch == '(') {
+      final int next = cp(text, pos + 1);
+      if(next == ':' || next == '#') {
+        enter(next == ':' ? COMMENT : PRAGMA, 1);
+        return cyan;
+      }
+      return plain;
+    }
+    if(ch == '"' || ch == '\'') {
+      enter(ch == '"' ? STRING_D : STRING_S, 0);
       return brown;
     }
-
-    // comment
-    if(state[COMMENT] == 0 && ch == '(') {
-      state[COMMENT]++;
-    } else if(state[COMMENT] == 1) {
-      state[COMMENT] = ch == ':' ? 2 : 0;
-    } else if(state[COMMENT] == 2 && ch == ':') {
-      state[COMMENT]++;
-    } else if(state[COMMENT] == 3 && ch != ':') {
-      state[COMMENT] = ch == ')' ? 0 : 2;
-    }
-    if(state[COMMENT] != 0) {
-      state[VAR] = 0;
-      return cyan;
-    }
-
-    // quotes
-    if(ch == '"' || ch == '\'' || ch == '`') {
-      state[QUOTE] = ch;
+    if(ch == '`') {
+      final boolean constr = startsWith(text, pos, "``[");
+      enter(constr ? CONSTRUCTOR : TEMPLATE, constr ? 2 : 0);
       return brown;
     }
-
-    // variables
-    if(ch == '$') {
-      state[VAR] = 1;
-      return green;
+    // URI of an EQName: must not be parsed as code
+    if(ch == 'Q' && cp(text, pos + 1) == '{') {
+      enter(EQNAME, 1);
+      return brown;
     }
-    if(state[VAR] != 0) {
-      state[VAR] = XMLToken.isChar(ch) ? 1 : 0;
-      return green;
+    if(ch == '<') return open(text, pos);
+    if(ch == '{') {
+      enter(CODE, 0);
+      return plain;
+    }
+    if(ch == '}') {
+      close(0);
+      return plain;
+    }
+    if(ch == '$') return green;
+    if(ch == '%' && XMLToken.isNCStartChar(cp(text, pos + 1))) return blue;
+
+    if(name(text, pos)) {
+      final int prev = nameStart > 0 ? text[nameStart - 1] : 0;
+      if(prev == '$') return green;
+      return prev == '%' || nameKeyword ? blue : plain;
+    }
+    // numeric literals (a dot is only a decimal point if it is not part of a name)
+    return digit(ch) || ch == '.' && (digit(cp(text, pos + 1)) || digit(prev(text, pos))) ?
+      purple : plain;
+  }
+
+  @Override
+  boolean element(final byte[] text, final int pos) {
+    return state[MODE] == CONTENT || !operand(text, pos);
+  }
+
+  @Override
+  boolean enclosed(final byte[] text, final int pos, final int mode) {
+    final int ch = cp(text, pos);
+    if(ch != '{' && ch != '}') return false;
+    // doubled curly braces are escaped
+    if(cp(text, pos + 1) == ch) {
+      state[SKIP] = 1;
+      return false;
+    }
+    if(ch == '}') return false;
+    enter(CODE, 0);
+    return true;
+  }
+
+  @Override
+  void classify(final byte[] text, final int start, final int end) {
+    nameKeyword = keyword(text, start, end);
+  }
+
+  @Override
+  boolean operandName(final byte[] text, final int pos) {
+    // numbers, variables and user-defined names end an operand; keywords do not
+    if(!name(text, pos)) return true;
+    if(nameStart > 0 && text[nameStart - 1] == '$') return true;
+    return !nameKeyword;
+  }
+
+  /**
+   * Checks if the specified name is highlighted as a keyword.
+   * @param text text
+   * @param start start of the name
+   * @param end end of the name
+   * @return result of check
+   */
+  private static boolean keyword(final byte[] text, final int start, final int end) {
+    if(end - start > MAXKEY) return false;
+    String name = string(text, start, end - start);
+    int first = start;
+
+    // an EQName is resolved via its braced URI; a lexical prefix is ignored (XQuery 4.0, 'EQName')
+    final int brace = braced(text, start);
+    if(brace != -1) {
+      final byte[] prefix = NSGlobal.prefix(substring(text, brace + 1, start - 1));
+      if(prefix.length == 0) return false;
+      final int colon = name.indexOf(':');
+      name = string(prefix) + ':' + (colon == -1 ? name : name.substring(colon + 1));
+      first = brace - 1;
     }
 
-    // integers
-    if(number(iter)) return purple;
+    // built-in functions are only highlighted if they are called: 'count(1)', 'count#1', 'a::b'
+    final int next = skipWs(text, end);
+    final int nc = cp(text, next);
+    if(nc == '(' || nc == '#' || nc == ':' && cp(text, next + 1) == ':')
+      return KEYWORDS.contains(name) || FUNCTIONS.contains(name);
 
-    // special characters
-    if(!XMLToken.isNCChar(ch)) {
-      state[ELEM] = ch == '<' || ch == '%' ? 1 : 0;
-      return cyan;
+    // reserved words are no keywords in name tests: '//name', '@id', 'child::text', '$map?key'
+    final int prev = skipWsBack(text, first), pc = cp(text, prev);
+    final boolean step = pc == '/' || pc == '@' || pc == '?' ||
+      pc == ':' && cp(text, back(text, prev)) == ':';
+    return !step && KEYWORDS.contains(name);
+  }
+
+  /**
+   * Returns the opening brace of the braced URI that precedes an EQName.
+   * @param text text
+   * @param start start of the name
+   * @return position, or {@code -1} if the name has no braced URI
+   */
+  private static int braced(final byte[] text, final int start) {
+    if(start < 3 || text[start - 1] != '}') return -1;
+    // a braced URI contains no braces
+    for(int p = start - 2; p > 0; p--) {
+      if(text[p] == '}') return -1;
+      if(text[p] == '{') return text[p - 1] == 'Q' ? p : -1;
     }
-
-    // check for keywords
-    if(state[ELEM] == 0 && KEYWORDS.contains(iter.currString())) return blue;
-
-    // standard text
-    state[ELEM] = 0;
-    return plain;
+    return -1;
   }
 
   @Override
