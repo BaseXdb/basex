@@ -1,5 +1,6 @@
 package org.basex.util.similarity;
 
+import static org.basex.util.FTToken.*;
 import static org.basex.util.Token.*;
 
 import org.basex.util.list.*;
@@ -29,20 +30,21 @@ public final class Soundex {
     // normalize input to ascii characters (ignore all others)
     final IntList tmp = new IntList(cps.length);
     for(final int cp : cps) {
-      final int c = uc(cp);
+      final int c = uc(noDiacritics(cp));
       if(c >= 'A' && c <= 'Z') tmp.add(c);
     }
 
-    final int[] out = { '0', '0', '0', '0' }, in = tmp.finish();
+    // no letters, no pronunciation, no code
+    final int[] in = tmp.finish();
     final int is = in.length;
-    if(is > 0) {
-      out[0] = in[0];
-      for(int op = 1, ip = 0, lastCode = map(in, ip++, MAPPING); ip < is && op < 4;) {
-        final int code = map(in, ip++, MAPPING);
-        if(code != 0) {
-          if(code != '0' && code != lastCode) out[op++] = code;
-          lastCode = code;
-        }
+    if(is == 0) return in;
+
+    final int[] out = { in[0], '0', '0', '0' };
+    for(int op = 1, ip = 0, lastCode = map(in, ip++, MAPPING); ip < is && op < 4;) {
+      final int code = map(in, ip++, MAPPING);
+      if(code != 0) {
+        if(code != '0' && code != lastCode) out[op++] = code;
+        lastCode = code;
       }
     }
     return out;

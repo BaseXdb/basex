@@ -32,6 +32,11 @@ public final class StringModuleTest extends SandboxTest {
     colognePhonetic("Müller-Lüdenscheidt", "65752682");
     colognePhonetic("bergisch-gladbach", "174845214");
 
+    // combining marks are dropped: the code is independent of the Unicode normalization form
+    colognePhonetic("çs", "8");
+    query(_STRING_COLOGNE_PHONETIC.args(" normalize-unicode('çs', 'NFD')"), "8");
+    query(_STRING_COLOGNE_PHONETIC.args(" normalize-unicode('Ñuñez', 'NFD')"), "668");
+
     // edge cases
     colognePhonetic("a", "0");
     colognePhonetic("e", "0");
@@ -109,6 +114,27 @@ public final class StringModuleTest extends SandboxTest {
   @Test public void colognePhoneticVariations() {
     cologneVariations("65", "mella", "milah", "moulla", "mellah", "muehle", "mule");
     cologneVariations("67", "Meier", "Maier", "Mair", "Meyer", "Meyr", "Mejer", "Major");
+    // diacritics are folded, not dropped
+    cologneVariations("0648276", "Ångström", "Angstroem");
+    cologneVariations("668", "Ñuñez", "Nunez");
+  }
+
+  /** Checks properties of the phonetic encodings that must hold for random words. */
+  @Test public void phoneticProperties() {
+    query("let $chars := ('a', 'c', 's', 'z', 'ç', 'ñ', 'ä', 'ß', 'É', '-')\n" +
+      "let $numbers := random:seeded-integer(42, 4000, count($chars))\n" +
+      "for $word in 1 to 500\n" +
+      "let $s := string-join(\n" +
+      "  for $number in subsequence($numbers, ($word - 1) * 8 + 1, 1 + $word mod 8)\n" +
+      "  return $chars[$number + 1]\n" +
+      ")\n" +
+      "for $code in (string:soundex#1, string:cologne-phonetic#1)\n" +
+      // codes are independent of the Unicode normalization form and the case of the input
+      "where $code(normalize-unicode($s, 'NFC')) != $code(normalize-unicode($s, 'NFD'))\n" +
+      "   or $code($s) != $code(upper-case($s))\n" +
+      // a Soundex code is empty, or an initial letter, followed by three digits
+      "   or not(matches(string:soundex($s), '^([A-Z][0-9]{3})?$'))\n" +
+      "return $s", "");
   }
 
   /** Test method. */
@@ -477,8 +503,10 @@ public final class StringModuleTest extends SandboxTest {
   @Test public void soundex() {
     final Function func = _STRING_SOUNDEX;
     // queries
-    query(func.args(""), "0000");
-    query(func.args(" \"\""), "0000");
+    // strings without letters yield no code
+    query(func.args(""), "");
+    query(func.args(" \"\""), "");
+    query(func.args("123"), "");
 
     query(func.args(" \"&#x9;&#xa;&#xd; Washington &#x9;&#xa;&#xd;\" "), "W252");
     query(func.args("Ashcraft"), "A261");
@@ -585,6 +613,10 @@ public final class StringModuleTest extends SandboxTest {
     soundexVariations("E625",
       "Erickson", "Erickson", "Erikson", "Ericson", "Ericksen", "Ericsen"
     );
+    // diacritics are folded, not dropped
+    soundexVariations("N520", "Ñuñez", "Nunez");
+    soundexVariations("A523", "Ångström", "Angstroem");
+    soundexVariations("S162", "Šafařík", "Safarik");
   }
 
   /**

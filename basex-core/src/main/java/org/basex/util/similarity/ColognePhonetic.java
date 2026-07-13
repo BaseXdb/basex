@@ -1,5 +1,6 @@
 package org.basex.util.similarity;
 
+import static org.basex.util.FTToken.*;
 import static org.basex.util.Token.*;
 
 import org.basex.util.list.*;
@@ -42,15 +43,10 @@ public final class ColognePhonetic {
    * @return encoded codepoints
    */
   public static int[] encode(final int[] cps) {
-    // normalize input
+    // normalize input; drop combining marks (they would be treated as separators)
     final IntList tmp = new IntList(cps.length);
     for(final int cp : cps) {
-      int c = lc(cp);
-      if(c == '\u00E4') c = 'a';
-      else if(c == '\u00F6') c = 'o';
-      else if(c == '\u00FC') c = 'u';
-      else if(c == '\u00DF') c = 's';
-      tmp.add(c);
+      if(!combining(cp)) tmp.add(lc(noDiacritics(cp)));
     }
 
     final IntList out = new IntList();

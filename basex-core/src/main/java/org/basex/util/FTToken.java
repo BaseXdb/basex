@@ -32,6 +32,15 @@ public final class FTToken {
   }
 
   /**
+   * Returns true if the specified codepoint is a combining mark.
+   * @param cp codepoint to be tested
+   * @return result of check
+   */
+  public static boolean combining(final int cp) {
+    return isCombining(Character.getType(cp));
+  }
+
+  /**
    * Returns a token without diacritics.
    * @param token token to be normalized
    * @return resulting token
