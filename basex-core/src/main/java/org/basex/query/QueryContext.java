@@ -703,31 +703,26 @@ public final class QueryContext extends Job implements Closeable {
    * @throws QueryException query exception
    */
   private Value update() throws QueryException {
-    try {
-      // retrieve result
-      final Value value = main.value(this);
-      // only perform updates if no parent context exists
-      if(updates == null || parent != null) return value;
+    // retrieve result
+    final Value value = main.value(this);
+    // only perform updates if no parent context exists
+    if(updates == null || parent != null) return value;
 
-      // create copies of results that will be modified by an update operation
-      final HashSet<Data> datas = updates.prepare(this);
-      final StringList dbs = updates.databases();
+    // create copies of results that will be modified by an update operation
+    final HashSet<Data> datas = updates.prepare(this);
+    final StringList dbs = updates.databases();
 
-      final ValueBuilder vb = new ValueBuilder(this);
-      final QueryConsumer<Value> materialize = val -> vb.add(val.materialize(d -> d != null &&
-          (datas.contains(d) || !d.inMemory() && dbs.contains(d.meta.name)), null, this));
-      materialize.accept(value);
-      materialize.accept(updates.output(true, this));
+    final ValueBuilder vb = new ValueBuilder(this);
+    final QueryConsumer<Value> materialize = val -> vb.add(val.materialize(d -> d != null &&
+        (datas.contains(d) || !d.inMemory() && dbs.contains(d.meta.name)), null, this));
+    materialize.accept(value);
+    materialize.accept(updates.output(true, this));
 
-      // invalidate current node set in context, apply updates
-      if(context.data() != null) context.invalidate();
-      updates.apply(this);
+    // invalidate current node set in context, apply updates
+    if(context.data() != null) context.invalidate();
+    updates.apply(this);
 
-      return vb.value(value);
-    } catch(final StackOverflowError ex) {
-      Util.debug(ex);
-      throw BASEX_OVERFLOW.get(null);
-    }
+    return vb.value(value);
   }
 
   /**
@@ -822,6 +817,9 @@ public final class QueryContext extends Job implements Closeable {
     }
     try {
       return code.get();
+    } catch(final StackOverflowError ex) {
+      Util.debug(ex);
+      throw BASEX_OVERFLOW.get(null);
     } finally {
       runtime.addAndGet(perf.nanoRuntime());
     }

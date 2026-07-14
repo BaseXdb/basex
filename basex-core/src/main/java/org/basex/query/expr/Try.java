@@ -107,6 +107,13 @@ public final class Try extends Single {
       final Catch ctch = matches(ex);
       if(ctch != null) return ctch.value(qc, ex);
       throw ex;
+    } catch(final StackOverflowError ex) {
+      // the stack has been unwound to this expression, so the catch clause has room to run
+      Util.debug(ex);
+      final QueryException qe = BASEX_OVERFLOW.get(info);
+      final Catch ctch = matches(qe);
+      if(ctch != null) return ctch.value(qc, qe);
+      throw qe;
     } finally {
       final Value fnl = fnlly.value(qc);
       if(fnl != Empty.VALUE) throw FINALLY_X.get(info, fnl);

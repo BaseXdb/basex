@@ -1,5 +1,7 @@
 package org.basex.query.ast;
 
+import static org.basex.query.QueryError.*;
+
 import org.basex.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -14,6 +16,10 @@ import org.junit.jupiter.api.*;
  * @author Leo Woerteler
  */
 public final class TCOTest extends SandboxTest {
+  /** Non-tail-recursive function, called with a depth that exhausts the stack. */
+  private static final String DEEP =
+      "declare function local:deep($n) { if($n eq 0) then () else ($n, local:deep($n - 1)) };";
+
   /** Checks if tail-call optimization was applied. */
   @Test public void facTest() {
     check("declare function local:fac($n, $f) {" +
@@ -161,5 +167,22 @@ public final class TCOTest extends SandboxTest {
         + "local:sum(0, 1 to 100000)", 5000050000L,
         exists(Util.className(StaticFuncCall.class) + "[@tailCall eq 'true']")
     );
+  }
+
+  /** Checks if the stack overflow of a non-tail-recursive function is catchable. */
+  @Test public void overflowCaught() {
+    query(DEEP + "(try { count(local:deep(1000000)) } catch * { string($err:code) }) || ' next'",
+        "basex:overflow next");
+  }
+
+  /** Checks if an uncaught stack overflow is raised as a query error. */
+  @Test public void overflowUncaught() {
+    error(DEEP + "count(local:deep(1000000))", BASEX_OVERFLOW);
+  }
+
+  /** Checks if a stack overflow is not swallowed by a clause for a different error. */
+  @Test public void overflowOtherCatch() {
+    error(DEEP + "try { count(local:deep(1000000)) } catch err:FORG0001 { 'wrong' }",
+        BASEX_OVERFLOW);
   }
 }
