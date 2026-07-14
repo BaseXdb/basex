@@ -257,6 +257,16 @@ public final class PackageAPITest extends SandboxTest {
   }
 
   /**
+   * Tests installation of an XQuery module whose namespace contains dots (e.g. version tags),
+   * the dotted part must not be split into subdirectories.
+   */
+  @Test public void repoInstallDottedNamespace() {
+    execute(new RepoInstall(REPO + "versioned.xqm", null));
+    assertTrue(isFile("test/v1.0.0.xqm"), "File not found: test/v1.0.0.xqm");
+    query("import module namespace v='test:v1.0.0'; v:version()", "1.0.0");
+  }
+
+  /**
    * Tests installation of a XAR file.
    * @throws Exception exception
    */

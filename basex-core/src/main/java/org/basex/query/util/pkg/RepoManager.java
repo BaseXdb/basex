@@ -221,11 +221,10 @@ public final class RepoManager {
   private boolean installXQ(final byte[] content, final String path)
       throws QueryException, IOException {
 
-    // parse module to find namespace URI
+    // parse module to find namespace URI, write file to rewritten URI file path
     try(QueryContext qc = new QueryContext(context)) {
       final byte[] uri = qc.parseLibrary(string(content), path).sc.module.uri();
-      // copy file to rewritten URI file path
-      return write(Strings.uri2path(string(uri)), IO.XQMSUFFIX, content);
+      return write(xqTarget(string(uri)), content);
     }
   }
 
@@ -243,55 +242,86 @@ public final class RepoManager {
     final byte[] manifest = new RepoArchive(content).read(MANIFEST_MF);
     try(NewlineInput nli = new NewlineInput(new IOContent(manifest))) {
       for(String s; (s = nli.readLine()) != null;) {
-        // write file to rewritten file path
+        // write file to rewritten file path, extract bundled files
         final Matcher main = MAIN_CLASS.matcher(s);
-        if(main.find()) return write(main.group(1), IO.JARSUFFIX, content);
+        if(main.find()) {
+          final String mainClass = main.group(1);
+          final IOFile target = jarTarget(mainClass);
+          final boolean exists = write(target, content);
+          extractJar(target, Strings.uri2path(mainClass));
+          return exists;
+        }
       }
     }
     throw REPO_PARSE_X_X.get(info, path, MANIFEST);
   }
 
   /**
-   * Writes a package to disk.
-   * @param pkg package
-   * @param suffix file suffix
+   * Returns the repository root.
+   * @return repository directory
+   */
+  private IOFile repo() {
+    return new IOFile(context.soptions.get(StaticOptions.REPOPATH));
+  }
+
+  /**
+   * Returns the target file of an XQuery module in the repository.
+   * @param uri module namespace URI
+   * @return target file
+   */
+  private IOFile xqTarget(final String uri) {
+    return new IOFile(repo(), Strings.uri2path(uri) + IO.XQMSUFFIX);
+  }
+
+  /**
+   * Returns the target file of a JAR package in the repository.
+   * @param mainClass main class from the JAR manifest
+   * @return target file
+   */
+  private IOFile jarTarget(final String mainClass) {
+    return new IOFile(repo(), Strings.uri2path(Strings.uriToClasspath(mainClass)) + IO.JARSUFFIX);
+  }
+
+  /**
+   * Writes content to a repository file, creating parent directories.
+   * @param target target file
    * @param content package content
-   * @return {@code true} if existing package was replaced
+   * @return {@code true} if an existing file was replaced
    * @throws IOException I/O exception
    */
-  private boolean write(final String pkg, final String suffix, final byte[] content)
-      throws IOException {
-    final IOFile repo = new IOFile(context.soptions.get(StaticOptions.REPOPATH));
-    final boolean isJar = suffix.equals(IO.JARSUFFIX);
-    final String pth = isJar ? Strings.uriToClasspath(pkg) : pkg;
-    final IOFile target = new IOFile(repo, Strings.uri2path(pth) + suffix);
+  private static boolean write(final IOFile target, final byte[] content) throws IOException {
     final boolean exists = target.exists();
     if(!target.parent().md()) throw new BaseXException("Could not create %.", target);
     target.write(content);
+    return exists;
+  }
 
-    // extract files from JAR package
-    if(isJar) {
-      final String pkgPath =  Strings.uri2path(pkg);
-      final String pkgName = target.name().replaceAll(IO.JARSUFFIX + '$', "");
-      try(JarFile jarFile = new JarFile(target.file())) {
-        for(final JarEntry entry : Collections.list(jarFile.entries())) {
-          final String name = entry.getName();
-          IOFile trg = null;
-          if(name.matches("^lib/[^/]+\\.jar")) {
-            // extract JARs from a zipped lib/ directory to the repository
-            trg = new IOFile(target.parent().resolve('.' + pkgName), name.replaceAll("^.*?/", ""));
-          } else if(name.equals(pkgPath + IO.XQMSUFFIX)) {
-            // extract XQM file
-            trg = new IOFile(repo, name);
-          }
-          if(trg != null) {
-            if(!trg.parent().md()) throw new BaseXException("Could not create %.", trg);
-            trg.write(jarFile.getInputStream(entry));
-          }
+  /**
+   * Extracts bundled libraries and the combined XQuery module from an installed JAR.
+   * @param target installed JAR file
+   * @param pkgPath rewritten package path (used to locate the embedded module)
+   * @throws IOException I/O exception
+   */
+  private void extractJar(final IOFile target, final String pkgPath) throws IOException {
+    final IOFile repo = repo();
+    final String pkgName = target.name().replaceAll(IO.JARSUFFIX + '$', "");
+    try(JarFile jarFile = new JarFile(target.file())) {
+      for(final JarEntry entry : Collections.list(jarFile.entries())) {
+        final String name = entry.getName();
+        IOFile trg = null;
+        if(name.matches("^lib/[^/]+\\.jar")) {
+          // extract JARs from a zipped lib/ directory to the repository
+          trg = new IOFile(target.parent().resolve('.' + pkgName), name.replaceAll("^.*?/", ""));
+        } else if(name.equals(pkgPath + IO.XQMSUFFIX)) {
+          // extract XQM file
+          trg = new IOFile(repo, name);
+        }
+        if(trg != null) {
+          if(!trg.parent().md()) throw new BaseXException("Could not create %.", trg);
+          trg.write(jarFile.getInputStream(entry));
         }
       }
     }
-    return exists;
   }
 
   /**
