@@ -121,4 +121,36 @@ public final class FTQueryTest extends SandboxTest {
     query(_FT_SEARCH.args(NAME, "test a", " { 'fuzzy': true() }"), "test a text");
     query(_FT_SEARCH.args(NAME, "a test", " { 'fuzzy': true() }"), "test a text");
   }
+
+  /** Fuzzy search: prefix-pruned traversal of the index. */
+  @Test public void fuzzyIndex() {
+    final String fuzzy = " { 'fuzzy': true() }";
+
+    // dead 'abb' prefixes are skipped; 'baaa' and the neighboring length groups must be found
+    query(_DB_CREATE.args(NAME, " <x><b>aaa</b><b>aaaa</b><b>aaab</b><b>abba</b><b>abbb</b>"
+        + "<b>abbc</b><b>abbd</b><b>baaa</b><b>bbbb</b><b>aaaaa</b></x>",
+        NAME, " { 'ftindex': true() }"));
+    query(_FT_SEARCH.args(NAME, "aaaa", fuzzy), "aaa\naaaa\naaab\nbaaa\naaaaa");
+    query(_FT_SEARCH.args(NAME, "aaaa", " { 'fuzzy': true(), 'errors': 2 }"),
+        "aaa\naaaa\naaab\nabba\nbaaa\naaaaa");
+    query(_FT_TOKENS.args(NAME, "aaaa", fuzzy) + " ! string()",
+        "aaa\naaaa\naaab\nbaaa\naaaaa");
+    query(_FT_TOKENS.args(NAME, "aaaa", " { 'fuzzy': true(), 'errors': 2 }") + " ! string()",
+        "aaa\naaaa\naaab\nabba\nbaaa\naaaaa");
+    query("db:get('" + NAME + "')//b[text() contains text 'aaaa' using fuzzy 1 errors] ! string()",
+        "aaa\naaaa\naaab\nbaaa\naaaaa");
+
+    // dynamic error calculation: exact matches for short tokens; transpositions
+    query(_DB_CREATE.args(NAME, " <x><b>ab</b><b>ba</b><b>abc</b><b>aa</b></x>",
+        NAME, " { 'ftindex': true() }"));
+    query(_FT_SEARCH.args(NAME, "ab", fuzzy), "ab");
+    query(_FT_SEARCH.args(NAME, "ab", " { 'fuzzy': true(), 'errors': 1 }"), "ab\nba\nabc\naa");
+
+    // normalization: umlauts and 'ß' (expanded to 'ss') are matched
+    query(_DB_CREATE.args(NAME, " <x><b>straße</b><b>strasse</b><b>häuser</b><b>hauser</b>"
+        + "<b>masse</b></x>", NAME, " { 'ftindex': true() }"));
+    query(_FT_SEARCH.args(NAME, "strasse", fuzzy), "straße\nstrasse");
+    query(_FT_SEARCH.args(NAME, "maße", fuzzy), "masse");
+    query(_FT_SEARCH.args(NAME, "hauser", fuzzy), "häuser\nhauser");
+  }
 }

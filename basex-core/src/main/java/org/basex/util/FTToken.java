@@ -1,6 +1,7 @@
 package org.basex.util;
 
 import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * <p>This class provides mapping tables for converting full-text tokens.</p>
@@ -59,6 +60,23 @@ public final class FTToken {
       }
     });
     return tb.finish();
+  }
+
+  /**
+   * Removes diacritics from a codepoint, lowercases it, and adds the resulting codepoints
+   * (zero or more) to a list.
+   * @param cp codepoint to be normalized
+   * @param list target list
+   */
+  public static void normalize(final int cp, final IntList list) {
+    if(cp < 0x80) {
+      list.add(Token.lc(cp));
+    } else if(!isCombining(Character.getType(cp))) {
+      // fold before lowercasing: expansions are case-preserving (ß -> ss, ẞ -> SS)
+      final byte[] letters = NORM_MULTI.get(cp);
+      if(letters != null) Token.forEachCp(letters, c -> list.add(Token.lc(c)));
+      else list.add(Token.lc(noDiacritics(cp)));
+    }
   }
 
   /**

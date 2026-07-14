@@ -21,7 +21,6 @@ import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
-import org.basex.util.similarity.*;
 
 /**
  * <p>This class provides access to a fuzzy full-text index structure
@@ -52,12 +51,10 @@ import org.basex.util.similarity.*;
  */
 public final class FTIndex extends ValueIndex {
   /** Minimum fixed size for each token entry. */
-  private static final int ENTRY = 9;
+  static final int ENTRY = 9;
 
   /** Cached texts. Increases used memory, but speeds up repeated queries. */
   private final IntObjectMap<byte[]> ctext = new IntObjectMap<>();
-  /** Levenshtein reference. */
-  private final Levenshtein ls = new Levenshtein();
 
   /** Index storing each unique token length and pointer
    * on the first token with this length. */
@@ -350,35 +347,30 @@ public final class FTIndex extends ValueIndex {
     final int tokl = token.length, pl = positions.length;
     final int k = errors > 0 ? errors : tokl >> 2;
     final int last = Math.min(pl - 2, tokl + k);
+    final FTFuzzy fuzzy = new FTFuzzy(dataY, token, k);
 
     return new EntryIterator() {
-      int s = Math.max(1, tokl - k) - 1, p, e, nr;
+      int s = Math.max(1, tokl - k) - 1, i, nr;
+      IntList offsets = new IntList(0);
 
       @Override
       public byte[] next() {
         synchronized(FTIndex.this) {
           while(true) {
-            // loop through all entries with the same character length
-            if(p < e) {
-              final byte[] entry = dataY.readBytes(p, s);
-              final long pos = p;
-              p += s + ENTRY;
-              if(ls.similar(entry, token, k)) {
-                nr = FTIndex.this.size(pos, s);
-                return entry;
-              }
-            } else {
-              // find next group of entries
-              if(++s > last) return null;
-              p = positions[s];
-              if(p == -1) {
-                p = 0;
-                e = 0;
-              } else {
-                int c = s + 1;
-                e = -1;
-                while(c < pl && e == -1) e = positions[c++];
-              }
+            // loop through all similar entries with the same character length
+            if(i < offsets.size()) {
+              final int p = offsets.get(i++);
+              nr = FTIndex.this.size(p, s);
+              return dataY.readBytes(p, s);
+            }
+            // find next group of entries
+            if(++s > last) return null;
+            final int p = positions[s];
+            if(p != -1) {
+              int c = s + 1, e = -1;
+              while(c < pl && e == -1) e = positions[c++];
+              offsets = fuzzy.offsets(p, e, s);
+              i = 0;
             }
           }
         }
@@ -399,18 +391,18 @@ public final class FTIndex extends ValueIndex {
    */
   private IndexIterator fuzzy(final byte[] token, final int k) {
     final int tokl = token.length, pl = positions.length, e = Math.min(pl - 1, tokl + k);
-    int s = Math.max(1, tokl - k) - 1;
+    final FTFuzzy fuzzy = new FTFuzzy(dataY, token, k);
     final ArrayList<FTIndexIterator> iters = new ArrayList<>();
-    while(++s <= e) {
-      int p = positions[s];
+    for(int s = Math.max(1, tokl - k); s <= e; s++) {
+      final int p = positions[s];
       if(p == -1) continue;
       int t = s + 1, r = -1;
       while(t < pl && r == -1) r = positions[t++];
-      while(p < r) {
-        if(ls.similar(dataY.readBytes(p, s), token, k)) {
-          iters.add(iter(pointer(p, s), size(p, s), dataZ, token));
-        }
-        p += s + ENTRY;
+      final IntList offsets = fuzzy.offsets(p, r, s);
+      final int os = offsets.size();
+      for(int o = 0; o < os; o++) {
+        final int off = offsets.get(o);
+        iters.add(iter(pointer(off, s), size(off, s), dataZ, token));
       }
     }
     return iters.isEmpty() ? FTIndexIterator.FTEMPTY :

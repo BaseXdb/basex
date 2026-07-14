@@ -1,10 +1,12 @@
 package org.basex.util.similarity;
 
-import static org.basex.util.FTToken.*;
 import static org.basex.util.Token.*;
 
 import java.util.*;
 import java.util.function.*;
+
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * <p>Optimal string alignment. Based on the publications from Levenshtein (1965): "Binary codes
@@ -157,11 +159,9 @@ public final class Levenshtein {
    * @return normalized token
    */
   private static int[] normalize(final byte[] token) {
-    // fold before lowercasing: expansions are case-preserving (ß -> ss, ẞ -> SS)
-    final int[] cps = cps(noDiacritics(token));
-    final int cl = cps.length;
-    for(int c = 0; c < cl; c++) cps[c] = lc(cps[c]);
-    return cps;
+    final IntList list = new IntList(token.length);
+    forEachCp(token, cp -> FTToken.normalize(cp, list));
+    return list.finish();
   }
 
   /**
