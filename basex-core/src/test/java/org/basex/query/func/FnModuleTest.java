@@ -687,11 +687,14 @@ public final class FnModuleTest extends SandboxTest {
     // Comment rows are skipped before the header row is chosen:
     query(PARSE_CSV.args(comments, " { 'comment-marker': '#', 'header': true() }") + "?columns",
         "name\ncity");
+    // A newline separator is ignored, as rows are always delimited by newlines:
+    query(func.args("one,two", " { 'separator': char('\\n') }"), "[\"one,two\"]");
+    query(func.args(" `one{ char('\\n') }two`", " { 'separator': char('\\n') }"),
+        "[\"one\"]\n[\"two\"]");
     // Invalid options:
     error(func.args("", " { 'comment-marker': '' }"), CSV_SINGLECHAR_X_X);
     error(func.args("", " { 'comment-marker': '##' }"), CSV_SINGLECHAR_X_X);
     error(func.args("", " { 'comment-marker': char('\\n') }"), CSV_NEWLINE_X);
-    error(func.args("", " { 'separator': char('\\n') }"), CSV_NEWLINE_X);
     error(func.args("", " { 'comment-marker': ',' }"), CSV_DELIMITER_X);
     error(func.args("", " { 'comment-marker': '\"' }"), CSV_DELIMITER_X);
     error(func.args("", " { 'comment-marker': 1 }"), INVALIDOPTION_X_X_X_X);

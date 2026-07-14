@@ -42,8 +42,6 @@ public final class CsvParser {
   /** Select columns. */
   private final int[] selectColumns;
 
-  /** First entry of a line. */
-  private boolean first = true;
   /** Number of fields in first row. */
   private int rowSize = -1;
   /** Data mode. */
@@ -90,15 +88,14 @@ public final class CsvParser {
 
     int ch = input.read();
     while(ch != -1) {
-      if(rowStart) {
-        // skip comment row: discard all characters up to and including the next newline
-        if(ch == commentMarker) {
-          do ch = input.read(); while(ch != -1 && ch != '\n');
-          if(ch != -1) ch = input.read();
-          continue;
-        }
-        rowStart = false;
+      // skip comment row: discard all characters up to and including the next newline
+      if(rowStart && ch == commentMarker) {
+        do ch = input.read(); while(ch != -1 && ch != '\n');
+        if(ch != -1) ch = input.read();
+        continue;
       }
+      rowStart = false;
+
       if(quoted) {
         // quoted state
         if(ch == quoteCharacter) {
@@ -126,16 +123,14 @@ public final class CsvParser {
           if(ch != quoteCharacter || backslashes) add(entry, quoteCharacter);
           continue;
         }
+      } else if(ch == '\n') {
+        // parse newline (takes precedence over a separator)
+        record(entry, false, true);
+        data = true;
+        rowStart = true;
       } else if(ch == separator) {
         // parse separator
         record(entry, false, false);
-        first = false;
-      } else if(ch == '\n') {
-        // parse newline
-        record(entry, false, true);
-        first = true;
-        data = true;
-        rowStart = true;
       } else {
         if(ch == '\\' && backslashes) ch = bs();
         add(entry, ch);
@@ -180,22 +175,24 @@ public final class CsvParser {
       throws IOException {
     final byte[] next = entry.next();
     final byte[] field = trimWhitespace || !data ? Token.trim(next) : next;
-    if(field.length > 0 || !(first && lastField)) fields.add(field);
-    if(lastField && !(lastRow && fields.isEmpty())) {
-      if(data) conv.record();
-      if(rowSize == -1) rowSize = fields.size();
-      final int n = selectColumns.length != 0 ? selectColumns.length
-                                              : trimRows ? rowSize : fields.size();
-      for(int i = 0; i < n; ++i) {
-        final int index = selectColumns.length != 0 ? selectColumns[i] - 1 : i;
-        final byte[] f = index < fields.size() ? fields.get(index) : Token.EMPTY;
-        if(data) {
-          conv.entry(f);
-        } else {
-          conv.header(f);
-        }
+    // a single empty field indicates a blank row
+    if(field.length > 0 || !lastField || !fields.isEmpty()) fields.add(field);
+    // wait for the end of the row; skip empty row at the end of the input
+    if(!lastField || lastRow && fields.isEmpty()) return;
+
+    if(data) conv.record();
+    if(rowSize == -1) rowSize = fields.size();
+    final boolean select = selectColumns.length != 0;
+    final int fs = fields.size(), n = select ? selectColumns.length : trimRows ? rowSize : fs;
+    for(int i = 0; i < n; ++i) {
+      final int index = select ? selectColumns[i] - 1 : i;
+      final byte[] f = index < fs ? fields.get(index) : Token.EMPTY;
+      if(data) {
+        conv.entry(f);
+      } else {
+        conv.header(f);
       }
-      fields.reset();
     }
+    fields.reset();
   }
 }

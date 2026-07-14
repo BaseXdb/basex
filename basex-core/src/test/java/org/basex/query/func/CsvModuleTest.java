@@ -39,6 +39,8 @@ public final class CsvModuleTest extends SandboxTest {
     parse("X\tY", "'separator': '\t'", "...<entry>X</entry><entry>Y</entry>");
     parse("X\tY", "'separator': '\\t'", "...<entry>X</entry><entry>Y</entry>");
     parse("X,Y", "", "...<entry>X</entry><entry>Y</entry>");
+    // a newline separator is ignored, as rows are always delimited by newlines
+    parse("X,Y", "'separator': '\\n'", "<csv><record><entry>X,Y</entry></record></csv>");
 
     final String marker = "'comment-marker': '#'";
     parse("#C\nX,Y", marker, "...<entry>X</entry><entry>Y</entry>");
@@ -105,7 +107,6 @@ public final class CsvModuleTest extends SandboxTest {
     parseError("", "'format': 'abc'");
     parseError("", "'separator': ''");
     parseError("", "'separator': 'XXX'");
-    parseError("", "'separator': '\\n'");
     parseError("", "'comment-marker': 'XXX'");
     parseError("", "'comment-marker': ','");
     parseError("", "'comment-marker': '\\n'");

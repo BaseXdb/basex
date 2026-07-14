@@ -115,7 +115,8 @@ public class CsvOptions extends Options {
       if(option == COMMENT_MARKER && value.isEmpty()) continue;
       final int cp = option == SEPARATOR ? separator() : checkCodepoint(value);
       if(cp == -1) throw CSV_SINGLECHAR_X_X.get(info, option.name(), value);
-      if(cp == '\n') throw CSV_NEWLINE_X.get(info, option.name());
+      // a newline separator is ignored, as rows are always delimited by newlines
+      if(cp == '\n' && option != SEPARATOR) throw CSV_NEWLINE_X.get(info, option.name());
       if(!chars.add(cp)) throw CSV_DELIMITER_X.get(info, value);
     }
   }
