@@ -40,6 +40,12 @@ public final class CsvModuleTest extends SandboxTest {
     parse("X\tY", "'separator': '\\t'", "...<entry>X</entry><entry>Y</entry>");
     parse("X,Y", "", "...<entry>X</entry><entry>Y</entry>");
 
+    final String marker = "'comment-marker': '#'";
+    parse("#C\nX,Y", marker, "...<entry>X</entry><entry>Y</entry>");
+    parse("#C\nX\nY", marker + ", 'header': true()", "<csv><record><X>Y</X></record></csv>");
+    parse("X,#Y", marker, "...<entry>X</entry><entry>#Y</entry>");
+    parse("#C\nX,Y", "", "...<entry>#C</entry></record><record><entry>X</entry>");
+
     final String header = "'header': true()", skipEmpty = "'skip-empty': true()";
     parse("X\nY", header, "<csv><record><X>Y</X></record></csv>");
     parse("A,B,C\nX,Y,Z", header, "...<A>X</A><B>Y</B><C>Z</C>");
@@ -99,6 +105,10 @@ public final class CsvModuleTest extends SandboxTest {
     parseError("", "'format': 'abc'");
     parseError("", "'separator': ''");
     parseError("", "'separator': 'XXX'");
+    parseError("", "'separator': '\\n'");
+    parseError("", "'comment-marker': 'XXX'");
+    parseError("", "'comment-marker': ','");
+    parseError("", "'comment-marker': '\\n'");
   }
 
   /** Test method. */

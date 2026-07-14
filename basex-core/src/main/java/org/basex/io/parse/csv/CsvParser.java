@@ -29,6 +29,8 @@ public final class CsvParser {
   private final int separator;
   /** Quote character (see {@link CsvOptions#QUOTE_CHARACTER}). */
   private final int quoteCharacter;
+  /** Comment marker, {@code -1} if comments are not recognized. */
+  private final int commentMarker;
   /** Parse quotes.  */
   private final boolean quotes;
   /** Trim whitespace (see {@link CsvOptions#TRIM_WHITESPACE}). */
@@ -63,6 +65,7 @@ public final class CsvParser {
     header = opts.get(CsvOptions.HEADER) == Bln.TRUE;
     separator = opts.separator();
     quoteCharacter = opts.quoteCharacter();
+    commentMarker = opts.commentMarker();
     strictQuoting = opts.get(CsvOptions.STRICT_QUOTING);
     quotes = strictQuoting || opts.get(CsvOptions.QUOTES);
     backslashes = opts.get(CsvOptions.BACKSLASHES);
@@ -82,11 +85,20 @@ public final class CsvParser {
    */
   public void parse(final InputInfo ii) throws QueryException, IOException {
     final TokenBuilder entry = new TokenBuilder();
-    boolean quoted = false;
+    boolean quoted = false, rowStart = true;
     data = !header;
 
     int ch = input.read();
     while(ch != -1) {
+      if(rowStart) {
+        // skip comment row: discard all characters up to and including the next newline
+        if(ch == commentMarker) {
+          do ch = input.read(); while(ch != -1 && ch != '\n');
+          if(ch != -1) ch = input.read();
+          continue;
+        }
+        rowStart = false;
+      }
       if(quoted) {
         // quoted state
         if(ch == quoteCharacter) {
@@ -123,6 +135,7 @@ public final class CsvParser {
         record(entry, false, true);
         first = true;
         data = true;
+        rowStart = true;
       } else {
         if(ch == '\\' && backslashes) ch = bs();
         add(entry, ch);

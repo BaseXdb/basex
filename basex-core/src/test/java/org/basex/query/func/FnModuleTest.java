@@ -663,6 +663,38 @@ public final class FnModuleTest extends SandboxTest {
         "[\"name\",\"city\"]\n"
       + "[\"Bob\",\"Berlin\"]\n"
       + "[\"Alice\",\"Aachen\"]");
+    // Comment rows:
+    final String comments =
+        " string-join(\n"
+      + "    (\"# comment\", \"name,city\", \"Bob,Berlin\", \"# comment\", \"Alice,Aachen\"),\n"
+      + "    char('\\n')\n"
+      + "  )";
+    query(func.args(comments, " { 'comment-marker': '#' }"),
+        "[\"name\",\"city\"]\n"
+      + "[\"Bob\",\"Berlin\"]\n"
+      + "[\"Alice\",\"Aachen\"]");
+    query(func.args(comments, " { 'comment-marker': () }"),
+        "[\"# comment\"]\n"
+      + "[\"name\",\"city\"]\n"
+      + "[\"Bob\",\"Berlin\"]\n"
+      + "[\"# comment\"]\n"
+      + "[\"Alice\",\"Aachen\"]");
+    // A comment row ends with the next newline, even if a quote was opened:
+    query(func.args(" `#\"a{ char('\\n') }b,c{ char('\\n') }x,y`", " { 'comment-marker': '#' }"),
+        "[\"b\",\"c\"]\n[\"x\",\"y\"]");
+    // Comment markers are only recognized at the start of a row:
+    query(func.args(" `a,#b{ char('\\n') }#c,d`", " { 'comment-marker': '#' }"), "[\"a\",\"#b\"]");
+    // Comment rows are skipped before the header row is chosen:
+    query(PARSE_CSV.args(comments, " { 'comment-marker': '#', 'header': true() }") + "?columns",
+        "name\ncity");
+    // Invalid options:
+    error(func.args("", " { 'comment-marker': '' }"), CSV_SINGLECHAR_X_X);
+    error(func.args("", " { 'comment-marker': '##' }"), CSV_SINGLECHAR_X_X);
+    error(func.args("", " { 'comment-marker': char('\\n') }"), CSV_NEWLINE_X);
+    error(func.args("", " { 'separator': char('\\n') }"), CSV_NEWLINE_X);
+    error(func.args("", " { 'comment-marker': ',' }"), CSV_DELIMITER_X);
+    error(func.args("", " { 'comment-marker': '\"' }"), CSV_DELIMITER_X);
+    error(func.args("", " { 'comment-marker': 1 }"), INVALIDOPTION_X_X_X_X);
   }
 
   /** Test method. */

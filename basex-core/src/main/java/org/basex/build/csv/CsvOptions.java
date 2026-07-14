@@ -3,11 +3,14 @@ package org.basex.build.csv;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.value.type.Types.*;
 
+import java.util.*;
+
 import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.options.*;
 
 /**
@@ -31,6 +34,8 @@ public class CsvOptions extends Options {
   public static final BooleanOption QUOTES = new BooleanOption("quotes", true);
   /** Option: quote character. */
   public static final StringOption QUOTE_CHARACTER = new StringOption("quote-character", "\"");
+  /** Option: comment marker. */
+  public static final StringOption COMMENT_MARKER = new StringOption("comment-marker", "");
   /** Option: trim whitespace. */
   public static final BooleanOption TRIM_WHITESPACE = new BooleanOption("trim-whitespace", false);
   /** Option: strict quoting (implies QUOTES). */
@@ -103,10 +108,16 @@ public class CsvOptions extends Options {
    * @throws QueryException query exception
    */
   private void validate(final InputInfo info) throws QueryException {
-    final int s = separator(), q = quoteCharacter();
-    final StringOption option = s == -1 ? SEPARATOR : q == -1 ? QUOTE_CHARACTER : null;
-    if(option != null) throw CSV_SINGLECHAR_X_X.get(info, option.name(), get(option));
-    if(s == q) throw CSV_DELIMITER_X.get(info, get(SEPARATOR));
+    final IntSet chars = new IntSet();
+    for(final StringOption option : Arrays.asList(SEPARATOR, QUOTE_CHARACTER, COMMENT_MARKER)) {
+      final String value = get(option);
+      // an empty comment marker indicates that comments are not recognized
+      if(option == COMMENT_MARKER && value.isEmpty()) continue;
+      final int cp = option == SEPARATOR ? separator() : checkCodepoint(value);
+      if(cp == -1) throw CSV_SINGLECHAR_X_X.get(info, option.name(), value);
+      if(cp == '\n') throw CSV_NEWLINE_X.get(info, option.name());
+      if(!chars.add(cp)) throw CSV_DELIMITER_X.get(info, value);
+    }
   }
 
   /**
@@ -125,6 +136,15 @@ public class CsvOptions extends Options {
    */
   public int quoteCharacter() {
     return checkCodepoint(get(QUOTE_CHARACTER));
+  }
+
+  /**
+   * Returns the comment marker or {@code -1} if comments are not recognized.
+   * @return comment marker
+   */
+  public int commentMarker() {
+    final String marker = get(COMMENT_MARKER);
+    return marker.isEmpty() ? -1 : checkCodepoint(marker);
   }
 
   /**
