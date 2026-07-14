@@ -30,7 +30,7 @@ public final class FnPadString extends StandardFunc {
   /** Options. */
   public static final class PadOptions extends Options {
     /** Option. */
-    public static final StringOption FILL = new StringOption("fill", " ");
+    public static final StringOption PADDING = new StringOption("padding", " ");
     /** Option. */
     public static final EnumOption<Side> SIDE = new EnumOption<>("side", Side.END);
   }
@@ -45,31 +45,31 @@ public final class FnPadString extends StandardFunc {
     final long missing = length - Token.length(token);
     if(missing <= 0) return Str.get(token);
 
-    final byte[] fill = Token.token(options.get(PadOptions.FILL));
-    if(fill.length == 0) throw INVALIDOPTION_X.get(info,
-        Util.info("Option '%': fill string must not be empty.", PadOptions.FILL.name()));
+    final byte[] padding = Token.token(options.get(PadOptions.PADDING));
+    if(padding.length == 0) throw INVALIDOPTION_X.get(info,
+        Util.info("Option '%': padding string must not be empty.", PadOptions.PADDING.name()));
     if(missing > Integer.MAX_VALUE) throw RANGE_X.get(info, length);
 
     final int miss = (int) missing;
     final Side side = options.get(PadOptions.SIDE);
     final int start = side == Side.START ? miss : side == Side.BOTH ? miss / 2 : 0;
     final TokenBuilder tb = new TokenBuilder();
-    pad(tb, fill, start);
+    pad(tb, padding, start);
     tb.add(token);
-    pad(tb, fill, miss - start);
+    pad(tb, padding, miss - start);
     return Str.get(tb.finish());
   }
 
   /**
-   * Appends the specified number of characters, repeating the fill string as often as required.
+   * Appends the specified number of characters, repeating the padding string as often as required.
    * @param tb token builder
-   * @param fill fill string
+   * @param padding padding string
    * @param count number of characters to append
    */
-  private static void pad(final TokenBuilder tb, final byte[] fill, final int count) {
+  private static void pad(final TokenBuilder tb, final byte[] padding, final int count) {
     for(int c = 0; c < count;) {
-      for(int f = 0; f < fill.length && c < count; f += Token.cl(fill, f), c++) {
-        tb.add(Token.cp(fill, f));
+      for(int p = 0; p < padding.length && c < count; p += Token.cl(padding, p), c++) {
+        tb.add(Token.cp(padding, p));
       }
     }
   }
