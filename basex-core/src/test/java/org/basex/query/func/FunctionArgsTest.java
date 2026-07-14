@@ -57,7 +57,7 @@ public final class FunctionArgsTest extends SandboxTest {
       if((min > 0 || al != 0) && (any == 0 || any != al)) {
         final String query = qu.append(')').toString();
         if(in) error(query, EXP_FOUND_X_X, INVTYPE_X, NONUMBER_X_X, BINARY_X, STRBIN_X_X,
-            FUNCCAST_X_X, RESWHICH_X, DB_NODE_X, NODOC_X);
+            FUNCCAST_X_X, RESWHICH_X, DB_COMPACT_X, DB_NODE_X, NODOC_X);
         // wrong number of arguments: XPST0017
         else error(query, INVNARGS_X_X);
       }

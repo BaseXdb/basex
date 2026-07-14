@@ -87,7 +87,7 @@ public final class IndexDynDb extends IndexDb {
     final Value value = expr.value(qc);
     final Data data = value.data();
     if(data == null || !value.seqType().type.instanceOf(NodeType.DOCUMENT))
-      throw DB_NODE_X.get(info, value);
+      throw DB_COMPACT_X.get(info, value);
     return data;
   }
 

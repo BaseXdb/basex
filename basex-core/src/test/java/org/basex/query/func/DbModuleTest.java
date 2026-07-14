@@ -824,6 +824,7 @@ public final class DbModuleTest extends SandboxTest {
     final Function func = _DB_NAME;
     query(func.args(_DB_GET.args(NAME)), NAME);
     query(func.args(_DB_GET.args(NAME) + "/*"), NAME);
+    error(func.args(" <x/>"), DB_NODE_X);
     error(func.args(" <x/> update {}"), DB_NODE_X);
   }
 
@@ -832,6 +833,7 @@ public final class DbModuleTest extends SandboxTest {
     final Function func = _DB_NODE_ID;
     query(func.args(" /html"), 1);
     query(func.args(" / | /html"), "0\n1");
+    error(func.args(" <x/> update {}"), DB_NODE_X);
   }
 
   /** Test method. */
@@ -839,6 +841,7 @@ public final class DbModuleTest extends SandboxTest {
     final Function func = _DB_NODE_PRE;
     query(func.args(" /html"), 1);
     query(func.args(" / | /html"), "0\n1");
+    error(func.args(" <x/> update {}"), DB_NODE_X);
   }
 
   /** Test method. */
@@ -953,6 +956,7 @@ public final class DbModuleTest extends SandboxTest {
     final Function func = _DB_PATH;
     query(func.args(_DB_GET.args(NAME)), XML.replaceAll(".*/", ""));
     query(func.args(_DB_GET.args(NAME) + "/*"), XML.replaceAll(".*/", ""));
+    error(func.args(" <x/>"), DB_NODE_X);
     error(func.args(" <x/> update {}"), DB_NODE_X);
   }
 

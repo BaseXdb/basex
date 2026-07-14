@@ -239,7 +239,9 @@ public enum QueryError {
   /** Error code. */
   DB_NOBACKUP_X(DB, "no-backup", "No backup exists for database '%'."),
   /** Error code. */
-  DB_NODE_X(DB, "node", "No database node: %."),
+  DB_COMPACT_X(DB, "node", "Compact node expected: %."),
+  /** Error code. */
+  DB_NODE_X(DB, "node", "Database node expected: %."),
   /** Error code. */
   DB_NOINDEX_X_X(DB, "no-index", "Database '%' has no % index."),
   /** Error code. */
