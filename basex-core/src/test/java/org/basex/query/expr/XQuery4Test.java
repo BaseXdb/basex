@@ -909,6 +909,30 @@ public final class XQuery4Test extends SandboxTest {
     query("let $Q{}foo:=1 return $Q{}foo", 1);
   }
 
+  /** Unprefixed function names (qtspecs#2569): explicit default function namespace wins. */
+  @Test public void defaultFunctionNamespace() {
+    // no declaration: no-namespace functions are preferred, fn functions serve as fallback
+    query("declare function f() { 'no-namespace' }; f()", "no-namespace");
+    query("declare function data($v) { 'shadowed' }; data(1)", "shadowed");
+    query("declare function data($v) { 'shadowed' }; data#1(1)", "shadowed");
+    query("abs(-1)", 1);
+
+    // explicit declaration: no search for no-namespace functions
+    final String decl = "declare default function namespace 'urn:test'; ";
+    query(decl + "declare function f() { 'ns' }; declare function Q{}f() { 'no-ns' }; f()", "ns");
+    query(decl + "declare function f() { 'ns' }; declare function Q{}f() { 'no-ns' }; f#0()", "ns");
+    query(decl + "declare function Q{}f() { 'no-ns' }; Q{}f()", "no-ns");
+    query("declare default function namespace 'http://www.w3.org/2005/xpath-functions'; abs(-1)",
+        1);
+    error(decl + "declare function Q{}f() { 'no-ns' }; f()", WHICHFUNC_X);
+    error(decl + "declare function Q{}f() { 'no-ns' }; f#0()", WHICHFUNC_X);
+    error(decl + "abs(-1)", WHICHFUNC_X);
+
+    // empty string: unprefixed names refer to no-namespace functions only
+    query("declare default function namespace ''; declare function f() { 'no-ns' }; f()", "no-ns");
+    error("declare default function namespace ''; abs(-1)", WHICHFUNC_X);
+  }
+
   /** Calls of dynamic function sequences. */
   @Test public void dynamicFunctionSequences() {
     // empty sequences

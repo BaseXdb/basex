@@ -202,9 +202,9 @@ public final class Functions {
   }
 
   /**
-   * Returns the actual function name of a function call or named function reference. For an
-   * unprefixed name, the default function namespace is used, unless a matching function exists
-   * with no namespace.
+   * Returns the actual function name of a function call or named function reference. An
+   * unprefixed name refers to an explicitly declared default function namespace; otherwise,
+   * matching functions with no namespace are given preference.
    * @param name function name
    * @param arity number of arguments
    * @param info input info
@@ -215,8 +215,12 @@ public final class Functions {
       final QueryContext qc) {
 
     final StaticContext sc = info.sc();
-    if(name.hasURI() || qc.functions.get(sc, name, arity, false) != null) return name;
-    final QNm dflt = new QNm(name.local(), sc.funcNS != null ? sc.funcNS : FN_URI);
+    if(name.hasURI()) return name;
+    // explicitly declared default function namespace: no search for no-namespace functions
+    final byte[] ns = sc.funcNS;
+    if(ns != null) return ns.length == 0 ? name : new QNm(name.local(), ns);
+    if(qc.functions.get(sc, name, arity, false) != null) return name;
+    final QNm dflt = new QNm(name.local(), FN_URI);
     return builtIn(dflt) == null && qc.functions.exists(sc, name) ? name : dflt;
   }
 
