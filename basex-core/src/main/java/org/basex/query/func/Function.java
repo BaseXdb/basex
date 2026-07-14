@@ -277,7 +277,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM), BOOLEAN_O),
   /** XQuery function. */
   EXPANDED_QNAME(FnExpandedQName::new, "expanded-QName(value)",
-      params(QNAME_ZO), STRING_O),
+      params(QNAME_ZO), STRING_ZO),
   /** XQuery function. */
   FALSE(FnFalse::new, "false()",
       params(), BOOLEAN_O),
@@ -350,7 +350,7 @@ public enum Function implements AFunction {
       params(GNODE_ZO), BOOLEAN_O),
   /** XQuery function. */
   HASH(FnHash::new, "hash(value[,algorithm,options])",
-      params(STRING_OR_BINARY_ZO, STRING_ZO, MAP_ZO), HEX_BINARY_O),
+      params(STRING_OR_BINARY_ZO, STRING_ZO, MAP_ZO), HEX_BINARY_ZO),
   /** XQuery function. */
   HEAD(FnHead::new, "head(input)",
       params(ITEM_ZM), ITEM_ZO),

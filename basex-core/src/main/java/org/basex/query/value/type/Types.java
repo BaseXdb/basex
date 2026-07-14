@@ -146,6 +146,8 @@ public final class Types {
   public static final SeqType BINARY_ZM = BINARY.seqType(ZERO_OR_MORE);
   /** One xs:hexBinary. */
   public static final SeqType HEX_BINARY_O = HEX_BINARY.seqType();
+  /** Zero or one xs:hexBinary. */
+  public static final SeqType HEX_BINARY_ZO = HEX_BINARY.seqType(ZERO_OR_ONE);
   /** Single xs:base64Binary. */
   public static final SeqType BASE64_BINARY_O = BASE64_BINARY.seqType();
   /** Zero or one xs:base64Binary. */
