@@ -4,10 +4,12 @@ import static org.basex.gui.layout.BaseXKeys.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.*;
 import java.util.*;
 
 import javax.swing.*;
 import javax.swing.event.*;
+import javax.swing.text.*;
 
 import org.basex.gui.*;
 import org.basex.gui.listener.*;
@@ -31,8 +33,8 @@ public class BaseXTextField extends JTextField {
   /** Option. */
   private Option<?> option;
 
-  /** Hint. */
-  private BaseXTextHint hint;
+  /** Hint, displayed if the text field is empty (can be {@code null}). */
+  private String hint;
   /** Last input. */
   private String last = "";
 
@@ -131,9 +133,19 @@ public class BaseXTextField extends JTextField {
   }
 
   @Override
-  public void setFont(final Font f) {
-    super.setFont(f);
-    if(hint != null) hint.setFont(f);
+  protected void paintComponent(final Graphics g) {
+    super.paintComponent(g);
+    if(hint == null || getDocument().getLength() != 0) return;
+    try {
+      // request text position from the look and feel; it may differ from the component insets
+      final Rectangle2D rect = modelToView2D(0);
+      if(rect == null) return;
+      BaseXLayout.hints(g);
+      g.setColor(GUIConstants.gray);
+      g.drawString(hint, (int) rect.getX(), (int) rect.getY() + g.getFontMetrics().getAscent());
+    } catch(final BadLocationException ex) {
+      Util.debug(ex);
+    }
   }
 
   /**
@@ -142,12 +154,9 @@ public class BaseXTextField extends JTextField {
    * @return self reference
    */
   public final BaseXTextField hint(final String label) {
-    if(hint == null) {
-      hint = new BaseXTextHint(label, this);
-    } else {
-      hint.setText(label);
-    }
+    hint = label;
     setToolTipText(label.replaceAll("\\.\\.\\.$", ""));
+    repaint();
     return this;
   }
 
@@ -155,7 +164,6 @@ public class BaseXTextField extends JTextField {
   public void setText(final String text) {
     last = text;
     super.setText(text);
-    if(hint != null) hint.update();
   }
 
   /**

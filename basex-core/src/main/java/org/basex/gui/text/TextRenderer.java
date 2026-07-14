@@ -235,7 +235,7 @@ final class TextRenderer extends BaseXBack {
     for(final TextIterator iter = init(g, true); more(iter, g); next(iter)) {
       if(iter.curr() == TokenBuilder.NLINE) maxX = Math.max(x, maxX);
     }
-    return new Dimension(Math.max(x, maxX) + font.charWidth(' '), y + fontHeight);
+    return new Dimension(Math.max(x, maxX) + Math.max(OFFSET, font.charWidth(' ')), y + fontHeight);
   }
 
   /**

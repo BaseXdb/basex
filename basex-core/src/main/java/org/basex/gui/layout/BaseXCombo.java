@@ -27,8 +27,6 @@ public class BaseXCombo extends JComboBox<Object> {
   private Option<?> optionKey;
   /** History. */
   private BaseXHistory history;
-  /** Hint. */
-  private BaseXTextHint hint;
   /** Key listener. */
   private KeyListener keys;
   /** Focus listener. */
@@ -176,22 +174,9 @@ public class BaseXCombo extends JComboBox<Object> {
    */
   public BaseXCombo hint(final String label) {
     final BaseXTextField tf = textField();
-    if(tf != null) {
-      if(hint == null) {
-        hint = new BaseXTextHint(label, tf);
-      } else {
-        hint.setText(label);
-      }
-    }
+    if(tf != null) tf.hint(label);
     setToolTipText(label.replaceAll("\\.\\.\\.$", ""));
     return this;
-  }
-
-  @Override
-  public void setFont(final Font font) {
-    super.setFont(font);
-    final BaseXTextField tf = textField();
-    if(hint != null && tf != null) hint.setFont(tf.getFont());
   }
 
   /**
@@ -274,7 +259,6 @@ public class BaseXCombo extends JComboBox<Object> {
         }
       }
     }
-    if(hint != null) hint.update();
   }
 
   /**
