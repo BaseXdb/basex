@@ -62,6 +62,24 @@ final class FTFuzzy {
   }
 
   /**
+   * Returns the minimum byte length of similar tokens.
+   * @return length
+   */
+  int minLength() {
+    // tokens have at least as many bytes as normalized codepoints
+    return Math.max(1, query.length - k);
+  }
+
+  /**
+   * Returns the maximum byte length of similar tokens.
+   * @return length
+   */
+  int maxLength() {
+    // a codepoint occupies up to 4 bytes (tokens with combining characters may be longer)
+    return query.length + k << 2;
+  }
+
+  /**
    * Collects the offsets of all similar tokens in a length group.
    * @param start offset of first entry
    * @param end offset of last entry (exclusive)

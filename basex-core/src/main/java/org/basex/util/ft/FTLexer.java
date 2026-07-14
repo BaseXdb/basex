@@ -125,12 +125,11 @@ public final class FTLexer extends FTIterator implements IndexSearch {
   }
 
   /**
-   * Returns the Levenshtein error for the specified token.
-   * @param token token
-   * @return error
+   * Returns the number of allowed Levenshtein errors.
+   * @return errors ({@code 0}: dynamic calculation)
    */
-  public int errors(final byte[] token) {
-    return errors > 0 ? errors : token.length >> 2;
+  public int errors() {
+    return Math.max(0, errors);
   }
 
   @Override

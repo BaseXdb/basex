@@ -117,7 +117,7 @@ public final class FTIndex extends ValueIndex {
 
     // fuzzy search
     if(opt.is(FZ)) {
-      return fuzzy(token, lexer.errors(token));
+      return fuzzy(token, lexer.errors());
     }
 
     // return cached or new result
@@ -344,13 +344,11 @@ public final class FTIndex extends ValueIndex {
    * @return entry iterator
    */
   private EntryIterator fuzzyEntries(final byte[] token, final int errors) {
-    final int tokl = token.length, pl = positions.length;
-    final int k = errors > 0 ? errors : tokl >> 2;
-    final int last = Math.min(pl - 2, tokl + k);
-    final FTFuzzy fuzzy = new FTFuzzy(dataY, token, k);
+    final FTFuzzy fuzzy = new FTFuzzy(dataY, token, errors);
+    final int pl = positions.length, last = Math.min(pl - 2, fuzzy.maxLength());
 
     return new EntryIterator() {
-      int s = Math.max(1, tokl - k) - 1, i, nr;
+      int s = fuzzy.minLength() - 1, i, nr;
       IntList offsets = new IntList(0);
 
       @Override
@@ -384,16 +382,16 @@ public final class FTIndex extends ValueIndex {
   }
 
   /**
-   * Performs a fuzzy search for the specified token with a maximum number of errors.
+   * Performs a fuzzy search for the specified token.
    * @param token token to look for
-   * @param k number of errors allowed
+   * @param errors number of allowed errors (dynamic calculation if the value is {@code 0})
    * @return iterator
    */
-  private IndexIterator fuzzy(final byte[] token, final int k) {
-    final int tokl = token.length, pl = positions.length, e = Math.min(pl - 1, tokl + k);
-    final FTFuzzy fuzzy = new FTFuzzy(dataY, token, k);
+  private IndexIterator fuzzy(final byte[] token, final int errors) {
+    final FTFuzzy fuzzy = new FTFuzzy(dataY, token, errors);
+    final int pl = positions.length, e = Math.min(pl - 1, fuzzy.maxLength());
     final ArrayList<FTIndexIterator> iters = new ArrayList<>();
-    for(int s = Math.max(1, tokl - k); s <= e; s++) {
+    for(int s = fuzzy.minLength(); s <= e; s++) {
       final int p = positions[s];
       if(p == -1) continue;
       int t = s + 1, r = -1;
