@@ -3538,6 +3538,91 @@ return
   }
 
   /** Test method. */
+  @Test public void resolveUri() {
+    final Function func = RESOLVE_URI;
+    final String base = "http://a/b/c/d;p?q";
+
+    // RFC 3986, 5.4.1: normal examples
+    query(func.args("g:h", base), "g:h");
+    query(func.args("g", base), "http://a/b/c/g");
+    query(func.args("./g", base), "http://a/b/c/g");
+    query(func.args("g/", base), "http://a/b/c/g/");
+    query(func.args("/g", base), "http://a/g");
+    query(func.args("//g", base), "http://g");
+    query(func.args("?y", base), "http://a/b/c/d;p?y");
+    query(func.args("g?y", base), "http://a/b/c/g?y");
+    query(func.args("#s", base), "http://a/b/c/d;p?q#s");
+    query(func.args("g#s", base), "http://a/b/c/g#s");
+    query(func.args("g?y#s", base), "http://a/b/c/g?y#s");
+    query(func.args(";x", base), "http://a/b/c/;x");
+    query(func.args("g;x", base), "http://a/b/c/g;x");
+    query(func.args("g;x?y#s", base), "http://a/b/c/g;x?y#s");
+    query(func.args("", base), "http://a/b/c/d;p?q");
+    query(func.args(".", base), "http://a/b/c/");
+    query(func.args("./", base), "http://a/b/c/");
+    query(func.args("..", base), "http://a/b/");
+    query(func.args("../", base), "http://a/b/");
+    query(func.args("../g", base), "http://a/b/g");
+    query(func.args("../..", base), "http://a/");
+    query(func.args("../../", base), "http://a/");
+    query(func.args("../../g", base), "http://a/g");
+
+    // RFC 3986, 5.4.2: abnormal examples
+    query(func.args("../../../g", base), "http://a/g");
+    query(func.args("../../../../g", base), "http://a/g");
+    query(func.args("/./g", base), "http://a/g");
+    query(func.args("/../g", base), "http://a/g");
+    query(func.args("g.", base), "http://a/b/c/g.");
+    query(func.args(".g", base), "http://a/b/c/.g");
+    query(func.args("g..", base), "http://a/b/c/g..");
+    query(func.args("..g", base), "http://a/b/c/..g");
+    query(func.args("./../g", base), "http://a/b/g");
+    query(func.args("./g/.", base), "http://a/b/c/g/");
+    query(func.args("g/./h", base), "http://a/b/c/g/h");
+    query(func.args("g/../h", base), "http://a/b/c/h");
+    query(func.args("g;x=1/./y", base), "http://a/b/c/g;x=1/y");
+    query(func.args("g;x=1/../y", base), "http://a/b/c/y");
+    // dot segments are only removed from the path
+    query(func.args("g?y/./x", base), "http://a/b/c/g?y/./x");
+    query(func.args("g?y/../x", base), "http://a/b/c/g?y/../x");
+    query(func.args("g#s/./x", base), "http://a/b/c/g#s/./x");
+    query(func.args("g#s/../x", base), "http://a/b/c/g#s/../x");
+    // strict parser: 'http' is a scheme, not the first path segment
+    query(func.args("http:g", base), "http:g");
+
+    // IRIs (RFC 3987) and LEIRIs: no percent-encoding takes place
+    query(func.args("ç.html", "http://a/à.html"), "http://a/ç.html");
+    query(func.args("%C3%A0.html", "http://a/%C3%A7.html"), "http://a/%C3%A0.html");
+    query(func.args("this doc.html", "http://a/that doc.html"), "http://a/this doc.html");
+    query(func.args("a^b", "http://a/b/"), "http://a/b/a^b");
+    query(func.args("a{b}c", "http://a/b/"), "http://a/b/a{b}c");
+    query(func.args("a|b", "http://a/b/"), "http://a/b/a|b");
+    query(func.args("a\\b", "http://a/b/"), "http://a/b/a\\b");
+    query(func.args("g", "http://a/b^c/"), "http://a/b^c/g");
+
+    // fragment identifiers in the base URI are ignored
+    query(func.args("b.html", "http://a/c.html#s"), "http://a/b.html");
+    query(func.args("", "http://a/c.html#s"), "http://a/c.html");
+    query(func.args("#t", "http://a/c.html#s"), "http://a/c.html#t");
+
+    // empty sequences, static base URI
+    query(func.args(" ()", base), "");
+    query(func.args(" ()", " ()"), "");
+    query(func.args("g:h", " ()"), "g:h");
+    query(func.args("a.html") + " => ends-with('/a.html')", true);
+    query(func.args("a.html", " ()") + " => ends-with('/a.html')", true);
+    query(func.args("g:h") + " instance of xs:anyURI", true);
+
+    // invalid URI reference
+    error(func.args(":", base), URIARG_X);
+    // relative base URI (includes database paths, see GH-1172)
+    error(func.args("a.html", "b.html"), URIARG_X);
+    error(func.args("a.xml", "/db/path/b.xml"), URIARG_X);
+    // non-hierarchical base URI
+    error(func.args("a.html", "urn:doi:234567"), URIARG_X);
+  }
+
+  /** Test method. */
   @Test public void reverse() {
     final Function func = REVERSE;
     query(func.args(" ()"), "");

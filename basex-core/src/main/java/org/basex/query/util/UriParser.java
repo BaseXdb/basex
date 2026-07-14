@@ -171,8 +171,79 @@ public final class UriParser {
             "(#" + FRAGMENT + ")?" +
           ")$");
 
+  /** Scheme of an absolute URI. */
+  private static final Pattern SCHEME_ONLY = Pattern.compile('^' + SCHEME + '$');
+
   /** Private constructor. */
   private UriParser() { }
+
+  /**
+   * Resolves a URI reference against a base URI (RFC 3986, 5.2). Characters that are invalid in
+   * URIs are treated like unreserved characters, and no percent-encoding takes place (LEIRI).
+   * @param base base URI
+   * @param reference URI reference to be resolved
+   * @return resolved URI
+   */
+  public static String resolve(final String base, final String reference) {
+    final Parts bs = new Parts(base), rf = new Parts(reference);
+    final Parts uri = new Parts();
+    uri.fragment = rf.fragment;
+    if(rf.scheme != null) {
+      uri.scheme = rf.scheme;
+      uri.authority = rf.authority;
+      uri.path = removeDots(rf.path);
+      uri.query = rf.query;
+    } else {
+      uri.scheme = bs.scheme;
+      if(rf.authority != null) {
+        uri.authority = rf.authority;
+        uri.path = removeDots(rf.path);
+        uri.query = rf.query;
+      } else {
+        uri.authority = bs.authority;
+        if(rf.path.isEmpty()) {
+          uri.path = bs.path;
+          uri.query = rf.query != null ? rf.query : bs.query;
+        } else {
+          uri.path = removeDots(Strings.startsWith(rf.path, '/') ? rf.path : bs.merge(rf.path));
+          uri.query = rf.query;
+        }
+      }
+    }
+    return uri.toString();
+  }
+
+  /**
+   * Removes dot segments from a path (RFC 3986, 5.2.4).
+   * @param path path
+   * @return normalized path
+   */
+  private static String removeDots(final String path) {
+    final boolean absolute = Strings.startsWith(path, '/');
+    final StringBuilder sb = new StringBuilder();
+    String in = absolute ? path : '/' + path;
+    // parent references of a relative path that can be resolved against a subsequent base URI
+    int dots = 0;
+    while(!in.isEmpty()) {
+      if(in.startsWith("/./")) {
+        in = in.substring(2);
+      } else if(in.equals("/.")) {
+        in = "/";
+      } else if(in.startsWith("/../") || in.equals("/..")) {
+        in = in.equals("/..") ? "/" : in.substring(3);
+        if(sb.isEmpty()) ++dots;
+        else sb.setLength(sb.lastIndexOf("/"));
+      } else {
+        int s = in.indexOf('/', 1);
+        if(s == -1) s = in.length();
+        sb.append(in, 0, s);
+        in = in.substring(s);
+      }
+    }
+    if(absolute) return sb.toString();
+    final String result = sb.isEmpty() ? "" : sb.substring(1);
+    return dots == 0 ? result : "../".repeat(dots) + result;
+  }
 
   /**
    * Parses an RFC 3986 URI.
@@ -192,6 +263,82 @@ public final class UriParser {
       Util.debug(er);
     }
     return ParsedUri.INVALID;
+  }
+
+  /**
+   * Components of a URI reference (RFC 3986, 3).
+   * @author BaseX Team, BSD License
+   * @author Christian Gruen
+   */
+  private static final class Parts {
+    /** Scheme ({@code null} if the URI is relative). */
+    private String scheme;
+    /** Authority (can be {@code null}). */
+    private String authority;
+    /** Path (never {@code null}). */
+    private String path = "";
+    /** Query (can be {@code null}). */
+    private String query;
+    /** Fragment (can be {@code null}). */
+    private String fragment;
+
+    /** Constructor. */
+    private Parts() { }
+
+    /**
+     * Splits a URI reference into its components.
+     * @param uri URI reference
+     */
+    private Parts(final String uri) {
+      String rest = uri;
+      int s = rest.indexOf('#');
+      if(s != -1) {
+        fragment = rest.substring(s + 1);
+        rest = rest.substring(0, s);
+      }
+      s = rest.indexOf('?');
+      if(s != -1) {
+        query = rest.substring(s + 1);
+        rest = rest.substring(0, s);
+      }
+      // a colon introduces a scheme only if it occurs in the first path segment
+      s = rest.indexOf(':');
+      final int slash = rest.indexOf('/');
+      if(s != -1 && (slash == -1 || s < slash) &&
+          SCHEME_ONLY.matcher(rest.substring(0, s)).matches()) {
+        scheme = rest.substring(0, s);
+        rest = rest.substring(s + 1);
+      }
+      if(rest.startsWith("//")) {
+        s = rest.indexOf('/', 2);
+        if(s == -1) s = rest.length();
+        authority = rest.substring(2, s);
+        rest = rest.substring(s);
+      }
+      path = rest;
+    }
+
+    /**
+     * Merges a relative path with the path of this URI (RFC 3986, 5.2.3).
+     * @param relative relative path
+     * @return merged path
+     */
+    private String merge(final String relative) {
+      if(authority != null && path.isEmpty()) return "/" + relative;
+      final int s = path.lastIndexOf('/');
+      return s == -1 ? relative : path.substring(0, s + 1) + relative;
+    }
+
+    @Override
+    public String toString() {
+      final StringBuilder sb = new StringBuilder();
+      if(scheme != null) sb.append(scheme).append(':');
+      if(authority != null) sb.append("//").append(authority);
+      sb.append(path);
+      if(query != null) sb.append('?').append(query);
+      if(fragment != null) sb.append('#').append(fragment);
+      return sb.toString();
+    }
   }
 
   /**

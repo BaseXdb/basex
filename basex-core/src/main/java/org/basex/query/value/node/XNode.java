@@ -366,11 +366,11 @@ public abstract class XNode extends GNode {
     do {
       final Uri bu = Uri.get(nd.baseURI(), false);
       if(!bu.isValid()) throw INVURI_X.get(info, nd.baseURI());
-      uri = bu.resolve(uri, info);
+      uri = bu.resolve(uri);
       if(nd.kind() == DOCUMENT && nd instanceof DBNode) break;
       nd = nd.parent();
     } while(!uri.isAbsolute() && nd != null);
-    return nd == null || uri == Uri.EMPTY ? base.resolve(uri, info) : uri;
+    return nd == null || uri == Uri.EMPTY ? base.resolve(uri) : uri;
   }
 
   /**

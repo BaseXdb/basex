@@ -233,7 +233,7 @@ public final class SerializerOptions extends Options {
       // parse parameters and character map
       Uri uri = Uri.get(value);
       if(!uri.isValid()) throw INVURI_X.get(info, value);
-      if(!uri.isAbsolute()) uri = info.sc().baseURI().resolve(uri, info);
+      if(!uri.isAbsolute()) uri = info.sc().baseURI().resolve(uri);
       final IO io = IO.get(string(uri.string()));
       final GNode root;
       try {

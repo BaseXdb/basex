@@ -28,13 +28,14 @@ public final class FnResolveUri extends StandardFunc {
     if(!u.isValid()) throw URIARG_X.get(info, u);
     if(u.isAbsolute()) return u;
 
-    // check base URI: reject invalid, relative, and non-hierarchical URIs and fragment identifiers
+    // check base URI: reject invalid, relative and non-hierarchical URIs
     final Uri b = base == null ? sc().baseURI() : Uri.get(base);
     final byte[] string = b.string();
-    if(!b.isValid() || !b.isAbsolute() || contains(string, '#') || !contains(string, '/'))
-      throw URIARG_X.get(info, b);
+    if(!b.isValid() || !b.isAbsolute() || !contains(string, '/')) throw URIARG_X.get(info, b);
 
-    return b.resolve(u, info);
+    // a fragment identifier in the base URI is ignored
+    final int f = indexOf(string, '#');
+    return (f == -1 ? b : Uri.get(substring(string, 0, f))).resolve(u);
   }
 
   @Override

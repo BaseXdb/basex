@@ -184,12 +184,14 @@ public class DBNode extends XNode {
   @Override
   public final byte[] baseURI() {
     if(kind() == Kind.DOCUMENT) {
-      final String base = Token.string(data.text(pre, true));
+      final String base = Token.string(data.text(pre, true)), name = data.meta.name;
       if(data.inMemory()) {
         final String path = data.meta.original;
-        return Token.token(path.isEmpty() ? base : IO.get(path).merge(base).url());
+        if(!path.isEmpty()) return Token.token(IO.get(path).merge(base).url());
+        // documents without a database (e.g. created via fn:parse-xml) have no base URI
+        if(name.isEmpty()) return Token.token(base);
       }
-      return Token.concat('/', data.meta.name, '/', base);
+      return Token.concat('/', name, '/', base);
     }
     final byte[] base = attribute(XML_BASE);
     return base != null ? base : Token.EMPTY;

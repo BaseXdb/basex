@@ -1,7 +1,5 @@
 package org.basex.query.value.item;
 
-import static org.basex.query.QueryError.*;
-
 import java.net.*;
 
 import org.basex.io.*;
@@ -73,29 +71,16 @@ public final class Uri extends AStr {
   }
 
   /**
-   * Appends the specified address. If one of the URIs is invalid,
-   * the original URI is returned.
-   * @param add address to be appended
-   * @param info input info (can be {@code null})
+   * Resolves the specified URI reference against this URI.
+   * @param add URI reference to be resolved
    * @return new URI
-   * @throws QueryException query exception
    */
-  public Uri resolve(final Uri add, final InputInfo info) throws QueryException {
+  public Uri resolve(final Uri add) {
     if(add.value.length == 0) return this;
-    try {
-      final URI res = new URI(Token.string(add.value));
-      URI base = new URI(Token.string(value));
-      if("".equals(base.getPath()) && !"".equals(base.getHost())) {
-        // work around JDK-8272702, https://bugs.java.com/bugdatabase/view_bug?bug_id=8272702
-        base = new URI(Token.string(value) + "/");
-      }
-      String uri = base.resolve(res).toString();
-      if(uri.startsWith(IO.FILEPREF))
-        uri = uri.replaceAll('^' + IO.FILEPREF + "([^/])", IO.FILEPREF + "//$1");
-      return get(Token.token(uri), false);
-    } catch(final URISyntaxException ex) {
-      throw URIARG_X.get(info, ex.getMessage());
-    }
+    String uri = UriParser.resolve(Token.string(value), Token.string(add.value));
+    if(uri.startsWith(IO.FILEPREF))
+      uri = uri.replaceAll('^' + IO.FILEPREF + "([^/])", IO.FILEPREF + "//$1");
+    return get(Token.token(uri), false);
   }
 
   /**

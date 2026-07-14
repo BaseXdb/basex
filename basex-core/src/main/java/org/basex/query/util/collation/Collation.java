@@ -58,7 +58,7 @@ public abstract class Collation {
     final Uri u = Uri.get(uri);
     if(!u.isValid()) throw INVURI_X.get(info, uri);
     final byte[] url = u.isAbsolute() ? uri : Token.startsWith(uri, '?') ? concat(BASEX, uri) :
-      info.sc().baseURI().resolve(u, info).string();
+      info.sc().baseURI().resolve(u).string();
 
     // return Unicode point collation
     if(eq(COLLATION_URI, url)) return null;
