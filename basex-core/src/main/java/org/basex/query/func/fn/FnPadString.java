@@ -46,8 +46,8 @@ public final class FnPadString extends StandardFunc {
     if(missing <= 0) return Str.get(token);
 
     final byte[] padding = Token.token(options.get(PadOptions.PADDING));
-    if(padding.length == 0) throw INVALIDOPTION_X.get(info,
-        Util.info("Option '%': padding string must not be empty.", PadOptions.PADDING.name()));
+    if(padding.length == 0)
+      throw INVALIDVALUE_X_X.get(info, PadOptions.PADDING.name(), Str.get(padding));
     if(missing > Integer.MAX_VALUE) throw RANGE_X.get(info, length);
 
     final int miss = (int) missing;

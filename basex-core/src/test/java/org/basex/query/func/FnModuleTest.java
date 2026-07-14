@@ -2824,7 +2824,7 @@ return
 
     check(func.args("abc", 6), "abc   ", empty(func));
 
-    error(func.args("abc", 6, " { 'padding': '' }"), INVALIDOPTION_X);
+    error(func.args("abc", 6, " { 'padding': '' }"), INVALIDVALUE_X_X);
     error(func.args("abc", 6, " { 'side': 'middle' }"), INVALIDOPTION_X);
     error(func.args("abc", Long.MAX_VALUE), RANGE_X);
   }
