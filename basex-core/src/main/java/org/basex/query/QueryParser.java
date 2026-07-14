@@ -1140,9 +1140,7 @@ public class QueryParser extends InputParser {
       qc.namedTypes.put(qn, st);
     }
     declaredTypes.put(qn, st);
-    if(qn.uri().length != 0) {
-      qc.typeCnstrs.add(new TypeCnstr(sc, qn, st, anns, docBuilder.toString(), ii, funcs));
-    }
+    qc.typeCnstrs.add(new TypeCnstr(sc, qn, st, anns, docBuilder.toString(), ii, funcs));
   }
 
   /**
