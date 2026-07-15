@@ -1,6 +1,7 @@
 package org.basex.gui.text;
 
 import static org.basex.gui.GUIConstants.*;
+import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import java.awt.*;
@@ -34,7 +35,7 @@ final class SyntaxXQuery extends SyntaxMarkup {
   private static final byte[] BOUNDARY = token("boundary-space");
   /** Clauses of a FLWOR expression (without {@code return}). */
   private static final HashSet<String> CLAUSES = new HashSet<>(Arrays.asList(
-    "count", "for", "group", "let", "order", "stable", "where", "window"));
+    COUNT, FOR, GROUP, LET, ORDER, STABLE, WHERE, WINDOW));
 
   /** Line type: no clause. */
   private static final int NONE = 0;
@@ -44,11 +45,19 @@ final class SyntaxXQuery extends SyntaxMarkup {
   private static final int FINAL = 2;
   /** Operators that are followed by an expression (no asterisk: '/*', 'xs:string*'). */
   private static final String OPERATORS = "=+-<>|!/";
+  /** Operator keywords that follow an operand. */
+  private static final HashSet<String> INFIX = new HashSet<>(Arrays.asList(
+    AND, CAST, CASTABLE, DIV, EXCEPT, IDIV, INSTANCE, INTERSECT, MOD, OR, OTHERWISE, TO, TREAT,
+    UNION));
   /** Keywords that are followed by an expression. */
   private static final HashSet<String> DANGLING = new HashSet<>(Arrays.asList(
-    "and", "as", "case", "cast", "castable", "default", "div", "else", "eq", "except", "ge", "gt",
-    "idiv", "in", "instance", "intersect", "is", "le", "lt", "mod", "ne", "of", "or", "otherwise",
-    "return", "satisfies", "then", "to", "treat", "union", "where"));
+    AS, CASE, DEFAULT, ELSE, IN, OF, RETURN, SATISFIES, THEN, WHERE));
+  static {
+    // comparison operators are infix operators as well; every infix operator dangles
+    for(final CmpOp op : CmpOp.values()) INFIX.add(op.toValueString());
+    INFIX.add(CmpOp.EQ.toNodeString());
+    DANGLING.addAll(INFIX);
+  }
 
   /** Mode: code. */
   private static final int CODE = MODES;
@@ -139,6 +148,7 @@ final class SyntaxXQuery extends SyntaxMarkup {
         yield cyan;
       }
       case EQNAME -> {
+        if(reference(text, pos)) yield purple;
         if(ch == '}') close(0);
         yield brown;
       }
@@ -215,6 +225,8 @@ final class SyntaxXQuery extends SyntaxMarkup {
     if(name(text, pos)) {
       final int prev = nameStart > 0 ? text[nameStart - 1] : 0;
       if(prev == '$') return green;
+      // a name glued to a preceding digit is the tail of a numeric literal: '10_000', '1e5', '0xF'
+      if(digit(prev)) return purple;
       return prev == '%' || nameKeyword ? blue : plain;
     }
     // numeric literals (a dot is only a decimal point if it is not part of a name)
@@ -325,7 +337,10 @@ final class SyntaxXQuery extends SyntaxMarkup {
     final int type = clause(text, pos), ref = previous.reference();
     // the commas of a clause separate its own operands, not the operands of an enclosing list
     final boolean separates = type != CLAUSE;
-    if(continued(text, pos, last, code, newlines)) return new Indent(1, 1, type, separates);
+    // a clause continuation opens a new baseline; a non-clause continuation is transparent and
+    // preserves the clause context, so that a following clause stays aligned with the continued one
+    if(continued(text, pos, last, code, newlines)) return type != NONE ?
+      new Indent(1, 1, type, separates) : new Indent(1, ref, previous.type(), separates);
     // consecutive clauses are indented alike
     if(type != NONE && previous.type() == CLAUSE) return new Indent(ref, ref, type, separates);
     // further operands of a clause are indented; the clause remains the reference
@@ -348,6 +363,8 @@ final class SyntaxXQuery extends SyntaxMarkup {
     // annotations continue a declaration
     if(cp(text, pos) == '%') return true;
     if(newlines != 1 || !code) return false;
+    // an operator keyword at the start of the line continues the preceding expression
+    if(INFIX.contains(startName(text, pos))) return true;
     final int p = skipWsBack(text, last), ch = cp(text, p);
     if(OPERATORS.indexOf(ch) != -1) return true;
     return XMLToken.isNCChar(ch) && name(text, p) &&
@@ -361,9 +378,19 @@ final class SyntaxXQuery extends SyntaxMarkup {
    * @return {@link #NONE}, {@link #CLAUSE} or {@link #FINAL}
    */
   private int clause(final byte[] text, final int pos) {
-    if(!name(text, pos) || nameStart != pos) return NONE;
-    final String name = string(text, nameStart, nameEnd - nameStart);
-    return "return".equals(name) ? FINAL : CLAUSES.contains(name) ? CLAUSE : NONE;
+    final String name = startName(text, pos);
+    return RETURN.equals(name) ? FINAL : CLAUSES.contains(name) ? CLAUSE : NONE;
+  }
+
+  /**
+   * Returns the name that starts at the specified position.
+   * @param text text
+   * @param pos position
+   * @return name, or {@code null} if no name starts at the position
+   */
+  private String startName(final byte[] text, final int pos) {
+    return name(text, pos) && nameStart == pos ? string(text, nameStart, nameEnd - nameStart) :
+      null;
   }
 
   @Override

@@ -42,6 +42,15 @@ public final class XQueryFormatterTest {
     // reserved words that do not expect an operand
     format("for $x in (1, 2)\norder by $x descending\nreturn $x",
            "for $x in (1, 2)\norder by $x descending\nreturn $x");
+    // a line that begins with a binary operator continues the previous one
+    format("()\notherwise 0", "()\n  otherwise 0");
+    format("$a\nand $b", "$a\n  and $b");
+    // comparison operators are derived from CmpOp, not listed literally
+    format("$a\neq $b", "$a\n  eq $b");
+    // a non-clause continuation does not break the alignment of a following clause
+    format("let $x := ()\notherwise 0\nreturn $x", "let $x := ()\n  otherwise 0\nreturn $x");
+    format("let $entries :=\nlet $sec := ()\notherwise 0\nreturn {}\nreturn $entries",
+           "let $entries :=\n  let $sec := ()\n  otherwise 0\n  return {}\nreturn $entries");
   }
 
   /** Only brackets in code are indented. */

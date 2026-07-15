@@ -69,6 +69,11 @@ public final class SyntaxXQueryTest {
     check("1.5 + 1e3", "NNN...NNN");
     check(".5", "NN");
     check("a.b", "...");
+    // digit separators, exponents and hexadecimal digits belong to the literal
+    check("10_000", "NNNNNN");
+    check("1_000.000_1", "NNNNNNNNNNN");
+    check("1.5e10", "NNNNNN");
+    check("0xFF_FF", "NNNNNNN");
   }
 
   /** Comments. */
@@ -86,6 +91,8 @@ public final class SyntaxXQueryTest {
     check("Q{http://x.com}local(1)", "SSSSSSSSSSSSSSS......N.");
     // an apostrophe in the URI must not open a string literal
     check("Q{a'b}c 1", "SSSSSS..N");
+    // a character or entity reference in the URI is highlighted, as in string literals
+    check("Q{&amp;}c", "SSNNNNNS.");
   }
 
   /** EQNames are resolved via their braced URI; a lexical prefix is ignored. */
