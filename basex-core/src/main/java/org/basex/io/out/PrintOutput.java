@@ -45,8 +45,8 @@ public class PrintOutput extends OutputStream {
    * @return print output
    */
   public static PrintOutput get(final OutputStream out) {
+    // buffer a ByteArrayOutputStream as well: its synchronized, array-growing writes are costly
     return out instanceof final PrintOutput po ? po : new PrintOutput(
-           out instanceof ByteArrayOutputStream ||
            out instanceof BufferedOutputStream ||
            out instanceof BufferOutput ? out : new BufferOutput(out));
   }
