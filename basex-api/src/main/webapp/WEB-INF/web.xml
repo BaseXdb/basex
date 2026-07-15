@@ -43,16 +43,19 @@
     <url-pattern>/rest/*</url-pattern>
   </servlet-mapping>
 
-  <!-- Mapping for static resources (may be restricted to a sub path) -->
+  <!-- Mapping for static resources (may be restricted to a sub path).
+       Jetty 12 EE10: on a prefix mapping the DefaultServlet resolves the path info
+       below its base resource, so the base is pointed at the "static" directory. -->
   <servlet>
-    <servlet-name>default</servlet-name>
+    <servlet-name>static</servlet-name>
+    <servlet-class>org.eclipse.jetty.ee10.servlet.DefaultServlet</servlet-class>
     <init-param>
-      <param-name>useFileMappedBuffer</param-name>
-      <param-value>false</param-value>
+      <param-name>baseResource</param-name>
+      <param-value>static</param-value>
     </init-param>
   </servlet>
   <servlet-mapping>
-    <servlet-name>default</servlet-name>
+    <servlet-name>static</servlet-name>
     <url-pattern>/static/*</url-pattern>
   </servlet-mapping>
 
