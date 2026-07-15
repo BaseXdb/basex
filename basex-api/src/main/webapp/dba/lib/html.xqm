@@ -28,16 +28,17 @@ declare function html:wrap(
 ) as element(html) {
   let $header := head($options?header) ! utils:capitalize(.)
   let $user := session:get($config:SESSION-KEY)
-  return <html>
+  return <html lang='en'>
     <head>
       <meta charset='utf-8'/>
+      <meta name='viewport' content='width=device-width, initial-scale=1'/>
       <title>DBA{ ($header, tail($options?header)) ! (' » ' || .) }</title>
       <meta name='description' content='Database Administration'/>
       <meta name='author' content='BaseX Team, BSD License'/>
       <meta name="robots" content="noindex"/>
       <link rel='icon' href='static/basex.svg'/>
-      <link rel='stylesheet' type='text/css' href='static/style.css'/>
-      <link rel='stylesheet' type='text/css' href='static/codemirror/codemirror.css'/>
+      <link rel='stylesheet' href='static/style.css'/>
+      <link rel='stylesheet' href='static/codemirror/codemirror.css'/>
       <script src='static/js.js'/>
       <script src='static/editor.js'/>
       <script src='static/codemirror/codemirror.js'/>
@@ -45,67 +46,55 @@ declare function html:wrap(
       <script src='static/codemirror/xml.js'/>
     </head>
     <body>
-      <table cellpadding='0' cellspacing='0'>
-        <tr>
-          <td class='slick'>
-            <table width='100%' cellpadding='0' cellspacing='0'>
-              <tr>
-                <td>{
-                  <span style='float:left'>
-                    <h1>BaseX Database Administration</h1>
-                  </span>,
-                  if ($user) {
-                    <span style='float:right'>
-                      <b>{ $user }</b> · <a href='logout'>logout</a>
-                    </span>
-                  }
-                }</td>
-              </tr>
-              <tr>
-                <td>
-                  <div class='ellipsis'>{
-                    if ($user) {
-                      let $cats := (
-                        for $cat in ('Logs', 'Databases', 'Editor', 'Files', 'Jobs',
-                          'Users', 'Sessions', 'Settings')
-                        let $link := <a href='{ lower-case($cat) }'>{ $cat }</a>
-                        return if ($link = $header) then <b>{ $link }</b> else $link
-                      )
-                      return (
-                        head($cats),
-                        tail($cats) ! (' · ', .),
-                        (1 to 3) ! '&#x2000;'
-                      )
-                    } else {
-                      <div class='note'>
-                        Please enter your admin credentials:
-                      </div>
-                    },
-                    <span>{
-                      element b {
-                        attribute id { 'info' },
-                        let $error := $options?error[.], $info := $options?info[.]
-                        return if ($error) {
-                          attribute class { 'error' }, $error
-                        } else if ($info) {
-                          attribute class { 'info' }, $info
-                        }
-                      }
-                    }</span>
-                  }</div>
-                  <hr/>
-                </td>
-              </tr>
-            </table>
-          </td>
-          <td class='slick'>
-            <a href='/'><img src='static/basex.svg'/></a>
-          </td>
-        </tr>
-      </table>
-      <table width='100%'>{ $rows }</table>
+      <header>
+        <div class='header-main'>
+          <div class='header-top'>
+            <h1>BaseX Database Administration</h1>
+            {
+              if ($user) {
+                <div><b>{ $user }</b> · <a href='logout'>logout</a></div>
+              }
+            }
+          </div>
+          <nav class='ellipsis'>{
+            if ($user) {
+              let $cats := (
+                for $cat in ('Logs', 'Databases', 'Editor', 'Files', 'Jobs',
+                  'Users', 'Sessions', 'Settings')
+                let $link := <a href='{ lower-case($cat) }'>{ $cat }</a>
+                return if ($link = $header) then <b>{ $link }</b> else $link
+              )
+              return (
+                head($cats),
+                tail($cats) ! (' · ', .),
+                (1 to 3) ! '&#x2000;'
+              )
+            } else {
+              <div class='note'>
+                Please enter your admin credentials:
+              </div>
+            },
+            <span>{
+              element b {
+                attribute id { 'info' },
+                let $error := $options?error[.], $info := $options?info[.]
+                return if ($error) {
+                  attribute class { 'error' }, $error
+                } else if ($info) {
+                  attribute class { 'info' }, $info
+                }
+              }
+            }</span>
+          }</nav>
+          <hr/>
+        </div>
+        <a href='/' class='header-logo'><img src='static/basex.svg' alt='BaseX'/></a>
+      </header>
+      <main>
+        <table class='content' width='100%'>{ $rows }</table>
+      </main>
       <hr/>
-      <div id='footer' class='right'><sup>BaseX Team, BSD License</sup></div>
+      <footer class='right'><sup>BaseX Team, BSD License</sup></footer>
       <div class='small'/>
       { html:js('buttons();') }
     </body>
@@ -157,11 +146,13 @@ declare function html:checkbox(
   $label   as xs:string,
   $map     as map(*)
 ) as node()+ {
-  element input {
-    attribute type { 'checkbox' },
-    map:for-each($map, fn($key, $value) { attribute { $key } { $value } })
+  element label {
+    element input {
+      attribute type { 'checkbox' },
+      map:for-each($map, fn($key, $value) { attribute { $key } { $value } })
+    },
+    text { $label }
   },
-  text { $label },
   element br { }
 };
 
@@ -197,7 +188,7 @@ declare function html:properties(
     for $header in $props/*
     return (
       <tr>
-        <th colspan='2' align='left'>
+        <th colspan='2'>
           <h3>{ upper-case(name($header)) }</h3>
         </th>
       </tr>,
@@ -342,15 +333,13 @@ declare function html:table(
       return $sorted-entries[position() >= $first][position() <= $max-option + 1]
     }
     where exists($shown-entries)
-    return element table {
+    let $table := element table {
       element tr {
         for $header at $pos in $headers
         let $name := $header?key
         let $label := upper-case($header?label)
         return element th {
-          attribute align {
-            if ($header?type = $html:NUMBER) then 'right' else 'left'
-          },
+          attribute class { 'num' }[$header?type = $html:NUMBER],
 
           if ($pos = 1 and $buttons) {
             <input type='checkbox' onclick='toggle(this)'/>, ' '
@@ -396,7 +385,7 @@ declare function html:table(
           $err:description
         }
         return element td {
-          attribute align { if ($type = $html:NUMBER) then 'right' else 'left' },
+          attribute class { 'num' }[$type = $html:NUMBER],
           if ($pos = 1 and $buttons) {
             <input type='checkbox' name='{ $name }' value='{ data($value) }'
               onclick='buttons(this)'/>,
@@ -410,6 +399,8 @@ declare function html:table(
         }
       }
     }
+    (: horizontal scroll on narrow screens :)
+    return element div { attribute class { 'scroll' }, $table }
   )
 };
 

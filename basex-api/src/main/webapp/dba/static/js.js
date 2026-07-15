@@ -1,27 +1,34 @@
 /** Link to the CodeMirror editor component. */
-var _editor;
+let _editor;
 /** Link to the CodeMirror output component. */
-var _output;
+let _output;
 
 /** Type of (latest) running query. */
-var _updating;
+let _updating;
 /** Promise of (latest) running query. */
-var _running;
+let _running;
 
 /** Most recent log entry search string. */
-var _logInput;
+let _logInput;
 /** Most recent log filter string. */
-var _dbInput;
+let _dbInput;
+
+/**
+ * Indicates whether the table row containing a checkbox is currently shown.
+ * @param {checkbox} input checkbox
+ * @returns {boolean} visibility
+ */
+function rowVisible(input) {
+  return input.closest("tr")?.style.display !== "none";
+}
 
 /**
  * Toggles the selection of all checkboxes in a form.
  * @param {checkbox} source clicked header checkbox
  */
 function toggle(source) {
-  for(var input of getForm(source).getElementsByTagName("input")) {
-    if(input.type === "checkbox") {
-      input.checked = source.checked && input.parentElement.parentElement.style.display !== "none";
-    }
+  for(const input of getForm(source).querySelectorAll("input[type=checkbox]")) {
+    input.checked = source.checked && rowVisible(input);
   }
   buttons(source);
 }
@@ -31,11 +38,11 @@ function toggle(source) {
  * @param {checkbox} source clicked checkbox. if undefined, all forms will be refreshed
  */
 function buttons(source) {
-  for(var form of (source ? [ getForm(source) ] : document.getElementsByTagName("form"))) {
+  for(const form of (source ? [ getForm(source) ] : document.querySelectorAll("form"))) {
     // count selected items and refresh header checkbox
-    var count = 0, checked = 0, header = undefined;
-    for(var input of form.getElementsByTagName("input")) {
-      if(input.type === "checkbox" && input.parentElement.parentElement.style.display !== "none") {
+    let count = 0, checked = 0, header;
+    for(const input of form.querySelectorAll("input[type=checkbox]")) {
+      if(rowVisible(input)) {
         if(input.name) {
           count++;
           if(input.checked) checked++;
@@ -47,19 +54,18 @@ function buttons(source) {
     if(header) header.checked = count && count === checked;
 
     // check button states
-    for(var button of form.getElementsByTagName("button")) {
+    for(const button of form.querySelectorAll("button")) {
       if(button.getAttribute("data-check")) button.disabled = !checked;
     }
   }
 }
 
 /**
- * Returns an ancestor element
+ * Returns the enclosing form element.
  * @param {source} source element
  */
 function getForm(source) {
-  while(source.tagName.toLowerCase() !== "form") source = source.parentElement;
-  return source;
+  return source.closest("form");
 }
 
 /**
@@ -69,16 +75,16 @@ function getForm(source) {
  * @returns {boolean} true if the action was confirmed
  */
 function confirmAction(button, action) {
-  var values = [];
-  for(var input of getForm(button).getElementsByTagName("input")) {
-    if(input.type === "checkbox" && input.name && input.checked &&
-       input.parentElement.parentElement.style.display !== "none") {
+  const values = [];
+  for(const input of getForm(button).querySelectorAll("input[type=checkbox]")) {
+    if(input.name && input.checked && rowVisible(input)) {
       values.push(input.value);
     }
   }
-  var message = values.length
-    ? action + " " + values.length + (values.length === 1 ? " entry: " : " entries: ") +
-      values.slice(0, 8).join(", ") + (values.length > 8 ? ", …" : "") + "?"
+  const count = values.length;
+  const message = count
+    ? `${action} ${count} ${count === 1 ? "entry" : "entries"}: ` +
+      `${values.slice(0, 8).join(", ")}${count > 8 ? ", …" : ""}?`
     : "Are you sure?";
   return confirm(message);
 }
@@ -89,7 +95,7 @@ function confirmAction(button, action) {
  * @param {type} type message type (info, warning, error)
  */
 function setText(message, type) {
-  var info = document.getElementById("info");
+  const info = document.getElementById("info");
   info.className = type;
   info.textContent = message;
   info.title = message;
@@ -101,23 +107,21 @@ function setText(message, type) {
  * @param {data} data data to be sent
  * @returns {promise} promise
  */
-function request(url, data) {
-  return new Promise((resolve, reject) => {
-    var request = new XMLHttpRequest();
-    request.open("post", url);
-    request.setRequestHeader("Content-Type", "text/plain");
-    request.onreadystatechange = () => {
-      if(request.readyState === XMLHttpRequest.DONE) {
-        var status = request.status;
-        if(status >= 200 && status < 400) {
-          resolve(request.responseText);
-        } else {
-          reject(request);
-        }
-      }
-    };
-    request.send(data);
-  });
+async function request(url, data) {
+  let response;
+  try {
+    response = await fetch(url, {
+      method: "post",
+      headers: { "Content-Type": "text/plain" },
+      body: data
+    });
+  } catch {
+    // network failure: mirror the XHR shape that consumers (showError) read
+    throw { status: 0, statusText: "", responseText: "" };
+  }
+  const text = await response.text();
+  if(response.status >= 200 && response.status < 400) return text;
+  throw { status: response.status, statusText: response.statusText, responseText: text };
 }
 
 /**
@@ -127,11 +131,11 @@ function request(url, data) {
  * @param {boolean} reset reset query
  */
 function query(path, query, reset) {
-  var url = path;
-  for(var name of [ "name", "date", "resource", "sort", "time", "page" ]) {
-    var element = document.getElementById(name), value = element && element.value;
+  let url = path;
+  for(const name of [ "name", "date", "resource", "sort", "time", "page" ]) {
+    const value = document.getElementById(name)?.value;
     if(value && (name !== "page" || value !== 1 && !reset)) {
-      url += (url === path ? "?" : "&") + name + "=" + encodeURIComponent(value);
+      url += `${url === path ? "?" : "&"}${name}=${encodeURIComponent(value)}`;
     }
   }
   return request(url, query);
@@ -140,37 +144,36 @@ function query(path, query, reset) {
 /**
  * Evaluates a query in the editor panel.
  */
-function runQuery() {
+async function runQuery() {
   if(document.getElementById("run").disabled) return;
   if(_editor) _editor.focus();
 
-  var stop = document.getElementById("stop");
+  const stop = document.getElementById("stop");
   stop.disabled = true;
   setText("", "");
 
-  var queryString = document.getElementById("editor").value;
-  var self = query("parse", queryString);
-  return self.then((updating) => {
-    var up = updating === "true";
-    var next = _running && up !== _updating ? stopQuery() : Promise.resolve();
+  const queryString = document.getElementById("editor").value;
+  const self = query("parse", queryString);
+  try {
+    const up = (await self) === "true";
+    // stop a running query of the other kind before switching update/query mode
+    const stopping = _running && up !== _updating ? stopQuery() : Promise.resolve();
     _updating = up;
-    return next;
-  }).then(() => {
+    await stopping;
+
     register(self);
-    var file = document.getElementById("file");
-    var path = _updating ? "update" : "query";
-    if(file && file.value) path += "?file=" + encodeURIComponent(file.value);
-    return query(path, queryString);
-  }).then((text) => {
-    showResult(text);
-  }).catch((response) => {
+    const file = document.getElementById("file");
+    let path = _updating ? "update" : "query";
+    if(file && file.value) path += `?file=${encodeURIComponent(file.value)}`;
+    showResult(await query(path, queryString));
+  } catch(response) {
     showError(response);
-  }).finally(() => {
+  } finally {
     if(self === _running) {
       stop.disabled = true;
       _running = undefined;
     }
-  });
+  }
 }
 
 /**
@@ -178,16 +181,15 @@ function runQuery() {
  * @param {boolean} show show info if query was successfully stopped
  * @returns {promise} promise
  */
-function stopQuery(show) {
+async function stopQuery(show) {
   if(_editor) _editor.focus();
 
-  return query(_updating ? "update" : "query", "()").then(() => {
-    _running = undefined;
-    if(show) {
-      setText("Query was stopped.", "warning");
-      document.getElementById("stop").disabled = true;
-    }
-  });
+  await query(_updating ? "update" : "query", "()");
+  _running = undefined;
+  if(show) {
+    setText("Query was stopped.", "warning");
+    document.getElementById("stop").disabled = true;
+  }
 }
 
 /**
@@ -199,7 +201,7 @@ function register(self) {
   setTimeout(() => {
     if(self === _running) {
       setText("Please wait…", "warning");
-      var stop = document.getElementById("stop");
+      const stop = document.getElementById("stop");
       if(stop) stop.disabled = false;
     }
   }, 500);
@@ -214,16 +216,16 @@ function showError(response, info) {
   if(response.status === 460) return;
 
   // normalize error message
-  var msg = response.statusText.match(/\[\w+\]/g) ? response.statusText : response.responseText;
-  var lc = !info && msg.match(/\d+\/\d+:/);
-  var s = msg.indexOf("["), e1 = msg.indexOf("\n", s);
+  let msg = response.statusText.match(/\[\w+\]/g) ? response.statusText : response.responseText;
+  const lc = !info && msg.match(/\d+\/\d+:/);
+  const s = msg.indexOf("["), e1 = msg.indexOf("\n", s);
   if(s > -1) msg = msg.substring(s, e1 > s ? e1 : msg.length);
   msg = msg.replace(/^\[.*?\] /, "").replace(/Stack Trace:.*/, "").replace(/\s+/g, " ");
-  if(info) msg = info + ": " + msg;
-  if(lc) msg = lc + " " + msg;
+  if(info) msg = `${info}: ${msg}`;
+  if(lc) msg = `${lc} ${msg}`;
 
   // decode HTML entities via an inert parse (no scripts run, no resources load)
-  var decoded = new DOMParser().parseFromString(msg, "text/html").documentElement.textContent;
+  const decoded = new DOMParser().parseFromString(msg, "text/html").documentElement.textContent;
   setText(decoded, "error");
 }
 
@@ -241,35 +243,36 @@ function showResult(text) {
  * Queries the entries of the current log file.
  * @param {string} key typed key
  */
-function logEntries(key) {
-  var reset = key && key !== "Enter";
-  var input = document.getElementById("input").value.trim();
+async function logEntries(key) {
+  const reset = key && key !== "Enter";
+  const input = document.getElementById("input").value.trim();
   if(reset && _logInput === input) return false;
   _logInput = input;
-  return query("logs", input, reset).then((text) => {
+  try {
+    const text = await query("logs", input, reset);
     setText("", "");
     document.getElementById("output").innerHTML = text;
-    var e = document.getElementById(window.location.hash.replace(/^#/, ""));
+    const e = document.getElementById(window.location.hash.replace(/^#/, ""));
     if(e) e.scrollIntoView();
     if(reset) window.history.replaceState(null, "", replaceParam(window.location.href, "page", 1));
-  }, (response) => {
+  } catch(response) {
     showError(response);
-  }).finally(() => {
+  } finally {
     // refresh browser history
     window.history.replaceState(null, "", replaceParam(window.location.href, "input", input));
-  });
+  }
 }
 
 /**
  * Filters log files.
  */
 function logFilter() {
-  var value = document.getElementById("log-filter").value;
-  var count = 0, checked = 0;
-  for(var input of document.getElementById("dates").getElementsByTagName("input")) {
-    if(input.type === "checkbox" && input.name === "name") {
-      var visible = !value || input.value.startsWith(value);
-      input.parentElement.parentElement.style.display = visible ? null : "none";
+  const value = document.getElementById("log-filter").value;
+  let count = 0, checked = 0;
+  for(const input of document.getElementById("dates").querySelectorAll("input[type=checkbox]")) {
+    if(input.name === "name") {
+      const visible = !value || input.value.startsWith(value);
+      input.closest("tr").style.display = visible ? null : "none";
       if(visible) {
         count++;
         if(input.checked) checked++;
@@ -278,10 +281,10 @@ function logFilter() {
       }
     }
   }
-  for(var id of ["log-download", "log-delete"]) {
+  for(const id of ["log-download", "log-delete"]) {
     document.getElementById(id).disabled = !checked;
   }
-  document.getElementsByTagName("h3")[0].innerHTML = count + " Entries";
+  document.querySelector("h3").innerHTML = `${count} Entries`;
   buttons();
 }
 
@@ -289,20 +292,20 @@ function logFilter() {
  * Queries a database resource.
  * @param {boolean} enforce enforce query execution
  */
-function queryResource(enforce) {
-  var input = document.getElementById("input").value.trim();
+async function queryResource(enforce) {
+  const input = document.getElementById("input").value.trim();
   if(!enforce && _dbInput === input) return false;
   _dbInput = input;
 
-  var self = query("db-query", input);
+  const self = query("db-query", input);
   register(self);
-  return self.then((text) => {
-    showResult(text);
-  }).catch((response) => {
+  try {
+    showResult(await self);
+  } catch(response) {
     showError(response);
-  }).finally(() => {
+  } finally {
     if(self === _running) _running = undefined;
-  });
+  }
 }
 
 /**
@@ -314,9 +317,9 @@ function queryResource(enforce) {
 function loadCodeMirror(language, edit, resize) {
   if(!CodeMirror || !dispatchEvent) return;
 
-  var useCM = !/android/i.test(navigator.userAgent);
+  const useCM = !/android/i.test(navigator.userAgent);
   if(edit) {
-    var editorArea = document.getElementById("editor");
+    const editorArea = document.getElementById("editor");
     if (useCM) {
       _editor = CodeMirror.fromTextArea(editorArea, {
         mode: language,
@@ -327,7 +330,7 @@ function loadCodeMirror(language, edit, resize) {
           "Cmd-Enter" : runQuery
         }
       });
-      _editor.display.wrapper.className += " codemirror";
+      _editor.display.wrapper.classList.add("codemirror");
       _editor.on("change", (cm) => {
         cm.save();
         if(checkButtons) checkButtons();
@@ -345,7 +348,7 @@ function loadCodeMirror(language, edit, resize) {
     }
   }
 
-  var outputArea = document.getElementById("output");
+  const outputArea = document.getElementById("output");
   if(outputArea != null) {
     if (useCM) {
       _output = CodeMirror.fromTextArea(outputArea, {
@@ -353,7 +356,7 @@ function loadCodeMirror(language, edit, resize) {
         lineWrapping: true,
         readOnly: true
       });
-      _output.display.wrapper.className += " codemirror";
+      _output.display.wrapper.classList.add("codemirror");
     } else {
       _output = {
         setValue(v) { outputArea.value = v; }
@@ -362,16 +365,17 @@ function loadCodeMirror(language, edit, resize) {
   }
 
   if(resize) {
-    var refresh = () => {
-      var size = window.innerHeight - document.getElementById("footer").offsetTop - 32;
-      var height = elem => Math.max(192, size + elem.offsetHeight);
+    const refresh = () => {
+      // size each pane from its own top to the viewport bottom, so a tall
+      // sibling column (e.g. a long resource list) can't shrink it
+      const height = elem => Math.max(192, window.innerHeight - elem.getBoundingClientRect().top - 32);
       if (useCM) {
-        for(var elem of document.getElementsByClassName("CodeMirror")) {
+        for(const elem of document.querySelectorAll(".CodeMirror")) {
           elem.CodeMirror.setSize("100%", height(elem));
         }
       } else {
-        for(var elem of document.getElementsByTagName("textarea")) {
-          elem.style.height = height(elem) + "px"; 
+        for(const elem of document.querySelectorAll("textarea")) {
+          elem.style.height = `${height(elem)}px`;
         }
       }
     };
@@ -396,12 +400,12 @@ function addInput(source) {
  * @returns {string} new url
  */
 function replaceParam(url, name, value) {
-  var key = name + "=";
-  var qm = url.indexOf("?");
-  var href = (qm < 0 ? url : url.substr(0, qm)) + "?" + key + encodeURIComponent(value);
+  const key = `${name}=`;
+  const qm = url.indexOf("?");
+  let href = `${qm < 0 ? url : url.substr(0, qm)}?${key}${encodeURIComponent(value)}`;
   if(qm >= 0) {
-    for(var param of url.substr(qm + 1).split("&")) {
-      if(param.indexOf(key) < 0) href += "&" + param;
+    for(const param of url.substr(qm + 1).split("&")) {
+      if(param.indexOf(key) < 0) href += `&${param}`;
     }
   }
   return href;

@@ -1,53 +1,56 @@
 /** Link to the resizer area. */
-var _resizer;
+let _resizer;
 /** Link to the left editor component. */
-var _left;
+let _left;
 
 /**
  * Opens a file.
  * @param {string} file optional file name
  */
-function openFile(file) {
+async function openFile(file) {
   if(_editor.historySize().undo > 0 && !confirm("Replace editor contents?")) return;
 
-  var name = file || fileName();
-  return request("editor-open?name=" + encodeURIComponent(name)).then((text) => {
-    _editor.setValue(text);
+  const name = file || fileName();
+  try {
+    _editor.setValue(await request(`editor-open?name=${encodeURIComponent(name)}`));
     finishFile(name, "File was opened.");
-  }).catch((response) => {
+  } catch(response) {
     showError(response, name);
-  });
+  }
 }
 
 /**
  * Saves a file.
  */
-function saveFile() {
+async function saveFile() {
   // append file suffix
-  var name = fileName();
+  let name = fileName();
   if(!name.includes(".")) name += ".xq";
- 
-  var fileString = document.getElementById("editor").value;
-  return request("editor-save?name=" + encodeURIComponent(name), fileString).then((text) => {
+
+  const fileString = document.getElementById("editor").value;
+  try {
+    const text = await request(`editor-save?name=${encodeURIComponent(name)}`, fileString);
     finishFile(name, "File was saved.");
     refreshDataList(text.split("/"));
-  }).catch((response) => {
+  } catch(response) {
     showError(response, name);
-  });
+  }
 }
 
 /**
  * Closes a file.
  */
-function closeFile() {
-  var name = fileName();
-  return name ? request("editor-close?name=" + encodeURIComponent(name)).then((text) => {
+async function closeFile() {
+  const name = fileName();
+  if(!name) return;
+  try {
+    const text = await request(`editor-close?name=${encodeURIComponent(name)}`);
     _editor.setValue("");
     finishFile("", "File was closed.");
     refreshDataList(text.split("/"));
-  }).catch((response) => {
+  } catch(response) {
     showError(response);
-  }) : Promise.resolve();
+  }
 }
 
 /**
@@ -57,7 +60,7 @@ function closeFile() {
  */
 function finishFile(name, info) {
   document.getElementById("file").value = name;
-  var disabled = name && !name.match(/\.xq(m|l|uery)?$/i);
+  const disabled = name && !name.match(/\.xq(m|l|uery)?$/i);
   document.getElementById("run").disabled = disabled;
   _editor.clearHistory();
   checkButtons();
@@ -70,12 +73,10 @@ function finishFile(name, info) {
  * @param {array} names editable files
  */
 function refreshDataList(names) {
-  var files = document.getElementById("files");
-  while(files.firstChild) {
-    files.removeChild(files.firstChild);
-  }
-  for(var name of names) {
-    var opt = document.createElement("option");
+  const files = document.getElementById("files");
+  files.replaceChildren();
+  for(const name of names) {
+    const opt = document.createElement("option");
     opt.value = name;
     files.appendChild(opt);
   }
@@ -85,7 +86,7 @@ function refreshDataList(names) {
  * Refreshes the editor buttons.
  */
 function checkButtons() {
-  var name = fileName();
+  const name = fileName();
   (document.getElementById("open") || {}).disabled = !fileExists(name);
   (document.getElementById("save") || {}).disabled = !name;
   (document.getElementById("close") || {}).disabled = !name;
@@ -106,7 +107,7 @@ function fileExists(name) {
  * @returns {string} file name
  */
 function fileName() {
-  const file = document.getElementById("file")
+  const file = document.getElementById("file");
   if(file) return file.value.trim();
 }
 

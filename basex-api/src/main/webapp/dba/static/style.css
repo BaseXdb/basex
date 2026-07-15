@@ -1,8 +1,40 @@
+:root {
+  --bg: #fff;
+  --fg: #111;
+  --accent: #C33;
+  --accent-strong: #A22;
+  --muted: #666;
+  --strong: #333;
+  --border: #AAA;
+  --border-light: #DDD;
+  --pre-bg: #F8F8F8;
+  --info: #090;
+  --warning: #999;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1e1e1e;
+    --fg: #ddd;
+    --accent: #f77;
+    --accent-strong: #e66;
+    --muted: #aaa;
+    --strong: #ccc;
+    --border: #555;
+    --border-light: #444;
+    --pre-bg: #2a2a2a;
+    --info: #6c6;
+    --warning: #999;
+  }
+}
+
 body {
   font-family: Calibri, Helvetica, sans-serif;
   font-size: 16px;
   overflow-y: scroll;
   margin: .5rem 1rem 1rem 1rem;
+  background-color: var(--bg);
+  color: var(--fg);
 }
 
 p {
@@ -11,19 +43,19 @@ p {
 
 h1 {
   font-size: 220%;
-  color: #A22;
+  color: var(--accent-strong);
   margin: -2px 0 0 0;
 }
 
 h2 {
   font-size: 150%;
-  color: #C33;
+  color: var(--accent);
   margin: 0 0 .2rem 0;
 }
 
 h3 {
   font-size: 120%;
-  color: #666;
+  color: var(--muted);
   margin: .2rem 0 .2rem 0;
 }
 
@@ -35,6 +67,11 @@ th {
   vertical-align: top;
   text-align: left;
   padding: 0 1rem 0rem 0;
+}
+
+/* right-aligned numeric table columns (was the deprecated align='right' attribute) */
+.num {
+  text-align: right;
 }
 
 td {
@@ -68,7 +105,7 @@ dt {
 }
 
 a {
-  color: #C33;
+  color: var(--accent);
   text-decoration: none;
 }
 
@@ -77,13 +114,13 @@ a:hover {
 }
 
 b {
-  color: #333;
+  color: var(--strong);
 }
 
 code {
   font-family: SFMono-Regular, Consolas, Menlo, monospace;
   font-size: 90%;
-  border: 1px solid #DDD;
+  border: 1px solid var(--border-light);
   border-radius: 3px;
   padding: 0 4px 0 4px;
   margin: 0 2px 0 2px;
@@ -92,41 +129,45 @@ code {
 pre {
   font-family: SFMono-Regular, Consolas, Menlo, monospace;
   font-size: 90%;
-  border-color: #DDD;
+  border-color: var(--border-light);
   border-width: 1px;
   border-style: solid;
   border-radius: 3px;
-  background-color: #F8F8F8;
+  background-color: var(--pre-bg);
   padding: .5rem;
   margin: .2rem 0 .5rem 0;
 }
 
 textarea {
   font-family: SFMono-Regular, Consolas, Menlo, monospace;
-  border: 1px solid #AAA;
+  border: 1px solid var(--border);
   border-radius: 3px;
   outline: none;
   width: 100%;
   height: 200px;
   resize: vertical;
+  background-color: var(--bg);
+  color: var(--fg);
 }
 
 input[type=text], input[type=password], input[type=number], select, button {
   padding: 4px;
-  border: 1px solid #AAA;
+  border: 1px solid var(--border);
   border-radius: 3px;
   outline: none;
+  background-color: var(--bg);
+  color: var(--fg);
 }
 
 input[type=submit], button {
   padding: 4px 8px 4px 8px;
-  border: 1px solid #AAA;
+  border: 1px solid var(--border);
   border-radius: 3px;
   outline: none;
 }
 
 .codemirror {
-  border: 1px solid #AAA;
+  border: 1px solid var(--border);
 }
 
 input[type=text], input[type=password], input[type=number], select {
@@ -134,13 +175,13 @@ input[type=text], input[type=password], input[type=number], select {
 }
 
 input:focus, select:focus, button:focus {
-  outline: .5px solid black;
+  outline: .5px solid var(--fg);
 }
 
 hr {
   height: .7px;
   border: 0;
-  background-color: #AAA;
+  background-color: var(--border);
 }
 
 input.smallinput {
@@ -151,8 +192,34 @@ input.smallinput {
   vertical-align: top;
 }
 
-.slick {
-  padding: 0 0 0 0;
+/* page header */
+header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.header-main {
+  flex: 1;
+  /* allow the nav line to shrink and truncate instead of pushing the logo away */
+  min-width: 0;
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.header-logo {
+  flex: none;
+}
+
+/* wraps wide data tables so they scroll sideways instead of widening the page */
+.scroll {
+  overflow-x: auto;
 }
 
 .right {
@@ -160,12 +227,12 @@ input.smallinput {
 }
 
 .error {
-  color: #C33;
+  color: var(--accent);
   font-weight: bold;
 }
 
 .info {
-  color: #090;
+  color: var(--info);
   font-weight: bold;
 }
 
@@ -178,7 +245,7 @@ input.smallinput {
 }
 
 .warning {
-  color: #999;
+  color: var(--warning);
   font-weight: bold;
 }
 
@@ -188,12 +255,12 @@ input.smallinput {
 .error::before   { content: "\2717\00a0"; }
 
 .note {
-  color: #666;
+  color: var(--muted);
 }
 
 .footnote {
   font-size: 70%;
-  color: #666;
+  color: var(--muted);
 }
 
 .small {
@@ -206,6 +273,20 @@ input.smallinput {
 
 .vertical {
   width: 1px;
-  border-left: .7px solid #AAA;
+  border-left: .7px solid var(--border);
   height: 100%;
+}
+
+/* narrow screens: stack the side-by-side content panels, drop their dividers */
+@media (max-width: 800px) {
+  table.content,
+  table.content > tbody,
+  table.content > tbody > tr,
+  table.content > tbody > tr > td {
+    display: block;
+    width: auto;
+  }
+  table.content > tbody > tr > td.vertical {
+    display: none;
+  }
 }
