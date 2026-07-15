@@ -1,0 +1,148 @@
+name: Docker Image
+
+# Builds release containers from the official zips on files.basex.org.
+#
+# Triggers:
+# - schedule: weekly rebuild of all releases of the supported major lines,
+#   picking up new BaseX releases and security updates of the base image.
+# - push tag / workflow_dispatch: build one specific version.
+on:
+  schedule:
+    - cron: '30 4 * * 1'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'BaseX release version (e.g. 12.4); leave empty to build all supported releases'
+        required: false
+      publish:
+        description: 'Push the image to the registry'
+        type: boolean
+        default: true
+  push:
+    tags:
+      - '[0-9]+.[0-9]+'
+      - '[0-9]+.[0-9]+.[0-9]+'
+
+env:
+  # major lines that receive weekly rebuilds
+  SUPPORTED_MAJORS: '12'
+
+jobs:
+  versions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      matrix: ${{ steps.list.outputs.versions }}
+      newest_map: ${{ steps.list.outputs.newest_map }}
+      newest: ${{ steps.list.outputs.newest }}
+    steps:
+      - name: Determine versions to build
+        id: list
+        run: |
+          # all published releases, and the newest one per major line
+          ALL=$(curl -fs https://files.basex.org/releases/ \
+            | grep -oE 'href="[0-9]+\.[0-9]+(\.[0-9]+)?/"' \
+            | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' | sort -uV)
+          NEWEST_MAP=$(echo "$ALL" | jq -Rnc \
+            '[inputs] | group_by(split(".")[0]) | map({(.[0] | split(".")[0]): last}) | add')
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            VERSIONS='["${{ github.event.inputs.version }}"]'
+          elif [ "${{ github.event_name }}" = "push" ]; then
+            VERSIONS='["${{ github.ref_name }}"]'
+          else
+            # schedule, or a manual run without version: all releases of the
+            # supported major lines, so that older version tags also receive
+            # base-image security updates
+            VERSIONS=$(for MAJOR in $SUPPORTED_MAJORS; do
+              echo "$ALL" | grep "^$MAJOR\."
+            done | jq -Rnc '[inputs]')
+          fi
+          echo "versions=$VERSIONS" >> "$GITHUB_OUTPUT"
+          echo "newest_map=$NEWEST_MAP" >> "$GITHUB_OUTPUT"
+          # newest release across the supported major lines ("latest" tag)
+          echo "newest=$(for MAJOR in $SUPPORTED_MAJORS; do
+            echo "$NEWEST_MAP" | jq -r --arg m "$MAJOR" '.[$m] // empty'
+          done | sort -V | tail -1)" >> "$GITHUB_OUTPUT"
+
+  docker:
+    needs: versions
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ${{ fromJSON(needs.versions.outputs.matrix) }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Derive tags
+        id: tags
+        run: |
+          # in a fork, images go to the fork owner's namespace (ghcr requires lowercase)
+          OWNER="${{ github.repository_owner }}"
+          IMAGE="ghcr.io/${OWNER,,}/basex"
+          VERSION="${{ matrix.version }}"
+          MAJOR="${VERSION%%.*}"
+          TAGS="$IMAGE:$VERSION"
+          # moving tags only when this is actually the newest release, so that
+          # backfilling an old version does not drag them backwards
+          NEWEST_IN_MAJOR=$(echo '${{ needs.versions.outputs.newest_map }}' \
+            | jq -r --arg m "$MAJOR" '.[$m] // empty')
+          if [ "$VERSION" = "$NEWEST_IN_MAJOR" ]; then
+            TAGS="$TAGS,$IMAGE:$MAJOR"
+          fi
+          if [ "$VERSION" = "${{ needs.versions.outputs.newest }}" ]; then
+            TAGS="$TAGS,$IMAGE:latest"
+          fi
+          echo "tags=$TAGS" >> "$GITHUB_OUTPUT"
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build image for smoke test
+        uses: docker/build-push-action@v7
+        with:
+          context: docker
+          build-args: BASEX_VERSION=${{ matrix.version }}
+          pull: true
+          load: true
+          tags: basex:smoke
+
+      - name: Smoke test (HTTP server, DBA, admin password)
+        run: |
+          docker run -d --name smoke -p 8080:8080 -e BASEX_ADMIN_PASSWORD=smoke-test basex:smoke
+          timeout 90 sh -c 'until [ "$(docker inspect -f "{{.State.Health.Status}}" smoke)" = "healthy" ]; do sleep 2; done'
+          curl -fs http://localhost:8080/ > /dev/null
+          curl -fsL http://localhost:8080/dba > /dev/null
+          curl -fs -u admin:smoke-test http://localhost:8080/rest > /dev/null
+          docker rm -f smoke
+
+      - name: Log in to GitHub Container Registry
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.publish }}
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # For Docker Hub, add a second docker/login-action with
+      # DOCKERHUB_USERNAME/DOCKERHUB_TOKEN secrets and extra tags below.
+
+      - name: Build and push multi-arch image
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.publish }}
+        uses: docker/build-push-action@v7
+        with:
+          context: docker
+          build-args: BASEX_VERSION=${{ matrix.version }}
+          platforms: linux/amd64,linux/arm64
+          pull: true
+          push: true
+          tags: ${{ steps.tags.outputs.tags }}
