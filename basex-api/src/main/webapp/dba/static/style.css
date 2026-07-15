@@ -277,8 +277,15 @@ header {
   height: 100%;
 }
 
-/* narrow screens: stack the side-by-side content panels, drop their dividers */
+/* narrow screens */
 @media (max-width: 800px) {
+  /* let the navigation wrap instead of truncating with an ellipsis */
+  nav.ellipsis {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+  /* stack the side-by-side content panels, drop their dividers */
   table.content,
   table.content > tbody,
   table.content > tbody > tr,
