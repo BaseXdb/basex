@@ -37,15 +37,27 @@ public final class DbInfo extends DbAccessFn {
       final String[] cols = line.split(": ", 2);
       if(cols[0].isEmpty()) continue;
 
-      final String col = cols[0].replaceAll("[ -:]", "").toLowerCase(Locale.ENGLISH);
-      final FBuilder node = FElem.build(qc.shared.qName(Token.token(col)));
-      if(Strings.startsWith(cols[0], ' ')) {
-        header.node(node.text(cols[1]));
-      } else {
+      if(!Strings.startsWith(cols[0], ' ')) {
+        // new section header
         if(header != null) root.node(header);
-        header = node;
+        header = element(cols[0], qc);
+      } else if(header != null) {
+        // indented line: key/value pair, or a keyless status message
+        if(cols.length > 1) header.node(element(cols[0], qc).text(cols[1]));
+        else header.text(cols[0].trim());
       }
     }
     return root.node(header).finish();
+  }
+
+  /**
+   * Creates an element whose name is derived from the specified label.
+   * @param label label
+   * @param qc query context
+   * @return element builder
+   */
+  private static FBuilder element(final String label, final QueryContext qc) {
+    final String col = label.replaceAll("[ -:]", "").toLowerCase(Locale.ENGLISH);
+    return FElem.build(qc.shared.qName(Token.token(col)));
   }
 }
