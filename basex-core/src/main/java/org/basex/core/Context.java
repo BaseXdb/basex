@@ -308,6 +308,28 @@ public final class Context {
   }
 
   /**
+   * Returns a copy of this context, detached from the current client request, for
+   * asynchronous execution. Request-scoped externals are dropped and the client information is
+   * snapshotted, so that a background job cannot dereference a recycled request.
+   * @return detached context
+   */
+  public Context detach() {
+    final String address = clientAddress(), name = clientName();
+    final Context ctx = new Context(this, new ClientInfo() {
+      @Override
+      public String clientAddress() {
+        return address;
+      }
+      @Override
+      public String clientName() {
+        return name;
+      }
+    });
+    ctx.external.removeIf(object -> object instanceof RequestScope);
+    return ctx;
+  }
+
+  /**
    * Returns all options visible to the current user.
    * @return options (with names in lower-case)
    */

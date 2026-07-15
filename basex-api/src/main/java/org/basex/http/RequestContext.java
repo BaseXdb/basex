@@ -24,7 +24,7 @@ import jakarta.servlet.http.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class RequestContext {
+public final class RequestContext implements RequestScope {
   /** HTTP servlet request. */
   public final HttpServletRequest request;
   /** Query parameters. */
