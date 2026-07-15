@@ -38,8 +38,8 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
 
   /** Header parameters. */
   final Map<String, Value> headers = new HashMap<>();
-  /** Request URL (captured during the handshake, as the request is recycled afterwards). */
-  private final String requestURL;
+  /** Request location (captured during the handshake). */
+  final RequestLocation location;
   /** Remote client address (captured during the handshake). */
   private final String remoteAddress;
 
@@ -56,16 +56,17 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
     final String pi = request.getPathInfo();
     path = new WsPath(pi != null ? pi : "/");
     session = request.getSession();
-    requestURL = String.valueOf(request.getRequestURL());
+    location = new RequestLocation(request.getQueryString(),
+        String.valueOf(request.getRequestURL()), request.getRequestURI());
     remoteAddress = HTTPConnection.remoteAddress(request);
 
     // capture upgrade headers during the handshake, as the request is recycled afterwards
     addHeader("http-version", request.getProtocol());
     addHeader("origin", request.getHeader("Origin"));
     addHeader("protocol-version", request.getHeader("Sec-WebSocket-Version"));
-    addHeader("query-string", request.getQueryString());
+    addHeader("query-string", location.query());
     addHeader("is-secure", String.valueOf(request.isSecure()));
-    addHeader("request-uri", requestURL);
+    addHeader("request-uri", location.url());
     addHeader("host", request.getHeader("Host"));
     final TokenList protocols = new TokenList();
     for(final String header : Collections.list(request.getHeaders("Sec-WebSocket-Protocol"))) {
@@ -107,20 +108,20 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
   public void onWebSocketOpen(final Session sess) {
     super.onWebSocketOpen(sess);
     id = WsPool.add(this);
-    run("[WS-OPEN] " + requestURL, null, () -> findAndProcess(Annotation._WS_CONNECT, null));
+    run("[WS-OPEN] " + location.url(), null, () -> findAndProcess(Annotation._WS_CONNECT, null));
   }
 
   @Override
   public void onWebSocketError(final Throwable th) {
     final String m1 = th.getMessage(), m2 = Util.message(th), msg = m1 != null ? m1 : m2;
-    run("[WS-ERROR] " + requestURL + ": " + msg, null,
+    run("[WS-ERROR] " + location.url() + ": " + msg, null,
         () -> findAndProcess(Annotation._WS_ERROR, msg));
   }
 
   @Override
   public void onWebSocketClose(final int status, final String message, final Callback callback) {
     try {
-      run("[WS-CLOSE] " + requestURL, status,
+      run("[WS-CLOSE] " + location.url(), status,
           () -> findAndProcess(Annotation._WS_CLOSE, null));
     } finally {
       WsPool.remove(id);

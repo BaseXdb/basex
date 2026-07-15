@@ -1,5 +1,7 @@
 package org.basex.http;
 
+import static org.basex.query.QueryError.*;
+
 import java.io.*;
 import java.util.*;
 
@@ -25,8 +27,10 @@ import jakarta.servlet.http.*;
  * @author Christian Gruen
  */
 public final class RequestContext implements RequestScope {
-  /** HTTP servlet request. */
+  /** HTTP servlet request (can be {@code null} for WebSocket connections). */
   public final HttpServletRequest request;
+  /** Request location (query string, URL, URI). */
+  private final RequestLocation location;
   /** Query parameters. */
   private XQMap values;
   /** Form parameters. */
@@ -37,11 +41,30 @@ public final class RequestContext implements RequestScope {
   private IOContent body;
 
   /**
-   * Returns an immutable map with all query parameters.
+   * Constructor for HTTP connections.
    * @param request HTTP request
    */
   public RequestContext(final HttpServletRequest request) {
     this.request = request;
+    location = new RequestLocation(request.getQueryString(),
+        request.getRequestURL().toString(), request.getRequestURI());
+  }
+
+  /**
+   * Constructor for WebSocket connections.
+   * @param location request location
+   */
+  public RequestContext(final RequestLocation location) {
+    request = null;
+    this.location = location;
+  }
+
+  /**
+   * Returns the request location.
+   * @return location
+   */
+  public RequestLocation location() {
+    return location;
   }
 
   /**
@@ -50,6 +73,7 @@ public final class RequestContext implements RequestScope {
    * @throws QueryException query exception
    */
   public XQMap headers() throws QueryException {
+    if(request == null) throw BASEX_HTTP.get(null);
     if(headers == null) {
       final MapBuilder map = new MapBuilder();
       for(final String name : Collections.list(request.getHeaderNames())) {
@@ -85,7 +109,7 @@ public final class RequestContext implements RequestScope {
   public XQMap queryValues() throws QueryException {
     if(values == null) {
       final MapBuilder mb = new MapBuilder();
-      final String string = request.getQueryString();
+      final String string = location().query();
       if(string != null) addParams(string, mb);
       values = mb.map();
     }
@@ -101,13 +125,14 @@ public final class RequestContext implements RequestScope {
    */
   public XQMap formValues(final MainOptions options) throws QueryException, IOException {
     if(form == null) {
-      final MediaType mt = HTTPConnection.mediaType(request);
-      if(mt.is(MediaType.MULTIPART_FORM_DATA)) {
+      // no request (WebSocket connection): no form body
+      final MediaType mt = request != null ? HTTPConnection.mediaType(request) : null;
+      if(mt != null && mt.is(MediaType.MULTIPART_FORM_DATA)) {
         // convert multipart parameters encoded in a form
         try(InputStream is = body().inputStream()) {
           form = new Payload(is, true, null, options).multiForm(mt);
         }
-      } else if(mt.is(MediaType.APPLICATION_X_WWW_FORM_URLENCODED)) {
+      } else if(mt != null && mt.is(MediaType.APPLICATION_X_WWW_FORM_URLENCODED)) {
         // convert URL-encoded parameters
         final MapBuilder mb = new MapBuilder();
         addParams(body().toString(), mb);

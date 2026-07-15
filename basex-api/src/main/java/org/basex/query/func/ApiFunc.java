@@ -34,7 +34,9 @@ public abstract class ApiFunc extends StandardFunc {
    * @throws QueryException query exception
    */
   public final HttpServletRequest request(final QueryContext qc) throws QueryException {
-    return requestContext(qc).request;
+    final HttpServletRequest request = requestContext(qc).request;
+    if(request == null) throw BASEX_HTTP.get(info);
+    return request;
   }
 
   /**

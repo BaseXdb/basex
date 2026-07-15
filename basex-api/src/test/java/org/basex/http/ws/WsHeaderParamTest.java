@@ -104,6 +104,83 @@ public final class WsHeaderParamTest extends WsTest {
   }
 
   /**
+   * {@code request:parameter} is available in a connect handler: the query parameters of the
+   * upgrade request are exposed via the request context, captured before the request is recycled.
+   * @throws Exception exception
+   */
+  @Test public void requestParameter() throws Exception {
+    register(
+        "declare %ws:connect('/h')" +
+        "        function m:c() { ws:emit(request:parameter('version')) };" +
+        "declare %ws:message('/h', '{$m}') function m:msg($m) { () };");
+
+    final Listener l = new Listener();
+    final java.net.http.WebSocket ws = connect("/h?version=12", l);
+    try {
+      assertEquals("12", l.pollText());
+    } finally {
+      close(ws);
+    }
+  }
+
+  /**
+   * {@code request:query} returns the raw query string of the upgrade request.
+   * @throws Exception exception
+   */
+  @Test public void requestQuery() throws Exception {
+    register(
+        "declare %ws:connect('/h')" +
+        "        function m:c() { ws:emit(request:query()) };" +
+        "declare %ws:message('/h', '{$m}') function m:msg($m) { () };");
+
+    final Listener l = new Listener();
+    final java.net.http.WebSocket ws = connect("/h?a=1&b=2", l);
+    try {
+      assertEquals("a=1&b=2", l.pollText());
+    } finally {
+      close(ws);
+    }
+  }
+
+  /**
+   * {@code request:uri} returns the URL of the upgrade request.
+   * @throws Exception exception
+   */
+  @Test public void requestUri() throws Exception {
+    register(
+        "declare %ws:connect('/h')" +
+        "        function m:c() { ws:emit(ends-with(request:uri(), '/ws/h')) };" +
+        "declare %ws:message('/h', '{$m}') function m:msg($m) { () };");
+
+    final Listener l = new Listener();
+    final java.net.http.WebSocket ws = connect("/h", l);
+    try {
+      assertEquals("true", l.pollText());
+    } finally {
+      close(ws);
+    }
+  }
+
+  /**
+   * {@code request:path} returns the path of the upgrade request.
+   * @throws Exception exception
+   */
+  @Test public void requestPath() throws Exception {
+    register(
+        "declare %ws:connect('/h')" +
+        "        function m:c() { ws:emit(request:path()) };" +
+        "declare %ws:message('/h', '{$m}') function m:msg($m) { () };");
+
+    final Listener l = new Listener();
+    final java.net.http.WebSocket ws = connect("/h", l);
+    try {
+      assertEquals("/ws/h", l.pollText());
+    } finally {
+      close(ws);
+    }
+  }
+
+  /**
    * The {@code http-version} and {@code protocol-version} pseudo-headers are captured
    * from the upgrade request.
    * @throws Exception exception
