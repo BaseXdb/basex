@@ -6,6 +6,7 @@
 module namespace dba = 'dba/common';
 
 import module namespace html = 'dba/html' at 'lib/html.xqm';
+import module namespace utils = 'dba/utils' at 'lib/utils.xqm';
 
 (:~
  : Redirects to the start page.
@@ -30,14 +31,16 @@ declare
 function dba:file(
   $file  as xs:string
 ) as item()+ {
-  let $path := file:base-dir() || 'static/' || $file
-  return (
+  let $path := utils:safe-path(file:base-dir() || 'static/', $file)
+  return if (file:is-file($path)) {
     web:response-header(
       { 'media-type': web:content-type($path) },
       { 'Cache-Control': 'max-age=3600,public', 'Content-Length': file:size($path) }
     ),
     file:read-binary($path)
-  )
+  } else {
+    web:error(404, 'Resource not found.')
+  }
 };
 
 (:~
@@ -50,7 +53,8 @@ declare
   %output:method('html')
 function dba:unknown(
   $path  as xs:string
-) as element(html) {
+) as element()+ {
+  web:response-header((), (), { 'status': 404 }),
   <tr>
     <td>
       <h2>Page not found:</h2>

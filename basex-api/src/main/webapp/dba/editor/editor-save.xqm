@@ -23,7 +23,7 @@ function dba:editor-save(
   $name     as xs:string,
   $content  as xs:string?
 ) as xs:string {
-  let $path := config:editor-dir() || $name
+  let $path := utils:safe-path(config:editor-dir(), $name)
   let $string := string($content)
   return (
     (: validate file :)

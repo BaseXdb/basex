@@ -35,9 +35,7 @@ function dba:databases(
 ) as element(html) {
   let $db-names := db:list()
   let $databases :=
-    let $start := utils:start($page, $sort)
-    let $end := utils:end($page, $sort)
-    for $db in db:list-details()[position() = $start to $end]
+    for $db in utils:slice(db:list-details(), $page, $sort)
     return {
       'name': $db,
       'resources': $db/@resources,

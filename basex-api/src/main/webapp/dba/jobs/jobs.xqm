@@ -51,10 +51,8 @@ function dba:jobs(
             let $curr := job:current()
             for $details in job:list-details()
             let $id := $details/@id
-            let $sec := (
-              let $dur := xs:dayTimeDuration($details/@duration)
-              return if (exists($dur)) then $dur div xs:dayTimeDuration('PT1S') else 0
-            )
+            let $sec := (xs:dayTimeDuration($details/@duration) div xs:dayTimeDuration('PT1S'))
+              otherwise 0
             let $time := data($details/@time)
             let $start := data($details/@start)
             order by $sec descending, $start descending

@@ -173,12 +173,19 @@ input.smallinput {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
+  /* fixed height so the status glyph (fallback font) can't shift the layout */
+  line-height: 1.4;
 }
 
 .warning {
   color: #999;
   font-weight: bold;
 }
+
+/* status glyphs, so state is not conveyed by color alone */
+.info::before    { content: "\2713\00a0"; }
+.warning::before { content: "\21bb\00a0"; }
+.error::before   { content: "\2717\00a0"; }
 
 .note {
   color: #666;

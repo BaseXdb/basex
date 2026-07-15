@@ -27,11 +27,9 @@ function dba:check(
   } else if (session:get($config:SESSION-KEY)) {
     (: everything fine, user is logged in :)
   } else {
-    (: normalize login path :)
-    let $target := if (ends-with($path, '/dba')) then 'dba/login' else 'login'
     (: last visited page to redirect to (if there was one) :)
     let $page := replace($path, '^.*dba/?', '')[.]
-    return web:redirect($target, html:parameters({ 'page': $page }))
+    return web:redirect('/dba/login', html:parameters({ 'page': $page }))
   }
 };
 

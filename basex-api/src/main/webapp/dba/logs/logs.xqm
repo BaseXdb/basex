@@ -49,7 +49,7 @@ function dba:logs(
       <td width='190'>
         <h2>{
           'Logs', '&#xa0;',
-          <input type='text' id='log-filter' name='log-filter' max-length='10'
+          <input type='text' id='log-filter' name='log-filter' maxlength='10'
                  onkeyup='logFilter();' class='smallinput'/>
         }</h2>
 
@@ -127,8 +127,9 @@ function dba:log(
   $page   as xs:string,
   $time   as xs:string?
 ) as element()+ {
-  (: check if input is a valid regular expression :)
-  $input[.] ! void(analyze-string('', .)),
+  (: reject an invalid search expression :)
+  let $error := $input[.] ! (try { void(analyze-string('', .)) } catch * { $err:description })
+  return if ($error) then web:error(400, $error) else
 
   let $headers := (
     { 'key': 'time', 'label': 'Time', 'type': 'dynamic', 'order': 'desc' },

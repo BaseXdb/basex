@@ -62,9 +62,7 @@ function dba:database(
                 { 'key': 'size', 'label': 'Size', 'type': 'number', 'order': 'desc' }
               )
               let $entries :=
-                let $start := utils:start($page, $sort)
-                let $end := utils:end($page, $sort)
-                for $res in db:list-details($name)[position() = $start to $end]
+                for $res in utils:slice(db:list-details($name), $page, $sort)
                 return {
                   'resource': $res,
                   'type': $res/@type,

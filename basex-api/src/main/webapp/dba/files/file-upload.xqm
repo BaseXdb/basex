@@ -35,7 +35,7 @@ function dba:file-upload(
       }
     }),
     map:for-each($files, fn($name, $content) {
-      file:write-binary($dir || $name, $content)
+      file:write-binary(utils:safe-path($dir, $name), $content)
     }),
     web:redirect($dba:CAT, { 'info': utils:info(map:keys($files), 'file', 'uploaded') })
   } catch * {

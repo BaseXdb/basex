@@ -63,6 +63,27 @@ function getForm(source) {
 }
 
 /**
+ * Asks for confirmation, naming the action and the selected entries.
+ * @param {button} button clicked button
+ * @param {string} action action label
+ * @returns {boolean} true if the action was confirmed
+ */
+function confirmAction(button, action) {
+  var values = [];
+  for(var input of getForm(button).getElementsByTagName("input")) {
+    if(input.type === "checkbox" && input.name && input.checked &&
+       input.parentElement.parentElement.style.display !== "none") {
+      values.push(input.value);
+    }
+  }
+  var message = values.length
+    ? action + " " + values.length + (values.length === 1 ? " entry: " : " entries: ") +
+      values.slice(0, 8).join(", ") + (values.length > 8 ? ", …" : "") + "?"
+    : "Are you sure?";
+  return confirm(message);
+}
+
+/**
  * Displays text with the specified type.
  * @param {string} message message to display
  * @param {type} type message type (info, warning, error)
@@ -201,10 +222,9 @@ function showError(response, info) {
   if(info) msg = info + ": " + msg;
   if(lc) msg = lc + " " + msg;
 
-  // display correctly escaped feedback
-  var html = document.createElement("div");
-  html.innerHTML = msg;
-  setText(html.innerText || html.textContent, "error");
+  // decode HTML entities via an inert parse (no scripts run, no resources load)
+  var decoded = new DOMParser().parseFromString(msg, "text/html").documentElement.textContent;
+  setText(decoded, "error");
 }
 
 /**

@@ -54,7 +54,7 @@ function dba:user(
           }</h2>
           <input type='hidden' name='name' value='{ $name }'/>
           <table>{
-            let $admin := $name eq 'admin' return (
+            (
               if ($admin) then <input type='hidden' name='newname' value='admin'/> else (
                 <tr>
                   <td>Name:</td>
@@ -119,10 +119,10 @@ function dba:user(
                   'pattern': @pattern,
                   'permission': @permission
                 }
-                let $buttons := if (not($admin)) {
+                let $buttons := (
                   html:button('pattern-add', 'Add…'),
                   html:button('pattern-drop', 'Drop', ('CHECK', 'CONFIRM'))
-                }
+                )
                 return html:table($headers, $entries, $buttons)
               }
             </form>

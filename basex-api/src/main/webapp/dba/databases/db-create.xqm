@@ -88,11 +88,10 @@ function dba:db-create(
       error((), 'Database already exists.')
     } else {
       db:create($name, (), (), map:merge((
-        for $option in ('textindex', 'attrindex', 'tokenindex', 'ftindex',
-          'stemming', 'casesens', 'diacritics', 'updindex')
-        return map:entry($option, $opts = $option),
-        $lang ! map:entry('language', .)))
-      ),
+        ('textindex', 'attrindex', 'tokenindex', 'ftindex',
+          'stemming', 'casesens', 'diacritics', 'updindex') ! map:entry(., $opts = .),
+        $lang ! map:entry('language', .)
+      ))),
       utils:redirect($dba:SUB, { 'name': $name, 'info': `Database "{ $name }" was created.` })
     }
   })

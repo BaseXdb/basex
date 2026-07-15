@@ -6,6 +6,7 @@
 module namespace dba = 'dba/editor';
 
 import module namespace config = 'dba/config' at '../lib/config.xqm';
+import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 
 (:~
  : Returns the content of a file.
@@ -19,7 +20,7 @@ declare
 function dba:editor-open(
   $name  as xs:string
 ) as xs:string {
-  let $path := config:editor-dir() || $name
+  let $path := utils:safe-path(config:editor-dir(), $name)
   return (
     file:read-text($path),
     config:set-edited-file($path)

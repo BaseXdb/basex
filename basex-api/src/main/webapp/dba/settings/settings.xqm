@@ -25,6 +25,8 @@ function dba:settings(
   $info  as xs:string?
 ) as element(html) {
   let $system := html:properties(db:system())
+  (: boundary between global and local options (keyed by name, not position) :)
+  let $local := $system/tr[th/h3 = 'LOCALOPTIONS']
   let $table-row := fn($label, $items) {
     <tr><td>{ $label, <br/>, $items }</td></tr>
   }
@@ -71,7 +73,7 @@ function dba:settings(
         <form method='post' autocomplete='off'>
           <h2>Global Options » { html:button('settings-gc', 'GC') }</h2>
           <table>{
-            $system/tr[th][3]/preceding-sibling::tr[not(th)]
+            $local/preceding-sibling::tr[not(th)]
           }</table>
         </form>
       </td>
@@ -79,7 +81,7 @@ function dba:settings(
       <td width='33%'>
         <h2>Local Options</h2>
         <table>{
-          $system/tr[th][3]/following-sibling::tr
+          $local/following-sibling::tr
         }</table>
       </td>
     </tr>

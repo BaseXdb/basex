@@ -91,36 +91,23 @@ declare %private function utils:query-options() as map(*) {
 };
 
 (:~
- : Returns the index of the first result to generate.
- : @param  $page  current page
- : @param  $sort  sort key
- : @return last result
+ : Returns the entries to be shown on the current page. While a table is being sorted, all entries
+ : are returned, as sorting and paging are then performed in html:table.
+ : @param  $entries  all entries
+ : @param  $page     current page
+ : @param  $sort     sort key
+ : @return entries to display
  :)
-declare function utils:start(
-  $page  as xs:integer,
-  $sort  as xs:string
-) as xs:integer {
+declare function utils:slice(
+  $entries  as item()*,
+  $page     as xs:integer,
+  $sort     as xs:string
+) as item()* {
   if ($page and not($sort)) {
-    ($page - 1) * config:get($config:MAXROWS) + 1
+    let $max := config:get($config:MAXROWS)
+    return subsequence($entries, ($page - 1) * $max + 1, $max)
   } else {
-    1
-  }
-};
-
-(:~
- : Returns the index of the last result to generate.
- : @param  $page  current page
- : @param  $sort  sort key
- : @return last result
- :)
-declare function utils:end(
-  $page  as xs:integer,
-  $sort  as xs:string
-) as xs:integer {
-  if ($page and not($sort)) {
-    $page * config:get($config:MAXROWS)
-  } else {
-    999999999
+    $entries
   }
 };
 
@@ -138,6 +125,26 @@ declare function utils:chop(
     substring($string, 1, $max) || '...'
   } else {
     $string
+  }
+};
+
+(:~
+ : Resolves a relative path against a base directory. Guards file access against path traversal,
+ : independent of the servlet container; raises a bad-request error if the path escapes the base.
+ : @param  $dir   base directory
+ : @param  $name  relative path
+ : @return resolved native path, located within the base directory
+ :)
+declare function utils:safe-path(
+  $dir   as xs:string,
+  $name  as xs:string
+) as xs:string {
+  let $base := file:resolve-path($dir)
+  let $path := file:resolve-path($name, $base)
+  return if (starts-with($path, $base)) {
+    $path
+  } else {
+    web:error(400, 'Invalid path: ' || $name)
   }
 };
 

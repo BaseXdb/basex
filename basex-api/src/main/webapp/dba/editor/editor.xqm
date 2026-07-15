@@ -48,7 +48,7 @@ function dba:editor(
           <datalist id='files'>{ config:editor-files() ! element option { . } }</datalist>,
           insert-separator((
             <input type='text' id='file' name='file' placeholder='Name of file'
-                   list='files' oninput='checkButtons()' onpropertychange='checkButtons()'/>,
+                   list='files' oninput='checkButtons()'/>,
             <button type='submit' name='open' id='open' disabled=''
                     onclick='openFile()'>Open</button>,
             <button name='save' id='save' disabled='' onclick='saveFile()'>Save</button>,

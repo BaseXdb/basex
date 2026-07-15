@@ -6,6 +6,7 @@
 module namespace dba = 'dba/files';
 
 import module namespace config = 'dba/config' at '../lib/config.xqm';
+import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := '../files';
@@ -21,7 +22,7 @@ declare
 function dba:file-download(
   $name  as xs:string
 ) as item()+ {
-  let $path := config:files-dir() || $name
+  let $path := utils:safe-path(config:files-dir(), $name)
   return try {
     web:response-header(
       { 'media-type': 'application/octet-stream' },

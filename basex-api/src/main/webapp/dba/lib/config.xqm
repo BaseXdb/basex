@@ -14,7 +14,7 @@ declare %private variable $config:EDITED-FILE := 'dba-edited-file';
 
 (:~ DBA directory. :)
 declare variable $config:DBA-DIR := (
-  for $dir in db:option('dbpath') || '/.dba'
+  let $dir := db:option('dbpath') || '/.dba'
   return (
     if (not(file:exists($dir))) { file:create-dir($dir) },
     file:path-to-native($dir)

@@ -142,8 +142,7 @@ declare function html:checkbox(
   $label    as xs:string
 ) as node()+ {
   html:checkbox($label, map:merge((
-    { 'name':  $name },
-    { 'value': $value },
+    { 'name': $name, 'value': $value },
     { 'checked': $checked }[$checked]
   )))
 };
@@ -180,7 +179,7 @@ declare function html:button(
 ) as element(button) {
   <button>{
     attribute formaction { $action }[$action],
-    attribute onclick { 'return confirm("Are you sure?");' }[$options = 'CONFIRM'],
+    attribute onclick { 'return confirmAction(this, "' || $label || '");' }[$options = 'CONFIRM'],
     attribute data-check { 'check' }[$options = 'CHECK'],
     $label
   }</button>
@@ -266,7 +265,7 @@ declare function html:table(
   (: sort entries :)
   let $sort := $options?sort
   let $sorted-entries := (
-    let $key := head(($sort[.], head($headers)?key))
+    let $key := $sort[.] otherwise head($headers)?key
     return if (not($sort) or $key = $options?presort) {
       $entries
     } else {
@@ -449,7 +448,7 @@ declare function html:time(
   $date  as xs:dateTime
 ) as element(span) {
   let $adjusted := html:adjust($date)
-  let $formatted := format-dateTime(html:adjust($date), '[H00]:[m00]:[s00]')
+  let $formatted := format-dateTime($adjusted, '[H00]:[m00]:[s00]')
   return <span title='{ $adjusted }'>{ $formatted }</span>
 };
 
@@ -462,7 +461,7 @@ declare function html:adjust(
   $date  as xs:dateTime
 ) as xs:dateTime {
   let $zone := timezone-from-dateTime(current-dateTime())
-  return fn:adjust-dateTime-to-timezone(xs:dateTime($date), $zone)
+  return adjust-dateTime-to-timezone(xs:dateTime($date), $zone)
 };
 
 (:~
@@ -528,8 +527,8 @@ declare function html:parameters(
 declare %updating function html:update(
   $do       as xs:string?,
   $options  as map(*),
-  $output   as function() as element(tr)*,
-  $update   as %updating function(*)
+  $output   as fn() as element(tr)*,
+  $update   as %updating fn(*)
 ) {
   if ($do) {
     try {
