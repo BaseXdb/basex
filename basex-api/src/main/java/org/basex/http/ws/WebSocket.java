@@ -1,9 +1,8 @@
 package org.basex.http.ws;
 
-import java.io.*;
+import java.nio.*;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.function.*;
 
 import org.basex.core.*;
 import org.basex.http.*;
@@ -17,18 +16,19 @@ import org.basex.util.*;
 import org.basex.util.http.*;
 import org.basex.util.list.*;
 import org.basex.util.log.*;
-import org.eclipse.jetty.ee9.websocket.api.*;
-import org.eclipse.jetty.ee9.websocket.api.exceptions.*;
+import org.eclipse.jetty.websocket.api.*;
+import org.eclipse.jetty.websocket.api.exceptions.*;
 
 import jakarta.servlet.http.*;
 
 /**
- * This class defines an abstract WebSocket. It inherits the Jetty WebSocket adapter.
+ * This class defines a WebSocket. It implements the Jetty WebSocket session listener.
  *
  * @author BaseX Team, BSD License
  * @author Johannes Finckh
  */
-public final class WebSocket extends WebSocketAdapter implements ClientInfo {
+public final class WebSocket extends Session.Listener.AbstractAutoDemanding
+    implements ClientInfo, WsSession {
   /** WebSocket attributes. */
   public final ConcurrentHashMap<String, Value> atts = new ConcurrentHashMap<>();
   /** Database context. */
@@ -38,8 +38,10 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
 
   /** Header parameters. */
   final Map<String, Value> headers = new HashMap<>();
-  /** Servlet request. */
-  final HttpServletRequest request;
+  /** Request URL (captured during the handshake, as the request is recycled afterwards). */
+  private final String requestURL;
+  /** Remote client address (captured during the handshake). */
+  private final String remoteAddress;
 
   /** Client WebSocket ID. */
   public String id;
@@ -51,13 +53,38 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
    * @param request request
    */
   private WebSocket(final HttpServletRequest request) {
-    this.request = request;
-
     final String pi = request.getPathInfo();
     path = new WsPath(pi != null ? pi : "/");
     session = request.getSession();
+    requestURL = String.valueOf(request.getRequestURL());
+    remoteAddress = HTTPConnection.remoteAddress(request);
+
+    // capture upgrade headers during the handshake, as the request is recycled afterwards
+    addHeader("http-version", request.getProtocol());
+    addHeader("origin", request.getHeader("Origin"));
+    addHeader("protocol-version", request.getHeader("Sec-WebSocket-Version"));
+    addHeader("query-string", request.getQueryString());
+    addHeader("is-secure", String.valueOf(request.isSecure()));
+    addHeader("request-uri", requestURL);
+    addHeader("host", request.getHeader("Host"));
+    final TokenList protocols = new TokenList();
+    for(final String header : Collections.list(request.getHeaders("Sec-WebSocket-Protocol"))) {
+      for(final String protocol : header.split("\\s*,\\s*")) {
+        if(!protocol.isEmpty()) protocols.add(protocol);
+      }
+    }
+    headers.put("sub-protocols", StrSeq.get(protocols));
 
     context = new Context(HTTPContext.get().context(), this);
+  }
+
+  /**
+   * Adds an upgrade header to the header parameters.
+   * @param key header key
+   * @param value header value (ignored if {@code null})
+   */
+  private void addHeader(final String key, final String value) {
+    if(value != null) headers.put(key, Atm.get(value));
   }
 
   /**
@@ -77,47 +104,27 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
   }
 
   @Override
-  public void onWebSocketConnect(final Session sess) {
-    super.onWebSocketConnect(sess);
+  public void onWebSocketOpen(final Session sess) {
+    super.onWebSocketOpen(sess);
     id = WsPool.add(this);
-
-    run("[WS-OPEN] " + request.getRequestURL(), null, () -> {
-      // add headers (for binding them to the XQuery parameters in the corresponding bind method)
-      final UpgradeRequest ur = sess.getUpgradeRequest();
-      final BiConsumer<String, String> addHeader = (k, v) -> {
-        if(v != null) headers.put(k, Atm.get(v));
-      };
-
-      addHeader.accept("http-version", ur.getHttpVersion());
-      addHeader.accept("origin", ur.getOrigin());
-      addHeader.accept("protocol-version", ur.getProtocolVersion());
-      addHeader.accept("query-string", ur.getQueryString());
-      addHeader.accept("is-secure", String.valueOf(ur.isSecure()));
-      addHeader.accept("request-uri", ur.getRequestURI().toString());
-      addHeader.accept("host", ur.getHost());
-      final TokenList protocols = new TokenList();
-      for(final String protocol : ur.getSubProtocols()) protocols.add(protocol);
-      headers.put("sub-protocols", StrSeq.get(protocols));
-
-      findAndProcess(Annotation._WS_CONNECT, null);
-    });
+    run("[WS-OPEN] " + requestURL, null, () -> findAndProcess(Annotation._WS_CONNECT, null));
   }
 
   @Override
   public void onWebSocketError(final Throwable th) {
     final String m1 = th.getMessage(), m2 = Util.message(th), msg = m1 != null ? m1 : m2;
-    run("[WS-ERROR] " + request.getRequestURL() + ": " + msg, null,
+    run("[WS-ERROR] " + requestURL + ": " + msg, null,
         () -> findAndProcess(Annotation._WS_ERROR, msg));
   }
 
   @Override
-  public void onWebSocketClose(final int status, final String message) {
+  public void onWebSocketClose(final int status, final String message, final Callback callback) {
     try {
-      run("[WS-CLOSE] " + request.getRequestURL(), status,
+      run("[WS-CLOSE] " + requestURL, status,
           () -> findAndProcess(Annotation._WS_CLOSE, null));
     } finally {
       WsPool.remove(id);
-      super.onWebSocketClose(status, message);
+      callback.succeed();
     }
   }
 
@@ -127,13 +134,20 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
   }
 
   @Override
-  public void onWebSocketBinary(final byte[] payload, final int offset, final int len) {
-    findAndProcess(Annotation._WS_MESSAGE, payload);
+  public void onWebSocketBinary(final ByteBuffer buffer, final Callback callback) {
+    try {
+      final byte[] payload = new byte[buffer.remaining()];
+      buffer.get(payload);
+      findAndProcess(Annotation._WS_MESSAGE, payload);
+      callback.succeed();
+    } catch(final RuntimeException ex) {
+      callback.fail(ex);
+    }
   }
 
   @Override
   public String clientAddress() {
-    return HTTPConnection.remoteAddress(request);
+    return remoteAddress;
   }
 
   @Override
@@ -143,12 +157,31 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
       HTTPConnection.getAttribute(session, HTTPText.CLIENT_ID), context);
   }
 
+  @Override
+  public HttpSession session() {
+    return session;
+  }
+
   /**
    * Closes the WebSocket connection.
    */
   public void close() {
     WsPool.remove(id);
-    getSession().close();
+    if(isOpen()) getSession().close();
+  }
+
+  /**
+   * Sends a value to the connected client.
+   * @param value byte buffer or string to be sent
+   */
+  public void send(final Object value) {
+    final Session sess = getSession();
+    if(sess == null || !sess.isOpen()) return;
+    if(value instanceof final ByteBuffer bb) {
+      sess.sendBinary(bb, Callback.NOOP);
+    } else {
+      sess.sendText((String) value, Callback.NOOP);
+    }
   }
 
   /**
@@ -180,11 +213,7 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
    */
   public void error(final Exception ex) {
     Util.debug(ex);
-    try {
-      getRemote().sendString(ex.getMessage());
-    } catch(final IOException e) {
-      Util.debug(e);
-    }
+    send(ex.getMessage());
   }
 
   /**

@@ -16,8 +16,8 @@ import org.basex.util.*;
 import org.basex.util.log.*;
 import org.eclipse.jetty.compression.gzip.*;
 import org.eclipse.jetty.compression.server.*;
-import org.eclipse.jetty.ee9.webapp.*;
-import org.eclipse.jetty.ee9.websocket.server.config.*;
+import org.eclipse.jetty.ee10.webapp.*;
+import org.eclipse.jetty.ee10.websocket.server.config.*;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.util.resource.*;
 import org.eclipse.jetty.xml.*;
@@ -89,7 +89,7 @@ public final class BaseXHTTP extends CLI {
     jetty = (Server) new XmlConfiguration(resource).configure();
 
     // try to use GZIP compression (changed with Jetty 12.1)
-    Supplier<Handler> supplier = wac;
+    Supplier<Handler> supplier = () -> wac;
     if(soptions.get(StaticOptions.GZIP)) {
       final String clzz = "org.eclipse.jetty.compression.server.CompressionHandler";
       if(Reflect.available(clzz)) {

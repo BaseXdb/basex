@@ -1,6 +1,5 @@
 package org.basex.http.ws;
 
-import java.nio.*;
 import java.util.*;
 import java.util.Map.*;
 import java.util.concurrent.*;
@@ -10,7 +9,6 @@ import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.list.*;
-import org.eclipse.jetty.ee9.websocket.api.*;
 
 /**
  * This class defines a pool for WebSockets. It manages all connected WebSockets.
@@ -124,15 +122,7 @@ public final class WsPool {
 
     // send result to all clients
     for(final WebSocket ws : websockets) {
-      if(!ws.isConnected()) continue;
-      final RemoteEndpoint remote = ws.getSession().getRemote();
-      for(final Object value : values) {
-        if(value instanceof final ByteBuffer bb) {
-          remote.sendBytes(bb, WriteCallback.NOOP);
-        } else {
-          remote.sendString((String) value, WriteCallback.NOOP);
-        }
-      }
+      for(final Object value : values) ws.send(value);
     }
   }
 

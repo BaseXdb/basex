@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import jakarta.servlet.http.*;
 
+import org.basex.http.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.util.*;
@@ -23,13 +24,11 @@ abstract class SessionFn extends ApiFunc {
    * @throws QueryException query exception
    */
   final ASession session(final QueryContext qc, final boolean create) throws QueryException {
-    // check if HTTP connection is available
-    final HttpServletRequest request = request(qc);
-
     // WebSocket context: access existing session
     HttpSession session = wsSession(qc);
-    // HTTP context: get/create session
+    // HTTP context: get/create session (requires an HTTP connection)
     if(session == null) {
+      final HttpServletRequest request = request(qc);
       try {
         session = request.getSession(create);
       } catch(final NullPointerException ex) {
@@ -51,12 +50,7 @@ abstract class SessionFn extends ApiFunc {
    * @return session instance or {@code null}
    */
   private static HttpSession wsSession(final QueryContext qc) {
-    // accessed via reflection, as WebSockets are only supported for Jetty
-    final Class<?> wsClass = Reflect.find("org.basex.http.ws.WebSocket");
-    if(wsClass != null) {
-      final Object ws = qc.context.getExternal(wsClass);
-      if(ws != null) return (HttpSession) Reflect.get(Reflect.field(wsClass, "session"), ws);
-    }
-    return null;
+    return qc.context.getExternal(WsSession.class) instanceof final WsSession ws ? ws.session() :
+      null;
   }
 }

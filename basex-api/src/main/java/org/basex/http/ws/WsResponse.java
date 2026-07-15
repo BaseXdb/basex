@@ -6,7 +6,6 @@ import java.io.*;
 import java.nio.*;
 import java.util.*;
 
-import org.basex.http.*;
 import org.basex.http.web.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
@@ -15,7 +14,6 @@ import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
-import org.eclipse.jetty.ee9.websocket.api.*;
 /**
  * Creates WebSocket responses.
  *
@@ -45,7 +43,6 @@ public final class WsResponse extends WebResponse {
     qc = function.module.qc(ctx);
     qc.jc().type(WEBSOCKET);
     ctx.setExternal(ws);
-    ctx.setExternal(new RequestContext(ws.request));
 
     func = new WsFunction(function.function, function.module, qc);
     func.parseAnnotations(null);
@@ -59,14 +56,7 @@ public final class WsResponse extends WebResponse {
     // don't send anything if the WebSocket connection has been closed
     if(!func.matches(Annotation._WS_CLOSE, null) &&
        !func.matches(Annotation._WS_ERROR, null)) {
-      for(final Object value : values) {
-        final RemoteEndpoint remote = ws.getSession().getRemote();
-        if(value instanceof final ByteBuffer bb) {
-          remote.sendBytes(bb);
-        } else {
-          remote.sendString((String) value);
-        }
-      }
+      for(final Object value : values) ws.send(value);
     }
     return Response.STANDARD;
   }

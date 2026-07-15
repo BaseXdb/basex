@@ -81,4 +81,50 @@ public final class WsHeaderParamTest extends WsTest {
       close(ws);
     }
   }
+
+  /**
+   * The {@code query-string} pseudo-header carries the query part of the upgrade URI.
+   * It is captured during the handshake, before the request is recycled.
+   * @throws Exception exception
+   */
+  @Test public void queryString() throws Exception {
+    register(
+        "declare %ws:connect('/h')" +
+        "        %ws:header-param('query-string', '{$q}')" +
+        "        function m:c($q) { ws:emit($q) };" +
+        "declare %ws:message('/h', '{$m}') function m:msg($m) { () };");
+
+    final Listener l = new Listener();
+    final java.net.http.WebSocket ws = connect("/h?a=1&b=2", l);
+    try {
+      assertEquals("a=1&b=2", l.pollText());
+    } finally {
+      close(ws);
+    }
+  }
+
+  /**
+   * The {@code http-version} and {@code protocol-version} pseudo-headers are captured
+   * from the upgrade request.
+   * @throws Exception exception
+   */
+  @Test public void upgradeVersions() throws Exception {
+    register(
+        "declare %ws:connect('/h')" +
+        "        %ws:header-param('http-version', '{$v}')" +
+        "        %ws:header-param('protocol-version', '{$p}')" +
+        "        function m:c($v, $p) { ws:emit($v || '|' || $p) };" +
+        "declare %ws:message('/h', '{$m}') function m:msg($m) { () };");
+
+    final Listener l = new Listener();
+    final java.net.http.WebSocket ws = connect("/h", l);
+    try {
+      final String[] parts = l.pollText().split("\\|", -1);
+      assertEquals(2, parts.length);
+      assertTrue(parts[0].startsWith("HTTP/"), "http-version should start with HTTP/: " + parts[0]);
+      assertEquals("13", parts[1]);
+    } finally {
+      close(ws);
+    }
+  }
 }
