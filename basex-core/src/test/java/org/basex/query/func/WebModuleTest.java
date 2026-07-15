@@ -64,6 +64,17 @@ public final class WebModuleTest extends SandboxTest {
     error(func.args(-1, "x"), WEB_STATUS_X);
     error(func.args(0, "x"), WEB_STATUS_X);
     error(func.args(1000, "x"), WEB_STATUS_X);
+
+    // error value carries the message (string body)
+    query("try { " + func.args(400, "bad") + " } catch * { $err:value }", "bad");
+    query("try { " + func.args(400, "bad") + " } catch * { $err:description }", "bad");
+    // error value carries a structured body; description is shortened to a generic phrase
+    query("try { " + func.args(400, " { 'code': 42 }", " { 'method': 'json' }") +
+        " } catch * { $err:value?code }", 42);
+    query("try { " + func.args(400, " { 'code': 42 }", " { 'method': 'json' }") +
+        " } catch * { $err:description }", "HTTP 400");
+    // unknown serialization parameter
+    error(func.args(400, "x", " { 'unknown': 'x' }"), INVALIDOPTION_X);
   }
 
   /** Test method. */

@@ -6,6 +6,7 @@ import static org.basex.query.QueryText.*;
 
 import java.util.*;
 
+import org.basex.io.serial.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -59,6 +60,8 @@ public class QueryException extends Exception {
   private final QNm name;
   /** Error value. */
   private Value value = Empty.VALUE;
+  /** Serialization parameters for the error output ({@code null} if not specified). */
+  private SerializerOptions output;
   /** Error reference ({@code null} for dynamic error messages). */
   private QueryError error;
   /** Error line and column. */
@@ -243,6 +246,24 @@ public class QueryException extends Exception {
    */
   public final Value value() {
     return value;
+  }
+
+  /**
+   * Attaches serialization parameters for rendering the error as output.
+   * @param so serialization parameters
+   * @return self reference
+   */
+  public final QueryException output(final SerializerOptions so) {
+    output = so;
+    return this;
+  }
+
+  /**
+   * Returns serialization parameters for rendering the error as output.
+   * @return serialization parameters (can be {@code null})
+   */
+  public final SerializerOptions output() {
+    return output;
   }
 
   /**

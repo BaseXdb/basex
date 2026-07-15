@@ -181,13 +181,26 @@ public final class HTTPConnection implements ClientInfo {
   /**
    * Handles an error with an info message.
    * @param code status code
-   * @param info info, will additionally be logged
+   * @param info info, will be logged and sent as response body
    * @throws IOException I/O exception
    */
   public void error(final int code, final String info) throws IOException {
+    error(code, info, info, null);
+  }
+
+  /**
+   * Handles an error, logging a message and sending a response body.
+   * @param code status code
+   * @param log message to be logged
+   * @param body response body (can be {@code null})
+   * @param type media type of the response body (can be {@code null})
+   * @throws IOException I/O exception
+   */
+  public void error(final int code, final String log, final String body, final MediaType type)
+      throws IOException {
     discardBody();
-    log(code, info);
-    status(code, info);
+    log(code, log);
+    status(code, body, type);
   }
 
   /**
@@ -305,6 +318,17 @@ public final class HTTPConnection implements ClientInfo {
    * @throws IOException I/O exception
    */
   public void status(final int code, final String body) throws IOException {
+    status(code, body, null);
+  }
+
+  /**
+   * Sets a status and sends an info message.
+   * @param code status code
+   * @param body message for response body (can be {@code null})
+   * @param type media type of the response body (can be {@code null})
+   * @throws IOException I/O exception
+   */
+  public void status(final int code, final String body, final MediaType type) throws IOException {
     try {
       response.resetBuffer();
       if(code == SC_UNAUTHORIZED && !response.containsHeader(WWW_AUTHENTICATE)) {
@@ -320,7 +344,9 @@ public final class HTTPConnection implements ClientInfo {
 
       response.setStatus(code < 0 || code > 999 ? 500 : code);
       if(body != null) {
-        response.setContentType(MediaType.TEXT_PLAIN + "; " + CHARSET + '=' + Strings.UTF8);
+        final MediaType mt = type != null ? type : MediaType.TEXT_PLAIN;
+        response.setContentType(mt.parameter(CHARSET) != null ? mt.toString() :
+          mt + "; " + CHARSET + '=' + Strings.UTF8);
         response.getOutputStream().write(new TokenBuilder(token(body)).normalize().finish());
       }
     } catch(final IllegalStateException | IllegalArgumentException ex) {

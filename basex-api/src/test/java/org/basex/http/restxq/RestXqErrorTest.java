@@ -1,5 +1,7 @@
 package org.basex.http.restxq;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.jupiter.api.*;
 
 /**
@@ -110,6 +112,20 @@ public final class RestXqErrorTest extends RestXqTest {
         "declare %R:error('*:x', '*:x') function m:b() { 'F' };", "");
     get(500, "declare %R:path('') function m:a() { () };" +
         "declare %R:error('x:*', 'x:*') function m:b() { 'F' };", "");
+  }
+
+  /**
+   * Response bodies raised via {@code web:error} (no error function).
+   * @throws Exception exception
+   */
+  @Test public void errorResponse() throws Exception {
+    // status is derived from the raised name; plain-text body (default)
+    register("declare %R:path('') function m:a() { web:error(400, 'bad') };");
+    assertEquals("bad", get(400, ""));
+    // structured body, serialized as JSON
+    register("declare %R:path('') function m:a() { " +
+        "web:error(400, { 'code': 42 }, { 'method': 'json' }) };");
+    assertEquals("{\"code\":42}", get(400, ""));
   }
 
   /**

@@ -11,8 +11,8 @@ import jakarta.servlet.http.*;
 import org.basex.core.*;
 import org.basex.core.StaticOptions.*;
 import org.basex.core.jobs.*;
+import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.server.*;
 import org.basex.util.*;
@@ -75,11 +75,24 @@ public abstract class BaseXServlet extends HttpServlet {
       boolean full = conn.context.soptions.get(StaticOptions.RESTXQERRORS);
       final QNm qname = ex.qname();
       if(Token.eq(qname.uri(), QueryText.REST_URI)) {
-        final Value value = ex.value();
-        if(value instanceof final ANum num) code = (int) num.itr();
+        // status code is encoded in the local name (e.g. 'status404')
+        code = Token.toInt(Token.substring(qname.local(), QueryText.STATUS.length));
         full = false;
       }
-      conn.error(code, full ? Util.message(ex) : ex.getLocalizedMessage());
+      final SerializerOptions sopts = ex.output();
+      if(sopts != null) {
+        // render the error value as the response body
+        String body;
+        try {
+          body = ex.value().serialize(sopts).toString();
+        } catch(final QueryIOException e) {
+          Util.debug(e);
+          body = ex.getLocalizedMessage();
+        }
+        conn.error(code, ex.getLocalizedMessage(), body, HTTPConnection.mediaType(sopts));
+      } else {
+        conn.error(code, full ? Util.message(ex) : ex.getLocalizedMessage());
+      }
     } catch(final IOException ex) {
       final boolean full = conn.context.soptions.get(StaticOptions.RESTXQERRORS);
       conn.error(SC_INTERNAL_SERVER_ERROR, full ? Util.message(ex) : ex.getLocalizedMessage());
