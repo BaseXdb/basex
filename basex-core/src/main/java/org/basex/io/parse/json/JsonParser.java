@@ -488,7 +488,7 @@ public final class JsonParser {
    */
   private int consume() throws IOException {
     final int cp = current;
-    buf[(int) (pos++ % buf.length)] = cp;
+    buf[(int) (pos++ & buf.length - 1)] = cp; // faster than modulo
     if(cp == '\n') {
       line++;
       col = 1;
