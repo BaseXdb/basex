@@ -252,6 +252,11 @@ public abstract class IO {
     if(io.isAbsolute()) return io;
     if(IOUrl.isJarURL(pth)) {
       try {
+        final int sep = pth.lastIndexOf("!/");
+        if(sep != -1) {
+          return get(pth.substring(0, sep + 2) +
+              new URI(pth.substring(sep + 2)).resolve(path).normalize());
+        }
         return get(JARPREF + new URI(pth.substring(JARPREF.length())).resolve(path));
       } catch(final URISyntaxException | IllegalArgumentException ex) {
         Util.stack(ex);
