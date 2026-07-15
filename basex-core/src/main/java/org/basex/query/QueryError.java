@@ -449,6 +449,8 @@ public enum QueryError {
   UNIT_NOARGS_X(UNIT, "no-args", "Test function '%' must have no arguments."),
   /** Error code. */
   UNIT_PRIVATE_X(UNIT, "private", "Test function '%' must not be private."),
+  /** Error code. */
+  UNIT_TIMEOUT_X(UNIT, "timeout", "Test timed out after % seconds."),
 
   // User Module
 

@@ -163,7 +163,9 @@ public enum Annotation {
   /** XQuery annotation. */
   _UNIT_IGNORE("ignore([message])", params(STRING), UNIT_URI),
   /** XQuery annotation. */
-  _UNIT_TEST("test(['expected',error])", params(STRING, STRING), UNIT_URI),
+  _UNIT_TEST("test(['expected',errors...])", params(STRING), UNIT_URI),
+  /** XQuery annotation. */
+  _UNIT_TIMEOUT("timeout(seconds)", params(DECIMAL), UNIT_URI),
 
   /** XQuery annotation. */
   _WS_CONNECT("connect(path)", params(STRING), WS_URI),

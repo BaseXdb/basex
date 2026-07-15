@@ -113,7 +113,7 @@ final class Unit {
       }
 
       // call initializing functions before first test
-      for(final StaticFunc sf : beforeModule) eval(sf);
+      for(final StaticFunc sf : beforeModule) eval(sf, 0);
 
       for(final StaticFunc sf : test) {
         // check arguments
@@ -122,13 +122,22 @@ final class Unit {
         final Value value = ann.value();
         final long vs = value.size();
 
-        // expected error code
-        QNm code = null;
-        if(vs == 2 && eq(Q_EXPECTED.string(), value.itemAt(0).string(null))) {
-          code = QNm.parse(value.itemAt(1).string(null), QueryText.ERROR_URI, null, sf.sc, sf.info);
+        // expected error codes
+        QNm[] codes = null;
+        if(vs >= 2 && eq(Q_EXPECTED.string(), value.itemAt(0).string(null))) {
+          codes = new QNm[(int) vs - 1];
+          for(int c = 1; c < vs; c++) {
+            codes[c - 1] = QNm.parse(value.itemAt(c).string(null), QueryText.ERROR_URI, null,
+                sf.sc, sf.info);
+          }
         } else if(vs != 0) {
           throw BASEX_ANN2_X_X.get(ann.info, ann, arity(arguments(vs), new IntList().add(0)));
         }
+
+        // optional timeout (annotated in seconds, converted to milliseconds)
+        final Ann to = anns.get(_UNIT_TIMEOUT);
+        final double seconds = to == null ? 0 : ((ANum) to.value().itemAt(0)).dbl();
+        final long timeout = seconds > 0 ? (long) (seconds * 1000) : 0;
 
         final FBuilder testcase = FElem.build(Q_TESTCASE).attr(Q_NAME, sf.name.local());
         tests++;
@@ -141,24 +150,25 @@ final class Unit {
             int l = before.size();
             for(int i = 0; i < l; i++) {
               final QNm name = beforeFilter.get(i);
-              if(name == null || name.eq(sf.name)) eval(before.get(i));
+              if(name == null || name.eq(sf.name)) eval(before.get(i), 0);
             }
             // call function
-            eval(sf);
+            eval(sf, timeout);
             // call functions marked with "after"
             l = after.size();
             for(int i = 0; i < l; i++) {
               final QNm name = afterFilter.get(i);
-              if(name == null || name.eq(sf.name)) eval(after.get(i));
+              if(name == null || name.eq(sf.name)) eval(after.get(i), 0);
             }
 
-            if(code != null) {
+            if(codes != null) {
               failures++;
-              testcase.node(FElem.build(Q_FAILURE).node(FElem.build(Q_EXPECTED).
-                  text(code.prefixId())));
+              final TokenBuilder tb = new TokenBuilder();
+              for(final QNm code : codes) tb.add(tb.isEmpty() ? "" : ", ").add(code.prefixId());
+              testcase.node(FElem.build(Q_FAILURE).node(FElem.build(Q_EXPECTED).text(tb.finish())));
             }
           } catch(final QueryException ex) {
-            addError(ex, testcase, code);
+            addError(ex, testcase, codes);
           }
         } else {
           // skip test
@@ -170,7 +180,7 @@ final class Unit {
       }
 
       // run finalizing tests
-      for(final StaticFunc sf : afterModule) eval(sf);
+      for(final StaticFunc sf : afterModule) eval(sf, 0);
     } catch(final QueryException ex) {
       if(current == null) {
         // handle errors caused by parsing or compilation
@@ -210,11 +220,11 @@ final class Unit {
    * Adds an error element to the specified test case.
    * @param ex exception
    * @param testcase testcase element
-   * @param code error code (can be {@code null})
+   * @param codes expected error codes (can be {@code null})
    */
-  private void addError(final QueryException ex, final FBuilder testcase, final QNm code) {
+  private void addError(final QueryException ex, final FBuilder testcase, final QNm[] codes) {
     final QNm name = ex.qname();
-    if(code == null || !code.eq(name)) {
+    if(!expected(codes, name)) {
       final FBuilder error;
       final boolean fail = UNIT_FAIL.eq(name);
       if(fail) {
@@ -250,6 +260,20 @@ final class Unit {
   }
 
   /**
+   * Checks if a raised error matches one of the expected error codes.
+   * @param codes expected error codes (can be {@code null})
+   * @param name raised error code
+   * @return result of check
+   */
+  private static boolean expected(final QNm[] codes, final QNm name) {
+    if(codes == null) return false;
+    for(final QNm code : codes) {
+      if(code.eq(name)) return true;
+    }
+    return false;
+  }
+
+  /**
    * Creates a new element.
    * @param item item
    * @param name name (expected/returned)
@@ -277,17 +301,34 @@ final class Unit {
   /**
    * Evaluates a function.
    * @param func function to evaluate
+   * @param timeout timeout in milliseconds (ignored if not positive)
    * @throws QueryException query exception
    */
-  private void eval(final StaticFunc func) throws QueryException {
+  private void eval(final StaticFunc func, final long timeout) throws QueryException {
     current = func;
 
+    Timer timer = null;
     try(QueryContext qc = job.pushJob(new QueryContext(ctx))) {
-      qc.parse(input, file.path());
-      qc.assign(func);
-      // ignore results
-      for(final Iter iter = qc.iter(); qc.next(iter) != null;);
+      if(timeout > 0) {
+        timer = new Timer(true);
+        timer.schedule(new TimerTask() {
+          @Override
+          public void run() { qc.timeout(); }
+        }, timeout);
+      }
+      try {
+        qc.parse(input, file.path());
+        qc.assign(func);
+        // ignore results
+        for(final Iter iter = qc.iter(); qc.next(iter) != null;);
+      } catch(final JobException ex) {
+        // convert timeout interruption into a regular query error
+        if(qc.state != JobState.TIMEOUT) throw ex;
+        Thread.interrupted();
+        throw UNIT_TIMEOUT_X.get(func.info, timeout / 1000.0);
+      }
     } finally {
+      if(timer != null) timer.cancel();
       job.popJob();
     }
   }
