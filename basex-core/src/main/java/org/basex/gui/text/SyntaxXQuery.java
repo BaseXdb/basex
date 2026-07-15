@@ -219,12 +219,13 @@ final class SyntaxXQuery extends SyntaxMarkup {
       close(0);
       return plain;
     }
-    if(ch == '$') return green;
+    // a variable name may be separated from its '$' by whitespace ('$ x'); comments are ignored
+    if(ch == '$' && XMLToken.isNCStartChar(cp(text, skipWs(text, pos + 1)))) return green;
     if(ch == '%' && XMLToken.isNCStartChar(cp(text, pos + 1))) return blue;
 
     if(name(text, pos)) {
       final int prev = nameStart > 0 ? text[nameStart - 1] : 0;
-      if(prev == '$') return green;
+      if(cp(text, skipWsBack(text, nameStart)) == '$') return green;
       // a name glued to a preceding digit is the tail of a numeric literal: '10_000', '1e5', '0xF'
       if(digit(prev)) return purple;
       return prev == '%' || nameKeyword ? blue : plain;

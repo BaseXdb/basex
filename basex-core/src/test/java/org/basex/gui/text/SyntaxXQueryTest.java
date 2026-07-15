@@ -33,6 +33,11 @@ public final class SyntaxXQueryTest {
     check("analyze-string('')", "KKKKKKKKKKKKKK.SS.");
     check("string:ngrams(1)", "KKKKKKKKKKKKK.N.");
     check("xs:integer", "KKKKKKKKKK");
+    // a dollar sign marks a variable if a name follows, possibly after whitespace ('$ x')
+    check("$x", "VV");
+    check("$ x", "V.V");
+    // a bare dollar sign is no variable marker
+    check("$+", "..");
     // user-defined names are no keywords
     check("local:get-value()", ".................");
     check("for $x in 1", "KKK.VV.KK.N");
