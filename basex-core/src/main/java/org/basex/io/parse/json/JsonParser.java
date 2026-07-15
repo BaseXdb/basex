@@ -135,10 +135,10 @@ public final class JsonParser {
     consumeWs('{', true);
     conv.openObject();
     if(!consumeWs('}', false)) {
-      final TokenSet set = new TokenSet();
+      final TokenSet set = duplicates == JsonDuplicates.RETAIN ? null : new TokenSet();
       do {
         final byte[] key = !liberal || current == '"' ? string() : unquoted();
-        final boolean dupl = set.contains(key);
+        final boolean dupl = set != null && set.contains(key);
         if(dupl && duplicates == JsonDuplicates.REJECT)
           throw error(DUPLICATE_JSON_X, "Key \"%\" occurs more than once", key);
         consumeWs(':', true);
@@ -149,7 +149,7 @@ public final class JsonParser {
           value();
           conv.closePair();
         }
-        set.put(key);
+        if(set != null) set.put(key);
       } while(consumeWs(',', false) && !(liberal && current == '}'));
       consumeWs('}', true);
     }
