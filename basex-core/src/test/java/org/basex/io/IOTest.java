@@ -106,4 +106,15 @@ public final class IOTest {
     assertEquals("https://user@xn--bcher-kva.example:8080/p",
         IOUrl.toAscii("https://user@bücher.example:8080/p"));
   }
+
+  /** JAR URL merges. */
+  @Test public void jarMerge() {
+    assertEquals("jar:file:/a/b.jar!/x/z.xq",
+        IO.get("jar:file:/a/b.jar!/x/y.xq").merge("z.xq").path());
+    assertEquals("jar:file:/a/b.jar!/z.xq",
+        IO.get("jar:file:/a/b.jar!/x/y.xq").merge("../z.xq").path());
+    assertEquals("jar:fatjar:WEB-INF/lib/rr.jar!/de/bottlecaps/railroad/xq/cst-to-ast.xq",
+        IO.get("jar:fatjar:WEB-INF/lib/rr.jar!/de/bottlecaps/railroad/xq/basic-interface.xq").
+            merge("cst-to-ast.xq").path());
+  }
 }
