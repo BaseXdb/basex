@@ -396,20 +396,25 @@ public class Options implements Iterable<Option<?>> {
   public synchronized void assign(final Item name, final Value value, final InputInfo info)
       throws QueryException {
 
-    final String nm;
-    if(name instanceof final QNm qnm) {
-      nm = string(qnm.unique());
-    } else if(name.type.isStringOrUntyped()) {
-      nm = string(name.string(info));
-    } else {
-      throw INVALIDOPTION_X_X_X.get(info, BasicType.STRING, name.type, name);
-    }
-
+    final String nm = name(name, info);
     if(definitions.isEmpty()) {
       free.put(nm, serialize(value, info));
     } else {
       assign(nm, value, info);
     }
+  }
+
+  /**
+   * Returns the name of an option.
+   * @param name name (QName or string)
+   * @param info input info (can be {@code null})
+   * @return name
+   * @throws QueryException query exception
+   */
+  private static String name(final Item name, final InputInfo info) throws QueryException {
+    if(name instanceof final QNm qnm) return string(qnm.unique());
+    if(name.type.isStringOrUntyped()) return string(name.string(info));
+    throw INVALIDOPTION_X_X_X.get(info, BasicType.STRING, name.type, name);
   }
 
   /**
@@ -559,6 +564,16 @@ public class Options implements Iterable<Option<?>> {
    */
   public final synchronized void assign(final XQMap map, final InputInfo info)
       throws QueryException {
+    // reject unknown options; exclude supplied options from the suggestions
+    if(!definitions.isEmpty() && map.structSize() != 0) {
+      final TreeMap<String, Option<?>> defs = new TreeMap<>(definitions);
+      String unknown = null;
+      for(final Item key : map.keys()) {
+        final String nm = name(key, info);
+        if(defs.remove(nm) == null && unknown == null && !nm.startsWith("Q{")) unknown = nm;
+      }
+      if(unknown != null) throw INVALIDOPTION_X.get(info, similar(unknown, defs));
+    }
     map.forEach((key, value) -> assign(key, value, info));
   }
 
