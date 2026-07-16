@@ -256,8 +256,8 @@ public final class RestXqFunction extends WebFunction {
     }
 
     // bind permission information
-    if(ext instanceof final RestXqFunction rxf && permission.var != null) {
-      bind(permission.var, args, RestXqPerm.map(rxf, conn), qc, "Error info");
+    if(ext instanceof final WebFunction wf && permission.var != null) {
+      bind(permission.var, args, RestXqPerm.map(wf, conn), qc, "Error info");
     }
     return args;
   }

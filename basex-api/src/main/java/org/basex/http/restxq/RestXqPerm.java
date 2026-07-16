@@ -3,12 +3,14 @@ package org.basex.http.restxq;
 import static org.basex.http.web.WebText.*;
 
 import org.basex.http.*;
+import org.basex.http.web.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
+import org.basex.util.list.*;
 
 /**
  * RESTXQ permissions.
@@ -39,10 +41,12 @@ public final class RestXqPerm implements Comparable<RestXqPerm> {
    * @return permission information
    * @throws QueryException query exception
    */
-  static XQMap map(final RestXqFunction func, final HTTPConnection conn)
+  static XQMap map(final WebFunction func, final HTTPConnection conn)
       throws QueryException {
+    final TokenList allows = func instanceof final RestXqFunction rxf ? rxf.allows :
+      new TokenList(0);
     return new MapBuilder().
-      put(ALLOW, StrSeq.get(func.allows.toArray())).
+      put(ALLOW, StrSeq.get(allows.toArray())).
       put(PATH, conn.path()).
       put(METHOD, conn.method).
       put(HEADERS, conn.requestCtx.headers()).

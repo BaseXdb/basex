@@ -29,7 +29,7 @@ import jakarta.servlet.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-final class RestXqResponse extends WebResponse {
+public final class RestXqResponse extends WebResponse {
   /** HTTP connection. */
   private final HTTPConnection conn;
 
@@ -46,7 +46,7 @@ final class RestXqResponse extends WebResponse {
    * Constructor.
    * @param conn HTTP connection
    */
-  RestXqResponse(final HTTPConnection conn) {
+  public RestXqResponse(final HTTPConnection conn) {
     super(conn.context);
     this.conn = conn;
   }

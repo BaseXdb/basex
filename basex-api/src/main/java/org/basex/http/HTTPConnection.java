@@ -61,9 +61,10 @@ public final class HTTPConnection implements ClientInfo {
    * @param request request
    * @param response response
    * @param authMethod authentication method (can be {@code null})
+   * @param pth request path (if {@code null}, the path info of the request is used)
    */
-  HTTPConnection(final HttpServletRequest request, final HttpServletResponse response,
-      final AuthMethod authMethod) {
+  public HTTPConnection(final HttpServletRequest request, final HttpServletResponse response,
+      final AuthMethod authMethod, final String pth) {
 
     this.request = request;
     this.response = response;
@@ -74,7 +75,7 @@ public final class HTTPConnection implements ClientInfo {
 
     // set UTF8 as default encoding (can be overwritten)
     response.setCharacterEncoding(Strings.UTF8);
-    path = normalize(request.getPathInfo());
+    path = normalize(pth != null ? pth : request.getPathInfo());
 
     // capture client address, as the request may be recycled when the value is requested
     remoteAddress = requestCtx.state().originalAddress();
@@ -90,7 +91,7 @@ public final class HTTPConnection implements ClientInfo {
    * @param username name of default servlet user (can be {@code null})
    * @throws IOException I/O exception
    */
-  void authenticate(final String username) throws IOException {
+  public void authenticate(final String username) throws IOException {
     // choose admin user for OPTIONS requests, servlet-specific user, or global user (can be empty)
     String name = method.equals(Method.OPTIONS.name()) ? UserText.ADMIN : username;
     if(name == null) name = context.soptions.get(StaticOptions.USER);

@@ -123,6 +123,17 @@ public abstract class WsTest extends HTTPTest {
   }
 
   /**
+   * Returns the value assigned to the given key in the cache of the HTTP server's context.
+   * @param key key
+   * @return value, or an empty string if no value is assigned
+   * @throws Exception exception
+   */
+  protected static String cacheGet(final String key) throws Exception {
+    return new XQuery("cache:get('" + key + "')").
+        execute(HTTPContext.get().context()).trim();
+  }
+
+  /**
    * Polls the cache of the HTTP server's context until the given key has the expected value.
    * @param key key
    * @param expected expected value

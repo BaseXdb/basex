@@ -42,18 +42,10 @@ public abstract class BaseXServlet extends HttpServlet {
     }
 
     // parse servlet-specific user and authentication method
-    for(final String n : Collections.list(config.getInitParameterNames())) {
-      String name = n;
-      final String value = config.getInitParameter(name);
-      if(name.startsWith(Prop.DBPREFIX)) {
-        name = name.substring(Prop.DBPREFIX.length());
-        if(name.equalsIgnoreCase(StaticOptions.USER.name())) {
-          username = value;
-        } else if(name.equalsIgnoreCase(StaticOptions.AUTHMETHOD.name())) {
-          auth = AuthMethod.valueOf(value);
-        }
-      }
-    }
+    username = initParam(config, StaticOptions.USER.name());
+    final String method = initParam(config, StaticOptions.AUTHMETHOD.name());
+    if(method != null) auth = AuthMethod.valueOf(method);
+
     final Context ctx = hc.context();
     if(ctx.soptions.get(StaticOptions.LOGTRACE)) ctx.setExternal(ctx.log);
   }
@@ -62,46 +54,12 @@ public abstract class BaseXServlet extends HttpServlet {
   public final void service(final HttpServletRequest request, final HttpServletResponse response)
       throws IOException {
 
-    final HTTPConnection conn = new HTTPConnection(request, response, auth);
+    final HTTPConnection conn = new HTTPConnection(request, response, auth, null);
     try {
       conn.authenticate(username);
       run(conn);
-    } catch(final HTTPException ex) {
-      conn.error(ex.getStatus(), Util.message(ex));
-    } catch(final LoginException ex) {
-      conn.error(SC_UNAUTHORIZED, Util.message(ex));
-    } catch(final QueryException ex) {
-      int code = SC_INTERNAL_SERVER_ERROR;
-      boolean full = conn.context.soptions.get(StaticOptions.RESTXQERRORS);
-      final QNm qname = ex.qname();
-      if(Token.eq(qname.uri(), QueryText.REST_URI)) {
-        // status code is encoded in the local name (e.g. 'status404')
-        code = Token.toInt(Token.substring(qname.local(), QueryText.STATUS.length));
-        full = false;
-      }
-      final SerializerOptions sopts = ex.output();
-      if(sopts != null) {
-        // render the error value as the response body
-        String body;
-        try {
-          body = ex.value().serialize(sopts).toString();
-        } catch(final QueryIOException e) {
-          Util.debug(e);
-          body = ex.getLocalizedMessage();
-        }
-        conn.error(code, ex.getLocalizedMessage(), body, sopts.mediaType());
-      } else {
-        conn.error(code, full ? Util.message(ex) : ex.getLocalizedMessage());
-      }
-    } catch(final IOException ex) {
-      final boolean full = conn.context.soptions.get(StaticOptions.RESTXQERRORS);
-      conn.error(SC_INTERNAL_SERVER_ERROR, full ? Util.message(ex) : ex.getLocalizedMessage());
-    } catch(final JobException ex) {
-      conn.stop(ex);
     } catch(final Exception ex) {
-      final String message = Util.bug(ex);
-      Util.errln(message);
-      conn.error(SC_INTERNAL_SERVER_ERROR, Util.info(HTTPText.UNEXPECTED_X, message));
+      error(conn, ex);
     } finally {
       if(Prop.debug) {
         Util.errln("Request: " + request.getMethod() + ' ' + request.getRequestURL());
@@ -122,4 +80,66 @@ public abstract class BaseXServlet extends HttpServlet {
    * @throws Exception any exception
    */
   protected abstract void run(HTTPConnection conn) throws Exception;
+
+  /**
+   * Returns the value of a servlet-specific initialization parameter.
+   * @param config servlet configuration
+   * @param name name of parameter (without database prefix)
+   * @return value, or {@code null} if the parameter is not specified
+   */
+  public static String initParam(final ServletConfig config, final String name) {
+    for(final String param : Collections.list(config.getInitParameterNames())) {
+      if(param.startsWith(Prop.DBPREFIX) &&
+          param.substring(Prop.DBPREFIX.length()).equalsIgnoreCase(name)) {
+        return config.getInitParameter(param);
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Handles a servlet exception and sends an error response.
+   * @param conn HTTP connection
+   * @param ex exception
+   * @throws IOException I/O exception
+   */
+  public static void error(final HTTPConnection conn, final Exception ex) throws IOException {
+    if(ex instanceof final HTTPException hex) {
+      conn.error(hex.getStatus(), Util.message(hex));
+    } else if(ex instanceof LoginException) {
+      conn.error(SC_UNAUTHORIZED, Util.message(ex));
+    } else if(ex instanceof final QueryException qex) {
+      int code = SC_INTERNAL_SERVER_ERROR;
+      boolean full = conn.context.soptions.get(StaticOptions.RESTXQERRORS);
+      final QNm qname = qex.qname();
+      if(Token.eq(qname.uri(), QueryText.REST_URI)) {
+        // status code is encoded in the local name (e.g. 'status404')
+        code = Token.toInt(Token.substring(qname.local(), QueryText.STATUS.length));
+        full = false;
+      }
+      final SerializerOptions sopts = qex.output();
+      if(sopts != null) {
+        // render the error value as the response body
+        String body;
+        try {
+          body = qex.value().serialize(sopts).toString();
+        } catch(final QueryIOException e) {
+          Util.debug(e);
+          body = qex.getLocalizedMessage();
+        }
+        conn.error(code, qex.getLocalizedMessage(), body, sopts.mediaType());
+      } else {
+        conn.error(code, full ? Util.message(qex) : qex.getLocalizedMessage());
+      }
+    } else if(ex instanceof IOException) {
+      final boolean full = conn.context.soptions.get(StaticOptions.RESTXQERRORS);
+      conn.error(SC_INTERNAL_SERVER_ERROR, full ? Util.message(ex) : ex.getLocalizedMessage());
+    } else if(ex instanceof final JobException jex) {
+      conn.stop(jex);
+    } else {
+      final String message = Util.bug(ex);
+      Util.errln(message);
+      conn.error(SC_INTERNAL_SERVER_ERROR, Util.info(HTTPText.UNEXPECTED_X, message));
+    }
+  }
 }

@@ -168,23 +168,38 @@ public final class WebModules {
   }
 
   /**
-   * Returns all implementations for the given WebSocket.
-   * @param ws WebSocket
+   * Returns all WebSocket functions that match the specified path.
+   * @param pth concrete connection path
+   * @param ctx database context
    * @param ann annotation (can be {@code null})
-   * @return result of check
+   * @return matching functions
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private ArrayList<WsFunction> findWs(final WebSocket ws, final Annotation ann)
+  private ArrayList<WsFunction> findWs(final String pth, final Context ctx, final Annotation ann)
       throws QueryException, IOException {
     final ArrayList<WsFunction> funcs = new ArrayList<>();
-    for(final WebModule mod : cache(ws.context).values()) {
+    for(final WebModule mod : cache(ctx).values()) {
       for(final WsFunction func : mod.wsFunctions()) {
-        if(func.matches(ann, ws.path)) funcs.add(func);
+        if(func.matches(ann, pth)) funcs.add(func);
       }
     }
     Collections.sort(funcs);
     return funcs;
+  }
+
+  /**
+   * Returns a WebSocket function that matches the specified path.
+   * @param pth concrete connection path
+   * @param ctx database context
+   * @return function, or {@code null} if no function matches
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   */
+  public WsFunction websocket(final String pth, final Context ctx)
+      throws QueryException, IOException {
+    final ArrayList<WsFunction> funcs = findWs(pth, ctx, null);
+    return funcs.isEmpty() ? null : funcs.getFirst();
   }
 
   /**
@@ -218,7 +233,7 @@ public final class WebModules {
       throws QueryException, IOException {
 
     // collect and sort all function candidates
-    final ArrayList<WsFunction> funcs = findWs(ws, ann);
+    final ArrayList<WsFunction> funcs = findWs(ws.path, ws.context, ann);
     if(funcs.isEmpty()) return null;
 
     // multiple functions: check specifity
