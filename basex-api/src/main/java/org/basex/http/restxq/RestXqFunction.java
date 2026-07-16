@@ -52,6 +52,8 @@ public final class RestXqFunction extends WebFunction {
   final ArrayList<WebParam> queryParams = new ArrayList<>();
   /** Form parameters. */
   final ArrayList<WebParam> formParams = new ArrayList<>();
+  /** Header parameters. */
+  final ArrayList<WebParam> headerParams = new ArrayList<>();
 
   /** Supported methods. */
   final Set<String> methods = new HashSet<>();
@@ -226,16 +228,17 @@ public final class RestXqFunction extends WebFunction {
     }
 
     // bind header parameters
+    final RequestState state = conn.requestCtx.state();
     for(final WebParam rxp : headerParams) {
       final TokenList tl = new TokenList();
-      for(final String header : Collections.list(conn.request.getHeaders(rxp.name()))) {
+      for(final String header : state.headers(rxp.name())) {
         for(final String s : header.split(", *")) tl.add(s);
       }
       bind(rxp, args, StrSeq.get(tl), qc);
     }
 
     // bind cookie parameters
-    final Cookie[] cookies = conn.request.getCookies();
+    final Cookie[] cookies = state.cookies();
     for(final WebParam rxp : cookieParams) {
       Value value = Empty.VALUE;
       if(cookies != null) {

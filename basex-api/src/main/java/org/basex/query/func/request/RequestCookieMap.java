@@ -18,7 +18,7 @@ public final class RequestCookieMap extends ApiFunc {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final MapBuilder map = new MapBuilder();
-    final Cookie[] cookies = request(qc).getCookies();
+    final Cookie[] cookies = state(qc).cookies();
     if(cookies != null) {
       for(final Cookie c : cookies) {
         map.put(c.getName(), Str.get(c.getValue()));

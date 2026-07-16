@@ -78,7 +78,7 @@ public final class ASession {
    */
   public Value get(final String key, final QueryContext qc, final InputInfo info)
       throws QueryException {
-    final Object value = HTTPConnection.getAttribute(session, key);
+    final Object value = RequestState.attribute(session, key);
     return value != null ? JavaCall.toValue(value, qc, info) : null;
   }
 

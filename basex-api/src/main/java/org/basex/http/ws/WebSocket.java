@@ -1,7 +1,6 @@
 package org.basex.http.ws;
 
 import java.nio.*;
-import java.util.*;
 import java.util.concurrent.*;
 
 import org.basex.core.*;
@@ -9,12 +8,9 @@ import org.basex.http.*;
 import org.basex.http.web.*;
 import org.basex.query.ann.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.server.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
-import org.basex.util.list.*;
 import org.basex.util.log.*;
 import org.eclipse.jetty.websocket.api.*;
 import org.eclipse.jetty.websocket.api.exceptions.*;
@@ -36,12 +32,8 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
   /** Path. */
   public final WsPath path;
 
-  /** Header parameters. */
-  final Map<String, Value> headers = new HashMap<>();
-  /** Request location (captured during the handshake). */
-  final RequestLocation location;
-  /** Remote client address (captured during the handshake). */
-  private final String remoteAddress;
+  /** Request context (captured during the handshake). */
+  final RequestContext requestCtx;
 
   /** Client WebSocket ID. */
   public String id;
@@ -56,36 +48,9 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
     final String pi = request.getPathInfo();
     path = new WsPath(pi != null ? pi : "/");
     session = request.getSession();
-    location = new RequestLocation(request.getQueryString(),
-        String.valueOf(request.getRequestURL()), request.getRequestURI());
-    remoteAddress = HTTPConnection.remoteAddress(request);
-
-    // capture upgrade headers during the handshake, as the request is recycled afterwards
-    addHeader("http-version", request.getProtocol());
-    addHeader("origin", request.getHeader("Origin"));
-    addHeader("protocol-version", request.getHeader("Sec-WebSocket-Version"));
-    addHeader("query-string", location.query());
-    addHeader("is-secure", String.valueOf(request.isSecure()));
-    addHeader("request-uri", location.url());
-    addHeader("host", request.getHeader("Host"));
-    final TokenList protocols = new TokenList();
-    for(final String header : Collections.list(request.getHeaders("Sec-WebSocket-Protocol"))) {
-      for(final String protocol : header.split("\\s*,\\s*")) {
-        if(!protocol.isEmpty()) protocols.add(protocol);
-      }
-    }
-    headers.put("sub-protocols", StrSeq.get(protocols));
-
+    // capture request values during the handshake, as the request is recycled afterwards
+    requestCtx = new RequestContext(request).detach();
     context = new Context(HTTPContext.get().context(), this);
-  }
-
-  /**
-   * Adds an upgrade header to the header parameters.
-   * @param key header key
-   * @param value header value (ignored if {@code null})
-   */
-  private void addHeader(final String key, final String value) {
-    if(value != null) headers.put(key, Atm.get(value));
   }
 
   /**
@@ -108,20 +73,21 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
   public void onWebSocketOpen(final Session sess) {
     super.onWebSocketOpen(sess);
     id = WsPool.add(this);
-    run("[WS-OPEN] " + location.url(), null, () -> findAndProcess(Annotation._WS_CONNECT, null));
+    run("[WS-OPEN] " + requestCtx.state().url(), null,
+        () -> findAndProcess(Annotation._WS_CONNECT, null));
   }
 
   @Override
   public void onWebSocketError(final Throwable th) {
     final String m1 = th.getMessage(), m2 = Util.message(th), msg = m1 != null ? m1 : m2;
-    run("[WS-ERROR] " + location.url() + ": " + msg, null,
+    run("[WS-ERROR] " + requestCtx.state().url() + ": " + msg, null,
         () -> findAndProcess(Annotation._WS_ERROR, msg));
   }
 
   @Override
   public void onWebSocketClose(final int status, final String message, final Callback callback) {
     try {
-      run("[WS-CLOSE] " + location.url(), status,
+      run("[WS-CLOSE] " + requestCtx.state().url(), status,
           () -> findAndProcess(Annotation._WS_CLOSE, null));
     } finally {
       WsPool.remove(id);
@@ -148,14 +114,14 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
 
   @Override
   public String clientAddress() {
-    return remoteAddress;
+    return requestCtx.state().originalAddress();
   }
 
   @Override
   public String clientName() {
     final Object value = atts.get(HTTPText.CLIENT_ID);
     return clientName(value != null ? value :
-      HTTPConnection.getAttribute(session, HTTPText.CLIENT_ID), context);
+      RequestState.attribute(session, HTTPText.CLIENT_ID), context);
   }
 
   @Override

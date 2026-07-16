@@ -3,8 +3,6 @@ package org.basex.http.ws;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
-import java.util.*;
-
 import org.basex.core.*;
 import org.basex.http.web.*;
 import org.basex.query.*;
@@ -52,14 +50,6 @@ public final class WsFunction extends WebFunction {
       found = true;
       final Value value = ann.value();
       switch(def) {
-        case _WS_HEADER_PARAM:
-          final String name = toString(value.itemAt(0));
-          final QNm var = checkVariable(toString(value.itemAt(1)), declared);
-          final long vs = value.size();
-          final ItemList items = new ItemList(vs - 2);
-          for(int v = 2; v < vs; v++) items.add(value.itemAt(v));
-          headerParams.add(new WebParam(var, name, items.value()));
-          break;
         case _WS_CLOSE:
         case _WS_CONNECT:
           path = new WsPath(toString(value.itemAt(0)));
@@ -82,31 +72,23 @@ public final class WsFunction extends WebFunction {
   /**
    * Binds the function parameters.
    * @param msg message (can be {@code null}; otherwise string or byte array)
-   * @param values header values
    * @param qc query context
    * @return arguments
    * @throws QueryException query exception
    */
-  Expr[] bind(final Object msg, final Map<String, Value> values,
-      final QueryContext qc) throws QueryException {
-
+  Expr[] bind(final Object msg, final QueryContext qc) throws QueryException {
     final Expr[] args = new Expr[function.arity()];
-    if(msg != null) values.put("message", msg instanceof final byte[] bytes ? B64.get(bytes) :
-        Str.get((String) msg));
-
-    for(final WebParam param : headerParams) {
-      final Value v = values.get(param.name());
-      bind(param.var(), args, v == null || v.isEmpty() ? param.value() : v, qc,
-          "Value of '" + param.name() + "'");
-    }
     if(message != null) {
-      bind(message.var(), args, values.get(message.name()), qc, "Message");
+      Value value = null;
+      if(msg instanceof final byte[] bytes) value = B64.get(bytes);
+      else if(msg != null) value = Str.get((String) msg);
+      bind(message.var(), args, value, qc, "Message");
     }
     return args;
   }
 
   /**
-   * Checks if an WebSocket request matches this annotation and path.
+   * Checks if a WebSocket request matches this annotation and path.
    * @param definition annotation definition (can be {@code null})
    * @param pth path to compare to (can be {@code null})
    * @return boolean result of check

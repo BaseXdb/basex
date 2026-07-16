@@ -1,7 +1,5 @@
 package org.basex.query.func.request;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
@@ -21,9 +19,7 @@ public final class RequestHeader extends ApiFunc {
     final String name = toString(arg(0), qc);
 
     final TokenList list = new TokenList(1);
-    for(final String value : Collections.list(request(qc).getHeaders(name))) {
-      list.add(value);
-    }
+    for(final String value : state(qc).headers(name)) list.add(value);
     if(list.isEmpty()) {
       final Value dflt = arg(1).atomValue(qc, info);
       for(final Item item : dflt) list.add(toToken(item));

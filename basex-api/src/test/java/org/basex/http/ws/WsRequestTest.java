@@ -5,50 +5,59 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.*;
 
 /**
- * Tests for {@code %ws:header-param} annotations.
+ * Tests for request functions in WebSocket functions.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class WsHeaderParamTest extends WsTest {
+public final class WsRequestTest extends WsTest {
   /**
-   * Standard upgrade headers (host, request-uri, http-version, is-secure) are bound.
+   * {@code request:method} returns the method of the upgrade request.
    * @throws Exception exception
    */
-  @Test public void standardHeaders() throws Exception {
+  @Test public void requestMethod() throws Exception {
     register(
         "declare %ws:connect('/h')" +
-        "        %ws:header-param('host', '{$host}')" +
-        "        %ws:header-param('request-uri', '{$uri}')" +
-        "        %ws:header-param('is-secure', '{$secure}')" +
-        "        function m:c($host, $uri, $secure) {" +
-        "  ws:emit($host || '|' || $uri || '|' || $secure)" +
-        "};" +
+        "        function m:c() { ws:emit(request:method()) };" +
         "declare %ws:message('/h', '{$m}') function m:msg($m) { () };");
 
     final Listener l = new Listener();
     final java.net.http.WebSocket ws = connect("/h", l);
     try {
-      final String[] parts = l.pollText().split("\\|", -1);
-      assertEquals(3, parts.length);
-      assertTrue(parts[0].contains("localhost"), "host should contain localhost: " + parts[0]);
-      assertTrue(parts[1].endsWith("/ws/h"), "request-uri should end with /ws/h: " + parts[1]);
-      assertEquals("false", parts[2]);
+      assertEquals("GET", l.pollText());
     } finally {
       close(ws);
     }
   }
 
   /**
-   * A header that is not provided by the upgrade request falls back to the
-   * declared default value.
+   * {@code request:header} returns upgrade headers; lookup is case-insensitive.
    * @throws Exception exception
    */
-  @Test public void defaultValue() throws Exception {
+  @Test public void requestHeader() throws Exception {
     register(
         "declare %ws:connect('/h')" +
-        "        %ws:header-param('origin', '{$o}', 'fallback')" +
-        "        function m:c($o) { ws:emit($o) };" +
+        "        function m:c() { ws:emit(string(request:header('HOST'))) };" +
+        "declare %ws:message('/h', '{$m}') function m:msg($m) { () };");
+
+    final Listener l = new Listener();
+    final java.net.http.WebSocket ws = connect("/h", l);
+    try {
+      final String host = l.pollText();
+      assertTrue(host.contains("localhost"), "host should contain localhost: " + host);
+    } finally {
+      close(ws);
+    }
+  }
+
+  /**
+   * A header that is not sent by the upgrade request yields the supplied default.
+   * @throws Exception exception
+   */
+  @Test public void requestHeaderDefault() throws Exception {
+    register(
+        "declare %ws:connect('/h')" +
+        "        function m:c() { ws:emit(request:header('Origin', 'fallback')) };" +
         "declare %ws:message('/h', '{$m}') function m:msg($m) { () };");
 
     final Listener l = new Listener();
@@ -62,50 +71,26 @@ public final class WsHeaderParamTest extends WsTest {
   }
 
   /**
-   * The {@code sub-protocols} pseudo-header is bound as an (here: empty) sequence
-   * when the client does not offer sub-protocols.
+   * {@code request:scheme} and {@code request:hostname} return the values of the upgrade request.
    * @throws Exception exception
    */
-  @Test public void subProtocolsEmpty() throws Exception {
+  @Test public void requestScheme() throws Exception {
     register(
         "declare %ws:connect('/h')" +
-        "        %ws:header-param('sub-protocols', '{$p}')" +
-        "        function m:c($p) { ws:emit('count=' || count($p)) };" +
+        "        function m:c() { ws:emit(request:scheme() || '|' || request:hostname()) };" +
         "declare %ws:message('/h', '{$m}') function m:msg($m) { () };");
 
     final Listener l = new Listener();
     final java.net.http.WebSocket ws = connect("/h", l);
     try {
-      assertEquals("count=0", l.pollText());
+      assertEquals("http|localhost", l.pollText());
     } finally {
       close(ws);
     }
   }
 
   /**
-   * The {@code query-string} pseudo-header carries the query part of the upgrade URI.
-   * It is captured during the handshake, before the request is recycled.
-   * @throws Exception exception
-   */
-  @Test public void queryString() throws Exception {
-    register(
-        "declare %ws:connect('/h')" +
-        "        %ws:header-param('query-string', '{$q}')" +
-        "        function m:c($q) { ws:emit($q) };" +
-        "declare %ws:message('/h', '{$m}') function m:msg($m) { () };");
-
-    final Listener l = new Listener();
-    final java.net.http.WebSocket ws = connect("/h?a=1&b=2", l);
-    try {
-      assertEquals("a=1&b=2", l.pollText());
-    } finally {
-      close(ws);
-    }
-  }
-
-  /**
-   * {@code request:parameter} is available in a connect handler: the query parameters of the
-   * upgrade request are exposed via the request context, captured before the request is recycled.
+   * {@code request:parameter} returns the query parameters of the upgrade request.
    * @throws Exception exception
    */
   @Test public void requestParameter() throws Exception {
@@ -175,31 +160,6 @@ public final class WsHeaderParamTest extends WsTest {
     final java.net.http.WebSocket ws = connect("/h", l);
     try {
       assertEquals("/ws/h", l.pollText());
-    } finally {
-      close(ws);
-    }
-  }
-
-  /**
-   * The {@code http-version} and {@code protocol-version} pseudo-headers are captured
-   * from the upgrade request.
-   * @throws Exception exception
-   */
-  @Test public void upgradeVersions() throws Exception {
-    register(
-        "declare %ws:connect('/h')" +
-        "        %ws:header-param('http-version', '{$v}')" +
-        "        %ws:header-param('protocol-version', '{$p}')" +
-        "        function m:c($v, $p) { ws:emit($v || '|' || $p) };" +
-        "declare %ws:message('/h', '{$m}') function m:msg($m) { () };");
-
-    final Listener l = new Listener();
-    final java.net.http.WebSocket ws = connect("/h", l);
-    try {
-      final String[] parts = l.pollText().split("\\|", -1);
-      assertEquals(2, parts.length);
-      assertTrue(parts[0].startsWith("HTTP/"), "http-version should start with HTTP/: " + parts[0]);
-      assertEquals("13", parts[1]);
     } finally {
       close(ws);
     }

@@ -18,7 +18,7 @@ public final class RequestCookieNames extends ApiFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final TokenList tl = new TokenList();
-    final Cookie[] cookies = request(qc).getCookies();
+    final Cookie[] cookies = state(qc).cookies();
     if(cookies != null) {
       for(final Cookie c : cookies) tl.add(c.getName());
     }

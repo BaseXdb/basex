@@ -7,7 +7,6 @@ import jakarta.servlet.http.*;
 import org.basex.http.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.util.*;
 
 /**
  * Session function.
@@ -26,15 +25,9 @@ abstract class SessionFn extends ApiFunc {
   final ASession session(final QueryContext qc, final boolean create) throws QueryException {
     // WebSocket context: access existing session
     HttpSession session = wsSession(qc);
-    // HTTP context: get/create session (requires an HTTP connection)
+    // HTTP context: get/create session (not available for detached requests)
     if(session == null) {
-      final HttpServletRequest request = request(qc);
-      try {
-        session = request.getSession(create);
-      } catch(final NullPointerException ex) {
-        // Jetty 12, getSession: _coreRequest may be null for propagated request instances
-        Util.debug(ex);
-      }
+      session = state(qc).session(create);
     }
     // no session created (may happen with WebSockets): raise error or return null reference
     if(session == null) {

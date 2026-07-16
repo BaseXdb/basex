@@ -30,10 +30,6 @@ import org.basex.util.log.*;
  * @author Christian Gruen
  */
 public final class HTTPConnection implements ClientInfo {
-  /** Forwarding headers. */
-  private static final String[] FORWARDING_HEADERS = { "X-Forwarded-For", "Proxy-Client-IP",
-      "WL-Proxy-Client-IP", "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR" };
-
   /** HTTP servlet request. */
   public final HttpServletRequest request;
   /** HTTP servlet response. */
@@ -50,6 +46,10 @@ public final class HTTPConnection implements ClientInfo {
   private final AuthMethod authMethod;
   /** Path, starting with a slash. */
   private final String path;
+  /** Remote client address (captured at construction time). */
+  private final String remoteAddress;
+  /** Remote client port (captured at construction time). */
+  private final int remotePort;
 
   /** Request method. */
   public String method;
@@ -75,6 +75,10 @@ public final class HTTPConnection implements ClientInfo {
     // set UTF8 as default encoding (can be overwritten)
     response.setCharacterEncoding(Strings.UTF8);
     path = normalize(request.getPathInfo());
+
+    // capture client address, as the request may be recycled when the value is requested
+    remoteAddress = requestCtx.state().originalAddress();
+    remotePort = requestCtx.state().remotePort();
 
     // authentication method (servlet-specific or global)
     this.authMethod = authMethod != null ? authMethod :
@@ -110,7 +114,7 @@ public final class HTTPConnection implements ClientInfo {
    * @return content-type
    */
   public MediaType mediaType() {
-    return mediaType(request);
+    return requestCtx.state().mediaType();
   }
 
   /**
@@ -118,7 +122,7 @@ public final class HTTPConnection implements ClientInfo {
    */
   public void initResponse() {
     final SerializerOptions sopts = sopts();
-    final MediaType mt = mediaType(sopts);
+    final MediaType mt = sopts.mediaType();
     response.setContentType((mt.parameter(CHARSET) == null ?
       new MediaType(mt + ";" + CHARSET + "=" + sopts.get(SerializerOptions.ENCODING)) :
       mt).toString());
@@ -264,51 +268,35 @@ public final class HTTPConnection implements ClientInfo {
 
   @Override
   public String clientAddress() {
-    final String addr = getRemoteAddr();
-    return addr != null ? addr + ':' + request.getRemotePort() : null;
+    return remoteAddress != null ? remoteAddress + ':' + remotePort : null;
   }
 
   @Override
   public String clientName() {
     // check for request ID
-    Object value = getAttribute(request, HTTPText.CLIENT_ID);
+    final RequestState state = requestCtx.state();
+    Object value = state.attribute(HTTPText.CLIENT_ID);
     // check for session ID (DBA, global)
     if(value == null) {
       final boolean dba = (path() + '/').contains('/' + HTTPText.DBA_CLIENT_ID + '/');
       final String name = dba ? HTTPText.DBA_CLIENT_ID : HTTPText.CLIENT_ID;
-      try {
-        value = getAttribute(request.getSession(false), name);
-      } catch(final NullPointerException ex) {
-        // Jetty 12, getSession: _coreRequest may be null for propagated request instances
-        Util.debug(ex);
-      }
+      value = RequestState.attribute(state.session(false), name);
     }
     return clientName(value, context);
   }
 
   /**
-   * Sets 460 a proprietary status code and sends the exception message as info.
+   * Sends the proprietary 460 status code and the exception message as info.
    * @param ex job exception
    * @throws IOException I/O exception
    */
   void stop(final JobException ex) throws IOException {
-    final int code = 460;
+    // client directive: do not cache result (HTTP 1.1, old clients)
+    response.setHeader(CACHE_CONTROL, "no-cache, no-store, must-revalidate");
+    response.setHeader(PRAGMA, "no-cache");
+    response.setHeader(EXPIRES, "0");
     final String info = ex.getMessage();
-    discardBody();
-    log(code, info);
-    try {
-      response.resetBuffer();
-      response.setStatus(code);
-      response.setContentType(MediaType.TEXT_PLAIN + "; " + CHARSET + '=' + Strings.UTF8);
-      // client directive: do not cache result (HTTP 1.1, old clients)
-      response.setHeader(CACHE_CONTROL, "no-cache, no-store, must-revalidate");
-      response.setHeader(PRAGMA, "no-cache");
-      response.setHeader(EXPIRES, "0");
-      response.getOutputStream().write(token(info));
-    } catch(final IllegalStateException e) {
-      // too late (response has already been committed)
-      logError(code, info, e);
-    }
+    error(460, info, info, MediaType.TEXT_PLAIN);
   }
 
   /**
@@ -368,117 +356,6 @@ public final class HTTPConnection implements ClientInfo {
     add.accept("evaluate", qi.evaluating.get());
     add.accept("serialize", qi.serializing.get());
     response.setHeader(SERVER_TIMING, String.join(",", list.finish()));
-  }
-
-  /**
-   * Returns the media type defined in the specified serialization parameters.
-   * @param sopts serialization parameters
-   * @return media type
-   */
-  public static MediaType mediaType(final SerializerOptions sopts) {
-    // set content-type
-    final String type = sopts.get(SerializerOptions.MEDIA_TYPE);
-    if(!type.isEmpty()) return new MediaType(type);
-
-    // determine content-type dependent on output method
-    final SerialMethod sm = sopts.get(SerializerOptions.METHOD);
-    if(sm == SerialMethod.BASEX || sm == SerialMethod.ADAPTIVE || sm == SerialMethod.XML)
-      return MediaType.APPLICATION_XML;
-    if(sm == SerialMethod.XHTML || sm == SerialMethod.HTML) return MediaType.TEXT_HTML;
-    if(sm == SerialMethod.JSON) return MediaType.APPLICATION_JSON;
-    return MediaType.TEXT_PLAIN;
-  }
-
-  /**
-   * Returns the content-type of a request as media type.
-   * @param request servlet request
-   * @return content-type
-   */
-  public static MediaType mediaType(final HttpServletRequest request) {
-    final String ct = request.getContentType();
-    return ct == null ? MediaType.ALL_ALL : new MediaType(ct);
-  }
-
-  /**
-   * Returns the address of the client that sent a request, or an empty string.
-   * Evaluates the HTTP headers to find the original IP address.
-   * @param request servlet request
-   * @return remote address
-   */
-  public static String remoteAddress(final HttpServletRequest request) {
-    for(final String header : FORWARDING_HEADERS) {
-      final String value = request.getHeader(header);
-      // header found: test last (most reliable) part first
-      if(value != null && !value.isEmpty()) {
-        String ip = null;
-        final String[] entries = value.split("\\s*,\\s*");
-        for(int e = entries.length; --e >= 0 && entries[e].matches("^\\[?[:.\\d]+\\]?$");) {
-          ip = entries[e];
-        }
-        if(ip != null) return ip;
-      }
-    }
-    return request.getRemoteAddr();
-  }
-
-  /**
-   * Returns all request attributes.
-   * @param request servlet request (can be {@code null})
-   * @return map
-   */
-  public static HashMap<String, Object> getAttributes(final HttpServletRequest request) {
-    final HashMap<String, Object> map = new HashMap<>();
-    try {
-      final Enumeration<String> names = request.getAttributeNames();
-      while(names.hasMoreElements()) {
-        final String name = names.nextElement();
-        map.put(name, getAttribute(request, name));
-      }
-    } catch(final NullPointerException | IllegalStateException ex) {
-      // Tomcat: https://github.com/spring-projects/spring-boot/issues/36763
-      // Jetty 12.1: org.eclipse.jetty.ee11.servlet.ServletApiRequest.getAttribute (line 915)
-      Util.debug(ex);
-    }
-    return map;
-  }
-
-  /**
-   * Returns a request attribute.
-   * @param request servlet request (can be {@code null})
-   * @param name name of the attribute
-   * @return value, or {@code null} if it does not exist or cannot be retrieved
-   */
-  public static Object getAttribute(final HttpServletRequest request, final String name) {
-    if(request != null) {
-      try {
-        return request.getAttribute(name);
-      } catch(final NullPointerException | IllegalStateException ex) {
-        // Tomcat: https://github.com/spring-projects/spring-boot/issues/36763
-        // Jetty 12.1: org.eclipse.jetty.ee11.servlet.ServletApiRequest.getAttribute (line 915)
-        Util.debug(ex);
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Returns a session attribute.
-   * @param session HTTP session (can be {@code null})
-   * @param name name of the attribute
-   * @return value, or {@code null} if it does not exist or cannot be retrieved
-   */
-  public static Object getAttribute(final HttpSession session, final String name) {
-    if(session != null) {
-      try {
-        return session.getAttribute(name);
-      } catch(final NullPointerException | IllegalStateException ex) {
-        // Jetty 12
-        // - getSession: _coreRequest may be null for propagated request instances
-        // - checkValidForRead: Invalid for read
-        Util.debug(ex);
-      }
-    }
-    return null;
   }
 
   // PRIVATE METHODS ==============================================================================
@@ -580,11 +457,11 @@ public final class HTTPConnection implements ClientInfo {
       }
 
       // accept and return user
-      context.blocker.remove(token(getRemoteAddr()));
+      context.blocker.remove(token(remoteAddress));
       return user;
     } catch(final LoginException ex) {
       // delay users with wrong passwords
-      context.blocker.delay(token(getRemoteAddr()));
+      context.blocker.delay(token(remoteAddress));
       throw ex;
     }
   }
@@ -599,14 +476,6 @@ public final class HTTPConnection implements ClientInfo {
     final User user = context.users.get(name);
     if(user == null || !user.enabled()) throw new LoginException(name);
     return user;
-  }
-
-  /**
-   * Returns the remote address. Resolves proxy forwardings.
-   * @return client address
-   */
-  private String getRemoteAddr() {
-    return remoteAddress(request);
   }
 
   /**

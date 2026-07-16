@@ -54,7 +54,7 @@ public class JobEval extends StandardFunc {
     }
 
     // synchronous jobs share the caller's context (the request stays live); asynchronous jobs
-    // receive a detached copy, so they cannot access a request that has meanwhile been recycled
+    // receive a detached copy with captured request values, as the request may be recycled
     final boolean sync = synchronous();
     final Locks held = sync ? qc.context.locking.held() : null;
     final QueryJobSpec spec = new QueryJobSpec(options, bindings, query);

@@ -14,6 +14,6 @@ import org.basex.util.*;
 public final class RequestContextPath extends ApiFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return toStr(request(qc).getContextPath());
+    return toStr(state(qc).contextPath());
   }
 }

@@ -15,7 +15,7 @@ import org.basex.util.*;
 public final class RequestQuery extends ApiFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String query = requestContext(qc).location().query();
+    final String query = state(qc).query();
     return query == null ? Empty.VALUE : Str.get(query);
   }
 }

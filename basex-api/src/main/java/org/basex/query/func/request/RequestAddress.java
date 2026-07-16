@@ -14,6 +14,6 @@ import org.basex.util.*;
 public final class RequestAddress extends ApiFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return toStr(request(qc).getLocalAddr());
+    return toStr(state(qc).localAddress());
   }
 }

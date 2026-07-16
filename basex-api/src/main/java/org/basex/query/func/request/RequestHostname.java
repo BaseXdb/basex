@@ -14,6 +14,6 @@ import org.basex.util.*;
 public final class RequestHostname extends ApiFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return toStr(request(qc).getServerName());
+    return toStr(state(qc).serverName());
   }
 }

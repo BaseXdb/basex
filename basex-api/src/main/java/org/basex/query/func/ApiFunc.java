@@ -16,9 +16,9 @@ import org.basex.query.value.item.*;
  */
 public abstract class ApiFunc extends StandardFunc {
   /**
-   * Returns the current HTTP servlet request.
+   * Returns the current request context.
    * @param qc query context
-   * @return HTTP request
+   * @return request context
    * @throws QueryException query exception
    */
   public final RequestContext requestContext(final QueryContext qc) throws QueryException {
@@ -37,6 +37,16 @@ public abstract class ApiFunc extends StandardFunc {
     final HttpServletRequest request = requestContext(qc).request;
     if(request == null) throw BASEX_HTTP.get(info);
     return request;
+  }
+
+  /**
+   * Returns the state of the current request.
+   * @param qc query context
+   * @return request state
+   * @throws QueryException query exception
+   */
+  public final RequestState state(final QueryContext qc) throws QueryException {
+    return requestContext(qc).state();
   }
 
   /**

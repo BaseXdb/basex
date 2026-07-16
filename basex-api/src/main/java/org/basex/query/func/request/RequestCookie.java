@@ -18,7 +18,7 @@ public final class RequestCookie extends ApiFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final String name = toString(arg(0), qc);
-    final Cookie[] cookies = request(qc).getCookies();
+    final Cookie[] cookies = state(qc).cookies();
     if(cookies != null) {
       for(final Cookie c : cookies) {
         if(c.getName().equals(name)) return Str.get(c.getValue());

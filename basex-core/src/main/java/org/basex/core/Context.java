@@ -309,7 +309,7 @@ public final class Context {
 
   /**
    * Returns a copy of this context, detached from the current client request, for
-   * asynchronous execution. Request-scoped externals are dropped and the client information is
+   * asynchronous execution. Request-scoped externals are detached and the client information is
    * snapshotted, so that a background job cannot dereference a recycled request.
    * @return detached context
    */
@@ -325,7 +325,11 @@ public final class Context {
         return name;
       }
     });
-    ctx.external.removeIf(object -> object instanceof RequestScope);
+    ctx.external.clear();
+    for(final Object object : external) {
+      final Object detached = object instanceof final RequestScope rs ? rs.detach() : object;
+      if(detached != null) ctx.external.add(detached);
+    }
     return ctx;
   }
 

@@ -6,7 +6,6 @@ import java.io.*;
 import java.nio.*;
 import java.util.*;
 
-import org.basex.http.*;
 import org.basex.http.web.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
@@ -44,11 +43,11 @@ public final class WsResponse extends WebResponse {
     qc = function.module.qc(ctx);
     qc.jc().type(WEBSOCKET);
     ctx.setExternal(ws);
-    ctx.setExternal(new RequestContext(ws.location));
+    ctx.setExternal(ws.requestCtx);
 
     func = new WsFunction(function.function, function.module, qc);
     func.parseAnnotations(null);
-    return func.bind(data, ws.headers, qc);
+    return func.bind(data, qc);
   }
 
   @Override

@@ -4,7 +4,6 @@ import static org.basex.http.web.WebText.*;
 import static org.basex.query.QueryText.*;
 
 import java.io.*;
-import java.util.*;
 import java.util.regex.*;
 
 import org.basex.core.*;
@@ -37,8 +36,6 @@ public abstract class WebFunction implements Comparable<WebFunction> {
   public final WebModule module;
   /** Serialization parameters. */
   public final SerializerOptions sopts;
-  /** Header Parameters. */
-  public final ArrayList<WebParam> headerParams = new ArrayList<>();
 
   /**
    * Web parameter.

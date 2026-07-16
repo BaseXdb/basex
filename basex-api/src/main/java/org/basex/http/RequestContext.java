@@ -1,7 +1,5 @@
 package org.basex.http;
 
-import static org.basex.query.QueryError.*;
-
 import java.io.*;
 import java.util.*;
 
@@ -27,10 +25,10 @@ import jakarta.servlet.http.*;
  * @author Christian Gruen
  */
 public final class RequestContext implements RequestScope {
-  /** HTTP servlet request (can be {@code null} for WebSocket connections). */
+  /** HTTP servlet request (can be {@code null} if the request is not accessible). */
   public final HttpServletRequest request;
-  /** Request location (query string, URL, URI). */
-  private final RequestLocation location;
+  /** Request state. */
+  private final RequestState state;
   /** Query parameters. */
   private XQMap values;
   /** Form parameters. */
@@ -46,25 +44,35 @@ public final class RequestContext implements RequestScope {
    */
   public RequestContext(final HttpServletRequest request) {
     this.request = request;
-    location = new RequestLocation(request.getQueryString(),
-        request.getRequestURL().toString(), request.getRequestURI());
+    state = new LiveRequest(request);
   }
 
   /**
-   * Constructor for WebSocket connections.
-   * @param location request location
+   * Constructor for request contexts without live servlet request.
+   * @param state request state
    */
-  public RequestContext(final RequestLocation location) {
+  private RequestContext(final RequestState state) {
     request = null;
-    this.location = location;
+    this.state = state;
+  }
+
+  @Override
+  public RequestContext detach() {
+    if(request == null) return this;
+    final RequestContext rc = new RequestContext(new FrozenRequest(state));
+    rc.values = values;
+    rc.form = form;
+    rc.headers = headers;
+    rc.body = body;
+    return rc;
   }
 
   /**
-   * Returns the request location.
-   * @return location
+   * Returns the request state.
+   * @return state
    */
-  public RequestLocation location() {
-    return location;
+  public RequestState state() {
+    return state;
   }
 
   /**
@@ -73,12 +81,11 @@ public final class RequestContext implements RequestScope {
    * @throws QueryException query exception
    */
   public XQMap headers() throws QueryException {
-    if(request == null) throw BASEX_HTTP.get(null);
     if(headers == null) {
       final MapBuilder map = new MapBuilder();
-      for(final String name : Collections.list(request.getHeaderNames())) {
+      for(final String name : state.headerNames()) {
         final TokenList list = new TokenList(1);
-        for(final String value : Collections.list(request.getHeaders(name))) list.add(value);
+        for(final String value : state.headers(name)) list.add(value);
         map.put(name, StrSeq.get(list));
       }
       headers = map.map();
@@ -109,7 +116,7 @@ public final class RequestContext implements RequestScope {
   public XQMap queryValues() throws QueryException {
     if(values == null) {
       final MapBuilder mb = new MapBuilder();
-      final String string = location().query();
+      final String string = state.query();
       if(string != null) addParams(string, mb);
       values = mb.map();
     }
@@ -125,8 +132,8 @@ public final class RequestContext implements RequestScope {
    */
   public XQMap formValues(final MainOptions options) throws QueryException, IOException {
     if(form == null) {
-      // no request (WebSocket connection): no form body
-      final MediaType mt = request != null ? HTTPConnection.mediaType(request) : null;
+      // no live request (WebSocket connection, detached job): no form body
+      final MediaType mt = request != null ? state.mediaType() : null;
       if(mt != null && mt.is(MediaType.MULTIPART_FORM_DATA)) {
         // convert multipart parameters encoded in a form
         try(InputStream is = body().inputStream()) {

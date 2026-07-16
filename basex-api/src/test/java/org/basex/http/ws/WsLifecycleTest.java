@@ -197,12 +197,10 @@ public final class WsLifecycleTest extends WsTest {
   }
 
   /**
-   * The {@code request:*} module is not available inside a WebSocket handler (the servlet
-   * request is recycled after the upgrade). The resulting error is delivered to the client
-   * rather than crashing or hanging the connection.
+   * The {@code request:*} module is available inside a WebSocket message handler.
    * @throws Exception exception
    */
-  @Test public void requestModuleUnavailable() throws Exception {
+  @Test public void requestModuleAvailable() throws Exception {
     register("declare %ws:message('/echo', '{$m}') function m:msg($m) {"
         + " Q{http://exquery.org/ns/request}method() };");
 
@@ -210,7 +208,7 @@ public final class WsLifecycleTest extends WsTest {
     final java.net.http.WebSocket ws = connect("/echo", l);
     try {
       ws.sendText("go", true).get(5, TimeUnit.SECONDS);
-      assertFalse(l.pollText().isEmpty(), "An error message should be delivered to the client.");
+      assertEquals("GET", l.pollText());
     } finally {
       close(ws);
     }

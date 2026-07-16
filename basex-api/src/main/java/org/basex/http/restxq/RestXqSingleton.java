@@ -34,7 +34,7 @@ final class RestXqSingleton {
   RestXqSingleton(final HTTPConnection conn, final String id, final QueryContext qc) {
     this.qc = qc;
     this.id = id;
-    session = conn.request.getSession();
+    session = conn.requestCtx.state().session(true);
     queue();
     register();
   }
@@ -88,7 +88,7 @@ final class RestXqSingleton {
    */
   private QueryContext qc() {
     synchronized(MUTEX) {
-      return HTTPConnection.getAttribute(session, id)
+      return RequestState.attribute(session, id)
           instanceof final QueryContext qctx ? qctx : null;
     }
   }
