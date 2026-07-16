@@ -13,6 +13,19 @@ module namespace chat-ws = 'chat-ws';
 import module namespace chat-util = 'chat/util' at 'chat-util.xqm';
 
 (:~
+ : Runs before a client is allowed to connect: %perm:check functions guard
+ : all URLs below the given path, including WebSocket handshakes. Without
+ : this check, anyone could skip the login page and connect to
+ : ws://HOST/ws/chat directly.
+ :)
+declare
+  %perm:check('/ws/chat')
+function chat-ws:check() as empty-sequence() {
+  (: no user in the session: refuse the upgrade with 403 :)
+  if(empty(session:get($chat-util:id))) then web:error(403, 'Please log in.') else ()
+};
+
+(:~
  : Runs when a new client connects: registers the user, tells all clients,
  : and makes sure the heartbeat job is running.
  :)
