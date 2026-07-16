@@ -142,6 +142,101 @@ public abstract class FnHttpTest extends HTTPTest {
   }
 
   /**
+   * Tests sending of body contents linked via the src attribute.
+   * @throws Exception exception
+   */
+  @Test public final void putSrc() throws Exception {
+    final IOFile file = new IOFile(sandbox(), "src-payload.xml");
+    file.write(token("<src-payload/>"));
+
+    // PUT - contents of linked file
+    try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+        " <http:request method='put' status-only='true'>"
+        + "<http:body media-type='application/xml' src='" + file.url() + "'/>"
+        + "</http:request>", REST_URL), ctx)) {
+      checkResponse(qp.value(), 1, 201);
+    }
+
+    // GET - verify that the contents were transmitted
+    try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+        " <http:request method='get'/>", REST_URL + '/' + NAME + ".xml") + "[2]", ctx)) {
+      assertEquals("<src-payload/>", qp.value().serialize().toString());
+    }
+  }
+
+  /**
+   * Tests lazy retrieval of binary response bodies.
+   * @throws Exception exception
+   */
+  @Test public final void lazyResponse() throws Exception {
+    // store binary resource
+    try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+        " <http:request method='put' status-only='true'>"
+        + "<http:body media-type='text/xml'><x/></http:body>"
+        + "</http:request>", REST_URL), ctx)) {
+      checkResponse(qp.value(), 1, 201);
+    }
+    try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+        " <http:request method='put' status-only='true'>"
+        + "<http:body media-type='application/octet-stream'/>"
+        + "</http:request>", REST_URL + "/data.bin", " xs:base64Binary('QmFzZVg=')"), ctx)) {
+      checkResponse(qp.value(), 1, 201);
+    }
+
+    // response body is lazy; repeated consumptions send new requests, nothing is cached
+    try(QueryProcessor qp = new QueryProcessor(
+        "let $body := " + _HTTP_SEND_REQUEST.args(
+        " <http:request method='get'/>", REST_URL + "/data.bin") + "[2] "
+        + "return string-join((lazy:is-lazy($body), lazy:is-cached($body), "
+        + "hash($body, 'md5') = hash($body, 'md5'), lazy:is-cached($body)) ! string(), ',')",
+        ctx)) {
+      assertEquals("true,false,true,false", qp.value().serialize().toString());
+    }
+  }
+
+  /**
+   * Tests streaming of file-based request payloads.
+   * @throws Exception exception
+   */
+  @Test public final void putLazy() throws Exception {
+    final IOFile file = new IOFile(sandbox(), "lazy-payload.bin");
+    file.write(token("lazy-payload"));
+
+    // PUT - file-backed lazy item is streamed
+    try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+        " <http:request method='put' status-only='true'>"
+        + "<http:body media-type='text/xml'><x/></http:body>"
+        + "</http:request>", REST_URL), ctx)) {
+      checkResponse(qp.value(), 1, 201);
+    }
+    try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+        " <http:request method='put' status-only='true'>"
+        + "<http:body media-type='application/octet-stream'/>"
+        + "</http:request>", REST_URL + "/lazy.bin",
+        " file:read-binary('" + file.url() + "')"), ctx)) {
+      checkResponse(qp.value(), 1, 201);
+    }
+
+    // PUT - lazy response body as request payload (materialized: guards against deadlocks)
+    try(QueryProcessor qp = new QueryProcessor(
+        "let $body := " + _HTTP_SEND_REQUEST.args(
+        " <http:request method='get'/>", REST_URL + "/lazy.bin") + "[2] "
+        + "return " + _HTTP_SEND_REQUEST.args(
+        " <http:request method='put' status-only='true' timeout='10'>"
+        + "<http:body media-type='application/octet-stream'/>"
+        + "</http:request>", REST_URL + "/copy.bin", " $body"), ctx)) {
+      checkResponse(qp.value(), 1, 201);
+    }
+
+    // GET - verify that the contents were transmitted
+    try(QueryProcessor qp = new QueryProcessor(
+        "string(" + _HTTP_SEND_REQUEST.args(
+        " <http:request method='get'/>", REST_URL + "/copy.bin") + "[2])", ctx)) {
+      assertEquals("bGF6eS1wYXlsb2Fk", qp.value().serialize().toString());
+    }
+  }
+
+  /**
    * Test sending of HTTP DELETE requests.
    * @throws Exception exception
    */

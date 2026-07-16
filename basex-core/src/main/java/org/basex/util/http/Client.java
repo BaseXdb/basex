@@ -139,16 +139,13 @@ public final class Client {
 
       // set method, attach payload
       final String method = request.attribute(METHOD);
-      final boolean hasBody = !(request.payload.isEmpty() && request.parts.isEmpty());
+      final String src = request.isMultipart ? null : request.payloadAtts.get(SRC);
+      final boolean hasBody = src != null ||
+          !(request.payload.isEmpty() && request.parts.isEmpty());
       if(method != null) {
-        final BodyPublisher publisher;
-        if(!hasBody) {
-          publisher = HttpRequest.BodyPublishers.noBody();
-        } else {
-          setContentType(rb, request);
-          publisher = HttpRequest.BodyPublishers.ofByteArray(payload(request));
-        }
-        rb.method(method, publisher);
+        if(hasBody) setContentType(rb, request);
+        rb.method(method, hasBody ? publisher(request, src) :
+          HttpRequest.BodyPublishers.noBody());
       }
 
       // assign headers to request; the Content-Type of a payload request is already set above,
@@ -184,6 +181,32 @@ public final class Client {
       Util.debug(ex);
       throw new IOException(ex.getMessage());
     }
+  }
+
+  /**
+   * Returns a publisher for the request payload. The contents of file-based sources are streamed;
+   * other payloads are materialized in advance. Live HTTP response streams are not attached
+   * directly, as reading them while sending can deadlock the shared HTTP client.
+   * @param request request data
+   * @param src linked resource (can be {@code null})
+   * @return publisher
+   * @throws IOException I/O exception
+   */
+  private static BodyPublisher publisher(final Request request, final String src)
+      throws IOException {
+    IO io = null;
+    if(src != null) {
+      io = IO.get(src);
+    } else if(request.payload.size() == 1 &&
+        request.payload.get(0) instanceof final B64IOLazy bin && !bin.isCached() &&
+        Checks.all(request.payloadAtts.entrySet(), att ->
+          att.getKey().equals(SerializerOptions.MEDIA_TYPE.name()) &&
+          Payload.binary(new MediaType(att.getValue())))) {
+      io = bin.input();
+    }
+    return io instanceof final IOFile file ?
+      HttpRequest.BodyPublishers.ofFile(file.file().toPath()) :
+      HttpRequest.BodyPublishers.ofByteArray(payload(request));
   }
 
   /**
