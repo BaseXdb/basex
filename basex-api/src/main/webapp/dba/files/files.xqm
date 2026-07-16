@@ -136,7 +136,8 @@ function dba:files(
         }</form>
 
         <h3>Upload Files</h3>
-        <form method='post' enctype='multipart/form-data' autocomplete='off'>{
+        <form method='post' enctype='multipart/form-data' autocomplete='off'
+              onsubmit='uploading(this);'>{
           <input type='file' name='files' multiple='multiple'/>,
           html:button('file-upload', 'Upload')
         }</form>

@@ -102,6 +102,18 @@ function setText(message, type) {
 }
 
 /**
+ * Indicates that the files of a form are being uploaded.
+ * @param {form} form submitted form
+ */
+function uploading(form) {
+  setText("Files are being uploaded…", "warning");
+  // disable buttons after dispatch, so the clicked button's 'formaction' is still evaluated
+  setTimeout(() => {
+    for(const button of form.querySelectorAll("button")) button.disabled = true;
+  });
+}
+
+/**
  * Creates and sends an HTTP request.
  * @param {url} url URL to be called
  * @param {data} data data to be sent
@@ -390,6 +402,17 @@ function loadCodeMirror(language, edit, resize) {
  */
 function addInput(source) {
   source.href = replaceParam(source.href, "input", document.getElementById("input").value.trim());
+}
+
+/**
+ * Removes query parameters from the address bar, so a page refresh
+ * will not repeat outdated info and error messages.
+ * @param {...string} names parameter names
+ */
+function hideParams(...names) {
+  const url = new URL(window.location.href);
+  for(const name of names) url.searchParams.delete(name);
+  window.history.replaceState(null, "", url);
 }
 
 /**

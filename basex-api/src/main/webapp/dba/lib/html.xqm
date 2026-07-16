@@ -96,7 +96,10 @@ declare function html:wrap(
       <hr/>
       <footer class='right'><sup>BaseX Team, BSD License</sup></footer>
       <div class='small'/>
-      { html:js('buttons();') }
+      {
+        html:js('buttons();'),
+        html:js('hideParams("info", "error");')[exists(($options?info, $options?error)[.])]
+      }
     </body>
   </html>
 };

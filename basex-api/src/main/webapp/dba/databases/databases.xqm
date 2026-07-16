@@ -88,7 +88,8 @@ function dba:databases(
       <td class='vertical'/>
       <td width='50%'>
         <h2>Upload Backups</h2>
-        <form method='post' enctype='multipart/form-data' autocomplete='off'>{
+        <form method='post' enctype='multipart/form-data' autocomplete='off'
+              onsubmit='uploading(this);'>{
           <input type='file' name='files' multiple='multiple'/>,
           html:button('backup-upload', 'Upload')
         }</form>
