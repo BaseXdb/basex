@@ -11,6 +11,16 @@ import module namespace html = 'dba/html' at '../lib/html.xqm';
 (:~ Top category :)
 declare variable $dba:CAT := 'logs';
 
+(:~ Table columns :)
+declare variable $dba:COLUMNS := (
+  { 'key': 'time', 'label': 'Time', 'type': 'dynamic', 'order': 'desc', 'width': '7rem' },
+  { 'key': 'address', 'label': 'Address', 'width': '12rem' },
+  { 'key': 'user', 'label': 'User', 'type': 'dynamic', 'width': '7rem' },
+  { 'key': 'type', 'label': 'Type', 'type': 'dynamic', 'width': '7rem' },
+  { 'key': 'ms', 'label': 'ms', 'type': 'decimal', 'order': 'desc', 'width': '5rem' },
+  { 'key': 'text', 'label': 'Text', 'type': 'dynamic' }
+);
+
 (:~
  : Logs.
  : @param  $input  search input
@@ -127,18 +137,18 @@ function dba:log(
   $page   as xs:string,
   $time   as xs:string?
 ) as element()+ {
-  (: reject an invalid search expression :)
-  let $error := $input[.] ! (try { void(analyze-string('', .)) } catch * { $err:description })
+  (: reject invalid search expressions :)
+  let $filters := map:merge(
+    for $column in $dba:COLUMNS
+    let $value := request:parameter('f-' || $column?key)[.]
+    where exists($value)
+    return { $column?key: $value }
+  )
+  let $error := head(
+    ($input[.], $filters?*) ! (try { void(analyze-string('', .)) } catch * { $err:description })
+  )
   return if ($error) then web:error(400, $error) else
 
-  let $headers := (
-    { 'key': 'time', 'label': 'Time', 'type': 'dynamic', 'order': 'desc' },
-    { 'key': 'address', 'label': 'Address' },
-    { 'key': 'user', 'label': 'User', 'type': 'dynamic' },
-    { 'key': 'type', 'label': 'Type', 'type': 'dynamic' },
-    { 'key': 'ms', 'label': 'ms', 'type': 'decimal', 'order': 'desc' },
-    { 'key': 'text', 'label': 'Text', 'type': 'dynamic' }
-  )
   let $entries := (
     let $ignore-logs := config:get($config:IGNORE-LOGS)
     let $regex-string := matches($input, '[+*?^$(){}|\[\]\\]')
@@ -148,6 +158,10 @@ function dba:log(
     for $log in reverse(admin:logs($date, true()))
     let $text := string($log)
     where not($ignore-logs and matches($text, $ignore-logs, 'i'))
+    (: AND-combine column filters :)
+    where every $key in map:keys($filters) satisfies matches(
+      if ($key = 'text') then $text else string($log/@*[name() = $key]), $filters($key), 'i'
+    )
 
     for $map-results in (
       let $map := {
@@ -194,9 +208,24 @@ function dba:log(
       }
     ))
   )
-  let $params := { 'name': $date, 'input': $input }
-  let $options := { 'sort': $sort, 'presort': 'time', 'page': xs:integer($page) }
-  return html:table($headers, $entries, (), $params, $options)
+  let $params := map:merge((
+    { 'name': $date, 'input': $input },
+    map:for-each($filters, fn($key, $value) { map:entry('f-' || $key, $value) })
+  ))
+  (: filter fields, displayed below the table header :)
+  let $filter-row := element tr {
+    for $column in $dba:COLUMNS
+    let $name := 'f-' || $column?key
+    return element td {
+      <input type='text' class='filter' name='{ $name }' value='{ $filters($column?key) }'
+             placeholder='{ $column?label }' autocomplete='off'
+             title='Filter: { $column?label }' onkeyup='logEntries(event.key);'/>
+    }
+  }
+  let $options := {
+    'sort': $sort, 'presort': 'time', 'page': xs:integer($page), 'filters': $filter-row
+  }
+  return html:table($dba:COLUMNS, $entries, (), $params, $options)
 };
 
 (:~

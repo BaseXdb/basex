@@ -8,7 +8,7 @@ let _updating;
 /** Promise of (latest) running query. */
 let _running;
 
-/** Most recent log entry search string. */
+/** Most recent log entry search state. */
 let _logInput;
 /** Most recent log filter string. */
 let _dbInput;
@@ -67,6 +67,29 @@ function buttons(source) {
 function getForm(source) {
   return source.closest("form");
 }
+
+/**
+ * Toggles the expansion of truncated table cells.
+ */
+document.addEventListener("click", (event) => {
+  const cell = event.target.closest("table.fixed td");
+  // keep state if text is being selected (e.g. for copying it)
+  if(cell?.matches(".truncated, .expanded") && window.getSelection().isCollapsed) {
+    cell.classList.toggle("expanded");
+  }
+});
+
+/**
+ * Marks truncated table cells, indicating that they can be expanded.
+ */
+function markTruncated() {
+  for(const cell of document.querySelectorAll("table.fixed td")) {
+    if(!cell.classList.contains("expanded")) {
+      cell.classList.toggle("truncated", cell.scrollWidth > cell.clientWidth);
+    }
+  }
+}
+window.addEventListener("resize", markTruncated);
 
 /**
  * Asks for confirmation, naming the action and the selected entries.
@@ -148,6 +171,20 @@ function query(path, query, reset) {
     const value = document.getElementById(name)?.value;
     if(value && (name !== "page" || value !== 1 && !reset)) {
       url += `${url === path ? "?" : "&"}${name}=${encodeURIComponent(value)}`;
+    }
+  }
+  const filters = document.querySelectorAll("input.filter");
+  if(filters.length) {
+    for(const input of filters) {
+      const value = input.value.trim();
+      if(value) url += `${url === path ? "?" : "&"}${input.name}=${encodeURIComponent(value)}`;
+    }
+  } else {
+    // initial rendering: filter fields do not exist yet, take values from page URL
+    for(const [name, value] of new URL(window.location.href).searchParams) {
+      if(name.startsWith("f-") && value) {
+        url += `${url === path ? "?" : "&"}${name}=${encodeURIComponent(value)}`;
+      }
     }
   }
   return request(url, query);
@@ -258,20 +295,36 @@ function showResult(text) {
 async function logEntries(key) {
   const reset = key && key !== "Enter";
   const input = document.getElementById("input").value.trim();
-  if(reset && _logInput === input) return false;
-  _logInput = input;
+  const filters = document.querySelectorAll("input.filter");
+  const state = [ input, ...[...filters].map(f => f.value.trim()) ].join("\u0000");
+  if(reset && _logInput === state) return false;
+  _logInput = state;
   try {
     const text = await query("logs", input, reset);
     setText("", "");
+    // preserve focus and caret of a filter field across the table refresh
+    const active = document.activeElement;
+    const focused = active?.matches("input.filter") && active;
     document.getElementById("output").innerHTML = text;
+    markTruncated();
     const e = document.getElementById(window.location.hash.replace(/^#/, ""));
     if(e) e.scrollIntoView();
+    if(focused) {
+      const filter = document.querySelector(`input.filter[name="${focused.name}"]`);
+      if(filter) {
+        filter.value = focused.value;
+        filter.focus();
+        filter.setSelectionRange(focused.selectionStart, focused.selectionEnd);
+      }
+    }
     if(reset) window.history.replaceState(null, "", replaceParam(window.location.href, "page", 1));
   } catch(response) {
     showError(response);
   } finally {
     // refresh browser history
-    window.history.replaceState(null, "", replaceParam(window.location.href, "input", input));
+    let href = replaceParam(window.location.href, "input", input);
+    for(const filter of filters) href = replaceParam(href, filter.name, filter.value.trim());
+    window.history.replaceState(null, "", href);
   }
 }
 
@@ -401,7 +454,11 @@ function loadCodeMirror(language, edit, resize) {
  * @param {link} source clicked link
  */
 function addInput(source) {
-  source.href = replaceParam(source.href, "input", document.getElementById("input").value.trim());
+  let href = replaceParam(source.href, "input", document.getElementById("input").value.trim());
+  for(const input of document.querySelectorAll("input.filter")) {
+    href = replaceParam(href, input.name, input.value.trim());
+  }
+  source.href = href;
 }
 
 /**
@@ -416,20 +473,15 @@ function hideParams(...names) {
 }
 
 /**
- * Replace a query parameter.
+ * Replaces a query parameter; empty values remove the parameter.
  * @param {string} url URL
  * @param {string} name name
  * @param {string} value value
  * @returns {string} new url
  */
 function replaceParam(url, name, value) {
-  const key = `${name}=`;
-  const qm = url.indexOf("?");
-  let href = `${qm < 0 ? url : url.substr(0, qm)}?${key}${encodeURIComponent(value)}`;
-  if(qm >= 0) {
-    for(const param of url.substr(qm + 1).split("&")) {
-      if(param.indexOf(key) < 0) href += `&${param}`;
-    }
-  }
-  return href;
+  const u = new URL(url);
+  if(`${value}`) u.searchParams.set(name, value);
+  else u.searchParams.delete(name);
+  return u.href;
 }

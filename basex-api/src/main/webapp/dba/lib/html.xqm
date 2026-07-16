@@ -223,6 +223,8 @@ declare function html:properties(
  :   * The 'order' attribute defines how sorted values will be ordered:
  :     * 'desc': descending order
  :     * otherwise, ascending order
+ :   * The 'width' attribute assigns a fixed column width. If widths are supplied, the table
+ :     layout gets stable: overflowing values are truncated and can be expanded via clicks.
  :   * The 'main' attribute indicates which column is the main column
  : * The supplied table rows are supplied as elements. Values are contained in attributes; their
  :   names represents the column key.
@@ -234,6 +236,7 @@ declare function html:properties(
  :   * 'link': function for generating a link reference
  :   * 'page': currently displayed page
  :   * 'count': maximum number of results
+ :   * 'filters': table row with filter fields, displayed below the header row
  :
  : @param  $headers  table headers
  : @param  $entries  table entries
@@ -303,7 +306,7 @@ declare function html:table(
     (: result summary :)
     element h3 {
       $entries,
-      if ($entries = 1) then ' Entry' else 'Entries',
+      if ($entries = 1) then 'Entry' else 'Entries',
 
       if ($page-option and $last-page != 1) {
         '(Page: ',
@@ -335,14 +338,17 @@ declare function html:table(
       let $first := ($curr-page - 1) * $max-option + 1
       return $sorted-entries[position() >= $first][position() <= $max-option + 1]
     }
-    where exists($shown-entries)
+    where exists($shown-entries) or exists($options?filters)
+    let $fixed := some $header in $headers satisfies exists($header?width)
     let $table := element table {
+      attribute class { 'fixed' }[$fixed],
       element tr {
         for $header at $pos in $headers
         let $name := $header?key
         let $label := upper-case($header?label)
         return element th {
           attribute class { 'num' }[$header?type = $html:NUMBER],
+          attribute style { 'width: ' || $header?width }[$header?width],
 
           if ($pos = 1 and $buttons) {
             <input type='checkbox' onclick='toggle(this)'/>, ' '
@@ -359,6 +365,7 @@ declare function html:table(
           }
         }
       },
+      $options?filters,
 
       let $link := $options?link
       for $entry in $shown-entries[position() <= $max-option]
