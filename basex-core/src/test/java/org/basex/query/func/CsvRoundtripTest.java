@@ -456,8 +456,7 @@ public final class CsvRoundtripTest extends SandboxTest {
       "<row><field>three</field><field column=\"right\">four</field></row></rows></csv>");
     roundtrip(func, ",&#xA;one,two&#xA;three,four",
       "'header': true()",
-      "<csv xmlns=\"http://www.w3.org/2005/xpath-functions\">" +
-      "<columns><column/><column/></columns><rows>" +
+      "<csv xmlns=\"http://www.w3.org/2005/xpath-functions\"><rows>" +
       "<row><field>one</field><field>two</field></row>" +
       "<row><field>three</field><field>four</field></row></rows></csv>");
     roundtrip(func, "1,2,3,4,5,6,7,8,9,10&#xA;11,12,13,14,15,16,17,18,19,20",

@@ -76,9 +76,12 @@ public class CsvW3XmlConverter extends CsvConverter {
   protected final FNode finish(final InputInfo ii, final QueryContext qc) {
     finishRecord();
     final FBuilder root = FElem.build(Q_FN_CSV);
-    if(!headers.isEmpty()) {
+    // skip trailing empty column names; omit element if no non-empty names exist
+    int size = headers.size();
+    while(size > 0 && headers.get(size - 1).length == 0) --size;
+    if(size > 0) {
       final FBuilder columns = FElem.build(Q_FN_COLUMNS);
-      for(final byte[] h : headers) columns.node(FElem.build(Q_FN_COLUMN).text(h));
+      for(int h = 0; h < size; h++) columns.node(FElem.build(Q_FN_COLUMN).text(headers.get(h)));
       root.node(columns);
     }
     return doc.node(root.node(rows)).finish();

@@ -46,6 +46,8 @@ public final class CsvParser {
   private int rowSize = -1;
   /** Data mode. */
   private boolean data;
+  /** Quoted state of the current field. */
+  private boolean quotedField;
   /** Fields of the current row. */
   private final TokenList fields = new TokenList();
 
@@ -116,6 +118,7 @@ public final class CsvParser {
         if(quotes && entry.isEmpty()) {
           // parse quote
           quoted = true;
+          quotedField = true;
         } else if(strictQuoting) {
           throw QueryError.CSV_QUOTING_X.get(ii, new TokenBuilder().add(entry).add(quoteCharacter));
         } else {
@@ -174,9 +177,11 @@ public final class CsvParser {
   private void record(final TokenBuilder entry, final boolean lastRow, final boolean lastField)
       throws IOException {
     final byte[] next = entry.next();
-    final byte[] field = trimWhitespace || !data ? Token.trim(next) : next;
-    // a single empty field indicates a blank row
-    if(field.length > 0 || !lastField || !fields.isEmpty()) fields.add(field);
+    // quoted fields are never trimmed; header names always are
+    final byte[] field = trimWhitespace && !quotedField || !data ? Token.trim(next) : next;
+    // a single empty unquoted field indicates a blank row
+    if(field.length > 0 || quotedField || !lastField || !fields.isEmpty()) fields.add(field);
+    quotedField = false;
     // wait for the end of the row; skip empty row at the end of the input
     if(!lastField || lastRow && fields.isEmpty()) return;
 

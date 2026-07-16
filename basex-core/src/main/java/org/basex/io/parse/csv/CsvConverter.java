@@ -12,7 +12,6 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -84,12 +83,8 @@ public abstract class CsvConverter extends Job {
     final Value header = copts.get(CsvOptions.HEADER);
     skipEmpty = copts.get(CsvParserOptions.SKIP_EMPTY) && header != Bln.FALSE;
     if(header.seqType().type.isStringOrUntyped()) {
-      final TokenSet names = new TokenSet();
       try {
-        for(final Item columnName : header) {
-          final byte[] token = columnName.string(null);
-          header(names.add(token) ? token : Token.EMPTY);
-        }
+        for(final Item columnName : header) header(columnName.string(null));
       } catch(final QueryException ex) {
         throw Util.notExpected(ex);
       }

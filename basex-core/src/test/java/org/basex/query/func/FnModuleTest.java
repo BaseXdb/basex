@@ -663,6 +663,10 @@ public final class FnModuleTest extends SandboxTest {
         "[\"name\",\"city\"]\n"
       + "[\"Bob\",\"Berlin\"]\n"
       + "[\"Alice\",\"Aachen\"]");
+    // Quoted fields are not trimmed:
+    query(func.args(" '\" a \",b'", " { \"trim-whitespace\": true() }"), "[\" a \",\"b\"]");
+    // An empty quoted field constitutes a non-blank row:
+    query(func.args(" '\"\"'"), "[\"\"]");
     // Comment rows:
     final String comments =
         " string-join(\n"
@@ -687,11 +691,8 @@ public final class FnModuleTest extends SandboxTest {
     // Comment rows are skipped before the header row is chosen:
     query(PARSE_CSV.args(comments, " { 'comment-marker': '#', 'header': true() }") + "?columns",
         "name\ncity");
-    // A newline separator is ignored, as rows are always delimited by newlines:
-    query(func.args("one,two", " { 'separator': char('\\n') }"), "[\"one,two\"]");
-    query(func.args(" `one{ char('\\n') }two`", " { 'separator': char('\\n') }"),
-        "[\"one\"]\n[\"two\"]");
     // Invalid options:
+    error(func.args("", " { 'separator': char('\\n') }"), CSV_NEWLINE_X);
     error(func.args("", " { 'comment-marker': '' }"), CSV_SINGLECHAR_X_X);
     error(func.args("", " { 'comment-marker': '##' }"), CSV_SINGLECHAR_X_X);
     error(func.args("", " { 'comment-marker': char('\\n') }"), CSV_NEWLINE_X);
@@ -724,6 +725,15 @@ public final class FnModuleTest extends SandboxTest {
     // An empty CSV with explicit column names:
     query(func.args("", " { \"header\": (\"name\", \"\", \"city\") }"), resultTag + "<columns>"
       + "<column>name</column><column/><column>city</column></columns><rows/></csv>");
+    // Trailing empty column names are skipped:
+    query(func.args("", " { \"header\": (\"name\", \"\") }"),
+      resultTag + "<columns><column>name</column></columns><rows/></csv>");
+    // Without any non-empty column name, the columns element is omitted:
+    query(func.args("", " { \"header\": (\"\", \"\") }"), resultTag + "<rows/></csv>");
+    // Duplicate column names are retained:
+    query(func.args("A,B", " { \"header\": (\"name\", \"name\") }"),
+      resultTag + "<columns><column>name</column><column>name</column></columns><rows>"
+      + "<row><field column=\"name\">A</field><field column=\"name\">B</field></row></rows></csv>");
     // With defaults for delimiters and quotes, recognizing headers:
     query(queryPrefix + func.args(" $csv-string", " { 'header': true() }"),
       resultTag + "<columns><column>name</column><column>city</column></columns><rows><row><field "

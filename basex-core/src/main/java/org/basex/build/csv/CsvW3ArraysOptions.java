@@ -38,13 +38,13 @@ public class CsvW3ArraysOptions extends Options {
    */
   public CsvParserOptions finish(final InputInfo ii, final CsvFormat format) throws QueryException {
     final IntSet chars = new IntSet();
-    check(get(SEPARATOR), SEPARATOR.name(), true, chars, ii);
-    check(get(QUOTE_CHARACTER), QUOTE_CHARACTER.name(), false, chars, ii);
+    check(get(SEPARATOR), SEPARATOR.name(), chars, ii);
+    check(get(QUOTE_CHARACTER), QUOTE_CHARACTER.name(), chars, ii);
     final Value marker = get(COMMENT_MARKER);
     String cm = "";
     if(!marker.isEmpty()) {
       cm = Token.string(((Item) marker).string(ii));
-      check(cm, COMMENT_MARKER.name(), false, chars, ii);
+      check(cm, COMMENT_MARKER.name(), chars, ii);
     }
 
     final CsvParserOptions copts = new CsvParserOptions();
@@ -61,16 +61,16 @@ public class CsvW3ArraysOptions extends Options {
    * Checks the value of a single-character option.
    * @param value option value
    * @param name option name
-   * @param newline allow newline (rows are always delimited by newlines, so it will be ignored)
    * @param chars characters that have already been assigned
    * @param ii input info (can be {@code null})
    * @throws QueryException query exception
    */
-  private static void check(final String value, final String name, final boolean newline,
-      final IntSet chars, final InputInfo ii) throws QueryException {
+  private static void check(final String value, final String name, final IntSet chars,
+      final InputInfo ii) throws QueryException {
     if(value.codePointCount(0, value.length()) != 1) throw CSV_SINGLECHAR_X_X.get(ii, name, value);
     final int cp = value.codePointAt(0);
-    if(cp == '\n' && !newline) throw CSV_NEWLINE_X.get(ii, name);
+    // newlines are reserved for delimiting rows
+    if(cp == '\n') throw CSV_NEWLINE_X.get(ii, name);
     if(!chars.add(cp)) throw CSV_DELIMITER_X.get(ii, value);
   }
 }
