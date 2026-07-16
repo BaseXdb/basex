@@ -1520,7 +1520,7 @@ public enum QueryError {
 
     /** Error type. */ ADMIN(ADMIN_PREFIX,       ADMIN_URI),
     /** Error type. */ BASEX(BASEX_PREFIX,       BASEX_URI),
-    /** Error type. */ ARCHIVE(ADMIN_PREFIX,     ARCHIVE_URI),
+    /** Error type. */ ARCHIVE(ARCHIVE_PREFIX,   ARCHIVE_URI),
     /** Error type. */ CLIENT(CLIENT_PREFIX,     CLIENT_URI),
     /** Error type. */ CONVERT(CONVERT_PREFIX,   CONVERT_URI),
     /** Error type. */ CSV(CSV_PREFIX,           CSV_URI),
