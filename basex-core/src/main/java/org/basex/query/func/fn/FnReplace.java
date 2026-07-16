@@ -3,13 +3,14 @@ package org.basex.query.func.fn;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
+import java.util.*;
 import java.util.regex.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.regex.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
 
 /**
@@ -21,8 +22,9 @@ import org.basex.query.value.type.*;
 public final class FnReplace extends RegExFn {
   /** Type of the replacement argument. */
   public static final SeqType REPLACEMENT_TYPE =
-      ChoiceItemType.get(BasicType.STRING, FuncType.get(Types.ITEM_ZO,
-          Types.UNTYPED_ATOMIC_O, Types.UNTYPED_ATOMIC_ZM)).seqType(Occ.ZERO_OR_ONE);
+      ChoiceItemType.get(BasicType.STRING, FuncType.get(Types.ITEM_ZO, Types.UNTYPED_ATOMIC_O,
+          MapType.get(ChoiceItemType.get(BasicType.INTEGER, BasicType.STRING),
+              Types.UNTYPED_ATOMIC_O).seqType())).seqType(Occ.ZERO_OR_ONE);
 
   @Override
   protected Str item(final QueryContext qc) throws QueryException {
@@ -48,16 +50,20 @@ public final class FnReplace extends RegExFn {
     final Matcher matcher = regExpr.pattern.matcher(string(value));
 
     if(func) {
+      final String[] names = regExpr.getGroupNames();
       final HofArgs args = new HofArgs(2);
       final StringBuilder sb = new StringBuilder();
       while(matcher.find()) {
-        final ValueBuilder groups = new ValueBuilder(qc);
+        final MapBuilder groups = new MapBuilder();
         final int gc = matcher.groupCount();
-        for(int g = 0; g < gc; g++) {
-          final String grp = matcher.group(g + 1);
-          groups.add(grp == null ? Atm.EMPTY : Atm.get(grp));
+        for(int g = 1; g <= gc; g++) {
+          final String grp = matcher.group(g);
+          if(grp != null) {
+            final String name = g <= names.length ? names[g - 1] : null;
+            groups.put(name != null ? Str.get(name) : Itr.get(g), Atm.get(grp));
+          }
         }
-        args.set(0, Atm.get(matcher.group())).set(1, groups.value());
+        args.set(0, Atm.get(matcher.group())).set(1, groups.map());
         final Item item = invoke(action, args, qc).atomItem(qc, info);
         matcher.appendReplacement(sb, item.isEmpty() ? "" :
           string(item.string(info)).replace("\\", "\\\\").replace("$", "\\$"));
@@ -77,13 +83,15 @@ public final class FnReplace extends RegExFn {
         if(replace[r] == '\\') {
           if(n != '\\' && n != '$') throw REGBACKSLASH_X.get(info, replace);
           ++r;
-        } else if(replace[r] == '$' && (r == 0 || replace[r - 1] != '\\') && !digit(n)) {
+        } else if(replace[r] == '$' && (r == 0 || replace[r - 1] != '\\') &&
+            !digit(n) && n != '<') {
           throw REGDOLLAR_X.get(info, replace);
         }
       }
 
-      // remove unused group references
+      // convert named group references, remove unused group references
       if(contains(replace, '$')) {
+        final List<String> names = Arrays.asList(regExpr.getGroupNames());
         final StringBuilder sb = new StringBuilder();
         final int sl = string.length();
         for(int s = 0; s < sl;) {
@@ -94,10 +102,20 @@ public final class FnReplace extends RegExFn {
           } else if(!isEscaped(string, i)) {
             sb.append(string, s, i);
             s = ++i;
-            if(i < sl && Character.isDigit(string.charAt(i))) i++;
-            final int n = Integer.parseInt(string.substring(s, i));
-            if(n <= matcher.groupCount()) sb.append('$').append(n);
-            s = i;
+            if(string.charAt(s) == '<') {
+              // named group reference: $<name> → ${name}
+              i = string.indexOf('>', s);
+              if(i == -1) throw REGDOLLAR_X.get(info, replace);
+              final String name = string.substring(s + 1, i);
+              if(!names.contains(name)) throw REGGROUP_X.get(info, name);
+              sb.append("${").append(name).append('}');
+              s = i + 1;
+            } else {
+              if(i < sl && Character.isDigit(string.charAt(i))) i++;
+              final int n = Integer.parseInt(string.substring(s, i));
+              if(n <= matcher.groupCount()) sb.append('$').append(n);
+              s = i;
+            }
           } else {
             sb.append(string, s, i + 1);
             s = i + 1;

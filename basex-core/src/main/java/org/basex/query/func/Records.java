@@ -137,9 +137,8 @@ public enum Records {
         add("flags", Types.STRING_O).
         add("matches", FuncType.get(Types.BOOLEAN_O, Types.STRING_O).seqType()).
         add("tokenize", FuncType.get(Types.STRING_ZM, Types.STRING_O).seqType()).
-        add("replace", FuncType.get(Types.STRING_O, Types.STRING_O, ChoiceItemType.get(
-            BasicType.STRING, FuncType.get(Types.ITEM_ZO, Types.UNTYPED_ATOMIC_O,
-                Types.UNTYPED_ATOMIC_ZM)).seqType(Occ.ZERO_OR_ONE)).seqType()).
+        add("replace", FuncType.get(Types.STRING_O, Types.STRING_O,
+            FnReplace.REPLACEMENT_TYPE).seqType()).
         add("analyze-string", FuncType.get(
             NodeType.get(NameTest.get(FnAnalyzeString.Q_ANALYZE_STRING_RESULT)).seqType(),
             Types.STRING_O).seqType()).

@@ -3550,8 +3550,8 @@ return
     query(func.args("c", "c", " fn($k, $g) { upper-case($k) }"), "C");
     query(func.args("de", ".", " fn($k, $g) { $k || $k }"), "ddee");
 
-    // GH-2692: unmatched groups supplied to replacement functions are zero-length strings
-    query(func.args("", "(X)?", " fn($_, $groups) { $groups[1] }"), "");
+    // GH-2692: unmatched groups are absent from the groups map
+    query(func.args("", "(X)?", " fn($_, $groups) { $groups?1 }"), "");
 
     // GH-2697: unmatched groups
     query(func.args("a", "(a)|(b)", " fn($m){$m}"), "a");
@@ -3565,30 +3565,31 @@ return
         + func.args("LHR to LAX", "[A-Z]{3}", " fn($s, $g) { $map($s) }"),
         "London to Los Angeles");
     query(func.args("57°43′30″", "([0-9]+)°([0-9]+)′([0-9]+)″", " fn($s, $g) "
-        + "{ string(number($g[1]) + number($g[2]) div 60 + number($g[3]) div 3600) || '°' }"),
+        + "{ string(number($g?1) + number($g?2) div 60 + number($g?3) div 3600) || '°' }"),
         "57.725°");
     query(func.args("A1 B234", "([A-Z]+)([0-9]+)",
-        " fn($s, $g) { string-join(characters($g[2]) ! ($g[1] || .)) }"),
+        " fn($s, $g) { string-join(characters($g?2) ! ($g?1 || .)) }"),
         "A1 B2B3B4");
     query(func.args("A(0)B(1)C(0)D(9)", "(.)\\((\\d)\\)",
-        " fn($s, $g) { $g[1][$g[2] != '0'] }"),
+        " fn($s, $g) { $g?1[$g?2 != '0'] }"),
         "BD");
-    query(func.args("chop first character ", "(.).*? ", " substring-after#2"),
+    query(func.args("chop first character ", "(.).*? ", " fn($s, $g) "
+        + "{ substring-after($s, $g?1) }"),
         "hop irst haracter ");
-    query(func.args("12345678", ".(.)", " replace(?, ?, '')"),
+    query(func.args("12345678", ".(.)", " fn($s, $g) { replace($s, $g?1, '') }"),
         1357);
     query("for $function in (head#1, tail#1) return" +
-        func.args("1234", "(.)(.)", " fn($s, $g) { $function($g) }"),
+        func.args("1234", "(.)(.)", " fn($s, $g) { $function($g?*) }"),
         "13\n24");
     query("for $function in (substring-before#2, substring-after#2) return" +
-        func.args("1234", ".(..)", " $function"),
+        func.args("1234", ".(..)", " fn($s, $g) { $function($s, $g?1) }"),
         "14\n4");
     query("for $before in (true(), false()) "
         + "let $name := 'fn:substring-' || (if($before) then 'before' else 'after') "
         + "let $function := function-lookup(xs:QName($name), 2) "
-        + "return" + func.args("1234", ".(..)", " $function"),
+        + "return" + func.args("1234", ".(..)", " fn($s, $g) { $function($s, $g?1) }"),
         "14\n4");
-    query(func.args("X", ".", " contains#2"), true);
+    query(func.args("X", ".", " fn($s, $g) { map:size($g) = 0 }"), true);
     query(func.args("1", "(.)", " fn($n, $_) { $n + 1 }"), 2);
 
     query(func.args("bab", "a", " fn($_, $__) {}"), "bb");
@@ -3598,6 +3599,31 @@ return
     query(func.args("abcde", "b(.)d", "$1", "j"), "ace");
 
     query(func.args("W", ".*", " fn($k, $g) { '~' }"), "~~");
+
+    // named capturing groups in replacement strings
+    query(func.args("2026-06-25", "(?<year>\\d{4})-(?<month>\\d{2})-(?<day>\\d{2})",
+        "$<day>/$<month>/$<year>"), "25/06/2026");
+    query(func.args("ab", "(?<first>a)(b)", "$2$<first>"), "ba");
+    query(func.args("b", "(?<a>a)|b", "[$<a>]"), "[]");
+    query(func.args("x$<a>x", "$<a>", "y", "q"), "xyx");
+    error(func.args("x", "(?<a>x)", "$<b>"), REGGROUP_X);
+    error(func.args("x", "(?<a>x)", "$<a"), REGDOLLAR_X);
+    error(func.args("x", "x", "$x"), REGDOLLAR_X);
+
+    // named capturing groups in replacement functions
+    query(func.args("42 plus 7", "(?<first>\\d+) plus (?<second>\\d+)",
+        " fn($s, $g) { string($g?first + $g?second) }"), "49");
+    query(func.args("A1", "(?<letter>[A-Z])([0-9])",
+        " fn($s, $g) { string-join(map:keys($g), ',') }"), "letter,2");
+    query(func.args("b", "(?<a>a)|(?<b>b)",
+        " fn($s, $g) { string-join(map:keys($g), ',') }"), "b");
+
+    // named back-references
+    query(func.args("cool food", "(?<c>[od])\\k<c>", "X"), "cXl fXd");
+    query(func.args("'a' \"b\"", "(?<quote>['\"]).*?\\k<quote>", "Q"), "Q Q");
+    error(func.args("x", "(?<a>x)\\k<b>", ""), REGINVALID_X);
+    error(func.args("x", "\\k<a>(?<a>x)", ""), REGINVALID_X);
+    error(func.args("x", "[\\k<a>](?<a>x)", ""), REGINVALID_X);
   }
 
   /** Test method. */

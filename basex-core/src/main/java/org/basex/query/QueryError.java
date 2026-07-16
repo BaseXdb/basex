@@ -771,6 +771,8 @@ public enum QueryError {
   REGBACKSLASH_X(FORX, 4, "Invalid backslash in replacement string: %."),
   /** Error code. */
   REGDOLLAR_X(FORX, 4, "Invalid dollar sign in replacement string: %."),
+  /** Error code. */
+  REGGROUP_X(FORX, 4, "Unknown group name in replacement string: $<%>."),
 
   /** Error code. */
   FIATOMIZE_X(FOTY, 13, "Atomic item required, function item found: %."),
