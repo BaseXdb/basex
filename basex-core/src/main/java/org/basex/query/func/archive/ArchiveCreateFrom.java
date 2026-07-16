@@ -21,7 +21,8 @@ import org.basex.util.list.*;
  */
 public final class ArchiveCreateFrom extends ArchiveCreate {
   @Override
-  public void create(final OutputStream os, final QueryContext qc) throws QueryException {
+  public void create(final OutputStream os, final IOFile target, final QueryContext qc)
+      throws QueryException {
     final IOFile root = new IOFile(toPath(arg(0), qc));
     final CreateFromOptions options = toOptions(arg(1), new CreateFromOptions(), qc);
     Value entries = arg(2).value(qc);
@@ -31,12 +32,15 @@ public final class ArchiveCreateFrom extends ArchiveCreate {
     if(!root.isDir()) throw FILE_NO_DIR_X.get(info, root);
 
     if(entries.isEmpty()) {
+      // collect directory contents, exclude the target archive
       final TokenList tl = new TokenList();
       if(recursive) {
-        for(final String file : root.descendants()) tl.add(file);
+        for(final String file : root.descendants()) {
+          if(!new IOFile(root, file).eq(target)) tl.add(file);
+        }
       } else {
         for(final IOFile file : root.children()) {
-          if(!file.isDir()) tl.add(file.name());
+          if(!file.isDir() && !file.eq(target)) tl.add(file.name());
         }
       }
       entries = StrSeq.get(tl);

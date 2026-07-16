@@ -595,6 +595,17 @@ public final class FileModuleTest extends SandboxTest {
     query(func.args(PATH1, bin));
     query(func.args(PATH1, _LAZY_CACHE.args(_FILE_READ_BINARY.args(PATH1))));
     query(_FILE_READ_TEXT.args(PATH1), "0");
+
+    // streamed archive:create-from: exclude target from archive contents
+    query(_FILE_DELETE.args(PATH1));
+    query(_FILE_CREATE_DIR.args(PATH1));
+    query(func.args(PATH3, bin));
+    final String archive = PATH1 + "/archive.zip";
+    query(func.args(archive, _ARCHIVE_CREATE_FROM.args(PATH1)));
+    query(_ARCHIVE_ENTRIES.args(_FILE_READ_BINARY.args(archive)) + " ! string()", "x");
+    // repeated run: existing target must be excluded as well
+    query(func.args(archive, _ARCHIVE_CREATE_FROM.args(PATH1)));
+    query(_ARCHIVE_ENTRIES.args(_FILE_READ_BINARY.args(archive)) + " ! string()", "x");
   }
 
   /** Test method. */

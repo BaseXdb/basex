@@ -48,7 +48,7 @@ public class FileWriteBinary extends FileWriteFn {
     } else if(arg(1) instanceof final ArchiveCreate ac) {
       // optimization: stream archive to disk (archive:create, archive:create-from)
       try(BufferOutput out = BufferOutput.get(new FileOutputStream(path.toFile(), append))) {
-        ac.create(out, qc);
+        ac.create(out, new IOFile(path), qc);
       }
     } else {
       // default case: no archive, no offset
