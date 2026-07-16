@@ -164,6 +164,26 @@ public final class WsPoolTest extends WsTest {
   }
 
   /**
+   * {@code ws:ping} sends a protocol-level ping frame; no message handler is involved
+   * on either side.
+   * @throws Exception exception
+   */
+  @Test public void ping() throws Exception {
+    register(
+        "declare %ws:message('/p', '{$m}') function m:msg($m) { ws:ping(ws:id()) };");
+
+    final Listener l = new Listener();
+    final java.net.http.WebSocket ws = connect("/p", l);
+    try {
+      ws.sendText("beat", true).get(5, TimeUnit.SECONDS);
+      await(() -> l.pinged ? Boolean.TRUE : null);
+      assertNull(l.texts.poll(), "Ping should not arrive as a text message.");
+    } finally {
+      close(ws);
+    }
+  }
+
+  /**
    * {@code ws:get($unknown-id, ...)} raises a query error which is delivered to the client.
    * @throws Exception exception
    */

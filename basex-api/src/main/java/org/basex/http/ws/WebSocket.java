@@ -156,6 +156,14 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
   }
 
   /**
+   * Sends a ping frame to the connected client.
+   */
+  public void ping() {
+    final Session sess = getSession();
+    if(sess != null && sess.isOpen()) sess.sendPing(ByteBuffer.allocate(0), Callback.NOOP);
+  }
+
+  /**
    * Finds a function and processes it.
    * @param ann annotation
    * @param message message (can be {@code null}; otherwise string, byte array or close info)

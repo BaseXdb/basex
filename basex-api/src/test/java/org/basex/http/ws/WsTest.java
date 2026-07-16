@@ -149,6 +149,8 @@ public abstract class WsTest extends HTTPTest {
     public volatile String closeReason;
     /** Error, or {@code null} if no error occurred. */
     public volatile Throwable error;
+    /** Indicates if a ping frame was received. */
+    public volatile boolean pinged;
 
     /** Accumulator for text frame parts. */
     private final StringBuilder textBuf = new StringBuilder();
@@ -177,6 +179,13 @@ public abstract class WsTest extends HTTPTest {
         binaries.add(binBuf.toByteArray());
         binBuf = new ByteArrayOutputStream();
       }
+      ws.request(1);
+      return null;
+    }
+
+    @Override
+    public CompletionStage<?> onPing(final java.net.http.WebSocket ws, final ByteBuffer message) {
+      pinged = true;
       ws.request(1);
       return null;
     }
