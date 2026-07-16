@@ -7,6 +7,7 @@ import java.net.*;
 import java.net.http.*;
 import java.nio.*;
 import java.time.*;
+import java.util.*;
 import java.util.concurrent.*;
 
 import org.basex.core.*;
@@ -64,14 +65,18 @@ public abstract class WsTest extends HTTPTest {
    * Opens a WebSocket connection to the test server.
    * @param path WebSocket path (must start with "/")
    * @param listener listener
+   * @param subprotocols sub-protocols to offer, in order of preference (optional)
    * @return JDK WebSocket client
    * @throws Exception exception
    */
-  protected static java.net.http.WebSocket connect(final String path, final Listener listener)
-      throws Exception {
+  protected static java.net.http.WebSocket connect(final String path, final Listener listener,
+      final String... subprotocols) throws Exception {
     final HttpClient client = HttpClient.newHttpClient();
-    return client.newWebSocketBuilder().connectTimeout(Duration.ofSeconds(10)).
-        buildAsync(URI.create(WS_ROOT + path), listener).get(10, TimeUnit.SECONDS);
+    final java.net.http.WebSocket.Builder wsb = client.newWebSocketBuilder().
+        connectTimeout(Duration.ofSeconds(10));
+    if(subprotocols.length > 0) wsb.subprotocols(subprotocols[0],
+        Arrays.copyOfRange(subprotocols, 1, subprotocols.length));
+    return wsb.buildAsync(URI.create(WS_ROOT + path), listener).get(10, TimeUnit.SECONDS);
   }
 
   /**

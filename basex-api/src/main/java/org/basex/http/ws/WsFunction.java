@@ -11,6 +11,7 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
+import org.basex.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -30,6 +31,8 @@ public final class WsFunction extends WebFunction {
   private WebParam status;
   /** Close reason parameter. */
   private WebParam reason;
+  /** Declared sub-protocols. */
+  public final StringList subprotocols = new StringList(1);
 
   /**
    * Close information.
@@ -62,6 +65,9 @@ public final class WsFunction extends WebFunction {
       found = true;
       final Value value = ann.value();
       switch(def) {
+        case _WS_SUBPROTOCOL:
+          for(final Item item : value) subprotocols.add(toString(item));
+          continue;
         case _WS_CLOSE:
           if(value.size() > 1) status = param(value.itemAt(1), "status", declared);
           if(value.size() > 2) reason = param(value.itemAt(2), "reason", declared);
@@ -76,6 +82,8 @@ public final class WsFunction extends WebFunction {
       path = parsePath(value, ann, declared);
       starts = starts.attach(ann);
     }
+    if(!subprotocols.isEmpty() && !matches(Annotation._WS_CONNECT, null))
+      throw error("%ws:subprotocol requires a %ws:connect annotation.");
     return checkParsed(found, starts, declared);
   }
 

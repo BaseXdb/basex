@@ -184,6 +184,25 @@ public final class WsPoolTest extends WsTest {
   }
 
   /**
+   * Pool functions can be called from outside a WebSocket context: a scheduled job
+   * pings all connected clients (as the chat demo's heartbeat does).
+   * @throws Exception exception
+   */
+  @Test public void pingFromJob() throws Exception {
+    register("declare %ws:message('/p', '{$m}') function m:msg($m) {"
+        + " void(job:eval('ws:ids() ! ws:ping(.)', ())) };");
+
+    final Listener l = new Listener();
+    final java.net.http.WebSocket ws = connect("/p", l);
+    try {
+      ws.sendText("go", true).get(5, TimeUnit.SECONDS);
+      await(() -> l.pinged ? Boolean.TRUE : null);
+    } finally {
+      close(ws);
+    }
+  }
+
+  /**
    * {@code ws:get($unknown-id, ...)} raises a query error which is delivered to the client.
    * @throws Exception exception
    */

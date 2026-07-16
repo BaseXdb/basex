@@ -198,7 +198,10 @@ public final class WebModules {
   public boolean websocket(final WebSocket ws) throws QueryException, IOException {
     boolean found = false;
     for(final Annotation ann : Annotation.values()) {
-      if(eq(ann.name.uri(), QueryText.WS_URI)) found |= websocket(ws, ann) != null;
+      if(ann == Annotation._WS_SUBPROTOCOL || !eq(ann.name.uri(), QueryText.WS_URI)) continue;
+      final WsFunction func = websocket(ws, ann);
+      found |= func != null;
+      if(func != null && ann == Annotation._WS_CONNECT) ws.negotiate(func.subprotocols);
     }
     return found;
   }

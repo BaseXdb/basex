@@ -12,6 +12,8 @@ public final class WsCreator implements JettyWebSocketCreator {
   @Override
   public Object createWebSocket(final JettyServerUpgradeRequest request,
       final JettyServerUpgradeResponse response) {
-    return WebSocket.get(request.getHttpServletRequest());
+    final WebSocket ws = WebSocket.get(request.getHttpServletRequest());
+    if(ws != null && ws.subprotocol != null) response.setAcceptedSubProtocol(ws.subprotocol);
+    return ws;
   }
 }

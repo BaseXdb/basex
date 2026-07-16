@@ -11,6 +11,7 @@ import org.basex.query.value.*;
 import org.basex.server.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
+import org.basex.util.list.*;
 import org.basex.util.log.*;
 import org.eclipse.jetty.websocket.api.*;
 import org.eclipse.jetty.websocket.api.exceptions.*;
@@ -39,6 +40,11 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
   public String id;
   /** HTTP Session. */
   public HttpSession session;
+  /** Negotiated sub-protocol ({@code null} if none). */
+  public String subprotocol;
+
+  /** Sub-protocols offered by the client. */
+  private final String[] offered;
 
   /**
    * Constructor.
@@ -47,6 +53,8 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
   private WebSocket(final HttpServletRequest request) {
     final String pi = request.getPathInfo();
     path = pi != null ? pi : "/";
+    final String sp = request.getHeader("Sec-WebSocket-Protocol");
+    offered = sp != null ? sp.trim().split("\\s*,\\s*") : new String[0];
     session = request.getSession();
     // capture request values during the handshake, as the request is recycled afterwards
     requestCtx = new RequestContext(request).detach();
@@ -152,6 +160,20 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
       sess.sendBinary(bb, Callback.NOOP);
     } else {
       sess.sendText((String) value, Callback.NOOP);
+    }
+  }
+
+  /**
+   * Negotiates the sub-protocol: chooses the first protocol offered by the client
+   * that has also been declared by the connect function.
+   * @param declared declared sub-protocols
+   */
+  public void negotiate(final StringList declared) {
+    for(final String offer : offered) {
+      if(declared.contains(offer)) {
+        subprotocol = offer;
+        return;
+      }
     }
   }
 

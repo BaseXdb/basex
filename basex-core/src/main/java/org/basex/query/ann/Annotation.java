@@ -176,7 +176,9 @@ public enum Annotation {
   /** XQuery annotation. */
   _WS_CLOSE("close(path[,status,reason])", params(STRING, STRING, STRING), WS_URI),
   /** XQuery annotation. */
-  _WS_ERROR("error(path,message)", params(STRING, STRING), WS_URI);
+  _WS_ERROR("error(path,message)", params(STRING, STRING), WS_URI),
+  /** XQuery annotation. */
+  _WS_SUBPROTOCOL("subprotocol(protocol[,protocols...])", params(STRING), WS_URI);
 
   /** Parameter types. */
   public final BasicType[] params;
