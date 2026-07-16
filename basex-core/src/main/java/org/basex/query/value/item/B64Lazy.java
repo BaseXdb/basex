@@ -4,10 +4,8 @@ import java.io.*;
 import java.util.function.*;
 
 import org.basex.data.*;
-import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
-import org.basex.query.func.Function;
 import org.basex.util.*;
 
 /**
@@ -16,9 +14,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class B64Lazy extends B64 implements Lazy {
-  /** File reference. */
-  private final IO input;
+public abstract class B64Lazy extends B64 implements Lazy {
   /** Error message. */
   private final QueryError error;
   /** Caching flag. */
@@ -26,81 +22,68 @@ public final class B64Lazy extends B64 implements Lazy {
 
   /**
    * Constructor.
-   * @param input input
    * @param error error message to be thrown
    */
-  public B64Lazy(final IO input, final QueryError error) {
-    this.input = input;
+  B64Lazy(final QueryError error) {
     this.error = error;
   }
 
+  /**
+   * Opens a stream on the uncached value.
+   * @return buffered input
+   * @throws IOException I/O exception
+   */
+  abstract BufferInput open() throws IOException;
+
   @Override
-  public byte[] binary(final InputInfo info) throws QueryException {
+  public final byte[] binary(final InputInfo info) throws QueryException {
     cache(info);
     return data;
   }
 
   @Override
-  public BufferInput input(final InputInfo ii) throws QueryException {
+  public final BufferInput input(final InputInfo ii) throws QueryException {
     if(cache) cache(ii);
     if(isCached()) return super.input(ii);
     try {
-      return BufferInput.get(input);
-    } catch(final IOException ex) {
-      Util.debug(ex);
-      throw error.get(ii,  input);
-    }
-  }
-
-  /**
-   * Returns the input reference.
-   * @return input
-   */
-  public IO input() {
-    return input;
-  }
-
-
-  @Override
-  public void cache(final  boolean lazy, final InputInfo ii) throws QueryException {
-    if(lazy) cache = true;
-    else cache(ii);
-  }
-
-  @Override
-  public void cache(final InputInfo ii) throws QueryException {
-    try {
-      if(!isCached()) data = input.read();
+      return open();
     } catch(final IOException ex) {
       throw error.get(ii, ex);
     }
   }
 
   @Override
-  public boolean isCached() {
+  public final void cache(final boolean lazy, final InputInfo ii) throws QueryException {
+    if(lazy) cache = true;
+    else cache(ii);
+  }
+
+  @Override
+  public final void cache(final InputInfo ii) throws QueryException {
+    if(isCached()) return;
+    try(BufferInput bi = open()) {
+      data = bi.content();
+    } catch(final IOException ex) {
+      throw error.get(ii, ex);
+    }
+  }
+
+  @Override
+  public final boolean isCached() {
     return data != null;
   }
 
   @Override
-  public Item materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
-      throws QueryException {
+  public final Item materialize(final Predicate<Data> test, final InputInfo ii,
+      final QueryContext qc) throws QueryException {
     cache(ii);
     return this;
   }
 
   @Override
-  public boolean materialized(final Predicate<Data> test, final InputInfo ii)
+  public final boolean materialized(final Predicate<Data> test, final InputInfo ii)
       throws QueryException {
     cache(ii);
     return true;
-  }
-
-  @Override
-  public void toString(final QueryString qs) {
-    if(isCached()) {
-      super.toString(qs);
-    } else {
-      qs.function(Function._FILE_READ_BINARY, input);
-    }
   }
 }

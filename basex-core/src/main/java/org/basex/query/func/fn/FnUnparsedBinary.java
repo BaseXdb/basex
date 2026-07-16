@@ -19,7 +19,7 @@ public final class FnUnparsedBinary extends ParseFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String source = toStringOrNull(arg(0), qc);
-    return source == null ? Empty.VALUE : new B64Lazy(toIO(source, false), RESWHICH_X);
+    return source == null ? Empty.VALUE : new B64IOLazy(toIO(source, false), RESWHICH_X);
   }
 
   @Override

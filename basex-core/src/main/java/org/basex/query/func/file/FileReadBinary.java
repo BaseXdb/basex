@@ -31,7 +31,7 @@ public final class FileReadBinary extends FileFn {
     final long off = offset != null ? offset : 0;
     long len = length != null ? length : Long.MAX_VALUE;
     if(off == 0 && len == Long.MAX_VALUE) {
-      return new B64Lazy(new IOFile(path), FILE_IO_ERROR_X);
+      return new B64IOLazy(new IOFile(path), FILE_IO_ERROR_X);
     }
 
     // read chunk

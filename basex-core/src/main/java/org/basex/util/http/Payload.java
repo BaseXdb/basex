@@ -318,6 +318,17 @@ public final class Payload {
   // STATIC METHODS ===============================================================================
 
   /**
+   * Checks if a media type is treated as binary data (see {@link #value}).
+   * @param type media type
+   * @return result of check
+   */
+  public static boolean binary(final MediaType type) {
+    return !(type.isJSON() || type.isCSV() || type.is(MediaType.TEXT_HTML) || type.isXml() ||
+        type.isText() || type.is(MediaType.APPLICATION_X_WWW_FORM_URLENCODED) ||
+        type.isMultipart());
+  }
+
+  /**
    * Returns an XQuery value for the specified body.
    * @param body body
    * @param type type of the body

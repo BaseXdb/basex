@@ -19,6 +19,6 @@ public final class HttpSendRequest extends StandardFunc {
     final byte[] href = toZeroToken(arg(1), qc);
     final Value body = arg(2).value(qc);
 
-    return new Client(info, qc.context.options).sendRequest(href, request, body);
+    return new Client(info, qc.context.options).sendRequest(href, request, body, qc);
   }
 }

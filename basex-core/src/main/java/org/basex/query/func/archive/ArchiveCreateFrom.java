@@ -52,7 +52,7 @@ public final class ArchiveCreateFrom extends ArchiveCreate {
           final IOFile file = new IOFile(root, toString(item, qc));
           if(!file.exists()) throw FILE_NOT_FOUND_X.get(info, file);
           if(file.isDir()) throw FILE_IS_DIR_X.get(info, file);
-          add(new SimpleEntry<>(item, new B64Lazy(file, FILE_NOT_FOUND_X)), out, level, dir, qc);
+          add(new SimpleEntry<>(item, new B64IOLazy(file, FILE_NOT_FOUND_X)), out, level, dir, qc);
         }
       } catch(final IOException ex) {
         throw ARCHIVE_ERROR_X.get(info, ex);

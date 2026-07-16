@@ -80,7 +80,7 @@ final class SpillOutput extends OutputStream {
    */
   B64 finish(final QueryError error) throws IOException {
     if(file != null) file.flush();
-    return io != null ? new B64Lazy(io, error) : B64.get(array.finish());
+    return io != null ? new B64IOLazy(io, error) : B64.get(array.finish());
   }
 
   /**

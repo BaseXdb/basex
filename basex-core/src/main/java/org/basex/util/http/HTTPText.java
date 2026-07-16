@@ -39,6 +39,8 @@ public interface HTTPText {
   /** HTTP header string. */
   String CONTENT_ENCODING = "Content-Encoding";
   /** HTTP header string. */
+  String CONTENT_LENGTH = "Content-Length";
+  /** HTTP header string. */
   String USER_AGENT = "User-Agent";
   /** HTTP header string. */
   String CONTENT_TYPE = "Content-Type";

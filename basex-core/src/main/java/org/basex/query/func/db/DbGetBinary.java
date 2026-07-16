@@ -24,7 +24,7 @@ public final class DbGetBinary extends DbGetValue {
 
   @Override
   Value resource(final IOFile path, final QueryContext qc) {
-    return new B64Lazy(path, IOERR_X);
+    return new B64IOLazy(path, IOERR_X);
   }
 
   @Override

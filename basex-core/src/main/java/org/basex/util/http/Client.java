@@ -59,11 +59,12 @@ public final class Client {
    * @param href URL to send the request to (can be empty string)
    * @param request request data
    * @param bodies request body
+   * @param qc query context
    * @return HTTP response
    * @throws QueryException query exception
    */
-  public Value sendRequest(final byte[] href, final XNode request, final Value bodies)
-      throws QueryException {
+  public Value sendRequest(final byte[] href, final XNode request, final Value bodies,
+      final QueryContext qc) throws QueryException {
 
     final Request req = new RequestParser(info).parse(request, bodies);
     final URI uri = uri(href, req);
@@ -80,7 +81,7 @@ public final class Client {
       mopts.set(MainOptions.HTMLPARSER,
           assign(new HtmlOptions(mopts.get(MainOptions.HTMLPARSER)), req.attribute(HTML)));
 
-      return new Response(info, mopts).getResponse(send(uri, req), body, mediaType);
+      return new Response(info, mopts, uri, req, qc).getResponse(send(uri, req), body, mediaType);
     } catch(final IOException ex) {
       throw HC_ERROR_X.get(info, ex);
     }
@@ -125,7 +126,7 @@ public final class Client {
    * @throws IOException I/O Exception
    * @throws MalformedURLException incorrect url
    */
-  private static HttpResponse<InputStream> send(final URI uri, final Request request)
+  public static HttpResponse<InputStream> send(final URI uri, final Request request)
       throws IOException {
 
     final HttpRequest.Builder rb;
