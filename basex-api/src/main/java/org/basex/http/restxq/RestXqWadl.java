@@ -8,7 +8,6 @@ import java.util.regex.*;
 
 import jakarta.servlet.http.*;
 
-import org.basex.http.*;
 import org.basex.http.web.*;
 import org.basex.http.web.WebFunction.*;
 import org.basex.query.*;
@@ -107,7 +106,7 @@ public final class RestXqWadl {
         // create response
         final FBuilder response = FElem.build(Q_RESPONSE);
         final FBuilder representation = FElem.build(Q_REPRESENTATION);
-        representation.attr(Q_MEDIA_TYPE, HTTPConnection.mediaType(func.sopts));
+        representation.attr(Q_MEDIA_TYPE, func.sopts.mediaType());
         response.node(representation);
         method.node(response);
 

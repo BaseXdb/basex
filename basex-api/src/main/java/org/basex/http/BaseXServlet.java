@@ -89,7 +89,7 @@ public abstract class BaseXServlet extends HttpServlet {
           Util.debug(e);
           body = ex.getLocalizedMessage();
         }
-        conn.error(code, ex.getLocalizedMessage(), body, HTTPConnection.mediaType(sopts));
+        conn.error(code, ex.getLocalizedMessage(), body, sopts.mediaType());
       } else {
         conn.error(code, full ? Util.message(ex) : ex.getLocalizedMessage());
       }

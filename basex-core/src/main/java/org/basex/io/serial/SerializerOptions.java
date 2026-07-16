@@ -20,6 +20,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.http.*;
 import org.basex.util.options.*;
 
 /**
@@ -276,6 +277,24 @@ public final class SerializerOptions extends Options {
       }
     }
     return this;
+  }
+
+  /**
+   * Returns the media type defined by these serialization parameters.
+   * @return media type
+   */
+  public MediaType mediaType() {
+    // return specified content type
+    final String type = get(MEDIA_TYPE);
+    if(!type.isEmpty()) return new MediaType(type);
+
+    // determine content type via output method
+    final SerialMethod sm = get(METHOD);
+    if(sm == SerialMethod.BASEX || sm == SerialMethod.ADAPTIVE || sm == SerialMethod.XML)
+      return MediaType.APPLICATION_XML;
+    if(sm == SerialMethod.XHTML || sm == SerialMethod.HTML) return MediaType.TEXT_HTML;
+    if(sm == SerialMethod.JSON) return MediaType.APPLICATION_JSON;
+    return MediaType.TEXT_PLAIN;
   }
 
   /**
