@@ -47,7 +47,7 @@ public final class WsResponse extends WebResponse {
 
     func = new WsFunction(function.function, function.module, qc);
     func.parseAnnotations(null);
-    return func.bind(data, qc);
+    return func.bind(data, ws.path, qc);
   }
 
   @Override

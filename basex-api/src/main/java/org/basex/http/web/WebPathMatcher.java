@@ -1,4 +1,4 @@
-package org.basex.http.restxq;
+package org.basex.http.web;
 
 import static java.math.BigInteger.*;
 import static org.basex.http.web.WebText.*;
@@ -13,23 +13,23 @@ import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
- * RESTXQ path template.
+ * Web path template, shared by RESTXQ and WebSocket endpoints.
  *
  * @author BaseX Team, BSD License
  * @author Dimitar Popov
  */
-final class RestXqPathMatcher {
+final class WebPathMatcher implements Comparable<WebPathMatcher> {
   /** Default matcher for empty path templates. */
-  private static final RestXqPathMatcher EMPTY =
-      new RestXqPathMatcher("/", Collections.emptyList(), 0, ZERO);
+  private static final WebPathMatcher EMPTY =
+      new WebPathMatcher("/", Collections.emptyList(), 0, ZERO);
   /** Variable names defined in the path template. */
   final List<QNm> varNames;
-  /** Compiled regular expression which matches paths defined by the path annotation. */
-  final Pattern pattern;
   /** Number of path segments. */
   final int segments;
   /** Bit array with variable positions within the path template. */
   final BigInteger varsPos;
+  /** Compiled regular expression which matches paths defined by the path annotation. */
+  final Pattern pattern;
 
   /**
    * Constructor.
@@ -38,7 +38,7 @@ final class RestXqPathMatcher {
    * @param segments segment count
    * @param varsPos variable position
    */
-  private RestXqPathMatcher(final String regex, final List<QNm> varNames, final int segments,
+  private WebPathMatcher(final String regex, final List<QNm> varNames, final int segments,
       final BigInteger varsPos) {
     this.varNames = varNames;
     this.segments = segments;
@@ -87,14 +87,32 @@ final class RestXqPathMatcher {
     return pattern.matcher(input);
   }
 
+  @Override
+  public int compareTo(final WebPathMatcher wpm) {
+    // compare number of path segments: path with fewer segments is less specific
+    final int d = wpm.segments - segments;
+    if(d != 0) return d;
+
+    // look for templates: segment with template is less specific
+    for(int s = 0; s < segments; s++) {
+      final boolean t1 = varsPos.testBit(s), t2 = wpm.varsPos.testBit(s);
+      if(t1 != t2) return t1 ? 1 : -1;
+    }
+
+    // identical specifity
+    return 0;
+  }
+
   /**
    * Parses a path template.
    * @param path path template string to be parsed
    * @param info input info (can be {@code null})
+   * @param err error code to raise on a malformed template (RESTXQ or WebSocket)
    * @return parsed path template
    * @throws QueryException query exception
    */
-  static RestXqPathMatcher parse(final String path, final InputInfo info) throws QueryException {
+  static WebPathMatcher parse(final String path, final InputInfo info, final QueryError err)
+      throws QueryException {
     if(path.isEmpty()) return EMPTY;
 
     final ArrayList<QNm> varNames = new ArrayList<>();
@@ -112,11 +130,11 @@ final class RestXqPathMatcher {
     while(i.hasNext()) {
       char ch = i.next();
       if(ch == '{') {
-        decodeAndEscape(literals, result, info);
+        decodeAndEscape(literals, result, info, err);
 
         // variable
         if(!i.hasNext() || i.nextNonWS() != '$')
-          throw RestXqFunction.error(info, INV_TEMPLATE_X, path);
+          throw err.get(info, Util.info(INV_TEMPLATE_X, path));
 
         // default variable regular expression
         regex.append("[^/]+?");
@@ -128,7 +146,7 @@ final class RestXqPathMatcher {
           if(ch == '=') {
             regex.setLength(0);
             addRegex(i, regex);
-            if(regex.isEmpty()) throw RestXqFunction.error(info, INV_TEMPLATE_X, path);
+            if(regex.isEmpty()) throw err.get(info, Util.info(INV_TEMPLATE_X, path));
             break;
           } else if(ch == '{') {
             ++braces;
@@ -139,7 +157,7 @@ final class RestXqPathMatcher {
         }
 
         final byte[] var = variable.toArray();
-        if(!XMLToken.isQName(var)) throw RestXqFunction.error(info, INV_VARNAME_X, variable);
+        if(!XMLToken.isQName(var)) throw err.get(info, Util.info(INV_VARNAME_X, variable));
         varNames.add(new QNm(var));
         variable.reset();
         varsPos.set(segment);
@@ -151,10 +169,10 @@ final class RestXqPathMatcher {
         literals.append(ch);
       }
     }
-    decodeAndEscape(literals, result, info);
+    decodeAndEscape(literals, result, info, err);
 
     final BigInteger vp = varsPos.cardinality() == 0 ? ZERO : new BigInteger(varsPos.toByteArray());
-    return new RestXqPathMatcher(result.toString(), varNames, segment + 1, vp);
+    return new WebPathMatcher(result.toString(), varNames, segment + 1, vp);
   }
 
   /**
@@ -175,16 +193,17 @@ final class RestXqPathMatcher {
   /**
    * Decodes the URL and escapes regex characters in path template literals.
    * @param literals literals to escape
-   * @param info input info (can be {@code null})
    * @param result string builder where the escaped literals will be appended to
+   * @param info input info (can be {@code null})
+   * @param err error code to raise on invalid encodings
    * @throws QueryException query exception
    */
   private static void decodeAndEscape(final StringBuilder literals, final StringBuilder result,
-      final InputInfo info) throws QueryException {
+      final InputInfo info, final QueryError err) throws QueryException {
 
     if(!literals.isEmpty()) {
       final String path = XMLToken.decodeUri(literals.toString());
-      if(path.contains("\uFFFD")) throw RestXqFunction.error(info, INV_ENCODING_X, literals);
+      if(path.contains("\uFFFD")) throw err.get(info, Util.info(INV_ENCODING_X, literals));
       final TokenBuilder tb = new TokenBuilder(path.length());
       path.codePoints().forEach(cp -> {
         if(".^&!?-:<>()[]{}$=,*+|".indexOf(cp) >= 0) tb.addByte((byte) '\\');

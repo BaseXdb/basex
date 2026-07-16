@@ -202,6 +202,9 @@ public final class WebModules {
     final ArrayList<WsFunction> funcs = findWs(ws, ann);
     if(funcs.isEmpty()) return null;
 
+    // multiple functions: check specifity
+    if(funcs.size() > 1) bestSpec(funcs);
+
     final WsFunction first = funcs.getFirst();
     if(funcs.size() == 1) return first;
 
@@ -245,7 +248,7 @@ public final class WebModules {
    * Filters functions by their specifity.
    * @param funcs list of functions
    */
-  private static void bestSpec(final List<RestXqFunction> funcs) {
+  private static void bestSpec(final List<? extends WebFunction> funcs) {
     for(int l = funcs.size() - 1; l > 0; l--) {
       if(funcs.getFirst().compareTo(funcs.get(l)) != 0) funcs.remove(l);
     }

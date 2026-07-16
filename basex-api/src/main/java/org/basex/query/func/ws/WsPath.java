@@ -13,6 +13,6 @@ import org.basex.util.*;
 public final class WsPath extends WsFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Str.get(client(qc).path.toString());
+    return Str.get(client(qc).path);
   }
 }

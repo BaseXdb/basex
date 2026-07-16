@@ -68,7 +68,7 @@ public final class RestXqFunction extends WebFunction {
   private final ArrayList<MediaType> consumes = new ArrayList<>();
 
   /** Path (can be {@code null}). */
-  public RestXqPath path;
+  public WebPath path;
   /** Singleton ID (can be {@code null}). */
   String singleton;
 
@@ -105,7 +105,7 @@ public final class RestXqFunction extends WebFunction {
       final Value value = ann.value();
       if(def == _REST_PATH) {
         try {
-          path = new RestXqPath(toString(value.itemAt(0)), ann.info);
+          path = new WebPath(toString(value.itemAt(0)), ann.info, BASEX_RESTXQ_X);
           starts = starts.attach(ann);
         } catch(final IllegalArgumentException ex) {
           throw error(ann.info, ex.getMessage());
@@ -198,7 +198,7 @@ public final class RestXqFunction extends WebFunction {
     // bind variables from segments
     final Expr[] args = new Expr[function.arity()];
     if(path != null) {
-      final QNmMap<String> qnames = path.values(conn);
+      final QNmMap<String> qnames = path.values(conn.path());
       for(final QNm qname : qnames) {
         final QNm qnm = new QNm(qname.string(), function.sc);
         if(function.sc.elemNS != null && eq(qnm.uri(), function.sc.elemNS)) qnm.uri(EMPTY);
@@ -276,7 +276,7 @@ public final class RestXqFunction extends WebFunction {
 
     if(perm) return permission != null && permission.matches(conn);
     if(err != null) return error != null && error.matches(err);
-    return path != null && path.matches(conn);
+    return path != null && path.matches(conn.path());
   }
 
   /**

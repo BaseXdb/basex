@@ -9,6 +9,7 @@ import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -22,7 +23,7 @@ import org.basex.util.*;
  */
 public final class WsFunction extends WebFunction {
   /** Path of the function. */
-  public WsPath path;
+  public WebPath path;
   /** Message parameter. */
   private WebParam message;
 
@@ -52,14 +53,14 @@ public final class WsFunction extends WebFunction {
       switch(def) {
         case _WS_CLOSE:
         case _WS_CONNECT:
-          path = new WsPath(toString(value.itemAt(0)));
+          path = parsePath(value, ann, declared);
           starts = starts.attach(ann);
           break;
         case _WS_ERROR:
         case _WS_MESSAGE:
           final QNm msg = checkVariable(toString(value.itemAt(1)), declared);
           message = new WebParam(msg, "message", null);
-          path = new WsPath(toString(value.itemAt(0)));
+          path = parsePath(value, ann, declared);
           starts = starts.attach(ann);
           break;
         default:
@@ -72,12 +73,20 @@ public final class WsFunction extends WebFunction {
   /**
    * Binds the function parameters.
    * @param msg message (can be {@code null}; otherwise string or byte array)
+   * @param pth concrete connection path
    * @param qc query context
    * @return arguments
    * @throws QueryException query exception
    */
-  Expr[] bind(final Object msg, final QueryContext qc) throws QueryException {
+  Expr[] bind(final Object msg, final String pth, final QueryContext qc) throws QueryException {
     final Expr[] args = new Expr[function.arity()];
+    // bind variables from path template (resolved once, at the handshake)
+    final QNmMap<String> qnames = path.values(pth);
+    for(final QNm qname : qnames) {
+      final QNm qnm = new QNm(qname.string(), function.sc);
+      if(function.sc.elemNS != null && eq(qnm.uri(), function.sc.elemNS)) qnm.uri(EMPTY);
+      bind(qnm, args, Atm.get(qnames.get(qname)), qc, "Path segment");
+    }
     if(message != null) {
       Value value = null;
       if(msg instanceof final byte[] bytes) value = B64.get(bytes);
@@ -90,13 +99,14 @@ public final class WsFunction extends WebFunction {
   /**
    * Checks if a WebSocket request matches this annotation and path.
    * @param definition annotation definition (can be {@code null})
-   * @param pth path to compare to (can be {@code null})
+   * @param pth concrete connection path (can be {@code null})
    * @return boolean result of check
    */
-  public boolean matches(final Annotation definition, final WsPath pth) {
+  public boolean matches(final Annotation definition, final String pth) {
+    if(pth != null && !path.matches(pth)) return false;
+    if(definition == null) return true;
     for(final Ann ann : function.anns) {
-      if((definition == null || ann.definition == definition) &&
-          (pth == null || path.compareTo(pth) == 0)) return true;
+      if(ann.definition == definition) return true;
     }
     return false;
   }
@@ -118,6 +128,26 @@ public final class WsFunction extends WebFunction {
   }
 
   // PRIVATE METHODS ==============================================================================
+
+  /**
+   * Parses the path template of an annotation and registers its variables.
+   * @param value annotation value
+   * @param ann annotation
+   * @param declared variable declaration flags
+   * @return path template
+   * @throws QueryException query exception
+   */
+  private WebPath parsePath(final Value value, final Ann ann, final boolean[] declared)
+      throws QueryException {
+    final WebPath pth;
+    try {
+      pth = new WebPath(toString(value.itemAt(0)), ann.info, BASEX_WS_X);
+    } catch(final IllegalArgumentException ex) {
+      throw error(ann.info, ex.getMessage());
+    }
+    for(final QNm name : pth.varNames()) checkVariable(name, declared);
+    return pth;
+  }
 
   /**
    * Creates an exception with the specific message.

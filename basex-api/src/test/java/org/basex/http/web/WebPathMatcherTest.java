@@ -1,6 +1,7 @@
-package org.basex.http.restxq;
+package org.basex.http.web;
 
 import static java.math.BigInteger.*;
+import static org.basex.query.QueryError.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.*;
@@ -14,9 +15,9 @@ import org.junit.jupiter.api.*;
  * Path matcher tests.
  *
  * @author BaseX Team, BSD License
- * @author Dimitar Popov
+ * @author Christian Gruen
  */
-public final class RestXqPathMatcherTest {
+public final class WebPathMatcherTest {
   /** Test.
    * @throws Exception exception */
   @Test public void testParseEmptyPath() throws Exception {
@@ -137,7 +138,7 @@ public final class RestXqPathMatcherTest {
   private static void testValues(final String template, final String path, final String var,
       final String value) throws Exception {
 
-    final QNmMap<String> actual = RestXqPathMatcher.parse(template, null).values(path);
+    final QNmMap<String> actual = WebPathMatcher.parse(template, null, BASEX_RESTXQ_X).values(path);
     assertEquals(value, actual.get(new QNm(var)), "values differ");
   }
 
@@ -153,7 +154,7 @@ public final class RestXqPathMatcherTest {
   private static void testParse(final String input, final String regex, final int segments,
       final BigInteger variables, final QNm... vars) throws Exception {
 
-    final RestXqPathMatcher p = RestXqPathMatcher.parse(input, null);
+    final WebPathMatcher p = WebPathMatcher.parse(input, null, BASEX_RESTXQ_X);
     assertEquals(regex, p.pattern.toString());
     assertEquals(Arrays.asList(vars), p.varNames);
     assertEquals(segments, p.segments);

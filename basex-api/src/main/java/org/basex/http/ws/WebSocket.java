@@ -29,8 +29,8 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
   public final ConcurrentHashMap<String, Value> atts = new ConcurrentHashMap<>();
   /** Database context. */
   public final Context context;
-  /** Path. */
-  public final WsPath path;
+  /** Concrete connection path. */
+  public final String path;
 
   /** Request context (captured during the handshake). */
   final RequestContext requestCtx;
@@ -46,7 +46,7 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
    */
   private WebSocket(final HttpServletRequest request) {
     final String pi = request.getPathInfo();
-    path = new WsPath(pi != null ? pi : "/");
+    path = pi != null ? pi : "/";
     session = request.getSession();
     // capture request values during the handshake, as the request is recycled afterwards
     requestCtx = new RequestContext(request).detach();
