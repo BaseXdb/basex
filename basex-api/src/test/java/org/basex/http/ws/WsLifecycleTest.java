@@ -80,8 +80,7 @@ public final class WsLifecycleTest extends WsTest {
    * @throws Exception exception
    */
   @Test public void closeHandler() throws Exception {
-    final org.basex.core.Context httpCtx = org.basex.http.HTTPContext.get().context();
-    new org.basex.core.cmd.XQuery("cache:put('ws-close', false())").execute(httpCtx);
+    putCache("ws-close", "false");
     register(
         "declare %ws:message('/c', '{$m}') function m:msg($m) { () };" +
         "declare %ws:close('/c') function m:cl() { cache:put('ws-close', true()) };");
@@ -91,16 +90,7 @@ public final class WsLifecycleTest extends WsTest {
     close(ws);
 
     // wait until the close handler has flipped the flag
-    await(() -> {
-      try {
-        final String value = new org.basex.core.cmd.XQuery(
-            "cache:get('ws-close')").execute(httpCtx);
-        return "true".equals(value.trim()) ? Boolean.TRUE : null;
-      } catch(final Exception ex) {
-        Util.debug(ex);
-        return null;
-      }
-    });
+    awaitCache("ws-close", "true");
   }
 
   /**
@@ -256,6 +246,67 @@ public final class WsLifecycleTest extends WsTest {
       } catch(final Exception ignore) {
         Util.debug(ignore);
       }
+    }
+  }
+
+  /**
+   * {@code %ws:close} can bind the close status and reason sent by the client.
+   * @throws Exception exception
+   */
+  @Test public void closeStatusReason() throws Exception {
+    putCache("ws-close-info", "");
+    register(
+        "declare %ws:message('/c', '{$m}') function m:msg($m) { () };" +
+        "declare %ws:close('/c', '{$status}', '{$reason}') function m:cl($status, $reason) {" +
+        "  cache:put('ws-close-info', $status || ':' || $reason) };");
+
+    final Listener l = new Listener();
+    final java.net.http.WebSocket ws = connect("/c", l);
+    ws.sendClose(4000, "test-reason").get(5, TimeUnit.SECONDS);
+
+    awaitCache("ws-close-info", "4000:test-reason");
+  }
+
+  /**
+   * {@code ws:close} with status and reason: the client observes both values.
+   * @throws Exception exception
+   */
+  @Test public void serverCloseStatus() throws Exception {
+    register("declare %ws:message('/x', '{$m}') function m:msg($m) {"
+        + " ws:close(ws:id(), 4123, 'server bye') };");
+
+    final Listener l = new Listener();
+    final java.net.http.WebSocket ws = connect("/x", l);
+    try {
+      ws.sendText("bye", true).get(5, TimeUnit.SECONDS);
+      await(() -> l.closeStatus != -1 ? Boolean.TRUE : null);
+      assertEquals(4123, l.closeStatus);
+      assertEquals("server bye", l.closeReason);
+    } finally {
+      // the server has already closed the connection; ignore any resulting error
+      try {
+        close(ws);
+      } catch(final Exception ignore) {
+        Util.debug(ignore);
+      }
+    }
+  }
+
+  /**
+   * {@code ws:close} rejects status codes outside the RFC 6455 range.
+   * @throws Exception exception
+   */
+  @Test public void closeInvalidStatus() throws Exception {
+    register("declare %ws:message('/x', '{$m}') function m:msg($m) {"
+        + " ws:close(ws:id(), 5000) };");
+
+    final Listener l = new Listener();
+    final java.net.http.WebSocket ws = connect("/x", l);
+    try {
+      ws.sendText("go", true).get(5, TimeUnit.SECONDS);
+      assertTrue(l.pollText().contains("Invalid close status"));
+    } finally {
+      close(ws);
     }
   }
 }

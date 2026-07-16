@@ -26,6 +26,17 @@ public final class WsFunction extends WebFunction {
   public WebPath path;
   /** Message parameter. */
   private WebParam message;
+  /** Close status parameter. */
+  private WebParam status;
+  /** Close reason parameter. */
+  private WebParam reason;
+
+  /**
+   * Close information.
+   * @param status close status
+   * @param reason close reason
+   */
+  public record CloseInfo(int status, String reason) { }
 
   /**
    * Constructor.
@@ -52,27 +63,25 @@ public final class WsFunction extends WebFunction {
       final Value value = ann.value();
       switch(def) {
         case _WS_CLOSE:
-        case _WS_CONNECT:
-          path = parsePath(value, ann, declared);
-          starts = starts.attach(ann);
+          if(value.size() > 1) status = param(value.itemAt(1), "status", declared);
+          if(value.size() > 2) reason = param(value.itemAt(2), "reason", declared);
           break;
         case _WS_ERROR:
         case _WS_MESSAGE:
-          final QNm msg = checkVariable(toString(value.itemAt(1)), declared);
-          message = new WebParam(msg, "message", null);
-          path = parsePath(value, ann, declared);
-          starts = starts.attach(ann);
+          message = param(value.itemAt(1), "message", declared);
           break;
         default:
           break;
       }
+      path = parsePath(value, ann, declared);
+      starts = starts.attach(ann);
     }
     return checkParsed(found, starts, declared);
   }
 
   /**
    * Binds the function parameters.
-   * @param msg message (can be {@code null}; otherwise string or byte array)
+   * @param msg message (can be {@code null}; otherwise string, byte array or close info)
    * @param pth concrete connection path
    * @param qc query context
    * @return arguments
@@ -87,11 +96,12 @@ public final class WsFunction extends WebFunction {
       if(function.sc.elemNS != null && eq(qnm.uri(), function.sc.elemNS)) qnm.uri(EMPTY);
       bind(qnm, args, Atm.get(qnames.get(qname)), qc, "Path segment");
     }
-    if(message != null) {
-      Value value = null;
-      if(msg instanceof final byte[] bytes) value = B64.get(bytes);
-      else if(msg != null) value = Str.get((String) msg);
-      bind(message.var(), args, value, qc, "Message");
+    if(msg instanceof final CloseInfo info) {
+      if(status != null) bind(status.var(), args, Itr.get(info.status()), qc, "Status");
+      if(reason != null) bind(reason.var(), args, Str.get(info.reason()), qc, "Reason");
+    } else if(message != null && msg != null) {
+      bind(message.var(), args, msg instanceof final byte[] bytes ? B64.get(bytes) :
+        Str.get((String) msg), qc, "Message");
     }
     return args;
   }
@@ -128,6 +138,19 @@ public final class WsFunction extends WebFunction {
   }
 
   // PRIVATE METHODS ==============================================================================
+
+  /**
+   * Parses a variable template of an annotation.
+   * @param item annotation value
+   * @param name name of parameter
+   * @param declared variable declaration flags
+   * @return web parameter
+   * @throws QueryException query exception
+   */
+  private WebParam param(final Item item, final String name, final boolean[] declared)
+      throws QueryException {
+    return new WebParam(checkVariable(toString(item), declared), name, null);
+  }
 
   /**
    * Parses the path template of an annotation and registers its variables.

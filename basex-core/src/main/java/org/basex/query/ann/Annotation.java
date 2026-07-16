@@ -174,7 +174,7 @@ public enum Annotation {
   /** XQuery annotation. */
   _WS_MESSAGE("message(path,message)", params(STRING, STRING), WS_URI),
   /** XQuery annotation. */
-  _WS_CLOSE("close(path)", params(STRING), WS_URI),
+  _WS_CLOSE("close(path[,status,reason])", params(STRING, STRING, STRING), WS_URI),
   /** XQuery annotation. */
   _WS_ERROR("error(path,message)", params(STRING, STRING), WS_URI);
 

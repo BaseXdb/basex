@@ -188,6 +188,22 @@ public final class WebModules {
   }
 
   /**
+   * Checks if a WebSocket function matches the connection path of the given WebSocket.
+   * @param ws WebSocket
+   * @return result of check
+   * @throws QueryException query exception, raised if equally specific paths conflict
+   *   for an annotation (all annotations are probed, so no early exit)
+   * @throws IOException I/O exception
+   */
+  public boolean websocket(final WebSocket ws) throws QueryException, IOException {
+    boolean found = false;
+    for(final Annotation ann : Annotation.values()) {
+      if(eq(ann.name.uri(), QueryText.WS_URI)) found |= websocket(ws, ann) != null;
+    }
+    return found;
+  }
+
+  /**
    * Returns the WebSocket function that matches the current request.
    * @param ws WebSocket
    * @param ann annotation

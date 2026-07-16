@@ -181,8 +181,8 @@ public enum ApiFunction implements AFunction {
   _WS_BROADCAST(WsBroadcast::new, "broadcast(message)",
       params(ITEM_O), EMPTY_SEQUENCE_Z, WS_URI),
   /** XQuery function. */
-  _WS_CLOSE(WsClose::new, "close(id)",
-      params(STRING_O), EMPTY_SEQUENCE_Z, WS_URI),
+  _WS_CLOSE(WsClose::new, "close(id[,status,reason])",
+      params(STRING_O, INTEGER_O, STRING_O), EMPTY_SEQUENCE_Z, WS_URI),
   /** XQuery function. */
   _WS_DELETE(WsDelete::new, "delete(id,key)",
       params(STRING_O, STRING_O), EMPTY_SEQUENCE_Z, WS_URI),

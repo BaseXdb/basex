@@ -10,6 +10,7 @@ import java.time.*;
 import java.util.concurrent.*;
 
 import org.basex.core.*;
+import org.basex.core.cmd.XQuery;
 import org.basex.http.*;
 import org.basex.http.web.*;
 import org.basex.io.*;
@@ -101,6 +102,37 @@ public abstract class WsTest extends HTTPTest {
       }
     }
     throw new AssertionError("Timeout waiting for value.");
+  }
+
+  /**
+   * Assigns a value to the given key in the cache of the HTTP server's context.
+   * Side effects of close/error handlers cannot be delivered to the client;
+   * tests observe them via this cache instead.
+   * @param key key
+   * @param value value
+   * @throws Exception exception
+   */
+  protected static void putCache(final String key, final String value) throws Exception {
+    new XQuery("cache:put('" + key + "', '" + value + "')").
+        execute(HTTPContext.get().context());
+  }
+
+  /**
+   * Polls the cache of the HTTP server's context until the given key has the expected value.
+   * @param key key
+   * @param expected expected value
+   */
+  protected static void awaitCache(final String key, final String expected) {
+    final Context ctx = HTTPContext.get().context();
+    await(() -> {
+      try {
+        return expected.equals(new XQuery("cache:get('" + key + "')").execute(ctx).trim())
+          ? Boolean.TRUE : null;
+      } catch(final Exception ex) {
+        Util.debug(ex);
+        return null;
+      }
+    });
   }
 
   /**

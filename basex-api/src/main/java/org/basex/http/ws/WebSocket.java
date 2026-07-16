@@ -53,10 +53,6 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
     context = new Context(HTTPContext.get().context(), this);
   }
 
-  /** WebSocket annotations. */
-  private static final Annotation[] ANNOTATIONS = { Annotation._WS_CONNECT,
-      Annotation._WS_MESSAGE, Annotation._WS_CLOSE, Annotation._WS_ERROR };
-
   /**
    * Creates a new WebSocket instance.
    * @param request request
@@ -66,12 +62,7 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
     final WebSocket ws = new WebSocket(request);
     try {
       // refuse the upgrade if equally specific paths conflict for an annotation
-      final WebModules modules = WebModules.get(ws.context);
-      boolean found = false;
-      for(final Annotation ann : ANNOTATIONS) {
-        found |= modules.websocket(ws, ann) != null;
-      }
-      if(found) return ws;
+      if(WebModules.get(ws.context).websocket(ws)) return ws;
     } catch(final Exception ex) {
       Util.debug(ex);
       throw new CloseException(StatusCode.ABNORMAL, ex.getMessage());
@@ -98,7 +89,8 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
   public void onWebSocketClose(final int status, final String message, final Callback callback) {
     try {
       run("[WS-CLOSE] " + requestCtx.state().url(), status,
-          () -> findAndProcess(Annotation._WS_CLOSE, null));
+          () -> findAndProcess(Annotation._WS_CLOSE,
+              new WsFunction.CloseInfo(status, message != null ? message : "")));
     } finally {
       WsPool.remove(id);
       callback.succeed();
@@ -140,11 +132,13 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
   }
 
   /**
-   * Closes the WebSocket connection.
+   * Closes the WebSocket connection with the specified status.
+   * @param status close status
+   * @param reason close reason (can be {@code null})
    */
-  public void close() {
+  public void close(final int status, final String reason) {
     WsPool.remove(id);
-    if(isOpen()) getSession().close();
+    if(isOpen()) getSession().close(status, reason, Callback.NOOP);
   }
 
   /**
@@ -164,7 +158,7 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
   /**
    * Finds a function and processes it.
    * @param ann annotation
-   * @param message message (can be {@code null}; otherwise string or byte array)
+   * @param message message (can be {@code null}; otherwise string, byte array or close info)
    */
   private void findAndProcess(final Annotation ann, final Object message) {
     // check if an HTTP session exists, and if it still valid
