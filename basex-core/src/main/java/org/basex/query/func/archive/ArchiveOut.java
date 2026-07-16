@@ -68,15 +68,16 @@ abstract class ArchiveOut implements Closeable {
   public abstract void write(ZipEntry entry, InputStream is) throws IOException;
 
   /**
-   * Writes the specified entry.
+   * Writes the specified entry. The contents of lazy binaries are read in a single pass.
    * @param entry zip entry
    * @param bin binary data
    * @param info input info (can be {@code null})
+   * @param qc query context
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  public abstract void write(ZipEntry entry, Bin bin, InputInfo info) throws IOException,
-    QueryException;
+  public abstract void write(ZipEntry entry, Bin bin, InputInfo info, QueryContext qc)
+    throws IOException, QueryException;
 
   @Override
   public abstract void close();

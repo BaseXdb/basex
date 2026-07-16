@@ -1,10 +1,11 @@
 package org.basex.query.func.archive;
 
+import static org.basex.query.QueryError.*;
+
 import java.io.*;
 import java.util.zip.*;
 
 import org.basex.io.in.*;
-import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -47,17 +48,17 @@ final class ZIPOut extends ArchiveOut {
     zo.setTime(entry.getTime());
     zo.setComment(entry.getComment());
 
-    if(entry.getMethod() == ZipEntry.STORED) {
-      stored = true;
-      final ArrayOutput out = new ArrayOutput();
-      is.transferTo(out);
-      write(zo, out.finish());
+    if(entry.getMethod() == ZipEntry.STORED && entry.getSize() != -1 && entry.getCrc() != -1) {
+      // size and checksum are known in advance: copy stored entry without buffering it
+      zo.setMethod(ZipEntry.STORED);
+      zo.setSize(entry.getSize());
+      zo.setCrc(entry.getCrc());
     } else {
       level(-1);
-      zos.putNextEntry(zo);
-      is.transferTo(zos);
-      zos.closeEntry();
     }
+    zos.putNextEntry(zo);
+    is.transferTo(zos);
+    zos.closeEntry();
   }
 
   @Override
@@ -74,22 +75,26 @@ final class ZIPOut extends ArchiveOut {
   }
 
   @Override
-  public void write(final ZipEntry entry, final Bin bin, final InputInfo info)
-      throws IOException, QueryException {
+  public void write(final ZipEntry entry, final Bin bin, final InputInfo info,
+      final QueryContext qc) throws IOException, QueryException {
 
     if(stored) {
-      try(BufferInput bi = bin.input(info)) {
+      // spool the contents to compute checksum and size: avoids reading lazy input twice
+      try(SpillOutput so = new SpillOutput(qc)) {
         final CRC32 crc = new CRC32();
-        long size = 0;
-        try(CheckedInputStream cis = new CheckedInputStream(bi, crc)) {
-          while(cis.read() != -1) size++;
+        final long size;
+        try(BufferInput bi = bin.input(info)) {
+          size = bi.transferTo(new CheckedOutputStream(so, crc));
         }
         entry.setCrc(crc.getValue());
         entry.setSize(size);
+        zos.putNextEntry(entry);
+        writeBin(so.finish(ARCHIVE_ERROR_X), zos, info);
       }
+    } else {
+      zos.putNextEntry(entry);
+      writeBin(bin, zos, info);
     }
-    zos.putNextEntry(entry);
-    writeBin(bin, zos, info);
     zos.closeEntry();
   }
 

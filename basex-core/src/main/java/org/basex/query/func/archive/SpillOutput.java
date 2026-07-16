@@ -19,8 +19,6 @@ import org.basex.util.*;
  * temporary file is registered with the query context's resources for automatic deletion when the
  * query finishes.
  *
- * This class is used by {@link ArchiveCreateFrom} and {@link ArchiveCreate}.
- *
  * @author BaseX Team, BSD License
  * @author Vincent Lizzi
  */

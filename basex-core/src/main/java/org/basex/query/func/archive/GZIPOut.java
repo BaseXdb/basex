@@ -47,8 +47,8 @@ final class GZIPOut extends ArchiveOut {
   }
 
   @Override
-  public void write(final ZipEntry entry, final Bin bin, final InputInfo info)
-      throws IOException, QueryException {
+  public void write(final ZipEntry entry, final Bin bin, final InputInfo info,
+      final QueryContext qc) throws IOException, QueryException {
     writeBin(bin, zos, info);
   }
 

@@ -144,7 +144,7 @@ abstract class ArchiveFn extends StandardFunc {
     // data to be compressed
     final Item content = file.getValue();
     if(content instanceof final Bin bin) {
-      out.write(ze, bin, info);
+      out.write(ze, bin, info, qc);
     } else if(content != XQArray.empty()) {
       out.write(ze, encode(toBytes(content, qc), encoding(header), false, qc));
     }
