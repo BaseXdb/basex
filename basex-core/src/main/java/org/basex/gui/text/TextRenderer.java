@@ -208,12 +208,14 @@ final class TextRenderer extends BaseXBack {
   int[] caretPos() {
     final TextIterator iter = new TextIterator(text);
     final int c = iter.caret(), idx = lineIndex(c);
-    if(idx < 0) return new int[] { 1, 1 };
-
-    // jump to the caret's line and count columns within it
-    int col = 1;
-    for(iter.pos(cache.pos(idx)); iter.pos() < c; iter.next()) col++;
-    return new int[] { idx + 1, col };
+    // jump to the caret's cached line; if the cache is stale, scan the text from the start
+    int ln = Math.max(idx, 0) + 1, col = 1;
+    if(idx >= 0) iter.pos(cache.pos(idx));
+    while(iter.pos() < c) {
+      if(iter.next() == '\n') { ln++; col = 1; }
+      else col++;
+    }
+    return new int[] { ln, col };
   }
 
   /**
