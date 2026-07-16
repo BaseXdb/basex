@@ -53,15 +53,25 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
     context = new Context(HTTPContext.get().context(), this);
   }
 
+  /** WebSocket annotations. */
+  private static final Annotation[] ANNOTATIONS = { Annotation._WS_CONNECT,
+      Annotation._WS_MESSAGE, Annotation._WS_CLOSE, Annotation._WS_ERROR };
+
   /**
    * Creates a new WebSocket instance.
    * @param request request
-   * @return WebSocket or {@code null}
+   * @return WebSocket, or {@code null} if no function matches the path
    */
   static WebSocket get(final HttpServletRequest request) {
     final WebSocket ws = new WebSocket(request);
     try {
-      if(!WebModules.get(ws.context).findWs(ws, null).isEmpty()) return ws;
+      // refuse the upgrade if equally specific paths conflict for an annotation
+      final WebModules modules = WebModules.get(ws.context);
+      boolean found = false;
+      for(final Annotation ann : ANNOTATIONS) {
+        found |= modules.websocket(ws, ann) != null;
+      }
+      if(found) return ws;
     } catch(final Exception ex) {
       Util.debug(ex);
       throw new CloseException(StatusCode.ABNORMAL, ex.getMessage());

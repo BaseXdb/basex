@@ -139,22 +139,30 @@ public final class WsPathTemplateTest extends WsTest {
   }
 
   /**
-   * Two equally specific templates for the same path are reported as a conflict.
-   * @throws Exception exception
+   * Two equally specific templates for the same path and annotation are refused
+   * at the handshake.
    */
-  @Test public void conflict() throws Exception {
-    register(
-        "declare %ws:message('/x/{$a}', '{$m}') function m:a($a, $m) { () };" +
-        "declare %ws:message('/x/{$b}', '{$m}') function m:b($b, $m) { () };");
+  @Test public void conflict() {
+    assertThrows(Exception.class, () -> {
+      register(
+          "declare %ws:message('/x/{$a}', '{$m}') function m:a($a, $m) { () };" +
+          "declare %ws:message('/x/{$b}', '{$m}') function m:b($b, $m) { () };");
+      connect("/x/1", new Listener());
+    });
+  }
 
-    final Listener l = new Listener();
-    final java.net.http.WebSocket ws = connect("/x/1", l);
-    try {
-      ws.sendText("go", true).get(5, TimeUnit.SECONDS);
-      assertTrue(l.pollText().contains("Multiple functions"));
-    } finally {
-      close(ws);
-    }
+  /**
+   * A conflict on one annotation refuses the handshake even if another annotation
+   * matches the path unambiguously.
+   */
+  @Test public void conflictOtherAnnotation() {
+    assertThrows(Exception.class, () -> {
+      register(
+          "declare %ws:message('/x/{$a}', '{$m}') function m:msg($a, $m) { () };" +
+          "declare %ws:close('/x/{$a}') function m:a($a) { () };" +
+          "declare %ws:close('/x/{$b}') function m:b($b) { () };");
+      connect("/x/1", new Listener());
+    });
   }
 
   /**

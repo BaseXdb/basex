@@ -175,7 +175,7 @@ public final class WebModules {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  public ArrayList<WsFunction> findWs(final WebSocket ws, final Annotation ann)
+  private ArrayList<WsFunction> findWs(final WebSocket ws, final Annotation ann)
       throws QueryException, IOException {
     final ArrayList<WsFunction> funcs = new ArrayList<>();
     for(final WebModule mod : cache(ws.context).values()) {
