@@ -18,7 +18,9 @@ public enum Method {
   /** HEAD method. */
   HEAD,
   /** OPTIONS method. */
-  OPTIONS;
+  OPTIONS,
+  /** QUERY method. */
+  QUERY(true);
 
   /** Flag showing if body can be present in the HTTP request with the current method. */
   public final boolean body;

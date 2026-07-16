@@ -151,6 +151,8 @@ public enum Annotation {
   _REST_OPTIONS("OPTIONS()", params(), REST_URI),
   /** XQuery annotation. */
   _REST_PATCH("PATCH([body])", params(STRING), REST_URI),
+  /** XQuery annotation. */
+  _REST_QUERY("QUERY([body])", params(STRING), REST_URI),
 
   /** XQuery annotation. */
   _UNIT_AFTER("after([function])", params(STRING), UNIT_URI),

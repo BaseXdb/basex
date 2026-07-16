@@ -37,6 +37,19 @@ public final class RestXqMethodTest extends RestXqTest {
   }
 
   /**
+   * {@code %QUERY} method.
+   * @throws Exception exception
+   */
+  @Test public void query() throws Exception {
+    // QUERY method with body
+    register("declare %R:QUERY('{$b}') %R:path('') function m:f($b) { $b };");
+    assertEquals("12", send(200, "QUERY", new ArrayInput("12"), MediaType.TEXT_PLAIN, ""));
+    // QUERY method without body
+    register("declare %R:QUERY %R:path('') function m:f() { 'x' };");
+    assertEquals("x", send(200, "QUERY", null, null, ""));
+  }
+
+  /**
    * Custom method.
    * @throws Exception exception */
   @Test public void method() throws Exception {
