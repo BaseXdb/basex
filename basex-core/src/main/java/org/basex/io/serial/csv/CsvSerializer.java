@@ -6,9 +6,14 @@ import static org.basex.util.Token.*;
 import java.io.*;
 
 import org.basex.build.csv.*;
+import org.basex.io.parse.csv.*;
 import org.basex.io.serial.*;
+import org.basex.query.*;
 import org.basex.query.value.*;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -66,8 +71,13 @@ public abstract class CsvSerializer extends StandardSerializer {
     copts = sopts.get(SerializerOptions.CSV);
     quotes = copts.get(CsvOptions.QUOTES);
     backslashes = copts.get(CsvOptions.BACKSLASHES);
-    separator = copts.separator();
-    quoteCharacter = copts.quoteCharacter();
+    separator = character(sopts.get(SerializerOptions.CSV_SEPARATOR),
+        SerializerOptions.CSV_SEPARATOR.name(), copts.separator());
+    quoteCharacter = character(sopts.get(SerializerOptions.CSV_QUOTE_CHARACTER),
+        SerializerOptions.CSV_QUOTE_CHARACTER.name(), copts.quoteCharacter());
+    if(separator == quoteCharacter) throw SERPARAM_X.getIO(Util.info(
+        "Parameters '%' and '%' must differ.", SerializerOptions.CSV_SEPARATOR.name(),
+        SerializerOptions.CSV_QUOTE_CHARACTER.name()));
     selectColumns = copts.get(CsvOptions.SELECT_COLUMNS);
     maxCol = -1;
     for(final int col : selectColumns) {
@@ -80,6 +90,25 @@ public abstract class CsvSerializer extends StandardSerializer {
       final Boolean b = Strings.toBoolean(string(str.string()));
       if(b != null) header = b;
     }
+    if(sopts.yes(SerializerOptions.CSV_HEADER)) header = true;
+  }
+
+  /**
+   * Returns the character of a single-character serialization parameter.
+   * @param value parameter value (can be {@code null})
+   * @param name parameter name
+   * @param fallback fallback character
+   * @return character
+   * @throws QueryIOException query I/O exception
+   */
+  private static int character(final String value, final String name, final int fallback)
+      throws QueryIOException {
+    if(value == null) return fallback;
+    if(value.codePointCount(0, value.length()) == 1) {
+      final int cp = value.codePointAt(0);
+      if(cp != '\n') return cp;
+    }
+    throw SERPARAM_X.getIO(Util.info("Invalid value of '%' parameter: '%'.", name, value));
   }
 
   /**
@@ -130,8 +159,8 @@ public abstract class CsvSerializer extends StandardSerializer {
     byte[] txt = value != null ? value : Token.EMPTY;
     if(form != null) txt = normalize(txt, form);
     final boolean delim = contains(txt, separator) || contains(txt, '\n');
-    final boolean special = contains(txt, '\r') || contains(txt, '\t')
-        || contains(txt, quoteCharacter);
+    final boolean special = contains(txt, '\r') || contains(txt, quoteCharacter)
+        || backslashes && contains(txt, '\t');
     if(delim || special || backslashes && contains(txt, '\\')) {
       final TokenBuilder tb = new TokenBuilder();
       if(delim && !backslashes && !quotes)
@@ -160,8 +189,74 @@ public abstract class CsvSerializer extends StandardSerializer {
     printChars(txt);
   }
 
+  /**
+   * Serializes a map that conforms to the result format of fn:parse-csv.
+   * @param map map
+   * @throws IOException I/O exception
+   */
+  final void w3(final XQMap map) throws IOException {
+    final TokenList tl = new TokenList();
+    try {
+      // print header
+      if(header) {
+        final Value columns = map.getOrNull(CsvConverter.COLUMNS);
+        if(columns == null) throw SERCSV_X.getIO("Map has no 'columns' key");
+        row(columns, tl);
+      }
+      // print rows
+      final Value rows = map.getOrNull(CsvConverter.ROWS);
+      if(rows == null) throw SERCSV_X.getIO("Map has no 'rows' key");
+      for(final Item record : rows) {
+        if(!(record instanceof final XQArray array)) throw typeError("Array", record);
+        row(array.members(), tl);
+      }
+    } catch(final QueryException ex) {
+      throw new QueryIOException(ex);
+    }
+  }
+
+  /**
+   * Serializes an array that conforms to the result format of fn:csv-to-arrays.
+   * @param array array
+   * @throws IOException I/O exception
+   */
+  final void w3(final XQArray array) throws IOException {
+    try {
+      row(array.members(), new TokenList());
+    } catch(final QueryException ex) {
+      throw new QueryIOException(ex);
+    }
+  }
+
+  /**
+   * Serializes a single line (header or contents).
+   * @param line line to be serialized
+   * @param tl token list
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   */
+  private void row(final Iterable<? extends Value> line, final TokenList tl)
+      throws QueryException, IOException {
+    for(final Value value : line) {
+      if(!(value instanceof final Item item) || item instanceof XNode || item instanceof FItem)
+        throw typeError("Single atomic item", value);
+      tl.add(item.string(null));
+    }
+    record(tl);
+  }
+
+  /**
+   * Returns a type error.
+   * @param expected expected type
+   * @param found found value
+   * @return error
+   */
+  static QueryIOException typeError(final String expected, final Value found) {
+    return SERCSV_X_X.getIO(expected + " expected, " + found.seqType() + " found ", found);
+  }
+
   @Override
   protected void atomic(final Item value) throws IOException {
-    throw CSV_SERIALIZE_X.getIO("Atomic items cannot be serialized");
+    throw SERCSV_X.getIO("Atomic items cannot be serialized");
   }
 }

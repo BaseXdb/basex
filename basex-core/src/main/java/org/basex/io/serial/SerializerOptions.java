@@ -45,6 +45,15 @@ public final class SerializerOptions extends Options {
   /** Serialization parameter: list of QNames. */
   public static final StringOption CDATA_SECTION_ELEMENTS =
       new StringOption("cdata-section-elements", "", Types.QNAME_ZM);
+  /** Serialization parameter: yes/no. */
+  public static final EnumOption<YesNo> CSV_HEADER =
+      new EnumOption<>("csv-header", YesNo.NO, YES_NO);
+  /** Serialization parameter: single character. */
+  public static final StringOption CSV_QUOTE_CHARACTER =
+      new StringOption("csv-quote-character", null, Types.STRING_ZO);
+  /** Serialization parameter: single character. */
+  public static final StringOption CSV_SEPARATOR =
+      new StringOption("csv-separator", null, Types.STRING_ZO);
   /** Serialization parameter. */
   public static final StringOption DOCTYPE_PUBLIC =
       new StringOption("doctype-public", "", Types.STRING_ZO);
@@ -303,6 +312,7 @@ public final class SerializerOptions extends Options {
       return MediaType.APPLICATION_XML;
     if(sm.oneOf(SerialMethod.XHTML, SerialMethod.HTML)) return MediaType.TEXT_HTML;
     if(sm == SerialMethod.JSON) return MediaType.APPLICATION_JSON;
+    if(sm == SerialMethod.CSV) return MediaType.TEXT_CSV;
     return MediaType.TEXT_PLAIN;
   }
 

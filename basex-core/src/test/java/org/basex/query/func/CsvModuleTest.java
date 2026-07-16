@@ -237,7 +237,7 @@ public final class CsvModuleTest extends SandboxTest {
     serial(map, "'format': 'xquery', 'header': ('C', 'D')", "X\nY\n");
 
     error(_CSV_SERIALIZE.args(" { 'rows': [ { 'A': '' } ]?*('A') }",
-        " { 'format': 'w3' }"), CSV_SERIALIZE_X_X);
+        " { 'format': 'w3' }"), SERCSV_X_X);
   }
 
   /** Test method. */

@@ -3809,6 +3809,41 @@ return
     query(func.args("1", " { 'use-character-maps': { '1': 'a,b=c' } }"), "a,b=c");
     error(func.args("1", " { 'use-character-maps': { 'ab': 'x' } }"), SERPARAM_X);
 
+    // CSV output method: maps, arrays and nodes are serialized as CSV
+    query(func.args(" parse-csv('a,b')", " { 'method': 'csv' }"), "a,b\n");
+    query(func.args(" csv-to-arrays('a,b' || char('\\n') || 'c,d')", " { 'method': 'csv' }"),
+        "a,b\nc,d\n");
+    query(func.args(" <csv><record><A>1</A></record></csv>", " { 'method': 'csv' }"), "1\n");
+    // CSV output method: flat parameters
+    query(func.args(" parse-csv('a,b')", " { 'method': 'csv', 'csv-separator': ';' }"), "a;b\n");
+    query(func.args(" { 'rows': [ 'a;b' ] }", " { 'method': 'csv', 'csv-separator': ';' }"),
+        "\"a;b\"\n");
+    query(func.args(" { 'rows': [ 'a|b' ] }", " { 'method': 'csv', 'csv-quote-character': '|' }"),
+        "|a||b|\n");
+    query(func.args(" parse-csv('a,b' || char('\\n') || '1,2', { 'header': true() })",
+        " { 'method': 'csv', 'csv-header': 'yes' }"), "a,b\n1,2\n");
+    // CSV output method: flat parameters override format-specific options
+    query(func.args(" parse-csv('a,b')",
+        " { 'method': 'csv', 'csv': { 'separator': ';' }, 'csv-separator': '|' }"), "a|b\n");
+    // CSV output method: quoting
+    query(func.args(" { 'rows': [ 'a' || char('\\t') || 'b', 'c' ] }", " { 'method': 'csv' }"),
+        "a\tb,c\n");
+    query(func.args(" { 'rows': [ 'a' || char('\\r') || 'b' ] }", " { 'method': 'csv' }"),
+        "\"a\nb\"\n");
+    // CSV output method: invalid structures
+    error(func.args(" (parse-csv('a'), parse-csv('b'))", " { 'method': 'csv' }"), SERCSV_X_X);
+    error(func.args(" (csv-to-arrays('a'), parse-csv('b'))", " { 'method': 'csv' }"), SERCSV_X_X);
+    error(func.args(" [ <x>1</x> ]", " { 'method': 'csv' }"), SERCSV_X_X);
+    error(func.args("x", " { 'method': 'csv' }"), SERCSV_X);
+    error(func.args(" { 'no-rows': 1 }", " { 'method': 'csv' }"), SERCSV_X);
+    // CSV output method: invalid flat parameters
+    error(func.args(" parse-csv('a,b')", " { 'method': 'csv', 'csv-separator': 'XX' }"),
+        SERPARAM_X);
+    error(func.args(" parse-csv('a,b')", " { 'method': 'csv', 'csv-separator': char('\\n') }"),
+        SERPARAM_X);
+    error(func.args(" parse-csv('a,b')", " { 'method': 'csv', 'csv-separator': '\"' }"),
+        SERPARAM_X);
+
     // boolean arguments
     query(func.args("1", " { 'indent': false() }"), 1);
     query(func.args("1", " { 'indent': true() }"), 1);

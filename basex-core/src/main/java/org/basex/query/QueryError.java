@@ -894,6 +894,10 @@ public enum QueryError {
   SERCANONURI(SERE, 24, "Canonical XML serialization failed: found relative namespace URI: '%'"),
   /** Error code. */
   SERCANONROOTS_X(SERE, 24, "Canonical XML serialization failed: not wellformed: '%'"),
+  /** Error code. */
+  SERCSV_X(SERE, 25, "%."),
+  /** Error code. */
+  SERCSV_X_X(SERE, 25, "%: %."),
 
   /** Error code. */
   NOCTX_X(XPDY, 2, "%: Context value is undefined."),
