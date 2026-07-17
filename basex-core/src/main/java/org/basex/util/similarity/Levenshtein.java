@@ -77,8 +77,7 @@ public final class Levenshtein {
   }
 
   /**
-   * Returns the most similar entry; falls back to the first entry whose prepared name starts
-   * with the input if no similar entry is found.
+   * Returns the most similar entry, or the shortest prefix-matching entry.
    * @param <T> element type
    * @param token input token
    * @param objects objects to be compared
@@ -89,8 +88,7 @@ public final class Levenshtein {
   }
 
   /**
-   * Returns the most similar entry; falls back to the first entry whose prepared name starts
-   * with the input if no similar entry is found.
+   * Returns the most similar entry, or the shortest prefix-matching entry.
    * @param <T> element type
    * @param token input token
    * @param objects objects to be compared
@@ -103,11 +101,17 @@ public final class Levenshtein {
     final T similar = similar(token, objects, prepare);
     if(similar != null) return similar;
     final byte[] lc = lc(token);
+    T best = null;
+    // accept names that are at most twice as long as the input
+    int min = (lc.length << 1) + 1;
     for(final T obj : objects) {
       final byte[] compare = token(prepare.apply(obj));
-      if(compare != null && startsWith(lc(compare), lc)) return obj;
+      if(compare != null && compare.length < min && startsWith(lc(compare), lc)) {
+        best = obj;
+        min = compare.length;
+      }
     }
-    return null;
+    return best;
   }
 
   /**

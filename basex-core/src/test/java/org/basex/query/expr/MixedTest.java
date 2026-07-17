@@ -552,19 +552,23 @@ public final class MixedTest extends SandboxTest {
     // Levenshtein match for typo
     unknownName("declare function local:x($alpha) { }; local:x(alph := 0)",
         PARAMUNKNOWN_X_X, "alpha");
-    // prefix fallback for short input that is too far in Levenshtein distance
+    // prefix fallback for input that is too far in Levenshtein distance
     unknownName("declare function local:c($langitude, $longitude) { };"
-        + " local:c(lang := 1, longitude := 2)", PARAMUNKNOWN_X_X, "langitude");
+        + " local:c(langi := 1, longitude := 2)", PARAMUNKNOWN_X_X, "langitude");
   }
 
   /** Unknown built-in function: hint to similar function name. */
   @Test public void unknownFunction() {
     // Levenshtein match for typo (unprefixed call, hint without fn: prefix)
     unknownName("coun()", WHICHFUNC_X, "count");
-    // prefix fallback for short input that is too far in Levenshtein distance
-    unknownName("all()", WHICHFUNC_X, "all-");
+    // prefix fallback for input that is too far in Levenshtein distance
+    unknownName("all-eq()", WHICHFUNC_X, "all-equal");
+    // shortest name wins among multiple prefix matches
+    unknownName("fold-(1)", WHICHFUNC_X, "fold-left");
+    // no hint for inputs that cover less than half of the closest name
+    noHint("x()", WHICHFUNC_X);
     // prefix fallback for user-defined function (local: prefix is preserved)
-    unknownName("declare function local:abcde($john) { }; local:a()",
+    unknownName("declare function local:abcde($john) { }; local:abc()",
         WHICHFUNC_X, "local:abcde");
     // built-in match preferred over user-defined when both exist
     unknownName("declare function local:subsequence-after() { };"
@@ -625,6 +629,24 @@ public final class MixedTest extends SandboxTest {
       assertSame(code, ex.error(), ex.getLocalizedMessage());
       final String msg = ex.getLocalizedMessage();
       assertTrue(msg.contains("(maybe: " + similar), msg);
+    } catch(final Exception ex) {
+      fail(ex);
+    }
+  }
+
+  /**
+   * Checks that the error message includes no similar-name hint.
+   * @param query query that should fail
+   * @param code expected error code
+   */
+  private static void noHint(final String query, final QueryError code) {
+    try {
+      eval(query);
+      fail("Query did not fail.");
+    } catch(final QueryException ex) {
+      assertSame(code, ex.error(), ex.getLocalizedMessage());
+      final String msg = ex.getLocalizedMessage();
+      assertFalse(msg.contains("maybe"), msg);
     } catch(final Exception ex) {
       fail(ex);
     }
