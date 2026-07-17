@@ -706,6 +706,8 @@ public enum QueryError {
   PLAN_X_X(FOJS, 8, "Layout '%' cannot be applied: %."),
   /** Error code. */
   MAP_TO_ELEMENT_X(FOJS, 9, "%"),
+  /** Error code. */
+  PLAN_TYPE_X_X(FOJS, 10, "Value '%' cannot be cast to type '%'."),
 
   /** Error code. */
   NSDECL_X(FONS, 4, "Namespace prefix not declared: %."),

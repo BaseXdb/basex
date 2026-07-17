@@ -1446,12 +1446,29 @@ public final class FnModuleTest extends SandboxTest {
     // infinity and not-a-number are not inferred as numeric
     query(func.args(" <a>INF</a>") + "?a instance of xs:untypedAtomic", true);
     query(func.args(" <a>NaN</a>") + "?a instance of xs:untypedAtomic", true);
-    query(func.args(" <a>x</a>", " { 'plan': { 'a': {'layout': 'simple', 'type': 'boolean' } } }") +
-        "?a instance of xs:untypedAtomic", true);
-    query(func.args(" <a>x</a>", " { 'plan': { 'a': {'layout': 'simple', 'type': 'double' } } }") +
-        "?a instance of xs:untypedAtomic", true);
     query(func.args(" <a>1</a>", " { 'plan': { 'a': {'layout': 'simple', 'type': 'decimal' } } }") +
         "?a instance of xs:decimal", true);
+    // strict validation (default): a value that cannot be cast to the prescribed type raises an error
+    error(func.args(" <a>x</a>", " { 'plan': { 'a': {'layout': 'simple', 'type': 'boolean' } } }"),
+        PLAN_TYPE_X_X);
+    error(func.args(" <a>x</a>", " { 'plan': { 'a': {'layout': 'simple', 'type': 'double' } } }"),
+        PLAN_TYPE_X_X);
+    // lax validation: the value is retained in its original form
+    query(func.args(" <a>x</a>", " { 'plan': { 'a': {'layout': 'simple', 'type': 'boolean' } }, "
+        + "'validation': 'lax' }") + "?a instance of xs:untypedAtomic", true);
+    query(func.args(" <a>x</a>", " { 'plan': { 'a': {'layout': 'simple', 'type': 'double' } }, "
+        + "'validation': 'lax' }") + "?a instance of xs:untypedAtomic", true);
+    // empty and whitespace-only content: prescribed type is not applied, no error is raised
+    query(func.args(" <a/>", " { 'plan': { 'a': {'layout': 'simple', 'type': 'integer' } } }") +
+        "?a instance of xs:untypedAtomic", true);
+    query(func.args(" <a> </a>", " { 'plan': { 'a': {'layout': 'simple', 'type': 'integer' } } }") +
+        "?a instance of xs:untypedAtomic", true);
+    // inferred types never raise a strict error
+    query(func.args(" <a>x</a>") + "?a instance of xs:untypedAtomic", true);
+    // attribute types are validated too
+    error(func.args(" <a b='x'/>", " { 'plan': { '@b': { 'type': 'integer' } } }"), PLAN_TYPE_X_X);
+    query(func.args(" <a b='x'/>", " { 'plan': { '@b': { 'type': 'integer' } }, "
+        + "'validation': 'lax' }") + "?a?('@b') instance of xs:untypedAtomic", true);
 
     // content-key option
     query(func.args(" <price currency='USD'>12.16</price>",

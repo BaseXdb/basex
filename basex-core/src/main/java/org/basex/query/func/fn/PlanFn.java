@@ -36,6 +36,9 @@ public abstract class PlanFn extends StandardFunc {
         new EnumOption<>("name-format", NameFormat.DEFAULT);
     /** Option. */
     public static final ValueOption PLAN = new ValueOption("plan", Types.MAP_ZO);
+    /** Option. */
+    public static final EnumOption<Validation> VALIDATION =
+        new EnumOption<>("validation", Validation.STRICT);
   }
 
   /** Content string. */
@@ -65,6 +68,19 @@ public abstract class PlanFn extends StandardFunc {
     String marker;
     /** Content key. */
     Str content = CONTENT;
+    /** Strict validation: raise an error if a value cannot be cast to a prescribed type. */
+    boolean strict = true;
+  }
+
+  /** Validation mode. */
+  enum Validation {
+    /** Raise an error if a value cannot be cast to a prescribed type. */ STRICT,
+    /** Retain the original value if it cannot be cast to a prescribed type. */ LAX;
+
+    @Override
+    public String toString() {
+      return Enums.string(this);
+    }
   }
 
   /** Name format. */
@@ -196,38 +212,53 @@ public abstract class PlanFn extends StandardFunc {
     PlanLayout layout;
     /** Type (can be {@code null}). */
     PlanType type;
+    /** Type was explicitly prescribed by the supplied plan (not inferred). */
+    boolean explicitType;
     /** Child (can be {@code null}). */
     QNm child;
 
     /**
-     * Casts an item to the target type.
+     * Casts an item to the target type. If a prescribed type cannot be applied, the original
+     * value is retained (lax) or an error is raised (strict); empty and whitespace-only content
+     * is never affected.
      * @param item item
+     * @param plan plan
      * @return cast item
+     * @throws QueryException query exception
      */
-    Item cast(final Str item) {
-      if(type != null) {
+    Item cast(final Str item, final Plan plan) throws QueryException {
+      final byte[] value = item.string();
+      if(applyType(value)) {
         try {
-          switch(type) {
+          final Item cast = switch(type) {
             case BOOLEAN -> {
-              final Boolean b = Bln.parse(item.string());
-              if(b != null) return Bln.get(b);
+              final Boolean b = Bln.parse(value);
+              yield b != null ? Bln.get(b) : null;
             }
-            case INTEGER -> {
-              return Itr.get(item.itr(info));
-            }
-            case DECIMAL -> {
-              return Dec.get(item.dec(info));
-            }
-            case DOUBLE -> {
-              return Dbl.get(item.dbl(info));
-            }
-            default -> { }
-          }
+            case INTEGER -> Itr.get(item.itr(info));
+            case DECIMAL -> Dec.get(item.dec(info));
+            case DOUBLE -> Dbl.get(item.dbl(info));
+            default -> null;
+          };
+          if(cast != null) return cast;
         } catch(final QueryException ex) {
           Util.debug(ex);
         }
+        // value could not be cast to the prescribed type
+        if(plan.strict && explicitType) throw PLAN_TYPE_X_X.get(info, value, type);
       }
-      return Atm.get(item.string());
+      return Atm.get(value);
+    }
+
+    /**
+     * Checks whether a prescribed type is to be applied: a non-string type is prescribed and the
+     * content is neither empty nor whitespace-only.
+     * @param value string value
+     * @return result of check
+     */
+    private boolean applyType(final byte[] value) {
+      return type != null && type != PlanType.STRING && type != PlanType.SKIP &&
+          Token.normalize(value).length != 0;
     }
 
     /**
@@ -252,6 +283,8 @@ public abstract class PlanFn extends StandardFunc {
         try {
           return pe.create(node, parent, plan, qc);
         } catch(final QueryException ex) {
+          // a strict validation error is final; it must not trigger layout fallback
+          if(ex.error() == PLAN_TYPE_X_X) throw ex;
           Util.debug(ex);
         }
       }
@@ -299,10 +332,10 @@ public abstract class PlanFn extends StandardFunc {
         case EMPTY_PLUS ->
           attributes(node, plan, qc).map();
         case SIMPLE ->
-          cast(Str.get(node.string()));
+          cast(Str.get(node.string()), plan);
         case SIMPLE_PLUS -> {
           final MapBuilder mb = attributes(node, plan, qc);
-          yield mb.put(contentKey(mb, plan), cast(Str.get(node.string()))).map();
+          yield mb.put(contentKey(mb, plan), cast(Str.get(node.string()), plan)).map();
         }
         case LIST ->
           list(node, plan, qc);
@@ -344,6 +377,7 @@ public abstract class PlanFn extends StandardFunc {
     plan.name = options.get(ElementsOptions.NAME_FORMAT);
     plan.marker = options.get(ElementsOptions.ATTRIBUTE_MARKER);
     plan.content = Str.get(options.get(ElementsOptions.CONTENT_KEY));
+    plan.strict = options.get(ElementsOptions.VALIDATION) == Validation.STRICT;
 
     final Value pln = options.get(ElementsOptions.PLAN);
     if(!pln.isEmpty()) {
@@ -373,6 +407,7 @@ public abstract class PlanFn extends StandardFunc {
           final String string = toString(type, qc);
           pe.type = Enums.get(PlanType.class, string);
           if(pe.type == null) throw unexpected("type", string, name);
+          pe.explicitType = true;
         }
         final Value child = map.get(CHILD);
         if(!child.isEmpty()) {
@@ -574,7 +609,7 @@ public abstract class PlanFn extends StandardFunc {
       if(entry != null && entry.type == PlanType.SKIP) continue;
       final byte[] value = attr.string();
       mb.put(nodeName(attr.qname(), false, node, plan, qc, marker),
-          entry != null ? entry.cast(Str.get(value)) : Atm.get(value));
+          entry != null ? entry.cast(Str.get(value), plan) : Atm.get(value));
     }
     return mb;
   }
