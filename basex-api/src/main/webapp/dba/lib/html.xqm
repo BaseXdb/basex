@@ -31,6 +31,9 @@ declare function html:wrap(
   return <html lang='en'>
     <head>
       <meta charset='utf-8'/>
+      <meta http-equiv='Content-Security-Policy'
+            content="default-src 'self'; script-src 'self' 'unsafe-inline';
+                     style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'"/>
       <meta name='viewport' content='width=device-width, initial-scale=1'/>
       <title>DBA{ ($header, tail($options?header)) ! (' » ' || .) }</title>
       <meta name='description' content='Database Administration'/>
