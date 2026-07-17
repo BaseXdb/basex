@@ -154,7 +154,7 @@ public final class EditorArea extends TextPanel {
     if(!opened() || timeStamp == ts && !enforce) return;
 
     // reset timestamp if file will not be reopened
-    if(modified && !BaseXDialog.confirm(gui, Util.info(REOPEN_FILE_X, file.name()))) {
+    if(modified && !BaseXDialog.confirm(gui, Util.info(REVERT_FILE_X, file.name()))) {
       timeStamp = 0;
       return;
     }

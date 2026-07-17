@@ -1006,7 +1006,7 @@ public interface Text {
   /** Command info. */
   String OPEN_EXTERNALLY = lang("open_externally");
   /** Command info. */
-  String REOPEN = lang("reopen");
+  String REVERT = lang("revert");
   /** Command info. */
   String SAVE = lang("save");
   /** Command info. */
@@ -1264,8 +1264,8 @@ public interface Text {
   String CLOSE_FILE_X = lang("close_file_%");
   /** Dialog title for deleting a file. */
   String DELETE_FILE_X = lang("delete_file_%");
-  /** Dialog title for reopening a file. */
-  String REOPEN_FILE_X = lang("reopen_file_%");
+  /** Dialog title for reverting a file. */
+  String REVERT_FILE_X = lang("revert_file_%");
   /** Close all. */
   String CLOSE_ALL = lang("close_all");
 

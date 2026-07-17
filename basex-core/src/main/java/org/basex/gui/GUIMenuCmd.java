@@ -125,7 +125,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Reverts the current editor file. */
-  C_EDIT_REOPEN(REOPEN + DOTS, null, false, false) {
+  C_EDIT_REVERT(REVERT + DOTS, null, false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.getEditor().reopen(true);
@@ -133,7 +133,8 @@ public enum GUIMenuCmd implements GUICommand {
 
     @Override
     public boolean enabled(final GUI gui) {
-      return gui.gopts.get(GUIOptions.SHOWEDITOR);
+      final EditorArea ea = gui.editor.getEditor();
+      return gui.gopts.get(GUIOptions.SHOWEDITOR) && ea != null && ea.opened() && ea.modified();
     }
   },
 

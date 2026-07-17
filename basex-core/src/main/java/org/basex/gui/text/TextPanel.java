@@ -293,7 +293,10 @@ public class TextPanel extends BaseXPanel {
    */
   public final void comment() {
     final int caret = editor.pos();
-    if(editor.comment(rend.getSyntax())) hist.store(editor.text(), caret, editor.pos());
+    if(editor.comment(rend.getSyntax())) {
+      hist.store(editor.text(), caret, editor.pos());
+      release(Action.CHECK);
+    }
     computeHeight.invokeLater(true);
   }
 
@@ -303,7 +306,10 @@ public class TextPanel extends BaseXPanel {
    */
   public final void toCase(final Case cs) {
     final int caret = editor.pos();
-    if(editor.toCase(cs)) hist.store(editor.text(), caret, editor.pos());
+    if(editor.toCase(cs)) {
+      hist.store(editor.text(), caret, editor.pos());
+      release(Action.CHECK);
+    }
     computeHeight.invokeLater(true);
   }
 
@@ -323,6 +329,7 @@ public class TextPanel extends BaseXPanel {
     if(!ds.ok() || !editor.sort()) return;
 
     hist.store(editor.text(), caret, editor.pos());
+    release(Action.CHECK);
     computeHeight.invokeLater(true);
     repaint();
   }
@@ -332,7 +339,10 @@ public class TextPanel extends BaseXPanel {
    */
   public final void format() {
     final int caret = editor.pos();
-    if(editor.format(rend.getSyntax())) hist.store(editor.text(), caret, editor.pos());
+    if(editor.format(rend.getSyntax())) {
+      hist.store(editor.text(), caret, editor.pos());
+      release(Action.CHECK);
+    }
     computeHeight.invokeLater(true);
   }
 
