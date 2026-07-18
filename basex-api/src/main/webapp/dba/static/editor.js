@@ -24,7 +24,7 @@ async function openFile(file) {
     _editor.setValue(disk);
     finishFile(name, "File was opened.");
     // apply a newer unsaved draft on top of the saved file (undo reverts to disk)
-    if(draft !== null && draft !== disk) applyDraft(draft);
+    if(draft !== null && draft !== disk) _editor.setValue(draft);
   } catch(response) {
     showError(response, name);
   }
@@ -57,7 +57,13 @@ async function saveFile() {
  */
 async function closeFile() {
   const name = fileName();
-  if(!name) return;
+  // no file open: still clear the (possibly unsaved) untitled buffer
+  if(!name) {
+    _saved = "";
+    _editor.setValue("");
+    finishFile("", "Editor was cleared.");
+    return;
+  }
   try {
     const text = await request(`editor-close?name=${encodeURIComponent(name)}`);
     // baseline before setValue's synchronous change event (see openFile)
@@ -103,20 +109,11 @@ function saveDraft() {
 }
 
 /**
- * Loads a draft into the editor and notifies the user (undo reverts to the saved file).
- * @param {string} draft draft text
- */
-function applyDraft(draft) {
-  _editor.setValue(draft);
-  setText("Unsaved draft restored (undo to discard).", "warning");
-}
-
-/**
  * Restores the unsaved draft of the untitled buffer on page load, if one exists.
  */
 function restoreDraft() {
   const draft = localStorage.getItem(DRAFT + (fileName() ?? ""));
-  if(draft) applyDraft(draft);
+  if(draft) _editor.setValue(draft);
 }
 
 /**
@@ -140,7 +137,8 @@ function checkButtons() {
   const name = fileName();
   (document.getElementById("open") || {}).disabled = !fileExists(name);
   (document.getElementById("save") || {}).disabled = !name;
-  (document.getElementById("close") || {}).disabled = !name;
+  // Close also clears an untitled buffer, so enable it whenever there is content
+  (document.getElementById("close") || {}).disabled = !name && !document.getElementById("editor")?.value;
 }
 
 /**

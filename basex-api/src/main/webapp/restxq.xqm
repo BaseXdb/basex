@@ -58,8 +58,8 @@ function page:start(
         <p><b>A live, multi-room chat</b></p>
         <p>Switch between channels, see who is online and where they are, and post to the whole room
           or privately to a single person. Every message pushed instantly over WebSockets.</p>
-        <p>For the full effect, open the chat in two browsers and log in as different
-          users (create the extra users in the DBA first).</p>
+        <p>For the full effect, create multiple users in the DBA, open the chat in two browsers,
+          and log in as different users.</p>
 
         <h2>REST</h2>
         <p><b>Work with your databases straight over HTTP</b></p>

@@ -18,7 +18,7 @@ declare variable $dba:COLUMNS := (
   { 'key': 'user', 'label': 'User', 'type': 'dynamic', 'width': '7rem' },
   { 'key': 'type', 'label': 'Type', 'type': 'dynamic', 'width': '7rem' },
   { 'key': 'ms', 'label': 'ms', 'type': 'decimal', 'order': 'desc', 'width': '5rem' },
-  { 'key': 'text', 'label': 'Text', 'type': 'dynamic' }
+  { 'key': 'text', 'label': 'Text', 'type': 'dynamic', 'width': '30rem' }
 );
 
 (:~
@@ -104,9 +104,8 @@ function dba:logs(
             <input type='text' id='input' name='input' value='{ $input }' autocomplete='off'
                    title='Enter regular expression' autofocus='' onkeyup='logEntries(event.key);'/>,
             <span class='ignore'>{
-              'Ignore: ',
               <input type='text' id='ignore' class='smallinput' autocomplete='off'
-                     placeholder='e.g. /dba' title='Regular expression of entries to hide'
+                     placeholder='Ignore, e.g. /dba' title='Regular expression of entries to hide'
                      onkeyup='ignoreLogs(event.key);'/>
             }</span>
           }</div>,

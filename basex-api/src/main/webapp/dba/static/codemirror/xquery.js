@@ -37,20 +37,23 @@ CodeMirror.defineMode("xquery", function() {
     'context', 'copy', 'copy-namespaces', 'count', 'decimal-format', 'declare', 'default', 'delete',
     'descendant', 'descendant-or-self', 'descending', 'diacritics', 'different', 'distance',
     'document', 'document-node', 'element', 'else', 'empty', 'empty-sequence', 'encoding', 'end',
-    'entire', 'every', 'exactly', 'except', 'external', 'first', 'following', 'following-sibling',
+    'entire', 'enum', 'every', 'exactly', 'except', 'external', 'finally', 'first', 'fn', 'following',
+    'following-sibling',
     'for', 'from', 'ftand', 'ftnot', 'ft-option', 'ftor', 'function', 'fuzzy', 'greatest', 'group',
     'if', 'import', 'in', 'inherit', 'insensitive', 'insert', 'instance', 'intersect', 'into',
     'invoke', 'is', 'item', 'language', 'last', 'lax', 'least', 'let', 'levels', 'lowercase', 'map',
-    'modify', 'module', 'most', 'namespace', 'next', 'no', 'node', 'nodes', 'no-inherit',
-    'no-preserve', 'not', 'occurs', 'of', 'only', 'option', 'order', 'ordered', 'ordering',
+    'member', 'modify', 'module', 'most', 'namespace', 'namespace-node', 'next', 'no', 'node', 'nodes',
+    'no-inherit',
+    'no-preserve', 'not', 'occurs', 'of', 'only', 'option', 'order', 'ordered', 'ordering', 'otherwise',
     'paragraph', 'paragraphs', 'parent', 'phrase', 'preceding', 'preceding-sibling', 'preserve',
-    'previous', 'processing-instruction', 'relationship', 'rename', 'replace', 'return',
+    'previous', 'processing-instruction', 'record', 'relationship', 'rename', 'replace', 'return',
     'revalidation', 'same', 'satisfies', 'schema', 'schema-attribute', 'schema-element', 'score',
     'self', 'sensitive', 'sentence', 'sentences', 'sequence', 'skip', 'sliding', 'some', 'stable',
     'start', 'stemming', 'stop', 'strict', 'strip', 'switch', 'text', 'then', 'thesaurus', 'times',
     'to', 'transform', 'treat', 'try', 'tumbling', 'type', 'typeswitch', 'union', 'unordered',
     'update', 'updating', 'uppercase', 'using', 'validate', 'value', 'variable', 'version',
-    'weight', 'when', 'where', 'wildcards', 'window', 'with', 'without', 'word', 'words', 'xquery'];
+    'weight', 'when', 'where', 'while', 'wildcards', 'window', 'with', 'without', 'word', 'words',
+    'xquery'];
     for(var i=0, l=basic.length; i < l; i++) { kwObj[basic[i]] = kw(basic[i]);};
 
     // a list of types. For each add a property to kwObj with the value of
@@ -132,9 +135,10 @@ CodeMirror.defineMode("xquery", function() {
       else
         return "variable";
     }
-    // if a number
+    // a number (XQuery 4.0: hex 0x, binary 0b, '_' digit separators, e/E exponent)
     else if (/\d/.test(ch)) {
-      stream.match(/^\d*(?:\.\d*)?(?:E[+\-]?\d+)?/);
+      if(!(ch == "0" && (stream.match(/^[xX][\da-fA-F_]+/) || stream.match(/^[bB][01_]+/))))
+        stream.match(/^[\d_]*(?:\.[\d_]*)?(?:[eE][+\-]?[\d_]+)?/);
       return "atom";
     }
     // comment start

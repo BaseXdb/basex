@@ -167,5 +167,7 @@ declare function config:editor-files() as xs:string* {
   let $limit := config:get($config:MAXCHARS)
   for $file in file:children(config:editor-dir())
   where file:is-file($file) and file:size($file) <= $limit
-  return file:name($file)
+  let $name := file:name($file)
+  order by $name
+  return $name
 };

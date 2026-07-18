@@ -1,4 +1,6 @@
 :root {
+  /* let native controls (buttons, scrollbars) follow the OS light/dark scheme */
+  color-scheme: light dark;
   --bg: #fff;
   --fg: #111;
   --accent: #C33;
@@ -140,8 +142,6 @@ input[type=text], input[type=password], input[type=number], select, button {
   border: 1px solid var(--border);
   border-radius: 3px;
   outline: none;
-  background-color: var(--bg);
-  color: var(--fg);
 }
 
 input[type=submit], button {
@@ -153,32 +153,19 @@ input[type=submit], button {
 
 input[type=text], input[type=password], input[type=number], select {
   width: 200px;
+  /* entry fields keep themed colours; buttons stay native so disabled greys out */
+  background-color: var(--bg);
+  color: var(--fg);
 }
 
 input:focus, select:focus, button:focus {
   outline: .5px solid var(--fg);
 }
 
-/* explicit background/colour above suppress the browser's greyed-disabled
-   look, so restore a muted appearance for disabled buttons (e.g. Send) */
-button:disabled {
-  background-color: var(--border-light);
-  color: var(--warning);
-  cursor: default;
-}
-
 hr {
   height: .7px;
   border: 0;
   background-color: var(--border);
-}
-
-.img {
-  vertical-align: top;
-}
-
-.slick {
-  padding: 0 0 0 0;
 }
 
 .right {
@@ -219,10 +206,6 @@ hr {
 
 .small {
   height: 10px;
-}
-
-.variable {
-  font-family: Calibri, Helvetica, sans-serif;
 }
 
 .vertical {
@@ -289,5 +272,15 @@ header {
     white-space: normal;
     overflow: visible;
     text-overflow: clip;
+  }
+  /* keep the status message on one line: short ones stay inline after the nav
+     links, a long one truncates with an ellipsis instead of wrapping */
+  #info {
+    display: inline-block;
+    max-width: 100%;
+    vertical-align: bottom;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
