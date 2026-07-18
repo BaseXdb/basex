@@ -2024,7 +2024,7 @@ public enum Function implements AFunction {
       params(STRING_ZO), ELEMENT_O, USER_URI),
   /** XQuery function. */
   _USER_LIST(UserList::new, "list()",
-      params(), ELEMENT_ZM, flag(NDT), USER_URI),
+      params(), STRING_ZM, flag(NDT), USER_URI),
   /** XQuery function. */
   _USER_LIST_DETAILS(UserListDetails::new, "list-details([name])",
       params(STRING_ZO), ELEMENT_ZM, flag(NDT), USER_URI),
