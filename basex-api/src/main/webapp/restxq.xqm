@@ -13,49 +13,61 @@ declare
   %rest:path('')
   %output:method('html')
 function page:start(
-) as element(Q{http://www.w3.org/1999/xhtml}html) {
-  <html xmlns='http://www.w3.org/1999/xhtml'>
+) as element(html) {
+  <html lang='en'>
     <head>
+      <meta charset='utf-8'/>
+      <meta name='viewport' content='width=device-width, initial-scale=1'/>
       <title>BaseX HTTP Services</title>
+      <link rel='icon' href='static/basex.svg'/>
       <link rel='stylesheet' type='text/css' href='static/style.css'/>
     </head>
     <body>
-      <div class='right'><a href='/'><img src='static/basex.svg'/></a></div>
-      <h1>BaseX HTTP Services</h1>
-      <div>Welcome to the BaseX HTTP Services. They allow you to:</div>
-      <ul>
-        <li>create web applications and services with
-          <a href='https://docs.basex.org/main/RESTXQ'>RESTXQ</a>,</li>
-        <li>use full-duplex communication with
-          <a href='https://docs.basex.org/main/WebSockets'>WebSockets</a>, and </li>
-        <li>query and modify databases via <a href='https://docs.basex.org/main/REST'>REST</a>
-          (try <a href='rest'>here</a>).</li>
-      </ul>
+      <header>
+        <div class='header-main'>
+          <div class='header-top'>
+            <h1>BaseX HTTP Services</h1>
+          </div>
+          <nav class='ellipsis'>
+            <a href='dba'>DBA</a> · <a href='chat'>Chat</a>
+          </nav>
+          <hr/>
+        </div>
+        <a href='/' class='header-logo'><img src='static/basex.svg' alt='BaseX'/></a>
+      </header>
+      <main>
+        <p>Welcome to the BaseX HTTP Services: sample web applications written in
+          XQuery, and a REST interface to your databases.</p>
+        <p>For the full picture, see the
+          <a href='https://docs.basex.org/main/Web_Application'>Web Application</a>
+          documentation.</p>
 
-      <p>Find more information on the
-        <a href='https://docs.basex.org/main/Web_Application'>Web Application</a>
-        page in our documentation.</p>
+        <h2>RESTXQ &amp; WebSockets</h2>
+        <p>These sample applications are built entirely in XQuery with
+          <a href='https://docs.basex.org/main/RESTXQ'>RESTXQ</a>.
+          Their source is yours to read: a starting point for your own
+          web applications.</p>
 
-      <p>The following sample applications give you a glimpse of how applications
-        can be written with BaseX:</p>
+        <h3><a href='dba'>DBA: Database Administration</a></h3>
+        <p><b>A complete web front-end for your server</b></p>
+        <p>Browse and edit databases and their resources, manage users,
+        run queries in a live editor, and keep an eye on jobs,
+        sessions and logs, all updating in real time.</p>
 
-      <h3><a href='dba'>DBA: Database Administration</a></h3>
+        <h3><a href='chat'>Chat Application</a></h3>
+        <p><b>A live, multi-room chat</b></p>
+        <p>Switch between channels, see who is online and where they are, and post to the whole room
+          or privately to a single person. Every message pushed instantly over WebSockets.</p>
+        <p>For the full effect, open the chat in two browsers and log in as different
+          users (create the extra users in the DBA first).</p>
 
-      <p>The Database Administration interface is completely written in RESTXQ.<br/>
-        You can view the source code to learn how to build complex web applications with XQuery.
-      </p>
-
-      <h3><a href='chat'>WebSocket Chat</a></h3>
-
-      <p>The chat application demonstrates how bidirectional communication
-        is realized with BaseX.<br/>
-        For a better experience when testing the chat, consider the following steps:
-      </p>
-        
-      <ol>
-        <li> Create different database users first (e.g. via the DBA).</li>
-        <li> Open two different browsers and log in with different users.</li>
-      </ol>
+        <h2>REST</h2>
+        <p><b>Work with your databases straight over HTTP</b></p>
+        <p>Read, add, replace and delete documents, and run queries.
+          All with ordinary web requests, no extra tooling required. Try it <a href='rest'>here</a>.</p>
+      </main>
+      <hr/>
+      <footer class='right'><sup>BaseX Team, BSD License</sup></footer>
     </body>
   </html>
 };
