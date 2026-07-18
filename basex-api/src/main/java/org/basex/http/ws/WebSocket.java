@@ -150,8 +150,9 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
    * @param reason close reason (can be {@code null})
    */
   public void close(final int status, final String reason) {
-    WsPool.remove(id);
+    // remove from the pool only after the close handler has run (via onWebSocketClose)
     if(isOpen()) getSession().close(status, reason, Callback.NOOP);
+    else WsPool.remove(id);
   }
 
   /**

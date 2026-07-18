@@ -293,6 +293,34 @@ public final class WsLifecycleTest extends WsTest {
   }
 
   /**
+   * A server-side {@code ws:close} leaves the connection queryable in {@code %ws:close}.
+   * @throws Exception exception
+   */
+  @Test public void serverCloseHandlerSeesConnection() throws Exception {
+    putCache("ws-close-attr", "");
+    register(
+        "declare %ws:connect('/sc') function m:c() { ws:set(ws:id(), 'k', 'v') };" +
+        "declare %ws:message('/sc', '{$m}') function m:msg($m) { ws:close(ws:id()) };" +
+        "declare %ws:close('/sc') function m:cl() {" +
+        "  cache:put('ws-close-attr', ws:get(ws:id(), 'k')) };");
+
+    final Listener l = new Listener();
+    final java.net.http.WebSocket ws = connect("/sc", l);
+    try {
+      ws.sendText("go", true).get(5, TimeUnit.SECONDS);
+      // the close handler ran with the connection still in the pool and read its attribute
+      awaitCache("ws-close-attr", "v");
+    } finally {
+      // the server has already closed the connection; ignore any resulting error
+      try {
+        close(ws);
+      } catch(final Exception ignore) {
+        Util.debug(ignore);
+      }
+    }
+  }
+
+  /**
    * {@code ws:close} rejects status codes outside the RFC 6455 range.
    * @throws Exception exception
    */
