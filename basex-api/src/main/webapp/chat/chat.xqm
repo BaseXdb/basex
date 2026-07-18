@@ -84,7 +84,6 @@ function chat:logout() as element(rest:response) {
  :)
 declare %private function chat:login() as element(html) {
   chat:wrap((
-    <div class='warning'>Please enter your credentials:</div>,
     (: the entered name and password are sent to login-check (see above) :)
     <form action='/chat/login-check' method='post'>
       <div class='small'/>
@@ -92,13 +91,14 @@ declare %private function chat:login() as element(html) {
         <tr>
           <td><b>Name:</b></td>
           <td>
-            <input size='30' name='name' id='user' autofocus=''/>
+            <input type='text' name='name' id='user' autofocus=''/>
           </td>
         </tr>
         <tr>
           <td><b>Password:</b></td>
           <td>{
-            <input size='30' type='password' name='pass'/>,
+            <input type='password' name='pass'/>,
+            ' ',
             <button type='submit'>Login</button>
           }</td>
         </tr>
@@ -108,31 +108,40 @@ declare %private function chat:login() as element(html) {
 };
 
 (:~
- : Returns the HTML main page: a field for typing messages, the list of
- : users, and the chat messages. The included script (chat.js) opens the
- : WebSocket connection and fills in the 'users' and 'messages' parts.
+ : Returns the HTML main page: the room selector, a status line, a field for
+ : typing messages, the list of users, and the chat messages. The included
+ : script (chat.js) opens the WebSocket connection to the selected room and
+ : fills in the 'status', 'users' and 'messages' parts.
  : @return HTML page
  :)
 declare %private function chat:main() as element(html) {
   chat:wrap((
+    (: the input sends chat messages; the button asks the server for
+     : statistics, which arrive asynchronously (see chat-ws:info / ws:eval) :)
     <p>
-      <input type='text' size='60' autofocus='true' placeholder='Message to all users…'
+      <input type='text' autofocus='true' placeholder='Message to the room…'
              id='input' onkeydown='keyDown(event)' autocomplete='off'/>
+      { ' ' }
+      <button type='button' id='send' onclick='sendInput()' disabled='disabled'>Send</button>
+      { ' ' }
+      <button type='button' id='cancel' onclick='resetPrivateMsg()'
+              title='Leave private mode' hidden='hidden'>Cancel</button>
+      { ' ' }
+      <button type='button' onclick='serverInfo()'>Who’s here?</button>
     </p>,
     <table width='100%'>
       <tr>
-        <td width='100'>
-          <div class='note'>USERS (<b>online</b>)</div>
+        <td width='140'>
           <div id='users'/>
         </td>
         <td class='vertical'/>
         <td>
-          <div class='note'>CHAT MESSAGES</div>
+          <div class='note'><b>MESSAGES</b></div>
           <div id='messages'/>
         </td>
       </tr>
     </table>
-  ), <script type='text/javascript' src='/static/chat.js'/>)
+  ), <script type='text/javascript' defer='' src='/static/chat.js'/>)
 };
 
 (:~
@@ -145,25 +154,56 @@ declare %private function chat:wrap(
   $contents  as item()*,
   $headers   as element()*
 ) as element(html) {
-  <html>
+  let $user := session:get($chat-util:id)
+  return <html lang='en'>
     <head>
       <meta charset='utf-8'/>
-      <title>BaseX WebSocket Chat</title>
+      <meta name='viewport' content='width=device-width, initial-scale=1'/>
+      <title>BaseX Chat Application</title>
       <meta name='author' content='BaseX Team, BSD License'/>
+      <link rel='icon' href='/static/basex.svg'/>
       <link rel='stylesheet' type='text/css' href='/static/style.css'/>
       { $headers }
     </head>
-    <body>
-      <span class='right'>
-        {
-          (: if someone is logged in, show the name and a logout link :)
-          for $id in session:get($chat-util:id)
-          return <span><b>{ $id }</b> (<a href='/chat/logout'>logout</a>)</span>
-        }
-        &#xa0; <a href='/'><img src='static/basex.svg' class='img'/></a>
-      </span>
-      <h1>BaseX WebSocket Chat</h1>
-      { $contents }
+    <body data-user='{ $user }'>
+      <header>
+        <div class='header-main'>
+          <div class='header-top'>
+            <h1>
+              <span class='title-full'>BaseX Chat Application</span>
+              <span class='title-short'>BaseX Chat</span>
+            </h1>
+            {
+              (: if someone is logged in, show the name and a logout link :)
+              if($user) { <div><b>{ $user }</b> · <a href='/chat/logout'>logout</a></div> }
+            }
+          </div>
+          <nav class='ellipsis'>{
+            (: logged in: room selector (active room bolded by chat.js) plus the
+             : info element for server notices (welcome, join/leave, 'Who''s
+             : here?'); logged out: the login prompt, placed here like the DBA :)
+            if($user) {
+              let $links := $chat-util:rooms !
+                <a href='#' class='room' data-room='{ . }'>{ chat-util:name(.) }</a>
+              return (
+                head($links), tail($links) ! (' · ', .),
+                (1 to 2) ! '&#x2000;', <b id='info' class='note'/>
+              )
+            } else {
+              <div class='note'>Please enter your credentials:</div>
+            }
+          }</nav>
+          <hr/>
+        </div>
+        <a href='/' class='header-logo'><img src='/static/basex.svg' alt='BaseX'/></a>
+      </header>
+      <main>
+        <table class='content' width='100%'>
+          <tr><td>{ $contents }</td></tr>
+        </table>
+      </main>
+      <hr/>
+      <footer class='right'><sup>BaseX Team, BSD License</sup></footer>
     </body>
   </html>
 };
