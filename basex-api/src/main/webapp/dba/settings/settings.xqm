@@ -42,9 +42,6 @@ function dba:settings(
   let $number := fn($key, $label) {
     $table-row($label, <input type='number' name='{ $key }' value='{ config:get($key) }'/>)
   }
-  let $string := fn($key, $label) {
-    $table-row($label, <input type='text' name='{ $key }' value='{ config:get($key) }'/>)
-  }
   return (
     <tr>
       <td width='33%'>
@@ -61,10 +58,6 @@ function dba:settings(
           <h3>Tables</h3>
           <table>{
             $number($config:MAXROWS,  'Displayed table rows')
-          }</table>
-          <h3>Logs</h3>
-          <table>{
-            $string($config:IGNORE-LOGS, <span>Ignore entries (e.g. <code>/dba</code>):</span>)
           }</table>
         </form>
       </td>

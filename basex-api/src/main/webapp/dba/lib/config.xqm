@@ -36,8 +36,6 @@ declare variable $config:TIMEOUT := 'timeout';
 declare variable $config:MEMORY := 'memory';
 (:~ Permission when running queries. :)
 declare variable $config:PERMISSION := 'permission';
-(:~ Show DBA log entries. :)
-declare variable $config:IGNORE-LOGS := 'ignore-logs';
 (:~ Indent results. :)
 declare variable $config:INDENT := 'indent';
 
@@ -47,11 +45,10 @@ declare %private variable $config:OPTIONS-FILE := $config:DBA-DIR || '.dba.xml';
 (:~ Default options. :)
 declare %basex:lazy %private variable $config:DEFAULTS := {
   $config:MAXCHARS   : 1000000,
-  $config:MAXROWS    : 1000,
+  $config:MAXROWS    : 100,
   $config:TIMEOUT    : 30,
   $config:MEMORY     : 1000,
   $config:PERMISSION : 'admin',
-  $config:IGNORE-LOGS: '',
   $config:INDENT     : 'no'
 };
 

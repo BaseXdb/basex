@@ -55,7 +55,8 @@ function dba:editor(
             <button name='close' id='close' disabled='' onclick='closeFile()'>Close</button>,
             <span>  </span>,
             <button id='run' onclick='runQuery()' title='Ctrl-Enter'>Run</button>,
-            <button id='stop' onclick='stopQuery(true)' disabled=''>Stop</button>
+            <button id='stop' onclick='stopQuery(true)' disabled=''>Stop</button>,
+            <button type='button' onclick='copyOutput()'>Copy</button>
           ), <span> </span>),
           <h2 class='right'>Result</h2>
         }</form>
@@ -70,7 +71,11 @@ function dba:editor(
         <textarea id='output' readonly='' spellcheck='false'/>,
         html:js('loadCodeMirror("xquery", true, true);'),
         html:js('initResizer();'),
-        $edited ! html:js('openFile("' || file:name(.) || '");')
+        if ($edited) {
+          html:js('openFile("' || file:name($edited) || '");')
+        } else {
+          html:js('restoreDraft();')
+        }
       }</td>
     </tr>
   ) => html:wrap({ 'header': $dba:CAT, 'info': $info, 'error': $error })

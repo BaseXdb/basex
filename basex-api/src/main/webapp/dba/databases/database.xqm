@@ -142,6 +142,8 @@ function dba:database(
             if (db:type($name, $resource) != 'xml') { attribute disabled {} }
           }</input>,
           <div class='small'/>,
+          <button type='button' onclick='copyOutput()'>Copy</button>,
+          <div class='small'/>,
           <textarea name='output' id='output' readonly='' spellcheck='false'/>,
           html:js('loadCodeMirror("xml", false, true); queryResource(true);')
         } else if ($db-exists) {

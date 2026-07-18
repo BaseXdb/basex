@@ -13,6 +13,9 @@ let _logInput;
 /** Most recent log filter string. */
 let _dbInput;
 
+/** localStorage key for the logs 'ignore entries' filter. */
+const IGNORE_KEY = "dba-ignore-logs";
+
 /**
  * Indicates whether the table row containing a checkbox is currently shown.
  * @param {checkbox} input checkbox
@@ -83,11 +86,16 @@ document.addEventListener("click", (event) => {
  * Marks truncated table cells, indicating that they can be expanded.
  */
 function markTruncated() {
-  for(const cell of document.querySelectorAll("table.fixed td")) {
-    if(!cell.classList.contains("expanded")) {
-      cell.classList.toggle("truncated", cell.scrollWidth > cell.clientWidth);
-    }
+  // read all overflow states first, then write classes: interleaving the two forces
+  // a full re-layout per cell, which is O(rows) for a fixed table and dominates on large logs
+  const cells = document.querySelectorAll("table.fixed td");
+  const truncated = [];
+  for(const cell of cells) {
+    truncated.push(cell.classList.contains("expanded") ? null : cell.scrollWidth > cell.clientWidth);
   }
+  cells.forEach((cell, i) => {
+    if(truncated[i] !== null) cell.classList.toggle("truncated", truncated[i]);
+  });
 }
 window.addEventListener("resize", markTruncated);
 
@@ -167,7 +175,7 @@ async function request(url, data) {
  */
 function query(path, query, reset) {
   let url = path;
-  for(const name of [ "name", "date", "resource", "sort", "time", "page" ]) {
+  for(const name of [ "name", "date", "resource", "sort", "time", "page", "ignore" ]) {
     const value = document.getElementById(name)?.value;
     if(value && (name !== "page" || value !== 1 && !reset)) {
       url += `${url === path ? "?" : "&"}${name}=${encodeURIComponent(value)}`;
@@ -266,16 +274,37 @@ function showError(response, info) {
 
   // normalize error message
   let msg = response.statusText.match(/\[\w+\]/g) ? response.statusText : response.responseText;
-  const lc = !info && msg.match(/\d+\/\d+:/);
-  const s = msg.indexOf("["), e1 = msg.indexOf("\n", s);
+  const lc = !info && msg.match(/(\d+)\/(\d+):/);
+  // isolate the error-code line ([XPST0003] …); match a real code, not any '[' in the text
+  const s = msg.search(/\[[A-Z]\w*\]/), e1 = msg.indexOf("\n", s);
   if(s > -1) msg = msg.substring(s, e1 > s ? e1 : msg.length);
   msg = msg.replace(/^\[.*?\] /, "").replace(/Stack Trace:.*/, "").replace(/\s+/g, " ");
   if(info) msg = `${info}: ${msg}`;
-  if(lc) msg = `${lc} ${msg}`;
 
   // decode HTML entities via an inert parse (no scripts run, no resources load)
   const decoded = new DOMParser().parseFromString(msg, "text/html").documentElement.textContent;
   setText(decoded, "error");
+
+  // with a line/column and an open editor, make a click on the message jump there
+  const el = document.getElementById("info");
+  if(lc && _editor && _editor.setCursor) {
+    el.dataset.line = lc[1];
+    el.dataset.column = lc[2];
+    el.classList.add("locatable");
+  } else {
+    delete el.dataset.line;
+    delete el.dataset.column;
+  }
+}
+
+/**
+ * Moves the editor cursor to the line/column of a clickable error message.
+ */
+function jumpToError() {
+  const info = document.getElementById("info");
+  if(!info.classList.contains("locatable") || !_editor || !_editor.setCursor) return;
+  _editor.setCursor({ line: Number(info.dataset.line) - 1, ch: Number(info.dataset.column) - 1 });
+  _editor.focus();
 }
 
 /**
@@ -295,8 +324,9 @@ function showResult(text) {
 async function logEntries(key) {
   const reset = key && key !== "Enter";
   const input = document.getElementById("input").value.trim();
+  const ignore = document.getElementById("ignore")?.value.trim() ?? "";
   const filters = document.querySelectorAll("input.filter");
-  const state = [ input, ...[...filters].map(f => f.value.trim()) ].join("\u0000");
+  const state = [ input, ignore, ...[...filters].map(f => f.value.trim()) ].join("\u0000");
   if(reset && _logInput === state) return false;
   _logInput = state;
   try {
@@ -326,6 +356,24 @@ async function logEntries(key) {
     for(const filter of filters) href = replaceParam(href, filter.name, filter.value.trim());
     window.history.replaceState(null, "", href);
   }
+}
+
+/**
+ * Persists the log ignore filter and refreshes the entries.
+ * @param {string} key typed key
+ */
+function ignoreLogs(key) {
+  localStorage.setItem(IGNORE_KEY, document.getElementById("ignore").value);
+  return logEntries(key);
+}
+
+/**
+ * Restores the persisted ignore filter, then loads the log entries.
+ */
+function initLogs() {
+  const ignore = document.getElementById("ignore");
+  if(ignore) ignore.value = localStorage.getItem(IGNORE_KEY) ?? "";
+  return logEntries();
 }
 
 /**
@@ -399,6 +447,7 @@ function loadCodeMirror(language, edit, resize) {
       _editor.on("change", (cm) => {
         cm.save();
         if(checkButtons) checkButtons();
+        saveDraft();
       });
     } else {
       _editor = {
@@ -409,6 +458,7 @@ function loadCodeMirror(language, edit, resize) {
       }
       editorArea.onchange = () => {
         if(checkButtons) checkButtons();
+        saveDraft();
       };
     }
   }
@@ -432,8 +482,12 @@ function loadCodeMirror(language, edit, resize) {
   if(resize) {
     const refresh = () => {
       // size each pane from its own top to the viewport bottom, so a tall
-      // sibling column (e.g. a long resource list) can't shrink it
-      const height = elem => Math.max(192, window.innerHeight - elem.getBoundingClientRect().top - 32);
+      // sibling column (e.g. a long resource list) can't shrink it. the reserve
+      // leaves room for the chrome below <main>: hr + footer + small + body margin.
+      // on narrow (stacked) layouts, cap the height so the editor stays compact
+      // instead of filling the viewport and pushing the output/buttons off-screen
+      const height = elem => window.innerWidth <= 800 ? 200 :
+        Math.max(192, window.innerHeight - elem.getBoundingClientRect().top - 52);
       if (useCM) {
         for(const elem of document.querySelectorAll(".CodeMirror")) {
           elem.CodeMirror.setSize("100%", height(elem));
@@ -459,6 +513,93 @@ function addInput(source) {
     href = replaceParam(href, input.name, input.value.trim());
   }
   source.href = href;
+}
+
+/**
+ * Enables drag-and-drop and selection feedback for file upload forms.
+ */
+function enableUploads() {
+  for(const input of document.querySelectorAll("input[type=file]")) {
+    const form = input.closest("form");
+    if(!form) continue;
+    const info = document.createElement("span");
+    info.className = "note";
+    input.after(info);
+    const show = () => {
+      const n = input.files.length;
+      info.textContent = n ? ` ${n} file${n === 1 ? "" : "s"} selected` : "";
+    };
+    input.addEventListener("change", show);
+    form.addEventListener("dragover", (event) => {
+      event.preventDefault();
+      form.classList.add("dragover");
+    });
+    form.addEventListener("dragleave", (event) => {
+      // ignore events bubbling up from child elements
+      if(!form.contains(event.relatedTarget)) form.classList.remove("dragover");
+    });
+    form.addEventListener("drop", (event) => {
+      event.preventDefault();
+      form.classList.remove("dragover");
+      input.files = event.dataTransfer.files;
+      show();
+    });
+  }
+}
+
+/**
+ * Copies text to the clipboard and confirms via the message area.
+ * @param {string} text text to copy
+ */
+async function copy(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    setText("Copied to clipboard.", "info");
+  } catch {
+    setText("Copy failed.", "error");
+  }
+}
+
+/**
+ * Copies the current query result to the clipboard.
+ */
+function copyOutput() {
+  copy(_output ? _output.getValue() : "");
+}
+
+/**
+ * Handles global keyboard shortcuts.
+ * @param {event} event keydown event
+ */
+function shortcuts(event) {
+  if(event.key === "Escape") {
+    setText("", "");
+    return;
+  }
+  // ignore key presses while typing or combined with modifier keys
+  const target = event.target;
+  if(event.ctrlKey || event.metaKey || event.altKey ||
+     target.matches("input, textarea, select") || target.closest(".CodeMirror")) return;
+  if(event.key === "/") {
+    // prefer the main search field (right panel) over column and log-file filters
+    for(const selector of [ "#input", "input.filter", "#log-filter" ]) {
+      const field = document.querySelector(selector);
+      if(field) {
+        event.preventDefault();
+        field.focus();
+        break;
+      }
+    }
+  }
+}
+
+/**
+ * Initializes page-wide interactive behavior.
+ */
+function ready() {
+  enableUploads();
+  document.addEventListener("keydown", shortcuts);
+  document.getElementById("info")?.addEventListener("click", jumpToError);
 }
 
 /**

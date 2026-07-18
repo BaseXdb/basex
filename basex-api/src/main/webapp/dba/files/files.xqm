@@ -39,6 +39,7 @@ function dba:files(
       <td>
         <h2>Directory</h2>
         <form action='dir-change' method='get' autocomplete='off'>
+          <button type='button' class='right' onclick='copy(this.form.dir.value)'>Copy path</button>
           <select name='dir' style='width: 350px;' onchange='this.form.submit();'>{
             let $dir-path := fn($path) {
               try {

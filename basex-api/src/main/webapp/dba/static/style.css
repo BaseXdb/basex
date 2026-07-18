@@ -32,7 +32,9 @@ body {
   font-family: Calibri, Helvetica, sans-serif;
   font-size: 16px;
   overflow-y: scroll;
-  margin: .5rem 1rem 1rem 1rem;
+  /* no top margin: the sticky header supplies its own top spacing (via padding),
+     so it starts flush at the viewport top and pins without any travel */
+  margin: 0 1rem 1rem 1rem;
   background-color: var(--bg);
   color: var(--fg);
 }
@@ -193,6 +195,11 @@ input.filter {
   box-sizing: border-box;
 }
 
+/* numeric-column filter fields align with their right-aligned values */
+td.num input.filter {
+  text-align: right;
+}
+
 /* stable column widths: truncate overflowing cells, show full values in tooltips */
 table.fixed {
   width: 100%;
@@ -231,6 +238,12 @@ header {
   display: flex;
   align-items: flex-start;
   gap: 1rem;
+  /* keep the header pinned while the page scrolls */
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: var(--bg);
+  padding-top: .5rem;
 }
 
 .header-main {
@@ -242,13 +255,18 @@ header {
 .header-top {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: flex-start;
   gap: 1rem;
   flex-wrap: wrap;
 }
 
 .header-logo {
   flex: none;
+}
+
+/* short page title, shown on narrow screens instead of the full one */
+.title-short {
+  display: none;
 }
 
 /* wraps wide data tables so they scroll sideways instead of widening the page */
@@ -313,6 +331,9 @@ header {
 
 /* narrow screens */
 @media (max-width: 800px) {
+  /* shorten the page title */
+  .title-full { display: none; }
+  .title-short { display: inline; }
   /* let the navigation wrap instead of truncating with an ellipsis */
   nav.ellipsis {
     white-space: normal;
@@ -330,4 +351,39 @@ header {
   table.content > tbody > tr > td.vertical {
     display: none;
   }
+  /* logs: show the search panel above the file list on narrow screens */
+  table.content > tbody > tr.stack-reverse {
+    display: flex;
+    flex-direction: column;
+  }
+  table.content > tbody > tr.stack-reverse > td:last-child {
+    order: -1;
+  }
+}
+
+/* drag-and-drop target highlight for file upload forms */
+form.dragover {
+  outline: 2px dashed var(--accent);
+  outline-offset: 4px;
+}
+
+/* error message that can be clicked to jump to its line/column in the editor */
+#info.locatable {
+  cursor: pointer;
+}
+
+/* logs: search line with a right-aligned "Ignore" filter */
+.logbar {
+  display: flex;
+  align-items: baseline;
+  gap: .5rem;
+  /* separate the search line from the results below it */
+  margin-bottom: .75rem;
+}
+.logbar h3 {
+  margin: 0;
+}
+.logbar .ignore {
+  margin-left: auto;
+  color: var(--muted);
 }

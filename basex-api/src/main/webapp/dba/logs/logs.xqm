@@ -55,7 +55,7 @@ function dba:logs(
   let $files := reverse(sort(admin:logs()))
   let $date := $name otherwise string(head($files))
   return (
-    <tr>
+    <tr class='stack-reverse'>
       <td width='190'>
         <h2>{
           'Logs', '&#xa0;',
@@ -98,14 +98,20 @@ function dba:logs(
       <td class='vertical'/>
       <td>{
         if ($date) {
-          <h3>{
-            $date, '&#xa0;',
+          <div class='logbar'>{
+            <h3>{ $date }</h3>,
             <input type='hidden' name='name' value='{ $date }'/>,
             <input type='text' id='input' name='input' value='{ $input }' autocomplete='off'
-                   title='Enter regular expression' autofocus='' onkeyup='logEntries(event.key);'/>
-          }</h3>,
+                   title='Enter regular expression' autofocus='' onkeyup='logEntries(event.key);'/>,
+            <span class='ignore'>{
+              'Ignore: ',
+              <input type='text' id='ignore' class='smallinput' autocomplete='off'
+                     placeholder='e.g. /dba' title='Regular expression of entries to hide'
+                     onkeyup='ignoreLogs(event.key);'/>
+            }</span>
+          }</div>,
           <div id='output'/>,
-          html:js('logEntries();')
+          html:js('initLogs();')
         }
       }</td>
     </tr>
@@ -124,18 +130,20 @@ function dba:logs(
 declare
   %rest:POST('{$input}')
   %rest:path('/dba/logs')
-  %rest:query-param('date', '{$date}')
-  %rest:query-param('sort', '{$sort}', 'time')
-  %rest:query-param('page', '{$page}', '1')
-  %rest:query-param('time', '{$time}')
+  %rest:query-param('date',   '{$date}')
+  %rest:query-param('sort',   '{$sort}', 'time')
+  %rest:query-param('page',   '{$page}', '1')
+  %rest:query-param('time',   '{$time}')
+  %rest:query-param('ignore', '{$ignore}')
   %output:method('html')
   %rest:single
 function dba:log(
-  $input  as xs:string?,
-  $date   as xs:string,
-  $sort   as xs:string,
-  $page   as xs:string,
-  $time   as xs:string?
+  $input   as xs:string?,
+  $date    as xs:string,
+  $sort    as xs:string,
+  $page    as xs:string,
+  $time    as xs:string?,
+  $ignore  as xs:string?
 ) as element()+ {
   (: reject invalid search expressions :)
   let $filters := map:merge(
@@ -150,14 +158,13 @@ function dba:log(
   return if ($error) then web:error(400, $error) else
 
   let $entries := (
-    let $ignore-logs := config:get($config:IGNORE-LOGS)
     let $regex-string := matches($input, '[+*?^$(){}|\[\]\\]')
     let $terms := if ($regex-string) then $input else tokenize($input)
     let $joined-terms := if ($regex-string) then $input else string-join($terms, '|')
 
     for $log in reverse(admin:logs($date, true()))
     let $text := string($log)
-    where not($ignore-logs and matches($text, $ignore-logs, 'i'))
+    where not($ignore and matches($text, $ignore, 'i'))
     (: AND-combine column filters :)
     where every $key in map:keys($filters) satisfies matches(
       if ($key = 'text') then $text else string($log/@*[name() = $key]), $filters($key), 'i'
@@ -202,7 +209,8 @@ function dba:log(
         'address': string($log/@address),
         'ms': xs:decimal($log/@ms),
         'time': fn() {
-          let $link := html:link($id, $dba:CAT || '-jump', { 'date': $date, 'time': $id })
+          let $link := html:link($id, $dba:CAT || '-jump',
+            ({ 'date': $date, 'time': $id }, { 'ignore': $ignore }[$ignore]))
           return if (not($input) and $id = $time) then element b { $link } else $link
         }
       }
@@ -217,6 +225,7 @@ function dba:log(
     for $column in $dba:COLUMNS
     let $name := 'f-' || $column?key
     return element td {
+      attribute class { 'num' }[$column?type = $html:NUMBER],
       <input type='text' class='filter' name='{ $name }' value='{ $filters($column?key) }'
              placeholder='{ $column?label }' autocomplete='off'
              title='Filter: { $column?label }' onkeyup='logEntries(event.key);'/>
@@ -237,17 +246,18 @@ function dba:log(
 declare
   %rest:GET
   %rest:path('/dba/logs-jump')
-  %rest:query-param('date', '{$date}')
-  %rest:query-param('time', '{$time}')
+  %rest:query-param('date',   '{$date}')
+  %rest:query-param('time',   '{$time}')
+  %rest:query-param('ignore', '{$ignore}')
 function dba:logs-jump(
-  $date  as xs:string,
-  $time  as xs:string
+  $date    as xs:string,
+  $time    as xs:string,
+  $ignore  as xs:string?
 ) as element(rest:response) {
   let $page := head((
-    let $ignore-logs := config:get($config:IGNORE-LOGS)
     let $max := config:get($config:MAXROWS)
     for $log at $pos in reverse(
-      admin:logs($date, true())[not($ignore-logs and matches(., $ignore-logs, 'i'))]
+      admin:logs($date, true())[not($ignore and matches(., $ignore, 'i'))]
     )
     where $log/@time = $time
     return ($pos - 1) idiv $max + 1,

@@ -3,6 +3,11 @@ let _resizer;
 /** Link to the left editor component. */
 let _left;
 
+/** localStorage key prefix for unsaved editor drafts (per file name). */
+const DRAFT = "dba-draft:";
+/** On-disk content of the current file (empty for an untitled buffer). */
+let _saved = "";
+
 /**
  * Opens a file.
  * @param {string} file optional file name
@@ -12,8 +17,14 @@ async function openFile(file) {
 
   const name = file || fileName();
   try {
-    _editor.setValue(await request(`editor-open?name=${encodeURIComponent(name)}`));
+    const disk = await request(`editor-open?name=${encodeURIComponent(name)}`);
+    const draft = localStorage.getItem(DRAFT + name);
+    // set the baseline before setValue, whose synchronous change event runs saveDraft
+    _saved = disk;
+    _editor.setValue(disk);
     finishFile(name, "File was opened.");
+    // apply a newer unsaved draft on top of the saved file (undo reverts to disk)
+    if(draft !== null && draft !== disk) applyDraft(draft);
   } catch(response) {
     showError(response, name);
   }
@@ -24,12 +35,16 @@ async function openFile(file) {
  */
 async function saveFile() {
   // append file suffix
-  let name = fileName();
+  const raw = fileName();
+  let name = raw;
   if(!name.includes(".")) name += ".xq";
 
   const fileString = document.getElementById("editor").value;
   try {
     const text = await request(`editor-save?name=${encodeURIComponent(name)}`, fileString);
+    // drop the draft: the buffer now matches the saved file (also the pre-suffix key)
+    localStorage.removeItem(DRAFT + raw);
+    localStorage.removeItem(DRAFT + name);
     finishFile(name, "File was saved.");
     refreshDataList(text.split("/"));
   } catch(response) {
@@ -45,6 +60,9 @@ async function closeFile() {
   if(!name) return;
   try {
     const text = await request(`editor-close?name=${encodeURIComponent(name)}`);
+    // baseline before setValue's synchronous change event (see openFile)
+    _saved = "";
+    localStorage.removeItem(DRAFT + name);
     _editor.setValue("");
     finishFile("", "File was closed.");
     refreshDataList(text.split("/"));
@@ -63,9 +81,42 @@ function finishFile(name, info) {
   const disabled = name && !name.match(/\.xq(m|l|uery)?$/i);
   document.getElementById("run").disabled = disabled;
   _editor.clearHistory();
+  _saved = document.getElementById("editor").value;
   checkButtons();
   setText(info, "info");
   _editor.focus();
+}
+
+/**
+ * Persists the editor buffer as a local draft, or drops it once it matches the saved file.
+ */
+function saveDraft() {
+  const name = fileName();
+  // drafts are an editor-page feature; skip on other CodeMirror pages (no file field)
+  if(name === undefined) return;
+  const content = document.getElementById("editor").value;
+  const key = DRAFT + name;
+  try {
+    if(content === _saved) localStorage.removeItem(key);
+    else localStorage.setItem(key, content);
+  } catch { /* storage disabled or full: drafts are best-effort */ }
+}
+
+/**
+ * Loads a draft into the editor and notifies the user (undo reverts to the saved file).
+ * @param {string} draft draft text
+ */
+function applyDraft(draft) {
+  _editor.setValue(draft);
+  setText("Unsaved draft restored (undo to discard).", "warning");
+}
+
+/**
+ * Restores the unsaved draft of the untitled buffer on page load, if one exists.
+ */
+function restoreDraft() {
+  const draft = localStorage.getItem(DRAFT + (fileName() ?? ""));
+  if(draft) applyDraft(draft);
 }
 
 /**

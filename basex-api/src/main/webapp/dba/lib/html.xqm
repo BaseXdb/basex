@@ -52,7 +52,10 @@ declare function html:wrap(
       <header>
         <div class='header-main'>
           <div class='header-top'>
-            <h1>BaseX Database Administration</h1>
+            <h1>
+              <span class='title-full'>BaseX Database Administration</span>
+              <span class='title-short'>BaseX DBA</span>
+            </h1>
             {
               if ($user) {
                 <div><b>{ $user }</b> · <a href='logout'>logout</a></div>
@@ -100,7 +103,7 @@ declare function html:wrap(
       <footer class='right'><sup>BaseX Team, BSD License</sup></footer>
       <div class='small'/>
       {
-        html:js('buttons();'),
+        html:js('buttons(); ready();'),
         html:js('hideParams("info", "error");')[exists(($options?info, $options?error)[.])]
       }
     </body>
