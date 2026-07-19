@@ -105,6 +105,7 @@ final class TextRenderer extends BaseXBack {
   public void setFont(final Font f) {
     super.setFont(f);
     if(gui == null) return;
+    cache.reset();
 
     final GUIOptions gopts = gui.gopts;
     margin = gopts.get(GUIOptions.SHOWMARGIN) ? Math.max(gopts.get(GUIOptions.MARGIN), 1) : -1;
@@ -206,9 +207,10 @@ final class TextRenderer extends BaseXBack {
    * @return line and column
    */
   int[] caretPos() {
+    computeHeight();
+
     final TextIterator iter = new TextIterator(text);
     final int c = iter.caret(), idx = lineIndex(c);
-    // jump to the caret's cached line; if the cache is stale, scan the text from the start
     int ln = Math.max(idx, 0) + 1, col = 1;
     if(idx >= 0) iter.pos(cache.pos(idx));
     while(iter.pos() < c) {
@@ -273,20 +275,58 @@ final class TextRenderer extends BaseXBack {
    */
   void computeHeight() {
     width = getWidth() - OFFSET;
-
-    // rebuild the line-offset cache while measuring the whole document
-    final Graphics g = getGraphics();
-    cache.reset();
-    final TextIterator iter = init(g, true);
-    cache.add(y, 0, syntax.state());
-    while(more(iter, g)) {
-      // advance the highlighter state so it can be restored when rendering resumes mid-document
-      syntax.getColor(iter);
-      if(next(iter)) cache.add(y, iter.posEnd(), syntax.state());
+    // text and width unchanged: only refresh the derived height and scroll extent
+    if(cache.built(text.text(), width)) {
+      height = getHeight() + fontHeight;
+      scroll.height(cache.endY() + OFFSET);
+      return;
     }
-    cache.finish(text.size(), width);
+
+    final Graphics g = getGraphics();
+    final byte[] txt = text.text();
+    final TextIterator iter = init(g, true);
+    // try to resume from the edited line
+    final int r0 = g != null ? cache.beginUpdate(txt, width, offset) : -1;
+    int endY;
+    if(r0 < 0) {
+      cache.reset();
+      cache.add(y, 0, syntax.state());
+      while(more(iter, g)) {
+        // advance the highlighter state so it can be restored when rendering resumes mid-document
+        syntax.getColor(iter);
+        if(next(iter)) cache.add(y, iter.posEnd(), syntax.state());
+      }
+      endY = y;
+    } else {
+      // resume at the first changed line
+      final int sp = cache.startPos();
+      final int[] st = cache.startState();
+      y = cache.startY();
+      lineY = y - (fontHeight << 2) / 5;
+      line = r0 + 1;
+      iter.pos(sp);
+      iter.posEnd(sp);
+      syntax.state(st);
+      lineC = edit && iter.caretLine(true);
+      cache.add(y, sp, st);
+
+      endY = -1;
+      while(more(iter, g)) {
+        syntax.getColor(iter);
+        if(next(iter)) {
+          final int p = iter.posEnd();
+          final int[] state = syntax.state();
+          // stop as soon as the layout re-converges with the unchanged tail
+          if(cache.splice(p, y, state)) { endY = cache.endY(); break; }
+          cache.add(y, p, state);
+        }
+      }
+      // no convergence: the edit reached the end of the document
+      if(endY < 0) endY = y;
+    }
+    cache.finish(txt, width, offset, endY);
     height = getHeight() + fontHeight;
-    scroll.height(y + OFFSET);
+    scroll.height(endY + OFFSET);
     marks();
   }
 
@@ -326,14 +366,16 @@ final class TextRenderer extends BaseXBack {
 
   /**
    * Positions the iterator at the first text line at or above the viewport, using the
-   * line-offset cache, so only the visible region is rendered. Falls back to rendering from
-   * the top of the document if the cache is missing or stale.
+   * line-offset cache, so only the visible region is rendered.
    * @param iter text iterator
    */
   private void skip(final TextIterator iter) {
-    if(!cache.valid(text.size(), width)) return;
+    if(!cache.positionable(width)) return;
     final int top = scroll.pos();
     final int idx = cache.indexByY(top);
+    final int p = cache.pos(idx);
+    // trust a stale cache only if the pending edit (at the caret) is not above this line
+    if(p > iter.caret() && !cache.valid(text.size(), width)) return;
     position(iter, idx, -top);
     // restore the highlighter state captured for this line so colors resume correctly
     syntax.state(cache.state(idx));

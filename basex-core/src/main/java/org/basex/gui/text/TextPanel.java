@@ -293,11 +293,7 @@ public class TextPanel extends BaseXPanel {
    */
   public final void comment() {
     final int caret = editor.pos();
-    if(editor.comment(rend.getSyntax())) {
-      hist.store(editor.text(), caret, editor.pos());
-      release(Action.CHECK);
-    }
-    computeHeight.invokeLater(true);
+    finish(caret, editor.comment(rend.getSyntax()));
   }
 
   /**
@@ -306,11 +302,7 @@ public class TextPanel extends BaseXPanel {
    */
   public final void toCase(final Case cs) {
     final int caret = editor.pos();
-    if(editor.toCase(cs)) {
-      hist.store(editor.text(), caret, editor.pos());
-      release(Action.CHECK);
-    }
-    computeHeight.invokeLater(true);
+    finish(caret, editor.toCase(cs));
   }
 
   /**
@@ -326,12 +318,7 @@ public class TextPanel extends BaseXPanel {
   public final void sort() {
     final int caret = editor.pos();
     final DialogSort ds = new DialogSort(gui);
-    if(!ds.ok() || !editor.sort()) return;
-
-    hist.store(editor.text(), caret, editor.pos());
-    release(Action.CHECK);
-    computeHeight.invokeLater(true);
-    repaint();
+    finish(caret, ds.ok() && editor.sort());
   }
 
   /**
@@ -339,11 +326,7 @@ public class TextPanel extends BaseXPanel {
    */
   public final void format() {
     final int caret = editor.pos();
-    if(editor.format(rend.getSyntax())) {
-      hist.store(editor.text(), caret, editor.pos());
-      release(Action.CHECK);
-    }
-    computeHeight.invokeLater(true);
+    finish(caret, editor.format(rend.getSyntax()));
   }
 
   @Override
@@ -761,7 +744,7 @@ public class TextPanel extends BaseXPanel {
     final int pos = editor.pos();
     if(editor.isSelected()) editor.delete();
     editor.insert(string);
-    finish(pos);
+    finish(pos, true);
   }
 
   /**
@@ -776,13 +759,17 @@ public class TextPanel extends BaseXPanel {
   }
 
   /**
-   * Finishes a command.
-   * @param old old cursor position; store entry to history if position != -1
+   * Finishes an edit command: records history and re-checks if the text changed, and always
+   * recomputes the layout.
+   * @param old cursor position before the edit ({@code -1} to skip the history entry)
+   * @param changed whether the text was modified
    */
-  private void finish(final int old) {
-    if(old != -1) hist.store(editor.text(), old, editor.pos());
+  private void finish(final int old, final boolean changed) {
+    if(changed) {
+      if(old != -1) hist.store(editor.text(), old, editor.pos());
+      release(Action.CHECK);
+    }
     computeHeight.invokeLater(true);
-    release(Action.CHECK);
   }
 
   /**
@@ -834,7 +821,7 @@ public class TextPanel extends BaseXPanel {
       if(t == null) return;
       editor.text(t);
       editor.pos(hist.caret());
-      finish(-1);
+      finish(-1, true);
     }
     @Override
     public boolean enabled(final GUI main) { return !hist.first(); }
@@ -852,7 +839,7 @@ public class TextPanel extends BaseXPanel {
       if(t == null) return;
       editor.text(t);
       editor.pos(hist.caret());
-      finish(-1);
+      finish(-1, true);
     }
     @Override
     public boolean enabled(final GUI main) { return !hist.last(); }
@@ -868,7 +855,7 @@ public class TextPanel extends BaseXPanel {
       final int pos = editor.pos();
       if(!copy()) return;
       editor.delete();
-      finish(pos);
+      finish(pos, true);
     }
     @Override
     public boolean enabled(final GUI main) { return hist.active() && editor.isSelected(); }
@@ -910,7 +897,7 @@ public class TextPanel extends BaseXPanel {
     public void execute() {
       final int pos = editor.pos();
       editor.delete();
-      finish(pos);
+      finish(pos, true);
     }
     @Override
     public boolean enabled(final GUI main) { return hist.active() && editor.isSelected(); }
@@ -1155,7 +1142,7 @@ public class TextPanel extends BaseXPanel {
   private void complete(final String string, final int start) {
     final int pos = editor.pos();
     editor.complete(string, start);
-    finish(pos);
+    finish(pos, true);
   }
 
   /** Replacement lists. */
