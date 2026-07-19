@@ -15,22 +15,15 @@ public enum SerializerMode {
     void init(final SerializerOptions options) {
     }
   },
-  /** Default serialization with indentation. */
+  /** Indent results. */
   INDENT {
     @Override
     void init(final SerializerOptions options) {
       options.set(SerializerOptions.INDENT, YesNo.YES);
     }
   },
-  /** Debugging (adaptive method). */
-  DEBUG {
-    @Override
-    void init(final SerializerOptions options) {
-      options.set(SerializerOptions.METHOD, SerialMethod.ADAPTIVE);
-    }
-  },
-  /** API result retrieval. Also used by XQJ. */
-  API {
+  /** Textual output. */
+  TEXT {
     @Override
     void init(final SerializerOptions options) {
       options.set(SerializerOptions.BINARY, YesNo.NO);
