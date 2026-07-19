@@ -9,30 +9,52 @@ import java.util.*;
  * @author Christian Gruen
  */
 public final class History {
-  /** Maximum size of stored change records. */
-  private static final long MAXBYTES = 100_000_000;
-  /** Maximum number of entries to be stored. */
-  private static final int MAX = 1024;
+  /** A single change: replaces the removed bytes at an offset with the inserted bytes. */
+  private static final class Change {
+    /** Change offset. */
+    private final int offset;
+    /** Removed bytes. */
+    private final byte[] oldMid;
+    /** Caret position before the change. */
+    private final int oldCaret;
+    /** Inserted bytes (extended when consecutive input is folded in). */
+    private byte[] newMid;
+    /** Caret position after the change (updated when input is folded in). */
+    private int newCaret;
 
-  /** Change offsets (index {@code i} describes the transition from state {@code i - 1}). */
-  private final int[] offset;
-  /** Removed bytes per change. */
-  private final byte[][] oldMid;
-  /** Inserted bytes per change. */
-  private final byte[][] newMid;
-  /** Caret history (caret position per state). */
-  private final int[] caret;
+    /**
+     * Constructor.
+     * @param offset change offset
+     * @param oldMid removed bytes
+     * @param newMid inserted bytes
+     * @param oldCaret caret position before the change
+     * @param newCaret caret position after the change
+     */
+    private Change(final int offset, final byte[] oldMid, final byte[] newMid,
+        final int oldCaret, final int newCaret) {
+      this.offset = offset;
+      this.oldMid = oldMid;
+      this.newMid = newMid;
+      this.oldCaret = oldCaret;
+      this.newCaret = newCaret;
+    }
+  }
+
   /** Active flag. */
   private final boolean active;
+  /** Stored changes (unbounded); change {@code i} transitions state {@code i} to {@code i + 1}. */
+  private final ArrayList<Change> changes = new ArrayList<>();
 
   /** Current text (state at {@link #pos}). */
   private byte[] current;
-  /** Maximum of stored entries. */
-  private int max;
-  /** History position. */
+  /** Caret position of the current state. */
+  private int caret;
+  /** History position (number of applied changes). */
   private int pos;
   /** Save position. */
   private int saved;
+  /** Navigation flag: an undo or redo breaks the current typing run. */
+  private boolean navigated;
 
   /**
    * Constructor.
@@ -40,18 +62,7 @@ public final class History {
    */
   public History(final byte[] text) {
     active = text != null;
-    if(active) {
-      caret = new int[MAX];
-      offset = new int[MAX];
-      oldMid = new byte[MAX][];
-      newMid = new byte[MAX][];
-      init(text);
-    } else {
-      caret = null;
-      offset = null;
-      oldMid = null;
-      newMid = null;
-    }
+    if(active) init(text);
   }
 
   /**
@@ -59,9 +70,12 @@ public final class History {
    * @param text initial text
    */
   public void init(final byte[] text) {
+    changes.clear();
     current = text;
+    caret = 0;
     pos = 0;
-    max = 0;
+    saved = 0;
+    navigated = false;
   }
 
   /**
@@ -85,7 +99,7 @@ public final class History {
    * @return result of check
    */
   public boolean last() {
-    return pos == max;
+    return pos == changes.size();
   }
 
   /**
@@ -94,9 +108,12 @@ public final class History {
    */
   public byte[] prev() {
     if(pos == 0) return null;
-    // rebuild the previous state: replace the inserted bytes with the removed ones
-    current = apply(pos, newMid[pos], oldMid[pos]);
-    pos--;
+    // rebuild the previous state by replacing the inserted bytes with the removed ones
+    final Change c = changes.get(--pos);
+    current = splice(current, c.offset, c.newMid.length, c.oldMid);
+    // undoing a change returns the caret to where it was before that change
+    caret = c.oldCaret;
+    navigated = true;
     return current;
   }
 
@@ -105,23 +122,14 @@ public final class History {
    * @return next text or {@code null}
    */
   public byte[] next() {
-    if(pos == max) return null;
-    pos++;
-    // rebuild the next state: replace the removed bytes with the inserted ones
-    current = apply(pos, oldMid[pos], newMid[pos]);
+    if(pos == changes.size()) return null;
+    // rebuild the next state by replacing the removed bytes with the inserted ones
+    final Change c = changes.get(pos++);
+    current = splice(current, c.offset, c.oldMid.length, c.newMid);
+    // redoing a change places the caret where that change left it
+    caret = c.newCaret;
+    navigated = true;
     return current;
-  }
-
-  /**
-   * Rebuilds a neighboring state from the current text.
-   * @param i change index
-   * @param del bytes to be replaced
-   * @param ins replacement bytes
-   * @return rebuilt text
-   */
-  private byte[] apply(final int i, final byte[] del, final byte[] ins) {
-    final int o = offset[i];
-    return splice(current, o, del.length, ins);
   }
 
   /**
@@ -129,7 +137,7 @@ public final class History {
    * @return caret position
    */
   public int caret() {
-    return caret[pos];
+    return caret;
   }
 
   /**
@@ -148,51 +156,29 @@ public final class History {
     while(suffix < mx && current[current.length - 1 - suffix] == str[str.length - 1 - suffix]) {
       suffix++;
     }
-    final int off = prefix;
     final byte[] oMid = Arrays.copyOfRange(current, prefix, current.length - suffix);
     final byte[] nMid = Arrays.copyOfRange(str, prefix, str.length - suffix);
 
-    // merge consecutive character inputs without deletions
-    final int prevLen = pos > 0 ? current.length - newMid[pos].length + oldMid[pos].length : 0;
-    if(pos > 0 && saved != pos && caret[pos] == oc && oc + 1 == nc && prevLen < str.length &&
-        off >= offset[pos] && off + oMid.length <= offset[pos] + newMid[pos].length) {
-      // fold the new bytes into the inserted part of the current change
-      newMid[pos] = splice(newMid[pos], off - offset[pos], oMid.length, nMid);
+    // fold a single typed character into the current change (contiguous, growing insertion)
+    final Change last = pos > 0 ? changes.get(pos - 1) : null;
+    if(last != null && !navigated && saved != pos && last.newCaret == oc && oc + 1 == nc &&
+        current.length - last.newMid.length + last.oldMid.length < str.length &&
+        prefix >= last.offset && prefix + oMid.length <= last.offset + last.newMid.length) {
+      last.newMid = splice(last.newMid, prefix - last.offset, oMid.length, nMid);
+      last.newCaret = nc;
       current = str;
-      caret[pos] = nc;
+      caret = nc;
       return;
     }
 
-    // summarize and limit size of stored records
-    long len = (long) oMid.length + nMid.length;
-    int cut = pos + 1;
-    for(; cut > 0 && len < MAXBYTES; cut--) {
-      final int idx = cut - 1;
-      if(idx >= 1) len += oldMid[idx].length + newMid[idx].length;
-    }
-    // enough space: limit number of entries
-    if(cut == 0 && pos + 1 == MAX) cut = 1;
-    // remove entries
-    if(cut > 0) {
-      Array.remove(offset, 0, cut, MAX);
-      Array.remove(oldMid, 0, cut, MAX);
-      Array.remove(newMid, 0, cut, MAX);
-      Array.remove(caret, 0, cut, MAX);
-      saved -= cut;
-      pos -= cut;
-    }
-    // save new entry
-    if(pos >= 0) caret[pos] = oc;
+    // discard the invalidated redo branch, then append the new change
     if(saved > pos) saved = -1;
-    max = ++pos;
-    offset[pos] = off;
-    oldMid[pos] = oMid;
-    newMid[pos] = nMid;
-    caret[pos] = nc;
+    changes.subList(pos, changes.size()).clear();
+    changes.add(new Change(prefix, oMid, nMid, oc, nc));
+    pos++;
     current = str;
-    // remove old entries to save memory
-    Arrays.fill(oldMid, pos + 1, MAX, null);
-    Arrays.fill(newMid, pos + 1, MAX, null);
+    caret = nc;
+    navigated = false;
   }
 
   /**

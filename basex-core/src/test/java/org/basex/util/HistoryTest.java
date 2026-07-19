@@ -55,6 +55,33 @@ public final class HistoryTest {
     assertEquals(3, h.caret());
   }
 
+  /** Redo restores the caret left by the redone change, not the next change's start. */
+  @Test public void caretRedoIndependentEdits() {
+    final History h = new History(Token.token("xy"));
+    // two independent insertions at different positions (no typing merge)
+    h.store(Token.token("Axy"), 0, 1);
+    h.store(Token.token("AxyB"), 3, 4);
+    // undo both, then redo the first: caret must land after "A", not at the second edit
+    h.prev();
+    h.prev();
+    assertEquals(0, h.caret());
+    h.next();
+    assertEquals(1, h.caret());
+  }
+
+  /** Typing right after a redo starts a new step instead of merging into the redone change. */
+  @Test public void noMergeAfterRedo() {
+    final History h = new History(Token.token("a"));
+    // insert "X" at the front: a separate step (caret jump, no merge)
+    h.store(Token.token("Xa"), 0, 1);
+    h.prev();
+    h.next();
+    // continue typing inside that insertion region (oc + 1 == nc): must not fold into it
+    h.store(Token.token("XYa"), 1, 2);
+    assertArrayEquals(Token.token("Xa"), h.prev());
+    assertArrayEquals(Token.token("a"), h.prev());
+  }
+
   /** Consecutive single-character typing collapses into one undo step. */
   @Test public void mergeTyping() {
     final History h = new History(Token.token(""));
@@ -206,26 +233,25 @@ public final class HistoryTest {
     assertTrue(h.last());
   }
 
-  /** Beyond the entry cap, the oldest steps drop but the retained window reconstructs exactly. */
-  @Test public void entryCap() {
+  /** History is unbounded: many steps are all retained and reconstruct exactly. */
+  @Test public void deepHistory() {
     final ArrayList<byte[]> states = new ArrayList<>();
-    byte[] cur = Token.token("a");
+    byte[] cur = Token.token("");
     states.add(cur);
     final History h = new History(cur);
-    final int count = 5000;
+    final int count = 20_000;
     for(int i = 0; i < count; i++) {
       cur = Token.token(String.valueOf((char) ('a' + i % 26)));
       states.add(cur);
       h.store(cur, 0, 0);
     }
-    // undo as far as the retained history allows
+    // every single step is still undoable, all the way back to the first
     int depth = 0;
     while(!h.first()) {
       assertArrayEquals(states.get(states.size() - 1 - depth - 1), h.prev(), "undo depth " + depth);
       depth++;
     }
-    // trimming happened (not everything retained) but a deep window survived
-    assertTrue(depth > 0 && depth < count, "unexpected retained depth: " + depth);
+    assertEquals(count, depth, "no step must be dropped");
   }
 
   /** Edits at the very end and start of large texts round-trip correctly. */
