@@ -294,7 +294,10 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
     add(QUERY, origqu, tb, sctns);
     add(QUERY_PLAN, plan, tb, sctns);
     add(TIMING, strings, tb, sctns);
-    if(inf != null) tb.add(inf).nline();
+    if(inf != null) {
+      final byte[] prev = tb.next();
+      tb.add(inf).nline().add(prev);
+    }
     clear = reset;
 
     // show total time required for running a command
