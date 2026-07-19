@@ -23,7 +23,7 @@ public enum SerializerMode {
     }
   },
   /** Textual output. */
-  TEXT {
+  API {
     @Override
     void init(final SerializerOptions options) {
       options.set(SerializerOptions.BINARY, YesNo.NO);

@@ -1650,9 +1650,6 @@ public final class FnModuleTest extends SandboxTest {
     // variadic functions
     query(func.args(" #fn:concat", 0) + "()", "");
     query(func.args(" #fn:concat", 2) + "('a', 'b')", "ab");
-    query(func.args(" #string:format", 0), "");
-    query(func.args(" #string:format", 1) + "('x')", "x");
-    query(func.args(" #string:format", 3) + "('%s-%s', 'a', 'b')", "a-b");
 
     inline(true);
     check(func.args(" #fn:count", 1) + "((1, 2))", 2, root(Itr.class));

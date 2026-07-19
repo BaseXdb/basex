@@ -126,7 +126,7 @@ public final class ServerQuery extends Job {
       // iterate through results
       int hits = 0;
       final PrintOutput po = PrintOutput.get(encode ? new ServerOutput(out) : out);
-      final SerializerOptions sopts = full ? SerializerMode.TEXT.get() : qc.parameters();
+      final SerializerOptions sopts = full ? SerializerMode.API.get() : qc.parameters();
       try(Serializer ser = Serializer.get(po, sopts)) {
         for(Item item; (item = qc.next(iter)) != null;) {
           if(iterative) {
