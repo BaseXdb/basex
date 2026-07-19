@@ -39,7 +39,7 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
    * @param i index
    * @return element, or {@code null} if index exceeds list size
    */
-  public E get(final int i) {
+  public final E get(final int i) {
     return i < size ? list[i] : null;
   }
 
@@ -63,7 +63,7 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
    * @return result of check
    */
   @SuppressWarnings("unchecked")
-  public L addUnique(final E element) {
+  public final L addUnique(final E element) {
     if(!contains(element)) add(element);
     return (L) this;
   }
@@ -92,7 +92,7 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
    * @return self reference
    */
   @SuppressWarnings("unchecked")
-  public L add(final E... elements) {
+  public final L add(final E... elements) {
     E[] lst = list;
     final int l = elements.length, s = size, ns = s + l;
     if(ns > lst.length) {
@@ -110,7 +110,7 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
    * @return self reference
    */
   @SuppressWarnings("unchecked")
-  public L add(final L elements) {
+  public final L add(final L elements) {
     for(final E e : elements) add(e);
     return (L) this;
   }
@@ -132,6 +132,16 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
     lst[index] = element;
     size = Math.max(s, ns);
     return (L) this;
+  }
+
+  /**
+   * Enforces the number of elements, releasing any elements above the new size.
+   * @param sz number of elements
+   */
+  @Override
+  public final void size(final int sz) {
+    if(sz < size) Arrays.fill(list, sz, size, null);
+    size = sz;
   }
 
   /**
@@ -192,7 +202,7 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
    * @return self reference
    */
   @SuppressWarnings("unchecked")
-  public L removeAll(final L elements) {
+  public final L removeAll(final L elements) {
     for(final E e : elements) removeAll(e);
     return (L) this;
   }
@@ -221,7 +231,7 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
    * Returns the uppermost element on the stack, without removing it.
    * @return uppermost element
    */
-  public E peek() {
+  public final E peek() {
     return list[size - 1];
   }
 
@@ -230,7 +240,7 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
    * @return self reference
    */
   @SuppressWarnings("unchecked")
-  public L reverse() {
+  public final L reverse() {
     final E[] lst = list;
     for(int l = 0, r = size - 1; l < r; l++, r--) {
       final E tmp = lst[l];
