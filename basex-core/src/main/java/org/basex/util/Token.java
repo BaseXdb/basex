@@ -1095,7 +1095,7 @@ public final class Token {
         }
       }
     }
-    return Array.copyOf(tokens, tl);
+    return Arrays.copyOf(tokens, tl);
   }
 
   /**

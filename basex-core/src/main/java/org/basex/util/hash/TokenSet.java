@@ -189,7 +189,7 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
 
   @Override
   protected void rehash(final int newSize) {
-    keys = Array.copyOf(keys, newSize);
+    keys = Arrays.copyOf(keys, newSize);
   }
 
   @Override

@@ -1,6 +1,9 @@
 package org.basex.util;
 
 import static org.basex.util.Token.*;
+
+import java.util.*;
+
 import org.basex.util.list.*;
 
 /**
@@ -57,7 +60,7 @@ public final class Atts extends ElementList {
     byte[][] lst = list;
     final int s = size;
     if(s == lst.length) {
-      lst = Array.copyOf(lst, Array.newCapacity(s >>> 1) << 1);
+      lst = Arrays.copyOf(lst, Array.newCapacity(s >>> 1) << 1);
       list = lst;
     }
     lst[s] = name;
@@ -165,7 +168,7 @@ public final class Atts extends ElementList {
    */
   public Atts optimize() {
     final byte[][] lst = list;
-    if(size != lst.length) list = Array.copyOf(lst, size);
+    if(size != lst.length) list = Arrays.copyOf(lst, size);
     return this;
   }
 

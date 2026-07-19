@@ -24,42 +24,6 @@ public final class Array {
   private Array() { }
 
   /**
-   * Copies the specified array.
-   * @param array array to be copied
-   * @param size new array size
-   * @return new array
-   */
-  public static byte[][] copyOf(final byte[][] array, final int size) {
-    final byte[][] tmp = new byte[size][];
-    copy(array, Math.min(size, array.length), tmp);
-    return tmp;
-  }
-
-  /**
-   * Copies the specified array.
-   * @param array array to be copied
-   * @param size new array size
-   * @return new array
-   */
-  public static int[][] copyOf(final int[][] array, final int size) {
-    final int[][] tmp = new int[size][];
-    copy(array, Math.min(size, array.length), tmp);
-    return tmp;
-  }
-
-  /**
-   * Copies the specified array.
-   * @param array array to be copied
-   * @param size new array size
-   * @return new array
-   */
-  public static String[] copyOf(final String[] array, final int size) {
-    final String[] tmp = new String[size];
-    copy(array, Math.min(size, array.length), tmp);
-    return tmp;
-  }
-
-  /**
    * Adds an entry to the end of an array and returns the new array.
    * @param array array to be resized
    * @param entry entry to be added
@@ -82,6 +46,19 @@ public final class Array {
   public static int[] add(final int[] array, final int entry) {
     final int s = array.length;
     final int[] t = Arrays.copyOf(array, s + 1);
+    t[s] = entry;
+    return t;
+  }
+
+  /**
+   * Adds an entry to the end of an array and returns the new array.
+   * @param array array to be resized
+   * @param entry entry to be added
+   * @return array
+   */
+  public static boolean[] add(final boolean[] array, final boolean entry) {
+    final int s = array.length;
+    final boolean[] t = Arrays.copyOf(array, s + 1);
     t[s] = entry;
     return t;
   }

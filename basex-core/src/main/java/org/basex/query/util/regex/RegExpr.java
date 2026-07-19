@@ -3,6 +3,8 @@ package org.basex.query.util.regex;
 import java.util.*;
 import java.util.regex.*;
 
+import org.basex.util.*;
+
 /**
  * Compiled regular expression (pattern and lazily computed group metadata).
  *
@@ -135,12 +137,9 @@ public class RegExpr {
           }
           case CAPT_LPAREN -> {
             if(!quoted && classLevel == 0) {
-              parentGroups = Arrays.copyOf(parentGroups, parentGroups.length + 1);
-              parentGroups[parentGroups.length - 1] = open.peek();
-              inAssertion = Arrays.copyOf(inAssertion, inAssertion.length + 1);
-              inAssertion[inAssertion.length - 1] = assrtMark != 0;
-              groupNames = Arrays.copyOf(groupNames, groupNames.length + 1);
-              groupNames[groupNames.length - 1] = gnd.name;
+              parentGroups = Array.add(parentGroups, open.peek());
+              inAssertion = Array.add(inAssertion, assrtMark != 0);
+              groupNames = Array.add(groupNames, gnd.name);
               open.push(parentGroups.length);
             }
           }

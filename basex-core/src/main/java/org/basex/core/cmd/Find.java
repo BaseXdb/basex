@@ -2,6 +2,8 @@ package org.basex.core.cmd;
 
 import static org.basex.util.Token.*;
 
+import java.util.*;
+
 import org.basex.query.expr.path.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -149,6 +151,6 @@ public final class Find extends AQuery {
       }
     }
     if(!sb.isEmpty()) split[s++] = sb.toString();
-    return Array.copyOf(split, s);
+    return Arrays.copyOf(split, s);
   }
 }

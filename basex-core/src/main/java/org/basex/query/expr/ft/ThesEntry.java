@@ -1,5 +1,7 @@
 package org.basex.query.expr.ft;
 
+import java.util.*;
+
 import org.basex.util.*;
 
 /**
@@ -36,7 +38,7 @@ final class ThesEntry {
     if(size == synonyms.length) {
       final int s = Array.newCapacity(size);
       synonyms = Array.copy(synonyms, new ThesEntry[s]);
-      relations = Array.copyOf(relations, s);
+      relations = Arrays.copyOf(relations, s);
     }
     synonyms[size] = entry;
     relations[size++] = relation;
