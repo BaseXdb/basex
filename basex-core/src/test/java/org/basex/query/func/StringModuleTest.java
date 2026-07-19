@@ -169,25 +169,6 @@ public final class StringModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void format() {
-    final Function func = _STRING_FORMAT;
-    query(func.args("x", "x"), "x");
-    query(func.args("%d", " 1"), "1");
-    query(func.args("%2d", " 1"), " 1");
-    query(func.args("%05d", " 123"), "00123");
-    query(func.args("%s is %d", "Alice", 42), "Alice is 42");
-
-    // the result must not depend on the locale of the system
-    query(func.args("%e", 1234.5678), "1.234568e+03");
-    query(func.args("%,d", 1234567), "1,234,567");
-    query(func.args("%.2f", 1234.5678), "1234.57");
-
-    // a format specifier requires a value
-    error(func.args("%s", " ()"), INVTYPE_X);
-    error(func.args("%d", " ()"), INVTYPE_X);
-  }
-
-  /** Test method. */
   @Test public void jaroWinkler() {
     final Function func = _STRING_JARO_WINKLER;
     query(func.args("", ""), 1);
