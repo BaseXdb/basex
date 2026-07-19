@@ -159,6 +159,14 @@ public final class FnModuleTest extends SandboxTest {
 
     query(func.args("a", ""), "<analyze-string-result xmlns=\"http://www.w3.org/2005/xpath-"
         + "functions\"><match/><non-match>a</non-match><match/></analyze-string-result>");
+
+    // named capturing groups carry a name attribute (GH-2729)
+    query(func.args("2026", "(?<y>\\d+)"), "<analyze-string-result xmlns="
+        + "\"http://www.w3.org/2005/xpath-functions\"><match><group name=\"y\" nr=\"1\">2026"
+        + "</group></match></analyze-string-result>");
+    query(func.args("go", "\\b(?=(?<w>\\w+))"), "<analyze-string-result xmlns="
+        + "\"http://www.w3.org/2005/xpath-functions\"><match><lookahead-group name=\"w\" nr=\"1\" "
+        + "value=\"go\" position=\"1\"/></match><non-match>go</non-match></analyze-string-result>");
   }
 
   /** Test method. */

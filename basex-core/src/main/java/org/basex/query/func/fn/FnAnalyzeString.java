@@ -30,6 +30,8 @@ public final class FnAnalyzeString extends RegExFn {
   /** QName. */
   private static final QNm Q_NR = new QNm("nr");
   /** QName. */
+  private static final QNm Q_NAME = new QNm("name");
+  /** QName. */
   private static final QNm Q_VALUE = new QNm("value");
   /** QName. */
   private static final QNm Q_POSITION = new QNm("position");
@@ -66,7 +68,11 @@ public final class FnAnalyzeString extends RegExFn {
       final int group, final RegExpr regExpr) {
 
     final FBuilder node = FElem.build(group == 0 ? Q_MATCH : Q_MGROUP);
-    if(group > 0) node.attr(Q_NR, group);
+    if(group > 0) {
+      final String name = regExpr.getGroupNames()[group - 1];
+      if(name != null) node.attr(Q_NAME, name);
+      node.attr(Q_NR, group);
+    }
 
     final int start = matcher.start(group), end = matcher.end(group), gc = matcher.groupCount();
     int[] pos = { group + 1, start }; // group and position in string
@@ -87,6 +93,8 @@ public final class FnAnalyzeString extends RegExFn {
       for(int g = 1; g <= assertionFlags.length; ++g) {
         if(assertionFlags[g - 1] && matcher.start(g) >= 0) {
           final FBuilder lg = FElem.build(Q_LGROUP);
+          final String name = regExpr.getGroupNames()[g - 1];
+          if(name != null) lg.attr(Q_NAME, name);
           lg.attr(Q_NR, g);
           lg.attr(Q_VALUE, string.substring(matcher.start(g), matcher.end(g)));
           lg.attr(Q_POSITION, matcher.start(g) + 1);
