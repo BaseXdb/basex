@@ -401,4 +401,18 @@ public final class SerializerTest extends SandboxTest {
     // document must only have one element root node (use 'update {}': create database node)
     error(option + "document { <x/>, <x/> } update {}", SERCANONROOTS_X);
   }
+
+  /** Test: method=json, escaping of C1 control characters (U+007F-U+009F). */
+  @Test public void jsonControls() {
+    final String option = METHOD.arg("json");
+    query(option + "codepoints-to-string(127)", "\"\\u007F\"");
+    query(option + "codepoints-to-string(159)", "\"\\u009F\"");
+    query(option + "'a' || codepoints-to-string(133) || 'b'", "\"a\\u0085b\"");
+    // U+00A0 is outside the C1 range and stays unescaped
+    query("string-to-codepoints(serialize(codepoints-to-string(160), "
+        + "map { 'method': 'json' }))", "34\n160\n34");
+    // canonical serialization leaves C1 control characters unescaped
+    query("string-to-codepoints(serialize(codepoints-to-string(127), "
+        + "map { 'method': 'json', 'canonical': true() }))", "34\n127\n34");
+  }
 }

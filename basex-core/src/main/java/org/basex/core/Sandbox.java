@@ -110,6 +110,17 @@ public abstract class Sandbox {
   }
 
   /**
+   * Checks that a query returns the specified database node {@code pre} values.
+   * @param query query returning database nodes
+   * @param pre expected pre values
+   */
+  protected static void pre(final String query, final int... pre) {
+    final StringBuilder sb = new StringBuilder();
+    for(final int p : pre) sb.append(sb.isEmpty() ? "" : "\n").append(p);
+    query("db:node-pre(" + query + ")", sb);
+  }
+
+  /**
    * Checks if a query yields the specified string.
    * @param query query string
    * @param result query result

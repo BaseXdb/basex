@@ -3578,6 +3578,12 @@ return
     query("count(" + func.args(" 1 to 1000000", 1000000) + ")", 1000000000000L);
     query("count(" + func.args(func.args(" 1 to 3", 3), 3) + ")", 27);
 
+    // single item: total size fits into the integer range
+    query("count(" + func.args("A", 4611686018427387904L) + ")", 4611686018427387904L);
+    // multiple items: total size exceeds the integer range (clean error, not out of memory)
+    error("count(" + func.args(" (1, 2, 3)", 4611686018427387904L) + ")", RANGE_X);
+    error("subsequence(" + func.args(" (1, 2, 3)", 4611686018427387904L) + ", 5, 2)", RANGE_X);
+
     query("for $i in 1 to 2 return " + func.args(1, " $i"), "1\n1\n1");
     query(func.args(" <a/>", 2), "<a/>\n<a/>");
     query(func.args(" <a/>", wrap(2)), "<a/>\n<a/>");

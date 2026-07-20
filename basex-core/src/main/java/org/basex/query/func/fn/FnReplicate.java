@@ -1,5 +1,6 @@
 package org.basex.query.func.fn;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
@@ -32,12 +33,24 @@ public final class FnReplicate extends StandardFunc {
 
     // check if expression must be evaluated only once
     final boolean once = input instanceof Value || !defined(2) || !toBooleanOrFalse(arg(2), qc);
-    if(once) return SingletonSeq.get(input.value(qc), count);
+    if(once) return singleton(input.value(qc), count);
 
     // repeated evaluations
     final ValueBuilder vb = new ValueBuilder(qc, size());
     for(long c = 0; c < count; c++) vb.add(input.value(qc));
     return vb.value(this);
+  }
+
+  /**
+   * Returns a singleton sequence, or raises an error if its size exceeds the integer range.
+   * @param value value to replicate
+   * @param count number of replications
+   * @return singleton sequence
+   * @throws QueryException query exception
+   */
+  private Value singleton(final Value value, final long count) throws QueryException {
+    if(!Util.inBounds(value.size(), count)) throw RANGE_X.get(info, value.size() + " * " + count);
+    return SingletonSeq.get(value, count);
   }
 
   @Override
@@ -49,7 +62,7 @@ public final class FnReplicate extends StandardFunc {
 
     // check if expression must be evaluated only once
     final boolean repeat = toBooleanOrFalse(arg(2), qc);
-    if(!repeat) return SingletonSeq.get(input.value(qc), count).iter();
+    if(!repeat) return singleton(input.value(qc), count).iter();
 
     // repeated evaluations
     if(input.seqType().one()) {

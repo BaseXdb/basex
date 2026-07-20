@@ -1,8 +1,12 @@
 package org.basex.query.simple;
 
-import static org.basex.query.func.Function.*;
+import static org.basex.query.QueryError.*;
 
-import org.basex.query.*;
+import org.basex.*;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * Simple XQuery tests.
@@ -10,204 +14,247 @@ import org.basex.query.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class SimpleTest extends QueryTest {
-  static {
-    create("<x>X</x>");
+public final class SimpleTest extends SandboxTest {
+  /** Creates the test database (context item: {@code <x>X</x>}). */
+  @BeforeAll public static void beforeClass() {
+    set(MainOptions.STRIPWS, true);
+    execute(new CreateDB(NAME, "<x>X</x>"));
+  }
 
-    queries = new Object[][] {
-      { "Number 1", decimal(2), "1.+1." },
+  /** Drops the test database. */
+  @AfterAll public static void afterClass() {
+    execute(new DropDB(NAME));
+    set(MainOptions.STRIPWS, false);
+  }
 
-      { "Float 1", "xs:float('Infinity')" },
-      { "Float 2", "xs:float('infinity')" },
-      { "Float 3", booleans(true), "xs:float('INF') > 0" },
-      { "Float 4", "xs:float('inf')" },
-      { "Float 5", "xs:float('-Infinity')" },
-      { "Float 6", "xs:float('-infinity')" },
-      { "Float 7", booleans(true), "xs:float('-INF') < 0" },
-      { "Float 8", "xs:float('-inf')" },
-      { "Float 9", booleans(true), "xs:float('+INF') > 0" },
+  /** Numbers. */
+  @Test public void number() {
+    query("1.+1.", 2);
+  }
 
-      { "Double 1", "xs:double('Infinity')" },
-      { "Double 2", "xs:double('infinity')" },
-      { "Double 3", booleans(true), "xs:double('INF') > 0" },
-      { "Double 4", "xs:double('inf')" },
-      { "Double 5", "xs:double('-Infinity')" },
-      { "Double 6", "xs:double('-infinity')" },
-      { "Double 7", booleans(true), "xs:double('-INF') < 0" },
-      { "Double 8", "xs:double('-inf')" },
-      { "Double 9", booleans(true), "xs:double('+INF') > 0" },
+  /** xs:float. */
+  @Test public void xsFloat() {
+    error("xs:float('Infinity')", FUNCCAST_X_X);
+    error("xs:float('infinity')", FUNCCAST_X_X);
+    query("xs:float('INF') > 0", true);
+    error("xs:float('inf')", FUNCCAST_X_X);
+    error("xs:float('-Infinity')", FUNCCAST_X_X);
+    error("xs:float('-infinity')", FUNCCAST_X_X);
+    query("xs:float('-INF') < 0", true);
+    error("xs:float('-inf')", FUNCCAST_X_X);
+    query("xs:float('+INF') > 0", true);
+  }
 
-      { "UnsignedLong 1", booleans(false), "xs:unsignedLong('3') eq 3.1"},
-      { "UnsignedLong 2", booleans(false), "3.1 eq xs:unsignedLong('3')"},
-      { "UnsignedLong 3", booleans(true), "xs:unsignedLong(3) lt 3.1"},
-      { "UnsignedLong 4", booleans(true), "3.1 gt xs:unsignedLong(3)"},
-      { "UnsignedLong 5", integers(1), "compare(3.1, xs:unsignedLong('3'))"},
-      { "UnsignedLong 6", integers(-1), "compare(xs:unsignedLong('3'), 3.1)"},
+  /** xs:double. */
+  @Test public void xsDouble() {
+    error("xs:double('Infinity')", FUNCCAST_X_X);
+    error("xs:double('infinity')", FUNCCAST_X_X);
+    query("xs:double('INF') > 0", true);
+    error("xs:double('inf')", FUNCCAST_X_X);
+    error("xs:double('-Infinity')", FUNCCAST_X_X);
+    error("xs:double('-infinity')", FUNCCAST_X_X);
+    query("xs:double('-INF') < 0", true);
+    error("xs:double('-inf')", FUNCCAST_X_X);
+    query("xs:double('+INF') > 0", true);
+  }
 
-      { "Annotation 1", integers(1), "declare %local:x(.1) variable $a := 1; $a" },
-      { "Annotation 2", integers(1), "declare %local:x(1.) variable $a := 1; $a" },
-      { "Annotation 3", "declare %local:x(.) variable $a := 1; $a" },
+  /** xs:unsignedLong comparisons. */
+  @Test public void unsignedLong() {
+    query("xs:unsignedLong('3') eq 3.1", false);
+    query("3.1 eq xs:unsignedLong('3')", false);
+    query("xs:unsignedLong(3) lt 3.1", true);
+    query("3.1 gt xs:unsignedLong(3)", true);
+    query("compare(3.1, xs:unsignedLong('3'))", 1);
+    query("compare(xs:unsignedLong('3'), 3.1)", -1);
+  }
 
-      { "Compare 1",  booleans(true),  "xs:QName('b') = attribute a { 'b' }" },
-      { "Compare 2",  booleans(false), "<a/>/x = (c, ())" },
-      { "Compare 3",  booleans(false), "(4, 5, 6) < (1, 2)" },
-      { "Compare 4",  booleans(false), "(4, 5) < (1, 2, 3)" },
-      { "Compare 5",  booleans(false), "1234567890.12345678 = 1234567890.1234567" },
-      { "Compare 6",  booleans(false), "123456789012345678  = 123456789012345679" },
-      // GH-2112, GH-2115
-      { "Compare 7",  booleans(true), "xs:decimal(1.13) gt xs:double(1.13)" },
-      { "Compare 8",  booleans(true), "xs:decimal(1.13) gt xs:float(1.13)" },
-      { "Compare 9",  booleans(false),  "xs:decimal(1.13) le xs:double(1.13)" },
-      { "Compare 10", booleans(false),  "xs:decimal(1.13) le xs:float(1.13)" },
-      // GH-2113, GH-2114
-      { "Compare 11", booleans(false), "xs:float (1.13) ge xs:double(1.13)" },
-      { "Compare 12", booleans(true),  "xs:float (1.13) le xs:double(1.13)" },
-      { "Compare 13", booleans(true),  "xs:float (1.13) lt xs:double(1.13)" },
-      { "Compare 14", booleans(false), "xs:float (1.13) gt xs:double(1.13)" },
-      { "Compare 15", booleans(true),  "xs:double(1.13) ge xs:float (1.13)" },
-      { "Compare 16", booleans(false), "xs:double(1.13) le xs:float (1.13)" },
-      { "Compare 17", booleans(false), "xs:double(1.13) lt xs:float (1.13)" },
-      { "Compare 18", booleans(true),  "xs:double(1.13) gt xs:float (1.13)" },
+  /** Annotations. */
+  @Test public void annotation() {
+    query("declare %local:x(.1) variable $a := 1; $a", 1);
+    query("declare %local:x(1.) variable $a := 1; $a", 1);
+    error("declare %local:x(.) variable $a := 1; $a", NUMBER_X);
+  }
 
-      { "Compare 50", booleans(true),  "xs:hexBinary('41') = xs:untypedAtomic('41')" },
-      { "Compare 51", booleans(true),  "xs:untypedAtomic('41') = xs:hexBinary('41')" },
-      { "Compare 52", booleans(true),  "xs:untypedAtomic('41') <= xs:hexBinary('41')" },
-      { "Compare 53", booleans(true),  "xs:hexBinary('41') <= xs:untypedAtomic('41')" },
+  /** Comparisons. */
+  @Test public void compare() {
+    query("xs:QName('b') = attribute a { 'b' }", true);
+    query("<a/>/x = (c, ())", false);
+    query("(4, 5, 6) < (1, 2)", false);
+    query("(4, 5) < (1, 2, 3)", false);
+    query("1234567890.12345678 = 1234567890.1234567", false);
+    query("123456789012345678  = 123456789012345679", false);
+    // GH-2112, GH-2115
+    query("xs:decimal(1.13) gt xs:double(1.13)", true);
+    query("xs:decimal(1.13) gt xs:float(1.13)", true);
+    query("xs:decimal(1.13) le xs:double(1.13)", false);
+    query("xs:decimal(1.13) le xs:float(1.13)", false);
+    // GH-2113, GH-2114
+    query("xs:float (1.13) ge xs:double(1.13)", false);
+    query("xs:float (1.13) le xs:double(1.13)", true);
+    query("xs:float (1.13) lt xs:double(1.13)", true);
+    query("xs:float (1.13) gt xs:double(1.13)", false);
+    query("xs:double(1.13) ge xs:float (1.13)", true);
+    query("xs:double(1.13) le xs:float (1.13)", false);
+    query("xs:double(1.13) lt xs:float (1.13)", false);
+    query("xs:double(1.13) gt xs:float (1.13)", true);
 
-      { "Compare 60", booleans(false),
-        "string-join(replicate(1, 40)) -> (xs:float(.) = <x>{ . }</x>)" },
-      { "Compare 61", booleans(false),
-        "string-join(replicate(1, 40)) -> (<x>{ . }</x> = xs:float(.))" },
-      { "Compare 62", booleans(true),
-        "string-join(replicate(1, 40)) -> (xs:double(.) = <x>{ . }</x>)" },
-      { "Compare 63", booleans(true),
-        "string-join(replicate(1, 40)) -> (<x>{ . }</x> = xs:double(.))" },
+    query("xs:hexBinary('41') = xs:untypedAtomic('41')", true);
+    query("xs:untypedAtomic('41') = xs:hexBinary('41')", true);
+    query("xs:untypedAtomic('41') <= xs:hexBinary('41')", true);
+    query("xs:hexBinary('41') <= xs:untypedAtomic('41')", true);
 
-      { "FLWOR 1", integers(3), "(for $i in 1 to 5 return $i)[3]" },
-      { "FLWOR 2", integers(4),
-        "(for $a in 1 to 5 for $b in 1 to 5 return $a * $b)[7]" },
-      { "FLWOR 3", booleans(true), "declare namespace x = 'X'; " +
-        "let $a := <a>0</a> let $b := $a return $b = 0" },
-      { "FLWOR 4", integers(1),
-        "for $a in (1, 2) let $b := 'a' where $a = 1 return $a" },
-      { "FLWOR 5", integers(1, 2),
-        "for $a in (1, 2) let $b := 'a'[$a = 1] return $a" },
-      { "FLWOR 6", emptySequence(),
-        "for $a in (1, 2) let $b := 3 where $b = 4 return $a" },
-      { "FLWOR 7", integers(1, 2),
-        "for $a in (1, 2) let $b := 3[. = 4] return $a" },
-      { "FLWOR 8", integers(2),
-        "for $a at $p in (1, 2) where $a = 2 return $p" },
+    query("string-join(replicate(1, 40)) -> (xs:float(.) = <x>{ . }</x>)", false);
+    query("string-join(replicate(1, 40)) -> (<x>{ . }</x> = xs:float(.))", false);
+    query("string-join(replicate(1, 40)) -> (xs:double(.) = <x>{ . }</x>)", true);
+    query("string-join(replicate(1, 40)) -> (<x>{ . }</x> = xs:double(.))", true);
+  }
 
-      { "ForLet 1", integers(3, 3),
-        "for $a in 1 to 2 let $b := 3 return $b" },
-      { "ForLet 2", integers(3, 3),
-        "for $a in 1 to 2 let $b := 3 let $c := 3 return $c" },
-      { "ForLet 3", integers(4, 4),
-        "for $a in 1 to 2 let $b := 3 let $b := 4 return $b" },
-      { "ForLet 4", integers(3),
-        "for $a score $s in 1 let $s := 3 return $s" },
-      { "ForLet 5", integers(1),
-        "for $a at $p in 1 let $s := $p return $s" },
+  /** FLWOR expressions. */
+  @Test public void flwor() {
+    query("(for $i in 1 to 5 return $i)[3]", 3);
+    query("(for $a in 1 to 5 for $b in 1 to 5 return $a * $b)[7]", 4);
+    query("declare namespace x = 'X'; let $a := <a>0</a> let $b := $a return $b = 0", true);
+    query("for $a in (1, 2) let $b := 'a' where $a = 1 return $a", 1);
+    query("for $a in (1, 2) let $b := 'a'[$a = 1] return $a", "1\n2");
+    query("for $a in (1, 2) let $b := 3 where $b = 4 return $a", "");
+    query("for $a in (1, 2) let $b := 3[. = 4] return $a", "1\n2");
+    query("for $a at $p in (1, 2) where $a = 2 return $p", 2);
+  }
 
-      { "ExtVar 1", integers(1), "declare variable $a external; 1" },
-      { "ExtVar 2", "declare variable $a external; $a" },
-      { "ExtVar 3", strings("a"), "declare variable $x as enum('a', 'b') := 'a'; $x" },
-      { "ExtVar 4", strings("a"), "declare variable $x as enum('a', 'b') := xs:anyURI('a'); $x" },
+  /** For/let clauses. */
+  @Test public void forLet() {
+    query("for $a in 1 to 2 let $b := 3 return $b", "3\n3");
+    query("for $a in 1 to 2 let $b := 3 let $c := 3 return $c", "3\n3");
+    query("for $a in 1 to 2 let $b := 3 let $b := 4 return $b", "4\n4");
+    query("for $a score $s in 1 let $s := 3 return $s", 3);
+    query("for $a at $p in 1 let $s := $p return $s", 1);
+  }
 
-      { "If  1", booleans(true), "if(true()) then true() else false()" },
-      { "If  2", booleans(false), "if(false()) then true() else false()" },
-      { "If  3", booleans(true), "if(true() = true()) then true() else false()" },
-      { "If  4", integers(1), "if(boolean(<x/>) eq true()) then 1 else 2" },
-      { "If  5", integers(2), "if(boolean(<x/>) ne true()) then 1 else 2" },
-      { "If  6", integers(2), "if(boolean(<x/>) eq false()) then 1 else 2" },
-      { "If  7", integers(1), "if(boolean(<x/>) ne false()) then 1 else 2" },
-      { "If  8", integers(1), "if(boolean(<x/>) = true()) then 1 else 2" },
-      { "If  9", integers(2), "if(boolean(<x/>) != true()) then 1 else 2" },
-      { "If 10", integers(2), "if(boolean(<x/>) = false()) then 1 else 2" },
-      { "If 11", integers(1), "if(boolean(<x/>) != false()) then 1 else 2" },
-      { "If 12", "if(<x/> = true()) then 1 else 2" },
+  /** External variables. */
+  @Test public void extVar() {
+    query("declare variable $a external; 1", 1);
+    error("declare variable $a external; $a", VAREMPTY_X);
+    query("declare variable $x as enum('a', 'b') := 'a'; $x", "a");
+    query("declare variable $x as enum('a', 'b') := xs:anyURI('a'); $x", "a");
+  }
 
-      { "And 1", booleans(true), "<a/> and <a/>" },
-      { "And 2", booleans(true), "<a/> and (<a/> and <a/>)" },
-      { "And 3", booleans(false), "<a/> and (<a/> and not(<a/>))" },
-      { "And 4", booleans(false), "0 and (1 + 'x')" },
+  /** If expressions. */
+  @Test public void ifExpr() {
+    query("if(true()) then true() else false()", true);
+    query("if(false()) then true() else false()", false);
+    query("if(true() = true()) then true() else false()", true);
+    query("if(boolean(<x/>) eq true()) then 1 else 2", 1);
+    query("if(boolean(<x/>) ne true()) then 1 else 2", 2);
+    query("if(boolean(<x/>) eq false()) then 1 else 2", 2);
+    query("if(boolean(<x/>) ne false()) then 1 else 2", 1);
+    query("if(boolean(<x/>) = true()) then 1 else 2", 1);
+    query("if(boolean(<x/>) != true()) then 1 else 2", 2);
+    query("if(boolean(<x/>) = false()) then 1 else 2", 2);
+    query("if(boolean(<x/>) != false()) then 1 else 2", 1);
+    error("if(<x/> = true()) then 1 else 2", FUNCCAST_X_X_X);
+  }
 
-      { "Or 1", booleans(true), "<a/> or <a/>" },
-      { "Or 2", booleans(true), "<a/> or (<a/> or <a/>)" },
-      { "Or 3", booleans(false), "not(<a/>) or (not(<a/>) or not(<a/>))" },
-      { "Or 4", booleans(true), "fold-left(true(), false(), function($a, $b) { $a or $b })" },
-      { "Or 5", booleans(true), "1 or (1 + 'x')" },
+  /** Logical 'and'. */
+  @Test public void andExpr() {
+    query("<a/> and <a/>", true);
+    query("<a/> and (<a/> and <a/>)", true);
+    query("<a/> and (<a/> and not(<a/>))", false);
+    query("0 and (1 + 'x')", false);
+  }
 
-      { "Seq 1", integers(), "((( )  )    )" },
-      { "Seq 2", integers(1), "((( 1 )  )    )" },
-      { "Seq 3", integers(1, 2), "((( 1, 2 )  )    )" },
-      { "Seq 4", integers(1, 2, 3), "(1, (( 2,3 )  )    )" },
-      { "Seq 5", integers(1, 2, 3, 4), "(1, (( 2,3 )  ),4   )" },
+  /** Logical 'or'. */
+  @Test public void orExpr() {
+    query("<a/> or <a/>", true);
+    query("<a/> or (<a/> or <a/>)", true);
+    query("not(<a/>) or (not(<a/>) or not(<a/>))", false);
+    query("fold-left(true(), false(), function($a, $b) { $a or $b })", true);
+    query("1 or (1 + 'x')", true);
+  }
 
-      { "IntersectExcept 1", emptySequence(), "<a/> intersect <b/>" },
-      { "IntersectExcept 2", emptySequence(), "<a/> intersect <b/> except <c/>" },
-      { "IntersectExcept 3", emptySequence(), "<a/> except <b/> intersect <c/>" },
-      { "IntersectExcept 4", integers(1), "count(<a/> except <b/>)" },
-      { "IntersectExcept 5", strings("a"), "<a/> ! (. intersect (., <b/>))/name()" },
+  /** Sequences. */
+  @Test public void seq() {
+    query("((( )  )    )", "");
+    query("((( 1 )  )    )", 1);
+    query("((( 1, 2 )  )    )", "1\n2");
+    query("(1, (( 2,3 )  )    )", "1\n2\n3");
+    query("(1, (( 2,3 )  ),4   )", "1\n2\n3\n4");
+  }
 
-      { "Filter 1", "1[1][error()]" },
-      { "Filter 2", emptySequence(), "1[1][<x/>/a]" },
-      { "Filter 3", strings("b"), "name(<x><a/><b c='d'/></x>/(a, b)[@c])" },
-      { "Filter 4", strings("b"), "name(<x><a/><b/></x>/(b, a)[self::b])" },
-      { "Filter 5", emptySequence(), "<x><a><b c='d'/></a></x>/(a, b)[@c]" },
-      { "Filter 6", booleans(true), "empty((1, 2, 3)[3][2])" },
-      { "Filter 7", booleans(true), "empty((1, 2, 3)[position() = 3][2])" },
-      { "Filter 8", integers(1), "1[boolean(max((<a>1</a>, <b>2</b>)))]" },
-      { "Filter 9", strings("x"), "string(<n><a/><a>x</a></n>/a/text()[.][.])" },
-      { "Filter 10", strings("x"), "string(<n><a/><a>x</a></n>/a/text()[1][1])" },
-      { "Filter 11", integers(1), "1[1 to 2]" },
-      { "Filter 12", emptySequence(), "for $n in 0 to 1 return 'a'[position()= $n to 0]" },
-      { "Filter 13", strings("a", "a"), "for $n in 0 to 1 return ('a', 'b')[position()= $n to 1]" },
+  /** Intersect/except. */
+  @Test public void intersectExcept() {
+    query("<a/> intersect <b/>", "");
+    query("<a/> intersect <b/> except <c/>", "");
+    query("<a/> except <b/> intersect <c/>", "");
+    query("count(<a/> except <b/>)", 1);
+    query("<a/> ! (. intersect (., <b/>))/name()", "a");
+  }
 
-      { "ContextItem 0", nodes(0), "." },
-      { "ContextItem 1", nodes(0), "42[not(.)], ." },
-      { "ContextItem 2", nodes(0), "try { 1[error()] } catch * {.}" },
-      { "ContextItem 3", nodes(0), "try { 1[error()][1] } catch * {.}" },
-      { "ContextItem 4", nodes(0), "try { 1[1][error()] } catch * {.}" },
-      { "ContextItem 5", nodes(0),
-        "try { let $a := <a><b/></a> return $a/b[error()] } catch * {.}" },
-      { "ContextItem 6", integers(1),
-        "declare function local:x() {1+<x/>};1[try { local:x() } catch *{.}]" },
-      { "ContextItem 7", nodes(0), "try { <a/>/(1+'') } catch * {.}" },
-      { "ContextItem 8", integers(1, 1), "('a', 'b') ! count(.)" },
+  /** Filters. */
+  @Test public void filter() {
+    error("1[1][error()]", FUNERR1);
+    query("1[1][<x/>/a]", "");
+    query("name(<x><a/><b c='d'/></x>/(a, b)[@c])", "b");
+    query("name(<x><a/><b/></x>/(b, a)[self::b])", "b");
+    query("<x><a><b c='d'/></a></x>/(a, b)[@c]", "");
+    query("empty((1, 2, 3)[3][2])", true);
+    query("empty((1, 2, 3)[position() = 3][2])", true);
+    query("1[boolean(max((<a>1</a>, <b>2</b>)))]", 1);
+    query("string(<n><a/><a>x</a></n>/a/text()[.][.])", "x");
+    query("string(<n><a/><a>x</a></n>/a/text()[1][1])", "x");
+    query("1[1 to 2]", 1);
+    query("for $n in 0 to 1 return 'a'[position()= $n to 0]", "");
+    query("for $n in 0 to 1 return ('a', 'b')[position()= $n to 1]", "a\na");
+  }
 
-      { "Path 1", emptySequence(), "<a/>[./(@*)]" },
-      { "Path 2", strings("A", "B"), "<_><x><x>A</x>B</x></_>//x/node()[last()] ! string()" },
-      { "Path 3", integers(2, 2), "<a><b/><b/></a>/b/last()" },
-      { "Path 4", "<local:a/>/self::local :*" },
+  /** Context item. */
+  @Test public void contextItem() {
+    query(".", "<x>X</x>");
+    query("42[not(.)], .", "<x>X</x>");
+    query("try { 1[error()] } catch * {.}", "<x>X</x>");
+    query("try { 1[error()][1] } catch * {.}", "<x>X</x>");
+    query("try { 1[1][error()] } catch * {.}", "<x>X</x>");
+    query("try { let $a := <a><b/></a> return $a/b[error()] } catch * {.}", "<x>X</x>");
+    query("declare function local:x() {1+<x/>};1[try { local:x() } catch *{.}]", 1);
+    query("try { <a/>/(1+'') } catch * {.}", "<x>X</x>");
+    query("('a', 'b') ! count(.)", "1\n1");
+  }
 
-      { "Cast 1", integers(1), "xs:integer('+1')" },
-      { "Cast 2", "xs:integer('++1')" },
-      { "Cast 3", booleans(false), "string('/') castable as xs:QName" },
-      { "Cast 4", strings("error"),
-        "try { '1999-12-31'/. castable as xs:date } catch err:XPTY0004 { 'error' }" },
-      { "Cast 5", strings("bar"),
-          "declare function local:shortcircuit($a) {"
-          + "  if($a castable as xs:double and xs:double($a) gt 0) then $a else 'bar'"
-          + "};"
-          + "local:shortcircuit('foo')" },
-      { "Cast 6", emptySequence(), "xs:integer(())" },
-      { "Cast 7", emptySequence(), "xs:integer#1(())" },
-      { "Cast 8", emptySequence(), "xs:integer(?)(())" },
-      { "Cast 9", strings("1", "2"), "('1', '2 3') ! xs:NMTOKENS(.)[1]" },
-      { "Cast 10", "exactly-one(xs:NMTOKENS(<x>1 2</x>))" },
+  /** Paths. */
+  @Test public void path() {
+    query("<a/>[./(@*)]", "");
+    query("<_><x><x>A</x>B</x></_>//x/node()[last()] ! string()", "A\nB");
+    query("<a><b/><b/></a>/b/last()", "2\n2");
+    error("<local:a/>/self::local :*", QUERYEND_X);
+  }
 
-      { "Mixed 1", "(<a/>, <b/>)/(if(name() = 'a') then <a/> else 2)/." },
+  /** Casts. */
+  @Test public void cast() {
+    query("xs:integer('+1')", 1);
+    error("xs:integer('++1')", FUNCCAST_X_X);
+    query("string('/') castable as xs:QName", false);
+    query("try { '1999-12-31'/. castable as xs:date } catch err:XPTY0004 { 'error' }", "error");
+    query("declare function local:shortcircuit($a) {"
+        + "  if($a castable as xs:double and xs:double($a) gt 0) then $a else 'bar'"
+        + "};"
+        + "local:shortcircuit('foo')", "bar");
+    query("xs:integer(())", "");
+    query("xs:integer#1(())", "");
+    query("xs:integer(?)(())", "");
+    query("('1', '2 3') ! xs:NMTOKENS(.)[1]", "1\n2");
+    error("exactly-one(xs:NMTOKENS(<x>1 2</x>))", EXACTLYONE);
+  }
 
-      { "Typeswitch 1", integers(1),
-        "typeswitch(<a>1</a>) case xs:string return 1 default return 1" },
-      { "Typeswitch 2", integers(1),
-        "typeswitch(<a>1</a>) case $a as xs:string return 1 default return 1" },
-      { "Typeswitch 3", integers(1, 2),
-        "typeswitch(<a>1</a>) case $a as xs:string return (1, 2) default return (1, 2)" },
-      { "Typeswitch 4", integers(1, 2, 3, 4, 5),
-        "(xs:byte(0), xs:short(0), xs:int(0), xs:long(0), 0) ! "
+  /** Mixed content. */
+  @Test public void mixed() {
+    error("(<a/>, <b/>)/(if(name() = 'a') then <a/> else 2)/.", PATHNODE_X_X_X);
+  }
+
+  /** Typeswitch. */
+  @Test public void typeswitch() {
+    query("typeswitch(<a>1</a>) case xs:string return 1 default return 1", 1);
+    query("typeswitch(<a>1</a>) case $a as xs:string return 1 default return 1", 1);
+    query("typeswitch(<a>1</a>) case $a as xs:string return (1, 2) default return (1, 2)", "1\n2");
+    query("(xs:byte(0), xs:short(0), xs:int(0), xs:long(0), 0) ! "
         + "(typeswitch (.)"
         + " case xs:byte return 1"
         + " case xs:short return 2"
@@ -215,122 +262,186 @@ public final class SimpleTest extends QueryTest {
         + " case xs:long return 4"
         + " case xs:decimal | xs:integer return 5"
         + " default return 6"
-        + ")" },
-      { "Typeswitch 5", integers(1, 1),
-          "(0, xs:byte(0)) ! "
-          + "(typeswitch (.)"
-          + " case xs:integer return 1"
-          + " case xs:byte return 2"
-          + " default return 3"
-          + ")" },
+        + ")", "1\n2\n3\n4\n5");
+    query("(0, xs:byte(0)) ! "
+        + "(typeswitch (.)"
+        + " case xs:integer return 1"
+        + " case xs:byte return 2"
+        + " default return 3"
+        + ")", "1\n1");
+  }
 
-      { "FunctionContext 0", "declare function local:x() { /x }; local:x()" },
+  /** Function context. */
+  @Test public void functionContext() {
+    error("declare function local:x() { /x }; local:x()", NOCTX_X);
+  }
 
-      { "XQuery 3.0", emptySequence(), "xquery version '3.0'; <a/>/node()" },
-      { "XQuery 1.0", emptySequence(), "xquery version '1.0'; <a/>/node()" },
+  /** XQuery version declarations. */
+  @Test public void xqueryVersion() {
+    query("xquery version '3.0'; <a/>/node()", "");
+    query("xquery version '1.0'; <a/>/node()", "");
+  }
 
-      { "DeclFun 1", integers(0, 1), "declare function local:x($x as xs:integer) { $x }; " +
-        "let $a := 0, $b := 1 return try { local:x( (1 to 20) ) } catch * { $a, $b }" },
+  /** Declared functions. */
+  @Test public void declFun() {
+    query("declare function local:x($x as xs:integer) { $x }; "
+        + "let $a := 0, $b := 1 return try { local:x( (1 to 20) ) } catch * { $a, $b }", "0\n1");
+  }
 
-      { "Catch 1", "try { 1+'' } catch XPTY0004 { 1 }" },
-      { "Catch 2", integers(1), "try { 1+'' } catch err:XPTY0004 { 1 }" },
-      { "Catch 3", integers(1), "try { 1+'' } catch *:XPTY0004 { 1 }" },
-      { "Catch 4", integers(1), "try { 1+'' } catch err:* { 1 }" },
-      { "Catch 5", integers(1), "try { 1+'' } catch * { 1 }" },
-      { "Catch 6", integers(1),
-        "declare function local:f($x) { try { 1 idiv $x } catch * { 1 } }; local:f(0)" },
+  /** Catch clauses. */
+  @Test public void catchClause() {
+    error("try { 1+'' } catch XPTY0004 { 1 }", NONUMBER_X_X);
+    query("try { 1+'' } catch err:XPTY0004 { 1 }", 1);
+    query("try { 1+'' } catch *:XPTY0004 { 1 }", 1);
+    query("try { 1+'' } catch err:* { 1 }", 1);
+    query("try { 1+'' } catch * { 1 }", 1);
+    query("declare function local:f($x) { try { 1 idiv $x } catch * { 1 } }; local:f(0)", 1);
+  }
 
-      { "NodeTest 1", strings("a"),
-        "let $d as document-node(element()) := parse-xml('<!--a--><a/>') return name($d/*)" },
-      { "NodeTest 2", strings("a"),
-        "let $d as document-node(element(a)) := parse-xml('<!--a--><a/>') return name($d/*)" },
+  /** Node tests. */
+  @Test public void nodeTest() {
+    query("let $d as document-node(element()) := parse-xml('<!--a--><a/>') return name($d/*)", "a");
+    query("let $d as document-node(element(a)) := parse-xml('<!--a--><a/>') return name($d/*)",
+        "a");
+  }
 
-      { "FuncTest 1", integers(1), "xquery version '1.0';" +
-        "declare function local:foo() { count(local:bar()) };" +
-        "declare function local:bar() { 42 };" +
-        "local:foo()" },
-      { "FuncTest 2", integers(1), "xquery:eval('" +
-        "declare function local:foo() { count(local:bar()) };" +
-        "declare function local:bar() { 1 };" +
-        "local:foo()')" },
-      { "FuncTest 3", "local:a(), local:a(1)" },
-      { "FuncTest 4", emptySequence(), "()/x[function($x as item()){1}(.)]" },
+  /** Function tests. */
+  @Test public void funcTest() {
+    query("xquery version '1.0';"
+        + "declare function local:foo() { count(local:bar()) };"
+        + "declare function local:bar() { 42 };"
+        + "local:foo()", 1);
+    query("xquery:eval('"
+        + "declare function local:foo() { count(local:bar()) };"
+        + "declare function local:bar() { 1 };"
+        + "local:foo()')", 1);
+    error("local:a(), local:a(1)", WHICHFUNC_X);
+    query("()/x[function($x as item()){1}(.)]", "");
+  }
 
-      { "Limits 1", integers(9223372036854775806L), "2 * 4611686018427387903" },
-      { "Limits 2", "2 * 4611686018427387904" }, // overflow
-      { "Limits 3", integers(-9223372036854775808L), "-2 * 4611686018427387904" },
-      { "Limits 4", "4611686018427387905 * -2" }, // underflow
-      { "Limits 5", integers(-9223372036854775808L), "xs:decimal('18446744073709551616') idiv -2" },
-      { "Limits 6", "xs:decimal('18446744073709551616') idiv 2" }, // does not fit
-      { "Limits 7", integers(9223372036854775806L), "xs:decimal('18446744073709551612') idiv 2" },
-      { "Limits 8", "-9223372036854775808 idiv -1" },
-      { "Limits 9", "-9223372036854775807 - 1024" },
-      { "Limits 10", "-9223372036854775808 - 1" },
+  /** Numeric limits. */
+  @Test public void limits() {
+    query("2 * 4611686018427387903", 9223372036854775806L);
+    error("2 * 4611686018427387904", RANGE_X);
+    query("-2 * 4611686018427387904", -9223372036854775808L);
+    error("4611686018427387905 * -2", RANGE_X);
+    query("xs:decimal('18446744073709551616') idiv -2", -9223372036854775808L);
+    error("xs:decimal('18446744073709551616') idiv 2", RANGE_X);
+    query("xs:decimal('18446744073709551612') idiv 2", 9223372036854775806L);
+    error("-9223372036854775808 idiv -1", RANGE_X);
+    error("-9223372036854775807 - 1024", RANGE_X);
+    error("-9223372036854775808 - 1", RANGE_X);
+  }
 
-      { "Empty 1", strings(""), "format-integer(let $x := " + _RANDOM_INTEGER.args() +
-        " return (), '0')" },
-      { "Empty 2", emptySequence(),
-          "math:sin(let $x := " + _RANDOM_INTEGER.args() + " return ())" },
-      { "Empty 3", booleans(true), "let $a := () return empty($a)" },
-      { "Empty 4", booleans(false), "let $a := () return exists($a)" },
-      { "Empty 5", booleans(true), "declare function local:foo($x as empty-sequence())"
-          + "as xs:boolean { empty($x) }; local:foo(())" },
+  /** Empty sequences. */
+  @Test public void eempty() {
+    query("format-integer(let $x := random:integer() return (), '0')", "");
+    query("math:sin(let $x := random:integer() return ())", "");
+    query("let $a := () return empty($a)", true);
+    query("let $a := () return exists($a)", false);
+    query("declare function local:foo($x as empty-sequence()) as xs:boolean { empty($x) }; "
+        + "local:foo(())", true);
+  }
 
-      { "Map 1", strings("c", "a"), "<a/> ! (('b' ! 'c'), name())" },
-      { "Map 2", integers(5), "((1 to 100000) ! 5)[1]" },
-      { "Map 3", strings("a", "b"), "<a><b/></a>/b ! ancestor-or-self::node() ! name()" },
-      { "Map 4", strings("a", "b"), "<_ a='a' b='b'/> ! (@a, @b) ! string()" },
+  /** Simple map operator. */
+  @Test public void map() {
+    query("<a/> ! (('b' ! 'c'), name())", "c\na");
+    query("((1 to 100000) ! 5)[1]", 5);
+    query("<a><b/></a>/b ! ancestor-or-self::node() ! name()", "a\nb");
+    query("<_ a='a' b='b'/> ! (@a, @b) ! string()", "a\nb");
+  }
 
-      { "Constructor 1", strings("1"), "<n xmlns='u'>{ attribute { 'a' }{ 1 }}</n>/@a/string()" },
+  /** Constructors. */
+  @Test public void constructor() {
+    query("<n xmlns='u'>{ attribute { 'a' }{ 1 }}</n>/@a/string()", 1);
+  }
 
-      // #1140
-      { "Pred 1", emptySequence(), "declare function local:test() {" +
-          "for $n in (1, 1) return <_><c/><w/></_>/*[$n[1]] }; local:test()/self::w" },
-      { "Pred 2", emptySequence(),
-            "for $n in (2, 2) return (<c><c0/></c>, <d><d0/><d2/></d>)/*[$n[$n]]" },
-      { "Pred 3", strings("XML"), "(('XML')[1])[1]" },
-      { "Pred 4", integers(1), "1[position() = 1 to 2]" },
-      { "Pred 5", integers(1), "1[position() = (1, 2)]" },
-      { "Pred 6", integers(1), "count((text { 'x' }, element x {})[. instance of element()])" },
+  /** Predicates (#1140). */
+  @Test public void pred() {
+    query("declare function local:test() {"
+        + "for $n in (1, 1) return <_><c/><w/></_>/*[$n[1]] }; local:test()/self::w", "");
+    query("for $n in (2, 2) return (<c><c0/></c>, <d><d0/><d2/></d>)/*[$n[$n]]", "");
+    query("(('XML')[1])[1]", "XML");
+    query("1[position() = 1 to 2]", 1);
+    query("1[position() = (1, 2)]", 1);
+    query("count((text { 'x' }, element x {})[. instance of element()])", 1);
+  }
 
-      { "FItem 1", integers(1), "declare context item := 0; last#0()" },
-      { "FItem 2", integers(2), "declare context item := 1; let $f := last#0 return (2, 3)[$f()]" },
+  /** Function items. */
+  @Test public void fItem() {
+    query("declare context item := 0; last#0()", 1);
+    query("declare context item := 1; let $f := last#0 return (2, 3)[$f()]", 2);
+  }
 
-      { "List 1", integers(1, 10000000000L),
-        "for $i in (1, 10000000000) return (1 to $i)[last()]" },
-      { "List 2", strings("x", "x"),
-        "for $i in (1, 10000000000) return (1 to $i, 'x')[last()]" },
-      { "List 3", integers(2, 10000000001L),
-        "for $i in (1, 10000000000) return count((1 to $i, 'x'))" },
+  /** Lists. */
+  @Test public void list() {
+    query("for $i in (1, 10000000000) return (1 to $i)[last()]", "1\n10000000000");
+    query("for $i in (1, 10000000000) return (1 to $i, 'x')[last()]", "x\nx");
+    query("for $i in (1, 10000000000) return count((1 to $i, 'x'))", "2\n10000000001");
+  }
 
-      { "Identity 1", booleans(false),
-          "let $a := <a/> " +
-          "let $b := <_>{ $a }</_> " +
-          "return $b/a is $a" },
-      { "Identity 2", booleans(true),
-          "let $a := <a/> " +
-          "let $b := (# db:copynode false #) { <_>{ $a }</_> } " +
-          "return $b/a is $a" },
+  /** Node identity. */
+  @Test public void identity() {
+    query("let $a := <a/> let $b := <_>{ $a }</_> return $b/a is $a", false);
+    query("let $a := <a/> let $b := (# db:copynode false #) { <_>{ $a }</_> } "
+        + "return $b/a is $a", true);
+  }
 
-      { "Range 1", integers(100), "count((1 to 10) ! (. to . + 9))" },
-      { "Range 2", integers(100), "count((1 to 10) ! (. to . - -9))" },
-      { "Range 3", integers(1_000_000_000), "count((1 to 100_000) ! (. to . + 9_999))" },
+  /** Range expressions. */
+  @Test public void range() {
+    query("count((1 to 10) ! (. to . + 9))", 100);
+    query("count((1 to 10) ! (. to . - -9))", 100);
+    query("count((1 to 100_000) ! (. to . + 9_999))", 1_000_000_000);
+    query("count((-9223372036854775807 - 1) to 9223372036854775807)", Long.MAX_VALUE);
+    query("head((-9223372036854775807 - 1) to 9223372036854775807)", Long.MIN_VALUE);
+  }
 
-      { "Arith 1", strings("P6M"), "string(.5 * xs:yearMonthDuration('P1Y'))" },
-      { "Arith 2", strings("P6M"), "string(<_>.5</_> * xs:yearMonthDuration('P1Y'))" },
-      { "Arith 3", strings("P6M"), "string(xs:yearMonthDuration('P1Y') * .5)" },
-      { "Arith 4", strings("P6M"), "string(xs:yearMonthDuration('P1Y') * <_>.5</_>)" },
-      { "Arith 5", strings("P2Y"), "string(xs:yearMonthDuration('P1Y') div .5)" },
-      { "Arith 6", strings("P2Y"), "string(xs:yearMonthDuration('P1Y') div <_>.5</_>)" },
+  /** Arithmetics with durations. */
+  @Test public void arith() {
+    query("string(.5 * xs:yearMonthDuration('P1Y'))", "P6M");
+    query("string(<_>.5</_> * xs:yearMonthDuration('P1Y'))", "P6M");
+    query("string(xs:yearMonthDuration('P1Y') * .5)", "P6M");
+    query("string(xs:yearMonthDuration('P1Y') * <_>.5</_>)", "P6M");
+    query("string(xs:yearMonthDuration('P1Y') div .5)", "P2Y");
+    query("string(xs:yearMonthDuration('P1Y') div <_>.5</_>)", "P2Y");
+  }
 
-      { "URIQualifiedName 1", strings("abc"), "declare function local:text($t) {$t}; "
-          + "Q{http://www.w3.org/2005/xquery-local-functions}text#1('abc')"},
-      { "URIQualifiedName 2", strings("abc"), "declare function Q{http://www.w3.org/2005/xquery-loc"
-          + "al-functions}text($t) {$t}; local:text('abc')"},
-      { "URIQualifiedName 3", strings("abc"), "declare function local:text($t) {$t}; "
-          + "Q{http://www.w3.org/2005/xquery-local-functions}text('abc')"},
-      { "URIQualifiedName 4", strings("abc"), "declare function local:text($t) {$t}; "
-          + "'abc' => Q{http://www.w3.org/2005/xquery-local-functions}text()"},
-    };
+  /** URI-qualified names. */
+  @Test public void uriQualifiedName() {
+    query("declare function local:text($t) {$t}; "
+        + "Q{http://www.w3.org/2005/xquery-local-functions}text#1('abc')", "abc");
+    query("declare function Q{http://www.w3.org/2005/xquery-loc"
+        + "al-functions}text($t) {$t}; local:text('abc')", "abc");
+    query("declare function local:text($t) {$t}; "
+        + "Q{http://www.w3.org/2005/xquery-local-functions}text('abc')", "abc");
+    query("declare function local:text($t) {$t}; "
+        + "'abc' => Q{http://www.w3.org/2005/xquery-local-functions}text()", "abc");
+  }
+
+  /** Subsequence with large offsets and lengths (no integer overflow). */
+  @Test public void subSequence() {
+    query("subsequence(1 to 2000, 2000, 9223372036854775807)", 2000);
+    query("subsequence(1 to 5, 2, 9223372036854775807)", "2\n3\n4\n5");
+    query("subsequence(1 to 5, 3, 2147483648)", "3\n4\n5");
+  }
+
+  /** Substring with large positions and lengths (no integer overflow). */
+  @Test public void subString() {
+    query("substring('hello', 1, 9223372036854775807)", "hello");
+    query("substring('hello', 2, 9223372036854775807)", "ello");
+    query("substring('hello', 3, 2147483648)", "llo");
+    query("substring('hello', -2, 9223372036854775807)", "hello");
+  }
+
+  /** Insert-before with an extreme position (no integer underflow). */
+  @Test public void insertBefore() {
+    query("insert-before((1, 2, 3), -9223372036854775807 - 1, 99)", "99\n1\n2\n3");
+    query("insert-before((1, 2, 3), 5, 99)", "1\n2\n3\n99");
+  }
+
+  /** Subarray bounds check with a large length (no integer overflow). */
+  @Test public void subArray() {
+    error("array:subarray([1, 2, 3], 2, 9223372036854775807)", ARRAYBOUNDS_X_X);
+    query("array:subarray([1, 2, 3, 4, 5], 2, 3)", "[2,3,4]");
   }
 }

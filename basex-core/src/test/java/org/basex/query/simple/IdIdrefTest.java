@@ -1,38 +1,37 @@
 package org.basex.query.simple;
 
 import static org.basex.query.func.Function.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.stream.*;
 
+import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.query.*;
-import org.basex.query.value.*;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
 
 /**
- * Tests for {@code ID} and {@code IDREF}.
+ * Tests for {@code ID} and {@code IDREF}. As the queries return element or attribute nodes and are
+ * evaluated with different storage options (including main memory), results are compared via their
+ * node names.
  *
  * @author BaseX Team, BSD License
  * @author Jens Erat
  */
-public final class IdIdrefTest extends QueryTest {
+public final class IdIdrefTest extends SandboxTest {
   /**
    * Queries to test.
-   * @return argument stream
+   * @return argument stream (expected node names, query)
    */
   private static Stream<Arguments> testQueries() {
     return Stream.of(
-      Arguments.of(new int[] { 1 }, _DB_GET.args(NAME, "1.xml") + "/id('foo')"),
-      Arguments.of(new int[] { 1 }, _DB_GET.args(NAME, "1.xml") + "/id('foo')"),
-      Arguments.of(new int[] { 5 }, _DB_GET.args(NAME, "2.xml") + "/id('batz')"),
-      Arguments.of(new int[] { 3 }, _DB_GET.args(NAME, "1.xml") + "/idref('bar')"),
-      Arguments.of(new int[] { 7 }, _DB_GET.args(NAME, "2.xml") + "/idref('quix')"),
-      Arguments.of(new int[] { 3, 7 }, "collection('" + NAME + "')/idref('quix', .)")
+      Arguments.of("root1", _DB_GET.args(NAME, "1.xml") + "/id('foo')"),
+      Arguments.of("root1", _DB_GET.args(NAME, "1.xml") + "/id('foo')"),
+      Arguments.of("root2", _DB_GET.args(NAME, "2.xml") + "/id('batz')"),
+      Arguments.of("idref", _DB_GET.args(NAME, "1.xml") + "/idref('bar')"),
+      Arguments.of("idref2", _DB_GET.args(NAME, "2.xml") + "/idref('quix')"),
+      Arguments.of("idref\nidref2", "collection('" + NAME + "')/idref('quix', .)")
     );
   }
 
@@ -53,23 +52,26 @@ public final class IdIdrefTest extends QueryTest {
     ));
   }
 
+  /** Resets options and drops the test database. */
+  @AfterEach public void tearDown() {
+    execute(new DropDB(NAME));
+    set(MainOptions.MAINMEM, false);
+    set(MainOptions.UPDINDEX, false);
+    set(MainOptions.TOKENINDEX, false);
+  }
+
   /**
-   * Prepare test, setting up parameterized environment.
+   * Runs a query in a parameterized environment and checks the resulting node names.
    * @param mainmem main-memory flag
    * @param updindex updatable index flag
    * @param tokenindex token index flag
-   * @param expectedIds expected results
-   * @param query query string
-   * @throws Exception exception
+   * @param names expected node names (newline-separated)
+   * @param qu query string
    */
-  @DisplayName("IdIdrefTest")
-  @ParameterizedTest(name = "[{3}] {4}: mainmem={0}, updindex={1}, tokenindex={2}")
+  @ParameterizedTest(name = "{4}: mainmem={0}, updindex={1}, tokenindex={2}")
   @MethodSource("generateParams")
   public void test(final boolean mainmem, final boolean updindex, final boolean tokenindex,
-      final int[] expectedIds, final String query)
-      throws Exception {
-
-    // set up environment
+      final String names, final String qu) {
     set(MainOptions.MAINMEM, mainmem);
     set(MainOptions.UPDINDEX, updindex);
     set(MainOptions.TOKENINDEX, tokenindex);
@@ -77,17 +79,6 @@ public final class IdIdrefTest extends QueryTest {
     execute(new Add("1.xml", "<root1 id='foo' idref='bar quix' />"));
     execute(new Add("2.xml", "<root2 id='batz' idref2='quix' />"));
 
-    final Value expected = nodes(expectedIds);
-    final Value actual = run(query);
-
-    assertTrue(eq(actual, expected), String.format(
-      "[E] %d result(s): %s%n[F] %d result(s): %s",
-      expected.size(), serialize(expected),
-      actual.size(), serialize(actual)));
-  }
-
-  @Override
-  @Test public void test() {
-    // super.test() is not needed since we use @ParameterizedTest with queries as parameters.
+    query("(" + qu + ") ! name()", names);
   }
 }

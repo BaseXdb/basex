@@ -3,25 +3,30 @@ package org.basex.query.ft;
 import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.util.*;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
 /**
- * Test if index and non-index full-text queries behave the same way.
+ * Tests that full-text queries yield the same result with and without a full-text index.
+ * The queries against the shared document are already checked in both modes by {@link FTTest} and
+ * {@link FTSeqTest}; this class covers extended features on dedicated documents.
  *
  * @author BaseX Team, BSD License
  * @author Dimitar Popov
  */
-public final class FTIndexQueryTest extends FTTest {
-  static {
-    create(DOC);
-    queries = QUERIES;
+public final class FTIndexQueryTest extends SandboxTest {
+  /** Drops the test databases. */
+  @AfterEach public void tearDown() {
+    execute(new DropDB(NAME));
+    execute(new DropDB(NAME + "ix"));
+    set(MainOptions.FTINDEX, false);
   }
 
   /**
-   * Initializes the test with the given input.
+   * Creates an unindexed and a full-text indexed database from the given input.
    * @param input input
    */
   private static void init(final String input) {
@@ -35,54 +40,31 @@ public final class FTIndexQueryTest extends FTTest {
   }
 
   /**
-   * Runs all tests from {@link FTSeqTest}.
+   * Asserts that a query returns the same result with and without a full-text index.
+   * @param qu query
    */
-  @Test public void testFTTest() {
-    init(DOC);
-    final StringBuilder sb = new StringBuilder();
-    for(final Object[] q : QUERIES) {
-      try {
-        if(q.length == 3) assertQuery((String) q[0], (String) q[2]);
-      } catch(final Throwable th) {
-        Util.debug(th);
-        sb.append(th.getMessage());
-      }
-    }
-    if(!sb.isEmpty()) fail(sb.toString());
+  private static void assertQuery(final String qu) {
+    execute(new Open(NAME));
+    final String result = query(qu);
+    execute(new Open(NAME + "ix"));
+    assertEquals(result, query(qu), '\n' + qu + '\n');
   }
 
-  /**
-   * Tests extended full-text features.
-   */
-  @Test public void testExt() {
+  /** Extended full-text features. */
+  @Test public void ext() {
     init("<x>A x B</x>");
-    assertQuery("Ext 1", "//*[text() contains text 'A B' all words distance exactly 0 words]");
-    assertQuery("Ext 2", _FT_MARK.args(" //*[text() contains text { 'A B' } all words], 'b'"));
-    assertQuery("Ext 3", _FT_MARK.args(" //*[text() contains text 'A' ftand 'B'], 'b'"));
+    assertQuery("//*[text() contains text 'A B' all words distance exactly 0 words]");
+    assertQuery(_FT_MARK.args(" //*[text() contains text { 'A B' } all words], 'b'"));
+    assertQuery(_FT_MARK.args(" //*[text() contains text 'A' ftand 'B'], 'b'"));
   }
 
-  /**
-   * Tests mixed content.
-   */
+  /** Mixed content. */
   @Test public void mixedContent() {
     init("<mix>A<sub/>B</mix>");
-    assertQuery("Mix", "//mix[text()[1] contains text 'B']");
+    assertQuery("//mix[text()[1] contains text 'B']");
 
     init("<xml><mix>B<sub/>A</mix><mix>A<sub/>B</mix></xml>");
-    assertQuery("Mix", "//mix[text()[1] contains text 'B']");
-    assertQuery("Mix", "//mix[text() contains text 'A'][1]");
-  }
-
-  /**
-   * Asserts that a query returns the same result with and without ft index.
-   * @param name name of query
-   * @param query query
-   */
-  private static void assertQuery(final String name, final String query) {
-    execute(new Open(NAME));
-    final String result1 = query(query);
-    execute(new Open(NAME + "ix"));
-    final String resultIx = query(query);
-    assertEquals(result1, resultIx, '\n' + name + ": " + query + '\n');
+    assertQuery("//mix[text()[1] contains text 'B']");
+    assertQuery("//mix[text() contains text 'A'][1]");
   }
 }

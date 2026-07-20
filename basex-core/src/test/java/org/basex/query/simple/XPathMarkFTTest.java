@@ -1,14 +1,18 @@
 package org.basex.query.simple;
 
-import org.basex.query.*;
+import org.basex.*;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
- * XPathMark functional tests.
+ * XPathMark functional tests. Node results are checked via their {@code pre} values.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class XPathMarkFTTest extends QueryTest {
+public final class XPathMarkFTTest extends SandboxTest {
   /** Test document. */
   private static final String DOC = """
     <?xml version='1.0' encoding='UTF-8'?>
@@ -41,228 +45,110 @@ public final class XPathMarkFTTest extends QueryTest {
     <Y id='n25' pre='25' post='23'>yawn</Y>
     <Z id='n26' pre='26' post='24' idrefs='n8 n17' xml:lang='it'>zuzzurellone</Z></X></A>""";
 
-  static { create(DOC); }
+  /** Creates the test database. */
+  @BeforeAll public static void beforeClass() {
+    set(MainOptions.STRIPWS, true);
+    execute(new CreateDB(NAME, DOC));
+  }
 
-  /** Test queries. */
-  private static final Object[][] QUERIES = {
-      { "A01", nodes(59, 64, 79), "//L/*" },
-      { "A02", nodes(20), "//L/parent::*" },
-      { "A03", nodes(59, 64, 68, 73, 79), "//L/descendant::*" },
-      { "A04", nodes(53, 59, 64, 68, 73, 79), "//L/descendant-or-self::*" },
-      { "A05", nodes(1, 20), "//L/ancestor::*" },
-      { "A06", nodes(1, 20, 53), "//L/ancestor-or-self::*" },
-      { "A07", nodes(85, 99), "//L/following-sibling::*" },
-      { "A08", nodes(24, 39), "//L/preceding-sibling::*" },
-      { "A09", nodes(85, 89, 94, 99, 103, 108, 113, 117, 122),
-        "//L/following::*" },
-      { "A10", nodes(6, 10, 15, 24, 28, 33, 39, 43, 48), "//L/preceding::*" },
-      { "A11", nodes(53), "//L/self::*" },
-      { "A12", strings("n12"), "//L/@id/string()" },
-      { "F01", nodes(1, 20, 53, 64, 73), "//*[contains(., 'plentiful')]" },
-      { "F02", nodes(73), "//*[starts-with(., 'plentiful')]" },
-      { "F03", nodes(73), "//*[substring(., 1, 9) = 'plentiful']" },
-      { "F04", nodes(68), "//*[substring-after(., 'oven') = 'ware']" },
-      { "F05", nodes(73), "//*[substring-before(., 'ful') = 'plenti']" },
-      { "F06", nodes(1, 20), "//*[string-length(translate(" +
-        "normalize-space(.), ' ', '')) > 100]" },
-      { "F07", nodes(59), "//*[concat(., ..) = ..]" },
-      { "F08", nodes(1, 6, 20, 24, 39, 53, 85, 99, 113),
-        "//*[ceiling(@pre div @post) = 1]" },
-      { "F09", nodes(1, 6, 20, 53, 113), "//*[floor(@pre div @post) = 0]" },
-      { "F10", nodes(1, 20), "//*[round(@pre div @post) = 0]" },
-      { "F11", nodes(113), "//*[name(.) = 'X']" },
-      { "F12", nodes(122), "//*[lang('it')]" },
-      { "F13", nodes(79), "//L/child::*[last()]" },
-      { "F14", nodes(73), "//L/descendant::*[4]" },
-      { "F15", nodes(1), "//L/ancestor::*[2]" },
-      { "F16", nodes(85), "//L/following-sibling::*[1]" },
-      { "F17", nodes(39), "//L/preceding-sibling::*[1]" },
-      { "F18", nodes(113), "//L/following::*[7]" },
-      { "F19", nodes(15), "//L/preceding::*[7]" },
-      { "F20", nodes(68, 73), "//*[count(ancestor::*) > 3]" },
-      { "F21", nodes(1, 6, 20, 24, 39, 53, 64, 85, 99, 113),
-        "//*[sum(ancestor::*/@pre) < sum(descendant::*/@pre)]" },
-      { "F22", nodes(1, 122), "id('n1 n26')" },
-      { "F23", nodes(33, 79, 122),
-        "id(id(//*[.='happy-go-lucky man']/@idrefs)/@idrefs)" },
-      { "F24", nodes(1, 6, 20, 53, 113), "//*[number(@pre) < number(@post)]" },
-      { "F25", nodes(1), "//*[string(@pre - 1) = '0']" },
-      { "F26", nodes(1, 6, 10, 15, 20, 24, 28, 39, 43, 48, 53, 59, 64, 68,
-          73, 85, 89, 94, 99, 103, 108, 113, 117),
-          "//*[boolean(@id) = true() and boolean(@idrefs) = false()]" },
-      { "O01", nodes(85, 99, 113), "//*[child::* and preceding::Q]" },
-      { "O02", nodes(89, 94, 103, 108, 117, 122),
-          "//*[not(child::*) and preceding::Q]" },
-      { "O03", nodes(6, 10, 15, 24, 28, 33, 39, 43, 48, 85, 89, 94, 99,
-          103, 108, 113, 117, 122), "//*[preceding::L or following::L]" },
-      { "O04", nodes(1, 20, 59, 64, 68, 73, 79),
-          "//L/ancestor::* | //L/descendant::*" },
-      { "O05", nodes(33), "//*[.='happy-go-lucky man']" },
-      { "O06", nodes(59, 64, 68, 73, 79), "//*[@pre > 12 and @post < 15]" },
-      { "O07", nodes(1, 6, 10, 15, 20, 28, 33, 43, 48, 53, 59, 64, 68, 73,
-          79, 89, 94, 103, 108, 113, 117, 122),
-          "//*[@pre != @post]" },
-      { "O08", nodes(6, 24, 39, 48, 53, 59, 64, 79, 85, 89, 94, 99, 103,
-          108, 113, 117, 122), "//*[((@post * @post + @pre * @pre) div " +
-          "(@post + @pre)) > ((@post - @pre) * (@post - @pre))]" },
-      { "O09", nodes(6, 15, 24, 33, 43, 53, 64, 73, 85, 94, 103, 113, 122),
-          "//*[@pre mod 2 = 0]" },
-      { "P01", nodes(20), "//*[L]" },
-      { "P02", nodes(59, 64, 79), "//*[parent::L]" },
-      { "P03", nodes(1, 20), "//*[descendant::L]" },
-      { "P04", nodes(1, 20, 53), "//*[descendant-or-self::L]" },
-      { "P05", nodes(59, 64, 68, 73, 79), "//*[ancestor::L]" },
-      { "P06", nodes(53, 59, 64, 68, 73, 79), "//*[ancestor-or-self::L]" },
-      { "P07", nodes(24, 39), "//*[following-sibling::L]" },
-      { "P08", nodes(85, 99), "//*[preceding-sibling::L]" },
-      { "P09", nodes(6, 10, 15, 24, 28, 33, 39, 43, 48), "//*[following::L]" },
-      { "P10", nodes(85, 89, 94, 99, 103, 108, 113, 117, 122),
-        "//*[preceding::L]" },
-      { "P11", nodes(53), "//*[self::L]" },
-      { "P12", nodes(1, 6, 10, 15, 20, 24, 28, 33, 39, 43, 48, 53, 59, 64,
-          68, 73, 79, 85, 89, 94, 99, 103, 108, 113, 117, 122),
-          "//*[@id]" },
-      { "T01", nodes(58, 63), "//L/text()" },
-      { "T02", nodes(57), "//L/comment()" },
-      { "T03", nodes(78), "//L/processing-instruction()" },
-      { "T04", nodes(78), "//L/processing-instruction('myPI')" },
-      { "T05", nodes(57, 58, 59, 63, 64, 78, 79), "//L/node()" },
-      { "T06", nodes(64), "//L/N" },
-      { "T07", nodes(59, 64, 79), "//L/*" }
-    };
+  /** Drops the test database. */
+  @AfterAll public static void afterClass() {
+    execute(new DropDB(NAME));
+    set(MainOptions.STRIPWS, false);
+  }
 
-  static { queries = QUERIES; }
+  /** Axes. */
+  @Test public void axes() {
+    pre("//L/*", 59, 64, 79);
+    pre("//L/parent::*", 20);
+    pre("//L/descendant::*", 59, 64, 68, 73, 79);
+    pre("//L/descendant-or-self::*", 53, 59, 64, 68, 73, 79);
+    pre("//L/ancestor::*", 1, 20);
+    pre("//L/ancestor-or-self::*", 1, 20, 53);
+    pre("//L/following-sibling::*", 85, 99);
+    pre("//L/preceding-sibling::*", 24, 39);
+    pre("//L/following::*", 85, 89, 94, 99, 103, 108, 113, 117, 122);
+    pre("//L/preceding::*", 6, 10, 15, 24, 28, 33, 39, 43, 48);
+    pre("//L/self::*", 53);
+    query("//L/@id/string()", "n12");
+  }
 
-  /* TABLE REPRESENTATION
-  POS  PAR  TYPE  CONTENT
-    0   -1  DOC   test.xml
-    1    0  ELEM  A
-    2    1  ATTR  id="n1"
-    3    1  ATTR  pre="1"
-    4    1  ATTR  post="26"
-    5    1  ATTR  xml:lang="en"
-    6    1  ELEM  B
-    7    6  ATTR  id="n2"
-    8    6  ATTR  pre="2"
-    9    6  ATTR  post="3"
-   10    6  ELEM  C
-   11   10  ATTR  id="n3"
-   12   10  ATTR  pre="3"
-   13   10  ATTR  post="1"
-   14   10  TEXT  clergywoman
-   15    6  ELEM  D
-   16   15  ATTR  id="n4"
-   17   15  ATTR  pre="4"
-   18   15  ATTR  post="2"
-   19   15  TEXT  decadent
-   20    1  ELEM  E
-   21   20  ATTR  id="n5"
-   22   20  ATTR  pre="5"
-   23   20  ATTR  post="22"
-   24   20  ELEM  F
-   25   24  ATTR  id="n6"
-   26   24  ATTR  pre="6"
-   27   24  ATTR  post="6"
-   28   24  ELEM  G
-   29   28  ATTR  id="n7"
-   30   28  ATTR  pre="7"
-   31   28  ATTR  post="4"
-   32   28  TEXT  gentility
-   33   24  ELEM  H
-   34   33  ATTR  id="n8"
-   35   33  ATTR  pre="8"
-   36   33  ATTR  post="5"
-   37   33  ATTR  idrefs="n17 n26"
-   38   33  TEXT  happy-go-lucky man
-   39   20  ELEM  I
-   40   39  ATTR  id="n9"
-   41   39  ATTR  pre="9"
-   42   39  ATTR  post="9"
-   43   39  ELEM  J
-   44   43  ATTR  id="n10"
-   45   43  ATTR  pre="10"
-   46   43  ATTR  post="7"
-   47   43  TEXT  jigsaw
-   48   39  ELEM  K
-   49   48  ATTR  id="n11"
-   50   48  ATTR  pre="11"
-   51   48  ATTR  post="8"
-   52   48  TEXT  kerchief
-   53   20  ELEM  L
-   54   53  ATTR  id="n12"
-   55   53  ATTR  pre="12"
-   56   53  ATTR  post="15"
-   57   53  COMM  L is the twelve-th letter of the English alphabet
-   58   53  TEXT  The letter L is followed by the letter:
-   59   53  ELEM  M
-   60   59  ATTR  id="n13"
-   61   59  ATTR  pre="13"
-   62   59  ATTR  post="10"
-   63   53  TEXT  which is followed by the letter:
-   64   53  ELEM  N
-   65   64  ATTR  id="n14"
-   66   64  ATTR  pre="14"
-   67   64  ATTR  post="13"
-   68   64  ELEM  O
-   69   68  ATTR  id="n15"
-   70   68  ATTR  pre="15"
-   71   68  ATTR  post="11"
-   72   68  TEXT  ovenware
-   73   64  ELEM  P
-   74   73  ATTR  id="n16"
-   75   73  ATTR  pre="16"
-   76   73  ATTR  post="12"
-   77   73  TEXT  plentiful
-   78   53  PI    myPI value="XPath is nice"
-   79   53  ELEM  Q
-   80   79  ATTR  id="n17"
-   81   79  ATTR  pre="17"
-   82   79  ATTR  post="14"
-   83   79  ATTR  idrefs="n8 n26"
-   84   79  TEXT  quarrelsome
-   85   20  ELEM  R
-   86   85  ATTR  id="n18"
-   87   85  ATTR  pre="18"
-   88   85  ATTR  post="18"
-   89   85  ELEM  S
-   90   89  ATTR  id="n19"
-   91   89  ATTR  pre="19"
-   92   89  ATTR  post="16"
-   93   89  TEXT  sage
-   94   85  ELEM  T
-   95   94  ATTR  id="n20"
-   96   94  ATTR  pre="20"
-   97   94  ATTR  post="17"
-   98   94  TEXT  tattered
-   99   20  ELEM  U
-  100   99  ATTR  id="n21"
-  101   99  ATTR  pre="21"
-  102   99  ATTR  post="21"
-  103   99  ELEM  V
-  104  103  ATTR  id="n22"
-  105  103  ATTR  pre="22"
-  106  103  ATTR  post="19"
-  107  103  TEXT  voluptuary
-  108   99  ELEM  W
-  109  108  ATTR  id="n23"
-  110  108  ATTR  pre="23"
-  111  108  ATTR  post="20"
-  112  108  TEXT  wriggle
-  113    1  ELEM  X
-  114  113  ATTR  id="n24"
-  115  113  ATTR  pre="24"
-  116  113  ATTR  post="25"
-  117  113  ELEM  Y
-  118  117  ATTR  id="n25"
-  119  117  ATTR  pre="25"
-  120  117  ATTR  post="23"
-  121  117  TEXT  yawn
-  122  113  ELEM  Z
-  123  122  ATTR  id="n26"
-  124  122  ATTR  pre="26"
-  125  122  ATTR  post="24"
-  126  122  ATTR  idrefs="n8 n17"
-  127  122  ATTR  xml:lang="it"
-  128  122  TEXT  zuzzurellone
-   */
+  /** Functions. */
+  @Test public void functions() {
+    pre("//*[contains(., 'plentiful')]", 1, 20, 53, 64, 73);
+    pre("//*[starts-with(., 'plentiful')]", 73);
+    pre("//*[substring(., 1, 9) = 'plentiful']", 73);
+    pre("//*[substring-after(., 'oven') = 'ware']", 68);
+    pre("//*[substring-before(., 'ful') = 'plenti']", 73);
+    pre("//*[string-length(translate(normalize-space(.), ' ', '')) > 100]", 1, 20);
+    pre("//*[concat(., ..) = ..]", 59);
+    pre("//*[ceiling(@pre div @post) = 1]", 1, 6, 20, 24, 39, 53, 85, 99, 113);
+    pre("//*[floor(@pre div @post) = 0]", 1, 6, 20, 53, 113);
+    pre("//*[round(@pre div @post) = 0]", 1, 20);
+    pre("//*[name(.) = 'X']", 113);
+    pre("//*[lang('it')]", 122);
+    pre("//L/child::*[last()]", 79);
+    pre("//L/descendant::*[4]", 73);
+    pre("//L/ancestor::*[2]", 1);
+    pre("//L/following-sibling::*[1]", 85);
+    pre("//L/preceding-sibling::*[1]", 39);
+    pre("//L/following::*[7]", 113);
+    pre("//L/preceding::*[7]", 15);
+    pre("//*[count(ancestor::*) > 3]", 68, 73);
+    pre("//*[sum(ancestor::*/@pre) < sum(descendant::*/@pre)]",
+        1, 6, 20, 24, 39, 53, 64, 85, 99, 113);
+    pre("id('n1 n26')", 1, 122);
+    pre("id(id(//*[.='happy-go-lucky man']/@idrefs)/@idrefs)", 33, 79, 122);
+    pre("//*[number(@pre) < number(@post)]", 1, 6, 20, 53, 113);
+    pre("//*[string(@pre - 1) = '0']", 1);
+    pre("//*[boolean(@id) = true() and boolean(@idrefs) = false()]",
+        1, 6, 10, 15, 20, 24, 28, 39, 43, 48, 53, 59, 64, 68, 73, 85, 89, 94, 99, 103,
+        108, 113, 117);
+  }
+
+  /** Operators. */
+  @Test public void operators() {
+    pre("//*[child::* and preceding::Q]", 85, 99, 113);
+    pre("//*[not(child::*) and preceding::Q]", 89, 94, 103, 108, 117, 122);
+    pre("//*[preceding::L or following::L]",
+        6, 10, 15, 24, 28, 33, 39, 43, 48, 85, 89, 94, 99, 103, 108, 113, 117, 122);
+    pre("//L/ancestor::* | //L/descendant::*", 1, 20, 59, 64, 68, 73, 79);
+    pre("//*[.='happy-go-lucky man']", 33);
+    pre("//*[@pre > 12 and @post < 15]", 59, 64, 68, 73, 79);
+    pre("//*[@pre != @post]",
+        1, 6, 10, 15, 20, 28, 33, 43, 48, 53, 59, 64, 68, 73, 79, 89, 94, 103, 108, 113,
+        117, 122);
+    pre("//*[((@post * @post + @pre * @pre) div (@post + @pre)) > "
+        + "((@post - @pre) * (@post - @pre))]",
+        6, 24, 39, 48, 53, 59, 64, 79, 85, 89, 94, 99, 103, 108, 113, 117, 122);
+    pre("//*[@pre mod 2 = 0]", 6, 15, 24, 33, 43, 53, 64, 73, 85, 94, 103, 113, 122);
+  }
+
+  /** Predicates. */
+  @Test public void predicates() {
+    pre("//*[L]", 20);
+    pre("//*[parent::L]", 59, 64, 79);
+    pre("//*[descendant::L]", 1, 20);
+    pre("//*[descendant-or-self::L]", 1, 20, 53);
+    pre("//*[ancestor::L]", 59, 64, 68, 73, 79);
+    pre("//*[ancestor-or-self::L]", 53, 59, 64, 68, 73, 79);
+    pre("//*[following-sibling::L]", 24, 39);
+    pre("//*[preceding-sibling::L]", 85, 99);
+    pre("//*[following::L]", 6, 10, 15, 24, 28, 33, 39, 43, 48);
+    pre("//*[preceding::L]", 85, 89, 94, 99, 103, 108, 113, 117, 122);
+    pre("//*[self::L]", 53);
+    pre("//*[@id]", 1, 6, 10, 15, 20, 24, 28, 33, 39, 43, 48, 53, 59, 64, 68, 73, 79, 85, 89, 94,
+        99, 103, 108, 113, 117, 122);
+  }
+
+  /** Node tests. */
+  @Test public void nodeTests() {
+    pre("//L/text()", 58, 63);
+    pre("//L/comment()", 57);
+    pre("//L/processing-instruction()", 78);
+    pre("//L/processing-instruction('myPI')", 78);
+    pre("//L/node()", 57, 58, 59, 63, 64, 78, 79);
+    pre("//L/N", 64);
+    pre("//L/*", 59, 64, 79);
+  }
 }

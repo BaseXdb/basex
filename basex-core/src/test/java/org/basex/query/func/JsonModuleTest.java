@@ -225,6 +225,11 @@ public final class JsonModuleTest extends SandboxTest {
     query("string-to-codepoints(" + func.args("\"\\t\\u000A\"",
         " { 'format': 'xquery', 'escape': false(), 'liberal': true() }") + ')',
         "9\n10");
+    // control characters U+007F to U+009F are escaped as well
+    query(func.args("\"\\u007F\\u0080\\u009F\"", " { 'format': 'xquery', 'escape': true() }"),
+        "\\u007F\\u0080\\u009F");
+    query("string-to-codepoints(" + func.args("\"\\u007F\"",
+        " { 'format': 'xquery', 'escape': false() }") + ')', 127);
 
     error(func.args("42", " { 'spec': 'garbage' }"), INVALIDOPTION_X);
 
