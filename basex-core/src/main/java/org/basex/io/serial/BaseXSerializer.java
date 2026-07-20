@@ -6,9 +6,7 @@ import java.io.*;
 
 import org.basex.io.in.*;
 import org.basex.query.*;
-import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 
@@ -21,8 +19,6 @@ import org.basex.query.value.type.*;
 public final class BaseXSerializer extends AdaptiveSerializer {
   /** Binary. */
   private final boolean binary;
-  /** Level counter. */
-  private int nested;
 
   /**
    * Constructor, specifying serialization options.
@@ -37,38 +33,33 @@ public final class BaseXSerializer extends AdaptiveSerializer {
 
   @Override
   protected void atomic(final Item item) throws IOException {
-    if(nested == 0) {
-      try {
+    final Type type = item.type;
+    try {
+      if(type == DOUBLE) {
+        printChars(Dbl.string(item.dbl(null)));
+      } else if(type == QNAME) {
+        printChar('#');
+        printChars(item.string(null));
+      } else if(depth == 0) {
         if(binary && item instanceof Bin) {
           try(BufferInput bi = item.input(null)) {
             for(int b; (b = bi.read()) != -1;) out.write(b);
           }
-        } else if(item.type == BasicType.DOUBLE) {
-          printChars(Dbl.string(item.dbl(null)));
         } else {
-          if(item.type == QNAME) printChar('#');
           printChars(item.string(null));
         }
-      } catch(final QueryException ex) {
-        throw new QueryIOException(ex);
+      } else {
+        super.atomic(item);
       }
-    } else {
-      super.atomic(item);
+    } catch(final QueryException ex) {
+      throw new QueryIOException(ex);
     }
   }
 
   @Override
-  protected void array(final XQArray item) throws IOException {
-    ++nested;
-    super.array(item);
-    --nested;
-  }
-
-  @Override
-  protected void map(final XQMap item) throws IOException {
-    ++nested;
-    super.map(item);
-    --nested;
+  protected Type constructor(final Type type) {
+    // project mode never wraps atomic values in a type constructor
+    return null;
   }
 
   @Override
