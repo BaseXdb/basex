@@ -60,21 +60,6 @@ public final class JobPool {
   }
 
   /**
-   * Schedules a job task for delayed or periodic execution.
-   * @param task job task
-   * @param delay initial delay (ms)
-   * @param interval repeat interval (ms; run once: {@code 0})
-   */
-  void schedule(final QueryJobTask task, final long delay, final long interval) {
-    // assign the cancellation handle before the task can run its body (see QueryJobTask#run)
-    synchronized(task) {
-      task.future(interval > 0
-          ? scheduler.scheduleAtFixedRate(task, delay, interval, TimeUnit.MILLISECONDS)
-          : scheduler.schedule(task, delay, TimeUnit.MILLISECONDS));
-    }
-  }
-
-  /**
    * Registers a job, blocking until a run slot is available.
    * @param job job
    */

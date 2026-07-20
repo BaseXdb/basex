@@ -3,6 +3,7 @@ package org.basex.core.jobs;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
+import java.time.*;
 import java.util.*;
 import java.util.Map.*;
 import java.util.concurrent.atomic.*;
@@ -109,9 +110,9 @@ public final class QueryJob extends Job implements Runnable {
       }
 
       // create and schedule job task
-      final QueryJobTask task = new QueryJobTask(this, delay, interval, duration);
+      final QueryJobTask task = new QueryJobTask(this, jobs, delay, interval, duration);
       jobs.tasks.put(id, task);
-      jobs.schedule(task, delay, interval);
+      task.schedule(delay);
     }
   }
 
@@ -155,24 +156,27 @@ public final class QueryJob extends Job implements Runnable {
       throws QueryException {
 
     final QueryDateTime qdt = new QueryDateTime();
-    long ms;
+    // time (minutes past the hour)
     if(start instanceof final Itr itr) {
-      // time
-      ms = itr.itr() * 60000;
+      long ms = itr.itr() * 60000;
       ms -= qdt.time.daySeconds().multiply(Dec.BD_1000).longValue();
       while(ms <= min) ms += 3600000;
-    } else if(start instanceof final DTDur dur) {
-      // dayTimeDuration
-      ms = dur.ms(info);
-    } else if(start instanceof final Dtm dtm) {
-      // dateTime
+      return ms;
+    }
+    // dayTimeDuration: relative offset from now, i.e. a real-time delay
+    if(start instanceof final DTDur dur) return dur.ms(info);
+    // absolute wall-clock target: reproject the delta through the time zone so DST is respected
+    long ms;
+    if(start instanceof final Dtm dtm) {
       ms = new DTDur(dtm, qdt.datm, info).ms(info);
     } else {
-      // time
       ms = new DTDur((Tim) start, qdt.time, info).ms(info);
       while(ms <= min) ms += 86400000;
     }
-    return ms;
+    final ZoneId zone = ZoneId.systemDefault();
+    final Instant now = Instant.now();
+    final LocalDateTime target = LocalDateTime.ofInstant(now, zone).plus(Duration.ofMillis(ms));
+    return Duration.between(now, target.atZone(zone).toInstant()).toMillis();
   }
 
   /**
