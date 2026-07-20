@@ -198,6 +198,21 @@ public final class Util {
   }
 
   /**
+   * Checks if the specified address belongs to the local host: a loopback address, or an address
+   * that is assigned to one of the local network interfaces.
+   * @param address address to check
+   * @return result of check
+   */
+  public static boolean localHost(final InetAddress address) {
+    try {
+      return address.isLoopbackAddress() || NetworkInterface.getByInetAddress(address) != null;
+    } catch(final SocketException ex) {
+      debug(ex);
+      return false;
+    }
+  }
+
+  /**
    * Prints a string to standard error if the {@link Prop#debug} flag is set.
    * @param string debug string
    * @param ext text optional extensions

@@ -204,8 +204,22 @@ public final class ClientListener extends Thread implements ClientInfo {
 
       // evaluate login data
       in = BufferInput.get(socket.getInputStream());
-      // receive {USER}0{DIGEST-HASH}0
-      final String name = in.readString(), hash = in.readString();
+      // receive {USER}0
+      final String name = in.readString();
+
+      // loopback-only server shutdown request (see BaseXServer#stop)
+      if(name.equals(BaseXServer.STOP)) {
+        server.remove(this);
+        final boolean local = Util.localHost(socket.getInetAddress());
+        // shut the server down, then send the completion flag (0: stopped, 1: refused)
+        if(local) server.close();
+        send(local);
+        socket.close();
+        return false;
+      }
+
+      // receive {DIGEST-HASH}0
+      final String hash = in.readString();
       final User user = context.users.get(name);
       ok = user != null && user.enabled() &&
           Strings.md5(user.code(Algorithm.DIGEST, Code.HASH) + nonce).equals(hash);

@@ -9,7 +9,8 @@ import java.util.Map.*;
 
 import org.basex.api.client.*;
 import org.basex.core.*;
-import org.basex.io.*;
+import org.basex.io.in.*;
+import org.basex.io.out.*;
 import org.basex.server.*;
 import org.basex.util.*;
 import org.basex.util.log.*;
@@ -25,6 +26,8 @@ import org.basex.util.log.*;
 public final class BaseXServer extends CLI implements Runnable {
   /** Maximum number of queued incoming connections (absorbs connection bursts). */
   private static final int BACKLOG = 1 << 10;
+  /** Reserved identifier for shutting down a server shutdown during the login handshake. */
+  public static final String STOP = "stop:";
 
   /** New sessions. */
   private final HashSet<ClientListener> authorizing = new HashSet<>();
@@ -40,8 +43,6 @@ public final class BaseXServer extends CLI implements Runnable {
   private boolean daemon;
   /** Quiet flag. */
   private boolean quiet;
-  /** Stop file. */
-  private IOFile stopFile;
 
   /**
    * Main method, launching the server process.
@@ -105,7 +106,6 @@ public final class BaseXServer extends CLI implements Runnable {
       socket = new ServerSocket();
       socket.setReuseAddress(true);
       socket.bind(new InetSocketAddress(addr, port), BACKLOG);
-      stopFile = stopFile(getClass(), port);
     } catch(final BindException ex) {
       context.log.writeServer(LogType.ERROR, Util.message(ex));
       Util.debug(ex);
@@ -141,30 +141,26 @@ public final class BaseXServer extends CLI implements Runnable {
       try {
         final Socket s = socket.accept();
         s.setTcpNoDelay(true);
-        if(stopFile.exists()) {
-          close();
-        } else {
-          // drop inactive connections
-          final long ka = context.soptions.get(StaticOptions.KEEPALIVE) * 1000L;
-          if(ka > 0) {
-            final long ms = System.currentTimeMillis();
-            for(final ClientListener cl : context.sessions) {
-              if(ms - cl.last > ka) cl.close();
-            }
+        // drop inactive connections
+        final long ka = context.soptions.get(StaticOptions.KEEPALIVE) * 1000L;
+        if(ka > 0) {
+          final long ms = System.currentTimeMillis();
+          for(final ClientListener cl : context.sessions) {
+            if(ms - cl.last > ka) cl.close();
           }
-          // create client listener, stop authentication after timeout
-          final ClientListener cl = new ClientListener(s, context, this);
-          if(ka > 0) {
-            cl.timeout.schedule(new TimerTask() {
-              @Override
-              public void run() {
-                cl.close();
-              }
-            }, ka);
-            authorizing.add(cl);
-          }
-          cl.start();
         }
+        // create client listener, stop authentication after timeout
+        final ClientListener cl = new ClientListener(s, context, this);
+        if(ka > 0) {
+          cl.timeout.schedule(new TimerTask() {
+            @Override
+            public void run() {
+              cl.close();
+            }
+          }, ka);
+          authorizing.add(cl);
+        }
+        cl.start();
       } catch(final SocketException ex) {
         Util.debug(ex);
         break;
@@ -189,9 +185,10 @@ public final class BaseXServer extends CLI implements Runnable {
   }
 
   /**
-   * Shuts down the server.
+   * Shuts down the server. Called by the shutdown hook and by a loopback stop request
+   * (see {@link ClientListener}).
    */
-  private synchronized void close() {
+  public synchronized void close() {
     if(!running) return;
 
     for(final ClientListener cl : authorizing) {
@@ -216,9 +213,6 @@ public final class BaseXServer extends CLI implements Runnable {
     // close database context
     context.close();
 
-    if(!stopFile.delete()) {
-      context.log.writeServer(LogType.ERROR, Util.info(FILE_NOT_DELETED_X, stopFile));
-    }
     running = false;
   }
 
@@ -315,18 +309,19 @@ public final class BaseXServer extends CLI implements Runnable {
    * @throws IOException I/O exception
    */
   public static void stop(final String host, final int port) throws IOException {
-    // create stop file
-    final IOFile stopFile = stopFile(BaseXServer.class, port);
-    stopFile.parent().md();
-    stopFile.touch();
-
-    // try to connect the server
-    try(Socket s = new Socket(host, port)) {
-      // wait until server was stopped
-      do Performance.sleep(10); while(stopFile.exists());
+    try(Socket socket = new Socket(host, port)) {
+      socket.setTcpNoDelay(true);
+      final PrintOutput out = PrintOutput.get(socket.getOutputStream());
+      final BufferInput in = BufferInput.get(socket.getInputStream());
+      // consume the server realm, send the shutdown request, wait for the completion flag
+      in.readString();
+      out.print(STOP);
+      out.write(0);
+      out.flush();
+      // 0: server was stopped; anything else (or EOF) indicates a refused or failed request
+      if(in.read() != 0) throw new BaseXException(CONNECTION_ERROR_X, port);
     } catch(final IOException ex) {
       Util.debug(ex);
-      stopFile.delete();
       throw new BaseXException(CONNECTION_ERROR_X, port);
     }
   }

@@ -12,6 +12,8 @@ import java.util.function.*;
 import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.io.*;
+import org.basex.io.in.*;
+import org.basex.io.out.*;
 import org.basex.util.*;
 import org.basex.util.log.*;
 import org.eclipse.jetty.compression.gzip.*;
@@ -343,18 +345,17 @@ public final class BaseXHTTP extends CLI {
    * @throws IOException I/O exception
    */
   public static void stop(final String host, final int port) throws IOException {
-    // create stop file
-    final IOFile stopFile = stopFile(BaseXHTTP.class, port);
-    stopFile.parent().md();
-    stopFile.touch();
-
-    // try to connect the server
-    try(Socket s = new Socket(host, port)) {
-      // wait until server was stopped
-      do Performance.sleep(10); while(stopFile.exists());
+    try(Socket socket = new Socket(host, port)) {
+      socket.setTcpNoDelay(true);
+      final PrintOutput out = PrintOutput.get(socket.getOutputStream());
+      final BufferInput in = BufferInput.get(socket.getInputStream());
+      // send the shutdown request, wait for the completion flag (0: stopped)
+      out.print(BaseXServer.STOP);
+      out.write(0);
+      out.flush();
+      if(in.read() != 0) throw new IOException(Util.info(CONNECTION_ERROR_X, port));
     } catch(final IOException ex) {
       Util.debug(ex);
-      stopFile.delete();
       throw new IOException(Util.info(CONNECTION_ERROR_X, port));
     }
   }
@@ -373,8 +374,6 @@ public final class BaseXHTTP extends CLI {
   private final class StopServer extends Thread {
     /** Server socket. */
     private final ServerSocket socket;
-    /** Stop file. */
-    private final IOFile stopFile;
     /** Port. */
     private final int stopPort;
 
@@ -391,23 +390,44 @@ public final class BaseXHTTP extends CLI {
       socket = new ServerSocket();
       socket.setReuseAddress(true);
       socket.bind(new InetSocketAddress(addr, stopPort));
-      stopFile = stopFile(BaseXHTTP.class, stopPort);
     }
 
     @Override
     public void run() {
+      Util.println(HTTP + " STOP " + SRV_STARTED_PORT_X, stopPort);
       try {
         while(true) {
-          Util.println(HTTP + " STOP " + SRV_STARTED_PORT_X, stopPort);
-          try(Socket s = socket.accept()) { /* no action */ }
-          if(stopFile.exists()) {
+          try(Socket s = socket.accept()) {
+            // bound the read so an idle connection cannot block the monitor
+            s.setSoTimeout(5000);
+            final PrintOutput po = PrintOutput.get(s.getOutputStream());
+            final boolean stp;
+            try {
+              // honor same-host shutdown requests only
+              stp = BaseXServer.STOP.equals(BufferInput.get(s.getInputStream()).readString()) &&
+                  Util.localHost(s.getInetAddress());
+              if(!stp) {
+                po.write(1);
+                po.flush();
+              }
+            } catch(final IOException ex) {
+              // ignore malformed, idle or aborted connections
+              Util.debug(ex);
+              continue;
+            }
+            if(!stp) continue;
+
             socket.close();
             Util.println(HTTP + " STOP " + SRV_STOPPED_PORT_X, stopPort);
             jetty.stop();
             hc.close();
             Prop.clear();
-            if(!stopFile.delete()) {
-              context.log.writeServer(LogType.ERROR, Util.info(FILE_NOT_DELETED_X, stopFile));
+            try {
+              // best-effort completion flag; the server is already shutting down
+              po.write(0);
+              po.flush();
+            } catch(final IOException ex) {
+              Util.debug(ex);
             }
             break;
           }

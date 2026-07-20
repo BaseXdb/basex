@@ -1,9 +1,6 @@
 package org.basex.util;
 
 import java.io.*;
-import java.util.*;
-
-import org.basex.io.*;
 
 /**
  * This is an interface for classes with main methods and command-line arguments.
@@ -29,17 +26,6 @@ public abstract class Main {
    */
   final String[] args() {
     return args;
-  }
-
-  /**
-   * Generates a stop file for the specified class and port.
-   * @param clazz class name
-   * @param port port
-   * @return stop file
-   */
-  protected static IOFile stopFile(final Class<?> clazz, final int port) {
-    final String file = Util.className(clazz).toLowerCase(Locale.ENGLISH) + "stop-" + port + ".tmp";
-    return new IOFile(new IOFile(Prop.TEMPDIR, Prop.PROJECT), file);
   }
 
   /**
