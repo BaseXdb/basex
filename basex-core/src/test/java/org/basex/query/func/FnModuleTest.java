@@ -4538,6 +4538,9 @@ return
     check(func.args("a", wrap(""), "b"), "a", root(func));
     check(func.args(wrap(""), "a", "b"), "", root(func));
     check(func.args(wrap("abcd"), "bd", "B"), "aBc", root(func));
+
+    query(func.args(" string-join((1 to 100000) ! 'a')",
+        " string-join((1 to 100000) ! 'b') || 'a'", ""), "");
   }
 
   /** Test method. */

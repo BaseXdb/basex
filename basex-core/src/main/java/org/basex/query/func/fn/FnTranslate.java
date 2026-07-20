@@ -6,6 +6,7 @@ import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Function implementation.
@@ -24,10 +25,23 @@ public final class FnTranslate extends StandardFunc {
     final int cl = cps.length, rl = rplc.length, wl = wth.length;
     if(cl == 0 || rl == 0) return value;
 
+    // use a map for large translations
+    IntMap map = null;
+    if((long) cl * rl > 2048) {
+      map = new IntMap(rl);
+      for(int r = rl - 1; r >= 0; r--) map.put(rplc[r], r);
+    }
     final TokenBuilder tb = new TokenBuilder(cl);
     for(final int cp : cps) {
-      int r = -1;
-      while(++r < rl && cp != rplc[r]);
+      qc.checkStop();
+      int r;
+      if(map != null) {
+        r = map.get(cp);
+        if(r == Integer.MIN_VALUE) r = rl;
+      } else {
+        r = -1;
+        while(++r < rl && cp != rplc[r]);
+      }
       if(r == rl) {
         tb.add(cp);
       } else if(r < wl) {
