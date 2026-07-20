@@ -471,15 +471,17 @@ public class TextPanel extends BaseXPanel {
 
   @Override
   public final void mousePressed(final MouseEvent e) {
-    // copy and paste text with middle mouse button
+    // copy and paste text with middle mouse button (Unix only)
     if(SwingUtilities.isMiddleMouseButton(e)) {
-      if(editor.isSelected()) {
-        copy();
-        editor.noSelect();
-        rend.repaint();
-      } else if(editable && isEnabled()) {
-        final ArrayList<Object> clips = BaseXLayout.fromClipboard(null);
-        if(!clips.isEmpty()) paste(clips.getFirst().toString());
+      if(!Prop.WIN && !Prop.MAC) {
+        if(editor.isSelected()) {
+          copy();
+          editor.noSelect();
+          rend.repaint();
+        } else if(editable && isEnabled()) {
+          final ArrayList<Object> clips = BaseXLayout.fromClipboard(null);
+          if(!clips.isEmpty()) paste(clips.getFirst().toString());
+        }
       }
       return;
     }
