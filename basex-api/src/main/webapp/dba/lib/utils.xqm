@@ -67,10 +67,10 @@ declare function utils:serialize(
 ) as xs:string {
   (: serialize more characters than requested, because limit represents number of bytes :)
   let $limit := config:get($config:MAXCHARS)
-  let $indent := config:get($config:INDENT)
+  (: indentation is a client-side preference, sent along with the request :)
   let $string := serialize($value, {
     'limit': $limit * 2 + 1,
-    'indent': $indent,
+    'indent': request:parameter('indent') = 'true',
     'method': 'basex'
   })
   return utils:chop($string, $limit)

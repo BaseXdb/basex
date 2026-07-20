@@ -56,7 +56,9 @@ function dba:editor(
             <span>  </span>,
             <button id='run' onclick='runQuery()' title='Ctrl-Enter'>Run</button>,
             <button id='stop' onclick='stopQuery(true)' disabled=''>Stop</button>,
-            <button type='button' onclick='copyOutput()'>Copy</button>
+            <button type='button' onclick='copyOutput()'>Copy</button>,
+            <span> </span>,
+            <label><input type='checkbox' id='indent' onchange='indentChanged()'/> Indent</label>
           ), <span> </span>),
           <h2 class='right'>Result</h2>
         }</form>

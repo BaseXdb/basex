@@ -5,6 +5,7 @@
  :)
 module namespace dba = 'dba/databases';
 
+import module namespace config = 'dba/config' at '../lib/config.xqm';
 import module namespace html = 'dba/html' at '../lib/html.xqm';
 import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 
@@ -128,24 +129,63 @@ function dba:database(
       <td class='vertical'/>,
       <td>{
         if ($resource) {
-          <h2>Resource: { $resource }</h2>,
-          <form method='post'>{
-            <input type='hidden' name='name' value='{ $name }'/>,
-            <input type='hidden' name='resource' value='{ $resource }' id='resource'/>,
-            html:button('db-rename', 'Rename…'), ' ',
-            html:button('db-download', 'Download'), ' ',
-            html:button('db-replace', 'Replace…')
-          }</form>,
-          <b>Enter your query…</b>,
-          <input type='text' style='width:100%' name='input' id='input'
-            onkeyup='queryResource(false)' autofocus=''>{
-            if (db:type($name, $resource) != 'xml') { attribute disabled {} }
-          }</input>,
-          <div class='small'/>,
-          <button type='button' onclick='copyOutput()'>Copy</button>,
-          <div class='small'/>,
-          <textarea name='output' id='output' readonly='' spellcheck='false'/>,
-          html:js('loadCodeMirror("xml", false, true); queryResource(true);')
+          let $type := db:type($name, $resource)
+          let $max := config:get($config:MAXCHARS)
+          (: bounded serialization: real size signal (db:list-details/@size counts
+             nodes, not characters) and a preview that never inlines a huge document :)
+          let $value :=
+            if ($type = 'binary') then db:get-binary($name, $resource)
+            else if ($type = 'value') then db:get-value($name, $resource)
+            else db:get($name, $resource)
+          let $preview := serialize($value, {
+            'method': if ($type = 'xml') then 'xml' else 'basex',
+            'limit': $max * 2 + 1
+          })
+          let $editable := $type = 'xml' and string-length($preview) <= $max
+          let $content := if ($editable) then $preview else substring($preview, 1, $max)
+          return (
+            <h2>Resource: { $resource }</h2>,
+            <form method='post'>{
+              <input type='hidden' name='name' value='{ $name }'/>,
+              <input type='hidden' name='resource' value='{ $resource }' id='resource'/>,
+              insert-separator((
+                (: Save is shown for every XML resource; the tooltip covers every disabled
+                   reason (too large, read-only query/indent view, no unsaved changes) and
+                   sits on a wrapper span, as disabled buttons suppress title tooltips :)
+                if ($type = 'xml') {
+                  <span title='Only modified, editable and unindented documents can be saved.'>{
+                    <button type='button' id='save-resource' onclick='saveResource()'
+                            disabled=''>Save</button>
+                  }</span>
+                },
+                <button type='button' id='copy-resource' onclick='copyResource()'>Copy</button>,
+                <span> </span>,
+                html:button('db-rename', 'Rename…'),
+                html:button('db-download', 'Download'),
+                html:button('db-replace', 'Upload…'),
+                if ($type = 'xml') {
+                  <span> </span>,
+                  <label>{
+                    <input type='checkbox' id='indent' onchange='indentChanged()'/>, ' Indent'
+                  }</label>
+                }
+              ), <span> </span>)
+            }</form>,
+            if ($type = 'xml') {
+              <div class='small'/>,
+              <input type='text' style='width:100%' name='input' id='input'
+                placeholder='Enter your query…' onkeyup='queryResource(false)'>{
+                if (not($editable)) { attribute autofocus {} }
+              }</input>,
+              <div class='small'/>
+            },
+            <textarea id='editor' spellcheck='false'>{
+              if ($editable) { attribute autofocus {} },
+              $content
+            }</textarea>,
+            html:js('loadCodeMirror("xml", true, true); initResource(' ||
+              (if ($editable) then 'true' else 'false') || ');')
+          )
         } else if ($db-exists) {
           <h2>Information</h2>,
           html:properties(db:info($name))

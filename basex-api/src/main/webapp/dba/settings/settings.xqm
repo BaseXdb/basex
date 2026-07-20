@@ -52,8 +52,7 @@ function dba:settings(
             $number($config:TIMEOUT, 'Timeout, in seconds (0 = disabled)'),
             $number($config:MEMORY, 'Memory limit, in MB (0 = disabled)'),
             $number($config:MAXCHARS, 'Maximum output size'),
-            $option($config:PERMISSION, $config:PERMISSIONS, 'Permission'),
-            $option($config:INDENT, $config:INDENTS, 'Indent results')
+            $option($config:PERMISSION, $config:PERMISSIONS, 'Permission')
           }</table>
           <h3>Tables</h3>
           <table>{

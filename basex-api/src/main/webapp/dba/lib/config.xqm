@@ -23,8 +23,6 @@ declare variable $config:DBA-DIR := (
 
 (:~ Permission values. :)
 declare variable $config:PERMISSIONS := ('none', 'read', 'write', 'create', 'admin');
-(:~ Indentation values. :)
-declare variable $config:INDENTS := ('no', 'yes');
 
 (:~ Maximum length of XML characters. :)
 declare variable $config:MAXCHARS := 'maxchars';
@@ -36,8 +34,6 @@ declare variable $config:TIMEOUT := 'timeout';
 declare variable $config:MEMORY := 'memory';
 (:~ Permission when running queries. :)
 declare variable $config:PERMISSION := 'permission';
-(:~ Indent results. :)
-declare variable $config:INDENT := 'indent';
 
 (:~ Options file. :)
 declare %private variable $config:OPTIONS-FILE := $config:DBA-DIR || '.dba.xml';
@@ -48,8 +44,7 @@ declare %basex:lazy %private variable $config:DEFAULTS := {
   $config:MAXROWS    : 100,
   $config:TIMEOUT    : 30,
   $config:MEMORY     : 1000,
-  $config:PERMISSION : 'admin',
-  $config:INDENT     : 'no'
+  $config:PERMISSION : 'admin'
 };
 
 (:~ Currently assigned options. :)
