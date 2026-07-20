@@ -328,9 +328,6 @@ public enum Function implements AFunction {
   FUNCTION_ARITY(FnFunctionArity::new, "function-arity(function)",
       params(FUNCTION_O), INTEGER_O),
   /** XQuery function. */
-  FUNCTION_IDENTITY(FnFunctionIdentity::new, "function-identity(function)",
-      params(FUNCTION_O), STRING_O),
-  /** XQuery function. */
   FUNCTION_LOOKUP(FnFunctionLookup::new, "function-lookup(name, arity)",
       params(QNAME_O, INTEGER_O), FUNCTION_ZO, flag(POS, CTX, CNS, NDT, HOF)),
   /** XQuery function. */
