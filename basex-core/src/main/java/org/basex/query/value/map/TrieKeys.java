@@ -1,6 +1,7 @@
 package org.basex.query.value.map;
 
 import java.util.*;
+import java.util.concurrent.atomic.*;
 
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -15,8 +16,8 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 final class TrieKeys implements Iterable<Item> {
-  /** Key array must be copied before being updated, as it is referenced multiple times. */
-  private boolean copy;
+  /** Indicates that the shared key array's free tail slot has already been claimed. */
+  private final AtomicBoolean copy = new AtomicBoolean();
   /** Keys. */
   private final Item[] keys;
   /** Number of keys. */
@@ -50,11 +51,10 @@ final class TrieKeys implements Iterable<Item> {
     final Item[] ks;
     if(sz == keys.length) {
       ks = Array.copy(keys, new Item[Array.newCapacity(sz)]);
-    } else if(copy) {
-      ks = keys.clone();
-    } else {
+    } else if(copy.compareAndSet(false, true)) {
       ks = keys;
-      copy = true;
+    } else {
+      ks = keys.clone();
     }
     ks[sz] = key;
     return new TrieKeys(ks, sz + 1);

@@ -12,9 +12,11 @@ import org.basex.util.*;
  */
 final class TrieOrder {
   /** Added keys. */
-  private TrieKeys added;
-  /** Removed keys (lazy instantiation). */
-  private TrieKeys removed;
+  private final TrieKeys added;
+  /** Removed keys ({@code null} if none are pending). */
+  private final TrieKeys removed;
+  /** Resolved keys, memoized. */
+  private volatile TrieKeys resolved;
 
   /**
    * Constructor.
@@ -27,20 +29,20 @@ final class TrieOrder {
   /**
    * Constructor.
    * @param added added keys
-   * @param removed removed keys
+   * @param removed removed keys (can be {@code null})
    */
   private TrieOrder(final TrieKeys added, final TrieKeys removed) {
     this.added = added;
     this.removed = removed;
+    if(removed == null) resolved = added;
   }
 
   /**
-   * Returns all key.
+   * Returns all keys.
    * @return keys
    */
   Value keys() {
-    optimize();
-    return added.keys();
+    return resolved().keys();
   }
 
   /**
@@ -49,8 +51,7 @@ final class TrieOrder {
    * @return key
    */
   Item keyAt(final int index) {
-    optimize();
-    return added.keyAt(index);
+    return resolved().keyAt(index);
   }
 
   /**
@@ -72,18 +73,23 @@ final class TrieOrder {
   }
 
   /**
-   * Optimizes the data structure.
+   * Resolves and memoizes the effective key list.
+   * @return keys
    */
-  private void optimize() {
-    if(removed != null) {
-      added = added.remove(removed);
-      removed = null;
+  private TrieKeys resolved() {
+    TrieKeys r = resolved;
+    if(r == null) {
+      synchronized(this) {
+        r = resolved;
+        if(r == null) r = resolved = added.remove(removed);
+      }
     }
+    return r;
   }
 
   @Override
   public String toString() {
-    return Util.className(this) + '[' + "Keys: " + added  +
+    return Util.className(this) + '[' + "Keys: " + added +
         (removed != null ? "; removed: " + removed : "") + ']';
   }
 }

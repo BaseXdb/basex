@@ -541,6 +541,32 @@ public final class MapModuleTest extends SandboxTest {
   }
 
   /**
+   * Derives many maps from one shared base map in parallel and checks that the insertion order of
+   * each result stays consistent. Regression: the order tracking mutated a shared key array in
+   * place, so concurrent {@code map:put} calls on a shared map could leak keys between results.
+   */
+  @Test @Timeout(60) public void concurrentPut() {
+    query("""
+let $base := fold-left(1 to 8, {}, fn($m, $i) { map:put($m, 'b' || $i, $i) })
+return sum(
+  for $rep in 1 to 8
+  return count(
+    xquery:fork-join(
+      for $k in 1 to 64
+      return fn() {
+        let $m := fold-left(1 to 40, $base, fn($mm, $j) { map:put($mm, `t{ $k }_{ $j }`, $j) })
+        let $ks := map:keys($m) ! string(.)
+        return
+          if(count($ks) ne map:size($m) or (some $x in $ks
+             satisfies starts-with($x, 't') and not(starts-with($x, 't' || $k || '_'))))
+          then 1 else ()
+      }
+    )
+  )
+)""", 0);
+  }
+
+  /**
    * Counts the map entries.
    * @param query query string
    * @param count expected number of entries
