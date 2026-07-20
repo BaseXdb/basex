@@ -180,6 +180,36 @@ public final class MapOrderTest extends SandboxTest {
   }
 
   /**
+   * Checks that write-heavy churn that never reads the keys keeps the order state near the live
+   * size (compaction in {@link TrieOrder#remove}).
+   * @throws QueryException query exception
+   */
+  @Test public void churnBloat() throws QueryException {
+    final int keep = 64, churn = 20_000;
+    XQMap map = XQMap.empty();
+    for(int i = 0; i < keep; i++) map = map.put(Itr.get(i), Itr.get(i));
+    // put and remove one extra key over and over; never read the keys back
+    for(int i = 0; i < churn; i++) {
+      map = (i & 1) == 0 ? map.put(Itr.get(999), Itr.get(i)) : map.remove(Itr.get(999));
+    }
+    final long live = map.structSize();
+    assertEquals(keep, live);
+    final int state = orderState(map);
+    assertTrue(state <= 8 * live, "order state " + state + " exceeds 8x the live size " + live);
+  }
+
+  /**
+   * Returns the number of key references retained by a map's order structure.
+   * @param map map to inspect
+   * @return retained key-reference count (0 for empty/singleton maps without an order)
+   */
+  private static int orderState(final XQMap map) {
+    if(!(map instanceof final XQTrieMap tm)) return 0;
+    final TrieOrder order = tm.order();
+    return order == null ? 0 : order.retained();
+  }
+
+  /**
    * Asserts that a map's keys, values, {@code keys()} sequence, and lookups all agree with a
    * reference model in insertion order.
    * @param map map to check

@@ -53,6 +53,14 @@ public final class XQTrieMap extends XQMap {
     return value(keyAt(index));
   }
 
+  /**
+   * Returns the map order.
+   * @return order, or {@code null} for empty and singleton maps
+   */
+  TrieOrder order() {
+    return order;
+  }
+
   @Override
   public XQTrieMap put(final Item key, final Value value) throws QueryException {
     final long oldSize = structSize();

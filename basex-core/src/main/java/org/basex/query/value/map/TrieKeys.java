@@ -61,6 +61,14 @@ final class TrieKeys implements Iterable<Item> {
   }
 
   /**
+   * Returns the number of keys.
+   * @return size
+   */
+  int size() {
+    return size;
+  }
+
+  /**
    * Returns all keys.
    * @return keys
    */

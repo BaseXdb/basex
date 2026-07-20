@@ -64,12 +64,22 @@ final class TrieOrder {
   }
 
   /**
-   * Removes a key.
+   * Removes a key, compacting the order when pending removals dominate the key list.
    * @param key key to be removed
    * @return new order
    */
   TrieOrder remove(final Item key) {
-    return new TrieOrder(added, removed != null ? removed.add(key) : new TrieKeys(key));
+    final TrieKeys rem = removed != null ? removed.add(key) : new TrieKeys(key);
+    return rem.size() * 2L > added.size() ? new TrieOrder(added.remove(rem), null) :
+      new TrieOrder(added, rem);
+  }
+
+  /**
+   * Returns the number of key references this order retains (for testing).
+   * @return retained key reference count
+   */
+  int retained() {
+    return added.size() + (removed != null ? removed.size() : 0);
   }
 
   /**
@@ -79,10 +89,8 @@ final class TrieOrder {
   private TrieKeys resolved() {
     TrieKeys r = resolved;
     if(r == null) {
-      synchronized(this) {
-        r = resolved;
-        if(r == null) r = resolved = added.remove(removed);
-      }
+      r = added.remove(removed);
+      resolved = r;
     }
     return r;
   }
