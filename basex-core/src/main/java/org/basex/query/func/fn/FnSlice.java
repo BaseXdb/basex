@@ -122,8 +122,8 @@ public class FnSlice extends StandardFunc {
      */
     private Slice(final long size, final long start, final long end, final long step,
         final boolean reverse) {
-      this.start = start > 0 ? start : start < 0              ? size + start + 1 : 1;
-      this.end   = end   > 0 ? end   : end   < 0              ? size + end   + 1 : size;
+      this.start = start > 0 ? start : start < 0 ? size + start + 1 : step < 0 ? size : 1;
+      this.end   = end   > 0 ? end   : end   < 0 ? size + end   + 1 : step < 0 ? 1 : size;
       this.step  = step != 0 ? step  : this.start <= this.end ? 1                : -1;
       this.reverse = reverse;
     }

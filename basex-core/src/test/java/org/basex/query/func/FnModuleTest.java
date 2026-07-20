@@ -3891,6 +3891,10 @@ return
     query(in + func.args(-2, -4), "f\ne\nd");
     query(in + func.args(-4, -2, +2), "d\nf");
     query(in + func.args(-2, -4, -2), "f\nd");
+    // negative step with omitted bounds reverses the sequence
+    query(in + func.args(+0, +0, -1), "g\nf\ne\nd\nc\nb\na");
+    query(in + func.args(+3, +0, -1), "c\nb\na");
+    query(in + func.args(+0, +3, -1), "g\nf\ne\nd\nc");
 
     in = "('a', 'b', 'c', 'd', 'e', 'f', 'g')[. < 'c'] =>";
     query(in + func.args(+0), "a\nb");
