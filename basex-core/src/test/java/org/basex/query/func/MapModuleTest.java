@@ -566,6 +566,46 @@ return sum(
 )""", 0);
   }
 
+  /** Insertion-order and key-equality semantics that are visible at the XQuery level. */
+  @Test public void order() {
+    // same-key deduplication: the second entry overwrites, size stays 1
+    query("map:put(map:put({}, xs:double('NaN'), 1), xs:double('NaN'), 2) => map:size()", 1);
+    query("map:put(map:put({}, xs:double('NaN'), 1), xs:double('NaN'), 2)(xs:double('NaN'))", 2);
+    query("map:put(map:put({}, xs:double('0'), 1), xs:double('-0'), 2) => map:size()", 1);
+    query("map:put(map:put({}, 1, 'a'), 1.0e0, 'b') => map:size()", 1);
+    query("map:put({}, 1, 'a')(1.0e0)", "a");
+    query("map:put({}, 1.0e0, 'a')(1)", "a");
+
+    // xs:anyURI is the same key as xs:string
+    query("map:contains({ 'a': 1 }, xs:anyURI('a'))", true);
+    query("map:put(map:put({}, xs:anyURI('a'), 1), 'a', 2) => map:size()", 1);
+
+    // distinct large integers do not collide; Integer.MIN_VALUE is a usable key
+    query("map:put(map:put({}, 4294967297, 'a'), 1, 'b') => map:size()", 2);
+    query("empty(map:put({}, 4294967297, 'a')(1))", true);
+    query("map:put({}, -2147483648, 'x')(-2147483648)", "x");
+    query("map:merge((map { -2147483648: 'x' }, map { 7: 'y' }))(-2147483648)", "x");
+
+    // insertion order: merge keeps the first position, uses the last value
+    query("map:keys(map:merge((map { 1: 1 }, map { 2: 2 }, map { 1: 3 }), "
+        + "map { 'duplicates': 'use-last' }))", "1\n2");
+    // filter preserves relative order
+    query("map:keys(map:filter(map:build(1 to 10, fn($k) { $k }, fn($k) { $k }), "
+        + "fn($k, $v) { $v mod 2 = 0 }))", "2\n4\n6\n8\n10");
+    // for-each visits in insertion order
+    query("string-join(map:for-each({} => map:put('z', 1) => map:put('a', 2) => map:put('m', 3), "
+        + "fn($k, $v) { $k }))", "zam");
+    // JSON serialization preserves insertion order
+    query("serialize({} => map:put('z', 1) => map:put('a', 2) => map:put('m', 3), "
+        + "map { 'method': 'json' })", "{\"z\":1,\"a\":2,\"m\":3}");
+
+    // deep-equal: the map-order option makes the comparison order-sensitive
+    query("let $a := {} => map:put('x', 1) => map:put('y', 2) "
+        + "let $b := {} => map:put('y', 2) => map:put('x', 1) "
+        + "return (deep-equal($a, $b), deep-equal($a, $b, map { 'map-order': true() }))",
+        "true\nfalse");
+  }
+
   /**
    * Counts the map entries.
    * @param query query string
