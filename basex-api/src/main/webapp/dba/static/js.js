@@ -516,38 +516,6 @@ function addInput(source) {
 }
 
 /**
- * Enables drag-and-drop and selection feedback for file upload forms.
- */
-function enableUploads() {
-  for(const input of document.querySelectorAll("input[type=file]")) {
-    const form = input.closest("form");
-    if(!form) continue;
-    const info = document.createElement("span");
-    info.className = "note";
-    input.after(info);
-    const show = () => {
-      const n = input.files.length;
-      info.textContent = n ? ` ${n} file${n === 1 ? "" : "s"} selected` : "";
-    };
-    input.addEventListener("change", show);
-    form.addEventListener("dragover", (event) => {
-      event.preventDefault();
-      form.classList.add("dragover");
-    });
-    form.addEventListener("dragleave", (event) => {
-      // ignore events bubbling up from child elements
-      if(!form.contains(event.relatedTarget)) form.classList.remove("dragover");
-    });
-    form.addEventListener("drop", (event) => {
-      event.preventDefault();
-      form.classList.remove("dragover");
-      input.files = event.dataTransfer.files;
-      show();
-    });
-  }
-}
-
-/**
  * Copies text to the clipboard and confirms via the message area.
  * @param {string} text text to copy
  */
@@ -597,7 +565,6 @@ function shortcuts(event) {
  * Initializes page-wide interactive behavior.
  */
 function ready() {
-  enableUploads();
   document.addEventListener("keydown", shortcuts);
   document.getElementById("info")?.addEventListener("click", jumpToError);
 }

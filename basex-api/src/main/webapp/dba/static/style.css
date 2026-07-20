@@ -373,12 +373,6 @@ header {
   }
 }
 
-/* drag-and-drop target highlight for file upload forms */
-form.dragover {
-  outline: 2px dashed var(--accent);
-  outline-offset: 4px;
-}
-
 /* error message that can be clicked to jump to its line/column in the editor */
 #info.locatable {
   cursor: pointer;
