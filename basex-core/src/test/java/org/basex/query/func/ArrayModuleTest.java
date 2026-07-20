@@ -479,6 +479,10 @@ public final class ArrayModuleTest extends SandboxTest {
     error(func.args(" [ 1 ]", 1, " -1"), ARRAYNEG_X);
     error(func.args(" []", 1, 1), ARRAYBOUNDS_X_X);
     error(func.args(" [ 1 ]", 1, 2), ARRAYBOUNDS_X_X);
+
+    error(func.args(" [ 1, 2, 3 ]", 2, 9223372036854775807L), ARRAYBOUNDS_X_X);
+    query("try { " + func.args(" [ 1, 2, 3 ]", 2, 9223372036854775807L) +
+        " } catch * { starts-with($err:description, 'Array index 9223372036854775807') }", true);
   }
 
   /** Test method. */
