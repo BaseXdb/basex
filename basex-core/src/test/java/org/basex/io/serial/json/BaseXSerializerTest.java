@@ -61,6 +61,31 @@ public final class BaseXSerializerTest extends SandboxTest {
   }
 
   /**
+   * Tests JNode serialization: root nodes keep their value, non-root nodes keep their key by
+   * being wrapped in their container (map entry, array member with dropped index).
+   */
+  @Test public void jnode() {
+    // root nodes: serialize the wrapped value
+    serialize("jtree({ 'x': 'y' })", "{'x':'y'}");
+    serialize("jtree([ 'x', 'y' ])", "['x','y']");
+
+    // map entries: key is preserved
+    serialize("jtree({ 'a': 1, 'b': 2 })/*", "{'a':1}\n{'b':2}");
+    serialize("jtree({ 'a': (1, 2) })/*", "{'a':(1,2)}");
+    serialize("jtree({ 'a': { 'b': 1 } })/*", "{'a':{'b':1}}");
+    // integer key: still a map entry, not an array member
+    serialize("jtree({ 1: 'x' })/*", "{1:'x'}");
+
+    // array members: index is dropped
+    serialize("jtree([ 'a', ('b', 'c') ])/*", "['a']\n[('b','c')]");
+    serialize("jtree([ { 'a': 1 } ])/*", "[{'a':1}]");
+
+    // one-level wrapping: deeper navigation drops outer keys
+    serialize("jtree({ 'a': { 'b': 1 } })/*/*", "{'b':1}");
+    serialize("jtree([ { 'a': 1 }, { 'b': 2 } ])/*/*", "{'a':1}\n{'b':2}");
+  }
+
+  /**
    * Serializes the specified input as JSON.
    * @param query query string
    * @param expected expected result

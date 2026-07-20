@@ -90,6 +90,14 @@ public final class JNode extends GNode {
     return key == Empty.VALUE;
   }
 
+  /**
+   * Returns the map or array that contains this non-root node.
+   * @return container ({@code null} for the root node)
+   */
+  public XQStruct container() {
+    return parent != null ? (XQStruct) parent.value.itemAt(position - 1) : null;
+  }
+
   @Override
   public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
     return value.atomValue(qc, ii);
