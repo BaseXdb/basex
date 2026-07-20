@@ -394,7 +394,7 @@ public final class JsonParser {
         tb.add("\\r");
       } else if(cp == '\t') {
         tb.add("\\t");
-      } else if(XMLToken.valid(cp)) {
+      } else if(XMLToken.valid(cp) && (cp < 0x7F || cp > 0x9F)) {
         tb.add(cp);
       } else {
         tb.add("\\u").add(hex(cp, 4));
