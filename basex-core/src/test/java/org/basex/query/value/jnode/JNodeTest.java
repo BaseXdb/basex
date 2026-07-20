@@ -252,8 +252,8 @@ public final class JNodeTest extends SandboxTest {
     query("[ 8, 9 ]/jnode(-0x7FFFFFFFFFFFFFFF)", "");
     query("[ 8, 9 ]/jnode(-1)", "");
     query("[ 8, 9 ]/jnode(0)", "");
-    query("[ 8, 9 ]/jnode(1)", 8);
-    query("[ 8, 9 ]/jnode(2)", 9);
+    query("[ 8, 9 ]/jnode(1)", "[8]");
+    query("[ 8, 9 ]/jnode(2)", "[9]");
     query("[ 8, 9 ]/jnode(3)", "");
     query("[ 8, 9 ]/jnode(0x7FFFFFFF)", "");
     query("[ 8, 9 ]/jnode(0x7FFFFFFFFFFF)", "");
@@ -271,13 +271,13 @@ public final class JNodeTest extends SandboxTest {
 
   /** Child step. */
   @Test public void axisChild() {
-    query(jtree + "/b", "{\"x\":{\"y\":2}}");
-    query(jtree + "/b/x", "{\"y\":2}");
-    query(jtree + "/b/x/y", 2);
+    query(jtree + "/b", "{\"b\":{\"x\":{\"y\":2}}}");
+    query(jtree + "/b/x", "{\"x\":{\"y\":2}}");
+    query(jtree + "/b/x/y", "{\"y\":2}");
 
-    query(jtree + "/*", "{\"x\":1,\"y\":{\"z\":2}}\n{\"x\":{\"y\":2}}");
-    query(jtree + "/*/*", "1\n{\"z\":2}\n{\"y\":2}");
-    query(jtree + "/*/*/*", "2\n2");
+    query(jtree + "/*", "{\"a\":{\"x\":1,\"y\":{\"z\":2}}}\n{\"b\":{\"x\":{\"y\":2}}}");
+    query(jtree + "/*/*", "{\"x\":1}\n{\"y\":{\"z\":2}}\n{\"x\":{\"y\":2}}");
+    query(jtree + "/*/*/*", "{\"z\":2}\n{\"y\":2}");
     query(jtree + "/*/*/*/*", "");
 
     query(jtree + "/* => count()", 2);
@@ -288,9 +288,9 @@ public final class JNodeTest extends SandboxTest {
 
   /** Descendant step. */
   @Test public void axisDescendant() {
-    query(jtree + "//b", "{\"x\":{\"y\":2}}");
-    query(jtree + "//x", "1\n{\"y\":2}");
-    query(jtree + "//y", "{\"z\":2}\n2");
+    query(jtree + "//b", "{\"b\":{\"x\":{\"y\":2}}}");
+    query(jtree + "//x", "{\"x\":1}\n{\"x\":{\"y\":2}}");
+    query(jtree + "//y", "{\"y\":{\"z\":2}}\n{\"y\":2}");
 
     query(jtree + "//* => count()", 7);
     query(jtree + "//*//* => count()", 5);
@@ -310,52 +310,52 @@ public final class JNodeTest extends SandboxTest {
   /** Ancestor step. */
   @Test public void axisAncestor() {
     query(jtree + "//y/ancestor::y", "");
-    query(jtree + "//y/ancestor::x", "{\"y\":2}");
-    query(jtree + "//y/ancestor::b", "{\"x\":{\"y\":2}}");
+    query(jtree + "//y/ancestor::x", "{\"x\":{\"y\":2}}");
+    query(jtree + "//y/ancestor::b", "{\"b\":{\"x\":{\"y\":2}}}");
     query(jtree + "//y/ancestor::* => count()", 4);
     query(jtree + "//y/ancestor::gnode() => count()", 4);
   }
 
   /** Ancestor-or-self step. */
   @Test public void axisAncestorOrSelf() {
-    query(jtree + "//y/ancestor-or-self::y", "{\"z\":2}\n2");
-    query(jtree + "//y/ancestor-or-self::x", "{\"y\":2}");
-    query(jtree + "//y/ancestor-or-self::b", "{\"x\":{\"y\":2}}");
+    query(jtree + "//y/ancestor-or-self::y", "{\"y\":{\"z\":2}}\n{\"y\":2}");
+    query(jtree + "//y/ancestor-or-self::x", "{\"x\":{\"y\":2}}");
+    query(jtree + "//y/ancestor-or-self::b", "{\"b\":{\"x\":{\"y\":2}}}");
     query(jtree + "//y/ancestor-or-self::* => count()", 6);
     query(jtree + "//y/ancestor-or-self::gnode() => count()", 6);
   }
 
   /** Self step. */
   @Test public void axisSelf() {
-    query(jtree + "//*/self::y", "{\"z\":2}\n2");
-    query(jtree + "//*/self::z", 2);
+    query(jtree + "//*/self::y", "{\"y\":{\"z\":2}}\n{\"y\":2}");
+    query(jtree + "//*/self::z", "{\"z\":2}");
     query(jtree + "//*/self::w", "");
 
-    query(jtree + "//z/self::z", 2);
-    query(jtree + "//z/self::*", 2);
-    query(jtree + "//z/self::jnode()", 2);
-    query(jtree + "//z/self::gnode()", 2);
+    query(jtree + "//z/self::z", "{\"z\":2}");
+    query(jtree + "//z/self::*", "{\"z\":2}");
+    query(jtree + "//z/self::jnode()", "{\"z\":2}");
+    query(jtree + "//z/self::gnode()", "{\"z\":2}");
     query(jtree + "//z/self::node()", "");
   }
 
   /** Parent step. */
   @Test public void axisParent() {
-    query(jtree + "//z/..", "{\"z\":2}");
-    query(jtree + "//z/../..", "{\"x\":1,\"y\":{\"z\":2}}");
+    query(jtree + "//z/..", "{\"y\":{\"z\":2}}");
+    query(jtree + "//z/../..", "{\"a\":{\"x\":1,\"y\":{\"z\":2}}}");
     query(jtree + "/*/..", string);
     query(jtree + "/*/../..", "");
   }
 
   /** Preceding-sibling step. */
   @Test public void axisPrecedingSibling() {
-    query(jtree + "//y/preceding-sibling::*", 1);
+    query(jtree + "//y/preceding-sibling::*", "{\"x\":1}");
     query(jtree + "//x/preceding-sibling::*", "");
   }
 
   /** Following-sibling step. */
   @Test public void axisFollowingSibling() {
     query(jtree + "//y/following-sibling::*", "");
-    query(jtree + "//x/following-sibling::*", "{\"z\":2}");
+    query(jtree + "//x/following-sibling::*", "{\"y\":{\"z\":2}}");
   }
 
   /** Following step. */
@@ -371,7 +371,7 @@ public final class JNodeTest extends SandboxTest {
   @Test public void axisPreceding() {
     query(jtree + "/*/preceding::* => count()", 4);
     query(jtree + "//*/preceding::* => count()", 4);
-    query(jtree + "//z/preceding::*", 1);
+    query(jtree + "//z/preceding::*", "{\"x\":1}");
     query(jtree + "//b/preceding::* => count()", 4);
     query(jtree + "//a/preceding::* => count()", 0);
  }
@@ -379,14 +379,14 @@ public final class JNodeTest extends SandboxTest {
   /** Absolute path expressions starting at a map or array. */
   @Test public void absolutePath() {
     // single slash: map or array is coerced to a root JNode
-    query("declare context item := { 'a': 1, 'b': 2 }; /a", 1);
-    query("declare context item := { 'a': 1, 'b': 2 }; /b", 2);
+    query("declare context item := { 'a': 1, 'b': 2 }; /a", "{\"a\":1}");
+    query("declare context item := { 'a': 1, 'b': 2 }; /b", "{\"b\":2}");
     query("declare context item := { 'a': 1, 'b': 2 }; /* => count()", 2);
-    query("declare context item := [ 8, 9 ]; /jnode(2)", 9);
-    query("({ 'a': 1 }) / (/a)", 1);
+    query("declare context item := [ 8, 9 ]; /jnode(2)", "[9]");
+    query("({ 'a': 1 }) / (/a)", "{\"a\":1}");
 
     // double slash: descendants of the coerced root JNode
-    query("declare context item := { 'a': { 'b': 2 } }; //b", 2);
+    query("declare context item := { 'a': { 'b': 2 } }; //b", "{\"b\":2}");
     query("declare context item := { 'a': { 'b': 2 } }; //jnode() => count()", 2);
     query("declare context item := [ [ 1, 2 ] ]; //jnode(*, xs:integer) => count()", 2);
 
@@ -399,11 +399,11 @@ public final class JNodeTest extends SandboxTest {
   @Test public void nestedPath() {
     // the inner '$j' is a nested-path root and must still be coerced to a JNode;
     // it must not be flattened into a step, where the coercion no longer applies
-    query("let $j := { 'a': 1 } return $j/($j/a)", 1);
-    query("let $j := { 'a': 1 } return $j/(($j/a)[true()])", 1);
-    query("let $j := { 'a': { 'b': 2 } } return $j/($j/a/b)", 2);
+    query("let $j := { 'a': 1 } return $j/($j/a)", "{\"a\":1}");
+    query("let $j := { 'a': 1 } return $j/(($j/a)[true()])", "{\"a\":1}");
+    query("let $j := { 'a': { 'b': 2 } } return $j/($j/a/b)", "{\"b\":2}");
     // equivalent form with the inner JNode precomputed
-    query("let $j := { 'a': 1 } let $x := $j/a return $j/$x", 1);
+    query("let $j := { 'a': 1 } let $x := $j/a return $j/$x", "{\"a\":1}");
   }
 
   /** A path result over JNodes must be JNodes or atomic values (XPTY0018, not XPTY0004). */
@@ -432,8 +432,8 @@ public final class JNodeTest extends SandboxTest {
     error(jtree + "//x?y", LOOKUP_X);
 
     // non-navigational parenthesized steps remain key selectors (unaffected by the above)
-    query("[ 10, 20, 30 ]/(2)", 20);
-    query("{ 'a': 1 }/('a')", 1);
+    query("[ 10, 20, 30 ]/(2)", "[20]");
+    query("{ 'a': 1 }/('a')", "{\"a\":1}");
     query("{ 'a': 1 }/(42)", "");
   }
 
