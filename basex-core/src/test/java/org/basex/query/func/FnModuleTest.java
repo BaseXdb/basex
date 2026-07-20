@@ -875,9 +875,14 @@ public final class FnModuleTest extends SandboxTest {
     query("deep-equal(1 to 1000000000, 1 to 1000000001)", false);
 
     // function items are compared for equivalence
+    query(func.args(" true#0", " true#0"), true);
     query(func.args(" fn($x) { $x }", " fn($y) { $y }"), true);
+    query(func.args(" fn($x) { $x }", " fn($y) {  $y  }"), true);
+    query(func.args(" fn() { error() }", " fn() { error() }"), true);
     query(func.args(" fn($x) { $x }", " fn($x) { $x + 1 }"), false);
     query(func.args(" fn($x) { $x }", " fn($x, $y) { $x }"), false);
+    // context-dependent references capture the focus
+    query("let $f := (<a/>, <b/>) ! fn:name#0 return " + func.args(" $f[1]", " $f[2]"), false);
     // closures: captured values are compared with deep equality
     query("let $n := <a/> return " + func.args(" fn() { $n }", " fn() { $n }"), true);
     query(func.args(" (let $n := <a/> return fn() { $n })", " (let $m := <a/> return fn() { $m })"),
@@ -1775,16 +1780,6 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" %Q{uri}name('a', 'b') function() {}") +
         " (QName('uri', 'name'))", "a\nb");
     query(COUNT.args(func.args(" %basex:inline %basex:lazy function() {}")), 2);
-  }
-
-  /** Test method. */
-  @Test public void functionIdentity() {
-    final Function func = FUNCTION_IDENTITY;
-
-    query(func.args(" true#0"), "fn:true#0");
-    query(func.args(" <a/>/name#0") + " => contains('fn:name#0-')", true);
-    query(func.args(" fn() {}") + " => contains('fn#0-')", true);
-    query(func.args(" fn() { 1 }") + " ne " + func.args(" fn() { 2 }"), true);
   }
 
   /** Test method. */
