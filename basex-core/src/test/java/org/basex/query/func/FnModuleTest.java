@@ -579,6 +579,25 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void containsSubsequence() {
+    final Function func = CONTAINS_SUBSEQUENCE;
+
+    query(func.args(" ()", " ()"), true);
+    query(func.args(" (1 to 5)", " ()"), true);
+    query(func.args(" (1 to 5)", " (2, 3)"), true);
+    query(func.args(" (1 to 5)", " (2, 4)"), false);
+    query(func.args(" (1 to 5)", " (1 to 5)"), true);
+    query(func.args(" (1 to 5)", " (4, 5, 6)"), false);
+
+    // custom comparison function (its invocation checks for interruptions)
+    query(func.args(" ('a', 'B', 'c')", " ('b')",
+        " fn($a, $b) { lower-case($a) = lower-case($b) }"), true);
+
+    // large scan: guarded by qc:checkStop, otherwise an uninterruptible quadratic search
+    query(func.args(" (1 to 50000) ! 'a'", " ((1 to 1000) ! 'a', 'b')"), false);
+  }
+
+  /** Test method. */
   @Test public void count() {
     final Function func = COUNT;
 

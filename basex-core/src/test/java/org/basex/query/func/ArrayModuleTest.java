@@ -216,6 +216,24 @@ public final class ArrayModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void indexOf() {
+    final Function func = _ARRAY_INDEX_OF;
+
+    query(func.args(" array {}", 1), "");
+    query(func.args(" array { 1 }", 1), 1);
+    query(func.args(" array { 1 }", 2), "");
+    query(func.args(" array { 1, 2, 3, 2 }", 2), "2\n4");
+    query(func.args(" array { 'a', 'b', 'a' }", "a"), "1\n3");
+
+    // members that are sequences are compared with deep equality
+    query(func.args(" [ 1, (2, 3), 4 ]", " (2, 3)"), 2);
+    query(func.args(" [ 1, (2, 3), 4 ]", " (2, 4)"), "");
+
+    // large scan: guarded by qc:checkStop, otherwise an uninterruptible linear search
+    query("count(" + func.args(" array { 1 to 1000000 }", -1) + ')', 0);
+  }
+
+  /** Test method. */
   @Test public void indexWhere() {
     final Function func = _ARRAY_INDEX_WHERE;
 

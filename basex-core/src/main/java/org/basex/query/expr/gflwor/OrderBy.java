@@ -96,6 +96,7 @@ public final class OrderBy extends Clause {
         try {
           Arrays.sort(perm, (x, y) -> {
             try {
+              qc.checkStop();
               final Item[] a = ks[x], b = ks[y];
               final int kl = keys.length;
               for(int k = 0; k < kl; k++) {

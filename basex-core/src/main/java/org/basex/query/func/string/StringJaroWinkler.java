@@ -18,6 +18,9 @@ public final class StringJaroWinkler extends StringFn {
     final byte[] value1 = toToken(arg(0), qc), value2 = toToken(arg(1), qc);
     final FTOpt opt = ftOpt(arg(2), qc);
 
-    return Dbl.get(JaroWinkler.distance(cps(value1, opt), cps(value2, opt)));
+    final int[] cps1 = cps(value1, opt), cps2 = cps(value2, opt);
+    checkLength(cps1.length);
+    checkLength(cps2.length);
+    return Dbl.get(JaroWinkler.distance(cps1, cps2));
   }
 }

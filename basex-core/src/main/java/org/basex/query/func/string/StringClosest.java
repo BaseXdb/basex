@@ -62,9 +62,9 @@ public final class StringClosest extends StringFn {
 
     final boolean tokenize = Enums.oneOf(measure, Measure.TOKEN_SORT_RATIO,
         Measure.TOKEN_SET_RATIO);
-    // all measures that are based on the edit distance are limited in length
-    final boolean bounded = Enums.oneOf(measure, Measure.LEVENSHTEIN, Measure.TOKEN_SORT_RATIO,
-        Measure.TOKEN_SET_RATIO, Measure.PARTIAL_RATIO);
+    // measures with a quadratic runtime are limited in length
+    final boolean bounded = Enums.oneOf(measure, Measure.LEVENSHTEIN, Measure.JARO_WINKLER,
+        Measure.TOKEN_SORT_RATIO, Measure.TOKEN_SET_RATIO, Measure.PARTIAL_RATIO);
     final int[] cps = cps(value, opt);
     final String[] tokens = tokenize ? tokens(value, opt) : null;
     if(bounded) checkLength(cps.length);

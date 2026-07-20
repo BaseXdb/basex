@@ -187,6 +187,11 @@ public final class StringModuleTest extends SandboxTest {
 
     // the common prefix is rewarded, but only up to 4 characters
     query(func.args("abcdefgh", "abcdefghx"), .98);
+
+    // inputs are length-bounded: the algorithm is quadratic and otherwise uninterruptible
+    query(func.args(" string-join(replicate('x', 10000))", "x"), 0.67);
+    error(func.args(" string-join(replicate('x', 10001))", "x"), STRING_BOUNDS_X);
+    error(func.args("x", " string-join(replicate('x', 10001))"), STRING_BOUNDS_X);
   }
 
   /** Test method. */
@@ -324,7 +329,7 @@ public final class StringModuleTest extends SandboxTest {
     final String long1 = " string-join(replicate('x', 10001))";
     error(func.args(long1, " ('a')"), STRING_BOUNDS_X);
     error(func.args("a", long1), STRING_BOUNDS_X);
-    query("exists(" + func.args("a", long1, " { 'measure': string:jaro-winkler#2 }") + ')', true);
+    error(func.args("a", long1, " { 'measure': string:jaro-winkler#2 }"), STRING_BOUNDS_X);
 
     // edge cases
     query(func.args("", " ('', 'a')", " { 'limit': 0 }") + "?similarity", "1\n0");

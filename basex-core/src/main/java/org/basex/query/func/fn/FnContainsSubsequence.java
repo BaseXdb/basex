@@ -30,10 +30,16 @@ public class FnContainsSubsequence extends StandardFunc {
 
     final QueryBiFunction<Item, Item, Boolean> cmp;
     if(compare != null) {
+      // the invoked function checks for interruptions
       final HofArgs args = new HofArgs(2);
       cmp = (item1, item2) -> test(compare, args.set(0, item1).set(1, item2), qc);
     } else {
-      cmp = new DeepEqual(info, null, qc)::equal;
+      // the comparison of single items must be interruptible (quadratic worst case)
+      final DeepEqual deep = new DeepEqual(info, null, qc);
+      cmp = (item1, item2) -> {
+        qc.checkStop();
+        return deep.equal(item1, item2);
+      };
     }
     return test(input, subsequence, cmp);
   }
