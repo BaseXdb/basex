@@ -17,10 +17,12 @@ public final class ClientBlocker {
    * Registers the client and delays the process.
    * @param client client address
    */
-  public synchronized void delay(final byte[] client) {
-    // do not delay more than 10 seconds
-    int delay = Math.min(blocked.get(client) + 1, 20);
-    blocked.put(client, delay);
+  public void delay(final byte[] client) {
+    int delay;
+    synchronized(this) {
+      delay = Math.min(Math.max(blocked.get(client), 0) + 1, 20);
+      blocked.put(client, delay);
+    }
     while(--delay > 0) Performance.sleep(500);
   }
 

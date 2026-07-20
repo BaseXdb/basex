@@ -23,8 +23,8 @@ public final class JobWait extends StandardFunc {
 
     final JobPool pool = qc.context.jobs;
     while(pool.tasks.containsKey(id) || pool.active.containsKey(id)) {
-      Performance.sleep(1);
       qc.checkStop();
+      pool.awaitChange();
     }
     return Empty.VALUE;
   }

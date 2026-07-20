@@ -3,6 +3,7 @@ package org.basex.http.ws;
 import java.util.*;
 import java.util.Map.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.*;
 
 import org.basex.io.serial.*;
 import org.basex.query.*;
@@ -22,7 +23,7 @@ public final class WsPool {
   /** WebSocket prefix. */
   private static final String PREFIX = "websocket";
   /** Incrementing ID. */
-  private static long websocketId = -1;
+  private static final AtomicLong WEBSOCKET_ID = new AtomicLong(-1);
 
   /** Private constructor. */
   private WsPool() { }
@@ -130,8 +131,7 @@ public final class WsPool {
    * Creates a new, unused WebSocket ID.
    * @return new ID
    */
-  private static synchronized String createId() {
-    websocketId = Math.max(0, websocketId + 1);
-    return PREFIX + websocketId;
+  private static String createId() {
+    return PREFIX + WEBSOCKET_ID.incrementAndGet();
   }
 }

@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 import jakarta.servlet.http.*;
 
@@ -56,14 +57,17 @@ public final class WebModules {
     if(sec >= 0) {
       // speed up permission checks: keep cache for a minimum of time even if caching is disabled
       final int ms = sec == 0 ? 10 : sec * 1000;
-      new Timer(true).scheduleAtFixedRate(new TimerTask() {
-        @Override
-        public void run() {
-          synchronized(WebModules.this) {
-            if(System.currentTimeMillis() - access >= ms) init(true);
-          }
+      final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(
+          runnable -> {
+            final Thread thread = new Thread(runnable, "basex-restxq-cache");
+            thread.setDaemon(true);
+            return thread;
+          });
+      scheduler.scheduleAtFixedRate(() -> {
+        synchronized(WebModules.this) {
+          if(System.currentTimeMillis() - access >= ms) init(true);
         }
-      }, 0, 100);
+      }, 0, 100, TimeUnit.MILLISECONDS);
     }
   }
 
@@ -72,7 +76,7 @@ public final class WebModules {
    * @param ctx database context
    * @return instance
    */
-  public static WebModules get(final Context ctx) {
+  public static synchronized WebModules get(final Context ctx) {
     if(instance == null) instance = new WebModules(ctx);
     return instance;
   }

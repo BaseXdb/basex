@@ -32,6 +32,11 @@ import org.basex.util.hash.*;
 public final class CompileContext {
   /**
    * Compile-time simplifications.
+   * Common rule: a parent requests, for each operand, the mode that matches the context in which it
+   * consumes that operand's value (see the {@code Requested by} lists); operands that are passed on
+   * unchanged are left untouched. This is why some expressions simplify all operands (e.g.
+   * {@link Arith}), only a name ({@link CElem}), or only a single argument ({@link Lookup}).
+   * An operand that can benefit from the requested context rewrites itself ({@code Evaluated by}).
    * @see Expr#simplifyFor(Simplify, CompileContext)
    */
   public enum Simplify {

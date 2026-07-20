@@ -42,7 +42,7 @@ public final class HTTPContext {
    * Returns the singleton instance.
    * @return instance
    */
-  public static HTTPContext get() {
+  public static synchronized HTTPContext get() {
     if(instance == null) instance = new HTTPContext();
     return instance;
   }

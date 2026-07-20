@@ -55,7 +55,9 @@ public final class ClientListener extends Thread implements ClientInfo {
   /** Output stream. */
   private PrintOutput out;
   /** Current command. */
-  private Command command;
+  private volatile Command command;
+  /** Monitor, notified when {@link #command} is cleared (see {@link #close()}). */
+  private final Object monitor = new Object();
   /** Query ID counter. */
   private int id;
   /** Indicates if the server thread is running. */
@@ -84,7 +86,7 @@ public final class ClientListener extends Thread implements ClientInfo {
 
     try {
       while(authenticated) {
-        command = null;
+        command(null);
         String cmd;
         final ServerCmd sc;
         try {
@@ -123,7 +125,7 @@ public final class ClientListener extends Thread implements ClientInfo {
 
         // parse input and create command instance
         try {
-          command = CommandParser.get(cmd, context).parseSingle();
+          command(CommandParser.get(cmd, context).parseSingle());
           log(LogType.REQUEST, command.toString(true));
         } catch(final QueryException ex) {
           // log invalid command
@@ -160,16 +162,29 @@ public final class ClientListener extends Thread implements ClientInfo {
 
         // stop console
         if(command instanceof Exit) {
-          command = null;
+          command(null);
           close();
         }
       }
     } catch(final IOException ex) {
       log(LogType.ERROR, Util.message(ex));
-      command = null;
+      command(null);
       close();
     }
-    command = null;
+    command(null);
+  }
+
+  /**
+   * Assigns the currently processed command and notifies {@link #close()} when it is cleared.
+   * @param cmd command (can be {@code null})
+   */
+  private void command(final Command cmd) {
+    command = cmd;
+    if(cmd == null) {
+      synchronized(monitor) {
+        monitor.notifyAll();
+      }
+    }
   }
 
   /**
@@ -232,7 +247,17 @@ public final class ClientListener extends Thread implements ClientInfo {
     final Command c = command;
     if(c != null) {
       c.stop();
-      do Performance.sleep(1); while(command != null);
+      synchronized(monitor) {
+        while(command != null) {
+          try {
+            monitor.wait(1000);
+          } catch(final InterruptedException ex) {
+            Util.debug(ex);
+            Thread.currentThread().interrupt();
+            break;
+          }
+        }
+      }
     }
     context.sessions.remove(this);
 

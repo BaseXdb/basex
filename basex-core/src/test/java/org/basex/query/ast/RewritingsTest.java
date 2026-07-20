@@ -52,6 +52,28 @@ public final class RewritingsTest extends SandboxTest {
     check("count(/self::document-node())", 1, exists(Itr.class));
   }
 
+  /** Checks that ranges with a possibly-empty operand do not get a non-empty result size. */
+  @Test public void rangeEmptyOperand() {
+    // operand is xs:integer? and empty at runtime, so the range is empty
+    final String h = "head((1 to 10)[. > 100])";
+    check("count(" + h + " to " + h + ")", 0);
+    check("exists(" + h + " to " + h + ")", false);
+    check("count(" + h + " to " + h + " + 10)", 0);
+    check("exists(" + h + " to " + h + " + 10)", false);
+    // single-item operands: result is still computed correctly
+    check("let $i := (1 to 10)[. = 5] return count($i to $i)", 1);
+    check("let $i := (1 to 10)[. = 5] return count($i to $i + 4)", 5);
+  }
+
+  /** Checks that dead 'otherwise' operands are dropped in a single optimization pass. */
+  @Test public void otherwiseChop() {
+    check("1 otherwise 2 otherwise 3", 1, empty(Otherwise.class), root(Itr.class));
+    check("count((1, 2) otherwise (3, 4) otherwise 5)", 2, empty(Otherwise.class));
+    check("<a/> otherwise 2 otherwise 3", "<a/>", empty(Otherwise.class));
+    // leading possibly-empty operands are kept
+    check("(1 to 10)[. = <x>11</x>] otherwise 2 otherwise 3", 2, exists(Otherwise.class));
+  }
+
   /** Checks if descendant-or-self::node() steps are rewritten. */
   @Test public void mergeDesc() {
     execute(new CreateDB(NAME, "<a><b>B</b><b><c>C</c></b></a>"));

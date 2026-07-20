@@ -29,7 +29,7 @@ public final class ArraySubarray extends ArrayFn {
 
     final long len = toLong(length);
     if(len < 0) throw ARRAYNEG_X.get(info, len);
-    if(start + len > size) throw ARRAYBOUNDS_X_X.get(info, start + 1 + len, size + 1);
+    if(len > size - start) throw ARRAYBOUNDS_X_X.get(info, start + 1 + len, size + 1);
     return array.subArray(start, len, qc);
   }
 

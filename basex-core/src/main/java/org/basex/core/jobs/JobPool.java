@@ -38,6 +38,8 @@ public final class JobPool {
   private final ExecutorService pool = Executors.newCachedThreadPool(factory("basex-job"));
   /** Available slots for jobs running in parallel. */
   private final Semaphore slots = new Semaphore(MAX_RUNNING);
+  /** Monitor, notified whenever a job or task completes (see {@link #awaitChange}). */
+  private final Object monitor = new Object();
   /** Timeout (ms). */
   private final long timeout;
 
@@ -88,6 +90,30 @@ public final class JobPool {
   public void unregister(final Job job) {
     active.remove(job.jc().id());
     slots.release();
+    notifyChange();
+  }
+
+  /**
+   * Wakes threads that wait for a job or task to complete.
+   */
+  public void notifyChange() {
+    synchronized(monitor) {
+      monitor.notifyAll();
+    }
+  }
+
+  /**
+   * Waits a bounded time for a job or task to complete.
+   */
+  public void awaitChange() {
+    synchronized(monitor) {
+      try {
+        monitor.wait(1000);
+      } catch(final InterruptedException ex) {
+        Util.debug(ex);
+        Thread.currentThread().interrupt();
+      }
+    }
   }
 
   /**
@@ -97,7 +123,7 @@ public final class JobPool {
     // stop running tasks and queries
     scheduler.shutdownNow();
     for(final Job job : active.values()) job.stop();
-    while(!active.isEmpty()) Performance.sleep(10);
+    while(!active.isEmpty()) awaitChange();
     pool.shutdown();
   }
 
@@ -152,6 +178,7 @@ public final class JobPool {
     // remove potentially cached result
     results.remove(id);
 
+    notifyChange();
     return job != null || task != null;
   }
 

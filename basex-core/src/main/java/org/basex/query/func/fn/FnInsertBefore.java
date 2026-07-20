@@ -62,7 +62,8 @@ public final class FnInsertBefore extends StandardFunc {
    * @throws QueryException query exception
    */
   private long pos(final QueryContext qc) throws QueryException {
-    return Math.max(0, toLong(arg(1), qc) - 1);
+    final long pos = toLong(arg(1), qc);
+    return pos < 1 ? 0 : pos - 1;
   }
 
   @Override

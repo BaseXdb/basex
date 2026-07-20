@@ -59,7 +59,7 @@ public final class List extends Arr {
 
     final int el = exprs.length;
     if(el == 0) return cc.emptySeq(this);
-    if(el == 1) return exprs[0];
+    if(el == 1) return cc.replaceWith(this, exprs[0]);
 
     // determine result type, compute number of results, set expression type
     final SeqType st = SeqType.union(exprs, false);

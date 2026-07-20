@@ -173,7 +173,8 @@ public class FnSubsequence extends StandardFunc {
    */
   public long end(final long first, final double second) {
     final long l = StrictMath.round(second);
-    return l == Long.MAX_VALUE ? l : l + first - 1;
+    final long add = first - 1;
+    return l == Long.MAX_VALUE || add > 0 && l > Long.MAX_VALUE - add ? Long.MAX_VALUE : l + add;
   }
 
   /**

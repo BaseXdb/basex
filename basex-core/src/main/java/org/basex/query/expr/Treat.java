@@ -32,10 +32,7 @@ public final class Treat extends Single {
     final SeqType st = seqType(), et = expr.seqType();
 
     // skip check if return type is already correct
-    if(et.instanceOf(st)) {
-      cc.info(OPTTYPE_X_X, st, expr);
-      return expr;
-    }
+    if(et.instanceOf(st)) return cc.replaceWith(this, expr);
     return expr instanceof Value ? cc.preEval(this) : this;
   }
 

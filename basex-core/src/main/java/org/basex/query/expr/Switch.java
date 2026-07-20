@@ -270,7 +270,7 @@ public final class Switch extends ParseExpr {
   public Expr typeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
     boolean changed = false;
     for(final SwitchGroup group : groups) {
-      changed = group.typeCheck(tc, cc) != null;
+      changed |= group.typeCheck(tc, cc) != null;
     }
     return changed ? optimize(cc) : this;
   }

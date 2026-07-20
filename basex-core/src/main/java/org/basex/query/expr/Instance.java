@@ -52,7 +52,7 @@ public final class Instance extends Single {
       if(et.intersect(seqType) == null) return cc.replaceWith(this, Bln.FALSE);
     }
 
-    // 1: only check item type, 2: only check occurrence indicator
+    // 1: only check occurrence indicator, 2: only check item type
     check = et.with(seqType.occ).instanceOf(seqType) ? 1 : et.occ.instanceOf(seqType.occ) ? 2 : 0;
     return this;
   }

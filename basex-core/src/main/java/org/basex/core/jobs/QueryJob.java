@@ -280,6 +280,7 @@ public final class QueryJob extends Job implements Runnable {
         jc.performance = null;
 
         if(remove) ctx.jobs.tasks.remove(id);
+        ctx.jobs.notifyChange();
         if(notify != null) notify.accept(result);
         if(result.value != null && result.value.isEmpty()) ctx.jobs.results.remove(id);
       }

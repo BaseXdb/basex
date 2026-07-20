@@ -79,16 +79,16 @@ public final class Otherwise extends Arr {
     flatten(cc);
     removeEmpty(cc);
 
-    // chop remaining expressions if an operator yields one or more items
-    // 1 otherwise 2 → 1
+    // drop dead operands once an operand is known to yield one or more items
+    // 1 otherwise 2 otherwise 3 → 1
     int el = exprs.length - 1;
     int e = -1;
     while(++e < el && !exprs[e].seqType().oneOrMore());
-    if(e < el) exprs = Arrays.copyOf(exprs, el);
+    if(e < el) exprs = Arrays.copyOf(exprs, e + 1);
 
     el = exprs.length;
     if(el == 0) return cc.emptySeq(this);
-    if(el == 1) return exprs[0];
+    if(el == 1) return cc.replaceWith(this, exprs[0]);
 
     // determine result type
     Occ occ = null;

@@ -46,9 +46,10 @@ public final class Range extends Arr {
 
       final Expr min = exprs[0], max = exprs[1];
       if(!min.has(Flag.NDT)) {
+        final boolean one = min.seqType().one();
         if(min.equals(max)) {
           // identical operands: $int to $int
-          exprType.assign(Occ.EXACTLY_ONE);
+          exprType.assign(one ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE);
           if(integers()) expr = min;
         } else if(max instanceof final Arith arith && min.equals(max.arg(0))) {
           if(arith.calc.oneOf(Calc.ADD, Calc.SUBTRACT) && arith.arg(1) instanceof final Itr itr) {
@@ -56,7 +57,7 @@ public final class Range extends Arr {
             final long n = (arith.calc == Calc.ADD ? itr.itr() : -itr.itr()) + 1;
             if(n < 1) {
               expr = Empty.VALUE;
-            } else {
+            } else if(one) {
               exprType.assign(seqType(), n);
             }
           }
@@ -87,7 +88,7 @@ public final class Range extends Arr {
     // max smaller than min: create range
     final long size = mx - mn + 1;
     // too large range: assign maximum
-    return RangeSeq.get(mn, size < 0 ? Long.MAX_VALUE : size, true);
+    return RangeSeq.get(mn, size <= 0 ? Long.MAX_VALUE : size, true);
   }
 
   @Override

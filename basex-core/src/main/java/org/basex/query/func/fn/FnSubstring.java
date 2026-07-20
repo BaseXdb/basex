@@ -20,15 +20,16 @@ public final class FnSubstring extends StandardFunc {
     final AStr value = toZeroStr(arg(0), qc);
 
     final int length = value.length(info);
-    int start = start(qc), end = length(length, qc);
+    int start = start(qc);
+    long end = length(length, qc);
     if(length == 0 || start == Integer.MIN_VALUE) return Str.EMPTY;
 
     if(start < 0) {
       end += start;
       start = 0;
     }
-    end = Math.min(length, defined(2) ? start + end : Integer.MAX_VALUE);
-    return start < end ? value.substring(info, start, end) : Str.EMPTY;
+    final long e = Math.min(length, defined(2) ? start + end : Integer.MAX_VALUE);
+    return start < e ? value.substring(info, start, (int) e) : Str.EMPTY;
   }
 
   @Override
@@ -72,7 +73,7 @@ public final class FnSubstring extends StandardFunc {
    */
   private int length(final int def, final QueryContext qc) throws QueryException {
     final Item length = arg(2).atomItem(qc, info);
-    return length.isEmpty() ? def : length instanceof final Itr itr ? (int) itr.itr() :
+    return length.isEmpty() ? def : length instanceof final Itr itr ? limit(itr.itr()) :
       subPos(length.dbl(info) + 1);
   }
 
