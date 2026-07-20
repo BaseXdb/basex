@@ -37,6 +37,8 @@ public final class BaseXServer extends CLI implements Runnable {
   private volatile boolean stop;
   /** Server socket. */
   private ServerSocket socket;
+  /** Socket accept loop. */
+  private Thread acceptor;
   /** Start as service. */
   private boolean service;
   /** Daemon flag. */
@@ -118,7 +120,8 @@ public final class BaseXServer extends CLI implements Runnable {
       throw new BaseXException(ex.getLocalizedMessage());
     }
 
-    new Thread(this).start();
+    acceptor = new Thread(this);
+    acceptor.start();
 
     // show info that server has been started
     final String startX = Util.info(SRV_STARTED_PORT_X, port);
@@ -200,9 +203,14 @@ public final class BaseXServer extends CLI implements Runnable {
     try {
       // close interactive input if server was stopped by another process
       socket.close();
+      // wait for the accept loop to exit, so the port is released before the caller is notified
+      if(acceptor != null && acceptor != Thread.currentThread()) acceptor.join();
     } catch(final IOException ex) {
       Util.errln(ex);
       context.log.writeServer(LogType.ERROR, Util.message(ex));
+    } catch(final InterruptedException ex) {
+      Util.debug(ex);
+      Thread.currentThread().interrupt();
     }
 
     final int port = context.soptions.get(StaticOptions.SERVERPORT);
