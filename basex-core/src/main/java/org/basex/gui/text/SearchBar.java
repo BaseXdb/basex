@@ -90,11 +90,6 @@ public final class SearchBar extends BaseXBack {
     replace.hint(Text.REPLACE_WITH + "\u2026");
     count = new BaseXLabel(" ");
 
-    // compact metrics for the entire find strip (Aqua hint, ignored elsewhere)
-    find.putClientProperty("JComponent.sizeVariant", "small");
-    replace.putClientProperty("JComponent.sizeVariant", "small");
-    count.putClientProperty("JComponent.sizeVariant", "small");
-
     final ActionListener al = e -> {
       modes();
       search();
@@ -103,8 +98,6 @@ public final class SearchBar extends BaseXBack {
     word = button("f_word", BaseXLayout.addShortcut(Text.WHOLE_WORD, WHOLEWORD.toString()), al);
     regex = button("f_regex", BaseXLayout.addShortcut(Text.REGULAR_EXPR, REGEX.toString()), al);
     dotall = button("f_dotall", BaseXLayout.addShortcut(Text.DOT_ALL, DOTALL.toString()), al);
-    // render the four mode toggles as a single segmented control
-    BaseXButton.segment(mcase, word, regex, dotall);
 
     // restore the search modes of the last session
     mcase.setSelected(gui.gopts.get(GUIOptions.MATCHCASE));

@@ -88,19 +88,6 @@ public final class BaseXButton extends JButton {
   }
 
   /**
-   * Groups the specified buttons into a single segmented control (Aqua hint, ignored elsewhere).
-   * @param buttons buttons, in visual order
-   */
-  public static void segment(final AbstractButton... buttons) {
-    final int bl = buttons.length;
-    for(int b = 0; b < bl; b++) {
-      buttons[b].putClientProperty("JButton.buttonType", "segmented");
-      buttons[b].putClientProperty("JButton.segmentPosition",
-          bl == 1 ? "only" : b == 0 ? "first" : b < bl - 1 ? "middle" : "last");
-    }
-  }
-
-  /**
    * Unifies the button style.
    * @param button button reference
    * @return button
@@ -108,9 +95,7 @@ public final class BaseXButton extends JButton {
   private static AbstractButton style(final AbstractButton button) {
     // no shadow effects (flat style)
     button.setOpaque(false);
-    // flat toolbar rendering with compact metrics (Aqua hints, ignored by other look and feels)
     button.putClientProperty("JButton.buttonType", "toolbar");
-    button.putClientProperty("JComponent.sizeVariant", "small");
     // trim horizontal button margins (mac)
     final Insets in = button.getMargin();
     in.left /= 4;
