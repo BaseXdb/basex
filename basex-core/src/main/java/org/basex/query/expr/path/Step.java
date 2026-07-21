@@ -193,7 +193,7 @@ public abstract class Step extends Preds {
 
   @Override
   public final Expr compile(final CompileContext cc) throws QueryException {
-    if(selector != null) selector = selector.compile(cc);
+    if(selector != null) selector = cc.get(null, false, () -> selector.compile(cc));
     return super.compile(cc);
   }
 
@@ -305,7 +305,8 @@ public abstract class Step extends Preds {
     // do not inline context value
     if(ic.var == null) return null;
 
-    final Expr s = selector != null ? ic.inlineOrNull(selector) : null;
+    final Expr s = selector == null ? null :
+      ic.cc.get(null, false, () -> ic.inlineOrNull(selector));
     if(s != null) selector = s;
     final boolean preds = ic.cc.ok(this, true, () -> ic.inline(exprs));
     return s != null || preds ? optimize(ic.cc) : null;

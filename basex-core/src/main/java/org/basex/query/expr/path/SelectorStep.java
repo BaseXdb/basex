@@ -49,11 +49,18 @@ public final class SelectorStep extends Step {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    // evaluate name keys once, with the context node as focus
-    final Value keys = selector.atomValue(qc, info);
+    // evaluate name keys with an absent focus once
+    final QueryFocus focus = qc.focus;
+    final Value keys;
+    qc.focus = new QueryFocus();
+    try {
+      keys = selector.atomValue(qc, info);
+    } finally {
+      qc.focus = focus;
+    }
 
     final GNodeList list = new GNodeList();
-    final Value value = qc.focus.value;
+    final Value value = focus.value;
     if(axis == Axis.CHILD && keys instanceof final Item key &&
         toContextNode(value) instanceof final JNode jnode && jnode.value instanceof XQStruct) {
       // child axis, single key, single struct: direct key lookup
@@ -101,13 +108,12 @@ public final class SelectorStep extends Step {
 
   @Override
   Expr optimize(final Expr root, final CompileContext cc) throws QueryException {
-    selector = selector.optimize(cc);
+    selector = cc.get(null, false, () -> selector.optimize(cc));
 
     // no keys: no results
     if(selector.seqType().zero()) return cc.emptySeq(this);
 
     // constant keys: rewrite to a static test
-    // JNodes select by key (JNodeTest, enabling direct lookup), XML nodes by name (NameTest)
     if(selector instanceof final Value value) {
       final Expr in = root != null ? root : cc.qc.focus.value;
       final Type it = in != null ? in.seqType().type : null;
