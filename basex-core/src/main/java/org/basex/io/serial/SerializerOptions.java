@@ -274,10 +274,11 @@ public final class SerializerOptions extends Options {
     // reset options that are to be ignored for canonicalization
     if(yes(CANONICAL)) {
       final SerialMethod m = get(METHOD);
-      if(m == SerialMethod.XML || m == SerialMethod.XHTML || m == SerialMethod.JSON) {
+      if(m.oneOf(SerialMethod.XML, SerialMethod.XHTML, SerialMethod.JSON)) {
         for(final Option<?> option : this) {
           if(!CANONICAL_OPTIONS.contains(option)) put(option, option.value());
         }
+        set(NEWLINE, Newline.NL);
       } else {
         set(CANONICAL, YesNo.NO);
       }
@@ -296,9 +297,9 @@ public final class SerializerOptions extends Options {
 
     // determine content type via output method
     final SerialMethod sm = get(METHOD);
-    if(sm == SerialMethod.BASEX || sm == SerialMethod.ADAPTIVE || sm == SerialMethod.XML)
+    if(sm.oneOf(SerialMethod.BASEX, SerialMethod.ADAPTIVE, SerialMethod.XML))
       return MediaType.APPLICATION_XML;
-    if(sm == SerialMethod.XHTML || sm == SerialMethod.HTML) return MediaType.TEXT_HTML;
+    if(sm.oneOf(SerialMethod.XHTML, SerialMethod.HTML)) return MediaType.TEXT_HTML;
     if(sm == SerialMethod.JSON) return MediaType.APPLICATION_JSON;
     return MediaType.TEXT_PLAIN;
   }

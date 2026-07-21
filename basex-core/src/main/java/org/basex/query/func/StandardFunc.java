@@ -161,6 +161,10 @@ public abstract class StandardFunc extends Arr {
   protected final byte[] serialize(final Iter iter, final SerializerOptions sopts,
       final QueryError err, final QueryContext qc) throws QueryException {
 
+    // use line feeds if no line ending was requested
+    if(!sopts.contains(SerializerOptions.LINE_ENDING)) {
+      sopts.set(SerializerOptions.NEWLINE, SerializerOptions.Newline.NL);
+    }
     try {
       final ArrayOutput ao = new ArrayOutput();
       try(Serializer ser = Serializer.get(ao, sopts)) {
@@ -169,7 +173,7 @@ public abstract class StandardFunc extends Arr {
           ser.serialize(item);
         }
       }
-      return new TokenBuilder(ao.finish()).normalize().finish();
+      return ao.finish();
     } catch(final QueryIOException ex) {
       throw ex.getCause(info);
     } catch(final IOException ex) {

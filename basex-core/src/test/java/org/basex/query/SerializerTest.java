@@ -20,10 +20,14 @@ public final class SerializerTest extends SandboxTest {
   @Test public void xml() {
     query(METHOD.arg("xml") + "<html/>", "<html/>");
     query(METHOD.arg("xml") + "<x a='1 > 0'>1 > 0</x>", "<x a=\"1 &gt; 0\">1 &gt; 0</x>");
-    query(METHOD.arg("xml") + INDENT_ATTRIBUTES.arg("yes") + "<x a='1' b='2' c='3'/>",
+    query(METHOD.arg("xml") + INDENT.arg("yes") + INDENT_ATTRIBUTES.arg("yes")
+        + "<x a='1' b='2' c='3'/>",
         "<x a=\"1\"\n"
         + "   b=\"2\"\n"
         + "   c=\"3\"/>");
+    // no effect if indentation is disabled
+    query(METHOD.arg("xml") + INDENT_ATTRIBUTES.arg("yes") + "<x a='1' b='2' c='3'/>",
+        "<x a=\"1\" b=\"2\" c=\"3\"/>");
   }
 
   /** Test: indent-unit. */
@@ -50,18 +54,14 @@ public final class SerializerTest extends SandboxTest {
 
   /** Test: line-ending. */
   @Test public void lineEnding() {
-    // Line endings are a byte-stream concern: write to a file and inspect the raw bytes.
-    // (fn:serialize normalizes line endings in its string result, so it cannot be used here.)
-    final String write = "let $f := file:create-temp-file('x', '.xml') return (file:write($f, "
-        + "<a><b/></a>, map { 'method': 'xml', 'indent': true(), ";
-    final String check = " }), contains(string(xs:hexBinary(file:read-binary($f))), '0D0A'), "
-        + "file:delete($f))";
-    // CR LF is emitted as the line ending
-    query(write + "'line-ending': '&#13;&#10;'" + check, true);
-    // CR LF, supplied as the escape sequence \r\n
-    query(write + "'line-ending': '\\r\\n'" + check, true);
-    // 'line-ending' takes precedence over the 'newline' option
-    query(write + "'newline': '\\n', 'line-ending': '&#13;&#10;'" + check, true);
+    final String ser = "serialize(<a><b/></a>, map { 'method': 'xml', 'indent': true()";
+    query(ser + " }) => contains('&#13;')", false);
+    query(ser + ", 'line-ending': '&#13;&#10;' }) => contains('&#13;&#10;')", true);
+    query(ser + ", 'line-ending': '\\r\\n' }) => contains('&#13;&#10;')", true);
+    query(ser + ", 'line-ending': '\\r' }) => contains('&#10;')", false);
+    query(ser + ", 'newline': '\\n', 'line-ending': '&#13;&#10;' }) "
+        + "=> contains('&#13;&#10;')", true);
+    query("serialize('a&#13;b', map { 'method': 'text' }) => contains('&#13;')", true);
   }
 
   /** Test: method=xhtml. */

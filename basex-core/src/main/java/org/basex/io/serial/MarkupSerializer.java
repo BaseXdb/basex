@@ -86,7 +86,7 @@ abstract class MarkupSerializer extends StandardSerializer {
     escape  = sopts.yes(ESCAPE_URI_ATTRIBUTES);
     content = sopts.yes(INCLUDE_CONTENT_TYPE);
     undecl  = sopts.yes(UNDECLARE_PREFIXES);
-    indAttr = sopts.yes(INDENT_ATTRIBUTES);
+    indAttr = indent && sopts.yes(INDENT_ATTRIBUTES);
 
     if(docsys.isEmpty()) docsys = null;
     if(docpub.isEmpty()) docpub = null;

@@ -46,7 +46,7 @@ public abstract class OutputSerializer extends Serializer {
     // indentation unit: standard 'indent-unit' takes precedence over 'tabulator'/'indents'
     final String unit = sopts.get(INDENT_UNIT);
     if(unit != null) {
-      indentUnit = token(unescape(unit));
+      indentUnit = token(unescape(INDENT_UNIT.name(), unit, "\t*| *"));
     } else {
       final byte ch = (byte) (sopts.yes(TABULATOR) ? '\t' : ' ');
       indentUnit = new byte[sopts.get(INDENTS)];
@@ -67,7 +67,8 @@ public abstract class OutputSerializer extends Serializer {
 
     // line ending: standard 'line-ending' takes precedence over 'newline'
     final String le = sopts.get(LINE_ENDING);
-    final String newline = le != null ? unescape(le) : sopts.get(NEWLINE).newline();
+    final String newline = le != null ? unescape(LINE_ENDING.name(), le, "\r\n|\r|\n") :
+      sopts.get(NEWLINE).newline();
     if(!newline.equals("\n")) po = new NewlineOutput(po, token(newline));
     out = po;
 
@@ -84,12 +85,20 @@ public abstract class OutputSerializer extends Serializer {
   }
 
   /**
-   * Replaces the escapes {@code \t}, {@code \r} and {@code \n} with the corresponding characters.
+   * Replaces the escapes {@code \t}, {@code \r} and {@code \n} with the corresponding characters
+   * and checks the result against the pattern of allowed values.
+   * @param name parameter name
    * @param value parameter value
+   * @param pattern allowed values
    * @return resulting string
+   * @throws IOException I/O exception
    */
-  private static String unescape(final String value) {
-    return value.replace("\\t", "\t").replace("\\r", "\r").replace("\\n", "\n");
+  private static String unescape(final String name, final String value, final String pattern)
+      throws IOException {
+    final String unescaped = value.replace("\\t", "\t").replace("\\r", "\r").replace("\\n", "\n");
+    if(!unescaped.matches(pattern))
+      throw SERPARAM_X.getIO(Util.info("Invalid value for '%': '%'.", name, value));
+    return unescaped;
   }
 
   @Override
