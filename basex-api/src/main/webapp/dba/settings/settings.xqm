@@ -42,9 +42,25 @@ function dba:settings(
   let $number := fn($key, $label) {
     $table-row($label, <input type='number' name='{ $key }' value='{ config:get($key) }'/>)
   }
+  let $fixed-table := fn($rows) {
+    <table class='fixed'>{
+      (: 'fixed': long values are truncated and expanded via click :)
+      <colgroup><col style='width: 40%'/><col/></colgroup>,
+      $rows
+    }</table>
+  }
+  let $map-table := fn($map) {
+    $fixed-table(
+      for $key in sort(map:keys($map))
+      return <tr>
+        <td><b>{ $key }</b></td>
+        <td>{ $map($key) }</td>
+      </tr>
+    )
+  }
   return (
     <tr>
-      <td width='33%'>
+      <td>
         <form method='post' autocomplete='off'>
           <h2>Settings » { html:button('settings-save', 'Save') }</h2>
           <h3>Queries</h3>
@@ -61,20 +77,26 @@ function dba:settings(
         </form>
       </td>
       <td class='vertical'/>
-      <td width='33%'>
+      <td>
         <form method='post' autocomplete='off'>
           <h2>Global Options » { html:button('settings-gc', 'GC') }</h2>
-          <table>{
-            $local/preceding-sibling::tr[not(th)]
-          }</table>
+          { $fixed-table($local/preceding-sibling::tr[not(th)]) }
         </form>
       </td>
       <td class='vertical'/>
-      <td width='33%'>
+      <td>
         <h2>Local Options</h2>
-        <table>{
-          $local/following-sibling::tr
-        }</table>
+        { $fixed-table($local/following-sibling::tr) }
+      </td>
+      <td class='vertical'/>
+      <td class='collapsed'>
+        <h2>Environment Variables</h2>
+        { $map-table(map:build(available-environment-variables(), value := environment-variable#1)) }
+      </td>
+      <td class='vertical'/>
+      <td class='collapsed'>
+        <h2>System Properties</h2>
+        { $map-table(proc:property-map()) }
       </td>
     </tr>
   ) => html:wrap({ 'header': $dba:CAT, 'info': $info })

@@ -141,22 +141,28 @@ function dba:database(
             'method': if ($type = 'xml') then 'xml' else 'basex',
             'limit': $max * 2 + 1
           })
-          let $editable := $type = 'xml' and string-length($preview) <= $max
+          let $truncated := string-length($preview) > $max
+          let $editable := $type = 'xml' and not($truncated)
           let $content := if ($editable) then $preview else substring($preview, 1, $max)
+          (: reason why a resource cannot be edited; extended by the client for query results :)
+          let $note := string-join((
+            'Read-only ' || (
+              if ($type = 'xml')
+              then '(too large for editing)'
+              else '(only XML can be edited)'
+            ),
+            ', and truncated: download it to see the full content.'[$truncated]
+          ))[not($editable)]
           return (
             <h2>Resource: { $resource }</h2>,
             <form method='post'>{
               <input type='hidden' name='name' value='{ $name }'/>,
               <input type='hidden' name='resource' value='{ $resource }' id='resource'/>,
               insert-separator((
-                (: Save is shown for every XML resource; the tooltip covers every disabled
-                   reason (too large, read-only query/indent view, no unsaved changes) and
-                   sits on a wrapper span, as disabled buttons suppress title tooltips :)
+                (: enabled by the client if the document can be edited :)
                 if ($type = 'xml') {
-                  <span title='Only modified, editable and unindented documents can be saved.'>{
-                    <button type='button' id='save-resource' onclick='saveResource()'
-                            disabled=''>Save</button>
-                  }</span>
+                  <button type='button' id='save-resource' onclick='saveResource()'
+                          disabled=''>Save</button>
                 },
                 <button type='button' id='copy-resource' onclick='copyResource()'>Copy</button>,
                 <span> </span>,
@@ -171,6 +177,7 @@ function dba:database(
                 }
               ), <span> </span>)
             }</form>,
+            <div id='note' class='note{ ' strong'[$truncated] }'>{ $note }</div>,
             if ($type = 'xml') {
               <div class='small'/>,
               <input type='text' style='width:100%' name='input' id='input'

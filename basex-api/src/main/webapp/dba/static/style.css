@@ -309,6 +309,14 @@ header {
   color: var(--muted);
 }
 
+/* read-only reason; emphasized if the shown document is incomplete */
+#note.strong {
+  color: var(--accent);
+}
+#note.strong::before {
+  content: "\26A0\00a0";
+}
+
 .small {
   height: 10px;
 }
@@ -317,6 +325,49 @@ header {
   width: 1px;
   border-left: .7px solid var(--border);
   height: 100%;
+}
+
+/* collapsible content panels: a chevron folds a panel to a labeled strip */
+button.collapse {
+  position: absolute;
+  top: 0;
+  right: .4rem;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 130%;
+  line-height: 1;
+  cursor: pointer;
+}
+button.collapse:hover {
+  color: var(--accent);
+}
+td.collapsed {
+  width: 1.6rem;
+  padding-right: 0;
+}
+td.collapsed > :not(button.collapse) {
+  display: none;
+}
+td.collapsed > button.collapse {
+  position: static;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .4rem;
+  font-size: 110%;
+}
+/* only the title rotates, the arrow stays upright */
+button.collapse .label {
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+  font-size: 90%;
+}
+/* siblings of a collapsed panel take over the freed space */
+td.wide {
+  width: auto;
 }
 
 /* narrow screens */
@@ -350,6 +401,13 @@ header {
   }
   table.content > tbody > tr > td.vertical {
     display: none;
+  }
+  /* stacked panels collapse to a horizontal strip */
+  td.collapsed > button.collapse {
+    flex-direction: row;
+  }
+  button.collapse .label {
+    writing-mode: horizontal-tb;
   }
   /* logs: show the search panel above the file list on narrow screens */
   table.content > tbody > tr.stack-reverse {

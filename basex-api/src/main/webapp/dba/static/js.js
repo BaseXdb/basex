@@ -15,15 +15,17 @@ let _dbInput;
 
 /** Whether the current database resource can be edited. */
 let _resourceEditable;
-/** Whether the resource editor currently shows (read-only) query output. */
-let _queryMode;
-/** Saved baseline of the resource editor; edits are detected against it. */
+/** Server-rendered read-only reason ([ message, class ]). */
+let _resourceNote;
+/** Cached raw document; undefined if it must be requested again. */
 let _resourceSaved;
 
 /** localStorage key for the logs 'ignore entries' filter. */
 const IGNORE_KEY = "dba-ignore-logs";
 /** localStorage key for the 'Indent' output preference. */
 const INDENT_KEY = "dba-indent";
+/** localStorage key prefix for the collapsed content panels of a page. */
+const PANELS_KEY = "dba-panels-";
 
 /**
  * Indicates whether the table row containing a checkbox is currently shown.
@@ -103,7 +105,11 @@ function markTruncated() {
     truncated.push(cell.classList.contains("expanded") ? null : cell.scrollWidth > cell.clientWidth);
   }
   cells.forEach((cell, i) => {
-    if(truncated[i] !== null) cell.classList.toggle("truncated", truncated[i]);
+    if(truncated[i] === null) return;
+    cell.classList.toggle("truncated", truncated[i]);
+    // the tooltip is the only access to the clipped text
+    if(truncated[i]) cell.title = cell.textContent;
+    else cell.removeAttribute("title");
   });
 }
 window.addEventListener("resize", markTruncated);
@@ -413,42 +419,51 @@ function logFilter() {
 }
 
 /**
- * Shows a database resource in the editor: the raw editable document, a query
- * result, or the indented document. Serialized output (query result or indented
- * document) is read-only, so editing is only possible on the raw, non-indented
- * view — clearing the query then restores the exact saved content.
+ * Shows a database resource in the editor: the document, raw or indented, or a query result.
  * @param {boolean} enforce enforce execution
  */
 async function queryResource(enforce) {
   const input = document.getElementById("input").value.trim();
   const indent = indentOn();
   // re-run whenever the query or the indent preference changes
-  const state = input + " " + indent;
+  const state = input + " " + indent;
   if(!enforce && _dbInput === state) return false;
   _dbInput = state;
 
-  // no query and no indentation: show the raw, editable baseline (never reformatted)
-  if(!input && !indent) {
-    _queryMode = false;
-    if(_resourceEditable) {
-      editorReadOnly(false);
-      resourceButtons(false);
+  // no query: show the document, raw or indented. only the raw one is cached
+  if(!input) {
+    if(!indent && _resourceSaved !== undefined) {
+      showResource(_resourceSaved);
+      return;
     }
-    _editor.setValue(_resourceSaved);
-    setText("", "");
+    // block edits until the document has been received
+    editResource(false);
+
+    const self = query("db-query", ".");
+    register(self);
+    try {
+      const text = await self;
+      showResource(text);
+      if(!indent) _resourceSaved = text;
+    } catch(response) {
+      showError(response);
+    } finally {
+      if(self === _running) _running = undefined;
+    }
     return;
   }
 
-  // otherwise show read-only serialized output: a query result or the indented document
-  _queryMode = true;
-  editorReadOnly(true);
-  if(_resourceEditable) setDisabled("save-resource", true);
+  // a query result is read-only
+  editResource(false);
+  if(_resourceEditable) {
+    showNote("Read-only: query result. Clear the query to edit the document again.");
+  }
 
-  const self = query("db-query", input || ".");
+  const self = query("db-query", input);
   register(self);
   try {
     _editor.setValue(await self);
-    setText(input ? "Query was successful." : "", input ? "info" : "");
+    setText("Query was successful.", "info");
   } catch(response) {
     showError(response);
   } finally {
@@ -457,35 +472,54 @@ async function queryResource(enforce) {
 }
 
 /**
+ * Shows an editable document in the resource editor.
+ * @param {string} text document
+ */
+function showResource(text) {
+  _editor.setValue(text);
+  editResource(_resourceEditable);
+  showNote(_resourceEditable && indentOn() ?
+    "Whitespace may be stripped when the document is saved." : undefined, true);
+  setText("", "");
+}
+
+/**
+ * Shows a note below the resource toolbar.
+ * @param {string} message message; if omitted, the server-rendered reason is restored
+ * @param {boolean} warn emphasize the message
+ */
+function showNote(message, warn) {
+  const note = document.getElementById("note");
+  if(note) [ note.textContent, note.className ] =
+    message ? [ message, warn ? "note strong" : "note" ] : _resourceNote;
+}
+
+/**
  * Initializes the resource editor and its button states, honoring the stored
- * 'Indent' preference (an indented document is shown read-only).
+ * 'Indent' preference.
  * @param {boolean} editable whether the resource can be edited in place
  */
 function initResource(editable) {
   _resourceEditable = editable;
-  _queryMode = false;
   _resourceSaved = document.getElementById("editor").value;
-  if(editable) _editor.on("change", updateResource);
+  const note = document.getElementById("note");
+  _resourceNote = [ note.textContent, note.className ];
 
   if(document.getElementById("input") && indentOn()) {
-    // XML resource with indentation enabled: show the indented document read-only
+    // XML resource with indentation enabled: request the indented document
     queryResource(true);
-  } else if(editable) {
-    resourceButtons(false);
   } else {
-    // binary, value, or oversized XML: shown read-only, content inlined server-side
-    editorReadOnly(true);
+    editResource(editable);
   }
 }
 
 /**
- * Refreshes the resource controls after an edit: toggles the Save, Copy, query
- * and Indent controls to match the modification state. Ignored while serialized
- * output is shown.
+ * Enables or disables editing of the shown resource.
+ * @param {boolean} enabled edit state
  */
-function updateResource() {
-  if(_queryMode) return;
-  resourceButtons(document.getElementById("editor").value !== _resourceSaved);
+function editResource(enabled) {
+  editorReadOnly(!enabled);
+  setDisabled("save-resource", !enabled);
 }
 
 /**
@@ -503,18 +537,6 @@ function indentChanged() {
   localStorage.setItem(INDENT_KEY, document.getElementById("indent").checked ? "yes" : "no");
   // resource view re-renders immediately; the editor applies it on the next run
   if(document.getElementById("resource")) queryResource(true);
-}
-
-/**
- * Applies the resource button states for the given modification state.
- * @param {boolean} dirty whether the document has unsaved changes
- */
-function resourceButtons(dirty) {
-  setDisabled("save-resource", !dirty);
-  // querying, copying or indenting an unsaved document would ignore the pending edits
-  setDisabled("copy-resource", dirty);
-  setDisabled("input", dirty);
-  setDisabled("indent", dirty);
 }
 
 /**
@@ -544,18 +566,19 @@ function copyResource() {
 }
 
 /**
- * Saves the edited content of a database resource, updating the saved baseline.
+ * Saves the edited content of a database resource.
  */
 async function saveResource() {
-  if(_queryMode) return;
   const name = document.getElementById("name").value;
   const resource = document.getElementById("resource").value;
   const content = document.getElementById("editor").value;
-  const url = `db-save?name=${encodeURIComponent(name)}&resource=${encodeURIComponent(resource)}`;
+  const indent = indentOn();
+  let url = `db-save?name=${encodeURIComponent(name)}&resource=${encodeURIComponent(resource)}`;
+  if(indent) url += "&indent=true";
   try {
     await request(url, content);
-    _resourceSaved = content;
-    resourceButtons(false);
+    // the raw document has changed: request it again
+    _resourceSaved = indent ? undefined : content;
     setText("Resource was saved.", "info");
   } catch(response) {
     showError(response);
@@ -703,9 +726,87 @@ function shortcuts(event) {
 }
 
 /**
+ * Makes the side-by-side content panels of a page collapsible.
+ */
+function initPanels() {
+  // if no state was stored yet, the markup supplies the default
+  const stored = localStorage.getItem(PANELS_KEY + window.location.pathname);
+  const collapsed = stored?.split(",");
+  document.querySelectorAll("table.content > tbody > tr").forEach((row, r) => {
+    const panels = [ ...row.children ].filter(td => !td.classList.contains("vertical"));
+    if(panels.length < 2) return;
+    panels.forEach((panel, p) => {
+      // the heading supplies the label of the collapsed strip
+      const heading = panel.querySelector("h2, h3");
+      if(!heading) return;
+      const id = `${r}-${p}`;
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "collapse";
+      // the last panel folds to the right, all others to the left
+      button.dataset.right = p === panels.length - 1;
+      button.dataset.title = heading.textContent.split("»")[0].trim();
+      button.addEventListener("click", () => togglePanel(panel, id));
+      panel.prepend(button);
+      showPanel(panel, collapsed ? collapsed.includes(id) : panel.classList.contains("collapsed"));
+    });
+  });
+}
+
+/**
+ * Collapses or expands a content panel and persists the new state.
+ * @param {td} panel panel to be toggled
+ * @param {string} id panel id
+ */
+function togglePanel(panel, id) {
+  const collapse = !panel.classList.contains("collapsed");
+  showPanel(panel, collapse);
+
+  const key = PANELS_KEY + window.location.pathname;
+  const ids = new Set((localStorage.getItem(key) ?? "").split(",").filter(Boolean));
+  if(collapse) ids.add(id);
+  else ids.delete(id);
+  localStorage.setItem(key, [ ...ids ].join(","));
+
+  // lets CodeMirror panes and truncated cells adjust to the new widths
+  window.dispatchEvent(new Event("resize"));
+}
+
+/**
+ * Applies the collapsed state of a content panel.
+ * @param {td} panel panel
+ * @param {boolean} collapse collapsed state
+ */
+function showPanel(panel, collapse) {
+  panel.classList.toggle("collapsed", collapse);
+
+  const button = panel.firstElementChild;
+  const right = button.dataset.right === "true";
+  const title = button.dataset.title;
+  // the arrow points the way the panel will move
+  button.textContent = right !== collapse ? "›" : "‹";
+  if(collapse) {
+    const label = document.createElement("span");
+    label.className = "label";
+    label.textContent = title;
+    button.append(label);
+  }
+  button.title = `${collapse ? "Expand" : "Collapse"} ${title}`;
+  button.setAttribute("aria-expanded", !collapse);
+
+  // siblings of a collapsed panel share the freed space
+  const panels = [ ...panel.parentElement.children ].filter(td => !td.classList.contains("vertical"));
+  const shrunk = panels.some(p => p.classList.contains("collapsed"));
+  for(const p of panels) p.classList.toggle("wide", shrunk && !p.classList.contains("collapsed"));
+}
+
+/**
  * Initializes page-wide interactive behavior.
  */
 function ready() {
+  initPanels();
+  // statically rendered tables are not marked by their own code
+  markTruncated();
   document.addEventListener("keydown", shortcuts);
   document.getElementById("info")?.addEventListener("click", jumpToError);
   // reflect the stored 'Indent' preference in the checkbox (editor and resource views)

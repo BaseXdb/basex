@@ -10,6 +10,7 @@ module namespace dba = 'dba/databases';
  : @param  $name      database
  : @param  $resource  resource
  : @param  $content   new content
+ : @param  $indent    indicates if the content is indented
  : @return empty output
  :)
 declare
@@ -18,13 +19,16 @@ declare
   %rest:path('/dba/db-save')
   %rest:query-param('name',     '{$name}')
   %rest:query-param('resource', '{$resource}')
+  %rest:query-param('indent',   '{$indent}')
   %rest:single
   %output:method('text')
 function dba:db-save(
   $name      as xs:string,
   $resource  as xs:string,
-  $content   as xs:string?
+  $content   as xs:string?,
+  $indent    as xs:string?
 ) {
-  db:put($name, parse-xml($content), $resource),
+  (: indentation is only added for display :)
+  db:put($name, parse-xml($content, { 'strip-space': $indent = 'true' }), $resource),
   update:output('')
 };
