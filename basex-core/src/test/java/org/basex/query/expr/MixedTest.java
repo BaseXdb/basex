@@ -59,10 +59,10 @@ public final class MixedTest extends SandboxTest {
 
   /** Checks static context scoping in variables. */
   @Test public void varsInModules() {
-    contains("import module namespace a='world' at '" + XQMFILE + "'; $a:eager", "hello:foo");
-    contains("import module namespace a='world' at '" + XQMFILE + "'; $a:lazy", "hello:foo");
-    contains("import module namespace a='world' at '" + XQMFILE + "'; $a:func()", "hello:foo");
-    contains("import module namespace a='world' at '" + XQMFILE + "'; a:inlined()", "hello:foo");
+    contains("import module namespace a='world' at '" + XQMFILE + "'; $a:eager", "Q{world}foo");
+    contains("import module namespace a='world' at '" + XQMFILE + "'; $a:lazy", "Q{world}foo");
+    contains("import module namespace a='world' at '" + XQMFILE + "'; $a:func()", "Q{world}foo");
+    contains("import module namespace a='world' at '" + XQMFILE + "'; a:inlined()", "Q{world}foo");
   }
 
   /** Checks imported module's types. */
@@ -86,10 +86,10 @@ public final class MixedTest extends SandboxTest {
     query("declare type local:int as xs:integer; ['1'] ! local:int()", 1);
     query("declare type local:int as xs:integer; local:int(value := '7')", 7);
     query("declare type local:int as xs:integer; local:int(())", "");
-    query("declare type local:int as xs:integer; function-lookup(xs:QName('local:int'), 1)('9')",
-        9);
+    query("declare type local:int as xs:integer;"
+        + "function-lookup(xs:QName('local:int'), 1)('9')", 9);
     // forward references, aliases of aliases
-    query("declare function local:f() { local:b('42') };"
+    query("declare function local:f() { local:b('42') }; "
         + "declare type local:b as local:a; declare type local:a as xs:integer; local:f()", 42);
     // types of imported modules
     query("import module namespace a='world' at '" + XQMFILE + "'; a:int('42')", 42);
@@ -99,14 +99,15 @@ public final class MixedTest extends SandboxTest {
         FUNCPRIVATE_X);
 
     // constructor functions for union types
-    query("declare type local:u as (xs:date | xs:time); local:u('12:00:00') instance of xs:time",
-        true);
-    query("declare type local:n as xs:numeric; local:n('1') instance of xs:double", true);
+    query("declare type local:u as (xs:date | xs:time); "
+        + "local:u('12:00:00') instance of xs:time", true);
+    query("declare type local:n as xs:numeric; "
+        + "local:n('1') instance of xs:double", true);
     // constructor functions for record types
-    query("declare type local:r as record(x as xs:integer, y as xs:string); local:r(1, 'a')?y",
-        "a");
-    query("declare type local:r as record(x as xs:integer); local:r(2) instance of local:r",
-        true);
+    query("declare type local:r as record(x as xs:integer, y as xs:string); "
+        + "local:r(1, 'a')?y", "a");
+    query("declare type local:r as record(x as xs:integer); "
+        + "local:r(2) instance of local:r", true);
     // no constructor functions for other item types
     error("declare type local:m as map(*); local:m({})", WHICHFUNC_X);
     error("declare type local:e as element(); local:e(<x/>)", WHICHFUNC_X);

@@ -449,7 +449,7 @@ public final class XQuery4Test extends SandboxTest {
     query("4_5", 45);
     query("67.89", 67.89);
     query("1_000_000", 1_000_000);
-    query("1_2__3_________4.5______________6e7________________________8", "1.23456e+81");
+    query("1_2__3_________4.5______________6e7________________________8", "1.23456E81");
 
     error("_1", NOCTX_X);
     error("2._3", NUMBER_X);
@@ -790,6 +790,12 @@ public final class XQuery4Test extends SandboxTest {
         empty(SelectorStep.class));
     check("let $m := { 'x': 1, 'y': 2, 'z': 3 } return "
         + "($m/child::{ ('y', 'z') })[jvalue() > 2] ! jvalue()", 3, empty(SelectorStep.class));
+
+    // focus-dependent selector: evaluated with an absent focus, hence a dynamic error
+    error("<a><b name='b'/><c name='x'/></a>/child::{ @name }", NOCTX_X);
+    error("let $m := { 'a': 'a', 'b': 'x' } return $m/child::{ string(.) }", NOCTX_X);
+    // the selector must not be optimized with the focus of the step
+    error("<a><b/><c/></a>/child::{ if(. instance of node()) then 'b' else 'c' }", NOCTX_X);
   }
 
   /** Path operator: JNode navigation with atomic step results (jkey matching). */

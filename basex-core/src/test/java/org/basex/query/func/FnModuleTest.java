@@ -231,12 +231,12 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void atomicTypeAnnotation() {
     final Function func = ATOMIC_TYPE_ANNOTATION;
 
-    query(func.args(23) + " ? name", "#integer");
+    query(func.args(23) + " ? name", "#xs:integer");
     query("let $x := 23, $y := 93.7 return " + func.args(" $x") + "? matches($y)", false);
-    query(func.args(" xs:numeric('23.2')") + " ? name", "#double");
+    query(func.args(" xs:numeric('23.2')") + " ? name", "#xs:double");
 
     final String q1 = func.args(" <a>42</a>");
-    query(q1, "{\"name\":#untypedAtomic,"
+    query(q1, "{\"name\":#xs:untypedAtomic,"
         + "\"is-simple\":true(),"
         + "\"base-type\":fn() as fn:schema-type-record { type-annotation() },"
         + "\"primitive-type\":fn() as fn:schema-type-record { type-annotation() },"
@@ -265,7 +265,7 @@ public final class FnModuleTest extends SandboxTest {
     query(q1 + "?constructor(<a>abc</a>)", "abc");
 
     final String q2 = "let $q2 := " + func.args(" xs:unsignedByte(255)") + "\n return $q2";
-    query(q2, "{\"name\":#unsignedByte,"
+    query(q2, "{\"name\":#xs:unsignedByte,"
         + "\"is-simple\":true(),"
         + "\"base-type\":fn() as fn:schema-type-record { type-annotation() },"
         + "\"primitive-type\":fn() as fn:schema-type-record { type-annotation() },"
@@ -2254,7 +2254,7 @@ return
         + "return $variables(QName('http://example.com/dyn', 'value'))", 4);
     query(func.args("m", " { 'content': 'module namespace m=\"m\"; "
         + "declare function m:f() { 42 };' }")
-        + "?functions => map:keys()", "#m:f");
+        + "?functions => map:keys()", "#Q{m}f");
     query(func.args("x", " { 'content': 'module namespace x=\"x\";\ndeclare context item as "
         + "xs:decimal external; declare variable $x:x := .;', 'context-item': 1 }") + "?variables"
         + "?#Q{x}x", 1);
@@ -2651,12 +2651,12 @@ return
   @Test public void nodeTypeAnnotation() {
     final Function func = NODE_TYPE_ANNOTATION;
 
-    query("let $e := parse-xml(\"<e/>\")/* return " + func.args(" $e") + " ? name", "#untyped");
+    query("let $e := parse-xml(\"<e/>\")/* return " + func.args(" $e") + " ? name", "#xs:untyped");
     query("let $a := parse-xml(\"<e a='3'/>\")//@a return " + func.args(" $a") + " ? name",
-        "#untypedAtomic");
+        "#xs:untypedAtomic");
 
     final String q1 = func.args(" <a>42</a>");
-    query(q1, "{\"name\":#untyped,"
+    query(q1, "{\"name\":#xs:untyped,"
         + "\"is-simple\":false(),"
         + "\"base-type\":fn() as fn:schema-type-record { type-annotation() },"
         + "\"primitive-type\":(),"
@@ -2676,7 +2676,7 @@ return
     query(q1 + "=> map:contains('simple-content-type')", true);
 
     final String q2 = func.args(" attribute a {42}");
-    query(q2, "{\"name\":#untypedAtomic,"
+    query(q2, "{\"name\":#xs:untypedAtomic,"
         + "\"is-simple\":true(),"
         + "\"base-type\":fn() as fn:schema-type-record { type-annotation() },"
         + "\"primitive-type\":fn() as fn:schema-type-record { type-annotation() },"
@@ -3762,12 +3762,12 @@ return
 
     query(" declare type t as xs:integer; " + func.args(" #t"), "");
     query(func.args(" #fn:schema-type-record"), "");
-    query(func.args(" #xs:integer") + " ? name", "#integer");
-    query(func.args(" #xs:long") + " ? primitive-type() ? name", "#decimal");
-    query(func.args(" #xs:positiveInteger") + " ? base-type() ? name", "#nonNegativeInteger");
+    query(func.args(" #xs:integer") + " ? name", "#xs:integer");
+    query(func.args(" #xs:long") + " ? primitive-type() ? name", "#xs:decimal");
+    query(func.args(" #xs:positiveInteger") + " ? base-type() ? name", "#xs:nonNegativeInteger");
     query(func.args(" #xs:integer") + " ? matches(23)", true);
     query(func.args(" #xs:numeric") + " ? variety", "union");
-    query(func.args(" #xs:numeric") + " ? members() ? name", "#double\n#float\n#decimal");
+    query(func.args(" #xs:numeric") + " ? members() ? name", "#xs:double\n#xs:float\n#xs:decimal");
   }
 
   /** Test method. */
