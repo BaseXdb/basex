@@ -41,8 +41,6 @@ public final class GUIInput extends BaseXCombo {
     super(main, true);
     gui = main;
 
-    BaseXLayout.resizeFont(this, 1.3f);
-
     completions = new BaseXCombo(main);
     completions.addActionListener(e -> completeInput());
     popup = new GUIInputPopup(completions);
