@@ -12,10 +12,6 @@
   <servlet>
     <servlet-name>RESTXQ</servlet-name>
     <servlet-class>org.basex.http.restxq.RestXqServlet</servlet-class>
-    <init-param>
-      <param-name>org.basex.user</param-name>
-      <param-value>admin</param-value>
-    </init-param>
     <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>
@@ -27,10 +23,6 @@
   <servlet>
     <servlet-name>WebSocket</servlet-name>
     <servlet-class>org.basex.http.ws.WsServlet</servlet-class>
-    <init-param>
-      <param-name>org.basex.user</param-name>
-      <param-value>admin</param-value>
-    </init-param>
   </servlet>
   <servlet-mapping>
     <servlet-name>WebSocket</servlet-name>

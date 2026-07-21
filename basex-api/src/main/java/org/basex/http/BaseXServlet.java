@@ -9,7 +9,6 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 
 import org.basex.core.*;
-import org.basex.core.StaticOptions.*;
 import org.basex.core.jobs.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
@@ -25,11 +24,6 @@ import org.basex.util.http.*;
  * @author Christian Gruen
  */
 public abstract class BaseXServlet extends HttpServlet {
-  /** Servlet-specific user. */
-  private String username;
-  /** Servlet-specific authentication method. */
-  private AuthMethod auth;
-
   @Override
   public void init(final ServletConfig config) throws ServletException {
     super.init(config);
@@ -41,11 +35,6 @@ public abstract class BaseXServlet extends HttpServlet {
       throw new ServletException(ex);
     }
 
-    // parse servlet-specific user and authentication method
-    username = initParam(config, StaticOptions.USER.name());
-    final String method = initParam(config, StaticOptions.AUTHMETHOD.name());
-    if(method != null) auth = AuthMethod.valueOf(method);
-
     final Context ctx = hc.context();
     if(ctx.soptions.get(StaticOptions.LOGTRACE)) ctx.setExternal(ctx.log);
   }
@@ -54,9 +43,9 @@ public abstract class BaseXServlet extends HttpServlet {
   public final void service(final HttpServletRequest request, final HttpServletResponse response)
       throws IOException {
 
-    final HTTPConnection conn = new HTTPConnection(request, response, auth, null);
+    final HTTPConnection conn = new HTTPConnection(request, response, null);
     try {
-      conn.authenticate(username);
+      conn.authenticate(username());
       run(conn);
     } catch(final Exception ex) {
       error(conn, ex);
@@ -82,18 +71,10 @@ public abstract class BaseXServlet extends HttpServlet {
   protected abstract void run(HTTPConnection conn) throws Exception;
 
   /**
-   * Returns the value of a servlet-specific initialization parameter.
-   * @param config servlet configuration
-   * @param name name of parameter (without database prefix)
-   * @return value, or {@code null} if the parameter is not specified
+   * Returns the name of the user to run the servlet with.
+   * @return user name, or {@code null} if the global default user is to be used
    */
-  public static String initParam(final ServletConfig config, final String name) {
-    for(final String param : Collections.list(config.getInitParameterNames())) {
-      if(param.startsWith(Prop.DBPREFIX) &&
-          param.substring(Prop.DBPREFIX.length()).equalsIgnoreCase(name)) {
-        return config.getInitParameter(param);
-      }
-    }
+  protected String username() {
     return null;
   }
 

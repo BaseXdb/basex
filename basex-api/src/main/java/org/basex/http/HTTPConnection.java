@@ -60,11 +60,10 @@ public final class HTTPConnection implements ClientInfo {
    * Constructor.
    * @param request request
    * @param response response
-   * @param authMethod authentication method (can be {@code null})
    * @param pth request path (if {@code null}, the path info of the request is used)
    */
   public HTTPConnection(final HttpServletRequest request, final HttpServletResponse response,
-      final AuthMethod authMethod, final String pth) {
+      final String pth) {
 
     this.request = request;
     this.response = response;
@@ -81,18 +80,16 @@ public final class HTTPConnection implements ClientInfo {
     remoteAddress = requestCtx.state().originalAddress();
     remotePort = requestCtx.state().remotePort();
 
-    // authentication method (servlet-specific or global)
-    this.authMethod = authMethod != null ? authMethod :
-      context.soptions.get(StaticOptions.AUTHMETHOD);
+    authMethod = context.soptions.get(StaticOptions.AUTHMETHOD);
   }
 
   /**
    * Authorizes a request. Initializes the user if it is called for the first time.
-   * @param username name of default servlet user (can be {@code null})
+   * @param username name of servlet user (can be {@code null})
    * @throws IOException I/O exception
    */
   public void authenticate(final String username) throws IOException {
-    // choose admin user for OPTIONS requests, servlet-specific user, or global user (can be empty)
+    // choose admin user for OPTIONS requests, servlet user, or global user (can be empty)
     String name = method.equals(Method.OPTIONS.name()) ? UserText.ADMIN : username;
     if(name == null) name = context.soptions.get(StaticOptions.USER);
 

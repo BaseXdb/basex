@@ -4,7 +4,6 @@ import java.nio.*;
 import java.util.concurrent.*;
 
 import org.basex.core.*;
-import org.basex.core.users.*;
 import org.basex.http.*;
 import org.basex.http.web.*;
 import org.basex.query.ann.*;
@@ -60,10 +59,6 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
     // capture request values during the handshake, as the request is recycled afterwards
     requestCtx = new RequestContext(request).detach();
     context = new Context(HTTPContext.get().context(), this);
-    // adopt the user that was authenticated during the handshake
-    if(request.getAttribute(HTTPText.REQUEST_USER) instanceof final User user) {
-      context.user(user);
-    }
   }
 
   /**
