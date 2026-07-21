@@ -16,6 +16,7 @@ import org.basex.query.func.util.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Timeout.*;
 
 /**
  * Checks that optimizations preserve the side effects of nondeterministic code.
@@ -574,6 +575,18 @@ public final class NonDeterministicTest extends SandboxTest {
    */
   @Test public void trunkNdt() {
     query("trunk(" + fileAppend() + ")", "", "x");
+  }
+
+  /**
+   * Checks that the nondeterminism check does not traverse atomic values. Regression: a dynamic
+   * call on a large constant array or sequence walked all members at compile time.
+   * <p>
+   * Requires the atomic type checks in {@code containsNdtFunction} in {@link DynFuncCall#optimize}.
+   * The timeout is preemptive, as the traversal would not be interrupted by the default one.
+   */
+  @Test @Timeout(value = 60, threadMode = ThreadMode.SEPARATE_THREAD) public void largeValues() {
+    query("array { 1 to 100_000_000_000 }(1)", 1);
+    error("(1 to 100_000_000_000)(1)", INVFUNCITEM_X_X);
   }
 
   /**

@@ -162,19 +162,29 @@ public final class DynFuncCall extends FuncCall {
    * @return result of check
    */
   private static boolean containsNdtFunction(final Value value) {
+    if(atomic(value.seqType())) return false;
     for(final Item item : value) {
       if(item instanceof final FuncItem fi && fi.ndt()) return true;
-      if(item instanceof final XQArray array) {
+      if(item instanceof final XQArray array && !atomic(array.funcType().declType)) {
         for(final Value member : array.members()) {
           if(containsNdtFunction(member)) return true;
         }
-      } else if(item instanceof final XQMap map) {
+      } else if(item instanceof final XQMap map && !atomic(map.funcType().declType)) {
         for(final XQMap.Entry entry : map.entries()) {
           if(containsNdtFunction(entry.value())) return true;
         }
       }
     }
     return false;
+  }
+
+  /**
+   * Checks if a sequence type is atomic, i.e., if it cannot contain function items.
+   * @param st sequence type
+   * @return result of check
+   */
+  private static boolean atomic(final SeqType st) {
+    return st.type.instanceOf(BasicType.ANY_ATOMIC_TYPE);
   }
 
   @Override
