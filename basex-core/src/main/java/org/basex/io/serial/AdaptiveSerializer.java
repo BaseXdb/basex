@@ -117,7 +117,7 @@ public class AdaptiveSerializer extends OutputSerializer {
         printChars(((QNm) item).prefixId());
       } else if(type == BOOLEAN) {
         printChars(Token.token(item));
-      } else if(type.instanceOf(NUMERIC) || type == FLOAT) {
+      } else if(type.instanceOf(NUMERIC)) {
         printChars(item.string(null));
       } else {
         final Type tp = constructor(type);
@@ -141,10 +141,9 @@ public class AdaptiveSerializer extends OutputSerializer {
   }
 
   /**
-   * Returns the type whose name wraps an atomic value in a constructor function
-   * (for example {@code xs:date} in {@code xs:date("…")}).
+   * Returns the type whose name wraps an atomic value in a constructor function.
    * @param type atomic type
-   * @return constructor type, or {@code null} if the value is serialized without a wrapper
+   * @return constructor type or {@code null}
    */
   protected Type constructor(final Type type) {
     return type.instanceOf(STRING) || type.oneOf(UNTYPED_ATOMIC, ANY_URI) ? null :

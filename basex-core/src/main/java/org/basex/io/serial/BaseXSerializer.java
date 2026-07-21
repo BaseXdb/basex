@@ -6,7 +6,9 @@ import java.io.*;
 
 import org.basex.io.in.*;
 import org.basex.query.*;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 
@@ -55,14 +57,11 @@ public final class BaseXSerializer extends AdaptiveSerializer {
 
   @Override
   protected Type constructor(final Type type) {
-    // project mode never wraps atomic values in a type constructor
     return null;
   }
 
   @Override
   protected void jnode(final JNode jnode) throws IOException {
-    // root: serialize the wrapped value; non-root: keep the key by wrapping the node in its
-    // container (map entry → single-entry map, array member → single-member array, index dropped)
     if(jnode.isRoot()) {
       reset();
       for(final Item item : jnode.value) {
