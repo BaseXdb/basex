@@ -43,16 +43,16 @@ public final class FnLoadXQueryModule extends StandardFunc {
 
     final XQMap options = toEmptyMap(arg(1), qc);
     final LoadXQueryModuleOptions opt = toOptions(options, new LoadXQueryModuleOptions(), qc);
-    final String[] hints = opt.get(LOCATION_HINTS);
+    final Value hints = opt.get(LOCATION_HINTS);
 
     // check for cached result
     Map<String, XQMap> modCache = null;
     String cacheKey = null;
-    if(hints.length == 1 && options.structSize() == 1) {
+    if(hints.size() == 1 && options.structSize() == 1) {
       QueryContext qcAnc = qc;
       while(qcAnc.parent != null) qcAnc = qcAnc.parent;
       modCache = qcAnc.threads.moduleCache().get();
-      cacheKey = new TokenBuilder(modUri).add('#').add(hints[0]).toString();
+      cacheKey = new TokenBuilder(modUri).add('#').add(toToken(hints.itemAt(0))).toString();
       if(modCache.containsKey(cacheKey)) return modCache.get(cacheKey);
     }
 
@@ -61,7 +61,8 @@ public final class FnLoadXQueryModule extends StandardFunc {
     if(cont != null) {
       srcs.add(new IOContent(cont));
     } else {
-      final StringList locs = new StringList().add(hints);
+      final StringList locs = new StringList();
+      for(final Item hint : hints) locs.add(toString(hint));
       if(locs.isEmpty()) {
         final TokenList files = qc.modDeclared.get(modUri);
         if(files != null) {
@@ -195,9 +196,10 @@ public final class FnLoadXQueryModule extends StandardFunc {
     public static final ValueOption XQUERY_VERSION = new ValueOption("xquery-version",
         Types.DECIMAL_O, null);
     /** load-xquery-module option location-hints. */
-    public static final StringsOption LOCATION_HINTS = new StringsOption("location-hints");
+    public static final ValueOption LOCATION_HINTS =
+        new ValueOption("location-hints", Types.STRING_ZM);
     /** load-xquery-module option content. */
-    public static final StringOption CONTENT = new StringOption("content");
+    public static final StringOption CONTENT = new StringOption("content", null, Types.STRING_ZO);
     /** load-xquery-module option context-item. */
     public static final ValueOption CONTEXT_ITEM = new ValueOption("context-item", Types.ITEM_ZO,
         null);

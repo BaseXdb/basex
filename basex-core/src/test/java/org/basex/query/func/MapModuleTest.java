@@ -91,7 +91,7 @@ public final class MapModuleTest extends SandboxTest {
     error(func.args(input, empty, pos, " { 'duplicates': 'reject' }"),
         MERGE_DUPLICATE_X);
     error(func.args(input, empty, pos, " { 'duplicates': 'rejecting' }"),
-        INVTYPE_X);
+        INVALIDOPTION_X_X_X_X);
 
     check(func.args(empty) + " => map:keys()", "", empty());
     check(func.args(1) + " => map:keys()", 1, root(Itr.class));
@@ -370,7 +370,7 @@ public final class MapModuleTest extends SandboxTest {
     error(func.args(input, " { 'duplicates': 'reject' }"),
         MERGE_DUPLICATE_X);
     error(func.args(input, " { 'duplicates': 'rejecting' }"),
-        INVTYPE_X);
+        INVALIDOPTION_X_X_X_X);
 
     check(func.args(" {}") + " => map:keys()", "", empty());
     check(func.args(" { 1: 2 }") + " => map:keys()", 1, root(Itr.class));

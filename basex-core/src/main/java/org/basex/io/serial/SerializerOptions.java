@@ -30,81 +30,86 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public final class SerializerOptions extends Options {
+  /** Required type of a parameter that is defined as yes/no in the serialization spec. */
+  private static final SeqType YES_NO = Types.BOOLEAN_ZO;
+  /** Required type of a parameter that denotes a serialization method. */
+  private static final SeqType METHOD_TYPE =
+      ChoiceItemType.get(BasicType.STRING, BasicType.QNAME).seqType(Occ.ZERO_OR_ONE);
+  /** Required type of the character map. */
+  private static final SeqType CHARACTER_MAPS =
+      MapType.get(BasicType.STRING, Types.STRING_O).seqType(Occ.ZERO_OR_ONE);
+
   /** Serialization parameter: yes/no. */
   public static final EnumOption<YesNo> BYTE_ORDER_MARK =
-      new EnumOption<>("byte-order-mark", YesNo.NO);
+      new EnumOption<>("byte-order-mark", YesNo.NO, YES_NO);
   /** Serialization parameter: list of QNames. */
   public static final StringOption CDATA_SECTION_ELEMENTS =
-      new StringOption("cdata-section-elements", "");
+      new StringOption("cdata-section-elements", "", Types.QNAME_ZM);
   /** Serialization parameter. */
   public static final StringOption DOCTYPE_PUBLIC =
-      new StringOption("doctype-public", "");
+      new StringOption("doctype-public", "", Types.STRING_ZO);
   /** Serialization parameter. */
   public static final StringOption DOCTYPE_SYSTEM =
-      new StringOption("doctype-system", "");
+      new StringOption("doctype-system", "", Types.STRING_ZO);
   /** Serialization parameter: valid encoding. */
   public static final StringOption ENCODING =
-      new StringOption("encoding", Strings.UTF8);
+      new StringOption("encoding", Strings.UTF8, Types.STRING_ZO);
   /** Serialization parameter: yes/no. */
   public static final EnumOption<YesNo> ESCAPE_SOLIDUS =
-      new EnumOption<>("escape-solidus", YesNo.YES);
+      new EnumOption<>("escape-solidus", YesNo.YES, YES_NO);
   /** Serialization parameter: yes/no. */
   public static final EnumOption<YesNo> ESCAPE_URI_ATTRIBUTES =
-      new EnumOption<>("escape-uri-attributes", YesNo.YES);
+      new EnumOption<>("escape-uri-attributes", YesNo.YES, YES_NO);
   /** Serialization parameter: yes/no. */
   public static final EnumOption<YesNo> INCLUDE_CONTENT_TYPE =
-      new EnumOption<>("include-content-type", YesNo.YES);
+      new EnumOption<>("include-content-type", YesNo.YES, YES_NO);
   /** Serialization parameter: yes/no. */
-  public static final EnumOption<YesNo> INDENT =
-      new EnumOption<>("indent", YesNo.NO);
+  public static final EnumOption<YesNo> INDENT = new EnumOption<>("indent", YesNo.NO, YES_NO);
   /** Serialization parameter. */
   public static final StringOption SUPPRESS_INDENTATION =
-      new StringOption("suppress-indentation", "");
+      new StringOption("suppress-indentation", "", Types.QNAME_ZM);
   /** Serialization parameter. */
-  public static final StringOption MEDIA_TYPE =
-      new StringOption("media-type", "");
+  public static final StringOption MEDIA_TYPE = new StringOption("media-type", "", Types.STRING_ZO);
   /** Serialization parameter: xml/xhtml/html/text/json/csv/raw/adaptive. */
   public static final EnumOption<SerialMethod> METHOD =
-      new EnumOption<>("method", SerialMethod.BASEX);
+      new EnumOption<>("method", SerialMethod.BASEX, METHOD_TYPE);
   /** Serialization parameter: NFC/NFD/NFKC/NKFD/fully-normalized/none. */
   public static final StringOption NORMALIZATION_FORM =
-      new StringOption("normalization-form", "none");
+      new StringOption("normalization-form", "none", Types.STRING_ZO);
   /** Serialization parameter: yes/no. */
   public static final EnumOption<YesNo> OMIT_XML_DECLARATION =
-      new EnumOption<>("omit-xml-declaration", YesNo.YES);
+      new EnumOption<>("omit-xml-declaration", YesNo.YES, YES_NO);
   /** Serialization parameter: yes/no/omit. */
   public static final EnumOption<YesNoOmit> STANDALONE =
-      new EnumOption<>("standalone", YesNoOmit.OMIT);
+      new EnumOption<>("standalone", YesNoOmit.OMIT, YES_NO);
   /** Serialization parameter: yes/no. */
   public static final EnumOption<YesNo> UNDECLARE_PREFIXES =
-      new EnumOption<>("undeclare-prefixes", YesNo.NO);
+      new EnumOption<>("undeclare-prefixes", YesNo.NO, YES_NO);
   /** Serialization parameter. */
   public static final StringOption USE_CHARACTER_MAPS =
-      new StringOption("use-character-maps", "");
+      new StringOption("use-character-maps", "", CHARACTER_MAPS);
   /** Serialization parameter. */
   public static final StringOption ITEM_SEPARATOR =
-      new StringOption("item-separator");
+      new StringOption("item-separator", null, Types.STRING_ZO);
   /** Serialization parameter (supported values depend on method). */
-  public static final StringOption VERSION =
-      new StringOption("version", "");
+  public static final StringOption VERSION = new StringOption("version", "", Types.STRING_ZO);
   /** Serialization parameter: 4.0/4.01/5.0. */
   public static final StringOption HTML_VERSION =
-      new StringOption("html-version", "");
+      new StringOption("html-version", "", Types.DECIMAL_ZO);
   /** Parameter document. */
   public static final StringOption PARAMETER_DOCUMENT =
-      new StringOption("parameter-document", "");
+      new StringOption("parameter-document", "", Types.STRING_ZO);
   /** Serialization parameter: xml/xhtml/html/text. */
   public static final EnumOption<YesNo> ALLOW_DUPLICATE_NAMES =
-      new EnumOption<>("allow-duplicate-names", YesNo.NO);
+      new EnumOption<>("allow-duplicate-names", YesNo.NO, YES_NO);
   /** Serialization parameter: xml/xhtml/html/text. */
   public static final EnumOption<SerialMethod> JSON_NODE_OUTPUT_METHOD =
-      new EnumOption<>("json-node-output-method", SerialMethod.XML);
+      new EnumOption<>("json-node-output-method", SerialMethod.XML, METHOD_TYPE);
   /** Serialization parameter: yes/no. */
   public static final EnumOption<YesNo> JSON_LINES =
-      new EnumOption<>("json-lines", YesNo.NO);
+      new EnumOption<>("json-lines", YesNo.NO, YES_NO);
   /** Serialization parameter: yes/no. */
-  public static final EnumOption<YesNo> CANONICAL =
-      new EnumOption<>("canonical", YesNo.NO);
+  public static final EnumOption<YesNo> CANONICAL = new EnumOption<>("canonical", YesNo.NO, YES_NO);
 
   /** Specific serialization parameter. */
   public static final OptionsOption<CsvOptions> CSV =
@@ -114,29 +119,26 @@ public final class SerializerOptions extends Options {
       new OptionsOption<>("json", new JsonSerialOptions());
   /** Serialization parameter: line ending (takes precedence over 'newline' if assigned). */
   public static final StringOption LINE_ENDING =
-      new StringOption("line-ending");
+      new StringOption("line-ending", null, Types.STRING_ZO);
   /** Specific serialization parameter: newline. */
   public static final EnumOption<Newline> NEWLINE =
       new EnumOption<>("newline",
-        "\r".equals(Prop.NL) ? Newline.CR : "\n".equals(Prop.NL) ? Newline.NL : Newline.CRNL);
+        "\r".equals(Prop.NL) ? Newline.CR : "\n".equals(Prop.NL) ? Newline.NL : Newline.CRNL,
+        Types.STRING_ZO);
   /** Serialization parameter: indentation unit (takes precedence over 'tabulator'/'indents'). */
   public static final StringOption INDENT_UNIT =
-      new StringOption("indent-unit");
+      new StringOption("indent-unit", null, Types.STRING_ZO);
   /** Specific serialization parameter: indent with spaces or tabs. */
-  public static final EnumOption<YesNo> TABULATOR =
-      new EnumOption<>("tabulator", YesNo.NO);
+  public static final EnumOption<YesNo> TABULATOR = new EnumOption<>("tabulator", YesNo.NO, YES_NO);
   /** Specific serialization parameter: number of spaces to indent. */
-  public static final NumberOption INDENTS =
-      new NumberOption("indents", 2);
+  public static final NumberOption INDENTS = new NumberOption("indents", 2);
   /** Specific serialization parameter: maximum number of bytes to serialize. */
-  public static final NumberOption LIMIT =
-      new NumberOption("limit", -1);
+  public static final NumberOption LIMIT = new NumberOption("limit", -1);
   /** Specific serialization parameter: binary serialization. */
-  public static final EnumOption<YesNo> BINARY =
-      new EnumOption<>("binary", YesNo.YES);
+  public static final EnumOption<YesNo> BINARY = new EnumOption<>("binary", YesNo.YES, YES_NO);
   /** Specific serialization parameter: attribute indentation. */
   public static final EnumOption<YesNo> INDENT_ATTRIBUTES =
-      new EnumOption<>("indent-attributes", YesNo.NO);
+      new EnumOption<>("indent-attributes", YesNo.NO, YES_NO);
 
   /** QName. */
   public static final QNm Q_ROOT = new QNm(OUTPUT_PREFIX, "serialization-parameters", OUTPUT_URI);

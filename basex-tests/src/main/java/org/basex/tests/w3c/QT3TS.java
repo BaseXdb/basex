@@ -775,7 +775,7 @@ public final class QT3TS extends Main {
           asString("serialize(., { 'method': 'xml' })", returned));
       if(expctd.equals(rslt)) return null;
       final String rtrnd = normNL(
-          asString("serialize(., { 'method': 'xml', 'omit-xml-declaration': 'no' })",
+          asString("serialize(., { 'method': 'xml', 'omit-xml-declaration': false() })",
           returned));
       if(expctd.equals(rtrnd)) return null;
 

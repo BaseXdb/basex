@@ -30,7 +30,7 @@ public final class JsonParserOptions extends JsonOptions {
   /** Option: validation (json-to-xml). */
   public static final BooleanOption VALIDATE = new BooleanOption("validate");
   /** Option: encoding (custom). */
-  public static final StringOption ENCODING = CommonOptions.ENCODING;
+  public static final StringOption ENCODING = new StringOption(CommonOptions.ENCODING);
 
   /** Number format. */
   public enum JsonNumberFormat {

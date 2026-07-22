@@ -9,6 +9,7 @@ import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.options.*;
@@ -43,7 +44,8 @@ public class CsvOptions extends Options {
   /** Option: trim-rows. */
   public static final BooleanOption TRIM_ROWS = new BooleanOption("trim-rows", false);
   /** Option: select-columns. */
-  public static final NumbersOption SELECT_COLUMNS = new NumbersOption("select-columns");
+  public static final NumbersOption SELECT_COLUMNS =
+      new NumbersOption("select-columns", POSITIVE_INTEGER_ZM);
 
   /** CSV formats. */
   public enum CsvFormat {
@@ -118,6 +120,10 @@ public class CsvOptions extends Options {
       // newlines are reserved for delimiting rows
       if(cp == '\n') throw CSV_NEWLINE_X.get(info, option.name());
       if(!chars.add(cp)) throw CSV_DELIMITER_X.get(info, value);
+    }
+    // required type is not enforced if the options are assigned as a string
+    for(final int column : get(SELECT_COLUMNS)) {
+      if(column < 1) throw typeError(Itr.get(column), BasicType.POSITIVE_INTEGER, info);
     }
   }
 

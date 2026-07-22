@@ -16,6 +16,5 @@ public final class UriOptions extends Options {
   public static final BooleanOption OMIT_DEFAULT_PORTS =
       new BooleanOption("omit-default-ports", false);
   /** Option. */
-  public static final BooleanOption UNC_PATH =
-      new BooleanOption("unc-path", false);
+  public static final BooleanOption UNC_PATH = new BooleanOption("unc-path", false);
 }

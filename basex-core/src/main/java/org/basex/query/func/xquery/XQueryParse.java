@@ -41,7 +41,7 @@ public final class XQueryParse extends StandardFunc {
     /** Pass on error info. */
     public static final BooleanOption PASS = new BooleanOption("pass", false);
     /** Query base-uri. */
-    public static final StringOption BASE_URI = CommonOptions.BASE_URI;
+    public static final StringOption BASE_URI = new StringOption(CommonOptions.BASE_URI);
   }
 
   @Override

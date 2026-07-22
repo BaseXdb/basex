@@ -1,10 +1,9 @@
 package org.basex.query.util;
 
-import static org.basex.util.Token.*;
+import static org.basex.query.value.type.Types.*;
 
 import java.text.*;
 
-import org.basex.query.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -19,26 +18,19 @@ import org.basex.util.options.*;
  */
 public final class DeepEqualOptions extends Options {
   /** Option: base-uri. */
-  public static final BooleanOption BASE_URI =
-      new BooleanOption("base-uri", false);
+  public static final BooleanOption BASE_URI = new BooleanOption("base-uri", false);
   /** Option: collation. */
-  public static final StringOption COLLATION =
-      new StringOption("collation");
+  public static final StringOption COLLATION = new StringOption("collation");
   /** Option: comments. */
-  public static final BooleanOption COMMENTS =
-      new BooleanOption("comments", false);
+  public static final BooleanOption COMMENTS = new BooleanOption("comments", false);
   /** Option: debug. */
-  public static final BooleanOption DEBUG =
-      new BooleanOption("debug", false);
+  public static final BooleanOption DEBUG = new BooleanOption("debug", false);
   /** Option: false-on-error. */
-  public static final BooleanOption FALSE_ON_ERROR =
-      new BooleanOption("false-on-error", false);
+  public static final BooleanOption FALSE_ON_ERROR = new BooleanOption("false-on-error", false);
   /** Option: id-property. */
-  public static final BooleanOption ID_PROPERTY =
-      new BooleanOption("id-property", false);
+  public static final BooleanOption ID_PROPERTY = new BooleanOption("id-property", false);
   /** Option: idrefs-property. */
-  public static final BooleanOption IDREFS_PROPERTY =
-      new BooleanOption("idrefs-property", false);
+  public static final BooleanOption IDREFS_PROPERTY = new BooleanOption("idrefs-property", false);
   /** Option: ignore-empty-entries. */
   public static final BooleanOption IGNORE_EMPTY_ENTRIES =
       new BooleanOption("ignore-empty-entries", false);
@@ -46,44 +38,35 @@ public final class DeepEqualOptions extends Options {
   public static final BooleanOption IN_SCOPE_NAMESPACES =
       new BooleanOption("in-scope-namespaces", false);
   /** Option: items-equal. */
-  public static final ValueOption ITEMS_EQUAL =
-      new ValueOption("items-equal", Types.FUNCTION_O);
+  public static final ValueOption ITEMS_EQUAL = new ValueOption("items-equal", Types.FUNCTION_O);
   /** Option: map-order. */
-  public static final BooleanOption MAP_ORDER =
-      new BooleanOption("map-order", false);
+  public static final BooleanOption MAP_ORDER = new BooleanOption("map-order", false);
   /** Option: namespace-prefixes. */
   public static final BooleanOption NAMESPACE_PREFIXES =
       new BooleanOption("namespace-prefixes", false);
   /** Option: nilled-property. */
-  public static final BooleanOption NILLED_PROPERTY =
-      new BooleanOption("nilled-property", false);
+  public static final BooleanOption NILLED_PROPERTY = new BooleanOption("nilled-property", false);
   /** Option: normalization-form. */
   public static final EnumOption<Normalizer.Form> NORMALIZATION_FORM =
-      new EnumOption<>("normalization-form", Normalizer.Form.class);
+      new EnumOption<>("normalization-form", Normalizer.Form.class, STRING_ZO);
   /** Option: normalize-space. */
-  public static final BooleanOption NORMALIZE_SPACE =
-      new BooleanOption("normalize-space", false);
+  public static final BooleanOption NORMALIZE_SPACE = new BooleanOption("normalize-space", false);
   /** Option: ordered. */
-  public static final BooleanOption ORDERED =
-      new BooleanOption("ordered", true);
+  public static final BooleanOption ORDERED = new BooleanOption("ordered", true);
   /** Option: processing-instructions. */
   public static final BooleanOption PROCESSING_INSTRUCTIONS =
       new BooleanOption("processing-instructions", false);
   /** Option: timezones. */
-  public static final BooleanOption TIMEZONES =
-      new BooleanOption("timezones", false);
+  public static final BooleanOption TIMEZONES = new BooleanOption("timezones", false);
   /** Option: type-annotations. */
-  public static final BooleanOption TYPE_ANNOTATIONS =
-      new BooleanOption("type-annotations", false);
+  public static final BooleanOption TYPE_ANNOTATIONS = new BooleanOption("type-annotations", false);
   /** Option: type-variety. */
-  public static final BooleanOption TYPE_VARIETY =
-      new BooleanOption("type-variety", true);
+  public static final BooleanOption TYPE_VARIETY = new BooleanOption("type-variety", true);
   /** Option: typed-values. */
-  public static final BooleanOption TYPED_VALUES =
-      new BooleanOption("typed-values", true);
+  public static final BooleanOption TYPED_VALUES = new BooleanOption("typed-values", true);
   /** Option: unordered-elements. */
-  public static final StringOption UNORDERED_ELEMENTS =
-      new StringOption("unordered-elements", "");
+  public static final ValueOption UNORDERED_ELEMENTS =
+      new ValueOption("unordered-elements", QNAME_ZM);
   /** Option: whitespace. */
   public static final EnumOption<Whitespace> WHITESPACE =
       new EnumOption<>("whitespace", Whitespace.PRESERVE);
@@ -107,14 +90,11 @@ public final class DeepEqualOptions extends Options {
    * Checks if the specified QName is among the unordered element names.
    * @param qname QName
    * @return element names
-   * @throws QueryException query exception
    */
-  public boolean unordered(final QNm qname) throws QueryException {
+  public boolean unordered(final QNm qname) {
     if(unordered == null) {
       unordered = new QNmSet();
-      for(final byte[] name : distinctTokens(token(get(UNORDERED_ELEMENTS)))) {
-        unordered.add(QNm.parse(name, null, null, null, null));
-      }
+      for(final Item name : get(UNORDERED_ELEMENTS)) unordered.add((QNm) name);
     }
     return unordered.contains(qname);
   }

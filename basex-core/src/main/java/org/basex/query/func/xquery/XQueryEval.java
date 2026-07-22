@@ -38,7 +38,7 @@ public class XQueryEval extends StandardFunc {
     /** Maximum amount of megabytes that may be allocated by the query. */
     public static final NumberOption MEMORY = new NumberOption("memory", 0);
     /** Query base-uri. */
-    public static final StringOption BASE_URI = CommonOptions.BASE_URI;
+    public static final StringOption BASE_URI = new StringOption(CommonOptions.BASE_URI);
     /** Pass on error info. */
     public static final BooleanOption PASS = new BooleanOption("pass", false);
   }

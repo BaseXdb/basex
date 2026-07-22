@@ -1,5 +1,6 @@
 package org.basex.query.util.format;
 
+import org.basex.query.value.type.*;
 import org.basex.util.options.*;
 
 /**
@@ -32,5 +33,6 @@ public final class DecFormatOptions extends Options {
   /** Decimal format property: pattern-separator. */
   public static final StringOption PATTERN_SEPARATOR = new StringOption("pattern-separator");
   /** Decimal format property: format-name. */
-  public static final StringOption FORMAT_NAME = new StringOption("format-name");
+  public static final StringOption FORMAT_NAME = new StringOption("format-name", null,
+      ChoiceItemType.get(BasicType.NCNAME, BasicType.QNAME).seqType(Occ.ZERO_OR_ONE));
 }

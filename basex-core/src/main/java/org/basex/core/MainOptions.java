@@ -195,7 +195,7 @@ public final class MainOptions extends Options {
     STEMMING, CASESENS, DIACRITICS, UPDINDEX, AUTOOPTIMIZE };
 
   /** Mapping of XML parsing options. */
-  private static final Map<Option<?>, Option<?>> XMLPARSINGMAP = new HashMap<>();
+  private static final Map<String, Option<?>> XMLPARSINGMAP = new HashMap<>();
   static {
     XMLPARSINGMAP.put(CommonOptions.INTPARSE, INTPARSE);
     XMLPARSINGMAP.put(CommonOptions.STRIP_SPACE, STRIPWS);
@@ -299,9 +299,13 @@ public final class MainOptions extends Options {
     this(false);
     XMLPARSINGMAP.forEach((source, target) -> {
       final Object value = options.get(source);
-      if(value != null) put(target, value);
+      if(value instanceof final CommonOptions.StripSpace ss) {
+        put(STRIPWS, ss == CommonOptions.StripSpace.ALL);
+      } else if(value != null) {
+        put(target, value);
+      }
     });
-    final Boolean t = options.get(CommonOptions.TRUSTED);
+    final Boolean t = (Boolean) options.get(CommonOptions.TRUSTED);
     if(parent == null) {
       resolver = null;
       trusted = t == Boolean.TRUE;

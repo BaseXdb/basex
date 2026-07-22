@@ -24,6 +24,9 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public abstract class Docs extends DynamicFn {
+  /** Prefix of the {@link CommonOptions#XSD_VALIDATION} value that selects a schema type. */
+  private static final String TYPE = "type ";
+
   /** Query input. */
   QueryInput queryInput;
 
@@ -97,26 +100,30 @@ public abstract class Docs extends DynamicFn {
   void check(final Options options, final boolean fragment, final QueryContext qc)
       throws QueryException {
 
-    final Predicate<BooleanOption> bool = o -> options.get(o) == Boolean.TRUE;
-    final boolean dtd = bool.test(CommonOptions.DTD) || bool.test(MainOptions.DTD);
-    final boolean xinclude = bool.test(CommonOptions.XINCLUDE) || bool.test(MainOptions.XINCLUDE);
+    final Predicate<String> bool = name -> options.get(name) == Boolean.TRUE;
+    final boolean dtd = bool.test(CommonOptions.DTD) || bool.test(MainOptions.DTD.name());
+    final boolean xinclude = bool.test(CommonOptions.XINCLUDE) ||
+        bool.test(MainOptions.XINCLUDE.name());
     final boolean intparse = fragment || bool.test(CommonOptions.INTPARSE) ||
-        bool.test(MainOptions.INTPARSE);
+        bool.test(MainOptions.INTPARSE.name());
     final boolean dtdVal = bool.test(CommonOptions.DTD_VALIDATION) ||
-        bool.test(MainOptions.DTDVALIDATION);
+        bool.test(MainOptions.DTDVALIDATION.name());
     String xsdVal = fragment ? CommonOptions.SKIP : options.get(MainOptions.XSDVALIDATION);
-    if(xsdVal == null) xsdVal = options.get(CommonOptions.XSD_VALIDATION);
+    if(xsdVal == null) xsdVal = (String) options.get(CommonOptions.XSD_VALIDATION);
     final boolean skip = CommonOptions.SKIP.equals(xsdVal);
     final boolean strict = CommonOptions.STRICT.equals(xsdVal);
     final boolean xsiLocation = !skip &&
-        (bool.test(CommonOptions.USE_XSI_SCHEMA_LOCATION) || bool.test(MainOptions.XSILOCATION));
+        (bool.test(CommonOptions.USE_XSI_SCHEMA_LOCATION) ||
+         bool.test(MainOptions.XSILOCATION.name()));
     if(dtd || xinclude || dtdVal || xsiLocation) checkPerm(qc, Perm.CREATE);
 
-    if(intparse) {
-      if(dtdVal) throw NODTDVALIDATION.get(info);
-      if(!skip) throw NOXSDVALIDATION_X.get(info, xsdVal);
-    } else if(!skip) {
-      if(!strict) throw INVALIDXSDOPT_X.get(info, xsdVal);
+    if(intparse && dtdVal) throw NODTDVALIDATION.get(info);
+    if(!skip) {
+      // reject unknown values before reporting the missing capability
+      if(!strict && !CommonOptions.LAX.equals(xsdVal) && !xsdVal.startsWith(TYPE))
+        throw INVALIDXSDOPT_X.get(info, xsdVal);
+      if(!strict) throw NOSCHEMAAWARENESS_X.get(info, '\'' + xsdVal + "' validation");
+      if(intparse) throw NOXSDVALIDATION_X.get(info, xsdVal);
       if(dtdVal) throw NOXSDANDDTD_X.get(info, xsdVal);
     }
   }

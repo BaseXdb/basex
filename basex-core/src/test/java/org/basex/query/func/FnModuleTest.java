@@ -981,11 +981,12 @@ public final class FnModuleTest extends SandboxTest {
     final String docWithExtDtd = write.apply("ext-dtd.xml",
         "<!DOCTYPE root SYSTEM 'validate.dtd'><root/>");
     write.apply("validate.dtd", "<!ELEMENT root (#PCDATA)>");
-    query(func.args(docWithExtDtd, " { 'dtd-validation': 'yes', 'trusted': true() }"), "<root/>");
-    error(func.args(docWithExtDtd, " { 'dtd-validation': 'yes', 'trusted': false() }"),
+    query(func.args(docWithExtDtd, " { 'dtd-validation': true(), 'trusted': true() }"), "<root/>");
+    error(func.args(docWithExtDtd, " { 'dtd-validation': true(), 'trusted': false() }"),
         EXTERNALRESOURCE_X);
-    error("xquery:eval(``[" + func.args(docWithExtDtd, " { 'dtd-validation': 'yes', 'trusted': true"
-        + "() }") + "]``, (), {'permission': 'read'})", XQUERY_PERM_X);
+    error("xquery:eval(``[" + func.args(docWithExtDtd,
+        " { 'dtd-validation': true(), 'trusted': true() }") + "]``, (), {'permission': 'read'})",
+        XQUERY_PERM_X);
 
     final String xincDoc = write.apply("xinclude.xml",
         "<?xml version='1.0'?>"
@@ -3181,20 +3182,22 @@ return
         + "<!ENTITY e SYSTEM '" + path + "'>]>";
     error(func.args(dtd + "<a>&amp;e;</a>", " { 'trusted': false() }"), EXTERNALRESOURCE_X);
     query(func.args(dtd + "<a>&amp;e;</a>", " { 'trusted': true() }"), "<a><b/></a>");
-    query(func.args(dtd + "<a>&amp;e;</a>", " { 'dtd': 'no' }"), "<a/>");
-    query(func.args(dtd + "<a>&amp;e;</a>", " { 'dtd': 'yes', 'trusted': true() }"), "<a><b/></a>");
-    query(func.args(dtd + "<b>&amp;e;</b>", " { 'dtd': 'yes', 'trusted': true() }"), "<b><b/></b>");
-    query(func.args(dtd + "<a><b/></a>", " { 'dtd-validation': 'yes' }"), "<a><b/></a>");
-    query(func.args(dtd + "<a>&amp;e;</a>", " { 'dtd-validation': 'no', 'trusted': true() }"),
+    query(func.args(dtd + "<a>&amp;e;</a>", " { 'dtd': false() }"), "<a/>");
+    query(func.args(dtd + "<a>&amp;e;</a>", " { 'dtd': true(), 'trusted': true() }"),
         "<a><b/></a>");
-    query(func.args(dtd + "<a>&amp;e;</a>", " { 'dtd-validation': 'yes', 'trusted': true() }"),
+    query(func.args(dtd + "<b>&amp;e;</b>", " { 'dtd': true(), 'trusted': true() }"),
+        "<b><b/></b>");
+    query(func.args(dtd + "<a><b/></a>", " { 'dtd-validation': true() }"), "<a><b/></a>");
+    query(func.args(dtd + "<a>&amp;e;</a>", " { 'dtd-validation': false(), 'trusted': true() }"),
         "<a><b/></a>");
-    query(func.args(dtd + "<a>&amp;e;</a>", " { 'dtd-validation': 'yes', 'dtd': 'yes', 'trusted': "
-        + "true() }"), "<a><b/></a>");
+    query(func.args(dtd + "<a>&amp;e;</a>", " { 'dtd-validation': true(), 'trusted': true() }"),
+        "<a><b/></a>");
+    query(func.args(dtd + "<a>&amp;e;</a>",
+        " { 'dtd-validation': true(), 'dtd': true(), 'trusted': true() }"), "<a><b/></a>");
     error(func.args("<!DOCTYPE root SYSTEM 'src/test/resources/validate.dtd'><root/>",
-        " { 'dtd-validation': 'yes', 'trusted': false() }"), EXTERNALRESOURCE_X);
+        " { 'dtd-validation': true(), 'trusted': false() }"), EXTERNALRESOURCE_X);
     query(func.args("<!DOCTYPE root SYSTEM 'src/test/resources/validate.dtd'><root/>",
-        " { 'dtd-validation': 'yes', 'trusted': true() }"), "<root/>");
+        " { 'dtd-validation': true(), 'trusted': true() }"), "<root/>");
     query(func.args("<root xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "
         + "xsi:noNamespaceSchemaLocation='src/test/resources/validate.xsd'/>",
         " { 'xsd-validation': 'strict', 'use-xsi-schema-location': true(), 'trusted': true() }"),
@@ -3202,7 +3205,7 @@ return
         + "xsi:noNamespaceSchemaLocation=\"src/test/resources/validate.xsd\"/>");
 
     query(func.args("<a xmlns:xi='http://www.w3.org/2001/XInclude'><xi:include href='" + path
-        + "'/></a>", " { 'xinclude': 'no' }"), "<a xmlns:xi=\"http://www.w3.org/2001/XInclude\">"
+        + "'/></a>", " { 'xinclude': false() }"), "<a xmlns:xi=\"http://www.w3.org/2001/XInclude\">"
         + "<xi:include href=\"" + path + "\"/></a>");
     error(func.args("<a xmlns:xi='http://www.w3.org/2001/XInclude'><xi:include href='" + path
         + "'/></a>", " { 'xinclude': true(), 'trusted': false() }"), EXTERNALRESOURCE_X);
@@ -3217,7 +3220,7 @@ return
         EXTERNALRESOURCE_X);
 
     error(func.args(dtd + "<b>&amp;e;</b>",
-        " { 'dtd-validation': 'yes', 'trusted': true() }"), DTDVALIDATIONERR_X);
+        " { 'dtd-validation': true(), 'trusted': true() }"), DTDVALIDATIONERR_X);
     error(func.args("<a xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "
         + "xsi:noNamespaceSchemaLocation='src/test/resources/validate.xsd'/>",
         " { 'xsd-validation': 'strict', 'use-xsi-schema-location': true(),"
@@ -3229,9 +3232,9 @@ return
   @Test public void parseXmlFragment() {
     final Function func = PARSE_XML_FRAGMENT;
     query(func.args("<x> <y> </y> </x> <z/>"), "<x> <y> </y> </x> <z/>");
-    query(func.args("<x> <y> </y> </x> <z/>", " { 'strip-space': 'no' }"),
+    query(func.args("<x> <y> </y> </x> <z/>", " { 'strip-space': false() }"),
         "<x> <y> </y> </x> <z/>");
-    query(func.args("<x> <y> </y> </x> <z/>", " { 'strip-space': 'yes' }"),
+    query(func.args("<x> <y> </y> </x> <z/>", " { 'strip-space': true() }"),
         "<x><y/></x><z/>");
     query(func.args("<x:doc xmlns:x='X'/>"), "<x:doc xmlns:x=\"X\"/>");
     query(func.args("<x:doc xmlns:x='X'/>", " { 'stripns': false() }"), "<x:doc xmlns:x=\"X\"/>");
@@ -3778,19 +3781,26 @@ return
     contains(func.args(" <x>a</x>", " { 'method': 'text' }"), "a");
 
     // character maps
-    query(func.args("1;2", " { 'use-character-maps': ';=,,' }"), "1,2");
     query(func.args("1;2", " { 'use-character-maps': { ';': ',' } }"), "1,2");
+    error(func.args("1;2", " { 'use-character-maps': ';=,,' }"), INVALIDOPTION_X_X_X_X);
 
     // boolean arguments
-    query(func.args("1", " { 'indent': 'yes' }"), 1);
     query(func.args("1", " { 'indent': false() }"), 1);
     query(func.args("1", " { 'indent': true() }"), 1);
-    query(func.args("1", " { 'indent': 1 }"), 1);
-    error(func.args("1", " { 'indent': 2 }"), INVALIDOPTION_X);
+    query(func.args("1", " { 'indent': xs:untypedAtomic('true') }"), 1);
+    query(func.args("1", " { 'indent': () }"), 1);
+    error(func.args("1", " { 'indent': 'yes' }"), INVALIDOPTION_X_X_X_X);
+    error(func.args("1", " { 'indent': 1 }"), INVALIDOPTION_X_X_X_X);
 
     query(func.args("<html/>", " { 'html-version': 5 }"), "&lt;html/&gt;");
     query(func.args("<html/>", " { 'html-version': 5.0 }"), "&lt;html/&gt;");
     query(func.args("<html/>", " { 'html-version': 5.0000 }"), "&lt;html/&gt;");
+    error(func.args("<html/>", " { 'html-version': '5.0' }"), INVALIDOPTION_X_X_X_X);
+
+    // QName arguments
+    query(func.args(" <a>1</a>", " { 'cdata-section-elements': xs:QName('a') }"),
+        "<a><![CDATA[1]]></a>");
+    error(func.args(" <a>1</a>", " { 'cdata-section-elements': 'a' }"), INVALIDOPTION_X_X_X_X);
 
     query("declare namespace p = 'Q';\n"
         + "declare option output:method 'text';\n"
@@ -4755,7 +4765,7 @@ return
   @Test public void xmlToJson() {
     final Function func = XML_TO_JSON;
     query(func.args(" <map xmlns='http://www.w3.org/2005/xpath-functions'>"
-        + "<string key=''>í</string></map>", " { 'indent' : 'no' }"), "{\"\":\"\u00ed\"}");
+        + "<string key=''>í</string></map>", " { 'indent': false() }"), "{\"\":\"\u00ed\"}");
     query(func.args(" <fn:string key='root'>X</fn:string>"), "\"X\"");
   }
 }

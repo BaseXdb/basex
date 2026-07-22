@@ -14,6 +14,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
@@ -30,12 +31,13 @@ public class FnParseXmlFragment extends Docs {
   /** Function options. */
   public static class ParseXmlFragmentOptions extends Options {
     /** Document node's base URI. */
-    public static final StringOption BASE_URI = CommonOptions.BASE_URI;
+    public static final StringOption BASE_URI =
+        new StringOption(CommonOptions.BASE_URI, null, Types.ANY_URI_O);
     /** Remove whitespace-only text nodes. */
-    public static final BooleanOption STRIP_SPACE = CommonOptions.STRIP_SPACE;
-
+    public static final BooleanOption STRIP_SPACE =
+        new BooleanOption(CommonOptions.STRIP_SPACE, false);
     /** Custom option (see {@link MainOptions#STRIPNS}). */
-    public static final BooleanOption STRIPNS = CommonOptions.STRIPNS;
+    public static final BooleanOption STRIPNS = new BooleanOption(CommonOptions.STRIPNS, false);
   }
 
   @Override
@@ -68,8 +70,8 @@ public class FnParseXmlFragment extends Docs {
 
     check(options, fragment, qc);
 
-    final String baseURI = options.contains(CommonOptions.BASE_URI) ?
-      options.get(CommonOptions.BASE_URI) : string(sc().baseURI().string());
+    final String baseURI = options.get(CommonOptions.BASE_URI) instanceof final String uri ? uri :
+      string(sc().baseURI().string());
     final String encoding = value instanceof Bin ? null : Strings.UTF8;
     final IO io = new IOContent(toBytes(value), baseURI, encoding);
 

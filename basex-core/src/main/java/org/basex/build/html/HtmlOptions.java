@@ -42,10 +42,10 @@ public final class HtmlOptions extends Options {
   public static final StringOption DOCTYPE_PUBLIC = new StringOption("doctype-public");
 
   /** Common option: encoding. */
-  public static final StringOption ENCODING = CommonOptions.ENCODING;
+  public static final StringOption ENCODING = new StringOption(CommonOptions.ENCODING);
   /** Common option: method. */
-  public static final EnumOption<HtmlParser.Method> METHOD = new EnumOption<>("method",
-      HtmlParser.Method.class);
+  public static final EnumOption<HtmlParser.Method> METHOD =
+      new EnumOption<>("method", HtmlParser.Method.class);
 
   /** fn:parse-html option: fail-on-error. */
   public static final BooleanOption FAIL_ON_ERROR = new BooleanOption("fail-on-error", false);

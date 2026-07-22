@@ -170,14 +170,14 @@ public final class CsvModuleTest extends SandboxTest {
         "A_\n1\n");
     serial("<csv><record><_>1</_></record></csv>", "'header': true(), 'lax': false()", "\n1\n");
     serial("<csv><record><A_0020B>1</A_0020B></record></csv>",
-        "'header': 'yes', 'lax': 'no'", "A B\n1\n");
+        "'header': 'yes', 'lax': false()", "A B\n1\n");
 
     serial("<csv><record><_A_>1</_A_></record></csv>", "'header': true(), 'lax': true()",
         "_A_\n1\n");
     serial("<csv><record><_>1</_></record></csv>", "'header': true(), 'lax': true()", "_\n1\n");
     serial("<csv><record><__>1</__></record></csv>", "'header': true(), 'lax': true()", "__\n1\n");
     serial("<csv><record><A_0020B>1</A_0020B></record></csv>",
-        "'header': 'yes', 'lax': 'yes'", "A_0020B\n1\n");
+        "'header': 'yes', 'lax': true()", "A_0020B\n1\n");
 
     serial("<csv/>", "", "");
 

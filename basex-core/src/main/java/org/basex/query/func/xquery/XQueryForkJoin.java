@@ -49,8 +49,7 @@ public final class XQueryForkJoin extends StandardFunc {
     }
 
     final Boolean results = options == Empty.UNDEFINED ? Boolean.TRUE :
-      options instanceof Value ? toOptions(options, new TaskOptions(), cc.qc).get(RESULTS) :
-      null;
+      options instanceof Value ? toOptions(options, new TaskOptions(), cc.qc).get(RESULTS) : null;
     if(results == Boolean.TRUE) {
       final FuncType ft = functions.funcType();
       if(ft != null) {

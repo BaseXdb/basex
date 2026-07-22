@@ -20,9 +20,9 @@ abstract class FileReadFn extends FileFn {
   /** Parse Options. */
   public static final class ParseOptions extends Options {
     /** Encoding option. */
-    public static final StringOption ENCODING = CommonOptions.ENCODING;
+    public static final StringOption ENCODING = new StringOption(CommonOptions.ENCODING);
     /** Fallback option. */
-    public static final BooleanOption FALLBACK = CommonOptions.FALLBACK;
+    public static final BooleanOption FALLBACK = new BooleanOption(CommonOptions.FALLBACK, false);
   }
 
   /**
