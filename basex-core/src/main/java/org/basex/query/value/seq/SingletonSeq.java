@@ -77,6 +77,11 @@ public final class SingletonSeq extends Seq {
   }
 
   @Override
+  public Value baseItems() {
+    return value.baseItems();
+  }
+
+  @Override
   protected Value subSeq(final long pos, final long length, final Job job) {
     return singleItem() ? get(value, length) : super.subSeq(pos, length, job);
   }

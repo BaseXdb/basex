@@ -73,7 +73,8 @@ public final class DynFuncCall extends FuncCall {
     final Expr func = body();
     // the call is nondeterministic if the invoked function is (a function item is a value and so
     // carries no flag of its own, hence the explicit check)
-    if(func.has(Flag.NDT) || func instanceof final Value value && containsNdtFunction(value)) {
+    if(func.has(Flag.NDT) ||
+        func instanceof final Value value && containsNdtFunction(value, cc.qc)) {
       ndt = true;
     }
 
@@ -139,10 +140,13 @@ public final class DynFuncCall extends FuncCall {
   /**
    * Checks if an expression contains a nondeterministic function item or closure.
    * @param expr expression
+   * @param qc query context
    * @return result of check
+   * @throws QueryException query exception
    */
-  public static boolean containsNdtFunction(final Expr expr) {
-    return expr instanceof final Value value ? containsNdtFunction(value) :
+  public static boolean containsNdtFunction(final Expr expr, final QueryContext qc)
+      throws QueryException {
+    return expr instanceof final Value value ? containsNdtFunction(value, qc) :
       !expr.accept(new ASTVisitor() {
         @Override
         public boolean funcItem(final FuncItem func) {
@@ -159,19 +163,30 @@ public final class DynFuncCall extends FuncCall {
   /**
    * Checks if a value contains a nondeterministic function item or closure.
    * @param value value
+   * @param qc query context
    * @return result of check
+   * @throws QueryException query exception
    */
-  private static boolean containsNdtFunction(final Value value) {
+  private static boolean containsNdtFunction(final Value value, final QueryContext qc)
+      throws QueryException {
     if(atomic(value.seqType())) return false;
+    // inspect the base items of repeated sequences (e.g. from fn:replicate)
+    final Value base = value.baseItems();
+    if(base != value) return containsNdtFunction(base, qc);
     for(final Item item : value) {
       if(item instanceof final FuncItem fi && fi.ndt()) return true;
       if(item instanceof final XQArray array && !atomic(array.funcType().declType)) {
-        for(final Value member : array.members()) {
-          if(containsNdtFunction(member)) return true;
+        if(array instanceof ItemArray) {
+          // all members share one backing sequence (e.g. a replicate): inspect it, not each member
+          if(containsNdtFunction(array.items(qc), qc)) return true;
+        } else {
+          for(final Value member : array.members()) {
+            if(containsNdtFunction(member, qc)) return true;
+          }
         }
       } else if(item instanceof final XQMap map && !atomic(map.funcType().declType)) {
         for(final XQMap.Entry entry : map.entries()) {
-          if(containsNdtFunction(entry.value())) return true;
+          if(containsNdtFunction(entry.value(), qc)) return true;
         }
       }
     }

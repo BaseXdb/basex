@@ -590,6 +590,45 @@ public final class NonDeterministicTest extends SandboxTest {
   }
 
   /**
+   * Checks that the nondeterminism check collapses repeated function sequences instead of walking
+   * them. Regression: a dynamic call on a large replicated array walked all members at compile
+   * time.
+   * <p>
+   * Requires {@code Value.baseItems} (overridden in {@code SingletonSeq} and {@code SubSeq}), and
+   * {@code containsNdtFunction} inspecting the backing of an {@code ItemArray} but the members of a
+   * multi-member array (so the members are not flattened).
+   */
+  @Test @Timeout(value = 60, threadMode = ThreadMode.SEPARATE_THREAD) public void largeFunctions() {
+    query("array { (1 to 100_000_000_000) ! identity#1 }(1)(42)", 42);
+    query("array { (1 to 100_000_000_000) ! (identity#1, abs#1) }(1)(1)", 1);
+    query("array { subsequence((1 to 100_000_000_000) ! (identity#1, abs#1), 3) }(1)(1)", 1);
+    query("[ (1 to 100_000_000_000) ! identity#1, (1 to 100_000_000_000) ! abs#1 ](1)[1](42)", 42);
+  }
+
+  /**
+   * Checks that a nondeterministic function item repeated across a large array is still detected,
+   * so its side effects are preserved when the enclosing for clause is collapsed.
+   * <p>
+   * Requires {@code Value.baseItems} to inspect the distinct members rather than skipping them.
+   */
+  @Test public void largeNdtFunctions() {
+    query("let $f := array { (1 to 300000) ! (function() { " + fileAppend() + " }, identity#1) } " +
+        "for $x in (1 to 2) return $f(1)()", "", "xx");
+  }
+
+  /**
+   * Checks that a nondeterministic function item in a member of a large multi-member array is still
+   * detected, so its side effects are preserved.
+   * <p>
+   * Guards the {@code members()} branch of {@code containsNdtFunction}: a multi-member array is not
+   * an {@code ItemArray}, so its members are inspected individually rather than flattened.
+   */
+  @Test public void squareArrayNdtFunction() {
+    query("let $f := [ (1 to 300000) ! function() { " + fileAppend() +
+        " }, (1 to 300000) ! identity#1 ] for $x in (1 to 2) return $f(1)[1]()", "", "xx");
+  }
+
+  /**
    * Returns a function call that records a single evaluation in the log.
    * @return file:append-text call
    */

@@ -35,6 +35,13 @@ public final class SubSeq extends Seq {
   }
 
   @Override
+  public Value baseItems() {
+    // collapse only if the underlying sequence collapses (e.g. a repetition), not a dense one
+    final Value base = sub.baseItems();
+    return base == sub ? this : base;
+  }
+
+  @Override
   protected Seq subSeq(final long pos, final long length, final Job job) {
     return new SubSeq(sub, start + pos, length);
   }

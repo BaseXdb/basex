@@ -395,7 +395,7 @@ public final class GFLWOR extends ParseExpr {
         if(last) {
           // merge with return expression unless a nondeterministic function is referenced
           //   for $c in 1 to 3 return $c → 1 to 3
-          if(!referencesNdtFunction(rtrn, c)) {
+          if(!referencesNdtFunction(rtrn, c, cc.qc)) {
             final Expr expr = inline(inline, rtrn, fl, cc);
             if(expr != null) {
               rtrn = expr;
@@ -443,12 +443,15 @@ public final class GFLWOR extends ParseExpr {
    * nondeterministic function item or closure.
    * @param expr expression
    * @param max index of the first clause that is not considered
+   * @param qc query context
    * @return result of check
+   * @throws QueryException query exception
    */
-  private boolean referencesNdtFunction(final Expr expr, final int max) {
+  private boolean referencesNdtFunction(final Expr expr, final int max, final QueryContext qc)
+      throws QueryException {
     for(int c = 0; c < max; c++) {
       if(clauses.get(c) instanceof final Let lt && expr.count(lt.var) != VarUsage.NEVER &&
-          DynFuncCall.containsNdtFunction(lt.expr)) return true;
+          DynFuncCall.containsNdtFunction(lt.expr, qc)) return true;
     }
     return false;
   }

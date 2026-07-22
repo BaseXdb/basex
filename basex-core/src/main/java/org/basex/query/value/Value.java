@@ -106,6 +106,14 @@ public abstract class Value extends Expr implements Iterable<Item> {
   public abstract Value unwrappedValue(QueryContext qc);
 
   /**
+   * Returns the base items, collapsing repetitions (e.g. from {@code fn:replicate}).
+   * @return base items (default: {@code this})
+   */
+  public Value baseItems() {
+    return this;
+  }
+
+  /**
    * Returns a subsequence with the given start and length.
    * The following properties must hold:
    * <ul>
