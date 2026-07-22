@@ -91,7 +91,8 @@ public final class StaticVar extends StaticDecl {
     try {
       return super.value(qc);
     } catch(final QueryException ex) {
-      ex.notCatchable();
+      // errors of lazy variables can surface anywhere: make them non-catchable
+      if(lazy) ex.notCatchable();
       // eagerly compute line/column so waiting threads see consistent values
       if(ex.info() != null) ex.info().init();
       error = ex;
@@ -178,8 +179,11 @@ public final class StaticVar extends StaticDecl {
    */
   private void rethrow() throws QueryException {
     final Throwable th = evalError;
-    if(th instanceof final QueryException ex) throw new QueryException(
-        ex.info(), ex.qname(), ex.getLocalizedMessage()).value(ex.value()).notCatchable();
+    if(th instanceof final QueryException ex) {
+      final QueryException qe = new QueryException(
+          ex.info(), ex.qname(), ex.getLocalizedMessage()).value(ex.value());
+      throw lazy ? qe.notCatchable() : qe;
+    }
     if(th instanceof final RuntimeException ex) throw ex;
     if(th instanceof final Error ex) throw ex;
     throw Util.notExpected(th);

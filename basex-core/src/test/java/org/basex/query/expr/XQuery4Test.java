@@ -532,6 +532,14 @@ public final class XQuery4Test extends SandboxTest {
         FUNERR1);
     // finally block must still run even for non-catchable errors
     error("declare %basex:lazy variable $x := error(); try { $x } finally { 1 }", FINALLY_X);
+
+    // errors of eager variables are catchable
+    query("declare variable $x := error(); try { $x } catch * { 1 }", 1);
+    query("declare variable $x := error(); try { $x } catch err:FOER0000 { 1 }", 1);
+    query("declare variable $x := local:f(); declare function local:f() { $x };"
+        + "try { $x } catch * { 1 }", 1);
+    query("declare variable $x := error(); (try { $x } catch * { 1 }, try { $x } catch * { 2 })",
+        "1\n2");
   }
 
   /** Eager vs. lazy evaluation of prolog variables. */
