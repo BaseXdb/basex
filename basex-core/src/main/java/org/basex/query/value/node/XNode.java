@@ -86,10 +86,10 @@ public abstract class XNode extends GNode {
 
   @Override
   public final int compare(final Item item, final Collation coll, final boolean transitive,
-      final InputInfo ii) throws QueryException {
+      final QueryContext qc, final InputInfo ii) throws QueryException {
     return item.type.isStringOrUntyped() ?
       Token.compare(string(), item.string(ii), Collation.get(coll, ii)) :
-      -item.compare(this, coll, transitive, ii);
+      -item.compare(this, coll, transitive, qc, ii);
   }
 
   @Override

@@ -101,13 +101,15 @@ public final class DTDur extends Dur {
    * Constructor for subtracting two date/time items.
    * @param date date item
    * @param sub date/time to be subtracted
+   * @param qc query context (can be {@code null}; supplies the implicit timezone)
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public DTDur(final ADate date, final ADate sub, final InputInfo info) throws QueryException {
+  public DTDur(final ADate date, final ADate sub, final QueryContext qc, final InputInfo info)
+      throws QueryException {
     super(BasicType.DAY_TIME_DURATION);
     // resolve the implicit timezone once, and only if an operand is missing one
-    final int implicit = date.hasTz() && sub.hasTz() ? 0 : ADate.implicitTz();
+    final int implicit = date.hasTz() && sub.hasTz() ? 0 : ADate.implicitTz(qc);
     seconds = date.toSeconds(implicit).subtract(sub.toSeconds(implicit));
     final double d = seconds.doubleValue();
     if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw SECRANGE_X.get(info, d);
@@ -141,9 +143,9 @@ public final class DTDur extends Dur {
 
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
-      final InputInfo ii) throws QueryException {
+      final QueryContext qc, final InputInfo ii) throws QueryException {
     return item.type == type ? seconds.subtract(((Dur) item).seconds).signum() :
-      super.compare(item, coll, transitive, ii);
+      super.compare(item, coll, transitive, qc, ii);
   }
 
   /**

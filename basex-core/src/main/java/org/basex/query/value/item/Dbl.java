@@ -110,9 +110,9 @@ public final class Dbl extends ANum {
 
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
-      final InputInfo ii) throws QueryException {
+      final QueryContext qc, final InputInfo ii) throws QueryException {
     return item.type.instanceOf(BasicType.DECIMAL) ?
-      -item.compare(this, coll, transitive, ii) :
+      -item.compare(this, coll, transitive, qc, ii) :
       compare(value, item.dbl(ii), transitive);
   }
 

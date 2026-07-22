@@ -103,7 +103,7 @@ public final class Bln extends Item {
 
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
-      final InputInfo ii) throws QueryException {
+      final QueryContext qc, final InputInfo ii) throws QueryException {
     final boolean b = item.type == BasicType.BOOLEAN ? item.bool(ii) : parse(item, ii);
     return value == b ? 0 : b ? -1 : 1;
   }

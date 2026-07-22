@@ -202,7 +202,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public boolean atomicEqual(final Item item) throws QueryException {
-    return this == item || comparable(item) && compare(item, null, false, null) == 0;
+    return this == item || comparable(item) && compare(item, null, false, null, null) == 0;
   }
 
   /**
@@ -210,12 +210,13 @@ public abstract class Item extends Value {
    * @param item item to be compared
    * @param coll collation (can be {@code null})
    * @param transitive transitive comparison
+   * @param qc query context (can be {@code null}; supplies the implicit timezone)
    * @param ii input info (can be {@code null})
    * @return difference
    * @throws QueryException query exception
    */
-  public abstract int compare(Item item, Collation coll, boolean transitive, InputInfo ii)
-      throws QueryException;
+  public abstract int compare(Item item, Collation coll, boolean transitive, QueryContext qc,
+      InputInfo ii) throws QueryException;
 
   /**
    * Returns an input stream.

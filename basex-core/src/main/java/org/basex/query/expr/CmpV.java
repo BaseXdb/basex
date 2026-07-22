@@ -92,7 +92,7 @@ public final class CmpV extends Cmp {
     if(item1 == Empty.VALUE) return Empty.VALUE;
     final Item item2 = exprs[1].atomItem(qc, info);
     if(item2 == Empty.VALUE) return Empty.VALUE;
-    return Bln.get(test(item1, item2));
+    return Bln.get(test(item1, item2, qc));
   }
 
   @Override
@@ -102,18 +102,20 @@ public final class CmpV extends Cmp {
     if(item1 == Empty.VALUE) return false;
     final Item item2 = exprs[1].atomItem(qc, info);
     if(item2 == Empty.VALUE) return false;
-    return test(item1, item2);
+    return test(item1, item2, qc);
   }
 
   /**
    * Performs the test.
    * @param item1 first item
    * @param item2 second item
+   * @param qc query context
    * @return result of check
    * @throws QueryException query exception
    */
-  private boolean test(final Item item1, final Item item2) throws QueryException {
-    if(item1.comparable(item2)) return op.eval(item1.compare(item2, null, false, info));
+  private boolean test(final Item item1, final Item item2, final QueryContext qc)
+      throws QueryException {
+    if(item1.comparable(item2)) return op.eval(item1.compare(item2, null, false, qc, info));
     throw compareError(item1, item2, info);
   }
 

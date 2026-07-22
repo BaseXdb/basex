@@ -87,7 +87,7 @@ public final class Uln extends ANum {
 
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
-      final InputInfo ii) throws QueryException {
+      final QueryContext qc, final InputInfo ii) throws QueryException {
     return item instanceof final Uln uln ? value.compareTo(uln.value) :
       compare(item, transitive, ii);
   }

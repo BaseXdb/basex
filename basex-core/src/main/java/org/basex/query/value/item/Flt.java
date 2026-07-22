@@ -110,10 +110,10 @@ public final class Flt extends ANum {
 
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
-      final InputInfo ii) throws QueryException {
+      final QueryContext qc, final InputInfo ii) throws QueryException {
     final float f = item.flt(ii);
     return item.type.instanceOf(BasicType.DECIMAL) || item instanceof Dbl ?
-      -item.compare(this, coll, transitive, ii) :
+      -item.compare(this, coll, transitive, qc, ii) :
       Dbl.compare(value, Float.isInfinite(f) ? item.dbl(ii) : f, transitive);
   }
 

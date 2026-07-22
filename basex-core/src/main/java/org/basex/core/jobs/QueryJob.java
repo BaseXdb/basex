@@ -189,7 +189,7 @@ public final class QueryJob extends Job implements Runnable {
     // time (minutes past the hour)
     if(start instanceof final Itr itr) {
       long ms = itr.itr() * 60000;
-      ms -= qdt.time.daySeconds().multiply(Dec.BD_1000).longValue();
+      ms -= qdt.time.daySeconds(qdt.zone).multiply(Dec.BD_1000).longValue();
       while(ms <= min) ms += 3600000;
       return ms;
     }
@@ -198,9 +198,9 @@ public final class QueryJob extends Job implements Runnable {
     // absolute wall-clock target: reproject the delta through the time zone so DST is respected
     long ms;
     if(start instanceof final Dtm dtm) {
-      ms = new DTDur(dtm, qdt.datm, info).ms(info);
+      ms = new DTDur(dtm, qdt.datm, null, info).ms(info);
     } else {
-      ms = new DTDur((Tim) start, qdt.time, info).ms(info);
+      ms = new DTDur((Tim) start, qdt.time, null, info).ms(info);
       while(ms <= min) ms += 86400000;
     }
     final ZoneId zone = ZoneId.systemDefault();

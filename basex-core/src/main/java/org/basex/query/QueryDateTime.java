@@ -2,7 +2,6 @@ package org.basex.query;
 
 import static org.basex.util.Token.*;
 
-import java.math.*;
 import java.time.*;
 
 import org.basex.query.value.item.*;
@@ -22,8 +21,8 @@ public final class QueryDateTime {
   public Dtm datm;
   /** Current Time. */
   public Tim time;
-  /** Current timezone. */
-  public DTDur zone;
+  /** Current timezone, in minutes. */
+  public int zone;
   /** Current nanoseconds. */
   public long nano;
 
@@ -38,7 +37,7 @@ public final class QueryDateTime {
     time = new Tim(token(hms + zon), null);
     date = new Dat(token(ymd + zon), null);
     datm = new Dtm(token(ymd + 'T' + hms + zon), BasicType.DATE_TIME_STAMP, null);
-    zone = new DTDur(BigDecimal.valueOf(zdt.getOffset().getTotalSeconds()));
+    zone = zdt.getOffset().getTotalSeconds() / 60;
     nano = System.nanoTime();
   }
 }

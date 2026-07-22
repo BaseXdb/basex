@@ -111,9 +111,10 @@ public enum Calc {
           default      -> subtractDec(item1, item2, info);
         };
       } else if(type1.instanceOf(DATE_TIME) && type2.instanceOf(DATE_TIME)) {
-        return new DTDur((ADate) item1, (ADate) item2, info);
+        // no query context available: implicit timezone is taken from the system clock
+        return new DTDur((ADate) item1, (ADate) item2, null, info);
       } else if(type1 == type2) {
-        if(type1.oneOf(DATE, TIME)) return new DTDur((ADate) item1, (ADate) item2, info);
+        if(type1.oneOf(DATE, TIME)) return new DTDur((ADate) item1, (ADate) item2, null, info);
         if(type1 == DAY_TIME_DURATION) return new DTDur((DTDur) item1, (DTDur) item2, false, info);
         if(type1 == YEAR_MONTH_DURATION)
           return new YMDur((YMDur) item1, (YMDur) item2, false, info);

@@ -101,8 +101,8 @@ public final class YMDur extends Dur {
 
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
-      final InputInfo ii) throws QueryException {
+      final QueryContext qc, final InputInfo ii) throws QueryException {
     return item.type == type ? Long.compare(months, ((Dur) item).months) :
-      super.compare(item, coll, transitive, ii);
+      super.compare(item, coll, transitive, qc, ii);
   }
 }

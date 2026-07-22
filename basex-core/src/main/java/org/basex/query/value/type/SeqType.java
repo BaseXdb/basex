@@ -343,7 +343,7 @@ public final class SeqType {
     // relabeling is no cast: if the value is outside the value space, a type error is raised
     final boolean lenient = type instanceof EnumType || relabel != null;
     final Item cast = (Item) cast(item, !lenient, qc, info);
-    return cast != null && (relabel == null || cast.compare(relabel, null, false, info) == 0) ?
+    return cast != null && (relabel == null || cast.compare(relabel, null, false, qc, info) == 0) ?
         cast : null;
   }
 

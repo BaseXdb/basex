@@ -29,7 +29,7 @@ public final class HofTopKBy extends StandardFunc {
     final MinHeap<Item, Item> heap = new MinHeap<>((item1, item2) -> {
       try {
         if(!item1.comparable(item2)) throw compareError(item1, item2, info);
-        return item1.compare(item2, null, true, info);
+        return item1.compare(item2, null, true, qc, info);
       } catch(final QueryException ex) {
         throw new QueryRTException(ex);
       }

@@ -248,7 +248,7 @@ public abstract class ADate extends ADateDur {
 
   /**
    * Creates a new item with an adjusted timezone.
-   * @param dur duration to add to the timezone (if {@code null}, assign implicit timezone)
+   * @param dur duration to add to the timezone (ignored if {@code undefined} is set)
    * @param undefined invalidate timezone
    * @param info input info (can be {@code null})
    * @return new item
@@ -259,7 +259,7 @@ public abstract class ADate extends ADateDur {
 
   /**
    * Adjusts the timezone.
-   * @param dur duration to add to the timezone (if {@code null}, assign implicit timezone)
+   * @param dur duration to add to the timezone (ignored if {@code undefined} is set)
    * @param undefined invalidate timezone
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
@@ -271,13 +271,9 @@ public abstract class ADate extends ADateDur {
       t = Short.MAX_VALUE;
       defined &= ~ZON;
     } else {
-      if(dur == null) {
-        t = (short) implicitTz();
-      } else {
-        t = (short) (dur.minute() + dur.hour() * 60);
-        if(dur.seconds().signum() != 0) throw ZONESEC_X.get(info, dur);
-        if(Math.abs(t) > 60 * 14 || dur.day() != 0) throw INVALIDZONE_X.get(info, dur);
-      }
+      t = (short) (dur.minute() + dur.hour() * 60);
+      if(dur.seconds().signum() != 0) throw ZONESEC_X.get(info, dur);
+      if(Math.abs(t) > 60 * 14 || dur.day() != 0) throw INVALIDZONE_X.get(info, dur);
 
       // change time if two competing time zones exist
       if(has(ZON)) add(BigDecimal.valueOf(60L * (t - tz)), info);
@@ -438,14 +434,15 @@ public abstract class ADate extends ADateDur {
   @Override
   public final boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
     return (type.instanceOf(item.type) || item.type.instanceOf(type))
-        && compare(item, deep.info) == 0
+        && compare(item, deep.qc, deep.info) == 0
         && (!deep.options.get(DeepEqualOptions.TIMEZONES) || tz == ((ADate) item).tz);
   }
 
   @Override
   public final boolean atomicEqual(final Item item) throws QueryException {
+    // the timezones are compared first: the implicit timezone is never required afterwards
     return this == item || (type.instanceOf(item.type) || item.type.instanceOf(type))
-        && compare(item, null) == 0 && hasTz() == ((ADate) item).hasTz();
+        && hasTz() == ((ADate) item).hasTz() && compare(item, null, null) == 0;
   }
 
   @Override
@@ -457,22 +454,25 @@ public abstract class ADate extends ADateDur {
 
   @Override
   public final int compare(final Item item, final Collation coll, final boolean transitive,
-      final InputInfo ii) throws QueryException {
-    return compare(item, ii);
+      final QueryContext qc, final InputInfo ii) throws QueryException {
+    return compare(item, qc, ii);
   }
 
   /**
    * Compares the current and the specified item.
-   * See {@link Item#compare(Item, Collation, boolean, InputInfo)}.
+   * See {@link Item#compare(Item, Collation, boolean, QueryContext, InputInfo)}.
    * @param item item to be compared
+   * @param qc query context (can be {@code null})
    * @param info input info (can be {@code null})
    * @return result of comparison (-1, 0, 1)
    * @throws QueryException query exception
    */
-  private int compare(final Item item, final InputInfo info) throws QueryException {
-    final ADate dat = (ADate) (item instanceof ADate ? item : type.cast(item, null, info));
-    // resolve the implicit timezone once, and only if an operand is missing one
-    final int implicit = has(ZON) && dat.has(ZON) ? 0 : implicitTz();
+  private int compare(final Item item, final QueryContext qc, final InputInfo info)
+      throws QueryException {
+    final ADate dat = (ADate) (item instanceof ADate ? item : type.cast(item, qc, info));
+    // resolve the implicit timezone only if exactly one operand has a timezone: if both have or
+    // lack one, it is either unused or cancels out in the comparison
+    final int implicit = has(ZON) == dat.has(ZON) ? 0 : implicitTz(qc);
     return toSeconds(implicit).compareTo(dat.toSeconds(implicit));
   }
 
@@ -500,32 +500,25 @@ public abstract class ADate extends ADateDur {
 
   /**
    * Returns the seconds of one day.
-   * @return seconds
-   */
-  public final BigDecimal daySeconds() {
-    return daySeconds(implicitTz());
-  }
-
-  /**
-   * Returns the seconds of one day.
    * @param implicit implicit timezone in minutes, applied if the item has none
    * @return seconds
    */
-  private BigDecimal daySeconds(final int implicit) {
+  public final BigDecimal daySeconds(final int implicit) {
     final int z = has(ZON) ? tz : implicit;
     return seconds().add(BigDecimal.valueOf(
         (has(HRS) ? hour : 0) * 3600L + (has(MIN) ? minute : 0) * 60L - z * 60L));
   }
 
   /**
-   * Returns the implicit timezone, i.e. the offset of the system timezone, in minutes.
-   * Resolved per call: the value of the query context ({@link QueryDateTime#zone}, returned by
-   * {@code fn:implicit-timezone}) is not available here, so both can differ if the offset changes
-   * while a query is running.
+   * Returns the implicit timezone in minutes.
+   * Without a query context, the offset of the system timezone is resolved per call, and can
+   * differ from {@code fn:implicit-timezone} if it changes while a query is running.
+   * @param qc query context (can be {@code null})
    * @return offset
+   * @throws QueryException query exception
    */
-  static int implicitTz() {
-    return DateTime.offset(System.currentTimeMillis()) / 60;
+  static int implicitTz(final QueryContext qc) throws QueryException {
+    return qc != null ? qc.dateTime().zone : DateTime.offset(System.currentTimeMillis()) / 60;
   }
 
   /**

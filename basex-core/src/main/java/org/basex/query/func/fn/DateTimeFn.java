@@ -38,9 +38,11 @@ abstract class DateTimeFn extends StandardFunc {
     if(value.isEmpty()) return Empty.VALUE;
 
     final ADate date = toDate(value, type, qc);
-    final boolean empty = zone.isEmpty();
-    final DTDur dur = empty ? null : (DTDur) checkType(zone, DAY_TIME_DURATION);
-    return date.timeZone(dur, defined(1) && empty, info);
+    final boolean empty = zone.isEmpty(), undefined = defined(1) && empty;
+    // without a zone argument, the implicit timezone of the query is assigned
+    final DTDur dur = !empty ? (DTDur) checkType(zone, DAY_TIME_DURATION) :
+      undefined ? null : new DTDur(0, qc.dateTime().zone);
+    return date.timeZone(dur, undefined, info);
   }
 
   @Override

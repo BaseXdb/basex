@@ -28,7 +28,7 @@ public final class FnIndexOf extends StandardFunc {
       public Itr next() throws QueryException {
         for(Item item; (item = qc.next(input)) != null;) {
           ++c;
-          if(item.comparable(search) && item.compare(search, collation, false, info) == 0) {
+          if(item.comparable(search) && item.compare(search, collation, false, qc, info) == 0) {
             return Itr.get(c);
           }
         }
