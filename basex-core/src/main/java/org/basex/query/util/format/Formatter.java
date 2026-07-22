@@ -28,6 +28,21 @@ public abstract class Formatter extends FormatUtil {
   private static final byte[] MIL = token("YXWVUTSRQPONZABCDEFGHIKLM");
   /** Token: n. */
   private static final byte[] N = cpToken('n');
+  /** Token: 1. */
+  private static final byte[] ONE = cpToken('1');
+  /** Presentation modifier: two digits. */
+  private static final byte[] TWO_DIGITS = token("01");
+  /** Presentation modifier: timezone. */
+  private static final byte[] ZONE_DIGITS = token("01:01");
+  /** Default digit pattern of a timezone component. */
+  private static final byte[] ZONE_PATTERN = token("00");
+  /** Components that are not available in times. */
+  private static final byte[] DATE_COMPONENTS = token("YMDdFWwE");
+  /** Components that are not available in dates. */
+  private static final byte[] TIME_COMPONENTS = token("HhPmsf");
+  /** Japanese factors (kanji offset: 10 + array index). */
+  private static final long[] JAPANESE = { 10, 100, 1000, 10000, 100000000L, 1000000000000L,
+    10000000000000000L };
   /** Allowed calendars. */
   private static final byte[][] CALENDARS = tokens(
     "ISO", "AD", "AH", "AME", "AM", "AP", "AS", "BE", "CB", "CE", "CL", "CS", "EE", "FE",
@@ -146,200 +161,212 @@ public abstract class Formatter extends FormatUtil {
 
     final TokenBuilder tb = new TokenBuilder();
     if(languageTag.length != 0 && !available(languageTag)) tb.add("[Language: en]");
-    if(calendar != null) {
-      final QNm qnm;
-      try {
-        qnm = QNm.parse(trim(calendar), null, info.sc());
-      } catch(final QueryException ex) {
-        Util.debug(ex);
-        throw CALWHICH_X.get(info, calendar);
-      }
-      if(qnm.uri().length == 0) {
-        int c = -1;
-        final byte[] ln = qnm.local();
-        final int cl = CALENDARS.length;
-        while(++c < cl && !eq(CALENDARS[c], ln));
-        if(c == cl) throw CALWHICH_X.get(info, calendar);
-        if(c > 1) tb.add("[Calendar: AD]");
-      }
-    }
+    if(calendar != null && !supported(calendar, info)) tb.add("[Calendar: AD]");
+
+    // adopt IANA timezone, and remember its name (standard time for xs:time, otherwise DST-aware)
     ADate date = dt;
     byte[] zone = null;
-    if(contains(place, '/')) { // IANA time zone name
-      try {
-        final ZoneId id = ZoneId.of(string(place));
-        final ZoneRules rules = id.getRules();
-        final boolean time = dt.type == BasicType.TIME;
-        final Instant instant = time ? Instant.now() :
-          dt.toLocalDateTime().atZone(zoneId(dt)).toInstant();
-        final ZoneOffset offset = time ? rules.getStandardOffset(instant) :
-          rules.getOffset(instant);
-        date = dt.timeZone(DTDur.get(offset.getTotalSeconds() * 1000L), false, info);
-        // timezone name (standard time for xs:time, otherwise DST-aware; e.g. EST, CEST)
-        final Locale locale = languageTag.length == 0 ? Locale.ENGLISH :
-          Locale.forLanguageTag(string(languageTag));
-        final boolean dst = !time && rules.isDaylightSavings(instant);
-        zone = token(TimeZone.getTimeZone(id).getDisplayName(dst, TimeZone.SHORT, locale));
-      } catch(final ZoneRulesException ex) {
-        // not a supported IANA time zone
-        Util.debug(ex);
-      }
+    final ZoneId id = zoneId(place);
+    if(id != null) {
+      final ZoneRules rules = id.getRules();
+      final boolean time = dt.type == BasicType.TIME;
+      final Instant instant = time ? Instant.now() :
+        dt.toLocalDateTime().atZone(zoneId(dt)).toInstant();
+      final ZoneOffset offset = time ? rules.getStandardOffset(instant) : rules.getOffset(instant);
+      date = dt.timeZone(DTDur.get(offset.getTotalSeconds() * 1000L), false, info);
+      final Locale locale = languageTag.length == 0 ? Locale.ENGLISH :
+        Locale.forLanguageTag(string(languageTag));
+      zone = token(TimeZone.getTimeZone(id).getDisplayName(
+        !time && rules.isDaylightSavings(instant), TimeZone.SHORT, locale));
     }
 
     final DateParser dp = new DateParser(info, picture);
     while(dp.more()) {
       final int ch = dp.literal();
-      if(ch == -1) {
-        // retrieve variable marker
-        final byte[] marker = dp.marker();
-        if(marker.length == 0) throw PICDATE_X.get(info, picture);
-
-        // parse component specifier
-        final int compSpec = ch(marker, 0);
-        byte[] pres = cpToken('1');
-        boolean max = false;
-        BigDecimal frac = null;
-        long num = 0;
-
-        final Type type = date.type;
-        final boolean dat = type == BasicType.DATE, tim = type == BasicType.TIME;
-        boolean err = false;
-        switch(compSpec) {
-          case 'Y' -> {
-            num = Math.abs(date.yea());
-            max = true;
-            err = tim;
-          }
-          case 'M' -> {
-            num = date.mon();
-            err = tim;
-          }
-          case 'D' -> {
-            num = date.day();
-            err = tim;
-          }
-          case 'd' -> {
-            final long y = date.yea();
-            for(int m = (int) date.mon(); --m >= 1;) num += ADate.daysOfMonth(y, m);
-            num += date.day();
-            err = tim;
-          }
-          case 'F' -> {
-            num = date.toLocalDate().getDayOfWeek().getValue();
-            pres = N;
-            err = tim;
-          }
-          case 'W' -> {
-            num = date.toLocalDate().get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
-            err = tim;
-          }
-          case 'w' -> {
-            final TemporalField wom = WeekFields.ISO.weekOfMonth();
-            final LocalDate ld = date.toLocalDate();
-            num = ld.get(wom);
-            // first week of month: use last week of previous month, according to ISO 8601
-            if(num == 0) num = ld.minusDays(ld.getDayOfMonth()).get(wom);
-            err = tim;
-          }
-          case 'H' -> {
-            num = date.hour();
-            err = dat;
-          }
-          case 'h' -> {
-            num = date.hour() % 12;
-            if(num == 0) num = 12;
-            err = dat;
-          }
-          case 'P' -> {
-            num = date.hour() / 12;
-            pres = N;
-            err = dat;
-          }
-          case 'm' -> {
-            num = date.minute();
-            pres = token("01");
-            err = dat;
-          }
-          case 's' -> {
-            num = date.seconds().intValue();
-            pres = token("01");
-            err = dat;
-          }
-          case 'f' -> {
-            frac = date.seconds().remainder(BigDecimal.ONE);
-            err = dat;
-          }
-          case 'Z', 'z' -> {
-            num = date.tz();
-            pres = token("01:01");
-          }
-          case 'C' -> pres = N;
-          case 'E' -> {
-            num = date.yea();
-            pres = N;
-            err = tim;
-          }
-          default -> throw INVCOMPSPEC_X.get(info, marker);
-        }
-        if(err) throw PICINVCOMP_X_X_X.get(info, marker, type, date);
-        if(pres == null) continue;
-
-        // parse presentation modifier(s) and width modifier
-        final DateFormat fp = new DateFormat(substring(marker, 1), pres, frac != null, info);
-        if(max) {
-          // year: reduce value modulo ten to the power N (see: Formatting the Year Component)
-          int n = fp.max;
-          if(n == Integer.MAX_VALUE && zeroes(fp.first) != -1) {
-            // decimal-digit-pattern: number of mandatory and optional digit signs, if 2 or more
-            int w = 0;
-            final int fl = fp.primary.length;
-            for(int f = 0; f < fl; f += cl(fp.primary, f)) {
-              final int cp = ch(fp.primary, f);
-              if(cp == '#' || zeroes(cp) != -1) w++;
-            }
-            if(w > 1) n = w;
-          }
-          if(n > 0 && n < 19) {
-            long p = 1;
-            while(n-- > 0) p *= 10;
-            num %= p;
-          }
-        }
-
-        if(compSpec == 'z' || compSpec == 'Z') {
-          // output timezone (as name if requested via 'N' and a place is known)
-          tb.add(fp.first == 'n' && zone != null ? zone : formatZone((int) num, fp, marker));
-        } else if(fp.first == 'n') {
-          // output name representation
-          byte[] in = switch(compSpec) {
-            case 'M' -> month((int) num - 1, fp.min, fp.max);
-            case 'F' -> day((int) num - 1, fp.min, fp.max);
-            case 'P' -> ampm(num == 0);
-            case 'C' -> calendar();
-            case 'E' -> era((int) num);
-            default -> null;
-          };
-          if(in != null) {
-            if(fp.cs == Case.LOWER) in = lc(in);
-            if(fp.cs == Case.UPPER) in = uc(in);
-            tb.add(in);
-          } else {
-            // fallback representation
-            fp.first = '0';
-            fp.primary = cpToken('1');
-            tb.add(formatInt(num, fp));
-          }
-        } else if(frac != null) {
-          tb.add(formatFrac(frac, fp));
-        } else {
-          tb.add(formatInt(num, fp));
-        }
-      } else {
+      if(ch != -1) {
         // print literal
         tb.add(ch);
+      } else {
+        // retrieve and format variable marker
+        final byte[] marker = dp.marker();
+        if(marker.length == 0) throw PICDATE_X.get(info, picture);
+        tb.add(component(marker, date, zone, info));
       }
     }
     return tb.finish();
+  }
+
+  /**
+   * Formats a variable marker of a date picture.
+   * @param marker variable marker
+   * @param date date
+   * @param zone timezone name (can be {@code null})
+   * @param info input info (can be {@code null})
+   * @return formatted component
+   * @throws QueryException query exception
+   */
+  private byte[] component(final byte[] marker, final ADate date, final byte[] zone,
+      final InputInfo info) throws QueryException {
+
+    // reject components that are not available in the supplied value
+    final int comp = ch(marker, 0);
+    final Type type = date.type;
+    final byte[] rejected = type == BasicType.DATE ? TIME_COMPONENTS :
+      type == BasicType.TIME ? DATE_COMPONENTS : EMPTY;
+    if(indexOf(rejected, comp) != -1) throw PICINVCOMP_X_X_X.get(info, marker, type, date);
+
+    // evaluate component, choose default presentation modifier
+    byte[] pres = ONE;
+    BigDecimal frac = null;
+    long num = 0;
+    switch(comp) {
+      case 'Y' -> num = Math.abs(date.yea());
+      case 'M' -> num = date.mon();
+      case 'D' -> num = date.day();
+      case 'd' -> {
+        final long year = date.yea();
+        for(int m = (int) date.mon(); --m >= 1;) num += ADate.daysOfMonth(year, m);
+        num += date.day();
+      }
+      case 'F' -> {
+        num = date.toLocalDate().getDayOfWeek().getValue();
+        pres = N;
+      }
+      case 'W' -> num = date.toLocalDate().get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
+      case 'w' -> {
+        final TemporalField wom = WeekFields.ISO.weekOfMonth();
+        final LocalDate ld = date.toLocalDate();
+        num = ld.get(wom);
+        // first week of month: use last week of previous month, according to ISO 8601
+        if(num == 0) num = ld.minusDays(ld.getDayOfMonth()).get(wom);
+      }
+      case 'H' -> num = date.hour();
+      case 'h' -> {
+        num = date.hour() % 12;
+        if(num == 0) num = 12;
+      }
+      case 'P' -> {
+        num = date.hour() / 12;
+        pres = N;
+      }
+      case 'm' -> {
+        num = date.minute();
+        pres = TWO_DIGITS;
+      }
+      case 's' -> {
+        num = date.seconds().intValue();
+        pres = TWO_DIGITS;
+      }
+      case 'f' -> frac = date.seconds().remainder(BigDecimal.ONE);
+      case 'Z', 'z' -> {
+        num = date.tz();
+        pres = ZONE_DIGITS;
+      }
+      case 'C' -> pres = N;
+      case 'E' -> {
+        num = date.yea();
+        pres = N;
+      }
+      default -> throw INVCOMPSPEC_X.get(info, marker);
+    }
+
+    // parse presentation modifier(s) and width modifier
+    final DateFormat fp = new DateFormat(substring(marker, 1), pres, frac != null, info);
+    if(comp == 'Y') num = year(num, fp);
+
+    if(comp == 'Z' || comp == 'z') {
+      // output timezone (as name if requested via 'N' and a place is known)
+      final byte[] tz = fp.first == 'n' && zone != null ? zone : formatZone((int) num, fp, marker);
+      // pad to minimum width; the representation is never shortened
+      return tz.length == 0 ? tz : format(tz, fp.min, Integer.MAX_VALUE);
+    }
+    if(fp.first == 'n') {
+      // output name representation
+      byte[] name = switch(comp) {
+        case 'M' -> month((int) num - 1, fp.min, fp.max);
+        case 'F' -> day((int) num - 1, fp.min, fp.max);
+        case 'P' -> ampm(num == 0);
+        case 'C' -> calendar();
+        case 'E' -> era((int) num);
+        default -> null;
+      };
+      if(name != null) {
+        if(fp.cs == Case.LOWER) name = lc(name);
+        else if(fp.cs == Case.UPPER) name = uc(name);
+        return name;
+      }
+      // fallback representation
+      fp.first = '0';
+      fp.primary = ONE;
+    } else if(frac != null) {
+      return formatFrac(frac, fp);
+    }
+    // integer-valued component: minimum width is enforced, maximum width is ignored
+    fp.max = Integer.MAX_VALUE;
+    return formatInt(num, fp);
+  }
+
+  /**
+   * Checks if the specified calendar is supported.
+   * @param calendar calendar
+   * @param info input info (can be {@code null})
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  private static boolean supported(final byte[] calendar, final InputInfo info)
+      throws QueryException {
+
+    final QNm qnm;
+    try {
+      qnm = QNm.parse(trim(calendar), null, info.sc());
+    } catch(final QueryException ex) {
+      Util.debug(ex);
+      throw CALWHICH_X.get(info, calendar);
+    }
+    if(qnm.uri().length != 0) return true;
+
+    final byte[] local = qnm.local();
+    int c = -1;
+    final int cl = CALENDARS.length;
+    while(++c < cl && !eq(CALENDARS[c], local));
+    if(c == cl) throw CALWHICH_X.get(info, calendar);
+    // only ISO and AD are supported
+    return c <= 1;
+  }
+
+  /**
+   * Reduces a year to the number of digits requested by the format
+   * (see: Formatting the Year Component).
+   * @param year year
+   * @param fp date format
+   * @return reduced year
+   */
+  private long year(final long year, final DateFormat fp) {
+    int n = fp.max;
+    if(n == Integer.MAX_VALUE && zeroes(fp.first) != -1) {
+      // decimal-digit-pattern: number of mandatory and optional digit signs, if 2 or more
+      final int w = digits(fp.primary, false) + digits(fp.primary, true);
+      if(w > 1) n = w;
+    }
+    if(n < 1 || n > 18) return year;
+    long p = 1;
+    while(n-- > 0) p *= 10;
+    return year % p;
+  }
+
+  /**
+   * Counts the digit signs of a presentation modifier.
+   * @param primary primary format token
+   * @param optional count optional ({@code #}) instead of mandatory digit signs
+   * @return number of digit signs
+   */
+  private int digits(final byte[] primary, final boolean optional) {
+    int count = 0;
+    for(final TokenParser tp = new TokenParser(primary); tp.more();) {
+      final int cp = tp.next();
+      if(optional ? cp == '#' : zeroes(cp) != -1) ++count;
+    }
+    return count;
   }
 
   /**
@@ -352,12 +379,8 @@ public abstract class Formatter extends FormatUtil {
     String s = num.toString().replace("0.", "").replaceAll("0+$", "");
 
     // count optional and mandatory digit signs
-    int od = 0, md = 0;
-    for(final TokenParser tp = new TokenParser(fp.primary); tp.more();) {
-      final int c = tp.next();
-      if(c == '#') ++od;
-      else if(zeroes(c) != -1) ++md;
-    }
+    int od = digits(fp.primary, true);
+    final int md = digits(fp.primary, false);
 
     // calculate number of target digits, including trailing zeroes
     final int sl = s.length();
@@ -365,11 +388,11 @@ public abstract class Formatter extends FormatUtil {
     if(fl == 1) fl = sl;
 
     // adjust min/max with mandatory digit count
-    if(fp.max < md) fp.max = md;
-    if(fp.min < md) fp.min = md;
+    fp.max = Math.max(fp.max, md);
+    fp.min = Math.max(fp.min, md);
 
     // adjust number of target digits
-    if(fp.min > fl) fl = fp.min;
+    fl = Math.max(fl, fp.min);
     if(fp.max != Integer.MAX_VALUE) {
       od = fp.max - fp.min;
       fl = fp.max;
@@ -377,9 +400,9 @@ public abstract class Formatter extends FormatUtil {
 
     // force calculated length
     if(fl != sl) {
-      final String s1 = num.setScale(fl, RoundingMode.DOWN).toString();
-      final int d = s1.indexOf('.');
-      s = d == -1 ? s1 : s1.substring(d + 1);
+      final String scaled = num.setScale(fl, RoundingMode.DOWN).toPlainString();
+      final int d = scaled.indexOf('.');
+      s = d == -1 ? scaled : scaled.substring(d + 1);
     }
 
     // format number
@@ -388,17 +411,16 @@ public abstract class Formatter extends FormatUtil {
     // truncate trailing zeroes
     if(od > 0 && s.endsWith("0")) {
       final String ns = string(number);
-      final int nsl = ns.length();
-      int nsi = nsl;
+      int nsi = ns.length();
       for(int dc = 0; dc <= od;) {
-        final int c = ns.charAt(--nsi);
-        final int zero = zeroes(c);
+        final int cp = ns.charAt(--nsi);
+        final int zero = zeroes(cp);
         if(zero != -1) {
           ++dc;
-          if(c != zero) break;
+          if(cp != zero) break;
         }
       }
-      if(nsi + 1 != nsl) number = token(ns.substring(0, nsi + 1));
+      if(nsi + 1 != ns.length()) number = token(ns.substring(0, nsi + 1));
     }
     return number;
   }
@@ -411,125 +433,113 @@ public abstract class Formatter extends FormatUtil {
    */
   public final byte[] formatInt(final long num, final FormatParser fp) {
     // prepend minus sign to negative values
-    long n = num;
-    final boolean sign = n < 0;
-    if(sign) n = -n;
+    final boolean sign = num < 0;
+    final long n = sign ? -num : num;
 
     final TokenBuilder tb = new TokenBuilder();
     final int ch = fp.first;
     if(ch == 'w') {
       tb.add(word(n, fp.numType, fp.modifier));
     } else if(ch == KANJI[1]) {
-      japanese(tb, n);
+      if(n == 0) tb.add(KANJI[0]);
+      else japanese(tb, n, false);
     } else if(ch == 'i') {
       roman(tb, n, fp.min);
     } else if(ch == '\u2460' || ch == '\u2474' || ch == '\u2488') {
-      if(num < 1 || num > 20) tb.addLong(num);
-      else tb.add((int) (ch + num - 1));
+      // circled, parenthesized and dotted digits are limited to the range 1-20
+      if(n < 1 || n > 20) tb.addLong(n);
+      else tb.add((int) (ch + n - 1));
     } else {
       final String seq = sequence(ch);
-      if(seq != null) alpha(tb, num, seq);
+      if(seq != null) alpha(tb, n, seq);
       else tb.add(number(n, fp, ch));
     }
 
     // finalize formatted string
     byte[] in = tb.finish();
     if(fp.cs == Case.LOWER) in = lc(in);
-    if(fp.cs == Case.UPPER) in = uc(in);
+    else if(fp.cs == Case.UPPER) in = uc(in);
     return sign ? concat(cpToken('-'), in) : in;
   }
 
   /**
    * Returns a formatted timezone.
-   * @param num integer to be formatted
+   * @param num timezone (minutes)
    * @param fp format parser
-   * @param marker marker
+   * @param marker variable marker
    * @return string representation
    * @throws QueryException query exception
    */
   private byte[] formatZone(final int num, final FormatParser fp, final byte[] marker)
       throws QueryException {
 
-    final boolean uc = ch(marker, 0) == 'Z';
-    final boolean mil = uc && ch(marker, 1) == 'Z';
-
+    final boolean uc = ch(marker, 0) == 'Z', mil = uc && ch(marker, 1) == 'Z';
     // ignore values without timezone. exception: military timezone
     if(num == Short.MAX_VALUE) return mil ? cpToken('J') : EMPTY;
+    // military timezone: single letter, restricted to full hours
+    if(mil && num % 60 == 0 && num >= -720 && num <= 720) return cpToken(MIL[num / 60 + 12]);
 
     final TokenBuilder tb = new TokenBuilder();
-    if(!mil || !addMilZone(num, tb)) {
-      if(!uc) tb.add("GMT");
+    if(!uc) tb.add("GMT");
+    if(fp.trad && num == 0) return tb.add('Z').finish();
+    tb.add(num < 0 ? '-' : '+');
 
-      final boolean minus = num < 0;
-      if(fp.trad && num == 0) {
-        tb.add('Z');
-      } else {
-        tb.add(minus ? '-' : '+');
+    // split digit pattern into hours, separator and minutes
+    final int[] cps = cps(fp.primary);
+    final int cl = cps.length;
+    int digits = 0;
+    while(digits < cl && zeroes(cps[digits]) != -1) ++digits;
 
-        final TokenParser tp = new TokenParser(fp.primary);
-        final int c1 = tp.next(), c2 = tp.next(), c3 = tp.next(), c4 = tp.next();
-        final int z1 = zeroes(c1), z2 = zeroes(c2), z3 = zeroes(c3), z4 = zeroes(c4);
-        if(z1 == -1) {
-          tb.add(addZone(num, 0, new TokenBuilder().add("00"))).add(':');
-          tb.add(addZone(num, 1, new TokenBuilder().add("00")));
-        } else if(z2 == -1) {
-          tb.add(addZone(num, 0, new TokenBuilder().add(c1)));
-          if(c2 == -1) {
-            if(num % 60 != 0) tb.add(':').add(addZone(num, 1, new TokenBuilder().add("00")));
-          } else {
-            final TokenBuilder t = new TokenBuilder().add(z3 == -1 ? '0' : z3);
-            if(z3 != -1 && z4 != -1) t.add(z4);
-            tb.add(c2).add(addZone(num, 1, t));
-          }
-        } else if(z3 == -1) {
-          tb.add(addZone(num, 0, new TokenBuilder().add(c1).add(c2)));
-          if(c3 == -1) {
-            if(num % 60 != 0) tb.add(':').add(addZone(num, 1, new TokenBuilder().add("00")));
-          } else {
-            final int c5 = tp.next(), z5 = zeroes(c5);
-            final TokenBuilder t = new TokenBuilder().add(z4 == -1 ? '0' : z4);
-            if(z4 != -1 && z5 != -1) t.add(z5);
-            tb.add(c3).add(addZone(num % 60, 1, t));
-          }
-        } else if(z4 == -1) {
-          tb.add(addZone(num, 0, new TokenBuilder().add(c1)));
-          tb.add(addZone(num, 1, new TokenBuilder().add(c2).add(c3)));
-        } else {
-          tb.add(addZone(num, 0, new TokenBuilder().add(c1).add(c2)));
-          tb.add(addZone(num, 1, new TokenBuilder().add(c3).add(c4)));
+    final TokenBuilder hours = new TokenBuilder(), minutes = new TokenBuilder();
+    int sep = 0;
+    if(digits == 0) {
+      // no digits: use default pattern
+      hours.add(ZONE_PATTERN);
+      minutes.add(ZONE_PATTERN);
+      sep = ':';
+    } else if(digits > 2) {
+      // three or more digits: the last two ones represent the minutes
+      final int hl = Math.min(digits - 2, 2);
+      for(int c = 0; c < hl; c++) hours.add(cps[c]);
+      minutes.add(cps[hl]).add(cps[hl + 1]);
+    } else {
+      for(int c = 0; c < digits; c++) hours.add(cps[c]);
+      if(digits < cl) {
+        // digits are followed by a separator and by up to two minute digits
+        sep = cps[digits];
+        for(int c = digits + 1; c <= digits + 2 && c < cl; c++) {
+          final int zero = zeroes(cps[c]);
+          if(zero == -1) break;
+          minutes.add(zero);
         }
+        if(minutes.isEmpty()) minutes.add('0');
+      } else if(num % 60 != 0) {
+        // no separator: add minutes only if required
+        minutes.add(ZONE_PATTERN);
+        sep = ':';
       }
+    }
+
+    tb.add(zoneValue(num, true, hours.finish()));
+    if(!minutes.isEmpty()) {
+      if(sep != 0) tb.add(sep);
+      tb.add(zoneValue(num, false, minutes.finish()));
     }
     return tb.finish();
   }
 
   /**
    * Returns a timezone component.
-   * @param num number to be formatted
-   * @param c counter
-   * @param format presentation format
+   * @param num timezone (minutes)
+   * @param hours format hours (otherwise, minutes)
+   * @param pattern digit pattern
    * @return timezone component
    * @throws QueryException query exception
    */
-  private byte[] addZone(final int num, final int c, final TokenBuilder format)
+  private byte[] zoneValue(final int num, final boolean hours, final byte[] pattern)
       throws QueryException {
-
-    int n = c == 0 ? num / 60 : num % 60;
-    if(num < 0) n = -n;
-    return number(n, new IntFormat(format.toArray(), null), format.cp(0));
-  }
-
-  /**
-   * Adds a military timezone component to the specified token builder.
-   * @param num number to be formatted
-   * @param tb token builder
-   * @return {@code true} if timezone was added
-   */
-  private static boolean addMilZone(final int num, final TokenBuilder tb) {
-    final int n = num / 60;
-    if(num % 60 != 0 || n < -12 || n > 12) return false;
-    tb.add(MIL[n + 12]);
-    return true;
+    return number(Math.abs(hours ? num / 60 : num % 60), new IntFormat(pattern, null),
+        ch(pattern, 0));
   }
 
   /**
@@ -540,7 +550,7 @@ public abstract class Formatter extends FormatUtil {
    */
   private static void alpha(final TokenBuilder tb, final long n, final String a) {
     final int al = a.length();
-    final long m = n < 0 ? -1 - n : n - 1;
+    final long m = n - 1;
     if(m >= al) alpha(tb, m / al, a);
     if(m >= 0) tb.add(a.charAt((int) (m % al)));
     else tb.add('0');
@@ -567,59 +577,28 @@ public abstract class Formatter extends FormatUtil {
   }
 
   /**
-   * Adds a Japanese character sequence.
-   * @param tb token builder
-   * @param n number to be formatted
-   */
-  private static void japanese(final TokenBuilder tb, final long n) {
-    if(n == 0) {
-      tb.add(KANJI[0]);
-    } else {
-      jp(tb, n, false);
-    }
-  }
-
-  /**
    * Recursively adds a Japanese character sequence.
    * @param tb token builder
    * @param n number to be formatted
-   * @param i initial call
+   * @param initial initial call
    */
-  private static void jp(final TokenBuilder tb, final long n, final boolean i) {
-    if(n == 0) {
-    } else if(n <= 9) {
-      if(n != 1 || !i) tb.add(KANJI[(int) n]);
-    } else if(n == 10) {
-      tb.add(KANJI[10]);
-    } else if(n <= 99) {
-      jp(tb, n, 10, 10);
-    } else if(n <= 999) {
-      jp(tb, n, 100, 11);
-    } else if(n <= 9999) {
-      jp(tb, n, 1000, 12);
-    } else if(n <= 99999999) {
-      jp(tb, n, 10000, 13);
-    } else if(n <= 999999999999L) {
-      jp(tb, n, 100000000, 14);
-    } else if(n <= 9999999999999999L) {
-      jp(tb, n, 1000000000000L, 15);
+  private static void japanese(final TokenBuilder tb, final long n, final boolean initial) {
+    if(n == 0) return;
+    if(n <= 9) {
+      if(n != 1 || !initial) tb.add(KANJI[(int) n]);
     } else {
-      tb.addLong(n);
+      final int jl = JAPANESE.length - 1;
+      int j = 0;
+      while(j < jl && n >= JAPANESE[j + 1]) ++j;
+      if(j == jl) {
+        tb.addLong(n);
+      } else {
+        final long f = JAPANESE[j];
+        japanese(tb, n / f, true);
+        tb.add(KANJI[10 + j]);
+        japanese(tb, n % f, false);
+      }
     }
-  }
-
-  /**
-   * Recursively adds a Japanese character sequence.
-   * @param tb token builder
-   * @param n number to be formatted
-   * @param f factor
-   * @param o kanji offset
-   */
-  private static void jp(final TokenBuilder tb, final long n, final long f,
-      final int o) {
-    jp(tb, n / f, true);
-    tb.add(KANJI[o]);
-    jp(tb, n % f, false);
   }
 
   /**
@@ -629,6 +608,22 @@ public abstract class Formatter extends FormatUtil {
    */
   private static ZoneId zoneId(final ADate date) {
     return date.hasTz() ? ZoneOffset.ofTotalSeconds(date.tz() * 60) : ZoneId.systemDefault();
+  }
+
+  /**
+   * Returns the timezone with the specified IANA name.
+   * @param place place
+   * @return timezone, or {@code null} if the place is no supported IANA timezone name
+   */
+  private static ZoneId zoneId(final byte[] place) {
+    if(contains(place, '/')) {
+      try {
+        return ZoneId.of(string(place));
+      } catch(final ZoneRulesException ex) {
+        Util.debug(ex);
+      }
+    }
+    return null;
   }
 
   /**
@@ -715,7 +710,7 @@ public abstract class Formatter extends FormatUtil {
     }
     while(min-- >= 0) reverse.add(zero);
 
-    // reverse result and add ordinal suffix
+    // reverse result
     final TokenBuilder result = new TokenBuilder();
     for(int rs = reverse.size() - 1; rs >= 0; --rs) result.add(reverse.get(rs));
     return result.finish();
