@@ -352,4 +352,12 @@ public final class MainOptions extends Options {
   public boolean isTrusted() {
     return trusted;
   }
+
+  /**
+   * Assigns the trust level.
+   * @param trust trusted flag
+   */
+  public void trusted(final boolean trust) {
+    trusted = trust;
+  }
 }

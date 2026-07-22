@@ -40,10 +40,7 @@ public final class FnParseXml extends FnParseXmlFragment {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ParseXmlOptions options = toOptions(arg(1), new ParseXmlOptions(), qc);
-    final Boolean trustedOpt = options.get(ParseXmlOptions.TRUSTED);
-    final boolean trusted = trustedOpt != null ? trustedOpt :
-        qc.context.options.get(MainOptions.FNXMLTRUSTED);
-    if(!trusted) {
+    if(!trusted(options, qc)) {
       if(options.get(ParseXmlOptions.XINCLUDE)) throw EXTERNALRESOURCE_X.get(info, "'xinclude'");
       if(options.get(ParseXmlOptions.USE_XSI_SCHEMA_LOCATION) &&
           !CommonOptions.SKIP.equals(options.get(ParseXmlOptions.XSD_VALIDATION)))

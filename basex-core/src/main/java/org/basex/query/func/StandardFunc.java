@@ -671,6 +671,19 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
+   * Indicates if external resources may be retrieved. If the 'trusted' option was not specified,
+   * the value of {@link MainOptions#FNXMLTRUSTED} is returned.
+   * @param options options
+   * @param qc query context
+   * @return result of check
+   */
+  protected final boolean trusted(final Options options, final QueryContext qc) {
+    final Object trusted = options.get(CommonOptions.TRUSTED);
+    return trusted != null ? (Boolean) trusted :
+      qc.context.options.get(MainOptions.FNXMLTRUSTED);
+  }
+
+  /**
    * Evaluates an expression to variable bindings.
    * @param expr expression (can be empty)
    * @param qc query context

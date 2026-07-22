@@ -216,11 +216,12 @@ public final class QueryResources {
    * @param docOpts options used by fn:doc or fn:collection
    * @param user current user
    * @param info input info (can be {@code null})
+   * @param trusted allow access to external resources
    * @return document
    * @throws QueryException query exception
    */
   public synchronized DBNode doc(final QueryInput qi, final DocOptions docOpts, final User user,
-      final InputInfo info) throws QueryException {
+      final InputInfo info, final boolean trusted) throws QueryException {
     final MainOptions options = context.options;
     // favor default database
     if(options.get(MainOptions.WITHDB) && options.get(MainOptions.DEFAULTDB)) {
@@ -235,7 +236,7 @@ public final class QueryResources {
     }
 
     // access open database or create new one
-    final Data data = data(true, qi, docOpts, user, info);
+    final Data data = data(true, qi, docOpts, user, info, trusted);
     // ensure that database contains a single document
     final IntList docs = data.resources.docs(qi.dbPath);
     if(docs.size() == 1) return new DBNode(data, docs.get(0), Data.DOC);
@@ -282,7 +283,7 @@ public final class QueryResources {
     }
 
     // access open database or create new one
-    final Data data = data(false, qi, DOC_OPTIONS, user, info);
+    final Data data = data(false, qi, DOC_OPTIONS, user, info, false);
     final IntList docs = data.resources.docs(qi.dbPath);
     return DBNodeSeq.get(docs, data, true, qi.dbPath.isEmpty());
   }
@@ -366,7 +367,7 @@ public final class QueryResources {
   public void addDoc(final String name, final String path, final StaticContext sc)
       throws QueryException {
     final QueryInput qi = new QueryInput(path, sc);
-    final Data data = create(qi, DOC_OPTIONS, context.user(), null, true);
+    final Data data = create(qi, DOC_OPTIONS, context.user(), null, true, true);
     if(name != null) data.meta.original = name;
   }
 
@@ -393,7 +394,8 @@ public final class QueryResources {
     final ItemList items = new ItemList(paths.length);
     for(final String path : paths) {
       final QueryInput qi = new QueryInput(path, sc);
-      items.add(new DBNode(create(qi, DOC_OPTIONS, context.user(), null, false), 0, Data.DOC));
+      final Data data = create(qi, DOC_OPTIONS, context.user(), null, false, true);
+      items.add(new DBNode(data, 0, Data.DOC));
     }
     addCollection(items.value(NodeType.DOCUMENT), name);
   }
@@ -434,11 +436,12 @@ public final class QueryResources {
    * @param docOpts options used by fn:doc or fn:collection
    * @param user current user
    * @param info input info (can be {@code null})
+   * @param trusted allow access to external resources
    * @return document
    * @throws QueryException query exception
    */
   private Data data(final boolean single, final QueryInput qi, final DocOptions docOpts,
-      final User user, final InputInfo info) throws QueryException {
+      final User user, final InputInfo info, final boolean trusted) throws QueryException {
 
     final boolean withdb = context.options.get(MainOptions.WITHDB);
     final String name = qi.dbName;
@@ -478,7 +481,7 @@ public final class QueryResources {
     }
 
     // otherwise, create new instance
-    final Data data = create(qi, docOpts, user, info, single);
+    final Data data = create(qi, docOpts, user, info, single, trusted);
     // reset database path: indicates that all documents were parsed
     qi.dbPath = "";
     return data;
@@ -491,11 +494,12 @@ public final class QueryResources {
    * @param user current user
    * @param info input info (can be {@code null})
    * @param single expect single document
+   * @param trusted allow access to external resources
    * @return data reference
    * @throws QueryException query exception
    */
   private Data create(final QueryInput input, final DocOptions docOpts, final User user,
-      final InputInfo info, final boolean single) throws QueryException {
+      final InputInfo info, final boolean single, final boolean trusted) throws QueryException {
 
     // check user permissions
     final IO io = input.io;
@@ -510,11 +514,12 @@ public final class QueryResources {
     final MainOptions mopts = context.options, options;
     final boolean mainmem = !mopts.get(MainOptions.FORCECREATE);
     if(mainmem) {
-      if(docOpts == DOC_OPTIONS && mopts.resolver().standard()
+      if(!trusted && docOpts == DOC_OPTIONS && mopts.resolver().standard()
         && !mopts.get(MainOptions.FNXMLTRUSTED)) {
         options = MAIN_OPTIONS;
       } else {
         options = new MainOptions(docOpts, mopts);
+        if(trusted) options.trusted(true);
       }
     } else {
       docOpts.checkDbAccess(info);

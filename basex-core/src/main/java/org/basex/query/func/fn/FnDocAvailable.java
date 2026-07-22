@@ -41,10 +41,7 @@ public class FnDocAvailable extends Docs {
   final Item doc(final QueryContext qc) throws QueryException {
     final DocOptions options = toOptions(arg(1), new DocOptions(), qc);
     check(options, false, qc);
-    final Boolean trustedOpt = options.get(DocOptions.TRUSTED);
-    final boolean trusted = trustedOpt != null ? trustedOpt :
-        qc.context.options.get(MainOptions.FNXMLTRUSTED);
-    if(!trusted) {
+    if(!trusted(options, qc)) {
       if(options.get(DocOptions.XINCLUDE)) throw EXTERNALRESOURCE_X.get(info, "'xinclude'");
       if(options.get(DocOptions.USE_XSI_SCHEMA_LOCATION) &&
           !CommonOptions.SKIP.equals(options.get(DocOptions.XSD_VALIDATION)))
@@ -58,6 +55,6 @@ public class FnDocAvailable extends Docs {
       qi = queryInput(toToken(source));
       if(qi == null) throw INVDOC_X.get(info, source);
     }
-    return qc.resources.doc(qi, options, qc.user, info);
+    return qc.resources.doc(qi, options, qc.user, info, false);
   }
 }

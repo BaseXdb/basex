@@ -147,7 +147,7 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
   public XdmValue document(final String name) {
     try {
       return XdmItem.get(qp.qc.resources.doc(new QueryInput(name, qp.sc),
-          QueryResources.DOC_OPTIONS, qp.qc.user, null));
+          QueryResources.DOC_OPTIONS, qp.qc.user, null, true));
     } catch(final QueryException ex) {
       throw new XQueryException(ex);
     }
