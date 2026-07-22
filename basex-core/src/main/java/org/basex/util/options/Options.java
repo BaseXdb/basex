@@ -413,7 +413,12 @@ public class Options implements Iterable<Option<?>> {
    * @throws QueryException query exception
    */
   private static String name(final Item name, final InputInfo info) throws QueryException {
-    if(name instanceof final QNm qnm) return string(qnm.unique());
+    if(name instanceof final QNm qnm) {
+      // implementation-defined options must have a non-absent namespace
+      if(qnm.uri().length == 0) throw INVALIDOPTION_X.get(info,
+          Util.info("Option name has no namespace: '%'.", qnm.local()));
+      return string(qnm.unique());
+    }
     if(name.type.isStringOrUntyped()) return string(name.string(info));
     throw INVALIDOPTION_X_X_X.get(info, BasicType.STRING, name.type, name);
   }
@@ -950,7 +955,7 @@ public class Options implements Iterable<Option<?>> {
       final String string = normalizeEnum(serialize(val, info));
       result = eo.get(string);
       if(result == null) {
-        throw INVALIDOPTION_X.get(info, allowed(eo, string, (Object[]) eo.values()));
+        throw INVALIDOPTIONVALUE_X.get(info, allowed(eo, string, (Object[]) eo.values()));
       }
     } else if(option instanceof final OptionsOption oo) {
       if(!(item instanceof final XQMap map)) throw expected.apply(Types.MAP);

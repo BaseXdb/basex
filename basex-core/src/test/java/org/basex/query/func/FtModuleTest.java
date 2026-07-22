@@ -85,7 +85,7 @@ public final class FtModuleTest extends SandboxTest {
 
     // check buggy options
     error(func.args("x", "x", " { 'x': 'y' }"), INVALIDOPTION_X);
-    error(func.args("x", "x", " { 'mode': '' }"), INVALIDOPTION_X);
+    error(func.args("x", "x", " { 'mode': '' }"), INVALIDOPTIONVALUE_X);
     error(func.args("x", "x", " 1"), INVTYPE_X);
   }
 
@@ -226,7 +226,7 @@ public final class FtModuleTest extends SandboxTest {
 
     // check buggy options
     error(func.args(NAME, "x", " { 'x': 'y' }"), INVALIDOPTION_X);
-    error(func.args(NAME, "x", " { 'mode': '' }"), INVALIDOPTION_X);
+    error(func.args(NAME, "x", " { 'mode': '' }"), INVALIDOPTIONVALUE_X);
     error(func.args(NAME, "x", " 1"), INVTYPE_X);
   }
 

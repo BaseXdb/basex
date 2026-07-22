@@ -165,7 +165,7 @@ public final class StringModuleTest extends SandboxTest {
     query(set.args("Ruisdael, Jacob van", "Jacob van Ruisdael", " { 'case': 'insensitive' }"), 1);
     query(sort.args("Gogh, Vincent van", "vincent van gogh", " { 'case': 'insensitive' }"), 1);
 
-    error(lev.args("a", "b", " { 'case': 'unknown' }"), INVALIDOPTION_X);
+    error(lev.args("a", "b", " { 'case': 'unknown' }"), INVALIDOPTIONVALUE_X);
   }
 
   /** Test method. */

@@ -1187,6 +1187,8 @@ public enum QueryError {
   /** Error code. */
   INVALIDOPTION_X(XPTY, 4, "%"),
   /** Error code. */
+  INVALIDOPTIONVALUE_X(XPTY, 4, "%"),
+  /** Error code. */
   UNKNOWNOPTION_X(XPTY, 4, "Unknown option '%'."),
   /** Error code. */
   PATHNODE_X_X_X(XPTY, 4, "%: node expected, % found: %."),

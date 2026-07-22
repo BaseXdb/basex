@@ -146,7 +146,7 @@ public final class FnTransform extends StandardFunc {
 
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final TransformOptions options = toOptions(arg(0), new TransformOptions(), qc);
+    final TransformOptions options = options(qc);
 
     // reject requests that cannot be served by the JAXP interface
     for(final Option<?> option : UNSUPPORTED) {
@@ -196,6 +196,21 @@ public final class FnTransform extends StandardFunc {
   @Override
   public int hofOffsets() {
     return functionOption(0) ? Integer.MAX_VALUE : 0;
+  }
+
+  /**
+   * Returns the transformation options. Values that are not permitted for an option are
+   * rejected with a function-specific error.
+   * @param qc query context
+   * @return options
+   * @throws QueryException query exception
+   */
+  private TransformOptions options(final QueryContext qc) throws QueryException {
+    try {
+      return toOptions(arg(0), new TransformOptions(), qc);
+    } catch(final QueryException ex) {
+      throw error(ex, ex.error() == INVALIDOPTIONVALUE_X ? TRANSFORM_OPTIONS_X : null);
+    }
   }
 
   /**

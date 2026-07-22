@@ -2873,7 +2873,7 @@ return
     check(func.args("abc", 6), "abc   ", empty(func));
 
     error(func.args("abc", 6, " { 'padding': '' }"), INVALIDVALUE_X_X);
-    error(func.args("abc", 6, " { 'side': 'middle' }"), INVALIDOPTION_X);
+    error(func.args("abc", 6, " { 'side': 'middle' }"), INVALIDOPTIONVALUE_X);
     error(func.args("abc", Long.MAX_VALUE), RANGE_X);
   }
 
@@ -2902,7 +2902,7 @@ return
     error(func.args(42), STRBIN_X_X);
     error(func.args("42", 42), INVTYPE_X);
     error(func.args("42", " { '1234': '' }"), INVALIDOPTION_X);
-    error(func.args("42", " { 'heuristics': '5678' }"), INVALIDOPTION_X);
+    error(func.args("42", " { 'heuristics': '5678' }"), INVALIDOPTIONVALUE_X);
     error(func.args("42", " { 'heuristics': 'CHARDET' }"), BASEX_CLASSPATH_X_X);
     error(func.args("42", " { 'heuristics': 'ALL' }"), BASEX_CLASSPATH_X_X);
   }
@@ -3827,6 +3827,10 @@ return
         "<a><![CDATA[1]]></a>");
     error(func.args(" <a>1</a>", " { 'cdata-section-elements': 'a' }"), INVALIDOPTION_X_X_X_X);
 
+    // option names: implementation-defined parameters must have a namespace
+    query(func.args("1", " { QName('http://vendor.example.com/', 'xindent'): true() }"), 1);
+    error(func.args("1", " { QName('', 'indent'): true() }"), INVALIDOPTION_X);
+
     query("declare namespace p = 'Q';\n"
         + "declare option output:method 'text';\n"
         + "<x xmlns:p='P'>{\n"
@@ -4628,6 +4632,8 @@ return
     // missing and conflicting options
     error(func.args(" { }"), TRANSFORM_OPTIONS_X);
     error(func.args(opts + ", 'stylesheet-location': 'x.xsl' }"), TRANSFORM_OPTIONS_X);
+    // values that are not permitted for an option
+    error(func.args(opts + ", 'delivery-format': 'doc' }"), TRANSFORM_OPTIONS_X);
     // invalid stylesheet and options
     error(func.args(" { 'stylesheet-text': '<oops/>', 'source-node': <a/> }"), TRANSFORM_ERROR_X);
     error(func.args(opts + ", 'unknown': 1 }"), INVALIDOPTION_X);
@@ -4889,7 +4895,7 @@ return
     // invalid schema
     error(func.args(" { 'schema': <schema/> }"), SCHEMAASSEMBLY_X);
     // invalid options
-    error(func.args(" { 'validation-mode': 'unknown' }"), INVALIDOPTION_X);
+    error(func.args(" { 'validation-mode': 'unknown' }"), INVALIDOPTIONVALUE_X);
     error(validator + "(<a/>, <b/>)", INVARITY_X_X);
     error(validator + "(<!--comment-->)", INVTYPE_X);
   }
