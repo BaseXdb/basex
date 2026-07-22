@@ -302,20 +302,20 @@ public abstract class Value extends Expr implements Iterable<Item> {
   /**
    * If possible, returns a compactified version of this value.
    * Note that the memory consumption may increase during the reconstruction of a data structure.
-   * @param job interruptible job
+   * @param qc query context
    * @return compactified value or self reference
    * @throws QueryException query exception
    */
-  public abstract Value shrink(Job job) throws QueryException;
+  public abstract Value shrink(QueryContext qc) throws QueryException;
 
   /**
    * Saves memory by recursively rebuilding the data structure.
-   * Called by {@link #shrink(Job)} and implemented for sequences, maps and arrays.
-   * @param job query exception
+   * Called by {@link #shrink(QueryContext)} and implemented for sequences, maps and arrays.
+   * @param qc query context
    * @return rebuilt data structure
    * @throws QueryException query exception
    */
-  protected abstract Value rebuild(Job job) throws QueryException;
+  protected abstract Value rebuild(QueryContext qc) throws QueryException;
 
   @Override
   public boolean accept(final ASTVisitor visitor) {

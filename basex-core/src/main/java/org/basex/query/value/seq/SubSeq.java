@@ -40,7 +40,7 @@ public final class SubSeq extends Seq {
   }
 
   @Override
-  public Value shrink(final Job job) throws QueryException {
-    return rebuild(job);
+  public Value shrink(final QueryContext qc) throws QueryException {
+    return rebuild(qc);
   }
 }

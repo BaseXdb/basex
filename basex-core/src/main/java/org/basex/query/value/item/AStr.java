@@ -16,13 +16,15 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public abstract class AStr extends Item {
-  /** ASCII offset flag. */
+  /** ASCII index flag. */
   private static final int[] ASCII = {};
+  /** Number of codepoints that are represented by a single index entry. */
+  private static final int BLOCK = 32;
 
   /** String data ({@code null} if not cached yet). */
   byte[] value;
-  /** Character offsets. {@code null}: not cached yet, {@code ASCII}: ASCII, otherwise: offsets. */
-  private int[] offsets;
+  /** Sparse codepoint index ({@code null}: not computed; {@link #ASCII}: ASCII string). */
+  private int[] index;
 
   /**
    * Constructor.
@@ -39,7 +41,7 @@ public abstract class AStr extends Item {
   AStr(final byte[] value, final Type type) {
     super(type);
     this.value = value;
-    if(value.length < 2) offsets = ASCII;
+    if(value.length < 2) index = ASCII;
   }
 
   @Override
@@ -54,13 +56,47 @@ public abstract class AStr extends Item {
    * @throws QueryException query exception
    */
   public final boolean ascii(final InputInfo info) throws QueryException {
-    int[] off = offsets;
-    if(off == null) {
-      off = Token.cpOffsets(string(info));
-      if(off == null) off = ASCII;
-      offsets = off;
+    return index(info) == ASCII;
+  }
+
+  /**
+   * Returns the codepoint index of the string.
+   * @param info input info (can be {@code null})
+   * @return index, or {@link #ASCII} for ASCII strings
+   * @throws QueryException query exception
+   */
+  private int[] index(final InputInfo info) throws QueryException {
+    int[] idx = index;
+    if(idx == null) {
+      final byte[] token = string(info);
+      if(Token.ascii(token)) {
+        idx = ASCII;
+      } else {
+        // count codepoints first: the index can then be allocated with its final size
+        final int count = Token.length(token, false), tl = token.length;
+        idx = new int[(count - 1) / BLOCK + 1];
+        idx[0] = count;
+        for(int t = 0, c = 0; t < tl; t += Token.cl(token, t), c++) {
+          if(c != 0 && c % BLOCK == 0) idx[c / BLOCK] = t;
+        }
+      }
+      index = idx;
     }
-    return off == ASCII;
+    return idx;
+  }
+
+  /**
+   * Returns the byte offset of the specified codepoint.
+   * @param token token
+   * @param idx codepoint index
+   * @param pos codepoint position
+   * @return byte offset
+   */
+  private static int offset(final byte[] token, final int[] idx, final int pos) {
+    final int block = pos / BLOCK;
+    int t = block == 0 ? 0 : idx[block];
+    for(int c = pos % BLOCK; c > 0; c--) t += Token.cl(token, t);
+    return t;
   }
 
   /**
@@ -70,7 +106,8 @@ public abstract class AStr extends Item {
    * @throws QueryException query exception
    */
   public final int length(final InputInfo info) throws QueryException {
-    return ascii(info) ? string(info).length : offsets.length;
+    final int[] idx = index(info);
+    return idx == ASCII ? string(info).length : idx[0];
   }
 
   /**
@@ -107,13 +144,22 @@ public abstract class AStr extends Item {
    */
   public final AStr substring(final InputInfo info, final int start, final int end)
       throws QueryException {
-    if(start == 0 && end == length(info)) return this;
-
     final byte[] token = string(info);
-    final boolean ascii =  ascii(info);
-    final int s = ascii ? start : offsets[start];
-    final int e = ascii ? end : end < offsets.length ? offsets[end] : token.length;
+    final int[] idx = index(info);
+    final boolean ascii = idx == ASCII;
+    final int length = ascii ? token.length : idx[0];
+    if(start == 0 && end == length) return this;
+
+    final int s = ascii ? start : offset(token, idx, start);
+    final int e = ascii ? end : end < length ? offset(token, idx, end) : token.length;
     return Str.get(Arrays.copyOfRange(token, s, e));
+  }
+
+  @Override
+  public Item shrink(final QueryContext qc) {
+    // reuse an equal token; skip lazy items whose value has not been cached yet
+    if(value != null) value = qc.shared.token(value);
+    return this;
   }
 
   @Override

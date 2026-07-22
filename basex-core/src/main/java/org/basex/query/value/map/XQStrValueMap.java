@@ -1,6 +1,5 @@
 package org.basex.query.value.map;
 
-import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -74,11 +73,11 @@ public final class XQStrValueMap extends XQHashMap {
   }
 
   @Override
-  public Item shrink(final Job job) throws QueryException {
-    shrinkValues(job);
+  public Item shrink(final QueryContext qc) throws QueryException {
+    shrinkValues(qc);
     refineType();
     // see MapBuilder#put for types with compact representation
     final SeqType vt = ((MapType) type).valueType();
-    return vt.one() && vt.type.oneOf(BasicType.INTEGER, BasicType.STRING) ? rebuild(job) : this;
+    return vt.one() && vt.type.oneOf(BasicType.INTEGER, BasicType.STRING) ? rebuild(qc) : this;
   }
 }

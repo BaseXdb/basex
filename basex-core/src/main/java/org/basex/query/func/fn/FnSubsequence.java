@@ -104,7 +104,7 @@ public class FnSubsequence extends StandardFunc {
     if(size != -1) {
       if(sr.length == size) return iter.value(qc, this);
 
-      final ValueBuilder vb = new ValueBuilder(qc, size);
+      final ValueBuilder vb = new ValueBuilder(qc, sr.length);
       for(long i = sr.start; i < sr.end; i++) vb.add(iter.get(i));
       return vb.value(this);
     }

@@ -94,8 +94,8 @@ public abstract class TreeSeq extends Seq {
   abstract TreeSeq append(TreeSeq other);
 
   @Override
-  public final Value shrink(final Job job) throws QueryException {
-    return rebuild(job);
+  public final Value shrink(final QueryContext qc) throws QueryException {
+    return rebuild(qc);
   }
 
   /**

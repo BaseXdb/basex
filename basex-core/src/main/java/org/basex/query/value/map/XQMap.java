@@ -8,7 +8,6 @@ import java.util.*;
 import java.util.function.*;
 
 import org.basex.core.*;
-import org.basex.core.jobs.*;
 import org.basex.data.*;
 import org.basex.io.out.DataOutput;
 import org.basex.query.*;
@@ -392,9 +391,9 @@ public abstract class XQMap extends XQStruct {
   }
 
   @Override
-  protected final XQMap rebuild(final Job job) throws QueryException {
+  protected final XQMap rebuild(final QueryContext qc) throws QueryException {
     final MapBuilder mb = new MapBuilder(structSize());
-    forEach((key, value) -> mb.put(key, value.shrink(job)));
+    forEach((key, value) -> mb.put(key, value.shrink(qc)));
     return mb.map(this);
   }
 

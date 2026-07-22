@@ -398,9 +398,9 @@ public abstract class XQArray extends XQStruct {
   }
 
   @Override
-  protected final XQArray rebuild(final Job job) throws QueryException {
-    final ArrayBuilder ab = new ArrayBuilder(job, structSize());
-    for(final Value value : members()) ab.add(value.shrink(job));
+  protected final XQArray rebuild(final QueryContext qc) throws QueryException {
+    final ArrayBuilder ab = new ArrayBuilder(qc, structSize());
+    for(final Value value : members()) ab.add(value.shrink(qc));
     return ab.array(this);
   }
 

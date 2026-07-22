@@ -316,12 +316,12 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public Item shrink(final Job job) throws QueryException {
+  public Item shrink(final QueryContext qc) throws QueryException {
     return this;
   }
 
   @Override
-  protected Item rebuild(final Job job) throws QueryException {
+  protected Item rebuild(final QueryContext qc) throws QueryException {
     return this;
   }
 

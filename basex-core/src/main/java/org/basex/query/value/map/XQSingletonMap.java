@@ -1,6 +1,5 @@
 package org.basex.query.value.map;
 
-import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -80,8 +79,8 @@ public final class XQSingletonMap extends XQMap {
   }
 
   @Override
-  public Item shrink(final Job job) throws QueryException {
-    v = v.shrink(job);
+  public Item shrink(final QueryContext qc) throws QueryException {
+    v = v.shrink(qc);
     type = MapType.get(k.type, v.seqType());
     return this;
   }

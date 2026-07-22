@@ -222,7 +222,7 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public Value shrink(final Job job) {
+  public Value shrink(final QueryContext qc) {
     return this;
   }
 

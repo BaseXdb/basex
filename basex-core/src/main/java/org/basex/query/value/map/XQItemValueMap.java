@@ -1,6 +1,5 @@
 package org.basex.query.value.map;
 
-import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.value.*;
@@ -64,11 +63,11 @@ public final class XQItemValueMap extends XQHashMap {
   }
 
   @Override
-  public Item shrink(final Job job) throws QueryException {
-    shrinkValues(job);
+  public Item shrink(final QueryContext qc) throws QueryException {
+    shrinkValues(qc);
     refineType();
     // see MapBuilder#put for types with compact representation
     return ((MapType) type).keyType().oneOf(BasicType.INTEGER, BasicType.STRING,
-        BasicType.UNTYPED_ATOMIC) ? rebuild(job) : this;
+        BasicType.UNTYPED_ATOMIC) ? rebuild(qc) : this;
   }
 }

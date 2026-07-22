@@ -71,6 +71,13 @@ public final class StrSeq extends NativeSeq {
   }
 
   @Override
+  public Value shrink(final QueryContext qc) {
+    // reuse equal tokens across the whole sequence (only worthwhile for retained values)
+    qc.shared.tokens(values, qc);
+    return this;
+  }
+
+  @Override
   public Value sort() {
     return get(new TokenList(values.clone()).sort().finish(), type);
   }
