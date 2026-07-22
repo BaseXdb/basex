@@ -114,7 +114,7 @@ public enum QueryError {
   /** Error code. */
   BIN_IOOR_X_X(BIN, "index-out-of-range", "Index '%' is out of range (0-%)."),
   /** Error code. */
-  BIN_ITL_X_X(BIN, "integer-too-large", "Index '%' is too large: %."),
+  BIN_ITL_X(BIN, "integer-too-large", "Value is too large for an integer: %."),
   /** Error code. */
   BIN_NS_X(BIN, "negative-size", "Size '%' is negative."),
   /** Error code. */
@@ -430,8 +430,6 @@ public enum QueryError {
 
   // String Module
 
-  /** Error code. */
-  STRING_FORMAT_X_X(STRING, "format", "%: %."),
   /** Error code. */
   STRING_BOUNDS_X(STRING, "bounds", "String exceeds maximum supported length of % characters."),
   /** Error code. */

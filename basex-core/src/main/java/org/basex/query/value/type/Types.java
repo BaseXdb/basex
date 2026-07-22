@@ -66,6 +66,8 @@ public final class Types {
   public static final SeqType INTEGER_ZM = INTEGER.seqType(ZERO_OR_MORE);
   /** Positive integer. */
   public static final SeqType POSITIVE_INTEGER_O = POSITIVE_INTEGER.seqType();
+  /** Zero or more positive integers. */
+  public static final SeqType POSITIVE_INTEGER_ZM = POSITIVE_INTEGER.seqType(ZERO_OR_MORE);
   /** Zero or more bytes. */
   public static final SeqType BYTE_ZM = BYTE.seqType(ZERO_OR_MORE);
 
@@ -101,6 +103,8 @@ public final class Types {
   public static final SeqType QNAME_O = QNAME.seqType();
   /** Zero or one QNames. */
   public static final SeqType QNAME_ZO = QNAME.seqType(ZERO_OR_ONE);
+  /** Zero or more QNames. */
+  public static final SeqType QNAME_ZM = QNAME.seqType(ZERO_OR_MORE);
 
   /** Single xs:boolean. */
   public static final SeqType BOOLEAN_O = BOOLEAN.seqType();

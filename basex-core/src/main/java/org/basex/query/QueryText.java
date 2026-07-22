@@ -412,8 +412,6 @@ public interface QueryText {
   /** Serialization. */ byte[] CHARACTER_MAP = token("character-map");
   /** Serialization. */ byte[] MAP_STRING = token("map-string");
 
-  /** Debugging info. */ String DEBUG_ASSIGNMENTS = "Assignments:";
-
   /** Java prefix. */ String JAVA_PREFIX_COLON = "java:";
   /** Java keyword: new. */ String NEW = "new";
   /** Java default namespace. */ String JAVA_LANG_DOT = "java.lang.";

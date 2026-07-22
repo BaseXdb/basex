@@ -29,7 +29,7 @@ public class ValidateXsd extends ValidateFn {
   private static final String SAXON_VERSION_URI = "http://saxon.sf.net/feature/xsd-version";
 
   /** XSD implementations. */
-  static final String[] IMPL = {
+  private static final String[] IMPL = {
     "com.saxonica.ee.jaxp.SchemaFactoryImpl", "Saxon EE", "1.1",
     "org.apache.xerces.jaxp.validation.XMLSchema11Factory", "Xerces", "1.1",
     "org.apache.xerces.jaxp.validation.XMLSchemaFactory", "Xerces", "1.0",
@@ -37,7 +37,7 @@ public class ValidateXsd extends ValidateFn {
   };
 
   /** Implementation offset. */
-  static final int OFFSET;
+  private static final int OFFSET;
   /** Saxon flag. */
   private static final boolean SAXON;
   /** Java flag. */
@@ -55,6 +55,22 @@ public class ValidateXsd extends ValidateFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     return check(qc);
+  }
+
+  /**
+   * Returns the name of the XSD processor.
+   * @return processor
+   */
+  public static String processor() {
+    return IMPL[OFFSET + 1];
+  }
+
+  /**
+   * Returns the supported XSD version.
+   * @return version
+   */
+  public static String version() {
+    return IMPL[OFFSET + 2];
   }
 
   @Override
@@ -85,7 +101,7 @@ public class ValidateXsd extends ValidateFn {
               throw new BaseXException(ex);
             }
             // Saxon: use version 1.1
-            if(SAXON) sf.setProperty(SAXON_VERSION_URI, IMPL[OFFSET + 2]);
+            if(SAXON) sf.setProperty(SAXON_VERSION_URI, version());
           }
           sf.setErrorHandler(this);
 

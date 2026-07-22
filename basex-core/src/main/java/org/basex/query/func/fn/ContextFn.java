@@ -46,7 +46,7 @@ public abstract class ContextFn extends StandardFunc {
   }
 
   @Override
-  public boolean hasCTX() {
+  public final boolean hasCTX() {
     return contextAccess();
   }
 
