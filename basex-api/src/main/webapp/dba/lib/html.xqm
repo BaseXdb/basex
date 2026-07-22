@@ -12,6 +12,25 @@ import module namespace utils = 'dba/utils' at 'utils.xqm';
 declare variable $html:NUMBER := ('decimal', 'number', 'bytes');
 
 (:~
+ : Appends a cache-busting version query to a local static asset reference. The
+ : version is the file's last-modified timestamp, so a redeployed asset (e.g. a
+ : rebuilt CodeMirror bundle) is refetched automatically without a manual bump.
+ : @param  $path  asset path, relative to the DBA root (e.g. 'static/js.js')
+ : @return path, suffixed with '?v=<timestamp>' when the file is found on disk
+ :)
+declare %private function html:asset(
+  $path  as xs:string
+) as xs:string {
+  (: static assets live next to this module's parent (lib/ -> ../static/...) :)
+  let $file := file:base-dir() || '../' || $path
+  return $path || (
+    if (file:exists($file)) {
+      '?v=' || format-dateTime(file:last-modified($file), '[Y0001][M01][D01][H01][m01][s01]')
+    }
+  )
+};
+
+(:~
  : Extends the specified table rows with the page template.
  : The following options can be specified:
  : * header: page headers
@@ -33,20 +52,18 @@ declare function html:wrap(
       <meta charset='utf-8'/>
       <meta http-equiv='Content-Security-Policy'
             content="default-src 'self'; script-src 'self' 'unsafe-inline';
-                     style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'"/>
+                     style-src 'self' 'unsafe-inline'; img-src 'self' data:;
+                     object-src 'none'; base-uri 'self'"/>
       <meta name='viewport' content='width=device-width, initial-scale=1'/>
       <title>DBA{ ($header, tail($options?header)) ! (' » ' || .) }</title>
       <meta name='description' content='Database Administration'/>
       <meta name='author' content='BaseX Team, BSD License'/>
       <meta name="robots" content="noindex"/>
       <link rel='icon' href='static/basex.svg'/>
-      <link rel='stylesheet' href='static/style.css'/>
-      <link rel='stylesheet' href='static/codemirror/codemirror.css'/>
-      <script src='static/js.js'/>
-      <script src='static/editor.js'/>
-      <script src='static/codemirror/codemirror.js'/>
-      <script src='static/codemirror/xquery.js'/>
-      <script src='static/codemirror/xml.js'/>
+      <link rel='stylesheet' href='{ html:asset("static/style.css") }'/>
+      <script src='{ html:asset("static/js.js") }'/>
+      <script src='{ html:asset("static/editor.js") }'/>
+      <script src='{ html:asset("static/codemirror6/cm6.js") }'/>
     </head>
     <body>
       <header>

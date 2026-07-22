@@ -592,30 +592,31 @@ async function saveResource() {
  * @param {boolean} resize resize text areas to maximum height
  */
 function loadCodeMirror(language, edit, resize) {
-  if(!CodeMirror || !dispatchEvent) return;
-
-  const useCM = !/android/i.test(navigator.userAgent);
+  // CodeMirror 6 is delivered as the self-contained window.CM6 bundle
+  // (static/codemirror6/cm6.js). Without it, or on Android, fall back to plain
+  // textareas; CM6.fromTextArea returns a CodeMirror-5-compatible handle so the
+  // rest of the DBA (editor.js) is unaware of the change.
+  const useCM = !!window.CM6 && !/android/i.test(navigator.userAgent);
   if(edit) {
     const editorArea = document.getElementById("editor");
     if (useCM) {
-      _editor = CodeMirror.fromTextArea(editorArea, {
-        mode: language,
-        lineNumbers: true,
-        lineWrapping: true,
-        extraKeys: {
-          "Ctrl-Enter": runQuery,
-          "Cmd-Enter" : runQuery
+      _editor = CM6.fromTextArea(editorArea, {
+        language,
+        // Lezer-driven syntax-error gutter, only for the XQuery editor
+        parseErrors: language === "xquery",
+        extraKeys: [
+          { key: "Ctrl-Enter", run: () => (runQuery(), true) },
+          { key: "Cmd-Enter",  run: () => (runQuery(), true) }
+        ],
+        onChange: () => {
+          if(checkButtons) checkButtons();
+          saveDraft();
         }
-      });
-      _editor.display.wrapper.classList.add("codemirror");
-      _editor.on("change", (cm) => {
-        cm.save();
-        if(checkButtons) checkButtons();
-        saveDraft();
       });
     } else {
       _editor = {
         setValue(v) { editorArea.value = v; },
+        getValue() { return editorArea.value; },
         historySize() { return {}; },
         clearHistory() {},
         focus() { editorArea.focus(); }
@@ -630,12 +631,7 @@ function loadCodeMirror(language, edit, resize) {
   const outputArea = document.getElementById("output");
   if(outputArea != null) {
     if (useCM) {
-      _output = CodeMirror.fromTextArea(outputArea, {
-        mode: "xml",
-        lineWrapping: true,
-        readOnly: true
-      });
-      _output.display.wrapper.classList.add("codemirror");
+      _output = CM6.fromTextArea(outputArea, { language: "xml", readOnly: true });
     } else {
       _output = {
         setValue(v) { outputArea.value = v; }
@@ -653,8 +649,8 @@ function loadCodeMirror(language, edit, resize) {
       const height = elem => window.innerWidth <= 800 ? 200 :
         Math.max(192, window.innerHeight - elem.getBoundingClientRect().top - 52);
       if (useCM) {
-        for(const elem of document.querySelectorAll(".CodeMirror")) {
-          elem.CodeMirror.setSize("100%", height(elem));
+        for(const elem of document.querySelectorAll(".cm-editor")) {
+          elem.style.height = `${height(elem)}px`;
         }
       } else {
         for(const elem of document.querySelectorAll("textarea")) {
