@@ -1,7 +1,10 @@
 <catalog xmlns='urn:oasis:names:tc:entity:xmlns:xml:catalog'>
   <system systemId='http://dtd.dtd' uri='dtd.dtd' />
   <system systemId='http://import.xsd' uri='import.xsd' />
+  <uri name='http://import.xsd' uri='import.xsd' />
   <system systemId='http://import.xsl' uri='import.xsl' />
+  <uri name='http://import.xsl' uri='import.xsl' />
   <system systemId='http://import-xsl.xml' uri='import-xsl.xml' />
+  <uri name='http://import-xsl.xml' uri='import-xsl.xml' />
   <uri name='http://doc.xml' uri='doc.xml' />
 </catalog>

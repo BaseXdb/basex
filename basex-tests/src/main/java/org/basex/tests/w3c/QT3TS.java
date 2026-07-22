@@ -346,7 +346,7 @@ public final class QT3TS extends Main {
           query.addDocument(src.get(URI), path);
           if(role == null) continue;
 
-          final XdmValue doc = query.document(path);
+          final XdmValue doc = query.document(src.get(URI) != null ? src.get(URI) : path);
           if(role.equals(".")) query.context(doc);
           else query.variable(role, doc);
         }

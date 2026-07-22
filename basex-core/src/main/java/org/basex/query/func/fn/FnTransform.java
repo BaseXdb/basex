@@ -147,7 +147,20 @@ public final class FnTransform extends StandardFunc {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final TransformOptions options = options(qc);
+    requestedProperties(options);
+    version(options);
+    return saxon() ? new SaxonTransform(this, options, trusted(options, qc), qc).transform() :
+      jaxp(options, qc);
+  }
 
+  /**
+   * Performs a transformation via the JAXP interface.
+   * @param options transformation options
+   * @param qc query context
+   * @return result map
+   * @throws QueryException query exception
+   */
+  private XQMap jaxp(final TransformOptions options, final QueryContext qc) throws QueryException {
     // reject requests that cannot be served by the JAXP interface
     for(final Option<?> option : UNSUPPORTED) {
       if(options.contains(option))
@@ -156,8 +169,6 @@ public final class FnTransform extends StandardFunc {
     final DeliveryFormat format = options.get(DELIVERY_FORMAT);
     if(format == DeliveryFormat.RAW)
       throw TRANSFORM_PROCESSOR_X.get(info, "'" + format + "' delivery format");
-    version(options);
-    requestedProperties(options);
 
     // resolve stylesheet, source document and target file
     final IO stylesheet = stylesheet(options);
@@ -179,18 +190,32 @@ public final class FnTransform extends StandardFunc {
         tree ? document : new StreamResult(output),
         options.get(CACHE), trusted(options, qc), qc, tr -> {
           params.forEach(tr::setParameter);
-          properties.forEach(tr::setOutputProperty);
+          properties.forEach((name, value) -> {
+            if(OUTPUT_KEYS.contains(name)) tr.setOutputProperty(name, value);
+          });
         });
     if(error != null) throw TRANSFORM_ERROR_X.get(info, error);
 
     // deliver result, optionally post-processed by a user-defined function
     final Str key = Str.get(uri != null ? uri : "output");
-    Value value = tree ? document.node() : deliver(output.finish(), file);
+    final Value value = tree ? document.node() : deliver(output.finish(), file);
+    return XQMap.get(key, postProcess(key, value, options, qc));
+  }
+
+  /**
+   * Post-processes a transformation result with a user-defined function.
+   * @param key result key
+   * @param value result value
+   * @param options transformation options
+   * @param qc query context
+   * @return post-processed result
+   * @throws QueryException query exception
+   */
+  Value postProcess(final Str key, final Value value, final TransformOptions options,
+      final QueryContext qc) throws QueryException {
     final Value pp = options.get(POST_PROCESS);
-    if(pp != null) {
-      value = invoke(toFunction(pp, 2, qc), new HofArgs(2).set(0, key).set(1, value), qc);
-    }
-    return XQMap.get(key, value);
+    return pp != null ?
+      invoke(toFunction(pp, 2, qc), new HofArgs(2).set(0, key).set(1, value), qc) : value;
   }
 
   @Override
@@ -220,10 +245,19 @@ public final class FnTransform extends StandardFunc {
    */
   private void version(final TransformOptions options) throws QueryException {
     final Value version = options.get(XSLT_VERSION);
-    if(version == null || Xslt.VERSION.isEmpty()) return;
-    final double requested = ((ANum) version).dbl();
-    if(requested > Double.parseDouble(Xslt.VERSION))
-      throw TRANSFORM_PROCESSOR_X.get(info, "XSLT " + version);
+    if(version == null) return;
+    final String supported = saxon() ? "4.0" : Xslt.VERSION;
+    if(supported.isEmpty()) return;
+    if(((ANum) version).dbl() > Double.parseDouble(supported))
+      throw TRANSFORM_PROCESSOR_X.get(info, "XSLT version " + version + " (max " + supported + ")");
+  }
+
+  /**
+   * Indicates if transformations are performed via the Saxon s9api interface.
+   * @return result of check
+   */
+  private static boolean saxon() {
+    return Xslt.S9API && SaxonTransform.available();
   }
 
   /**
@@ -242,13 +276,13 @@ public final class FnTransform extends StandardFunc {
   }
 
   /**
-   * Returns the serialization parameters that will be passed on to the XSLT processor.
+   * Returns the serialization parameters with a string representation.
    * @param options transformation options
    * @param qc query context
    * @return output properties
    * @throws QueryException query exception
    */
-  private HashMap<String, String> outputProperties(final TransformOptions options,
+  HashMap<String, String> outputProperties(final TransformOptions options,
       final QueryContext qc) throws QueryException {
 
     final HashMap<String, String> properties = new HashMap<>();
@@ -258,13 +292,16 @@ public final class FnTransform extends StandardFunc {
       // validate parameters, and pass on those that are known to XSLT processors
       new SerializerOptions().assign(map, qc, info);
       for(final XQMap.Entry entry : map.entries()) {
-        final String name = string(entry.key().string(info));
         final Value value = entry.value();
-        if(!OUTPUT_KEYS.contains(name) || value.isEmpty()) continue;
+        if(value.isEmpty()) continue;
+        final String name = string(entry.key().string(info));
         final TokenBuilder tb = new TokenBuilder();
         for(final Item item : value) {
+          if(item instanceof FItem)
+            throw TRANSFORM_PROCESSOR_X.get(info, "'" + name + "' serialization parameter");
           if(!tb.isEmpty()) tb.add(' ');
           if(item instanceof final Bln bln) tb.add(bln.bool(info) ? Text.YES : Text.NO);
+          else if(item instanceof final QNm qnm) tb.add(qnm.toJava().toString());
           else tb.add(item.string(info));
         }
         properties.put(name, tb.toString());
@@ -298,17 +335,47 @@ public final class FnTransform extends StandardFunc {
    * @return input reference
    * @throws QueryException query exception
    */
-  private IO stylesheet(final TransformOptions options) throws QueryException {
+  IO stylesheet(final TransformOptions options) throws QueryException {
     final String location = options.get(STYLESHEET_LOCATION), text = options.get(STYLESHEET_TEXT);
     final XNode node = node(options.get(STYLESHEET_NODE));
     exclusive(location, text, node);
+
+    IO io = input(location, text, node, options);
+    if(io == null) throw TRANSFORM_OPTIONS_X.get(info, "No stylesheet supplied.");
+    // preserve the requested base URI, which is lost if the location is remapped to a local file
+    if(location != null) {
+      final String base = options.get(STYLESHEET_BASE_URI);
+      final String uri = base != null ? sc().resolve(base).url() :
+        Uri.get(location).isAbsolute() ? location : io.url();
+      if(!uri.equals(io.url())) {
+        try {
+          io = new IOContent(io.read(), uri);
+        } catch(final IOException ex) {
+          throw TRANSFORM_ERROR_X.get(info, Util.message(ex));
+        }
+      }
+    }
+    return io;
+  }
+
+  /**
+   * Returns a reference to a stylesheet or a stylesheet package.
+   * @param location location (can be {@code null})
+   * @param text lexical XML (can be {@code null})
+   * @param node node (can be {@code null})
+   * @param options transformation options
+   * @return input reference, or {@code null} if no input was supplied
+   * @throws QueryException query exception
+   */
+  IO input(final String location, final String text, final XNode node,
+      final TransformOptions options) throws QueryException {
 
     if(location != null) return toIO(location, false);
     final String base = options.get(STYLESHEET_BASE_URI);
     final Uri uri = base != null ? Uri.get(sc().resolve(base).url()) : sc().baseURI();
     if(text != null) return new IOContent(text, string(uri.string()));
-    if(node != null) return Xslt.io(node, uri, info);
-    throw TRANSFORM_OPTIONS_X.get(info, "No stylesheet supplied.");
+    if(node != null) return Xslt.io(node, base != null ? uri : node.baseURI(uri, true, info), info);
+    return null;
   }
 
   /**
@@ -334,7 +401,7 @@ public final class FnTransform extends StandardFunc {
    * @return file
    * @throws QueryException query exception
    */
-  private IOFile file(final String uri, final QueryContext qc) throws QueryException {
+  IOFile file(final String uri, final QueryContext qc) throws QueryException {
     checkPerm(qc, Perm.ADMIN);
     if(uri == null) throw TRANSFORM_OPTIONS_X.get(info, "No base output URI supplied.");
     if(sc().resolve(uri) instanceof final IOFile file) return file;
@@ -346,7 +413,7 @@ public final class FnTransform extends StandardFunc {
    * @param values supplied option values (can be {@code null})
    * @throws QueryException query exception
    */
-  private void exclusive(final Object... values) throws QueryException {
+  void exclusive(final Object... values) throws QueryException {
     int count = 0;
     for(final Object value : values) {
       if(value != null) ++count;
@@ -376,7 +443,7 @@ public final class FnTransform extends StandardFunc {
    * @param value option value (can be {@code null})
    * @return node, or {@code null} if no node was supplied
    */
-  private static XNode node(final Value value) {
+  static XNode node(final Value value) {
     return value instanceof final XNode node ? node : null;
   }
 

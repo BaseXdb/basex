@@ -85,7 +85,8 @@ public class XsltTransform extends StandardFunc {
    */
   private IO read(final Expr expr, final QueryContext qc) throws QueryException {
     final Item item = toNodeOrAtomItem(expr, false, qc);
-    return item instanceof final XNode node ? Xslt.io(node, sc().baseURI(), info) : io(item);
+    return item instanceof final XNode node ?
+      Xslt.io(node, node.baseURI(sc().baseURI(), true, info), info) : io(item);
   }
 
   /**

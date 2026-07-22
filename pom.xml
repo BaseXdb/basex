@@ -161,6 +161,13 @@
         <scope>provided</scope>
         <optional>true</optional>
       </dependency>
+      <dependency>
+        <groupId>net.sf.saxon</groupId>
+        <artifactId>Saxon-HE</artifactId>
+        <version>13.0</version>
+        <scope>provided</scope>
+        <optional>true</optional>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 

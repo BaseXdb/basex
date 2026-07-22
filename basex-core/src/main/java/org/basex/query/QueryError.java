@@ -3,8 +3,6 @@ package org.basex.query;
 import static org.basex.query.QueryError.ErrType.*;
 import static org.basex.query.QueryText.*;
 
-import org.basex.core.*;
-
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -617,7 +615,7 @@ public enum QueryError {
   /** Error code. */
   SCHEMAASSEMBLY_X(FODC, 15, "Schema cannot be assembled: %"),
   /** Error code. */
-  EXTERNALRESOURCE_X(FODC, 16, Text.EXTACCESS_BLOCKED_X),
+  EXTERNALRESOURCE_X(FODC, 16, "Call is untrusted: %."),
 
   /** Error code. */
   FORMATWHICH_X(FODF, 1280, "Unknown decimal format: %."),
