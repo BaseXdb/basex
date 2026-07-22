@@ -68,19 +68,6 @@ public final class Token {
   /** Unicode replacement codepoint (\\uFFFD). */
   public static final char REPLACEMENT = '\uFFFD';
 
-  /** US charset. */
-  public static final DecimalFormatSymbols LOC = new DecimalFormatSymbols(Locale.US);
-  /** Scientific double output. */
-  public static final DecimalFormat SD = new DecimalFormat("0.0##################E0", LOC);
-  /** Decimal double output. */
-  public static final DecimalFormat DD = new DecimalFormat("#####0.0################", LOC);
-  /** Scientific float output. */
-  public static final DecimalFormat SF = new DecimalFormat("0.0######E0", LOC);
-  /** Decimal float output. */
-  public static final DecimalFormat DF = new DecimalFormat("#####0.0######", LOC);
-  /** Adaptive output. */
-  public static final DecimalFormat AD = new DecimalFormat("0.0##########################E0", LOC);
-
   /** BigInteger representing 2 * ({@link Long#MAX_VALUE} + 1). */
   public static final BigInteger MAX_ULONG = BigInteger.ONE.shiftLeft(64);
   /** Digits used in base conversion. */
@@ -446,16 +433,7 @@ public final class Token {
    */
   public static byte[] token(final double dbl) {
     final byte[] b = fastToken(dbl);
-    if(b != null) return b;
-
-    final double a = Math.abs(dbl);
-    final String s;
-    if(a >= 1.0e-6 && a < 1.0e6) {
-      synchronized(DD) { s = DD.format(dbl); }
-    } else {
-      synchronized(SD) { s = SD.format(dbl); }
-    }
-    return chopNumber(token(s));
+    return b != null ? b : floatToken(Double.toString(dbl));
   }
 
   /**
@@ -465,23 +443,40 @@ public final class Token {
    */
   public static byte[] token(final float flt) {
     final byte[] b = fastToken(flt);
-    if(b != null) return b;
+    return b != null ? b : floatToken(Float.toString(flt));
+  }
 
-    final int fl = FLT.length;
-    for(int i = 0; i < fl; ++i) {
-      if(flt == FLT[i]) return FLTSTR[i];
-    }
-    final float a = Math.abs(flt);
-    final boolean small = a >= 1.0e-6f && a < 1.0e6f;
-    String s1;
-    if(small) {
-      synchronized(DF) { s1 = DF.format(flt); }
+  /**
+   * Converts a Java floating-point string, as returned by {@link Double#toString} or
+   * {@link Float#toString}, to its canonical XPath representation.
+   * @param java Java string representation
+   * @return token
+   */
+  private static byte[] floatToken(final String java) {
+    final boolean neg = java.charAt(0) == '-';
+    final int p = neg ? 1 : 0, e = java.indexOf('E');
+    final String mnt = e == -1 ? java.substring(p) : java.substring(p, e);
+    final int exp = e == -1 ? 0 : Integer.parseInt(java.substring(e + 1));
+    final int dot = mnt.indexOf('.');
+    String digits = mnt.substring(0, dot) + mnt.substring(dot + 1);
+    int point = dot + exp;
+    int s = 0, t = digits.length();
+    while(s < t - 1 && digits.charAt(s) == '0') { s++; point--; }
+    while(t > s + 1 && digits.charAt(t - 1) == '0') t--;
+    digits = digits.substring(s, t);
+    final int lead = point - 1;
+    final TokenBuilder tb = new TokenBuilder();
+    if(neg) tb.add('-');
+    if(lead < -6 || lead > 5) {
+      final int dl = digits.length();
+      tb.add(digits.charAt(0)).add('.').add(dl > 1 ? digits.substring(1) : "0");
+      tb.add('E').addInt(lead);
+    } else if(point <= 0) {
+      tb.add("0.").add("0".repeat(-point)).add(digits);
     } else {
-      synchronized(SF) { s1 = SF.format(flt); }
+      tb.add(digits.substring(0, point)).add('.').add(digits.substring(point));
     }
-    final String s2 = Float.toString(flt);
-    if(s2.length() < s1.length() && (!s2.contains("E") || !small)) s1 = s2;
-    return chopNumber(token(s1));
+    return tb.finish();
   }
 
   /**
@@ -514,13 +509,6 @@ public final class Token {
     while(--tl > 0 && token[tl] == '0');
     return substring(token, 0, token[tl] == '.' ? tl : tl + 1);
   }
-
-  /** Constant float values. */
-  private static final float[] FLT = { 1.0E17f, 1.0E15f, 1.0E13f, 1.0E11f,
-    -1.0E17f, -1.0E15f, -1.0E13f, -1.0E11f };
-  /** Token representations of float values. */
-  private static final byte[][] FLTSTR = tokens("1.0E17", "1.0E15",
-    "1.0E13", "1.0E11", "-1.0E17", "-1.0E15", "-1.0E13", "-1.0E11");
 
   /**
    * Converts the specified token into a double value.
