@@ -236,6 +236,12 @@ public final class SerializerTest extends SandboxTest {
     query(option + "<a>1</a>", 1);
     query(option + "1, <a>2</a>, 3", 123);
     query(option + USE_CHARACTER_MAPS.arg(";=,,") + "'1;2'", "1,2");
+    // delimiters and whitespace in keys are percent-encoded
+    query(option + USE_CHARACTER_MAPS.arg("%3D=EQ") + "'1=2'", "1EQ2");
+    query(option + USE_CHARACTER_MAPS.arg("%2C=CM") + "'1,2'", "1CM2");
+    query(option + USE_CHARACTER_MAPS.arg("%20=SP") + "'1 2'", "1SP2");
+    query(option + USE_CHARACTER_MAPS.arg("%25=PC") + "'1%2'", "1PC2");
+    query(option + USE_CHARACTER_MAPS.arg("%=PC") + "'1%2'", "1PC2");
   }
 
   /** Test: item-separator. */

@@ -3783,6 +3783,13 @@ return
     // character maps
     query(func.args("1;2", " { 'use-character-maps': { ';': ',' } }"), "1,2");
     error(func.args("1;2", " { 'use-character-maps': ';=,,' }"), INVALIDOPTION_X_X_X_X);
+    // delimiters and whitespace can be mapped
+    query(func.args("1=2", " { 'use-character-maps': { '=': 'EQ' } }"), "1EQ2");
+    query(func.args("1,2", " { 'use-character-maps': { '1': 'x', ',': 'CM' } }"), "xCM2");
+    query(func.args("1 2", " { 'use-character-maps': { ' ': 'SP' } }"), "1SP2");
+    query(func.args("1%2", " { 'use-character-maps': { '%': 'PC' } }"), "1PC2");
+    query(func.args("1", " { 'use-character-maps': { '1': 'a,b=c' } }"), "a,b=c");
+    error(func.args("1", " { 'use-character-maps': { 'ab': 'x' } }"), SERPARAM_X);
 
     // boolean arguments
     query(func.args("1", " { 'indent': false() }"), 1);

@@ -432,7 +432,7 @@ public class Options implements Iterable<Option<?>> {
       if(item instanceof final XQMap map) {
         map.forEach((key, v) -> {
           if(!tb.isEmpty()) tb.add(',');
-          tb.add(key.string(info)).add('=');
+          tb.add(escape(string(key.string(info)))).add('=');
           if(v.size() != 1) throw INVALIDOPTION_X_X_X.get(info, BasicType.STRING, v.seqType(), v);
           tb.add(string(((Item) v).string(info)).replace(",", ",,"));
         });
@@ -449,6 +449,51 @@ public class Options implements Iterable<Option<?>> {
       }
     }
     return tb.toString();
+  }
+
+  /**
+   * Escapes the delimiters of a key in a flattened map ({@code %} itself, {@code ,} and {@code =})
+   * and characters that may be stripped by whitespace normalization.
+   * Names of options and variables are not affected by this conversion.
+   * @param key key
+   * @return escaped key
+   * @see #unescape(String)
+   */
+  public static String escape(final String key) {
+    final StringBuilder sb = new StringBuilder(key.length());
+    final int kl = key.length();
+    for(int k = 0; k < kl; k++) {
+      final char ch = key.charAt(k);
+      if(ch == '%' || ch == ',' || ch == '=' || ch <= ' ') {
+        sb.append('%').append((char) HEX_TABLE[ch >> 4]).append((char) HEX_TABLE[ch & 0xF]);
+      } else {
+        sb.append(ch);
+      }
+    }
+    return sb.toString();
+  }
+
+  /**
+   * Resolves percent-encoded characters in a key. A percent sign that is not followed by two
+   * hexadecimal digits is adopted as is.
+   * @param key key
+   * @return unescaped key
+   * @see #escape(String)
+   */
+  public static String unescape(final String key) {
+    final StringBuilder sb = new StringBuilder(key.length());
+    final int kl = key.length();
+    for(int k = 0; k < kl; k++) {
+      final char ch = key.charAt(k);
+      final int cp = ch == '%' && k + 2 < kl ? dec(key.charAt(k + 1), key.charAt(k + 2)) : -1;
+      if(cp != -1) {
+        sb.append((char) cp);
+        k += 2;
+      } else {
+        sb.append(ch);
+      }
+    }
+    return sb.toString();
   }
 
   /**

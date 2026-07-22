@@ -344,7 +344,7 @@ public final class SerializerOptions extends Options {
     final TokenBuilder tb = new TokenBuilder();
     for(final byte[] key : map) {
       if(!tb.isEmpty()) tb.add(',');
-      tb.add(key).add('=').add(string(map.get(key)).replace(",", ",,"));
+      tb.add(Options.escape(string(key))).add('=').add(string(map.get(key)).replace(",", ",,"));
     }
     return tb.toString();
   }
@@ -398,7 +398,9 @@ public final class SerializerOptions extends Options {
         }
         if(value == null) throw SERDOC_X.get(info, "Missing 'value' attribute.");
       }
-      sb.append(name).append('=').append(value.trim().replace(",", ",,")).append(',');
+      // whitespace in character maps is significant
+      if(option != USE_CHARACTER_MAPS) value = value.trim();
+      sb.append(name).append('=').append(value.replace(",", ",,")).append(',');
     }
     return sb.toString();
   }

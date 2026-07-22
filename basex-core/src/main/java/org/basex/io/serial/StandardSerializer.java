@@ -18,6 +18,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.options.*;
 
 /**
  * This class serializes items to an output stream.
@@ -58,11 +59,13 @@ public abstract class StandardSerializer extends OutputSerializer {
         throw SERNORM_X.getIO(norm);
       }
     }
-    if(sopts.get(USE_CHARACTER_MAPS).isEmpty()) {
+    final String maps = sopts.get(USE_CHARACTER_MAPS);
+    if(maps.isEmpty()) {
       cmap = null;
     } else {
       cmap = new IntObjectMap<>();
-      for(final Map.Entry<String, String> entry : sopts.toMap(USE_CHARACTER_MAPS).entrySet()) {
+      final Map<String, String> map = Options.toMap(maps, new LinkedHashMap<>(), Options::unescape);
+      for(final Map.Entry<String, String> entry : map.entrySet()) {
         final String key = entry.getKey();
         if(key.codePoints().count() != 1) throw SERPARAM_X.getIO(
             Util.info("Key in character map is not a single character: %.", key));
