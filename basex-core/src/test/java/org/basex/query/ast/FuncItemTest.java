@@ -231,8 +231,7 @@ public final class FuncItemTest extends SandboxTest {
   @Test public void funcItemCoercion() {
     error("let $f := function($g as function() as item()) { $g() }" +
         "return $f(function() { 1, 2 })", INVTYPE_X);
-    error("let $x as fn (xs:byte) as item() := fn($x as item()) { $x } return $x(384)",
-        FUNCCAST_X_X_X);
+    error("let $x as fn (xs:byte) as item() := fn($x as item()) { $x } return $x(384)", INVTYPE_X);
     error("let $x as fn(xs:anyAtomicType) as xs:string? := { 1:'A', 'x':'B' } return $x?*",
         LOOKUP_X);
     error("let $x as fn(xs:integer) as xs:integer := [1, 2] return $x?*", LOOKUP_X);

@@ -1036,7 +1036,7 @@ public final class RewritingsTest extends SandboxTest {
         empty(TypeCheck.class), root(ItemSeq.class), count(Itr.class, 2));
 
     error("<a/> coerce to empty-sequence()", INVTYPE_X);
-    error("(1, 128) coerce to xs:byte+", FUNCCAST_X_X_X);
+    error("(1, 128) coerce to xs:byte+", INVTYPE_X);
   }
 
   /** Treat and coerce, error messages. */
@@ -2235,8 +2235,8 @@ public final class RewritingsTest extends SandboxTest {
     check("for $a in (1 to 2)[. >= 0] group by $a as xs:byte := $a return $a", "1\n2",
         root(GFLWOR.class));
 
-    error("for $a as xs:byte in (127 to 128)[. >= 0] group by $a return $a", FUNCCAST_X_X_X);
-    error("for $a in (127 to 128)[. >= 0] group by $a as xs:byte := $a return $a", FUNCCAST_X_X_X);
+    error("for $a as xs:byte in (127 to 128)[. >= 0] group by $a return $a", INVTYPE_X);
+    error("for $a in (127 to 128)[. >= 0] group by $a as xs:byte := $a return $a", INVTYPE_X);
   }
 
   /** Rewrite expression range to replicate. */

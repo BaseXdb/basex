@@ -100,9 +100,11 @@ public final class ADateTest extends SandboxTest {
     query("count(distinct-values((xs:dateTime('2026-07-22T12:00:00Z'), " +
         "xs:dateTime('2026-07-22T14:00:00+02:00'))))", 1);
     query("count(distinct-values((xs:date('2026-07-22Z'), xs:date('2026-07-22+00:00'))))", 1);
-    // a value with a timezone is never equal to one without
-    query("count(distinct-values((xs:dateTime('2026-07-22T12:00:00Z'), " +
-        "xs:dateTime('2026-07-22T12:00:00'))))", 2);
+    // a value with a timezone is deduplicated with one without only if both compare as equal,
+    // which depends on the implicit timezone
+    query("let $a := xs:dateTime('2026-07-22T12:00:00Z'), " +
+        "$b := xs:dateTime('2026-07-22T12:00:00') " +
+        "return count(distinct-values(($a, $b))) = (if($a eq $b) then 1 else 2)", true);
     // values without a timezone are compared in the same implicit timezone
     query("count(distinct-values((xs:dateTime('2026-07-22T12:00:00'), " +
         "xs:dateTime('2026-07-22T12:00:00'))))", 1);
