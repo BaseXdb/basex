@@ -4,7 +4,7 @@ import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 
 import java.io.*;
-import java.util.*;
+import java.time.*;
 import java.util.zip.*;
 
 import org.basex.core.*;
@@ -95,7 +95,7 @@ public final class CreateBackup extends ABackup {
     final StringList files = sopts.dbFiles(db);
     if(cmd != null) cmd.total = files.size();
 
-    final String name = db + '-' + DateTime.format(new Date(), DateTime.DATETIME) + IO.ZIPSUFFIX;
+    final String name = db + '-' + DateTime.DATETIME.format(LocalDateTime.now()) + IO.ZIPSUFFIX;
     final IOFile backup = sopts.dbPath(name);
     try(BufferOutput bo = new BufferOutput(backup); ZipOutputStream out = new ZipOutputStream(bo)) {
       if(comment != null) {

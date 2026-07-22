@@ -17,7 +17,6 @@ public final class FnMonthFromDateTime extends DateTimeFn {
     final ADate value = toGregorianOrNull(arg(0), qc);
     if(value == null) return Empty.VALUE;
 
-    final long comp = value.mon();
-    return comp == 0 ? Empty.VALUE : Itr.get(comp);
+    return value.hasMonth() ? Itr.get(value.mon()) : Empty.VALUE;
   }
 }

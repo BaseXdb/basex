@@ -1,7 +1,7 @@
 package org.basex.util.log;
 
 import java.math.*;
-import java.util.*;
+import java.time.*;
 
 /**
  * Log entry.
@@ -27,7 +27,7 @@ public final class LogEntry {
   public BigDecimal ms;
 
   /** Date. */
-  Date date;
+  LocalDateTime date;
 
   /** Cached string representation. */
   private String string;

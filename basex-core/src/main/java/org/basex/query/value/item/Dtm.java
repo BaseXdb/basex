@@ -4,7 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.math.*;
-import java.util.*;
+import java.time.*;
 
 import org.basex.query.*;
 import org.basex.query.value.type.*;
@@ -30,7 +30,8 @@ public final class Dtm extends ADate {
   public Dtm(final ADate date, final Type type, final InputInfo info) throws QueryException {
     super(type, date);
     if(type == BasicType.DATE_TIME_STAMP && !hasTz()) throw MISSINGZONE_X.get(info, date);
-    if(hour == -1) {
+    if(!has(HRS)) {
+      defined |= HRS | MIN | SEC;
       hour = 0;
       minute = 0;
       seconds = BigDecimal.ZERO;
@@ -47,12 +48,14 @@ public final class Dtm extends ADate {
   public Dtm(final Dat date, final Tim time, final InputInfo info) throws QueryException {
     super(BasicType.DATE_TIME, date);
 
+    defined |= time.defined & (HRS | MIN | SEC);
     hour = time.hour;
     minute = time.minute;
     seconds = time.seconds;
-    if(tz == Short.MAX_VALUE) {
+    if(!has(ZON)) {
+      defined |= time.defined & ZON;
       tz = time.tz;
-    } else if(tz != time.tz && time.tz != Short.MAX_VALUE) {
+    } else if(tz != time.tz && time.hasTz()) {
       throw FUNZONE_X_X.get(info, date, time);
     }
   }
@@ -85,8 +88,7 @@ public final class Dtm extends ADate {
 
     this(dateTime, dateTime.type, info);
     if(dur instanceof final DTDur dtd) {
-      calc(dtd, plus);
-      if(year <= MIN_YEAR || year > MAX_YEAR) throw YEARRANGE_X.get(info, year);
+      calc(dtd, plus, info);
     } else {
       calc((YMDur) dur, plus, info);
     }
@@ -114,11 +116,18 @@ public final class Dtm extends ADate {
    * @return dateTime instance
    */
   public static Dtm get(final long ms) {
-    try {
-      return new Dtm(Token.token(DateTime.format(new Date(ms))), BasicType.DATE_TIME_STAMP, null);
-    } catch(final QueryException ex) {
-      throw Util.notExpected(ex);
-    }
+    final LocalDateTime ldt = LocalDateTime.ofEpochSecond(Math.floorDiv(ms, 1000),
+        Math.floorMod(ms, 1000) * 1000000, ZoneOffset.UTC);
+    final Dtm dtm = new Dtm(BasicType.DATE_TIME_STAMP);
+    dtm.defined = YEA | MON | DAY | HRS | MIN | SEC | ZON;
+    dtm.year = ldt.getYear();
+    dtm.month = (byte) ldt.getMonthValue();
+    dtm.day = (byte) ldt.getDayOfMonth();
+    dtm.hour = (byte) ldt.getHour();
+    dtm.minute = (byte) ldt.getMinute();
+    dtm.seconds = BigDecimal.valueOf(ldt.getSecond() * 1000L + ldt.getNano() / 1000000, 3);
+    dtm.tz = 0;
+    return dtm;
   }
 
   /**
@@ -129,8 +138,7 @@ public final class Dtm extends ADate {
    * @throws QueryException query exception
    */
   public static Dtm local(final long ms, final InputInfo info) throws QueryException {
-    return get(ms).timeZone(
-        new DTDur(BigDecimal.valueOf(TimeZone.getDefault().getOffset(ms) / 1000)), false, info);
+    return get(ms).timeZone(new DTDur(BigDecimal.valueOf(DateTime.offset(ms))), false, info);
   }
 
   @Override
@@ -176,9 +184,12 @@ public final class Dtm extends ADate {
       final Long hours, final Long minutes, final BigDecimal seconds,
       final DTDur zone, final InputInfo info) throws QueryException {
     final Dtm base = new Dtm(targetType);
+    base.defined =
+      (year    != null ? YEA : 0) | (month   != null ? MON : 0) | (day     != null ? DAY : 0) |
+      (hours   != null ? HRS : 0) | (minutes != null ? MIN : 0) | (seconds != null ? SEC : 0);
     base.year    = year    == null ? Long.MAX_VALUE : year;
-    base.month   = month   == null ? -1             : (byte) (month - 1);
-    base.day     = day     == null ? -1             : (byte) (day - 1);
+    base.month   = month   == null ? -1             : month.byteValue();
+    base.day     = day     == null ? -1             : day.byteValue();
     base.hour    = hours   == null ? -1             : hours.byteValue();
     base.minute  = minutes == null ? -1             : minutes.byteValue();
     base.seconds = seconds;

@@ -7,6 +7,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.net.*;
 import java.nio.file.*;
+import java.time.*;
 import java.util.*;
 
 import org.basex.core.*;
@@ -746,8 +747,14 @@ public abstract class StandardFunc extends Arr {
    */
   protected final long toMs(final Expr expr, final QueryContext qc) throws QueryException {
     final Dtm dtm = (Dtm) checkType(expr, BasicType.DATE_TIME, qc);
-    if(dtm.yea() > 292278993) throw INTRANGE_X.get(info, dtm.yea());
-    return dtm.toJava().toGregorianCalendar().getTimeInMillis();
+    final LocalDateTime ldt = dtm.toLocalDateTime();
+    try {
+      return ldt.toInstant(dtm.hasTz() ? ZoneOffset.ofTotalSeconds(dtm.tz() * 60) :
+        ZoneId.systemDefault().getRules().getOffset(ldt)).toEpochMilli();
+    } catch(final ArithmeticException | DateTimeException ex) {
+      Util.debug(ex);
+      throw INTRANGE_X.get(info, dtm.yea());
+    }
   }
 
   /**

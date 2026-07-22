@@ -77,7 +77,7 @@ public class Dur extends ADateDur {
     this(BasicType.DURATION);
     checkFactor(factor, mult, type, info);
     months = scaleMonths(dur.months, factor, mult, info);
-    seconds = scaleSeconds(dur.seconds == null ? BigDecimal.ZERO : dur.seconds, factor, mult);
+    seconds = scaleSeconds(dur.totalSeconds(), factor, mult);
   }
 
   /**
@@ -88,7 +88,7 @@ public class Dur extends ADateDur {
   private Dur(final Dur dur, final Type type) {
     this(type);
     months = dur.months;
-    seconds = dur.seconds == null ? BigDecimal.ZERO : dur.seconds;
+    seconds = dur.totalSeconds();
   }
 
   /**
@@ -180,6 +180,15 @@ public class Dur extends ADateDur {
   @Override
   public final BigDecimal seconds() {
     return seconds.remainder(BD_60);
+  }
+
+  /**
+   * Returns the total number of seconds, or zero if the component is undefined
+   * (a duration with no time part, such as {@code P1Y}).
+   * @return seconds
+   */
+  final BigDecimal totalSeconds() {
+    return seconds == null ? BigDecimal.ZERO : seconds;
   }
 
   /**

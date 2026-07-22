@@ -27,7 +27,7 @@ public final class DTDur extends Dur {
    */
   public DTDur(final Dur dur) {
     super(BasicType.DAY_TIME_DURATION);
-    seconds = dur.seconds == null ? BigDecimal.ZERO : dur.seconds;
+    seconds = dur.totalSeconds();
   }
 
   /**
@@ -106,7 +106,9 @@ public final class DTDur extends Dur {
    */
   public DTDur(final ADate date, final ADate sub, final InputInfo info) throws QueryException {
     super(BasicType.DAY_TIME_DURATION);
-    seconds = date.toSeconds().subtract(sub.toSeconds());
+    // resolve the implicit timezone once, and only if an operand is missing one
+    final int implicit = date.hasTz() && sub.hasTz() ? 0 : ADate.implicitTz();
+    seconds = date.toSeconds(implicit).subtract(sub.toSeconds(implicit));
     final double d = seconds.doubleValue();
     if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw SECRANGE_X.get(info, d);
   }

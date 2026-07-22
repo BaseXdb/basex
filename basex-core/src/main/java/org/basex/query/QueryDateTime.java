@@ -2,7 +2,8 @@ package org.basex.query;
 
 import static org.basex.util.Token.*;
 
-import java.util.*;
+import java.math.*;
+import java.time.*;
 
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -31,15 +32,13 @@ public final class QueryDateTime {
    * @throws QueryException query exception
    */
   public QueryDateTime() throws QueryException {
-    final Date d = new Date();
-    final String ymd = DateTime.format(d, DateTime.DATE);
-    final String hms = DateTime.format(d, DateTime.TIME);
-    final String zon = DateTime.format(d, DateTime.ZONE);
-    final String znm = zon.substring(0, 3), zns = zon.substring(3);
-    time = new Tim(token(hms + znm + ':' + zns), null);
-    date = new Dat(token(ymd + znm + ':' + zns), null);
-    datm = new Dtm(token(ymd + 'T' + hms + znm + ':' + zns), BasicType.DATE_TIME_STAMP, null);
-    zone = new DTDur(Strings.toInt(znm), Strings.toInt(zns));
+    final ZonedDateTime zdt = ZonedDateTime.now();
+    final String ymd = DateTime.DATE.format(zdt), hms = DateTime.TIME.format(zdt);
+    final String zon = DateTime.ZONE.format(zdt);
+    time = new Tim(token(hms + zon), null);
+    date = new Dat(token(ymd + zon), null);
+    datm = new Dtm(token(ymd + 'T' + hms + zon), BasicType.DATE_TIME_STAMP, null);
+    zone = new DTDur(BigDecimal.valueOf(zdt.getOffset().getTotalSeconds()));
     nano = System.nanoTime();
   }
 }

@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.value.type.BasicType.*;
 
 import java.math.*;
+import java.time.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -157,7 +158,7 @@ public class FnBuildDateTime extends DateTimeFn {
    * @throws QueryException query exception
    */
   private static void checkYear(final long year, final InputInfo info) throws QueryException {
-    if(year <= ADate.MIN_YEAR || year > ADate.MAX_YEAR)
+    if(year < Year.MIN_VALUE || year > Year.MAX_VALUE)
       throw INVALIDVALUE_X_X.get(info, YEAR, year);
   }
 
@@ -193,8 +194,7 @@ public class FnBuildDateTime extends DateTimeFn {
       throws QueryException {
     checkMonth(month, info);
     checkDayOnly(day, info);
-    if(day < 1 || day > ADate.DAYS[(int) month - 1] + (month == 2 ? 1 : 0))
-      throw INVALIDVALUE_X_X.get(info, DAY, day);
+    if(day > ADate.maxDaysOfMonth((int) month)) throw INVALIDVALUE_X_X.get(info, DAY, day);
   }
 
   /**
@@ -210,7 +210,7 @@ public class FnBuildDateTime extends DateTimeFn {
     checkYear(year, info);
     checkMonth(month, info);
     checkDayOnly(day, info);
-    final int dom = ADate.daysOfMonth(year, (int) month - 1);
+    final int dom = ADate.daysOfMonth(year, (int) month);
     if(day > dom) throw INVALIDVALUE_X_X.get(info, DAY, day);
   }
 

@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 
 import java.math.*;
 import java.time.*;
+import java.time.temporal.*;
 import java.time.zone.*;
 import java.util.*;
 
@@ -170,7 +171,7 @@ public abstract class Formatter extends FormatUtil {
         final ZoneRules rules = id.getRules();
         final boolean time = dt.type == BasicType.TIME;
         final Instant instant = time ? Instant.now() :
-          dt.toJava().toGregorianCalendar().toInstant();
+          dt.toLocalDateTime().atZone(zoneId(dt)).toInstant();
         final ZoneOffset offset = time ? rules.getStandardOffset(instant) :
           rules.getOffset(instant);
         date = dt.timeZone(DTDur.get(offset.getTotalSeconds() * 1000L), false, info);
@@ -219,27 +220,25 @@ public abstract class Formatter extends FormatUtil {
           }
           case 'd' -> {
             final long y = date.yea();
-            for(int m = (int) date.mon() - 1; --m >= 0;) num += ADate.daysOfMonth(y, m);
+            for(int m = (int) date.mon(); --m >= 1;) num += ADate.daysOfMonth(y, m);
             num += date.day();
             err = tim;
           }
           case 'F' -> {
-            num = date.toJava().toGregorianCalendar().get(Calendar.DAY_OF_WEEK) - 1;
-            if(num == 0) num = 7;
+            num = date.toLocalDate().getDayOfWeek().getValue();
             pres = N;
             err = tim;
           }
           case 'W' -> {
-            num = date.toJava().toGregorianCalendar().get(Calendar.WEEK_OF_YEAR);
+            num = date.toLocalDate().get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
             err = tim;
           }
           case 'w' -> {
-            num = date.toJava().toGregorianCalendar().get(Calendar.WEEK_OF_MONTH);
-            // first week of month: fix value, according to ISO 8601
-            if(num == 0) {
-              num = new Dtm(new Dtm(date, BasicType.DATE_TIME, info), new DTDur(date.day() * 24, 0),
-                  false, info).toJava().toGregorianCalendar().get(Calendar.WEEK_OF_MONTH);
-            }
+            final TemporalField wom = WeekFields.ISO.weekOfMonth();
+            final LocalDate ld = date.toLocalDate();
+            num = ld.get(wom);
+            // first week of month: use last week of previous month, according to ISO 8601
+            if(num == 0) num = ld.minusDays(ld.getDayOfMonth()).get(wom);
             err = tim;
           }
           case 'H' -> {
@@ -621,6 +620,15 @@ public abstract class Formatter extends FormatUtil {
     jp(tb, n / f, true);
     tb.add(KANJI[o]);
     jp(tb, n % f, false);
+  }
+
+  /**
+   * Returns the timezone of a date, or the system timezone if the date has none.
+   * @param date date
+   * @return timezone
+   */
+  private static ZoneId zoneId(final ADate date) {
+    return date.hasTz() ? ZoneOffset.ofTotalSeconds(date.tz() * 60) : ZoneId.systemDefault();
   }
 
   /**

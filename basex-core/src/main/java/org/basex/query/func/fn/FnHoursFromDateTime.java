@@ -17,7 +17,6 @@ public final class FnHoursFromDateTime extends DateTimeFn {
     final ADate value = toGregorianOrNull(arg(0), qc);
     if(value == null) return Empty.VALUE;
 
-    final long comp = value.hour();
-    return comp == -1 ? Empty.VALUE : Itr.get(comp);
+    return value.hasHours() ? Itr.get(value.hour()) : Empty.VALUE;
   }
 }

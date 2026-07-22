@@ -1,6 +1,5 @@
 package org.basex.query.value.item;
 
-import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
@@ -47,8 +46,7 @@ public final class Dat extends ADate {
 
     this(value);
     if(dur instanceof final DTDur dtd) {
-      calc(dtd, plus);
-      if(year <= MIN_YEAR || year > MAX_YEAR) throw YEARRANGE_X.get(info, year);
+      calc(dtd, plus, info);
     } else {
       calc((YMDur) dur, plus, info);
     }
@@ -68,6 +66,7 @@ public final class Dat extends ADate {
    * Cleans the item and removes invalid components.
    */
   private void clean() {
+    defined &= ~(HRS | MIN | SEC);
     hour = -1;
     minute = -1;
     seconds = null;

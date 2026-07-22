@@ -5,6 +5,7 @@ import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
+import java.time.*;
 import java.util.*;
 
 import org.basex.*;
@@ -280,7 +281,7 @@ public final class JobModuleTest extends SandboxTest {
     final String id = query(func.args("1", " ()", " { 'log': '" + uuid + "' }"));
     query(_JOB_WAIT.args(id));
     // find log entry
-    final String date = DateTime.format(new Date(), DateTime.DATE);
+    final String date = DateTime.DATE.format(LocalDate.now());
     query(_ADMIN_LOGS.args(date) + " = '" + uuid + "'", true);
   }
 

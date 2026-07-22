@@ -33,7 +33,7 @@ public final class DbBackups extends DbAccessFn {
         final String backup = backups.get((int) i), db = Databases.name(backup);
         final FBuilder elem = FElem.build(Q_BACKUP).text(backup);
         if(!db.isEmpty()) elem.attr(Q_DATABASE, db);
-        elem.attr(Q_DATE, Dtm.get(DateTime.parse(Databases.date(backup)).getTime()).string(info));
+        elem.attr(Q_DATE, Dtm.get(DateTime.parse(Databases.date(backup))).string(info));
         elem.attr(Q_SIZE, new IOFile(dbPath, backup + IO.ZIPSUFFIX).length());
         final String comment = ShowBackups.comment(backup, ctx);
         if(!comment.isEmpty()) elem.attr(Q_COMMENT, comment);

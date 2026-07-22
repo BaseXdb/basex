@@ -17,7 +17,6 @@ public final class FnYearFromDateTime extends DateTimeFn {
     final ADate value = toGregorianOrNull(arg(0), qc);
     if(value == null) return Empty.VALUE;
 
-    final long comp = value.yea();
-    return comp == Long.MAX_VALUE ? Empty.VALUE : Itr.get(comp);
+    return value.hasYear() ? Itr.get(value.yea()) : Empty.VALUE;
   }
 }

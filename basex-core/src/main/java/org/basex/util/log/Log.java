@@ -1,6 +1,7 @@
 package org.basex.util.log;
 
 import java.io.*;
+import java.time.*;
 import java.util.*;
 import java.util.function.*;
 import java.util.regex.*;
@@ -146,8 +147,8 @@ public final class Log implements QueryTracer {
     }
 
     final LogEntry entry = new LogEntry();
-    entry.date = new Date();
-    entry.time = DateTime.format(entry.date, DateTime.TIME);
+    entry.date = LocalDateTime.now();
+    entry.time = DateTime.TIME.format(entry.date);
     entry.address = addr;
     entry.user = user != null ? user : UserText.ADMIN;
     entry.type = type.toString();
@@ -246,7 +247,7 @@ public final class Log implements QueryTracer {
    * @throws IOException I/O exception
    */
   public void write(final LogEntry entry) throws IOException {
-    final String name = DateTime.format(entry.date, DateTime.DATE);
+    final String name = DateTime.DATE.format(entry.date);
     if(file != null && !file.valid(name)) close();
     if(file == null) file = LogFile.create(name, dir());
     file.write(Token.token(entry + Prop.NL));

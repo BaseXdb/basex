@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.value.item.Dec.*;
 
 import java.math.*;
+import java.time.*;
 import java.util.*;
 import java.util.regex.*;
 
@@ -22,12 +23,10 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class ADate extends ADateDur {
-  /** Maximum value for computations on year value based on long range. */
-  public static final long MAX_YEAR = (long) (Long.MAX_VALUE / 365.2425) - 2;
-  /** Minimum year value. */
-  public static final long MIN_YEAR = -MAX_YEAR;
-  /** Constant for counting negative years (divisible by 400). */
-  private static final long ADD_NEG = (MAX_YEAR / 400 + 1) * 400;
+  /** Minimum day count. */
+  private static final long MIN_DAY = LocalDate.MIN.toEpochDay();
+  /** Maximum day count. */
+  private static final long MAX_DAY = LocalDate.MAX.toEpochDay();
 
   /** Pattern for two digits. */
   static final String DD = "(\\d{2})";
@@ -35,33 +34,43 @@ public abstract class ADate extends ADateDur {
   static final String YEAR = "(-?([1-9]\\d{3,}|0\\d{3}))";
   /** Date pattern. */
   static final String ZONE = "(([-+])" + DD + ':' + DD + "|Z)?";
-  /** Day per months. */
-  public static final byte[] DAYS = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-
   /** Date pattern. */
   public static final Pattern DATE = Pattern.compile(YEAR + '-' + DD + '-' + DD + ZONE);
   /** Time pattern. */
   public static final Pattern TIME = Pattern.compile(
       DD + ':' + DD + ':' + "(\\d{2}(\\.\\d+)?)" + ZONE);
 
-  /** Year.
-   * <ul>
-   *   <li> 1 - {@code Long#MAX_VALUE}-1: AD</li>
-   *   <li> 0 - {@link Long#MIN_VALUE}: BC</li>
-   *   <li> {@link Long#MAX_VALUE}: undefined</li>
-   * </ul> */
+  /** Component flag: year. */
+  static final int YEA = 1;
+  /** Component flag: month. */
+  static final int MON = 2;
+  /** Component flag: day. */
+  static final int DAY = 4;
+  /** Component flag: hours. */
+  static final int HRS = 8;
+  /** Component flag: minutes. */
+  static final int MIN = 16;
+  /** Component flag: seconds. */
+  static final int SEC = 32;
+  /** Component flag: timezone. */
+  static final int ZON = 64;
+
+  /** Components that have been assigned. Undefined components keep their initial value. */
+  int defined;
+
+  /** Year ({@code 1 - Long#MAX_VALUE-1}: AD, {@code 0 - Long#MIN_VALUE}: BC). */
   long year = Long.MAX_VALUE;
-  /** Month ({@code 0-11}). {@code -1}: undefined. */
+  /** Month ({@code 1-12}). */
   byte month = -1;
-  /** Day ({@code 0-30}). {@code -1}: undefined. */
+  /** Day ({@code 1-31}). */
   byte day = -1;
-  /** Hour ({@code 0-59}). {@code -1}: undefined. */
+  /** Hour ({@code 0-59}). */
   byte hour = -1;
-  /** Minute ({@code 0-59}). {@code -1}: undefined. */
+  /** Minute ({@code 0-59}). */
   byte minute = -1;
-  /** Seconds and milliseconds. {@code null}: undefined. */
+  /** Seconds and milliseconds. */
   BigDecimal seconds;
-  /** Timezone in minutes ({@code -14*60-14*60}). {@link Short#MAX_VALUE}: undefined. */
+  /** Timezone in minutes ({@code -14*60-14*60}). */
   short tz = Short.MAX_VALUE;
 
   /** Data factory. */
@@ -82,6 +91,7 @@ public abstract class ADate extends ADateDur {
    */
   ADate(final Type type, final ADate date) {
     super(type);
+    defined = date.defined;
     year = date.year;
     month = date.month;
     day = date.day;
@@ -110,13 +120,14 @@ public abstract class ADate extends ADateDur {
     final Matcher mt = DATE.matcher(Token.string(date).trim());
     if(!mt.matches()) throw dateError(date, exp, info);
     year = toLong(mt.group(1), false, info);
-    month = (byte) (Strings.toInt(mt.group(3)) - 1);
-    day = (byte) (Strings.toInt(mt.group(4)) - 1);
+    month = (byte) Strings.toInt(mt.group(3));
+    day = (byte) Strings.toInt(mt.group(4));
+    defined |= YEA | MON | DAY;
 
-    if(month < 0 || month >= 12 || day < 0 || day >= daysOfMonth(year, month)) {
+    if(month < 1 || month > 12 || day < 1 || day > daysOfMonth(year, month)) {
       throw dateError(date, exp, info);
     }
-    if(year <= MIN_YEAR || year > MAX_YEAR) throw DATERANGE_X_X.get(info, type, date);
+    if(year < Year.MIN_VALUE || year > Year.MAX_VALUE) throw DATERANGE_X_X.get(info, type, date);
     zone(mt, 5, date, info);
   }
 
@@ -134,6 +145,7 @@ public abstract class ADate extends ADateDur {
     hour = (byte) Strings.toInt(mt.group(1));
     minute = (byte) Strings.toInt(mt.group(2));
     seconds = toDecimal(mt.group(3), false, info);
+    defined |= HRS | MIN | SEC;
     if(minute >= 60 || seconds.compareTo(BD_60) >= 0 || hour > 24 ||
        hour == 24 && (minute > 0 || seconds.compareTo(BigDecimal.ZERO) > 0)) {
       throw dateError(time, exp, info);
@@ -141,7 +153,7 @@ public abstract class ADate extends ADateDur {
     zone(mt, 5, time, info);
     if(hour == 24) {
       hour = 0;
-      add(BD_864000);
+      add(BD_864000, info);
     }
   }
 
@@ -158,6 +170,7 @@ public abstract class ADate extends ADateDur {
 
     final String z = matcher.group(pos);
     if(z == null) return;
+    defined |= ZON;
     if("Z".equals(z)) {
       tz = 0;
     } else {
@@ -175,9 +188,12 @@ public abstract class ADate extends ADateDur {
    * Adds/subtracts the specified dayTime duration.
    * @param dur duration
    * @param plus plus/minus flag
+   * @param info input info (can be {@code null})
+   * @throws QueryException query exception
    */
-  final void calc(final DTDur dur, final boolean plus) {
-    add(plus ? dur.seconds : dur.seconds.negate());
+  final void calc(final DTDur dur, final boolean plus, final InputInfo info)
+      throws QueryException {
+    add(plus ? dur.seconds : dur.seconds.negate(), info);
   }
 
   /**
@@ -189,56 +205,45 @@ public abstract class ADate extends ADateDur {
    */
   final void calc(final YMDur dur, final boolean plus, final InputInfo info) throws QueryException {
     final long m = plus ? dur.months : -dur.months;
-    final long mn = month + m;
-    month = (byte) mod(mn, 12);
-    year += div(mn, 12);
-    day = (byte) Math.min(daysOfMonth(year, month) - 1, day);
+    final long mn = month - 1 + m;
+    month = (byte) (Math.floorMod(mn, 12) + 1);
+    year += Math.floorDiv(mn, 12);
+    day = (byte) Math.min(daysOfMonth(year, month), day);
 
-    if(year <= MIN_YEAR || year > MAX_YEAR) throw YEARRANGE_X.get(info, year);
+    if(year < Year.MIN_VALUE || year > Year.MAX_VALUE) throw YEARRANGE_X.get(info, year);
   }
 
   /**
    * Adds the specified dayTime duration.
    * @param add value to be added
+   * @param info input info (can be {@code null})
+   * @throws QueryException query exception
    */
-  private void add(final BigDecimal add) {
+  private void add(final BigDecimal add, final InputInfo info) throws QueryException {
     // normalized modulo: sc % 60  vs.  (-sc + sc % 60 + 60 + sc) % 60
     final BigDecimal sc = seconds().add(add);
     seconds = sc.signum() >= 0 ? sc.remainder(BD_60) :
       sc.negate().add(sc.remainder(BD_60)).add(BD_60).add(sc).remainder(BD_60);
 
-    final long mn = Math.max(minute(), 0) + div(
+    final long mn = (has(MIN) ? minute : 0) + Math.floorDiv(
         sc.setScale(0, RoundingMode.FLOOR).longValue(), 60);
-    minute = (byte) mod(mn, 60);
+    minute = (byte) Math.floorMod(mn, 60);
 
-    final long ho = Math.max(hour, 0) + div(mn, 60);
-    hour = (byte) mod(ho, 24);
-    final long da = div(ho, 24);
+    final long ho = (has(HRS) ? hour : 0) + Math.floorDiv(mn, 60);
+    hour = (byte) Math.floorMod(ho, 24);
+    defined |= HRS | MIN | SEC;
 
-    final long[] ymd = ymd(days().add(BigDecimal.valueOf(da)));
-    year = ymd[0];
-    month = (byte) ymd[1];
-    day = (byte) ymd[2];
-  }
+    // xs:time: the date is undefined and will be discarded
+    if(!has(YEA)) return;
 
-  /**
-   * Returns a normalized module value for negative and positive values.
-   * @param value input value
-   * @param mod modulo
-   * @return result
-   */
-  private static long mod(final long value, final int mod) {
-    return (value > 0 ? value : Long.MAX_VALUE / mod * mod + value) % mod;
-  }
+    final long dys = days() + Math.floorDiv(ho, 24);
+    // 400 years span exactly 146097 days: sufficient for an approximate error message
+    if(dys < MIN_DAY || dys > MAX_DAY) throw YEARRANGE_X.get(info, dys * 400 / 146097 + 1970);
 
-  /**
-   * Returns a normalized division value for negative and positive values.
-   * @param value input value
-   * @param div divisor
-   * @return result
-   */
-  private static long div(final long value, final int div) {
-    return value < 0 ? (value + 1) / div - 1 : value / div;
+    final LocalDate ld = LocalDate.ofEpochDay(dys);
+    year = ld.getYear();
+    month = (byte) ld.getMonthValue();
+    day = (byte) ld.getDayOfMonth();
   }
 
   /**
@@ -264,10 +269,10 @@ public abstract class ADate extends ADateDur {
     final short t;
     if(undefined) {
       t = Short.MAX_VALUE;
+      defined &= ~ZON;
     } else {
       if(dur == null) {
-        final Calendar c = Calendar.getInstance();
-        t = (short) ((c.get(Calendar.ZONE_OFFSET) + c.get(Calendar.DST_OFFSET)) / 60000);
+        t = (short) implicitTz();
       } else {
         t = (short) (dur.minute() + dur.hour() * 60);
         if(dur.seconds().signum() != 0) throw ZONESEC_X.get(info, dur);
@@ -275,7 +280,8 @@ public abstract class ADate extends ADateDur {
       }
 
       // change time if two competing time zones exist
-      if(tz != Short.MAX_VALUE) add(BigDecimal.valueOf(60L * (t - tz)));
+      if(has(ZON)) add(BigDecimal.valueOf(60L * (t - tz)), info);
+      defined |= ZON;
     }
     tz = t;
   }
@@ -287,12 +293,12 @@ public abstract class ADate extends ADateDur {
 
   @Override
   public final long mon() {
-    return month + 1;
+    return month;
   }
 
   @Override
   public final long day() {
-    return day + 1;
+    return day;
   }
 
   @Override
@@ -307,15 +313,7 @@ public abstract class ADate extends ADateDur {
 
   @Override
   public final BigDecimal seconds() {
-    return seconds == null ? BigDecimal.ZERO : seconds;
-  }
-
-  /**
-   * Returns the seconds component.
-   * @return seconds or {@code null})
-   */
-  public final BigDecimal sec() {
-    return seconds;
+    return has(SEC) ? seconds : BigDecimal.ZERO;
   }
 
   /**
@@ -327,17 +325,74 @@ public abstract class ADate extends ADateDur {
   }
 
   /**
+   * Returns if all specified components are defined.
+   * @param components component flags
+   * @return result of check
+   */
+  final boolean has(final int components) {
+    return (defined & components) == components;
+  }
+
+  /**
+   * Returns if the year is defined.
+   * @return result of check
+   */
+  public final boolean hasYear() {
+    return has(YEA);
+  }
+
+  /**
+   * Returns if the month is defined.
+   * @return result of check
+   */
+  public final boolean hasMonth() {
+    return has(MON);
+  }
+
+  /**
+   * Returns if the day is defined.
+   * @return result of check
+   */
+  public final boolean hasDay() {
+    return has(DAY);
+  }
+
+  /**
+   * Returns if the hours are defined.
+   * @return result of check
+   */
+  public final boolean hasHours() {
+    return has(HRS);
+  }
+
+  /**
+   * Returns if the minutes are defined.
+   * @return result of check
+   */
+  public final boolean hasMinutes() {
+    return has(MIN);
+  }
+
+  /**
+   * Returns if the seconds are defined.
+   * @return result of check
+   */
+  public final boolean hasSeconds() {
+    return has(SEC);
+  }
+
+  /**
    * Returns if the timezone is defined.
    * @return time zone
    */
   public final boolean hasTz() {
-    return tz != Short.MAX_VALUE;
+    return has(ZON);
   }
 
   @Override
   public byte[] string(final InputInfo ii) {
     final TokenBuilder tb = new TokenBuilder();
-    final boolean ymd = year != Long.MAX_VALUE;
+    final boolean ymd = has(YEA);
     if(ymd) {
       if(year < 0) tb.add('-');
       prefix(tb, Math.abs(yea()), 4);
@@ -346,7 +401,7 @@ public abstract class ADate extends ADateDur {
       tb.add('-');
       prefix(tb, day(), 2);
     }
-    if(hour >= 0) {
+    if(has(HRS)) {
       if(ymd) tb.add('T');
       prefix(tb, hour(), 2);
       tb.add(':');
@@ -364,15 +419,8 @@ public abstract class ADate extends ADateDur {
    * @param tb token builder
    */
   void zone(final TokenBuilder tb) {
-    if(tz == Short.MAX_VALUE) return;
-    if(tz == 0) {
-      tb.add('Z');
-    } else {
-      tb.add(tz > 0 ? '+' : '-');
-      prefix(tb, Math.abs(tz) / 60, 2);
-      tb.add(':');
-      prefix(tb, Math.abs(tz) % 60, 2);
-    }
+    // the offset ID is the XSD lexical form: 'Z', or +/-HH:MM
+    if(has(ZON)) tb.add(ZoneOffset.ofTotalSeconds(tz * 60).getId());
   }
 
   /**
@@ -402,7 +450,9 @@ public abstract class ADate extends ADateDur {
 
   @Override
   public final int hashCode() {
-    return toSeconds().intValue();
+    // the implicit timezone is irrelevant here: items are only equal if both have or lack a
+    // timezone, and if both lack one, it cancels out in the comparison
+    return toSeconds(0).intValue();
   }
 
   @Override
@@ -421,28 +471,31 @@ public abstract class ADate extends ADateDur {
    */
   private int compare(final Item item, final InputInfo info) throws QueryException {
     final ADate dat = (ADate) (item instanceof ADate ? item : type.cast(item, null, info));
-    return toSeconds().compareTo(dat.toSeconds());
+    // resolve the implicit timezone once, and only if an operand is missing one
+    final int implicit = has(ZON) && dat.has(ZON) ? 0 : implicitTz();
+    return toSeconds(implicit).compareTo(dat.toSeconds(implicit));
   }
 
   @Override
   public final XMLGregorianCalendar toJava() {
     return DF.newXMLGregorianCalendar(
-      year == Long.MAX_VALUE ? null : BigInteger.valueOf(year),
-      month >= 0 ? month + 1 : Integer.MIN_VALUE,
-      day >= 0 ? day + 1 : Integer.MIN_VALUE,
-      hour >= 0 ? hour : Integer.MIN_VALUE,
-      minute >= 0 ? minute : Integer.MIN_VALUE,
-      seconds != null ? seconds.intValue() : Integer.MIN_VALUE,
-      seconds != null ? seconds.remainder(BigDecimal.ONE) : null,
-      tz == Short.MAX_VALUE ? Integer.MIN_VALUE : tz);
+      has(YEA) ? BigInteger.valueOf(year) : null,
+      has(MON) ? month : Integer.MIN_VALUE,
+      has(DAY) ? day : Integer.MIN_VALUE,
+      has(HRS) ? hour : Integer.MIN_VALUE,
+      has(MIN) ? minute : Integer.MIN_VALUE,
+      has(SEC) ? seconds.intValue() : Integer.MIN_VALUE,
+      has(SEC) ? seconds.remainder(BigDecimal.ONE) : null,
+      has(ZON) ? tz : Integer.MIN_VALUE);
   }
 
   /**
    * Returns the date in seconds.
+   * @param implicit implicit timezone in minutes, applied if the item has none
    * @return seconds
    */
-  final BigDecimal toSeconds() {
-    return daySeconds().add(days().multiply(BD_864000));
+  final BigDecimal toSeconds(final int implicit) {
+    return daySeconds(implicit).add(BigDecimal.valueOf(days()).multiply(BD_864000));
   }
 
   /**
@@ -450,71 +503,78 @@ public abstract class ADate extends ADateDur {
    * @return seconds
    */
   public final BigDecimal daySeconds() {
-    int z = tz;
-    if(z == Short.MAX_VALUE) {
-      final long n = System.currentTimeMillis();
-      z = Calendar.getInstance().getTimeZone().getOffset(n) / 60000;
-    }
-    return (seconds == null ? BigDecimal.ZERO : seconds).add(
-        BigDecimal.valueOf(Math.max(0, hour) * 3600L + Math.max(0, minute) * 60L - z * 60L));
+    return daySeconds(implicitTz());
   }
 
   /**
-   * Returns a day count.
+   * Returns the seconds of one day.
+   * @param implicit implicit timezone in minutes, applied if the item has none
+   * @return seconds
+   */
+  private BigDecimal daySeconds(final int implicit) {
+    final int z = has(ZON) ? tz : implicit;
+    return seconds().add(BigDecimal.valueOf(
+        (has(HRS) ? hour : 0) * 3600L + (has(MIN) ? minute : 0) * 60L - z * 60L));
+  }
+
+  /**
+   * Returns the implicit timezone, i.e. the offset of the system timezone, in minutes.
+   * Resolved per call: the value of the query context ({@link QueryDateTime#zone}, returned by
+   * {@code fn:implicit-timezone}) is not available here, so both can differ if the offset changes
+   * while a query is running.
+   * @return offset
+   */
+  static int implicitTz() {
+    return DateTime.offset(System.currentTimeMillis()) / 60;
+  }
+
+  /**
+   * Returns the day count since 1970-01-01.
    * @return days
    */
-  final BigDecimal days() {
-    final long y = year == Long.MAX_VALUE ? 1 : year;
-    return days(y + ADD_NEG, Math.max(month, 0), Math.max(day, 0));
-  }
-
-  /**
-   * Returns a day count for the specified years, months and days.
-   * All values must be specified in their internal representation
-   * (undefined values are supported, too).
-   * Algorithm is derived from J R Stockton (http://www.merlyn.demon.co.uk/daycount.htm).
-   * @param year year
-   * @param month month
-   * @param day days
-   * @return days
-   */
-  private static BigDecimal days(final long year, final int month, final int day) {
-    final long y = year - (month < 2 ? 1 : 0), m = month + (month < 2 ? 13 : 1), d = day + 1;
-    return BD_365.multiply(BigDecimal.valueOf(y)).add(
-        BigDecimal.valueOf(y / 4 - y / 100 + y / 400 - 92 + d + (153 * m - 2) / 5));
-  }
-
-  /**
-   * Converts a day count into year, month and day components.
-   * Algorithm is derived from J R Stockton (http://www.merlyn.demon.co.uk/daycount.htm).
-   * @param days day count
-   * @return result array
-   */
-  private static long[] ymd(final BigDecimal days) {
-    BigDecimal d = days, t = d.add(BD_36525).multiply(BD_4).
-        divideToIntegralValue(BD_146097).subtract(BigDecimal.ONE);
-    BigDecimal y = BD_100.multiply(t);
-    d = d.subtract(BD_36524.multiply(t).add(t.divideToIntegralValue(BD_4)));
-    t = d.add(BD_366).multiply(BD_4).divideToIntegralValue(BD_1461).subtract(BigDecimal.ONE);
-    y = y.add(t);
-    d = d.subtract(BD_365.multiply(t).add(t.divideToIntegralValue(BD_4)));
-    final BigDecimal m = BD_5.multiply(d).add(BD_2).divideToIntegralValue(BD_153);
-    d = d.subtract(BD_153.multiply(m).add(BD_2).divideToIntegralValue(BD_5));
-    long mm = m.longValue();
-    if(mm > 9) { mm -= 12; y = y.add(BigDecimal.ONE); }
-    return new long[] { y.subtract(BigDecimal.valueOf(ADD_NEG)).longValue(),
-        mm + 2, d.longValue() };
+  final long days() {
+    // Reference year for values without year (leap year)
+    final int y = has(YEA) ? (int) year : 2000;
+    return LocalDate.of(y, has(MON) ? month : 1, 1).toEpochDay() + (has(DAY) ? day - 1 : 0);
   }
 
   /**
    * Returns the number of days of the specified month, considering leap years.
    * @param year year
-   * @param month month
+   * @param month month ({@code 1-12})
    * @return days
    */
   public static int daysOfMonth(final long year, final int month) {
-    final byte days = DAYS[month];
-    return month == 1 && year % 4 == 0 && (year % 100 != 0 || year % 400 == 0) ? days + 1 : days;
+    return Month.of(month).length(Year.isLeap(year));
+  }
+
+  /**
+   * Returns the maximum number of days of the specified month, irrespective of the year.
+   * February has 29 days, as required by {@code xs:gMonthDay} and {@code xs:gDay}.
+   * @param month month ({@code 1-12})
+   * @return days
+   */
+  public static int maxDaysOfMonth(final int month) {
+    return Month.of(month).maxLength();
+  }
+
+  /**
+   * Returns the date components as a local date. See {@link #days()} for undefined components.
+   * @return local date
+   */
+  public final LocalDate toLocalDate() {
+    return LocalDate.ofEpochDay(days());
+  }
+
+  /**
+   * Returns the date and time components as a local date and time.
+   * Undefined components are replaced with their minimum, fractional seconds are truncated.
+   * @return local date and time
+   */
+  public final LocalDateTime toLocalDateTime() {
+    final BigDecimal sc = seconds();
+    return toLocalDate().atTime(has(HRS) ? hour : 0, has(MIN) ? minute : 0, sc.intValue(),
+        sc.remainder(BigDecimal.ONE).movePointRight(9).intValue());
   }
 
   @Override

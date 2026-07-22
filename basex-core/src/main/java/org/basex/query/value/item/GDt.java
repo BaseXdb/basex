@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.value.type.BasicType.*;
 
+import java.time.*;
 import java.util.regex.*;
 
 import org.basex.query.*;
@@ -40,9 +41,13 @@ public final class GDt extends ADate {
    */
   public GDt(final ADate date, final Type type) {
     super(type, date);
-    if(type != G_YEAR && type != G_YEAR_MONTH) year = Long.MAX_VALUE;
-    if(type != G_MONTH && type != G_YEAR_MONTH && type != G_MONTH_DAY) month = -1;
-    if(type != G_DAY && type != G_MONTH_DAY) day = -1;
+    if(type != G_YEAR && type != G_YEAR_MONTH) { defined &= ~YEA; year = Long.MAX_VALUE; }
+    if(type != G_MONTH && type != G_YEAR_MONTH && type != G_MONTH_DAY) {
+      defined &= ~MON;
+      month = -1;
+    }
+    if(type != G_DAY && type != G_MONTH_DAY) { defined &= ~DAY; day = -1; }
+    defined &= ~(HRS | MIN | SEC);
     hour = -1;
     minute = -1;
     seconds = null;
@@ -65,16 +70,19 @@ public final class GDt extends ADate {
 
     if(i < 2) {
       year = toLong(mt.group(1), false, info);
-      if(year < MIN_YEAR || year >= MAX_YEAR) throw DATERANGE_X_X.get(info, type, date);
+      defined |= YEA;
+      if(year < Year.MIN_VALUE || year > Year.MAX_VALUE) throw DATERANGE_X_X.get(info, type, date);
     }
     if(i > 0 && i < 4) {
-      month = (byte) (Strings.toLong(mt.group(i == 1 ? 3 : 1)) - 1);
-      if(month < 0 || month > 11) throw dateError(date, EXAMPLES[i], info);
+      month = (byte) Strings.toLong(mt.group(i == 1 ? 3 : 1));
+      defined |= MON;
+      if(month < 1 || month > 12) throw dateError(date, EXAMPLES[i], info);
     }
     if(i > 2) {
-      day = (byte) (Strings.toLong(mt.group(i == 3 ? 2 : 1)) - 1);
-      final int m = Math.max(month, 0);
-      if(day < 0 || day >= DAYS[m] + (m == 1 ? 1 : 0)) throw dateError(date, EXAMPLES[i], info);
+      day = (byte) Strings.toLong(mt.group(i == 3 ? 2 : 1));
+      defined |= DAY;
+      if(day < 1 || day > maxDaysOfMonth(has(MON) ? month : 1))
+        throw dateError(date, EXAMPLES[i], info);
     }
     zone(mt, ZONES[i], date, info);
   }
@@ -100,16 +108,16 @@ public final class GDt extends ADate {
   @Override
   public byte[] string(final InputInfo ii) {
     final TokenBuilder tb = new TokenBuilder();
-    if(year == Long.MAX_VALUE) {
+    if(!has(YEA)) {
       tb.add('-');
     } else {
       if(year < 0) tb.add('-');
       prefix(tb, Math.abs(yea()), 4);
     }
-    if(month >= 0 || day >= 0) tb.add('-');
-    if(month >= 0) prefix(tb, month + 1, 2);
-    if(day >= 0) tb.add('-');
-    if(day >= 0) prefix(tb, day + 1, 2);
+    if(has(MON) || has(DAY)) tb.add('-');
+    if(has(MON)) prefix(tb, month, 2);
+    if(has(DAY)) tb.add('-');
+    if(has(DAY)) prefix(tb, day, 2);
 
     zone(tb);
     return tb.finish();
