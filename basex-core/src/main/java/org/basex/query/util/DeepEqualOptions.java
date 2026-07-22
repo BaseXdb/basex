@@ -25,8 +25,6 @@ public final class DeepEqualOptions extends Options {
   public static final BooleanOption COMMENTS = new BooleanOption("comments", false);
   /** Option: debug. */
   public static final BooleanOption DEBUG = new BooleanOption("debug", false);
-  /** Option: false-on-error. */
-  public static final BooleanOption FALSE_ON_ERROR = new BooleanOption("false-on-error", false);
   /** Option: id-property. */
   public static final BooleanOption ID_PROPERTY = new BooleanOption("id-property", false);
   /** Option: idrefs-property. */
@@ -49,8 +47,6 @@ public final class DeepEqualOptions extends Options {
   /** Option: normalization-form. */
   public static final EnumOption<Normalizer.Form> NORMALIZATION_FORM =
       new EnumOption<>("normalization-form", Normalizer.Form.class, STRING_ZO);
-  /** Option: normalize-space. */
-  public static final BooleanOption NORMALIZE_SPACE = new BooleanOption("normalize-space", false);
   /** Option: ordered. */
   public static final BooleanOption ORDERED = new BooleanOption("ordered", true);
   /** Option: processing-instructions. */

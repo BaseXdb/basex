@@ -196,6 +196,7 @@ public abstract class StandardFunc extends Arr {
           if(hasCTX()) return true;
         }
         case NDT -> {
+          if(hasNDT()) return true;
           // check whether function arguments may contain non-deterministic code
           final int hof = hofOffsets(), al = args().length;
           for(int a = 0; a < al; a++) {
@@ -225,6 +226,14 @@ public abstract class StandardFunc extends Arr {
    */
   public boolean hasCTX() {
     return definition.has(Flag.CTX);
+  }
+
+  /**
+   * Indicates if this function is nondeterministic.
+   * @return result of check
+   */
+  public boolean hasNDT() {
+    return definition.has(Flag.NDT);
   }
 
   /**

@@ -43,7 +43,29 @@ public final class FnDeepEqual extends StandardFunc {
     final Value ie = deo.get(DeepEqualOptions.ITEMS_EQUAL);
     if(!ie.isEmpty()) de.itemsEqual = toFunction(ie, 2, qc);
 
-    return de.equal(input1, input2);
+    final boolean eq = de.equal(input1, input2);
+    if(!eq) de.debug();
+    return eq;
+  }
+
+  @Override
+  public boolean hasNDT() {
+    // diagnostics are a side effect: the call must not be pre-evaluated
+    return debug() || super.hasNDT();
+  }
+
+  /**
+   * Indicates if diagnostics may be requested via the 'debug' option.
+   * @return result of check
+   */
+  private boolean debug() {
+    if(!defined(2)) return false;
+    final Expr options = arg(2);
+    // dynamic options: the option may be enabled
+    if(!(options instanceof final Item item)) return true;
+    // string (collation) or empty sequence: no diagnostics
+    if(!(item instanceof final XQMap map)) return false;
+    return map.value(Str.get(DeepEqualOptions.DEBUG.name())) == Bln.TRUE;
   }
 
   @Override

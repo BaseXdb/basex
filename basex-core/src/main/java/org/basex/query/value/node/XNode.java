@@ -183,7 +183,8 @@ public abstract class XNode extends GNode {
         if(deep.qc != null) deep.qc.checkStop();
         final GNode child1 = iter1.next();
         if(child1 == null) return true;
-        if(!deep.equal(child1, iter2.next())) return false;
+        final GNode child2 = iter2.next();
+        if(!deep.equal(child1, child2)) return deep.different(child1, child2);
       }
     }
 
@@ -197,7 +198,7 @@ public abstract class XNode extends GNode {
           found = true;
         }
       }
-      if(!found) return false;
+      if(!found) return deep.different(list1.get(l1), null);
     }
     return true;
   }

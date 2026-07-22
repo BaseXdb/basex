@@ -863,6 +863,24 @@ public final class FnModuleTest extends SandboxTest {
     query("let $a := reverse((<a/>, <b/>)) return " + func.args(" $a/.", " $a/."), true);
     query("deep-equal(1 to 1000000000, 1 to 1000000000)", true);
     query("deep-equal(1 to 1000000000, 1 to 1000000001)", false);
+
+    // options that are accepted, but cannot take effect in a processor without schema support
+    query(func.args(1, 1, " { 'typed-values': false() }"), true);
+    query(func.args(1, 1, " { 'type-annotations': true() }"), true);
+    query(func.args(1, 1, " { 'type-variety': false() }"), true);
+    // diagnostics
+    query(func.args(1, 1, " { 'debug': true() }"), true);
+    query(func.args(1, 2, " { 'debug': true() }"), false);
+    query(func.args(" ()", " <x/>", " { 'debug': true() }"), false);
+    query(func.args(" (1, 2)", " (1, 2, 3)", " { 'debug': true() }"), false);
+    query(func.args(" <a><b>1</b></a>", " <a><b>2</b></a>", " { 'debug': true() }"), false);
+    // diagnostics are a side effect: the call must not be pre-evaluated
+    check(func.args(1, 2, " { 'debug': true() }"), false, exists(DEEP_EQUAL));
+    check(func.args(1, 2, " { 'debug': false() }"), false, empty(DEEP_EQUAL));
+    check(func.args(1, 2), false, empty(DEEP_EQUAL));
+    // options that were removed
+    error(func.args(1, 1, " { 'false-on-error': true() }"), INVALIDOPTION_X);
+    error(func.args(1, 1, " { 'normalize-space': true() }"), INVALIDOPTION_X);
   }
 
   /** Test method. */
