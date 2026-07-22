@@ -28,6 +28,8 @@ public final class JobOptions extends Options {
   public static final StringOption END = new StringOption("end", null, TIME_TYPE);
   /** Interval after which query will be repeated. */
   public static final StringOption INTERVAL = new StringOption("interval", null, INTERVAL_TYPE);
+  /** Cron expression describing when the query will be repeated. */
+  public static final StringOption CRON = new StringOption("cron");
   /** Custom ID string. */
   public static final StringOption ID = new StringOption("id");
   /** Register as service. */

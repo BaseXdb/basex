@@ -1723,6 +1723,9 @@ public enum Function implements AFunction {
   _JOB_LIST_DETAILS(JobListDetails::new, "list-details([id])",
       params(STRING_ZO), ELEMENT_ZM, flag(NDT), JOB_URI, Perm.ADMIN),
   /** XQuery function. */
+  _JOB_NEXT(JobNext::new, "next(cron[,count])",
+      params(STRING_O, INTEGER_ZO), DATE_TIME_ZM, flag(NDT), JOB_URI),
+  /** XQuery function. */
   _JOB_REMOVE(JobRemove::new, "remove(id[,options])",
       params(STRING_O, MAP_ZO), EMPTY_SEQUENCE_Z, flag(NDT), JOB_URI, Perm.ADMIN),
   /** XQuery function. */

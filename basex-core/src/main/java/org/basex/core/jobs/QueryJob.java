@@ -68,11 +68,29 @@ public final class QueryJob extends Job implements Runnable {
 
     // check when job is to be repeated
     long interval = 0;
-    final String inter = opts.get(JobOptions.INTERVAL);
-    if(inter != null && !inter.isEmpty()) {
+    Cron cron = null;
+    LocalDateTime first = null;
+    final boolean cache = opts.get(JobOptions.CACHE) == Boolean.TRUE;
+    final String cr = opts.get(JobOptions.CRON), inter = opts.get(JobOptions.INTERVAL);
+    final boolean repeat = inter != null && !inter.isEmpty();
+    if(cr != null && !cr.isEmpty()) {
+      final String cn = JobOptions.CRON.name();
+      if(repeat) throw JOBS_OPTIONS_X_X.get(info, cn, JobOptions.INTERVAL.name());
+      if(start != null) throw JOBS_OPTIONS_X_X.get(info, cn, JobOptions.START.name());
+      if(cache) throw JOBS_OPTIONS_X_X.get(info, cn, JobOptions.CACHE.name());
+      cron = toCron(cr, info);
+      final ZoneId zone = ZoneId.systemDefault();
+      final Instant now = Instant.now();
+      first = cron.next(LocalDateTime.ofInstant(now, zone));
+      if(first == null) throw JOBS_CRON_X_X.get(info, cron, "will never match a date");
+      delay = Duration.between(now, first.atZone(zone).toInstant()).toMillis();
+    } else if(repeat) {
+      final String in = JobOptions.INTERVAL.name();
+      if(cache) throw JOBS_OPTIONS_X_X.get(info, in, JobOptions.CACHE.name());
       interval = new DTDur(token(inter), info).ms(info);
       if(interval < 1000) throw JOBS_RANGE_X.get(info, inter);
-      while(delay < 0) delay += interval;
+      // shift a start time in the past forward to the first future repetition
+      if(delay < 0) delay = Math.floorMod(delay, interval);
     }
     if(delay < 0) throw JOBS_RANGE_X.get(info, start);
 
@@ -80,10 +98,6 @@ public final class QueryJob extends Job implements Runnable {
     final Item end = toTime(opts.get(JobOptions.END), info);
     final long duration = end == null ? Long.MAX_VALUE : toDelay(end, delay, info);
     if(duration <= delay) throw JOBS_RANGE_X.get(info, end);
-
-    // check job results are to be cached
-    final boolean cache = opts.contains(JobOptions.CACHE) && opts.get(JobOptions.CACHE);
-    if(cache && interval > 0) throw JOBS_OPTIONS.get(info);
 
     // number of scheduled and active tasks must not exceed limit
     final JobPool jobs = context.jobs;
@@ -110,9 +124,9 @@ public final class QueryJob extends Job implements Runnable {
       }
 
       // create and schedule job task
-      final QueryJobTask task = new QueryJobTask(this, jobs, delay, interval, duration);
-      jobs.tasks.put(id, task);
-      task.schedule(delay);
+      final QueryJobTask qjt = new QueryJobTask(this, jobs, delay, interval, cron, first, duration);
+      jobs.tasks.put(id, qjt);
+      qjt.schedule();
     }
   }
 
@@ -134,6 +148,22 @@ public final class QueryJob extends Job implements Runnable {
     if(ADate.TIME.matcher(string).matches()) return new Tim(token(string), info);
     // dateTime
     return new Dtm(token(string), BasicType.DATE_TIME, info);
+  }
+
+  /**
+   * Parses a cron expression.
+   * @param string cron expression
+   * @param info input info (can be {@code null})
+   * @return cron expression
+   * @throws QueryException query exception
+   */
+  public static Cron toCron(final String string, final InputInfo info) throws QueryException {
+    try {
+      return new Cron(string);
+    } catch(final BaseXException ex) {
+      Util.debug(ex);
+      throw JOBS_CRON_X_X.get(info, string, ex.getLocalizedMessage());
+    }
   }
 
   /**

@@ -123,6 +123,8 @@ public final class Types {
   public static final SeqType DATE_TIME_O = DATE_TIME.seqType();
   /** Zero or one date-time. */
   public static final SeqType DATE_TIME_ZO = DATE_TIME.seqType(ZERO_OR_ONE);
+  /** Zero or more date-times. */
+  public static final SeqType DATE_TIME_ZM = DATE_TIME.seqType(ZERO_OR_MORE);
   /** One date-time-stamp. */
   public static final SeqType DATE_TIME_STAMP_O = DATE_TIME_STAMP.seqType();
   /** One time. */

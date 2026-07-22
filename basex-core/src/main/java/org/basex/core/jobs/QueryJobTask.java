@@ -16,6 +16,8 @@ public final class QueryJobTask implements Runnable {
   public final QueryJob job;
   /** Interval (ms; no repetition: {@code 0}). */
   public final long interval;
+  /** Cron expression (can be {@code null}). */
+  public final Cron cron;
   /** End time (@link {@link Long#MAX_VALUE}: no end). */
   public final long end;
 
@@ -39,26 +41,35 @@ public final class QueryJobTask implements Runnable {
    * @param jobs job pool
    * @param delay delay (ms)
    * @param interval interval (ms; no repetition: {@code 0})
+   * @param cron cron expression (can be {@code null})
+   * @param first first cron occurrence ({@code null} if no cron expression was supplied)
    * @param duration total duration (ms; no limit: {@link Long#MAX_VALUE})
    */
   public QueryJobTask(final QueryJob job, final JobPool jobs, final long delay, final long interval,
-      final long duration) {
+      final Cron cron, final LocalDateTime first, final long duration) {
     this.job = job;
     this.jobs = jobs;
     this.interval = interval;
+    this.cron = cron;
     final long time = System.currentTimeMillis();
-    start = time + delay;
     end = duration == Long.MAX_VALUE ? duration : time + duration;
-    next = Instant.ofEpochMilli(start).atZone(zone).toLocalDateTime();
+    if(first != null) {
+      // cron occurrences are exact wall-clock times
+      next = first;
+      start = millis(first);
+    } else {
+      // interval starts are exact instants
+      start = time + delay;
+      next = Instant.ofEpochMilli(start).atZone(zone).toLocalDateTime();
+    }
   }
 
   @Override
   public synchronized void run() {
-    if(interval != 0) {
-      next = next.plus(Duration.ofMillis(interval));
-      start = next.atZone(zone).toInstant().toEpochMilli();
-    }
-    if(interval == 0 || start >= end) {
+    next = cron != null ? cron.next(next) :
+      interval != 0 ? next.plus(Duration.ofMillis(interval)) : null;
+    if(next != null) start = millis(next);
+    if(next == null || start >= end) {
       job.remove();
       cancel();
     } else {
@@ -68,11 +79,19 @@ public final class QueryJobTask implements Runnable {
   }
 
   /**
-   * Schedules the first execution.
-   * @param delay initial delay (ms)
+   * Projects a local time onto the time zone and returns its milliseconds.
+   * @param dt local date and time
+   * @return milliseconds since 01/01/1970
    */
-  synchronized void schedule(final long delay) {
-    future(jobs.schedule(this, delay));
+  private long millis(final LocalDateTime dt) {
+    return dt.atZone(zone).toInstant().toEpochMilli();
+  }
+
+  /**
+   * Schedules the first execution.
+   */
+  synchronized void schedule() {
+    future(jobs.schedule(this, Math.max(0, start - System.currentTimeMillis())));
   }
 
   /**
@@ -108,7 +127,8 @@ public final class QueryJobTask implements Runnable {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(Util.className(this)).append('[').append(job);
-    sb.append(", interval:").append(interval);
+    if(cron != null) sb.append(", cron:").append(cron);
+    else sb.append(", interval:").append(interval);
     sb.append(", start:").append(start);
     if(end != Long.MAX_VALUE) sb.append(", end:").append(end);
     return sb.append(']').toString();

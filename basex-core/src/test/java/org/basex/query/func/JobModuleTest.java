@@ -4,9 +4,11 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.*;
 import java.util.*;
 
 import org.basex.*;
+import org.basex.core.jobs.*;
 import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.util.*;
@@ -92,6 +94,71 @@ public final class JobModuleTest extends SandboxTest {
     error(func.args("1", " ()", " { 'id': 'job123' }"), JOBS_ID_INVALID_X);
     error("(1, 2) ! " + func.args(SLOW_QUERY, " ()", " { 'id': 'abc', 'cache': true() }"),
         JOBS_ID_EXISTS_X);
+    error(func.args("1", " ()", " { 'cron': '* * *' }"), JOBS_CRON_X_X);
+    error(func.args("1", " ()", " { 'cron': '0 0 30 2 *' }"), JOBS_CRON_X_X);
+    error(func.args("1", " ()", " { 'cron': '* * * * *', 'interval': 'PT1S' }"), JOBS_OPTIONS_X_X);
+    error(func.args("1", " ()", " { 'cron': '* * * * *', 'start': 'PT1S' }"), JOBS_OPTIONS_X_X);
+    error(func.args("1", " ()", " { 'cron': '* * * * *', 'cache': true() }"), JOBS_OPTIONS_X_X);
+  }
+
+  /** Test method. */
+  @Test public void next() {
+    final Function func = _JOB_NEXT;
+    // a single date is returned by default
+    query("count(" + func.args("* * * * *") + ')', 1);
+    query("count(" + func.args("0 0 * * *", 5) + ')', 5);
+    query("count(" + func.args("* * * * *", 0) + ')', 0);
+    // all dates lie in the future and are returned in ascending order
+    query("every $d in " + func.args("* * * * *", 3) + " satisfies $d > current-dateTime()", true);
+    query("let $d := " + func.args("*/15 * * * *", 5) + " return deep-equal($d, sort($d))", true);
+    // a daily job is triggered at midnight, on five different days
+    query("every $d in " + func.args("0 0 * * *", 5) +
+        " satisfies hours-from-dateTime($d) = 0 and minutes-from-dateTime($d) = 0", true);
+    query("count(distinct-values(" + func.args("0 0 * * *", 5) + " ! xs:date(.)))", 5);
+    // times are honored, weekends are skipped
+    query("every $d in " + func.args("0 8 * * MON-FRI", 10) +
+        " satisfies hours-from-dateTime($d) = 8", true);
+    query("distinct-values(" + func.args("0 8 * * MON-FRI", 10) +
+        " ! format-dateTime(., '[FNn]')) => sort()",
+        "Friday\nMonday\nThursday\nTuesday\nWednesday");
+    // expression that never matches
+    query("count(" + func.args("0 0 30 2 *", 3) + ')', 0);
+    // the query clock is used: repeated calls yield the same results
+    query("let $a := " + func.args("* * * * * *") + " return (" +
+        VOID.args(" prof:sleep(1100)") + ", $a eq " + func.args("* * * * * *") + ')', true);
+
+    // errors
+    error(func.args("* * *"), JOBS_CRON_X_X);
+    error(func.args("* * * * 8"), JOBS_CRON_X_X);
+    error(func.args("* * * * *", -1), JOBS_RANGE_X);
+  }
+
+  /** Test method. */
+  @Test public void evalAnchor() {
+    // a start time in the past anchors the phase of the interval: 30 seconds past the minute
+    final Function func = _JOB_EVAL;
+    final String id = query(func.args("1", " ()",
+        " { 'start': '2020-01-01T00:00:30', 'interval': 'PT1M' }"));
+    // the scheduled start may drift by some milliseconds
+    final String seconds = query("floor(seconds-from-dateTime(xs:dateTime(" +
+        _JOB_LIST_DETAILS.args(id) + "/@start)))");
+    // remove before asserting: a repeating job that survives makes clean() wait forever
+    query(_JOB_REMOVE.args(id));
+    assertEquals("30", seconds);
+  }
+
+  /** Test method. */
+  @Test public void evalCron() {
+    // run every second, and check that the job is registered and repeated
+    final Function func = _JOB_EVAL;
+    final String id = query(func.args("prof:sleep(400)", " ()",
+        " { 'cron': '* * * * * *', 'end': 'PT2.5S' }"));
+    query(_JOB_LIST_DETAILS.args(id) + "/@cron/string()", "* * * * * *");
+    Performance.sleep(1200);
+    query(_JOB_LIST.args() + "='" + id + '\'', true);
+    // job is removed after the end time has been exceeded
+    Performance.sleep(2000);
+    query(_JOB_LIST.args() + "='" + id + '\'', false);
   }
 
   /** Test method. */
@@ -159,6 +226,33 @@ public final class JobModuleTest extends SandboxTest {
     query("exists(" + _JOB_SERVICES.args() + "[@id = 'ID'])", true);
     query(_JOB_REMOVE.args("ID", " { 'service': true() }"));
     query("exists(" + _JOB_SERVICES.args() + "[@id = 'ID'])", false);
+  }
+
+  /**
+   * Test method.
+   * @throws IOException I/O exception
+   */
+  @Test public void evalServiceCron() throws IOException {
+    // register a cron service: the expression is persisted
+    final Function func = _JOB_EVAL;
+    query(func.args("1", " ()",
+        " { 'id': 'CRON', 'cron': '0 6 * * MON-FRI', 'service': true() }"));
+    final String persisted = query(_JOB_SERVICES.args() + "[@id = 'CRON']/@cron/string()");
+
+    // drop the scheduled job, keep the service, and re-register it as a restart would
+    query(_JOB_REMOVE.args("CRON"));
+    final String dropped = query("exists(" + _JOB_LIST_DETAILS.args("CRON") + ')');
+    new Jobs(context).init();
+    final String restored = query(_JOB_LIST_DETAILS.args("CRON") + "/@cron/string()");
+
+    // remove job and service before asserting: a surviving cron job would stall clean()
+    query(_JOB_REMOVE.args("CRON", " { 'service': true() }"));
+    final String removed = query("exists(" + _JOB_SERVICES.args() + "[@id = 'CRON'])");
+
+    assertEquals("0 6 * * MON-FRI", persisted);
+    assertEquals("false", dropped);
+    assertEquals("0 6 * * MON-FRI", restored);
+    assertEquals("false", removed);
   }
 
   /** Test method. */

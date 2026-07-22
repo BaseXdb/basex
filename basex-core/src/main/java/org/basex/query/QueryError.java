@@ -327,7 +327,9 @@ public enum QueryError {
   /** Error code. */
   JOBS_ID_INVALID_X(JOB, "id", "Invalid job name: %."),
   /** Error code. */
-  JOBS_OPTIONS(JOB, "options", "Either 'cache' or 'interval' option is allowed."),
+  JOBS_CRON_X_X(JOB, "cron", "Cron expression '%': %."),
+  /** Error code. */
+  JOBS_OPTIONS_X_X(JOB, "options", "Options are mutually exclusive: '%', '%'."),
   /** Error code. */
   JOBS_OVERFLOW1_X(JOB, "overflow", "Too many jobs registered (%)."),
   /** Error code. */

@@ -121,6 +121,18 @@ public final class Dtm extends ADate {
     }
   }
 
+  /**
+   * Returns a dateTime item for the specified milliseconds, adjusted to the local time zone.
+   * @param ms milliseconds since January 1, 1970, 00:00:00 GMT
+   * @param info input info (can be {@code null})
+   * @return dateTime instance
+   * @throws QueryException query exception
+   */
+  public static Dtm local(final long ms, final InputInfo info) throws QueryException {
+    return get(ms).timeZone(
+        new DTDur(BigDecimal.valueOf(TimeZone.getDefault().getOffset(ms) / 1000)), false, info);
+  }
+
   @Override
   public boolean comparable(final Item item) {
     return item instanceof Dtm;

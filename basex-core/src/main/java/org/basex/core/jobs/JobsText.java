@@ -26,6 +26,8 @@ public interface JobsText {
   /** QName. */
   QNm Q_INTERVAL = new QNm("interval");
   /** QName. */
+  QNm Q_CRON = new QNm("cron");
+  /** QName. */
   QNm Q_USER = new QNm("user");
   /** QName. */
   QNm Q_READS = new QNm("reads");
