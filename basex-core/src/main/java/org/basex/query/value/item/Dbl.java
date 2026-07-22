@@ -58,6 +58,11 @@ public final class Dbl extends ANum {
   }
 
   @Override
+  public byte[] jsonString() {
+    return Double.isFinite(value) ? string(value) : string();
+  }
+
+  @Override
   public long itr() {
     return (long) value;
   }

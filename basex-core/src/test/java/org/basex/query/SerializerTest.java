@@ -304,7 +304,8 @@ public final class SerializerTest extends SandboxTest {
     query(option + "1", 1);
     query(option + "1.0", 1);
     query(option + "1e0", 1);
-    query(option + "1234567890e0", "1.23456789E9");
+    query(option + "1234567890e0", 1234567890);
+    query(option + "1e21", "1e+21");
     query(option + "xs:double('NaN')", "NaN");
     query(option + "xs:double('INF')", "INF");
     query(option + "xs:double('-0')", "-0");
@@ -320,13 +321,15 @@ public final class SerializerTest extends SandboxTest {
     query(option + "true#0", "fn:true#0");
     query(option + "fn() {}", "fn() as item()* { () }");
     query(option + "xs:float(1)", 1);
+    query(option + "xs:float(1e21)", "1e+21");
+    query(option + "xs:float(0.1)", 0.1);
     query(option + "xs:float('-0')", "-0");
 
     query(option + "[]", "[]");
     query(option + "[ 1 ]", "[1]");
     query(option + "[ 1.0 ]", "[1]");
     query(option + "[ 1e0 ]", "[1]");
-    query(option + "[ 1234567890e0 ]", "[1.23456789E9]");
+    query(option + "[ 1234567890e0 ]", "[1234567890]");
     query(option + "[ xs:double('NaN') ]", "[NaN]");
     query(option + "[ xs:double('INF') ]", "[INF]");
     query(option + "[ xs:double('-0') ]", "[-0]");
@@ -352,7 +355,8 @@ public final class SerializerTest extends SandboxTest {
     query("1", 1);
     query("1.0", 1);
     query("1e0", 1);
-    query("1234567890e0", "1.23456789E9");
+    query("1234567890e0", 1234567890);
+    query("1e21", "1e+21");
     query("xs:double('NaN')", "NaN");
     query("xs:double('INF')", "INF");
     query("xs:double('-0')", "-0");
@@ -367,13 +371,15 @@ public final class SerializerTest extends SandboxTest {
     query("true#0", "fn:true#0");
     query("fn() {}", "fn() as item()* { () }");
     query("xs:float(1)", 1);
+    query("xs:float(1e21)", "1e+21");
+    query("xs:float(0.1)", 0.1);
     query("xs:float('-0')", "-0");
 
     query("[]", "[]");
     query("[ 1 ]", "[1]");
     query("[ 1.0 ]", "[1]");
     query("[ 1e0 ]", "[1]");
-    query("[ 1234567890e0 ]", "[1.23456789E9]");
+    query("[ 1234567890e0 ]", "[1234567890]");
     query("[ xs:double('NaN') ]", "[NaN]");
     query("[ xs:double('INF') ]", "[INF]");
     query("[ xs:byte(1) ]", "[1]");

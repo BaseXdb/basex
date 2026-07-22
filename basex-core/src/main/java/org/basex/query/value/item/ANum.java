@@ -67,6 +67,14 @@ public abstract class ANum extends Item {
   public abstract byte[] string();
 
   /**
+   * Returns a string representation of the value in JavaScript notation.
+   * @return string value
+   */
+  public byte[] jsonString() {
+    return string();
+  }
+
+  /**
    * Returns an integer (long) representation of the value.
    * @return long value
    */

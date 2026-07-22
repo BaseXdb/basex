@@ -35,24 +35,24 @@ public final class BaseXSerializer extends AdaptiveSerializer {
 
   @Override
   protected void atomic(final Item item) throws IOException {
+    // top level: raw binaries, unquoted booleans; everything else is inherited
     if(depth == 0) {
       try {
         if(binary && item instanceof Bin) {
           try(BufferInput bi = item.input(null)) {
             for(int b; (b = bi.read()) != -1;) out.write(b);
           }
-        } else if(item.type == QNAME) {
-          printChar('#');
-          printChars(((QNm) item).prefixId());
-        } else {
+          return;
+        }
+        if(item.type == BOOLEAN) {
           printChars(item.string(null));
+          return;
         }
       } catch(final QueryException ex) {
         throw new QueryIOException(ex);
       }
-    } else {
-      super.atomic(item);
     }
+    super.atomic(item);
   }
 
   @Override

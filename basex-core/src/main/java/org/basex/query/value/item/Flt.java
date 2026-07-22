@@ -58,6 +58,11 @@ public final class Flt extends ANum {
   }
 
   @Override
+  public byte[] jsonString() {
+    return Float.isFinite(value) ? string(value) : string();
+  }
+
+  @Override
   public long itr() {
     return (long) value;
   }
@@ -144,5 +149,19 @@ public final class Flt extends ANum {
       }
     }
     throw BasicType.FLOAT.castError(value, info);
+  }
+
+  /**
+   * Returns a string representation of the specified value in JavaScript notation.
+   * @param value value to be converted
+   * @return string representation
+   */
+  public static byte[] string(final float value) {
+    if(value == 0) return 1 / value > 0 ? Token.token(0) : Token.NEGATIVE_ZERO;
+
+    final BigDecimal bd = new BigDecimal(Float.toString(value)).stripTrailingZeros();
+    final float abs = Math.abs(value);
+    return abs >= 1e-6f && abs < 1e21f ? Token.token(bd.toPlainString()) :
+      Token.token(bd.toString().replace('E', 'e'));
   }
 }
