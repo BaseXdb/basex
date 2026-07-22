@@ -94,6 +94,17 @@ public final class MemBuilder extends Builder {
   }
 
   /**
+   * Finalizes a database that was built without calling {@link #build()},
+   * i.e., by feeding the builder with events.
+   * @return data reference
+   */
+  public MemData finish() {
+    meta.lastid = meta.size - 1;
+    if(meta.updindex) data.idmap.finish(meta.lastid);
+    return data;
+  }
+
+  /**
    * Returns the data reference.
    * @return data reference
    */

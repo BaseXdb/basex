@@ -4588,6 +4588,52 @@ return
   }
 
   /** Test method. */
+  @Test public void transform() {
+    final Function func = TRANSFORM;
+    final String xsl = "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' "
+        + "version='1.0'><xsl:param name='v'/><xsl:template match='/'>"
+        + "<out><xsl:value-of select='//b'/><xsl:value-of select='$v'/></out>"
+        + "</xsl:template></xsl:stylesheet>";
+    final String opts = " { 'stylesheet-text': \"" + xsl + "\", 'source-node': <a><b>89</b></a>";
+
+    query(func.args(opts + " }") + "?output", "<out>89</out>");
+    query(func.args(opts + ", 'delivery-format': 'serialized', 'serialization-params': "
+        + "{ 'omit-xml-declaration': true() } }") + "?output", "<out>89</out>");
+    query(func.args(opts + ", 'stylesheet-params': { QName('', 'v'): 'X' } }") + "?output",
+        "<out>89X</out>");
+    query("map:keys(" + func.args(opts + ", 'base-output-uri': 'http://x/y' }") + ")",
+        "http://x/y");
+    query(func.args(opts + ", 'post-process': fn($uri, $result) { $uri } }") + "?output",
+        "output");
+
+    // document results are built directly, without serializing and parsing the result
+    final String html = "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' "
+        + "version='1.0'><xsl:output method='html'/><xsl:template match='/'><div><br/></div>"
+        + "</xsl:template></xsl:stylesheet>";
+    query("count(" + func.args(" { 'stylesheet-text': \"" + html + "\", 'source-node': <a/> }")
+        + "?output//br)", 1);
+    final String text = "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' "
+        + "version='1.0'><xsl:template match='/'><xsl:value-of select='//b'/>"
+        + "</xsl:template></xsl:stylesheet>";
+    query(func.args(" { 'stylesheet-text': \"" + text + "\", 'source-node': <a><b>89</b></a> }")
+        + "?output ! (. instance of document-node(), string())", "true\n89");
+    // source documents with multiple roots are not serialized
+    query(func.args(opts.replace("<a><b>89</b></a>", "parse-xml-fragment('<a><b>89</b></a><c/>')")
+        + " }") + "?output", "<out>89</out>");
+
+    // requests that cannot be served by the XSLT processor
+    error(func.args(opts + ", 'initial-template': QName('', 'main') }"), TRANSFORM_PROCESSOR_X);
+    error(func.args(opts + ", 'delivery-format': 'raw' }"), TRANSFORM_PROCESSOR_X);
+    error(func.args(opts + ", 'xslt-version': 99.0 }"), TRANSFORM_PROCESSOR_X);
+    // missing and conflicting options
+    error(func.args(" { }"), TRANSFORM_OPTIONS_X);
+    error(func.args(opts + ", 'stylesheet-location': 'x.xsl' }"), TRANSFORM_OPTIONS_X);
+    // invalid stylesheet and options
+    error(func.args(" { 'stylesheet-text': '<oops/>', 'source-node': <a/> }"), TRANSFORM_ERROR_X);
+    error(func.args(opts + ", 'unknown': 1 }"), INVALIDOPTION_X);
+  }
+
+  /** Test method. */
   @Test public void translate() {
     final Function func = TRANSLATE;
     query(func.args("a", "a", "b"), "b");

@@ -37,6 +37,11 @@ public final class XsltModuleTest extends SandboxTest {
         "<X><xsl:value-of select='$t'/></X></xsl:template>");
     query(func.args(doc, ' ' + style, " { 't': '1' }"), "<X>1</X>");
     query(func.args(doc, ' ' + style, " { 't' : text { '1' } }"), "<X>1</X>");
+
+    // the result tree is built directly: HTML output is not parsed back as XML
+    style = wrap("<xsl:output method='html'/><xsl:template match='/'><X><br/></X>" +
+        "</xsl:template>");
+    query("count(" + func.args(doc, ' ' + style) + "//br)", 1);
   }
 
   /** Test method. */

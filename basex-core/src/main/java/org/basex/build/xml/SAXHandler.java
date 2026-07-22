@@ -33,17 +33,38 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
   private final StringBuilder sb = new StringBuilder();
   /** Temporary namespace array. */
   private final Atts nsp = new Atts();
+  /** URI of the document to be built (can be {@code null}). */
+  private final byte[] docUri;
   /** DTD flag. */
   private boolean dtd;
   /** Element counter. */
   int nodes;
 
   /**
-   * Constructor.
+   * Constructor. The document node is opened and closed by the caller.
    * @param builder builder reference
    */
   public SAXHandler(final Builder builder) {
-    this(builder, false, false);
+    this(builder, false, false, null);
+  }
+
+  /**
+   * Constructor for handlers that build the document node themselves.
+   * @param builder builder reference
+   * @param docUri URI of the document
+   */
+  public SAXHandler(final Builder builder, final byte[] docUri) {
+    this(builder, false, false, docUri);
+  }
+
+  /**
+   * Constructor. The document node is opened and closed by the caller.
+   * @param builder builder reference
+   * @param stripWS strip whitespace
+   * @param stripNS strip namespaces
+   */
+  public SAXHandler(final Builder builder, final boolean stripWS, final boolean stripNS) {
+    this(builder, stripWS, stripNS, null);
   }
 
   /**
@@ -51,12 +72,36 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
    * @param builder builder reference
    * @param stripWS strip whitespace
    * @param stripNS strip namespaces
+   * @param docUri URI of the document to be built (can be {@code null})
    */
-  public SAXHandler(final Builder builder, final boolean stripWS, final boolean stripNS) {
+  private SAXHandler(final Builder builder, final boolean stripWS, final boolean stripNS,
+      final byte[] docUri) {
     this.builder = builder;
     this.stripNS = stripNS;
     this.stripWS = stripWS;
+    this.docUri = docUri;
     strips.push(stripWS);
+  }
+
+  @Override
+  public void startDocument() throws SAXException {
+    if(docUri == null) return;
+    try {
+      builder.openDoc(docUri);
+    } catch(final IOException ex) {
+      throw error(ex);
+    }
+  }
+
+  @Override
+  public void endDocument() throws SAXException {
+    if(docUri == null) return;
+    try {
+      finishText();
+      builder.closeDoc();
+    } catch(final IOException ex) {
+      throw error(ex);
+    }
   }
 
   @Override

@@ -795,6 +795,13 @@ public enum QueryError {
   RECDECODING_X(FOUT, 1200, "%."),
 
   /** Error code. */
+  TRANSFORM_PROCESSOR_X(FOXT, 1, "Not supported by the available XSLT processor: %."),
+  /** Error code. */
+  TRANSFORM_OPTIONS_X(FOXT, 2, "%"),
+  /** Error code. */
+  TRANSFORM_ERROR_X(FOXT, 3, "%"),
+
+  /** Error code. */
   FTWEIGHT_X(FTDY, 16, "Weight value out of range: %."),
   /** Error code. */
   FTMILD(FTDY, 17, "Invalid 'mild not' selection."),
@@ -1576,6 +1583,7 @@ public enum QueryError {
     /** Error type. */ FOUP,
     /** Error type. */ FOUR,
     /** Error type. */ FOUT,
+    /** Error type. */ FOXT,
     /** Error type. */ FTDY,
     /** Error type. */ FTST,
     /** Error type. */ SENR,
