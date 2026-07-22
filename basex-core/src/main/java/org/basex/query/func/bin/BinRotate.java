@@ -23,7 +23,7 @@ public final class BinRotate extends StandardFunc {
     final int bl = bytes.length;
     final long bits = (long) bl << 3;
     // normalized left rotation amount
-    final int r = bits == 0 ? 0 : (int) ((by % bits + bits) % bits);
+    final int r = bits == 0 ? 0 : (int) Math.floorMod(by, bits);
     if(r == 0) return value;
 
     final byte[] tmp = new byte[bl];

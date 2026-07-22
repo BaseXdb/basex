@@ -158,7 +158,7 @@ public final class BaseXSlider extends BaseXPanel {
       (getWidth() - SLIDERW);
 
     final int old = value;
-    value = Math.max(min, Math.min(max, (int) (oldValue - prop)));
+    value = Math.clamp((int) (oldValue - prop), min, max);
     if(value != old) notifyListeners();
     repaint();
   }

@@ -920,7 +920,7 @@ public final class TreeView extends View {
     while(true) {
       final double ld = (h - lvs * nh) / (lvs - 1.0d);
       if(ld >= dist || nh < MIN_NODE_HEIGHT) {
-        levelDistance = Math.max(MIN_LEVEL_DISTANCE, Math.min(MAX_LEVEL_DISTANCE, (int) ld));
+        levelDistance = Math.clamp((int) ld, MIN_LEVEL_DISTANCE, MAX_LEVEL_DISTANCE);
         break;
       }
       nh--;

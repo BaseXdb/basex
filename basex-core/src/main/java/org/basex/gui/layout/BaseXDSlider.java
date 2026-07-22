@@ -113,12 +113,12 @@ public final class BaseXDSlider extends BaseXPanel {
     final double prop = r.dist * (mouX - e.getX()) / r.w;
 
     if(left) {
-      currMin = limit(min, currMax, decode(oldMin - prop) - 1);
+      currMin = Math.clamp(decode(oldMin - prop) - 1, min, currMax);
     } else if(right) {
-      currMax = limit(currMin, max, decode(oldMax - prop) - 1);
+      currMax = Math.clamp(decode(oldMax - prop) - 1, currMin, max);
     } else {
-      currMin = limit(min, max, decode(oldMin - prop) - 1);
-      currMax = limit(min, max, decode(oldMax - prop) - 1);
+      currMin = Math.clamp(decode(oldMin - prop) - 1, min, max);
+      currMax = Math.clamp(decode(oldMax - prop) - 1, min, max);
     }
     if(itr) {
       currMin = (long) currMin;
@@ -178,10 +178,10 @@ public final class BaseXDSlider extends BaseXPanel {
     diffMax = dist / 20 * diffMax;
 
     if(diffMin != 0) {
-      currMin = limit(min, currMax, decode(Math.max(0, encode(currMin) + diffMin)));
+      currMin = Math.clamp(decode(Math.max(0, encode(currMin) + diffMin)), min, currMax);
     }
     if(diffMax != 0) {
-      currMax = limit(currMin, max, decode(Math.max(0, encode(currMax) + diffMax)));
+      currMax = Math.clamp(decode(Math.max(0, encode(currMax) + diffMax)), currMin, max);
     }
     if(currMin != oldMin || currMax != oldMax) {
       if(itr) {
@@ -274,17 +274,6 @@ public final class BaseXDSlider extends BaseXPanel {
    */
   private double decode(final double v) {
     return log ? StrictMath.exp(v) - 1 : v;
-  }
-
-  /**
-   * Returns a double in the specified minimum and maximum range.
-   * @param mn minimum value
-   * @param mx maximum value
-   * @param val value
-   * @return new value
-   */
-  private static double limit(final double mn, final double mx, final double val) {
-    return Math.max(mn, Math.min(mx, val));
   }
 
   /** Range class. */

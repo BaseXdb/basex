@@ -363,7 +363,7 @@ public final class BaseXLayout {
         nfs = (long) (dmfont.getSize() * 1.4);
       }
       if(fs != nfs) {
-        gui.gopts.set(GUIOptions.FONTSIZE, (int) Math.max(1, Math.min(128, nfs)));
+        gui.gopts.set(GUIOptions.FONTSIZE, Math.clamp(nfs, 1, 128));
         gui.updateLayout();
       }
     };
