@@ -29,6 +29,9 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
       OPTIMIZING, OPTIMIZED_QUERY, QUERY, RESULT, TIMING, QUERY_PLAN
   };
 
+  /** Error start. */
+  private static final Pattern STOPPED = Pattern.compile(Pattern.quote(STOPPED_AT) + "(.*)" + COL);
+
   /** Searchable editor. */
   private final SearchEditor editor;
 
@@ -231,7 +234,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
       } else if(line.equals(Text.ERROR + COL)) {
         boolean stopped = false;
         while(++s < sl && !split[s].isEmpty()) {
-          final Matcher matcher = Pattern.compile(STOPPED_AT + "(.*)" + COL).matcher(split[s]);
+          final Matcher matcher = STOPPED.matcher(split[s]);
           if(!stopped && matcher.find()) {
             final TokenBuilder tmp = new TokenBuilder();
             tmp.add(STOPPED_AT).uline().add(matcher.group(1)).uline().add(COL);

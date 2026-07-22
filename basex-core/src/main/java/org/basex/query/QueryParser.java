@@ -109,6 +109,8 @@ public class QueryParser extends InputParser {
   /** Current XQDoc string. */
   private final TokenBuilder docBuilder = new TokenBuilder();
 
+  /** Function or variable declaration that is currently parsed (can be {@code null}). */
+  private String declaration;
   /** XQDoc string of module. */
   private String moduleDoc = "";
   /** Alternative error. */
@@ -1049,7 +1051,9 @@ public class QueryParser extends InputParser {
     final boolean external = wsConsumeWs(EXTERNAL);
     Expr expr = null;
     if(wsConsume(":=")) {
+      declaration = string(var.name.varString());
       expr = check(single(), NOVARDECL);
+      declaration = null;
     } else if(!external) {
       throw error(WRONGCHAR_X_X, ":=", found());
     }
@@ -1096,7 +1100,10 @@ public class QueryParser extends InputParser {
 
     localVars.pushContext(false);
     final Params params = paramList(true);
+    // input info of the body will refer to this, even after inlining
+    declaration = Strings.concat(name.prefixString(), '#', params.size());
     final Expr expr = wsConsumeWs(EXTERNAL) ? null : enclosedExpr();
+    declaration = null;
     final String doc = docBuilder.toString();
     final VarScope vs = localVars.popContext();
     final byte[] uri = name.uri();
@@ -5277,6 +5284,6 @@ public class QueryParser extends InputParser {
 
   @Override
   public final InputInfo info() {
-    return new InputInfo(this, sc);
+    return new InputInfo(this, sc, declaration);
   }
 }

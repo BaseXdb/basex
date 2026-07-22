@@ -825,7 +825,9 @@ public final class EditorView extends View {
    * @param link link
    */
   public void jump(final String link) {
-    final Matcher m = LINK.matcher(link);
+    // discard the enclosing declaration of an error location: "name (path, line/column)"
+    final Matcher m = LINK.matcher(link.endsWith(")") ?
+      link.substring(link.indexOf('(') + 1, link.length() - 1) : link);
     if(m.matches()) {
       inputInfo = new InputInfo(m.group(1), Strings.toInt(m.group(2)), Strings.toInt(m.group(3)));
       markError(true);
