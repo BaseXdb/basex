@@ -341,9 +341,12 @@ interface CalcOpt {
   static Itr addInt(final Item item1, final Item item2, final InputInfo info)
       throws QueryException {
     final long itr1 = item1.itr(info), itr2 = item2.itr(info);
-    if(itr2 > 0 ? itr1 > Long.MAX_VALUE - itr2 : itr1 < Long.MIN_VALUE - itr2)
+    try {
+      return Itr.get(Math.addExact(itr1, itr2));
+    } catch(final ArithmeticException ex) {
+      Util.debug(ex);
       throw RANGE_X.get(info, itr1 + " + " + itr2);
-    return Itr.get(itr1 + itr2);
+    }
   }
 
   /**
@@ -357,9 +360,12 @@ interface CalcOpt {
   static Itr subtractInt(final Item item1, final Item item2, final InputInfo info)
       throws QueryException {
     final long itr1 = item1.itr(info), itr2 = item2.itr(info);
-    if(itr2 < 0 ? itr1 > Long.MAX_VALUE + itr2 : itr1 < Long.MIN_VALUE + itr2)
+    try {
+      return Itr.get(Math.subtractExact(itr1, itr2));
+    } catch(final ArithmeticException ex) {
+      Util.debug(ex);
       throw RANGE_X.get(info, itr1 + " - " + itr2);
-    return Itr.get(itr1 - itr2);
+    }
   }
 
   /**
@@ -373,11 +379,12 @@ interface CalcOpt {
   static Itr multiplyInt(final Item item1, final Item item2, final InputInfo info)
       throws QueryException {
     final long l1 = item1.itr(info), l2 = item2.itr(info);
-    if(l2 > 0 ? l1 > Long.MAX_VALUE / l2 || l1 < Long.MIN_VALUE / l2
-              : l2 < -1 ? l1 > Long.MIN_VALUE / l2 || l1 < Long.MAX_VALUE / l2
-                        : l2 == -1 && l1 == Long.MIN_VALUE)
+    try {
+      return Itr.get(Math.multiplyExact(l1, l2));
+    } catch(final ArithmeticException ex) {
+      Util.debug(ex);
       throw RANGE_X.get(info, l1 + " * " + l2);
-    return Itr.get(l1 * l2);
+    }
   }
 
   /**
@@ -392,8 +399,12 @@ interface CalcOpt {
       throws QueryException {
     final long n1 = item1.itr(info), n2 = item2.itr(info);
     if(n2 == 0) throw DIVZERO_X.get(info, item1);
-    if(n1 == Integer.MIN_VALUE && n2 == -1) throw RANGE_X.get(info, item1 + " idiv " + item2);
-    return Itr.get(n1 / n2);
+    try {
+      return Itr.get(Math.divideExact(n1, n2));
+    } catch(final ArithmeticException ex) {
+      Util.debug(ex);
+      throw RANGE_X.get(info, item1 + " idiv " + item2);
+    }
   }
 
   /**
