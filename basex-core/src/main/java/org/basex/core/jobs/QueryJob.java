@@ -252,7 +252,7 @@ public final class QueryJob extends Job implements Runnable {
         result.exception = XQUERY_UNEXPECTED_X.get(null, ex);
       } finally {
         // close and invalidate query after result has been assigned. order is important!
-        if(Boolean.TRUE.equals(opts.get(JobOptions.CACHE))) {
+        if(opts.get(JobOptions.CACHE) == Boolean.TRUE) {
           ctx.jobs.scheduleResult(this);
           state(JobState.CACHED);
         } else {

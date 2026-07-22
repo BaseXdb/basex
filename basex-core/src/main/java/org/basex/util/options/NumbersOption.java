@@ -2,6 +2,8 @@ package org.basex.util.options;
 
 import java.util.*;
 
+import org.basex.query.value.type.*;
+
 /**
  * Option containing an integer array value.
  *
@@ -18,7 +20,17 @@ public final class NumbersOption extends Option<int[]> {
    * @param value value
    */
   public NumbersOption(final String name, final int... value) {
-    super(name);
+    this(name, null, value);
+  }
+
+  /**
+   * Constructor with required type.
+   * @param name name
+   * @param seqType required type (can be {@code null})
+   * @param value value
+   */
+  public NumbersOption(final String name, final SeqType seqType, final int... value) {
+    super(name, seqType);
     this.value = value;
   }
 
@@ -30,6 +42,11 @@ public final class NumbersOption extends Option<int[]> {
   @Override
   public int[] copy() {
     return value == null ? null : value.clone();
+  }
+
+  @Override
+  SeqType defaultType() {
+    return Types.INTEGER_ZM;
   }
 
   @Override

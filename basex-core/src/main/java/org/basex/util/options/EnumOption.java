@@ -1,5 +1,6 @@
 package org.basex.util.options;
 
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -21,9 +22,20 @@ public final class EnumOption<V extends Enum<V>> extends Option<V> {
    * @param name name
    * @param value value
    */
-  @SuppressWarnings("unchecked")
   public EnumOption(final String name, final V value) {
-    super(name);
+    this(name, value, null);
+  }
+
+  /**
+   * Constructor with required type. Options are stored as enum values, but the value that is
+   * supplied in an option map may be of any other type.
+   * @param name name
+   * @param value value
+   * @param seqType required type (can be {@code null})
+   */
+  @SuppressWarnings("unchecked")
+  public EnumOption(final String name, final V value, final SeqType seqType) {
+    super(name, seqType);
     this.value = value;
     clazz = (Class<V>) value.getClass();
   }
@@ -34,7 +46,17 @@ public final class EnumOption<V extends Enum<V>> extends Option<V> {
    * @param clazz class
    */
   public EnumOption(final String name, final Class<V> clazz) {
-    super(name);
+    this(name, clazz, null);
+  }
+
+  /**
+   * Constructor with required type.
+   * @param name name
+   * @param clazz class
+   * @param seqType required type (can be {@code null})
+   */
+  public EnumOption(final String name, final Class<V> clazz, final SeqType seqType) {
+    super(name, seqType);
     this.clazz = clazz;
     value = null;
   }
@@ -42,6 +64,11 @@ public final class EnumOption<V extends Enum<V>> extends Option<V> {
   @Override
   public V value() {
     return value;
+  }
+
+  @Override
+  SeqType defaultType() {
+    return Types.STRING_O;
   }
 
   /**

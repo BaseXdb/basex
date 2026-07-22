@@ -636,7 +636,7 @@ public abstract class StandardFunc extends Arr {
 
     final Item item = expr.unwrappedItem(qc, info);
     if(item instanceof final XQMap map) {
-      options.assign(map, info);
+      options.assign(map, qc, info);
     } else if(!item.isEmpty()) {
       options.assign(item, info);
     }
@@ -666,7 +666,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final <E extends Options> E toOptions(final Expr expr, final E options,
       final QueryContext qc) throws QueryException {
-    options.assign(toEmptyMap(expr, qc), info);
+    options.assign(toEmptyMap(expr, qc), qc, info);
     return options;
   }
 

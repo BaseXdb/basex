@@ -29,7 +29,7 @@ public final class WebError extends StandardFunc {
     // serialization parameters (default: plain text)
     final SerializerOptions sopts = new SerializerOptions();
     sopts.set(SerializerOptions.METHOD, SerialMethod.TEXT);
-    sopts.assign(options, info);
+    sopts.assign(options, qc, info);
 
     // description: message text for a plain string, generic phrase for a structured body
     final String desc = message instanceof final AStr str ? Token.string(str.string(info)) :
