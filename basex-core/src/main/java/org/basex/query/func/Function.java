@@ -777,6 +777,9 @@ public enum Function implements AFunction {
   XML_TO_JSON(FnXmlToJson::new, "xml-to-json(node[,options])",
       params(NODE_ZO, MAP_ZO), STRING_ZO),
   /** XQuery function. */
+  XSD_VALIDATOR(FnXsdValidator::new, "xsd-validator([options])",
+      params(MAP_ZO), FnXsdValidator.VALIDATOR_TYPE.seqType()),
+  /** XQuery function. */
   YEAR_FROM_DATE(FnYearFromDate::new, "year-from-date(value)",
       params(DATE_ZO), INTEGER_ZO),
   /** XQuery function. */
@@ -819,6 +822,8 @@ public enum Function implements AFunction {
   SCHEMA_TYPE_RECORD(Records.SCHEMA_TYPE.get()),
   /** XQuery function. */
   URI_STRUCTURE_RECORD(Records.URI_STRUCTURE.get()),
+  /** XQuery function. */
+  VALIDATION_RESULT_RECORD(Records.VALIDATION_RESULT.get()),
 
   // Map Module
 

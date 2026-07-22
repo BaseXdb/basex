@@ -10,9 +10,9 @@ import org.xml.sax.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-final class ErrorInfo {
+public final class ErrorInfo {
   /** Error level. */
-  enum Level {
+  public enum Level {
     /** Fatal. */ FATAL,
     /** Error. */ ERROR,
     /** Warning. */ WARNING;
@@ -24,15 +24,15 @@ final class ErrorInfo {
   }
 
   /** Message. */
-  final String message;
+  public final String message;
   /** Level. */
-  final Level level;
+  public final Level level;
   /** URL. */
-  String url;
+  public String url;
   /** Line number. */
-  int line = Integer.MIN_VALUE;
+  public int line = Integer.MIN_VALUE;
   /** Column number. */
-  int column = Integer.MIN_VALUE;
+  public int column = Integer.MIN_VALUE;
 
   /**
    * Constructor.
@@ -40,7 +40,7 @@ final class ErrorInfo {
    * @param level type
    * @param schema schema url
    */
-  ErrorInfo(final SAXException ex, final Level level, final IO schema) {
+  public ErrorInfo(final SAXException ex, final Level level, final IO schema) {
     this.level = level;
 
     String m = ex.getMessage();

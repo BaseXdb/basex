@@ -4839,4 +4839,58 @@ return
         + "<string key=''>í</string></map>", " { 'indent': false() }"), "{\"\":\"\u00ed\"}");
     query(func.args(" <fn:string key='root'>X</fn:string>"), "\"X\"");
   }
+
+  /** Test method. */
+  @Test public void xsdValidator() {
+    final Function func = XSD_VALIDATOR;
+    final String xsd = "<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'>"
+        + "<xs:element name='distance' type='xs:decimal'/></xs:schema>";
+    final String validator = func.args(" { 'schema': " + xsd + " }");
+    final String valid = "(<distance>8.5</distance>)", invalid = "(<distance>8.5km</distance>)";
+
+    query(validator + "(())", "");
+    query(validator + valid + "?is-valid", true);
+    query(validator + valid + "?typed-node", "<distance>8.5</distance>");
+    query(validator + valid + "?typed-node/parent::node()", "");
+    query(validator + "(document { <distance>8.5</distance> })?typed-node",
+        "<distance>8.5</distance>");
+    query(validator + invalid + "?is-valid", false);
+    query(validator + invalid + "?typed-node", "");
+    query(validator + invalid + "?error-details", "");
+
+    // details on invalidities
+    final String details = func.args(
+        " { 'schema': " + xsd + ", 'return-error-details': true() }");
+    query("exists(" + details + invalid + "?error-details?message)", true);
+    // the result of an invalid document is discarded while it is still being built
+    query("exists(" + details + "(document { <distance>8.5km</distance> })?error-details)", true);
+
+    // namespaces and default values of the validated node
+    final String ns = " { 'schema': <xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema' "
+        + "targetNamespace='urn:t' elementFormDefault='qualified'>"
+        + "<xs:element name='box'><xs:complexType><xs:sequence>"
+        + "<xs:element name='in' type='xs:string'/></xs:sequence>"
+        + "<xs:attribute name='unit' type='xs:string' default='cm'/>"
+        + "</xs:complexType></xs:element></xs:schema> }";
+    query(func.args(ns) + "(<t:box xmlns:t='urn:t'><t:in>x</t:in></t:box>)?typed-node",
+        "<t:box xmlns:t=\"urn:t\" unit=\"cm\"><t:in>x</t:in></t:box>");
+    // comments and processing instructions are preserved
+    query(func.args(ns) + "(<t:box xmlns:t='urn:t'><!--c--><t:in>x</t:in><?p i?></t:box>)"
+        + "?typed-node/node() ! name()", "\nt:in\np");
+    query("count(" + validator + "(document { <!--c-->, <distance>8.5</distance>, <?p i?> })"
+        + "?typed-node/node())", 3);
+
+    // unknown element declaration
+    query(func.args() + "(<unknown/>)?is-valid", false);
+    // features that require a schema-aware processor
+    error(func.args(" { 'validation-mode': 'lax' }"), NOSCHEMAAWARENESS_X);
+    error(func.args(" { 'type': xs:QName('xs:integer') }"), NOSCHEMAAWARENESS_X);
+    error(func.args(" { 'target-namespace': 'http://x.com' }"), NOSCHEMAAWARENESS_X);
+    // invalid schema
+    error(func.args(" { 'schema': <schema/> }"), SCHEMAASSEMBLY_X);
+    // invalid options
+    error(func.args(" { 'validation-mode': 'unknown' }"), INVALIDOPTION_X);
+    error(validator + "(<a/>, <b/>)", INVARITY_X_X);
+    error(validator + "(<!--comment-->)", INVTYPE_X);
+  }
 }

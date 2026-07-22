@@ -601,11 +601,15 @@ public enum QueryError {
   /** Error code. */
   NOXSDANDDTD_X(FODC, 9, "DTD validation must not be enabled when 'xsd-validation' is '%'."),
   /** Error code. */
+  NOSCHEMAAWARENESS_X(FODC, 9, "Schema-aware processing is not supported: %."),
+  /** Error code. */
   INVHTML_X(FODC, 11, "HTML parsing failed: %"),
   /** Error code. */
   NODTDVALIDATION(FODC, 13, "The internal parser does not support DTD validation."),
   /** Error code. */
   XSDVALIDATIONERR_X(FODC, 14, "XSD Validation error: %"),
+  /** Error code. */
+  SCHEMAASSEMBLY_X(FODC, 15, "Schema cannot be assembled: %"),
   /** Error code. */
   EXTERNALRESOURCE_X(FODC, 16, Text.EXTACCESS_BLOCKED_X),
 

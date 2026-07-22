@@ -1,9 +1,11 @@
 package org.basex.query.func.validate;
 
 import java.io.*;
+import java.math.*;
 import java.util.*;
 import java.util.Map.*;
 
+import javax.xml.*;
 import javax.xml.transform.stream.*;
 import javax.xml.validation.*;
 
@@ -27,6 +29,8 @@ public class ValidateXsd extends ValidateFn {
   private static final String FACTORY = "http://www.w3.org/2001/XMLSchema";
   /** Saxon version URI. */
   private static final String SAXON_VERSION_URI = "http://saxon.sf.net/feature/xsd-version";
+  /** Saxon URI for resolving xsi:schemaLocation attributes. */
+  private static final String SAXON_XSI_URI = "http://saxon.sf.net/feature/useXsiSchemaLocation";
 
   /** XSD implementations. */
   private static final String[] IMPL = {
@@ -58,6 +62,82 @@ public class ValidateXsd extends ValidateFn {
   }
 
   /**
+   * Creates a schema factory for the most powerful available XSD implementation.
+   * @param options main options
+   * @return schema factory
+   * @throws BaseXException factory cannot be created
+   * @throws SAXException SAX exception
+   */
+  public static SchemaFactory factory(final MainOptions options)
+      throws BaseXException, SAXException {
+
+    final SchemaFactory sf;
+    if(JAVA) {
+      sf = SchemaFactory.newInstance(FACTORY);
+    } else {
+      final Class<?> clz = Reflect.find(IMPL[OFFSET]);
+      // catch Saxon errors (e.g. NoClassDefFoundError: org/xmlresolver/Resolver)
+      try {
+        sf = (SchemaFactory) clz.getDeclaredConstructor().newInstance();
+      } catch(final Exception ex) {
+        throw new BaseXException(ex);
+      }
+      // Saxon: use version 1.1
+      if(SAXON) sf.setProperty(SAXON_VERSION_URI, version());
+    }
+    final LSResourceResolver ls = options.resolver().lsResourceResolver();
+    if(ls != null) sf.setResourceResolver(ls);
+    return sf;
+  }
+
+  /**
+   * Denies access to schema documents that are referenced by other schema documents.
+   * @param factory schema factory
+   */
+  public static void restrict(final SchemaFactory factory) {
+    property(factory::setProperty, XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+    property(factory::setProperty, XMLConstants.ACCESS_EXTERNAL_DTD, "");
+  }
+
+  /**
+   * Denies access to schema documents that are referenced by the validated document.
+   * @param handler validating handler
+   */
+  public static void restrict(final ValidatorHandler handler) {
+    property(handler::setProperty, XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+    // Saxon rejects the JAXP property and supplies its own switch
+    property(handler::setProperty, SAXON_XSI_URI, Boolean.FALSE);
+  }
+
+  /**
+   * Assigns a property. Properties that are rejected by the processor are ignored: the
+   * implementations differ in which of them they support.
+   * @param setter property setter
+   * @param name property name
+   * @param value property value
+   */
+  private static void property(final PropertySetter setter, final String name,
+      final Object value) {
+    try {
+      setter.set(name, value);
+    } catch(final SAXException ex) {
+      Util.debug(ex);
+    }
+  }
+
+  /** Setter for a JAXP property. */
+  @FunctionalInterface
+  private interface PropertySetter {
+    /**
+     * Assigns a property.
+     * @param name property name
+     * @param value property value
+     * @throws SAXException property is not supported
+     */
+    void set(String name, Object value) throws SAXException;
+  }
+
+  /**
    * Returns the name of the XSD processor.
    * @return processor
    */
@@ -71,6 +151,15 @@ public class ValidateXsd extends ValidateFn {
    */
   public static String version() {
     return IMPL[OFFSET + 2];
+  }
+
+  /**
+   * Checks if the requested XSD version is supported.
+   * @param version requested version
+   * @return result of check
+   */
+  public static boolean supports(final BigDecimal version) {
+    return version.compareTo(new BigDecimal(version())) <= 0;
   }
 
   @Override
@@ -88,25 +177,8 @@ public class ValidateXsd extends ValidateFn {
 
         Schema s = cache ? MAP.get(url) : null;
         if(s == null) {
-          // create schema factory and set version
-          final SchemaFactory sf;
-          if(JAVA) {
-            sf = SchemaFactory.newInstance(FACTORY);
-          } else {
-            final Class<?> clz = Reflect.find(IMPL[OFFSET]);
-            // catch Saxon errors (e.g. NoClassDefFoundError: org/xmlresolver/Resolver)
-            try {
-              sf = (SchemaFactory) clz.getDeclaredConstructor().newInstance();
-            } catch(final Exception ex) {
-              throw new BaseXException(ex);
-            }
-            // Saxon: use version 1.1
-            if(SAXON) sf.setProperty(SAXON_VERSION_URI, version());
-          }
+          final SchemaFactory sf = factory(qc.context.options);
           sf.setErrorHandler(this);
-
-          final LSResourceResolver ls = qc.context.options.resolver().lsResourceResolver();
-          if(ls != null) sf.setResourceResolver(ls);
 
           // assign parser features
           for(final Entry<String, String> entry : options.entrySet()) {
