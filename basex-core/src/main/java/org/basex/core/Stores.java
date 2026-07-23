@@ -12,6 +12,7 @@ import org.basex.io.out.DataOutput;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -51,12 +52,7 @@ public final class Stores implements Closeable {
   public synchronized Value keys(final String name, final InputInfo info, final QueryContext qc)
       throws QueryException {
     final Store store = get(name, false, info, qc);
-    if(store != null) {
-      final TokenList list = new TokenList(store.map.size());
-      for(final String key : store.map.keySet()) list.add(key);
-      return StrSeq.get(list);
-    }
-    return Empty.VALUE;
+    return store != null ? store.map.keys() : Empty.VALUE;
   }
 
   /**
@@ -71,11 +67,7 @@ public final class Stores implements Closeable {
   public synchronized Value get(final String key, final String name, final InputInfo info,
       final QueryContext qc) throws QueryException {
     final Store store = get(name, false, info, qc);
-    if(store != null) {
-      final Value value = store.map.get(key);
-      if(value != null) return value;
-    }
-    return Empty.VALUE;
+    return store != null ? store.map.get(Str.get(key)) : Empty.VALUE;
   }
 
   /**
@@ -90,11 +82,8 @@ public final class Stores implements Closeable {
   public synchronized void put(final String key, final Value value, final String name,
       final InputInfo info, final QueryContext qc) throws QueryException {
     final Store store = get(name, true, info, qc);
-    if(value.isEmpty()) {
-      store.map.remove(key);
-    } else {
-      store.map.put(key, value);
-    }
+    final Item ky = Str.get(key);
+    store.map = value.isEmpty() ? store.map.remove(ky) : store.map.put(ky, value);
     store.dirty = true;
   }
 
@@ -143,7 +132,7 @@ public final class Stores implements Closeable {
   public synchronized Value list() {
     final TreeSet<String> names = listStores();
     for(final Map.Entry<String, Store> entry : stores.entrySet()) {
-      if(entry.getValue().map.isEmpty()) names.remove(entry.getKey());
+      if(entry.getValue().map.structSize() == 0) names.remove(entry.getKey());
       else names.add(entry.getKey());
     }
     names.remove("");
@@ -221,7 +210,7 @@ public final class Stores implements Closeable {
       if(storeFile(name).exists()) {
         readStore(name, info, qc);
       } else if(create) {
-        stores.put(name, new Store());
+        stores.put(name, new Store(XQMap.empty()));
       }
     }
     return stores.get(name);
@@ -236,15 +225,15 @@ public final class Stores implements Closeable {
    */
   private void readStore(final String name, final InputInfo info, final QueryContext qc)
       throws QueryException {
-    final HashMap<String, Value> map = new HashMap<>();
+    final MapBuilder mb = new MapBuilder();
     try(DataInput in = new DataInput(storeFile(name))) {
       for(int s = in.readNum() - 1; s >= 0; s--) {
-        map.put(Token.string(in.readToken()), read(in, qc));
+        mb.put(in.readToken(), read(in, qc));
       }
     } catch(final IOException ex) {
       throw QueryError.STORE_IO_X.get(info, ex);
     }
-    stores.put(name, new Store(map));
+    stores.put(name, new Store(mb.map()));
   }
 
   /**
@@ -259,16 +248,17 @@ public final class Stores implements Closeable {
     final Store entry = stores.get(name);
     final IOFile file = storeFile(name);
     if(entry != null && (entry.dirty || enforce)) {
-      final HashMap<String, Value> map = entry.map;
-      if(map.isEmpty()) {
+      final XQMap map = entry.map;
+      final long size = map.structSize();
+      if(size == 0) {
         file.delete();
       } else {
         file.parent().md();
         try(DataOutput out = new DataOutput(file)) {
-          out.writeNum(map.size());
-          for(final Map.Entry<String, Value> e : map.entrySet()) {
-            out.writeToken(Token.token(e.getKey()));
-            write(out, e.getValue());
+          out.writeNum((int) size);
+          for(final XQMap.Entry e : map.entries()) {
+            out.writeToken(e.key().string(null));
+            write(out, e.value());
           }
         }
       }
@@ -411,22 +401,15 @@ public final class Stores implements Closeable {
    */
   private static final class Store {
     /** Map with data. */
-    private final HashMap<String, Value> map;
+    private XQMap map;
     /** Dirty flag. */
     private boolean dirty;
-
-    /**
-     * Default constructor.
-     */
-    private Store() {
-      this(new HashMap<>());
-    }
 
     /**
      * Constructor.
      * @param map map
      */
-    private Store(final HashMap<String, Value> map) {
+    private Store(final XQMap map) {
       this.map = map;
     }
   }
