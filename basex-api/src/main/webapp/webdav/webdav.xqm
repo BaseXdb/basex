@@ -19,6 +19,21 @@ declare namespace DAV = 'DAV:';
 declare variable $dav:ALLOW :=
   'OPTIONS, HEAD, GET, PUT, DELETE, MKCOL, COPY, MOVE, PROPFIND, LOCK, UNLOCK';
 
+(: AUTHORIZATION ================================================================================:)
+
+(:~
+ : Restricts WebDAV to users with admin permissions. Non-admin users cannot access the lock
+ : store, which the Store Module gates behind the create permission.
+ : @return forbidden response, or empty sequence to allow the request
+ :)
+declare
+  %perm:check('/webdav')
+function dav:authorize() as element(rest:response)? {
+  if (not(user:list-details(user:current())/@permission = 'admin')) {
+    web:response-header((), {}, { 'status': 403, 'message': 'Forbidden' })
+  }
+};
+
 (: OPTIONS ======================================================================================:)
 
 (:~
