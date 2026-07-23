@@ -4,7 +4,6 @@ import static jakarta.servlet.http.HttpServletResponse.*;
 
 import java.util.stream.*;
 
-import org.basex.core.users.*;
 import org.basex.http.*;
 import org.basex.http.web.*;
 import org.basex.http.web.WebResponse.Response;
@@ -24,11 +23,6 @@ import org.basex.util.http.*;
  * @author Christian Gruen
  */
 public final class RestXqServlet extends BaseXServlet {
-  @Override
-  protected String username() {
-    return UserText.ADMIN;
-  }
-
   @Override
   protected void run(final HTTPConnection conn) throws Exception {
     // no trailing slash: send redirect

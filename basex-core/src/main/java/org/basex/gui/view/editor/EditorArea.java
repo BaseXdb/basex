@@ -28,6 +28,8 @@ public final class EditorArea extends TextPanel {
   final BaseXLabel label;
   /** File in tab. */
   private IOFile file;
+  /** Flag indicating that the editor contents are assigned to a file. */
+  private boolean opened;
   /** Flag for modified content. */
   private boolean modified;
   /** Last input. */
@@ -35,7 +37,7 @@ public final class EditorArea extends TextPanel {
 
   /** View reference. */
   private final EditorView view;
-  /** Timestamp. Set to {@code 0} if the editor contents are not saved on disk. */
+  /** Timestamp of the assigned file. */
   private long timeStamp;
 
   /**
@@ -60,11 +62,11 @@ public final class EditorArea extends TextPanel {
   }
 
   /**
-   * Returns {@code true} if the editor contents are saved on disk.
+   * Returns {@code true} if the editor contents are assigned to a file.
    * @return result of check
    */
   public boolean opened() {
-    return timeStamp != 0;
+    return opened;
   }
 
   /**
@@ -149,25 +151,24 @@ public final class EditorArea extends TextPanel {
    * @param enforce enforce reload
    */
   public void reopen(final boolean enforce) {
-    // skip if editor contents are saved on disk, or if they are up-to-date
+    // skip if editor contents are not assigned to a file, or if they are up-to-date
     final long ts = file.timeStamp();
-    if(!opened() || timeStamp == ts && !enforce) return;
+    if(!opened || timeStamp == ts && !enforce) return;
+    timeStamp = ts;
 
-    // reset timestamp if file will not be reopened
-    if(modified && !BaseXDialog.confirm(gui, Util.info(REVERT_FILE_X, file.name()))) {
-      timeStamp = 0;
-      return;
-    }
+    // do not discard modifications without confirmation (skipped if file was deleted)
+    if(file.exists() && modified &&
+        !BaseXDialog.confirm(gui, Util.info(REVERT_FILE_X, file.name()))) return;
 
     try {
       // reopens the file
       setText(file.read());
       file(file, false);
       release(Action.PARSE);
-      timeStamp = ts;
     } catch(final IOException ex) {
-      // reset timestamp if file could not be opened
-      timeStamp = 0;
+      // file was deleted or cannot be accessed: flag editor contents as modified
+      hist.invalidate();
+      view.refreshControls(this, true);
       Util.debug(ex);
       BaseXDialog.error(gui, Util.info(FILE_NOT_OPENED_X, file));
     }
@@ -188,7 +189,7 @@ public final class EditorArea extends TextPanel {
    */
   boolean save(final IOFile io) {
     final boolean rename = io != file;
-    if(rename || modified || timeStamp == 0) {
+    if(rename || modified || !opened) {
       try {
         final byte[] text = getText();
         final boolean xquery = io.hasSuffix(IO.XQSUFFIXES);
@@ -227,6 +228,7 @@ public final class EditorArea extends TextPanel {
       setSyntax(io, true);
       repaint();
     }
+    opened = true;
     timeStamp = file.timeStamp();
     hist.save();
     view.refreshHistory(file);
