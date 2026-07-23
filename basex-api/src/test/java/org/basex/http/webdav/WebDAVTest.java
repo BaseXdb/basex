@@ -3,6 +3,7 @@ package org.basex.http.webdav;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
+import java.net.*;
 import java.net.http.*;
 import java.util.*;
 import java.util.regex.*;
@@ -68,6 +69,19 @@ public final class WebDAVTest extends WebappTest {
     for(final String method : new String[] { "PROPFIND", "MKCOL", "LOCK", "UNLOCK", "COPY" }) {
       assertTrue(allow.contains(method), allow);
     }
+  }
+
+  /**
+   * Tests that requests without credentials are rejected.
+   * @throws Exception exception
+   */
+  @Test public void unauthorized() throws Exception {
+    final HttpRequest request = HttpRequest.newBuilder(URI.create(HTTP_ROOT + "webdav")).
+        method("PROPFIND", HttpRequest.BodyPublishers.noBody()).build();
+    final HttpResponse<String> response = HttpClient.newHttpClient().
+        send(request, HttpResponse.BodyHandlers.ofString());
+    assertEquals(401, response.statusCode());
+    assertTrue(response.headers().firstValue("WWW-Authenticate").orElse("").startsWith("Basic"));
   }
 
   /**

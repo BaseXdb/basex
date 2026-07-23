@@ -25,6 +25,10 @@ import org.junit.jupiter.api.*;
  * @author Christian Gruen
  */
 public abstract class WebappTest extends HTTPTest {
+  /** Credentials of the sandbox admin user (for servlets without a default user). */
+  private static final String CREDENTIALS = "Basic " + Base64.getEncoder().
+      encodeToString(("admin:" + NAME).getBytes(StandardCharsets.UTF_8));
+
   /** Root URL of the deployed web application. */
   private static String root;
   /** Session-aware HTTP client (keeps cookies of a login). */
@@ -165,6 +169,7 @@ public abstract class WebappTest extends HTTPTest {
       throws IOException {
 
     final HttpRequest.Builder rb = HttpRequest.newBuilder(URI.create(root + path));
+    rb.header("Authorization", CREDENTIALS);
     if(type != null) rb.header("Content-Type", type);
     headers.forEach(rb::header);
     rb.method(method, body == null ? BodyPublishers.noBody() :

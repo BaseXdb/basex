@@ -23,6 +23,20 @@
     <url-pattern>/*</url-pattern>
   </servlet-mapping>
 
+  <!-- WebDAV Service: RESTXQ with authentication (can be disabled by removing this entry) -->
+  <servlet>
+    <servlet-name>WebDAV</servlet-name>
+    <servlet-class>org.basex.http.restxq.RestXqServlet</servlet-class>
+    <init-param>
+      <param-name>org.basex.user</param-name>
+      <param-value/>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>WebDAV</servlet-name>
+    <url-pattern>/webdav/*</url-pattern>
+  </servlet-mapping>
+
   <!-- WebSocket Service (can be disabled by removing this entry) -->
   <servlet>
     <servlet-name>WebSocket</servlet-name>
