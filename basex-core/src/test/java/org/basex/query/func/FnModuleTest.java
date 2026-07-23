@@ -824,9 +824,11 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(""), "");
     query(func.args("A"), "A");
 
-    query(func.args("+"), " ");
+    query(func.args("+"), "+");
     query(func.args("%41"), "A");
-    query(func.args("A%42+C"), "AB C");
+    query(func.args("A%42%20C"), "AB C");
+    query(func.args("A%42+C"), "AB+C");
+    query("decode-from-uri(translate('A%42+C', '+', ' '))", "AB C");
     query(func.args("%F0%9F%92%A1"), "\uD83D\uDCA1");
 
     query(func.args("%"), "\uFFFD");

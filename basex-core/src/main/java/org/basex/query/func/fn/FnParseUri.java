@@ -162,8 +162,9 @@ public class FnParseUri extends StandardFunc {
     if(!query.isEmpty()) {
       for(final String q : query.split("&")) {
         final int eq = q.indexOf('=');
-        final Str key = eq == -1 ? Str.EMPTY : Str.get(XMLToken.decodeUri(q.substring(0, eq)));
-        final Str val = Str.get(XMLToken.decodeUri(q.substring(eq + 1)));
+        final Str key = eq == -1 ? Str.EMPTY :
+          Str.get(XMLToken.decodeUri(q.substring(0, eq), true));
+        final Str val = Str.get(XMLToken.decodeUri(q.substring(eq + 1), true));
         queries = queries.put(key, queries.get(key).append(val, qc));
       }
     }

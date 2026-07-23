@@ -187,7 +187,7 @@ public final class RequestContext implements RequestScope {
       final String[] parts = Strings.split(param, '=', 2);
       if(parts.length == 2) {
         final ItemList list = map.computeIfAbsent(Str.get(parts[0]), ItemList::new);
-        list.add(Atm.get(XMLToken.decodeUri(parts[1])));
+        list.add(Atm.get(XMLToken.decodeUri(parts[1], true)));
       }
     }
     // create final map
