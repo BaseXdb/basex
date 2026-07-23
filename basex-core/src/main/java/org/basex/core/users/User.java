@@ -176,12 +176,21 @@ public final class User {
   }
 
   /**
-   * Computes new passwords.
+   * Assigns a new password and discards all codes of the old one.
    * @param password password (plain text)
    * @param algorithms algorithms for which password codes are computed
    */
   public synchronized void password(final String password, final Algorithm[] algorithms) {
     passwords.clear();
+    recode(password, algorithms);
+  }
+
+  /**
+   * Recomputes the codes of the specified algorithms and preserves all others.
+   * @param password password (plain text)
+   * @param algorithms algorithms for which password codes are computed
+   */
+  synchronized void recode(final String password, final Algorithm[] algorithms) {
     for(final Algorithm algorithm : algorithms) {
       passwords.put(algorithm, algorithm.create(name, password));
     }
@@ -287,7 +296,6 @@ public final class User {
    * @return result of check
    */
   synchronized boolean outdated(final Algorithm[] algorithms) {
-    if(passwords.size() != algorithms.length) return true;
     for(final Algorithm algorithm : algorithms) {
       final EnumMap<Code, String> codes = passwords.get(algorithm);
       if(codes == null || !algorithm.current(codes)) return true;

@@ -138,7 +138,7 @@ public final class Users {
   public synchronized void rehash(final User user, final String password,
       final Algorithm[] algorithms) {
     if(user.outdated(algorithms)) {
-      user.password(password, algorithms);
+      user.recode(password, algorithms);
       write();
     }
   }
