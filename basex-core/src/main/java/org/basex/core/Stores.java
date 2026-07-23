@@ -1,5 +1,6 @@
 package org.basex.core;
 
+import static org.basex.core.Text.*;
 import static org.basex.query.QueryError.*;
 
 import java.io.*;
@@ -362,7 +363,7 @@ public final class Stores implements Closeable {
       // ORDER MUST NOT BE CHANGED. MAXIMUM: 63 ENTRIES
       final Class<?>[] classes = {
         BlnSeq.class, BytSeq.class, DblSeq.class, DecSeq.class, FltSeq.class, IntSeq.class,
-        ShrSeq.class, StrSeq.class, SingletonSeq.class, RangeSeq.class
+        ShrSeq.class, StrSeq.class, SingletonSeq.class, RangeSeq.class, LongSeq.class
       };
       METHODS = new MethodHandle[classes.length];
 
@@ -436,6 +437,8 @@ public final class Stores implements Closeable {
       }
       return vb.value(type);
     }
+    // data class is unknown: the store was written by a newer version
+    if(classId >= METHODS.length) throw new IOException(H_STORE_FORMAT);
     try {
       return (Value) METHODS[classId].invoke(in, type, qc);
     } catch(final Throwable th) {

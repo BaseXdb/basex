@@ -424,6 +424,7 @@ h_out_of_mem         = Növelje a Java kupacméretét (heap size) a következőv
 h_path_index         = Egy útvonalösszegzés gyorsítja az útvonal felbontásait.
 h_stemming           = Kifejezés csupaszítása (stemming) az indexelés előtt.
 h_stopwords          = Válasszon egy megállító-kulcsszavakat (stopwords) tartalmazó fájlt a gyakran figyelmen kívül hagyott kifejezésekhez.
+h_store_format       = A tároló formátuma megváltozott; kérem, használjon újabb verziót.
 h_strip_ws           = Ez a beállítás törli a címkék és a tartalom között lévő nem látható karaktereket (whitespace-eket).
 h_text_index         = Ez az index a szövegek feltételekben lévő összehasonlítását gyorsítja meg.
 h_token_index        = Tokenek gyorsabb keresése attribútumok értékeiben.

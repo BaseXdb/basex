@@ -424,6 +424,7 @@ h_out_of_mem         = Vergroot Java's heap size met de vlag -Xmx<size>.
 h_path_index         = Een pad-index versnelt het vergelijken van paden.
 h_stemming           = Van termen wordt de stam bepaald voor ze geïndexeerd worden.
 h_stopwords          = Kies een stopword lijst om veelvoorkomende termen over te slaan.
+h_store_format       = Het formaat van de opslag is gewijzigd; gebruik een nieuwere versie.
 h_strip_ws           = Deze optie verwijdert witruimte tussen tags en content.
 h_text_index         = Deze index versnelt tekst vergelijkingen in predicaten.
 h_token_index        = Snellere opzoeking van tokens in attribuutwaarden.

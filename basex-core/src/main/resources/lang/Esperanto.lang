@@ -424,6 +424,7 @@ h_out_of_mem         = Vi povas pligrandigi la Java-amason per la flago -Xmx<siz
 h_path_index         = Voja indekso ebligas optimumigon de XPath-informmendoj.
 h_stemming           = Terminoj estas radikigataj antaŭ ol ili estas indeksataj.
 h_stopwords          = Elektu liston de ĉesvortoj por preterlasi oftajn terminojn.
+h_store_format       = La formato de la konservejo ŝanĝiĝis; bonvolu uzi pli novan version.
 h_strip_ws           = Ĉi tiu opcio forigas blankspacojn inter etikedoj kaj enhavo.
 h_text_index         = Ĉi tiu indekso plirapidigas komparojn de teksto en predikatoj.
 h_token_index        = Pli rapida serĉado de ĵetonoj en atributaj valoroj.

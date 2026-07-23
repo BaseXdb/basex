@@ -424,6 +424,7 @@ h_out_of_mem         = Augmenter la mémoire maximum allouée à Java avec le pa
 h_path_index         = Définir un index des chemins accélère les résolutions de chemins.
 h_stemming           = Les termes sont stemmés avant d’être indexés.
 h_stopwords          = Choisir une liste de mots vides pour ignorer les termes fréquents.
+h_store_format       = Le format du stockage a changé ; veuillez utiliser une version plus récente.
 h_strip_ws           = Cette option supprime les espaces entre balises et contenus.
 h_text_index         = Cet index accélère les comparaisons de texte dans les prédicats.
 h_token_index        = recherche de tokens plus rapide dans les valeurs d’attributs.

@@ -424,6 +424,7 @@ h_out_of_mem         = Java heap boyutunu -Xmx<size> parametresi ile artırabili
 h_path_index         = Yol (path) indeksi, XPath sorgularını optimize eder
 h_stemming           = Terimler indekslenmeden önce köklerine indirgenir
 h_stopwords          = Sık kullanılan kelimeleri atlamak için bir stopword listesi seçin
+h_store_format       = Depolama formatı değişti; lütfen daha yeni bir sürüm kullanın
 h_strip_ws           = Bu seçenek, etiketler ile içerik arasındaki boşlukları kaldırır
 h_text_index         = Bu indeks, metin karşılaştırmalarını hızlandırır
 h_token_index        = Öznitelik değerlerindeki token’ların daha hızlı aranmasını sağlar

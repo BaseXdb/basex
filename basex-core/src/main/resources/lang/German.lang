@@ -424,6 +424,7 @@ h_out_of_mem         = Sie können den verfügbaren Speicher mit dem Java-Flag -
 h_path_index         = Ein Pfadindex erlaubt Optimierungen von XPath-Anfragen.
 h_stemming           = Begriffe werden vor der Indexierung auf die Stammform reduziert.
 h_stopwords          = Auswahl einer Stoppwort-Liste, um häufige Begriffe zu ignorieren.
+h_store_format       = Das Speicherformat hat sich geändert; bitte verwenden Sie eine neuere Version.
 h_strip_ws           = Diese Option entfernt Leerzeichen zwischen Tags und Textknoten.
 h_text_index         = Dieser Index beschleunigt Textvergleiche in Prädikaten.
 h_token_index        = Schnellere Suche nach Tokens in Attributwerten.

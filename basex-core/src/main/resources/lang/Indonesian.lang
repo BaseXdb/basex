@@ -424,6 +424,7 @@ h_out_of_mem         = Menaikkan ukuran heap Java dengan penanda -Xmx<size>
 h_path_index         = Suat ringkasan rintis mempercepat penemuan rintis.
 h_stemming           = Istilah dipotong sebelum diindeks.
 h_stopwords          = Pilih suatu daftar kata henti untuk melewatkan istilah yang sering muncul.
+h_store_format       = Bentuk penyimpanan telah berubah; mohon gunakan versi yang lebih baru
 h_strip_ws           = Pilihan ini menghilangkan lebeihan spasi antara tag dan isi.
 h_text_index         = Indeks ini mempercepat pembandingan teks dalam predikat.
 h_token_index        = Pencarian token yang lebih cepat dalam nilai atribut.

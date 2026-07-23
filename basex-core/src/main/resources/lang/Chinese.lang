@@ -424,6 +424,7 @@ h_out_of_mem         = 使用 -Xmx<size> 选项来加大Java堆内存
 h_path_index         = 路径索引可以优化XPath查询
 h_stemming           = 词条在建立索引前会被提取词干。
 h_stopwords          = 选择停用词表以跳过高频词。
+h_store_format       = 存储结构已经变了，请使用新版软件
 h_strip_ws            = 这个选项将删除标签和内容间的空白
 h_text_index         = 这个索引加速了断言中文本的比较
 h_token_index        = 更快地查找属性值中的词元。

@@ -424,6 +424,7 @@ h_out_of_mem         = Măriti dimensiunea Java heap cu flagul -Xmx<size>.
 h_path_index         = Un rezumat a caii accelerează rezoluţiile de cale.
 h_stemming           = Termenii sunt stemmed înainte de a fi indexati.
 h_stopwords          = Alege o listă stopword pentru a sări peste termeni frecventi.
+h_store_format       = Formatul stocării a fost schimbat, vă rugăm să folosiţi o versiune mai nouă.
 h_strip_ws           = Această opţiune elimină spaţiile goale dintre tag-uri şi conţinut.
 h_text_index         = Acest indice accelereaza comparaţia de predicate.
 h_token_index        = Cautare mai rapida de token-uri in valorile atributelor.

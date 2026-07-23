@@ -424,6 +424,7 @@ h_out_of_mem         = Puede incrementar el tamaño de pila de Java con el modif
 h_path_index         = Un resumen de ruta acelera las resoluciones de ruta.
 h_stemming           = Los términos son reducidos a la raiz antes de ser indizados.
 h_stopwords          = Escoja una lista de "palabras vacías" para ignorar términos frecuentes.
+h_store_format       = El formato del almacén ha cambiado; por favor utilice una versión más reciente.
 h_strip_ws           = Esta opción borra los espacios en blanco entre etiquetas y contenidos.
 h_text_index         = Este índice acelera las comparaciones de texto en los predicados.
 h_token_index        = Este índice acelera la búsqueda de tokens de los values de atributos.

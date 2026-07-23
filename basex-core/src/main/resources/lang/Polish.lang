@@ -424,6 +424,7 @@ h_out_of_mem         = Możesz zwiększyć rozmiar sterty Javy flagą -Xmx<size>
 h_path_index         = Indeks ścieżek umożliwia optymalizację zapytań XPath.
 h_stemming           = Terminy są sprowadzane do rdzenia przed indeksowaniem.
 h_stopwords          = Wybierz listę słów pomijanych, aby pomijać częste terminy.
+h_store_format       = Format magazynu uległ zmianie; użyj nowszej wersji.
 h_strip_ws           = Ta opcja usuwa białe znaki między znacznikami a zawartością.
 h_text_index         = Ten indeks przyspiesza porównania tekstu w predykatach.
 h_token_index        = Szybsze wyszukiwanie tokenów w wartościach atrybutów.

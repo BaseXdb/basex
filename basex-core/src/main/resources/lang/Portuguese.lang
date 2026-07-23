@@ -424,6 +424,7 @@ h_out_of_mem         = Você pode aumentar o tamanho do heap do Java com a opç�
 h_path_index         = Um índice de caminhos permite otimizar consultas XPath.
 h_stemming           = Os termos são reduzidos ao radical antes de serem indexados.
 h_stopwords          = Escolha uma lista de palavras irrelevantes para ignorar termos frequentes.
+h_store_format       = O formato do armazenamento mudou; use uma versão mais recente.
 h_strip_ws           = Esta opção remove os espaços em branco entre tags e conteúdo.
 h_text_index         = Este índice acelera comparações de texto em predicados.
 h_token_index        = Busca mais rápida de tokens em valores de atributos.

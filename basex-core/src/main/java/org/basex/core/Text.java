@@ -1427,6 +1427,8 @@ public interface Text {
   String H_DB_FORMAT = lang("h_db_format");
   /** Index update. */
   String H_INDEX_FORMAT = lang("h_index_format");
+  /** Store update. */
+  String H_STORE_FORMAT = lang("h_store_format");
   /** Dialog title for opening a large database. */
   String H_LARGE_DB = lang("h_large_db") + NL + ' ';
   /** Dialog title for announcing binary file. */

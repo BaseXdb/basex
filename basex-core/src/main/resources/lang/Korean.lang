@@ -424,6 +424,7 @@ h_out_of_mem         = -Xmx<size> 플래그로 Java 힙 크기를 늘릴 수 있
 h_path_index         = 경로 색인을 사용하면 XPath 쿼리를 최적화할 수 있습니다.
 h_stemming           = 용어는 색인 생성 전에 어간으로 변환됩니다.
 h_stopwords          = 자주 나오는 용어를 건너뛰려면 불용어 목록을 선택하세요.
+h_store_format       = 저장소 형식이 변경되었습니다. 최신 버전을 사용하세요.
 h_strip_ws           = 이 옵션은 태그와 내용 사이의 공백을 제거합니다.
 h_text_index         = 이 색인은 술어에서 텍스트 비교의 속도를 높입니다.
 h_token_index        = 속성 값에서 토큰을 더 빠르게 조회합니다.

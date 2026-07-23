@@ -275,11 +275,7 @@ public abstract class JavaCall extends Arr {
           return IntSeq.get(list.finish(), BasicType.UNSIGNED_LONG);
         }
         // integer array
-        if(object instanceof final long[] values) {
-          final ItemList list = new ItemList(values.length);
-          for(final long value : values) list.add(Itr.get(value));
-          return list.value();
-        }
+        if(object instanceof final long[] values) return LongSeq.get(values);
         // check for null values
         for(final Object obj : (Object[]) object) {
           if(obj == null) throw JAVANULL.get(info);

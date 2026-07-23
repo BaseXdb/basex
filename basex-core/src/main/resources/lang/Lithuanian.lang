@@ -424,6 +424,7 @@ h_out_of_mem         = Java krūvos dydį galite padidinti vėliavėle -Xmx<size
 h_path_index         = Kelių rodyklė leidžia optimizuoti XPath užklausas.
 h_stemming           = Prieš indeksuojant terminai suvedami į kamieną.
 h_stopwords          = Pasirinkite stabdomųjų žodžių sąrašą, kad praleistumėte dažnus terminus.
+h_store_format       = Saugyklos formatas pakeistas; naudokite naujesnę versiją.
 h_strip_ws           = Ši parinktis pašalina tarpus tarp žymų ir turinio.
 h_text_index         = Ši rodyklė pagreitina teksto palyginimus predikatuose.
 h_token_index        = Spartesnė leksemų paieška atributų reikšmėse.
