@@ -106,7 +106,7 @@ public final class StaticOptions extends Options {
       new EnumOption<>("AUTHMETHOD", AuthMethod.BASIC);
   /** Password algorithms (comma-separated, in order of priority). */
   public static final StringOption AUTHALGORITHMS =
-      new StringOption("AUTHALGORITHMS", "salted-sha256,digest");
+      new StringOption("AUTHALGORITHMS", "salted-sha256");
 
   /** Authorization method. */
   public enum AuthMethod {

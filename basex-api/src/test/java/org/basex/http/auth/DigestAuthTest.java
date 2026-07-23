@@ -1,5 +1,7 @@
 package org.basex.http.auth;
 
+import org.basex.core.*;
+import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -14,6 +16,8 @@ public final class DigestAuthTest extends AuthTest {
    * @throws Exception exception
    */
   @BeforeAll public static void start() throws Exception {
+    // digest authentication requires the matching password algorithm
+    Prop.put(StaticOptions.AUTHALGORITHMS, "salted-sha256,digest");
     init("Digest");
   }
 
