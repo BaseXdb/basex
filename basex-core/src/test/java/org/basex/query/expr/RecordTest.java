@@ -172,6 +172,18 @@ public final class RecordTest extends SandboxTest {
     error("fn($r as record(x)) { $r }({ 'x': 1, 'y': 2 })", INVTYPE_X);
   }
 
+  /** The field set of {@code record(*)} is unknown: no field access must be folded away. */
+  @Test public void anyRecord() {
+    query("fn($r as record(*)) { $r?a }({ 'a': 1 })", 1);
+    query("fn($r as record(*)) { $r?('a') }({ 'a': 1 })", 1);
+    query("fn($r as record(*)) { map:get($r, 'a') }({ 'a': 1 })", 1);
+    query("fn($r as record(*)) { map:contains($r, 'a') }({ 'a': 1 })", true);
+    query("fn($r as record(*)) { map:remove($r, 'a') }({ 'a': 1, 'b': 2 })", "{\"b\":2}");
+    query("fn($r as record(*)) { map:put($r, 'b', 2)?a }({ 'a': 1 })", 1);
+    // record keys are strings: numeric lookups can still be discarded
+    query("fn($r as record(*)) { map:get($r, 1) }({ 'a': 1 })", "");
+  }
+
   /** Recursive records. */
   @Test public void recRec() {
     query("declare variable $v as list := "

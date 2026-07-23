@@ -120,12 +120,21 @@ public final class RecordType extends MapType {
   }
 
   /**
+   * Indicates if this is the abstract {@code record(*)} type, which matches any record. Its field
+   * set is unknown, so no assumptions must be made about the presence or absence of a field.
+   * @return result of check
+   */
+  public boolean any() {
+    return this == Types.RECORD;
+  }
+
+  /**
    * Indicates if this record type enforces strict field access, i.e. it is sealed and not the
    * abstract {@code record(*)} type. Lookups of undeclared fields on such records raise an error.
    * @return result of check
    */
   public boolean strict() {
-    return sealed && this != Types.RECORD;
+    return sealed && !any();
   }
 
   /**
