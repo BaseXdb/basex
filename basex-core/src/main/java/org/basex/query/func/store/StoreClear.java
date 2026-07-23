@@ -12,8 +12,8 @@ import org.basex.util.*;
  */
 public final class StoreClear extends StoreFn {
   @Override
-  public Empty item(final QueryContext qc, final InputInfo ii) {
-    stores(qc).clear();
+  public Empty item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    stores(qc).clear(info);
     return Empty.VALUE;
   }
 }

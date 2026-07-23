@@ -1922,6 +1922,10 @@ public enum Function implements AFunction {
   _STORE_REMOVE(StoreRemove::new, "remove(key[,name])",
       params(STRING_O, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
   /** XQuery function. */
+  _STORE_UPDATE(StoreUpdate::new, "update(update[,name])",
+      params(FuncType.get(MAP_O, MAP_O).seqType(), STRING_ZO),
+      BOOLEAN_O, flag(NDT), STORE_URI, Perm.CREATE),
+  /** XQuery function. */
   _STORE_WRITE(StoreWrite::new, "write([name])",
       params(STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
 
