@@ -31,6 +31,8 @@ public interface HTTPText {
   String DBA_CLIENT_ID = "dba";
   /** Client ID. */
   String CLIENT_ID = "id";
+  /** Request attribute: authenticated user. */
+  String REQUEST_USER = "org.basex.user";
 
   /** HTTP header string. */
   String WWW_AUTHENTICATE = "WWW-Authenticate";
