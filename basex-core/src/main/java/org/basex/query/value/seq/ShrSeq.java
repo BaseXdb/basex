@@ -18,16 +18,17 @@ import org.basex.query.value.type.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class ShrSeq extends NativeSeq {
+public final class ShrSeq extends ItrSeq {
   /** Values. */
   private final short[] values;
 
   /**
    * Constructor.
    * @param values shorts
+   * @param type type
    */
-  private ShrSeq(final short[] values) {
-    super(values.length, BasicType.SHORT);
+  private ShrSeq(final short[] values, final Type type) {
+    super(values.length, type);
     this.values = values;
   }
 
@@ -45,7 +46,7 @@ public final class ShrSeq extends NativeSeq {
     final int size = in.readNum();
     final short[] values = new short[size];
     for(int s = 0; s < size; s++) values[s] = (short) in.readNum();
-    return get(values);
+    return get(values, type);
   }
 
   @Override
@@ -60,41 +61,61 @@ public final class ShrSeq extends NativeSeq {
   }
 
   @Override
+  public long itrAt(final int index) {
+    return values[index];
+  }
+
+  @Override
+  int width() {
+    return 2;
+  }
+
+  @Override
   public Value reverse(final Job job) {
     final int sz = (int) size;
     final short[] tmp = new short[sz];
     for(int i = 0; i < sz; i++) tmp[sz - i - 1] = values[i];
-    return get(tmp);
+    return get(tmp, type);
   }
 
   @Override
   public Value sort() {
     final short[] tmp = values.clone();
     Arrays.sort(tmp);
-    return get(tmp);
+    return get(tmp, type);
   }
 
   @Override
-  public short[] toJava() {
-    return values;
+  public Object toJava() throws QueryException {
+    return type == BasicType.SHORT ? values : super.toJava();
   }
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || (obj instanceof final ShrSeq seq ? Arrays.equals(values, seq.values) :
-      super.equals(obj));
+    return this == obj || (obj instanceof final ShrSeq seq ? type == seq.type &&
+        Arrays.equals(values, seq.values) : super.equals(obj));
   }
 
   // STATIC METHODS ===============================================================================
 
   /**
-   * Creates a sequence with the specified values.
+   * Creates an xs:short sequence with the specified values.
    * @param values values
    * @return value
    */
   public static Value get(final short[] values) {
+    return get(values, BasicType.SHORT);
+  }
+
+  /**
+   * Creates a sequence with the specified values.
+   * @param values values
+   * @param type type; must be xs:short or an instance of xs:integer
+   * @return value
+   */
+  public static Value get(final short[] values, final Type type) {
     final int vl = values.length;
-    return vl == 0 ? Empty.VALUE : vl == 1 ? Itr.get(values[0], BasicType.SHORT) :
-      new ShrSeq(values);
+    return vl == 0 ? Empty.VALUE : vl == 1 ? Itr.get(values[0], type) :
+      refine(new ShrSeq(values, type));
   }
 }
