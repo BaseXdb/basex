@@ -370,15 +370,15 @@ public final class Token {
     // use fast variant for powers of two
     for(int shift = 1, p = 2; shift < 6; shift++, p <<= 1) {
       if(radix == p) {
-        final byte[] tmp = new byte[(64 + shift - 1) / shift];
-        final int mask = (1 << shift) - 1;
+        final int mask = (1 << shift) - 1, bits = 64 - Long.numberOfLeadingZeros(value);
+        final byte[] tmp = new byte[Math.max(1, (bits + shift - 1) / shift)];
         long n = value;
         int pos = tmp.length;
         do {
           tmp[--pos] = DIGITS[(int) (n & mask)];
           n >>>= shift;
         } while(n != 0);
-        return substring(tmp, pos);
+        return tmp;
       }
     }
 
@@ -503,7 +503,13 @@ public final class Token {
    * @return token
    */
   public static byte[] chopNumber(final byte[] token) {
-    if(!contains(token, '.') || contains(token, 'e') || contains(token, 'E')) return token;
+    // chop only plain decimals: require a '.', skip scientific notation
+    boolean dot = false;
+    for(final byte b : token) {
+      if(b == '.') dot = true;
+      else if(b == 'e' || b == 'E') return token;
+    }
+    if(!dot) return token;
     // remove trailing zeroes
     int tl = token.length;
     while(--tl > 0 && token[tl] == '0');
