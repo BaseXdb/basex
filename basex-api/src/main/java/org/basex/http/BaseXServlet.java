@@ -54,7 +54,7 @@ public abstract class BaseXServlet extends HttpServlet {
   public final void service(final HttpServletRequest request, final HttpServletResponse response)
       throws IOException {
 
-    final HTTPConnection conn = new HTTPConnection(request, response, auth, null);
+    final HTTPConnection conn = new HTTPConnection(request, response, auth, path(request));
     try {
       conn.authenticate(username);
       run(conn);
@@ -80,6 +80,15 @@ public abstract class BaseXServlet extends HttpServlet {
    * @throws Exception any exception
    */
   protected abstract void run(HTTPConnection conn) throws Exception;
+
+  /**
+   * Returns the request path to be processed.
+   * @param request HTTP request
+   * @return path
+   */
+  protected String path(final HttpServletRequest request) {
+    return request.getPathInfo();
+  }
 
   /**
    * Returns the value of a servlet-specific initialization parameter.
