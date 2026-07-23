@@ -1,6 +1,6 @@
 /**
  * basexdbc.c : communicate with BaseX database server
- * Works with BaseX 7.x and with BaseX 8.0 and later
+ * Works with BaseX 13.0 and later
  *
  * Copyright (c), Alexander Holupirek <alex@holupirek.de>, BSD license
  *
@@ -22,7 +22,7 @@
 #include <unistd.h>
 
 #include "basexdbc.h"
-#include "md5.h"
+#include "sha256.h"
 #include "readstring.h"
 
 static int send_db(int sfd, const char *buf, size_t buf_len);
@@ -92,15 +92,17 @@ basex_connect(const char *host, const char *port)
 /**
  * Authenticate against BaseX server connected on sfd using user and passwd.
  *
- * Authentication as defined by BaseX transfer protocol (BaseX 7.0 ff.):
- * https://github.com/BaseXdb/basex-api/blob/master/etc/readme.txt
+ * Authentication as defined by BaseX transfer protocol (BaseX 13.0 ff.):
+ * https://docs.basex.org/wiki/Server_Protocol
  * {...} = string; \n = single byte
  *
  *   1. Client connects to server socket (basex_connect)
- *   2. Server sends timestamp: {timestamp} \0
- *   3. Client sends username and hash:
- *      {username} \0 {md5(md5(password) + timestamp)} \0
- *   4. Server sends \0 (success) or \1 (error)
+ *   2. Server sends challenge: {realm} : {nonce} \0
+ *   3. Client sends username and an empty hash:
+ *      {username} \0 \0
+ *   4. Server sends password parameters: {algorithm} : {salt} \0
+ *   5. Client sends hash: {sha256(sha256(salt + password) + nonce)} \0
+ *   6. Server sends \0 (success) or \1 (error)
  *
  * @param sfd socket file descriptor successfully connected to BaseX server
  * @param user string with database username
@@ -110,111 +112,105 @@ basex_connect(const char *host, const char *port)
 int
 basex_authenticate(int sfd, const char *user, const char *passwd)
 {
-	char ts[BUFSIZ]; /* timestamp returned by basex. */
-	char *md5_pwd;   /* md5'ed passwd */
-	int ts_len, rc, i;
+	char *challenge = NULL; /* {realm}:{nonce} sent by the server */
+	char *params = NULL;    /* {algorithm}:{salt} sent by the server */
+	char *code = NULL;      /* sha256(salt + password) */
+	int rc;
 
-	/* Right after the first connect BaseX returns a nul-terminated
-         * timestamp string. */
-	memset(ts, 0, BUFSIZ);
-	rc = read(sfd, &ts, BUFSIZ);
+	/* Right after the first connect BaseX sends {realm}:{nonce}\0 */
+	rc = readstring(sfd, &challenge);
 	if (rc == -1) {
-		warnx("Reading timestamp failed.");
+		warnx("Reading challenge failed.");
 		return -1;
 	}
-	ts_len = strlen(ts);
+	char *nonce = strchr(challenge, ':');
+	if (nonce == NULL) {
+		warnx("Unsupported server: no realm in challenge.");
+		free(challenge);
+		return -1;
+	}
+	nonce++;
 
 #if DEBUG
-	warnx("timestamp       : %s (%d)", ts, strlen(ts));
+	warnx("challenge       : %s", challenge);
 #endif
 
-	/* BaseX Server expects an authentification sequence:
-           {username}\0{md5(md5(user:realm:password) + timestamp)}\0 */
- 	/* legacy - 
-        /* {username}\0{md5(md5(password) + timestamp)}\0 */
-        
-
-	/* Send {username}\0 */
+	/* Send {username}\0 and an empty hash \0 to request the salt. */
 	int user_len = strlen(user) + 1;
 	rc = write(sfd, user, user_len);
 	if (rc == -1 || rc != user_len) {
 		warnx("Sending username failed. %d != %d", rc, user_len);
+		free(challenge);
 		return -1;
 	}
-        
-        char* p = strchr(ts,':');
-        char* t;
-        if (!p) {
-            /* legacy login */
-            t = ts;
-            /* Compute md5 for passwd. */
-            md5_pwd = md5(passwd);
-            if (md5_pwd == NULL) {
-                    warnx("md5 computation for password failed.");
-                    return -1;
-            }  
-        }
-        else {
-            /* v8.0+ login */
-            t = p + 1;
-            /* Compute md5 for codeword. */
-            int user_len = strlen(user);
-            int pass_len = strlen(passwd);
-            int realm_len = p - ts;
-            char codewd[user_len + realm_len + pass_len + 3];
-            strncpy(codewd, user, user_len);
-            codewd[user_len] = ':';
-            strncpy(codewd + user_len + 1, ts, realm_len);
-            codewd[user_len + 1 + realm_len] = ':';
-            strncpy(codewd + user_len + 1 + realm_len + 1, passwd, pass_len);
-            codewd[user_len + 1 + realm_len + 1 + pass_len] = '\0';
-            md5_pwd = md5(codewd);
-            if (md5_pwd == NULL) {
-                    warnx("md5 computation for password failed.");
-                    return -1;
-            }
-            ts_len = ts_len - realm_len -1;
-        }
-        int md5_pwd_len = strlen(md5_pwd);
-        
-#if DEBUG
-	warnx("md5(pwd)        : %s (%d)", md5_pwd, md5_pwd_len);
-#endif
-	
-	/* Concat md5'ed codewd string and timestamp/nonce string. */
-	int pwdts_len = md5_pwd_len + ts_len + 1;
-	char pwdts[pwdts_len];
-	memset(pwdts, 0, sizeof(pwdts));
-	for (i = 0; i < md5_pwd_len; i++)
-		pwdts[i] = md5_pwd[i];
-	int j = md5_pwd_len;
-	for (i = 0; i < ts_len; i++,j++)
-		pwdts[j] = t[i];
-	pwdts[pwdts_len - 1] = '\0';
-#if DEBUG
-	warnx("md5(pwd)+ts     : %s (%d)", pwdts, strlen(pwdts));
-#endif
-
-	/* Compute md5 for md5'ed codeword + timestamp */
-	char *md5_pwdts = md5(pwdts);
-	if (md5_pwdts == NULL) {
-		warnx("md5 computation for password + timestamp failed.");
+	rc = write(sfd, "", 1);
+	if (rc != 1) {
+		warnx("Requesting password parameters failed.");
+		free(challenge);
 		return -1;
 	}
-	int md5_pwdts_len = strlen(md5_pwdts);
+
+	/* Receive {algorithm}:{salt}\0 */
+	rc = readstring(sfd, &params);
+	if (rc == -1) {
+		warnx("Reading password parameters failed.");
+		free(challenge);
+		return -1;
+	}
+	char *salt = strchr(params, ':');
+	if (salt == NULL) {
+		warnx("Malformed password parameters.");
+		free(challenge);
+		free(params);
+		return -1;
+	}
+	*salt++ = '\0';
+
 #if DEBUG
-	warnx("md5(md5(pwd)+ts): %s (%d)", md5_pwdts, md5_pwdts_len);
+	warnx("algorithm, salt : %s, %s", params, salt);
 #endif
 
-	/* Send md5'ed(md5'ed codeword + timestamp) to basex. */
-	rc = send_db(sfd, md5_pwdts, md5_pwdts_len + 1);  // also send '\0'
+	/* Compute sha256(salt + password), then sha256 of that plus the nonce. */
+	int salt_len = strlen(salt);
+	int pass_len = strlen(passwd);
+	char codewd[salt_len + pass_len + 1];
+	strncpy(codewd, salt, salt_len);
+	strncpy(codewd + salt_len, passwd, pass_len);
+	codewd[salt_len + pass_len] = '\0';
+	code = sha256(codewd);
+	if (code == NULL) {
+		warnx("sha256 computation for password failed.");
+		free(challenge);
+		free(params);
+		return -1;
+	}
+
+	int code_len = strlen(code);
+	int nonce_len = strlen(nonce);
+	char codenonce[code_len + nonce_len + 1];
+	strncpy(codenonce, code, code_len);
+	strncpy(codenonce + code_len, nonce, nonce_len);
+	codenonce[code_len + nonce_len] = '\0';
+
+	char *hash = sha256(codenonce);
+	free(challenge);
+	free(params);
+	free(code);
+	if (hash == NULL) {
+		warnx("sha256 computation for password + nonce failed.");
+		return -1;
+	}
+#if DEBUG
+	warnx("hash            : %s", hash);
+#endif
+
+	/* Send the hash to basex. */
+	rc = send_db(sfd, hash, strlen(hash) + 1);  // also send '\0'
+	free(hash);
 	if (rc == -1) {
 		warnx("Sending credentials failed.");
 		return -1;
 	}
-
-	free(md5_pwd);
-	free(md5_pwdts);
 
 	/* Retrieve authentification status. */
 	rc = basex_status(sfd);

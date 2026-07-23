@@ -1,7 +1,7 @@
 <?php
 /*
  * PHP client for BaseX.
- * Works with BaseX 7.0 and later
+ * Works with BaseX 13.0 and later
  *
  * Documentation: https://docs.basex.org/wiki/Clients
  *
@@ -30,20 +30,20 @@ class Session
             throw $this->error("Cannot connect");
         }
 
-        // receive timestamp
-        $ts = $this->readString();
-        // Hash container
-        if (strpos($ts, ':') !== false) {
-            // digest-auth
-            $challenge = explode(':', $ts, 2);
-            $md5 = hash("md5", hash("md5", $user.':'.$challenge[0].':'.$password).$challenge[1]);
-        } else {
-            // Legacy: cram-md5
-            $md5 = hash("md5", hash("md5", $password).$ts);
-        }
+        // receive challenge: {realm}:{nonce}
+        $challenge = explode(':', $this->readString());
+        $nonce = $challenge[1];
 
-        // send username and hashed password/timestamp
-        $result = $this->send($user.chr(0).$md5.chr(0));
+        // request the password parameters: send username and an empty hash
+        $this->send($user.chr(0).chr(0));
+
+        // receive password parameters: {algorithm}:{salt}
+        $params = explode(':', $this->readString());
+        $salt = $params[1];
+
+        // send hashed password
+        $code = hash("sha256", hash("sha256", $salt.$password).$nonce);
+        $result = $this->send($code.chr(0));
         if ($result === false) {
             throw $this->error("Write failed");
         }

@@ -1,11 +1,11 @@
 # Perl client for BaseX.
-# Works with BaseX 7.0 and later
+# Works with BaseX 13.0 and later
 #
 # Documentation: https://docs.basex.org/wiki/Clients
-# 
+#
 # (C) BaseX Team, BSD License
 
-use Digest::MD5;
+use Digest::SHA;
 use IO::Socket;
 use warnings;
 use strict;
@@ -25,23 +25,19 @@ sub new {
     PeerAddr => $host, PeerPort => $port, Proto => "tcp") or
     die "Can't communicate with the server.";
 
-  # receive server response
-  my $code; my $nonce;
-  my @response = split(':', $self->_receive());
-  if(@response > 1) {
-    # support for digest authentication
-    $code = "$user:$response[0]:$pw";
-    $nonce = $response[1];
-  } else {
-    # support for cram-md5 (Version < 8.0)
-    $code = $pw;
-    $nonce = $response[0];
-  }
+  # receive challenge: {realm}:{nonce}
+  my $nonce = (split(':', $self->_receive()))[1];
 
-  # send username and hashed password/timestamp
-  my $codemd5 = Digest::MD5->new()->add($code)->hexdigest();
-  my $complete = Digest::MD5->new()->add($codemd5.$nonce)->hexdigest();
-  $self->send($user.chr(0).$complete);
+  # request the password parameters: send username and an empty hash
+  $self->send($user);
+  $self->send("");
+
+  # receive password parameters: {algorithm}:{salt}
+  my $salt = (split(':', $self->_receive()))[1];
+
+  # send hashed password
+  my $code = Digest::SHA->new(256)->add($salt.$pw)->hexdigest();
+  $self->send(Digest::SHA->new(256)->add($code.$nonce)->hexdigest());
 
   # evaluate success flag
   return $self if !$self->_read() or die "Access denied.";

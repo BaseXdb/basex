@@ -1,5 +1,5 @@
 # R client for BaseX.
-# Works with BaseX 8.0 and later
+# Works with BaseX 13.0 and later
 #
 # Documentation: https://docs.basex.org/wiki/Clients
 #
@@ -18,18 +18,18 @@ BasexClient <- R6Class("BasexClient",
       private$sock <- socketConnection(host = "localhost", port = 1984L, 
         open = "w+b", server = FALSE, blocking = TRUE, encoding = "utf-8")
       private$response <- self$str_receive()
-      splitted <-strsplit(private$response, "\\:")
-      ifelse(length(splitted[[1]]) > 1,
-             { code <- paste(username, splitted[[1]][1],password, sep=":")
-             nonce <- splitted[[1]][2]
-             },
-             { code <- password
-             nonce <- splitted[[1]][1]
-             }
-      )
-      code <- md5(paste(md5(code), nonce, sep = ""))
-      class(code) <- "character"
+      # challenge: {realm}:{nonce}
+      nonce <- strsplit(private$response, "\\:")[[1]][2]
+
+      # request the password parameters: send username and an empty hash
       private$void_send(username)
+      private$void_send("")
+
+      # password parameters: {algorithm}:{salt}
+      salt <- strsplit(self$str_receive(), "\\:")[[1]][2]
+
+      code <- sha256(paste(sha256(paste(salt, password, sep = "")), nonce, sep = ""))
+      class(code) <- "character"
       private$void_send(code)
       if (!self$bool_test_sock()) stop("Access denied")},
     command = function(command = command) {

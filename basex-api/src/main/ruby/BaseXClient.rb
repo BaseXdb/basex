@@ -1,12 +1,12 @@
 # Ruby client for BaseX.
-# Works with BaseX 7.0 and later
+# Works with BaseX 13.0 and later
 #
 # Documentation: https://docs.basex.org/wiki/Clients
 #
 # (C) BaseX Team, BSD License
 
 require 'socket'
-require 'digest/md5'
+require 'digest/sha2'
 
 module BaseXClient
   class Session
@@ -15,18 +15,20 @@ module BaseXClient
       # create server connection
       @socket = TCPSocket.open(host, port)
                   
-      # authenticate
-      hash = Digest::MD5.new
-      # response either {nonce} or {realm:nonce}
-      rec = receive.split(':')
-      if rec.length == 1
-        hash.update(hash.hexdigest(pw))
-        hash.update(rec[0])
-      else
-        hash.update(hash.hexdigest([username, rec[0], pw].join(':')))
-        hash.update(rec[1])
-      end
+      # receive challenge: {realm}:{nonce}
+      nonce = receive.split(':')[1]
+
+      # request the password parameters: send username and an empty hash
       send(username)
+      send("")
+
+      # receive password parameters: {algorithm}:{salt}
+      salt = receive.split(':')[1]
+
+      # send hashed password
+      hash = Digest::SHA256.new
+      hash.update(hash.hexdigest(salt + pw))
+      hash.update(nonce)
       send(hash.hexdigest())
 
       # evaluate success flag

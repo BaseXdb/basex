@@ -99,24 +99,21 @@ public class ClientSession extends Session {
     }
     sin = socket.getInputStream();
 
-    // receive server response
+    // receive challenge: {REALM}:{NONCE}
     final BufferInput bi = BufferInput.get(sin);
-    final String[] response = Strings.split(bi.readString(), ':');
-    final String code, nonce;
-    if(response.length > 1) {
-      // support for digest authentication
-      code = username + ':' + response[0] + ':' + password;
-      nonce = response[1];
-    } else {
-      // support for cram-md5 (Version < 8.0)
-      code = password;
-      nonce = response[0];
-    }
+    final String nonce = Strings.split(bi.readString(), ':')[1];
 
-    // send username and hashed password
+    // request the salt of the user: send the username and an empty hash
     sout = PrintOutput.get(socket.getOutputStream());
     send(username);
-    send(Strings.md5(Strings.md5(code) + nonce));
+    send("");
+    sout.flush();
+
+    // receive password parameters: {ALGORITHM}:{SALT}
+    final String[] params = Strings.split(bi.readString(), ':');
+
+    // send hashed password
+    send(Strings.sha256(Strings.sha256(params[1] + password) + nonce));
     sout.flush();
 
     // receive success flag

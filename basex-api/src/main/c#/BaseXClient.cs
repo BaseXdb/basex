@@ -1,6 +1,6 @@
 /*
  * Language Binding for BaseX.
- * Works with BaseX 7.0 and later
+ * Works with BaseX 13.0 and later
  *
  * Documentation: https://docs.basex.org/wiki/Clients
  *
@@ -30,23 +30,17 @@ namespace BaseXClient
     {
       socket = new TcpClient(host, port);
       stream = socket.GetStream();
-      string[] response = Receive().Split(':');
+      // challenge: {realm}:{nonce}
+      string nonce = Receive().Split(':')[1];
 
-      string nonce;
-      string code;
-      if (response.Length > 1)
-      {
-          code = username + ":" + response[0] + ":" + pw;
-          nonce = response[1];
-      }
-      else
-      {
-          code = pw;
-          nonce = response[0];
-      }
-
+      // request the password parameters: send username and an empty hash
       Send(username);
-      Send(MD5(MD5(code) + nonce));
+      Send("");
+
+      // password parameters: {algorithm}:{salt}
+      string salt = Receive().Split(':')[1];
+
+      Send(Hash(Hash(salt + pw) + nonce));
       if (stream.ReadByte() != 0)
       {
           throw new IOException("Access denied.");
@@ -183,10 +177,9 @@ namespace BaseXClient
       return Read() == 0;
     }
 
-    private string MD5(string input)
+    private string Hash(string input)
     {
-      MD5CryptoServiceProvider MD5 = new MD5CryptoServiceProvider();
-      byte[] hash = MD5.ComputeHash(Encoding.UTF8.GetBytes(input));
+      byte[] hash = SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(input));
 
       StringBuilder sb = new StringBuilder();
       foreach (byte h in hash)
