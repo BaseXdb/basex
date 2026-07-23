@@ -7,9 +7,7 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.util.list.*;
 
 /**
  * Function implementation.
@@ -25,11 +23,11 @@ public final class FnIndexWhere extends StandardFunc {
     final FItem predicate = toFunction(arg(1), 2, qc);
 
     final HofArgs args = new HofArgs(2, predicate);
-    final IntList list = new IntList();
+    final ValueBuilder vb = new ValueBuilder(qc);
     for(Item item; (item = input.next()) != null;) {
-      if(test(predicate, args.set(0, item).inc(), qc)) list.add(args.pos());
+      if(test(predicate, args.set(0, item).inc(), qc)) vb.add(args.pos());
     }
-    return IntSeq.get(list.finish());
+    return vb.value(BasicType.INTEGER);
   }
 
   @Override

@@ -468,9 +468,9 @@ public final class MixedTest extends SandboxTest {
     check("('A', 'B', 'A', 'B', 'A', 'B')",
         "A\nB\nA\nB\nA\nB", root(StrSeq.class), type(StrSeq.class, "xs:string+"));
     check("(1, 3)",
-        "1\n3", root(IntSeq.class), type(IntSeq.class, "xs:integer+"));
+        "1\n3", root(BytSeq.class), type(BytSeq.class, "xs:integer+"));
     check("(1, 3, 1, 3, 1, 3)",
-        "1\n3\n1\n3\n1\n3", root(IntSeq.class), type(IntSeq.class, "xs:integer+"));
+        "1\n3\n1\n3\n1\n3", root(BytSeq.class), type(BytSeq.class, "xs:integer+"));
     check("data((<a>A</a>))",
         "A", root(Atm.class));
     check("data((<a>A</a>, <a>B</a>))",
@@ -482,7 +482,7 @@ public final class MixedTest extends SandboxTest {
     checkType("('A', 'B', 'A', 'B', 'A', 'B')",
         new TypeInfo(StrSeq.class, "xs:string+", 6));
     checkType("(1, 3, 1, 3, 1, 3)",
-        new TypeInfo(IntSeq.class, "xs:integer+", 6));
+        new TypeInfo(BytSeq.class, "xs:integer+", 6));
     checkType("data((<a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>))",
         new TypeInfo(StrSeq.class, "xs:untypedAtomic+", 6));
 
@@ -495,7 +495,7 @@ public final class MixedTest extends SandboxTest {
         new TypeInfo(StrSeq.class, "xs:untypedAtomic+", 6));
     checkType("(1, 3, 1, 3, 1, 3)[not(. = 2)]",
         new TypeInfo(IterFilter.class, "xs:integer*", -1),
-        new TypeInfo(IntSeq.class, "xs:integer+", 6));
+        new TypeInfo(BytSeq.class, "xs:integer+", 6));
 
     // map operator
     checkType("(1 to 6) ! string()",
@@ -509,7 +509,7 @@ public final class MixedTest extends SandboxTest {
         new TypeInfo(RangeSeq.class, "xs:integer+", 6));
     checkType("(1, 3, 1, 3, 1, 3) ! ('0' || .) ! xs:integer()",
         new TypeInfo(DualMap.class, "xs:integer+", 6),
-        new TypeInfo(IntSeq.class, "xs:integer+", 6));
+        new TypeInfo(BytSeq.class, "xs:integer+", 6));
   }
 
   /** Tests the data structure before and after shrinking. */

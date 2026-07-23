@@ -52,19 +52,19 @@ public abstract class TreeSeq extends Seq {
       return pos == 0 ? other.append(this) : append(other);
     }
 
-    final TreeSeqBuilder sb = new TreeSeqBuilder();
+    final TreeSeqBuilder sb = new TreeSeqBuilder(job);
     if(pos < MAX_SMALL) {
-      sb.add(value, job);
+      sb.add(value);
       for(long i = pos; --i >= 0;) sb.prepend(itemAt(i));
     } else {
-      sb.add(subsequence(0, pos, job), job);
-      sb.add(value, job);
+      sb.add(subsequence(0, pos, job));
+      sb.add(value);
     }
 
     if(right < MAX_SMALL) {
       for(long i = size - right; i < size; i++) sb.add(itemAt(i));
     } else {
-      sb.add(subsequence(pos, right, job), job);
+      sb.add(subsequence(pos, right, job));
     }
 
     return sb.value(type.union(value.type));

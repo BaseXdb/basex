@@ -75,21 +75,45 @@ public final class ValueBuilder {
         return this;
       }
       single = null;
-      sb = tr > 0 && (tr -= sngl.size()) <= 0 ? new TreeSeqBuilder() :
-        isStr(sngl) && isStr(value) ? new StrSeqBuilder() :
-        isAtm(sngl) && isAtm(value) ? new AtmSeqBuilder() :
-        isInt(sngl) && isInt(value) ? new IntSeqBuilder() :
-        isDbl(sngl) && isDbl(value) ? new DblSeqBuilder() :
-        isBln(sngl) && isBln(value) ? new BlnSeqBuilder() :
-        new ItemSeqBuilder();
-      sb = sb.add(sngl, job);
+      sb = tr > 0 && (tr -= sngl.size()) <= 0 ? new TreeSeqBuilder(job) :
+        isStr(sngl) && isStr(value) ? new StrSeqBuilder(job) :
+        isAtm(sngl) && isAtm(value) ? new AtmSeqBuilder(job) :
+        isItr(sngl) && isItr(value) ? itrSeqBuilder(
+          sngl instanceof final Itr itr ? itr.itr() : 0, capacity) :
+        isDbl(sngl) && isDbl(value) ? new DblSeqBuilder(job) :
+        isBln(sngl) && isBln(value) ? new BlnSeqBuilder(job) :
+        new ItemSeqBuilder(job);
+      sb = sb.add(sngl);
       tree = tr;
     }
     if(tr > 0 && (tr -= value.size()) <= 0) {
-      sb = new TreeSeqBuilder().add(sb.value(BasicType.ITEM), job);
+      sb = new TreeSeqBuilder(job).add(sb.value(BasicType.ITEM));
       tree = tr;
     }
-    builder = sb.add(value, job);
+    builder = sb.add(value);
+    return this;
+  }
+
+  /**
+   * Appends an integer value to the sequence.
+   * @param value value to append
+   * @return reference to this builder for convenience
+   */
+  public ValueBuilder add(final long value) {
+    job.checkStop();
+
+    SeqBuilder sb = builder;
+    if(sb == null) {
+      final Value sngl = single;
+      if(sngl == null) {
+        single = Itr.get(value);
+        return this;
+      }
+      single = null;
+      sb = isItr(sngl) ? itrSeqBuilder(value, capacity) : new ItemSeqBuilder(job);
+      sb = sb.add(sngl);
+    }
+    builder = sb.add(value);
     return this;
   }
 
@@ -147,7 +171,7 @@ public final class ValueBuilder {
    * @param value value
    * @return result of check
    */
-  static boolean isInt(final Value value) {
+  static boolean isItr(final Value value) {
     return value.type == BasicType.INTEGER;
   }
 
@@ -177,6 +201,14 @@ public final class ValueBuilder {
 
   /** String sequence builder. */
   final class StrSeqBuilder extends SeqBuilder {
+    /**
+     * Constructor.
+     * @param job interruptible job
+     */
+    StrSeqBuilder(final Job job) {
+      super(job);
+    }
+
     /** Values. */
     private final TokenList values = new TokenList(capacity);
 
@@ -186,7 +218,7 @@ public final class ValueBuilder {
         values.add(((Str) item).string());
         return this;
       }
-      return tree(item, job);
+      return tree(item);
     }
 
     @Override
@@ -197,6 +229,14 @@ public final class ValueBuilder {
 
   /** Untyped atomic sequence builder. */
   final class AtmSeqBuilder extends SeqBuilder {
+    /**
+     * Constructor.
+     * @param job interruptible job
+     */
+    AtmSeqBuilder(final Job job) {
+      super(job);
+    }
+
     /** Values. */
     private final TokenList values = new TokenList(capacity);
 
@@ -206,7 +246,7 @@ public final class ValueBuilder {
         values.add(((Atm) item).string(null));
         return this;
       }
-      return tree(item, job);
+      return tree(item);
     }
 
     @Override
@@ -215,21 +255,164 @@ public final class ValueBuilder {
     }
   }
 
-  /** Integer sequence builder. */
-  final class IntSeqBuilder extends SeqBuilder {
-    /** Values. */
-    private final IntList values = new IntList(capacity);
+  /** Integer sequence builder, collecting values in the narrowest representation. */
+  abstract class ItrSeqBuilder extends SeqBuilder {
+    /**
+     * Constructor.
+     * @param job interruptible job
+     */
+    ItrSeqBuilder(final Job job) {
+      super(job);
+    }
 
     @Override
-    public SeqBuilder add(final Item item) {
-      if(isInt(item)) {
-        final int i = ((Itr) item).toInt();
-        if(i != Integer.MIN_VALUE) {
-          values.add(i);
-          return this;
-        }
+    public final SeqBuilder add(final Item item) {
+      return isItr(item) ? add(((Itr) item).itr()) : tree(item);
+    }
+
+    @Override
+    public abstract SeqBuilder add(long value);
+
+    @Override
+    protected SeqBuilder addSequence(final Value value) {
+      if(!(value instanceof final ItrSeq seq)) return super.addSequence(value);
+      // adopt the values of a native sequence without materializing items
+      SeqBuilder sb = this;
+      final int sz = (int) seq.size();
+      for(int i = 0; i < sz; i++) {
+        job.checkStop();
+        sb = sb.add(seq.itrAt(i));
       }
-      return tree(item, job);
+      return sb;
+    }
+
+    /**
+     * Transfers the collected values to the specified builder.
+     * @param sb target builder
+     */
+    abstract void transfer(ItrSeqBuilder sb);
+
+    /**
+     * Moves the collected values to a builder that can store the specified value.
+     * @param value value that does not fit the current representation
+     * @param size number of collected values
+     * @return builder to be used for subsequent values
+     */
+    final SeqBuilder widen(final long value, final int size) {
+      // the target is always wider, so transferred values never trigger another widening
+      final ItrSeqBuilder sb = itrSeqBuilder(value, Math.max(capacity, size));
+      transfer(sb);
+      return sb.add(value);
+    }
+  }
+
+  /**
+   * Returns an integer builder that can store the specified value.
+   * @param value value to be stored
+   * @param cap initial capacity
+   * @return builder
+   */
+  ItrSeqBuilder itrSeqBuilder(final long value, final long cap) {
+    return switch(ItrSeq.minWidth(value, value)) {
+      case 1 -> new BytSeqBuilder(job, cap);
+      case 2 -> new ShrSeqBuilder(job, cap);
+      case 4 -> new IntSeqBuilder(job, cap);
+      default -> new LongSeqBuilder(job, cap);
+    };
+  }
+
+  /** Byte sequence builder. */
+  final class BytSeqBuilder extends ItrSeqBuilder {
+    /** Values. */
+    private final ByteList values;
+
+    /**
+     * Constructor.
+     * @param job interruptible job
+     * @param cap initial capacity
+     */
+    BytSeqBuilder(final Job job, final long cap) {
+      super(job);
+      values = new ByteList(cap);
+    }
+
+    @Override
+    public SeqBuilder add(final long value) {
+      if(value < Byte.MIN_VALUE || value > Byte.MAX_VALUE) return widen(value, values.size());
+      values.add((int) value);
+      return this;
+    }
+
+    @Override
+    void transfer(final ItrSeqBuilder sb) {
+      for(int i = 0, s = values.size(); i < s; i++) sb.add(values.get(i));
+    }
+
+    @Override
+    public Value value(final Type type) {
+      return BytSeq.get(values.finish(), BasicType.INTEGER);
+    }
+  }
+
+  /** Short sequence builder. */
+  final class ShrSeqBuilder extends ItrSeqBuilder {
+    /** Values. */
+    private final ShortList values;
+
+    /**
+     * Constructor.
+     * @param job interruptible job
+     * @param cap initial capacity
+     */
+    ShrSeqBuilder(final Job job, final long cap) {
+      super(job);
+      values = new ShortList(cap);
+    }
+
+    @Override
+    public SeqBuilder add(final long value) {
+      if(value < Short.MIN_VALUE || value > Short.MAX_VALUE) return widen(value, values.size());
+      values.add((short) value);
+      return this;
+    }
+
+    @Override
+    void transfer(final ItrSeqBuilder sb) {
+      for(int i = 0, s = values.size(); i < s; i++) sb.add(values.get(i));
+    }
+
+    @Override
+    public Value value(final Type type) {
+      return ShrSeq.get(values.finish(), BasicType.INTEGER);
+    }
+  }
+
+  /** Int sequence builder. */
+  final class IntSeqBuilder extends ItrSeqBuilder {
+    /** Values. */
+    private final IntList values;
+
+    /**
+     * Constructor.
+     * @param job interruptible job
+     * @param cap initial capacity
+     */
+    IntSeqBuilder(final Job job, final long cap) {
+      super(job);
+      values = new IntList(cap);
+    }
+
+    @Override
+    public SeqBuilder add(final long value) {
+      final int i = (int) value;
+      if(i != value) return widen(value, values.size());
+      values.add(i);
+      return this;
+    }
+
+    @Override
+    void transfer(final ItrSeqBuilder sb) {
+      for(int i = 0, s = values.size(); i < s; i++) sb.add(values.get(i));
     }
 
     @Override
@@ -238,8 +421,48 @@ public final class ValueBuilder {
     }
   }
 
+  /** Long sequence builder. */
+  final class LongSeqBuilder extends ItrSeqBuilder {
+    /** Values. */
+    private final LongList values;
+
+    /**
+     * Constructor.
+     * @param job interruptible job
+     * @param cap initial capacity
+     */
+    LongSeqBuilder(final Job job, final long cap) {
+      super(job);
+      values = new LongList(cap);
+    }
+
+    @Override
+    public SeqBuilder add(final long value) {
+      values.add(value);
+      return this;
+    }
+
+    @Override
+    void transfer(final ItrSeqBuilder sb) {
+      for(int i = 0, s = values.size(); i < s; i++) sb.add(values.get(i));
+    }
+
+    @Override
+    public Value value(final Type type) {
+      return LongSeq.get(values.finish());
+    }
+  }
+
   /** Double sequence builder. */
   final class DblSeqBuilder extends SeqBuilder {
+    /**
+     * Constructor.
+     * @param job interruptible job
+     */
+    DblSeqBuilder(final Job job) {
+      super(job);
+    }
+
     /** Values. */
     private final DoubleList values = new DoubleList(capacity);
 
@@ -249,7 +472,7 @@ public final class ValueBuilder {
         values.add(((Dbl) item).dbl());
         return this;
       }
-      return tree(item, job);
+      return tree(item);
     }
 
     @Override
@@ -260,6 +483,14 @@ public final class ValueBuilder {
 
   /** Boolean sequence builder. */
   final class BlnSeqBuilder extends SeqBuilder {
+    /**
+     * Constructor.
+     * @param job interruptible job
+     */
+    BlnSeqBuilder(final Job job) {
+      super(job);
+    }
+
     /** Values. */
     private final BoolList values = new BoolList(capacity);
 
@@ -269,7 +500,7 @@ public final class ValueBuilder {
         values.add(((Bln) item).bool(null));
         return this;
       }
-      return tree(item, job);
+      return tree(item);
     }
 
     @Override
@@ -280,6 +511,14 @@ public final class ValueBuilder {
 
   /** Item sequence builder. */
   final class ItemSeqBuilder extends SeqBuilder {
+    /**
+     * Constructor.
+     * @param job interruptible job
+     */
+    ItemSeqBuilder(final Job job) {
+      super(job);
+    }
+
     /** Items. */
     private final ItemList items = new ItemList(capacity);
 

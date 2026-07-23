@@ -134,7 +134,7 @@ public final class SimpleMapTest extends SandboxTest {
 
     // unroll expression
     unroll(true);
-    check("(1, 2) ! (. * 2)", "2\n4", root(IntSeq.class));
+    check("(1, 2) ! (. * 2)", "2\n4", root(BytSeq.class));
     check("(true(), false()) ! (. = true())", "true\nfalse", root(BlnSeq.class));
   }
 }

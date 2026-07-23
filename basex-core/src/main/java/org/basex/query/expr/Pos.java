@@ -6,7 +6,6 @@ import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -51,7 +50,7 @@ public final class Pos extends Single {
 
     if(op == CmpOp.EQ) {
       // normalize positions (sort, remove duplicates and illegal positions)
-      if(cc.values(true, pos)) pos = ddo((Value) pos);
+      if(cc.values(true, pos)) pos = ddo((Value) pos, cc.qc);
       if(pos == Empty.VALUE) return Bln.FALSE;
 
       // range sequence. example: position() = 5 to 10
@@ -128,31 +127,23 @@ public final class Pos extends Single {
   /**
    * Returns distinct ordered positions.
    * @param value positions
+   * @param qc query context
    * @return sorted positions
    * @throws QueryException query exception
    */
-  public static Value ddo(final Value value) throws QueryException {
+  public static Value ddo(final Value value, final QueryContext qc) throws QueryException {
     if(value instanceof RangeSeq) return value;
-    boolean small = true;
     final LongList list = new LongList();
     for(final Item item : value) {
       final double d = item.dbl(null);
       final long l = (long) d;
-      if(l > 0 && d == l) {
-        list.add(l);
-        small = small && l == (int) l;
-      }
+      if(l > 0 && d == l) list.add(l);
     }
     list.ddo();
 
-    if(small) {
-      final IntList il = new IntList(list.size());
-      for(final long l : list.finish()) il.add((int) l);
-      return IntSeq.get(il.finish());
-    }
-    final ItemList il = new ItemList(list.size());
-    for(final long l : list.finish()) il.add(Itr.get(l));
-    return il.value();
+    final ValueBuilder vb = new ValueBuilder(qc, list.size());
+    for(final long l : list.finish()) vb.add(l);
+    return vb.value(BasicType.INTEGER);
   }
 
   @Override

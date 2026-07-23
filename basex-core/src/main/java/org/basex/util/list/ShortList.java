@@ -64,6 +64,15 @@ public final class ShortList extends ElementList {
   }
 
   /**
+   * Returns the element at the specified index.
+   * @param index index
+   * @return element
+   */
+  public short get(final int index) {
+    return list[index];
+  }
+
+  /**
    * Returns an array with all elements.
    * @return array
    */

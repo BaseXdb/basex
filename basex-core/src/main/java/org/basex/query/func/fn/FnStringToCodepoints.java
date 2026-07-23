@@ -9,6 +9,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 
 /**
  * Function implementation.
@@ -32,7 +33,10 @@ public final class FnStringToCodepoints extends StandardFunc {
         }
         @Override
         public Value value(final QueryContext q, final Expr expr) throws QueryException {
-          return IntSeq.get(value.codepoints(info));
+          // ASCII: the bytes of the token are the codepoints
+          final ValueBuilder vb = new ValueBuilder(q, tl);
+          for(final byte b : token) vb.add(b);
+          return vb.value(BasicType.INTEGER);
         }
       };
     }
@@ -49,7 +53,9 @@ public final class FnStringToCodepoints extends StandardFunc {
       }
       @Override
       public Value value(final QueryContext q, final Expr expr) throws QueryException {
-        return IntSeq.get(value.codepoints(info));
+        final ValueBuilder vb = new ValueBuilder(q);
+        for(int s = 0; s < tl; s += cl(token, s)) vb.add(cp(token, s));
+        return vb.value(BasicType.INTEGER);
       }
     };
   }

@@ -55,7 +55,7 @@ public final class ProfModuleTest extends SandboxTest {
     checkType(func.args(" (1, 1 to 8) => remove(2)"),
         new TypeInfo(RangeSeq.class, "xs:integer+", 8));
     checkType(func.args(" (1, 1 to 8) => remove(3)"),
-        new TypeInfo(IntSeq.class, "xs:integer+", 8));
+        new TypeInfo(BytSeq.class, "xs:integer+", 8));
   }
 
   /** Test method. */

@@ -834,7 +834,7 @@ public final class RewritingsTest extends SandboxTest {
 
   /** Merge of consecutive operations. */
   @Test public void gh1778() {
-    check("(1 to 3)[. = 1 or . != 2 or . = 3 or . != 4]", "1\n2\n3", count(IntSeq.class, 2));
+    check("(1 to 3)[. = 1 or . != 2 or . = 3 or . != 4]", "1\n2\n3", count(BytSeq.class, 2));
 
     check("for $n in (<a/>, <b/>, <c/>) " +
         "where name($n) != 'a' where $n = '' where name($n) != 'b' " +
@@ -2153,8 +2153,8 @@ public final class RewritingsTest extends SandboxTest {
     check("1, 2 to 3", "1\n2\n3", root(RangeSeq.class));
     check("5, 6 to 7, 8", "5\n6\n7\n8", root(RangeSeq.class));
     check("5 to 6, 7 to 8", "5\n6\n7\n8", root(RangeSeq.class));
-    check("5 to 6, 8", "5\n6\n8", root(IntSeq.class));
-    check("1, 3 to 4", "1\n3\n4", root(IntSeq.class));
+    check("5 to 6, 8", "5\n6\n8", root(BytSeq.class));
+    check("1, 3 to 4", "1\n3\n4", root(BytSeq.class));
 
     // partial rewrites
     check("<a/>, 0 to 1", "<a/>\n0\n1", exists(RangeSeq.class));
@@ -2200,7 +2200,7 @@ public final class RewritingsTest extends SandboxTest {
   /** Rewrite distinct sequence checks. */
   @Test public void gh1930() {
     check("(1 to 2)[. = (5, 4, 3, 1, 2, 5)]", "1\n2", exists(RangeSeq.class));
-    check("distinct-values((5, 3, 4, 2, 1, 6, 1))", "5\n3\n4\n2\n1\n6", root(IntSeq.class));
+    check("distinct-values((5, 3, 4, 2, 1, 6, 1))", "5\n3\n4\n2\n1\n6", root(BytSeq.class));
   }
 
   /** Ancestor steps on database and fragment nodes. */
@@ -2215,7 +2215,7 @@ public final class RewritingsTest extends SandboxTest {
     check("for $a in 1 to 2 group by $b := data($a) return $b", "1\n2", root(RangeSeq.class));
 
     check("for $a in (1, 2) group by $a return $a", "1\n2", root(RangeSeq.class));
-    check("for $a in (1, 3) group by $a return $a", "1\n3", root(IntSeq.class));
+    check("for $a in (1, 3) group by $a return $a", "1\n3", root(BytSeq.class));
     check("for $a in (1, 'a', 1) group by $a return $a", "1\na", root(ItemSeq.class));
 
     check("for $p in (1 to 2)[. >= 0] group by $q := string($p) return $q",
@@ -2255,7 +2255,7 @@ public final class RewritingsTest extends SandboxTest {
   /** Positional checks. */
   @Test public void gh1937() {
     check("1[position()]", 1, root(Itr.class));
-    check("(1, 3)[position()]", "1\n3", root(IntSeq.class));
+    check("(1, 3)[position()]", "1\n3", root(BytSeq.class));
     check("('a', 'b')[position()[position() ! .]]", "a\nb", root(StrSeq.class));
 
     check("(1, 3, 5)[last() - 2]", 1, root(Itr.class));

@@ -8,7 +8,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.util.list.*;
 
 /**
  * Function implementation.
@@ -25,13 +24,13 @@ public final class ArrayIndexOf extends ArrayFn {
 
     int c = 0;
     final DeepEqual deep = new DeepEqual(info, collation, qc);
-    final IntList list = new IntList();
+    final ValueBuilder vb = new ValueBuilder(qc);
     for(final Value value : array.members()) {
       qc.checkStop();
       ++c;
-      if(deep.equal(value, target)) list.add(c);
+      if(deep.equal(value, target)) vb.add(c);
     }
-    return IntSeq.get(list.finish());
+    return vb.value(BasicType.INTEGER);
   }
 
   @Override

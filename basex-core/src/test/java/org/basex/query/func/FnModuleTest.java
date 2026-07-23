@@ -914,7 +914,7 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" (1 to 100000000) ! 'a'"), "a");
     query("count(" + func.args(" 1 to 100000000") + ')', 100000000);
     check(func.args(" void(1)"), "", root(VOID));
-    check("(1, 3) ! " + func.args(" ."), "1\n3", root(IntSeq.class));
+    check("(1, 3) ! " + func.args(" ."), "1\n3", root(BytSeq.class));
 
     // remove duplicate expressions
     check(func.args(" (1, <_/>, 1)"), "1\n", count(Itr.class, 1));

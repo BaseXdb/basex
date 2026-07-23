@@ -13,6 +13,17 @@ import org.basex.query.value.type.*;
  * @author Christian Gruen
  */
 public abstract class SeqBuilder {
+  /** Interruptible job. */
+  protected final Job job;
+
+  /**
+   * Constructor.
+   * @param job interruptible job
+   */
+  protected SeqBuilder(final Job job) {
+    this.job = job;
+  }
+
   /**
    * Appends an item.
    * @param item item to append
@@ -21,22 +32,29 @@ public abstract class SeqBuilder {
   protected abstract SeqBuilder add(Item item);
 
   /**
+   * Appends an integer value.
+   * @param value value to append
+   * @return reference to this builder for convenience
+   */
+  public SeqBuilder add(final long value) {
+    return add(Itr.get(value));
+  }
+
+  /**
    * Appends items.
    * @param value items to append
-   * @param job interruptible job
    * @return this builder for convenience
    */
-  public final SeqBuilder add(final Value value, final Job job) {
-    return value.size() == 1 ? add((Item) value) : addSequence(value, job);
+  public final SeqBuilder add(final Value value) {
+    return value.size() == 1 ? add((Item) value) : addSequence(value);
   }
 
   /**
    * Appends a sequence.
    * @param value items to append
-   * @param job interruptible job
    * @return this builder for convenience
    */
-  protected SeqBuilder addSequence(final Value value, final Job job) {
+  protected SeqBuilder addSequence(final Value value) {
     SeqBuilder sb = this;
     for(final Item item : value) {
       job.checkStop();
@@ -55,10 +73,9 @@ public abstract class SeqBuilder {
   /**
    * Converts the builder to a tree sequence builder.
    * @param item item to append
-   * @param job interruptible job
    * @return tree sequence builder
    */
-  protected final SeqBuilder tree(final Item item, final Job job) {
-    return new TreeSeqBuilder().add(value(null), job).add(item);
+  protected final SeqBuilder tree(final Item item) {
+    return new TreeSeqBuilder(job).add(value(null)).add(item);
   }
 }

@@ -11,7 +11,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * Function implementation.
@@ -59,19 +58,17 @@ public class FnDuplicateValues extends StandardFunc {
     final Collation collation = toCollation(arg(1), qc);
 
     // try to treat items as 32-bit integers
-    final IntList list = new IntList();
+    final ValueBuilder vb = new ValueBuilder(qc);
     IntSet ints1 = new IntSet(), ints2 = new IntSet();
     Item item;
     while((item = qc.next(values)) != null) {
       final int v = toInt(item);
       if(v == Integer.MIN_VALUE) break;
-      if(!ints1.add(v) && ints2.add(v)) list.add(v);
+      if(!ints1.add(v) && ints2.add(v)) vb.add(v);
     }
-    final Value intseq = IntSeq.get(list.finish());
-    if(item == null) return intseq;
+    if(item == null) return vb.value(BasicType.INTEGER);
 
-    // fallback
-    final ValueBuilder vb = new ValueBuilder(qc).add(intseq);
+    // fallback: continue with the values that have already been collected
     final ItemSet set1 = ItemSet.get(collation, info), set2 = ItemSet.get(collation, info);
     for(final int i : ints1.keys()) set1.add(Itr.get(i));
     for(final int i : ints2.keys()) set2.add(Itr.get(i));
