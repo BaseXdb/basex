@@ -94,7 +94,9 @@ public final class XmlParser {
       f.setSchema(sf.newSchema());
     }
     final XMLReader xr = f.newSAXParser().getXMLReader();
-    for(final String limit : LIMITS) xr.setProperty(limit, "0");
+    if(options.isTrusted()) {
+      for(final String limit : LIMITS) xr.setProperty(limit, "0");
+    }
     if(xsdValidation && !xsiLocation) {
       xr.setEntityResolver((pubId, sysId) -> {
         throw new SAXException("External access not allowed: " + sysId);
