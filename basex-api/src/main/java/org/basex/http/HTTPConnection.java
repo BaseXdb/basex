@@ -46,9 +46,11 @@ public final class HTTPConnection implements ClientInfo {
   private final AuthMethod authMethod;
   /** Path, starting with a slash. */
   private final String path;
-  /** Remote client address (captured at construction time). */
+  /** Original address. */
+  private final String originalAddress;
+  /** Remote address. */
   private final String remoteAddress;
-  /** Remote client port (captured at construction time). */
+  /** Remote port. */
   private final int remotePort;
 
   /** Request method. */
@@ -78,8 +80,10 @@ public final class HTTPConnection implements ClientInfo {
     path = normalize(pth != null ? pth : request.getPathInfo());
 
     // capture client address, as the request may be recycled when the value is requested
-    remoteAddress = requestCtx.state().originalAddress();
-    remotePort = requestCtx.state().remotePort();
+    final RequestState state = requestCtx.state();
+    originalAddress = state.originalAddress();
+    remoteAddress = state.remoteAddress();
+    remotePort = state.remotePort();
 
     // authentication method (servlet-specific or global)
     this.authMethod = authMethod != null ? authMethod :
@@ -269,7 +273,7 @@ public final class HTTPConnection implements ClientInfo {
 
   @Override
   public String clientAddress() {
-    return remoteAddress != null ? remoteAddress + ':' + remotePort : null;
+    return originalAddress != null ? originalAddress + ':' + remotePort : null;
   }
 
   @Override
