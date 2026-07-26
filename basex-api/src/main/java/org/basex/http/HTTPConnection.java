@@ -445,7 +445,7 @@ public final class HTTPConnection implements ClientInfo {
               append(auth.get(RequestAttribute.URI));
           final String qop = auth.get(RequestAttribute.QOP);
           if(Strings.eq(qop, AUTH_INT)) {
-            h2.append(':').append(Strings.md5(requestCtx.body().toString()));
+            h2.append(':').append(Strings.md5(string(requestCtx.body().read())));
           }
           final String ha2 = Strings.md5(h2.toString());
 

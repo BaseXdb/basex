@@ -61,6 +61,7 @@ public abstract class BaseXServlet extends HttpServlet {
     } catch(final Exception ex) {
       error(conn, ex);
     } finally {
+      conn.requestCtx.close();
       if(Prop.debug) {
         Util.errln("Request: " + request.getMethod() + ' ' + request.getRequestURL());
         for(final String name : Collections.list(request.getHeaderNames())) {

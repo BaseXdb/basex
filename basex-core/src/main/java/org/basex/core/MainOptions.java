@@ -250,7 +250,7 @@ public final class MainOptions extends Options {
 
   /** Resolver instance (lazy instantiation). */
   private XMLResolver resolver;
-  /** Whether external resources may be accessed. Derived from context, not user-configurable. */
+  /** Whether external resources may be accessed. */
   private boolean trusted = true;
 
   /**
@@ -356,8 +356,10 @@ public final class MainOptions extends Options {
   /**
    * Assigns the trust level.
    * @param trust trusted flag
+   * @return self reference
    */
-  public void trusted(final boolean trust) {
+  public MainOptions trusted(final boolean trust) {
     trusted = trust;
+    return this;
   }
 }

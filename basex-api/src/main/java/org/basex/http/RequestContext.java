@@ -6,6 +6,7 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
+import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
@@ -36,7 +37,7 @@ public final class RequestContext implements RequestScope {
   /** Headers. */
   private XQMap headers;
   /** Content body. */
-  private IOContent body;
+  private IO body;
 
   /**
    * Constructor for HTTP connections.
@@ -142,7 +143,7 @@ public final class RequestContext implements RequestScope {
       } else if(mt != null && mt.is(MediaType.APPLICATION_X_WWW_FORM_URLENCODED)) {
         // convert URL-encoded parameters
         final MapBuilder mb = new MapBuilder();
-        addParams(body().toString(), mb);
+        addParams(Token.string(body().read()), mb);
         form = mb.map();
       } else {
         form = XQMap.empty();
@@ -153,14 +154,23 @@ public final class RequestContext implements RequestScope {
 
   /**
    * Returns the cached body.
-   * @return value
+   * @return body
    * @throws IOException I/O exception
    */
-  public IOContent body() throws IOException {
+  public IO body() throws IOException {
     if(body == null) {
-      body = new IOContent(BufferInput.get(request.getInputStream()).content());
+      final InputStream is = request.getInputStream();
+      body = Payload.binary(state.mediaType()) ? SpillOutput.read(is, null) :
+        new IOContent(BufferInput.get(is).content());
     }
     return body;
+  }
+
+  /**
+   * Discards the temporary file that the body was spilled to.
+   */
+  public void close() {
+    if(body instanceof final IOFile file) file.delete();
   }
 
   // PRIVATE FUNCTIONS ============================================================================

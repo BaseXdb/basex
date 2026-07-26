@@ -108,7 +108,7 @@ public final class Response {
     } else {
       try(InputStream is = new StoppableInputStream(response.body())) {
         final Payload payload = new Payload(is, body, info, options);
-        root.node(payload.parse(type, encoding));
+        root.node(payload.parse(type, encoding, qc));
         if(body) items.add(payload.value());
       }
     }
