@@ -17,6 +17,7 @@ import org.basex.build.json.*;
 import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.http.web.*;
+import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
@@ -209,7 +210,7 @@ public final class RestXqFunction extends WebFunction {
     // bind request body in the correct format
     if(requestBody != null) {
       final MediaType type = conn.mediaType();
-      final byte[] body = conn.requestCtx.body().read();
+      final IO body = conn.requestCtx.body();
       final Value value;
       try {
         value = Payload.value(body, type, mopts);
@@ -270,13 +271,16 @@ public final class RestXqFunction extends WebFunction {
    * @return result of check
    */
   public boolean matches(final HTTPConnection conn, final QNm err, final boolean perm) {
-    // check method, consumed and produced media type, and path or error
-    if(!methods.isEmpty() && !methods.contains(conn.method) || !consumes(conn) || !produces(conn))
-      return false;
+    // reject if the HTTP method or the consumed/produced media type does not match
+    final boolean methodMatches = methods.isEmpty() || methods.contains(conn.method);
+    if(!methodMatches || !consumes(conn) || !produces(conn)) return false;
 
     if(perm) return permission != null && permission.matches(conn);
     if(err != null) return error != null && error.matches(err);
-    return path != null && path.matches(conn.path());
+
+    // a method-agnostic target is not triggered by OPTIONS requests (preflight, run as admin)
+    final boolean optionsPreflight = methods.isEmpty() && conn.method.equals(Method.OPTIONS.name());
+    return !optionsPreflight && path != null && path.matches(conn.path());
   }
 
   /**

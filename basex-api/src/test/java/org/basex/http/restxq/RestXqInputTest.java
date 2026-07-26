@@ -73,4 +73,23 @@ public final class RestXqInputTest extends RestXqTest {
     post("", "declare %R:POST('{$x}') %R:path('') function m:f($x) {$x//A};", "",
         "A\n1", MediaType.TEXT_CSV);
   }
+
+  /**
+   * XML: entity-expansion bomb in the request body must be rejected, not expanded.
+   * @throws Exception exception
+   */
+  @Test public void xmlEntityExpansion() throws Exception {
+    register("declare %R:POST('{$x}') %R:path('') function m:f($x) { $x };");
+    // bounded 'billion laughs' (~111k expansions, exceeding the JDK default limit)
+    final String bomb = "<?xml version='1.0'?>\n"
+        + "<!DOCTYPE x [\n"
+        + "<!ENTITY a 'aaaaaaaaaa'>\n"
+        + "<!ENTITY b '&a;&a;&a;&a;&a;&a;&a;&a;&a;&a;'>\n"
+        + "<!ENTITY c '&b;&b;&b;&b;&b;&b;&b;&b;&b;&b;'>\n"
+        + "<!ENTITY d '&c;&c;&c;&c;&c;&c;&c;&c;&c;&c;'>\n"
+        + "<!ENTITY e '&d;&d;&d;&d;&d;&d;&d;&d;&d;&d;'>\n"
+        + "<!ENTITY f '&e;&e;&e;&e;&e;&e;&e;&e;&e;&e;'>\n"
+        + "]>\n<x>&f;</x>";
+    post(500, bomb, MediaType.APPLICATION_XML, "");
+  }
 }
