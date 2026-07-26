@@ -1394,19 +1394,19 @@ public final class FnModuleTest extends SandboxTest {
         exists(_RANDOM_DOUBLE));
 
     // ensure that builder takes advantage of regularities
-    checkType(func.args(" 0 to 999", " ()", " fn($seq, $i) { $seq, $i }"),
-        new TypeInfo(RangeSeq.class, "xs:integer+", 1000));
-    checkType(func.args(" 0 to 999", " ()", " fn($seq, $i) { $seq, -$i }"),
-        new TypeInfo(RangeSeq.class, "xs:integer+", 1000));
-    checkType(func.args(" 0 to 999", " ()", " fn($seq, $i) { $i, $seq }"),
-        new TypeInfo(RangeSeq.class, "xs:integer+", 1000));
-    checkType(func.args(" 0 to 999", " ()", " fn($seq, $i) { -$i, $seq }"),
-        new TypeInfo(RangeSeq.class, "xs:integer+", 1000));
+    checkType(func.args(" 0 to 4", " ()", " fn($seq, $i) { $seq, $i }"),
+        new TypeInfo(RangeSeq.class, "xs:integer+", 5));
+    checkType(func.args(" 0 to 4", " ()", " fn($seq, $i) { $seq, -$i }"),
+        new TypeInfo(RangeSeq.class, "xs:integer+", 5));
+    checkType(func.args(" 0 to 4", " ()", " fn($seq, $i) { $i, $seq }"),
+        new TypeInfo(RangeSeq.class, "xs:integer+", 5));
+    checkType(func.args(" 0 to 4", " ()", " fn($seq, $i) { -$i, $seq }"),
+        new TypeInfo(RangeSeq.class, "xs:integer+", 5));
 
-    checkType(func.args(" 0 to 9", " ()", " fn($seq, $i) { $seq, 1 }"),
-        new TypeInfo(SingletonSeq.class, "xs:integer+", 10));
-    checkType(func.args(" 0 to 9", " ()", " fn($seq, $i) { 1, $seq }"),
-        new TypeInfo(SingletonSeq.class, "xs:integer+", 10));
+    checkType(func.args(" 0 to 4", " ()", " fn($seq, $i) { $seq, 1 }"),
+        new TypeInfo(SingletonSeq.class, "xs:integer+", 5));
+    checkType(func.args(" 0 to 4", " ()", " fn($seq, $i) { 1, $seq }"),
+        new TypeInfo(SingletonSeq.class, "xs:integer+", 5));
   }
 
   /** Test method. */

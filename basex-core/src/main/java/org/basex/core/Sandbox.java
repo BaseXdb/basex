@@ -544,7 +544,7 @@ public abstract class Sandbox {
    * @param enable flag
    */
   protected static void inline(final boolean enable) {
-    context.options.set(MainOptions.INLINELIMIT, enable ? 1 << 16 : 0);
+    context.options.set(MainOptions.INLINELIMIT, enable ? MainOptions.INLINELIMIT.value() : 0);
   }
 
   /**
@@ -552,7 +552,7 @@ public abstract class Sandbox {
    * @param enable flag
    */
   protected static void unroll(final boolean enable) {
-    context.options.set(MainOptions.UNROLLLIMIT, enable ? 1 << 16 : 0);
+    context.options.set(MainOptions.UNROLLLIMIT, enable ? MainOptions.UNROLLLIMIT.value() : 0);
   }
 
   /**
