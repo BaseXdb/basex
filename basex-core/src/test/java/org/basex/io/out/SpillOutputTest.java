@@ -1,4 +1,4 @@
-package org.basex.query.func.archive;
+package org.basex.io.out;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -6,6 +6,7 @@ import java.io.*;
 
 import org.basex.*;
 import org.basex.io.*;
+import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -66,6 +67,32 @@ public final class SpillOutputTest extends SandboxTest {
       assertEquals(before + 1, countTempFiles(tmpDir), "temp file should exist while qc is open");
     }
     assertEquals(before, countTempFiles(tmpDir), "temp file should be deleted after qc closes");
+  }
+
+  /**
+   * Without a query context, the caller takes ownership of the temporary file.
+   * @throws IOException I/O exception
+   */
+  @Test public void unregisteredTempFile() throws IOException {
+    final IO io;
+    try(SpillOutput so = new SpillOutput(null, 0)) {
+      so.write(new byte[] { 1, 2, 3 });
+      io = so.finish();
+    }
+    assertTrue(io instanceof IOFile, "expected temporary file");
+    assertTrue(io.exists(), "temp file should not be deleted by the stream");
+    assertTrue(((IOFile) io).delete());
+  }
+
+  /**
+   * A stream is read completely, whether or not it spills.
+   * @throws IOException I/O exception
+   */
+  @Test public void readStream() throws IOException {
+    final byte[] data = { 1, 2, 3 };
+    try(QueryContext qc = new QueryContext(context)) {
+      assertArrayEquals(data, SpillOutput.read(new ArrayInput(data), qc).read());
+    }
   }
 
   /**

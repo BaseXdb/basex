@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.Map.*;
 
 import org.basex.io.*;
+import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;

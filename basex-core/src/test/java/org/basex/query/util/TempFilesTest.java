@@ -1,4 +1,4 @@
-package org.basex.query.func.archive;
+package org.basex.query.util;
 
 import static org.junit.jupiter.api.Assertions.*;
 

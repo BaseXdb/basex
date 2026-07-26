@@ -1,11 +1,10 @@
-package org.basex.query.func.archive;
+package org.basex.io.out;
 
 import java.io.*;
 
 import org.basex.io.*;
-import org.basex.io.out.*;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryError;
+import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -14,16 +13,17 @@ import org.basex.util.*;
  *
  * This class provides an output stream that buffers data in memory, then spills transparently to a
  * temporary file if the data exceeds the maximum array size or a given threshold.
- * The result can be retrieved as a binary item via the {@link #finish} method, which returns a lazy
- * reference to the temporary file if data was spilled, or an in-memory binary item otherwise. The
- * temporary file is registered with the query context's resources for automatic deletion when the
- * query finishes.
+ * The result can be retrieved as an {@link IO} reference via {@link #finish()}, or as a binary item
+ * via {@link #finish(QueryError)}, which returns a lazy reference to the temporary file if data was
+ * spilled, or an in-memory binary item otherwise.
+ * If a query context is supplied, the temporary file is registered with its resources and deleted
+ * when the query finishes; otherwise, the caller takes ownership of the returned {@link IOFile}.
  *
  * @author BaseX Team, BSD License
  * @author Vincent Lizzi
  */
-final class SpillOutput extends OutputStream {
-  /** Query context for registering the temporary file on spill. */
+public final class SpillOutput extends OutputStream {
+  /** Query context for registering the temporary file on spill (can be {@code null}). */
   private final QueryContext qc;
   /** Threshold in bytes before spilling to disk. */
   private final int threshold;
@@ -37,20 +37,35 @@ final class SpillOutput extends OutputStream {
 
   /**
    * Constructor.
-   * @param qc query context
+   * @param qc query context (can be {@code null})
    */
-  SpillOutput(final QueryContext qc) {
+  public SpillOutput(final QueryContext qc) {
     this(qc, Array.MAX_SIZE);
   }
 
   /**
-   * Constructor with an explicit spill threshold (used for testing).
-   * @param qc query context
+   * Constructor with an explicit spill threshold.
+   * @param qc query context (can be {@code null})
    * @param threshold spill threshold in bytes
    */
-  SpillOutput(final QueryContext qc, final int threshold) {
+  public SpillOutput(final QueryContext qc, final int threshold) {
     this.qc = qc;
     this.threshold = threshold;
+  }
+
+  /**
+   * Reads an input stream, spilling to a temporary file if it outgrows the maximum array size.
+   * The stream is not closed.
+   * @param is input stream
+   * @param qc query context (can be {@code null})
+   * @return input reference
+   * @throws IOException I/O exception
+   */
+  public static IO read(final InputStream is, final QueryContext qc) throws IOException {
+    try(SpillOutput so = new SpillOutput(qc)) {
+      is.transferTo(so);
+      return so.finish();
+    }
   }
 
   @Override
@@ -68,17 +83,26 @@ final class SpillOutput extends OutputStream {
   }
 
   /**
+   * Returns the result: a reference to the temporary file if data was spilled, or the in-memory
+   * contents otherwise. Any buffered disk output is flushed first so that callers may read the
+   * temporary file even if the stream has not yet been closed.
+   * @return input reference
+   * @throws IOException I/O exception
+   */
+  public IO finish() throws IOException {
+    if(file != null) file.flush();
+    return io != null ? io : new IOContent(array.finish());
+  }
+
+  /**
    * Returns the result as a binary item: a lazy reference to the temporary file
    * if data was spilled, or an in-memory binary item otherwise.
-   * Any buffered disk output is flushed first so that callers may read the temporary file
-   * even if the stream has not yet been closed.
    * @param error error to raise if the temporary file cannot be read
    * @return binary item
    * @throws IOException I/O exception
    */
-  B64 finish(final QueryError error) throws IOException {
-    if(file != null) file.flush();
-    return io != null ? new B64IOLazy(io, error) : B64.get(array.finish());
+  public B64 finish(final QueryError error) throws IOException {
+    return B64.get(finish(), error);
   }
 
   /**
@@ -101,7 +125,7 @@ final class SpillOutput extends OutputStream {
    */
   private void spill() throws IOException {
     io = new IOFile(File.createTempFile(Prop.NAME + '-', IO.TMPSUFFIX));
-    qc.resources.index(TempFiles.class).add(io);
+    if(qc != null) qc.resources.index(TempFiles.class).add(io);
     file = new BufferOutput(io);
     file.write(array.buffer(), 0, (int) array.size());
     array = null;

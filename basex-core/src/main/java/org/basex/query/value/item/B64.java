@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.io.*;
 import org.basex.io.out.DataOutput;
 import org.basex.query.*;
 import org.basex.query.value.type.*;
@@ -60,6 +61,18 @@ public class B64 extends Bin {
    */
   public static B64 get(final byte[] value) {
     return value.length == 1 ? get(value[0]) : new B64(value);
+  }
+
+  /**
+   * Returns an instance of this class: a lazy reference if the input is backed by a file,
+   * an in-memory item otherwise.
+   * @param input input reference
+   * @param error error to raise if the input cannot be read
+   * @return instance
+   * @throws IOException I/O exception
+   */
+  public static B64 get(final IO input, final QueryError error) throws IOException {
+    return input instanceof IOContent ? get(input.read()) : new B64IOLazy(input, error);
   }
 
   /**

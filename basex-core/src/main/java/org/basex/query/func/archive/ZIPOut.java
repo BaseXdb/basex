@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.zip.*;
 
 import org.basex.io.in.*;
+import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;

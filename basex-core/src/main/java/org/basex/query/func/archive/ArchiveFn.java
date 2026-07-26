@@ -13,6 +13,7 @@ import java.util.zip.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
+import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;

@@ -1,4 +1,4 @@
-package org.basex.query.func.archive;
+package org.basex.query.util;
 
 import java.util.*;
 
@@ -23,7 +23,7 @@ public final class TempFiles implements QueryResource {
    * Adds a temporary file to be deleted on close.
    * @param file temporary file
    */
-  synchronized void add(final IOFile file) {
+  public synchronized void add(final IOFile file) {
     files.add(file);
   }
 
