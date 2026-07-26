@@ -12,7 +12,7 @@ import org.basex.util.*;
  * Spill output stream.
  *
  * This class provides an output stream that buffers data in memory, then spills transparently to a
- * temporary file if the data exceeds the maximum array size or a given threshold.
+ * temporary file if the data exceeds a default or explicitly supplied threshold.
  * The result can be retrieved as an {@link IO} reference via {@link #finish()}, or as a binary item
  * via {@link #finish(QueryError)}, which returns a lazy reference to the temporary file if data was
  * spilled, or an in-memory binary item otherwise.
@@ -23,6 +23,9 @@ import org.basex.util.*;
  * @author Vincent Lizzi
  */
 public final class SpillOutput extends OutputStream {
+  /** Threshold in bytes. */
+  private static final int THRESHOLD = 100_000_000;
+
   /** Query context for registering the temporary file on spill (can be {@code null}). */
   private final QueryContext qc;
   /** Threshold in bytes before spilling to disk. */
@@ -40,7 +43,7 @@ public final class SpillOutput extends OutputStream {
    * @param qc query context (can be {@code null})
    */
   public SpillOutput(final QueryContext qc) {
-    this(qc, Array.MAX_SIZE);
+    this(qc, THRESHOLD);
   }
 
   /**
@@ -54,7 +57,7 @@ public final class SpillOutput extends OutputStream {
   }
 
   /**
-   * Reads an input stream, spilling to a temporary file if it outgrows the maximum array size.
+   * Reads an input stream, spilling to a temporary file if it outgrows the default threshold.
    * The stream is not closed.
    * @param is input stream
    * @param qc query context (can be {@code null})
@@ -63,8 +66,14 @@ public final class SpillOutput extends OutputStream {
    */
   public static IO read(final InputStream is, final QueryContext qc) throws IOException {
     try(SpillOutput so = new SpillOutput(qc)) {
-      is.transferTo(so);
-      return so.finish();
+      try {
+        is.transferTo(so);
+        return so.finish();
+      } catch(final Throwable th) {
+        Util.debug(th);
+        so.discard();
+        throw th;
+      }
     }
   }
 
@@ -116,6 +125,19 @@ public final class SpillOutput extends OutputStream {
       file.close();
       file = null;
     }
+  }
+
+  /**
+   * Closes the disk output stream and deletes the temporary file if data was spilled.
+   * The stream must be closed first: an open file cannot be deleted on Windows.
+   */
+  private void discard() {
+    try {
+      close();
+    } catch(final IOException ex) {
+      Util.debug(ex);
+    }
+    if(io != null) io.delete();
   }
 
   /**

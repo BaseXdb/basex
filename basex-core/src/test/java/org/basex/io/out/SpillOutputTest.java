@@ -19,6 +19,9 @@ import org.junit.jupiter.api.*;
  * @author Vincent Lizzi
  */
 public final class SpillOutputTest extends SandboxTest {
+  /** Bytes to be returned before a stream fails; must exceed the default spill threshold. */
+  private static final long SPILLED = 101_000_000;
+
   /**
    * Small data stays in memory: result is an in-memory binary item, content is correct.
    * @throws IOException I/O exception
@@ -96,6 +99,29 @@ public final class SpillOutputTest extends SandboxTest {
   }
 
   /**
+   * A failed transfer discards the spilled file before the query context is closed.
+   */
+  @Test public void readStreamFails() {
+    final File tmpDir = new File(Prop.TEMPDIR);
+    final int before = countTempFiles(tmpDir);
+    try(QueryContext qc = new QueryContext(context)) {
+      assertThrows(IOException.class, () -> SpillOutput.read(failing(), qc));
+      assertEquals(before, countTempFiles(tmpDir), "spilled file should be discarded at once");
+    }
+  }
+
+  /**
+   * A failed transfer discards the spilled file even without a query context,
+   * where nothing else would ever delete it.
+   */
+  @Test public void readStreamFailsUnregistered() {
+    final File tmpDir = new File(Prop.TEMPDIR);
+    final int before = countTempFiles(tmpDir);
+    assertThrows(IOException.class, () -> SpillOutput.read(failing(), null));
+    assertEquals(before, countTempFiles(tmpDir), "spilled file should be discarded");
+  }
+
+  /**
    * Calling close twice does not throw.
    * @throws IOException I/O exception
    */
@@ -107,6 +133,27 @@ public final class SpillOutputTest extends SandboxTest {
         assertDoesNotThrow(so::close);
       }
     }
+  }
+
+  /**
+   * Returns a stream that yields enough data to be spilled, and then fails.
+   * @return input stream
+   */
+  private static InputStream failing() {
+    return new InputStream() {
+      /** Number of returned bytes. */
+      private long total;
+
+      @Override public int read() {
+        return -1;
+      }
+
+      @Override public int read(final byte[] b, final int off, final int len) throws IOException {
+        if(total > SPILLED) throw new IOException("simulated abort");
+        total += len;
+        return len;
+      }
+    };
   }
 
   /**
