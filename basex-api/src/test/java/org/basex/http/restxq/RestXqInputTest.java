@@ -90,6 +90,6 @@ public final class RestXqInputTest extends RestXqTest {
         + "<!ENTITY e '&d;&d;&d;&d;&d;&d;&d;&d;&d;&d;'>\n"
         + "<!ENTITY f '&e;&e;&e;&e;&e;&e;&e;&e;&e;&e;'>\n"
         + "]>\n<x>&f;</x>";
-    post(500, bomb, MediaType.APPLICATION_XML, "");
+    post(400, bomb, MediaType.APPLICATION_XML, "");
   }
 }

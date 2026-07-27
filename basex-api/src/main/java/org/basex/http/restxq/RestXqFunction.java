@@ -248,7 +248,7 @@ public final class RestXqFunction extends WebFunction {
       try {
         value = Payload.value(body, type, mopts);
       } catch(final IOException ex) {
-        throw error(BODY_TYPE_X_X, type, ex);
+        throw HTTPStatus.BAD_REQUEST_X.get(Util.info(BODY_TYPE_X_X, type, ex));
       }
       bind(requestBody, args, value, qc, "Request body");
     }
