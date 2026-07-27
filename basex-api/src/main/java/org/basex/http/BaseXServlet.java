@@ -118,6 +118,9 @@ public abstract class BaseXServlet extends HttpServlet {
         // status code is encoded in the local name (e.g. 'status404')
         code = Token.toInt(Token.substring(qname.local(), QueryText.STATUS.length));
         full = false;
+      } else if(QueryError.BASEX_PERMISSION_X_X.eq(qname)) {
+        // insufficient permissions of an authenticated user
+        code = SC_FORBIDDEN;
       }
       final SerializerOptions sopts = qex.output();
       if(sopts != null) {
