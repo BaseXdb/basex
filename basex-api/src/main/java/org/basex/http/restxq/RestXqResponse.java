@@ -58,7 +58,8 @@ public final class RestXqResponse extends WebResponse {
     qc.jc().type(RESTXQ);
     ctx.setExternal(conn.requestCtx);
 
-    func = new RestXqFunction(function.function, function.module, qc);
+    final RestXqFunction rxf = (RestXqFunction) function;
+    func = new RestXqFunction(rxf.function, rxf.module, qc, rxf.index);
     final MainOptions mopts = new MainOptions(ctx.options);
     func.parseAnnotations(mopts);
 

@@ -111,7 +111,7 @@ public enum Annotation {
   _PERM_ALLOW("allow(names...)", params(STRING), PERM_URI, false),
 
   /** XQuery annotation. */
-  _REST_PATH("path(path)", params(STRING), REST_URI),
+  _REST_PATH("path(path)", params(STRING), REST_URI, false),
   /** XQuery annotation. */
   _REST_ERROR("error(codes...)", params(STRING), REST_URI, false),
   /** XQuery annotation. */

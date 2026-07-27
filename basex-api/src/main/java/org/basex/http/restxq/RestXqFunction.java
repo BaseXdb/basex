@@ -67,9 +67,15 @@ public final class RestXqFunction extends WebFunction {
   private final ArrayList<WebParam> cookieParams = new ArrayList<>();
   /** Consumed media types. */
   private final ArrayList<MediaType> consumes = new ArrayList<>();
+  /** Variables of all path templates. */
+  private final QNmSet pathVars = new QNmSet();
+  /** Index of the assigned path annotation. */
+  final int index;
 
   /** Path (can be {@code null}). */
   public WebPath path;
+  /** Number of path annotations. */
+  private int paths;
   /** Singleton ID (can be {@code null}). */
   String singleton;
 
@@ -86,9 +92,20 @@ public final class RestXqFunction extends WebFunction {
    * @param function associated user function
    * @param module web module
    * @param qc query context
+   * @param index index of the path annotation to be assigned
    */
-  public RestXqFunction(final StaticFunc function, final WebModule module, final QueryContext qc) {
+  public RestXqFunction(final StaticFunc function, final WebModule module, final QueryContext qc,
+      final int index) {
     super(function, module, qc);
+    this.index = index;
+  }
+
+  /**
+   * Returns the number of path annotations.
+   * @return number of annotations
+   */
+  public int paths() {
+    return paths;
   }
 
   @Override
@@ -99,6 +116,7 @@ public final class RestXqFunction extends WebFunction {
 
     AnnList starts = AnnList.EMPTY;
     Ann pathAnn = null;
+    final Set<String> templates = new HashSet<>();
     for(final Ann ann : function.anns) {
       final Annotation def = ann.definition;
       if(def == null) continue;
@@ -106,14 +124,22 @@ public final class RestXqFunction extends WebFunction {
       found |= eq(def.name.uri(), QueryText.REST_URI, QueryText.PERM_URI);
       final Value value = ann.value();
       if(def == _REST_PATH) {
+        final WebPath wp;
         try {
-          path = new WebPath(toString(value.itemAt(0)), ann.info, BASEX_RESTXQ_X);
-          pathAnn = ann;
+          wp = new WebPath(toString(value.itemAt(0)), ann.info, BASEX_RESTXQ_X);
         } catch(final IllegalArgumentException ex) {
           throw error(ann.info, ex.getMessage());
         }
-        for(final QNm name : path.varNames()) {
-          checkVariable(name, declared);
+        // identical templates always conflict: all other constraints are shared
+        if(!templates.add(wp.regex())) throw error(ann.info, PATH_DUPL_X, wp);
+        // a function is registered once for each of its path annotations
+        if(paths++ == index) path = wp;
+        pathAnn = ann;
+        final QNmSet vars = new QNmSet();
+        for(final QNm name : wp.varNames()) {
+          // a variable may be declared by several path templates, but only once per template
+          if(!vars.add(resolve(name))) throw error(ann.info, PARAM_DUPL_X, name.string());
+          if(pathVars.add(name)) checkVariable(name, declared);
         }
       } else if(def == _REST_ERROR) {
         error(ann);
@@ -204,10 +230,13 @@ public final class RestXqFunction extends WebFunction {
     final Expr[] args = new Expr[function.arity()];
     if(path != null) {
       final QNmMap<String> qnames = path.values(conn.path());
-      for(final QNm qname : qnames) {
+      for(final QNm qname : pathVars) {
         final QNm qnm = new QNm(qname.string(), function.sc);
         if(function.sc.elemNS != null && eq(qnm.uri(), function.sc.elemNS)) qnm.uri(EMPTY);
-        bind(qnm, args, Atm.get(qnames.get(qname)), qc, "Path segment");
+        // variables of other path templates are bound to an empty sequence
+        final String segment = qnames.get(qname);
+        bind(qnm, args, segment != null ? Atm.get(segment) : Empty.VALUE, qc,
+          "Path segment $" + string(qname.string()));
       }
     }
 
