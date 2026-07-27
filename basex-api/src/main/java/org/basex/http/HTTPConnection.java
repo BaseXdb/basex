@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import static org.basex.util.http.HTTPText.*;
 
 import java.io.*;
+import java.security.*;
 import java.util.*;
 import java.util.function.*;
 
@@ -329,7 +330,7 @@ public final class HTTPConnection implements ClientInfo {
         header.add(' ').add(RequestAttribute.REALM).add("=\"").add(Prop.NAME).add('"');
         if(authMethod == AuthMethod.DIGEST) {
           final String nonce = Strings.md5(Long.toString(System.nanoTime()));
-          header.add(",").add(RequestAttribute.QOP).add("=\"").add(AUTH).add(',').add(AUTH_INT);
+          header.add(",").add(RequestAttribute.QOP).add("=\"").add(AUTH);
           header.add('"').add(',').add(RequestAttribute.NONCE).add("=\"").add(nonce).add('"');
         }
         response.setHeader(WWW_AUTHENTICATE, header.toString());
@@ -441,22 +442,19 @@ public final class HTTPConnection implements ClientInfo {
           if(Strings.eq(auth.get(RequestAttribute.ALGORITHM), MD5_SESS))
             ha1 = Strings.md5(ha1 + ':' + nonce + ':' + cnonce);
 
-          final StringBuilder h2 = new StringBuilder().append(method).append(':').
-              append(auth.get(RequestAttribute.URI));
           final String qop = auth.get(RequestAttribute.QOP);
-          if(Strings.eq(qop, AUTH_INT)) {
-            h2.append(':').append(Strings.md5(string(requestCtx.body().read())));
-          }
-          final String ha2 = Strings.md5(h2.toString());
+          final String ha2 = Strings.md5(method + ':' + auth.get(RequestAttribute.URI));
 
           final StringBuilder sb = new StringBuilder(ha1).append(':').append(nonce);
-          if(Strings.eq(qop, AUTH, AUTH_INT)) {
+          if(Strings.eq(qop, AUTH)) {
             sb.append(':').append(auth.get(RequestAttribute.NC));
             sb.append(':').append(cnonce).append(':').append(qop);
           }
           sb.append(':').append(ha2);
 
-          if(!Strings.md5(sb.toString()).equals(auth.get(RequestAttribute.RESPONSE)))
+          // constant-time comparison of the recomputed and the transmitted response
+          final String rsp = auth.get(RequestAttribute.RESPONSE);
+          if(rsp == null || !MessageDigest.isEqual(token(Strings.md5(sb.toString())), token(rsp)))
             throw new LoginException(user.name());
         }
       }

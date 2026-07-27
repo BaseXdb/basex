@@ -242,7 +242,7 @@ public final class Client {
       final String[] parts = Strings.split(auth, ' ', 2);
       values.put(AUTH_METHOD, parts[0]);
       if(parts.length > 1) {
-        for(final String header : Strings.split(parts[1], ',')) {
+        for(final String header : splitFields(parts[1])) {
           final String[] kv = Strings.split(header, '=', 2);
           final String key = kv[0].trim();
           if(!key.isEmpty() && kv.length == 2) {
@@ -253,6 +253,31 @@ public final class Client {
       }
     }
     return values;
+  }
+
+  /**
+   * Splits a comma-separated list of authentication fields, ignoring commas inside quoted
+   * strings (e.g. a challenge with {@code qop="auth,auth-int"}).
+   * @param string field list
+   * @return single fields
+   */
+  private static ArrayList<String> splitFields(final String string) {
+    final ArrayList<String> fields = new ArrayList<>();
+    final StringBuilder sb = new StringBuilder();
+    boolean quoted = false;
+    final int sl = string.length();
+    for(int s = 0; s < sl; s++) {
+      final char ch = string.charAt(s);
+      if(ch == '"') quoted = !quoted;
+      if(ch == ',' && !quoted) {
+        fields.add(sb.toString());
+        sb.setLength(0);
+      } else {
+        sb.append(ch);
+      }
+    }
+    fields.add(sb.toString());
+    return fields;
   }
 
   /**

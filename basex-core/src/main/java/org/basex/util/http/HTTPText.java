@@ -86,8 +86,6 @@ public interface HTTPText {
   String MD5_SESS = MD5 + "-sess";
   /** Auth. */
   String AUTH = "auth";
-  /** Auth-int. */
-  String AUTH_INT = "auth-int";
 
   /** Content encoding: gzip. */
   String GZIP = "gzip";
