@@ -287,6 +287,9 @@ public final class BaseXHTTP extends CLI {
           case 'l': // use local mode
             Prop.put(StaticOptions.HTTPLOCAL, Boolean.toString(true));
             break;
+          case 'L': // start database server in addition
+            Prop.put(StaticOptions.HTTPLOCAL, Boolean.toString(false));
+            break;
           case 'n': // parse host name
             final String n = arg.string();
             Prop.put(StaticOptions.HOST, n);

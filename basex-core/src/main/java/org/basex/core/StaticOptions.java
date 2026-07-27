@@ -98,7 +98,7 @@ public final class StaticOptions extends Options {
   /** Show errors in RESTXQ directory. */
   public static final BooleanOption RESTXQERRORS = new BooleanOption("RESTXQERRORS", true);
   /** Local (embedded) mode. */
-  public static final BooleanOption HTTPLOCAL = new BooleanOption("HTTPLOCAL", false);
+  public static final BooleanOption HTTPLOCAL = new BooleanOption("HTTPLOCAL", true);
   /** Port for stopping the web server. */
   public static final NumberOption STOPPORT = new NumberOption("STOPPORT", 8081);
   /** Default authentication method. */

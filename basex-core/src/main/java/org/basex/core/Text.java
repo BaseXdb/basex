@@ -174,7 +174,8 @@ public interface Text {
     "  -d         Enable debugging output" + NL +
     "  -g         Enable GZIP support" + NL +
     "  -h<port>   Set port of HTTP server" + NL +
-    "  -l         Start in local mode" + NL +
+    "  -l         Start in local mode (default)" + NL +
+    "  -L         Start database server in addition" + NL +
     "  -n<name>   Set host name of database server" + NL +
     "  -p<port>   Set port of database server" + NL +
     "  -s<port>   Specify port to stop HTTP server" + NL +
