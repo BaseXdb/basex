@@ -36,7 +36,7 @@ public final class RepoDelete extends ARepo {
       new RepoManager(context, info).delete(args[0]);
       return info(PKG_DELETED_X, args[0]);
     } catch(final QueryException ex) {
-      return error(Util.message(ex));
+      return error(ex);
     }
   }
 

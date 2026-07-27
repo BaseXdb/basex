@@ -133,8 +133,7 @@ public class B64 extends Bin {
     try {
       return Base64.decode(value);
     } catch(final IllegalArgumentException ex) {
-      Util.debug(ex);
-      throw BasicType.BASE64_BINARY.castError(value, info);
+      throw BasicType.BASE64_BINARY.castError(value, info).cause(ex);
     }
   }
 

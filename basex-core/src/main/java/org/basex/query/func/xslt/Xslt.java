@@ -58,12 +58,17 @@ public final class Xslt {
       if(SAXONS.contains(impl)) {
         // Saxon: assign to system property, retrieve edition and XSL version
         processor = "Saxon";
+        version = "3.0";
         if(!impl.equals(property)) System.setProperty(clazz, impl);
-        final Class<?> vrsn = Reflect.find("net.sf.saxon.Version");
-        final Object se = Reflect.get(Reflect.field(vrsn, "softwareEdition"), null);
-        if(se != null) processor += " " + se;
-        final Object xsl = Reflect.invoke(Reflect.method(vrsn, "getXSLVersionString"), null);
-        version = xsl != null ? xsl.toString() : "3.0";
+        try {
+          final Class<?> vrsn = Class.forName("net.sf.saxon.Version");
+          final Object se = vrsn.getField("softwareEdition").get(null);
+          if(se != null) processor += " " + se;
+          final Object xsl = vrsn.getMethod("getXSLVersionString").invoke(null);
+          if(xsl != null) version = xsl.toString();
+        } catch(final ReflectiveOperationException ex) {
+          Util.debug(ex);
+        }
       } else {
         // unknown: assign classpath
         processor = impl;

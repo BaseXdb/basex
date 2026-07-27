@@ -23,8 +23,7 @@ public final class FnCollationAvailable extends StandardFunc {
    final byte[] collation = toToken(arg(0), qc);
     try {
       toCollation(collation, qc);
-    } catch(final QueryException ex) {
-      Util.debug(ex);
+    } catch(final QueryException ignore) {
       return false;
     }
     return true;

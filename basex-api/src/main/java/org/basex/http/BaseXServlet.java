@@ -105,6 +105,7 @@ public abstract class BaseXServlet extends HttpServlet {
    * @throws IOException I/O exception
    */
   public static void error(final HTTPConnection conn, final Exception ex) throws IOException {
+    Util.debug(ex);
     if(ex instanceof final HTTPException hex) {
       conn.error(hex.getStatus(), Util.message(hex));
     } else if(ex instanceof LoginException) {

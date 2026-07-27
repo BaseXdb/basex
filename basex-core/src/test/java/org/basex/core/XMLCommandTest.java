@@ -175,9 +175,8 @@ public final class XMLCommandTest extends SandboxTest {
     try {
       CommandParser.get(string, context).parse();
       fail('"' + string + "\" was supposed to fail.");
-    } catch(final QueryException ex) {
-      Util.debug(ex);
-      /* expected */
+    } catch(final QueryException expected) {
+      Util.debug(expected);
     }
   }
 }

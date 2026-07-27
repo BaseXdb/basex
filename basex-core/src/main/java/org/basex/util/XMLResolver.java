@@ -103,10 +103,14 @@ public final class XMLResolver {
       if(!catalog.isEmpty()) {
         if(Reflect.available(RESOLVER)) {
           // instance of Norm’s enhanced XML resolver
-          final Class<?> rslvr = Reflect.find(RESOLVER);
-          final Class<?> cnfgrtn = Reflect.find(CONFIGURATION);
-          final Object cnf = Reflect.get(Reflect.find(cnfgrtn, String.class), catalog);
-          resolver = Reflect.get(Reflect.find(rslvr, cnfgrtn), cnf);
+          try {
+            final Class<?> cnfgrtn = Class.forName(CONFIGURATION);
+            final Object cnf = cnfgrtn.getConstructor(String.class).newInstance(catalog);
+            resolver = Class.forName(RESOLVER).getConstructor(cnfgrtn).newInstance(cnf);
+          } catch(final Throwable th) {
+            // catch resolver errors (e.g. NoClassDefFoundError for missing dependencies)
+            Util.debug(th);
+          }
         } else {
           // JDK 11 resolver
           final ArrayList<URI> uris = new ArrayList<>();

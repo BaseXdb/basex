@@ -322,8 +322,8 @@ final class StringParser extends CommandParser {
       try {
         // return command reference; allow empty strings as input ("NULL")
         return Enum.valueOf(complete, token == null ? "NULL" : token.toUpperCase(Locale.ENGLISH));
-      } catch(final IllegalArgumentException ex) {
-        Util.debug(ex);
+      } catch(final IllegalArgumentException ignore) {
+        // alternatives are suggested
       }
     }
 

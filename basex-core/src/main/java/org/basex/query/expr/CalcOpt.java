@@ -344,8 +344,7 @@ interface CalcOpt {
     try {
       return Itr.get(Math.addExact(itr1, itr2));
     } catch(final ArithmeticException ex) {
-      Util.debug(ex);
-      throw RANGE_X.get(info, itr1 + " + " + itr2);
+      throw RANGE_X.get(info, itr1 + " + " + itr2).cause(ex);
     }
   }
 
@@ -363,8 +362,7 @@ interface CalcOpt {
     try {
       return Itr.get(Math.subtractExact(itr1, itr2));
     } catch(final ArithmeticException ex) {
-      Util.debug(ex);
-      throw RANGE_X.get(info, itr1 + " - " + itr2);
+      throw RANGE_X.get(info, itr1 + " - " + itr2).cause(ex);
     }
   }
 
@@ -382,8 +380,7 @@ interface CalcOpt {
     try {
       return Itr.get(Math.multiplyExact(l1, l2));
     } catch(final ArithmeticException ex) {
-      Util.debug(ex);
-      throw RANGE_X.get(info, l1 + " * " + l2);
+      throw RANGE_X.get(info, l1 + " * " + l2).cause(ex);
     }
   }
 
@@ -402,8 +399,7 @@ interface CalcOpt {
     try {
       return Itr.get(Math.divideExact(n1, n2));
     } catch(final ArithmeticException ex) {
-      Util.debug(ex);
-      throw RANGE_X.get(info, item1 + " idiv " + item2);
+      throw RANGE_X.get(info, item1 + " idiv " + item2).cause(ex);
     }
   }
 

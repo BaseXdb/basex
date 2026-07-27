@@ -51,8 +51,7 @@ public final class DBPut extends DBUpdate {
       try(DataOutput out = new DataOutput(bin)) {
         Stores.write(out, paths.get(path));
       } catch(final IOException ex) {
-        Util.debug(ex);
-        throw UPDBPUT_X.get(info, path);
+        throw UPDBPUT_X.get(info, path).cause(ex);
       }
     }
   }

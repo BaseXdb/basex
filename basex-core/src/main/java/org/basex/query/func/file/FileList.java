@@ -70,7 +70,6 @@ public class FileList extends FileFn {
     } catch(final IOException ex) {
       // skip entries that cannot be accessed; throw exception only on root level
       if(top) {
-        Util.debug(ex);
         throw ex;
       }
       return;

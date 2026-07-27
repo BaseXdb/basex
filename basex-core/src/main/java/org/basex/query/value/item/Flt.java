@@ -145,7 +145,7 @@ public final class Flt extends ANum {
       try {
         return Float.parseFloat(Token.string(v));
       } catch(final NumberFormatException ex) {
-        Util.debug(ex);
+        throw BasicType.FLOAT.castError(value, info).cause(ex);
       }
     }
     throw BasicType.FLOAT.castError(value, info);

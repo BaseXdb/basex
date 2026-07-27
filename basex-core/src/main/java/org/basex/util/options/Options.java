@@ -734,6 +734,7 @@ public class Options implements Iterable<Option<?>> {
       try {
         o.assign(value);
       } catch(final BaseXException ex) {
+        Util.debug(ex);
         return Util.message(ex);
       }
       assign.accept(o);

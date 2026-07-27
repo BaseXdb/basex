@@ -54,8 +54,8 @@ public class FnUnparsedTextAvailable extends ParseFn {
       try {
         input = toIO(toString(source, cc.qc), false);
         if(!(input instanceof IOUrl)) return value(cc.qc);
-      } catch(final QueryException ex) {
-        Util.debug(ex);
+      } catch(final QueryException ignore) {
+        // pre-evaluation is skipped
       }
     }
     return this;
@@ -66,8 +66,7 @@ public class FnUnparsedTextAvailable extends ParseFn {
     try {
       while(ti.read() != -1);
       return Bln.TRUE;
-    } catch(final IOException ex) {
-      Util.debug(ex);
+    } catch(final IOException ignore) {
       return Bln.FALSE;
     }
   }

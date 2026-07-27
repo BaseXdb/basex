@@ -107,18 +107,15 @@ public final class FnLoadXQueryModule extends StandardFunc {
         final String uri = path.isEmpty() ? Token.string(sc().baseURI().string()) : path;
         lib = mqc.parse(content, uri);
       } catch(final IOException ex) {
-        Util.debug(ex);
-        throw WHICHMODFILE_X.get(info, src);
+        throw WHICHMODFILE_X.get(info, src).cause(ex);
       } catch(final QueryException ex) {
-        Util.debug(ex);
-        throw MODULE_STATIC_ERROR_X_X.get(info, modUri, ex.getLocalizedMessage());
+        throw MODULE_STATIC_ERROR_X_X.get(info, modUri, ex.getLocalizedMessage()).cause(ex);
       }
       try {
         mqc.vars.bindExternal(mqc, bindings, false);
       } catch(final QueryException ex) {
-        Util.debug(ex);
         throw ex.error() != INVTYPE_X ? ex : MODULE_PARAMETER_TYPE_X_X.get(info, modUri,
-            ex.getLocalizedMessage());
+            ex.getLocalizedMessage()).cause(ex);
       }
       if(ctx != null && lib.sc.contextType != null && !lib.sc.contextType.instance(ctx)) {
         throw MODULE_CONTEXT_TYPE_X_X.get(info, modUri, ctx.seqType());

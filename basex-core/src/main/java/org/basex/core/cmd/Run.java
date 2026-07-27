@@ -46,6 +46,7 @@ public final class Run extends Execute {
           // otherwise, interpret input as xquery
           commands.add(new XQuery(file.readString()).baseURI(file.path()));
         } catch(final IOException ex) {
+          exception = ex;
           error = Util.message(ex);
         }
       }

@@ -65,8 +65,8 @@ public final class ChoiceItemType implements Type {
     for(final Type tp : types) {
       try {
         return tp.cast(value, qc, info);
-      } catch(final QueryException ex) {
-        Util.debug(ex);
+      } catch(final QueryException ignore) {
+        // try next type
       }
     }
     throw FUNCCAST_X_X.get(info, this, value);

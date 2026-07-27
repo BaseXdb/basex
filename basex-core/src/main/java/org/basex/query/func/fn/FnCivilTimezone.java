@@ -26,8 +26,7 @@ public final class FnCivilTimezone extends DateTimeFn {
     try {
       id = place != null ? ZoneId.of(place) : ZoneId.systemDefault();
     } catch(final RuntimeException ex) {
-      Util.debug(ex);
-      throw PLACE_X.get(info, place);
+      throw PLACE_X.get(info, place).cause(ex);
     }
 
     return DTDur.get(ZonedDateTime.ofInstant(instant, id).getOffset().getTotalSeconds() * 1000L);

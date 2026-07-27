@@ -193,7 +193,7 @@ public final class Dec extends ANum {
       try {
         return new BigDecimal(Token.string(value).trim());
       } catch(final NumberFormatException ex) {
-        Util.debug(ex);
+        if(error) throw BasicType.DECIMAL.castError(value, info).cause(ex);
       }
     }
 

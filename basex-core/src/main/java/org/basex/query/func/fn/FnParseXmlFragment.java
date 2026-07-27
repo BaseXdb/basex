@@ -82,7 +82,7 @@ public class FnParseXmlFragment extends Docs {
     } catch(final IOException ex) {
       final Throwable th = ex.getCause();
       if(th instanceof TrustedViolationException)
-        throw EXTERNALRESOURCE_X.get(info, th.getMessage());
+        throw EXTERNALRESOURCE_X.get(info, th.getMessage()).cause(ex);
       final QueryException qe = !(th instanceof ValidationException) ? SAXERR_X.get(info, ex) :
         mopts.get(MainOptions.DTDVALIDATION) ? DTDVALIDATIONERR_X.get(info, ex) :
           XSDVALIDATIONERR_X.get(info, ex);

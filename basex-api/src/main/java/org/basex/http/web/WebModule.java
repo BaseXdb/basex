@@ -71,7 +71,6 @@ public final class WebModule {
       if(ctx.soptions.get(StaticOptions.RESTXQERRORS)) throw ex;
       // ignore modules that cannot be parsed
       ctx.log.writeServer(LogType.ERROR, Util.message(ex));
-      Util.debug(ex);
     }
   }
 

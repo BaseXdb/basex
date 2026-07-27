@@ -112,7 +112,7 @@ public abstract class StandardFunc extends Arr {
   }
 
   @Override
-  public final StandardFunc copy(final CompileContext cc, final IntObjectMap<Var> vm) {
+  public StandardFunc copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(definition.get(info, copyAll(cc, vm, args())));
   }
 
@@ -498,8 +498,7 @@ public abstract class StandardFunc extends Arr {
       final Path cd = qc.resources.currentDir;
       return cd != null ? cd.resolve(p) : p;
     } catch(final IllegalArgumentException | URISyntaxException ex) {
-      Util.debug(ex);
-      throw FILE_INVALID_PATH_X.get(info, path);
+      throw FILE_INVALID_PATH_X.get(info, path).cause(ex);
     }
   }
 
@@ -752,8 +751,7 @@ public abstract class StandardFunc extends Arr {
       return ldt.toInstant(dtm.hasTz() ? ZoneOffset.ofTotalSeconds(dtm.tz() * 60) :
         ZoneId.systemDefault().getRules().getOffset(ldt)).toEpochMilli();
     } catch(final ArithmeticException | DateTimeException ex) {
-      Util.debug(ex);
-      throw INTRANGE_X.get(info, dtm.yea());
+      throw INTRANGE_X.get(info, dtm.yea()).cause(ex);
     }
   }
 
@@ -911,13 +909,12 @@ public abstract class StandardFunc extends Arr {
   /**
    * Returns the original exception, or a new exception for the specified error.
    * @param ex original exception
-   * @param error error adapted error (ignored if {@code null})
+   * @param error adapted error (can be {@code null})
    * @return new exception
    */
   protected final QueryException error(final QueryException ex, final QueryError error) {
     if(error == null) return ex;
-    Util.debug(ex);
-    return error.get(info, ex.getLocalizedMessage());
+    return error.get(info, ex.getLocalizedMessage()).cause(ex);
   }
 
   @Override

@@ -353,7 +353,9 @@ public final class HtmlParser extends XMLParser {
      * @return result of check
      */
     public boolean available(@SuppressWarnings("unused") final HtmlOptions options) {
-      for(final String cl : classes) if(!Reflect.available(cl)) return false;
+      for(final String cl : classes) {
+        if(!Reflect.available(cl)) return false;
+      }
       return true;
     }
 
@@ -376,9 +378,13 @@ public final class HtmlParser extends XMLParser {
      * @param info input info (can be {@code null})
      * @throws QueryException query exception,
      */
-    static void ensureAvailable(final String className, final QNm name,
-        final InputInfo info) throws QueryException {
-      if(!Reflect.available(className)) throw BASEX_CLASSPATH_X_X.get(info, name, className);
+    static void ensureAvailable(final String className, final QNm name, final InputInfo info)
+        throws QueryException {
+      try {
+        Reflect.forName(className);
+      } catch(final Throwable th) {
+        throw BASEX_CLASSPATH_X_X.get(info, name, className).cause(th);
+      }
     }
 
     /**

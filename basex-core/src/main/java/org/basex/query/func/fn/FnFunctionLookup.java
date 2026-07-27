@@ -51,8 +51,8 @@ public final class FnFunctionLookup extends StandardFunc {
     if(arity >= 0 && arity <= Integer.MAX_VALUE) {
       try {
         return Functions.item(name, (int) arity, true, info, qc);
-      } catch(final QueryException ex) {
-        Util.debug(ex);
+      } catch(final QueryException ignore) {
+        // function is not available
       }
     }
     return null;

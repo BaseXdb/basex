@@ -104,8 +104,7 @@ public class SqlExecutePrepared extends SqlExecute {
       } catch(final SQLException ex) {
         throw SQL_ERROR_X.get(info, ex);
       } catch(final IllegalArgumentException ex) {
-        Util.debug(ex);
-        throw SQL_TYPE_X_X.get(info, type, value);
+        throw SQL_TYPE_X_X.get(info, type, value).cause(ex);
       }
     }
   }

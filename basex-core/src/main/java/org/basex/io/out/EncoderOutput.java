@@ -7,7 +7,6 @@ import java.io.*;
 import java.nio.*;
 import java.nio.charset.*;
 
-import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
@@ -48,8 +47,7 @@ public final class EncoderOutput extends PrintOutput {
       if(fallback != null) {
         fallback.print(cp);
       } else {
-        Util.debug(ex);
-        throw SERENC_X_X.getIO(Integer.toHexString(cp), charset);
+        throw SERENC_X_X.getIO(Integer.toHexString(cp), charset).cause(ex);
       }
     }
     lineLength = cp == '\n' ? 0 : lineLength + 1;

@@ -14,4 +14,13 @@ public final class JobException extends RuntimeException {
   public JobException(final String message) {
     super(message);
   }
+
+  /**
+   * Constructor.
+   * @param message error message
+   * @param cause cause
+   */
+  public JobException(final String message, final Throwable cause) {
+    super(message, cause);
+  }
 }

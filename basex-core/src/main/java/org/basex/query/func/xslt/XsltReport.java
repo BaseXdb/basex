@@ -60,7 +60,7 @@ final class XsltReport {
    * @param tr transformer
    */
   void register(final Transformer tr) {
-    if(tr.getClass() == TI) {
+    if(tr.getClass() == TI && MW != null && TI_GUC != null && MW_GW != null && MW_SMW != null) {
       try {
         final Supplier<Object> supplier = () -> {
           final Object mw = Reflect.get(MW);
@@ -68,7 +68,7 @@ final class XsltReport {
           return mw;
         };
         MW_SMW.invoke(TI_GUC.invoke(tr), supplier);
-      } catch(final Exception ex) {
+      } catch(final ReflectiveOperationException ex) {
         Util.stack(ex);
       }
     }
@@ -91,7 +91,8 @@ final class XsltReport {
     final ValueBuilder vb = new ValueBuilder(qc);
     try {
       for(final Object message : messages) {
-        final Value value = convert(new IOContent(MW_GW.invoke(message).toString()), false);
+        final Object writer = MW_GW.invoke(message);
+        final Value value = convert(new IOContent(writer.toString()), false);
         final ArrayBuilder ab = new ArrayBuilder(qc, value.size());
         for(final Item item : value) ab.add(item);
         vb.add(ab.array());

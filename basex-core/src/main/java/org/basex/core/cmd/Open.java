@@ -9,7 +9,6 @@ import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 
 /**
  * Evaluates the 'open' command and opens a database.
@@ -55,7 +54,7 @@ public final class Open extends Command {
         if(data.meta.oldindex()) info(H_INDEX_FORMAT);
         if(data.meta.corrupt)  info(DB_CORRUPT);
       } catch(final IOException ex) {
-        return error(Util.message(ex));
+        return error(ex);
       }
     }
     return info(DB_OPENED_X, db, jc().performance);

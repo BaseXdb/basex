@@ -91,6 +91,7 @@ abstract class ProcFn extends StandardFunc {
       } catch(final IOException ex) {
         result.exception(ex);
       } catch(final InterruptedException ex) {
+        Util.debug(ex);
         result.error.add(Util.message(ex));
       }
     });

@@ -70,7 +70,6 @@ public final class SpillOutput extends OutputStream {
         is.transferTo(so);
         return so.finish();
       } catch(final Throwable th) {
-        Util.debug(th);
         so.discard();
         throw th;
       }

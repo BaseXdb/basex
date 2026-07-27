@@ -243,8 +243,8 @@ public final class Strings {
   public static String checkEncoding(final String encoding) {
     try {
       if(Charset.isSupported(encoding)) return null;
-    } catch(final IllegalArgumentException ex) {
-      Util.debug(ex);
+    } catch(final IllegalArgumentException ignore) {
+      // encoding name is invalid
     }
     return "Unknown encoding: " + QueryError.similar(encoding,
         Levenshtein.similar(Token.token(encoding), encodings())) + '.';
@@ -371,8 +371,8 @@ public final class Strings {
         tb.add(p == null || p.isEmpty() ? "/" : p.replace('.', '/'));
       }
       path = tb.toString();
-    } catch(final URISyntaxException ex) {
-      Util.debug(ex);
+    } catch(final URISyntaxException ignore) {
+      // original path is used
     }
 
     // replace special characters with dashes; remove multiple slashes

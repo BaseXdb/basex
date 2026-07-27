@@ -203,6 +203,7 @@ public final class DialogManage extends BaseXDialog {
           meta.read();
           info = InfoDB.db(meta, true, true);
         } catch(final IOException ex) {
+          Util.debug(ex);
           info = Util.message(ex);
         }
       } else if(dbs.size() == 1) {

@@ -55,8 +55,7 @@ public abstract class StandardSerializer extends OutputSerializer {
       try {
         form = Form.valueOf(norm);
       } catch(final IllegalArgumentException ex) {
-        Util.debug(ex);
-        throw SERNORM_X.getIO(norm);
+        throw SERNORM_X.getIO(norm).cause(ex);
       }
     }
     final String maps = sopts.get(USE_CHARACTER_MAPS);

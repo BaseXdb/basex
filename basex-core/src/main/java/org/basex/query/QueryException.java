@@ -78,7 +78,7 @@ public class QueryException extends Exception {
    */
   public QueryException(final Throwable cause) {
     this(Util.message(cause));
-    initCause(cause);
+    cause(cause);
   }
 
   /**
@@ -115,11 +115,18 @@ public class QueryException extends Exception {
     this.name = name;
     if(info != null) info(info);
     for(final Object o : ext) {
-      if(o instanceof final Throwable th) {
-        initCause(th);
-        break;
-      }
+      if(o instanceof final Throwable th) cause(th);
     }
+  }
+
+  /**
+   * Attaches the throwable that caused this error.
+   * @param cause cause (can be {@code null})
+   * @return self reference
+   */
+  public final QueryException cause(final Throwable cause) {
+    if(cause != null && cause != this && getCause() == null) initCause(cause);
+    return this;
   }
 
   /**

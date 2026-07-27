@@ -490,6 +490,7 @@ public final class HTTPConnection implements ClientInfo {
    * @param ex exception
    */
   private void logError(final int code, final String info, final Exception ex) {
+    Util.debug(ex);
     final StringBuilder sb = new StringBuilder();
     sb.append("Code: ").append(code);
     if(info != null) sb.append(", Info: ").append(info);

@@ -209,8 +209,7 @@ public abstract class JavaCall extends Arr {
    * @param args converted arguments
    * @return exception
    */
-  final QueryException executionError(final Throwable th, final Object[] args) {
-    Util.debug(th);
+  final QueryException executionError(final Throwable th, final Object... args) {
     final Throwable root = Util.rootException(th);
     return root instanceof final QueryException qe ? qe.info(info) :
       JAVAEXEC_X_X_X.get(info, root, name(), JavaCall.argTypes(args));
@@ -379,10 +378,9 @@ public abstract class JavaCall extends Arr {
         Class<?> clazz = null;
         try {
           clazz = modules.findClass(className);
-        } catch(final ClassNotFoundException ex) {
-          Util.debug(ex);
+        } catch(final ClassNotFoundException ignore) {
+          // class not found
         } catch(final Throwable th) {
-          // catch linkage and other errors as well
           throw JAVAINIT_X_X.get(info, Util.className(th), th);
         }
 

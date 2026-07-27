@@ -161,8 +161,7 @@ public final class QueryJob extends Job implements Runnable {
     try {
       return new Cron(string);
     } catch(final BaseXException ex) {
-      Util.debug(ex);
-      throw JOBS_CRON_X_X.get(info, string, ex.getLocalizedMessage());
+      throw JOBS_CRON_X_X.get(info, string, ex.getLocalizedMessage()).cause(ex);
     }
   }
 

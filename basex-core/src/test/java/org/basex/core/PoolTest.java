@@ -114,8 +114,8 @@ public final class PoolTest extends SandboxTest {
     try {
       session.execute(cmd);
       fail("Command was supposed to fail.");
-    } catch(final IOException ex) {
-      Util.debug(ex);
+    } catch(final IOException expected) {
+      Util.debug(expected);
     }
   }
 }

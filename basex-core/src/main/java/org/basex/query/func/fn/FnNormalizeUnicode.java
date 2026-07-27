@@ -29,8 +29,7 @@ public final class FnNormalizeUnicode extends StandardFunc {
       try {
         frm = Form.valueOf(string(norm));
       } catch(final IllegalArgumentException ex) {
-        Util.debug(ex);
-        throw NORMUNI_X.get(info, form);
+        throw NORMUNI_X.get(info, form).cause(ex);
       }
     }
     final byte[] bytes = value.string(info), normalized = Token.normalize(bytes, frm);

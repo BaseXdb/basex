@@ -269,8 +269,8 @@ public final class SeqType {
         try {
           final Value value = tp.seqType().coerce(item, name, qc, cc, info);
           if(value != null) return value;
-        } catch(final QueryException ex) {
-          Util.debug(ex);
+        } catch(final QueryException ignore) {
+          // try next type
         }
       }
       return null;

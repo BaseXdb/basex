@@ -128,9 +128,8 @@ public final class StaticVar extends StaticDecl {
         try {
           waiting.wait();
         } catch(final InterruptedException ex) {
-          Util.debug(ex);
           Thread.currentThread().interrupt();
-          throw new JobException(Text.INTERRUPTED);
+          throw new JobException(Text.INTERRUPTED, ex);
         } finally {
           waiting.remove(qc);
         }

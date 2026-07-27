@@ -110,6 +110,7 @@ public class Execute extends Command {
       try {
         Collections.addAll(commands, CommandParser.get(input, ctx).path(path).parse());
       } catch(final QueryException ex) {
+        exception = ex;
         error = Util.message(ex);
         return false;
       }

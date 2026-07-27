@@ -74,11 +74,10 @@ public final class UCAOptions extends CollationOptions {
       try {
         final VersionInfo vi = VersionInfo.getInstance(v);
         final VersionInfo vic = rbc.getUCAVersion();
-        if((vi == null || vic == null || vi.compareTo(vic) > 0) && !fallback)
-          throw error(VERSION);
+        if((vi == null || vic == null || vi.compareTo(vic) > 0) && !fallback) throw error(VERSION);
       } catch(final IllegalArgumentException ex) {
+        if(!fallback) throw new BaseXException("Version not supported: %.", v, ex);
         Util.debug(ex);
-        if(!fallback) throw new BaseXException("Version not supported: %.", v);
       }
     }
 

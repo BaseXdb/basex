@@ -9,7 +9,6 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Functions on files and directories.
@@ -24,8 +23,7 @@ abstract class FileFn extends StandardFunc {
     try {
       return eval(qc);
     } catch(final NoSuchFileException ex) {
-      Util.debug(ex);
-      throw FILE_NOT_FOUND_X.get(info, ex.getMessage());
+      throw FILE_NOT_FOUND_X.get(info, ex.getMessage()).cause(ex);
     } catch(final NotDirectoryException ex) {
       throw FILE_NO_DIR_X.get(info, ex);
     } catch(final FileAlreadyExistsException ex) {

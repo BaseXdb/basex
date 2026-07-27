@@ -58,8 +58,7 @@ public final class FnHash extends StandardFunc {
     try {
       md = MessageDigest.getInstance(alg);
     } catch(final NoSuchAlgorithmException ex) {
-      Util.debug(ex);
-      throw HASH_ALGORITHM_X.get(info, algorithm);
+      throw HASH_ALGORITHM_X.get(info, algorithm).cause(ex);
     }
 
     if(value instanceof B64Lazy) {

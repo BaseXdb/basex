@@ -189,15 +189,13 @@ public class BaseXTextField extends JTextField {
    */
   private boolean check(final boolean assign) {
     if(option instanceof final NumberOption number) {
-      try {
-        final int num = Integer.parseInt(getText());
-        if(assign) options.set(number, num);
-        setBackground(back);
-      } catch(final NumberFormatException ex) {
-        Util.debug(ex);
+      final int num = Strings.toInt(getText());
+      if(num == Integer.MIN_VALUE) {
         setBackground(GUIConstants.lightRed);
         return false;
       }
+      if(assign) options.set(number, num);
+      setBackground(back);
     } else {
       options.set((StringOption) option, getText());
     }

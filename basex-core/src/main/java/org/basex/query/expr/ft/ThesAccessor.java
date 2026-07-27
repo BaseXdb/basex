@@ -102,8 +102,7 @@ public final class ThesAccessor {
       try {
         thesaurus = new Thesaurus(new DBNode(file));
       } catch(final IOException ex) {
-        Util.debug(ex);
-        throw QueryError.NOTHES_X.get(info, file);
+        throw QueryError.NOTHES_X.get(info, file).cause(ex);
       }
     }
     return thesaurus;

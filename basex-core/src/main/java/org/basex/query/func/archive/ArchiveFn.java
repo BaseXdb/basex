@@ -194,8 +194,7 @@ abstract class ArchiveFn extends StandardFunc {
       try {
         if(value != null) return toMs(new Dtm(value, BasicType.DATE_TIME, info), qc);
       } catch(final QueryException ex) {
-        Util.debug(ex);
-        throw ARCHIVE_TIMESTAMP_X.get(info, value);
+        throw ARCHIVE_TIMESTAMP_X.get(info, value).cause(ex);
       }
     }
     return -1;

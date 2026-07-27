@@ -171,6 +171,7 @@ public final class ClientListener extends Thread implements ClientInfo {
         }
       }
     } catch(final IOException ex) {
+      Util.debug(ex);
       log(LogType.ERROR, Util.message(ex));
       command(null);
       close();
@@ -489,6 +490,7 @@ public final class ClientListener extends Thread implements ClientInfo {
       log(LogType.OK, sc.toString() + '[' + arg + "] " + info);
     } catch(final Throwable ex) {
       // log exception (static or runtime)
+      Util.debug(ex);
       error = ex instanceof RuntimeException ? Util.bug(ex) : Util.message(ex);
       log(LogType.REQUEST, sc + "[" + arg + ']');
       log(LogType.ERROR, error);

@@ -60,8 +60,7 @@ public final class Set extends Command {
       if(debug) Prop.debug = opts.get(StaticOptions.DEBUG);
       return info(name + COLS + opts.get(opts.option(name)));
     } catch(final BaseXException ex) {
-      Util.debug(ex);
-      return error(Util.message(ex));
+      return error(ex);
     }
   }
 

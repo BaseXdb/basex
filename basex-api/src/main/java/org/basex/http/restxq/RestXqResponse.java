@@ -18,7 +18,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 import org.basex.util.http.*;
 
 import jakarta.servlet.*;
@@ -123,7 +122,6 @@ public final class RestXqResponse extends WebResponse {
           for(; item != null; item = qc.next(iter)) ser.serialize(item);
         } catch(final IOException ex) {
           // client has disconnected: stop the query
-          Util.debug(ex);
           if(cache == null) qc.stop();
           throw ex;
         }

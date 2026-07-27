@@ -324,8 +324,7 @@ public class Dur extends ADateDur {
     BigDecimal d = BigDecimal.valueOf(factor), result;
     try {
       result = mult ? seconds.multiply(d) : seconds.divide(d, MathContext.DECIMAL64);
-    } catch(final ArithmeticException ex) {
-      Util.debug(ex);
+    } catch(final ArithmeticException ignore) {
       d = BigDecimal.valueOf(1 / factor);
       result = mult ? seconds.divide(d, MathContext.DECIMAL64) : seconds.multiply(d);
     }

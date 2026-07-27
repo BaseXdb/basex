@@ -113,8 +113,7 @@ public final class Client {
     try {
       return new URI(IOUrl.toAscii(uri));
     } catch(final URISyntaxException ex) {
-      Util.debug(ex);
-      throw HC_URI_X.get(info, uri);
+      throw HC_URI_X.get(info, uri).cause(ex);
     }
   }
 
@@ -157,8 +156,7 @@ public final class Client {
         rb.header(ACCEPT, MediaType.ALL_ALL.toString());
       }
     } catch(final IllegalArgumentException ex) {
-      Util.debug(ex);
-      throw new IOException(ex.getMessage());
+      throw new IOException(ex.getMessage(), ex);
     }
 
     final String fw = request.attribute(FOLLOW_REDIRECT);
@@ -178,8 +176,7 @@ public final class Client {
       return Job.run(() -> client.send(rb.build(), handler));
     } catch(final InterruptedException | IllegalArgumentException ex) {
       // illegal argument exception may be caused by wrongly encoded redirect URL
-      Util.debug(ex);
-      throw new IOException(ex.getMessage());
+      throw new IOException(ex.getMessage(), ex);
     }
   }
 

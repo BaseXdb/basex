@@ -67,7 +67,7 @@ public final class CreateDB extends ACreate {
         source = li.lookup() == -1 ? null : new IOStream(li, source.name());
       }
     } catch(final IOException ex) {
-      return error(Util.message(ex));
+      return error(ex);
     }
 
     try {
@@ -122,7 +122,7 @@ public final class CreateDB extends ACreate {
     } catch(final JobException ex) {
       throw ex;
     } catch(final IOException ex) {
-      return error(Util.message(ex));
+      return error(ex);
     } catch(final Exception ex) {
       // known exceptions:
       // - IllegalArgumentException (UTF8, zip files)

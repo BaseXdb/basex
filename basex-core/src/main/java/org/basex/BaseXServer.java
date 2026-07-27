@@ -110,14 +110,12 @@ public final class BaseXServer extends CLI implements Runnable {
       socket.bind(new InetSocketAddress(addr, port), BACKLOG);
     } catch(final BindException ex) {
       context.log.writeServer(LogType.ERROR, Util.message(ex));
-      Util.debug(ex);
-      throw new BaseXException(SRV_RUNNING_X, port);
+      throw new BaseXException(SRV_RUNNING_X, port, ex);
     } catch(final IOException ex) {
       throw ex;
     } catch(final Exception ex) {
       context.log.writeServer(LogType.ERROR, Util.message(ex));
-      Util.debug(ex);
-      throw new BaseXException(ex.getLocalizedMessage());
+      throw new BaseXException(ex.getLocalizedMessage(), ex);
     }
 
     acceptor = new Thread(this);
@@ -329,8 +327,7 @@ public final class BaseXServer extends CLI implements Runnable {
       // 0: server was stopped; anything else (or EOF) indicates a refused or failed request
       if(in.read() != 0) throw new BaseXException(CONNECTION_ERROR_X, port);
     } catch(final IOException ex) {
-      Util.debug(ex);
-      throw new BaseXException(CONNECTION_ERROR_X, port);
+      throw new BaseXException(CONNECTION_ERROR_X, port, ex);
     }
   }
 

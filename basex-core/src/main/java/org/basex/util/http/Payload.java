@@ -374,8 +374,7 @@ public final class Payload {
         if(Token.contains(decoded, Token.REPLACEMENT)) throw new InputException(Token.REPLACEMENT);
         return Str.get(decoded);
       } catch(final IllegalArgumentException ex) {
-        Util.debug(ex);
-        throw new IOException(ex.getMessage());
+        throw new IOException(ex.getMessage(), ex);
       }
     } else if(type.isMultipart()) {
       try(InputStream is = io.inputStream()) {

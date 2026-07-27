@@ -56,6 +56,10 @@ final class GZIPIn extends ArchiveIn {
 
   @Override
   public void close() {
-    try { zis.close(); } catch(final IOException ex) { Util.debug(ex); }
+    try {
+      zis.close();
+    } catch(final IOException ex) {
+      Util.debug(ex);
+    }
   }
 }

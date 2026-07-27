@@ -249,8 +249,7 @@ public class QueryParser extends InputParser {
     try {
       return sequenceType();
     } catch(final QueryException expr) {
-      Util.debug(expr);
-      throw error(CASTTYPE_X, null, expr.getLocalizedMessage());
+      throw error(CASTTYPE_X, null, expr.getLocalizedMessage()).cause(expr);
     }
   }
 
@@ -982,8 +981,7 @@ public class QueryParser extends InputParser {
       try {
         query = io.readString();
       } catch(final IOException expr) {
-        Util.debug(expr);
-        throw error(WHICHMODFILE_X, info, io);
+        throw error(WHICHMODFILE_X, info, io).cause(expr);
       }
 
       qc.modStack.push(tPath);
@@ -4672,8 +4670,7 @@ public class QueryParser extends InputParser {
               try {
                 opt.sw.read(fl, except);
               } catch(final IOException expr) {
-                Util.debug(expr);
-                throw error(NOSTOPFILE_X, fl);
+                throw error(NOSTOPFILE_X, fl).cause(expr);
               }
             } else if(!union && !except) {
               throw error(FTSTOP);

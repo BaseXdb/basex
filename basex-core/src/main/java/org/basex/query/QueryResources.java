@@ -535,7 +535,7 @@ public final class QueryResources {
     } catch(final IOException ex) {
       final Throwable th = ex.getCause();
       if(th instanceof TrustedViolationException)
-        throw EXTERNALRESOURCE_X.get(info, th.getMessage());
+        throw EXTERNALRESOURCE_X.get(info, th.getMessage()).cause(ex);
       throw !(th instanceof ValidationException) ? IOERR_X.get(info, ex) :
         options.get(MainOptions.DTDVALIDATION) ? DTDVALIDATIONERR_X.get(info, ex) :
           XSDVALIDATIONERR_X.get(info, ex);

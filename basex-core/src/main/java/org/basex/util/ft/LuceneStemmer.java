@@ -15,16 +15,11 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-final class LuceneStemmer extends Stemmer {
+final class LuceneStemmer extends ExternalStemmer<LuceneStemmer.StemmerClass> {
   /** Name of the package with all Lucene stemmers. */
   private static final String PATTERN = "org.apache.lucene.analysis.%Stemmer";
   /** Stemmer classes which the Lucene library provides. */
   private static final HashMap<Language, StemmerClass> CLASSES = new HashMap<>();
-
-  /** Stemmer class corresponding to the required properties. */
-  private StemmerClass clazz;
-  /** Stemmer instance. */
-  private Object stemmer;
 
   static {
     if(Reflect.available(PATTERN, "de.German")) {
@@ -67,7 +62,6 @@ final class LuceneStemmer extends Stemmer {
     if(m == null) {
       Util.debugln("Could not initialize \"%\" Lucene stemmer method.", lang);
     } else {
-      m.setAccessible(true);
       CLASSES.put(lang, new StemmerClass(clz, m, ch));
     }
   }
@@ -91,14 +85,7 @@ final class LuceneStemmer extends Stemmer {
    * @param fti full-text iterator
    */
   private LuceneStemmer(final Language lang, final FTIterator fti) {
-    super(fti);
-    clazz = CLASSES.get(lang);
-    stemmer = Reflect.get(clazz.clz);
-  }
-
-  @Override
-  Collection<Language> languages() {
-    return CLASSES.keySet();
+    super(lang, fti);
   }
 
   @Override
@@ -107,8 +94,8 @@ final class LuceneStemmer extends Stemmer {
   }
 
   @Override
-  public boolean supports(final Language lang) {
-    return CLASSES.containsKey(lang);
+  Map<Language, StemmerClass> classes() {
+    return CLASSES;
   }
 
   @Override
@@ -136,5 +123,6 @@ final class LuceneStemmer extends Stemmer {
    * @param stem  method {@code stem}
    * @param chars string indicator
    */
-  private record StemmerClass(Class<?> clz, Method stem, boolean chars) { }
+  record StemmerClass(Class<?> clz, Method stem, boolean chars)
+      implements ExternalStemmer.StemmerClass { }
 }

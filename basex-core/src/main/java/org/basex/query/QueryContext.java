@@ -371,8 +371,7 @@ public final class QueryContext extends Job implements Closeable {
             }
           }
         } catch(final QueryException ex) {
-          Util.debug(ex);
-          throw ex.error() == NOCTX_X ? CIRCCTX.get(ex.info()) : ex;
+          throw ex.error() == NOCTX_X ? CIRCCTX.get(ex.info()).cause(ex) : ex;
         }
       }
       if(main != null) {
@@ -384,7 +383,6 @@ public final class QueryContext extends Job implements Closeable {
         vars.compileAll(cc);
       }
     } catch(final StackOverflowError ex) {
-      Util.debug(ex);
       throw BASEX_OVERFLOW.get(null, ex);
     } finally {
       info.runtime = true;
@@ -818,8 +816,7 @@ public final class QueryContext extends Job implements Closeable {
     try {
       return code.get();
     } catch(final StackOverflowError ex) {
-      Util.debug(ex);
-      throw BASEX_OVERFLOW.get(null);
+      throw BASEX_OVERFLOW.get(null).cause(ex);
     } finally {
       runtime.addAndGet(perf.nanoRuntime());
     }

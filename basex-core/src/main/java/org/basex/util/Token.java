@@ -574,8 +574,7 @@ public final class Token {
     // parse as double value
     try {
       return Double.parseDouble(new String(str));
-    } catch(final NumberFormatException ex) {
-      Util.debug(ex);
+    } catch(final NumberFormatException ignore) {
       return Double.NaN;
     }
   }

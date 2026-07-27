@@ -72,8 +72,7 @@ public final class StrLazy extends AStr implements Lazy {
     try {
       if(!isCached()) value = get(ii).content();
     } catch(final IOException ex) {
-      Util.debug(ex);
-      throw error.get(ii,  input);
+      throw error.get(ii,  input).cause(ex);
     }
   }
 

@@ -143,7 +143,6 @@ public class XQueryEval extends StandardFunc {
         if(error != null) throw error.get(pass ? new InputInfo(query.path(), 1, 1) : info);
         throw ex;
       } catch(final QueryException ex) {
-        Util.debug(ex);
         final QueryError error = ex.error();
         final QueryException qe = error(ex, error == BASEX_PERMISSION_X_X ? XQUERY_PERM_X :
           error == BASEX_OVERFLOW ? XQUERY_UNEXPECTED_X : null);

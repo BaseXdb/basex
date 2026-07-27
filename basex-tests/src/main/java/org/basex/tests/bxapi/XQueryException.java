@@ -17,7 +17,6 @@ public final class XQueryException extends RuntimeException {
    */
   public XQueryException(final QueryException ex) {
     super(ex);
-    Util.debug(ex);
   }
 
   /**
@@ -26,7 +25,6 @@ public final class XQueryException extends RuntimeException {
    */
   public XQueryException(final Exception ex) {
     super(new QueryException(ex));
-    Util.debug(ex);
   }
 
   /**
@@ -35,6 +33,15 @@ public final class XQueryException extends RuntimeException {
    */
   public XQueryException(final String msg) {
     super(new QueryException(msg));
+  }
+
+  /**
+   * Constructor.
+   * @param msg message
+   * @param cause cause
+   */
+  public XQueryException(final String msg, final Throwable cause) {
+    super(new QueryException(msg).cause(cause));
   }
 
   /**

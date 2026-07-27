@@ -267,8 +267,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
       throw SERPARAM_X.getIO(ex);
     } catch(final ArrayIndexOutOfBoundsException ex) {
       // might occur if serialized result is too large
-      Util.debug(ex);
-      throw BASEX_ERROR_X.getIO(ex.getLocalizedMessage());
+      throw BASEX_ERROR_X.getIO(ex.getLocalizedMessage()).cause(ex);
     }
     return ao;
   }

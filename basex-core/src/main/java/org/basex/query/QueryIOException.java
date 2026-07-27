@@ -30,6 +30,16 @@ public final class QueryIOException extends IOException {
   }
 
   /**
+   * Attaches the throwable that caused this error to the wrapped query exception.
+   * @param th cause (can be {@code null})
+   * @return self reference
+   */
+  public QueryIOException cause(final Throwable th) {
+    cause.cause(th);
+    return this;
+  }
+
+  /**
    * Returns the query exception.
    * @param info input info (can be {@code null})
    * @return query exception
