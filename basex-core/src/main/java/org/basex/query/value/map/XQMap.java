@@ -213,7 +213,7 @@ public abstract class XQMap extends XQStruct {
   }
 
   @Override
-  public final XQMap materialize(final Predicate<Data> test, final InputInfo ii,
+  public XQMap materialize(final Predicate<Data> test, final InputInfo ii,
       final QueryContext qc) throws QueryException {
 
     if(materialized(test, ii)) return this;
@@ -227,7 +227,7 @@ public abstract class XQMap extends XQStruct {
   }
 
   @Override
-  public final boolean materialized(final Predicate<Data> test, final InputInfo ii)
+  public boolean materialized(final Predicate<Data> test, final InputInfo ii)
       throws QueryException {
     return funcType().declType.type.instanceOf(BasicType.ANY_ATOMIC_TYPE) ||
         test((key, value) -> value.materialized(test, ii));

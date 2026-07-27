@@ -407,6 +407,29 @@ public final class RecordType extends MapType {
   }
 
   /**
+   * Indicates if this record type is free of initializing expressions, i.e. of references to the
+   * query in which it was declared.
+   * @return result of check
+   */
+  public boolean detached() {
+    for(final RecordField rf : fields.values()) {
+      if(rf.init() != null) return false;
+    }
+    return true;
+  }
+
+  /**
+   * Returns a version of this record type that can be attached to a materialized value.
+   * @return record type without initializing expressions
+   */
+  public RecordType detach() {
+    if(detached()) return this;
+    final TokenObjectMap<RecordField> map = new TokenObjectMap<>(fields.size());
+    for(final byte[] key : fields) map.put(key, new RecordField(fields.get(key).seqType()));
+    return new RecordType(sealed, map, name, anns);
+  }
+
+  /**
    * Creates a new compile-time instance of the record type. The result is not sealed, as it is
    * produced by map operations such as {@code map:put}.
    * @param remove key to remove (can be {@code null})
