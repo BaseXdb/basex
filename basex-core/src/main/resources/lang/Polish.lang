@@ -324,6 +324,7 @@ run_tests            = Uruchom testy
 save                 = Zapisz
 save_as              = Zapisz jako
 save_before_execute  = Zapisz przed wykonaniem pliku
+save_copy_as         = Zapisz kopię jako
 scroll_tabs          = Jednowierszowe karty edytora
 select_all           = Zaznacz wszystko
 separator            = Separator

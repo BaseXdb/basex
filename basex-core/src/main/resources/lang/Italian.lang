@@ -324,6 +324,7 @@ run_tests            = Esegui test
 save                 = Salva
 save_as              = Salva come
 save_before_execute  = Salva prima di eseguire il file
+save_copy_as         = Salva una copia come
 scroll_tabs          = Scorrere tabs dell'editor
 select_all           = Seleziona tutto
 separator            = Separatore

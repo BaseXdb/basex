@@ -324,6 +324,7 @@ run_tests            = Tests ausführen
 save                 = Speichern
 save_as              = Speichern unter
 save_before_execute  = Speichere Dateien vor der Ausführung
+save_copy_as         = Kopie speichern unter
 scroll_tabs          = Einzeilige Editorenreiter
 select_all           = Alles markieren
 separator            = Trennzeichen

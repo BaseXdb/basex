@@ -324,6 +324,7 @@ run_tests            = Rulare teste
 save                 = Salvare
 save_as              = Salvează ca
 save_before_execute  = Salveaza inainte sa executi fisierul
+save_copy_as         = Salvează o copie ca
 scroll_tabs          = Scroll editor tabs
 select_all           = Selectare totală
 separator            = Separator

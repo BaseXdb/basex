@@ -190,21 +190,42 @@ public final class EditorArea extends TextPanel {
   boolean save(final IOFile io) {
     final boolean rename = io != file;
     if(rename || modified || !opened) {
-      try {
-        final byte[] text = getText();
-        final boolean xquery = io.hasSuffix(IO.XQSUFFIXES);
-        final boolean library = xquery && QueryParser.isLibrary(Token.string(text));
-        io.write(text);
-        file(io, true);
-        view.project.save(io, rename, xquery, library);
-        view.gui.saveOptions();
-        return true;
-      } catch(final Exception ex) {
-        Util.debug(ex);
-        BaseXDialog.error(gui, Util.info(FILE_NOT_SAVED_X, io));
-      }
+      if(!write(io, rename)) return false;
+      file(io, true);
+      return true;
     }
     return false;
+  }
+
+  /**
+   * Saves a copy of the editor contents, leaving the assigned file untouched.
+   * @param io file to save
+   * @return success flag
+   */
+  boolean saveCopy(final IOFile io) {
+    return write(io, true);
+  }
+
+  /**
+   * Writes the editor contents to the specified file.
+   * @param io file to write
+   * @param rename file has been renamed
+   * @return success flag
+   */
+  private boolean write(final IOFile io, final boolean rename) {
+    try {
+      final byte[] text = getText();
+      final boolean xquery = io.hasSuffix(IO.XQSUFFIXES);
+      final boolean library = xquery && QueryParser.isLibrary(Token.string(text));
+      io.write(text);
+      view.project.save(io, rename, xquery, library);
+      view.gui.saveOptions();
+      return true;
+    } catch(final Exception ex) {
+      Util.debug(ex);
+      BaseXDialog.error(gui, Util.info(FILE_NOT_SAVED_X, io));
+      return false;
+    }
   }
 
   /**

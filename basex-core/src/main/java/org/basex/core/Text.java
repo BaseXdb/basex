@@ -1013,6 +1013,8 @@ public interface Text {
   /** Command info. */
   String SAVE_AS = lang("save_as");
   /** Command info. */
+  String SAVE_COPY_AS = lang("save_copy_as");
+  /** Command info. */
   String PACKAGES = lang("packages");
   /** Command info. */
   String SHOW_HIDDEN_FILES = lang("show_hidden_files");

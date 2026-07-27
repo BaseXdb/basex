@@ -324,6 +324,7 @@ run_tests            = Тестүүдийг ажиллуулах
 save                 = Хадгалах
 save_as              = Файлын хадгалах байршил сонгох
 save_before_execute  = Файлыг ажиллуулахаас өмнө хадгалах
+save_copy_as         = Хуулбарыг өөр нэрээр хадгалах
 scroll_tabs          = Scroll editor tabs
 select_all           = Бүгдийг сонгох
 separator            = Тусгаарлагч

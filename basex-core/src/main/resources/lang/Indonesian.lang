@@ -324,6 +324,7 @@ run_tests            = Jalankan pengujian
 save                 = Simpan
 save_as              = Simpan sebagai
 save_before_execute  = Simpan sebelum mengeksekusi berkas
+save_copy_as         = Simpan salinan sebagai
 scroll_tabs          = Scroll editor tabs
 select_all           = Pilih Semua
 separator            = Pemisah
