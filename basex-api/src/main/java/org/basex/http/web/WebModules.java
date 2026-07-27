@@ -131,7 +131,7 @@ public final class WebModules {
     if(funcs.size() == 1) return first;
 
     // show error if we are left with multiple function candidates
-    throw first.path == null ?
+    throw error != null ?
       first.error(ERROR_CONFLICT_X_X, error, toString(funcs)) :
       first.error(PATH_CONFLICT_X_X, first.path, toString(funcs));
   }

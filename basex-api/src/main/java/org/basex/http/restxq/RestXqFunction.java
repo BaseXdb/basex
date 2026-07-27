@@ -77,8 +77,8 @@ public final class RestXqFunction extends WebFunction {
   private QNm requestBody;
 
   /** Error (can be {@code null}). */
-  private RestXqError error;
-  /** Error (can be {@code null}). */
+  RestXqError error;
+  /** Permission (can be {@code null}). */
   private RestXqPerm permission;
 
   /**
@@ -98,6 +98,7 @@ public final class RestXqFunction extends WebFunction {
     boolean found = false;
 
     AnnList starts = AnnList.EMPTY;
+    Ann pathAnn = null;
     for(final Ann ann : function.anns) {
       final Annotation def = ann.definition;
       if(def == null) continue;
@@ -107,7 +108,7 @@ public final class RestXqFunction extends WebFunction {
       if(def == _REST_PATH) {
         try {
           path = new WebPath(toString(value.itemAt(0)), ann.info, BASEX_RESTXQ_X);
-          starts = starts.attach(ann);
+          pathAnn = ann;
         } catch(final IllegalArgumentException ex) {
           throw error(ann.info, ex.getMessage());
         }
@@ -170,6 +171,9 @@ public final class RestXqFunction extends WebFunction {
         }
       }
     }
+
+    // a path combined with error annotations restricts the scope of the error handler
+    if(pathAnn != null && error == null) starts = starts.attach(pathAnn);
 
     // check validity of quality factors
     for(final MediaType produce : produces) {
@@ -276,11 +280,13 @@ public final class RestXqFunction extends WebFunction {
     if(!methodMatches || !consumes(conn) || !produces(conn)) return false;
 
     if(perm) return permission != null && permission.matches(conn);
-    if(err != null) return error != null && error.matches(err);
+    // an error handler with a path is limited to errors that are raised under this path
+    if(err != null) return error != null && error.matches(err) &&
+        (path == null || path.matches(conn.path()));
 
     // a method-agnostic target is not triggered by OPTIONS requests (preflight, run as admin)
     final boolean optionsPreflight = methods.isEmpty() && conn.method.equals(Method.OPTIONS.name());
-    return !optionsPreflight && path != null && path.matches(conn.path());
+    return !optionsPreflight && error == null && path != null && path.matches(conn.path());
   }
 
   /**
@@ -315,8 +321,12 @@ public final class RestXqFunction extends WebFunction {
   @Override
   public int compareTo(final WebFunction func) {
     if(!(func instanceof final RestXqFunction rxf)) return -1;
+    if(error != null) {
+      final int diff = path == null ? rxf.path == null ? 0 : 1 :
+        rxf.path == null ? -1 : path.compareTo(rxf.path);
+      return diff != 0 ? diff : error.compareTo(rxf.error);
+    }
     if(path != null) return path.compareTo(rxf.path);
-    if(error != null) return error.compareTo(rxf.error);
     return permission.compareTo(rxf.permission);
   }
 
