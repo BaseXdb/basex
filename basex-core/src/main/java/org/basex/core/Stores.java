@@ -36,6 +36,9 @@ public final class Stores implements Closeable {
   /** Database context. */
   private final Context context;
 
+  /** WebDAV locks (in-memory only, not persisted). */
+  private XQMap locks = XQMap.empty();
+
   /**
    * Constructor.
    * @param context database context
@@ -128,6 +131,27 @@ public final class Stores implements Closeable {
     } finally {
       updating.remove(name);
     }
+  }
+
+  /**
+   * Returns the WebDAV locks.
+   * @return locks
+   */
+  public synchronized XQMap locks() {
+    return locks;
+  }
+
+  /**
+   * Atomically replaces the WebDAV locks.
+   * @param func function that maps the current locks to the new ones
+   * @return {@code true} if the locks have changed
+   * @throws QueryException query exception
+   */
+  public synchronized boolean locks(final QueryFunction<XQMap, XQMap> func) throws QueryException {
+    final XQMap map = func.apply(locks);
+    if(map == locks) return false;
+    locks = map;
+    return true;
   }
 
   /**

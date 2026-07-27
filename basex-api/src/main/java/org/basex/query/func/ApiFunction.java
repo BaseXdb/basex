@@ -11,6 +11,7 @@ import org.basex.query.func.request.*;
 import org.basex.query.func.rest.*;
 import org.basex.query.func.session.*;
 import org.basex.query.func.sessions.*;
+import org.basex.query.func.webdav.*;
 import org.basex.query.func.ws.*;
 import org.basex.query.util.*;
 import org.basex.query.value.type.*;
@@ -177,6 +178,15 @@ public enum ApiFunction implements AFunction {
   /** XQuery function. */
   _SESSIONS_SET(SessionsSet::new, "set(id,key,value)",
       params(STRING_O, STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, SESSIONS_URI, Perm.ADMIN),
+
+  // WebDAV Module (internal: lock storage for the WebDAV service)
+
+  /** XQuery function. */
+  _WEBDAV_LOCKS(WebDAVLocks::new, "locks()",
+      params(), WebDAVLocks.LOCKS, WEBDAV_URI),
+  /** XQuery function. */
+  _WEBDAV_LOCK_UPDATE(WebDAVLockUpdate::new, "lock-update(update)",
+      params(FuncType.get(WebDAVLocks.LOCKS, WebDAVLocks.LOCKS).seqType()), BOOLEAN_O, WEBDAV_URI),
 
   // WebSocket Module
 

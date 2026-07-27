@@ -43,7 +43,7 @@ function page:start(
           documentation.</p>
 
         <h2>RESTXQ &amp; WebSockets</h2>
-        <p>These sample applications are built entirely in XQuery with
+        <p>These applications are built entirely in XQuery with
           <a href='https://docs.basex.org/main/RESTXQ'>RESTXQ</a>.
           Their source is yours to read: a starting point for your own
           web applications.</p>
@@ -65,6 +65,11 @@ function page:start(
         <p><b>Work with your databases straight over HTTP</b></p>
         <p>Read, add, replace and delete documents, and run queries.
           All with ordinary web requests, no extra tooling required. Try it <a href='rest'>here</a>.</p>
+
+        <h2>WebDAV</h2>
+        <p><b>Your databases as a file system</b></p>
+        <p>Browse and edit resources with your file manager or XML editor.
+          Databases appear as folders below <a href='webdav'>/webdav</a>.</p>
       </main>
       <hr/>
       <footer class='right'><sup>BaseX Team, BSD License</sup></footer>
