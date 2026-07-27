@@ -325,6 +325,7 @@ run_tests            = Exécuter les tests
 save                 = Enregistrer
 save_as              = Enregistrer sous
 save_before_execute  = Enregistrer avant d’exécuter le fichier
+save_copy_as         = Enregistrer une copie sous
 scroll_tabs          = Défiler les onglets de l’éditeur
 select_all           = Sélectionner tout
 separator            = Séparateur

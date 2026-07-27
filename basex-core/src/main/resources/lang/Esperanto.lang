@@ -325,6 +325,7 @@ run_tests            = Plenumi testojn
 save                 = Konservi
 save_as              = Konservi kiel
 save_before_execute  = Konservi antaŭ plenumo de dosiero
+save_copy_as         = Konservi kopion kiel
 scroll_tabs          = Unuliniaj redaktilaj langetoj
 select_all           = Elekti ĉion
 separator            = Apartigilo

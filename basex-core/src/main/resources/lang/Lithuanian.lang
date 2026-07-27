@@ -325,6 +325,7 @@ run_tests            = Vykdyti testus
 save                 = Įrašyti
 save_as              = Įrašyti kaip
 save_before_execute  = Įrašyti prieš vykdant failą
+save_copy_as         = Įrašyti kopiją kaip
 scroll_tabs          = Vienos eilutės redaktoriaus kortelės
 select_all           = Pažymėti viską
 separator            = Skirtukas

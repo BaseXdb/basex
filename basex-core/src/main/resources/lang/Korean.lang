@@ -325,6 +325,7 @@ run_tests            = 테스트 실행
 save                 = 저장
 save_as              = 다른 이름으로 저장
 save_before_execute  = 파일 실행 전 저장
+save_copy_as         = 사본을 다른 이름으로 저장
 scroll_tabs          = 한 줄 편집기 탭
 select_all           = 모두 선택
 separator            = 구분 기호

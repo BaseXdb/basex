@@ -325,6 +325,7 @@ run_tests            = Testleri çalıştır
 save                 = Kaydet
 save_as              = Farklı kaydet
 save_before_execute  = Dosyayı çalıştırmadan önce kaydet
+save_copy_as         = Kopyasını farklı kaydet
 scroll_tabs          = Tek satır editör sekmeleri
 select_all           = Tümünü seç
 separator            = Ayırıcı
