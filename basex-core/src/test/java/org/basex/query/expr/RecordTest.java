@@ -121,6 +121,14 @@ public final class RecordTest extends SandboxTest {
     query("let $r as record(a) := { 'a': 1 } return map:get($r, 'b', 99)", 99);
   }
 
+  /** Field lookup in a filter that is copied while the context is inlined. */
+  @Test public void recordGetInlined() {
+    query("let $rs as record(a as xs:integer)* := ({ 'a': 1 }, { 'a': 2 }) "
+        + "return $rs ! .[?a = 1]?a", 1);
+    query("declare function local:f($rs as record(a)*) { $rs[?a = 1] }; "
+        + "local:f(({ 'a': 1 }, { 'a': 2 }))?a", 1);
+  }
+
   /** The {@code +:=} (record put) operator. */
   @Test public void recordPut() {
     query("let $r as record(a, b) := { 'a': 1, 'b': 2 } return $r +:= { 'b': 9 }",

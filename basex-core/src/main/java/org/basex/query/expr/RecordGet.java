@@ -30,8 +30,20 @@ public final class RecordGet extends Single {
    * @param index index of record entry (starting with 1)
    */
   public RecordGet(final InputInfo info, final Expr record, final int index) {
+    this(info, record, index, (RecordType) record.seqType().type);
+  }
+
+  /**
+   * Constructor.
+   * @param info input info (can be {@code null})
+   * @param record record expression
+   * @param index index of record entry (starting with 1)
+   * @param type type of processed record
+   */
+  private RecordGet(final InputInfo info, final Expr record, final int index,
+      final RecordType type) {
     super(info, record, Types.ITEM_ZM);
-    this.type = (RecordType) record.seqType().type;
+    this.type = type;
     this.index = index;
   }
 
@@ -48,7 +60,7 @@ public final class RecordGet extends Single {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
-    return copyType(new RecordGet(info, expr.copy(cc, vm), index));
+    return copyType(new RecordGet(info, expr.copy(cc, vm), index, type));
   }
 
   @Override
