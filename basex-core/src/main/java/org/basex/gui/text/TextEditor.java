@@ -507,17 +507,13 @@ public final class TextEditor {
    * @param select selection flag
    */
   void rowStart(final int p, final boolean select) {
-    startSelection(select);
-
-    final int c = pos;
-    pos = p;
+    int t = p;
     // first row of a line: move to first non-whitespace character, or back to the row start
     if(p == 0 || text[p - 1] == '\n') {
-      while(FTToken.ws(curr()) && curr() != '\n') forward(select);
-      if(pos == c) pos = p;
+      while(t < size() && text[t] != '\n' && FTToken.ws(text[t])) t++;
+      if(t == pos) t = p;
     }
-
-    if(select) endSelection();
+    moveTo(t, select);
   }
 
   /**
@@ -526,21 +522,12 @@ public final class TextEditor {
    * @param select selection flag
    */
   void rowEnd(final int p, final boolean select) {
-    startSelection(select);
-
-    pos = p;
+    int t = p;
     // wrapped row: skip trailing whitespace, as the position is shared with the next row
-    if(curr() != '\n') {
-      int c = p;
-      while(pos > 0) {
-        final int ch = prev();
-        if(ch == '\n' || !FTToken.ws(ch)) break;
-        c = pos;
-      }
-      pos = c;
+    if(p < size() && text[p] != '\n') {
+      while(t > 0 && text[t - 1] != '\n' && FTToken.ws(text[t - 1])) t--;
     }
-
-    if(select) endSelection();
+    moveTo(t, select);
   }
 
   /**

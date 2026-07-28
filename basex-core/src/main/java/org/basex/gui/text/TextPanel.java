@@ -688,11 +688,10 @@ public class TextPanel extends BaseXPanel {
     if(p == -1) {
       if(end) editor.lineEnd(select);
       else editor.lineStart(select);
-    } else if(end) {
-      editor.rowEnd(p, select);
-    } else {
-      editor.rowStart(p, select);
+      return;
     }
+    if(end) editor.rowEnd(p, select);
+    else editor.rowStart(p, select);
   }
 
   /** Computes the height of the text and updates the scroll bar. */
