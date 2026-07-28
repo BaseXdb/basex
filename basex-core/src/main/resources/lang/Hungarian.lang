@@ -154,6 +154,7 @@ global_options       = Globális beállítások
 go_back              = Menj vissza
 go_forward           = Menj előre
 go_home              = Kezdőoldal
+go_to_declaration    = Ugrás a deklarációra
 go_to_line           = Ugrás a sorra
 go_up                = Menj felfelé
 granted_%_%          = % biztosítva neki: '%'.

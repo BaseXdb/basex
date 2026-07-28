@@ -154,6 +154,7 @@ global_options       = Algemene instellingen
 go_back              = Ga terug
 go_forward           = Ga vooruit
 go_home              = Ga naar home
+go_to_declaration    = Spring naar declaratie
 go_to_line           = Spring naar regel
 go_up                = Ga omhoog
 granted_%_%          = % toegewezen aan '%'.

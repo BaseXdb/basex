@@ -154,6 +154,7 @@ global_options       = Глобальные настройки
 go_back              = Назад
 go_forward           = Вперед
 go_home              = Домой
+go_to_declaration    = Перейти к объявлению
 go_to_line           = Перейти к строке
 go_up                = Наверх
 granted_%_%          = Привилегия % установлена пользователю '%'

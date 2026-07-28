@@ -927,6 +927,8 @@ public interface Text {
   /** Command info. */
   String GO_TO_LINE = lang("go_to_line");
   /** Command info. */
+  String GO_TO_DECLARATION = lang("go_to_declaration");
+  /** Command info. */
   String COLORS = lang("colors");
   /** Command info. */
   String CUT = lang("cut");

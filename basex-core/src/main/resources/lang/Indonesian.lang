@@ -154,6 +154,7 @@ global_options       = Opsi umum
 go_back              = Menuju ke belakang
 go_forward           = Menuju ke depan
 go_home              = Menuju ke rumah
+go_to_declaration    = Menuju ke deklarasi
 go_to_line           = Menuju ke baris
 go_up                = Menuju ke atas
 granted_%_%          = % diberikan kepada '%'.

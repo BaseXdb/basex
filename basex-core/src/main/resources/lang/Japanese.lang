@@ -154,6 +154,7 @@ global_options       = グローバルオプション
 go_back              = 戻る
 go_forward           = 進む
 go_home              = ホームへ
+go_to_declaration    = 宣言へ
 go_to_line           = 指定行へ
 go_up                = 上へ
 granted_%_%          = % を '%' に与えました。

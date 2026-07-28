@@ -154,6 +154,7 @@ global_options       = Globale Optionen
 go_back              = Zurück
 go_forward           = Weiter
 go_home              = Wurzelknoten
+go_to_declaration    = Gehe zu Deklaration
 go_to_line           = Gehe zu Zeile
 go_up                = Hoch
 granted_%_%          = % zugewiesen an '%'.

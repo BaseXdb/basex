@@ -154,6 +154,7 @@ global_options       = 전역 옵션
 go_back              = 뒤로
 go_forward           = 앞으로
 go_home              = 홈으로
+go_to_declaration    = 선언으로 이동
 go_to_line           = 줄로 이동
 go_up                = 위로
 granted_%_%          = %이(가) '%'에 부여되었습니다.

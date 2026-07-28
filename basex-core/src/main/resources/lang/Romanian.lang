@@ -154,6 +154,7 @@ global_options       = Opțiuni globale
 go_back              = Mergi inapoi
 go_forward           = Mergi inainte
 go_home              = Home
+go_to_declaration    = Mergi la declaraţia
 go_to_line           = Mergi la linia
 go_up                = Mai sus
 granted_%_%          = % acordat lui '%'.

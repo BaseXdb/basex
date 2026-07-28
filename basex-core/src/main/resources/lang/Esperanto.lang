@@ -154,6 +154,7 @@ global_options       = Mallokaj opcioj
 go_back              = Reen
 go_forward           = Antaŭen
 go_home              = Al la hejmo
+go_to_declaration    = Iri al deklaracio
 go_to_line           = Iri al linio
 go_up                = Supren
 granted_%_%          = % donita al '%'.

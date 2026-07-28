@@ -154,6 +154,7 @@ global_options       = 全局选项
 go_back              = 后退
 go_forward           = 前进
 go_home              = 首页
+go_to_declaration    = 跳转到声明
 go_to_line           = 跳转到
 go_up                = 向上
 granted_%_%          = % 被授权给了 '%'

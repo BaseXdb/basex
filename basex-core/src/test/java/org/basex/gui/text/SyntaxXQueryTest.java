@@ -6,6 +6,7 @@ import java.awt.*;
 
 import org.basex.gui.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -201,6 +202,42 @@ public final class SyntaxXQueryTest {
       }
     }
     assertEquals(expected, sb.toString(), query);
+  }
+
+  /** Function and variable declarations. */
+  @Test public void declarations() {
+    declarations("declare function local:f() { 1 };", "local:f 1");
+    declarations("declare variable $x := 1;", "$x 1");
+    declarations("declare variable $local:X external;", "$local:X 1");
+    // annotations and their arguments are skipped, including numeric ones
+    declarations("declare %private function f() {};", "f 1");
+    declarations("declare %rest:GET %rest:query-param('p', '{$p}', 1) function f($p) {};", "f 1");
+    declarations("declare updating function f() {};", "f 1");
+    // other prolog declarations are skipped
+    declarations("declare namespace a = 'b'; declare option db:chop 'true';");
+    declarations("declare default function namespace 'a';");
+    declarations("declare context item as function(*) external;");
+    // declarations in strings and comments are ignored
+    declarations("'declare function f()'");
+    declarations("(: declare function f() :)");
+    // the line of each declaration is returned
+    declarations("declare function a() {};\ndeclare\n  variable $b := 1;", "a 1", "$b 3");
+  }
+
+  /**
+   * Compares the declarations of a query with the expected ones.
+   * @param query query string
+   * @param expected expected declarations (name, followed by the line)
+   */
+  private static void declarations(final String query, final String... expected) {
+    final Syntax syntax = new SyntaxXQuery();
+    syntax.init(PLAIN);
+
+    final StringList names = new StringList();
+    for(final Declaration declaration : syntax.declarations(Token.token(query))) {
+      names.add(declaration.name() + ' ' + declaration.line());
+    }
+    assertArrayEquals(expected, names.finish(), query);
   }
 
   /**

@@ -76,6 +76,15 @@ final class SyntaxXQuery extends SyntaxMarkup {
   /** Mode: URI of an EQName ({@code Q{...}}). */
   private static final int EQNAME = MODES + 7;
 
+  /** Declaration scan: outside a declaration. */
+  private static final int OUTSIDE = 0;
+  /** Declaration scan: after the {@code declare} keyword. */
+  private static final int DECLARED = 1;
+  /** Declaration scan: after the {@code function} keyword. */
+  private static final int FUNCTION_NAME = 2;
+  /** Declaration scan: after the {@code variable} keyword. */
+  private static final int VARIABLE_NAME = 3;
+
   // initialize keywords
   static {
     try {
@@ -316,6 +325,75 @@ final class SyntaxXQuery extends SyntaxMarkup {
       if(text[p] == '{') return text[p - 1] == 'Q' ? p : -1;
     }
     return -1;
+  }
+
+  @Override
+  boolean hasDeclarations() {
+    return true;
+  }
+
+  @Override
+  ArrayList<Declaration> declarations(final byte[] text) {
+    final ArrayList<Declaration> declarations = new ArrayList<>();
+    reset();
+
+    // start and line of the current name, nesting depth of the arguments of an annotation
+    int begin = -1, beginLine = 1, line = 1, scan = OUTSIDE, depth = 0;
+    boolean annotation = false;
+
+    final int tl = text.length;
+    for(int p = 0; p < tl;) {
+      final int cl = cl(text, p), ch = cp(text, p);
+      color(text, p, p + cl);
+
+      // a colon continues a name if it separates prefix and local name
+      final boolean code = code(), nc = code && (XMLToken.isNCChar(ch) ||
+        ch == ':' && begin != -1 && XMLToken.isNCStartChar(cp(text, p + cl)));
+      if(nc) {
+        if(begin == -1) {
+          begin = p;
+          beginLine = line;
+        }
+      } else {
+        if(begin != -1) {
+          final String word = string(text, begin, p - begin);
+          switch(scan) {
+            case OUTSIDE -> {
+              if(DECLARE.equals(word)) {
+                scan = DECLARED;
+                depth = 0;
+              }
+            }
+            case DECLARED -> {
+              // the name and the arguments of an annotation are no prolog keywords
+              if(annotation || depth > 0) {
+                annotation = false;
+              } else if(FUNCTION.equals(word)) {
+                scan = FUNCTION_NAME;
+              } else if(VARIABLE.equals(word)) {
+                scan = VARIABLE_NAME;
+              } else if(!UPDATING.equals(word)) {
+                scan = OUTSIDE;
+              }
+            }
+            default -> {
+              final String name = scan == VARIABLE_NAME ? '$' + word : word;
+              declarations.add(new Declaration(name, begin, beginLine));
+              scan = OUTSIDE;
+            }
+          }
+          begin = -1;
+        }
+        if(code && scan == DECLARED) {
+          if(ch == '%') annotation = true;
+          else if(ch == '(') depth++;
+          else if(ch == ')' && depth > 0) depth--;
+        }
+      }
+      if(ch == '\n') line++;
+      p += cl;
+    }
+    return declarations;
   }
 
   @Override

@@ -154,6 +154,7 @@ global_options       = Visuotinės parinktys
 go_back              = Atgal
 go_forward           = Pirmyn
 go_home              = Į pradžią
+go_to_declaration    = Eiti į deklaraciją
 go_to_line           = Eiti į eilutę
 go_up                = Aukštyn
 granted_%_%          = % suteikta naudotojui „%“.

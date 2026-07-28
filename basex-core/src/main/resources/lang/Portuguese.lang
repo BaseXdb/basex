@@ -154,6 +154,7 @@ global_options       = Opções globais
 go_back              = Voltar
 go_forward           = Avançar
 go_home              = Ir para o início
+go_to_declaration    = Ir para a declaração
 go_to_line           = Ir para a linha
 go_up                = Subir
 granted_%_%          = % concedido a '%'.

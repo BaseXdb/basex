@@ -58,6 +58,8 @@ public final class EditorView extends View {
   final ProjectView project;
   /** Test button. */
   final AbstractButton test;
+  /** Declaration button. */
+  private final AbstractButton declaration;
 
   /** History Button. */
   private final AbstractButton history;
@@ -115,6 +117,8 @@ public final class EditorView extends View {
     final AbstractButton openB = BaseXButton.command(GUIMenuCmd.C_EDIT_OPEN, gui);
     final AbstractButton saveB = BaseXButton.get("c_save", SAVE, false, gui);
     final AbstractButton find = search.button(FIND_REPLACE);
+    declaration = BaseXButton.get("c_declarations", BaseXLayout.addShortcut(GO_TO_DECLARATION,
+        BaseXKeys.GOTODECL.toString()), false, gui);
     final AbstractButton vars = BaseXButton.command(GUIMenuCmd.C_EXTERNAL_VARIABLES, gui);
     final AbstractButton go = BaseXButton.command(GUIMenuCmd.C_GO, gui);
 
@@ -137,6 +141,7 @@ public final class EditorView extends View {
     buttons.add(test);
     buttons.addSeparator();
     buttons.add(find);
+    buttons.add(declaration);
 
     context = new BaseXLabel("").resize(1.25f);
     context.setForeground(darkGray);
@@ -196,6 +201,7 @@ public final class EditorView extends View {
 
     info.addMouseListener((MouseClickedListener) e -> markError(true));
     test.addActionListener(e -> run(getEditor(), Action.TEST));
+    declaration.addActionListener(e -> getEditor().gotoDeclaration());
     tabs.addChangeListener(e -> {
       final EditorArea ea = getEditor();
       if(ea == null) return;
@@ -222,6 +228,7 @@ public final class EditorView extends View {
   public void refreshMark() {
     final EditorArea edit = getEditor();
     test.setEnabled(edit.file().hasSuffix(IO.XQSUFFIXES) && !edit.modified());
+    declaration.setEnabled(edit.hasDeclarations());
   }
 
   @Override

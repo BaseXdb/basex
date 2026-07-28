@@ -127,13 +127,13 @@ public class TextPanel extends BaseXPanel {
       new GUICommand[] {
         new FindCmd(), new FindNextCmd(), new FindPrevCmd(),
         new MatchCaseCmd(), new WholeWordCmd(), new RegExCmd(), new DotAllCmd(), null,
-        new GotoCmd(), null,
+        new GotoCmd(), new DeclarationCmd(), null,
         new UndoCmd(), new RedoCmd(), null,
         new AllCmd(), new CutCmd(), new CopyCmd(), new PasteCmd(), new DelCmd() } :
       new GUICommand[] {
         new FindCmd(), new FindNextCmd(), new FindPrevCmd(),
         new MatchCaseCmd(), new WholeWordCmd(), new RegExCmd(), new DotAllCmd(), null,
-        new GotoCmd(), null,
+        new GotoCmd(), new DeclarationCmd(), null,
         new AllCmd(), new CopyCmd() }
     );
 
@@ -1030,6 +1030,17 @@ public class TextPanel extends BaseXPanel {
     public boolean enabled(final GUI main) { return search != null; }
   }
 
+  /** Go to declaration. */
+  private class DeclarationCmd extends GUIPopupCmd {
+    /** Constructor. */
+    DeclarationCmd() { super(Text.GO_TO_DECLARATION + Text.DOTS, GOTODECL); }
+
+    @Override
+    public void execute() { gotoDeclaration(); }
+    @Override
+    public boolean enabled(final GUI main) { return hasDeclarations(); }
+  }
+
   /**
    * Jumps to a specific line.
    */
@@ -1051,6 +1062,34 @@ public class TextPanel extends BaseXPanel {
       ++line;
     }
     setCaret(pos);
+    gui.editor.posCode.invokeLater();
+  }
+
+  /**
+   * Indicates if the current text can have function and variable declarations.
+   * @return result of check
+   */
+  public final boolean hasDeclarations() {
+    return rend.getSyntax().hasDeclarations();
+  }
+
+  /**
+   * Returns the function and variable declarations of the current text.
+   * @return declarations
+   */
+  private ArrayList<Declaration> declarations() {
+    return rend.getSyntax().declarations(editor.text());
+  }
+
+  /**
+   * Jumps to a declaration of the current text.
+   */
+  public final void gotoDeclaration() {
+    // the keyboard shortcut bypasses the enabled state of the button and the menu entry
+    if(!hasDeclarations()) return;
+
+    // the caret follows the selection and stays where the dialog leaves it
+    DialogDeclaration.show(gui, declarations(), getCaret(), this::setCaret);
     gui.editor.posCode.invokeLater();
   }
 

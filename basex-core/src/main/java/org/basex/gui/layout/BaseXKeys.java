@@ -82,6 +82,7 @@ public enum BaseXKeys {
   /** Go home.               */ GOHOME(ALT, VK_HOME),
 
   /** Go to line.            */ GOTOLINE(META, VK_L),
+  /** Go to declaration.     */ GOTODECL(META | SHIFT, VK_O),
 
   // Find
 

@@ -154,6 +154,7 @@ global_options       = Глобал сонголтууд
 go_back              = Буцах
 go_forward           = Урагшлуулах
 go_home              = Эхлэл рүү буцах
+go_to_declaration    = Зарлалт руу очих
 go_to_line           = Мөр рүү очих
 go_up                = Дээшлүүлэх
 granted_%_%          = % нь '%'-нд баталгаажсан.
