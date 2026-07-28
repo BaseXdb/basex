@@ -502,6 +502,17 @@ public final class TextEditor {
   }
 
   /**
+   * Moves the cursor to the specified position.
+   * @param p caret position
+   * @param select selection flag
+   */
+  void moveTo(final int p, final boolean select) {
+    startSelection(select);
+    pos = p;
+    if(select) endSelection();
+  }
+
+  /**
    * Adds a string at the current position.
    * @param str string
    */

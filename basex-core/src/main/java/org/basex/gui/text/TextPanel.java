@@ -588,19 +588,19 @@ public class TextPanel extends BaseXPanel {
     } else if(LINEEND.is(e)) {
       editor.lineEnd(shift);
     } else if(PREVPAGE_RO.is(e) && !hist.active()) {
-      lc = editor.linesUp(getHeight() / fh, false, lastCol);
+      lc = moveCaret(-(getHeight() / fh), false);
       down = false;
     } else if(NEXTPAGE_RO.is(e) && !hist.active()) {
-      lc = editor.linesDown(getHeight() / fh, false, lastCol);
+      lc = moveCaret(getHeight() / fh, false);
     } else if(PREVPAGE.is(e) && !sc(e)) {
-      lc = editor.linesUp(getHeight() / fh, shift, lastCol);
+      lc = moveCaret(-(getHeight() / fh), shift);
       down = false;
     } else if(NEXTPAGE.is(e) && !sc(e)) {
-      lc = editor.linesDown(getHeight() / fh, shift, lastCol);
+      lc = moveCaret(getHeight() / fh, shift);
     } else if(NEXTLINE.is(e) && !MOVEDOWN.is(e)) {
-      lc = editor.linesDown(1, shift, lastCol);
+      lc = moveCaret(1, shift);
     } else if(PREVLINE.is(e) && !MOVEUP.is(e)) {
-      lc = editor.linesUp(1, shift, lastCol);
+      lc = moveCaret(-1, shift);
       down = false;
     } else if(NEXTCHAR.is(e)) {
       editor.next(shift);
@@ -610,7 +610,7 @@ public class TextPanel extends BaseXPanel {
     } else {
       consumed = false;
     }
-    lastCol = lc == Integer.MIN_VALUE ? -1 : lc;
+    lastX = lc == Integer.MIN_VALUE ? -1 : lc;
 
     // edit text
     if(hist.active()) {
@@ -659,6 +659,24 @@ public class TextPanel extends BaseXPanel {
     }
   }
 
+  /**
+   * Moves the caret up or down by the specified number of rendered rows.
+   * @param count number of rows (negative: upwards)
+   * @param select selection flag
+   * @return new horizontal position, or {@code -1} if the text has not been rendered yet
+   */
+  private int moveCaret(final int count, final boolean select) {
+    final int[] caret = rend.caretRows(count, lastX);
+    // no rendered text: fall back to logical lines
+    if(caret == null) {
+      if(count < 0) editor.linesUp(-count, select, -1);
+      else editor.linesDown(count, select, -1);
+      return -1;
+    }
+    editor.moveTo(caret[0], select);
+    return caret[1];
+  }
+
   /** Computes the height of the text and updates the scroll bar. */
   private final GUICode computeHeight = new GUICode() {
     @Override
@@ -692,7 +710,7 @@ public class TextPanel extends BaseXPanel {
   }
 
   /** Last horizontal position. */
-  private int lastCol = -1;
+  private int lastX = -1;
 
   @Override
   public void keyTyped(final KeyEvent e) {
