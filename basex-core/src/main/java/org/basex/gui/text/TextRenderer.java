@@ -705,23 +705,55 @@ final class TextRenderer extends BaseXBack {
    */
   int[] caretRows(final int count, final int lastX) {
     final Graphics g = getGraphics();
-    if(g == null) return null;
+    final TextIterator iter = caretIter(g);
+    if(iter == null) return null;
 
-    // locate caret: x position and top of its row
-    TextIterator iter = init(g, true);
+    // x position of the caret, and top of the target row
+    final int cpos = iter.caret();
+    final int xPos = lastX != -1 ? lastX : x + font.stringWidth(iter.substring(iter.pos(), cpos));
+    final int yPos = y - fontHeight + count * fontHeight;
+    return new int[] { scan(g, xPos, yPos).pos(), xPos };
+  }
+
+  /**
+   * Returns the caret position at the beginning or end of the rendered row with the caret.
+   * @param end end of row
+   * @return caret position, or {@code -1} if the text has not been rendered yet
+   */
+  int caretRow(final boolean end) {
+    final Graphics g = getGraphics();
+    if(caretIter(g) == null) return -1;
+    final int yPos = y - fontHeight;
+    return scan(g, end ? Integer.MAX_VALUE : 0, yPos).pos();
+  }
+
+  /**
+   * Initializes the renderer and moves the iterator to the rendered row with the caret.
+   * @param g graphics reference (can be {@code null})
+   * @return text iterator, or {@code null} if the text has not been rendered yet
+   */
+  private TextIterator caretIter(final Graphics g) {
+    if(g == null) return null;
+    final TextIterator iter = init(g, true);
     if(width - offset <= 0) return null;
-    final int cpos = iter.caret(), idx = lineIndex(cpos);
+    final int idx = lineIndex(iter.caret());
     if(idx >= 0) position(iter, idx, 0);
     for(; more(iter, g) && !iter.edited(); next(iter));
-    final int xPos = lastX != -1 ? lastX :
-      x + font.stringWidth(iter.substring(iter.pos(), cpos));
-    final int yPos = y - fontHeight + count * fontHeight;
+    return iter;
+  }
 
-    // resolve the text position in the target row
-    iter = init(g, true);
+  /**
+   * Initializes the renderer and moves the iterator to the text at the specified coordinates.
+   * @param g graphics reference
+   * @param xPos x position
+   * @param yPos y position (top of the rendered row)
+   * @return text iterator
+   */
+  private TextIterator scan(final Graphics g, final int xPos, final int yPos) {
+    final TextIterator iter = init(g, true);
     if(cache.valid(text.size(), width)) position(iter, cache.indexByY(yPos), 0);
     scan(iter, g, xPos, yPos);
-    return new int[] { iter.pos(), xPos };
+    return iter;
   }
 
   /**

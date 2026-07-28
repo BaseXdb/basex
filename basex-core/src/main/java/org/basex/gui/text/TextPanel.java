@@ -583,10 +583,10 @@ public class TextPanel extends BaseXPanel {
     } else if(TEXTEND.is(e)) {
       editor.textEnd(shift);
     } else if(LINESTART.is(e)) {
-      editor.lineStart(shift);
+      moveRow(false, shift);
       down = false;
     } else if(LINEEND.is(e)) {
-      editor.lineEnd(shift);
+      moveRow(true, shift);
     } else if(PREVPAGE_RO.is(e) && !hist.active()) {
       lc = moveCaret(-(getHeight() / fh), false);
       down = false;
@@ -675,6 +675,24 @@ public class TextPanel extends BaseXPanel {
     }
     editor.moveTo(caret[0], select);
     return caret[1];
+  }
+
+  /**
+   * Moves the caret to the beginning or end of the rendered row.
+   * @param end end of row
+   * @param select selection flag
+   */
+  private void moveRow(final boolean end, final boolean select) {
+    final int p = rend.caretRow(end);
+    // no rendered text: fall back to logical lines
+    if(p == -1) {
+      if(end) editor.lineEnd(select);
+      else editor.lineStart(select);
+    } else if(end) {
+      editor.rowEnd(p, select);
+    } else {
+      editor.rowStart(p, select);
+    }
   }
 
   /** Computes the height of the text and updates the scroll bar. */
