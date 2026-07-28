@@ -57,7 +57,7 @@ public final class RestXqFunction extends WebFunction {
   final ArrayList<WebParam> headerParams = new ArrayList<>();
 
   /** Supported methods. */
-  final Set<String> methods = new HashSet<>();
+  public final Set<String> methods = new HashSet<>();
   /** Permissions (can be empty). */
   final TokenList allows = new TokenList();
 

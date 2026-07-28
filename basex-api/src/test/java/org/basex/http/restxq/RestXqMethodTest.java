@@ -83,6 +83,23 @@ public final class RestXqMethodTest extends RestXqTest {
   }
 
   /**
+   * Method annotations.
+   * @throws Exception exception
+   */
+  @Test public void methodAgnostic() throws Exception {
+    // function with method annotation is preferred
+    register("declare %R:GET %R:path('') function m:f() { 'get' }; "
+        + "declare %R:path('') function m:g() { 'any' };");
+    get("get", "");
+    assertEquals("any", send(200, "RETRIEVE", null, null, ""));
+
+    // more specific path is preferred
+    register("declare %R:GET %R:path('{$x}') function m:f($x) { 'get' }; "
+        + "declare %R:path('a') function m:g() { 'any' };");
+    get("any", "a");
+  }
+
+  /**
    * {@code %HEAD} method.
    * @throws Exception exception
    */
