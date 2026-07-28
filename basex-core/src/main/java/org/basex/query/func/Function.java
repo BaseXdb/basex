@@ -707,8 +707,8 @@ public enum Function implements AFunction {
   TAIL(FnTail::new, "tail(input)",
       params(ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
-  TAKE_WHILE(FnTakeWhile::new, "take-while(input[,predicate])",
-      params(ITEM_ZM, PREDICATE_O.with(Occ.ZERO_OR_ONE)), ITEM_ZM),
+  TAKE_WHILE(FnTakeWhile::new, "take-while(input,predicate)",
+      params(ITEM_ZM, PREDICATE_O), ITEM_ZM),
   /** XQuery function. */
   TIMEZONE_FROM_DATE(FnTimezoneFromDate::new, "timezone-from-date(value)",
       params(DATE_ZO), DAY_TIME_DURATION_ZO),
@@ -2002,10 +2002,6 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _UPDATE_OUTPUT(UpdateOutput::new, "output(input)",
       params(ITEM_ZM), EMPTY_SEQUENCE_Z, flag(UPD), UPDATE_URI),
-  /** XQuery function. */
-  _UPDATE_REPLACE(UpdateReplace::new, "replace(input,target,value)",
-      params(NODE_O, FuncType.get(GNODE_ZM, NODE_O).seqType(),
-      FuncType.get(ITEM_ZM, NODE_O).seqType()), NODE_O, flag(NDT), UPDATE_URI),
 
   // User Module
 

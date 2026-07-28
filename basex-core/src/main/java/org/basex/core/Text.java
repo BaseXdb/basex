@@ -371,10 +371,10 @@ public interface Text {
     lang("c_info21") + NL +
     LI + lang("c_info22") + NL +
     LI + CmdInfo.DATABASE + COLS + lang("c_info23") + NL +
-    LI + CmdInfo.INDEX + " [" + CmdIndexInfo.TEXT + '|' + CmdIndexInfo.ATTRIBUTE + '|' +
+    LI + CmdInfo.INDEX + " ([" + CmdIndexInfo.TEXT + '|' + CmdIndexInfo.ATTRIBUTE + '|' +
       CmdIndexInfo.TOKEN + '|' + CmdIndexInfo.FULLTEXT + '|' + CmdIndexInfo.PATH + '|' +
-      CmdIndexInfo.ELEMNAME + '|' + CmdIndexInfo.ATTRNAME + "]" + COLS + lang("c_info24") + NL +
-    LI + CmdInfo.STORAGE + " [start end] | [" + S_QUERY + "]: " + lang("c_info25")
+      CmdIndexInfo.ELEMNAME + '|' + CmdIndexInfo.ATTRNAME + "])" + COLS + lang("c_info24") + NL +
+    LI + CmdInfo.STORAGE + " ([start] ([end]))" + COLS + lang("c_info25")
   };
   /** Command help. */
   String[] HELPCLOSE = {
@@ -386,7 +386,7 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPDIR = {
-    '[' + S_PATH  + ']', lang("c_dir1"), lang("c_dir2")
+    "([" + S_PATH  + "])", lang("c_dir1"), lang("c_dir2")
   };
   /** Command help. */
   String[] HELPDROP = {
@@ -427,7 +427,7 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPRUN = {
-    '[' + S_PATH + ']', lang("c_run1"), lang("c_run2", S_PATH)
+    "[file]", lang("c_run1"), lang("c_run2", "file")
   };
   /** Command help. */
   String[] HELPTEST = {
@@ -439,7 +439,7 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPKILL = {
-    '[' + S_NAME + ']', lang("c_kill1"), lang("c_kill2")
+    "[target]", lang("c_kill1"), lang("c_kill2")
   };
   /** Command help. */
   String[] HELPRENAME = {
@@ -483,7 +483,7 @@ public interface Text {
     "  " + lang("c_alterbackup") + NL +
     LI + CmdAlter.DATABASE + " [" + S_NAME + "] [newname]" + NL +
     "  " + lang("c_alterdb") + NL +
-    LI + CmdAlter.PASSWORD + " [" + S_NAME + "] [" + S_PW + ']' + NL +
+    LI + CmdAlter.PASSWORD + " [" + S_NAME + "] ([" + S_PW + "])" + NL +
     "  " + lang("c_alterpw") + NL +
     LI + CmdAlter.USER  + " [" + S_NAME + "] ([newname]):" + NL +
     "  " + lang("c_alteruser")

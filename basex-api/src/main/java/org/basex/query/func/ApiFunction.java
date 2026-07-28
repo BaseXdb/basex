@@ -221,7 +221,7 @@ public enum ApiFunction implements AFunction {
   _WS_PING(WsPing::new, "ping(id)",
       params(STRING_O), EMPTY_SEQUENCE_Z, WS_URI),
   /** XQuery function. */
-  _WS_SEND(WsSend::new, "send(message[,ids])",
+  _WS_SEND(WsSend::new, "send(message,ids)",
       params(ITEM_O, STRING_ZM), EMPTY_SEQUENCE_Z, WS_URI),
   /** XQuery function. */
   _WS_SET(WsSet::new, "set(id,key,value)",

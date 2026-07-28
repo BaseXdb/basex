@@ -5233,7 +5233,7 @@ public class QueryParser extends InputParser {
       }
       if(curr == ':' && next() == ')') {
         pos += 2;
-        if(!nested && moduleDoc.isEmpty()) {
+        if(!nested && moduleDoc.isEmpty() && !documented()) {
           moduleDoc = docBuilder.toString().trim();
           docBuilder.reset();
         }
@@ -5242,6 +5242,22 @@ public class QueryParser extends InputParser {
       if(xqdoc) docBuilder.add(curr);
     }
     throw error(COMCLOSE);
+  }
+
+  /**
+   * Checks if a declaration follows that adopts the documentation of a comment.
+   * @return result of check
+   */
+  private boolean documented() {
+    final int p = pos;
+    consumeWS();
+    boolean found = consume(DECLARE);
+    if(found) {
+      consumeWS();
+      found = current() == '%' || consume(FUNCTION) || consume(VARIABLE);
+    }
+    pos = p;
+    return found;
   }
 
   /**
