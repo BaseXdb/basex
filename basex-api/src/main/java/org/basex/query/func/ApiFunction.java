@@ -40,6 +40,9 @@ public enum ApiFunction implements AFunction {
   _REQUEST_ATTRIBUTE_NAMES(RequestAttributeNames::new, "attribute-names()",
       params(), STRING_ZM, REQUEST_URI),
   /** XQuery function. */
+  _REQUEST_BODY(RequestBody::new, "body()",
+      params(), BASE64_BINARY_ZO, REQUEST_URI),
+  /** XQuery function. */
   _REQUEST_CONTEXT_PATH(RequestContextPath::new, "context-path()",
       params(), STRING_O, REQUEST_URI),
   /** XQuery function. */
