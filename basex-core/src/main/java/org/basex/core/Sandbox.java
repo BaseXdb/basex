@@ -38,11 +38,11 @@ public abstract class Sandbox {
   private static final String BASEURI = new File(".").getAbsolutePath();
 
   /** Database port. */
-  protected static final int DB_PORT = 9996;
+  protected static final int DB_PORT = 9863;
   /** HTTP stop port. */
-  protected static final int STOP_PORT = 9999;
+  protected static final int STOP_PORT = 9864;
   /** HTTP port. */
-  protected static final int HTTP_PORT = 9998;
+  protected static final int HTTP_PORT = 9865;
 
   /** REST identifier. */
   protected static final String REST = "rest";
