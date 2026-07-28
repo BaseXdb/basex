@@ -2,6 +2,7 @@ package org.basex.query.expr.path;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -27,7 +28,15 @@ public final class DynamicStep extends Single {
   }
 
   @Override
+  public void checkUp() throws QueryException {
+    expr.checkUp();
+  }
+
+  @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
+    // updating expressions are no JNode selectors
+    if(expr.has(Flag.UPD)) return expr;
+
     // if(. instance of node()) then E else child::{ E }
     final Expr ctx = new ContextValue(info).optimize(cc);
     final Expr cond = new Instance(info, ctx, Types.NODE_O).optimize(cc);
