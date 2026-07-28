@@ -130,6 +130,19 @@ public final class Prop {
   }
 
   /**
+   * Returns the home directory of the specified directory or of one of its ancestors.
+   * @param path directory path
+   * @return home directory (can be {@code null})
+   */
+  public static String homeDir(final String path) {
+    for(IOFile io = new IOFile(path); io != null; io = io.parent()) {
+      final String home = configDir(io.path());
+      if(home != null) return dir(home);
+    }
+    return null;
+  }
+
+  /**
    * Returns the application directory.
    * @param location location of application (can be {@code null})
    * @return application directory (can be {@code null})
