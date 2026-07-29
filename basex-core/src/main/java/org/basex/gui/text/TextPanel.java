@@ -39,8 +39,8 @@ public class TextPanel extends BaseXPanel {
   /** Text editor. */
   public final TextEditor editor;
   /** Undo history. */
-
   public final History hist;
+
   /** Text caret. */
   private final Timer caretTimer;
   /** Renderer reference. */
@@ -53,12 +53,12 @@ public class TextPanel extends BaseXPanel {
   /** Search bar. */
   protected SearchBar search;
   /** Link listener (can be {@code null}). */
+  private LinkListener linkListener;
   /** Edit listener (can be {@code null}). */
   private EditListener editListener;
-  private LinkListener linkListener;
 
-  private int clicks;
   /** Last number of mouse clicks. */
+  private int clicks;
   /** Last horizontal position. */
   private int lastX = -1;
 
@@ -113,8 +113,8 @@ public class TextPanel extends BaseXPanel {
 
     add(rend, BorderLayout.CENTER);
     add(scroll, BorderLayout.EAST);
-    hist = new History(editable ? EMPTY : null);
 
+    hist = new History(editable ? EMPTY : null);
     setText(text);
     // the initial text is no undoable change
     if(editable) hist.init(editor.text());
@@ -340,6 +340,7 @@ public class TextPanel extends BaseXPanel {
   public final void setLinkListener(final LinkListener ll) {
     linkListener = ll;
   }
+
   /**
    * Installs an edit listener.
    * @param el edit listener
@@ -354,7 +355,6 @@ public class TextPanel extends BaseXPanel {
   private void edited() {
     if(editListener != null) editListener.edited();
   }
-
 
   /**
    * Installs a search bar.
@@ -516,6 +516,7 @@ public class TextPanel extends BaseXPanel {
    */
   private void select(final Point point, final boolean start) {
     editor.select(rend.jump(point).pos(), start);
+    editor.atRowEnd(rend.rowEnd());
     rend.repaint();
   }
 
@@ -613,15 +614,15 @@ public class TextPanel extends BaseXPanel {
     }
     lastX = lc == Integer.MIN_VALUE ? -1 : lc;
 
-    boolean edited = false;
     // edit text
+    boolean edited = false;
     if(hist.active()) {
       if(COMPLETE.is(e)) {
         complete();
         return;
       }
-      edited = true;
 
+      edited = true;
       if(MOVEDOWN.is(e)) {
         editor.move(true);
       } else if(MOVEUP.is(e)) {
@@ -677,6 +678,7 @@ public class TextPanel extends BaseXPanel {
       return -1;
     }
     editor.moveTo(caret[0], select);
+    editor.atRowEnd(rend.rowEnd());
     return caret[1];
   }
 
@@ -695,6 +697,7 @@ public class TextPanel extends BaseXPanel {
     }
     if(end) editor.rowEnd(p, select);
     else editor.rowStart(p, select);
+    editor.atRowEnd(rend.rowEnd());
   }
 
   /** Computes the height of the text and updates the scroll bar. */

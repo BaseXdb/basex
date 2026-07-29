@@ -66,6 +66,8 @@ public final class TextEditor {
   private int lines = -1;
   /** Caret/edit position. */
   private int pos;
+  /** Caret position at the end of a rendered row ({@code -1} if the caret is elsewhere). */
+  private int rowEndPos = -1;
 
   /**
    * Constructor.
@@ -534,6 +536,24 @@ public final class TextEditor {
       while(t > 0 && text[t - 1] != '\n' && FTToken.ws(text[t - 1])) t--;
     }
     moveTo(t, select);
+  }
+
+  /**
+   * Indicates if the caret is placed at the end of a rendered row. A wrapped row shares this
+   * position with the next one, which is where the caret would otherwise be rendered.
+   * @return result of check
+   */
+  boolean atRowEnd() {
+    return rowEndPos == pos;
+  }
+
+  /**
+   * Remembers if the caret is placed at the end of a rendered row. As the position is recorded,
+   * any subsequent caret movement discards the flag.
+   * @param rowEnd flag
+   */
+  void atRowEnd(final boolean rowEnd) {
+    rowEndPos = rowEnd ? pos : -1;
   }
 
   /**

@@ -64,6 +64,16 @@ final class TextRenderer extends BaseXBack {
   private int y;
   /** Current y position of rendered line. */
   private int lineY;
+  /** Current x position of the row that was left by the last line break. */
+  private int rowX;
+  /** Current y position of the row that was left by the last line break. */
+  private int rowY;
+  /** Current y position of the rendered line that was left by the last line break. */
+  private int rowLineY;
+  /** Indicates if the current token was moved to a new row. */
+  private boolean wrapped;
+  /** Indicates if the last scan stopped at the end of a row. */
+  private boolean rowEnd;
   /** Current line number. */
   private int line;
   /** Indicates if the cursor is located in the current line. */
@@ -138,7 +148,7 @@ final class TextRenderer extends BaseXBack {
 
     stringWidth = 0;
     final int s = iter.pos();
-    if(caret && s == iter.caret()) drawCaret(g, x);
+    if(caret && s == iter.caret()) drawCaret(g, x, lineY);
     if(s == iter.errorPos()) drawError(g);
 
     drawLinesSep(g);
@@ -413,10 +423,25 @@ final class TextRenderer extends BaseXBack {
   int cursorY() {
     final Graphics g = getGraphics();
     final TextIterator iter = init(g, true);
+    toCaretRow(iter, g);
+    return y - fontHeight;
+  }
+
+  /**
+   * Moves the iterator to the rendered row with the caret.
+   * @param iter text iterator
+   * @param g graphics reference (can be {@code null})
+   */
+  private void toCaretRow(final TextIterator iter, final Graphics g) {
     final int idx = lineIndex(iter.caret());
     if(idx >= 0) position(iter, idx, 0);
     for(; more(iter, g) && !iter.edited(); next(iter));
-    return y - fontHeight;
+    // the caret is rendered at the end of the previous row: adopt that row
+    if(atRowEnd(iter)) {
+      x = rowX;
+      y = rowY;
+      lineY = rowLineY;
+    }
   }
 
   /**
@@ -426,10 +451,12 @@ final class TextRenderer extends BaseXBack {
    * @return {@code true}} if more strings exist
    */
   private boolean more(final TextIterator iter, final Graphics g) {
+    wrapped = false;
     // no valid graphics reference, no more words found: quit
     final int w = width, maxWidth = w - offset;
     if(g == null || maxWidth <= 0 || !iter.moreStrings(w >> 2)) return false;
 
+    final int oldY = y;
     String s = iter.currString();
     int sw = 0;
 
@@ -464,6 +491,7 @@ final class TextRenderer extends BaseXBack {
     // no space left: move current string into next line
     if(sw < maxWidth && sw > w - x) newline(true);
 
+    wrapped = y != oldY;
     currString = s;
     stringWidth = sw;
     return true;
@@ -475,6 +503,10 @@ final class TextRenderer extends BaseXBack {
    */
   private void newline(final boolean full) {
     final int h = fontHeight >> (full ? 0 : 1);
+    // remember the end of the row that is left behind
+    rowX = x;
+    rowY = y;
+    rowLineY = lineY;
     x = offset;
     y += h;
     lineY += h;
@@ -589,8 +621,11 @@ final class TextRenderer extends BaseXBack {
       }
       // underline linked text
       if(link) g.drawLine(x, y + 1, x + stringWidth, y + 1);
-      // show cursor
-      if(caret && iter.edited()) drawCaret(g, x + font.stringWidth(iter.substring(pos, cpos)));
+      // show cursor: a wrapped token shares its first position with the end of the previous row
+      if(caret && iter.edited()) {
+        if(atRowEnd(iter)) drawCaret(g, rowX, rowLineY);
+        else drawCaret(g, x + font.stringWidth(iter.substring(pos, cpos)), lineY);
+      }
     }
 
     // finish step
@@ -615,15 +650,25 @@ final class TextRenderer extends BaseXBack {
   }
 
   /**
+   * Indicates if the caret is to be rendered at the end of the previous row.
+   * @param iter text iterator
+   * @return result of check
+   */
+  private boolean atRowEnd(final TextIterator iter) {
+    return wrapped && iter.rowEnd() && iter.pos() == iter.caret();
+  }
+
+  /**
    * Paints the text cursor.
    * @param g graphics reference
    * @param xx x position
+   * @param yy y position
    */
-  private void drawCaret(final Graphics g, final int xx) {
+  private void drawCaret(final Graphics g, final int xx, final int yy) {
     g.setColor(GUIConstants.darkGray);
-    g.fillRect(xx, lineY, 2, fontHeight);
+    g.fillRect(xx, yy, 2, fontHeight);
     cursor[0] = xx;
-    cursor[1] = lineY + fontHeight;
+    cursor[1] = yy + fontHeight;
   }
 
   /**
@@ -691,6 +736,8 @@ final class TextRenderer extends BaseXBack {
         break;
       }
     }
+    // the scan walked past the target row: its last position is shared with the next row
+    rowEnd = y - fontHeight > yPos;
   }
 
   /**
@@ -733,9 +780,7 @@ final class TextRenderer extends BaseXBack {
     if(g == null) return null;
     final TextIterator iter = init(g, true);
     if(width - offset <= 0) return null;
-    final int idx = lineIndex(iter.caret());
-    if(idx >= 0) position(iter, idx, 0);
-    for(; more(iter, g) && !iter.edited(); next(iter));
+    toCaretRow(iter, g);
     return iter;
   }
 
@@ -751,6 +796,14 @@ final class TextRenderer extends BaseXBack {
     if(cache.valid(text.size(), width)) position(iter, cache.indexByY(yPos), 0);
     scan(iter, g, xPos, yPos);
     return iter;
+  }
+
+  /**
+   * Indicates if the last scan stopped at the end of a rendered row.
+   * @return result of check
+   */
+  boolean rowEnd() {
+    return rowEnd;
   }
 
   /**

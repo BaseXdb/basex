@@ -21,6 +21,8 @@ final class TextIterator {
   private final int length;
   /** Caret position. */
   private final int caret;
+  /** Indicates if the caret is placed at the end of a rendered row. */
+  private final boolean rowEnd;
   /** Start position of a text selection. */
   private final int start;
   /** End position of a text selection (+1). */
@@ -28,9 +30,9 @@ final class TextIterator {
   /** Start position of an error highlighting. */
   private final int errPos;
   /** Start and end positions of search terms. */
+  private final IntList[] searchResults;
   /** Search results of the current token. */
   private final ArrayList<int[]> results = new ArrayList<>();
-  private final IntList[] searchResults;
 
   /** Current start position. */
   private int pos;
@@ -49,6 +51,7 @@ final class TextIterator {
     text = et.text();
     length = text.length;
     caret = et.pos();
+    rowEnd = et.atRowEnd();
     start = et.start();
     end = et.end();
     errPos = et.error();
@@ -196,6 +199,14 @@ final class TextIterator {
   }
 
   /**
+   * Indicates if the caret is placed at the end of a rendered row.
+   * @return result of check
+   */
+  boolean rowEnd() {
+    return rowEnd;
+  }
+
+  /**
    * Returns a selection range.
    * @return range or {@code null}
    */
@@ -220,8 +231,8 @@ final class TextIterator {
       final int s = starts.get(si), e = ends.get(si);
       if(s >= posEnd) break;
       results.add(new int[] { s, e });
-    searchIndex = results.isEmpty() ? si : si - 1;
     }
+    searchIndex = results.isEmpty() ? si : si - 1;
     return results;
   }
 
