@@ -394,8 +394,8 @@ public final class GUIConstants {
 
     final Color col = COLORS[16];
     color1A = color(darker(r, 110), darker(g, 150), darker(b, 160), 100);
-    color2A = color(col.getRed(), col.getGreen(), col.getBlue(), 50);
-    color3A = color(col.getRed(), col.getGreen(), col.getBlue(), 30);
+    color2A = alpha(col, 50);
+    color3A = alpha(col, 30);
     colormark1A = color(darker(r, 32), darker(g, 160), darker(b, 320), 100);
     colormark2A = color(darker(r, 12), darker(g, 60), darker(b, 120), 100);
 
@@ -451,10 +451,23 @@ public final class GUIConstants {
    */
   private static Color color(final int r, final int g, final int b, final int a) {
     if(dark) {
-      final double l = .2126 * r + .7152 * g + .0722 * b, m = (255 - l) / l;
+      final double l = .2126 * r + .7152 * g + .0722 * b;
+      if(l == 0) return new Color(255, 255, 255, a);
+      final double m = (255 - l) / l;
       return new Color((int) Math.min(255, r * m), (int) Math.min(255, g * m),
           (int) Math.min(255, b * m), a);
     }
     return new Color(r, g, b, a);
+  }
+
+  /**
+   * Assigns an alpha value to an existing color, doubled for dark color modes.
+   * @param color color
+   * @param a alpha component
+   * @return converted color
+   */
+  private static Color alpha(final Color color, final int a) {
+    return new Color(color.getRed(), color.getGreen(), color.getBlue(),
+        dark ? Math.min(255, a << 1) : a);
   }
 }
