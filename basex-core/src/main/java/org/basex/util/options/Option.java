@@ -1,5 +1,7 @@
 package org.basex.util.options;
 
+import org.basex.query.value.type.*;
+
 /**
  * Single option, stored in {@link Options} instances.
  *
@@ -10,13 +12,25 @@ package org.basex.util.options;
 public abstract class Option<O> {
   /** Name. */
   private final String name;
+  /** Required type (can be {@code null}). */
+  private final SeqType seqType;
 
   /**
-   * Constructor without default value.
+   * Constructor without required type.
    * @param name name
    */
   Option(final String name) {
+    this(name, null);
+  }
+
+  /**
+   * Constructor.
+   * @param name name
+   * @param seqType required type (can be {@code null})
+   */
+  Option(final String name, final SeqType seqType) {
     this.name = name;
+    this.seqType = seqType;
   }
 
   /**
@@ -25,6 +39,22 @@ public abstract class Option<O> {
    */
   public final String name() {
     return name;
+  }
+
+  /**
+   * Returns the required type of values that are supplied in option maps.
+   * @return type or {@code null}
+   */
+  public final SeqType seqType() {
+    return seqType != null ? seqType : defaultType();
+  }
+
+  /**
+   * Returns the required type of subclasses that always enforce one.
+   * @return type or {@code null}
+   */
+  SeqType defaultType() {
+    return null;
   }
 
   /**

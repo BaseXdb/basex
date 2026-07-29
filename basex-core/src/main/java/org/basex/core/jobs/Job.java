@@ -249,8 +249,11 @@ public abstract class Job {
       checkStop();
       return op.run();
     } catch(final IOException | InterruptedException ex) {
-      Util.debug(ex);
-      checkStop();
+      try {
+        checkStop();
+      } catch(final JobException je) {
+        throw (JobException) je.initCause(ex);
+      }
       throw ex;
     } finally {
       threads.remove(thread);

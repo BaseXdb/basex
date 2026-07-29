@@ -390,17 +390,18 @@ public class Options implements Iterable<Option<?>> {
    * it will be added as free option.
    * @param name name of option
    * @param value value to be assigned
+   * @param qc query context
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public synchronized void assign(final Item name, final Value value, final InputInfo info)
-      throws QueryException {
+  public synchronized void assign(final Item name, final Value value, final QueryContext qc,
+      final InputInfo info) throws QueryException {
 
     final String nm = name(name, info);
     if(definitions.isEmpty()) {
       free.put(nm, serialize(value, info));
     } else {
-      assign(nm, value, info);
+      assign(nm, value, qc, info);
     }
   }
 
@@ -412,7 +413,12 @@ public class Options implements Iterable<Option<?>> {
    * @throws QueryException query exception
    */
   private static String name(final Item name, final InputInfo info) throws QueryException {
-    if(name instanceof final QNm qnm) return string(qnm.unique());
+    if(name instanceof final QNm qnm) {
+      // implementation-defined options must have a non-absent namespace
+      if(qnm.uri().length == 0) throw INVALIDOPTION_X.get(info,
+          Util.info("Option name has no namespace: '%'.", qnm.local()));
+      return string(qnm.unique());
+    }
     if(name.type.isStringOrUntyped()) return string(name.string(info));
     throw INVALIDOPTION_X_X_X.get(info, BasicType.STRING, name.type, name);
   }
@@ -431,7 +437,7 @@ public class Options implements Iterable<Option<?>> {
       if(item instanceof final XQMap map) {
         map.forEach((key, v) -> {
           if(!tb.isEmpty()) tb.add(',');
-          tb.add(key.string(info)).add('=');
+          tb.add(escape(string(key.string(info)))).add('=');
           if(v.size() != 1) throw INVALIDOPTION_X_X_X.get(info, BasicType.STRING, v.seqType(), v);
           tb.add(string(((Item) v).string(info)).replace(",", ",,"));
         });
@@ -448,6 +454,51 @@ public class Options implements Iterable<Option<?>> {
       }
     }
     return tb.toString();
+  }
+
+  /**
+   * Escapes the delimiters of a key in a flattened map ({@code %} itself, {@code ,} and {@code =})
+   * and characters that may be stripped by whitespace normalization.
+   * Names of options and variables are not affected by this conversion.
+   * @param key key
+   * @return escaped key
+   * @see #unescape(String)
+   */
+  public static String escape(final String key) {
+    final StringBuilder sb = new StringBuilder(key.length());
+    final int kl = key.length();
+    for(int k = 0; k < kl; k++) {
+      final char ch = key.charAt(k);
+      if(ch == '%' || ch == ',' || ch == '=' || ch <= ' ') {
+        sb.append('%').append((char) HEX_TABLE[ch >> 4]).append((char) HEX_TABLE[ch & 0xF]);
+      } else {
+        sb.append(ch);
+      }
+    }
+    return sb.toString();
+  }
+
+  /**
+   * Resolves percent-encoded characters in a key. A percent sign that is not followed by two
+   * hexadecimal digits is adopted as is.
+   * @param key key
+   * @return unescaped key
+   * @see #escape(String)
+   */
+  public static String unescape(final String key) {
+    final StringBuilder sb = new StringBuilder(key.length());
+    final int kl = key.length();
+    for(int k = 0; k < kl; k++) {
+      final char ch = key.charAt(k);
+      final int cp = ch == '%' && k + 2 < kl ? dec(key.charAt(k + 1), key.charAt(k + 2)) : -1;
+      if(cp != -1) {
+        sb.append((char) cp);
+        k += 2;
+      } else {
+        sb.append(ch);
+      }
+    }
+    return sb.toString();
   }
 
   /**
@@ -559,11 +610,12 @@ public class Options implements Iterable<Option<?>> {
   /**
    * Parses and assigns options from the specified map.
    * @param map options map
+   * @param qc query context
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public final synchronized void assign(final XQMap map, final InputInfo info)
-      throws QueryException {
+  public final synchronized void assign(final XQMap map, final QueryContext qc,
+      final InputInfo info) throws QueryException {
     // reject unknown options; exclude supplied options from the suggestions
     if(!definitions.isEmpty() && map.structSize() != 0) {
       final TreeMap<String, Option<?>> defs = new TreeMap<>(definitions);
@@ -574,7 +626,7 @@ public class Options implements Iterable<Option<?>> {
       }
       if(unknown != null) throw INVALIDOPTION_X.get(info, similar(unknown, defs));
     }
-    map.forEach((key, value) -> assign(key, value, info));
+    map.forEach((key, value) -> assign(key, value, qc, info));
   }
 
   /**
@@ -609,10 +661,7 @@ public class Options implements Iterable<Option<?>> {
           if(value2 == null || !s.equals(value2.toString())) list.add(s);
         } else if(!value.equals(value2)) {
           if(value instanceof final Value val) {
-            // quick and dirty: rewrite "A" to A, true() to true, ...
-            for(final Item item : val) {
-              list.add(item.toString().replaceAll("[\"()]", ""));
-            }
+            for(final Item item : val) list.add(lexical(item));
           } else {
             list.add(value.toString());
           }
@@ -624,6 +673,21 @@ public class Options implements Iterable<Option<?>> {
       }
     });
     return sb.toString();
+  }
+
+  /**
+   * Returns the lexical representation of an option value. Options are stored in their lexical
+   * form; values without such a form (maps, arrays, functions) can only occur in option sets
+   * that are never assigned as strings.
+   * @param item item
+   * @return string
+   */
+  private static String lexical(final Item item) {
+    try {
+      return string(item.string(null));
+    } catch(final QueryException ex) {
+      throw Util.notExpected(ex);
+    }
   }
 
   // STATIC METHODS ===============================================================================
@@ -670,6 +734,7 @@ public class Options implements Iterable<Option<?>> {
       try {
         o.assign(value);
       } catch(final BaseXException ex) {
+        Util.debug(ex);
         return Util.message(ex);
       }
       assign.accept(o);
@@ -835,11 +900,12 @@ public class Options implements Iterable<Option<?>> {
    * Assigns the specified name and value.
    * @param name name of option
    * @param value value to be assigned
+   * @param qc query context
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  private synchronized void assign(final String name, final Value value, final InputInfo info)
-      throws QueryException {
+  private synchronized void assign(final String name, final Value value, final QueryContext qc,
+      final InputInfo info) throws QueryException {
 
     final Option<?> option = definitions.get(name);
     if(option == null) {
@@ -847,43 +913,55 @@ public class Options implements Iterable<Option<?>> {
       throw INVALIDOPTION_X.get(info, similar(name));
     }
 
-    final Item item = value.size() == 1 ? (Item) value : null;
     final SeqType st = value.seqType();
     final QueryFunction<Object, QueryException> expected = type ->
       INVALIDOPTION_X_X_X_X.get(info, name, type, st, value);
 
+    // apply coercion rules if a required type is defined (other values are parsed lexically)
+    Value val = value;
+    final SeqType required = option.seqType();
+    if(required != null) {
+      try {
+        val = required.coerce(value, qc, info);
+      } catch(final QueryException ex) {
+        throw ex.error() == INVTYPE_X ? expected.apply(required) : ex;
+      }
+      // empty sequence: reset option to its default value
+      if(val.isEmpty()) {
+        put(option, option.copy());
+        return;
+      }
+    }
+    final Item item = val.size() == 1 ? (Item) val : null;
+
     Object result = null;
-    if(option instanceof final ValueOption vo) {
-      final SeqType est = vo.seqType();
-      if(!st.instanceOf(est)) throw expected.apply(est);
-      result = value;
+    if(option instanceof ValueOption) {
+      result = val;
     } else if(option instanceof BooleanOption) {
-      final Boolean b = item != null ? Strings.toBoolean(string(item.string(info))) : null;
-      if(b == null) throw expected.apply(BasicType.BOOLEAN);
-      result = b;
+      // coercion has already yielded a single boolean
+      result = item.bool(info);
     } else if(option instanceof NumberOption) {
-      if(item == null) throw expected.apply(BasicType.INTEGER);
       result = (int) item.itr(info);
     } else if(option instanceof StringOption) {
-      result = serialize(value, info);
+      result = serialize(val, info);
     } else if(option instanceof StringsOption) {
       final StringList list = new StringList();
-      for(final Item it :  value) list.add(serialize(it, info));
+      for(final Item it :  val) list.add(serialize(it, info));
       result = list.finish();
     } else if(option instanceof NumbersOption) {
       final IntList list = new IntList();
-      for(final Item it :  value) list.add(Strings.toInt(string(it.string(info))));
+      for(final Item it :  val) list.add(Strings.toInt(string(it.string(info))));
       result = list.finish();
     } else if(option instanceof final EnumOption eo) {
-      final String string = normalizeEnum(serialize(value, info));
+      final String string = normalizeEnum(serialize(val, info));
       result = eo.get(string);
       if(result == null) {
-        throw INVALIDOPTION_X.get(info, allowed(eo, string, (Object[]) eo.values()));
+        throw INVALIDOPTIONVALUE_X.get(info, allowed(eo, string, (Object[]) eo.values()));
       }
     } else if(option instanceof final OptionsOption oo) {
       if(!(item instanceof final XQMap map)) throw expected.apply(Types.MAP);
       result = oo.newInstance();
-      ((Options) result).assign(map, info);
+      ((Options) result).assign(map, qc, info);
     }
     put(option, result);
   }
@@ -938,9 +1016,22 @@ public class Options implements Iterable<Option<?>> {
    * @return map
    */
   private static Map<String, String> toMap(final String string) {
-    final HashMap<String, String> map = new HashMap<>();
+    return toMap(string, new HashMap<>(), String::trim);
+  }
+
+  /**
+   * Parses a comma-separated string of key/value pairs. Keys and values are separated by an
+   * equals sign; literal commas in values are duplicated.
+   * @param string string representation
+   * @param map target map (defines the iteration order of the entries)
+   * @param name key conversion
+   * @return supplied map
+   */
+  public static Map<String, String> toMap(final String string, final Map<String, String> map,
+      final UnaryOperator<String> name) {
+
     final StringBuilder key = new StringBuilder(), value = new StringBuilder();
-    final Runnable add = () -> map.put(key.toString().trim(), value.toString());
+    final Runnable add = () -> map.put(name.apply(key.toString()), value.toString());
 
     boolean left = true;
     final int sl = string.length();

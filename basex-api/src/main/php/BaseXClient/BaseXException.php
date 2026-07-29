@@ -1,7 +1,7 @@
 <?php
 /*
  * PHP client for BaseX.
- * Works with BaseX 7.0 and later
+ * Works with BaseX 13.0 and later
  *
  * Documentation: https://docs.basex.org/wiki/Clients
  *

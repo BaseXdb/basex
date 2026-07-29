@@ -4,6 +4,7 @@ import java.nio.*;
 import java.util.concurrent.*;
 
 import org.basex.core.*;
+import org.basex.core.users.*;
 import org.basex.http.*;
 import org.basex.http.web.*;
 import org.basex.query.ann.*;
@@ -59,6 +60,10 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
     // capture request values during the handshake, as the request is recycled afterwards
     requestCtx = new RequestContext(request).detach();
     context = new Context(HTTPContext.get().context(), this);
+    // adopt the user that was authenticated during the handshake
+    if(request.getAttribute(HTTPText.REQUEST_USER) instanceof final User user) {
+      context.user(user);
+    }
   }
 
   /**
@@ -72,8 +77,7 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
       // refuse the upgrade if equally specific paths conflict for an annotation
       if(WebModules.get(ws.context).websocket(ws)) return ws;
     } catch(final Exception ex) {
-      Util.debug(ex);
-      throw new CloseException(StatusCode.ABNORMAL, ex.getMessage());
+      throw new CloseException(StatusCode.ABNORMAL, ex.getMessage(), ex);
     }
     return null;
   }
@@ -88,6 +92,7 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
 
   @Override
   public void onWebSocketError(final Throwable th) {
+    Util.debug(th);
     final String m1 = th.getMessage(), m2 = Util.message(th), msg = m1 != null ? m1 : m2;
     run("[WS-ERROR] " + requestCtx.state().url() + ": " + msg, null,
         () -> findAndProcess(Annotation._WS_ERROR, msg));

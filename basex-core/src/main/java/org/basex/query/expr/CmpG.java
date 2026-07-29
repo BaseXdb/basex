@@ -206,7 +206,7 @@ public class CmpG extends Cmp {
       for(Item item1; (item1 = iter1.next()) != null;) {
         if(ir2 == null) ir2 = exprs[1].atomIter(qc, info);
         for(Item item2; (item2 = qc.next(ir2)) != null;) {
-          if(eval(item1, item2)) return true;
+          if(eval(item1, item2, qc)) return true;
         }
         ir2 = null;
       }
@@ -216,7 +216,7 @@ public class CmpG extends Cmp {
       for(Item item2; (item2 = iter2.next()) != null;) {
         if(ir1 == null) ir1 = exprs[0].atomIter(qc, info);
         for(Item item1; (item1 = qc.next(ir1)) != null;) {
-          if(eval(item1, item2)) return true;
+          if(eval(item1, item2, qc)) return true;
         }
         ir1 = null;
       }
@@ -228,12 +228,14 @@ public class CmpG extends Cmp {
    * Compares a single item.
    * @param item1 first item to be compared
    * @param item2 second item to be compared
+   * @param qc query context
    * @return result of check
    * @throws QueryException query exception
    */
-  final boolean eval(final Item item1, final Item item2) throws QueryException {
+  final boolean eval(final Item item1, final Item item2, final QueryContext qc)
+      throws QueryException {
     if(comparable || item1.comparable(item2) || item1.type.isUntyped() || item2.type.isUntyped()) {
-      return op.eval(item1.compare(item2, null, false, info));
+      return op.eval(item1.compare(item2, null, false, qc, info));
     }
     throw compareError(item1, item2, info);
   }

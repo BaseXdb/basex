@@ -62,8 +62,7 @@ public final class RepoManager {
     try {
       content = io.read();
     } catch(final IOException ex) {
-      Util.debug(ex);
-      throw REPO_NOTFOUND_X.get(info, source);
+      throw REPO_NOTFOUND_X.get(info, source).cause(ex);
     }
 
     try {

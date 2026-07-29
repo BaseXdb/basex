@@ -5,14 +5,12 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 
 /**
- * Option containing a boolean value.
+ * Option containing an XQuery value.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class ValueOption extends Option<Value> {
-  /** Sequence type. */
-  private final SeqType seqType;
   /** Default value. */
   private final Value value;
 
@@ -32,21 +30,12 @@ public final class ValueOption extends Option<Value> {
    * @param value value
    */
   public ValueOption(final String name, final SeqType seqType, final Value value) {
-    super(name);
-    this.seqType = seqType;
+    super(name, seqType);
     this.value = value;
   }
 
   @Override
   public Value value() {
     return value;
-  }
-
-  /**
-   * Returns the expected sequence type.
-   * @return type
-   */
-  public SeqType seqType() {
-    return seqType;
   }
 }

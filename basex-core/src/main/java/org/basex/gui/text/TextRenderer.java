@@ -660,12 +660,23 @@ final class TextRenderer extends BaseXBack {
   TextIterator jump(final Point pos) {
     final Graphics g = getGraphics();
     final TextIterator iter = init(g, false);
+    scan(iter, g, pos.x, pos.y - fontHeight / 5);
+    iter.link(link);
+    return iter;
+  }
 
-    for(final int xPos = pos.x, yPos = pos.y - fontHeight / 5;
-        yPos >= y - fontHeight && more(iter, g); next(iter)) {
-      // skip line
+  /**
+   * Moves the iterator to the text at the specified coordinates.
+   * @param iter text iterator
+   * @param g graphics reference (can be {@code null})
+   * @param xPos x position
+   * @param yPos y position (top of the rendered row)
+   */
+  private void scan(final TextIterator iter, final Graphics g, final int xPos, final int yPos) {
+    for(; yPos >= y - fontHeight && more(iter, g); next(iter)) {
+      // skip row
       if(yPos >= y) continue;
-      // beginning of line
+      // beginning of row
       if(xPos < x) break;
       // token found
       if(xPos < x + stringWidth) {
@@ -683,7 +694,65 @@ final class TextRenderer extends BaseXBack {
         break;
       }
     }
-    iter.link(link);
+  }
+
+  /**
+   * Returns the caret position that is the specified number of rendered rows away from the
+   * current one.
+   * @param count number of rows (negative: upwards)
+   * @param lastX preferred x position, or {@code -1}
+   * @return caret and x position, or {@code null} if the text has not been rendered yet
+   */
+  int[] caretRows(final int count, final int lastX) {
+    final Graphics g = getGraphics();
+    final TextIterator iter = caretIter(g);
+    if(iter == null) return null;
+
+    // x position of the caret, and top of the target row
+    final int cpos = iter.caret();
+    final int xPos = lastX != -1 ? lastX : x + font.stringWidth(iter.substring(iter.pos(), cpos));
+    final int yPos = y - fontHeight + count * fontHeight;
+    return new int[] { scan(g, xPos, yPos).pos(), xPos };
+  }
+
+  /**
+   * Returns the caret position at the beginning or end of the rendered row with the caret.
+   * @param end end of row
+   * @return caret position, or {@code -1} if the text has not been rendered yet
+   */
+  int caretRow(final boolean end) {
+    final Graphics g = getGraphics();
+    if(caretIter(g) == null) return -1;
+    final int yPos = y - fontHeight;
+    return scan(g, end ? Integer.MAX_VALUE : 0, yPos).pos();
+  }
+
+  /**
+   * Initializes the renderer and moves the iterator to the rendered row with the caret.
+   * @param g graphics reference (can be {@code null})
+   * @return text iterator, or {@code null} if the text has not been rendered yet
+   */
+  private TextIterator caretIter(final Graphics g) {
+    if(g == null) return null;
+    final TextIterator iter = init(g, true);
+    if(width - offset <= 0) return null;
+    final int idx = lineIndex(iter.caret());
+    if(idx >= 0) position(iter, idx, 0);
+    for(; more(iter, g) && !iter.edited(); next(iter));
+    return iter;
+  }
+
+  /**
+   * Initializes the renderer and moves the iterator to the text at the specified coordinates.
+   * @param g graphics reference
+   * @param xPos x position
+   * @param yPos y position (top of the rendered row)
+   * @return text iterator
+   */
+  private TextIterator scan(final Graphics g, final int xPos, final int yPos) {
+    final TextIterator iter = init(g, true);
+    if(cache.valid(text.size(), width)) position(iter, cache.indexByY(yPos), 0);
+    scan(iter, g, xPos, yPos);
     return iter;
   }
 

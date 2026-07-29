@@ -165,6 +165,19 @@ public enum GUIMenuCmd implements GUICommand {
     }
   },
 
+  /** Saves a copy of the current editor file. */
+  C_EDIT_SAVE_COPY_AS(SAVE_COPY_AS + DOTS, null, false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.saveCopyAs();
+    }
+
+    @Override
+    public boolean enabled(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWEDITOR);
+    }
+  },
+
   /** Closes the current editor file. */
   C_EDIT_CLOSE(CLOSE, "% W", false, false) {
     @Override

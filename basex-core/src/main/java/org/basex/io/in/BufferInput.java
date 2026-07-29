@@ -3,6 +3,7 @@ package org.basex.io.in;
 import java.io.*;
 
 import org.basex.io.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -212,7 +213,7 @@ public class BufferInput extends InputStream {
     try {
       if(length > -1) {
         // input length is known in advance
-        final int sl = (int) Math.min(Integer.MAX_VALUE, length);
+        final int sl = Array.checkCapacity(length);
         final byte[] bytes = new byte[sl];
         for(int c = 0; c < sl; c++) bytes[c] = (byte) readByte();
         return bytes;

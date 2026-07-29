@@ -863,6 +863,24 @@ public final class FnModuleTest extends SandboxTest {
     query("let $a := reverse((<a/>, <b/>)) return " + func.args(" $a/.", " $a/."), true);
     query("deep-equal(1 to 1000000000, 1 to 1000000000)", true);
     query("deep-equal(1 to 1000000000, 1 to 1000000001)", false);
+
+    // options that are accepted, but cannot take effect in a processor without schema support
+    query(func.args(1, 1, " { 'typed-values': false() }"), true);
+    query(func.args(1, 1, " { 'type-annotations': true() }"), true);
+    query(func.args(1, 1, " { 'type-variety': false() }"), true);
+    // diagnostics
+    query(func.args(1, 1, " { 'debug': true() }"), true);
+    query(func.args(1, 2, " { 'debug': true() }"), false);
+    query(func.args(" ()", " <x/>", " { 'debug': true() }"), false);
+    query(func.args(" (1, 2)", " (1, 2, 3)", " { 'debug': true() }"), false);
+    query(func.args(" <a><b>1</b></a>", " <a><b>2</b></a>", " { 'debug': true() }"), false);
+    // diagnostics are a side effect: the call must not be pre-evaluated
+    check(func.args(1, 2, " { 'debug': true() }"), false, exists(DEEP_EQUAL));
+    check(func.args(1, 2, " { 'debug': false() }"), false, empty(DEEP_EQUAL));
+    check(func.args(1, 2), false, empty(DEEP_EQUAL));
+    // options that were removed
+    error(func.args(1, 1, " { 'false-on-error': true() }"), INVALIDOPTION_X);
+    error(func.args(1, 1, " { 'normalize-space': true() }"), INVALIDOPTION_X);
   }
 
   /** Test method. */
@@ -896,7 +914,7 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" (1 to 100000000) ! 'a'"), "a");
     query("count(" + func.args(" 1 to 100000000") + ')', 100000000);
     check(func.args(" void(1)"), "", root(VOID));
-    check("(1, 3) ! " + func.args(" ."), "1\n3", root(IntSeq.class));
+    check("(1, 3) ! " + func.args(" ."), "1\n3", root(BytSeq.class));
 
     // remove duplicate expressions
     check(func.args(" (1, <_/>, 1)"), "1\n", count(Itr.class, 1));
@@ -981,11 +999,12 @@ public final class FnModuleTest extends SandboxTest {
     final String docWithExtDtd = write.apply("ext-dtd.xml",
         "<!DOCTYPE root SYSTEM 'validate.dtd'><root/>");
     write.apply("validate.dtd", "<!ELEMENT root (#PCDATA)>");
-    query(func.args(docWithExtDtd, " { 'dtd-validation': 'yes', 'trusted': true() }"), "<root/>");
-    error(func.args(docWithExtDtd, " { 'dtd-validation': 'yes', 'trusted': false() }"),
+    query(func.args(docWithExtDtd, " { 'dtd-validation': true(), 'trusted': true() }"), "<root/>");
+    error(func.args(docWithExtDtd, " { 'dtd-validation': true(), 'trusted': false() }"),
         EXTERNALRESOURCE_X);
-    error("xquery:eval(``[" + func.args(docWithExtDtd, " { 'dtd-validation': 'yes', 'trusted': true"
-        + "() }") + "]``, (), {'permission': 'read'})", XQUERY_PERM_X);
+    error("xquery:eval(``[" + func.args(docWithExtDtd,
+        " { 'dtd-validation': true(), 'trusted': true() }") + "]``, (), {'permission': 'read'})",
+        XQUERY_PERM_X);
 
     final String xincDoc = write.apply("xinclude.xml",
         "<?xml version='1.0'?>"
@@ -1375,19 +1394,19 @@ public final class FnModuleTest extends SandboxTest {
         exists(_RANDOM_DOUBLE));
 
     // ensure that builder takes advantage of regularities
-    checkType(func.args(" 0 to 999", " ()", " fn($seq, $i) { $seq, $i }"),
-        new TypeInfo(RangeSeq.class, "xs:integer+", 1000));
-    checkType(func.args(" 0 to 999", " ()", " fn($seq, $i) { $seq, -$i }"),
-        new TypeInfo(RangeSeq.class, "xs:integer+", 1000));
-    checkType(func.args(" 0 to 999", " ()", " fn($seq, $i) { $i, $seq }"),
-        new TypeInfo(RangeSeq.class, "xs:integer+", 1000));
-    checkType(func.args(" 0 to 999", " ()", " fn($seq, $i) { -$i, $seq }"),
-        new TypeInfo(RangeSeq.class, "xs:integer+", 1000));
+    checkType(func.args(" 0 to 4", " ()", " fn($seq, $i) { $seq, $i }"),
+        new TypeInfo(RangeSeq.class, "xs:integer+", 5));
+    checkType(func.args(" 0 to 4", " ()", " fn($seq, $i) { $seq, -$i }"),
+        new TypeInfo(RangeSeq.class, "xs:integer+", 5));
+    checkType(func.args(" 0 to 4", " ()", " fn($seq, $i) { $i, $seq }"),
+        new TypeInfo(RangeSeq.class, "xs:integer+", 5));
+    checkType(func.args(" 0 to 4", " ()", " fn($seq, $i) { -$i, $seq }"),
+        new TypeInfo(RangeSeq.class, "xs:integer+", 5));
 
-    checkType(func.args(" 0 to 9", " ()", " fn($seq, $i) { $seq, 1 }"),
-        new TypeInfo(SingletonSeq.class, "xs:integer+", 10));
-    checkType(func.args(" 0 to 9", " ()", " fn($seq, $i) { 1, $seq }"),
-        new TypeInfo(SingletonSeq.class, "xs:integer+", 10));
+    checkType(func.args(" 0 to 4", " ()", " fn($seq, $i) { $seq, 1 }"),
+        new TypeInfo(SingletonSeq.class, "xs:integer+", 5));
+    checkType(func.args(" 0 to 4", " ()", " fn($seq, $i) { 1, $seq }"),
+        new TypeInfo(SingletonSeq.class, "xs:integer+", 5));
   }
 
   /** Test method. */
@@ -2854,7 +2873,7 @@ return
     check(func.args("abc", 6), "abc   ", empty(func));
 
     error(func.args("abc", 6, " { 'padding': '' }"), INVALIDVALUE_X_X);
-    error(func.args("abc", 6, " { 'side': 'middle' }"), INVALIDOPTION_X);
+    error(func.args("abc", 6, " { 'side': 'middle' }"), INVALIDOPTIONVALUE_X);
     error(func.args("abc", Long.MAX_VALUE), RANGE_X);
   }
 
@@ -2883,7 +2902,7 @@ return
     error(func.args(42), STRBIN_X_X);
     error(func.args("42", 42), INVTYPE_X);
     error(func.args("42", " { '1234': '' }"), INVALIDOPTION_X);
-    error(func.args("42", " { 'heuristics': '5678' }"), INVALIDOPTION_X);
+    error(func.args("42", " { 'heuristics': '5678' }"), INVALIDOPTIONVALUE_X);
     error(func.args("42", " { 'heuristics': 'CHARDET' }"), BASEX_CLASSPATH_X_X);
     error(func.args("42", " { 'heuristics': 'ALL' }"), BASEX_CLASSPATH_X_X);
   }
@@ -3181,20 +3200,22 @@ return
         + "<!ENTITY e SYSTEM '" + path + "'>]>";
     error(func.args(dtd + "<a>&amp;e;</a>", " { 'trusted': false() }"), EXTERNALRESOURCE_X);
     query(func.args(dtd + "<a>&amp;e;</a>", " { 'trusted': true() }"), "<a><b/></a>");
-    query(func.args(dtd + "<a>&amp;e;</a>", " { 'dtd': 'no' }"), "<a/>");
-    query(func.args(dtd + "<a>&amp;e;</a>", " { 'dtd': 'yes', 'trusted': true() }"), "<a><b/></a>");
-    query(func.args(dtd + "<b>&amp;e;</b>", " { 'dtd': 'yes', 'trusted': true() }"), "<b><b/></b>");
-    query(func.args(dtd + "<a><b/></a>", " { 'dtd-validation': 'yes' }"), "<a><b/></a>");
-    query(func.args(dtd + "<a>&amp;e;</a>", " { 'dtd-validation': 'no', 'trusted': true() }"),
+    query(func.args(dtd + "<a>&amp;e;</a>", " { 'dtd': false() }"), "<a/>");
+    query(func.args(dtd + "<a>&amp;e;</a>", " { 'dtd': true(), 'trusted': true() }"),
         "<a><b/></a>");
-    query(func.args(dtd + "<a>&amp;e;</a>", " { 'dtd-validation': 'yes', 'trusted': true() }"),
+    query(func.args(dtd + "<b>&amp;e;</b>", " { 'dtd': true(), 'trusted': true() }"),
+        "<b><b/></b>");
+    query(func.args(dtd + "<a><b/></a>", " { 'dtd-validation': true() }"), "<a><b/></a>");
+    query(func.args(dtd + "<a>&amp;e;</a>", " { 'dtd-validation': false(), 'trusted': true() }"),
         "<a><b/></a>");
-    query(func.args(dtd + "<a>&amp;e;</a>", " { 'dtd-validation': 'yes', 'dtd': 'yes', 'trusted': "
-        + "true() }"), "<a><b/></a>");
+    query(func.args(dtd + "<a>&amp;e;</a>", " { 'dtd-validation': true(), 'trusted': true() }"),
+        "<a><b/></a>");
+    query(func.args(dtd + "<a>&amp;e;</a>",
+        " { 'dtd-validation': true(), 'dtd': true(), 'trusted': true() }"), "<a><b/></a>");
     error(func.args("<!DOCTYPE root SYSTEM 'src/test/resources/validate.dtd'><root/>",
-        " { 'dtd-validation': 'yes', 'trusted': false() }"), EXTERNALRESOURCE_X);
+        " { 'dtd-validation': true(), 'trusted': false() }"), EXTERNALRESOURCE_X);
     query(func.args("<!DOCTYPE root SYSTEM 'src/test/resources/validate.dtd'><root/>",
-        " { 'dtd-validation': 'yes', 'trusted': true() }"), "<root/>");
+        " { 'dtd-validation': true(), 'trusted': true() }"), "<root/>");
     query(func.args("<root xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "
         + "xsi:noNamespaceSchemaLocation='src/test/resources/validate.xsd'/>",
         " { 'xsd-validation': 'strict', 'use-xsi-schema-location': true(), 'trusted': true() }"),
@@ -3202,7 +3223,7 @@ return
         + "xsi:noNamespaceSchemaLocation=\"src/test/resources/validate.xsd\"/>");
 
     query(func.args("<a xmlns:xi='http://www.w3.org/2001/XInclude'><xi:include href='" + path
-        + "'/></a>", " { 'xinclude': 'no' }"), "<a xmlns:xi=\"http://www.w3.org/2001/XInclude\">"
+        + "'/></a>", " { 'xinclude': false() }"), "<a xmlns:xi=\"http://www.w3.org/2001/XInclude\">"
         + "<xi:include href=\"" + path + "\"/></a>");
     error(func.args("<a xmlns:xi='http://www.w3.org/2001/XInclude'><xi:include href='" + path
         + "'/></a>", " { 'xinclude': true(), 'trusted': false() }"), EXTERNALRESOURCE_X);
@@ -3217,7 +3238,7 @@ return
         EXTERNALRESOURCE_X);
 
     error(func.args(dtd + "<b>&amp;e;</b>",
-        " { 'dtd-validation': 'yes', 'trusted': true() }"), DTDVALIDATIONERR_X);
+        " { 'dtd-validation': true(), 'trusted': true() }"), DTDVALIDATIONERR_X);
     error(func.args("<a xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "
         + "xsi:noNamespaceSchemaLocation='src/test/resources/validate.xsd'/>",
         " { 'xsd-validation': 'strict', 'use-xsi-schema-location': true(),"
@@ -3229,9 +3250,9 @@ return
   @Test public void parseXmlFragment() {
     final Function func = PARSE_XML_FRAGMENT;
     query(func.args("<x> <y> </y> </x> <z/>"), "<x> <y> </y> </x> <z/>");
-    query(func.args("<x> <y> </y> </x> <z/>", " { 'strip-space': 'no' }"),
+    query(func.args("<x> <y> </y> </x> <z/>", " { 'strip-space': false() }"),
         "<x> <y> </y> </x> <z/>");
-    query(func.args("<x> <y> </y> </x> <z/>", " { 'strip-space': 'yes' }"),
+    query(func.args("<x> <y> </y> </x> <z/>", " { 'strip-space': true() }"),
         "<x><y/></x><z/>");
     query(func.args("<x:doc xmlns:x='X'/>"), "<x:doc xmlns:x=\"X\"/>");
     query(func.args("<x:doc xmlns:x='X'/>", " { 'stripns': false() }"), "<x:doc xmlns:x=\"X\"/>");
@@ -3778,19 +3799,37 @@ return
     contains(func.args(" <x>a</x>", " { 'method': 'text' }"), "a");
 
     // character maps
-    query(func.args("1;2", " { 'use-character-maps': ';=,,' }"), "1,2");
     query(func.args("1;2", " { 'use-character-maps': { ';': ',' } }"), "1,2");
+    error(func.args("1;2", " { 'use-character-maps': ';=,,' }"), INVALIDOPTION_X_X_X_X);
+    // delimiters and whitespace can be mapped
+    query(func.args("1=2", " { 'use-character-maps': { '=': 'EQ' } }"), "1EQ2");
+    query(func.args("1,2", " { 'use-character-maps': { '1': 'x', ',': 'CM' } }"), "xCM2");
+    query(func.args("1 2", " { 'use-character-maps': { ' ': 'SP' } }"), "1SP2");
+    query(func.args("1%2", " { 'use-character-maps': { '%': 'PC' } }"), "1PC2");
+    query(func.args("1", " { 'use-character-maps': { '1': 'a,b=c' } }"), "a,b=c");
+    error(func.args("1", " { 'use-character-maps': { 'ab': 'x' } }"), SERPARAM_X);
 
     // boolean arguments
-    query(func.args("1", " { 'indent': 'yes' }"), 1);
     query(func.args("1", " { 'indent': false() }"), 1);
     query(func.args("1", " { 'indent': true() }"), 1);
-    query(func.args("1", " { 'indent': 1 }"), 1);
-    error(func.args("1", " { 'indent': 2 }"), INVALIDOPTION_X);
+    query(func.args("1", " { 'indent': xs:untypedAtomic('true') }"), 1);
+    query(func.args("1", " { 'indent': () }"), 1);
+    error(func.args("1", " { 'indent': 'yes' }"), INVALIDOPTION_X_X_X_X);
+    error(func.args("1", " { 'indent': 1 }"), INVALIDOPTION_X_X_X_X);
 
     query(func.args("<html/>", " { 'html-version': 5 }"), "&lt;html/&gt;");
     query(func.args("<html/>", " { 'html-version': 5.0 }"), "&lt;html/&gt;");
     query(func.args("<html/>", " { 'html-version': 5.0000 }"), "&lt;html/&gt;");
+    error(func.args("<html/>", " { 'html-version': '5.0' }"), INVALIDOPTION_X_X_X_X);
+
+    // QName arguments
+    query(func.args(" <a>1</a>", " { 'cdata-section-elements': xs:QName('a') }"),
+        "<a><![CDATA[1]]></a>");
+    error(func.args(" <a>1</a>", " { 'cdata-section-elements': 'a' }"), INVALIDOPTION_X_X_X_X);
+
+    // option names: implementation-defined parameters must have a namespace
+    query(func.args("1", " { QName('http://vendor.example.com/', 'xindent'): true() }"), 1);
+    error(func.args("1", " { QName('', 'indent'): true() }"), INVALIDOPTION_X);
 
     query("declare namespace p = 'Q';\n"
         + "declare option output:method 'text';\n"
@@ -4553,6 +4592,54 @@ return
   }
 
   /** Test method. */
+  @Test public void transform() {
+    final Function func = TRANSFORM;
+    final String xsl = "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' "
+        + "version='1.0'><xsl:param name='v'/><xsl:template match='/'>"
+        + "<out><xsl:value-of select='//b'/><xsl:value-of select='$v'/></out>"
+        + "</xsl:template></xsl:stylesheet>";
+    final String opts = " { 'stylesheet-text': \"" + xsl + "\", 'source-node': <a><b>89</b></a>";
+
+    query(func.args(opts + " }") + "?output", "<out>89</out>");
+    query(func.args(opts + ", 'delivery-format': 'serialized', 'serialization-params': "
+        + "{ 'omit-xml-declaration': true() } }") + "?output", "<out>89</out>");
+    query(func.args(opts + ", 'stylesheet-params': { QName('', 'v'): 'X' } }") + "?output",
+        "<out>89X</out>");
+    query("map:keys(" + func.args(opts + ", 'base-output-uri': 'http://x/y' }") + ")",
+        "http://x/y");
+    query(func.args(opts + ", 'post-process': fn($uri, $result) { $uri } }") + "?output",
+        "output");
+
+    // document results are built directly, without serializing and parsing the result
+    final String html = "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' "
+        + "version='1.0'><xsl:output method='html'/><xsl:template match='/'><div><br/></div>"
+        + "</xsl:template></xsl:stylesheet>";
+    query("count(" + func.args(" { 'stylesheet-text': \"" + html + "\", 'source-node': <a/> }")
+        + "?output//br)", 1);
+    final String text = "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' "
+        + "version='1.0'><xsl:template match='/'><xsl:value-of select='//b'/>"
+        + "</xsl:template></xsl:stylesheet>";
+    query(func.args(" { 'stylesheet-text': \"" + text + "\", 'source-node': <a><b>89</b></a> }")
+        + "?output ! (. instance of document-node(), string())", "true\n89");
+    // source documents with multiple roots are not serialized
+    query(func.args(opts.replace("<a><b>89</b></a>", "parse-xml-fragment('<a><b>89</b></a><c/>')")
+        + " }") + "?output", "<out>89</out>");
+
+    // requests that cannot be served by the XSLT processor
+    error(func.args(opts + ", 'initial-template': QName('', 'main') }"), TRANSFORM_PROCESSOR_X);
+    error(func.args(opts + ", 'delivery-format': 'raw' }"), TRANSFORM_PROCESSOR_X);
+    error(func.args(opts + ", 'xslt-version': 99.0 }"), TRANSFORM_PROCESSOR_X);
+    // missing and conflicting options
+    error(func.args(" { }"), TRANSFORM_OPTIONS_X);
+    error(func.args(opts + ", 'stylesheet-location': 'x.xsl' }"), TRANSFORM_OPTIONS_X);
+    // values that are not permitted for an option
+    error(func.args(opts + ", 'delivery-format': 'doc' }"), TRANSFORM_OPTIONS_X);
+    // invalid stylesheet and options
+    error(func.args(" { 'stylesheet-text': '<oops/>', 'source-node': <a/> }"), TRANSFORM_ERROR_X);
+    error(func.args(opts + ", 'unknown': 1 }"), INVALIDOPTION_X);
+  }
+
+  /** Test method. */
   @Test public void translate() {
     final Function func = TRANSLATE;
     query(func.args("a", "a", "b"), "b");
@@ -4755,7 +4842,61 @@ return
   @Test public void xmlToJson() {
     final Function func = XML_TO_JSON;
     query(func.args(" <map xmlns='http://www.w3.org/2005/xpath-functions'>"
-        + "<string key=''>í</string></map>", " { 'indent' : 'no' }"), "{\"\":\"\u00ed\"}");
+        + "<string key=''>í</string></map>", " { 'indent': false() }"), "{\"\":\"\u00ed\"}");
     query(func.args(" <fn:string key='root'>X</fn:string>"), "\"X\"");
+  }
+
+  /** Test method. */
+  @Test public void xsdValidator() {
+    final Function func = XSD_VALIDATOR;
+    final String xsd = "<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'>"
+        + "<xs:element name='distance' type='xs:decimal'/></xs:schema>";
+    final String validator = func.args(" { 'schema': " + xsd + " }");
+    final String valid = "(<distance>8.5</distance>)", invalid = "(<distance>8.5km</distance>)";
+
+    query(validator + "(())", "");
+    query(validator + valid + "?is-valid", true);
+    query(validator + valid + "?typed-node", "<distance>8.5</distance>");
+    query(validator + valid + "?typed-node/parent::node()", "");
+    query(validator + "(document { <distance>8.5</distance> })?typed-node",
+        "<distance>8.5</distance>");
+    query(validator + invalid + "?is-valid", false);
+    query(validator + invalid + "?typed-node", "");
+    query(validator + invalid + "?error-details", "");
+
+    // details on invalidities
+    final String details = func.args(
+        " { 'schema': " + xsd + ", 'return-error-details': true() }");
+    query("exists(" + details + invalid + "?error-details?message)", true);
+    // the result of an invalid document is discarded while it is still being built
+    query("exists(" + details + "(document { <distance>8.5km</distance> })?error-details)", true);
+
+    // namespaces and default values of the validated node
+    final String ns = " { 'schema': <xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema' "
+        + "targetNamespace='urn:t' elementFormDefault='qualified'>"
+        + "<xs:element name='box'><xs:complexType><xs:sequence>"
+        + "<xs:element name='in' type='xs:string'/></xs:sequence>"
+        + "<xs:attribute name='unit' type='xs:string' default='cm'/>"
+        + "</xs:complexType></xs:element></xs:schema> }";
+    query(func.args(ns) + "(<t:box xmlns:t='urn:t'><t:in>x</t:in></t:box>)?typed-node",
+        "<t:box xmlns:t=\"urn:t\" unit=\"cm\"><t:in>x</t:in></t:box>");
+    // comments and processing instructions are preserved
+    query(func.args(ns) + "(<t:box xmlns:t='urn:t'><!--c--><t:in>x</t:in><?p i?></t:box>)"
+        + "?typed-node/node() ! name()", "\nt:in\np");
+    query("count(" + validator + "(document { <!--c-->, <distance>8.5</distance>, <?p i?> })"
+        + "?typed-node/node())", 3);
+
+    // unknown element declaration
+    query(func.args() + "(<unknown/>)?is-valid", false);
+    // features that require a schema-aware processor
+    error(func.args(" { 'validation-mode': 'lax' }"), NOSCHEMAAWARENESS_X);
+    error(func.args(" { 'type': xs:QName('xs:integer') }"), NOSCHEMAAWARENESS_X);
+    error(func.args(" { 'target-namespace': 'http://x.com' }"), NOSCHEMAAWARENESS_X);
+    // invalid schema
+    error(func.args(" { 'schema': <schema/> }"), SCHEMAASSEMBLY_X);
+    // invalid options
+    error(func.args(" { 'validation-mode': 'unknown' }"), INVALIDOPTIONVALUE_X);
+    error(validator + "(<a/>, <b/>)", INVARITY_X_X);
+    error(validator + "(<!--comment-->)", INVTYPE_X);
   }
 }

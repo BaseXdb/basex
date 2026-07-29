@@ -144,8 +144,7 @@ public final class BaseXHTTP extends CLI {
     try {
       jetty.start();
     } catch(final BindException ex) {
-      Util.debug(ex);
-      throw new BaseXException(HTTP + ' ' + SRV_RUNNING_X, port);
+      throw new BaseXException(HTTP + ' ' + SRV_RUNNING_X, port, ex);
     }
     // throw cached exception that did not break the servlet architecture
     final IOException ex = hc.exception();
@@ -288,6 +287,9 @@ public final class BaseXHTTP extends CLI {
           case 'l': // use local mode
             Prop.put(StaticOptions.HTTPLOCAL, Boolean.toString(true));
             break;
+          case 'L': // start database server in addition
+            Prop.put(StaticOptions.HTTPLOCAL, Boolean.toString(false));
+            break;
           case 'n': // parse host name
             final String n = arg.string();
             Prop.put(StaticOptions.HOST, n);
@@ -355,8 +357,7 @@ public final class BaseXHTTP extends CLI {
       out.flush();
       if(in.read() != 0) throw new IOException(Util.info(CONNECTION_ERROR_X, port));
     } catch(final IOException ex) {
-      Util.debug(ex);
-      throw new IOException(Util.info(CONNECTION_ERROR_X, port));
+      throw new IOException(Util.info(CONNECTION_ERROR_X, port), ex);
     }
   }
 

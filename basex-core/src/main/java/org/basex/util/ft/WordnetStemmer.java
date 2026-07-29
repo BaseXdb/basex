@@ -30,34 +30,27 @@ final class WordnetStemmer extends Stemmer {
   private static final Object DICT;
 
   static {
+    Constructor<?> ctr = null;
+    Method findStems = null;
+    Object dictionary = null;
     // don't try to find the other classes if Dictionary is not found:
-    final Class<?> dict = Reflect.find(PATTERN, "Dictionary");
-    if(dict == null) {
-      CTR = null;
-      FIND_STEMS = null;
-      DICT = null;
-    } else {
-      final Class<?> wn = Reflect.find(PATTERN, "morph.WordnetStemmer");
-      CTR = Reflect.find(wn, Reflect.find(PATTERN, "IDictionary"));
-      FIND_STEMS = Reflect.method(wn, "findStems", String.class);
-      DICT = newDict(dict);
+    final Class<?> dct = Reflect.find(PATTERN, "Dictionary");
+    if(dct != null) {
+      try {
+        final Class<?> wn = Class.forName(Util.info(PATTERN, "morph.WordnetStemmer"));
+        ctr = wn.getConstructor(Class.forName(Util.info(PATTERN, "IDictionary")));
+        findStems = wn.getMethod("findStems", String.class);
+        final URL url = new File(PATH).toURI().toURL();
+        final Object dict = dct.getConstructor(URL.class).newInstance(url);
+        // open returns a boolean flag; discard dictionary if it could not be opened
+        if(dct.getMethod("open").invoke(dict) == Boolean.TRUE) dictionary = dict;
+      } catch(final Exception ex) {
+        Util.debug(ex);
+      }
     }
-  }
-
-  /**
-   * Create new instance of the WordNet dictionary.
-   * @param dct dictionary class
-   * @return new instance of the WordNet dictionary or {@code null}
-   */
-  private static Object newDict(final Class<?> dct) {
-    try {
-      final Constructor<?> ctr = Reflect.find(dct, URL.class);
-      final Object dict = Reflect.get(ctr, new File(PATH).toURI().toURL());
-      return Reflect.invoke(Reflect.method(dct, "open"), dict);
-    } catch(final Exception ex) {
-      Util.debug(ex);
-      return null;
-    }
+    CTR = ctr;
+    FIND_STEMS = findStems;
+    DICT = dictionary;
   }
 
   /**
@@ -65,7 +58,7 @@ final class WordnetStemmer extends Stemmer {
    * @return result of check
    */
   static boolean available() {
-    return DICT != null;
+    return CTR != null && FIND_STEMS != null && DICT != null;
   }
 
   /** Instance of WordNet stemmer. */
@@ -82,17 +75,16 @@ final class WordnetStemmer extends Stemmer {
    */
   private WordnetStemmer(final FTIterator fti) {
     super(fti);
-    stemmer = Reflect.get(CTR, DICT);
+    try {
+      stemmer = CTR.newInstance(DICT);
+    } catch(final ReflectiveOperationException ex) {
+      throw Util.notExpected(ex);
+    }
   }
 
   @Override
   Stemmer get(final Language lang, final FTIterator fti) {
     return new WordnetStemmer(fti);
-  }
-
-  @Override
-  public boolean supports(final Language lang) {
-    return lang.equals(Language.get("en"));
   }
 
   @Override
@@ -102,9 +94,7 @@ final class WordnetStemmer extends Stemmer {
 
   @Override
   Collection<Language> languages() {
-    final HashSet<Language> ln = new HashSet<>();
-    ln.add(Language.get("en"));
-    return ln;
+    return collection("en");
   }
 
   @Override

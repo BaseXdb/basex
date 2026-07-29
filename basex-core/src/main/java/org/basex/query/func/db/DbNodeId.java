@@ -11,8 +11,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.seq.*;
-import org.basex.util.list.*;
+import org.basex.query.value.type.*;
 
 /**
  * Function implementation.
@@ -42,9 +41,9 @@ public class DbNodeId extends StandardFunc {
       }
       @Override
       public Value value(final QueryContext q, final Expr expr) throws QueryException {
-        final IntList ids = new IntList(size);
-        addIds(nodes.value(qc, expr), ids);
-        return IntSeq.get(ids.finish());
+        final ValueBuilder vb = new ValueBuilder(q, size);
+        addIds(nodes.value(qc, expr), vb);
+        return vb.value(BasicType.INTEGER);
       }
     };
   }
@@ -73,11 +72,11 @@ public class DbNodeId extends StandardFunc {
   /**
    * Adds the IDs.
    * @param nodes nodes
-   * @param ids ID list
+   * @param vb value builder
    * @throws QueryException query exception
    */
-  void addIds(final Value nodes, final IntList ids) throws QueryException {
-    for(final Item node : nodes) ids.add(id(node));
+  void addIds(final Value nodes, final ValueBuilder vb) throws QueryException {
+    for(final Item node : nodes) vb.add(id(node));
   }
 
   @Override

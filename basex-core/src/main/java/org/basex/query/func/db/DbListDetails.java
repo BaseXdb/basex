@@ -3,7 +3,6 @@ package org.basex.query.func.db;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.util.*;
 
 import org.basex.core.*;
 import org.basex.core.users.*;
@@ -39,7 +38,7 @@ public final class DbListDetails extends DbList {
           final int binaries = meta.dir(ResourceType.BINARY).descendants().size();
           final int values = meta.dir(ResourceType.VALUE).descendants().size();
           database.attr(Q_RESOURCES, meta.ndocs + binaries + values);
-          database.attr(Q_MODIFIED_DATE, DateTime.format(new Date(meta.dbTime())));
+          database.attr(Q_MODIFIED_DATE, DateTime.format(meta.dbTime()));
           database.attr(Q_SIZE, meta.dbSize());
           if(qc.user.has(Perm.CREATE, name)) database.attr(Q_PATH, meta.original);
         } catch(final IOException ex) {

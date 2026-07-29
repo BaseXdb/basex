@@ -139,7 +139,7 @@ public abstract class AQuery extends Command {
       init(ctx);
       return qp.qc.parameters().toString();
     } catch(final QueryException ex) {
-      error(Util.message(ex));
+      error(ex);
     }
     return SerializerMode.DEFAULT.get().toString();
   }
@@ -150,12 +150,10 @@ public abstract class AQuery extends Command {
       init(ctx);
       return qp.updating;
     } catch(final QueryException | JobException ex) {
-      Util.debug(ex);
       qp.close();
       exception = ex;
       return false;
     } catch(final RuntimeException ex) {
-      Util.debug(ex);
       qp.close();
       exception = ex;
       throw ex;

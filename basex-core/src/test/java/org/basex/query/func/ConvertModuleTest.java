@@ -53,7 +53,18 @@ public final class ConvertModuleTest extends SandboxTest {
     final Function func = _CONVERT_DATETIME_TO_INTEGER;
     // successful queries
     query(func.args(" xs:dateTime('1970-01-01T00:00:00Z')"), 0);
+    query(func.args(" xs:dateTime('1969-12-31T23:59:59Z')"), -1000);
+    query(func.args(" xs:dateTime('1970-01-01T00:00:00.9999Z')"), 999);
+    // largest representable instant
+    query(func.args(" xs:dateTime('292278994-08-17T07:12:55Z')"), 9223372036854775000L);
+    // round trip through the inverse conversion
+    query(_CONVERT_INTEGER_TO_DATETIME.args(
+        " " + func.args(" xs:dateTime('2026-07-22T12:00:00Z')")), "2026-07-22T12:00:00Z");
+    // out of range, in both directions
+    error(func.args(" xs:dateTime('292278994-08-17T07:12:56Z')"), INTRANGE_X);
     error(func.args(" xs:dateTime('600000000-01-01T00:00:00Z')"), INTRANGE_X);
+    error(func.args(" xs:dateTime('-292278994-01-01T00:00:00Z')"), INTRANGE_X);
+    error(func.args(" xs:dateTime('-999999999-01-01T00:00:00Z')"), INTRANGE_X);
   }
 
   /** Test method. */

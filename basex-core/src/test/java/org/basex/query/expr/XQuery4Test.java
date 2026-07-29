@@ -449,7 +449,7 @@ public final class XQuery4Test extends SandboxTest {
     query("4_5", 45);
     query("67.89", 67.89);
     query("1_000_000", 1_000_000);
-    query("1_2__3_________4.5______________6e7________________________8", "1.23456E81");
+    query("1_2__3_________4.5______________6e7________________________8", "1.23456e+81");
 
     error("_1", NOCTX_X);
     error("2._3", NUMBER_X);
@@ -532,6 +532,14 @@ public final class XQuery4Test extends SandboxTest {
         FUNERR1);
     // finally block must still run even for non-catchable errors
     error("declare %basex:lazy variable $x := error(); try { $x } finally { 1 }", FINALLY_X);
+
+    // errors of eager variables are catchable
+    query("declare variable $x := error(); try { $x } catch * { 1 }", 1);
+    query("declare variable $x := error(); try { $x } catch err:FOER0000 { 1 }", 1);
+    query("declare variable $x := local:f(); declare function local:f() { $x };"
+        + "try { $x } catch * { 1 }", 1);
+    query("declare variable $x := error(); (try { $x } catch * { 1 }, try { $x } catch * { 2 })",
+        "1\n2");
   }
 
   /** Eager vs. lazy evaluation of prolog variables. */
@@ -642,20 +650,29 @@ public final class XQuery4Test extends SandboxTest {
 
   /** Record tests. */
   @Test public void recordTest() {
-    query("{} instance of record()", true);
-    query("{ 'x': 1 } instance of record(x)", true);
-    query("{ 'x': 1, 'y': 2 } instance of record(x, y)", true);
-    query("{ 'x': 1 } instance of record(x as xs:integer)", true);
+    // only a record, i.e. a map with a record annotation, matches a record type
+    query("let $r as record() := {} return $r instance of record()", true);
+    query("let $r as record(x) := { 'x': 1 } return $r instance of record(x)", true);
+    query("let $r as record(x, y) := { 'x': 1, 'y': 2 } return $r instance of record(x, y)", true);
+    query("let $r as record(x as xs:integer) := { 'x': 1 } "
+        + "return $r instance of record(x as xs:integer)", true);
 
-    query("{} instance of record(x)", true);
-    query("{ 'x': 1 } instance of record(x, y)", true);
+    query("{} instance of record()", false);
+    query("{ 'x': 1 } instance of record(x)", false);
+    query("{ 'x': 1, 'y': 2 } instance of record(x, y)", false);
+    query("{ 'x': 1 } instance of record(x as xs:integer)", false);
+
+    query("{} instance of record(x)", false);
+    query("{ 'x': 1 } instance of record(x, y)", false);
     query("{} instance of record(x as xs:integer)", false);
     query("{ 'x': 1 } instance of record(x as xs:string)", false);
     query("{ 'x': 1, 'y': 2 } instance of record(x)", false);
 
-    // record(*) matches any record (a map with string keys)
-    query("{} instance of record(*)", true);
-    query("{ 'x': 1 } instance of record(*)", true);
+    // record(*) matches any record, but no plain map
+    query("let $r as record() := {} return $r instance of record(*)", true);
+    query("let $r as record(x) := { 'x': 1 } return $r instance of record(*)", true);
+    query("{} instance of record(*)", false);
+    query("{ 'x': 1 } instance of record(*)", false);
     query("{ 1: 2 } instance of record(*)", false);
   }
 
@@ -854,7 +871,8 @@ public final class XQuery4Test extends SandboxTest {
     // distinct identity"), even when the wrapped values are equal or the same object
     query("({ 'x': 1 }, { 'x': 1 })/x", "{\"x\":1}\n{\"x\":1}");
     query("count(({ 'x': 1 }, { 'x': 1 }, { 'x': 1 })/x)", "3");
-    query("count(([ 1 ], [ 1 ])/?*)", "2");
+    // navigational step: '?*' is non-navigational and would raise a type error (qtspecs #2734)
+    query("count(([ 1 ], [ 1 ])/*)", "2");
     query("count(replicate({ 'x': 1 }, 2)/x)", "2");
     query("let $m := { 'x': 1 } return count(($m, $m)/x)", "2");
     query("(1 to 6) ! { 'a': 1 } -> (.[1]/a is .[2]/a)", "false");

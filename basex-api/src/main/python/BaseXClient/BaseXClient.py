@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Python 2.7.3 and 3.x client for BaseX.
-Works with BaseX 7.0 and later
+Works with BaseX 13.0 and later
 
 Requires Python 3.x or Python 2.x having some backports like bytearray.
 (I've tested Python 3.2.3, and Python 2.7.3 on Fedora 16 linux x86_64.)
@@ -113,22 +113,22 @@ class Session:
 
         self.__swrapper.connect((host, port))
 
-        # receive timestamp
-        response = self.recv_c_str().split(':')
+        # receive challenge: {realm}:{nonce}
+        nonce = self.recv_c_str().split(':')[1]
 
-        # send username and hashed password/timestamp
-        hfun = hashlib.md5()
+        # request the password parameters: send username and an empty hash
+        self.send(user)
+        self.send('')
 
-        if len(response) > 1:
-            code = "%s:%s:%s" % (user, response[0], password)
-            nonce = response[1]
-        else:
-            code = password
-            nonce = response[0]
+        # receive password parameters: {algorithm}:{salt}
+        salt = self.recv_c_str().split(':')[1]
 
-        hfun.update(hashlib.md5(code.encode('us-ascii')).hexdigest().encode('us-ascii'))
+        # send hashed password
+        code = hashlib.sha256((salt + password).encode('us-ascii')).hexdigest()
+        hfun = hashlib.sha256()
+        hfun.update(code.encode('us-ascii'))
         hfun.update(nonce.encode('us-ascii'))
-        self.send(user + chr(0) + hfun.hexdigest())
+        self.send(hfun.hexdigest())
 
         # evaluate success flag
         if not self.server_response_success():

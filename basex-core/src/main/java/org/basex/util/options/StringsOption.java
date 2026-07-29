@@ -2,6 +2,8 @@ package org.basex.util.options;
 
 import java.util.*;
 
+import org.basex.query.value.type.*;
+
 /**
  * Option containing an strings array value.
  *
@@ -30,6 +32,11 @@ public final class StringsOption extends Option<String[]> {
   @Override
   public String[] copy() {
     return value == null ? null : value.clone();
+  }
+
+  @Override
+  SeqType defaultType() {
+    return Types.STRING_ZM;
   }
 
   @Override

@@ -5,6 +5,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -30,16 +31,16 @@ public class ConvertIntegersToBase64 extends ConvertFn {
     final Value input = arg(0).atomValue(qc, info);
 
     // return internal byte array
-    if(input instanceof final BytSeq bs) return B64.get(bs.toJava());
+    if(input instanceof final BytSeq bs && bs.type == BasicType.BYTE) return B64.get(bs.values());
 
     // single integer
     final long size = input.size();
     if(size == 1 && input instanceof final Itr itr) return B64.get((byte) itr.itr());
 
     final ByteList bl = new ByteList(Seq.initialCapacity(size));
-    if(input instanceof final IntSeq is) {
-      // integer sequence
-      for(final long l : is.values()) bl.add((byte) l);
+    if(input instanceof final ItrSeq seq) {
+      // integer sequence, stored in a native representation
+      for(int i = 0, s = (int) size; i < s; i++) bl.add((byte) seq.itrAt(i));
     } else {
       // other types
       final Iter iter = input.iter();

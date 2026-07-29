@@ -1,5 +1,7 @@
 package org.basex.util.options;
 
+import org.basex.query.value.type.*;
+
 /**
  * Option containing an integer value.
  *
@@ -32,5 +34,10 @@ public final class NumberOption extends Option<Integer> {
   @Override
   public Integer value() {
     return value;
+  }
+
+  @Override
+  SeqType defaultType() {
+    return Types.INTEGER_O;
   }
 }

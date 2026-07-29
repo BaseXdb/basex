@@ -67,6 +67,11 @@ public final class GFLWOR extends ParseExpr {
   }
 
   @Override
+  public boolean navigational() {
+    return rtrn.navigational();
+  }
+
+  @Override
   public Iter iter(final QueryContext qc) {
     return new Iter() {
       private final Eval eval = newEval();

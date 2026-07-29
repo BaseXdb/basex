@@ -8,14 +8,9 @@ import org.basex.core.jobs.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.query.*;
-import org.basex.query.CompileContext.*;
-import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
-import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * Sequence of items of type {@link Itr xs:integer}, containing at least two of them.
@@ -23,7 +18,7 @@ import org.basex.util.list.*;
  * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
-public final class IntSeq extends NativeSeq {
+public final class IntSeq extends ItrSeq {
   /** Values. */
   private final int[] values;
 
@@ -66,14 +61,13 @@ public final class IntSeq extends NativeSeq {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
-      throws QueryException {
+  public long itrAt(final int index) {
+    return values[index];
+  }
 
-    if(pos == 0) return super.test(qc, ii, pos);
-    for(final long value : values) {
-      if(value == pos) return true;
-    }
-    return false;
+  @Override
+  int width() {
+    return 4;
   }
 
   @Override
@@ -100,58 +94,8 @@ public final class IntSeq extends NativeSeq {
   }
 
   @Override
-  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    Expr expr = this;
-
-    int[] tmp = null;
-    if(mode == Simplify.PREDICATE) {
-      // remove duplicates, order data: (2, 1, 2) → 1 to 2
-      tmp = new IntList((int) size).add(values).ddo().finish();
-    } else if(mode == Simplify.DISTINCT) {
-      // remove duplicates, but preserve order: (2, 1, 2) → (2, 1)
-      final IntSet is = new IntSet(size);
-      for(final int i : values) is.add(i);
-      tmp = is.keys();
-    }
-    if(tmp != null) {
-      final int tl = tmp.length;
-      int t = 0;
-      if(seqType().type == BasicType.INTEGER) {
-        while(++t < tl && tmp[0] + t == tmp[t]);
-      }
-      if(t == tl) expr = RangeSeq.get(tmp[0], tl, true);
-      else if(tl != size) expr = get(tmp, type);
-    }
-
-    return cc.simplify(this, expr, mode);
-  }
-
-  @Override
-  public Object toJava() {
-    return switch((BasicType) type) {
-      case BYTE -> {
-        final ByteList bl = new ByteList((int) size);
-        for(final int value : values) bl.add((byte) value);
-        yield bl.finish();
-      }
-      case SHORT, UNSIGNED_BYTE -> {
-        final ShortList sl = new ShortList((int) size);
-        for(final int value : values) sl.add((short) value);
-        yield sl.finish();
-      }
-      case UNSIGNED_SHORT -> {
-        final char[] chars = new char[(int) size];
-        int c = 0;
-        for(final int value : values) chars[c++] = (char) value;
-        yield chars;
-      }
-      case INT -> values;
-      default -> {
-        final LongList il = new LongList((int) size);
-        for(final int value : values) il.add(value);
-        yield il.finish();
-      }
-    };
+  public Object toJava() throws QueryException {
+    return type == BasicType.INT ? values : super.toJava();
   }
 
   @Override
@@ -178,21 +122,8 @@ public final class IntSeq extends NativeSeq {
    * @return value
    */
   public static Value get(final int[] values, final Type type) {
-    // empty?
     final int vl = values.length;
-    if(vl == 0) return Empty.VALUE;
-    // single item?
-    final int first = values[0];
-    if(vl == 1) return Itr.get(first, type);
-    // singleton or range?
-    boolean same = true, asc = true, desc = true;
-    for(int v = 1; v < vl && (same || asc || desc); v++) {
-      final int i = values[v];
-      if(same && i != first) same = false;
-      if(asc  && i != first + v) asc = false;
-      if(desc && i != first - v) desc = false;
-    }
-    return same ? SingletonSeq.get(Itr.get(first, type), vl) :
-      asc || desc ? RangeSeq.get(first, vl, asc) : new IntSeq(values, type);
+    return vl == 0 ? Empty.VALUE : vl == 1 ? Itr.get(values[0], type) :
+      refine(new IntSeq(values, type));
   }
 }

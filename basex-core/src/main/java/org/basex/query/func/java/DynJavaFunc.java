@@ -63,8 +63,7 @@ final class DynJavaFunc extends DynJavaCall {
       } else {
         arities.add(al);
       }
-    } catch(final NoSuchFieldException ex) {
-      Util.debug(ex);
+    } catch(final NoSuchFieldException ignore) {
       // field not found
     }
 
@@ -102,7 +101,7 @@ final class DynJavaFunc extends DynJavaCall {
     } catch(final IllegalArgumentException ex) {
       throw instanceExpected(ex);
     } catch(final Throwable th) {
-      throw executionError(th, new Object[0]);
+      throw executionError(th);
     }
   }
 

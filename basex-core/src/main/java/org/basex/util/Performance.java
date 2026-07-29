@@ -124,6 +124,7 @@ public final class Performance {
       Thread.sleep(Math.max(0, ms));
     } catch(final InterruptedException ex) {
       Util.debug(ex);
+      Thread.currentThread().interrupt();
     }
   }
 

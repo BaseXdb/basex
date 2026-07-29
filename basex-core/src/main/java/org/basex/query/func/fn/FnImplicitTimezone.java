@@ -13,6 +13,6 @@ import org.basex.util.*;
 public final class FnImplicitTimezone extends DynamicFn {
   @Override
   public DTDur item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return qc.dateTime().zone;
+    return new DTDur(0, qc.dateTime().zone);
   }
 }

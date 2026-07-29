@@ -1,11 +1,11 @@
 # Raku client for BaseX.
-# Works with BaseX 7.0 and later
+# Works with BaseX 13.0 and later
 #
 # Documentation: https://docs.basex.org/wiki/Clients
 # 
 # (C) BaseX Team, BSD License
 
-use	Digest::MD5;
+use	Digest::SHA256::Native;
 use	JSON::Fast;
 
 class	BaseXClient::Query {
@@ -72,23 +72,20 @@ class	BaseXClient::Session {
 		# create server connection
 		$!sock = IO::Socket::INET.new(:$host, :$port) or die "Can't communicate with the server.";
 
-		# receive server response
-		my $code; my $nonce;
-		my @response = split(':', self.receive());
-		if (@response > 1) {
-			# support for digest authentication
-			$code = "$username:@response[0]:$password";
-			$nonce = @response[1];
-		} else {
-			# support for cram-md5 (Version < 8.0)
-			$code = $password;
-			$nonce = @response[0];
-		}
+		# receive challenge: {realm}:{nonce}
+		my $nonce = split(':', self.receive())[1];
 
-		# send username and hashed password/timestamp
-		my $codemd5  = Digest::MD5.new().md5_hex($code);
-		my $complete = Digest::MD5.new().md5_hex($codemd5 ~ $nonce);
-		self.send($username ~ chr(0) ~ $complete);
+		# request the password parameters: send username and an empty hash
+		self.send($username);
+		self.send("");
+
+		# receive password parameters: {algorithm}:{salt}
+		my $salt = split(':', self.receive())[1];
+
+		# send hashed password
+		my $code     = sha256-hex($salt ~ $password);
+		my $complete = sha256-hex($code ~ $nonce);
+		self.send($complete);
 
 		# evaluate success flag
 		self.read() and die "Access denied.";

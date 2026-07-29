@@ -320,6 +320,7 @@ public final class GUI extends JFrame implements BaseXWindow {
         cp.pwReader(pwReader);
         execute(cp.parse());
       } catch(final QueryException ex) {
+        Util.debug(ex);
         if(!info.visible()) GUIMenuCmd.C_SHOW_INFO.execute(this);
         info.setInfo(Util.message(ex), null, false, true);
       }
@@ -424,6 +425,7 @@ public final class GUI extends JFrame implements BaseXWindow {
         cmd.execute(context, output);
         inf = cmd.info();
       } catch(final BaseXException ex) {
+        Util.debug(ex);
         cause = ex.getCause();
         if(cause == null) cause = ex;
         ok = false;

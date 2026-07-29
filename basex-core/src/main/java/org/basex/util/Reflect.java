@@ -1,25 +1,27 @@
 package org.basex.util;
 
 import java.lang.reflect.*;
-import java.util.*;
 
 /**
- * This class assembles some reflection methods. Most exceptions are caught and replaced
- * by a {@code null} value.
+ * This class assembles some reflection methods. Lookups return {@code null} if a class or method
+ * is not found; failing instantiations and invocations raise runtime exceptions.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class Reflect {
-  /** Cached constructors. */
-  private static final HashMap<String, Constructor<?>> CONSTRUCTORS = new HashMap<>();
-  /** Cached classes. */
-  private static final HashMap<String, Class<?>> CLASSES = new HashMap<>();
-  /** Cached fields. */
-  private static final HashMap<String, Field> FIELDS = new HashMap<>();
-
   /** Hidden constructor. */
   private Reflect() { }
+
+  /**
+   * Reports a failed lookup, unless the class or method was simply not found.
+   * @param th throwable
+   */
+  private static void unexpected(final Throwable th) {
+    if(!(th instanceof ClassNotFoundException || th instanceof NoSuchMethodException)) {
+      Util.debug(th);
+    }
+  }
 
   /**
    * Checks if the class specified by the pattern is available.
@@ -32,13 +34,13 @@ public final class Reflect {
       forName(Util.info(pattern, ext));
       return true;
     } catch(final Throwable ex) {
-      Util.debug(ex);
+      unexpected(ex);
       return false;
     }
   }
 
   /**
-   * Caches and returns a reference to the specified class.
+   * Returns a reference to the specified class.
    * @param name fully qualified class name
    * @return reference, or {@code null} if the class is not found
    */
@@ -46,89 +48,31 @@ public final class Reflect {
     try {
       return forName(name);
     } catch(final Throwable ex) {
-      Util.debug(ex);
+      unexpected(ex);
       return null;
     }
   }
 
   /**
-   * Caches and returns a reference to the specified class, or throws an exception.
+   * Returns a reference to the specified class, or throws an exception.
    * @param name fully qualified class name
    * @return class reference
-   * @throws ClassNotFoundException any exception or error
+   * @throws ClassNotFoundException class not found
    */
   public static Class<?> forName(final String name) throws ClassNotFoundException {
-    Class<?> c = CLASSES.get(name);
-    if(c == null) {
-      c = Class.forName(name);
-      if(!Modifier.isPublic(c.getModifiers())) throw new ClassNotFoundException(name);
-      CLASSES.put(name, c);
-    }
+    final Class<?> c = Class.forName(name);
+    if(!Modifier.isPublic(c.getModifiers())) throw new ClassNotFoundException(name);
     return c;
   }
 
   /**
-   * Caches and returns a reference to the specified field or {@code null}.
-   * @param clazz class to search for the constructor
-   * @param name field name
-   * @return reference or {@code null} if the field is not found
-   */
-  public static Field field(final Class<?> clazz, final String name) {
-    final String key = clazz.getName() + name;
-    Field f = FIELDS.get(key);
-    if(f == null) {
-      try {
-        f = clazz.getField(name);
-        FIELDS.put(key, f);
-      } catch(final Throwable ex) {
-        Util.debug(ex);
-      }
-    }
-    return f;
-  }
-
-  /**
-   * Caches and returns a reference to the class specified by the pattern,
-   * or {@code null}.
+   * Returns a reference to the class specified by the pattern, or {@code null}.
    * @param pattern class pattern
    * @param ext optional extension
    * @return reference or {@code null} if the class is not found
    */
   public static Class<?> find(final String pattern, final Object... ext) {
     return find(Util.info(pattern, ext));
-  }
-
-  /**
-   * Caches and returns a constructor by parameter types.
-   * @param clazz class to search for the constructor
-   * @param types constructor parameters
-   * @param <O> class type
-   * @return constructor, or {@code null} if the constructor is not found
-   */
-  public static <O> Constructor<O> find(final Class<O> clazz, final Class<?>... types) {
-    if(clazz == null) return null;
-
-    final StringBuilder sb = new StringBuilder(clazz.getName());
-    for(final Class<?> c : types) sb.append(c.getName());
-    final String key = sb.toString();
-
-    @SuppressWarnings("unchecked")
-    Constructor<O> m = (Constructor<O>) CONSTRUCTORS.get(key);
-    if(m == null) {
-      try {
-        try {
-          m = clazz.getConstructor(types);
-        } catch(final Throwable ex) {
-          Util.debug(ex);
-          m = clazz.getDeclaredConstructor(types);
-          m.setAccessible(true);
-        }
-        CONSTRUCTORS.put(key, m);
-      } catch(final Throwable ex) {
-        Util.debug(ex);
-      }
-    }
-    return m;
   }
 
   /**
@@ -145,12 +89,12 @@ public final class Reflect {
       try {
         m = clazz.getMethod(name, types);
       } catch(final Throwable ex) {
-        Util.debug(ex);
+        unexpected(ex);
         m = clazz.getDeclaredMethod(name, types);
         m.setAccessible(true);
       }
     } catch(final Throwable ex) {
-      Util.debug(ex);
+      unexpected(ex);
     }
     return m;
   }
@@ -159,30 +103,13 @@ public final class Reflect {
    * Returns a class instance.
    * @param clazz class
    * @param <O> type
-   * @return instance or {@code null}
+   * @return instance, or {@code null} if the class is {@code null}
    */
   public static <O> O get(final Class<O> clazz) {
     try {
       return clazz != null ? clazz.getDeclaredConstructor().newInstance() : null;
     } catch(final Throwable ex) {
-      Util.debug(ex);
-      return null;
-    }
-  }
-
-  /**
-   * Returns a class instance or {@code null}.
-   * @param constructor constructor
-   * @param args arguments
-   * @param <O> class type
-   * @return instance or {@code null}
-   */
-  public static <O> O get(final Constructor<O> constructor, final Object... args) {
-    try {
-      return constructor != null ? constructor.newInstance(args) : null;
-    } catch(final Throwable ex) {
-      Util.debug(ex);
-      return null;
+      throw Util.notExpected(ex);
     }
   }
 
@@ -191,29 +118,13 @@ public final class Reflect {
    * @param method method to run
    * @param object object ({@code null} for static methods)
    * @param args arguments
-   * @return result of method call or {@code null}
+   * @return result of method call, or {@code null} if the method is {@code null}
    */
   public static Object invoke(final Method method, final Object object, final Object... args) {
     try {
       return method != null ? method.invoke(object, args) : null;
     } catch(final Throwable ex) {
-      Util.debug(ex);
-      return null;
-    }
-  }
-
-  /**
-   * Returns the value of a field.
-   * @param field field to access
-   * @param object object ({@code null} for static methods)
-   * @return value of field
-   */
-  public static Object get(final Field field, final Object object) {
-    try {
-      return field != null ? field.get(object) : null;
-    } catch(final Throwable ex) {
-      Util.debug(ex);
-      return null;
+      throw Util.notExpected(ex);
     }
   }
 }

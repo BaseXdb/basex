@@ -41,7 +41,7 @@ public class JobEval extends StandardFunc {
     final HashMap<String, Value> bindings = toBindings(arg(1), qc);
     options.set(JobOptions.BASE_URI, toBaseUri(query.url(), options, JobOptions.BASE_URI));
 
-    final boolean service = Boolean.TRUE.equals(options.get(JobOptions.SERVICE));
+    final boolean service = options.get(JobOptions.SERVICE) == Boolean.TRUE;
     if(service) {
       if(!bindings.isEmpty()) throw JOBS_SERVICE.get(info);
       // invalidate option (not relevant for next steps, i.e., if services are written to disk)

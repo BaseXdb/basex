@@ -78,7 +78,7 @@ public final class Try extends Single {
       try {
         expr.value(cc.qc);
       } catch(final QueryException ex) {
-        Util.debug(ex);
+        // the error was raised by fn:error, so its stack trace is of no interest
         final Catch ctch = matches(ex);
         if(ctch != null) e = ctch.inline(ex, cc);
         else if(fnlly == Empty.VALUE) throw ex;
@@ -103,17 +103,17 @@ public final class Try extends Single {
     try {
       return expr.value(qc);
     } catch(final QueryException ex) {
-      Util.debug(ex);
       final Catch ctch = matches(ex);
-      if(ctch != null) return ctch.value(qc, ex);
-      throw ex;
+      if(ctch == null) throw ex;
+      Util.debug(ex);
+      return ctch.value(qc, ex);
     } catch(final StackOverflowError ex) {
       // the stack has been unwound to this expression, so the catch clause has room to run
-      Util.debug(ex);
-      final QueryException qe = BASEX_OVERFLOW.get(info);
+      final QueryException qe = BASEX_OVERFLOW.get(info).cause(ex);
       final Catch ctch = matches(qe);
-      if(ctch != null) return ctch.value(qc, qe);
-      throw qe;
+      if(ctch == null) throw qe;
+      Util.debug(qe);
+      return ctch.value(qc, qe);
     } finally {
       final Value fnl = fnlly.value(qc);
       if(fnl != Empty.VALUE) throw FINALLY_X.get(info, fnl);

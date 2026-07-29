@@ -29,6 +29,34 @@ public final class XQueryExtensionsTest extends SandboxTest {
     query("try { error() } catch * { count($err:stack-trace) }", 1);
     query("let $f := function () { error() } " +
         "return try { $f() } catch * { count($err:stack-trace) }", 1);
+
+    // every entry names the function it occurred in; the last one is the main module
+    query("declare %basex:inline(0) function local:f() { local:g() }; " +
+        "declare %basex:inline(0) function local:g() { error() }; " +
+        "try { local:f() } catch * { " +
+        "let $lines := tokenize($err:stack-trace, '\n')[normalize-space()] return (" +
+        "count($lines), " +
+        "starts-with($lines[1], 'local:g#0 ('), " +
+        "starts-with($lines[2], 'local:f#0 ('), " +
+        "matches($lines[3], '^[^#]+, \\d+/\\d+$')) }", "3\ntrue\ntrue\ntrue");
+    // global variables are reported as well
+    query("declare %basex:inline(0) function local:f() { error() }; " +
+        "declare variable $config := local:f(); " +
+        "try { $config } catch * { let $lines := tokenize($err:stack-trace, '\n') return (" +
+        "starts-with($lines[1], 'local:f#0 ('), " +
+        "starts-with($lines[2], '$config (')) }", "true\ntrue");
+    query("declare variable $config := error(); " +
+        "try { $config } catch * { starts-with($err:stack-trace, '$config (') }", true);
+    // errors outside a declaration are reported without a name
+    query("let $f := function() { error() } " +
+        "return try { $f() } catch * { contains($err:stack-trace, '(') }", false);
+    query("try { error() } catch * { contains($err:stack-trace, '(') }", false);
+
+    // the enclosing function is recorded at parse time, and hence survives inlining
+    query("declare %basex:inline function local:f() { error() }; " +
+        "try { local:f() } catch * { starts-with($err:stack-trace, 'local:f#0 (') }", true);
+    query("declare %basex:inline(0) function local:f() { error() }; " +
+        "try { local:f() } catch * { starts-with($err:stack-trace, 'local:f#0 (') }", true);
   }
 
   /** Pipeline operator. */

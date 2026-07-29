@@ -77,7 +77,7 @@ public class Dur extends ADateDur {
     this(BasicType.DURATION);
     checkFactor(factor, mult, type, info);
     months = scaleMonths(dur.months, factor, mult, info);
-    seconds = scaleSeconds(dur.seconds == null ? BigDecimal.ZERO : dur.seconds, factor, mult);
+    seconds = scaleSeconds(dur.totalSeconds(), factor, mult);
   }
 
   /**
@@ -88,7 +88,7 @@ public class Dur extends ADateDur {
   private Dur(final Dur dur, final Type type) {
     this(type);
     months = dur.months;
-    seconds = dur.seconds == null ? BigDecimal.ZERO : dur.seconds;
+    seconds = dur.totalSeconds();
   }
 
   /**
@@ -183,6 +183,15 @@ public class Dur extends ADateDur {
   }
 
   /**
+   * Returns the total number of seconds, or zero if the component is undefined
+   * (a duration with no time part, such as {@code P1Y}).
+   * @return seconds
+   */
+  final BigDecimal totalSeconds() {
+    return seconds == null ? BigDecimal.ZERO : seconds;
+  }
+
+  /**
    * Returns the time as milliseconds.
    * @param info input info
    * @return milliseconds
@@ -250,8 +259,8 @@ public class Dur extends ADateDur {
 
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
-      final InputInfo ii) throws QueryException {
-    final Dur dur = (Dur) (item instanceof Dur ? item : type.cast(item, null, ii));
+      final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Dur dur = (Dur) (item instanceof Dur ? item : type.cast(item, qc, ii));
     final int m = Long.compare(months, dur.months);
     return m != 0 ? m : seconds.compareTo(dur.seconds);
   }
@@ -315,8 +324,7 @@ public class Dur extends ADateDur {
     BigDecimal d = BigDecimal.valueOf(factor), result;
     try {
       result = mult ? seconds.multiply(d) : seconds.divide(d, MathContext.DECIMAL64);
-    } catch(final ArithmeticException ex) {
-      Util.debug(ex);
+    } catch(final ArithmeticException ignore) {
       d = BigDecimal.valueOf(1 / factor);
       result = mult ? seconds.divide(d, MathContext.DECIMAL64) : seconds.multiply(d);
     }

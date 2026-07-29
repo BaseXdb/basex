@@ -39,10 +39,13 @@ public final class Tim extends ADate {
    * @param value time
    * @param dur duration to be added/subtracted
    * @param plus plus/minus flag
+   * @param info input info (can be {@code null})
+   * @throws QueryException query exception
    */
-  public Tim(final Tim value, final DTDur dur, final boolean plus) {
+  public Tim(final Tim value, final DTDur dur, final boolean plus, final InputInfo info)
+      throws QueryException {
     super(BasicType.TIME, value);
-    calc(dur, plus);
+    calc(dur, plus, info);
     clean();
   }
 
@@ -59,6 +62,7 @@ public final class Tim extends ADate {
    * Cleans the item and removes invalid components.
    */
   private void clean() {
+    defined &= ~(YEA | MON | DAY);
     year = Long.MAX_VALUE;
     month = -1;
     day = -1;

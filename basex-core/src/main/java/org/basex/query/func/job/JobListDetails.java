@@ -2,7 +2,6 @@ package org.basex.query.func.job;
 
 import static org.basex.core.jobs.JobsText.*;
 
-import java.math.*;
 import java.util.*;
 
 import org.basex.core.*;
@@ -53,28 +52,17 @@ public final class JobListDetails extends StandardFunc {
       elem.attr(Q_USER, jc.context.clientName());
       if(ms >= 0) elem.attr(Q_DURATION, DTDur.get(ms).string(info));
       if(jt != null) {
-        elem.attr(Q_START, dateTime(jt.start));
-        if(jt.end != Long.MAX_VALUE) elem.attr(Q_END, dateTime(jt.end));
-        if(jt.interval != 0) elem.attr(Q_INTERVAL, DTDur.get(jt.interval).string(info));
+        elem.attr(Q_START, Dtm.local(jt.start, info).string(info));
+        if(jt.end != Long.MAX_VALUE) elem.attr(Q_END, Dtm.local(jt.end, info).string(info));
+        if(jt.cron != null) elem.attr(Q_CRON, jt.cron);
+        else if(jt.interval != 0) elem.attr(Q_INTERVAL, DTDur.get(jt.interval).string(info));
       }
       elem.attr(Q_READS, jc.locks.reads);
       elem.attr(Q_WRITES, jc.locks.writes);
-      elem.attr(Q_TIME, dateTime(jc.time));
+      elem.attr(Q_TIME, Dtm.local(jc.time, info).string(info));
       elem.text(Token.chop(Token.normalize(Token.token(jc)), max));
       vb.add(elem.finish());
     }
     return vb.value(this);
-  }
-
-  /**
-   * Returns a timezone-adjusted dateTime representation.
-   * @param ms milliseconds since 01/01/1970
-   * @return date time
-   * @throws QueryException query exception
-   */
-  private byte[] dateTime(final long ms) throws QueryException {
-    final Dtm dtm = Dtm.get(ms);
-    final DTDur tz = new DTDur(BigDecimal.valueOf(TimeZone.getDefault().getOffset(ms) / 1000));
-    return dtm.timeZone(tz, false, info).string(info);
   }
 }

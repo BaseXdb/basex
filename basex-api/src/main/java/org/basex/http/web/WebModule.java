@@ -61,8 +61,16 @@ public final class WebModule {
       for(final StaticFunc sf : qc.functions) {
         // only add functions that are defined in the same module (file)
         if(sf.expr != null && name.equals(new IOFile(sf.info.path()).name())) {
-          final RestXqFunction rxf = new RestXqFunction(sf, this, qc);
-          if(rxf.parseAnnotations(null)) functions.add(rxf);
+          final RestXqFunction rxf = new RestXqFunction(sf, this, qc, 0);
+          if(rxf.parseAnnotations(null)) {
+            functions.add(rxf);
+            // register an additional instance for each further path annotation
+            for(int p = 1; p < rxf.paths(); p++) {
+              final RestXqFunction func = new RestXqFunction(sf, this, qc, p);
+              func.parseAnnotations(null);
+              functions.add(func);
+            }
+          }
           final WsFunction wxq = new WsFunction(sf, this, qc);
           if(wxq.parseAnnotations(null)) wsFunctions.add(wxq);
         }
@@ -71,7 +79,6 @@ public final class WebModule {
       if(ctx.soptions.get(StaticOptions.RESTXQERRORS)) throw ex;
       // ignore modules that cannot be parsed
       ctx.log.writeServer(LogType.ERROR, Util.message(ex));
-      Util.debug(ex);
     }
   }
 

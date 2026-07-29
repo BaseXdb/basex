@@ -90,11 +90,7 @@ public abstract class Command extends Job {
     register(ctx);
     try {
       // run command and return success flag
-      if(!run(ctx, os)) {
-        final BaseXException ex = new BaseXException(info());
-        ex.initCause(exception);
-        throw ex;
-      }
+      if(!run(ctx, os)) throw new BaseXException(info()).cause(exception);
     } catch(final RuntimeException th) {
       Util.stack(th);
       throw th;
@@ -314,6 +310,17 @@ public abstract class Command extends Job {
     info.reset();
     info.addExt(msg == null ? "" : msg, ext);
     return false;
+  }
+
+  /**
+   * Adds the message of an exception to the message buffer {@link #info} and attaches the
+   * exception as cause of the resulting {@link BaseXException}.
+   * @param ex exception
+   * @return {@code false}
+   */
+  protected final boolean error(final Exception ex) {
+    exception = ex;
+    return error(Util.message(ex));
   }
 
   /**

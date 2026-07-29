@@ -54,8 +54,8 @@ public final class BXDatabase implements Database {
     try {
       new Set(name, value).execute(ctx);
     } catch(final BaseXException ex) {
-      Util.debug(ex);
-      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_PROP + name);
+      throw (XMLDBException) new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_PROP + name).
+          initCause(ex);
     }
   }
 

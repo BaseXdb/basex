@@ -100,7 +100,7 @@ public final class CompileContext {
   }
 
   /** Limit for the size of sequences that are pre-evaluated. */
-  private static final int MAX_PREEVAL = 1 << 18;
+  public static final int MAX_PREEVAL = 1 << 18;
 
   /** Query context. */
   public final QueryContext qc;

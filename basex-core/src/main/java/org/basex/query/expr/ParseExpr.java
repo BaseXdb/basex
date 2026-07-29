@@ -55,7 +55,7 @@ public abstract class ParseExpr extends Expr {
       for(Class<?> clz = getClass(); clz != ParseExpr.class; clz = clz.getSuperclass()) {
         try {
           if(clz.getMethod("iter", QueryContext.class).getDeclaringClass() == clz) return true;
-        } catch(@SuppressWarnings("unused") final Exception ex) { /* ignore */ }
+        } catch(final Exception ignore) { }
       }
       return false;
     });

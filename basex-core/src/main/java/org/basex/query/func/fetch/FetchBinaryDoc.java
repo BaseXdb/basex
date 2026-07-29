@@ -15,6 +15,7 @@ public final class FetchBinaryDoc extends FetchDoc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Bin source = toBin(arg(0), qc);
-    return fetch(new IOContent(source.binary(info)), qc);
+    // input is streamed: large binaries are not cached in main memory
+    return fetch(new IOStream(source.input(info)), qc);
   }
 }

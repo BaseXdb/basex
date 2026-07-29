@@ -422,7 +422,7 @@ return count($errors[local-name-from-QName(.) = 'XQDY0054'])
         " { 'pass': true() }") + "} catch * { $err:line-number }", 1);
 
     query("contains(try {" + func.args("1 +",
-        " { 'base-uri': 'XXXX', 'pass': 'true' }") + "} catch * { $err:module }, 'XXXX')",
+        " { 'base-uri': 'XXXX', 'pass': true() }") + "} catch * { $err:module }, 'XXXX')",
         true);
 
     // queries

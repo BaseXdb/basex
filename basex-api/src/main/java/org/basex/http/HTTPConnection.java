@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import static org.basex.util.http.HTTPText.*;
 
 import java.io.*;
+import java.security.*;
 import java.util.*;
 import java.util.function.*;
 
@@ -46,9 +47,11 @@ public final class HTTPConnection implements ClientInfo {
   private final AuthMethod authMethod;
   /** Path, starting with a slash. */
   private final String path;
-  /** Remote client address (captured at construction time). */
+  /** Original address. */
+  private final String originalAddress;
+  /** Remote address. */
   private final String remoteAddress;
-  /** Remote client port (captured at construction time). */
+  /** Remote port. */
   private final int remotePort;
 
   /** Request method. */
@@ -60,10 +63,11 @@ public final class HTTPConnection implements ClientInfo {
    * Constructor.
    * @param request request
    * @param response response
+   * @param authMethod authentication method (can be {@code null})
    * @param pth request path (if {@code null}, the path info of the request is used)
    */
   public HTTPConnection(final HttpServletRequest request, final HttpServletResponse response,
-      final String pth) {
+      final AuthMethod authMethod, final String pth) {
 
     this.request = request;
     this.response = response;
@@ -77,19 +81,23 @@ public final class HTTPConnection implements ClientInfo {
     path = normalize(pth != null ? pth : request.getPathInfo());
 
     // capture client address, as the request may be recycled when the value is requested
-    remoteAddress = requestCtx.state().originalAddress();
-    remotePort = requestCtx.state().remotePort();
+    final RequestState state = requestCtx.state();
+    originalAddress = state.originalAddress();
+    remoteAddress = state.remoteAddress();
+    remotePort = state.remotePort();
 
-    authMethod = context.soptions.get(StaticOptions.AUTHMETHOD);
+    // authentication method (servlet-specific or global)
+    this.authMethod = authMethod != null ? authMethod :
+      context.soptions.get(StaticOptions.AUTHMETHOD);
   }
 
   /**
    * Authorizes a request. Initializes the user if it is called for the first time.
-   * @param username name of servlet user (can be {@code null})
+   * @param username name of default servlet user (can be {@code null})
    * @throws IOException I/O exception
    */
   public void authenticate(final String username) throws IOException {
-    // choose admin user for OPTIONS requests, servlet user, or global user (can be empty)
+    // choose admin user for OPTIONS requests, servlet-specific user, or global user (can be empty)
     String name = method.equals(Method.OPTIONS.name()) ? UserText.ADMIN : username;
     if(name == null) name = context.soptions.get(StaticOptions.USER);
 
@@ -266,7 +274,7 @@ public final class HTTPConnection implements ClientInfo {
 
   @Override
   public String clientAddress() {
-    return remoteAddress != null ? remoteAddress + ':' + remotePort : null;
+    return originalAddress != null ? originalAddress + ':' + remotePort : null;
   }
 
   @Override
@@ -322,7 +330,7 @@ public final class HTTPConnection implements ClientInfo {
         header.add(' ').add(RequestAttribute.REALM).add("=\"").add(Prop.NAME).add('"');
         if(authMethod == AuthMethod.DIGEST) {
           final String nonce = Strings.md5(Long.toString(System.nanoTime()));
-          header.add(",").add(RequestAttribute.QOP).add("=\"").add(AUTH).add(',').add(AUTH_INT);
+          header.add(",").add(RequestAttribute.QOP).add("=\"").add(AUTH);
           header.add('"').add(',').add(RequestAttribute.NONCE).add("=\"").add(nonce).add('"');
         }
         response.setHeader(WWW_AUTHENTICATE, header.toString());
@@ -434,22 +442,19 @@ public final class HTTPConnection implements ClientInfo {
           if(Strings.eq(auth.get(RequestAttribute.ALGORITHM), MD5_SESS))
             ha1 = Strings.md5(ha1 + ':' + nonce + ':' + cnonce);
 
-          final StringBuilder h2 = new StringBuilder().append(method).append(':').
-              append(auth.get(RequestAttribute.URI));
           final String qop = auth.get(RequestAttribute.QOP);
-          if(Strings.eq(qop, AUTH_INT)) {
-            h2.append(':').append(Strings.md5(requestCtx.body().toString()));
-          }
-          final String ha2 = Strings.md5(h2.toString());
+          final String ha2 = Strings.md5(method + ':' + auth.get(RequestAttribute.URI));
 
           final StringBuilder sb = new StringBuilder(ha1).append(':').append(nonce);
-          if(Strings.eq(qop, AUTH, AUTH_INT)) {
+          if(Strings.eq(qop, AUTH)) {
             sb.append(':').append(auth.get(RequestAttribute.NC));
             sb.append(':').append(cnonce).append(':').append(qop);
           }
           sb.append(':').append(ha2);
 
-          if(!Strings.md5(sb.toString()).equals(auth.get(RequestAttribute.RESPONSE)))
+          // constant-time comparison of the recomputed and the transmitted response
+          final String rsp = auth.get(RequestAttribute.RESPONSE);
+          if(rsp == null || !MessageDigest.isEqual(token(Strings.md5(sb.toString())), token(rsp)))
             throw new LoginException(user.name());
         }
       }
@@ -483,6 +488,7 @@ public final class HTTPConnection implements ClientInfo {
    * @param ex exception
    */
   private void logError(final int code, final String info, final Exception ex) {
+    Util.debug(ex);
     final StringBuilder sb = new StringBuilder();
     sb.append("Code: ").append(code);
     if(info != null) sb.append(", Info: ").append(info);

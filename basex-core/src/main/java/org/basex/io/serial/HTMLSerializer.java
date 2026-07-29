@@ -88,6 +88,7 @@ final class HTMLSerializer extends XhtmlHtmlSerializer {
       // escape URI attributes
       if(escape && URIS.contains(key)) val = encodeUri(val, UriEncoder.ESCAPE);
     }
+    val = normalize(val, form);
 
     out.print(ATT1);
     final int vl = val.length;

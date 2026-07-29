@@ -122,10 +122,59 @@ public final class RestXqPathTest extends RestXqTest {
     get(500, "declare %R:path() function m:f() {()};", "");
     // two path arguments
     get(500, "declare %R:path('a', 'b') function m:f() {()};", "a");
-    get(500, "declare %R:path('a') %R:path('b') function m:f() {()};", "a");
     // path not found
     get(404, "declare %R:path('') function m:f() { 1 };", "X");
     get(404, "declare %R:path('a') function m:f() { 1 };", "");
+  }
+
+  /**
+   * Multiple {@code %path} annotations.
+   * @throws Exception exception
+   */
+  @Test public void pathAnns() throws Exception {
+    // a function is addressed by each of its paths
+    final String f = "declare %R:path('a') %R:path('b') function m:f() { 'x' };";
+    get("x", f, "a");
+    get("x", f, "b");
+    get(404, f, "c");
+    // a service can cover its root and its sub-paths with a single function
+    final String g = "declare %R:path('/p') %R:path('/p/{$x=.*}') " +
+        "function m:f($x as xs:string?) { $x otherwise 'root' };";
+    get("root", g, "p");
+    get("a/b", g, "p/a/b");
+    // the same variable may be declared by several path templates
+    final String h = "declare %R:path('/q/{$x}') %R:path('/q/{$x}/{$y}') " +
+        "function m:f($x, $y as xs:string?) { $x || ($y otherwise '') };";
+    get("a", h, "q/a");
+    get("ab", h, "q/a/b");
+    // the more specific path is chosen
+    get("2", "declare %R:path('/{$x}') %R:path('/s') function m:f($x as xs:string?) " +
+        "{ if(exists($x)) then 1 else 2 };", "s");
+    // identical paths are rejected, regardless of how they are written
+    get(500, "declare %R:path('/t') %R:path('/t') function m:f() { 1 };", "t");
+    get(500, "declare %R:path('t') %R:path('/t') function m:f() { 1 };", "t");
+    get(500, "declare %R:path('%7b') %R:path('{{') function m:f() { 1 };", "t");
+    get(500, "declare %R:path('{$a}') %R:path('{$b}') function m:f($a, $b) { 1 };", "t");
+    // the same collision is only detected at request time if two functions are involved
+    get(500, "declare %R:path('/{$a}/t') function m:f($a) { 1 };" +
+        "declare %R:path('/{$b}/t') function m:g($b) { 2 };", "x/t");
+    // identical paths of different functions are legal if their methods differ
+    get("1", "declare %R:GET %R:path('/t') function m:f() { 1 };" +
+        "declare %R:POST %R:path('/t') function m:g() { 2 };", "t");
+    // variables of unmatched templates must be optional
+    final String u = "declare %R:path('/u') %R:path('/u/{$x}') ";
+    get(500, u + "function m:f($x as xs:string) { $x };", "u");
+    get(500, u + "function m:f($x as xs:string+) { $x };", "u");
+    // only the path that leaves the variable unbound fails
+    get("a", u + "function m:f($x as xs:string) { $x };", "u/a");
+    // untyped arguments and optional types are fine
+    get("", u + "function m:f($x) { $x };", "u");
+    get("", u + "function m:f($x as xs:string?) { $x };", "u");
+    // a variable that all templates bind may be mandatory
+    get("a", "declare %R:path('/u/{$x}') %R:path('/u/{$x}/e') function m:f($x as xs:string) " +
+        "{ $x };", "u/a");
+    // variable in template missing
+    get(500, "declare %R:path('/v') %R:path('/v/{$x}') function m:f() { 1 };", "v");
   }
 
   /**

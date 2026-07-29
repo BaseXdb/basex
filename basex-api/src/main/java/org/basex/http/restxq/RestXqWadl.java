@@ -73,7 +73,7 @@ public final class RestXqWadl {
     final TreeMap<String, FBuilder> map = new TreeMap<>();
     for(final WebModule module : modules.values()) {
       for(final RestXqFunction func : module.functions()) {
-        if(func.path == null) continue;
+        if(func.path == null || func.error != null) continue;
 
         final TokenObjectMap<TokenList> xqdoc = func.function.doc();
         final String path = func.path.toString();

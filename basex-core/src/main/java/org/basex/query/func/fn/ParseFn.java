@@ -104,12 +104,13 @@ public abstract class ParseFn extends StandardFunc {
 
     // encoding
     final Options options = options(qc);
-    final String enc = toEncodingOrNull(options.get(CommonOptions.ENCODING), RESENCODING_X);
+    final String enc = toEncodingOrNull((String) options.get(CommonOptions.ENCODING),
+        RESENCODING_X);
     final String encoding = enc != null ? enc : testResources != null ? testResources[1] : null;
-    final boolean fallback = Boolean.TRUE.equals(options.get((Option<?>) CommonOptions.FALLBACK));
+    final boolean fallback = options.get(CommonOptions.FALLBACK) == Boolean.TRUE;
 
     // newline normalization
-    Boolean normalize = options.get(CommonOptions.NORMALIZE_NEWLINES);
+    Boolean normalize = (Boolean) options.get(CommonOptions.NORMALIZE_NEWLINES);
     if(normalize != null) {
       if(nl()) throw INVALIDOPTION_X.get(info, Options.unknown(CommonOptions.NORMALIZE_NEWLINES));
     } else {

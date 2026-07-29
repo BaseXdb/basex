@@ -5,6 +5,7 @@ import static org.basex.query.QueryError.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.gflwor.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -33,6 +34,12 @@ public final class Lookup extends Arr {
    */
   public Lookup(final InputInfo info, final Expr... expr) {
     super(info, Types.ITEM_ZM, expr);
+  }
+
+  @Override
+  public boolean navigational() {
+    final Expr input = exprs[0];
+    return (input instanceof Path || input instanceof Lookup) && input.navigational();
   }
 
   @Override

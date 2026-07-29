@@ -109,6 +109,8 @@ public class QueryParser extends InputParser {
   /** Current XQDoc string. */
   private final TokenBuilder docBuilder = new TokenBuilder();
 
+  /** Function or variable declaration that is currently parsed (can be {@code null}). */
+  private String declaration;
   /** XQDoc string of module. */
   private String moduleDoc = "";
   /** Alternative error. */
@@ -247,8 +249,7 @@ public class QueryParser extends InputParser {
     try {
       return sequenceType();
     } catch(final QueryException expr) {
-      Util.debug(expr);
-      throw error(CASTTYPE_X, null, expr.getLocalizedMessage());
+      throw error(CASTTYPE_X, null, expr.getLocalizedMessage()).cause(expr);
     }
   }
 
@@ -336,12 +337,12 @@ public class QueryParser extends InputParser {
       }
     }
     deferredMapKeys.clear();
-    // a referenced cast target type must be declared and castable
+    // a referenced cast target type must be declared and eligible as a cast target
     for(final TypeRef ref : deferredCastTargets) {
       final SeqType st = declaredTypes.get(ref.name());
       if(st == null) throw error(WHICHCAST_X, BasicType.similar(ref.name()));
       ref.resolve(st.type);
-      if(ref.atomic() == null) throw error(INVALIDCAST_X, ref);
+      checkCastTarget(ref, false);
     }
     deferredCastTargets.clear();
   }
@@ -980,8 +981,7 @@ public class QueryParser extends InputParser {
       try {
         query = io.readString();
       } catch(final IOException expr) {
-        Util.debug(expr);
-        throw error(WHICHMODFILE_X, info, io);
+        throw error(WHICHMODFILE_X, info, io).cause(expr);
       }
 
       qc.modStack.push(tPath);
@@ -1049,7 +1049,9 @@ public class QueryParser extends InputParser {
     final boolean external = wsConsumeWs(EXTERNAL);
     Expr expr = null;
     if(wsConsume(":=")) {
+      declaration = string(var.name.varString());
       expr = check(single(), NOVARDECL);
+      declaration = null;
     } else if(!external) {
       throw error(WRONGCHAR_X_X, ":=", found());
     }
@@ -1096,7 +1098,10 @@ public class QueryParser extends InputParser {
 
     localVars.pushContext(false);
     final Params params = paramList(true);
+    // input info of the body will refer to this, even after inlining
+    declaration = Strings.concat(name.prefixString(), '#', params.size());
     final Expr expr = wsConsumeWs(EXTERNAL) ? null : enclosedExpr();
+    declaration = null;
     final String doc = docBuilder.toString();
     final VarScope vs = localVars.popContext();
     final byte[] uri = name.uri();
@@ -2423,7 +2428,26 @@ public class QueryParser extends InputParser {
       else root = expr;
     }
     relativePath(el);
-    return Path.get(info(), root, el.finish());
+    return Path.get(info(), root, dynamicSteps(root, el.finish()));
+  }
+
+  /**
+   * Rewrites non-navigational path steps for JNode navigation (XQuery 4.0, qtspecs #2734):
+   * every step but the leading one, if it is not {@link Expr#navigational() navigational}, is
+   * wrapped in a {@link DynamicStep} (which expands to
+   * {@code if(. instance of node()) then E else child::{ E }}).
+   * @param root root expression (can be {@code null})
+   * @param steps path steps
+   * @return rewritten steps
+   */
+  private Expr[] dynamicSteps(final Expr root, final Expr[] steps) {
+    for(int s = 0; s < steps.length; s++) {
+      final Expr step = steps[s];
+      if((root != null || s > 0) && !step.navigational()) {
+        steps[s] = new DynamicStep(step.info(info()), step);
+      }
+    }
+    return steps;
   }
 
   /**
@@ -3936,13 +3960,27 @@ public class QueryParser extends InputParser {
   private SeqType castTarget() throws QueryException {
     Type type;
     if(wsConsume("(")) {
+      // choice item type, e.g. (xs:date | xs:dateTime)
       type = choiceItemType().type;
     } else {
-      final QNm name = eQName(sc.elemNsAny ? XS_URI : sc.elemNS, TYPEINVALID);
-      if(!name.hasURI() && eq(name.local(), token(ENUM))) {
+      final QNm name = eQName(null, TYPEINVALID);
+      final byte[] local = name.hasURI() ? null : name.local();
+      final Type ft = FuncType.get(name);
+      if(eq(local, token(ENUM))) {
+        // enumeration type
         if(!wsConsume("(")) throw error(WHICHCAST_X, BasicType.similar(name));
         type = enumerationType();
+      } else if(ft != null && wsConsume("(")) {
+        // array(...), map(...), record(...); function(...) is rejected in checkCastTarget
+        type = functionTest(AnnList.EMPTY, ft);
+      } else if(eq(local, token(ITEM)) && wsConsume("(")) {
+        // item()
+        wsCheck(")");
+        type = BasicType.ITEM;
       } else {
+        // attach default element namespace, or schema namespace if default is ##any
+        if(!name.hasURI()) name.uri(sc.elemNsAny ? XS_URI : sc.elemNS);
+        // schema type, list type, or (forward) reference to a named item type
         type = ListType.get(name);
         if(type == null) {
           type = BasicType.get(name, false);
@@ -3963,9 +4001,40 @@ public class QueryParser extends InputParser {
         }
       }
     }
-    if(!(type instanceof TypeRef) && type.atomic() == null) throw error(INVALIDCAST_X, type);
+    // check cast eligibility (forward references are re-checked after resolution)
+    checkCastTarget(type, false);
+    // occurrence indicator
     skipWs();
-    return type.seqType(consume('?') ? Occ.ZERO_OR_ONE : Occ.EXACTLY_ONE);
+    final Occ occ = consume('?') ? Occ.ZERO_OR_ONE : consume('+') ? Occ.ONE_OR_MORE :
+      consume('*') ? Occ.ZERO_OR_MORE : Occ.EXACTLY_ONE;
+    return type.seqType(occ);
+  }
+
+  /**
+   * Checks if an unresolved forward reference exists.
+   * @param type type to check
+   * @param atomic type must be a generalized atomic type
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  private boolean checkCastTarget(final Type type, final boolean atomic) throws QueryException {
+    if(TypeRef.unresolved(type)) return true;
+    final Type tp = TypeRef.deref(type);
+    // choice item type: all alternatives must be generalized atomic types
+    if(tp instanceof final ChoiceItemType cit) {
+      boolean deferred = false;
+      for(final Type alt : cit.types) deferred |= checkCastTarget(alt, true);
+      return deferred;
+    }
+    // generalized atomic type, enumeration type
+    if(tp instanceof EnumType) return false;
+    if(tp instanceof final BasicType bt && bt.atomic() != null &&
+        !bt.oneOf(BasicType.NOTATION, BasicType.ANY_ATOMIC_TYPE, BasicType.ANY_SIMPLE_TYPE))
+      return false;
+    // item(); schema list type; array, map, record types (components are checked while casting)
+    if(!atomic && (tp == BasicType.ITEM || tp instanceof ListType || tp instanceof ArrayType ||
+        tp instanceof MapType)) return false;
+    throw error(INVALIDCAST_X, type);
   }
 
   /**
@@ -4665,8 +4734,7 @@ public class QueryParser extends InputParser {
               try {
                 opt.sw.read(fl, except);
               } catch(final IOException expr) {
-                Util.debug(expr);
-                throw error(NOSTOPFILE_X, fl);
+                throw error(NOSTOPFILE_X, fl).cause(expr);
               }
             } else if(!union && !except) {
               throw error(FTSTOP);
@@ -5165,7 +5233,7 @@ public class QueryParser extends InputParser {
       }
       if(curr == ':' && next() == ')') {
         pos += 2;
-        if(!nested && moduleDoc.isEmpty()) {
+        if(!nested && moduleDoc.isEmpty() && !documented()) {
           moduleDoc = docBuilder.toString().trim();
           docBuilder.reset();
         }
@@ -5174,6 +5242,22 @@ public class QueryParser extends InputParser {
       if(xqdoc) docBuilder.add(curr);
     }
     throw error(COMCLOSE);
+  }
+
+  /**
+   * Checks if a declaration follows that adopts the documentation of a comment.
+   * @return result of check
+   */
+  private boolean documented() {
+    final int p = pos;
+    consumeWS();
+    boolean found = consume(DECLARE);
+    if(found) {
+      consumeWS();
+      found = current() == '%' || consume(FUNCTION) || consume(VARIABLE);
+    }
+    pos = p;
+    return found;
   }
 
   /**
@@ -5277,6 +5361,6 @@ public class QueryParser extends InputParser {
 
   @Override
   public final InputInfo info() {
-    return new InputInfo(this, sc);
+    return new InputInfo(this, sc, declaration);
   }
 }

@@ -497,7 +497,7 @@ public final class QT3TS extends Main {
   /** Flags for dependencies that are not supported. */
   private static final String NOSUPPORT =
     "('schema-location-hint', 'schemaImport', 'schemaValidation', " +
-    "'staticTyping', 'typedData', 'XQUpdate', 'fn-transform-XSLT')";
+    "'staticTyping', 'typedData', 'XQUpdate')";
 
   /** Tests cases to be skipped due to deviations from the spec, or
    * as the testing effort does not justify the outcome. */
@@ -521,6 +521,8 @@ public final class QT3TS extends Main {
     "'K2-ComputeConElem-26', 'K2-ComputeConPI-16', 'K2-ComputeConPI-17', " +
     "'K2-ForExprWithout-42a', 'K2-ForExprWithout-43a', 'K2-ForExprWithout-44a', " +
     "'nscons-047', 'nscons-048', " +
+    // use-character-maps can be declared in the prolog: BaseX supports a lexical string syntax
+    "'Serialization-023', " +
     // too much effort to support in the test suite
     "'fn-available-environment-variables-011', " +
     "'environment-variable-005', 'environment-variable-006', 'environment-variable-007', " +
@@ -775,7 +777,7 @@ public final class QT3TS extends Main {
           asString("serialize(., { 'method': 'xml' })", returned));
       if(expctd.equals(rslt)) return null;
       final String rtrnd = normNL(
-          asString("serialize(., { 'method': 'xml', 'omit-xml-declaration': 'no' })",
+          asString("serialize(., { 'method': 'xml', 'omit-xml-declaration': false() })",
           returned));
       if(expctd.equals(rtrnd)) return null;
 

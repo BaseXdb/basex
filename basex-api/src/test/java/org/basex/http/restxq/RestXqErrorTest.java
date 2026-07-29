@@ -64,6 +64,30 @@ public final class RestXqErrorTest extends RestXqTest {
   }
 
   /**
+   * Error annotations that are restricted to a path.
+   * @throws Exception exception
+   */
+  @Test public void errorPath() throws Exception {
+    final String f = "declare %R:path('/a/{$x}') function m:a($x) { 1 + <a/> };" +
+        "declare %R:path('/b') function m:b() { 1 + <a/> };";
+    final String c = "declare %R:path('/a/{$x}') %R:error('*') function m:c($x) { '1' };";
+
+    // handler is only invoked for errors that are raised under its path
+    get("1", f + c, "a/x");
+    get(500, f + c, "b");
+    // handler with a path is preferred over a global one
+    final String d = "declare %R:error('*') function m:d() { '2' };";
+    get("1", f + c + d, "a/x");
+    get("2", f + c + d, "b");
+    // path segments are bound to the handler
+    get("x", f + "declare %R:path('/a/{$x}') %R:error('*') function m:c($x) { $x };", "a/x");
+    // handlers for the same code do not conflict if their paths differ
+    get("2", f + c + "declare %R:path('/b') %R:error('*') function m:e() { '2' };", "b");
+    // handler with a path is no endpoint
+    get(404, "declare %R:path('/a') %R:error('*') function m:a() { 'F' };", "a");
+  }
+
+  /**
    * Errors with error annotation.
    * @throws Exception exception
    */

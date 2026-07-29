@@ -294,6 +294,24 @@ abstract class Syntax {
   }
 
   /**
+   * Indicates if the syntax can have function and variable declarations.
+   * @return result of check
+   */
+  boolean hasDeclarations() {
+    return false;
+  }
+
+  /**
+   * Returns the function and variable declarations of the specified text.
+   * @param text text
+   * @return declarations
+   */
+  @SuppressWarnings("unused")
+  ArrayList<Declaration> declarations(final byte[] text) {
+    return new ArrayList<>();
+  }
+
+  /**
    * Returns the indentation of a line, relative to the expression that encloses it.
    * @param text text
    * @param pos start of the line (first character that is no whitespace)

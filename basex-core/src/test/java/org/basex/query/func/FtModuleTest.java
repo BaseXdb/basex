@@ -42,8 +42,8 @@ public final class FtModuleTest extends SandboxTest {
     query(func.args(" ('A', 'B')", " ('C', 'B')"), true);
 
     // check match options
-    query(func.args("Assignments", "Azzignments", " { 'fuzzy': 'yes' }"), true);
-    query(func.args("Assignments", "Azzignments", " { 'fuzzy': 'no' }"), false);
+    query(func.args("Assignments", "Azzignments", " { 'fuzzy': true() }"), true);
+    query(func.args("Assignments", "Azzignments", " { 'fuzzy': false() }"), false);
     query(func.args("Assignments", "assignment", " { 'stemming': true() }"), true);
     query(func.args("Assignment", "assignments", " { 'stemming': true() }"), true);
     query(func.args("A", "a", " { 'case': 'upper' }"), true);
@@ -85,7 +85,7 @@ public final class FtModuleTest extends SandboxTest {
 
     // check buggy options
     error(func.args("x", "x", " { 'x': 'y' }"), INVALIDOPTION_X);
-    error(func.args("x", "x", " { 'mode': '' }"), INVALIDOPTION_X);
+    error(func.args("x", "x", " { 'mode': '' }"), INVALIDOPTIONVALUE_X);
     error(func.args("x", "x", " 1"), INVTYPE_X);
   }
 
@@ -148,7 +148,7 @@ public final class FtModuleTest extends SandboxTest {
     query(func.args("A bc"), "a bc");
     query(func.args("A bc", " { 'case': 'sensitive' }"), "A bc");
     query(func.args("\u00e4", " { 'diacritics': 'sensitive' }"), "\u00e4");
-    query(func.args("gifts", " { 'stemming': 'true' }"), "gift");
+    query(func.args("gifts", " { 'stemming': true() }"), "gift");
 
     query("declare ft-option using stemming; " + func.args("Gifts"), "gift");
     query(func.args(""), "");
@@ -205,8 +205,8 @@ public final class FtModuleTest extends SandboxTest {
 
     // check match options
     query(func.args(NAME, "Assignments", " {}"), "Assignments");
-    query(func.args(NAME, "Azzignments", " { 'fuzzy': 'yes' }"), "Assignments");
-    query(func.args(NAME, "Azzignments", " { 'fuzzy': 'no' }"), "");
+    query(func.args(NAME, "Azzignments", " { 'fuzzy': true() }"), "Assignments");
+    query(func.args(NAME, "Azzignments", " { 'fuzzy': false() }"), "");
     // check search modes
     query(func.args(NAME, "1 Exercise", " { 'mode': 'phrase' }"), "");
     query(func.args(NAME, "1 Exercise", " { 'mode': 'all' }"), "");
@@ -226,7 +226,7 @@ public final class FtModuleTest extends SandboxTest {
 
     // check buggy options
     error(func.args(NAME, "x", " { 'x': 'y' }"), INVALIDOPTION_X);
-    error(func.args(NAME, "x", " { 'mode': '' }"), INVALIDOPTION_X);
+    error(func.args(NAME, "x", " { 'mode': '' }"), INVALIDOPTIONVALUE_X);
     error(func.args(NAME, "x", " 1"), INVTYPE_X);
   }
 
@@ -252,7 +252,7 @@ public final class FtModuleTest extends SandboxTest {
     query(func.args("A bc"), "a\nbc");
     query(func.args("A bc", " { 'case': 'sensitive' }"), "A\nbc");
     query(func.args("\u00e4", " { 'diacritics': 'sensitive' }"), "\u00e4");
-    query(func.args("gifts", " { 'stemming': 'true' }"), "gift");
+    query(func.args("gifts", " { 'stemming': true() }"), "gift");
 
     query("declare ft-option using stemming; " + func.args("Gifts"), "gift");
     query("count(" + func.args("") + ')', 0);

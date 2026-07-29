@@ -538,7 +538,7 @@ public abstract class W3CTS extends Main {
       }
 
       final Value value = qp.qc.resources.doc(new QueryInput(src, qp.sc),
-          QueryResources.DOC_OPTIONS, qp.qc.user, null);
+          QueryResources.DOC_OPTIONS, qp.qc.user, null, true);
       qp.variable(string(vars.itemAt(n).string(null)), value);
     }
     return tb.finish();

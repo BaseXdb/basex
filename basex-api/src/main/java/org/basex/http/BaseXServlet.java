@@ -9,6 +9,7 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 
 import org.basex.core.*;
+import org.basex.core.StaticOptions.*;
 import org.basex.core.jobs.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
@@ -24,6 +25,11 @@ import org.basex.util.http.*;
  * @author Christian Gruen
  */
 public abstract class BaseXServlet extends HttpServlet {
+  /** Servlet-specific user. */
+  private String username;
+  /** Servlet-specific authentication method. */
+  private AuthMethod auth;
+
   @Override
   public void init(final ServletConfig config) throws ServletException {
     super.init(config);
@@ -35,6 +41,11 @@ public abstract class BaseXServlet extends HttpServlet {
       throw new ServletException(ex);
     }
 
+    // parse servlet-specific user and authentication method
+    username = initParam(config, StaticOptions.USER.name());
+    final String method = initParam(config, StaticOptions.AUTHMETHOD.name());
+    if(method != null) auth = AuthMethod.valueOf(method);
+
     final Context ctx = hc.context();
     if(ctx.soptions.get(StaticOptions.LOGTRACE)) ctx.setExternal(ctx.log);
   }
@@ -43,13 +54,14 @@ public abstract class BaseXServlet extends HttpServlet {
   public final void service(final HttpServletRequest request, final HttpServletResponse response)
       throws IOException {
 
-    final HTTPConnection conn = new HTTPConnection(request, response, null);
+    final HTTPConnection conn = new HTTPConnection(request, response, auth, path(request));
     try {
-      conn.authenticate(username());
+      conn.authenticate(username);
       run(conn);
     } catch(final Exception ex) {
       error(conn, ex);
     } finally {
+      conn.requestCtx.close();
       if(Prop.debug) {
         Util.errln("Request: " + request.getMethod() + ' ' + request.getRequestURL());
         for(final String name : Collections.list(request.getHeaderNames())) {
@@ -71,10 +83,27 @@ public abstract class BaseXServlet extends HttpServlet {
   protected abstract void run(HTTPConnection conn) throws Exception;
 
   /**
-   * Returns the name of the user to run the servlet with.
-   * @return user name, or {@code null} if the global default user is to be used
+   * Returns the request path to be processed.
+   * @param request HTTP request
+   * @return path
    */
-  protected String username() {
+  protected String path(final HttpServletRequest request) {
+    return request.getPathInfo();
+  }
+
+  /**
+   * Returns the value of a servlet-specific initialization parameter.
+   * @param config servlet configuration
+   * @param name name of parameter (without database prefix)
+   * @return value, or {@code null} if the parameter is not specified
+   */
+  public static String initParam(final ServletConfig config, final String name) {
+    for(final String param : Collections.list(config.getInitParameterNames())) {
+      if(param.startsWith(Prop.DBPREFIX) &&
+          param.substring(Prop.DBPREFIX.length()).equalsIgnoreCase(name)) {
+        return config.getInitParameter(param);
+      }
+    }
     return null;
   }
 
@@ -85,6 +114,7 @@ public abstract class BaseXServlet extends HttpServlet {
    * @throws IOException I/O exception
    */
   public static void error(final HTTPConnection conn, final Exception ex) throws IOException {
+    Util.debug(ex);
     if(ex instanceof final HTTPException hex) {
       conn.error(hex.getStatus(), Util.message(hex));
     } else if(ex instanceof LoginException) {
@@ -97,6 +127,9 @@ public abstract class BaseXServlet extends HttpServlet {
         // status code is encoded in the local name (e.g. 'status404')
         code = Token.toInt(Token.substring(qname.local(), QueryText.STATUS.length));
         full = false;
+      } else if(QueryError.BASEX_PERMISSION_X_X.eq(qname)) {
+        // insufficient permissions of an authenticated user
+        code = SC_FORBIDDEN;
       }
       final SerializerOptions sopts = qex.output();
       if(sopts != null) {

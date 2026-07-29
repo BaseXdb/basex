@@ -133,7 +133,7 @@ public final class List extends Command {
       }
       Close.close(data, context);
     } catch(final IOException ex) {
-      return error(Util.message(ex));
+      return error(ex);
     }
     out.println(table.sort().finish());
     return true;

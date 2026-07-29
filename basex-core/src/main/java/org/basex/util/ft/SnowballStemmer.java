@@ -15,16 +15,11 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Dimitar Popov
  */
-final class SnowballStemmer extends Stemmer {
+final class SnowballStemmer extends ExternalStemmer<SnowballStemmer.StemmerClass> {
   /** Name of the package with all Snowball stemmers. */
   private static final String PATTERN = "org.tartarus.snowball.ext.%Stemmer";
   /** Stemmer classes which the Snowball library provides. */
   private static final HashMap<Language, StemmerClass> CLASSES = new HashMap<>();
-
-  /** Stemmer class corresponding to the required properties. */
-  private StemmerClass clazz;
-  /** Stemmer instance. */
-  private Object stemmer;
 
   static {
     if(Reflect.available(PATTERN, "German")) {
@@ -62,9 +57,7 @@ final class SnowballStemmer extends Stemmer {
    * @param lang language of the text to stem
    */
   private SnowballStemmer(final Language lang, final FTIterator fti) {
-    super(fti);
-    clazz = CLASSES.get(lang);
-    stemmer = Reflect.get(clazz.clz);
+    super(lang, fti);
   }
 
   @Override
@@ -73,18 +66,13 @@ final class SnowballStemmer extends Stemmer {
   }
 
   @Override
-  public boolean supports(final Language lang) {
-    return CLASSES.containsKey(lang);
+  Map<Language, StemmerClass> classes() {
+    return CLASSES;
   }
 
   @Override
   protected byte prec() {
     return 2;
-  }
-
-  @Override
-  Collection<Language> languages() {
-    return CLASSES.keySet();
   }
 
   @Override
@@ -102,5 +90,6 @@ final class SnowballStemmer extends Stemmer {
    * @param stem       Method {@code stem}.
    * @param getCurrent Method {@code getCurrent}.
    */
-  private record StemmerClass(Class<?> clz, Method setCurrent, Method stem, Method getCurrent) { }
+  record StemmerClass(Class<?> clz, Method setCurrent, Method stem, Method getCurrent)
+      implements ExternalStemmer.StemmerClass { }
 }

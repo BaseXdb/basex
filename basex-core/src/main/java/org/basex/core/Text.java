@@ -174,7 +174,8 @@ public interface Text {
     "  -d         Enable debugging output" + NL +
     "  -g         Enable GZIP support" + NL +
     "  -h<port>   Set port of HTTP server" + NL +
-    "  -l         Start in local mode" + NL +
+    "  -l         Start in local mode (default)" + NL +
+    "  -L         Start database server in addition" + NL +
     "  -n<name>   Set host name of database server" + NL +
     "  -p<port>   Set port of database server" + NL +
     "  -s<port>   Specify port to stop HTTP server" + NL +
@@ -370,10 +371,10 @@ public interface Text {
     lang("c_info21") + NL +
     LI + lang("c_info22") + NL +
     LI + CmdInfo.DATABASE + COLS + lang("c_info23") + NL +
-    LI + CmdInfo.INDEX + " [" + CmdIndexInfo.TEXT + '|' + CmdIndexInfo.ATTRIBUTE + '|' +
+    LI + CmdInfo.INDEX + " ([" + CmdIndexInfo.TEXT + '|' + CmdIndexInfo.ATTRIBUTE + '|' +
       CmdIndexInfo.TOKEN + '|' + CmdIndexInfo.FULLTEXT + '|' + CmdIndexInfo.PATH + '|' +
-      CmdIndexInfo.ELEMNAME + '|' + CmdIndexInfo.ATTRNAME + "]" + COLS + lang("c_info24") + NL +
-    LI + CmdInfo.STORAGE + " [start end] | [" + S_QUERY + "]: " + lang("c_info25")
+      CmdIndexInfo.ELEMNAME + '|' + CmdIndexInfo.ATTRNAME + "])" + COLS + lang("c_info24") + NL +
+    LI + CmdInfo.STORAGE + " ([start] ([end]))" + COLS + lang("c_info25")
   };
   /** Command help. */
   String[] HELPCLOSE = {
@@ -385,7 +386,7 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPDIR = {
-    '[' + S_PATH  + ']', lang("c_dir1"), lang("c_dir2")
+    "([" + S_PATH  + "])", lang("c_dir1"), lang("c_dir2")
   };
   /** Command help. */
   String[] HELPDROP = {
@@ -426,7 +427,7 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPRUN = {
-    '[' + S_PATH + ']', lang("c_run1"), lang("c_run2", S_PATH)
+    "[file]", lang("c_run1"), lang("c_run2", "file")
   };
   /** Command help. */
   String[] HELPTEST = {
@@ -438,7 +439,7 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPKILL = {
-    '[' + S_NAME + ']', lang("c_kill1"), lang("c_kill2")
+    "[target]", lang("c_kill1"), lang("c_kill2")
   };
   /** Command help. */
   String[] HELPRENAME = {
@@ -482,7 +483,7 @@ public interface Text {
     "  " + lang("c_alterbackup") + NL +
     LI + CmdAlter.DATABASE + " [" + S_NAME + "] [newname]" + NL +
     "  " + lang("c_alterdb") + NL +
-    LI + CmdAlter.PASSWORD + " [" + S_NAME + "] [" + S_PW + ']' + NL +
+    LI + CmdAlter.PASSWORD + " [" + S_NAME + "] ([" + S_PW + "])" + NL +
     "  " + lang("c_alterpw") + NL +
     LI + CmdAlter.USER  + " [" + S_NAME + "] ([newname]):" + NL +
     "  " + lang("c_alteruser")
@@ -926,6 +927,8 @@ public interface Text {
   /** Command info. */
   String GO_TO_LINE = lang("go_to_line");
   /** Command info. */
+  String GO_TO_DECLARATION = lang("go_to_declaration");
+  /** Command info. */
   String COLORS = lang("colors");
   /** Command info. */
   String CUT = lang("cut");
@@ -1011,6 +1014,8 @@ public interface Text {
   String SAVE = lang("save");
   /** Command info. */
   String SAVE_AS = lang("save_as");
+  /** Command info. */
+  String SAVE_COPY_AS = lang("save_copy_as");
   /** Command info. */
   String PACKAGES = lang("packages");
   /** Command info. */
@@ -1427,6 +1432,8 @@ public interface Text {
   String H_DB_FORMAT = lang("h_db_format");
   /** Index update. */
   String H_INDEX_FORMAT = lang("h_index_format");
+  /** Store update. */
+  String H_STORE_FORMAT = lang("h_store_format");
   /** Dialog title for opening a large database. */
   String H_LARGE_DB = lang("h_large_db") + NL + ' ';
   /** Dialog title for announcing binary file. */

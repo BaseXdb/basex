@@ -19,10 +19,7 @@ public final class BaseXException extends IOException {
   public BaseXException(final String message, final Object... ext) {
     super(Util.info(message, ext));
     for(final Object o : ext) {
-      if(o instanceof final Throwable th) {
-        initCause(th);
-        break;
-      }
+      if(o instanceof final Throwable th) cause(th);
     }
   }
 
@@ -32,6 +29,16 @@ public final class BaseXException extends IOException {
    */
   public BaseXException(final Exception ex) {
     super(Util.message(ex));
-    initCause(ex);
+    cause(ex);
+  }
+
+  /**
+   * Attaches the throwable that caused this error.
+   * @param cause cause (can be {@code null})
+   * @return self reference
+   */
+  public BaseXException cause(final Throwable cause) {
+    if(cause != null && cause != this && getCause() == null) initCause(cause);
+    return this;
   }
 }

@@ -18,7 +18,11 @@ public final class SqlInit extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String driver = toString(arg(0), qc);
-    if(Reflect.find(driver) == null) throw SQL_INIT_X.get(info, driver);
+    try {
+      Reflect.forName(driver);
+    } catch(final Throwable th) {
+      throw SQL_INIT_X.get(info, driver).cause(th);
+    }
     return Empty.VALUE;
   }
 }

@@ -114,7 +114,7 @@ public enum QueryError {
   /** Error code. */
   BIN_IOOR_X_X(BIN, "index-out-of-range", "Index '%' is out of range (0-%)."),
   /** Error code. */
-  BIN_ITL_X_X(BIN, "integer-too-large", "Index '%' is too large: %."),
+  BIN_ITL_X(BIN, "integer-too-large", "Value is too large for an integer: %."),
   /** Error code. */
   BIN_NS_X(BIN, "negative-size", "Size '%' is negative."),
   /** Error code. */
@@ -327,7 +327,9 @@ public enum QueryError {
   /** Error code. */
   JOBS_ID_INVALID_X(JOB, "id", "Invalid job name: %."),
   /** Error code. */
-  JOBS_OPTIONS(JOB, "options", "Either 'cache' or 'interval' option is allowed."),
+  JOBS_CRON_X_X(JOB, "cron", "Cron expression '%': %."),
+  /** Error code. */
+  JOBS_OPTIONS_X_X(JOB, "options", "Options are mutually exclusive: '%', '%'."),
   /** Error code. */
   JOBS_OVERFLOW1_X(JOB, "overflow", "Too many jobs registered (%)."),
   /** Error code. */
@@ -390,6 +392,8 @@ public enum QueryError {
   // Request Module
 
   /** Error code. */
+  REQUEST_BODY(REQUEST, "body", "Request body cannot be read."),
+  /** Error code. */
   REQUEST_PARAMETER(REQUEST, "parameter", "Query string cannot be decoded."),
 
   // Session Module
@@ -427,11 +431,11 @@ public enum QueryError {
   STORE_IO_X(STORE, "io", "%"),
   /** Error code. */
   STORE_NAME_X(STORE, "name", "Invalid name: %."),
+  /** Error code. */
+  STORE_UPDATE(STORE, "update", "Store cannot be modified while it is updated."),
 
   // String Module
 
-  /** Error code. */
-  STRING_FORMAT_X_X(STRING, "format", "%: %."),
   /** Error code. */
   STRING_BOUNDS_X(STRING, "bounds", "String exceeds maximum supported length of % characters."),
   /** Error code. */
@@ -603,11 +607,15 @@ public enum QueryError {
   /** Error code. */
   NOXSDANDDTD_X(FODC, 9, "DTD validation must not be enabled when 'xsd-validation' is '%'."),
   /** Error code. */
+  NOSCHEMAAWARENESS_X(FODC, 9, "Schema-aware processing is not supported: %."),
+  /** Error code. */
   INVHTML_X(FODC, 11, "HTML parsing failed: %"),
   /** Error code. */
   NODTDVALIDATION(FODC, 13, "The internal parser does not support DTD validation."),
   /** Error code. */
   XSDVALIDATIONERR_X(FODC, 14, "XSD Validation error: %"),
+  /** Error code. */
+  SCHEMAASSEMBLY_X(FODC, 15, "Schema cannot be assembled: %"),
   /** Error code. */
   EXTERNALRESOURCE_X(FODC, 16, Text.EXTACCESS_BLOCKED_X),
 
@@ -795,6 +803,13 @@ public enum QueryError {
   RESINPUT_X(FOUT, 1190, "%."),
   /** Error code. */
   RECDECODING_X(FOUT, 1200, "%."),
+
+  /** Error code. */
+  TRANSFORM_PROCESSOR_X(FOXT, 1, "Not supported by the available XSLT processor: %."),
+  /** Error code. */
+  TRANSFORM_OPTIONS_X(FOXT, 2, "%"),
+  /** Error code. */
+  TRANSFORM_ERROR_X(FOXT, 3, "%"),
 
   /** Error code. */
   FTWEIGHT_X(FTDY, 16, "Weight value out of range: %."),
@@ -1176,6 +1191,8 @@ public enum QueryError {
   /** Error code. */
   INVALIDOPTION_X(XPTY, 4, "%"),
   /** Error code. */
+  INVALIDOPTIONVALUE_X(XPTY, 4, "%"),
+  /** Error code. */
   UNKNOWNOPTION_X(XPTY, 4, "Unknown option '%'."),
   /** Error code. */
   PATHNODE_X_X_X(XPTY, 4, "%: node expected, % found: %."),
@@ -1188,6 +1205,8 @@ public enum QueryError {
   PATHJNODE_X_X_X(XPTY, 18, "%: JNode or atomic value expected, % found: %."),
   /** Error code. */
   NSSENS_X_X(XPTY, 117, "Cannot convert % to %."),
+  /** Error code. */
+  INVCONVERT_X_X(XPTY, 155, "% cannot be cast to %."),
 
   /** Error code. */
   CATTDUPL_X(XQDY, 25, "Duplicate attribute name: %."),
@@ -1578,6 +1597,7 @@ public enum QueryError {
     /** Error type. */ FOUP,
     /** Error type. */ FOUR,
     /** Error type. */ FOUT,
+    /** Error type. */ FOXT,
     /** Error type. */ FTDY,
     /** Error type. */ FTST,
     /** Error type. */ SENR,

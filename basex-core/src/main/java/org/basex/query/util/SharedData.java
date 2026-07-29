@@ -2,6 +2,7 @@ package org.basex.query.util;
 
 import java.util.*;
 
+import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -82,6 +83,30 @@ public final class SharedData {
   public byte[] token(final byte[] token) {
     synchronized (tokens) {
       return token.length == 0 ? Token.EMPTY : tokens.put(token);
+    }
+  }
+
+  /** Interval at which token interning re-evaluates the dedup rate. */
+  private static final int INTERN_PROBE = 4096;
+
+  /**
+   * Interns the tokens of a sequence in place, replacing duplicates with shared instances.
+   * @param values tokens to be interned (updated in place)
+   * @param job interruptible job
+   */
+  public void tokens(final byte[][] values, final Job job) {
+    final int vl = values.length;
+    synchronized(tokens) {
+      final int before = tokens.size();
+      for(int v = 0; v < vl; v++) {
+        if((v & INTERN_PROBE - 1) == 0) {
+          job.checkStop();
+          // stop if more than half of the tokens seen so far were distinct
+          if(v >= INTERN_PROBE && tokens.size() - before << 1 > v) return;
+        }
+        final byte[] value = values[v];
+        if(value.length != 0) values[v] = tokens.put(value);
+      }
     }
   }
 

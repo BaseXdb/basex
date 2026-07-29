@@ -383,7 +383,8 @@ public final class JNodeTest extends SandboxTest {
     query("declare context item := { 'a': 1, 'b': 2 }; /b", "{\"b\":2}");
     query("declare context item := { 'a': 1, 'b': 2 }; /* => count()", 2);
     query("declare context item := [ 8, 9 ]; /jnode(2)", "[9]");
-    query("({ 'a': 1 }) / (/a)", "{\"a\":1}");
+    // an absolute path is no navigational step: it is evaluated as a selector with absent focus
+    error("({ 'a': 1 }) / (/a)", NOCTX_X);
 
     // double slash: descendants of the coerced root JNode
     query("declare context item := { 'a': { 'b': 2 } }; //b", "{\"b\":2}");
@@ -395,26 +396,30 @@ public final class JNodeTest extends SandboxTest {
     error("declare context item := 123; //a", NODOC_X);
   }
 
-  /** Nested path expressions: flattening must preserve map/array coercion to JNodes. */
+  /** Nested path expressions: only navigational steps navigate, others select by key. */
   @Test public void nestedPath() {
-    // the inner '$j' is a nested-path root and must still be coerced to a JNode;
-    // it must not be flattened into a step, where the coercion no longer applies
-    query("let $j := { 'a': 1 } return $j/($j/a)", "{\"a\":1}");
-    query("let $j := { 'a': 1 } return $j/(($j/a)[true()])", "{\"a\":1}");
-    query("let $j := { 'a': { 'b': 2 } } return $j/($j/a/b)", "{\"b\":2}");
+    // a nested path rooted in a variable is no navigational step: its value is used as a key
+    query("let $j := { 'a': 1 } return $j/($j/a)", "");
+    query("let $j := { 'a': 1 } return $j/(($j/a)[true()])", "");
+    query("let $j := { 'a': { 'b': 2 } } return $j/($j/a/b)", "");
     // equivalent form with the inner JNode precomputed
-    query("let $j := { 'a': 1 } let $x := $j/a return $j/$x", "{\"a\":1}");
+    query("let $j := { 'a': 1 } let $x := $j/a return $j/$x", "");
+    // navigational steps: the path root must still be coerced to a JNode
+    query("let $j := { 'a': 1 } return $j/(a[true()])", "{\"a\":1}");
+    query("let $j := { 'a': { 'b': 2 } } return $j/(a/b)", "{\"b\":2}");
   }
 
   /** A path result over JNodes must be JNodes or atomic values (XPTY0018, not XPTY0004). */
   @Test public void pathResultType() {
-    error("let $j := { 'a': 1 } return $j/$j", PATHJNODE_X_X_X);
-    error("{ 'a': 1 }/({ 'b': 2 })", PATHJNODE_X_X_X);
-    error("{ 'a': 1 }/(true#0)", PATHJNODE_X_X_X);
-    // XML nodes are not valid results either (must not be treated as a child step)
-    error("{ 'a': { 'b': 'c' } }/<a>a</a>", PATHJNODE_X_X_X);
-    error("{ 'a': 1 }/<x>y</x>", PATHJNODE_X_X_X);
-    error("{ 'a': 1 }/(<x>y</x>, 'a')", PATHJNODE_X_X_X);
+    error("{ 'a': { 'b': <x/> } }/a?b", PATHJNODE_X_X_X);
+    error("{ 'a': { 'b': true#0 } }/a?b", PATHJNODE_X_X_X);
+    // non-navigational steps are selectors: their value is atomized to a key
+    error("let $j := { 'a': 1 } return $j/$j", FIATOMIZE_X);
+    error("{ 'a': 1 }/({ 'b': 2 })", FIATOMIZE_X);
+    error("{ 'a': 1 }/(true#0)", FIATOMIZE_X);
+    query("{ 'a': { 'b': 'c' } }/<a>a</a>", "{\"a\":{\"b\":\"c\"}}");
+    query("{ 'a': 1 }/<x>y</x>", "");
+    query("{ 'a': 1 }/(<x>y</x>, 'a')", "{\"a\":1}");
   }
 
   /** Lookup and navigational steps that compute an atomic value return the value, not a key. */

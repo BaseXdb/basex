@@ -14,6 +14,6 @@ import org.basex.util.*;
 public final class ValidateXsdProcessor extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) {
-    return Str.get(ValidateXsd.IMPL[ValidateXsd.OFFSET + 1]);
+    return Str.get(ValidateXsd.processor());
   }
 }

@@ -38,7 +38,7 @@ public class XQueryEval extends StandardFunc {
     /** Maximum amount of megabytes that may be allocated by the query. */
     public static final NumberOption MEMORY = new NumberOption("memory", 0);
     /** Query base-uri. */
-    public static final StringOption BASE_URI = CommonOptions.BASE_URI;
+    public static final StringOption BASE_URI = new StringOption(CommonOptions.BASE_URI);
     /** Pass on error info. */
     public static final BooleanOption PASS = new BooleanOption("pass", false);
   }
@@ -143,7 +143,6 @@ public class XQueryEval extends StandardFunc {
         if(error != null) throw error.get(pass ? new InputInfo(query.path(), 1, 1) : info);
         throw ex;
       } catch(final QueryException ex) {
-        Util.debug(ex);
         final QueryError error = ex.error();
         final QueryException qe = error(ex, error == BASEX_PERMISSION_X_X ? XQUERY_PERM_X :
           error == BASEX_OVERFLOW ? XQUERY_UNEXPECTED_X : null);
@@ -151,7 +150,7 @@ public class XQueryEval extends StandardFunc {
         InputInfo ii = ex.info();
         if(pass && ii == null) ii = new InputInfo(query.path(), 1, 1);
         throw qe.info(pass ? ii.path().equals(info.path()) ?
-          new InputInfo(query.path(), ii.line(), ii.column()) : ii : info);
+          new InputInfo(query.path(), ii.line(), ii.column(), ii.decl()) : ii : info);
       } catch(final StackOverflowError er) {
         // pass on error info: assign (possibly empty) path of module which caused the error
         throw XQUERY_UNEXPECTED_X.get(info, er);

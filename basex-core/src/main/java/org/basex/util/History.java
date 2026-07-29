@@ -207,6 +207,13 @@ public final class History {
   }
 
   /**
+   * Invalidates the saved position.
+   */
+  public void invalidate() {
+    saved = -1;
+  }
+
+  /**
    * Checks if the file has been modified.
    * @return result of check
    */

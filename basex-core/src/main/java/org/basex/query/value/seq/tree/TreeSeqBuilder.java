@@ -34,6 +34,14 @@ public final class TreeSeqBuilder extends SeqBuilder {
   private final FingerTreeBuilder<Item> tree = new FingerTreeBuilder<>();
 
   /**
+   * Constructor.
+   * @param job interruptible job
+   */
+  public TreeSeqBuilder(final Job job) {
+    super(job);
+  }
+
+  /**
    * Adds an item to the start of the sequence.
    * @param item item to add
    * @return reference to this builder for convenience
@@ -95,8 +103,8 @@ public final class TreeSeqBuilder extends SeqBuilder {
   }
 
   @Override
-  protected SeqBuilder addSequence(final Value value, final Job job) {
-    if(!(value instanceof final BigSeq big)) return super.addSequence(value, job);
+  protected SeqBuilder addSequence(final Value value) {
+    if(!(value instanceof final BigSeq big)) return super.addSequence(value);
 
     final Item[] ls = big.left, rs = big.right;
     final FingerTree<Item, Item> midTree = big.middle;

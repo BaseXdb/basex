@@ -27,8 +27,8 @@ public final class FnCompare extends StandardFunc {
     if(value1 == null || value2 == null) return Empty.VALUE;
     if(!value1.comparable(value2)) throw compareError(value1, value2, info);
 
-    final long diff = value1.compare(value2, collation, true, info);
-    return Itr.get(diff < 0 ? -1 : diff > 0 ? 1 : 0);
+    final long diff = value1.compare(value2, collation, true, qc, info);
+    return Itr.get(Long.signum(diff));
   }
 
   @Override

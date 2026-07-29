@@ -152,8 +152,7 @@ public final class BXCollection implements Collection {
       data.delete(getResource(del.getId()).pre);
       data.finishUpdate(mopts);
     } catch(final BaseXException ex) {
-      Util.debug(ex);
-      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_LOCK);
+      throw (XMLDBException) new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_LOCK).initCause(ex);
     }
   }
 
@@ -193,8 +192,7 @@ public final class BXCollection implements Collection {
       data.insert(data.meta.size, -1, new DataClip(md));
       data.finishUpdate(mopts);
     } catch(final BaseXException ex) {
-      Util.debug(ex);
-      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_LOCK);
+      throw (XMLDBException) new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_LOCK).initCause(ex);
     }
   }
 
@@ -256,8 +254,8 @@ public final class BXCollection implements Collection {
         f.set(md, val);
       }
     } catch(final Exception ex) {
-      Util.debug(ex);
-      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_PROP + name);
+      throw (XMLDBException) new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_PROP + name).
+          initCause(ex);
     }
   }
 

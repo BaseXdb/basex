@@ -162,8 +162,8 @@ public final class SingletonSeq extends Seq {
   }
 
   @Override
-  public Value shrink(final Job job) throws QueryException {
-    value.shrink(job);
+  public Value shrink(final QueryContext qc) throws QueryException {
+    value.shrink(qc);
     return this;
   }
 

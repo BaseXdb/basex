@@ -5,7 +5,6 @@ import java.util.zip.*;
 
 import org.basex.io.*;
 import org.basex.io.in.*;
-import org.basex.util.list.*;
 
 /**
  * Contains methods for zipping and unzipping archives.
@@ -68,19 +67,9 @@ final class RepoArchive {
   private static byte[] getEntry(final ZipInputStream in, final String entry) throws IOException {
     for(ZipEntry ze; (ze = in.getNextEntry()) != null;) {
       if(!entry.equals(ze.getName())) continue;
+      // pre-allocate if the size is known, otherwise read to the end of the entry
       final int s = (int) ze.getSize();
-      if(s >= 0) {
-        // known size: pre-allocate and fill array
-        final byte[] data = new byte[s];
-        int c, o = 0;
-        while(s - o != 0 && (c = in.read(data, o, s - o)) != -1) o += c;
-        return data;
-      }
-      // unknown size: use byte list
-      final byte[] data = new byte[IO.BLOCKSIZE];
-      final ByteList bl = new ByteList();
-      for(int c; (c = in.read(data)) != -1;) bl.add(data, 0, c);
-      return bl.finish();
+      return s >= 0 ? in.readNBytes(s) : in.readAllBytes();
     }
     return null;
   }

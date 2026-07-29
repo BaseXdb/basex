@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.list.*;
 
 /**
  * Function implementation.
@@ -19,11 +18,11 @@ public final class DbNodePre extends DbNodeId {
   }
 
   @Override
-  void addIds(final Value nodes, final IntList ids) throws QueryException {
+  void addIds(final Value nodes, final ValueBuilder vb) throws QueryException {
     if(nodes instanceof final DBNodeSeq seq) {
-      for(final int pre : seq.pres()) ids.add(pre);
+      for(final int pre : seq.pres()) vb.add(pre);
     } else {
-      super.addIds(nodes, ids);
+      super.addIds(nodes, vb);
     }
   }
 }

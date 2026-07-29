@@ -42,9 +42,9 @@ public enum Calc {
         if(type1 == DATE) return new Dat((Dat) item1, dur(info, item2), true, info);
         if(type2 == DATE) return new Dat((Dat) item2, dur(info, item1), true, info);
         if(type1 == TIME && type2 == DAY_TIME_DURATION)
-          return new Tim((Tim) item1, (DTDur) item2, true);
+          return new Tim((Tim) item1, (DTDur) item2, true, info);
         if(type2 == TIME && type1 == DAY_TIME_DURATION)
-          return new Tim((Tim) item2, (DTDur) item1, true);
+          return new Tim((Tim) item2, (DTDur) item1, true, info);
       }
       throw typeError(info, item1, item2);
     }
@@ -111,9 +111,10 @@ public enum Calc {
           default      -> subtractDec(item1, item2, info);
         };
       } else if(type1.instanceOf(DATE_TIME) && type2.instanceOf(DATE_TIME)) {
-        return new DTDur((ADate) item1, (ADate) item2, info);
+        // no query context available: implicit timezone is taken from the system clock
+        return new DTDur((ADate) item1, (ADate) item2, null, info);
       } else if(type1 == type2) {
-        if(type1.oneOf(DATE, TIME)) return new DTDur((ADate) item1, (ADate) item2, info);
+        if(type1.oneOf(DATE, TIME)) return new DTDur((ADate) item1, (ADate) item2, null, info);
         if(type1 == DAY_TIME_DURATION) return new DTDur((DTDur) item1, (DTDur) item2, false, info);
         if(type1 == YEAR_MONTH_DURATION)
           return new YMDur((YMDur) item1, (YMDur) item2, false, info);
@@ -121,7 +122,7 @@ public enum Calc {
         if(type1.instanceOf(DATE_TIME)) return new Dtm((Dtm) item1, dur(info, item2), false, info);
         if(type1 == DATE) return new Dat((Dat) item1, dur(info, item2), false, info);
         if(type1 == TIME && type2 == DAY_TIME_DURATION)
-          return new Tim((Tim) item1, (DTDur) item2, false);
+          return new Tim((Tim) item1, (DTDur) item2, false, info);
       }
       throw typeError(info, item1, item2);
     }

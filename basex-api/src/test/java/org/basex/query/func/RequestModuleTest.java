@@ -34,6 +34,16 @@ public final class RequestModuleTest extends HTTPTest {
    * Function test.
    * @throws Exception exception
    */
+  @Test public void body() throws Exception {
+    final ApiFunction func = _REQUEST_BODY;
+    // request without body (the REST service consumes the body of a request)
+    get("0", "", "query", "count(" + func.args() + ")");
+  }
+
+  /**
+   * Function test.
+   * @throws Exception exception
+   */
   @Test public void scheme() throws Exception {
     final ApiFunction func = _REQUEST_SCHEME;
     get("http", "", "query", func.args());

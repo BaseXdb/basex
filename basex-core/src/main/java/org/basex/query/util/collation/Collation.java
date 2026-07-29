@@ -108,7 +108,7 @@ public abstract class Collation {
       coll.uri = uri;
       return coll;
     } catch(final IllegalArgumentException | BaseXException ex) {
-      throw err.get(info, ex.getMessage());
+      throw err.get(info, ex.getMessage()).cause(ex);
     }
   }
 

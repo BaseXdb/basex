@@ -71,7 +71,7 @@ public class FnMin extends StandardFunc {
          dateTime ? it instanceof Dtm : duration ? it instanceof Dur : type == type2)) {
         throw ARGTYPE_X_X_X.get(info, type, type2, it);
       }
-      if(min ^ item.compare(it, collation, true, info) < 0) item = it;
+      if(min ^ item.compare(it, collation, true, qc, info) < 0) item = it;
     }
     return item;
   }

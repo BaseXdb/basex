@@ -134,7 +134,18 @@ public final class SimpleMapTest extends SandboxTest {
 
     // unroll expression
     unroll(true);
-    check("(1, 2) ! (. * 2)", "2\n4", root(IntSeq.class));
+    check("(1, 2) ! (. * 2)", "2\n4", root(BytSeq.class));
     check("(true(), false()) ! (. = true())", "true\nfalse", root(BlnSeq.class));
+  }
+
+  /** Unrolled operands must not share the mapped expression. */
+  @Test public void unrolledOperands() {
+    inline(true);
+    unroll(true);
+    // list with empty operands: number of items is smaller than number of operands
+    check("declare function local:f($a as xs:string?, $b as xs:string?, $c as xs:string?, " +
+        "$d as xs:string?, $e as xs:string?, $f as xs:string?) { " +
+        "  ($a, $b, $c, $d, $e, $f) ! ('[' || . || ']') };" +
+        "local:f('A', (), 'C', 'D', (), ())", "[A]\n[C]\n[D]");
   }
 }

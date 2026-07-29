@@ -86,10 +86,10 @@ public abstract class XNode extends GNode {
 
   @Override
   public final int compare(final Item item, final Collation coll, final boolean transitive,
-      final InputInfo ii) throws QueryException {
+      final QueryContext qc, final InputInfo ii) throws QueryException {
     return item.type.isStringOrUntyped() ?
       Token.compare(string(), item.string(ii), Collation.get(coll, ii)) :
-      -item.compare(this, coll, transitive, ii);
+      -item.compare(this, coll, transitive, qc, ii);
   }
 
   @Override
@@ -183,7 +183,8 @@ public abstract class XNode extends GNode {
         if(deep.qc != null) deep.qc.checkStop();
         final GNode child1 = iter1.next();
         if(child1 == null) return true;
-        if(!deep.equal(child1, iter2.next())) return false;
+        final GNode child2 = iter2.next();
+        if(!deep.equal(child1, child2)) return deep.different(child1, child2);
       }
     }
 
@@ -197,7 +198,7 @@ public abstract class XNode extends GNode {
           found = true;
         }
       }
-      if(!found) return false;
+      if(!found) return deep.different(list1.get(l1), null);
     }
     return true;
   }
@@ -288,7 +289,7 @@ public abstract class XNode extends GNode {
   }
 
   /**
-   * Returns a copy of the namespace hierarchy.
+   * Returns a copy of the in-scope namespaces.
    * @param qc query context (can be {@code null})
    * @return namespaces
    */
@@ -302,7 +303,7 @@ public abstract class XNode extends GNode {
           if(!ns.contains(name)) ns.add(name, nsp.value(a));
         }
       }
-      // constructed elements do not inherit namespaces from their parents
+      // frozen inherited set: add it and stop ascending (constructed/no-inherit boundary)
       final Atts inherited = node.nsInherited();
       if(inherited != null) {
         final int is = inherited.size();

@@ -20,6 +20,8 @@ public final class InputInfo {
   private boolean internal;
   /** Input path. */
   private final String path;
+  /** Enclosing declaration (can be {@code null}). */
+  private final String decl;
   /** Static context (can be {@code null}). */
   private StaticContext sc;
   /** Input string as codepoints (can be {@code null}). */
@@ -34,19 +36,21 @@ public final class InputInfo {
    * @param parser input parser, containing information on the current parsing state
    */
   public InputInfo(final InputParser parser) {
-    input = parser.input;
-    path = parser.path;
-    column = parser.pos;
+    this(parser, null, null);
   }
 
   /**
    * Constructor.
    * @param parser input parser, containing information on the current parsing state
-   * @param sc static context
+   * @param sc static context (can be {@code null})
+   * @param decl enclosing declaration (can be {@code null})
    */
-  public InputInfo(final InputParser parser, final StaticContext sc) {
-    this(parser);
+  public InputInfo(final InputParser parser, final StaticContext sc, final String decl) {
+    input = parser.input;
+    path = parser.path;
+    column = parser.pos;
     this.sc = sc;
+    this.decl = decl;
   }
 
   /**
@@ -56,9 +60,21 @@ public final class InputInfo {
    * @param col column
    */
   public InputInfo(final String path, final int line, final int col) {
+    this(path, line, col, null);
+  }
+
+  /**
+   * Constructor.
+   * @param path input path
+   * @param line line
+   * @param col column
+   * @param decl enclosing declaration (can be {@code null})
+   */
+  public InputInfo(final String path, final int line, final int col, final String decl) {
     this.path = path;
     this.line = line;
     column = col;
+    this.decl = decl;
   }
 
   /**
@@ -93,6 +109,14 @@ public final class InputInfo {
    */
   public StaticContext sc() {
     return sc;
+  }
+
+  /**
+   * Returns the declaration that encloses this position.
+   * @return declaration (can be {@code null})
+   */
+  public String decl() {
+    return decl;
   }
 
   /**

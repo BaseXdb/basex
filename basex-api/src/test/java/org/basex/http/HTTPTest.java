@@ -54,7 +54,7 @@ public abstract class HTTPTest extends SandboxTest {
 
     final StringList sl = new StringList("-p" + DB_PORT, "-h" + HTTP_PORT, "-s" + STOP_PORT,
         "-c", "password " + NAME, "-z", "-q");
-    if(local) sl.add("-l");
+    if(!local) sl.add("-L");
     if(!auth) sl.add("-Uadmin");
     http = new BaseXHTTP(sl.finish());
     rootUrl = url;

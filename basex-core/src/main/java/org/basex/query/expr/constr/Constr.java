@@ -172,36 +172,24 @@ public final class Constr {
   }
 
   /**
-   * Applies the copy-namespaces mode to a copied element and its descendants.
-   * @param orig original element
+   * Recursively applies the copy-namespaces mode to a copied element and its descendants.
+   * @param orig original element (can be {@code null})
    * @param copy copied element
    */
   private void copyNamespaces(final XNode orig, final FElem copy) {
     final StaticContext sc = info != null ? info.sc() : null;
     final boolean preserve = sc == null || sc.preserveNS, inherit = sc == null || sc.inheritNS;
-    if(!preserve || !inherit) copyNamespaces(orig, copy, preserve, inherit);
-  }
+    if(preserve && inherit) return;
 
-  /**
-   * Recursively adjusts inherited and preserved namespaces of a copied element.
-   * @param orig original element
-   * @param copy copied element
-   * @param preserve preserve namespaces
-   * @param inherit inherit namespaces
-   */
-  private static void copyNamespaces(final XNode orig, final FElem copy, final boolean preserve,
-      final boolean inherit) {
-    // no-inherit: freeze inherited namespaces to prevent inheritance from the new parent
+    // no-inherit: restore the original frozen set so the copy does not inherit its new parent
     if(!inherit) copy.nsInherited(orig.nsInherited());
-    // no-preserve: drop namespaces that are used neither by the element nor by its attributes
+    // no-preserve: drop namespaces used neither by the element nor by its attributes
     if(!preserve) copy.noPreserve();
-    // recurse into copied child elements (materialized copy mirrors the original structure)
-    final BasicNodeIter oi = orig.childIter(), ci = copy.childIter();
-    for(GNode o; (o = oi.next()) != null;) {
-      final GNode c = ci.next();
-      if(o.kind() == Kind.ELEMENT && c instanceof final FElem ce) {
-        copyNamespaces((XNode) o, ce, preserve, inherit);
-      }
+    // recurse into child elements, tracking the original in lockstep if it is still needed
+    final BasicNodeIter ci = copy.childIter(), oi = inherit ? null : orig.childIter();
+    for(GNode c; (c = ci.next()) != null;) {
+      final GNode o = oi != null ? oi.next() : null;
+      if(c instanceof final FElem ce) copyNamespaces((XNode) o, ce);
     }
   }
 

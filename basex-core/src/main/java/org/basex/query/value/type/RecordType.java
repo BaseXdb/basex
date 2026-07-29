@@ -120,12 +120,21 @@ public final class RecordType extends MapType {
   }
 
   /**
+   * Indicates if this is the abstract {@code record(*)} type, which matches any record. Its field
+   * set is unknown, so no assumptions must be made about the presence or absence of a field.
+   * @return result of check
+   */
+  public boolean any() {
+    return this == Types.RECORD;
+  }
+
+  /**
    * Indicates if this record type enforces strict field access, i.e. it is sealed and not the
    * abstract {@code record(*)} type. Lookups of undeclared fields on such records raise an error.
    * @return result of check
    */
   public boolean strict() {
-    return sealed && this != Types.RECORD;
+    return sealed && !any();
   }
 
   /**
@@ -226,8 +235,9 @@ public final class RecordType extends MapType {
       }
       return false;
     }
+    // record(*) is only matched by types that carry a record annotation
     if(type == Types.RECORD) {
-      return true;
+      return sealed;
     }
     if(type instanceof final RecordType rt) {
       // an open record is not an instance of a sealed record (the seal is an extra guarantee)
@@ -395,6 +405,29 @@ public final class RecordType extends MapType {
    */
   public RecordType open() {
     return strict() ? new RecordType(false, fields) : this;
+  }
+
+  /**
+   * Indicates if this record type is free of initializing expressions, i.e. of references to the
+   * query in which it was declared.
+   * @return result of check
+   */
+  public boolean detached() {
+    for(final RecordField rf : fields.values()) {
+      if(rf.init() != null) return false;
+    }
+    return true;
+  }
+
+  /**
+   * Returns a version of this record type that can be attached to a materialized value.
+   * @return record type without initializing expressions
+   */
+  public RecordType detach() {
+    if(detached()) return this;
+    final TokenObjectMap<RecordField> map = new TokenObjectMap<>(fields.size());
+    for(final byte[] key : fields) map.put(key, new RecordField(fields.get(key).seqType()));
+    return new RecordType(sealed, map, name, anns);
   }
 
   /**

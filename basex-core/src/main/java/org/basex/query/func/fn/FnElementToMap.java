@@ -24,17 +24,14 @@ public final class FnElementToMap extends PlanFn {
   /** Options. */
   public static class ElementsOptions extends Options {
     /** Option. */
-    public static final StringOption ATTRIBUTE_MARKER =
-        new StringOption("attribute-marker", "@");
+    public static final StringOption ATTRIBUTE_MARKER = new StringOption("attribute-marker", "@");
     /** Option. */
-    public static final StringOption CONTENT_KEY =
-        new StringOption("content-key", "#content");
+    public static final StringOption CONTENT_KEY = new StringOption("content-key", "#content");
     /** Option. */
     public static final EnumOption<NameFormat> NAME_FORMAT =
         new EnumOption<>("name-format", NameFormat.DEFAULT);
     /** Option. */
-    public static final ValueOption PLAN =
-        new ValueOption("plan", Types.MAP_ZO);
+    public static final ValueOption PLAN = new ValueOption("plan", Types.MAP_ZO);
   }
 
   @Override

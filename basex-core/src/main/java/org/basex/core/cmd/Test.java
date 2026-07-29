@@ -9,7 +9,6 @@ import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.func.unit.*;
-import org.basex.util.*;
 
 /**
  * Evaluates the 'test' command and processes an input file.
@@ -45,8 +44,7 @@ public final class Test extends Command {
       sb.append(suite.skipped).append(' ').append("skipped.");
       return suite.errors + suite.failures == 0 ? info(sb.toString()) : error(sb.toString());
     } catch(final IOException ex) {
-      exception = ex;
-      return error(Util.message(ex));
+      return error(ex);
     }
   }
 

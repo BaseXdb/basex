@@ -6,7 +6,6 @@ import org.basex.build.csv.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -56,10 +55,8 @@ public final class CsvParser {
    * @param input input
    * @param opts options
    * @param conv converter
-   * @throws QueryException query exception
    */
-  public CsvParser(final TextInput input, final CsvParserOptions opts, final CsvConverter conv)
-      throws QueryException {
+  public CsvParser(final TextInput input, final CsvParserOptions opts, final CsvConverter conv) {
     this.input = input;
     this.conv = conv;
     header = opts.get(CsvOptions.HEADER) == Bln.TRUE;
@@ -72,9 +69,6 @@ public final class CsvParser {
     trimWhitespace = opts.get(CsvOptions.TRIM_WHITESPACE);
     trimRows = opts.get(CsvOptions.TRIM_ROWS);
     selectColumns = opts.get(CsvOptions.SELECT_COLUMNS);
-    for(final int sc : selectColumns) {
-      if(sc < 1) throw QueryError.typeError(Itr.get(sc), BasicType.POSITIVE_INTEGER, null);
-    }
   }
 
   /**

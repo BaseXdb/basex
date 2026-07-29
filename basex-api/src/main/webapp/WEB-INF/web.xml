@@ -12,6 +12,10 @@
   <servlet>
     <servlet-name>RESTXQ</servlet-name>
     <servlet-class>org.basex.http.restxq.RestXqServlet</servlet-class>
+    <init-param>
+      <param-name>org.basex.user</param-name>
+      <param-value>admin</param-value>
+    </init-param>
     <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>
@@ -19,17 +23,35 @@
     <url-pattern>/*</url-pattern>
   </servlet-mapping>
 
-  <!-- WebSocket Service (can be disabled by removing this entry) -->
+  <!-- WebDAV Service (disable it by removing this entry and the webdav directory) -->
+  <servlet>
+    <servlet-name>WebDAV</servlet-name>
+    <servlet-class>org.basex.http.restxq.RestXqServlet</servlet-class>
+    <init-param>
+      <param-name>org.basex.user</param-name>
+      <param-value/>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>WebDAV</servlet-name>
+    <url-pattern>/webdav/*</url-pattern>
+  </servlet-mapping>
+
+  <!-- WebSocket Service (disable it by removing this entry) -->
   <servlet>
     <servlet-name>WebSocket</servlet-name>
     <servlet-class>org.basex.http.ws.WsServlet</servlet-class>
+    <init-param>
+      <param-name>org.basex.user</param-name>
+      <param-value>admin</param-value>
+    </init-param>
   </servlet>
   <servlet-mapping>
     <servlet-name>WebSocket</servlet-name>
     <url-pattern>/ws/*</url-pattern>
   </servlet-mapping>
 
-  <!-- REST Service (can be disabled by removing this entry) -->
+  <!-- REST Service (disable it by removing this entry) -->
   <servlet>
     <servlet-name>REST</servlet-name>
     <servlet-class>org.basex.http.rest.RESTServlet</servlet-class>
@@ -39,9 +61,7 @@
     <url-pattern>/rest/*</url-pattern>
   </servlet-mapping>
 
-  <!-- Mapping for static resources (may be restricted to a sub path).
-       Jetty 12 EE10: on a prefix mapping the DefaultServlet resolves the path info
-       below its base resource, so the base is pointed at the "static" directory. -->
+  <!-- Mapping for static resources (may be restricted to a sub path) -->
   <servlet>
     <servlet-name>static</servlet-name>
     <servlet-class>org.eclipse.jetty.ee10.servlet.DefaultServlet</servlet-class>

@@ -125,8 +125,7 @@ public final class JsonW3Converter extends JsonConverter {
         try {
           value = decimalOrInteger(new BigDecimal(Dbl.parse(string, null)));
         } catch(final NumberFormatException ex) {
-          Util.debug(ex);
-          throw FUNCCAST_X_X.get(info, "xs:decimal", string);
+          throw FUNCCAST_X_X.get(info, "xs:decimal", string).cause(ex);
         }
       }
     }

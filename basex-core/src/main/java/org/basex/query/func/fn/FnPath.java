@@ -46,8 +46,7 @@ public final class FnPath extends ContextFn {
     if(node == null) return Empty.VALUE;
 
     final boolean indexes = options.get(PathOptions.INDEXES);
-    final Value ns = options.get(PathOptions.NAMESPACES);
-    final XQMap namespaces = ns.isEmpty() ? XQMap.empty() : toMap(ns, qc);
+    final XQMap namespaces = toEmptyMap(options.get(PathOptions.NAMESPACES), qc);
     final boolean lexical = options.get(PathOptions.LEXICAL);
     final Value origin = options.get(PathOptions.ORIGIN);
     final boolean cache = map.structSize() == 0;
@@ -97,8 +96,9 @@ public final class FnPath extends ContextFn {
             // boolean
             tb.add(string).add("()");
           } else {
-            // any other type
-            tb.add(key.type.toString()).add('(').add(QueryString.toQuoted(string)).add(')');
+            // any other type: constructor function, wrapped in a selector step
+            tb.add("child::{").add(key.type.toString()).add('(').add(QueryString.toQuoted(string)).
+              add(")}");
           }
         }
         // optional index

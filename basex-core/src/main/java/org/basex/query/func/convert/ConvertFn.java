@@ -32,8 +32,7 @@ public abstract class ConvertFn extends StandardFunc {
     try {
       return toBinary(value, encoding);
     } catch(final CharacterCodingException ex) {
-      Util.debug(ex);
-      throw CONVERT_BINARY_X_X.get(info, value, encoding);
+      throw CONVERT_BINARY_X_X.get(info, value, encoding).cause(ex);
     }
   }
 

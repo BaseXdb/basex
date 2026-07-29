@@ -259,6 +259,7 @@ public interface QueryText {
   /** XQuery prefix. */ byte[] UTIL_PREFIX = token("util");
   /** XQuery prefix. */ byte[] VALIDATE_PREFIX = token("validate");
   /** XQuery prefix. */ byte[] WEB_PREFIX = token("web");
+  /** XQuery prefix. */ byte[] WEBDAV_PREFIX = token("webdav");
   /** XQuery prefix. */ byte[] WS_PREFIX = token("ws");
   /** XQuery prefix. */ byte[] XQ_PREFIX = token("xq");
   /** XQuery prefix. */ byte[] XQUERY_PREFIX = token("xquery");
@@ -333,6 +334,7 @@ public interface QueryText {
   /** BaseX URI. */ byte[] UTIL_URI = token(BXMODULES_URL + "util");
   /** BaseX URI. */ byte[] VALIDATE_URI = token(BXMODULES_URL + "validate");
   /** BaseX URI. */ byte[] WEB_URI = token(BXMODULES_URL + "web");
+  /** BaseX URI. */ byte[] WEBDAV_URI = token(BXMODULES_URL + "webdav");
   /** BaseX URI. */ byte[] WS_URI = token(BXMODULES_URL + "ws");
   /** BaseX URI. */ byte[] XQUERY_URI = token(BXMODULES_URL + "xquery");
   /** BaseX URI. */ byte[] XSLT_URI = token(BXMODULES_URL + "xslt");
@@ -411,8 +413,6 @@ public interface QueryText {
   /** Serialization. */ byte[] CHARACTER = token("character");
   /** Serialization. */ byte[] CHARACTER_MAP = token("character-map");
   /** Serialization. */ byte[] MAP_STRING = token("map-string");
-
-  /** Debugging info. */ String DEBUG_ASSIGNMENTS = "Assignments:";
 
   /** Java prefix. */ String JAVA_PREFIX_COLON = "java:";
   /** Java keyword: new. */ String NEW = "new";

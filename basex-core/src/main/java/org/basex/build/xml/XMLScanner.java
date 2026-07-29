@@ -695,7 +695,7 @@ final class XMLScanner extends Job {
           try {
             content = input.io().merge(name).read();
           } catch(final IOException ex) {
-            throw error(Util.message(ex));
+            throw (BuildException) error(Util.message(ex)).initCause(ex);
           }
         } else {
           content = new byte[0];

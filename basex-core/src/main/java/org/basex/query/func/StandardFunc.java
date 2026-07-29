@@ -7,6 +7,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.net.*;
 import java.nio.file.*;
+import java.time.*;
 import java.util.*;
 
 import org.basex.core.*;
@@ -111,7 +112,7 @@ public abstract class StandardFunc extends Arr {
   }
 
   @Override
-  public final StandardFunc copy(final CompileContext cc, final IntObjectMap<Var> vm) {
+  public StandardFunc copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(definition.get(info, copyAll(cc, vm, args())));
   }
 
@@ -196,6 +197,7 @@ public abstract class StandardFunc extends Arr {
           if(hasCTX()) return true;
         }
         case NDT -> {
+          if(hasNDT()) return true;
           // check whether function arguments may contain non-deterministic code
           final int hof = hofOffsets(), al = args().length;
           for(int a = 0; a < al; a++) {
@@ -225,6 +227,14 @@ public abstract class StandardFunc extends Arr {
    */
   public boolean hasCTX() {
     return definition.has(Flag.CTX);
+  }
+
+  /**
+   * Indicates if this function is nondeterministic.
+   * @return result of check
+   */
+  public boolean hasNDT() {
+    return definition.has(Flag.NDT);
   }
 
   /**
@@ -488,8 +498,7 @@ public abstract class StandardFunc extends Arr {
       final Path cd = qc.resources.currentDir;
       return cd != null ? cd.resolve(p) : p;
     } catch(final IllegalArgumentException | URISyntaxException ex) {
-      Util.debug(ex);
-      throw FILE_INVALID_PATH_X.get(info, path);
+      throw FILE_INVALID_PATH_X.get(info, path).cause(ex);
     }
   }
 
@@ -636,7 +645,7 @@ public abstract class StandardFunc extends Arr {
 
     final Item item = expr.unwrappedItem(qc, info);
     if(item instanceof final XQMap map) {
-      options.assign(map, info);
+      options.assign(map, qc, info);
     } else if(!item.isEmpty()) {
       options.assign(item, info);
     }
@@ -666,8 +675,21 @@ public abstract class StandardFunc extends Arr {
    */
   protected final <E extends Options> E toOptions(final Expr expr, final E options,
       final QueryContext qc) throws QueryException {
-    options.assign(toEmptyMap(expr, qc), info);
+    options.assign(toEmptyMap(expr, qc), qc, info);
     return options;
+  }
+
+  /**
+   * Indicates if external resources may be retrieved. If the 'trusted' option was not specified,
+   * the value of {@link MainOptions#FNXMLTRUSTED} is returned.
+   * @param options options
+   * @param qc query context
+   * @return result of check
+   */
+  protected final boolean trusted(final Options options, final QueryContext qc) {
+    final Object trusted = options.get(CommonOptions.TRUSTED);
+    return trusted != null ? (Boolean) trusted :
+      qc.context.options.get(MainOptions.FNXMLTRUSTED);
   }
 
   /**
@@ -724,8 +746,13 @@ public abstract class StandardFunc extends Arr {
    */
   protected final long toMs(final Expr expr, final QueryContext qc) throws QueryException {
     final Dtm dtm = (Dtm) checkType(expr, BasicType.DATE_TIME, qc);
-    if(dtm.yea() > 292278993) throw INTRANGE_X.get(info, dtm.yea());
-    return dtm.toJava().toGregorianCalendar().getTimeInMillis();
+    final LocalDateTime ldt = dtm.toLocalDateTime();
+    try {
+      return ldt.toInstant(dtm.hasTz() ? ZoneOffset.ofTotalSeconds(dtm.tz() * 60) :
+        ZoneId.systemDefault().getRules().getOffset(ldt)).toEpochMilli();
+    } catch(final ArithmeticException | DateTimeException ex) {
+      throw INTRANGE_X.get(info, dtm.yea()).cause(ex);
+    }
   }
 
   /**
@@ -882,13 +909,12 @@ public abstract class StandardFunc extends Arr {
   /**
    * Returns the original exception, or a new exception for the specified error.
    * @param ex original exception
-   * @param error error adapted error (ignored if {@code null})
+   * @param error adapted error (can be {@code null})
    * @return new exception
    */
   protected final QueryException error(final QueryException ex, final QueryError error) {
     if(error == null) return ex;
-    Util.debug(ex);
-    return error.get(info, ex.getLocalizedMessage());
+    return error.get(info, ex.getLocalizedMessage()).cause(ex);
   }
 
   @Override

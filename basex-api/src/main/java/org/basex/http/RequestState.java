@@ -68,25 +68,25 @@ public interface RequestState {
 
   /**
    * Returns the local address of the server.
-   * @return local address
+   * @return local address (can be {@code null})
    */
   String localAddress();
 
   /**
    * Returns the address of the client.
-   * @return remote address
+   * @return remote address (can be {@code null})
    */
   String remoteAddress();
 
   /**
    * Returns the host name of the client.
-   * @return remote host name
+   * @return remote host name (can be {@code null})
    */
   String remoteHostname();
 
   /**
    * Returns the port of the client.
-   * @return remote port
+   * @return remote port (can be {@code -1})
    */
   int remotePort();
 
@@ -105,7 +105,7 @@ public interface RequestState {
 
   /**
    * Returns all cookies.
-   * @return cookies, or {@code null} if none were sent
+   * @return cookies or {@code null}
    */
   Cookie[] cookies();
 

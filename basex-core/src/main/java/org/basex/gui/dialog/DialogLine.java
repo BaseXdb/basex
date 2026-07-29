@@ -65,11 +65,7 @@ public final class DialogLine extends BaseXDialog {
    * @return line number, or {@code -1} or invalid values
    */
   public int line() {
-    try {
-      return Integer.parseInt(line.getText());
-    } catch(final NumberFormatException ex) {
-      Util.debug(ex);
-      return -1;
-    }
+    final int num = Strings.toInt(line.getText());
+    return num == Integer.MIN_VALUE ? -1 : num;
   }
 }

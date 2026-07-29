@@ -83,6 +83,23 @@ public final class RestXqMethodTest extends RestXqTest {
   }
 
   /**
+   * Method annotations.
+   * @throws Exception exception
+   */
+  @Test public void methodAgnostic() throws Exception {
+    // function with method annotation is preferred
+    register("declare %R:GET %R:path('') function m:f() { 'get' }; "
+        + "declare %R:path('') function m:g() { 'any' };");
+    get("get", "");
+    assertEquals("any", send(200, "RETRIEVE", null, null, ""));
+
+    // more specific path is preferred
+    register("declare %R:GET %R:path('{$x}') function m:f($x) { 'get' }; "
+        + "declare %R:path('a') function m:g() { 'any' };");
+    get("any", "a");
+  }
+
+  /**
    * {@code %HEAD} method.
    * @throws Exception exception
    */
@@ -110,6 +127,21 @@ public final class RestXqMethodTest extends RestXqTest {
 
     options("declare %R:GET %R:path('') function m:f() { <R:response/> };", "");
     options("declare %R:GET %R:path('sdfdfs') function m:f() { <R:response/> };", "");
+
+    // method-agnostic functions must not be triggered by OPTIONS requests (preflight, admin)
+    options("declare %R:path('') function m:f() { 'secret' };", "");
+  }
+
+  /**
+   * A method-agnostic {@code %perm:check} must still guard an explicit {@code %OPTIONS} function.
+   * @throws Exception exception
+   */
+  @Test public void optionsPermissionCheck() throws Exception {
+    register("declare namespace P = 'http://basex.org/modules/perm'; "
+        + "declare %P:check('') function m:c() as element(R:response) { "
+        + "  <R:response><http:response status='403'/></R:response> }; "
+        + "declare %R:OPTIONS %R:path('') function m:f() { 'secret' };");
+    send(403, "OPTIONS", null, null, "");
   }
 
   /**

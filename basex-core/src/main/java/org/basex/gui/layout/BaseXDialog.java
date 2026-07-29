@@ -101,8 +101,15 @@ public abstract class BaseXDialog extends JDialog implements BaseXWindow {
   protected final void finish() {
     pack();
     setMinimumSize(getPreferredSize());
-    setLocationRelativeTo(gui);
+    place();
     setVisible(true);
+  }
+
+  /**
+   * Places the dialog window; can be overwritten.
+   */
+  protected void place() {
+    setLocationRelativeTo(gui);
   }
 
   /**

@@ -370,6 +370,28 @@ public abstract class XQArray extends XQStruct {
     return ab.array(at);
   }
 
+  /**
+   * Casts this array to the given array type (see {@link SeqType#cast}).
+   * @param at array type
+   * @param error raise error (return {@code null} otherwise)
+   * @param qc query context
+   * @param info input info (can be {@code null})
+   * @return cast array, or {@code null} if casting failed and no error was raised
+   * @throws QueryException query exception
+   */
+  public final XQArray castTo(final ArrayType at, final boolean error, final QueryContext qc,
+      final InputInfo info) throws QueryException {
+    if(at == Types.ARRAY) return this;
+    final SeqType vt = at.valueType();
+    final ArrayBuilder ab = new ArrayBuilder(qc, structSize());
+    for(final Value value : members()) {
+      final Value cast = vt.convert(value, error, qc, info);
+      if(cast == null) return null;
+      ab.add(cast);
+    }
+    return ab.array(at);
+  }
+
   @Override
   public final boolean refineType() {
     Type refined = null;
@@ -398,9 +420,9 @@ public abstract class XQArray extends XQStruct {
   }
 
   @Override
-  protected final XQArray rebuild(final Job job) throws QueryException {
-    final ArrayBuilder ab = new ArrayBuilder(job, structSize());
-    for(final Value value : members()) ab.add(value.shrink(job));
+  protected final XQArray rebuild(final QueryContext qc) throws QueryException {
+    final ArrayBuilder ab = new ArrayBuilder(qc, structSize());
+    for(final Value value : members()) ab.add(value.shrink(qc));
     return ab.array(this);
   }
 

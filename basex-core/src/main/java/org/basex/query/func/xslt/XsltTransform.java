@@ -3,22 +3,18 @@ package org.basex.query.func.xslt;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
-import java.io.*;
 import java.util.*;
-import java.util.function.*;
 
 import javax.xml.transform.*;
-import javax.xml.transform.stream.*;
 
 import org.basex.io.*;
-import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 import org.basex.util.options.*;
 
 /**
@@ -28,7 +24,7 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  * @author Liam Quin
  */
-public class XsltTransform extends XsltFn {
+public class XsltTransform extends StandardFunc {
   /** XSLT Options. */
   public static final class XsltOptions extends Options {
     /** Cache flag. */
@@ -37,113 +33,68 @@ public class XsltTransform extends XsltFn {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    try {
-      final Str result = (Str) transform(qc, true);
-      return new DBNode(new IOContent(result.string()));
-    } catch(final IOException ex) {
-      throw IOERR_X.get(info, ex);
-    }
+    final XsltResult result = new XsltResult(EMPTY, qc.context.options);
+    transform(result, null, qc);
+    return result.node();
   }
 
   /**
-   * Performs an XSL transformation.
+   * Performs an XSL transformation. Errors are raised, or added to the report.
+   * @param result transformation result
+   * @param report report builder (can be {@code null})
    * @param qc query context
-   * @param simple simple processing (no report generation)
-   * @return item (map or string)
    * @throws QueryException query exception
    */
-  final Item transform(final QueryContext qc, final boolean simple) throws QueryException {
-    final IO input = read(arg(0), qc);
+  final void transform(final Result result, final XsltReport report, final QueryContext qc)
+      throws QueryException {
+
+    final Source input = source(arg(0), qc);
     final IO stylesheet = read(arg(1), qc);
     final HashMap<String, String> arguments = toOptions(arg(2), qc);
     final XsltOptions options = toOptions(arg(3), new XsltOptions(), qc);
 
-    final ArrayOutput result = new ArrayOutput();
-    final PrintStream errPS = System.err;
-    final ArrayOutput err = new ArrayOutput();
-    final XsltReport xr = simple ? null : new XsltReport(qc);
-    try {
-      // redirect errors
-      System.setErr(new PrintStream(err));
-      final StreamSource ss = stylesheet.streamSource();
-      final String key = options.get(XsltOptions.CACHE) ? ss.getSystemId() : null;
+    final String error = Xslt.transform(stylesheet, input, result,
+        options.get(XsltOptions.CACHE), true, qc, tr -> {
+          if(report != null) report.register(tr);
+          arguments.forEach(tr::setParameter);
+        });
+    if(error == null) return;
+    if(report == null) throw XSLT_ERROR_X.get(info, error);
+    report.addError(Str.get(error));
+  }
 
-      // retrieve new or cached templates object
-      Templates templates = key != null ? MAP.get(key) : null;
-      final URIResolver ur = qc.context.options.resolver().uriResolver();
-      if(templates == null) {
-        // no templates object cached: create new instance
-        final TransformerFactory tf = TransformerFactory.newInstance();
-        // assign catalog resolver (if defined)
-        if(ur != null) tf.setURIResolver(ur);
-        templates = tf.newTemplates(ss);
-        if(key != null) MAP.put(key, templates);
-      }
-
-      // create transformer, assign catalog resolver (if defined)
-      final Transformer tr = templates.newTransformer();
-      if(ur != null) tr.setURIResolver(ur);
-
-      // bind parameters
-      arguments.forEach(tr::setParameter);
-
-      // do transformation and return result
-      if(simple) {
-        tr.transform(input.streamSource(), new StreamResult(result));
-        return Str.get(result.finish());
-      }
-
-      xr.register(tr);
-      tr.transform(input.streamSource(), new StreamResult(result));
-      xr.addMessage();
-    } catch(final IllegalArgumentException ex) {
-      // Saxon raises runtime exceptions for illegal parameters
-      if(simple) throw XSLT_ERROR_X.get(info, ex);
-      xr.addError(Str.get(Util.message(ex)));
-    } catch(final TransformerException | TransformerFactoryConfigurationError ex) {
-      Util.debug(ex);
-      // catch transformation errors, throw them again or add them to report
-      final StringList list = new StringList();
-      final Consumer<String> add = string -> {
-        final String normalized = string != null ? string.replaceAll("\\s+", " ").trim() : "";
-        if(!normalized.isEmpty()) list.addUnique(normalized);
-      };
-      for(Throwable th = ex; th != null; th = th.getCause()) add.accept(th.getMessage());
-      try {
-        add.accept(new String(err.toArray(), Prop.CHARSET));
-      } catch(final Exception e) {
-        Util.debug(e);
-        add.accept(e.getMessage());
-      }
-
-      final String error = String.join("; ", list.reverse().finish());
-      if(simple) throw XSLT_ERROR_X.get(info, error);
-      xr.addError(Str.get(error));
-      xr.addMessage();
-    } finally {
-      System.setErr(errPS);
-    }
-    xr.addResult(result.finish());
-    return xr.finish();
+  /**
+   * Evaluates an expression (node, URI string) to an input source.
+   * @param expr expression
+   * @param qc query context
+   * @return source
+   * @throws QueryException query exception
+   */
+  private Source source(final Expr expr, final QueryContext qc) throws QueryException {
+    final Item item = toNodeOrAtomItem(expr, false, qc);
+    return item instanceof final XNode node ? Xslt.source(node, sc().baseURI(), info) :
+      io(item).streamSource();
   }
 
   /**
    * Evaluates an expression (node, URI string) to an input reference.
    * @param expr expression
    * @param qc query context
-   * @return item
+   * @return input reference
    * @throws QueryException query exception
    */
   private IO read(final Expr expr, final QueryContext qc) throws QueryException {
     final Item item = toNodeOrAtomItem(expr, false, qc);
-    if(item instanceof final XNode node) {
-      try {
-        final Uri base = node.baseURI(sc().baseURI(), true, info);
-        return new IOContent(item.serialize().finish(), string(base.string()));
-      } catch(final QueryIOException ex) {
-        throw ex.getCause(info);
-      }
-    }
+    return item instanceof final XNode node ? Xslt.io(node, sc().baseURI(), info) : io(item);
+  }
+
+  /**
+   * Converts an item (URI string, string content) to an input reference.
+   * @param item item
+   * @return input reference
+   * @throws QueryException query exception
+   */
+  private IO io(final Item item) throws QueryException {
     final Type type = item.type;
     if(type.isStringOrUntyped()) return toIO(toString(item), true);
     throw STRNOD_X_X.get(info, type, item);

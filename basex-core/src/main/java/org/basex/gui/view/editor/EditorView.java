@@ -58,6 +58,8 @@ public final class EditorView extends View {
   final ProjectView project;
   /** Test button. */
   final AbstractButton test;
+  /** Declaration button. */
+  private final AbstractButton declaration;
 
   /** History Button. */
   private final AbstractButton history;
@@ -115,6 +117,8 @@ public final class EditorView extends View {
     final AbstractButton openB = BaseXButton.command(GUIMenuCmd.C_EDIT_OPEN, gui);
     final AbstractButton saveB = BaseXButton.get("c_save", SAVE, false, gui);
     final AbstractButton find = search.button(FIND_REPLACE);
+    declaration = BaseXButton.get("c_declarations", BaseXLayout.addShortcut(GO_TO_DECLARATION,
+        BaseXKeys.GOTODECL.toString()), false, gui);
     final AbstractButton vars = BaseXButton.command(GUIMenuCmd.C_EXTERNAL_VARIABLES, gui);
     final AbstractButton go = BaseXButton.command(GUIMenuCmd.C_GO, gui);
 
@@ -137,6 +141,7 @@ public final class EditorView extends View {
     buttons.add(test);
     buttons.addSeparator();
     buttons.add(find);
+    buttons.add(declaration);
 
     context = new BaseXLabel("").resize(1.25f);
     context.setForeground(darkGray);
@@ -184,10 +189,13 @@ public final class EditorView extends View {
       final StringBuilder mnem = new StringBuilder();
       final JMenuItem sa = GUIMenu.newItem(GUIMenuCmd.C_EDIT_SAVE, gui, mnem);
       final JMenuItem sas = GUIMenu.newItem(GUIMenuCmd.C_EDIT_SAVE_AS, gui, mnem);
+      final JMenuItem sca = GUIMenu.newItem(GUIMenuCmd.C_EDIT_SAVE_COPY_AS, gui, mnem);
       sa.setEnabled(GUIMenuCmd.C_EDIT_SAVE.enabled(gui));
       sas.setEnabled(GUIMenuCmd.C_EDIT_SAVE_AS.enabled(gui));
+      sca.setEnabled(GUIMenuCmd.C_EDIT_SAVE_COPY_AS.enabled(gui));
       pop.add(sa);
       pop.add(sas);
+      pop.add(sca);
       pop.show(saveB, 0, saveB.getHeight());
     });
 
@@ -196,6 +204,7 @@ public final class EditorView extends View {
 
     info.addMouseListener((MouseClickedListener) e -> markError(true));
     test.addActionListener(e -> run(getEditor(), Action.TEST));
+    declaration.addActionListener(e -> getEditor().gotoDeclaration());
     tabs.addChangeListener(e -> {
       final EditorArea ea = getEditor();
       if(ea == null) return;
@@ -222,6 +231,7 @@ public final class EditorView extends View {
   public void refreshMark() {
     final EditorArea edit = getEditor();
     test.setEnabled(edit.file().hasSuffix(IO.XQSUFFIXES) && !edit.modified());
+    declaration.setEnabled(edit.hasDeclarations());
   }
 
   @Override
@@ -451,21 +461,46 @@ public final class EditorView extends View {
    * @return {@code false} if operation was canceled
    */
   public boolean saveAs() {
-    // open file chooser for XML creation
     final EditorArea edit = getEditor();
-    final String path = edit.opened() ? edit.file().path() : gui.gopts.get(GUIOptions.WORKPATH);
-    final BaseXFileChooser fc = new BaseXFileChooser(gui, SAVE_AS, path);
-    fc.filter(XQUERY_FILES, false, IO.XQSUFFIXES);
-    fc.filter(BXS_FILES, false, IO.BXSSUFFIX);
-    fc.textFilters();
-    fc.suffix(IO.XQSUFFIX);
-
-    // save new file
-    final IOFile file = fc.select(Mode.FSAVE);
+    final IOFile file = chooseFile(SAVE_AS);
     if(file == null || !edit.save(file)) return false;
     // success: parse contents
     run(edit, Action.PARSE);
     return true;
+  }
+
+  /**
+   * Saves a copy of the currently opened editor under a new name and opens it in a new tab.
+   * @return {@code false} if operation was canceled
+   */
+  public boolean saveCopyAs() {
+    final EditorArea edit = getEditor();
+    final IOFile file = chooseFile(SAVE_COPY_AS);
+    if(file == null) return false;
+    // chosen file is assigned to the current editor: save contents
+    if(file.eq(edit.file())) return edit.save();
+    if(!edit.saveCopy(file)) return false;
+    // refresh editor if copy was already opened, and open it in a new tab
+    final EditorArea copy = find(file);
+    if(copy != null) copy.reopen(true);
+    open(file);
+    return true;
+  }
+
+  /**
+   * Opens a file chooser for saving the contents of the currently opened editor.
+   * @param title dialog title
+   * @return chosen file, or {@code null} if operation was canceled
+   */
+  private IOFile chooseFile(final String title) {
+    final EditorArea edit = getEditor();
+    final String path = edit.opened() ? edit.file().path() : gui.gopts.get(GUIOptions.WORKPATH);
+    final BaseXFileChooser fc = new BaseXFileChooser(gui, title, path);
+    fc.filter(XQUERY_FILES, false, IO.XQSUFFIXES);
+    fc.filter(BXS_FILES, false, IO.BXSSUFFIX);
+    fc.textFilters();
+    fc.suffix(IO.XQSUFFIX);
+    return fc.select(Mode.FSAVE);
   }
 
   /**
@@ -825,7 +860,9 @@ public final class EditorView extends View {
    * @param link link
    */
   public void jump(final String link) {
-    final Matcher m = LINK.matcher(link);
+    // discard the enclosing declaration of an error location: "name (path, line/column)"
+    final Matcher m = LINK.matcher(link.endsWith(")") ?
+      link.substring(link.indexOf('(') + 1, link.length() - 1) : link);
     if(m.matches()) {
       inputInfo = new InputInfo(m.group(1), Strings.toInt(m.group(2)), Strings.toInt(m.group(3)));
       markError(true);

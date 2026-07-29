@@ -778,7 +778,7 @@ public final class NamespaceTest extends SandboxTest {
     query(defAny + "namespace-uri(element a {})", "");
     query(defAny + "<r xmlns:x='X'><a/><x:a/></r>/Q{}a", "<a/>");
     query(defAny + "declare option output:method 'text';serialize(<x>42</x>, "
-        + "{'cdata-section-elements': 'x'})", "<x><![CDATA[42]]></x>");
+        + "{'cdata-section-elements': xs:QName('x')})", "<x><![CDATA[42]]></x>");
 
     // inspect:static-context reports ##any
     query(defAny + "inspect:static-context((), 'element-namespace')", "##any");

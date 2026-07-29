@@ -40,8 +40,10 @@ public final class FnInvisibleXml extends StandardFunc {
   public FuncItem item(final QueryContext qc, final InputInfo ii) throws QueryException {
     if(generator == null) {
       for(final String className : CLASSES) {
-        if(!Reflect.available(className)) {
-          throw BASEX_CLASSPATH_X_X.get(info, definition.name, className);
+        try {
+          Reflect.forName(className);
+        } catch(final Throwable th) {
+          throw BASEX_CLASSPATH_X_X.get(info, definition.name, className).cause(th);
         }
       }
       generator = new Generator();

@@ -1,5 +1,6 @@
 package org.basex.core;
 
+import static org.basex.core.Text.*;
 import static org.basex.query.QueryError.*;
 
 import java.io.*;
@@ -12,6 +13,7 @@ import org.basex.io.out.DataOutput;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -29,8 +31,13 @@ public final class Stores implements Closeable {
 
   /** Stores. */
   private final HashMap<String, Store> stores = new HashMap<>();
+  /** Names of stores that are currently being updated. */
+  private final HashSet<String> updating = new HashSet<>();
   /** Database context. */
   private final Context context;
+
+  /** WebDAV locks (in-memory only, not persisted). */
+  private XQMap locks = XQMap.empty();
 
   /**
    * Constructor.
@@ -51,12 +58,7 @@ public final class Stores implements Closeable {
   public synchronized Value keys(final String name, final InputInfo info, final QueryContext qc)
       throws QueryException {
     final Store store = get(name, false, info, qc);
-    if(store != null) {
-      final TokenList list = new TokenList(store.map.size());
-      for(final String key : store.map.keySet()) list.add(key);
-      return StrSeq.get(list);
-    }
-    return Empty.VALUE;
+    return store != null ? store.map.keys() : Empty.VALUE;
   }
 
   /**
@@ -71,11 +73,7 @@ public final class Stores implements Closeable {
   public synchronized Value get(final String key, final String name, final InputInfo info,
       final QueryContext qc) throws QueryException {
     final Store store = get(name, false, info, qc);
-    if(store != null) {
-      final Value value = store.map.get(key);
-      if(value != null) return value;
-    }
-    return Empty.VALUE;
+    return store != null ? store.map.get(Str.get(key)) : Empty.VALUE;
   }
 
   /**
@@ -89,12 +87,10 @@ public final class Stores implements Closeable {
    */
   public synchronized void put(final String key, final Value value, final String name,
       final InputInfo info, final QueryContext qc) throws QueryException {
+    checkUpdate(name, info);
     final Store store = get(name, true, info, qc);
-    if(value.isEmpty()) {
-      store.map.remove(key);
-    } else {
-      store.map.put(key, value);
-    }
+    final Item ky = Str.get(key);
+    store.map = value.isEmpty() ? store.map.remove(ky) : store.map.put(ky, value);
     store.dirty = true;
   }
 
@@ -112,9 +108,69 @@ public final class Stores implements Closeable {
   }
 
   /**
-   * Clears all stores.
+   * Atomically replaces the entries of a store. No other store operation will be performed
+   * while the supplied function is evaluated.
+   * @param name name of store
+   * @param func function that maps the current entries to the new ones
+   * @param info input info
+   * @param qc query context
+   * @return {@code true} if the entries have changed
+   * @throws QueryException query exception
    */
-  public synchronized void clear() {
+  public synchronized boolean update(final String name, final QueryFunction<XQMap, XQMap> func,
+      final InputInfo info, final QueryContext qc) throws QueryException {
+    final Store store = get(name, true, info, qc);
+    // the monitor is reentrant: lock out modifications by the supplied function
+    if(!updating.add(name)) throw STORE_UPDATE.get(info);
+    try {
+      final XQMap map = func.apply(store.map);
+      if(map == store.map) return false;
+      store.map = map;
+      store.dirty = true;
+      return true;
+    } finally {
+      updating.remove(name);
+    }
+  }
+
+  /**
+   * Returns the WebDAV locks.
+   * @return locks
+   */
+  public synchronized XQMap locks() {
+    return locks;
+  }
+
+  /**
+   * Atomically replaces the WebDAV locks.
+   * @param func function that maps the current locks to the new ones
+   * @return {@code true} if the locks have changed
+   * @throws QueryException query exception
+   */
+  public synchronized boolean locks(final QueryFunction<XQMap, XQMap> func) throws QueryException {
+    final XQMap map = func.apply(locks);
+    if(map == locks) return false;
+    locks = map;
+    return true;
+  }
+
+  /**
+   * Rejects the modification of a store that is currently being updated.
+   * @param name name of store
+   * @param info input info
+   * @throws QueryException query exception
+   */
+  private void checkUpdate(final String name, final InputInfo info) throws QueryException {
+    if(updating.contains(name)) throw STORE_UPDATE.get(info);
+  }
+
+  /**
+   * Clears all stores.
+   * @param info input info
+   * @throws QueryException query exception
+   */
+  public synchronized void clear(final InputInfo info) throws QueryException {
+    if(!updating.isEmpty()) throw STORE_UPDATE.get(info);
     stores.clear();
     for(final String name : listStores()) {
       storeFile(name).delete();
@@ -128,6 +184,7 @@ public final class Stores implements Closeable {
    * @throws QueryException query exception
    */
   public synchronized void close(final String name, final InputInfo info) throws QueryException {
+    checkUpdate(name, info);
     try {
       writeStore(name, false);
     } catch(final IOException ex) {
@@ -143,7 +200,7 @@ public final class Stores implements Closeable {
   public synchronized Value list() {
     final TreeSet<String> names = listStores();
     for(final Map.Entry<String, Store> entry : stores.entrySet()) {
-      if(entry.getValue().map.isEmpty()) names.remove(entry.getKey());
+      if(entry.getValue().map.structSize() == 0) names.remove(entry.getKey());
       else names.add(entry.getKey());
     }
     names.remove("");
@@ -161,6 +218,7 @@ public final class Stores implements Closeable {
    */
   public synchronized void read(final String name, final InputInfo info, final QueryContext qc)
       throws QueryException {
+    checkUpdate(name, info);
     if(storeFile(name).exists()) {
       readStore(name, info, qc);
     } else {
@@ -185,8 +243,11 @@ public final class Stores implements Closeable {
   /**
    * Deletes a store.
    * @param name name of store
+   * @param info input info
+   * @throws QueryException query exception
    */
-  public synchronized void delete(final String name) {
+  public synchronized void delete(final String name, final InputInfo info) throws QueryException {
+    checkUpdate(name, info);
     stores.remove(name);
     storeFile(name).delete();
   }
@@ -221,7 +282,7 @@ public final class Stores implements Closeable {
       if(storeFile(name).exists()) {
         readStore(name, info, qc);
       } else if(create) {
-        stores.put(name, new Store());
+        stores.put(name, new Store(XQMap.empty()));
       }
     }
     return stores.get(name);
@@ -236,15 +297,15 @@ public final class Stores implements Closeable {
    */
   private void readStore(final String name, final InputInfo info, final QueryContext qc)
       throws QueryException {
-    final HashMap<String, Value> map = new HashMap<>();
+    final MapBuilder mb = new MapBuilder();
     try(DataInput in = new DataInput(storeFile(name))) {
       for(int s = in.readNum() - 1; s >= 0; s--) {
-        map.put(Token.string(in.readToken()), read(in, qc));
+        mb.put(in.readToken(), read(in, qc));
       }
     } catch(final IOException ex) {
       throw QueryError.STORE_IO_X.get(info, ex);
     }
-    stores.put(name, new Store(map));
+    stores.put(name, new Store(mb.map()));
   }
 
   /**
@@ -259,16 +320,17 @@ public final class Stores implements Closeable {
     final Store entry = stores.get(name);
     final IOFile file = storeFile(name);
     if(entry != null && (entry.dirty || enforce)) {
-      final HashMap<String, Value> map = entry.map;
-      if(map.isEmpty()) {
+      final XQMap map = entry.map;
+      final long size = map.structSize();
+      if(size == 0) {
         file.delete();
       } else {
         file.parent().md();
         try(DataOutput out = new DataOutput(file)) {
-          out.writeNum(map.size());
-          for(final Map.Entry<String, Value> e : map.entrySet()) {
-            out.writeToken(Token.token(e.getKey()));
-            write(out, e.getValue());
+          out.writeNum((int) size);
+          for(final XQMap.Entry e : map.entries()) {
+            out.writeToken(e.key().string(null));
+            write(out, e.value());
           }
         }
       }
@@ -325,7 +387,7 @@ public final class Stores implements Closeable {
       // ORDER MUST NOT BE CHANGED. MAXIMUM: 63 ENTRIES
       final Class<?>[] classes = {
         BlnSeq.class, BytSeq.class, DblSeq.class, DecSeq.class, FltSeq.class, IntSeq.class,
-        ShrSeq.class, StrSeq.class, SingletonSeq.class, RangeSeq.class
+        ShrSeq.class, StrSeq.class, SingletonSeq.class, RangeSeq.class, LongSeq.class
       };
       METHODS = new MethodHandle[classes.length];
 
@@ -399,6 +461,8 @@ public final class Stores implements Closeable {
       }
       return vb.value(type);
     }
+    // data class is unknown: the store was written by a newer version
+    if(classId >= METHODS.length) throw new IOException(H_STORE_FORMAT);
     try {
       return (Value) METHODS[classId].invoke(in, type, qc);
     } catch(final Throwable th) {
@@ -411,22 +475,15 @@ public final class Stores implements Closeable {
    */
   private static final class Store {
     /** Map with data. */
-    private final HashMap<String, Value> map;
+    private XQMap map;
     /** Dirty flag. */
     private boolean dirty;
-
-    /**
-     * Default constructor.
-     */
-    private Store() {
-      this(new HashMap<>());
-    }
 
     /**
      * Constructor.
      * @param map map
      */
-    private Store(final HashMap<String, Value> map) {
+    private Store(final XQMap map) {
       this.map = map;
     }
   }

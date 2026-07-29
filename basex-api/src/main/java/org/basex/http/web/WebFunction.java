@@ -123,6 +123,16 @@ public abstract class WebFunction implements Comparable<WebFunction> {
   }
 
   /**
+   * Resolves the namespace prefix of the specified variable name.
+   * @param name variable name
+   * @return supplied variable name
+   */
+  protected final QNm resolve(final QNm name) {
+    if(name.hasPrefix()) name.uri(function.sc.ns.resolveStatic(name.prefix()));
+    return name;
+  }
+
+  /**
    * Checks if the specified variable exists in the current function.
    * @param name variable
    * @param declared variable declaration flags
@@ -132,7 +142,7 @@ public abstract class WebFunction implements Comparable<WebFunction> {
   protected final QNm checkVariable(final QNm name, final boolean[] declared)
       throws QueryException {
 
-    if(name.hasPrefix()) name.uri(function.sc.ns.resolveStatic(name.prefix()));
+    resolve(name);
     int p = -1;
     final Var[] params = function.params;
     final int pl = params.length;
@@ -170,8 +180,7 @@ public abstract class WebFunction implements Comparable<WebFunction> {
         try {
           args[p] = value.seqType().instanceOf(st) ? value : st.coerce(value, qc, null);
         } catch(final QueryException ex) {
-          Util.debug(ex);
-          throw error(ARG_TYPE_X_X_X, input, st, value);
+          throw error(ARG_TYPE_X_X_X, input, st, value).cause(ex);
         }
         break;
       }

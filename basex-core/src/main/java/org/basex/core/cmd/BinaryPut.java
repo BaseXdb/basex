@@ -108,10 +108,10 @@ public final class BinaryPut extends ACreate {
       if(r != null) {
         for(int c; (c = r.read()) != -1;) po.print(c);
       } else if(is != null) {
-        for(int b; (b = is.read()) != -1;) po.write(b);
+        is.transferTo(po);
       } else if(id != null) {
         try(BufferInput bi = BufferInput.get(IO.get(id))) {
-          for(int b; (b = bi.read()) != -1;) po.write(b);
+          bi.transferTo(po);
         }
       }
     }

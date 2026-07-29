@@ -5,7 +5,6 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.lang.reflect.*;
 import java.util.*;
 
 import org.basex.core.*;
@@ -22,9 +21,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class ModuleLoader {
-  /** Close method. */
-  private static final Method CLOSE = Reflect.method(QueryResource.class, "close");
-
   /** Database context. */
   private final Context context;
   /** Java modules. */
@@ -49,7 +45,13 @@ public final class ModuleLoader {
   public void close() {
     for(final Object jm : javaModules) {
       for(final Class<?> c : jm.getClass().getInterfaces()) {
-        if(c == QueryResource.class) Reflect.invoke(CLOSE, jm);
+        if(c == QueryResource.class) {
+          try {
+            ((QueryResource) jm).close();
+          } catch(final RuntimeException ex) {
+            Util.debug(ex);
+          }
+        }
       }
     }
     javaModules.clear();
@@ -113,12 +115,12 @@ public final class ModuleLoader {
       addLoader(jarUrls(context, className));
       clz = findClass(className);
     } catch(final ClassNotFoundException ex) {
+      if(java) throw WHICHMODCLASS_X.get(info, className).cause(ex);
       Util.debug(ex);
-      if(java) throw WHICHMODCLASS_X.get(info, className);
       return false;
     } catch(final Throwable th) {
       final Throwable t = Util.rootException(th);
-      throw MODINIT_X_X_X.get(info, className, t.getMessage(), Util.className(t));
+      throw MODINIT_X_X_X.get(info, className, t.getMessage(), Util.className(t)).cause(th);
     }
 
     // instantiate class
@@ -242,7 +244,7 @@ public final class ModuleLoader {
       addLoader(pkgUrls(pkgPath, modDir, info));
     } catch(final Throwable th) {
       final Throwable t = Util.rootException(th);
-      throw MODINIT_X_X_X.get(info, pkg.name, t.getMessage(), Util.className(t));
+      throw MODINIT_X_X_X.get(info, pkg.name, t.getMessage(), Util.className(t)).cause(th);
     }
 
     // package has dependencies. they have to be loaded first

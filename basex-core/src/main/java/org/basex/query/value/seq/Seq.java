@@ -217,9 +217,9 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  protected final Value rebuild(final Job job) throws QueryException {
-    final ValueBuilder vb = new ValueBuilder(job, size());
-    for(final Item item : this) vb.add(item.shrink(job));
+  protected final Value rebuild(final QueryContext qc) throws QueryException {
+    final ValueBuilder vb = new ValueBuilder(qc, size());
+    for(final Item item : this) vb.add(item.shrink(qc));
     return vb.value(type);
   }
 

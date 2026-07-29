@@ -37,10 +37,17 @@ public class MapMerge extends MapFn {
     }
   }
 
+  /** Enumeration of the supported duplicate handlers. */
+  private static final EnumType DUPLICATES_ENUM = EnumType.get(Duplicates.values());
+
   /** Merge options. */
   public static final class MergeOptions extends Options {
+    /** Required type: enumeration value, or merge function (arity is checked by the caller). */
+    private static final SeqType DUPLICATES_TYPE =
+        ChoiceItemType.get(DUPLICATES_ENUM, Types.FUNCTION).seqType(Occ.ZERO_OR_ONE);
+
     /** Duplicates handling. */
-    public static final ValueOption DUPLICATES = new ValueOption("duplicates", Types.ITEM_ZM);
+    public static final ValueOption DUPLICATES = new ValueOption("duplicates", DUPLICATES_TYPE);
   }
 
   /** Cached value merger instance. */
@@ -148,7 +155,7 @@ public class MapMerge extends MapFn {
     // fixed option
     final String string = duplicates.isEmpty() ? dflt.toString() : toString(duplicates, qc);
     final Duplicates value = Enums.get(Duplicates.class, string);
-    if(value == null) throw typeError(duplicates, EnumType.get(Duplicates.values()), info);
+    if(value == null) throw typeError(duplicates, DUPLICATES_ENUM, info);
 
     return switch(value) {
       case REJECT -> new Reject();

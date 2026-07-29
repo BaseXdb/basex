@@ -138,8 +138,7 @@ public abstract class CLI extends Main {
     try {
       return new ClientSession(host, port, username, password, out);
     } catch(final ConnectException ex) {
-      Util.debug(ex);
-      throw new BaseXException(CONNECTION_ERROR_X, port);
+      throw new BaseXException(CONNECTION_ERROR_X, port, ex);
     }
   }
 

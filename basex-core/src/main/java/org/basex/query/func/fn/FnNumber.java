@@ -20,16 +20,9 @@ public final class FnNumber extends ContextFn {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item value = context(qc).atomItem(qc, info);
     if(value.isEmpty()) return Dbl.NAN;
-    if(value.type == DOUBLE) return value;
-    try {
-      if(info != null) info.internal(true);
-      return DOUBLE.cast(value, qc, info);
-    } catch(final QueryException ex) {
-      Util.debug(ex);
-      return Dbl.NAN;
-    } finally {
-      if(info != null) info.internal(false);
-    }
+    // invalid input: NaN is returned
+    final Item cast = (Item) DOUBLE.seqType().cast(value, false, qc, info);
+    return cast != null ? cast : Dbl.NAN;
   }
 
   @Override

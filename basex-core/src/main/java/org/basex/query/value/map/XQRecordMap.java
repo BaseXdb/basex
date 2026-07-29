@@ -1,6 +1,8 @@
 package org.basex.query.value.map;
 
-import org.basex.core.jobs.*;
+import java.util.function.*;
+
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -103,8 +105,29 @@ public final class XQRecordMap extends XQHashMap {
   }
 
   @Override
-  public Item shrink(final Job job) throws QueryException {
-    shrinkValues(job);
+  public XQMap materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
+      throws QueryException {
+
+    if(materialized(test, ii)) return this;
+
+    final int vl = values.length;
+    final Value[] vals = new Value[vl];
+    for(int v = 0; v < vl; v++) {
+      qc.checkStop();
+      vals[v] = values[v].materialize(test, ii, qc);
+    }
+    return new XQRecordMap(((RecordType) type).detach(), vals);
+  }
+
+  @Override
+  public boolean materialized(final Predicate<Data> test, final InputInfo ii)
+      throws QueryException {
+    return ((RecordType) type).detached() && super.materialized(test, ii);
+  }
+
+  @Override
+  public Item shrink(final QueryContext qc) throws QueryException {
+    shrinkValues(qc);
     return this;
   }
 }

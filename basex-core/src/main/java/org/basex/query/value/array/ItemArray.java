@@ -92,8 +92,8 @@ public final class ItemArray extends XQArray {
   }
 
   @Override
-  public Item shrink(final Job job) throws QueryException {
-    members = members.shrink(job);
+  public Item shrink(final QueryContext qc) throws QueryException {
+    members = members.shrink(qc);
     type = ArrayType.get(members.seqType().with(Occ.EXACTLY_ONE));
     return this;
   }

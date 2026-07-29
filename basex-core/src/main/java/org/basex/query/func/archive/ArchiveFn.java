@@ -13,6 +13,7 @@ import java.util.zip.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
+import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -193,8 +194,7 @@ abstract class ArchiveFn extends StandardFunc {
       try {
         if(value != null) return toMs(new Dtm(value, BasicType.DATE_TIME, info), qc);
       } catch(final QueryException ex) {
-        Util.debug(ex);
-        throw ARCHIVE_TIMESTAMP_X.get(info, value);
+        throw ARCHIVE_TIMESTAMP_X.get(info, value).cause(ex);
       }
     }
     return -1;

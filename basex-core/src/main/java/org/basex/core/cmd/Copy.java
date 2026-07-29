@@ -79,7 +79,6 @@ public final class Copy extends Command {
       }
     } catch(final IOException ex) {
       // error: drop new database
-      Util.debug(ex);
       DropDB.drop(target, sopts);
       throw ex;
     }

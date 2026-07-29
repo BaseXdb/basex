@@ -66,8 +66,7 @@ public final class Put extends DBUpdate {
           ser.serialize(node);
         }
       } catch(final IOException ex) {
-        Util.debug(ex);
-        throw UPPUTERR_X.get(info, path);
+        throw UPPUTERR_X.get(info, path).cause(ex);
       }
     }
   }

@@ -97,6 +97,12 @@ public enum Records {
     field("query-parameters", MapType.get(BasicType.STRING, Types.STRING_ZM).
         seqType(Occ.ZERO_OR_ONE)),
     field("filepath", Types.STRING_ZO)
+  ),
+  /** Record definition. */
+  VALIDATION_RESULT(FN_URI, "validation-result",
+    field("is-valid", Types.BOOLEAN_O),
+    field("typed-node", Types.NODE_ZO),
+    field("error-details", Types.MAP_ZM)
   );
 
   /** Built-in record types. */

@@ -78,7 +78,7 @@ public class QueryException extends Exception {
    */
   public QueryException(final Throwable cause) {
     this(Util.message(cause));
-    initCause(cause);
+    cause(cause);
   }
 
   /**
@@ -115,11 +115,18 @@ public class QueryException extends Exception {
     this.name = name;
     if(info != null) info(info);
     for(final Object o : ext) {
-      if(o instanceof final Throwable th) {
-        initCause(th);
-        break;
-      }
+      if(o instanceof final Throwable th) cause(th);
     }
+  }
+
+  /**
+   * Attaches the throwable that caused this error.
+   * @param cause cause (can be {@code null})
+   * @return self reference
+   */
+  public final QueryException cause(final Throwable cause) {
+    if(cause != null && cause != this && getCause() == null) initCause(cause);
+    return this;
   }
 
   /**
@@ -283,13 +290,13 @@ public class QueryException extends Exception {
   @Override
   public final String getMessage() {
     final TokenBuilder tb = new TokenBuilder();
-    if(info != null) tb.add(STOPPED_AT).add(info).add(COL).add(NL);
+    if(info != null) tb.add(STOPPED_AT).add(location(info)).add(COL).add(NL);
     final byte[] code = name.local();
     if(code.length != 0) tb.add('[').add(name.prefixId(QueryText.ERROR_URI)).add("] ");
     tb.add(getLocalizedMessage());
     if(!stack.isEmpty()) {
       tb.add(NL).add(NL).add(STACK_TRACE).add(COL);
-      for(final InputInfo ii : stack) tb.add(NL).add(LI).add(ii);
+      for(final InputInfo ii : stack) tb.add(NL).add(LI).add(location(ii));
     }
     return tb.toString();
   }
@@ -333,8 +340,8 @@ public class QueryException extends Exception {
    */
   public ValueList values() throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
-    if(info != null) tb.add(info).add('\n');
-    for(final InputInfo stck : stack) tb.add(stck).add('\n');
+    if(info != null) tb.add(location(info)).add('\n');
+    for(final InputInfo ii : stack) tb.add(location(ii)).add('\n');
     final Str trace = Str.get(tb.finish());
 
     final ValueList list = new ValueList();
@@ -374,6 +381,16 @@ public class QueryException extends Exception {
       v++;
     }
     return mb.map();
+  }
+
+  /**
+   * Returns an error location, prefixed by the enclosing declaration.
+   * @param ii input info
+   * @return location
+   */
+  private static String location(final InputInfo ii) {
+    final String decl = ii.decl();
+    return decl == null ? ii.toString() : Strings.concat(decl, " (", ii, ')');
   }
 
   /**

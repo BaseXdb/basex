@@ -116,6 +116,6 @@ public final class CatalogTest extends SandboxTest {
     query(func.args("<!DOCTYPE xml SYSTEM 'http://dtd.dtd'><doc>&amp;x;</doc>",
         " { 'dtd': true(), 'trusted': true() }"), "<doc>X</doc>");
     query(func.args("<!DOCTYPE xml SYSTEM 'http://dtd.dtd'><doc>&amp;x;</doc>",
-        " { 'dtd': 'no' }"), "<doc/>");
+        " { 'dtd': false() }"), "<doc/>");
   }
 }

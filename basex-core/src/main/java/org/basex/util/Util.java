@@ -63,7 +63,9 @@ public final class Util {
    * @return runtime exception (indicates that an error is raised)
    */
   public static RuntimeException notExpected(final Object message, final Object... ext) {
-    return new RuntimeException(info(message, ext));
+    final RuntimeException ex = new RuntimeException(info(message, ext));
+    if(message instanceof final Throwable th) ex.initCause(th);
+    return ex;
   }
 
   /**
@@ -131,7 +133,6 @@ public final class Util {
   public static Throwable rootException(final Throwable throwable) {
     Throwable th = throwable;
     while(true) {
-      debug(th);
       final Throwable ca = th.getCause();
       if(ca == null || th instanceof QueryException && !(ca instanceof QueryException)) return th;
       th = ca;
@@ -144,7 +145,12 @@ public final class Util {
    * @param ext text optional extensions
    */
   public static void errln(final Object object, final Object... ext) {
-    err((object instanceof final Throwable th ? message(th) : object) + NL, ext);
+    Object obj = object;
+    if(object instanceof final Throwable th) {
+      debug(th);
+      obj = message(th);
+    }
+    err(obj + NL, ext);
   }
 
   /**
@@ -162,7 +168,6 @@ public final class Util {
    * @return error message
    */
   public static String message(final Throwable th) {
-    debug(th);
     if(th instanceof BindException) return SRV_RUNNING;
     if(th instanceof ConnectException) return CONNECTION_ERROR;
     if(th instanceof SocketTimeoutException) return TIMEOUT_EXCEEDED;

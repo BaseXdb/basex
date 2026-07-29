@@ -50,7 +50,7 @@ public abstract class Bin extends Item {
 
   @Override
   public final int compare(final Item item, final Collation coll, final boolean transitive,
-      final InputInfo ii) throws QueryException {
+      final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] binary = item instanceof final Bin bin ? bin.binary(ii) : parse(item, ii);
     return Token.compare(binary(ii), binary);
   }

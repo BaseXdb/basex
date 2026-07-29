@@ -17,7 +17,6 @@ public final class FnMinutesFromDateTime extends DateTimeFn {
     final ADate value = toGregorianOrNull(arg(0), qc);
     if(value == null) return Empty.VALUE;
 
-    final long comp = value.minute();
-    return comp == -1 ? Empty.VALUE : Itr.get(comp);
+    return value.hasMinutes() ? Itr.get(value.minute()) : Empty.VALUE;
   }
 }

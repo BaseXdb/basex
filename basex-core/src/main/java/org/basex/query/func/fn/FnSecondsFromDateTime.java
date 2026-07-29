@@ -1,7 +1,5 @@
 package org.basex.query.func.fn;
 
-import java.math.*;
-
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -19,7 +17,6 @@ public final class FnSecondsFromDateTime extends DateTimeFn {
     final ADate value = toGregorianOrNull(arg(0), qc);
     if(value == null) return Empty.VALUE;
 
-    final BigDecimal comp = value.sec();
-    return comp == null ? Empty.VALUE : Dec.get(comp);
+    return value.hasSeconds() ? Dec.get(value.seconds()) : Empty.VALUE;
   }
 }

@@ -590,6 +590,32 @@ public final class NonDeterministicTest extends SandboxTest {
   }
 
   /**
+   * Checks that the nondeterminism check does not traverse large function sequences, arrays and
+   * maps. Regression: a dynamic call on a large constant array of functions walked all members at
+   * compile time.
+   * <p>
+   * Requires the size checks in {@code containsNdtFunction} in {@link DynFuncCall#optimize}.
+   * The timeout is preemptive, as the traversal would not be interrupted by the default one.
+   */
+  @Test @Timeout(value = 60, threadMode = ThreadMode.SEPARATE_THREAD) public void largeFunctions() {
+    query("array { (1 to 100_000_000_000) ! identity#1 }(1)(42)", 42);
+    query("array { subsequence((1 to 100_000_000_000) ! identity#1, 3) }(1)(42)", 42);
+    query("[ (1 to 100_000_000_000) ! identity#1 ](1)[1](42)", 42);
+    query("((1 to 100_000_000_000) ! identity#1)[1](42)", 42);
+  }
+
+  /**
+   * Checks that a nondeterministic function item in a large array is still detected, so that its
+   * side effects are preserved when the enclosing for clause is collapsed.
+   * <p>
+   * Guards the conservative result of the size checks in {@code containsNdtFunction}.
+   */
+  @Test public void largeNdtFunctions() {
+    query("let $f := array { (1 to 300000) ! (function() { " + fileAppend() + " }, identity#1) } " +
+        "for $x in (1 to 2) return $f(1)()", "", "xx");
+  }
+
+  /**
    * Returns a function call that records a single evaluation in the log.
    * @return file:append-text call
    */

@@ -114,8 +114,8 @@ final class ClassLoaderCache {
         final Class<?> c = Class.forName(name, true, loader);
         classes.putIfAbsent(name, c);
         return c;
-      } catch(final ClassNotFoundException ex) {
-        Util.debug(ex);
+      } catch(final ClassNotFoundException ignore) {
+        // class not found
         return null;
       }
     }

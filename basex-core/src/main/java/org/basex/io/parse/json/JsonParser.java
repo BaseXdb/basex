@@ -90,8 +90,7 @@ public final class JsonParser {
       skipWs();
       value();
     } catch(final StackOverflowError er) {
-      Util.debug(er);
-      throw error("Input is too deeply nested");
+      throw error("Input is too deeply nested").cause(er);
     }
     if(more()) throw error("Unexpected trailing content: %", remaining());
   }

@@ -170,8 +170,8 @@ public final class JNode extends GNode {
 
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
-      final InputInfo ii) throws QueryException {
-    return atomItem(null, ii).compare(item, coll, transitive, ii);
+      final QueryContext qc, final InputInfo ii) throws QueryException {
+    return atomItem(null, ii).compare(item, coll, transitive, qc, ii);
   }
 
   @Override

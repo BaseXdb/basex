@@ -8,12 +8,14 @@ import java.io.*;
 import java.util.regex.*;
 import java.util.zip.*;
 
+import org.basex.build.*;
 import org.basex.build.csv.*;
 import org.basex.build.html.*;
 import org.basex.build.json.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
+import org.basex.io.out.*;
 import org.basex.io.parse.csv.*;
 import org.basex.io.parse.json.*;
 import org.basex.query.*;
@@ -67,11 +69,14 @@ public final class Payload {
    * Parses the HTTP payload and returns a result body element.
    * @param type media type
    * @param encoding content encoding
+   * @param qc query context
    * @return body element
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  FNode parse(final MediaType type, final String encoding) throws IOException, QueryException {
+  FNode parse(final MediaType type, final String encoding, final QueryContext qc)
+      throws IOException, QueryException {
+
     // decompress before parsing (applies to multipart and single-part alike); coding is
     // case-insensitive (RFC 9110)
     if(GZIP.equalsIgnoreCase(encoding)) input = new GZIPInputStream(input);
@@ -88,7 +93,10 @@ public final class Payload {
       // single part response
       body = FElem.build(Q_HTTP_BODY);
       if(payloads != null) {
-        payloads.add(parse(BufferInput.get(input).content(), type));
+        // the stream is closed as before, releasing the inflater of a decompressed response
+        try(InputStream is = input) {
+          payloads.add(parse(SpillOutput.read(is, qc), type));
+        }
       }
     }
     return body.attr(Q_MEDIA_TYPE, type.type()).finish();
@@ -109,7 +117,7 @@ public final class Payload {
    * @return interpreted payload
    * @throws QueryException query exception
    */
-  private Value parse(final byte[] payload, final MediaType type) throws QueryException {
+  private Value parse(final IO payload, final MediaType type) throws QueryException {
     try {
       return value(payload, type, options);
     } catch(final IOException ex) {
@@ -197,7 +205,7 @@ public final class Payload {
     if(payloads != null) {
       final String encoding = type.parameter(CHARSET);
       final byte[] part = new TextInput(new IOContent(bl.finish()), encoding).content();
-      payloads.add(parse(base64 ? Base64.decode(part) : part, type));
+      payloads.add(parse(new IOContent(base64 ? Base64.decode(part) : part), type));
     }
     return true;
   }
@@ -337,10 +345,10 @@ public final class Payload {
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  public static Value value(final byte[] body, final MediaType type, final MainOptions options)
+  public static Value value(final IO body, final MediaType type, final MainOptions options)
       throws IOException, QueryException {
 
-    final IOContent io = prepare(body, type);
+    final IO io = prepare(body, type);
     if(io.length() == 0) {
       return Empty.VALUE;
     } else if(type.isJSON()) {
@@ -356,7 +364,8 @@ public final class Payload {
       opts.assign(type);
       return new DBNode(new HtmlParser(io, options, opts));
     } else if(type.isXml()) {
-      return new DBNode(io);
+      // remote input: parse as untrusted
+      return new DBNode(Parser.xmlParser(io, new MainOptions().trusted(false)));
     } else if(type.isText()) {
       return Str.get(io.read());
     } else if(type.is(MediaType.APPLICATION_X_WWW_FORM_URLENCODED)) {
@@ -365,8 +374,7 @@ public final class Payload {
         if(Token.contains(decoded, Token.REPLACEMENT)) throw new InputException(Token.REPLACEMENT);
         return Str.get(decoded);
       } catch(final IllegalArgumentException ex) {
-        Util.debug(ex);
-        throw new IOException(ex.getMessage());
+        throw new IOException(ex.getMessage(), ex);
       }
     } else if(type.isMultipart()) {
       try(InputStream is = io.inputStream()) {
@@ -375,30 +383,29 @@ public final class Payload {
         return payload.value();
       }
     } else {
-      return B64.get(io.read());
+      return B64.get(io, IOERR_X);
     }
   }
 
   /**
-   * Returns a normalized payload.
+   * Returns a normalized payload. Only text and XML input is materialized.
    * @param body body
    * @param type media type
    * @return content
    * @throws IOException I/O exception
    */
-  private static IOContent prepare(final byte[] body, final MediaType type) throws IOException {
-    byte[] data = body;
+  private static IO prepare(final IO body, final MediaType type) throws IOException {
     final boolean xml = type.isXml(), text = type.isText();
-    if(xml || text) {
-      // convert text to UTF8; skip redundant XML declaration
-      data = new NewlineInput(new IOContent(body), type.parameter(CHARSET)).content();
-      // '<?xml' is only a declaration if followed by whitespace; otherwise it is a
-      // processing instruction such as '<?xml-stylesheet?>', which must be kept
-      if(xml && startsWith(data, DECLSTART) && data.length > DECLSTART.length &&
-          ws(data[DECLSTART.length])) {
-        final int d = indexOf(data, DECLEND, DECLSTART.length);
-        if(d != -1) data = substring(data, d + DECLEND.length);
-      }
+    if(!(xml || text)) return body;
+
+    // convert text to UTF8; skip redundant XML declaration
+    byte[] data = new NewlineInput(body, type.parameter(CHARSET)).content();
+    // '<?xml' is only a declaration if followed by whitespace; otherwise it is a
+    // processing instruction such as '<?xml-stylesheet?>', which must be kept
+    if(xml && startsWith(data, DECLSTART) && data.length > DECLSTART.length &&
+        ws(data[DECLSTART.length])) {
+      final int d = indexOf(data, DECLEND, DECLSTART.length);
+      if(d != -1) data = substring(data, d + DECLEND.length);
     }
     return new IOContent(data);
   }

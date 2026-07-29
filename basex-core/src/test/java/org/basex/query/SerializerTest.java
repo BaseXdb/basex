@@ -64,6 +64,36 @@ public final class SerializerTest extends SandboxTest {
     query("serialize('a&#13;b', map { 'method': 'text' }) => contains('&#13;')", true);
   }
 
+  /** Test: normalization-form. */
+  @Test public void normalizationForm() {
+    // u with diaeresis: composed is codepoint 252, decomposed is 117 followed by 776
+    final String composed = "<p a='&#xFC;'>&#xFC;</p>", decomposed = "<p a='u&#x308;'>u&#x308;</p>";
+    for(final String method : new String[] { "xml", "xhtml", "html" }) {
+      // no normalization: values are serialized unchanged
+      query(occurrences(composed, method, "none", 252), 2);
+      query(occurrences(decomposed, method, "none", 776), 2);
+      // text and attribute values are normalized alike
+      query(occurrences(composed, method, "NFD", 776), 2);
+      query(occurrences(composed, method, "NFD", 252), 0);
+      query(occurrences(decomposed, method, "NFC", 252), 2);
+      query(occurrences(decomposed, method, "NFC", 776), 0);
+    }
+  }
+
+  /**
+   * Returns a query that counts how often a codepoint occurs in a serialized element.
+   * @param element element to serialize
+   * @param method serialization method
+   * @param form normalization form
+   * @param cp codepoint to count
+   * @return query
+   */
+  private static String occurrences(final String element, final String method, final String form,
+      final int cp) {
+    return "count(index-of(string-to-codepoints(serialize(" + element + ", map { 'method': '"
+        + method + "', 'normalization-form': '" + form + "' })), " + cp + "))";
+  }
+
   /** Test: method=xhtml. */
   @Test public void xhtml() {
     final String option = METHOD.arg("xhtml");
@@ -236,6 +266,12 @@ public final class SerializerTest extends SandboxTest {
     query(option + "<a>1</a>", 1);
     query(option + "1, <a>2</a>, 3", 123);
     query(option + USE_CHARACTER_MAPS.arg(";=,,") + "'1;2'", "1,2");
+    // delimiters and whitespace in keys are percent-encoded
+    query(option + USE_CHARACTER_MAPS.arg("%3D=EQ") + "'1=2'", "1EQ2");
+    query(option + USE_CHARACTER_MAPS.arg("%2C=CM") + "'1,2'", "1CM2");
+    query(option + USE_CHARACTER_MAPS.arg("%20=SP") + "'1 2'", "1SP2");
+    query(option + USE_CHARACTER_MAPS.arg("%25=PC") + "'1%2'", "1PC2");
+    query(option + USE_CHARACTER_MAPS.arg("%=PC") + "'1%2'", "1PC2");
   }
 
   /** Test: item-separator. */
@@ -298,7 +334,8 @@ public final class SerializerTest extends SandboxTest {
     query(option + "1", 1);
     query(option + "1.0", 1);
     query(option + "1e0", 1);
-    query(option + "1234567890e0", "1.23456789E9");
+    query(option + "1234567890e0", 1234567890);
+    query(option + "1e21", "1e+21");
     query(option + "xs:double('NaN')", "NaN");
     query(option + "xs:double('INF')", "INF");
     query(option + "xs:double('-0')", "-0");
@@ -314,13 +351,15 @@ public final class SerializerTest extends SandboxTest {
     query(option + "true#0", "fn:true#0");
     query(option + "fn() {}", "fn() as item()* { () }");
     query(option + "xs:float(1)", 1);
+    query(option + "xs:float(1e21)", "1e+21");
+    query(option + "xs:float(0.1)", 0.1);
     query(option + "xs:float('-0')", "-0");
 
     query(option + "[]", "[]");
     query(option + "[ 1 ]", "[1]");
     query(option + "[ 1.0 ]", "[1]");
     query(option + "[ 1e0 ]", "[1]");
-    query(option + "[ 1234567890e0 ]", "[1.23456789E9]");
+    query(option + "[ 1234567890e0 ]", "[1234567890]");
     query(option + "[ xs:double('NaN') ]", "[NaN]");
     query(option + "[ xs:double('INF') ]", "[INF]");
     query(option + "[ xs:double('-0') ]", "[-0]");
@@ -346,7 +385,8 @@ public final class SerializerTest extends SandboxTest {
     query("1", 1);
     query("1.0", 1);
     query("1e0", 1);
-    query("1234567890e0", "1.23456789E9");
+    query("1234567890e0", 1234567890);
+    query("1e21", "1e+21");
     query("xs:double('NaN')", "NaN");
     query("xs:double('INF')", "INF");
     query("xs:double('-0')", "-0");
@@ -361,13 +401,15 @@ public final class SerializerTest extends SandboxTest {
     query("true#0", "fn:true#0");
     query("fn() {}", "fn() as item()* { () }");
     query("xs:float(1)", 1);
+    query("xs:float(1e21)", "1e+21");
+    query("xs:float(0.1)", 0.1);
     query("xs:float('-0')", "-0");
 
     query("[]", "[]");
     query("[ 1 ]", "[1]");
     query("[ 1.0 ]", "[1]");
     query("[ 1e0 ]", "[1]");
-    query("[ 1234567890e0 ]", "[1.23456789E9]");
+    query("[ 1234567890e0 ]", "[1234567890]");
     query("[ xs:double('NaN') ]", "[NaN]");
     query("[ xs:double('INF') ]", "[INF]");
     query("[ xs:byte(1) ]", "[1]");

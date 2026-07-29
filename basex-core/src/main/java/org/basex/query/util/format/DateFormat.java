@@ -48,7 +48,7 @@ final class DateFormat extends FormatParser {
     try {
       finish(pres.length == 0 ? def : presentation(pres, def, true, frac));
     } catch(final QueryException ex) {
-      throw INVFDPATTERN_X.get(info, ex.getLocalizedMessage());
+      throw INVFDPATTERN_X.get(info, ex.getLocalizedMessage()).cause(ex);
     }
 
     // check width modifier

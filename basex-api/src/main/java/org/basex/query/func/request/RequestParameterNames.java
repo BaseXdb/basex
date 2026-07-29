@@ -11,7 +11,6 @@ import org.basex.query.util.hash.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -29,8 +28,7 @@ public final class RequestParameterNames extends ApiFunc {
       for(final Item name : requestCtx.formValues(qc.context.options).keys()) cache.add(name);
       return ItemSeq.get(cache.keys(), cache.size(), null);
     } catch(final IOException ex) {
-      Util.debug(ex);
-      throw REQUEST_PARAMETER.get(info);
+      throw REQUEST_PARAMETER.get(info).cause(ex);
     }
   }
 }

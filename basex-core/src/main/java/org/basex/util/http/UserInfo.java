@@ -89,10 +89,16 @@ public final class UserInfo {
       final EnumMap<RequestAttribute, String> auth = Client.authHeaders(header.get());
       if(!auth.get(AUTH_METHOD).equals(request.authMethod.toString())) return false;
 
-      final String realm =
-          auth.get(REALM),
+      // the challenge may offer several qop values; this client implements "auth" only
+      String qop = auth.get(QOP);
+      if(qop != null) {
+        for(final String q : Strings.split(qop, ',')) {
+          if(q.trim().equals(AUTH)) { qop = AUTH; break; }
+        }
+      }
+      final String opaque = auth.get(OPAQUE),
+          realm = auth.get(REALM),
           nonce = auth.get(NONCE),
-          qop = auth.get(QOP),
           nc = "00000001",
           cnonce = Strings.md5(Long.toString(System.nanoTime())),
           ha1 = Strings.md5(username + ':' + realm + ':' + password),
@@ -106,8 +112,9 @@ public final class UserInfo {
         + NC + '=' + nc + ','
         + CNONCE + "=\"" + cnonce + "\","
         + RESPONSE + "=\"" + rsp + "\","
-        + ALGORITHM + '=' + MD5 + ','
-        + OPAQUE + "=\"" + auth.get(OPAQUE) + '"';
+        + ALGORITHM + '=' + MD5
+        // include the opaque value only if the server provided one
+        + (opaque != null ? "," + OPAQUE + "=\"" + opaque + '"' : "");
     }
     rb.header(AUTHORIZATION, request.authMethod + " " + value);
     return true;

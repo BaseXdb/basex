@@ -42,12 +42,15 @@ public final class ItemSeq extends Seq {
   }
 
   @Override
-  public Value shrink(final Job job) throws QueryException {
-    for(int i = 0; i < size; i++) items[i] = items[i].shrink(job);
+  public Value shrink(final QueryContext qc) throws QueryException {
+    for(int i = 0; i < size; i++) items[i] = items[i].shrink(qc);
     refineType();
     // see ValueBuilder#add for types with compact representation
-    return type.oneOf(BasicType.STRING, BasicType.UNTYPED_ATOMIC, BasicType.INTEGER,
-        BasicType.DOUBLE, BasicType.BOOLEAN) ? rebuild(job) : this;
+    if(type.oneOf(BasicType.STRING, BasicType.UNTYPED_ATOMIC, BasicType.INTEGER,
+        BasicType.DOUBLE, BasicType.BOOLEAN)) return rebuild(qc);
+    // discard unused entries of the array, which may have been supplied by a builder
+    final int sz = (int) size;
+    return items.length == sz ? this : new ItemSeq(Array.copy(items, new Item[sz]), sz, type);
   }
 
   @Override

@@ -21,7 +21,8 @@ public final class CsvW3Options extends CsvW3ArraysOptions {
   /** parse-csv option header. */
   public static final ValueOption HEADER = new ValueOption("header", ITEM_ZM, Bln.FALSE);
   /** parse-csv option select-columns. */
-  public static final NumbersOption SELECT_COLUMNS = new NumbersOption("select-columns");
+  public static final NumbersOption SELECT_COLUMNS =
+      new NumbersOption("select-columns", POSITIVE_INTEGER_ZM);
   /** parse-csv option trim-rows. */
   public static final BooleanOption TRIM_ROWS = new BooleanOption("trim-rows", false);
 

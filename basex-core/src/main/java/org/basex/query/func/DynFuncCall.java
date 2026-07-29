@@ -73,7 +73,7 @@ public final class DynFuncCall extends FuncCall {
     final Expr func = body();
     // the call is nondeterministic if the invoked function is (a function item is a value and so
     // carries no flag of its own, hence the explicit check)
-    if(func.has(Flag.NDT) || func instanceof final Value value && containsNdtFunction(value)) {
+    if(func.has(Flag.NDT) || func instanceof final Value value && mayBeNdt(value)) {
       ndt = true;
     }
 
@@ -142,36 +142,36 @@ public final class DynFuncCall extends FuncCall {
    * @return result of check
    */
   public static boolean containsNdtFunction(final Expr expr) {
-    return expr instanceof final Value value ? containsNdtFunction(value) :
-      !expr.accept(new ASTVisitor() {
-        @Override
-        public boolean funcItem(final FuncItem func) {
-          return !func.ndt();
-        }
-
-        @Override
-        public boolean inlineFunc(final Scope scope) {
-          return !(scope instanceof final Closure cl && cl.has(Flag.NDT));
-        }
-      });
+    return expr instanceof final Value value ? mayBeNdt(value) : !expr.accept(new ASTVisitor() {
+      @Override
+      public boolean funcItem(final FuncItem func) {
+        return !func.ndt();
+      }
+      @Override
+      public boolean inlineFunc(final Scope scope) {
+        return !(scope instanceof final Closure cl && cl.has(Flag.NDT));
+      }
+    });
   }
 
   /**
-   * Checks if a value contains a nondeterministic function item or closure.
+   * Checks if a value may contain a nondeterministic function item or closure.
    * @param value value
-   * @return result of check
+   * @return result of check (large values are not traversed and yield {@code true})
    */
-  private static boolean containsNdtFunction(final Value value) {
-    if(atomic(value.seqType())) return false;
-    for(final Item item : value) {
-      if(item instanceof final FuncItem fi && fi.ndt()) return true;
-      if(item instanceof final XQArray array && !atomic(array.funcType().declType)) {
-        for(final Value member : array.members()) {
-          if(containsNdtFunction(member)) return true;
-        }
-      } else if(item instanceof final XQMap map && !atomic(map.funcType().declType)) {
-        for(final XQMap.Entry entry : map.entries()) {
-          if(containsNdtFunction(entry.value())) return true;
+  private static boolean mayBeNdt(final Value value) {
+    if(!atomic(value.seqType())) {
+      if(value.size() > CompileContext.MAX_PREEVAL) return true;
+      for(final Item item : value) {
+        if(item instanceof final FuncItem fi) {
+          if(fi.ndt()) return true;
+        } else if(item instanceof final XQStruct struct && !atomic(struct.funcType().declType)) {
+          if(struct.structSize() > CompileContext.MAX_PREEVAL) return true;
+          if(item instanceof final XQArray array) {
+            if(Checks.any(array.members(), m -> mayBeNdt(m))) return true;
+          } else if(item instanceof final XQMap map) {
+            if(Checks.any(map.entries(), e -> mayBeNdt(e.value()))) return true;
+          }
         }
       }
     }

@@ -421,7 +421,6 @@ public final class IOFile extends IO {
     try {
       return Paths.get(pth);
     } catch(final InvalidPathException ex) {
-      Util.debug(ex);
       throw new IOException(ex);
     }
   }

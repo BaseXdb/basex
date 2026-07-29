@@ -1,6 +1,5 @@
 package org.basex.query.value.array;
 
-import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -34,8 +33,8 @@ abstract class TreeArray extends XQArray {
   }
 
   @Override
-  public final Item shrink(final Job job) throws QueryException {
-    return rebuild(job);
+  public final Item shrink(final QueryContext qc) throws QueryException {
+    return rebuild(qc);
   }
 
   /**

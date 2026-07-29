@@ -118,7 +118,7 @@ public class AdaptiveSerializer extends OutputSerializer {
       } else if(type == BOOLEAN) {
         printChars(Token.token(item));
       } else if(type.instanceOf(NUMERIC)) {
-        printChars(item.string(null));
+        printChars(((ANum) item).jsonString());
       } else {
         final Type tp = constructor(type);
         if(tp == null && depth == 0) {

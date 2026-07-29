@@ -6,7 +6,7 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 
 /**
  * Function implementation.
@@ -36,9 +36,9 @@ public final class BinToOctets extends StandardFunc {
         final int bl = bytes.length;
         if(bl == 1) return get(0);
 
-        final int[] list = new int[bl];
-        for(int b = 0; b < bl; b++) list[b] = bytes[b] & 0xFF;
-        return IntSeq.get(list);
+        final ValueBuilder vb = new ValueBuilder(q, bl);
+        for(final byte b : bytes) vb.add(b & 0xFF);
+        return vb.value(BasicType.INTEGER);
       }
     };
   }

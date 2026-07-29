@@ -53,8 +53,7 @@ public final class DBPutBinary extends DBUpdate {
           ((IO) source).inputStream()) {
         bin.write(is);
       } catch(final IOException ex) {
-        Util.debug(ex);
-        throw UPDBPUT_X.get(info, path);
+        throw UPDBPUT_X.get(info, path).cause(ex);
       }
     }
   }

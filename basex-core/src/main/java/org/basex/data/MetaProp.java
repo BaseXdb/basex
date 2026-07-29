@@ -1,7 +1,5 @@
 package org.basex.data;
 
-import java.util.*;
-
 import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.util.*;
@@ -52,7 +50,7 @@ public enum MetaProp {
   /** Property. */
   TIMESTAMP(false) {
     @Override
-    public String value(final MetaData meta) { return DateTime.format(new Date(meta.dbTime())); }
+    public String value(final MetaData meta) { return DateTime.format(meta.dbTime()); }
   },
   /** Property. */
   UPTODATE(false) {
@@ -72,7 +70,7 @@ public enum MetaProp {
   /** Property. */
   INPUTDATE(false) {
     @Override
-    public String value(final MetaData meta) { return DateTime.format(new Date(meta.time)); }
+    public String value(final MetaData meta) { return DateTime.format(meta.time); }
   },
 
   /** Property. */

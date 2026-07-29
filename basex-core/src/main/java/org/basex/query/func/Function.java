@@ -707,8 +707,8 @@ public enum Function implements AFunction {
   TAIL(FnTail::new, "tail(input)",
       params(ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
-  TAKE_WHILE(FnTakeWhile::new, "take-while(input[,predicate])",
-      params(ITEM_ZM, PREDICATE_O.with(Occ.ZERO_OR_ONE)), ITEM_ZM),
+  TAKE_WHILE(FnTakeWhile::new, "take-while(input,predicate)",
+      params(ITEM_ZM, PREDICATE_O), ITEM_ZM),
   /** XQuery function. */
   TIMEZONE_FROM_DATE(FnTimezoneFromDate::new, "timezone-from-date(value)",
       params(DATE_ZO), DAY_TIME_DURATION_ZO),
@@ -724,6 +724,9 @@ public enum Function implements AFunction {
   /** XQuery function. */
   TRACE(FnTrace::new, "trace(input[,label])",
       params(ITEM_ZM, STRING_ZO), ITEM_ZM, flag(NDT)),
+  /** XQuery function. */
+  TRANSFORM(FnTransform::new, "transform(options)",
+      params(MAP_O), MAP_O, flag(NDT), FN_URI, Perm.CREATE),
   /** XQuery function. */
   TRANSITIVE_CLOSURE(FnTransitiveClosure::new, "transitive-closure(node,step)",
       params(GNODE_ZO, FUNCTION_O), GNODE_ZM),
@@ -774,6 +777,9 @@ public enum Function implements AFunction {
   XML_TO_JSON(FnXmlToJson::new, "xml-to-json(node[,options])",
       params(NODE_ZO, MAP_ZO), STRING_ZO),
   /** XQuery function. */
+  XSD_VALIDATOR(FnXsdValidator::new, "xsd-validator([options])",
+      params(MAP_ZO), FnXsdValidator.VALIDATOR_TYPE.seqType()),
+  /** XQuery function. */
   YEAR_FROM_DATE(FnYearFromDate::new, "year-from-date(value)",
       params(DATE_ZO), INTEGER_ZO),
   /** XQuery function. */
@@ -816,6 +822,8 @@ public enum Function implements AFunction {
   SCHEMA_TYPE_RECORD(Records.SCHEMA_TYPE.get()),
   /** XQuery function. */
   URI_STRUCTURE_RECORD(Records.URI_STRUCTURE.get()),
+  /** XQuery function. */
+  VALIDATION_RESULT_RECORD(Records.VALIDATION_RESULT.get()),
 
   // Map Module
 
@@ -1715,6 +1723,9 @@ public enum Function implements AFunction {
   _JOB_LIST_DETAILS(JobListDetails::new, "list-details([id])",
       params(STRING_ZO), ELEMENT_ZM, flag(NDT), JOB_URI, Perm.ADMIN),
   /** XQuery function. */
+  _JOB_NEXT(JobNext::new, "next(cron[,count])",
+      params(STRING_O, INTEGER_ZO), DATE_TIME_ZM, flag(NDT), JOB_URI),
+  /** XQuery function. */
   _JOB_REMOVE(JobRemove::new, "remove(id[,options])",
       params(STRING_O, MAP_ZO), EMPTY_SEQUENCE_Z, flag(NDT), JOB_URI, Perm.ADMIN),
   /** XQuery function. */
@@ -1911,6 +1922,10 @@ public enum Function implements AFunction {
   _STORE_REMOVE(StoreRemove::new, "remove(key[,name])",
       params(STRING_O, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
   /** XQuery function. */
+  _STORE_UPDATE(StoreUpdate::new, "update(update[,name])",
+      params(FuncType.get(MAP_O, MAP_O).seqType(), STRING_ZO),
+      BOOLEAN_O, flag(NDT), STORE_URI, Perm.CREATE),
+  /** XQuery function. */
   _STORE_WRITE(StoreWrite::new, "write([name])",
       params(STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
 
@@ -1987,10 +2002,6 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _UPDATE_OUTPUT(UpdateOutput::new, "output(input)",
       params(ITEM_ZM), EMPTY_SEQUENCE_Z, flag(UPD), UPDATE_URI),
-  /** XQuery function. */
-  _UPDATE_REPLACE(UpdateReplace::new, "replace(input,target,value)",
-      params(NODE_O, FuncType.get(GNODE_ZM, NODE_O).seqType(),
-      FuncType.get(ITEM_ZM, NODE_O).seqType()), NODE_O, flag(NDT), UPDATE_URI),
 
   // User Module
 

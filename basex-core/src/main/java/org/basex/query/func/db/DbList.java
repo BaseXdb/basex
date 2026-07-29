@@ -1,7 +1,5 @@
 package org.basex.query.func.db;
 
-import java.util.*;
-
 import org.basex.data.*;
 import org.basex.index.resource.*;
 import org.basex.query.*;
@@ -70,7 +68,7 @@ public class DbList extends DbAccessFn {
    * @return resource node
    */
   static FNode dir(final String path, final long mdate) {
-    final String date = DateTime.format(new Date(mdate));
+    final String date = DateTime.format(mdate);
     return FElem.build(Q_DIR).text(path).attr(Q_MODIFIED_DATE, date).finish();
   }
 
@@ -88,7 +86,7 @@ public class DbList extends DbAccessFn {
     final FBuilder elem = FElem.build(Q_RESOURCE).text(path);
     elem.attr(Q_TYPE, type);
     elem.attr(Q_CONTENT_TYPE, type.contentType(path));
-    elem.attr(Q_MODIFIED_DATE, DateTime.format(new Date(mdate)));
+    elem.attr(Q_MODIFIED_DATE, DateTime.format(mdate));
     elem.attr(Q_SIZE, size);
     return elem.finish();
   }

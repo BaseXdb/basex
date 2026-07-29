@@ -11,6 +11,7 @@ import org.basex.query.func.request.*;
 import org.basex.query.func.rest.*;
 import org.basex.query.func.session.*;
 import org.basex.query.func.sessions.*;
+import org.basex.query.func.webdav.*;
 import org.basex.query.func.ws.*;
 import org.basex.query.util.*;
 import org.basex.query.value.type.*;
@@ -39,6 +40,9 @@ public enum ApiFunction implements AFunction {
   /** XQuery function. */
   _REQUEST_ATTRIBUTE_NAMES(RequestAttributeNames::new, "attribute-names()",
       params(), STRING_ZM, REQUEST_URI),
+  /** XQuery function. */
+  _REQUEST_BODY(RequestBody::new, "body()",
+      params(), BASE64_BINARY_ZO, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_CONTEXT_PATH(RequestContextPath::new, "context-path()",
       params(), STRING_O, REQUEST_URI),
@@ -175,6 +179,15 @@ public enum ApiFunction implements AFunction {
   _SESSIONS_SET(SessionsSet::new, "set(id,key,value)",
       params(STRING_O, STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, SESSIONS_URI, Perm.ADMIN),
 
+  // WebDAV Module (internal: lock storage for the WebDAV service)
+
+  /** XQuery function. */
+  _WEBDAV_LOCKS(WebDAVLocks::new, "locks()",
+      params(), WebDAVLocks.LOCKS, WEBDAV_URI),
+  /** XQuery function. */
+  _WEBDAV_LOCK_UPDATE(WebDAVLockUpdate::new, "lock-update(update)",
+      params(FuncType.get(WebDAVLocks.LOCKS, WebDAVLocks.LOCKS).seqType()), BOOLEAN_O, WEBDAV_URI),
+
   // WebSocket Module
 
   /** XQuery function. */
@@ -208,7 +221,7 @@ public enum ApiFunction implements AFunction {
   _WS_PING(WsPing::new, "ping(id)",
       params(STRING_O), EMPTY_SEQUENCE_Z, WS_URI),
   /** XQuery function. */
-  _WS_SEND(WsSend::new, "send(message[,ids])",
+  _WS_SEND(WsSend::new, "send(message,ids)",
       params(ITEM_O, STRING_ZM), EMPTY_SEQUENCE_Z, WS_URI),
   /** XQuery function. */
   _WS_SET(WsSet::new, "set(id,key,value)",

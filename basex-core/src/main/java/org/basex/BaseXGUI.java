@@ -3,12 +3,13 @@ package org.basex;
 import static org.basex.core.Text.*;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
 
 import javax.swing.*;
 
 import org.basex.core.*;
-import org.basex.core.cmd.Check;
+import org.basex.core.cmd.*;
 import org.basex.gui.*;
 import org.basex.gui.dialog.*;
 import org.basex.gui.layout.*;
@@ -50,6 +51,10 @@ public final class BaseXGUI extends Main {
     super(args);
     parseArgs();
 
+    // delegate files to a GUI instance that is already running
+    final String[] paths = files.finish();
+    if(GUIInstance.delegate(paths)) return;
+
     // initialize fonts and colors
     final GUIOptions gopts = new GUIOptions();
     GUIConstants.init(gopts);
@@ -68,26 +73,60 @@ public final class BaseXGUI extends Main {
         splash.dispose();
       }
 
-      // open specified file
-      final ArrayList<IOFile> xqfiles = new ArrayList<>();
-      for(final String file : files.finish()) {
-        if(file.endsWith(IO.BASEXSUFFIX)) continue;
+      // open specified files
+      gui.editor.init(filter(gui, paths));
 
-        final IOFile io = new IOFile(file);
-        final boolean xml = file.endsWith(IO.XMLSUFFIX);
-        if(xml && BaseXDialog.confirm(gui, Util.info(CREATE_DB_FILE, io))) {
-          gopts.setFile(GUIOptions.INPUTPATH, io);
-          gopts.set(GUIOptions.DBNAME, io.dbName());
-          DialogProgress.execute(gui, new Check(file));
-        } else {
-          xqfiles.add(io);
-        }
-      }
-      gui.editor.init(xqfiles);
+      // open files that are delegated by other GUI instances
+      GUIInstance.listen(paths, delegated -> SwingUtilities.invokeLater(() -> {
+        for(final IOFile file : filter(gui, delegated)) gui.editor.open(file);
+        focus(gui);
+      }));
     });
 
     // guarantee correct shutdown of database context
     Runtime.getRuntime().addShutdownHook(new Thread(context::close));
+  }
+
+  /**
+   * Returns the files to be opened in the editor and creates databases for XML documents.
+   * @param gui reference to the main window
+   * @param paths paths to the files
+   * @return editor files
+   */
+  private static ArrayList<IOFile> filter(final GUI gui, final String[] paths) {
+    final ArrayList<IOFile> xqfiles = new ArrayList<>();
+    for(final String file : paths) {
+      if(file.endsWith(IO.BASEXSUFFIX)) continue;
+
+      final IOFile io = new IOFile(file);
+      if(file.endsWith(IO.XMLSUFFIX) && BaseXDialog.confirm(gui, Util.info(CREATE_DB_FILE, io))) {
+        gui.gopts.setFile(GUIOptions.INPUTPATH, io);
+        gui.gopts.set(GUIOptions.DBNAME, io.dbName());
+        DialogProgress.execute(gui, new Check(file));
+      } else {
+        xqfiles.add(io);
+      }
+    }
+    return xqfiles;
+  }
+
+  /**
+   * Moves the main window to the foreground.
+   * @param gui reference to the main window
+   */
+  private static void focus(final GUI gui) {
+    // inject key event: Windows grants the focus only to the process that received the last input
+    if(Prop.WIN) {
+      try {
+        final Robot robot = new Robot();
+        robot.keyPress(KeyEvent.VK_CONTROL);
+        robot.keyRelease(KeyEvent.VK_CONTROL);
+      } catch(final AWTException ex) {
+        Util.debug(ex);
+      }
+    }
+    gui.setExtendedState(gui.getExtendedState() & ~Frame.ICONIFIED);
+    gui.toFront();
   }
 
   /**

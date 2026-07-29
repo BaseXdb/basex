@@ -9,7 +9,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.tests.bxapi.*;
-import org.basex.util.*;
 
 /**
  * Wrapper for representing XQuery values.
@@ -61,8 +60,7 @@ public abstract class XdmValue implements Iterable<XdmItem> {
     try {
       return Long.parseLong(getString());
     } catch(final NumberFormatException ex) {
-      Util.debug(ex);
-      throw new XQueryException("Value has no integer representation: " + this);
+      throw new XQueryException("Value has no integer representation: " + this, ex);
     }
   }
 

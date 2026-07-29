@@ -8,7 +8,6 @@ import java.util.*;
 import java.util.function.*;
 
 import org.basex.core.*;
-import org.basex.core.jobs.*;
 import org.basex.data.*;
 import org.basex.io.out.DataOutput;
 import org.basex.query.*;
@@ -214,7 +213,7 @@ public abstract class XQMap extends XQStruct {
   }
 
   @Override
-  public final XQMap materialize(final Predicate<Data> test, final InputInfo ii,
+  public XQMap materialize(final Predicate<Data> test, final InputInfo ii,
       final QueryContext qc) throws QueryException {
 
     if(materialized(test, ii)) return this;
@@ -228,7 +227,7 @@ public abstract class XQMap extends XQStruct {
   }
 
   @Override
-  public final boolean materialized(final Predicate<Data> test, final InputInfo ii)
+  public boolean materialized(final Predicate<Data> test, final InputInfo ii)
       throws QueryException {
     return funcType().declType.type.instanceOf(BasicType.ANY_ATOMIC_TYPE) ||
         test((key, value) -> value.materialized(test, ii));
@@ -240,29 +239,9 @@ public abstract class XQMap extends XQStruct {
     if(coerce && tp instanceof FuncType) return false;
 
     try {
-      if(tp instanceof final RecordType rt) {
-        // record(*)
-        if(rt == Types.RECORD) {
-          for(final Item key : keys()) {
-            if(!key.type.instanceOf(BasicType.STRING)) return false;
-          }
-          return true;
-        }
-        // coercion: skip only if this is already a sealed record of the required type
-        if(coerce) {
-          return type.instanceOf(rt) && type instanceof final RecordType st && st.sealed();
-        }
-        // structural check: absent fields are treated as empty sequence, no extra keys
-        final TokenObjectMap<RecordField> fields = rt.fields();
-        final int fs = fields.size();
-        for(int f = 1; f <= fs; f++) {
-          if(!fields.value(f).seqType().instance(get(Str.get(fields.key(f))))) return false;
-        }
-        for(final Item key : keys()) {
-          if(!key.type.instanceOf(BasicType.STRING) || !fields.contains(key.string(null)))
-            return false;
-        }
-        return true;
+      // a map matches a record type only if it is a record, i.e. if it carries a record annotation
+      if(tp instanceof RecordType) {
+        return type instanceof final RecordType rt && rt.sealed() && type.instanceOf(tp);
       }
       if(type.instanceOf(tp)) return true;
 
@@ -359,6 +338,9 @@ public abstract class XQMap extends XQStruct {
   public final XQMap coerceTo(final RecordType rt, final QueryContext qc, final InputInfo ii,
       final CompileContext cc) throws QueryException {
 
+    // record(*) is abstract: it is matched, but never constructed, by coercion
+    if(rt.any()) throw typeError(this, rt, ii);
+
     final TokenObjectMap<RecordField> fields = rt.fields();
     // reject undeclared keys
     for(final Item key : keys()) {
@@ -369,11 +351,76 @@ public abstract class XQMap extends XQStruct {
 
     // build record
     final int fs = fields.size();
-    if(fs == 0) return empty();
     final Value[] values = new Value[fs];
     for(int f = 0; f < fs; f++) {
       values[f] = fields.value(f + 1).seqType().coerce(get(Str.get(fields.key(f + 1))),
           qc, ii, null, cc);
+    }
+    return new XQRecordMap(rt, values);
+  }
+
+  /**
+   * Casts this map to the given map type (see {@link SeqType#cast}).
+   * @param mt map type
+   * @param error raise error (return {@code null} otherwise)
+   * @param qc query context
+   * @param info input info (can be {@code null})
+   * @return cast map, or {@code null} if casting failed and no error was raised
+   * @throws QueryException query exception
+   */
+  public final XQMap castTo(final MapType mt, final boolean error, final QueryContext qc,
+      final InputInfo info) throws QueryException {
+    if(mt == Types.MAP) return this;
+    final SeqType kt = mt.keyType().seqType(), vt = mt.valueType();
+    final MapBuilder mb = new MapBuilder(structSize());
+    for(final Item key : keys()) {
+      qc.checkStop();
+      final Value ck = kt.convert(key, error, qc, info);
+      if(ck == null) return null;
+      final Item k = (Item) ck;
+      if(mb.contains(k)) {
+        if(error) throw MAPDUPLKEY_X.get(info, k);
+        return null;
+      }
+      final Value cv = vt.convert(get(key), error, qc, info);
+      if(cv == null) return null;
+      mb.put(k, cv);
+    }
+    return mb.map();
+  }
+
+  /**
+   * Casts this map to the given record type (see {@link SeqType#cast}). Undeclared entries are
+   * discarded; a missing field yields the empty sequence if that is a valid field value.
+   * @param rt record type
+   * @param error raise error (return {@code null} otherwise)
+   * @param qc query context
+   * @param info input info (can be {@code null})
+   * @return cast record, or {@code null} if casting failed and no error was raised
+   * @throws QueryException query exception
+   */
+  public final XQMap castTo(final RecordType rt, final boolean error, final QueryContext qc,
+      final InputInfo info) throws QueryException {
+    // record(*) is abstract: only records can be cast to it
+    if(rt.any()) return instanceOf(rt, false) ? this : null;
+    final TokenObjectMap<RecordField> fields = rt.fields();
+    final int fs = fields.size();
+    final Value[] values = new Value[fs];
+    for(int f = 0; f < fs; f++) {
+      qc.checkStop();
+      final SeqType ft = fields.value(f + 1).seqType();
+      final Value value = getOrNull(Str.get(fields.key(f + 1)));
+      final Value cast;
+      if(value != null) {
+        cast = ft.convert(value, error, qc, info);
+      } else if(ft.instance(Empty.VALUE)) {
+        cast = Empty.VALUE;
+      } else {
+        if(error) throw INVCONVERT_X_X.get(info, Empty.VALUE, ft);
+        cast = null;
+      }
+      if(cast == null) return null;
+      values[f] = cast;
     }
     return new XQRecordMap(rt, values);
   }
@@ -392,9 +439,9 @@ public abstract class XQMap extends XQStruct {
   }
 
   @Override
-  protected final XQMap rebuild(final Job job) throws QueryException {
+  protected final XQMap rebuild(final QueryContext qc) throws QueryException {
     final MapBuilder mb = new MapBuilder(structSize());
-    forEach((key, value) -> mb.put(key, value.shrink(job)));
+    forEach((key, value) -> mb.put(key, value.shrink(qc)));
     return mb.map(this);
   }
 

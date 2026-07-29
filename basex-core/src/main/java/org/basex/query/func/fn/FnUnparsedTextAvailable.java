@@ -25,11 +25,12 @@ public class FnUnparsedTextAvailable extends ParseFn {
   /** Parse Options. */
   public static final class ParseOptions extends Options {
     /** Normalize-newlines option. */
-    public static final BooleanOption NORMALIZE_NEWLINES = CommonOptions.NORMALIZE_NEWLINES;
+    public static final BooleanOption NORMALIZE_NEWLINES =
+        new BooleanOption(CommonOptions.NORMALIZE_NEWLINES);
     /** Encoding option. */
-    public static final StringOption ENCODING = CommonOptions.ENCODING;
+    public static final StringOption ENCODING = new StringOption(CommonOptions.ENCODING);
     /** Fallback option. */
-    public static final BooleanOption FALLBACK = CommonOptions.FALLBACK;
+    public static final BooleanOption FALLBACK = new BooleanOption(CommonOptions.FALLBACK, false);
   }
 
   @Override
@@ -53,8 +54,8 @@ public class FnUnparsedTextAvailable extends ParseFn {
       try {
         input = toIO(toString(source, cc.qc), false);
         if(!(input instanceof IOUrl)) return value(cc.qc);
-      } catch(final QueryException ex) {
-        Util.debug(ex);
+      } catch(final QueryException ignore) {
+        // pre-evaluation is skipped
       }
     }
     return this;
@@ -65,8 +66,7 @@ public class FnUnparsedTextAvailable extends ParseFn {
     try {
       while(ti.read() != -1);
       return Bln.TRUE;
-    } catch(final IOException ex) {
-      Util.debug(ex);
+    } catch(final IOException ignore) {
       return Bln.FALSE;
     }
   }

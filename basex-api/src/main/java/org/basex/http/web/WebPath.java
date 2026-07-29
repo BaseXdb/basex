@@ -58,6 +58,14 @@ public final class WebPath implements Comparable<WebPath> {
     return matcher.varNames;
   }
 
+  /**
+   * Returns the regular expression the path template was compiled to.
+   * @return regular expression
+   */
+  public String regex() {
+    return matcher.pattern.pattern();
+  }
+
   @Override
   public int compareTo(final WebPath wp) {
     return matcher.compareTo(wp.matcher);

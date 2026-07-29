@@ -206,7 +206,7 @@ public final class QNm extends Item {
 
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
-      final InputInfo ii) throws QueryException {
+      final QueryContext qc, final InputInfo ii) throws QueryException {
     final QNm qnm;
     final StaticContext sc = ii != null ? ii.sc() : null;
     if(item instanceof final QNm q) {

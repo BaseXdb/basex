@@ -17,6 +17,7 @@ import org.basex.build.json.*;
 import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.http.web.*;
+import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
@@ -56,7 +57,7 @@ public final class RestXqFunction extends WebFunction {
   final ArrayList<WebParam> headerParams = new ArrayList<>();
 
   /** Supported methods. */
-  final Set<String> methods = new HashSet<>();
+  public final Set<String> methods = new HashSet<>();
   /** Permissions (can be empty). */
   final TokenList allows = new TokenList();
 
@@ -66,9 +67,15 @@ public final class RestXqFunction extends WebFunction {
   private final ArrayList<WebParam> cookieParams = new ArrayList<>();
   /** Consumed media types. */
   private final ArrayList<MediaType> consumes = new ArrayList<>();
+  /** Variables of all path templates. */
+  private final QNmSet pathVars = new QNmSet();
+  /** Index of the assigned path annotation. */
+  final int index;
 
   /** Path (can be {@code null}). */
   public WebPath path;
+  /** Number of path annotations. */
+  private int paths;
   /** Singleton ID (can be {@code null}). */
   String singleton;
 
@@ -76,8 +83,8 @@ public final class RestXqFunction extends WebFunction {
   private QNm requestBody;
 
   /** Error (can be {@code null}). */
-  private RestXqError error;
-  /** Error (can be {@code null}). */
+  RestXqError error;
+  /** Permission (can be {@code null}). */
   private RestXqPerm permission;
 
   /**
@@ -85,9 +92,20 @@ public final class RestXqFunction extends WebFunction {
    * @param function associated user function
    * @param module web module
    * @param qc query context
+   * @param index index of the path annotation to be assigned
    */
-  public RestXqFunction(final StaticFunc function, final WebModule module, final QueryContext qc) {
+  public RestXqFunction(final StaticFunc function, final WebModule module, final QueryContext qc,
+      final int index) {
     super(function, module, qc);
+    this.index = index;
+  }
+
+  /**
+   * Returns the number of path annotations.
+   * @return number of annotations
+   */
+  public int paths() {
+    return paths;
   }
 
   @Override
@@ -97,6 +115,8 @@ public final class RestXqFunction extends WebFunction {
     boolean found = false;
 
     AnnList starts = AnnList.EMPTY;
+    Ann pathAnn = null;
+    final Set<String> templates = new HashSet<>();
     for(final Ann ann : function.anns) {
       final Annotation def = ann.definition;
       if(def == null) continue;
@@ -104,14 +124,22 @@ public final class RestXqFunction extends WebFunction {
       found |= eq(def.name.uri(), QueryText.REST_URI, QueryText.PERM_URI);
       final Value value = ann.value();
       if(def == _REST_PATH) {
+        final WebPath wp;
         try {
-          path = new WebPath(toString(value.itemAt(0)), ann.info, BASEX_RESTXQ_X);
-          starts = starts.attach(ann);
+          wp = new WebPath(toString(value.itemAt(0)), ann.info, BASEX_RESTXQ_X);
         } catch(final IllegalArgumentException ex) {
           throw error(ann.info, ex.getMessage());
         }
-        for(final QNm name : path.varNames()) {
-          checkVariable(name, declared);
+        // identical templates always conflict: all other constraints are shared
+        if(!templates.add(wp.regex())) throw error(ann.info, PATH_DUPL_X, wp);
+        // a function is registered once for each of its path annotations
+        if(paths++ == index) path = wp;
+        pathAnn = ann;
+        final QNmSet vars = new QNmSet();
+        for(final QNm name : wp.varNames()) {
+          // a variable may be declared by several path templates, but only once per template
+          if(!vars.add(resolve(name))) throw error(ann.info, PARAM_DUPL_X, name.string());
+          if(pathVars.add(name)) checkVariable(name, declared);
         }
       } else if(def == _REST_ERROR) {
         error(ann);
@@ -170,6 +198,9 @@ public final class RestXqFunction extends WebFunction {
       }
     }
 
+    // a path combined with error annotations restricts the scope of the error handler
+    if(pathAnn != null && error == null) starts = starts.attach(pathAnn);
+
     // check validity of quality factors
     for(final MediaType produce : produces) {
       final String qs = produce.parameter("qs");
@@ -199,22 +230,25 @@ public final class RestXqFunction extends WebFunction {
     final Expr[] args = new Expr[function.arity()];
     if(path != null) {
       final QNmMap<String> qnames = path.values(conn.path());
-      for(final QNm qname : qnames) {
+      for(final QNm qname : pathVars) {
         final QNm qnm = new QNm(qname.string(), function.sc);
         if(function.sc.elemNS != null && eq(qnm.uri(), function.sc.elemNS)) qnm.uri(EMPTY);
-        bind(qnm, args, Atm.get(qnames.get(qname)), qc, "Path segment");
+        // variables of other path templates are bound to an empty sequence
+        final String segment = qnames.get(qname);
+        bind(qnm, args, segment != null ? Atm.get(segment) : Empty.VALUE, qc,
+          "Path segment $" + string(qname.string()));
       }
     }
 
     // bind request body in the correct format
     if(requestBody != null) {
       final MediaType type = conn.mediaType();
-      final byte[] body = conn.requestCtx.body().read();
+      final IO body = conn.requestCtx.body();
       final Value value;
       try {
         value = Payload.value(body, type, mopts);
       } catch(final IOException ex) {
-        throw error(BODY_TYPE_X_X, type, ex);
+        throw HTTPStatus.BAD_REQUEST_X.get(Util.info(BODY_TYPE_X_X, type, ex));
       }
       bind(requestBody, args, value, qc, "Request body");
     }
@@ -270,13 +304,18 @@ public final class RestXqFunction extends WebFunction {
    * @return result of check
    */
   public boolean matches(final HTTPConnection conn, final QNm err, final boolean perm) {
-    // check method, consumed and produced media type, and path or error
-    if(!methods.isEmpty() && !methods.contains(conn.method) || !consumes(conn) || !produces(conn))
-      return false;
+    // reject if the HTTP method or the consumed/produced media type does not match
+    final boolean methodMatches = methods.isEmpty() || methods.contains(conn.method);
+    if(!methodMatches || !consumes(conn) || !produces(conn)) return false;
 
     if(perm) return permission != null && permission.matches(conn);
-    if(err != null) return error != null && error.matches(err);
-    return path != null && path.matches(conn.path());
+    // an error handler with a path is limited to errors that are raised under this path
+    if(err != null) return error != null && error.matches(err) &&
+        (path == null || path.matches(conn.path()));
+
+    // a method-agnostic target is not triggered by OPTIONS requests (preflight, run as admin)
+    final boolean optionsPreflight = methods.isEmpty() && conn.method.equals(Method.OPTIONS.name());
+    return !optionsPreflight && error == null && path != null && path.matches(conn.path());
   }
 
   /**
@@ -311,8 +350,12 @@ public final class RestXqFunction extends WebFunction {
   @Override
   public int compareTo(final WebFunction func) {
     if(!(func instanceof final RestXqFunction rxf)) return -1;
+    if(error != null) {
+      final int diff = path == null ? rxf.path == null ? 0 : 1 :
+        rxf.path == null ? -1 : path.compareTo(rxf.path);
+      return diff != 0 ? diff : error.compareTo(rxf.error);
+    }
     if(path != null) return path.compareTo(rxf.path);
-    if(error != null) return error.compareTo(rxf.error);
     return permission.compareTo(rxf.permission);
   }
 

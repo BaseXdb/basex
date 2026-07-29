@@ -39,29 +39,48 @@ enum LogTarget {
   SLF4J {
     @Override
     void write(final Log log, final LogEntry entry) {
-      if(slf4j != null) slf4j.accept(entry.type, entry.toString());
+      if(SLF4J_LOGGER != null) {
+        SLF4J_LOGGER.accept(entry.type, entry.toString());
+      } else if(!warned) {
+        warned = true;
+        Util.errln("SLF4J logger not available.");
+      }
     }
   };
 
   /** SLF4J logger ({@code null} if not available). */
-  private static BiConsumer<String, String> slf4j;
+  private static final BiConsumer<String, String> SLF4J_LOGGER = slf4j();
+  /** Indicates if the user has been informed about the missing SLF4J logger. */
+  private static boolean warned;
 
-  static {
-    final Class<?> cLoggerFactory = Reflect.find("org.slf4j.LoggerFactory");
-    final Class<?> cLogger = Reflect.find("org.slf4j.Logger");
-    final Method mLogger = Reflect.method(cLoggerFactory, "getLogger", String.class);
-    final Object logger = Reflect.invoke(mLogger, null, Prop.NAME);
-    slf4j = (type, text) -> {
-      final String level = Strings.eqic(type, "trace", "debug", "warn", "error") ?
-        type.toLowerCase(Locale.ENGLISH) : "info";
-      final Method method = Reflect.method(cLogger, level, String.class);
-      if(method != null) {
-        Reflect.invoke(method, logger, text);
-      } else {
-        Util.errln("SLF4J logger not available.");
-        slf4j = null;
+  /**
+   * Initializes the SLF4J logger.
+   * @return logger, or {@code null} if SLF4J is not available
+   */
+  private static BiConsumer<String, String> slf4j() {
+    try {
+      final Class<?> factory = Class.forName("org.slf4j.LoggerFactory");
+      final Class<?> clazz = Class.forName("org.slf4j.Logger");
+      final Object logger = factory.getMethod("getLogger", String.class).invoke(null, Prop.NAME);
+
+      final Map<String, Method> methods = new HashMap<>();
+      for(final String level : new String[] { "trace", "debug", "info", "warn", "error" }) {
+        methods.put(level, clazz.getMethod(level, String.class));
       }
-    };
+      return (type, text) -> {
+        final String level = Strings.eqic(type, "trace", "debug", "warn", "error") ?
+          type.toLowerCase(Locale.ENGLISH) : "info";
+        // logging must never interfere with the caller
+        try {
+          methods.get(level).invoke(logger, text);
+        } catch(final ReflectiveOperationException ex) {
+          Util.debug(ex);
+        }
+      };
+    } catch(final ReflectiveOperationException ex) {
+      Util.debug(ex);
+      return null;
+    }
   }
 
   /**

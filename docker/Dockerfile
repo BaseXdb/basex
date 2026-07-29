@@ -29,9 +29,8 @@ VOLUME ["/opt/basex/data"]
 
 USER basex
 
-# 1984: database server (client API)
 # 8080: HTTP server (REST, RESTXQ, DBA)
-EXPOSE 1984 8080
+EXPOSE 8080
 
 # / is served by webapp/restxq.xqm without authentification; /rest/ would require credentials.
 HEALTHCHECK --interval=10s --timeout=5s --start-period=15s --retries=3 \

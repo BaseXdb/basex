@@ -110,7 +110,7 @@ public final class OrderBy extends Clause {
                 final int c = m == Empty.VALUE
                     ? n == Empty.VALUE ? 0             : key.least ? -1 : 1
                     : n == Empty.VALUE ? key.least ? 1 : -1 :
-                      m.compare(n, key.coll, true, key.info());
+                      m.compare(n, key.coll, true, qc, key.info());
                 if(c != 0) return key.desc ? -c : c;
               }
               return 0;

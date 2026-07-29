@@ -126,12 +126,14 @@ public final class WebModules {
     if(funcs.size() > 1) bestQf(funcs, conn);
     // multiple functions: check consume filter
     if(funcs.size() > 1) bestConsume(funcs, conn);
+    // multiple functions: check method annotations
+    if(funcs.size() > 1) bestMethod(funcs);
 
     final RestXqFunction first = funcs.getFirst();
     if(funcs.size() == 1) return first;
 
     // show error if we are left with multiple function candidates
-    throw first.path == null ?
+    throw error != null ?
       first.error(ERROR_CONFLICT_X_X, error, toString(funcs)) :
       first.error(PATH_CONFLICT_X_X, first.path, toString(funcs));
   }
@@ -289,6 +291,20 @@ public final class WebModules {
   private static void bestSpec(final List<? extends WebFunction> funcs) {
     for(int l = funcs.size() - 1; l > 0; l--) {
       if(funcs.getFirst().compareTo(funcs.get(l)) != 0) funcs.remove(l);
+    }
+  }
+
+  /**
+   * Filters functions by their method annotations.
+   * @param funcs list of functions
+   */
+  private static void bestMethod(final List<RestXqFunction> funcs) {
+    // drop method-agnostic functions if a function with method annotations exists
+    for(final RestXqFunction func : funcs) {
+      if(!func.methods.isEmpty()) {
+        funcs.removeIf(f -> f.methods.isEmpty());
+        break;
+      }
     }
   }
 

@@ -143,6 +143,13 @@ public final class StoreModuleTest extends SandboxTest {
     query(_STORE_KEYS.args("cache"), "");
     query(_STORE_LIST.args() + " => count()", 0);
 
+    // a record with a node is materialized as a record, detached from the declaring query
+    query("declare record r(a, owner as element(*)?); " + func.args("key", " r(1, <owner/>)"), "");
+    query("(" + _STORE_GET.args("key") + " +:= { 'a': 2 })?a", 2);
+    query("declare record r(a, owner as element(*)?, n := 42); " +
+        func.args("key", " r(1, <owner/>)"), "");
+    query("(" + _STORE_GET.args("key") + " +:= { 'a': 2 })?n", 42);
+
     error(func.args("key", " true#0"), BASEX_FUNCTION_X);
     error(func.args("key", " [ fn() { 123 } ]"), BASEX_FUNCTION_X);
     error(func.args("key", " { 0: concat(1, ?) }"), BASEX_FUNCTION_X);
@@ -193,6 +200,74 @@ public final class StoreModuleTest extends SandboxTest {
     query(_STORE_LIST.args() + "=> count()", 1);
     query(func.args("key", "cache"), "");
     query(_STORE_LIST.args() + "=> count()", 0);
+  }
+
+  /** Test method. */
+  @Test public void update() {
+    final Function func = _STORE_UPDATE;
+    query(func.args(" fn($map) { map:put($map, 'key', 'UPDATE') }"), true);
+    query(_STORE_GET.args("key"), "UPDATE");
+
+    // the current entries are supplied
+    query(func.args(" fn($map) { map:put($map, 'size', map:size($map)) }"), true);
+    query(_STORE_GET.args("size"), 1);
+    // the returned map replaces all entries
+    query(func.args(" fn($map) { { 'key': 'REPLACED' } }"), true);
+    query(_STORE_KEYS.args(), "key");
+    query(_STORE_GET.args("key"), "REPLACED");
+    // entries with empty values are dropped
+    query(func.args(" fn($map) { map:put($map, 'key', ()) }"), true);
+    query(_STORE_KEYS.args(), "");
+
+    // custom store
+    query(func.args(" fn($map) { { 'key': 'CACHE' } }", "cache"), true);
+    query(_STORE_GET.args("key", "cache"), "CACHE");
+    query(_STORE_GET.args("key"), "");
+
+    // unchanged entries are reported and leave the store untouched
+    query(func.args(" fn($map) { $map }"), false);
+    query(func.args(" fn($map) { {} }"), false);
+    query(_STORE_PUT.args("seq", " (1 to 10) ! string()"));
+    query(func.args(" fn($map) { $map }"), false);
+    query(func.args(" fn($map) { map:put($map, 'seq', $map?seq) }"), false);
+    query(func.args(" fn($map) { map:remove($map, 'absent') }"), false);
+    query(func.args(" fn($map) { map:put($map, 'seq', reverse($map?seq)) }"), true);
+    query(_STORE_CLEAR.args());
+
+    // errors: the store is left untouched
+    query(_STORE_PUT.args("key", "OLD"));
+    error(func.args(" fn($map) { error() }"), FUNERR1);
+    error(func.args(" fn($map) { 'no map' }"), INVTYPE_X);
+    error(func.args(" fn($map) { map:put($map, 'f', true#0) }"), BASEX_FUNCTION_X);
+    query(_STORE_GET.args("key"), "OLD");
+
+    // concurrent updates are serialized: no increment gets lost
+    query(_STORE_PUT.args("n", 0));
+    query(_XQUERY_FORK_JOIN.args(" (1 to 100) ! fn() { " +
+        func.args(" fn($map) { map:put($map, 'n', $map?n + 1) }") + " }"));
+    query(_STORE_GET.args("n"), 100);
+
+    // nested modifications of the same store are rejected
+    query(_STORE_CLEAR.args());
+    query(_STORE_PUT.args("key", "NESTED"));
+    error(func.args(" fn($map) { " + _STORE_PUT.args("x", "X") + ", $map }"), STORE_UPDATE);
+    error(func.args(" fn($map) { " + _STORE_REMOVE.args("key") + ", $map }"), STORE_UPDATE);
+    error(func.args(" fn($map) { " + _STORE_DELETE.args("") + ", $map }"), STORE_UPDATE);
+    error(func.args(" fn($map) { " + _STORE_CLEAR.args() + ", $map }"), STORE_UPDATE);
+    error(func.args(" fn($map) { " + func.args(" fn($m) { map:put($m, 'x', 'X') }") +
+        " => void(), $map }"), STORE_UPDATE);
+
+    // reads, and updates of other stores, are allowed
+    query(_STORE_CLEAR.args());
+    query(_STORE_PUT.args("key", "NESTED"));
+    query(func.args(" fn($map) { map:put($map, 'keys', count(" + _STORE_KEYS.args() + ")) }"),
+        true);
+    query(func.args(" fn($map) { " + func.args(" fn($m) { map:put($m, 'y', 'Y') }", "other") +
+        " => void(), $map }"), false);
+    query(_STORE_GET.args("y", "other"), "Y");
+
+    // invalid names
+    for(final char ch : INVALID) error(func.args(" fn($map) { $map }", ch), STORE_NAME_X);
   }
 
   /** Test method. */

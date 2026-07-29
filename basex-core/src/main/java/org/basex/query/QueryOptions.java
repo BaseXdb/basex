@@ -6,7 +6,6 @@ import java.util.*;
 import java.util.Map.*;
 
 import org.basex.core.*;
-import org.basex.util.*;
 import org.basex.util.options.*;
 
 /**
@@ -51,8 +50,7 @@ final class QueryOptions {
     try {
       dummyOptions.assign(key, value);
     } catch(final BaseXException ex) {
-      Util.debug(ex);
-      throw BASEX_OPTIONS_X_X.get(parser.info(), key, value);
+      throw BASEX_OPTIONS_X_X.get(parser.info(), key, value).cause(ex);
     }
     // if successful, cache assigned value
     localOpts.put(option, dummyOptions.get(option));

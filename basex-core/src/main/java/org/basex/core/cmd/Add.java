@@ -79,7 +79,7 @@ public final class Add extends ACreate {
     try {
       source = sourceToIO(path);
     } catch(final IOException ex) {
-      return error(Util.message(ex));
+      return error(ex);
     }
 
     // check if resource exists
@@ -120,7 +120,7 @@ public final class Add extends ACreate {
       tmpData = builder.build();
       return true;
     } catch(final IOException ex) {
-      return error(Util.message(ex));
+      return error(ex);
     }
   }
 

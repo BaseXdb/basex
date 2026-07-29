@@ -54,8 +54,7 @@ public final class FnFormatNumber extends StandardFunc {
       try {
         df = new DecFormatter(toOptions(options, df.options(), qc), info);
       } catch(final QueryException ex) {
-        Util.debug(ex);
-        throw FORMATINV_X.get(info, ex.getLocalizedMessage());
+        throw FORMATINV_X.get(info, ex.getLocalizedMessage()).cause(ex);
       }
     }
 

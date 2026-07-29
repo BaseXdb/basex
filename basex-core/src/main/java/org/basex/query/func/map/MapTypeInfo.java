@@ -38,7 +38,8 @@ public final class MapTypeInfo {
     final SeqType st = map.seqType();
     if(st.one() && st.type instanceof final MapType mt) {
       mti.mapType = mt;
-      if(mt instanceof final RecordType rt) mti.record = rt;
+      // record(*) has an unknown field set: no static information on single fields
+      if(mt instanceof final RecordType rt && !rt.any()) mti.record = rt;
     }
     return mti;
   }

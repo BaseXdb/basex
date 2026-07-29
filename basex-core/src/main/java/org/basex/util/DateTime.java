@@ -1,7 +1,7 @@
 package org.basex.util;
 
-import java.text.*;
-import java.util.*;
+import java.time.*;
+import java.time.format.*;
 
 /**
  * This class contains static, thread-safe methods for parsing and formatting dates and times.
@@ -10,53 +10,53 @@ import java.util.*;
  * @author Christian Gruen
  */
 public final class DateTime {
-  /** Date format without milliseconds and timestamp (uses UTC time zone). */
-  public static final SimpleDateFormat DATETIME = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
-  /** Full date format. */
-  public static final SimpleDateFormat FULL = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+  /** Date and time format without milliseconds and timezone. */
+  public static final DateTimeFormatter DATETIME =
+      DateTimeFormatter.ofPattern("uuuu-MM-dd-HH-mm-ss");
   /** Date format. */
-  public static final SimpleDateFormat DATE = new SimpleDateFormat("yyyy-MM-dd");
+  public static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("uuuu-MM-dd");
   /** Time format. */
-  public static final SimpleDateFormat TIME = new SimpleDateFormat("HH:mm:ss.SSS");
-  /** Time zone. */
-  public static final SimpleDateFormat ZONE = new SimpleDateFormat("Z");
-
-  static { FULL.setTimeZone(TimeZone.getTimeZone("UTC")); }
+  public static final DateTimeFormatter TIME = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
+  /** Timezone format. */
+  public static final DateTimeFormatter ZONE = DateTimeFormatter.ofPattern("xxx");
+  /** Full date and time format (UTC). */
+  private static final DateTimeFormatter FULL =
+      DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(ZoneOffset.UTC);
 
   /** Hidden constructor. */
   private DateTime() { }
 
   /**
-   * Parses a string and produces a date object.
-   * Returns the standard base time if it cannot be converted.
+   * Parses a local date and time. The {@link #DATETIME} format is the only supported one.
    * @param date string representing a date
-   * @return parsed date
+   * @return milliseconds since 1970-01-01T00:00:00Z, or {@code 0} if the input cannot be parsed
    */
-  public static synchronized Date parse(final String date) {
+  public static long parse(final String date) {
     try {
-      return (date.contains(":") ? FULL : DATETIME).parse(date);
-    } catch(final ParseException ex) {
+      return LocalDateTime.parse(date, DATETIME).atZone(ZoneId.systemDefault()).
+          toInstant().toEpochMilli();
+    } catch(final DateTimeParseException ex) {
       Util.errln(ex);
-      return new Date(0);
+      return 0;
     }
   }
 
   /**
-   * Creates a full string representation for the specified date.
-   * @param date date
+   * Creates a full UTC string representation for the specified time.
+   * @param ms milliseconds since 1970-01-01T00:00:00Z
    * @return string with the formatted date
    */
-  public static synchronized String format(final Date date) {
-    return format(date, FULL);
+  public static String format(final long ms) {
+    return FULL.format(Instant.ofEpochMilli(ms));
   }
 
   /**
-   * Creates a string representation for a date in the specified format.
-   * @param format date format
-   * @param date date
-   * @return string with the formatted date
+   * Returns the offset of the system timezone at the specified time.
+   * The zone is resolved on each call, as it can be changed at runtime.
+   * @param ms milliseconds since 1970-01-01T00:00:00Z
+   * @return offset in seconds
    */
-  public static synchronized String format(final Date date, final DateFormat format) {
-    return format.format(date);
+  public static int offset(final long ms) {
+    return ZoneId.systemDefault().getRules().getOffset(Instant.ofEpochMilli(ms)).getTotalSeconds();
   }
 }

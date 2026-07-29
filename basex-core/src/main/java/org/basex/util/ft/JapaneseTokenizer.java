@@ -18,7 +18,7 @@ import org.basex.util.*;
  */
 final class JapaneseTokenizer extends Tokenizer {
   /** Flag available. */
-  private static boolean available = true;
+  private static boolean available;
 
   /** Name of the Igo tagger class. */
   private static final String PATTERN = "net.reduls.igo.Tagger";
@@ -89,37 +89,22 @@ final class JapaneseTokenizer extends Tokenizer {
   private boolean sc;
 
   static {
-    IOFile dic = null;
-    if(Reflect.available(PATTERN)) {
-      dic = new IOFile(LANG);
-      if(!dic.exists()) {
-        dic = new IOFile(Prop.HOMEDIR, "etc/" + LANG);
-        if(!dic.exists()) available = false;
-      }
-    } else {
-      available = false;
-    }
-
-    if(available) {
-      Class<?> clz = Reflect.find(PATTERN);
-      if(clz == null) {
-        Util.debugln("Could not initialize Igo Japanese lexer.");
-      } else {
-        /* Igo constructor. */
-        final Constructor<?> tgr = Reflect.find(clz, String.class);
-        tagger = Reflect.get(tgr, dic.path());
-        if(tagger == null) {
-          available = false;
+    final Class<?> clz = Reflect.find(PATTERN);
+    if(clz != null) {
+      IOFile dic = new IOFile(LANG);
+      if(!dic.exists()) dic = new IOFile(Prop.HOMEDIR, "etc/" + LANG);
+      if(dic.exists()) {
+        try {
+          tagger = clz.getConstructor(String.class).newInstance(dic.path());
+          parse = clz.getMethod("parse", CharSequence.class);
+          final Class<?> morpheme = Class.forName("net.reduls.igo.Morpheme");
+          surface = morpheme.getField("surface");
+          feature = morpheme.getField("feature");
+          start = morpheme.getField("start");
+          available = true;
+        } catch(final Exception ex) {
+          Util.debug(ex);
           Util.debugln("Could not initialize Igo Japanese lexer.");
-        } else {
-          parse = Reflect.method(clz, "parse", CharSequence.class);
-          if(parse == null) {
-            Util.debugln("Could not initialize Igo lexer method.");
-          }
-          clz = Reflect.find("net.reduls.igo.Morpheme");
-          surface = Reflect.field(clz, "surface");
-          feature = Reflect.field(clz, "feature");
-          start = Reflect.field(clz, "start");
         }
       }
     }

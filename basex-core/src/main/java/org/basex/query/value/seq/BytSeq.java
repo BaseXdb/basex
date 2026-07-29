@@ -18,16 +18,17 @@ import org.basex.query.value.type.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class BytSeq extends NativeSeq {
+public final class BytSeq extends ItrSeq {
   /** Values. */
   private final byte[] values;
 
   /**
    * Constructor.
    * @param values bytes
+   * @param type type
    */
-  private BytSeq(final byte[] values) {
-    super(values.length, BasicType.BYTE);
+  private BytSeq(final byte[] values, final Type type) {
+    super(values.length, type);
     this.values = values;
   }
 
@@ -45,7 +46,7 @@ public final class BytSeq extends NativeSeq {
     final int size = in.readNum();
     final byte[] values = new byte[size];
     for(int s = 0; s < size; s++) values[s] = (byte) in.readNum();
-    return get(values);
+    return get(values, type);
   }
 
   @Override
@@ -60,41 +61,69 @@ public final class BytSeq extends NativeSeq {
   }
 
   @Override
+  public long itrAt(final int index) {
+    return values[index];
+  }
+
+  @Override
+  int width() {
+    return 1;
+  }
+
+  @Override
   public Value reverse(final Job job) {
     final int sz = (int) size;
     final byte[] tmp = new byte[sz];
     for(int i = 0; i < sz; i++) tmp[sz - i - 1] = values[i];
-    return get(tmp);
+    return get(tmp, type);
   }
 
   @Override
   public Value sort() {
     final byte[] tmp = values.clone();
     Arrays.sort(tmp);
-    return get(tmp);
+    return get(tmp, type);
   }
 
   @Override
-  public byte[] toJava() {
+  public Object toJava() throws QueryException {
+    return type == BasicType.BYTE ? values : super.toJava();
+  }
+
+  /**
+   * Returns the internal values.
+   * @return values
+   */
+  public byte[] values() {
     return values;
   }
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || (obj instanceof final BytSeq seq ? Arrays.equals(values, seq.values) :
-      super.equals(obj));
+    return this == obj || (obj instanceof final BytSeq seq ? type == seq.type &&
+        Arrays.equals(values, seq.values) : super.equals(obj));
   }
 
   // STATIC METHODS ===============================================================================
 
   /**
-   * Creates a sequence with the specified values.
+   * Creates an xs:byte sequence with the specified values.
    * @param values values
    * @return value
    */
   public static Value get(final byte[] values) {
+    return get(values, BasicType.BYTE);
+  }
+
+  /**
+   * Creates a sequence with the specified values.
+   * @param values values
+   * @param type type; must be xs:byte or an instance of xs:integer
+   * @return value
+   */
+  public static Value get(final byte[] values, final Type type) {
     final int vl = values.length;
-    return vl == 0 ? Empty.VALUE : vl == 1 ? Itr.get(values[0], BasicType.BYTE) :
-      new BytSeq(values);
+    return vl == 0 ? Empty.VALUE : vl == 1 ? Itr.get(values[0], type) :
+      refine(new BytSeq(values, type));
   }
 }

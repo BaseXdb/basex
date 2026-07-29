@@ -32,7 +32,7 @@ public final class CmpSimpleG extends CmpG {
     if(item1 == Empty.VALUE) return false;
     final Item item2 = exprs[1].item(qc, info);
     if(item2 == Empty.VALUE) return false;
-    return eval(item1, item2);
+    return eval(item1, item2, qc);
   }
 
   @Override

@@ -4,11 +4,13 @@ import java.io.*;
 import java.time.*;
 import java.util.*;
 
-import org.basex.core.users.*;
+import org.basex.core.*;
+import org.basex.core.StaticOptions.*;
 import org.basex.http.*;
 import org.basex.http.restxq.*;
 import org.basex.http.web.*;
 import org.basex.http.web.WebResponse.Response;
+import org.basex.util.http.*;
 import org.eclipse.jetty.ee10.websocket.server.*;
 
 import jakarta.servlet.*;
@@ -21,6 +23,11 @@ import jakarta.servlet.http.*;
  * @author Johannes Finckh
  */
 public final class WsServlet extends JettyWebSocketServlet {
+  /** Servlet-specific user. */
+  private String username;
+  /** Servlet-specific authentication method. */
+  private AuthMethod auth;
+
   @Override
   public void configure(final JettyWebSocketServletFactory factory) {
     final Map<String, ?> map = HTTPContext.get().initParams();
@@ -42,6 +49,10 @@ public final class WsServlet extends JettyWebSocketServlet {
     } catch(final IOException ex) {
       throw new ServletException(ex);
     }
+    // parse servlet-specific user and authentication method
+    username = BaseXServlet.initParam(config, StaticOptions.USER.name());
+    final String method = BaseXServlet.initParam(config, StaticOptions.AUTHMETHOD.name());
+    if(method != null) auth = AuthMethod.valueOf(method);
   }
 
   @Override
@@ -50,10 +61,12 @@ public final class WsServlet extends JettyWebSocketServlet {
 
     // permission checks are matched against the client-visible path (including servlet mapping)
     final String pi = request.getPathInfo(), path = pi != null ? pi : "/";
-    final HTTPConnection conn = new HTTPConnection(request, response,
+    final HTTPConnection conn = new HTTPConnection(request, response, auth,
         request.getServletPath() + path);
     try {
-      conn.authenticate(UserText.ADMIN);
+      conn.authenticate(username);
+      // pass authenticated user on to the WebSocket instance
+      request.setAttribute(HTTPText.REQUEST_USER, conn.context.user());
 
       // run permission checks if the path addresses a WebSocket function
       final WebModules modules = WebModules.get(conn.context);

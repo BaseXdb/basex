@@ -4,7 +4,8 @@ import static jakarta.servlet.http.HttpServletResponse.*;
 
 import java.util.stream.*;
 
-import org.basex.core.users.*;
+import jakarta.servlet.http.*;
+
 import org.basex.http.*;
 import org.basex.http.web.*;
 import org.basex.http.web.WebResponse.Response;
@@ -25,14 +26,16 @@ import org.basex.util.http.*;
  */
 public final class RestXqServlet extends BaseXServlet {
   @Override
-  protected String username() {
-    return UserText.ADMIN;
+  protected String path(final HttpServletRequest request) {
+    // annotations are matched against the client-visible path (including servlet mapping)
+    final String info = request.getPathInfo();
+    return request.getServletPath() + (info != null ? info : "");
   }
 
   @Override
   protected void run(final HTTPConnection conn) throws Exception {
     // no trailing slash: send redirect
-    if(conn.request.getPathInfo() == null) {
+    if(conn.request.getPathInfo() == null && conn.request.getServletPath().isEmpty()) {
       conn.redirect("/");
       return;
     }
