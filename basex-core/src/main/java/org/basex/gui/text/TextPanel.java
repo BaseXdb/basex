@@ -563,7 +563,7 @@ public class TextPanel extends BaseXPanel {
     final int pos = editor.pos();
 
     final boolean shift = e.isShiftDown();
-    boolean down = true, consumed = true;
+    boolean down = true, moved = true;
 
     // move caret
     int lc = Integer.MIN_VALUE;
@@ -604,16 +604,18 @@ public class TextPanel extends BaseXPanel {
       editor.prevChar(shift);
       down = false;
     } else {
-      consumed = false;
+      moved = false;
     }
     lastX = lc == Integer.MIN_VALUE ? -1 : lc;
 
+    boolean edited = false;
     // edit text
     if(hist.active()) {
       if(COMPLETE.is(e)) {
         complete();
         return;
       }
+      edited = true;
 
       if(MOVEDOWN.is(e)) {
         editor.move(true);
@@ -639,10 +641,10 @@ public class TextPanel extends BaseXPanel {
         editor.deletePrev();
         down = false;
       } else {
-        consumed = false;
+        edited = false;
       }
     }
-    if(consumed) e.consume();
+    if(moved || edited) e.consume();
 
     final byte[] tmp = editor.text();
     if(txt != tmp) {
