@@ -136,6 +136,7 @@ final class CompletionPopup {
     model.addAll(values);
 
     // assign a fixed cell size: the list must not measure every single candidate
+    list.setFont(list.getFont().deriveFont((float) dmfont.getSize() + 2));
     boldFont = list.getFont().deriveFont(Font.BOLD);
     final FontMetrics fm = list.getFontMetrics(boldFont);
     final int ms = values.size(), max = WIDTH - (MARGIN << 1);

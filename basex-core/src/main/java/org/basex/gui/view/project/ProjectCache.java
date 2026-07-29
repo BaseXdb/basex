@@ -16,22 +16,23 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 final class ProjectCache implements Iterable<String> {
-  /** Maximum number of paths to be cached. */
-  private static final int MAX = 50000;
-
   /** Cached file paths (all with forward-slashes). */
   private final StringList cache = new StringList();
   /** Show hidden files. */
   private final boolean showHidden;
+  /** Maximum number of paths to be cached. */
+  private final int max;
   /** Valid flag. */
   private boolean valid;
 
   /**
    * Constructor.
    * @param showHidden show hidden files
+   * @param max maximum number of paths to be cached
    */
-  ProjectCache(final boolean showHidden) {
+  ProjectCache(final boolean showHidden, final int max) {
     this.showHidden = showHidden;
+    this.max = max;
   }
 
   /**
@@ -94,7 +95,7 @@ final class ProjectCache implements Iterable<String> {
 
       // add files; stop traversal if maximum has been exceeded
       for(final IOFile file : files) {
-        if(cache.size() == MAX) return;
+        if(cache.size() == max) return;
         cache.add(file.path());
       }
     } catch(final IOException ex) {

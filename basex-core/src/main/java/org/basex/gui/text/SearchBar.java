@@ -51,7 +51,7 @@ public final class SearchBar extends BaseXBack {
   private final AbstractButton cls;
 
   /** GUI reference. */
-  private final GUI gui;
+  final GUI gui;
   /** Search text. */
   private final BaseXCombo find;
   /** Replace text. */

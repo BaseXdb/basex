@@ -184,8 +184,8 @@ public final class EditorArea extends TextPanel {
    * @return success flag
    */
   boolean save(final IOFile io) {
-    final boolean rename = io != file;
-    if(rename || modified || !opened) {
+    final boolean tidied = tidy(), rename = io != file;
+    if(rename || modified || tidied || !opened) {
       if(!write(io, rename)) return false;
       file(io, true);
       return true;
@@ -200,6 +200,39 @@ public final class EditorArea extends TextPanel {
    */
   boolean saveCopy(final IOFile io) {
     return write(io, true);
+  }
+
+  /**
+   * Removes trailing whitespace and appends a final newline.
+   * @return {@code true} if the editor contents have been changed
+   */
+  private boolean tidy() {
+    final GUIOptions gopts = gui.gopts;
+    final boolean trim = gopts.get(GUIOptions.TRIMLINES), nl = gopts.get(GUIOptions.FINALNL);
+    if(!trim && !nl) return false;
+
+    // carriage returns have already been removed from the editor contents
+    final byte[] text = getText();
+    final byte[] tmp = new byte[text.length + 1];
+    // size of the new text, start of the current whitespace run ({@code -1}: no run)
+    int size = 0, ws = -1;
+    for(final byte b : text) {
+      if(trim && (b == ' ' || b == '\t')) {
+        if(ws == -1) ws = size;
+      } else {
+        if(b == '\n' && ws != -1) size = ws;
+        ws = -1;
+      }
+      tmp[size++] = b;
+    }
+    if(ws != -1) size = ws;
+    if(nl && size > 0 && tmp[size - 1] != '\n') tmp[size++] = '\n';
+    if(size == text.length) return false;
+
+    final int caret = getCaret();
+    setText(tmp, size);
+    setCaret(Math.min(caret, size));
+    return true;
   }
 
   /**

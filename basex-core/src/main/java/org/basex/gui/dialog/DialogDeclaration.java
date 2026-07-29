@@ -83,6 +83,7 @@ public final class DialogDeclaration extends BaseXDialog {
       final Declaration declaration = declaration();
       if(jumping && declaration != null) this.jump.accept(declaration.pos());
     });
+    list.setFont(list.getFont().deriveFont((float) GUIConstants.dmfont.getSize() + 2));
     filter.setFont(list.getFont());
 
     final JScrollPane scroll = new JScrollPane(list);

@@ -109,6 +109,8 @@ public final class GUIOptions extends Options {
   public static final NumberOption PREFTAB = new NumberOption("PREFTAB", 0);
   /** Flag for Java look and feel. */
   public static final StringOption LOOKANDFEEL = new StringOption("LOOKANDFEEL", "");
+  /** Scaling of the user interface in percent (0: system default). */
+  public static final NumberOption UISCALE = new NumberOption("UISCALE", 0);
   /** Label attributes, separated by comma. */
   public static final StringOption LABELS = new StringOption("LABELS", "name,label,id");
   /** Flag for scrolling editor tabs. */
@@ -156,6 +158,16 @@ public final class GUIOptions extends Options {
   public static final StringOption FILES = new StringOption("FILES", "*.xml, *.xq*");
   /** Show hidden files. */
   public static final BooleanOption SHOWHIDDEN = new BooleanOption("SHOWHIDDEN", false);
+  /** Remove trailing whitespace when saving a file. */
+  public static final BooleanOption TRIMLINES = new BooleanOption("TRIMLINES", false);
+  /** Append a final newline when saving a file. */
+  public static final BooleanOption FINALNL = new BooleanOption("FINALNL", false);
+  /** Code completion: proposed always (0) or via shortcut (1). */
+  public static final NumberOption COMPLETION = new NumberOption("COMPLETION", 0);
+  /** Maximum number of indexed project files. */
+  public static final NumberOption MAXFILES = new NumberOption("MAXFILES", 100000);
+  /** Maximum number of search hits. */
+  public static final NumberOption MAXSEARCH = new NumberOption("MAXSEARCH", 1000000);
 
   /** Current input mode in global text field (Search, XQuery, Command). */
   public static final NumberOption SEARCHMODE = new NumberOption("SEARCHMODE", 0);

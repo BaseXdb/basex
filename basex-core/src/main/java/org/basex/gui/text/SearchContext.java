@@ -2,6 +2,7 @@ package org.basex.gui.text;
 
 import java.util.regex.*;
 
+import org.basex.gui.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -12,10 +13,11 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class SearchContext {
-  /** Maximum number of hits. */
-  private static final int MAX = 10000000;
   /** Word character: matches {@link Character#isLetterOrDigit(int)}. */
   private static final String WORD = "[\\p{L}\\p{Nd}]";
+
+  /** Maximum number of hits. */
+  private final int max;
 
   /** Search bar. */
   final SearchBar bar;
@@ -52,6 +54,7 @@ public final class SearchContext {
     this.bar = bar;
     string = text;
     flags = new SearchFlags(mcase, word, regex, dotall);
+    max = bar != null ? bar.gui.gopts.get(GUIOptions.MAXSEARCH) : GUIOptions.MAXSEARCH.value();
 
     // compile pattern once; remember error message for invalid expressions
     Pattern pt = null;
@@ -160,7 +163,7 @@ public final class SearchContext {
       while(m.find()) {
         start.add(cursor.advance(m.start()));
         end.add(cursor.advance(m.end()));
-        if(start.size() >= MAX) break;
+        if(start.size() >= max) break;
       }
     }
     StoppableString.checkStop();

@@ -174,7 +174,8 @@ final class ProjectFiles {
     final ProjectCache pc = cache;
     if(pc == null) {
       // no file cache available: create and return new one
-      cache = new ProjectCache(view.gui.gopts.get(GUIOptions.SHOWHIDDEN));
+      final GUIOptions gopts = view.gui.gopts;
+      cache = new ProjectCache(gopts.get(GUIOptions.SHOWHIDDEN), gopts.get(GUIOptions.MAXFILES));
       cache.scan(Paths.get(root.path()), p -> p != cache);
     } else {
       // wait until file cache is initialized

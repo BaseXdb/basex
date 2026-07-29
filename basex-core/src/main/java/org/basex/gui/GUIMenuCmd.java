@@ -792,22 +792,6 @@ public enum GUIMenuCmd implements GUICommand {
     }
   },
 
-  /** Color schema. */
-  C_COLOR(COLORS + DOTS, null, false, false) {
-    @Override
-    public void execute(final GUI gui) {
-      DialogColors.show(gui);
-    }
-  },
-
-  /** Changes the fonts. */
-  C_FONTS(FONTS_D, null, false, false) {
-    @Override
-    public void execute(final GUI gui) {
-      DialogFonts.show(gui);
-    }
-  },
-
   /** Shows a preference dialog. */
   C_PREFERENCES(PREFERENCES + DOTS, Prop.MAC ? null : "% shift P", false, false) {
     @Override

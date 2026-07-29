@@ -133,6 +133,17 @@ public class BaseXTextField extends JTextField {
   }
 
   @Override
+  public void setFont(final Font f) {
+    super.setFont(f);
+    // the height of a fixed component size must be adapted to the new font
+    if(isPreferredSizeSet()) {
+      final int w = getPreferredSize().width;
+      setPreferredSize(null);
+      setPreferredSize(new Dimension(w, getPreferredSize().height));
+    }
+  }
+
+  @Override
   protected void paintComponent(final Graphics g) {
     super.paintComponent(g);
     if(hint == null || getDocument().getLength() != 0) return;

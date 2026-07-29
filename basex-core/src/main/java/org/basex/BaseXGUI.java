@@ -55,8 +55,9 @@ public final class BaseXGUI extends Main {
     final String[] paths = files.finish();
     if(GUIInstance.delegate(paths)) return;
 
-    // initialize fonts and colors
+    // initialize scaling, fonts and colors
     final GUIOptions gopts = new GUIOptions();
+    scale(gopts);
     GUIConstants.init(gopts);
 
     // create splash screen
@@ -128,6 +129,16 @@ public final class BaseXGUI extends Main {
     }
     gui.setExtendedState(gui.getExtendedState() & ~Frame.ICONIFIED);
     gui.toFront();
+  }
+
+  /**
+   * Assigns the scaling factor of the user interface.
+   * @param opts gui options
+   */
+  private static void scale(final GUIOptions opts) {
+    // the property must be assigned before the graphics environment is initialized
+    final int scale = opts.get(GUIOptions.UISCALE);
+    if(scale > 0) System.setProperty("sun.java2d.uiScale", Double.toString(scale / 100.0d));
   }
 
   /**

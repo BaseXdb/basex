@@ -1021,8 +1021,8 @@ public interface Text {
   /** Command info. */
   String SHOW_HIDDEN_FILES = lang("show_hidden_files");
 
-  /** Command info. */
-  String FONTS_D = lang("fonts") + DOTS;
+  /** Fonts. */
+  String FONTS = lang("fonts");
 
   // BUTTONS ======================================================================================
 
@@ -1287,8 +1287,16 @@ public interface Text {
   String FILE_SUFFIXES_X = lang("file_suffixes_%");
   /** Limits. */
   String LIMITS = lang("limits");
+  /** Appearance. */
+  String APPEARANCE = lang("appearance");
+  /** Views. */
+  String VIEWS = lang("views");
   /** Look and feel. */
-  String JAVA_LF = "Look & Feel (" + lang("requires_restart") + ')';
+  String JAVA_LF = "Look & Feel";
+  /** Scaling of the user interface. */
+  String UI_SCALE = lang("scaling");
+  /** Header for preferences that are applied after a restart. */
+  String AFTER_RESTART = lang("after_restart");
   /** Focus. */
   String RT_FOCUS = lang("rt_focus");
   /** Label attributes. */
@@ -1299,8 +1307,6 @@ public interface Text {
   String MAX_NO_OF_HITS = lang("max_nr_of_hits");
   /** Size of text result. */
   String SIZE_TEXT_RESULTS = lang("size_text_results");
-  /** Language preference. */
-  String LANGUAGE_RESTART = lang("language") + " (" + lang("requires_restart") + ')';
 
   /** Show line numbers. */
   String SHOW_LINE_NUMBERS = lang("show_line_numbers");
@@ -1324,6 +1330,18 @@ public interface Text {
   String AUTO_ADD_CHARS = lang("auto_add_chars");
   /** Default file filter. */
   String FILE_FILTER = lang("file_filter");
+  /** Remove trailing whitespace. */
+  String TRIM_LINES = lang("trim_lines");
+  /** Append final newline. */
+  String FINAL_NEWLINE = lang("final_newline");
+  /** Code completion. */
+  String CODE_COMPLETION = lang("code_completion");
+  /** Modes for proposing code completions. */
+  String[] COMPLETIONS = { lang("always"), lang("via_shortcut") };
+  /** Maximum number of indexed project files. */
+  String INDEXED_FILES = lang("indexed_files");
+  /** Maximum number of search hits. */
+  String SEARCH_HITS = lang("search_hits");
 
   /** Comment. */
   String COMMENT = lang("comment");

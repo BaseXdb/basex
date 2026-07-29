@@ -239,6 +239,14 @@ public class TextPanel extends BaseXPanel {
   }
 
   /**
+   * Returns the caret position.
+   * @return caret position
+   */
+  public final int getCaret() {
+    return editor.pos();
+  }
+
+  /**
    * Returns the output text.
    * @return output text
    */
@@ -1220,7 +1228,9 @@ public class TextPanel extends BaseXPanel {
       if(candidates.isEmpty()) completion.hide();
       else completion.update(candidates, word(start));
     }
-    if(schedule && !completion.visible()) completion.schedule();
+    // completions are only proposed automatically if the corresponding option is activated
+    if(schedule && !completion.visible() && gui.gopts.get(GUIOptions.COMPLETION) == 0)
+      completion.schedule();
   }
 
   /**

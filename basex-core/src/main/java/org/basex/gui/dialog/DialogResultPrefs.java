@@ -46,12 +46,12 @@ final class DialogResultPrefs extends BaseXBack {
     border(8).setLayout(new RowLayout(0));
     gui = dialog.gui();
 
-    int val = sliderIndex(gui.gopts.get(GUIOptions.MAXRESULTS), MAXRESULTS);
+    int val = BaseXSlider.index(gui.gopts.get(GUIOptions.MAXRESULTS), MAXRESULTS);
     resultsMax = new BaseXSlider(dialog, 0, MAXRESULTS.length - 1, val);
     resultsMax.addActionListener(e -> action());
     resultsLabel = new BaseXLabel(" ");
 
-    val = sliderIndex(gui.gopts.get(GUIOptions.MAXTEXT), MAXTEXT);
+    val = BaseXSlider.index(gui.gopts.get(GUIOptions.MAXTEXT), MAXTEXT);
     textMax = new BaseXSlider(dialog, 0, MAXTEXT.length - 1, val);
     textMax.addActionListener(e -> action());
     textLabel = new BaseXLabel(" ");
@@ -103,18 +103,5 @@ final class DialogResultPrefs extends BaseXBack {
    */
   void cancel() {
     gui.set(MainOptions.SERIALIZER, serial.options());
-  }
-
-  /**
-   * Returns the selected maximum number of hits as slider value.
-   * @param value value to be found
-   * @param values allowed values
-   * @return index
-   */
-  private static int sliderIndex(final int value, final int[] values) {
-    final int hl = values.length - 1;
-    int i = -1;
-    while(++i < hl && values[i] < value);
-    return i;
   }
 }

@@ -20,9 +20,6 @@ final class DialogGeneralPrefs extends BaseXBack {
   /** Main window reference. */
   private final GUI gui;
 
-  /** Information on available languages. */
-  private static final String[][] LANGS = Lang.parse();
-
   /** Directory path. */
   private final BaseXTextField dbPath;
   /** Repository path. */
@@ -30,10 +27,6 @@ final class DialogGeneralPrefs extends BaseXBack {
   /** XML Suffixes. */
   private final BaseXTextField xmlSuffixes;
 
-  /** Language label. */
-  private final BaseXLabel creds;
-  /** Language combobox. */
-  private final BaseXCombo lang;
   /** Browse database path. */
   private final BaseXButton dbButton;
   /** Browse repository path. */
@@ -67,10 +60,6 @@ final class DialogGeneralPrefs extends BaseXBack {
       if(dir != null) repoPath.setText(dir.path());
     });
 
-    lang = new BaseXCombo(dialog, LANGS[0]);
-    lang.setSelectedItem(opts.get(StaticOptions.LANG));
-    creds = new BaseXLabel(" ");
-
     add(new BaseXLabel(DATABASE_PATH + COL, true, true));
     BaseXBack p = new BaseXBack(new ColumnLayout(8));
     p.add(dbPath);
@@ -87,26 +76,6 @@ final class DialogGeneralPrefs extends BaseXBack {
     p = new BaseXBack(new ColumnLayout(8));
     p.add(xmlSuffixes);
     add(p);
-
-    // checkbox for simple file dialog
-    add(new BaseXLabel(LANGUAGE_RESTART + COL, true, true).border(8, 0, 8, 0));
-    p = new BaseXBack(new ColumnLayout(12));
-    p.add(lang);
-    p.add(creds);
-    add(p);
-  }
-
-  /**
-   * Returns the translation credits for the specified language.
-   * @param language language
-   * @return credits
-   */
-  static String credits(final String language) {
-    final int ll = LANGS[0].length;
-    for(int l = 0; l < ll; l++) {
-      if(LANGS[0][l].equals(language)) return LANGS[1][l];
-    }
-    return "";
   }
 
   /**
@@ -128,10 +97,7 @@ final class DialogGeneralPrefs extends BaseXBack {
       gui.context.repo.reset();
       opts.set(StaticOptions.REPOPATH, repoPath.getText());
     }
-    opts.set(StaticOptions.LANG, lang.getSelectedItem());
     xmlSuffixes.assign();
-
-    creds.setText(TRANSLATION + COLS + credits(lang.getSelectedItem()));
     return true;
   }
 }
