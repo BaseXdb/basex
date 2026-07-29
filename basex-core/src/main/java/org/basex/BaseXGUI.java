@@ -77,9 +77,10 @@ public final class BaseXGUI extends Main {
       gui.editor.init(filter(gui, paths));
 
       // open files that are delegated by other GUI instances
-      GUIInstance.listen(paths, delegated -> SwingUtilities.invokeLater(() -> {
-        for(final IOFile file : filter(gui, delegated)) gui.editor.open(file);
+      GUIInstance.listen(gui, paths, delegated -> SwingUtilities.invokeLater(() -> {
+        // request focus first: dialogs of a background process will not receive key events
         focus(gui);
+        for(final IOFile file : filter(gui, delegated)) gui.editor.open(file);
       }));
     });
 
