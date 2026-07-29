@@ -1285,10 +1285,11 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _CRYPTO_DECRYPT(CryptoDecrypt::new, "decrypt(value,type,key,algorithm)",
-      params(STRING_O, STRING_O, STRING_O, STRING_O), STRING_O, CRYPTO_URI),
+      params(STRING_OR_BINARY_O, STRING_O, STRING_OR_BINARY_O, STRING_O), STRING_O, CRYPTO_URI),
   /** XQuery function. */
   _CRYPTO_ENCRYPT(CryptoEncrypt::new, "encrypt(value,type,key,algorithm)",
-      params(STRING_O, STRING_O, STRING_O, STRING_O), STRING_O, CRYPTO_URI),
+      params(STRING_OR_BINARY_O, STRING_O, STRING_OR_BINARY_O, STRING_O), BASE64_BINARY_O,
+      CRYPTO_URI),
   /** XQuery function. */
   _CRYPTO_GENERATE_SIGNATURE(CryptoGenerateSignature::new, "generate-signature" +
       "(node,canonicalization,digest,signature,prefix,type[,ext1,ext2])",
@@ -1296,7 +1297,7 @@ public enum Function implements AFunction {
       NODE_O, CRYPTO_URI),
   /** XQuery function. */
   _CRYPTO_HMAC(CryptoHmac::new, "hmac(value,key,algorithm[,encoding])",
-      params(STRING_O, STRING_O, STRING_O, STRING_ZO), STRING_O, CRYPTO_URI),
+      params(STRING_OR_BINARY_O, STRING_OR_BINARY_O, STRING_O, STRING_ZO), STRING_O, CRYPTO_URI),
   /** XQuery function. */
   _CRYPTO_VALIDATE_SIGNATURE(CryptoValidateSignature::new, "validate-signature(node)",
       params(NODE_O), BOOLEAN_O, CRYPTO_URI),
