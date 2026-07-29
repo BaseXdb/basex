@@ -36,18 +36,6 @@ public class TextPanel extends BaseXPanel {
     /** Caret at the bottom. */ BOTTOM
   }
 
-  /** Editor action. */
-  public enum Action {
-    /** Check for changes; do nothing if input has not changed. */
-    CHECK,
-    /** Enforce parsing of input. */
-    PARSE,
-    /** Enforce execution of input. */
-    EXECUTE,
-    /** Enforce testing of input. */
-    TEST
-  }
-
   /** Text editor. */
   public final TextEditor editor;
   /** Undo history. */
@@ -64,7 +52,9 @@ public class TextPanel extends BaseXPanel {
 
   /** Search bar. */
   protected SearchBar search;
-  /** Link listener. */
+  /** Link listener (can be {@code null}). */
+  /** Edit listener (can be {@code null}). */
+  private EditListener editListener;
   private LinkListener linkListener;
 
   private int clicks;
@@ -350,6 +340,21 @@ public class TextPanel extends BaseXPanel {
   public final void setLinkListener(final LinkListener ll) {
     linkListener = ll;
   }
+  /**
+   * Installs an edit listener.
+   * @param el edit listener
+   */
+  public final void setEditListener(final EditListener el) {
+    editListener = el;
+  }
+
+  /**
+   * Notifies the edit listener that the text was changed by an edit command.
+   */
+  private void edited() {
+    if(editListener != null) editListener.edited();
+  }
+
 
   /**
    * Installs a search bar.
@@ -386,7 +391,7 @@ public class TextPanel extends BaseXPanel {
       // the caret keeps its position; a replacement in a selection re-selects its new range
       setText(rc.text);
       if(range != null) editor.select(range[0], range[1]);
-      release(Action.CHECK);
+      edited();
     }
   }
 
@@ -401,7 +406,7 @@ public class TextPanel extends BaseXPanel {
     if(select == null) return false;
     setText(rc.text);
     setCaret(select[1]);
-    release(Action.CHECK);
+    edited();
     return true;
   }
 
@@ -755,13 +760,6 @@ public class TextPanel extends BaseXPanel {
   }
 
   /**
-   * Releases a key or mouse. Can be overwritten to react on events.
-   * @param action action
-   */
-  @SuppressWarnings("unused")
-  protected void release(final Action action) { }
-
-  /**
    * Refreshes the layout.
    * @param f used font
    */
@@ -803,7 +801,7 @@ public class TextPanel extends BaseXPanel {
   private void finish(final int old, final boolean changed) {
     if(changed) {
       if(old != -1) hist.store(editor.text(), old, editor.pos());
-      release(Action.CHECK);
+      edited();
     }
     computeHeight.invokeLater(Align.BOTTOM);
   }

@@ -25,7 +25,6 @@ import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.*;
 import org.basex.gui.listener.*;
 import org.basex.gui.text.*;
-import org.basex.gui.text.TextPanel.Action;
 import org.basex.gui.view.*;
 import org.basex.gui.view.project.*;
 import org.basex.io.*;
