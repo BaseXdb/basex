@@ -175,6 +175,14 @@ public final class TextEditor {
   }
 
   /**
+   * Returns the context of the last search.
+   * @return search context (can be {@code null})
+   */
+  SearchContext searchContext() {
+    return searchContext;
+  }
+
+  /**
    * Returns the start and end positions of the search hits.
    * @return positions (must not be modified)
    */

@@ -21,6 +21,8 @@ public final class SearchContext {
   final SearchBar bar;
   /** Search string. */
   final String string;
+  /** Search flags. */
+  final SearchFlags flags;
   /** Compiled pattern; {@code null} if the search string is empty or an invalid expression. */
   final Pattern pattern;
   /** Error message of an invalid regular expression ({@code null} otherwise). */
@@ -49,6 +51,7 @@ public final class SearchContext {
       final boolean regex, final boolean dotall) {
     this.bar = bar;
     string = text;
+    flags = new SearchFlags(mcase, word, regex, dotall);
 
     // compile pattern once; remember error message for invalid expressions
     Pattern pt = null;

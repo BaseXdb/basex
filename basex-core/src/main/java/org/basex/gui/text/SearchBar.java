@@ -117,28 +117,25 @@ public final class SearchBar extends BaseXBack {
         false, gui);
 
     // add interaction to search field
-    find.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyPressed(final KeyEvent e) {
-        if(ENTER.is(e) || FINDNEXT.is(e)) {
-          editor.jump(SearchDir.FORWARD, true);
-        } else if(SHIFT_ENTER.is(e) || FINDPREV.is(e)) {
-          editor.jump(SearchDir.BACKWARD, true);
-        } else if(META_ENTER.is(e)) {
-          replaceAll();
-        } else {
-          return;
-        }
-        e.consume();
+    find.addKeyListener((KeyPressedListener) e -> {
+      if(ENTER.is(e) || FINDNEXT.is(e)) {
+        editor.jump(SearchDir.FORWARD, true);
+      } else if(SHIFT_ENTER.is(e) || FINDPREV.is(e)) {
+        editor.jump(SearchDir.BACKWARD, true);
+      } else if(META_ENTER.is(e)) {
+        replaceAll();
+      } else {
+        return;
       }
+      e.consume();
+    });
 
-      @Override
-      public void keyReleased(final KeyEvent e) {
-        final String srch = find.getText();
-        if(!oldSearch.equals(srch)) {
-          oldSearch = srch;
-          search();
-        }
+    // catch all changes of the search string, including those caused by mouse interactions
+    find.onChange(() -> {
+      final String srch = find.getText();
+      if(!oldSearch.equals(srch)) {
+        oldSearch = srch;
+        search();
       }
     });
 
@@ -352,11 +349,23 @@ public final class SearchBar extends BaseXBack {
   }
 
   /**
+   * Returns the current search flags.
+   * @return search flags
+   */
+  private SearchFlags flags() {
+    return new SearchFlags(mcase.isSelected(), word.isSelected(), regex.isSelected(),
+        dotall.isSelected());
+  }
+
+  /**
    * Indicates whether the current hits can be replaced.
    * @return result of check
    */
   private boolean replaceEnabled() {
-    return editor != null && editor.isEditable() && isVisible() && rplc.isEnabled();
+    if(editor == null || !editor.isEditable() || !isVisible() || !rplc.isEnabled()) return false;
+    // reject results of a superseded search: a new one may still be running
+    final SearchContext sc = editor.editor.searchContext();
+    return sc != null && sc.string.equals(find.getText()) && sc.flags.equals(flags());
   }
 
   /**
@@ -452,6 +461,8 @@ public final class SearchBar extends BaseXBack {
     replace.setToolTipText(Text.REPLACE_WITH + "\u2026");
     // the markers depend on the results; the count also on the navigation position
     editor.marks();
+    // results that arrive without user interaction must be painted as well
+    editor.repaint();
     // a requested jump is deferred until its results arrive; it refreshes the count itself
     final SearchDir dir = jumpDir;
     final boolean select = jumpSelect;

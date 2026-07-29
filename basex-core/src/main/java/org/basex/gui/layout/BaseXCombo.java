@@ -168,6 +168,25 @@ public class BaseXCombo extends JComboBox<Object> {
   }
 
   /**
+   * Attaches a listener that is notified whenever the text of an editable combo box changes.
+   * @param action action to be performed
+   * @return self reference
+   */
+  public final BaseXCombo onChange(final Runnable action) {
+    final JTextComponent comp = textField();
+    // assigned text is removed and inserted: the action is deferred until the text is complete
+    if(comp != null) comp.getDocument().addDocumentListener(new DocumentListener() {
+      @Override
+      public void removeUpdate(final DocumentEvent e) { SwingUtilities.invokeLater(action); }
+      @Override
+      public void insertUpdate(final DocumentEvent e) { SwingUtilities.invokeLater(action); }
+      @Override
+      public void changedUpdate(final DocumentEvent e) { }
+    });
+    return this;
+  }
+
+  /**
    * Adds a hint to the text field.
    * @param label text of the hint
    * @return self reference

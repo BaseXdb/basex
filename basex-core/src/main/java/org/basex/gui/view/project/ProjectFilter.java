@@ -138,8 +138,8 @@ final class ProjectFilter extends BaseXBack {
     add(filesFilter, BorderLayout.NORTH);
     add(contentRow, BorderLayout.CENTER);
 
-    addKeyListener(filesFilter);
-    addKeyListener(contentsFilter);
+    addListeners(filesFilter);
+    addListeners(contentsFilter);
     replace.addKeyListener(modeKeys);
     refreshLayout();
   }
@@ -418,11 +418,13 @@ final class ProjectFilter extends BaseXBack {
   }
 
   /**
-   * Adds a key listener to the specified combo box.
+   * Adds the filter listeners to the specified combo box.
    * @param combo combo box
    */
-  private void addKeyListener(final BaseXCombo combo) {
+  private void addListeners(final BaseXCombo combo) {
     combo.addKeyListener(modeKeys);
+    // catch all changes of the filter string, including those caused by mouse interactions
+    combo.onChange(() -> refresh(false));
     combo.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
@@ -442,10 +444,6 @@ final class ProjectFilter extends BaseXBack {
             }
           }
         }
-      }
-      @Override
-      public void keyReleased(final KeyEvent e) {
-        refresh(false);
       }
     });
   }
