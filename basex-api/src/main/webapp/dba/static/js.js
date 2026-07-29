@@ -660,6 +660,13 @@ function loadCodeMirror(language, edit, resize) {
     };
     window.addEventListener("load", refresh);
     window.addEventListener("resize", refresh);
+  } else if (useCM) {
+    // no auto-resize (e.g. the users pages): give the editor the fixed default
+    // height the old CodeMirror 5 had, so it doesn't collapse to a single line.
+    // The plain-textarea fallback already gets its height from style.css.
+    for(const elem of document.querySelectorAll(".cm-editor")) {
+      elem.style.height = "300px";
+    }
   }
 }
 
