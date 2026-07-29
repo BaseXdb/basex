@@ -340,6 +340,19 @@ public final class TextEditor {
   int completionStart() {
     int p = pos;
     while(p > 0 && completeMore(text[p - 1])) --p;
+    // include a dollar sign or angle bracket, which introduce variable and element names
+    if(p > 0 && (text[p - 1] == '$' || text[p - 1] == '<')) --p;
+    return p;
+  }
+
+  /**
+   * Returns the position after the last character of the current auto-completion input.
+   * @return position
+   */
+  int completionEnd() {
+    int p = pos;
+    final int tl = text.length;
+    while(p < tl && completeMore(text[p])) ++p;
     return p;
   }
 
@@ -753,17 +766,17 @@ public final class TextEditor {
    * @param p position to start completion from
    */
   void complete(final String value, final int p) {
-    // key found
+    // remove first underscore, which indicates the new cursor position
     String v = value;
     final int car = v.indexOf('_');
-    if(car != -1) v = v.replace("_", "");
+    if(car != -1) v = v.substring(0, car) + v.substring(car + 1);
     // adopt current indentation
     final int ind = open();
     if(ind != 0) {
       v = new TokenBuilder().addAll(v.split("\n"), "\n" + " ".repeat(ind)).toString();
     }
     // delete old string, add new one
-    replace(p, pos, v);
+    replace(p, completionEnd(), v);
     // adjust cursor
     if(car != -1) pos = p + car;
   }

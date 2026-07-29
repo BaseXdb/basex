@@ -1,100 +1,75 @@
 package org.basex.gui.text;
 
-import static org.basex.util.Token.*;
-
 import java.util.*;
-import java.util.AbstractMap.*;
-import java.util.Map.*;
 import java.util.function.*;
-import java.util.regex.*;
 
-import org.basex.query.*;
-import org.basex.query.func.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 
 /**
- * Candidates for the code completion of the {@link TextPanel}.
+ * Matcher for the code completion of the {@link TextPanel}.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class Completions {
-  /** Replacement lists, ordered by relevance. */
-  private static final ArrayList<ArrayList<Entry<String, String>>> LISTS = new ArrayList<>();
-  /** Pattern for abbreviating function names. */
-  private static final Pattern ABBR = Pattern.compile("(.)[^-A-Z]*-?");
-  /** Pattern for abbreviating prefixed function names. */
-  private static final Pattern ABBR_PREFIX = Pattern.compile("(:?.)[^-:A-Z]*-?");
-
-  /* Reads in the property file. */
-  static {
-    for(int l = 0; l < 5; l++) LISTS.add(new ArrayList<>());
-    final TokenObjectMap<byte[]> map = Util.properties("completions.properties");
-    for(final byte[] key : map) {
-      LISTS.getFirst().add(new SimpleEntry<>(Token.string(key), Token.string(map.get(key))));
-    }
-    // add functions (default functions first)
-    for(final FuncDefinition fd : Functions.BUILT_IN.values()) {
-      final String name = string(fd.name.prefixId(QueryText.FN_URI));
-      final String value = name + (fd.params.length > 0 ? "(_)" : "()");
-      final BiConsumer<Integer, String> add = (i, string) ->
-        LISTS.get(i).add(new SimpleEntry<>(string.toLowerCase(Locale.ENGLISH), value));
-      if(fd.name.uri() == QueryText.FN_URI) {
-        add.accept(1, ABBR.matcher(name).replaceAll("$1"));
-        add.accept(2, name);
-      } else {
-        add.accept(3, ABBR_PREFIX.matcher(name).replaceAll("$1"));
-        add.accept(4, name);
-      }
-    }
-  }
-
   /** Hidden constructor. */
   private Completions() { }
 
   /**
-   * Returns the insertion candidates for the specified input.
-   * @param input input string (lower case)
-   * @return candidates, grouped by {@code null} separators
+   * Returns the insertion candidates for the specified string, which will not be proposed itself.
+   * @param word string at the cursor
+   * @param lists candidates, ordered by relevance
+   * @return matches, ordered by relevance and separated by {@code null} references
    */
-  static ArrayList<Entry<String, String>> candidates(final String input) {
-    final ArrayList<Entry<String, String>> pairs = new ArrayList<>();
-    final Consumer<Entry<String, String>> add = pair -> {
-      for(final Entry<String, String> p : pairs) {
-        if(p != null && p.getValue().equals(pair.getValue())) return;
-      }
-      pairs.add(pair);
+  static ArrayList<Completion> candidates(final String word,
+      final ArrayList<ArrayList<Completion>> lists) {
+
+    final String input = word.toLowerCase(Locale.ENGLISH);
+    final ArrayList<Completion> matches = new ArrayList<>();
+    // the string at the cursor is no candidate, and duplicate insertions are skipped
+    final HashSet<String> values = new HashSet<>();
+    values.add(word);
+    final Consumer<Completion> add = completion -> {
+      if(values.add(completion.value())) matches.add(completion);
     };
 
     // add matches that start with the input string
-    final int ll = LISTS.size();
-    for(final ArrayList<Entry<String, String>> list : LISTS) {
-      pairs.add(null);
-      for(final Entry<String, String> pair : list) {
-        final String name = pair.getKey();
-        if(name.startsWith(input) || name.replace(":", "").startsWith(input)) add.accept(pair);
-      }
-    }
-    // add matches that start with and contain the input string
-    for(final boolean strt : new boolean[] { true, false }) {
-      if(pairs.size() != ll + 1) {
-        pairs.add(null);
-        for(int l = 0; l < ll; l++) {
-          for(final Entry<String, String> pair : LISTS.get(l)) {
-            if(SmartStrings.containsChars(pair.getKey(), input, strt)) add.accept(pair);
-          }
+    for(final ArrayList<Completion> list : lists) {
+      final int size = matches.size();
+      for(final Completion completion : list) {
+        // the input is compared with the full name, the local name and the name without colon
+        final String match = completion.match();
+        final int c = completion.alias() ? -1 : match.indexOf(':');
+        if(match.startsWith(input) || c != -1 && match.startsWith(input, c + 1) ||
+          match.replace(":", "").startsWith(input)) {
+          add.accept(completion);
         }
       }
+      separate(matches, size);
     }
-    // remove duplicate and trailing separators
-    for(int p = 0; p < pairs.size();) {
-      if(pairs.get(p) == null && (p == 0 || p + 1 == pairs.size() || pairs.get(p + 1) == null)) {
-        pairs.remove(p);
-      } else {
-        p++;
+    // add matches that start with and contain the input string (skipped for a single candidate)
+    if(matches.size() != 1) {
+      for(final boolean strt : new boolean[] { true, false }) {
+        final int size = matches.size();
+        for(final ArrayList<Completion> list : lists) {
+          for(final Completion completion : list) {
+            if(!completion.alias() && SmartStrings.containsChars(completion.match(), input, strt)) {
+              add.accept(completion);
+            }
+          }
+        }
+        separate(matches, size);
       }
     }
-    return pairs;
+    return matches;
+  }
+
+  /**
+   * Separates a new group of matches from the preceding ones.
+   * @param matches matches
+   * @param size number of matches before the new group was added
+   */
+  private static void separate(final ArrayList<Completion> matches, final int size) {
+    if(size > 0 && matches.size() > size) matches.add(size, null);
   }
 }

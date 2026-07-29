@@ -195,6 +195,16 @@ final class TextRenderer extends BaseXBack {
   }
 
   /**
+   * Returns the pixel width of the specified text range.
+   * @param start start position
+   * @param end end position
+   * @return width
+   */
+  int width(final int start, final int end) {
+    return font.stringWidth(Token.string(text.text(), start, end - start));
+  }
+
+  /**
    * Jumps to a search string.
    * @param dir search direction
    * @param select select hit

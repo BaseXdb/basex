@@ -153,6 +153,14 @@ public final class FuncDefinition {
   }
 
   /**
+   * Returns the descriptive parameter string.
+   * @return parameter string
+   */
+  public String paramString() {
+    return paramString;
+  }
+
+  /**
    * Indicates if this is a variadic function.
    * @return result of check
    */

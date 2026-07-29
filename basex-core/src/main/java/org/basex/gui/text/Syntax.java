@@ -312,6 +312,55 @@ abstract class Syntax {
   }
 
   /**
+   * Indicates if code completions can be proposed at the specified position.
+   * @param text text
+   * @param pos position
+   * @return result of check
+   */
+  final boolean completable(final byte[] text, final int pos) {
+    final int tl = text.length;
+    if(tl == 0) return true;
+    // the state of a character is known after it has been processed
+    final int end = Math.min(pos + 1, tl);
+    scan(text, end);
+    return completable(cp(text, back(text, end)));
+  }
+
+  /**
+   * Resets the state and processes the text up to the specified position.
+   * @param text text
+   * @param end end position
+   */
+  final void scan(final byte[] text, final int end) {
+    reset();
+    for(int p = 0; p < end;) {
+      final int cl = cl(text, p);
+      color(text, p, p + cl);
+      p += cl;
+    }
+  }
+
+  /**
+   * Indicates if code completions can be proposed for the last processed character.
+   * @param ch character
+   * @return result of check
+   */
+  @SuppressWarnings("unused")
+  boolean completable(final int ch) {
+    return code();
+  }
+
+  /**
+   * Returns the code completion candidates for the specified text.
+   * @param text text
+   * @return candidates, ordered by relevance
+   */
+  @SuppressWarnings("unused")
+  ArrayList<ArrayList<Completion>> completions(final byte[] text) {
+    return new ArrayList<>();
+  }
+
+  /**
    * Returns the indentation of a line, relative to the expression that encloses it.
    * @param text text
    * @param pos start of the line (first character that is no whitespace)

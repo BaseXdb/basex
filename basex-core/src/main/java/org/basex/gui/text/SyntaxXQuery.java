@@ -7,6 +7,7 @@ import static org.basex.util.Token.*;
 import java.awt.*;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.regex.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -16,6 +17,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * This class defines syntax highlighting for XQuery files.
@@ -30,6 +32,11 @@ final class SyntaxXQuery extends SyntaxMarkup {
   private static final HashSet<String> FUNCTIONS = new HashSet<>();
   /** Maximum length of a keyword. */
   private static final int MAXKEY = 64;
+
+  /** Code completions (snippets, types, functions), ordered by relevance. */
+  private static final ArrayList<ArrayList<Completion>> COMPLETIONS = new ArrayList<>();
+  /** Pattern for abbreviating function names. */
+  private static final Pattern ABBR = Pattern.compile("(:?.)[^-:A-Z]*-?");
 
   /** Prolog declaration for boundary whitespace. */
   private static final byte[] BOUNDARY = token("boundary-space");
@@ -114,6 +121,39 @@ final class SyntaxXQuery extends SyntaxMarkup {
     }
   }
 
+  // initialize code completions
+  static {
+    final ArrayList<Completion> snippets = new ArrayList<>(), types = new ArrayList<>(),
+        abbrs = new ArrayList<>(), names = new ArrayList<>(),
+        prefixedAbbrs = new ArrayList<>(), prefixedNames = new ArrayList<>();
+
+    final TokenObjectMap<byte[]> map = Util.properties("completions.properties");
+    for(final byte[] key : map) {
+      final String value = string(map.get(key));
+      snippets.add(new Completion(string(key), value, value, false));
+    }
+    // add node kinds and atomic types
+    for(final Kind kind : Kind.values()) {
+      final String name = kind.toString();
+      types.add(new Completion(name, name, name, false));
+    }
+    for(final BasicType type : BasicType.values()) {
+      final String name = type.toString();
+      types.add(new Completion(name.toLowerCase(Locale.ENGLISH), name, name, false));
+    }
+    // add types with a mandatory argument: the cursor is placed inside the parentheses
+    for(final String name : new String[] { ARRAY, ENUM, FUNCTION, MAP, RECORD }) {
+      types.add(new Completion(name, name + "()", name + "(_)", false));
+    }
+    // add functions (functions of the default namespace can also be called without prefix)
+    for(final FuncDefinition fd : Functions.BUILT_IN.values()) {
+      final boolean deflt = eq(fd.name.uri(), FN_URI);
+      if(deflt) add(string(fd.name.local()), fd, abbrs, names, false);
+      add(string(fd.name.prefixId()), fd, prefixedAbbrs, prefixedNames, deflt);
+    }
+    Collections.addAll(COMPLETIONS, snippets, types, abbrs, names, prefixedAbbrs, prefixedNames);
+  }
+
   /** Indicates if the last resolved name is a keyword. */
   private boolean nameKeyword;
 
@@ -131,6 +171,12 @@ final class SyntaxXQuery extends SyntaxMarkup {
   @Override
   boolean quoteEscape() {
     return true;
+  }
+
+  @Override
+  boolean completable(final int ch) {
+    // the tags of element constructors are code, but no completion context
+    return modeBefore() == CODE && modeAfter() == CODE;
   }
 
   @Override
@@ -334,6 +380,56 @@ final class SyntaxXQuery extends SyntaxMarkup {
 
   @Override
   ArrayList<Declaration> declarations(final byte[] text) {
+    return scan(text, null);
+  }
+
+  @Override
+  ArrayList<ArrayList<Completion>> completions(final byte[] text) {
+    final ArrayList<Completion> local = new ArrayList<>();
+    final TokenSet variables = new TokenSet();
+    for(final Declaration declaration : scan(text, variables)) {
+      // declared variables are covered by the collected variable names
+      final String name = declaration.name();
+      if(name.indexOf('$') == -1) {
+        local.add(new Completion(name.toLowerCase(Locale.ENGLISH), name + "()", name + "(_)",
+          false));
+      }
+    }
+    for(final byte[] variable : variables) {
+      final String name = string(variable);
+      local.add(new Completion(name.toLowerCase(Locale.ENGLISH), name, name, false));
+    }
+
+    final ArrayList<ArrayList<Completion>> lists = new ArrayList<>();
+    lists.add(local);
+    lists.addAll(COMPLETIONS);
+    return lists;
+  }
+
+  /**
+   * Adds the completions for a built-in function.
+   * @param name function name
+   * @param fd function definition
+   * @param abbrs completions for the abbreviated name
+   * @param names completions for the full name
+   * @param alias prefixed name of a function that can also be called without prefix
+   */
+  private static void add(final String name, final FuncDefinition fd,
+      final ArrayList<Completion> abbrs, final ArrayList<Completion> names, final boolean alias) {
+    final String label = name + '(' + fd.paramString() + ')';
+    final String value = name + (fd.params.length > 0 ? "(_)" : "()");
+    abbrs.add(new Completion(ABBR.matcher(name).replaceAll("$1").toLowerCase(Locale.ENGLISH),
+      label, value, alias));
+    names.add(new Completion(name.toLowerCase(Locale.ENGLISH), label, value, alias));
+  }
+
+  /**
+   * Returns the function and variable declarations of the specified text.
+   * @param text text
+   * @param variables set for collecting the names of all variables (can be {@code null})
+   * @return declarations
+   */
+  private ArrayList<Declaration> scan(final byte[] text, final TokenSet variables) {
     final ArrayList<Declaration> declarations = new ArrayList<>();
     reset();
 
@@ -357,6 +453,10 @@ final class SyntaxXQuery extends SyntaxMarkup {
       } else {
         if(begin != -1) {
           final String word = string(text, begin, p - begin);
+          // a dollar sign indicates the declaration or reference of a variable
+          if(variables != null && begin > 0 && text[begin - 1] == '$') {
+            variables.add(token('$' + word));
+          }
           switch(scan) {
             case OUTSIDE -> {
               if(DECLARE.equals(word)) {

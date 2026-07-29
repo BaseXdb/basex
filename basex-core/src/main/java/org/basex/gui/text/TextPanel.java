@@ -7,7 +7,6 @@ import static org.basex.util.Token.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
-import java.util.Map.*;
 
 import javax.swing.*;
 import javax.swing.Timer;
@@ -41,6 +40,9 @@ public class TextPanel extends BaseXPanel {
   /** Undo history. */
   public final History hist;
 
+  /** Code completion popup. */
+  private final CompletionPopup completion;
+
   /** Text caret. */
   private final Timer caretTimer;
   /** Renderer reference. */
@@ -57,6 +59,8 @@ public class TextPanel extends BaseXPanel {
   /** Edit listener (can be {@code null}). */
   private EditListener editListener;
 
+  /** Indicates if the last key press was processed by the completion popup. */
+  private boolean completed;
   /** Last number of mouse clicks. */
   private int clicks;
   /** Last horizontal position. */
@@ -82,6 +86,7 @@ public class TextPanel extends BaseXPanel {
     this.editable = editable;
     final EditorOptions opts = new EditorOptions(gui.gopts);
     editor = new TextEditor(opts);
+    completion = new CompletionPopup(this);
 
     setFocusable(true);
     setFocusTraversalKeysEnabled(!editable);
@@ -102,6 +107,7 @@ public class TextPanel extends BaseXPanel {
       @Override
       public void focusLost(final FocusEvent e) {
         caret(false);
+        completion.hide();
       }
     });
 
@@ -489,6 +495,7 @@ public class TextPanel extends BaseXPanel {
 
     if(!isEnabled() || !isFocusable()) return;
 
+    completion.hide();
     requestFocusInWindow();
     caret(true);
 
@@ -544,6 +551,14 @@ public class TextPanel extends BaseXPanel {
 
   @Override
   public void keyPressed(final KeyEvent e) {
+    // navigate in the completion popup
+    completed = false;
+    if(completion.visible() && completion.key(e)) {
+      completed = true;
+      e.consume();
+      return;
+    }
+
     // ignore modifier keys
     if(specialKey(e) || modifier(e)) {
       e.consume();
@@ -618,7 +633,7 @@ public class TextPanel extends BaseXPanel {
     boolean edited = false;
     if(hist.active()) {
       if(COMPLETE.is(e)) {
-        complete();
+        complete(true);
         return;
       }
 
@@ -661,6 +676,8 @@ public class TextPanel extends BaseXPanel {
       // cursor position or selection state has changed
       updateScrollpos.invokeLater(down ? Align.BOTTOM : Align.TOP);
     }
+    // refresh completions, or show them after a delay if the cursor was moved
+    if(moved || edited) refreshCompletion(true);
   }
 
   /**
@@ -738,6 +755,11 @@ public class TextPanel extends BaseXPanel {
 
   @Override
   public void keyTyped(final KeyEvent e) {
+    // the key press was consumed by the completion popup
+    if(completed) {
+      e.consume();
+      return;
+    }
     if(!hist.active() || control(e) || DELNEXT.is(e) || DELPREV.is(e) || ESCAPE.is(e) || CUT.is(e))
       return;
 
@@ -760,6 +782,9 @@ public class TextPanel extends BaseXPanel {
     // adjust text height
     computeHeight.invokeLater(Align.BOTTOM);
     e.consume();
+
+    // refresh completions, or show them after a delay if a letter was typed
+    refreshCompletion(Character.isLetter(e.getKeyChar()));
   }
 
   /**
@@ -821,6 +846,7 @@ public class TextPanel extends BaseXPanel {
 
   @Override
   public final void mouseWheelMoved(final MouseWheelEvent e) {
+    completion.hide();
     scroll.pos(scroll.pos() + e.getUnitsToScroll() * 20);
     rend.repaint();
   }
@@ -1125,47 +1151,76 @@ public class TextPanel extends BaseXPanel {
 
   /**
    * Code completion.
+   * @param explicit invoked via keyboard shortcut
    */
-  private void complete() {
+  void complete(final boolean explicit) {
     if(selected()) return;
 
-    // find first character
-    final int caret = editor.pos(), start = editor.completionStart();
-    final String input = string(substring(editor.text(), start, caret)).toLowerCase(Locale.ENGLISH);
+    // the popup is placed at the beginning of the completed string, before the cursor is moved
+    final int start = editor.completionStart(), caret = editor.pos();
+    final int[] cursor = rend.cursor();
+    final Point point = new Point(Math.max(0, cursor[0] - rend.width(start, caret)), cursor[1]);
+    // the cursor jumps to the end of the edited string
+    if(explicit) setCaret(editor.completionEnd());
 
-    final ArrayList<Entry<String, String>> pairs = Completions.candidates(input);
-    if(pairs.size() == 1) {
+    final ArrayList<Completion> candidates = candidates(start, explicit);
+    if(explicit && candidates.size() == 1) {
       // insert single candidate
-      complete(pairs.getFirst().getValue(), start);
-    } else if(!pairs.isEmpty()) {
-      // show popup menu
-      final JPopupMenu pm = new JPopupMenu();
-      final ActionListener al = ae -> complete(
-        ae.getActionCommand().replaceAll("^.*?] ", ""), start);
-      for(final Entry<String, String> entry : pairs) {
-        if(entry == null) {
-          pm.addSeparator();
-        } else {
-          final JMenuItem mi = new JMenuItem(entry.getValue());
-          pm.add(mi);
-          mi.addActionListener(al);
-        }
-        if(pm.getComponentCount() >= 15) {
-          final JMenuItem mi = new JMenuItem("… " + Util.info(Text.RESULTS_X,
-              BaseXLayout.format(pairs.size())));
-          mi.setEnabled(false);
-          pm.add(mi);
-          break;
-        }
-      }
-
-      final int[] cursor = rend.cursor();
-      pm.show(this, cursor[0], cursor[1]);
-
-      // highlight first entry
-      final MenuElement[] me = { pm, (JMenuItem) pm.getComponent(0) };
-      MenuSelectionManager.defaultManager().setSelectedPath(me);
+      complete(candidates.getFirst().value(), start);
+    } else if(!candidates.isEmpty()) {
+      completion.show(candidates, word(start), start, point);
     }
+  }
+
+  /**
+   * Returns the completion candidates for the string before the cursor.
+   * @param start start position of the string
+   * @param explicit invoked via keyboard shortcut
+   * @return candidates
+   */
+  private ArrayList<Completion> candidates(final int start, final boolean explicit) {
+    final ArrayList<Completion> empty = new ArrayList<>();
+    final byte[] text = editor.text();
+    final int caret = editor.pos();
+
+    if(!explicit) {
+      // the cursor must be placed at the end of a string that starts with a name character
+      if(caret == start || caret != editor.completionEnd()) return empty;
+      final int ch = cp(text, start);
+      if(ch != '$' && ch != '<' && !XMLToken.isNCStartChar(ch)) return empty;
+      // a function call is already complete
+      if(caret < text.length && text[caret] == '(') return empty;
+    }
+    // no completions in strings, comments, tags and other non-code tokens
+    final Syntax syntax = rend.syntax();
+    if(!syntax.completable(text, start)) return empty;
+
+    return Completions.candidates(word(start), syntax.completions(text));
+  }
+
+  /**
+   * Returns the string that is completed.
+   * @param start start position
+   * @return string
+   */
+  private String word(final int start) {
+    return string(editor.text(), start, editor.pos() - start);
+  }
+
+  /**
+   * Refreshes the candidates of a visible completion popup.
+   * @param schedule show a new popup after a delay if none is visible
+   */
+  private void refreshCompletion(final boolean schedule) {
+    if(completion.visible()) {
+      // the popup is closed if the cursor leaves the completed string
+      final int start = completion.start();
+      final ArrayList<Completion> candidates =
+        editor.completionStart() == start ? candidates(start, false) : new ArrayList<>();
+      if(candidates.isEmpty()) completion.hide();
+      else completion.update(candidates, word(start));
+    }
+    if(schedule && !completion.visible()) completion.schedule();
   }
 
   /**
@@ -1173,7 +1228,7 @@ public class TextPanel extends BaseXPanel {
    * @param string string
    * @param start start position
    */
-  private void complete(final String string, final int start) {
+  void complete(final String string, final int start) {
     final int pos = editor.pos();
     editor.complete(string, start);
     finish(pos, true);
