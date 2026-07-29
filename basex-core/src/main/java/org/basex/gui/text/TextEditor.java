@@ -6,6 +6,7 @@ import java.text.*;
 import java.util.*;
 
 import javax.swing.*;
+import javax.swing.Timer;
 
 import org.basex.gui.*;
 import org.basex.gui.text.SearchBar.*;
@@ -27,10 +28,14 @@ public final class TextEditor {
   }
 
   /** Completion characters. */
+  private static final char[] ALLOWED = { ':', '-' };
+  /** Delay before a text change triggers a new search (ms). */
+  private static final int SEARCH_DELAY = 100;
 
   /** Editor options. */
   private final EditorOptions opts;
-  private static final char[] ALLOWED = { ':', '-' };
+  /** Collapses the searches of consecutive text changes into a single one. */
+  private final Timer searchTimer;
 
   /** Start and end positions of search terms (initially empty). */
   private IntList[] searchResults = { new IntList(), new IntList() };
@@ -40,11 +45,14 @@ public final class TextEditor {
   private boolean searchSelected;
   /** Context of the current search results (can be {@code null}). */
   private SearchContext searchContext;
+  /** Context of the most recently started search (can be {@code null}). */
+  private SearchContext searchRequest;
   /** Search thread (can be {@code null}). */
   private Thread searchThread;
   /** Id of the most recent search. */
   private long searchId;
   /** Result of the last decoding (accessed by the search thread and the event dispatch thread). */
+  private volatile Decoded decoded;
 
   /** Start position of a text selection ({@code -1} if no text is selected). */
   private int start = -1;
@@ -52,7 +60,6 @@ public final class TextEditor {
   private int end = -1;
   /** Start position of an error highlighting ({@code -1} for no error). */
   private int error = -1;
-  private volatile Decoded decoded;
   /** Text array to be written. */
   private byte[] text = EMPTY;
   /** Number of lines. Required for displaying line numbers. */
@@ -66,6 +73,10 @@ public final class TextEditor {
    */
   TextEditor(final EditorOptions opts) {
     this.opts = opts;
+    searchTimer = new Timer(SEARCH_DELAY, e -> {
+      if(searchRequest != null) startSearch(searchRequest, false);
+    });
+    searchTimer.setRepeats(false);
   }
 
   /**
@@ -79,7 +90,8 @@ public final class TextEditor {
     text = txt;
     lines = -1;
     noSelect();
-    search(searchContext, false);
+    // repeat the last requested search, but not before the changes have come to a rest
+    if(searchRequest != null) searchTimer.restart();
     if(pos > tl) pos = tl;
     return true;
   }
@@ -106,14 +118,23 @@ public final class TextEditor {
   }
 
   /**
-   * Sets a new search context. The search runs in a separate thread; its results are adopted,
-   * and accessed, in the event dispatch thread.
+   * Sets a new search context and searches at once.
    * @param sc search context (can be {@code null})
    * @param jump jump to next search result
    */
   void search(final SearchContext sc, final boolean jump) {
-    if(sc == null) return;
+    searchTimer.stop();
+    if(sc != null) startSearch(sc, jump);
+  }
 
+  /**
+   * Starts a search. It runs in a separate thread; its results are adopted, and accessed,
+   * in the event dispatch thread.
+   * @param sc search context
+   * @param jump jump to next search result
+   */
+  private void startSearch(final SearchContext sc, final boolean jump) {
+    searchRequest = sc;
     // interrupt old search thread
     final Thread old = searchThread;
     if(old != null) old.interrupt();
@@ -139,6 +160,7 @@ public final class TextEditor {
     t.start();
     searchThread = t;
   }
+
   /**
    * Adopts the results of a search.
    * @param results start and end positions of the hits (must not be modified)
@@ -157,7 +179,6 @@ public final class TextEditor {
   IntList[] searchResults() {
     return searchResults;
   }
-
 
   /**
    * Replaces all hits; a selection restricts the replacement.
@@ -1299,6 +1320,7 @@ public final class TextEditor {
   boolean isSelected() {
     return start != end;
   }
+
   /**
    * Returns the start position of a text selection.
    * @return position ({@code -1} if no text is selected)
@@ -1330,7 +1352,6 @@ public final class TextEditor {
   private int selMax() {
     return Math.max(start, end);
   }
-
 
   /**
    * Returns the selected string.
@@ -1415,6 +1436,7 @@ public final class TextEditor {
   void error(final int s) {
     error = s;
   }
+
   /**
    * Returns the error position.
    * @return position ({@code -1} if there is no error)
@@ -1422,7 +1444,6 @@ public final class TextEditor {
   int error() {
     return error;
   }
-
 
   // SEARCH HIGHLIGHTING ==========================================================================
 
