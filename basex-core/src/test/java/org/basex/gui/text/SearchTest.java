@@ -134,8 +134,8 @@ public final class SearchTest {
     final IntList st = new IntList(), en = new IntList();
     st.add(0); st.add(4); st.add(5);
     en.add(3); en.add(4); en.add(8);
-    final TextEditor ed = new TextEditor(null);
-    ed.searchResults = new IntList[] { st, en };
+    final TextEditor ed = new TextEditor(EditorOptions.DEFAULTS);
+    ed.searchResults(new IntList[] { st, en }, null);
     ed.pos(0);
     ed.jump(SearchBar.SearchDir.CURRENT, false);
     final IntList visited = new IntList();
@@ -155,8 +155,8 @@ public final class SearchTest {
       st.add(i);
       en.add(i + 1);
     }
-    final TextEditor ed = new TextEditor(null);
-    ed.searchResults = new IntList[] { st, en };
+    final TextEditor ed = new TextEditor(EditorOptions.DEFAULTS);
+    ed.searchResults(new IntList[] { st, en }, null);
     // caret behind the first, just replaced hit
     ed.pos(1);
     ed.jump(SearchBar.SearchDir.CURRENT, true);
@@ -169,8 +169,8 @@ public final class SearchTest {
     final IntList st = new IntList(), en = new IntList();
     st.add(2); st.add(10);
     en.add(5); en.add(13);
-    final TextEditor ed = new TextEditor(null);
-    ed.searchResults = new IntList[] { st, en };
+    final TextEditor ed = new TextEditor(EditorOptions.DEFAULTS);
+    ed.searchResults(new IntList[] { st, en }, null);
 
     // caret before, at the start of, and inside the first hit
     for(final int p : new int[] { 0, 2, 3 }) {
@@ -185,7 +185,7 @@ public final class SearchTest {
     assertEquals(0, ed.caretHit());
 
     // no hits
-    ed.searchResults = new IntList[] { new IntList(), new IntList() };
+    ed.searchResults(new IntList[] { new IntList(), new IntList() }, null);
     assertEquals(-1, ed.caretHit());
   }
 
@@ -428,16 +428,15 @@ public final class SearchTest {
    * @return editor
    */
   private static TextEditor editor(final int[] select) {
-    final TextEditor ed = new TextEditor(null);
+    final TextEditor ed = new TextEditor(EditorOptions.DEFAULTS);
     ed.text(token("aa\naa\naa"));
-    ed.searchContext = literal("a", true);
     // the hits of "a": every character but the two newlines
     final IntList st = new IntList(), en = new IntList();
     for(final int p : new int[] { 0, 1, 3, 4, 6, 7 }) {
       st.add(p);
       en.add(p + 1);
     }
-    ed.searchResults = new IntList[] { st, en };
+    ed.searchResults(new IntList[] { st, en }, literal("a", true));
     if(select != null) ed.select(select[0], select[1]);
     return ed;
   }

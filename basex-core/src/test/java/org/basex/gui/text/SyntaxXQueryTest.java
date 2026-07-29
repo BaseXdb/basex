@@ -187,7 +187,7 @@ public final class SyntaxXQueryTest {
    * @param expected expected legend ({@code B}: bracket in code)
    */
   private static void brackets(final String query, final String expected) {
-    final TextEditor editor = new TextEditor(null);
+    final TextEditor editor = new TextEditor(EditorOptions.DEFAULTS);
     editor.text(Token.token(query));
     final TextIterator iter = new TextIterator(editor);
     final Syntax syntax = new SyntaxXQuery();
@@ -247,7 +247,7 @@ public final class SyntaxXQueryTest {
    *   {@code N}: number, {@code C}: comment, {@code S}: string)
    */
   private static void check(final String query, final String expected) {
-    final TextEditor editor = new TextEditor(null);
+    final TextEditor editor = new TextEditor(EditorOptions.DEFAULTS);
     editor.text(Token.token(query));
     final TextIterator iter = new TextIterator(editor);
     final Syntax syntax = new SyntaxXQuery();

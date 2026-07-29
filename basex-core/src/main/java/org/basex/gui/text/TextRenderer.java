@@ -16,8 +16,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 final class TextRenderer extends BaseXBack {
-  /** Reference to the main window. */
-  private final GUI gui;
+  /** Editor options. */
+  private final EditorOptions opts;
   /** Offset. */
   private static final int OFFSET = 5;
 
@@ -42,7 +42,7 @@ final class TextRenderer extends BaseXBack {
   private boolean showInvisible;
   /** Show newlines. */
   private boolean showNL;
-  /** Line margin. */
+  /** Line margin ({@code 0} if no margin is shown). */
   private int margin;
   /** Show line numbers. */
   private boolean showLines;
@@ -88,32 +88,32 @@ final class TextRenderer extends BaseXBack {
    * @param text text to be drawn
    * @param scroll scrollbar reference
    * @param edit editable flag
-   * @param gui reference to the main window
+   * @param opts editor options
    */
   TextRenderer(final TextEditor text, final BaseXScrollBar scroll, final boolean edit,
-      final GUI gui) {
+      final EditorOptions opts) {
 
     setOpaque(false);
     this.text = text;
     this.scroll = scroll;
     this.edit = edit;
-    this.gui = gui;
+    this.opts = opts;
     setFont(GUIConstants.dmfont);
   }
 
   @Override
   public void setFont(final Font f) {
     super.setFont(f);
-    if(gui == null) return;
+    // the superclass constructor assigns a font before the options are available
+    if(opts == null) return;
     cache.reset();
 
-    final GUIOptions gopts = gui.gopts;
-    margin = gopts.get(GUIOptions.SHOWMARGIN) ? Math.max(gopts.get(GUIOptions.MARGIN), 1) : -1;
-    showInvisible = gopts.get(GUIOptions.SHOWINVISIBLE);
-    showNL = gopts.get(GUIOptions.SHOWNL);
-    showLines = gopts.get(GUIOptions.SHOWLINES);
-    markline = gopts.get(GUIOptions.MARKLINE);
-    antiAlias = gopts.get(GUIOptions.ANTIALIAS);
+    margin = opts.margin();
+    showInvisible = opts.get(GUIOptions.SHOWINVISIBLE);
+    showNL = opts.get(GUIOptions.SHOWNL);
+    showLines = opts.get(GUIOptions.SHOWLINES);
+    markline = opts.get(GUIOptions.MARKLINE);
+    antiAlias = opts.get(GUIOptions.ANTIALIAS);
     repaint();
   }
 
@@ -167,7 +167,7 @@ final class TextRenderer extends BaseXBack {
         g.setColor(GUIConstants.lightGray);
         g.drawLine(lx, 0, lx, height);
       }
-      if(margin != -1) {
+      if(margin > 0) {
         // line margin
         final int lx = offset + font.charWidth(' ') * margin;
         g.setColor(GUIConstants.lightGray);
@@ -249,9 +249,7 @@ final class TextRenderer extends BaseXBack {
    * @return text iterator
    */
   private TextIterator init(final Graphics g, final boolean start) {
-    final int indent = gui != null ? Math.max(1, gui.gopts.get(GUIOptions.INDENT)) :
-      GUIOptions.INDENT.value();
-    font = new TextFont(getFont(), indent, this);
+    font = new TextFont(getFont(), opts.indent(), this);
     setStyle(Font.PLAIN);
     syntax.init(GUIConstants.textColor);
 
@@ -335,7 +333,7 @@ final class TextRenderer extends BaseXBack {
    * The hits are mapped to the document-space y of their line, the axis of the slider.
    */
   void marks() {
-    final IntList starts = text.searchResults[0], ys = new IntList();
+    final IntList starts = text.searchResults()[0], ys = new IntList();
     // a stale line cache yields no positions; the next layout will assign them
     if(cache.valid(text.size(), width)) {
       final int ss = starts.size(), cs = cache.size();
@@ -561,7 +559,6 @@ final class TextRenderer extends BaseXBack {
       // mark selected and found text
       mark(iter.selection(), iter, g);
       for(final int[] sr : iter.searchResults()) mark(sr, iter, g);
-      //for(int[] sr; (sr = iter.searchResult()) != null;) mark(sr, iter, g);
 
       // retrieve first character of current token
       if(iter.error()) drawError(g);
@@ -785,7 +782,7 @@ final class TextRenderer extends BaseXBack {
    * Sets a syntax highlighter.
    * @param s syntax highlighter
    */
-  void setSyntax(final Syntax s) {
+  void syntax(final Syntax s) {
     if(syntax != s) cache.reset();
     syntax = s;
   }
@@ -794,7 +791,7 @@ final class TextRenderer extends BaseXBack {
    * Returns the syntax highlighter.
    * @return syntax highlighter
    */
-  Syntax getSyntax() {
+  Syntax syntax() {
     return syntax;
   }
 }

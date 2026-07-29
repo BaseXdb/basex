@@ -28,6 +28,8 @@ final class TextIterator {
   /** Start position of an error highlighting. */
   private final int errPos;
   /** Start and end positions of search terms. */
+  /** Search results of the current token. */
+  private final ArrayList<int[]> results = new ArrayList<>();
   private final IntList[] searchResults;
 
   /** Current start position. */
@@ -47,10 +49,10 @@ final class TextIterator {
     text = et.text();
     length = text.length;
     caret = et.pos();
-    start = et.start;
-    end = et.end;
-    errPos = et.error;
-    searchResults = et.searchResults;
+    start = et.start();
+    end = et.end();
+    errPos = et.error();
+    searchResults = et.searchResults();
   }
 
   /**
@@ -206,24 +208,19 @@ final class TextIterator {
     return null;
   }
 
-  /** Search results. */
-  private final ArrayList<int[]> results = new ArrayList<>();
-
   /**
-   * Returns the next search result range.
-   * @return range or {@code null}
+   * Returns the search results of the current token.
+   * @return ranges
    */
   ArrayList<int[]> searchResults() {
     results.clear();
-    if(searchResults != null) {
-      final IntList starts = searchResults[0], ends = searchResults[1];
-      int si = searchIndex;
-      for(final int ss = starts.size(); si < ss; ++si) {
-        final int s = starts.get(si), e = ends.get(si);
-        if(s >= posEnd) break;
-        results.add(new int[] { s, e });
-      }
-      searchIndex = results.isEmpty() ? si : si - 1;
+    final IntList starts = searchResults[0], ends = searchResults[1];
+    int si = searchIndex;
+    for(final int ss = starts.size(); si < ss; ++si) {
+      final int s = starts.get(si), e = ends.get(si);
+      if(s >= posEnd) break;
+      results.add(new int[] { s, e });
+    searchIndex = results.isEmpty() ? si : si - 1;
     }
     return results;
   }

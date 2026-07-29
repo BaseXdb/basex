@@ -57,7 +57,7 @@ public final class SyntaxXMLTest {
    * @param expected expected legend
    */
   private static void check(final String xml, final String expected) {
-    final TextEditor editor = new TextEditor(null);
+    final TextEditor editor = new TextEditor(EditorOptions.DEFAULTS);
     editor.text(Token.token(xml));
     final TextIterator iter = new TextIterator(editor);
     final Syntax syntax = new SyntaxXML();

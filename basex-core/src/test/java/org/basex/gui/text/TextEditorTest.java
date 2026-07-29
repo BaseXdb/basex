@@ -44,8 +44,8 @@ public final class TextEditorTest {
     editor.pos(6);
     editor.lineStart(true);
     assertEquals(4, editor.pos());
-    assertEquals(6, editor.start);
-    assertEquals(4, editor.end);
+    assertEquals(6, editor.start());
+    assertEquals(4, editor.end());
   }
 
   /**
@@ -110,7 +110,7 @@ public final class TextEditorTest {
    * @return editor
    */
   private static TextEditor editor(final String string) {
-    final TextEditor editor = new TextEditor(null);
+    final TextEditor editor = new TextEditor(EditorOptions.DEFAULTS);
     editor.text(Token.token(string));
     return editor;
   }

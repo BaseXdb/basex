@@ -27,31 +27,31 @@ public final class TextEditor {
   }
 
   /** Completion characters. */
+
+  /** Editor options. */
+  private final EditorOptions opts;
   private static final char[] ALLOWED = { ':', '-' };
 
   /** Start and end positions of search terms (initially empty). */
-  IntList[] searchResults = { new IntList(), new IntList() };
+  private IntList[] searchResults = { new IntList(), new IntList() };
   /** Index of the current search hit ({@code -1} if none). */
   private int searchHit = -1;
   /** Indicates whether the current search hit was reached by a selecting jump. */
   private boolean searchSelected;
-  /** Start position of a text selection ({@code -1} if no text is selected). */
-  int start = -1;
-  /** End position of a text selection +1 ({@code -1} if no text is selected). */
-  int end = -1;
-  /** Start position of an error highlighting ({@code -1} for no error). */
-  int error = -1;
-
-  /** Search context. */
-  SearchContext searchContext;
-
-  /** GUI reference. */
-  private final GUI gui;
-  /** Search thread. */
+  /** Context of the current search results (can be {@code null}). */
+  private SearchContext searchContext;
+  /** Search thread (can be {@code null}). */
   private Thread searchThread;
   /** Id of the most recent search. */
   private long searchId;
   /** Result of the last decoding (accessed by the search thread and the event dispatch thread). */
+
+  /** Start position of a text selection ({@code -1} if no text is selected). */
+  private int start = -1;
+  /** End position of a text selection +1 ({@code -1} if no text is selected). */
+  private int end = -1;
+  /** Start position of an error highlighting ({@code -1} for no error). */
+  private int error = -1;
   private volatile Decoded decoded;
   /** Text array to be written. */
   private byte[] text = EMPTY;
@@ -62,10 +62,10 @@ public final class TextEditor {
 
   /**
    * Constructor.
-   * @param gui gui reference
+   * @param opts editor options
    */
-  TextEditor(final GUI gui) {
-    this.gui = gui;
+  TextEditor(final EditorOptions opts) {
+    this.opts = opts;
   }
 
   /**
@@ -127,9 +127,7 @@ public final class TextEditor {
         SwingUtilities.invokeLater(() -> {
           // discard the results of a search that has been superseded
           if(id != searchId) return;
-          searchResults = results;
-          searchHit = -1;
-          searchContext = sc;
+          searchResults(results, sc);
           if(sc.bar != null) sc.bar.refresh(this, sc, jump);
         });
       } catch(final Exception ex) {
@@ -141,6 +139,25 @@ public final class TextEditor {
     t.start();
     searchThread = t;
   }
+  /**
+   * Adopts the results of a search.
+   * @param results start and end positions of the hits (must not be modified)
+   * @param sc search context (can be {@code null})
+   */
+  void searchResults(final IntList[] results, final SearchContext sc) {
+    searchResults = results;
+    searchHit = -1;
+    searchContext = sc;
+  }
+
+  /**
+   * Returns the start and end positions of the search hits.
+   * @return positions (must not be modified)
+   */
+  IntList[] searchResults() {
+    return searchResults;
+  }
+
 
   /**
    * Replaces all hits; a selection restricts the replacement.
@@ -161,7 +178,7 @@ public final class TextEditor {
    */
   int[] selectionRange() {
     if(!isSelected()) return null;
-    final int s = Math.min(start, end), e = Math.max(start, end);
+    final int s = selMin(), e = selMax();
     final int hit = searchResults[0].sortedIndexOf(s);
     return hit >= 0 && searchResults[1].get(hit) == e ? null : new int[] { s, e };
   }
@@ -217,7 +234,7 @@ public final class TextEditor {
     if(select || !isSelected()) {
       next();
     } else {
-      pos(Math.max(start, end));
+      pos(selMax());
     }
   }
 
@@ -225,17 +242,17 @@ public final class TextEditor {
    * Moves one character forward.
    * @param select selection flag
    */
-  void next(final boolean select) {
+  void nextChar(final boolean select) {
     if(select && !isSelected()) startSelect();
     forward(select);
     if(select) endSelection();
   }
 
   /**
-   * Moves one character forward.
+   * Moves one character back.
    * @param select selection flag
    */
-  void previous(final boolean select) {
+  void prevChar(final boolean select) {
     if(select && !isSelected()) startSelect();
     back(select);
     if(select) endSelection();
@@ -339,38 +356,6 @@ public final class TextEditor {
   // POSITION =====================================================================================
 
   /**
-   * Returns the current indentation.
-   * @return indentation
-   */
-  private int indent() {
-    return Math.max(1, gui.gopts.get(GUIOptions.INDENT));
-  }
-
-  /**
-   * Returns the spaces used for indenting text.
-   * @return spaces
-   */
-  private byte[] spaces() {
-    final byte[] spaces;
-    if(gui.gopts.get(GUIOptions.TABSPACES)) {
-      spaces = new byte[indent()];
-      Arrays.fill(spaces, (byte) ' ');
-    } else {
-      spaces = new byte[] { '\t' };
-    }
-    return spaces;
-  }
-
-  /**
-   * Returns the line margin, or {@code 0} if no margin is shown.
-   * @return margin
-   */
-  private int margin() {
-    return gui.gopts.get(GUIOptions.SHOWMARGIN) ?
-      Math.max(1, gui.gopts.get(GUIOptions.MARGIN)) : 0;
-  }
-
-  /**
    * Moves to the beginning of the line.
    * @param select selection flag
    * @return number of passed characters
@@ -380,7 +365,7 @@ public final class TextEditor {
       if(!select) noSelect();
       return 0;
     }
-    final int ind = indent();
+    final int ind = opts.indent();
     int c = 0;
     do c += curr() == '\t' ? ind : 1; while(back(select) != '\n');
     if(pos != 0 || curr() == '\n') forward(select);
@@ -413,7 +398,7 @@ public final class TextEditor {
    */
   void lineEnd(final boolean select) {
     startSelection(select);
-    forward(Integer.MAX_VALUE, select);
+    forwardTo(Integer.MAX_VALUE, select);
     if(select) endSelection();
   }
 
@@ -424,7 +409,7 @@ public final class TextEditor {
    */
   private int back(final boolean select) {
     if(select || !isSelected()) return prev();
-    pos(Math.min(start, end));
+    pos(selMin());
     return curr();
   }
 
@@ -440,12 +425,12 @@ public final class TextEditor {
   }
 
   /**
-   * Moves to the specified position or the end of the line.
-   * @param p position to move to
+   * Moves to the specified column or the end of the line.
+   * @param p column to move to
    * @param select selection flag
    */
-  private void forward(final int p, final boolean select) {
-    final int ind = indent();
+  private void forwardTo(final int p, final boolean select) {
+    final int ind = opts.indent();
     int nc = 0;
     while(curr() != '\n') {
       nc += curr() == '\t' ? ind : 1;
@@ -473,7 +458,7 @@ public final class TextEditor {
         back(select);
         bol(select);
       }
-      forward(col, select);
+      forwardTo(col, select);
     }
     if(select) endSelection();
     return col;
@@ -491,10 +476,10 @@ public final class TextEditor {
 
     int lc = lastCol == -1 ? bol(select) : lastCol;
     for(int i = 0; i < l; ++i) {
-      forward(Integer.MAX_VALUE, select);
+      forwardTo(Integer.MAX_VALUE, select);
       forward(select);
     }
-    forward(lc, select);
+    forwardTo(lc, select);
     if(pos() == size()) lc = -1;
 
     if(select) endSelection();
@@ -635,7 +620,7 @@ public final class TextEditor {
    */
   boolean toCase(final Case cs) {
     if(!isSelected()) return false;
-    final int s = Math.min(start, end), e = Math.max(start, end), d = size() - e;
+    final int s = selMin(), e = selMax(), d = size() - e;
     final byte[] tmp = substring(text, s, e);
 
     final TokenBuilder tb = new TokenBuilder(size());
@@ -741,9 +726,10 @@ public final class TextEditor {
    */
   boolean format(final Syntax syntax) {
     final boolean sel = isSelected();
-    final int s = sel ? Math.min(start, end) : 0;
-    final int e = sel ? Math.max(start, end) : size();
-    final byte[] format = syntax.format(Arrays.copyOfRange(text, s, e), spaces(), margin());
+    final int s = sel ? selMin() : 0;
+    final int e = sel ? selMax() : size();
+    final byte[] format = syntax.format(Arrays.copyOfRange(text, s, e), opts.spaces(),
+        opts.margin());
     final boolean changed = insert(format, s, e);
     select(s, s + format.length);
     return changed;
@@ -798,9 +784,8 @@ public final class TextEditor {
    * @param tokens list of tokens
    */
   private void sort(final TokenList tokens) {
-    final GUIOptions gopts = gui.gopts;
-    final boolean unicode = gopts.get(GUIOptions.UNICODE);
-    final int column = gopts.get(GUIOptions.COLUMN) - 1;
+    final boolean unicode = opts.get(GUIOptions.UNICODE);
+    final int column = opts.get(GUIOptions.COLUMN) - 1;
 
     // stable sort: before custom sort, apply default sort
     if(!unicode || column > 0) tokens.sort(true, true);
@@ -810,15 +795,15 @@ public final class TextEditor {
     if(!unicode) {
       final Collator coll = Collator.getInstance();
       cc = (t1, t2) -> coll.compare(string(sub(t1, column)), string(sub(t2, column)));
-    } else if(gopts.get(GUIOptions.CASESORT)) {
+    } else if(opts.get(GUIOptions.CASESORT)) {
       cc = (t1, t2) -> compare(sub(t1, column), sub(t2, column));
     } else {
       cc = (t1, t2) -> compare(lc(sub(t1, column)), lc(sub(t2, column)));
     }
-    tokens.sort(cc, gopts.get(GUIOptions.ASCSORT));
+    tokens.sort(cc, opts.get(GUIOptions.ASCSORT));
 
     // remove duplicates
-    if(gopts.get(GUIOptions.MERGEDUPL)) tokens.unique();
+    if(opts.get(GUIOptions.MERGEDUPL)) tokens.unique();
   }
 
   /**
@@ -861,7 +846,7 @@ public final class TextEditor {
         if(b == '\n') break;
       }
       sb.setLength(0);
-      sb.append(string(spaces()));
+      sb.append(string(opts.spaces()));
     }
     return false;
   }
@@ -876,7 +861,7 @@ public final class TextEditor {
     final boolean opening = pos > 0 && Syntax.OPENING.indexOf(text[pos - 1]) != -1;
     final boolean closing = pos < size() && Syntax.CLOSING.indexOf(text[pos]) != -1;
 
-    final int ind = indent();
+    final int ind = opts.indent();
     int indent = open(), move = 0;
     if(opening) {
       if(closing) {
@@ -905,7 +890,7 @@ public final class TextEditor {
     if(sb.isEmpty()) return 0;
 
     int move = 0;
-    if(!selected && gui.gopts.get(GUIOptions.AUTO)) {
+    if(!selected && opts.get(GUIOptions.AUTO)) {
       final char ch = sb.charAt(0);
       final int next = pos + 1 < size() ? text[pos + 1] : 0;
       final int curr = pos < size() ? text[pos] : 0;
@@ -983,7 +968,7 @@ public final class TextEditor {
       if(!ws(b)) return;
     }
     if(++p >= pos) return;
-    start = Math.max(pos - indent(), p);
+    start = Math.max(pos - opts.indent(), p);
     end = Math.max(pos, p);
     if(start != end) delete();
   }
@@ -1028,7 +1013,7 @@ public final class TextEditor {
       final int curr = curr(), prev = prev();
       endSelection();
 
-      if(gui.gopts.get(GUIOptions.AUTO)) {
+      if(opts.get(GUIOptions.AUTO)) {
         if(curr == prev && (curr == '"' || curr == '\'' || curr == '`')) {
           // remove closing quote
           start++;
@@ -1059,7 +1044,7 @@ public final class TextEditor {
    * Deletes the current selection.
    */
   private void del() {
-    final int s = Math.min(start, end), e = Math.max(start, end), ts = size();
+    final int s = selMin(), e = selMax(), ts = size();
     text(new ByteList(ts - e + s).add(text, 0, s).add(text, e, ts).finish());
     pos = s;
   }
@@ -1145,7 +1130,7 @@ public final class TextEditor {
       if(!isSelected()) return false;
     }
 
-    int s = Math.min(start, end), e = Math.max(start, end);
+    int s = selMin(), e = selMax();
     final int ts = size();
     while(s > 0 && text[s - 1] != '\n') s--;
     if(e > 0) while(e < ts && text[e - 1] != '\n') e++;
@@ -1161,8 +1146,8 @@ public final class TextEditor {
   private void indent(final boolean shift) {
     if(!extend()) return;
 
-    final int s = start, e = end, ind = indent();
-    final byte[] spaces = spaces();
+    final int s = start, e = end, ind = opts.indent();
+    final byte[] spaces = opts.spaces();
 
     // build new text
     final TokenBuilder tb = new TokenBuilder();
@@ -1194,12 +1179,12 @@ public final class TextEditor {
   }
 
   /**
-   * Adds indenting spaces to the specified string builder.
+   * Returns the indentation of the current line.
    * @return number of spaces to indent
    */
   private int open() {
     // adopt indentation from previous line
-    final int ind = indent();
+    final int ind = opts.indent();
     int indent = 0;
     for(int p = pos - 1; p >= 0; p--) {
       final byte b = text[p];
@@ -1314,14 +1299,46 @@ public final class TextEditor {
   boolean isSelected() {
     return start != end;
   }
+  /**
+   * Returns the start position of a text selection.
+   * @return position ({@code -1} if no text is selected)
+   */
+  int start() {
+    return start;
+  }
+
+  /**
+   * Returns the end position of a text selection.
+   * @return position ({@code -1} if no text is selected)
+   */
+  int end() {
+    return end;
+  }
+
+  /**
+   * Returns the first offset of a text selection.
+   * @return offset
+   */
+  private int selMin() {
+    return Math.min(start, end);
+  }
+
+  /**
+   * Returns the offset after a text selection.
+   * @return offset
+   */
+  private int selMax() {
+    return Math.max(start, end);
+  }
+
 
   /**
    * Returns the selected string.
    * @return string
    */
   String selected() {
-    final int e = Math.max(start, end);
-    int s = Math.min(start, end);
+    final int e = selMax();
+    int s = selMin();
     final TokenBuilder tb = new TokenBuilder(e - s);
     for(; s < e; s += cl(text, s)) {
       final int cp = cp(text, s);
@@ -1358,7 +1375,7 @@ public final class TextEditor {
   void selectLine() {
     bol(false);
     startSelect();
-    forward(Integer.MAX_VALUE, true);
+    forwardTo(Integer.MAX_VALUE, true);
     next();
     endSelection();
   }
@@ -1398,6 +1415,14 @@ public final class TextEditor {
   void error(final int s) {
     error = s;
   }
+  /**
+   * Returns the error position.
+   * @return position ({@code -1} if there is no error)
+   */
+  int error() {
+    return error;
+  }
+
 
   // SEARCH HIGHLIGHTING ==========================================================================
 

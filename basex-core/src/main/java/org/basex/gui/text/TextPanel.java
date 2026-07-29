@@ -7,9 +7,7 @@ import static org.basex.util.Token.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
-import java.util.AbstractMap.*;
 import java.util.Map.*;
-import java.util.function.*;
 
 import javax.swing.*;
 import javax.swing.Timer;
@@ -22,10 +20,7 @@ import org.basex.gui.listener.*;
 import org.basex.gui.text.SearchBar.*;
 import org.basex.gui.text.TextEditor.*;
 import org.basex.io.*;
-import org.basex.query.*;
-import org.basex.query.func.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 
 /**
  * Renders and provides edit capabilities for text.
@@ -34,8 +29,12 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public class TextPanel extends BaseXPanel {
-  /** Text caret. */
-  private final Timer caretTimer;
+  /** Vertical alignment of the caret after scrolling. */
+  private enum Align {
+    /** Caret at the top. */ TOP,
+    /** Caret in the middle. */ CENTER,
+    /** Caret at the bottom. */ BOTTOM
+  }
 
   /** Editor action. */
   public enum Action {
@@ -52,8 +51,10 @@ public class TextPanel extends BaseXPanel {
   /** Text editor. */
   public final TextEditor editor;
   /** Undo history. */
-  public final History hist;
 
+  public final History hist;
+  /** Text caret. */
+  private final Timer caretTimer;
   /** Renderer reference. */
   private final TextRenderer rend;
   /** Scrollbar reference. */
@@ -66,8 +67,10 @@ public class TextPanel extends BaseXPanel {
   /** Link listener. */
   private LinkListener linkListener;
 
-  /** Last number of mouse clicks. */
   private int clicks;
+  /** Last number of mouse clicks. */
+  /** Last horizontal position. */
+  private int lastX = -1;
 
   /**
    * Default constructor.
@@ -87,7 +90,8 @@ public class TextPanel extends BaseXPanel {
   public TextPanel(final BaseXWindow win, final String text, final boolean editable) {
     super(win);
     this.editable = editable;
-    editor = new TextEditor(gui);
+    final EditorOptions opts = new EditorOptions(gui.gopts);
+    editor = new TextEditor(opts);
 
     setFocusable(true);
     setFocusTraversalKeysEnabled(!editable);
@@ -115,27 +119,27 @@ public class TextPanel extends BaseXPanel {
     layout(new BorderLayout());
 
     scroll = new BaseXScrollBar(this);
-    rend = new TextRenderer(editor, scroll, editable, gui);
+    rend = new TextRenderer(editor, scroll, editable, opts);
 
     add(rend, BorderLayout.CENTER);
     add(scroll, BorderLayout.EAST);
+    hist = new History(editable ? EMPTY : null);
 
     setText(text);
-    hist = new History(editable ? editor.text() : null);
+    // the initial text is no undoable change
+    if(editable) hist.init(editor.text());
 
-    new BaseXPopup(this, editable ?
-      new GUICommand[] {
-        new FindCmd(), new FindNextCmd(), new FindPrevCmd(),
-        new MatchCaseCmd(), new WholeWordCmd(), new RegExCmd(), new DotAllCmd(), null,
-        new GotoCmd(), new DeclarationCmd(), null,
-        new UndoCmd(), new RedoCmd(), null,
-        new AllCmd(), new CutCmd(), new CopyCmd(), new PasteCmd(), new DelCmd() } :
-      new GUICommand[] {
-        new FindCmd(), new FindNextCmd(), new FindPrevCmd(),
-        new MatchCaseCmd(), new WholeWordCmd(), new RegExCmd(), new DotAllCmd(), null,
-        new GotoCmd(), new DeclarationCmd(), null,
-        new AllCmd(), new CopyCmd() }
-    );
+    final ArrayList<GUICommand> cmds = new ArrayList<>(Arrays.asList(
+      new FindCmd(), new FindNextCmd(), new FindPrevCmd(),
+      new MatchCaseCmd(), new WholeWordCmd(), new RegExCmd(), new DotAllCmd(), null,
+      new GotoCmd(), new DeclarationCmd(), null));
+    if(editable) {
+      cmds.addAll(Arrays.asList(new UndoCmd(), new RedoCmd(), null,
+        new AllCmd(), new CutCmd(), new CopyCmd(), new PasteCmd(), new DelCmd()));
+    } else {
+      cmds.addAll(Arrays.asList(new AllCmd(), new CopyCmd()));
+    }
+    new BaseXPopup(this, cmds.toArray(GUICommand[]::new));
 
     caretTimer = new Timer(500, e -> rend.caret(!rend.caret()));
   }
@@ -154,7 +158,6 @@ public class TextPanel extends BaseXPanel {
    */
   public void setText(final byte[] t) {
     setText(t, t.length);
-    resetError();
   }
 
   /**
@@ -193,7 +196,8 @@ public class TextPanel extends BaseXPanel {
     } else if(text.length != size) {
       txt = Arrays.copyOf(text, size);
     }
-    if(editor.text(txt) && hist != null) hist.store(txt, editor.pos(), 0);
+    if(editor.text(txt)) hist.store(txt, editor.pos(), 0);
+    resetError();
     if(isShowing()) resizeCode.invokeLater();
   }
 
@@ -224,7 +228,7 @@ public class TextPanel extends BaseXPanel {
    * @param syntax syntax reference
    */
   public final void setSyntax(final Syntax syntax) {
-    rend.setSyntax(syntax);
+    rend.syntax(syntax);
     if(isShowing()) resizeCode.invokeLater();
   }
 
@@ -234,16 +238,8 @@ public class TextPanel extends BaseXPanel {
    */
   public final void setCaret(final int pos) {
     editor.pos(pos);
-    updateScrollpos.invokeLater(1);
+    updateScrollpos.invokeLater(Align.CENTER);
     caret(true);
-  }
-
-  /**
-   * Returns the current text cursor.
-   * @return cursor position
-   */
-  private int getCaret() {
-    return editor.pos();
   }
 
   /**
@@ -267,7 +263,7 @@ public class TextPanel extends BaseXPanel {
     super.setFont(f);
     if(rend != null) {
       rend.setFont(f);
-      computeHeight.invokeLater(true);
+      computeHeight.invokeLater(Align.BOTTOM);
     }
   }
 
@@ -293,7 +289,7 @@ public class TextPanel extends BaseXPanel {
    */
   public final void comment() {
     final int caret = editor.pos();
-    finish(caret, editor.comment(rend.getSyntax()));
+    finish(caret, editor.comment(rend.syntax()));
   }
 
   /**
@@ -309,7 +305,7 @@ public class TextPanel extends BaseXPanel {
    * Jumps to a matching bracket.
    */
   public final void bracket() {
-    setCaret(editor.bracket(rend.getSyntax()));
+    setCaret(editor.bracket(rend.syntax()));
   }
 
   /**
@@ -326,7 +322,7 @@ public class TextPanel extends BaseXPanel {
    */
   public final void format() {
     final int caret = editor.pos();
-    finish(caret, editor.format(rend.getSyntax()));
+    finish(caret, editor.format(rend.syntax()));
   }
 
   @Override
@@ -423,7 +419,7 @@ public class TextPanel extends BaseXPanel {
    */
   protected final void jump(final SearchDir dir, final boolean select) {
     SwingUtilities.invokeLater(() -> {
-      scroll(rend.jump(dir, select), 1);
+      scroll(rend.jump(dir, select), Align.CENTER);
       if(search != null) search.refreshCount();
     });
   }
@@ -603,9 +599,9 @@ public class TextPanel extends BaseXPanel {
       lc = moveCaret(-1, shift);
       down = false;
     } else if(NEXTCHAR.is(e)) {
-      editor.next(shift);
+      editor.nextChar(shift);
     } else if(PREVCHAR.is(e)) {
-      editor.previous(shift);
+      editor.prevChar(shift);
       down = false;
     } else {
       consumed = false;
@@ -652,10 +648,10 @@ public class TextPanel extends BaseXPanel {
     if(txt != tmp) {
       // text has changed: add old text to history
       hist.store(tmp, pos, editor.pos());
-      computeHeight.invokeLater(down);
+      computeHeight.invokeLater(down ? Align.BOTTOM : Align.TOP);
     } else if(pos != editor.pos() || selected != editor.isSelected()) {
       // cursor position or selection state has changed
-      updateScrollpos.invokeLater(down ? 2 : 0);
+      updateScrollpos.invokeLater(down ? Align.BOTTOM : Align.TOP);
     }
   }
 
@@ -695,39 +691,40 @@ public class TextPanel extends BaseXPanel {
   }
 
   /** Computes the height of the text and updates the scroll bar. */
-  private final GUICode computeHeight = new GUICode() {
+  private final GUICode<Align> computeHeight = new GUICode<>() {
     @Override
-    public void execute(final Object down) {
+    public void execute(final Align align) {
       rend.computeHeight();
-      updateScrollpos.execute((Boolean) down ? 2 : 0);
+      updateScrollpos.execute(align);
     }
   };
 
   /** Updates the position of the scroll bar. */
-  private final GUICode updateScrollpos = new GUICode() {
+  private final GUICode<Align> updateScrollpos = new GUICode<>() {
     @Override
-    public void execute(final Object align) {
-      scroll(rend.cursorY(), (Integer) align);
+    public void execute(final Align align) {
+      scroll(rend.cursorY(), align);
     }
   };
 
   /**
    * Scrolls to the specified position.
    * @param y new vertical position
-   * @param align alignment (0: scroll up, 1: jump, 2: scroll down)
+   * @param align vertical alignment of the caret
    */
-  private void scroll(final int y, final int align) {
+  private void scroll(final int y, final Align align) {
     if(y != -1) {
       final int h = getHeight(), m = y + (rend.fontHeight() << 1) - h, p = scroll.pos();
       if(p < m || p > y) {
-        scroll.pos(align == 0 ? y : align == 1 ? y - h / 2 : m);
+        scroll.pos(switch(align) {
+          case TOP -> y;
+          case CENTER -> y - h / 2;
+          case BOTTOM -> m;
+        });
       }
     }
     rend.repaint();
   }
-
-  /** Last horizontal position. */
-  private int lastX = -1;
 
   @Override
   public void keyTyped(final KeyEvent e) {
@@ -751,7 +748,7 @@ public class TextPanel extends BaseXPanel {
     if(move != 0) editor.pos(Math.min(editor.size(), caret + move));
 
     // adjust text height
-    computeHeight.invokeLater(true);
+    computeHeight.invokeLater(Align.BOTTOM);
     e.consume();
   }
 
@@ -806,7 +803,7 @@ public class TextPanel extends BaseXPanel {
       if(old != -1) hist.store(editor.text(), old, editor.pos());
       release(Action.CHECK);
     }
-    computeHeight.invokeLater(true);
+    computeHeight.invokeLater(Align.BOTTOM);
   }
 
   /**
@@ -826,9 +823,9 @@ public class TextPanel extends BaseXPanel {
   }
 
   /** Calculation counter. */
-  private final GUICode resizeCode = new GUICode() {
+  private final GUICode<Void> resizeCode = new GUICode<>() {
     @Override
-    public void execute(final Object arg) {
+    public void execute(final Void arg) {
       rend.computeHeight();
       // update scrollbar to display value within valid range
       scroll.pos(scroll.pos());
@@ -1080,20 +1077,15 @@ public class TextPanel extends BaseXPanel {
    * Jumps to a specific line.
    */
   private void gotoLine() {
-    final byte[] last = editor.text();
-    final int ll = last.length, cr = getCaret();
-    int line = 1;
-    for(int l = 0; l < ll && l < cr; l += cl(last, l)) {
-      if(last[l] == '\n') ++line;
-    }
-    final DialogLine dl = new DialogLine(gui, line);
+    final DialogLine dl = new DialogLine(gui, caretPos()[0]);
     if(!dl.ok()) return;
-    final int el = dl.line();
-    line = 1;
-    int pos = 0;
-    for(int l = 0; l < ll && line < el; l += cl(last, l)) {
-      if(last[l] != '\n') continue;
-      pos = l + 1;
+
+    final byte[] text = editor.text();
+    final int tl = text.length, el = dl.line();
+    int line = 1, pos = 0;
+    for(int t = 0; t < tl && line < el; t += cl(text, t)) {
+      if(text[t] != '\n') continue;
+      pos = t + 1;
       ++line;
     }
     setCaret(pos);
@@ -1105,7 +1097,7 @@ public class TextPanel extends BaseXPanel {
    * @return result of check
    */
   public final boolean hasDeclarations() {
-    return rend.getSyntax().hasDeclarations();
+    return rend.syntax().hasDeclarations();
   }
 
   /**
@@ -1113,7 +1105,7 @@ public class TextPanel extends BaseXPanel {
    * @return declarations
    */
   private ArrayList<Declaration> declarations() {
-    return rend.getSyntax().declarations(editor.text());
+    return rend.syntax().declarations(editor.text());
   }
 
   /**
@@ -1124,7 +1116,7 @@ public class TextPanel extends BaseXPanel {
     if(!hasDeclarations()) return;
 
     // the caret follows the selection and stays where the dialog leaves it
-    DialogDeclaration.show(gui, declarations(), getCaret(), this::setCaret);
+    DialogDeclaration.show(gui, declarations(), editor.pos(), this::setCaret);
     gui.editor.posCode.invokeLater();
   }
 
@@ -1138,44 +1130,7 @@ public class TextPanel extends BaseXPanel {
     final int caret = editor.pos(), start = editor.completionStart();
     final String input = string(substring(editor.text(), start, caret)).toLowerCase(Locale.ENGLISH);
 
-    // find insertion candidates
-    final ArrayList<Entry<String, String>> pairs = new ArrayList<>();
-    final Consumer<Entry<String, String>> add = pair -> {
-      for(final Entry<String, String> p : pairs) {
-        if(p != null && p.getValue().equals(pair.getValue())) return;
-      }
-      pairs.add(pair);
-    };
-
-    // add matches that start with the input string
-    final int ll = LISTS.size();
-    for(final ArrayList<Entry<String, String>> list : LISTS) {
-      pairs.add(null);
-      for(final Entry<String, String> pair : list) {
-        final String name = pair.getKey();
-        if(name.startsWith(input) || name.replace(":", "").startsWith(input)) add.accept(pair);
-      }
-    }
-    // add matches that start with and contain the input string
-    for(final boolean strt : new boolean[] { true, false }) {
-      if(pairs.size() != ll + 1) {
-        pairs.add(null);
-        for(int l = 0; l < ll; l++) {
-          for(final Entry<String, String> pair : LISTS.get(l)) {
-            if(SmartStrings.containsChars(pair.getKey(), input, strt)) add.accept(pair);
-          }
-        }
-      }
-    }
-    // remove duplicate and trailing separators
-    for(int p = 0; p < pairs.size();) {
-      if(pairs.get(p) == null && (p == 0 || p + 1 == pairs.size() || pairs.get(p + 1) == null)) {
-        pairs.remove(p);
-      } else {
-        p++;
-      }
-    }
-
+    final ArrayList<Entry<String, String>> pairs = Completions.candidates(input);
     if(pairs.size() == 1) {
       // insert single candidate
       complete(pairs.getFirst().getValue(), start);
@@ -1219,31 +1174,5 @@ public class TextPanel extends BaseXPanel {
     final int pos = editor.pos();
     editor.complete(string, start);
     finish(pos, true);
-  }
-
-  /** Replacement lists. */
-  private static final ArrayList<ArrayList<Entry<String, String>>> LISTS = new ArrayList<>();
-
-  /* Reads in the property file. */
-  static {
-    for(int l = 0; l < 5; l++) LISTS.add(new ArrayList<>());
-    final TokenObjectMap<byte[]> map = Util.properties("completions.properties");
-    for(final byte[] key : map) {
-      LISTS.getFirst().add(new SimpleEntry<>(Token.string(key), Token.string(map.get(key))));
-    }
-    // add functions (default functions first)
-    for(final FuncDefinition fd : Functions.BUILT_IN.values()) {
-      final String name = string(fd.name.prefixId(QueryText.FN_URI));
-      final String value = name + (fd.params.length > 0 ? "(_)" : "()");
-      final BiConsumer<Integer, String> add = (i, string) ->
-        LISTS.get(i).add(new SimpleEntry<>(string.toLowerCase(Locale.ENGLISH), value));
-      if(fd.name.uri() == QueryText.FN_URI) {
-        add.accept(1, name.replaceAll("(.)[^-A-Z]*-?", "$1"));
-        add.accept(2, name);
-      } else {
-        add.accept(3, name.replaceAll("(:?.)[^-:A-Z]*-?", "$1"));
-        add.accept(4, name);
-      }
-    }
   }
 }

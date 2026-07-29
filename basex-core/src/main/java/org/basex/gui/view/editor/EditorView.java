@@ -1017,9 +1017,9 @@ public final class EditorView extends View {
   }
 
   /** Code for setting cursor position. */
-  public final GUICode posCode = new GUICode() {
+  public final GUICode<Void> posCode = new GUICode<>() {
     @Override
-    public void execute(final Object arg) {
+    public void execute(final Void arg) {
       final int[] cp = getEditor().caretPos();
       pos.setText(cp[0] + "\u2009:\u2009" + cp[1]);
     }
