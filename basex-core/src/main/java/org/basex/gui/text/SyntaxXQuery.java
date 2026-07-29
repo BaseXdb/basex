@@ -33,8 +33,12 @@ final class SyntaxXQuery extends SyntaxMarkup {
   /** Maximum length of a keyword. */
   private static final int MAXKEY = 64;
 
-  /** Code completions (snippets, types, functions), ordered by relevance. */
+  /** Code completion snippets. */
+  private static final ArrayList<Completion> SNIPPETS = new ArrayList<>();
+  /** Code completions (types, functions), ordered by relevance. */
   private static final ArrayList<ArrayList<Completion>> COMPLETIONS = new ArrayList<>();
+  /** Placeholder in a snippet for the namespace prefix of a library module. */
+  private static final String PLACEHOLDER = "~";
   /** Pattern for abbreviating function names. */
   private static final Pattern ABBR = Pattern.compile("(:?.)[^-:A-Z]*-?");
 
@@ -92,6 +96,15 @@ final class SyntaxXQuery extends SyntaxMarkup {
   /** Declaration scan: after the {@code variable} keyword. */
   private static final int VARIABLE_NAME = 3;
 
+  /** Module scan: before the module declaration. */
+  private static final int MODULE_KEYWORD = 0;
+  /** Module scan: after the {@code module} keyword. */
+  private static final int MODULE_NAMESPACE = 1;
+  /** Module scan: after the {@code namespace} keyword. */
+  private static final int MODULE_PREFIX = 2;
+  /** Module scan: prefix found, or main module. */
+  private static final int MODULE_DONE = 3;
+
   // initialize keywords
   static {
     try {
@@ -123,14 +136,14 @@ final class SyntaxXQuery extends SyntaxMarkup {
 
   // initialize code completions
   static {
-    final ArrayList<Completion> snippets = new ArrayList<>(), types = new ArrayList<>(),
+    final ArrayList<Completion> types = new ArrayList<>(),
         abbrs = new ArrayList<>(), names = new ArrayList<>(),
         prefixedAbbrs = new ArrayList<>(), prefixedNames = new ArrayList<>();
 
     final TokenObjectMap<byte[]> map = Util.properties("completions.properties");
     for(final byte[] key : map) {
       final String value = string(map.get(key));
-      snippets.add(new Completion(string(key), value, value, false));
+      SNIPPETS.add(new Completion(string(key), value, value, false));
     }
     // add node kinds and atomic types
     for(final Kind kind : Kind.values()) {
@@ -151,7 +164,7 @@ final class SyntaxXQuery extends SyntaxMarkup {
       if(deflt) add(string(fd.name.local()), fd, abbrs, names, false);
       add(string(fd.name.prefixId()), fd, prefixedAbbrs, prefixedNames, deflt);
     }
-    Collections.addAll(COMPLETIONS, snippets, types, abbrs, names, prefixedAbbrs, prefixedNames);
+    Collections.addAll(COMPLETIONS, types, abbrs, names, prefixedAbbrs, prefixedNames);
   }
 
   /** Indicates if the last resolved name is a keyword. */
@@ -380,14 +393,15 @@ final class SyntaxXQuery extends SyntaxMarkup {
 
   @Override
   ArrayList<Declaration> declarations(final byte[] text) {
-    return scan(text, null);
+    return scan(text, null, null);
   }
 
   @Override
   ArrayList<ArrayList<Completion>> completions(final byte[] text) {
     final ArrayList<Completion> local = new ArrayList<>();
     final TokenSet variables = new TokenSet();
-    for(final Declaration declaration : scan(text, variables)) {
+    final TokenBuilder module = new TokenBuilder();
+    for(final Declaration declaration : scan(text, variables, module)) {
       // declared variables are covered by the collected variable names
       final String name = declaration.name();
       if(name.indexOf('$') == -1) {
@@ -400,8 +414,19 @@ final class SyntaxXQuery extends SyntaxMarkup {
       local.add(new Completion(name.toLowerCase(Locale.ENGLISH), name, name, false));
     }
 
+    // snippets: adopt the namespace prefix of a library module
+    final String prefix = module.isEmpty() ? "" : module + ":";
+    final ArrayList<Completion> snippets = new ArrayList<>(SNIPPETS.size());
+    for(final Completion snippet : SNIPPETS) {
+      final String label = snippet.label();
+      snippets.add(label.contains(PLACEHOLDER) ? new Completion(snippet.match(),
+        label.replace(PLACEHOLDER, prefix), snippet.value().replace(PLACEHOLDER, prefix), false) :
+        snippet);
+    }
+
     final ArrayList<ArrayList<Completion>> lists = new ArrayList<>();
     lists.add(local);
+    lists.add(snippets);
     lists.addAll(COMPLETIONS);
     return lists;
   }
@@ -427,14 +452,16 @@ final class SyntaxXQuery extends SyntaxMarkup {
    * Returns the function and variable declarations of the specified text.
    * @param text text
    * @param variables set for collecting the names of all variables (can be {@code null})
+   * @param prefix builder for the namespace prefix of a library module (can be {@code null})
    * @return declarations
    */
-  private ArrayList<Declaration> scan(final byte[] text, final TokenSet variables) {
+  private ArrayList<Declaration> scan(final byte[] text, final TokenSet variables,
+      final TokenBuilder prefix) {
     final ArrayList<Declaration> declarations = new ArrayList<>();
     reset();
 
     // start and line of the current name, nesting depth of the arguments of an annotation
-    int begin = -1, beginLine = 1, line = 1, scan = OUTSIDE, depth = 0;
+    int begin = -1, beginLine = 1, line = 1, scan = OUTSIDE, depth = 0, module = MODULE_KEYWORD;
     boolean annotation = false;
 
     final int tl = text.length;
@@ -456,6 +483,25 @@ final class SyntaxXQuery extends SyntaxMarkup {
           // a dollar sign indicates the declaration or reference of a variable
           if(variables != null && begin > 0 && text[begin - 1] == '$') {
             variables.add(token('$' + word));
+          }
+          // the module declaration is the first one of a library module
+          if(prefix != null && module != MODULE_DONE) {
+            switch(module) {
+              case MODULE_KEYWORD -> {
+                // the words of a version declaration are skipped
+                if(MODULE.equals(word)) {
+                  module = MODULE_NAMESPACE;
+                } else if(!Strings.eq(word, XQUERY, VERSION, ENCODING)) {
+                  module = MODULE_DONE;
+                }
+              }
+              case MODULE_NAMESPACE -> module = NAMESPACE.equals(word) ? MODULE_PREFIX :
+                MODULE_DONE;
+              default -> {
+                prefix.add(word);
+                module = MODULE_DONE;
+              }
+            }
           }
           switch(scan) {
             case OUTSIDE -> {

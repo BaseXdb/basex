@@ -3,6 +3,7 @@ package org.basex.gui.text;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.awt.*;
+import java.util.*;
 
 import org.basex.gui.*;
 import org.basex.util.*;
@@ -222,6 +223,41 @@ public final class SyntaxXQueryTest {
     declarations("(: declare function f() :)");
     // the line of each declaration is returned
     declarations("declare function a() {};\ndeclare\n  variable $b := 1;", "a 1", "$b 3");
+  }
+
+  /** Code completion snippets. */
+  @Test public void snippets() {
+    // main modules: no prefix
+    snippet("", "declare function _() {\n};\n");
+    snippet("1", "declare function _() {\n};\n");
+    snippet("import module namespace m = 'uri';", "declare function _() {\n};\n");
+    // library modules: prefix of the module declaration
+    snippet("module namespace m = 'uri';", "declare function m:_() {\n};\n");
+    snippet("module namespace m='uri'; declare function m:f() {};",
+      "declare function m:_() {\n};\n");
+    // version declarations and comments are skipped
+    snippet("xquery version '4.0'; module namespace m = 'uri';",
+      "declare function m:_() {\n};\n");
+    snippet("(: module namespace x = 'uri' :) module namespace m = 'uri';",
+      "declare function m:_() {\n};\n");
+  }
+
+  /**
+   * Compares the function snippet of a query with the expected one.
+   * @param query query string
+   * @param expected expected snippet
+   */
+  private static void snippet(final String query, final String expected) {
+    final Syntax syntax = new SyntaxXQuery();
+    syntax.init(PLAIN);
+
+    String value = null;
+    for(final ArrayList<Completion> list : syntax.completions(Token.token(query))) {
+      for(final Completion completion : list) {
+        if(value == null && "function".equals(completion.match())) value = completion.value();
+      }
+    }
+    assertEquals(expected, value, query);
   }
 
   /**
