@@ -19,43 +19,60 @@ import org.junit.jupiter.api.*;
  * @author Gunther Rademacher
  */
 public final class RecordTest extends SandboxTest {
-  /** Empty record. */
+  /** Record type matching. */
   @Test public void instanceOf() {
-    query("declare record x(x); { 'x': () } instance of x", true);
+    // a plain map never matches a record type, however well it fits structurally
+    query("declare record x(x); { 'x': () } instance of x", false);
 
-    query("{} instance of record()", true);
+    query("{} instance of record()", false);
     query("{ 'x': () } instance of record()", false);
-    query("declare record local:empty(); {} instance of local:empty", true);
+    query("declare record local:empty(); {} instance of local:empty", false);
     query("declare record local:empty(); { 'x': () } instance of local:empty", false);
 
-    query("{ 'x': () } instance of record(x)", true);
-    query("{} instance of record(x)", true);
+    query("{ 'x': () } instance of record(x)", false);
+    query("{} instance of record(x)", false);
     query("{} instance of record(x as xs:integer)", false);
 
-    query("{ 'x': (), 'y': () } instance of record(x, y)", true);
+    query("{ 'x': (), 'y': () } instance of record(x, y)", false);
     query("{ 'x': (), 'y': () } instance of record(x)", false);
     query("{ 'x': (), 0: () } instance of record(x, y)", false);
     query("{ 'x': (), 0: () } instance of record(x)", false);
 
+    query("map:entries({ 'a': 1 }) instance of record(a)", false);
+    query("map:entries({ 'x': 1 }) instance of record(a)", false);
+
+    // coercion attaches the record annotation: the coerced value matches
+    query("declare record x(x); let $r as x := { 'x': () } return $r instance of x", true);
+    query("let $r as record() := {} return $r instance of record()", true);
+    query("declare record local:empty(); let $r as local:empty := {} "
+        + "return $r instance of local:empty", true);
+    query("let $r as record(x) := { 'x': () } return $r instance of record(x)", true);
+    query("let $r as record(x, y) := { 'x': (), 'y': () } return $r instance of record(x, y)",
+        true);
+    query("let $r as record(a) := map:entries({ 'a': 1 }) return $r instance of record(a)", true);
+
+    // a record is de-sealed by map operations that do not preserve the annotation
     query("declare record local:coord(x as xs:integer, y as xs:integer); "
         + "let $coord := local:coord(1, 2) "
         + "let $new := map:remove($coord, 'x') "
         + "return $new instance of local:coord", false);
 
-    query("map:entries({ 'a': 1 }) instance of record(a)", true);
-    query("map:entries({ 'x': 1 }) instance of record(a)", false);
-
     // a non-constant map (node/function value keeps it an expression) must not be statically
-    // folded to false: the type intersection of an inferred and a declared record was wrong
-    query("{ 'a': 1, 'b': <x/> } instance of record(a, b)", true);
-    query("{ 'a': 1, 'b': fn($x) { $x } } instance of record(a, b)", true);
-    query("{ 'a': 1, 'b': <x/> } instance of record(a as xs:integer, b as element(x))", true);
+    // folded to true: the type intersection of an inferred and a declared record was wrong
+    query("let $r as record(a, b) := { 'a': 1, 'b': <x/> } return $r instance of record(a, b)",
+        true);
+    query("let $r as record(a, b) := { 'a': 1, 'b': fn($x) { $x } } "
+        + "return $r instance of record(a, b)", true);
+    query("let $r as record(a as xs:integer, b as element(x)) := { 'a': 1, 'b': <x/> } "
+        + "return $r instance of record(a as xs:integer, b as element(x))", true);
+    query("{ 'a': 1, 'b': <x/> } instance of record(a, b)", false);
     query("{ 'a': 1, 'b': <x/>, 'c': 2 } instance of record(a, b)", false);
     query("{ 'a': <x/>, 'b': 2 } instance of record(a as xs:integer, b)", false);
     // the parsed-csv-structure built-in record (function-valued 'get' field)
-    query("{ 'columns': ('a', 'b'), 'column-index': { 'a': 1 }, 'rows': [ 'p' ],\n"
+    query("let $r as fn:parsed-csv-structure-record :="
+        + "  { 'columns': ('a', 'b'), 'column-index': { 'a': 1 }, 'rows': [ 'p' ],\n"
         + "  'get': fn($r as xs:positiveInteger, $c as (xs:positiveInteger | xs:string))"
-        + " as xs:string { 'x' } } instance of fn:parsed-csv-structure-record", true);
+        + " as xs:string { 'x' } } return $r instance of fn:parsed-csv-structure-record", true);
     query("{ 'columns': ('a', 'b', 'c'), 'column-index': { 'a': 1, 'b': 2, 'c': 3 },\n"
         + "  'rows': ([ 'p', 'q', 'r' ], [ 's', 't', 'u' ]),\n"
         + "  'get': fn($row as xs:positiveInteger, $col as (xs:positiveInteger | xs:string))"
@@ -63,14 +80,15 @@ public final class RecordTest extends SandboxTest {
     query("{ 'number': 0.937e0, 'next': fn() { fn:random-number-generator() },\n"
         + "  'permute': fn($in) { reverse($in) } }"
         + " instance of fn:random-number-generator-record", false);
-    query("{ 'name': xs:QName('platonic'), 'is-simple': true(),\n"
+    query("let $r as fn:schema-type-record :="
+        + "  { 'name': xs:QName('platonic'), 'is-simple': true(),\n"
         + "  'base-type': fn() as fn:schema-type-record { atomic-type-annotation(3) },\n"
         + "  'primitive-type': fn() as fn:schema-type-record { atomic-type-annotation(3) },\n"
         + "  'variety': 'atomic',\n"
         + "  'members': fn() as fn:schema-type-record* { () },\n"
         + "  'simple-content-type': fn() as fn:schema-type-record { atomic-type-annotation(3) },\n"
         + "  'matches': fn($x as xs:anyAtomicType) as xs:boolean { true() },\n"
-        + "  'constructor': xs:integer#1 } instance of fn:schema-type-record", true);
+        + "  'constructor': xs:integer#1 } return $r instance of fn:schema-type-record", true);
     error("fn() as fn:schema-type-record* { 1 }()", INVTYPE_X);
     query("let $map := (\n"
         + "  {'x':5, 'y':6}\n"
@@ -158,11 +176,16 @@ public final class RecordTest extends SandboxTest {
 
   /** Width-invariant subtyping and {@code record(*)}. */
   @Test public void subtyping() {
-    // record(*) matches any record (a map with string keys), but not a non-string-keyed map
-    query("{} instance of record(*)", true);
-    query("{ 'x': 1 } instance of record(*)", true);
+    // record(*) matches any record, but no plain map
+    query("let $r as record() := {} return $r instance of record(*)", true);
+    query("let $r as record(x) := { 'x': 1 } return $r instance of record(*)", true);
+    query("{} instance of record(*)", false);
+    query("{ 'x': 1 } instance of record(*)", false);
     query("{ 1: 2 } instance of record(*)", false);
-    query("fn($r as record(*)) { count(map:keys($r)) }({ 'a': 1, 'b': 2 })", 2);
+    // record(*) is abstract: a plain map cannot be coerced to it
+    query("declare record local:c(a, b); "
+        + "fn($r as record(*)) { count(map:keys($r)) }(local:c(1, 2))", 2);
+    error("fn($r as record(*)) { count(map:keys($r)) }({ 'a': 1, 'b': 2 })", INVTYPE_X);
 
     // record subtyping is width-invariant: the field-name sets must match
     query("let $r as record(x, y) := { 'x': 1, 'y': 2 } return $r instance of record(x)", false);
@@ -182,14 +205,15 @@ public final class RecordTest extends SandboxTest {
 
   /** The field set of {@code record(*)} is unknown: no field access must be folded away. */
   @Test public void anyRecord() {
-    query("fn($r as record(*)) { $r?a }({ 'a': 1 })", 1);
-    query("fn($r as record(*)) { $r?('a') }({ 'a': 1 })", 1);
-    query("fn($r as record(*)) { map:get($r, 'a') }({ 'a': 1 })", 1);
-    query("fn($r as record(*)) { map:contains($r, 'a') }({ 'a': 1 })", true);
-    query("fn($r as record(*)) { map:remove($r, 'a') }({ 'a': 1, 'b': 2 })", "{\"b\":2}");
-    query("fn($r as record(*)) { map:put($r, 'b', 2)?a }({ 'a': 1 })", 1);
+    final String prolog = "declare record local:r(a, b := ()); ";
+    query(prolog + "fn($r as record(*)) { $r?a }(local:r(1))", 1);
+    query(prolog + "fn($r as record(*)) { $r?('a') }(local:r(1))", 1);
+    query(prolog + "fn($r as record(*)) { map:get($r, 'a') }(local:r(1))", 1);
+    query(prolog + "fn($r as record(*)) { map:contains($r, 'a') }(local:r(1))", true);
+    query(prolog + "fn($r as record(*)) { map:remove($r, 'a') }(local:r(1, 2))", "{\"b\":2}");
+    query(prolog + "fn($r as record(*)) { map:put($r, 'b', 2)?a }(local:r(1))", 1);
     // record keys are strings: numeric lookups can still be discarded
-    query("fn($r as record(*)) { map:get($r, 1) }({ 'a': 1 })", "");
+    query(prolog + "fn($r as record(*)) { map:get($r, 1) }(local:r(1))", "");
   }
 
   /** Recursive records. */
@@ -200,16 +224,14 @@ public final class RecordTest extends SandboxTest {
         + "$v",
         "{\"value\":42,\"next\":{\"value\":43,\"next\":{\"value\":44,\"next\":()}}}");
     // omitted emptiable field is equivalent to an explicit empty sequence
-    query("declare variable $v := "
-        + "  { 'value': 42, 'next': { 'value': 43, 'next': { 'value': 44 } } } instance of list;\n"
-        + "declare record list(value as item()*, next as list?);\n"
-        + "$v",
+    query("declare record list(value as item()*, next as list?);\n"
+        + "let $v as list := { 'value': 42, 'next': { 'value': 43, 'next': { 'value': 44 } } }\n"
+        + "return $v instance of list",
         true);
-    query("declare variable $v := "
-        + "  { 'value': 42, 'next': { 'value': 43, 'next': { 'value': 44, 'next': () } } } "
-        + "instance of list;\n"
-        + "declare record list(value as item()*, next as list?);"
-        + "$v",
+    query("declare record list(value as item()*, next as list?);\n"
+        + "let $v as list := "
+        + "  { 'value': 42, 'next': { 'value': 43, 'next': { 'value': 44, 'next': () } } }\n"
+        + "return $v instance of list",
         true);
     // recursive RecordType.instanceOf
     query("declare record list1(value, next as list1?);\n"

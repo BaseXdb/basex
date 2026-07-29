@@ -650,20 +650,29 @@ public final class XQuery4Test extends SandboxTest {
 
   /** Record tests. */
   @Test public void recordTest() {
-    query("{} instance of record()", true);
-    query("{ 'x': 1 } instance of record(x)", true);
-    query("{ 'x': 1, 'y': 2 } instance of record(x, y)", true);
-    query("{ 'x': 1 } instance of record(x as xs:integer)", true);
+    // only a record, i.e. a map with a record annotation, matches a record type
+    query("let $r as record() := {} return $r instance of record()", true);
+    query("let $r as record(x) := { 'x': 1 } return $r instance of record(x)", true);
+    query("let $r as record(x, y) := { 'x': 1, 'y': 2 } return $r instance of record(x, y)", true);
+    query("let $r as record(x as xs:integer) := { 'x': 1 } "
+        + "return $r instance of record(x as xs:integer)", true);
 
-    query("{} instance of record(x)", true);
-    query("{ 'x': 1 } instance of record(x, y)", true);
+    query("{} instance of record()", false);
+    query("{ 'x': 1 } instance of record(x)", false);
+    query("{ 'x': 1, 'y': 2 } instance of record(x, y)", false);
+    query("{ 'x': 1 } instance of record(x as xs:integer)", false);
+
+    query("{} instance of record(x)", false);
+    query("{ 'x': 1 } instance of record(x, y)", false);
     query("{} instance of record(x as xs:integer)", false);
     query("{ 'x': 1 } instance of record(x as xs:string)", false);
     query("{ 'x': 1, 'y': 2 } instance of record(x)", false);
 
-    // record(*) matches any record (a map with string keys)
-    query("{} instance of record(*)", true);
-    query("{ 'x': 1 } instance of record(*)", true);
+    // record(*) matches any record, but no plain map
+    query("let $r as record() := {} return $r instance of record(*)", true);
+    query("let $r as record(x) := { 'x': 1 } return $r instance of record(*)", true);
+    query("{} instance of record(*)", false);
+    query("{ 'x': 1 } instance of record(*)", false);
     query("{ 1: 2 } instance of record(*)", false);
   }
 

@@ -235,8 +235,9 @@ public final class RecordType extends MapType {
       }
       return false;
     }
+    // record(*) is only matched by types that carry a record annotation
     if(type == Types.RECORD) {
-      return true;
+      return sealed;
     }
     if(type instanceof final RecordType rt) {
       // an open record is not an instance of a sealed record (the seal is an extra guarantee)

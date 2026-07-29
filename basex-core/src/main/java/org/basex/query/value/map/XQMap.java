@@ -239,29 +239,9 @@ public abstract class XQMap extends XQStruct {
     if(coerce && tp instanceof FuncType) return false;
 
     try {
-      if(tp instanceof final RecordType rt) {
-        // record(*)
-        if(rt == Types.RECORD) {
-          for(final Item key : keys()) {
-            if(!key.type.instanceOf(BasicType.STRING)) return false;
-          }
-          return true;
-        }
-        // coercion: skip only if this is already a sealed record of the required type
-        if(coerce) {
-          return type.instanceOf(rt) && type instanceof final RecordType st && st.sealed();
-        }
-        // structural check: absent fields are treated as empty sequence, no extra keys
-        final TokenObjectMap<RecordField> fields = rt.fields();
-        final int fs = fields.size();
-        for(int f = 1; f <= fs; f++) {
-          if(!fields.value(f).seqType().instance(get(Str.get(fields.key(f))))) return false;
-        }
-        for(final Item key : keys()) {
-          if(!key.type.instanceOf(BasicType.STRING) || !fields.contains(key.string(null)))
-            return false;
-        }
-        return true;
+      // a map matches a record type only if it is a record, i.e. if it carries a record annotation
+      if(tp instanceof RecordType) {
+        return type instanceof final RecordType rt && rt.sealed() && type.instanceOf(tp);
       }
       if(type.instanceOf(tp)) return true;
 
@@ -358,6 +338,9 @@ public abstract class XQMap extends XQStruct {
   public final XQMap coerceTo(final RecordType rt, final QueryContext qc, final InputInfo ii,
       final CompileContext cc) throws QueryException {
 
+    // record(*) is abstract: it is matched, but never constructed, by coercion
+    if(rt.any()) throw typeError(this, rt, ii);
+
     final TokenObjectMap<RecordField> fields = rt.fields();
     // reject undeclared keys
     for(final Item key : keys()) {
@@ -368,7 +351,6 @@ public abstract class XQMap extends XQStruct {
 
     // build record
     final int fs = fields.size();
-    if(fs == 0) return empty();
     final Value[] values = new Value[fs];
     for(int f = 0; f < fs; f++) {
       values[f] = fields.value(f + 1).seqType().coerce(get(Str.get(fields.key(f + 1))),
@@ -419,10 +401,10 @@ public abstract class XQMap extends XQStruct {
    */
   public final XQMap castTo(final RecordType rt, final boolean error, final QueryContext qc,
       final InputInfo info) throws QueryException {
-    if(rt == Types.RECORD) return this;
+    // record(*) is abstract: only records can be cast to it
+    if(rt.any()) return instanceOf(rt, false) ? this : null;
     final TokenObjectMap<RecordField> fields = rt.fields();
     final int fs = fields.size();
-    if(fs == 0) return empty();
     final Value[] values = new Value[fs];
     for(int f = 0; f < fs; f++) {
       qc.checkStop();

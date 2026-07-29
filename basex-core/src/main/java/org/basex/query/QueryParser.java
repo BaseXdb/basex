@@ -342,7 +342,7 @@ public class QueryParser extends InputParser {
       final SeqType st = declaredTypes.get(ref.name());
       if(st == null) throw error(WHICHCAST_X, BasicType.similar(ref.name()));
       ref.resolve(st.type);
-      checkCastTarget(ref);
+      checkCastTarget(ref, false);
     }
     deferredCastTargets.clear();
   }
@@ -4002,7 +4002,7 @@ public class QueryParser extends InputParser {
       }
     }
     // check cast eligibility (forward references are re-checked after resolution)
-    checkCastTarget(type);
+    checkCastTarget(type, false);
     // occurrence indicator
     skipWs();
     final Occ occ = consume('?') ? Occ.ZERO_OR_ONE : consume('+') ? Occ.ONE_OR_MORE :
@@ -4011,29 +4011,29 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Checks if a type is eligible as the target of a cast expression. The component types of arrays,
-   * maps, and records are not validated here: they are checked while casting. Unresolved forward
-   * references are treated as eligible and re-checked after resolution.
+   * Checks if an unresolved forward reference exists.
    * @param type type to check
-   * @return {@code true} if an unresolved forward reference was encountered
-   * @throws QueryException if the type cannot serve as a cast target
+   * @param atomic type must be a generalized atomic type
+   * @return result of check
+   * @throws QueryException query exception
    */
-  private boolean checkCastTarget(final Type type) throws QueryException {
+  private boolean checkCastTarget(final Type type, final boolean atomic) throws QueryException {
     if(TypeRef.unresolved(type)) return true;
     final Type tp = TypeRef.deref(type);
-    // item(); array, map, record types (component types are checked while casting)
-    if(tp == BasicType.ITEM || tp instanceof ArrayType || tp instanceof MapType) return false;
-    // choice item type: all alternatives must be eligible
+    // choice item type: all alternatives must be generalized atomic types
     if(tp instanceof final ChoiceItemType cit) {
       boolean deferred = false;
-      for(final Type alt : cit.types) deferred |= checkCastTarget(alt);
+      for(final Type alt : cit.types) deferred |= checkCastTarget(alt, true);
       return deferred;
     }
-    // generalized atomic type, schema list type, enumeration type
-    if(tp instanceof EnumType || tp instanceof ListType) return false;
+    // generalized atomic type, enumeration type
+    if(tp instanceof EnumType) return false;
     if(tp instanceof final BasicType bt && bt.atomic() != null &&
         !bt.oneOf(BasicType.NOTATION, BasicType.ANY_ATOMIC_TYPE, BasicType.ANY_SIMPLE_TYPE))
       return false;
+    // item(); schema list type; array, map, record types (components are checked while casting)
+    if(!atomic && (tp == BasicType.ITEM || tp instanceof ListType || tp instanceof ArrayType ||
+        tp instanceof MapType)) return false;
     throw error(INVALIDCAST_X, type);
   }
 

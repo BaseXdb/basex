@@ -125,7 +125,9 @@ public final class CastTest extends SandboxTest {
   @Test public void wildcards() {
     query("[ 1, 'a' ] cast as array(*)", "[1,\"a\"]");
     query("{ 'a': 1 } cast as map(*)", "{\"a\":1}");
-    query("{ 'a': 1 } cast as record(*)", "{\"a\":1}");
+    // record(*) is abstract: only a record can be cast to it
+    query("let $r as record(a) := { 'a': 1 } return $r cast as record(*)", "{\"a\":1}");
+    error("{ 'a': 1 } cast as record(*)", INVTYPE_X);
     query("count(([ 1 ], [ 2 ]) cast as array(*)*)", 2);
 
     query("([ 1 ] cast as array(*)) instance of array(*)", true);
