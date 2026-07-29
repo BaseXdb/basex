@@ -206,8 +206,9 @@ public final class EditorView extends View {
     test.addActionListener(e -> run(getEditor(), Action.TEST));
     declaration.addActionListener(e -> getEditor().gotoDeclaration());
     tabs.addChangeListener(e -> {
+      // ignore index changes caused by dragged tabs: the selected editor stays the same
       final EditorArea ea = getEditor();
-      if(ea == null) return;
+      if(ea == null || tabs.dragged()) return;
       search.editor(ea, true);
       gui.refreshControls(false);
       posCode.invokeLater();
@@ -1148,8 +1149,9 @@ public final class EditorView extends View {
    */
   private EditorArea[] editors() {
     final ArrayList<EditorArea> edits = new ArrayList<>();
-    for(final Component c : tabs.getComponents()) {
-      if(c instanceof final EditorArea edit) edits.add(edit);
+    // iterate through tab indexes: the order of child components is not updated when tabs are moved
+    for(int t = 0; t < tabs.getTabCount(); t++) {
+      if(tabs.getComponentAt(t) instanceof final EditorArea edit) edits.add(edit);
     }
     return edits.toArray(EditorArea[]::new);
   }
