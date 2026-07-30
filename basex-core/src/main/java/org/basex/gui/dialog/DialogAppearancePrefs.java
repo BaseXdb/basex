@@ -18,8 +18,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 final class DialogAppearancePrefs extends BaseXBack {
-  /** Scaling factors of the user interface in percent. */
-  private static final int[] SCALES = { 100, 125, 150, 175, 200, 250, 300 };
+  /** Scaling factors of the user interface. */
+  private static final int[] SCALES = { 50, 67, 75, 80, 90, 100, 110, 125, 150, 175, 200 };
   /** Predefined font sizes. */
   private static final String[] SIZES =
     { "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20",
@@ -100,15 +100,17 @@ final class DialogAppearancePrefs extends BaseXBack {
     lookfeel = new BaseXCombo(dialog, lafs.finish());
     lookfeel.setSelectedIndex(l);
 
-    final StringList scales = new StringList("(default)");
+    final StringList scales = new StringList();
     final int scale = gopts.get(GUIOptions.UISCALE);
-    int s = 0;
+    int s = -1, d = 0;
     for(final int sc : SCALES) {
       scales.add(sc + "%");
       if(sc == scale) s = scales.size() - 1;
+      else if(sc == GUIOptions.UISCALE.value()) d = scales.size() - 1;
     }
     uiScale = new BaseXCombo(dialog, scales.finish());
-    uiScale.setSelectedIndex(s);
+    // choose the default factor if the assigned value is not supported
+    uiScale.setSelectedIndex(s != -1 ? s : d);
 
     lang = new BaseXCombo(dialog, LANGS[0]);
     lang.setSelectedItem(gui.context.soptions.get(StaticOptions.LANG));
@@ -116,10 +118,10 @@ final class DialogAppearancePrefs extends BaseXBack {
 
     final String[] fonts = GUIConstants.fonts();
     font = new BaseXList(dialog, fonts);
-    font.setWidth(250);
+    font.setWidth(240);
     font.setValue(gopts.get(GUIOptions.FONT));
     font2 = new BaseXList(dialog, fonts);
-    font2.setWidth(250);
+    font2.setWidth(240);
     font2.setValue(gopts.get(GUIOptions.MONOFONT));
     font2.setEnabled(false);
     size = new BaseXList(dialog, SIZES);
@@ -145,10 +147,10 @@ final class DialogAppearancePrefs extends BaseXBack {
 
     p = new BaseXBack(new RowLayout());
     p.add(new BaseXLabel(AFTER_RESTART + COL, true, true));
-    p.add(new BaseXLabel(JAVA_LF + COL));
-    p.add(lookfeel);
-    p.add(new BaseXLabel(UI_SCALE + COL).border(8, 0, 0, 0));
+    p.add(new BaseXLabel(SCALING + COL));
     p.add(uiScale);
+    p.add(new BaseXLabel(LOOK_AND_FEEL + COL).border(8, 0, 0, 0));
+    p.add(lookfeel);
     p.add(new BaseXLabel(LANGUAGE + COL).border(8, 0, 0, 0));
     p.add(lang);
     p.add(new BaseXLabel(TRANSLATION + COL).border(8, 0, 0, 0));
@@ -180,8 +182,7 @@ final class DialogAppearancePrefs extends BaseXBack {
   boolean action(final Object source) {
     final GUIOptions gopts = gui.gopts;
     gopts.set(GUIOptions.LOOKANDFEEL, classes.get(lookfeel.getSelectedIndex()));
-    final int s = uiScale.getSelectedIndex();
-    gopts.set(GUIOptions.UISCALE, s == 0 ? 0 : SCALES[s - 1]);
+    gopts.set(GUIOptions.UISCALE, SCALES[uiScale.getSelectedIndex()]);
     gui.context.soptions.set(StaticOptions.LANG, lang.getSelectedItem());
     creds.setText(credits(lang.getSelectedItem()));
 

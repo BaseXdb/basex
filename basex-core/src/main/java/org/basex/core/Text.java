@@ -1298,9 +1298,9 @@ public interface Text {
   /** Views. */
   String VIEWS = lang("views");
   /** Look and feel. */
-  String JAVA_LF = "Look & Feel";
+  String LOOK_AND_FEEL = "Look & Feel";
   /** Scaling of the user interface. */
-  String UI_SCALE = lang("scaling");
+  String SCALING = lang("scaling");
   /** Header for preferences that are applied after a restart. */
   String AFTER_RESTART = lang("after_restart");
   /** Focus. */

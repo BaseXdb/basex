@@ -61,6 +61,7 @@ public final class BaseXGUI extends Main {
     init(gopts);
     // adopt fonts and colors of the look and feel
     GUIConstants.init(gopts);
+    osScale(gopts);
 
     // create splash screen
     final JFrame splash = splash();
@@ -73,6 +74,8 @@ public final class BaseXGUI extends Main {
       } finally {
         splash.dispose();
       }
+      // the splash screen never receives the focus: move the main window to the foreground
+      focus(gui);
 
       // open specified files
       gui.editor.init(filter(gui, paths));
@@ -138,7 +141,18 @@ public final class BaseXGUI extends Main {
   private static void scale(final GUIOptions opts) {
     // the property must be assigned before the graphics environment is initialized
     final int scale = opts.get(GUIOptions.UISCALE);
-    if(scale > 0) System.setProperty("sun.java2d.uiScale", Double.toString(scale / 100.0d));
+    if(scale > 0 && scale != 100) System.setProperty("sun.java2d.uiScale",
+        Double.toString(scale * opts.get(GUIOptions.OSSCALE) / 10000.0d));
+  }
+
+  /**
+   * Remembers the scaling factor of the operating system for the next startup.
+   * @param opts gui options
+   */
+  private static void osScale(final GUIOptions opts) {
+    // the screen resolution is not affected by a custom scaling factor
+    if(!Prop.MAC) opts.set(GUIOptions.OSSCALE,
+        Toolkit.getDefaultToolkit().getScreenResolution() * 100 / 96);
   }
 
   /**

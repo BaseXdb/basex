@@ -109,8 +109,10 @@ public final class GUIOptions extends Options {
   public static final NumberOption PREFTAB = new NumberOption("PREFTAB", 0);
   /** Flag for Java look and feel. */
   public static final StringOption LOOKANDFEEL = new StringOption("LOOKANDFEEL", "");
-  /** Scaling of the user interface in percent (0: system default). */
-  public static final NumberOption UISCALE = new NumberOption("UISCALE", 0);
+  /** Scaling of the user interface in percent, relative to the system scaling. */
+  public static final NumberOption UISCALE = new NumberOption("UISCALE", 100);
+  /** Scaling of the operating system in percent, detected at the last startup. */
+  public static final NumberOption OSSCALE = new NumberOption("OSSCALE", 100);
   /** Label attributes, separated by comma. */
   public static final StringOption LABELS = new StringOption("LABELS", "name,label,id");
   /** Flag for scrolling editor tabs. */
