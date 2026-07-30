@@ -51,9 +51,9 @@ public final class BaseXGUI extends Main {
     super(args);
     parseArgs();
 
-    // delegate files to a GUI instance that is already running
+    // delegate files to a GUI instance that is already running; without files, open a new window
     final String[] paths = files.finish();
-    if(GUIInstance.delegate(paths)) return;
+    if(paths.length > 0 && GUIInstance.delegate(paths)) return;
 
     // initialize scaling and look and feel
     final GUIOptions gopts = new GUIOptions();
