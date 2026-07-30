@@ -34,7 +34,7 @@ final class DialogInput extends BaseXDialog {
     /** Rename document. */ RENAME_DOCUMENT(RENAME, TARGET_PATH),
     /** Alter database.  */ ALTER_DATABASE(RENAME_DB, NAME_OF_DB),
     /** Copy database.   */ COPY_DATABASE(COPY_DB, NAME_OF_DB_COPY),
-    /** Create backup.   */ CREATE_BACKUP(COMMENT, COMMENT);
+    /** Create backup.   */ CREATE_BACK(BACKUP, COMMENT);
 
     /** Title of action. */
     final String title;
@@ -98,7 +98,7 @@ final class DialogInput extends BaseXDialog {
       // document checks
       ok = !in.isEmpty() && MetaData.normPath(in) != null;
       if(!ok) inf = Util.info(INVALID_X, PATH);
-    } else if(action == Action.CREATE_BACKUP) {
+    } else if(action == Action.CREATE_BACK) {
       ok = true;
     } else {
       // database checks

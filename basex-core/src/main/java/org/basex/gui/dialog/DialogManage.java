@@ -168,7 +168,7 @@ public final class DialogManage extends BaseXDialog {
       cmds.add(new Copy(db, input.input()));
       refresh = true;
     } else if(cmp == backup) {
-      final DialogInput input = new DialogInput("", this, Action.CREATE_BACKUP);
+      final DialogInput input = new DialogInput("", this, Action.CREATE_BACK);
       if(!input.ok()) return;
       for(final String name : dbs) cmds.add(new CreateBackup(name, input.input()));
     } else if(cmp == restore) {

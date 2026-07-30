@@ -992,14 +992,14 @@ public final class TextEditor {
       } else if(ch == '~') {
         // closes XQuery comments
         if(prev == ':' && pprv == '(') {
-          sb.append("  ");
+          sb.append(" ");
           if(curr != ':') {
             sb.append(':');
             if(curr != ')') sb.append(')');
           } else if(next != ')') {
             sb.append(')');
           }
-          move = 2;
+          move = 1;
         }
       } else if(ch == '-') {
         // closes XML comments
