@@ -22,12 +22,12 @@ import org.basex.util.list.*;
 final class CompletionPopup {
   /** Maximum number of visible candidates. */
   private static final int ROWS = 12;
-  /** Maximum width of the popup window. */
-  private static final int WIDTH = 240;
+  /** Characters to show. */
+  private static final int CHARS = 45;
   /** Popup delay (ms). */
   private static final int DELAY = 250;
   /** Horizontal margin of a candidate. */
-  private static final int MARGIN = 3;
+  private static final int MARGIN = 4;
 
   /** Text panel. */
   private final TextPanel panel;
@@ -136,19 +136,14 @@ final class CompletionPopup {
     model.addAll(values);
 
     // assign a fixed cell size: the list must not measure every single candidate
-    list.setFont(list.getFont().deriveFont((float) dmfont.getSize() + 2));
-    boldFont = list.getFont().deriveFont(Font.BOLD);
-    final FontMetrics fm = list.getFontMetrics(boldFont);
-    final int ms = values.size(), max = WIDTH - (MARGIN << 1);
-    int width = 0;
-    for(int m = 0; m < ms && width < max; m++) {
-      width = Math.max(width, fm.stringWidth(label(values.get(m))));
-    }
-    list.setFixedCellWidth(Math.min(WIDTH, width + (MARGIN << 1)));
+    final Font f = list.getFont().deriveFont((float) font.getSize());
+    final FontMetrics fm = list.getFontMetrics(f);
+    boldFont = f.deriveFont(Font.BOLD);
+    list.setFont(f);
+    list.setFixedCellWidth(fm.charWidth('a') * CHARS);
     list.setFixedCellHeight(fm.getHeight());
-
+    list.setVisibleRowCount(Math.min(values.size(), ROWS));
     list.setSelectedIndex(0);
-    list.setVisibleRowCount(Math.min(ms, ROWS));
     window.pack();
   }
 
