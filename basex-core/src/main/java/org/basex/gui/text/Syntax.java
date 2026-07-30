@@ -353,10 +353,11 @@ abstract class Syntax {
   /**
    * Returns the code completion candidates for the specified text.
    * @param text text
+   * @param pos start position of the completed string
    * @return candidates, ordered by relevance
    */
   @SuppressWarnings("unused")
-  ArrayList<ArrayList<Completion>> completions(final byte[] text) {
+  ArrayList<ArrayList<Completion>> completions(final byte[] text, final int pos) {
     return new ArrayList<>();
   }
 

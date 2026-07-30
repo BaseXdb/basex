@@ -30,7 +30,8 @@ final class Completions {
     final HashSet<String> values = new HashSet<>();
     values.add(word);
     final Consumer<Completion> add = completion -> {
-      if(values.add(completion.value())) matches.add(completion);
+      // trailing whitespace is ignored: a candidate must insert more than the string at the cursor
+      if(values.add(completion.value().stripTrailing())) matches.add(completion);
     };
 
     // add matches that start with the input string

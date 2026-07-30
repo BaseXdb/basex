@@ -791,8 +791,9 @@ public class TextPanel extends BaseXPanel {
     computeHeight.invokeLater(Align.BOTTOM);
     e.consume();
 
-    // refresh completions, or show them after a delay if a letter was typed
-    refreshCompletion(Character.isLetter(e.getKeyChar()));
+    // refresh completions, or show them after a delay if a completion was started
+    final char ch = e.getKeyChar();
+    refreshCompletion(Character.isLetter(ch) || completeStart(ch));
   }
 
   /**
@@ -1192,10 +1193,11 @@ public class TextPanel extends BaseXPanel {
     final int caret = editor.pos();
 
     if(!explicit) {
-      // the cursor must be placed at the end of a string that starts with a name character
-      if(caret == start || caret != editor.completionEnd()) return empty;
-      final int ch = cp(text, start);
-      if(ch != '$' && ch != '<' && !XMLToken.isNCStartChar(ch)) return empty;
+      // the cursor must be placed at the end of the completed string
+      if(caret != editor.completionEnd()) return empty;
+      // a completion is started by a name character, or by the character before an empty string
+      final int ch = caret == start ? Syntax.prev(text, start) : cp(text, start);
+      if(!completeStart(ch) && !XMLToken.isNCStartChar(ch)) return empty;
       // a function call is already complete
       if(caret < text.length && text[caret] == '(') return empty;
     }
@@ -1203,7 +1205,17 @@ public class TextPanel extends BaseXPanel {
     final Syntax syntax = rend.syntax();
     if(!syntax.completable(text, start)) return empty;
 
-    return Completions.candidates(word(start), syntax.completions(text));
+    return Completions.candidates(word(start), syntax.completions(text, start));
+  }
+
+  /**
+   * Indicates if the specified character starts a code completion.
+   * @param ch character
+   * @return result of check
+   */
+  private static boolean completeStart(final int ch) {
+    // variables, annotations and element constructors
+    return ch == '$' || ch == '%' || ch == '<';
   }
 
   /**

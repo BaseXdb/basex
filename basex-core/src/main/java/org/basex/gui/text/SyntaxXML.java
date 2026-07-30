@@ -39,7 +39,7 @@ public final class SyntaxXML extends SyntaxMarkup {
   }
 
   @Override
-  ArrayList<ArrayList<Completion>> completions(final byte[] text) {
+  ArrayList<ArrayList<Completion>> completions(final byte[] text, final int pos) {
     elements = new TokenSet();
     attributes = new TokenSet();
     scan(text, text.length);
@@ -76,11 +76,8 @@ public final class SyntaxXML extends SyntaxMarkup {
     final ArrayList<Completion> list = new ArrayList<>();
     for(final byte[] name : names) {
       final String string = string(name);
-      list.add(new Completion(string.toLowerCase(Locale.ENGLISH), string, string, false));
-      if(tags) {
-        final String tag = '<' + string;
-        list.add(new Completion(tag.toLowerCase(Locale.ENGLISH), tag, tag, true));
-      }
+      list.add(Completion.get(string, false));
+      if(tags) list.add(Completion.get('<' + string, true));
     }
     return list;
   }

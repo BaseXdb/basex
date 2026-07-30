@@ -228,18 +228,237 @@ public final class SyntaxXQueryTest {
   /** Code completion snippets. */
   @Test public void snippets() {
     // main modules: no prefix
-    snippet("", "declare function _() {\n};\n");
-    snippet("1", "declare function _() {\n};\n");
-    snippet("import module namespace m = 'uri';", "declare function _() {\n};\n");
+    snippet("", "declare function _() {};");
+    snippet("declare variable $x := 1;", "declare function _() {};");
+    snippet("import module namespace m = 'uri';", "declare function _() {};");
     // library modules: prefix of the module declaration
-    snippet("module namespace m = 'uri';", "declare function m:_() {\n};\n");
+    snippet("module namespace m = 'uri';", "declare function m:_() {};");
     snippet("module namespace m='uri'; declare function m:f() {};",
-      "declare function m:_() {\n};\n");
+      "declare function m:_() {};");
     // version declarations and comments are skipped
     snippet("xquery version '4.0'; module namespace m = 'uri';",
-      "declare function m:_() {\n};\n");
+      "declare function m:_() {};");
     snippet("(: module namespace x = 'uri' :) module namespace m = 'uri';",
-      "declare function m:_() {\n};\n");
+      "declare function m:_() {};");
+  }
+
+  /** Code completion for annotations. */
+  @Test public void annotations() {
+    // annotations of the XQuery namespace are proposed without prefix
+    completion("%_", "public", "public");
+    completion("declare %_", "updating", "updating");
+    // the cursor is placed inside the parentheses of an annotation with arguments
+    completion("declare %_", "rest:path", "rest:path(_)");
+    completion("declare %_", "unit:test", "unit:test(_)");
+    // annotations are only proposed after a percent sign
+    completion("declare _", "rest:path", null);
+    // other candidates are skipped after a percent sign
+    completion("%_", "count", null);
+  }
+
+  /** Code completion for the keywords of a prolog declaration. */
+  @Test public void prolog() {
+    // the syntax of the declaration is supplied
+    completion("declare _", "function", "function _() {};");
+    completion("declare _", "namespace", "namespace _ = '';");
+    completion("declare _", "base-uri", "base-uri '_';");
+    completion("module namespace m = 'uri'; declare _", "function", "function m:_() {};");
+    // the default keyword introduces further declarations
+    completion("declare _", "default", "default collation '_';");
+    completion("declare default _", "element", "element namespace '_';");
+    completion("declare default _", "order", "order empty _;");
+    completion("declare default _", "function", "function namespace '_';");
+    // no candidates of the enclosing context
+    completion("declare default _", "count", null);
+    completion("declare default _", "variable", null);
+    // the updating keyword and annotations are skipped
+    completion("declare updating _", "function", "function _() {};");
+    completion("declare %private _", "function", "function _() {};");
+    completion("declare %rest:path('a;b') _", "function", "function _() {};");
+    // snippets, functions and types are no candidates
+    completion("declare _", "for", null);
+    completion("declare _", "count", null);
+    completion("declare _", "xs:string", null);
+    // the name of a declaration is a new one
+    completion("declare function _", "count", null);
+    completion("declare variable _", "count", null);
+    // the body of a function is no declaration
+    completion("declare function f() { _ };", "count", "count(_)");
+  }
+
+  /** Code completion for the start of a prolog declaration. */
+  @Test public void declare() {
+    completion("_", "declare", "declare ");
+    completion("xquery version '4.0'; _", "declare", "declare ");
+    completion("declare variable $x := 1; _", "declare", "declare ");
+    completion("declare function f() { 1 }; _", "declare", "declare ");
+    // declarations are proposed with the keyword that introduces them
+    completion("_", "contextvalue", "declare context value := _;");
+    completion("_", "base-uri", "declare base-uri '_';");
+    completion("_", "module", "module namespace _ = '';");
+    // a declaration cannot follow an expression
+    completion("let $a := 1 return _", "declare", null);
+    completion("1, _", "contextvalue", null);
+    completion("1, _", "module", null);
+    // expression snippets are proposed in expressions
+    completion("1, _", "for", "for $_ in \nreturn");
+    completion("declare function f() { _ };", "declare", null);
+    completion("declare _", "declare", null);
+    completion("'a', _", "declare", null);
+    // semicolons in strings and comments start no declaration
+    completion("let $a := 'x;y' return 1, _", "declare", null);
+    completion("let $a := 1 (: ; :) return 1, _", "declare", null);
+  }
+
+  /** Code completion for sequence types. */
+  @Test public void types() {
+    completion("declare variable $x as _", "xs:string", "xs:string");
+    completion("1 instance of _", "element()", "element()");
+    completion("1 cast as _", "xs:integer", "xs:integer");
+    completion("for $x as _", "map", "map(_)");
+    // no other candidates
+    completion("declare variable $x as _", "count", null);
+    completion("1 instance of _", "for", null);
+    // a variable is no keyword
+    completion("let $as := 1 return $as _", "count", "count(_)");
+  }
+
+  /** Code completion for lookups. */
+  @Test public void lookups() {
+    completion("$map?key, $map?_", "key", "key");
+    // lookups are collected in the whole module
+    completion("declare function f() { $map?key }; $m?_", "key", "key");
+    // no other candidates
+    completion("$map?_", "count", null);
+    // lookups in strings and comments are ignored
+    completion("'?key', $map?_", "key", null);
+    completion("(: $map?key :) $map?_", "key", null);
+  }
+
+  /** Code completion in the tags of element constructors. */
+  @Test public void tags() {
+    // the angle bracket is part of the completed element name
+    completion("<title/>, _<t", "<title", "<title");
+    completion("<xhtml:div/>, _<x", "<xhtml:div", "<xhtml:div");
+    // attribute names are completed after the element name
+    completion("<a id='x'/>, <b _", "id", "id");
+    // element names are no attribute names, and vice versa
+    completion("<a id='x'/>, <b _", "<a", null);
+    completion("<a id='x'/>, _<a", "id", null);
+    // no other candidates in a tag
+    completion("<a/>, _<a", "count", null);
+    completion("<a id='x'/>, <b _", "count", null);
+    // an angle bracket that starts no constructor is a comparison
+    completion("<a/>, 1 _<a", "<a", null);
+    // names in comments are ignored
+    completion("<b/>, (: <a/> :) 1, _<b", "<a", null);
+    completion("<b/>, (: <a/> :) 1, _<b", "<b", "<b");
+  }
+
+  /** Code completion for end tags. */
+  @Test public void endTags() {
+    completion("<a></_", "a", "a");
+    completion("<a><b></_", "b", "b");
+    completion("<a><b/></_", "a", "a");
+    completion("<a><b></b></_", "a", "a");
+    // no element is open
+    completion("<a></a></_", "a", null);
+    // no other candidates
+    completion("<a></_", "count", null);
+  }
+
+  /** Code completion for documentation tags. */
+  @Test public void docTags() {
+    // a tag is followed by its description
+    completion("(:~\n : @_", "param", "param ");
+    completion("(:~\n : @_", "author", "author ");
+    completion("(:~\n : @_", "return", "return ");
+    // tags are also proposed in ordinary comments
+    completion("(: @_ :) 1", "param", "param ");
+    // no other candidates in comments
+    completion("(:~\n : @_", "count", null);
+    completion("(:~\n : _", "author", null);
+    completion("(: _ :) 1", "count", null);
+    // outside comments, no tags are proposed
+    completion("@_", "author", null);
+    // tags are proposed in lexicographic order
+    assertEquals("author", proposals("(:~\n : @_").get(0));
+  }
+
+  /** Code completion for variables in scope. */
+  @Test public void variables() {
+    // global variables are in scope in the whole module
+    completion("declare variable $g := 1; _", "$g", "$g");
+    completion("declare variable $g := 1; declare function f() { _ };", "$g", "$g");
+    // parameters and local variables of the current declaration are in scope
+    completion("declare function f($p) { _ };", "$p", "$p");
+    completion("declare function f() { let $a := 1 return _ };", "$a", "$a");
+    // local variables of other declarations are out of scope
+    completion("declare function f() { let $a := 1 return $a }; _", "$a", null);
+    completion("declare function f() { let $a := 1 return $a };\n" +
+      "declare function g() { _ };", "$a", null);
+    // variables that are declared after the completed string are out of scope
+    completion("_ let $a := 1 return $a", "$a", null);
+    // semicolons in strings and comments end no declaration
+    completion("let $a := 'x;y' return _", "$a", "$a");
+    completion("let $a := 1 (: ; :) return _", "$a", "$a");
+  }
+
+  /** Candidates that are already typed are not proposed. */
+  @Test public void typed() {
+    assertFalse(proposed("declare variable $x := 1; _declare", "declare"));
+    assertTrue(proposed("declare variable $x := 1; _decl", "declare"));
+    // the only element name is the one that is being typed
+    assertFalse(proposed("<a/>, _<a", "<a"));
+    assertTrue(proposed("<abc/>, _<a", "<abc"));
+    // annotations
+    assertFalse(proposed("declare %_public", "public"));
+    assertTrue(proposed("declare %_publi", "public"));
+  }
+
+  /** Full names are proposed before abbreviated ones. */
+  @Test public void ranking() {
+    final StringList proposals = proposals("declare %_pu");
+    assertEquals("public", proposals.get(0));
+    assertTrue(proposals.contains("rest:put"));
+  }
+
+  /**
+   * Checks if a candidate is proposed for the completed string, which ends with the query.
+   * @param query query string, in which an underscore marks the completed string
+   * @param match name to be matched
+   * @return result of check
+   */
+  private static boolean proposed(final String query, final String match) {
+    return proposals(query).contains(match);
+  }
+
+  /**
+   * Returns the candidates that are proposed for the completed string, which ends with the query.
+   * @param query query string, in which an underscore marks the completed string
+   * @return matched names, ordered by relevance
+   */
+  private static StringList proposals(final String query) {
+    final int pos = query.indexOf('_');
+    final StringList names = new StringList();
+    for(final Completion completion :
+        Completions.candidates(query.substring(pos + 1), lists(query))) {
+      if(completion != null) names.add(completion.match());
+    }
+    return names;
+  }
+
+  /**
+   * Returns the candidate lists for the completed string of a query.
+   * @param query query string, in which an underscore marks the completed string
+   * @return candidates, ordered by relevance
+   */
+  private static ArrayList<ArrayList<Completion>> lists(final String query) {
+    final Syntax syntax = new SyntaxXQuery();
+    syntax.init(PLAIN);
+
+    final int pos = query.indexOf('_');
+    return syntax.completions(Token.token(query.substring(0, pos) + query.substring(pos + 1)), pos);
   }
 
   /**
@@ -248,13 +467,20 @@ public final class SyntaxXQueryTest {
    * @param expected expected snippet
    */
   private static void snippet(final String query, final String expected) {
-    final Syntax syntax = new SyntaxXQuery();
-    syntax.init(PLAIN);
+    completion(query + '_', "function", expected);
+  }
 
+  /**
+   * Compares the completion value of a query with the expected one.
+   * @param query query string, in which an underscore marks the completed string
+   * @param match name to be matched
+   * @param expected expected value (can be {@code null})
+   */
+  private static void completion(final String query, final String match, final String expected) {
     String value = null;
-    for(final ArrayList<Completion> list : syntax.completions(Token.token(query))) {
+    for(final ArrayList<Completion> list : lists(query)) {
       for(final Completion completion : list) {
-        if(value == null && "function".equals(completion.match())) value = completion.value();
+        if(value == null && match.equals(completion.match())) value = completion.value();
       }
     }
     assertEquals(expected, value, query);
