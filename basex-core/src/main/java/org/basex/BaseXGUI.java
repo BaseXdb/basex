@@ -55,15 +55,15 @@ public final class BaseXGUI extends Main {
     final String[] paths = files.finish();
     if(GUIInstance.delegate(paths)) return;
 
-    // initialize scaling, fonts and colors
+    // initialize scaling and look and feel
     final GUIOptions gopts = new GUIOptions();
     scale(gopts);
+    init(gopts);
+    // adopt fonts and colors of the look and feel
     GUIConstants.init(gopts);
 
     // create splash screen
     final JFrame splash = splash();
-    // initialize look and feel
-    init(gopts);
 
     SwingUtilities.invokeLater(() -> {
       // open main window and close splash screen
