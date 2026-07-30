@@ -1178,7 +1178,8 @@ public final class TextEditor {
    */
   private void replace(final int s, final int e, final String value) {
     select(s, e);
-    delete();
+    // an empty area is no selection: the next character must not be deleted
+    if(isSelected()) delete();
     insert(value);
   }
 

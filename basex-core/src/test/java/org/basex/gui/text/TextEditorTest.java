@@ -104,6 +104,31 @@ public final class TextEditorTest {
     return editor.bracket(syntax);
   }
 
+  /** Code completion. */
+  @Test public void complete() {
+    // the completed string is replaced
+    assertEquals("declare %public\ndeclare", complete("declare %pu\ndeclare", 11, "public"));
+    // an empty completed string deletes no text
+    assertEquals("declare %public\ndeclare", complete("declare %\ndeclare", 9, "public"));
+    // an underscore indicates the new cursor position
+    assertEquals("declare %rest:path()\ndeclare",
+      complete("declare %\ndeclare", 9, "rest:path(_)"));
+  }
+
+  /**
+   * Completes the string before the specified position.
+   * @param string text
+   * @param pos cursor position
+   * @param value completion value
+   * @return new text
+   */
+  private static String complete(final String string, final int pos, final String value) {
+    final TextEditor editor = editor(string);
+    editor.pos(pos);
+    editor.complete(value, editor.completionStart());
+    return Token.string(editor.text());
+  }
+
   /**
    * Returns an editor for the specified text.
    * @param string text
