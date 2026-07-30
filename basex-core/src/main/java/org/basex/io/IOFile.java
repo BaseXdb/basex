@@ -340,6 +340,16 @@ public final class IOFile extends IO {
     Files.copy(toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
   }
 
+  /**
+   * Moves a file to another target.
+   * @param target target
+   * @throws IOException I/O exception
+   */
+  public void moveTo(final IOFile target) throws IOException {
+    target.parent().md();
+    Files.move(toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+  }
+
   @Override
   public boolean eq(final IO io) {
     return io instanceof IOFile && equals(pth, io.pth);

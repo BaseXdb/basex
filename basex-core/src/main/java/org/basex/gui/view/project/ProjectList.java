@@ -28,6 +28,10 @@ final class ProjectList extends JList<String> implements ProjectCommands {
 
   /** Content search string. */
   private String search = "";
+  /** Number of content hits per file ({@code -1}: unknown; missing: not counted yet). */
+  private final HashMap<String, Integer> counts = new HashMap<>();
+  /** Indicates that the list shows all matching files. */
+  private boolean complete;
 
   /**
    * Constructor.
@@ -51,8 +55,9 @@ final class ProjectList extends JList<String> implements ProjectCommands {
    * Assigns the specified list entries and selects the first one.
    * @param list result elements
    * @param srch content search string
+   * @param all list shows all matching files
    */
-  void setElements(final String[] list, final String srch) {
+  void setElements(final String[] list, final String srch, final boolean all) {
     // rebuild the list only if the entries changed (preserves the selection otherwise)
     final ListModel<String> model = getModel();
     final int ll = list.length, ms = model.getSize();
@@ -63,8 +68,55 @@ final class ProjectList extends JList<String> implements ProjectCommands {
       if(ll > 0) setSelectedIndex(0);
     }
 
-    // remember search string
+    // discard the hit counts if the entries or the search string have changed
+    if(!same || !search.equals(srch)) counts.clear();
     search = srch;
+    complete = all;
+  }
+
+  /**
+   * Assigns the number of content hits of files and refreshes the list.
+   * @param hits number of hits per file path ({@code -1} if a file could not be read)
+   */
+  void count(final Map<String, Integer> hits) {
+    counts.putAll(hits);
+    repaint();
+  }
+
+  /**
+   * Indicates if the list shows all matching files.
+   * @return result of check
+   */
+  boolean complete() {
+    return complete;
+  }
+
+
+  /**
+   * Returns all listed files.
+   * @return files
+   */
+  List<IOFile> allFiles() {
+    final ListModel<String> model = getModel();
+    final int ms = model.getSize();
+    final ArrayList<IOFile> files = new ArrayList<>(ms);
+    for(int m = 0; m < ms; m++) files.add(new IOFile(model.getElementAt(m)));
+    return files;
+  }
+
+  /**
+   * Returns the number of counted hits in the specified files.
+   * @param files files
+   * @return number of hits, or {@code -1} if a file has not been counted or is too large
+   */
+  int hits(final List<IOFile> files) {
+    int hits = 0;
+    for(final IOFile file : files) {
+      final Integer count = counts.get(file.path());
+      if(count == null || count < 0) return -1;
+      hits += count;
+    }
+    return hits;
   }
 
   /** List cell renderer. */
@@ -73,6 +125,8 @@ final class ProjectList extends JList<String> implements ProjectCommands {
     private final BaseXLabel label;
     /** Current file. */
     private IOFile file = new IOFile(".");
+    /** Content hits of the current file ({@code null} if not counted yet). */
+    private Integer count;
 
     /**
      * Constructor.
@@ -93,6 +147,12 @@ final class ProjectList extends JList<String> implements ProjectCommands {
           g.drawString(s, x, y);
           x += fm.stringWidth(s);
           g.setColor(GUIConstants.gray);
+          // files that have not been counted yet have no marker at all
+          if(count != null) {
+            final String c = " \u00b7 " + (count < 0 ? "?" : BaseXLayout.format(count));
+            g.drawString(c, x, y);
+            x += fm.stringWidth(c);
+          }
           g.drawString(" \u00b7 " + BaseXLayout.reversePath(file), x, y);
         }
       };
@@ -104,6 +164,7 @@ final class ProjectList extends JList<String> implements ProjectCommands {
         final int index, final boolean selected, final boolean expanded) {
 
       file = new IOFile(value.toString());
+      count = counts.get(file.path());
       label.setIcon(BaseXImages.file(file));
       label.setText("");
       label.setToolTipText(BaseXLayout.info(file, true));
@@ -132,17 +193,6 @@ final class ProjectList extends JList<String> implements ProjectCommands {
 
     final ArrayList<IOFile> files = new ArrayList<>();
     for(final String value : getSelectedValuesList()) files.add(new IOFile(value));
-    return files;
-  }
-
-  /**
-   * Returns all listed files (a content replacement applies to all of them).
-   * @return files
-   */
-  List<IOFile> allFiles() {
-    final ListModel<String> model = getModel();
-    final ArrayList<IOFile> files = new ArrayList<>();
-    for(int i = 0; i < model.getSize(); i++) files.add(new IOFile(model.getElementAt(i)));
     return files;
   }
 

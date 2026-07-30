@@ -224,6 +224,15 @@ public abstract class BaseXDialog extends JDialog implements BaseXWindow {
   }
 
   /**
+   * Static information dialog.
+   * @param gui parent reference
+   * @param text text
+   */
+  public static void info(final GUI gui, final String text) {
+    new DialogMessage(gui, text.trim(), Msg.SUCCESS);
+  }
+
+  /**
    * Static error dialog.
    * @param gui parent reference
    * @param text text

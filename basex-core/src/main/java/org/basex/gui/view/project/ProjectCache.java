@@ -44,6 +44,14 @@ final class ProjectCache implements Iterable<String> {
   }
 
   /**
+   * Returns the number of cached files.
+   * @return number of files
+   */
+  int size() {
+    return cache.size();
+  }
+
+  /**
    * Recursively populates the cache.
    * @param root root directory
    * @param stop stop function

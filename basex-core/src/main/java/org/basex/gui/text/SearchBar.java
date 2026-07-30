@@ -72,6 +72,8 @@ public final class SearchBar extends BaseXBack {
   private TextPanel editor;
   /** Old search text. */
   private String oldSearch = "";
+  /** Editor selection at the time of the last search. */
+  private String selection = "";
 
   /**
    * Constructor.
@@ -349,10 +351,29 @@ public final class SearchBar extends BaseXBack {
   }
 
   /**
+   * Returns the current search string.
+   * @return search string
+   */
+  public String searchString() {
+    return find.getText();
+  }
+
+  /**
+   * Indicates if the current search should be continued elsewhere: it must be running, and
+   * the specified selection must not have been made after it.
+   * @param string selected text
+   * @return result of check
+   */
+  public boolean adopts(final String string) {
+    return isVisible() && !find.getText().isEmpty() && (string.isEmpty() ||
+        string.equals(selection) || new SearchContext(this, find.getText()).matches(string));
+  }
+
+  /**
    * Returns the current search flags.
    * @return search flags
    */
-  private SearchFlags flags() {
+  public SearchFlags flags() {
     return new SearchFlags(mcase.isSelected(), word.isSelected(), regex.isSelected(),
         dotall.isSelected());
   }
@@ -469,6 +490,8 @@ public final class SearchBar extends BaseXBack {
     resetJump();
     if(jump) editor.jump(dir, select);
     else refreshCount();
+    // remember the selection: a different one will have been made after this search
+    selection = editor.searchString();
   }
 
   /**

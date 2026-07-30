@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.regex.*;
 
 import org.basex.core.*;
+import org.basex.core.jobs.*;
 import org.basex.gui.*;
 import org.basex.gui.text.*;
 import org.basex.io.*;
@@ -22,16 +23,14 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 final class ProjectFiles {
-  /** Maximum number of filtered hits (speeds up search). */
-  static final int MAXHITS = 1000;
   /** Content match result (success). */
   static final int FOUND = 1;
   /** Content match result (missing). */
   static final int MISSING = 0;
   /** Content match result (binary). */
   static final int BINARY = -1;
-  /** Maximum file size for the buffered regex search. */
-  private static final long MAXBYTES = 100L << 20;
+  /** Maximum file size for buffered scans (searching, counting). */
+  static final long MAXBYTES = 100L << 20;
   /** Regex characters. */
   private static final String REGEX_META = "\\.[]{}()*+?^$|";
   /** Parse ID. */
@@ -83,6 +82,21 @@ final class ProjectFiles {
    */
   String[] filter(final String files, final ContentFilter content, final IOFile root)
       throws InterruptedException {
+    return filter(files, content, root, view.gui.gopts.get(GUIOptions.MAXHITS), null);
+  }
+
+  /**
+   * Chooses files that match the specified pattern.
+   * @param files files filter
+   * @param content contents filter
+   * @param root root directory
+   * @param max maximum number of hits
+   * @param job job to be checked for interruptions (can be {@code null})
+   * @return sorted file paths
+   * @throws InterruptedException interruption
+   */
+  String[] filter(final String files, final ContentFilter content, final IOFile root,
+      final int max, final Job job) throws InterruptedException {
 
     final long id = ++filterId;
     final StringList results = new StringList();
@@ -93,12 +107,22 @@ final class ProjectFiles {
       final Pattern pt = Pattern.compile(IOFile.regex(files));
       for(final String path : pc) {
         if(id != filterId) throw new InterruptedException();
-        if(pt.matcher(path).matches() && content.matches(path) && add(path, results)) break;
+        if(job != null) job.checkStop();
+        if(pt.matcher(path).matches() && content.matches(path) && add(path, results, max)) break;
       }
     } else {
-      filter(files, content, id, results, pc);
+      filter(files, content, id, results, pc, max, job);
     }
     return results.finish();
+  }
+
+  /**
+   * Returns the number of cached files.
+   * @return number of files, or {@code 0} if no cache exists yet
+   */
+  int cacheSize() {
+    final ProjectCache pc = cache;
+    return pc == null ? 0 : pc.size();
   }
 
   /**
@@ -196,10 +220,13 @@ final class ProjectFiles {
    * @param id search ID
    * @param results search result
    * @param cache file cache
+   * @param max maximum number of hits
+   * @param job job to be checked for interruptions (can be {@code null})
    * @throws InterruptedException interruption
    */
   private static void filter(final String files, final ContentFilter content, final long id,
-      final StringList results, final ProjectCache cache) throws InterruptedException {
+      final StringList results, final ProjectCache cache, final int max, final Job job)
+          throws InterruptedException {
 
     final String query = files.replace('\\', '/');
     final HashSet<String> exclude = new HashSet<>();
@@ -207,12 +234,13 @@ final class ProjectFiles {
       for(int mode = 0; mode < 3; mode++) {
         for(final String path : cache) {
           if(id != filterId) throw new InterruptedException();
+          if(job != null) job.checkStop();
           // skip files that were already added or whose contents were already scanned
           if(exclude.contains(path)) continue;
           // check if the file name (or path) matches the pattern
           final String file = onlyName ? path.substring(path.lastIndexOf('/') + 1) : path;
           if(nameMatches(mode, file, query)) {
-            if(content.matches(path) && add(path, results)) return;
+            if(content.matches(path) && add(path, results, max)) return;
             exclude.add(path);
           }
         }
@@ -237,11 +265,12 @@ final class ProjectFiles {
    * Adds a matching path to the results.
    * @param path file path
    * @param results result list
+   * @param max maximum number of hits
    * @return {@code true} if the hit limit has been reached
    */
-  private static boolean add(final String path, final StringList results) {
+  private static boolean add(final String path, final StringList results, final int max) {
     results.add(path);
-    return results.size() >= MAXHITS;
+    return results.size() >= max;
   }
 
   /** Content matcher. */
@@ -433,34 +462,50 @@ final class ProjectFiles {
   }
 
   /**
-   * Creates backups and replaces all matches of a pattern in a file.
+   * Counts how often a pattern matches in a file.
    * @param file file
    * @param pattern search pattern
-   * @param replacement Java replacement string
-   * @param backup backup file for the original contents
-   * @return {@code true} if the file was changed
+   * @return number of matches, or {@code -1} if the file could not be processed
    */
-  static boolean replace(final IOFile file, final Pattern pattern, final String replacement,
+  static int count(final IOFile file, final Pattern pattern) {
+    return replace(file, pattern, null, null);
+  }
+
+  /**
+   * Replaces all matches of a pattern in a file, and backs up its original contents.
+   * @param file file
+   * @param pattern search pattern
+   * @param replacement Java replacement string ({@code null} to count the matches)
+   * @param backup backup file for the original contents (can be {@code null})
+   * @return number of matches, or {@code -1} if the file could not be processed
+   */
+  static int replace(final IOFile file, final Pattern pattern, final String replacement,
       final IOFile backup) {
-    if(file.length() > MAXBYTES) return false;
-    final String text = read(file);
-    if(text == null) return false;
-
-    final Matcher matcher = pattern.matcher(text);
-    final StringBuilder sb = new StringBuilder();
-    int count = 0;
-    for(; matcher.find(); count++) matcher.appendReplacement(sb, replacement);
-    if(count == 0) return false;
-    matcher.appendTail(sb);
-
     try {
-      backup.parent().md();
-      file.copyTo(backup);
+      final String text = read(file);
+      if(text == null) return -1;
+
+      final Matcher matcher = pattern.matcher(text);
+      final StringBuilder sb = new StringBuilder();
+      int count = 0;
+      while(matcher.find()) {
+        count++;
+        if(replacement != null) matcher.appendReplacement(sb, replacement);
+      }
+      if(count == 0 || replacement == null) return count;
+      matcher.appendTail(sb);
+
+      if(backup != null) file.copyTo(backup);
       file.write(sb.toString());
-      return true;
+      return count;
     } catch(final IOException ex) {
       Util.debug(ex);
-      return false;
+      return -1;
+    } catch(final OutOfMemoryError ex) {
+      // the file does not fit into main memory
+      Performance.gc(2);
+      Util.debug(ex);
+      return -1;
     }
   }
 

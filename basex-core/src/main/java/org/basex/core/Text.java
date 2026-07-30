@@ -849,8 +849,10 @@ public interface Text {
   String REPLACE_WITH = lang("replace_with");
   /** Number of replaced strings. */
   String STRINGS_REPLACED_X = lang("strings_replaced_%");
-  /** Confirm content replacement in a number of files. */
-  String REPLACE_FILES_X = lang("replace_files_%");
+  /** Confirm the replacement of a number of strings in a number of files. */
+  String REPLACE_FILES_X_X = lang("replace_files_%_%");
+  /** Back up files before replacing their contents. */
+  String CREATE_BACKUP = lang("create_backup");
   /** Undo the last content replacement. */
   String UNDO_REPLACE = lang("undo_replace");
   /** Match case. */
@@ -865,6 +867,10 @@ public interface Text {
   String FILES_FOUND_X = lang("files_found_%");
   /** Content search result: found, searched, too large, binary. */
   String FILES_FOUND_STATS_X = lang("files_found_%_%_%_%");
+  /** Number of restored files. */
+  String FILES_REVERTED_X = lang("files_reverted_%");
+  /** Number of files that could not be processed. */
+  String FILES_SKIPPED_X = lang("files_skipped_%");
 
   /** Serialization parameters. */
   String SERIALIZATION = lang("serialization");
@@ -1269,6 +1275,8 @@ public interface Text {
   String DELETE_FILE_X = lang("delete_file_%");
   /** Dialog title for reverting a file. */
   String REVERT_FILE_X = lang("revert_file_%");
+  /** Confirm the restoration of a number of files. */
+  String REVERT_FILES_X = lang("revert_files_%");
   /** Close all. */
   String CLOSE_ALL = lang("close_all");
 
