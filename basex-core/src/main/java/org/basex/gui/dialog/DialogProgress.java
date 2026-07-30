@@ -30,19 +30,19 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
   private BaseXButton cancel;
   /** Memory usage. */
   private BaseXMem mem;
-  /** Executed command. */
-  private Command command;
+  /** Executed job. */
+  private Job job;
   /** Progress bar. */
   private JProgressBar bar;
 
   /**
    * Default constructor.
    * @param gui main window
-   * @param cmd progress reference
+   * @param jb progress reference
    */
-  private DialogProgress(final GUI gui, final Command cmd) {
+  private DialogProgress(final GUI gui, final Job jb) {
     super(gui, "");
-    init(gui, cmd);
+    init(gui, jb);
   }
 
   /**
@@ -58,13 +58,13 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
   /**
    * Initializes all components.
    * @param win window
-   * @param cmd progress reference
+   * @param jb progress reference
    */
-  private void init(final BaseXWindow win, final Command cmd) {
+  private void init(final BaseXWindow win, final Job jb) {
     info = new BaseXLabel(" ", true, true);
     set(info, BorderLayout.NORTH);
 
-    if(cmd.supportsProg()) {
+    if(jb.supportsProg()) {
       bar = new JProgressBar(0, MAX);
       set(bar, BorderLayout.CENTER);
     } else {
@@ -79,13 +79,13 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
     m.add(mem);
     s.add(m, BorderLayout.WEST);
 
-    if(cmd.stoppable()) {
+    if(jb.stoppable()) {
       cancel = new BaseXButton(this, B_CANCEL);
       s.add(cancel, BorderLayout.EAST);
     }
     set(s, BorderLayout.SOUTH);
 
-    command = cmd;
+    job = jb;
     timer.start();
     pack();
     setLocationRelativeTo(win.component());
@@ -94,7 +94,7 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
   @Override
   public void cancel() {
     if(cancel != null) cancel.setEnabled(false);
-    command.stop();
+    job.stop();
   }
 
   @Override
@@ -105,18 +105,40 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
   @Override
   public void dispose() {
     timer.stop();
-    command = null;
+    job = null;
     super.dispose();
   }
 
   @Override
   public void actionPerformed(final ActionEvent e) {
-    final Job job = command.active();
-    setTitle(job.shortInfo());
-    final String detail = job.detailedInfo();
+    // refresh events can be queued before the dialog is disposed
+    if(job == null) return;
+    final Job active = job.active();
+    setTitle(active.shortInfo());
+    final String detail = active.detailedInfo();
     info.setText(detail.isEmpty() ? " " : detail);
     mem.repaint();
-    if(bar != null) bar.setValue((int) (job.progressInfo() * MAX));
+    if(bar != null) bar.setValue((int) (active.progressInfo() * MAX));
+  }
+
+  /**
+   * Runs the specified job in a new thread, decorated by a progress dialog, and returns
+   * when the job has finished or was canceled.
+   * @param <J> job type
+   * @param gui reference to the main window
+   * @param job job to be run
+   */
+  public static <J extends Job & Runnable> void execute(final GUI gui, final J job) {
+    final DialogProgress wait = new DialogProgress(gui, job);
+    new Thread(() -> {
+      try {
+        job.run();
+      } finally {
+        // the dialog is disposed in the event queue: the job may end before it is made visible
+        EventQueue.invokeLater(wait::dispose);
+      }
+    }).start();
+    wait.setVisible(true);
   }
 
   /**
