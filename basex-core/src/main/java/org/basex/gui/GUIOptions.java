@@ -166,8 +166,8 @@ public final class GUIOptions extends Options {
   public static final NumberOption COMPLETION = new NumberOption("COMPLETION", 0);
   /** Maximum number of indexed project files. */
   public static final NumberOption MAXFILES = new NumberOption("MAXFILES", 100000);
-  /** Maximum number of search hits. */
-  public static final NumberOption MAXSEARCH = new NumberOption("MAXSEARCH", 1000000);
+  /** Maximum number of files listed by the project filter. */
+  public static final NumberOption MAXHITS = new NumberOption("MAXHITS", 1000);
 
   /** Current input mode in global text field (Search, XQuery, Command). */
   public static final NumberOption SEARCHMODE = new NumberOption("SEARCHMODE", 0);
@@ -253,6 +253,8 @@ public final class GUIOptions extends Options {
   public static final StringsOption PROJCONTS = new StringsOption("PROJCONTS");
   /** History of project content replacements. */
   public static final StringsOption PROJREPLACE = new StringsOption("PROJREPLACE");
+  /** Back up files before replacing their contents. */
+  public static final BooleanOption PROJBACKUP = new BooleanOption("PROJBACKUP", true);
 
   /**
    * Constructor.

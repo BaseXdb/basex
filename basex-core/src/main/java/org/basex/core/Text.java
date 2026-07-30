@@ -734,9 +734,7 @@ public interface Text {
   String UPDATED_CC = lang("updated") + COLS;
   /** "Printed. */
   String PRINTED_CC = lang("printed") + COLS;
-  /** Result. */
-  String RESULT_X = lang("result_%");
-  /** Results. */
+  /** Number of results. */
   String RESULTS_X = lang("results_%");
   /** Query executed. */
   String QUERY_EXECUTED_X_X = lang("query_executed_%_%");
@@ -1340,8 +1338,8 @@ public interface Text {
   String[] COMPLETIONS = { lang("always"), lang("via_shortcut") };
   /** Maximum number of indexed project files. */
   String INDEXED_FILES = lang("indexed_files");
-  /** Maximum number of search hits. */
-  String SEARCH_HITS = lang("search_hits");
+  /** Maximum number of search results. */
+  String SEARCH_RESULTS = lang("search_results");
 
   /** Comment. */
   String COMMENT = lang("comment");

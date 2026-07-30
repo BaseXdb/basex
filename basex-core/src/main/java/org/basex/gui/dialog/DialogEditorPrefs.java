@@ -14,8 +14,8 @@ import org.basex.gui.layout.*;
 final class DialogEditorPrefs extends BaseXBack {
   /** Values of {@link GUIOptions#MAXFILES}. */
   private static final int[] MAXFILES = { 1000, 10000, 100000, 1000000, Integer.MAX_VALUE };
-  /** Values of {@link GUIOptions#MAXSEARCH}. */
-  private static final int[] MAXSEARCH = { 10000, 100000, 1000000, 10000000, Integer.MAX_VALUE };
+  /** Values of {@link GUIOptions#MAXHITS}. */
+  private static final int[] MAXHITS = { 10, 100, 1000, 10000, Integer.MAX_VALUE };
 
   /** GUI options. */
   private final GUIOptions gopts;
@@ -58,10 +58,10 @@ final class DialogEditorPrefs extends BaseXBack {
   private final BaseXSlider maxFiles;
   /** Label for the number of indexed project files. */
   private final BaseXLabel maxFilesLabel;
-  /** Maximum number of search hits. */
-  private final BaseXSlider maxSearch;
-  /** Label for the number of search hits. */
-  private final BaseXLabel maxSearchLabel;
+  /** Maximum number of search results. */
+  private final BaseXSlider maxHits;
+  /** Label for the number of search results. */
+  private final BaseXLabel maxHitsLabel;
 
   /**
    * Default constructor.
@@ -92,15 +92,15 @@ final class DialogEditorPrefs extends BaseXBack {
       BaseXSlider.index(gopts.get(GUIOptions.MAXFILES), MAXFILES));
     maxFiles.addActionListener(e -> action());
     maxFilesLabel = new BaseXLabel(" ");
-    maxSearch = new BaseXSlider(dialog, 0, MAXSEARCH.length - 1,
-      BaseXSlider.index(gopts.get(GUIOptions.MAXSEARCH), MAXSEARCH));
-    maxSearch.addActionListener(e -> action());
-    maxSearchLabel = new BaseXLabel(" ");
+    maxHits = new BaseXSlider(dialog, 0, MAXHITS.length - 1,
+      BaseXSlider.index(gopts.get(GUIOptions.MAXHITS), MAXHITS));
+    maxHits.addActionListener(e -> action());
+    maxHitsLabel = new BaseXLabel(" ");
     margin.setColumns(4);
     indent.setColumns(3);
     files.setColumns(18);
     BaseXLayout.setWidth(maxFiles, 120);
-    BaseXLayout.setWidth(maxSearch, 120);
+    BaseXLayout.setWidth(maxHits, 120);
 
     BaseXBack p = new BaseXBack().layout(new RowLayout());
     p.add(new BaseXLabel(VIEW + COL, true, true));
@@ -113,11 +113,6 @@ final class DialogEditorPrefs extends BaseXBack {
     p.add(numbers);
     p.add(markline);
     p.add(scrollTabs);
-    p.add(new BaseXLabel(SEARCH_HITS + COL).border(6, 0, 2, 0));
-    pp = new BaseXBack().layout(new ColumnLayout(12));
-    pp.add(maxSearch);
-    pp.add(maxSearchLabel);
-    p.add(pp);
     add(p);
 
     p = new BaseXBack().layout(new RowLayout());
@@ -148,6 +143,11 @@ final class DialogEditorPrefs extends BaseXBack {
     pp.add(maxFiles);
     pp.add(maxFilesLabel);
     p.add(pp);
+    p.add(new BaseXLabel(SEARCH_RESULTS + COL).border(6, 0, 2, 0));
+    pp = new BaseXBack().layout(new ColumnLayout(12));
+    pp.add(maxHits);
+    pp.add(maxHitsLabel);
+    p.add(pp);
     add(p);
   }
 
@@ -174,11 +174,13 @@ final class DialogEditorPrefs extends BaseXBack {
     parseproj.assign();
     showHidden.assign();
 
-    final int mf = MAXFILES[maxFiles.getValue()], ms = MAXSEARCH[maxSearch.getValue()];
+    final int mf = MAXFILES[maxFiles.getValue()];
     gopts.set(GUIOptions.MAXFILES, mf);
-    gopts.set(GUIOptions.MAXSEARCH, ms);
     maxFilesLabel.setText(mf == Integer.MAX_VALUE ? ALL : BaseXLayout.format(mf));
-    maxSearchLabel.setText(ms == Integer.MAX_VALUE ? ALL : BaseXLayout.format(ms));
+
+    final int mh = MAXHITS[maxHits.getValue()];
+    gopts.set(GUIOptions.MAXHITS, mh);
+    maxHitsLabel.setText(mh == Integer.MAX_VALUE ? ALL : BaseXLayout.format(mh));
 
     // no short-circuiting, do all checks...
     return margin.assign() & indent.assign();
