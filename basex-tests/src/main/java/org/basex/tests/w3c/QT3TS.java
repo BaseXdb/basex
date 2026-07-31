@@ -273,12 +273,15 @@ public final class QT3TS extends Main {
     final Performance perf = new Performance();
     final String qfile = asString("*:test/@file", test);
     String string;
+    String qbase = baseURI;
     if(qfile.isEmpty()) {
       // get query string
       string = asString("*:test", test);
     } else {
-      // get query from file
-      string = string(new IOFile(baseDir, qfile).read());
+      // get query from file: the file supplies the static base URI
+      final IOFile io = new IOFile(baseDir, qfile);
+      string = string(io.read());
+      qbase = io.path();
     }
 
     if(verbose) Util.println(name);
@@ -305,7 +308,7 @@ public final class QT3TS extends Main {
     }
 
     final XQuery query = new XQuery(string, ctx);
-    if(base) query.baseURI(baseURI);
+    if(base) query.baseURI(qbase);
 
     // add modules
     final String qm = "for $m in *:module where $m/@uri return ($m/@uri, $m/@file)";
