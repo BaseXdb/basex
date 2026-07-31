@@ -554,6 +554,7 @@ public class TextPanel extends BaseXPanel {
     } else {
       return false;
     }
+    completion.hide();
     return true;
   }
 
@@ -686,6 +687,8 @@ public class TextPanel extends BaseXPanel {
     }
     // refresh completions, or show them after a delay if the cursor was moved
     if(moved || edited) refreshCompletion(true);
+    // close the popup: the key press will be processed as a shortcut
+    else if(control(e) || e.getKeyChar() == KeyEvent.CHAR_UNDEFINED) completion.hide();
   }
 
   /**
