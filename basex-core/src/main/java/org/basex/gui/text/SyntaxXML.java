@@ -6,6 +6,7 @@ import java.util.*;
 
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * This class defines syntax highlighting for XML files: markup without embedded code.
@@ -21,6 +22,8 @@ public final class SyntaxXML extends SyntaxMarkup {
   private TokenSet elements;
   /** Attribute names of the current completion scan (can be {@code null}). */
   private TokenSet attributes;
+  /** Name of the last start tag of the current completion scan (can be {@code null}). */
+  private byte[] element;
 
   @Override
   public byte[] commentOpen() {
@@ -42,43 +45,54 @@ public final class SyntaxXML extends SyntaxMarkup {
   ArrayList<ArrayList<Completion>> completions(final byte[] text, final int pos) {
     elements = new TokenSet();
     attributes = new TokenSet();
-    scan(text, text.length);
 
-    final ArrayList<ArrayList<Completion>> lists = new ArrayList<>();
-    lists.add(completions(elements, true));
-    lists.add(completions(attributes, false));
+    // collect the names of the document and the element that is open at the specified position
+    final TokenList stack = new TokenList();
+    byte[] open = null;
+    reset();
+    for(int p = 0, tl = text.length; p < tl;) {
+      final int cl = cl(text, p);
+      color(text, p, p + cl);
+      // the name of a start tag is pushed when the element is opened, and popped by its end tag
+      if(elementOpen(text, p)) stack.add(element);
+      else if(modeBefore() == ETAG && modeAfter() != ETAG && !stack.isEmpty()) stack.pop();
+      if(p < pos) open = stack.isEmpty() ? null : stack.peek();
+      p += cl;
+    }
+
+    final ArrayList<Completion> list;
+    final int slash = back(text, pos);
+    if(cp(text, slash) == '/' && prev(text, slash) == '<') {
+      // an end tag is closed by the name of the innermost open element
+      list = open == null ? new ArrayList<>() : candidates(new TokenSet(open), "");
+    } else {
+      // in a start tag, the element name follows the angle bracket, all other names are attributes
+      final boolean tag = cp(text, pos) == '<';
+      list = candidates(tag ? elements : attributes, tag ? "<" : "");
+    }
     elements = null;
     attributes = null;
-    return lists;
+    element = null;
+    return single(list);
   }
 
   @Override
-  boolean completable(final int ch) {
-    // completions are proposed in tags and directly after an opening angle bracket
-    return code() || ch == '<';
+  boolean completable() {
+    // completions are proposed in tags, including the position after the opening angle bracket
+    final int after = modeAfter();
+    return after == TAG || after == ETAG;
   }
 
   @Override
   void classify(final byte[] text, final int start, final int end) {
     // the element name directly follows the opening angle bracket
     if(elements == null) return;
-    final TokenSet names = start > 0 && text[start - 1] == '<' ? elements : attributes;
-    names.add(substring(text, start, end));
-  }
-
-  /**
-   * Converts the specified names to completion candidates.
-   * @param names names
-   * @param tags add candidates that include the opening angle bracket
-   * @return candidates
-   */
-  private static ArrayList<Completion> completions(final TokenSet names, final boolean tags) {
-    final ArrayList<Completion> list = new ArrayList<>();
-    for(final byte[] name : names) {
-      final String string = string(name);
-      list.add(Completion.get(string, false));
-      if(tags) list.add(Completion.get('<' + string, true));
+    final byte[] name = substring(text, start, end);
+    if(start > 0 && text[start - 1] == '<') {
+      elements.add(name);
+      element = name;
+    } else {
+      attributes.add(name);
     }
-    return list;
   }
 }

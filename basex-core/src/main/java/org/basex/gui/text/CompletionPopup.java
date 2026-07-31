@@ -248,7 +248,7 @@ final class CompletionPopup {
         g.setColor(lightGray);
         g.drawLine(0, 0, w, 0);
       }
-      g.setColor(selected ? list.getSelectionForeground() : list.getForeground());
+      g.setColor(selected ? list.getSelectionForeground() : darkGray);
 
       final FontMetrics fm = g.getFontMetrics(boldFont);
       final int y = (h - fm.getHeight()) / 2 + fm.getAscent();

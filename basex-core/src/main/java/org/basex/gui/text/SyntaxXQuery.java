@@ -224,11 +224,17 @@ final class SyntaxXQuery extends SyntaxMarkup {
   }
 
   @Override
-  boolean completable(final int ch) {
+  boolean completable() {
     // names are completed in the tags of element constructors, tags in comments
     final int after = modeAfter();
     return modeBefore() == CODE && after == CODE || after == TAG || after == ETAG ||
       after == COMMENT;
+  }
+
+  @Override
+  boolean completeStart(final int ch) {
+    // variables, annotations and the lookups of maps and arrays
+    return ch == '$' || ch == '%' || ch == '?' || super.completeStart(ch);
   }
 
   @Override
@@ -485,17 +491,6 @@ final class SyntaxXQuery extends SyntaxMarkup {
   }
 
   /**
-   * Returns a single list of candidates.
-   * @param candidates candidates
-   * @return candidate lists
-   */
-  private static ArrayList<ArrayList<Completion>> single(final ArrayList<Completion> candidates) {
-    final ArrayList<ArrayList<Completion>> lists = new ArrayList<>(1);
-    lists.add(candidates);
-    return lists;
-  }
-
-  /**
    * Adds the snippets that continue a declaration, without the keywords that introduce it.
    * @param list list to be filled
    * @param keywords keywords of the declaration, followed by a space
@@ -511,20 +506,6 @@ final class SyntaxXQuery extends SyntaxMarkup {
         list.add(new Completion(s == -1 ? string : string.substring(0, s), string, string, false));
       }
     }
-  }
-
-  /**
-   * Converts the specified names to completion candidates.
-   * @param names names
-   * @param prefix string to be prefixed to each name
-   * @return candidates
-   */
-  private static ArrayList<Completion> candidates(final TokenSet names, final String prefix) {
-    final ArrayList<Completion> list = new ArrayList<>(names.size());
-    for(final byte[] name : names) {
-      list.add(Completion.get(prefix + string(name), false));
-    }
-    return list;
   }
 
   /**

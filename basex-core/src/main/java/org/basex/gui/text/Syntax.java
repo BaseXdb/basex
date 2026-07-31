@@ -6,6 +6,7 @@ import java.awt.*;
 import java.util.*;
 
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Framework for syntax highlighting: assigns a stackable mode to every character.
@@ -314,16 +315,14 @@ abstract class Syntax {
   /**
    * Indicates if code completions can be proposed at the specified position.
    * @param text text
-   * @param pos position
+   * @param caret caret position
    * @return result of check
    */
-  final boolean completable(final byte[] text, final int pos) {
-    final int tl = text.length;
-    if(tl == 0) return true;
+  final boolean completable(final byte[] text, final int caret) {
+    if(caret == 0) return true;
     // the state of a character is known after it has been processed
-    final int end = Math.min(pos + 1, tl);
-    scan(text, end);
-    return completable(cp(text, back(text, end)));
+    scan(text, caret);
+    return completable();
   }
 
   /**
@@ -342,12 +341,20 @@ abstract class Syntax {
 
   /**
    * Indicates if code completions can be proposed for the last processed character.
+   * @return result of check
+   */
+  boolean completable() {
+    return code();
+  }
+
+  /**
+   * Indicates if the specified character introduces a code completion.
    * @param ch character
    * @return result of check
    */
   @SuppressWarnings("unused")
-  boolean completable(final int ch) {
-    return code();
+  boolean completeStart(final int ch) {
+    return false;
   }
 
   /**
@@ -359,6 +366,31 @@ abstract class Syntax {
   @SuppressWarnings("unused")
   ArrayList<ArrayList<Completion>> completions(final byte[] text, final int pos) {
     return new ArrayList<>();
+  }
+
+  /**
+   * Returns a single list of candidates.
+   * @param candidates candidates
+   * @return candidate lists
+   */
+  static ArrayList<ArrayList<Completion>> single(final ArrayList<Completion> candidates) {
+    final ArrayList<ArrayList<Completion>> lists = new ArrayList<>(1);
+    lists.add(candidates);
+    return lists;
+  }
+
+  /**
+   * Converts the specified names to completion candidates.
+   * @param names names
+   * @param prefix string to be prefixed to each name
+   * @return candidates
+   */
+  static ArrayList<Completion> candidates(final TokenSet names, final String prefix) {
+    final ArrayList<Completion> list = new ArrayList<>(names.size());
+    for(final byte[] name : names) {
+      list.add(Completion.get(prefix + string(name), false));
+    }
+    return list;
   }
 
   /**
