@@ -213,25 +213,31 @@ public final class EditorArea extends TextPanel {
 
     // carriage returns have already been removed from the editor contents
     final byte[] text = getText();
-    final byte[] tmp = new byte[text.length + 1];
+    final int tl = text.length, caret = getCaret();
+    final byte[] tmp = new byte[tl + 1];
     // size of the new text, start of the current whitespace run ({@code -1}: no run)
-    int size = 0, ws = -1;
-    for(final byte b : text) {
+    int size = 0, ws = -1, cr = -1;
+    for(int t = 0; t < tl; t++) {
+      if(t == caret) cr = size;
+      final byte b = text[t];
       if(trim && (b == ' ' || b == '\t')) {
         if(ws == -1) ws = size;
       } else {
-        if(b == '\n' && ws != -1) size = ws;
+        if(b == '\n' && ws != -1) {
+          size = ws;
+          if(cr > ws) cr = ws;
+        }
         ws = -1;
       }
       tmp[size++] = b;
     }
     if(ws != -1) size = ws;
+    if(cr == -1 || cr > size) cr = size;
     if(nl && size > 0 && tmp[size - 1] != '\n') tmp[size++] = '\n';
-    if(size == text.length) return false;
+    if(size == tl) return false;
 
-    final int caret = getCaret();
     setText(tmp, size);
-    setCaret(Math.min(caret, size));
+    setCaret(cr);
     return true;
   }
 
