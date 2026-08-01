@@ -182,8 +182,8 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
    */
   private void finishText() throws IOException {
     if(!sb.isEmpty()) {
-      final String s = sb.toString();
-      builder.text(token(strips.peek() ? s.trim() : s));
+      final byte[] text = token(sb.toString());
+      if(!(strips.peek() && ws(text))) builder.text(text);
       sb.setLength(0);
     }
   }

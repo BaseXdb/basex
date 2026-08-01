@@ -70,14 +70,12 @@ public class XMLParser extends SingleParser {
     while(true) {
       if(scanner.type == Type.TEXT) {
         final byte[] text = scanner.token.toArray();
-        // ignore whitespace outside the root element, and ignorable whitespace between the
-        // children of an element with element-only content (matching the default parser)
-        final boolean ignorable = ws(text) && (elms.isEmpty() ? !fragment :
-            scanner.elementContent(elms.peek()));
-        if(!ignorable) {
-          if(strips.peek()) scanner.token.trim();
-          builder.text(scanner.token.toArray());
-        }
+        // ignore stripped whitespace, whitespace outside the root element, and ignorable
+        // whitespace between the children of an element with element-only content
+        // (matching the default parser)
+        final boolean ignorable = ws(text) && (strips.peek() || (elms.isEmpty() ? !fragment :
+            scanner.elementContent(elms.peek())));
+        if(!ignorable) builder.text(text);
       } else if(scanner.type == Type.COMMENT) {
         builder.comment(scanner.token.toArray());
       } else if(scanner.type == Type.PI) {
