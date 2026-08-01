@@ -164,6 +164,10 @@ public final class QueryPlan {
   private void attachType(final FBuilder elem, final SeqType seqType, final long size,
       final long structSize, final Data data) {
     addAttribute(elem, TYPE, seqType);
+    // field names of the top-level shape, declared or inferred
+    if(seqType.type instanceof final ShapeType sh && !sh.any()) {
+      addAttribute(elem, SHAPE, sh.fieldNames());
+    }
     if(size != -1) addAttribute(elem, SIZE, size);
     if(structSize != -1) addAttribute(elem, STRUCT_SIZE, structSize);
     if(data != null) addAttribute(elem, DATABASE, data.meta.name);

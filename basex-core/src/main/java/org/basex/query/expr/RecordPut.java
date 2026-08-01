@@ -39,7 +39,8 @@ public final class RecordPut extends Arr {
       update2.forEach((key, value) -> mb.put(key, value));
       exprs = new Expr[] { rp.exprs[0], mb.map() };
     }
-    // the result carries the record type of the left operand
+    // the result carries the record type of the left operand; an inferred shape is no record, but
+    // a record may still turn up at runtime, so the check is left to the evaluation step
     final SeqType st = exprs[0].seqType();
     if(st.type instanceof final RecordType rt) {
       // the update supplies every field: drop the left operand
@@ -65,14 +66,14 @@ public final class RecordPut extends Arr {
    */
   private Expr retarget(final Expr update, final RecordType rt, final CompileContext cc)
       throws QueryException {
-    if(!(update instanceof final RecordConstructor rc) ||
-        !(update.seqType().type instanceof final RecordType urt) ||
-        urt.fields().size() != rt.fields().size()) return null;
-    final TokenObjectMap<RecordField> ufields = urt.fields(), fields = rt.fields();
+    if(!(update instanceof final ShapeConstructor rc) ||
+        !(update.seqType().type instanceof final ShapeType ush) ||
+        ush.fields().size() != rt.fields().size()) return null;
+    final TokenObjectMap<ShapeField> ufields = ush.fields(), fields = rt.fields();
     final int fs = fields.size();
     final Expr[] args = new Expr[fs];
     for(int f = 1; f <= fs; f++) args[f - 1] = rc.arg(ufields.index(fields.key(f)) - 1);
-    return RecordConstructor.get(info, rt, args).optimize(cc);
+    return ShapeConstructor.get(info, rt, args).optimize(cc);
   }
 
   /**
@@ -82,9 +83,9 @@ public final class RecordPut extends Arr {
    * @return result of check
    */
   private static boolean covered(final Expr update, final RecordType rt) {
-    if(!(update instanceof RecordConstructor || update instanceof XQMap) ||
-        !(update.seqType().type instanceof final RecordType urt)) return false;
-    final TokenObjectMap<RecordField> ufields = urt.fields(), fields = rt.fields();
+    if(!(update instanceof ShapeConstructor || update instanceof XQMap) ||
+        !(update.seqType().type instanceof final ShapeType ush)) return false;
+    final TokenObjectMap<ShapeField> ufields = ush.fields(), fields = rt.fields();
     final int fs = fields.size();
     for(int f = 1; f <= fs; f++) {
       if(!ufields.contains(fields.key(f))) return false;
@@ -109,12 +110,14 @@ public final class RecordPut extends Arr {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final XQMap record = toMap(exprs[0], qc);
-    if(!(record.type instanceof final RecordType rt)) throw typeError(record, Types.RECORD, info);
+    if(!(record.type instanceof final RecordType rt)) {
+      throw typeError(record, Types.RECORD, info);
+    }
     final XQMap update = toMap(exprs[1], qc);
 
     // compact record layout
-    if(record instanceof final XQRecordMap rec) {
-      final TokenObjectMap<RecordField> fields = rt.fields();
+    if(record instanceof final XQShapeMap rec) {
+      final TokenObjectMap<ShapeField> fields = rt.fields();
       final int fs = fields.size();
       final Value[] values = new Value[fs];
       for(int f = 0; f < fs; f++) values[f] = rec.valueAt(f);
@@ -123,7 +126,7 @@ public final class RecordPut extends Arr {
         if(i == 0) throw typeError(update, rt, info);
         values[i - 1] = fields.value(i).seqType().coerce(value, qc, info, null, null);
       });
-      return new XQRecordMap(rt, values);
+      return new XQShapeMap(rt, values);
     }
 
     // fallback

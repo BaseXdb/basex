@@ -51,7 +51,7 @@ public final class RecordTest extends SandboxTest {
         true);
     query("let $r as record(a) := map:entries({ 'a': 1 }) return $r instance of record(a)", true);
 
-    // a record is de-sealed by map operations that do not preserve the annotation
+    // map operations that do not preserve the annotation reduce a record to its shape
     query("declare record local:coord(x as xs:integer, y as xs:integer); "
         + "let $coord := local:coord(1, 2) "
         + "let $new := map:remove($coord, 'x') "
@@ -101,9 +101,9 @@ public final class RecordTest extends SandboxTest {
         + ")", true);
   }
 
-  /** Strict field access on sealed records. */
+  /** Strict field access on records. */
   @Test public void lookup() {
-    // sealed record: lookup or call of an undeclared field is a type error
+    // record: lookup or call of an undeclared field is a type error
     error("let $r as record(a) := { 'a': 1 } return $r?b", RECORDFIELD_X_X);
     error("let $r as record(a) := { 'a': 1 } return $r('b')", RECORDFIELD_X_X);
     error("let $r as record(a) := { 'a': 1 } return $r(('b')[. != ''])", RECORDFIELD_X_X);
@@ -112,16 +112,16 @@ public final class RecordTest extends SandboxTest {
     query("let $r as record(a) := { 'a': 1 } return $r?a", 1);
     query("let $r as record(a, b) := { 'a': 1, 'b': 2 } return $r?b", 2);
     query("let $r as record(a) := { 'a': 1 } return $r('a')", 1);
-    // a plain map literal is not sealed: lookup or call of an absent key returns ()
+    // a plain map literal is no record: lookup or call of an absent key returns ()
     query("{ 'a': 1 }?b", "");
     query("{ 'a': 1 }('b')", "");
-    // map:get stays lenient even on a sealed record
+    // map:get stays lenient even on a record
     query("let $r as record(a) := { 'a': 1 } return map:get($r, 'b')", "");
     query("let $r as record(a) := { 'a': 1 } return $r => map:get('b')", "");
-    // map:put and map:remove de-seal: the teeth no longer apply to the result
+    // map:put and map:remove drop the annotation: strict access no longer applies
     query("let $r as record(a) := { 'a': 1 } return map:put($r, 'a', 2)?b", "");
     query("let $r as record(a, b) := { 'a': 1, 'b': 2 } return map:remove($r, 'a')?z", "");
-    // a declared return type re-seals a result de-sealed by map:put: the teeth apply again
+    // a declared return type re-annotates the result of map:put: strict access applies again
     query("declare record local:coord(x, y);\n"
         + "declare function local:reset($c as local:coord) as local:coord { map:put($c, 'x', 0) }; "
         + "local:reset(local:coord(1, 2)) instance of local:coord", true);
@@ -135,12 +135,12 @@ public final class RecordTest extends SandboxTest {
     query("let $r as record(a, b) := { 'a': 1, 'b': 2 } return $r?*", "1\n2");
     // nested record lookup
     query("let $o as record(in as record(x)) := { 'in': { 'x': 5 } } return $o?in?x", 5);
-    // map:get with a default stays lenient on a sealed record
+    // map:get with a default stays lenient on a record
     query("let $r as record(a) := { 'a': 1 } return map:get($r, 'b', 99)", 99);
   }
 
   /** Field lookup in a filter that is copied while the context is inlined. */
-  @Test public void recordGetInlined() {
+  @Test public void shapeGetInlined() {
     query("let $rs as record(a as xs:integer)* := ({ 'a': 1 }, { 'a': 2 }) "
         + "return $rs ! .[?a = 1]?a", 1);
     query("declare function local:f($rs as record(a)*) { $rs[?a = 1] }; "
@@ -158,7 +158,7 @@ public final class RecordTest extends SandboxTest {
         "{\"a\":3}");
     // coercion applies: an integer is promoted to the required type
     query("let $r as record(a as xs:double) := { 'a': 1 } return ($r +:= { 'a': 2 })?a", 2);
-    // the result is a sealed record: looking up an undeclared field still errors
+    // the result is still a record: looking up an undeclared field errors
     error("let $r as record(a) := { 'a': 1 } return ($r +:= { 'a': 2 })?b", RECORDFIELD_X_X);
     // an undeclared field in the right operand is a type error
     error("let $r as record(a) := { 'a': 1 } return $r +:= { 'c': 9 }", INVTYPE_X);
@@ -166,10 +166,17 @@ public final class RecordTest extends SandboxTest {
     error("let $r as record(a as xs:integer) := { 'a': 1 } return $r +:= { 'a': 'x' }", INVTYPE_X);
     // the left operand must be a record (a map with non-string keys is not)
     error("{ 1: 'a' } +:= { 1: 'b' }", INVTYPE_X);
+    // a plain map is no record, even if its field set is statically known
+    error("{ 'a': 1 } +:= { 'a': 2 }", INVTYPE_X);
+    error("{ 'a': 1 } +:= { 'b': 2 }", INVTYPE_X);
+    error("let $m := { 'a': 1 } return $m +:= { 'a': 2 }", INVTYPE_X);
+    // a record passed through a shape-typed variable is still a record
+    query("declare record local:p(x); let $m as map(*) := local:p(1) return ($m +:= { 'x': 9 })?x",
+        9);
     // updates a record built by a named constructor; unmentioned fields are preserved
     query("declare record local:p(x, y); local:p(1, 2) +:= { 'y': 9 }", "{\"x\":1,\"y\":9}");
     query("let $r as record(a, b) := { 'a': 1, 'b': 2 } return ($r +:= { 'a': 9 })?b", 2);
-    // an empty right operand leaves the record unchanged (and still sealed)
+    // an empty right operand leaves the record unchanged (annotation included)
     query("let $r as record(a) := { 'a': 1 } return $r +:= {}", "{\"a\":1}");
     error("let $r as record(a) := { 'a': 1 } return ($r +:= {})?b", RECORDFIELD_X_X);
   }
@@ -194,7 +201,7 @@ public final class RecordTest extends SandboxTest {
     query("let $r as record(x as xs:integer) := { 'x': 1 } "
         + "return $r instance of record(x as xs:decimal)", true);
 
-    // a sealed record is an instance of a structurally equal open record
+    // a record is an instance of a structurally equal shape
     query("declare record local:coord(x, y); local:coord(1, 2) instance of record(x, y)", true);
 
     // function-argument coercion widens a narrower record (a missing field becomes ())
@@ -233,31 +240,31 @@ public final class RecordTest extends SandboxTest {
         + "  { 'value': 42, 'next': { 'value': 43, 'next': { 'value': 44, 'next': () } } }\n"
         + "return $v instance of list",
         true);
-    // recursive RecordType.instanceOf
+    // recursive ShapeType.instanceOf
     query("declare record list1(value, next as list1?);\n"
         + "declare record list2(value, next as list2?);\n"
         + "fn($l as list2) as list1 { $l }({ 'value': () })",
         "{\"value\":(),\"next\":()}");
-    // recursive RecordType.eq and RecordType.instanceOf
+    // recursive ShapeType.eq and ShapeType.instanceOf
     query("declare record list1(value, next as list1?);\n"
         + "declare record list2(value, next as list2?);\n"
         + "declare function local:f1($l as list1) as list2 { $l };\n"
         + "declare function local:f2($f as fn(list2) as list1, $l as list1) as list2 { $f($l) };\n"
         + "local:f2(local:f1#1, { 'value': () })",
         "{\"value\":(),\"next\":()}");
-    // recursive RecordType.eq and RecordType.instanceOf
+    // recursive ShapeType.eq and ShapeType.instanceOf
     query("declare function local:f2($f as fn(list2) as list1, $l as list1) as list2 { $f($l) };\n"
         + "declare record list1(value, next as list1?);\n"
         + "declare record list2(value, next as record(value, next as list2?)?);\n"
         + "local:f2(fn($l as list1) as list2 { $l }, { 'value': 42, 'next': { 'value': 43 } })",
         "{\"value\":42,\"next\":{\"value\":43,\"next\":()}}");
-    // recursive RecordType.union
+    // recursive ShapeType.union
     query("declare record list1(value, next as list1?);declare record list2(item, next as list2?);"
         + "fn($l1 as list1, $l2 as list2) { "
         + "map:merge(($l1, $l2))}("
         + "{ 'value': 42, 'next': { 'value': 43 } }, { 'item': 44,'next': { 'item': 45 } })",
         "{\"value\":42,\"next\":{\"value\":43,\"next\":()},\"item\":44}");
-    // recursive RecordType.intersect
+    // recursive ShapeType.intersect
     query("declare record list1(next as list1?, x, y);\n"
         + "declare record list2(next as list2?, x, z);\n"
         + "let $f := fn($r as record(next as list2?, x as xs:boolean)) as xs:boolean { $r?x }\n"
@@ -265,7 +272,7 @@ public final class RecordTest extends SandboxTest {
         + "return $f($r)",
         "false");
 
-    // recursive RecordType.eq and RecordType.instanceOf
+    // recursive ShapeType.eq and ShapeType.instanceOf
     error("declare function local:f2($f as fn(list2) as list1, $l as list1) as list2 { $f($l) };\n"
         + "declare record list1(value, next as list1?);\n"
         + "declare record list2(value, next as record(value as xs:string, next as list2?)?);\n"
@@ -363,20 +370,20 @@ public final class RecordTest extends SandboxTest {
         + "  fold-left(<x><a/><a/></x>//a, { 'x': 0e0, 'y': 0e0 }, "
         + "    fn($acc, $node) { { 'x': $acc?x + $cx, 'y': $acc?y + 2e0 } })?x"
         + "}; local:f(1e0)",
-        2, exists("RecordGet[@type = 'xs:double']"),
-        empty("RecordGet[contains(@type, 'anyAtomicType')]"));
+        2, exists("ShapeGet[@type = 'xs:double']"),
+        empty("ShapeGet[contains(@type, 'anyAtomicType')]"));
 
     inline(true);
     // while-do: 'x' stays xs:double, 'i' stays xs:integer
     check("while-do({ 'x': 0e0, 'i': 0 }, fn($s) { $s?i < 3 }, "
         + "fn($s) { { 'x': $s?x + 1e0, 'i': $s?i + 1 } })?x",
-        3, exists("RecordGet[@type = 'xs:double']"),
-        empty("RecordGet[contains(@type, 'anyAtomicType')]"));
+        3, exists("ShapeGet[@type = 'xs:double']"),
+        empty("ShapeGet[contains(@type, 'anyAtomicType')]"));
     // fold-left over constructed nodes (not pre-evaluable): same specialization
     check("fold-left(<x><a/><a/></x>//a, { 'x': 0e0, 'y': 0e0 }, "
         + "fn($acc, $node) { { 'x': $acc?x + 1e0, 'y': $acc?y + 2e0 } })?x",
-        2, exists("RecordGet[@type = 'xs:double']"),
-        empty("RecordGet[contains(@type, 'anyAtomicType')]"));
+        2, exists("ShapeGet[@type = 'xs:double']"),
+        empty("ShapeGet[contains(@type, 'anyAtomicType')]"));
   }
 
   /** Type propagation when removing entries. */
@@ -394,13 +401,13 @@ public final class RecordTest extends SandboxTest {
         empty(func));
 
     check("declare record local:x(x, y := ()); local:x(1) => map:remove('x')", "{\"y\":()}",
-        type(func, "record(y)"));
+        type(func, "map(xs:string, item()*)"));
     check("declare record local:x(x, y := ()); local:x(1) => map:remove(<_>x</_>)", "{\"y\":()}",
-        type(func, "record(y)"));
+        type(func, "map(xs:string, item()*)"));
     check("declare record local:x(x, y := ()); local:x(1) => map:remove('y')", "{\"x\":1}",
-        type(func, "record(x)"));
+        type(func, "map(xs:string, item()*)"));
     check("declare record local:x(x, y := ()); local:x(1) => map:remove(<_>y</_>)", "{\"x\":1}",
-        type(func, "record(x)"));
+        type(func, "map(xs:string, item()*)"));
     check("declare record local:x(x, y := ()); local:x(1) => map:remove('z')", "{\"x\":1,\"y\":()}",
         empty(func), type(StaticFuncCall.class, "local:x"));
     check("declare record local:x(x, y := ()); local:x(1) => map:remove(1)", "{\"x\":1,\"y\":()}",
@@ -411,27 +418,33 @@ public final class RecordTest extends SandboxTest {
   @Test public void typePut() {
     final Function func = _MAP_PUT;
     check("declare record local:x(x); local:x(1) => map:put('x', 2)",
-        "{\"x\":2}", type(RecordSet.class, "record(x)"));
+        "{\"x\":2}", type(ShapeSet.class, "map(xs:string, item()*)"),
+        shape(ShapeSet.class, "x"));
     check("declare record local:x(x); local:x(1) => map:put(<_>x</_>, 2)",
-        "{\"x\":2}", type(RecordSet.class, "record(x)"));
+        "{\"x\":2}", type(ShapeSet.class, "map(xs:string, item()*)"),
+        shape(ShapeSet.class, "x"));
     check("declare record local:x(x); local:x(1) => map:put('y', 2)",
-        "{\"x\":1,\"y\":2}", type(func, "record(x, y)"));
+        "{\"x\":1,\"y\":2}", type(func, "map(xs:string, item()*)"));
     check("declare record local:x(x); local:x(1) => map:put(<_>y</_>, 2)",
-        "{\"x\":1,\"y\":2}", type(func, "record(x, y)"));
+        "{\"x\":1,\"y\":2}", type(func, "map(*)"));
     check("declare record local:x(x); local:x(1) => map:put(0, 0)",
         "{\"x\":1,0:0}", type(func, "map(*)"));
 
     check("declare record local:x(x as xs:int); local:x(1) => map:put('x', <x/>)",
-        "{\"x\":<x/>}", type(RecordSet.class, "record(x)"));
+        "{\"x\":<x/>}", type(ShapeSet.class, "map(xs:string, item())"));
 
     check("declare record local:x(x, y := ()); local:x(1) => map:put('x', 2)",
-        "{\"x\":2,\"y\":()}", type(RecordSet.class, "record(x, y)"));
+        "{\"x\":2,\"y\":()}", type(ShapeSet.class, "map(xs:string, item()*)"),
+        shape(ShapeSet.class, "x, y"));
     check("declare record local:x(x, y := ()); local:x(1) => map:put(<_>x</_>, 2)",
-        "{\"x\":2,\"y\":()}", type(RecordSet.class, "record(x, y)"));
+        "{\"x\":2,\"y\":()}", type(ShapeSet.class, "map(xs:string, item()*)"),
+        shape(ShapeSet.class, "x, y"));
     check("declare record local:x(x, y := ()); local:x(1) => map:put('y', 2)",
-        "{\"x\":1,\"y\":2}", type(RecordSet.class, "record(x, y)"));
+        "{\"x\":1,\"y\":2}", type(ShapeSet.class, "map(xs:string, item()*)"),
+        shape(ShapeSet.class, "x, y"));
     check("declare record local:x(x, y := ()); local:x(1) => map:put(<_>y</_>, 2)",
-        "{\"x\":1,\"y\":2}", type(RecordSet.class, "record(x, y)"));
+        "{\"x\":1,\"y\":2}", type(ShapeSet.class, "map(xs:string, item()*)"),
+        shape(ShapeSet.class, "x, y"));
     check("declare record local:x(x, y := ()); local:x(1) => map:put(0, 0)",
         "{\"x\":1,\"y\":(),0:0}", type(func, "map(*)"));
   }
@@ -441,8 +454,8 @@ public final class RecordTest extends SandboxTest {
     // map:put(R, FIELD, VALUE) coerce to RECORD  ->  R +:= map:entry(FIELD, VALUE)
     check("let $r as record(a, b) := { 'a': <a/>, 'b': 2 } "
         + "let $s as record(a, b) := map:put($r, 'a', 0) return $s",
-        "{\"a\":0,\"b\":2}", root(RecordPut.class), empty(RecordSet.class));
-    // the fused result is sealed again: strict field access applies
+        "{\"a\":0,\"b\":2}", root(RecordPut.class), empty(ShapeSet.class));
+    // the fused result is a record again: strict field access applies
     error("declare record local:coord(x, y);\n"
         + "declare function local:reset($c as local:coord) as local:coord { map:put($c, 'x', 0) }; "
         + "local:reset(local:coord(<x>1</x>, <y>2</y>))?z", RECORDFIELD_X_X);
@@ -453,7 +466,7 @@ public final class RecordTest extends SandboxTest {
     check("let $r as record(a, b) := { 'a': <a/>, 'b': 2 } "
         + "let $s as record(a, b) := $r => map:put('a', 0) => map:put('b', 9) return $s",
         "{\"a\":0,\"b\":9}",
-        root(RecordPut.class), empty(RecordSet.class), count(RecordPut.class, 1));
+        root(RecordPut.class), empty(ShapeSet.class), count(RecordPut.class, 1));
     error("declare record local:coord(x, y);\n"
         + "declare function local:reset($c as local:coord) as local:coord "
         + "{ $c => map:put('x', 0) => map:put('y', 0) };\n"
@@ -493,7 +506,7 @@ public final class RecordTest extends SandboxTest {
         "{\"a\":4,\"b\":5}");
     // a non-constant covering update also drops the operator; only the update construction remains
     check("let $r as record(a, b) := { 'a': 1, 'b': 2 } return $r +:= { 'a': <c/>, 'b': <d/> }",
-        "{\"a\":<c/>,\"b\":<d/>}", empty(RecordPut.class), count(RecordConstructor.class, 1));
+        "{\"a\":<c/>,\"b\":<d/>}", empty(RecordPut.class), count(ShapeConstructor.class, 1));
     // a covering constructor update builds the record type directly: no intermediate + coercion,
     // so the plan carries no TypeCheck (field types differ: integer arguments, double fields)
     check("declare record local:pt(x as xs:double, y as xs:double);\n"
@@ -502,7 +515,7 @@ public final class RecordTest extends SandboxTest {
         "{\"x\":3,\"y\":3}", empty(RecordPut.class), empty(TypeCheck.class));
     // coercion still applies on the collapsed path: the integer is promoted to the field type
     query("let $r as record(a as xs:double) := { 'a': 1 } return ($r +:= { 'a': 2 })?a", 2);
-    // the collapsed result stays a sealed record: an undeclared field in the update still errors
+    // the collapsed result stays a record: an undeclared field in the update still errors
     error("let $r as record(a) := { 'a': 1 } return $r +:= { 'a': 2, 'c': 3 }", INVTYPE_X);
     // a partial update does NOT trigger the rewrite: the merge is kept, unmentioned fields survive
     check("declare record local:c(x, y); local:c(<x>1</x>, <y>2</y>) +:= { 'x': 0 }",
@@ -511,7 +524,7 @@ public final class RecordTest extends SandboxTest {
     inline(true);
     // local:rec(...) is inlined and the whole expression constant-folds to a single record
     check("declare record local:rec(a, b); local:rec(1, 2) +:= local:rec(4, 5)",
-        "{\"a\":4,\"b\":5}", empty(RecordPut.class), root(XQRecordMap.class));
+        "{\"a\":4,\"b\":5}", empty(RecordPut.class), root(XQShapeMap.class));
   }
 
   /** Tests for the compact record map implementation. */
@@ -521,19 +534,19 @@ public final class RecordTest extends SandboxTest {
     check(map + " => map:get('c')", "", empty());
     check(map + " => map:get(1)", "", empty());
     check(map + " => map:get(<?_ 1?> cast as xs:integer)", "", empty());
-    check(map + " => map:put('b', 3)", "{\"a\":1,\"b\":3}", root(XQRecordMap.class));
-    check(map + " => map:put('b', xs:byte(3))", "{\"a\":1,\"b\":3}", root(XQRecordMap.class));
+    check(map + " => map:put('b', 3)", "{\"a\":1,\"b\":3}", root(XQShapeMap.class));
+    check(map + " => map:put('b', xs:byte(3))", "{\"a\":1,\"b\":3}", root(XQShapeMap.class));
     check(map + " => map:put('b', '3')", "{\"a\":1,\"b\":\"3\"}", root(XQTrieMap.class));
     check(map + " => map:put('c', 3)", "{\"a\":1,\"b\":2,\"c\":3}", root(XQTrieMap.class));
     check(map + " => map:put(3, 3)", "{\"a\":1,\"b\":2,3:3}", root(XQTrieMap.class));
     check(map + " => map:remove('b')", "{\"a\":1}", root(XQTrieMap.class));
-    check(map + " => map:remove('c')", "{\"a\":1,\"b\":2}", root(XQRecordMap.class));
-    check(map + " => map:remove(1)", "{\"a\":1,\"b\":2}", root(XQRecordMap.class));
+    check(map + " => map:remove('c')", "{\"a\":1,\"b\":2}", root(XQShapeMap.class));
+    check(map + " => map:remove(1)", "{\"a\":1,\"b\":2}", root(XQShapeMap.class));
     check(map + " => map:remove(<?_ 1?> cast as xs:integer)", "{\"a\":1,\"b\":2}",
-        root(XQRecordMap.class));
+        root(XQShapeMap.class));
 
     map = "{ 'a': 1, 'b': <?_ 2?> cast as xs:integer }";
-    check(map + " => map:get('a')", 1, type(RecordGet.class, "xs:integer"));
+    check(map + " => map:get('a')", 1, type(ShapeGet.class, "xs:integer"));
     check(map + " => map:get('c')", "", empty());
     check(map + " => map:get(1)", "", empty());
     check(map + " => map:get(<?_ 1?> cast as xs:integer)", "", empty());
@@ -546,7 +559,7 @@ public final class RecordTest extends SandboxTest {
 
   /** {@code map:empty} must be structural: a non-singleton empty record is still empty. */
   @Test public void mapEmpty() {
-    // constructed empty record: an XQRecordMap, not the shared empty map, but still empty
+    // constructed empty record: an XQShapeMap, not the shared empty map, but still empty
     query("declare record local:e(); "
         + "declare %basex:inline(0) function local:f() as map(*) { local:e() }; "
         + "map:empty(local:f())", true);
@@ -560,14 +573,14 @@ public final class RecordTest extends SandboxTest {
         + "map:empty(local:f())", false);
   }
 
-  /** A record-typed value that is not a compact XQRecordMap must still support field access. */
+  /** A record-typed value that is not a compact XQShapeMap must still support field access. */
   @Test public void recordFieldAccess() {
-    // RecordGet/RecordSet index into an XQRecordMap by field position; a record-typed plain map
+    // ShapeGet/ShapeSet index into an XQShapeMap by field position; a record-typed plain map
     // (here an XQSingletonMap, kept non-constant so it survives to runtime) must not class-cast
-    query("declare function local:f($v) { { 'a': $v }?a }; local:f(1)", 1);   // RecordGet
-    query("map:get({ 'a': (1, 2)[. = 1] }, 'a')", 1);                         // MapGet -> RecordGet
-    query("map:put({ 'a': (1, 2)[. = 1] }, 'a', 5)?a", 5);                    // RecordSet
-    // a two-field record written out of order is materialized as a field-ordered XQRecordMap,
+    query("declare function local:f($v) { { 'a': $v }?a }; local:f(1)", 1);   // ShapeGet
+    query("map:get({ 'a': (1, 2)[. = 1] }, 'a')", 1);                         // MapGet -> ShapeGet
+    query("map:put({ 'a': (1, 2)[. = 1] }, 'a', 5)?a", 5);                    // ShapeSet
+    // a two-field record written out of order is materialized as a field-ordered XQShapeMap,
     // so positional field access still resolves each field to its own value
     query("declare function local:f($v) { { 'b': $v, 'a': 9 }?a }; local:f(1)", 9);
     query("declare function local:f($v) { { 'b': $v, 'a': 9 }?b }; local:f(1)", 1);

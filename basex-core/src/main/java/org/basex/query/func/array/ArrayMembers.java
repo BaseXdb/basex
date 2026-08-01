@@ -21,7 +21,7 @@ public final class ArrayMembers extends ArrayFn {
     return new BasicIter<>(array.structSize()) {
       @Override
       public Item get(final long i) {
-        return new XQRecordMap(Records.MEMBER.get(), array.valueAt(i));
+        return new XQShapeMap(Records.MEMBER.get(), array.valueAt(i));
       }
     };
   }

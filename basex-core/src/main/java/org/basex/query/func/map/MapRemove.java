@@ -31,27 +31,20 @@ public final class MapRemove extends MapFn {
     final Expr map = arg(0), key = arg(1);
     if(map == XQMap.empty()) return map;
 
-    Type tp = null;
     final MapTypeInfo mti = MapTypeInfo.get(map).key(key);
     if(mti.field != null) {
-      if(mti.record.fields().size() <= RecordType.MAX_GENERATED_SIZE) {
-        // derive new record type with the field removed
-        final RecordType rt = mti.record.copy(mti.key, null, null, cc);
-        // return empty map if it will contain no entries
-        if(rt != null && rt.fields().isEmpty()) return XQMap.empty();
-        tp = rt;
-      }
+      // remove the only field of a record: map:remove(RECORD, FIELD) → {}
+      if(mti.shape.fields().size() == 1) return XQMap.empty();
     } else if(mti.validKey) {
       // return input map if nothing changes: map:remove({ 'a': 1 }, 'b') → { 'a': 1 }
       return map;
     }
 
-    if(tp == null && mti.mapType != null) {
+    if(mti.mapType != null) {
       // map:remove({ 1: 1 }, 'string') → { 1: 1 }
       if(mti.keyMismatch) return map;
-      tp = MapType.get(mti.mapType);
+      exprType.assign(MapType.get(mti.mapType));
     }
-    if(tp != null) exprType.assign(tp);
     return this;
   }
 }

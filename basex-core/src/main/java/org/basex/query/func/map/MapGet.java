@@ -37,7 +37,7 @@ public final class MapGet extends MapFn {
     boolean notFound = false;
     if(mti.field != null) {
       // use optimized getter for records
-      return new RecordGet(info, map, mti.index).optimize(cc);
+      return new ShapeGet(info, map, mti.index).optimize(cc);
     } else if(mti.validKey) {
       // map:get({ 'a': 1 }, 'b') → ()
       notFound = true;

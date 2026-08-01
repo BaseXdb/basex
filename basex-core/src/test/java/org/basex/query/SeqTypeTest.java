@@ -139,7 +139,7 @@ public final class SeqTypeTest {
    * Tests for {@link SeqType#eq(SeqType)}.
    */
   @Test public void eq() {
-    final TokenObjectMap<RecordField> fld1 = new TokenObjectMap<>(),
+    final TokenObjectMap<ShapeField> fld1 = new TokenObjectMap<>(),
         fld2 = new TokenObjectMap<>();
     final QNm r1Name = new QNm(Token.token("r1")),
       r2Name = new QNm(Token.token("r2"));
@@ -150,14 +150,14 @@ public final class SeqTypeTest {
       // r2 record(next? as r2, x)
       r2 = new TypeRef(r2Name, ii).seqType();
 
-    fld1.put(Token.token("next"), new RecordField(r1.union(ZERO)));
-    fld1.put(Token.token("x"), new RecordField(ITEM_ZM));
+    fld1.put(Token.token("next"), new ShapeField(r1.union(ZERO)));
+    fld1.put(Token.token("x"), new ShapeField(ITEM_ZM));
 
-    fld2.put(Token.token("next"), new RecordField(r2.union(ZERO)));
-    fld2.put(Token.token("x"), new RecordField(ITEM_ZM));
+    fld2.put(Token.token("next"), new ShapeField(r2.union(ZERO)));
+    fld2.put(Token.token("x"), new ShapeField(ITEM_ZM));
 
-    ((TypeRef) r1.type).resolve(new RecordType(fld1));
-    ((TypeRef) r2.type).resolve(new RecordType(fld2));
+    ((TypeRef) r1.type).resolve(new ShapeType(fld1));
+    ((TypeRef) r2.type).resolve(new ShapeType(fld2));
 
     assertTrue(r1.eq(r2));
     assertTrue(r2.eq(r1));
@@ -407,7 +407,7 @@ public final class SeqTypeTest {
     assertTrue(c7.instanceOf(GNODE_O));
     assertTrue(GNODE_O.instanceOf(c7));
 
-    final TokenObjectMap<RecordField> fld1 = new TokenObjectMap<>(), fld2 = new TokenObjectMap<>();
+    final TokenObjectMap<ShapeField> fld1 = new TokenObjectMap<>(), fld2 = new TokenObjectMap<>();
     final QNm r1Name = new QNm(Token.token("r1")), r2Name = new QNm(Token.token("r2"));
     final InputInfo ii = new InputInfo(getClass().getName(), 1, 1);
     final SeqType
@@ -416,14 +416,14 @@ public final class SeqTypeTest {
       // r2 record(next? as r2, x)
       r2 = new TypeRef(r2Name, ii).seqType();
 
-    fld1.put(Token.token("next"), new RecordField(r1.union(ZERO)));
-    fld1.put(Token.token("x"), new RecordField(ITEM_ZM));
+    fld1.put(Token.token("next"), new ShapeField(r1.union(ZERO)));
+    fld1.put(Token.token("x"), new ShapeField(ITEM_ZM));
 
-    fld2.put(Token.token("next"), new RecordField(r2.union(ZERO)));
-    fld2.put(Token.token("x"), new RecordField(ITEM_ZM));
+    fld2.put(Token.token("next"), new ShapeField(r2.union(ZERO)));
+    fld2.put(Token.token("x"), new ShapeField(ITEM_ZM));
 
-    ((TypeRef) r1.type).resolve(new RecordType(fld1));
-    ((TypeRef) r2.type).resolve(new RecordType(fld2));
+    ((TypeRef) r1.type).resolve(new ShapeType(fld1));
+    ((TypeRef) r2.type).resolve(new ShapeType(fld2));
 
     assertTrue(RECORD_O.instanceOf(FUNCTION_O));
     assertFalse(MAP_O.instanceOf(RECORD_O));
@@ -659,47 +659,47 @@ public final class SeqTypeTest {
     combine(c6, FUNCTION_O, ITEM_O, op);
     combine(c6, STRING_O, ITEM_O, op);
 
-    final TokenObjectMap<RecordField> fld1 = new TokenObjectMap<>(),
+    final TokenObjectMap<ShapeField> fld1 = new TokenObjectMap<>(),
         fld2 = new TokenObjectMap<>(),
         fld3 = new TokenObjectMap<>(),
         fld5 = new TokenObjectMap<>(),
         fld6 = new TokenObjectMap<>(),
         fld8 = new TokenObjectMap<>(),
         fld9 = new TokenObjectMap<>();
-    fld1.put(Token.token("a"), new RecordField(INTEGER_O));
-    fld2.put(Token.token("a"), new RecordField(STRING_O));
-    fld3.put(Token.token("a"), new RecordField(ANY_ATOMIC_TYPE_O));
-    fld5.put(Token.token("a"), new RecordField(INTEGER_O.union(ZERO)));
-    fld6.put(Token.token("b"), new RecordField(INTEGER_O.union(ZERO)));
+    fld1.put(Token.token("a"), new ShapeField(INTEGER_O));
+    fld2.put(Token.token("a"), new ShapeField(STRING_O));
+    fld3.put(Token.token("a"), new ShapeField(ANY_ATOMIC_TYPE_O));
+    fld5.put(Token.token("a"), new ShapeField(INTEGER_O.union(ZERO)));
+    fld6.put(Token.token("b"), new ShapeField(INTEGER_O.union(ZERO)));
     final QNm r8Name = new QNm(Token.token("r8")),
       r9Name = new QNm(Token.token("r9"));
     final InputInfo ii = new InputInfo(getClass().getName(), 1, 1);
     final SeqType
       // record(a as xs:integer)
-      r1 = new RecordType(true, fld1).seqType(),
+      r1 = new RecordType(fld1).seqType(),
       // record(a as xs:string)
-      r2 = new RecordType(true, fld2).seqType(),
+      r2 = new RecordType(fld2).seqType(),
       // record(a as xs:anyAtomicType)
-      r3 = new RecordType(true, fld3).seqType(),
+      r3 = new RecordType(fld3).seqType(),
       // record(a as xs:integer?)
-      r5 = new RecordType(true, fld5).seqType(),
+      r5 = new RecordType(fld5).seqType(),
       // record(b as xs:integer?)
-      r6 = new RecordType(true, fld6).seqType(),
+      r6 = new RecordType(fld6).seqType(),
       // r8 record(next as r8?, x, y)
       r8 = new TypeRef(r8Name, ii).seqType(),
       // r9 record(next as r9?, x, z)
       r9 = new TypeRef(r9Name, ii).seqType();
 
-    fld8.put(Token.token("next"), new RecordField(r8.union(ZERO)));
-    fld8.put(Token.token("x"), new RecordField(ITEM_ZM));
-    fld8.put(Token.token("y"), new RecordField(ITEM_ZM));
+    fld8.put(Token.token("next"), new ShapeField(r8.union(ZERO)));
+    fld8.put(Token.token("x"), new ShapeField(ITEM_ZM));
+    fld8.put(Token.token("y"), new ShapeField(ITEM_ZM));
 
-    fld9.put(Token.token("next"), new RecordField(r9.union(ZERO)));
-    fld9.put(Token.token("x"), new RecordField(ITEM_ZM));
-    fld9.put(Token.token("z"), new RecordField(ITEM_ZM));
+    fld9.put(Token.token("next"), new ShapeField(r9.union(ZERO)));
+    fld9.put(Token.token("x"), new ShapeField(ITEM_ZM));
+    fld9.put(Token.token("z"), new ShapeField(ITEM_ZM));
 
-    ((TypeRef) r8.type).resolve(new RecordType(fld8));
-    ((TypeRef) r9.type).resolve(new RecordType(fld9));
+    ((TypeRef) r8.type).resolve(new ShapeType(fld8));
+    ((TypeRef) r9.type).resolve(new ShapeType(fld9));
 
     combine(RECORD_O, FUNCTION_O, FUNCTION_O, op);
     combine(RECORD_O, MAP_O, MAP_O, op);
@@ -967,7 +967,7 @@ public final class SeqTypeTest {
     combine(c6, INTEGER_O, null, op);
     combine(c6, ITEM_O, c6, op);
 
-    final TokenObjectMap<RecordField> fld1 = new TokenObjectMap<>(),
+    final TokenObjectMap<ShapeField> fld1 = new TokenObjectMap<>(),
         fld2 = new TokenObjectMap<>(),
         fld3 = new TokenObjectMap<>(),
         fld5 = new TokenObjectMap<>(),
@@ -976,44 +976,44 @@ public final class SeqTypeTest {
         fld8 = new TokenObjectMap<>(),
         fld9 = new TokenObjectMap<>(),
         fld10 = new TokenObjectMap<>();
-    fld1.put(Token.token("a"), new RecordField(INTEGER_O));
-    fld2.put(Token.token("a"), new RecordField(STRING_O));
-    fld3.put(Token.token("a"), new RecordField(ANY_ATOMIC_TYPE_O));
-    fld5.put(Token.token("a"), new RecordField(INTEGER_O.union(ZERO)));
-    fld6.put(Token.token("b"), new RecordField(INTEGER_O.union(ZERO)));
-    fld7.put(Token.token("a"), new RecordField(INTEGER_O));
-    fld7.put(Token.token("b"), new RecordField(INTEGER_O.union(ZERO)));
-    fld10.put(Token.token("a"), new RecordField(INTEGER_O.union(ZERO)));
-    fld10.put(Token.token("b"), new RecordField(INTEGER_O.union(ZERO)));
+    fld1.put(Token.token("a"), new ShapeField(INTEGER_O));
+    fld2.put(Token.token("a"), new ShapeField(STRING_O));
+    fld3.put(Token.token("a"), new ShapeField(ANY_ATOMIC_TYPE_O));
+    fld5.put(Token.token("a"), new ShapeField(INTEGER_O.union(ZERO)));
+    fld6.put(Token.token("b"), new ShapeField(INTEGER_O.union(ZERO)));
+    fld7.put(Token.token("a"), new ShapeField(INTEGER_O));
+    fld7.put(Token.token("b"), new ShapeField(INTEGER_O.union(ZERO)));
+    fld10.put(Token.token("a"), new ShapeField(INTEGER_O.union(ZERO)));
+    fld10.put(Token.token("b"), new ShapeField(INTEGER_O.union(ZERO)));
     final QNm r8Name = new QNm(Token.token("r8")),
       r9Name = new QNm(Token.token("r9"));
     final InputInfo ii = new InputInfo(getClass().getName(), 1, 1);
     final SeqType
       // record(a as xs:integer)
-      r1 = new RecordType(true, fld1).seqType(),
+      r1 = new RecordType(fld1).seqType(),
       // record(a as xs:string)
-      r2 = new RecordType(true, fld2).seqType(),
+      r2 = new RecordType(fld2).seqType(),
       // record(a as xs:anyAtomicType)
-      r3 = new RecordType(true, fld3).seqType(),
+      r3 = new RecordType(fld3).seqType(),
       // record(a? as xs:integer)
-      r5 = new RecordType(true, fld5).seqType(),
+      r5 = new RecordType(fld5).seqType(),
       // record(b? as xs:integer)
-      r6 = new RecordType(true, fld6).seqType(),
+      r6 = new RecordType(fld6).seqType(),
       // r8 record(next? as r8, x, y)
       r8 = new TypeRef(r8Name, ii).seqType(),
       // r9 record(next? as r9, x, z)
       r9 = new TypeRef(r9Name, ii).seqType();
 
-    fld8.put(Token.token("next"), new RecordField(r8.union(ZERO)));
-    fld8.put(Token.token("x"), new RecordField(ITEM_ZM));
-    fld8.put(Token.token("y"), new RecordField(ITEM_ZM));
+    fld8.put(Token.token("next"), new ShapeField(r8.union(ZERO)));
+    fld8.put(Token.token("x"), new ShapeField(ITEM_ZM));
+    fld8.put(Token.token("y"), new ShapeField(ITEM_ZM));
 
-    fld9.put(Token.token("next"), new RecordField(r9.union(ZERO)));
-    fld9.put(Token.token("x"), new RecordField(ITEM_ZM));
-    fld9.put(Token.token("z"), new RecordField(ITEM_ZM));
+    fld9.put(Token.token("next"), new ShapeField(r9.union(ZERO)));
+    fld9.put(Token.token("x"), new ShapeField(ITEM_ZM));
+    fld9.put(Token.token("z"), new ShapeField(ITEM_ZM));
 
-    ((TypeRef) r8.type).resolve(new RecordType(fld8));
-    ((TypeRef) r9.type).resolve(new RecordType(fld9));
+    ((TypeRef) r8.type).resolve(new ShapeType(fld8));
+    ((TypeRef) r9.type).resolve(new ShapeType(fld9));
 
     combine(RECORD_O, FUNCTION_O, RECORD_O, op);
     combine(RECORD_O, MAP_O, RECORD_O, op);

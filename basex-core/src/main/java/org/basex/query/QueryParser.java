@@ -411,7 +411,7 @@ public class QueryParser extends InputParser {
    */
   private static boolean cnstrType(final Type type) {
     final Type tp = TypeRef.deref(type);
-    if(tp instanceof RecordType) return tp != Types.RECORD;
+    if(tp instanceof ShapeType) return tp != Types.RECORD;
     return tp.instanceOf(BasicType.ANY_ATOMIC_TYPE) &&
         !tp.oneOf(BasicType.ANY_ATOMIC_TYPE, BasicType.NOTATION);
   }
@@ -429,7 +429,7 @@ public class QueryParser extends InputParser {
     final Type tp = TypeRef.deref(tc.seqType().type);
     if(tp instanceof final RecordType rt) {
       // record type: derive parameters from record fields (initializing expressions are ignored)
-      final TokenObjectMap<RecordField> fields = rt.fields();
+      final TokenObjectMap<ShapeField> fields = rt.fields();
       for(final byte[] key : fields) {
         params.add(new QNm(key), fields.get(key).seqType(), null, null);
       }
@@ -439,7 +439,7 @@ public class QueryParser extends InputParser {
       for(int i = 0; i < pv.length; ++i) {
         args[i] = new VarRef(null, pv[i]);
       }
-      expr = RecordConstructor.get(ii, rt, args);
+      expr = ShapeConstructor.get(ii, rt, args);
     } else {
       // generalized atomic type: cast the supplied argument to the declared type
       final SeqType st = tc.seqType().type.seqType(Occ.ZERO_OR_ONE);
@@ -566,7 +566,7 @@ public class QueryParser extends InputParser {
         } else if(wsConsumeWs(RECORD)) {
           // types cannot be updating
           if(anns.contains(Annotation.UPDATING)) throw error(UPDATINGTYPE);
-          namedRecordTypeDecl(anns.check(false, true));
+          namedShapeTypeDecl(anns.check(false, true));
         } else if(!anns.isEmpty()) {
           throw error(VARFUNC);
         } else {
@@ -1149,17 +1149,17 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "NamedRecordTypeDecl" rule.
+   * Parses the "NamedShapeTypeDecl" rule.
    * @param anns annotations
    * @throws QueryException query exception
    */
-  private void namedRecordTypeDecl(final AnnList anns) throws QueryException {
+  private void namedShapeTypeDecl(final AnnList anns) throws QueryException {
     final InputInfo ii = info();
     final QNm qn = eQName(sc.elemNS, TYPENAME);
     if(declaredTypes.contains(qn)) throw error(DUPLTYPE_X, qn.string());
     if(NSGlobal.reserved(qn.uri())) throw error(TYPERESERVED_X, qn.string());
     wsCheck("(");
-    final TokenObjectMap<RecordField> fields = new TokenObjectMap<>();
+    final TokenObjectMap<ShapeField> fields = new TokenObjectMap<>();
     if(!wsConsume(")")) {
       boolean exprRequired = false;
       do {
@@ -1176,7 +1176,7 @@ public class QueryParser extends InputParser {
           localVars.popContext();
           exprRequired = true;
         }
-        fields.put(name, new RecordField(seqType, expr));
+        fields.put(name, new ShapeField(seqType, expr));
       } while(wsConsume(","));
       wsCheck(")");
     }
@@ -1187,7 +1187,7 @@ public class QueryParser extends InputParser {
       publicTypes.put(qn, rt.seqType());
       qc.namedTypes.put(qn, rt.seqType());
     }
-    declareRecordConstructor(rt, ii);
+    declareShapeConstructor(rt, ii);
   }
 
   /**
@@ -1196,15 +1196,15 @@ public class QueryParser extends InputParser {
    * @param ii input info
    * @throws QueryException query exception
    */
-  private void declareRecordConstructor(final RecordType rt, final InputInfo ii)
+  private void declareShapeConstructor(final RecordType rt, final InputInfo ii)
       throws QueryException {
 
-    final TokenObjectMap<RecordField> fields = rt.fields();
+    final TokenObjectMap<ShapeField> fields = rt.fields();
     localVars.pushContext(false);
     final Params params = new Params();
     boolean defaults = false;
     for(final byte[] key : fields) {
-      final RecordField rf = fields.get(key);
+      final ShapeField rf = fields.get(key);
       final Expr init = rf.init();
       if(init != null) {
         defaults = true;
@@ -1221,7 +1221,7 @@ public class QueryParser extends InputParser {
     for(int i = 0; i < pv.length; ++i) {
       args[i] = new VarRef(null, pv[i]);
     }
-    final Expr expr = RecordConstructor.get(ii, rt, args);
+    final Expr expr = ShapeConstructor.get(ii, rt, args);
     final String doc = docBuilder.toString();
     final VarScope vs = localVars.popContext();
     final StaticFunc func = qc.functions.declare(sc, rt.name(), params, expr, rt.anns(), doc, vs,
@@ -4177,7 +4177,7 @@ public class QueryParser extends InputParser {
         return type;
       }
       // record(): empty record (distinct from the abstract record(*))
-      if(wsConsume(")")) return qc.shared.record(new RecordType(true, new TokenObjectMap<>(0)));
+      if(wsConsume(")")) return qc.shared.shape(new RecordType(new TokenObjectMap<>(0)));
     } else if(wsConsume("*")) {
       // wildcard
       wsCheck(")");
@@ -4185,19 +4185,19 @@ public class QueryParser extends InputParser {
     }
 
     // record
-    if(type instanceof RecordType) {
-      final TokenObjectMap<RecordField> fields = new TokenObjectMap<>();
+    if(type instanceof ShapeType) {
+      final TokenObjectMap<ShapeField> fields = new TokenObjectMap<>();
       if(!consume(')')) {
         do {
           skipWs();
           final byte[] name = quote(current()) ? stringLiteral() : ncName(NOSTRNCN_X, false);
           final SeqType seqType = wsConsume(AS) ? sequenceType() : null;
           if(fields.contains(name)) throw error(DUPFIELD_X, name);
-          fields.put(name, new RecordField(seqType));
+          fields.put(name, new ShapeField(seqType));
         } while(wsConsume(","));
         check(')');
       }
-      return qc.shared.record(new RecordType(true, fields));
+      return qc.shared.shape(new RecordType(fields));
     }
     // map
     if(type instanceof MapType) {

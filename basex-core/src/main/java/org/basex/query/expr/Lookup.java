@@ -92,9 +92,9 @@ public final class Lookup extends Arr {
     final boolean map = it instanceof MapType, array = it instanceof ArrayType;
     if(map || array) {
       // keep the lookup if a runtime value could be a strict record that lacks a requested key
-      if(keys != WILDCARD && it instanceof final MapType mt && (mt instanceof final RecordType rt
-          ? rt.strict() && !(ks == 1 && keys instanceof final AStr str &&
-              rt.fields().contains(str.string(info)))
+      if(keys != WILDCARD && it instanceof final MapType mt && (mt instanceof final ShapeType sh
+          ? sh.strict() && !(ks == 1 && keys instanceof final AStr str &&
+              sh.fields().contains(str.string(info)))
           : mt.keyType().intersect(BasicType.STRING) != null)) return this;
 
       /* REWRITE LOOKUP:

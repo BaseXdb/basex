@@ -493,10 +493,31 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected final Path toPath(final String path, final QueryContext qc) throws QueryException {
+    final Path p = toRawPath(path);
+    final Path cd = qc.resources.currentDir;
+    return cd != null ? cd.resolve(p) : p;
+  }
+
+  /**
+   * Evaluates an expression to a file path that is not resolved against the current directory.
+   * @param expr expression
+   * @param qc query context
+   * @return file path
+   * @throws QueryException query exception
+   */
+  protected final Path toRawPath(final Expr expr, final QueryContext qc) throws QueryException {
+    return toRawPath(toString(expr, qc));
+  }
+
+  /**
+   * Converts a path to a file path that is not resolved against the current directory.
+   * @param path path string
+   * @return file path
+   * @throws QueryException query exception
+   */
+  protected final Path toRawPath(final String path) throws QueryException {
     try {
-      final Path p = path.startsWith(IO.FILEPREF) ? Paths.get(new URI(path)) : Paths.get(path);
-      final Path cd = qc.resources.currentDir;
-      return cd != null ? cd.resolve(p) : p;
+      return path.startsWith(IO.FILEPREF) ? Paths.get(new URI(path)) : Paths.get(path);
     } catch(final IllegalArgumentException | URISyntaxException ex) {
       throw FILE_INVALID_PATH_X.get(info, path).cause(ex);
     }

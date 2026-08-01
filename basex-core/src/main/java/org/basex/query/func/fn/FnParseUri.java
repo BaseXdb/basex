@@ -169,7 +169,7 @@ public class FnParseUri extends StandardFunc {
     }
     filepath = XMLToken.decodeUri(filepath);
 
-    return new XQRecordMap(Records.URI_STRUCTURE.get(),
+    return new XQShapeMap(Records.URI_STRUCTURE.get(),
       toValue(value), toValue(scheme), absolute ? Bln.TRUE : Empty.VALUE, toValue(hierarchical),
       toValue(authority), toValue(userinfo), toValue(host), toValue(prt),
       toValue(path), toValue(query), toValue(fragment), toValue(StrSeq.get(segments)),

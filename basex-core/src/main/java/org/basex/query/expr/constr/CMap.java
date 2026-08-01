@@ -67,24 +67,24 @@ public final class CMap extends Arr {
     }
 
     // not too large, only strings as keys? replace with record constructor
-    boolean record = el / 2 <= RecordType.MAX_GENERATED_SIZE;
+    boolean record = el / 2 <= ShapeType.MAX_GENERATED_SIZE;
     for(int e = 0; e < el && record; e += 2) {
       if(nested(e) || !(exprs[e] instanceof AStr && exprs[e].seqType().eq(Types.STRING_O))) {
         record = false;
       }
     }
     if(record) {
-      final TokenObjectMap<RecordField> fields = new TokenObjectMap<>(el / 2);
+      final TokenObjectMap<ShapeField> fields = new TokenObjectMap<>(el / 2);
       final ExprList args = new ExprList(el / 2);
       for(int e = 0; e < el; e += 2) {
         final Expr key = exprs[e], value = exprs[e + 1];
-        if(fields.put(((AStr) key).string(info), new RecordField(value.seqType())) != null) {
+        if(fields.put(((AStr) key).string(info), new ShapeField(value.seqType())) != null) {
           throw MAPDUPLKEY_X.get(info, key);
         }
         args.add(value);
       }
-      final RecordType rt = cc.qc.shared.record(new RecordType(fields));
-      return RecordConstructor.get(info, rt, args.finish()).optimize(cc);
+      final ShapeType sh = cc.qc.shared.shape(new ShapeType(fields));
+      return ShapeConstructor.get(info, sh, args.finish()).optimize(cc);
     }
 
     // determine static types
@@ -125,10 +125,10 @@ public final class CMap extends Arr {
     } else if(expr instanceof CMap) {
       // { 1: <a/> }
       list.add(expr.args());
-    } else if(expr instanceof RecordConstructor) {
+    } else if(expr instanceof ShapeConstructor) {
       // { 'a': <a/> }
-      final RecordType rt = (RecordType) expr.seqType().type;
-      final TokenObjectMap<RecordField> fields = rt.fields();
+      final ShapeType sh = (ShapeType) expr.seqType().type;
+      final TokenObjectMap<ShapeField> fields = sh.fields();
       final int fs = fields.size();
       for(int f = 1; f <= fs; f++) list.add(Str.get(fields.key(f))).add(expr.arg(f - 1));
     } else if(Function._MAP_ENTRY.is(expr)) {

@@ -731,7 +731,7 @@ public final class XQuery4Test extends SandboxTest {
         "{0:0,1:1,2:2,3:3,4:4,5:5,6:6}", root(CMap.class));
     check("{ (1 to 6) ! { .: . } }", "{1:1,2:2,3:3,4:4,5:5,6:6}", root(CMap.class));
 
-    check("{ 'one': 1, { 'two': 2 } }", "{\"one\":1,\"two\":2}", root(XQRecordMap.class));
+    check("{ 'one': 1, { 'two': 2 } }", "{\"one\":1,\"two\":2}", root(XQShapeMap.class));
     check("{ 'one': 1, { 2: 'two' } }", "{\"one\":1,2:\"two\"}", root(XQItemValueMap.class));
 
     check("{ 0: <a/>, 1: <b/> } => map:size()", 2, root(Itr.class));

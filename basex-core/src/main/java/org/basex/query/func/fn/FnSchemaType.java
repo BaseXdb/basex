@@ -94,7 +94,7 @@ public class FnSchemaType extends StandardFunc {
       } else {
         return Empty.VALUE;
       }
-      vb.add(new XQRecordMap(Records.SCHEMA_TYPE.get(),
+      vb.add(new XQShapeMap(Records.SCHEMA_TYPE.get(),
         name,
         Bln.get(!type.oneOf(ANY_TYPE, UNTYPED)),
         baseType == null ? TypeAnnotation.funcItem(info) : TypeAnnotation.funcItem(info, baseType),

@@ -236,7 +236,7 @@ public final class FnXsdValidator extends StandardFunc {
       final boolean valid = errors.isEmpty();
       if(!valid) typed = Empty.VALUE;
       final Value details = !valid && errorDetails ? details(errors, qc) : Empty.VALUE;
-      return new XQRecordMap(Records.VALIDATION_RESULT.get(), Bln.get(valid), typed, details);
+      return new XQShapeMap(Records.VALIDATION_RESULT.get(), Bln.get(valid), typed, details);
     }
 
     /**

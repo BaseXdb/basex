@@ -32,23 +32,16 @@ public final class MapPut extends MapFn {
     // map:put({}, $k, $v) → map:entry($k, $v)
     if(map == XQMap.empty()) return cc.function(_MAP_ENTRY, info, key, value);
 
-    Type tp = null;
     final MapTypeInfo mti = MapTypeInfo.get(map).key(key);
     if(mti.field != null) {
       // use optimized setter for records
-      return new RecordSet(info, map, mti.index, value).optimize(cc);
-    } else if(mti.validKey) {
-      if(mti.key != null && mti.record.fields().size() < RecordType.MAX_GENERATED_SIZE) {
-        // otherwise, derive new record type
-        tp = mti.record.copy(null, mti.key, value.seqType(), cc);
-      }
+      return new ShapeSet(info, map, mti.index, value).optimize(cc);
     }
 
-    if(tp == null && mti.mapType != null) {
+    if(mti.mapType != null) {
       final Type akt = key.seqType().type.atomic();
-      if(akt != null) tp = mti.mapType.union(akt, value.seqType());
+      if(akt != null) exprType.assign(mti.mapType.union(akt, value.seqType()));
     }
-    if(tp != null) exprType.assign(tp);
     return this;
   }
 }

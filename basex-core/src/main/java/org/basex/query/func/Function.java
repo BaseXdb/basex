@@ -2183,11 +2183,11 @@ public enum Function implements AFunction {
   private final FuncDefinition definition;
 
   /**
-   * Constructs a function signature for a predefined record constructor from a RecordType.
+   * Constructs a function signature for a predefined record constructor from a ShapeType.
    * @param rt record type
    */
   Function(final RecordType rt) {
-    this(RecordConstructor.definition(rt));
+    this(ShapeConstructor.definition(rt));
   }
 
   /**

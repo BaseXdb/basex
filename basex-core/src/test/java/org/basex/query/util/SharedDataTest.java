@@ -36,8 +36,8 @@ public final class SharedDataTest extends SandboxTest {
         + "=> count()", N);
   }
 
-  /** Concurrent usage of SharedData#recordTypes. */
-  @Test public void recordType() {
+  /** Concurrent usage of SharedData#shapeTypes. */
+  @Test public void shapeType() {
     query("xquery:fork-join(\n"
         + "  for $i in 1 to " + N + "\n"
         + "  return function() { \n"

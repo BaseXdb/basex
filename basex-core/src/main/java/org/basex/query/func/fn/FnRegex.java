@@ -27,7 +27,7 @@ public final class FnRegex extends RegExFn {
     regExpr(pattern, flags, qc);
     final Str pttrn = Str.get(pattern);
     final Str flgs = Str.get(flags);
-    return new XQRecordMap(Records.COMPILED_REGEX.get(), pttrn, flgs,
+    return new XQShapeMap(Records.COMPILED_REGEX.get(), pttrn, flgs,
         valueFunc(MATCHES, qc, pttrn, flgs),
         valueFunc(TOKENIZE, qc, pttrn, flgs),
         valueReplacementFunc(qc, pttrn, flgs),

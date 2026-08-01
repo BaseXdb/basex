@@ -21,13 +21,13 @@ public final class SharedData {
   /** Cached tokens. */
   private final WeakTokenSet tokens = new WeakTokenSet();
   /** Cached record types. */
-  private final IntObjectMap<ArrayList<RecordType>> recordTypes = new IntObjectMap<>();
+  private final IntObjectMap<ArrayList<ShapeType>> shapeTypes = new IntObjectMap<>();
 
   /**
    * Constructor.
    */
   public SharedData() {
-    record(Types.RECORD);
+    shape(Types.RECORD);
   }
 
   /**
@@ -111,19 +111,19 @@ public final class SharedData {
   }
 
   /**
-   * Creates a new record or returns an existing instance.
-   * @param rt record type
-   * @return new or already registered record type
+   * Registers a shape or returns an existing instance.
+   * @param sh shape
+   * @return new or already registered shape
    */
-  public RecordType record(final RecordType rt) {
-    synchronized(recordTypes) {
-      final ArrayList<RecordType> types = recordTypes.computeIfAbsent(rt.fields().size(),
+  public ShapeType shape(final ShapeType sh) {
+    synchronized(shapeTypes) {
+      final ArrayList<ShapeType> types = shapeTypes.computeIfAbsent(sh.fields().size(),
           ArrayList::new);
-      for(final RecordType type : types) {
-        if(type.equals(rt)) return type;
+      for(final ShapeType type : types) {
+        if(type.equals(sh)) return type;
       }
-      types.add(rt);
-      return rt;
+      types.add(sh);
+      return sh;
     }
   }
 }

@@ -15,13 +15,11 @@ import org.basex.util.hash.*;
 public final class MapTypeInfo {
   /** Map type ({@code null} if statically unknown). */
   public MapType mapType;
-  /** Record type ({@code null} if statically unknown). */
-  public RecordType record;
-  /** Key ({@code null} if statically unknown). */
-  public byte[] key;
-  /** Record field ({@code null} if statically unknown, or if key is unknown). */
-  public RecordField field;
-  /** Record field index ({@code 0} if statically unknown, or if key is unknown). */
+  /** Shape of the map ({@code null} if statically unknown). */
+  public ShapeType shape;
+  /** Field ({@code null} if statically unknown, or if key is unknown). */
+  public ShapeField field;
+  /** Field index ({@code 0} if statically unknown, or if key is unknown). */
   public Integer index;
   /** Key type mismatch. */
   public boolean keyMismatch;
@@ -39,7 +37,7 @@ public final class MapTypeInfo {
     if(st.one() && st.type instanceof final MapType mt) {
       mti.mapType = mt;
       // record(*) has an unknown field set: no static information on single fields
-      if(mt instanceof final RecordType rt && !rt.any()) mti.record = rt;
+      if(mt instanceof final ShapeType sh && !sh.any()) mti.shape = sh;
     }
     return mti;
   }
@@ -51,12 +49,12 @@ public final class MapTypeInfo {
    * @throws QueryException query exception
    */
   public MapTypeInfo key(final Expr expr) throws QueryException {
-    if(record != null) {
+    if(shape != null) {
       if(expr instanceof final Item item) {
         final Type kt = expr.seqType().type;
         if(kt.isStringOrUntyped()) {
-          final TokenObjectMap<RecordField> fields = record.fields();
-          key = item.string(null);
+          final TokenObjectMap<ShapeField> fields = shape.fields();
+          final byte[] key = item.string(null);
           index = fields.index(key);
           field = fields.get(key);
         }

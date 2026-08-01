@@ -8,12 +8,12 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 
 /**
- * Record field definition.
+ * Field definition of a shape.
  *
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
-public final class RecordField {
+public final class ShapeField {
   /** Field type. */
   private final SeqType seqType;
   /** Initializing expression (can be {@code null}). */
@@ -23,7 +23,7 @@ public final class RecordField {
    * Constructor for a field without initializer.
    * @param seqType field type (can be {@code null})
    */
-  public RecordField(final SeqType seqType) {
+  public ShapeField(final SeqType seqType) {
     this(seqType, null);
   }
 
@@ -32,7 +32,7 @@ public final class RecordField {
    * @param seqType field type (can be {@code null})
    * @param init initializing expression (can be {@code null})
    */
-  public RecordField(final SeqType seqType, final Expr init) {
+  public ShapeField(final SeqType seqType, final Expr init) {
     this.seqType = seqType == null ? Types.ITEM_ZM : seqType;
     this.init = init;
   }
@@ -55,7 +55,7 @@ public final class RecordField {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof final RecordField rf &&
+    return this == obj || obj instanceof final ShapeField rf &&
         seqType.eq(rf.seqType) && Objects.equals(init, rf.init);
   }
 

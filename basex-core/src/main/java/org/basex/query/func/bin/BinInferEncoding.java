@@ -25,7 +25,7 @@ public final class BinInferEncoding extends BinFn {
 
     try(TextInput ti = new TextInput(value.input(info), encoding)) {
       final String enc = ti.encoding();
-      return new XQRecordMap(Records.INFER_ENCODING.get(), Str.get(enc), Itr.get(ti.position()));
+      return new XQShapeMap(Records.INFER_ENCODING.get(), Str.get(enc), Itr.get(ti.position()));
     } catch(final IOException ex) {
       throw BIN_CE_X.get(info, ex);
     }

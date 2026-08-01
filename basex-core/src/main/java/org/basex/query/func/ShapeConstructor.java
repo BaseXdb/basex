@@ -16,21 +16,21 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Constructor function for some record type.
+ * Constructor function for a shape.
  */
-public class RecordConstructor extends StandardFunc {
-  /** Record type. */
-  private RecordType recordType;
+public class ShapeConstructor extends StandardFunc {
+  /** Shape. */
+  private ShapeType shapeType;
   /** Field names. */
   private final QNm[] names;
 
   /**
    * Constructor.
-   * @param recordType record type
+   * @param shapeType shape
    */
-  public RecordConstructor(final RecordType recordType) {
-    this.recordType = recordType;
-    final TokenObjectMap<RecordField> fields = recordType.fields();
+  public ShapeConstructor(final ShapeType shapeType) {
+    this.shapeType = shapeType;
+    final TokenObjectMap<ShapeField> fields = shapeType.fields();
     final int fs = fields.size();
     names = new QNm[fs];
     for(int f = 1; f <= fs; ++f) {
@@ -39,50 +39,50 @@ public class RecordConstructor extends StandardFunc {
   }
 
   /**
-   * Returns a constructor function for a record type.
-   * @param rt record type
+   * Returns a constructor function for a shape.
+   * @param sh shape
    * @param ii input info
    * @param args constructor arguments
    * @return constructor function
    */
-  public static RecordConstructor get(final InputInfo ii, final RecordType rt, final Expr[] args) {
-    final RecordConstructor rc = new RecordConstructor(rt);
-    rc.init(ii, definition(rt), args);
-    return rc;
+  public static ShapeConstructor get(final InputInfo ii, final ShapeType sh, final Expr[] args) {
+    final ShapeConstructor sc = new ShapeConstructor(sh);
+    sc.init(ii, definition(sh), args);
+    return sc;
   }
 
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final TokenObjectMap<RecordField> fields = recordType.fields();
+    final TokenObjectMap<ShapeField> fields = shapeType.fields();
     final int fs = fields.size(), el = exprs.length;
     final Value[] values = new Value[fs];
     for(int f = 0; f < fs; ++f) {
-      final RecordField rf = fields.value(f + 1);
+      final ShapeField rf = fields.value(f + 1);
       final Value value = f < el ? exprs[f].value(qc) :
           rf.init() != null ? rf.init().value(qc) : Empty.VALUE;
       values[f] = rf.seqType().coerce(value, qc, ii, names[f], null);
     }
-    return new XQRecordMap(recordType, values);
+    return new XQShapeMap(shapeType, values);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    // refine the field types of an inferred (anonymous) record from the argument types
-    if(recordType.name() == null) {
-      final TokenObjectMap<RecordField> fields = recordType.fields();
+    // refine the field types of an anonymous shape from the argument types
+    if(shapeType.name() == null) {
+      final TokenObjectMap<ShapeField> fields = shapeType.fields();
       final int fs = fields.size();
       if(fs == exprs.length) {
-        final TokenObjectMap<RecordField> refined = new TokenObjectMap<>(fs);
+        final TokenObjectMap<ShapeField> refined = new TokenObjectMap<>(fs);
         boolean narrowed = false;
         for(int f = 0; f < fs; f++) {
           final SeqType ost = fields.value(f + 1).seqType(), nst = exprs[f].seqType();
           final SeqType st = nst.instanceOf(ost) ? nst : ost;
           if(!st.eq(ost)) narrowed = true;
-          refined.put(fields.key(f + 1), new RecordField(st));
+          refined.put(fields.key(f + 1), new ShapeField(st));
         }
         if(narrowed) {
-          recordType = cc.qc.shared.record(new RecordType(refined));
-          exprType.assign(recordType.seqType());
+          shapeType = cc.qc.shared.shape(shapeType.with(refined));
+          exprType.assign(shapeType.seqType());
         }
       }
     }
@@ -91,22 +91,22 @@ public class RecordConstructor extends StandardFunc {
 
   @Override
   public long structSize() {
-    return recordType.fields().size();
+    return shapeType.fields().size();
   }
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof final RecordConstructor rc &&
-        recordType.eq(rc.recordType) && Array.equals(exprs, rc.exprs);
+    return this == obj || obj instanceof final ShapeConstructor sc &&
+        shapeType.eq(sc.shapeType) && Array.equals(exprs, sc.exprs);
   }
 
   @Override
   public void toString(final QueryString qs) {
-    if(recordType.name() != null) {
+    if(shapeType.name() != null) {
       super.toString(qs);
     } else {
       qs.token("{ ");
-      final TokenObjectMap<RecordField> fields = recordType.fields();
+      final TokenObjectMap<ShapeField> fields = shapeType.fields();
       int f = 0;
       for(final Expr expr : exprs) {
         if(++f > 1) qs.token(',');
@@ -117,16 +117,17 @@ public class RecordConstructor extends StandardFunc {
   }
 
   /**
-   * Returns a constructor function definition for this record type.
-   * @param rt record type
+   * Returns a constructor function definition for this shape.
+   * @param sh shape
    * @return constructor function definition
    */
-  public static FuncDefinition definition(final RecordType rt) {
-    final TokenBuilder tb = new TokenBuilder(
-        rt.name() == null ? Token.token(QueryText.RECORD) : rt.name().local()).add('(');
-    final TokenObjectMap<RecordField> fields = rt.fields();
+  public static FuncDefinition definition(final ShapeType sh) {
+    final QNm name = sh.name();
+    final TokenBuilder tb = new TokenBuilder(name != null ? name.local() :
+      Token.token(sh instanceof RecordType ? QueryText.RECORD : QueryText.MAP)).add('(');
+    final TokenObjectMap<ShapeField> fields = sh.fields();
     final int max = fields.size();
-    final int min = rt.minFields();
+    final int min = sh.minFields();
     for(int i = 1; i <= max; ++i) {
       if(i == min + 1) tb.add('[');
       if(i > 1) tb.add(',');
@@ -137,12 +138,12 @@ public class RecordConstructor extends StandardFunc {
 
     final SeqType[] params = new SeqType[max];
     for(int i = 0; i < max; ++i) {
-      final RecordField f = fields.value(i + 1);
+      final ShapeField f = fields.value(i + 1);
       params[i] = f.seqType();
     }
 
-    final Supplier<RecordConstructor> supplier = () -> new RecordConstructor(rt);
-    return new FuncDefinition(supplier, description, params, rt.seqType(),
-        EnumSet.noneOf(Flag.class), rt.name() == null ? Token.EMPTY : rt.name().uri(), Perm.NONE);
+    final Supplier<ShapeConstructor> supplier = () -> new ShapeConstructor(sh);
+    return new FuncDefinition(supplier, description, params, sh.seqType(),
+        EnumSet.noneOf(Flag.class), name == null ? Token.EMPTY : name.uri(), Perm.NONE);
   }
 }

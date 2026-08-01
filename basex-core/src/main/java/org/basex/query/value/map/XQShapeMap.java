@@ -12,27 +12,42 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Compact map implementation for records with fixed entries.
+ * Compact map implementation for maps with a known shape.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class XQRecordMap extends XQHashMap {
+public final class XQShapeMap extends XQHashMap {
   /** Values. */
   private final Value[] values;
 
   /**
    * Constructor.
-   * @param type record type
+   * @param type shape
    * @param values values
    */
-  public XQRecordMap(final Type type, final Value... values) {
+  public XQShapeMap(final Type type, final Value... values) {
     super(type);
     this.values = values;
   }
 
   @Override
-  public boolean refineType() throws QueryException {
+  public boolean refineType() {
+    // a named record type must retain its declared field types
+    final ShapeType sh = (ShapeType) type;
+    if(sh.name() == null) {
+      final TokenObjectMap<ShapeField> fields = sh.fields();
+      final int fs = fields.size();
+      final TokenObjectMap<ShapeField> refined = new TokenObjectMap<>(fs);
+      boolean narrowed = false;
+      for(int f = 0; f < fs; f++) {
+        final SeqType ost = fields.value(f + 1).seqType(), nst = values[f].seqType();
+        final SeqType st = nst.instanceOf(ost) ? nst : ost;
+        if(!st.eq(ost)) narrowed = true;
+        refined.put(fields.key(f + 1), new ShapeField(st));
+      }
+      if(narrowed) type = sh.with(refined);
+    }
     return true;
   }
 
@@ -53,11 +68,11 @@ public final class XQRecordMap extends XQHashMap {
   @Override
   public XQMap putAt(final int index, final Value value) throws QueryException {
     if(value.seqType().instanceOf(fields().value(index + 1).seqType())) {
-      final Type tp = type instanceof final RecordType rt ? rt.open() : type;
+      final Type tp = type instanceof final ShapeType sh ? sh.shape() : type;
       if(value == values[index] && tp == type) return this;
       final Value[] copy = values.clone();
       copy[index] = value;
-      return new XQRecordMap(tp, copy);
+      return new XQShapeMap(tp, copy);
     }
     return super.putAt(index, value);
   }
@@ -82,11 +97,11 @@ public final class XQRecordMap extends XQHashMap {
   }
 
   /**
-   * Returns the record fields.
+   * Returns the fields of the map type.
    * @return fields
    */
-  private TokenObjectMap<RecordField> fields() {
-    return ((RecordType) type).fields();
+  private TokenObjectMap<ShapeField> fields() {
+    return ((ShapeType) type).fields();
   }
 
   @Override
@@ -116,18 +131,19 @@ public final class XQRecordMap extends XQHashMap {
       qc.checkStop();
       vals[v] = values[v].materialize(test, ii, qc);
     }
-    return new XQRecordMap(((RecordType) type).detach(), vals);
+    return new XQShapeMap(((ShapeType) type).detach(), vals);
   }
 
   @Override
   public boolean materialized(final Predicate<Data> test, final InputInfo ii)
       throws QueryException {
-    return ((RecordType) type).detached() && super.materialized(test, ii);
+    return ((ShapeType) type).detached() && super.materialized(test, ii);
   }
 
   @Override
   public Item shrink(final QueryContext qc) throws QueryException {
     shrinkValues(qc);
+    refineType();
     return this;
   }
 }

@@ -114,12 +114,12 @@ public enum Records {
     }
 
     // definitions requiring (possibly recursive) forward references
-    final RecordType rng = RANDOM_NUMBER_GENERATOR.get();
+    final ShapeType rng = RANDOM_NUMBER_GENERATOR.get();
     rng.add("number", Types.DOUBLE_O).
         add("next", FuncType.get(rng.seqType()).seqType()).
         add("permute", FuncType.get(Types.ITEM_ZM, Types.ITEM_ZM).seqType());
 
-    final RecordType stp = SCHEMA_TYPE.get();
+    final ShapeType stp = SCHEMA_TYPE.get();
     stp.add("name", Types.QNAME_ZO).
         add("is-simple", Types.BOOLEAN_O).
         add("base-type", FuncType.get(stp.seqType(Occ.ZERO_OR_ONE)).seqType()).
@@ -132,7 +132,7 @@ public enum Records {
         add("constructor", FuncType.get(Types.ANY_ATOMIC_TYPE_ZM,
             Types.ANY_ATOMIC_TYPE_ZO).seqType(Occ.ZERO_OR_ONE));
 
-    final RecordType crx = COMPILED_REGEX.get();
+    final ShapeType crx = COMPILED_REGEX.get();
     crx.add("pattern", Types.STRING_O).
         add("flags", Types.STRING_O).
         add("matches", FuncType.get(Types.BOOLEAN_O, Types.STRING_O).seqType()).
@@ -163,7 +163,7 @@ public enum Records {
    * @param name name
    * @param field record field
    */
-  private record NamedRecordField(byte[] name, RecordField field) { }
+  private record NamedShapeField(byte[] name, ShapeField field) { }
 
   /**
    * Constructor.
@@ -171,9 +171,9 @@ public enum Records {
    * @param name name of record
    * @param fields field declarations
    */
-  Records(final byte[] namespace, final String name, final NamedRecordField... fields) {
-    final TokenObjectMap<RecordField> map = new TokenObjectMap<>(fields.length);
-    for(final NamedRecordField field : fields) {
+  Records(final byte[] namespace, final String name, final NamedShapeField... fields) {
+    final TokenObjectMap<ShapeField> map = new TokenObjectMap<>(fields.length);
+    for(final NamedShapeField field : fields) {
       map.put(field.name, field.field);
     }
     final QNm qnm = new QNm(name + "-record", namespace);
@@ -186,8 +186,8 @@ public enum Records {
    * @param field record field
    * @return name/field pair
    */
-  private static NamedRecordField field(final String name, final RecordField field) {
-    return new NamedRecordField(Token.token(name), field);
+  private static NamedShapeField field(final String name, final ShapeField field) {
+    return new NamedShapeField(Token.token(name), field);
   }
 
   /**
@@ -196,7 +196,7 @@ public enum Records {
    * @param type type of record field
    * @return name/field pair
    */
-  private static NamedRecordField field(final String name, final SeqType type) {
-    return field(name, new RecordField(type));
+  private static NamedShapeField field(final String name, final SeqType type) {
+    return field(name, new ShapeField(type));
   }
 }

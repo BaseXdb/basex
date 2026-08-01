@@ -1732,8 +1732,8 @@ public enum QueryError {
       desc.add(" of type ").add(est).add(" expected, ");
       // try to find missing record entry:
       boolean missing = false;
-      if(est.type instanceof final RecordType rt && expr instanceof final XQMap map) {
-        final TokenObjectMap<RecordField> fields = rt.fields();
+      if(est.type instanceof final ShapeType sh && expr instanceof final XQMap map) {
+        final TokenObjectMap<ShapeField> fields = sh.fields();
         for(final byte[] key : fields) {
           if(map.value(Str.get(key)) != null) continue;
           desc.add(QueryString.toQuoted(key)).add(" missing");

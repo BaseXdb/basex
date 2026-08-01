@@ -90,8 +90,8 @@ public abstract class XQMap extends XQStruct {
   public final Value invokeInternal(final QueryContext qc, final InputInfo ii, final Value[] args)
       throws QueryException {
     final Item k = key(args[0], qc, ii);
-    if(type instanceof final RecordType rt && rt.strict() &&
-        (!k.type.isStringOrUntyped() || !rt.fields().contains(k.string(null)))) {
+    if(type instanceof final ShapeType sh && sh.strict() &&
+        (!k.type.isStringOrUntyped() || !sh.fields().contains(k.string(null)))) {
       throw RECORDFIELD_X_X.get(ii, this, k);
     }
     return get(k);
@@ -240,8 +240,8 @@ public abstract class XQMap extends XQStruct {
 
     try {
       // a map matches a record type only if it is a record, i.e. if it carries a record annotation
-      if(tp instanceof RecordType) {
-        return type instanceof final RecordType rt && rt.sealed() && type.instanceOf(tp);
+      if(tp instanceof ShapeType) {
+        return type instanceof RecordType && type.instanceOf(tp);
       }
       if(type.instanceOf(tp)) return true;
 
@@ -341,7 +341,7 @@ public abstract class XQMap extends XQStruct {
     // record(*) is abstract: it is matched, but never constructed, by coercion
     if(rt.any()) throw typeError(this, rt, ii);
 
-    final TokenObjectMap<RecordField> fields = rt.fields();
+    final TokenObjectMap<ShapeField> fields = rt.fields();
     // reject undeclared keys
     for(final Item key : keys()) {
       if(!key.type.isStringOrUntyped() || !fields.contains(key.string(null))) {
@@ -356,7 +356,7 @@ public abstract class XQMap extends XQStruct {
       values[f] = fields.value(f + 1).seqType().coerce(get(Str.get(fields.key(f + 1))),
           qc, ii, null, cc);
     }
-    return new XQRecordMap(rt, values);
+    return new XQShapeMap(rt, values);
   }
 
   /**
@@ -403,7 +403,7 @@ public abstract class XQMap extends XQStruct {
       final InputInfo info) throws QueryException {
     // record(*) is abstract: only records can be cast to it
     if(rt.any()) return instanceOf(rt, false) ? this : null;
-    final TokenObjectMap<RecordField> fields = rt.fields();
+    final TokenObjectMap<ShapeField> fields = rt.fields();
     final int fs = fields.size();
     final Value[] values = new Value[fs];
     for(int f = 0; f < fs; f++) {
@@ -422,7 +422,7 @@ public abstract class XQMap extends XQStruct {
       if(cast == null) return null;
       values[f] = cast;
     }
-    return new XQRecordMap(rt, values);
+    return new XQShapeMap(rt, values);
   }
 
   @Override

@@ -92,7 +92,7 @@ public final class LookupTest extends SandboxTest {
         exists(Lookup.class));
     check("[ <x/>, <y/> ]?(1, 2)", "<x/>\n<y/>", exists(Lookup.class));
 
-    check("({ 'a': <x/> })?a", "<x/>", exists(RecordGet.class), empty(Lookup.class));
+    check("({ 'a': <x/> })?a", "<x/>", exists(ShapeGet.class), empty(Lookup.class));
     check("({ 'a': <x/> })?b", "", empty(Lookup.class));
     check("({ 1: <x/> })?1", "<x/>", exists(_MAP_GET), empty(Lookup.class));
     check("({ 'a': <x/> })?*", "<x/>", exists(_MAP_ITEMS), empty(Lookup.class));

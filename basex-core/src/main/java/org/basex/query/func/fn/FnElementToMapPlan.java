@@ -44,7 +44,7 @@ public final class FnElementToMapPlan extends PlanFn {
     final MapBuilder ecm = new MapBuilder();
     for(final QNm name : elemNames) {
       final PlanEntry pe = entry(elemNames.get(name).finish());
-      final XQMap plan = new XQRecordMap(Records.ELEMENT_CONVERSION_PLAN.get(),
+      final XQMap plan = new XQShapeMap(Records.ELEMENT_CONVERSION_PLAN.get(),
         Str.get(pe.layout.toString()),
         pe.child != null ? Str.get(pe.child.uri().length != 0 ? pe.child.eqName() :
           pe.child.local()) : Empty.VALUE,
@@ -55,7 +55,7 @@ public final class FnElementToMapPlan extends PlanFn {
     for(final QNm attr : attrNames) {
       final PlanType pt = PlanType.get(attrNames.get(attr).finish());
       if(pt != null && pt != PlanType.STRING) {
-        final XQMap acm = new XQRecordMap(Records.ATTRIBUTE_CONVERSION_PLAN.get(),
+        final XQMap acm = new XQShapeMap(Records.ATTRIBUTE_CONVERSION_PLAN.get(),
             Str.get(pt.toString()));
         ecm.put(Strings.concat('@', attr.unique()), acm);
       }
