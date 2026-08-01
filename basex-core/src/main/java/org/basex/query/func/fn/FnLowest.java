@@ -97,6 +97,7 @@ public class FnLowest extends StandardFunc {
         if(ast.zeroOrOne() && noCheck.test(ast.type)) return input;
       }
     }
-    return adoptType(input);
+    exprType.assign(input, new long[] { st.oneOrMore() ? 1 : 0, input.size() });
+    return this;
   }
 }
