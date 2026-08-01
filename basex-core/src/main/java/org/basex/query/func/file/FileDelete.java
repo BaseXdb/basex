@@ -20,7 +20,7 @@ public final class FileDelete extends FileFn {
     final Path path = toPath(arg(0), qc);
     final boolean recursive = toBooleanOrFalse(arg(1), qc);
 
-    if(Files.exists(path)) {
+    if(Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
       if(recursive) {
         delete(path, qc);
       } else {
@@ -37,7 +37,8 @@ public final class FileDelete extends FileFn {
    * @throws IOException I/O exception
    */
   public static void delete(final Path path, final Job job) throws IOException {
-    if(Files.isDirectory(path)) {
+    // symbolic links are deleted without descending into their target
+    if(Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
       try(DirectoryStream<Path> children = Files.newDirectoryStream(path)) {
         for(final Path child : children) {
           job.checkStop();
