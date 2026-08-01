@@ -215,6 +215,22 @@ public final class SearchTest {
     assertNull(editor(null).replace(new ReplaceContext("XY")));
   }
 
+  /** Replace All keeps the caret at its position in the text. */
+  @Test public void replaceAllCaret() {
+    // every "a" of "aa\naa\naa" is replaced with "XY": the caret is shifted by the preceding hits
+    assertEquals(0, caret(0));
+    assertEquals(2, caret(1));
+    assertEquals(4, caret(2));
+    assertEquals(5, caret(3));
+    assertEquals(14, caret(8));
+
+    // caret inside a hit: it is moved to the end of the replacement
+    final ReplaceContext rc = new ReplaceContext("XY");
+    rc.caret = 1;
+    rc.replace(literal("aa", true), token("aa"), "aa", 0, 2);
+    assertEquals(2, rc.caret);
+  }
+
   /** Only the replaced hits are encoded anew; all other bytes are copied as they are. */
   @Test public void replacePreservesBytes() {
     // 0xE9 is no valid UTF-8 sequence: decoding and encoding it would yield a U+FFFD (0xEFBFBD)
@@ -439,6 +455,19 @@ public final class SearchTest {
     ed.searchResults(new IntList[] { st, en }, literal("a", true));
     if(select != null) ed.select(select[0], select[1]);
     return ed;
+  }
+
+  /**
+   * Replaces all hits of "a" with "XY" in the text "aa\naa\naa".
+   * @param pos caret position
+   * @return new caret position
+   */
+  private static int caret(final int pos) {
+    final ReplaceContext rc = new ReplaceContext("XY");
+    final TextEditor ed = editor(null);
+    ed.pos(pos);
+    ed.replace(rc);
+    return rc.caret;
   }
 
   /**

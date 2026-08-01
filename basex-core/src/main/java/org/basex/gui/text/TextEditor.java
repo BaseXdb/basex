@@ -197,6 +197,7 @@ public final class TextEditor {
    */
   int[] replace(final ReplaceContext rc) {
     final int[] range = selectionRange();
+    rc.caret = pos;
     final int[] rng = rc.replace(searchContext, text, decode(text), range != null ? range[0] : 0,
         range != null ? range[1] : size());
     return range != null ? rng : null;
@@ -617,8 +618,10 @@ public final class TextEditor {
     final byte[] st = syntax.commentOpen(), en = syntax.commentEnd();
     final byte[] ste = concat(st, cpToken(' ')), ene = concat(cpToken(' '), en);
     final int sl = st.length, el = en.length, sle = ste.length, ele = ene.length;
+    final boolean sel = isSelected();
+    final int caret = pos;
 
-    if(!isSelected()) {
+    if(!sel) {
       // no selection: select line
       start = pos;
       end = pos;
@@ -641,23 +644,29 @@ public final class TextEditor {
 
     // create new text with or without comment
     final TokenBuilder tb = new TokenBuilder();
-    final int mx = Math.max(min + sl, max - el), off;
+    final int mx = Math.max(min + sl, max - el), off, open;
     final int mxe = Math.max(min + sle, max - ele);
     if(indexOf(text, ste, min) == min && indexOf(text, ene, mxe) == mxe) {
       // remove existing comment
       tb.add(text, min + sle, max - ele);
-      off = -sle - ele;
+      open = -sle;
+      off = open - ele;
     } else if(indexOf(text, st, min) == min && indexOf(text, en, mx) == mx) {
       // remove existing comment
       tb.add(text, min + sl, max - el);
-      off = -sl - el;
+      open = -sl;
+      off = open - el;
     } else {
       // add new comment
       tb.add(ste).add(text, min, max).add(ene);
-      off = sle + ele;
+      open = sle;
+      off = open + ele;
     }
     final boolean added = insert(tb.finish(), min, max);
-    select(min, max + off);
+    // selected text is reselected; otherwise, the caret is shifted by the opening comment
+    if(sel) select(min, max + off);
+    else pos(caret < min ? caret : caret > max ? caret + off :
+      Math.max(min, Math.min(caret + open, max + off)));
     return added;
   }
 
@@ -790,11 +799,94 @@ public final class TextEditor {
     final boolean sel = isSelected();
     final int s = sel ? selMin() : 0;
     final int e = sel ? selMax() : size();
+    final int count = sel ? 0 : chars(s);
+    final boolean brk = !sel && broken(s);
     final byte[] format = syntax.format(Arrays.copyOfRange(text, s, e), opts.spaces(),
         opts.margin());
     final boolean changed = insert(format, s, e);
-    select(s, s + format.length);
+    // selected text is reselected; otherwise, the caret keeps its place in the text
+    final int to = s + format.length;
+    if(sel) select(s, to);
+    else pos(offset(s, to, count, brk));
     return changed;
+  }
+
+  /**
+   * Removes trailing whitespace and appends a final newline.
+   * @param trim remove trailing whitespace
+   * @param nl append a final newline
+   * @return {@code true} if text has changed
+   */
+  boolean tidy(final boolean trim, final boolean nl) {
+    // carriage returns have already been removed from the editor contents
+    final int tl = size(), count = chars(0);
+    final boolean brk = broken(0);
+    final byte[] tmp = new byte[tl + 1];
+    // size of the new text, start of the current whitespace run ({@code -1}: no run)
+    int size = 0, run = -1;
+    for(int t = 0; t < tl; t++) {
+      final byte b = text[t];
+      if(trim && (b == ' ' || b == '\t')) {
+        if(run == -1) run = size;
+      } else {
+        if(b == '\n' && run != -1) size = run;
+        run = -1;
+      }
+      tmp[size++] = b;
+    }
+    if(run != -1) size = run;
+    if(nl && size > 0 && tmp[size - 1] != '\n') tmp[size++] = '\n';
+
+    if(!text(size == tmp.length ? tmp : Arrays.copyOf(tmp, size))) return false;
+    pos(offset(0, size, count, brk));
+    return true;
+  }
+
+  /**
+   * Counts the non-whitespace characters that precede the caret.
+   * @param s start offset
+   * @return number of characters
+   */
+  private int chars(final int s) {
+    int c = 0;
+    for(int p = s; p < pos; p++) {
+      if(!ws(text[p])) c++;
+    }
+    return c;
+  }
+
+  /**
+   * Checks if a line break separates the caret from the character that precedes it.
+   * @param s start offset
+   * @return result of check
+   */
+  private boolean broken(final int s) {
+    for(int p = pos - 1; p >= s && ws(text[p]); p--) {
+      if(text[p] == '\n') return true;
+    }
+    return false;
+  }
+
+  /**
+   * Returns the caret position in a text in which only whitespace was changed.
+   * @param s start offset
+   * @param e end offset
+   * @param count non-whitespace characters that precede the caret
+   * @param brk line break separates the caret from the last of these characters
+   * @return caret position
+   */
+  private int offset(final int s, final int e, final int count, final boolean brk) {
+    // skip the characters that precede the caret
+    int c = 0, p = s;
+    while(p < e && c < count) {
+      if(!ws(text[p])) c++;
+      p++;
+    }
+    // the caret was placed in a new line: skip the whitespace that precedes the next character
+    if(brk) {
+      while(p < e && ws(text[p])) p++;
+    }
+    return p;
   }
 
   /**
@@ -802,7 +894,9 @@ public final class TextEditor {
    * @return {@code true} if text has changed
    */
   boolean sort() {
-    if(!isSelected()) selectAll();
+    final boolean sel = isSelected();
+    final int caret = pos;
+    if(!sel) selectAll();
     if(!extend()) return false;
 
     // count lines
@@ -825,6 +919,20 @@ public final class TextEditor {
       }
     }
     if(!bl.isEmpty()) tl.add(bl.finish());
+
+    // line with the caret, and column in this line
+    int cl = 0, cc = 0;
+    if(!sel) {
+      for(int i = s; i < caret; i++) {
+        if(tmp[i] == '\n') {
+          cl++;
+          cc = 0;
+        } else {
+          cc++;
+        }
+      }
+    }
+    final byte[] caretLine = sel || cl >= tl.size() ? null : tl.get(cl);
     sort(tl);
 
     // copy lines back to text
@@ -837,7 +945,21 @@ public final class TextEditor {
     }
     if(i < e) Array.copy(tmp, e, ts - e, tmp, i);
     final boolean changed = text(i == e ? tmp : Arrays.copyOf(tmp, ts - e + i));
-    select(s, i);
+    // selected text is reselected; otherwise, the caret follows its line
+    if(sel) {
+      select(s, i);
+    } else {
+      int p = i;
+      if(caretLine != null) {
+        p = s;
+        for(final byte[] ln : tl) {
+          if(eq(ln, caretLine)) break;
+          p += ln.length + 1;
+        }
+        p = Math.min(p + cc, i);
+      }
+      pos(p);
+    }
     return changed;
   }
 

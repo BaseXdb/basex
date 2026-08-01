@@ -322,6 +322,23 @@ public class TextPanel extends BaseXPanel {
   }
 
   /**
+   * Removes trailing whitespace and appends a final newline.
+   * @param trim remove trailing whitespace
+   * @param nl append a final newline
+   * @return {@code true} if text has changed
+   */
+  public final boolean tidy(final boolean trim, final boolean nl) {
+    final int caret = editor.pos();
+    if(!editor.tidy(trim, nl)) return false;
+    hist.store(editor.text(), caret, editor.pos());
+    resetError();
+    if(isShowing()) resizeCode.invokeLater();
+    updateScrollpos.invokeLater(Align.CENTER);
+    caret(true);
+    return true;
+  }
+
+  /**
    * Formats the selected text.
    */
   public final void format() {
@@ -402,9 +419,10 @@ public class TextPanel extends BaseXPanel {
   final void replace(final ReplaceContext rc) {
     final int[] range = editor.replace(rc);
     if(rc.text != null) {
-      // the caret keeps its position; a replacement in a selection re-selects its new range
+      // a replacement in a selection reselects its new range; otherwise, the caret is preserved
       setText(rc.text);
       if(range != null) editor.select(range[0], range[1]);
+      else setCaret(rc.caret);
       edited();
     }
   }

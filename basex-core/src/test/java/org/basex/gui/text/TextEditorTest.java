@@ -129,6 +129,120 @@ public final class TextEditorTest {
     return Token.string(editor.text());
   }
 
+  /** Formatting keeps the caret at its place in the code if no text is selected. */
+  @Test public void formatCaret() {
+    // the indentation of the second line is reduced to "if(true()) {\n  1\n}"
+    final String string = "if(true()) {\n        1\n}";
+    assertEquals(0, format(string, 0));
+    assertEquals(18, format(string, 24));
+    // caret before and after the reindented character
+    assertEquals(15, format(string, 21));
+    assertEquals(16, format(string, 22));
+    // caret in the discarded indentation: it moves to the code that follows
+    assertEquals(15, format(string, 13));
+    assertEquals(15, format(string, 17));
+
+    // selected text is reselected
+    final TextEditor editor = editor(string);
+    editor.selectAll();
+    editor.format(new SyntaxXQuery());
+    assertEquals(0, editor.start());
+    assertEquals(18, editor.end());
+  }
+
+  /**
+   * Formats the text.
+   * @param string text
+   * @param pos cursor position
+   * @return new cursor position
+   */
+  private static int format(final String string, final int pos) {
+    final TextEditor editor = editor(string);
+    editor.pos(pos);
+    editor.format(new SyntaxXQuery());
+    return editor.pos();
+  }
+
+  /** Tidying keeps the caret at the end of its line. */
+  @Test public void tidyCaret() {
+    // "a  \nb" is trimmed and gets a final newline
+    final TextEditor editor = editor("a  \nb");
+    assertTrue(editor.tidy(true, true));
+    assertEquals("a\nb\n", Token.string(editor.text()));
+    assertFalse(editor.tidy(true, true));
+
+    // caret in the removed whitespace: it stays at the end of the first line
+    assertEquals(0, tidy("a  \nb", 0));
+    assertEquals(1, tidy("a  \nb", 1));
+    assertEquals(1, tidy("a  \nb", 2));
+    assertEquals(1, tidy("a  \nb", 3));
+    // caret in the second line
+    assertEquals(2, tidy("a  \nb", 4));
+    assertEquals(3, tidy("a  \nb", 5));
+  }
+
+  /**
+   * Removes trailing whitespace and appends a final newline.
+   * @param string text
+   * @param pos cursor position
+   * @return new cursor position
+   */
+  private static int tidy(final String string, final int pos) {
+    final TextEditor editor = editor(string);
+    editor.pos(pos);
+    editor.tidy(true, true);
+    return editor.pos();
+  }
+
+  /** Comments shift the caret if no text is selected. */
+  @Test public void commentCaret() {
+    // "foo" is enclosed by "(: " and " :)"
+    assertEquals(3, comment("foo", 0));
+    assertEquals(4, comment("foo", 1));
+    assertEquals(6, comment("foo", 3));
+    // the comment is removed again
+    assertEquals(0, comment("(: foo :)", 3));
+    assertEquals(1, comment("(: foo :)", 4));
+    // caret in the comment delimiters: it is restricted to the commented text
+    assertEquals(0, comment("(: foo :)", 1));
+    assertEquals(3, comment("(: foo :)", 9));
+  }
+
+  /**
+   * (Un)comments the current line.
+   * @param string text
+   * @param pos cursor position
+   * @return new cursor position
+   */
+  private static int comment(final String string, final int pos) {
+    final TextEditor editor = editor(string);
+    editor.pos(pos);
+    editor.comment(new SyntaxXQuery());
+    return editor.pos();
+  }
+
+  /** Sorting moves the caret to the new position of its line. */
+  @Test public void sortCaret() {
+    // the lines are sorted to "a\nb\nc"; the caret keeps its column in its line
+    assertEquals(4, sort("c\na\nb", 0));
+    assertEquals(5, sort("c\na\nb", 1));
+    assertEquals(0, sort("c\na\nb", 2));
+    assertEquals(2, sort("c\na\nb", 4));
+  }
+
+  /**
+   * Sorts the lines of the text.
+   * @param string text
+   * @param pos cursor position
+   * @return new cursor position
+   */
+  private static int sort(final String string, final int pos) {
+    final TextEditor editor = editor(string);
+    editor.pos(pos);
+    editor.sort();
+    return editor.pos();
+  }
+
   /**
    * Returns an editor for the specified text.
    * @param string text
