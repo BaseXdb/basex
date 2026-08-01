@@ -101,6 +101,11 @@ public final class Otherwise extends Arr {
   }
 
   @Override
+  public void markTailCalls(final CompileContext cc) {
+    exprs[exprs.length - 1].markTailCalls(cc);
+  }
+
+  @Override
   public boolean vacuous() {
     return Checks.all(exprs, Expr::vacuous);
   }

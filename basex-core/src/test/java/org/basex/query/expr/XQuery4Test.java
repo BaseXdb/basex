@@ -481,9 +481,10 @@ public final class XQuery4Test extends SandboxTest {
     query("declare function local:f($a) {"
         + "  try { 1 div 0 } catch * { if($a > 0) then local:f($a - 1) else $a } "
         + "}; local:f(10000)", 0);
+    // calls in a try clause are no tail calls: the stack overflow is caught
     query("declare function local:f($a) {"
         + "  try { if($a > 0) then local:f($a - 1) else $a } catch * { 1 } "
-        + "}; local:f(10000)", 0);
+        + "}; local:f(10000)", 1);
     query("declare function local:f($a) {"
         + "  try { 0 } catch * { 1 } "
         + "}; local:f(10000)", 0);

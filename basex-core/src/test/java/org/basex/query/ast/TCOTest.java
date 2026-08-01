@@ -142,12 +142,53 @@ public final class TCOTest extends SandboxTest {
   @Test public void tailCallInTry() {
     check(
         "declare option db:inlinelimit '-1';" +
-        "declare option db:tailcalls '0';" +
         "declare function local:foo() { try { local:bar() } catch * { 42 } };" +
         "declare function local:bar() { error() };" +
         "local:foo()",
 
-        42);
+        42,
+
+        exists(Util.className(Try.class) + "//" + Util.className(StaticFuncCall.class) +
+            "[@tailCall eq 'false']")
+    );
+  }
+
+  /** Checks if TCO is applied to catch clauses. */
+  @Test public void tailCallInCatch() {
+    check("declare function local:f($n) {" +
+        "  try { error(xs:QName('local:e'), string($n)) }" +
+        "  catch * { if($n eq 0) then 'done' else local:f($n - 1) }" +
+        "};" +
+        "local:f(100000)",
+
+        "done",
+
+        exists(Util.className(Catch.class) + "//" + Util.className(StaticFuncCall.class) +
+            "[@tailCall eq 'true']")
+    );
+  }
+
+  /** Checks if TCO is applied to the last operand of an otherwise expression. */
+  @Test public void tailCallInOtherwise() {
+    check("declare function local:f($n) {" +
+        "  $n[. eq -1] otherwise (if($n eq 0) then 'done' else local:f($n - 1))" +
+        "};" +
+        "local:f(100000)",
+
+        "done",
+
+        exists(Util.className(Otherwise.class) + "//" + Util.className(StaticFuncCall.class) +
+            "[@tailCall eq 'true']")
+    );
+  }
+
+  /** Checks if all results are returned if a dynamic call invokes multiple function items. */
+  @Test public void multipleFuncItems() {
+    query("declare function local:f($n, $fs) { if($n eq 0) then 'end' else $fs($n, $fs) };" +
+        "let $fs := (function($n, $g) { local:f($n - 1, $g) }, function($n, $g) { 'second' })" +
+        "return count(local:f(100, $fs))",
+
+        101);
   }
 
   /** Checks if static type xs:error affects tail call optimization. */

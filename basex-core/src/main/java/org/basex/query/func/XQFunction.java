@@ -61,7 +61,7 @@ public interface XQFunction extends XQFunctionExpr {
     qc.checkStop();
     final int size = stackFrameSize();
     if(qc.tco && qc.stack.tco(size)) {
-      // stack is full: register tail call function
+      // stack is full: register tail call function, return placeholder (discarded by the caller)
       qc.tcFunc = this;
       qc.tcArgs = args;
       return Empty.VALUE;

@@ -118,7 +118,7 @@ public final class StaticFuncCall extends FuncCall {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return evalFunc(func, qc);
+    return evalFunc(func, qc, tco);
   }
 
   @Override

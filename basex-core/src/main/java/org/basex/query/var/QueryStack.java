@@ -19,8 +19,6 @@ public final class QueryStack {
   private static final int INIT = 1 << 5;
   /** Assigned values. */
   private Value[] values = new Value[INIT];
-  /** Declared variables. */
-  private Var[] vars = new Var[INIT];
   /** Frame pointer, marking the start of the current stack frame. */
   private int start;
   /** Stack limit, marking the end of the current stack frame. */
@@ -65,7 +63,7 @@ public final class QueryStack {
 
     final int vl = vls.length;
     int ns = vl;
-    while(ns > INIT && vl <= ns >> 2) ns >>= 1;
+    while(ns > INIT && end <= ns >> 2) ns >>= 1;
     if(ns != vl) resize(ns);
   }
 
@@ -90,17 +88,13 @@ public final class QueryStack {
   }
 
   /**
-   * Resizes the stacks.
+   * Resizes the stack.
    * @param size new size
    */
   private void resize(final int size) {
-    final int os = end;
     final Value[] vls = new Value[size];
-    Array.copy(values, os, vls);
+    Array.copy(values, end, vls);
     values = vls;
-    final Var[] vrs = new Var[size];
-    Array.copy(vars, os, vrs);
-    vars = vrs;
   }
 
   /**
@@ -122,9 +116,7 @@ public final class QueryStack {
    * @throws QueryException if the value does not have the right type
    */
   public void set(final Var var, final Value value, final QueryContext qc) throws QueryException {
-    final int pos = start + var.slot;
-    vars[pos] = var;
-    values[pos] = var.checkType(value, qc, null);
+    values[start + var.slot] = var.checkType(value, qc, null);
   }
 
   @Override

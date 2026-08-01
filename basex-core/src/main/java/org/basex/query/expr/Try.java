@@ -191,8 +191,8 @@ public final class Try extends Single {
 
   @Override
   public void markTailCalls(final CompileContext cc) {
+    // the try clause is no tail position: errors of eliminated calls would not be caught
     if(fnlly == Empty.VALUE) {
-      expr.markTailCalls(cc);
       for(final Catch ctch : catches) ctch.markTailCalls(cc);
     }
   }

@@ -54,6 +54,11 @@ public final class Catch extends Single {
     return (Catch) adoptType(expr);
   }
 
+  @Override
+  public void markTailCalls(final CompileContext cc) {
+    expr.markTailCalls(cc);
+  }
+
   /**
    * Returns the value of the caught expression.
    * @param qc query context
