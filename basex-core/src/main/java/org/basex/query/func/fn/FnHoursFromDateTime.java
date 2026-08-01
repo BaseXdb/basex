@@ -19,4 +19,9 @@ public final class FnHoursFromDateTime extends DateTimeFn {
 
     return value.hasHours() ? Itr.get(value.hour()) : Empty.VALUE;
   }
+
+  @Override
+  protected boolean mayBeEmpty() {
+    return true;
+  }
 }

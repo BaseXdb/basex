@@ -19,4 +19,9 @@ public final class FnYearFromDateTime extends DateTimeFn {
 
     return value.hasYear() ? Itr.get(value.yea()) : Empty.VALUE;
   }
+
+  @Override
+  protected boolean mayBeEmpty() {
+    return true;
+  }
 }

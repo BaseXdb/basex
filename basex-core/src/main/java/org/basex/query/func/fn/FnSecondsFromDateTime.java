@@ -19,4 +19,9 @@ public final class FnSecondsFromDateTime extends DateTimeFn {
 
     return value.hasSeconds() ? Dec.get(value.seconds()) : Empty.VALUE;
   }
+
+  @Override
+  protected boolean mayBeEmpty() {
+    return true;
+  }
 }

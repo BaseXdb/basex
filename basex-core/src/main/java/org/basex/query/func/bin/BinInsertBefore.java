@@ -23,7 +23,7 @@ public final class BinInsertBefore extends BinFn {
     final int bl = bytes.length;
     final int[] bounds = bounds(offset, null, bl);
 
-    if(extra == null) return value;
+    if(extra == null) return value instanceof final B64 b64 ? b64 : B64.get(bytes);
     final byte[] xtr = extra.binary(info);
     final int xl = xtr.length;
 

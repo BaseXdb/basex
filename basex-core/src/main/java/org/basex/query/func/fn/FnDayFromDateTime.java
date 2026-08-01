@@ -19,4 +19,9 @@ public final class FnDayFromDateTime extends DateTimeFn {
 
     return value.hasDay() ? Itr.get(value.day()) : Empty.VALUE;
   }
+
+  @Override
+  protected boolean mayBeEmpty() {
+    return true;
+  }
 }

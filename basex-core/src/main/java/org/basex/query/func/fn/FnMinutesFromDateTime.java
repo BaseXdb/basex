@@ -19,4 +19,9 @@ public final class FnMinutesFromDateTime extends DateTimeFn {
 
     return value.hasMinutes() ? Itr.get(value.minute()) : Empty.VALUE;
   }
+
+  @Override
+  protected boolean mayBeEmpty() {
+    return true;
+  }
 }

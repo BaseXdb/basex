@@ -459,6 +459,15 @@ public final class BinModuleTest extends SandboxTest {
     hexQuery(func.args(hex("FFFFFFFF"), -31), "00000001");
     hexQuery(func.args(hex("FFFFFFFF"), -32), "00000000");
 
+    // single byte: shifts of 32 bits and more must not wrap around
+    hexQuery(func.args(hex("FF"), 7),         "80");
+    hexQuery(func.args(hex("FF"), -7),        "01");
+    hexQuery(func.args(hex("FF"), 8),         "00");
+    hexQuery(func.args(hex("FF"), -8),        "00");
+    hexQuery(func.args(hex("FF"), 32),        "00");
+    hexQuery(func.args(hex("FF"), -32),       "00");
+    hexQuery(func.args(hex("FF"), 64),        "00");
+
     hexQuery(func.args(hex("00000000"), 111111111), "00000000");
     hexQuery(func.args(hex("00000000"), -111111111), "00000000");
   }

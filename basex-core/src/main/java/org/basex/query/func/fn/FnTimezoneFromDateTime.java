@@ -19,4 +19,9 @@ public final class FnTimezoneFromDateTime extends DateTimeFn {
 
     return zon(value);
   }
+
+  @Override
+  protected boolean mayBeEmpty() {
+    return true;
+  }
 }

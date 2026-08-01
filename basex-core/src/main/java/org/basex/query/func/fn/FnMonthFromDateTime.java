@@ -19,4 +19,9 @@ public final class FnMonthFromDateTime extends DateTimeFn {
 
     return value.hasMonth() ? Itr.get(value.mon()) : Empty.VALUE;
   }
+
+  @Override
+  protected boolean mayBeEmpty() {
+    return true;
+  }
 }

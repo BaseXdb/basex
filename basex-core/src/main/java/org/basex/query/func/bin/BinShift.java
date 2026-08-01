@@ -23,10 +23,13 @@ public final class BinShift extends StandardFunc {
 
     // special cases
     if(value == null) return Empty.VALUE;
-    if(by == 0) return value;
+    if(by == 0) return value instanceof final B64 b64 ? b64 : B64.get(value.binary(info));
 
     final byte[] bytes = value.binary(info);
     final int bl = bytes.length;
+
+    // too many shifts: zeroes
+    if(by / 8 >= bl || by / 8 <= -bl) return B64.get(new byte[bl]);
 
     // single byte
     if(bl == 1) {
@@ -34,26 +37,20 @@ public final class BinShift extends StandardFunc {
       return B64.get((byte) (by > 0 ? b << by : (b & 0xFF) >> -by));
     }
 
-    byte[] shifted;
-    if(by / 8 >= bl || by / 8 <= -bl) {
-      // too many shifts: zeroes
-      shifted = new byte[bl];
+    final int shifts = (int) (by < 0 ? -by : by);
+    BigInteger bi = new BigInteger(bytes);
+    if(by > 0) {
+      // left shift
+      bi = bi.shiftLeft(shifts);
+    } else if(bi.signum() >= 0) {
+      // right shift
+      bi = bi.shiftRight(shifts);
     } else {
-      final int shifts = (int) (by < 0 ? -by : by);
-      BigInteger bi = new BigInteger(bytes);
-      if(by > 0) {
-        // left shift
-        bi = bi.shiftLeft(shifts);
-      } else if(bi.signum() >= 0) {
-        // right shift
-        bi = bi.shiftRight(shifts);
-      } else {
-        final BigInteger o = BigInteger.ONE.shiftLeft((bl << 3) + 1);
-        final BigInteger m = o.subtract(BigInteger.ONE).shiftRight(shifts + 1);
-        bi = bi.subtract(o).shiftRight(shifts).and(m);
-      }
-      shifted = bi.toByteArray();
+      final BigInteger o = BigInteger.ONE.shiftLeft((bl << 3) + 1);
+      final BigInteger m = o.subtract(BigInteger.ONE).shiftRight(shifts + 1);
+      bi = bi.subtract(o).shiftRight(shifts).and(m);
     }
+    byte[] shifted = bi.toByteArray();
 
     // return array with identical size
     final int tl = shifted.length;

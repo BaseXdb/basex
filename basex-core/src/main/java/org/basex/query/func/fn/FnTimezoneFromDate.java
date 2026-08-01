@@ -20,4 +20,9 @@ public final class FnTimezoneFromDate extends DateTimeFn {
 
     return zon(toDate(value, BasicType.DATE, qc));
   }
+
+  @Override
+  protected boolean mayBeEmpty() {
+    return true;
+  }
 }
