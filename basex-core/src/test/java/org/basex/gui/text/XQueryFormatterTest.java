@@ -120,6 +120,10 @@ public final class XQueryFormatterTest {
     // text is no boundary whitespace: its indentation is significant
     format("<a>\n  text\n</a>", "<a>\n  text\n</a>");
     format("<a>x\n  <b/>\n</a>", "<a>x\n  <b/>\n</a>");
+    // mixed content: the whitespace between the tags is significant as well
+    format("<a>\n<b>x</b>\ntext\n{ 1 }\n</a>", "<a>\n<b>x</b>\ntext\n{ 1 }\n</a>");
+    // its indentation is the reference for the lines that are nested in it
+    format("<a>\ntext\n{\n1\n}\n</a>", "<a>\ntext\n{\n  1\n}\n</a>");
     // escaped curly braces are literal text, not enclosed expressions
     format("<a>\n{{ }}\n</a>", "<a>\n{{ }}\n</a>");
     // preserved boundary whitespace is significant

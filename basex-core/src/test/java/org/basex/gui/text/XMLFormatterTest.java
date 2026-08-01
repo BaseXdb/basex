@@ -35,6 +35,13 @@ public final class XMLFormatterTest {
     format("<a>x\n  <b/>\n</a>", "<a>x\n  <b/>\n</a>");
     // brackets in text are no code
     format("<a>\n<b>{ ( }</b>\n</a>", "<a>\n  <b>{ ( }</b>\n</a>");
+    // mixed content: the whitespace between the tags is significant as well
+    format("<a>\n<b>x</b>\ntext\n<b>y</b>\n</a>", "<a>\n<b>x</b>\ntext\n<b>y</b>\n</a>");
+    format("<a>\n   <b/>\n   text\n</a>", "<a>\n   <b/>\n   text\n</a>");
+    // the indentation of mixed content is the reference for the lines that are nested in it
+    format("<a>\n  text\n  <b>\n    <c/>\n  </b>\n</a>",
+           "<a>\n  text\n  <b>\n    <c/>\n  </b>\n</a>");
+    format("<a>\ntext\n<b>\n  <c/>\n</b>\n</a>", "<a>\ntext\n<b>\n  <c/>\n</b>\n</a>");
     // comments, sections and instructions are adopted unchanged
     format("<?xml version='1.0'?>\n<a>\n<!--  c  -->\n<![CDATA[ < ]]>\n</a>",
            "<?xml version='1.0'?>\n<a>\n  <!--  c  -->\n  <![CDATA[ < ]]>\n</a>");

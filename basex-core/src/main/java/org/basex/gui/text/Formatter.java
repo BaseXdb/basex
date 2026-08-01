@@ -28,6 +28,13 @@ final class Formatter {
    */
   private record Bracket(boolean broken, boolean separated, Syntax.Indent indent) { }
 
+  /**
+   * State of an element that is currently open.
+   * @param mixed the content of the element contains text
+   * @param level nesting depth of the enclosing content
+   */
+  private record Element(boolean mixed, int level) { }
+
   /** Syntax highlighter: supplies the modes of the formatted text. */
   private final Syntax syntax;
   /** Separators: preceded by no space, followed by a single space. */
@@ -55,6 +62,8 @@ final class Formatter {
   private int wsLines;
   /** Indicates if that whitespace occurs in element content. */
   private boolean wsContent;
+  /** Indicates if that content is mixed. */
+  private boolean wsMixed;
   /** Last character that was not whitespace. */
   private int lastChar;
   /** Position after the last character that was not whitespace ({@code -1}: no previous line). */
@@ -92,14 +101,16 @@ final class Formatter {
   byte[] format(final byte[] text) {
     final BoolList direct = new BoolList();
     final IntList lengths = lengths(text, direct);
-    syntax.reset();
     base = base(text);
     boundary = syntax.boundarySpace(text);
+    final BoolList mixed = mixed(text);
+    syntax.reset();
 
     final ArrayDeque<Bracket> brackets = new ArrayDeque<>();
-    final BoolList elements = new BoolList();
+    final ArrayDeque<Element> elements = new ArrayDeque<>();
+    elements.push(new Element(mixed.get(0), 0));
     final int tl = text.length;
-    int index = 0;
+    int index = 0, element = 0;
     for(int p = 0; p < tl;) {
       final int cl = cl(text, p), ch = cp(text, p);
       syntax.color(text, p, p + cl);
@@ -110,6 +121,7 @@ final class Formatter {
         if(wsStart == -1) {
           wsStart = p;
           wsContent = content;
+          wsMixed = elements.peek().mixed();
         }
         if(ch == '\n') wsLines++;
         p += cl;
@@ -125,8 +137,9 @@ final class Formatter {
         brk = bracket.broken();
         close = bracket.indent();
         if(brk) level = Math.max(0, level - 1 - close.extra());
-      } else if(boundary && syntax.elementClose() && !elements.isEmpty()) {
-        if(elements.pop() && level > 0) level--;
+      } else if(boundary && syntax.elementClose() && elements.size() > 1) {
+        // the end tag and the rest of the enclosing content are indented like the start tag
+        level = elements.pop().level();
       }
       whitespace(text, p, brk, close, ch);
 
@@ -154,9 +167,8 @@ final class Formatter {
         wrap = true;
       } else if(boundary && syntax.elementOpen(text, p)) {
         // the content of an element is only indented if it starts in the next line
-        final boolean indent = newline(text, p + cl);
-        elements.add(indent);
-        if(indent) level++;
+        elements.push(new Element(mixed.get(++element), level));
+        if(newline(text, p + cl)) level++;
       }
       lastChar = ch;
       last = p + cl;
@@ -214,6 +226,34 @@ final class Formatter {
   }
 
   /**
+   * Assigns for the document and all its elements if their direct content contains text.
+   * @param text text
+   * @return flags, in the order of the start tags (the first entry refers to the document)
+   */
+  private BoolList mixed(final byte[] text) {
+    // the whitespace of mixed content is significant, including the whitespace between its tags
+    final BoolList mixed = new BoolList().add(false);
+    if(!boundary) return mixed;
+
+    syntax.reset();
+    final IntList indexes = new IntList().add(0);
+    for(int p = 0, tl = text.length; p < tl;) {
+      final int cl = cl(text, p);
+      syntax.color(text, p, p + cl);
+      if(syntax.elementOpen(text, p)) {
+        indexes.add(mixed.size());
+        mixed.add(false);
+      } else if(syntax.elementClose()) {
+        if(indexes.size() > 1) indexes.pop();
+      } else if(syntax.content() && !ws(cp(text, p))) {
+        mixed.set(indexes.peek(), true);
+      }
+      p += cl;
+    }
+    return mixed;
+  }
+
+  /**
    * Checks if a character opens a bracketed expression in code.
    * @param ch character
    * @return result of check
@@ -244,12 +284,14 @@ final class Formatter {
       final Syntax.Indent close, final int ch) {
     if(wsContent) {
       // boundary whitespace is indented if it spans lines; other text is adopted unchanged
-      if(boundary && wsLines > 0 && lastContent && syntax.contentEnd()) {
+      if(boundary && !wsMixed && wsLines > 0 && lastContent && syntax.contentEnd()) {
         lineBreaks(wsLines);
         indent(0);
         lastIndent = Syntax.Indent.NONE;
       } else if(wsStart != -1) {
         add(text, wsStart, end);
+        // the indentation of mixed content is the reference for its nested lines, but not its last
+        if(wsMixed && wsLines > 0 && !syntax.elementClose()) level = levels(text, wsStart, end);
       }
     } else if(wsLines > 0) {
       // the indentation rules of the syntax are only applied if the line opens no expression
@@ -278,6 +320,7 @@ final class Formatter {
     wsStart = -1;
     wsLines = 0;
     wsContent = false;
+    wsMixed = false;
   }
 
   /**
@@ -305,6 +348,19 @@ final class Formatter {
   private void indent(final int extra) {
     add(base, 0, base.length);
     for(int l = level + extra; l > 0; l--) add(spaces, 0, spaces.length);
+  }
+
+  /**
+   * Returns the number of indentation levels of the last line of the specified whitespace.
+   * @param text text
+   * @param start start of the whitespace
+   * @param end end of the whitespace
+   * @return levels
+   */
+  private int levels(final byte[] text, final int start, final int end) {
+    int s = end;
+    while(s > start && text[s - 1] != '\n') s--;
+    return (end - s) / spaces.length;
   }
 
   /**
