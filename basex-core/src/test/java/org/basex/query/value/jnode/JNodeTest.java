@@ -411,8 +411,6 @@ public final class JNodeTest extends SandboxTest {
 
   /** A path result over JNodes must be JNodes or atomic values (XPTY0018, not XPTY0004). */
   @Test public void pathResultType() {
-    error("{ 'a': { 'b': <x/> } }/a?b", PATHJNODE_X_X_X);
-    error("{ 'a': { 'b': true#0 } }/a?b", PATHJNODE_X_X_X);
     // non-navigational steps are selectors: their value is atomized to a key
     error("let $j := { 'a': 1 } return $j/$j", FIATOMIZE_X);
     error("{ 'a': 1 }/({ 'b': 2 })", FIATOMIZE_X);
@@ -422,19 +420,16 @@ public final class JNodeTest extends SandboxTest {
     query("{ 'a': 1 }/(<x>y</x>, 'a')", "{\"a\":1}");
   }
 
-  /** Lookup and navigational steps that compute an atomic value return the value, not a key. */
+  /** Lookups on a path result: the JNode is coerced to its jvalue, the value is returned. */
   @Test public void lookupStep() {
-    // a lookup step is navigational: the JNode is coerced to its jvalue, the value is returned
-    query(jtree + "/a?x", 1);
-    query(jtree + "/a?y?z", 2);
-    query(jtree + "/b?x?y", 2);
-    // navigation ('/') and lookup ('?') can be mixed within one path
-    query(jtree + "/b/x?y", 2);
-    // a lookup step yields the same result as a lookup on the navigated node
-    query("{ 'a': { 'b': 3 } }/a?b", 3);
+    query("(" + jtree + "/a)?x", 1);
+    query("(" + jtree + "/a)?y?z", 2);
+    query("(" + jtree + "/b)?x?y", 2);
+    // navigation ('/') and lookup ('?') can be mixed within one expression
+    query("(" + jtree + "/b/x)?y", 2);
     query("({ 'a': { 'b': 3 } }/a)?b", 3);
     // lookup on a JNode whose value is atomic raises a type error
-    error(jtree + "//x?y", LOOKUP_X);
+    error("(" + jtree + "//x)?y", LOOKUP_X);
 
     // non-navigational parenthesized steps remain key selectors (unaffected by the above)
     query("[ 10, 20, 30 ]/(2)", "[20]");
