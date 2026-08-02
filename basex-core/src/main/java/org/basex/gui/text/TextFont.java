@@ -32,6 +32,12 @@ final class TextFont {
 
   /** Cached fallback fonts. */
   private final Map<String, FontFamily> fallbacks = new LinkedHashMap<>();
+  /** Cached widths of ASCII characters (plain, bold). */
+  private final int[][] widths = { new int[128], new int[128] };
+  /** Cached unsnapped widths of ASCII characters (plain, bold). */
+  private final int[][] raws = { new int[128], new int[128] };
+  /** Cached font families of ASCII characters (plain, bold). */
+  private final FontFamily[][] families = { new FontFamily[128], new FontFamily[128] };
   /** Component. */
   private final JComponent comp;
   /** Font family. */
@@ -100,10 +106,36 @@ final class TextFont {
    */
   int stringWidth(final String string) {
     // single character (e.g. tab): use its cell width
-    if(string.length() == 1) return charWidth(string.codePointAt(0));
-    // monospaced: sum per-glyph cells (matches grid drawing); proportional: native width
-    return mono ? string.codePoints().map(this::charWidth).sum() :
-      family(string).metrics(style).stringWidth(string);
+    final int sl = string.length();
+    if(sl == 1) return charWidth(string.codePointAt(0));
+    // proportional: native width
+    if(!mono) return family(string).metrics(style).stringWidth(string);
+    // monospaced: sum per-glyph cells (matches grid drawing)
+    int width = 0;
+    for(int s = 0; s < sl;) {
+      final int cp = string.codePointAt(s);
+      width += charWidth(cp);
+      s += Character.charCount(cp);
+    }
+    return width;
+  }
+
+  /**
+   * Returns the pixel width of the specified text range.
+   * @param text text
+   * @param start start position
+   * @param end end position
+   * @return width
+   */
+  int stringWidth(final byte[] text, final int start, final int end) {
+    // proportional: the width of a string is not the sum of its glyph widths
+    if(!mono) return stringWidth(Token.string(text, start, end - start));
+    int width = 0;
+    for(int p = start; p < end;) {
+      width += charWidth(Token.cp(text, p));
+      p += Token.cl(text, p);
+    }
+    return width;
   }
 
   /**
@@ -131,6 +163,22 @@ final class TextFont {
    * @return width
    */
   int charWidth(final int cp) {
+    if(cp >= 128) return width(cp);
+    final int[] cache = widths[style];
+    int width = cache[cp];
+    if(width == 0) {
+      width = width(cp);
+      cache[cp] = width;
+    }
+    return width;
+  }
+
+  /**
+   * Computes the pixel width of the specified codepoint.
+   * @param cp codepoint
+   * @return width
+   */
+  private int width(final int cp) {
     if(cp >= TokenBuilder.PRIVATE_START && cp <= TokenBuilder.PRIVATE_END) return 0;
     if(cp == '\t') return charWidth(' ') * indent;
     // combining marks attach to the preceding glyph and take no space of their own
@@ -157,7 +205,14 @@ final class TextFont {
    * @return width
    */
   private int rawWidth(final int cp) {
-    return family(cp).metrics(style).charWidth(cp);
+    if(cp >= 128) return family(cp).metrics(style).charWidth(cp);
+    final int[] cache = raws[style];
+    int width = cache[cp];
+    if(width == 0) {
+      width = family(cp).metrics(style).charWidth(cp);
+      cache[cp] = width;
+    }
+    return width;
   }
 
   /**
@@ -168,32 +223,56 @@ final class TextFont {
    * @param y y position
    */
   void draw(final Graphics g, final String string, final int x, final int y) {
-    if(mono) {
-      final char[] chars = string.toCharArray();
-      final int len = chars.length;
-      int cx = x;
-      Font last = null;
-      for(int i = 0; i < len;) {
-        final int cp = string.codePointAt(i), w = charWidth(cp);
-        // group the base glyph with trailing combining marks, so the font can compose them
-        int end = i + Character.charCount(cp);
-        while(end < len) {
-          final int mcp = string.codePointAt(end);
-          if(!nonspacing(mcp)) break;
-          end += Character.charCount(mcp);
-        }
-        if(w > 0) {
-          final Font fnt = family(cp).font(style);
-          if(fnt != last) { g.setFont(fnt); last = fnt; }
-          g.drawChars(chars, i, end - i, cx, y);
-        }
-        cx += w;
-        i = end;
-      }
-    } else {
+    if(!mono) {
       g.setFont(font(string));
       g.drawString(string, x, y);
+      return;
     }
+    // draw as many characters as possible with a single call: start of the pending run and its
+    // x position ({@code -1}: no characters pending)
+    final char[] chars = string.toCharArray();
+    final int len = chars.length;
+    int cx = x, start = -1, sx = 0;
+    Font last = null;
+    for(int i = 0; i < len;) {
+      final int cp = string.codePointAt(i), w = charWidth(cp);
+      // group the base glyph with trailing combining marks, so the font can compose them
+      int end = i + Character.charCount(cp);
+      while(end < len) {
+        final int mcp = string.codePointAt(end);
+        if(!nonspacing(mcp)) break;
+        end += Character.charCount(mcp);
+      }
+      if(w == 0) {
+        // invisible glyph: it is skipped, so the pending characters must be drawn
+        if(start != -1) {
+          g.drawChars(chars, start, i - start, sx, y);
+          start = -1;
+        }
+      } else {
+        final Font fnt = family(cp).font(style);
+        if(fnt != last) {
+          if(start != -1) {
+            g.drawChars(chars, start, i - start, sx, y);
+            start = -1;
+          }
+          g.setFont(fnt);
+          last = fnt;
+        }
+        if(start == -1) {
+          start = i;
+          sx = cx;
+        }
+        // the glyph was snapped to the grid: the next one must be positioned explicitly
+        if(w != rawWidth(cp)) {
+          g.drawChars(chars, start, end - start, sx, y);
+          start = -1;
+        }
+      }
+      cx += w;
+      i = end;
+    }
+    if(start != -1) g.drawChars(chars, start, len - start, sx, y);
   }
 
   /**
@@ -202,7 +281,14 @@ final class TextFont {
    * @return font family
    */
   private FontFamily family(final int cp) {
-    return family.font(style).canDisplay(cp) ? family : fallback(cp);
+    if(cp >= 128) return family.font(style).canDisplay(cp) ? family : fallback(cp);
+    final FontFamily[] cache = families[style];
+    FontFamily ff = cache[cp];
+    if(ff == null) {
+      ff = family.font(style).canDisplay(cp) ? family : fallback(cp);
+      cache[cp] = ff;
+    }
+    return ff;
   }
 
   /**

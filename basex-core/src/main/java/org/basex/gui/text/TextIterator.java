@@ -104,19 +104,6 @@ final class TextIterator {
   }
 
   /**
-   * Checks if the caret is in the current line.
-   * @param first first call
-   * @return iterator position
-   */
-  boolean caretLine(final boolean first) {
-    for(int p = pos + (first ? 0 : 1); p < length; p++) {
-      if(p == caret) return true;
-      if(text[p] == '\n') return false;
-    }
-    return caret == length;
-  }
-
-  /**
    * Returns the current character.
    * @return current character
    */

@@ -36,8 +36,6 @@ final class TextRenderer extends BaseXBack {
   private int fontHeight;
   /** Width of current string. */
   private int stringWidth;
-  /** Current string. */
-  private String currString;
   /** Show invisible characters. */
   private boolean showInvisible;
   /** Show newlines. */
@@ -76,8 +74,10 @@ final class TextRenderer extends BaseXBack {
   private boolean rowEnd;
   /** Current line number. */
   private int line;
-  /** Indicates if the cursor is located in the current line. */
-  private boolean lineC;
+  /** Start of the line with the cursor ({@code -1}: not computed yet). */
+  private int caretStart;
+  /** End of the line with the cursor. */
+  private int caretEnd;
 
   /** Line-offset cache (maps document-space y or text position to a line). */
   private final TextLineCache cache = new TextLineCache();
@@ -143,7 +143,7 @@ final class TextRenderer extends BaseXBack {
       }
       write(iter, g);
     }
-    if(x == offset) markLine(g);
+    if(x == offset) markLine(iter, g);
     if(line != oldL) drawLineNumber(g);
 
     stringWidth = 0;
@@ -282,10 +282,9 @@ final class TextRenderer extends BaseXBack {
     lineY = y - (fontHeight << 2) / 5;
     line = 1;
     link = false;
+    caretStart = -1;
 
-    final TextIterator iter = new TextIterator(text);
-    lineC = edit && iter.caretLine(true);
-    return iter;
+    return new TextIterator(text);
   }
 
   /**
@@ -328,7 +327,6 @@ final class TextRenderer extends BaseXBack {
       iter.pos(sp);
       iter.posEnd(sp);
       syntax.state(st);
-      lineC = edit && iter.caretLine(true);
       cache.add(y, sp, st);
 
       endY = -1;
@@ -426,7 +424,6 @@ final class TextRenderer extends BaseXBack {
     final int p = cache.pos(idx);
     iter.pos(p);
     iter.posEnd(p);
-    lineC = edit && iter.caretLine(true);
   }
 
   /**
@@ -470,11 +467,9 @@ final class TextRenderer extends BaseXBack {
     if(g == null || maxWidth <= 0 || !iter.moreStrings(w >> 2)) return false;
 
     final int oldY = y;
-    String s = iter.currString();
     int sw = 0;
 
-    if(s.isEmpty()) return false;
-    final int cp = s.codePointAt(0);
+    final int cp = iter.curr();
     if(cp == TokenBuilder.BOLD) {
       setStyle(Font.BOLD);
     } else if(cp == TokenBuilder.NORM) {
@@ -483,19 +478,19 @@ final class TextRenderer extends BaseXBack {
       link ^= true;
     } else {
       // compute string width, shorten if it exceeds panel width
-      sw = font.stringWidth(s);
+      sw = font.stringWidth(iter.text(), iter.pos(), iter.posEnd());
       if(sw > maxWidth) {
         if(x != offset) newline(true);
 
         final TokenBuilder tb = new TokenBuilder();
         sw = 0;
-        for(final int scp : s.codePoints().toArray()) {
+        for(final int scp : iter.currString().codePoints().toArray()) {
           if(sw >= maxWidth) break;
           tb.add(scp);
           sw += font.charWidth(scp);
           if(sw > maxWidth) sw = font.stringWidth(tb.toString());
         }
-        s = tb.removeLast().toString();
+        final String s = tb.removeLast().toString();
         if(s.isEmpty()) return false;
         sw = font.stringWidth(s);
         iter.posEnd(iter.pos() + tb.size());
@@ -505,7 +500,6 @@ final class TextRenderer extends BaseXBack {
     if(sw < maxWidth && sw > w - x) newline(true);
 
     wrapped = y != oldY;
-    currString = s;
     stringWidth = sw;
     return true;
   }
@@ -526,11 +520,24 @@ final class TextRenderer extends BaseXBack {
   }
 
   /**
-   * Marks the current line.
+   * Marks the current line if it contains the cursor.
+   * @param iter iterator
    * @param g graphics reference
    */
-  private void markLine(final Graphics g) {
-    if(lineC && markline) {
+  private void markLine(final TextIterator iter, final Graphics g) {
+    if(!edit || !markline) return;
+    if(caretStart == -1) {
+      // locate the boundaries of the line with the cursor
+      final byte[] txt = iter.text();
+      final int tl = txt.length;
+      int s = iter.caret(), e = s;
+      while(s > 0 && txt[s - 1] != '\n') s--;
+      while(e < tl && txt[e] != '\n') e++;
+      caretStart = s;
+      caretEnd = e;
+    }
+    final int pos = iter.pos();
+    if(pos >= caretStart && pos <= caretEnd) {
       g.setColor(GUIConstants.color3A);
       g.fillRect(0, lineY, width + offset, fontHeight);
     }
@@ -555,7 +562,6 @@ final class TextRenderer extends BaseXBack {
     if(ch == TokenBuilder.NLINE || ch == TokenBuilder.HLINE) {
       newline(ch == TokenBuilder.NLINE);
       line++;
-      lineC = edit && iter.caretLine(false);
       return true;
     }
     x += stringWidth;
@@ -568,7 +574,7 @@ final class TextRenderer extends BaseXBack {
    * @param g graphics reference
    */
   private void write(final TextIterator iter, final Graphics g) {
-    if(x == offset) markLine(g);
+    if(x == offset) markLine(iter, g);
 
     // advance the highlighter, and choose color for enabled text, depending on highlighting or link
     final Color syntaxColor = syntax.getColor(iter);
@@ -629,7 +635,7 @@ final class TextRenderer extends BaseXBack {
         } else {
           // draw non-whitespace string
           g.setColor(color);
-          drawString(currString, x, y, g);
+          drawString(iter.currString(), x, y, g);
         }
       }
       // underline linked text
