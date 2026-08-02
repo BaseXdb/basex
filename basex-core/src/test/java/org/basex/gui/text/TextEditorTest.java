@@ -90,6 +90,111 @@ public final class TextEditorTest {
     return editor.pos();
   }
 
+  /** Horizontal movement collapses an existing selection to its edges. */
+  @Test public void charSelection() {
+    // shift+right extends the selection
+    final TextEditor extend = editor("abcd");
+    extend.pos(1);
+    extend.nextChar(true);
+    assertEquals(1, extend.start());
+    assertEquals(2, extend.end());
+
+    // right and left collapse the selection to its end and to its start
+    final TextEditor next = editor("abcd");
+    next.select(1, 3);
+    next.nextChar(false);
+    assertEquals(3, next.pos());
+
+    final TextEditor prev = editor("abcd");
+    prev.select(1, 3);
+    prev.prevChar(false);
+    assertEquals(1, prev.pos());
+  }
+
+  /** Words and lines are deleted, and line breaks at the caret. */
+  @Test public void deleteWordLine() {
+    // delete to the end of the line; at the line end, the line break is deleted
+    assertEquals("a\ncd", deleteNext("ab\ncd", 1, false));
+    assertEquals("abcd", deleteNext("ab\ncd", 2, false));
+    // delete to the beginning of the line; at the line start, the line break is deleted
+    assertEquals("ab\nd", deletePrev("ab\ncd", 4, false));
+    assertEquals("abcd", deletePrev("ab\ncd", 3, false));
+    // delete the next and the previous word
+    assertEquals("bar", deleteNext("foo bar", 0, true));
+    assertEquals("foo ", deletePrev("foo bar", 7, true));
+    // beginning and end of the text: nothing is deleted
+    assertEquals("ab", deleteNext("ab", 2, false));
+    assertEquals("ab", deletePrev("ab", 0, false));
+  }
+
+  /**
+   * Deletes the word or line following the cursor.
+   * @param string text
+   * @param pos cursor position
+   * @param word word/line flag
+   * @return new text
+   */
+  private static String deleteNext(final String string, final int pos, final boolean word) {
+    final TextEditor editor = editor(string);
+    editor.pos(pos);
+    editor.deleteNext(word);
+    return Token.string(editor.text());
+  }
+
+  /**
+   * Deletes the word or line preceding the cursor.
+   * @param string text
+   * @param pos cursor position
+   * @param word word/line flag
+   * @return new text
+   */
+  private static String deletePrev(final String string, final int pos, final boolean word) {
+    final TextEditor editor = editor(string);
+    editor.pos(pos);
+    editor.deletePrev(word);
+    return Token.string(editor.text());
+  }
+
+  /** Lines are moved up and down, starting at the beginning of the line. */
+  @Test public void moveLine() {
+    assertEquals("b\na\nc", move("a\nb\nc", 2, false));
+    assertEquals("b\na\nc", move("a\nb\nc", 0, true));
+  }
+
+  /**
+   * Moves the current line up or down.
+   * @param string text
+   * @param pos cursor position
+   * @param down down/up flag
+   * @return new text
+   */
+  private static String move(final String string, final int pos, final boolean down) {
+    final TextEditor editor = editor(string);
+    editor.pos(pos);
+    editor.move(down);
+    return Token.string(editor.text());
+  }
+
+  /** A line is selected from its start up to the following line break. */
+  @Test public void selectLine() {
+    final TextEditor editor = editor("  ab\ncd");
+    editor.pos(3);
+    editor.selectLine();
+    assertEquals(0, editor.start());
+    assertEquals(5, editor.end());
+  }
+
+  /** Tidying with a single option enabled. */
+  @Test public void tidyOptions() {
+    final TextEditor trim = editor("a  \nb");
+    assertTrue(trim.tidy(true, false));
+    assertEquals("a\nb", Token.string(trim.text()));
+
+    final TextEditor nl = editor("a  \nb");
+    assertTrue(nl.tidy(false, true));
+    assertEquals("a  \nb\n", Token.string(nl.text()));
+  }
+
   /** Jumps to a matching bracket; brackets that are no code are ignored. */
   @Test public void bracket() {
     assertEquals(5, bracket("(1, 2)", 0));
