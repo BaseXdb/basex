@@ -61,6 +61,35 @@ public final class TextEditorTest {
     return editor.pos();
   }
 
+  /** Vertical cursor movement restores the column; tabs are expanded to the indentation. */
+  @Test public void lines() {
+    // the column is restored in the target line
+    assertEquals(5, lines("abc\nxyz", 1, 1));
+    assertEquals(1, lines("abc\nxyz", 5, -1));
+    // tabs count as indentation: the caret keeps its rendered column
+    assertEquals(6, lines("\tab\n\tcd", 2, 1));
+    // shorter target line: the caret stops at its end
+    assertEquals(6, lines("abcd\nx", 3, 1));
+    // first line: the caret moves to the line start; last line: it stays at the text end
+    assertEquals(0, lines("abc\nxyz", 1, -1));
+    assertEquals(7, lines("abc\nxyz", 5, 1));
+  }
+
+  /**
+   * Moves the cursor up or down. This is the fallback for text that has not been rendered yet;
+   * the editor moves by rendered rows.
+   * @param string text
+   * @param pos initial cursor position
+   * @param l number of lines to move cursor (negative: upwards)
+   * @return new cursor position
+   */
+  private static int lines(final String string, final int pos, final int l) {
+    final TextEditor editor = editor(string);
+    editor.pos(pos);
+    editor.lines(l, false);
+    return editor.pos();
+  }
+
   /** Jumps to a matching bracket; brackets that are no code are ignored. */
   @Test public void bracket() {
     assertEquals(5, bracket("(1, 2)", 0));
@@ -206,6 +235,29 @@ public final class TextEditorTest {
     // caret in the comment delimiters: it is restricted to the commented text
     assertEquals(0, comment("(: foo :)", 1));
     assertEquals(3, comment("(: foo :)", 9));
+    // comment without spaces
+    assertEquals(0, comment("(:foo:)", 2));
+    assertEquals(2, comment("(:foo:)", 4));
+  }
+
+  /** Comments are added with spaces, and removed with and without them. */
+  @Test public void commentText() {
+    assertEquals("(: foo :)", commented("foo", 0));
+    assertEquals("foo", commented("(: foo :)", 3));
+    assertEquals("foo", commented("(:foo:)", 2));
+  }
+
+  /**
+   * (Un)comments the current line.
+   * @param string text
+   * @param pos cursor position
+   * @return new text
+   */
+  private static String commented(final String string, final int pos) {
+    final TextEditor editor = editor(string);
+    editor.pos(pos);
+    editor.comment(new SyntaxXQuery());
+    return Token.string(editor.text());
   }
 
   /**

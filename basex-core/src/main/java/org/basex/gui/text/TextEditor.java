@@ -410,13 +410,14 @@ public final class TextEditor {
 
   /**
    * Returns the column of the caret.
-   * @return number of characters that precede the caret in its line
+   * @return number of characters up to and including the one at the caret
    */
   private int column() {
     int p = pos;
     while(p > 0 && text[p - 1] != '\n') p--;
     final int ind = opts.indent();
-    int c = 0;
+    // the character at the caret is included: forward movement stops as soon as the count is reached
+    int c = pos < size() && text[pos] == '\t' ? ind : 1;
     for(; p < pos; p += cl(text, p)) c += text[p] == '\t' ? ind : 1;
     return c;
   }
