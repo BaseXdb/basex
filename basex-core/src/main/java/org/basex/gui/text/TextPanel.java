@@ -7,6 +7,7 @@ import static org.basex.util.Token.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.function.*;
 
 import javax.swing.*;
 import javax.swing.Timer;
@@ -126,11 +127,14 @@ public class TextPanel extends BaseXPanel {
     if(editable) hist.init(editor.text());
 
     final ArrayList<GUICommand> cmds = new ArrayList<>(Arrays.asList(
-      new FindCmd(), new FindNextCmd(), new FindPrevCmd(),
-      new MatchCaseCmd(), new WholeWordCmd(), new RegExCmd(), new DotAllCmd(), null,
+      new FindCmd(), new FindHitCmd(true), new FindHitCmd(false),
+      new ToggleCmd(Text.MATCH_CASE, MATCHCASE, sb -> sb.mcase),
+      new ToggleCmd(Text.WHOLE_WORD, WHOLEWORD, sb -> sb.word),
+      new ToggleCmd(Text.REGULAR_EXPR, REGEX, sb -> sb.regex),
+      new ToggleCmd(Text.DOT_ALL, DOTALL, sb -> sb.dotall), null,
       new GotoCmd(), new DeclarationCmd(), null));
     if(editable) {
-      cmds.addAll(Arrays.asList(new UndoCmd(), new RedoCmd(), null,
+      cmds.addAll(Arrays.asList(new HistoryCmd(true), new HistoryCmd(false), null,
         new AllCmd(), new CutCmd(), new CopyCmd(), new PasteCmd(), new DelCmd()));
     } else {
       cmds.addAll(Arrays.asList(new AllCmd(), new CopyCmd()));
@@ -194,7 +198,7 @@ public class TextPanel extends BaseXPanel {
     }
     if(editor.text(txt)) hist.store(txt, editor.pos(), 0);
     resetError();
-    if(isShowing()) resizeCode.invokeLater();
+    updateCode.invokeLater();
   }
 
   /**
@@ -225,7 +229,7 @@ public class TextPanel extends BaseXPanel {
    */
   public final void setSyntax(final Syntax syntax) {
     rend.syntax(syntax);
-    if(isShowing()) resizeCode.invokeLater();
+    updateCode.invokeLater();
   }
 
   /**
@@ -234,7 +238,7 @@ public class TextPanel extends BaseXPanel {
    */
   public final void setCaret(final int pos) {
     editor.pos(pos);
-    updateScrollpos.invokeLater(Align.CENTER);
+    updateCode.invokeLater(Align.CENTER);
     caret(true);
   }
 
@@ -267,7 +271,7 @@ public class TextPanel extends BaseXPanel {
     super.setFont(f);
     if(rend != null) {
       rend.setFont(f);
-      computeHeight.invokeLater(Align.BOTTOM);
+      updateCode.invokeLater(Align.BOTTOM);
     }
   }
 
@@ -330,10 +334,10 @@ public class TextPanel extends BaseXPanel {
   public final boolean tidy(final boolean trim, final boolean nl) {
     final int caret = editor.pos();
     if(!editor.tidy(trim, nl)) return false;
+    // no edit notification: the tidied text is written to disk right afterwards
     hist.store(editor.text(), caret, editor.pos());
     resetError();
-    if(isShowing()) resizeCode.invokeLater();
-    updateScrollpos.invokeLater(Align.CENTER);
+    updateCode.invokeLater(Align.CENTER);
     caret(true);
     return true;
   }
@@ -509,7 +513,7 @@ public class TextPanel extends BaseXPanel {
       if(!Prop.WIN && !Prop.MAC) {
         if(editor.isSelected()) {
           copy();
-          editor.noSelect();
+          editor.resetSelection();
           rend.repaint();
         } else if(editable && isEnabled()) {
           final ArrayList<Object> clips = BaseXLayout.fromClipboard(null);
@@ -548,7 +552,9 @@ public class TextPanel extends BaseXPanel {
    * @param start states if selection has just been started
    */
   private void select(final Point point, final boolean start) {
-    editor.select(rend.jump(point).pos(), start);
+    final int p = rend.jump(point).pos();
+    if(start) editor.selectFrom(p);
+    else editor.selectTo(p);
     editor.atRowEnd(rend.rowEnd());
     rend.repaint();
   }
@@ -695,13 +701,12 @@ public class TextPanel extends BaseXPanel {
     if(moved || edited) e.consume();
 
     final byte[] tmp = editor.text();
-    if(txt != tmp) {
-      // text has changed: add old text to history
-      hist.store(tmp, pos, editor.pos());
-      computeHeight.invokeLater(down ? Align.BOTTOM : Align.TOP);
-    } else if(pos != editor.pos() || selected != editor.isSelected()) {
-      // cursor position or selection state has changed
-      updateScrollpos.invokeLater(down ? Align.BOTTOM : Align.TOP);
+    final boolean changed = txt != tmp;
+    // text has changed: add old text to history
+    if(changed) hist.store(tmp, pos, editor.pos());
+    // text, cursor position or selection state has changed
+    if(changed || pos != editor.pos() || selected != editor.isSelected()) {
+      updateCode.invokeLater(down ? Align.BOTTOM : Align.TOP);
     }
     // refresh completions, or show them after a delay if the cursor was moved
     if(moved || edited) refreshCompletion(true);
@@ -719,8 +724,7 @@ public class TextPanel extends BaseXPanel {
     final int[] caret = rend.caretRows(count, lastX);
     // no rendered text: fall back to logical lines
     if(caret == null) {
-      if(count < 0) editor.linesUp(-count, select, -1);
-      else editor.linesDown(count, select, -1);
+      editor.lines(count, select);
       return -1;
     }
     editor.moveTo(caret[0], select);
@@ -746,20 +750,19 @@ public class TextPanel extends BaseXPanel {
     editor.atRowEnd(rend.rowEnd());
   }
 
-  /** Computes the height of the text and updates the scroll bar. */
-  private final GUICode<Align> computeHeight = new GUICode<>() {
+  /** Recomputes the text height and adjusts the scroll bar ({@code null}: keep the position). */
+  private final GUICode<Align> updateCode = new GUICode<>() {
     @Override
     public void execute(final Align align) {
+      if(!isShowing()) return;
       rend.computeHeight();
-      updateScrollpos.execute(align);
-    }
-  };
-
-  /** Updates the position of the scroll bar. */
-  private final GUICode<Align> updateScrollpos = new GUICode<>() {
-    @Override
-    public void execute(final Align align) {
-      scroll(rend.cursorY(), align);
+      if(align != null) {
+        scroll(rend.cursorY(), align);
+      } else {
+        // keep the scroll position within the valid range
+        scroll.pos(scroll.pos());
+        rend.repaint();
+      }
     }
   };
 
@@ -809,7 +812,7 @@ public class TextPanel extends BaseXPanel {
     if(move != 0) editor.pos(Math.min(editor.size(), caret + move));
 
     // adjust text height
-    computeHeight.invokeLater(Align.BOTTOM);
+    updateCode.invokeLater(Align.BOTTOM);
     e.consume();
 
     // refresh completions, or show them after a delay if a completion was started
@@ -861,7 +864,7 @@ public class TextPanel extends BaseXPanel {
       if(old != -1) hist.store(editor.text(), old, editor.pos());
       edited();
     }
-    computeHeight.invokeLater(Align.BOTTOM);
+    updateCode.invokeLater(Align.BOTTOM);
   }
 
   /**
@@ -881,61 +884,41 @@ public class TextPanel extends BaseXPanel {
     rend.repaint();
   }
 
-  /** Calculation counter. */
-  private final GUICode<Void> resizeCode = new GUICode<>() {
-    @Override
-    public void execute(final Void arg) {
-      rend.computeHeight();
-      // update scrollbar to display value within valid range
-      scroll.pos(scroll.pos());
-      rend.repaint();
-    }
-  };
-
   @Override
   public final void componentResized(final ComponentEvent e) {
-    if(isShowing()) resizeCode.invokeLater();
+    updateCode.invokeLater();
   }
 
   @Override
   public final void componentShown(final ComponentEvent e) {
-    resizeCode.invokeLater();
+    updateCode.invokeLater();
   }
 
-  /** Undo command. */
-  private class UndoCmd extends GUIPopupCmd {
-    /** Constructor. */
-    UndoCmd() { super(Text.UNDO, UNDOSTEP); }
+  /** Undo/redo command. */
+  private class HistoryCmd extends GUIPopupCmd {
+    /** Undo/redo flag. */
+    private final boolean undo;
+
+    /**
+     * Constructor.
+     * @param undo undo/redo flag
+     */
+    HistoryCmd(final boolean undo) {
+      super(undo ? Text.UNDO : Text.REDO, undo ? UNDOSTEP : REDOSTEP);
+      this.undo = undo;
+    }
 
     @Override
     public void execute() {
       if(!hist.active()) return;
-      final byte[] t = hist.prev();
+      final byte[] t = undo ? hist.prev() : hist.next();
       if(t == null) return;
       editor.text(t);
       editor.pos(hist.caret());
       finish(-1, true);
     }
     @Override
-    public boolean enabled(final GUI main) { return !hist.first(); }
-  }
-
-  /** Redo command. */
-  private class RedoCmd extends GUIPopupCmd {
-    /** Constructor. */
-    RedoCmd() { super(Text.REDO, REDOSTEP); }
-
-    @Override
-    public void execute() {
-      if(!hist.active()) return;
-      final byte[] t = hist.next();
-      if(t == null) return;
-      editor.text(t);
-      editor.pos(hist.caret());
-      finish(-1, true);
-    }
-    @Override
-    public boolean enabled(final GUI main) { return !hist.last(); }
+    public boolean enabled(final GUI main) { return undo ? !hist.first() : !hist.last(); }
   }
 
   /** Cut command. */
@@ -1017,87 +1000,53 @@ public class TextPanel extends BaseXPanel {
     public boolean enabled(final GUI main) { return search != null; }
   }
 
-  /** Find next hit. */
-  private class FindNextCmd extends GUIPopupCmd {
-    /** Constructor. */
-    FindNextCmd() { super(Text.FIND_NEXT, FINDNEXT); }
+  /** Find next or previous hit. */
+  private class FindHitCmd extends GUIPopupCmd {
+    /** Next/previous flag. */
+    private final boolean next;
+
+    /**
+     * Constructor.
+     * @param next next/previous flag
+     */
+    FindHitCmd(final boolean next) {
+      super(next ? Text.FIND_NEXT : Text.FIND_PREVIOUS, next ? FINDNEXT : FINDPREV);
+      this.next = next;
+    }
 
     @Override
-    public void execute() { search(true); }
+    public void execute() { search(next); }
     @Override
     public boolean enabled(final GUI main) { return search != null; }
   }
 
-  /** Find previous hit. */
-  private class FindPrevCmd extends GUIPopupCmd {
-    /** Constructor. */
-    FindPrevCmd() { super(Text.FIND_PREVIOUS, FINDPREV); }
+  /** Toggles a search mode. */
+  private class ToggleCmd extends GUIPopupCmd {
+    /** Button of the search mode. */
+    private final Function<SearchBar, AbstractButton> button;
+
+    /**
+     * Constructor.
+     * @param label label
+     * @param shortcut shortcut
+     * @param button button of the search mode
+     */
+    ToggleCmd(final String label, final BaseXKeys shortcut,
+        final Function<SearchBar, AbstractButton> button) {
+      super(label, shortcut);
+      this.button = button;
+    }
 
     @Override
-    public void execute() { search(false); }
-    @Override
-    public boolean enabled(final GUI main) { return search != null; }
-  }
-
-  /** Match-case search. */
-  private class MatchCaseCmd extends GUIPopupCmd {
-    /** Constructor. */
-    MatchCaseCmd() { super(Text.MATCH_CASE, MATCHCASE); }
-
-    @Override
-    public void execute() { search.toggle(search.mcase); }
+    public void execute() { search.toggle(button.apply(search)); }
     @Override
     public boolean toggle() { return true; }
     @Override
-    public boolean enabled(final GUI main) { return search != null; }
+    public boolean enabled(final GUI main) {
+      return search != null && button.apply(search).isEnabled();
+    }
     @Override
-    public boolean selected(final GUI main) { return search.mcase.isSelected(); }
-  }
-
-  /** Whole-word search. */
-  private class WholeWordCmd extends GUIPopupCmd {
-    /** Constructor. */
-    WholeWordCmd() { super(Text.WHOLE_WORD, WHOLEWORD); }
-
-    @Override
-    public void execute() { search.toggle(search.word); }
-    @Override
-    public boolean toggle() { return true; }
-    @Override
-    public boolean enabled(final GUI main) { return search != null && search.word.isEnabled(); }
-    @Override
-    public boolean selected(final GUI main) { return search.word.isSelected(); }
-  }
-
-  /** Regular-expression search. */
-  private class RegExCmd extends GUIPopupCmd {
-    /** Constructor. */
-    RegExCmd() { super(Text.REGULAR_EXPR, REGEX); }
-
-    @Override
-    public void execute() {
-      search.toggle(search.regex); }
-    @Override
-    public boolean toggle() { return true; }
-    @Override
-    public boolean enabled(final GUI main) { return search != null; }
-    @Override
-    public boolean selected(final GUI main) { return search.regex.isSelected(); }
-  }
-
-  /** Dot-matches-all search. */
-  private class DotAllCmd extends GUIPopupCmd {
-    /** Constructor. */
-    DotAllCmd() { super(Text.DOT_ALL, DOTALL); }
-
-    @Override
-    public void execute() { search.toggle(search.dotall); }
-    @Override
-    public boolean toggle() { return true; }
-    @Override
-    public boolean enabled(final GUI main) { return search != null && search.dotall.isEnabled(); }
-    @Override
-    public boolean selected(final GUI main) { return search.dotall.isSelected(); }
+    public boolean selected(final GUI main) { return button.apply(search).isSelected(); }
   }
 
   /**
@@ -1142,7 +1091,7 @@ public class TextPanel extends BaseXPanel {
     final byte[] text = editor.text();
     final int tl = text.length, el = dl.line();
     int line = 1, pos = 0;
-    for(int t = 0; t < tl && line < el; t += cl(text, t)) {
+    for(int t = 0; t < tl && line < el; t++) {
       if(text[t] != '\n') continue;
       pos = t + 1;
       ++line;

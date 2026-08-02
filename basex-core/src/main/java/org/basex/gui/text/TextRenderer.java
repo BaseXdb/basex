@@ -300,11 +300,14 @@ final class TextRenderer extends BaseXBack {
       return;
     }
 
+    // no graphics reference: the layout cannot be computed, and the cache must not be updated
     final Graphics g = getGraphics();
+    if(g == null) return;
+
     final byte[] txt = text.text();
     final TextIterator iter = init(g, true);
     // try to resume from the edited line
-    final int r0 = g != null ? cache.beginUpdate(txt, width, offset) : -1;
+    final int r0 = cache.beginUpdate(txt, width, offset);
     int endY;
     if(r0 < 0) {
       cache.reset();
