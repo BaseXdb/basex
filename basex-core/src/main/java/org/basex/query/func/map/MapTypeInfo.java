@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.util.hash.*;
 
 /**
  * Compile-time information on maps.
@@ -17,10 +16,8 @@ public final class MapTypeInfo {
   public MapType mapType;
   /** Shape of the map ({@code null} if statically unknown). */
   public ShapeType shape;
-  /** Field ({@code null} if statically unknown, or if key is unknown). */
-  public ShapeField field;
-  /** Field index ({@code 0} if statically unknown, or if key is unknown). */
-  public Integer index;
+  /** Field index ({@code 0} if the key is unknown or no field of the shape). */
+  public int index;
   /** Key type mismatch. */
   public boolean keyMismatch;
   /** Key is known to be valid. */
@@ -52,12 +49,7 @@ public final class MapTypeInfo {
     if(shape != null) {
       if(expr instanceof final Item item) {
         final Type kt = expr.seqType().type;
-        if(kt.isStringOrUntyped()) {
-          final TokenObjectMap<ShapeField> fields = shape.fields();
-          final byte[] key = item.string(null);
-          index = fields.index(key);
-          field = fields.get(key);
-        }
+        if(kt.isStringOrUntyped()) index = shape.fields().index(item.string(null));
         if(kt.instanceOf(BasicType.ANY_ATOMIC_TYPE)) validKey = true;
       }
     }

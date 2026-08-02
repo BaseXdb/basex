@@ -35,7 +35,7 @@ public final class MapGet extends MapFn {
     final MapTypeInfo mti = MapTypeInfo.get(map).key(key);
     SeqType st = null;
     boolean notFound = false;
-    if(mti.field != null) {
+    if(mti.index != 0) {
       // use optimized getter for records
       return new ShapeGet(info, map, mti.index).optimize(cc);
     } else if(mti.validKey) {

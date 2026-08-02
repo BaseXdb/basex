@@ -33,21 +33,10 @@ public final class XQShapeMap extends XQHashMap {
 
   @Override
   public boolean refineType() {
-    // a named record type must retain its declared field types
-    final ShapeType sh = (ShapeType) type;
-    if(sh.name() == null) {
-      final TokenObjectMap<ShapeField> fields = sh.fields();
-      final int fs = fields.size();
-      final TokenObjectMap<ShapeField> refined = new TokenObjectMap<>(fs);
-      boolean narrowed = false;
-      for(int f = 0; f < fs; f++) {
-        final SeqType ost = fields.value(f + 1).seqType(), nst = values[f].seqType();
-        final SeqType st = nst.instanceOf(ost) ? nst : ost;
-        if(!st.eq(ost)) narrowed = true;
-        refined.put(fields.key(f + 1), new ShapeField(st));
-      }
-      if(narrowed) type = sh.with(refined);
-    }
+    final int vl = values.length;
+    final SeqType[] seqTypes = new SeqType[vl];
+    for(int v = 0; v < vl; v++) seqTypes[v] = values[v].seqType();
+    type = shape().refine(seqTypes);
     return true;
   }
 
@@ -59,22 +48,39 @@ public final class XQShapeMap extends XQHashMap {
   @Override
   public XQMap put(final Item key, final Value value) throws QueryException {
     if(key.type.isStringOrUntyped()) {
-      final int i = fields().index(key.string(null));
+      final byte[] name = key.string(null);
+      final int i = fields().index(name);
       if(i != 0) return putAt(i - 1, value);
+      if(key.type == BasicType.STRING) {
+        final ShapeType sh = shape().put(name, value.seqType());
+        if(sh != null) return new XQShapeMap(sh, Array.add(values, value));
+      }
     }
     return super.put(key, value);
   }
 
   @Override
   public XQMap putAt(final int index, final Value value) throws QueryException {
-    if(value.seqType().instanceOf(fields().value(index + 1).seqType())) {
-      final Type tp = type instanceof final ShapeType sh ? sh.shape() : type;
-      if(value == values[index] && tp == type) return this;
-      final Value[] copy = values.clone();
-      copy[index] = value;
-      return new XQShapeMap(tp, copy);
+    final ShapeType sh = shape();
+    final SeqType vt = value.seqType();
+    final ShapeType tp = vt.instanceOf(fields().value(index + 1).seqType()) ? sh.shape() :
+      sh.put(fields().key(index + 1), vt);
+    if(value == values[index] && tp == type) return this;
+    final Value[] copy = values.clone();
+    copy[index] = value;
+    return new XQShapeMap(tp, copy);
+  }
+
+  @Override
+  public XQMap remove(final Item key) throws QueryException {
+    if(key.type.isStringOrUntyped()) {
+      final byte[] name = key.string(null);
+      final int i = fields().index(name);
+      if(i == 0) return this;
+      if(values.length == 1) return empty();
+      return new XQShapeMap(shape().remove(name), Array.remove(values, i - 1));
     }
-    return super.putAt(index, value);
+    return super.remove(key);
   }
 
   @Override
@@ -97,11 +103,19 @@ public final class XQShapeMap extends XQHashMap {
   }
 
   /**
+   * Returns the shape of this map.
+   * @return shape
+   */
+  private ShapeType shape() {
+    return (ShapeType) type;
+  }
+
+  /**
    * Returns the fields of the map type.
    * @return fields
    */
   private TokenObjectMap<ShapeField> fields() {
-    return ((ShapeType) type).fields();
+    return shape().fields();
   }
 
   @Override
@@ -131,13 +145,13 @@ public final class XQShapeMap extends XQHashMap {
       qc.checkStop();
       vals[v] = values[v].materialize(test, ii, qc);
     }
-    return new XQShapeMap(((ShapeType) type).detach(), vals);
+    return new XQShapeMap(shape().detach(), vals);
   }
 
   @Override
   public boolean materialized(final Predicate<Data> test, final InputInfo ii)
       throws QueryException {
-    return ((ShapeType) type).detached() && super.materialized(test, ii);
+    return shape().detached() && super.materialized(test, ii);
   }
 
   @Override

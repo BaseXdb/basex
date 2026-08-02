@@ -51,7 +51,7 @@ abstract class XQHashMap extends XQMap {
   }
 
   @Override
-  public final XQMap remove(final Item key) throws QueryException {
+  public XQMap remove(final Item key) throws QueryException {
     return getOrNull(key) == null ? this : trie().remove(key);
   }
 

@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.util.hash.*;
 
 /**
  * Map with a single entry.
@@ -66,7 +65,12 @@ public final class XQSingletonMap extends XQMap {
 
   @Override
   public XQMap put(final Item key, final Value value) throws QueryException {
-    return key.atomicEqual(k) ? putAt(0, value) : empty().put(k, v).put(key, value);
+    if(key.atomicEqual(k)) return putAt(0, value);
+    if(type instanceof final ShapeType sh && key.type == BasicType.STRING) {
+      final ShapeType nsh = sh.put(key.string(null), value.seqType());
+      if(nsh != null) return new XQShapeMap(nsh, v, value);
+    }
+    return empty().put(k, v).put(key, value);
   }
 
   @Override
@@ -98,16 +102,7 @@ public final class XQSingletonMap extends XQMap {
   @Override
   public boolean refineType() throws QueryException {
     if(!(type instanceof final ShapeType sh)) return super.refineType();
-    // a named record must retain its declared field types
-    if(sh.name() == null) {
-      final SeqType ost = sh.fields().value(1).seqType(), nst = v.seqType();
-      final SeqType st = nst.instanceOf(ost) ? nst : ost;
-      if(!st.eq(ost)) {
-        final TokenObjectMap<ShapeField> refined = new TokenObjectMap<>(1);
-        refined.put(sh.fields().key(1), new ShapeField(st));
-        type = sh.with(refined);
-      }
-    }
+    type = sh.refine(v.seqType());
     return true;
   }
 

@@ -10,6 +10,7 @@ import org.basex.query.util.hash.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -401,13 +402,18 @@ public final class RecordTest extends SandboxTest {
         empty(func));
 
     check("declare record local:x(x, y := ()); local:x(1) => map:remove('x')", "{\"y\":()}",
-        type(func, "map(xs:string, item()*)"));
+        type(func, "map(xs:string, item()*)"), shape(func, "y"));
     check("declare record local:x(x, y := ()); local:x(1) => map:remove(<_>x</_>)", "{\"y\":()}",
-        type(func, "map(xs:string, item()*)"));
+        type(func, "map(xs:string, item()*)"), shape(func, "y"));
     check("declare record local:x(x, y := ()); local:x(1) => map:remove('y')", "{\"x\":1}",
-        type(func, "map(xs:string, item()*)"));
+        type(func, "map(xs:string, item()*)"), shape(func, "x"));
     check("declare record local:x(x, y := ()); local:x(1) => map:remove(<_>y</_>)", "{\"x\":1}",
-        type(func, "map(xs:string, item()*)"));
+        type(func, "map(xs:string, item()*)"), shape(func, "x"));
+    // the removed field is no longer looked up
+    check("declare record local:x(x, y); local:x(1, 2) => map:remove('x') => map:get('x')", "",
+        empty());
+    check("declare record local:x(x, y); local:x(1, 2) => map:remove('x') => map:get('y')", 2,
+        root(ShapeGet.class));
     check("declare record local:x(x, y := ()); local:x(1) => map:remove('z')", "{\"x\":1,\"y\":()}",
         empty(func), type(StaticFuncCall.class, "local:x"));
     check("declare record local:x(x, y := ()); local:x(1) => map:remove(1)", "{\"x\":1,\"y\":()}",
@@ -424,14 +430,21 @@ public final class RecordTest extends SandboxTest {
         "{\"x\":2}", type(ShapeSet.class, "map(xs:string, item()*)"),
         shape(ShapeSet.class, "x"));
     check("declare record local:x(x); local:x(1) => map:put('y', 2)",
-        "{\"x\":1,\"y\":2}", type(func, "map(xs:string, item()*)"));
+        "{\"x\":1,\"y\":2}", type(func, "map(xs:string, item()*)"),
+        shape(func, "x, y"));
+    // the new field is appended, and the record annotation is dropped
+    query("declare record local:x(x); local:x(1) => map:put('y', 2) instance of local:x", false);
     check("declare record local:x(x); local:x(1) => map:put(<_>y</_>, 2)",
         "{\"x\":1,\"y\":2}", type(func, "map(*)"));
     check("declare record local:x(x); local:x(1) => map:put(0, 0)",
         "{\"x\":1,0:0}", type(func, "map(*)"));
 
+    // a mismatching value widens the field type, the field set is preserved
     check("declare record local:x(x as xs:int); local:x(1) => map:put('x', <x/>)",
-        "{\"x\":<x/>}", type(ShapeSet.class, "map(xs:string, item())"));
+        "{\"x\":<x/>}", type(ShapeSet.class, "map(xs:string, element(x))"),
+        shape(ShapeSet.class, "x"));
+    check("declare record local:x(x, y); local:x(1, 2) => map:put('x', <x/>) => map:get('z')", "",
+        empty());
 
     check("declare record local:x(x, y := ()); local:x(1) => map:put('x', 2)",
         "{\"x\":2,\"y\":()}", type(ShapeSet.class, "map(xs:string, item()*)"),
@@ -447,6 +460,18 @@ public final class RecordTest extends SandboxTest {
         shape(ShapeSet.class, "x, y"));
     check("declare record local:x(x, y := ()); local:x(1) => map:put(0, 0)",
         "{\"x\":1,\"y\":(),0:0}", type(func, "map(*)"));
+
+    // inferred shapes are extended as well
+    check("{ 'a': 1, 'b': 2 } => map:put('c', <c/>)", "{\"a\":1,\"b\":2,\"c\":<c/>}",
+        type(func, "map(xs:string, item())"), shape(func, "a, b, c"));
+    check("{ 'a': 1, 'b': 2 } => map:put('c', <c/>) => map:size()", 3, root(Itr.class));
+    // fields are only added if the maximum shape size is not exceeded
+    final StringBuilder sb = new StringBuilder("{");
+    for(int f = 1; f <= ShapeType.MAX_GENERATED_SIZE; f++) {
+      sb.append(f > 1 ? ", " : " ").append("'f").append(f).append("': ").append(f);
+    }
+    check(sb + " } => map:put('f0', <f/>)", null, type(func, "map(xs:string, item())"),
+        empty(func.className() + "[@shape]"));
   }
 
   /** A field update coerced back to its record type is fused into the {@code +:=} operator. */
@@ -536,10 +561,17 @@ public final class RecordTest extends SandboxTest {
     check(map + " => map:get(<?_ 1?> cast as xs:integer)", "", empty());
     check(map + " => map:put('b', 3)", "{\"a\":1,\"b\":3}", root(XQShapeMap.class));
     check(map + " => map:put('b', xs:byte(3))", "{\"a\":1,\"b\":3}", root(XQShapeMap.class));
-    check(map + " => map:put('b', '3')", "{\"a\":1,\"b\":\"3\"}", root(XQTrieMap.class));
-    check(map + " => map:put('c', 3)", "{\"a\":1,\"b\":2,\"c\":3}", root(XQTrieMap.class));
+    check(map + " => map:put('b', '3')", "{\"a\":1,\"b\":\"3\"}", root(XQShapeMap.class));
+    check(map + " => map:put('c', 3)", "{\"a\":1,\"b\":2,\"c\":3}", root(XQShapeMap.class));
+    check(map + " => map:put(xs:untypedAtomic('c'), 3)", "{\"a\":1,\"b\":2,\"c\":3}",
+        root(XQTrieMap.class));
     check(map + " => map:put(3, 3)", "{\"a\":1,\"b\":2,3:3}", root(XQTrieMap.class));
-    check(map + " => map:remove('b')", "{\"a\":1}", root(XQTrieMap.class));
+    check("map:entry('a', 1) => map:put('b', 2)", "{\"a\":1,\"b\":2}", root(XQShapeMap.class));
+    // fields are only appended if the maximum shape size is not exceeded
+    query("let $m := fold-left(1 to 40, {}, fn($m, $i) { map:put($m, 'f' || $i, $i) }) "
+        + "return ($m?f40, count(map:keys($m)))", "40\n40");
+    check(map + " => map:remove('b')", "{\"a\":1}", root(XQShapeMap.class));
+    check(map + " => map:remove(xs:untypedAtomic('b'))", "{\"a\":1}", root(XQShapeMap.class));
     check(map + " => map:remove('c')", "{\"a\":1,\"b\":2}", root(XQShapeMap.class));
     check(map + " => map:remove(1)", "{\"a\":1,\"b\":2}", root(XQShapeMap.class));
     check(map + " => map:remove(<?_ 1?> cast as xs:integer)", "{\"a\":1,\"b\":2}",

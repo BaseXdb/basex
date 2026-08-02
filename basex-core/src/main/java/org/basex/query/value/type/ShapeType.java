@@ -45,12 +45,68 @@ public class ShapeType extends MapType {
   }
 
   /**
-   * Returns an anonymous type of the same kind with the specified fields.
+   * Returns a type of the same kind with the specified fields.
    * @param map field declarations
    * @return shape
    */
   public ShapeType with(final TokenObjectMap<ShapeField> map) {
     return new ShapeType(map);
+  }
+
+  /**
+   * Returns an inferred shape with an additional or updated field.
+   * @param fieldName field name
+   * @param seqType sequence type of the field
+   * @return shape, or {@code null} if the maximum size of generated shapes is exceeded
+   */
+  public final ShapeType put(final byte[] fieldName, final SeqType seqType) {
+    return copy(null, fieldName, seqType);
+  }
+
+  /**
+   * Returns an inferred shape without the specified field.
+   * @param fieldName field name
+   * @return shape
+   */
+  public final ShapeType remove(final byte[] fieldName) {
+    return copy(fieldName, null, null);
+  }
+
+  /**
+   * Returns an inferred shape with a removed and/or added field.
+   * @param remove name of the field to be removed (can be {@code null})
+   * @param put name of the field to be added or updated (can be {@code null})
+   * @param seqType sequence type of the added field (can be {@code null})
+   * @return shape, or {@code null} if the maximum size of generated shapes is exceeded
+   */
+  private ShapeType copy(final byte[] remove, final byte[] put, final SeqType seqType) {
+    if(put != null && !fields.contains(put) && fields.size() >= MAX_GENERATED_SIZE) return null;
+    final TokenObjectMap<ShapeField> map = new TokenObjectMap<>(fields.size() + 1L);
+    for(final byte[] key : fields) {
+      if(remove == null || !Token.eq(remove, key)) map.put(key, fields.get(key));
+    }
+    if(put != null) map.put(put, new ShapeField(seqType));
+    return new ShapeType(map);
+  }
+
+  /**
+   * Returns a shape with field types narrowed to the specified sequence types.
+   * @param seqTypes new field types, one per field
+   * @return refined shape, or {@code this} if no field type is narrowed
+   */
+  public final ShapeType refine(final SeqType... seqTypes) {
+    final int fs = fields.size();
+    if(name() != null || seqTypes.length != fs) return this;
+
+    final TokenObjectMap<ShapeField> map = new TokenObjectMap<>(fs);
+    boolean narrowed = false;
+    for(int f = 1; f <= fs; f++) {
+      final SeqType ost = fields.value(f).seqType(), nst = seqTypes[f - 1];
+      final SeqType st = nst.instanceOf(ost) ? nst : ost;
+      if(!st.eq(ost)) narrowed = true;
+      map.put(fields.key(f), new ShapeField(st));
+    }
+    return narrowed ? with(map) : this;
   }
 
   /**

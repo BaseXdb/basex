@@ -68,23 +68,13 @@ public class ShapeConstructor extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     // refine the field types of an anonymous shape from the argument types
-    if(shapeType.name() == null) {
-      final TokenObjectMap<ShapeField> fields = shapeType.fields();
-      final int fs = fields.size();
-      if(fs == exprs.length) {
-        final TokenObjectMap<ShapeField> refined = new TokenObjectMap<>(fs);
-        boolean narrowed = false;
-        for(int f = 0; f < fs; f++) {
-          final SeqType ost = fields.value(f + 1).seqType(), nst = exprs[f].seqType();
-          final SeqType st = nst.instanceOf(ost) ? nst : ost;
-          if(!st.eq(ost)) narrowed = true;
-          refined.put(fields.key(f + 1), new ShapeField(st));
-        }
-        if(narrowed) {
-          shapeType = cc.qc.shared.shape(shapeType.with(refined));
-          exprType.assign(shapeType.seqType());
-        }
-      }
+    final int el = exprs.length;
+    final SeqType[] seqTypes = new SeqType[el];
+    for(int e = 0; e < el; e++) seqTypes[e] = exprs[e].seqType();
+    final ShapeType sh = shapeType.refine(seqTypes);
+    if(sh != shapeType) {
+      shapeType = cc.qc.shared.shape(sh);
+      exprType.assign(shapeType.seqType());
     }
     return this;
   }

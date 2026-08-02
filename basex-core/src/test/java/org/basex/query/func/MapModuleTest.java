@@ -463,7 +463,7 @@ public final class MapModuleTest extends SandboxTest {
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", 1), "{\"x\":1}",
         type(ShapeSet.class, "map(xs:string, xs:integer)"), shape(ShapeSet.class, "x"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", "y"), "{\"x\":\"y\"}",
-        type(ShapeSet.class, "map(xs:string, xs:anyAtomicType)"));
+        type(ShapeSet.class, "map(xs:string, xs:string)"), shape(ShapeSet.class, "x"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "y", 2), "{\"x\":0,\"y\":2}",
         type(func, "map(xs:string, xs:integer)"));
 
@@ -471,7 +471,7 @@ public final class MapModuleTest extends SandboxTest {
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", 1), "{\"x\":1}",
         type(ShapeSet.class, "map(xs:string, xs:integer?)"), shape(ShapeSet.class, "x"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", "y"), "{\"x\":\"y\"}",
-        type(ShapeSet.class, "map(xs:string, xs:anyAtomicType?)"));
+        type(ShapeSet.class, "map(xs:string, xs:string)"), shape(ShapeSet.class, "x"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "y", 2), "{\"x\":0,\"y\":2}",
         type(func, "map(xs:string, xs:integer?)"));
 
@@ -479,7 +479,7 @@ public final class MapModuleTest extends SandboxTest {
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", 1), "{\"x\":1}",
         type(ShapeSet.class, "map(xs:string, xs:integer)"), shape(ShapeSet.class, "x"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", "y"), "{\"x\":\"y\"}",
-        type(ShapeSet.class, "map(xs:string, xs:anyAtomicType)"));
+        type(ShapeSet.class, "map(xs:string, xs:string)"), shape(ShapeSet.class, "x"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "y", 2), "{\"x\":0,\"y\":2}",
         type(func, "map(xs:string, xs:integer)"));
   }
@@ -537,7 +537,7 @@ public final class MapModuleTest extends SandboxTest {
 
     check(func.args(" {}"), 0, root(Itr.class));
     check(func.args(" { 'a': <a/> }"), 1, root(Itr.class));
-    check("{} => map:put('a', <a/>) => map:put('b', <b/>) =>" + func.args(), 2, root(func));
+    check("{} => map:put('a', <a/>) => map:put('b', <b/>) =>" + func.args(), 2, root(Itr.class));
   }
 
   /**

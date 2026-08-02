@@ -42,8 +42,6 @@ public final class XMLToken {
   public static final byte[] E_CR = token("&#xD;");
   /** Newline. */
   public static final byte[] E_NL = token("&#xA;");
-  /** Line separator. */
-  public static final byte[] E_2028 = token("&#x2028;");
   /** HTML: Non-breaking space entity. */
   public static final byte[] E_NBSP = token("&nbsp;");
 

@@ -47,7 +47,7 @@ public final class RecordType extends ShapeType {
 
   @Override
   public RecordType with(final TokenObjectMap<ShapeField> map) {
-    return new RecordType(map);
+    return new RecordType(map, name, anns);
   }
 
   @Override

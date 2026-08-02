@@ -40,8 +40,7 @@ public final class ShapeGet extends Single {
    * @param index index of the field (starting with 1)
    * @param type type of the processed map
    */
-  private ShapeGet(final InputInfo info, final Expr map, final int index,
-      final ShapeType type) {
+  private ShapeGet(final InputInfo info, final Expr map, final int index, final ShapeType type) {
     super(info, map, Types.ITEM_ZM);
     this.type = type;
     this.index = index;
