@@ -64,6 +64,24 @@ public final class SerializerTest extends SandboxTest {
     query("serialize('a&#13;b', map { 'method': 'text' }) => contains('&#13;')", true);
   }
 
+  /** Test: cdata-section-elements. */
+  @Test public void cdataSectionElements() {
+    final String ser = "serialize(<a>{ $text }</a>, "
+        + "map { 'cdata-section-elements': xs:QName('a') })";
+    query("let $text := 'x' return " + ser, "<a><![CDATA[x]]></a>");
+    // sections are split before the closing delimiter
+    query("let $text := 'x]]>y' return " + ser, "<a><![CDATA[x]]]]><![CDATA[>y]]></a>");
+    // characters that require escaping are moved outside the section
+    query("let $text := 'x&#xD;y' return " + ser, "<a><![CDATA[x]]>&#xD;<![CDATA[y]]></a>");
+    query("let $text := 'x&#x85;y' return " + ser, "<a><![CDATA[x]]>&#x85;<![CDATA[y]]></a>");
+    query("let $text := 'x&#x2028;y' return " + ser, "<a><![CDATA[x]]>&#x2028;<![CDATA[y]]></a>");
+    // tabs and newlines are retained
+    query("let $text := 'x&#x9;&#xA;y' return " + ser, "<a><![CDATA[x\t\ny]]></a>");
+    // carriage returns survive a round trip
+    query("string-to-codepoints(parse-xml(let $text := 'x&#xD;&#xA;y' return " + ser + ")/a)",
+        "120\n13\n10\n121");
+  }
+
   /** Test: normalization-form. */
   @Test public void normalizationForm() {
     // u with diaeresis: composed is codepoint 252, decomposed is 117 followed by 776
