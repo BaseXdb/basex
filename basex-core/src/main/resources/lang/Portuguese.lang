@@ -418,6 +418,7 @@ view                 = Exibir
 views                = Exibições
 visualization        = Visualização
 whole_word           = Palavra inteira
+word_wrap            = Quebra de linha automática
 write_locking        = Bloqueio de escrita
 yes                  = Sim
 

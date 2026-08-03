@@ -418,6 +418,7 @@ view                 = View
 views                = Views
 visualization        = Visualization
 whole_word           = Whole Word
+word_wrap            = Word wrap
 write_locking        = Write Locking
 yes                  = Yes
 

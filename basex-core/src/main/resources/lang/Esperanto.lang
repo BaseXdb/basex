@@ -418,6 +418,7 @@ view                 = Rigardo
 views                = Rigardoj
 visualization        = Bildigo
 whole_word           = Tuta vorto
+word_wrap            = Linifaldo
 write_locking        = Skriba ŝloso
 yes                  = Jes
 

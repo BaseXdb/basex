@@ -50,6 +50,10 @@ public class TextPanel extends BaseXPanel {
   private final TextRenderer rend;
   /** Scrollbar reference. */
   private final BaseXScrollBar scroll;
+  /** Horizontal scrollbar reference. */
+  private final BaseXScrollBar hscroll;
+  /** Panel with the horizontal scrollbar (hidden if long lines are wrapped). */
+  private final BaseXBack hpanel;
   /** Editable flag. */
   private final boolean editable;
 
@@ -116,10 +120,21 @@ public class TextPanel extends BaseXPanel {
     layout(new BorderLayout());
 
     scroll = new BaseXScrollBar(this);
-    rend = new TextRenderer(editor, scroll, editable, opts);
+    hscroll = new BaseXScrollBar(this, true);
+
+    // the filler keeps the horizontal scrollbar clear of the vertical one
+    final BaseXBack filler = new BaseXBack();
+    BaseXLayout.setWidth(filler, scroll.getPreferredSize().width);
+    hpanel = new BaseXBack().layout(new BorderLayout());
+    hpanel.add(hscroll, BorderLayout.CENTER);
+    hpanel.add(filler, BorderLayout.EAST);
+
+    rend = new TextRenderer(editor, scroll, hscroll, editable, opts);
+    hpanel.setVisible(!rend.wrap());
 
     add(rend, BorderLayout.CENTER);
     add(scroll, BorderLayout.EAST);
+    add(hpanel, BorderLayout.SOUTH);
 
     hist = new History(editable ? EMPTY : null);
     setText(text);
@@ -270,6 +285,9 @@ public class TextPanel extends BaseXPanel {
     super.setFont(f);
     if(rend != null) {
       rend.setFont(f);
+      // a visibility change of the scrollbar must be propagated to the layout
+      hpanel.setVisible(!rend.wrap());
+      revalidate();
       updateCode.invokeLater(Align.BOTTOM);
     }
   }
@@ -502,6 +520,8 @@ public class TextPanel extends BaseXPanel {
       select(e.getPoint(), false);
       final int y = Math.max(20, Math.min(e.getY(), getHeight() - 20));
       if(y != e.getY()) scroll.pos(scroll.pos() + e.getY() - y);
+      final int x = Math.max(20, Math.min(e.getX(), getWidth() - 20));
+      if(x != e.getX()) rend.moveX(e.getX() - x);
     }
   }
 
@@ -758,8 +778,9 @@ public class TextPanel extends BaseXPanel {
       if(align != null) {
         scroll(rend.cursorY(), align);
       } else {
-        // keep the scroll position within the valid range
+        // keep the scroll positions within the valid range
         scroll.pos(scroll.pos());
+        hscroll.pos(hscroll.pos());
         rend.repaint();
       }
     }
@@ -781,6 +802,7 @@ public class TextPanel extends BaseXPanel {
         });
       }
     }
+    rend.scrollX();
     rend.repaint();
   }
 
@@ -826,6 +848,7 @@ public class TextPanel extends BaseXPanel {
   public final void refreshLayout(final Font f) {
     setFont(f);
     scroll.refreshLayout();
+    hscroll.refreshLayout();
   }
 
   // EDITOR COMMANDS ==============================================================================
@@ -879,7 +902,9 @@ public class TextPanel extends BaseXPanel {
   @Override
   public final void mouseWheelMoved(final MouseWheelEvent e) {
     completion.hide();
-    scroll.pos(scroll.pos() + e.getUnitsToScroll() * 20);
+    final int units = e.getUnitsToScroll() * 20;
+    if(e.isShiftDown()) rend.moveX(units);
+    else scroll.pos(scroll.pos() + units);
     rend.repaint();
   }
 

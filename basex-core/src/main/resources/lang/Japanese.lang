@@ -418,6 +418,7 @@ view                 = ビュー
 views                = ビュー
 visualization        = ビジュアライゼーション
 whole_word           = 単語全体
+word_wrap            = 折り返し
 write_locking        = 書き込みロック
 yes                  = はい
 

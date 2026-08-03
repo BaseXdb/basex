@@ -418,6 +418,7 @@ view                 = 보기
 views                = 보기
 visualization        = 시각화
 whole_word           = 전체 단어
+word_wrap            = 자동 줄 바꿈
 write_locking        = 쓰기 잠금
 yes                  = 예
 

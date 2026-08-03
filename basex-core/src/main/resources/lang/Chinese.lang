@@ -418,6 +418,7 @@ view                 = 视图
 views                = 视图
 visualization        = 可视化
 whole_word           = 整词
+word_wrap            = 自动换行
 write_locking        = 写锁定
 yes                  = 是
 

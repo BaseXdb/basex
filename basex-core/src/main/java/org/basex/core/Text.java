@@ -1320,6 +1320,8 @@ public interface Text {
   /** Size of text result. */
   String SIZE_TEXT_RESULTS = lang("size_text_results");
 
+  /** Wrap long lines. */
+  String WORD_WRAP = lang("word_wrap");
   /** Show line numbers. */
   String SHOW_LINE_NUMBERS = lang("show_line_numbers");
   /** Show line margin. */

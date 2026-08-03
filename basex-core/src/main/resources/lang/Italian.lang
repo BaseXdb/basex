@@ -418,6 +418,7 @@ view                 = Visualizza
 views                = Viste
 visualization        = Visualizzazione
 whole_word           = Parola Intera
+word_wrap            = A capo automatico
 write_locking        = Locking in scrittura
 yes                  = Sì
 

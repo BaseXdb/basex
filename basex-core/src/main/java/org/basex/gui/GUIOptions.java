@@ -134,6 +134,8 @@ public final class GUIOptions extends Options {
   /** Unicode order. */
   public static final BooleanOption UNICODE = new BooleanOption("UNICODE", true);
 
+  /** Wrap long lines. */
+  public static final BooleanOption WORDWRAP = new BooleanOption("WORDWRAP", true);
   /** Show line margin. */
   public static final BooleanOption SHOWMARGIN = new BooleanOption("SHOWMARGIN", true);
   /** Line margin. */

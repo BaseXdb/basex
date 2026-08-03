@@ -418,6 +418,7 @@ view                 = Lihat
 views                = Tampilan
 visualization        = Visualisasi
 whole_word           = Seluruh kata
+word_wrap            = Bungkus kata
 write_locking        = Tulis pengunci
 yes                  = Ya
 

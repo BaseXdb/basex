@@ -418,6 +418,7 @@ view                 = Nézet
 views                = Nézetek
 visualization        = Megjelenítés
 whole_word           = Egész szó
+word_wrap            = Sortörés
 write_locking        = Írási zárolása
 yes                  = Igen
 

@@ -418,6 +418,7 @@ view                 = Görünüm
 views                = Görünümler
 visualization        = Görselleştirme
 whole_word           = Tam Kelime
+word_wrap            = Sözcük kaydırma
 write_locking        = Yazma kilitleme
 yes                  = Evet
 

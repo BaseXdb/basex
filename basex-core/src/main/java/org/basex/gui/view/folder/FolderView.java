@@ -169,7 +169,7 @@ public final class FolderView extends View {
     if(opened == null) return;
 
     treeH = new FolderIterator(this).height();
-    scroll.height(treeH + 5);
+    scroll.extent(treeH + 5);
   }
 
   @Override

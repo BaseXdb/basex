@@ -25,6 +25,8 @@ final class TextRenderer extends BaseXBack {
   private final TextEditor text;
   /** Vertical start position. */
   private final BaseXScrollBar scroll;
+  /** Horizontal start position (no word wrap). */
+  private final BaseXScrollBar hscroll;
   /** Indicates if the text is edited. */
   private final boolean edit;
   /** Current brackets. */
@@ -40,6 +42,8 @@ final class TextRenderer extends BaseXBack {
   private boolean showInvisible;
   /** Show newlines. */
   private boolean showNL;
+  /** Wrap long lines. */
+  private boolean wrap;
   /** Line margin ({@code 0} if no margin is shown). */
   private int margin;
   /** Show line numbers. */
@@ -56,6 +60,8 @@ final class TextRenderer extends BaseXBack {
   /** Height of total text area. */
   private int height;
 
+  /** x position at the beginning of a row. */
+  private int startX;
   /** Current x position. */
   private int x;
   /** Current y position. */
@@ -96,16 +102,18 @@ final class TextRenderer extends BaseXBack {
   /**
    * Constructor.
    * @param text text to be drawn
-   * @param scroll scrollbar reference
+   * @param scroll vertical scrollbar reference
+   * @param hscroll horizontal scrollbar reference
    * @param edit editable flag
    * @param opts editor options
    */
-  TextRenderer(final TextEditor text, final BaseXScrollBar scroll, final boolean edit,
-      final EditorOptions opts) {
+  TextRenderer(final TextEditor text, final BaseXScrollBar scroll, final BaseXScrollBar hscroll,
+      final boolean edit, final EditorOptions opts) {
 
     setOpaque(false);
     this.text = text;
     this.scroll = scroll;
+    this.hscroll = hscroll;
     this.edit = edit;
     this.opts = opts;
     setFont(GUIConstants.dmfont);
@@ -119,6 +127,9 @@ final class TextRenderer extends BaseXBack {
     cache.reset();
 
     margin = opts.margin();
+    // text that cannot be edited is always wrapped: it has no horizontal scrolling
+    wrap = !edit || opts.get(GUIOptions.WORDWRAP);
+    if(wrap) hscroll.pos(0);
     showInvisible = opts.get(GUIOptions.SHOWINVISIBLE);
     showNL = opts.get(GUIOptions.SHOWNL);
     showLines = opts.get(GUIOptions.SHOWLINES);
@@ -134,6 +145,7 @@ final class TextRenderer extends BaseXBack {
 
     parentheses.reset();
     final TextIterator iter = init(g, false);
+    clipText(g);
     skip(iter);
     int oldL = line - 1;
     while(more(iter, g) && y < height) {
@@ -143,7 +155,7 @@ final class TextRenderer extends BaseXBack {
       }
       write(iter, g);
     }
-    if(x == offset) markLine(iter, g);
+    if(rowStart()) markLine(iter, g);
     if(line != oldL) drawLineNumber(g);
 
     stringWidth = 0;
@@ -151,7 +163,41 @@ final class TextRenderer extends BaseXBack {
     if(caret && s == iter.caret()) drawCaret(g, x, lineY);
     if(s == iter.errorPos()) drawError(g);
 
+    clipAll(g);
     drawLinesSep(g);
+  }
+
+  /**
+   * Restricts the graphics to the text area, right of the line numbers.
+   * @param g graphics reference
+   */
+  private void clipText(final Graphics g) {
+    final int cx = Math.max(0, sepX() + 1);
+    g.setClip(cx, 0, getWidth() - cx, getHeight());
+  }
+
+  /**
+   * Extends the graphics to the whole panel, including the line numbers.
+   * @param g graphics reference
+   */
+  private void clipAll(final Graphics g) {
+    g.setClip(0, 0, getWidth(), getHeight());
+  }
+
+  /**
+   * Returns the x position of the line number separator.
+   * @return position
+   */
+  private int sepX() {
+    return offset - OFFSET * 3 / 2;
+  }
+
+  /**
+   * Indicates if the current position is at the beginning of a row.
+   * @return result of check
+   */
+  private boolean rowStart() {
+    return x == startX;
   }
 
   /**
@@ -162,7 +208,9 @@ final class TextRenderer extends BaseXBack {
     if(edit && showLines) {
       g.setColor(GUIConstants.gray);
       final String string = Integer.toString(line);
+      clipAll(g);
       drawString(string, offset - font.stringWidth(string) - (OFFSET << 1), y, g);
+      clipText(g);
     }
   }
 
@@ -172,16 +220,18 @@ final class TextRenderer extends BaseXBack {
    */
   private void drawLinesSep(final Graphics g) {
     if(edit) {
+      final int sx = sepX();
       if(showLines) {
-        final int lx = offset - OFFSET * 3 / 2;
         g.setColor(GUIConstants.lightGray);
-        g.drawLine(lx, 0, lx, height);
+        g.drawLine(sx, 0, sx, height);
       }
       if(margin > 0) {
         // line margin
-        final int lx = offset + font.charWidth(' ') * margin;
-        g.setColor(GUIConstants.lightGray);
-        g.drawLine(lx, 0, lx, height);
+        final int lx = offset - hscroll.pos() + font.charWidth(' ') * margin;
+        if(lx > sx) {
+          g.setColor(GUIConstants.lightGray);
+          g.drawLine(lx, 0, lx, height);
+        }
       }
     }
   }
@@ -277,7 +327,8 @@ final class TextRenderer extends BaseXBack {
     if(g != null && edit && showLines) {
       offset += font.stringWidth(Integer.toString(text.lines())) + (OFFSET << 1);
     }
-    x = offset;
+    startX = offset - (start ? 0 : hscroll.pos());
+    x = startX;
     y = fontHeight - (start ? 0 : scroll.pos()) - 2;
     lineY = y - (fontHeight << 2) / 5;
     line = 1;
@@ -293,9 +344,10 @@ final class TextRenderer extends BaseXBack {
   void computeHeight() {
     width = getWidth() - OFFSET;
     // text and width unchanged: only refresh the derived height and scroll extent
-    if(cache.built(text.text(), width)) {
+    if(cache.built(text.text(), cacheWidth())) {
       height = getHeight() + fontHeight;
-      scroll.height(cache.endY() + OFFSET);
+      scroll.extent(cache.endY() + OFFSET);
+      hscroll.extent(textWidth());
       return;
     }
 
@@ -306,7 +358,7 @@ final class TextRenderer extends BaseXBack {
     final byte[] txt = text.text();
     final TextIterator iter = init(g, true);
     // try to resume from the edited line
-    final int r0 = cache.beginUpdate(txt, width, offset);
+    final int r0 = cache.beginUpdate(txt, cacheWidth(), offset);
     int endY;
     if(r0 < 0) {
       cache.reset();
@@ -314,8 +366,13 @@ final class TextRenderer extends BaseXBack {
       while(more(iter, g)) {
         // advance the highlighter state so it can be restored when rendering resumes mid-document
         syntax.getColor(iter);
-        if(next(iter)) cache.add(y, iter.posEnd(), syntax.state());
+        if(next(iter)) {
+          // the line that was left behind ends at the remembered row position
+          cache.lineWidth(rowX - offset);
+          cache.add(y, iter.posEnd(), syntax.state());
+        }
       }
+      cache.lineWidth(x - offset);
       endY = y;
     } else {
       // resume at the first changed line
@@ -335,18 +392,47 @@ final class TextRenderer extends BaseXBack {
         if(next(iter)) {
           final int p = iter.posEnd();
           final int[] state = syntax.state();
+          cache.lineWidth(rowX - offset);
           // stop as soon as the layout re-converges with the unchanged tail
           if(cache.splice(p, y, state)) { endY = cache.endY(); break; }
           cache.add(y, p, state);
         }
       }
       // no convergence: the edit reached the end of the document
-      if(endY < 0) endY = y;
+      if(endY < 0) {
+        cache.lineWidth(x - offset);
+        endY = y;
+      }
     }
-    cache.finish(txt, width, offset, endY);
+    cache.finish(txt, cacheWidth(), offset, endY);
     height = getHeight() + fontHeight;
-    scroll.height(endY + OFFSET);
+    scroll.extent(endY + OFFSET);
+    hscroll.extent(textWidth());
     marks();
+  }
+
+  /**
+   * Returns the total width of the rendered text, including the borders.
+   * @return width, or {@code 0} if long lines are wrapped
+   */
+  private int textWidth() {
+    return wrap ? 0 : offset + cache.maxWidth() + OFFSET;
+  }
+
+  /**
+   * Indicates if long lines are wrapped.
+   * @return result of check
+   */
+  boolean wrap() {
+    return wrap;
+  }
+
+  /**
+   * Returns the width the line cache is built for.
+   * @return width, or {@code -1} if the layout is independent of the width of the panel
+   */
+  private int cacheWidth() {
+    return wrap ? width : -1;
   }
 
   /**
@@ -356,7 +442,7 @@ final class TextRenderer extends BaseXBack {
   void marks() {
     final IntList starts = text.searchResults()[0], ys = new IntList();
     // a stale line cache yields no positions; the next layout will assign them
-    if(cache.valid(text.size(), width)) {
+    if(cache.valid(text.size(), cacheWidth())) {
       final int ss = starts.size(), cs = cache.size();
       // one marker per line: the number of hits in a line is unbounded
       for(int s = 0; s < ss;) {
@@ -389,12 +475,12 @@ final class TextRenderer extends BaseXBack {
    * @param iter text iterator
    */
   private void skip(final TextIterator iter) {
-    if(!cache.positionable(width)) return;
+    if(!cache.positionable(cacheWidth())) return;
     final int top = scroll.pos();
     final int idx = cache.indexByY(top);
     final int p = cache.pos(idx);
     // trust a stale cache only if the pending edit (at the caret) is not above this line
-    if(p > iter.caret() && !cache.valid(text.size(), width)) return;
+    if(p > iter.caret() && !cache.valid(text.size(), cacheWidth())) return;
     position(iter, idx, -top);
     // restore the highlighter state captured for this line so colors resume correctly
     syntax.state(cache.state(idx));
@@ -407,7 +493,7 @@ final class TextRenderer extends BaseXBack {
    * @return line index, or {@code -1}
    */
   private int lineIndex(final int pos) {
-    return cache.valid(text.size(), width) ? cache.indexByPos(pos) : -1;
+    return cache.valid(text.size(), cacheWidth()) ? cache.indexByPos(pos) : -1;
   }
 
   /**
@@ -420,7 +506,7 @@ final class TextRenderer extends BaseXBack {
     line = idx + 1;
     y = cache.y(idx) + dy;
     lineY = y - (fontHeight << 2) / 5;
-    x = offset;
+    x = startX;
     final int p = cache.pos(idx);
     iter.pos(p);
     iter.posEnd(p);
@@ -479,8 +565,8 @@ final class TextRenderer extends BaseXBack {
     } else {
       // compute string width, shorten if it exceeds panel width
       sw = font.stringWidth(iter.text(), iter.pos(), iter.posEnd());
-      if(sw > maxWidth) {
-        if(x != offset) newline(true);
+      if(wrap && sw > maxWidth) {
+        if(!rowStart()) newline(true);
 
         final TokenBuilder tb = new TokenBuilder();
         sw = 0;
@@ -497,7 +583,7 @@ final class TextRenderer extends BaseXBack {
       }
     }
     // no space left: move current string into next line
-    if(sw < maxWidth && sw > w - x) newline(true);
+    if(wrap && sw < maxWidth && sw > w - x) newline(true);
 
     wrapped = y != oldY;
     stringWidth = sw;
@@ -514,7 +600,7 @@ final class TextRenderer extends BaseXBack {
     rowX = x;
     rowY = y;
     rowLineY = lineY;
-    x = offset;
+    x = startX;
     y += h;
     lineY += h;
   }
@@ -539,7 +625,9 @@ final class TextRenderer extends BaseXBack {
     final int pos = iter.pos();
     if(pos >= caretStart && pos <= caretEnd) {
       g.setColor(GUIConstants.color3A);
-      g.fillRect(0, lineY, width + offset, fontHeight);
+      clipAll(g);
+      g.fillRect(0, lineY, getWidth(), fontHeight);
+      clipText(g);
     }
   }
 
@@ -549,7 +637,9 @@ final class TextRenderer extends BaseXBack {
    */
   private void markErrorLine(final Graphics g) {
     g.setColor(GUIConstants.colormark2A);
-    g.fillRect(0, lineY, offset - OFFSET * 3 / 2, fontHeight);
+    clipAll(g);
+    g.fillRect(0, lineY, sepX(), fontHeight);
+    clipText(g);
   }
 
   /**
@@ -574,7 +664,7 @@ final class TextRenderer extends BaseXBack {
    * @param g graphics reference
    */
   private void write(final TextIterator iter, final Graphics g) {
-    if(x == offset) markLine(iter, g);
+    if(rowStart()) markLine(iter, g);
 
     // advance the highlighter, and choose color for enabled text, depending on highlighting or link
     final Color syntaxColor = syntax.getColor(iter);
@@ -606,7 +696,7 @@ final class TextRenderer extends BaseXBack {
     }
 
     // check if text is visible
-    if(y > 0) {
+    if(y > 0 && x <= width && x + stringWidth >= offset) {
       // mark selected and found text
       mark(iter.selection(), iter, g);
       for(final int[] sr : iter.searchResults()) mark(sr, iter, g);
@@ -779,6 +869,29 @@ final class TextRenderer extends BaseXBack {
   }
 
   /**
+   * Moves the text horizontally.
+   * @param dx pixels to move (negative: to the left)
+   */
+  void moveX(final int dx) {
+    if(wrap) return;
+    hscroll.pos(hscroll.pos() + dx);
+    repaint();
+  }
+
+  /**
+   * Moves the text horizontally to make the cursor visible.
+   */
+  void scrollX() {
+    if(wrap) return;
+    final Graphics g = getGraphics();
+    final TextIterator iter = caretIter(g);
+    if(iter == null) return;
+    // horizontal position of the cursor in the text (the rendering starts at the left border)
+    final int cx = x + font.stringWidth(iter.substring(iter.pos(), iter.caret()));
+    hscroll.pos(Math.min(Math.max(hscroll.pos(), cx - width), cx - offset));
+  }
+
+  /**
    * Returns the caret position at the beginning or end of the rendered row with the caret.
    * @param end end of row
    * @return caret position, or {@code -1} if the text has not been rendered yet
@@ -812,7 +925,7 @@ final class TextRenderer extends BaseXBack {
    */
   private TextIterator scan(final Graphics g, final int xPos, final int yPos) {
     final TextIterator iter = init(g, true);
-    if(cache.valid(text.size(), width)) position(iter, cache.indexByY(yPos), 0);
+    if(cache.valid(text.size(), cacheWidth())) position(iter, cache.indexByY(yPos), 0);
     scan(iter, g, xPos, yPos);
     return iter;
   }

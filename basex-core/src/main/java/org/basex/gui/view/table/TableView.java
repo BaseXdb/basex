@@ -74,7 +74,7 @@ public final class TableView extends View {
     if(tdata.rows == null) return;
 
     if(quick) {
-      scroll.height(tdata.rows.size() * tdata.rowH(1));
+      scroll.extent(tdata.rows.size() * tdata.rowH(1));
       focus();
       repaint();
     } else {
@@ -84,7 +84,7 @@ public final class TableView extends View {
         // current zoom step
         int zoomstep = ZOOM.length;
         while(--zoomstep >= 0) {
-          scroll.height(tdata.rows.size() * tdata.rowH(ZOOM[zoomstep]));
+          scroll.extent(tdata.rows.size() * tdata.rowH(ZOOM[zoomstep]));
           repaint();
           Performance.sleep(25);
         }
@@ -117,7 +117,7 @@ public final class TableView extends View {
   public void refreshLayout() {
     if(!visible() || tdata.rows == null) return;
 
-    scroll.height(tdata.rows.size() * tdata.rowH(1));
+    scroll.extent(tdata.rows.size() * tdata.rowH(1));
     scroll.refreshLayout();
     header.refreshLayout();
     refreshContext(false, true);

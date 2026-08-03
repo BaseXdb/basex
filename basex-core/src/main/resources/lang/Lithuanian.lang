@@ -418,6 +418,7 @@ view                 = Rodinys
 views                = Rodiniai
 visualization        = Vizualizacija
 whole_word           = Visas žodis
+word_wrap            = Eilučių laužymas
 write_locking        = Rašymo užrakinimas
 yes                  = Taip
 

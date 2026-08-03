@@ -9,8 +9,8 @@ import org.junit.jupiter.api.*;
 /**
  * Tests the incremental line-offset cache: an incremental update after an edit must produce the
  * same lines as a rebuild from scratch. Lines are modelled without a renderer, using one row per
- * newline-separated line, a fixed row height, and a highlighter state that flips on each
- * {@code '#'} (so state-changing edits can be exercised).
+ * newline-separated line, a fixed row height, a fixed character width, and a highlighter state
+ * that flips on each {@code '#'} (so state-changing edits can be exercised).
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -18,6 +18,8 @@ import org.junit.jupiter.api.*;
 public final class TextLineCacheTest {
   /** Row height. */
   private static final int ROW_H = 12;
+  /** Character width. */
+  private static final int CHAR_W = 7;
   /** Text width the cache is built for. */
   private static final int WIDTH = 200;
   /** Border offset the cache is built for. */
@@ -135,7 +137,10 @@ public final class TextLineCacheTest {
   private static void buildFull(final TextLineCache cache, final byte[] text) {
     cache.reset();
     final int[] pos = starts(text);
-    for(int i = 0; i < pos.length; i++) cache.add(i * ROW_H, pos[i], state(text, pos[i]));
+    for(int i = 0; i < pos.length; i++) {
+      cache.add(i * ROW_H, pos[i], state(text, pos[i]));
+      cache.lineWidth(width(text, pos, i));
+    }
     cache.finish(text, WIDTH, OFFSET, endY(pos.length));
   }
 
@@ -151,11 +156,13 @@ public final class TextLineCacheTest {
     final int[] pos = starts(text);
     // resume at the first changed line, reusing its cached start (position, y and state)
     cache.add(cache.startY(), cache.startPos(), cache.startState());
+    cache.lineWidth(width(text, pos, r0));
     int end = -1;
     for(int i = r0 + 1; i < pos.length; i++) {
       final int[] st = state(text, pos[i]);
       if(cache.splice(pos[i], i * ROW_H, st)) { end = cache.endY(); break; }
       cache.add(i * ROW_H, pos[i], st);
+      cache.lineWidth(width(text, pos, i));
     }
     cache.finish(text, WIDTH, OFFSET, end < 0 ? endY(pos.length) : end);
   }
@@ -168,12 +175,17 @@ public final class TextLineCacheTest {
   private static void assertLayout(final TextLineCache cache, final byte[] text) {
     final int[] pos = starts(text);
     assertEquals(pos.length, cache.size(), "line count");
+    int max = 0;
     for(int i = 0; i < pos.length; i++) {
+      final int w = width(text, pos, i);
       assertEquals(pos[i], cache.pos(i), "position of line " + i);
       assertEquals(i * ROW_H, cache.y(i), "y of line " + i);
+      assertEquals(w, cache.width(i), "width of line " + i);
       assertArrayEquals(state(text, pos[i]), cache.state(i), "state of line " + i);
+      max = Math.max(max, w);
     }
     assertEquals(endY(pos.length), cache.endY(), "total height");
+    assertEquals(max, cache.maxWidth(), "total width");
   }
 
   /**
@@ -187,6 +199,18 @@ public final class TextLineCacheTest {
       if(text[i] == '\n') pos.add(i + 1);
     }
     return pos.finish();
+  }
+
+  /**
+   * Returns the modelled width of a line: its length without the newline character.
+   * @param text text
+   * @param pos line-start positions
+   * @param idx line index
+   * @return width
+   */
+  private static int width(final byte[] text, final int[] pos, final int idx) {
+    final int end = idx + 1 < pos.length ? pos[idx + 1] - 1 : text.length;
+    return (end - pos[idx]) * CHAR_W;
   }
 
   /**

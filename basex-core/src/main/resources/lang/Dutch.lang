@@ -418,6 +418,7 @@ view                 = Beeld
 views                = Weergaven
 visualization        = Visualisatie
 whole_word           = Heel woord
+word_wrap            = Regelterugloop
 write_locking        = Schrijfvergrendeling
 yes                  = Ja
 

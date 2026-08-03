@@ -418,6 +418,7 @@ view                 = Харагдах байдал
 views                = Харагдацууд
 visualization        = Дүрслэл
 whole_word           = Бүтэн үг
+word_wrap            = Мөр таслах
 write_locking        = Бичих түгжээ
 yes                  = Тийм
 

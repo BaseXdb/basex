@@ -268,6 +268,25 @@ public enum GUIMenuCmd implements GUICommand {
     }
   },
 
+  /** Wraps long lines. */
+  C_WORD_WRAP(WORD_WRAP, null, false, true) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.gopts.invert(GUIOptions.WORDWRAP);
+      gui.notify.layout();
+    }
+
+    @Override
+    public boolean enabled(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWEDITOR);
+    }
+
+    @Override
+    public boolean selected(final GUI gui) {
+      return gui.gopts.get(GUIOptions.WORDWRAP);
+    }
+  },
+
   /** Adds or removes a comment. */
   C_COMMENT(COMMENT, "% K", false, false) {
     @Override

@@ -418,6 +418,7 @@ view                 = Вид
 views                = Виды
 visualization        = Визуализация
 whole_word           = Слово целиком
+word_wrap            = Перенос строк
 write_locking        = Блокировка на запись
 yes                  = Да
 

@@ -418,6 +418,7 @@ view                 = Vizualizare
 views                = Vizualizări
 visualization        = Vizualizare
 whole_word           = Cuvantul intreg
+word_wrap            = Incadrare text
 write_locking        = Blocare pe scriere
 yes                  = Da
 
