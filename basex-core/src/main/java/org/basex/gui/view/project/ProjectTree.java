@@ -55,7 +55,7 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener, Pro
     // delete file or show error dialog
     // choose free name
     final GUIPopupCmd[] edit = {
-      new GUIPopupCmd(DELETE + DOTS, BaseXKeys.DELNEXT) {
+      new GUIPopupCmd(DELETE + ELLIPSIS, BaseXKeys.DELNEXT) {
         @Override
         public void execute() {
           final ProjectNode node = selectedNode();

@@ -53,7 +53,7 @@ final class DialogPut extends BaseXBack {
     add(tabs, BorderLayout.CENTER);
 
     // buttons
-    put = new BaseXButton(dialog, PUT + DOTS);
+    put = new BaseXButton(dialog, PUT + ELLIPSIS);
 
     add(dialog.newButtons(put), BorderLayout.SOUTH);
     action(general.parsers);

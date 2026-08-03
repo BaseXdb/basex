@@ -131,8 +131,7 @@ public class TextPanel extends BaseXPanel {
       new ToggleCmd(Text.MATCH_CASE, MATCHCASE, sb -> sb.mcase),
       new ToggleCmd(Text.WHOLE_WORD, WHOLEWORD, sb -> sb.word),
       new ToggleCmd(Text.REGULAR_EXPR, REGEX, sb -> sb.regex),
-      new ToggleCmd(Text.DOT_ALL, DOTALL, sb -> sb.dotall), null,
-      new GotoCmd(), new DeclarationCmd(), null));
+      new ToggleCmd(Text.DOT_ALL, DOTALL, sb -> sb.dotall), null));
     if(editable) {
       cmds.addAll(Arrays.asList(new HistoryCmd(true), new HistoryCmd(false), null,
         new AllCmd(), new CutCmd(), new CopyCmd(), new PasteCmd(), new DelCmd()));
@@ -909,16 +908,31 @@ public class TextPanel extends BaseXPanel {
     }
 
     @Override
-    public void execute() {
-      if(!hist.active()) return;
-      final byte[] t = undo ? hist.prev() : hist.next();
-      if(t == null) return;
-      editor.text(t);
-      editor.pos(hist.caret());
-      finish(-1, true);
-    }
+    public void execute() { history(undo); }
     @Override
-    public boolean enabled(final GUI main) { return undo ? !hist.first() : !hist.last(); }
+    public boolean enabled(final GUI main) { return hasHistory(undo); }
+  }
+
+  /**
+   * Undoes or redoes the last modification.
+   * @param undo undo/redo flag
+   */
+  public final void history(final boolean undo) {
+    if(!hist.active()) return;
+    final byte[] text = undo ? hist.prev() : hist.next();
+    if(text == null) return;
+    editor.text(text);
+    editor.pos(hist.caret());
+    finish(-1, true);
+  }
+
+  /**
+   * Indicates if a modification can be undone or redone.
+   * @param undo undo/redo flag
+   * @return result of check
+   */
+  public final boolean hasHistory(final boolean undo) {
+    return undo ? !hist.first() : !hist.last();
   }
 
   /** Cut command. */
@@ -991,13 +1005,28 @@ public class TextPanel extends BaseXPanel {
   /** Open search bar. */
   private class FindCmd extends GUIPopupCmd {
     /** Constructor. */
-    FindCmd() { super(Text.FIND + "\u2026", FIND); }
+    FindCmd() { super(Text.FIND + Text.ELLIPSIS, FIND); }
 
+    @Override
+    public void execute() { find(); }
+    @Override
+    public boolean enabled(final GUI main) { return searchable(); }
+  }
+
+  /**
+   * Activates the search bar.
+   */
+  public final void find() {
     // the adopted selection is a hit of the new search, and restricts no replacement
-    @Override
-    public void execute() { search.activate(searchString(), true, false); }
-    @Override
-    public boolean enabled(final GUI main) { return search != null; }
+    search.activate(searchString(), true, false);
+  }
+
+  /**
+   * Indicates if the text is attached to a search bar.
+   * @return result of check
+   */
+  public final boolean searchable() {
+    return search != null;
   }
 
   /** Find next or previous hit. */
@@ -1017,7 +1046,7 @@ public class TextPanel extends BaseXPanel {
     @Override
     public void execute() { search(next); }
     @Override
-    public boolean enabled(final GUI main) { return search != null; }
+    public boolean enabled(final GUI main) { return searchable(); }
   }
 
   /** Toggles a search mode. */
@@ -1053,38 +1082,16 @@ public class TextPanel extends BaseXPanel {
    * Highlights the next/previous hit.
    * @param next next/previous hit
    */
-  private void search(final boolean next) {
+  public final void search(final boolean next) {
     // a hidden search bar adopts the selected string: its first hit is the current one
     search.find(searchString(), search.isVisible() ?
       next ? SearchDir.FORWARD : SearchDir.BACKWARD : SearchDir.CURRENT);
   }
 
-  /** Go to line. */
-  private class GotoCmd extends GUIPopupCmd {
-    /** Constructor. */
-    GotoCmd() { super(Text.GO_TO_LINE + Text.DOTS, GOTOLINE); }
-
-    @Override
-    public void execute() { gotoLine(); }
-    @Override
-    public boolean enabled(final GUI main) { return search != null; }
-  }
-
-  /** Go to declaration. */
-  private class DeclarationCmd extends GUIPopupCmd {
-    /** Constructor. */
-    DeclarationCmd() { super(Text.GO_TO_DECLARATION + Text.DOTS, GOTODECL); }
-
-    @Override
-    public void execute() { gotoDeclaration(); }
-    @Override
-    public boolean enabled(final GUI main) { return hasDeclarations(); }
-  }
-
   /**
    * Jumps to a specific line.
    */
-  private void gotoLine() {
+  public final void gotoLine() {
     final DialogLine dl = new DialogLine(gui, caretPos()[0]);
     if(!dl.ok()) return;
 
@@ -1120,7 +1127,7 @@ public class TextPanel extends BaseXPanel {
    * Jumps to a declaration of the current text.
    */
   public final void gotoDeclaration() {
-    // the keyboard shortcut bypasses the enabled state of the button and the menu entry
+    // the button and the menu entry can be enabled until the controls are refreshed
     if(!hasDeclarations()) return;
 
     // the caret follows the selection and stays where the dialog leaves it

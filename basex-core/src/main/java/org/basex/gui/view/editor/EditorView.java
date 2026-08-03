@@ -116,8 +116,8 @@ public final class EditorView extends View {
     final AbstractButton openB = BaseXButton.command(GUIMenuCmd.C_EDIT_OPEN, gui);
     final AbstractButton saveB = BaseXButton.get("c_save", SAVE, false, gui);
     final AbstractButton find = search.button(FIND_REPLACE);
-    declaration = BaseXButton.get("c_declarations", BaseXLayout.addShortcut(GO_TO_DECLARATION,
-        BaseXKeys.GOTODECL.toString()), false, gui);
+    declaration = BaseXButton.get("c_declarations",
+        GUIMenuCmd.C_DECLARATIONS.shortCut(), false, gui);
     final AbstractButton vars = BaseXButton.command(GUIMenuCmd.C_EXTERNAL_VARIABLES, gui);
     final AbstractButton go = BaseXButton.command(GUIMenuCmd.C_GO, gui);
 
@@ -282,7 +282,7 @@ public final class EditorView extends View {
     final JPopupMenu menu = new JPopupMenu();
     int p = start - 1;
     final int max = Math.min(paths.size(), start + BaseXHistory.MAXPAGE);
-    if(start > 0) menu.add(new JMenuItem(DOTS)).addActionListener(
+    if(start > 0) menu.add(new JMenuItem(ELLIPSIS)).addActionListener(
         ac -> historyPopup(start - BaseXHistory.MAXPAGE));
     while(++p < max) {
       final String path = paths.get(p);
@@ -293,7 +293,7 @@ public final class EditorView extends View {
       if(opened.contains(path)) BaseXLayout.boldFont(item);
       menu.add(item).addActionListener(ac -> open(file));
     }
-    if(p < paths.size()) menu.add(new JMenuItem(DOTS)).addActionListener(
+    if(p < paths.size()) menu.add(new JMenuItem(ELLIPSIS)).addActionListener(
         ac -> historyPopup(start + BaseXHistory.MAXPAGE));
     menu.show(history, 0, history.getHeight());
   }
@@ -1061,12 +1061,13 @@ public final class EditorView extends View {
   private IOFile newTabFile() {
     int n = 0;
     for(final EditorArea edit : editors()) {
-      final String name = edit.file().name(), num = name.replaceAll("^" + FILE + "(\\d*)$", "$1");
+      final String name = edit.file().name();
+      final String num = name.replaceAll("^" + NEW_FILE + "(\\d*)$", "$1");
       if(!edit.opened() && !name.equals(num)) {
         n = Math.max(n, num.isEmpty() ? 1 : Strings.toInt(num));
       }
     }
-    return new IOFile(gui.gopts.get(GUIOptions.WORKPATH), FILE + (n == 0 ? "" : n + 1));
+    return new IOFile(gui.gopts.get(GUIOptions.WORKPATH), NEW_FILE + (n == 0 ? "" : n + 1));
   }
 
   /**

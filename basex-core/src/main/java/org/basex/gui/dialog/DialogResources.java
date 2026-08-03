@@ -191,7 +191,7 @@ final class DialogResources extends BaseXBack {
 
     // add dummy node if maximum number of nodes is exceeded
     if(cmax <= 0) {
-      root.add(new ResourceLeaf(token(DOTS), sub, ResourceType.XML, true, tree, data));
+      root.add(new ResourceLeaf(token(ELLIPSIS), sub, ResourceType.XML, true, tree, data));
     }
 
     ((DefaultTreeModel) tree.getModel()).nodeStructureChanged(root);
@@ -244,7 +244,7 @@ final class DialogResources extends BaseXBack {
   /** Delete command. */
   private final class DeleteCmd extends GUIPopupCmd {
     /** Constructor. */
-    DeleteCmd() { super(DELETE + DOTS, BaseXKeys.DELNEXT); }
+    DeleteCmd() { super(DELETE + ELLIPSIS, BaseXKeys.DELNEXT); }
 
     @Override
     public void execute() {
@@ -265,7 +265,7 @@ final class DialogResources extends BaseXBack {
   /** Rename command. */
   private final class RenameCmd extends GUIPopupCmd {
     /** Constructor. */
-    RenameCmd() { super(RENAME + DOTS, BaseXKeys.RENAME); }
+    RenameCmd() { super(RENAME + ELLIPSIS, BaseXKeys.RENAME); }
 
     @Override
     public void execute() {

@@ -5,6 +5,7 @@ import static org.basex.gui.GUIConstants.*;
 import javax.swing.*;
 
 import org.basex.gui.layout.*;
+import org.basex.gui.listener.*;
 
 /**
  * This is the menu bar of the main window.
@@ -39,6 +40,8 @@ public final class GUIMenu extends JMenuBar {
     for(int b = 0; b < bl; ++b) {
       final JMenu menu = new JMenu(MENUBAR[b]);
       BaseXLayout.setMnemonic(menu, gmnem);
+      // the state of editor commands changes without triggering a refresh of the controls
+      menu.addMenuListener((MenuSelectedListener) e -> refresh());
 
       // create menu point for each sub menu entry
       final StringBuilder mnemCache = new StringBuilder();

@@ -89,8 +89,8 @@ public class BaseXLabel extends JLabel {
     String txt = text;
     if(width < fm.stringWidth(txt)) {
       int tl = txt.length();
-      while(tl > 0 && width < fm.stringWidth(txt + Text.DOTS)) txt = txt.substring(0, --tl);
-      txt += Text.DOTS;
+      while(tl > 0 && width < fm.stringWidth(txt + Text.ELLIPSIS)) txt = txt.substring(0, --tl);
+      txt += Text.ELLIPSIS;
     }
     setText(txt);
     return this;

@@ -33,6 +33,7 @@ public final class DialogLine extends BaseXDialog {
 
     line = new BaseXTextField(this, Integer.toString(curr));
     line.addKeyListener(keys);
+    BaseXLayout.setWidth(line, gui.getWidth() / 5);
     info = new BaseXLabel(" ");
 
     final BaseXBack p = new BaseXBack(new BorderLayout(0, 8));

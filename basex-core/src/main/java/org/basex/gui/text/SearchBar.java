@@ -87,9 +87,9 @@ public final class SearchBar extends BaseXBack {
     setVisible(false);
 
     find = new BaseXCombo(gui, true).history(GUIOptions.SEARCHED, gui.gopts);
-    find.hint(Text.FIND + "\u2026");
+    find.hint(Text.FIND + Text.ELLIPSIS);
     replace = new BaseXCombo(gui, true).history(GUIOptions.REPLACED, gui.gopts);
-    replace.hint(Text.REPLACE_WITH + "\u2026");
+    replace.hint(Text.REPLACE_WITH + Text.ELLIPSIS);
     count = new BaseXLabel(" ");
 
     final ActionListener al = e -> {
@@ -477,9 +477,9 @@ public final class SearchBar extends BaseXBack {
     rplcNext.setEnabled(hits);
     find.highlight(error ? GUIConstants.lightRed :
       hits || sc.string.isEmpty() ? GUIConstants.backColor : GUIConstants.paleGray);
-    find.setToolTipText(error ? sc.error : Text.FIND + "\u2026");
+    find.setToolTipText(error ? sc.error : Text.FIND + Text.ELLIPSIS);
     replace.highlight(GUIConstants.backColor);
-    replace.setToolTipText(Text.REPLACE_WITH + "\u2026");
+    replace.setToolTipText(Text.REPLACE_WITH + Text.ELLIPSIS);
     // the markers depend on the results; the count also on the navigation position
     editor.marks();
     // results that arrive without user interaction must be painted as well

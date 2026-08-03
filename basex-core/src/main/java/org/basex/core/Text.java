@@ -65,6 +65,8 @@ public interface Text {
   String DOT = ".";
   /** Dots. */
   String DOTS = "...";
+  /** Ellipsis (GUI). */
+  String ELLIPSIS = "\u2026";
   /** List. */
   String LI = "- ";
 
@@ -911,6 +913,10 @@ public interface Text {
 
   /** Database. */
   String DATABASE = lang("database");
+  /** File. */
+  String FILE = lang("file");
+  /** Search. */
+  String SEARCH = lang("search");
   /** Editor. */
   String EDITOR = lang("editor");
   /** View. */
@@ -931,7 +937,7 @@ public interface Text {
   /** Command info. */
   String GO_TO_LINE = lang("go_to_line");
   /** Command info. */
-  String GO_TO_DECLARATION = lang("go_to_declaration");
+  String DECLARATIONS = lang("declarations");
   /** Command info. */
   String COLORS = lang("colors");
   /** Command info. */
@@ -1073,7 +1079,7 @@ public interface Text {
   String RESTORE = lang("restore");
 
   /** Button text for browsing files/directories. */
-  String BROWSE_D = lang("browse") + DOTS;
+  String BROWSE_D = lang("browse") + ELLIPSIS;
 
   /** Button text for creating things. */
   String CREATE = lang("create");
@@ -1096,8 +1102,8 @@ public interface Text {
   String NO_DATA = lang("no_data");
   /** Not enough pixels. */
   String NO_PIXELS = lang("no_pixels");
-  /** file. */
-  String FILE = lang("file");
+  /** Name of new files. */
+  String NEW_FILE = lang("new_file");
 
   // DIALOG WINDOWS ===============================================================================
 

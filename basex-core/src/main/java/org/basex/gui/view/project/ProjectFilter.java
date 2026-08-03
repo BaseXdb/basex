@@ -101,7 +101,7 @@ final class ProjectFilter extends BaseXBack {
     filesFilter.addFocusListener(view.lastfocus);
 
     contentsFilter = new BaseXCombo(view.gui, true).history(GUIOptions.PROJCONTS, view.gui.gopts);
-    contentsFilter.hint(Text.FIND_CONTENTS + Text.DOTS);
+    contentsFilter.hint(Text.FIND_CONTENTS + Text.ELLIPSIS);
     contentsFilter.addFocusListener(view.lastfocus);
 
     // content search modes
@@ -133,7 +133,7 @@ final class ProjectFilter extends BaseXBack {
 
     // content replacement
     replace = new BaseXCombo(view.gui, true).history(GUIOptions.PROJREPLACE, view.gui.gopts);
-    replace.hint(Text.REPLACE_WITH + Text.DOTS);
+    replace.hint(Text.REPLACE_WITH + Text.ELLIPSIS);
     replace.addFocusListener(view.lastfocus);
     replaceButton = BaseXButton.get("f_replaceall", BaseXLayout.addShortcut(
         Text.REPLACE_ALL, BaseXKeys.META_ENTER.toString()), false, view.gui);
@@ -449,7 +449,7 @@ final class ProjectFilter extends BaseXBack {
    */
   void refreshLayout() {
     final String filter = view.gui.gopts.get(GUIOptions.FILES).trim();
-    filesFilter.hint(filter.isEmpty() ? Text.FIND_FILES + Text.DOTS : filter);
+    filesFilter.hint(filter.isEmpty() ? Text.FIND_FILES + Text.ELLIPSIS : filter);
   }
 
   /**

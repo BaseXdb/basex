@@ -80,10 +80,10 @@ public final class DialogManage extends BaseXDialog {
     detail.setPreferredSize(new Dimension(600, 1));
 
     // database buttons
-    rename = new BaseXButton(this, RENAME + DOTS);
-    copy = new BaseXButton(this, COPY + DOTS);
+    rename = new BaseXButton(this, RENAME + ELLIPSIS);
+    copy = new BaseXButton(this, COPY + ELLIPSIS);
     open = new BaseXButton(this, OPEN);
-    drop = new BaseXButton(this, DROP + DOTS);
+    drop = new BaseXButton(this, DROP + ELLIPSIS);
 
     // first tab
     final BaseXBack tab1 = new BaseXBack(new BorderLayout(0, 8)).border(8);
@@ -107,7 +107,7 @@ public final class DialogManage extends BaseXDialog {
     backup = new BaseXButton(this, BACKUP);
     restore = new BaseXButton(this, RESTORE);
     delete = new BaseXButton(this, DELETE);
-    deleteAll = new BaseXButton(this, DELETE_ALL + DOTS);
+    deleteAll = new BaseXButton(this, DELETE_ALL + ELLIPSIS);
 
     // second tab
     final BaseXBack tab2 = new BaseXBack(new BorderLayout(0, 8)).border(8);

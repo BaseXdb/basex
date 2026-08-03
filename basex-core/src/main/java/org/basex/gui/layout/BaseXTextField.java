@@ -112,6 +112,7 @@ public class BaseXTextField extends JTextField {
         final String t = getText();
         setText(last);
         last = t;
+        e.consume();
       }
     });
 
