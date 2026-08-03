@@ -103,7 +103,7 @@ public final class LockVisitor extends ASTVisitor {
   }
 
   @Override
-  public boolean inlineFunc(final Scope scope) {
+  public boolean subScope(final Scope scope) {
     return visit(scope, true);
   }
 
@@ -123,6 +123,7 @@ public final class LockVisitor extends ASTVisitor {
    * Promotes all read locks to write locks if an update target could not be resolved statically.
    */
   public void finish() {
+    // sound as all databases that can be reached by the query have been read-locked
     if(unresolved) {
       locks.writes.add(locks.reads);
       locks.reads.reset();

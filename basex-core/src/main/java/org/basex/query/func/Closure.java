@@ -443,7 +443,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       for(final Expr ex : global.values()) {
         if(!ex.accept(visitor)) return false;
       }
-      return visitor.inlineFunc(this);
+      return visitor.subScope(this);
     });
   }
 

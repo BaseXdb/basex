@@ -183,6 +183,12 @@ public final class CommandLockingTest extends SandboxTest {
     // target of a node update cannot be resolved statically: read locks become write locks
     ckDBs(new XQuery("delete node " + _DB_GET.args(NAME) + "/*"), true, NAME_LIST);
     ckDBs(new XQuery(PUT.args(_DB_GET.args(NAME), FILE)), true, NAME_LIST);
+    // read locks of databases that are not updated are promoted as well
+    ckDBs(new XQuery("let $x := " + _DB_GET.args(NAME2) + " return delete node " +
+        _DB_GET.args(NAME) + "/*[. = $x]"), true, new LockList().add(NAME).add(NAME2));
+    // updates in a modify clause do not promote read locks
+    ckDBs(new XQuery("copy $c := " + _DB_GET.args(NAME) + "/* " +
+        "modify delete node $c/x return $c"), false, NAME_LIST);
   }
 
   /** Tests that the first operand of a simple map is evaluated in the outer focus. */

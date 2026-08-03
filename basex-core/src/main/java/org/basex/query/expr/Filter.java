@@ -247,8 +247,9 @@ public abstract class Filter extends Preds {
   public final boolean accept(final ASTVisitor visitor) {
     for(final Expr expr : exprs) {
       visitor.enterFocus();
-      if(!expr.accept(visitor)) return false;
+      final boolean more = expr.accept(visitor);
       visitor.exitFocus();
+      if(!more) return false;
     }
     return root.accept(visitor);
   }

@@ -1207,14 +1207,14 @@ public abstract class Path extends ParseExpr {
   @Override
   public final boolean accept(final ASTVisitor visitor) {
     if(root == null) {
-      visitor.lock(Locking.CONTEXT, false);
+      if(!visitor.lock(Locking.CONTEXT, false)) return false;
     } else if(!root.accept(visitor)) {
       return false;
     }
     visitor.enterFocus();
-    if(!visitAll(visitor, steps)) return false;
+    final boolean more = visitAll(visitor, steps);
     visitor.exitFocus();
-    return true;
+    return more;
   }
 
   @Override

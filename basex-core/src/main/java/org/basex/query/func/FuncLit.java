@@ -134,7 +134,7 @@ public final class FuncLit extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return visitor.inlineFunc(this);
+    return visitor.subScope(this);
   }
 
   @Override

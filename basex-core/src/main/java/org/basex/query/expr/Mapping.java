@@ -76,12 +76,11 @@ public abstract class Mapping extends Arr {
     // first operand is evaluated in the outer focus
     if(!exprs[0].accept(visitor)) return false;
     visitor.enterFocus();
+    boolean more = true;
     final int el = exprs.length;
-    for(int e = 1; e < el; e++) {
-      if(!exprs[e].accept(visitor)) return false;
-    }
+    for(int e = 1; e < el && more; e++) more = exprs[e].accept(visitor);
     visitor.exitFocus();
-    return true;
+    return more;
   }
 
   @Override

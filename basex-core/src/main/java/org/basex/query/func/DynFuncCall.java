@@ -148,7 +148,7 @@ public final class DynFuncCall extends FuncCall {
         return !func.ndt();
       }
       @Override
-      public boolean inlineFunc(final Scope scope) {
+      public boolean subScope(final Scope scope) {
         return !(scope instanceof final Closure cl && cl.has(Flag.NDT));
       }
     });
