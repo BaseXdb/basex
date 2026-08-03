@@ -173,7 +173,7 @@ public class CmpG extends Cmp {
 
   @Override
   public final Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(test(qc, ii, 0));
+    return Bln.get(test(qc, info, 0));
   }
 
   @Override
