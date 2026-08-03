@@ -86,7 +86,7 @@ public abstract class Docs extends DynamicFn {
         }
       }
       return list;
-    }) && super.accept(visitor);
+    }, false) && super.accept(visitor);
   }
 
   /**

@@ -41,6 +41,14 @@ abstract class Copy extends Arr {
     if(!modify.has(Flag.UPD) && !modify.vacuous()) throw UPMODIFY.get(info);
   }
 
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    visitor.enterModify();
+    final boolean more = arg(update()).accept(visitor);
+    visitor.exitModify();
+    return more && arg(target()).accept(visitor);
+  }
+
   /**
    * Returns the position of the updating expression.
    * @return result expression

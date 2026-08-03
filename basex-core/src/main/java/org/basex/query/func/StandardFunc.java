@@ -885,10 +885,11 @@ public abstract class StandardFunc extends Arr {
    * Tries to lock a database supplied by the specified argument.
    * @param expr expression
    * @param backup backup flag
+   * @param write write access
    * @param visitor visitor
    * @return result of check
    */
-  protected final boolean dataLock(final Expr expr, final boolean backup,
+  protected final boolean dataLock(final Expr expr, final boolean backup, final boolean write,
       final ASTVisitor visitor) {
     return visitor.lock(() -> {
       final ArrayList<String> list = new ArrayList<>(1);
@@ -907,7 +908,7 @@ public abstract class StandardFunc extends Arr {
       }
       list.add(name);
       return list;
-    });
+    }, write);
   }
 
   /**

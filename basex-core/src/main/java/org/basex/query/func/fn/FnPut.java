@@ -8,6 +8,7 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.up.*;
 import org.basex.query.up.primitives.db.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -40,5 +41,12 @@ public final class FnPut extends StandardFunc {
 
     updates.add(new Put(target.pre(), target.data(), path, options, info), qc);
     return Empty.VALUE;
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    // target database is supplied by a node and cannot be resolved statically
+    visitor.unresolvedTarget();
+    return super.accept(visitor);
   }
 }

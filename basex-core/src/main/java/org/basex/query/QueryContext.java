@@ -432,24 +432,27 @@ public final class QueryContext extends Job implements Closeable {
 
   @Override
   public void addLocks() {
-    // choose read or write locks
-    final Locks l = jc().locks;
-    final LockList list = updating ? l.writes : l.reads;
+    final Locks jobLocks = jc().locks;
+    final LockVisitor visitor = new LockVisitor(jobLocks, updating, contextValue == null);
 
     // locks in main module (can be null if parsing failed)
-    boolean local = main == null || main.databases(new LockVisitor(list, contextValue == null));
+    boolean local = main == null || main.databases(visitor);
     // locks in context expression
     if(local && contextValue != null) {
       // check if scope may still be overwritten by dynamic context
-      if(!finalContext) list.add(Locking.CONTEXT);
-      local = contextValue.databases(new LockVisitor(list, true));
+      if(!finalContext) jobLocks.reads.add(Locking.CONTEXT);
+      visitor.resetFocus();
+      local = contextValue.databases(visitor);
     }
+    // custom locks of the query
+    final LockList list = updating ? jobLocks.writes : jobLocks.reads;
     if(local) {
       list.add(locks);
     } else {
       // global locking, referenced databases cannot be determined statically
       list.addGlobal();
     }
+    visitor.finish();
   }
 
   /**

@@ -91,10 +91,11 @@ public abstract class ASTVisitor {
    * Notifies the visitor of database locks. Overwritten by {@link MainModule}.
    * Returns {@code false} if the lock is not known statically.
    * @param list function supplying lock strings
+   * @param write write access
    * @return if more expressions should be visited ({@code true} by default)
    */
   @SuppressWarnings("unused")
-  public boolean lock(final Supplier<ArrayList<String>> list) {
+  public boolean lock(final Supplier<ArrayList<String>> list, final boolean write) {
     return true;
   }
 
@@ -102,12 +103,35 @@ public abstract class ASTVisitor {
    * Notifies the visitor of a database lock. Overwritten by {@link MainModule}.
    * Returns {@code false} if the lock is not known statically.
    * @param lock lock string (can be {@code null})
+   * @param write write access
    * @return if more expressions should be visited ({@code true} by default)
    */
   @SuppressWarnings("unused")
-  public boolean lock(final String lock) {
+  public boolean lock(final String lock, final boolean write) {
     return true;
   }
+
+  /**
+   * Notifies the visitor of custom query locks.
+   * @param list function supplying lock strings
+   */
+  @SuppressWarnings("unused")
+  public void queryLock(final Supplier<ArrayList<String>> list) { }
+
+  /**
+   * Notifies the visitor of an update whose target database cannot be resolved statically.
+   */
+  public void unresolvedTarget() { }
+
+  /**
+   * Notifies the visitor of an expression entering a modify clause.
+   */
+  public void enterModify() { }
+
+  /**
+   * Notifies the visitor of an expression leaving a modify clause.
+   */
+  public void exitModify() { }
 
   /**
    * Notifies the visitor of an expression entering a focus. Overwritten by {@link MainModule}.

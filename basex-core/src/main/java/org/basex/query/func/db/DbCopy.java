@@ -42,6 +42,6 @@ public class DbCopy extends DbAccessFn {
 
   @Override
   public final boolean accept(final ASTVisitor visitor) {
-    return dataLock(arg(1), false, visitor) && super.accept(visitor);
+    return dataLock(arg(1), false, true, visitor) && super.accept(visitor);
   }
 }

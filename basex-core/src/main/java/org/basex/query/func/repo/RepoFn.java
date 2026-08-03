@@ -23,6 +23,6 @@ abstract class RepoFn extends StandardFunc {
 
   @Override
   public final boolean accept(final ASTVisitor visitor) {
-    return visitor.lock(Locking.REPO) && super.accept(visitor);
+    return visitor.lock(Locking.REPO, hasUPD()) && super.accept(visitor);
   }
 }
