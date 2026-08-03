@@ -73,8 +73,13 @@ public abstract class Mapping extends Arr {
 
   @Override
   public final boolean accept(final ASTVisitor visitor) {
+    // first operand is evaluated in the outer focus
+    if(!exprs[0].accept(visitor)) return false;
     visitor.enterFocus();
-    if(!visitAll(visitor, exprs)) return false;
+    final int el = exprs.length;
+    for(int e = 1; e < el; e++) {
+      if(!exprs[e].accept(visitor)) return false;
+    }
     visitor.exitFocus();
     return true;
   }

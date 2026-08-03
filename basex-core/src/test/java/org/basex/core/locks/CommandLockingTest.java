@@ -170,6 +170,16 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new XQuery(_RANDOM_INTEGER.args()), false, NONE);
   }
 
+  /** Tests that the first operand of a simple map is evaluated in the outer focus. */
+  @Test public void simpleMap() {
+    execute(new CreateDB(NAME));
+    try {
+      ckDBs(new XQuery("for $node in ./* return " + COUNT.args(" $node")), false, NAME_LIST);
+    } finally {
+      execute(new DropDB(NAME));
+    }
+  }
+
   /** Tests user-defined functions. */
   @Test public void userDefined() {
     ckDBs(new XQuery("declare function local:a($a) { " +
