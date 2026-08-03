@@ -3,12 +3,12 @@ package org.basex.query.func.array;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.fn.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -16,15 +16,9 @@ import org.basex.query.value.type.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class ArraySortWith extends FnSortWith {
+public final class ArraySortWith extends SortFn {
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    // overwrite implementation of superclass
-    return value(qc).iter();
-  }
-
-  @Override
-  public Value value(final QueryContext qc) throws QueryException {
+  public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
     final long as = array.structSize();
 
@@ -47,7 +41,6 @@ public final class ArraySortWith extends FnSortWith {
 
   @Override
   public long structSize() {
-    final Expr expr1 = arg(0);
-    return expr1.seqType().instanceOf(Types.ARRAY_O) ? expr1.structSize() : -1;
+    return ArrayFn.arraySize(arg(0));
   }
 }
