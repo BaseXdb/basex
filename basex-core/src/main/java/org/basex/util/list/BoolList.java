@@ -78,9 +78,16 @@ public final class BoolList extends ElementList {
    * @param element element to be stored
    */
   public void set(final int index, final boolean element) {
-    if(index >= list.length) list = Arrays.copyOf(list, newCapacity(index + 1));
-    list[index] = element;
-    size = Math.max(size, index + 1);
+    checkIndex(index);
+    boolean[] lst = list;
+    final int s = size, ns = index + 1;
+    if(ns > lst.length) {
+      lst = Arrays.copyOf(lst, newCapacity(ns));
+      list = lst;
+    }
+    if(index > s) Arrays.fill(lst, s, index, false);
+    lst[index] = element;
+    size = Math.max(s, ns);
   }
 
   /**

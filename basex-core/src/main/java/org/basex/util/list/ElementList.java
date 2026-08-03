@@ -37,6 +37,14 @@ public abstract class ElementList {
   }
 
   /**
+   * Raises an exception if the specified index is negative.
+   * @param index index
+   */
+  protected static void checkIndex(final int index) {
+    if(index < 0) throw new ArrayIndexOutOfBoundsException("Negative index: " + index + '.');
+  }
+
+  /**
    * Returns the number of elements.
    * @return number of elements
    */
