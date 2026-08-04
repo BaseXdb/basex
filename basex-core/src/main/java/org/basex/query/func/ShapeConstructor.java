@@ -23,16 +23,19 @@ public final class ShapeConstructor extends StandardFunc {
   private ShapeType shapeType;
   /** Field names. */
   private final QNm[] names;
+  /** Values that need no coercion. */
+  private final boolean[] typed;
 
   /**
    * Constructor.
    * @param shapeType shape
    */
-  public ShapeConstructor(final ShapeType shapeType) {
+  private ShapeConstructor(final ShapeType shapeType) {
     this.shapeType = shapeType;
     final TokenObjectMap<ShapeField> fields = shapeType.fields();
     final int fs = fields.size();
     names = new QNm[fs];
+    typed = new boolean[fs];
     for(int f = 1; f <= fs; ++f) {
       names[f - 1] = new QNm(fields.key(f));
     }
@@ -58,9 +61,9 @@ public final class ShapeConstructor extends StandardFunc {
     final Value[] values = new Value[fs];
     for(int f = 0; f < fs; ++f) {
       final ShapeField rf = fields.value(f + 1);
-      final Value value = f < el ? exprs[f].value(qc) :
-          rf.init() != null ? rf.init().value(qc) : Empty.VALUE;
-      values[f] = rf.seqType().coerce(value, qc, info, names[f], null);
+      final Expr expr = f < el ? exprs[f] : rf.init();
+      final Value value = expr != null ? expr.value(qc) : Empty.VALUE;
+      values[f] = typed[f] ? value : rf.seqType().coerce(value, qc, info, names[f], null);
     }
     return new XQShapeMap(shapeType, values);
   }
@@ -75,6 +78,14 @@ public final class ShapeConstructor extends StandardFunc {
     if(sh != shapeType) {
       shapeType = cc.qc.shared.shape(sh);
       exprType.assign(shapeType.seqType());
+    }
+    // skip runtime coercion of values that already match the field type
+    final TokenObjectMap<ShapeField> fields = shapeType.fields();
+    final int fs = fields.size();
+    for(int f = 0; f < fs; ++f) {
+      final ShapeField rf = fields.value(f + 1);
+      final Expr expr = f < el ? exprs[f] : rf.init();
+      typed[f] = expr != null && expr.seqType().instanceOf(rf.seqType());
     }
     return this;
   }
