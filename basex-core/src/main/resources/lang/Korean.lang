@@ -215,6 +215,7 @@ map_choice3          = 제목, 테두리 없음
 map_choice4          = 제목, 작은 테두리
 map_choice5          = 제목, 큰 테두리
 mark_edited_line     = 편집된 줄 표시
+mark_occurrences     = 동일 이름 표시
 match_case           = 대소문자 일치
 max_nr_of_hits       = 최대 결과 수
 merge_duplicates     = 중복 병합

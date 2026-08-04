@@ -215,6 +215,7 @@ map_choice3          = タイトル有り、枠線無し
 map_choice4          = タイトル有り、細枠線
 map_choice5          = タイトル有り、太枠線
 mark_edited_line     = 編集行をマーク
+mark_occurrences     = 出現箇所をマーク
 match_case           = 大文字・小文字を区別する
 max_nr_of_hits       = 最大ヒット件数
 merge_duplicates     = 重複をマージ

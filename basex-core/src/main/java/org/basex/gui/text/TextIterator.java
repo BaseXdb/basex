@@ -33,6 +33,10 @@ final class TextIterator {
   private final IntList[] searchResults;
   /** Search results of the current token. */
   private final ArrayList<int[]> results = new ArrayList<>();
+  /** Name at the caret (can be {@code null}: no name is highlighted). */
+  private final byte[] name;
+  /** Occurrences of the name in the current token. */
+  private final ArrayList<int[]> occurrences = new ArrayList<>();
 
   /** Current start position. */
   private int pos;
@@ -40,6 +44,10 @@ final class TextIterator {
   private int posEnd;
   /** Current search index. */
   private int searchIndex;
+  /** Position up to which occurrences have been located. */
+  private int occurrencePos;
+  /** Occurrence that was located last (can be {@code null}). */
+  private int[] occurrence;
   /** Indicates if current token is part of a link. */
   private boolean link;
 
@@ -56,6 +64,7 @@ final class TextIterator {
     end = et.end();
     errPos = et.error();
     searchResults = et.searchResults();
+    name = et.occurrence();
   }
 
   /**
@@ -211,6 +220,44 @@ final class TextIterator {
     }
     searchIndex = results.isEmpty() ? si : si - 1;
     return results;
+  }
+
+  /**
+   * Returns the occurrences of the name at the caret in the current token. The text is scanned
+   * while it is rendered: occurrences outside the rendered range are never located.
+   * @return ranges
+   */
+  ArrayList<int[]> occurrences() {
+    occurrences.clear();
+    if(name != null) {
+      // an occurrence that spans several tokens is reported for each of them
+      if(occurrence != null && occurrence[1] > pos) occurrences.add(occurrence);
+      final int nl = name.length, max = Math.min(length - nl, posEnd - 1);
+      for(int p = Math.max(occurrencePos, pos); p <= max; p++) {
+        if(matches(p)) {
+          occurrence = new int[] { p, p + nl };
+          occurrences.add(occurrence);
+          p += nl - 1;
+        }
+      }
+      occurrencePos = posEnd;
+    }
+    return occurrences;
+  }
+
+  /**
+   * Checks if the name occurs at the specified position.
+   * @param p position
+   * @return result of check
+   */
+  private boolean matches(final int p) {
+    final int nl = name.length;
+    for(int n = 0; n < nl; n++) {
+      if(text[p + n] != name[n]) return false;
+    }
+    // the name must not be preceded or followed by other name characters
+    return !(p > 0 && (TextEditor.nameChar(text[p - 1]) || text[p - 1] == '$')) &&
+      !(p + nl < length && TextEditor.nameChar(text[p + nl]));
   }
 
   /**

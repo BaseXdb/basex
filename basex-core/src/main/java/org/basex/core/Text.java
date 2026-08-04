@@ -1336,6 +1336,8 @@ public interface Text {
   String INDENTATION_SIZE = lang("indentation_size");
   /** Mark current line. */
   String MARK_EDITED_LINE = lang("mark_edited_line");
+  /** Mark occurrences. */
+  String MARK_OCCURRENCES = lang("mark_occurrences");
   /** Save before executing file. */
   String SAVE_BEFORE_EXECUTE = lang("save_before_execute");
   /** Parse project files. */

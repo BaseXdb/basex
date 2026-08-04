@@ -215,6 +215,7 @@ map_choice3          = 有标题，无边界
 map_choice4          = 有标题，小边界
 map_choice5          = 有标题，大边界
 mark_edited_line     = 标记修改行
+mark_occurrences     = 标记相同名称
 match_case           = 匹配大小写
 max_nr_of_hits       = 命中最大值
 merge_duplicates     = 合并重复

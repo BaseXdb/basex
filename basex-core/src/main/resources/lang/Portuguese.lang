@@ -215,6 +215,7 @@ map_choice3          = Título, sem borda
 map_choice4          = Título, borda pequena
 map_choice5          = Título, borda grande
 mark_edited_line     = Marcar linha editada
+mark_occurrences     = Marcar ocorrências
 match_case           = Diferenciar maiúsculas
 max_nr_of_hits       = Número máximo de resultados
 merge_duplicates     = Mesclar duplicatas

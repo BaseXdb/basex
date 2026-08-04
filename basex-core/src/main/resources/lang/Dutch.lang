@@ -215,6 +215,7 @@ map_choice3          = Titel, geen rand
 map_choice4          = Titel, kleine rand
 map_choice5          = Titel, grote rand
 mark_edited_line     = Markeer gewijzigde regel
+mark_occurrences     = Markeer overeenkomsten
 match_case           = Hoofd- en kleine letters overeenkomend
 max_nr_of_hits       = Maximum aantal hits
 merge_duplicates     = Duplicaten samenvoegen

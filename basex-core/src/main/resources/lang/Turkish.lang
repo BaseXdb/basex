@@ -215,6 +215,7 @@ map_choice3          = Başlık, Kenarlık yok
 map_choice4          = Başlık, küçük Kenarlık
 map_choice5          = Başlık, büyük Kenarlık
 mark_edited_line     = Düzenlenen satırı işaretle
+mark_occurrences     = Eşleşmeleri işaretle
 match_case           = Büyük/küçük harfe duyarlı ara
 max_nr_of_hits       = Maksimum sonuç sayısı
 merge_duplicates     = Yinelenenleri birleştir

@@ -215,6 +215,7 @@ map_choice3          = Titolo, sen bordero
 map_choice4          = Titolo, malgranda bordero
 map_choice5          = Titolo, granda bordero
 mark_edited_line     = Marki redaktitan linion
+mark_occurrences     = Marki aperojn
 match_case           = Kongruigi usklecon
 max_nr_of_hits       = Maksimuma nombro da trafoj
 merge_duplicates     = Kunfandi duplikatojn

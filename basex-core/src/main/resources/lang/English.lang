@@ -215,6 +215,7 @@ map_choice3          = Title, no Border
 map_choice4          = Title, small Border
 map_choice5          = Title, large Border
 mark_edited_line     = Mark edited line
+mark_occurrences     = Mark occurrences
 match_case           = Match Case
 max_nr_of_hits       = Maximum number of hits
 merge_duplicates     = Merge duplicates

@@ -215,6 +215,7 @@ map_choice3          = Cím, nincs keret
 map_choice4          = Cím, kicsi keret
 map_choice5          = Cím, nagy keret
 mark_edited_line     = Szerkesztett sor megjelölése
+mark_occurrences     = Előfordulások megjelölése
 match_case           = Kis- és nagybetűk megkülönböztetése
 max_nr_of_hits       = Találatok maximális száma
 merge_duplicates     = Ismétlődések egyesítése

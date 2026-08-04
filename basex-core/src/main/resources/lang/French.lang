@@ -215,6 +215,7 @@ map_choice3          = Titre, pas de bordure
 map_choice4          = Titre, petite bordure
 map_choice5          = Titre, bordure large
 mark_edited_line     = Marquer la ligne éditée
+mark_occurrences     = Marquer les occurrences
 match_case           = Respecter la casse
 max_nr_of_hits       = Nombre maximum de hits
 merge_duplicates     = Fusionner les duplicates

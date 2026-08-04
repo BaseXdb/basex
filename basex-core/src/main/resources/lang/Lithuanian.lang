@@ -215,6 +215,7 @@ map_choice3          = Antraštė, be rėmelio
 map_choice4          = Antraštė, mažas rėmelis
 map_choice5          = Antraštė, didelis rėmelis
 mark_edited_line     = Žymėti redaguotą eilutę
+mark_occurrences     = Žymėti pasikartojimus
 match_case           = Skirti raidžių dydį
 max_nr_of_hits       = Didžiausias atitikmenų skaičius
 merge_duplicates     = Sulieti dublikatus

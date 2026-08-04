@@ -215,6 +215,7 @@ map_choice3          = Гарчиг, Хүрээгүй
 map_choice4          = Гарчиг, жижиг хүрээтэй
 map_choice5          = Гарчиг, том хүрээтэй
 mark_edited_line     = Засварласан мөрийг тэмдэглэх
+mark_occurrences     = Давтагдсаныг тэмдэглэх
 match_case           = Том жижиг үсэг ялгах
 max_nr_of_hits       = Оролтуудын хамгийн дээд утга
 merge_duplicates     = Давхардлыг нэгтгэх

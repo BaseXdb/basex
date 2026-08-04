@@ -680,26 +680,27 @@ final class TextRenderer extends BaseXBack {
     final boolean code = syntax.codeBefore() || syntax.codeAfter();
     final int opening = code ? Syntax.OPENING.indexOf(cp) : -1;
     final int closing = code ? Syntax.CLOSING.indexOf(cp) : -1;
-    if(opening != -1) {
-      parentheses.add(x).add(y).add(pos).add(cp);
-    } else if(closing != -1 && !parentheses.isEmpty()) {
-      final int open = Syntax.OPENING.charAt(closing);
-      if(parentheses.peek() == open) {
-        parentheses.pop();
+    if(opening != -1 || closing != -1) {
+      // a bracket at the caret is highlighted even if its counterpart is not rendered
+      final boolean marked = cpos == pos || cpos == pos + 1;
+      if(marked) drawBracket(g, x, lineY, cp);
+      if(opening != -1) {
+        parentheses.add(x).add(lineY).add(pos).add(cp);
+      } else if(!parentheses.isEmpty() && parentheses.peek() == Syntax.OPENING.charAt(closing)) {
+        final int open = parentheses.pop();
         final int cr = parentheses.pop(), yy = parentheses.pop(), xx = parentheses.pop();
-        if(cpos == pos || cpos == cr) {
-          g.setColor(GUIConstants.color4);
-          g.drawRect(xx, yy - (fontHeight << 2) / 5, font.charWidth(open), fontHeight);
-          g.drawRect(x, lineY, font.charWidth(cp), fontHeight);
-        }
+        // highlight the counterpart of the bracket at the caret
+        if(marked) drawBracket(g, xx, yy, open);
+        else if(cpos == cr || cpos == cr + 1) drawBracket(g, x, lineY, cp);
       }
     }
 
     // check if text is visible
     if(y > 0 && x <= width && x + stringWidth >= offset) {
-      // mark selected and found text
-      mark(iter.selection(), iter, g);
-      for(final int[] sr : iter.searchResults()) mark(sr, iter, g);
+      // mark repeated, selected and found text
+      for(final int[] oc : iter.occurrences()) mark(oc, iter, g, GUIConstants.color3A);
+      mark(iter.selection(), iter, g, GUIConstants.color2A);
+      for(final int[] sr : iter.searchResults()) mark(sr, iter, g, GUIConstants.color2A);
 
       // retrieve first character of current token
       if(iter.error()) drawError(g);
@@ -746,14 +747,16 @@ final class TextRenderer extends BaseXBack {
    * @param range start/end of mark
    * @param iter iterator
    * @param g graphics reference
+   * @param color color of the highlighting
    */
-  private void mark(final int[] range, final TextIterator iter, final Graphics g) {
+  private void mark(final int[] range, final TextIterator iter, final Graphics g,
+      final Color color) {
     if(range != null) {
       final int pos = iter.pos(), posEnd = iter.posEnd();
       final int ss = Math.max(pos, range[0]), se = Math.min(posEnd, range[1]);
       final int xs = font.stringWidth(iter.text(), pos, ss);
       final int cw = font.stringWidth(iter.text(), ss, se);
-      g.setColor(GUIConstants.color2A);
+      g.setColor(color);
       g.fillRect(x + xs, lineY, cw, fontHeight);
     }
   }
@@ -765,6 +768,18 @@ final class TextRenderer extends BaseXBack {
    */
   private boolean atRowEnd(final TextIterator iter) {
     return wrapped && iter.rowEnd() && iter.pos() == iter.caret();
+  }
+
+  /**
+   * Highlights a bracket.
+   * @param g graphics reference
+   * @param xx x position
+   * @param yy y position
+   * @param bracket bracket character
+   */
+  private void drawBracket(final Graphics g, final int xx, final int yy, final int bracket) {
+    g.setColor(GUIConstants.color4);
+    g.drawRect(xx, yy, font.charWidth(bracket), fontHeight);
   }
 
   /**

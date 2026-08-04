@@ -215,6 +215,7 @@ map_choice3          = Dengan Judul, tanpa Batas
 map_choice4          = Dengan Judul, Batas kecil
 map_choice5          = Dengan Judul, Batas besar
 mark_edited_line     = Catat baris yang berubah
+mark_occurrences     = Tandai kemunculan
 match_case           = Ukuran sesuai
 max_nr_of_hits       = Jumlah temuan maksimum
 merge_duplicates     = Gabungkan duplikasi

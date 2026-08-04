@@ -401,7 +401,7 @@ public final class GUIConstants {
     final Color col = COLORS[16];
     color1A = color(darker(r, 110), darker(g, 150), darker(b, 160), 100);
     color2A = alpha(col, 50);
-    color3A = alpha(col, 30);
+    color3A = alpha(col, 15);
     colormark1A = color(darker(r, 32), darker(g, 160), darker(b, 320), 100);
     colormark2A = color(darker(r, 12), darker(g, 60), darker(b, 120), 100);
 

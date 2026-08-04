@@ -215,6 +215,7 @@ map_choice3          = Tytuł, bez obramowania
 map_choice4          = Tytuł, małe obramowanie
 map_choice5          = Tytuł, duże obramowanie
 mark_edited_line     = Zaznacz edytowany wiersz
+mark_occurrences     = Zaznacz wystąpienia
 match_case           = Uwzględnij wielkość liter
 max_nr_of_hits       = Maksymalna liczba trafień
 merge_duplicates     = Scal duplikaty

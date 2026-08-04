@@ -191,6 +191,30 @@ public final class TextEditor {
   }
 
   /**
+   * Returns the name at the caret, the occurrences of which are highlighted.
+   * @return name, or {@code null} if no name is to be highlighted
+   */
+  byte[] occurrence() {
+    // no name is highlighted if the marking is disabled, or if text is selected
+    if(!opts.get(GUIOptions.MARKOCCURRENCES) || isSelected()) return null;
+
+    // determine the name at the caret
+    final int tl = text.length;
+    int s = pos, e = pos;
+    while(s > 0 && nameChar(text[s - 1])) --s;
+    while(e < tl && nameChar(text[e])) ++e;
+    if(s > 0 && text[s - 1] == '$') {
+      // the dollar sign of a variable name is part of the name
+      --s;
+    } else if(s == pos && e == pos && pos < tl && text[pos] == '$') {
+      // the caret is placed before a variable name
+      while(++e < tl && nameChar(text[e]));
+    }
+    // single characters and numbers are no candidates
+    return e - s < 2 || digit(text[s]) ? null : substring(text, s, e);
+  }
+
+  /**
    * Replaces all hits; a selection restricts the replacement.
    * @param rc replace context
    * @return new range of the selection, or {@code null} if the whole text was replaced
@@ -339,7 +363,7 @@ public final class TextEditor {
    */
   int completionStart() {
     int p = pos;
-    while(p > 0 && completeMore(text[p - 1])) --p;
+    while(p > 0 && nameChar(text[p - 1])) --p;
     // include a dollar sign or angle bracket, which introduce variable and element names
     if(p > 0 && (text[p - 1] == '$' || text[p - 1] == '<')) --p;
     return p;
@@ -352,16 +376,16 @@ public final class TextEditor {
   int completionEnd() {
     int p = pos;
     final int tl = text.length;
-    while(p < tl && completeMore(text[p])) ++p;
+    while(p < tl && nameChar(text[p])) ++p;
     return p;
   }
 
   /**
-   * Checks if the specified character is a completion character.
+   * Checks if the specified character is part of a name.
    * @param ch character
    * @return result of check
    */
-  private static boolean completeMore(final byte ch) {
+  static boolean nameChar(final byte ch) {
     if(letterOrDigit(ch)) return true;
     for(final char a : ALLOWED) {
       if(ch == a) return true;

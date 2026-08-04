@@ -215,6 +215,7 @@ map_choice3          = Titlu, fara frontieră
 map_choice4          = Titlu, frontieră mică
 map_choice5          = Titlu, frontieră mare
 mark_edited_line     = Marchează linia editata
+mark_occurrences     = Marchează aparițiile
 match_case           = Sensibil la majuscule
 max_nr_of_hits       = Numărul maxim de afisari
 merge_duplicates     = Contopește duplicatele

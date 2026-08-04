@@ -215,6 +215,7 @@ map_choice3          = Titel, kein Rand
 map_choice4          = Titel, kleiner Rand
 map_choice5          = Titel, großer Rand
 mark_edited_line     = Markiere bearbeitete Zeile
+mark_occurrences     = Markiere Vorkommen
 match_case           = Groß- und Kleinschreibung
 max_nr_of_hits       = Maximale Trefferzahl
 merge_duplicates     = Merge identischer Zeilen

@@ -36,6 +36,8 @@ final class DialogEditorPrefs extends BaseXBack {
   private final BaseXCheckBox numbers;
   /** Mark current line. */
   private final BaseXCheckBox markline;
+  /** Mark occurrences of the name at the caret. */
+  private final BaseXCheckBox markoccurrences;
   /** Single-line editor tabs. */
   private final BaseXCheckBox scrollTabs;
   /** Save before executing file. */
@@ -77,6 +79,8 @@ final class DialogEditorPrefs extends BaseXBack {
     shownl = new BaseXCheckBox(dialog, SHOW_NEWLINES, GUIOptions.SHOWNL, gopts);
     numbers = new BaseXCheckBox(dialog, SHOW_LINE_NUMBERS, GUIOptions.SHOWLINES, gopts);
     markline = new BaseXCheckBox(dialog, MARK_EDITED_LINE, GUIOptions.MARKLINE, gopts);
+    markoccurrences = new BaseXCheckBox(dialog, MARK_OCCURRENCES, GUIOptions.MARKOCCURRENCES,
+      gopts);
     scrollTabs = new BaseXCheckBox(dialog, SCROLL_TABS, GUIOptions.SCROLLTABS, gopts);
     spaces = new BaseXCheckBox(dialog, TABS_AS_SPACES, GUIOptions.TABSPACES, gopts);
     indent = new BaseXTextField(dialog, GUIOptions.INDENT, gopts);
@@ -112,6 +116,7 @@ final class DialogEditorPrefs extends BaseXBack {
     p.add(shownl);
     p.add(numbers);
     p.add(markline);
+    p.add(markoccurrences);
     p.add(scrollTabs);
     add(p);
 
@@ -163,6 +168,7 @@ final class DialogEditorPrefs extends BaseXBack {
     shownl.assign();
     numbers.assign();
     markline.assign();
+    markoccurrences.assign();
     scrollTabs.assign();
     files.assign();
     spaces.assign();
