@@ -744,6 +744,83 @@ public final class TextEditor {
   }
 
   /**
+   * Function call that encloses the caret.
+   * @param start start position of the function name
+   * @param end end position of the function name
+   * @param arg index of the argument at the caret ({@code -1} if keyword arguments are supplied,
+   *   as these can be specified in any order)
+   * @param keyword parameter name that introduces the argument at the caret
+   *   (can be {@code null})
+   */
+  record Call(int start, int end, int arg, String keyword) { }
+
+  /**
+   * Returns the function call that encloses the caret.
+   * @param syntax syntax highlighter
+   * @return function call, or {@code null} if the caret is enclosed by none
+   */
+  Call call(final Syntax syntax) {
+    // the highlighter is a forward-only lexer: scan the text before the caret in a single pass
+    syntax.reset();
+    final IntList positions = new IntList(), arguments = new IntList(), starts = new IntList();
+    final BoolList keywords = new BoolList();
+    final int caret = pos();
+
+    for(int p = 0; p < caret; p += cl(text, p)) {
+      final int cl = cl(text, p);
+      syntax.color(text, p, p + cl);
+      if(!syntax.code()) continue;
+      final int cp = cp(text, p);
+      if(Syntax.OPENING.indexOf(cp) != -1) {
+        positions.add(p);
+        arguments.add(0);
+        starts.add(p + cl);
+        keywords.add(false);
+      } else if(Syntax.CLOSING.indexOf(cp) != -1) {
+        if(!positions.isEmpty()) {
+          positions.pop();
+          arguments.pop();
+          starts.pop();
+          keywords.pop();
+        }
+      } else if(cp == ',' && !arguments.isEmpty()) {
+        arguments.set(arguments.size() - 1, arguments.peek() + 1);
+        starts.set(starts.size() - 1, p + cl);
+      } else if(cp == ':' && p + cl < caret && text[p + cl] == '=' && !keywords.isEmpty()) {
+        // arguments are no more supplied in the order of the parameters
+        keywords.set(keywords.size() - 1, true);
+      }
+    }
+    // the innermost bracket must be the parenthesis of an argument list
+    if(positions.isEmpty() || text[positions.peek()] != '(') return null;
+
+    // the parenthesis must be preceded by a function name
+    final int e = positions.peek();
+    int s = e;
+    while(s > 0 && nameChar(text[s - 1])) --s;
+    return s < e ? new Call(s, e, keywords.peek() ? -1 : arguments.peek(),
+      keyword(starts.peek(), caret)) : null;
+  }
+
+  /**
+   * Returns the parameter name that introduces an argument.
+   * @param from start position of the argument
+   * @param to end position of the argument
+   * @return name, or {@code null} if the argument is no keyword argument
+   */
+  private String keyword(final int from, final int to) {
+    int s = from;
+    while(s < to && ws(text[s])) s++;
+    int e = s;
+    while(e < to && nameChar(text[e])) e++;
+    // the name must be followed by the assignment operator
+    int p = e;
+    while(p < to && ws(text[p])) p++;
+    return e > s && p + 1 < to && text[p] == ':' && text[p + 1] == '=' ?
+      string(text, s, e - s) : null;
+  }
+
+  /**
    * Moves the current line or the selected lines up or down.
    * @param down down/up flag
    */

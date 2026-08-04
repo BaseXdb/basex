@@ -245,6 +245,18 @@ final class TextRenderer extends BaseXBack {
   }
 
   /**
+   * Returns the horizontal position of the specified text position.
+   * @param pos text position
+   * @return position, relative to the text panel
+   */
+  int x(final int pos) {
+    final byte[] txt = text.text();
+    int start = pos;
+    while(start > 0 && txt[start - 1] != '\n') start--;
+    return Math.max(0, offset - hscroll.pos() + width(start, pos));
+  }
+
+  /**
    * Returns the pixel width of the specified text range.
    * @param start start position
    * @param end end position

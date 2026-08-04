@@ -369,6 +369,16 @@ abstract class Syntax {
   }
 
   /**
+   * Returns the signature of the specified function.
+   * @param name function name
+   * @return signature, or {@code null} if the function is unknown
+   */
+  @SuppressWarnings("unused")
+  Signature signature(final String name) {
+    return null;
+  }
+
+  /**
    * Returns a single list of candidates.
    * @param candidates candidates
    * @return candidate lists

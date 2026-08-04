@@ -45,6 +45,12 @@ public class TextPanel extends BaseXPanel {
   private final CompletionPopup completion;
   /** Proposals of the current code completion, ordered by relevance (initially empty). */
   private ArrayList<ArrayList<Completion>> proposals = new ArrayList<>();
+  /** Popup with the signature of the current function call. */
+  private final SignaturePopup signature;
+  /** Start position of the call with the resolved signature ({@code -1}: none). */
+  private int signatureStart = -1;
+  /** Resolved signature (can be {@code null}: the called function is unknown). */
+  private Signature signatureValue;
 
   /** Text caret. */
   private final Timer caretTimer;
@@ -94,6 +100,7 @@ public class TextPanel extends BaseXPanel {
     final EditorOptions opts = new EditorOptions(gui.gopts);
     editor = new TextEditor(opts);
     completion = new CompletionPopup(this);
+    signature = new SignaturePopup(this);
 
     setFocusable(true);
     setFocusTraversalKeysEnabled(!editable);
@@ -115,6 +122,7 @@ public class TextPanel extends BaseXPanel {
       public void focusLost(final FocusEvent e) {
         caret(false);
         completion.hide();
+        signature.hide();
       }
     });
 
@@ -529,6 +537,7 @@ public class TextPanel extends BaseXPanel {
 
   @Override
   public final void mousePressed(final MouseEvent e) {
+    signature.hide();
     // copy and paste text with middle mouse button (Unix only)
     if(SwingUtilities.isMiddleMouseButton(e)) {
       if(!Prop.WIN && !Prop.MAC) {
@@ -600,6 +609,7 @@ public class TextPanel extends BaseXPanel {
       return false;
     }
     completion.hide();
+    signature.hide();
     return true;
   }
 
@@ -730,9 +740,14 @@ public class TextPanel extends BaseXPanel {
       updateCode.invokeLater(down ? Align.BOTTOM : Align.TOP);
     }
     // refresh completions, or show them after a delay if the cursor was moved
-    if(moved || edited) refreshCompletion(true);
-    // close the popup: the key press will be processed as a shortcut
-    else if(control(e) || e.getKeyChar() == KeyEvent.CHAR_UNDEFINED) completion.hide();
+    if(moved || edited) {
+      refreshCompletion(true);
+      refreshSignature(false);
+    } else if(control(e) || e.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
+      // close the popups: the key press will be processed as a shortcut
+      completion.hide();
+      signature.hide();
+    }
   }
 
   /**
@@ -841,6 +856,8 @@ public class TextPanel extends BaseXPanel {
     // refresh completions, or show them after a delay if a completion was started
     final char ch = e.getKeyChar();
     refreshCompletion(Character.isLetter(ch) || rend.syntax().completeStart(ch));
+    // a signature is proposed if an argument list is opened or continued
+    refreshSignature(ch == '(' || ch == ',');
   }
 
   /**
@@ -904,6 +921,7 @@ public class TextPanel extends BaseXPanel {
   @Override
   public final void mouseWheelMoved(final MouseWheelEvent e) {
     completion.hide();
+    signature.hide();
     final int units = e.getUnitsToScroll() * 20;
     if(e.isShiftDown()) rend.moveX(units);
     else scroll.pos(scroll.pos() + units);
@@ -1182,6 +1200,8 @@ public class TextPanel extends BaseXPanel {
       complete(candidates.getFirst().value(), start);
     } else if(!candidates.isEmpty()) {
       completion.show(candidates, word(start), start, point);
+      // both popups are placed at the same position: the candidates take precedence
+      signature.hide();
     }
   }
 
@@ -1232,6 +1252,52 @@ public class TextPanel extends BaseXPanel {
   }
 
   /**
+   * Refreshes the signature of the function call that encloses the caret.
+   * @param show show the signature of a call that has no visible signature yet
+   */
+  private void refreshSignature(final boolean show) {
+    if(!show && !signature.active()) return;
+
+    // both popups are placed at the same position: the candidates take precedence
+    final Syntax syntax = rend.syntax();
+    final TextEditor.Call call = completion.visible() ? null : editor.call(syntax);
+    if(call != null) {
+      final String name = string(editor.text(), call.start(), call.end() - call.start());
+      // the signature is resolved once per call: a declaration lookup scans the text
+      if(call.start() != signatureStart) {
+        signatureStart = call.start();
+        signatureValue = signature(name);
+      }
+      final Signature sig = signatureValue;
+      // the signature is shown if the function is known and can take a further argument
+      if(sig != null && call.arg() < sig.params()) {
+        // a keyword argument emphasizes the parameter it names, others the one at its position
+        final String keyword = call.keyword();
+        final int index = keyword != null ? sig.param(keyword) : call.arg();
+        // the popup is aligned with the called function, below the line with the caret
+        signature.show(sig, name, index, new Point(rend.x(call.start()), rend.cursor()[1]));
+        return;
+      }
+    }
+    signature.hide();
+  }
+
+  /**
+   * Returns the signature of a built-in or declared function.
+   * @param name function name
+   * @return signature, or {@code null} if the function is unknown
+   */
+  private Signature signature(final String name) {
+    final Signature sig = rend.syntax().signature(name);
+    if(sig != null) return sig;
+    // declared functions are looked up in the text
+    for(final Declaration declaration : declarations()) {
+      if(declaration.name().equals(name)) return Signature.get(declaration.args());
+    }
+    return null;
+  }
+
+  /**
    * Refreshes the candidates of a visible completion popup.
    * @param schedule show a new popup after a delay if none is visible
    */
@@ -1260,5 +1326,7 @@ public class TextPanel extends BaseXPanel {
     final int pos = editor.pos();
     editor.complete(string, start);
     finish(pos, true);
+    // an inserted function call is annotated with its signature
+    refreshSignature(true);
   }
 }

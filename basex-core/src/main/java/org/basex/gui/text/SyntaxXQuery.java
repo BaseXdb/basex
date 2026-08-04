@@ -50,6 +50,8 @@ final class SyntaxXQuery extends SyntaxMarkup {
   private static final ArrayList<Completion> DEFAULTS = new ArrayList<>();
   /** Code completions (start and snippets of prolog declarations). */
   private static final ArrayList<Completion> DECLARATIONS = new ArrayList<>();
+  /** Signatures of the built-in functions, with and without namespace prefix. */
+  private static final HashMap<String, Signature> SIGNATURES = new HashMap<>();
   /** Code completions (documentation tags of a comment). */
   private static final ArrayList<Completion> TAGS = new ArrayList<>();
   /** Placeholder in a snippet for the namespace prefix of a library module. */
@@ -183,8 +185,15 @@ final class SyntaxXQuery extends SyntaxMarkup {
     for(final FuncDefinition fd : Functions.BUILT_IN.values()) {
       final String args = '(' + fd.paramString() + ')', value = fd.params.length > 0 ? "(_)" : "()";
       final boolean deflt = eq(fd.name.uri(), FN_URI);
-      if(deflt) add(string(fd.name.local()), args, value, abbrs, names, false);
-      add(string(fd.name.prefixId()), args, value, prefixedAbbrs, prefixedNames, deflt);
+      final String prefixed = string(fd.name.prefixId());
+      final Signature signature = Signature.get(args);
+      SIGNATURES.put(prefixed, signature);
+      if(deflt) {
+        final String local = string(fd.name.local());
+        SIGNATURES.put(local, signature);
+        add(local, args, value, abbrs, names, false);
+      }
+      add(prefixed, args, value, prefixedAbbrs, prefixedNames, deflt);
     }
     // add annotations (annotations of the XQuery namespace are specified without prefix)
     for(final Annotation ann : Annotation.values()) {
@@ -495,6 +504,11 @@ final class SyntaxXQuery extends SyntaxMarkup {
     lists.add(resolve(SNIPPETS, prefix));
     lists.addAll(COMPLETIONS);
     return lists;
+  }
+
+  @Override
+  Signature signature(final String name) {
+    return SIGNATURES.get(name);
   }
 
   /**
