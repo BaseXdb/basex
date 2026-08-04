@@ -128,6 +128,14 @@ abstract class MarkupSerializer extends StandardSerializer {
   // PROTECTED METHODS ============================================================================
 
   @Override
+  protected boolean separate() throws IOException {
+    if(!more || itemsep == null) return false;
+    // separators are inserted as text nodes: characters are mapped and escaped
+    printChars(itemsep);
+    return true;
+  }
+
+  @Override
   protected void namespace(final byte[] prefix, final byte[] uri, final boolean standalone)
       throws IOException {
     if(undecl || prefix.length == 0 || uri.length != 0) super.namespace(prefix, uri, standalone);
