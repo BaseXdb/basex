@@ -5,7 +5,6 @@ import static org.basex.query.value.type.BasicType.*;
 import static org.basex.query.value.type.BasicType.ITEM;
 
 import org.basex.query.func.*;
-import org.basex.query.util.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -27,7 +26,7 @@ public enum Annotation {
   UPDATING("updating()", params(), XQ_URI, false),
 
   /** XQuery annotation. */
-  _BASEX_INLINE("inline([limit])", params(INTEGER), BASEX_URI),
+  _BASEX_INLINE("inline(limit?)", params(INTEGER), BASEX_URI),
   /** XQuery annotation. */
   _BASEX_LAZY("lazy()", params(), BASEX_URI),
   /** XQuery annotation. */
@@ -108,7 +107,7 @@ public enum Annotation {
   /** XQuery annotation. */
   _PERM_ALLOW("allow(names...)", params(STRING), PERM_URI, false),
   /** XQuery annotation. */
-  _PERM_CHECK("check([path,map])", params(STRING, STRING), PERM_URI),
+  _PERM_CHECK("check(path?, map?)", params(STRING, STRING), PERM_URI),
 
   /** XQuery annotation. */
   _REST_DELETE("DELETE()", params(), REST_URI),
@@ -119,66 +118,66 @@ public enum Annotation {
   /** XQuery annotation. */
   _REST_OPTIONS("OPTIONS()", params(), REST_URI),
   /** XQuery annotation. */
-  _REST_PATCH("PATCH([body])", params(STRING), REST_URI),
+  _REST_PATCH("PATCH(body?)", params(STRING), REST_URI),
   /** XQuery annotation. */
-  _REST_POST("POST([body])", params(STRING), REST_URI),
+  _REST_POST("POST(body?)", params(STRING), REST_URI),
   /** XQuery annotation. */
-  _REST_PUT("PUT([body])", params(STRING), REST_URI),
+  _REST_PUT("PUT(body?)", params(STRING), REST_URI),
   /** XQuery annotation. */
-  _REST_QUERY("QUERY([body])", params(STRING), REST_URI),
+  _REST_QUERY("QUERY(body?)", params(STRING), REST_URI),
   /** XQuery annotation. */
   _REST_CONSUMES("consumes(types...)", params(STRING), REST_URI, false),
   /** XQuery annotation. */
-  _REST_COOKIE_PARAM("cookie-param(name,variable[,defaults...])",
+  _REST_COOKIE_PARAM("cookie-param(name, variable, defaults...)",
       params(STRING, STRING, ITEM), REST_URI, false),
   /** XQuery annotation. */
   _REST_ERROR("error(codes...)", params(STRING), REST_URI, false),
   /** XQuery annotation. */
-  _REST_ERROR_PARAM("error-param(name,variable[,defaults...])",
+  _REST_ERROR_PARAM("error-param(name, variable, defaults...)",
       params(STRING, STRING, ITEM), REST_URI, false),
   /** XQuery annotation. */
-  _REST_FORM_PARAM("form-param(name,variable[,defaults...])",
+  _REST_FORM_PARAM("form-param(name, variable, defaults...)",
       params(STRING, STRING, ITEM), REST_URI, false),
   /** XQuery annotation. */
-  _REST_HEADER_PARAM("header-param(name,variable[,defaults...])",
+  _REST_HEADER_PARAM("header-param(name, variable, defaults...)",
       params(STRING, STRING, ITEM), REST_URI, false),
   /** XQuery annotation. */
-  _REST_METHOD("method(name[,body])", params(STRING, STRING), REST_URI, false),
+  _REST_METHOD("method(name, body?)", params(STRING, STRING), REST_URI, false),
   /** XQuery annotation. */
   _REST_PATH("path(path)", params(STRING), REST_URI, false),
   /** XQuery annotation. */
   _REST_PRODUCES("produces(types...)", params(STRING), REST_URI, false),
   /** XQuery annotation. */
-  _REST_QUERY_PARAM("query-param(name,variable[,defaults...])",
+  _REST_QUERY_PARAM("query-param(name, variable, defaults...)",
       params(STRING, STRING, ITEM), REST_URI, false),
   /** XQuery annotation. */
-  _REST_SINGLE("single([key])", params(STRING), REST_URI),
+  _REST_SINGLE("single(key?)", params(STRING), REST_URI),
 
   /** XQuery annotation. */
-  _UNIT_AFTER("after([function])", params(STRING), UNIT_URI),
+  _UNIT_AFTER("after(function?)", params(STRING), UNIT_URI),
   /** XQuery annotation. */
   _UNIT_AFTER_MODULE("after-module()", params(), UNIT_URI),
   /** XQuery annotation. */
-  _UNIT_BEFORE("before([function])", params(STRING), UNIT_URI),
+  _UNIT_BEFORE("before(function?)", params(STRING), UNIT_URI),
   /** XQuery annotation. */
   _UNIT_BEFORE_MODULE("before-module()", params(), UNIT_URI),
   /** XQuery annotation. */
-  _UNIT_IGNORE("ignore([message])", params(STRING), UNIT_URI),
+  _UNIT_IGNORE("ignore(message?)", params(STRING), UNIT_URI),
   /** XQuery annotation. */
-  _UNIT_TEST("test(['expected',errors...])", params(STRING), UNIT_URI),
+  _UNIT_TEST("test('expected'?, errors...)", params(STRING), UNIT_URI),
   /** XQuery annotation. */
   _UNIT_TIMEOUT("timeout(seconds)", params(DECIMAL), UNIT_URI),
 
   /** XQuery annotation. */
-  _WS_CLOSE("close(path[,status,reason])", params(STRING, STRING, STRING), WS_URI),
+  _WS_CLOSE("close(path, status?, reason?)", params(STRING, STRING, STRING), WS_URI),
   /** XQuery annotation. */
   _WS_CONNECT("connect(path)", params(STRING), WS_URI),
   /** XQuery annotation. */
-  _WS_ERROR("error(path,message)", params(STRING, STRING), WS_URI),
+  _WS_ERROR("error(path, message)", params(STRING, STRING), WS_URI),
   /** XQuery annotation. */
-  _WS_MESSAGE("message(path,message)", params(STRING, STRING), WS_URI),
+  _WS_MESSAGE("message(path, message)", params(STRING, STRING), WS_URI),
   /** XQuery annotation. */
-  _WS_SUBPROTOCOL("subprotocol(protocol[,protocols...])", params(STRING), WS_URI);
+  _WS_SUBPROTOCOL("subprotocol(protocol, protocols...)", params(STRING), WS_URI);
 
   /** Parameter types. */
   public final BasicType[] params;
@@ -222,9 +221,8 @@ public enum Annotation {
     this.params = params;
     this.single = single;
 
-    final int s = string.indexOf('(');
-    name = new QNm(NSGlobal.prefix(uri), Token.token(string.substring(0, s)), uri);
-    paramString = string.substring(s + 1).replace(")", "");
+    name = FuncDefinition.name(string, uri);
+    paramString = FuncDefinition.paramString(string);
     minMax = FuncDefinition.minMax(paramString);
   }
 

@@ -563,24 +563,19 @@ final class SyntaxXQuery extends SyntaxMarkup {
 
   /**
    * Returns the argument string of a function declaration and resets the specified lists.
-   * Optional parameters are enclosed in nested square brackets, as with built-in functions.
+   * Optional parameters are suffixed with a question mark, as with built-in functions.
    * @param params parameter names
    * @param optional optionality of the parameters
    * @return argument string, enclosed in parentheses
    */
   private static String args(final StringList params, final BoolList optional) {
     final StringBuilder args = new StringBuilder().append('(');
-    int brackets = 0;
     final int ps = params.size();
     for(int p = 0; p < ps; p++) {
-      if(optional.get(p)) {
-        args.append('[');
-        brackets++;
-      }
-      if(p > 0) args.append(',');
+      if(p > 0) args.append(", ");
       args.append(params.get(p));
+      if(optional.get(p)) args.append('?');
     }
-    while(brackets-- > 0) args.append(']');
     params.reset();
     optional.reset();
     return args.append(')').toString();

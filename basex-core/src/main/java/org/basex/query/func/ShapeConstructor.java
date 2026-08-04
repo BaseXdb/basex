@@ -127,20 +127,17 @@ public final class ShapeConstructor extends StandardFunc {
     final TokenBuilder tb = new TokenBuilder(name != null ? name.local() :
       Token.token(sh instanceof RecordType ? QueryText.RECORD : QueryText.MAP)).add('(');
     final TokenObjectMap<ShapeField> fields = sh.fields();
-    final int max = fields.size();
-    final int min = sh.minFields();
+    final int max = fields.size(), min = sh.minFields();
     for(int i = 1; i <= max; ++i) {
-      if(i == min + 1) tb.add('[');
-      if(i > 1) tb.add(',');
+      if(i > 1) tb.add(", ");
       tb.add(fields.key(i));
+      if(i > min) tb.add('?');
     }
-    if(max > min) tb.add(']');
     final String description = tb.add(')').toString();
 
     final SeqType[] params = new SeqType[max];
     for(int i = 0; i < max; ++i) {
-      final ShapeField f = fields.value(i + 1);
-      params[i] = f.seqType();
+      params[i] = fields.value(i + 1).seqType();
     }
 
     final Supplier<ShapeConstructor> supplier = () -> new ShapeConstructor(sh);

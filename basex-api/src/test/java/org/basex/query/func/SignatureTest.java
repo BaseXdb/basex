@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.*;
 
 import org.basex.*;
+import org.basex.query.ann.*;
 import org.basex.query.value.item.*;
 import org.junit.jupiter.api.*;
 
@@ -15,58 +16,76 @@ import org.junit.jupiter.api.*;
  * @author Christian Gruen
  */
 public final class SignatureTest extends SandboxTest {
+  /** Syntax of parameter names. */
+  private static final String PARAM = "[a-z\\d][-a-z\\d]*";
+
   /**
    * Tests the validity of all function signatures.
    */
-  @Test public void signatures() {
-    for(final FuncDefinition fd : Functions.BUILT_IN.values()) check(fd);
+  @Test public void functions() {
+    for(final FuncDefinition fd : Functions.BUILT_IN.values()) {
+      // check the general syntax of the description string
+      final String string = fd.toString();
+      assertTrue(string.matches("^.+\\(.*\\)$"), "Invalid syntax: " + string);
+      assertTrue(string.replaceAll("\\(.*", "").matches("^[a-z]+:[-a-zA-Z\\d]+$"),
+          "Invalid function name: " + string);
+
+      final String[] params = check(string, fd.paramString(), PARAM);
+      final int pl = params.length;
+      final boolean variadic = fd.variadic();
+      assertEquals(pl > 0 && params[pl - 1].endsWith("..."), variadic,
+          "Variadic function? " + string);
+
+      // check that there are enough argument names
+      final QNm[] names = fd.params;
+      assertEquals(names.length, variadic ? fd.minMax[0] + 1 : fd.minMax[1],
+          "Wrong number of argument names: " + string + Arrays.toString(names));
+
+      // all variable names must be distinct
+      final Set<QNm> set = new HashSet<>(Arrays.asList(names));
+      assertEquals(names.length, set.size(), "Duplicate argument names: " + string);
+    }
   }
 
   /**
-   * Checks if the specified function correctly handles its argument types,
-   * and returns the function name.
-   * @param fd function signature
-   * types are supported.
+   * Tests the validity of all annotation signatures.
    */
-  private static void check(final FuncDefinition fd) {
-    // check the general syntax of the description syntax
-    final String string = fd.toString();
-    assertTrue(string.matches("^.+\\(.*\\)$"), "Invalid syntax: " + string);
-
-    final String name = string.replaceAll("\\(.*", "");
-    String params = string.replaceAll("^.*\\(|\\)$", "");
-    assertTrue(name.matches("^[a-z]+:[-a-zA-Z\\d]+$"), "Invalid function name: " + string);
-    if(params.contains("[")) {
-      assertTrue(params.matches("^.*\\[[^\\]]+\\]$"), "Invalid optional parameters: " + string);
-      params = params.replaceAll("\\[|\\]", "");
+  @Test public void annotations() {
+    for(final Annotation ann : Annotation.values()) {
+      check(ann.toString(), ann.paramString, PARAM + "|'" + PARAM + "'");
     }
-    final String[] list = params.split(",");
-    final boolean variadic = fd.variadic();
-    boolean dots = false;
-    if(!list[0].isEmpty()) {
-      for(final String param : list) {
-        assertFalse(dots, "Variadic parameter must be last one: " + string);
-        assertTrue(param.matches("^[a-z\\d][-a-z\\d]*(\\.\\.\\.)?$"),
-            "Invalid parameter name: " + string);
-        dots = param.endsWith("...");
+  }
+
+  /**
+   * Checks the syntax of a parameter string.
+   * @param string descriptive string
+   * @param paramString parameter string
+   * @param name syntax of parameter names
+   * @return parameters, including their optional and variadic markers
+   */
+  private static String[] check(final String string, final String paramString, final String name) {
+    assertFalse(paramString.contains("[") || paramString.contains("]"),
+        "Obsolete syntax for optional parameters: " + string);
+    if(paramString.isEmpty()) return new String[0];
+
+    final String[] params = paramString.split(",", -1);
+    final int pl = params.length;
+    boolean optional = false, variadic = false;
+    for(int p = 0; p < pl; p++) {
+      String param = params[p];
+      if(p > 0) {
+        assertTrue(param.startsWith(" "), "Missing space after comma: " + string);
+        param = param.substring(1);
       }
+      assertFalse(variadic, "Variadic parameter must be last one: " + string);
+      assertTrue(param.matches("^(" + name + ")(\\?|\\.\\.\\.)?$"),
+          "Invalid parameter name: " + string);
+      variadic = param.endsWith("...");
+      final boolean opt = variadic || param.endsWith("?");
+      assertFalse(optional && !opt, "Parameter after optional one must be optional: " + string);
+      optional = opt;
+      params[p] = param;
     }
-    assertEquals(variadic, dots, "Variadic function? " + string);
-
-    // check that there are enough argument names
-    final QNm[] names = fd.params;
-    final int min = fd.minMax[0], max = fd.minMax[1];
-    assertEquals(names.length, variadic ? min + 1 : max,
-      "Wrong number of argument names: " + fd + Arrays.toString(names));
-
-    // all variable names must be distinct
-    final Set<QNm> set = new HashSet<>(Arrays.asList(names));
-    assertEquals(names.length, set.size(), "Duplicate argument names: " + fd);
-
-    /* higher-order functions must have HOF flag
-    final Checks<SeqType> hof = arg -> arg.type.instanceOf(SeqType.FUNCTION) &&
-        !arg.type.instanceOf(SeqType.MAP) && !arg.type.instanceOf(SeqType.ARRAY);
-    if(hof.any(fd.types) && !fd.has(Flag.HOF)) System.err.println(fd);
-    */
+    return params;
   }
 }
