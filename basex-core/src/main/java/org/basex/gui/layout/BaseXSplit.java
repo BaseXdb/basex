@@ -148,8 +148,12 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
     for(int n = 0; n < r - 1; ++n) {
       if(m[(n << 1) + 1] == sep) q = n + 1;
     }
+    final int size = splitSize();
+    if(size <= 0) return;
+
     final double v = (dragPos - p) / (horizontal ? getWidth() : getHeight());
-    final double min = anchor >= 0 ? (double) anchorMin / splitSize() : 0.0001;
+    // keep a visible strip of every panel, so it can be enlarged again
+    final double min = (double) (anchor >= 0 ? anchorMin : SEPARATOR_SIZE) / size;
     for(int i = 0; i < q; ++i) {
       if(dragSize[i] - v / q < min) return;
     }
@@ -264,7 +268,7 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
       if((c & 1) == 0) {
         // panel
         size = (int) (propSize[c >> 1] * sz);
-        invisible = size == 0;
+        invisible = propSize[c >> 1] == 0;
       } else {
         // splitter: hide when last panel was invisible
         size = invisible ? 0 : SEPARATOR_SIZE;
