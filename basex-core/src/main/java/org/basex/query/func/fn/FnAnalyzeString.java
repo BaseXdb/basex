@@ -9,7 +9,6 @@ import org.basex.query.*;
 import org.basex.query.util.regex.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -36,7 +35,7 @@ public final class FnAnalyzeString extends RegExFn {
   private static final QNm Q_POSITION = new QNm("position");
 
   @Override
-  public FNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected FNode item(final QueryContext qc) throws QueryException {
     final String value = string(toZeroToken(arg(0), qc));
     final byte[] pattern = toToken(arg(1), qc);
     final byte[] flags = toZeroToken(arg(2), qc);

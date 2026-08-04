@@ -55,7 +55,7 @@ public final class Unary extends Single {
   }
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final Item item = expr.atomItem(qc, info);
     if(item == Empty.VALUE) return Empty.VALUE;
 

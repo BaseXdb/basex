@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
@@ -16,7 +15,7 @@ import org.basex.util.hash.*;
  */
 public final class ArchiveDelete extends ArchiveFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final Value entries = arg(1).atomValue(qc, info);
 
     // entries to be deleted

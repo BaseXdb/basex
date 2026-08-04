@@ -14,7 +14,6 @@ import org.basex.query.up.primitives.db.*;
 import org.basex.query.up.primitives.node.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -25,7 +24,7 @@ import org.basex.util.list.*;
  */
 public final class DbPut extends DbNew {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
     final Item input = toNodeOrAtomItem(arg(1), false, qc);
     final String path = toDbPath(arg(2), qc);

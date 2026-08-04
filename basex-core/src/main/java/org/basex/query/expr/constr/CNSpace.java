@@ -45,7 +45,7 @@ public final class CNSpace extends CName {
   }
 
   @Override
-  public FNSpace item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected FNSpace item(final QueryContext qc) throws QueryException {
     final byte[] nm = ncname(true, qc);
     if(nm.length != 0 && !XMLToken.isNCName(nm)) throw INVNSPREFIX_X.get(info, nm);
 

@@ -29,7 +29,7 @@ public class ArithSimple extends Arith {
   }
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final Item item1 = exprs[0].item(qc, info);
     if(item1 == Empty.VALUE) return Empty.VALUE;
     final Item item2 = exprs[1].item(qc, info);

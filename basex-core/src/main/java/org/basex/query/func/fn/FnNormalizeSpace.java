@@ -15,14 +15,13 @@ import org.basex.util.*;
  */
 public final class FnNormalizeSpace extends ContextFn {
   @Override
-  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Str item(final QueryContext qc) throws QueryException {
     final Item item = context(qc).item(qc, info);
     return item.isEmpty() ? Str.EMPTY : Str.get(Token.normalize(item.string(info)));
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
-      throws QueryException {
+  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
     return !Token.ws(toZeroToken(context(qc), qc));
   }
 

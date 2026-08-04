@@ -8,7 +8,6 @@ import org.basex.query.*;
 import org.basex.query.func.convert.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -18,7 +17,7 @@ import org.basex.util.*;
  */
 public final class BinEncodeString extends BinFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final byte[] value = toTokenOrNull(arg(0), qc);
     final String encoding = toEncodingOrNull(arg(1), BIN_UE_X, qc);
     if(value == null) return Empty.VALUE;

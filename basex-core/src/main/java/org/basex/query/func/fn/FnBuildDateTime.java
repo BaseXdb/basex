@@ -53,7 +53,7 @@ public class FnBuildDateTime extends DateTimeFn {
   private static final BigDecimal BD_60 = BigDecimal.valueOf(60);
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final Item value = arg(0).item(qc, info);
     if(value.isEmpty()) return Empty.VALUE;
 

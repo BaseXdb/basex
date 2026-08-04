@@ -2,7 +2,6 @@ package org.basex.query.func.user;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -12,13 +11,12 @@ import org.basex.util.*;
  */
 public final class UserExists extends UserFn {
   @Override
-  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(test(qc, info, 0));
+  protected Bln item(final QueryContext qc) throws QueryException {
+    return Bln.get(test(qc, 0));
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
-      throws QueryException {
+  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
     return qc.context.users.get(toName(arg(0), false, qc)) != null;
   }
 }

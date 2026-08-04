@@ -24,7 +24,7 @@ import org.basex.util.list.*;
  */
 public final class DbRename extends DbAccessFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
     final String source = toDbPath(arg(1), qc), target = toDbPath(arg(2), qc);
 

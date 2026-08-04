@@ -5,7 +5,6 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -15,7 +14,7 @@ import org.basex.util.*;
  */
 public final class RandomUuid extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) {
+  protected Item item(final QueryContext qc) {
     return Str.get(UUID.randomUUID().toString());
   }
 }

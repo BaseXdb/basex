@@ -6,7 +6,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.array.XQArray;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -16,7 +15,7 @@ import org.basex.util.*;
  */
 public final class ArrayTail extends ArrayFn {
   @Override
-  public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected XQArray item(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
     if(array == XQArray.empty()) throw ARRAYEMPTY.get(info);
     return array.subArray(1, array.structSize() - 1, qc);

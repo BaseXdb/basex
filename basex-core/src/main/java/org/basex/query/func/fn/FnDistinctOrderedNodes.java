@@ -11,7 +11,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -34,8 +33,7 @@ public final class FnDistinctOrderedNodes extends StandardFunc {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
-      throws QueryException {
+  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
     final Item item = arg(0).iter(qc).next();
     if(item == null) return false;
     toGNode(item);

@@ -11,7 +11,6 @@ import org.basex.query.util.regex.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -26,7 +25,7 @@ public final class FnReplace extends RegExFn {
           Types.UNTYPED_ATOMIC_O, Types.UNTYPED_ATOMIC_ZM)).seqType(Occ.ZERO_OR_ONE);
 
   @Override
-  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Str item(final QueryContext qc) throws QueryException {
     final byte[] value = toZeroToken(arg(0), qc);
     final byte[] pattern = toToken(arg(1), qc);
     final Item replacement = arg(2).unwrappedItem(qc, info);

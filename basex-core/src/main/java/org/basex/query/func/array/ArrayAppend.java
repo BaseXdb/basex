@@ -7,7 +7,6 @@ import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -17,7 +16,7 @@ import org.basex.util.*;
  */
 public final class ArrayAppend extends ArrayFn {
   @Override
-  public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected XQArray item(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
     final Value member = arg(1).value(qc);
     return array.appendMember(member, qc);

@@ -3,7 +3,6 @@ package org.basex.query.func.fetch;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -13,7 +12,7 @@ import org.basex.util.*;
  */
 public final class FetchBinaryDoc extends FetchDoc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final Bin source = toBin(arg(0), qc);
     // input is streamed: large binaries are not cached in main memory
     return fetch(new IOStream(source.input(info)), qc);

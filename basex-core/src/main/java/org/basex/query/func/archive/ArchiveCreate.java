@@ -10,7 +10,6 @@ import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -20,7 +19,7 @@ import org.basex.util.*;
  */
 public class ArchiveCreate extends ArchiveFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     try(SpillOutput so = new SpillOutput(qc)) {
       create(so, null, qc);
       return so.finish(ARCHIVE_ERROR_X);

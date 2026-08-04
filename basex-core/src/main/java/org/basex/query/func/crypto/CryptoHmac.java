@@ -3,7 +3,6 @@ package org.basex.query.func.crypto;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -13,7 +12,7 @@ import org.basex.util.*;
  */
 public final class CryptoHmac extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final byte[] value = toBytes(arg(0), qc);
     final byte[] key = toBytes(arg(1), qc);
     final String algorithm = toString(arg(2), qc);

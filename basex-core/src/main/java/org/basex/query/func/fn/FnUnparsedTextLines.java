@@ -30,7 +30,7 @@ public final class FnUnparsedTextLines extends FnUnparsedTextAvailable {
   }
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     // overwrite implementation of superclass
     return value(qc).item(qc, info);
   }

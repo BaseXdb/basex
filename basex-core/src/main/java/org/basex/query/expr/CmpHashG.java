@@ -31,8 +31,7 @@ public final class CmpHashG extends CmpG {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
-      throws QueryException {
+  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
     final Iter iter1 = exprs[0].atomIter(qc, info);
     final long size1 = iter1.size();
     if(size1 == 0) return false;

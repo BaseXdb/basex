@@ -7,7 +7,6 @@ import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 import org.basex.util.options.*;
 
 /**
@@ -18,7 +17,7 @@ import org.basex.util.options.*;
  */
 public class DbOptionMap extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final MapBuilder map = new MapBuilder();
     for(final Entry<String, Object> option : qc.context.options().entrySet()) {
       map.put(option.getKey(), item(option.getValue()));

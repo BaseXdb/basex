@@ -125,7 +125,7 @@ public final class CElem extends CName {
   }
 
   @Override
-  public FNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected FNode item(final QueryContext qc) throws QueryException {
     final int s = addNS(qc);
     try {
       // create and check element name

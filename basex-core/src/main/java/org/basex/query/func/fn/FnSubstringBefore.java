@@ -9,7 +9,6 @@ import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -19,7 +18,7 @@ import org.basex.util.*;
  */
 public final class FnSubstringBefore extends StandardFunc {
   @Override
-  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Str item(final QueryContext qc) throws QueryException {
     final byte[] value = toZeroToken(arg(0), qc);
     final byte[] substring = toZeroToken(arg(1), qc);
     final Collation collation = toCollation(arg(2), qc);

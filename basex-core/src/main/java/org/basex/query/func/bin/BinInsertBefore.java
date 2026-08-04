@@ -13,7 +13,7 @@ import org.basex.util.*;
  */
 public final class BinInsertBefore extends BinFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final Bin value = toBinOrNull(arg(0), qc);
     final Long offset = toLongOrNull(arg(1), qc);
     final Bin extra = toBinOrNull(arg(2), qc);

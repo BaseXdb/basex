@@ -35,7 +35,7 @@ public abstract class CNode extends Arr {
   }
 
   @Override
-  public abstract Item item(QueryContext qc, InputInfo ii) throws QueryException;
+  protected abstract Item item(QueryContext qc) throws QueryException;
 
   /**
    * Optimizes the node value.

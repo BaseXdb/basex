@@ -139,13 +139,12 @@ public final class CmpR extends Single {
   }
 
   @Override
-  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(test(qc, info, 0));
+  protected Bln item(final QueryContext qc) throws QueryException {
+    return Bln.get(test(qc, 0));
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
-      throws QueryException {
+  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
     // atomic evaluation of arguments (faster)
     if(single) {
       final Item item = expr.item(qc, info);

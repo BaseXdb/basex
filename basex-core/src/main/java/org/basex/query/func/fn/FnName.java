@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -14,7 +13,7 @@ import org.basex.util.*;
  */
 public class FnName extends FnNodeName {
   @Override
-  public final Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected final Str item(final QueryContext qc) throws QueryException {
     final XNode node = toNodeOrNull(context(qc), qc);
     return node == null || empty(node.kind()) ? Str.EMPTY : Str.get(name(node));
   }

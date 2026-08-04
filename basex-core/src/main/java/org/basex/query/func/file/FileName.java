@@ -5,7 +5,6 @@ import java.nio.file.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -15,7 +14,7 @@ import org.basex.util.*;
  */
 public final class FileName extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final Path path = toRawPath(arg(0), qc).getFileName();
     return path == null ? Str.EMPTY : Str.get(path.toString());
   }

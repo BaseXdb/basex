@@ -46,7 +46,7 @@ public final class CPI extends CName {
   }
 
   @Override
-  public FPI item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected FPI item(final QueryContext qc) throws QueryException {
     final byte[] nm = ncname(false, qc);
     if(eq(lc(nm), XML)) throw CPIXML_X.get(info, nm);
     if(!XMLToken.isNCName(nm)) throw CPIINVAL_X.get(info, nm);

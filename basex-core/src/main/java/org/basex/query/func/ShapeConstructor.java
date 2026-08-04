@@ -52,7 +52,7 @@ public class ShapeConstructor extends StandardFunc {
   }
 
   @Override
-  public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected XQMap item(final QueryContext qc) throws QueryException {
     final TokenObjectMap<ShapeField> fields = shapeType.fields();
     final int fs = fields.size(), el = exprs.length;
     final Value[] values = new Value[fs];
@@ -60,7 +60,7 @@ public class ShapeConstructor extends StandardFunc {
       final ShapeField rf = fields.value(f + 1);
       final Value value = f < el ? exprs[f].value(qc) :
           rf.init() != null ? rf.init().value(qc) : Empty.VALUE;
-      values[f] = rf.seqType().coerce(value, qc, ii, names[f], null);
+      values[f] = rf.seqType().coerce(value, qc, info, names[f], null);
     }
     return new XQShapeMap(shapeType, values);
   }

@@ -26,8 +26,7 @@ public final class CmpSimpleG extends CmpG {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
-      throws QueryException {
+  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
     final Item item1 = exprs[0].item(qc, info);
     if(item1 == Empty.VALUE) return false;
     final Item item2 = exprs[1].item(qc, info);

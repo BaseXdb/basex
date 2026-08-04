@@ -51,13 +51,12 @@ public abstract class Logical extends Arr {
   }
 
   @Override
-  public final Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(test(qc, info, 0));
+  protected final Bln item(final QueryContext qc) throws QueryException {
+    return Bln.get(test(qc, 0));
   }
 
   @Override
-  public final boolean test(final QueryContext qc, final InputInfo ii, final long pos)
-      throws QueryException {
+  protected final boolean test(final QueryContext qc, final long pos) throws QueryException {
     final boolean or = or();
     for(final Expr expr : exprs) {
       if(expr.test(qc, info, 0) == or) return or;

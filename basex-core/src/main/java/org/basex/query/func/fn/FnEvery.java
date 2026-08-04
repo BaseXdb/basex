@@ -7,7 +7,6 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -17,14 +16,13 @@ import org.basex.util.*;
  */
 public class FnEvery extends StandardFunc {
   @Override
-  public final Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected final Bln item(final QueryContext qc) throws QueryException {
     // implementation for dynamic function lookup
-    return Bln.get(test(qc, info, 0));
+    return Bln.get(test(qc, 0));
   }
 
   @Override
-  public final boolean test(final QueryContext qc, final InputInfo ii, final long pos)
-      throws QueryException {
+  protected final boolean test(final QueryContext qc, final long pos) throws QueryException {
     // implementation for dynamic function lookup
     final Iter input = arg(0).iter(qc);
     final FItem predicate = toFunctionOrNull(arg(1), 2, qc);

@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.format.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
@@ -18,7 +17,7 @@ public final class FnFormatInteger extends StandardFunc {
   private final TokenObjectMap<IntFormat> formats = new TokenObjectMap<>();
 
   @Override
-  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Str item(final QueryContext qc) throws QueryException {
     final Item value = arg(0).atomItem(qc, info);
     final byte[] picture = toToken(arg(1), qc);
     final byte[] language = toZeroToken(arg(2), qc);

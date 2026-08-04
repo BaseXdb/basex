@@ -7,7 +7,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -17,7 +16,7 @@ import org.basex.util.*;
  */
 public final class ArrayOfMembers extends ArrayFn {
   @Override
-  public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected XQArray item(final QueryContext qc) throws QueryException {
     final Iter input = arg(0).unwrappedIter(qc);
 
     final ArrayBuilder ab = new ArrayBuilder(qc, input.size());

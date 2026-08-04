@@ -15,11 +15,11 @@ public final class FtNormalize extends FtTokenize {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     // overwrite implementation of superclass
-    return item(qc, info);
+    return item(qc);
   }
 
   @Override
-  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Str item(final QueryContext qc) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
     for(final byte[] token : tokens(qc, true)) tb.add(token);
     return Str.get(tb.finish());

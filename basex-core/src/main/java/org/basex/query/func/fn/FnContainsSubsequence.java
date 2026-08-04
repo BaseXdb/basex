@@ -7,7 +7,6 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -17,13 +16,12 @@ import org.basex.util.*;
  */
 public class FnContainsSubsequence extends StandardFunc {
   @Override
-  public final Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(test(qc, info, 0));
+  protected final Bln item(final QueryContext qc) throws QueryException {
+    return Bln.get(test(qc, 0));
   }
 
   @Override
-  public final boolean test(final QueryContext qc, final InputInfo ii, final long pos)
-      throws QueryException {
+  protected final boolean test(final QueryContext qc, final long pos) throws QueryException {
     final Value input = arg(0).value(qc);
     final Value subsequence = arg(1).value(qc);
     final FItem compare = toFunctionOrNull(arg(2), 2, qc);

@@ -37,8 +37,7 @@ public final class SingleIterPath extends AxisPath {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
-      throws QueryException {
+  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
     return qc.focus.value != Empty.VALUE && steps[0].test(qc, info, 0);
   }
 

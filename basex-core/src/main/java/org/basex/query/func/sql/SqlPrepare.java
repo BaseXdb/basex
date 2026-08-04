@@ -6,7 +6,6 @@ import java.sql.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -16,7 +15,7 @@ import org.basex.util.*;
  */
 public final class SqlPrepare extends SqlFn {
   @Override
-  public Uri item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Uri item(final QueryContext qc) throws QueryException {
     final Connection conn = connection(qc);
     final String prepStmt = toString(arg(1), qc);
     final StatementOptions options = toOptions(arg(2), new StatementOptions(), qc);

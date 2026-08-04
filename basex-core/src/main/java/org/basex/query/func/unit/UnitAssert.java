@@ -3,7 +3,6 @@ package org.basex.query.func.unit;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -13,7 +12,7 @@ import org.basex.util.*;
  */
 public final class UnitAssert extends UnitFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     if(arg(0).test(qc, info, 0)) return Empty.VALUE;
     throw error(toNodeOrAtomItem(arg(1), true, qc));
   }

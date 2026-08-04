@@ -7,7 +7,6 @@ import org.basex.query.up.primitives.*;
 import org.basex.query.up.primitives.name.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -17,7 +16,7 @@ import org.basex.util.*;
  */
 public final class DbCreate extends DbNew {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final String database = toName(arg(0), qc);
     checkCreate(database, qc);
     final NewInput[] inputs = toInputs(qc);

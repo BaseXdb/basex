@@ -18,7 +18,7 @@ import org.basex.util.*;
  */
 public final class FnStringJoin extends StandardFunc {
   @Override
-  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Str item(final QueryContext qc) throws QueryException {
     final Iter values = arg(0).atomIter(qc, info);
     final byte[] separator = toZeroToken(arg(1), qc);
 
@@ -39,8 +39,7 @@ public final class FnStringJoin extends StandardFunc {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
-      throws QueryException {
+  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
     final Iter values = arg(0).atomIter(qc, info);
     final boolean separator = toZeroToken(arg(1), qc).length > 0;
 

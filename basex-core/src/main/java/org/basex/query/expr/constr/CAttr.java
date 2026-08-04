@@ -52,7 +52,7 @@ public final class CAttr extends CName {
   }
 
   @Override
-  public FAttr item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected FAttr item(final QueryContext qc) throws QueryException {
     QNm nm = qname(false, qc);
     byte[] nmPrefix = nm.prefix();
     final byte[] nmUri = nm.uri();

@@ -4,7 +4,6 @@ import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -14,13 +13,12 @@ import org.basex.util.*;
  */
 public final class JobFinished extends StandardFunc {
   @Override
-  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(test(qc, info, 0));
+  protected Bln item(final QueryContext qc) throws QueryException {
+    return Bln.get(test(qc, 0));
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
-      throws QueryException {
+  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
     final String id = toString(arg(0), qc);
     final JobPool pool = qc.context.jobs;
     final QueryJobResult result = pool.results.get(id);

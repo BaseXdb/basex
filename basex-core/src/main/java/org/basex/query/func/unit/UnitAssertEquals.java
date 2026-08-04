@@ -7,7 +7,6 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -17,7 +16,7 @@ import org.basex.util.*;
  */
 public final class UnitAssertEquals extends UnitFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final Iter iter1 = arg(0).iter(qc), iter2 = arg(1).iter(qc);
     final DeepEqual deep = new DeepEqual(info, null, qc);
     Item item1, item2;

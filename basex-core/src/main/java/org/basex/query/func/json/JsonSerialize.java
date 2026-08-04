@@ -8,7 +8,6 @@ import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -18,7 +17,7 @@ import org.basex.util.*;
  */
 public final class JsonSerialize extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final Iter input = arg(0).iter(qc);
     final JsonSerialOptions options = toOptions(arg(1), new JsonSerialOptions(), qc);
     return Str.get(serialize(input, FnXmlToJson.options(options), INVALIDOPTION_X, qc));

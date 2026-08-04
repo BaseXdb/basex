@@ -46,10 +46,10 @@ public final class FTOr extends FTExpr {
   }
 
   @Override
-  public FTNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final FTNode item = exprs[0].item(qc, info);
+  public FTNode item(final QueryContext qc) throws QueryException {
+    final FTNode item = exprs[0].item(qc);
     final int el = exprs.length;
-    for(int e = 1; e < el; e++) or(item, exprs[e].item(qc, info));
+    for(int e = 1; e < el; e++) or(item, exprs[e].item(qc));
     return item;
   }
 

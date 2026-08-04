@@ -9,7 +9,6 @@ import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
-import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
@@ -23,7 +22,7 @@ public final class FnError extends StandardFunc {
   private QueryException cause;
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final QNm code = toQNmOrNull(arg(0), qc);
     final String description = toStringOrNull(arg(1), qc);
     final Value value = defined(2) ? arg(2).value(qc) : null;

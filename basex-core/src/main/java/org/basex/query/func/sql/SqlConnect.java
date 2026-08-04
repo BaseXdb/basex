@@ -24,7 +24,7 @@ public final class SqlConnect extends SqlFn {
   private static final String PASS = "password";
 
   @Override
-  public Uri item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Uri item(final QueryContext qc) throws QueryException {
     final String url = toString(arg(0), qc);
     final String username = toStringOrNull(arg(1), qc);
     final String password = toStringOrNull(arg(2), qc);

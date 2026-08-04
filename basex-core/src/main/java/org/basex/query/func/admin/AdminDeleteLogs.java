@@ -5,7 +5,6 @@ import static org.basex.query.QueryError.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 import org.basex.util.log.*;
 
 /**
@@ -16,7 +15,7 @@ import org.basex.util.log.*;
  */
 public final class AdminDeleteLogs extends AdminFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final String date = toString(arg(0), qc);
 
     final LogFile file = qc.context.log.file(date);

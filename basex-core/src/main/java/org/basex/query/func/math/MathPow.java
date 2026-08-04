@@ -8,7 +8,6 @@ import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -18,7 +17,7 @@ import org.basex.util.*;
  */
 public final class MathPow extends MathFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final Item x = arg(0).atomItem(qc, info);
     final double y = toDouble(arg(1), qc);
     return x.isEmpty() ? Empty.VALUE : Dbl.get(power(toDouble(x), y));

@@ -10,7 +10,6 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -23,7 +22,7 @@ public final class FnCount extends StandardFunc {
   private boolean ndt;
 
   @Override
-  public Itr item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Itr item(final QueryContext qc) throws QueryException {
     // if the iterator size is unknown or nondeterministic, iterate through all results
     final Iter input = arg(0).iter(qc);
     long size = ndt ? -1 : input.size();

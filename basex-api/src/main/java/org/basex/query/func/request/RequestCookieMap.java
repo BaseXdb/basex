@@ -4,8 +4,6 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
-import org.basex.util.*;
-
 import jakarta.servlet.http.*;
 
 /**
@@ -16,7 +14,7 @@ import jakarta.servlet.http.*;
  */
 public final class RequestCookieMap extends ApiFunc {
   @Override
-  public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected XQMap item(final QueryContext qc) throws QueryException {
     final MapBuilder map = new MapBuilder();
     final Cookie[] cookies = state(qc).cookies();
     if(cookies != null) {

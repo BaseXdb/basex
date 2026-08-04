@@ -54,8 +54,8 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public FTNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return weight(exprs[0].item(qc, info), qc);
+  public FTNode item(final QueryContext qc) throws QueryException {
+    return weight(exprs[0].item(qc), qc);
   }
 
   @Override

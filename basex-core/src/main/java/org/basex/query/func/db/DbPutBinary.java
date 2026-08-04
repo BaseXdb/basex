@@ -12,7 +12,6 @@ import org.basex.query.up.primitives.db.*;
 import org.basex.query.up.primitives.node.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -23,7 +22,7 @@ import org.basex.util.list.*;
  */
 public class DbPutBinary extends DbNew {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
     final Item input = arg(1).item(qc, info);
     final String path = toDbPath(arg(2), qc);

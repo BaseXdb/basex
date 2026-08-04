@@ -104,7 +104,7 @@ public final class FuncLit extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  public FuncItem item(final QueryContext qc, final InputInfo ii) {
+  protected FuncItem item(final QueryContext qc) {
     return new FuncItem(info, expr, params, anns, funcType(), vs.stackSize(), name,
         qc.focus.copy());
   }

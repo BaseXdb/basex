@@ -6,7 +6,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -17,7 +16,7 @@ import org.basex.util.list.*;
  */
 public class ConvertIntegersToBase64 extends ConvertFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     return bytesToB64(qc);
   }
 

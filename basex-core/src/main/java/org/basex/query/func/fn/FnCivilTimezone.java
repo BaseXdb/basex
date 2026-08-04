@@ -7,7 +7,6 @@ import java.time.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -17,7 +16,7 @@ import org.basex.util.*;
  */
 public final class FnCivilTimezone extends DateTimeFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final Dtm value = (Dtm) checkType(arg(0), BasicType.DATE_TIME, qc);
     final String place = toStringOrNull(arg(1), qc);
 

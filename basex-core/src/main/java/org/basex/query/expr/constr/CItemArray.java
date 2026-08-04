@@ -41,7 +41,7 @@ public final class CItemArray extends Single {
   }
 
   @Override
-  public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected XQArray item(final QueryContext qc) throws QueryException {
     return XQArray.items(expr.value(qc));
   }
 

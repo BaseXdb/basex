@@ -164,7 +164,7 @@ public final class If extends Arr {
   }
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     return expr(qc).item(qc, info);
   }
 

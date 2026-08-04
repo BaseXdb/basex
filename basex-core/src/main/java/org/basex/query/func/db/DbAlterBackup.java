@@ -8,7 +8,6 @@ import org.basex.query.up.primitives.name.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -19,7 +18,7 @@ import org.basex.util.list.*;
  */
 public final class DbAlterBackup extends DbAccessFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final String name = toName(arg(0), qc), newname = toName(arg(1), qc);
     if(name.equals(newname)) throw DB_CONFLICT4_X.get(info, name, newname);
 

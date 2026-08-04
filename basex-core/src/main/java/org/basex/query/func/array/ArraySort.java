@@ -10,7 +10,6 @@ import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -20,7 +19,7 @@ import org.basex.util.*;
  */
 public final class ArraySort extends ArraySortBy {
   @Override
-  public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected XQArray item(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc), value = quickValue(array, qc);
     return value != null ? value : sort(array, qc);
   }

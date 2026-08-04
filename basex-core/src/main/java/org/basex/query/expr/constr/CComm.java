@@ -37,7 +37,7 @@ public final class CComm extends CNode {
   }
 
   @Override
-  public FComm item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected FComm item(final QueryContext qc) throws QueryException {
     return new FComm(qc.shared.token(FComm.parse(atomValue(qc, true), info)));
   }
 

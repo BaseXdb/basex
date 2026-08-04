@@ -2,7 +2,6 @@ package org.basex.query.func.proc;
 
 import org.basex.query.*;
 import org.basex.query.value.node.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -12,7 +11,7 @@ import org.basex.util.*;
  */
 public final class ProcExecute extends ProcFn {
   @Override
-  public FNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected FNode item(final QueryContext qc) throws QueryException {
     final ProcResult result = exec(qc, false);
     final boolean ex = result.exception != null;
     if(ex) result.error.add(result.exception.getMessage());

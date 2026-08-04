@@ -5,7 +5,6 @@ import static org.basex.query.QueryError.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -15,7 +14,7 @@ import org.basex.util.*;
  */
 public final class FetchBinary extends FetchDoc {
   @Override
-  public B64IOLazy item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected B64IOLazy item(final QueryContext qc) throws QueryException {
     final IO source = toIO(arg(0), qc);
     return new B64IOLazy(source, FETCH_OPEN_X);
   }

@@ -6,7 +6,6 @@ import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 import org.basex.util.options.*;
 
 /**
@@ -17,7 +16,7 @@ import org.basex.util.options.*;
  */
 public final class FnUnparsedText extends FnUnparsedTextAvailable {
   @Override
-  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Str item(final QueryContext qc) throws QueryException {
     return (Str) doc(qc);
   }
 

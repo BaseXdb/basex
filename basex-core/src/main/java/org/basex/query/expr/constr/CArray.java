@@ -46,7 +46,7 @@ public final class CArray extends Arr {
   }
 
   @Override
-  public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected XQArray item(final QueryContext qc) throws QueryException {
     final ArrayBuilder ab = new ArrayBuilder(qc, exprs.length);
     for(final Expr expr : exprs) ab.add(expr.value(qc));
     return ab.array(this);

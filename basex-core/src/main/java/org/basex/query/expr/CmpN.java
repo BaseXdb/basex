@@ -44,7 +44,7 @@ public final class CmpN extends Cmp {
   }
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final GNode n1 = toGNodeOrNull(exprs[0], qc);
     if(n1 == null) return Empty.VALUE;
     final GNode n2 = toGNodeOrNull(exprs[1], qc);
@@ -53,8 +53,7 @@ public final class CmpN extends Cmp {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
-      throws QueryException {
+  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
     final GNode n1 = toGNodeOrNull(exprs[0], qc);
     if(n1 == null) return false;
     final GNode n2 = toGNodeOrNull(exprs[1], qc);

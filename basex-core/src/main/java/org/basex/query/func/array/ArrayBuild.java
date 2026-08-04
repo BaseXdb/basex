@@ -8,7 +8,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -18,7 +17,7 @@ import org.basex.util.*;
  */
 public final class ArrayBuild extends ArrayFn {
   @Override
-  public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected XQArray item(final QueryContext qc) throws QueryException {
     final Expr input = arg(0);
     final FItem action = toFunctionOrNull(arg(1), 2, qc);
     if(action == null) return XQArray.items(input.value(qc));

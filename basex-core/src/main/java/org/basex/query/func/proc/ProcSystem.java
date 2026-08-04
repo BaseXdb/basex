@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -15,7 +14,7 @@ import org.basex.util.*;
  */
 public final class ProcSystem extends ProcFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final ProcResult result = exec(qc, false);
     if(result.exception != null) throw PROC_ERROR_X.get(info, result.exception);
     if(result.code == 0) return Str.get(result.output.normalize().finish());

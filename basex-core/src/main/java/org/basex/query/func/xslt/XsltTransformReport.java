@@ -5,7 +5,6 @@ import javax.xml.transform.stream.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -15,7 +14,7 @@ import org.basex.util.*;
  */
 public final class XsltTransformReport extends XsltTransform {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final ArrayOutput result = new ArrayOutput();
     final XsltReport report = new XsltReport(qc);
     transform(new StreamResult(result), report, qc);

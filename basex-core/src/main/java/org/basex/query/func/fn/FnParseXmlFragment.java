@@ -41,7 +41,7 @@ public class FnParseXmlFragment extends Docs {
   }
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     return parse(qc, true, toOptions(arg(1), new ParseXmlFragmentOptions(), qc));
   }
 

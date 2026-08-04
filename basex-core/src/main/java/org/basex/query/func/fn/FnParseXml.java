@@ -5,7 +5,6 @@ import static org.basex.query.QueryError.*;
 import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 import org.basex.util.options.*;
 
 /**
@@ -38,7 +37,7 @@ public final class FnParseXml extends FnParseXmlFragment {
   }
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final ParseXmlOptions options = toOptions(arg(1), new ParseXmlOptions(), qc);
     if(!trusted(options, qc)) {
       if(options.get(ParseXmlOptions.XINCLUDE)) throw EXTERNALRESOURCE_X.get(info, "'xinclude'");

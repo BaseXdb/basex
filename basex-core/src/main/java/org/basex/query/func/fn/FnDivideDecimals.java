@@ -9,7 +9,6 @@ import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -19,7 +18,7 @@ import org.basex.util.*;
  */
 public final class FnDivideDecimals extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final BigDecimal value = checkType(arg(0), BasicType.DECIMAL, qc).dec(info);
     final BigDecimal divisor = checkType(arg(1), BasicType.DECIMAL, qc).dec(info);
     final Item precision = arg(2).atomItem(qc, info);
