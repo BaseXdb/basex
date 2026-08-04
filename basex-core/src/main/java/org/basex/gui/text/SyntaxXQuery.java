@@ -114,6 +114,8 @@ final class SyntaxXQuery extends SyntaxMarkup {
   private static final int INITIAL = 4;
   /** Declaration scan: after the {@code default} keyword of a declaration. */
   private static final int DEFAULTED = 5;
+  /** Declaration scan: in the parameter list of a function. */
+  private static final int FUNCTION_PARAMS = 6;
 
   /** Module scan: before the module declaration. */
   private static final int MODULE_KEYWORD = 0;
@@ -474,11 +476,16 @@ final class SyntaxXQuery extends SyntaxMarkup {
 
     final ArrayList<Completion> local = new ArrayList<>();
     for(final Declaration declaration : declarations) {
-      // functions are completed with parentheses; global variables are in scope in the whole module
+      // functions are completed with their parameters; variables are in scope in the whole module
       final String name = declaration.name();
-      local.add(name.indexOf('$') == -1 ?
-        new Completion(name.toLowerCase(Locale.ENGLISH), name + "()", name + "(_)", false) :
-        Completion.get(name, false));
+      if(name.indexOf('$') != -1) {
+        local.add(Completion.get(name, false));
+      } else {
+        // the cursor is placed inside the parentheses if the function has parameters
+        final String args = declaration.args();
+        local.add(new Completion(name.toLowerCase(Locale.ENGLISH), name + args,
+          name + (args.length() > 2 ? "(_)" : "()"), false));
+      }
     }
     local.addAll(candidates(context.variables, ""));
 
@@ -541,6 +548,31 @@ final class SyntaxXQuery extends SyntaxMarkup {
   }
 
   /**
+   * Returns the argument string of a function declaration and resets the specified lists.
+   * Optional parameters are enclosed in nested square brackets, as with built-in functions.
+   * @param params parameter names
+   * @param optional optionality of the parameters
+   * @return argument string, enclosed in parentheses
+   */
+  private static String args(final StringList params, final BoolList optional) {
+    final StringBuilder args = new StringBuilder().append('(');
+    int brackets = 0;
+    final int ps = params.size();
+    for(int p = 0; p < ps; p++) {
+      if(optional.get(p)) {
+        args.append('[');
+        brackets++;
+      }
+      if(p > 0) args.append(',');
+      args.append(params.get(p));
+    }
+    while(brackets-- > 0) args.append(']');
+    params.reset();
+    optional.reset();
+    return args.append(')').toString();
+  }
+
+  /**
    * Adds the completions for a built-in function or annotation.
    * @param name function or annotation name
    * @param args argument string to be appended to the label
@@ -574,6 +606,10 @@ final class SyntaxXQuery extends SyntaxMarkup {
     // names of the open elements, name of the last start tag
     final TokenList stack = new TokenList();
     byte[] element = null;
+    // parameter names of the current function, their optionality, and flag for the next parameter
+    final StringList params = new StringList();
+    final BoolList optional = new BoolList();
+    boolean parameter = false;
 
     final int tl = text.length;
     for(int p = 0; p < tl;) {
@@ -601,7 +637,15 @@ final class SyntaxXQuery extends SyntaxMarkup {
           if(begin > 0) {
             final int prev = text[begin - 1];
             // a dollar sign indicates the declaration or reference of a variable
-            if(prev == '$' && begin < pos) context.variables.add(token('$' + word));
+            if(prev == '$') {
+              if(begin < pos) context.variables.add(token('$' + word));
+              // the first variable of a parameter is its name; the others occur in default values
+              if(scan == FUNCTION_PARAMS && parameter) {
+                params.add(word);
+                optional.add(false);
+                parameter = false;
+              }
+            }
             // a question mark indicates the lookup of a map or array
             if(prev == '?') context.lookups.add(token(word));
             // in a start tag, the element name follows the angle bracket
@@ -657,10 +701,21 @@ final class SyntaxXQuery extends SyntaxMarkup {
               }
             }
             case DEFAULTED -> scan = OUTSIDE;
+            case FUNCTION_PARAMS -> {
+              // the words of a parameter list are names, types and keywords
+            }
             default -> {
-              final String name = scan == VARIABLE_NAME ? '$' + word : word;
-              declarations.add(new Declaration(name, begin, beginLine));
-              scan = OUTSIDE;
+              if(scan == FUNCTION_NAME) {
+                // the parameter names are collected until the list is closed
+                declarations.add(new Declaration(word, "()", begin, beginLine));
+                scan = FUNCTION_PARAMS;
+                params.reset();
+                optional.reset();
+                depth = 0;
+              } else {
+                declarations.add(new Declaration('$' + word, "", begin, beginLine));
+                scan = OUTSIDE;
+              }
             }
           }
           begin = -1;
@@ -669,6 +724,23 @@ final class SyntaxXQuery extends SyntaxMarkup {
           if(ch == '%') annotation = true;
           else if(ch == '(') depth++;
           else if(ch == ')' && depth > 0) depth--;
+        } else if(code && scan == FUNCTION_PARAMS) {
+          // types and default values may be parenthesized: only the outermost list is relevant
+          if(ch == '(') {
+            parameter = ++depth == 1;
+          } else if(ch == ',') {
+            parameter = depth == 1;
+          } else if(ch == ':' && p + cl < tl && text[p + cl] == '=' && !params.isEmpty()) {
+            // a default value makes the last parameter optional
+            optional.set(params.size() - 1, true);
+          } else if(ch == ')' && depth > 0 && --depth == 0) {
+            // the declaration adopts the collected parameter names
+            final Declaration decl = declarations.getLast();
+            declarations.set(declarations.size() - 1, new Declaration(decl.name(),
+              args(params, optional), decl.pos(), decl.line()));
+            parameter = false;
+            scan = OUTSIDE;
+          }
         }
         if(code && ch == ';') {
           // a semicolon ends a declaration: a new one may follow, its variables are out of scope

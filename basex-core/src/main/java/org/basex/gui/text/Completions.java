@@ -26,12 +26,15 @@ final class Completions {
 
     final String input = word.toLowerCase(Locale.ENGLISH);
     final ArrayList<Completion> matches = new ArrayList<>();
-    // the string at the cursor is no candidate, and duplicate insertions are skipped
+    // duplicate insertions are skipped
     final HashSet<String> values = new HashSet<>();
-    values.add(word);
+    // indicates if the string at the cursor is a complete candidate
+    final boolean[] exact = new boolean[1];
     final Consumer<Completion> add = completion -> {
       // trailing whitespace is ignored: a candidate must insert more than the string at the cursor
-      if(values.add(completion.value().stripTrailing())) matches.add(completion);
+      final String value = completion.value().stripTrailing();
+      if(value.equals(word)) exact[0] = true;
+      else if(values.add(value)) matches.add(completion);
     };
 
     // add matches that start with the input string
@@ -48,8 +51,9 @@ final class Completions {
       }
       separate(matches, size);
     }
-    // add matches that start with and contain the input string (skipped for a single candidate)
-    if(matches.size() != 1) {
+    // add matches that start with and contain the input string; skipped for a single candidate,
+    // and if the string at the cursor is a complete candidate itself
+    if(!exact[0] && matches.size() != 1) {
       for(final boolean strt : new boolean[] { true, false }) {
         final int size = matches.size();
         for(final ArrayList<Completion> list : lists) {

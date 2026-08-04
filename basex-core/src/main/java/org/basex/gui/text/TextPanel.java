@@ -43,6 +43,8 @@ public class TextPanel extends BaseXPanel {
 
   /** Code completion popup. */
   private final CompletionPopup completion;
+  /** Proposals of the current code completion, ordered by relevance (initially empty). */
+  private ArrayList<ArrayList<Completion>> proposals = new ArrayList<>();
 
   /** Text caret. */
   private final Timer caretTimer;
@@ -1184,30 +1186,40 @@ public class TextPanel extends BaseXPanel {
   }
 
   /**
-   * Returns the completion candidates for the string before the cursor.
+   * Returns the completion candidates for the string before the cursor. The text is scanned:
+   * as long as the popup stays open, the resulting candidates are only filtered again.
    * @param start start position of the string
    * @param explicit invoked via keyboard shortcut
    * @return candidates
    */
   private ArrayList<Completion> candidates(final int start, final boolean explicit) {
-    final ArrayList<Completion> empty = new ArrayList<>();
+    final byte[] text = editor.text();
+    final Syntax syntax = rend.syntax();
+    // no completions in strings, comments, tags and other non-code tokens
+    if(!completing(start, explicit) || !syntax.completable(text, editor.pos()))
+      return new ArrayList<>();
+
+    proposals = syntax.completions(text, start);
+    return Completions.candidates(word(start), proposals);
+  }
+
+  /**
+   * Indicates if candidates may be proposed for the string before the cursor.
+   * @param start start position of the string
+   * @param explicit invoked via keyboard shortcut
+   * @return result of check
+   */
+  private boolean completing(final int start, final boolean explicit) {
+    if(explicit) return true;
     final byte[] text = editor.text();
     final int caret = editor.pos();
-    final Syntax syntax = rend.syntax();
-
-    if(!explicit) {
-      // the cursor must be placed at the end of the completed string
-      if(caret != editor.completionEnd()) return empty;
-      // a completion is started by a name character, or by the character before an empty string
-      final int ch = caret == start ? Syntax.prev(text, start) : cp(text, start);
-      if(!syntax.completeStart(ch) && !XMLToken.isNCStartChar(ch)) return empty;
-      // a function call is already complete
-      if(caret < text.length && text[caret] == '(') return empty;
-    }
-    // no completions in strings, comments, tags and other non-code tokens
-    if(!syntax.completable(text, caret)) return empty;
-
-    return Completions.candidates(word(start), syntax.completions(text, start));
+    // the cursor must be placed at the end of the completed string
+    if(caret != editor.completionEnd()) return false;
+    // a completion is started by a name character, or by the character before an empty string
+    final int ch = caret == start ? Syntax.prev(text, start) : cp(text, start);
+    if(!rend.syntax().completeStart(ch) && !XMLToken.isNCStartChar(ch)) return false;
+    // a function call is already complete
+    return caret >= text.length || text[caret] != '(';
   }
 
   /**
@@ -1227,8 +1239,10 @@ public class TextPanel extends BaseXPanel {
     if(completion.visible()) {
       // the popup is closed if the cursor leaves the completed string
       final int start = completion.start();
-      final ArrayList<Completion> candidates =
-        editor.completionStart() == start ? candidates(start, false) : new ArrayList<>();
+      // the text is not scanned again: the proposals of the visible popup are filtered
+      final ArrayList<Completion> candidates = editor.completionStart() == start &&
+        completing(start, false) ? Completions.candidates(word(start), proposals) :
+        new ArrayList<>();
       if(candidates.isEmpty()) completion.hide();
       else completion.update(candidates, word(start));
     }

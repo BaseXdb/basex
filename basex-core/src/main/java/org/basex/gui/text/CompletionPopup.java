@@ -136,7 +136,7 @@ final class CompletionPopup {
     model.addAll(values);
 
     // assign a fixed cell size: the list must not measure every single candidate
-    final Font f = list.getFont().deriveFont((float) font.getSize());
+    final Font f = list.getFont().deriveFont((float) popupFontSize);
     final FontMetrics fm = list.getFontMetrics(f);
     boldFont = f.deriveFont(Font.BOLD);
     list.setFont(f);
@@ -174,14 +174,13 @@ final class CompletionPopup {
       hide();
     } else if(ENTER.is(e) || TAB.is(e)) {
       insert();
-    } else if(NEXTLINE.is(e) && !MOVEDOWN.is(e)) {
-      move(1);
-    } else if(PREVLINE.is(e) && !MOVEUP.is(e)) {
-      move(-1);
-    } else if(NEXTPAGE.is(e)) {
-      move(ROWS);
-    } else if(PREVPAGE.is(e)) {
-      move(-ROWS);
+    } else if(model.getSize() > 1) {
+      // a single candidate cannot be navigated: the key is processed by the text panel
+      if(NEXTLINE.is(e) && !MOVEDOWN.is(e)) move(1);
+      else if(PREVLINE.is(e) && !MOVEUP.is(e)) move(-1);
+      else if(NEXTPAGE.is(e)) move(ROWS);
+      else if(PREVPAGE.is(e)) move(-ROWS);
+      else return false;
     } else {
       return false;
     }

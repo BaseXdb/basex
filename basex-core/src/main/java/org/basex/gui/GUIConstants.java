@@ -279,6 +279,8 @@ public final class GUIConstants {
   public static Font dmfont;
   /** Current font size. */
   public static int fontSize;
+  /** Font size of the popups of the text editor. */
+  public static int popupFontSize;
 
   /** Names of available fonts. */
   private static String[] fonts;
@@ -408,6 +410,7 @@ public final class GUIConstants {
     final String name = opts.get(GUIOptions.FONT);
 
     fontSize = opts.get(GUIOptions.FONTSIZE);
+    popupFontSize = Math.max(1, fontSize * 4 / 5);
     font  = new Font(name, Font.PLAIN, fontSize);
     mfont = new Font(opts.get(GUIOptions.MONOFONT), Font.PLAIN, fontSize);
     bfont = new Font(name, Font.BOLD, fontSize);
