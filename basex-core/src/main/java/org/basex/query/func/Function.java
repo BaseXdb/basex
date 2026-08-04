@@ -1119,7 +1119,7 @@ public enum Function implements AFunction {
       params(STRING_ZO), BASE64_BINARY_ZO, BIN_URI),
   /** XQuery function. */
   _BIN_INFER_ENCODING(BinInferEncoding::new, "infer-encoding(value[,encoding])",
-      params(BINARY_ZO, STRING_ZO), Records.INFER_ENCODING.get().seqType(), BIN_URI),
+      params(BINARY_O, STRING_ZO), Records.INFER_ENCODING.get().seqType(), BIN_URI),
   /** XQuery function. */
   _BIN_INSERT_BEFORE(BinInsertBefore::new, "insert-before(value,offset,extra)",
       params(BINARY_ZO, INTEGER_O, BINARY_ZO), BASE64_BINARY_ZO, BIN_URI),
