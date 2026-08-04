@@ -2048,7 +2048,7 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _UTIL_ARRAY_MEMBER(UtilArrayMember::new, "array-member(input)",
-      params(ITEM_ZM), ARRAY_ZM, UTIL_URI),
+      params(ITEM_ZM), ARRAY_O, UTIL_URI),
   /** XQuery function. */
   _UTIL_COUNT_WITHIN(UtilCountWithin::new, "count-within(input,min[,max])",
       params(ITEM_ZM, INTEGER_O, INTEGER_ZO), BOOLEAN_O, UTIL_URI),
