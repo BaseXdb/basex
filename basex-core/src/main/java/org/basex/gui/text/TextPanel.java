@@ -47,8 +47,8 @@ public class TextPanel extends BaseXPanel {
   private ArrayList<ArrayList<Completion>> proposals = new ArrayList<>();
   /** Popup with the signature of the current function call. */
   private final SignaturePopup signature;
-  /** Start position of the call with the resolved signature ({@code -1}: none). */
-  private int signatureStart = -1;
+  /** Name of the call with the resolved signature (can be {@code null}: none). */
+  private String signatureName;
   /** Resolved signature (can be {@code null}: the called function is unknown). */
   private Signature signatureValue;
 
@@ -1263,9 +1263,9 @@ public class TextPanel extends BaseXPanel {
     final TextEditor.Call call = completion.visible() ? null : editor.call(syntax);
     if(call != null) {
       final String name = string(editor.text(), call.start(), call.end() - call.start());
-      // the signature is resolved once per call: a declaration lookup scans the text
-      if(call.start() != signatureStart) {
-        signatureStart = call.start();
+      // the signature is resolved once per name: a declaration lookup scans the text
+      if(!name.equals(signatureName)) {
+        signatureName = name;
         signatureValue = signature(name);
       }
       final Signature sig = signatureValue;
