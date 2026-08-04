@@ -209,7 +209,7 @@ final class TextRenderer extends BaseXBack {
       g.setColor(GUIConstants.gray);
       final String string = Integer.toString(line);
       clipAll(g);
-      drawString(string, offset - font.stringWidth(string) - (OFFSET << 1), y, g);
+      font.draw(g, string, offset - font.stringWidth(string) - (OFFSET << 1), y);
       clipText(g);
     }
   }
@@ -251,7 +251,7 @@ final class TextRenderer extends BaseXBack {
    * @return width
    */
   int width(final int start, final int end) {
-    return font.stringWidth(Token.string(text.text(), start, end - start));
+    return font.stringWidth(text.text(), start, end);
   }
 
   /**
@@ -568,18 +568,18 @@ final class TextRenderer extends BaseXBack {
       if(wrap && sw > maxWidth) {
         if(!rowStart()) newline(true);
 
-        final TokenBuilder tb = new TokenBuilder();
+        // keep the longest prefix of the token that fits into the row
+        final byte[] txt = iter.text();
+        final int start = iter.pos(), end = iter.posEnd();
+        int p = start;
         sw = 0;
-        for(final int scp : iter.currString().codePoints().toArray()) {
-          if(sw >= maxWidth) break;
-          tb.add(scp);
-          sw += font.charWidth(scp);
-          if(sw > maxWidth) sw = font.stringWidth(tb.toString());
+        for(; p < end; p += Token.cl(txt, p)) {
+          final int cw = font.charWidth(Token.cp(txt, p));
+          if(sw + cw >= maxWidth) break;
+          sw += cw;
         }
-        final String s = tb.removeLast().toString();
-        if(s.isEmpty()) return false;
-        sw = font.stringWidth(s);
-        iter.posEnd(iter.pos() + tb.size());
+        if(p == start) return false;
+        iter.posEnd(p);
       }
     }
     // no space left: move current string into next line
@@ -707,7 +707,7 @@ final class TextRenderer extends BaseXBack {
       if(showNL && cp == TokenBuilder.NLINE) {
         // draw newline character
         g.setColor(GUIConstants.gray);
-        drawString("\u00b6", x, y, g);
+        font.draw(g, "\u00b6", x, y);
       } else if(showInvisible && cp == '\t') {
         // draw tab arrow
         final int lh = 1 + fontHeight / 12, xe = x + font.charWidth('\t') - lh;
@@ -725,7 +725,7 @@ final class TextRenderer extends BaseXBack {
         } else {
           // draw non-whitespace string
           g.setColor(color);
-          drawString(iter.currString(), x, y, g);
+          font.draw(g, iter.currString(), x, y);
         }
       }
       // underline linked text
@@ -733,7 +733,7 @@ final class TextRenderer extends BaseXBack {
       // show cursor: a wrapped token shares its first position with the end of the previous row
       if(caret && iter.edited()) {
         if(atRowEnd(iter)) drawCaret(g, rowX, rowLineY);
-        else drawCaret(g, x + font.stringWidth(iter.substring(pos, cpos)), lineY);
+        else drawCaret(g, x + font.stringWidth(iter.text(), pos, cpos), lineY);
       }
     }
 
@@ -751,8 +751,8 @@ final class TextRenderer extends BaseXBack {
     if(range != null) {
       final int pos = iter.pos(), posEnd = iter.posEnd();
       final int ss = Math.max(pos, range[0]), se = Math.min(posEnd, range[1]);
-      final int xs = font.stringWidth(iter.substring(pos, ss));
-      final int cw = font.stringWidth(iter.substring(ss, se));
+      final int xs = font.stringWidth(iter.text(), pos, ss);
+      final int cw = font.stringWidth(iter.text(), ss, se);
       g.setColor(GUIConstants.color2A);
       g.fillRect(x + xs, lineY, cw, fontHeight);
     }
@@ -793,17 +793,6 @@ final class TextRenderer extends BaseXBack {
   }
 
   /**
-   * Returns the width of the specified codepoint.
-   * @param string string to be drawn
-   * @param xx x position
-   * @param yy y position
-   * @param g graphics reference
-   */
-  private void drawString(final String string, final int xx, final int yy, final Graphics g) {
-    font.draw(g, string, xx, yy);
-  }
-
-  /**
    * Jumps to the text at the specified position.
    * @param pos mouse position
    * @return text iterator
@@ -835,7 +824,7 @@ final class TextRenderer extends BaseXBack {
         for(int caretP, oldFsw = 0; iter.more();) {
           caretP = iter.pos();
           iter.next();
-          final int fsw = font.stringWidth(iter.substring(p, iter.pos()));
+          final int fsw = font.stringWidth(iter.text(), p, iter.pos());
           if(sw < fsw) {
             if(sw < oldFsw + (fsw - oldFsw) / 2) iter.pos(caretP);
             break;
@@ -863,7 +852,7 @@ final class TextRenderer extends BaseXBack {
 
     // x position of the caret, and top of the target row
     final int cpos = iter.caret();
-    final int xPos = lastX != -1 ? lastX : x + font.stringWidth(iter.substring(iter.pos(), cpos));
+    final int xPos = lastX != -1 ? lastX : x + font.stringWidth(iter.text(), iter.pos(), cpos);
     final int yPos = y - fontHeight + count * fontHeight;
     return new int[] { scan(g, xPos, yPos).pos(), xPos };
   }
@@ -887,7 +876,7 @@ final class TextRenderer extends BaseXBack {
     final TextIterator iter = caretIter(g);
     if(iter == null) return;
     // horizontal position of the cursor in the text (the rendering starts at the left border)
-    final int cx = x + font.stringWidth(iter.substring(iter.pos(), iter.caret()));
+    final int cx = x + font.stringWidth(iter.text(), iter.pos(), iter.caret());
     hscroll.pos(Math.min(Math.max(hscroll.pos(), cx - width), cx - offset));
   }
 

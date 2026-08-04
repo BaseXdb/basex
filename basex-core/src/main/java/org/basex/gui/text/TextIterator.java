@@ -94,16 +94,6 @@ final class TextIterator {
   }
 
   /**
-   * Returns a substring.
-   * @param s start position
-   * @param e end position
-   * @return string
-   */
-  String substring(final int s, final int e) {
-    return s < e ? string(text, s, e - s) : "";
-  }
-
-  /**
    * Returns the current character.
    * @return current character
    */
