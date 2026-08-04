@@ -16,12 +16,12 @@ import org.basex.query.value.type.*;
 public final class FnBoolean extends StandardFunc {
   @Override
   protected Bln item(final QueryContext qc) throws QueryException {
-    return Bln.get(test(qc, 0));
+    return Bln.get(ebv(qc));
   }
 
   @Override
   protected boolean test(final QueryContext qc, final long pos) throws QueryException {
-    return arg(0).test(qc, info, 0);
+    return arg(0).ebv(qc, info);
   }
 
   @Override

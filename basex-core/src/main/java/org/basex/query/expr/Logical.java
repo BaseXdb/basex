@@ -52,14 +52,14 @@ public abstract class Logical extends Arr {
 
   @Override
   protected final Bln item(final QueryContext qc) throws QueryException {
-    return Bln.get(test(qc, 0));
+    return Bln.get(ebv(qc));
   }
 
   @Override
   protected final boolean test(final QueryContext qc, final long pos) throws QueryException {
     final boolean or = or();
     for(final Expr expr : exprs) {
-      if(expr.test(qc, info, 0) == or) return or;
+      if(expr.ebv(qc, info) == or) return or;
     }
     return !or;
   }

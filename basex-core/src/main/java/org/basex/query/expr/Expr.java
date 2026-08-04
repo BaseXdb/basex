@@ -76,7 +76,9 @@ public abstract class Expr extends ExprInfo {
    */
   public abstract Value value(QueryContext qc) throws QueryException;
 
-  // merging the one- and two-arg variants below would result in endless recursion in Value
+  // one-arg variants are implemented and invoked on this, two-arg variants are invoked
+  // on sub-expressions: they lend the input info to values, which have none of their own.
+  // Merging the variants, or invoking a two-arg variant on this, is endless recursion.
 
   /**
    * Evaluates the expression and returns the resulting item,
@@ -90,8 +92,8 @@ public abstract class Expr extends ExprInfo {
   protected abstract Item item(QueryContext qc) throws QueryException;
 
   /**
-   * Evaluates the expression and returns the resulting item, lending the specified input info
-   * to those {@link Value} instances that have none. Overwritten by {@link Value}.
+   * Same as {@link #item(QueryContext)}, but lends the specified input info to {@link Value}
+   * receivers, which have none of their own.
    * @param qc query context
    * @param ii input info (can be {@code null})
    * @return item or {@link Empty#VALUE}
@@ -130,8 +132,8 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Evaluates the expression and returns an iterator on the atomized items, lending the specified
-   * input info to those {@link Value} instances that have none. Overwritten by {@link Value}.
+   * Same as {@link #atomIter(QueryContext)}, but lends the specified input info to {@link Value}
+   * receivers, which have none of their own.
    * @param qc query context
    * @param ii input info (can be {@code null})
    * @return iterator
@@ -154,8 +156,8 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Evaluates the expression and returns the atomized item, lending the specified input info
-   * to those {@link Value} instances that have none. Overwritten by {@link Value}.
+   * Same as {@link #atomItem(QueryContext)}, but lends the specified input info to {@link Value}
+   * receivers, which have none of their own.
    * @param qc query context
    * @param ii input info (can be {@code null})
    * @return item or {@link Empty#VALUE}
@@ -175,8 +177,8 @@ public abstract class Expr extends ExprInfo {
   protected abstract Value atomValue(QueryContext qc) throws QueryException;
 
   /**
-   * Evaluates the expression and returns the atomized items, lending the specified input info
-   * to those {@link Value} instances that have none. Overwritten by {@link Value}.
+   * Same as {@link #atomValue(QueryContext)}, but lends the specified input info to {@link Value}
+   * receivers, which have none of their own.
    * @param qc query context
    * @param ii input info (can be {@code null})
    * @return atomized item
@@ -230,7 +232,7 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Evaluates the expression and returns the unwrapped item, lending the specified input info
-   * to those {@link Value} instances that have none. Overwritten by {@link Value}.
+   * to {@link Value} receivers, which have none of their own.
    * @param qc query context
    * @param ii input info (can be {@code null})
    * @return item
@@ -242,27 +244,49 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Computes the effective boolean value for this expression.
+   * Matches this expression against the specified context position.
    * @param qc query context
-   * @param pos position of context item (if {@code 0}, perform EBV test)
-   * @return item
+   * @param pos position of context item ({@code 0}: compute effective boolean value instead)
+   * @return result of check
    * @throws QueryException query exception
    */
   protected abstract boolean test(QueryContext qc, long pos) throws QueryException;
 
   /**
-   * Computes the effective boolean value, lending the specified input info to those
-   * {@link Value} instances that have none. Overwritten by {@link Value}.
+   * Same as {@link #test(QueryContext, long)}, but lends the specified input info to
+   * {@link Value} receivers, which have none of their own.
    * @param qc query context
    * @param ii input info (can be {@code null})
-   * @param pos position of context item (if {@code 0}, perform EBV test)
-   * @return item
+   * @param pos position of context item ({@code 0}: compute effective boolean value instead)
+   * @return result of check
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
   public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
     return test(qc, pos);
+  }
+
+  /**
+   * Computes the effective boolean value of this expression.
+   * @param qc query context
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  protected final boolean ebv(final QueryContext qc) throws QueryException {
+    return test(qc, 0);
+  }
+
+  /**
+   * Same as {@link #ebv(QueryContext)}, but lends the specified input info to {@link Value}
+   * receivers, which have none of their own.
+   * @param qc query context
+   * @param ii input info (can be {@code null})
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  public final boolean ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return test(qc, ii, 0);
   }
 
   /**

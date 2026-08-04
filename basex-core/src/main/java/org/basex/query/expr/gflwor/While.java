@@ -38,7 +38,7 @@ public final class While extends Clause {
     return new Eval() {
       @Override
       public boolean next(final QueryContext qc) throws QueryException {
-        return sub.next(qc) && expr.test(qc, info, 0);
+        return sub.next(qc) && expr.ebv(qc, info);
       }
     };
   }

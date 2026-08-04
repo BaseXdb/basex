@@ -43,7 +43,7 @@ public final class HoistedFilter extends CachedFilter {
             final double d = num.dbl(info) - 1;
             final long l = (long) d;
             value = d == l && l >= 0 && l < value.size() ? value.itemAt(l) : Empty.VALUE;
-          } else if(!item.test(qc, info, 0)) {
+          } else if(!item.ebv(qc, info)) {
             value = Empty.VALUE;
           }
         } else {

@@ -18,7 +18,7 @@ public class FnEvery extends StandardFunc {
   @Override
   protected final Bln item(final QueryContext qc) throws QueryException {
     // implementation for dynamic function lookup
-    return Bln.get(test(qc, 0));
+    return Bln.get(ebv(qc));
   }
 
   @Override
@@ -30,8 +30,8 @@ public class FnEvery extends StandardFunc {
     final HofArgs args = predicate != null ? new HofArgs(2, predicate) : null;
     final boolean some = some();
     for(Item item; (item = qc.next(input)) != null;) {
-      final boolean test = predicate == null ? item.test(qc, info, 0) :
-        invoke(predicate, args.set(0, item).inc(), qc).test(qc, info, 0);
+      final boolean test = predicate == null ? item.ebv(qc, info) :
+        invoke(predicate, args.set(0, item).inc(), qc).ebv(qc, info);
       if(test == some) return some;
     }
     return !some;

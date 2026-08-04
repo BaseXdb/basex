@@ -13,7 +13,7 @@ import org.basex.query.value.seq.*;
 public final class UnitAssert extends UnitFn {
   @Override
   protected Item item(final QueryContext qc) throws QueryException {
-    if(arg(0).test(qc, info, 0)) return Empty.VALUE;
+    if(arg(0).ebv(qc, info)) return Empty.VALUE;
     throw error(toNodeOrAtomItem(arg(1), true, qc));
   }
 }
