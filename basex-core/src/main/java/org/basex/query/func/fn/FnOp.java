@@ -23,7 +23,7 @@ public final class FnOp extends StandardFunc {
   private static final QNm Q_Y = new QNm("y");
 
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  protected FuncItem item(final QueryContext qc) throws QueryException {
     final String operator = toString(arg(0), qc);
 
     final int pl =  2;

@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
 /**
  * Constructor function for a shape.
  */
-public class ShapeConstructor extends StandardFunc {
+public final class ShapeConstructor extends StandardFunc {
   /** Shape. */
   private ShapeType shapeType;
   /** Field names. */

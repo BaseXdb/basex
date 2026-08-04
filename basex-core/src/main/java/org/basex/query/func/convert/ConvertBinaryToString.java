@@ -16,7 +16,7 @@ import org.basex.query.value.item.*;
  */
 public final class ConvertBinaryToString extends ConvertFn {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  protected Str item(final QueryContext qc) throws QueryException {
     final Bin value = toBin(arg(0), qc);
     final String encoding = toEncodingOrNull(arg(1), CONVERT_ENCODING_X, qc);
     final boolean fallback = toBooleanOrFalse(arg(2), qc);

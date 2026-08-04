@@ -17,7 +17,7 @@ import org.basex.query.value.item.*;
  */
 public final class CsvSerialize extends StandardFunc {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  protected Str item(final QueryContext qc) throws QueryException {
     final Iter input = arg(0).iter(qc);
     try {
       final CsvOptions options = toOptions(arg(1), new CsvOptions(), qc);

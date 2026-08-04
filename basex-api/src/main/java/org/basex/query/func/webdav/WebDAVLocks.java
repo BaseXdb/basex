@@ -38,7 +38,7 @@ public final class WebDAVLocks extends StandardFunc {
   }
 
   @Override
-  public XQMap value(final QueryContext qc) throws QueryException {
+  public XQMap item(final QueryContext qc) throws QueryException {
     final User user = qc.context.user();
 
     // a local permission overrides the global one, so every lock is checked separately

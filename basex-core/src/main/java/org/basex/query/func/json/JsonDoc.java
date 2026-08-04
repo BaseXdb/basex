@@ -9,7 +9,7 @@ import org.basex.query.value.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class JsonDoc extends JsonParse {
+public final class JsonDoc extends JsonParse {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     try {

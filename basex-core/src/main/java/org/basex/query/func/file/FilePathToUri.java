@@ -12,7 +12,7 @@ import org.basex.query.value.item.*;
  */
 public final class FilePathToUri extends StandardFunc {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  protected Uri item(final QueryContext qc) throws QueryException {
     return Uri.get(toPath(arg(0), qc).toUri().toString());
   }
 }

@@ -14,7 +14,7 @@ import org.basex.util.*;
  */
 public final class CryptoGenerateSignature extends StandardFunc {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  protected GNode item(final QueryContext qc) throws QueryException {
     final XNode node = toNode(arg(0), qc);
     final byte[] can = toToken(arg(1), qc);
     final byte[] dig = toToken(arg(2), qc);

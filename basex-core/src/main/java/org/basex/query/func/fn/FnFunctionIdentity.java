@@ -12,7 +12,7 @@ import org.basex.query.value.item.*;
  */
 public final class FnFunctionIdentity extends StandardFunc {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  protected Str item(final QueryContext qc) throws QueryException {
     final FItem function = toFunction(arg(0), qc);
     return Str.get(function.funcIdentity());
   }

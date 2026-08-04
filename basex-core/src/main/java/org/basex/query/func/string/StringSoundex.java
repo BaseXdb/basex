@@ -12,7 +12,7 @@ import org.basex.util.similarity.*;
  */
 public final class StringSoundex extends StringFn {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  protected Str item(final QueryContext qc) throws QueryException {
     return str(Soundex.encode(toToken(arg(0), qc)));
   }
 }

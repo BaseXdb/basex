@@ -19,7 +19,7 @@ import org.basex.query.value.item.*;
  */
 public class ArchiveCreate extends ArchiveFn {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  protected B64 item(final QueryContext qc) throws QueryException {
     try(SpillOutput so = new SpillOutput(qc)) {
       create(so, null, qc);
       return so.finish(ARCHIVE_ERROR_X);

@@ -13,7 +13,7 @@ import org.basex.util.similarity.*;
  */
 public final class StringNgramSimilarity extends StringFn {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  protected Dbl item(final QueryContext qc) throws QueryException {
     final byte[] value1 = toToken(arg(0), qc), value2 = toToken(arg(1), qc);
     final NgramOptions options = toOptions(arg(2), new NgramOptions(), qc);
 

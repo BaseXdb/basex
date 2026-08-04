@@ -13,7 +13,7 @@ import org.basex.util.*;
  */
 public final class FileTempDir extends StandardFunc {
   @Override
-  protected Item item(final QueryContext qc) {
+  protected Str item(final QueryContext qc) {
     return Str.get(Prop.TEMPDIR);
   }
 }

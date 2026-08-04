@@ -13,7 +13,7 @@ import org.basex.query.value.item.*;
  */
 public final class FtCount extends FtAccessFn {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  protected Itr item(final QueryContext qc) throws QueryException {
     final FTPosData tmp = qc.ftPosData;
     qc.ftPosData = new FTPosData();
     final Iter nodes = arg(0).unwrappedIter(qc);

@@ -11,7 +11,7 @@ import org.basex.query.value.item.*;
  */
 public final class ConvertIntegersToHex extends ConvertIntegersToBase64 {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  protected Hex item(final QueryContext qc) throws QueryException {
     return new Hex(bytesToB64(qc).binary(info));
   }
 }

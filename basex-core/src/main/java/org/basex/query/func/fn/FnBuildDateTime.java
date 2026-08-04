@@ -20,7 +20,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
-public class FnBuildDateTime extends DateTimeFn {
+public final class FnBuildDateTime extends DateTimeFn {
   /** Field name: year.     */
   private static final Str YEAR     = Str.get("year");
   /** Field name: month.    */

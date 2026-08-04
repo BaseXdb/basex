@@ -13,7 +13,7 @@ import org.basex.query.value.item.*;
  */
 public final class FnCollationKey extends StandardFunc {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  protected B64 item(final QueryContext qc) throws QueryException {
     final byte[] token = toToken(arg(0), qc);
     final Collation collation = toCollation(arg(1), qc);
 

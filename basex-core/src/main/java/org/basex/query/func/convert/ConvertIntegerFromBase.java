@@ -14,7 +14,7 @@ import org.basex.query.value.item.*;
  */
 public final class ConvertIntegerFromBase extends StandardFunc {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  protected Itr item(final QueryContext qc) throws QueryException {
     final byte[] value = toToken(arg(0), qc);
     final long base = toLong(arg(1), qc);
     if(base < 2 || base > 36) throw CONVERT_BASE_X.get(info, base);

@@ -11,7 +11,7 @@ import org.basex.query.value.item.*;
  */
 public final class ClientInfo extends ClientFn {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  protected Str item(final QueryContext qc) throws QueryException {
     return Str.get(session(qc, false).info().replace("\r\n?", "\n").trim());
   }
 }

@@ -12,7 +12,7 @@ import org.basex.query.value.item.*;
  */
 public final class CryptoHmac extends StandardFunc {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  protected Str item(final QueryContext qc) throws QueryException {
     final byte[] value = toBytes(arg(0), qc);
     final byte[] key = toBytes(arg(1), qc);
     final String algorithm = toString(arg(2), qc);

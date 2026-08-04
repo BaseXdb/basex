@@ -15,9 +15,9 @@ import org.basex.query.value.type.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class FnInsertSeparator extends StandardFunc {
+public final class FnInsertSeparator extends StandardFunc {
   @Override
-  public final Value value(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final Iter input = arg(0).iter(qc);
     final Value separator = arg(1).value(qc);
 
@@ -31,7 +31,7 @@ public class FnInsertSeparator extends StandardFunc {
   }
 
   @Override
-  protected final Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr values = arg(0), separator = arg(1);
     final SeqType st = values.seqType(), stSep = separator.seqType();
     if(st.zeroOrOne() || separator == Empty.VALUE) return cc.voidAndReturn(separator, values, info);

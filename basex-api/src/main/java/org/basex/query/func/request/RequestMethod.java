@@ -12,7 +12,7 @@ import org.basex.query.value.item.*;
  */
 public final class RequestMethod extends ApiFunc {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  protected Str item(final QueryContext qc) throws QueryException {
     return toStr(state(qc).method());
   }
 }

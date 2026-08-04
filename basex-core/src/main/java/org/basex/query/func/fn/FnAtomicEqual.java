@@ -14,7 +14,7 @@ import org.basex.query.value.type.*;
  */
 public final class FnAtomicEqual extends StandardFunc {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  protected Bln item(final QueryContext qc) throws QueryException {
     final Item value1 = toAtomItem(arg(0), qc);
     final Item value2 = toAtomItem(arg(1), qc);
     return Bln.get(value1.atomicEqual(value2));

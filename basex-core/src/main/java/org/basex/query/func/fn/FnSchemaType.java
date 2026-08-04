@@ -205,7 +205,7 @@ public class FnSchemaType extends StandardFunc {
     }
 
     @Override
-    public Item item(final QueryContext qc) throws QueryException {
+    public Bln item(final QueryContext qc) throws QueryException {
       final Item value = toAtomItem(arg(0), qc);
       return Bln.get(value.type.instanceOf(type));
     }

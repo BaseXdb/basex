@@ -16,7 +16,7 @@ import org.basex.query.value.map.*;
  */
 public final class MapFind extends MapFn {
   @Override
-  public XQArray value(final QueryContext qc) throws QueryException {
+  public XQArray item(final QueryContext qc) throws QueryException {
     final Iter input = arg(0).iter(qc);
     final Item key = toAtomItem(arg(1), qc);
 

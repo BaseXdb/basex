@@ -11,7 +11,7 @@ import org.basex.query.value.item.*;
  */
 public final class BinUnpackDouble extends BinFn {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  protected Dbl item(final QueryContext qc) throws QueryException {
     return Dbl.get(unpack(qc, 8).getDouble());
   }
 }

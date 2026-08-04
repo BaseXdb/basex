@@ -17,7 +17,7 @@ import org.basex.query.value.item.*;
  */
 public final class DbContentType extends DbAccessFn {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  protected Str item(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
     final String path = toDbPath(arg(1), qc);
 

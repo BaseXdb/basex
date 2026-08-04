@@ -18,7 +18,7 @@ import org.basex.query.value.item.*;
  */
 public final class ClientExecute extends ClientFn {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  protected Str item(final QueryContext qc) throws QueryException {
     final ClientSession cs = session(qc, false);
     final String cmd = toString(arg(1), qc);
 

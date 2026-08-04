@@ -14,7 +14,7 @@ import org.basex.query.value.item.*;
  */
 public final class FetchText extends FetchDoc {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  protected StrLazy item(final QueryContext qc) throws QueryException {
     final IO source = toIO(arg(0), qc);
     final String encoding = toEncodingOrNull(arg(1), FETCH_ENCODING_X, qc);
     final boolean fallback = toBooleanOrFalse(arg(2), qc);

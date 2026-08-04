@@ -13,7 +13,7 @@ import org.basex.query.value.item.*;
  */
 public final class MathE extends MathFn {
   @Override
-  protected Item item(final QueryContext qc) {
+  protected Dbl item(final QueryContext qc) {
     return Dbl.get(E);
   }
 }

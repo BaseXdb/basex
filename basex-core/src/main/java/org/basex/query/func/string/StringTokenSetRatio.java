@@ -14,7 +14,7 @@ import org.basex.util.similarity.*;
  */
 public final class StringTokenSetRatio extends StringFn {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  protected Dbl item(final QueryContext qc) throws QueryException {
     final byte[] value1 = toToken(arg(0), qc), value2 = toToken(arg(1), qc);
     final FTOpt opt = ftOpt(arg(2), qc);
 

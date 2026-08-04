@@ -16,7 +16,7 @@ import org.basex.query.value.type.*;
  */
 public final class FnJtree extends StandardFunc {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  protected JNode item(final QueryContext qc) throws QueryException {
     final Item item = arg(0).unwrappedItem(qc, info);
     if(!(item instanceof XQStruct)) throw typeError(item, Types.MAP_OR_ARRAY, info);
 

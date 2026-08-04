@@ -12,7 +12,7 @@ import org.basex.query.value.item.*;
  */
 public final class ValidateXsdVersion extends StandardFunc {
   @Override
-  protected Item item(final QueryContext qc) {
+  protected Str item(final QueryContext qc) {
     return Str.get(ValidateXsd.version());
   }
 }

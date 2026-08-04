@@ -19,7 +19,7 @@ public final class RandomInteger extends StandardFunc {
   private static final Random RND = new Random();
 
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  protected Itr item(final QueryContext qc) throws QueryException {
     final Long max = toLongOrNull(arg(0), qc);
     final long next;
     if(max != null) {

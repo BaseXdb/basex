@@ -12,7 +12,7 @@ import org.basex.query.value.seq.*;
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
-public class FnPartsOfDateTime extends DateTimeFn {
+public final class FnPartsOfDateTime extends DateTimeFn {
   @Override
   protected Item item(final QueryContext qc) throws QueryException {
     final ADate value = toGregorianOrNull(arg(0), qc);
