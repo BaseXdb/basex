@@ -48,7 +48,7 @@ public final class SyntaxJSONTest {
    * @param expected expected legend
    */
   private static void check(final String json, final String expected) {
-    final TextEditor editor = new TextEditor(null);
+    final TextEditor editor = new TextEditor(EditorOptions.DEFAULTS);
     editor.text(Token.token(json));
     final TextIterator iter = new TextIterator(editor);
     final Syntax syntax = new SyntaxJSON();

@@ -109,7 +109,7 @@ abstract class DbAccessFn extends StandardFunc {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return dataLock(arg(0), false, visitor) && super.accept(visitor);
+    return dataLock(arg(0), false, hasUPD(), visitor) && super.accept(visitor);
   }
 
   /**

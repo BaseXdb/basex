@@ -4,7 +4,6 @@ import static org.basex.util.similarity.Levenshtein.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 import org.basex.util.ft.*;
 
 /**
@@ -15,7 +14,7 @@ import org.basex.util.ft.*;
  */
 public final class StringLevenshtein extends StringFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Dbl item(final QueryContext qc) throws QueryException {
     final byte[] value1 = toToken(arg(0), qc), value2 = toToken(arg(1), qc);
     final FTOpt opt = ftOpt(arg(2), qc);
 

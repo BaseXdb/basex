@@ -204,7 +204,7 @@ public final class TextView extends View {
   public void setText(final ArrayOutput out, final long results, final Throwable throwable) {
     final byte[] buffer = out.buffer();
     final int size = (int) out.size();
-    final byte[] chop = token(DOTS);
+    final byte[] chop = token(ELLIPSIS);
     final int cl = chop.length;
     if(out.finished() && size >= cl) Array.copyFromStart(chop, cl, buffer, size - cl);
     text.setText(buffer, size);

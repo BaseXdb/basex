@@ -6,7 +6,6 @@ import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -16,8 +15,8 @@ import org.basex.util.*;
  */
 public final class FnFunctionLookup extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Expr expr = item(qc);
+  protected Item item(final QueryContext qc) throws QueryException {
+    final Expr expr = lookup(qc);
     return expr != null ? expr.item(qc, info) : Empty.VALUE;
   }
 
@@ -27,7 +26,7 @@ public final class FnFunctionLookup extends StandardFunc {
     if(!cc.dynamic) cc.qc.functions.compileAll(cc);
 
     if(values(false, cc)) {
-      final Expr expr = item(cc.qc);
+      final Expr expr = lookup(cc.qc);
       if(expr != null) return expr;
     }
     return this;
@@ -36,7 +35,7 @@ public final class FnFunctionLookup extends StandardFunc {
   @Override
   public boolean accept(final ASTVisitor visitor) {
     // locked resources cannot be detected statically
-    return visitor.lock((String) null) && super.accept(visitor);
+    return visitor.lock((String) null, false) && super.accept(visitor);
   }
 
   /**
@@ -45,7 +44,7 @@ public final class FnFunctionLookup extends StandardFunc {
    * @return literal or {@code null}
    * @throws QueryException query exception
    */
-  private Expr item(final QueryContext qc) throws QueryException {
+  private Expr lookup(final QueryContext qc) throws QueryException {
     final QNm name = toQNm(toAtomItem(arg(0), qc));
     final long arity = toLong(arg(1), qc);
     if(arity >= 0 && arity <= Integer.MAX_VALUE) {

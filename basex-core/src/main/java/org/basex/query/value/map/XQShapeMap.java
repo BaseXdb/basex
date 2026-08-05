@@ -12,27 +12,31 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Compact map implementation for records with fixed entries.
+ * Compact map implementation for maps with a known shape.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class XQRecordMap extends XQHashMap {
+public final class XQShapeMap extends XQHashMap {
   /** Values. */
   private final Value[] values;
 
   /**
    * Constructor.
-   * @param type record type
+   * @param type shape
    * @param values values
    */
-  public XQRecordMap(final Type type, final Value... values) {
+  public XQShapeMap(final Type type, final Value... values) {
     super(type);
     this.values = values;
   }
 
   @Override
-  public boolean refineType() throws QueryException {
+  public boolean refineType() {
+    final int vl = values.length;
+    final SeqType[] seqTypes = new SeqType[vl];
+    for(int v = 0; v < vl; v++) seqTypes[v] = values[v].seqType();
+    type = shape().refine(seqTypes);
     return true;
   }
 
@@ -44,22 +48,39 @@ public final class XQRecordMap extends XQHashMap {
   @Override
   public XQMap put(final Item key, final Value value) throws QueryException {
     if(key.type.isStringOrUntyped()) {
-      final int i = fields().index(key.string(null));
+      final byte[] name = key.string(null);
+      final int i = fields().index(name);
       if(i != 0) return putAt(i - 1, value);
+      if(key.type == BasicType.STRING) {
+        final ShapeType sh = shape().put(name, value.seqType());
+        if(sh != null) return new XQShapeMap(sh, Array.add(values, value));
+      }
     }
     return super.put(key, value);
   }
 
   @Override
   public XQMap putAt(final int index, final Value value) throws QueryException {
-    if(value.seqType().instanceOf(fields().value(index + 1).seqType())) {
-      final Type tp = type instanceof final RecordType rt ? rt.open() : type;
-      if(value == values[index] && tp == type) return this;
-      final Value[] copy = values.clone();
-      copy[index] = value;
-      return new XQRecordMap(tp, copy);
+    final ShapeType sh = shape();
+    final SeqType vt = value.seqType();
+    final ShapeType tp = vt.instanceOf(fields().value(index + 1).seqType()) ? sh.shape() :
+      sh.put(fields().key(index + 1), vt);
+    if(value == values[index] && tp == type) return this;
+    final Value[] copy = values.clone();
+    copy[index] = value;
+    return new XQShapeMap(tp, copy);
+  }
+
+  @Override
+  public XQMap remove(final Item key) throws QueryException {
+    if(key.type.isStringOrUntyped()) {
+      final byte[] name = key.string(null);
+      final int i = fields().index(name);
+      if(i == 0) return this;
+      if(values.length == 1) return empty();
+      return new XQShapeMap(shape().remove(name), Array.remove(values, i - 1));
     }
-    return super.putAt(index, value);
+    return super.remove(key);
   }
 
   @Override
@@ -82,11 +103,19 @@ public final class XQRecordMap extends XQHashMap {
   }
 
   /**
-   * Returns the record fields.
+   * Returns the shape of this map.
+   * @return shape
+   */
+  private ShapeType shape() {
+    return (ShapeType) type;
+  }
+
+  /**
+   * Returns the fields of the map type.
    * @return fields
    */
-  private TokenObjectMap<RecordField> fields() {
-    return ((RecordType) type).fields();
+  private TokenObjectMap<ShapeField> fields() {
+    return shape().fields();
   }
 
   @Override
@@ -116,18 +145,19 @@ public final class XQRecordMap extends XQHashMap {
       qc.checkStop();
       vals[v] = values[v].materialize(test, ii, qc);
     }
-    return new XQRecordMap(((RecordType) type).detach(), vals);
+    return new XQShapeMap(shape().detach(), vals);
   }
 
   @Override
   public boolean materialized(final Predicate<Data> test, final InputInfo ii)
       throws QueryException {
-    return ((RecordType) type).detached() && super.materialized(test, ii);
+    return shape().detached() && super.materialized(test, ii);
   }
 
   @Override
   public Item shrink(final QueryContext qc) throws QueryException {
     shrinkValues(qc);
+    refineType();
     return this;
   }
 }

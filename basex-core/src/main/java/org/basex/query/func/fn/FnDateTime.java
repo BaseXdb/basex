@@ -6,7 +6,6 @@ import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -16,7 +15,7 @@ import org.basex.util.*;
  */
 public final class FnDateTime extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final Item date = arg(0).atomItem(qc, info);
     final Item time = arg(1).atomItem(qc, info);
     if(date.isEmpty() || time.isEmpty()) return Empty.VALUE;

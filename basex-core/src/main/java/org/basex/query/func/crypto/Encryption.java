@@ -144,7 +144,7 @@ final class Encryption {
    * @return MAC
    * @throws QueryException query exception
    */
-  Item hmac(final byte[] data, final byte[] key, final String algorithm, final String encoding)
+  Str hmac(final byte[] data, final byte[] key, final String algorithm, final String encoding)
       throws QueryException {
 
     final boolean b64 = encoding == null || encoding.equals(BASE64);

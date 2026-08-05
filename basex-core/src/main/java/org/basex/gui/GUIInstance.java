@@ -1,5 +1,6 @@
 package org.basex.gui;
 
+import java.awt.event.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -51,10 +52,12 @@ public final class GUIInstance {
 
   /**
    * Listens for files that are delegated by other GUI instances.
+   * @param gui reference to the main window
    * @param files files that have been opened by this instance
    * @param handler handler for the received files
    */
-  public static void listen(final String[] files, final Consumer<String[]> handler) {
+  public static void listen(final GUI gui, final String[] files,
+      final Consumer<String[]> handler) {
     final ServerSocket server;
     try {
       server = new ServerSocket();
@@ -65,8 +68,20 @@ public final class GUIInstance {
       return;
     }
 
+    // release the port when the window is closed
+    gui.addWindowListener(new WindowAdapter() {
+      @Override
+      public void windowClosed(final WindowEvent e) {
+        try {
+          server.close();
+        } catch(final IOException ex) {
+          Util.debug(ex);
+        }
+      }
+    });
+
     final Thread thread = new Thread(() -> {
-      while(true) {
+      while(!server.isClosed()) {
         try(Socket socket = server.accept()) {
           socket.setSoTimeout(TIMEOUT);
           final DataInputStream in = new DataInputStream(socket.getInputStream());

@@ -68,17 +68,17 @@ public abstract class ParseExpr extends Expr {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return iterImpl ? iter(qc).value(qc, this) : item(qc, info);
+    return iterImpl ? iter(qc).value(qc, this) : item(qc);
   }
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     return iterImpl ? item(iter(qc), qc) : value(qc).item(qc, info);
   }
 
   @Override
-  public Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return iterImpl ? item(atomIter(qc, info), qc) : super.atomItem(qc, info);
+  protected Item atomItem(final QueryContext qc) throws QueryException {
+    return iterImpl ? item(atomIter(qc), qc) : super.atomItem(qc);
   }
 
   /**
@@ -97,7 +97,7 @@ public abstract class ParseExpr extends Expr {
   }
 
   @Override
-  public final Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected final Value atomValue(final QueryContext qc) throws QueryException {
     return value(qc).atomValue(qc, info);
   }
 
@@ -107,10 +107,9 @@ public abstract class ParseExpr extends Expr {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
-      throws QueryException {
+  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
     // single item
-    if(seqType().zeroOrOne()) return item(qc, info).test(qc, info, pos);
+    if(seqType().zeroOrOne()) return item(qc).test(qc, info, pos);
     // empty sequence?
     final Iter iter = iter(qc);
     final Item item1 = iter.next();

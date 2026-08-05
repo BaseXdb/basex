@@ -9,7 +9,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -25,14 +24,14 @@ public final class FnRandomNumberGenerator extends StandardFunc {
       FuncType.get(MapType.get(BasicType.STRING, Types.ITEM_O).seqType());
 
   @Override
-  public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected XQMap item(final QueryContext qc) throws QueryException {
     final Item seed = arg(0).atomItem(qc, info);
 
     final LongUnaryOperator number = l -> l * 0x5DEECE66DL + 0xBL & (1L << 48) - 1;
     final long i1 = number.applyAsLong(seed.isEmpty() ? qc.dateTime().nano : seed.hashCode());
     final long i2 = number.applyAsLong(i1);
     // derived from Java's random class
-    return new XQRecordMap(Records.RANDOM_NUMBER_GENERATOR.get(),
+    return new XQShapeMap(Records.RANDOM_NUMBER_GENERATOR.get(),
       Dbl.get(((i1 >>> 22 << 27) + (i2 >>> 21)) / (double) (1L << 53)),
       FuncType.get(Records.RANDOM_NUMBER_GENERATOR.get().seqType()).cast(nextFunc(i2), qc, info),
       permuteFunc(i1, qc));

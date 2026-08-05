@@ -10,7 +10,7 @@ import org.basex.query.value.item.*;
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
-public class FnAtomicTypeAnnotation extends FnSchemaType {
+public final class FnAtomicTypeAnnotation extends FnSchemaType {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {

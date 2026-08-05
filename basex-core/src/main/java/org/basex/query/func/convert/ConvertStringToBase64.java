@@ -2,7 +2,6 @@ package org.basex.query.func.convert;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -12,7 +11,7 @@ import org.basex.util.*;
  */
 public final class ConvertStringToBase64 extends ConvertFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected B64 item(final QueryContext qc) throws QueryException {
     return B64.get(stringToBinary(qc));
   }
 }

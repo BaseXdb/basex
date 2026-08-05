@@ -142,7 +142,7 @@ public final class UpdIndexTest extends SandboxTest {
    */
   @ParameterizedTest
   @MethodSource("params")
-  public void replaceValue(final boolean updindex, final boolean mainmem)  {
+  public void replaceValue(final boolean updindex, final boolean mainmem) {
     init(updindex, mainmem);
     final Random rnd = new Random();
     final StringBuilder sb = new StringBuilder();

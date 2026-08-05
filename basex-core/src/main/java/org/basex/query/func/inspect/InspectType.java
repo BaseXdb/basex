@@ -36,7 +36,7 @@ public final class InspectType extends StandardFunc {
   }
 
   @Override
-  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Str item(final QueryContext qc) throws QueryException {
     final Value input = arg(0).value(qc);
     final InspectOptions options = toOptions(arg(1), new InspectOptions(), qc);
     final Mode mode = options.get(InspectOptions.MODE);

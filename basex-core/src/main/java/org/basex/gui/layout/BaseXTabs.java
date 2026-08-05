@@ -38,6 +38,14 @@ public final class BaseXTabs extends JTabbedPane {
   }
 
   /**
+   * Indicates if a tab is currently being dragged.
+   * @return result of check
+   */
+  public boolean dragged() {
+    return draggedTab != -1;
+  }
+
+  /**
    * Adds drag and drop support.
    */
   public void addDragDrop() {
@@ -76,14 +84,29 @@ public final class BaseXTabs extends JTabbedPane {
   private void drop(final MouseEvent e) {
     final int newTab = Math.min(getTabCount() - 1,
         getUI().tabForCoordinate(this, e.getX(), e.getY()));
+    if(newTab < 0) return;
 
-    if(newTab >= 0 && newTab != draggedTab) {
-      final Component comp = getComponentAt(draggedTab);
-      final Component head = getTabComponentAt(draggedTab);
-      removeTabAt(draggedTab);
-      add(comp, head, newTab);
-      draggedTab = newTab;
+    // swap adjacent tabs, one at a time
+    while(draggedTab != newTab) {
+      final int tab = draggedTab + (newTab > draggedTab ? 1 : -1);
+      swap(draggedTab, tab);
+      draggedTab = tab;
     }
+  }
+
+  /**
+   * Swaps two adjacent tabs.
+   * @param tab1 index of first tab
+   * @param tab2 index of second tab
+   */
+  private void swap(final int tab1, final int tab2) {
+    // re-insert the unselected tab: removing the selected one would repaint its contents
+    final int source = getSelectedIndex() == tab1 ? tab2 : tab1;
+    final int target = source == tab1 ? tab2 : tab1;
+    final Component comp = getComponentAt(source), head = getTabComponentAt(source);
+    removeTabAt(source);
+    add(comp, target);
+    setTabComponentAt(target, head);
   }
 
   /**

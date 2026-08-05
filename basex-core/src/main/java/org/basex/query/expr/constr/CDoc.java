@@ -30,7 +30,7 @@ public final class CDoc extends CNode {
   }
 
   @Override
-  public FNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected FNode item(final QueryContext qc) throws QueryException {
     final FBuilder doc = FDoc.build();
 
     final Constr constr = new Constr(doc, info, qc).add(exprs);

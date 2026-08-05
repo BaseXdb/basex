@@ -7,7 +7,6 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -17,14 +16,13 @@ import org.basex.util.*;
  */
 public class FnEvery extends StandardFunc {
   @Override
-  public final Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected final Bln item(final QueryContext qc) throws QueryException {
     // implementation for dynamic function lookup
-    return Bln.get(test(qc, info, 0));
+    return Bln.get(ebv(qc));
   }
 
   @Override
-  public final boolean test(final QueryContext qc, final InputInfo ii, final long pos)
-      throws QueryException {
+  protected final boolean test(final QueryContext qc, final long pos) throws QueryException {
     // implementation for dynamic function lookup
     final Iter input = arg(0).iter(qc);
     final FItem predicate = toFunctionOrNull(arg(1), 2, qc);
@@ -32,8 +30,8 @@ public class FnEvery extends StandardFunc {
     final HofArgs args = predicate != null ? new HofArgs(2, predicate) : null;
     final boolean some = some();
     for(Item item; (item = qc.next(input)) != null;) {
-      final boolean test = predicate == null ? item.test(qc, info, 0) :
-        invoke(predicate, args.set(0, item).inc(), qc).test(qc, info, 0);
+      final boolean test = predicate == null ? item.ebv(qc, info) :
+        invoke(predicate, args.set(0, item).inc(), qc).ebv(qc, info);
       if(test == some) return some;
     }
     return !some;

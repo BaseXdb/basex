@@ -44,6 +44,6 @@ public final class FtTokens extends StandardFunc {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return dataLock(arg(0), false, visitor) && super.accept(visitor);
+    return dataLock(arg(0), false, false, visitor) && super.accept(visitor);
   }
 }

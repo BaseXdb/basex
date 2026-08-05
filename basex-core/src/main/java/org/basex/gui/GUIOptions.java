@@ -109,6 +109,10 @@ public final class GUIOptions extends Options {
   public static final NumberOption PREFTAB = new NumberOption("PREFTAB", 0);
   /** Flag for Java look and feel. */
   public static final StringOption LOOKANDFEEL = new StringOption("LOOKANDFEEL", "");
+  /** Scaling of the user interface in percent, relative to the system scaling. */
+  public static final NumberOption UISCALE = new NumberOption("UISCALE", 100);
+  /** Scaling of the operating system in percent, detected at the last startup. */
+  public static final NumberOption OSSCALE = new NumberOption("OSSCALE", 100);
   /** Label attributes, separated by comma. */
   public static final StringOption LABELS = new StringOption("LABELS", "name,label,id");
   /** Flag for scrolling editor tabs. */
@@ -130,6 +134,8 @@ public final class GUIOptions extends Options {
   /** Unicode order. */
   public static final BooleanOption UNICODE = new BooleanOption("UNICODE", true);
 
+  /** Wrap long lines. */
+  public static final BooleanOption WORDWRAP = new BooleanOption("WORDWRAP", true);
   /** Show line margin. */
   public static final BooleanOption SHOWMARGIN = new BooleanOption("SHOWMARGIN", true);
   /** Line margin. */
@@ -146,6 +152,8 @@ public final class GUIOptions extends Options {
   public static final BooleanOption SHOWLINES = new BooleanOption("SHOWLINES", true);
   /** Mark current line. */
   public static final BooleanOption MARKLINE = new BooleanOption("MARKLINE", true);
+  /** Mark occurrences of the name at the caret. */
+  public static final BooleanOption MARKOCCURRENCES = new BooleanOption("MARKOCCURRENCES", true);
   /** Save before executing file. */
   public static final BooleanOption SAVERUN = new BooleanOption("SAVERUN", false);
   /** Parse project files. */
@@ -156,6 +164,16 @@ public final class GUIOptions extends Options {
   public static final StringOption FILES = new StringOption("FILES", "*.xml, *.xq*");
   /** Show hidden files. */
   public static final BooleanOption SHOWHIDDEN = new BooleanOption("SHOWHIDDEN", false);
+  /** Remove trailing whitespace when saving a file. */
+  public static final BooleanOption TRIMLINES = new BooleanOption("TRIMLINES", false);
+  /** Append a final newline when saving a file. */
+  public static final BooleanOption FINALNL = new BooleanOption("FINALNL", false);
+  /** Code completion: proposed always (0) or via shortcut (1). */
+  public static final NumberOption COMPLETION = new NumberOption("COMPLETION", 0);
+  /** Maximum number of indexed project files. */
+  public static final NumberOption MAXFILES = new NumberOption("MAXFILES", 100000);
+  /** Maximum number of files listed by the project filter. */
+  public static final NumberOption MAXHITS = new NumberOption("MAXHITS", 1000);
 
   /** Current input mode in global text field (Search, XQuery, Command). */
   public static final NumberOption SEARCHMODE = new NumberOption("SEARCHMODE", 0);
@@ -241,6 +259,8 @@ public final class GUIOptions extends Options {
   public static final StringsOption PROJCONTS = new StringsOption("PROJCONTS");
   /** History of project content replacements. */
   public static final StringsOption PROJREPLACE = new StringsOption("PROJREPLACE");
+  /** Back up files before replacing their contents. */
+  public static final BooleanOption PROJBACKUP = new BooleanOption("PROJBACKUP", true);
 
   /**
    * Constructor.

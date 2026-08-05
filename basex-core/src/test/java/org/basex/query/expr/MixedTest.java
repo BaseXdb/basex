@@ -534,8 +534,8 @@ public final class MixedTest extends SandboxTest {
         new TypeInfo(XQIntValueMap.class, "map(xs:integer, xs:anyAtomicType+)", 2),
         new TypeInfo(XQIntValueMap.class, "map(xs:integer, xs:integer+)", 2));
     test("{ 'a': ('x', 1 to 3) => remove(1), 'b': 3 }",
-        new TypeInfo(XQRecordMap.class, "record(a, b)", 2),
-        new TypeInfo(XQRecordMap.class, "record(a, b)", 2));
+        new TypeInfo(XQShapeMap.class, "map(xs:string, xs:anyAtomicType+)", 2),
+        new TypeInfo(XQShapeMap.class, "map(xs:string, xs:integer+)", 2));
 
     test("[ (1, 2), 3, 4 ] => array:remove(1)",
         new TypeInfo(SmallArray.class, "array(xs:integer+)", 2),

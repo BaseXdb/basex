@@ -51,7 +51,7 @@ public final class SearchBar extends BaseXBack {
   private final AbstractButton cls;
 
   /** GUI reference. */
-  private final GUI gui;
+  final GUI gui;
   /** Search text. */
   private final BaseXCombo find;
   /** Replace text. */
@@ -72,6 +72,8 @@ public final class SearchBar extends BaseXBack {
   private TextPanel editor;
   /** Old search text. */
   private String oldSearch = "";
+  /** Editor selection at the time of the last search. */
+  private String selection = "";
 
   /**
    * Constructor.
@@ -85,9 +87,9 @@ public final class SearchBar extends BaseXBack {
     setVisible(false);
 
     find = new BaseXCombo(gui, true).history(GUIOptions.SEARCHED, gui.gopts);
-    find.hint(Text.FIND + "\u2026");
+    find.hint(Text.FIND + Text.ELLIPSIS);
     replace = new BaseXCombo(gui, true).history(GUIOptions.REPLACED, gui.gopts);
-    replace.hint(Text.REPLACE_WITH + "\u2026");
+    replace.hint(Text.REPLACE_WITH + Text.ELLIPSIS);
     count = new BaseXLabel(" ");
 
     final ActionListener al = e -> {
@@ -117,28 +119,25 @@ public final class SearchBar extends BaseXBack {
         false, gui);
 
     // add interaction to search field
-    find.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyPressed(final KeyEvent e) {
-        if(ENTER.is(e) || FINDNEXT.is(e)) {
-          editor.jump(SearchDir.FORWARD, true);
-        } else if(SHIFT_ENTER.is(e) || FINDPREV.is(e)) {
-          editor.jump(SearchDir.BACKWARD, true);
-        } else if(META_ENTER.is(e)) {
-          replaceAll();
-        } else {
-          return;
-        }
-        e.consume();
+    find.addKeyListener((KeyPressedListener) e -> {
+      if(ENTER.is(e) || FINDNEXT.is(e)) {
+        editor.jump(SearchDir.FORWARD, true);
+      } else if(SHIFT_ENTER.is(e) || FINDPREV.is(e)) {
+        editor.jump(SearchDir.BACKWARD, true);
+      } else if(META_ENTER.is(e)) {
+        replaceAll();
+      } else {
+        return;
       }
+      e.consume();
+    });
 
-      @Override
-      public void keyReleased(final KeyEvent e) {
-        final String srch = find.getText();
-        if(!oldSearch.equals(srch)) {
-          oldSearch = srch;
-          search();
-        }
+    // catch all changes of the search string, including those caused by mouse interactions
+    find.onChange(() -> {
+      final String srch = find.getText();
+      if(!oldSearch.equals(srch)) {
+        oldSearch = srch;
+        search();
       }
     });
 
@@ -352,11 +351,42 @@ public final class SearchBar extends BaseXBack {
   }
 
   /**
+   * Returns the current search string.
+   * @return search string
+   */
+  public String searchString() {
+    return find.getText();
+  }
+
+  /**
+   * Indicates if the current search should be continued elsewhere: it must be running, and
+   * the specified selection must not have been made after it.
+   * @param string selected text
+   * @return result of check
+   */
+  public boolean adopts(final String string) {
+    return isVisible() && !find.getText().isEmpty() && (string.isEmpty() ||
+        string.equals(selection) || new SearchContext(this, find.getText()).matches(string));
+  }
+
+  /**
+   * Returns the current search flags.
+   * @return search flags
+   */
+  public SearchFlags flags() {
+    return new SearchFlags(mcase.isSelected(), word.isSelected(), regex.isSelected(),
+        dotall.isSelected());
+  }
+
+  /**
    * Indicates whether the current hits can be replaced.
    * @return result of check
    */
   private boolean replaceEnabled() {
-    return editor != null && editor.isEditable() && isVisible() && rplc.isEnabled();
+    if(editor == null || !editor.isEditable() || !isVisible() || !rplc.isEnabled()) return false;
+    // reject results of a superseded search: a new one may still be running
+    final SearchContext sc = editor.editor.searchContext();
+    return sc != null && sc.string.equals(find.getText()) && sc.flags.equals(flags());
   }
 
   /**
@@ -447,17 +477,21 @@ public final class SearchBar extends BaseXBack {
     rplcNext.setEnabled(hits);
     find.highlight(error ? GUIConstants.lightRed :
       hits || sc.string.isEmpty() ? GUIConstants.backColor : GUIConstants.paleGray);
-    find.setToolTipText(error ? sc.error : Text.FIND + "\u2026");
+    find.setToolTipText(error ? sc.error : Text.FIND + Text.ELLIPSIS);
     replace.highlight(GUIConstants.backColor);
-    replace.setToolTipText(Text.REPLACE_WITH + "\u2026");
+    replace.setToolTipText(Text.REPLACE_WITH + Text.ELLIPSIS);
     // the markers depend on the results; the count also on the navigation position
     editor.marks();
+    // results that arrive without user interaction must be painted as well
+    editor.repaint();
     // a requested jump is deferred until its results arrive; it refreshes the count itself
     final SearchDir dir = jumpDir;
     final boolean select = jumpSelect;
     resetJump();
     if(jump) editor.jump(dir, select);
     else refreshCount();
+    // remember the selection: a different one will have been made after this search
+    selection = editor.searchString();
   }
 
   /**

@@ -32,13 +32,13 @@ public final class FnMatchingSegments extends RegExFn {
       for(int g = 1; g <= gc; g++) {
         final int s = matcher.start(g);
         if(s >= 0) {
-          final XQRecordMap group = new XQRecordMap(Records.MATCHING_GROUP.get(),
+          final XQShapeMap group = new XQShapeMap(Records.MATCHING_GROUP.get(),
               Str.get(matcher.group(g)), Itr.get(s + 1));
           final String name = g <= names.length ? names[g - 1] : null;
           groups.put(name != null ? Str.get(name) : Itr.get(g), group);
         }
       }
-      vb.add(new XQRecordMap(Records.MATCHING_SEGMENT.get(),
+      vb.add(new XQShapeMap(Records.MATCHING_SEGMENT.get(),
           Str.get(matcher.group()), Itr.get(matcher.start() + 1), groups.map()));
     }
     return vb.value();

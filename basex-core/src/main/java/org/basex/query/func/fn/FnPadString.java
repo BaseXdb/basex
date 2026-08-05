@@ -36,7 +36,7 @@ public final class FnPadString extends StandardFunc {
   }
 
   @Override
-  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Str item(final QueryContext qc) throws QueryException {
     final Item value = arg(0).atomItem(qc, info);
     final long length = toLong(arg(1), qc);
     final PadOptions options = toOptions(arg(2), new PadOptions(), qc);

@@ -15,7 +15,7 @@ import org.basex.util.*;
  */
 public final class UserPassword extends UserFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final User user = toUser(arg(0), false, qc);
     final String password = toString(arg(1), qc);
     qc.updates().add(new Password(user, password, qc, info), qc);

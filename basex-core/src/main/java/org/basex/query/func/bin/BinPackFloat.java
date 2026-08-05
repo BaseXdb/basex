@@ -4,7 +4,6 @@ import java.nio.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -14,7 +13,7 @@ import org.basex.util.*;
  */
 public final class BinPackFloat extends BinFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected B64 item(final QueryContext qc) throws QueryException {
     final float value = toFloat(arg(0), qc);
     final ByteOrder order = order(arg(1), qc);
     return B64.get(ByteBuffer.wrap(new byte[4]).order(order).putFloat(value).array());

@@ -13,6 +13,6 @@ import org.basex.query.value.item.*;
 public final class FileIsAbsolute extends FileFn {
   @Override
   public Value eval(final QueryContext qc) throws QueryException {
-    return Bln.get(toPath(arg(0), qc).isAbsolute());
+    return Bln.get(toRawPath(arg(0), qc).isAbsolute());
   }
 }

@@ -334,17 +334,6 @@ public final class BaseXLayout {
    */
   private static KeyListener globalShortcuts(final GUI gui) {
     if(keys == null) keys = (KeyPressedListener) e -> {
-      // browse back/forward
-      if(!Prop.MAC && gui.context.data() != null) {
-        if(GOBACK.is(e)) {
-          GUIMenuCmd.C_GO_BACK.execute(gui);
-        } else if(GOFORWARD.is(e)) {
-          GUIMenuCmd.C_GO_FORWARD.execute(gui);
-        } else if(GOHOME.is(e)) {
-          GUIMenuCmd.C_GO_HOME.execute(gui);
-        }
-      }
-
       // focus input bar
       if(FOCUSINPUT.is(e)) gui.input.requestFocusInWindow();
       // focus editor
@@ -385,6 +374,16 @@ public final class BaseXLayout {
       sb.append('+').append(t);
     }
     return string + " (" + sb.substring(1) + ')';
+  }
+
+  /**
+   * Adds a human-readable shortcut to the specified string.
+   * @param string tooltip string
+   * @param key shortcut
+   * @return tooltip
+   */
+  public static String addShortcut(final String string, final BaseXKeys key) {
+    return string + " (" + key + ')';
   }
 
   /**
@@ -589,7 +588,7 @@ public final class BaseXLayout {
     final StringBuilder sb = new StringBuilder();
     if(count >= 0) {
       final String text = more.apply(count, gopts.get(GUIOptions.MAXRESULTS)) + format(count);
-      sb.append(Util.info(count == 1 ? Text.RESULT_X : Text.RESULTS_X, text));
+      sb.append(Util.info(Text.RESULTS_X, text));
       if(bytes >= 0) {
         final int maxtext = gopts.get(GUIOptions.MAXTEXT);
         sb.append(", ").append(more.apply(bytes, maxtext)).append(Performance.formatHuman(bytes));

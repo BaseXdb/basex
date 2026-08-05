@@ -39,6 +39,19 @@ public final class BaseXSlider extends BaseXPanel {
   private int mouseX;
 
   /**
+   * Returns the index of the first value that is not smaller than the specified one.
+   * @param value value to be found
+   * @param values allowed values
+   * @return index
+   */
+  public static int index(final int value, final int[] values) {
+    final int vl = values.length - 1;
+    int v = -1;
+    while(++v < vl && values[v] < value);
+    return v;
+  }
+
+  /**
    * Checkbox.
    * @param win parent window
    * @param min min value

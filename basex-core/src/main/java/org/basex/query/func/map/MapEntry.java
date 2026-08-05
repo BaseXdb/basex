@@ -6,7 +6,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
@@ -17,12 +16,12 @@ import org.basex.util.hash.*;
  */
 public final class MapEntry extends MapFn {
   @Override
-  public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected XQMap item(final QueryContext qc) throws QueryException {
     final Item key = toAtomItem(arg(0), qc);
     final Value value = arg(1).value(qc);
 
     final XQMap map = XQMap.get(key, value);
-    if(seqType().type instanceof final RecordType rt) map.type = rt;
+    if(seqType().type instanceof final ShapeType sh) map.type = sh;
     return map;
   }
 
@@ -32,9 +31,9 @@ public final class MapEntry extends MapFn {
 
     final Type type;
     if(key instanceof final Str str && key.seqType().eq(Types.STRING_O)) {
-      final TokenObjectMap<RecordField> fields = new TokenObjectMap<>(1);
-      fields.put(str.string(), new RecordField(value.seqType()));
-      type = cc.qc.shared.record(new RecordType(fields));
+      final TokenObjectMap<ShapeField> fields = new TokenObjectMap<>(1);
+      fields.put(str.string(), new ShapeField(value.seqType()));
+      type = cc.qc.shared.shape(new ShapeType(fields));
     } else {
       final BasicType kt = key.seqType().type.atomic();
       type = MapType.get(kt != null ? kt : BasicType.ANY_ATOMIC_TYPE, value.seqType());

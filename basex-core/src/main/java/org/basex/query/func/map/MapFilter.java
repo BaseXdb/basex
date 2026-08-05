@@ -6,7 +6,6 @@ import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -16,7 +15,7 @@ import org.basex.util.*;
  */
 public final class MapFilter extends MapFn {
   @Override
-  public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected XQMap item(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(arg(0), qc);
     final FItem predicate = toFunction(arg(1), 3, qc);
 

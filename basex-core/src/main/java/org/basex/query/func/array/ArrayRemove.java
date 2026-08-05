@@ -6,7 +6,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.array.XQArray;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -17,7 +16,7 @@ import org.basex.util.list.*;
  */
 public final class ArrayRemove extends ArrayFn {
   @Override
-  public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected XQArray item(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
     final Value positions = arg(1).atomValue(qc, info);
 

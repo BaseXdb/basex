@@ -5,7 +5,6 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -15,7 +14,7 @@ import org.basex.util.*;
  */
 public final class DbPath extends StandardFunc {
   @Override
-  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Str item(final QueryContext qc) throws QueryException {
     XNode node, parent = toNode(arg(0), qc);
     do {
       node = parent;

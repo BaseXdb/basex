@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -14,8 +13,8 @@ import org.basex.util.*;
  */
 public final class FnDefaultCollation extends StandardFunc {
   @Override
-  public Uri item(final QueryContext qc, final InputInfo ii) {
+  protected Str item(final QueryContext qc) {
     final Collation coll = sc().collation;
-    return Uri.get(coll == null ? QueryText.COLLATION_URI : coll.uri());
+    return Str.get(coll == null ? QueryText.COLLATION_URI : coll.uri());
   }
 }

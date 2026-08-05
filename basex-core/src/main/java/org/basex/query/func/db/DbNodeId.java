@@ -36,7 +36,7 @@ public class DbNodeId extends StandardFunc {
         return Itr.get(id(nodes.get(i)));
       }
       @Override
-      public long size() throws QueryException {
+      public long size() {
         return size;
       }
       @Override

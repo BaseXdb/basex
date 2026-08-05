@@ -103,6 +103,41 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   @Override
+  protected final Item item(final QueryContext qc) throws QueryException {
+    return item(qc, null);
+  }
+
+  @Override
+  protected final Value atomValue(final QueryContext qc) throws QueryException {
+    return atomValue(qc, null);
+  }
+
+  @Override
+  protected final Item atomItem(final QueryContext qc) throws QueryException {
+    return atomItem(qc, null);
+  }
+
+  @Override
+  public Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return atomValue(qc, ii).item(qc, ii);
+  }
+
+  @Override
+  protected final Iter atomIter(final QueryContext qc) throws QueryException {
+    return atomIter(qc, null);
+  }
+
+  @Override
+  public Iter atomIter(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return toAtomIter(iter(), qc, ii);
+  }
+
+  @Override
+  protected final boolean test(final QueryContext qc, final long pos) throws QueryException {
+    return test(qc, null, pos);
+  }
+
+  @Override
   public abstract Value unwrappedValue(QueryContext qc);
 
   /**
@@ -319,7 +354,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
   @Override
   public boolean accept(final ASTVisitor visitor) {
     final Data data = data();
-    return data == null || visitor.lock(data.meta.name);
+    return data == null || visitor.lock(data.meta.name, false);
   }
 
   @Override

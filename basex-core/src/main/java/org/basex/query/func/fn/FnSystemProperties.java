@@ -20,7 +20,7 @@ public final class FnSystemProperties extends StandardFunc {
   private static final Dec XSD_VERSION = Dec.get(BigDecimal.valueOf(11, 1));
 
   @Override
-  public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected XQMap item(final QueryContext qc) throws QueryException {
     return new MapBuilder().
         put(property("xpath-version"), XPATH_VERSION).
         put(property("xsd-version"), XSD_VERSION).

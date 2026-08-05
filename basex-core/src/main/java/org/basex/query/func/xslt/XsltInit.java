@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -14,7 +13,7 @@ import org.basex.util.*;
  */
 public final class XsltInit extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) {
+  protected Item item(final QueryContext qc) {
     Xslt.init();
     return Empty.VALUE;
   }

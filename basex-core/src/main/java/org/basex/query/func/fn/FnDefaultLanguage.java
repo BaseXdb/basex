@@ -5,7 +5,6 @@ import org.basex.query.func.*;
 import org.basex.query.util.format.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -15,7 +14,7 @@ import org.basex.util.*;
  */
 public final class FnDefaultLanguage extends StandardFunc {
   @Override
-  public Str item(final QueryContext qc, final InputInfo ii) {
+  protected Str item(final QueryContext qc) {
     return Str.get(Formatter.EN, BasicType.LANGUAGE);
   }
 }

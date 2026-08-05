@@ -2,7 +2,6 @@ package org.basex.query.func.cache;
 
 import org.basex.query.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -12,7 +11,7 @@ import org.basex.util.*;
  */
 public final class CacheDelete extends CacheFn {
   @Override
-  public Empty item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Empty item(final QueryContext qc) throws QueryException {
     final String name = toZeroString(arg(0), qc);
 
     caches(qc).delete(name);

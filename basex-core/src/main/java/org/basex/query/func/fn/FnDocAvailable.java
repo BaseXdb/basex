@@ -8,7 +8,6 @@ import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -23,7 +22,7 @@ public class FnDocAvailable extends Docs {
       EXTERNALRESOURCE_X);
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     try {
       return Bln.get(!doc(qc).isEmpty());
     } catch(final QueryException ex) {

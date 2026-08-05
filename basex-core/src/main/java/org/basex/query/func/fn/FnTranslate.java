@@ -16,7 +16,7 @@ import org.basex.util.hash.*;
  */
 public final class FnTranslate extends StandardFunc {
   @Override
-  public AStr item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected AStr item(final QueryContext qc) throws QueryException {
     final AStr value = toZeroStr(arg(0), qc), replace = toStr(arg(1), qc), with = toStr(arg(2), qc);
 
     final int[] cps = value.codepoints(info);

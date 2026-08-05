@@ -14,7 +14,7 @@ import org.basex.util.*;
  */
 public final class ProcProperty extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final String name = toString(arg(0), qc), value = Prop.get(name);
     return value == null ? Empty.VALUE : Str.get(value);
   }

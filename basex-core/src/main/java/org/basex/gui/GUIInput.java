@@ -104,7 +104,7 @@ public final class GUIInput extends BaseXCombo {
    * @param mode mode
    */
   void mode(final String mode) {
-    hint(mode + Text.DOTS).setText("");
+    hint(mode + Text.ELLIPSIS).setText("");
 
     final Data data = gui.context.data();
     final int i = data == null ? 2 : gui.gopts.get(GUIOptions.SEARCHMODE);

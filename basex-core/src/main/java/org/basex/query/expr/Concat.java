@@ -27,7 +27,7 @@ public final class Concat extends Arr {
   }
 
   @Override
-  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Str item(final QueryContext qc) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
     for(final Expr expr : exprs) {
       final Iter iter = expr.atomIter(qc, info);
@@ -39,8 +39,7 @@ public final class Concat extends Arr {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
-      throws QueryException {
+  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
     for(final Expr expr : exprs) {
       final Iter iter = expr.atomIter(qc, info);
       for(Item item; (item = qc.next(iter)) != null;) {

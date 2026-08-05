@@ -11,7 +11,6 @@ import org.basex.query.func.*;
 import org.basex.query.scope.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.util.*;
 import org.basex.util.options.*;
 
 /**
@@ -45,7 +44,7 @@ public final class XQueryParse extends StandardFunc {
   }
 
   @Override
-  public FNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected FNode item(final QueryContext qc) throws QueryException {
     final IO query = toContent(arg(0), qc);
     final XQueryOptions options = toOptions(arg(1), new XQueryOptions(), qc);
 

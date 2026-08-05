@@ -19,12 +19,14 @@ public final class DialogPrefs extends BaseXDialog {
 
   /** General preferences. */
   private final DialogGeneralPrefs general;
+  /** Appearance preferences. */
+  private final DialogAppearancePrefs appearance;
   /** Editor preferences. */
   private final DialogEditorPrefs editor;
   /** Result preferences. */
   private final DialogResultPrefs result;
-  /** Visualization preferences. */
-  private final DialogVisualPrefs visual;
+  /** View preferences. */
+  private final DialogViewsPrefs views;
   /** Tabs. */
   private final BaseXTabs tabs;
 
@@ -37,14 +39,16 @@ public final class DialogPrefs extends BaseXDialog {
 
     tabs = new BaseXTabs(this);
     general = new DialogGeneralPrefs(this);
+    appearance = new DialogAppearancePrefs(this);
     editor = new DialogEditorPrefs(this);
     result = new DialogResultPrefs(this);
-    visual = new DialogVisualPrefs(this);
+    views = new DialogViewsPrefs(this);
 
     tabs.add(GENERAL, general);
+    tabs.add(APPEARANCE, appearance);
     tabs.add(EDITOR, editor);
     tabs.add(RESULT, result);
-    tabs.add(VISUALIZATION, visual);
+    tabs.add(VIEWS, views);
     tabs.setSelectedIndex(gui.gopts.get(GUIOptions.PREFTAB));
 
     set(tabs, BorderLayout.CENTER);
@@ -65,7 +69,8 @@ public final class DialogPrefs extends BaseXDialog {
   @Override
   public void action(final Object cmp) {
     // no short-circuiting, do all checks...
-    ok = general.action(cmp) & editor.action() & result.action() & visual.action();
+    ok = general.action(cmp) & appearance.action(cmp) & editor.action() & result.action() &
+      views.action(cmp);
     gui.notify.layout();
   }
 

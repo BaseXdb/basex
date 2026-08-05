@@ -64,6 +64,24 @@ public final class SerializerTest extends SandboxTest {
     query("serialize('a&#13;b', map { 'method': 'text' }) => contains('&#13;')", true);
   }
 
+  /** Test: cdata-section-elements. */
+  @Test public void cdataSectionElements() {
+    final String ser = "serialize(<a>{ $text }</a>, "
+        + "map { 'cdata-section-elements': xs:QName('a') })";
+    query("let $text := 'x' return " + ser, "<a><![CDATA[x]]></a>");
+    // sections are split before the closing delimiter
+    query("let $text := 'x]]>y' return " + ser, "<a><![CDATA[x]]]]><![CDATA[>y]]></a>");
+    // characters that require escaping are moved outside the section
+    query("let $text := 'x&#xD;y' return " + ser, "<a><![CDATA[x]]>&#xD;<![CDATA[y]]></a>");
+    query("let $text := 'x&#x85;y' return " + ser, "<a><![CDATA[x]]>&#x85;<![CDATA[y]]></a>");
+    query("let $text := 'x&#x2028;y' return " + ser, "<a><![CDATA[x]]>&#x2028;<![CDATA[y]]></a>");
+    // tabs and newlines are retained
+    query("let $text := 'x&#x9;&#xA;y' return " + ser, "<a><![CDATA[x\t\ny]]></a>");
+    // carriage returns survive a round trip
+    query("string-to-codepoints(parse-xml(let $text := 'x&#xD;&#xA;y' return " + ser + ")/a)",
+        "120\n13\n10\n121");
+  }
+
   /** Test: normalization-form. */
   @Test public void normalizationForm() {
     // u with diaeresis: composed is codepoint 252, decomposed is 117 followed by 776
@@ -298,6 +316,22 @@ public final class SerializerTest extends SandboxTest {
       query(METHOD.arg(key) + ITEM_SEPARATOR.arg("|") + "1, [[ 2 ]], []", value));
     Map.of("xml", "1|2|3", "text", "1|2|3", "adaptive", "1|[2,3]").forEach((key, value) ->
       query(METHOD.arg(key) + ITEM_SEPARATOR.arg("|") + "1, [ 2, 3 ]", value));
+
+    // separators are inserted as text nodes: characters are mapped and escaped
+    final String xml = METHOD.arg("xml");
+    query(xml + ITEM_SEPARATOR.arg("&lt;&amp;") + "<a/>, <b/>", "<a/>&lt;&amp;<b/>");
+    query(xml + ITEM_SEPARATOR.arg("&#xd;") + "<a/>, <b/>", "<a/>&#xD;<b/>");
+    query(xml + ITEM_SEPARATOR.arg("|") + USE_CHARACTER_MAPS.arg("|=--") + "<a/>, <b/>",
+        "<a/>--<b/>");
+    // escaping precedes the line-ending substitution
+    query("serialize((<a/>, <b/>), map { 'method': 'xml', 'item-separator': '&#xd;&#xa;', "
+        + "'line-ending': '&#xd;&#xa;' }) eq '<a/>&amp;#xD;&#xd;&#xa;<b/>'", true);
+    // separators survive a round trip
+    query("string-to-codepoints(parse-xml('<r>' || serialize((<a/>, <b/>), map { "
+        + "'method': 'xml', 'item-separator': '&#xd;&#xa;' }) || '</r>')/r/text())", "13\n10");
+    // separators of the text method are not escaped
+    query("string-to-codepoints(serialize(('a', 'b'), map { 'method': 'text', "
+        + "'item-separator': '&#xd;' }))", "97\n13\n98");
   }
 
   /** Test: xml:space='preserve'. */

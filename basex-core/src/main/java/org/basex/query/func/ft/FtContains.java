@@ -6,7 +6,6 @@ import org.basex.query.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 import org.basex.util.ft.*;
 
 /**
@@ -17,7 +16,7 @@ import org.basex.util.ft.*;
  */
 public final class FtContains extends FtAccessFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Bln item(final QueryContext qc) throws QueryException {
     final Value input = arg(0).value(qc), terms = arg(1).value(qc);
     final FtContainsOptions options = toOptions(arg(2), new FtContainsOptions(), qc);
 
@@ -34,6 +33,6 @@ public final class FtContains extends FtAccessFn {
     if(cs != null) opt.cs = cs;
 
     final FTWords ftw = new FTWords(info, terms, mode, null).ftOpt(opt).optimize(qc);
-    return new FTContains(input, ftExpr(ftw, options), info).item(qc, info);
+    return new FTContains(input, ftExpr(ftw, options), info).item(qc);
   }
 }

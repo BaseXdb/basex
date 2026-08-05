@@ -20,7 +20,7 @@ import org.basex.util.*;
  */
 public final class WebError extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final long status = toLong(arg(0), qc);
     final Value message = arg(1).value(qc);
     final XQMap options = toEmptyMap(arg(2), qc);

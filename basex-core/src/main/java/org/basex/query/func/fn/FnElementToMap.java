@@ -35,7 +35,7 @@ public final class FnElementToMap extends PlanFn {
   }
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final Item node = (Item) Types.DOCUMENT_OR_ELEMENT_ZO.coerce(arg(0).value(qc), qc, info);
     final ElementsOptions options = toOptions(arg(1), new ElementsOptions(), qc);
     if(node.isEmpty()) return Empty.VALUE;

@@ -158,12 +158,12 @@ public abstract class Seq extends Value {
     Expr expr = this;
     if(mode == Simplify.STRING && type.instanceOf(NodeType.NODE)) {
       final TokenList list = new TokenList(size);
-      for(final Item item : atomValue(cc.qc, null)) list.add(item.string(null));
+      for(final Item item : atomValue(cc.qc)) list.add(item.string(null));
       expr = StrSeq.get(list);
     } else if(mode.oneOf(Simplify.DATA, Simplify.NUMBER)) {
       final Type at = type.atomic();
       if(at != null && at != type) {
-        expr = atomValue(cc.qc, null);
+        expr = atomValue(cc.qc);
       }
     }
     return cc.simplify(this, expr, mode);

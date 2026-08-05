@@ -6,7 +6,6 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
@@ -17,7 +16,7 @@ import org.basex.util.hash.*;
  */
 public final class UtilStripNamespaces extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected XNode item(final QueryContext qc) throws QueryException {
     final XNode node = toNode(arg(0), qc);
     final Value names = arg(1).atomValue(qc, info);
 

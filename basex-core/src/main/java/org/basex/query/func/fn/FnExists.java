@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -14,9 +13,8 @@ import org.basex.util.*;
  */
 public final class FnExists extends FnEmpty {
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
-      throws QueryException {
-    return !super.test(qc, info, pos);
+  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+    return !super.test(qc, pos);
   }
 
   @Override

@@ -30,8 +30,8 @@ public final class FTExtension extends FTExpr {
   }
 
   @Override
-  public FTNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return exprs[0].item(qc, info);
+  public FTNode item(final QueryContext qc) throws QueryException {
+    return exprs[0].item(qc);
   }
 
   @Override

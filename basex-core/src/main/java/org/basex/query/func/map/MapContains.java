@@ -5,7 +5,6 @@ import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -15,13 +14,12 @@ import org.basex.util.*;
  */
 public final class MapContains extends MapFn {
   @Override
-  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(test(qc, info, 0));
+  protected Bln item(final QueryContext qc) throws QueryException {
+    return Bln.get(ebv(qc));
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
-      throws QueryException {
+  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
     final XQMap map = toMap(arg(0), qc);
     final Item key = toAtomItem(arg(1), qc);
     return map.contains(key);
@@ -35,7 +33,7 @@ public final class MapContains extends MapFn {
 
     if(!map.has(Flag.NDT)) {
       final MapTypeInfo mti = MapTypeInfo.get(map).key(key);
-      if(mti.field != null) {
+      if(mti.index != 0) {
         return Bln.TRUE;
       } else if(mti.validKey) {
         return Bln.FALSE;

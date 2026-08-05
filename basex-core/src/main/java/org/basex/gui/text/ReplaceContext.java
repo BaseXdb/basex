@@ -19,6 +19,8 @@ final class ReplaceContext {
   byte[] text;
   /** Number of replaced hits. */
   int count;
+  /** Caret position: supplied by the caller, adjusted by the replacements. */
+  int caret;
 
   /**
    * Constructor.
@@ -58,8 +60,8 @@ final class ReplaceContext {
       final TokenBuilder tb = new TokenBuilder(os);
       final StringBuilder sb = new StringBuilder();
       final TextCursor cursor = new TextCursor(txt);
-      // pc/p: char/byte offset of the copied text
-      int pc = 0, p = 0;
+      // pc/p: char/byte offset of the copied text, cr: new caret position ({@code -1}: unknown)
+      int pc = 0, p = 0, cr = -1;
       while(matcher.find()) {
         final int ms = matcher.start(), me = matcher.end();
         final int bs = cursor.advance(ms);
@@ -69,13 +71,18 @@ final class ReplaceContext {
         // appendReplacement prefixes the expanded replacement with the text since the last hit
         sb.setLength(0);
         matcher.appendReplacement(sb, replace);
-        tb.add(txt, p, bs).add(sb.substring(ms - pc));
+        tb.add(txt, p, bs);
+        // the caret is shifted by the preceding hits, or moved to the end of an enclosing one
+        final int cs = tb.size();
+        tb.add(sb.substring(ms - pc));
+        if(cr == -1 && caret < be) cr = caret <= bs ? caret + cs - bs : tb.size();
         pc = me;
         p = be;
         count++;
         if(single) break;
       }
       text = tb.add(txt, p, os).finish();
+      caret = cr != -1 ? cr : caret + text.length - os;
     }
     return new int[] { start, end - os + text.length };
   }

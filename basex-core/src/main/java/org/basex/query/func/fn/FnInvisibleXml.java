@@ -37,7 +37,7 @@ public final class FnInvisibleXml extends StandardFunc {
   private Generator generator;
 
   @Override
-  public FuncItem item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected FuncItem item(final QueryContext qc) throws QueryException {
     if(generator == null) {
       for(final String className : CLASSES) {
         try {
@@ -128,7 +128,7 @@ public final class FnInvisibleXml extends StandardFunc {
     }
 
     @Override
-    public DBNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    public DBNode item(final QueryContext qc) throws QueryException {
       final String input = toString(arg(0), qc);
       try {
         return new DBNode(IO.get(parser.parse(input)));

@@ -5,7 +5,6 @@ import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -15,7 +14,7 @@ import org.basex.util.*;
  */
 public final class ArraySize extends ArrayFn {
   @Override
-  public Itr item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Itr item(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
     return Itr.get(array.structSize());
   }

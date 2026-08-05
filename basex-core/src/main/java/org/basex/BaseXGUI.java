@@ -51,18 +51,20 @@ public final class BaseXGUI extends Main {
     super(args);
     parseArgs();
 
-    // delegate files to a GUI instance that is already running
+    // delegate files to a GUI instance that is already running; without files, open a new window
     final String[] paths = files.finish();
-    if(GUIInstance.delegate(paths)) return;
+    if(paths.length > 0 && GUIInstance.delegate(paths)) return;
 
-    // initialize fonts and colors
+    // initialize scaling and look and feel
     final GUIOptions gopts = new GUIOptions();
+    scale(gopts);
+    init(gopts);
+    // adopt fonts and colors of the look and feel
     GUIConstants.init(gopts);
+    osScale(gopts);
 
     // create splash screen
     final JFrame splash = splash();
-    // initialize look and feel
-    init(gopts);
 
     SwingUtilities.invokeLater(() -> {
       // open main window and close splash screen
@@ -72,14 +74,17 @@ public final class BaseXGUI extends Main {
       } finally {
         splash.dispose();
       }
+      // the splash screen never receives the focus: move the main window to the foreground
+      focus(gui);
 
       // open specified files
       gui.editor.init(filter(gui, paths));
 
       // open files that are delegated by other GUI instances
-      GUIInstance.listen(paths, delegated -> SwingUtilities.invokeLater(() -> {
-        for(final IOFile file : filter(gui, delegated)) gui.editor.open(file);
+      GUIInstance.listen(gui, paths, delegated -> SwingUtilities.invokeLater(() -> {
+        // request focus first: dialogs of a background process will not receive key events
         focus(gui);
+        for(final IOFile file : filter(gui, delegated)) gui.editor.open(file);
       }));
     });
 
@@ -127,6 +132,27 @@ public final class BaseXGUI extends Main {
     }
     gui.setExtendedState(gui.getExtendedState() & ~Frame.ICONIFIED);
     gui.toFront();
+  }
+
+  /**
+   * Assigns the scaling factor of the user interface.
+   * @param opts gui options
+   */
+  private static void scale(final GUIOptions opts) {
+    // the property must be assigned before the graphics environment is initialized
+    final int scale = opts.get(GUIOptions.UISCALE);
+    if(scale > 0 && scale != 100) System.setProperty("sun.java2d.uiScale",
+        Double.toString(scale * opts.get(GUIOptions.OSSCALE) / 10000.0d));
+  }
+
+  /**
+   * Remembers the scaling factor of the operating system for the next startup.
+   * @param opts gui options
+   */
+  private static void osScale(final GUIOptions opts) {
+    // the screen resolution is not affected by a custom scaling factor
+    if(!Prop.MAC) opts.set(GUIOptions.OSSCALE,
+        Toolkit.getDefaultToolkit().getScreenResolution() * 100 / 96);
   }
 
   /**

@@ -3,7 +3,7 @@ package org.basex.query.func.web;
 import java.util.*;
 
 import org.basex.query.*;
-import org.basex.query.value.*;
+import org.basex.query.value.node.*;
 
 /**
  * Function implementation.
@@ -13,7 +13,7 @@ import org.basex.query.value.*;
  */
 public final class WebResponseHeader extends WebFn {
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
+  public FNode item(final QueryContext qc) throws QueryException {
     final HashMap<String, String> output = toOptions(arg(0), qc);
     final HashMap<String, String> headers = toOptions(arg(1), qc);
     final ResponseOptions response = toOptions(arg(2), new ResponseOptions(), qc);

@@ -89,7 +89,7 @@ public final class ProjectView extends BaseXPanel {
     final BaseXToolBar buttons = new BaseXToolBar();
 
     final AbstractButton browse = BaseXButton.get("c_edit_open", OPEN, false, gui);
-    browse.setToolTipText(CHOOSE_DIR + DOTS);
+    browse.setToolTipText(CHOOSE_DIR + ELLIPSIS);
     browse.addActionListener(e -> chooseRoot());
     browse.setFocusable(true);
     buttons.add(browse);
@@ -128,8 +128,8 @@ public final class ProjectView extends BaseXPanel {
     addComponentListener(new ComponentAdapter() {
       @Override
       public void componentResized(final ComponentEvent e) {
-        // trigger parsing of project files
-        refresh(false, false);
+        // trigger parsing of project files; the filter must not be refreshed
+        parse(false);
       }
     });
 
@@ -216,7 +216,14 @@ public final class ProjectView extends BaseXPanel {
   private void refresh(final boolean reset, final boolean enforce) {
     if(reset) files.reset();
     filter.refresh(true);
+    parse(enforce);
+  }
 
+  /**
+   * Parses the project files in the background.
+   * @param enforce enforce parsing of XQuery files
+   */
+  private void parse(final boolean enforce) {
     // do not parse if project view is not visible, or if it has already been parsed
     if(!gui.gopts.get(GUIOptions.PARSEPROJ) || getWidth() == 0 || parsed && !enforce) return;
 

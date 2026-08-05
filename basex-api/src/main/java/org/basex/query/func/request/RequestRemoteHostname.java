@@ -3,7 +3,6 @@ package org.basex.query.func.request;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -13,7 +12,7 @@ import org.basex.util.*;
  */
 public final class RequestRemoteHostname extends ApiFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Str item(final QueryContext qc) throws QueryException {
     return toStr(state(qc).remoteHostname());
   }
 }

@@ -4,7 +4,6 @@ import org.basex.build.html.HtmlParser.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -14,7 +13,7 @@ import org.basex.util.*;
  */
 public final class HtmlParser extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) {
+  protected Str item(final QueryContext qc) {
     final Parser parser = Parser.PARSER;
     return Str.get(parser != null ? parser.toString() : "");
   }

@@ -338,7 +338,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  public FuncItem item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected FuncItem item(final QueryContext qc) throws QueryException {
     final Expr body;
     if(global.isEmpty()) {
       body = expr;
@@ -443,7 +443,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       for(final Expr ex : global.values()) {
         if(!ex.accept(visitor)) return false;
       }
-      return visitor.inlineFunc(this);
+      return visitor.subScope(this);
     });
   }
 

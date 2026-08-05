@@ -18,7 +18,7 @@ import org.basex.util.*;
  */
 public final class FnCollation extends StandardFunc {
   @Override
-  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Str item(final QueryContext qc) throws QueryException {
     final XQMap options = toMap(arg(0), qc);
 
     final MapBuilder map = new MapBuilder();

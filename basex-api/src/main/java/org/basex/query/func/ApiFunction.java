@@ -32,7 +32,7 @@ public enum ApiFunction implements AFunction {
   _REQUEST_ADDRESS(RequestAddress::new, "address()",
       params(), STRING_O, REQUEST_URI),
   /** XQuery function. */
-  _REQUEST_ATTRIBUTE(RequestAttribute::new, "attribute(name[,default])",
+  _REQUEST_ATTRIBUTE(RequestAttribute::new, "attribute(name, default?)",
       params(STRING_O, ITEM_ZM), ITEM_ZM, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_ATTRIBUTE_MAP(RequestAttributeMap::new, "attribute-map()",
@@ -47,7 +47,7 @@ public enum ApiFunction implements AFunction {
   _REQUEST_CONTEXT_PATH(RequestContextPath::new, "context-path()",
       params(), STRING_O, REQUEST_URI),
   /** XQuery function. */
-  _REQUEST_COOKIE(RequestCookie::new, "cookie(name[,default])",
+  _REQUEST_COOKIE(RequestCookie::new, "cookie(name, default?)",
       params(STRING_O, STRING_O), STRING_ZO, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_COOKIE_MAP(RequestCookieMap::new, "cookie-map()",
@@ -56,8 +56,8 @@ public enum ApiFunction implements AFunction {
   _REQUEST_COOKIE_NAMES(RequestCookieNames::new, "cookie-names()",
       params(), STRING_ZM, REQUEST_URI),
   /** XQuery function. */
-  _REQUEST_HEADER(RequestHeader::new, "header(name[,default])",
-      params(STRING_O, STRING_O), STRING_ZO, REQUEST_URI),
+  _REQUEST_HEADER(RequestHeader::new, "header(name, default?)",
+      params(STRING_O, STRING_ZM), STRING_ZM, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_HEADER_MAP(RequestHeaderMap::new, "header-map()",
       params(), MAP_O, REQUEST_URI),
@@ -71,7 +71,7 @@ public enum ApiFunction implements AFunction {
   _REQUEST_METHOD(RequestMethod::new, "method()",
       params(), STRING_O, REQUEST_URI),
   /** XQuery function. */
-  _REQUEST_PARAMETER(RequestParameter::new, "parameter(name[,default])",
+  _REQUEST_PARAMETER(RequestParameter::new, "parameter(name, default?)",
       params(STRING_O, ITEM_ZM), ITEM_ZM, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_PARAMETER_MAP(RequestParameterMap::new, "parameter-map()",
@@ -101,7 +101,7 @@ public enum ApiFunction implements AFunction {
   _REQUEST_SCHEME(RequestScheme::new, "scheme()",
       params(), STRING_O, REQUEST_URI),
   /** XQuery function. */
-  _REQUEST_SET_ATTRIBUTE(RequestSetAttribute::new, "set-attribute(name,value)",
+  _REQUEST_SET_ATTRIBUTE(RequestSetAttribute::new, "set-attribute(name, value)",
       params(STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, REQUEST_URI, Perm.ADMIN),
   /** XQuery function. */
   _REQUEST_URI(RequestUri::new, "uri()",
@@ -113,8 +113,8 @@ public enum ApiFunction implements AFunction {
   _RESTXQ_BASE_URI(RestBaseUri::new, "base-uri()",
       params(), ANY_URI_O, REST_URI),
   /** XQuery function. */
-  _RESTXQ_INIT(RestInit::new, "init([update])",
-      params(BOOLEAN_O), EMPTY_SEQUENCE_Z, REST_URI),
+  _RESTXQ_INIT(RestInit::new, "init(update?)",
+      params(BOOLEAN_ZO), EMPTY_SEQUENCE_Z, REST_URI),
   /** XQuery function. */
   _RESTXQ_URI(RestUri::new, "uri()",
       params(), ANY_URI_O, REST_URI),
@@ -140,7 +140,7 @@ public enum ApiFunction implements AFunction {
   _SESSION_DELETE(SessionDelete::new, "delete(key)",
       params(STRING_O), EMPTY_SEQUENCE_Z, SESSION_URI),
   /** XQuery function. */
-  _SESSION_GET(SessionGet::new, "get(key[,default])",
+  _SESSION_GET(SessionGet::new, "get(key, default?)",
       params(STRING_O, ITEM_ZM), ITEM_ZM, SESSION_URI),
   /** XQuery function. */
   _SESSION_ID(SessionId::new, "id()",
@@ -149,7 +149,7 @@ public enum ApiFunction implements AFunction {
   _SESSION_NAMES(SessionNames::new, "names()",
       params(), STRING_ZM, SESSION_URI),
   /** XQuery function. */
-  _SESSION_SET(SessionSet::new, "set(key,value)",
+  _SESSION_SET(SessionSet::new, "set(key, value)",
       params(STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, SESSION_URI),
 
   // Sessions Module
@@ -164,10 +164,10 @@ public enum ApiFunction implements AFunction {
   _SESSIONS_CREATED(SessionsCreated::new, "created(id)",
       params(STRING_O), DATE_TIME_O, SESSIONS_URI, Perm.ADMIN),
   /** XQuery function. */
-  _SESSIONS_DELETE(SessionsDelete::new, "delete(id,key)",
+  _SESSIONS_DELETE(SessionsDelete::new, "delete(id, key)",
       params(STRING_O, STRING_O), EMPTY_SEQUENCE_Z, SESSIONS_URI, Perm.ADMIN),
   /** XQuery function. */
-  _SESSIONS_GET(SessionsGet::new, "get(id,key[,default])",
+  _SESSIONS_GET(SessionsGet::new, "get(id, key, default?)",
       params(STRING_O, STRING_O, ITEM_ZM), ITEM_ZM, SESSIONS_URI, Perm.ADMIN),
   /** XQuery function. */
   _SESSIONS_IDS(SessionsIds::new, "ids()",
@@ -176,7 +176,7 @@ public enum ApiFunction implements AFunction {
   _SESSIONS_NAMES(SessionsNames::new, "names(id)",
       params(STRING_O), STRING_ZM, SESSIONS_URI, Perm.ADMIN),
   /** XQuery function. */
-  _SESSIONS_SET(SessionsSet::new, "set(id,key,value)",
+  _SESSIONS_SET(SessionsSet::new, "set(id, key, value)",
       params(STRING_O, STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, SESSIONS_URI, Perm.ADMIN),
 
   // WebDAV Module (internal: lock storage for the WebDAV service)
@@ -192,40 +192,40 @@ public enum ApiFunction implements AFunction {
 
   /** XQuery function. */
   _WS_BROADCAST(WsBroadcast::new, "broadcast(message)",
-      params(ITEM_O), EMPTY_SEQUENCE_Z, WS_URI),
+      params(ITEM_O), EMPTY_SEQUENCE_Z, WS_URI, Perm.ADMIN),
   /** XQuery function. */
-  _WS_CLOSE(WsClose::new, "close(id[,status,reason])",
-      params(STRING_O, INTEGER_O, STRING_O), EMPTY_SEQUENCE_Z, WS_URI),
+  _WS_CLOSE(WsClose::new, "close(id, status?, reason?)",
+      params(STRING_O, INTEGER_O, STRING_O), EMPTY_SEQUENCE_Z, WS_URI, Perm.ADMIN),
   /** XQuery function. */
-  _WS_DELETE(WsDelete::new, "delete(id,key)",
-      params(STRING_O, STRING_O), EMPTY_SEQUENCE_Z, WS_URI),
+  _WS_DELETE(WsDelete::new, "delete(id, key)",
+      params(STRING_O, STRING_O), EMPTY_SEQUENCE_Z, WS_URI, Perm.ADMIN),
   /** XQuery function. */
   _WS_EMIT(WsEmit::new, "emit(message)",
-      params(ITEM_O), EMPTY_SEQUENCE_Z, WS_URI),
+      params(ITEM_O), EMPTY_SEQUENCE_Z, WS_URI, Perm.ADMIN),
   /** XQuery function. */
-  _WS_EVAL(WsEval::new, "eval(query[,bindings,options])",
-      params(STRING_O, MAP_ZO, MAP_ZO), STRING_O, WS_URI),
+  _WS_EVAL(WsEval::new, "eval(query, bindings?, options?)",
+      params(STRING_O, MAP_ZO, MAP_ZO), STRING_O, WS_URI, Perm.ADMIN),
   /** XQuery function. */
-  _WS_GET(WsGet::new, "get(id,key[,default])",
-      params(STRING_O, STRING_O, ITEM_ZM), ITEM_ZM, WS_URI),
+  _WS_GET(WsGet::new, "get(id, key, default?)",
+      params(STRING_O, STRING_O, ITEM_ZM), ITEM_ZM, WS_URI, Perm.ADMIN),
   /** XQuery function. */
   _WS_ID(WsId::new, "id()",
       params(), STRING_O, WS_URI),
   /** XQuery function. */
   _WS_IDS(WsIds::new, "ids()",
-      params(), STRING_ZM, WS_URI),
+      params(), STRING_ZM, WS_URI, Perm.ADMIN),
   /** XQuery function. */
   _WS_PATH(WsPath::new, "path(id)",
-      params(STRING_O), STRING_O, WS_URI),
+      params(STRING_O), STRING_O, WS_URI, Perm.ADMIN),
   /** XQuery function. */
   _WS_PING(WsPing::new, "ping(id)",
-      params(STRING_O), EMPTY_SEQUENCE_Z, WS_URI),
+      params(STRING_O), EMPTY_SEQUENCE_Z, WS_URI, Perm.ADMIN),
   /** XQuery function. */
-  _WS_SEND(WsSend::new, "send(message,ids)",
-      params(ITEM_O, STRING_ZM), EMPTY_SEQUENCE_Z, WS_URI),
+  _WS_SEND(WsSend::new, "send(message, ids)",
+      params(ITEM_O, STRING_ZM), EMPTY_SEQUENCE_Z, WS_URI, Perm.ADMIN),
   /** XQuery function. */
-  _WS_SET(WsSet::new, "set(id,key,value)",
-      params(STRING_O, STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, WS_URI);
+  _WS_SET(WsSet::new, "set(id, key, value)",
+      params(STRING_O, STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, WS_URI, Perm.ADMIN);
 
   /** Function definition. */
   private final FuncDefinition definition;
@@ -248,7 +248,7 @@ public enum ApiFunction implements AFunction {
    * Constructs a function signature.
    * @param supplier function implementation constructor
    * @param desc descriptive function string, containing the function name and its parameters in
-   *   parentheses. Optional parameters are represented in nested square brackets; three dots
+   *   parentheses. Optional parameters are suffixed with a question mark; three dots
    *   indicate that the number of parameters of a function is not limited.
    * @param params parameter types
    * @param seqType return type

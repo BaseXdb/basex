@@ -29,14 +29,16 @@ public abstract class FuncCall extends Arr {
    * Evaluates a function item.
    * @param func function to be evaluated
    * @param qc query context
+   * @param tail eliminate tail call
    * @return the function
    * @throws QueryException query exception
    */
-  final Value evalFunc(final XQFunction func, final QueryContext qc) throws QueryException {
+  final Value evalFunc(final XQFunction func, final QueryContext qc, final boolean tail)
+      throws QueryException {
     final int arity = func.arity();
     final Value[] args = new Value[arity];
     for(int a = 0; a < arity; ++a) args[a] = exprs[a].value(qc);
-    return tco ? func.invokeTail(qc, info, args) : func.invoke(qc, info, args);
+    return tail ? func.invokeTail(qc, info, args) : func.invoke(qc, info, args);
   }
 
   @Override

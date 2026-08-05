@@ -48,8 +48,8 @@ public final class XsltModuleTest extends SandboxTest {
   @Test public void transformText() {
     final Function func = _XSLT_TRANSFORM_TEXT;
     final String doc = " <a/>";
-    String style = wrap("<xsl:template match='/'>" +
-        "<xsl:output omit-xml-declaration='yes'/>1</xsl:template>");
+    String style = wrap("<xsl:output omit-xml-declaration='yes'/>" +
+        "<xsl:template match='/'>1</xsl:template>");
     query(func.args(doc, ' ' + style), 1);
     query(func.args(doc, style), 1);
 
@@ -62,8 +62,8 @@ public final class XsltModuleTest extends SandboxTest {
   @Test public void transformReport() {
     final Function func = _XSLT_TRANSFORM_REPORT;
     final String doc = " <a/>";
-    final String style = wrap("<xsl:template match='/'>" +
-        "<xsl:output omit-xml-declaration='yes'/>1</xsl:template>");
+    final String style = wrap("<xsl:output omit-xml-declaration='yes'/>" +
+        "<xsl:template match='/'>1</xsl:template>");
     query(func.args(doc, ' ' + style) + "?result", 1);
     query(func.args(doc, ' ' + style) + "?error => exists()", false);
     query(func.args(doc, ' ' + wrap("")) + "?error => exists()", false);

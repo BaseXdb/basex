@@ -26,19 +26,19 @@ public final class WebDAVLocks extends StandardFunc {
   private static final Str PATH = Str.get("path");
 
   static {
-    final TokenObjectMap<RecordField> fields = new TokenObjectMap<>();
+    final TokenObjectMap<ShapeField> fields = new TokenObjectMap<>();
     for(final String name : new String[] { "token", "path", "depth", "scope" }) {
-      fields.put(Token.token(name), new RecordField(Types.STRING_O));
+      fields.put(Token.token(name), new ShapeField(Types.STRING_O));
     }
-    fields.put(Token.token("timeout"), new RecordField(Types.INTEGER_O));
-    fields.put(Token.token("expires"), new RecordField(Types.DATE_TIME_O));
-    fields.put(Token.token("owner"), new RecordField(Types.ELEMENT_ZO));
-    LOCK = new RecordType(fields).seqType();
+    fields.put(Token.token("timeout"), new ShapeField(Types.INTEGER_O));
+    fields.put(Token.token("expires"), new ShapeField(Types.DATE_TIME_O));
+    fields.put(Token.token("owner"), new ShapeField(Types.ELEMENT_ZO));
+    LOCK = new ShapeType(fields).seqType();
     LOCKS = MapType.get(BasicType.STRING, LOCK).seqType();
   }
 
   @Override
-  public XQMap value(final QueryContext qc) throws QueryException {
+  public XQMap item(final QueryContext qc) throws QueryException {
     final User user = qc.context.user();
 
     // a local permission overrides the global one, so every lock is checked separately

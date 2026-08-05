@@ -12,37 +12,36 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Returns the value of a record.
+ * Returns a field value of a map with a known shape.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class RecordGet extends Single {
-  /** Type of processed record. */
-  private final RecordType type;
-  /** Index of record entry (starting with 1). */
+public final class ShapeGet extends Single {
+  /** Type of the processed map. */
+  private final ShapeType type;
+  /** Index of the field (starting with 1). */
   private final int index;
 
   /**
    * Constructor.
    * @param info input info (can be {@code null})
-   * @param record record expression
-   * @param index index of record entry (starting with 1)
+   * @param map map expression
+   * @param index index of the field (starting with 1)
    */
-  public RecordGet(final InputInfo info, final Expr record, final int index) {
-    this(info, record, index, (RecordType) record.seqType().type);
+  public ShapeGet(final InputInfo info, final Expr map, final int index) {
+    this(info, map, index, (ShapeType) map.seqType().type);
   }
 
   /**
    * Constructor.
    * @param info input info (can be {@code null})
-   * @param record record expression
-   * @param index index of record entry (starting with 1)
-   * @param type type of processed record
+   * @param map map expression
+   * @param index index of the field (starting with 1)
+   * @param type type of the processed map
    */
-  private RecordGet(final InputInfo info, final Expr record, final int index,
-      final RecordType type) {
-    super(info, record, Types.ITEM_ZM);
+  private ShapeGet(final InputInfo info, final Expr map, final int index, final ShapeType type) {
+    super(info, map, Types.ITEM_ZM);
     this.type = type;
     this.index = index;
   }
@@ -60,12 +59,12 @@ public final class RecordGet extends Single {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
-    return copyType(new RecordGet(info, expr.copy(cc, vm), index, type));
+    return copyType(new ShapeGet(info, expr.copy(cc, vm), index, type));
   }
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof final RecordGet rg && index == rg.index &&
+    return this == obj || obj instanceof final ShapeGet rg && index == rg.index &&
         super.equals(obj);
   }
 

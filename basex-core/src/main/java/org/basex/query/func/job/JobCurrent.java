@@ -3,7 +3,6 @@ package org.basex.query.func.job;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -13,7 +12,7 @@ import org.basex.util.*;
  */
 public final class JobCurrent extends StandardFunc {
   @Override
-  public Str item(final QueryContext qc, final InputInfo ii) {
+  protected Str item(final QueryContext qc) {
     return Str.get(qc.jc().id());
   }
 }

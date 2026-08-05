@@ -8,11 +8,11 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.up.*;
 import org.basex.query.up.primitives.db.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -22,7 +22,7 @@ import org.basex.util.*;
  */
 public final class FnPut extends StandardFunc {
   @Override
-  public Empty item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Empty item(final QueryContext qc) throws QueryException {
     final XNode node = toNode(arg(0), qc);
     final byte[] source = toZeroToken(arg(1), qc);
     final SerializerOptions options = toSerializerOptions(arg(2), qc);
@@ -40,5 +40,12 @@ public final class FnPut extends StandardFunc {
 
     updates.add(new Put(target.pre(), target.data(), path, options, info), qc);
     return Empty.VALUE;
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    // target database is supplied by a node and cannot be resolved statically
+    visitor.unresolvedTarget();
+    return super.accept(visitor);
   }
 }

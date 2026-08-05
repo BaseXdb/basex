@@ -12,7 +12,7 @@ import org.basex.util.*;
  */
 public final class WebDecodeUrl extends WebFn {
   @Override
-  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Str item(final QueryContext qc) throws QueryException {
     final byte[] value = toToken(arg(0), qc);
     return Str.get(XMLToken.decodeUri(value));
   }

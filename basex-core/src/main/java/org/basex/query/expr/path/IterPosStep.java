@@ -67,7 +67,7 @@ public final class IterPosStep extends Step {
               if(!pos.test(qc, info, p)) return false;
               // last position reached: early exit
               if(p == pos.itemAt(pos.size() - 1).itr(info)) skip = true;
-            } else if(!exprs[e].test(qc, info, 0)) {
+            } else if(!exprs[e].ebv(qc, info)) {
               return false;
             }
           }

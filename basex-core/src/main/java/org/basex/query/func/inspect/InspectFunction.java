@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -14,14 +13,14 @@ import org.basex.util.*;
  */
 public final class InspectFunction extends StandardFunc {
   @Override
-  public FNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected FNode item(final QueryContext qc) throws QueryException {
     final FItem function = toFunction(arg(0), qc);
 
     final QNm name = function.funcName();
     StaticFunc func = null;
     if(name != null) {
       final int arity = function.arity();
-      func = qc.functions.get(ii.sc(), name, arity, true);
+      func = qc.functions.get(sc(), name, arity, true);
     }
     return new PlainDoc(qc, info).function(name, func, function.funcType(), function.annotations());
   }

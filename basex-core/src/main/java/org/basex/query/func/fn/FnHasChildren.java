@@ -3,7 +3,6 @@ package org.basex.query.func.fn;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -13,13 +12,12 @@ import org.basex.util.*;
  */
 public final class FnHasChildren extends ContextFn {
   @Override
-  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(test(qc, info, 0));
+  protected Bln item(final QueryContext qc) throws QueryException {
+    return Bln.get(ebv(qc));
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
-      throws QueryException {
+  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
     final GNode node = toGNodeOrNull(context(qc), qc);
     return node != null && node.hasChildren();
   }

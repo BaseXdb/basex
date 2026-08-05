@@ -42,13 +42,12 @@ public final class Castable extends Convert {
   }
 
   @Override
-  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(test(qc, ii, 0));
+  protected Bln item(final QueryContext qc) throws QueryException {
+    return Bln.get(ebv(qc));
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
-      throws QueryException {
+  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
     return seqType.cast(expr.value(qc), false, qc, info) != null;
   }
 

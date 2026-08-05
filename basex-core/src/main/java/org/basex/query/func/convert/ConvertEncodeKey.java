@@ -12,7 +12,7 @@ import org.basex.util.*;
  */
 public final class ConvertEncodeKey extends ConvertIntegersToBase64 {
   @Override
-  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Str item(final QueryContext qc) throws QueryException {
     final byte[] key = toToken(arg(0), qc);
     final boolean lax = toBooleanOrFalse(arg(1), qc);
 

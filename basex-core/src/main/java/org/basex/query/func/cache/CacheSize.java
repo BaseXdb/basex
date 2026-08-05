@@ -2,7 +2,6 @@ package org.basex.query.func.cache;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -12,7 +11,7 @@ import org.basex.util.*;
  */
 public final class CacheSize extends CacheFn {
   @Override
-  public Itr item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Itr item(final QueryContext qc) throws QueryException {
     final String name = toZeroString(arg(0), qc);
 
     return Itr.get(caches(qc).size(name));

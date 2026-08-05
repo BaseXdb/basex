@@ -5,7 +5,6 @@ import static org.basex.query.QueryError.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -15,7 +14,7 @@ import org.basex.util.*;
  */
 public final class FetchText extends FetchDoc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected StrLazy item(final QueryContext qc) throws QueryException {
     final IO source = toIO(arg(0), qc);
     final String encoding = toEncodingOrNull(arg(1), FETCH_ENCODING_X, qc);
     final boolean fallback = toBooleanOrFalse(arg(2), qc);

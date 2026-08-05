@@ -5,7 +5,6 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -18,7 +17,7 @@ public final class RandomDouble extends StandardFunc {
   private static final Random RND = new Random();
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) {
+  protected Dbl item(final QueryContext qc) {
     return Dbl.get(RND.nextDouble());
   }
 }

@@ -16,7 +16,7 @@ import org.basex.util.*;
  */
 public final class FnStringLength extends ContextFn {
   @Override
-  public Itr item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Itr item(final QueryContext qc) throws QueryException {
     final Item value = context(qc).item(qc, info);
     if(value.isEmpty()) return Itr.ZERO;
     // optimization to return pre-computed string length

@@ -97,7 +97,7 @@ final class DigitalSignature {
    * @return signed node
    * @throws QueryException query exception
    */
-  Item generate(final XNode node, final byte[] can, final byte[] dig, final byte[] sig,
+  GNode generate(final XNode node, final byte[] can, final byte[] dig, final byte[] sig,
       final byte[] ns, final byte[] tp, final byte[] path, final XNode cert, final QueryContext qc)
       throws QueryException {
 
@@ -127,7 +127,7 @@ final class DigitalSignature {
     if(!TYPES.contains(lc(b))) throw CX_SIGTYPINV.get(info, tp);
     final byte[] type = b;
 
-    final Item signedNode;
+    final GNode signedNode;
     try {
       final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
       final PrivateKey pk;

@@ -21,6 +21,8 @@ final class TextIterator {
   private final int length;
   /** Caret position. */
   private final int caret;
+  /** Indicates if the caret is placed at the end of a rendered row. */
+  private final boolean rowEnd;
   /** Start position of a text selection. */
   private final int start;
   /** End position of a text selection (+1). */
@@ -29,6 +31,12 @@ final class TextIterator {
   private final int errPos;
   /** Start and end positions of search terms. */
   private final IntList[] searchResults;
+  /** Search results of the current token. */
+  private final ArrayList<int[]> results = new ArrayList<>();
+  /** Name at the caret (can be {@code null}: no name is highlighted). */
+  private final byte[] name;
+  /** Occurrences of the name in the current token. */
+  private final ArrayList<int[]> occurrences = new ArrayList<>();
 
   /** Current start position. */
   private int pos;
@@ -36,6 +44,10 @@ final class TextIterator {
   private int posEnd;
   /** Current search index. */
   private int searchIndex;
+  /** Position up to which occurrences have been located. */
+  private int occurrencePos;
+  /** Occurrence that was located last (can be {@code null}). */
+  private int[] occurrence;
   /** Indicates if current token is part of a link. */
   private boolean link;
 
@@ -47,10 +59,12 @@ final class TextIterator {
     text = et.text();
     length = text.length;
     caret = et.pos();
-    start = et.start;
-    end = et.end;
-    errPos = et.error;
-    searchResults = et.searchResults;
+    rowEnd = et.atRowEnd();
+    start = et.start();
+    end = et.end();
+    errPos = et.error();
+    searchResults = et.searchResults();
+    name = et.occurrence();
   }
 
   /**
@@ -86,29 +100,6 @@ final class TextIterator {
    */
   String currString() {
     return posEnd <= length ? string(text, pos, posEnd - pos) : "";
-  }
-
-  /**
-   * Returns a substring.
-   * @param s start position
-   * @param e end position
-   * @return string
-   */
-  String substring(final int s, final int e) {
-    return s < e ? string(text, s, e - s) : "";
-  }
-
-  /**
-   * Checks if the caret is in the current line.
-   * @param first first call
-   * @return iterator position
-   */
-  boolean caretLine(final boolean first) {
-    for(int p = pos + (first ? 0 : 1); p < length; p++) {
-      if(p == caret) return true;
-      if(text[p] == '\n') return false;
-    }
-    return caret == length;
   }
 
   /**
@@ -194,6 +185,14 @@ final class TextIterator {
   }
 
   /**
+   * Indicates if the caret is placed at the end of a rendered row.
+   * @return result of check
+   */
+  boolean rowEnd() {
+    return rowEnd;
+  }
+
+  /**
    * Returns a selection range.
    * @return range or {@code null}
    */
@@ -206,26 +205,59 @@ final class TextIterator {
     return null;
   }
 
-  /** Search results. */
-  private final ArrayList<int[]> results = new ArrayList<>();
-
   /**
-   * Returns the next search result range.
-   * @return range or {@code null}
+   * Returns the search results of the current token.
+   * @return ranges
    */
   ArrayList<int[]> searchResults() {
     results.clear();
-    if(searchResults != null) {
-      final IntList starts = searchResults[0], ends = searchResults[1];
-      int si = searchIndex;
-      for(final int ss = starts.size(); si < ss; ++si) {
-        final int s = starts.get(si), e = ends.get(si);
-        if(s >= posEnd) break;
-        results.add(new int[] { s, e });
-      }
-      searchIndex = results.isEmpty() ? si : si - 1;
+    final IntList starts = searchResults[0], ends = searchResults[1];
+    int si = searchIndex;
+    for(final int ss = starts.size(); si < ss; ++si) {
+      final int s = starts.get(si), e = ends.get(si);
+      if(s >= posEnd) break;
+      results.add(new int[] { s, e });
     }
+    searchIndex = results.isEmpty() ? si : si - 1;
     return results;
+  }
+
+  /**
+   * Returns the occurrences of the name at the caret in the current token. The text is scanned
+   * while it is rendered: occurrences outside the rendered range are never located.
+   * @return ranges
+   */
+  ArrayList<int[]> occurrences() {
+    occurrences.clear();
+    if(name != null) {
+      // an occurrence that spans several tokens is reported for each of them
+      if(occurrence != null && occurrence[1] > pos) occurrences.add(occurrence);
+      final int nl = name.length, max = Math.min(length - nl, posEnd - 1);
+      for(int p = Math.max(occurrencePos, pos); p <= max; p++) {
+        if(matches(p)) {
+          occurrence = new int[] { p, p + nl };
+          occurrences.add(occurrence);
+          p += nl - 1;
+        }
+      }
+      occurrencePos = posEnd;
+    }
+    return occurrences;
+  }
+
+  /**
+   * Checks if the name occurs at the specified position.
+   * @param p position
+   * @return result of check
+   */
+  private boolean matches(final int p) {
+    final int nl = name.length;
+    for(int n = 0; n < nl; n++) {
+      if(text[p + n] != name[n]) return false;
+    }
+    // the name must not be preceded or followed by other name characters
+    return !(p > 0 && (TextEditor.nameChar(text[p - 1]) || text[p - 1] == '$')) &&
+      !(p + nl < length && TextEditor.nameChar(text[p + nl]));
   }
 
   /**

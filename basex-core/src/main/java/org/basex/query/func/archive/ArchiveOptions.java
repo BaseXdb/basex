@@ -20,7 +20,7 @@ import org.basex.util.*;
  */
 public final class ArchiveOptions extends ArchiveFn {
   @Override
-  public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected XQMap item(final QueryContext qc) throws QueryException {
     String format = null;
     int level = -1;
     try {

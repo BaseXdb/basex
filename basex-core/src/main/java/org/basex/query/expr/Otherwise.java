@@ -91,15 +91,18 @@ public final class Otherwise extends Arr {
     if(el == 1) return cc.replaceWith(this, exprs[0]);
 
     // determine result type
-    Occ occ = null;
-    for(final Expr expr : exprs) {
-      final Occ o = expr.seqType().occ;
-      occ = occ == null ? o : occ.union(o);
-    }
+    long max = 0;
+    for(final Expr expr : exprs) max = Math.max(max, expr.seqType().occ.max);
+    final Occ occ = Occ.get(exprs[el - 1].seqType().occ.min, max);
     final SeqType st = SeqType.union(exprs, false);
     exprType.assign(st != null ? st.type : BasicType.ITEM, occ).data(exprs);
 
     return this;
+  }
+
+  @Override
+  public void markTailCalls(final CompileContext cc) {
+    exprs[exprs.length - 1].markTailCalls(cc);
   }
 
   @Override

@@ -100,12 +100,19 @@ public class BaseXTextField extends JTextField {
 
     if(text != null) setText(text);
 
+    // discard legacy bindings: Ctrl+H shadows a menu shortcut, the others have no use in BaseX
+    final InputMap imap = getInputMap();
+    if(!Prop.MAC) imap.put(KeyStroke.getKeyStroke("control H"), "none");
+    imap.put(KeyStroke.getKeyStroke("control BACK_SLASH"), "none");
+    imap.put(KeyStroke.getKeyStroke("shift control O"), "none");
+
     addFocusListener((FocusGainedListener) e -> selectAll());
     addKeyListener((KeyPressedListener) e -> {
       if(UNDOSTEP.is(e) || REDOSTEP.is(e)) {
         final String t = getText();
         setText(last);
         last = t;
+        e.consume();
       }
     });
 
@@ -130,6 +137,17 @@ public class BaseXTextField extends JTextField {
 
     final BaseXDialog dialog = win.dialog();
     if(dialog != null) addKeyListener(dialog.keys);
+  }
+
+  @Override
+  public void setFont(final Font f) {
+    super.setFont(f);
+    // the height of a fixed component size must be adapted to the new font
+    if(isPreferredSizeSet()) {
+      final int w = getPreferredSize().width;
+      setPreferredSize(null);
+      setPreferredSize(new Dimension(w, getPreferredSize().height));
+    }
   }
 
   @Override

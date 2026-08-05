@@ -2,7 +2,6 @@ package org.basex.query.func.user;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -12,7 +11,7 @@ import org.basex.util.*;
  */
 public final class UserCurrent extends UserFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) {
+  protected Str item(final QueryContext qc) {
     return Str.get(qc.user.name());
   }
 }

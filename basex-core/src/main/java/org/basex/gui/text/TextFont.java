@@ -32,6 +32,10 @@ final class TextFont {
 
   /** Cached fallback fonts. */
   private final Map<String, FontFamily> fallbacks = new LinkedHashMap<>();
+  /** Cached widths of ASCII characters (plain, bold). */
+  private final int[][] widths = { new int[128], new int[128] };
+  /** Cached font families of ASCII characters (plain, bold). */
+  private final FontFamily[][] families = { new FontFamily[128], new FontFamily[128] };
   /** Component. */
   private final JComponent comp;
   /** Font family. */
@@ -40,10 +44,8 @@ final class TextFont {
   private final int indent;
   /** Font size. */
   private final int size;
-  /** Width of a character cell (base for monospaced grid alignment). */
+  /** Width of a character cell ({@code 0} if the font is not monospaced). */
   private final int cell;
-  /** Monospaced flag: snap glyphs to the character grid. */
-  private final boolean mono;
 
   /** Current style. */
   private int style;
@@ -71,10 +73,7 @@ final class TextFont {
     this.indent = indent;
     family = new FontFamily(font, comp);
     size = font.getSize();
-    // character cell width for grid alignment (0 for proportional fonts)
-    final FontMetrics fm = family.metrics(PLAIN);
-    cell = GUIConstants.monoWidth(fm);
-    mono = cell > 0;
+    cell = GUIConstants.monoWidth(family.metrics(PLAIN));
   }
 
   /**
@@ -99,30 +98,29 @@ final class TextFont {
    * @return width
    */
   int stringWidth(final String string) {
-    // single character (e.g. tab): use its cell width
-    if(string.length() == 1) return charWidth(string.codePointAt(0));
-    // monospaced: sum per-glyph cells (matches grid drawing); proportional: native width
-    return mono ? string.codePoints().map(this::charWidth).sum() :
-      family(string).metrics(style).stringWidth(string);
+    int width = 0;
+    for(int s = 0, sl = string.length(); s < sl;) {
+      final int cp = string.codePointAt(s);
+      width += charWidth(cp);
+      s += Character.charCount(cp);
+    }
+    return width;
   }
 
   /**
-   * Returns an appropriate font for the specified string.
-   * @param string string
-   * @return font
+   * Returns the pixel width of the specified text range.
+   * @param text text
+   * @param start start position
+   * @param end end position
+   * @return width
    */
-  Font font(final String string) {
-    return family(string).font(style);
-  }
-
-  /**
-   * Returns a font family for the specified string.
-   * @param string string
-   * @return font family
-   */
-  private FontFamily family(final String string) {
-    final int i = family.font(style).canDisplayUpTo(string);
-    return i == -1 ? family : fallback(string.codePointAt(i));
+  int stringWidth(final byte[] text, final int start, final int end) {
+    int width = 0;
+    for(int p = start; p < end;) {
+      width += charWidth(Token.cp(text, p));
+      p += Token.cl(text, p);
+    }
+    return width;
   }
 
   /**
@@ -131,14 +129,30 @@ final class TextFont {
    * @return width
    */
   int charWidth(final int cp) {
+    if(cp >= 128) return width(cp);
+    final int[] cache = widths[style];
+    int width = cache[cp];
+    if(width == 0) {
+      width = width(cp);
+      cache[cp] = width;
+    }
+    return width;
+  }
+
+  /**
+   * Computes the pixel width of the specified codepoint.
+   * @param cp codepoint
+   * @return width
+   */
+  private int width(final int cp) {
     if(cp >= TokenBuilder.PRIVATE_START && cp <= TokenBuilder.PRIVATE_END) return 0;
     if(cp == '\t') return charWidth(' ') * indent;
     // combining marks attach to the preceding glyph and take no space of their own
     if(nonspacing(cp)) return 0;
 
     // snap glyphs to the character grid to keep columns aligned in monospaced fonts
-    final int width = rawWidth(cp);
-    return mono && width != 0 ? Math.max(1, (width + cell / 2) / cell) * cell : width;
+    final int width = family(cp).metrics(style).charWidth(cp);
+    return cell != 0 && width != 0 ? Math.max(1, (width + cell / 2) / cell) * cell : width;
   }
 
   /**
@@ -152,47 +166,38 @@ final class TextFont {
   }
 
   /**
-   * Returns the unsnapped pixel width of the specified codepoint.
-   * @param cp codepoint
-   * @return width
-   */
-  private int rawWidth(final int cp) {
-    return family(cp).metrics(style).charWidth(cp);
-  }
-
-  /**
-   * Draws a string, aligning each character to the grid for monospaced fonts.
+   * Draws a string, positioning each character at its computed width.
    * @param g graphics reference
    * @param string string to draw
    * @param x x position
    * @param y y position
    */
   void draw(final Graphics g, final String string, final int x, final int y) {
-    if(mono) {
-      final char[] chars = string.toCharArray();
-      final int len = chars.length;
-      int cx = x;
-      Font last = null;
-      for(int i = 0; i < len;) {
-        final int cp = string.codePointAt(i), w = charWidth(cp);
-        // group the base glyph with trailing combining marks, so the font can compose them
-        int end = i + Character.charCount(cp);
-        while(end < len) {
-          final int mcp = string.codePointAt(end);
-          if(!nonspacing(mcp)) break;
-          end += Character.charCount(mcp);
-        }
-        if(w > 0) {
-          final Font fnt = family(cp).font(style);
-          if(fnt != last) { g.setFont(fnt); last = fnt; }
-          g.drawChars(chars, i, end - i, cx, y);
-        }
-        cx += w;
-        i = end;
+    // a single call would lay out the characters on the device grid: they would drift
+    final char[] chars = string.toCharArray();
+    final int len = chars.length;
+    int cx = x;
+    Font last = null;
+    for(int i = 0; i < len;) {
+      final int cp = string.codePointAt(i), w = charWidth(cp);
+      // group the base glyph with trailing combining marks, so the font can compose them
+      int end = i + Character.charCount(cp);
+      while(end < len) {
+        final int mcp = string.codePointAt(end);
+        if(!nonspacing(mcp)) break;
+        end += Character.charCount(mcp);
       }
-    } else {
-      g.setFont(font(string));
-      g.drawString(string, x, y);
+      // invisible glyphs are skipped
+      if(w != 0) {
+        final Font fnt = family(cp).font(style);
+        if(fnt != last) {
+          g.setFont(fnt);
+          last = fnt;
+        }
+        g.drawChars(chars, i, end - i, cx, y);
+      }
+      cx += w;
+      i = end;
     }
   }
 
@@ -202,7 +207,14 @@ final class TextFont {
    * @return font family
    */
   private FontFamily family(final int cp) {
-    return family.font(style).canDisplay(cp) ? family : fallback(cp);
+    if(cp >= 128) return family.font(style).canDisplay(cp) ? family : fallback(cp);
+    final FontFamily[] cache = families[style];
+    FontFamily ff = cache[cp];
+    if(ff == null) {
+      ff = family.font(style).canDisplay(cp) ? family : fallback(cp);
+      cache[cp] = ff;
+    }
+    return ff;
   }
 
   /**
@@ -212,7 +224,7 @@ final class TextFont {
    */
   private FontFamily fallback(final int cp) {
     if(fallbacks.isEmpty()) {
-      final StringList fonts = mono ? MONO : VARS;
+      final StringList fonts = cell != 0 ? MONO : VARS;
       for(final String name : fonts) fallback(name);
     }
 

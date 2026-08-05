@@ -74,9 +74,9 @@ public final class DialogPackages extends BaseXDialog {
     table.add(path);
 
     // database buttons
-    installURL = new BaseXButton(this, INSTALL_FROM_URL + DOTS);
-    install = new BaseXButton(this, INSTALL + DOTS);
-    delete = new BaseXButton(this, DELETE + DOTS);
+    installURL = new BaseXButton(this, INSTALL_FROM_URL + ELLIPSIS);
+    install = new BaseXButton(this, INSTALL + ELLIPSIS);
+    delete = new BaseXButton(this, DELETE + ELLIPSIS);
 
     BaseXBack p = new BaseXBack(new BorderLayout());
     p.add(packages, BorderLayout.CENTER);

@@ -34,6 +34,8 @@ public final class CommandLockingTest extends SandboxTest {
   private static final LockList NONE = new LockList();
   /** StringList containing name. */
   private static final LockList NAME_LIST = new LockList().add(NAME);
+  /** StringList containing second name. */
+  private static final LockList NAME2_LIST = new LockList().add(NAME2);
   /** StringList containing context. */
   private static final LockList CTX_LIST = new LockList().add(Locking.CONTEXT);
   /** StringList containing name and context. */
@@ -168,6 +170,35 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new XQuery(ERROR.args(" xs:QName('foo')", "bar")), false, NONE);
     ckDBs(new XQuery(ERROR.args(" xs:QName('foo')", "bar", " <batz/>")), false, NONE);
     ckDBs(new XQuery(_RANDOM_INTEGER.args()), false, NONE);
+  }
+
+  /** Tests read and write locks of updating queries. */
+  @Test public void readWrite() {
+    // databases that are only read keep their read lock
+    ckDBs(new XQuery("for $node in " + _DB_GET.args(NAME) + " return " +
+        _DB_PUT.args(NAME2, " $node", FILE)), NAME_LIST, NAME2_LIST);
+    // copied nodes are updated, not the database
+    ckDBs(new XQuery("for $node in " + _DB_GET.args(NAME) + " return " +
+        _DB_PUT.args(NAME2, " $node update { delete node .//x }", FILE)), NAME_LIST, NAME2_LIST);
+    // target of a node update cannot be resolved statically: read locks become write locks
+    ckDBs(new XQuery("delete node " + _DB_GET.args(NAME) + "/*"), true, NAME_LIST);
+    ckDBs(new XQuery(PUT.args(_DB_GET.args(NAME), FILE)), true, NAME_LIST);
+    // read locks of databases that are not updated are promoted as well
+    ckDBs(new XQuery("let $x := " + _DB_GET.args(NAME2) + " return delete node " +
+        _DB_GET.args(NAME) + "/*[. = $x]"), true, new LockList().add(NAME).add(NAME2));
+    // updates in a modify clause do not promote read locks
+    ckDBs(new XQuery("copy $c := " + _DB_GET.args(NAME) + "/* " +
+        "modify delete node $c/x return $c"), false, NAME_LIST);
+  }
+
+  /** Tests that the first operand of a simple map is evaluated in the outer focus. */
+  @Test public void simpleMap() {
+    execute(new CreateDB(NAME));
+    try {
+      ckDBs(new XQuery("for $node in ./* return " + COUNT.args(" $node")), false, NAME_LIST);
+    } finally {
+      execute(new DropDB(NAME));
+    }
   }
 
   /** Tests user-defined functions. */

@@ -37,7 +37,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
   private static final MapType QNAME_MAP_TYPE = MapType.get(BasicType.QNAME, Types.ITEM_ZM);
 
   @Override
-  public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected XQMap item(final QueryContext qc) throws QueryException {
     final byte[] modUri = toToken(arg(0), qc);
     if(modUri.length == 0) throw MODULE_URI_EMPTY.get(info);
 
@@ -162,7 +162,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
       }
     }
 
-    final XQMap map = new XQRecordMap(Records.LOAD_XQUERY_MODULE.get(),
+    final XQMap map = new XQShapeMap(Records.LOAD_XQUERY_MODULE.get(),
         variables.map(), functions.map());
     if(modCache != null) modCache.put(cacheKey, map);
     return map;

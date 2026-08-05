@@ -136,7 +136,7 @@ public final class Condition extends Single {
     // bind variables
     bind(qc, it, ps, pr, nx);
     // evaluate as effective boolean value
-    return expr.test(qc, info, 0);
+    return expr.ebv(qc, info);
   }
 
   /**

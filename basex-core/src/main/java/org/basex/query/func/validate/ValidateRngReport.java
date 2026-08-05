@@ -1,7 +1,7 @@
 package org.basex.query.func.validate;
 
 import org.basex.query.*;
-import org.basex.query.value.*;
+import org.basex.query.value.node.*;
 
 /**
  * Function implementation.
@@ -11,7 +11,7 @@ import org.basex.query.value.*;
  */
 public final class ValidateRngReport extends ValidateRng {
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
+  public FNode value(final QueryContext qc) throws QueryException {
     return report(qc);
   }
 }

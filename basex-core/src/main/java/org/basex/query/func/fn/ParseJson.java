@@ -10,6 +10,7 @@ import org.basex.build.json.JsonParserOptions.*;
 import org.basex.io.in.*;
 import org.basex.io.parse.json.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -27,6 +28,12 @@ public abstract class ParseJson extends ParseFn {
    * @return format
    */
   protected abstract JsonFormat format();
+
+  @Override
+  protected Expr opt(final CompileContext cc) {
+    // a JSON null can be mapped to an empty sequence
+    return optFirst(false, true, null);
+  }
 
   @Override
   final QueryError error() {

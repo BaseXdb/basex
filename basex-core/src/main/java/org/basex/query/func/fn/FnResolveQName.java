@@ -19,7 +19,7 @@ import org.basex.util.*;
  */
 public final class FnResolveQName extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final byte[] value = toTokenOrNull(arg(0), qc);
     final XNode element = toElem(arg(1), qc);
     if(value == null) return Empty.VALUE;

@@ -19,7 +19,7 @@ import org.basex.query.var.*;
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
-public class FnPartialApply extends StandardFunc {
+public final class FnPartialApply extends StandardFunc {
   /** The type of parameter "arguments". */
   private static final SeqType ARGS_TYPE = MapType.get(BasicType.POSITIVE_INTEGER,
       Types.ITEM_ZM).seqType();

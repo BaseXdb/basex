@@ -5,7 +5,6 @@ import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -15,7 +14,7 @@ import org.basex.util.*;
  */
 public final class FnBaseUri extends ContextFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final XNode node = toNodeOrNull(context(qc), qc);
     if(node != null) {
       final Uri uri = node.baseURI(sc().baseURI(), false, info);

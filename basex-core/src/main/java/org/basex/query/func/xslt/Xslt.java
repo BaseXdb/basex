@@ -14,6 +14,7 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -41,6 +42,8 @@ public final class Xslt {
   public static final String PROCESSOR;
   /** Version. */
   public static final String VERSION;
+  /** Saxon s9api interface is available. */
+  public static final boolean S9API;
 
   static {
     // check for system property, create list of implementations to check
@@ -52,6 +55,7 @@ public final class Xslt {
 
     // search for implementation (custom, predefined)
     String processor = "Java", version = "1.0";
+    boolean s9api = false;
     for(final String impl : impls) {
       if(Reflect.find(impl) == null) continue;
 
@@ -69,6 +73,7 @@ public final class Xslt {
         } catch(final ReflectiveOperationException ex) {
           Util.debug(ex);
         }
+        s9api = Reflect.available("net.sf.saxon.s9api.Xslt30Transformer");
       } else {
         // unknown: assign classpath
         processor = impl;
@@ -78,6 +83,7 @@ public final class Xslt {
     }
     PROCESSOR = processor;
     VERSION = version;
+    S9API = s9api;
   }
 
   /** Private constructor. */
@@ -88,20 +94,20 @@ public final class Xslt {
    */
   public static void init() {
     CACHE.clear();
+    if(S9API) SaxonTransform.init();
   }
 
   /**
    * Returns an input reference for a node.
    * @param node node
-   * @param base base URI of the query
+   * @param uri base URI to be assigned to the serialized node
    * @param info input info (can be {@code null})
    * @return input reference
    * @throws QueryException query exception
    */
-  public static IO io(final XNode node, final Uri base, final InputInfo info)
+  public static IO io(final XNode node, final Uri uri, final InputInfo info)
       throws QueryException {
     try {
-      final Uri uri = node.baseURI(base, true, info);
       return new IOContent(node.serialize().finish(), string(uri.string()));
     } catch(final QueryIOException ex) {
       throw ex.getCause(info);
@@ -120,7 +126,7 @@ public final class Xslt {
   public static Source source(final XNode node, final Uri base, final InputInfo info)
       throws QueryException {
     if(node.kind() != Kind.DOCUMENT || Types.DOCUMENT_ELEMENT.test.matches(node))
-      return io(node, base, info).streamSource();
+      return io(node, node.baseURI(base, true, info), info).streamSource();
 
     final DOMSource source = new DOMSource(node.toJava());
     source.setSystemId(string(node.baseURI(base, true, info).string()));
@@ -157,21 +163,27 @@ public final class Xslt {
       Util.debug(ex);
       // collect transformation errors, most specific one last
       final StringList list = new StringList();
-      final Consumer<String> add = string -> {
-        final String normalized = string != null ? string.replaceAll("\\s+", " ").trim() : "";
-        if(!normalized.isEmpty()) list.addUnique(normalized);
-      };
-      for(Throwable th = ex; th != null; th = th.getCause()) add.accept(th.getMessage());
+      for(Throwable th = ex; th != null; th = th.getCause()) message(list, th.getMessage());
       try {
-        add.accept(new String(err.toArray(), Prop.CHARSET));
+        message(list, new String(err.toArray(), Prop.CHARSET));
       } catch(final Exception e) {
         Util.debug(e);
-        add.accept(e.getMessage());
+        message(list, e.getMessage());
       }
       return String.join("; ", list.reverse().finish());
     } finally {
       System.setErr(errPS);
     }
+  }
+
+  /**
+   * Adds an error message to a list.
+   * @param list message list
+   * @param message message (can be {@code null})
+   */
+  public static void message(final StringList list, final String message) {
+    final String normalized = message != null ? message.replaceAll("\\s+", " ").trim() : "";
+    if(!normalized.isEmpty()) list.addUnique(normalized);
   }
 
   /**

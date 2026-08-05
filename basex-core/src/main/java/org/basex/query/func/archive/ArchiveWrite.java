@@ -12,7 +12,6 @@ import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -22,7 +21,7 @@ import org.basex.util.*;
  */
 public final class ArchiveWrite extends ArchiveFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final Path path = toPath(arg(0), qc);
     final Map<String, Entry<Item, Item>> files = toFiles(arg(1), arg(2), qc);
     final CreateOptions options = toOptions(arg(3), new CreateOptions(), qc);

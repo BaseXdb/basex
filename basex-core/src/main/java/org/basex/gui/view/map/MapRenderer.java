@@ -101,7 +101,7 @@ final class MapRenderer {
         if(ll != 0) yy += fh;
         if(yy + fh > rect.y + rect.h) {
           // text to high, skip drawing
-          if(draw) g.drawString(Text.DOTS, xx + ll, yy);
+          if(draw) g.drawString(Text.ELLIPSIS, xx + ll, yy);
           return rect.h;
         }
 
@@ -136,7 +136,7 @@ final class MapRenderer {
         yy += fh;
         if(yy + fh > rect.y + rect.h) {
           // text to high, skip drawing
-          if(draw) g.drawString(Text.DOTS, xx + ll, yy);
+          if(draw) g.drawString(Text.ELLIPSIS, xx + ll, yy);
           return rect.h;
         }
       }

@@ -36,11 +36,11 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
 
   /**
    * Returns the element at the specified index.
-   * @param i index
+   * @param index index of the element to return
    * @return element, or {@code null} if index exceeds list size
    */
-  public final E get(final int i) {
-    return i < size ? list[i] : null;
+  public final E get(final int index) {
+    return index < size ? list[index] : null;
   }
 
   /**
@@ -116,13 +116,14 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
   }
 
   /**
-   * Sets an element at the specified index position.
-   * @param index index
-   * @param element element to be set
+   * Stores an element at the specified index.
+   * @param index index of the element to replace
+   * @param element element to be stored
    * @return self reference
    */
   @SuppressWarnings("unchecked")
   public final L set(final int index, final E element) {
+    checkIndex(index);
     E[] lst = list;
     final int s = size, ns = index + 1;
     if(ns > lst.length) {

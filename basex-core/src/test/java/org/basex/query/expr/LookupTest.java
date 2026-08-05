@@ -73,18 +73,6 @@ public final class LookupTest extends SandboxTest {
     query("array:for-each([], function($i) { string($i) })!?([])", "");
   }
 
-  /** Lookup directly following an axis step (#2591). */
-  @Test public void step() {
-    query("{ 'a': 1, 'b': 2 } ! self::jnode()?b", 2);
-    query("{ 'a': 1, 'b': 2 } ! self::jnode()?*", "1\n2");
-    query("{ 'a': { 'b': 5 } } ! self::jnode()?a?b", 5);
-    // predicate before and after the lookup
-    query("{ 'a': 1 } ! self::jnode()[1]?a", 1);
-    query("{ 'a': (1, 2, 3) } ! self::jnode()?a[. > 1]", "2\n3");
-    // one lookup per context item
-    query("({ 'k': 7 }, { 'k': 8 }) ! self::jnode()?k", "7\n8");
-  }
-
   /** Rewrite lookups to map:get/array:get unless this could suppress a strict-record error. */
   @Test public void rewrite() {
     check("({ 'a': <x/> }, { 'b': <y/> })?a", "<x/>", exists(Lookup.class), empty(_MAP_GET));
@@ -92,7 +80,7 @@ public final class LookupTest extends SandboxTest {
         exists(Lookup.class));
     check("[ <x/>, <y/> ]?(1, 2)", "<x/>\n<y/>", exists(Lookup.class));
 
-    check("({ 'a': <x/> })?a", "<x/>", exists(RecordGet.class), empty(Lookup.class));
+    check("({ 'a': <x/> })?a", "<x/>", exists(ShapeGet.class), empty(Lookup.class));
     check("({ 'a': <x/> })?b", "", empty(Lookup.class));
     check("({ 1: <x/> })?1", "<x/>", exists(_MAP_GET), empty(Lookup.class));
     check("({ 'a': <x/> })?*", "<x/>", exists(_MAP_ITEMS), empty(Lookup.class));

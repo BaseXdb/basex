@@ -23,7 +23,17 @@ public final class XQSingletonMap extends XQMap {
    * @param value value
    */
   XQSingletonMap(final Item key, final Value value) {
-    super(MapType.get(key.type, value.seqType()));
+    this(key, value, MapType.get(key.type, value.seqType()));
+  }
+
+  /**
+   * Constructor with a predefined type.
+   * @param key key
+   * @param value value
+   * @param type map type
+   */
+  private XQSingletonMap(final Item key, final Value value, final Type type) {
+    super(type);
     k = key;
     v = value;
   }
@@ -55,12 +65,23 @@ public final class XQSingletonMap extends XQMap {
 
   @Override
   public XQMap put(final Item key, final Value value) throws QueryException {
-    return key.atomicEqual(k) ? new XQSingletonMap(k, value) : empty().put(k, v).put(key, value);
+    if(key.atomicEqual(k)) return putAt(0, value);
+    if(type instanceof final ShapeType sh && key.type == BasicType.STRING) {
+      final ShapeType nsh = sh.put(key.string(null), value.seqType());
+      if(nsh != null) return new XQShapeMap(nsh, v, value);
+    }
+    return empty().put(k, v).put(key, value);
   }
 
   @Override
   public XQMap putAt(final int index, final Value value) {
-    return value != v ? new XQSingletonMap(k, value) : this;
+    if(value == v) return this;
+    // the shape is preserved (without the record annotation) if the value matches the field type
+    if(type instanceof final ShapeType sh &&
+        value.seqType().instanceOf(sh.fields().value(index + 1).seqType())) {
+      return new XQSingletonMap(k, value, sh.shape());
+    }
+    return new XQSingletonMap(k, value);
   }
 
   @Override
@@ -79,9 +100,16 @@ public final class XQSingletonMap extends XQMap {
   }
 
   @Override
+  public boolean refineType() throws QueryException {
+    if(!(type instanceof final ShapeType sh)) return super.refineType();
+    type = sh.refine(v.seqType());
+    return true;
+  }
+
+  @Override
   public Item shrink(final QueryContext qc) throws QueryException {
     v = v.shrink(qc);
-    type = MapType.get(k.type, v.seqType());
+    refineType();
     return this;
   }
 }

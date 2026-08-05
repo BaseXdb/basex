@@ -3,7 +3,6 @@ package org.basex.query.func.web;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 import org.basex.util.http.*;
 
 /**
@@ -14,7 +13,7 @@ import org.basex.util.http.*;
  */
 public final class WebContentType extends StandardFunc {
   @Override
-  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Str item(final QueryContext qc) throws QueryException {
     return Str.get(MediaType.get(toString(arg(0), qc)).toString());
   }
 }

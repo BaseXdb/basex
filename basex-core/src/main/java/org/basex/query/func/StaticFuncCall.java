@@ -93,7 +93,7 @@ public final class StaticFuncCall extends FuncCall {
         return call.func != func;
       }
       @Override
-      public boolean inlineFunc(final Scope scope) {
+      public boolean subScope(final Scope scope) {
         return scope.visit(this);
       }
       @Override
@@ -118,7 +118,7 @@ public final class StaticFuncCall extends FuncCall {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return evalFunc(func, qc);
+    return evalFunc(func, qc, tco);
   }
 
   @Override

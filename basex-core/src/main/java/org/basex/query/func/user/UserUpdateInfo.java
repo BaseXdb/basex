@@ -18,7 +18,7 @@ import org.basex.util.*;
  */
 public final class UserUpdateInfo extends UserFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final XNode node = toElem(arg(0), Q_INFO, qc, ELM_X_X_X);
     final User user = toUser(arg(1), true, qc);
 

@@ -122,7 +122,7 @@ final class TableContent extends BaseXBack {
 
       // add dots if content is too long
       for(final TokenBuilder t : tb) {
-        if(t.size() > 100) t.add(DOTS);
+        if(t.size() > 100) t.add(ELLIPSIS);
       }
 
       // draw row contents

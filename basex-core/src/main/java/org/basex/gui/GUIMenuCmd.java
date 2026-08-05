@@ -3,6 +3,7 @@ package org.basex.gui;
 import static org.basex.core.Text.*;
 
 import java.awt.*;
+import java.util.function.Supplier;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
@@ -33,7 +34,7 @@ public enum GUIMenuCmd implements GUICommand {
   /* DATABASE MENU */
 
   /** Opens a dialog to create a new database. */
-  C_CREATE(NEW + DOTS, "% N", false, false) {
+  C_CREATE(NEW + ELLIPSIS, "% N", false, false) {
     @Override
     public void execute(final GUI gui) {
       // open file chooser for XML creation
@@ -46,7 +47,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Opens a dialog to manage databases. */
-  C_OPEN_MANAGE(OPEN_MANAGE + DOTS, "% M", false, false) {
+  C_OPEN_MANAGE(OPEN_MANAGE + ELLIPSIS, "% M", false, false) {
     @Override
     public void execute(final GUI gui) {
       if(new DialogManage(gui).nodb() && BaseXDialog.confirm(gui, NEW_DB_QUESTION))
@@ -55,7 +56,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Shows database info. */
-  C_PROPERTIES(PROPERTIES + DOTS, "% shift M", true, false) {
+  C_PROPERTIES(PROPERTIES + ELLIPSIS, "% shift M", true, false) {
     @Override
     public void execute(final GUI gui) {
       new DialogProps(gui);
@@ -63,7 +64,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Exports a database. */
-  C_EXPORT(EXPORT + DOTS, null, true, false) {
+  C_EXPORT(EXPORT + ELLIPSIS, null, true, false) {
     @Override
     public void execute(final GUI gui) {
       final DialogExport dialog = new DialogExport(gui);
@@ -117,7 +118,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Opens a new file in the editor. */
-  C_EDIT_OPEN(OPEN + DOTS, "% O", false, false) {
+  C_EDIT_OPEN(OPEN + ELLIPSIS, "% O", false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.open();
@@ -125,7 +126,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Reverts the current editor file. */
-  C_EDIT_REVERT(REVERT + DOTS, null, false, false) {
+  C_EDIT_REVERT(REVERT + ELLIPSIS, null, false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.getEditor().reopen(true);
@@ -153,7 +154,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Saves the current editor file under a new name. */
-  C_EDIT_SAVE_AS(SAVE_AS + DOTS, "% shift S", false, false) {
+  C_EDIT_SAVE_AS(SAVE_AS + ELLIPSIS, "% shift S", false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.saveAs();
@@ -166,7 +167,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Saves a copy of the current editor file. */
-  C_EDIT_SAVE_COPY_AS(SAVE_COPY_AS + DOTS, null, false, false) {
+  C_EDIT_SAVE_COPY_AS(SAVE_COPY_AS + ELLIPSIS, null, false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.saveCopyAs();
@@ -226,7 +227,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Edits external variables. */
-  C_EXTERNAL_VARIABLES(EXTERNAL_VARIABLES, "% shift E", false, false) {
+  C_EXTERNAL_VARIABLES(EXTERNAL_VARIABLES + ELLIPSIS, "% shift E", false, false) {
     @Override
     public void execute(final GUI gui) {
       new DialogBindings(gui);
@@ -267,6 +268,25 @@ public enum GUIMenuCmd implements GUICommand {
     }
   },
 
+  /** Wraps long lines. */
+  C_WORD_WRAP(WORD_WRAP, null, false, true) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.gopts.invert(GUIOptions.WORDWRAP);
+      gui.notify.layout();
+    }
+
+    @Override
+    public boolean enabled(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWEDITOR);
+    }
+
+    @Override
+    public boolean selected(final GUI gui) {
+      return gui.gopts.get(GUIOptions.WORDWRAP);
+    }
+  },
+
   /** Adds or removes a comment. */
   C_COMMENT(COMMENT, "% K", false, false) {
     @Override
@@ -294,7 +314,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Sorts text. */
-  C_SORT(SORT, "% U", false, false) {
+  C_SORT(SORT + ELLIPSIS, "% U", false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.getEditor().sort();
@@ -355,6 +375,104 @@ public enum GUIMenuCmd implements GUICommand {
     @Override
     public boolean enabled(final GUI gui) {
       return gui.gopts.get(GUIOptions.SHOWEDITOR);
+    }
+  },
+
+  /** Undoes the last modification. */
+  C_UNDO(UNDO, () -> BaseXKeys.UNDOSTEP) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.getEditor().history(true);
+    }
+
+    @Override
+    public boolean enabled(final GUI gui) {
+      final EditorArea edit = editor(gui);
+      return edit != null && edit.hasHistory(true);
+    }
+  },
+
+  /** Redoes the last modification. */
+  C_REDO(REDO, () -> BaseXKeys.REDOSTEP) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.getEditor().history(false);
+    }
+
+    @Override
+    public boolean enabled(final GUI gui) {
+      final EditorArea edit = editor(gui);
+      return edit != null && edit.hasHistory(false);
+    }
+  },
+
+  /** Opens the search bar. */
+  C_FIND(FIND + ELLIPSIS, () -> BaseXKeys.FIND) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.getEditor().find();
+    }
+
+    @Override
+    public boolean enabled(final GUI gui) {
+      final EditorArea edit = editor(gui);
+      return edit != null && edit.searchable();
+    }
+  },
+
+  /** Jumps to the next search hit. */
+  C_FIND_NEXT(FIND_NEXT, () -> BaseXKeys.FINDNEXT) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.getEditor().search(true);
+    }
+
+    @Override
+    public boolean enabled(final GUI gui) {
+      final EditorArea edit = editor(gui);
+      return edit != null && edit.searchable();
+    }
+  },
+
+  /** Jumps to the previous search hit. */
+  C_FIND_PREVIOUS(FIND_PREVIOUS, () -> BaseXKeys.FINDPREV) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.getEditor().search(false);
+    }
+
+    @Override
+    public boolean enabled(final GUI gui) {
+      final EditorArea edit = editor(gui);
+      return edit != null && edit.searchable();
+    }
+  },
+
+  /** Jumps to a specific line. */
+  C_GO_TO_LINE(GO_TO_LINE + ELLIPSIS, "% L", false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.getEditor().gotoLine();
+    }
+
+    @Override
+    public boolean enabled(final GUI gui) {
+      final EditorArea edit = editor(gui);
+      return edit != null && edit.searchable();
+    }
+  },
+
+  /** Jumps to a declaration. */
+  C_DECLARATIONS(DECLARATIONS + ELLIPSIS, "% shift O", false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.getEditor().gotoDeclaration();
+    }
+
+    @Override
+    public boolean enabled(final GUI gui) {
+      final EditorArea edit = editor(gui);
+      return edit != null && edit.hasDeclarations();
     }
   },
 
@@ -425,7 +543,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Deletes the currently marked nodes. */
-  C_DELETE_NODES(DELETE + DOTS, null, true, false) {
+  C_DELETE_NODES(DELETE + ELLIPSIS, null, true, false) {
     @Override
     public void execute(final GUI gui) {
       if(!BaseXDialog.confirm(gui, DELETE_NODES)) return;
@@ -449,7 +567,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Inserts new nodes. */
-  C_NEW_NODES(NEW + DOTS, null, true, false) {
+  C_NEW_NODES(NEW + ELLIPSIS, null, true, false) {
     @Override
     public void execute(final GUI gui) {
       final DBNodes n = gui.context.marked;
@@ -478,7 +596,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Opens a dialog to edit the currently marked nodes. */
-  C_EDIT_NODES(EDIT + DOTS, null, true, false) {
+  C_EDIT_NODES(EDIT + ELLIPSIS, null, true, false) {
     @Override
     public void execute(final GUI gui) {
       final DBNodes n = gui.context.marked;
@@ -557,7 +675,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Finds files. */
-  C_FIND_CONTENTS(FIND_CONTENTS, Prop.MAC ? "% shift H" : "% H", false, false) {
+  C_FIND_CONTENTS(FIND_CONTENTS + ELLIPSIS, Prop.MAC ? "% shift H" : "% H", false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.editor.showProject();
@@ -604,7 +722,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Repository manager. */
-  C_PACKAGES(PACKAGES + DOTS, null, false, false) {
+  C_PACKAGES(PACKAGES + ELLIPSIS, null, false, false) {
     @Override
     public void execute(final GUI gui) {
       new DialogPackages(gui);
@@ -739,7 +857,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Shows used memory. */
-  C_SHOW_MEM(USED_MEM + DOTS, null, false, false) {
+  C_SHOW_MEM(USED_MEM + ELLIPSIS, null, false, false) {
     @Override
     public void execute(final GUI gui) {
       DialogMem.show(gui);
@@ -792,24 +910,8 @@ public enum GUIMenuCmd implements GUICommand {
     }
   },
 
-  /** Color schema. */
-  C_COLOR(COLORS + DOTS, null, false, false) {
-    @Override
-    public void execute(final GUI gui) {
-      DialogColors.show(gui);
-    }
-  },
-
-  /** Changes the fonts. */
-  C_FONTS(FONTS_D, null, false, false) {
-    @Override
-    public void execute(final GUI gui) {
-      DialogFonts.show(gui);
-    }
-  },
-
   /** Shows a preference dialog. */
-  C_PREFERENCES(PREFERENCES + DOTS, Prop.MAC ? null : "% shift P", false, false) {
+  C_PREFERENCES(PREFERENCES + ELLIPSIS, Prop.MAC ? null : "% shift P", false, false) {
     @Override
     public void execute(final GUI gui) {
       DialogPrefs.show(gui);
@@ -843,7 +945,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Shows the "about" information. */
-  C_ABOUT(ABOUT + DOTS, null, false, false) {
+  C_ABOUT(ABOUT + ELLIPSIS, null, false, false) {
     @Override
     public void execute(final GUI gui) {
       DialogAbout.show(gui);
@@ -942,8 +1044,10 @@ public enum GUIMenuCmd implements GUICommand {
   private final boolean data;
   /** Indicates if this command has two states. */
   private final boolean toggle;
-  /** Shortcut. */
+  /** Shortcut (can be {@code null}). */
   private final String shortcut;
+  /** Supplier of a shortcut, resolved after class initialization (can be {@code null}). */
+  private final Supplier<BaseXKeys> textKey;
 
   /**
    * Constructor.
@@ -958,6 +1062,21 @@ public enum GUIMenuCmd implements GUICommand {
     this.data = data;
     this.toggle = toggle;
     shortcut = BaseXLayout.addShortcut(label, key);
+    textKey = null;
+  }
+
+  /**
+   * Constructor for commands that share their shortcut with the text panel.
+   * @param label label of the menu item
+   * @param key supplier of the shortcut
+   */
+  GUIMenuCmd(final String label, final Supplier<BaseXKeys> key) {
+    this.label = label;
+    textKey = key;
+    this.key = null;
+    data = false;
+    toggle = false;
+    shortcut = null;
   }
 
   @Override
@@ -977,12 +1096,25 @@ public enum GUIMenuCmd implements GUICommand {
   public final boolean toggle() { return toggle; }
 
   @Override
-  public String shortCut() { return shortcut; }
+  public String shortCut() {
+    return textKey == null ? shortcut : BaseXLayout.addShortcut(label, textKey.get());
+  }
 
   @Override
-  public Object shortcuts() { return key; }
+  public Object shortcuts() {
+    return textKey == null ? key : new BaseXKeys[] { textKey.get() };
+  }
 
   // STATIC METHODS ===============================================================================
+
+  /**
+   * Returns the currently opened editor.
+   * @param gui reference to the main window
+   * @return editor (can be {@code null})
+   */
+  private static EditorArea editor(final GUI gui) {
+    return gui.gopts.get(GUIOptions.SHOWEDITOR) ? gui.editor.getEditor() : null;
+  }
 
   /**
    * Checks if data can be updated.

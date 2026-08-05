@@ -9,7 +9,6 @@ import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -19,7 +18,7 @@ import org.basex.util.*;
  */
 public final class FnCompare extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final Item value1 = arg(0).atomItem(qc, info);
     final Item value2 = arg(1).atomItem(qc, info);
     final Collation collation = toCollation(arg(2), qc);

@@ -90,6 +90,12 @@ abstract class SyntaxMarkup extends Syntax {
   }
 
   @Override
+  boolean completeStart(final int ch) {
+    // an angle bracket introduces the name of a tag
+    return ch == '<';
+  }
+
+  @Override
   Color color(final int mode) {
     return switch(mode) {
       case ATTR_D, ATTR_S -> brown;

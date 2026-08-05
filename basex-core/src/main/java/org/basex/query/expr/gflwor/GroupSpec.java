@@ -43,7 +43,7 @@ public final class GroupSpec extends Single {
   }
 
   @Override
-  public Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item atomItem(final QueryContext qc) throws QueryException {
     return expr.atomItem(qc, info);
   }
 

@@ -45,7 +45,7 @@ public final class BaseXPragma extends Pragma {
 
   @Override
   public void accept(final ASTVisitor visitor) {
-    visitor.lock(() -> {
+    visitor.queryLock(() -> {
       final ArrayList<String> list = new ArrayList<>(1);
       if(name.eq(Annotation._BASEX_LOCK.name)) {
         Collections.addAll(list, Locking.queryLocks(value));

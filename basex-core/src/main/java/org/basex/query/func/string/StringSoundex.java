@@ -2,7 +2,6 @@ package org.basex.query.func.string;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 import org.basex.util.similarity.*;
 
 /**
@@ -13,7 +12,7 @@ import org.basex.util.similarity.*;
  */
 public final class StringSoundex extends StringFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Str item(final QueryContext qc) throws QueryException {
     return str(Soundex.encode(toToken(arg(0), qc)));
   }
 }

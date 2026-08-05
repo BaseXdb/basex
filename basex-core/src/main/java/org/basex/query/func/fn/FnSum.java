@@ -27,7 +27,7 @@ import org.basex.util.*;
  */
 public class FnSum extends NumericFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final Item item = sum(false, qc);
     return item != null ? item : defined(1) ? arg(1).atomItem(qc, info) : Itr.ZERO;
   }

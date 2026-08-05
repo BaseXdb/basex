@@ -155,13 +155,12 @@ public final class Pos extends Single {
   }
 
   @Override
-  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(test(qc, ii, 0));
+  protected Bln item(final QueryContext qc) throws QueryException {
+    return Bln.get(ebv(qc));
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
-      throws QueryException {
+  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
     ctxValue(qc);
 
     final Value value = expr.value(qc);

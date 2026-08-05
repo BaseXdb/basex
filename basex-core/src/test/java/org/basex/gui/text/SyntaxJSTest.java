@@ -65,7 +65,7 @@ public final class SyntaxJSTest {
    * @param expected expected legend
    */
   private static void check(final String js, final String expected) {
-    final TextEditor editor = new TextEditor(null);
+    final TextEditor editor = new TextEditor(EditorOptions.DEFAULTS);
     editor.text(Token.token(js));
     final TextIterator iter = new TextIterator(editor);
     final Syntax syntax = new SyntaxJS();

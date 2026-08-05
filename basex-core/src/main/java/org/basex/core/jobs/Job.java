@@ -224,6 +224,24 @@ public abstract class Job {
   }
 
   /**
+   * Returns true if this job returns a progress value.
+   * This method is only required by the GUI.
+   * @return result of check
+   */
+  public boolean supportsProg() {
+    return false;
+  }
+
+  /**
+   * Returns true if this job can be stopped.
+   * This method is only required by the GUI.
+   * @return result of check
+   */
+  public boolean stoppable() {
+    return false;
+  }
+
+  /**
    * Recursively assigns the specified job context.
    * @param ctx job context
    */

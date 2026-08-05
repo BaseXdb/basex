@@ -34,7 +34,7 @@ abstract class ArrayFn extends StandardFunc {
    * @param expr expression
    * @return array size
    */
-  final long arraySize(final Expr expr) {
+  static long arraySize(final Expr expr) {
     return arraySize(expr, 0);
   }
 
@@ -44,7 +44,7 @@ abstract class ArrayFn extends StandardFunc {
    * @param offset offset to add (can be negative)
    * @return resulting array size
    */
-  final long arraySize(final Expr expr, final int offset) {
+  static long arraySize(final Expr expr, final int offset) {
     long size = -1;
     if(expr.seqType().instanceOf(Types.ARRAY_O)) size = expr.structSize();
     return size == -1 ? -1 : size + offset;

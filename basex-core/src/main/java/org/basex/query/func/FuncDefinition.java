@@ -43,7 +43,7 @@ public final class FuncDefinition {
    * Constructs a function signature.
    * @param supplier function implementation constructor
    * @param string descriptive function string, containing the function name and its arguments
-   *   in parentheses. Optional arguments are represented in nested square brackets; three dots
+   *   in parentheses. Optional arguments are suffixed with a question mark; three dots
    *   indicate that the number of arguments of a function is not limited
    * @param types parameter types
    * @param seqType return type
@@ -61,18 +61,37 @@ public final class FuncDefinition {
     this.flags = flags;
     this.perm = perm;
 
-    final int s = string.indexOf('(');
-    name = new QNm(NSGlobal.prefix(uri), Token.token(string.substring(0, s)), uri);
-    paramString = string.substring(s + 1).replace(")", "");
+    name = name(string, uri);
+    paramString = paramString(string);
     minMax = minMax(paramString);
 
-    final String[] prms = Strings.split(paramString.replaceAll("[.\\[\\]]", ""), ',');
-    final int pl = prms.length == 1 && prms[0].isEmpty() ? 0 : prms.length;
+    final String[] prms = split(paramString);
+    final int pl = prms.length;
     params = new QNm[pl];
-    for(int p = 0; p < pl; p++) params[p] = new QNm(prms[p]);
+    for(int p = 0; p < pl; p++) params[p] = new QNm(prms[p].replaceAll("(\\?|\\.\\.\\.)$", ""));
 
     // treat updating expressions as nondeterministic
     if(flags.contains(Flag.UPD)) flags.add(Flag.NDT);
+  }
+
+  /**
+   * Extracts the function name from a description string.
+   * @param string description string
+   * @param uri URI
+   * @return function name
+   */
+  public static QNm name(final String string, final byte[] uri) {
+    final String local = string.substring(0, string.indexOf('('));
+    return new QNm(NSGlobal.prefix(uri), Token.token(local), uri);
+  }
+
+  /**
+   * Extracts the parameter string from a description string.
+   * @param string description string
+   * @return parameter string
+   */
+  public static String paramString(final String string) {
+    return string.substring(string.indexOf('(') + 1).replace(")", "");
   }
 
   /**
@@ -81,32 +100,26 @@ public final class FuncDefinition {
    * @return min/max values
    */
   public static int[] minMax(final String paramString) {
-    boolean optional = false;
-    int min = 0, max = -1;
-    for(int d = 0; d < paramString.length(); d++) {
-      final char ch = paramString.charAt(d);
-      if(ch == ',') {
-        if(optional) {
-          max++;
-        } else {
-          min++;
-        }
-        d++;
-      } else if(ch == '[') {
-        optional = true;
-        max = min;
-      } else if(ch == '.') {
-        if(!optional) min -= 1;
-        max = Integer.MAX_VALUE;
-        break;
-      } else if(optional) {
-        if(max == min) max++;
-      } else if(min == 0) {
-        min = 1;
-      }
+    int min = 0, max = 0;
+    for(final String param : split(paramString)) {
+      if(param.endsWith("...")) return new int[] { min, Integer.MAX_VALUE };
+      if(!param.endsWith("?")) min++;
+      max++;
     }
-    if(max == -1) max = min;
     return new int[] { min, max };
+  }
+
+  /**
+   * Splits a parameter string into its single parameters.
+   * @param paramString parameter string
+   * @return parameters, including their optional and variadic markers
+   */
+  private static String[] split(final String paramString) {
+    if(paramString.isBlank()) return new String[0];
+    final String[] prms = Strings.split(paramString, ',');
+    final int pl = prms.length;
+    for(int p = 0; p < pl; p++) prms[p] = prms[p].trim();
+    return prms;
   }
 
   /**
@@ -150,6 +163,14 @@ public final class FuncDefinition {
       }
     }
     return qnames;
+  }
+
+  /**
+   * Returns the descriptive parameter string.
+   * @return parameter string
+   */
+  public String paramString() {
+    return paramString;
   }
 
   /**

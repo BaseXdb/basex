@@ -3,7 +3,6 @@ package org.basex.query.func.array;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.fn.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
@@ -15,16 +14,20 @@ import org.basex.query.value.type.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class ArraySortBy extends FnSortBy {
+public class ArraySortBy extends SortFn {
   @Override
-  public final Iter iter(final QueryContext qc) throws QueryException {
-    // overwrite implementation of superclass
-    return value(qc).iter();
+  protected XQArray item(final QueryContext qc) throws QueryException {
+    return sort(toArray(arg(0), qc), qc);
   }
 
-  @Override
-  public final Value value(final QueryContext qc) throws QueryException {
-    final XQArray array = toArray(arg(0), qc);
+  /**
+   * Sorts the members of an array.
+   * @param array array to be sorted
+   * @param qc query context
+   * @return sorted array
+   * @throws QueryException query exception
+   */
+  final XQArray sort(final XQArray array, final QueryContext qc) throws QueryException {
     final long as = array.structSize();
     if(as == 0) return array;
 
@@ -50,7 +53,6 @@ public class ArraySortBy extends FnSortBy {
 
   @Override
   public long structSize() {
-    final Expr expr1 = arg(0);
-    return expr1.seqType().instanceOf(Types.ARRAY_O) ? expr1.structSize() : -1;
+    return ArrayFn.arraySize(arg(0));
   }
 }

@@ -2,7 +2,6 @@ package org.basex.query.func.ws;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -12,7 +11,7 @@ import org.basex.util.*;
  */
 public final class WsId extends WsFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Str item(final QueryContext qc) throws QueryException {
     return Str.get(ws(qc).id);
   }
 }

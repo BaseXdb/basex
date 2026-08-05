@@ -35,6 +35,13 @@ abstract class Update extends Arr {
     return Flag.UPD.oneOf(flags) || Flag.NDT.oneOf(flags) || super.has(flags);
   }
 
+  @Override
+  public final boolean accept(final ASTVisitor visitor) {
+    // target database is supplied by a node and cannot be resolved statically
+    visitor.unresolvedTarget();
+    return super.accept(visitor);
+  }
+
   /**
    * Checks for namespace conflicts in attributes.
    * @param list node list

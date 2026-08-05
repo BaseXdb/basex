@@ -178,24 +178,6 @@ public abstract class Command extends Job {
   }
 
   /**
-   * Returns true if this command returns a progress value.
-   * This method is only required by the GUI.
-   * @return result of check
-   */
-  public boolean supportsProg() {
-    return false;
-  }
-
-  /**
-   * Returns true if this command can be stopped.
-   * This method is only required by the GUI.
-   * @return result of check
-   */
-  public boolean stoppable() {
-    return false;
-  }
-
-  /**
    * Initializes the command execution.
    * @param ctx database context
    * @param os output stream

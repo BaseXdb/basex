@@ -17,6 +17,8 @@ final class TextLineCache {
   private final IntList ys = new IntList();
   /** Text position at each line start. */
   private final IntList ps = new IntList();
+  /** Pixel width of each line (of its last row if the text is wrapped). */
+  private final IntList ws = new IntList();
   /** Highlighter state at each line start. */
   private final ArrayList<int[]> states = new ArrayList<>();
   /** Text the cache was built for (staleness guard and edit-diff reference). */
@@ -27,11 +29,15 @@ final class TextLineCache {
   private int offset = -1;
   /** Document-space y after the last line (total text height). */
   private int endY;
+  /** Pixel width of the widest line (total text width). */
+  private int maxWidth;
 
   /** Snapshot of the reusable tail during an incremental update: y at each line. */
   private int[] tailY;
   /** Snapshot of the reusable tail: text position at each line. */
   private int[] tailPos;
+  /** Snapshot of the reusable tail: pixel width of each line. */
+  private int[] tailWidth;
   /** Snapshot of the reusable tail: highlighter state at each line. */
   private int[][] tailState;
   /** Text-position delta between old and new text (new minus old). */
@@ -45,6 +51,7 @@ final class TextLineCache {
   void reset() {
     ys.reset();
     ps.reset();
+    ws.reset();
     states.clear();
     text = null;
   }
@@ -58,7 +65,16 @@ final class TextLineCache {
   void add(final int y, final int p, final int[] state) {
     ys.add(y);
     ps.add(p);
+    ws.add(0);
     states.add(state);
+  }
+
+  /**
+   * Assigns the pixel width of the last added line.
+   * @param w width
+   */
+  void lineWidth(final int w) {
+    ws.set(ws.size() - 1, w);
   }
 
   /**
@@ -75,7 +91,11 @@ final class TextLineCache {
     endY = ey;
     tailY = null;
     tailPos = null;
+    tailWidth = null;
     tailState = null;
+    // the widest line can only be found by revisiting all of them: an edit may have shortened it
+    maxWidth = 0;
+    for(int i = ws.size() - 1; i >= 0; i--) maxWidth = Math.max(maxWidth, ws.get(i));
   }
 
   /**
@@ -125,6 +145,14 @@ final class TextLineCache {
   }
 
   /**
+   * Returns the total text width (pixel width of the widest line).
+   * @return width
+   */
+  int maxWidth() {
+    return maxWidth;
+  }
+
+  /**
    * Returns the index of the last line starting at or above the specified document-space y.
    * @param y document-space y
    * @return line index
@@ -158,6 +186,15 @@ final class TextLineCache {
    */
   int pos(final int idx) {
     return ps.get(idx);
+  }
+
+  /**
+   * Returns the pixel width at the specified line index.
+   * @param idx line index
+   * @return width
+   */
+  int width(final int idx) {
+    return ws.get(idx);
   }
 
   /**
@@ -203,14 +240,17 @@ final class TextLineCache {
     final int sz = ps.size(), tl = sz - r0;
     tailY = new int[tl];
     tailPos = new int[tl];
+    tailWidth = new int[tl];
     tailState = new int[tl][];
     for(int i = 0; i < tl; i++) {
       tailY[i] = ys.get(r0 + i);
       tailPos[i] = ps.get(r0 + i);
+      tailWidth[i] = ws.get(r0 + i);
       tailState[i] = states.get(r0 + i);
     }
     ys.size(r0);
     ps.size(r0);
+    ws.size(r0);
     states.subList(r0, sz).clear();
     return r0;
   }
@@ -266,6 +306,7 @@ final class TextLineCache {
     for(int i = j, tl = tailPos.length; i < tl; i++) {
       ys.add(tailY[i] + dy);
       ps.add(tailPos[i] + delta);
+      ws.add(tailWidth[i]);
       states.add(tailState[i]);
     }
     endY += dy;

@@ -137,7 +137,7 @@ public class MainModule extends AModule {
       }
 
       @Override
-      public boolean inlineFunc(final Scope scope) {
+      public boolean subScope(final Scope scope) {
         if(visited.add(scope)) scope.visit(this);
         return true;
       }

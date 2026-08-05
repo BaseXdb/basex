@@ -481,9 +481,10 @@ public final class XQuery4Test extends SandboxTest {
     query("declare function local:f($a) {"
         + "  try { 1 div 0 } catch * { if($a > 0) then local:f($a - 1) else $a } "
         + "}; local:f(10000)", 0);
+    // calls in a try clause are no tail calls: the stack overflow is caught
     query("declare function local:f($a) {"
         + "  try { if($a > 0) then local:f($a - 1) else $a } catch * { 1 } "
-        + "}; local:f(10000)", 0);
+        + "}; local:f(10000)", 1);
     query("declare function local:f($a) {"
         + "  try { 0 } catch * { 1 } "
         + "}; local:f(10000)", 0);
@@ -730,7 +731,7 @@ public final class XQuery4Test extends SandboxTest {
         "{0:0,1:1,2:2,3:3,4:4,5:5,6:6}", root(CMap.class));
     check("{ (1 to 6) ! { .: . } }", "{1:1,2:2,3:3,4:4,5:5,6:6}", root(CMap.class));
 
-    check("{ 'one': 1, { 'two': 2 } }", "{\"one\":1,\"two\":2}", root(XQRecordMap.class));
+    check("{ 'one': 1, { 'two': 2 } }", "{\"one\":1,\"two\":2}", root(XQShapeMap.class));
     check("{ 'one': 1, { 2: 'two' } }", "{\"one\":1,2:\"two\"}", root(XQItemValueMap.class));
 
     check("{ 0: <a/>, 1: <b/> } => map:size()", 2, root(Itr.class));

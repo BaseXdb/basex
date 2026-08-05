@@ -69,8 +69,7 @@ public final class IterPath extends AxisPath {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
-      throws QueryException {
+  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
     return iterator(qc).next() != null;
   }
 

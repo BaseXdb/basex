@@ -47,6 +47,14 @@ abstract class DateTimeFn extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    return optFirst();
+    return optFirst(!mayBeEmpty(), true, null);
+  }
+
+  /**
+   * Indicates if an empty sequence can be returned for a non-empty argument.
+   * @return result of check
+   */
+  protected boolean mayBeEmpty() {
+    return false;
   }
 }

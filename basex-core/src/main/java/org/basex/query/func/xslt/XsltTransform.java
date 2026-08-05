@@ -14,7 +14,6 @@ import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 import org.basex.util.options.*;
 
 /**
@@ -32,7 +31,7 @@ public class XsltTransform extends StandardFunc {
   }
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final XsltResult result = new XsltResult(EMPTY, qc.context.options);
     transform(result, null, qc);
     return result.node();
@@ -85,7 +84,8 @@ public class XsltTransform extends StandardFunc {
    */
   private IO read(final Expr expr, final QueryContext qc) throws QueryException {
     final Item item = toNodeOrAtomItem(expr, false, qc);
-    return item instanceof final XNode node ? Xslt.io(node, sc().baseURI(), info) : io(item);
+    return item instanceof final XNode node ?
+      Xslt.io(node, node.baseURI(sc().baseURI(), true, info), info) : io(item);
   }
 
   /**

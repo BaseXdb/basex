@@ -6,7 +6,6 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -16,14 +15,14 @@ import org.basex.util.*;
  */
 public final class FnLast extends StandardFunc {
   @Override
-  public Itr item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Itr item(final QueryContext qc) throws QueryException {
     ctxValue(qc);
     return Itr.get(qc.focus.size);
   }
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return visitor.lock(Locking.CONTEXT) && super.accept(visitor);
+    return visitor.lock(Locking.CONTEXT, false) && super.accept(visitor);
   }
 
   @Override

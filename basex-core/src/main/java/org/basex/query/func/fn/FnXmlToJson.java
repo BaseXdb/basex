@@ -11,7 +11,6 @@ import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 import org.basex.util.options.Options.*;
 
 /**
@@ -22,7 +21,7 @@ import org.basex.util.options.Options.*;
  */
 public final class FnXmlToJson extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final XNode node = toNodeOrNull(arg(0), qc);
     final JsonSerialOptions options = toOptions(arg(1), new JsonSerialOptions(), qc);
     if(node == null) return Empty.VALUE;

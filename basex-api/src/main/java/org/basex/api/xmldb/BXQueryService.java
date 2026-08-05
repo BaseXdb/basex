@@ -127,7 +127,7 @@ public final class BXQueryService implements XPathQueryService {
         qp.sc.ns.add(token(entry.getKey()), token(entry.getValue()), null);
       }
       // perform query and return result
-      qp.parse();
+      qp.compile();
       qp.register(ctx);
       try {
         return new BXResourceSet(qp.value(), coll);

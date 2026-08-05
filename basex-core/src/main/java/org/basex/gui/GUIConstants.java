@@ -99,7 +99,8 @@ public final class GUIConstants {
 
   /** Top menu entries. */
   static final String[] MENUBAR = {
-    Text.DATABASE, Text.EDITOR, Text.VIEW, Text.VISUALIZATION, Text.OPTIONS, Text.HELP
+    Text.DATABASE, Text.FILE, Text.EDIT, Text.SEARCH, Text.QUERY, Text.VIEW,
+    Text.VISUALIZATION, Text.HELP
   };
 
   /**
@@ -107,25 +108,30 @@ public final class GUIConstants {
    * {@link GUIPopupCmd#SEPARATOR} references serve as menu separators.
    */
   static final GUICommand[][] MENUITEMS = { {
-    C_CREATE, C_OPEN_MANAGE, SEPARATOR, C_PROPERTIES, C_EXPORT, C_CLOSE,
+    C_CREATE, C_OPEN_MANAGE, C_PROPERTIES, C_EXPORT, C_CLOSE, SEPARATOR,
+    Prop.MAC ? null : C_PREFERENCES, C_PACKAGES,
     Prop.MAC ? null : SEPARATOR, Prop.MAC ? null : C_EXIT
   }, {
     C_EDIT_NEW, C_EDIT_OPEN, C_EDIT_REVERT, C_EDIT_SAVE, C_EDIT_SAVE_AS, C_EDIT_SAVE_COPY_AS,
-    C_EDIT_CLOSE, C_EDIT_CLOSE_ALL, SEPARATOR,
-    C_GO, C_STOP, C_INDENT_RESULT, C_EXTERNAL_VARIABLES, SEPARATOR,
-    C_FORMAT, C_COMMENT, C_SORT, SEPARATOR,
-    C_LOWER_CASE, C_UPPER_CASE, C_TITLE_CASE, SEPARATOR,
-    C_JUMP_TO_BRACKET, C_JUMP_TO_FILE, C_NEXT_ERROR
+    C_EDIT_CLOSE, C_EDIT_CLOSE_ALL
   }, {
-    C_SHOW_EDITOR, C_SHOW_PROJECT, C_FIND_CONTENTS, SEPARATOR,
-    C_SHOW_RESULT, C_SHOW_INFO, SEPARATOR,
+    C_UNDO, C_REDO, SEPARATOR,
+    C_FORMAT, C_COMMENT, C_SORT, SEPARATOR,
+    C_LOWER_CASE, C_UPPER_CASE, C_TITLE_CASE
+  }, {
+    C_FIND, C_FIND_NEXT, C_FIND_PREVIOUS, C_FIND_CONTENTS, SEPARATOR,
+    C_GO_TO_LINE, C_DECLARATIONS, SEPARATOR,
+    C_NEXT_ERROR, C_JUMP_TO_BRACKET, C_JUMP_TO_FILE
+  }, {
+    C_GO, C_STOP, C_EXTERNAL_VARIABLES, SEPARATOR,
+    C_RT_EXECUTION, C_RT_FILTERING
+  }, {
+    C_SHOW_EDITOR, C_WORD_WRAP, C_SHOW_PROJECT, SEPARATOR,
+    C_SHOW_RESULT, C_INDENT_RESULT, C_SHOW_INFO, SEPARATOR,
     C_SHOW_BUTTONS, C_SHOW_INPUT_BAR
   }, {
-    C_SHOW_MAP, C_SHOW_TREE, C_SHOW_FOLDER, C_SHOW_PLOT, C_SHOW_TABLE, C_SHOW_EXPLORE,
-  }, {
-    C_RT_EXECUTION, C_RT_FILTERING, SEPARATOR,
-    C_PACKAGES, Prop.MAC ? null : SEPARATOR,
-    C_COLOR, C_FONTS, Prop.MAC ? null : C_PREFERENCES
+    C_SHOW_MAP, C_SHOW_TREE, C_SHOW_FOLDER, C_SHOW_PLOT, C_SHOW_TABLE, C_SHOW_EXPLORE, SEPARATOR,
+    C_GO_HOME, C_GO_BACK, C_GO_UP, C_GO_FORWARD, SEPARATOR, C_FILTER_NODES
   }, {
     C_HELP, SEPARATOR, C_COMMUNITY, C_CHECK_FOR_UPDATES, SEPARATOR,
     C_SHOW_MEM, Prop.MAC ? null : C_ABOUT
@@ -273,6 +279,8 @@ public final class GUIConstants {
   public static Font dmfont;
   /** Current font size. */
   public static int fontSize;
+  /** Font size of the popups of the text editor. */
+  public static int popupFontSize;
 
   /** Names of available fonts. */
   private static String[] fonts;
@@ -394,14 +402,15 @@ public final class GUIConstants {
 
     final Color col = COLORS[16];
     color1A = color(darker(r, 110), darker(g, 150), darker(b, 160), 100);
-    color2A = color(col.getRed(), col.getGreen(), col.getBlue(), 50);
-    color3A = color(col.getRed(), col.getGreen(), col.getBlue(), 30);
+    color2A = alpha(col, 50);
+    color3A = alpha(col, 15);
     colormark1A = color(darker(r, 32), darker(g, 160), darker(b, 320), 100);
     colormark2A = color(darker(r, 12), darker(g, 60), darker(b, 120), 100);
 
     final String name = opts.get(GUIOptions.FONT);
 
     fontSize = opts.get(GUIOptions.FONTSIZE);
+    popupFontSize = Math.max(1, fontSize * 4 / 5);
     font  = new Font(name, Font.PLAIN, fontSize);
     mfont = new Font(opts.get(GUIOptions.MONOFONT), Font.PLAIN, fontSize);
     bfont = new Font(name, Font.BOLD, fontSize);
@@ -451,10 +460,23 @@ public final class GUIConstants {
    */
   private static Color color(final int r, final int g, final int b, final int a) {
     if(dark) {
-      final double l = .2126 * r + .7152 * g + .0722 * b, m = (255 - l) / l;
+      final double l = .2126 * r + .7152 * g + .0722 * b;
+      if(l == 0) return new Color(255, 255, 255, a);
+      final double m = (255 - l) / l;
       return new Color((int) Math.min(255, r * m), (int) Math.min(255, g * m),
           (int) Math.min(255, b * m), a);
     }
     return new Color(r, g, b, a);
+  }
+
+  /**
+   * Assigns an alpha value to an existing color, doubled for dark color modes.
+   * @param color color
+   * @param a alpha component
+   * @return converted color
+   */
+  private static Color alpha(final Color color, final int a) {
+    return new Color(color.getRed(), color.getGreen(), color.getBlue(),
+        dark ? Math.min(255, a << 1) : a);
   }
 }

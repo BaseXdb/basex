@@ -490,6 +490,36 @@ public abstract class Sandbox {
   }
 
   /**
+   * Returns a test to check the field names of an expression.
+   * @param name name of expression
+   * @param shape comma-separated field names
+   * @return test string
+   */
+  protected static String shape(final String name, final String shape) {
+    return "string(//" + name + "/@shape) = '" + shape + "'";
+  }
+
+  /**
+   * Returns a test to check the field names of an expression.
+   * @param clazz expression class
+   * @param shape comma-separated field names
+   * @return test string
+   */
+  protected static String shape(final Class<?> clazz, final String shape) {
+    return shape(Util.className(clazz), shape);
+  }
+
+  /**
+   * Returns a test to check the field names of a function.
+   * @param func function
+   * @param shape comma-separated field names
+   * @return test string
+   */
+  protected static String shape(final Function func, final String shape) {
+    return shape(func.className(), shape);
+  }
+
+  /**
    * Writes a test file.
    * @param file file
    * @param data data to write

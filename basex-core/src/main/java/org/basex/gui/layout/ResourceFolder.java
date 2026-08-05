@@ -58,7 +58,7 @@ public class ResourceFolder extends ResourceNode {
     cmax = addLeaves(EMPTY, cmax, this);
     // add dummy node if not all nodes are displayed
     if(cmax <= 0) {
-      add(new ResourceLeaf(token(Text.DOTS), sub, ResourceType.XML, true, tree, data));
+      add(new ResourceLeaf(token(Text.ELLIPSIS), sub, ResourceType.XML, true, tree, data));
     }
 
     loaded = true;

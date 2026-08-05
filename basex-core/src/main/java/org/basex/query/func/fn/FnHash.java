@@ -23,7 +23,7 @@ import org.basex.util.*;
  */
 public final class FnHash extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final Item value = arg(0).atomItem(qc, info);
     final String algorithm = toStringOrNull(arg(1), qc);
     return value.isEmpty() ? Empty.VALUE : new Hex(hash(value, algorithm, qc));

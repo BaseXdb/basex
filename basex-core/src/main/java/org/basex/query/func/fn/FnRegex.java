@@ -9,7 +9,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -19,7 +18,7 @@ import org.basex.util.*;
  */
 public final class FnRegex extends RegExFn {
   @Override
-  public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected XQMap item(final QueryContext qc) throws QueryException {
     final byte[] pattern = toToken(arg(0), qc);
     final byte[] flags = toZeroToken(arg(1), qc);
 
@@ -27,7 +26,7 @@ public final class FnRegex extends RegExFn {
     regExpr(pattern, flags, qc);
     final Str pttrn = Str.get(pattern);
     final Str flgs = Str.get(flags);
-    return new XQRecordMap(Records.COMPILED_REGEX.get(), pttrn, flgs,
+    return new XQShapeMap(Records.COMPILED_REGEX.get(), pttrn, flgs,
         valueFunc(MATCHES, qc, pttrn, flgs),
         valueFunc(TOKENIZE, qc, pttrn, flgs),
         valueReplacementFunc(qc, pttrn, flgs),

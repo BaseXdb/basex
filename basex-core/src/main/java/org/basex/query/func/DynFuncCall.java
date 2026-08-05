@@ -148,7 +148,7 @@ public final class DynFuncCall extends FuncCall {
         return !func.ndt();
       }
       @Override
-      public boolean inlineFunc(final Scope scope) {
+      public boolean subScope(final Scope scope) {
         return !(scope instanceof final Closure cl && cl.has(Flag.NDT));
       }
     });
@@ -189,26 +189,28 @@ public final class DynFuncCall extends FuncCall {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return body() instanceof final FItem func ? eval(func, qc) : iterate(qc).value(qc, this);
+    return body() instanceof final FItem func ? eval(func, qc, tco) : iterate(qc).value(qc, this);
   }
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return body() instanceof final FItem func ? eval(func, qc).iter() : iterate(qc);
+    return body() instanceof final FItem func ? eval(func, qc, tco).iter() : iterate(qc);
   }
 
   /**
    * Evaluates a single function item.
    * @param func function item
    * @param qc query context
+   * @param tail eliminate tail call
    * @return value
    * @throws QueryException query exception
    */
-  private Value eval(final FItem func, final QueryContext qc) throws QueryException {
+  private Value eval(final FItem func, final QueryContext qc, final boolean tail)
+      throws QueryException {
     checkUp(func, updating);
     final int nargs = exprs.length - 1, arity = func.arity();
     if(nargs != arity) throw arityError(func, nargs, arity, false, info);
-    return evalFunc(func, qc);
+    return evalFunc(func, qc, tail);
   }
 
   /**
@@ -220,16 +222,24 @@ public final class DynFuncCall extends FuncCall {
   private Iter iterate(final QueryContext qc) throws QueryException {
     return new Iter() {
       final Iter iter = body().unwrappedIter(qc);
+      Item next = iter.next();
+      boolean first = true;
       Iter value;
 
       @Override
       public Item next() throws QueryException {
         while(true) {
           if(value == null) {
-            final Item item = iter.next();
+            final Item item = next;
             if(item == null) return null;
-            if(item instanceof final FItem fi) value = eval(fi, qc).iter();
-            else throw INVFUNCITEM_X_X.get(info, item.seqType(), item);
+            if(item instanceof final FItem fi) {
+              // a tail call discards all other results: eliminate it for a single function item
+              next = iter.next();
+              value = eval(fi, qc, tco && first && next == null).iter();
+              first = false;
+            } else {
+              throw INVFUNCITEM_X_X.get(info, item.seqType(), item);
+            }
           }
           final Item item = value.next();
           if(item != null) return item;

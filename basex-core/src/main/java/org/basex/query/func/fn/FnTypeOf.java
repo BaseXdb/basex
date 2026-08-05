@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
  */
 public final class FnTypeOf extends ContextFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Str item(final QueryContext qc) throws QueryException {
     final Value value = arg(0).value(qc);
     return Str.get(toString(value));
   }

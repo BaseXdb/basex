@@ -8,8 +8,9 @@ import javax.swing.*;
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
+ * @param <A> argument type
  */
-public abstract class GUICode {
+public abstract class GUICode<A> {
   /** Counter. */
   private int counter;
 
@@ -17,7 +18,7 @@ public abstract class GUICode {
    * Code to be run.
    * @param arg argument (can be {@code null})
    */
-  public abstract void execute(Object arg);
+  public abstract void execute(A arg);
 
   /**
    * Invokes the specified thread after all other threads.
@@ -30,7 +31,7 @@ public abstract class GUICode {
    * Invokes the specified thread after all other threads.
    * @param arg optional argument
    */
-  public final void invokeLater(final Object arg) {
+  public final void invokeLater(final A arg) {
     final int c = ++counter;
     SwingUtilities.invokeLater(() -> {
       if(c == counter) execute(arg);

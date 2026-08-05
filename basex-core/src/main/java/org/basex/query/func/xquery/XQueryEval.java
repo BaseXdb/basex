@@ -163,6 +163,6 @@ public class XQueryEval extends StandardFunc {
   @Override
   public final boolean accept(final ASTVisitor visitor) {
     // locked resources cannot be detected statically
-    return visitor.lock((String) null) && super.accept(visitor);
+    return visitor.lock((String) null, false) && super.accept(visitor);
   }
 }

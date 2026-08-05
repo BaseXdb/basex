@@ -23,7 +23,7 @@ public final class FnCodepointsToString extends StandardFunc {
   private boolean singleInt;
 
   @Override
-  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Str item(final QueryContext qc) throws QueryException {
     final Expr values = arg(0);
 
     // input is single integer
@@ -43,8 +43,7 @@ public final class FnCodepointsToString extends StandardFunc {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
-      throws QueryException {
+  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
     if(!singleInt) {
       final Item item = arg(0).atomIter(qc, info).next();
       if(item == null) return false;

@@ -214,7 +214,7 @@ public final class TypeswitchGroup extends Single {
   }
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     return expr.item(qc, info);
   }
 

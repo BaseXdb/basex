@@ -42,7 +42,7 @@ public class FnFoldLeft extends StandardFunc {
    * @throws QueryException query exception
    */
   protected final boolean exit(final QueryContext qc, final HofArgs args) throws QueryException {
-    return exitOrAction != null && invoke(exitOrAction[0], args, qc).test(qc, info, 0);
+    return exitOrAction != null && invoke(exitOrAction[0], args, qc).ebv(qc, info);
   }
 
   /**

@@ -22,7 +22,7 @@ import org.basex.util.list.*;
  */
 public final class IndexFacets extends IndexFn {
   @Override
-  public FNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected FNode item(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
     final String type = toZeroString(arg(1), qc);
 

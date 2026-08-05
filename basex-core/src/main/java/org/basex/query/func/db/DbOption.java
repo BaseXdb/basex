@@ -14,7 +14,7 @@ import org.basex.util.*;
  */
 public final class DbOption extends DbOptionMap {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final byte[] key = toToken(arg(0), qc);
 
     final Object value = qc.context.option(Token.string(key));

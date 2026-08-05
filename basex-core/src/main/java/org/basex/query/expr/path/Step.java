@@ -543,8 +543,9 @@ public abstract class Step extends Preds {
     if(selector != null && !selector.accept(visitor)) return false;
     for(final Expr pred : exprs) {
       visitor.enterFocus();
-      if(!pred.accept(visitor)) return false;
+      final boolean more = pred.accept(visitor);
       visitor.exitFocus();
+      if(!more) return false;
     }
     return true;
   }

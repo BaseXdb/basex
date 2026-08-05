@@ -7,7 +7,6 @@ import org.basex.query.up.*;
 import org.basex.query.up.primitives.name.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -18,7 +17,7 @@ import org.basex.util.list.*;
  */
 public final class DbDropBackup extends BackupFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final String name = toBackup(arg(0), qc);
 
     checkCreate(name, qc);

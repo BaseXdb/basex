@@ -128,6 +128,14 @@ abstract class MarkupSerializer extends StandardSerializer {
   // PROTECTED METHODS ============================================================================
 
   @Override
+  protected boolean separate() throws IOException {
+    if(!more || itemsep == null) return false;
+    // separators are inserted as text nodes: characters are mapped and escaped
+    printChars(itemsep);
+    return true;
+  }
+
+  @Override
   protected void namespace(final byte[] prefix, final byte[] uri, final boolean standalone)
       throws IOException {
     if(undecl || prefix.length == 0 || uri.length != 0) super.namespace(prefix, uri, standalone);
@@ -202,7 +210,8 @@ abstract class MarkupSerializer extends StandardSerializer {
             }
             c = 0;
           }
-          out.print(cp, fallbackCDATA);
+          if(charRef(cp)) fallbackCDATA.print(cp);
+          else out.print(cp, fallbackCDATA);
         }
         out.print(CDATA_C);
       }
@@ -304,7 +313,7 @@ abstract class MarkupSerializer extends StandardSerializer {
 
   @Override
   protected void print(final int cp) throws IOException {
-    if(cp < ' ' && cp != '\n' && cp != '\t' || cp >= 0x7F && cp < 0xA0) {
+    if(charRef(cp)) {
       printHex(cp);
     } else if(cp == '&') {
       out.print(E_AMP);
@@ -312,11 +321,18 @@ abstract class MarkupSerializer extends StandardSerializer {
       out.print(E_GT);
     } else if(cp == '<') {
       out.print(E_LT);
-    } else if(cp == 0x2028) {
-      out.print(E_2028);
     } else {
       out.print(cp, fallback);
     }
+  }
+
+  /**
+   * Indicates if a codepoint must be output as a character reference.
+   * @param cp codepoint
+   * @return result of check
+   */
+  private static boolean charRef(final int cp) {
+    return cp < ' ' && cp != '\n' && cp != '\t' || cp >= 0x7F && cp < 0xA0 || cp == 0x2028;
   }
 
   /**

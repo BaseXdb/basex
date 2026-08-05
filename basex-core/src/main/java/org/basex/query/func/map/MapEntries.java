@@ -13,9 +13,9 @@ import org.basex.query.value.type.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class MapEntries extends MapFn {
+public final class MapEntries extends MapFn {
   @Override
-  public final Iter iter(final QueryContext qc) throws QueryException {
+  public Iter iter(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(arg(0), qc);
 
     return new Iter() {

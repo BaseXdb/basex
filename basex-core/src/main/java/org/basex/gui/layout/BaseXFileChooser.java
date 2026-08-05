@@ -25,7 +25,6 @@ public final class BaseXFileChooser {
     /** Open file or directory. */ FDOPEN,
     /** Open directory.         */ DOPEN,
     /** Save file.              */ FSAVE,
-    /** Save file or directory. */ DSAVE,
   }
 
   /** Reference to parent window (of type {@link BaseXDialog} or {@link GUI}). */
@@ -124,15 +123,24 @@ public final class BaseXFileChooser {
       }
       case FSAVE ->
         fc.showSaveDialog(win.component());
-      case DOPEN, DSAVE -> {
+      case DOPEN -> {
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         yield fc.showDialog(win.component(), null);
       }
     };
     if(state != JFileChooser.APPROVE_OPTION) return new IOFile[0];
 
-    final File[] fls = fc.isMultiSelectionEnabled() ? fc.getSelectedFiles() :
-      new File[] { fc.getSelectedFile() };
+    final File[] fls;
+    if(mode == Mode.DOPEN) {
+      // GTK: multiple selection is enabled, and the name of an entered directory is appended
+      final File dir = fc.getCurrentDirectory(), file = fc.getSelectedFile();
+      fls = new File[] { file == null || dir.equals(file.getParentFile()) &&
+          file.getName().equals(dir.getName()) ? dir : file };
+    } else if(fc.isMultiSelectionEnabled()) {
+      fls = fc.getSelectedFiles();
+    } else {
+      fls = new File[] { fc.getSelectedFile() };
+    }
     final int fl = fls.length;
 
     final IOFile[] files = new IOFile[fl];

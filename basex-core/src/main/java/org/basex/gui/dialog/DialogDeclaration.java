@@ -55,9 +55,9 @@ public final class DialogDeclaration extends BaseXDialog {
    */
   private DialogDeclaration(final GUI gui, final List<Declaration> declarations, final int pos,
       final IntConsumer jump) {
-    super(gui, GO_TO_DECLARATION);
+    super(gui, DECLARATIONS);
 
-    filter = new BaseXTextField(this).hint(Text.FIND + DOTS);
+    filter = new BaseXTextField(this).hint(Text.FIND + ELLIPSIS);
     filter.addKeyListener((KeyPressedListener) e -> {
       // cursor keys scroll through the list instead of moving the caret
       final int index = list.getSelectedIndex(), page = Math.max(1, list.getVisibleRowCount());
@@ -83,10 +83,11 @@ public final class DialogDeclaration extends BaseXDialog {
       final Declaration declaration = declaration();
       if(jumping && declaration != null) this.jump.accept(declaration.pos());
     });
+    list.setFont(list.getFont().deriveFont((float) GUIConstants.dmfont.getSize() + 2));
     filter.setFont(list.getFont());
 
     final JScrollPane scroll = new JScrollPane(list);
-    final int width = gui.getWidth() * 1 / 5;
+    final int width = gui.getWidth() / 5;
     BaseXLayout.setWidth(filter, width);
     BaseXLayout.setWidth(scroll, width);
     BaseXLayout.setHeight(scroll, list.getFont().getSize() * 20);

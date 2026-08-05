@@ -88,7 +88,7 @@ public final class FnXsdValidator extends StandardFunc {
   public static final FuncType VALIDATOR_TYPE = FuncType.get(RESULT_TYPE, TARGET_TYPE);
 
   @Override
-  public FuncItem item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected FuncItem item(final QueryContext qc) throws QueryException {
     final XsdValidatorOptions options = toOptions(arg(0), new XsdValidatorOptions(), qc);
     final boolean trusted = trusted(options, qc);
     final boolean xsi = options.get(XsdValidatorOptions.USE_XSI_SCHEMA_LOCATION);
@@ -202,7 +202,7 @@ public final class FnXsdValidator extends StandardFunc {
     }
 
     @Override
-    public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    public Item item(final QueryContext qc) throws QueryException {
       final Item item = arg(0).item(qc, info);
       if(item.isEmpty()) return Empty.VALUE;
 
@@ -236,7 +236,7 @@ public final class FnXsdValidator extends StandardFunc {
       final boolean valid = errors.isEmpty();
       if(!valid) typed = Empty.VALUE;
       final Value details = !valid && errorDetails ? details(errors, qc) : Empty.VALUE;
-      return new XQRecordMap(Records.VALIDATION_RESULT.get(), Bln.get(valid), typed, details);
+      return new XQShapeMap(Records.VALIDATION_RESULT.get(), Bln.get(valid), typed, details);
     }
 
     /**

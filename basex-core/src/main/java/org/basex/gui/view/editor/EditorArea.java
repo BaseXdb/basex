@@ -52,6 +52,7 @@ public final class EditorArea extends TextPanel {
     label = new BaseXLabel(file.name());
     label.setIcon(BaseXImages.file(new IOFile(IO.XQSUFFIX)));
     setSyntax(file, false);
+    setEditListener(() -> view.run(this, Action.CHECK));
 
     addFocusListener((FocusGainedListener) e -> {
       // refresh query path and working directory
@@ -133,17 +134,12 @@ public final class EditorArea extends TextPanel {
   @Override
   public void keyReleased(final KeyEvent e) {
     if(TESTS.is(e)) {
-      if(gui.editor.test.isEnabled()) release(Action.TEST);
+      if(gui.editor.test.isEnabled()) view.run(this, Action.TEST);
     } else if(HISTORY.is(e)) {
       gui.editor.historyPopup(0);
     } else if((!e.isActionKey() || MOVEDOWN.is(e) || MOVEUP.is(e)) && !modifier(e)) {
-      release(Action.CHECK);
+      view.run(this, Action.CHECK);
     }
-  }
-
-  @Override
-  protected void release(final Action action) {
-    view.run(this, action);
   }
 
   /**
@@ -164,7 +160,7 @@ public final class EditorArea extends TextPanel {
       // reopens the file
       setText(file.read());
       file(file, false);
-      release(Action.PARSE);
+      view.run(this, Action.PARSE);
     } catch(final IOException ex) {
       // file was deleted or cannot be accessed: flag editor contents as modified
       hist.invalidate();
@@ -188,8 +184,10 @@ public final class EditorArea extends TextPanel {
    * @return success flag
    */
   boolean save(final IOFile io) {
-    final boolean rename = io != file;
-    if(rename || modified || !opened) {
+    final GUIOptions gopts = gui.gopts;
+    final boolean trim = gopts.get(GUIOptions.TRIMLINES), nl = gopts.get(GUIOptions.FINALNL);
+    final boolean tidied = (trim || nl) && tidy(trim, nl), rename = io != file;
+    if(rename || modified || tidied || !opened) {
       if(!write(io, rename)) return false;
       file(io, true);
       return true;

@@ -13,7 +13,6 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -23,7 +22,7 @@ import org.basex.util.*;
  */
 public class JobEval extends StandardFunc {
   @Override
-  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Str item(final QueryContext qc) throws QueryException {
     return eval(toContent(arg(0), qc), toOptions(arg(2), new JobOptions(), qc), qc);
   }
 

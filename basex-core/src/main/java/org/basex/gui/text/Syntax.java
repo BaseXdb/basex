@@ -6,6 +6,7 @@ import java.awt.*;
 import java.util.*;
 
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Framework for syntax highlighting: assigns a stackable mode to every character.
@@ -309,6 +310,97 @@ abstract class Syntax {
   @SuppressWarnings("unused")
   ArrayList<Declaration> declarations(final byte[] text) {
     return new ArrayList<>();
+  }
+
+  /**
+   * Indicates if code completions can be proposed at the specified position.
+   * @param text text
+   * @param caret caret position
+   * @return result of check
+   */
+  final boolean completable(final byte[] text, final int caret) {
+    if(caret == 0) return true;
+    // the state of a character is known after it has been processed
+    scan(text, caret);
+    return completable();
+  }
+
+  /**
+   * Resets the state and processes the text up to the specified position.
+   * @param text text
+   * @param end end position
+   */
+  final void scan(final byte[] text, final int end) {
+    reset();
+    for(int p = 0; p < end;) {
+      final int cl = cl(text, p);
+      color(text, p, p + cl);
+      p += cl;
+    }
+  }
+
+  /**
+   * Indicates if code completions can be proposed for the last processed character.
+   * @return result of check
+   */
+  boolean completable() {
+    return code();
+  }
+
+  /**
+   * Indicates if the specified character introduces a code completion.
+   * @param ch character
+   * @return result of check
+   */
+  @SuppressWarnings("unused")
+  boolean completeStart(final int ch) {
+    return false;
+  }
+
+  /**
+   * Returns the code completion candidates for the specified text.
+   * @param text text
+   * @param pos start position of the completed string
+   * @return candidates, ordered by relevance
+   */
+  @SuppressWarnings("unused")
+  ArrayList<ArrayList<Completion>> completions(final byte[] text, final int pos) {
+    return new ArrayList<>();
+  }
+
+  /**
+   * Returns the signature of the specified function.
+   * @param name function name
+   * @return signature, or {@code null} if the function is unknown
+   */
+  @SuppressWarnings("unused")
+  Signature signature(final String name) {
+    return null;
+  }
+
+  /**
+   * Returns a single list of candidates.
+   * @param candidates candidates
+   * @return candidate lists
+   */
+  static ArrayList<ArrayList<Completion>> single(final ArrayList<Completion> candidates) {
+    final ArrayList<ArrayList<Completion>> lists = new ArrayList<>(1);
+    lists.add(candidates);
+    return lists;
+  }
+
+  /**
+   * Converts the specified names to completion candidates.
+   * @param names names
+   * @param prefix string to be prefixed to each name
+   * @return candidates
+   */
+  static ArrayList<Completion> candidates(final TokenSet names, final String prefix) {
+    final ArrayList<Completion> list = new ArrayList<>(names.size());
+    for(final byte[] name : names) {
+      list.add(Completion.get(prefix + string(name), false));
+    }
+    return list;
   }
 
   /**

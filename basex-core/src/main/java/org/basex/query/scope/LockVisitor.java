@@ -18,37 +18,67 @@ import org.basex.query.var.*;
 public final class LockVisitor extends ASTVisitor {
   /** Visited scopes. */
   private final IdentityHashMap<Scope, Object> scopes = new IdentityHashMap<>();
-  /** Reference to lock list. */
-  private final LockList ll;
+  /** Reference to the read and write locks. */
+  private final Locks locks;
+  /** Updating query. */
+  private final boolean updating;
   /** Focus level. */
   private int level;
+  /** Nesting level of modify clauses. */
+  private int modify;
+  /** Indicates if the target of an update could not be resolved statically. */
+  private boolean unresolved;
 
   /**
    * Constructor.
-   * @param ll lock list
+   * @param locks read and write locks
+   * @param updating updating query
    * @param root root flag
    */
-  public LockVisitor(final LockList ll, final boolean root) {
-    this.ll = ll;
+  public LockVisitor(final Locks locks, final boolean updating, final boolean root) {
+    this.locks = locks;
+    this.updating = updating;
     level = root ? 0 : 1;
   }
 
   @Override
-  public boolean lock(final String lock) {
+  public boolean lock(final String lock, final boolean write) {
     final boolean local = lock != null;
     if(local) {
       // if context value is found on top level, it will refer to currently opened database
-      if(lock != Locking.CONTEXT || level == 0) ll.add(lock);
+      if(lock != Locking.CONTEXT || level == 0) (write ? locks.writes : locks.reads).add(lock);
     }
     return local;
   }
 
   @Override
-  public boolean lock(final Supplier<ArrayList<String>> list) {
+  public boolean lock(final Supplier<ArrayList<String>> list, final boolean write) {
     for(final String lock : list.get()) {
-      if(!lock(lock)) return false;
+      if(!lock(lock, write)) return false;
     }
     return true;
+  }
+
+  @Override
+  public void queryLock(final Supplier<ArrayList<String>> list) {
+    final LockList ll = updating ? locks.writes : locks.reads;
+    for(final String lock : list.get()) ll.add(lock);
+  }
+
+  @Override
+  public void unresolvedTarget() {
+    // updates in modify clauses are restricted to copied nodes
+    if(modify == 0) unresolved = true;
+  }
+
+  @Override
+  public void enterModify() {
+    modify++;
+  }
+
+  @Override
+  public void exitModify() {
+    modify--;
   }
 
   @Override
@@ -63,23 +93,41 @@ public final class LockVisitor extends ASTVisitor {
 
   @Override
   public boolean staticVar(final StaticVar var) {
-    return cached(var) || var.visit(this);
+    return cached(var) || visit(var, false);
   }
 
   @Override
   public boolean staticFuncCall(final StaticFuncCall call) {
     final StaticFunc func = call.func();
-    return func == null || cached(func) || focusAndVisit(func);
+    return func == null || cached(func) || visit(func, true);
   }
 
   @Override
-  public boolean inlineFunc(final Scope scope) {
-    return focusAndVisit(scope);
+  public boolean subScope(final Scope scope) {
+    return visit(scope, true);
   }
 
   @Override
   public boolean funcItem(final FuncItem func) {
-    return cached(func) || focusAndVisit(func);
+    return cached(func) || visit(func, true);
+  }
+
+  /**
+   * Resets the focus level before the context expression is visited.
+   */
+  public void resetFocus() {
+    level = 0;
+  }
+
+  /**
+   * Promotes all read locks to write locks if an update target could not be resolved statically.
+   */
+  public void finish() {
+    // sound as all databases that can be reached by the query have been read-locked
+    if(unresolved) {
+      locks.writes.add(locks.reads);
+      locks.reads.reset();
+    }
   }
 
   /**
@@ -94,14 +142,18 @@ public final class LockVisitor extends ASTVisitor {
   }
 
   /**
-   * Visits a scope.
+   * Visits a scope outside the modify clauses of the current expression.
    * @param scope scope
+   * @param focus enter a new focus
    * @return if more expressions should be visited
    */
-  private boolean focusAndVisit(final Scope scope) {
-    enterFocus();
+  private boolean visit(final Scope scope, final boolean focus) {
+    if(focus) enterFocus();
+    final int tmp = modify;
+    modify = 0;
     final boolean more = scope.visit(this);
-    exitFocus();
+    modify = tmp;
+    if(focus) exitFocus();
     return more;
   }
 }

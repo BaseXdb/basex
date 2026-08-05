@@ -5,7 +5,6 @@ import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -13,13 +12,13 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
-public class FnPartsOfDateTime extends DateTimeFn {
+public final class FnPartsOfDateTime extends DateTimeFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final ADate value = toGregorianOrNull(arg(0), qc);
     if(value == null) return Empty.VALUE;
 
-    return new XQRecordMap(Records.DATETIME.get(),
+    return new XQShapeMap(Records.DATETIME.get(),
       value.hasYear()    ? Itr.get(value.yea())     : Empty.VALUE,
       value.hasMonth()   ? Itr.get(value.mon())     : Empty.VALUE,
       value.hasDay()     ? Itr.get(value.day())     : Empty.VALUE,

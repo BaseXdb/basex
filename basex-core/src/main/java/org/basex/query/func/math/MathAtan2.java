@@ -5,7 +5,6 @@ import static java.lang.StrictMath.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -15,7 +14,7 @@ import org.basex.util.*;
  */
 public final class MathAtan2 extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Dbl item(final QueryContext qc) throws QueryException {
     return Dbl.get(atan2(toDouble(arg(0), qc), toDouble(arg(1), qc)));
   }
 }

@@ -72,7 +72,9 @@ public final class ValueIndexTest extends SandboxTest {
     final LinkedHashMap<String, Integer> tokens = new LinkedHashMap<>();
     tokens.put("3", 3);
     tokens.put("3.4", 1);
-    tokens.put("text in child", 1);
+    // whitespace is only stripped from whitespace-only text nodes
+    tokens.put("\n                text in child\n            ", 1);
+    tokens.put("text in child", 0);
     tokens.put("nonexistent", 0);
     tokens.put("", 0);
 

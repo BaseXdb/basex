@@ -56,7 +56,7 @@ public class FnParseUri extends StandardFunc {
       "http", 80L, "https", 443L, "ftp", 21L, "ssh", 22L);
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Item item(final QueryContext qc) throws QueryException {
     final String value = toStringOrNull(arg(0), qc);
     final UriOptions options = toOptions(arg(1), new UriOptions(), qc);
     if(value == null) return Empty.VALUE;
@@ -169,7 +169,7 @@ public class FnParseUri extends StandardFunc {
     }
     filepath = XMLToken.decodeUri(filepath);
 
-    return new XQRecordMap(Records.URI_STRUCTURE.get(),
+    return new XQShapeMap(Records.URI_STRUCTURE.get(),
       toValue(value), toValue(scheme), absolute ? Bln.TRUE : Empty.VALUE, toValue(hierarchical),
       toValue(authority), toValue(userinfo), toValue(host), toValue(prt),
       toValue(path), toValue(query), toValue(fragment), toValue(StrSeq.get(segments)),

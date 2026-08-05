@@ -137,7 +137,7 @@ final class QueryCompiler {
       }
 
       @Override
-      public boolean inlineFunc(final Scope scope) {
+      public boolean subScope(final Scope scope) {
         return scope.visit(this);
       }
 

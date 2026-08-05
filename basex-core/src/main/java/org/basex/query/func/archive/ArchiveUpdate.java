@@ -6,7 +6,6 @@ import java.util.zip.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -16,7 +15,7 @@ import org.basex.util.*;
  */
 public final class ArchiveUpdate extends ArchiveFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected B64 item(final QueryContext qc) throws QueryException {
     final Map<String, Entry<Item, Item>> files = toFiles(arg(1), arg(2), qc);
 
     return rewrite(arg(0), qc, (entry, out) -> {

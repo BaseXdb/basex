@@ -4,7 +4,6 @@ import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.node.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -14,7 +13,7 @@ import org.basex.util.*;
  */
 public final class InspectModule extends StandardFunc {
   @Override
-  public FNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected FNode item(final QueryContext qc) throws QueryException {
     final IOContent content = toContent(toString(arg(0), qc), qc);
     return new PlainDoc(qc, info).parse(content);
   }

@@ -18,13 +18,12 @@ import org.basex.util.*;
  */
 public final class DbExists extends DbAccessFn {
   @Override
-  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(test(qc, info, 0));
+  protected Bln item(final QueryContext qc) throws QueryException {
+    return Bln.get(ebv(qc));
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
-      throws QueryException {
+  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
     try {
       final Data data = toData(qc);
       final String path = toDbPathOrNull(arg(1), qc);

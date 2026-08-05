@@ -54,7 +54,7 @@ public class MapMerge extends MapFn {
   MapDuplicates md;
 
   @Override
-  public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected XQMap item(final QueryContext qc) throws QueryException {
     final Iter maps = arg(0).unwrappedIter(qc);
     final MergeOptions options = toOptions(arg(1), new MergeOptions(), qc);
     final MapDuplicates dups = duplicates(options, qc, Duplicates.USE_FIRST);

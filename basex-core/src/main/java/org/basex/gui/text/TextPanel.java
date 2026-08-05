@@ -7,8 +7,6 @@ import static org.basex.util.Token.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
-import java.util.AbstractMap.*;
-import java.util.Map.*;
 import java.util.function.*;
 
 import javax.swing.*;
@@ -22,10 +20,7 @@ import org.basex.gui.listener.*;
 import org.basex.gui.text.SearchBar.*;
 import org.basex.gui.text.TextEditor.*;
 import org.basex.io.*;
-import org.basex.query.*;
-import org.basex.query.func.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 
 /**
  * Renders and provides edit capabilities for text.
@@ -34,19 +29,11 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public class TextPanel extends BaseXPanel {
-  /** Text caret. */
-  private final Timer caretTimer;
-
-  /** Editor action. */
-  public enum Action {
-    /** Check for changes; do nothing if input has not changed. */
-    CHECK,
-    /** Enforce parsing of input. */
-    PARSE,
-    /** Enforce execution of input. */
-    EXECUTE,
-    /** Enforce testing of input. */
-    TEST
+  /** Vertical alignment of the caret after scrolling. */
+  private enum Align {
+    /** Caret at the top. */ TOP,
+    /** Caret in the middle. */ CENTER,
+    /** Caret at the bottom. */ BOTTOM
   }
 
   /** Text editor. */
@@ -54,20 +41,43 @@ public class TextPanel extends BaseXPanel {
   /** Undo history. */
   public final History hist;
 
+  /** Code completion popup. */
+  private final CompletionPopup completion;
+  /** Proposals of the current code completion, ordered by relevance (initially empty). */
+  private ArrayList<ArrayList<Completion>> proposals = new ArrayList<>();
+  /** Popup with the signature of the current function call. */
+  private final SignaturePopup signature;
+  /** Name of the call with the resolved signature (can be {@code null}: none). */
+  private String signatureName;
+  /** Resolved signature (can be {@code null}: the called function is unknown). */
+  private Signature signatureValue;
+
+  /** Text caret. */
+  private final Timer caretTimer;
   /** Renderer reference. */
   private final TextRenderer rend;
   /** Scrollbar reference. */
   private final BaseXScrollBar scroll;
+  /** Horizontal scrollbar reference. */
+  private final BaseXScrollBar hscroll;
+  /** Panel with the horizontal scrollbar (hidden if long lines are wrapped). */
+  private final BaseXBack hpanel;
   /** Editable flag. */
   private final boolean editable;
 
   /** Search bar. */
   protected SearchBar search;
-  /** Link listener. */
+  /** Link listener (can be {@code null}). */
   private LinkListener linkListener;
+  /** Edit listener (can be {@code null}). */
+  private EditListener editListener;
 
+  /** Indicates if the last key press was processed by the completion popup. */
+  private boolean completed;
   /** Last number of mouse clicks. */
   private int clicks;
+  /** Last horizontal position. */
+  private int lastX = -1;
 
   /**
    * Default constructor.
@@ -87,7 +97,10 @@ public class TextPanel extends BaseXPanel {
   public TextPanel(final BaseXWindow win, final String text, final boolean editable) {
     super(win);
     this.editable = editable;
-    editor = new TextEditor(gui);
+    final EditorOptions opts = new EditorOptions(gui.gopts);
+    editor = new TextEditor(opts);
+    completion = new CompletionPopup(this);
+    signature = new SignaturePopup(this);
 
     setFocusable(true);
     setFocusTraversalKeysEnabled(!editable);
@@ -108,6 +121,8 @@ public class TextPanel extends BaseXPanel {
       @Override
       public void focusLost(final FocusEvent e) {
         caret(false);
+        completion.hide();
+        signature.hide();
       }
     });
 
@@ -115,27 +130,40 @@ public class TextPanel extends BaseXPanel {
     layout(new BorderLayout());
 
     scroll = new BaseXScrollBar(this);
-    rend = new TextRenderer(editor, scroll, editable, gui);
+    hscroll = new BaseXScrollBar(this, true);
+
+    // the filler keeps the horizontal scrollbar clear of the vertical one
+    final BaseXBack filler = new BaseXBack();
+    BaseXLayout.setWidth(filler, scroll.getPreferredSize().width);
+    hpanel = new BaseXBack().layout(new BorderLayout());
+    hpanel.add(hscroll, BorderLayout.CENTER);
+    hpanel.add(filler, BorderLayout.EAST);
+
+    rend = new TextRenderer(editor, scroll, hscroll, editable, opts);
+    hpanel.setVisible(!rend.wrap());
 
     add(rend, BorderLayout.CENTER);
     add(scroll, BorderLayout.EAST);
+    add(hpanel, BorderLayout.SOUTH);
 
+    hist = new History(editable ? EMPTY : null);
     setText(text);
-    hist = new History(editable ? editor.text() : null);
+    // the initial text is no undoable change
+    if(editable) hist.init(editor.text());
 
-    new BaseXPopup(this, editable ?
-      new GUICommand[] {
-        new FindCmd(), new FindNextCmd(), new FindPrevCmd(),
-        new MatchCaseCmd(), new WholeWordCmd(), new RegExCmd(), new DotAllCmd(), null,
-        new GotoCmd(), new DeclarationCmd(), null,
-        new UndoCmd(), new RedoCmd(), null,
-        new AllCmd(), new CutCmd(), new CopyCmd(), new PasteCmd(), new DelCmd() } :
-      new GUICommand[] {
-        new FindCmd(), new FindNextCmd(), new FindPrevCmd(),
-        new MatchCaseCmd(), new WholeWordCmd(), new RegExCmd(), new DotAllCmd(), null,
-        new GotoCmd(), new DeclarationCmd(), null,
-        new AllCmd(), new CopyCmd() }
-    );
+    final ArrayList<GUICommand> cmds = new ArrayList<>(Arrays.asList(
+      new FindCmd(), new FindHitCmd(true), new FindHitCmd(false),
+      new ToggleCmd(Text.MATCH_CASE, MATCHCASE, sb -> sb.mcase),
+      new ToggleCmd(Text.WHOLE_WORD, WHOLEWORD, sb -> sb.word),
+      new ToggleCmd(Text.REGULAR_EXPR, REGEX, sb -> sb.regex),
+      new ToggleCmd(Text.DOT_ALL, DOTALL, sb -> sb.dotall), null));
+    if(editable) {
+      cmds.addAll(Arrays.asList(new HistoryCmd(true), new HistoryCmd(false), null,
+        new AllCmd(), new CutCmd(), new CopyCmd(), new PasteCmd(), new DelCmd()));
+    } else {
+      cmds.addAll(Arrays.asList(new AllCmd(), new CopyCmd()));
+    }
+    new BaseXPopup(this, cmds.toArray(GUICommand[]::new));
 
     caretTimer = new Timer(500, e -> rend.caret(!rend.caret()));
   }
@@ -154,7 +182,6 @@ public class TextPanel extends BaseXPanel {
    */
   public void setText(final byte[] t) {
     setText(t, t.length);
-    resetError();
   }
 
   /**
@@ -193,8 +220,9 @@ public class TextPanel extends BaseXPanel {
     } else if(text.length != size) {
       txt = Arrays.copyOf(text, size);
     }
-    if(editor.text(txt) && hist != null) hist.store(txt, editor.pos(), 0);
-    if(isShowing()) resizeCode.invokeLater();
+    if(editor.text(txt)) hist.store(txt, editor.pos(), 0);
+    resetError();
+    updateCode.invokeLater();
   }
 
   /**
@@ -224,8 +252,8 @@ public class TextPanel extends BaseXPanel {
    * @param syntax syntax reference
    */
   public final void setSyntax(final Syntax syntax) {
-    rend.setSyntax(syntax);
-    if(isShowing()) resizeCode.invokeLater();
+    rend.syntax(syntax);
+    updateCode.invokeLater();
   }
 
   /**
@@ -234,15 +262,15 @@ public class TextPanel extends BaseXPanel {
    */
   public final void setCaret(final int pos) {
     editor.pos(pos);
-    updateScrollpos.invokeLater(1);
+    updateCode.invokeLater(Align.CENTER);
     caret(true);
   }
 
   /**
-   * Returns the current text cursor.
-   * @return cursor position
+   * Returns the caret position.
+   * @return caret position
    */
-  private int getCaret() {
+  public final int getCaret() {
     return editor.pos();
   }
 
@@ -267,7 +295,10 @@ public class TextPanel extends BaseXPanel {
     super.setFont(f);
     if(rend != null) {
       rend.setFont(f);
-      computeHeight.invokeLater(true);
+      // a visibility change of the scrollbar must be propagated to the layout
+      hpanel.setVisible(!rend.wrap());
+      revalidate();
+      updateCode.invokeLater(Align.BOTTOM);
     }
   }
 
@@ -293,7 +324,7 @@ public class TextPanel extends BaseXPanel {
    */
   public final void comment() {
     final int caret = editor.pos();
-    finish(caret, editor.comment(rend.getSyntax()));
+    finish(caret, editor.comment(rend.syntax()));
   }
 
   /**
@@ -309,7 +340,7 @@ public class TextPanel extends BaseXPanel {
    * Jumps to a matching bracket.
    */
   public final void bracket() {
-    setCaret(editor.bracket(rend.getSyntax()));
+    setCaret(editor.bracket(rend.syntax()));
   }
 
   /**
@@ -322,11 +353,28 @@ public class TextPanel extends BaseXPanel {
   }
 
   /**
+   * Removes trailing whitespace and appends a final newline.
+   * @param trim remove trailing whitespace
+   * @param nl append a final newline
+   * @return {@code true} if text has changed
+   */
+  public final boolean tidy(final boolean trim, final boolean nl) {
+    final int caret = editor.pos();
+    if(!editor.tidy(trim, nl)) return false;
+    // no edit notification: the tidied text is written to disk right afterwards
+    hist.store(editor.text(), caret, editor.pos());
+    resetError();
+    updateCode.invokeLater(Align.CENTER);
+    caret(true);
+    return true;
+  }
+
+  /**
    * Formats the selected text.
    */
   public final void format() {
     final int caret = editor.pos();
-    finish(caret, editor.format(rend.getSyntax()));
+    finish(caret, editor.format(rend.syntax()));
   }
 
   @Override
@@ -353,6 +401,21 @@ public class TextPanel extends BaseXPanel {
    */
   public final void setLinkListener(final LinkListener ll) {
     linkListener = ll;
+  }
+
+  /**
+   * Installs an edit listener.
+   * @param el edit listener
+   */
+  public final void setEditListener(final EditListener el) {
+    editListener = el;
+  }
+
+  /**
+   * Notifies the edit listener that the text was changed by an edit command.
+   */
+  private void edited() {
+    if(editListener != null) editListener.edited();
   }
 
   /**
@@ -387,10 +450,11 @@ public class TextPanel extends BaseXPanel {
   final void replace(final ReplaceContext rc) {
     final int[] range = editor.replace(rc);
     if(rc.text != null) {
-      // the caret keeps its position; a replacement in a selection re-selects its new range
+      // a replacement in a selection reselects its new range; otherwise, the caret is preserved
       setText(rc.text);
       if(range != null) editor.select(range[0], range[1]);
-      release(Action.CHECK);
+      else setCaret(rc.caret);
+      edited();
     }
   }
 
@@ -405,7 +469,7 @@ public class TextPanel extends BaseXPanel {
     if(select == null) return false;
     setText(rc.text);
     setCaret(select[1]);
-    release(Action.CHECK);
+    edited();
     return true;
   }
 
@@ -423,7 +487,7 @@ public class TextPanel extends BaseXPanel {
    */
   protected final void jump(final SearchDir dir, final boolean select) {
     SwingUtilities.invokeLater(() -> {
-      scroll(rend.jump(dir, select), 1);
+      scroll(rend.jump(dir, select), Align.CENTER);
       if(search != null) search.refreshCount();
     });
   }
@@ -466,17 +530,20 @@ public class TextPanel extends BaseXPanel {
       select(e.getPoint(), false);
       final int y = Math.max(20, Math.min(e.getY(), getHeight() - 20));
       if(y != e.getY()) scroll.pos(scroll.pos() + e.getY() - y);
+      final int x = Math.max(20, Math.min(e.getX(), getWidth() - 20));
+      if(x != e.getX()) rend.moveX(e.getX() - x);
     }
   }
 
   @Override
   public final void mousePressed(final MouseEvent e) {
+    signature.hide();
     // copy and paste text with middle mouse button (Unix only)
     if(SwingUtilities.isMiddleMouseButton(e)) {
       if(!Prop.WIN && !Prop.MAC) {
         if(editor.isSelected()) {
           copy();
-          editor.noSelect();
+          editor.resetSelection();
           rend.repaint();
         } else if(editable && isEnabled()) {
           final ArrayList<Object> clips = BaseXLayout.fromClipboard(null);
@@ -488,6 +555,7 @@ public class TextPanel extends BaseXPanel {
 
     if(!isEnabled() || !isFocusable()) return;
 
+    completion.hide();
     requestFocusInWindow();
     caret(true);
 
@@ -514,7 +582,10 @@ public class TextPanel extends BaseXPanel {
    * @param start states if selection has just been started
    */
   private void select(final Point point, final boolean start) {
-    editor.select(rend.jump(point).pos(), start);
+    final int p = rend.jump(point).pos();
+    if(start) editor.selectFrom(p);
+    else editor.selectTo(p);
+    editor.atRowEnd(rend.rowEnd());
     rend.repaint();
   }
 
@@ -537,11 +608,21 @@ public class TextPanel extends BaseXPanel {
     } else {
       return false;
     }
+    completion.hide();
+    signature.hide();
     return true;
   }
 
   @Override
   public void keyPressed(final KeyEvent e) {
+    // navigate in the completion popup
+    completed = false;
+    if(completion.visible() && completion.key(e)) {
+      completed = true;
+      e.consume();
+      return;
+    }
+
     // ignore modifier keys
     if(specialKey(e) || modifier(e)) {
       e.consume();
@@ -567,7 +648,7 @@ public class TextPanel extends BaseXPanel {
     final int pos = editor.pos();
 
     final boolean shift = e.isShiftDown();
-    boolean down = true, consumed = true;
+    boolean down = true, moved = true;
 
     // move caret
     int lc = Integer.MIN_VALUE;
@@ -603,22 +684,24 @@ public class TextPanel extends BaseXPanel {
       lc = moveCaret(-1, shift);
       down = false;
     } else if(NEXTCHAR.is(e)) {
-      editor.next(shift);
+      editor.nextChar(shift);
     } else if(PREVCHAR.is(e)) {
-      editor.previous(shift);
+      editor.prevChar(shift);
       down = false;
     } else {
-      consumed = false;
+      moved = false;
     }
     lastX = lc == Integer.MIN_VALUE ? -1 : lc;
 
     // edit text
+    boolean edited = false;
     if(hist.active()) {
       if(COMPLETE.is(e)) {
-        complete();
+        complete(true);
         return;
       }
 
+      edited = true;
       if(MOVEDOWN.is(e)) {
         editor.move(true);
       } else if(MOVEUP.is(e)) {
@@ -643,19 +726,27 @@ public class TextPanel extends BaseXPanel {
         editor.deletePrev();
         down = false;
       } else {
-        consumed = false;
+        edited = false;
       }
     }
-    if(consumed) e.consume();
+    if(moved || edited) e.consume();
 
     final byte[] tmp = editor.text();
-    if(txt != tmp) {
-      // text has changed: add old text to history
-      hist.store(tmp, pos, editor.pos());
-      computeHeight.invokeLater(down);
-    } else if(pos != editor.pos() || selected != editor.isSelected()) {
-      // cursor position or selection state has changed
-      updateScrollpos.invokeLater(down ? 2 : 0);
+    final boolean changed = txt != tmp;
+    // text has changed: add old text to history
+    if(changed) hist.store(tmp, pos, editor.pos());
+    // text, cursor position or selection state has changed
+    if(changed || pos != editor.pos() || selected != editor.isSelected()) {
+      updateCode.invokeLater(down ? Align.BOTTOM : Align.TOP);
+    }
+    // refresh completions, or show them after a delay if the cursor was moved
+    if(moved || edited) {
+      refreshCompletion(true);
+      refreshSignature(false);
+    } else if(control(e) || e.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
+      // close the popups: the key press will be processed as a shortcut
+      completion.hide();
+      signature.hide();
     }
   }
 
@@ -669,11 +760,11 @@ public class TextPanel extends BaseXPanel {
     final int[] caret = rend.caretRows(count, lastX);
     // no rendered text: fall back to logical lines
     if(caret == null) {
-      if(count < 0) editor.linesUp(-count, select, -1);
-      else editor.linesDown(count, select, -1);
+      editor.lines(count, select);
       return -1;
     }
     editor.moveTo(caret[0], select);
+    editor.atRowEnd(rend.rowEnd());
     return caret[1];
   }
 
@@ -692,45 +783,53 @@ public class TextPanel extends BaseXPanel {
     }
     if(end) editor.rowEnd(p, select);
     else editor.rowStart(p, select);
+    editor.atRowEnd(rend.rowEnd());
   }
 
-  /** Computes the height of the text and updates the scroll bar. */
-  private final GUICode computeHeight = new GUICode() {
+  /** Recomputes the text height and adjusts the scroll bar ({@code null}: keep the position). */
+  private final GUICode<Align> updateCode = new GUICode<>() {
     @Override
-    public void execute(final Object down) {
+    public void execute(final Align align) {
+      if(!isShowing()) return;
       rend.computeHeight();
-      updateScrollpos.execute((Boolean) down ? 2 : 0);
-    }
-  };
-
-  /** Updates the position of the scroll bar. */
-  private final GUICode updateScrollpos = new GUICode() {
-    @Override
-    public void execute(final Object align) {
-      scroll(rend.cursorY(), (Integer) align);
+      if(align != null) {
+        scroll(rend.cursorY(), align);
+      } else {
+        // keep the scroll positions within the valid range
+        scroll.pos(scroll.pos());
+        hscroll.pos(hscroll.pos());
+        rend.repaint();
+      }
     }
   };
 
   /**
    * Scrolls to the specified position.
    * @param y new vertical position
-   * @param align alignment (0: scroll up, 1: jump, 2: scroll down)
+   * @param align vertical alignment of the caret
    */
-  private void scroll(final int y, final int align) {
+  private void scroll(final int y, final Align align) {
     if(y != -1) {
       final int h = getHeight(), m = y + (rend.fontHeight() << 1) - h, p = scroll.pos();
       if(p < m || p > y) {
-        scroll.pos(align == 0 ? y : align == 1 ? y - h / 2 : m);
+        scroll.pos(switch(align) {
+          case TOP -> y;
+          case CENTER -> y - h / 2;
+          case BOTTOM -> m;
+        });
       }
     }
+    rend.scrollX();
     rend.repaint();
   }
 
-  /** Last horizontal position. */
-  private int lastX = -1;
-
   @Override
   public void keyTyped(final KeyEvent e) {
+    // the key press was consumed by the completion popup
+    if(completed) {
+      e.consume();
+      return;
+    }
     if(!hist.active() || control(e) || DELNEXT.is(e) || DELPREV.is(e) || ESCAPE.is(e) || CUT.is(e))
       return;
 
@@ -751,16 +850,15 @@ public class TextPanel extends BaseXPanel {
     if(move != 0) editor.pos(Math.min(editor.size(), caret + move));
 
     // adjust text height
-    computeHeight.invokeLater(true);
+    updateCode.invokeLater(Align.BOTTOM);
     e.consume();
-  }
 
-  /**
-   * Releases a key or mouse. Can be overwritten to react on events.
-   * @param action action
-   */
-  @SuppressWarnings("unused")
-  protected void release(final Action action) { }
+    // refresh completions, or show them after a delay if a completion was started
+    final char ch = e.getKeyChar();
+    refreshCompletion(Character.isLetter(ch) || rend.syntax().completeStart(ch));
+    // a signature is proposed if an argument list is opened or continued
+    refreshSignature(ch == '(' || ch == ',');
+  }
 
   /**
    * Refreshes the layout.
@@ -769,6 +867,7 @@ public class TextPanel extends BaseXPanel {
   public final void refreshLayout(final Font f) {
     setFont(f);
     scroll.refreshLayout();
+    hscroll.refreshLayout();
   }
 
   // EDITOR COMMANDS ==============================================================================
@@ -804,9 +903,9 @@ public class TextPanel extends BaseXPanel {
   private void finish(final int old, final boolean changed) {
     if(changed) {
       if(old != -1) hist.store(editor.text(), old, editor.pos());
-      release(Action.CHECK);
+      edited();
     }
-    computeHeight.invokeLater(true);
+    updateCode.invokeLater(Align.BOTTOM);
   }
 
   /**
@@ -821,65 +920,64 @@ public class TextPanel extends BaseXPanel {
 
   @Override
   public final void mouseWheelMoved(final MouseWheelEvent e) {
-    scroll.pos(scroll.pos() + e.getUnitsToScroll() * 20);
+    completion.hide();
+    signature.hide();
+    final int units = e.getUnitsToScroll() * 20;
+    if(e.isShiftDown()) rend.moveX(units);
+    else scroll.pos(scroll.pos() + units);
     rend.repaint();
   }
 
-  /** Calculation counter. */
-  private final GUICode resizeCode = new GUICode() {
-    @Override
-    public void execute(final Object arg) {
-      rend.computeHeight();
-      // update scrollbar to display value within valid range
-      scroll.pos(scroll.pos());
-      rend.repaint();
-    }
-  };
-
   @Override
   public final void componentResized(final ComponentEvent e) {
-    if(isShowing()) resizeCode.invokeLater();
+    updateCode.invokeLater();
   }
 
   @Override
   public final void componentShown(final ComponentEvent e) {
-    resizeCode.invokeLater();
+    updateCode.invokeLater();
   }
 
-  /** Undo command. */
-  private class UndoCmd extends GUIPopupCmd {
-    /** Constructor. */
-    UndoCmd() { super(Text.UNDO, UNDOSTEP); }
+  /** Undo/redo command. */
+  private class HistoryCmd extends GUIPopupCmd {
+    /** Undo/redo flag. */
+    private final boolean undo;
+
+    /**
+     * Constructor.
+     * @param undo undo/redo flag
+     */
+    HistoryCmd(final boolean undo) {
+      super(undo ? Text.UNDO : Text.REDO, undo ? UNDOSTEP : REDOSTEP);
+      this.undo = undo;
+    }
 
     @Override
-    public void execute() {
-      if(!hist.active()) return;
-      final byte[] t = hist.prev();
-      if(t == null) return;
-      editor.text(t);
-      editor.pos(hist.caret());
-      finish(-1, true);
-    }
+    public void execute() { history(undo); }
     @Override
-    public boolean enabled(final GUI main) { return !hist.first(); }
+    public boolean enabled(final GUI main) { return hasHistory(undo); }
   }
 
-  /** Redo command. */
-  private class RedoCmd extends GUIPopupCmd {
-    /** Constructor. */
-    RedoCmd() { super(Text.REDO, REDOSTEP); }
+  /**
+   * Undoes or redoes the last modification.
+   * @param undo undo/redo flag
+   */
+  public final void history(final boolean undo) {
+    if(!hist.active()) return;
+    final byte[] text = undo ? hist.prev() : hist.next();
+    if(text == null) return;
+    editor.text(text);
+    editor.pos(hist.caret());
+    finish(-1, true);
+  }
 
-    @Override
-    public void execute() {
-      if(!hist.active()) return;
-      final byte[] t = hist.next();
-      if(t == null) return;
-      editor.text(t);
-      editor.pos(hist.caret());
-      finish(-1, true);
-    }
-    @Override
-    public boolean enabled(final GUI main) { return !hist.last(); }
+  /**
+   * Indicates if a modification can be undone or redone.
+   * @param undo undo/redo flag
+   * @return result of check
+   */
+  public final boolean hasHistory(final boolean undo) {
+    return undo ? !hist.first() : !hist.last();
   }
 
   /** Cut command. */
@@ -952,148 +1050,102 @@ public class TextPanel extends BaseXPanel {
   /** Open search bar. */
   private class FindCmd extends GUIPopupCmd {
     /** Constructor. */
-    FindCmd() { super(Text.FIND + "\u2026", FIND); }
+    FindCmd() { super(Text.FIND + Text.ELLIPSIS, FIND); }
 
+    @Override
+    public void execute() { find(); }
+    @Override
+    public boolean enabled(final GUI main) { return searchable(); }
+  }
+
+  /**
+   * Activates the search bar.
+   */
+  public final void find() {
     // the adopted selection is a hit of the new search, and restricts no replacement
-    @Override
-    public void execute() { search.activate(searchString(), true, false); }
-    @Override
-    public boolean enabled(final GUI main) { return search != null; }
+    search.activate(searchString(), true, false);
   }
 
-  /** Find next hit. */
-  private class FindNextCmd extends GUIPopupCmd {
-    /** Constructor. */
-    FindNextCmd() { super(Text.FIND_NEXT, FINDNEXT); }
-
-    @Override
-    public void execute() { search(true); }
-    @Override
-    public boolean enabled(final GUI main) { return search != null; }
+  /**
+   * Indicates if the text is attached to a search bar.
+   * @return result of check
+   */
+  public final boolean searchable() {
+    return search != null;
   }
 
-  /** Find previous hit. */
-  private class FindPrevCmd extends GUIPopupCmd {
-    /** Constructor. */
-    FindPrevCmd() { super(Text.FIND_PREVIOUS, FINDPREV); }
+  /** Find next or previous hit. */
+  private class FindHitCmd extends GUIPopupCmd {
+    /** Next/previous flag. */
+    private final boolean next;
+
+    /**
+     * Constructor.
+     * @param next next/previous flag
+     */
+    FindHitCmd(final boolean next) {
+      super(next ? Text.FIND_NEXT : Text.FIND_PREVIOUS, next ? FINDNEXT : FINDPREV);
+      this.next = next;
+    }
 
     @Override
-    public void execute() { search(false); }
+    public void execute() { search(next); }
     @Override
-    public boolean enabled(final GUI main) { return search != null; }
+    public boolean enabled(final GUI main) { return searchable(); }
   }
 
-  /** Match-case search. */
-  private class MatchCaseCmd extends GUIPopupCmd {
-    /** Constructor. */
-    MatchCaseCmd() { super(Text.MATCH_CASE, MATCHCASE); }
+  /** Toggles a search mode. */
+  private class ToggleCmd extends GUIPopupCmd {
+    /** Button of the search mode. */
+    private final Function<SearchBar, AbstractButton> button;
+
+    /**
+     * Constructor.
+     * @param label label
+     * @param shortcut shortcut
+     * @param button button of the search mode
+     */
+    ToggleCmd(final String label, final BaseXKeys shortcut,
+        final Function<SearchBar, AbstractButton> button) {
+      super(label, shortcut);
+      this.button = button;
+    }
 
     @Override
-    public void execute() { search.toggle(search.mcase); }
+    public void execute() { search.toggle(button.apply(search)); }
     @Override
     public boolean toggle() { return true; }
     @Override
-    public boolean enabled(final GUI main) { return search != null; }
+    public boolean enabled(final GUI main) {
+      return search != null && button.apply(search).isEnabled();
+    }
     @Override
-    public boolean selected(final GUI main) { return search.mcase.isSelected(); }
-  }
-
-  /** Whole-word search. */
-  private class WholeWordCmd extends GUIPopupCmd {
-    /** Constructor. */
-    WholeWordCmd() { super(Text.WHOLE_WORD, WHOLEWORD); }
-
-    @Override
-    public void execute() { search.toggle(search.word); }
-    @Override
-    public boolean toggle() { return true; }
-    @Override
-    public boolean enabled(final GUI main) { return search != null && search.word.isEnabled(); }
-    @Override
-    public boolean selected(final GUI main) { return search.word.isSelected(); }
-  }
-
-  /** Regular-expression search. */
-  private class RegExCmd extends GUIPopupCmd {
-    /** Constructor. */
-    RegExCmd() { super(Text.REGULAR_EXPR, REGEX); }
-
-    @Override
-    public void execute() {
-      search.toggle(search.regex); }
-    @Override
-    public boolean toggle() { return true; }
-    @Override
-    public boolean enabled(final GUI main) { return search != null; }
-    @Override
-    public boolean selected(final GUI main) { return search.regex.isSelected(); }
-  }
-
-  /** Dot-matches-all search. */
-  private class DotAllCmd extends GUIPopupCmd {
-    /** Constructor. */
-    DotAllCmd() { super(Text.DOT_ALL, DOTALL); }
-
-    @Override
-    public void execute() { search.toggle(search.dotall); }
-    @Override
-    public boolean toggle() { return true; }
-    @Override
-    public boolean enabled(final GUI main) { return search != null && search.dotall.isEnabled(); }
-    @Override
-    public boolean selected(final GUI main) { return search.dotall.isSelected(); }
+    public boolean selected(final GUI main) { return button.apply(search).isSelected(); }
   }
 
   /**
    * Highlights the next/previous hit.
    * @param next next/previous hit
    */
-  private void search(final boolean next) {
+  public final void search(final boolean next) {
     // a hidden search bar adopts the selected string: its first hit is the current one
     search.find(searchString(), search.isVisible() ?
       next ? SearchDir.FORWARD : SearchDir.BACKWARD : SearchDir.CURRENT);
   }
 
-  /** Go to line. */
-  private class GotoCmd extends GUIPopupCmd {
-    /** Constructor. */
-    GotoCmd() { super(Text.GO_TO_LINE + Text.DOTS, GOTOLINE); }
-
-    @Override
-    public void execute() { gotoLine(); }
-    @Override
-    public boolean enabled(final GUI main) { return search != null; }
-  }
-
-  /** Go to declaration. */
-  private class DeclarationCmd extends GUIPopupCmd {
-    /** Constructor. */
-    DeclarationCmd() { super(Text.GO_TO_DECLARATION + Text.DOTS, GOTODECL); }
-
-    @Override
-    public void execute() { gotoDeclaration(); }
-    @Override
-    public boolean enabled(final GUI main) { return hasDeclarations(); }
-  }
-
   /**
    * Jumps to a specific line.
    */
-  private void gotoLine() {
-    final byte[] last = editor.text();
-    final int ll = last.length, cr = getCaret();
-    int line = 1;
-    for(int l = 0; l < ll && l < cr; l += cl(last, l)) {
-      if(last[l] == '\n') ++line;
-    }
-    final DialogLine dl = new DialogLine(gui, line);
+  public final void gotoLine() {
+    final DialogLine dl = new DialogLine(gui, caretPos()[0]);
     if(!dl.ok()) return;
-    final int el = dl.line();
-    line = 1;
-    int pos = 0;
-    for(int l = 0; l < ll && line < el; l += cl(last, l)) {
-      if(last[l] != '\n') continue;
-      pos = l + 1;
+
+    final byte[] text = editor.text();
+    final int tl = text.length, el = dl.line();
+    int line = 1, pos = 0;
+    for(int t = 0; t < tl && line < el; t++) {
+      if(text[t] != '\n') continue;
+      pos = t + 1;
       ++line;
     }
     setCaret(pos);
@@ -1105,7 +1157,7 @@ public class TextPanel extends BaseXPanel {
    * @return result of check
    */
   public final boolean hasDeclarations() {
-    return rend.getSyntax().hasDeclarations();
+    return rend.syntax().hasDeclarations();
   }
 
   /**
@@ -1113,101 +1165,156 @@ public class TextPanel extends BaseXPanel {
    * @return declarations
    */
   private ArrayList<Declaration> declarations() {
-    return rend.getSyntax().declarations(editor.text());
+    return rend.syntax().declarations(editor.text());
   }
 
   /**
    * Jumps to a declaration of the current text.
    */
   public final void gotoDeclaration() {
-    // the keyboard shortcut bypasses the enabled state of the button and the menu entry
+    // the button and the menu entry can be enabled until the controls are refreshed
     if(!hasDeclarations()) return;
 
     // the caret follows the selection and stays where the dialog leaves it
-    DialogDeclaration.show(gui, declarations(), getCaret(), this::setCaret);
+    DialogDeclaration.show(gui, declarations(), editor.pos(), this::setCaret);
     gui.editor.posCode.invokeLater();
   }
 
   /**
    * Code completion.
+   * @param explicit invoked via keyboard shortcut
    */
-  private void complete() {
+  void complete(final boolean explicit) {
     if(selected()) return;
 
-    // find first character
-    final int caret = editor.pos(), start = editor.completionStart();
-    final String input = string(substring(editor.text(), start, caret)).toLowerCase(Locale.ENGLISH);
+    // the popup is placed at the beginning of the completed string, before the cursor is moved
+    final int start = editor.completionStart(), caret = editor.pos();
+    final int[] cursor = rend.cursor();
+    final Point point = new Point(Math.max(0, cursor[0] - rend.width(start, caret)), cursor[1]);
+    // the cursor jumps to the end of the edited string
+    if(explicit) setCaret(editor.completionEnd());
 
-    // find insertion candidates
-    final ArrayList<Entry<String, String>> pairs = new ArrayList<>();
-    final Consumer<Entry<String, String>> add = pair -> {
-      for(final Entry<String, String> p : pairs) {
-        if(p != null && p.getValue().equals(pair.getValue())) return;
-      }
-      pairs.add(pair);
-    };
-
-    // add matches that start with the input string
-    final int ll = LISTS.size();
-    for(final ArrayList<Entry<String, String>> list : LISTS) {
-      pairs.add(null);
-      for(final Entry<String, String> pair : list) {
-        final String name = pair.getKey();
-        if(name.startsWith(input) || name.replace(":", "").startsWith(input)) add.accept(pair);
-      }
-    }
-    // add matches that start with and contain the input string
-    for(final boolean strt : new boolean[] { true, false }) {
-      if(pairs.size() != ll + 1) {
-        pairs.add(null);
-        for(int l = 0; l < ll; l++) {
-          for(final Entry<String, String> pair : LISTS.get(l)) {
-            if(SmartStrings.containsChars(pair.getKey(), input, strt)) add.accept(pair);
-          }
-        }
-      }
-    }
-    // remove duplicate and trailing separators
-    for(int p = 0; p < pairs.size();) {
-      if(pairs.get(p) == null && (p == 0 || p + 1 == pairs.size() || pairs.get(p + 1) == null)) {
-        pairs.remove(p);
-      } else {
-        p++;
-      }
-    }
-
-    if(pairs.size() == 1) {
+    final ArrayList<Completion> candidates = candidates(start, explicit);
+    if(explicit && candidates.size() == 1) {
       // insert single candidate
-      complete(pairs.getFirst().getValue(), start);
-    } else if(!pairs.isEmpty()) {
-      // show popup menu
-      final JPopupMenu pm = new JPopupMenu();
-      final ActionListener al = ae -> complete(
-        ae.getActionCommand().replaceAll("^.*?] ", ""), start);
-      for(final Entry<String, String> entry : pairs) {
-        if(entry == null) {
-          pm.addSeparator();
-        } else {
-          final JMenuItem mi = new JMenuItem(entry.getValue());
-          pm.add(mi);
-          mi.addActionListener(al);
-        }
-        if(pm.getComponentCount() >= 15) {
-          final JMenuItem mi = new JMenuItem("… " + Util.info(Text.RESULTS_X,
-              BaseXLayout.format(pairs.size())));
-          mi.setEnabled(false);
-          pm.add(mi);
-          break;
-        }
-      }
-
-      final int[] cursor = rend.cursor();
-      pm.show(this, cursor[0], cursor[1]);
-
-      // highlight first entry
-      final MenuElement[] me = { pm, (JMenuItem) pm.getComponent(0) };
-      MenuSelectionManager.defaultManager().setSelectedPath(me);
+      complete(candidates.getFirst().value(), start);
+    } else if(!candidates.isEmpty()) {
+      completion.show(candidates, word(start), start, point);
+      // both popups are placed at the same position: the candidates take precedence
+      signature.hide();
     }
+  }
+
+  /**
+   * Returns the completion candidates for the string before the cursor. The text is scanned:
+   * as long as the popup stays open, the resulting candidates are only filtered again.
+   * @param start start position of the string
+   * @param explicit invoked via keyboard shortcut
+   * @return candidates
+   */
+  private ArrayList<Completion> candidates(final int start, final boolean explicit) {
+    final byte[] text = editor.text();
+    final Syntax syntax = rend.syntax();
+    // no completions in strings, comments, tags and other non-code tokens
+    if(!completing(start, explicit) || !syntax.completable(text, editor.pos()))
+      return new ArrayList<>();
+
+    proposals = syntax.completions(text, start);
+    return Completions.candidates(word(start), proposals);
+  }
+
+  /**
+   * Indicates if candidates may be proposed for the string before the cursor.
+   * @param start start position of the string
+   * @param explicit invoked via keyboard shortcut
+   * @return result of check
+   */
+  private boolean completing(final int start, final boolean explicit) {
+    if(explicit) return true;
+    final byte[] text = editor.text();
+    final int caret = editor.pos();
+    // the cursor must be placed at the end of the completed string
+    if(caret != editor.completionEnd()) return false;
+    // a completion is started by a name character, or by the character before an empty string
+    final int ch = caret == start ? Syntax.prev(text, start) : cp(text, start);
+    if(!rend.syntax().completeStart(ch) && !XMLToken.isNCStartChar(ch)) return false;
+    // a function call is already complete
+    return caret >= text.length || text[caret] != '(';
+  }
+
+  /**
+   * Returns the string that is completed.
+   * @param start start position
+   * @return string
+   */
+  private String word(final int start) {
+    return string(editor.text(), start, editor.pos() - start);
+  }
+
+  /**
+   * Refreshes the signature of the function call that encloses the caret.
+   * @param show show the signature of a call that has no visible signature yet
+   */
+  private void refreshSignature(final boolean show) {
+    if(!show && !signature.active()) return;
+
+    // both popups are placed at the same position: the candidates take precedence
+    final Syntax syntax = rend.syntax();
+    final TextEditor.Call call = completion.visible() ? null : editor.call(syntax);
+    if(call != null) {
+      final String name = string(editor.text(), call.start(), call.end() - call.start());
+      // the signature is resolved once per name: a declaration lookup scans the text
+      if(!name.equals(signatureName)) {
+        signatureName = name;
+        signatureValue = signature(name);
+      }
+      final Signature sig = signatureValue;
+      // the signature is shown if the function is known and can take a further argument
+      if(sig != null && call.arg() < sig.params()) {
+        // a keyword argument emphasizes the parameter it names, others the one at its position
+        final String keyword = call.keyword();
+        final int index = keyword != null ? sig.param(keyword) : call.arg();
+        // the popup is aligned with the called function, below the line with the caret
+        signature.show(sig, name, index, new Point(rend.x(call.start()), rend.cursor()[1]));
+        return;
+      }
+    }
+    signature.hide();
+  }
+
+  /**
+   * Returns the signature of a built-in or declared function.
+   * @param name function name
+   * @return signature, or {@code null} if the function is unknown
+   */
+  private Signature signature(final String name) {
+    final Signature sig = rend.syntax().signature(name);
+    if(sig != null) return sig;
+    // declared functions are looked up in the text
+    for(final Declaration declaration : declarations()) {
+      if(declaration.name().equals(name)) return Signature.get(declaration.args());
+    }
+    return null;
+  }
+
+  /**
+   * Refreshes the candidates of a visible completion popup.
+   * @param schedule show a new popup after a delay if none is visible
+   */
+  private void refreshCompletion(final boolean schedule) {
+    if(completion.visible()) {
+      // the popup is closed if the cursor leaves the completed string
+      final int start = completion.start();
+      // the text is not scanned again: the proposals of the visible popup are filtered
+      final ArrayList<Completion> candidates = editor.completionStart() == start &&
+        completing(start, false) ? Completions.candidates(word(start), proposals) :
+        new ArrayList<>();
+      if(candidates.isEmpty()) completion.hide();
+      else completion.update(candidates, word(start));
+    }
+    // completions are only proposed automatically if the corresponding option is activated
+    if(schedule && !completion.visible() && gui.gopts.get(GUIOptions.COMPLETION) == 0)
+      completion.schedule();
   }
 
   /**
@@ -1215,35 +1322,11 @@ public class TextPanel extends BaseXPanel {
    * @param string string
    * @param start start position
    */
-  private void complete(final String string, final int start) {
+  void complete(final String string, final int start) {
     final int pos = editor.pos();
     editor.complete(string, start);
     finish(pos, true);
-  }
-
-  /** Replacement lists. */
-  private static final ArrayList<ArrayList<Entry<String, String>>> LISTS = new ArrayList<>();
-
-  /* Reads in the property file. */
-  static {
-    for(int l = 0; l < 5; l++) LISTS.add(new ArrayList<>());
-    final TokenObjectMap<byte[]> map = Util.properties("completions.properties");
-    for(final byte[] key : map) {
-      LISTS.getFirst().add(new SimpleEntry<>(Token.string(key), Token.string(map.get(key))));
-    }
-    // add functions (default functions first)
-    for(final FuncDefinition fd : Functions.BUILT_IN.values()) {
-      final String name = string(fd.name.prefixId(QueryText.FN_URI));
-      final String value = name + (fd.params.length > 0 ? "(_)" : "()");
-      final BiConsumer<Integer, String> add = (i, string) ->
-        LISTS.get(i).add(new SimpleEntry<>(string.toLowerCase(Locale.ENGLISH), value));
-      if(fd.name.uri() == QueryText.FN_URI) {
-        add.accept(1, name.replaceAll("(.)[^-A-Z]*-?", "$1"));
-        add.accept(2, name);
-      } else {
-        add.accept(3, name.replaceAll("(:?.)[^-:A-Z]*-?", "$1"));
-        add.accept(4, name);
-      }
-    }
+    // an inserted function call is annotated with its signature
+    refreshSignature(true);
   }
 }

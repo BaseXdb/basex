@@ -63,7 +63,7 @@ public abstract class FTExpr extends ParseExpr {
    * @throws QueryException query exception
    */
   @Override
-  public abstract FTNode item(QueryContext qc, InputInfo ii) throws QueryException;
+  public abstract FTNode item(QueryContext qc) throws QueryException;
 
   @Override
   public boolean has(final Flag... flags) {

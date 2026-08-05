@@ -3,8 +3,6 @@ package org.basex.query;
 import static org.basex.query.QueryError.ErrType.*;
 import static org.basex.query.QueryText.*;
 
-import org.basex.core.*;
-
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -617,7 +615,7 @@ public enum QueryError {
   /** Error code. */
   SCHEMAASSEMBLY_X(FODC, 15, "Schema cannot be assembled: %"),
   /** Error code. */
-  EXTERNALRESOURCE_X(FODC, 16, Text.EXTACCESS_BLOCKED_X),
+  EXTERNALRESOURCE_X(FODC, 16, "Call is untrusted: %."),
 
   /** Error code. */
   FORMATWHICH_X(FODF, 1280, "Unknown decimal format: %."),
@@ -1202,8 +1200,6 @@ public enum QueryError {
   /** Error code. */
   MIXEDRESULTS(XPTY, 18, "Path returns both nodes and non-nodes."),
   /** Error code. */
-  PATHJNODE_X_X_X(XPTY, 18, "%: JNode or atomic value expected, % found: %."),
-  /** Error code. */
   NSSENS_X_X(XPTY, 117, "Cannot convert % to %."),
   /** Error code. */
   INVCONVERT_X_X(XPTY, 155, "% cannot be cast to %."),
@@ -1734,8 +1730,8 @@ public enum QueryError {
       desc.add(" of type ").add(est).add(" expected, ");
       // try to find missing record entry:
       boolean missing = false;
-      if(est.type instanceof final RecordType rt && expr instanceof final XQMap map) {
-        final TokenObjectMap<RecordField> fields = rt.fields();
+      if(est.type instanceof final ShapeType sh && expr instanceof final XQMap map) {
+        final TokenObjectMap<ShapeField> fields = sh.fields();
         for(final byte[] key : fields) {
           if(map.value(Str.get(key)) != null) continue;
           desc.add(QueryString.toQuoted(key)).add(" missing");

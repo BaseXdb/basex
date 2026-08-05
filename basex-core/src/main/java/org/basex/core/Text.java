@@ -65,6 +65,8 @@ public interface Text {
   String DOT = ".";
   /** Dots. */
   String DOTS = "...";
+  /** Ellipsis (GUI). */
+  String ELLIPSIS = "\u2026";
   /** List. */
   String LI = "- ";
 
@@ -734,9 +736,7 @@ public interface Text {
   String UPDATED_CC = lang("updated") + COLS;
   /** "Printed. */
   String PRINTED_CC = lang("printed") + COLS;
-  /** Result. */
-  String RESULT_X = lang("result_%");
-  /** Results. */
+  /** Number of results. */
   String RESULTS_X = lang("results_%");
   /** Query executed. */
   String QUERY_EXECUTED_X_X = lang("query_executed_%_%");
@@ -851,8 +851,10 @@ public interface Text {
   String REPLACE_WITH = lang("replace_with");
   /** Number of replaced strings. */
   String STRINGS_REPLACED_X = lang("strings_replaced_%");
-  /** Confirm content replacement in a number of files. */
-  String REPLACE_FILES_X = lang("replace_files_%");
+  /** Confirm the replacement of a number of strings in a number of files. */
+  String REPLACE_FILES_X_X = lang("replace_files_%_%");
+  /** Back up files before replacing their contents. */
+  String CREATE_BACKUP = lang("create_backup");
   /** Undo the last content replacement. */
   String UNDO_REPLACE = lang("undo_replace");
   /** Match case. */
@@ -867,6 +869,10 @@ public interface Text {
   String FILES_FOUND_X = lang("files_found_%");
   /** Content search result: found, searched, too large, binary. */
   String FILES_FOUND_STATS_X = lang("files_found_%_%_%_%");
+  /** Number of restored files. */
+  String FILES_REVERTED_X = lang("files_reverted_%");
+  /** Number of files that could not be processed. */
+  String FILES_SKIPPED_X = lang("files_skipped_%");
 
   /** Serialization parameters. */
   String SERIALIZATION = lang("serialization");
@@ -907,6 +913,10 @@ public interface Text {
 
   /** Database. */
   String DATABASE = lang("database");
+  /** File. */
+  String FILE = lang("file");
+  /** Search. */
+  String SEARCH = lang("search");
   /** Editor. */
   String EDITOR = lang("editor");
   /** View. */
@@ -927,7 +937,7 @@ public interface Text {
   /** Command info. */
   String GO_TO_LINE = lang("go_to_line");
   /** Command info. */
-  String GO_TO_DECLARATION = lang("go_to_declaration");
+  String DECLARATIONS = lang("declarations");
   /** Command info. */
   String COLORS = lang("colors");
   /** Command info. */
@@ -1021,8 +1031,8 @@ public interface Text {
   /** Command info. */
   String SHOW_HIDDEN_FILES = lang("show_hidden_files");
 
-  /** Command info. */
-  String FONTS_D = lang("fonts") + DOTS;
+  /** Fonts. */
+  String FONTS = lang("fonts");
 
   // BUTTONS ======================================================================================
 
@@ -1069,7 +1079,7 @@ public interface Text {
   String RESTORE = lang("restore");
 
   /** Button text for browsing files/directories. */
-  String BROWSE_D = lang("browse") + DOTS;
+  String BROWSE_D = lang("browse") + ELLIPSIS;
 
   /** Button text for creating things. */
   String CREATE = lang("create");
@@ -1092,8 +1102,8 @@ public interface Text {
   String NO_DATA = lang("no_data");
   /** Not enough pixels. */
   String NO_PIXELS = lang("no_pixels");
-  /** file. */
-  String FILE = lang("file");
+  /** Name of new files. */
+  String NEW_FILE = lang("new_file");
 
   // DIALOG WINDOWS ===============================================================================
 
@@ -1271,6 +1281,8 @@ public interface Text {
   String DELETE_FILE_X = lang("delete_file_%");
   /** Dialog title for reverting a file. */
   String REVERT_FILE_X = lang("revert_file_%");
+  /** Confirm the restoration of a number of files. */
+  String REVERT_FILES_X = lang("revert_files_%");
   /** Close all. */
   String CLOSE_ALL = lang("close_all");
 
@@ -1287,8 +1299,16 @@ public interface Text {
   String FILE_SUFFIXES_X = lang("file_suffixes_%");
   /** Limits. */
   String LIMITS = lang("limits");
+  /** Appearance. */
+  String APPEARANCE = lang("appearance");
+  /** Views. */
+  String VIEWS = lang("views");
   /** Look and feel. */
-  String JAVA_LF = "Look & Feel (" + lang("requires_restart") + ')';
+  String LOOK_AND_FEEL = "Look & Feel";
+  /** Scaling of the user interface. */
+  String SCALING = lang("scaling");
+  /** Header for preferences that are applied after a restart. */
+  String AFTER_RESTART = lang("after_restart");
   /** Focus. */
   String RT_FOCUS = lang("rt_focus");
   /** Label attributes. */
@@ -1299,9 +1319,9 @@ public interface Text {
   String MAX_NO_OF_HITS = lang("max_nr_of_hits");
   /** Size of text result. */
   String SIZE_TEXT_RESULTS = lang("size_text_results");
-  /** Language preference. */
-  String LANGUAGE_RESTART = lang("language") + " (" + lang("requires_restart") + ')';
 
+  /** Wrap long lines. */
+  String WORD_WRAP = lang("word_wrap");
   /** Show line numbers. */
   String SHOW_LINE_NUMBERS = lang("show_line_numbers");
   /** Show line margin. */
@@ -1316,6 +1336,8 @@ public interface Text {
   String INDENTATION_SIZE = lang("indentation_size");
   /** Mark current line. */
   String MARK_EDITED_LINE = lang("mark_edited_line");
+  /** Mark occurrences. */
+  String MARK_OCCURRENCES = lang("mark_occurrences");
   /** Save before executing file. */
   String SAVE_BEFORE_EXECUTE = lang("save_before_execute");
   /** Parse project files. */
@@ -1324,6 +1346,18 @@ public interface Text {
   String AUTO_ADD_CHARS = lang("auto_add_chars");
   /** Default file filter. */
   String FILE_FILTER = lang("file_filter");
+  /** Remove trailing whitespace. */
+  String TRIM_LINES = lang("trim_lines");
+  /** Append final newline. */
+  String FINAL_NEWLINE = lang("final_newline");
+  /** Code completion. */
+  String CODE_COMPLETION = lang("code_completion");
+  /** Modes for proposing code completions. */
+  String[] COMPLETIONS = { lang("always"), lang("via_shortcut") };
+  /** Maximum number of indexed project files. */
+  String INDEXED_FILES = lang("indexed_files");
+  /** Maximum number of search results. */
+  String SEARCH_RESULTS = lang("search_results");
 
   /** Comment. */
   String COMMENT = lang("comment");

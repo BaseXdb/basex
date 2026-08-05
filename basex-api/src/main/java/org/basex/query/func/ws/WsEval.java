@@ -9,7 +9,6 @@ import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -19,7 +18,7 @@ import org.basex.util.*;
  */
 public final class WsEval extends WsFn {
   @Override
-  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  protected Str item(final QueryContext qc) throws QueryException {
     final IOContent query = toContent(arg(0), qc);
     final HashMap<String, Value> bindings = toBindings(arg(1), qc);
     final WsOptions options = toOptions(arg(2), new WsOptions(), qc);

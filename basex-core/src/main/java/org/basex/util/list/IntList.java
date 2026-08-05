@@ -92,14 +92,21 @@ public final class IntList extends ElementList {
   }
 
   /**
-   * Stores an element at the specified position.
+   * Stores an element at the specified index.
    * @param index index of the element to replace
    * @param element element to be stored
    */
   public void set(final int index, final int element) {
-    if(index >= list.length) list = Arrays.copyOf(list, newCapacity(index + 1));
-    list[index] = element;
-    size = Math.max(size, index + 1);
+    checkIndex(index);
+    int[] lst = list;
+    final int s = size, ns = index + 1;
+    if(ns > lst.length) {
+      lst = Arrays.copyOf(lst, newCapacity(ns));
+      list = lst;
+    }
+    if(index > s) Arrays.fill(lst, s, index, 0);
+    lst[index] = element;
+    size = Math.max(s, ns);
   }
 
   /**
@@ -134,9 +141,14 @@ public final class IntList extends ElementList {
   public void insert(final int index, final int... elements) {
     final int l = elements.length;
     if(l == 0) return;
-    if(size + l > list.length) list = Arrays.copyOf(list, newCapacity(size + l));
-    Array.insert(list, index, l, size, elements);
-    size += l;
+    int[] lst = list;
+    final int s = size, ns = s + l;
+    if(ns > lst.length) {
+      lst = Arrays.copyOf(lst, newCapacity(ns));
+      list = lst;
+    }
+    Array.insert(lst, index, l, s, elements);
+    size = ns;
   }
 
   /**
