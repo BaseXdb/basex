@@ -57,7 +57,7 @@ public enum ApiFunction implements AFunction {
       params(), STRING_ZM, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_HEADER(RequestHeader::new, "header(name, default?)",
-      params(STRING_O, STRING_O), STRING_ZO, REQUEST_URI),
+      params(STRING_O, STRING_ZM), STRING_ZM, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_HEADER_MAP(RequestHeaderMap::new, "header-map()",
       params(), MAP_O, REQUEST_URI),
@@ -114,7 +114,7 @@ public enum ApiFunction implements AFunction {
       params(), ANY_URI_O, REST_URI),
   /** XQuery function. */
   _RESTXQ_INIT(RestInit::new, "init(update?)",
-      params(BOOLEAN_O), EMPTY_SEQUENCE_Z, REST_URI),
+      params(BOOLEAN_ZO), EMPTY_SEQUENCE_Z, REST_URI),
   /** XQuery function. */
   _RESTXQ_URI(RestUri::new, "uri()",
       params(), ANY_URI_O, REST_URI),
@@ -192,40 +192,40 @@ public enum ApiFunction implements AFunction {
 
   /** XQuery function. */
   _WS_BROADCAST(WsBroadcast::new, "broadcast(message)",
-      params(ITEM_O), EMPTY_SEQUENCE_Z, WS_URI),
+      params(ITEM_O), EMPTY_SEQUENCE_Z, WS_URI, Perm.ADMIN),
   /** XQuery function. */
   _WS_CLOSE(WsClose::new, "close(id, status?, reason?)",
-      params(STRING_O, INTEGER_O, STRING_O), EMPTY_SEQUENCE_Z, WS_URI),
+      params(STRING_O, INTEGER_O, STRING_O), EMPTY_SEQUENCE_Z, WS_URI, Perm.ADMIN),
   /** XQuery function. */
   _WS_DELETE(WsDelete::new, "delete(id, key)",
-      params(STRING_O, STRING_O), EMPTY_SEQUENCE_Z, WS_URI),
+      params(STRING_O, STRING_O), EMPTY_SEQUENCE_Z, WS_URI, Perm.ADMIN),
   /** XQuery function. */
   _WS_EMIT(WsEmit::new, "emit(message)",
-      params(ITEM_O), EMPTY_SEQUENCE_Z, WS_URI),
+      params(ITEM_O), EMPTY_SEQUENCE_Z, WS_URI, Perm.ADMIN),
   /** XQuery function. */
   _WS_EVAL(WsEval::new, "eval(query, bindings?, options?)",
-      params(STRING_O, MAP_ZO, MAP_ZO), STRING_O, WS_URI),
+      params(STRING_O, MAP_ZO, MAP_ZO), STRING_O, WS_URI, Perm.ADMIN),
   /** XQuery function. */
   _WS_GET(WsGet::new, "get(id, key, default?)",
-      params(STRING_O, STRING_O, ITEM_ZM), ITEM_ZM, WS_URI),
+      params(STRING_O, STRING_O, ITEM_ZM), ITEM_ZM, WS_URI, Perm.ADMIN),
   /** XQuery function. */
   _WS_ID(WsId::new, "id()",
       params(), STRING_O, WS_URI),
   /** XQuery function. */
   _WS_IDS(WsIds::new, "ids()",
-      params(), STRING_ZM, WS_URI),
+      params(), STRING_ZM, WS_URI, Perm.ADMIN),
   /** XQuery function. */
   _WS_PATH(WsPath::new, "path(id)",
-      params(STRING_O), STRING_O, WS_URI),
+      params(STRING_O), STRING_O, WS_URI, Perm.ADMIN),
   /** XQuery function. */
   _WS_PING(WsPing::new, "ping(id)",
-      params(STRING_O), EMPTY_SEQUENCE_Z, WS_URI),
+      params(STRING_O), EMPTY_SEQUENCE_Z, WS_URI, Perm.ADMIN),
   /** XQuery function. */
   _WS_SEND(WsSend::new, "send(message, ids)",
-      params(ITEM_O, STRING_ZM), EMPTY_SEQUENCE_Z, WS_URI),
+      params(ITEM_O, STRING_ZM), EMPTY_SEQUENCE_Z, WS_URI, Perm.ADMIN),
   /** XQuery function. */
   _WS_SET(WsSet::new, "set(id, key, value)",
-      params(STRING_O, STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, WS_URI);
+      params(STRING_O, STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, WS_URI, Perm.ADMIN);
 
   /** Function definition. */
   private final FuncDefinition definition;

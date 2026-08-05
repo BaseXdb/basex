@@ -19,7 +19,7 @@ public final class AdminDeleteLogs extends AdminFn {
     final String date = toString(arg(0), qc);
 
     final LogFile file = qc.context.log.file(date);
-    if(file == null) throw WHICHRES_X.get(info, date);
+    if(file == null) throw ADMIN_DELETE_X.get(info, date);
     if(file.current()) throw ADMIN_TODAY.get(info, date);
     if(!file.delete()) throw ADMIN_DELETE_X.get(info, date);
     return Empty.VALUE;

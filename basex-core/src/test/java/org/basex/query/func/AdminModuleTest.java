@@ -29,7 +29,7 @@ public final class AdminModuleTest extends SandboxTest {
   @Test public void deleteLogs() {
     final Function func = _ADMIN_DELETE_LOGS;
     // no logging data exists in the sandbox
-    error(func.args("2001-01-01"), WHICHRES_X);
+    error(func.args("2001-01-01"), ADMIN_DELETE_X);
   }
 
   /** Test method. */

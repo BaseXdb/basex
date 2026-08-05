@@ -24,7 +24,7 @@ public final class HofFoldLeft1 extends StandardFunc {
     final Value first = input.next();
     if(first == null) return Empty.VALUE;
 
-    final HofArgs args = new HofArgs(3).set(0, first);
+    final HofArgs args = new HofArgs(3, action).set(0, first);
     for(Item item; (item = input.next()) != null;) {
       args.set(0, invoke(action, args.set(1, item).inc(), qc));
     }
