@@ -1205,11 +1205,23 @@ public enum Function implements AFunction {
       params(STRING_O, FuncType.get(ITEM_ZM).seqType(), STRING_ZO),
       ITEM_ZM, flag(NDT), CACHE_URI, Perm.CREATE),
   /** XQuery function. */
+  _CACHE_INFO(CacheInfo::new, "info(name?)",
+      params(STRING_ZO), MAP_O, flag(NDT), CACHE_URI, Perm.CREATE),
+  /** XQuery function. */
+  _CACHE_INIT(CacheInit::new, "init(options?, name?)",
+      params(MAP_ZO, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.CREATE),
+  /** XQuery function. */
+  _CACHE_KEYS(CacheKeys::new, "keys(name?)",
+      params(STRING_ZO), STRING_ZM, flag(NDT), CACHE_URI, Perm.CREATE),
+  /** XQuery function. */
   _CACHE_LIST(CacheList::new, "list()",
       params(), STRING_ZM, flag(NDT), CACHE_URI, Perm.CREATE),
   /** XQuery function. */
   _CACHE_PUT(CachePut::new, "put(key, value, name?)",
       params(STRING_O, ITEM_ZM, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.CREATE),
+  /** XQuery function. */
+  _CACHE_REMOVE(CacheRemove::new, "remove(key, name?)",
+      params(STRING_O, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.CREATE),
   /** XQuery function. */
   _CACHE_SIZE(CacheSize::new, "size(name?)",
       params(STRING_ZO), INTEGER_O, flag(NDT), CACHE_URI, Perm.CREATE),
@@ -2168,7 +2180,7 @@ public enum Function implements AFunction {
       params(), STRING_O, XSLT_URI),
   /** XQuery function. */
   _XSLT_TRANSFORM(XsltTransform::new, "transform(input, stylesheet, arguments?, options?)",
-      params(ITEM_O, ITEM_O, MAP_ZO, MAP_ZO), NODE_O, flag(NDT), XSLT_URI, Perm.CREATE),
+      params(ITEM_O, ITEM_O, MAP_ZO, MAP_ZO), DOCUMENT_O, flag(NDT), XSLT_URI, Perm.CREATE),
   /** XQuery function. */
   _XSLT_TRANSFORM_REPORT(XsltTransformReport::new,
       "transform-report(input, stylesheet, arguments?, options?)",

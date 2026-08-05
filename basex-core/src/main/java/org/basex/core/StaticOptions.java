@@ -37,6 +37,8 @@ public final class StaticOptions extends Options {
   public static final BooleanOption WRITESTORE = new BooleanOption("WRITESTORE", true);
   /** Maximum number of cache entries. */
   public static final NumberOption CACHEMAX = new NumberOption("CACHEMAX", 65536);
+  /** Lifetime (seconds) of cache entries. */
+  public static final NumberOption CACHETTL = new NumberOption("CACHETTL", 86400);
 
   /** Comment: written to the options file. */
   public static final Comment C_CLIENT = new Comment("Client/Server Architecture");
