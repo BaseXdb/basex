@@ -516,6 +516,8 @@ public final class QueryContext extends Job implements Closeable {
    * @param message message function
    */
   public void trace(final String label, final Supplier<String> message) {
+    // discard output of users with insufficient permissions
+    if(!user.has(Perm.CREATE)) return;
     if(parent != null) {
       parent.trace(label, message);
     } else {
