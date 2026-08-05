@@ -13,12 +13,12 @@ declare variable $dba:CAT := 'logs';
 
 (:~ Table columns :)
 declare variable $dba:COLUMNS := (
-  { 'key': 'time', 'label': 'Time', 'type': 'dynamic', 'order': 'desc', 'width': '7rem' },
-  { 'key': 'address', 'label': 'Address', 'width': '12rem' },
-  { 'key': 'user', 'label': 'User', 'type': 'dynamic', 'width': '7rem' },
-  { 'key': 'type', 'label': 'Type', 'type': 'dynamic', 'width': '7rem' },
-  { 'key': 'ms', 'label': 'ms', 'type': 'decimal', 'order': 'desc', 'width': '5rem' },
-  { 'key': 'text', 'label': 'Text', 'type': 'dynamic', 'width': '30rem' }
+  { 'key': 'time', 'label': 'Time', 'type': 'dynamic', 'order': 'desc', 'width': '10%' },
+  { 'key': 'address', 'label': 'Address', 'width': '18%' },
+  { 'key': 'user', 'label': 'User', 'type': 'dynamic', 'width': '10%' },
+  { 'key': 'type', 'label': 'Type', 'type': 'dynamic', 'width': '10%' },
+  { 'key': 'ms', 'label': 'ms', 'type': 'decimal', 'order': 'desc', 'width': '7%' },
+  { 'key': 'text', 'label': 'Text', 'type': 'dynamic', 'width': '45%' }
 );
 
 (:~

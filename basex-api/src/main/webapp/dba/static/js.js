@@ -593,9 +593,7 @@ async function saveResource() {
  */
 function loadCodeMirror(language, edit, resize) {
   // CodeMirror 6 is delivered as the self-contained window.CM6 bundle
-  // (static/codemirror6/cm6.js). Without it, or on Android, fall back to plain
-  // textareas; CM6.fromTextArea returns a CodeMirror-5-compatible handle so the
-  // rest of the DBA (editor.js) is unaware of the change.
+  // Without it, or on Android, fall back to plain textareas
   const useCM = !!window.CM6 && !/android/i.test(navigator.userAgent);
   if(edit) {
     const editorArea = document.getElementById("editor");

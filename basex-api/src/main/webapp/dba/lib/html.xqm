@@ -12,16 +12,13 @@ import module namespace utils = 'dba/utils' at 'utils.xqm';
 declare variable $html:NUMBER := ('decimal', 'number', 'bytes');
 
 (:~
- : Appends a cache-busting version query to a local static asset reference. The
- : version is the file's last-modified timestamp, so a redeployed asset (e.g. a
- : rebuilt CodeMirror bundle) is refetched automatically without a manual bump.
- : @param  $path  asset path, relative to the DBA root (e.g. 'static/js.js')
+ : Appends a cache-busting version query to a local static asset reference.
+ : @param  $path  asset path
  : @return path, suffixed with '?v=<timestamp>' when the file is found on disk
  :)
 declare %private function html:asset(
   $path  as xs:string
 ) as xs:string {
-  (: static assets live next to this module's parent (lib/ -> ../static/...) :)
   let $file := file:base-dir() || '../' || $path
   return $path || (
     if (file:exists($file)) {
@@ -63,7 +60,7 @@ declare function html:wrap(
       <link rel='stylesheet' href='{ html:asset("static/style.css") }'/>
       <script src='{ html:asset("static/js.js") }'/>
       <script src='{ html:asset("static/editor.js") }'/>
-      <script src='{ html:asset("static/codemirror6/cm6.js") }'/>
+      <script src='{ html:asset("static/cm6.js") }'/>
     </head>
     <body>
       <header>

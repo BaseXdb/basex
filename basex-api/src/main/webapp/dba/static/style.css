@@ -207,6 +207,10 @@ td.num input.filter {
 table.fixed {
   width: 100%;
 }
+/* column widths are percentages: padding must not add to them, or the sum overflows */
+table.fixed th, table.fixed td {
+  box-sizing: border-box;
+}
 table.fixed td {
   white-space: nowrap;
   overflow: hidden;
