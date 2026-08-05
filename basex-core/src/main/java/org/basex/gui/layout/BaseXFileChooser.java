@@ -131,15 +131,15 @@ public final class BaseXFileChooser {
     if(state != JFileChooser.APPROVE_OPTION) return new IOFile[0];
 
     final File[] fls;
-    if(fc.isMultiSelectionEnabled()) {
+    if(mode == Mode.DOPEN) {
+      // GTK: multiple selection is enabled, and the name of an entered directory is appended
+      final File dir = fc.getCurrentDirectory(), file = fc.getSelectedFile();
+      fls = new File[] { file == null || dir.equals(file.getParentFile()) &&
+          file.getName().equals(dir.getName()) ? dir : file };
+    } else if(fc.isMultiSelectionEnabled()) {
       fls = fc.getSelectedFiles();
     } else {
-      File file = fc.getSelectedFile();
-      if(mode == Mode.DOPEN) {
-        final File dir = fc.getCurrentDirectory();
-        if(file == null || !file.exists() && file.getName().equals(dir.getName())) file = dir;
-      }
-      fls = new File[] { file };
+      fls = new File[] { fc.getSelectedFile() };
     }
     final int fl = fls.length;
 
