@@ -466,6 +466,20 @@ public enum GUIMenuCmd implements GUICommand {
   C_DECLARATIONS(DECLARATIONS + ELLIPSIS, "% shift O", false, false) {
     @Override
     public void execute(final GUI gui) {
+      gui.editor.getEditor().showDeclarations();
+    }
+
+    @Override
+    public boolean enabled(final GUI gui) {
+      final EditorArea edit = editor(gui);
+      return edit != null && edit.hasDeclarations();
+    }
+  },
+
+  /** Jumps to the declaration of the name at the caret. */
+  C_GO_TO_DECLARATION(GO_TO_DECLARATION, "% B", false, false) {
+    @Override
+    public void execute(final GUI gui) {
       gui.editor.getEditor().gotoDeclaration();
     }
 
@@ -473,6 +487,32 @@ public enum GUIMenuCmd implements GUICommand {
     public boolean enabled(final GUI gui) {
       final EditorArea edit = editor(gui);
       return edit != null && edit.hasDeclarations();
+    }
+  },
+
+  /** Jumps to the previous location of the navigation history. */
+  C_PREVIOUS_LOCATION(PREVIOUS_LOCATION, "% alt LEFT", false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.navigate(false);
+    }
+
+    @Override
+    public boolean enabled(final GUI gui) {
+      return editor(gui) != null && gui.editor.navigable(false);
+    }
+  },
+
+  /** Jumps to the next location of the navigation history. */
+  C_NEXT_LOCATION(NEXT_LOCATION, "% alt RIGHT", false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.navigate(true);
+    }
+
+    @Override
+    public boolean enabled(final GUI gui) {
+      return editor(gui) != null && gui.editor.navigable(true);
     }
   },
 

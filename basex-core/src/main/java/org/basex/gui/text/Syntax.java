@@ -313,6 +313,17 @@ abstract class Syntax {
   }
 
   /**
+   * Returns the position at which the name at the specified position is declared.
+   * @param text text
+   * @param pos position of the name
+   * @return position of the declaration, or {@code -1} if none was found
+   */
+  @SuppressWarnings("unused")
+  int declaration(final byte[] text, final int pos) {
+    return -1;
+  }
+
+  /**
    * Indicates if code completions can be proposed at the specified position.
    * @param text text
    * @param caret caret position

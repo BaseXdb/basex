@@ -82,6 +82,9 @@ public final class EditorView extends View {
   /** Main-memory document. */
   private DBNode doc;
 
+  /** Navigation history. */
+  private final Navigation navigation = new Navigation();
+
   /** Parse counter. */
   private final AtomicInteger parseID = new AtomicInteger();
   /** Parse query context. */
@@ -203,7 +206,7 @@ public final class EditorView extends View {
 
     info.addMouseListener((MouseClickedListener) e -> markError(true));
     test.addActionListener(e -> run(getEditor(), Action.TEST));
-    declaration.addActionListener(e -> getEditor().gotoDeclaration());
+    declaration.addActionListener(e -> getEditor().showDeclarations());
     tabs.addChangeListener(e -> {
       // ignore index changes caused by dragged tabs: the selected editor stays the same
       final EditorArea ea = getEditor();
@@ -393,6 +396,46 @@ public final class EditorView extends View {
    */
   public void jumpToFile() {
     project.jumpTo(getEditor().file(), true);
+  }
+
+  /**
+   * Remembers the caret location that is left by a jump.
+   */
+  public void addLocation() {
+    final EditorArea edit = getEditor();
+    if(edit != null) navigation.add(new Navigation.Location(edit.file(), edit.getCaret()));
+  }
+
+  /**
+   * Jumps to the previous or next location of the navigation history.
+   * @param forward forward flag
+   */
+  public void navigate(final boolean forward) {
+    final EditorArea edit = getEditor();
+    final Navigation.Location location = navigation.go(forward, edit == null ? null :
+      new Navigation.Location(edit.file(), edit.getCaret()));
+    if(location == null) return;
+
+    // reopen a file that has been closed in the meantime
+    final IOFile file = location.file();
+    EditorArea area = find(file);
+    if(area == null) {
+      if(!file.exists()) return;
+      area = open(file, true, true);
+      if(area == null) return;
+    }
+    area.setCaret(Math.min(location.pos(), area.getText().length));
+    focusEditor();
+    posCode.invokeLater();
+  }
+
+  /**
+   * Indicates if the navigation history has a previous or next location.
+   * @param forward forward flag
+   * @return result of check
+   */
+  public boolean navigable(final boolean forward) {
+    return navigation.available(forward);
   }
 
   /**
@@ -891,6 +934,7 @@ public final class EditorView extends View {
     final IOFile file = new IOFile(path);
     final EditorArea found = find(file), opened;
     if(jump) {
+      addLocation();
       opened = open(file, error, true);
       // update error information if file was not already opened
       if(found == null && error) ii = inputInfo;

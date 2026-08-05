@@ -225,6 +225,38 @@ public final class SyntaxXQueryTest {
     declarations("declare function a() {};\ndeclare\n  variable $b := 1;", "a 1", "$b 3");
   }
 
+  /** Declaration of the name at the caret. */
+  @Test public void declaration() {
+    // functions are declared in the prolog
+    declaration("declare function ^local:f() { 1 }; local:_f()");
+    declaration("declare function ^f($a) { $a }; f_(1)");
+    declaration("declare function ^f() { 1 }; _f()");
+    // a variable is bound by a clause, a parameter or a global declaration
+    declaration("let $^x := 1 return $_x");
+    declaration("for $^x in 1 return $_x");
+    declaration("for member $^m in [] return $_m");
+    declaration("for $x at $^p in 1 return $_p");
+    declaration("declare variable $^x := 1; $_x");
+    declaration("declare function f($a, $^b) { $_b };");
+    declaration("let $f := fn($^x) { $_x } return $f(1)");
+    declaration("some $^x in 1 satisfies $_x = 1");
+    // the last binding before the caret is chosen
+    declaration("let $x := 1 return (let $^x := 2 return $_x)");
+    // a variable that is declared after the reference is found as well
+    declaration("declare function f() { $_x }; declare variable $^x := 1;");
+    // the caret may be placed at the start, inside and at the end of a name
+    declaration("let $^xy := 1 return $_xy");
+    declaration("let $^xy := 1 return $x_y");
+    declaration("let $^xy := 1 return $xy_");
+    // the arguments of a function call bind no variables
+    declaration("let $^x := 1 return f($_x)");
+    // names without declaration, names in strings and comments
+    declaration("let $x := 1 return $_y");
+    declaration("_1 + 1");
+    declaration("declare function f() { 1 }; '_f()'");
+    declaration("declare function f() { 1 }; (: _f() :)");
+  }
+
   /** Code completion snippets. */
   @Test public void snippets() {
     // main modules: no prefix
@@ -500,6 +532,22 @@ public final class SyntaxXQueryTest {
       names.add(declaration.name() + ' ' + declaration.line());
     }
     assertArrayEquals(expected, names.finish(), query);
+  }
+
+  /**
+   * Checks where the name at the caret of a query is declared.
+   * @param query query string, in which an underscore marks the caret and a circumflex the
+   *   expected declaration (no circumflex: no declaration is expected)
+   */
+  private static void declaration(final String query) {
+    final Syntax syntax = new SyntaxXQuery();
+    syntax.init(PLAIN);
+
+    // remove the markers and adjust the positions to the resulting string
+    final int c = query.indexOf('_'), m = query.indexOf('^');
+    final int caret = m != -1 && m < c ? c - 1 : c, expected = m == -1 || m < c ? m : m - 1;
+    final String string = query.replace("_", "").replace("^", "");
+    assertEquals(expected, syntax.declaration(Token.token(string), caret), query);
   }
 
   /**

@@ -939,6 +939,12 @@ public interface Text {
   /** Command info. */
   String DECLARATIONS = lang("declarations");
   /** Command info. */
+  String GO_TO_DECLARATION = lang("go_to_declaration");
+  /** Command info. */
+  String PREVIOUS_LOCATION = lang("previous_location");
+  /** Command info. */
+  String NEXT_LOCATION = lang("next_location");
+  /** Command info. */
   String COLORS = lang("colors");
   /** Command info. */
   String CUT = lang("cut");

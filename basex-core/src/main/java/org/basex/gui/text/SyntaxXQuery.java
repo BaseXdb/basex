@@ -64,6 +64,10 @@ final class SyntaxXQuery extends SyntaxMarkup {
   /** Clauses of a FLWOR expression (without {@code return}). */
   private static final HashSet<String> CLAUSES = new HashSet<>(Arrays.asList(
     COUNT, FOR, GROUP, LET, ORDER, STABLE, WHERE, WINDOW));
+  /** Keywords that are followed by the name of a variable they bind. */
+  private static final HashSet<String> BINDINGS = new HashSet<>(Arrays.asList(
+    AT, CASE, COPY, COUNT, END, EVERY, FOR, KEY, LET, MEMBER, NEXT, PREVIOUS, SCORE, SOME,
+    START, VALUEE, VARIABLE, WINDOW));
 
   /** Line type: no clause. */
   private static final int NONE = 0;
@@ -453,6 +457,19 @@ final class SyntaxXQuery extends SyntaxMarkup {
   }
 
   @Override
+  int declaration(final byte[] text, final int pos) {
+    final String name = symbol(text, pos);
+    if(name == null) return -1;
+    // a variable is bound by a clause, a parameter or a global declaration
+    if(name.charAt(0) == '$') return binding(text, name, pos);
+    // a function is declared in the prolog
+    for(final Declaration declaration : declarations(text)) {
+      if(declaration.name().equals(name)) return declaration.pos();
+    }
+    return -1;
+  }
+
+  @Override
   ArrayList<ArrayList<Completion>> completions(final byte[] text, final int pos) {
     final Context context = new Context(pos);
     final ArrayList<Declaration> declarations = scan(text, context);
@@ -773,6 +790,102 @@ final class SyntaxXQuery extends SyntaxMarkup {
       context.element = stack.isEmpty() ? null : stack.peek();
     }
     return declarations;
+  }
+
+  /**
+   * Returns the name of the function or variable at the specified position.
+   * @param text text
+   * @param pos position
+   * @return name, preceded by a dollar sign if it is a variable, or {@code null} if the position
+   *   is not covered by a name in code
+   */
+  private String symbol(final byte[] text, final int pos) {
+    reset();
+
+    // start of the current name
+    int begin = -1;
+    final int tl = text.length;
+    for(int p = 0; p <= tl;) {
+      final int cl = p < tl ? cl(text, p) : 1, ch = p < tl ? cp(text, p) : 0;
+      if(p < tl) color(text, p, p + cl);
+      final boolean code = p < tl && code(), nc = code && (XMLToken.isNCChar(ch) ||
+        ch == ':' && begin != -1 && p + cl < tl && XMLToken.isNCStartChar(cp(text, p + cl)));
+      if(nc) {
+        if(begin == -1) begin = p;
+      } else if(begin != -1) {
+        // the caret may be placed before, inside or after the name
+        if(pos >= begin && pos <= p) {
+          final String name = string(text, begin, p - begin);
+          return begin > 0 && text[begin - 1] == '$' ? '$' + name : name;
+        }
+        if(p > pos) break;
+        begin = -1;
+      }
+      p += cl;
+    }
+    return null;
+  }
+
+  /**
+   * Returns the position at which the specified variable is bound.
+   * @param text text
+   * @param name variable name, preceded by a dollar sign
+   * @param pos position of the reference
+   * @return position of the binding, or {@code -1} if none was found
+   */
+  private int binding(final byte[] text, final String name, final int pos) {
+    reset();
+
+    // last binding before the reference, and first binding of the text
+    int found = -1, first = -1;
+    // start of the current name, flag for the next variable, last two words in code
+    int begin = -1;
+    boolean binds = false;
+    String word = "", previous = "";
+    // parameter lists of inline functions
+    final BoolList params = new BoolList();
+
+    final int tl = text.length;
+    for(int p = 0; p < tl;) {
+      final int cl = cl(text, p), ch = cp(text, p);
+      color(text, p, p + cl);
+      final boolean code = code(), nc = code && (XMLToken.isNCChar(ch) ||
+        ch == ':' && begin != -1 && p + cl < tl && XMLToken.isNCStartChar(cp(text, p + cl)));
+      if(nc) {
+        if(begin == -1) begin = p;
+      } else {
+        if(begin != -1) {
+          if(begin > 0 && text[begin - 1] == '$') {
+            if(binds && name.equals('$' + string(text, begin, p - begin))) {
+              if(first == -1) first = begin;
+              if(begin <= pos) found = begin;
+            }
+            // a variable occupies the word slot: the name of a called function is no keyword
+            previous = word;
+            word = "";
+          } else {
+            previous = word;
+            word = string(text, begin, p - begin);
+            binds = BINDINGS.contains(word);
+          }
+          begin = -1;
+        }
+        // the parentheses and commas of an inline function bind its parameters
+        if(code && !ws(ch) && ch != '$') {
+          if(ch == '(') {
+            params.add(Strings.eq(word, FN, FUNCTION) || FUNCTION.equals(previous));
+            binds = params.peek();
+          } else if(ch == ',') {
+            binds = !params.isEmpty() && params.peek();
+          } else {
+            if(ch == ')' && !params.isEmpty()) params.pop();
+            binds = false;
+          }
+        }
+      }
+      p += cl;
+    }
+    return found != -1 ? found : first;
   }
 
   @Override

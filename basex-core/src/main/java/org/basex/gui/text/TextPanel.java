@@ -1148,6 +1148,7 @@ public class TextPanel extends BaseXPanel {
       pos = t + 1;
       ++line;
     }
+    gui.editor.addLocation();
     setCaret(pos);
     gui.editor.posCode.invokeLater();
   }
@@ -1169,14 +1170,27 @@ public class TextPanel extends BaseXPanel {
   }
 
   /**
-   * Jumps to a declaration of the current text.
+   * Opens a dialog for jumping to a declaration of the current text.
    */
-  public final void gotoDeclaration() {
+  public final void showDeclarations() {
     // the button and the menu entry can be enabled until the controls are refreshed
     if(!hasDeclarations()) return;
 
     // the caret follows the selection and stays where the dialog leaves it
+    gui.editor.addLocation();
     DialogDeclaration.show(gui, declarations(), editor.pos(), this::setCaret);
+    gui.editor.posCode.invokeLater();
+  }
+
+  /**
+   * Jumps to the declaration of the name at the caret.
+   */
+  public final void gotoDeclaration() {
+    final int pos = rend.syntax().declaration(editor.text(), editor.pos());
+    if(pos == -1) return;
+
+    gui.editor.addLocation();
+    setCaret(pos);
     gui.editor.posCode.invokeLater();
   }
 
