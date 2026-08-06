@@ -23,6 +23,8 @@ public final class JobPool {
   static final int MAX_CACHED = 1 << 10;
   /** Maximum number of registered jobs. */
   static final int MAX_REGISTERED = 1 << 20;
+  /** Interval between two memory checks (ms). */
+  private static final long MEMORY_INTERVAL = 250;
 
   /** Queued or running jobs. */
   public final Map<String, Job> active = new ConcurrentHashMap<>();
@@ -40,8 +42,15 @@ public final class JobPool {
   private final Semaphore slots = new Semaphore(MAX_RUNNING);
   /** Monitor, notified whenever a job or task completes (see {@link #awaitChange}). */
   private final Object monitor = new Object();
+  /** Jobs with a memory limit, watched by the memory guard. */
+  private final Map<Job, Watch> watched = new ConcurrentHashMap<>();
+  /** Indicates that a memory check is in progress. */
+  private final AtomicBoolean checking = new AtomicBoolean();
   /** Timeout (ms). */
   private final long timeout;
+
+  /** Handle for canceling the memory guard (can be {@code null}). */
+  private ScheduledFuture<?> memoryFuture;
 
   /**
    * Constructor.
@@ -129,6 +138,89 @@ public final class JobPool {
   public void scheduleResult(final Job job) {
     schedule(() -> results.remove(job.jc().id()), timeout);
   }
+
+  /**
+   * Watches the memory consumption of a job, which will be stopped if the heap usage grows beyond
+   * the specified limit. Must be called from the thread that runs the job.
+   * @param job job
+   * @param mb maximum number of megabytes that may be allocated
+   */
+  public void watchMemory(final Job job, final long mb) {
+    // enforce garbage collection: unreachable objects must not raise the baseline
+    Performance.gc(2);
+    final Thread thread = Thread.currentThread();
+    final Watch watch = new Watch(Performance.memory() + (mb << 20), thread,
+        Performance.allocated(thread));
+    synchronized(watched) {
+      watched.put(job, watch);
+      if(memoryFuture == null) memoryFuture = scheduler.scheduleWithFixedDelay(this::checkMemory,
+          MEMORY_INTERVAL, MEMORY_INTERVAL, TimeUnit.MILLISECONDS);
+    }
+  }
+
+  /**
+   * Stops watching the memory consumption of a job.
+   * @param job job
+   */
+  public void unwatchMemory(final Job job) {
+    synchronized(watched) {
+      if(watched.remove(job) != null && watched.isEmpty()) {
+        memoryFuture.cancel(false);
+        memoryFuture = null;
+      }
+    }
+  }
+
+  /**
+   * Stops the greediest job if a memory limit was exceeded.
+   */
+  private void checkMemory() {
+    // skip garbage collection if all limits are met, or if a previous check is still running
+    if(victim() == null || !checking.compareAndSet(false, true)) return;
+    // collect garbage outside the scheduler thread, as it may take a long time
+    pool.execute(() -> {
+      try {
+        Performance.gc(1);
+        final Job job = victim();
+        if(job != null) {
+          unwatchMemory(job);
+          job.outOfMemory();
+        }
+      } finally {
+        checking.set(false);
+      }
+    });
+  }
+
+  /**
+   * Returns the job to be stopped: of all jobs that exceed their memory limit, the one that has
+   * allocated most memory since it was watched.
+   * @return job, or {@code null} if all limits are met
+   */
+  private Job victim() {
+    final long memory = Performance.memory();
+    Job victim = null;
+    long max = -1;
+    for(final Map.Entry<Job, Watch> entry : watched.entrySet()) {
+      final Job job = entry.getKey();
+      final Watch watch = entry.getValue();
+      if(job.stopped() || memory <= watch.limit()) continue;
+      final long allocated = Performance.allocated(watch.thread()) - watch.allocated();
+      if(allocated > max) {
+        max = allocated;
+        victim = job;
+      }
+    }
+    return victim;
+  }
+
+  /**
+   * Memory limit of a watched job.
+   * @param limit heap usage above which the job will be stopped (bytes)
+   * @param thread thread that runs the job
+   * @param allocated bytes allocated by the thread when the job was watched
+   */
+  private record Watch(long limit, Thread thread, long allocated) { }
 
   /**
    * Returns all registered IDs.

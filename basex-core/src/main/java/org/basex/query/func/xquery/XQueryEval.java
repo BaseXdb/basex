@@ -78,29 +78,15 @@ public class XQueryEval extends StandardFunc {
     try(QueryContext qctx = new QueryContext(qc, null)) {
       qctx.user = new User(user).permission(perm);
 
-      // limit memory consumption: enforce garbage collection and calculate usage
+      // limit memory consumption
       final long mb = options.get(XQueryOptions.MEMORY);
-      if(mb != 0) {
-        Performance.gc(2);
-        final long limit = Performance.memory() + (mb << 20);
-        to = new Timer(true);
-        to.schedule(new TimerTask() {
-          @Override
-          // limit reached: stop query if garbage collection does not help
-          public void run() {
-            if(!qctx.stopped() && Performance.memory() > limit) {
-              Performance.gc(1);
-              if(Performance.memory() > limit) qctx.outOfMemory();
-            }
-          }
-        }, 250, 250);
-      }
+      if(mb != 0) qc.context.jobs.watchMemory(qctx, mb);
 
       // timeout
       final long ms = ((ANum) options.get(XQueryOptions.TIMEOUT)).dec(info).
           multiply(BigDecimal.valueOf(1000)).longValue();
       if(ms > 0) {
-        if(to == null) to = new Timer(true);
+        to = new Timer(true);
         to.schedule(new TimerTask() {
           @Override
           public void run() { qctx.timeout(); }
@@ -154,6 +140,8 @@ public class XQueryEval extends StandardFunc {
       } catch(final StackOverflowError er) {
         // pass on error info: assign (possibly empty) path of module which caused the error
         throw XQUERY_UNEXPECTED_X.get(info, er);
+      } finally {
+        qc.context.jobs.unwatchMemory(qctx);
       }
     } finally {
       if(to != null) to.cancel();

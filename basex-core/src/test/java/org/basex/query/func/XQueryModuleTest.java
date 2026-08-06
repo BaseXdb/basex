@@ -79,6 +79,9 @@ public final class XQueryModuleTest extends SandboxTest {
     // queries
     error(func.args("(1 to 10000000000000) ! <a/>", " {}", " { 'memory': 10 }"),
         XQUERY_MEMORY);
+    error(func.args("let $x := (1 to 3000000) ! string() return " +
+        "(count($x[. = 'zzz']), (1 to 200000000)[. = -1], count($x[. = 'yyy']))",
+        " {}", " { 'memory': 1 }"), XQUERY_MEMORY);
   }
 
   /** Test method. */
