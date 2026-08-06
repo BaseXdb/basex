@@ -45,7 +45,7 @@ public abstract class IndexBuilder extends Job {
   /** Number of partial index structures. */
   protected int splits;
   /** Threshold for freeing memory when estimating main memory consumption. */
-  private int gcCount;
+  private int gcCount = -1;
 
   /**
    * Constructor.
