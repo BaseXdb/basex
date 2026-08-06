@@ -148,6 +148,15 @@ public final class Performance {
   }
 
   /**
+   * Returns the number of bytes that may still be allocated before the heap limit is reached.
+   * @return available memory
+   */
+  public static long available() {
+    final Runtime rt = Runtime.getRuntime();
+    return rt.maxMemory() - rt.totalMemory() + rt.freeMemory();
+  }
+
+  /**
    * Returns the rounded up number of units.
    * @param number number
    * @param size size of unit

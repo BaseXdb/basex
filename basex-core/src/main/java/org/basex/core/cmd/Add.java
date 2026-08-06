@@ -154,12 +154,10 @@ public final class Add extends ACreate {
     }
 
     // check free memory
-    final Runtime rt = Runtime.getRuntime();
-    final long max = rt.maxMemory();
-    if(fl < (max - rt.freeMemory()) / 2) return false;
+    if(fl < Performance.available() / 2) return false;
     // if caching may be necessary, run garbage collection and try again
     Performance.gc(2);
-    return fl > (max - rt.freeMemory()) / 2;
+    return fl > Performance.available() / 2;
   }
 
   @Override
