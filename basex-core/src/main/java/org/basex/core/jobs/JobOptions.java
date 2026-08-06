@@ -1,6 +1,8 @@
 package org.basex.core.jobs;
 
 import org.basex.core.*;
+import org.basex.core.users.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.options.*;
 
@@ -24,6 +26,11 @@ public final class JobOptions extends Options {
   public static final BooleanOption CACHE = new BooleanOption("cache");
   /** Maximum amount of megabytes that may be allocated by the query. */
   public static final NumberOption MEMORY = new NumberOption("memory", 0);
+  /** Timeout in seconds. */
+  public static final ValueOption TIMEOUT =
+      new ValueOption("timeout", BasicType.DECIMAL.seqType(), Dec.ZERO);
+  /** Permission. */
+  public static final EnumOption<Perm> PERMISSION = new EnumOption<>("permission", Perm.ADMIN);
   /** Start date/time/duration. */
   public static final StringOption START = new StringOption("start", null, TIME_TYPE);
   /** End date/duration. */

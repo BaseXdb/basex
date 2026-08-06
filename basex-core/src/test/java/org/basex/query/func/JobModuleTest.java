@@ -115,6 +115,25 @@ public final class JobModuleTest extends SandboxTest {
     error(_JOB_RESULT.args(id), XQUERY_MEMORY);
   }
 
+  /** Test method. */
+  @Test public void evalTimeout() {
+    final Function func = _JOB_EVAL;
+    final String id = query(func.args(VERY_SLOW_QUERY, " ()",
+        " { 'cache': true(), 'timeout': 0.1 }"));
+    query(_JOB_WAIT.args(id));
+    error(_JOB_RESULT.args(id), XQUERY_TIMEOUT);
+  }
+
+  /** Test method. */
+  @Test public void evalPermission() {
+    final Function func = _JOB_EVAL;
+    query(_DB_CREATE.args(NAME));
+    final String id = query(func.args(_DB_GET.args(NAME).trim(), " ()",
+        " { 'cache': true(), 'permission': 'none' }"));
+    query(_JOB_WAIT.args(id));
+    error(_JOB_RESULT.args(id), BASEX_PERMISSION_X_X);
+  }
+
   /** Test method: a job that allocates a limited amount of memory is stopped as well. */
   @Test public void evalMemoryBounded() {
     final Function func = _JOB_EVAL;

@@ -59,7 +59,9 @@ public abstract class Job {
     state(JobState.RUNNING);
     jc.performance = new Performance();
     // non-admin users: stop process after timeout
-    if(!ctx.user().has(Perm.ADMIN)) startTimeout(ctx, ctx.soptions.get(StaticOptions.TIMEOUT));
+    if(!ctx.user().has(Perm.ADMIN)) {
+      startTimeout(ctx, ctx.soptions.get(StaticOptions.TIMEOUT) * 1000L);
+    }
   }
 
   /**
@@ -304,13 +306,13 @@ public abstract class Job {
   // PRIVATE FUNCTIONS ============================================================================
 
   /**
-   * Schedules the timeout on the shared job scheduler.
+   * Schedules the timeout on the shared job scheduler. A previously scheduled timeout is replaced.
    * @param ctx context
-   * @param sec seconds wait; deactivated if set to 0
+   * @param ms milliseconds to wait; deactivated if set to 0
    */
-  private void startTimeout(final Context ctx, final long sec) {
-    if(sec == 0) return;
-    timeoutFuture = ctx.jobs.schedule(this::timeout, sec * 1000L);
+  void startTimeout(final Context ctx, final long ms) {
+    stopTimeout();
+    if(ms > 0) timeoutFuture = ctx.jobs.schedule(this::timeout, ms);
   }
 
   /**

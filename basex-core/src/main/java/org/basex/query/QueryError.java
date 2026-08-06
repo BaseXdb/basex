@@ -331,6 +331,8 @@ public enum QueryError {
   /** Error code. */
   JOBS_OVERFLOW1_X(JOB, "overflow", "Too many jobs registered (%)."),
   /** Error code. */
+  JOBS_PERM_X(JOB, "permission", "No % permission."),
+  /** Error code. */
   JOBS_OVERFLOW2_X(JOB, "overflow", "Too many job results cached (%)."),
   /** Error code. */
   JOBS_RANGE_X(JOB, "range", "Value out of range: %."),

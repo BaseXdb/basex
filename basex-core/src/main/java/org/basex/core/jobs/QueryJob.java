@@ -3,6 +3,7 @@ package org.basex.core.jobs;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
+import java.math.*;
 import java.time.*;
 import java.util.*;
 import java.util.Map.*;
@@ -11,6 +12,7 @@ import java.util.function.*;
 
 import org.basex.core.*;
 import org.basex.core.locks.*;
+import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -35,6 +37,9 @@ public final class QueryJob extends Job implements Runnable {
   private final Locks callerLocks;
   /** Input info of the calling expression (for error reporting). */
   private final InputInfo info;
+
+  /** Permissions granted to the query. */
+  private final Perm perm;
 
   /** Query processor. */
   private QueryProcessor qp;
@@ -61,8 +66,12 @@ public final class QueryJob extends Job implements Runnable {
     this.info = info;
     jc().context = context;
 
-    // check when job is to be started
+    // permissions must not be escalated
     final JobOptions opts = job.options;
+    perm = opts.get(JobOptions.PERMISSION);
+    if(!context.user().has(perm)) throw JOBS_PERM_X.get(info, perm);
+
+    // check when job is to be started
     final Item start = toTime(opts.get(JobOptions.START), info);
     long delay = start == null ? 0 : toDelay(start, 0, info);
 
@@ -240,6 +249,7 @@ public final class QueryJob extends Job implements Runnable {
 
       final Performance perf = new Performance();
       qp = new QueryProcessor(job.query, opts.get(JobOptions.BASE_URI), ctx, null);
+      qp.qc.user = new User(ctx.user()).permission(perm);
       boolean registered = false;
       try {
         // parse, push and register query. order is important!
@@ -268,6 +278,10 @@ public final class QueryJob extends Job implements Runnable {
         // limit memory consumption
         final long mb = opts.get(JobOptions.MEMORY);
         if(mb != 0) ctx.jobs.watchMemory(this, mb);
+        // limit execution time
+        final long ms = ((ANum) opts.get(JobOptions.TIMEOUT)).dec(info).
+            multiply(BigDecimal.valueOf(1000)).longValue();
+        if(ms > 0) startTimeout(ctx, ms);
         // reset timer
         perf.nanoRuntime();
         if(remove) ctx.jobs.tasks.remove(id);
