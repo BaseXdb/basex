@@ -536,6 +536,16 @@ final class TextRenderer extends BaseXBack {
   }
 
   /**
+   * Returns the vertical position below the rendered row with the caret.
+   * @return position, relative to the text panel, or {@code -1} if the text has not been rendered
+   */
+  int cursorBottom() {
+    final Graphics g = getGraphics();
+    if(caretIter(g) == null) return -1;
+    return lineY + fontHeight - scroll.pos();
+  }
+
+  /**
    * Moves the iterator to the rendered row with the caret.
    * @param iter text iterator
    * @param g graphics reference (can be {@code null})

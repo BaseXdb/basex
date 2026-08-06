@@ -742,7 +742,7 @@ public class TextPanel extends BaseXPanel {
     // refresh completions, or show them after a delay if the cursor was moved
     if(moved || edited) {
       refreshCompletion(true);
-      refreshSignature(false);
+      signatureCode.invokeLater(false);
     } else if(control(e) || e.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
       // close the popups: the key press will be processed as a shortcut
       completion.hide();
@@ -803,6 +803,14 @@ public class TextPanel extends BaseXPanel {
     }
   };
 
+  /** Refreshes the signature popup ({@code true}: show the signature of a new call). */
+  private final GUICode<Boolean> signatureCode = new GUICode<>() {
+    @Override
+    public void execute(final Boolean show) {
+      refreshSignature(show);
+    }
+  };
+
   /**
    * Scrolls to the specified position.
    * @param y new vertical position
@@ -857,7 +865,7 @@ public class TextPanel extends BaseXPanel {
     final char ch = e.getKeyChar();
     refreshCompletion(Character.isLetter(ch) || rend.syntax().completeStart(ch));
     // a signature is proposed if an argument list is opened or continued
-    refreshSignature(ch == '(' || ch == ',');
+    signatureCode.invokeLater(ch == '(' || ch == ',');
   }
 
   /**
@@ -1274,9 +1282,12 @@ public class TextPanel extends BaseXPanel {
         // a keyword argument emphasizes the parameter it names, others the one at its position
         final String keyword = call.keyword();
         final int index = keyword != null ? sig.param(keyword) : call.arg();
-        // the popup is aligned with the called function, below the line with the caret
-        signature.show(sig, name, index, new Point(rend.x(call.start()), rend.cursor()[1]));
-        return;
+        // the popup is aligned with the called function, below the rendered row with the caret
+        final int y = rend.cursorBottom();
+        if(y != -1) {
+          signature.show(sig, name, index, new Point(rend.x(call.start()), y));
+          return;
+        }
       }
     }
     signature.hide();
@@ -1327,6 +1338,6 @@ public class TextPanel extends BaseXPanel {
     editor.complete(string, start);
     finish(pos, true);
     // an inserted function call is annotated with its signature
-    refreshSignature(true);
+    signatureCode.invokeLater(true);
   }
 }
