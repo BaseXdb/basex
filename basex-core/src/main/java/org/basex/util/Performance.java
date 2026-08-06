@@ -1,5 +1,7 @@
 package org.basex.util;
 
+import java.lang.management.*;
+import java.lang.reflect.*;
 import java.util.*;
 
 /**
@@ -9,6 +11,9 @@ import java.util.*;
  * @author Christian Gruen
  */
 public final class Performance {
+  /** Method for retrieving thread allocation statistics (can be {@code null}). */
+  private static final Method ALLOCATED = allocatedMethod();
+
   /** Performance timer, using nanoseconds. */
   private long time = System.nanoTime();
 
@@ -154,6 +159,41 @@ public final class Performance {
   public static long available() {
     final Runtime rt = Runtime.getRuntime();
     return rt.maxMemory() - rt.totalMemory() + rt.freeMemory();
+  }
+
+  /**
+   * Returns the total number of bytes that have been allocated by the specified thread.
+   * @param thread thread
+   * @return allocated bytes, or {@code -1} if allocation statistics are unavailable
+   */
+  public static long allocated(final Thread thread) {
+    try {
+      if(ALLOCATED != null) {
+        return (Long) ALLOCATED.invoke(ManagementFactory.getThreadMXBean(), thread.threadId());
+      }
+    } catch(final ReflectiveOperationException ex) {
+      Util.debug(ex);
+    }
+    return -1;
+  }
+
+  /**
+   * Returns the method for retrieving thread allocation statistics. The method is looked up by
+   * name, as it belongs to a JVM-specific extension that is not supplied by every runtime.
+   * @return method, or {@code null} if allocation statistics are unavailable
+   */
+  private static Method allocatedMethod() {
+    try {
+      final ThreadMXBean bean = ManagementFactory.getThreadMXBean();
+      final Class<?> clazz = Class.forName("com.sun.management.ThreadMXBean");
+      if(clazz.isInstance(bean) &&
+         clazz.getMethod("isThreadAllocatedMemoryEnabled").invoke(bean) == Boolean.TRUE) {
+        return clazz.getMethod("getThreadAllocatedBytes", long.class);
+      }
+    } catch(final ReflectiveOperationException ex) {
+      Util.debug(ex);
+    }
+    return null;
   }
 
   /**
