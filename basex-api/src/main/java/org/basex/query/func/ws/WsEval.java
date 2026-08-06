@@ -1,11 +1,14 @@
 package org.basex.query.func.ws;
 
+import java.nio.*;
 import java.util.*;
 import java.util.function.*;
 
 import org.basex.core.jobs.*;
 import org.basex.http.ws.*;
 import org.basex.io.*;
+import org.basex.io.out.*;
+import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -22,16 +25,17 @@ public final class WsEval extends WsFn {
     final IOContent query = toContent(arg(0), qc);
     final HashMap<String, Value> bindings = toBindings(arg(1), qc);
     final WsOptions options = toOptions(arg(2), new WsOptions(), qc);
+    options.set(JobOptions.BASE_URI, toBaseUri(query.url(), options, JobOptions.BASE_URI));
 
-    final JobOptions jopts = new JobOptions();
-    jopts.set(JobOptions.BASE_URI, toBaseUri(query.url(), options, WsOptions.BASE_URI));
-    jopts.set(JobOptions.ID, options.get(WsOptions.ID));
-
-    final QueryJobSpec spec = new QueryJobSpec(jopts, bindings, query);
+    final QueryJobSpec spec = new QueryJobSpec(options, bindings, query);
     final WebSocket ws = ws(qc);
+    final SerializerOptions sopts = options.get(WsOptions.SERIALIZER);
     final Consumer<QueryJobResult> notify = result -> {
       try {
-        WsPool.send(result.value, ws.id);
+        // the outcome of a query is one message; a failed query is reported as error
+        final Value value = result.get();
+        final ArrayOutput ao = value.serialize(sopts);
+        ws.send(value instanceof Bin ? ByteBuffer.wrap(ao.toArray()) : ao.toString());
       } catch(final Exception ex) {
         ws.error(ex);
       }

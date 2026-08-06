@@ -12,7 +12,7 @@ import org.basex.util.options.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class JobOptions extends Options {
+public class JobOptions extends Options {
   /** Required type of a point in time (see {@link QueryJob#toTime}). */
   private static final SeqType TIME_TYPE = ChoiceItemType.get(BasicType.STRING, BasicType.INTEGER,
       BasicType.DAY_TIME_DURATION, BasicType.TIME, BasicType.DATE_TIME).seqType();

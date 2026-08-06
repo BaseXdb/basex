@@ -1,6 +1,7 @@
 package org.basex.query.func.ws;
 
-import org.basex.core.*;
+import org.basex.core.jobs.*;
+import org.basex.io.serial.*;
 import org.basex.util.options.*;
 
 /**
@@ -9,9 +10,8 @@ import org.basex.util.options.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class WsOptions extends Options {
-  /** Query base-uri. */
-  public static final StringOption BASE_URI = new StringOption(CommonOptions.BASE_URI);
-  /** Custom ID string. */
-  public static final StringOption ID = new StringOption("id");
+public final class WsOptions extends JobOptions {
+  /** Parameters for serializing the query result. */
+  public static final OptionsOption<SerializerOptions> SERIALIZER =
+      new OptionsOption<>("serializer", new SerializerOptions());
 }
