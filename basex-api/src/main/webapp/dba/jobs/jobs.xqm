@@ -70,12 +70,15 @@ function dba:jobs(
           )
           let $options := { 'sort': $sort, 'presort': 'duration' }
           return html:table($headers, $entries, $buttons, {}, $options) update {
-            (: replace job ids with links :)
-            for $tr in tr[not(th)]
+            (: replace job ids with links; the separator after the checkbox stays outside :)
+            for $tr in descendant::tr[not(th)]
             for $text in $tr/td[1]/text()
             for $id in data($tr/@id)
-            for $entries in $entries[?id = $id][?you = '–']
-            return replace node $text with <a href='?job={ $entries?id }'>{ $text }</a>
+            where exists($entries[?id = $id][?you = '–'])
+            return replace node $text with (
+              substring-before($text, $id),
+              <a href='?job={ $id }'>{ $id }</a>
+            )
           }
         }
       </form>
