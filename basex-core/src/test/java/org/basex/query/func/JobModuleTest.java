@@ -26,6 +26,10 @@ public final class JobModuleTest extends SandboxTest {
   private static final String VERY_SLOW_QUERY = "(1 to 10000000000)[.=1]";
   /** Slow query. */
   private static final String SLOW_QUERY = "(1 to 10000000)[.=1]";
+  /** Query that allocates a limited amount of memory and keeps it referenced. The variable is
+   * accessed twice, so that the sequence is cached and stays reachable while the query runs. */
+  private static final String BOUNDED_QUERY = "let $x := (1 to 3000000) ! string() return " +
+      "(count($x[. = 'zzz']), (1 to 200000000)[. = -1], count($x[. = 'yyy']))";
 
   /** Wait until all queries have been processed. */
   @AfterEach public void clean() {
@@ -100,6 +104,40 @@ public final class JobModuleTest extends SandboxTest {
     error(func.args("1", " ()", " { 'cron': '* * * * *', 'interval': 'PT1S' }"), JOBS_OPTIONS_X_X);
     error(func.args("1", " ()", " { 'cron': '* * * * *', 'start': 'PT1S' }"), JOBS_OPTIONS_X_X);
     error(func.args("1", " ()", " { 'cron': '* * * * *', 'cache': true() }"), JOBS_OPTIONS_X_X);
+  }
+
+  /** Test method. */
+  @Test public void evalMemory() {
+    final Function func = _JOB_EVAL;
+    final String id = query(func.args("(1 to 10000000000000) ! <a/>", " ()",
+        " { 'cache': true(), 'memory': 10 }"));
+    query(_JOB_WAIT.args(id));
+    error(_JOB_RESULT.args(id), XQUERY_MEMORY);
+  }
+
+  /** Test method: a job that allocates a limited amount of memory is stopped as well. */
+  @Test public void evalMemoryBounded() {
+    final Function func = _JOB_EVAL;
+    final String id = query(func.args(BOUNDED_QUERY, " ()",
+        " { 'cache': true(), 'memory': 1 }"));
+    query(_JOB_WAIT.args(id));
+    error(_JOB_RESULT.args(id), XQUERY_MEMORY);
+  }
+
+  /** Test method: of two jobs with a memory limit, only the greedy one is stopped. */
+  @Test public void evalMemoryVictim() {
+    final Function func = _JOB_EVAL;
+    final String options = " { 'cache': true(), 'memory': 10 }";
+    // job that allocates nothing, but whose limit is exceeded by the heap usage of the other job
+    final String idle = query(func.args("prof:sleep(3000)", " ()", options));
+    final String greedy = query(func.args("(1 to 10000000000000) ! <a/>", " ()", options));
+
+    query(_JOB_WAIT.args(greedy));
+    error(_JOB_RESULT.args(greedy), XQUERY_MEMORY);
+    // the idle job was still running when the greedy one was stopped, and it survived
+    query(_JOB_LIST.args() + " = '" + idle + '\'', true);
+    query(_JOB_WAIT.args(idle));
+    query(_JOB_RESULT.args(idle));
   }
 
   /** Test method. */

@@ -265,6 +265,9 @@ public final class QueryJob extends Job implements Runnable {
         pushJob(qp);
         registered = true;
         register(ctx);
+        // limit memory consumption
+        final long mb = opts.get(JobOptions.MEMORY);
+        if(mb != 0) ctx.jobs.watchMemory(this, mb);
         // reset timer
         perf.nanoRuntime();
         if(remove) ctx.jobs.tasks.remove(id);
@@ -272,14 +275,20 @@ public final class QueryJob extends Job implements Runnable {
         // retrieve result; copy persistent database nodes
         result.value = qp.value().materialize(d -> d == null || d.inMemory(), null, qp.qc);
       } catch(final JobException ex) {
-        // query was interrupted: remove cached result
+        // query was interrupted: report exceeded limits, discard result of a stopped query
         Util.debug(ex);
-        ctx.jobs.results.remove(id);
+        final QueryError error = state == JobState.TIMEOUT ? XQUERY_TIMEOUT :
+          state == JobState.MEMORY ? XQUERY_MEMORY : null;
+        if(error != null) result.exception = error.get(info);
+        else ctx.jobs.results.remove(id);
       } catch(final QueryException ex) {
         result.exception = ex;
       } catch(final Throwable ex) {
         result.exception = XQUERY_UNEXPECTED_X.get(null, ex);
       } finally {
+        // stop watching before the state is updated, so that a finished job is never stopped
+        ctx.jobs.unwatchMemory(this);
+
         // close and invalidate query after result has been assigned. order is important!
         if(opts.get(JobOptions.CACHE) == Boolean.TRUE) {
           ctx.jobs.scheduleResult(this);
