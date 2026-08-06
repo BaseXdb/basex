@@ -380,10 +380,11 @@ header {
   border-left: var(--line) solid var(--border);
 }
 
-/* labeled form field: label column, control column */
+/* labeled form field: label column, control column.
+   The column is a constant because each field is its own grid: it must fit the longest label */
 .field {
   display: grid;
-  grid-template-columns: 10rem 1fr;
+  grid-template-columns: 8rem 1fr;
   align-items: baseline;
   /* collapses between adjacent fields, and separates the first from a block above */
   margin: var(--space) 0;

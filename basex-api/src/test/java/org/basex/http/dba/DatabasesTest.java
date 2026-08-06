@@ -22,7 +22,7 @@ public final class DatabasesTest extends DBATest {
    * @throws IOException I/O exception
    */
   @AfterEach public void cleanup() throws IOException {
-    post("dbs-drop", Map.of("name", DB));
+    post("databases/drop", Map.of("name", DB));
   }
 
   /**
@@ -41,7 +41,7 @@ public final class DatabasesTest extends DBATest {
     assertTrue(post("db-create", Map.of("name", DB, "do", "do", "lang", "en")).contains(DB),
         "new database not shown");
     assertTrue(get("databases").contains(DB), "database missing from list");
-    post("dbs-drop", Map.of("name", DB));
+    post("databases/drop", Map.of("name", DB));
     assertFalse(get("databases").contains(DB), "database still listed after drop");
   }
 }

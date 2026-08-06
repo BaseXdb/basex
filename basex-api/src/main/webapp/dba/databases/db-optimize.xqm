@@ -73,23 +73,3 @@ function dba:db-optimize(
     utils:redirect($dba:SUB, { 'name': $name, 'info': 'Database was optimized.' })
   })
 };
-
-(:~
- : Optimizes databases with the given settings.
- : @param  $names  names of databases
- : @return redirection
- :)
-declare
-  %updating
-  %rest:path('/dba/dbs-optimize')
-  %rest:form-param('name', '{$names}')
-function dba:dbs-optimize(
-  $names  as xs:string*
-) {
-  try {
-    $names ! db:optimize(.),
-    utils:redirect($dba:CAT, { 'info': utils:info($names, 'database', 'optimized') })
-  } catch * {
-    utils:redirect($dba:CAT, { 'error': $err:description })
-  }
-};

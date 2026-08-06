@@ -22,7 +22,7 @@ public final class UsersTest extends DBATest {
    * @throws IOException I/O exception
    */
   @AfterEach public void cleanup() throws IOException {
-    post("user-drop", Map.of("name", USER));
+    post("users/drop", Map.of("name", USER));
   }
 
   /**
@@ -33,7 +33,7 @@ public final class UsersTest extends DBATest {
     assertTrue(create("read").contains("User was created."), "user not created");
     assertTrue(get("users").contains(USER), "user missing from list");
     assertTrue(get("user?name=" + USER).contains(USER), "user page not served");
-    post("user-drop", Map.of("name", USER));
+    post("users/drop", Map.of("name", USER));
     assertFalse(get("users").contains(USER), "user still listed after drop");
   }
 

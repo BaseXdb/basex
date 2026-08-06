@@ -15,6 +15,7 @@ declare variable $dba:CAT := 'databases';
  : @param  $files  map with uploaded files
  : @return form or redirection
  :)
+(: kept out of the databases dispatcher: an upload must not wait for the database locks :)
 declare
   %rest:POST
   %rest:path('/dba/backup-upload')

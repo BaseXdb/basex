@@ -7,22 +7,26 @@ module namespace dba = 'dba/settings';
 
 import module namespace config = 'dba/config' at '../lib/config.xqm';
 import module namespace html = 'dba/html' at '../lib/html.xqm';
+import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'settings';
 
 (:~
  : Settings.
- : @param  $info  info string
+ : @param  $info   info string
+ : @param  $error  error string
  : @return page
  :)
 declare
   %rest:GET
   %rest:path('/dba/settings')
   %rest:query-param('info',  '{$info}')
+  %rest:query-param('error', '{$error}')
   %output:method('html')
 function dba:settings(
-  $info  as xs:string?
+  $info   as xs:string?,
+  $error  as xs:string?
 ) as element(html) {
   let $system := html:properties(db:system())
   (: boundary between global and local options (keyed by name, not position) :)
@@ -61,7 +65,7 @@ function dba:settings(
   return (
     <div class='panel'>
       <form method='post' autocomplete='off'>
-        <h2>Settings » { html:button('settings-save', 'Save') }</h2>
+        <h2>Settings » { html:button('settings/save', 'Save') }</h2>
         <h3>Queries</h3>
         {
           $number($config:TIMEOUT, 'Timeout, in seconds (0 = disabled)'),
@@ -75,7 +79,7 @@ function dba:settings(
     </div>,
     <div class='panel'>
       <form method='post' autocomplete='off'>
-        <h2>Global Options » { html:button('settings-gc', 'GC') }</h2>
+        <h2>Global Options » { html:button('settings/gc', 'GC') }</h2>
         { $fixed-table($local/preceding-sibling::tr[not(th)]) }
       </form>
     </div>,
@@ -91,18 +95,31 @@ function dba:settings(
       <h2>System Properties</h2>
       { $map-table(proc:property-map()) }
     </div>
-  ) => html:wrap({ 'header': $dba:CAT, 'info': $info })
+  ) => html:wrap({ 'header': $dba:CAT, 'info': $info, 'error': $error })
 };
 
 (:~
- : Saves the settings.
+ : Runs a settings action.
+ : @param  $action  name of action
  : @return redirection
  :)
 declare
+  %updating
   %rest:POST
-  %rest:path('/dba/settings-save')
-function dba:settings-save(
-) as element(rest:response) {
-  config:save(html:parameters()),
-  web:redirect($dba:CAT, { 'info': 'Settings were saved.' })
+  %rest:path('/dba/settings/{$action}')
+function dba:action(
+  $action  as xs:string
+) {
+  utils:dispatch($action, {
+    'save': fn($args) { {
+      'page': $dba:CAT,
+      'info': 'Settings were saved.',
+      'run' : %updating fn() { config:save(html:parameters()) }
+    } },
+    'gc': fn($args) { {
+      'page': $dba:CAT,
+      'info': 'Garbage collection was triggered.',
+      'run' : %updating fn() { prof:gc() }
+    } }
+  })
 };

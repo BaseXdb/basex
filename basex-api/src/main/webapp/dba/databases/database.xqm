@@ -71,7 +71,7 @@ function dba:database(
               }
             let $buttons := (
               html:button('db-put', 'Put…'),
-              html:button('db-delete', 'Delete', ('CHECK', 'CONFIRM')),
+              html:button('databases/resource-delete', 'Delete', ('CHECK', 'CONFIRM')),
               html:button('db-copy', 'Copy…'),
               html:button('db-alter', 'Rename…'),
               html:button('db-optimize', 'Optimize…')
@@ -115,8 +115,8 @@ function dba:database(
               html:button('backup-create', 'Create…') update {
                 if (not($db-exists)) then insert node attribute disabled { '' } into .
               },
-              html:button('backup-restore', 'Restore', ('CHECK', 'CONFIRM')),
-              html:button('backup-drop', 'Drop', ('CHECK', 'CONFIRM'))
+              html:button('databases/backup-restore', 'Restore', ('CHECK', 'CONFIRM')),
+              html:button('databases/backup-drop', 'Drop', ('CHECK', 'CONFIRM'))
             )
             let $params := { 'name': $name }
             return html:table($headers, $entries, $buttons, $params)

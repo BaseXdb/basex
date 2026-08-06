@@ -186,3 +186,36 @@ declare %updating function utils:redirect(
 ) {
   update:output(web:redirect($url, $params))
 };
+
+(:~
+ : Runs the requested action and redirects to its target page: an info message is shown if the
+ : action succeeds, the error description if it fails.
+ : The actions of a category are supplied as a map. Each entry assigns an action name to a
+ : function that takes the request parameters and returns the following keys:
+ : * 'page': target page (mandatory)
+ : * 'run': function performing the action (mandatory)
+ : * 'params': query parameters of the target page
+ : * 'info': info message
+ :
+ : @param  $action   name of action
+ : @param  $actions  actions of the category
+ : @return redirection
+ :)
+declare %updating function utils:dispatch(
+  $action   as xs:string,
+  $actions  as map(*)
+) {
+  let $entry := $actions?($action) otherwise web:error(404, 'Unknown action: ' || $action)
+  let $target := $entry(request:parameter-map())
+  let $page := '/dba/' || $target?page
+  let $params := $target?params otherwise {}
+  let $run := $target?run
+  return try {
+    updating $run(),
+    utils:redirect($page, map:merge((
+      $params, { 'info': $target?info }[$target?info]
+    )))
+  } catch * {
+    utils:redirect($page, map:put($params, 'error', $err:description))
+  }
+};

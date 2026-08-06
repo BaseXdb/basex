@@ -53,6 +53,6 @@ public final class SettingsTest extends DBATest {
   private static String save(final Map<String, String> overrides) throws IOException {
     final Map<String, String> form = new HashMap<>(DEFAULTS);
     form.putAll(overrides);
-    return post("settings-save", form);
+    return post("settings/save", form);
   }
 }

@@ -66,7 +66,7 @@ function dba:jobs(
               'start': $start otherwise $time
             }
           let $buttons := (
-            html:button('job-remove', 'Remove', ('CHECK', 'CONFIRM'))
+            html:button('jobs/remove', 'Remove', ('CHECK', 'CONFIRM'))
           )
           let $options := { 'sort': $sort, 'presort': 'duration' }
           return html:table($headers, $entries, $buttons, {}, $options) update {
@@ -90,7 +90,7 @@ function dba:jobs(
             <input type='hidden' name='id' value='{ $job }'/>,
             <h2>{
               'Job: ', $job, '&#xa0;',
-              if ($details) { html:button('job-remove', 'Remove') }
+              if ($details) { html:button('jobs/remove', 'Remove') }
             }</h2>,
 
             if ($details) {
@@ -154,4 +154,25 @@ function dba:jobs(
       )
     }
   ) => html:wrap({ 'header': $dba:CAT, 'info': $info, 'error': $error })
+};
+
+(:~
+ : Runs a job action.
+ : @param  $action  name of action
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/jobs/{$action}')
+function dba:action(
+  $action  as xs:string
+) {
+  utils:dispatch($action, {
+    'remove': fn($args) { {
+      'page': $dba:CAT,
+      'info': utils:info($args?id, 'job', 'removed'),
+      'run' : %updating fn() { $args?id ! job:remove(.) }
+    } }
+  })
 };

@@ -10,6 +10,8 @@ import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
+(:~ Sub category :)
+declare variable $dba:SUB := 'database';
 
 (:~
  : List of databases.
@@ -68,10 +70,10 @@ function dba:databases(
           let $entries := ($databases, $backups)
           let $buttons := (
             html:button('db-create', 'Create…'),
-            html:button('dbs-optimize', 'Optimize', 'CHECK'),
-            html:button('dbs-drop', 'Drop', ('CHECK', 'CONFIRM')),
-            html:button('backups-create', 'Back up', 'CHECK'),
-            html:button('backups-restore', 'Restore', ('CHECK', 'CONFIRM'))
+            html:button('databases/optimize', 'Optimize', 'CHECK'),
+            html:button('databases/drop', 'Drop', ('CHECK', 'CONFIRM')),
+            html:button('databases/backups-create', 'Back up', 'CHECK'),
+            html:button('databases/backups-restore', 'Restore', ('CHECK', 'CONFIRM'))
           )
           let $count := count($db-names) + count($backups)
           let $options := {
@@ -126,8 +128,8 @@ function dba:databases(
             }
           let $buttons := (
             html:button('backup-create', 'Create…'),
-            html:button('backup-restore', 'Restore', ('CHECK', 'CONFIRM')),
-            html:button('backup-drop', 'Drop', ('CHECK', 'CONFIRM'))
+            html:button('databases/backup-restore', 'Restore', ('CHECK', 'CONFIRM')),
+            html:button('databases/backup-drop', 'Drop', ('CHECK', 'CONFIRM'))
           )
           let $params := { 'name': '' }
           return html:table($headers, $entries, $buttons, $params)
@@ -135,4 +137,66 @@ function dba:databases(
       </form>
     </div>
   ) => html:wrap({ 'header': $dba:CAT, 'info': $info, 'error': $error })
+};
+
+(:~
+ : Runs a database action.
+ : @param  $action  name of action
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/databases/{$action}')
+function dba:action(
+  $action  as xs:string
+) {
+  utils:dispatch($action, {
+    'drop': fn($args) { {
+      'page': $dba:CAT,
+      'info': utils:info($args?name, 'database', 'dropped'),
+      'run' : %updating fn() { $args?name ! db:drop(.) }
+    } },
+    'optimize': fn($args) { {
+      'page': $dba:CAT,
+      'info': utils:info($args?name, 'database', 'optimized'),
+      'run' : %updating fn() { $args?name ! db:optimize(.) }
+    } },
+    'backups-create': fn($args) { {
+      'page': $dba:CAT,
+      'info': utils:info($args?name, 'database', 'backed up'),
+      'run' : %updating fn() { $args?name ! db:create-backup(.) }
+    } },
+    'backups-restore': fn($args) { {
+      'page': $dba:CAT,
+      'info': utils:info($args?name, 'backup', 'restored'),
+      'run' : %updating fn() { $args?name ! db:restore(.) }
+    } },
+    'backup-drop': fn($args) {
+      let $name := string($args?name)
+      return {
+        'page'  : if ($name) then $dba:SUB else $dba:CAT,
+        'params': { 'name': $name },
+        'info'  : utils:info($args?backup, 'backup', 'dropped'),
+        'run'   : %updating fn() { $args?backup ! db:drop-backup($name || '-' || .) }
+      }
+    },
+    'backup-restore': fn($args) {
+      let $name := string($args?name)
+      (: only the first backup will be restored :)
+      let $backup := head($args?backup)
+      return {
+        'page'  : if ($name) then $dba:SUB else $dba:CAT,
+        'params': { 'name': $name },
+        'info'  : utils:info($backup, 'backup', 'restored'),
+        'run'   : %updating fn() { db:restore($name || '-' || $backup) }
+      }
+    },
+    'resource-delete': fn($args) { {
+      'page'  : $dba:SUB,
+      'params': { 'name': $args?name },
+      'info'  : utils:info($args?resource, 'resource', 'deleted'),
+      'run'   : %updating fn() { $args?resource ! db:delete($args?name, .) }
+    } }
+  })
 };

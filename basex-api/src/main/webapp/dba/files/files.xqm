@@ -7,6 +7,7 @@ module namespace dba = 'dba/files';
 
 import module namespace config = 'dba/config' at '../lib/config.xqm';
 import module namespace html = 'dba/html' at '../lib/html.xqm';
+import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'files';
@@ -37,7 +38,7 @@ function dba:files(
   return (
     <div class='panel'>
       <h2>Directory</h2>
-      <form action='dir-change' method='get' autocomplete='off'>
+      <form action='files/dir-change' method='get' autocomplete='off'>
         <button type='button' class='right' onclick='copy(this.form.dir.value)'>Copy path</button>
         <select name='dir' style='width: 350px;' onchange='this.form.submit();'>{
           let $dir-path := fn($path) {
@@ -95,7 +96,7 @@ function dba:files(
           let $size := file:size($file)
           return {
             'name': fn() {
-              if ($dir) then html:link($name, 'dir-change', { 'dir': $name }) else $name
+              if ($dir) then html:link($name, 'files/dir-change', { 'dir': $name }) else $name
             },
             'date': $modified,
             'bytes': $size,
@@ -114,7 +115,7 @@ function dba:files(
                     )
                     let $id := string($job/@id)
                     return if (empty($job)) {
-                      html:link('Start', 'file-start', { 'file': $name })
+                      html:link('Start', 'files/start', { 'file': $name })
                     } else {
                       html:link('Job', 'jobs', { 'job': $id })
                     }
@@ -124,7 +125,7 @@ function dba:files(
             }
           }
         )
-        let $buttons := html:button('file-delete', 'Delete', ('CHECK', 'CONFIRM'))
+        let $buttons := html:button('files/delete', 'Delete', ('CHECK', 'CONFIRM'))
         let $options := { 'sort': $sort, 'page': xs:integer($page) }
         return html:table($headers, $entries, $buttons, {}, $options)
       }</form>
@@ -132,14 +133,14 @@ function dba:files(
       <h3>Create Directory</h3>
       <form method='post' autocomplete='off'>{
         <input type='text' name='name'/>, ' ',
-        html:button('dir-create', 'Create')
+        html:button('files/dir-create', 'Create')
       }</form>
 
       <h3>Upload Files</h3>
       <form method='post' enctype='multipart/form-data' autocomplete='off'
             onsubmit='uploading(this);'>{
         <input type='file' name='files' multiple='multiple'/>,
-        html:button('file-upload', 'Upload')
+        html:button('files/upload', 'Upload')
       }</form>
     <div class='note'>
       Ensure that your server has enough RAM to upload large files.
@@ -147,4 +148,79 @@ function dba:files(
   </div>
     => html:wrap({ 'header': $dba:CAT, 'info': $info, 'error': $error })
   )
+};
+
+(:~
+ : Runs a file action. The directory is also changed via GET requests.
+ : @param  $action  name of action
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:GET
+  %rest:POST
+  %rest:path('/dba/files/{$action}')
+function dba:action(
+  $action  as xs:string
+) {
+  utils:dispatch($action, {
+    'dir-create': fn($args) { {
+      'page': $dba:CAT,
+      'info': `Directory "{ $args?name }" was created.`,
+      'run' : %updating fn() { file:create-dir(config:files-dir() || $args?name) }
+    } },
+    'dir-change': fn($args) { {
+      'page': $dba:CAT,
+      'run' : %updating fn() {
+        let $sep := file:dir-separator()
+        let $dir := string($args?dir)
+        let $path := file:path-to-native(
+          if (contains($dir, $sep)) then $dir else config:files-dir() || $dir || $sep
+        )
+        (: ensure that the directory can be accessed :)
+        return (void(file:list($path)), config:set-files-dir($path))
+      }
+    } },
+    'delete': fn($args) { {
+      'page': $dba:CAT,
+      'info': utils:info($args?name, 'file', 'deleted'),
+      'run' : %updating fn() {
+        (: delete all files, ignore reference to parent directory :)
+        $args?name[. != '..'] ! file:delete(config:files-dir() || .)
+      }
+    } },
+    'upload': fn($args) {
+      let $dir := config:files-dir()
+      let $files := $args?files[. instance of map(*)] otherwise {}
+      return {
+        'page': $dba:CAT,
+        'info': if (map:size($files)) { utils:info(map:keys($files), 'file', 'uploaded') },
+        'run' : %updating fn() {
+          (: parse all XQuery files; reject files that cannot be parsed :)
+          void(
+            for key $name value $content in $files
+            where matches($name, '\.xq(m|l|y|u|uery)?$')
+            return utils:query-parse(convert:binary-to-string($content), $dir || $name)
+          ),
+          for key $name value $content in $files
+          return file:write-binary(utils:safe-path($dir, $name), $content)
+        }
+      }
+    },
+    'start': fn($args) {
+      let $id := replace(string($args?file), '\.\.+|/|\\', '')
+      return {
+        'page'  : $dba:CAT,
+        'params': { 'job': $id },
+        'info'  : 'Job was started.',
+        'run'   : %updating fn() {
+          (: stop running job before starting new job :)
+          job:remove($id),
+          job:wait($id),
+          void(job:eval(xs:anyURI(config:files-dir() || $id), (),
+            { 'cache': true(), 'id': $id, 'log': 'DBA job' }))
+        }
+      }
+    }
+  })
 };

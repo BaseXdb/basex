@@ -64,7 +64,7 @@ function dba:sessions(
               'you': $you
             }
           let $buttons := (
-            html:button('session-kill', 'Kill', ('CHECK', 'CONFIRM'))
+            html:button('sessions/kill', 'Kill', ('CHECK', 'CONFIRM'))
           )
           let $options := { 'sort': $sort, 'presort': 'access' }
           return html:table($headers, $entries, $buttons, {}, $options)
@@ -86,4 +86,27 @@ function dba:sessions(
       }
     </div>
   ) => html:wrap({ 'header': $dba:CAT, 'info': $info, 'error': $error })
+};
+
+(:~
+ : Runs a session action.
+ : @param  $action  name of action
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/sessions/{$action}')
+function dba:action(
+  $action  as xs:string
+) {
+  utils:dispatch($action, {
+    'kill': fn($args) { {
+      'page': $dba:CAT,
+      'info': utils:info($args?id, 'session', 'killed'),
+      'run' : %updating fn() {
+        $args?id ! sessions:delete(substring-before(., '|'), substring-after(., '|'))
+      }
+    } }
+  })
 };

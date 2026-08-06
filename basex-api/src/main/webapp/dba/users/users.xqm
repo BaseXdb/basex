@@ -7,9 +7,12 @@ module namespace dba = 'dba/users';
 
 import module namespace config = 'dba/config' at '../lib/config.xqm';
 import module namespace html = 'dba/html' at '../lib/html.xqm';
+import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'users';
+(:~ Sub category :)
+declare variable $dba:SUB := 'user';
 
 (:~
  : Users.
@@ -52,7 +55,7 @@ function dba:users(
           )
           let $buttons := (
             html:button('user-create', 'Create…'),
-            html:button('user-drop', 'Drop', ('CHECK', 'CONFIRM'))
+            html:button('users/drop', 'Drop', ('CHECK', 'CONFIRM'))
           )
           let $options := { 'link': 'user', 'sort': $sort }
           return html:table($headers, $entries, $buttons, {}, $options)
@@ -71,4 +74,31 @@ function dba:users(
       }</form>
     </div>
   ) => html:wrap({ 'header': $dba:CAT, 'info': $info, 'error': $error })
+};
+
+(:~
+ : Runs a user action.
+ : @param  $action  name of action
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/users/{$action}')
+function dba:action(
+  $action  as xs:string
+) {
+  utils:dispatch($action, {
+    'drop': fn($args) { {
+      'page': $dba:CAT,
+      'info': utils:info($args?name, 'user', 'dropped'),
+      'run' : %updating fn() { $args?name ! user:drop(.) }
+    } },
+    'pattern-drop': fn($args) { {
+      'page'  : $dba:SUB,
+      'params': { 'name': $args?name },
+      'info'  : utils:info($args?pattern, 'pattern', 'dropped'),
+      'run'   : %updating fn() { $args?pattern ! user:drop($args?name, .) }
+    } }
+  })
 };

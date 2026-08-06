@@ -95,7 +95,7 @@ function dba:user(
               }
               let $buttons := (
                 html:button('pattern-add', 'Add…'),
-                html:button('pattern-drop', 'Drop', ('CHECK', 'CONFIRM'))
+                html:button('users/pattern-drop', 'Drop', ('CHECK', 'CONFIRM'))
               )
               return html:table($headers, $entries, $buttons)
             }

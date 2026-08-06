@@ -58,24 +58,3 @@ function dba:backup-create(
     utils:redirect($dba:SUB, { 'name': $name, 'info': 'Backup was created.' })
   })
 };
-
-(:~
- : Creates backups.
- : @param  $names  names of databases
- : @return redirection
- :)
-declare
-  %updating
-  %rest:POST
-  %rest:path('/dba/backups-create')
-  %rest:form-param('name', '{$names}')
-function dba:backups-create(
-  $names  as xs:string*
-) {
-  try {
-    $names ! db:create-backup(.),
-    utils:redirect($dba:CAT, { 'info': utils:info($names, 'database', 'backed up') })
-  } catch * {
-    utils:redirect($dba:CAT, { 'error': $err:description })
-  }
-};

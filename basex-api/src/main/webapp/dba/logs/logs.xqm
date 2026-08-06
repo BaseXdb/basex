@@ -7,6 +7,7 @@ module namespace dba = 'dba/logs';
 
 import module namespace config = 'dba/config' at '../lib/config.xqm';
 import module namespace html = 'dba/html' at '../lib/html.xqm';
+import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'logs';
@@ -70,7 +71,7 @@ function dba:logs(
         <div id='list'>{
           let $buttons := (
             html:button('logs-download', 'Download', 'CHECK'),
-            html:button('logs-delete', 'Delete', ('CHECK', 'CONFIRM'))
+            html:button('logs/delete', 'Delete', ('CHECK', 'CONFIRM'))
           )
           let $headers := (
             { 'key': 'name', 'label': 'Name', 'type': 'dynamic' },
@@ -264,4 +265,25 @@ function dba:logs-jump(
   return web:redirect('/dba/logs', { 'name': $date, 'page': $page, 'time': $time }) update {
     .//*:header/@value ! (replace value of node . with . || '#' || $time)
   }
+};
+
+(:~
+ : Runs a log action.
+ : @param  $action  name of action
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/logs/{$action}')
+function dba:action(
+  $action  as xs:string
+) {
+  utils:dispatch($action, {
+    'delete': fn($args) { {
+      'page': $dba:CAT,
+      'info': utils:info($args?name, 'log', 'deleted'),
+      'run' : %updating fn() { $args?name ! admin:delete-logs(.) }
+    } }
+  })
 };
