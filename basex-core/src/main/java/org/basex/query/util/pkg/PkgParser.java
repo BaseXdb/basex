@@ -126,7 +126,7 @@ public final class PkgParser {
    * @param node root node
    * @return child element iterator
    */
-  private static BasicNodeIter childElements(final GNode node) {
+  static BasicNodeIter childElements(final GNode node) {
     return new BasicNodeIter() {
       final BasicNodeIter iter = node.childIter();
 

@@ -51,6 +51,18 @@ public final class Pkg {
   }
 
   /**
+   * Assigns the package path and an explicit type.
+   * @param pth path
+   * @param tp type
+   * @return self reference
+   */
+  public Pkg path(final String pth, final PkgType tp) {
+    path(pth);
+    type = tp;
+    return this;
+  }
+
+  /**
    * Returns the package ID, consisting of the package name/URI and, optionally, its version.
    * @return ID
    */
@@ -92,10 +104,10 @@ public final class Pkg {
 
   /**
    * Returns the package version.
-   * @return version ("{@code -}" if this is no EXPath type)
+   * @return version ("{@code -}" if this is no EXPath or web type)
    */
   public String version() {
-    return type == PkgType.EXPATH ? version : "-";
+    return type == PkgType.EXPATH || type == PkgType.WEB ? version : "-";
   }
 
   /**

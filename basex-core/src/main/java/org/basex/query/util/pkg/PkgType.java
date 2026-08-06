@@ -10,7 +10,8 @@ public enum PkgType {
   /** XQuery.   */ XQUERY("XQuery"),
   /** Java.     */ JAVA("Java"),
   /** Combined. */ COMBINED("Combined"),
-  /** EXPath.   */ EXPATH("EXPath");
+  /** EXPath.   */ EXPATH("EXPath"),
+  /** Web.      */ WEB("Web");
 
   /** Name of type. */
   private final String name;

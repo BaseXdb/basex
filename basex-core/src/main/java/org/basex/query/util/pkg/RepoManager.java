@@ -14,6 +14,7 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
+import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -68,7 +69,9 @@ public final class RepoManager {
     try {
       if(io.hasSuffix(IO.XQSUFFIXES)) return installXQ(content, source);
       if(io.hasSuffix(IO.JARSUFFIX)) return installJAR(content, source);
-      return installXAR(content);
+      final byte[] desc = new RepoArchive(content).entry(WEBDESCRIPTOR);
+      return desc != null ? installWeb(content, io.name(), webPkg(desc, io.name())) :
+        installXAR(content);
     } catch(final IOException ex) {
       throw REPO_PARSE_X_X.get(info, io.name(), ex);
     }
@@ -90,7 +93,7 @@ public final class RepoManager {
       tl.add(pkg.name());
       tl.add(pkg.version());
       tl.add(pkg.type().toString());
-      tl.add(pkg.path());
+      tl.add(path(pkg).path());
       table.contents.add(tl);
     }
     return table;
@@ -117,7 +120,16 @@ public final class RepoManager {
     final EXPathRepo repo = context.repo;
     for(final Pkg pkg : packages()) {
       final String pkgPath = pkg.path();
-      if(pkg.name().equals(name) || pkg.id().equals(name) || pkgPath.equals(name)) {
+      // packages are addressed by name, ID, or their relative or absolute path
+      if(pkg.name().equals(name) || pkg.id().equals(name) || pkgPath.equals(name) ||
+          path(pkg).path().equals(name)) {
+
+        // web applications are single archives, located in the RESTXQ directory
+        if(pkg.type() == PkgType.WEB) {
+          if(!path(pkg).delete()) throw REPO_DELETE_X.get(info, pkgPath);
+          deleted = true;
+          continue;
+        }
 
         final boolean isExpath = pkg.type() == PkgType.EXPATH;
         ClassLoaderCache.invalidate(isExpath
@@ -177,6 +189,16 @@ public final class RepoManager {
         }
       }
     }
+    // add web applications: archives in the RESTXQ directory with a web descriptor
+    final IOFile restxq = context.soptions.restxqPath();
+    if(restxq.exists()) {
+      for(final String path : restxq.descendants(IOFile.NO_HIDDEN)) {
+        final IOFile file = new IOFile(restxq, path);
+        final Pkg pkg = file.isArchive() ? webPkg(file) : null;
+        if(pkg != null) add(pkg.path(path, PkgType.WEB), map);
+      }
+    }
+
     // detect combined modules where names have different case
     for(final Pkg xqm : new ArrayList<>(map.values())) {
       if(xqm.type == PkgType.XQUERY) {
@@ -256,6 +278,49 @@ public final class RepoManager {
   }
 
   /**
+   * Returns the package of a web application archive.
+   * @param file archive file
+   * @return package, or {@code null} if the archive contains no web descriptor
+   */
+  private static Pkg webPkg(final IOFile file) {
+    try {
+      final byte[] desc = RepoArchive.entry(file, WEBDESCRIPTOR);
+      return desc == null ? null : webPkg(desc, file.name());
+    } catch(final IOException ex) {
+      Util.debug(ex);
+      return null;
+    }
+  }
+
+  /**
+   * Returns the package of a web application descriptor. Name and version are adopted from the
+   * descriptor; the name defaults to the file name, truncated at the first dot.
+   * @param desc descriptor contents
+   * @param file name of the archive file
+   * @return package
+   * @throws IOException I/O exception
+   */
+  private static Pkg webPkg(final byte[] desc, final String file) throws IOException {
+    final XNode node = (XNode) PkgParser.childElements(new DBNode(new IOContent(desc))).next();
+    final byte[] name = node == null ? null : node.attribute(Q_NAME);
+    final byte[] version = node == null ? null : node.attribute(Q_VERSION);
+
+    final Pkg pkg = new Pkg(name != null ? string(name) : file.replaceAll("\\..*", ""));
+    if(version != null) pkg.version = string(version);
+    return pkg;
+  }
+
+  /**
+   * Returns the absolute path to a package.
+   * @param pkg package
+   * @return file reference
+   */
+  public IOFile path(final Pkg pkg) {
+    final IOFile root = pkg.type() == PkgType.WEB ? context.soptions.restxqPath() : repo();
+    return new IOFile(root, pkg.path());
+  }
+
+  /**
    * Returns the repository root.
    * @return repository directory
    */
@@ -321,6 +386,30 @@ public final class RepoManager {
         }
       }
     }
+  }
+
+  /**
+   * Installs a web application archive in the RESTXQ directory. An application with the same
+   * name is replaced, even if it is stored under a different file name.
+   * @param content archive contents
+   * @param file name of the archive file
+   * @param pkg package of the archive
+   * @return {@code true} if an existing application was replaced
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   */
+  private boolean installWeb(final byte[] content, final String file, final Pkg pkg)
+      throws QueryException, IOException {
+
+    boolean exists = false;
+    for(final Pkg old : packages()) {
+      if(old.type() == PkgType.WEB && old.name().equals(pkg.name())) {
+        delete(path(old).path());
+        exists = true;
+      }
+    }
+    write(new IOFile(context.soptions.restxqPath(), file), content);
+    return exists;
   }
 
   /**

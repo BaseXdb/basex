@@ -55,7 +55,7 @@ public final class DialogPackages extends BaseXDialog {
 
     // create package chooser
     packages = new BaseXList(this, false);
-    packages.setSize(400, 280);
+    packages.setSize(300, 195);
 
     title = new BaseXLabel(" ").large().border(0, 5, 5, 0);
     name = new BaseXLabel(" ");
@@ -80,17 +80,13 @@ public final class DialogPackages extends BaseXDialog {
 
     BaseXBack p = new BaseXBack(new BorderLayout());
     p.add(packages, BorderLayout.CENTER);
-    final BaseXBack ss = new BaseXBack(new ColumnLayout(8)).border(8, 0, 0, 0);
-    ss.add(new BaseXLabel(PATH + COL, true, true), BorderLayout.NORTH);
-    ss.add(new BaseXLabel(gui.context.soptions.get(StaticOptions.REPOPATH)));
-    p.add(ss, BorderLayout.SOUTH);
     set(p, BorderLayout.CENTER);
 
     p = new BaseXBack(new BorderLayout());
     p.add(title, BorderLayout.NORTH);
     p.add(table, BorderLayout.CENTER);
     p.add(newButtons(installURL, install, delete), BorderLayout.SOUTH);
-    BaseXLayout.setWidth(p, 430);
+    BaseXLayout.setWidth(p, 500);
     set(p, BorderLayout.EAST);
 
     refresh = true;
@@ -134,13 +130,14 @@ public final class DialogPackages extends BaseXDialog {
       for(final String pkg : pkgs) cmds.add(new RepoDelete(pkg, null));
     } else {
       final String key = packages.getValue();
-      for(final Pkg pkg : new RepoManager(ctx).packages()) {
+      final RepoManager repo = new RepoManager(ctx);
+      for(final Pkg pkg : repo.packages()) {
         if(pkg.id().equals(key)) {
           title.setText(key);
           name.setText(pkg.name());
           version.setText(pkg.version());
           type.setText(pkg.type().toString());
-          path.setText(pkg.path());
+          path.setText(repo.path(pkg).path());
           break;
         }
       }

@@ -20,6 +20,8 @@ abstract class RepoFn extends StandardFunc {
   static final QNm Q_TYPE = new QNm("type");
   /** QName. */
   static final QNm Q_VERSION = new QNm("version");
+  /** QName. */
+  static final QNm Q_PATH = new QNm("path");
 
   @Override
   public final boolean accept(final ASTVisitor visitor) {

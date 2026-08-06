@@ -15,9 +15,11 @@ public final class RepoList extends RepoFn {
   @Override
   public Value value(final QueryContext qc) {
     final ValueBuilder vb  = new ValueBuilder(qc);
-    for(final Pkg pkg : new RepoManager(qc.context).packages()) {
+    final RepoManager repo = new RepoManager(qc.context);
+    for(final Pkg pkg : repo.packages()) {
       vb.add(FElem.build(Q_PACKAGE).attr(Q_NAME, pkg.name()).
-          attr(Q_VERSION, pkg.version()).attr(Q_TYPE, pkg.type()).finish());
+          attr(Q_VERSION, pkg.version()).attr(Q_TYPE, pkg.type()).
+          attr(Q_PATH, repo.path(pkg)).finish());
     }
     return vb.value(this);
   }
