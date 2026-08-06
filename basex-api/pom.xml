@@ -105,6 +105,31 @@
         </configuration>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <id>web-archives</id>
+            <phase>package</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <!-- package the web applications of the webapp directory -->
+                <zip destfile="${project.build.directory}/webapp/chat.zip"
+                     basedir="${basedir}/src/main/webapp/chat"/>
+                <zip destfile="${project.build.directory}/webapp/dba.zip"
+                     basedir="${basedir}/src/main/webapp/dba"/>
+                <zip destfile="${project.build.directory}/webapp/webdav.zip"
+                     basedir="${basedir}/src/main/webapp/webdav"/>
+              </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.eclipse.jetty.ee10</groupId>
         <artifactId>jetty-ee10-maven-plugin</artifactId>
         <version>${jettyVersion}</version>
