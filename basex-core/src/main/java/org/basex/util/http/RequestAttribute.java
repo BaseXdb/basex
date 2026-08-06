@@ -21,6 +21,7 @@ public enum RequestAttribute {
   /** Opaque. */ OPAQUE,
   /** Cnonce. */ CNONCE,
   /** Method. */ METHOD,
+  /** Cookies. */ COOKIES,
   /** Timeout. */ TIMEOUT,
   /** Response. */ RESPONSE,
   /** Password. */ PASSWORD,

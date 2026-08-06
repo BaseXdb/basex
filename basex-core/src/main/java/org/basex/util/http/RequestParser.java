@@ -204,7 +204,7 @@ public final class RequestParser {
 
     for(final RequestAttribute r : new RequestAttribute[] {
       RequestAttribute.FOLLOW_REDIRECT, RequestAttribute.STATUS_ONLY,
-      RequestAttribute.SEND_AUTHORIZATION
+      RequestAttribute.SEND_AUTHORIZATION, RequestAttribute.COOKIES
     }) {
       final String s = request.attribute(r);
       if(s != null && !Strings.isTrue(s) && !Strings.isFalse(s))

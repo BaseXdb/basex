@@ -76,7 +76,7 @@ public final class Client {
       mopts.set(MainOptions.HTMLPARSER,
           assign(new HtmlOptions(mopts.get(MainOptions.HTMLPARSER)), req.attribute(HTML)));
 
-      final Exchange exchange = new Exchange(uri, req, client(req));
+      final Exchange exchange = new Exchange(uri, req, client(req, qc));
       return new Response(info, mopts, exchange, qc).
         getResponse(exchange.send(), body, mediaType);
     } catch(final HttpTimeoutException ex) {
@@ -119,11 +119,14 @@ public final class Client {
   /**
    * Returns the HTTP client for a request.
    * @param request request
+   * @param qc query context
    * @return client
    */
-  private static HttpClient client(final Request request) {
+  private static HttpClient client(final Request request, final QueryContext qc) {
     final String fw = request.attribute(FOLLOW_REDIRECT);
-    return IOUrl.client(fw == null || Strings.isTrue(fw));
+    final boolean redirect = fw == null || Strings.isTrue(fw);
+    return Strings.isTrue(request.attribute(COOKIES)) ?
+      qc.resources.index(HttpClients.class).get(redirect) : IOUrl.client(redirect);
   }
 
   /**
