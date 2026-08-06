@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.http.HTTPText.*;
 
 import java.io.*;
-import java.net.*;
 import java.net.http.*;
 import java.util.zip.*;
 
@@ -22,10 +21,8 @@ import org.basex.util.http.*;
  * @author Christian Gruen
  */
 public final class B64HttpLazy extends B64Lazy {
-  /** Target URI. */
-  private final URI uri;
-  /** Request data. */
-  private final Request request;
+  /** HTTP exchange. */
+  private final Exchange exchange;
   /** Content encoding of the original response. */
   private final String encoding;
   /** Unread body of the original response (consumed by the first access). */
@@ -33,16 +30,13 @@ public final class B64HttpLazy extends B64Lazy {
 
   /**
    * Constructor.
-   * @param uri target URI
-   * @param request request data
+   * @param exchange HTTP exchange
    * @param pending unread body of the original response
    * @param encoding content encoding of the original response
    */
-  public B64HttpLazy(final URI uri, final Request request, final InputStream pending,
-      final String encoding) {
+  public B64HttpLazy(final Exchange exchange, final InputStream pending, final String encoding) {
     super(HC_ERROR_X);
-    this.uri = uri;
-    this.request = request;
+    this.exchange = exchange;
     this.pending = pending;
     this.encoding = encoding;
   }
@@ -54,7 +48,7 @@ public final class B64HttpLazy extends B64Lazy {
     if(is != null) {
       pending = null;
     } else {
-      final HttpResponse<InputStream> response = Client.send(uri, request);
+      final HttpResponse<InputStream> response = exchange.send();
       is = new StoppableInputStream(response.body());
       enc = response.headers().firstValue(CONTENT_ENCODING).orElse("");
     }
@@ -64,6 +58,6 @@ public final class B64HttpLazy extends B64Lazy {
   @Override
   public void toString(final QueryString qs) {
     if(isCached()) super.toString(qs);
-    else qs.function(Function._HTTP_SEND_REQUEST, uri);
+    else qs.function(Function._HTTP_SEND_REQUEST, exchange.uri());
   }
 }

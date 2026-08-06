@@ -31,7 +31,7 @@ public final class IOUrl extends IO {
   /** Optional SSL context for ignoring certificates. */
   private static SSLContext ssl;
   /** Cached HTTP client instances. */
-  private static final HttpClient[] CLIENTS = new HttpClient[2];
+  private static final HttpClients CLIENTS = new HttpClients(null);
 
   static {
     REASONS.put(100, "Continue");
@@ -171,13 +171,20 @@ public final class IOUrl extends IO {
    * @return client builder
    */
   public static HttpClient client(final boolean redirect) {
-    final int i = redirect ? 1 : 0;
-    if(CLIENTS[i] == null) {
-      final HttpClient.Builder cb = HttpClient.newBuilder();
-      if(ssl != null) cb.sslContext(ssl).connectTimeout(Duration.ofMinutes(1));
-      CLIENTS[i] = cb.followRedirects(redirect ? Redirect.ALWAYS : Redirect.NEVER).build();
-    }
-    return CLIENTS[i];
+    return CLIENTS.get(redirect);
+  }
+
+  /**
+   * Returns a new HTTP client instance.
+   * @param redirect follow redirects
+   * @param cookies cookie handler (can be {@code null})
+   * @return client
+   */
+  public static HttpClient client(final boolean redirect, final CookieHandler cookies) {
+    final HttpClient.Builder cb = HttpClient.newBuilder();
+    if(cookies != null) cb.cookieHandler(cookies);
+    if(ssl != null) cb.sslContext(ssl).connectTimeout(Duration.ofMinutes(1));
+    return cb.followRedirects(redirect ? Redirect.ALWAYS : Redirect.NEVER).build();
   }
 
   /**

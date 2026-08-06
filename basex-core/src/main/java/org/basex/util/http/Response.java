@@ -1,10 +1,8 @@
 package org.basex.util.http;
 
 import static org.basex.util.http.HTTPText.*;
-import static org.basex.util.http.RequestAttribute.*;
 
 import java.io.*;
-import java.net.*;
 import java.net.http.*;
 import java.util.*;
 import java.util.Map.*;
@@ -31,10 +29,8 @@ public final class Response {
   private final InputInfo info;
   /** Database options. */
   private final MainOptions options;
-  /** Target URI (can be {@code null}). */
-  private final URI uri;
-  /** Request data (can be {@code null}). */
-  private final Request request;
+  /** HTTP exchange (can be {@code null}). */
+  private final Exchange exchange;
   /** Query context (can be {@code null}). */
   private final QueryContext qc;
 
@@ -44,23 +40,21 @@ public final class Response {
    * @param options main options
    */
   public Response(final InputInfo info, final MainOptions options) {
-    this(info, options, null, null, null);
+    this(info, options, null, null);
   }
 
   /**
    * Constructor for lazy retrieval of response bodies.
    * @param info input info (can be {@code null})
    * @param options main options
-   * @param uri target URI
-   * @param request request data
+   * @param exchange HTTP exchange
    * @param qc query context
    */
-  public Response(final InputInfo info, final MainOptions options, final URI uri,
-      final Request request, final QueryContext qc) {
+  public Response(final InputInfo info, final MainOptions options, final Exchange exchange,
+      final QueryContext qc) {
     this.info = info;
     this.options = options;
-    this.uri = uri;
-    this.request = request;
+    this.exchange = exchange;
     this.qc = qc;
   }
 
@@ -98,13 +92,13 @@ public final class Response {
     final String encoding = headers.firstValue(CONTENT_ENCODING).orElse("");
 
     final ItemList items = new ItemList().add((Item) null);
-    if(body && request != null && "GET".equals(request.attribute(METHOD)) &&
+    if(body && exchange != null && "GET".equals(exchange.method()) &&
         Payload.binary(type) && !"0".equals(headers.firstValue(CONTENT_LENGTH).orElse(""))) {
       // binary result: skip retrieval of response body, return lazy item
       final InputStream is = new StoppableInputStream(response.body());
       qc.resources.add(is);
       root.node(FElem.build(Q_HTTP_BODY).attr(Q_MEDIA_TYPE, type.type()).finish());
-      items.add(new B64HttpLazy(uri, request, is, encoding));
+      items.add(new B64HttpLazy(exchange, is, encoding));
     } else {
       try(InputStream is = new StoppableInputStream(response.body())) {
         final Payload payload = new Payload(is, body, info, options);
