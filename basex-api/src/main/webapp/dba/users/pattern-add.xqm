@@ -38,40 +38,29 @@ function dba:pattern-add(
   $do       as xs:string?
 ) {
   html:update($do, { 'header': ($dba:CAT, $name) }, fn() {
-    <tr>
-      <td>
-        <form method='post' autocomplete='off'>
-          <input type='hidden' name='do' value='do'/>
-          <input type='hidden' name='name' value='{ $name }'/>
-          <h2>{
-            html:link('Users', $dba:CAT), ' » ',
-            html:link($name, $dba:SUB, { 'name': $name }), ' » ',
-            html:button('pattern-add', 'Add Pattern')
-          }</h2>
-          <table>
-            <tr>
-              <td>Pattern:</td>
-              <td>
-                <input type='text' name='pattern' value='{ $pattern }' autofocus=''/>  
-                <span class='note'>…support for <a target='_blank'
-                  href='https://docs.basex.org/main/Commands#Glob_Syntax'>glob syntax</a>.</span>
-                <div class='small'/>
-              </td>
-            </tr>
-            <tr>
-              <td>Permission:</td>
-              <td>
-                <select name='perm' size='3'>{
-                  for $p in $config:PERMISSIONS[position() = 1 to 3]
-                  return element option { attribute selected { }[$p = $perm], $p }
-                }</select>
-                <div class='small'/>
-              </td>
-            </tr>
-          </table>
-        </form>
-      </td>
-    </tr>
+    <div class='panel'>
+      <form method='post' autocomplete='off'>
+        <input type='hidden' name='do' value='do'/>
+        <input type='hidden' name='name' value='{ $name }'/>
+        <h2>{
+          html:link('Users', $dba:CAT), ' » ',
+          html:link($name, $dba:SUB, { 'name': $name }), ' » ',
+          html:button('pattern-add', 'Add Pattern')
+        }</h2>
+        {
+          html:field('Pattern:', (
+            <input type='text' name='pattern' value='{ $pattern }' autofocus=''/>, '&#xa0;',
+            <span class='note'>…support for <a target='_blank'
+              href='https://docs.basex.org/main/Commands#Glob_Syntax'>glob syntax</a>.</span>
+          )),
+          html:field('Permission:',
+            <select name='perm' size='3'>{
+              for $p in $config:PERMISSIONS[position() = 1 to 3]
+              return element option { attribute selected { }[$p = $perm], $p }
+            }</select>)
+        }
+      </form>
+    </div>
   }, fn() {
     user:grant($name, $perm, $pattern),
     utils:redirect($dba:SUB, { 'name': $name, 'info': 'Pattern was created.' })

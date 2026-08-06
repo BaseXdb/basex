@@ -55,14 +55,12 @@ function dba:unknown(
   $path  as xs:string
 ) as element()+ {
   web:response-header((), (), { 'status': 404 }),
-  <tr>
-    <td>
-      <h2>Page not found:</h2>
-      <ul>
-        <li>Page: dba/{ $path }</li>
-        <li>Method: { request:method() }</li>
-      </ul>
-    </td>
-  </tr>
+  <div class='panel'>
+    <h2>Page not found:</h2>
+    <ul>
+      <li>Page: dba/{ $path }</li>
+      <li>Method: { request:method() }</li>
+    </ul>
+  </div>
   => html:wrap()
 };

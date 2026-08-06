@@ -46,159 +46,152 @@ function dba:database(
 
   let $db-exists := db:exists($name)
   return (
-    <tr>{
-      <td>
-        <form method='post' autocomplete='off'>
-          <input type='hidden' name='name' value='{ $name }' id='name'/>
-          <h2>{
-            html:link('Databases', $dba:CAT), ' » ',
-            $name ! (if (empty($resource)) then . else html:link(., $dba:SUB, { 'name': . } ))
-          }</h2>
-          {
-            if ($db-exists) {
-              let $headers := (
-                { 'key': 'resource', 'label': 'Name' },
-                { 'key': 'type', 'label': 'Type' },
-                { 'key': 'binary', 'label': 'Binary' },
-                { 'key': 'size', 'label': 'Size', 'type': 'number', 'order': 'desc' }
-              )
-              let $entries :=
-                for $res in utils:slice(db:list-details($name), $page, $sort)
-                return {
-                  'resource': $res,
-                  'type': $res/@type,
-                  'binary': if ($res/@raw = 'true') then '✓' else '–',
-                  'size': $res/@size
-                }
-              let $buttons := (
-                html:button('db-put', 'Put…'),
-                html:button('db-delete', 'Delete', ('CHECK', 'CONFIRM')),
-                html:button('db-copy', 'Copy…'),
-                html:button('db-alter', 'Rename…'),
-                html:button('db-optimize', 'Optimize…')
-              )
-              let $params := { 'name': $name }
-              let $options := {
-                'sort': $sort,
-                'link': $dba:SUB,
-                'page': $page,
-                'count': count(db:list($name))
+    <div class='panel'>
+      <form method='post' autocomplete='off'>
+        <input type='hidden' name='name' value='{ $name }' id='name'/>
+        <h2>{
+          html:link('Databases', $dba:CAT), ' » ',
+          $name ! (if (empty($resource)) then . else html:link(., $dba:SUB, { 'name': . } ))
+        }</h2>
+        {
+          if ($db-exists) {
+            let $headers := (
+              { 'key': 'resource', 'label': 'Name' },
+              { 'key': 'type', 'label': 'Type' },
+              { 'key': 'binary', 'label': 'Binary' },
+              { 'key': 'size', 'label': 'Size', 'type': 'number', 'order': 'desc' }
+            )
+            let $entries :=
+              for $res in utils:slice(db:list-details($name), $page, $sort)
+              return {
+                'resource': $res,
+                'type': $res/@type,
+                'binary': if ($res/@raw = 'true') then '✓' else '–',
+                'size': $res/@size
               }
-              return html:table($headers, $entries, $buttons, $params, $options)
+            let $buttons := (
+              html:button('db-put', 'Put…'),
+              html:button('db-delete', 'Delete', ('CHECK', 'CONFIRM')),
+              html:button('db-copy', 'Copy…'),
+              html:button('db-alter', 'Rename…'),
+              html:button('db-optimize', 'Optimize…')
+            )
+            let $params := { 'name': $name }
+            let $options := {
+              'sort': $sort,
+              'link': $dba:SUB,
+              'page': $page,
+              'count': count(db:list($name))
             }
+            return html:table($headers, $entries, $buttons, $params, $options)
+          }
+        }
+      </form>
+    </div>,
+    if (not($resource)) {
+      <div class='panel'>
+        <form method='post' autocomplete='off'>
+          <input type='hidden' name='name' value='{ $name }'/>
+          <h2>Backups</h2>
+          {
+            let $headers := (
+              { 'key': 'backup', 'label': 'Name', 'order': 'desc' },
+              { 'key': 'size', 'label': 'Size', 'type': 'bytes' },
+              { 'key': 'comment', 'label': 'Comment' },
+              { 'key': 'action', 'label': 'Action', 'type': 'dynamic' }
+            )
+            let $entries :=
+              for $backup in db:backups($name)
+              order by $backup descending
+              return {
+                'backup': substring-after($backup, $name || '-'),
+                'size': $backup/@size,
+                'comment': $backup/@comment,
+                'action': fn() {
+                  html:link('Download', 'backup/' || encode-for-uri($backup) || '.zip')
+                }
+              }
+            let $buttons := (
+              html:button('backup-create', 'Create…') update {
+                if (not($db-exists)) then insert node attribute disabled { '' } into .
+              },
+              html:button('backup-restore', 'Restore', ('CHECK', 'CONFIRM')),
+              html:button('backup-drop', 'Drop', ('CHECK', 'CONFIRM'))
+            )
+            let $params := { 'name': $name }
+            return html:table($headers, $entries, $buttons, $params)
           }
         </form>
-      </td>,
-      if (not($resource)) {
-        <td class='vertical'/>,
-        <td>
-          <form method='post' autocomplete='off'>
-            <input type='hidden' name='name' value='{ $name }'/>
-            <h2>Backups</h2>
-            {
-              let $headers := (
-                { 'key': 'backup', 'label': 'Name', 'order': 'desc' },
-                { 'key': 'size', 'label': 'Size', 'type': 'bytes' },
-                { 'key': 'comment', 'label': 'Comment' },
-                { 'key': 'action', 'label': 'Action', 'type': 'dynamic' }
-              )
-              let $entries :=
-                for $backup in db:backups($name)
-                order by $backup descending
-                return {
-                  'backup': substring-after($backup, $name || '-'),
-                  'size': $backup/@size,
-                  'comment': $backup/@comment,
-                  'action': fn() {
-                    html:link('Download', 'backup/' || encode-for-uri($backup) || '.zip')
-                  }
-                }
-              let $buttons := (
-                html:button('backup-create', 'Create…') update {
-                  if (not($db-exists)) then insert node attribute disabled { '' } into .
-                },
-                html:button('backup-restore', 'Restore', ('CHECK', 'CONFIRM')),
-                html:button('backup-drop', 'Drop', ('CHECK', 'CONFIRM'))
-              )
-              let $params := { 'name': $name }
-              return html:table($headers, $entries, $buttons, $params)
-            }
-          </form>
-        </td>
-      },
-      <td class='vertical'/>,
-      <td>{
-        if ($resource) {
-          let $type := db:type($name, $resource)
-          let $max := config:get($config:MAXCHARS)
-          (: bounded serialization: real size signal (db:list-details/@size counts
-             nodes, not characters) and a preview that never inlines a huge document :)
-          let $value :=
-            if ($type = 'binary') then db:get-binary($name, $resource)
-            else if ($type = 'value') then db:get-value($name, $resource)
-            else db:get($name, $resource)
-          let $preview := serialize($value, {
-            'method': if ($type = 'xml') then 'xml' else 'basex',
-            'limit': $max * 2 + 1
-          })
-          let $truncated := string-length($preview) > $max
-          let $editable := $type = 'xml' and not($truncated)
-          let $content := if ($editable) then $preview else substring($preview, 1, $max)
-          (: reason why a resource cannot be edited; extended by the client for query results :)
-          let $note := string-join((
-            'Read-only ' || (
-              if ($type = 'xml')
-              then '(too large for editing)'
-              else '(only XML can be edited)'
-            ),
-            ', and truncated: download it to see the full content.'[$truncated]
-          ))[not($editable)]
-          return (
-            <h2>Resource: { $resource }</h2>,
-            <form method='post'>{
-              <input type='hidden' name='name' value='{ $name }'/>,
-              <input type='hidden' name='resource' value='{ $resource }' id='resource'/>,
-              insert-separator((
-                (: enabled by the client if the document can be edited :)
-                if ($type = 'xml') {
-                  <button type='button' id='save-resource' onclick='saveResource()'
-                          disabled=''>Save</button>
-                },
-                <button type='button' id='copy-resource' onclick='copyResource()'>Copy</button>,
+      </div>
+    },
+    <div class='panel'>{
+      if ($resource) {
+        let $type := db:type($name, $resource)
+        let $max := config:get($config:MAXCHARS)
+        (: bounded serialization: real size signal (db:list-details/@size counts
+           nodes, not characters) and a preview that never inlines a huge document :)
+        let $value :=
+          if ($type = 'binary') then db:get-binary($name, $resource)
+          else if ($type = 'value') then db:get-value($name, $resource)
+          else db:get($name, $resource)
+        let $preview := serialize($value, {
+          'method': if ($type = 'xml') then 'xml' else 'basex',
+          'limit': $max * 2 + 1
+        })
+        let $truncated := string-length($preview) > $max
+        let $editable := $type = 'xml' and not($truncated)
+        let $content := if ($editable) then $preview else substring($preview, 1, $max)
+        (: reason why a resource cannot be edited; extended by the client for query results :)
+        let $note := string-join((
+          'Read-only ' || (
+            if ($type = 'xml')
+            then '(too large for editing)'
+            else '(only XML can be edited)'
+          ),
+          ', and truncated: download it to see the full content.'[$truncated]
+        ))[not($editable)]
+        return (
+          <h2>Resource: { $resource }</h2>,
+          <form method='post'>{
+            <input type='hidden' name='name' value='{ $name }'/>,
+            <input type='hidden' name='resource' value='{ $resource }' id='resource'/>,
+            insert-separator((
+              (: enabled by the client if the document can be edited :)
+              if ($type = 'xml') {
+                <button type='button' id='save-resource' onclick='saveResource()'
+                        disabled=''>Save</button>
+              },
+              <button type='button' id='copy-resource' onclick='copyResource()'>Copy</button>,
+              <span> </span>,
+              html:button('db-rename', 'Rename…'),
+              html:button('db-download', 'Download'),
+              html:button('db-replace', 'Upload…'),
+              if ($type = 'xml') {
                 <span> </span>,
-                html:button('db-rename', 'Rename…'),
-                html:button('db-download', 'Download'),
-                html:button('db-replace', 'Upload…'),
-                if ($type = 'xml') {
-                  <span> </span>,
-                  <label>{
-                    <input type='checkbox' id='indent' onchange='indentChanged()'/>, ' Indent'
-                  }</label>
-                }
-              ), <span> </span>)
-            }</form>,
-            <div id='note' class='note{ ' strong'[$truncated] }'>{ $note }</div>,
-            if ($type = 'xml') {
-              <div class='small'/>,
-              <input type='text' style='width:100%' name='input' id='input'
-                placeholder='Enter your query…' onkeyup='queryResource(false)'>{
-                if (not($editable)) { attribute autofocus {} }
-              }</input>,
-              <div class='small'/>
-            },
-            <textarea id='editor' spellcheck='false'>{
-              if ($editable) { attribute autofocus {} },
-              $content
-            }</textarea>,
-            html:js('loadCodeMirror("xml", true, true); initResource(' ||
-              (if ($editable) then 'true' else 'false') || ');')
-          )
-        } else if ($db-exists) {
-          <h2>Information</h2>,
-          html:properties(db:info($name))
-        }
-      }</td>
-    }</tr>
-    => html:wrap({ 'header': ($dba:CAT, $name), 'info': $info, 'error': $error })
-  )
+                <label>{
+                  <input type='checkbox' id='indent' onchange='indentChanged()'/>, ' Indent'
+                }</label>
+              }
+            ), <span> </span>)
+          }</form>,
+          <div id='note' class='note{ ' strong'[$truncated] }'>{ $note }</div>,
+          if ($type = 'xml') {
+            <input type='text' class='query' style='width:100%' name='input' id='input'
+              placeholder='Enter your query…' onkeyup='queryResource(false)'>{
+              if (not($editable)) { attribute autofocus {} }
+            }</input>
+          },
+          <textarea id='editor' spellcheck='false'>{
+            if ($editable) { attribute autofocus {} },
+            $content
+          }</textarea>,
+          html:js('loadCodeMirror("xml", true, true); initResource(' ||
+            (if ($editable) then 'true' else 'false') || ');')
+        )
+      } else if ($db-exists) {
+        <h2>Information</h2>,
+        html:properties(db:info($name))
+      }
+    }</div>
+  ) => html:wrap({ 'header': ($dba:CAT, $name), 'info': $info, 'error': $error })
 };

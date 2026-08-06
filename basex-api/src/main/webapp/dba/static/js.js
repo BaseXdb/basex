@@ -13,6 +13,11 @@ let _logInput;
 /** Most recent log filter string. */
 let _dbInput;
 
+/** Content panels of the current page, in grid track order. */
+let _panels = [];
+/** Whether at least one of the panels can be collapsed. */
+let _collapsible = false;
+
 /** Whether the current database resource can be edited. */
 let _resourceEditable;
 /** Server-rendered read-only reason ([ message, class ]). */
@@ -20,12 +25,40 @@ let _resourceNote;
 /** Cached raw document; undefined if it must be requested again. */
 let _resourceSaved;
 
+/** Shortest an auto-resized editor gets, and its height on stacked layouts. */
+const EDITOR_MIN_HEIGHT = 200;
+/** Height of an editor that is not auto-resized. */
+const EDITOR_FIXED_HEIGHT = "300px";
+
 /** localStorage key for the logs 'ignore entries' filter. */
 const IGNORE_KEY = "dba-ignore-logs";
 /** localStorage key for the 'Indent' output preference. */
 const INDENT_KEY = "dba-indent";
-/** localStorage key prefix for the collapsed content panels of a page. */
-const PANELS_KEY = "dba-panels-";
+/** localStorage key prefix for the collapsed content panels of a page.
+    Versioned: panel ids used to be row-based, the grid layout numbers them flat. */
+const PANELS_KEY = "dba-panels-v2-";
+
+/**
+ * Indicates whether the layout has stacked the panels into a single column.
+ * The breakpoint belongs to style.css; this only reads the flag it sets.
+ * @returns {boolean} stacked state
+ */
+function stacked() {
+  return getComputedStyle(document.documentElement).getPropertyValue("--stacked").trim() === "1";
+}
+
+/**
+ * Returns the height of the page chrome below <main>: the rule, the footer and
+ * the body margin. None of it depends on the editor, so it can be measured.
+ * @returns {number} height in pixels
+ */
+function chromeBelowMain() {
+  let height = parseFloat(getComputedStyle(document.body).marginBottom);
+  for(let el = document.querySelector("main").nextElementSibling; el; el = el.nextElementSibling) {
+    height += el.getBoundingClientRect().height;
+  }
+  return height;
+}
 
 /**
  * Indicates whether the table row containing a checkbox is currently shown.
@@ -292,10 +325,10 @@ function showError(response, info) {
   // normalize error message
   let msg = response.statusText.match(/\[\w+\]/g) ? response.statusText : response.responseText;
   const lc = !info && msg.match(/(\d+)\/(\d+):/);
-  // isolate the error-code line ([XPST0003] …); match a real code, not any '[' in the text
-  const s = msg.search(/\[[A-Z]\w*\]/), e1 = msg.indexOf("\n", s);
+  // isolate the error-code line ([XPST0003] …, [db:get] …); match a real code, not any '[' in the text
+  const s = msg.search(/\[([A-Z]\w*|[a-z][\w-]*:[\w-]+)\]/), e1 = msg.indexOf("\n", s);
   if(s > -1) msg = msg.substring(s, e1 > s ? e1 : msg.length);
-  msg = msg.replace(/^\[.*?\] /, "").replace(/Stack Trace:.*/, "").replace(/\s+/g, " ");
+  msg = msg.replace(/^\[.*?\] /, "").replace(/\s*Stack Trace:[\s\S]*/, "").replace(/\s+/g, " ");
   if(info) msg = `${info}: ${msg}`;
 
   // decode HTML entities via an inert parse (no scripts run, no resources load)
@@ -640,12 +673,13 @@ function loadCodeMirror(language, edit, resize) {
   if(resize) {
     const refresh = () => {
       // size each pane from its own top to the viewport bottom, so a tall
-      // sibling column (e.g. a long resource list) can't shrink it. the reserve
-      // leaves room for the chrome below <main>: hr + footer + small + body margin.
-      // on narrow (stacked) layouts, cap the height so the editor stays compact
-      // instead of filling the viewport and pushing the output/buttons off-screen
-      const height = elem => window.innerWidth <= 800 ? 200 :
-        Math.max(192, window.innerHeight - elem.getBoundingClientRect().top - 52);
+      // sibling column (e.g. a long resource list) can't shrink it
+      // stacked layouts keep the minimum, so the editor does not fill the
+      // viewport and push the output and buttons off-screen
+      // measured once: reading it per element would interleave layout and style writes
+      const reserve = chromeBelowMain();
+      const height = elem => stacked() ? EDITOR_MIN_HEIGHT : Math.max(EDITOR_MIN_HEIGHT,
+        window.innerHeight - elem.getBoundingClientRect().top - reserve);
       if (useCM) {
         for(const elem of document.querySelectorAll(".cm-editor")) {
           elem.style.height = `${height(elem)}px`;
@@ -659,11 +693,10 @@ function loadCodeMirror(language, edit, resize) {
     window.addEventListener("load", refresh);
     window.addEventListener("resize", refresh);
   } else if (useCM) {
-    // no auto-resize (e.g. the users pages): give the editor the fixed default
-    // height the old CodeMirror 5 had, so it doesn't collapse to a single line.
-    // The plain-textarea fallback already gets its height from style.css.
+    // no auto-resize (e.g. the users pages): without a height, the editor
+    // collapses to a single line. The textarea fallback is sized by style.css
     for(const elem of document.querySelectorAll(".cm-editor")) {
-      elem.style.height = "300px";
+      elem.style.height = EDITOR_FIXED_HEIGHT;
     }
   }
 }
@@ -730,38 +763,47 @@ function shortcuts(event) {
  * Makes the side-by-side content panels of a page collapsible.
  */
 function initPanels() {
+  const content = document.querySelector(".content");
+  if(!content) return;
+  // panels spanning all columns have no track of their own and never collapse
+  const panels = [ ...content.children ].filter(p => p.matches(".panel:not(.full)"));
+  if(panels.length < 2) return;
+
+  // every panel owns a grid track, whether or not it can be collapsed
+  _panels = panels;
+
   // if no state was stored yet, the markup supplies the default
   const stored = localStorage.getItem(PANELS_KEY + window.location.pathname);
   const collapsed = stored?.split(",");
-  document.querySelectorAll("table.content > tbody > tr").forEach((row, r) => {
-    const panels = [ ...row.children ].filter(td => !td.classList.contains("vertical"));
-    if(panels.length < 2) return;
-    panels.forEach((panel, p) => {
-      // the heading supplies the label of the collapsed strip
-      const heading = panel.querySelector("h2, h3");
-      if(!heading) return;
-      const id = `${r}-${p}`;
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "collapse";
-      // the last panel folds to the right, all others to the left
-      button.dataset.right = p === panels.length - 1;
-      button.dataset.title = heading.textContent.split("»")[0].trim();
-      button.addEventListener("click", () => togglePanel(panel, id));
-      panel.prepend(button);
-      showPanel(panel, collapsed ? collapsed.includes(id) : panel.classList.contains("collapsed"));
-    });
+  panels.forEach((panel, p) => {
+    // the heading supplies the label of the collapsed strip; a panel without one
+    // (an empty side panel, the editor panes) stays as it is
+    const heading = panel.querySelector("h2, h3");
+    if(!heading) return;
+    const id = `${p}`;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "collapse";
+    // the last panel folds to the right, all others to the left
+    button.dataset.right = p === panels.length - 1;
+    button.dataset.title = heading.textContent.split("»")[0].trim();
+    button.addEventListener("click", () => togglePanel(panel, id));
+    panel.prepend(button);
+    _collapsible = true;
+    showPanel(panel, collapsed ? collapsed.includes(id) : panel.classList.contains("collapsed"));
   });
+  applyColumns();
 }
 
 /**
  * Collapses or expands a content panel and persists the new state.
- * @param {td} panel panel to be toggled
+ * @param {div} panel panel to be toggled
  * @param {string} id panel id
  */
 function togglePanel(panel, id) {
   const collapse = !panel.classList.contains("collapsed");
   showPanel(panel, collapse);
+  applyColumns();
 
   const key = PANELS_KEY + window.location.pathname;
   const ids = new Set((localStorage.getItem(key) ?? "").split(",").filter(Boolean));
@@ -775,7 +817,7 @@ function togglePanel(panel, id) {
 
 /**
  * Applies the collapsed state of a content panel.
- * @param {td} panel panel
+ * @param {div} panel panel
  * @param {boolean} collapse collapsed state
  */
 function showPanel(panel, collapse) {
@@ -794,12 +836,30 @@ function showPanel(panel, collapse) {
   }
   button.title = `${collapse ? "Expand" : "Collapse"} ${title}`;
   button.setAttribute("aria-expanded", !collapse);
-
-  // siblings of a collapsed panel share the freed space
-  const panels = [ ...panel.parentElement.children ].filter(td => !td.classList.contains("vertical"));
-  const shrunk = panels.some(p => p.classList.contains("collapsed"));
-  for(const p of panels) p.classList.toggle("wide", shrunk && !p.classList.contains("collapsed"));
 }
+
+/**
+ * Resizes the grid tracks: a collapsed panel shrinks to a strip,
+ * its siblings share the freed space.
+ */
+function applyColumns() {
+  // pages without collapsible panels keep the track widths they declared;
+  // the editor resizer owns the inline value there
+  const content = document.querySelector(".content");
+  if(!content || !_collapsible) return;
+
+  // on narrow screens the panels are stacked; the media query supplies the single column
+  const shrunk = !stacked() && _panels.some(p => p.classList.contains("collapsed"));
+  if(shrunk) {
+    // 'min-content' sizes the strip from the rotated label, whatever the font
+    content.style.gridTemplateColumns = _panels.map(
+      p => p.classList.contains("collapsed") ? "min-content" : "1fr").join(" ");
+  } else {
+    // restores the track widths declared by the page
+    content.style.removeProperty("grid-template-columns");
+  }
+}
+window.addEventListener("resize", applyColumns);
 
 /**
  * Initializes page-wide interactive behavior.

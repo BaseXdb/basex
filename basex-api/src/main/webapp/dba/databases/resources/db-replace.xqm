@@ -37,29 +37,20 @@ function dba:db-replace(
   $do        as xs:string?
 ) {
   html:update($do, { 'header': ($dba:CAT, $name) }, fn() {
-    <tr>
-      <td>
-        <form method='post' enctype='multipart/form-data' autocomplete='off'>
-          <input type='hidden' name='do' value='do'/>
-          <input type='hidden' name='name' value='{ $name }'/>
-          <input type='hidden' name='resource' value='{ $resource }'/>
-          <h2>{
-            html:link('Databases', $dba:CAT), ' » ',
-            html:link($name, $dba:SUB, { 'name': $name }), ' » ',
-            html:link($resource, $dba:SUB, { 'name': $name, 'resource': $resource }), ' » ',
-            html:button('db-replace', 'Replace')
-          }</h2>
-          <table>
-            <tr>
-              <td>
-                <input type='file' name='file' autofocus=''/>
-                <div class='small'/>
-              </td>
-            </tr>
-          </table>
-        </form>
-      </td>
-    </tr>
+    <div class='panel'>
+      <form method='post' enctype='multipart/form-data' autocomplete='off'>
+        <input type='hidden' name='do' value='do'/>
+        <input type='hidden' name='name' value='{ $name }'/>
+        <input type='hidden' name='resource' value='{ $resource }'/>
+        <h2>{
+          html:link('Databases', $dba:CAT), ' » ',
+          html:link($name, $dba:SUB, { 'name': $name }), ' » ',
+          html:link($resource, $dba:SUB, { 'name': $name, 'resource': $resource }), ' » ',
+          html:button('db-replace', 'Replace')
+        }</h2>
+        <input type='file' name='file' autofocus=''/>
+      </form>
+    </div>
   }, fn() {
     let $key := $file[. instance of map(*)] ! map:keys(.)
     return if (not($key)) {

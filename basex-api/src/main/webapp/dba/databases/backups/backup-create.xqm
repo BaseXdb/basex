@@ -37,33 +37,22 @@ function dba:backup-create(
   $do        as xs:string?
 ) {
   html:update($do, { 'header': ($dba:CAT, $name) }, fn() {
-    <tr>
-      <td>
-        <form method='post' autocomplete='off'>
-          <input type='hidden' name='do' value='do'/>
-          <input type='hidden' name='name' value='{ $name }'/>
-          <h2>{
-            html:link('Databases', $dba:CAT), ' » ',
-            (html:link($name, $dba:SUB, { 'name': $name }), ' » ')[$name],
-            html:button('backup-create', 'Create Backup')
-          }</h2>
-          <table>
-            <tr>
-              <td>Comment:</td>
-              <td>
-                <input type='text' name='comment' size='64' placeholder='optional' autofocus=''/>
-              </td>
-            </tr>
-            <tr>
-              <td>Compress Files:</td>
-              <td>{
-                html:checkbox('compress', 'true', true(), '')
-              }</td>
-            </tr>
-          </table>
-        </form>
-      </td>
-    </tr>
+    <div class='panel'>
+      <form method='post' autocomplete='off'>
+        <input type='hidden' name='do' value='do'/>
+        <input type='hidden' name='name' value='{ $name }'/>
+        <h2>{
+          html:link('Databases', $dba:CAT), ' » ',
+          (html:link($name, $dba:SUB, { 'name': $name }), ' » ')[$name],
+          html:button('backup-create', 'Create Backup')
+        }</h2>
+        {
+          html:field('Comment:',
+            <input type='text' name='comment' size='64' placeholder='optional' autofocus=''/>),
+          html:field('Compress Files:', html:checkbox('compress', 'true', true(), ''))
+        }
+      </form>
+    </div>
   }, fn() {
     db:create-backup($name, { 'comment': $comment, 'compress': boolean($compress) }),
     utils:redirect($dba:SUB, { 'name': $name, 'info': 'Backup was created.' })

@@ -36,44 +36,26 @@ function dba:user-create(
   $do    as xs:string?
 ) {
   html:update($do, { 'header': $dba:CAT }, fn() {
-    <tr>
-      <td>
-        <form method='post' autocomplete='off'>
-          <input type='hidden' name='do' value='do'/>
-          <!-- force chrome not to autocomplete form -->
-          <h2>{
-            html:link('Users', $dba:CAT), ' » ',
-            html:button('user-create', 'Create')
-          }</h2>
-          <table>
-            <tr>
-              <td>Name:</td>
-              <td>
-                <input type='text' name='name' value='{ $name }' autofocus=''/>
-                <div class='small'/>
-              </td>
-            </tr>
-            <tr>
-              <td>Password:</td>
-              <td>
-                <input type='password' name='pw' value='{ $pw }' autocomplete='new-password'/>
-                <div class='small'/>
-              </td>
-            </tr>
-            <tr>
-              <td>Permission:</td>
-              <td>
-                <select name='perm' size='5'>{
-                  for $p in $config:PERMISSIONS
-                  return element option { attribute selected { }[$p = $perm], $p }
-                }</select>
-                <div class='small'/>
-              </td>
-            </tr>
-          </table>
-        </form>
-      </td>
-    </tr>
+    <div class='panel'>
+      <form method='post' autocomplete='off'>
+        <input type='hidden' name='do' value='do'/>
+        <!-- force chrome not to autocomplete form -->
+        <h2>{
+          html:link('Users', $dba:CAT), ' » ',
+          html:button('user-create', 'Create')
+        }</h2>
+        {
+          html:field('Name:', <input type='text' name='name' value='{ $name }' autofocus=''/>),
+          html:field('Password:',
+            <input type='password' name='pw' value='{ $pw }' autocomplete='new-password'/>),
+          html:field('Permission:',
+            <select name='perm' size='5'>{
+              for $p in $config:PERMISSIONS
+              return element option { attribute selected { }[$p = $perm], $p }
+            }</select>)
+        }
+      </form>
+    </div>
   }, fn() {
     if (user:exists($name)) {
       error((), 'User already exists.')

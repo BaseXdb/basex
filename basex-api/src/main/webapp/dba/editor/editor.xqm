@@ -38,12 +38,7 @@ function dba:editor(
     config:edited-file()
   }
   return (
-    <colgroup>
-      <col id='left'/>
-      <col id='right'/>
-    </colgroup>,
-    <tr>
-      <td colspan='2'>
+    <div class='panel full'>
         <form autocomplete='off' action='javascript:void(0);'>{
           <datalist id='files'>{ config:editor-files() ! element option { . } }</datalist>,
           insert-separator((
@@ -62,23 +57,20 @@ function dba:editor(
           ), <span> </span>),
           <h2 class='right'>Result</h2>
         }</form>
-      </td>
-    </tr>,
-    <tr>
-      <td class='resize'>
-        <textarea id='editor' autofocus='' spellcheck='false'/>
-        <div class='resizer'/>
-      </td>
-      <td>{
-        <textarea id='output' readonly='' spellcheck='false'/>,
-        html:js('loadCodeMirror("xquery", true, true);'),
-        html:js('initResizer();'),
-        if ($edited) {
-          html:js('openFile("' || file:name($edited) || '");')
-        } else {
-          html:js('restoreDraft();')
-        }
-      }</td>
-    </tr>
+    </div>,
+    <div class='panel'>
+      <textarea id='editor' autofocus='' spellcheck='false'/>
+      <div class='resizer'/>
+    </div>,
+    <div class='panel no-divider'>{
+      <textarea id='output' readonly='' spellcheck='false'/>,
+      html:js('loadCodeMirror("xquery", true, true);'),
+      html:js('initResizer();'),
+      if ($edited) {
+        html:js('openFile("' || file:name($edited) || '");')
+      } else {
+        html:js('restoreDraft();')
+      }
+    }</div>
   ) => html:wrap({ 'header': $dba:CAT, 'info': $info, 'error': $error })
 };

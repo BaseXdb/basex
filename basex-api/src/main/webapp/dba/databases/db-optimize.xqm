@@ -42,44 +42,28 @@ function dba:db-optimize(
   html:update($do, { 'header': ($dba:CAT, $name) }, fn() {
     let $opts := if ($do) then $opts else db:info($name)//*[text() = 'true']/name()
     let $lang := if ($do) then $lang else db:property($name, 'language')
-    return <tr>
-      <td>
-        <form method='post' autocomplete='off'>
-          <input type='hidden' name='do' value='do'/>
-          <input type='hidden' name='name' value='{ $name }'/>
-          <h2>{
-            html:link('Databases', $dba:CAT), ' » ',
-            html:link($name, 'database', { 'name': $name }), ' » ',
-            html:button('db-optimize', 'Optimize')
-          }</h2>
-          <table>
-            <tr>
-              <td colspan='2'>
-                { html:checkbox('all', 'all', exists($all), 'Full optimization') }
-                <h3>{ html:option('textindex', 'Text Index', $opts) }</h3>
-                <h3>{ html:option('attrindex', 'Attribute Index', $opts) }</h3>
-                <h3>{ html:option('tokenindex', 'Token Index', $opts) }</h3>
-                <h3>{ html:option('ftindex', 'Fulltext Index', $opts) }</h3>
-              </td>
-            </tr>
-            <tr>
-              <td colspan='2'>{
-                html:option('stemming', 'Stemming', $opts),
-                html:option('casesens', 'Case Sensitivity', $opts),
-                html:option('diacritics', 'Diacritics', $opts)
-              }</td>
-            </tr>
-            <tr>
-              <td>Language:</td>
-              <td>
-                <input type='text' name='lang' value='{ $lang }'/>
-                <div class='small'/>
-              </td>
-            </tr>
-          </table>
-        </form>
-      </td>
-    </tr>
+    return <div class='panel'>
+      <form method='post' autocomplete='off'>
+        <input type='hidden' name='do' value='do'/>
+        <input type='hidden' name='name' value='{ $name }'/>
+        <h2>{
+          html:link('Databases', $dba:CAT), ' » ',
+          html:link($name, 'database', { 'name': $name }), ' » ',
+          html:button('db-optimize', 'Optimize')
+        }</h2>
+        {
+          html:checkbox('all', 'all', exists($all), 'Full optimization'),
+          <h3>{ html:option('textindex', 'Text Index', $opts) }</h3>,
+          <h3>{ html:option('attrindex', 'Attribute Index', $opts) }</h3>,
+          <h3>{ html:option('tokenindex', 'Token Index', $opts) }</h3>,
+          <h3>{ html:option('ftindex', 'Fulltext Index', $opts) }</h3>,
+          html:option('stemming', 'Stemming', $opts),
+          html:option('casesens', 'Case Sensitivity', $opts),
+          html:option('diacritics', 'Diacritics', $opts),
+          html:field('Language:', <input type='text' name='lang' value='{ $lang }'/>)
+        }
+      </form>
+    </div>
   }, fn() {
     db:optimize($name, boolean($all), map:merge((
       ('textindex', 'attrindex', 'tokenindex', 'ftindex', 'stemming', 'casesens', 'diacritics')

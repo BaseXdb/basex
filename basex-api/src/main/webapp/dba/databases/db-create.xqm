@@ -39,50 +39,27 @@ function dba:db-create(
   html:update($do, { 'header': $dba:CAT }, fn() {
     let $opts := if ($do) then $opts else ('textindex', 'attrindex')
     let $lang := if ($do) then $lang else 'en'
-    return <tr>
-      <td>
-        <form method='post' autocomplete='off'>
-          <input type='hidden' name='do' value='do'/>
-          <h2>{
-            html:link('Databases', $dba:CAT), ' » ',
-            html:button('db-create', 'Create')
-          }</h2>
-          <table>
-            <tr>
-              <td>Name:</td>
-              <td>
-                <input type='text' name='name' value='{ $name }' autofocus=''/>
-                <div class='small'/>
-              </td>
-            </tr>
-            <tr>
-              <td colspan='2'>{
-                <h3>{ html:option('textindex', 'Text Index', $opts) }</h3>,
-                <h3>{ html:option('attrindex', 'Attribute Index', $opts) }</h3>,
-                <h3>{ html:option('tokenindex', 'Token Index', $opts) }</h3>,
-                html:option('updindex', 'Incremental Indexing', $opts),
-                <div class='small'/>,
-                <h3>{ html:option('ftindex', 'Fulltext Indexing', $opts) }</h3>
-              }</td>
-            </tr>
-            <tr>
-              <td colspan='2'>{
-                html:option('stemming', 'Stemming', $opts),
-                html:option('casesens', 'Case Sensitivity', $opts),
-                html:option('diacritics', 'Diacritics', $opts)
-              }</td>
-            </tr>
-            <tr>
-              <td>Language:</td>
-              <td>
-                <input type='text' name='lang' value='{ $lang }'/>
-                <div class='small'/>
-              </td>
-            </tr>
-          </table>
-        </form>
-      </td>
-    </tr>
+    return <div class='panel'>
+      <form method='post' autocomplete='off'>
+        <input type='hidden' name='do' value='do'/>
+        <h2>{
+          html:link('Databases', $dba:CAT), ' » ',
+          html:button('db-create', 'Create')
+        }</h2>
+        {
+          html:field('Name:', <input type='text' name='name' value='{ $name }' autofocus=''/>),
+          <h3>{ html:option('textindex', 'Text Index', $opts) }</h3>,
+          <h3>{ html:option('attrindex', 'Attribute Index', $opts) }</h3>,
+          <h3>{ html:option('tokenindex', 'Token Index', $opts) }</h3>,
+          html:option('updindex', 'Incremental Indexing', $opts),
+          <h3>{ html:option('ftindex', 'Fulltext Indexing', $opts) }</h3>,
+          html:option('stemming', 'Stemming', $opts),
+          html:option('casesens', 'Case Sensitivity', $opts),
+          html:option('diacritics', 'Diacritics', $opts),
+          html:field('Language:', <input type='text' name='lang' value='{ $lang }'/>)
+        }
+      </form>
+    </div>
   }, fn() {
     if (db:exists($name)) {
       error((), 'Database already exists.')

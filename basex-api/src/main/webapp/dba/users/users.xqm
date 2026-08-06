@@ -30,48 +30,45 @@ function dba:users(
   $error  as xs:string?,
   $info   as xs:string?
 ) as element(html) {
-  <tr>
-    <td width='50%'>
+  (
+    <div class='panel'>
       <form method='post' autocomplete='off'>
-      <h2>Users</h2>
-      {
-        let $headers := (
-          { 'key': 'name', 'label': 'Name' },
-          { 'key': 'permission', 'label': 'Permission' },
-          { 'key': 'you', 'label': 'You' }
-        )
-        let $entries := (
-          let $current := session:get($config:SESSION-KEY)
-          for $user in user:list-details()
-          let $name := string($user/@name)
-          return {
-            'name': $name,
-            'permission': $user/@permission,
-            'you': if ($current = $name) then '✓' else '–'
-          }
-        )
-        let $buttons := (
-          html:button('user-create', 'Create…'),
-          html:button('user-drop', 'Drop', ('CHECK', 'CONFIRM'))
-        )
-        let $options := { 'link': 'user', 'sort': $sort }
-        return html:table($headers, $entries, $buttons, {}, $options)
-      }
+        <h2>Users</h2>
+        {
+          let $headers := (
+            { 'key': 'name', 'label': 'Name' },
+            { 'key': 'permission', 'label': 'Permission' },
+            { 'key': 'you', 'label': 'You' }
+          )
+          let $entries := (
+            let $current := session:get($config:SESSION-KEY)
+            for $user in user:list-details()
+            let $name := string($user/@name)
+            return {
+              'name': $name,
+              'permission': $user/@permission,
+              'you': if ($current = $name) then '✓' else '–'
+            }
+          )
+          let $buttons := (
+            html:button('user-create', 'Create…'),
+            html:button('user-drop', 'Drop', ('CHECK', 'CONFIRM'))
+          )
+          let $options := { 'link': 'user', 'sort': $sort }
+          return html:table($headers, $entries, $buttons, {}, $options)
+        }
       </form>
       <div>&#xa0;</div>
-    </td>
-    <td class='vertical'/>
-    <td width='50%'>
+    </div>,
+    <div class='panel'>
       <form method='post' autocomplete='off'>{
         <h2>User Information</h2>,
-        html:button('users-info', 'Update'),
-        <div class='small'/>,
+        <div class='buttons'>{ html:button('users-info', 'Update') }</div>,
         <textarea name='info' id='editor' spellcheck='false'>{
           serialize(user:info(), { 'indent': true() } )
         }</textarea>,
         html:js('loadCodeMirror("xml", true);')
       }</form>
-    </td>
-  </tr>
-  => html:wrap({ 'header': $dba:CAT, 'info': $info, 'error': $error })
+    </div>
+  ) => html:wrap({ 'header': $dba:CAT, 'info': $info, 'error': $error })
 };

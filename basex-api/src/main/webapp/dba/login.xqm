@@ -57,35 +57,22 @@ function dba:login(
   if (session:get($config:SESSION-KEY)) {
     web:redirect('/dba')
   } else {
-    <tr>
-      <td>
-        <form method='post'>
-          <input type='hidden' name='_page' value='{ $page }'/>
-          {
-            map:for-each(html:parameters(), fn($key, $value) {
-              <input type='hidden' name='{ $key }' value='{ $value }'/>
-            })
-          }
-          <div class='small'/>
-          <table>
-            <tr>
-              <td><b>Name:</b></td>
-              <td>
-                <input type='text' name='_name' value='{ $name }' autofocus=''/>
-              </td>
-            </tr>
-            <tr>
-              <td><b>Password:</b></td>
-              <td>{
-                <input type='password' name='_pass'/>,
-                ' ',
-                html:button('login', 'Login')
-              }</td>
-            </tr>
-          </table>
-        </form>
-      </td>
-    </tr>
+    <div class='panel'>
+      <form method='post'>
+        <input type='hidden' name='_page' value='{ $page }'/>
+        {
+          map:for-each(html:parameters(), fn($key, $value) {
+            <input type='hidden' name='{ $key }' value='{ $value }'/>
+          }),
+          html:field('Name:', <input type='text' name='_name' value='{ $name }' autofocus=''/>),
+          html:field('Password:', (
+            <input type='password' name='_pass'/>,
+            ' ',
+            html:button('login', 'Login')
+          ))
+        }
+      </form>
+    </div>
     => html:wrap({ 'error': $error })
   }
 };

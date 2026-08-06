@@ -27,20 +27,20 @@ function dba:settings(
   let $system := html:properties(db:system())
   (: boundary between global and local options (keyed by name, not position) :)
   let $local := $system/tr[th/h3 = 'LOCALOPTIONS']
-  let $table-row := fn($label, $items) {
-    <tr><td>{ $label, <br/>, $items }</td></tr>
-  }
+  (: the labels are full sentences: they are placed above their control :)
   let $option := fn($key, $values, $label) {
-    $table-row($label,
+    html:field($label,
       <select name='{ $key }'>{
         let $selected := config:get($key)
         for $value in $values
         return element option { attribute selected { }[$value = $selected], $value }
-      }</select>
+      }</select>,
+      'stacked'
     )
   }
   let $number := fn($key, $label) {
-    $table-row($label, <input type='number' name='{ $key }' value='{ config:get($key) }'/>)
+    html:field($label,
+      <input type='number' name='{ $key }' value='{ config:get($key) }'/>, 'stacked')
   }
   let $fixed-table := fn($rows) {
     <table class='fixed'>{
@@ -59,46 +59,38 @@ function dba:settings(
     )
   }
   return (
-    <tr>
-      <td>
-        <form method='post' autocomplete='off'>
-          <h2>Settings » { html:button('settings-save', 'Save') }</h2>
-          <h3>Queries</h3>
-          <table>{
-            $number($config:TIMEOUT, 'Timeout, in seconds (0 = disabled)'),
-            $number($config:MEMORY, 'Memory limit, in MB (0 = disabled)'),
-            $number($config:MAXCHARS, 'Maximum output size'),
-            $option($config:PERMISSION, $config:PERMISSIONS, 'Permission')
-          }</table>
-          <h3>Tables</h3>
-          <table>{
-            $number($config:MAXROWS,  'Displayed table rows')
-          }</table>
-        </form>
-      </td>
-      <td class='vertical'/>
-      <td>
-        <form method='post' autocomplete='off'>
-          <h2>Global Options » { html:button('settings-gc', 'GC') }</h2>
-          { $fixed-table($local/preceding-sibling::tr[not(th)]) }
-        </form>
-      </td>
-      <td class='vertical'/>
-      <td>
-        <h2>Local Options</h2>
-        { $fixed-table($local/following-sibling::tr) }
-      </td>
-      <td class='vertical'/>
-      <td class='collapsed'>
-        <h2>Environment Variables</h2>
-        { $map-table(map:build(available-environment-variables(), value := environment-variable#1)) }
-      </td>
-      <td class='vertical'/>
-      <td class='collapsed'>
-        <h2>System Properties</h2>
-        { $map-table(proc:property-map()) }
-      </td>
-    </tr>
+    <div class='panel'>
+      <form method='post' autocomplete='off'>
+        <h2>Settings » { html:button('settings-save', 'Save') }</h2>
+        <h3>Queries</h3>
+        {
+          $number($config:TIMEOUT, 'Timeout, in seconds (0 = disabled)'),
+          $number($config:MEMORY, 'Memory limit, in MB (0 = disabled)'),
+          $number($config:MAXCHARS, 'Maximum output size'),
+          $option($config:PERMISSION, $config:PERMISSIONS, 'Permission')
+        }
+        <h3>Tables</h3>
+        { $number($config:MAXROWS, 'Displayed table rows') }
+      </form>
+    </div>,
+    <div class='panel'>
+      <form method='post' autocomplete='off'>
+        <h2>Global Options » { html:button('settings-gc', 'GC') }</h2>
+        { $fixed-table($local/preceding-sibling::tr[not(th)]) }
+      </form>
+    </div>,
+    <div class='panel'>
+      <h2>Local Options</h2>
+      { $fixed-table($local/following-sibling::tr) }
+    </div>,
+    <div class='panel collapsed'>
+      <h2>Environment Variables</h2>
+      { $map-table(map:build(available-environment-variables(), value := environment-variable#1)) }
+    </div>,
+    <div class='panel collapsed'>
+      <h2>System Properties</h2>
+      { $map-table(proc:property-map()) }
+    </div>
   ) => html:wrap({ 'header': $dba:CAT, 'info': $info })
 };
 

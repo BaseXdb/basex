@@ -55,66 +55,65 @@ function dba:logs(
   let $files := reverse(sort(admin:logs()))
   let $date := $name otherwise string(head($files))
   return (
-    <tr class='stack-reverse'>
-      <td width='190'>
-        <h2>{
-          'Logs', '&#xa0;',
-          <input type='text' id='log-filter' name='log-filter' maxlength='10'
-                 onkeyup='logFilter();' class='smallinput'/>
-        }</h2>
+    <div class='panel'>
+      <h2>{
+        'Logs', '&#xa0;',
+        <input type='text' id='log-filter' name='log-filter' maxlength='10'
+               onkeyup='logFilter();' class='smallinput'/>
+      }</h2>
 
-        <form method='post' id='dates' autocomplete='off'>
-          <input type='hidden' name='date' id='date' value='{ $date }'/>
-          <input type='hidden' name='sort' id='sort' value='{ $sort }'/>
-          <input type='hidden' name='page' id='page' value='{ $page }'/>
-          <input type='hidden' name='time' id='time' value='{ $time }'/>
-          <div id='list'>{
-            let $buttons := (
-              html:button('logs-download', 'Download', 'CHECK'),
-              html:button('logs-delete', 'Delete', ('CHECK', 'CONFIRM'))
-            )
-            let $headers := (
-              { 'key': 'name', 'label': 'Name', 'type': 'dynamic' },
-              { 'key': 'size', 'label': 'Size', 'type': 'bytes' }
-            )
-            let $entries :=
-              for $entry in $files
-              return {
-                'name': fn() {
-                  let $link := html:link(
-                    $entry, $dba:CAT, ({ 'sort': $sort }, { 'name': $entry })
-                  ) update {
-                    (: enrich link targets with current search string :)
-                    insert node attribute onclick { 'addInput(this);' } into .
-                  }
-                  return if ($date = $entry) then element b { $link } else $link
-                },
-                'size': $entry/@size
-              }
-            return html:table($headers, $entries, $buttons)
-          }</div>
-        </form>
-      </td>
-      <td class='vertical'/>
-      <td>{
-        if ($date) {
-          <div class='logbar'>{
-            <h3>{ $date }</h3>,
-            <input type='hidden' name='name' value='{ $date }'/>,
-            <input type='text' id='input' name='input' value='{ $input }' autocomplete='off'
-                   title='Enter regular expression' autofocus='' onkeyup='logEntries(event.key);'/>,
-            <span class='ignore'>{
-              <input type='text' id='ignore' class='smallinput' autocomplete='off'
-                     placeholder='Ignore, e.g. /dba' title='Regular expression of entries to hide'
-                     onkeyup='ignoreLogs(event.key);'/>
-            }</span>
-          }</div>,
-          <div id='output'/>,
-          html:js('initLogs();')
-        }
-      }</td>
-    </tr>
-  ) => html:wrap({ 'header': $dba:CAT, 'info': $info, 'error': $error })
+      <form method='post' id='dates' autocomplete='off'>
+        <input type='hidden' name='date' id='date' value='{ $date }'/>
+        <input type='hidden' name='sort' id='sort' value='{ $sort }'/>
+        <input type='hidden' name='page' id='page' value='{ $page }'/>
+        <input type='hidden' name='time' id='time' value='{ $time }'/>
+        <div id='list'>{
+          let $buttons := (
+            html:button('logs-download', 'Download', 'CHECK'),
+            html:button('logs-delete', 'Delete', ('CHECK', 'CONFIRM'))
+          )
+          let $headers := (
+            { 'key': 'name', 'label': 'Name', 'type': 'dynamic' },
+            { 'key': 'size', 'label': 'Size', 'type': 'bytes' }
+          )
+          let $entries :=
+            for $entry in $files
+            return {
+              'name': fn() {
+                let $link := html:link(
+                  $entry, $dba:CAT, ({ 'sort': $sort }, { 'name': $entry })
+                ) update {
+                  (: enrich link targets with current search string :)
+                  insert node attribute onclick { 'addInput(this);' } into .
+                }
+                return if ($date = $entry) then element b { $link } else $link
+              },
+              'size': $entry/@size
+            }
+          return html:table($headers, $entries, $buttons)
+        }</div>
+      </form>
+    </div>,
+    <div class='panel stack-first'>{
+      if ($date) {
+        <div class='logbar'>{
+          <h3>{ $date }</h3>,
+          <input type='hidden' name='name' value='{ $date }'/>,
+          <input type='text' id='input' name='input' value='{ $input }' autocomplete='off'
+                 title='Enter regular expression' autofocus='' onkeyup='logEntries(event.key);'/>,
+          <span class='ignore'>{
+            <input type='text' id='ignore' class='smallinput' autocomplete='off'
+                   placeholder='Ignore, e.g. /dba' title='Regular expression of entries to hide'
+                   onkeyup='ignoreLogs(event.key);'/>
+          }</span>
+        }</div>,
+        <div id='output'/>,
+        html:js('initLogs();')
+      }
+    }</div>
+  ) => html:wrap({
+    'header': $dba:CAT, 'info': $info, 'error': $error, 'columns': ('190px', '1fr')
+  })
 };
 
 (:~

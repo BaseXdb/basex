@@ -12,38 +12,28 @@ import module namespace utils = 'dba/utils' at 'utils.xqm';
 declare variable $html:NUMBER := ('decimal', 'number', 'bytes');
 
 (:~
- : Appends a cache-busting version query to a local static asset reference.
- : @param  $path  asset path
- : @return path, suffixed with '?v=<timestamp>' when the file is found on disk
- :)
-declare %private function html:asset(
-  $path  as xs:string
-) as xs:string {
-  let $file := file:base-dir() || '../' || $path
-  return $path || (
-    if (file:exists($file)) {
-      '?v=' || format-dateTime(file:last-modified($file), '[Y0001][M01][D01][H01][m01][s01]')
-    }
-  )
-};
-
-(:~
- : Extends the specified table rows with the page template.
+ : Extends the specified content panels with the page template.
+ : Panels are laid out side by side, one grid column each; a panel with the
+ : additional 'full' class spans all columns.
  : The following options can be specified:
  : * header: page headers
  : * error: error string
  : * info: info string
+ : * columns: grid track widths, one per panel; defaults to equal widths
  :
- : @param  $rows     table rows
+ : @param  $panels   content panels
  : @param  $options  options
  : @return page
  :)
 declare function html:wrap(
-  $rows     as element()*,
+  $panels   as element()*,
   $options  as map(*) := {}
 ) as element(html) {
   let $header := head($options?header) ! utils:capitalize(.)
   let $user := session:get($config:SESSION-KEY)
+  let $columns := string-join(
+    $options?columns otherwise ($panels[not(tokenize(@class) = 'full')] ! '1fr'), ' '
+  )
   return <html lang='en'>
     <head>
       <meta charset='utf-8'/>
@@ -57,10 +47,10 @@ declare function html:wrap(
       <meta name='author' content='BaseX Team, BSD License'/>
       <meta name="robots" content="noindex"/>
       <link rel='icon' href='static/basex.svg'/>
-      <link rel='stylesheet' href='{ html:asset("static/style.css") }'/>
-      <script src='{ html:asset("static/js.js") }'/>
-      <script src='{ html:asset("static/editor.js") }'/>
-      <script src='{ html:asset("static/cm6.js") }'/>
+      <link rel='stylesheet' href='static/style.css'/>
+      <script src='static/js.js'/>
+      <script src='static/editor.js'/>
+      <script src='static/cm6.js'/>
     </head>
     <body>
       <header>
@@ -111,11 +101,10 @@ declare function html:wrap(
         <a href='/' class='header-logo'><img src='static/basex.svg' alt='BaseX'/></a>
       </header>
       <main>
-        <table class='content' width='100%'>{ $rows }</table>
+        <div class='content' style='--columns: { $columns }'>{ $panels }</div>
       </main>
       <hr/>
       <footer class='right'><sup>BaseX Team, BSD License</sup></footer>
-      <div class='small'/>
       {
         html:js('buttons(); ready();'),
         html:js('hideParams("info", "error");')[exists(($options?info, $options?error)[.])]
@@ -200,6 +189,24 @@ declare function html:button(
 };
 
 (:~
+ : Creates a labeled form field.
+ : @param  $label    field label
+ : @param  $control  input control and supplementary content
+ : @param  $class    additional class, e.g. 'stacked' for labels above their control
+ : @return field
+ :)
+declare function html:field(
+  $label    as xs:string,
+  $control  as item()*,
+  $class    as xs:string? := ()
+) as element(div) {
+  <div class='field{ $class ! (' ' || .) }'>{
+    <span>{ $label }</span>,
+    <div>{ $control }</div>
+  }</div>
+};
+
+(:~
  : Creates a property list.
  : @param  $props  properties
  : @return table
@@ -274,9 +281,7 @@ declare function html:table(
 ) as element()+ {
   (: display buttons :)
   if ($buttons) {
-    $buttons ! (., <span> </span>),
-    <br/>,
-    <div class='small'/>
+    <div class='buttons'>{ $buttons }</div>
   },
 
   (: sort entries :)
@@ -548,7 +553,7 @@ declare function html:parameters(
 declare %updating function html:update(
   $do       as xs:string?,
   $options  as map(*),
-  $output   as fn() as element(tr)*,
+  $output   as fn() as element()*,
   $update   as %updating fn(*)
 ) {
   if ($do) {

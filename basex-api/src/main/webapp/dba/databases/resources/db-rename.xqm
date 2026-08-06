@@ -37,30 +37,23 @@ function dba:db-rename(
   $do        as xs:string?
 ) {
   html:update($do, { 'header': ($dba:CAT, $name) }, fn() {
-    <tr>
-      <td>
-        <form method='post' autocomplete='off'>
-          <input type='hidden' name='do' value='do'/>
-          <input type='hidden' name='name' value='{ $name }'/>
-          <input type='hidden' name='resource' value='{ $resource }'/>
-          <h2>{
-            html:link('Databases', $dba:CAT), ' » ',
-            html:link($name, $dba:SUB, { 'name': $name }), ' » ',
-            html:link($resource, $dba:SUB, { 'name': $name, 'resource': $resource }), ' » ',
-            html:button('db-rename', 'Rename')
-          }</h2>
-          <table>
-            <tr>
-              <td>New path:</td>
-              <td>
-                <input type='text' name='target' value='{ $target otherwise $resource }' autofocus=''/>
-                <div class='small'/>
-              </td>
-            </tr>
-          </table>
-        </form>
-      </td>
-    </tr>
+    <div class='panel'>
+      <form method='post' autocomplete='off'>
+        <input type='hidden' name='do' value='do'/>
+        <input type='hidden' name='name' value='{ $name }'/>
+        <input type='hidden' name='resource' value='{ $resource }'/>
+        <h2>{
+          html:link('Databases', $dba:CAT), ' » ',
+          html:link($name, $dba:SUB, { 'name': $name }), ' » ',
+          html:link($resource, $dba:SUB, { 'name': $name, 'resource': $resource }), ' » ',
+          html:button('db-rename', 'Rename')
+        }</h2>
+        {
+          html:field('New path:',
+            <input type='text' name='target' value='{ $target otherwise $resource }' autofocus=''/>)
+        }
+      </form>
+    </div>
   }, fn() {
     if (db:exists($name, $target)) {
       error((), 'Resource already exists.')

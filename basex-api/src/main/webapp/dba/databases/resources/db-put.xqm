@@ -43,50 +43,31 @@ function dba:db-put(
   $do      as xs:string?
 ) {
   html:update($do, { 'header': ($dba:CAT, $name) }, fn() {
-    <tr>
-      <td>
-        <form method='post' enctype='multipart/form-data' autocomplete='off'>
-          <input type='hidden' name='do' value='do'/>
-          <input type='hidden' name='name' value='{ $name }'/>
-          <h2>{
-            html:link('Databases', $dba:CAT), ' » ',
-            html:link($name, $dba:SUB, { 'name': $name }), ' » ',
-            html:button('db-put', 'Put')
-          }</h2>
-          <table>
-            <tr>
-              <td>Input:</td>
-              <td>{
-                <input type='file' name='file' id='file'/>
-              }</td>
-            </tr>
-            <tr>
-              <td>Database Path:</td>
-              <td>
-                <input type='text' name='path' value='{ $path }'/>
-              </td>
-            </tr>
-            <tr>
-              <td>Binary Storage:</td>
-              <td>{ html:checkbox('binary', 'true', $binary = 'true', '') }</td>
-            </tr>
-            <tr>
-              <td colspan='2'>{
-                <h3>Parsing Options</h3>,
-                let $opts := if ($do) then $opts else ''
-                return (
-                  html:option('intparse', 'Use internal XML parser', $opts),
-                  html:option('dtd', 'Parse DTDs and entities', $opts),
-                  html:option('stripns', 'Strip namespaces', $opts),
-                  html:option('stripws', 'Strip whitespace', $opts),
-                  html:option('xinclude', 'Use XInclude', $opts)
-                )
-              }</td>
-            </tr>
-          </table>
-        </form>
-      </td>
-    </tr>
+    <div class='panel'>
+      <form method='post' enctype='multipart/form-data' autocomplete='off'>
+        <input type='hidden' name='do' value='do'/>
+        <input type='hidden' name='name' value='{ $name }'/>
+        <h2>{
+          html:link('Databases', $dba:CAT), ' » ',
+          html:link($name, $dba:SUB, { 'name': $name }), ' » ',
+          html:button('db-put', 'Put')
+        }</h2>
+        {
+          html:field('Input:', <input type='file' name='file' id='file'/>),
+          html:field('Database Path:', <input type='text' name='path' value='{ $path }'/>),
+          html:field('Binary Storage:', html:checkbox('binary', 'true', $binary = 'true', '')),
+          <h3>Parsing Options</h3>,
+          let $opts := if ($do) then $opts else ''
+          return (
+            html:option('intparse', 'Use internal XML parser', $opts),
+            html:option('dtd', 'Parse DTDs and entities', $opts),
+            html:option('stripns', 'Strip namespaces', $opts),
+            html:option('stripws', 'Strip whitespace', $opts),
+            html:option('xinclude', 'Use XInclude', $opts)
+          )
+        }
+      </form>
+    </div>
   }, fn() {
     let $key := $file[. instance of map(*)] ! map:keys(.)
     let $path := if (not($path) or ends-with($path, '/')) { $path || $key } else { $path }

@@ -33,8 +33,8 @@ function dba:jobs(
   $error  as xs:string?,
   $info   as xs:string?
 ) as element(html) {
-  <tr>{
-    <td width='50%'>
+  (
+    <div class='panel'>
       <form method='post' autocomplete='off'>
         <h2>Jobs</h2>
         {
@@ -79,14 +79,13 @@ function dba:jobs(
           }
         }
       </form>
-    </td>,
+    </div>,
 
     if ($job) {
       let $details := job:list-details($job)
       let $cached := $details/@state = 'cached'
       return (
-        <td class='vertical'/>,
-        <td width='50%'>
+        <div class='panel'>
           <form method='post' autocomplete='off'>{
             <input type='hidden' name='id' value='{ $job }'/>,
             <h2>{
@@ -151,9 +150,8 @@ function dba:jobs(
               'Job has expired.'
             }
           }</form>
-        </td>
+        </div>
       )
     }
-  }</tr>
-  => html:wrap({ 'header': $dba:CAT, 'info': $info, 'error': $error })
+  ) => html:wrap({ 'header': $dba:CAT, 'info': $info, 'error': $error })
 };

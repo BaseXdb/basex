@@ -34,28 +34,21 @@ function dba:db-copy(
   $do       as xs:string?
 ) {
   html:update($do, { 'header': ($dba:CAT, $name) }, fn() {
-    <tr>
-      <td>
-        <form method='post' autocomplete='off'>
-          <input type='hidden' name='do' value='do'/>
-          <input type='hidden' name='name' value='{ $name }'/>
-          <h2>{
-            html:link('Databases', $dba:CAT), ' » ',
-            html:link($name, $dba:SUB, { 'name': $name }), ' » ',
-            html:button('db-copy', 'Copy')
-          }</h2>
-          <table>
-            <tr>
-              <td>New name:</td>
-              <td>
-                <input type='text' name='newname' value='{ $newname otherwise $name }' autofocus=''/>
-                <div class='small'/>
-              </td>
-            </tr>
-          </table>
-        </form>
-      </td>
-    </tr>
+    <div class='panel'>
+      <form method='post' autocomplete='off'>
+        <input type='hidden' name='do' value='do'/>
+        <input type='hidden' name='name' value='{ $name }'/>
+        <h2>{
+          html:link('Databases', $dba:CAT), ' » ',
+          html:link($name, $dba:SUB, { 'name': $name }), ' » ',
+          html:button('db-copy', 'Copy')
+        }</h2>
+        {
+          html:field('New name:',
+            <input type='text' name='newname' value='{ $newname otherwise $name }' autofocus=''/>)
+        }
+      </form>
+    </div>
   }, fn() {
     if ($name != $newname) {
       if (db:exists($newname)) {

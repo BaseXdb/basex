@@ -1,7 +1,16 @@
 /** Link to the resizer area. */
 let _resizer;
-/** Link to the left editor component. */
-let _left;
+/** Link to the panel grid whose first track is resized. */
+let _content;
+/** Width of the left panel, in percent. */
+let _width;
+
+/** Width of the left panel before the resizer is first dragged, in percent. */
+const DEFAULT_PANEL_WIDTH = 50;
+/** Narrowest the resizer lets the left panel get, in percent of the grid. */
+const MIN_PANEL_WIDTH = 10;
+/** Widest the resizer lets the left panel get, in percent of the grid. */
+const MAX_PANEL_WIDTH = 85;
 
 /** localStorage key prefix for unsaved editor drafts (per file name). */
 const DRAFT = "dba-draft:";
@@ -164,10 +173,12 @@ function fileName() {
  * Initializes the panel resizer.
  */
 function initResizer() {
-  _left = document.getElementById("left");
+  _content = document.querySelector(".content");
   _resizer = document.querySelector(".resizer");
 
-  _left.style.width = (localStorage.getItem("editorWidth") || 50) + "%";
+  _width = Number(localStorage.getItem("editorWidth")) || DEFAULT_PANEL_WIDTH;
+  applyWidth();
+  window.addEventListener("resize", applyWidth);
   _resizer.addEventListener("pointerdown", e => {
     document.addEventListener("pointermove", resize);
     document.addEventListener("pointerup", stopResize);
@@ -176,12 +187,26 @@ function initResizer() {
 }
 
 /**
+ * Applies the current panel width. On narrow screens the panels are stacked,
+ * and the width declared in style.css takes over.
+ */
+function applyWidth() {
+  if(!stacked()) {
+    _content.style.gridTemplateColumns = `${_width}% 1fr`;
+  } else {
+    _content.style.removeProperty("grid-template-columns");
+  }
+}
+
+/**
  * Resizes the left panel.
  * @param {e} event
  */
 function resize(e) {
-  const w = (-28 + e.clientX) / _left.parentElement.clientWidth * 100;
-  _left.style.width = Math.min(85, Math.max(10, w)) + "%";
+  const rect = _content.getBoundingClientRect();
+  const width = (e.clientX - rect.left) / rect.width * 100;
+  _width = Math.min(MAX_PANEL_WIDTH, Math.max(MIN_PANEL_WIDTH, width));
+  applyWidth();
 }
 
 /**
@@ -192,5 +217,5 @@ function stopResize(e) {
   document.removeEventListener("pointermove", resize);
   document.removeEventListener("pointerup", stopResize);
   _resizer.releasePointerCapture(e.pointerId);
-  localStorage.setItem("editorWidth", _left.style.width.replace(/%/, ''));
+  localStorage.setItem("editorWidth", _width);
 }

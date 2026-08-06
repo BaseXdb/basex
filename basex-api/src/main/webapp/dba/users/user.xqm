@@ -44,97 +44,70 @@ function dba:user(
   let $user := user:list-details($name)
   let $admin := $name eq 'admin'
   return (
-    <tr>
-      <td width='50%'>
-        <form method='post' autocomplete='off'>
-          <h2>{
-            html:link('Users', $dba:CAT), ' » ',
-            $name, ' » ',
-            html:button('user-update', 'Update')
-          }</h2>
-          <input type='hidden' name='name' value='{ $name }'/>
-          <table>{
-            (
-              if ($admin) then <input type='hidden' name='newname' value='admin'/> else (
-                <tr>
-                  <td>Name:</td>
-                  <td>
-                    <input type='text' name='newname'
-                      value='{ $newname otherwise $name }' autofocus=''/>
-                    <div class='small'/>
-                  </td>
-                </tr>
-              ),
-              <tr>
-                <td>Password:</td>
-                <td>
-                  <input type='password' name='pw' value='{ $pw }' autocomplete='new-password'/>
-                  &#xa0;
-                  <span class='note'>
-                    …only changed if a new one is entered<br/>
-                  </span>
-                  <div class='small'/>
-                </td>
-              </tr>,
-              if ($admin) then <input type='hidden' name='perm' value='admin'/> else (
-                <tr>
-                  <td>Permission:</td>
-                  <td>
-                    <select name='perm' size='5'>{
-                      let $prm := $perm otherwise $user/@permission
-                      for $p in $config:PERMISSIONS
-                      return element option { if ($p = $prm) then attribute selected { }, $p }
-                    }</select>
-                    <div class='small'/>
-                  </td>
-                </tr>
-              ),
-              <tr>
-                <td>Information:</td>
-                <td>
-                  <textarea name='info' id='editor' spellcheck='false'>{
-                    serialize(user:info($name), { 'indent': true() } )
-                  }</textarea>
-                </td>
-              </tr>,
-              html:js('loadCodeMirror("xml", true);')
-            )
-          }</table>
-        </form>
-      </td>
-      <td class='vertical'/>
-      <td width='50%'>{
-        if (not($admin)) {
-          <_>
-            <h3>Local Permissions</h3>
-            <form method='post' autocomplete='off'>
-              <input type='hidden' name='name' value='{ $name }' id='name'/>
-              <div class='small'/>
-              {
-                let $headers := (
-                  { 'key': 'pattern', 'label': 'Pattern' },
-                  { 'key': 'permission', 'label': 'Local Permission' }
-                )
-                let $entries := $user/database ! {
-                  'pattern': @pattern,
-                  'permission': @permission
-                }
-                let $buttons := (
-                  html:button('pattern-add', 'Add…'),
-                  html:button('pattern-drop', 'Drop', ('CHECK', 'CONFIRM'))
-                )
-                return html:table($headers, $entries, $buttons)
-              }
-            </form>
-            <div class='note'>
-              A global permission can be overwritten by a local permission.<br/>
-              Local permissions are applied to those databases that match<br/>
-              a specified pattern. The pattern is based on the <a target='_blank'
-                href='https://docs.basex.org/main/Commands#Glob_Syntax'>glob syntax</a>.<br/>
-            </div>
-          </_>/node()
+    <div class='panel'>
+      <form method='post' autocomplete='off'>
+        <h2>{
+          html:link('Users', $dba:CAT), ' » ',
+          $name, ' » ',
+          html:button('user-update', 'Update')
+        }</h2>
+        <input type='hidden' name='name' value='{ $name }'/>
+        {
+          if ($admin) then <input type='hidden' name='newname' value='admin'/> else (
+            html:field('Name:',
+              <input type='text' name='newname' value='{ $newname otherwise $name }' autofocus=''/>)
+          ),
+          html:field('Password:', (
+            <input type='password' name='pw' value='{ $pw }' autocomplete='new-password'/>,
+            '&#xa0;',
+            <span class='note'>…only changed if a new one is entered</span>
+          )),
+          if ($admin) then <input type='hidden' name='perm' value='admin'/> else (
+            html:field('Permission:',
+              <select name='perm' size='5'>{
+                let $prm := $perm otherwise $user/@permission
+                for $p in $config:PERMISSIONS
+                return element option { if ($p = $prm) then attribute selected { }, $p }
+              }</select>)
+          ),
+          html:field('Information:',
+            <textarea name='info' id='editor' spellcheck='false'>{
+              serialize(user:info($name), { 'indent': true() } )
+            }</textarea>),
+          html:js('loadCodeMirror("xml", true);')
         }
-      }</td>
-    </tr>
+      </form>
+    </div>,
+    <div class='panel'>{
+      if (not($admin)) {
+        <_>
+          <h3>Local Permissions</h3>
+          <form method='post' autocomplete='off'>
+            <input type='hidden' name='name' value='{ $name }' id='name'/>
+            {
+              let $headers := (
+                { 'key': 'pattern', 'label': 'Pattern' },
+                { 'key': 'permission', 'label': 'Local Permission' }
+              )
+              let $entries := $user/database ! {
+                'pattern': @pattern,
+                'permission': @permission
+              }
+              let $buttons := (
+                html:button('pattern-add', 'Add…'),
+                html:button('pattern-drop', 'Drop', ('CHECK', 'CONFIRM'))
+              )
+              return html:table($headers, $entries, $buttons)
+            }
+          </form>
+          <div class='note'>
+            A global permission can be overwritten by a local permission.<br/>
+            Local permissions are applied to those databases that match<br/>
+            a specified pattern. The pattern is based on the <a target='_blank'
+              href='https://docs.basex.org/main/Commands#Glob_Syntax'>glob syntax</a>.<br/>
+          </div>
+        </_>/node()
+      }
+    }</div>
   ) => html:wrap({ 'header': ($dba:CAT, $name), 'info': $info, 'error': $error })
 };

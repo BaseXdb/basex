@@ -55,90 +55,84 @@ function dba:databases(
     }
   )
   return (
-    <tr>
-      <td width='50%'>
-        <form method='post' autocomplete='off'>
-          <h2>Databases</h2>
-          {
-            let $headers := (
-              { 'key': 'name', 'label': 'Name' },
-              { 'key': 'resources', 'label': 'Count', 'type': 'number', 'order': 'desc' },
-              { 'key': 'size', 'label': 'Bytes', 'type': 'bytes', 'order': 'desc' },
-              { 'key': 'date', 'label': 'Last Modified', 'type': 'dateTime', 'order': 'desc' }
-            )
-            let $entries := ($databases, $backups)
-            let $buttons := (
-              html:button('db-create', 'Create…'),
-              html:button('dbs-optimize', 'Optimize', 'CHECK'),
-              html:button('dbs-drop', 'Drop', ('CHECK', 'CONFIRM')),
-              html:button('backups-create', 'Back up', 'CHECK'),
-              html:button('backups-restore', 'Restore', ('CHECK', 'CONFIRM'))
-            )
-            let $count := count($db-names) + count($backups)
-            let $options := {
-              'sort': $sort,
-              'link': 'database',
-              'page': $page,
-              'count': $count
-            }
-            return html:table($headers, $entries, $buttons, {}, $options)
+    <div class='panel'>
+      <form method='post' autocomplete='off'>
+        <h2>Databases</h2>
+        {
+          let $headers := (
+            { 'key': 'name', 'label': 'Name' },
+            { 'key': 'resources', 'label': 'Count', 'type': 'number', 'order': 'desc' },
+            { 'key': 'size', 'label': 'Bytes', 'type': 'bytes', 'order': 'desc' },
+            { 'key': 'date', 'label': 'Last Modified', 'type': 'dateTime', 'order': 'desc' }
+          )
+          let $entries := ($databases, $backups)
+          let $buttons := (
+            html:button('db-create', 'Create…'),
+            html:button('dbs-optimize', 'Optimize', 'CHECK'),
+            html:button('dbs-drop', 'Drop', ('CHECK', 'CONFIRM')),
+            html:button('backups-create', 'Back up', 'CHECK'),
+            html:button('backups-restore', 'Restore', ('CHECK', 'CONFIRM'))
+          )
+          let $count := count($db-names) + count($backups)
+          let $options := {
+            'sort': $sort,
+            'link': 'database',
+            'page': $page,
+            'count': $count
           }
-        </form>
-      </td>
-      <td class='vertical'/>
-      <td width='50%'>
-        <h2>Upload Backups</h2>
-        <form method='post' enctype='multipart/form-data' autocomplete='off'
-              onsubmit='uploading(this);'>{
-          <input type='file' name='files' multiple='multiple'/>,
-          html:button('backup-upload', 'Upload')
-        }</form>
+          return html:table($headers, $entries, $buttons, {}, $options)
+        }
+      </form>
+    </div>,
+    <div class='panel'>
+      <h2>Upload Backups</h2>
+      <form method='post' enctype='multipart/form-data' autocomplete='off'
+            onsubmit='uploading(this);'>{
+        <input type='file' name='files' multiple='multiple'/>,
+        html:button('backup-upload', 'Upload')
+      }</form>
+      <div class='note'>
+        Ensure that your server has enough RAM assigned to upload large backups.
+      </div>
+      <form method='post' autocomplete='off'>
+        <input type='hidden' name='name' value=''/>
+        <h2>General Backups</h2>
         <div class='note'>
-          Ensure that your server has enough RAM assigned to upload large backups.
+          Comprising:
+          <a target='_blank'
+             href='https://docs.basex.org/main/User_Management'>registered users</a>;
+          <a target='_blank'
+             href='https://docs.basex.org/main/Jobs_Module#Services'>scheduled services</a>;
+          <a target='_blank'
+             href='https://docs.basex.org/main/Store_Module'>value stores</a>.
         </div>
-        <div class='small'/>
-        <form method='post' autocomplete='off'>
-          <input type='hidden' name='name' value=''/>
-          <h2>General Backups</h2>
-          <div class='note'>
-            Comprising:
-            <a target='_blank'
-               href='https://docs.basex.org/main/User_Management'>registered users</a>;
-            <a target='_blank'
-               href='https://docs.basex.org/main/Jobs_Module#Services'>scheduled services</a>;
-            <a target='_blank'
-               href='https://docs.basex.org/main/Store_Module'>value stores</a>.
-          </div>
-          <div class='small'/>
-          {
-            let $headers := (
-              { 'key': 'backup', 'label': 'Name', 'order': 'desc' },
-              { 'key': 'size', 'label': 'Size', 'type': 'bytes' },
-              { 'key': 'comment', 'label': 'Comment' },
-              { 'key': 'action', 'label': 'Action', 'type': 'dynamic' }
-            )
-            let $entries :=
-              for $backup in db:backups('')
-              order by $backup descending
-              return {
-                'backup': substring-after($backup, '-'),
-                'size': $backup/@size,
-                'comment': $backup/@comment,
-                'action': fn() {
-                  html:link('Download', 'backup/' || encode-for-uri($backup) || '.zip')
-                }
+        {
+          let $headers := (
+            { 'key': 'backup', 'label': 'Name', 'order': 'desc' },
+            { 'key': 'size', 'label': 'Size', 'type': 'bytes' },
+            { 'key': 'comment', 'label': 'Comment' },
+            { 'key': 'action', 'label': 'Action', 'type': 'dynamic' }
+          )
+          let $entries :=
+            for $backup in db:backups('')
+            order by $backup descending
+            return {
+              'backup': substring-after($backup, '-'),
+              'size': $backup/@size,
+              'comment': $backup/@comment,
+              'action': fn() {
+                html:link('Download', 'backup/' || encode-for-uri($backup) || '.zip')
               }
-            let $buttons := (
-              html:button('backup-create', 'Create…'),
-              html:button('backup-restore', 'Restore', ('CHECK', 'CONFIRM')),
-              html:button('backup-drop', 'Drop', ('CHECK', 'CONFIRM'))
-            )
-            let $params := { 'name': '' }
-            return html:table($headers, $entries, $buttons, $params)
-          }
-        </form>
-      </td>
-    </tr>
-    => html:wrap({ 'header': $dba:CAT, 'info': $info, 'error': $error })
-  )
+            }
+          let $buttons := (
+            html:button('backup-create', 'Create…'),
+            html:button('backup-restore', 'Restore', ('CHECK', 'CONFIRM')),
+            html:button('backup-drop', 'Drop', ('CHECK', 'CONFIRM'))
+          )
+          let $params := { 'name': '' }
+          return html:table($headers, $entries, $buttons, $params)
+        }
+      </form>
+    </div>
+  ) => html:wrap({ 'header': $dba:CAT, 'info': $info, 'error': $error })
 };

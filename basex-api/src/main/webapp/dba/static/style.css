@@ -1,6 +1,20 @@
 :root {
   /* let native controls (buttons, scrollbars) follow the OS light/dark scheme */
   color-scheme: light dark;
+
+  /* page gutter: margins, cell padding, and the gap between panels */
+  --gap: 1rem;
+  /* vertical separation between blocks */
+  --space: .6rem;
+  /* hairline rules and panel dividers */
+  --line: .7px;
+  /* grab area of the editor's panel resizer */
+  --resizer: 15px;
+  --radius: 3px;
+  /* set by the narrow-screen media query; read by js.js, which must not own
+     a second copy of the breakpoint */
+  --stacked: 0;
+
   --bg: #fff;
   --fg: #111;
   --accent: #C33;
@@ -36,13 +50,13 @@ body {
   overflow-y: scroll;
   /* no top margin: the sticky header supplies its own top spacing (via padding),
      so it starts flush at the viewport top and pins without any travel */
-  margin: 0 1rem 1rem 1rem;
+  margin: 0 var(--gap) var(--gap) var(--gap);
   background-color: var(--bg);
   color: var(--fg);
 }
 
 p {
-  margin: 0 0 .6rem 0;
+  margin: 0 0 var(--space) 0;
 }
 
 h1 {
@@ -60,7 +74,8 @@ h2 {
 h3 {
   font-size: 120%;
   color: var(--muted);
-  margin: .2rem 0 .2rem 0;
+  /* the top margin also separates a heading from the block above it */
+  margin: var(--space) 0 .2rem 0;
 }
 
 table {
@@ -70,7 +85,7 @@ table {
 th {
   vertical-align: top;
   text-align: left;
-  padding: 0 1rem 0rem 0;
+  padding: 0 var(--gap) 0 0;
 }
 
 /* right-aligned numeric table columns (was the deprecated align='right' attribute) */
@@ -80,16 +95,17 @@ th {
 
 td {
   vertical-align: top;
-  padding: 0 1rem 0 0;
+  padding: 0 var(--gap) 0 0;
   position: relative;
   border: 0;
 }
 
 .resizer {
   position: absolute;
-  right: 0;
   top: 0;
-  width: 15px;
+  /* straddles the gap between the panels, centered on it */
+  right: calc((var(--gap) + var(--resizer)) / -2);
+  width: var(--resizer);
   height: 100%;
   cursor: col-resize;
 }
@@ -104,7 +120,7 @@ dl {
 }
 
 dt {
-  margin: .6rem 0 .6rem 0;
+  margin: var(--space) 0;
   font-weight: bold;
 }
 
@@ -125,18 +141,16 @@ code {
   font-family: SFMono-Regular, Consolas, Menlo, monospace;
   font-size: 90%;
   border: 1px solid var(--border-light);
-  border-radius: 3px;
-  padding: 0 4px 0 4px;
-  margin: 0 2px 0 2px;
+  border-radius: var(--radius);
+  padding: 0 4px;
+  margin: 0 2px;
 }
 
 pre {
   font-family: SFMono-Regular, Consolas, Menlo, monospace;
   font-size: 90%;
-  border-color: var(--border-light);
-  border-width: 1px;
-  border-style: solid;
-  border-radius: 3px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
   background-color: var(--pre-bg);
   padding: .5rem;
   margin: .2rem 0 .5rem 0;
@@ -144,9 +158,6 @@ pre {
 
 textarea {
   font-family: SFMono-Regular, Consolas, Menlo, monospace;
-  border: 1px solid var(--border);
-  border-radius: 3px;
-  outline: none;
   width: 100%;
   height: 200px;
   resize: vertical;
@@ -154,29 +165,23 @@ textarea {
   color: var(--fg);
 }
 
-input[type=text], input[type=password], input[type=number], select, button {
-  padding: 4px;
+textarea, input[type=text], input[type=password], input[type=number],
+input[type=submit], select, button {
   border: 1px solid var(--border);
-  border-radius: 3px;
+  border-radius: var(--radius);
   outline: none;
-}
-
-input[type=submit], button {
-  padding: 4px 8px 4px 8px;
-  border: 1px solid var(--border);
-  border-radius: 3px;
-  outline: none;
-}
-
-.codemirror {
-  border: 1px solid var(--border);
 }
 
 input[type=text], input[type=password], input[type=number], select {
+  padding: 4px;
   width: 200px;
   /* entry fields keep themed colours; buttons stay native so disabled greys out */
   background-color: var(--bg);
   color: var(--fg);
+}
+
+input[type=submit], button {
+  padding: 4px 8px;
 }
 
 input:focus, select:focus, button:focus {
@@ -184,7 +189,7 @@ input:focus, select:focus, button:focus {
 }
 
 hr {
-  height: .7px;
+  height: var(--line);
   border: 0;
   background-color: var(--border);
 }
@@ -240,7 +245,7 @@ table.fixed td.expanded::after {
 header {
   display: flex;
   align-items: flex-start;
-  gap: 1rem;
+  gap: var(--gap);
   /* keep the header pinned while the page scrolls */
   position: sticky;
   top: 0;
@@ -259,7 +264,7 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 1rem;
+  gap: var(--gap);
   flex-wrap: wrap;
 }
 
@@ -311,6 +316,7 @@ header {
 
 .note {
   color: var(--muted);
+  margin-bottom: var(--space);
 }
 
 /* read-only reason; emphasized if the shown document is incomplete */
@@ -321,14 +327,71 @@ header {
   content: "\26A0\00a0";
 }
 
-.small {
-  height: 10px;
+/* row of actions above a table or an editor */
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-bottom: var(--space);
 }
 
-.vertical {
-  width: 1px;
-  border-left: .7px solid var(--border);
-  height: 100%;
+/* query field above a resource editor */
+.query {
+  margin: var(--space) 0;
+}
+
+/* page content: one grid column per panel, separated by the gap rather than by
+   panel padding, so that a track width is the width of the content */
+.content {
+  display: grid;
+  grid-template-columns: var(--columns);
+  /* a gutter on either side of the divider that sits in the middle */
+  column-gap: calc(var(--gap) * 2);
+  /* keeps a focus ring at the panel top clear of the sticky header */
+  padding-top: 2px;
+}
+
+/* with no divider to clear, a single gutter is enough (applies to the whole
+   page: so far only the editor, whose one gap is the resizer's) */
+.content:has(.no-divider) {
+  column-gap: var(--gap);
+}
+
+.content > .panel {
+  /* anchors the divider, the collapse button and the editor resizer */
+  position: relative;
+  /* lets a long value scroll inside the panel instead of widening the track */
+  min-width: 0;
+}
+
+/* a panel that spans all columns, e.g. the editor toolbar */
+.content > .full {
+  grid-column: 1 / -1;
+}
+
+/* divider, centered in the gap before every panel but the first of a row;
+   'no-divider' opts out where a resizer already separates the panels */
+.content > .panel:not(.full) ~ .panel:not(.full):not(.no-divider)::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--gap) * -1);
+  border-left: var(--line) solid var(--border);
+}
+
+/* labeled form field: label column, control column */
+.field {
+  display: grid;
+  grid-template-columns: 10rem 1fr;
+  align-items: baseline;
+  /* collapses between adjacent fields, and separates the first from a block above */
+  margin: var(--space) 0;
+}
+
+/* label above its control, for labels too long for a label column */
+.field.stacked {
+  grid-template-columns: 1fr;
 }
 
 /* collapsible content panels: a chevron folds a panel to a labeled strip */
@@ -348,14 +411,14 @@ button.collapse {
 button.collapse:hover {
   color: var(--accent);
 }
-td.collapsed {
-  width: 1.6rem;
-  padding-right: 0;
-}
-td.collapsed > :not(button.collapse) {
+.panel.collapsed > :not(button.collapse) {
   display: none;
 }
-td.collapsed > button.collapse {
+/* CodeMirror arms its editor root with 'display: flex !important' */
+.panel.collapsed .cm-editor {
+  display: none !important;
+}
+.panel.collapsed > button.collapse {
   position: static;
   display: flex;
   flex-direction: column;
@@ -369,13 +432,10 @@ button.collapse .label {
   white-space: nowrap;
   font-size: 90%;
 }
-/* siblings of a collapsed panel take over the freed space */
-td.wide {
-  width: auto;
-}
 
 /* narrow screens */
 @media (max-width: 800px) {
+  :root { --stacked: 1; }
   /* shorten the page title */
   .title-full { display: none; }
   .title-short { display: inline; }
@@ -396,30 +456,26 @@ td.wide {
     text-overflow: ellipsis;
   }
   /* stack the side-by-side content panels, drop their dividers */
-  table.content,
-  table.content > tbody,
-  table.content > tbody > tr,
-  table.content > tbody > tr > td {
-    display: block;
-    width: auto;
+  .content {
+    grid-template-columns: 1fr;
   }
-  table.content > tbody > tr > td.vertical {
+  .content > .panel:not(.full) ~ .panel:not(.full)::before {
     display: none;
   }
   /* stacked panels collapse to a horizontal strip */
-  td.collapsed > button.collapse {
+  .panel.collapsed > button.collapse {
     flex-direction: row;
   }
   button.collapse .label {
     writing-mode: horizontal-tb;
   }
   /* logs: show the search panel above the file list on narrow screens */
-  table.content > tbody > tr.stack-reverse {
-    display: flex;
-    flex-direction: column;
-  }
-  table.content > tbody > tr.stack-reverse > td:last-child {
+  .content > .panel.stack-first {
     order: -1;
+  }
+  /* labels above their controls, so the fields keep the full width */
+  .field {
+    grid-template-columns: 1fr;
   }
   /* keep the logs search + ignore fields on one line, letting them shrink to fit */
   .logbar h3 { white-space: nowrap; }
@@ -453,6 +509,8 @@ form.dragover {
   gap: .5rem;
   /* separate the search line from the results below it */
   margin-bottom: .75rem;
+  /* the bar reaches the panel edge, where the collapse button sits */
+  padding-right: 1.5rem;
 }
 .logbar h3 {
   margin: 0;
