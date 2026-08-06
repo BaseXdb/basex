@@ -17,16 +17,18 @@ public final class PerformanceTest {
   private static final int SIZE = 64 << 20;
 
   /**
-   * Tests that allocating memory reduces the available memory. The former implementation
-   * subtracted the free memory of the committed heap from the maximum heap size, which grew
-   * whenever memory was allocated.
+   * Tests that available and consumed memory add up to the maximum heap size. The former
+   * implementation subtracted the free memory of the committed heap from the maximum heap size,
+   * which yields a value that is too large by the size of the committed heap.
    */
   @Test public void available() {
-    final long before = Performance.available();
+    // allocate memory, so that only a small part of the committed heap is free
     final byte[] array = new byte[SIZE];
     array[SIZE - 1] = 1;
-    final long after = Performance.available();
-    assertTrue(after < before, "available memory did not shrink: " + before + " -> " + after);
+    final long max = Runtime.getRuntime().maxMemory();
+    final long sum = Performance.available() + Performance.memory();
+    assertTrue(Math.abs(sum - max) < (1 << 20),
+        "available and consumed memory add up to " + sum + ", expected " + max);
     assertEquals(1, array[SIZE - 1]);
   }
 
