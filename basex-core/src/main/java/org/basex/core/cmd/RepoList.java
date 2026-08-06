@@ -19,7 +19,7 @@ public final class RepoList extends ARepo {
    * Constructor.
    */
   public RepoList() {
-    super(Perm.NONE);
+    super(Perm.ADMIN);
   }
 
   @Override

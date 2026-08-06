@@ -1865,13 +1865,13 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _REPO_DELETE(RepoDelete::new, "delete(package)",
-      params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), REPO_URI, Perm.CREATE),
+      params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), REPO_URI, Perm.ADMIN),
   /** XQuery function. */
   _REPO_INSTALL(RepoInstall::new, "install(source)",
-      params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), REPO_URI, Perm.CREATE),
+      params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), REPO_URI, Perm.ADMIN),
   /** XQuery function. */
   _REPO_LIST(RepoList::new, "list()",
-      params(), STRING_ZM, flag(NDT), REPO_URI, Perm.CREATE),
+      params(), STRING_ZM, flag(NDT), REPO_URI, Perm.ADMIN),
 
   // SQL Module
 

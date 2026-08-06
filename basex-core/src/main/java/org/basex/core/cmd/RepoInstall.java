@@ -26,7 +26,7 @@ public final class RepoInstall extends ARepo {
    * @param info input info (can be {@code null})
    */
   public RepoInstall(final String perm, final InputInfo info) {
-    super(Perm.CREATE, perm);
+    super(Perm.ADMIN, perm);
     this.info = info;
   }
 

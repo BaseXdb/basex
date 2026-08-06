@@ -123,7 +123,7 @@ public final class PermissionTest extends SandboxTest {
     no(new Flush(), testSession);
     ok(new Close(), testSession);
     no(new RepoInstall(REPO + "/pkg3.xar", null), testSession);
-    ok(new RepoList(), testSession);
+    no(new RepoList(), testSession);
     no(new RepoDelete("http://www.pkg3.com", null), testSession);
 
     // XQuery
@@ -229,7 +229,7 @@ public final class PermissionTest extends SandboxTest {
     no(new Flush(), testSession);
     ok(new Close(), testSession);
     no(new RepoInstall(REPO + "/pkg3.xar", null), testSession);
-    ok(new RepoList(), testSession);
+    no(new RepoList(), testSession);
     no(new RepoDelete("http://www.pkg3.com", null), testSession);
 
     // XQuery
@@ -331,7 +331,7 @@ public final class PermissionTest extends SandboxTest {
     no(new AlterPassword(NAME, NAME), testSession);
     no(new AlterUser(NAME, "test2"), testSession);
     no(new RepoInstall(REPO + "/pkg3.xar", null), testSession);
-    ok(new RepoList(), testSession);
+    no(new RepoList(), testSession);
     no(new RepoDelete("http://www.pkg3.com", null), testSession);
 
     // XQuery
@@ -413,9 +413,9 @@ public final class PermissionTest extends SandboxTest {
     }
     ok(new Export(sandbox() + "-export"), testSession);
     ok(new Close(), testSession);
-    ok(new RepoInstall(REPO + "/pkg3.xar", null), testSession);
-    ok(new RepoList(), testSession);
-    ok(new RepoDelete("http://www.pkg3.com", null), testSession);
+    no(new RepoInstall(REPO + "/pkg3.xar", null), testSession);
+    no(new RepoList(), testSession);
+    no(new RepoDelete("http://www.pkg3.com", null), testSession);
 
     no(new CreateUser(NAME, NAME), testSession);
     no(new DropUser(NAME), testSession);
