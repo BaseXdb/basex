@@ -82,6 +82,8 @@ public final class Client {
           assign(new HtmlOptions(mopts.get(MainOptions.HTMLPARSER)), req.attribute(HTML)));
 
       return new Response(info, mopts, uri, req, qc).getResponse(send(uri, req), body, mediaType);
+    } catch(final HttpTimeoutException ex) {
+      throw HC_TIMEOUT.get(info).cause(ex);
     } catch(final IOException ex) {
       throw HC_ERROR_X.get(info, ex);
     }

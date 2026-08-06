@@ -303,11 +303,13 @@ public enum QueryError {
   /** Error code. */
   HC_PARSE_X(HC, 2, "Conversion failed: %"),
   /** Error code. */
-  HC_ATTR(HC, 3, "No attribute allowed beside 'src' and 'media-type'."),
+  HC_ATTR(HC, 4, "No attribute allowed beside 'src' and 'media-type'."),
   /** Error code. */
-  HC_REQ_X(HC, 4, "%."),
+  HC_REQ_X(HC, 5, "%."),
   /** Error code. */
   HC_URL(HC, 5, "No URL supplied."),
+  /** Error code. */
+  HC_TIMEOUT(HC, 6, "Timeout occurred waiting for the response."),
 
   // Inspection Module
 
