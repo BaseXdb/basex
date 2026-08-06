@@ -79,32 +79,62 @@ function chat:logout() as element(rest:response) {
 };
 
 (:~
+ : Returns a static file of the application.
+ : @param  $file  file or unknown path
+ : @return rest binary data
+ :)
+declare
+  %rest:path('/chat/.static/{$file=.+}')
+  %output:method('basex')
+function chat:file(
+  $file  as xs:string
+) as item()+ {
+  let $path := 'static/' || $file
+  return if (contains($file, '..')) {
+    web:error(400, 'Invalid path: ' || $file)
+  } else {
+    web:response-header(
+      { 'media-type': web:content-type($path) },
+      { 'Cache-Control': 'max-age=3600,public' }
+    ),
+    fetch:binary($path)
+  }
+};
+
+(:~
  : Returns the HTML login page.
  : @return HTML page
  :)
 declare %private function chat:login() as element(html) {
-  chat:wrap((
-    (: the entered name and password are sent to login-check (see above) :)
-    <form action='/chat/login-check' method='post'>
-      <div class='small'/>
-      <table>
-        <tr>
-          <td><b>Name:</b></td>
-          <td>
-            <input type='text' name='name' id='user' autofocus=''/>
-          </td>
-        </tr>
-        <tr>
-          <td><b>Password:</b></td>
-          <td>{
-            <input type='password' name='pass'/>,
-            ' ',
-            <button type='submit'>Login</button>
-          }</td>
-        </tr>
-      </table>
-    </form>
-  ), ())
+  (: the entered name and password are sent to login-check (see above) :)
+  chat:wrap(
+    <div class='panel'>
+      <form action='/chat/login-check' method='post'>{
+        chat:field('Name:', <input type='text' name='name' id='user' autofocus=''/>),
+        chat:field('Password:', (
+          <input type='password' name='pass'/>,
+          ' ',
+          <button type='submit'>Login</button>
+        ))
+      }</form>
+    </div>
+  , '1fr', ())
+};
+
+(:~
+ : Creates a labelled form field.
+ : @param  $label    field label
+ : @param  $control  form control
+ : @return field
+ :)
+declare %private function chat:field(
+  $label    as xs:string,
+  $control  as item()*
+) as element(div) {
+  <div class='field'>{
+    <span>{ $label }</span>,
+    <div>{ $control }</div>
+  }</div>
 };
 
 (:~
@@ -115,10 +145,11 @@ declare %private function chat:login() as element(html) {
  : @return HTML page
  :)
 declare %private function chat:main() as element(html) {
+  (: the input sends chat messages; the button asks the server for
+   : statistics, which arrive asynchronously (see chat-ws:info / ws:eval) :)
   chat:wrap((
-    (: the input sends chat messages; the button asks the server for
-     : statistics, which arrive asynchronously (see chat-ws:info / ws:eval) :)
-    <p>
+  <div class='panel full'>
+    <p class='compose'>
       <input type='text' autofocus='true' placeholder='Message to the room…'
              id='input' onkeydown='keyDown(event)' autocomplete='off'/>
       { ' ' }
@@ -128,41 +159,45 @@ declare %private function chat:main() as element(html) {
               title='Leave private mode' hidden='hidden'>Cancel</button>
       { ' ' }
       <button type='button' onclick='serverInfo()'>Who’s here?</button>
-    </p>,
-    <table width='100%'>
-      <tr>
-        <td width='140'>
-          <div id='users'/>
-        </td>
-        <td class='vertical'/>
-        <td>
-          <div class='note'><b>MESSAGES</b></div>
-          <div id='messages'/>
-        </td>
-      </tr>
-    </table>
-  ), <script type='text/javascript' defer='' src='/static/chat.js'/>)
+    </p>
+  </div>,
+  <div class='panel'>
+    <div id='users'/>
+  </div>,
+  <div class='panel'>
+    <div class='note'><b>MESSAGES</b></div>
+    <div id='messages'/>
+  </div>
+  ), '12rem 1fr', <script type='text/javascript' defer='' src='/chat/.static/chat.js'/>)
 };
 
 (:~
- : Puts the supplied contents into a complete HTML page with header and title.
- : @param $contents  page contents
- : @param $headers   extra header elements (scripts, etc.)
+ : Puts the supplied panels into a complete HTML page with header and title.
+ : @param $panels   page panels
+ : @param $columns  grid track sizes of the panels
+ : @param $headers  extra header elements (scripts, etc.)
  : @return HTML page
  :)
 declare %private function chat:wrap(
-  $contents  as item()*,
-  $headers   as element()*
+  $panels   as item()*,
+  $columns  as xs:string,
+  $headers  as element()*
 ) as element(html) {
   let $user := session:get($chat-util:id)
   return <html lang='en'>
     <head>
       <meta charset='utf-8'/>
+      <meta http-equiv='Content-Security-Policy'
+            content="default-src 'self'; script-src 'self' 'unsafe-inline';
+                     style-src 'self' 'unsafe-inline'; img-src 'self' data:;
+                     object-src 'none'; base-uri 'self'"/>
       <meta name='viewport' content='width=device-width, initial-scale=1'/>
       <title>BaseX Chat Application</title>
+      <meta name='description' content='WebSocket Chat'/>
       <meta name='author' content='BaseX Team, BSD License'/>
-      <link rel='icon' href='/static/basex.svg'/>
-      <link rel='stylesheet' type='text/css' href='/static/style.css'/>
+      <meta name='robots' content='noindex'/>
+      <link rel='icon' href='/chat/.static/basex.svg'/>
+      <link rel='stylesheet' type='text/css' href='/chat/.static/style.css'/>
       { $headers }
     </head>
     <body data-user='{ $user }'>
@@ -195,12 +230,10 @@ declare %private function chat:wrap(
           }</nav>
           <hr/>
         </div>
-        <a href='/' class='header-logo'><img src='/static/basex.svg' alt='BaseX'/></a>
+        <a href='/' class='header-logo'><img src='/chat/.static/basex.svg' alt='BaseX'/></a>
       </header>
       <main>
-        <table class='content' width='100%'>
-          <tr><td>{ $contents }</td></tr>
-        </table>
+        <div class='content' style='--columns: { $columns }'>{ $panels }</div>
       </main>
       <hr/>
       <footer class='right'><sup>BaseX Team, BSD License</sup></footer>

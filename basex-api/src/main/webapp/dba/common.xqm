@@ -20,26 +20,26 @@ function dba:redirect(
 };
 
 (:~
- : Returns a file.
+ : Returns a static file of the application.
  : @param  $file  file or unknown path
  : @return rest binary data
  :)
 declare
-  %rest:path('/dba/static/{$file=.+}')
+  %rest:path('/dba/.static/{$file=.+}')
   %output:method('basex')
   %perm:allow('public')
 function dba:file(
   $file  as xs:string
 ) as item()+ {
-  let $path := utils:safe-path(file:base-dir() || 'static/', $file)
-  return if (file:is-file($path)) {
+  let $path := 'static/' || $file
+  return if (contains($file, '..')) {
+    web:error(400, 'Invalid path: ' || $file)
+  } else {
     web:response-header(
       { 'media-type': web:content-type($path) },
-      { 'Cache-Control': 'max-age=3600,public', 'Content-Length': file:size($path) }
+      { 'Cache-Control': 'max-age=3600,public' }
     ),
-    file:read-binary($path)
-  } else {
-    web:error(404, 'Resource not found.')
+    fetch:binary($path)
   }
 };
 

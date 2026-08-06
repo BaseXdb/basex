@@ -46,11 +46,11 @@ declare function html:wrap(
       <meta name='description' content='Database Administration'/>
       <meta name='author' content='BaseX Team, BSD License'/>
       <meta name="robots" content="noindex"/>
-      <link rel='icon' href='static/basex.svg'/>
-      <link rel='stylesheet' href='static/style.css'/>
-      <script src='static/js.js'/>
-      <script src='static/editor.js'/>
-      <script src='static/cm6.js'/>
+      <link rel='icon' href='.static/basex.svg'/>
+      <link rel='stylesheet' href='.static/style.css'/>
+      <script src='.static/js.js'/>
+      <script src='.static/editor.js'/>
+      <script src='.static/cm6.js'/>
     </head>
     <body>
       <header>
@@ -98,7 +98,7 @@ declare function html:wrap(
           }</nav>
           <hr/>
         </div>
-        <a href='/' class='header-logo'><img src='static/basex.svg' alt='BaseX'/></a>
+        <a href='/' class='header-logo'><img src='.static/basex.svg' alt='BaseX'/></a>
       </header>
       <main>
         <div class='content' style='--columns: { $columns }'>{ $panels }</div>

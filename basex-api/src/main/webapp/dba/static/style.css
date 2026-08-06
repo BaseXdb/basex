@@ -318,6 +318,10 @@ header {
   color: var(--muted);
   margin-bottom: var(--space);
 }
+nav .note {
+  /* the header nav is a single row: no spacing before the rule below it */
+  margin-bottom: 0;
+}
 
 /* read-only reason; emphasized if the shown document is incomplete */
 #note.strong {

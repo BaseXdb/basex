@@ -17,6 +17,29 @@ import module namespace resp = 'webdav/responses' at 'responses.xqm';
 (: GET, HEAD ====================================================================================:)
 
 (:~
+ : Returns a static file of the application.
+ : @param  $file  file or unknown path
+ : @return rest binary data
+ :)
+declare
+  %rest:path('/webdav/.static/{$file=.+}')
+  %output:method('basex')
+function html:file(
+  $file  as xs:string
+) as item()+ {
+  let $path := 'static/' || $file
+  return if (contains($file, '..')) {
+    web:error(400, 'Invalid path: ' || $file)
+  } else {
+    web:response-header(
+      { 'media-type': web:content-type($path) },
+      { 'Cache-Control': 'max-age=3600,public' }
+    ),
+    fetch:binary($path)
+  }
+};
+
+(:~
  : Returns the content of a resource, or a listing of a collection.
  : @param  $path  path below the WebDAV root (empty for the root collection)
  : @return response
@@ -61,11 +84,17 @@ declare %private function html:listing(
   <html lang='en'>
     <head>
       <meta charset='utf-8'/>
+      <meta http-equiv='Content-Security-Policy'
+            content="default-src 'self'; script-src 'self' 'unsafe-inline';
+                     style-src 'self' 'unsafe-inline'; img-src 'self' data:;
+                     object-src 'none'; base-uri 'self'"/>
       <meta name='viewport' content='width=device-width, initial-scale=1'/>
       <title>BaseX WebDAV</title>
+      <meta name='description' content='WebDAV Interface'/>
       <meta name='author' content='BaseX Team, BSD License'/>
-      <link rel='icon' href='/static/basex.svg'/>
-      <link rel='stylesheet' type='text/css' href='/static/style.css'/>
+      <meta name='robots' content='noindex'/>
+      <link rel='icon' href='/webdav/.static/basex.svg'/>
+      <link rel='stylesheet' type='text/css' href='/webdav/.static/style.css'/>
     </head>
     <body>
       <header>
@@ -79,10 +108,12 @@ declare %private function html:listing(
           <nav class='ellipsis'>{ html:breadcrumb($rc) }</nav>
           <hr/>
         </div>
-        <a href='/' class='header-logo'><img src='/static/basex.svg' alt='BaseX'/></a>
+        <a href='/' class='header-logo'><img src='/webdav/.static/basex.svg' alt='BaseX'/></a>
       </header>
       <main>
-        <table class='content'>
+        <div class='content' style='--columns: 1fr'>
+        <div class='panel full'>
+        <table>
           <tr>
             <th>Name</th>
             <th>Content Type</th>
@@ -95,6 +126,8 @@ declare %private function html:listing(
             return html:entry($child)
           }
         </table>
+        </div>
+        </div>
       </main>
       <hr/>
       <footer class='right'><sup>BaseX Team, BSD License</sup></footer>
