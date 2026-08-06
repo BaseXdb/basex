@@ -543,7 +543,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final IO toIO(final String uri, final boolean content) throws QueryException {
     final IO io = sc().resolve(uri);
-    if(io instanceof IOContent) {
+    if(io instanceof IOContent && io.path().isEmpty()) {
       if(!content) throw RESURI_X.get(info, uri);
     } else {
       if(Strings.contains(io.path(), '#')) throw RESFRAG_X.get(info, io);

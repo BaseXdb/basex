@@ -13,7 +13,7 @@ public interface UriResolver {
    * @param path path (relative or absolute)
    * @param uri URI (can be {@code null})
    * @param base base URI (can be {@code null})
-   * @return reference to resources
+   * @return reference to resources, or {@code null} to apply the default resolution
    */
   IO resolve(String path, String uri, Uri base);
 }

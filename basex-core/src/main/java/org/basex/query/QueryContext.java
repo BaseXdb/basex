@@ -210,7 +210,20 @@ public final class QueryContext extends Job implements Closeable {
    * @throws QueryException query exception
    */
   public AModule parse(final String query, final String uri) throws QueryException {
-    return QueryParser.isLibrary(query) ? parseLibrary(query, uri) : parseMain(query, uri);
+    return parse(query, uri, null);
+  }
+
+  /**
+   * Parses the specified query.
+   * @param query query string
+   * @param uri base URI (can be {@code null})
+   * @param sc static context (can be {@code null})
+   * @return module
+   * @throws QueryException query exception
+   */
+  public AModule parse(final String query, final String uri, final StaticContext sc)
+      throws QueryException {
+    return QueryParser.isLibrary(query) ? parseLibrary(query, uri, sc) : parseMain(query, uri, sc);
   }
 
   /**
@@ -266,9 +279,22 @@ public final class QueryContext extends Job implements Closeable {
    * @throws QueryException query exception
    */
   public LibraryModule parseLibrary(final String query, final String uri) throws QueryException {
+    return parseLibrary(query, uri, null);
+  }
+
+  /**
+   * Parses the specified module.
+   * @param query query string
+   * @param uri base URI (can be {@code null})
+   * @param sc static context (can be {@code null})
+   * @return library module
+   * @throws QueryException query exception
+   */
+  public LibraryModule parseLibrary(final String query, final String uri, final StaticContext sc)
+      throws QueryException {
     return run(info.parsing, () -> {
       info.query = query;
-      return new QueryParser(query, uri, this, null).parseLibrary(true);
+      return new QueryParser(query, uri, this, sc).parseLibrary(true);
     });
   }
 

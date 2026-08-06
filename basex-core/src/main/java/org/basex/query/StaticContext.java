@@ -139,6 +139,16 @@ public final class StaticContext {
   }
 
   /**
+   * Assigns a custom URI resolver.
+   * @param custom URI resolver
+   * @return self reference
+   */
+  public StaticContext resolver(final UriResolver custom) {
+    resolver = custom;
+    return this;
+  }
+
+  /**
    * Resolves the specified path against the base URI.
    * @param path to be resolved
    * @return resulting path
@@ -155,7 +165,10 @@ public final class StaticContext {
    * @return io reference
    */
   public IO resolve(final String path, final String uri) {
-    if(resolver != null) return resolver.resolve(path, uri, baseURI);
+    if(resolver != null) {
+      final IO io = resolver.resolve(path, uri, baseURI);
+      if(io != null) return io;
+    }
 
     final IO baseIO = baseIO();
     if(baseIO == null) return IO.get(path);
