@@ -26,11 +26,14 @@ public final class ProfTrack extends StandardFunc {
     public static final BooleanOption TIME = new BooleanOption("time", true);
     /** Memory. */
     public static final BooleanOption MEMORY = new BooleanOption("memory", false);
+    /** Allocated memory. */
+    public static final BooleanOption ALLOCATED = new BooleanOption("allocated", true);
   }
 
   @Override
   protected XQMap item(final QueryContext qc) throws QueryException {
     final TrackOptions options = toOptions(arg(1), new TrackOptions(), qc);
+    final Thread thread = Thread.currentThread();
 
     // include memory consumption
     long min = -1;
@@ -38,6 +41,9 @@ public final class ProfTrack extends StandardFunc {
       Performance.gc(4);
       min = Performance.memory();
     }
+    // include allocated memory (requires no garbage collection)
+    final boolean allocated = options.get(TrackOptions.ALLOCATED);
+    final long alloc = allocated ? Performance.allocated(thread) : 0;
     // include execution time (called after garbage collection)
     Performance perf = null;
     if(options.get(TrackOptions.TIME)) {
@@ -56,12 +62,17 @@ public final class ProfTrack extends StandardFunc {
       }
     }
 
-    final MapBuilder mb = new MapBuilder(3);
+    final MapBuilder mb = new MapBuilder(4);
     // execution time (called before garbage collection)
     if(perf != null) {
       final BigDecimal ms = BigDecimal.valueOf(perf.nanoRuntime()).divide(Dec.BD_1000000,
           MathContext.DECIMAL64);
       mb.put(TrackOptions.TIME.name(), Dec.get(ms));
+    }
+    // allocated memory (called before garbage collection)
+    if(allocated) {
+      mb.put(TrackOptions.ALLOCATED.name(),
+          Itr.get(Math.max(0, Performance.allocated(thread) - alloc)));
     }
     // memory consumption
     if(min != -1) {
