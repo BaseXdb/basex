@@ -24,7 +24,9 @@ public final class WebModule {
   /** Supported WebSocket methods. */
   private final ArrayList<WsFunction> wsFunctions = new ArrayList<>();
   /** File reference. */
-  private final IOFile file;
+  private final IO file;
+  /** Web archive the module is stored in (can be {@code null}). */
+  private final WebArchive archive;
 
   /** Parsing timestamp, initially {{@code -1}. */
   private long time = -1;
@@ -34,9 +36,11 @@ public final class WebModule {
   /**
    * Constructor.
    * @param file xquery file
+   * @param archive web archive (can be {@code null})
    */
-  WebModule(final IOFile file) {
+  WebModule(final IO file, final WebArchive archive) {
     this.file = file;
+    this.archive = archive;
   }
 
   /**
@@ -46,7 +50,7 @@ public final class WebModule {
    * @throws IOException I/O exception
    */
   void parse(final Context ctx) throws QueryException, IOException {
-    final long ts = file.timeStamp();
+    final long ts = archive != null ? archive.time() : file.timeStamp();
     if(time == ts) return;
 
     time = ts;
@@ -106,7 +110,9 @@ public final class WebModule {
    */
   public QueryContext qc(final Context ctx) throws QueryException {
     final QueryContext qc = new QueryContext(ctx);
-    qc.parse(content, file.path());
+    final StaticContext sc = archive == null ? null :
+      new StaticContext(qc).resolver((path, uri, base) -> archive.resolve(path, base));
+    qc.parse(content, file.path(), sc);
     return qc;
   }
 }

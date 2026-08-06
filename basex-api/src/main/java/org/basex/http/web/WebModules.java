@@ -16,6 +16,7 @@ import org.basex.http.ws.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
+import org.basex.query.util.pkg.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -36,6 +37,8 @@ public final class WebModules {
 
   /** Module cache. */
   private HashMap<String, WebModule> modules = new HashMap<>();
+  /** Web archive cache. */
+  private HashMap<String, WebArchive> archives = new HashMap<>();
   /** Indicates if modules have been cached. */
   private boolean parsed;
   /** Last access time. */
@@ -47,9 +50,7 @@ public final class WebModules {
    */
   private WebModules(final Context ctx) {
     final StaticOptions sopts = ctx.soptions;
-    final String webpath = sopts.get(StaticOptions.WEBPATH);
-    final String rxqpath = sopts.get(StaticOptions.RESTXQPATH);
-    path = new IOFile(webpath).resolve(rxqpath);
+    path = sopts.restxqPath();
 
     // RESTXQ parsing
     final int sec = sopts.get(StaticOptions.PARSERESTXQ);
@@ -390,7 +391,9 @@ public final class WebModules {
       if(!path.exists()) throw HTTPStatus.NO_RESTXQ_DIRECTORY.get();
 
       cache = new HashMap<>();
-      parse(ctx, path, cache, modules);
+      final ArrayList<IOFile> files = new ArrayList<>();
+      parse(ctx, path, cache, modules, files);
+      parseArchives(ctx, cache, modules, files);
       modules = cache;
       parsed = true;
     }
@@ -401,17 +404,58 @@ public final class WebModules {
   }
 
   /**
+   * Parses the modules of all web application archives and caches new entries.
+   * @param ctx database context
+   * @param cache cached modules
+   * @param old old cache
+   * @param files archive files
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   */
+  private void parseArchives(final Context ctx, final HashMap<String, WebModule> cache,
+      final HashMap<String, WebModule> old, final ArrayList<IOFile> files)
+      throws QueryException, IOException {
+
+    final HashMap<String, WebArchive> map = new HashMap<>();
+    for(final IOFile file : files) {
+      if(!file.exists()) continue;
+
+      // reuse cached archive if it has not been modified
+      final String archivePath = file.path();
+      WebArchive archive = archives.get(archivePath);
+      final boolean reload = archive == null || archive.outdated();
+      if(reload) {
+        // skip archives that are no web applications (only the descriptor is read)
+        if(RepoArchive.entry(file, PkgText.WEBDESCRIPTOR) == null) continue;
+        archive = new WebArchive(file);
+      }
+      map.put(archivePath, archive);
+
+      for(final IO module : archive.modules()) {
+        // a reloaded archive invalidates all of its modules
+        final String pth = module.path();
+        WebModule wm = reload ? null : old.get(pth);
+        if(wm == null) wm = new WebModule(module, archive);
+        wm.parse(ctx);
+        cache.put(pth, wm);
+      }
+    }
+    archives = map;
+  }
+
+  /**
    * Parses the specified path for modules with relevant annotations and caches new entries.
    * @param root root path
    * @param ctx database context
    * @param cache cached modules
    * @param old old cache
+   * @param archived archive files (will be assigned)
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
   private static void parse(final Context ctx, final IOFile root,
-      final HashMap<String, WebModule> cache, final HashMap<String, WebModule> old)
-      throws QueryException, IOException {
+      final HashMap<String, WebModule> cache, final HashMap<String, WebModule> old,
+      final ArrayList<IOFile> archived) throws QueryException, IOException {
 
     // check if directory is to be skipped
     final IOFile[] files = root.children();
@@ -421,13 +465,15 @@ public final class WebModules {
 
     for(final IOFile file : files) {
       if(file.isDir()) {
-        parse(ctx, file, cache, old);
+        parse(ctx, file, cache, old, archived);
       } else {
         final String path = file.path();
-        if(file.hasSuffix(IO.XQSUFFIXES)) {
+        if(file.isArchive()) {
+          archived.add(file);
+        } else if(file.hasSuffix(IO.XQSUFFIXES)) {
           // retrieve existing module or create new instance
           WebModule module = old.get(path);
-          if(module == null) module = new WebModule(file);
+          if(module == null) module = new WebModule(file, null);
 
           // parse updated module, add to cache
           module.parse(ctx);

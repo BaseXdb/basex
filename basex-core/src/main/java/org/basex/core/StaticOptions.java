@@ -210,6 +210,14 @@ public final class StaticOptions extends Options {
   }
 
   /**
+   * Returns the path to the directory that contains all RESTXQ applications.
+   * @return RESTXQ path
+   */
+  public IOFile restxqPath() {
+    return new IOFile(get(WEBPATH)).resolve(get(RESTXQPATH));
+  }
+
+  /**
    * Returns a reference to a file or database in the database directory.
    * @param name name of the file or database (empty string for general data)
    * @return database path

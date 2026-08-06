@@ -18,6 +18,8 @@ public interface PkgText {
 
   /** Package descriptor. */
   String DESCRIPTOR = "expath-pkg" + IO.XMLSUFFIX;
+  /** Web application descriptor. */
+  String WEBDESCRIPTOR = Prop.PROJECT + "-web" + IO.XMLSUFFIX;
   /** Jar descriptor. */
   String JARDESC = Prop.PROJECT + IO.XMLSUFFIX;
 
