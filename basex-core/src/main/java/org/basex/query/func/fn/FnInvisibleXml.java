@@ -4,6 +4,8 @@ import static org.basex.query.QueryError.*;
 
 import java.io.*;
 
+import org.basex.build.*;
+import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -19,6 +21,7 @@ import org.basex.util.hash.*;
 import org.basex.util.options.*;
 
 import de.bottlecaps.markup.*;
+import de.bottlecaps.markup.blitz.ResultHandler;
 
 /**
  * Function implementation.
@@ -29,7 +32,8 @@ import de.bottlecaps.markup.*;
 public final class FnInvisibleXml extends StandardFunc {
   /** Required class names. */
   private static final String[] CLASSES = { "de.bottlecaps.markup.Blitz",
-      "de.bottlecaps.markup.BlitzException", "de.bottlecaps.markup.BlitzParseException"};
+      "de.bottlecaps.markup.BlitzException", "de.bottlecaps.markup.BlitzParseException",
+      "de.bottlecaps.markup.blitz.ResultHandler"};
   /** The function's argument type. */
   public static final SeqType ARG_TYPE = ChoiceItemType.get(BasicType.STRING,
       NodeType.get(NameTest.get(new QNm("ixml")))).seqType(Occ.ZERO_OR_ONE);
@@ -112,6 +116,8 @@ public final class FnInvisibleXml extends StandardFunc {
    * Result function of fn:invisible-xml: parse invisible XML input.
    */
   private static final class ParseInvisibleXml extends Arr {
+    /** Shared {@link MainOptions} instance to avoid expensive per-parse initialization. */
+    private static final MainOptions OPTIONS = new MainOptions();
     /** Generated invisible XML parser. */
     private final de.bottlecaps.markup.blitz.Parser parser;
 
@@ -131,11 +137,21 @@ public final class FnInvisibleXml extends StandardFunc {
     public DBNode item(final QueryContext qc) throws QueryException {
       final String input = toString(arg(0), qc);
       try {
-        return new DBNode(IO.get(parser.parse(input)));
+        final MemBuilder builder = new MemBuilder(new SingleParser(new IOContent(""), OPTIONS) {
+          @Override protected void parse() { }
+        });
+        builder.init();
+        builder.openDoc(Token.EMPTY);
+        parser.parse(input, new DBResultHandler(builder));
+        builder.closeDoc();
+        return new DBNode(builder.finish());
       } catch(final BlitzParseException ex) {
         throw IXML_INP_X_X_X.get(info, ex.getOffendingToken(), ex.getLine(), ex.getColumn());
       } catch(final BlitzException | IOException ex) {
         throw IXML_RESULT_X.get(info, ex);
+      } catch(final RuntimeException ex) {
+        if(ex.getCause() instanceof final IOException io) throw IXML_RESULT_X.get(info, io);
+        throw ex;
       }
     }
 
@@ -147,6 +163,95 @@ public final class FnInvisibleXml extends StandardFunc {
     @Override
     public void toString(final QueryString qs) {
       qs.token("parse-invisible-xml").params(exprs);
+    }
+  }
+
+  /**
+   * Result handler that builds an in-memory database directly from Markup Blitz result events, so
+   * that the document is created without serializing the parse tree to a string and re-parsing it.
+   */
+  private static final class DBResultHandler implements ResultHandler {
+    /** Database builder. */
+    private final MemBuilder builder;
+    /** Reusable buffer for turning a codepoint run into UTF-8 bytes. */
+    private final TokenBuilder token = new TokenBuilder();
+    /** Name of a started but not yet opened element (its attributes are still pending). */
+    private byte[] element;
+    /** Attributes of the pending element. */
+    private Atts atts = new Atts();
+    /** Namespaces of the pending element. */
+    private Atts nsp = new Atts();
+
+    /**
+     * Constructor.
+     * @param builder database builder
+     */
+    private DBResultHandler(final MemBuilder builder) {
+      this.builder = builder;
+    }
+
+    @Override
+    public void startElement(final String name) {
+      open();
+      element = Token.token(name);
+    }
+
+    @Override
+    public void endElement(final String name) {
+      open();
+      try {
+        builder.closeElem();
+      } catch(final IOException ex) {
+        throw new RuntimeException(ex);
+      }
+    }
+
+    @Override
+    public void attribute(final String name, final int[] codepoints, final int length) {
+      final byte[] val = bytes(codepoints, length);
+      if(name.equals("xmlns")) {
+        nsp.add(Token.EMPTY, val);
+      } else if(name.startsWith("xmlns:")) {
+        nsp.add(Token.token(name.substring(6)), val);
+      } else {
+        atts.add(Token.token(name), val);
+      }
+    }
+
+    @Override
+    public void text(final int[] codepoints, final int length) {
+      open();
+      if(length == 0) return;
+      try {
+        builder.text(bytes(codepoints, length));
+      } catch(final IOException ex) {
+        throw new RuntimeException(ex);
+      }
+    }
+
+    /** Opens the pending element with its collected attributes and namespaces. */
+    private void open() {
+      if(element == null) return;
+      try {
+        builder.openElem(element, atts, nsp);
+      } catch(final IOException ex) {
+        throw new RuntimeException(ex);
+      }
+      element = null;
+      atts = new Atts();
+      nsp = new Atts();
+    }
+
+    /**
+     * Turns a run of codepoints into UTF-8 bytes.
+     * @param codepoints codepoints holding the value
+     * @param length number of codepoints
+     * @return byte array
+     */
+    private byte[] bytes(final int[] codepoints, final int length) {
+      token.reset();
+      for(int i = 0; i < length; i++) token.add(codepoints[i]);
+      return token.toArray();
     }
   }
 
