@@ -59,6 +59,8 @@ public final class SyntaxXQueryTest {
     check("$x/@item", "VV......");
     // map lookups and name tests of an axis step are no keywords either
     check("$m?key", "VV....");
+    // a lookup is glued to its name; a detached question mark is an occurrence indicator
+    check("$x as xs:string? external", "VV.KK.KKKKKKKKK..KKKKKKKK");
     check("child::text", "KKKKK......");
     // function calls, node tests and axes are still highlighted
     check("count(1)", "KKKKK.N.");

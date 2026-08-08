@@ -421,7 +421,8 @@ final class SyntaxXQuery extends SyntaxMarkup {
 
     // reserved words are no keywords in name tests: '//name', '@id', 'child::text', '$map?key'
     final int prev = skipWsBack(text, first), pc = cp(text, prev);
-    final boolean step = pc == '/' || pc == '@' || pc == '?' ||
+    // a lookup is glued to its name; a detached question mark is an occurrence indicator
+    final boolean step = pc == '/' || pc == '@' || pc == '?' && prev + 1 == first ||
       pc == ':' && cp(text, back(text, prev)) == ':';
     return !step && KEYWORDS.contains(name);
   }
