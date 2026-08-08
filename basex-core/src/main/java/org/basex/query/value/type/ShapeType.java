@@ -270,12 +270,13 @@ public class ShapeType extends MapType {
         if(!fields.contains(key)) return false;
         final SeqType fst = fields.get(key).seqType(), shfst = sh.fields.get(key).seqType();
         if(fst != shfst) {
-          if(!fst.occ.instanceOf(shfst.occ)) return false;
           final Type ft = TypeRef.deref(fst.type), shft = TypeRef.deref(shfst.type);
-          if(ft instanceof final ShapeType sh1 && shft instanceof final ShapeType sh2) {
+          if(ft instanceof final ShapeType sh1 && shft instanceof final ShapeType sh2 &&
+              !fst.emptyType()) {
+            if(!fst.occ.instanceOf(shfst.occ)) return false;
             final Pair pair = new Pair(sh1, sh2);
             if(!pairs.contains(pair) && !sh1.instanceOf(sh2, pair.addTo(pairs))) return false;
-          } else if(!ft.instanceOf(shft)) {
+          } else if(!fst.instanceOf(shfst)) {
             return false;
           }
         }
@@ -381,7 +382,9 @@ public class ShapeType extends MapType {
           if(is == null) return null;
           map.put(key, new ShapeField(is));
         }
-        return get(map, declared() || sh.declared());
+        final ShapeType st = name() != null || !sh.declared() || sh.name() == null && declared() ?
+          this : sh;
+        return st.with(map);
       }
       return null;
     }
@@ -393,7 +396,7 @@ public class ShapeType extends MapType {
         if(is == null) return null;
         map.put(key, new ShapeField(is));
       }
-      return get(map, declared());
+      return with(map);
     }
     return null;
   }

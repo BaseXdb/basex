@@ -281,6 +281,30 @@ public final class RecordTest extends SandboxTest {
         INVTYPE_X);
   }
 
+  /** Global variables with a declared record type. */
+  @Test public void globalVar() {
+    query("declare record r(a as item()*);\n"
+        + "declare variable $v as r := { 'a': 1 };\n"
+        + "$v instance of r",
+        true);
+    // recursive record, declared before and after the variables
+    query("declare record list(value as item()*, next as list?);\n"
+        + "declare variable $v as list := { 'value': 42, 'next': () };\n"
+        + "declare variable $w as list := { 'value': 42 };\n"
+        + "$v instance of list and $w instance of list",
+        true);
+    query("declare variable $v as list := { 'value': 42, 'next': () };\n"
+        + "declare variable $w as list := { 'value': 42 };\n"
+        + "declare record list(value as item()*, next as list?);\n"
+        + "$v instance of list and $w instance of list",
+        true);
+    // nested records are annotated as well
+    query("declare record list(value as item()*, next as list?);\n"
+        + "declare variable $v as list := { 'value': 42, 'next': { 'value': 43, 'next': () } };\n"
+        + "$v?next instance of list",
+        true);
+  }
+
   /** Record constructor function. */
   @Test public void recConstr() {
     // constructor of a record in no namespace, called by an unprefixed name (#2257)
