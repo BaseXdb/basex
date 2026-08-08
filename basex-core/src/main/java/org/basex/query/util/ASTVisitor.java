@@ -1,8 +1,11 @@
 package org.basex.query.util;
 
+import org.basex.data.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.func.java.*;
 import org.basex.query.scope.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 
@@ -75,6 +78,33 @@ public abstract class ASTVisitor implements LockCollector {
    * @return if more expressions should be visited ({@code true} by default)
    */
   public boolean dynFuncCall(final Expr func) {
+    return true;
+  }
+
+  /**
+   * Notifies the visitor of a value.
+   * @param value value
+   * @return if more expressions should be visited ({@code true} by default)
+   */
+  public boolean value(final Value value) {
+    return true;
+  }
+
+  /**
+   * Notifies the visitor of an expression that is bound to an opened database.
+   * @param data data reference
+   * @return if more expressions should be visited ({@code true} by default)
+   */
+  public boolean database(final Data data) {
+    return true;
+  }
+
+  /**
+   * Notifies the visitor of a call to Java code.
+   * @param call Java call
+   * @return if more expressions should be visited ({@code true} by default)
+   */
+  public boolean javaCall(final JavaCall call) {
     return true;
   }
 

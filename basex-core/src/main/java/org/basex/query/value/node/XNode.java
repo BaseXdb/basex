@@ -230,11 +230,18 @@ public abstract class XNode extends GNode {
   }
 
   @Override
-  public abstract XNode materialize(Predicate<Data> test, InputInfo ii, QueryContext qc)
-      throws QueryException;
+  public abstract XNode materialize(Predicate<Data> test, boolean funcs, InputInfo ii,
+      QueryContext qc) throws QueryException;
 
   @Override
-  public final boolean materialized(final Predicate<Data> test, final InputInfo ii) {
+  public final XNode materialize(final Predicate<Data> test, final InputInfo ii,
+      final QueryContext qc) throws QueryException {
+    return materialize(test, false, ii, qc);
+  }
+
+  @Override
+  public final boolean materialized(final Predicate<Data> test, final boolean funcs,
+      final InputInfo ii) {
     return test.test(data());
   }
 

@@ -225,9 +225,9 @@ public class DBNode extends XNode {
   }
 
   @Override
-  public final DBNode materialize(final Predicate<Data> test, final InputInfo ii,
-      final QueryContext qc) throws QueryException {
-    return materialized(test, ii) ? this : copy(qc);
+  public final DBNode materialize(final Predicate<Data> test, final boolean funcs,
+      final InputInfo ii, final QueryContext qc) throws QueryException {
+    return materialized(test, funcs, ii) ? this : copy(qc);
   }
 
   @Override

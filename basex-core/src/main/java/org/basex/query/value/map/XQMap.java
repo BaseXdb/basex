@@ -213,24 +213,24 @@ public abstract class XQMap extends XQStruct {
   }
 
   @Override
-  public XQMap materialize(final Predicate<Data> test, final InputInfo ii,
+  public XQMap materialize(final Predicate<Data> test, final boolean funcs, final InputInfo ii,
       final QueryContext qc) throws QueryException {
 
-    if(materialized(test, ii)) return this;
+    if(materialized(test, funcs, ii)) return this;
 
     final MapBuilder mb = new MapBuilder(structSize());
     forEach((key, value) -> {
       qc.checkStop();
-      mb.put(key, value.materialize(test, ii, qc));
+      mb.put(key, value.materialize(test, funcs, ii, qc));
     });
     return mb.map();
   }
 
   @Override
-  public boolean materialized(final Predicate<Data> test, final InputInfo ii)
+  public boolean materialized(final Predicate<Data> test, final boolean funcs, final InputInfo ii)
       throws QueryException {
     return funcType().declType.type.instanceOf(BasicType.ANY_ATOMIC_TYPE) ||
-        test((key, value) -> value.materialized(test, ii));
+        test((key, value) -> value.materialized(test, funcs, ii));
   }
 
   @Override

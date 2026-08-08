@@ -66,8 +66,9 @@ public final class FPI extends FNode {
   }
 
   @Override
-  public FPI materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc) {
-    return materialized(test, ii) ? this : new FPI(name, value);
+  public FPI materialize(final Predicate<Data> test, final boolean funcs, final InputInfo ii,
+      final QueryContext qc) {
+    return materialized(test, funcs, ii) ? this : new FPI(name, value);
   }
 
   @Override

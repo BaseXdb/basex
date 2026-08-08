@@ -98,13 +98,13 @@ public final class FDoc extends FNode {
   }
 
   @Override
-  public FNode materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
-      throws QueryException {
+  public FNode materialize(final Predicate<Data> test, final boolean funcs, final InputInfo ii,
+      final QueryContext qc) throws QueryException {
 
-    if(materialized(test, ii)) return this;
+    if(materialized(test, funcs, ii)) return this;
 
     final FBuilder doc = build(uri);
-    for(final GNode child : children) doc.node((GNode) child.materialize(test, ii, qc));
+    for(final GNode child : children) doc.node((GNode) child.materialize(test, funcs, ii, qc));
     return doc.finish();
   }
 

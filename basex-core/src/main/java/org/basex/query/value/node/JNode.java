@@ -324,15 +324,15 @@ public final class JNode extends GNode {
   }
 
   @Override
-  public boolean materialized(final Predicate<Data> test, final InputInfo ii)
+  public boolean materialized(final Predicate<Data> test, final boolean funcs, final InputInfo ii)
       throws QueryException {
     return false;
   }
 
   @Override
-  public Value materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
-      throws QueryException {
-    return value.materialize(test, ii, qc);
+  public Value materialize(final Predicate<Data> test, final boolean funcs, final InputInfo ii,
+      final QueryContext qc) throws QueryException {
+    return value.materialize(test, funcs, ii, qc);
   }
 
   @Override

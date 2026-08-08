@@ -256,25 +256,53 @@ public abstract class Value extends Expr implements Iterable<Item> {
 
   /**
    * Returns a materialized version of this value without dependencies to persistent data.
-   * Raises an error if the value contains function items.
+   * Raises an error if the value contains function items that cannot be passed on.
+   * @param test test to check if a node can be adopted unchanged
+   * @param funcs accept function items without dependencies on the current query
+   * @param ii input info (can be {@code null})
+   * @param qc query context
+   * @return materialized value
+   * @throws QueryException query exception
+   */
+  public abstract Value materialize(Predicate<Data> test, boolean funcs, InputInfo ii,
+      QueryContext qc) throws QueryException;
+
+  /**
+   * Checks if this value is materialized, i.e., contains no persistent database nodes or
+   * function items that cannot be passed on.
+   * @param test test to check if a node can be adopted unchanged
+   * @param funcs accept function items without dependencies on the current query
+   * @param ii input info (can be {@code null})
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  public abstract boolean materialized(Predicate<Data> test, boolean funcs, InputInfo ii)
+      throws QueryException;
+
+  /**
+   * Returns a materialized version of this value, rejecting all function items.
    * @param test test to check if a node can be adopted unchanged
    * @param ii input info (can be {@code null})
    * @param qc query context
    * @return materialized value
    * @throws QueryException query exception
    */
-  public abstract Value materialize(Predicate<Data> test, InputInfo ii, QueryContext qc)
-      throws QueryException;
+  public Value materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
+      throws QueryException {
+    return materialize(test, false, ii, qc);
+  }
 
   /**
-   * Checks if this value is materialized, i.e., contains no persistent database nodes or
-   * function items.
+   * Checks if this value is materialized and contains no function items.
    * @param test test to check if a node can be adopted unchanged
    * @param ii input info (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
    */
-  public abstract boolean materialized(Predicate<Data> test, InputInfo ii) throws QueryException;
+  public final boolean materialized(final Predicate<Data> test, final InputInfo ii)
+      throws QueryException {
+    return materialized(test, false, ii);
+  }
 
   /**
    * Serializes the value, using the standard XML serializer,
@@ -354,7 +382,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
   @Override
   public boolean accept(final ASTVisitor visitor) {
     final Data data = data();
-    return data == null || visitor.lock(data.meta.name, false);
+    return (data == null || visitor.lock(data.meta.name, false)) && visitor.value(this);
   }
 
   @Override

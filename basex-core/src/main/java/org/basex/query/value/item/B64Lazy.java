@@ -74,15 +74,15 @@ public abstract class B64Lazy extends B64 implements Lazy {
   }
 
   @Override
-  public final Item materialize(final Predicate<Data> test, final InputInfo ii,
+  public final Item materialize(final Predicate<Data> test, final boolean funcs, final InputInfo ii,
       final QueryContext qc) throws QueryException {
     cache(ii);
     return this;
   }
 
   @Override
-  public final boolean materialized(final Predicate<Data> test, final InputInfo ii)
-      throws QueryException {
+  public final boolean materialized(final Predicate<Data> test, final boolean funcs,
+      final InputInfo ii) throws QueryException {
     cache(ii);
     return true;
   }

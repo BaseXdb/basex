@@ -269,6 +269,12 @@ public abstract class StandardFunc extends Arr {
     return size() == 0 && !has(Flag.UPD);
   }
 
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    final Data data = data();
+    return (data == null || visitor.database(data)) && super.accept(visitor);
+  }
+
   /**
    * Returns a coerced version of a function item argument.
    * @param i index of argument

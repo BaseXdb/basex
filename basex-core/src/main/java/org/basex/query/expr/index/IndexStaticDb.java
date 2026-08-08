@@ -56,7 +56,7 @@ public final class IndexStaticDb extends IndexDb {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return true;
+    return visitor.database(data());
   }
 
   @Override

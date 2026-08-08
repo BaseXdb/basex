@@ -119,15 +119,15 @@ public final class SingletonSeq extends Seq {
   }
 
   @Override
-  public Value materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
-      throws QueryException {
-    return materialized(test, ii) ? this : get(value.materialize(test, ii, qc), size);
+  public Value materialize(final Predicate<Data> test, final boolean funcs, final InputInfo ii,
+      final QueryContext qc) throws QueryException {
+    return materialized(test, funcs, ii) ? this : get(value.materialize(test, funcs, ii, qc), size);
   }
 
   @Override
-  public boolean materialized(final Predicate<Data> test, final InputInfo ii)
+  public boolean materialized(final Predicate<Data> test, final boolean funcs, final InputInfo ii)
       throws QueryException {
-    return value.materialized(test, ii);
+    return value.materialized(test, funcs, ii);
   }
 
   @Override

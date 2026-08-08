@@ -175,22 +175,22 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public Value materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
-      throws QueryException {
+  public Value materialize(final Predicate<Data> test, final boolean funcs, final InputInfo ii,
+      final QueryContext qc) throws QueryException {
 
-    if(materialized(test, ii)) return this;
+    if(materialized(test, funcs, ii)) return this;
 
     final ValueBuilder vb = new ValueBuilder(qc, size);
-    for(final Item item : this) vb.add(item.materialize(test, ii, qc));
+    for(final Item item : this) vb.add(item.materialize(test, funcs, ii, qc));
     return vb.value(type);
   }
 
   @Override
-  public boolean materialized(final Predicate<Data> test, final InputInfo ii)
+  public boolean materialized(final Predicate<Data> test, final boolean funcs, final InputInfo ii)
       throws QueryException {
     if(!type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) {
       for(final Item item : this) {
-        if(!item.materialized(test, ii)) return false;
+        if(!item.materialized(test, funcs, ii)) return false;
       }
     }
     return true;

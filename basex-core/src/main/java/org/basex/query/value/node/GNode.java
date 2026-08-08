@@ -375,8 +375,8 @@ public abstract class GNode extends Item {
   public abstract QNm qname();
 
   @Override
-  public abstract Value materialize(Predicate<Data> test, InputInfo ii, QueryContext qc)
-      throws QueryException;
+  public abstract Value materialize(Predicate<Data> test, boolean funcs, InputInfo ii,
+      QueryContext qc) throws QueryException;
 
   /**
    * Adds nodes of a child iterator and its descendants.

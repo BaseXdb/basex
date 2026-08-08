@@ -309,22 +309,22 @@ public abstract class XQArray extends XQStruct {
   }
 
   @Override
-  public final Item materialize(final Predicate<Data> test, final InputInfo ii,
+  public final Item materialize(final Predicate<Data> test, final boolean funcs, final InputInfo ii,
       final QueryContext qc) throws QueryException {
 
-    if(materialized(test, ii)) return this;
+    if(materialized(test, funcs, ii)) return this;
 
     final ArrayBuilder ab = new ArrayBuilder(qc, structSize());
-    for(final Value value : members()) ab.add(value.materialize(test, ii, qc));
+    for(final Value value : members()) ab.add(value.materialize(test, funcs, ii, qc));
     return ab.array(this);
   }
 
   @Override
-  public final boolean materialized(final Predicate<Data> test, final InputInfo ii)
-      throws QueryException {
+  public final boolean materialized(final Predicate<Data> test, final boolean funcs,
+      final InputInfo ii) throws QueryException {
     if(!funcType().declType.type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) {
       for(final Value value : members()) {
-        if(!value.materialized(test, ii)) return false;
+        if(!value.materialized(test, funcs, ii)) return false;
       }
     }
     return true;

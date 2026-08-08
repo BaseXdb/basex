@@ -80,6 +80,11 @@ public abstract class JavaCall extends Arr {
     return Empty.VALUE;
   }
 
+  @Override
+  public final boolean accept(final ASTVisitor visitor) {
+    return visitor.javaCall(this) && super.accept(visitor);
+  }
+
   /**
    * Returns the result of the evaluated Java function.
    * @param qc query context

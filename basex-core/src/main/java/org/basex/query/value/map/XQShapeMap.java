@@ -134,24 +134,24 @@ public final class XQShapeMap extends XQHashMap {
   }
 
   @Override
-  public XQMap materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
-      throws QueryException {
+  public XQMap materialize(final Predicate<Data> test, final boolean funcs, final InputInfo ii,
+      final QueryContext qc) throws QueryException {
 
-    if(materialized(test, ii)) return this;
+    if(materialized(test, funcs, ii)) return this;
 
     final int vl = values.length;
     final Value[] vals = new Value[vl];
     for(int v = 0; v < vl; v++) {
       qc.checkStop();
-      vals[v] = values[v].materialize(test, ii, qc);
+      vals[v] = values[v].materialize(test, funcs, ii, qc);
     }
     return new XQShapeMap(shape().detach(), vals);
   }
 
   @Override
-  public boolean materialized(final Predicate<Data> test, final InputInfo ii)
+  public boolean materialized(final Predicate<Data> test, final boolean funcs, final InputInfo ii)
       throws QueryException {
-    return shape().detached() && super.materialized(test, ii);
+    return shape().detached() && super.materialized(test, funcs, ii);
   }
 
   @Override

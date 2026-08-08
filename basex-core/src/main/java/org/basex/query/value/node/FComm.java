@@ -48,9 +48,9 @@ public final class FComm extends FNode {
   }
 
   @Override
-  public FComm materialize(final Predicate<Data> test, final InputInfo ii,
+  public FComm materialize(final Predicate<Data> test, final boolean funcs, final InputInfo ii,
       final QueryContext qc) {
-    return materialized(test, ii) ? this : new FComm(value);
+    return materialized(test, funcs, ii) ? this : new FComm(value);
   }
 
   @Override

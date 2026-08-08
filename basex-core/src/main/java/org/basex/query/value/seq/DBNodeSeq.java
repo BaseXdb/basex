@@ -124,7 +124,8 @@ public class DBNodeSeq extends NativeSeq {
   }
 
   @Override
-  public final boolean materialized(final Predicate<Data> test, final InputInfo ii) {
+  public final boolean materialized(final Predicate<Data> test, final boolean funcs,
+      final InputInfo ii) {
     return test.test(data);
   }
 

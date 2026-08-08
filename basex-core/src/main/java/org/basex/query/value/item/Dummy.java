@@ -71,12 +71,13 @@ public final class Dummy extends Value {
   }
 
   @Override
-  public Value materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc) {
+  public Value materialize(final Predicate<Data> test, final boolean funcs, final InputInfo ii,
+      final QueryContext qc) {
     throw Util.notExpected();
   }
 
   @Override
-  public boolean materialized(final Predicate<Data> test, final InputInfo ii) {
+  public boolean materialized(final Predicate<Data> test, final boolean funcs, final InputInfo ii) {
     throw Util.notExpected();
   }
 

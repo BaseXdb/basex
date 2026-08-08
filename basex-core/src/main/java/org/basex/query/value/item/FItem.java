@@ -8,6 +8,7 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
@@ -53,15 +54,17 @@ public abstract class FItem extends Item implements XQFunction {
   public abstract String funcIdentity();
 
   @Override
-  public Item materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
-      throws QueryException {
-    throw BASEX_FUNCTION_X.get(info(ii), this);
+  public Item materialize(final Predicate<Data> test, final boolean funcs, final InputInfo ii,
+      final QueryContext qc) throws QueryException {
+    if(!funcs) throw BASEX_FUNCTION_X.get(info(ii), this);
+    TransferVisitor.check(this, info(ii));
+    return this;
   }
 
   @Override
-  public boolean materialized(final Predicate<Data> test, final InputInfo ii)
+  public boolean materialized(final Predicate<Data> test, final boolean funcs, final InputInfo ii)
       throws QueryException {
-    throw BASEX_FUNCTION_X.get(info(ii), this);
+    return funcs && TransferVisitor.dependency(this) == null;
   }
 
   /**

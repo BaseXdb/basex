@@ -163,7 +163,7 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public boolean materialized(final Predicate<Data> test, final InputInfo ii) {
+  public boolean materialized(final Predicate<Data> test, final boolean funcs, final InputInfo ii) {
     return true;
   }
 

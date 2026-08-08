@@ -157,6 +157,14 @@ public final class FuncItem extends FItem implements Scope {
     return expr.has(Flag.NDT);
   }
 
+  /**
+   * Indicates if the query focus is left untouched by the function body.
+   * @return result of check
+   */
+  public boolean simple() {
+    return simple;
+  }
+
   @Override
   public boolean accept(final ASTVisitor visitor) {
     return visitor.funcItem(this);

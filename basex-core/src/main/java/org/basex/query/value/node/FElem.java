@@ -253,16 +253,18 @@ public final class FElem extends FNode {
   }
 
   @Override
-  public FNode materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
-      throws QueryException {
+  public FNode materialize(final Predicate<Data> test, final boolean funcs, final InputInfo ii,
+      final QueryContext qc) throws QueryException {
 
-    if(materialized(test, ii)) return this;
+    if(materialized(test, funcs, ii)) return this;
 
     final FBuilder elem = build(name);
     final int ns = namespaces.size();
     for(int n = 0; n < ns; n++) elem.ns(namespaces.name(n), namespaces.value(n));
-    for(final GNode attribute : attributes) elem.node((GNode) attribute.materialize(test, ii, qc));
-    for(final GNode child : children) elem.node((GNode) child.materialize(test, ii, qc));
+    for(final GNode attribute : attributes) {
+      elem.node((GNode) attribute.materialize(test, funcs, ii, qc));
+    }
+    for(final GNode child : children) elem.node((GNode) child.materialize(test, funcs, ii, qc));
     return elem.finish();
   }
 

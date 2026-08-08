@@ -49,9 +49,9 @@ public final class FNSpace extends FNode {
   }
 
   @Override
-  public FNSpace materialize(final Predicate<Data> test, final InputInfo ii,
+  public FNSpace materialize(final Predicate<Data> test, final boolean funcs, final InputInfo ii,
       final QueryContext qc) {
-    return materialized(test, ii) ? this : new FNSpace(name, value);
+    return materialized(test, funcs, ii) ? this : new FNSpace(name, value);
   }
 
   @Override
