@@ -41,8 +41,6 @@ public class JobOptions extends Options {
   public static final StringOption CRON = new StringOption("cron");
   /** Custom ID string. */
   public static final StringOption ID = new StringOption("id");
-  /** Register as service. */
-  public static final BooleanOption SERVICE = new BooleanOption("service");
   /** Log entry. */
   public static final StringOption LOG = new StringOption("log");
 }

@@ -18,7 +18,7 @@ public final class JobExecute extends JobEval {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final IOContent input = toContent(arg(0), qc);
-    final JobOptions options = new JobOptions();
+    final EvalOptions options = new EvalOptions();
     options.set(JobOptions.CACHE, true);
 
     final String id = eval(input, options, qc).toJava();

@@ -13,6 +13,7 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.util.options.*;
 
 /**
  * Function implementation.
@@ -21,9 +22,15 @@ import org.basex.query.value.item.*;
  * @author Christian Gruen
  */
 public class JobEval extends StandardFunc {
+  /** Eval options. */
+  public static final class EvalOptions extends JobOptions {
+    /** Register as service. */
+    public static final BooleanOption SERVICE = new BooleanOption("service");
+  }
+
   @Override
   protected Str item(final QueryContext qc) throws QueryException {
-    return eval(toContent(arg(0), qc), toOptions(arg(2), new JobOptions(), qc), qc);
+    return eval(toContent(arg(0), qc), toOptions(arg(2), new EvalOptions(), qc), qc);
   }
 
   /**
@@ -34,17 +41,17 @@ public class JobEval extends StandardFunc {
    * @return resulting value
    * @throws QueryException query exception
    */
-  final Str eval(final IOContent query, final JobOptions options, final QueryContext qc)
+  final Str eval(final IOContent query, final EvalOptions options, final QueryContext qc)
       throws QueryException {
 
     final HashMap<String, Value> bindings = toBindings(arg(1), qc);
     options.set(JobOptions.BASE_URI, toBaseUri(query.url(), options, JobOptions.BASE_URI));
 
-    final boolean service = options.get(JobOptions.SERVICE) == Boolean.TRUE;
+    final boolean service = options.get(EvalOptions.SERVICE) == Boolean.TRUE;
     if(service) {
       if(!bindings.isEmpty()) throw JOBS_SERVICE.get(info);
       // invalidate option (not relevant for next steps, i.e., if services are written to disk)
-      options.put(JobOptions.SERVICE, null);
+      options.put(EvalOptions.SERVICE, null);
     }
 
     // copy variable values
@@ -62,7 +69,6 @@ public class JobEval extends StandardFunc {
 
     // add service
     if(service) {
-      if(!bindings.isEmpty()) throw JOBS_SERVICE.get(info);
       try {
         final Jobs jobs = new Jobs(qc.context);
         jobs.add(spec);
