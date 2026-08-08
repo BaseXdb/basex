@@ -149,6 +149,14 @@ public final class StaticContext {
   }
 
   /**
+   * Returns the custom URI resolver.
+   * @return URI resolver (can be {@code null})
+   */
+  public UriResolver resolver() {
+    return resolver;
+  }
+
+  /**
    * Resolves the specified path against the base URI.
    * @param path to be resolved
    * @return resulting path

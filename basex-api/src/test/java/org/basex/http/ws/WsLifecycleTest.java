@@ -194,6 +194,31 @@ public final class WsLifecycleTest extends WsTest {
   }
 
   /**
+   * A job that is started with {@code ws:eval} and stopped sends no message to the client.
+   * @throws Exception exception
+   */
+  @Test public void evalStopped() throws Exception {
+    putCache("ws-eval-error", "");
+    register(
+        "declare %ws:message('/e', '{$m}') function m:msg($m) {" +
+        "  if($m = 'start') then cache:put('ws-eval-id', ws:eval('prof:sleep(5000)'))" +
+        "  else void(job:remove(cache:get('ws-eval-id')))" +
+        "};" +
+        "declare %ws:error('/e', '{$m}') function m:err($m) {" +
+        "  cache:put('ws-eval-error', $m)" +
+        "};");
+
+    final Listener l = new Listener();
+    final java.net.http.WebSocket ws = connect("/e", l);
+    // messages of a connection are processed in order: the job is registered before it is stopped
+    ws.sendText("start", true).get(5, TimeUnit.SECONDS);
+    ws.sendText("stop", true).get(5, TimeUnit.SECONDS);
+    assertNull(l.texts.poll(2, TimeUnit.SECONDS), "Message was sent for a stopped job.");
+    assertEquals("", cacheGet("ws-eval-error"));
+    close(ws);
+  }
+
+  /**
    * A transport error is dispatched to {@code %ws:error}. A message beyond the size limit is
    * the one such failure a test can provoke; the connection is closed, so the side effect is
    * observed via the cache.

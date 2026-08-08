@@ -59,11 +59,10 @@ public class JobEval extends StandardFunc {
       bindings.put(it.getKey(), it.getValue().materialize(n -> false, info, qc));
     }
 
-    // synchronous jobs share the caller's context (the request stays live); asynchronous jobs
-    // receive a detached copy with captured request values, as the request may be recycled
+    // synchronous jobs share the caller's context
     final boolean sync = synchronous();
     final Locks held = sync ? qc.context.locking.held() : null;
-    final QueryJobSpec spec = new QueryJobSpec(options, bindings, query);
+    final QueryJobSpec spec = new QueryJobSpec(options, bindings, query, sc().resolver());
     final QueryJob job = new QueryJob(spec, sync ? qc.context : qc.context.detach(), info, null,
         held);
 

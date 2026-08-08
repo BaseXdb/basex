@@ -6,6 +6,7 @@ import java.io.*;
 import java.net.*;
 import java.net.http.*;
 import java.util.Base64;
+import java.util.Map;
 import java.util.zip.*;
 
 import org.basex.core.*;
@@ -42,6 +43,43 @@ public final class WebappArchiveTest extends HTTPTest {
    */
   @AfterAll public static void undeploy() {
     for(final String app : APPS) archive(app).delete();
+    archive("probe").delete();
+  }
+
+  /**
+   * Resolves a module import inside a job of an archived application.
+   * @throws Exception exception
+   */
+  @Test public void jobModuleImport() throws Exception {
+    archive("probe").write(zip(Map.of(
+      "basex-web.xml", "<webapp name='probe' version='13.0'/>",
+      "lib.xqm", "module namespace lib = 'probe/lib';" +
+        "declare function lib:hello() { 'hello' };",
+      "job.xq", "import module namespace lib = 'probe/lib' at 'lib.xqm'; lib:hello()",
+      "probe.xqm", "module namespace probe = 'probe';" +
+        "declare %rest:path('/probe') %rest:GET %output:method('text')" +
+        "function probe:go() { job:execute(xs:anyURI('job.xq')) };")));
+    WebModules.get(HTTPContext.get().context()).init(false);
+
+    assertEquals("hello", get(200, "probe"));
+  }
+
+  /**
+   * Returns a ZIP archive with the specified entries.
+   * @param entries entry names and contents
+   * @return archive
+   * @throws IOException I/O exception
+   */
+  private static byte[] zip(final Map<String, String> entries) throws IOException {
+    final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    try(ZipOutputStream zos = new ZipOutputStream(bos)) {
+      for(final Map.Entry<String, String> entry : entries.entrySet()) {
+        zos.putNextEntry(new ZipEntry(entry.getKey()));
+        zos.write(Token.token(entry.getValue()));
+        zos.closeEntry();
+      }
+    }
+    return bos.toByteArray();
   }
 
   /**

@@ -249,6 +249,8 @@ public final class QueryJob extends Job implements Runnable {
 
       final Performance perf = new Performance();
       qp = new QueryProcessor(job.query, opts.get(JobOptions.BASE_URI), ctx, null);
+      // modules of the calling application are resolved as they were for the caller
+      if(job.resolver != null) qp.uriResolver(job.resolver);
       qp.qc.user = new User(ctx.user()).permission(perm);
       boolean registered = false;
       try {

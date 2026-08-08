@@ -27,10 +27,12 @@ public final class WsEval extends WsFn {
     final WsOptions options = toOptions(arg(2), new WsOptions(), qc);
     options.set(JobOptions.BASE_URI, toBaseUri(query.url(), options, JobOptions.BASE_URI));
 
-    final QueryJobSpec spec = new QueryJobSpec(options, bindings, query);
+    final QueryJobSpec spec = new QueryJobSpec(options, bindings, query, sc().resolver());
     final WebSocket ws = ws(qc);
     final SerializerOptions sopts = options.get(WsOptions.SERIALIZER);
     final Consumer<QueryJobResult> notify = result -> {
+      // a stopped job has neither a result nor an error: nothing is sent
+      if(result.value == null && result.exception == null) return;
       try {
         // the outcome of a query is one message; a failed query is reported as error
         final Value value = result.get();
