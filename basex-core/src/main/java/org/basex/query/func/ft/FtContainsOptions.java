@@ -18,4 +18,7 @@ public final class FtContainsOptions extends FtIndexOptions {
   public static final BooleanOption STEMMING = FtLexerOptions.STEMMING;
   /** Option: language. */
   public static final StringOption LANGUAGE = FtLexerOptions.LANGUAGE;
+  /** Option: occurrences. */
+  public static final OptionsOption<FTTimesOptions> OCCURS =
+      new OptionsOption<>("occurs", FTTimesOptions.class);
 }

@@ -3,6 +3,7 @@ package org.basex.query.func.ft;
 import static org.basex.util.ft.FTFlag.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -32,7 +33,11 @@ public final class FtContains extends FtAccessFn {
     final FTCase cs = options.get(FtContainsOptions.CASE);
     if(cs != null) opt.cs = cs;
 
-    final FTWords ftw = new FTWords(info, terms, mode, null).ftOpt(opt).optimize(qc);
+    final FTTimesOptions times = options.get(FtContainsOptions.OCCURS);
+    final Expr[] occ = times == null ? null : new Expr[] {
+      Itr.get(times.get(FTTimesOptions.MIN)), Itr.get(times.get(FTTimesOptions.MAX)) };
+
+    final FTWords ftw = new FTWords(info, terms, mode, occ).ftOpt(opt).optimize(qc);
     return new FTContains(input, ftExpr(ftw, options), info).item(qc);
   }
 }

@@ -8,6 +8,7 @@ import org.basex.query.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.util.*;
 import org.basex.util.ft.*;
 
 /**
@@ -34,6 +35,11 @@ abstract class FtAccessFn extends StandardFunc {
     final Boolean wildcards = opts.get(FtIndexOptions.WILDCARDS);
     if(wildcards != null) opt.set(WC, wildcards);
     if(opts.contains(FtFuzzyOptions.ERRORS)) opt.errors = opts.get(FtFuzzyOptions.ERRORS);
+    final String[] words = opts.get(FtIndexOptions.STOP_WORDS);
+    if(words != null) {
+      opt.sw = new StopWords();
+      for(final String word : words) opt.sw.add(Token.token(word));
+    }
 
     opt.assign(parent);
     if(opt.is(FZ) && opt.is(WC)) throw FT_OPTIONS.get(info, this);

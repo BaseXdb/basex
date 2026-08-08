@@ -83,6 +83,16 @@ public final class FtModuleTest extends SandboxTest {
     query(func.args(long1, long2, " { 'fuzzy': true(), 'errors': 2 }"), true);
     query(func.args(long1, long2, " { 'fuzzy': true(), 'errors': 0 }"), true);
 
+    // check occurrences
+    query(func.args("a b a", "a", " { 'occurs': { 'min': 2 } }"), true);
+    query(func.args("a b a", "a", " { 'occurs': { 'min': 3 } }"), false);
+    query(func.args("a b a", "a", " { 'occurs': { 'max': 1 } }"), false);
+    query(func.args("a b a", "a", " { 'occurs': { 'min': 1, 'max': 2 } }"), true);
+
+    // check stop words
+    query(func.args("cat", "the cat", " { 'mode': 'all words' }"), false);
+    query(func.args("cat", "the cat", " { 'mode': 'all words', 'stop-words': 'the' }"), true);
+
     // options of the query prolog are inherited
     query("declare ft-option using fuzzy; " + func.args("Assignments", "Azzignments"), true);
     query("declare ft-option using wildcards; " + func.args("Assignments", "Assign.*"), true);
@@ -276,6 +286,11 @@ public final class FtModuleTest extends SandboxTest {
     query(func.args(NAME, "databases xml",
         " { 'mode': 'all words', 'window': { 'size': 3 } }"),
         "Databases and XML");
+
+    // check stop words
+    query(func.args(NAME, "the assignments", " { 'mode': 'all words' }"), "");
+    query(func.args(NAME, "the assignments",
+        " { 'mode': 'all words', 'stop-words': 'the' }"), "Assignments");
 
     // options of the query prolog are inherited
     query("declare ft-option using fuzzy; " + func.args(NAME, "Azzignments"), "Assignments");

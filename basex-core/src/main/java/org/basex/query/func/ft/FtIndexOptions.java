@@ -14,6 +14,9 @@ public class FtIndexOptions extends FtFuzzyOptions {
   public static final EnumOption<FTMode> MODE = new EnumOption<>("mode", FTMode.ANY);
   /** Option: wildcards. */
   public static final BooleanOption WILDCARDS = new BooleanOption("wildcards");
+  /** Option: stop words. */
+  public static final StringsOption STOP_WORDS =
+      new StringsOption("stop-words", (String[]) null);
   /** Option: ordered. */
   public static final BooleanOption ORDERED = new BooleanOption("ordered", false);
   /** Option: distance. */
