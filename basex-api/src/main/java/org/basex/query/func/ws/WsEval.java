@@ -2,6 +2,7 @@ package org.basex.query.func.ws;
 
 import java.nio.*;
 import java.util.*;
+import java.util.Map.*;
 import java.util.function.*;
 
 import org.basex.core.jobs.*;
@@ -26,6 +27,11 @@ public final class WsEval extends WsFn {
     final HashMap<String, Value> bindings = toBindings(arg(1), qc);
     final WsOptions options = toOptions(arg(2), new WsOptions(), qc);
     options.set(JobOptions.BASE_URI, toBaseUri(query.url(), options, JobOptions.BASE_URI));
+
+    // copy variable values
+    for(final Entry<String, Value> it : bindings.entrySet()) {
+      bindings.put(it.getKey(), it.getValue().materialize(n -> false, info, qc));
+    }
 
     final QueryJobSpec spec = new QueryJobSpec(options, bindings, query, sc().resolver());
     final WebSocket ws = ws(qc);
