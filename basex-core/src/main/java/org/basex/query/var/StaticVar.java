@@ -23,6 +23,9 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public final class StaticVar extends StaticDecl {
+  /** Query contexts waiting for static variables, and monitor for the evaluation state. */
+  private static final IdentityHashMap<QueryContext, StaticVar> WAITING = new IdentityHashMap<>();
+
   /** Indicates if this variable can be bound from outside the query. */
   public final boolean external;
   /** Flag for lazy evaluation. */
@@ -55,7 +58,8 @@ public final class StaticVar extends StaticDecl {
     if(!compiled) {
       compiled = dontEnter = true;
 
-      final QueryFocus focus = pushFocus(cc.qc);
+      final QueryFocus focus = cc.qc.focus;
+      pushFocus(cc.qc);
       cc.pushScope(vs);
       try {
         expr = expr.compile(cc);
@@ -86,9 +90,10 @@ public final class StaticVar extends StaticDecl {
     final Value acquired = acquire(qc);
     if(acquired != null) return acquired;
 
-    final QueryFocus focus = pushFocus(qc);
+    final QueryFocus focus = qc.focus;
     Throwable error = null;
     try {
+      pushFocus(qc);
       return super.value(qc);
     } catch(final QueryException ex) {
       // errors of lazy variables can surface anywhere: make them non-catchable
@@ -102,7 +107,7 @@ public final class StaticVar extends StaticDecl {
       throw ex;
     } finally {
       qc.focus = focus;
-      release(qc, error);
+      release(error);
     }
   }
 
@@ -113,8 +118,7 @@ public final class StaticVar extends StaticDecl {
    * @throws QueryException query exception
    */
   private Value acquire(final QueryContext qc) throws QueryException {
-    final IdentityHashMap<QueryContext, StaticVar> waiting = qc.staticVarWaiting;
-    synchronized(waiting) {
+    synchronized(WAITING) {
       while(true) {
         if(value != null) return value;
         if(evalError != null) rethrow();
@@ -124,30 +128,30 @@ public final class StaticVar extends StaticDecl {
         }
         // someone else is evaluating this variable: check for circular dependencies, wait
         if(circular(qc)) throw CIRCVAR_X.get(info, name());
-        waiting.put(qc, this);
+        WAITING.put(qc, this);
         try {
-          waiting.wait();
+          // bounded wait: a stopped job must not wait for a variable that is never released
+          WAITING.wait(1000);
         } catch(final InterruptedException ex) {
           Thread.currentThread().interrupt();
           throw new JobException(Text.INTERRUPTED, ex);
         } finally {
-          waiting.remove(qc);
+          WAITING.remove(qc);
         }
+        qc.checkStop();
       }
     }
   }
 
   /**
    * Releases evaluation ownership and wakes waiting threads.
-   * @param qc query context
    * @param error error raised while evaluating this variable
    */
-  private void release(final QueryContext qc, final Throwable error) {
-    final IdentityHashMap<QueryContext, StaticVar> waiting = qc.staticVarWaiting;
-    synchronized(waiting) {
+  private void release(final Throwable error) {
+    synchronized(WAITING) {
       evalError = error;
       evalContext = null;
-      waiting.notifyAll();
+      WAITING.notifyAll();
     }
   }
 
@@ -167,7 +171,7 @@ public final class StaticVar extends StaticDecl {
       final QueryContext q = sv.evalContext;
       if(q == qc) return true;
       if(q == null) return false;
-      sv = qc.staticVarWaiting.get(q);
+      sv = WAITING.get(q);
     }
     return false;
   }
@@ -242,13 +246,11 @@ public final class StaticVar extends StaticDecl {
   /**
    * Assigns a new query focus with the global context value.
    * @param qc query context
-   * @return old focus
    */
-  private static QueryFocus pushFocus(final QueryContext qc) {
-    final QueryFocus focus = qc.focus, qf = new QueryFocus();
+  private static void pushFocus(final QueryContext qc) {
+    final QueryFocus qf = new QueryFocus();
     qf.value = qc.finalContext ? qc.contextValue.value : null;
     qc.focus = qf;
-    return focus;
   }
 
   @Override

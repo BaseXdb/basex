@@ -215,7 +215,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
 
       @Override
       public StaticVar next() {
-        if(!vars.hasNext()) throw new NoSuchElementException();
+        if(!hasNext()) throw new NoSuchElementException();
         return vars.next();
       }
     };
