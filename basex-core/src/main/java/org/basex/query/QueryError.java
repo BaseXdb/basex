@@ -347,6 +347,8 @@ public enum QueryError {
   /** Error code. */
   JOBS_SERVICE(JOB, "service", "No variables allowed."),
   /** Error code. */
+  JOBS_FUNCTION(JOB, "function", "Function items cannot be registered or scheduled."),
+  /** Error code. */
   JOBS_SERVICE_X_X(JOB, "service", "Cannot write service: %."),
 
   // JSON Module

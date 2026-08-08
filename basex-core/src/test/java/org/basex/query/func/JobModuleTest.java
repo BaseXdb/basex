@@ -353,6 +353,115 @@ public final class JobModuleTest extends SandboxTest {
     error(func.args("1 + ''"), CALCTYPE_X_X_X_X_X);
   }
 
+  /** Invokes function items instead of query strings. */
+  @Test public void executeFunction() {
+    final Function func = _JOB_EXECUTE;
+
+    query(func.args(" fn() { 1 + 1 }"), 2);
+    query(func.args(" fn() { () }"), "");
+    query(func.args(" fn($a) { $a * 2 }", " [ 21 ]"), 42);
+    query(func.args(" fn($a, $b) { $a || $b }", " [ 'x', 'y' ]"), "xy");
+    query(func.args(" fn($a) { $a }", " [ (1, 2, 3) ]"), "1\n2\n3");
+
+    // partial application and function literals
+    query(func.args(" concat('a', ?)", " [ 'b' ]"), "ab");
+    query(func.args(" count#1", " [ (1, 2) ]"), 2);
+
+    // closures over materialized values
+    query("let $a := 40 return " + func.args(" fn() { $a + 2 }"), 42);
+    query("let $n := <a>1</a> return " + func.args(" fn() { $n/text() }"), 1);
+
+    // function items as arguments
+    query(func.args(" fn($f) { $f() }", " [ fn() { 7 } ]"), 7);
+    query(func.args(" fn($f) { $f(3) }", " [ fn($n) { $n * 3 } ]"), 9);
+
+    // in-memory nodes are shared, so closure and argument stay the same node
+    query("let $n := <a/> return " + func.args(" fn($x) { $x is $n }", " [ $n ]"), true);
+
+    // calls of user-defined functions
+    query("declare function local:f() { 5 }; " + func.args(" fn() { local:f() }"), 5);
+    query("declare function local:g($n) { if($n) then local:g($n - 1) else 'done' }; " +
+        func.args(" fn() { local:g(3) }"), "done");
+
+    // the function keeps the static context of the query that created it
+    query("declare default element namespace 'x'; " +
+        func.args(" fn() { namespace-uri(<a/>) }"), "x");
+  }
+
+  /** Rejects function items that depend on the calling query. */
+  @Test public void executeFunctionErrors() {
+    final Function func = _JOB_EXECUTE;
+
+    // arity mismatches
+    error(func.args(" fn($a) { $a }"), APPLY_X_X);
+    error(func.args(" fn($a) { $a }", " [ 1, 2 ]"), APPLY_X_X);
+    error(func.args(" fn() { 1 }", " [ 1 ]"), APPLY_X_X);
+
+    // arguments must be supplied as array
+    error(func.args(" fn($a) { $a }", " { 'a': 1 }"), INVTYPE_X);
+    // maps and arrays are neither queries nor invocable functions
+    error(func.args(" { 'a': 1 }"), INVTYPE_X);
+    error(func.args(" [ 1 ]"), INVTYPE_X);
+
+    // dependencies on the calling query
+    error(func.args(" fn() { . }"), BASEX_TRANSFER_X_X);
+    error(func.args(" fn() { position() }"), BASEX_TRANSFER_X_X);
+    error("declare variable $v := random:integer(); " + func.args(" fn() { $v }"),
+        BASEX_TRANSFER_X_X);
+    error(func.args(" fn() { Q{java:java.lang.Math}abs(-1) }"), BASEX_TRANSFER_X_X);
+    // dependency in a function supplied as argument
+    error(func.args(" fn($f) { $f() }", " [ fn() { . } ]"), BASEX_TRANSFER_X_X);
+
+    // errors of the invoked function are passed on
+    error(func.args(" fn() { 1 + '' }"), CALCTYPE_X_X_X_X_X);
+  }
+
+  /** Runs function items as asynchronous jobs. */
+  @Test public void evalFunction() {
+    final Function func = _JOB_EVAL;
+
+    final String id1 = query(func.args(" fn() { 1 + 1 }", " ()", " { 'cache': true() }"));
+    query(_JOB_WAIT.args(id1));
+    query(_JOB_RESULT.args(id1), 2);
+
+    final String id2 = query(func.args(" fn($a) { $a }", " [ 'x' ]", " { 'cache': true() }"));
+    query(_JOB_WAIT.args(id2));
+    query(_JOB_RESULT.args(id2), "x");
+  }
+
+  /** Rejects function items for services and scheduled jobs. */
+  @Test public void evalFunctionScheduled() {
+    final Function func = _JOB_EVAL;
+
+    error(func.args(" fn() { 1 }", " ()", " { 'service': true() }"), JOBS_FUNCTION);
+    error(func.args(" fn() { 1 }", " ()", " { 'start': 'PT1S' }"), JOBS_FUNCTION);
+    error(func.args(" fn() { 1 }", " ()", " { 'interval': 'PT1S' }"), JOBS_FUNCTION);
+    error(func.args(" fn() { 1 }", " ()", " { 'cron': '* * * * *' }"), JOBS_FUNCTION);
+  }
+
+  /** Computes database locks for jobs that invoke a function item. */
+  @Test public void evalFunctionLocks() {
+    final Function func = _JOB_EVAL;
+    query(_DB_CREATE.args("db"));
+    try {
+      // a function job locks the same databases as the equivalent query
+      final String body = "db:get('db'), prof:sleep(500)";
+      final String fn = query(func.args(" fn() { " + body + " }", " ()",
+          " { 'cache': true() }"));
+      final String str = query(func.args(body, " ()", " { 'cache': true() }"));
+      Performance.sleep(200);
+      query(_JOB_LIST_DETAILS.args(fn) + "/@reads/string()", "db");
+      query(_JOB_LIST_DETAILS.args(str) + "/@reads/string()", "db");
+      query(_JOB_WAIT.args(fn));
+      query(_JOB_WAIT.args(str));
+
+      // the database is opened in the job's own context
+      query(_JOB_EXECUTE.args(" fn() { count(db:get('db')) }"), 0);
+    } finally {
+      query(_DB_DROP.args("db"));
+    }
+  }
+
   /** Rejects jobs whose execution would deadlock the calling query. */
   @Test public void deadlock() {
     final Function func = _JOB_EXECUTE;

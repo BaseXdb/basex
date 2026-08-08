@@ -5,6 +5,7 @@ import java.util.*;
 import org.basex.io.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
 
@@ -25,9 +26,13 @@ public final class QueryJobSpec {
   final boolean simple;
   /** URI resolver of the calling module (can be {@code null}). */
   final UriResolver resolver;
+  /** Function to be invoked instead of the query; discarded after the job was started. */
+  FItem function;
+  /** Arguments of the invoked function; discarded after the job was started. */
+  Value[] args;
 
   /**
-   * Constructor.
+   * Constructor for a query.
    * @param options job options
    * @param bindings variable bindings
    * @param content query content
@@ -41,6 +46,24 @@ public final class QueryJobSpec {
     this.resolver = scheduled(options) ? null : resolver;
     query = content.toString();
     simple = content.url().isEmpty();
+    function = null;
+    args = null;
+  }
+
+  /**
+   * Constructor for a function to be invoked.
+   * @param options job options
+   * @param function function item
+   * @param args function arguments
+   */
+  public QueryJobSpec(final JobOptions options, final FItem function, final Value[] args) {
+    this.options = options;
+    this.function = function;
+    this.args = args;
+    bindings = new HashMap<>();
+    resolver = null;
+    query = function.funcIdentity();
+    simple = true;
   }
 
   /**
@@ -48,7 +71,7 @@ public final class QueryJobSpec {
    * @param options job options
    * @return result of check
    */
-  private static boolean scheduled(final JobOptions options) {
+  public static boolean scheduled(final JobOptions options) {
     for(final StringOption option :
         new StringOption[] { JobOptions.START, JobOptions.INTERVAL, JobOptions.CRON }) {
       final String value = options.get(option);
@@ -59,6 +82,7 @@ public final class QueryJobSpec {
 
   @Override
   public boolean equals(final Object obj) {
+    // only services are compared, and they never invoke a function
     return this == obj || obj instanceof final QueryJobSpec spec && query.equals(spec.query) &&
         bindings.equals(spec.bindings) && options.toString().equals(spec.options.toString());
   }

@@ -14,6 +14,7 @@ import org.basex.core.*;
 import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -255,13 +256,20 @@ public final class QueryJob extends Job implements Runnable {
       boolean registered = false;
       try {
         // parse, push and register query. order is important!
-        for(final Entry<String, Value> binding : job.bindings.entrySet()) {
-          final String key = binding.getKey();
-          final Value value = binding.getValue();
-          if(key.isEmpty()) qp.context(value);
-          else qp.variable(key, value);
+        if(job.function != null) {
+          qp.assign(job.function, job.args);
+          // a function job is not repeated: release the compiled body and its arguments
+          job.function = null;
+          job.args = null;
+        } else {
+          for(final Entry<String, Value> binding : job.bindings.entrySet()) {
+            final String key = binding.getKey();
+            final Value value = binding.getValue();
+            if(key.isEmpty()) qp.context(value);
+            else qp.variable(key, value);
+          }
+          qp.parse();
         }
-        qp.parse();
         updating = qp.updating;
         qp.compile();
         result.time = perf.nanoRuntime();
@@ -289,7 +297,7 @@ public final class QueryJob extends Job implements Runnable {
         if(remove) ctx.jobs.tasks.remove(id);
 
         // retrieve result; copy persistent database nodes
-        result.value = qp.value().materialize(d -> d == null || d.inMemory(), null, qp.qc);
+        result.value = qp.value().materialize(TransferVisitor.SHAREABLE, null, qp.qc);
       } catch(final JobException ex) {
         // query was interrupted: report exceeded limits, discard result of a stopped query
         Util.debug(ex);

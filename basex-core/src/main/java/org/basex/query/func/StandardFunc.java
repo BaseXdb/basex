@@ -9,8 +9,10 @@ import java.net.*;
 import java.nio.file.*;
 import java.time.*;
 import java.util.*;
+import java.util.Map.*;
 
 import org.basex.core.*;
+import org.basex.core.jobs.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.*;
@@ -24,6 +26,7 @@ import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
@@ -569,9 +572,94 @@ public abstract class StandardFunc extends Arr {
    */
   protected final IOContent toContent(final Expr expr, final QueryContext qc)
       throws QueryException {
-    final Item item = toAtomItem(expr, qc);
+    return toContent(toAtomItem(expr, qc), qc);
+  }
+
+  /**
+   * Returns an input resource.
+   * @param item item
+   * @param qc query context
+   * @return input resource
+   * @throws QueryException query exception
+   */
+  protected final IOContent toContent(final Item item, final QueryContext qc)
+      throws QueryException {
     return item instanceof Uri ? toContent(string(item.string(info)), qc) :
       new IOContent(toToken(item));
+  }
+
+  /**
+   * Creates a job specification for a query or a function to be invoked.
+   * @param options job options
+   * @param service register job as service
+   * @param qc query context
+   * @param query query or function to be invoked
+   * @param args variable bindings or function arguments
+   * @return job specification
+   * @throws QueryException query exception
+   */
+  protected final QueryJobSpec toJobSpec(final Expr query, final Expr args,
+      final JobOptions options, final boolean service, final QueryContext qc)
+      throws QueryException {
+
+    final Item item = query.item(qc, info);
+    final FuncItem function = toInvocable(item);
+    if(function != null) {
+      // a service is written to disk, and a scheduled job outlives the query that created it
+      if(service || QueryJobSpec.scheduled(options)) throw JOBS_FUNCTION.get(info);
+      // the invoked function must not depend on the query that created it
+      TransferVisitor.check(function, info);
+      return new QueryJobSpec(options, function, toArguments(args, function, qc));
+    }
+
+    final IOContent content = toContent(item, qc);
+    options.set(JobOptions.BASE_URI, toBaseUri(content.url(), options, JobOptions.BASE_URI));
+    final HashMap<String, Value> bindings = toBindings(args, qc);
+    if(service && !bindings.isEmpty()) throw JOBS_SERVICE.get(info);
+
+    // copy variable values
+    for(final Entry<String, Value> binding : bindings.entrySet()) {
+      bindings.put(binding.getKey(), binding.getValue().materialize(n -> false, true, info, qc));
+    }
+    return new QueryJobSpec(options, bindings, content, sc().resolver());
+  }
+
+  /**
+   * Evaluates an expression to a function that can be invoked instead of a query.
+   * @param item item
+   * @return function item, or {@code null} if the item is no function
+   * @throws QueryException query exception
+   */
+  protected final FuncItem toInvocable(final Item item) throws QueryException {
+    if(item instanceof final FuncItem function) return function;
+    // maps and arrays are function items, but they are no queries either
+    if(item instanceof FItem) throw typeError(item, Types.QUERY_SPEC_O, info);
+    return null;
+  }
+
+  /**
+   * Evaluates an expression to the arguments of a function to be invoked.
+   * @param expr expression
+   * @param function function item
+   * @param qc query context
+   * @return function arguments
+   * @throws QueryException query exception
+   */
+  protected final Value[] toArguments(final Expr expr, final FuncItem function,
+      final QueryContext qc) throws QueryException {
+
+    final Item item = expr.item(qc, info);
+    final XQArray array = item.isEmpty() ? XQArray.empty() : toArray(item);
+    final int as = (int) array.structSize();
+    if(as != function.arity()) throw APPLY_X_X.get(info, arguments(as), function, array);
+
+    // copy persistent database nodes, share everything else with the invoked function
+    final Value[] args = new Value[as];
+    int a = 0;
+    for(final Value member : array.members()) {
+      args[a++] = member.materialize(TransferVisitor.SHAREABLE, true, info, qc);
+    }
+    return args;
   }
 
   /**

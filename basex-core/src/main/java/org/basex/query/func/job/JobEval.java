@@ -3,15 +3,11 @@ package org.basex.query.func.job;
 import static org.basex.query.QueryError.*;
 
 import java.io.*;
-import java.util.*;
-import java.util.Map.*;
 
 import org.basex.core.jobs.*;
 import org.basex.core.locks.*;
-import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.options.*;
 
@@ -30,39 +26,25 @@ public class JobEval extends StandardFunc {
 
   @Override
   protected Str item(final QueryContext qc) throws QueryException {
-    return eval(toContent(arg(0), qc), toOptions(arg(2), new EvalOptions(), qc), qc);
+    return eval(toOptions(arg(2), new EvalOptions(), qc), qc);
   }
 
   /**
-   * Evaluates a query as job.
-   * @param query query
+   * Evaluates a query or function as job.
    * @param options job options
    * @param qc query context
    * @return resulting value
    * @throws QueryException query exception
    */
-  final Str eval(final IOContent query, final EvalOptions options, final QueryContext qc)
-      throws QueryException {
-
-    final HashMap<String, Value> bindings = toBindings(arg(1), qc);
-    options.set(JobOptions.BASE_URI, toBaseUri(query.url(), options, JobOptions.BASE_URI));
-
+  final Str eval(final EvalOptions options, final QueryContext qc) throws QueryException {
     final boolean service = options.get(EvalOptions.SERVICE) == Boolean.TRUE;
-    if(service) {
-      if(!bindings.isEmpty()) throw JOBS_SERVICE.get(info);
-      // invalidate option (not relevant for next steps, i.e., if services are written to disk)
-      options.put(EvalOptions.SERVICE, null);
-    }
-
-    // copy variable values
-    for(final Entry<String, Value> it : bindings.entrySet()) {
-      bindings.put(it.getKey(), it.getValue().materialize(n -> false, info, qc));
-    }
+    final QueryJobSpec spec = toJobSpec(arg(0), arg(1), options, service, qc);
+    // invalidate option (not relevant for next steps, i.e., if services are written to disk)
+    if(service) options.put(EvalOptions.SERVICE, null);
 
     // synchronous jobs share the caller's context
     final boolean sync = synchronous();
     final Locks held = sync ? qc.context.locking.held() : null;
-    final QueryJobSpec spec = new QueryJobSpec(options, bindings, query, sc().resolver());
     final QueryJob job = new QueryJob(spec, sync ? qc.context : qc.context.detach(), info, null,
         held);
 

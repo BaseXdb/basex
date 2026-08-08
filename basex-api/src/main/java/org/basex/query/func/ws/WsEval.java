@@ -1,13 +1,10 @@
 package org.basex.query.func.ws;
 
 import java.nio.*;
-import java.util.*;
-import java.util.Map.*;
 import java.util.function.*;
 
 import org.basex.core.jobs.*;
 import org.basex.http.ws.*;
-import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
@@ -23,17 +20,8 @@ import org.basex.query.value.item.*;
 public final class WsEval extends WsFn {
   @Override
   protected Str item(final QueryContext qc) throws QueryException {
-    final IOContent query = toContent(arg(0), qc);
-    final HashMap<String, Value> bindings = toBindings(arg(1), qc);
     final WsOptions options = toOptions(arg(2), new WsOptions(), qc);
-    options.set(JobOptions.BASE_URI, toBaseUri(query.url(), options, JobOptions.BASE_URI));
-
-    // copy variable values
-    for(final Entry<String, Value> it : bindings.entrySet()) {
-      bindings.put(it.getKey(), it.getValue().materialize(n -> false, info, qc));
-    }
-
-    final QueryJobSpec spec = new QueryJobSpec(options, bindings, query, sc().resolver());
+    final QueryJobSpec spec = toJobSpec(arg(0), arg(1), options, false, qc);
     final WebSocket ws = ws(qc);
     final SerializerOptions sopts = options.get(WsOptions.SERIALIZER);
     final Consumer<QueryJobResult> notify = result -> {

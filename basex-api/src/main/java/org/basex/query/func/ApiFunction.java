@@ -204,7 +204,7 @@ public enum ApiFunction implements AFunction {
       params(ITEM_O), EMPTY_SEQUENCE_Z, WS_URI, Perm.ADMIN),
   /** XQuery function. */
   _WS_EVAL(WsEval::new, "eval(query, bindings?, options?)",
-      params(STRING_O, MAP_ZO, MAP_ZO), STRING_O, WS_URI, Perm.ADMIN),
+      params(QUERY_SPEC_O, MAP_OR_ARRAY_ZO, MAP_ZO), STRING_O, WS_URI, Perm.ADMIN),
   /** XQuery function. */
   _WS_GET(WsGet::new, "get(id, key, default?)",
       params(STRING_O, STRING_O, ITEM_ZM), ITEM_ZM, WS_URI, Perm.ADMIN),

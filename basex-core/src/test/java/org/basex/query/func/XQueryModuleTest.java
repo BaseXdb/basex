@@ -19,6 +19,64 @@ public final class XQueryModuleTest extends SandboxTest {
   /** Path to test file. */
   private static final String PATH = "src/test/resources/input.xml";
 
+  /** Invokes function items instead of query strings. */
+  @Test public void evalFunction() {
+    final Function func = _XQUERY_EVAL;
+
+    query(func.args(" fn() { 1 + 1 }"), 2);
+    query(func.args(" fn() { () }"), "");
+    query(func.args(" fn($a) { $a * 2 }", " [ 21 ]"), 42);
+    query(func.args(" fn($a, $b) { $a || $b }", " [ 'x', 'y' ]"), "xy");
+    query(func.args(" concat('a', ?)", " [ 'b' ]"), "ab");
+    query("let $a := 40 return " + func.args(" fn() { $a + 2 }"), 42);
+    query("declare function local:f() { 5 }; " + func.args(" fn() { local:f() }"), 5);
+
+    // the function keeps the static context of the query that created it
+    query("declare default element namespace 'x'; " +
+        func.args(" fn() { namespace-uri(<a/>) }"), "x");
+
+    // options that do not depend on the query text are honored
+    query(func.args(" fn() { 1 }", " ()", " { 'timeout': 10 }"), 1);
+
+    // arity mismatches
+    error(func.args(" fn($a) { $a }"), APPLY_X_X);
+    error(func.args(" fn($a) { $a }", " [ 1, 2 ]"), APPLY_X_X);
+    // arguments must be supplied as array
+    error(func.args(" fn($a) { $a }", " { 'a': 1 }"), INVTYPE_X);
+    // maps and arrays are neither queries nor invocable functions
+    error(func.args(" { 'a': 1 }"), INVTYPE_X);
+    error(func.args(" [ 1 ]"), INVTYPE_X);
+    // dependencies on the calling query
+    error(func.args(" fn() { . }"), BASEX_TRANSFER_X_X);
+    error("declare variable $v := random:integer(); " + func.args(" fn() { $v }"),
+        BASEX_TRANSFER_X_X);
+    error(func.args(" fn() { Q{java:java.lang.Math}abs(-1) }"), BASEX_TRANSFER_X_X);
+    // updating functions
+    error(func.args(" %updating fn() { delete node <a/> }"), XQUERY_NOUPDATES);
+  }
+
+  /** Evaluates function items with reduced permissions. */
+  @Test public void evalFunctionPermission() {
+    final Function func = _XQUERY_EVAL;
+
+    // the option constrains code that is compiled in the nested context, not supplied code
+    query(func.args(" fn() { 1 }", " ()", " { 'permission': 'none' }"), 1);
+    query(func.args(" fn($a) { $a }", " [ 2 ]", " { 'permission': 'read' }"), 2);
+    query(func.args(" fn() { 1 }", " ()", " { 'permission': 'admin' }"), 1);
+    // query strings are compiled with the reduced permissions
+    query(func.args("1", " ()", " { 'permission': 'none' }"), 1);
+    error(func.args("admin:sessions()", " ()", " { 'permission': 'none' }"), XQUERY_PERM_X);
+  }
+
+  /** Invokes updating function items. */
+  @Test public void evalUpdateFunction() {
+    final Function func = _XQUERY_EVAL_UPDATE;
+
+    query(func.args(" %updating fn() { delete node <a/> }"), "");
+    query(func.args(" %updating fn($n) { delete node $n }", " [ <a/> ]"), "");
+    error(func.args(" fn() { 1 }"), XQUERY_UPDATEEXPECTED);
+  }
+
   /** Test method. */
   @Test public void eval() {
     final Function func = _XQUERY_EVAL;

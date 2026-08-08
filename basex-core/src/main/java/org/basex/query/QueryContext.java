@@ -321,6 +321,20 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   /**
+   * Assigns a dynamic call of a function item as main module.
+   * @param function function item
+   * @param args function arguments
+   */
+  public void assign(final FItem function, final Value[] args) {
+    // the function carries the static context of the query it was created in
+    final InputInfo ii = function instanceof final FuncItem fi ? fi.info() : null;
+    final StaticContext sctx = ii != null ? ii.sc() : new StaticContext(this);
+    updating = function.annotations().contains(Annotation.UPDATING);
+    main = new MainModule(new DynFuncCall(ii, updating, false, function, args), new VarScope(),
+        sctx);
+  }
+
+  /**
    * Compiles the expression. Performs static optimizations.
    * @throws QueryException query exception
    */

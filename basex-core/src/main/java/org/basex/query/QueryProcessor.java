@@ -11,6 +11,7 @@ import org.basex.io.serial.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.list.*;
@@ -67,6 +68,17 @@ public final class QueryProcessor extends Job implements Closeable {
       parsed = true;
       updating = qc.updating;
     }
+  }
+
+  /**
+   * Invokes a function item instead of parsing a query.
+   * @param function function item
+   * @param args function arguments
+   */
+  public void assign(final FItem function, final Value[] args) {
+    qc.assign(function, args);
+    parsed = true;
+    updating = qc.updating;
   }
 
   /**

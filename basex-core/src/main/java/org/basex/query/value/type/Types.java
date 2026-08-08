@@ -269,6 +269,11 @@ public final class Types {
   public static final SeqType FUNCTION_ZO = FUNCTION.seqType(ZERO_OR_ONE);
   /** Zero of more functions. */
   public static final SeqType FUNCTION_ZM = FUNCTION.seqType(ZERO_OR_MORE);
+
+  /** Job target: a query string or URI, or a function to be invoked. */
+  public static final Type QUERY_SPEC = ChoiceItemType.get(ANY_ATOMIC_TYPE, FUNCTION);
+  /** Single job target. */
+  public static final SeqType QUERY_SPEC_O = QUERY_SPEC.seqType();
   /** Predicate function. */
   public static final SeqType PREDICATE_O = FuncType.get(BOOLEAN_ZO, ITEM_O, INTEGER_O).seqType();
   /** Predicate function. */
@@ -302,6 +307,8 @@ public final class Types {
   public static final Type MAP_OR_ARRAY = ChoiceItemType.get(MAP, ARRAY);
   /** Single map or array. */
   public static final SeqType MAP_OR_ARRAY_O = MAP_OR_ARRAY.seqType();
+  /** Zero or one map or array. */
+  public static final SeqType MAP_OR_ARRAY_ZO = MAP_OR_ARRAY.seqType(Occ.ZERO_OR_ONE);
   /** Zero or more maps or arrays. */
   public static final SeqType MAP_OR_ARRAY_ZM = MAP_OR_ARRAY.seqType(Occ.ZERO_OR_MORE);
   /** Zero or more GNodes, maps, or arrays. */

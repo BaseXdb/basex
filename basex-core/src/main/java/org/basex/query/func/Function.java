@@ -1723,10 +1723,10 @@ public enum Function implements AFunction {
       params(), STRING_O, flag(NDT), JOB_URI),
   /** XQuery function. */
   _JOB_EVAL(JobEval::new, "eval(query, bindings?, options?)",
-      params(ANY_ATOMIC_TYPE_O, MAP_ZO, MAP_ZO), STRING_O, flag(NDT), JOB_URI, Perm.ADMIN),
+      params(QUERY_SPEC_O, MAP_OR_ARRAY_ZO, MAP_ZO), STRING_O, flag(NDT), JOB_URI, Perm.ADMIN),
   /** XQuery function. */
   _JOB_EXECUTE(JobExecute::new, "execute(query, bindings?)",
-      params(ANY_ATOMIC_TYPE_O, MAP_ZO), ITEM_ZM, flag(NDT), JOB_URI, Perm.ADMIN),
+      params(QUERY_SPEC_O, MAP_OR_ARRAY_ZO), ITEM_ZM, flag(NDT), JOB_URI, Perm.ADMIN),
   /** XQuery function. */
   _JOB_FINISHED(JobFinished::new, "finished(id)",
       params(STRING_O), BOOLEAN_O, flag(NDT), JOB_URI, Perm.ADMIN),
@@ -2148,10 +2148,10 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _XQUERY_EVAL(XQueryEval::new, "eval(query, bindings?, options?)",
-      params(ANY_ATOMIC_TYPE_O, MAP_ZO, MAP_ZO), ITEM_ZM, flag(NDT), XQUERY_URI),
+      params(QUERY_SPEC_O, MAP_OR_ARRAY_ZO, MAP_ZO), ITEM_ZM, flag(NDT), XQUERY_URI),
   /** XQuery function. */
   _XQUERY_EVAL_UPDATE(XQueryEvalUpdate::new, "eval-update(query, bindings?, options?)",
-      params(ANY_ATOMIC_TYPE_O, MAP_ZO, MAP_ZO), EMPTY_SEQUENCE_Z,
+      params(QUERY_SPEC_O, MAP_OR_ARRAY_ZO, MAP_ZO), EMPTY_SEQUENCE_Z,
       flag(UPD), XQUERY_URI),
   /** XQuery function. */
   _XQUERY_FOR_EACH(XQueryForEach::new, "for-each(input, action, options?)",

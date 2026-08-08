@@ -45,27 +45,28 @@ public class XQueryEval extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return eval(toContent(arg(0), qc), false, qc);
+    return eval(false, qc);
   }
 
   /**
-   * Evaluates the specified string as XQuery expression.
-   * @param query query
+   * Evaluates the first argument as XQuery expression or invokes it as function.
    * @param updating updating query
    * @param qc query context
    * @return resulting value
    * @throws QueryException query exception
    */
-  final Value eval(final IOContent query, final boolean updating, final QueryContext qc)
-      throws QueryException {
-
+  final Value eval(final boolean updating, final QueryContext qc) throws QueryException {
     // allow limited number of nested calls
     QueryContext qcAnc = qc;
     for(int c = 5; qcAnc != null && c > 0; c--) qcAnc = qcAnc.parent;
     if(qcAnc != null) throw XQUERY_NESTED.get(info);
 
-    // bind variables and context value, parse options
-    final HashMap<String, Value> bindings = toBindings(arg(1), qc);
+    // resolve query or function to be invoked
+    final Item input = arg(0).item(qc, info);
+    final FuncItem function = toInvocable(input);
+    final IOContent query = function != null ? null : toContent(input, qc);
+
+    // parse options
     final XQueryOptions options = new XQueryOptions();
     final User user = qc.user;
     options.put(XQueryOptions.PERMISSION, user.permission(""));
@@ -73,6 +74,14 @@ public class XQueryEval extends StandardFunc {
 
     final Perm perm = Enums.get(Perm.class, options.get(XQueryOptions.PERMISSION).toString());
     if(!user.has(perm)) throw XQUERY_NOPERM_X.get(info, perm);
+
+    // bind variables and context value, or resolve the arguments of the invoked function
+    final HashMap<String, Value> bindings = function != null ? null : toBindings(arg(1), qc);
+    Value[] args = null;
+    if(function != null) {
+      TransferVisitor.check(function, info);
+      args = toArguments(arg(1), function, qc);
+    }
 
     Timer to = null;
     try(QueryContext qctx = new QueryContext(qc, null)) {
@@ -93,15 +102,19 @@ public class XQueryEval extends StandardFunc {
         }, ms);
       }
 
-      // evaluate query
-      final boolean pass = options.get(XQueryOptions.PASS);
+      // evaluate query; a function has no path to report
+      final boolean pass = options.get(XQueryOptions.PASS) && query != null;
       try {
-        final StaticContext sctx = new StaticContext(qctx);
-        sctx.baseURI(toBaseUri(query.url(), options, XQueryOptions.BASE_URI));
-        for(final Entry<String, Value> binding : bindings.entrySet()) {
-          qctx.bind(binding.getKey(), binding.getValue(), null, sctx);
+        if(function != null) {
+          qctx.assign(function, args);
+        } else {
+          final StaticContext sctx = new StaticContext(qctx);
+          sctx.baseURI(toBaseUri(query.url(), options, XQueryOptions.BASE_URI));
+          for(final Entry<String, Value> binding : bindings.entrySet()) {
+            qctx.bind(binding.getKey(), binding.getValue(), null, sctx);
+          }
+          qctx.parseMain(string(query.read()), null, sctx);
         }
-        qctx.parseMain(string(query.read()), null, sctx);
 
         if(updating != qctx.updating) {
           if(!updating) throw XQUERY_NOUPDATES.get(info);

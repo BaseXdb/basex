@@ -2,7 +2,6 @@ package org.basex.query.func.job;
 
 import org.basex.core.*;
 import org.basex.core.jobs.*;
-import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
@@ -17,11 +16,10 @@ import org.basex.util.*;
 public final class JobExecute extends JobEval {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final IOContent input = toContent(arg(0), qc);
     final EvalOptions options = new EvalOptions();
     options.set(JobOptions.CACHE, true);
 
-    final String id = eval(input, options, qc).toJava();
+    final String id = eval(options, qc).toJava();
 
     // wait for result; stop process if child process is stopped
     final JobPool pool = qc.context.jobs;
