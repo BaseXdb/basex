@@ -607,8 +607,6 @@ public abstract class StandardFunc extends Arr {
     if(function != null) {
       // a service is written to disk, and a scheduled job outlives the query that created it
       if(service || QueryJobSpec.scheduled(options)) throw JOBS_FUNCTION.get(info);
-      // the invoked function must not depend on the query that created it
-      TransferVisitor.check(function, info);
       return new QueryJobSpec(options, function, toArguments(args, function, qc));
     }
 
@@ -625,13 +623,17 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Evaluates an expression to a function that can be invoked instead of a query.
+   * Evaluates an expression to a function that can be invoked in another query context.
    * @param item item
    * @return function item, or {@code null} if the item is no function
    * @throws QueryException query exception
    */
   protected final FuncItem toInvocable(final Item item) throws QueryException {
-    if(item instanceof final FuncItem function) return function;
+    if(item instanceof final FuncItem function) {
+      // the invoked function must not depend on the query that created it
+      TransferVisitor.check(function, info);
+      return function;
+    }
     // maps and arrays are function items, but they are no queries either
     if(item instanceof FItem) throw typeError(item, Types.QUERY_SPEC_O, info);
     return null;

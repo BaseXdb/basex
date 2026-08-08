@@ -77,11 +77,7 @@ public class XQueryEval extends StandardFunc {
 
     // bind variables and context value, or resolve the arguments of the invoked function
     final HashMap<String, Value> bindings = function != null ? null : toBindings(arg(1), qc);
-    Value[] args = null;
-    if(function != null) {
-      TransferVisitor.check(function, info);
-      args = toArguments(arg(1), function, qc);
-    }
+    final Value[] args = function != null ? toArguments(arg(1), function, qc) : null;
 
     Timer to = null;
     try(QueryContext qctx = new QueryContext(qc, null)) {
