@@ -49,7 +49,6 @@ declare function html:wrap(
       <link rel='icon' href='.static/basex.svg'/>
       <link rel='stylesheet' href='.static/style.css'/>
       <script src='.static/js.js'/>
-      <script src='.static/editor.js'/>
       <script src='.static/cm6.js'/>
     </head>
     <body>
