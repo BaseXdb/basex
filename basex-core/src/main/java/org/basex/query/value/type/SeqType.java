@@ -562,6 +562,14 @@ public final class SeqType {
   }
 
   /**
+   * Tests if expressions of this type may yield function items.
+   * @return result of check
+   */
+  public boolean mayBeFunction() {
+    return !zero() && (type == BasicType.ITEM || type instanceof FType);
+  }
+
+  /**
    * Tests if contents may be wrapped in a data structure. This includes JNodes,
    * maps, arrays and function items.
    * @return result of check
