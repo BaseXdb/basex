@@ -209,8 +209,8 @@ public final class WsLifecycleTest extends WsTest {
     final Listener l = new Listener();
     final java.net.http.WebSocket ws = connect("/e", l);
     try {
-      // the default limit is 64 KB (see the maxTextMessageSize servlet parameter)
-      ws.sendText("x".repeat(100000), true).get(5, TimeUnit.SECONDS);
+      // exceeds the maxTextMessageSize servlet parameter of the deployed web.xml
+      ws.sendText("x".repeat(5000000), true).get(5, TimeUnit.SECONDS);
     } catch(final Exception ignore) {
       // the server drops the connection; the send may fail
       Util.debug(ignore);

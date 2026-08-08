@@ -45,6 +45,10 @@
       <param-name>org.basex.user</param-name>
       <param-value>admin</param-value>
     </init-param>
+    <init-param>
+      <param-name>maxTextMessageSize</param-name>
+      <param-value>4194304</param-value>
+    </init-param>
   </servlet>
   <servlet-mapping>
     <servlet-name>WebSocket</servlet-name>
