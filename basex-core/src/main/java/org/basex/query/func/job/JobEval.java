@@ -8,6 +8,7 @@ import org.basex.core.jobs.*;
 import org.basex.core.locks.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.util.options.*;
 
@@ -59,6 +60,11 @@ public class JobEval extends StandardFunc {
       }
     }
     return Str.get(job.jc().id());
+  }
+
+  @Override
+  public final boolean accept(final ASTVisitor visitor) {
+    return visitJobSpec(visitor);
   }
 
   /**

@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.function.*;
 
 import org.basex.core.locks.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
@@ -110,6 +111,12 @@ public final class LockVisitor extends ASTVisitor {
   @Override
   public boolean funcItem(final FuncItem func) {
     return cached(func) || visit(func, true);
+  }
+
+  @Override
+  public boolean transferred(final Expr expr) {
+    // a function item is invoked by another query, which registers its own locks
+    return expr instanceof FuncItem || expr.accept(this);
   }
 
   /**

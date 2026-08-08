@@ -8,6 +8,7 @@ import org.basex.http.ws.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 
@@ -39,5 +40,10 @@ public final class WsEval extends WsFn {
 
     final QueryJob job = new QueryJob(spec, qc.context, info, notify, null);
     return Str.get(job.jc().id());
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return visitJobSpec(visitor);
   }
 }

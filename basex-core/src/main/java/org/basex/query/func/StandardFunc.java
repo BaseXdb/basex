@@ -1006,6 +1006,21 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
+   * Visits the arguments of a function that hands its first argument over to a new job.
+   * @param visitor visitor
+   * @return result of check
+   */
+  protected final boolean visitJobSpec(final ASTVisitor visitor) {
+    final Expr[] args = args();
+    final int al = args.length;
+    if(!visitor.transferred(args[0])) return false;
+    for(int a = 1; a < al; a++) {
+      if(!args[a].accept(visitor)) return false;
+    }
+    return true;
+  }
+
+  /**
    * Indicates if the supplied options argument may contain a function.
    * @param i index of argument
    * @return result of check

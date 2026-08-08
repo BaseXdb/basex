@@ -82,6 +82,15 @@ public abstract class ASTVisitor implements LockCollector {
   }
 
   /**
+   * Notifies the visitor of an expression that is passed on to another query context.
+   * @param expr expression
+   * @return if more expressions should be visited (visits the expression by default)
+   */
+  public boolean transferred(final Expr expr) {
+    return expr.accept(this);
+  }
+
+  /**
    * Notifies the visitor of a value.
    * @param value value
    * @return if more expressions should be visited ({@code true} by default)
