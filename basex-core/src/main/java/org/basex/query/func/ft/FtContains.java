@@ -21,7 +21,7 @@ public final class FtContains extends FtAccessFn {
     final FtContainsOptions options = toOptions(arg(2), new FtContainsOptions(), qc);
 
     final FTMode mode = options.get(FtIndexOptions.MODE);
-    final FTOpt opt = ftOpt(options, qc).assign(qc.ftOpt());
+    final FTOpt opt = ftOpt(options, qc.ftOpt(), qc);
 
     final FTDiacritics dc = options.get(FtContainsOptions.DIACRITICS);
     if(dc != null) opt.set(DC, dc == FTDiacritics.SENSITIVE);

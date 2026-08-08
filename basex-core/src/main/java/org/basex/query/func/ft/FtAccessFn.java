@@ -20,17 +20,24 @@ abstract class FtAccessFn extends StandardFunc {
   /**
    * Parses and returns full-text options.
    * @param opts options specified in the query
+   * @param parent options to be inherited for unspecified values
    * @param qc query context
    * @return options
    * @throws QueryException query exception
    */
-  final FTOpt ftOpt(final FtIndexOptions opts, final QueryContext qc) throws QueryException {
+  final FTOpt ftOpt(final FtIndexOptions opts, final FTOpt parent, final QueryContext qc)
+      throws QueryException {
+
     final FTOpt opt = new FTOpt();
-    opt.set(FZ, opts.get(FtFuzzyOptions.FUZZY));
-    opt.set(WC, opts.get(FtIndexOptions.WILDCARDS));
+    final Boolean fuzzy = opts.get(FtFuzzyOptions.FUZZY);
+    if(fuzzy != null) opt.set(FZ, fuzzy);
+    final Boolean wildcards = opts.get(FtIndexOptions.WILDCARDS);
+    if(wildcards != null) opt.set(WC, wildcards);
+    if(opts.contains(FtFuzzyOptions.ERRORS)) opt.errors = opts.get(FtFuzzyOptions.ERRORS);
+
+    opt.assign(parent);
     if(opt.is(FZ) && opt.is(WC)) throw FT_OPTIONS.get(info, this);
-    opt.errors = opts.contains(FtFuzzyOptions.ERRORS) ? opts.get(FtFuzzyOptions.ERRORS) :
-      errors(qc);
+    if(opt.errors == -1) opt.errors = errors(qc);
     return opt;
   }
 

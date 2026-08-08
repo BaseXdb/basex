@@ -3,12 +3,12 @@ package org.basex.query.func.ft;
 import org.basex.util.options.*;
 
 /**
- * Full-text options.
+ * Full-text thesaurus options.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class FtThesaurusOptions extends FtIndexOptions {
+public final class FtThesaurusOptions extends Options {
   /** Option: relationship. */
   public static final StringOption RELATIONSHIP = new StringOption("relationship", "");
   /** Option: levels. */

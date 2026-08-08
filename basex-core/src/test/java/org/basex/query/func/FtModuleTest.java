@@ -83,10 +83,21 @@ public final class FtModuleTest extends SandboxTest {
     query(func.args(long1, long2, " { 'fuzzy': true(), 'errors': 2 }"), true);
     query(func.args(long1, long2, " { 'fuzzy': true(), 'errors': 0 }"), true);
 
+    // options of the query prolog are inherited
+    query("declare ft-option using fuzzy; " + func.args("Assignments", "Azzignments"), true);
+    query("declare ft-option using wildcards; " + func.args("Assignments", "Assign.*"), true);
+    query("declare ft-option using stop words ('the'); " +
+        func.args("cat", "the cat", " { 'mode': 'all words' }"), true);
+    // options of the function call take precedence
+    query("declare ft-option using fuzzy; " +
+        func.args("Assignments", "Azzignments", " { 'fuzzy': false() }"), false);
+
     // check buggy options
     error(func.args("x", "x", " { 'x': 'y' }"), INVALIDOPTION_X);
     error(func.args("x", "x", " { 'mode': '' }"), INVALIDOPTIONVALUE_X);
     error(func.args("x", "x", " 1"), INVTYPE_X);
+    error("declare ft-option using fuzzy; " +
+        func.args("x", "x", " { 'wildcards': true() }"), FT_OPTIONS);
   }
 
   /** Test method. */
@@ -126,6 +137,10 @@ public final class FtModuleTest extends SandboxTest {
     query(func.args(" //li[. contains text '1'], 'b', 20"), "<li>Exercise <b>1</b></li>");
     query(func.args(" <p>Exercise 1</p>[. contains text '1'], 'b', 20"),
       "<p>Exercise <b>1</b></p>");
+
+    // only nodes are accepted
+    error(func.args("string"), INVTYPE_X);
+    error(func.args(" //*[text() contains text '1'], 'p:m'"), INVALUE_X_X);
   }
 
   /** Test method. */
@@ -170,6 +185,10 @@ public final class FtModuleTest extends SandboxTest {
     // string values differ: no marker
     query(func.args(" <p>Exercise <i>1</i></p>[. contains text '1']", "b"),
       "<p>Exercise <i>1</i></p>");
+
+    // marker names must be NCNames
+    error(func.args(" //*[text() contains text '1'], 'p:m'"), INVALUE_X_X);
+    error(func.args(" //*[text() contains text '1'], '1'"), INVALUE_X_X);
   }
 
   /** Test method. */
@@ -258,6 +277,12 @@ public final class FtModuleTest extends SandboxTest {
         " { 'mode': 'all words', 'window': { 'size': 3 } }"),
         "Databases and XML");
 
+    // options of the query prolog are inherited
+    query("declare ft-option using fuzzy; " + func.args(NAME, "Azzignments"), "Assignments");
+
+    // tokenization options are dictated by the index
+    error(func.args(NAME, "x", " { 'stemming': true() }"), INVALIDOPTION_X);
+
     // check buggy options
     error(func.args(NAME, "x", " { 'x': 'y' }"), INVALIDOPTION_X);
     error(func.args(NAME, "x", " { 'mode': '' }"), INVALIDOPTIONVALUE_X);
@@ -274,6 +299,10 @@ public final class FtModuleTest extends SandboxTest {
     query(func.args(doc, "happy", " { 'levels': 5 }"), "lucky\nhappy");
     query(func.args(doc, "happy", " { 'relationship': 'RT' }"), "lucky\nhappy");
     query(func.args(doc, "happy", " { 'relationship': 'XYZ' }"), "");
+
+    // index options are rejected
+    error(func.args(doc, "happy", " { 'fuzzy': true() }"), INVALIDOPTION_X);
+    error(func.args(doc, "happy", " { 'mode': 'all' }"), INVALIDOPTION_X);
   }
 
   /** Test method. */

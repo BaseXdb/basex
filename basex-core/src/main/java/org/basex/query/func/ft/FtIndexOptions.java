@@ -13,7 +13,7 @@ public class FtIndexOptions extends FtFuzzyOptions {
   /** Option: mode. */
   public static final EnumOption<FTMode> MODE = new EnumOption<>("mode", FTMode.ANY);
   /** Option: wildcards. */
-  public static final BooleanOption WILDCARDS = new BooleanOption("wildcards", false);
+  public static final BooleanOption WILDCARDS = new BooleanOption("wildcards");
   /** Option: ordered. */
   public static final BooleanOption ORDERED = new BooleanOption("ordered", false);
   /** Option: distance. */

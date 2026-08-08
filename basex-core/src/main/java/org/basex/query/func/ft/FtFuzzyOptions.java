@@ -10,7 +10,7 @@ import org.basex.util.options.*;
  */
 public class FtFuzzyOptions extends Options {
   /** Option: fuzzy. */
-  public static final BooleanOption FUZZY = new BooleanOption("fuzzy", false);
+  public static final BooleanOption FUZZY = new BooleanOption("fuzzy");
   /** Option: Levenshtein errors. */
   public static final NumberOption ERRORS = new NumberOption("errors");
 }

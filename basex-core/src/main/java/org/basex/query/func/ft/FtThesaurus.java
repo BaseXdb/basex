@@ -2,6 +2,7 @@ package org.basex.query.func.ft;
 
 import org.basex.query.*;
 import org.basex.query.expr.ft.*;
+import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -13,10 +14,10 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class FtThesaurus extends FtAccessFn {
-  /** Most recently used thesaurus. */
+public final class FtThesaurus extends StandardFunc {
+  /** Most recently used thesaurus (can be {@code null}). */
   private Thesaurus thesaurus;
-  /** Most recently supplied root node. */
+  /** Most recently supplied root node (can be {@code null}). */
   private XNode nd;
 
   @Override
@@ -25,7 +26,7 @@ public final class FtThesaurus extends FtAccessFn {
     final byte[] term = toToken(arg(1), qc);
     final FtThesaurusOptions options = toOptions(arg(2), new FtThesaurusOptions(), qc);
 
-    if(node != nd) {
+    if(nd == null || !nd.is(node)) {
       thesaurus = new Thesaurus(node);
       nd = node;
     }

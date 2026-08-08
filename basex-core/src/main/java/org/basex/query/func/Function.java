@@ -1610,7 +1610,7 @@ public enum Function implements AFunction {
       params(NODE_ZM), INTEGER_O, FT_URI),
   /** XQuery function. */
   _FT_EXTRACT(FtExtract::new, "extract(nodes, name?, length?)",
-      params(ITEM_ZM, STRING_ZO, INTEGER_ZO), NODE_ZM, FT_URI),
+      params(NODE_ZM, STRING_ZO, INTEGER_ZO), NODE_ZM, FT_URI),
   /** XQuery function. */
   _FT_MARK(FtMark::new, "mark(nodes, name?)",
       params(NODE_ZM, STRING_ZO), NODE_ZM, FT_URI),
