@@ -43,11 +43,11 @@ public abstract class Preds extends Arr {
     if(el != 0) cc.get(this, true, () -> {
       if(root != null) {
         final long size = root.size();
-        if(size != -1) cc.qc.focus.size = size;
+        if(size != -1) cc.updateFocus(size);
       }
       for(int e = 0; e < el; ++e) {
         exprs[e] = cc.compileOrError(exprs[e], false);
-        cc.qc.focus.size = 1;
+        cc.updateFocus(1);
       }
       return null;
     });

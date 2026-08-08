@@ -48,7 +48,7 @@ public final class HoistedFilter extends CachedFilter {
           }
         } else {
           // fallback evaluation for multiple items
-          value = eval(value, pred, qc);
+          value = eval(value, pred, qc, qf);
         }
         if(value.isEmpty()) break;
       }

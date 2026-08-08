@@ -34,7 +34,7 @@ public class CachedFilter extends Filter {
     qc.focus = qf;
     try {
       for(final Expr expr : exprs) {
-        value = eval(value, expr, qc);
+        value = eval(value, expr, qc, qf);
         if(value.isEmpty()) break;
       }
       return value;
@@ -48,12 +48,12 @@ public class CachedFilter extends Filter {
    * @param value items to filter
    * @param pred predicate expression
    * @param qc query context
+   * @param qf query focus
    * @return filtered value
    * @throws QueryException query exception
    */
-  final Value eval(final Value value, final Expr pred, final QueryContext qc)
+  final Value eval(final Value value, final Expr pred, final QueryContext qc, final QueryFocus qf)
       throws QueryException {
-    final QueryFocus qf = qc.focus;
     final long vs = value.size();
     qf.size = vs;
     final ValueBuilder vb = new ValueBuilder(qc);

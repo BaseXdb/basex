@@ -45,10 +45,10 @@ public final class CachedPath extends AxisPath {
         final Iter iter = rt.iter(qc);
         for(Item item; (item = iter.next()) != null;) {
           qf.value = item;
-          iterate(0, list, qc);
+          iterate(0, list, qc, qf);
         }
       } else {
-        iterate(0, list, qc);
+        iterate(0, list, qc, qf);
       }
     } finally {
       qc.focus = focus;
@@ -61,10 +61,11 @@ public final class CachedPath extends AxisPath {
    * @param step current step
    * @param list node cache
    * @param qc query context
+   * @param qf query focus
    * @throws QueryException query exception
    */
-  private void iterate(final int step, final GNodeBuilder list, final QueryContext qc)
-      throws QueryException {
+  private void iterate(final int step, final GNodeBuilder list, final QueryContext qc,
+      final QueryFocus qf) throws QueryException {
 
     // cast is safe (steps will always return a {@link NodeIter} instance)
     final NodeIter ni = (NodeIter) steps[step].iter(qc);
@@ -74,8 +75,8 @@ public final class CachedPath extends AxisPath {
       }
     } else {
       for(GNode node; (node = ni.next()) != null;) {
-        qc.focus.value = node;
-        iterate(step + 1, list, qc);
+        qf.value = node;
+        iterate(step + 1, list, qc, qf);
       }
     }
   }

@@ -180,6 +180,14 @@ public final class CompileContext {
   }
 
   /**
+   * Assigns a new context size to the query focus.
+   * @param size context size
+   */
+  public void updateFocus(final long size) {
+    qc.focus.size = size;
+  }
+
+  /**
    * Evaluates a function within the focus of the supplied expression.
    * @param expr focus expression (can be {@code null})
    * @param item focus single item
