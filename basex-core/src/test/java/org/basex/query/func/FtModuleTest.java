@@ -97,6 +97,11 @@ public final class FtModuleTest extends SandboxTest {
     query(func.args(" //li[text() contains text 'exercise']"), 2);
     query("for $i in //li[text() contains text 'exercise'] return " +
         func.args(" $i[text() contains text 'exercise']"), "1\n1");
+
+    // constructed nodes
+    query(func.args(" text { 'a b a' }[. contains text 'a']"), 2);
+    query(func.args(" <p>a b a</p>//text()[. contains text 'a']"), 2);
+    query(func.args(" <p>a</p>//text()[. contains text 'b']"), 0);
   }
 
   /** Test method. */
@@ -110,6 +115,17 @@ public final class FtModuleTest extends SandboxTest {
       "<li>...<_o_>2</_o_></li>");
     contains(func.args(" //*[text() contains text 'Exercise'], 'b', 1"),
       "<li>...</li>");
+
+    // constructed nodes
+    query(func.args(" <p>Exercise 1</p>[text() contains text '1']"),
+      "<p>Exercise <mark>1</mark></p>");
+    query(func.args(" <p>Exercise 1</p>[text() contains text '1'], 'b', 1"),
+      "<p>...<b>1</b></p>");
+
+    // positions assigned to an ancestor with an identical string value
+    query(func.args(" //li[. contains text '1'], 'b', 20"), "<li>Exercise <b>1</b></li>");
+    query(func.args(" <p>Exercise 1</p>[. contains text '1'], 'b', 20"),
+      "<p>Exercise <b>1</b></p>");
   }
 
   /** Test method. */
@@ -130,12 +146,30 @@ public final class FtModuleTest extends SandboxTest {
 
     query(COUNT.args(func.args(" //*[text() contains text '1']/../../../../..")), 1);
 
+    // positions assigned to an ancestor with an identical string value
+    query(func.args(" //li[. contains text '1']", "b"), "<li>Exercise <b>1</b></li>");
+
     execute(new CreateDB(NAME, "<a:a xmlns:a='A'>C</a:a>"));
     query(func.args(" /descendant::*[text() contains text 'C']", "b"),
         "<a:a xmlns:a=\"A\"><b>C</b></a:a>");
     execute(new DropDB(NAME));
     query("copy $c := <A xmlns='A'>A</A> modify () return <X>{ " +
         func.args(" $c[text() contains text 'A']") + " }</X>/*");
+
+    // constructed nodes
+    query(func.args(" text { 'a b' }[. contains text 'a']", "b"), "<b>a</b>\n b");
+    query(func.args(" text { 'a b' }[. contains text 'a b']", "b"), "<b>a</b>\n \n<b>b</b>");
+    query(func.args(" <p>Exercise 1</p>[text() contains text '1']"),
+      "<p>Exercise <mark>1</mark></p>");
+    query("<X>{ " + func.args(" <A xmlns='A'>A</A>[text() contains text 'A']") + " }</X>/*",
+      "<A xmlns=\"A\"><mark>A</mark></A>");
+
+    query(func.args(" <p>Exercise 1</p>[. contains text '1']", "b"), "<p>Exercise <b>1</b></p>");
+    query(func.args(" <p><i>Exercise 1</i></p>[. contains text '1']", "b"),
+      "<p><i>Exercise <b>1</b></i></p>");
+    // string values differ: no marker
+    query(func.args(" <p>Exercise <i>1</i></p>[. contains text '1']", "b"),
+      "<p>Exercise <i>1</i></p>");
   }
 
   /** Test method. */

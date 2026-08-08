@@ -47,16 +47,31 @@ final class DataFTBuilder {
   }
 
   /**
+   * Returns the full-text positions of a node.
+   * @param node node
+   * @return positions, or {@code null} if no full-text positions exist
+   */
+  private FTPos get(final XNode node) {
+    return node instanceof final DBNode dbnode ? pos.get(dbnode.data(), dbnode.pre()) :
+      pos.get(node);
+  }
+
+  /**
    * Builds full-text information.
    * @param node node to be added
    * @return added strings, or {@code null} if no full-text positions exist
    */
-  ArrayList<DataFTMarker> build(final GNode node) {
-    // only database nodes can have full-text positions
-    if(!(node instanceof final DBNode dbnode)) return null;
-
+  ArrayList<DataFTMarker> build(final XNode node) {
     // not all nodes have full-text positions
-    final FTPos ftp = pos.get(dbnode.data(), dbnode.pre());
+    FTPos ftp = get(node);
+    for(XNode nd = node.parent(); ftp == null && nd != null; nd = nd.parent()) {
+      // positions may have been assigned to an ancestor with an identical string value
+      final FTPos anc = get(nd);
+      if(anc != null) {
+        if(eq(nd.string(), node.string())) ftp = anc;
+        break;
+      }
+    }
     if(ftp == null) return null;
 
     final ArrayList<DataFTMarker> marks = new ArrayList<>();

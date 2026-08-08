@@ -68,7 +68,7 @@ public class FtMark extends StandardFunc {
             // copy node to main memory data instance
             final MemData md = new MemData(qc.context.options);
             final DataBuilder db = new DataBuilder(md, qc);
-            db.ftpos(m, qc.ftPosData, l).build(toDBNode(item, true));
+            db.ftpos(m, qc.ftPosData, l).build(toNode(item));
 
             final IntList il = new IntList();
             final int s = md.meta.size;

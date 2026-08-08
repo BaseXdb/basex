@@ -60,8 +60,9 @@ public final class FTContains extends Single {
           found = true;
           if(scoring) score += it.score();
           // cache entry for visualizations or ft:mark/ft:extract
-          if(ftPosData != null && item instanceof final DBNode node) {
-            ftPosData.add(node.data(), node.pre(), all);
+          if(ftPosData != null) {
+            if(item instanceof final DBNode node) ftPosData.add(node.data(), node.pre(), all);
+            else if(item instanceof final XNode node) ftPosData.add(node, all);
           }
         }
         count++;

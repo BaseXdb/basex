@@ -4,7 +4,7 @@ import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * This class contains full-text positions for a single database node.
+ * This class contains full-text positions for a single node.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

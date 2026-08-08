@@ -3,6 +3,7 @@ package org.basex.query.util.ft;
 import java.util.*;
 
 import org.basex.data.*;
+import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
@@ -16,6 +17,8 @@ import org.basex.util.list.*;
  * @author Sebastian Gath
  */
 public final class FTPosData {
+  /** Position references of constructed nodes. */
+  private final IdentityHashMap<XNode, FTPos> fragments = new IdentityHashMap<>();
   /** Position references. */
   private FTPos[] pos = new FTPos[1];
   /** Data reference. */
@@ -47,16 +50,7 @@ public final class FTPosData {
     if(dt == null) dt = data;
     else if(dt != data) return;
 
-    // cache all positions
-    final IntSet set = new IntSet();
-    for(final FTMatch ftm : all) {
-      for(final FTStringMatch sm : ftm) {
-        for(int s = sm.start; s <= sm.end; ++s) set.add(s);
-      }
-    }
-
-    // sort and store all positions
-    final IntList il = new IntList(set.keys()).sort();
+    final IntList il = positions(all);
     int c = find(pre);
     if(c < 0) {
       c = -c - 1;
@@ -68,6 +62,33 @@ public final class FTPosData {
     } else {
       pos[c].union(il);
     }
+  }
+
+  /**
+   * Adds position data for a constructed node.
+   * @param node node
+   * @param all full-text matches
+   */
+  public void add(final XNode node, final FTMatches all) {
+    final IntList il = positions(all);
+    final FTPos ftpos = fragments.get(node);
+    if(ftpos != null) ftpos.union(il);
+    else fragments.put(node, new FTPos(-1, il));
+  }
+
+  /**
+   * Returns the sorted positions of the specified matches.
+   * @param all full-text matches
+   * @return positions
+   */
+  private static IntList positions(final FTMatches all) {
+    final IntSet set = new IntSet();
+    for(final FTMatch ftm : all) {
+      for(final FTStringMatch sm : ftm) {
+        for(int s = sm.start; s <= sm.end; ++s) set.add(s);
+      }
+    }
+    return new IntList(set.keys()).sort();
   }
 
   /**
@@ -85,12 +106,22 @@ public final class FTPosData {
   }
 
   /**
+   * Gets full-text data of a constructed node.
+   * @param node node
+   * @return full-text data or {@code null}
+   */
+  public FTPos get(final XNode node) {
+    return fragments.get(node);
+  }
+
+  /**
    * Returns the number of entries.
    * @return size
    */
   public int size() {
     int c = 0;
     for(int i = 0; i < size; ++i) c += pos[i].size();
+    for(final FTPos ftpos : fragments.values()) c += ftpos.size();
     return c;
   }
 
@@ -116,7 +147,7 @@ public final class FTPosData {
   public boolean equals(final Object obj) {
     if(this == obj) return true;
     if(!(obj instanceof final FTPosData ft)) return false;
-    if(size != ft.size) return false;
+    if(size != ft.size || !fragments.equals(ft.fragments)) return false;
     for(int p = 0; p < size; p++) {
       if(pos[p].pre != ft.pos[p].pre || !pos[p].equals(ft.pos[p])) return false;
     }
