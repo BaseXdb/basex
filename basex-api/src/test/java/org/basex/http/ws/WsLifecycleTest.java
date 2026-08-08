@@ -128,19 +128,88 @@ public final class WsLifecycleTest extends WsTest {
   }
 
   /**
-   * When the XQuery message handler raises an error, the exception message is sent back
-   * to the client as a text frame.
+   * An error raised by a message handler is dispatched to {@code %ws:error}, which decides
+   * what reaches the client.
    * @throws Exception exception
    */
   @Test public void handlerError() throws Exception {
     register("declare %ws:message('/e', '{$m}') function m:msg($m) {"
-        + " error(xs:QName('m:boom'), 'BOOM') };");
+        + " error(xs:QName('m:boom'), 'BOOM') };"
+        + "declare %ws:error('/e', '{$m}') function m:err($m) {"
+        + " ws:send('caught:' || $m, ws:id()) };");
 
     final Listener l = new Listener();
     final java.net.http.WebSocket ws = connect("/e", l);
     try {
       ws.sendText("trigger", true).get(5, TimeUnit.SECONDS);
-      assertTrue(l.pollText().contains("BOOM"));
+      final String text = l.pollText();
+      assertTrue(text.startsWith("caught:"), text);
+      assertTrue(text.contains("BOOM"), text);
+    } finally {
+      close(ws);
+    }
+  }
+
+  /**
+   * Without a {@code %ws:error} function, a failing handler sends nothing to the client.
+   * @throws Exception exception
+   */
+  @Test public void noErrorHandler() throws Exception {
+    register("declare %ws:message('/e', '{$m}') function m:msg($m) {"
+        + " if($m = 'boom') then error(xs:QName('m:boom'), 'BOOM')"
+        + " else ws:send('ok', ws:id()) };");
+
+    final Listener l = new Listener();
+    final java.net.http.WebSocket ws = connect("/e", l);
+    try {
+      ws.sendText("boom", true).get(5, TimeUnit.SECONDS);
+      ws.sendText("fine", true).get(5, TimeUnit.SECONDS);
+      // frames are delivered in order: the first frame answers the second message
+      assertEquals("ok", l.pollText());
+    } finally {
+      close(ws);
+    }
+  }
+
+  /**
+   * An error raised by the {@code %ws:error} function is not dispatched again.
+   * @throws Exception exception
+   */
+  @Test public void errorHandlerError() throws Exception {
+    register("declare %ws:message('/e', '{$m}') function m:msg($m) {"
+        + " if($m = 'boom') then error(xs:QName('m:boom'), 'BOOM')"
+        + " else ws:send('ok', ws:id()) };"
+        + "declare %ws:error('/e', '{$m}') function m:err($m) {"
+        + " error(xs:QName('m:worse'), 'WORSE') };");
+
+    final Listener l = new Listener();
+    final java.net.http.WebSocket ws = connect("/e", l);
+    try {
+      ws.sendText("boom", true).get(5, TimeUnit.SECONDS);
+      ws.sendText("fine", true).get(5, TimeUnit.SECONDS);
+      assertEquals("ok", l.pollText());
+    } finally {
+      close(ws);
+    }
+  }
+
+  /**
+   * A query that is started with {@code ws:eval} and fails is dispatched to {@code %ws:error}.
+   * @throws Exception exception
+   */
+  @Test public void evalError() throws Exception {
+    register("declare %ws:message('/e', '{$m}') function m:msg($m) {"
+        + " void(ws:eval('error((), \"BOOM\")')) };"
+        + "declare %ws:error('/e', '{$m}') function m:err($m) {"
+        + " ws:send('job:' || $m, ws:id()) };");
+
+    final Listener l = new Listener();
+    final java.net.http.WebSocket ws = connect("/e", l);
+    try {
+      ws.sendText("trigger", true).get(5, TimeUnit.SECONDS);
+      final String text = l.pollText();
+      assertTrue(text.startsWith("job:"), text);
+      assertTrue(text.contains("BOOM"), text);
     } finally {
       close(ws);
     }
@@ -326,7 +395,8 @@ public final class WsLifecycleTest extends WsTest {
    */
   @Test public void closeInvalidStatus() throws Exception {
     register("declare %ws:message('/x', '{$m}') function m:msg($m) {"
-        + " ws:close(ws:id(), 5000) };");
+        + " ws:close(ws:id(), 5000) };"
+        + "declare %ws:error('/x', '{$m}') function m:err($m) { ws:send($m, ws:id()) };");
 
     final Listener l = new Listener();
     final java.net.http.WebSocket ws = connect("/x", l);

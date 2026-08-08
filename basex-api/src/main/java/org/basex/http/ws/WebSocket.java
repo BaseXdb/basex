@@ -39,8 +39,8 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
 
   /** Client WebSocket ID. */
   public String id;
-  /** HTTP Session. */
-  public HttpSession session;
+  /** HTTP Session (invalidated sessions are dropped, possibly from a job thread). */
+  public volatile HttpSession session;
   /** Negotiated sub-protocol ({@code null} if none). */
   public String subprotocol;
 
@@ -92,10 +92,7 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
 
   @Override
   public void onWebSocketError(final Throwable th) {
-    Util.debug(th);
-    final String m1 = th.getMessage(), m2 = Util.message(th), msg = m1 != null ? m1 : m2;
-    run("[WS-ERROR] " + requestCtx.state().url() + ": " + msg, null,
-        () -> findAndProcess(Annotation._WS_ERROR, msg));
+    error(th);
   }
 
   @Override
@@ -210,17 +207,33 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
       final WsFunction func = WebModules.get(context).websocket(this, ann);
       if(func != null) new WsResponse(this).create(func, message, true);
     } catch(final Exception ex) {
-      error(ex);
+      // an error raised by the error handler itself must not be dispatched again
+      // (an error handler that starts a failing job re-enters via ws:eval and still loops)
+      if(ann == Annotation._WS_ERROR) log(ex);
+      else error(ex);
     }
   }
 
   /**
-   * Sends an error to the client.
-   * @param ex exception
+   * Reports an error to the error handler of the application.
+   * @param th error
    */
-  public void error(final Exception ex) {
-    Util.debug(ex);
-    send(ex.getMessage());
+  public void error(final Throwable th) {
+    findAndProcess(Annotation._WS_ERROR, log(th));
+  }
+
+  /**
+   * Logs an error.
+   * @param th error
+   * @return error message
+   */
+  private String log(final Throwable th) {
+    Util.debug(th);
+    final String detail = th.getMessage();
+    final String msg = detail != null ? detail : Util.message(th);
+    context.log.write(LogType.ERROR,
+        "[WS-ERROR] " + requestCtx.state().url() + ": " + msg, null, context);
+    return msg;
   }
 
   /**

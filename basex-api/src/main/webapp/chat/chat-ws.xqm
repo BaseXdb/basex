@@ -113,9 +113,10 @@ function chat-ws:close(
 };
 
 (:~
- : Runs when a connection fails on the transport level (a broken pipe, a
- : protocol error, …). Its result is not sent to the client, so it is used
- : here for server-side logging only.
+ : Runs when something fails: the transport (a broken pipe, a protocol
+ : error, …), one of the handlers above, or a query started with ws:eval.
+ : Its result is not sent to the client, so it is used here for server-side
+ : logging only; a handler that wants to reach the client calls ws:send.
  : @param  $room     room the connection belonged to
  : @param  $message  error message
  :)
@@ -125,7 +126,11 @@ function chat-ws:error(
   $room     as xs:string,
   $message  as xs:string
 ) as empty-sequence() {
-  admin:write-log('Chat error [' || $room || ']: ' || $message, 'CHAT')
+  (: the details go to the log; the client is only told that something failed,
+   : so internal error messages do not end up in the chat window. Sending to an
+   : already broken connection does nothing, so the transport case is covered too :)
+  admin:write-log('Chat error [' || $room || ']: ' || $message, 'CHAT'),
+  chat-util:system('Sorry, something went wrong.', ws:id())
 };
 
 (:~

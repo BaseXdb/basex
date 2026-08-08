@@ -203,14 +203,15 @@ public final class WsPoolTest extends WsTest {
   }
 
   /**
-   * {@code ws:get($unknown-id, ...)} raises a query error which is delivered to the client.
+   * {@code ws:get($unknown-id, ...)} raises a query error which reaches {@code %ws:error}.
    * @throws Exception exception
    */
   @Test public void unknownIdError() throws Exception {
     register(
         "declare %ws:message('/p', '{$m}') function m:msg($m) {" +
         "  ws:get('websocket-does-not-exist', 'k')" +
-        "};");
+        "};" +
+        "declare %ws:error('/p', '{$m}') function m:err($m) { ws:send($m, ws:id()) };");
 
     final Listener l = new Listener();
     final java.net.http.WebSocket ws = connect("/p", l);
