@@ -3,12 +3,12 @@ package org.basex.query.func.ft;
 import org.basex.util.options.*;
 
 /**
- * Options for looking up full-text tokens.
+ * Full-text fuzzy options.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class FtTokensOptions extends Options {
+public class FtFuzzyOptions extends Options {
   /** Option: fuzzy. */
   public static final BooleanOption FUZZY = new BooleanOption("fuzzy", false);
   /** Option: Levenshtein errors. */

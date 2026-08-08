@@ -9,10 +9,10 @@ import org.basex.util.options.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class FtTokenizeOptions extends Options {
+public class FtLexerOptions extends Options {
   /** Option: case. */
   public static final EnumOption<FTCase> CASE = new EnumOption<>("case", FTCase.class);
-  /** Option: case. */
+  /** Option: diacritics. */
   public static final EnumOption<FTDiacritics> DIACRITICS =
       new EnumOption<>("diacritics", FTDiacritics.class);
   /** Option: stemming. */

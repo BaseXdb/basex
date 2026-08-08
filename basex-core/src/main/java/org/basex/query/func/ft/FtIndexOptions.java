@@ -9,13 +9,9 @@ import org.basex.util.options.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class FtIndexOptions extends Options {
-  /** Option: wildcards. */
+public class FtIndexOptions extends FtFuzzyOptions {
+  /** Option: mode. */
   public static final EnumOption<FTMode> MODE = new EnumOption<>("mode", FTMode.ANY);
-  /** Option: fuzzy. */
-  public static final BooleanOption FUZZY = new BooleanOption("fuzzy", false);
-  /** Option: Levenshtein errors. */
-  public static final NumberOption ERRORS = new NumberOption("errors");
   /** Option: wildcards. */
   public static final BooleanOption WILDCARDS = new BooleanOption("wildcards", false);
   /** Option: ordered. */

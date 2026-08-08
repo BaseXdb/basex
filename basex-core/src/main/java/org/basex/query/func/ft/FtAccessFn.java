@@ -26,12 +26,21 @@ abstract class FtAccessFn extends StandardFunc {
    */
   final FTOpt ftOpt(final FtIndexOptions opts, final QueryContext qc) throws QueryException {
     final FTOpt opt = new FTOpt();
-    opt.set(FZ, opts.get(FtIndexOptions.FUZZY));
+    opt.set(FZ, opts.get(FtFuzzyOptions.FUZZY));
     opt.set(WC, opts.get(FtIndexOptions.WILDCARDS));
     if(opt.is(FZ) && opt.is(WC)) throw FT_OPTIONS.get(info, this);
-    opt.errors = opts.contains(FtIndexOptions.ERRORS) ? opts.get(FtIndexOptions.ERRORS) :
-      qc.context.options.get(MainOptions.LSERROR);
+    opt.errors = opts.contains(FtFuzzyOptions.ERRORS) ? opts.get(FtFuzzyOptions.ERRORS) :
+      errors(qc);
     return opt;
+  }
+
+  /**
+   * Returns the default number of tolerated Levenshtein errors.
+   * @param qc query context
+   * @return errors
+   */
+  static int errors(final QueryContext qc) {
+    return qc.context.options.get(MainOptions.LSERROR);
   }
 
   /**
