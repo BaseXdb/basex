@@ -118,44 +118,80 @@ function dba:logs(
 };
 
 (:~
- : Returns a log entry table.
- : @param  $input  search input
- : @param  $date   name of selected log files
- : @param  $sort   table sort key
- : @param  $page   current page
- : @param  $time   timestamp to highlight
- : @return html elements
+ : Sends a log entry table to the client.
+ : @param  $message  message
  :)
 declare
-  %rest:POST('{$input}')
-  %rest:path('/dba/logs')
-  %rest:query-param('date',   '{$date}')
-  %rest:query-param('sort',   '{$sort}', 'time')
-  %rest:query-param('page',   '{$page}', '1')
-  %rest:query-param('time',   '{$time}')
-  %rest:query-param('ignore', '{$ignore}')
-  %output:method('html')
-  %rest:single
-function dba:log(
-  $input   as xs:string?,
-  $date    as xs:string,
-  $sort    as xs:string,
-  $page    as xs:string,
-  $time    as xs:string?,
-  $ignore  as xs:string?
-) as element()+ {
-  (: reject invalid search expressions :)
-  let $filters := map:merge(
-    for $column in $dba:COLUMNS
-    let $value := request:parameter('f-' || $column?key)[.]
-    where exists($value)
-    return { $column?key: $value }
-  )
+  %ws:message('/dba/logs', '{$message}')
+function dba:ws-message(
+  $message  as xs:string
+) as empty-sequence() {
+  let $json := parse-json($message)
+  let $run := xs:integer($json?run)
+  let $filters := $json?filters otherwise {}
+  (: an expression is incomplete while it is being typed: report it, do not raise it :)
   let $error := head(
-    ($input[.], $filters?*) ! (try { void(analyze-string('', .)) } catch * { $err:description })
+    ($json?input[.], $filters?*) ! (try { void(analyze-string('', .)) } catch * { $err:description })
   )
-  return if ($error) then web:error(400, $error) else
+  return if ($error) {
+    utils:ws-send({ 'type': 'error', 'run': $run, 'message': $error })
+  } else {
+    (: searching a large log file takes time: stop a search that is superseded by this one :)
+    utils:ws-stop(),
+    let $id := job:eval(xs:anyURI('logs-eval.xq'), {
+      'input' : $json?input,
+      'date'  : $json?date,
+      'sort'  : $json?sort[.] otherwise 'time',
+      'page'  : xs:integer($json?page),
+      'time'  : $json?time,
+      'ignore': $json?ignore,
+      'filters': $filters
+    }, { 'cache': true() })
+    return utils:ws-start($id, $run, { 'method': 'html' })
+  }
+};
 
+(:~
+ : Stops a running search if the connection is closed.
+ :)
+declare
+  %ws:close('/dba/logs')
+function dba:ws-close() as empty-sequence() {
+  utils:ws-stop()
+};
+
+(:~
+ : Reports an error to the client.
+ : @param  $message  error message
+ :)
+declare
+  %ws:error('/dba/logs', '{$message}')
+function dba:ws-error(
+  $message  as xs:string
+) as empty-sequence() {
+  utils:ws-error('Logs', $message)
+};
+
+(:~
+ : Returns a log entry table.
+ : @param  $input    search input
+ : @param  $date     name of selected log files
+ : @param  $sort     table sort key
+ : @param  $page     current page
+ : @param  $time     timestamp to highlight
+ : @param  $ignore   regular expression of entries to hide
+ : @param  $filters  column filters
+ : @return html elements
+ :)
+declare function dba:entries(
+  $input    as xs:string?,
+  $date     as xs:string,
+  $sort     as xs:string,
+  $page     as xs:integer,
+  $time     as xs:string?,
+  $ignore   as xs:string?,
+  $filters  as map(*)
+) as element()+ {
   let $entries := (
     let $regex-string := matches($input, '[+*?^$(){}|\[\]\\]')
     let $terms := if ($regex-string) then $input else tokenize($input)
@@ -231,7 +267,7 @@ function dba:log(
     }
   }
   let $options := {
-    'sort': $sort, 'presort': 'time', 'page': xs:integer($page), 'filters': $filter-row
+    'sort': $sort, 'presort': 'time', 'page': $page, 'filters': $filter-row
   }
   return html:table($dba:COLUMNS, $entries, (), $params, $options)
 };

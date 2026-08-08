@@ -8,33 +8,45 @@ module namespace dba = 'dba/databases';
 import module namespace utils = 'dba/utils' at '../../lib/utils.xqm';
 
 (:~
- : Runs a query on a document and returns the result as string.
- : @param  $query     query
- : @param  $name      name of database
- : @param  $resource  resource
- : @return result string
+ : Runs a query on a database resource and sends the result to the client.
+ : @param  $message  message
  :)
 declare
-  %rest:POST('{$query}')
-  %rest:path('/dba/db-query')
-  %rest:query-param('name',     '{$name}')
-  %rest:query-param('resource', '{$resource}')
-  %rest:single
-  %output:method('text')
-function dba:db-query(
-  $name      as xs:string,
-  $resource  as xs:string,
-  $query     as xs:string?
-) as xs:string {
-  utils:query(
-    $query[.] otherwise '.',
-    let $type := db:type($name, $resource)
-    return head(if ($type = 'xml') {
-      db:get($name, $resource)
-    } else if ($type = 'binary') {
-      db:get-binary($name, $resource)
-    } else {
-      db:get-value($name, $resource)
-    })
+  %ws:message('/dba/db-query', '{$message}')
+function dba:ws-message(
+  $message  as xs:string
+) as empty-sequence() {
+  let $json := parse-json($message)
+  let $run := xs:integer($json?run)
+  return (
+    (: a query on a large resource takes time: stop one that is superseded by this one :)
+    utils:ws-stop(),
+    let $id := job:eval(xs:anyURI('db-query-eval.xq'), {
+      'name'    : $json?name,
+      'resource': $json?resource,
+      'query'   : $json?query
+    }, map:put(utils:job-options(), 'cache', true()))
+    return utils:ws-start($id, $run, utils:serialize-options($json?indent = true()))
   )
+};
+
+(:~
+ : Stops a running query if the connection is closed.
+ :)
+declare
+  %ws:close('/dba/db-query')
+function dba:ws-close() as empty-sequence() {
+  utils:ws-stop()
+};
+
+(:~
+ : Reports an error to the client.
+ : @param  $message  error message
+ :)
+declare
+  %ws:error('/dba/db-query', '{$message}')
+function dba:ws-error(
+  $message  as xs:string
+) as empty-sequence() {
+  utils:ws-error('Databases', $message)
 };

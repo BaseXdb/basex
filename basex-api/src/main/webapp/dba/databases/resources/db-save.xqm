@@ -20,7 +20,6 @@ declare
   %rest:query-param('name',     '{$name}')
   %rest:query-param('resource', '{$resource}')
   %rest:query-param('indent',   '{$indent}')
-  %rest:single
   %output:method('text')
 function dba:db-save(
   $name      as xs:string,

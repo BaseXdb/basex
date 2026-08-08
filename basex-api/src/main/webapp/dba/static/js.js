@@ -3,11 +3,8 @@ let _editor;
 /** Link to the CodeMirror output component. */
 let _output;
 
-/** Promise of (latest) running query. */
-let _running;
-
-/** Connection to the editor endpoint (promise, resolved with an open WebSocket). */
-let _socket;
+/** Connections to the WebSocket endpoints, by path (promises, resolved with open WebSockets). */
+const _sockets = {};
 /** Number of the last query that was started in the editor panel. */
 let _run = 0;
 /** Number of the query whose outcome is awaited (0: none). */
@@ -15,8 +12,6 @@ let _pending = 0;
 
 /** Most recent log entry search state. */
 let _logInput;
-/** Most recent log filter string. */
-let _dbInput;
 
 /** Content panels of the current page, in grid track order. */
 let _panels = [];
@@ -29,11 +24,13 @@ let _resourceEditable;
 let _resourceNote;
 /** Cached raw document; undefined if it must be requested again. */
 let _resourceSaved;
+/** Search input and indent preference of the pending resource request. */
+let _resource;
 
-/** Longest query that is accepted by the editor endpoint.
+/** Longest message that is accepted by the WebSocket endpoints.
     Kept well below the 'maxTextMessageSize' of the WebSocket servlet (see web.xml), which also
-    needs to accommodate the UTF-8 encoding and the JSON escaping of the query. */
-const MAX_QUERY_LENGTH = 1000000;
+    needs to accommodate the UTF-8 encoding of the message. */
+const MAX_MESSAGE_LENGTH = 1000000;
 
 /** Link to the resizer area. */
 let _resizer;
@@ -244,59 +241,29 @@ async function request(url, data) {
   throw { status: response.status, statusText: response.statusText, responseText: text };
 }
 
-/**
- * Runs a query and shows the result.
- * @param {string} path URL path
- * @param {string} query query to be evaluated
- * @param {boolean} reset reset query
- */
-function query(path, query, reset) {
-  let url = path;
-  for(const name of [ "name", "date", "resource", "sort", "time", "page", "ignore" ]) {
-    const value = document.getElementById(name)?.value;
-    if(value && (name !== "page" || value !== 1 && !reset)) {
-      url += `${url === path ? "?" : "&"}${name}=${encodeURIComponent(value)}`;
-    }
-  }
-  const filters = document.querySelectorAll("input.filter");
-  if(filters.length) {
-    for(const input of filters) {
-      const value = input.value.trim();
-      if(value) url += `${url === path ? "?" : "&"}${input.name}=${encodeURIComponent(value)}`;
-    }
-  } else {
-    // initial rendering: filter fields do not exist yet, take values from page URL
-    for(const [name, value] of new URL(window.location.href).searchParams) {
-      if(name.startsWith("f-") && value) {
-        url += `${url === path ? "?" : "&"}${name}=${encodeURIComponent(value)}`;
-      }
-    }
-  }
-  // output indentation is a client-side preference (see the 'Indent' checkbox)
-  if(indentOn()) url += `${url === path ? "?" : "&"}indent=true`;
-  return request(url, query);
-}
 
 /**
- * Returns the connection to the editor endpoint, and opens it if required.
+ * Returns the connection to the specified endpoint, and opens it if required.
+ * @param {string} path path, relative to the WebSocket root
  * @returns {promise} promise, resolved with an open WebSocket
  */
-function editorSocket() {
-  if(!_socket) {
-    _socket = new Promise((resolve, reject) => {
+function socket(path) {
+  if(!_sockets[path]) {
+    _sockets[path] = new Promise((resolve, reject) => {
       const scheme = location.protocol === "https:" ? "wss" : "ws";
-      const socket = new WebSocket(`${scheme}://${location.host}/ws/dba`);
-      socket.onopen = () => resolve(socket);
-      socket.onmessage = event => showMessage(event.data);
+      const ws = new WebSocket(`${scheme}://${location.host}/ws/dba${path}`);
+      ws.onopen = () => resolve(ws);
+      // the endpoint determines how a result is displayed; the server does not label it
+      ws.onmessage = event => showMessage(path, event.data);
       // a refused handshake and a lost connection both invalidate the cached promise,
-      // so that the next run opens a new one
-      socket.onerror = () => {
-        _socket = undefined;
+      // so that the next message opens a new one
+      ws.onerror = () => {
+        delete _sockets[path];
         reject(new Error("No connection to the server. " +
           "If you use a proxy server, check if WebSockets are enabled."));
       };
-      socket.onclose = () => {
-        _socket = undefined;
+      ws.onclose = () => {
+        delete _sockets[path];
         if(_pending) {
           _pending = 0;
           setDisabled("stop", true);
@@ -305,20 +272,29 @@ function editorSocket() {
       };
     });
   }
-  return _socket;
+  return _sockets[path];
 }
 
 /**
- * Sends a message to the editor endpoint.
+ * Sends a message to a WebSocket endpoint.
+ * @param {string} path path, relative to the WebSocket root
  * @param {object} message message to be sent
  * @returns {promise} promise, resolved with true if the message was sent
  */
-async function sendMessage(message) {
+async function sendMessage(path, message) {
+  // the server closes the connection without a response if a message exceeds its size limit
+  const string = JSON.stringify(message);
+  if(string.length > MAX_MESSAGE_LENGTH) {
+    _pending = 0;
+    showError(`Input is too long (maximum: ${MAX_MESSAGE_LENGTH} characters).`);
+    return false;
+  }
   try {
-    (await editorSocket()).send(JSON.stringify(message));
+    (await socket(path)).send(string);
     return true;
   } catch(ex) {
-    showError({ status: 0, statusText: "", responseText: ex.message });
+    _pending = 0;
+    showError(ex.message);
     return false;
   }
 }
@@ -334,20 +310,21 @@ async function runQuery() {
   setDisabled("stop", true);
   setText("", "");
 
-  // the server closes the connection without a response if a message exceeds its size limit
-  const queryString = document.getElementById("editor").value;
-  if(queryString.length > MAX_QUERY_LENGTH) {
-    setText(`Query is too long (maximum: ${MAX_QUERY_LENGTH} characters).`, "error");
-    return;
-  }
+  const run = _pending = ++_run;
+  if(!await sendMessage("", {
+    type: "run",
+    run: run,
+    query: document.getElementById("editor").value,
+    indent: indentOn()
+  })) return;
+  awaitResult(run);
+}
 
-  const run = ++_run;
-  _pending = run;
-  if(!await sendMessage({ type: "run", run: run, query: queryString, indent: indentOn() })) {
-    _pending = 0;
-    return;
-  }
-  // report and offer to stop a query that takes longer
+/**
+ * Reports a request that takes longer, and offers to stop it.
+ * @param {number} run number of the run
+ */
+function awaitResult(run) {
   setTimeout(() => {
     if(_pending === run) {
       setText("Please wait…", "warning");
@@ -366,50 +343,40 @@ async function stopQuery() {
   // drop the number of the run: the result of the stopped query will be ignored
   _pending = 0;
   setDisabled("stop", true);
-  await sendMessage({ type: "stop" });
+  await sendMessage("", { type: "stop" });
 }
 
 /**
- * Shows the outcome of a query that was pushed by the server.
+ * Shows a message that was pushed by the server.
+ * @param {string} path path of the endpoint that pushed the message
  * @param {string} data JSON message
  */
-function showMessage(data) {
+function showMessage(path, data) {
   const json = JSON.parse(data);
-  // messages without a run are not bound to a query: they must not end the one that is running
+  // messages without a run are not bound to a request: they must not end the running one
   if(json.type === "stopped") {
     setText("Query was stopped.", "warning");
   } else if(json.run === undefined) {
-    showError({ status: 0, statusText: "", responseText: json.message });
+    showError(json.message);
   } else if(json.run === _pending) {
-    // drop the outcome of a query that was stopped or superseded by a newer one
+    // drop the outcome of a request that was stopped or superseded by a newer one
     _pending = 0;
     setDisabled("stop", true);
-    if(json.type === "result") {
-      showResult(json.result);
+    if(json.type !== "result") {
+      showError(json.message, undefined, json);
+    } else if(path === "/logs") {
+      showLogEntries(json.result);
+    } else if(path === "/db-query") {
+      showResourceResult(json.result);
     } else {
-      showError({ status: 0, statusText: "", responseText: json.message }, undefined, json);
+      showResult(json.result);
     }
   }
 }
 
 /**
- * Registers the promise.
- * @param {promise} self reference to promise
- */
-function register(self) {
-  _running = self;
-  setTimeout(() => {
-    if(self === _running) {
-      setText("Please wait…", "warning");
-      const stop = document.getElementById("stop");
-      if(stop) stop.disabled = false;
-    }
-  }, 500);
-}
-
-/**
  * Displays an error message.
- * @param {response} response HTTP response
+ * @param {response|string} response HTTP response, or an error message
  * @param {string} info optional info
  * @param {object} position optional error position ({ line, column })
  */
@@ -417,7 +384,8 @@ function showError(response, info, position) {
   if(response.status === 460) return;
 
   // normalize error message
-  let msg = response.statusText.match(/\[\w+\]/g) ? response.statusText : response.responseText;
+  let msg = typeof response === "string" ? response :
+    response.statusText.match(/\[\w+\]/g) ? response.statusText : response.responseText;
   const match = info ? null : msg.match(/(\d+)\/(\d+):/);
   const line = position?.line ?? match?.[1], column = position?.column ?? match?.[2];
   // isolate the error-code line ([XPST0003] …, [db:get] …); match a real code, not any '[' in the text
@@ -466,7 +434,7 @@ function showResult(text) {
  * Queries the entries of the current log file.
  * @param {string} key typed key
  */
-async function logEntries(key) {
+function logEntries(key) {
   const reset = key && key !== "Enter";
   const input = document.getElementById("input").value.trim();
   const ignore = document.getElementById("ignore")?.value.trim() ?? "";
@@ -474,32 +442,52 @@ async function logEntries(key) {
   const state = [ input, ignore, ...[...filters].map(f => f.value.trim()) ].join("\u0000");
   if(reset && _logInput === state) return false;
   _logInput = state;
-  try {
-    const text = await query("logs", input, reset);
-    setText("", "");
-    // preserve focus and caret of a filter field across the table refresh
-    const active = document.activeElement;
-    const focused = active?.matches("input.filter") && active;
-    document.getElementById("output").innerHTML = text;
-    markTruncated();
-    const e = document.getElementById(window.location.hash.replace(/^#/, ""));
-    if(e) e.scrollIntoView();
-    if(focused) {
-      const filter = document.querySelector(`input.filter[name="${focused.name}"]`);
-      if(filter) {
-        filter.value = focused.value;
-        filter.focus();
-        filter.setSelectionRange(focused.selectionStart, focused.selectionEnd);
-      }
+
+  const message = {
+    type: "entries",
+    input: input,
+    ignore: ignore,
+    date: document.getElementById("date").value,
+    sort: document.getElementById("sort").value,
+    page: reset ? 1 : Number(document.getElementById("page").value) || 1,
+    time: document.getElementById("time").value,
+    filters: {}
+  };
+  for(const filter of filters) {
+    const value = filter.value.trim();
+    if(value) message.filters[filter.name.replace(/^f-/, "")] = value;
+  }
+  // the server stops a search that is superseded by a newer one
+  message.run = _pending = ++_run;
+  sendMessage("/logs", message);
+
+  // refresh browser history
+  let href = replaceParam(window.location.href, "input", input);
+  for(const filter of filters) href = replaceParam(href, filter.name, filter.value.trim());
+  if(reset) href = replaceParam(href, "page", 1);
+  window.history.replaceState(null, "", href);
+}
+
+/**
+ * Shows the log entries that were pushed by the server.
+ * @param {string} text HTML table
+ */
+function showLogEntries(text) {
+  setText("", "");
+  // preserve focus and caret of a filter field across the table refresh
+  const active = document.activeElement;
+  const focused = active?.matches("input.filter") && active;
+  document.getElementById("output").innerHTML = text;
+  markTruncated();
+  const e = document.getElementById(window.location.hash.replace(/^#/, ""));
+  if(e) e.scrollIntoView();
+  if(focused) {
+    const filter = document.querySelector(`input.filter[name="${focused.name}"]`);
+    if(filter) {
+      filter.value = focused.value;
+      filter.focus();
+      filter.setSelectionRange(focused.selectionStart, focused.selectionEnd);
     }
-    if(reset) window.history.replaceState(null, "", replaceParam(window.location.href, "page", 1));
-  } catch(response) {
-    showError(response);
-  } finally {
-    // refresh browser history
-    let href = replaceParam(window.location.href, "input", input);
-    for(const filter of filters) href = replaceParam(href, filter.name, filter.value.trim());
-    window.history.replaceState(null, "", href);
   }
 }
 
@@ -550,52 +538,48 @@ function logFilter() {
  * Shows a database resource in the editor: the document, raw or indented, or a query result.
  * @param {boolean} enforce enforce execution
  */
-async function queryResource(enforce) {
-  const input = document.getElementById("input").value.trim();
+function queryResource(enforce) {
+  const input = document.getElementById("input")?.value.trim() ?? "";
   const indent = indentOn();
   // re-run whenever the query or the indent preference changes
-  const state = input + " " + indent;
-  if(!enforce && _dbInput === state) return false;
-  _dbInput = state;
+  if(!enforce && _resource?.input === input && _resource?.indent === indent) return false;
+  // remember what was requested: the reply is evaluated when it arrives
+  _resource = { input: input, indent: indent };
 
   // no query: show the document, raw or indented. only the raw one is cached
-  if(!input) {
-    if(!indent && _resourceSaved !== undefined) {
-      showResource(_resourceSaved);
-      return;
-    }
-    // block edits until the document has been received
-    editResource(false);
-
-    const self = query("db-query", ".");
-    register(self);
-    try {
-      const text = await self;
-      showResource(text);
-      if(!indent) _resourceSaved = text;
-    } catch(response) {
-      showError(response);
-    } finally {
-      if(self === _running) _running = undefined;
-    }
+  if(!input && !indent && _resourceSaved !== undefined) {
+    showResource(_resourceSaved);
     return;
   }
-
-  // a query result is read-only
+  // block edits until the result has been received; a query result is read-only
   editResource(false);
-  if(_resourceEditable) {
+  if(input && _resourceEditable) {
     showNote("Read-only: query result. Clear the query to edit the document again.");
   }
 
-  const self = query("db-query", input);
-  register(self);
-  try {
-    _editor.setValue(await self);
+  const run = _pending = ++_run;
+  sendMessage("/db-query", {
+    type: "query",
+    run: run,
+    name: document.getElementById("name").value,
+    resource: document.getElementById("resource").value,
+    query: input || ".",
+    indent: indent
+  });
+  awaitResult(run);
+}
+
+/**
+ * Shows the resource or query result that was pushed by the server.
+ * @param {string} text result
+ */
+function showResourceResult(text) {
+  if(_resource.input) {
+    _editor.setValue(text);
     setText("Query was successful.", "info");
-  } catch(response) {
-    showError(response);
-  } finally {
-    if(self === _running) _running = undefined;
+  } else {
+    showResource(text);
+    if(!_resource.indent) _resourceSaved = text;
   }
 }
 

@@ -2,24 +2,15 @@ package org.basex.http.dba;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.concurrent.*;
-
 import org.junit.jupiter.api.*;
 
 /**
  * Tests for the WebSocket endpoint of the DBA editor.
- * Naming note: the JDK client type {@link java.net.http.WebSocket} collides with
- * BaseX's {@link org.basex.http.ws.WebSocket}; we therefore use the fully-qualified
- * name {@code java.net.http.WebSocket} throughout this file.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class QueryTest extends DBATest {
-  /** Messages pushed by the server. */
-  private final BlockingQueue<String> messages = new LinkedBlockingQueue<>();
-  /** Connection to the editor endpoint. */
-  private java.net.http.WebSocket socket;
   /** Number of the last run. */
   private int run;
 
@@ -27,31 +18,8 @@ public final class QueryTest extends DBATest {
    * Opens the connection.
    * @throws Exception exception
    */
-  @BeforeEach public void connect() throws Exception {
-    socket = socket("/dba", new java.net.http.WebSocket.Listener() {
-      /** Accumulator for text frame parts. */
-      private final StringBuilder buffer = new StringBuilder();
-
-      @Override
-      public CompletionStage<?> onText(final java.net.http.WebSocket ws, final CharSequence data,
-          final boolean last) {
-        buffer.append(data);
-        if(last) {
-          messages.add(buffer.toString());
-          buffer.setLength(0);
-        }
-        ws.request(1);
-        return null;
-      }
-    });
-  }
-
-  /**
-   * Closes the connection.
-   * @throws Exception exception
-   */
-  @AfterEach public void disconnect() throws Exception {
-    socket.sendClose(java.net.http.WebSocket.NORMAL_CLOSURE, "bye").get(5, TimeUnit.SECONDS);
+  @BeforeEach public void open() throws Exception {
+    connect("");
   }
 
   /**
@@ -125,10 +93,11 @@ public final class QueryTest extends DBATest {
    * @throws Exception exception
    */
   @Test public void stopped() throws Exception {
-    send("{ \"type\": \"run\", \"run\": 1, \"query\": \"prof:sleep(10000)\", \"indent\": false }");
-    send("{ \"type\": \"stop\" }");
+    sendMessage("{ \"type\": \"run\", \"run\": 1, \"query\": \"prof:sleep(10000)\"," +
+        " \"indent\": false }");
+    sendMessage("{ \"type\": \"stop\" }");
     // removing the job releases the waiting one, so the order of the two messages is undefined
-    final String messages = poll() + poll();
+    final String messages = pollMessage() + pollMessage();
     assertTrue(messages.contains("{\"type\":\"stopped\"}"), messages);
     assertTrue(messages.contains("{\"type\":\"result\",\"run\":1,\"result\":\"\"}"), messages);
   }
@@ -140,28 +109,8 @@ public final class QueryTest extends DBATest {
    * @throws Exception exception
    */
   private String evaluate(final String query) throws Exception {
-    send("{ \"type\": \"run\", \"run\": " + ++run + ", \"query\": \"" +
+    sendMessage("{ \"type\": \"run\", \"run\": " + ++run + ", \"query\": \"" +
         query.replace("\\", "\\\\").replace("\"", "\\\"") + "\", \"indent\": false }");
-    return poll();
-  }
-
-  /**
-   * Sends a message to the server.
-   * @param message message
-   * @throws Exception exception
-   */
-  private void send(final String message) throws Exception {
-    socket.sendText(message, true).get(5, TimeUnit.SECONDS);
-  }
-
-  /**
-   * Returns the next message pushed by the server.
-   * @return message
-   * @throws Exception exception
-   */
-  private String poll() throws Exception {
-    final String message = messages.poll(15, TimeUnit.SECONDS);
-    assertNotNull(message, "No message received within timeout.");
-    return message;
+    return pollMessage();
   }
 }

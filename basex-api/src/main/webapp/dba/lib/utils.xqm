@@ -7,6 +7,9 @@ module namespace utils = 'dba/utils';
 
 import module namespace config = 'dba/config' at 'config.xqm';
 
+(:~ WebSocket attribute: id of the job that runs for the current connection. :)
+declare %private variable $utils:JOB := 'dba-job';
+
 (:~ Regular expression for backups. :)
 declare variable $utils:BACKUP-REGEX := '^(.*)-(\d{4}-\d\d-\d\d)-(\d\d)-(\d\d)-(\d\d)$';
 (:~ Regular expression for backups. :)
@@ -30,38 +33,84 @@ declare function utils:query-parse(
 };
 
 (:~
- : Evaluates a query and returns the result.
- : @param  $query    query string
- : @param  $context  initial context item (can be empty)
- : @return serialized result of query
- :)
-declare function utils:query(
-  $query    as xs:string,
-  $context  as item()?
-) as xs:string {
-  let $bindings := $context ! { '': . }
-  let $result := xquery:eval($query, $bindings, utils:query-options())
-  return utils:serialize($result)
-};
-
-(:~
  : Serializes a value, considering the specified system limits.
  : @param  $value   value
  : @param  $indent  indent output
  : @return string
  :)
 declare function utils:serialize(
-  $value   as item()*,
-  $indent  as xs:boolean := request:parameter('indent') = 'true'
+  $value  as item()*
 ) as xs:string {
-  let $limit := config:get($config:MAXCHARS)
+  utils:chop(serialize($value, utils:serialize-options(false())), config:get($config:MAXCHARS))
+};
+
+(:~
+ : Returns the parameters for serializing a query result.
+ : @param  $indent  indent output
+ : @return serialization parameters
+ :)
+declare function utils:serialize-options(
+  $indent  as xs:boolean
+) as map(*) {
   (: serialize more characters than requested, because limit represents number of bytes :)
-  let $string := serialize($value, {
-    'limit' : $limit * 2 + 1,
+  {
+    'limit' : config:get($config:MAXCHARS) * 2 + 1,
     'indent': $indent,
     'method': 'basex'
-  })
-  return utils:chop($string, $limit)
+  }
+};
+
+(:~
+ : Sends a message to the client of the current WebSocket connection.
+ : @param  $message  message
+ :)
+declare function utils:ws-send(
+  $message  as map(*)
+) as empty-sequence() {
+  ws:send(serialize($message, { 'method': 'json' }), ws:id())
+};
+
+(:~
+ : Logs an error of a WebSocket connection and reports it to the client.
+ : @param  $category  category of the connection
+ : @param  $message   error message
+ :)
+declare function utils:ws-error(
+  $category  as xs:string,
+  $message   as xs:string
+) as empty-sequence() {
+  admin:write-log($category || ': ' || $message, 'DBA'),
+  utils:ws-send({ 'type': 'error', 'message': $message })
+};
+
+(:~
+ : Registers a job for the current connection and starts a job that pushes its outcome.
+ : @param  $id       id of the job to wait for
+ : @param  $run      number of the run (echoed to the client, which drops outdated results)
+ : @param  $options  serialization parameters
+ :)
+declare function utils:ws-start(
+  $id       as xs:string,
+  $run      as xs:integer,
+  $options  as map(*)
+) as empty-sequence() {
+  ws:set(ws:id(), $utils:JOB, $id),
+  void(ws:eval(xs:anyURI('ws-eval.xq'), {
+    'id'     : $id,
+    'run'    : $run,
+    'options': $options
+  }, { 'serializer': { 'method': 'json' } }))
+};
+
+(:~
+ : Stops the job that runs for the current connection.
+ :)
+declare function utils:ws-stop() as empty-sequence() {
+  for $id in ws:get(ws:id(), $utils:JOB)
+  return (
+    ws:delete(ws:id(), $utils:JOB),
+    job:remove($id)
+  )
 };
 
 (:~
@@ -75,14 +124,6 @@ declare function utils:job-options() as map(*) {
     'permission': config:get($config:PERMISSION),
     'base-uri'  : config:edited-file() otherwise config:editor-dir()
   }
-};
-
-(:~
- : Returns the options for evaluating a query.
- : @return options
- :)
-declare %private function utils:query-options() as map(*) {
-  map:put(utils:job-options(), 'pass', true())
 };
 
 (:~
