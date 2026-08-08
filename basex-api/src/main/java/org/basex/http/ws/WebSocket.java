@@ -2,6 +2,7 @@ package org.basex.http.ws;
 
 import java.nio.*;
 import java.util.concurrent.*;
+import java.util.function.*;
 
 import org.basex.core.*;
 import org.basex.core.users.*;
@@ -192,8 +193,9 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
    * Finds a function and processes it.
    * @param ann annotation
    * @param message message (can be {@code null}; otherwise string, byte array or close info)
+   * @return {@code false} if the function raised an error
    */
-  private void findAndProcess(final Annotation ann, final Object message) {
+  private boolean findAndProcess(final Annotation ann, final Object message) {
     // check if an HTTP session exists, and if it still valid
     try {
       if(session != null) session.getCreationTime();
@@ -206,11 +208,13 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
       // find function to evaluate
       final WsFunction func = WebModules.get(context).websocket(this, ann);
       if(func != null) new WsResponse(this).create(func, message, true);
+      return true;
     } catch(final Exception ex) {
-      // an error raised by the error handler itself must not be dispatched again
-      // (an error handler that starts a failing job re-enters via ws:eval and still loops)
-      if(ann == Annotation._WS_ERROR) log(ex);
+      if(ann == Annotation._WS_ERROR) {
+        context.log.write(LogType.ERROR, message(ex), null, context);
+      }
       else error(ex);
+      return false;
     }
   }
 
@@ -219,21 +223,20 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
    * @param th error
    */
   public void error(final Throwable th) {
-    findAndProcess(Annotation._WS_ERROR, log(th));
+    final String msg = message(th);
+    run("[WS-ERROR] " + requestCtx.state().url() + ": " + msg, null,
+        () -> findAndProcess(Annotation._WS_ERROR, msg));
   }
 
   /**
-   * Logs an error.
+   * Returns the message of an error.
    * @param th error
    * @return error message
    */
-  private String log(final Throwable th) {
+  private static String message(final Throwable th) {
     Util.debug(th);
-    final String detail = th.getMessage();
-    final String msg = detail != null ? detail : Util.message(th);
-    context.log.write(LogType.ERROR,
-        "[WS-ERROR] " + requestCtx.state().url() + ": " + msg, null, context);
-    return msg;
+    final String msg = th.getMessage();
+    return msg != null ? msg : Util.message(th);
   }
 
   /**
@@ -242,15 +245,19 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
    * @param status close status (can be {@code null})
    * @param func function to be run
    */
-  private void run(final String info, final Integer status, final Runnable func) {
+  private void run(final String info, final Integer status, final BooleanSupplier func) {
     context.log.write(LogType.REQUEST, info, null, context);
     final Performance perf = new Performance();
+    final boolean ok;
     try {
-      func.run();
+      ok = func.getAsBoolean();
     } catch(final Exception ex) {
       context.log.write(LogType.ERROR, "", perf, context);
       throw ex;
     }
-    context.log.write(status != null ? status : LogType.OK, null, perf, context);
+    // a handler that raised an error has logged it; the request must not be reported as OK
+    Object type = LogType.ERROR;
+    if(ok) type = status != null ? status : LogType.OK;
+    context.log.write(type, null, perf, context);
   }
 }

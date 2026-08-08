@@ -194,6 +194,31 @@ public final class WsLifecycleTest extends WsTest {
   }
 
   /**
+   * A transport error is dispatched to {@code %ws:error}. A message beyond the size limit is
+   * the one such failure a test can provoke; the connection is closed, so the side effect is
+   * observed via the cache.
+   * @throws Exception exception
+   */
+  @Test public void transportError() throws Exception {
+    putCache("ws-transport-error", "");
+    register(
+        "declare %ws:message('/e', '{$m}') function m:msg($m) { () };" +
+        "declare %ws:error('/e', '{$m}') function m:err($m) {" +
+        "  cache:put('ws-transport-error', 'caught') };");
+
+    final Listener l = new Listener();
+    final java.net.http.WebSocket ws = connect("/e", l);
+    try {
+      // the default limit is 64 KB (see the maxTextMessageSize servlet parameter)
+      ws.sendText("x".repeat(100000), true).get(5, TimeUnit.SECONDS);
+    } catch(final Exception ignore) {
+      // the server drops the connection; the send may fail
+      Util.debug(ignore);
+    }
+    awaitCache("ws-transport-error", "caught");
+  }
+
+  /**
    * A query that is started with {@code ws:eval} and fails is dispatched to {@code %ws:error}.
    * @throws Exception exception
    */
