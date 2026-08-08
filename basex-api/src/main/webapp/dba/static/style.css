@@ -323,9 +323,15 @@ nav .note {
   margin-bottom: 0;
 }
 
-/* read-only reason; emphasized if the shown document is incomplete */
+/* read-only reason; the line is reserved, as it is also assigned by the client.
+   The note labels the field below it, so it keeps the distance small */
+#note {
+  min-height: 1lh;
+  margin-bottom: .2rem;
+}
+/* emphasized if the shown document is incomplete: not an error, so no signal color */
 #note.strong {
-  color: var(--accent);
+  color: var(--fg);
 }
 #note.strong::before {
   content: "\26A0\00a0";
@@ -341,7 +347,8 @@ nav .note {
 
 /* query field above a resource editor */
 .query {
-  margin: var(--space) 0;
+  /* the note above supplies the distance; an input does not collapse its margins */
+  margin: 0 0 var(--space) 0;
 }
 
 /* page content: one grid column per panel, separated by the gap rather than by
