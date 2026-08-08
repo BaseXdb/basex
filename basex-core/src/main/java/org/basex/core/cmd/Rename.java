@@ -67,7 +67,12 @@ public final class Rename extends ACreate {
         final IOFile src = data.meta.file(source, type);
         if(src != null && src.exists()) {
           final IOFile trg = new IOFile(data.meta.dir(type), target);
-          if(!trg.parent().md() || !src.rename(trg)) ok = !info(NAME_INVALID_X, target);
+          if(!trg.parent().md() || !src.rename(trg)) {
+            ok = !info(NAME_INVALID_X, target);
+          } else {
+            // discard directories that have been emptied
+            src.parent().deleteEmpty(data.meta.dir(type));
+          }
           c++;
         }
       }

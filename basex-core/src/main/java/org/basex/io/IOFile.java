@@ -321,6 +321,16 @@ public final class IOFile extends IO {
   }
 
   /**
+   * Deletes this directory and its ancestors as long as they are empty.
+   * @param root root directory that will be preserved
+   */
+  public void deleteEmpty(final IOFile root) {
+    // File.delete removes a directory only if it is empty
+    IOFile dir = this;
+    while(dir != null && !dir.file.equals(root.file) && dir.file.delete()) dir = dir.parent();
+  }
+
+  /**
    * Renames a file to the specified path. The path must not exist yet.
    * @param target target reference
    * @return success flag
@@ -358,6 +368,11 @@ public final class IOFile extends IO {
   @Override
   public boolean equals(final Object obj) {
     return obj instanceof final IOFile iofile && pth.equals(iofile.pth);
+  }
+
+  @Override
+  public int hashCode() {
+    return pth.hashCode();
   }
 
   @Override

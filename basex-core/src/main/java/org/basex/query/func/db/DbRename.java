@@ -45,7 +45,7 @@ public final class DbRename extends DbAccessFn {
         if(src != null && src.exists()) {
           final IOFile trg = new IOFile(data.meta.dir(type), target);
           rename(data, src, trg, qc);
-          updates.add(new DBDelete(data, src, info), qc);
+          updates.add(new DBDelete(data, src, type, info), qc);
         }
       }
     }

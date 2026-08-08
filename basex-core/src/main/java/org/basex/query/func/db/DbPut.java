@@ -50,7 +50,7 @@ public final class DbPut extends DbNew {
         // delete file resources
         for(final ResourceType type : Resources.BINARIES) {
           final IOFile bin = data.meta.file(path, type);
-          if(bin != null) updates.add(new DBDelete(data, bin, info), qc);
+          if(bin != null) updates.add(new DBDelete(data, bin, type, info), qc);
         }
       }
       // delete spare documents

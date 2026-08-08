@@ -570,6 +570,13 @@ public final class DbModuleTest extends SandboxTest {
     execute(new Add("test/docs", FLDR));
     query(func.args(NAME, "test"));
     query("count(" + COLLECTION.args(NAME + "/test") + ")", 0);
+
+    // directories of deleted file resources are removed as well
+    query(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('00')", "binary/dir/binary.data"));
+    query(_DB_PUT_VALUE.args(NAME, " 1", "value/dir/value.data"));
+    query(func.args(NAME, "binary/dir/binary.data"));
+    query(func.args(NAME, "value/dir/value.data"));
+    query(_DB_DIR.args(NAME, "") + "/self::dir", "");
   }
 
   /** Test method. */
@@ -1165,6 +1172,11 @@ public final class DbModuleTest extends SandboxTest {
     query(func.args(NAME, "w", "v"));
     query(_DB_GET_VALUE.args(NAME, "v/value1"), 1);
     query(_DB_GET_VALUE.args(NAME, "v/value2"), 1);
+
+    // emptied directories are removed as well
+    query(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('')", "e1/e2/file6"));
+    query(func.args(NAME, "e1/e2/file6", "file6"));
+    query(_DB_DIR.args(NAME, "") + "/self::dir[. = 'e1']", "");
   }
 
   /** Test method. */

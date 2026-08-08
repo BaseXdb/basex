@@ -58,6 +58,8 @@ public final class Delete extends ACreate {
     if(bin != null && bin.exists()) {
       size += bin.isDir() ? bin.descendants().size() : 1;
       bin.delete();
+      // discard directories that have been emptied
+      bin.parent().deleteEmpty(data.meta.dir(type));
     }
     return size;
   }
