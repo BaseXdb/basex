@@ -3,10 +3,15 @@ let _editor;
 /** Link to the CodeMirror output component. */
 let _output;
 
-/** Type of (latest) running query. */
-let _updating;
 /** Promise of (latest) running query. */
 let _running;
+
+/** Connection to the editor endpoint (promise, resolved with an open WebSocket). */
+let _socket;
+/** Number of the last query that was started in the editor panel. */
+let _run = 0;
+/** Number of the query whose outcome is awaited (0: none). */
+let _pending = 0;
 
 /** Most recent log entry search state. */
 let _logInput;
@@ -24,6 +29,11 @@ let _resourceEditable;
 let _resourceNote;
 /** Cached raw document; undefined if it must be requested again. */
 let _resourceSaved;
+
+/** Longest query that is accepted by the editor endpoint.
+    Kept well below the 'maxTextMessageSize' of the WebSocket servlet (see web.xml), which also
+    needs to accommodate the UTF-8 encoding and the JSON escaping of the query. */
+const MAX_QUERY_LENGTH = 1000000;
 
 /** Shortest an auto-resized editor gets, and its height on stacked layouts. */
 const EDITOR_MIN_HEIGHT = 200;
@@ -249,53 +259,117 @@ function query(path, query, reset) {
 }
 
 /**
- * Evaluates a query in the editor panel.
+ * Returns the connection to the editor endpoint, and opens it if required.
+ * @returns {promise} promise, resolved with an open WebSocket
+ */
+function editorSocket() {
+  if(!_socket) {
+    _socket = new Promise((resolve, reject) => {
+      const scheme = location.protocol === "https:" ? "wss" : "ws";
+      const socket = new WebSocket(`${scheme}://${location.host}/ws/dba`);
+      socket.onopen = () => resolve(socket);
+      socket.onmessage = event => showMessage(event.data);
+      // a refused handshake and a lost connection both invalidate the cached promise,
+      // so that the next run opens a new one
+      socket.onerror = () => {
+        _socket = undefined;
+        reject(new Error("No connection to the server. " +
+          "If you use a proxy server, check if WebSockets are enabled."));
+      };
+      socket.onclose = () => {
+        _socket = undefined;
+        if(_pending) {
+          _pending = 0;
+          setDisabled("stop", true);
+          setText("Connection to the server was lost.", "error");
+        }
+      };
+    });
+  }
+  return _socket;
+}
+
+/**
+ * Sends a message to the editor endpoint.
+ * @param {object} message message to be sent
+ * @returns {promise} promise, resolved with true if the message was sent
+ */
+async function sendMessage(message) {
+  try {
+    (await editorSocket()).send(JSON.stringify(message));
+    return true;
+  } catch(ex) {
+    showError({ status: 0, statusText: "", responseText: ex.message });
+    return false;
+  }
+}
+
+/**
+ * Evaluates a query in the editor panel. The query is sent to the server, which pushes back the
+ * result or the error; see showMessage.
  */
 async function runQuery() {
   if(document.getElementById("run").disabled) return;
   if(_editor) _editor.focus();
 
-  const stop = document.getElementById("stop");
-  stop.disabled = true;
+  setDisabled("stop", true);
   setText("", "");
 
+  // the server closes the connection without a response if a message exceeds its size limit
   const queryString = document.getElementById("editor").value;
-  const self = query("parse", queryString);
-  try {
-    const up = (await self) === "true";
-    // stop a running query of the other kind before switching update/query mode
-    const stopping = _running && up !== _updating ? stopQuery() : Promise.resolve();
-    _updating = up;
-    await stopping;
-
-    register(self);
-    const file = document.getElementById("file");
-    let path = _updating ? "update" : "query";
-    if(file && file.value) path += `?file=${encodeURIComponent(file.value)}`;
-    showResult(await query(path, queryString));
-  } catch(response) {
-    showError(response);
-  } finally {
-    if(self === _running) {
-      stop.disabled = true;
-      _running = undefined;
-    }
+  if(queryString.length > MAX_QUERY_LENGTH) {
+    setText(`Query is too long (maximum: ${MAX_QUERY_LENGTH} characters).`, "error");
+    return;
   }
+
+  const run = ++_run;
+  _pending = run;
+  if(!await sendMessage({ type: "run", run: run, query: queryString, indent: indentOn() })) {
+    _pending = 0;
+    return;
+  }
+  // report and offer to stop a query that takes longer
+  setTimeout(() => {
+    if(_pending === run) {
+      setText("Please wait…", "warning");
+      setDisabled("stop", false);
+    }
+  }, 500);
 }
 
 /**
- * Stops the query that is currently evaluated in the editor panel.
- * @param {boolean} show show info if query was successfully stopped
- * @returns {promise} promise
+ * Stops the query that is currently evaluated in the editor panel. The server confirms the
+ * request with a 'stopped' message; see showMessage.
  */
-async function stopQuery(show) {
+async function stopQuery() {
   if(_editor) _editor.focus();
 
-  await query(_updating ? "update" : "query", "()");
-  _running = undefined;
-  if(show) {
+  // drop the number of the run: the result of the stopped query will be ignored
+  _pending = 0;
+  setDisabled("stop", true);
+  await sendMessage({ type: "stop" });
+}
+
+/**
+ * Shows the outcome of a query that was pushed by the server.
+ * @param {string} data JSON message
+ */
+function showMessage(data) {
+  const json = JSON.parse(data);
+  // messages without a run are not bound to a query: they must not end the one that is running
+  if(json.type === "stopped") {
     setText("Query was stopped.", "warning");
-    document.getElementById("stop").disabled = true;
+  } else if(json.run === undefined) {
+    showError({ status: 0, statusText: "", responseText: json.message });
+  } else if(json.run === _pending) {
+    // drop the outcome of a query that was stopped or superseded by a newer one
+    _pending = 0;
+    setDisabled("stop", true);
+    if(json.type === "result") {
+      showResult(json.result);
+    } else {
+      showError({ status: 0, statusText: "", responseText: json.message }, undefined, json);
+    }
   }
 }
 
@@ -318,13 +392,15 @@ function register(self) {
  * Displays an error message.
  * @param {response} response HTTP response
  * @param {string} info optional info
+ * @param {object} position optional error position ({ line, column })
  */
-function showError(response, info) {
+function showError(response, info, position) {
   if(response.status === 460) return;
 
   // normalize error message
   let msg = response.statusText.match(/\[\w+\]/g) ? response.statusText : response.responseText;
-  const lc = !info && msg.match(/(\d+)\/(\d+):/);
+  const match = info ? null : msg.match(/(\d+)\/(\d+):/);
+  const line = position?.line ?? match?.[1], column = position?.column ?? match?.[2];
   // isolate the error-code line ([XPST0003] …, [db:get] …); match a real code, not any '[' in the text
   const s = msg.search(/\[([A-Z]\w*|[a-z][\w-]*:[\w-]+)\]/), e1 = msg.indexOf("\n", s);
   if(s > -1) msg = msg.substring(s, e1 > s ? e1 : msg.length);
@@ -337,9 +413,9 @@ function showError(response, info) {
 
   // with a line/column and an open editor, make a click on the message jump there
   const el = document.getElementById("info");
-  if(lc && _editor && _editor.setCursor) {
-    el.dataset.line = lc[1];
-    el.dataset.column = lc[2];
+  if(line && _editor && _editor.setCursor) {
+    el.dataset.line = line;
+    el.dataset.column = column;
     el.classList.add("locatable");
   } else {
     delete el.dataset.line;

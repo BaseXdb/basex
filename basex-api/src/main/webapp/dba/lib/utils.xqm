@@ -45,35 +45,36 @@ declare function utils:query(
 };
 
 (:~
- : Runs an updating query.
- : @param  $query  query string
- :)
-declare %updating function utils:update(
-  $query  as xs:string
-) {
-  xquery:eval-update($query, (), utils:query-options()),
-  
-  let $result := update:cache(true())
-  return update:output(utils:serialize($result))
-};
-
-(:~
  : Serializes a value, considering the specified system limits.
- : @param  $value  value
+ : @param  $value   value
+ : @param  $indent  indent output
  : @return string
  :)
 declare function utils:serialize(
-  $value  as item()*
+  $value   as item()*,
+  $indent  as xs:boolean := request:parameter('indent') = 'true'
 ) as xs:string {
-  (: serialize more characters than requested, because limit represents number of bytes :)
   let $limit := config:get($config:MAXCHARS)
-  (: indentation is a client-side preference, sent along with the request :)
+  (: serialize more characters than requested, because limit represents number of bytes :)
   let $string := serialize($value, {
-    'limit': $limit * 2 + 1,
-    'indent': request:parameter('indent') = 'true',
+    'limit' : $limit * 2 + 1,
+    'indent': $indent,
     'method': 'basex'
   })
   return utils:chop($string, $limit)
+};
+
+(:~
+ : Returns the options for running a query as job.
+ : @return options
+ :)
+declare function utils:job-options() as map(*) {
+  {
+    'timeout'   : config:get($config:TIMEOUT),
+    'memory'    : config:get($config:MEMORY),
+    'permission': config:get($config:PERMISSION),
+    'base-uri'  : config:edited-file() otherwise config:editor-dir()
+  }
 };
 
 (:~
@@ -81,13 +82,7 @@ declare function utils:serialize(
  : @return options
  :)
 declare %private function utils:query-options() as map(*) {
-  {
-    'timeout'   : config:get($config:TIMEOUT),
-    'memory'    : config:get($config:MEMORY),
-    'permission': config:get($config:PERMISSION),
-    'base-uri'  : config:edited-file() otherwise config:editor-dir(),
-    'pass'      : true()
-  }
+  map:put(utils:job-options(), 'pass', true())
 };
 
 (:~

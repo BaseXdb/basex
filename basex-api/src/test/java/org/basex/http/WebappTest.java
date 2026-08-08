@@ -10,7 +10,9 @@ import java.net.http.HttpRequest.*;
 import java.net.http.HttpResponse.*;
 import java.nio.charset.*;
 import java.nio.file.*;
+import java.time.*;
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.stream.*;
 
 import org.basex.core.*;
@@ -84,6 +86,21 @@ public abstract class WebappTest extends HTTPTest {
   }
 
   // PROTECTED METHODS ============================================================================
+
+  /**
+   * Opens a WebSocket connection with the session client, so that the handshake carries the
+   * cookies of a login.
+   * @param path path relative to the WebSocket root
+   * @param listener listener
+   * @return WebSocket
+   * @throws Exception exception
+   */
+  protected static java.net.http.WebSocket socket(final String path,
+      final java.net.http.WebSocket.Listener listener) throws Exception {
+    final String url = HTTP_ROOT.replaceFirst("^http", "ws") + "ws" + path;
+    return client.newWebSocketBuilder().connectTimeout(Duration.ofSeconds(10)).
+        buildAsync(URI.create(url), listener).get(10, TimeUnit.SECONDS);
+  }
 
   /**
    * Sends a GET request.

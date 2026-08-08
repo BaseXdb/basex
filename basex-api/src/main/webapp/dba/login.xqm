@@ -34,6 +34,19 @@ function dba:check(
 };
 
 (:~
+ : Permissions: checks the user credentials of a WebSocket handshake.
+ : WebSocket URLs have their own address space, so they are not covered by the check above.
+ : @return error if a user is not logged in
+ :)
+declare
+  %perm:check('/ws/dba')
+function dba:ws-check() as empty-sequence() {
+  if (empty(session:get($config:SESSION-KEY))) {
+    web:error(403, 'Please log in.')
+  }
+};
+
+(:~
  : Login page.
  : @param  $name   username (optional)
  : @param  $error  error string (optional)
