@@ -118,13 +118,7 @@ public final class GUIInstance {
    */
   private static String homeDir(final String[] files) {
     // consider first file: check if it is located in a home directory or one of its descendants
-    if(files.length > 0) {
-      final IOFile parent = new IOFile(files[0]).parent();
-      if(parent != null) {
-        final String home = Prop.homeDir(parent.path());
-        if(home != null) return home;
-      }
-    }
-    return Prop.HOMEDIR;
+    final String home = Prop.homeDir(files.length > 0 ? files[0] : null);
+    return home != null ? home : Prop.HOMEDIR;
   }
 }

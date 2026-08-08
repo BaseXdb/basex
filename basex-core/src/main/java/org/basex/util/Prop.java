@@ -81,8 +81,8 @@ public final class Prop {
 
     // check system property 'org.basex.path'
     String homedir = System.getProperty(PATH);
-    // check if current working directory contains configuration file
-    if(homedir == null) homedir = configDir(System.getProperty("user.dir"));
+    // check if working directory or one of its ancestors contains configuration file
+    if(homedir == null) homedir = homeDir(System.getProperty("user.dir"));
     // check if application directory contains configuration file
     if(homedir == null) homedir = configDir(applicationDir(LOCATION));
     // fallback: choose home directory (linux: check HOME variable, GH-773)
@@ -130,12 +130,12 @@ public final class Prop {
   }
 
   /**
-   * Returns the home directory of the specified directory or of one of its ancestors.
-   * @param path directory path
+   * Returns the home directory of the specified path or of one of its ancestors.
+   * @param path file or directory path (can be {@code null})
    * @return home directory (can be {@code null})
    */
   public static String homeDir(final String path) {
-    for(IOFile io = new IOFile(path); io != null; io = io.parent()) {
+    for(IOFile io = path != null ? new IOFile(path) : null; io != null; io = io.parent()) {
       final String home = configDir(io.path());
       if(home != null) return dir(home);
     }
