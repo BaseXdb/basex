@@ -87,19 +87,15 @@ public final class QueryTest extends DBATest {
   }
 
   /**
-   * A stop request is confirmed. The stopped query has no cached result, so the waiting job
-   * pushes an empty one; the client discards it, as the number of the run does not match the
-   * one it waits for.
+   * A stop request is confirmed. The job that waits for the query result is stopped as well,
+   * so no result is pushed.
    * @throws Exception exception
    */
   @Test public void stopped() throws Exception {
     sendMessage("{ \"type\": \"run\", \"run\": 1, \"query\": \"prof:sleep(10000)\"," +
         " \"indent\": false }");
     sendMessage("{ \"type\": \"stop\" }");
-    // removing the job releases the waiting one, so the order of the two messages is undefined
-    final String messages = pollMessage() + pollMessage();
-    assertTrue(messages.contains("{\"type\":\"stopped\"}"), messages);
-    assertTrue(messages.contains("{\"type\":\"result\",\"run\":1,\"result\":\"\"}"), messages);
+    assertEquals("{\"type\":\"stopped\"}", pollMessage());
   }
 
   /**

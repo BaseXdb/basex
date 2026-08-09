@@ -208,17 +208,15 @@ function dba:action(
       }
     },
     'start': fn($args) {
-      let $id := replace(string($args?file), '\.\.+|/|\\', '')
+      let $file := replace(string($args?file), '\.\.+|/|\\', '')
+      let $id := utils:job-id($file)
       return {
         'page'  : $dba:CAT,
         'params': { 'job': $id },
         'info'  : 'Job was started.',
         'run'   : %updating fn() {
-          (: stop running job before starting new job :)
-          job:remove($id),
-          job:wait($id),
-          void(job:eval(xs:anyURI(config:files-dir() || $id), (),
-            { 'cache': true(), 'id': $id, 'log': 'DBA job' }))
+          void(job:eval(xs:anyURI(config:files-dir() || $file), (),
+            { 'cache': true(), 'id': $id, 'log': 'DBA file' }))
         }
       }
     }

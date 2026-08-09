@@ -35,7 +35,8 @@ function dba:ws-message(
         db:get-value($name, $resource)
       })
       return xquery:eval($query, { '': $context }, { 'pass': true() })
-    }, [ $json?name, $json?resource, $json?query ], utils:job-options())
+    }, [ $json?name, $json?resource, $json?query ],
+      utils:job-options($json?name || '/' || $json?resource))
     return utils:ws-start($id, $run, utils:serialize-options($json?indent = true()))
   )
 };

@@ -146,7 +146,7 @@ function dba:ws-message(
       $json?time,
       $json?ignore,
       $filters
-    ], { 'cache': true() })
+    ], { 'cache': true(), 'id': utils:job-id('logs') })
     return utils:ws-start($id, $run, { 'method': 'html' })
   }
 };

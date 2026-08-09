@@ -84,7 +84,8 @@ declare function utils:ws-error(
 };
 
 (:~
- : Registers a job for the current connection and starts a job that pushes its outcome.
+ : Starts a job that pushes the outcome of a query to the client, and registers both jobs for the
+ : current connection.
  : @param  $id       id of the job to wait for
  : @param  $run      number of the run (echoed to the client, which drops outdated results)
  : @param  $options  serialization parameters
@@ -95,9 +96,9 @@ declare function utils:ws-start(
   $options  as map(*)
 ) as empty-sequence() {
   let $maxchars := config:get($config:MAXCHARS)
-  return (
-    ws:set(ws:id(), $utils:JOB, $id),
-    void(ws:eval(fn() {
+  (: the reader is registered as well: it must be gone before the ID is assigned again :)
+  return ws:set(ws:id(), $utils:JOB, (
+    ws:eval(fn() {
       job:wait($id),
       try {
         let $string := serialize(job:result($id), $options)
@@ -115,32 +116,57 @@ declare function utils:ws-start(
           'column' : $err:column-number
         }
       }
-    }, (), { 'serializer': { 'method': 'json' } }))
+    }, (), { 'serializer': { 'method': 'json' } }),
+    $id
+  ))
+};
+
+(:~
+ : Stops the jobs that run for the current connection.
+ :)
+declare function utils:ws-stop() as empty-sequence() {
+  let $ids := ws:get(ws:id(), $utils:JOB)
+  return (
+    ws:delete(ws:id(), $utils:JOB),
+    (: wait for the jobs to be unregistered before new ones are started :)
+    for $id in $ids
+    return (job:remove($id), job:wait($id))
   )
 };
 
 (:~
- : Stops the job that runs for the current connection.
+ : Returns an ID for a job with the specified label. A counter is appended if a job with the same
+ : name is still registered.
+ : @param  $label  label of the job
+ : @return job ID
  :)
-declare function utils:ws-stop() as empty-sequence() {
-  for $id in ws:get(ws:id(), $utils:JOB)
-  return (
-    ws:delete(ws:id(), $utils:JOB),
-    job:remove($id)
+declare function utils:job-id(
+  $label  as xs:string
+) as xs:string {
+  let $ids := job:list()
+  let $id := 'dba:' || $label
+  (: increase the counter as long as the name is assigned :)
+  return while-do($id,
+    fn { . = $ids },
+    fn($name, $count) { $id || '-' || ($count + 1) }
   )
 };
 
 (:~
  : Returns the options for running a query as job.
+ : @param  $label  label of the job
  : @return options
  :)
-declare function utils:job-options() as map(*) {
+declare function utils:job-options(
+  $label  as xs:string
+) as map(*) {
   {
     'timeout'   : config:get($config:TIMEOUT),
     'memory'    : config:get($config:MEMORY),
     'permission': config:get($config:PERMISSION),
     'base-uri'  : config:edited-file() otherwise config:editor-dir(),
-    'cache'     : true()
+    'cache'     : true(),
+    'id'        : utils:job-id($label)
   }
 };
 
