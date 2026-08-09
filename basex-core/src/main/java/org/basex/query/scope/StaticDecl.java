@@ -1,5 +1,9 @@
 package org.basex.query.scope;
 
+import java.util.*;
+
+import org.basex.query.expr.*;
+import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -16,8 +20,8 @@ public abstract class StaticDecl extends StaticScope {
   /** Annotations. */
   public AnnList anns;
 
-  /** Indicates if code is currently being compiled. */
-  protected boolean dontEnter;
+  /** Cached properties of the expression. */
+  private final EnumMap<Flag, Boolean> props = new EnumMap<>(Flag.class);
 
   /**
    * Constructor.
@@ -42,6 +46,31 @@ public abstract class StaticDecl extends StaticScope {
   @Override
   public final void reset() {
     compiled = false;
+  }
+
+  /**
+   * Checks if the expression of this declaration has one of the specified compiler properties.
+   * @param flags flags
+   * @return result of check
+   * @see Expr#has(Flag...)
+   */
+  protected final boolean check(final Flag... flags) {
+    if(expr == null) return false;
+    // handle recursive references: check which flags have already been assigned
+    final ArrayList<Flag> flgs = new ArrayList<>();
+    for(final Flag flag : flags) {
+      if(!props.containsKey(flag)) {
+        props.put(flag, false);
+        flgs.add(flag);
+      }
+    }
+    // cache flags for remaining, new properties
+    for(final Flag flag : flgs) props.put(flag, expr.has(flag));
+    // evaluate result
+    for(final Flag flag : flags) {
+      if(props.get(flag)) return true;
+    }
+    return false;
   }
 
   /**

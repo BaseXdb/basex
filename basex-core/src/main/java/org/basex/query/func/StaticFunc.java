@@ -40,8 +40,8 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   /** Updating flag. */
   final boolean updating;
 
-  /** Map with requested function properties. */
-  private final EnumMap<Flag, Boolean> map = new EnumMap<>(Flag.class);
+  /** Indicates if the function is currently being compiled. */
+  private boolean dontEnter;
   /** Indicates if the query focus is accessed or modified. */
   private boolean simple;
 
@@ -230,29 +230,6 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    */
   public boolean updating() {
     return updating;
-  }
-
-  /**
-   * Checks if the function body has one of the specified compiler properties.
-   * @param flags flags
-   * @return result of check
-   */
-  private boolean check(final Flag... flags) {
-    // handle recursive calls: check which flags have already been assigned
-    final ArrayList<Flag> flgs = new ArrayList<>();
-    for(final Flag flag : flags) {
-      if(!map.containsKey(flag)) {
-        map.put(flag, false);
-        flgs.add(flag);
-      }
-    }
-    // cache flags for remaining, new properties
-    for(final Flag flag : flgs) map.put(flag, expr.has(flag));
-    // evaluate result
-    for(final Flag flag : flags) {
-      if(map.get(flag)) return true;
-    }
-    return false;
   }
 
   @Override

@@ -56,7 +56,7 @@ public final class StaticVar extends StaticDecl {
   public Expr compile(final CompileContext cc) throws QueryException {
     if(expr == null) throw VAREMPTY_X.get(info, name());
     if(!compiled) {
-      compiled = dontEnter = true;
+      compiled = true;
 
       final QueryFocus focus = cc.qc.focus;
       pushFocus(cc.qc);
@@ -66,7 +66,6 @@ public final class StaticVar extends StaticDecl {
       } finally {
         cc.removeScope(this);
         cc.qc.focus = focus;
-        dontEnter = false;
       }
 
       // dynamic compilation, eager evaluation: pre-evaluate deterministic expressions
@@ -236,11 +235,7 @@ public final class StaticVar extends StaticDecl {
    * @see Expr#has(Flag...)
    */
   boolean has(final Flag... flags) {
-    if(dontEnter || expr == null) return false;
-    dontEnter = true;
-    final boolean has = expr.has(flags);
-    dontEnter = false;
-    return has;
+    return check(flags);
   }
 
   /**
