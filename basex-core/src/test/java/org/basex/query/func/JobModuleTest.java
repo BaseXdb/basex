@@ -427,6 +427,13 @@ public final class JobModuleTest extends SandboxTest {
     final String id2 = query(func.args(" fn($a) { $a }", " [ 'x' ]", " { 'cache': true() }"));
     query(_JOB_WAIT.args(id2));
     query(_JOB_RESULT.args(id2), "x");
+
+    // arguments are returned as bindings, using the parameter names of the function
+    final String id3 = query(func.args(" fn($a, $b) { $a + $b }", " [ 1, 2 ]",
+        " { 'cache': true() }"));
+    query(_JOB_WAIT.args(id3));
+    query("map:keys(" + _JOB_BINDINGS.args(id3) + ") => sort()", "a\nb");
+    query(_JOB_BINDINGS.args(id3) + "?b", 2);
   }
 
   /** Rejects function items for services and scheduled jobs. */

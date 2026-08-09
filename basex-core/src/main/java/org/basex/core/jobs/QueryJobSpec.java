@@ -60,7 +60,12 @@ public final class QueryJobSpec {
     this.options = options;
     this.function = function;
     this.args = args;
+    // arguments are registered as bindings, so that they stay visible while the job is running
     bindings = new HashMap<>();
+    final int al = args.length;
+    for(int a = 0; a < al; a++) {
+      bindings.put(Token.string(function.paramName(a).unique()), args[a]);
+    }
     resolver = null;
     query = function.funcIdentity();
     simple = true;
