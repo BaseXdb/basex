@@ -100,8 +100,10 @@ public final class TransferVisitor extends ASTVisitor {
 
   @Override
   public boolean staticVar(final StaticVar var) {
-    // the value is cached in the shared declaration
-    return reject("static variable $" + Token.string(var.name.prefixString()));
+    // an evaluated variable is checked like any other value; otherwise, its declaration is visited
+    final Value val = var.value;
+    if(val != null ? value(val) : cached(var) || var.visit(this)) return true;
+    return reject(dependency + " in static variable $" + Token.string(var.name.prefixString()));
   }
 
   @Override

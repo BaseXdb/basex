@@ -138,15 +138,15 @@ function dba:ws-message(
   } else {
     (: searching a large log file takes time: stop a search that is superseded by this one :)
     utils:ws-stop(),
-    let $id := job:eval(xs:anyURI('logs-eval.xq'), {
-      'input' : $json?input,
-      'date'  : $json?date,
-      'sort'  : $json?sort[.] otherwise 'time',
-      'page'  : xs:integer($json?page),
-      'time'  : $json?time,
-      'ignore': $json?ignore,
-      'filters': $filters
-    }, { 'cache': true() })
+    let $id := job:eval(dba:entries#7, [
+      $json?input,
+      $json?date,
+      $json?sort[.] otherwise 'time',
+      xs:integer($json?page),
+      $json?time,
+      $json?ignore,
+      $filters
+    ], { 'cache': true() })
     return utils:ws-start($id, $run, { 'method': 'html' })
   }
 };

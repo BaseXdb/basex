@@ -94,12 +94,29 @@ declare function utils:ws-start(
   $run      as xs:integer,
   $options  as map(*)
 ) as empty-sequence() {
-  ws:set(ws:id(), $utils:JOB, $id),
-  void(ws:eval(xs:anyURI('ws-eval.xq'), {
-    'id'     : $id,
-    'run'    : $run,
-    'options': $options
-  }, { 'serializer': { 'method': 'json' } }))
+  let $maxchars := config:get($config:MAXCHARS)
+  return (
+    ws:set(ws:id(), $utils:JOB, $id),
+    void(ws:eval(fn() {
+      job:wait($id),
+      try {
+        let $string := serialize(job:result($id), $options)
+        return {
+          'type'  : 'result',
+          'run'   : $run,
+          'result': if ($options?limit) { utils:chop($string, $maxchars) } else { $string }
+        }
+      } catch * {
+        {
+          'type'   : 'error',
+          'run'    : $run,
+          'message': $err:description,
+          'line'   : $err:line-number,
+          'column' : $err:column-number
+        }
+      }
+    }, (), { 'serializer': { 'method': 'json' } }))
+  )
 };
 
 (:~
@@ -122,7 +139,8 @@ declare function utils:job-options() as map(*) {
     'timeout'   : config:get($config:TIMEOUT),
     'memory'    : config:get($config:MEMORY),
     'permission': config:get($config:PERMISSION),
-    'base-uri'  : config:edited-file() otherwise config:editor-dir()
+    'base-uri'  : config:edited-file() otherwise config:editor-dir(),
+    'cache'     : true()
   }
 };
 

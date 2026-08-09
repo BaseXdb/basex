@@ -406,7 +406,7 @@ public final class JobModuleTest extends SandboxTest {
     // dependencies on the calling query
     error(func.args(" fn() { . }"), BASEX_TRANSFER_X_X);
     error(func.args(" fn() { position() }"), BASEX_TRANSFER_X_X);
-    error("declare variable $v := random:integer(); " + func.args(" fn() { $v }"),
+    error("declare variable $v := Q{java:java.lang.Math}abs(-1); " + func.args(" fn() { $v }"),
         BASEX_TRANSFER_X_X);
     error(func.args(" fn() { Q{java:java.lang.Math}abs(-1) }"), BASEX_TRANSFER_X_X);
     // dependency in a function supplied as argument

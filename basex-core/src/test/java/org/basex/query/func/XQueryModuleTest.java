@@ -30,6 +30,7 @@ public final class XQueryModuleTest extends SandboxTest {
     query(func.args(" concat('a', ?)", " [ 'b' ]"), "ab");
     query("let $a := 40 return " + func.args(" fn() { $a + 2 }"), 42);
     query("declare function local:f() { 5 }; " + func.args(" fn() { local:f() }"), 5);
+    query("declare variable $v := random:integer(); " + func.args(" fn() { count($v) }"), 1);
 
     // the function keeps the static context of the query that created it
     query("declare default element namespace 'x'; " +
@@ -48,7 +49,7 @@ public final class XQueryModuleTest extends SandboxTest {
     error(func.args(" [ 1 ]"), INVTYPE_X);
     // dependencies on the calling query
     error(func.args(" fn() { . }"), BASEX_TRANSFER_X_X);
-    error("declare variable $v := random:integer(); " + func.args(" fn() { $v }"),
+    error("declare variable $v := Q{java:java.lang.Math}abs(-1); " + func.args(" fn() { $v }"),
         BASEX_TRANSFER_X_X);
     error(func.args(" fn() { Q{java:java.lang.Math}abs(-1) }"), BASEX_TRANSFER_X_X);
     // updating functions

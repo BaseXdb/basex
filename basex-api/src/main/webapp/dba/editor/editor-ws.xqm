@@ -58,11 +58,9 @@ declare %private function dba:ws-run(
   $indent  as xs:boolean
 ) as empty-sequence() {
   utils:ws-stop(),
-  let $options := map:merge((utils:job-options(), {
-    'cache': true(),
-    (: two log entries per run, one before and one after the evaluation :)
-    'log'  : 'DBA query' || (config:edited-file()[.] ! (': ' || file:name(.)))
-  }))
+  (: two log entries per run, one before and one after the evaluation :)
+  let $options := map:put(utils:job-options(), 'log',
+    'DBA query' || (config:edited-file()[.] ! (': ' || file:name(.))))
   (: the query itself is registered, so that Stop terminates it and not the waiting job :)
   return utils:ws-start(job:eval($query, (), $options), $run, utils:serialize-options($indent))
 };

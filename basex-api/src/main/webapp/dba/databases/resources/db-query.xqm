@@ -21,11 +21,21 @@ function dba:ws-message(
   return (
     (: a query on a large resource takes time: stop one that is superseded by this one :)
     utils:ws-stop(),
-    let $id := job:eval(xs:anyURI('db-query-eval.xq'), {
-      'name'    : $json?name,
-      'resource': $json?resource,
-      'query'   : $json?query
-    }, map:put(utils:job-options(), 'cache', true()))
+    let $id := job:eval(fn(
+      $name      as xs:string,
+      $resource  as xs:string,
+      $query     as xs:string
+    ) {
+      let $type := db:type($name, $resource)
+      let $context := head(if ($type = 'xml') {
+        db:get($name, $resource)
+      } else if ($type = 'binary') {
+        db:get-binary($name, $resource)
+      } else {
+        db:get-value($name, $resource)
+      })
+      return xquery:eval($query, { '': $context }, { 'pass': true() })
+    }, [ $json?name, $json?resource, $json?query ], utils:job-options())
     return utils:ws-start($id, $run, utils:serialize-options($json?indent = true()))
   )
 };

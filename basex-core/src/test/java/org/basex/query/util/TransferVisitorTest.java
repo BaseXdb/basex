@@ -56,10 +56,22 @@ public final class TransferVisitorTest extends SandboxTest {
     assertEquals("context value", dependency("[ fn() { . } ]"));
   }
 
-  /** Reference to a static variable. */
+  /** Reference to a static variable: the declaration is visited. */
   @Test public void staticVariable() {
-    assertEquals("static variable $v",
-        dependency("declare variable $v := random:integer(); fn() { $v }"));
+    assertNull(dependency("declare variable $v := random:integer(); fn() { $v }"));
+    assertEquals("Java code in static variable $v",
+        dependency("declare variable $v := Q{java:java.lang.Math}abs(-1); fn() { $v }"));
+  }
+
+  /** Reference to a static variable that has already been evaluated. */
+  @Test public void evaluatedStaticVariable() {
+    execute(new CreateDB(NAME, "<a/>"));
+    try {
+      assertEquals("persistent data in static variable $v", dependency(
+          "declare variable $v := db:get('" + NAME + "'); let $c := count($v) return fn() { $v }"));
+    } finally {
+      execute(new DropDB(NAME));
+    }
   }
 
   /** Access to the query focus. */
