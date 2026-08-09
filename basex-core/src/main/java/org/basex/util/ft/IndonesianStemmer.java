@@ -69,7 +69,7 @@ final class IndonesianStemmer extends InternalStemmer {
 
   @Override
   Collection<Language> languages() {
-    return collection("in");
+    return collection("id");
   }
 
   @Override
