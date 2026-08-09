@@ -6,6 +6,7 @@ import static org.basex.query.func.Function.*;
 import java.util.*;
 import java.util.function.*;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
@@ -111,6 +112,57 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public AnnList annotations() {
     return anns;
+  }
+
+  @Override
+  public FuncItem materialize(final Predicate<Data> test, final boolean funcs, final InputInfo ii,
+      final QueryContext qc) throws QueryException {
+    if(!funcs) throw BASEX_FUNCTION_X.get(info(ii), this);
+    final FuncItem func = closure(test, ii, qc);
+    TransferVisitor.check(func, info(ii));
+    return func;
+  }
+
+  /**
+   * Returns a function item in which the captured values and the captured query focus are
+   * materialized.
+   * @param test test for data references that can be shared
+   * @param ii input info (can be {@code null})
+   * @param qc query context
+   * @return function item, or this item if nothing needed to be rewritten
+   * @throws QueryException query exception
+   */
+  private FuncItem closure(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
+      throws QueryException {
+
+    final TypeCheck check = expr instanceof final TypeCheck tc ? tc : null;
+    final Expr body = check != null ? check.expr : expr;
+    Expr copy = null;
+    if(body instanceof final GFLWOR gflwor) {
+      final GFLWOR mat = gflwor.materialize(test, ii, qc);
+      if(mat != gflwor) copy = check != null ? new TypeCheck(info, mat, check.seqType()) : mat;
+    }
+
+    QueryFocus qf = null;
+    if(!simple && focus != null && focus.value != null) {
+      final Value value = focus.value.materialize(test, true, ii, qc);
+      if(value != focus.value) {
+        qf = focus.copy();
+        qf.value = value;
+      }
+    }
+
+    if(copy == null && qf == null) return this;
+    return new FuncItem(info, copy != null ? copy : expr, params, anns, funcType(), stackSize,
+        name, qf != null ? qf : focus);
+  }
+
+  /**
+   * Returns the query focus that was captured when this function item was created.
+   * @return query focus (can be {@code null})
+   */
+  public QueryFocus focus() {
+    return focus;
   }
 
   @Override

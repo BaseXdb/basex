@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Timeout.ThreadMode.*;
 
 import org.basex.*;
 import org.basex.core.*;
+import org.basex.core.cmd.CreateDB;
+import org.basex.core.cmd.DropDB;
 import org.basex.io.*;
 import org.junit.jupiter.api.*;
 
@@ -54,6 +56,24 @@ public final class XQueryModuleTest extends SandboxTest {
     error(func.args(" fn() { Q{java:java.lang.Math}abs(-1) }"), BASEX_TRANSFER_X_X);
     // updating functions
     error(func.args(" %updating fn() { delete node <a/> }"), XQUERY_NOUPDATES);
+  }
+
+  /** Invokes function items that capture nodes of a persistent database. */
+  @Test public void evalFunctionNode() {
+    final Function func = _XQUERY_EVAL;
+    final String let = "let $n := db:get('" + NAME + "')/* return ";
+    execute(new CreateDB(NAME, "<a><b/><c/></a>"));
+    try {
+      // the captured node is copied
+      query(let + func.args(" fn() { name($n) }"), "a");
+      query(let + func.args(" fn($s) { $n/name() || $s }", " [ '!' ]"), "a!");
+      // the copy has its own identity
+      query(let + func.args(" fn() { $n }") + " is $n", false);
+      // the captured query focus is copied as well
+      query("db:get('" + NAME + "')/*/* ! " + func.args(" name#0"), "b\nc");
+    } finally {
+      execute(new DropDB(NAME));
+    }
   }
 
   /** Evaluates function items with reduced permissions. */

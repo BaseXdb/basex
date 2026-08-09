@@ -3,6 +3,7 @@ package org.basex.query.expr.gflwor;
 import java.util.*;
 import java.util.function.*;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
@@ -54,6 +55,30 @@ public final class GFLWOR extends ParseExpr {
   public GFLWOR(final InputInfo info, final Clause clause, final Expr rtrn) {
     this(info, new LinkedList<>(), rtrn);
     clauses.add(clause);
+  }
+
+  /**
+   * Returns a copy of this expression in which the values bound by the let clauses are
+   * materialized.
+   * @param test test for data references that can be shared
+   * @param ii input info (can be {@code null})
+   * @param qc query context
+   * @return this expression, or a copy
+   * @throws QueryException query exception
+   */
+  public GFLWOR materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
+      throws QueryException {
+    final LinkedList<Clause> list = new LinkedList<>();
+    boolean copied = false;
+    for(final Clause clause : clauses) {
+      if(!(clause instanceof final Let let) || !(let.expr instanceof final Value value)) {
+        return this;
+      }
+      final Value mat = value.materialize(test, true, ii, qc);
+      copied |= mat != value;
+      list.add(mat == value ? let : new Let(let.var, mat, let.scoring));
+    }
+    return copied ? new GFLWOR(info, list, rtrn) : this;
   }
 
   /**

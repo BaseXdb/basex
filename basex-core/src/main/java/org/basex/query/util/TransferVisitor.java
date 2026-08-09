@@ -87,8 +87,12 @@ public final class TransferVisitor extends ASTVisitor {
 
   @Override
   public boolean funcItem(final FuncItem func) {
-    // a captured query focus is invisible to the function signature
-    if(!func.simple()) return reject("context value");
+    if(!func.simple()) {
+      // the function accesses the query focus, which is invisible to its signature
+      final QueryFocus focus = func.focus();
+      if(focus == null) return reject("context value");
+      if(focus.value != null && !value(focus.value)) return false;
+    }
     return cached(func) || func.visit(this);
   }
 
