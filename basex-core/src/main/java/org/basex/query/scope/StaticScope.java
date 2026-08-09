@@ -27,8 +27,6 @@ public abstract class StaticScope extends ExprInfo implements Scope {
 
   /** Expression of this declaration ({@code null} if this is an external function). */
   public Expr expr;
-  /** Resulting value (can be {@code null}). */
-  public volatile Value value;
 
   /** Input info (can be {@code null}). */
   public InputInfo info;
@@ -68,22 +66,14 @@ public abstract class StaticScope extends ExprInfo implements Scope {
   }
 
   /**
-   * Evaluates the expression and returns the resulting value.
+   * Coerces a value to the declared type of this scope.
+   * @param value value
    * @param qc query context
-   * @return result
+   * @return coerced value
    * @throws QueryException query exception
    */
-  public Value value(final QueryContext qc) throws QueryException {
-    if(value == null) {
-      final int fp = vs.enter(qc);
-      try {
-        final Value val = expr.value(qc);
-        value = declType != null ? declType.coerce(val, qc, info, name, null) : val;
-      } finally {
-        vs.exit(fp, qc);
-      }
-    }
-    return value;
+  protected final Value coerce(final Value value, final QueryContext qc) throws QueryException {
+    return declType != null ? declType.coerce(value, qc, info, name, null) : value;
   }
 
   /**

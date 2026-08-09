@@ -59,6 +59,8 @@ public final class QueryContext extends Job implements Closeable {
   public final QueryStack stack = new QueryStack();
   /** Static variables. */
   public final Variables vars = new Variables();
+  /** Values of static variables (shared with parent context). */
+  public final GlobalValues globals;
   /** Functions. */
   public final StaticFuncs functions = new StaticFuncs();
   /** Static and dynamic namespaces. */
@@ -196,6 +198,7 @@ public final class QueryContext extends Job implements Closeable {
     ftPosData = parent != null ? parent.ftPosData : null;
     shared = parent != null ? parent.shared : new SharedData();
     regex = parent != null ? parent.regex : new TokenObjectMap<>();
+    globals = parent != null ? parent.globals : new GlobalValues();
     user = context.user();
   }
 

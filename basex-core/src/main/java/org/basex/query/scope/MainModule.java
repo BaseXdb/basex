@@ -43,6 +43,21 @@ public class MainModule extends AModule {
   }
 
   /**
+   * Evaluates this module and returns the result.
+   * @param qc query context
+   * @return result
+   * @throws QueryException query exception
+   */
+  public Value value(final QueryContext qc) throws QueryException {
+    final int fp = vs.enter(qc);
+    try {
+      return expr.value(qc);
+    } finally {
+      vs.exit(fp, qc);
+    }
+  }
+
+  /**
    * Creates a result iterator which lazily evaluates this module.
    * @param qc query context
    * @return result iterator

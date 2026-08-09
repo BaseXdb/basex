@@ -3,10 +3,6 @@ package org.basex.query.var;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
-import java.util.*;
-
-import org.basex.core.*;
-import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
@@ -23,17 +19,12 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public final class StaticVar extends StaticDecl {
-  /** Query contexts waiting for static variables, and monitor for the evaluation state. */
-  private static final IdentityHashMap<QueryContext, StaticVar> WAITING = new IdentityHashMap<>();
-
   /** Indicates if this variable can be bound from outside the query. */
   public final boolean external;
+  /** Value assigned at compile time (can be {@code null}). */
+  public volatile Value value;
   /** Flag for lazy evaluation. */
   private final boolean lazy;
-  /** Context currently evaluating this variable ({@code null} if none). */
-  private QueryContext evalContext;
-  /** Error raised while evaluating this variable. Assigned once, returned by all future jobs. */
-  private Throwable evalError;
 
   /**
    * Constructor for a variable declared in a query.
@@ -71,7 +62,8 @@ public final class StaticVar extends StaticDecl {
       // dynamic compilation, eager evaluation: pre-evaluate deterministic expressions
       if(expr instanceof Value || cc.dynamic && !lazy && !expr.has(Flag.NDT)) {
         try {
-          cc.replaceWith(expr, value(cc.qc));
+          if(value == null) value = compute(cc.qc);
+          cc.replaceWith(expr, value);
         } catch(final QueryException ex) {
           if(ex.error() != NOCTX_X) throw ex;
         }
@@ -80,115 +72,49 @@ public final class StaticVar extends StaticDecl {
     return null;
   }
 
-  @Override
+  /**
+   * Returns the value of this variable.
+   * @param qc query context
+   * @return value
+   * @throws QueryException query exception
+   */
   public Value value(final QueryContext qc) throws QueryException {
     if(!lazy && expr == null) throw VAREMPTY_X.get(info, name());
 
     final Value cached = value;
-    if(cached != null) return cached;
-    final Value acquired = acquire(qc);
-    if(acquired != null) return acquired;
+    return cached != null ? cached : qc.globals.value(this, qc);
+  }
 
+  /**
+   * Evaluates the expression of this variable.
+   * @param qc query context
+   * @return value
+   * @throws QueryException query exception
+   */
+  Value compute(final QueryContext qc) throws QueryException {
     final QueryFocus focus = qc.focus;
-    Throwable error = null;
+    pushFocus(qc);
+    final int fp = vs.enter(qc);
     try {
-      pushFocus(qc);
-      return super.value(qc);
+      return coerce(expr.value(qc), qc);
     } catch(final QueryException ex) {
       // errors of lazy variables can surface anywhere: make them non-catchable
-      if(lazy) ex.notCatchable();
-      // eagerly compute line/column so waiting threads see consistent values
-      if(ex.info() != null) ex.info().init();
-      error = ex;
-      throw ex;
-    } catch(final RuntimeException | Error ex) {
-      error = ex;
-      throw ex;
+      throw lazy ? ex.notCatchable() : ex;
     } finally {
+      vs.exit(fp, qc);
       qc.focus = focus;
-      release(error);
     }
   }
 
   /**
-   * Acquires the right to evaluate this variable, or returns a cached value.
-   * @param qc query context
-   * @return cached value, or {@code null} if the caller must evaluate it
-   * @throws QueryException query exception
+   * Returns a copy of an error that was raised in another context.
+   * @param error original error
+   * @return query exception
    */
-  private Value acquire(final QueryContext qc) throws QueryException {
-    synchronized(WAITING) {
-      while(true) {
-        if(value != null) return value;
-        if(evalError != null) rethrow();
-        if(evalContext == null) {
-          evalContext = qc;
-          return null;
-        }
-        // someone else is evaluating this variable: check for circular dependencies, wait
-        if(circular(qc)) throw CIRCVAR_X.get(info, name());
-        WAITING.put(qc, this);
-        try {
-          // bounded wait: a stopped job must not wait for a variable that is never released
-          WAITING.wait(1000);
-        } catch(final InterruptedException ex) {
-          Thread.currentThread().interrupt();
-          throw new JobException(Text.INTERRUPTED, ex);
-        } finally {
-          WAITING.remove(qc);
-        }
-        qc.checkStop();
-      }
-    }
-  }
-
-  /**
-   * Releases evaluation ownership and wakes waiting threads.
-   * @param error error raised while evaluating this variable
-   */
-  private void release(final Throwable error) {
-    synchronized(WAITING) {
-      evalError = error;
-      evalContext = null;
-      WAITING.notifyAll();
-    }
-  }
-
-  /**
-   * Checks if waiting for this variable would introduce a circular dependency. This is the case if
-   * the current query context {@code qc} is the same as or nested in the evaluating context, or if
-   * the chain of waiting contexts, that is linked by the variables they are waiting for, contains
-   * the current query context {@code qc}.
-   * @param qc current query context
-   * @return result of check
-   */
-  private boolean circular(final QueryContext qc) {
-    for(QueryContext q = qc; q != null; q = q.parent) {
-      if(q == evalContext) return true;
-    }
-    for(StaticVar sv = this; sv != null;) {
-      final QueryContext q = sv.evalContext;
-      if(q == qc) return true;
-      if(q == null) return false;
-      sv = WAITING.get(q);
-    }
-    return false;
-  }
-
-  /**
-   * Throws an error that was raised while evaluating this variable.
-   * @throws QueryException query exception
-   */
-  private void rethrow() throws QueryException {
-    final Throwable th = evalError;
-    if(th instanceof final QueryException ex) {
-      final QueryException qe = new QueryException(
-          ex.info(), ex.qname(), ex.getLocalizedMessage()).value(ex.value());
-      throw lazy ? qe.notCatchable() : qe;
-    }
-    if(th instanceof final RuntimeException ex) throw ex;
-    if(th instanceof final Error ex) throw ex;
-    throw Util.notExpected(th);
+  QueryException error(final QueryException error) {
+    final QueryException ex = new QueryException(error.info(), error.qname(),
+        error.getLocalizedMessage()).value(error.value());
+    return lazy ? ex.notCatchable() : ex;
   }
 
   /**

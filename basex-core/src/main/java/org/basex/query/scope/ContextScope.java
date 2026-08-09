@@ -2,6 +2,7 @@ package org.basex.query.scope;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.value.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -13,6 +14,9 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class ContextScope extends MainModule {
+  /** Evaluated context value (can be {@code null}). */
+  public volatile Value value;
+
   /**
    * Constructor.
    * @param expr root expression
@@ -28,5 +32,11 @@ public final class ContextScope extends MainModule {
     this.declType = declType;
     this.info = info;
     doc(doc);
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    if(value == null) value = coerce(super.value(qc), qc);
+    return value;
   }
 }

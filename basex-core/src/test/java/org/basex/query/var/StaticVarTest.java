@@ -1,10 +1,16 @@
 package org.basex.query.var;
 
+import static org.basex.query.QueryError.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Timeout.ThreadMode.*;
+
+import java.io.*;
 
 import org.basex.*;
+import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
+import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -49,8 +55,34 @@ public final class StaticVarTest extends SandboxTest {
 
       assertFalse(thread.isAlive(), "Second context is still waiting for the variable.");
       if(error[0] != null) fail(error[0]);
-      assertEquals(values[0].toString(), values[1].toString(),
-          "Static variable was evaluated more than once.");
+      assertNotEquals(values[0].toString(), values[1].toString(),
+          "Value was shared by unrelated query contexts.");
     }
+  }
+
+  /** Reads a static variable from a nested context while it is being evaluated. */
+  @Test public void nestedContext() {
+    error("declare %basex:lazy variable $v := xquery:eval(function() { $v }); $v", CIRCVAR_X);
+  }
+
+  /** Reads two mutually dependent static variables from nested contexts of parallel tasks. */
+  @Test @Timeout(value = 20, threadMode = SEPARATE_THREAD) public void nestedCircular() {
+    error("declare %basex:lazy variable $x := " +
+        "(prof:sleep(100), xquery:eval(function() { $y })); " +
+        "declare %basex:lazy variable $y := " +
+        "(prof:sleep(100), xquery:eval(function() { $x })); " +
+        "xquery:fork-join((function() { $x }, function() { $y }))", CIRCVAR_X);
+  }
+
+  /**
+   * Reads a failing static variable from the parallel tasks of one query.
+   * @throws IOException I/O exception
+   */
+  @Test public void forkJoinError() throws IOException {
+    final IOFile file = new IOFile(sandbox(), "static-var");
+    file.delete();
+    error("declare %basex:lazy variable $v := (file:append-text('" + file.path() + "', 'x'), " +
+        "error()); xquery:fork-join(for $i in 1 to 4 return function() { $v })", FUNERR1);
+    assertEquals("x", Token.string(file.read()), "Variable was evaluated more than once.");
   }
 }
