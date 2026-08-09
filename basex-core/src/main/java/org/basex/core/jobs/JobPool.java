@@ -247,9 +247,12 @@ public final class JobPool {
    * @return return success flag
    */
   public boolean remove(final String id) {
-    // stop scheduled task
+    // stop scheduled task; the job is stopped as well, as it may not be registered yet
     final QueryJobTask task = tasks.remove(id);
-    if(task != null) task.cancel();
+    if(task != null) {
+      task.cancel();
+      task.job.stop();
+    }
     // send stop signal to job
     final Job job = active.get(id);
     if(job != null) job.stop();

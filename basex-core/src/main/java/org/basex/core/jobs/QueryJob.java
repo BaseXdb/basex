@@ -255,6 +255,8 @@ public final class QueryJob extends Job implements Runnable {
       qp.qc.user = new User(ctx.user()).permission(perm);
       boolean registered = false;
       try {
+        // the job may have been stopped before its execution started
+        checkStop();
         // parse, push and register query. order is important!
         if(job.function != null) {
           qp.assign(job.function, job.args);
