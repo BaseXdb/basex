@@ -39,11 +39,11 @@ declare variable $config:PERMISSION := 'permission';
 declare %private variable $config:OPTIONS-FILE := $config:DBA-DIR || '.dba.xml';
 
 (:~ Default options. :)
-declare %basex:lazy %private variable $config:DEFAULTS := {
-  $config:MAXCHARS   : 1000000,
+declare %private variable $config:DEFAULTS := {
+  $config:MAXCHARS   : 1_000_000,
   $config:MAXROWS    : 100,
-  $config:TIMEOUT    : 30,
-  $config:MEMORY     : 1000,
+  $config:TIMEOUT    : 60,
+  $config:MEMORY     : 8_000,
   $config:PERMISSION : 'admin'
 };
 
