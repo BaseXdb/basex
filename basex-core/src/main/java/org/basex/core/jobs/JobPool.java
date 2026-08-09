@@ -1,7 +1,5 @@
 package org.basex.core.jobs;
 
-import static org.basex.util.Token.*;
-
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
@@ -230,14 +228,17 @@ public final class JobPool {
     final Set<String> set = new HashSet<>(results.keySet());
     set.addAll(active.keySet());
     set.addAll(tasks.keySet());
-    final TokenList ids = new TokenList(set.size());
-    for(final String id : set) ids.add(id);
 
-    // compare default job counter, or compare custom IDs as strings
-    final byte[] prefix = token(JobContext.PREFIX);
-    final int pl = prefix.length;
-    return ids.sort((id1, id2) -> startsWith(id1, prefix) && startsWith(id2, prefix) ?
-        toInt(substring(id1, pl)) - toInt(substring(id2, pl)) : compare(id1, id2), true);
+    // compare generated IDs by their job counter, custom IDs as strings
+    final int pl = JobContext.PREFIX.length();
+    final List<String> list = new ArrayList<>(set);
+    list.sort((id1, id2) -> JobContext.generated(id1) && JobContext.generated(id2) ?
+      Long.compare(Long.parseLong(id1.substring(pl)), Long.parseLong(id2.substring(pl))) :
+      id1.compareTo(id2));
+
+    final TokenList ids = new TokenList(list.size());
+    for(final String id : list) ids.add(id);
+    return ids;
   }
 
   /**

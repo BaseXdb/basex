@@ -60,6 +60,7 @@ public final class JobModuleTest extends SandboxTest {
     query(func.args("declare variable $a external;$a", " { 'a': <a/> }"));
     query(func.args("static-base-uri()", " { 'base-uri': 'abc.xq' }"));
     query(func.args("1", " ()", " { 'id': '123' }"));
+    query(func.args("1", " ()", " { 'id': 'jobs.xq' }"));
   }
 
   /** Test method. */
@@ -96,7 +97,7 @@ public final class JobModuleTest extends SandboxTest {
     error(func.args("1", " ()", " { 'interval': '12345' }"), DATEFORMAT_X_X_X);
     error(func.args("1", " ()", " { 'interval': '-PT1S' }"), JOBS_RANGE_X);
     error(func.args("1", " ()", " { 'id': 'job123' }"), JOBS_ID_INVALID_X);
-    error(func.args("1", " ()", " { 'id': 'job123' }"), JOBS_ID_INVALID_X);
+    error(func.args("1", " ()", " { 'id': 'job0' }"), JOBS_ID_INVALID_X);
     error("(1, 2) ! " + func.args(SLOW_QUERY, " ()", " { 'id': 'abc', 'cache': true() }"),
         JOBS_ID_EXISTS_X);
     error(func.args("1", " ()", " { 'cron': '* * *' }"), JOBS_CRON_X_X);

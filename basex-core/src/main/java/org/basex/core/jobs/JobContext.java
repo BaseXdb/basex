@@ -1,6 +1,7 @@
 package org.basex.core.jobs;
 
 import java.util.concurrent.atomic.*;
+import java.util.regex.*;
 
 import org.basex.core.*;
 import org.basex.core.locks.*;
@@ -29,6 +30,8 @@ public final class JobContext {
 
   /** Job prefix. */
   static final String PREFIX = "job";
+  /** Pattern for generated job IDs. */
+  private static final Pattern GENERATED = Pattern.compile(PREFIX + "\\d+");
   /** Query ID. */
   private static final AtomicLong JOBID = new AtomicLong(-1);
 
@@ -57,6 +60,15 @@ public final class JobContext {
    */
   JobContext(final Job job) {
     this.job = job;
+  }
+
+  /**
+   * Indicates if the specified ID has the format of a generated job ID.
+   * @param id ID
+   * @return result of check
+   */
+  static boolean generated(final String id) {
+    return GENERATED.matcher(id).matches();
   }
 
   /**

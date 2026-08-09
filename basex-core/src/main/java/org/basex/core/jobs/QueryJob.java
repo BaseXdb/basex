@@ -118,7 +118,7 @@ public final class QueryJob extends Job implements Runnable {
       // custom job ID: check if it is invalid or has already been assigned
       String id = opts.get(JobOptions.ID);
       if(id != null) {
-        if(id.startsWith(JobContext.PREFIX)) throw JOBS_ID_INVALID_X.get(info, id);
+        if(JobContext.generated(id)) throw JOBS_ID_INVALID_X.get(info, id);
         if(jobs.tasks.containsKey(id) || jobs.active.containsKey(id) ||
            jobs.results.containsKey(id)) throw JOBS_ID_EXISTS_X.get(info, id);
         jc().id(id);

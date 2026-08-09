@@ -327,7 +327,7 @@ public enum QueryError {
   /** Error code. */
   JOBS_ID_EXISTS_X(JOB, "id", "Job id already exists: %."),
   /** Error code. */
-  JOBS_ID_INVALID_X(JOB, "id", "Invalid job name: %."),
+  JOBS_ID_INVALID_X(JOB, "id", "Job id is reserved: %."),
   /** Error code. */
   JOBS_CRON_X_X(JOB, "cron", "Cron expression '%': %."),
   /** Error code. */
