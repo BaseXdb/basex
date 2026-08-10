@@ -26,7 +26,7 @@
   <!-- WebDAV Service (disable it by removing this entry and the webdav directory) -->
   <servlet>
     <servlet-name>WebDAV</servlet-name>
-    <servlet-class>org.basex.http.restxq.RestXqServlet</servlet-class>
+    <servlet-class>org.basex.http.webdav.WebDAVServlet</servlet-class>
     <init-param>
       <param-name>org.basex.user</param-name>
       <param-value/>
