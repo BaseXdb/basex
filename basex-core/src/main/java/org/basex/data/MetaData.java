@@ -17,6 +17,7 @@ import org.basex.io.out.DataOutput;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.list.*;
+import org.basex.util.options.*;
 
 /**
  * This class provides meta information on a database.
@@ -148,10 +149,10 @@ public final class MetaData {
     maxcats = options.get(MainOptions.MAXCATS);
     stopwords = options.get(MainOptions.STOPWORDS);
     langOption = options.get(MainOptions.LANGUAGE);
-    textinclude = options.get(MainOptions.TEXTINCLUDE);
-    attrinclude = options.get(MainOptions.ATTRINCLUDE);
-    tokeninclude = options.get(MainOptions.TOKENINCLUDE);
-    ftinclude = options.get(MainOptions.FTINCLUDE);
+    textinclude = names(MainOptions.TEXTINCLUDE, options);
+    attrinclude = names(MainOptions.ATTRINCLUDE, options);
+    tokeninclude = names(MainOptions.TOKENINCLUDE, options);
+    ftinclude = names(MainOptions.FTINCLUDE, options);
     splitsize = options.get(MainOptions.SPLITSIZE);
   }
 
@@ -374,12 +375,22 @@ public final class MetaData {
    */
   public void names(final IndexType type, final MainOptions options) {
     switch(type) {
-      case TEXT      -> textinclude = options.get(MainOptions.TEXTINCLUDE);
-      case ATTRIBUTE -> attrinclude = options.get(MainOptions.ATTRINCLUDE);
-      case TOKEN     -> tokeninclude = options.get(MainOptions.TOKENINCLUDE);
-      case FULLTEXT  -> ftinclude = options.get(MainOptions.FTINCLUDE);
+      case TEXT      -> textinclude = names(MainOptions.TEXTINCLUDE, options);
+      case ATTRIBUTE -> attrinclude = names(MainOptions.ATTRINCLUDE, options);
+      case TOKEN     -> tokeninclude = names(MainOptions.TOKENINCLUDE, options);
+      case FULLTEXT  -> ftinclude = names(MainOptions.FTINCLUDE, options);
       default        -> throw Util.notExpected();
     }
+  }
+
+  /**
+   * Returns the included names of the specified index option, without whitespace.
+   * @param option index option
+   * @param options main options
+   * @return names
+   */
+  public static String names(final StringOption option, final MainOptions options) {
+    return options.get(option).replaceAll("\\s+", "");
   }
 
   /**
