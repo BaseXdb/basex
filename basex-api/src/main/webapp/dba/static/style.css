@@ -14,6 +14,8 @@
   /* set by the narrow-screen media query; read by js.js, which must not own
      a second copy of the breakpoint */
   --stacked: 0;
+  /* width of a scrollbar; measured by measureScrollbar, this is the common default */
+  --scrollbar: 12px;
 
   --bg: #fff;
   --fg: #111;
@@ -40,7 +42,6 @@
     --border-light: #444;
     --pre-bg: #2a2a2a;
     --info: #6c6;
-    --warning: #999;
   }
 }
 
@@ -110,6 +111,62 @@ td {
   cursor: col-resize;
 }
 
+.resizer-row {
+  position: absolute;
+  left: 0;
+  bottom: calc((var(--gap) + var(--resizer)) / -2);
+  height: var(--resizer);
+  width: 100%;
+  cursor: row-resize;
+}
+
+/* strip of open documents above the editor; scrolls rather than wrapping, so the editor
+   keeps its height however many documents are open */
+.tabs {
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  gap: 2px;
+  margin-bottom: 2px;
+}
+.tabs:empty {
+  display: none;
+}
+.tabs .tab {
+  display: flex;
+  align-items: center;
+  /* no gap: the marker of an edited document belongs to the name it follows. The cross
+     brings its own distance, so that it does not sit against either of them */
+  flex: none;
+  max-width: 14rem;
+  margin: 0;
+  padding: .15rem .5rem;
+  border: 1px solid var(--border-light);
+  border-bottom: none;
+  border-radius: var(--radius) var(--radius) 0 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 92%;
+  white-space: nowrap;
+}
+.tabs .tab > span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tabs .tab.active {
+  border-color: var(--border);
+  background: var(--bg);
+  color: var(--fg);
+}
+.tabs .close {
+  margin-left: .4rem;
+  opacity: .6;
+}
+.tabs .close:hover {
+  opacity: 1;
+  color: var(--accent-strong);
+}
+
 ol, ul, dd {
   padding-left: 1.2rem;
   margin-left: 0;
@@ -159,6 +216,8 @@ pre {
 textarea {
   font-family: SFMono-Regular, Consolas, Menlo, monospace;
   width: 100%;
+  /* the border must not add to the width, or the panel scrolls sideways */
+  box-sizing: border-box;
   height: 200px;
   resize: vertical;
   background-color: var(--bg);
@@ -203,6 +262,19 @@ input.filter {
   box-sizing: border-box;
 }
 
+/* the directory chooser shares the pinned row with the buttons and takes a line of its own;
+   its margin and the row gap of that flex row together make up the usual block spacing */
+select.directory {
+  margin-bottom: calc(var(--space) - .3rem);
+}
+
+/* controls that fill a narrow panel, capped so wide pages keep their proportions */
+select.wide, input.wide {
+  width: 100%;
+  max-width: 350px;
+  box-sizing: border-box;
+}
+
 /* numeric-column filter fields align with their right-aligned values */
 td.num input.filter {
   text-align: right;
@@ -215,8 +287,11 @@ table.fixed {
 /* column widths are percentages: padding must not add to them, or the sum overflows */
 table.fixed th, table.fixed td {
   box-sizing: border-box;
+  /* a full gutter per column costs more than the values are worth in a narrow panel */
+  padding-right: .5rem;
 }
-table.fixed td {
+/* a header that does not fit its column must not scroll the table sideways */
+table.fixed th, table.fixed td {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -318,6 +393,11 @@ header {
   color: var(--muted);
   margin-bottom: var(--space);
 }
+/* a note explaining the control above it belongs to its field: the field's own margin is what
+   separates it from what follows */
+.field .note {
+  margin-bottom: 0;
+}
 nav .note {
   /* the header nav is a single row: no spacing before the rule below it */
   margin-bottom: 0;
@@ -337,18 +417,89 @@ nav .note {
   content: "\26A0\00a0";
 }
 
-/* row of actions above a table or an editor */
+/* row of actions above a table or an editor; the gap matches the toolbar of the Files view */
 .buttons {
   display: flex;
   flex-wrap: wrap;
-  gap: .5rem;
+  gap: .3rem;
+  margin-bottom: var(--space);
+}
+/* forces the following controls onto a line of their own */
+.buttons .break {
+  flex-basis: 100%;
+  height: 0;
+}
+
+/* query field above a resource editor; named with its element, or the width of a text
+   field would be the more specific rule */
+input.query {
+  /* the note above supplies the distance; an input does not collapse its margins */
+  margin: 0 0 var(--space) 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* head of a scrolling list: the heading, the actions and the summary stay in reach while
+   the rows pass underneath. The background covers the rows that scroll behind it */
+.sticky {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: var(--bg);
+  padding-bottom: var(--space);
+}
+/* the collapse chevron floats over the top right corner: only what shares its line stays clear
+   of it, the rows below use the full width. The search line of the logs is a single row */
+.sticky:not(.logbar) > :first-child,
+.logbar {
+  padding-right: calc(var(--scrollbar) + 1rem);
+}
+/* the spacing below the head is the panel's, not the last block's inside it */
+.sticky > :last-child {
+  margin-bottom: 0;
+}
+
+/* the heading names a database or a path; what can be done with it starts its own line */
+#database-panel h2, #resource-panel > h2 {
   margin-bottom: var(--space);
 }
 
-/* query field above a resource editor */
-.query {
-  /* the note above supplies the distance; an input does not collapse its margins */
-  margin: 0 0 var(--space) 0;
+/* a heading names one thing, and a long name is clipped rather than wrapped over several
+   lines; the trailing non-breaking space keeps it clear of the collapse chevron */
+.content > .panel h2 {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.content > .panel h2::after {
+  content: "\00a0";
+}
+
+/* modal dialog: a form with more fields than a prompt can ask for */
+dialog {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background-color: var(--bg);
+  color: var(--fg);
+  padding: var(--gap);
+  max-width: min(90vw, 32rem);
+  max-height: 85vh;
+}
+dialog::backdrop {
+  background-color: rgb(0 0 0 / 40%);
+}
+/* the row that closes the dialog: set apart from the fields, and where a dialog ends */
+dialog .buttons {
+  justify-content: flex-end;
+  margin-top: var(--gap);
+  /* the dialog's own padding supplies the space below */
+  margin-bottom: 0;
+}
+
+/* the database and the resource that the panels to the right of it show */
+a.selected {
+  font-weight: bold;
+  color: var(--accent-strong);
 }
 
 /* page content: one grid column per panel, separated by the gap rather than by
@@ -375,14 +526,68 @@ nav .note {
   min-width: 0;
 }
 
-/* a panel that spans all columns, e.g. the editor toolbar */
-.content > .full {
-  grid-column: 1 / -1;
+/* a filled layout: the panel grid fills the viewport and the page never scrolls,
+   so that every panel keeps its share of the height and scrolls on its own */
+body:has(.content.fill) {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+body:has(.content.fill) main {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+/* the rule and the footer are flex items here: they must not be shrunk away, and
+   'float' would be ignored, so the footer is aligned by its text */
+body:has(.content.fill) > hr, body:has(.content.fill) > footer {
+  flex: none;
+}
+/* the default 'margin: .5em auto' of a rule centres it at zero width in a flex column, which
+   makes the line above the footer disappear: only the vertical margins are wanted here */
+body:has(.content.fill) > hr {
+  margin-inline: 0;
+}
+body:has(.content.fill) > footer {
+  text-align: right;
+}
+.content.fill {
+  grid-template-rows: var(--rows);
+  row-gap: var(--gap);
+  flex: 1;
+  min-height: 0;
+}
+.content.fill > .panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+/* a panel with nothing to show; applyColumns gives it no grid track.
+   It has to out-specify the filled panel above, which also sets 'display' */
+.content > .panel.hidden {
+  display: none;
+}
+/* the scrolling content of a filled panel; editors bring their own scrollbars */
+.content.fill .pane, .content.fill .cm-editor, .content.fill textarea {
+  flex: 1;
+  min-height: 0;
+}
+.content.fill .pane {
+  overflow: auto;
+}
+/* a pane that ends in an editor: its blocks are laid out in a column, so that the editor takes
+   the height they leave instead of the pane scrolling. A folded panel lays out nothing — and the
+   rule has to say so, or it would out-specify the 'display: none' that folds it */
+.content.fill .panel:not(.collapsed) > .pane.column {
+  display: flex;
+  flex-direction: column;
 }
 
 /* divider, centered in the gap before every panel but the first of a row;
    'no-divider' opts out where a resizer already separates the panels */
-.content > .panel:not(.full) ~ .panel:not(.full):not(.no-divider)::before {
+.content > .panel ~ .panel:not(.no-divider)::before {
   content: '';
   position: absolute;
   top: 0;
@@ -397,8 +602,9 @@ nav .note {
   display: grid;
   grid-template-columns: 8rem 1fr;
   align-items: baseline;
-  /* collapses between adjacent fields, and separates the first from a block above */
-  margin: var(--space) 0;
+  /* fields belong together, so they sit closer than blocks do; the margin collapses between
+     adjacent fields and separates the first of them from the block above */
+  margin: calc(var(--space) / 2) 0;
 }
 
 /* label above its control, for labels too long for a label column */
@@ -406,11 +612,16 @@ nav .note {
   grid-template-columns: 1fr;
 }
 
-/* collapsible content panels: a chevron folds a panel to a labeled strip */
+/* collapsible content panels: a chevron folds a panel to a labeled strip. It sits just inside
+   the scrollbar of the list or editor below it: over the content, so it costs no width, but
+   never on the scrollbar itself. The offset is measured by measureScrollbar */
 button.collapse {
   position: absolute;
   top: 0;
-  right: .4rem;
+  /* clear of the scrollbar, plus a little air */
+  right: calc(var(--scrollbar) + .5rem);
+  /* the pinned head of a list is raised, and would otherwise be painted over the button */
+  z-index: 2;
   padding: 0;
   border: none;
   background: none;
@@ -419,6 +630,15 @@ button.collapse {
   font-size: 130%;
   line-height: 1;
   cursor: pointer;
+}
+/* nothing scrolls behind it: the chevron takes the room the scrollbar would have needed */
+.panel.no-scrollbar > button.collapse {
+  right: .5rem;
+}
+/* and moves on into the gutter where a divider follows: what the chevron keeps its distance to
+   is whatever comes next, be that the scrollbar of its own panel or the line after it */
+.panel.no-scrollbar:has(+ .panel:not(.no-divider)) > button.collapse {
+  right: calc(.5rem - var(--gap));
 }
 button.collapse:hover {
   color: var(--accent);
@@ -471,7 +691,19 @@ button.collapse .label {
   .content {
     grid-template-columns: 1fr;
   }
-  .content > .panel:not(.full) ~ .panel:not(.full)::before {
+  /* stacked panels grow with their content again, and the page scrolls as usual */
+  .content.fill {
+    grid-template-rows: none;
+  }
+  body:has(.content.fill) {
+    height: auto;
+    overflow: visible;
+    display: block;
+  }
+  .content.fill .cm-editor, .content.fill .pane {
+    min-height: 200px;
+  }
+  .content > .panel ~ .panel::before {
     display: none;
   }
   /* stacked panels collapse to a horizontal strip */
@@ -503,15 +735,15 @@ button.collapse .label {
   }
 }
 
-/* drag-and-drop target highlight for file upload forms */
-form.dragover {
-  outline: 2px dashed var(--accent);
-  outline-offset: 4px;
-}
-
 /* error message that can be clicked to jump to its line/column in the editor */
 #info.locatable {
   cursor: pointer;
+}
+
+/* logs: a file is named by its date and measured in bytes, both of a known length. Neither is
+   wrapped over two lines when a scrollbar narrows the panel they are listed in */
+#list td {
+  white-space: nowrap;
 }
 
 /* logs: search line with a right-aligned "Ignore" filter */
@@ -521,8 +753,6 @@ form.dragover {
   gap: .5rem;
   /* separate the search line from the results below it */
   margin-bottom: .75rem;
-  /* the bar reaches the panel edge, where the collapse button sits */
-  padding-right: 1.5rem;
 }
 .logbar h3 {
   margin: 0;

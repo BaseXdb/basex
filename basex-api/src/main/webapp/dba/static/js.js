@@ -1,68 +1,98 @@
-/** Link to the CodeMirror editor component. */
-let _editor;
-/** Link to the CodeMirror output component. */
-let _output;
+/** Shared code of all DBA pages. */
+
+/*
+ * The DBA keeps its state in three places. Which one is right follows from a single question:
+ * who must see the value?
+ *
+ * - URL parameters: everything a link must be able to reproduce. The sort key and the page of a
+ *   table, the job a detail view shows, the info and error message of a redirect. If a colleague
+ *   opens the address and sees something else, the value belongs here.
+ * - localStorage: what the user set up and expects to find again, and what no one else should
+ *   see. Editor drafts, the directory and the open documents of the Files view, panel splits and
+ *   collapsed panels, the 'Live' and 'Indent' preferences, the log filter. Keys that describe
+ *   one page are scoped with pageKey; the rest are shared by every page of the DBA.
+ * - Server session: only what the server itself must know, which is the login. Anything else
+ *   would make two browsers fight over one value and the server answer differently to the
+ *   same request.
+ *
+ * Global options that outlive the browser (timeout, memory, permission, table rows) are not
+ * state: they are configuration, and live in the .dba.xml of the database directory.
+ */
+
+/** Root of the web application; empty if it is deployed in the root context. HTTP requests are
+    relative and need no prefix, but a WebSocket URL is absolute. */
+const CONTEXT_PATH = document.documentElement.dataset.context ?? "";
 
 /** Connections to the WebSocket endpoints, by path (promises, resolved with open WebSockets). */
 const _sockets = {};
+/** Handlers for the messages of a WebSocket endpoint, by path; a page registers its own. */
+const _handlers = {};
+/** Actions that a 'Live' checkbox starts, by the name in its 'data-live'; a page registers its own. */
+const _live_actions = {};
+
 /** Number of the last query that was started in the editor panel. */
 let _run = 0;
+
 /** Number of the query whose outcome is awaited (0: none). */
 let _pending = 0;
 
-/** Most recent log entry search state. */
-let _logInput;
+/** Handle of the timer that repeats what the 'Live' checkbox controls. */
+let _live;
+
+/** Moves the editor to a line and column that an error message names; registered by editor.js
+    where a page has an editor, and absent on the pages that do not load it. */
+let _locate;
+
+/** Delay before a query is reported as running. */
+const RESULT_DELAY = 500;
+
+/** localStorage key prefix for the 'Live' checkbox of a page. */
+const LIVE_KEY = "dba-live-";
+
+/** Pause between a result and the next refresh, in milliseconds; the server supplies it in
+    seconds, as the global option it keeps. Refreshes are chained: the pause starts when a
+    result arrives, so a slow one cannot queue up others. */
+const REFRESH_INTERVAL = Number(document.documentElement.dataset.interval) * 1000;
 
 /** Content panels of the current page, in grid track order. */
 let _panels = [];
+
 /** Whether at least one of the panels can be collapsed. */
 let _collapsible = false;
 
-/** Whether the current database resource can be edited. */
-let _resourceEditable;
-/** Server-rendered read-only reason ([ message, class ]). */
-let _resourceNote;
-/** Cached raw document; undefined if it must be requested again. */
-let _resourceSaved;
-/** Search input and indent preference of the pending resource request. */
-let _resource;
+/** Whether the collapsed panels are remembered. A page whose panel states follow from what it
+    shows assigns them itself, and storing them would fight with that. */
+let _storePanels = true;
 
 /** Longest message that is accepted by the WebSocket endpoints.
     Kept well below the 'maxTextMessageSize' of the WebSocket servlet (see web.xml), which also
     needs to accommodate the UTF-8 encoding of the message. */
 const MAX_MESSAGE_LENGTH = 1000000;
 
-/** Link to the resizer area. */
-let _resizer;
-/** Link to the panel grid whose first track is resized. */
+/** Link to the resized panel grid. */
 let _content;
-/** Width of the left panel, in percent. */
-let _width;
 
-/** Width of the left panel before the resizer is first dragged, in percent. */
-const DEFAULT_PANEL_WIDTH = 50;
-/** Narrowest the resizer lets the left panel get, in percent of the grid. */
-const MIN_PANEL_WIDTH = 10;
-/** Widest the resizer lets the left panel get, in percent of the grid. */
-const MAX_PANEL_WIDTH = 85;
+/** Resized grid tracks, as weights ({ column: [], row: [] }); the first row is not resized. */
+let _split;
 
-/** localStorage key prefix for unsaved editor drafts (per file name). */
-const DRAFT = "dba-draft:";
-/** On-disk content of the current file (empty for an untitled buffer). */
-let _saved = "";
+/** localStorage key prefix for the panel splits of a page. */
+const SPLIT_KEY = "dba-split-";
 
-/** Shortest an auto-resized editor gets, and its height on stacked layouts. */
-const EDITOR_MIN_HEIGHT = 200;
-/** Height of an editor that is not auto-resized. */
-const EDITOR_FIXED_HEIGHT = "300px";
+/** Smallest a panel gets by dragging, in pixels. */
+const MIN_PANEL_SIZE = 60;
 
-/** localStorage key for the logs 'ignore entries' filter. */
-const IGNORE_KEY = "dba-ignore-logs";
-/** localStorage key for the 'Indent' output preference. */
-const INDENT_KEY = "dba-indent";
 /** localStorage key prefix for the collapsed content panels of a page.
     Versioned: panel ids used to be row-based, the grid layout numbers them flat. */
 const PANELS_KEY = "dba-panels-v2-";
+
+/**
+ * Returns a localStorage key that describes the current page, not the DBA as a whole.
+ * @param {string} prefix key prefix
+ * @returns {string} key
+ */
+function pageKey(prefix) {
+  return prefix + window.location.pathname;
+}
 
 /**
  * Indicates whether the layout has stacked the panels into a single column.
@@ -74,21 +104,8 @@ function stacked() {
 }
 
 /**
- * Returns the height of the page chrome below <main>: the rule, the footer and
- * the body margin. None of it depends on the editor, so it can be measured.
- * @returns {number} height in pixels
- */
-function chromeBelowMain() {
-  let height = parseFloat(getComputedStyle(document.body).marginBottom);
-  for(let el = document.querySelector("main").nextElementSibling; el; el = el.nextElementSibling) {
-    height += el.getBoundingClientRect().height;
-  }
-  return height;
-}
-
-/**
  * Indicates whether the table row containing a checkbox is currently shown.
- * @param {checkbox} input checkbox
+ * @param {HTMLInputElement} input checkbox
  * @returns {boolean} visibility
  */
 function rowVisible(input) {
@@ -96,11 +113,21 @@ function rowVisible(input) {
 }
 
 /**
+ * Returns the checkboxes that select the entries of a form: the ones in its table. A checkbox
+ * elsewhere in the same form is a setting of an action (compress, binary), not a selection.
+ * @param {HTMLFormElement} form form
+ * @returns {NodeList} checkboxes
+ */
+function selection(form) {
+  return form.querySelectorAll("table input[type=checkbox]");
+}
+
+/**
  * Toggles the selection of all checkboxes in a form.
- * @param {checkbox} source clicked header checkbox
+ * @param {HTMLInputElement} source clicked header checkbox
  */
 function toggle(source) {
-  for(const input of getForm(source).querySelectorAll("input[type=checkbox]")) {
+  for(const input of selection(getForm(source))) {
     input.checked = source.checked && rowVisible(input);
   }
   buttons(source);
@@ -108,18 +135,19 @@ function toggle(source) {
 
 /**
  * Refreshes all buttons and checkboxes of a form.
- * @param {checkbox} source clicked checkbox. if undefined, all forms will be refreshed
+ * @param {HTMLInputElement} source clicked checkbox. if undefined, all forms will be refreshed
  */
 function buttons(source) {
   for(const form of (source ? [ getForm(source) ] : document.querySelectorAll("form"))) {
     // count selected items and refresh header checkbox
     let count = 0, checked = 0, header;
-    for(const input of form.querySelectorAll("input[type=checkbox]")) {
+    for(const input of selection(form)) {
       if(rowVisible(input)) {
         if(input.name) {
           count++;
           if(input.checked) checked++;
         } else {
+          // the select-all box of the table header; the named ones are the entries
           header = input;
         }
       }
@@ -135,7 +163,8 @@ function buttons(source) {
 
 /**
  * Returns the enclosing form element.
- * @param {source} source element
+ * @param {HTMLElement} source element
+ * @returns {HTMLFormElement} enclosing form
  */
 function getForm(source) {
   return source.closest("form");
@@ -154,11 +183,12 @@ document.addEventListener("click", (event) => {
 
 /**
  * Marks truncated table cells, indicating that they can be expanded.
+ * @param {HTMLElement} root part of the page to measure; the whole of it by default
  */
-function markTruncated() {
+function markTruncated(root = document) {
   // read all overflow states first, then write classes: interleaving the two forces
   // a full re-layout per cell, which is O(rows) for a fixed table and dominates on large logs
-  const cells = document.querySelectorAll("table.fixed td");
+  const cells = root.querySelectorAll("table.fixed td");
   const truncated = [];
   for(const cell of cells) {
     truncated.push(cell.classList.contains("expanded") ? null : cell.scrollWidth > cell.clientWidth);
@@ -170,34 +200,61 @@ function markTruncated() {
     if(truncated[i]) cell.title = cell.textContent;
     else cell.removeAttribute("title");
   });
+  // the content that was measured also decides whether the panel it fills scrolls
+  markScrollbars();
 }
-window.addEventListener("resize", markTruncated);
 
 /**
- * Asks for confirmation, naming the action and the selected entries.
- * @param {button} button clicked button
+ * Places the collapse chevrons. A chevron sits just inside the scrollbar of the list below it,
+ * and takes the room the scrollbar would have needed while the panel does not scroll.
+ */
+function markScrollbars() {
+  for(const panel of _panels) {
+    // an editor brings a scrollbar of its own; only a panel that scrolls as a whole can be
+    // free of one. The difference between the two widths is the scrollbar itself
+    const pane = panel.querySelector(".pane");
+    if(pane) panel.classList.toggle("no-scrollbar", pane.offsetWidth === pane.clientWidth);
+  }
+}
+
+// the event must not reach markTruncated, whose argument is the part of the page to measure
+window.addEventListener("resize", () => markTruncated());
+
+/**
+ * Asks for confirmation, naming the action and the selected entries. The answer arrives after
+ * the click has been dealt with, so the first click is always refused and the button clicks
+ * itself again once the action is confirmed; the second click submits its form.
+ * @param {HTMLButtonElement} button clicked button
  * @param {string} action action label
- * @returns {boolean} true if the action was confirmed
+ * @returns {boolean} true if the form may be submitted
  */
 function confirmAction(button, action) {
-  const values = [];
-  for(const input of getForm(button).querySelectorAll("input[type=checkbox]")) {
-    if(input.name && input.checked && rowVisible(input)) {
-      values.push(input.value);
-    }
+  if(button.dataset.confirmed) {
+    delete button.dataset.confirmed;
+    return true;
   }
-  const count = values.length;
+  // the entries are named by the table the question is asked from; the number is what the
+  // question adds, and a long list of paths would only bury it
+  let count = 0;
+  for(const input of selection(getForm(button))) {
+    if(input.name && input.checked && rowVisible(input)) count++;
+  }
   const message = count
-    ? `${action} ${count} ${count === 1 ? "entry" : "entries"}: ` +
-      `${values.slice(0, 8).join(", ")}${count > 8 ? ", …" : ""}?`
+    ? `${action} ${count} ${count === 1 ? "entry" : "entries"}?`
     : "Are you sure?";
-  return confirm(message);
+  confirmDialog(message).then(ok => {
+    if(ok) {
+      button.dataset.confirmed = "true";
+      button.click();
+    }
+  });
+  return false;
 }
 
 /**
  * Displays text with the specified type.
  * @param {string} message message to display
- * @param {type} type message type (info, warning, error)
+ * @param {string} type message type (info, warning, error)
  */
 function setText(message, type) {
   const info = document.getElementById("info");
@@ -208,7 +265,7 @@ function setText(message, type) {
 
 /**
  * Indicates that the files of a form are being uploaded.
- * @param {form} form submitted form
+ * @param {HTMLFormElement} form submitted form
  */
 function uploading(form) {
   setText("Files are being uploaded…", "warning");
@@ -220,9 +277,9 @@ function uploading(form) {
 
 /**
  * Creates and sends an HTTP request.
- * @param {url} url URL to be called
- * @param {data} data data to be sent
- * @returns {promise} promise
+ * @param {string} url URL to be called
+ * @param {string} data data to be sent
+ * @returns {Promise} promise
  */
 async function request(url, data) {
   let response;
@@ -241,17 +298,16 @@ async function request(url, data) {
   throw { status: response.status, statusText: response.statusText, responseText: text };
 }
 
-
 /**
  * Returns the connection to the specified endpoint, and opens it if required.
  * @param {string} path path, relative to the WebSocket root
- * @returns {promise} promise, resolved with an open WebSocket
+ * @returns {Promise} promise, resolved with an open WebSocket
  */
 function socket(path) {
   if(!_sockets[path]) {
     _sockets[path] = new Promise((resolve, reject) => {
       const scheme = location.protocol === "https:" ? "wss" : "ws";
-      const ws = new WebSocket(`${scheme}://${location.host}/ws/dba${path}`);
+      const ws = new WebSocket(`${scheme}://${location.host}${CONTEXT_PATH}/ws/dba${path}`);
       ws.onopen = () => resolve(ws);
       // the endpoint determines how a result is displayed; the server does not label it
       ws.onmessage = event => showMessage(path, event.data);
@@ -279,7 +335,7 @@ function socket(path) {
  * Sends a message to a WebSocket endpoint.
  * @param {string} path path, relative to the WebSocket root
  * @param {object} message message to be sent
- * @returns {promise} promise, resolved with true if the message was sent
+ * @returns {Promise} promise, resolved with true if the message was sent
  */
 async function sendMessage(path, message) {
   // the server closes the connection without a response if a message exceeds its size limit
@@ -300,24 +356,22 @@ async function sendMessage(path, message) {
 }
 
 /**
- * Evaluates a query in the editor panel. The query is sent to the server, which pushes back the
- * result or the error; see showMessage.
+ * Shows a message that was pushed by the server. A message that carries a run number reports
+ * the outcome of a request; one without is a notification. What it means is known by the page
+ * that opened the connection, which registers its handler in _handlers.
+ * @param {string} path path of the endpoint that pushed the message
+ * @param {string} data JSON message
  */
-async function runQuery() {
-  if(document.getElementById("run").disabled) return;
-  if(_editor) _editor.focus();
-
-  setDisabled("stop", true);
-  setText("", "");
-
-  const run = _pending = ++_run;
-  if(!await sendMessage("", {
-    type: "run",
-    run: run,
-    query: document.getElementById("editor").value,
-    indent: indentOn()
-  })) return;
-  awaitResult(run);
+function showMessage(path, data) {
+  const json = JSON.parse(data);
+  if(json.run !== undefined) {
+    // drop the outcome of a request that was stopped or superseded by a newer one
+    if(json.run !== _pending) return;
+    _pending = 0;
+    setDisabled("stop", true);
+  }
+  if(json.type === "error") showError(json.message, undefined, json);
+  _handlers[path]?.(json);
 }
 
 /**
@@ -330,48 +384,7 @@ function awaitResult(run) {
       setText("Please wait…", "warning");
       setDisabled("stop", false);
     }
-  }, 500);
-}
-
-/**
- * Stops the query that is currently evaluated in the editor panel. The server confirms the
- * request with a 'stopped' message; see showMessage.
- */
-async function stopQuery() {
-  if(_editor) _editor.focus();
-
-  // drop the number of the run: the result of the stopped query will be ignored
-  _pending = 0;
-  setDisabled("stop", true);
-  await sendMessage("", { type: "stop" });
-}
-
-/**
- * Shows a message that was pushed by the server.
- * @param {string} path path of the endpoint that pushed the message
- * @param {string} data JSON message
- */
-function showMessage(path, data) {
-  const json = JSON.parse(data);
-  // messages without a run are not bound to a request: they must not end the running one
-  if(json.type === "stopped") {
-    setText("Query was stopped.", "warning");
-  } else if(json.run === undefined) {
-    showError(json.message);
-  } else if(json.run === _pending) {
-    // drop the outcome of a request that was stopped or superseded by a newer one
-    _pending = 0;
-    setDisabled("stop", true);
-    if(json.type !== "result") {
-      showError(json.message, undefined, json);
-    } else if(path === "/logs") {
-      showLogEntries(json.result);
-    } else if(path === "/db-query") {
-      showResourceResult(json.result);
-    } else {
-      showResult(json.result);
-    }
-  }
+  }, RESULT_DELAY);
 }
 
 /**
@@ -400,10 +413,10 @@ function showError(response, info, position) {
 
   // with a line/column and an open editor, make a click on the message jump there
   const el = document.getElementById("info");
-  if(line && _editor && _editor.setCursor) {
+  el.classList.toggle("locatable", Boolean(line && _locate));
+  if(line && _locate) {
     el.dataset.line = line;
     el.dataset.column = column;
-    el.classList.add("locatable");
   } else {
     delete el.dataset.line;
     delete el.dataset.column;
@@ -415,249 +428,119 @@ function showError(response, info, position) {
  */
 function jumpToError() {
   const info = document.getElementById("info");
-  if(!info.classList.contains("locatable") || !_editor || !_editor.setCursor) return;
-  _editor.setCursor({ line: Number(info.dataset.line) - 1, ch: Number(info.dataset.column) - 1 });
-  _editor.focus();
-}
-
-/**
- * Shows the result of a query.
- * @param {string} text result
- * @returns {promise} promise
- */
-function showResult(text) {
-  setText("Query was successful.", "info");
-  _output.setValue(text);
-}
-
-/**
- * Queries the entries of the current log file.
- * @param {string} key typed key
- */
-function logEntries(key) {
-  const reset = key && key !== "Enter";
-  const input = document.getElementById("input").value.trim();
-  const ignore = document.getElementById("ignore")?.value.trim() ?? "";
-  const filters = document.querySelectorAll("input.filter");
-  const state = [ input, ignore, ...[...filters].map(f => f.value.trim()) ].join("\u0000");
-  if(reset && _logInput === state) return false;
-  _logInput = state;
-
-  const message = {
-    type: "entries",
-    input: input,
-    ignore: ignore,
-    date: document.getElementById("date").value,
-    sort: document.getElementById("sort").value,
-    page: reset ? 1 : Number(document.getElementById("page").value) || 1,
-    time: document.getElementById("time").value,
-    filters: {}
-  };
-  for(const filter of filters) {
-    const value = filter.value.trim();
-    if(value) message.filters[filter.name.replace(/^f-/, "")] = value;
-  }
-  // the server stops a search that is superseded by a newer one
-  message.run = _pending = ++_run;
-  sendMessage("/logs", message);
-
-  // refresh browser history
-  let href = replaceParam(window.location.href, "input", input);
-  for(const filter of filters) href = replaceParam(href, filter.name, filter.value.trim());
-  if(reset) href = replaceParam(href, "page", 1);
-  window.history.replaceState(null, "", href);
-}
-
-/**
- * Shows the log entries that were pushed by the server.
- * @param {string} text HTML table
- */
-function showLogEntries(text) {
-  setText("", "");
-  // preserve focus and caret of a filter field across the table refresh
-  const active = document.activeElement;
-  const focused = active?.matches("input.filter") && active;
-  document.getElementById("output").innerHTML = text;
-  markTruncated();
-  const e = document.getElementById(window.location.hash.replace(/^#/, ""));
-  if(e) e.scrollIntoView();
-  if(focused) {
-    const filter = document.querySelector(`input.filter[name="${focused.name}"]`);
-    if(filter) {
-      filter.value = focused.value;
-      filter.focus();
-      filter.setSelectionRange(focused.selectionStart, focused.selectionEnd);
-    }
+  if(info.classList.contains("locatable")) {
+    _locate(Number(info.dataset.line), Number(info.dataset.column));
   }
 }
 
 /**
- * Persists the log ignore filter and refreshes the entries.
- * @param {string} key typed key
+ * Indicates whether the 'Live' checkbox of the current page is ticked.
+ * @returns {boolean} live state
  */
-function ignoreLogs(key) {
-  localStorage.setItem(IGNORE_KEY, document.getElementById("ignore").value);
-  return logEntries(key);
+function liveOn() {
+  return document.getElementById("live")?.checked === true;
 }
 
 /**
- * Restores the persisted ignore filter, then loads the log entries.
+ * Restores the stored state of the 'Live' checkbox. What it controls is started by the page,
+ * which knows if the first request is already on its way.
  */
-function initLogs() {
-  const ignore = document.getElementById("ignore");
-  if(ignore) ignore.value = localStorage.getItem(IGNORE_KEY) ?? "";
-  return logEntries();
+function initLive() {
+  const live = document.getElementById("live");
+  if(!live) return;
+  const stored = localStorage.getItem(pageKey(LIVE_KEY));
+  if(stored !== null) live.checked = stored === "true";
 }
 
 /**
- * Filters log files.
+ * Persists the state of the 'Live' checkbox and starts what it controls.
  */
-function logFilter() {
-  const value = document.getElementById("log-filter").value;
-  let count = 0, checked = 0;
-  for(const input of document.getElementById("dates").querySelectorAll("input[type=checkbox]")) {
-    if(input.name === "name") {
-      const visible = !value || input.value.startsWith(value);
-      input.closest("tr").style.display = visible ? null : "none";
-      if(visible) {
-        count++;
-        if(input.checked) checked++;
-      } else {
-        input.checked = false;
-      }
-    }
-  }
-  for(const id of ["log-download", "log-delete"]) {
-    document.getElementById(id).disabled = !checked;
-  }
-  document.querySelector("h3").innerHTML = `${count} Entries`;
-  buttons();
+function liveChanged() {
+  const live = document.getElementById("live");
+  localStorage.setItem(pageKey(LIVE_KEY), live.checked);
+  // a repeat that was already scheduled must not slip through after unticking
+  clearTimeout(_live);
+  if(live.checked) _live_actions[live.dataset.live]?.();
 }
 
 /**
- * Shows a database resource in the editor: the document, raw or indented, or a query result.
- * @param {boolean} enforce enforce execution
+ * Opens a modal dialog: a form that needs more room than a question can be asked in.
+ * @param {string} id id of the dialog, without its suffix
  */
-function queryResource(enforce) {
-  const input = document.getElementById("input")?.value.trim() ?? "";
-  const indent = indentOn();
-  // re-run whenever the query or the indent preference changes
-  if(!enforce && _resource?.input === input && _resource?.indent === indent) return false;
-  // remember what was requested: the reply is evaluated when it arrives
-  _resource = { input: input, indent: indent };
-
-  // no query: show the document, raw or indented. only the raw one is cached
-  if(!input && !indent && _resourceSaved !== undefined) {
-    showResource(_resourceSaved);
-    return;
-  }
-  // block edits until the result has been received; a query result is read-only
-  editResource(false);
-  if(input && _resourceEditable) {
-    showNote("Read-only: query result. Clear the query to edit the document again.");
-  }
-
-  const run = _pending = ++_run;
-  sendMessage("/db-query", {
-    type: "query",
-    run: run,
-    name: document.getElementById("name").value,
-    resource: document.getElementById("resource").value,
-    query: input || ".",
-    indent: indent
-  });
-  awaitResult(run);
+function showDialog(id) {
+  document.getElementById(`${id}-dialog`)?.showModal();
 }
 
 /**
- * Shows the resource or query result that was pushed by the server.
- * @param {string} text result
+ * Opens one of the dialogs that answer a question, and waits for the answer. Their forms are
+ * submitted with 'method=dialog', so the clicked button's value is the answer; Escape closes
+ * the dialog with an empty one.
+ * @param {string} id id of the dialog, without its suffix
+ * @returns {Promise} promise, resolved with the value of the clicked button
  */
-function showResourceResult(text) {
-  if(_resource.input) {
-    _editor.setValue(text);
-    setText("Query was successful.", "info");
-  } else {
-    showResource(text);
-    if(!_resource.indent) _resourceSaved = text;
-  }
+function askDialog(id) {
+  const dialog = document.getElementById(`${id}-dialog`);
+  dialog.returnValue = "";
+  dialog.showModal();
+  return new Promise(resolve => dialog.addEventListener("close",
+    () => resolve(dialog.returnValue), { once: true }));
 }
 
 /**
- * Shows an editable document in the resource editor.
- * @param {string} text document
+ * Asks a question and waits for one of the answers it offers. The last answer is the way out:
+ * it is the one that Escape and a dismissed dialog give, so it carries an empty value.
+ * @param {string} message question to be answered
+ * @param {Array} answers answers, as [ value, label ] pairs
+ * @returns {Promise} promise, resolved with the value of the chosen answer
  */
-function showResource(text) {
-  _editor.setValue(text);
-  editResource(_resourceEditable);
-  showNote(_resourceEditable && indentOn() ?
-    "Whitespace may be stripped when the document is saved." : undefined, true);
-  setText("", "");
+function askQuestion(message, answers) {
+  document.getElementById("confirm-text").textContent = message;
+  const dialog = document.getElementById("confirm-dialog");
+  dialog.querySelector(".buttons").replaceChildren(...answers.map(([ value, label ]) => {
+    const button = document.createElement("button");
+    button.value = value;
+    button.textContent = label;
+    return button;
+  }));
+  return askDialog("confirm");
 }
 
 /**
- * Shows a note below the resource toolbar.
- * @param {string} message message; if omitted, the server-rendered reason is restored
- * @param {boolean} warn emphasize the message
+ * Asks for confirmation.
+ * @param {string} message question to be answered
+ * @returns {Promise} promise, resolved with true if the action was confirmed
  */
-function showNote(message, warn) {
-  const note = document.getElementById("note");
-  if(note) [ note.textContent, note.className ] =
-    message ? [ message, warn ? "note strong" : "note" ] : _resourceNote;
+async function confirmDialog(message) {
+  return await askQuestion(message, [ [ "ok", "OK" ], [ "", "Cancel" ] ]) === "ok";
 }
 
 /**
- * Initializes the resource editor and its button states, honoring the stored
- * 'Indent' preference.
- * @param {boolean} editable whether the resource can be edited in place
+ * Asks for a text value.
+ * @param {string} message question to be answered
+ * @param {string} value value to start from
+ * @returns {Promise} promise, resolved with the entered text, or null if it was cancelled
  */
-function initResource(editable) {
-  _resourceEditable = editable;
-  _resourceSaved = document.getElementById("editor").value;
-  const note = document.getElementById("note");
-  _resourceNote = [ note.textContent, note.className ];
-
-  if(document.getElementById("input") && indentOn()) {
-    // XML resource with indentation enabled: request the indented document
-    queryResource(true);
-  } else {
-    editResource(editable);
-  }
+async function promptDialog(message, value) {
+  const input = document.getElementById("prompt-input");
+  document.getElementById("prompt-text").textContent = message;
+  input.value = value ?? "";
+  const answer = askDialog("prompt");
+  // the dialog is open now: the text is offered for replacement, as a prompt does
+  input.select();
+  return await answer === "ok" ? input.value : null;
 }
 
 /**
- * Enables or disables editing of the shown resource.
- * @param {boolean} enabled edit state
+ * Publishes the width of a scrollbar, so that the collapse button of a panel can sit beside
+ * one instead of on top of it. It is the same for every panel, and is measured once.
  */
-function editResource(enabled) {
-  editorReadOnly(!enabled);
-  setDisabled("save-resource", !enabled);
-}
-
-/**
- * Reads the stored 'Indent' output preference.
- * @returns {boolean} whether output should be indented
- */
-function indentOn() {
-  return localStorage.getItem(INDENT_KEY) === "yes";
-}
-
-/**
- * Persists the 'Indent' preference and, in the resource view, re-renders with it.
- */
-function indentChanged() {
-  localStorage.setItem(INDENT_KEY, document.getElementById("indent").checked ? "yes" : "no");
-  // resource view re-renders immediately; the editor applies it on the next run
-  if(document.getElementById("resource")) queryResource(true);
-}
-
-/**
- * Sets the read-only state of the resource editor (CodeMirror or plain textarea).
- * @param {boolean} readOnly read-only state
- */
-function editorReadOnly(readOnly) {
-  if(_editor.setOption) _editor.setOption("readOnly", readOnly);
-  else document.getElementById("editor").readOnly = readOnly;
+function measureScrollbar() {
+  const probe = document.createElement("div");
+  probe.style.cssText = "position:absolute; visibility:hidden; overflow:scroll; width:100px";
+  document.body.append(probe);
+  document.documentElement.style.setProperty("--scrollbar",
+    `${probe.offsetWidth - probe.clientWidth}px`);
+  probe.remove();
 }
 
 /**
@@ -668,128 +551,6 @@ function editorReadOnly(readOnly) {
 function setDisabled(id, disabled) {
   const el = document.getElementById(id);
   if(el) el.disabled = disabled;
-}
-
-/**
- * Copies the current resource editor content to the clipboard.
- */
-function copyResource() {
-  copy(document.getElementById("editor").value);
-}
-
-/**
- * Saves the edited content of a database resource.
- */
-async function saveResource() {
-  const name = document.getElementById("name").value;
-  const resource = document.getElementById("resource").value;
-  const content = document.getElementById("editor").value;
-  const indent = indentOn();
-  let url = `db-save?name=${encodeURIComponent(name)}&resource=${encodeURIComponent(resource)}`;
-  if(indent) url += "&indent=true";
-  try {
-    await request(url, content);
-    // the raw document has changed: request it again
-    _resourceSaved = indent ? undefined : content;
-    setText("Resource was saved.", "info");
-  } catch(response) {
-    showError(response);
-  }
-}
-
-/**
- * Loads the CodeMirror editor extension.
- * @param {string}  language of main editor (for syntax highlighting)
- * @param {boolean} edit edit flag (edit vs. read-only)
- * @param {boolean} resize resize text areas to maximum height
- */
-function loadCodeMirror(language, edit, resize) {
-  // CodeMirror 6 is delivered as the self-contained window.CM6 bundle
-  // Without it, or on Android, fall back to plain textareas
-  const useCM = !!window.CM6 && !/android/i.test(navigator.userAgent);
-  if(edit) {
-    const editorArea = document.getElementById("editor");
-    if (useCM) {
-      _editor = CM6.fromTextArea(editorArea, {
-        language,
-        // Lezer-driven syntax-error gutter, only for the XQuery editor
-        parseErrors: language === "xquery",
-        extraKeys: [
-          { key: "Ctrl-Enter", run: () => (runQuery(), true) },
-          { key: "Cmd-Enter",  run: () => (runQuery(), true) }
-        ],
-        onChange: () => {
-          if(checkButtons) checkButtons();
-          saveDraft();
-        }
-      });
-    } else {
-      _editor = {
-        setValue(v) { editorArea.value = v; },
-        getValue() { return editorArea.value; },
-        historySize() { return {}; },
-        clearHistory() {},
-        focus() { editorArea.focus(); }
-      }
-      editorArea.onchange = () => {
-        if(checkButtons) checkButtons();
-        saveDraft();
-      };
-    }
-  }
-
-  const outputArea = document.getElementById("output");
-  if(outputArea != null) {
-    if (useCM) {
-      _output = CM6.fromTextArea(outputArea, { language: "xml", readOnly: true });
-    } else {
-      _output = {
-        setValue(v) { outputArea.value = v; }
-      }
-    }
-  }
-
-  if(resize) {
-    const refresh = () => {
-      // size each pane from its own top to the viewport bottom, so a tall
-      // sibling column (e.g. a long resource list) can't shrink it
-      // stacked layouts keep the minimum, so the editor does not fill the
-      // viewport and push the output and buttons off-screen
-      // measured once: reading it per element would interleave layout and style writes
-      const reserve = chromeBelowMain();
-      const height = elem => stacked() ? EDITOR_MIN_HEIGHT : Math.max(EDITOR_MIN_HEIGHT,
-        window.innerHeight - elem.getBoundingClientRect().top - reserve);
-      if (useCM) {
-        for(const elem of document.querySelectorAll(".cm-editor")) {
-          elem.style.height = `${height(elem)}px`;
-        }
-      } else {
-        for(const elem of document.querySelectorAll("textarea")) {
-          elem.style.height = `${height(elem)}px`;
-        }
-      }
-    };
-    window.addEventListener("load", refresh);
-    window.addEventListener("resize", refresh);
-  } else if (useCM) {
-    // no auto-resize (e.g. the users pages): without a height, the editor
-    // collapses to a single line. The textarea fallback is sized by style.css
-    for(const elem of document.querySelectorAll(".cm-editor")) {
-      elem.style.height = EDITOR_FIXED_HEIGHT;
-    }
-  }
-}
-
-/**
- * Adds the input string to the link target.
- * @param {link} source clicked link
- */
-function addInput(source) {
-  let href = replaceParam(source.href, "input", document.getElementById("input").value.trim());
-  for(const input of document.querySelectorAll("input.filter")) {
-    href = replaceParam(href, input.name, input.value.trim());
-  }
-  source.href = href;
 }
 
 /**
@@ -806,15 +567,8 @@ async function copy(text) {
 }
 
 /**
- * Copies the current query result to the clipboard.
- */
-function copyOutput() {
-  copy(_output ? _output.getValue() : "");
-}
-
-/**
  * Handles global keyboard shortcuts.
- * @param {event} event keydown event
+ * @param {Event} event keydown event
  */
 function shortcuts(event) {
   if(event.key === "Escape") {
@@ -845,27 +599,31 @@ function initPanels() {
   const content = document.querySelector(".content");
   if(!content) return;
   // panels spanning all columns have no track of their own and never collapse
-  const panels = [ ...content.children ].filter(p => p.matches(".panel:not(.full)"));
+  const panels = [ ...content.children ].filter(p => p.matches(".panel"));
   if(panels.length < 2) return;
 
   // every panel owns a grid track, whether or not it can be collapsed
   _panels = panels;
 
-  // if no state was stored yet, the markup supplies the default
-  const stored = localStorage.getItem(PANELS_KEY + window.location.pathname);
+  // if no state was stored yet, or the page owns the states, the markup supplies them
+  _storePanels = content.dataset.panels !== "auto";
+  const stored = _storePanels ? localStorage.getItem(pageKey(PANELS_KEY)) : null;
   const collapsed = stored?.split(",");
   panels.forEach((panel, p) => {
-    // the heading supplies the label of the collapsed strip; a panel without one
-    // (an empty side panel, the editor panes) stays as it is
+    // the label of the collapsed strip is the panel's own, or the first word of its heading:
+    // what follows a separator names the entry that is shown, which the panel outlives.
+    // A panel with neither (the editor panes) stays as it is
     const heading = panel.querySelector("h2, h3");
-    if(!heading) return;
+    const label = panel.dataset.label ?? heading?.textContent.split(/[»:]/)[0].trim();
+    if(!label) return;
     const id = `${p}`;
     const button = document.createElement("button");
     button.type = "button";
     button.className = "collapse";
-    // the last panel folds to the right, all others to the left
-    button.dataset.right = p === panels.length - 1;
-    button.dataset.title = heading.textContent.split("»")[0].trim();
+    // the last panel folds to the right, all others to the left; a panel at the right edge
+    // of a page that ends with more than one of them says so itself
+    button.dataset.right = panel.dataset.fold === "right" || p === panels.length - 1;
+    button.dataset.title = label;
     button.addEventListener("click", () => togglePanel(panel, id));
     panel.prepend(button);
     _collapsible = true;
@@ -876,7 +634,7 @@ function initPanels() {
 
 /**
  * Collapses or expands a content panel and persists the new state.
- * @param {div} panel panel to be toggled
+ * @param {HTMLElement} panel panel to be toggled
  * @param {string} id panel id
  */
 function togglePanel(panel, id) {
@@ -884,11 +642,13 @@ function togglePanel(panel, id) {
   showPanel(panel, collapse);
   applyColumns();
 
-  const key = PANELS_KEY + window.location.pathname;
-  const ids = new Set((localStorage.getItem(key) ?? "").split(",").filter(Boolean));
-  if(collapse) ids.add(id);
-  else ids.delete(id);
-  localStorage.setItem(key, [ ...ids ].join(","));
+  if(_storePanels) {
+    const key = pageKey(PANELS_KEY);
+    const ids = new Set((localStorage.getItem(key) ?? "").split(",").filter(Boolean));
+    if(collapse) ids.add(id);
+    else ids.delete(id);
+    localStorage.setItem(key, [ ...ids ].join(","));
+  }
 
   // lets CodeMirror panes and truncated cells adjust to the new widths
   window.dispatchEvent(new Event("resize"));
@@ -896,7 +656,7 @@ function togglePanel(panel, id) {
 
 /**
  * Applies the collapsed state of a content panel.
- * @param {div} panel panel
+ * @param {HTMLElement} panel panel
  * @param {boolean} collapse collapsed state
  */
 function showPanel(panel, collapse) {
@@ -910,7 +670,9 @@ function showPanel(panel, collapse) {
   if(collapse) {
     const label = document.createElement("span");
     label.className = "label";
-    label.textContent = title;
+    // the strip is drawn tight around its text: the trailing space keeps the rotated label
+    // off the edge, as the one after a heading keeps it off the chevron
+    label.textContent = `${title} `;
     button.append(label);
   }
   button.title = `${collapse ? "Expand" : "Collapse"} ${title}`;
@@ -918,8 +680,8 @@ function showPanel(panel, collapse) {
 }
 
 /**
- * Resizes the grid tracks: a collapsed panel shrinks to a strip,
- * its siblings share the freed space.
+ * Resizes the grid tracks: a panel with nothing to show gets none, a collapsed one a strip,
+ * and the rest share the freed space.
  */
 function applyColumns() {
   // pages without collapsible panels keep the track widths they declared;
@@ -928,30 +690,35 @@ function applyColumns() {
   if(!content || !_collapsible) return;
 
   // on narrow screens the panels are stacked; the media query supplies the single column
-  const shrunk = !stacked() && _panels.some(p => p.classList.contains("collapsed"));
-  if(shrunk) {
-    // 'min-content' sizes the strip from the rotated label, whatever the font
-    content.style.gridTemplateColumns = _panels.map(
-      p => p.classList.contains("collapsed") ? "min-content" : "1fr").join(" ");
+  const state = p => p.classList.contains("hidden") ? null :
+    p.classList.contains("collapsed") ? "min-content" : "";
+  const tracks = _panels.map(state);
+  if(!stacked() && tracks.some(t => t !== "")) {
+    // the panels that stay open keep the track widths the page declared, and
+    // 'min-content' sizes a folded strip from its rotated label, whatever the font
+    const widths = getComputedStyle(content).getPropertyValue("--columns").trim().split(/\s+/);
+    content.style.gridTemplateColumns = tracks
+      .map((t, i) => t === "" ? widths[i] || "1fr" : t)
+      .filter(t => t !== null).join(" ");
   } else {
     // restores the track widths declared by the page
     content.style.removeProperty("grid-template-columns");
   }
 }
+
 window.addEventListener("resize", applyColumns);
 
 /**
  * Initializes page-wide interactive behavior.
  */
 function ready() {
+  measureScrollbar();
   initPanels();
   // statically rendered tables are not marked by their own code
   markTruncated();
   document.addEventListener("keydown", shortcuts);
   document.getElementById("info")?.addEventListener("click", jumpToError);
-  // reflect the stored 'Indent' preference in the checkbox (editor and resource views)
-  const indent = document.getElementById("indent");
-  if(indent) indent.checked = indentOn();
+  initLive();
 }
 
 /**
@@ -980,204 +747,93 @@ function replaceParam(url, name, value) {
 }
 
 /**
- * Opens a file.
- * @param {string} file optional file name
+ * Makes the panel grid resizable: a '.resizer' drags a split between two columns, a
+ * '.resizer-row' one between two rows. 'data-split' numbers the split of its axis, so
+ * handles that sit on the same split drag it together.
  */
-async function openFile(file) {
-  if(_editor.historySize().undo > 0 && !confirm("Replace editor contents?")) return;
-
-  const name = file || fileName();
-  try {
-    const disk = await request(`editor-open?name=${encodeURIComponent(name)}`);
-    const draft = localStorage.getItem(DRAFT + name);
-    // set the baseline before setValue, whose synchronous change event runs saveDraft
-    _saved = disk;
-    _editor.setValue(disk);
-    finishFile(name, "File was opened.");
-    // apply a newer unsaved draft on top of the saved file (undo reverts to disk)
-    if(draft !== null && draft !== disk) _editor.setValue(draft);
-  } catch(response) {
-    showError(response, name);
-  }
-}
-
-/**
- * Saves a file.
- */
-async function saveFile() {
-  // append file suffix
-  const raw = fileName();
-  let name = raw;
-  if(!name.includes(".")) name += ".xq";
-
-  const fileString = document.getElementById("editor").value;
-  try {
-    const text = await request(`editor-save?name=${encodeURIComponent(name)}`, fileString);
-    // drop the draft: the buffer now matches the saved file (also the pre-suffix key)
-    localStorage.removeItem(DRAFT + raw);
-    localStorage.removeItem(DRAFT + name);
-    finishFile(name, "File was saved.");
-    refreshDataList(text.split("/"));
-  } catch(response) {
-    showError(response, name);
-  }
-}
-
-/**
- * Closes a file.
- */
-async function closeFile() {
-  const name = fileName();
-  // no file open: still clear the (possibly unsaved) untitled buffer
-  if(!name) {
-    _saved = "";
-    _editor.setValue("");
-    finishFile("", "Editor was cleared.");
-    return;
-  }
-  try {
-    const text = await request(`editor-close?name=${encodeURIComponent(name)}`);
-    // baseline before setValue's synchronous change event (see openFile)
-    _saved = "";
-    localStorage.removeItem(DRAFT + name);
-    _editor.setValue("");
-    finishFile("", "File was closed.");
-    refreshDataList(text.split("/"));
-  } catch(response) {
-    showError(response);
-  }
-}
-
-/**
- * Finishes a file operation.
- * @param {string} name new filename
- * @param {string} info info message
- */
-function finishFile(name, info) {
-  document.getElementById("file").value = name;
-  const disabled = name && !name.match(/\.xq(m|l|uery)?$/i);
-  document.getElementById("run").disabled = disabled;
-  _editor.clearHistory();
-  _saved = document.getElementById("editor").value;
-  checkButtons();
-  setText(info, "info");
-  _editor.focus();
-}
-
-/**
- * Persists the editor buffer as a local draft, or drops it once it matches the saved file.
- */
-function saveDraft() {
-  const name = fileName();
-  // drafts are an editor-page feature; skip on other CodeMirror pages (no file field)
-  if(name === undefined) return;
-  const content = document.getElementById("editor").value;
-  const key = DRAFT + name;
-  try {
-    if(content === _saved) localStorage.removeItem(key);
-    else localStorage.setItem(key, content);
-  } catch { /* storage disabled or full: drafts are best-effort */ }
-}
-
-/**
- * Restores the unsaved draft of the untitled buffer on page load, if one exists.
- */
-function restoreDraft() {
-  const draft = localStorage.getItem(DRAFT + (fileName() ?? ""));
-  if(draft) _editor.setValue(draft);
-}
-
-/**
- * Refreshes the list of editable files.
- * @param {array} names editable files
- */
-function refreshDataList(names) {
-  const files = document.getElementById("files");
-  files.replaceChildren();
-  for(const name of names) {
-    const opt = document.createElement("option");
-    opt.value = name;
-    files.appendChild(opt);
-  }
-}
-
-/**
- * Refreshes the editor buttons.
- */
-function checkButtons() {
-  const name = fileName();
-  (document.getElementById("open") || {}).disabled = !fileExists(name);
-  (document.getElementById("save") || {}).disabled = !name;
-  // Close also clears an untitled buffer, so enable it whenever there is content
-  (document.getElementById("close") || {}).disabled = !name && !document.getElementById("editor")?.value;
-}
-
-/**
- * Checks if the specified file exists.
- * @param {string} name filename
- * @returns {boolean} result of check
- */
-function fileExists(name) {
-  const files = document.getElementById("files");
-  return files && Array.from(files.children).some(file => file.value === name);
-}
-
-/**
- * Returns the current file name without file suffix
- * @returns {string} file name
- */
-function fileName() {
-  const file = document.getElementById("file");
-  if(file) return file.value.trim();
-}
-
-/**
- * Initializes the panel resizer.
- */
-function initResizer() {
+function initResizers() {
   _content = document.querySelector(".content");
-  _resizer = document.querySelector(".resizer");
+  if(!_content) return;
 
-  _width = Number(localStorage.getItem("editorWidth")) || DEFAULT_PANEL_WIDTH;
-  applyWidth();
-  window.addEventListener("resize", applyWidth);
-  _resizer.addEventListener("pointerdown", e => {
-    document.addEventListener("pointermove", resize);
-    document.addEventListener("pointerup", stopResize);
-    _resizer.setPointerCapture(e.pointerId);
-  });
-}
+  // the page declares the initial tracks; a stored split wins, but only if it still fits the
+  // grid: a page that changed its layout must not be sized by what an older one stored
+  const stored = JSON.parse(localStorage.getItem(pageKey(SPLIT_KEY)) ?? "{}");
+  const style = getComputedStyle(_content);
+  const fitting = (tracks, count) =>
+    Array.isArray(tracks) && tracks.length === count ? tracks : undefined;
+  _split = {
+    column: fitting(stored.column, style.gridTemplateColumns.split(" ").length),
+    // the first row holds the toolbar, which is not resized
+    row: fitting(stored.row, style.gridTemplateRows.split(" ").length - 1)
+  };
+  applySplit();
+  window.addEventListener("resize", applySplit);
 
-/**
- * Applies the current panel width. On narrow screens the panels are stacked,
- * and the width declared in style.css takes over.
- */
-function applyWidth() {
-  if(!stacked()) {
-    _content.style.gridTemplateColumns = `${_width}% 1fr`;
-  } else {
-    _content.style.removeProperty("grid-template-columns");
+  for(const handle of _content.querySelectorAll(".resizer, .resizer-row")) {
+    handle.addEventListener("pointerdown", event => {
+      const drag = e => resize(e, handle);
+      const stop = e => {
+        document.removeEventListener("pointermove", drag);
+        document.removeEventListener("pointerup", stop);
+        handle.releasePointerCapture(e.pointerId);
+        localStorage.setItem(pageKey(SPLIT_KEY), JSON.stringify(_split));
+      };
+      document.addEventListener("pointermove", drag);
+      document.addEventListener("pointerup", stop);
+      handle.setPointerCapture(event.pointerId);
+    });
   }
 }
 
 /**
- * Resizes the left panel.
- * @param {e} event
+ * Applies the dragged tracks. On narrow screens the panels are stacked, and the
+ * tracks declared in style.css take over.
  */
-function resize(e) {
-  const rect = _content.getBoundingClientRect();
-  const width = (e.clientX - rect.left) / rect.width * 100;
-  _width = Math.min(MAX_PANEL_WIDTH, Math.max(MIN_PANEL_WIDTH, width));
-  applyWidth();
+function applySplit() {
+  const apply = (name, tracks, prefix) => {
+    // on narrow screens the media query stacks the panels; the tracks that the page declared
+    // are left alone, as removing them would leave the grid without any at all
+    if(tracks && !stacked()) {
+      _content.style.setProperty(name, prefix + tracks.map(t => `${t}fr`).join(" "));
+    }
+  };
+  apply("--columns", _split.column, "");
+  // the first row holds the toolbar, which keeps the height it needs
+  apply("--rows", _split.row, "auto ");
 }
 
 /**
- * Stops resizing.
- * @param {e} event
+ * Moves a split to the pointer. What the dragged panel gains is taken from every panel behind
+ * it, in proportion to the space each of them has: dragging the first split must not squeeze
+ * its neighbour while the panels beyond it keep their width.
+ * @param {Event} e pointer event
+ * @param {HTMLElement} handle dragged handle
  */
-function stopResize(e) {
-  document.removeEventListener("pointermove", resize);
-  document.removeEventListener("pointerup", stopResize);
-  _resizer.releasePointerCapture(e.pointerId);
-  localStorage.setItem("editorWidth", _width);
+function resize(e, handle) {
+  const row = handle.matches(".resizer-row");
+  const style = getComputedStyle(_content);
+  // used track sizes, in pixels; written back as weights, which keeps the layout
+  const tracks = (row ? style.gridTemplateRows : style.gridTemplateColumns).split(" ").map(parseFloat);
+  const gap = parseFloat(row ? style.rowGap : style.columnGap) || 0;
+  // the first row is the toolbar and keeps its height; all columns are resized
+  const first = (row ? 1 : 0) + Number(handle.dataset.split ?? 0);
+
+  const rect = _content.getBoundingClientRect();
+  let start = row ? rect.top : rect.left;
+  for(let t = 0; t < first; t++) start += tracks[t] + gap;
+
+  // the tracks behind the split give way together and shrink in proportion, so the smallest
+  // of them is the one that reaches the minimum first and sets the limit
+  const after = tracks.slice(first + 1);
+  const rest = after.reduce((a, b) => a + b, 0);
+  const room = rest * (1 - MIN_PANEL_SIZE / Math.min(...after));
+  const size = Math.min(tracks[first] + room, Math.max(MIN_PANEL_SIZE,
+    (row ? e.clientY : e.clientX) - start));
+
+  const delta = size - tracks[first];
+  tracks[first] = size;
+  after.forEach((track, t) => { tracks[first + 1 + t] = track - delta * track / rest; });
+
+  _split[row ? "row" : "column"] = tracks.slice(row ? 1 : 0);
+  applySplit();
 }

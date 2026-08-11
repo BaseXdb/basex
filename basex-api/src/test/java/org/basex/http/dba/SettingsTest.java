@@ -16,8 +16,8 @@ import org.junit.jupiter.api.*;
 public final class SettingsTest extends DBATest {
   /** Default option values (a save persists every field, so all must be supplied). */
   private static final Map<String, String> DEFAULTS = Map.of(
-      "timeout", "30", "memory", "1000", "maxchars", "1000000",
-      "permission", "admin", "indent", "no", "maxrows", "1000", "ignore-logs", "");
+      "timeout", "60", "memory", "8000", "maxchars", "1000000",
+      "permission", "admin", "maxrows", "100");
 
   /**
    * Restores the default settings after each test.

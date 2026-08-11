@@ -95,7 +95,7 @@ public final class QueryTest extends DBATest {
     sendMessage("{ \"type\": \"run\", \"run\": 1, \"query\": \"prof:sleep(10000)\"," +
         " \"indent\": false }");
     sendMessage("{ \"type\": \"stop\" }");
-    assertEquals("{\"type\":\"stopped\"}", pollMessage());
+    assertEquals("{\"type\":\"stopped\"}", outcome());
   }
 
   /**
@@ -107,6 +107,19 @@ public final class QueryTest extends DBATest {
   private String evaluate(final String query) throws Exception {
     sendMessage("{ \"type\": \"run\", \"run\": " + ++run + ", \"query\": \"" +
         query.replace("\\", "\\\\").replace("\"", "\\\"") + "\", \"indent\": false }");
-    return pollMessage();
+    return outcome();
+  }
+
+  /**
+   * Returns the outcome of a request, skipping the notifications that precede it. The endpoint
+   * announces the job it started before the job has an outcome; the client tells the two apart
+   * by the number of the run, which only an outcome carries.
+   * @return message
+   * @throws Exception exception
+   */
+  private String outcome() throws Exception {
+    String message = pollMessage();
+    while(message.startsWith("{\"type\":\"job\"")) message = pollMessage();
+    return message;
   }
 }
