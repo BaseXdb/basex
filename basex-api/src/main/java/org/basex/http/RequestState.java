@@ -1,6 +1,7 @@
 package org.basex.http;
 
 import java.util.*;
+import java.util.function.*;
 
 import jakarta.servlet.http.*;
 
@@ -173,9 +174,99 @@ public interface RequestState {
    * @return value, or {@code null} if it does not exist or cannot be retrieved
    */
   static Object attribute(final HttpSession session, final String name) {
+    return access(session, s -> s.getAttribute(name), null);
+  }
+
+  /**
+   * Returns the ID of a session.
+   * @param session HTTP session (can be {@code null})
+   * @return ID, or {@code null} if the session is not available
+   */
+  static String id(final HttpSession session) {
+    return access(session, HttpSession::getId, null);
+  }
+
+  /**
+   * Returns the time when a session was created.
+   * @param session HTTP session (can be {@code null})
+   * @return time in milliseconds, or {@code -1} if the session is not available
+   */
+  static long created(final HttpSession session) {
+    return access(session, HttpSession::getCreationTime, -1L);
+  }
+
+  /**
+   * Returns the time when a session was last accessed.
+   * @param session HTTP session (can be {@code null})
+   * @return time in milliseconds, or {@code -1} if the session is not available
+   */
+  static long accessed(final HttpSession session) {
+    return access(session, HttpSession::getLastAccessedTime, -1L);
+  }
+
+  /**
+   * Returns the names of the attributes of a session.
+   * @param session HTTP session (can be {@code null})
+   * @return names, or {@code null} if the session is not available
+   */
+  static String[] attributeNames(final HttpSession session) {
+    return access(session, s -> Collections.list(s.getAttributeNames()).toArray(String[]::new),
+        null);
+  }
+
+  /**
+   * Assigns a session attribute.
+   * @param session HTTP session (can be {@code null})
+   * @param name name of the attribute
+   * @param value value to be assigned
+   * @return success flag
+   */
+  static boolean attribute(final HttpSession session, final String name, final Object value) {
+    return access(session, s -> {
+      s.setAttribute(name, value);
+      return true;
+    }, false);
+  }
+
+  /**
+   * Removes a session attribute.
+   * @param session HTTP session (can be {@code null})
+   * @param name name of the attribute
+   * @return success flag
+   */
+  static boolean remove(final HttpSession session, final String name) {
+    return access(session, s -> {
+      s.removeAttribute(name);
+      return true;
+    }, false);
+  }
+
+  /**
+   * Invalidates a session.
+   * @param session HTTP session (can be {@code null})
+   * @return success flag
+   */
+  static boolean invalidate(final HttpSession session) {
+    return access(session, s -> {
+      s.invalidate();
+      return true;
+    }, false);
+  }
+
+  /**
+   * Accesses a session. A container rejects every access to a session it has dropped, which can
+   * happen at any time and to a session that was listed a moment ago.
+   * @param <T> result type
+   * @param session HTTP session (can be {@code null})
+   * @param function access to the session
+   * @param fallback result if the session is not available
+   * @return result of the access, or the fallback
+   */
+  private static <T> T access(final HttpSession session, final Function<HttpSession, T> function,
+      final T fallback) {
     if(session != null) {
       try {
-        return session.getAttribute(name);
+        return function.apply(session);
       } catch(final NullPointerException | IllegalStateException ex) {
         // Jetty 12
         // - getSession: _coreRequest may be null for propagated request instances
@@ -183,6 +274,6 @@ public interface RequestState {
         Util.debug(ex);
       }
     }
-    return null;
+    return fallback;
   }
 }

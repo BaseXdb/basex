@@ -5,9 +5,11 @@
  :)
 module namespace dba = 'dba/logs';
 
-import module namespace config = 'dba/config' at '../lib/config.xqm';
-import module namespace html = 'dba/html' at '../lib/html.xqm';
-import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
+import module namespace config = 'dba/lib/config' at '../lib/config.xqm';
+import module namespace form = 'dba/lib/form' at '../lib/form.xqm';
+import module namespace html = 'dba/lib/html' at '../lib/html.xqm';
+import module namespace table = 'dba/lib/table' at '../lib/table.xqm';
+import module namespace utils = 'dba/lib/utils' at '../lib/utils.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'logs';
@@ -57,21 +59,19 @@ function dba:logs(
   let $date := $name otherwise string(head($files))
   return (
     <div class='panel'>
-      <h2>{
-        'Logs', '&#xa0;',
-        <input type='text' id='log-filter' name='log-filter' maxlength='10'
-               onkeyup='logFilter();' class='smallinput'/>
-      }</h2>
-
+      <div class='pane'>
       <form method='post' id='dates' autocomplete='off'>
         <input type='hidden' name='date' id='date' value='{ $date }'/>
         <input type='hidden' name='sort' id='sort' value='{ $sort }'/>
         <input type='hidden' name='page' id='page' value='{ $page }'/>
         <input type='hidden' name='time' id='time' value='{ $time }'/>
         <div id='list'>{
+          (: the filter is a control of the list, and shares the row of its buttons :)
           let $buttons := (
-            html:button('logs-download', 'Download', 'CHECK'),
-            html:button('logs/delete', 'Delete', ('CHECK', 'CONFIRM'))
+            form:button('logs-download', 'Download', 'CHECK'),
+            form:button('logs/delete', 'Delete', ('CHECK', 'CONFIRM')),
+            <input type='text' id='log-filter' name='log-filter' maxlength='10'
+                   onkeyup='logFilter();' class='smallinput'/>
           )
           let $headers := (
             { 'key': 'name', 'label': 'Name', 'type': 'dynamic' },
@@ -81,39 +81,52 @@ function dba:logs(
             for $entry in $files
             return {
               'name': fn() {
-                let $link := html:link(
-                  $entry, $dba:CAT, ({ 'sort': $sort }, { 'name': $entry })
-                ) update {
-                  (: enrich link targets with current search string :)
-                  insert node attribute onclick { 'addInput(this);' } into .
+                (: the reference is a deep link naming the file; following it in place asks
+                   for its entries over the connection the view already opened :)
+                html:link($entry, $dba:CAT, ({ 'sort': $sort }, { 'name': $entry })) update {
+                  insert node (
+                    attribute class { 'selected' }[$date = $entry],
+                    attribute data-select { $entry },
+                    attribute onclick { 'selectLog(this.dataset.select); return false;' }
+                  ) into .
                 }
-                return if ($date = $entry) then element b { $link } else $link
               },
               'size': $entry/@size
             }
-          return html:table($headers, $entries, $buttons)
+          (: the head is pinned, so the actions stay in reach while the files scroll.
+             The files of a server are few, and the filter looks through all of them :)
+          return table:create($headers, $entries, $buttons, {},
+            { 'sticky': <h2>Logs</h2>, 'all': true() })
         }</div>
       </form>
+      </div>
     </div>,
     <div class='panel stack-first'>{
       if ($date) {
-        <div class='logbar'>{
+        <div class='pane'>{
+        <div class='sticky logbar'>{
           <h3>{ $date }</h3>,
           <input type='hidden' name='name' value='{ $date }'/>,
           <input type='text' id='input' name='input' value='{ $input }' autocomplete='off'
                  title='Enter regular expression' autofocus='' onkeyup='logEntries(event.key);'/>,
+          <label title='Reload the entries every second'>{
+            <input type='checkbox' id='live' data-live='logs' onchange='liveChanged()'/>, ' Live'
+          }</label>,
           <span class='ignore'>{
             <input type='text' id='ignore' class='smallinput' autocomplete='off'
                    placeholder='Ignore, e.g. /dba' title='Regular expression of entries to hide'
                    onkeyup='ignoreLogs(event.key);'/>
           }</span>
         }</div>,
-        <div id='output'/>,
-        html:js('initLogs();')
+        <div id='output'/>
+        }</div>
       }
     }</div>
   ) => html:wrap({
-    'header': $dba:CAT, 'info': $info, 'error': $error, 'columns': ('190px', '1fr')
+    'header': $dba:CAT, 'info': $info, 'error': $error, 'columns': ('200px', '1fr'),
+    (: the panels fill the viewport and scroll on their own, so their heads can be pinned :)
+    'rows': '1fr',
+    'scripts': 'logs', 'init': 'initLogs();'[$date]
   })
 };
 
@@ -260,7 +273,7 @@ declare function dba:entries(
     for $column in $dba:COLUMNS
     let $name := 'f-' || $column?key
     return element td {
-      attribute class { 'num' }[$column?type = $html:NUMBER],
+      attribute class { 'num' }[$column?type = $table:NUMBER],
       <input type='text' class='filter' name='{ $name }' value='{ $filters($column?key) }'
              placeholder='{ $column?label }' autocomplete='off'
              title='Filter: { $column?label }' onkeyup='logEntries(event.key);'/>
@@ -269,7 +282,7 @@ declare function dba:entries(
   let $options := {
     'sort': $sort, 'presort': 'time', 'page': $page, 'filters': $filter-row
   }
-  return html:table($dba:COLUMNS, $entries, (), $params, $options)
+  return table:create($dba:COLUMNS, $entries, (), $params, $options)
 };
 
 (:~

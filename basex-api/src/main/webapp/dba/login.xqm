@@ -5,8 +5,10 @@
  :)
 module namespace dba = 'dba/login';
 
-import module namespace config = 'dba/config' at 'lib/config.xqm';
-import module namespace html = 'dba/html' at 'lib/html.xqm';
+import module namespace config = 'dba/lib/config' at 'lib/config.xqm';
+import module namespace form = 'dba/lib/form' at 'lib/form.xqm';
+import module namespace html = 'dba/lib/html' at 'lib/html.xqm';
+import module namespace utils = 'dba/lib/utils' at 'lib/utils.xqm';
 
 (:~
  : Permissions: checks the user credentials.
@@ -29,7 +31,7 @@ function dba:check(
   } else {
     (: last visited page to redirect to (if there was one) :)
     let $page := replace($path, '^.*dba/?', '')[.]
-    return web:redirect('/dba/login', html:parameters({ 'page': $page }))
+    return web:redirect(utils:page('login'), html:parameters({ 'page': $page }))
   }
 };
 
@@ -77,11 +79,11 @@ function dba:login(
           map:for-each(html:parameters(), fn($key, $value) {
             <input type='hidden' name='{ $key }' value='{ $value }'/>
           }),
-          html:field('Name:', <input type='text' name='_name' value='{ $name }' autofocus=''/>),
-          html:field('Password:', (
+          form:field('Name:', <input type='text' name='_name' value='{ $name }' autofocus=''/>),
+          form:field('Password:', (
             <input type='password' name='_pass'/>,
             ' ',
-            html:button('login', 'Login')
+            form:button('login', 'Login')
           ))
         }
       </form>

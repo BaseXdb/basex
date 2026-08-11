@@ -7,7 +7,8 @@ import org.basex.http.*;
 import org.junit.jupiter.api.*;
 
 /**
- * Tests for the WebSocket endpoint of the DBA resource query.
+ * Tests for the WebSocket endpoint of the DBA databases view, which serves both its panels
+ * and the queries on a resource.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -24,7 +25,7 @@ public final class DbQueryTest extends DBATest {
    */
   @BeforeEach public void open() throws Exception {
     execute("db:create('" + DB + "', <x><y>1</y><y>2</y></x>, '" + RESOURCE + "')");
-    connect("/db-query");
+    connect("/databases");
   }
 
   /**
@@ -70,6 +71,71 @@ public final class DbQueryTest extends DBATest {
     final String message = evaluate("1 +");
     assertTrue(message.startsWith("{\"type\":\"error\",\"run\":1,"), message);
     assertTrue(message.contains("\"line\":1,\"column\":4"), message);
+  }
+
+  /**
+   * The database list is pushed as the markup of its panel.
+   * @throws Exception exception
+   */
+  @Test public void databasesPanel() throws Exception {
+    final String message = panel("{ \"type\": \"databases\", \"name\": \"" + DB +
+        "\", \"sort\": \"\", \"page\": 1 }", "databases");
+    assertTrue(message.contains(DB), "database missing from the panel: " + message);
+  }
+
+  /**
+   * The panel of a database lists its resources.
+   * @throws Exception exception
+   */
+  @Test public void databasePanel() throws Exception {
+    final String message = panel("{ \"type\": \"database\", \"name\": \"" + DB +
+        "\", \"resource\": \"\", \"sort\": \"\", \"page\": 1 }", "database");
+    assertTrue(message.contains(RESOURCE), "resource missing from the panel: " + message);
+  }
+
+  /**
+   * A panel with nothing to show answers with empty contents, which hides it.
+   * @throws Exception exception
+   */
+  @Test public void emptyPanel() throws Exception {
+    assertEquals("{\"type\":\"database\",\"html\":\"\"}",
+        panel("{ \"type\": \"database\", \"name\": \"\", \"resource\": \"\"," +
+            " \"sort\": \"\", \"page\": 1 }", "database"));
+  }
+
+  /**
+   * The resource message carries the panel, the document and its edit state.
+   * @throws Exception exception
+   */
+  @Test public void resourcePanel() throws Exception {
+    final String message = panel("{ \"type\": \"resource\", \"name\": \"" + DB +
+        "\", \"resource\": \"" + RESOURCE + "\" }", "resource");
+    assertTrue(message.contains("\"editable\":true"), "document not editable: " + message);
+    assertTrue(message.contains("<x><y>1<\\/y><y>2<\\/y><\\/x>"), "document missing: " + message);
+  }
+
+  /**
+   * An unknown message type is reported.
+   * @throws Exception exception
+   */
+  @Test public void unknownType() throws Exception {
+    sendMessage("{ \"type\": \"nonsense\" }");
+    final String message = pollMessage();
+    assertTrue(message.contains("Unknown message type: nonsense"), message);
+  }
+
+  /**
+   * Sends a message and returns the pushed panel.
+   * @param message message
+   * @param type expected type of the answer
+   * @return message
+   * @throws Exception exception
+   */
+  private String panel(final String message, final String type) throws Exception {
+    sendMessage(message);
+    final String answer = pollMessage();
+    assertTrue(answer.startsWith("{\"type\":\"" + type + "\""), answer);
+    return answer;
   }
 
   /**

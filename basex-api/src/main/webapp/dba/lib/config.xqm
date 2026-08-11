@@ -3,16 +3,12 @@
  :
  : @author Christian Grün, BaseX Team, BSD License
  :)
-module namespace config = 'dba/config';
+module namespace config = 'dba/lib/config';
 
 (:~ Session key. :)
 declare variable $config:SESSION-KEY := 'dba';
-(:~ Current directory in the file panel. :)
-declare %private variable $config:FILES-DIR := 'dba-files-dir';
-(:~ Name of currently edited file. :)
-declare %private variable $config:EDITED-FILE := 'dba-edited-file';
 
-(:~ DBA directory. :)
+(:~ DBA directory; the file panel starts here if the client has no directory of its own. :)
 declare variable $config:DBA-DIR := (
   let $dir := db:option('dbpath') || '/.dba'
   return (
@@ -34,6 +30,8 @@ declare variable $config:TIMEOUT := 'timeout';
 declare variable $config:MEMORY := 'memory';
 (:~ Permission when running queries. :)
 declare variable $config:PERMISSION := 'permission';
+(:~ Delay between two requests of a live view, in seconds. :)
+declare variable $config:INTERVAL := 'interval';
 
 (:~ Options file. :)
 declare %private variable $config:OPTIONS-FILE := $config:DBA-DIR || '.dba.xml';
@@ -44,7 +42,8 @@ declare %private variable $config:DEFAULTS := {
   $config:MAXROWS    : 100,
   $config:TIMEOUT    : 60,
   $config:MEMORY     : 8_000,
-  $config:PERMISSION : 'admin'
+  $config:PERMISSION : 'admin',
+  $config:INTERVAL   : 1
 };
 
 (:~ Currently assigned options. :)
@@ -104,65 +103,16 @@ declare function config:save(
 };
 
 (:~
- : Returns the current files directory.
- : @return directory
+ : Resolves the directory of the file panel. The client remembers it and supplies it with every
+ : request; a relative step ('sub', '..') is appended to the path it sends.
+ : @param  $dir  directory supplied by the client (empty: use the default)
+ : @return existing directory, in native notation
  :)
-declare function config:files-dir() as xs:string {
-  session:get($config:FILES-DIR) otherwise $config:DBA-DIR
+declare function config:files-dir(
+  $dir  as xs:string?
+) as xs:string {
+  let $path := file:path-to-native(file:resolve-path(($dir[.] otherwise $config:DBA-DIR) || '/'))
+  (: ensure that the directory can be accessed :)
+  return (void(file:list($path)), $path)
 };
 
-(:~
- : Assigns the current files directory.
- : @param  $dir  directory
- :)
-declare function config:set-files-dir(
-  $dir  as xs:string
-) as empty-sequence() {
-  session:set($config:FILES-DIR, $dir)
-};
-
-(:~
- : Returns the current editor directory.
- : @return directory
- :)
-declare function config:editor-dir() as xs:string {
-  (config:edited-file()[.] ! file:parent(.)) otherwise config:files-dir()
-};
-
-(:~
- : Returns the currently edited file.
- : @return file path
- :)
-declare function config:edited-file() as xs:string? {
-  session:get($config:EDITED-FILE)
-};
-
-(:~
- : Assigns the currently edited file.
- : @param  $path  file path
- :)
-declare function config:set-edited-file(
-  $path  as xs:string
-) as empty-sequence() {
-  session:set($config:EDITED-FILE, $path)
-};
-
-(:~
- : Closes the currently edited file.
- :)
-declare function config:close-edited-file() as empty-sequence() {
-  session:delete($config:EDITED-FILE)
-};
-
-(:~
- : Returns the names of all files that can be opened in the editor.
- : @return list of files
- :)
-declare function config:editor-files() as xs:string* {
-  let $limit := config:get($config:MAXCHARS)
-  for $file in file:children(config:editor-dir())
-  where file:is-file($file) and file:size($file) <= $limit
-  let $name := file:name($file)
-  order by $name
-  return $name
-};

@@ -92,7 +92,10 @@ public final class SyntaxXQueryTest {
     check("(: a (: b :) c :)1", "CCCCCCCCCCCCCCCCCN");
     // a comment is not closed by the colon of its own opening delimiter
     check("(:)1", "CCCC");
-    check("(#p#)1", "CCCCCN");
+    check("(# p #)1", "CCCCCCCN");
+    // a pragma is followed by whitespace: '(#name' is a parenthesized QName literal
+    check("(#p#)1", ".....N");
+    check("error(#code, .)", "KKKKK..........");
   }
 
   /** EQNames: the URI must not be parsed as code. */

@@ -28,13 +28,13 @@ abstract class SessionFn extends ApiFunc {
     // HTTP context: get/create session (not available for detached requests)
     if(session == null) {
       session = state(qc).session(create);
+      // no session created (may happen with WebSockets): raise error or return null reference
+      if(session == null) {
+        if(create) throw SESSION_NOTFOUND.get(info);
+        return null;
+      }
     }
-    // no session created (may happen with WebSockets): raise error or return null reference
-    if(session == null) {
-      if(create) throw SESSION_NOTFOUND.get(info);
-      return null;
-    }
-    return new ASession(session);
+    return new ASession(session, null, info);
   }
 
   /**

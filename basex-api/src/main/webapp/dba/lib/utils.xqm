@@ -3,30 +3,33 @@
  :
  : @author Christian Grün, BaseX Team, BSD License
  :)
-module namespace utils = 'dba/utils';
+module namespace utils = 'dba/lib/utils';
 
-import module namespace config = 'dba/config' at 'config.xqm';
+import module namespace config = 'dba/lib/config' at 'config.xqm';
 
 (:~ WebSocket attribute: id of the job that runs for the current connection. :)
 declare %private variable $utils:JOB := 'dba-job';
 
-(:~ Regular expression for backups. :)
+(:~ Regular expression for XQuery files; matches the suffixes of IO.XQSUFFIXES. :)
+declare variable $utils:XQUERY-REGEX := '\.(xq|xqm|xqy|xql|xqu|xquery|xpath)$';
+
+(:~ Regular expression for backup names. :)
 declare variable $utils:BACKUP-REGEX := '^(.*)-(\d{4}-\d\d-\d\d)-(\d\d)-(\d\d)-(\d\d)$';
-(:~ Regular expression for backups. :)
+(:~ Regular expression for the file names of backups. :)
 declare variable $utils:BACKUP-ZIP-REGEX := '^(.*)-(\d{4}-\d\d-\d\d)-(\d\d)-(\d\d)-(\d\d)\.zip$';
 
 (:~
  : Parses a query.
  : @param  $query  query string
- : @param  $uri    base URI (optional)
+ : @param  $uri    base URI
  : @return parse result
  :)
 declare function utils:query-parse(
   $query  as xs:string,
-  $uri    as xs:string?
+  $uri    as xs:string
 ) as element() {
   xquery:parse($query, {
-    'base-uri': $uri otherwise config:edited-file() otherwise config:editor-dir(),
+    'base-uri': $uri,
     'plan'    : false(),
     'pass'    : true()
   })
@@ -34,8 +37,7 @@ declare function utils:query-parse(
 
 (:~
  : Serializes a value, considering the specified system limits.
- : @param  $value   value
- : @param  $indent  indent output
+ : @param  $value  value
  : @return string
  :)
 declare function utils:serialize(
@@ -71,6 +73,30 @@ declare function utils:ws-send(
 };
 
 (:~
+ : Renders a panel and pushes it to the client. Empty contents hide the panel, which is why the
+ : message is sent even then.
+ : @param  $type      type of the panel
+ : @param  $contents  panel contents
+ :)
+declare function utils:ws-panel(
+  $type      as xs:string,
+  $contents  as element()*
+) as empty-sequence() {
+  utils:ws-send({ 'type': $type, 'html': utils:html($contents) })
+};
+
+(:~
+ : Serializes nodes as the HTML that the client inserts into a panel.
+ : @param  $nodes  nodes
+ : @return HTML
+ :)
+declare function utils:html(
+  $nodes  as node()*
+) as xs:string {
+  serialize($nodes, { 'method': 'html' })
+};
+
+(:~
  : Logs an error of a WebSocket connection and reports it to the client.
  : @param  $category  category of the connection
  : @param  $message   error message
@@ -79,8 +105,11 @@ declare function utils:ws-error(
   $category  as xs:string,
   $message   as xs:string
 ) as empty-sequence() {
+  (: the log keeps the full text, the client is sent the code and its description :)
   admin:write-log($category || ': ' || $message, 'DBA'),
-  utils:ws-send({ 'type': 'error', 'message': $message })
+  let $text := replace($message, '\s*Stack Trace:.*', '', 's')
+  let $line := tokenize($text, '\n')[starts-with(., '[')]
+  return utils:ws-send({ 'type': 'error', 'message': head($line) otherwise $text })
 };
 
 (:~
@@ -135,44 +164,44 @@ declare function utils:ws-stop() as empty-sequence() {
 };
 
 (:~
- : Returns an ID for a job with the specified label. A counter is appended if a job with the same
- : name is still registered.
+ : Returns an ID for a job with the specified label. The connection the job is started for
+ : completes the name: a name is only reserved once the job starts, so two connections that
+ : choose the same one at the same time would collide. A connection starts one job at a time,
+ : and gives up the name before it asks for the next one.
  : @param  $label  label of the job
  : @return job ID
  :)
 declare function utils:job-id(
   $label  as xs:string
 ) as xs:string {
-  let $ids := job:list()
-  let $id := 'dba:' || $label
-  (: increase the counter as long as the name is assigned :)
-  return while-do($id,
-    fn { . = $ids },
-    fn($name, $count) { $id || '-' || ($count + 1) }
-  )
+  'dba:' || $label || '-' || ws:id()
 };
 
 (:~
  : Returns the options for running a query as job.
- : @param  $label  label of the job
+ : @param  $label     label of the job
+ : @param  $base-uri  base URI against which the query resolves relative paths
  : @return options
  :)
 declare function utils:job-options(
-  $label  as xs:string
+  $label     as xs:string,
+  $base-uri  as xs:string?
 ) as map(*) {
-  {
-    'timeout'   : config:get($config:TIMEOUT),
-    'memory'    : config:get($config:MEMORY),
-    'permission': config:get($config:PERMISSION),
-    'base-uri'  : config:edited-file() otherwise config:editor-dir(),
-    'cache'     : true(),
-    'id'        : utils:job-id($label)
-  }
+  map:merge((
+    {
+      'timeout'   : config:get($config:TIMEOUT),
+      'memory'    : config:get($config:MEMORY),
+      'permission': config:get($config:PERMISSION),
+      'cache'     : true(),
+      'id'        : utils:job-id($label)
+    },
+    { 'base-uri': $base-uri }[$base-uri]
+  ))
 };
 
 (:~
  : Returns the entries to be shown on the current page. While a table is being sorted, all entries
- : are returned, as sorting and paging are then performed in html:table.
+ : are returned, as sorting and paging are then performed by the table itself.
  : @param  $entries  all entries
  : @param  $page     current page
  : @param  $sort     sort key
@@ -226,6 +255,64 @@ declare function utils:safe-path(
   } else {
     web:error(400, 'Invalid path: ' || $name)
   }
+};
+
+(:~
+ : Returns files as a download. A single file is sent as it is; several files are packed
+ : into an archive, with the supplied name.
+ : @param  $paths    paths of the files
+ : @param  $archive  name of the archive, without suffix
+ : @return rest response and binary data
+ :)
+declare function utils:download(
+  $paths    as xs:string*,
+  $archive  as xs:string
+) as item()+ {
+  if (count($paths) = 1) {
+    utils:attachment(file:name($paths), file:read-binary($paths))
+  } else {
+    utils:attachment($archive || '.zip',
+      archive:create($paths ! file:name(.), $paths ! file:read-binary(.)))
+  }
+};
+
+(:~
+ : Returns binary data as a downloadable attachment.
+ : @param  $name  name of the file
+ : @param  $data  binary data
+ : @return rest response and binary data
+ :)
+declare %private function utils:attachment(
+  $name  as xs:string,
+  $data  as xs:base64Binary
+) as item()+ {
+  web:response-header({ 'media-type': web:content-type($name) }, utils:disposition($name)),
+  $data
+};
+
+(:~
+ : Returns the header that offers a response as a download. The name is encoded: a resource path
+ : may contain spaces, commas and characters outside ASCII, all of which a bare name would
+ : truncate or misrepresent.
+ : @param  $name  name of the file
+ : @return response header
+ :)
+declare function utils:disposition(
+  $name  as xs:string
+) as map(*) {
+  { 'Content-Disposition': "attachment; filename*=UTF-8''" || encode-for-uri($name) }
+};
+
+(:~
+ : Returns the URL of a DBA page. The context path is not included: web:redirect resolves
+ : absolute locations against the request URI, and thus adds it already.
+ : @param  $page  name of the page
+ : @return URL
+ :)
+declare function utils:page(
+  $page  as xs:string
+) as xs:string {
+  '/dba/' || $page
 };
 
 (:~
@@ -287,7 +374,7 @@ declare %updating function utils:dispatch(
 ) {
   let $entry := $actions?($action) otherwise web:error(404, 'Unknown action: ' || $action)
   let $target := $entry(request:parameter-map())
-  let $page := '/dba/' || $target?page
+  let $page := utils:page($target?page)
   let $params := $target?params otherwise {}
   let $run := $target?run
   return try {
