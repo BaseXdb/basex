@@ -3,6 +3,8 @@ package org.basex.http.dba;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
+import java.net.http.*;
+import java.nio.charset.*;
 
 import org.junit.jupiter.api.*;
 
@@ -23,6 +25,19 @@ public final class PagesTest extends DBATest {
       final String html = get(page);
       assertTrue(html.contains("<title>DBA"), page + ": not an authenticated DBA page:\n" + html);
     }
+  }
+
+  /**
+   * Serves a static resource from the file system, and rejects an unknown one.
+   * @throws IOException I/O exception
+   */
+  @Test public void staticResource() throws IOException {
+    final HttpResponse<String> response = send(200, "GET", ".static/style.css", null, null);
+    final String body = response.body();
+    assertTrue(body.contains("{"), body);
+    assertEquals(String.valueOf(body.getBytes(StandardCharsets.UTF_8).length),
+        response.headers().firstValue("Content-Length").orElse(null));
+    send(404, "GET", ".static/unknown.css", null, null);
   }
 
   /**

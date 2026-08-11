@@ -34,15 +34,25 @@ function dba:file(
   let $path := 'static/' || $file
   return if (contains($file, '..')) {
     web:error(400, 'Invalid path: ' || $file)
-  } else if (not(file:exists(file:resolve-path($path, static-base-uri())))) {
-    (: the message of the fetch error would name the directory of the application :)
-    web:error(404, 'Unknown file: ' || $file)
   } else {
-    web:response-header(
-      { 'media-type': web:content-type($path) },
-      { 'Cache-Control': 'max-age=3600,public' }
-    ),
-    fetch:binary($path)
+    try {
+      (: the lazy binary is read here: an error must not surface during serialization, and its
+         message would name the directory of the application :)
+      let $data := fetch:binary($path)
+      let $size := bin:length($data)
+      return (
+        web:response-header(
+          { 'media-type': web:content-type($path) },
+          {
+            'Cache-Control': 'max-age=3600,public',
+            'Content-Length': string($size)
+          }
+        ),
+        $data
+      )
+    } catch * {
+      web:error(404, 'Unknown file: ' || $file)
+    }
   }
 };
 
