@@ -88,7 +88,7 @@ public final class WebappArchiveTest extends HTTPTest {
    */
   @Test public void chatLogin() throws IOException {
     final String page = get(200, "chat");
-    assertTrue(page.contains("/chat/login-check"), page);
+    assertTrue(page.contains("action=\"chat/login-check\""), page);
   }
 
   /**
@@ -97,7 +97,7 @@ public final class WebappArchiveTest extends HTTPTest {
    */
   @Test public void chatLogout() throws IOException {
     final String page = get(200, "chat/logout");
-    assertTrue(page.contains("/chat/login-check"), page);
+    assertTrue(page.contains("action=\"chat/login-check\""), page);
   }
 
   /**

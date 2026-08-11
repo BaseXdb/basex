@@ -9,6 +9,9 @@
  : URL. When someone opens that URL, the function runs, and its result is
  : sent back to the browser.
  :
+ : All links are relative to the page they appear in (/chat), so they stay
+ : valid if the application is deployed below a context path.
+ :
  : @author BaseX Team, BSD License
  :)
 module namespace chat = 'chat';
@@ -57,9 +60,9 @@ function chat:login-check(
   } catch user:* {
     (: login fails: no session info is set :)
   },
-  (: go back to the main page: it shows the chat if the login
-   : worked, and the login form again if it did not :)
-  web:redirect('/chat')
+  (: go back to the main page (relative to /chat/login-check): it shows the
+   : chat if the login worked, and the login form again if it did not :)
+  web:redirect('../chat')
 };
 
 (:~
@@ -75,7 +78,7 @@ function chat:logout() as element(rest:response) {
   session:get($chat-util:id) ! chat-util:close(.),
   (: forget the user in the session :)
   session:delete($chat-util:id),
-  web:redirect('/chat')
+  web:redirect('../chat')
 };
 
 (:~
@@ -109,7 +112,7 @@ declare %private function chat:login() as element(html) {
   (: the entered name and password are sent to login-check (see above) :)
   chat:wrap(
     <div class='panel'>
-      <form action='/chat/login-check' method='post'>{
+      <form action='chat/login-check' method='post'>{
         chat:field('Name:', <input type='text' name='name' id='user' autofocus=''/>),
         chat:field('Password:', (
           <input type='password' name='pass'/>,
@@ -168,7 +171,7 @@ declare %private function chat:main() as element(html) {
     <div class='note'><b>MESSAGES</b></div>
     <div id='messages'/>
   </div>
-  ), '12rem 1fr', <script type='text/javascript' defer='' src='/chat/.static/chat.js'/>)
+  ), '12rem 1fr', <script type='text/javascript' defer='' src='chat/.static/chat.js'/>)
 };
 
 (:~
@@ -196,8 +199,8 @@ declare %private function chat:wrap(
       <meta name='description' content='WebSocket Chat'/>
       <meta name='author' content='BaseX Team, BSD License'/>
       <meta name='robots' content='noindex'/>
-      <link rel='icon' href='/chat/.static/basex.svg'/>
-      <link rel='stylesheet' type='text/css' href='/chat/.static/style.css'/>
+      <link rel='icon' href='chat/.static/basex.svg'/>
+      <link rel='stylesheet' type='text/css' href='chat/.static/style.css'/>
       { $headers }
     </head>
     <body data-user='{ $user }'>
@@ -210,7 +213,7 @@ declare %private function chat:wrap(
             </h1>
             {
               (: if someone is logged in, show the name and a logout link :)
-              if($user) { <div><b>{ $user }</b> · <a href='/chat/logout'>logout</a></div> }
+              if($user) { <div><b>{ $user }</b> · <a href='chat/logout'>logout</a></div> }
             }
           </div>
           <nav class='ellipsis'>{
@@ -230,7 +233,7 @@ declare %private function chat:wrap(
           }</nav>
           <hr/>
         </div>
-        <a href='/' class='header-logo'><img src='/chat/.static/basex.svg' alt='BaseX'/></a>
+        <a href='./' class='header-logo'><img src='chat/.static/basex.svg' alt='BaseX'/></a>
       </header>
       <main>
         <div class='content' style='--columns: { $columns }'>{ $panels }</div>

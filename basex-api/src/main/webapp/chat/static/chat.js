@@ -2,8 +2,8 @@
 // chat.xqm); this script opens a WebSocket connection to the selected room
 // and keeps the users list and the messages up-to-date.
 
-// base WebSocket address, built from the page address:
-// http(s)://HOST/chat  ->  ws(s)://HOST/ws/chat
+// base WebSocket address, built from the page address (a context path is
+// preserved): http(s)://HOST[/PATH]/chat  ->  ws(s)://HOST[/PATH]/ws/chat
 // the room name is appended when a room is opened (see openRoom)
 var base = window.location.href.replace(/^http(.*)\/chat\/?$/, "ws$1/ws/chat");
 // the open connection, the current room, and the private-message receiver
