@@ -209,7 +209,7 @@ public class TextPanel extends BaseXPanel {
   public final void setText(final byte[] text, final int size) {
     byte[] txt = text.length == size ? text : Arrays.copyOf(text, size);
     // remove carriage returns
-    if(Token.contains(txt, '\r')) txt = Token.replace(txt, new byte[] { '\r' }, Token.EMPTY);
+    txt = Token.replace(txt, new byte[] { '\r' }, Token.EMPTY);
     if(editor.text(txt)) hist.store(txt, editor.pos(), 0);
     resetError();
     updateCode.invokeLater();
