@@ -207,19 +207,9 @@ public class TextPanel extends BaseXPanel {
    * @param size text size
    */
   public final void setText(final byte[] text, final int size) {
-    byte[] txt = text;
-    if(Token.contains(text, '\r')) {
-      // remove carriage returns
-      int ns = 0;
-      for(int r = 0; r < size; ++r) {
-        final byte b = text[r];
-        if(b != '\r') text[ns++] = b;
-      }
-      // new text is different...
-      txt = Arrays.copyOf(text, ns);
-    } else if(text.length != size) {
-      txt = Arrays.copyOf(text, size);
-    }
+    byte[] txt = text.length == size ? text : Arrays.copyOf(text, size);
+    // remove carriage returns
+    if(Token.contains(txt, '\r')) txt = Token.replace(txt, new byte[] { '\r' }, Token.EMPTY);
     if(editor.text(txt)) hist.store(txt, editor.pos(), 0);
     resetError();
     updateCode.invokeLater();
