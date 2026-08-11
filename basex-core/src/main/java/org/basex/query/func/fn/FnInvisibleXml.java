@@ -6,7 +6,6 @@ import java.io.*;
 
 import org.basex.build.*;
 import org.basex.core.*;
-import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
@@ -21,6 +20,7 @@ import org.basex.util.hash.*;
 import org.basex.util.options.*;
 
 import de.bottlecaps.markup.*;
+import de.bottlecaps.markup.Blitz.Option;
 import de.bottlecaps.markup.blitz.ResultHandler;
 
 /**
@@ -70,6 +70,11 @@ public final class FnInvisibleXml extends StandardFunc {
    * Invisible XML parser generator.
    */
   private final class Generator {
+    /** Empty Markup Blitz options. */
+    private static final Option[] NO_OPTS = new Blitz.Option[0];
+    /** Markup Blitz options for fail-on-error. */
+    private static final Option[] FAIL_OPTS = new Blitz.Option[] { Blitz.Option.FAIL_ON_ERROR };
+
     /**
      * Generate a parser from an invisible XML grammar.
      * @param qc query context
@@ -80,24 +85,19 @@ public final class FnInvisibleXml extends StandardFunc {
       final Item grammar = (Item) ARG_TYPE.coerce(arg(0).value(qc), qc, info);
       final IxmlOptions options = toOptions(arg(1), new IxmlOptions(), qc);
 
+      final boolean xml = grammar instanceof XNode;
       final String grmmr;
       try {
-        grmmr = grammar.isEmpty() ? Blitz.ixmlGrammar() : grammar instanceof XNode ?
+        grmmr = grammar.isEmpty() ? Blitz.ixmlGrammar() : xml ?
           grammar.serialize().toString() : Token.string(grammar.string(info));
       } catch(final QueryIOException ex) {
         throw ex.getCause();
       }
 
       final de.bottlecaps.markup.blitz.Parser parser;
-      final boolean fail = options.get(IxmlOptions.FAIL_ON_ERROR);
+      final Blitz.Option[] opts = options.get(IxmlOptions.FAIL_ON_ERROR) ? FAIL_OPTS : NO_OPTS;
       try {
-        if(grammar instanceof XNode) {
-          parser = fail ? Blitz.generateFromXml(grmmr, Blitz.Option.FAIL_ON_ERROR) :
-            Blitz.generateFromXml(grmmr);
-        } else {
-          parser = fail ? Blitz.generate(grmmr, Blitz.Option.FAIL_ON_ERROR) :
-            Blitz.generate(grmmr);
-        }
+        parser = xml ? Blitz.generateFromXml(grmmr, opts) : Blitz.generate(grmmr, opts);
       } catch(final BlitzParseException ex) {
         throw IXML_GRM_X_X_X.get(info, ex.getOffendingToken(), ex.getLine(), ex.getColumn());
       } catch(final BlitzException ex) {
@@ -137,10 +137,7 @@ public final class FnInvisibleXml extends StandardFunc {
     public DBNode item(final QueryContext qc) throws QueryException {
       final String input = toString(arg(0), qc);
       try {
-        final MemBuilder builder = new MemBuilder(new SingleParser(new IOContent(""), OPTIONS) {
-          @Override protected void parse() { }
-        });
-        builder.init();
+        final MemBuilder builder = new MemBuilder(Parser.emptyParser(OPTIONS)).init();
         builder.openDoc(Token.EMPTY);
         parser.parse(input, new DBResultHandler(builder));
         builder.closeDoc();
@@ -149,9 +146,8 @@ public final class FnInvisibleXml extends StandardFunc {
         throw IXML_INP_X_X_X.get(info, ex.getOffendingToken(), ex.getLine(), ex.getColumn());
       } catch(final BlitzException | IOException ex) {
         throw IXML_RESULT_X.get(info, ex);
-      } catch(final RuntimeException ex) {
-        if(ex.getCause() instanceof final IOException io) throw IXML_RESULT_X.get(info, io);
-        throw ex;
+      } catch(final UncheckedIOException ex) {
+        throw IXML_RESULT_X.get(info, ex.getCause());
       }
     }
 
@@ -202,7 +198,7 @@ public final class FnInvisibleXml extends StandardFunc {
       try {
         builder.closeElem();
       } catch(final IOException ex) {
-        throw new RuntimeException(ex);
+        throw new UncheckedIOException(ex);
       }
     }
 
@@ -225,7 +221,7 @@ public final class FnInvisibleXml extends StandardFunc {
       try {
         builder.text(bytes(codepoints, length));
       } catch(final IOException ex) {
-        throw new RuntimeException(ex);
+        throw new UncheckedIOException(ex);
       }
     }
 
@@ -235,7 +231,7 @@ public final class FnInvisibleXml extends StandardFunc {
       try {
         builder.openElem(element, atts, nsp);
       } catch(final IOException ex) {
-        throw new RuntimeException(ex);
+        throw new UncheckedIOException(ex);
       }
       element = null;
       atts = new Atts();
