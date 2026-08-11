@@ -17,7 +17,7 @@ public final class SessionsGet extends SessionsFn {
     final ASession session = session(qc);
     final String key = toString(arg(1), qc);
 
-    final Value value = session.get(key, qc, info);
+    final Value value = session.get(key, qc);
     return value != null ? value : defined(2) ? arg(2).value(qc) : Empty.VALUE;
   }
 }

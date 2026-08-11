@@ -28,6 +28,6 @@ abstract class SessionsFn extends ApiFunc {
     final byte[] id = toToken(arg(0), qc);
     final HttpSession session = SessionListener.get(Token.string(id));
     if(session == null) throw SESSIONS_NOTFOUND_X.get(info, id);
-    return new ASession(session);
+    return new ASession(session, id, info);
   }
 }
