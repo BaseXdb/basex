@@ -730,7 +730,7 @@ public class TextPanel extends BaseXPanel {
       updateCode.invokeLater(down ? Align.BOTTOM : Align.TOP);
     }
     // refresh completions, or show them after a delay if the cursor was moved
-    if(moved || edited) {
+    if(hist.active() && (moved || edited)) {
       refreshCompletion(true);
       signatureCode.invokeLater(false);
     } else if(control(e) || e.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {

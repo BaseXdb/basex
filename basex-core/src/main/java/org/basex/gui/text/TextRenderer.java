@@ -126,14 +126,15 @@ final class TextRenderer extends BaseXBack {
     if(opts == null) return;
     cache.reset();
 
-    margin = opts.margin();
     // text that cannot be edited is always wrapped: it has no horizontal scrolling
     wrap = !edit || opts.get(GUIOptions.WORDWRAP);
     if(wrap) hscroll.pos(0);
-    showInvisible = opts.get(GUIOptions.SHOWINVISIBLE);
-    showNL = opts.get(GUIOptions.SHOWNL);
-    showLines = opts.get(GUIOptions.SHOWLINES);
-    markline = opts.get(GUIOptions.MARKLINE);
+    // editing aids are cleared for text that cannot be edited
+    margin = edit ? opts.margin() : 0;
+    showInvisible = edit && opts.get(GUIOptions.SHOWINVISIBLE);
+    showNL = edit && opts.get(GUIOptions.SHOWNL);
+    showLines = edit && opts.get(GUIOptions.SHOWLINES);
+    markline = edit && opts.get(GUIOptions.MARKLINE);
     antiAlias = opts.get(GUIOptions.ANTIALIAS);
     repaint();
   }
@@ -205,7 +206,7 @@ final class TextRenderer extends BaseXBack {
    * @param g graphics reference
    */
   private void drawLineNumber(final Graphics g) {
-    if(edit && showLines) {
+    if(showLines) {
       g.setColor(GUIConstants.gray);
       final String string = Integer.toString(line);
       clipAll(g);
@@ -219,19 +220,17 @@ final class TextRenderer extends BaseXBack {
    * @param g graphics reference
    */
   private void drawLinesSep(final Graphics g) {
-    if(edit) {
-      final int sx = sepX();
-      if(showLines) {
+    final int sx = sepX();
+    if(showLines) {
+      g.setColor(GUIConstants.lightGray);
+      g.drawLine(sx, 0, sx, height);
+    }
+    if(margin > 0) {
+      // line margin
+      final int lx = offset - hscroll.pos() + font.charWidth(' ') * margin;
+      if(lx > sx) {
         g.setColor(GUIConstants.lightGray);
-        g.drawLine(sx, 0, sx, height);
-      }
-      if(margin > 0) {
-        // line margin
-        final int lx = offset - hscroll.pos() + font.charWidth(' ') * margin;
-        if(lx > sx) {
-          g.setColor(GUIConstants.lightGray);
-          g.drawLine(lx, 0, lx, height);
-        }
+        g.drawLine(lx, 0, lx, height);
       }
     }
   }
@@ -336,7 +335,7 @@ final class TextRenderer extends BaseXBack {
     syntax.init(GUIConstants.textColor);
 
     offset = OFFSET;
-    if(g != null && edit && showLines) {
+    if(g != null && showLines) {
       offset += font.stringWidth(Integer.toString(text.lines())) + (OFFSET << 1);
     }
     startX = offset - (start ? 0 : hscroll.pos());
@@ -633,7 +632,7 @@ final class TextRenderer extends BaseXBack {
    * @param g graphics reference
    */
   private void markLine(final TextIterator iter, final Graphics g) {
-    if(!edit || !markline) return;
+    if(!markline) return;
     if(caretStart == -1) {
       // locate the boundaries of the line with the cursor
       final byte[] txt = iter.text();
@@ -698,8 +697,8 @@ final class TextRenderer extends BaseXBack {
     // retrieve first character of current token
     final int pos = iter.pos(), cpos = iter.caret();
 
-    // handle matching parentheses; ignore brackets in strings, comments and element content
-    final boolean code = syntax.codeBefore() || syntax.codeAfter();
+    // pair brackets in editable code, but not in strings, comments or element content
+    final boolean code = edit && (syntax.codeBefore() || syntax.codeAfter());
     final int opening = code ? Syntax.OPENING.indexOf(cp) : -1;
     final int closing = code ? Syntax.CLOSING.indexOf(cp) : -1;
     if(opening != -1 || closing != -1) {
@@ -720,7 +719,9 @@ final class TextRenderer extends BaseXBack {
     // check if text is visible
     if(y > 0 && x <= width && x + stringWidth >= offset) {
       // mark repeated, selected and found text
-      for(final int[] oc : iter.occurrences()) mark(oc, iter, g, GUIConstants.color3A);
+      if(edit) {
+        for(final int[] oc : iter.occurrences()) mark(oc, iter, g, GUIConstants.color3A);
+      }
       mark(iter.selection(), iter, g, GUIConstants.color2A);
       for(final int[] sr : iter.searchResults()) mark(sr, iter, g, GUIConstants.color2A);
 
