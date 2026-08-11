@@ -421,12 +421,25 @@ function jumpToError() {
 }
 
 /**
+ * Guesses the result language from its first character.
+ * @param {string} text serialized result
+ * @returns {string} language for _output.setLanguage
+ */
+function resultLanguage(text) {
+  const s = text.replace(/^[\s﻿]+/, "");
+  if(s[0] === "<") return "xml";
+  if(s[0] === "{" || s[0] === "[") return "json";
+  return "text";
+}
+
+/**
  * Shows the result of a query.
  * @param {string} text result
  * @returns {promise} promise
  */
 function showResult(text) {
   setText("Query was successful.", "info");
+  if(_output.setLanguage) _output.setLanguage(resultLanguage(text));
   _output.setValue(text);
 }
 
@@ -736,6 +749,9 @@ function loadCodeMirror(language, edit, resize) {
         saveDraft();
       };
     }
+    // language follows the file name
+    document.getElementById("file")?.addEventListener("input",
+      () => _editor.setLanguage?.(fileLanguage(fileName())));
   }
 
   const outputArea = document.getElementById("output");
@@ -1049,14 +1065,36 @@ async function closeFile() {
 }
 
 /**
+ * Indicates whether a file is run as XQuery (XQuery suffix or no name).
+ * @param {string} name file name (may be empty)
+ * @returns {boolean} result of check
+ */
+function isXQuery(name) {
+  return !name || /\.xq(m|l|uery)?$/i.test(name);
+}
+
+/**
+ * Chooses the editor language from the file name (see isXQuery).
+ * @param {string} name file name (may be empty)
+ * @returns {string} language for _editor.setLanguage
+ */
+function fileLanguage(name) {
+  if(isXQuery(name)) return "xquery";
+  const ext = name.replace(/^.*\./, "").toLowerCase();
+  if([ "xml", "xsd", "xsl", "xslt", "svg", "rng", "rdf", "wsdl", "xhtml" ].includes(ext)) return "xml";
+  if(ext === "json") return "json";
+  return "text";
+}
+
+/**
  * Finishes a file operation.
  * @param {string} name new filename
  * @param {string} info info message
  */
 function finishFile(name, info) {
   document.getElementById("file").value = name;
-  const disabled = name && !name.match(/\.xq(m|l|uery)?$/i);
-  document.getElementById("run").disabled = disabled;
+  document.getElementById("run").disabled = !isXQuery(name);
+  if(_editor.setLanguage) _editor.setLanguage(fileLanguage(name));
   _editor.clearHistory();
   _saved = document.getElementById("editor").value;
   checkButtons();
