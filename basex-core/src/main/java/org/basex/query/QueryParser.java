@@ -3519,8 +3519,7 @@ public class QueryParser extends InputParser {
         last = '`';
       } else if(cp == '(' && next() == ':') {
         skipComment();
-      } else if(cp == '(' && next() == '#') {
-        skipPragma();
+      } else if(cp == '(' && next() == '#' && skipPragma()) {
         last = ')';
       } else if(cp == '<') {
         final int nx = next();
@@ -3667,15 +3666,22 @@ public class QueryParser extends InputParser {
 
   /**
    * Skips a pragma.
+   * @return result of check
    * @throws QueryException query exception
    */
-  private void skipPragma() throws QueryException {
-    consume();
-    consume(); // '(#'
+  private boolean skipPragma() throws QueryException {
+    final int p = pos;
+    pos += 2; // '(#'
+    // a pragma is followed by whitespace: '(#name' is a parenthesized QName literal
+    if(!consumeWS()) {
+      pos = p;
+      return false;
+    }
     while(!consume("#)")) {
       if(!more()) throw error(PRAGMAINV);
       consume();
     }
+    return true;
   }
 
   /**

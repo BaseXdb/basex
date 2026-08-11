@@ -314,7 +314,8 @@ final class SyntaxXQuery extends SyntaxMarkup {
   private Color code(final byte[] text, final int pos, final int ch) {
     if(ch == '(') {
       final int next = cp(text, pos + 1);
-      if(next == ':' || next == '#') {
+      // a pragma is followed by whitespace: '(#name' is a parenthesized QName literal
+      if(next == ':' || next == '#' && ws(cp(text, pos + 2))) {
         enter(next == ':' ? COMMENT : PRAGMA, 1);
         return cyan;
       }
