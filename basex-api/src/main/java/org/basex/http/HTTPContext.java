@@ -8,8 +8,6 @@ import jakarta.servlet.*;
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.io.*;
-import org.basex.query.*;
-import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**
@@ -27,10 +25,6 @@ public final class HTTPContext {
   private IOException exception;
   /** Server instance. */
   private BaseXServer server;
-  /** Reference to web.xml file. */
-  private IOFile initFile;
-  /** Initialization parameters. */
-  private Map<String, ?> initParams;
 
   /** Singleton instance. */
   private static volatile HTTPContext instance;
@@ -56,33 +50,11 @@ public final class HTTPContext {
   }
 
   /**
-   * Returns initialization parameters.
-   * @return map
-   */
-  @SuppressWarnings("unchecked")
-  public Map<String, ?> initParams() {
-    if(initParams == null && context != null && initFile != null) {
-      try {
-        final String query = "{ .//*:init-param ! { *:param-name: data(*:param-value) } }";
-        try(QueryProcessor qp = new QueryProcessor(query, context).context(new DBNode(initFile))) {
-          initParams = (HashMap<String, ?>) qp.value().toJava();
-        }
-      } catch(final Exception ex) {
-        Util.debug(ex);
-      }
-    }
-    if(initParams == null) initParams = new HashMap<>();
-    return initParams;
-  }
-
-  /**
    * Initializes the HTTP context with static options.
    * @param sopts static options
-   * @param webXml web.xml file
    */
-  public void init(final StaticOptions sopts, final IOFile webXml) {
+  public void init(final StaticOptions sopts) {
     soptions = sopts;
-    initFile = webXml;
   }
 
   /**
@@ -95,7 +67,10 @@ public final class HTTPContext {
     // check if servlet context has already been initialized
     if(context != null) return;
 
+    // containers that serve a web archive without unpacking it grant no file access
     final String webapp = sc.getRealPath("/");
+    if(webapp == null) throw new BaseXException("Web application must be deployed unpacked.");
+
     // system property (requested in Prop#homePath)
     System.setProperty(Prop.PATH, webapp);
     // global option (will later be assigned to StaticOptions#WEBPATH)

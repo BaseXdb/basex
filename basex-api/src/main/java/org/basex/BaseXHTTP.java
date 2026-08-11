@@ -19,7 +19,7 @@ import org.basex.util.log.*;
 import org.eclipse.jetty.compression.gzip.*;
 import org.eclipse.jetty.compression.server.*;
 import org.eclipse.jetty.ee10.webapp.*;
-import org.eclipse.jetty.ee10.websocket.server.config.*;
+import org.eclipse.jetty.ee10.websocket.jakarta.server.config.*;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.util.resource.*;
 import org.eclipse.jetty.xml.*;
@@ -80,10 +80,11 @@ public final class BaseXHTTP extends CLI {
     // initialize configuration files and initialize HTTP context
     final String webapp = soptions.get(StaticOptions.WEBPATH);
     final WebAppContext wac = new WebAppContext(webapp, "/");
-    final IOFile webXml = locate(WEBCONF, webapp), jettyXml = locate(JETTYCONF, webapp);
+    locate(WEBCONF, webapp);
+    final IOFile jettyXml = locate(JETTYCONF, webapp);
 
     hc = HTTPContext.get();
-    hc.init(soptions, webXml);
+    hc.init(soptions);
 
     // create jetty instance
     final URI jettyUri = Paths.get(jettyXml.toString()).toUri();
@@ -103,7 +104,7 @@ public final class BaseXHTTP extends CLI {
       }
     }
     jetty.setHandler(supplier);
-    JettyWebSocketServletContainerInitializer.configure(wac, null);
+    JakartaWebSocketServletContainerInitializer.configure(wac, null);
 
     ServerConnector sc = null;
     for(final Connector conn : jetty.getConnectors()) {

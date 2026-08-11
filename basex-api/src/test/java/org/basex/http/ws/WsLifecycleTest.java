@@ -306,6 +306,28 @@ public final class WsLifecycleTest extends WsTest {
   }
 
   /**
+   * A text message below the {@code maxTextMessageSize} servlet parameter of the deployed
+   * web.xml, but well above the default buffer size of a WebSocket container, is accepted
+   * (guards the assignment of the servlet parameters to each new connection).
+   * @throws Exception exception
+   */
+  @Test public void textLarge() throws Exception {
+    register("declare %ws:message('/echo', '{$m}') function m:msg($m) {"
+        + " ws:send(string-length($m), ws:id()) };");
+
+    final Listener l = new Listener();
+    final java.net.http.WebSocket ws = connect("/echo", l);
+    try {
+      // matches the longest message that the DBA sends
+      final int size = 1000000;
+      ws.sendText("x".repeat(size), true).get(10, TimeUnit.SECONDS);
+      assertEquals(Integer.toString(size), l.pollText());
+    } finally {
+      close(ws);
+    }
+  }
+
+  /**
    * The {@code request:*} module is available inside a WebSocket message handler.
    * @throws Exception exception
    */

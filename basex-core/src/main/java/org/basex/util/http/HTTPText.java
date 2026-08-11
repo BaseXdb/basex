@@ -31,8 +31,6 @@ public interface HTTPText {
   String DBA_CLIENT_ID = "dba";
   /** Client ID. */
   String CLIENT_ID = "id";
-  /** Request attribute: authenticated user. */
-  String REQUEST_USER = "org.basex.user";
 
   /** HTTP header string. */
   String WWW_AUTHENTICATE = "WWW-Authenticate";
@@ -58,6 +56,10 @@ public interface HTTPText {
   String EXPIRES = "Expires";
   /** HTTP header string. */
   String LOCATION = "Location";
+  /** HTTP header string. */
+  String LAST_MODIFIED = "Last-Modified";
+  /** HTTP header string. */
+  String IF_MODIFIED_SINCE = "If-Modified-Since";
   /** HTTP header string. */
   String ACCEPT = "Accept";
   /** HTTP header string. */

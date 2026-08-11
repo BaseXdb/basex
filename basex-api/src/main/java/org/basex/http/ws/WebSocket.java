@@ -1,6 +1,8 @@
 package org.basex.http.ws;
 
+import java.io.*;
 import java.nio.*;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.*;
 
@@ -8,6 +10,7 @@ import org.basex.core.*;
 import org.basex.core.users.*;
 import org.basex.http.*;
 import org.basex.http.web.*;
+import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.value.*;
 import org.basex.server.*;
@@ -15,19 +18,20 @@ import org.basex.util.*;
 import org.basex.util.http.*;
 import org.basex.util.list.*;
 import org.basex.util.log.*;
-import org.eclipse.jetty.websocket.api.*;
-import org.eclipse.jetty.websocket.api.exceptions.*;
 
 import jakarta.servlet.http.*;
+import jakarta.websocket.*;
 
 /**
- * This class defines a WebSocket. It implements the Jetty WebSocket session listener.
+ * This class defines a WebSocket. It implements the Jakarta WebSocket endpoint interface.
  *
  * @author BaseX Team, BSD License
  * @author Johannes Finckh
  */
-public final class WebSocket extends Session.Listener.AbstractAutoDemanding
-    implements ClientInfo, WsSession {
+public final class WebSocket extends Endpoint implements ClientInfo, WsSession {
+  /** Marker for a ping frame in the send queue. */
+  private static final Object PING = new Object();
+
   /** WebSocket attributes. */
   public final ConcurrentHashMap<String, Value> atts = new ConcurrentHashMap<>();
   /** Database context. */
@@ -47,82 +51,96 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
 
   /** Sub-protocols offered by the client. */
   private final String[] offered;
+  /** Maximum idle time in milliseconds. */
+  private final long idleTimeout;
+  /** Maximum size of text messages ({@code -1}: container default). */
+  private final int maxText;
+  /** Maximum size of binary messages ({@code -1}: container default). */
+  private final int maxBinary;
+  /** Queued frames; also serves as monitor for the send state. */
+  private final ArrayDeque<Object> queue = new ArrayDeque<>();
+
+  /** Indicates that a frame is being sent (guarded by {@link #queue}). */
+  private boolean sending;
+  /** WebSocket session ({@code null} until the connection has been opened). */
+  private volatile Session socket;
 
   /**
    * Constructor.
    * @param request request
+   * @param user user that was authenticated during the handshake
+   * @param idleTimeout maximum idle time in milliseconds
+   * @param maxText maximum size of text messages ({@code -1}: container default)
+   * @param maxBinary maximum size of binary messages ({@code -1}: container default)
    */
-  private WebSocket(final HttpServletRequest request) {
+  private WebSocket(final HttpServletRequest request, final User user, final long idleTimeout,
+      final int maxText, final int maxBinary) {
     final String pi = request.getPathInfo();
     path = pi != null ? pi : "/";
     final String sp = request.getHeader("Sec-WebSocket-Protocol");
     offered = sp != null ? sp.trim().split("\\s*,\\s*") : new String[0];
     session = request.getSession();
+    this.idleTimeout = idleTimeout;
+    this.maxText = maxText;
+    this.maxBinary = maxBinary;
     // capture request values during the handshake, as the request is recycled afterwards
     requestCtx = new RequestContext(request).detach();
     context = new Context(HTTPContext.get().context(), this);
-    // adopt the user that was authenticated during the handshake
-    if(request.getAttribute(HTTPText.REQUEST_USER) instanceof final User user) {
-      context.user(user);
-    }
+    context.user(user);
   }
 
   /**
    * Creates a new WebSocket instance.
    * @param request request
+   * @param user user that was authenticated during the handshake
+   * @param idleTimeout maximum idle time in milliseconds
+   * @param maxText maximum size of text messages ({@code -1}: container default)
+   * @param maxBinary maximum size of binary messages ({@code -1}: container default)
    * @return WebSocket, or {@code null} if no function matches the path
+   * @throws QueryException query exception, raised if equally specific paths conflict
+   * @throws IOException I/O exception
    */
-  static WebSocket get(final HttpServletRequest request) {
-    final WebSocket ws = new WebSocket(request);
-    try {
-      // refuse the upgrade if equally specific paths conflict for an annotation
-      if(WebModules.get(ws.context).websocket(ws)) return ws;
-    } catch(final Exception ex) {
-      throw new CloseException(StatusCode.ABNORMAL, ex.getMessage(), ex);
-    }
-    return null;
+  static WebSocket get(final HttpServletRequest request, final User user, final long idleTimeout,
+      final int maxText, final int maxBinary) throws QueryException, IOException {
+    final WebSocket ws = new WebSocket(request, user, idleTimeout, maxText, maxBinary);
+    return WebModules.get(ws.context).websocket(ws) ? ws : null;
   }
 
   @Override
-  public void onWebSocketOpen(final Session sess) {
-    super.onWebSocketOpen(sess);
+  public void onOpen(final Session sess, final EndpointConfig config) {
+    socket = sess;
+    sess.setMaxIdleTimeout(idleTimeout);
+    if(maxText != -1) sess.setMaxTextMessageBufferSize(maxText);
+    if(maxBinary != -1) sess.setMaxBinaryMessageBufferSize(maxBinary);
+    sess.addMessageHandler(String.class, message ->
+      findAndProcess(Annotation._WS_MESSAGE, message));
+    sess.addMessageHandler(ByteBuffer.class, buffer -> {
+      final byte[] payload = new byte[buffer.remaining()];
+      buffer.get(payload);
+      findAndProcess(Annotation._WS_MESSAGE, payload);
+    });
+
     id = WsPool.add(this);
     run("[WS-OPEN] " + requestCtx.state().url(), null,
         () -> findAndProcess(Annotation._WS_CONNECT, null));
   }
 
   @Override
-  public void onWebSocketError(final Throwable th) {
-    error(th);
-  }
-
-  @Override
-  public void onWebSocketClose(final int status, final String message, final Callback callback) {
+  public void onClose(final Session sess, final CloseReason reason) {
+    final int status = reason.getCloseCode().getCode();
+    final String message = reason.getReasonPhrase();
     try {
       run("[WS-CLOSE] " + requestCtx.state().url(), status,
           () -> findAndProcess(Annotation._WS_CLOSE,
               new WsFunction.CloseInfo(status, message != null ? message : "")));
     } finally {
       WsPool.remove(id);
-      callback.succeed();
     }
   }
 
   @Override
-  public void onWebSocketText(final String message) {
-    findAndProcess(Annotation._WS_MESSAGE, message);
-  }
-
-  @Override
-  public void onWebSocketBinary(final ByteBuffer buffer, final Callback callback) {
-    try {
-      final byte[] payload = new byte[buffer.remaining()];
-      buffer.get(payload);
-      findAndProcess(Annotation._WS_MESSAGE, payload);
-      callback.succeed();
-    } catch(final RuntimeException ex) {
-      callback.fail(ex);
-    }
+  public void onError(final Session sess, final Throwable th) {
+    error(th);
   }
 
   @Override
@@ -148,9 +166,17 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
    * @param reason close reason (can be {@code null})
    */
   public void close(final int status, final String reason) {
-    // remove from the pool only after the close handler has run (via onWebSocketClose)
-    if(isOpen()) getSession().close(status, reason, Callback.NOOP);
-    else WsPool.remove(id);
+    // remove from the pool only after the close handler has run (via onClose)
+    final Session sess = socket;
+    if(sess != null && sess.isOpen()) {
+      try {
+        sess.close(new CloseReason(() -> status, reason));
+      } catch(final IOException ex) {
+        Util.debug(ex);
+      }
+    } else {
+      WsPool.remove(id);
+    }
   }
 
   /**
@@ -158,13 +184,14 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
    * @param value byte buffer or string to be sent
    */
   public void send(final Object value) {
-    final Session sess = getSession();
-    if(sess == null || !sess.isOpen()) return;
-    if(value instanceof final ByteBuffer bb) {
-      sess.sendBinary(bb, Callback.NOOP);
-    } else {
-      sess.sendText((String) value, Callback.NOOP);
-    }
+    enqueue(value);
+  }
+
+  /**
+   * Sends a ping frame to the connected client.
+   */
+  public void ping() {
+    enqueue(PING);
   }
 
   /**
@@ -182,11 +209,57 @@ public final class WebSocket extends Session.Listener.AbstractAutoDemanding
   }
 
   /**
-   * Sends a ping frame to the connected client.
+   * Queues a frame, and starts sending if no other frame is on its way. Only a single send
+   * operation may be in progress for a session, so frames of all threads are serialized.
+   * @param value frame to be queued
    */
-  public void ping() {
-    final Session sess = getSession();
-    if(sess != null && sess.isOpen()) sess.sendPing(ByteBuffer.allocate(0), Callback.NOOP);
+  private void enqueue(final Object value) {
+    final Session sess = socket;
+    if(sess == null || !sess.isOpen()) return;
+    synchronized(queue) {
+      queue.add(value);
+      if(sending) return;
+      sending = true;
+    }
+    sendNext();
+  }
+
+  /**
+   * Sends queued frames. Messages are sent asynchronously; the completion handler continues
+   * with the next frame.
+   */
+  private void sendNext() {
+    while(true) {
+      final Object value;
+      synchronized(queue) {
+        value = queue.poll();
+        if(value == null) {
+          sending = false;
+          return;
+        }
+      }
+      try {
+        final RemoteEndpoint.Async remote = socket.getAsyncRemote();
+        if(value == PING) {
+          // pings are sent synchronously, so the loop continues with the next frame
+          remote.sendPing(ByteBuffer.allocate(0));
+        } else if(value instanceof final ByteBuffer bb) {
+          remote.sendBinary(bb, result -> sendNext());
+          return;
+        } else {
+          remote.sendText((String) value, result -> sendNext());
+          return;
+        }
+      } catch(final Exception ex) {
+        // the connection is broken: discard all pending frames
+        Util.debug(ex);
+        synchronized(queue) {
+          queue.clear();
+          sending = false;
+        }
+        return;
+      }
+    }
   }
 
   /**

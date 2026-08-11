@@ -19,6 +19,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.lib.directory>lib</project.lib.directory>
     <jettyVersion>12.1.12</jettyVersion>
+    <websocketVersion>2.1.1</websocketVersion>
     <junit.version>6.1.3</junit.version>
   </properties>
 
@@ -118,15 +119,22 @@
         <version>${jettyVersion}</version>
         <scope>provided</scope>
       </dependency>
+      <!-- jakarta.websocket.server; the other packages are in jakarta.websocket-client-api -->
       <dependency>
-        <groupId>org.eclipse.jetty.ee10.websocket</groupId>
-        <artifactId>jetty-ee10-websocket-jetty-server</artifactId>
-        <version>${jettyVersion}</version>
+        <groupId>jakarta.websocket</groupId>
+        <artifactId>jakarta.websocket-api</artifactId>
+        <version>${websocketVersion}</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.jetty.websocket</groupId>
-        <artifactId>jetty-websocket-jetty-api</artifactId>
+        <groupId>jakarta.websocket</groupId>
+        <artifactId>jakarta.websocket-client-api</artifactId>
+        <version>${websocketVersion}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty.ee10.websocket</groupId>
+        <artifactId>jetty-ee10-websocket-jakarta-server</artifactId>
         <version>${jettyVersion}</version>
         <scope>provided</scope>
       </dependency>

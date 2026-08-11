@@ -2,6 +2,7 @@ package org.basex.http.ws;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.*;
 import java.util.concurrent.*;
 
 import org.junit.jupiter.api.*;
@@ -197,6 +198,38 @@ public final class WsPoolTest extends WsTest {
     try {
       ws.sendText("go", true).get(5, TimeUnit.SECONDS);
       await(() -> l.pinged ? Boolean.TRUE : null);
+    } finally {
+      close(ws);
+    }
+  }
+
+  /**
+   * Several jobs push large messages to the same client at the same time; all of them must
+   * arrive, as only a single send operation may be in progress for a connection.
+   * @throws Exception exception
+   */
+  @Test public void concurrentSends() throws Exception {
+    final int count = 20;
+    register("declare %ws:message('/p', '{$m}') function m:msg($m) {" +
+        "  let $id := ws:id()" +
+        "  let $payload := string-join((1 to 100000) ! 'x')" +
+        "  return (1 to " + count + ") ! void(job:eval(" +
+        "    'declare variable $m external; declare variable $id external; ws:send($m, $id)'," +
+        "    { 'm': 'm' || . || ':' || $payload, 'id': $id }, { 'start': 'PT1S' }))" +
+        "};");
+
+    final Listener l = new Listener();
+    final java.net.http.WebSocket ws = connect("/p", l);
+    try {
+      ws.sendText("go", true).get(5, TimeUnit.SECONDS);
+      final HashSet<String> received = new HashSet<>();
+      for(int c = 0; c < count; c++) {
+        final String text = l.pollText();
+        received.add(text.substring(0, text.indexOf(':')));
+      }
+      for(int c = 1; c <= count; c++) {
+        assertTrue(received.contains("m" + c), "Missing message: " + received);
+      }
     } finally {
       close(ws);
     }

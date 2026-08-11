@@ -7,7 +7,8 @@ import org.basex.http.ws.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.eclipse.jetty.websocket.api.*;
+
+import jakarta.websocket.CloseReason.*;
 
 /**
  * Function implementation.
@@ -22,8 +23,10 @@ public final class WsClose extends WsFn {
   @Override
   protected Item item(final QueryContext qc) throws QueryException {
     final WebSocket client = client(qc);
-    final long status = defined(1) ? toLong(arg(1), qc) : StatusCode.NORMAL;
-    if(status < 1000 || status > 4999)
+    final long status = defined(1) ? toLong(arg(1), qc) : CloseCodes.NORMAL_CLOSURE.getCode();
+    // 1005 and 1006 are reserved for internal use and must not be sent (RFC 6455)
+    if(status < 1000 || status > 4999 || status == CloseCodes.NO_STATUS_CODE.getCode() ||
+        status == CloseCodes.CLOSED_ABNORMALLY.getCode())
       throw BASEX_WS_X.get(info, "Invalid close status: " + status);
     final String reason = toStringOrNull(arg(2), qc);
     if(reason != null && token(reason).length > MAX_REASON)
