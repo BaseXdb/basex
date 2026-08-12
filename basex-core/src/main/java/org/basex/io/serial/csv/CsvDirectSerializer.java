@@ -9,7 +9,9 @@ import org.basex.build.csv.*;
 import org.basex.build.csv.CsvOptions.CsvFormat;
 import org.basex.io.serial.*;
 import org.basex.query.util.ft.*;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
@@ -32,6 +34,10 @@ public final class CsvDirectSerializer extends CsvSerializer {
   private TokenObjectMap<byte[]> data;
   /** Current attribute value. */
   private byte[] attv;
+  /** Map has been serialized. */
+  private boolean mapped;
+  /** Other items have been serialized. */
+  private boolean others;
 
   /**
    * Constructor.
@@ -45,6 +51,23 @@ public final class CsvDirectSerializer extends CsvSerializer {
     headers = header ? new TokenList() : null;
     atts = copts.get(CsvOptions.FORMAT) == CsvFormat.ATTRIBUTES;
     lax = copts.get(CsvOptions.LAX) || atts;
+  }
+
+  @Override
+  public void serialize(final Item item) throws IOException {
+    // serialize results of fn:parse-csv and fn:csv-to-arrays
+    if(mapped || others && item instanceof XQMap)
+      throw SERCSV_X_X.getIO("Single map or sequence of arrays expected", item);
+    if(item instanceof final XQMap map) {
+      mapped = true;
+      w3(map);
+    } else if(item instanceof final XQArray array) {
+      others = true;
+      w3(array);
+    } else {
+      others = true;
+      super.serialize(item);
+    }
   }
 
   @Override

@@ -1,15 +1,10 @@
 package org.basex.io.serial.csv;
 
-import static org.basex.query.QueryError.*;
-
 import java.io.*;
 
 import org.basex.io.serial.*;
-import org.basex.query.*;
-import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
-import org.basex.util.list.*;
 
 /**
  * This class serializes a sequence of arrays as CSV. The input must conform to the result
@@ -32,18 +27,7 @@ public final class CsvW3ArraysSerializer extends CsvSerializer {
 
   @Override
   public void serialize(final Item item) throws IOException {
-    if(!(item instanceof final XQArray array))
-      throw CSV_SERIALIZE_X_X.getIO("Array expected, found " + item.seqType(), item);
-    final TokenList tl = new TokenList();
-    try {
-      for(final Value value : array.members()) {
-        if(value.size() != 1) throw CSV_SERIALIZE_X_X.getIO(
-            "Item expected, found " + value.seqType(), value);
-        tl.add(((Item) value).string(null));
-      }
-    } catch(final QueryException ex) {
-      throw new QueryIOException(ex);
-    }
-    record(tl);
+    if(!(item instanceof final XQArray array)) throw typeError("Array", item);
+    w3(array);
   }
 }
