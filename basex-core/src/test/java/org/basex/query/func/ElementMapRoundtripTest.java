@@ -234,6 +234,21 @@ public final class ElementMapRoundtripTest extends SandboxTest {
     error("element-to-map(<a><b>1</b><b>2</b></a>, "
         + "{ 'plan': { 'a': { 'layout': 'list', 'child': 'z' } } })", PLAN_X_X);
 
+    // a plan may omit the child name: list layouts then accept any child element name
+    query("element-to-map(<a><b/><b/></a>, { 'plan': { 'a': { 'layout': 'list' } } })"
+        + "?a => array:size()", 2);
+    query("element-to-map(<a x='1'><b/><b/></a>, { 'plan': { 'a': { 'layout': 'list-plus' } } })"
+        + "?a => map:keys() => sort()", "@x\nb");
+    // without a child name, the reverse conversion cannot name the children
+    error("map-to-element({ 'a': [ '1', '2' ] }, { 'plan': { 'a': { 'layout': 'list' } } })",
+        MAP_TO_ELEMENT_X);
+
+    // the wildcard entry is consulted by the reverse conversion as well
+    query("serialize(map-to-element({ 'a': [ '1', '2' ] }, "
+        + "{ 'plan': { '*': { 'layout': 'list', 'child': 'b' } } }))", "<a><b>1</b><b>2</b></a>");
+    query("serialize(map-to-element({ 'a': '<b x=\"1\"/>' }, "
+        + "{ 'plan': { '*': { 'layout': 'xml' } } }))", "<b x=\"1\"/>");
+
     // the wildcard entry is the fallback for a layout that cannot be applied
     roundtrip("<a>t</a>", " { 'plan': { 'a': { 'layout': 'empty' }, "
         + "'*': { 'layout': 'simple' } } }");
@@ -311,7 +326,6 @@ public final class ElementMapRoundtripTest extends SandboxTest {
         + "{ 'plan': { 'a': { 'layout': 'list', 'child': 'x y' } } })", INVALIDOPTION_X);
     // missing and unexpected keys
     error("element-to-map(<a/>, { 'plan': { 'a': {} } })", INVALIDOPTION_X);
-    error("element-to-map(<a/>, { 'plan': { 'a': { 'layout': 'list' } } })", INVALIDOPTION_X);
     error("element-to-map(<a/>, { 'plan': { '@x': { 'layout': 'simple' } } })", INVALIDOPTION_X);
     error("element-to-map(<a/>, { 'plan': { '@x': {} } })", INVALIDOPTION_X);
     error("element-to-map(<a>1</a>, { 'plan': { 'a': { 'layout': 'simple', 'type': 'skip' } } })",
@@ -390,6 +404,25 @@ public final class ElementMapRoundtripTest extends SandboxTest {
     serialized("<a><!--c--><b>1</b><?p d?><c>2</c></a>", null, "<a><b>1</b><c>2</c></a>");
     // processing instruction without data
     serialized("<a>x{ processing-instruction p {} }<i>y</i></a>", null, "<a>x<?p?><i>y</i></a>");
+    // a processing instruction is represented by a nested target/data map
+    query("element-to-map(<a>x<?p d?><b/></a>)?a?2?('#processing-instruction')?('#target')", "p");
+    query("element-to-map(<a>x<?p d?><b/></a>)?a?2?('#processing-instruction')?('#data')", "d");
+    roundtrip("<a>x<?p d?><b/></a>");
+  }
+
+  /** Test method. */
+  @Test public void lenient() {
+    // the reverse conversion infers the layout from the value: a contradicting plan is ignored
+    query("serialize(map-to-element({ 'a': { 'b': '1' } }, "
+        + "{ 'plan': { 'a': { 'layout': 'simple' } } }))", "<a><b>1</b></a>");
+    query("serialize(map-to-element({ 'a': 'x' }, { 'plan': { 'a': { 'layout': 'empty' } } }))",
+        "<a>x</a>");
+    query("serialize(map-to-element({ 'a': 'x' }, { 'plan': { 'a': { 'layout': 'record' } } }))",
+        "<a>x</a>");
+    // an attribute that follows text or child elements in an array is hoisted to the element
+    query("serialize(map-to-element({ 'a': [ 'x', { '@id': '1' } ] }))", "<a id=\"1\">x</a>");
+    query("serialize(map-to-element({ 'a': [ { 'b': 'x' }, { '@id': '1' } ] }))",
+        "<a id=\"1\"><b>x</b></a>");
   }
 
   /** Test method. */

@@ -28,8 +28,6 @@ import org.basex.util.*;
 public final class FnMapToElement extends PlanFn {
   /** The fn:null QName, representing a nilled element. */
   private static final QNm NULL = new QNm(token("null"), QueryText.FN_URI);
-  /** Target key (for processing instructions, as defined by the specification). */
-  private static final Str TARGET = Str.get("#target");
 
   /** Role that a map key plays in the reconstructed element. */
   private enum Slot {
@@ -82,7 +80,7 @@ public final class FnMapToElement extends PlanFn {
    */
   private XNode element(final QNm name, final Value value, final Plan plan, final QueryContext qc)
       throws QueryException {
-    final PlanEntry pe = plan.entries.get(name);
+    final PlanEntry pe = entry(name, plan);
     // serialized XML layout: parse the string back into an element
     if(pe != null && pe.layout == PlanLayout.XML) return parse(string(value), qc);
 
@@ -193,7 +191,7 @@ public final class FnMapToElement extends PlanFn {
       default -> {
         // child element(s); reserved keys are invalid here and fail on the element name
         final QNm name = qName(key, true, parent, plan, qc);
-        final PlanEntry pe = plan.entries.get(name);
+        final PlanEntry pe = entry(name, plan);
         final Item item = single(value);
         // an array is a repeated child element, unless the plan assigns a list layout to the name
         if(item instanceof final XQArray array && (pe == null ||
@@ -223,14 +221,12 @@ public final class FnMapToElement extends PlanFn {
       throws QueryException {
 
     if(item instanceof final XQMap map) {
-      // processing instruction: { "#processing-instruction": ..., "#data": ... }
+      // processing instruction: { "#processing-instruction": { "#target": ..., "#data": ... } }
       final Value pi = map.get(PI);
       if(!pi.isEmpty()) {
-        final Item target = pi.itemAt(0);
-        final byte[] name = target instanceof final XQMap tm ? string(tm.get(TARGET)) :
-          string(pi);
-        final byte[] data = target instanceof final XQMap tm ? string(tm.get(DATA)) :
-          string(map.get(DATA));
+        if(!(single(pi) instanceof final XQMap target)) throw MAP_TO_ELEMENT_X.get(info,
+            "Invalid processing-instruction structure.");
+        final byte[] name = string(target.get(TARGET)), data = string(target.get(DATA));
         if(!XMLToken.isNCName(name) || eq(lc(name), token("xml"))) throw MAP_TO_ELEMENT_X.get(
             info, "Invalid processing-instruction target.");
         if(contains(data, FPI.CLOSE)) throw MAP_TO_ELEMENT_X.get(info,

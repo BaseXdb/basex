@@ -1277,13 +1277,18 @@ public final class FnModuleTest extends SandboxTest {
     error(func.args(" { 'a': <x/> }"), MAP_TO_ELEMENT_X);
     // error: simple content combined with child elements (no layout produces this)
     error(func.args(" { 'a': { '#content': 'x', 'b': 'y' } }"), MAP_TO_ELEMENT_X);
-    // error: invalid processing-instruction target or content
-    error(func.args(" { 'a': [ { '#processing-instruction': 'a b', '#data': 'd' } ] }"),
+    // processing instruction
+    query(func.args(" { 'a': [ { '#processing-instruction': "
+        + "{ '#target': 'p', '#data': 'd' } } ] }") + " => serialize()", "<a><?p d?></a>");
+    // error: invalid processing-instruction structure, target or content
+    error(func.args(" { 'a': [ { '#processing-instruction': 'p', '#data': 'd' } ] }"),
         MAP_TO_ELEMENT_X);
-    error(func.args(" { 'a': [ { '#processing-instruction': 'xml', '#data': 'd' } ] }"),
-        MAP_TO_ELEMENT_X);
-    error(func.args(" { 'a': [ { '#processing-instruction': 'p', '#data': 'a?>b' } ] }"),
-        MAP_TO_ELEMENT_X);
+    error(func.args(" { 'a': [ { '#processing-instruction': "
+        + "{ '#target': 'a b', '#data': 'd' } } ] }"), MAP_TO_ELEMENT_X);
+    error(func.args(" { 'a': [ { '#processing-instruction': "
+        + "{ '#target': 'xml', '#data': 'd' } } ] }"), MAP_TO_ELEMENT_X);
+    error(func.args(" { 'a': [ { '#processing-instruction': "
+        + "{ '#target': 'p', '#data': 'a?>b' } } ] }"), MAP_TO_ELEMENT_X);
     // error: invalid comment content
     error(func.args(" { 'a': [ { '#comment': 'a--b' } ] }"), MAP_TO_ELEMENT_X);
     error(func.args(" { 'a': [ { '#comment': 'ab-' } ] }"), MAP_TO_ELEMENT_X);

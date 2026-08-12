@@ -44,6 +44,8 @@ public abstract class PlanFn extends StandardFunc {
   static final Str COMMENT = Str.get("#comment");
   /** PI string. */
   static final Str PI = Str.get("#processing-instruction");
+  /** Target string. */
+  static final Str TARGET = Str.get("#target");
   /** Data string. */
   static final Str DATA = Str.get("#data");
   /** Layout string. */
@@ -270,7 +272,7 @@ public abstract class PlanFn extends StandardFunc {
         case LIST, LIST_PLUS -> {
           final GNodeList children = children(Kind.ELEMENT, node);
           yield empty(children(Kind.TEXT, node)) && equalNames(children) &&
-            (children.isEmpty() || children.get(0).qname().eq(child));
+            (child == null || children.isEmpty() || children.get(0).qname().eq(child));
         }
         case RECORD, SEQUENCE ->
           empty(children(Kind.TEXT, node));
@@ -304,9 +306,15 @@ public abstract class PlanFn extends StandardFunc {
         }
         case LIST ->
           list(node, plan, qc);
-        case LIST_PLUS ->
-          attributes(node, plan, qc).put(nodeName(child, true, node, plan, qc),
-              list(node, plan, qc)).map();
+        case LIST_PLUS -> {
+          final MapBuilder mb = attributes(node, plan, qc);
+          // if the plan supplies no child name, the name of the first child is adopted
+          final GNodeList children = children(Kind.ELEMENT, node);
+          final QNm name = child != null ? child :
+            children.isEmpty() ? null : children.get(0).qname();
+          if(name != null) mb.put(nodeName(name, true, node, plan, qc), list(node, plan, qc));
+          yield mb.map();
+        }
         case RECORD ->
           record(node, plan, qc);
         case SEQUENCE ->
@@ -380,9 +388,8 @@ public abstract class PlanFn extends StandardFunc {
         } else if(pe.attribute) {
           throw unexpected("layout", pe.layout, name);
         }
-        if(pe.layout == PlanLayout.LIST || pe.layout == PlanLayout.LIST_PLUS) {
-          if(pe.child == null) throw missing("child", name);
-        } else if(pe.child != null) {
+        if(pe.layout != PlanLayout.LIST && pe.layout != PlanLayout.LIST_PLUS &&
+            pe.child != null) {
           throw unexpected("child", pe.child, name);
         }
         if(pe.layout == PlanLayout.SIMPLE || pe.layout == PlanLayout.SIMPLE_PLUS ||
@@ -429,10 +436,20 @@ public abstract class PlanFn extends StandardFunc {
    * @return layout
    */
   final PlanEntry entry(final GNode node, final Plan plan) {
-    PlanEntry pe = plan.entries.get(node.qname());
-    // entries for attributes of the same name must be ignored
-    if(pe == null || pe.attribute) pe = plan.entries.get(QNm.EMPTY);
+    final PlanEntry pe = entry(node.qname(), plan);
     return pe != null ? pe : entry(node);
+  }
+
+  /**
+   * Returns the plan entry for an element name, falling back to the wildcard entry.
+   * @param name element name
+   * @param plan plan
+   * @return entry, or {@code null} if the plan has no entry for this element
+   */
+  static PlanEntry entry(final QNm name, final Plan plan) {
+    final PlanEntry pe = plan.entries.get(name);
+    // entries for attributes of the same name must be ignored
+    return pe != null && !pe.attribute ? pe : plan.entries.get(QNm.EMPTY);
   }
 
   /**
@@ -725,7 +742,8 @@ public abstract class PlanFn extends StandardFunc {
           new MapBuilder().put(nodeName(child, parent, plan, qc),
             entry(child, plan).apply(child, node, plan, qc)).map();
         case PROCESSING_INSTRUCTION ->
-          new MapBuilder().put(PI, child.name()).put(DATA, child.string()).map();
+          new MapBuilder().put(PI, new MapBuilder().put(TARGET, child.name()).
+            put(DATA, child.string()).map()).map();
         case TEXT -> {
           final byte[] text = child.string();
           yield ignoreEmpty && Token.normalize(text).length == 0 ? null : Str.get(text);
