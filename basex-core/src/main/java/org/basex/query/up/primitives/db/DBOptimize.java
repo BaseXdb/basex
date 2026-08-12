@@ -74,10 +74,10 @@ public final class DBOptimize extends DBUpdate {
   public void apply() throws QueryException {
     // check which options have changed
     final int maxlen = options.get(MainOptions.MAXLEN);
-    final String textinclude = MetaData.names(MainOptions.TEXTINCLUDE, options);
-    final String attrinclude = MetaData.names(MainOptions.ATTRINCLUDE, options);
-    final String tokeninclude = MetaData.names(MainOptions.TOKENINCLUDE, options);
-    final String ftinclude = MetaData.names(MainOptions.FTINCLUDE, options);
+    final String textinclude = options.get(MainOptions.TEXTINCLUDE);
+    final String attrinclude = options.get(MainOptions.ATTRINCLUDE);
+    final String tokeninclude = options.get(MainOptions.TOKENINCLUDE);
+    final String ftinclude = options.get(MainOptions.FTINCLUDE);
     final boolean stemming = options.get(MainOptions.STEMMING);
     final boolean casesens = options.get(MainOptions.CASESENS);
     final boolean diacritics = options.get(MainOptions.DIACRITICS);

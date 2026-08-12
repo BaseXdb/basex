@@ -8,7 +8,7 @@ import org.basex.query.value.type.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class StringOption extends Option<String> {
+public class StringOption extends Option<String> {
   /** Default value (can be {@null}). */
   private final String value;
 

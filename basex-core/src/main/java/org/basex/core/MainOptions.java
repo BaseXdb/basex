@@ -96,13 +96,13 @@ public final class MainOptions extends Options {
   public static final BooleanOption FTINDEX = new BooleanOption("FTINDEX", false);
 
   /** Text index: names to include. */
-  public static final StringOption TEXTINCLUDE = new StringOption("TEXTINCLUDE", "");
+  public static final NamesOption TEXTINCLUDE = new NamesOption("TEXTINCLUDE", "");
   /** Attribute index: names to include. */
-  public static final StringOption ATTRINCLUDE = new StringOption("ATTRINCLUDE", "");
+  public static final NamesOption ATTRINCLUDE = new NamesOption("ATTRINCLUDE", "");
   /** Token index: names to include. */
-  public static final StringOption TOKENINCLUDE = new StringOption("TOKENINCLUDE", "");
+  public static final NamesOption TOKENINCLUDE = new NamesOption("TOKENINCLUDE", "");
   /** Full-text index: names to include. */
-  public static final StringOption FTINCLUDE = new StringOption("FTINCLUDE", "");
+  public static final NamesOption FTINCLUDE = new NamesOption("FTINCLUDE", "");
 
   /** Maximum length of index entries. */
   public static final NumberOption MAXLEN = new NumberOption("MAXLEN", 96);

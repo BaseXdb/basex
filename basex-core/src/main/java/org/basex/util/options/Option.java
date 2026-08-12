@@ -71,6 +71,15 @@ public abstract class Option<O> {
     return value();
   }
 
+  /**
+   * Normalizes a value that is assigned to this option.
+   * @param value value
+   * @return normalized value
+   */
+  Object normalize(final Object value) {
+    return value;
+  }
+
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(name());

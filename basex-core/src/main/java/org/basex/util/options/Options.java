@@ -222,7 +222,7 @@ public class Options implements Iterable<Option<?>> {
    * @param value value to be assigned
    */
   public final synchronized void put(final Option<?> option, final Object value) {
-    values.put(option.name(), value);
+    values.put(option.name(), option.normalize(value));
   }
 
   /**
