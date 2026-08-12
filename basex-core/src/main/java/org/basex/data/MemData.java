@@ -22,10 +22,10 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class MemData extends Data {
-  /** Texts. */
-  private final TokenSet texts;
-  /** Attribute Values. */
-  private final TokenSet values;
+  /** Texts, created on demand (can be {@code null}). */
+  private TokenSet texts;
+  /** Attribute values, created on demand (can be {@code null}). */
+  private TokenSet values;
 
   /**
    * Constructor.
@@ -62,11 +62,11 @@ public final class MemData extends Data {
     super(new MetaData(options));
     table = new TableMemAccess(meta);
     if(meta.updindex) idmap = new IdPreMap(meta.lastid);
-    this.texts = texts == null ? new TokenSet() : texts;
-    this.values = values == null ? new TokenSet() : values;
+    this.texts = texts;
+    this.values = values;
     this.elemNames = elemNames == null ? new Names(meta) : elemNames;
     this.attrNames = attrNames == null ? new Names(meta) : attrNames;
-    this.paths = paths == null ? new PathIndex(this) : paths;
+    this.paths = paths;
     this.nspaces = nspaces == null ? new Namespaces() : nspaces;
   }
 
@@ -122,7 +122,7 @@ public final class MemData extends Data {
 
   @Override
   public byte[] text(final int pre, final boolean text) {
-    return (text ? texts : values).key((int) textRef(pre));
+    return values(text).key((int) textRef(pre));
   }
 
   @Override
@@ -151,7 +151,12 @@ public final class MemData extends Data {
    * @return set
    */
   public TokenSet values(final boolean text) {
-    return text ? texts : values;
+    if(text) {
+      if(texts == null) texts = new TokenSet();
+      return texts;
+    }
+    if(values == null) values = new TokenSet();
+    return values;
   }
 
   // UPDATE OPERATIONS ============================================================================
@@ -168,6 +173,6 @@ public final class MemData extends Data {
 
   @Override
   protected long textRef(final byte[] value, final boolean text) {
-    return (text ? texts : values).put(value);
+    return values(text).put(value);
   }
 }

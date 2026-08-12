@@ -47,7 +47,7 @@ final class PlotData {
   String[] getItems() {
     final Data data = context.data();
     final StringList sl = new StringList();
-    for(final byte[] name : data.paths.desc(EMPTY, true, true)) {
+    for(final byte[] name : data.paths().desc(EMPTY, true, true)) {
       if(getCategories(name).length > 1) sl.add(name);
     }
     return sl.finish();
@@ -61,7 +61,7 @@ final class PlotData {
   String[] getCategories(final byte[] name) {
     final Data data = context.data();
     final StringList sl = new StringList();
-    for(final byte[] nm : data.paths.desc(name, true, false)) {
+    for(final byte[] nm : data.paths().desc(name, true, false)) {
       final Names names = startsWith(nm, '@') ? data.attrNames : data.elemNames;
       if(names.stats(names.index(delete(nm, '@'))).type != StatsType.NONE) sl.add(nm);
     }

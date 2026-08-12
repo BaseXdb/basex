@@ -65,7 +65,7 @@ final class QuerySuggest extends QueryParser {
   void checkInit() {
     if(stack == null || stack.empty()) {
       stack = new Stack<>();
-      all = data.paths.root();
+      all = data.paths().root();
       current = all;
     }
   }

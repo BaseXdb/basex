@@ -105,7 +105,7 @@ public final class Optimize extends ACreate {
     // initialize structural indexes
     final MetaData meta = data.meta;
     if(!meta.uptodate) {
-      data.paths.init();
+      data.paths().init();
       data.elemNames.init();
       data.attrNames.init();
       meta.dirty = true;
@@ -123,21 +123,21 @@ public final class Optimize extends ACreate {
 
         final int level = pars.size();
         if(kind == Data.DOC) {
-          data.paths.index(0, Data.DOC, level);
+          data.paths().index(0, Data.DOC, level);
           pars.push(pre);
           elemStack.push(0);
           ++n;
         } else if(kind == Data.ELEM) {
           final int id = data.nameId(pre);
           data.elemNames.store(data.elemNames.key(id));
-          data.paths.index(id, Data.ELEM, level);
+          data.paths().index(id, Data.ELEM, level);
           pars.push(pre);
           elemStack.push(id);
         } else if(kind == Data.ATTR) {
           final int id = data.nameId(pre);
           final byte[] value = data.text(pre, false);
           data.attrNames.store(data.attrNames.key(id), value);
-          data.paths.index(id, Data.ATTR, level, value, meta);
+          data.paths().index(id, Data.ATTR, level, value, meta);
         } else {
           final byte[] value = data.text(pre, true);
           if(level > 1) {
@@ -145,7 +145,7 @@ public final class Optimize extends ACreate {
             if(kind == Data.TEXT) stats.add(value, meta);
             else stats.setLeaf(false);
           }
-          data.paths.index(0, kind, level, value, meta);
+          data.paths().index(0, kind, level, value, meta);
         }
         if(cmd != null) cmd.pre = pre;
       }

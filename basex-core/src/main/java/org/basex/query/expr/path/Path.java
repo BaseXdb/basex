@@ -375,7 +375,7 @@ public abstract class Path extends ParseExpr {
     // ensure that path starts with document nodes
     final Data data = data();
     return rt != null && rt.seqType().type.instanceOf(NodeType.DOCUMENT) && data != null &&
-        data.meta.uptodate ? pathNodes(data.paths.root(), stats) : null;
+        data.meta.uptodate ? pathNodes(data.paths().root(), stats) : null;
   }
 
   /**
@@ -555,7 +555,7 @@ public abstract class Path extends ParseExpr {
     if(rt == null || !rt.seqType().type.instanceOf(NodeType.DOCUMENT) ||
         data == null || !data.meta.uptodate || data.meta.ndocs != rt.size()) return -1;
 
-    ArrayList<PathNode> nodes = data.paths.root();
+    ArrayList<PathNode> nodes = data.paths().root();
     long lastSize = 1;
     final int sl = steps.length;
     for(int s = 0; s < sl; s++) {
@@ -587,7 +587,7 @@ public abstract class Path extends ParseExpr {
     final Data data = data();
     if(data == null || !data.meta.uptodate) return null;
 
-    ArrayList<PathNode> nodes = data.paths.root();
+    ArrayList<PathNode> nodes = data.paths().root();
     for(int s = 0; s <= last; s++) {
       // only follow axis steps
       final Step curr = axisStep(s);
@@ -894,7 +894,7 @@ public abstract class Path extends ParseExpr {
       // only consider local name tests
       if(test.name == null) return true;
       // only support unique paths with nodes on the correct level
-      final ArrayList<PathNode> pn = data().paths.desc(test.name);
+      final ArrayList<PathNode> pn = data().paths().desc(test.name);
       if(pn.size() != 1 || pn.getFirst().level() != s + 1) return true;
     }
     return false;

@@ -96,8 +96,8 @@ public abstract class Data {
   public Names attrNames;
   /** Namespace index. */
   public Namespaces nspaces;
-  /** Path index. */
-  public PathIndex paths;
+  /** Path index, created on demand (can be {@code null}). */
+  PathIndex paths;
   /** Text index. */
   public ValueIndex textIndex;
   /** Attribute value index. */
@@ -205,6 +205,15 @@ public abstract class Data {
   }
 
   /**
+   * Returns the path index.
+   * @return path index
+   */
+  public final PathIndex paths() {
+    if(paths == null) paths = new PathIndex(this);
+    return paths;
+  }
+
+  /**
    * Returns an index for the specified index type.
    * @param type index type
    * @return index
@@ -217,7 +226,7 @@ public abstract class Data {
       case ATTRIBUTE -> attrIndex;
       case TOKEN     -> tokenIndex;
       case FULLTEXT  -> ftIndex;
-      case PATH      -> paths;
+      case PATH      -> paths();
     };
   }
 

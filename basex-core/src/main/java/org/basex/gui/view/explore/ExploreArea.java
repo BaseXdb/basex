@@ -110,7 +110,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
       if(!Strings.startsWith(elem, '@')) tl.add(elem);
     }
 
-    final String[] entries = entries(data.paths.desc(tl, true, false));
+    final String[] entries = entries(data.paths().desc(tl, true, false));
     final BaseXCombo cm = new BaseXCombo(gui, entries);
     cm.addActionListener(this);
     cm.addKeyListener(main);

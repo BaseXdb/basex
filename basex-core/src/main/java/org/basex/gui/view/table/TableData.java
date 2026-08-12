@@ -88,9 +88,9 @@ final class TableData {
   void init(final Data data) {
     roots = new TokenList();
     // sort keys by occurrence
-    for(final byte[] k : data.paths.desc(EMPTY, true, true)) {
+    for(final byte[] k : data.paths().desc(EMPTY, true, true)) {
       int c = 0;
-      for(final byte[] kk : data.paths.desc(k, true, false)) {
+      for(final byte[] kk : data.paths().desc(k, true, false)) {
         final Names names = startsWith(kk, '@') ? data.attrNames : data.elemNames;
         if(names.stats(names.index(delete(kk, '@'))).isLeaf()) ++c;
       }
@@ -114,7 +114,7 @@ final class TableData {
 
     if(rt == -1 && roots.isEmpty()) return;
     if(root == -1) root = dt.elemNames.index(roots.get(0));
-    for(final byte[] k : dt.paths.desc(dt.elemNames.key(root), true, true)) {
+    for(final byte[] k : dt.paths().desc(dt.elemNames.key(root), true, true)) {
       final boolean elem = !startsWith(k, '@');
       final byte[] key = delete(k, '@');
       final Names names = elem ? dt.elemNames : dt.attrNames;
