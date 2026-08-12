@@ -2,6 +2,8 @@ package org.basex.util.options;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.*;
+
 import org.basex.*;
 import org.basex.build.csv.*;
 import org.basex.build.html.*;
@@ -53,6 +55,22 @@ public final class OptionsTest extends SandboxTest {
     } finally {
       System.clearProperty(Prop.DBPREFIX + name.name());
     }
+  }
+
+  /** Tests that option definitions cannot be modified. */
+  @Test public void immutableDefinitions() {
+    final Iterator<Option<?>> iter = new MainOptions(false).iterator();
+    iter.next();
+    assertThrows(UnsupportedOperationException.class, iter::remove);
+    assertNotNull(new MainOptions(false).option(MainOptions.STRIPWS.name()));
+  }
+
+  /** Tests that option values are instance-specific. */
+  @Test public void instanceValues() {
+    final MainOptions opts1 = new MainOptions(false), opts2 = new MainOptions(false);
+    opts1.set(MainOptions.STRIPWS, true);
+    assertTrue(opts1.get(MainOptions.STRIPWS));
+    assertFalse(opts2.get(MainOptions.STRIPWS));
   }
 
   /**

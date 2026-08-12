@@ -60,8 +60,44 @@ public class Options implements Iterable<Option<?>> {
   /** Comment in configuration file. */
   private static final String PROPUSER = "# Local Options";
 
-  /** Map with option names and definitions. */
-  private final TreeMap<String, Option<?>> definitions;
+  /**
+   * Cached option metadata (identical for all instances of a subclass).
+   * @param all all options in declaration order (with comments)
+   * @param definitions option names to definitions
+   * @param values default values (cloned per instance)
+   */
+  private record Meta(Option<?>[] all, SortedMap<String, Option<?>> definitions,
+      TreeMap<String, Object> values) { }
+
+  /** Metadata cache, computed once per subclass. */
+  private static final ClassValue<Meta> META = new ClassValue<>() {
+    @Override
+    protected Meta computeValue(final Class<?> clz) {
+      final ArrayList<Option<?>> all = new ArrayList<>();
+      final TreeMap<String, Option<?>> definitions = new TreeMap<>();
+      final TreeMap<String, Object> values = new TreeMap<>();
+      try {
+        for(final Field f : clz.getFields()) {
+          if(!Modifier.isStatic(f.getModifiers())) continue;
+          if(f.get(null) instanceof final Option opt) {
+            all.add(opt);
+            if(!(opt instanceof Comment)) {
+              final String name = opt.name();
+              definitions.put(name, opt);
+              values.put(name, opt.value());
+            }
+          }
+        }
+      } catch(final IllegalAccessException ex) {
+        throw Util.notExpected(ex);
+      }
+      return new Meta(all.toArray(Option[]::new),
+          Collections.unmodifiableSortedMap(definitions), values);
+    }
+  };
+
+  /** Map with option names and definitions (shared, cached, unmodifiable). */
+  private final SortedMap<String, Option<?>> definitions;
   /** Map with option names and values. */
   private final TreeMap<String, Object> values;
   /** Free option assignments. */
@@ -83,20 +119,12 @@ public class Options implements Iterable<Option<?>> {
    * Constructor with options file.
    * @param opts options file
    */
+  @SuppressWarnings("unchecked")
   protected Options(final IOFile opts) {
-    definitions = new TreeMap<>();
-    values = new TreeMap<>();
+    final Meta meta = META.get(getClass());
+    definitions = meta.definitions;
+    values = (TreeMap<String, Object>) meta.values.clone();
     free = new HashMap<>();
-    try {
-      for(final Option<?> opt : options(getClass())) {
-        if(opt instanceof Comment) continue;
-        final String name = opt.name();
-        definitions.put(name, opt);
-        values.put(name, opt.value());
-      }
-    } catch(final Exception ex) {
-      throw Util.notExpected(ex);
-    }
     if(opts != null) read(opts);
   }
 
@@ -106,7 +134,7 @@ public class Options implements Iterable<Option<?>> {
    */
   @SuppressWarnings("unchecked")
   protected Options(final Options opts) {
-    definitions = (TreeMap<String, Option<?>>) opts.definitions.clone();
+    definitions = opts.definitions;
     values = (TreeMap<String, Object>) opts.values.clone();
     free = (HashMap<String, String>) opts.free.clone();
     user.add(opts.user);
@@ -800,20 +828,12 @@ public class Options implements Iterable<Option<?>> {
   }
 
   /**
-   * Returns all options from the specified class.
+   * Returns all options from the specified class (in declaration order, including comments).
    * @param clz options class
    * @return option instances
-   * @throws IllegalAccessException exception
    */
-  private static Option<?>[] options(final Class<? extends Options> clz)
-      throws IllegalAccessException {
-
-    final ArrayList<Option<?>> options = new ArrayList<>();
-    for(final Field f : clz.getFields()) {
-      if(!Modifier.isStatic(f.getModifiers())) continue;
-      if(f.get(null) instanceof final Option opt) options.add(opt);
-    }
-    return options.toArray(Option[]::new);
+  private static Option<?>[] options(final Class<? extends Options> clz) {
+    return META.get(clz).all();
   }
 
   /**
@@ -880,12 +900,8 @@ public class Options implements Iterable<Option<?>> {
     // check if all mandatory files have been read
     boolean ok = true;
     if(errs.isEmpty()) {
-      try {
-        for(final Option<?> opt : options(getClass())) {
-          if(ok && !(opt instanceof Comment)) ok = read.contains(opt.name());
-        }
-      } catch(final IllegalAccessException ex) {
-        throw Util.notExpected(ex);
+      for(final Option<?> opt : options(getClass())) {
+        if(ok && !(opt instanceof Comment)) ok = read.contains(opt.name());
       }
     }
 
