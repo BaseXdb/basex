@@ -370,7 +370,7 @@ public final class Payload {
       return Str.get(io.read());
     } else if(type.is(MediaType.APPLICATION_X_WWW_FORM_URLENCODED)) {
       try {
-        final byte[] decoded = XMLToken.decodeUri(io.read());
+        final byte[] decoded = XMLToken.decodeUri(io.read(), true);
         if(Token.contains(decoded, Token.REPLACEMENT)) throw new InputException(Token.REPLACEMENT);
         return Str.get(decoded);
       } catch(final IllegalArgumentException ex) {

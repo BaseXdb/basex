@@ -1411,7 +1411,7 @@ public final class Token {
     },
     /** Path component. */ PATH {
       @Override
-      boolean literal(final int ch) { return (ch < 0 || ch > ' ') && "%#+[]/?".indexOf(ch) == -1; }
+      boolean literal(final int ch) { return (ch < 0 || ch > ' ') && "%#[]/?".indexOf(ch) == -1; }
     },
     /** Query component. */ QUERY {
       @Override
@@ -1419,7 +1419,7 @@ public final class Token {
     },
     /** Fragment component. */ FRAGMENT {
       @Override
-      boolean literal(final int ch) { return (ch < 0 || ch > ' ') && "%#+[]".indexOf(ch) == -1; }
+      boolean literal(final int ch) { return (ch < 0 || ch > ' ') && "%#[]".indexOf(ch) == -1; }
     };
 
     /**

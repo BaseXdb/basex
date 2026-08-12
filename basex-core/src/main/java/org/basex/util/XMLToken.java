@@ -410,11 +410,21 @@ public final class XMLToken {
    * @return decoded token
    */
   public static byte[] decodeUri(final byte[] token) {
+    return decodeUri(token, false);
+  }
+
+  /**
+   * Returns a URI-decoded token.
+   * @param token encoded token
+   * @param form decode plus signs as spaces (application/x-www-form-urlencoded)
+   * @return decoded token
+   */
+  public static byte[] decodeUri(final byte[] token, final boolean form) {
     final int tl = token.length;
     final TokenBuilder tb = new TokenBuilder(tl);
     for(int t = 0; t < tl; t++) {
       int b = token[t];
-      if(b == '+') {
+      if(form && b == '+') {
         b = ' ';
       } else if(b == '%') {
         final int b1 = ++t < tl ? dec(token[t]) : -1, b2 = ++t < tl ? dec(token[t]) : -1;
@@ -436,7 +446,17 @@ public final class XMLToken {
    * @return decoded string
    */
   public static String decodeUri(final String string) {
-    return Token.string(decodeUri(Token.token(string)));
+    return decodeUri(string, false);
+  }
+
+  /**
+   * URI-decodes a string.
+   * @param string encoded string
+   * @param form decode plus signs as spaces (application/x-www-form-urlencoded)
+   * @return decoded string
+   */
+  public static String decodeUri(final String string, final boolean form) {
+    return Token.string(decodeUri(Token.token(string), form));
   }
 
   /**
