@@ -3948,7 +3948,7 @@ return
     query(func.args(" { 'rows': [ 'a|b' ] }", " { 'method': 'csv', 'csv-quote-character': '|' }"),
         "|a||b|\n");
     query(func.args(" parse-csv('a,b' || char('\\n') || '1,2', { 'header': true() })",
-        " { 'method': 'csv', 'csv-header': 'yes' }"), "a,b\n1,2\n");
+        " { 'method': 'csv', 'csv-header': true() }"), "a,b\n1,2\n");
     // CSV output method: flat parameters override format-specific options
     query(func.args(" parse-csv('a,b')",
         " { 'method': 'csv', 'csv': { 'separator': ';' }, 'csv-separator': '|' }"), "a|b\n");
