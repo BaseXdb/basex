@@ -3,10 +3,12 @@ package org.basex.query.func;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
+import java.util.stream.*;
 
 import org.basex.*;
 import org.basex.query.ann.*;
 import org.basex.query.value.item.*;
+import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -21,39 +23,97 @@ public final class SignatureTest extends SandboxTest {
 
   /**
    * Tests the validity of all function signatures.
+   * @return tests
    */
-  @Test public void functions() {
-    for(final FuncDefinition fd : Functions.BUILT_IN.values()) {
-      // check the general syntax of the description string
-      final String string = fd.toString();
-      assertTrue(string.matches("^.+\\(.*\\)$"), "Invalid syntax: " + string);
-      assertTrue(string.replaceAll("\\(.*", "").matches("^[a-z]+:[-a-zA-Z\\d]+$"),
-          "Invalid function name: " + string);
-
-      final String[] params = check(string, fd.paramString(), PARAM);
-      final int pl = params.length;
-      final boolean variadic = fd.variadic();
-      assertEquals(pl > 0 && params[pl - 1].endsWith("..."), variadic,
-          "Variadic function? " + string);
-
-      // check that there are enough argument names
-      final QNm[] names = fd.params;
-      assertEquals(names.length, variadic ? fd.minMax[0] + 1 : fd.minMax[1],
-          "Wrong number of argument names: " + string + Arrays.toString(names));
-
-      // all variable names must be distinct
-      final Set<QNm> set = new HashSet<>(Arrays.asList(names));
-      assertEquals(names.length, set.size(), "Duplicate argument names: " + string);
-    }
+  @TestFactory public Stream<DynamicTest> functions() {
+    return Stream.concat(
+        Arrays.stream(Function.values()).map(func -> test(func, func.name())),
+        Arrays.stream(ApiFunction.values()).map(func -> test(func, func.name())));
   }
 
   /**
    * Tests the validity of all annotation signatures.
+   * @return tests
    */
-  @Test public void annotations() {
-    for(final Annotation ann : Annotation.values()) {
-      check(ann.toString(), ann.paramString, PARAM + "|'" + PARAM + "'");
+  @TestFactory public Stream<DynamicTest> annotations() {
+    return Arrays.stream(Annotation.values()).map(ann ->
+        DynamicTest.dynamicTest(ann.toString(), () -> annotation(ann)));
+  }
+
+  /**
+   * Creates a test for a single function.
+   * @param func function
+   * @param constant name of the enum constant
+   * @return test
+   */
+  private static DynamicTest test(final AFunction func, final String constant) {
+    return DynamicTest.dynamicTest(func.definition().toString(), () -> function(func, constant));
+  }
+
+  /**
+   * Checks the signature of a single function.
+   * @param func function
+   * @param constant name of the enum constant
+   */
+  private static void function(final AFunction func, final String constant) {
+    final FuncDefinition fd = func.definition();
+
+    // check the general syntax of the description string
+    final String string = fd.toString();
+    assertTrue(string.matches("^.+\\(.*\\)$"), "Invalid syntax: " + string);
+    assertTrue(string.replaceAll("\\(.*", "").matches("^[a-z]+:[-a-zA-Z\\d]+$"),
+        "Invalid function name: " + string);
+
+    final String[] params = check(string, fd.paramString(), PARAM);
+    final int pl = params.length;
+    final boolean variadic = fd.variadic();
+    assertEquals(pl > 0 && params[pl - 1].endsWith("..."), variadic,
+        "Variadic function? " + string);
+
+    // check that there are enough parameter names and types
+    final int arity = variadic ? fd.minMax[0] + 1 : fd.minMax[1];
+    final QNm[] names = fd.params;
+    assertEquals(arity, names.length,
+        "Wrong number of parameter names: " + string + Arrays.toString(names));
+    assertEquals(arity, fd.types.length, "Wrong number of parameter types: " + string);
+
+    // all variable names must be distinct
+    final Set<QNm> set = new HashSet<>(Arrays.asList(names));
+    assertEquals(names.length, set.size(), "Duplicate parameter names: " + string);
+
+    // enum constant and implementation class must be derived from the function name
+    final String prefix = Token.string(fd.name.prefix()), local = Token.string(fd.name.local());
+    assertEquals(constant(prefix, local, "fn"), constant, "Unexpected enum constant: " + string);
+
+    // record constructors are backed by a single implementation
+    final String clazz = func.className();
+    if(!clazz.equals(Util.className(ShapeConstructor.class))) {
+      // capitalization of acronyms is ignored
+      assertTrue(camelCase(prefix + '-' + local).equalsIgnoreCase(clazz),
+          "Unexpected implementation class: " + clazz + ", " + string);
     }
+  }
+
+  /**
+   * Checks the signature of a single annotation.
+   * @param ann annotation
+   */
+  private static void annotation(final Annotation ann) {
+    final String string = ann.toString();
+    final String[] params = check(string, ann.paramString, PARAM + "|'" + PARAM + "'");
+
+    // check that there are enough parameter types
+    final boolean variadic = ann.minMax[1] == Integer.MAX_VALUE;
+    assertEquals(variadic ? ann.minMax[0] + 1 : ann.minMax[1], ann.params.length,
+        "Wrong number of parameter types: " + string);
+
+    // all variable names must be distinct
+    final Set<String> set = new HashSet<>(Arrays.asList(params));
+    assertEquals(params.length, set.size(), "Duplicate parameter names: " + string);
+
+    // enum constant must be derived from the annotation name
+    final String prefix = Token.string(ann.name.prefix()), local = Token.string(ann.name.local());
+    assertEquals(constant(prefix, local, "xq"), ann.name(), "Unexpected enum constant: " + string);
   }
 
   /**
@@ -87,5 +147,32 @@ public final class SignatureTest extends SandboxTest {
       params[p] = param;
     }
     return params;
+  }
+
+  /**
+   * Returns the name of the enum constant for a qualified name.
+   * @param prefix namespace prefix
+   * @param local local name
+   * @param defaultPrefix prefix of the namespace that requires no qualifier
+   * @return constant name
+   */
+  private static String constant(final String prefix, final String local,
+      final String defaultPrefix) {
+    final String name = local.toUpperCase(Locale.ENGLISH).replace('-', '_');
+    return prefix.equals(defaultPrefix) ? name :
+      '_' + prefix.toUpperCase(Locale.ENGLISH) + '_' + name;
+  }
+
+  /**
+   * Converts a hyphenated name to camel case.
+   * @param name hyphenated name
+   * @return camel case name
+   */
+  private static String camelCase(final String name) {
+    final StringBuilder sb = new StringBuilder();
+    for(final String part : Strings.split(name, '-')) {
+      sb.append(Character.toUpperCase(part.charAt(0))).append(part, 1, part.length());
+    }
+    return sb.toString();
   }
 }

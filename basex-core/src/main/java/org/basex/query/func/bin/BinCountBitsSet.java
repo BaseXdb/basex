@@ -11,7 +11,7 @@ import org.basex.query.value.seq.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class BinCountBitsSets extends StandardFunc {
+public final class BinCountBitsSet extends StandardFunc {
   @Override
   protected Item item(final QueryContext qc) throws QueryException {
     final Bin value = toBinOrNull(arg(0), qc);

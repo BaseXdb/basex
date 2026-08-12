@@ -70,7 +70,7 @@ public enum Function implements AFunction {
   ADJUST_DATE_TO_TIMEZONE(FnAdjustDateToTimezone::new, "adjust-date-to-timezone(value, timezone?)",
       params(DATE_ZO, DAY_TIME_DURATION_ZO), DATE_ZO),
   /** XQuery function. */
-  ADJUST_DATETIME_TO_TIMEZONE(FnAdustDateTimeToTimezone::new,
+  ADJUST_DATETIME_TO_TIMEZONE(FnAdjustDateTimeToTimezone::new,
       "adjust-dateTime-to-timezone(value, timezone?)",
       params(DATE_TIME_ZO, DAY_TIME_DURATION_ZO), DATE_TIME_ZO),
   /** XQuery function. */
@@ -134,7 +134,7 @@ public enum Function implements AFunction {
   COLLATION(FnCollation::new, "collation(options)",
       params(MAP_O), STRING_O),
   /** XQuery function. */
-  COLLATION_AVAILALBE(FnCollationAvailable::new, "collation-available(collation)",
+  COLLATION_AVAILABLE(FnCollationAvailable::new, "collation-available(collation)",
       params(STRING_O), BOOLEAN_O),
   /** XQuery function. */
   COLLATION_KEY(FnCollationKey::new, "collation-key(value, collation?)",
@@ -193,7 +193,7 @@ public enum Function implements AFunction {
   DAY_FROM_DATETIME(FnDayFromDateTime::new, "day-from-dateTime(value)",
       params(GREGORIAN_ZO), INTEGER_ZO),
   /** XQuery function. */
-  DAYS_FROM_DURATION(FnDayFromDuration::new, "days-from-duration(value)",
+  DAYS_FROM_DURATION(FnDaysFromDuration::new, "days-from-duration(value)",
       params(DURATION_ZO), INTEGER_ZO),
   /** XQuery function. */
   DECODE_FROM_URI(FnDecodeFromUri::new, "decode-from-uri(value)",
@@ -808,7 +808,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   ELEMENT_CONVERSION_PLAN_RECORD(Records.ELEMENT_CONVERSION_PLAN.get()),
   /** XQuery function. */
-  INFER_ENCODING_RECORD(Records.INFER_ENCODING.get()),
+  _BIN_INFER_ENCODING_RECORD(Records.INFER_ENCODING.get()),
   /** XQuery function. */
   LOAD_XQUERY_MODULE_RECORD(Records.LOAD_XQUERY_MODULE.get()),
   /** XQuery function. */
@@ -816,7 +816,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   MATCHING_SEGMENT_RECORD(Records.MATCHING_SEGMENT.get()),
   /** XQuery function. */
-  MEMBER_RECORD(Records.MEMBER.get()),
+  _ARRAY_MEMBER_RECORD(Records.MEMBER.get()),
   /** XQuery function. */
   PARSED_CSV_STRUCTURE_RECORD(Records.PARSED_CSV_STRUCTURE.get()),
   /** XQuery function. */
@@ -1104,7 +1104,7 @@ public enum Function implements AFunction {
   _BIN_BIN(BinBin::new, "bin(value)",
       params(STRING_ZO), BASE64_BINARY_ZO, BIN_URI),
   /** XQuery function. */
-  _BIN_COUNT_BITS_SET(BinCountBitsSets::new, "count-bits-set(value)",
+  _BIN_COUNT_BITS_SET(BinCountBitsSet::new, "count-bits-set(value)",
       params(BINARY_ZO), INTEGER_ZO, BIN_URI),
   /** XQuery function. */
   _BIN_DECODE_STRING(BinDecodeString::new, "decode-string(value, encoding?, offset?, size?)",

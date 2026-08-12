@@ -110,16 +110,16 @@ public enum ApiFunction implements AFunction {
   // RESTXQ Module
 
   /** XQuery function. */
-  _RESTXQ_BASE_URI(RestBaseUri::new, "base-uri()",
+  _REST_BASE_URI(RestBaseUri::new, "base-uri()",
       params(), ANY_URI_O, REST_URI),
   /** XQuery function. */
-  _RESTXQ_INIT(RestInit::new, "init(update?)",
+  _REST_INIT(RestInit::new, "init(update?)",
       params(BOOLEAN_ZO), EMPTY_SEQUENCE_Z, REST_URI),
   /** XQuery function. */
-  _RESTXQ_URI(RestUri::new, "uri()",
+  _REST_URI(RestUri::new, "uri()",
       params(), ANY_URI_O, REST_URI),
   /** XQuery function. */
-  _RESTXQ_WADL(RestWadl::new, "wadl()",
+  _REST_WADL(RestWadl::new, "wadl()",
       params(), ELEMENT_O, REST_URI),
 
   // Session Module

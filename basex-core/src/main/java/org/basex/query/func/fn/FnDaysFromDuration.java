@@ -10,7 +10,7 @@ import org.basex.query.value.seq.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class FnDayFromDuration extends DateTimeFn {
+public final class FnDaysFromDuration extends DateTimeFn {
   @Override
   protected Item item(final QueryContext qc) throws QueryException {
     final Item value = arg(0).atomItem(qc, info);

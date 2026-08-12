@@ -177,7 +177,7 @@ public enum Annotation {
   /** XQuery annotation. */
   _WS_MESSAGE("message(path, message)", params(STRING, STRING), WS_URI),
   /** XQuery annotation. */
-  _WS_SUBPROTOCOL("subprotocol(protocol, protocols...)", params(STRING), WS_URI);
+  _WS_SUBPROTOCOL("subprotocol(protocol, protocols...)", params(STRING, STRING), WS_URI);
 
   /** Parameter types. */
   public final BasicType[] params;
