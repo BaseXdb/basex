@@ -96,8 +96,8 @@ public class Options implements Iterable<Option<?>> {
     }
   };
 
-  /** Map with option names and definitions (shared, cached, unmodifiable). */
-  private final SortedMap<String, Option<?>> definitions;
+  /** Cached metadata of the options class. */
+  private final Meta meta;
   /** Map with option names and values. */
   private final TreeMap<String, Object> values;
   /** Free option assignments. */
@@ -121,8 +121,7 @@ public class Options implements Iterable<Option<?>> {
    */
   @SuppressWarnings("unchecked")
   protected Options(final IOFile opts) {
-    final Meta meta = META.get(getClass());
-    definitions = meta.definitions;
+    meta = META.get(getClass());
     values = (TreeMap<String, Object>) meta.values.clone();
     free = new HashMap<>();
     if(opts != null) read(opts);
@@ -134,7 +133,7 @@ public class Options implements Iterable<Option<?>> {
    */
   @SuppressWarnings("unchecked")
   protected Options(final Options opts) {
-    definitions = opts.definitions;
+    meta = opts.meta;
     values = (TreeMap<String, Object>) opts.values.clone();
     free = (HashMap<String, String>) opts.free.clone();
     user.add(opts.user);
@@ -147,7 +146,7 @@ public class Options implements Iterable<Option<?>> {
   public final synchronized void write() {
     final StringList lines = new StringList();
     try {
-      for(final Option<?> option : options(getClass())) {
+      for(final Option<?> option : meta.all) {
         final String name = option.name();
         if(option instanceof Comment) {
           if(!lines.isEmpty()) lines.add("");
@@ -196,7 +195,7 @@ public class Options implements Iterable<Option<?>> {
    * @return value (can be {@code null})
    */
   public final synchronized Option<?> option(final String name) {
-    return definitions.get(name);
+    return meta.definitions.get(name);
   }
 
   /**
@@ -406,7 +405,7 @@ public class Options implements Iterable<Option<?>> {
    * @throws BaseXException database exception
    */
   public synchronized void assign(final String name, final String value) throws BaseXException {
-    if(definitions.isEmpty()) {
+    if(meta.definitions.isEmpty()) {
       free.put(name, value);
     } else {
       assign(name, value, -1, true);
@@ -426,7 +425,7 @@ public class Options implements Iterable<Option<?>> {
       final InputInfo info) throws QueryException {
 
     final String nm = name(name, info);
-    if(definitions.isEmpty()) {
+    if(meta.definitions.isEmpty()) {
       free.put(nm, serialize(value, info));
     } else {
       assign(nm, value, qc, info);
@@ -552,7 +551,7 @@ public class Options implements Iterable<Option<?>> {
    * @return error string
    */
   public final synchronized String similar(final Object option) {
-    return similar(option, definitions);
+    return similar(option, meta.definitions);
   }
 
   /**
@@ -616,7 +615,7 @@ public class Options implements Iterable<Option<?>> {
    */
   public final synchronized void assign(final MediaType type) throws BaseXException {
     for(final Entry<String, String> entry : type.parameters()) {
-      if(definitions.isEmpty()) {
+      if(meta.definitions.isEmpty()) {
         free.put(entry.getKey(), entry.getValue());
       } else {
         assign(entry.getKey(), entry.getValue(), -1, false);
@@ -645,8 +644,8 @@ public class Options implements Iterable<Option<?>> {
   public final synchronized void assign(final XQMap map, final QueryContext qc,
       final InputInfo info) throws QueryException {
     // reject unknown options; exclude supplied options from the suggestions
-    if(!definitions.isEmpty() && map.structSize() != 0) {
-      final TreeMap<String, Option<?>> defs = new TreeMap<>(definitions);
+    if(!meta.definitions.isEmpty() && map.structSize() != 0) {
+      final TreeMap<String, Option<?>> defs = new TreeMap<>(meta.definitions);
       String unknown = null;
       for(final Item key : map.keys()) {
         final String nm = name(key, info);
@@ -662,14 +661,14 @@ public class Options implements Iterable<Option<?>> {
    * @return names
    */
   public final synchronized String[] names() {
-    final StringList sl = new StringList(definitions.size());
+    final StringList sl = new StringList(meta.definitions.size());
     for(final Option<?> option : this) sl.add(option.name());
     return sl.finish();
   }
 
   @Override
   public final synchronized Iterator<Option<?>> iterator() {
-    return definitions.values().iterator();
+    return meta.definitions.values().iterator();
   }
 
   @Override
@@ -679,7 +678,7 @@ public class Options implements Iterable<Option<?>> {
     values.forEach((name, value) -> {
       if(value != null) {
         final StringList list = new StringList();
-        final Object value2 = definitions.get(name).value();
+        final Object value2 = meta.definitions.get(name).value();
         if(value instanceof final String[] strings) {
           for(final String s : strings) list.add(s);
         } else if(value instanceof final int[] ints) {
@@ -777,7 +776,10 @@ public class Options implements Iterable<Option<?>> {
         assign.accept(il.add(v).finish());
       } else {
         if(index < 0 || index >= ii.length) return Util.info(Text.OPT_OFFSET_X, name);
-        ii[index] = v;
+        // the current value may be the default value, which is shared by all instances
+        final int[] copy = ii.clone();
+        copy[index] = v;
+        assign.accept(copy);
       }
     } else if(option instanceof StringsOption && options != null) {
       String[] ss = (String[]) options.get(option);
@@ -792,7 +794,9 @@ public class Options implements Iterable<Option<?>> {
         options.values.put(name, new String[i]);
       } else {
         if(index <= 0 || index > ss.length) return Util.info(Text.OPT_OFFSET_X, name);
-        ss[index - 1] = value;
+        final String[] copy = ss.clone();
+        copy[index - 1] = value;
+        assign.accept(copy);
       }
     } else {
       throw Util.notExpected("Unsupported option (%): %", Util.className(option), option);
@@ -825,15 +829,6 @@ public class Options implements Iterable<Option<?>> {
       tb.add(value);
     }
     return tb.toString();
-  }
-
-  /**
-   * Returns all options from the specified class (in declaration order, including comments).
-   * @param clz options class
-   * @return option instances
-   */
-  private static Option<?>[] options(final Class<? extends Options> clz) {
-    return META.get(clz).all();
   }
 
   /**
@@ -900,7 +895,7 @@ public class Options implements Iterable<Option<?>> {
     // check if all mandatory files have been read
     boolean ok = true;
     if(errs.isEmpty()) {
-      for(final Option<?> opt : options(getClass())) {
+      for(final Option<?> opt : meta.all) {
         if(ok && !(opt instanceof Comment)) ok = read.contains(opt.name());
       }
     }
@@ -923,7 +918,7 @@ public class Options implements Iterable<Option<?>> {
   private synchronized void assign(final String name, final Value value, final QueryContext qc,
       final InputInfo info) throws QueryException {
 
-    final Option<?> option = definitions.get(name);
+    final Option<?> option = meta.definitions.get(name);
     if(option == null) {
       if(getClass() == Options.class || name.startsWith("Q{")) return;
       throw INVALIDOPTION_X.get(info, similar(name));
@@ -1015,7 +1010,7 @@ public class Options implements Iterable<Option<?>> {
   private synchronized boolean assign(final String name, final String value, final int index,
       final boolean error) throws BaseXException {
 
-    final Option<?> option = definitions.get(name);
+    final Option<?> option = meta.definitions.get(name);
     if(option == null) {
       if(error) throw new BaseXException(similar(name));
       return false;
