@@ -64,10 +64,11 @@ public class Options implements Iterable<Option<?>> {
    * Cached option metadata (identical for all instances of a subclass).
    * @param all all options in declaration order (with comments)
    * @param definitions option names to definitions
+   * @param offset index of the first option (subtracted from option indexes)
    * @param values default values (cloned per instance)
    */
-  private record Meta(Option<?>[] all, SortedMap<String, Option<?>> definitions,
-      TreeMap<String, Object> values) { }
+  private record Meta(Option<?>[] all, SortedMap<String, Option<?>> definitions, int offset,
+      Object[] values) { }
 
   /** Metadata cache, computed once per subclass. */
   private static final ClassValue<Meta> META = new ClassValue<>() {
@@ -75,31 +76,37 @@ public class Options implements Iterable<Option<?>> {
     protected Meta computeValue(final Class<?> clz) {
       final ArrayList<Option<?>> all = new ArrayList<>();
       final TreeMap<String, Option<?>> definitions = new TreeMap<>();
-      final TreeMap<String, Object> values = new TreeMap<>();
+      int min = Integer.MAX_VALUE, max = -1;
       try {
         for(final Field f : clz.getFields()) {
           if(!Modifier.isStatic(f.getModifiers())) continue;
           if(f.get(null) instanceof final Option opt) {
             all.add(opt);
             if(!(opt instanceof Comment)) {
-              final String name = opt.name();
-              definitions.put(name, opt);
-              values.put(name, opt.value());
+              definitions.put(opt.name(), opt);
+              min = Math.min(min, opt.index());
+              max = Math.max(max, opt.index());
             }
           }
         }
       } catch(final IllegalAccessException ex) {
         throw Util.notExpected(ex);
       }
+      // options of a class are created consecutively: address them via the smallest index
+      final int offset = max == -1 ? 0 : min;
+      final Object[] values = new Object[max - offset + 1];
+      for(final Option<?> option : definitions.values()) {
+        values[option.index() - offset] = option.value();
+      }
       return new Meta(all.toArray(Option[]::new),
-          Collections.unmodifiableSortedMap(definitions), values);
+          Collections.unmodifiableSortedMap(definitions), offset, values);
     }
   };
 
   /** Cached metadata of the options class. */
   private final Meta meta;
-  /** Map with option names and values. */
-  private final TreeMap<String, Object> values;
+  /** Option values, addressed by the index of an option. */
+  private final Object[] values;
   /** Free option assignments. */
   private final HashMap<String, String> free;
 
@@ -119,10 +126,9 @@ public class Options implements Iterable<Option<?>> {
    * Constructor with options file.
    * @param opts options file
    */
-  @SuppressWarnings("unchecked")
   protected Options(final IOFile opts) {
     meta = META.get(getClass());
-    values = (TreeMap<String, Object>) meta.values.clone();
+    values = meta.values.clone();
     free = new HashMap<>();
     if(opts != null) read(opts);
   }
@@ -134,7 +140,7 @@ public class Options implements Iterable<Option<?>> {
   @SuppressWarnings("unchecked")
   protected Options(final Options opts) {
     meta = opts.meta;
-    values = (TreeMap<String, Object>) opts.values.clone();
+    values = opts.values.clone();
     free = (HashMap<String, String>) opts.free.clone();
     user.add(opts.user);
     file = opts.file;
@@ -204,7 +210,8 @@ public class Options implements Iterable<Option<?>> {
    * @return value (can be {@code null})
    */
   public final synchronized Object get(final Option<?> option) {
-    return get(option.name());
+    final int index = option.index() - meta.offset;
+    return index >= 0 && index < values.length ? values[index] : null;
   }
 
   /**
@@ -213,7 +220,8 @@ public class Options implements Iterable<Option<?>> {
    * @return value (can be {@code null})
    */
   public final synchronized Object get(final String name) {
-    return values.get(name);
+    final Option<?> option = meta.definitions.get(name);
+    return option != null ? get(option) : null;
   }
 
   /**
@@ -222,7 +230,7 @@ public class Options implements Iterable<Option<?>> {
    * @param value value to be assigned
    */
   public final synchronized void put(final Option<?> option, final Object value) {
-    values.put(option.name(), option.normalize(value));
+    values[option.index() - meta.offset] = option.normalize(value);
   }
 
   /**
@@ -675,10 +683,11 @@ public class Options implements Iterable<Option<?>> {
   public final synchronized String toString() {
     // only those options are listed whose value differs from default value
     final StringBuilder sb = new StringBuilder();
-    values.forEach((name, value) -> {
+    for(final Option<?> option : meta.definitions.values()) {
+      final Object value = get(option);
       if(value != null) {
         final StringList list = new StringList();
-        final Object value2 = meta.definitions.get(name).value();
+        final Object value2 = option.value();
         if(value instanceof final String[] strings) {
           for(final String s : strings) list.add(s);
         } else if(value instanceof final int[] ints) {
@@ -695,10 +704,10 @@ public class Options implements Iterable<Option<?>> {
         }
         for(final String s : list) {
           if(!sb.isEmpty()) sb.append(',');
-          sb.append(name).append('=').append(s.replace(",", ",,"));
+          sb.append(option.name()).append('=').append(s.replace(",", ",,"));
         }
       }
-    });
+    }
     return sb.toString();
   }
 
@@ -791,7 +800,7 @@ public class Options implements Iterable<Option<?>> {
       } else if(index == 0) {
         final int i = Strings.toInt(value);
         if(i < 0) return Util.info(Text.OPT_NUMBER_X_X, name, value);
-        options.values.put(name, new String[i]);
+        options.put(option, new String[i]);
       } else {
         if(index <= 0 || index > ss.length) return Util.info(Text.OPT_OFFSET_X, name);
         final String[] copy = ss.clone();

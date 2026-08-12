@@ -1,5 +1,7 @@
 package org.basex.util.options;
 
+import java.util.concurrent.atomic.*;
+
 import org.basex.query.value.type.*;
 
 /**
@@ -10,10 +12,15 @@ import org.basex.query.value.type.*;
  * @param <O> option type
  */
 public abstract class Option<O> {
+  /** Counter for assigning option indexes. */
+  private static final AtomicInteger COUNTER = new AtomicInteger();
+
   /** Name. */
   private final String name;
   /** Required type (can be {@code null}). */
   private final SeqType seqType;
+  /** Index, unique for all options of a class. */
+  private final int index = COUNTER.getAndIncrement();
 
   /**
    * Constructor without required type.
@@ -39,6 +46,14 @@ public abstract class Option<O> {
    */
   public final String name() {
     return name;
+  }
+
+  /**
+   * Returns the index of the option.
+   * @return index
+   */
+  final int index() {
+    return index;
   }
 
   /**
