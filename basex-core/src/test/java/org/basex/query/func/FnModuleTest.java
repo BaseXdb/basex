@@ -3725,6 +3725,14 @@ return
     error(func.args("x", "(?<a>x)\\k<b>", ""), REGINVALID_X);
     error(func.args("x", "\\k<a>(?<a>x)", ""), REGINVALID_X);
     error(func.args("x", "[\\k<a>](?<a>x)", ""), REGINVALID_X);
+
+    // deprecated: groups are passed on as sequence
+    query(func.args("A1 B234", "([A-Z]+)([0-9]+)",
+        " fn($s, $g as xs:untypedAtomic*) { $g[2] || $g[1] }"), "1A 234B");
+    query(func.args("a", "(a)|(b)", " fn($s, $g as xs:untypedAtomic*) { count($g) }"), 2);
+    query(func.args("a", "(a)|(b)", " fn($s as xs:untypedAtomic, $g as xs:untypedAtomic*) "
+        + "as xs:string { string-join($g, ',') }"), "a,");
+    query(func.args("1234", ".(..)", " substring-after#2"), "4");
   }
 
   /** Test method. */

@@ -9,6 +9,7 @@ import java.util.regex.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.regex.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
@@ -20,11 +21,14 @@ import org.basex.query.value.type.*;
  * @author Christian Gruen
  */
 public final class FnReplace extends RegExFn {
-  /** Type of the replacement argument. */
-  public static final SeqType REPLACEMENT_TYPE =
-      ChoiceItemType.get(BasicType.STRING, FuncType.get(Types.ITEM_ZO, Types.UNTYPED_ATOMIC_O,
-          MapType.get(ChoiceItemType.get(BasicType.INTEGER, BasicType.STRING),
-              Types.UNTYPED_ATOMIC_O).seqType())).seqType(Occ.ZERO_OR_ONE);
+  /** Type of the groups argument of a replacement function. */
+  private static final SeqType GROUPS_TYPE = MapType.get(
+      ChoiceItemType.get(BasicType.INTEGER, BasicType.STRING), Types.UNTYPED_ATOMIC_O).seqType();
+  /** Type of the replacement argument (deprecated, including the old function signature). */
+  public static final SeqType REPLACEMENT_TYPE = ChoiceItemType.get(BasicType.STRING,
+      FuncType.get(Types.ITEM_ZO, Types.UNTYPED_ATOMIC_O, GROUPS_TYPE),
+      FuncType.get(Types.ITEM_ZO, Types.UNTYPED_ATOMIC_O, Types.UNTYPED_ATOMIC_ZM)).
+      seqType(Occ.ZERO_OR_ONE);
 
   @Override
   protected Str item(final QueryContext qc) throws QueryException {
@@ -50,20 +54,15 @@ public final class FnReplace extends RegExFn {
     final Matcher matcher = regExpr.pattern.matcher(string(value));
 
     if(func) {
-      final String[] names = regExpr.getGroupNames();
+      // deprecated: groups are passed on as sequence
+      final FuncType ft = action.funcType();
+      final SeqType[] at = ft != null ? ft.argTypes : null;
+      final boolean seq = at != null && at.length > 1 && !GROUPS_TYPE.instanceOf(at[1]);
+      final String[] names = seq ? null : regExpr.getGroupNames();
       final HofArgs args = new HofArgs(2);
       final StringBuilder sb = new StringBuilder();
       while(matcher.find()) {
-        final MapBuilder groups = new MapBuilder();
-        final int gc = matcher.groupCount();
-        for(int g = 1; g <= gc; g++) {
-          final String grp = matcher.group(g);
-          if(grp != null) {
-            final String name = g <= names.length ? names[g - 1] : null;
-            groups.put(name != null ? Str.get(name) : Itr.get(g), Atm.get(grp));
-          }
-        }
-        args.set(0, Atm.get(matcher.group())).set(1, groups.map());
+        args.set(0, Atm.get(matcher.group())).set(1, groups(matcher, names, qc));
         final Item item = invoke(action, args, qc).atomItem(qc, info);
         matcher.appendReplacement(sb, item.isEmpty() ? "" :
           string(item.string(info)).replace("\\", "\\\\").replace("$", "\\$"));
@@ -125,6 +124,36 @@ public final class FnReplace extends RegExFn {
       }
     }
     return Str.get(matcher.replaceAll(string));
+  }
+
+  /**
+   * Returns the capturing groups of the current match.
+   * @param matcher matcher
+   * @param names group names, or {@code null} if groups are to be returned as sequence
+   * @param qc query context
+   * @return groups
+   * @throws QueryException query exception
+   */
+  private static Value groups(final Matcher matcher, final String[] names, final QueryContext qc)
+      throws QueryException {
+    final int gc = matcher.groupCount();
+    if(names == null) {
+      final ValueBuilder vb = new ValueBuilder(qc);
+      for(int g = 1; g <= gc; g++) {
+        final String group = matcher.group(g);
+        vb.add(group == null ? Atm.EMPTY : Atm.get(group));
+      }
+      return vb.value();
+    }
+    final MapBuilder groups = new MapBuilder();
+    for(int g = 1; g <= gc; g++) {
+      final String group = matcher.group(g);
+      if(group != null) {
+        final String name = g <= names.length ? names[g - 1] : null;
+        groups.put(name != null ? Str.get(name) : Itr.get(g), Atm.get(group));
+      }
+    }
+    return groups.map();
   }
 
   /**
