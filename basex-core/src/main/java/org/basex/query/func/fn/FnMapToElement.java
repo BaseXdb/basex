@@ -40,15 +40,15 @@ public final class FnMapToElement extends PlanFn {
 
   @Override
   protected Item item(final QueryContext qc) throws QueryException {
-    final Value input = arg(0).value(qc);
+    final Value value = arg(0).value(qc);
     final ElementsOptions options = toOptions(arg(1), new ElementsOptions(), qc);
-    if(input.isEmpty()) return Empty.VALUE;
+    if(value.isEmpty()) return Empty.VALUE;
 
     final Plan plan = buildPlan(options, qc);
     if(plan.marker == null || plan.marker.isEmpty()) throw MAP_TO_ELEMENT_X.get(info,
         "Empty attribute marker is not allowed.");
 
-    final XQMap map = toMap(input, qc);
+    final XQMap map = toMap(value, qc);
     if(map.structSize() != 1) throw MAP_TO_ELEMENT_X.get(info, "Single-entry map expected.");
     final Item key = map.keys().itemAt(0);
     return element(key.string(info), map.get(key), null, plan, qc);

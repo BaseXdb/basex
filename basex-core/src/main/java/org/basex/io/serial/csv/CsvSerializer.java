@@ -178,6 +178,10 @@ public abstract class CsvSerializer extends StandardSerializer {
           else if(cp == '\\') tb.add("\\\\");
           else if(cp == separator && !quotes) tb.add('\\').add(cp);
           else tb.add(cp);
+        } else if(cp == '\r') {
+          // line endings are replaced by the string that separates records
+          tp.consume('\n');
+          tb.add('\n');
         } else {
           if(cp == quoteCharacter) tb.add(quoteCharacter);
           tb.add(cp);
