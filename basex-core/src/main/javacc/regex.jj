@@ -33,6 +33,8 @@ public class RegExParser {
   private int groups;
   /** Closed groups. */
   private final Map<Integer, Group> closed = new HashMap<Integer, Group>();
+  /** Numbers of closed named groups. */
+  private final Map<String, Integer> names = new HashMap<String, Integer>();
   /** Path of current atom: sequence numbers of branches and atoms currently being processed. */ 
   private Stack<Integer> atomPath = new Stack<Integer>();
   /** If the wildcard {@code .} matches any character. */
@@ -217,6 +219,7 @@ PARSER_END(RegExParser)
         if(lookbehind) throw new ParseException("Lookbehind assertions must not contain parenthesized expressions.");
         final Group g = new Group(nd, true, name, atomPath.toArray(new Integer[atomPath.size()]));
         closed.put(ngrp, g);
+        names.put(name, ngrp);
         nd = g;
       }
     | nd = backReference() {
@@ -246,17 +249,23 @@ PARSER_END(RegExParser)
    * @throws ParseException parsing exception
    */
   BackRef backReference() : {
-    int backref;
+    int backref = 0;
   } {
-      <BACK_REF> {
-      backref = token.image.charAt(1) - '0';
-    }
-    (
-      LOOKAHEAD(1, { 10 * backref + token.next.image.charAt(0) - '0' <= groups })
-      <DIGIT> {
-        backref = 10 * backref + token.image.charAt(0) - '0';
+    ( <BACK_REF> {
+        backref = token.image.charAt(1) - '0';
       }
-    )* {
+      (
+        LOOKAHEAD(1, { 10 * backref + token.next.image.charAt(0) - '0' <= groups })
+        <DIGIT> {
+          backref = 10 * backref + token.image.charAt(0) - '0';
+        }
+      )*
+    | <NAMED_BACK_REF> {
+        final Integer num = names.get((String) token.getValue());
+        if(num == null) throw new ParseException("Illegal back-reference: " + token.image);
+        backref = num;
+      }
+    ) {
       final Group g = closed.get(backref);
       if(g == null)
         throw new ParseException("Illegal back-reference: \\" + backref);

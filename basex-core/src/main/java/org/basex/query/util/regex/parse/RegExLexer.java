@@ -221,6 +221,21 @@ public final class RegExLexer implements TokenManager, RegExParserConstants {
       case 'w':
       case 'W':
         return MULTI_ESC;
+      case 'k':
+        // named back-reference: \k<name> (not allowed in character classes)
+        if(state > 0) throw error("\\", curr);
+        int nc = next(skipCmt);
+        if(nc != '<') throw error("\\k", nc);
+        nc = next(skipCmt);
+        if(!(nc >= 'a' && nc <= 'z' || nc >= 'A' && nc <= 'Z')) throw error("\\k<", nc);
+        final TokenBuilder name = new TokenBuilder().add(nc);
+        for(nc = next(skipCmt); nc != '>'; nc = next(skipCmt)) {
+          if(nc >= 'a' && nc <= 'z' || nc >= 'A' && nc <= 'Z' ||
+             nc >= '0' && nc <= '9') name.add(nc);
+          else throw error("\\k<" + name, nc);
+        }
+        payload = name.toString();
+        return NAMED_BACK_REF;
       case 'p':
       case 'P':
         final String p = "\\" + (char) curr;
