@@ -73,8 +73,10 @@ public final class TransformWith extends Copy {
         updates.addData(copy.data());
 
         if(arg(update()).value(qc) != Empty.VALUE) throw UPMODIFY.get(info);
-        updates.prepare(qc);
-        updates.apply(qc);
+        if(!updates.isEmpty()) {
+          updates.prepare(qc);
+          updates.apply(qc);
+        }
         vb.add(copy);
         qf.pos++;
       }

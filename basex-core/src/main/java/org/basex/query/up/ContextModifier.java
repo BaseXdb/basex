@@ -130,6 +130,14 @@ abstract class ContextModifier {
   }
 
   /**
+   * Indicates if no update primitives have been added.
+   * @return result of check
+   */
+  final synchronized boolean isEmpty() {
+    return dbUpdates.isEmpty() && nameUpdates.isEmpty() && userUpdates.isEmpty();
+  }
+
+  /**
    * Returns the total number of update operations.
    * @return number of updates
    */

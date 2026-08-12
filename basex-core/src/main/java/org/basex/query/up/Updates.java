@@ -192,6 +192,14 @@ public final class Updates {
   }
 
   /**
+   * Indicates if the pending update list is empty.
+   * @return result of check
+   */
+  public boolean isEmpty() {
+    return mod.isEmpty();
+  }
+
+  /**
    * Number of updates on the pending update list.
    * @return #updates
    */
