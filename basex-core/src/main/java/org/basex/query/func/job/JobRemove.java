@@ -34,9 +34,7 @@ public final class JobRemove extends StandardFunc {
     // remove service
     if(options.get(RemoveOptions.SERVICE)) {
       try {
-        final Jobs jobs = new Jobs(qc.context);
-        jobs.remove(id);
-        jobs.write();
+        Jobs.unregister(qc.context, id);
       } catch(final IOException ex) {
         throw JOBS_SERVICE_X_X.get(info, ex);
       }

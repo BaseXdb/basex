@@ -181,7 +181,7 @@ public final class Context {
    * @throws IOException I/O exception
    */
   public void initServer() throws IOException {
-    new Jobs(this).init();
+    Jobs.init(this);
     users.init(this);
   }
 

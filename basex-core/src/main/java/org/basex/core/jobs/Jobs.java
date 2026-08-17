@@ -70,18 +70,29 @@ public final class Jobs {
 
   /**
    * Schedules all registered jobs.
+   * @param context database context
+   * @throws IOException I/O exception
    */
-  public void init() {
+  public static void init(final Context context) throws IOException {
+    synchronized(FILE) {
+      new Jobs(context).start();
+    }
+  }
+
+  /**
+   * Schedules all jobs of the list.
+   */
+  private void start() {
     // start all jobs
     boolean error = false;
-    for(int l = 0; l < list.size(); l++) {
-      final QueryJobSpec spec = list.get(l);
+    final Iterator<QueryJobSpec> iter = list.iterator();
+    while(iter.hasNext()) {
       try {
-        new QueryJob(spec, context, null, null, null);
+        new QueryJob(iter.next(), context, null, null, null);
       } catch(final QueryException ex) {
         // drop failing jobs
         Util.errln(ex);
-        list.remove(l);
+        iter.remove();
         error = true;
       }
     }
@@ -96,17 +107,41 @@ public final class Jobs {
   }
 
   /**
+   * Registers a job as service.
+   * @param context database context
+   * @param spec job info
+   * @throws IOException I/O exception
+   */
+  public static void register(final Context context, final QueryJobSpec spec) throws IOException {
+    synchronized(FILE) {
+      final Jobs jobs = new Jobs(context);
+      jobs.add(spec);
+      jobs.write();
+    }
+  }
+
+  /**
+   * Unregisters all services with the specified job ID.
+   * @param context database context
+   * @param id job ID
+   * @throws IOException I/O exception
+   */
+  public static void unregister(final Context context, final String id) throws IOException {
+    synchronized(FILE) {
+      final Jobs jobs = new Jobs(context);
+      jobs.remove(id);
+      jobs.write();
+    }
+  }
+
+  /**
    * Adds a query job to the list.
    * @param spec job info
    */
-  public void add(final QueryJobSpec spec) {
-    for(int l = 0; l < list.size(); l++) {
-      final QueryJobSpec job = list.get(l);
-      // job exists: replace existing entry
-      if(job.equals(spec)) {
-        list.set(l, job);
-        return;
-      }
+  private void add(final QueryJobSpec spec) {
+    // skip job if an equal entry exists
+    for(final QueryJobSpec job : list) {
+      if(job.equals(spec)) return;
     }
     list.add(spec);
   }
@@ -115,7 +150,7 @@ public final class Jobs {
    * Removes all jobs with the specified ID from the list.
    * @param id job ID
    */
-  public void remove(final String id) {
+  private void remove(final String id) {
     list.removeIf(job -> id.equals(job.options.get(JobOptions.ID)));
   }
 
@@ -141,7 +176,7 @@ public final class Jobs {
    * Writes jobs to disk.
    * @throws IOException I/O exception
    */
-  public void write() throws IOException {
+  private void write() throws IOException {
     synchronized(FILE) {
       // only create jobs file if jobs are registered
       if(list.isEmpty() && file.exists()) {

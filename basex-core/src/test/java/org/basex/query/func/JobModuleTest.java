@@ -7,10 +7,12 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.*;
 import java.time.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 import org.basex.*;
 import org.basex.core.jobs.*;
 import org.basex.core.users.*;
+import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.util.*;
 import org.junit.jupiter.api.*;
@@ -301,7 +303,7 @@ public final class JobModuleTest extends SandboxTest {
     // drop the scheduled job, keep the service, and re-register it as a restart would
     query(_JOB_REMOVE.args("CRON"));
     final String dropped = query("exists(" + _JOB_LIST_DETAILS.args("CRON") + ')');
-    new Jobs(context).init();
+    Jobs.init(context);
     final String restored = query(_JOB_LIST_DETAILS.args("CRON") + "/@cron/string()");
 
     // remove job and service before asserting: a surviving cron job would stall clean()
@@ -312,6 +314,44 @@ public final class JobModuleTest extends SandboxTest {
     assertEquals("false", dropped);
     assertEquals("0 6 * * MON-FRI", restored);
     assertEquals("false", removed);
+  }
+
+  /**
+   * Test method.
+   * @throws Exception exception
+   */
+  @Test public void evalServiceConcurrent() throws Exception {
+    // register services in parallel: no registration must get lost
+    final int count = 8;
+    final CountDownLatch latch = new CountDownLatch(1);
+    final ArrayList<Thread> threads = new ArrayList<>();
+    for(int c = 0; c < count; c++) {
+      final JobOptions options = new JobOptions();
+      options.set(JobOptions.ID, "SERVICE" + c);
+      options.set(JobOptions.START, "PT1H");
+      final QueryJobSpec spec = new QueryJobSpec(options, new HashMap<>(),
+          new IOContent("1"), null);
+      final Thread thread = new Thread(() -> {
+        try {
+          latch.await();
+          Jobs.register(context, spec);
+        } catch(final IOException | InterruptedException ex) {
+          Util.stack(ex);
+        }
+      });
+      threads.add(thread);
+      thread.start();
+    }
+    latch.countDown();
+    for(final Thread thread : threads) thread.join();
+
+    final String services = "count(" + _JOB_SERVICES.args() + "[starts-with(@id, 'SERVICE')])";
+    try {
+      query(services, count);
+    } finally {
+      for(int c = 0; c < count; c++) Jobs.unregister(context, "SERVICE" + c);
+    }
+    query(services, 0);
   }
 
   /** Test method. */
