@@ -1,6 +1,5 @@
 package org.basex.core;
 
-import java.io.*;
 import java.util.*;
 
 import org.basex.core.jobs.*;
@@ -28,6 +27,8 @@ public final class Context {
   public final ClientBlocker blocker;
   /** Job pool. */
   public final JobPool jobs;
+  /** Persistent services. */
+  public final Services services;
   /** Main options. */
   public final MainOptions options;
   /** Static options. */
@@ -117,6 +118,7 @@ public final class Context {
     repo = ctx.repo;
     log = ctx.log;
     jobs = ctx.jobs;
+    services = ctx.services;
     stores = ctx.stores;
     caches = ctx.caches;
     external = new HashSet<>(ctx.external);
@@ -139,6 +141,7 @@ public final class Context {
     log = new Log(soptions);
     user = users.get(UserText.ADMIN);
     jobs = new JobPool(soptions);
+    services = new Services(soptions);
     external = new HashSet<>();
     stores = new Stores(this);
     caches = new Caches(this);
@@ -178,10 +181,9 @@ public final class Context {
 
   /**
    * Initializes a server instance.
-   * @throws IOException I/O exception
    */
-  public void initServer() throws IOException {
-    Jobs.init(this);
+  public void initServer() {
+    services.init(this);
     users.init(this);
   }
 

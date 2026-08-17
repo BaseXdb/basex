@@ -1,10 +1,5 @@
 package org.basex.query.func.job;
 
-import static org.basex.query.QueryError.*;
-
-import java.io.*;
-
-import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
@@ -18,10 +13,6 @@ import org.basex.query.value.*;
 public final class JobServices extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    try {
-      return new Jobs(qc.context).toXml().childIter().value(qc, this);
-    } catch(final IOException ex) {
-      throw JOBS_SERVICE_X_X.get(info, ex);
-    }
+    return qc.context.services.toXml().childIter().value(qc, this);
   }
 }

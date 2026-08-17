@@ -52,7 +52,7 @@ public class JobEval extends StandardFunc {
     // add service
     if(service) {
       try {
-        Jobs.register(qc.context, spec);
+        qc.context.services.register(spec);
       } catch(final IOException ex) {
         throw JOBS_SERVICE_X_X.get(info, ex);
       }

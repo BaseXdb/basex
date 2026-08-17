@@ -291,9 +291,8 @@ public final class JobModuleTest extends SandboxTest {
 
   /**
    * Test method.
-   * @throws IOException I/O exception
    */
-  @Test public void evalServiceCron() throws IOException {
+  @Test public void evalServiceCron() {
     // register a cron service: the expression is persisted
     final Function func = _JOB_EVAL;
     query(func.args("1", " ()",
@@ -303,7 +302,7 @@ public final class JobModuleTest extends SandboxTest {
     // drop the scheduled job, keep the service, and re-register it as a restart would
     query(_JOB_REMOVE.args("CRON"));
     final String dropped = query("exists(" + _JOB_LIST_DETAILS.args("CRON") + ')');
-    Jobs.init(context);
+    context.services.init(context);
     final String restored = query(_JOB_LIST_DETAILS.args("CRON") + "/@cron/string()");
 
     // remove job and service before asserting: a surviving cron job would stall clean()
@@ -334,7 +333,7 @@ public final class JobModuleTest extends SandboxTest {
       final Thread thread = new Thread(() -> {
         try {
           latch.await();
-          Jobs.register(context, spec);
+          context.services.register(spec);
         } catch(final IOException | InterruptedException ex) {
           Util.stack(ex);
         }
@@ -349,7 +348,7 @@ public final class JobModuleTest extends SandboxTest {
     try {
       query(services, count);
     } finally {
-      for(int c = 0; c < count; c++) Jobs.unregister(context, "SERVICE" + c);
+      for(int c = 0; c < count; c++) context.services.unregister("SERVICE" + c);
     }
     query(services, 0);
   }

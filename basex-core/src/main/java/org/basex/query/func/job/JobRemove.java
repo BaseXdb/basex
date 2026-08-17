@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 
 import java.io.*;
 
-import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
@@ -34,7 +33,7 @@ public final class JobRemove extends StandardFunc {
     // remove service
     if(options.get(RemoveOptions.SERVICE)) {
       try {
-        Jobs.unregister(qc.context, id);
+        qc.context.services.unregister(id);
       } catch(final IOException ex) {
         throw JOBS_SERVICE_X_X.get(info, ex);
       }
