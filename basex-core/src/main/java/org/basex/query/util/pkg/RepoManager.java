@@ -301,7 +301,7 @@ public final class RepoManager {
    * @throws IOException I/O exception
    */
   private static Pkg webPkg(final byte[] desc, final String file) throws IOException {
-    final XNode node = (XNode) PkgParser.childElements(new DBNode(new IOContent(desc))).next();
+    final XNode node = (XNode) XMLAccess.children(new DBNode(new IOContent(desc))).next();
     final byte[] name = node == null ? null : node.attribute(Q_NAME);
     final byte[] version = node == null ? null : node.attribute(Q_VERSION);
 

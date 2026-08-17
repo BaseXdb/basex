@@ -10,7 +10,6 @@ import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -40,10 +39,8 @@ final class JarParser {
   public JarDesc parse(final IO io) throws QueryException {
     final JarDesc desc = new JarDesc();
     try {
-      final GNode node = new DBNode(io).childIter().next();
-      for(final GNode next : node.childIter()) {
-        if(next.kind() != Kind.ELEMENT) continue;
-
+      final XNode node = (XNode) XMLAccess.children(new DBNode(io)).next();
+      for(final GNode next : XMLAccess.children(node)) {
         final QNm name = next.qname();
         // ignore namespace to improve compatibility
         if(eq(E_JAR, name.local())) desc.jars.add(next.string());

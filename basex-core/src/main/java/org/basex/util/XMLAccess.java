@@ -2,7 +2,12 @@ package org.basex.util;
 
 import static org.basex.util.Token.*;
 
+import java.io.*;
+
+import org.basex.build.*;
 import org.basex.core.*;
+import org.basex.io.*;
+import org.basex.io.serial.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -17,6 +22,38 @@ import org.basex.query.value.type.*;
 public final class XMLAccess {
   /** Private constructor. */
   private XMLAccess() { }
+
+  /**
+   * Returns the root element of an XML file.
+   * @param file file
+   * @param name name of root element
+   * @return root element, or {@code null} if the file does not exist or could not be parsed
+   */
+  public static XNode root(final IOFile file, final QNm name) {
+    if(!file.exists()) return null;
+    try {
+      final MainOptions options = new MainOptions(false);
+      options.set(MainOptions.INTPARSE, true);
+      options.set(MainOptions.STRIPWS, true);
+      final XNode doc = new DBNode(Parser.singleParser(file, options, ""));
+      if(children(doc, name).next() instanceof final XNode root) return root;
+      Util.errln("%: No <%/> root element.", file, name);
+    } catch(final IOException ex) {
+      Util.errln("%: %", file, ex);
+    }
+    return null;
+  }
+
+  /**
+   * Writes an XML file.
+   * @param file file
+   * @param node root element
+   * @throws IOException I/O exception
+   */
+  public static void write(final IOFile file, final FNode node) throws IOException {
+    file.parent().md();
+    file.write(node.serialize(SerializerMode.INDENT.get()).finish());
+  }
 
   /**
    * Returns child elements.

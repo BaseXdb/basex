@@ -2,17 +2,14 @@ package org.basex.core.users;
 
 import static org.basex.core.users.UserText.*;
 import static org.basex.util.Token.*;
-import static org.basex.util.XMLAccess.*;
 
 import java.io.*;
 import java.util.*;
 import java.util.Map.*;
 import java.util.regex.*;
 
-import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.io.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -49,41 +46,30 @@ public final class Users {
    * Reads user permissions.
    */
   private synchronized void read() {
-    if(!file.exists()) return;
-    try {
-      final MainOptions options = new MainOptions(false);
-      options.set(MainOptions.INTPARSE, true);
-      options.set(MainOptions.STRIPWS, true);
-      final XNode doc = new DBNode(Parser.singleParser(file, options, ""));
-      if(children(doc, Q_USERS).next() instanceof final XNode root) {
-        for(final GNode gchild : children(root)) {
-          final XNode child = (XNode) gchild;
-          final QNm qname = child.qname();
-          if(qname.eq(Q_USER)) {
-            try {
-              final User user = new User(child, file);
-              final String name = user.name();
-              if(users.get(name) != null) {
-                Util.errln("%: User '%' supplied more than once.", file, name);
-              } else {
-                users.put(name, user);
-              }
-            } catch(final BaseXException ex) {
-              // reject users with faulty data
-              Util.errln("%: %", file, ex.getLocalizedMessage());
-            }
-          } else if(qname.eq(Q_INFO)) {
-            if(info != null) Util.errln("%: <%/> occurs more than once.", file, qname);
-            else info = child;
+    final XNode root = XMLAccess.root(file, Q_USERS);
+    if(root == null) return;
+    for(final GNode gchild : XMLAccess.children(root)) {
+      final XNode child = (XNode) gchild;
+      final QNm qname = child.qname();
+      if(qname.eq(Q_USER)) {
+        try {
+          final User user = new User(child, file);
+          final String name = user.name();
+          if(users.get(name) != null) {
+            Util.errln("%: User '%' supplied more than once.", file, name);
           } else {
-            Util.errln("%: invalid element <%/>.", file, qname);
+            users.put(name, user);
           }
+        } catch(final BaseXException ex) {
+          // reject users with faulty data
+          Util.errln("%: %", file, ex.getLocalizedMessage());
         }
+      } else if(qname.eq(Q_INFO)) {
+        if(info != null) Util.errln("%: <%/> occurs more than once.", file, qname);
+        else info = child;
       } else {
-        Util.errln("%: No <%/> root element.", file, Q_USERS);
+        Util.errln("%: invalid element <%/>.", file, qname);
       }
-    } catch(final IOException ex) {
-      Util.errln(ex);
     }
   }
 
@@ -92,7 +78,6 @@ public final class Users {
    */
   public synchronized void write() {
     try {
-      file.parent().md();
       final FBuilder root = FElem.build(Q_USERS);
       for(final User user : users.values()) {
         root.node(user.toXml(null, null));
@@ -101,7 +86,7 @@ public final class Users {
         root.node(info);
         info.parent(null);
       }
-      file.write(root.finish().serialize(SerializerMode.INDENT.get()).finish());
+      XMLAccess.write(file, root.finish());
     } catch(final IOException | QueryException ex) {
       Util.errln(ex);
     }

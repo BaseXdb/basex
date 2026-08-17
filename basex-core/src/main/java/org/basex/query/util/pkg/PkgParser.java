@@ -9,10 +9,8 @@ import java.util.function.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -43,7 +41,7 @@ public final class PkgParser {
     final XNode node;
     try {
       // checks root node
-      node = (XNode) childElements(new DBNode(io)).next();
+      node = (XNode) XMLAccess.children(new DBNode(io)).next();
       if(!eqNS(E_PACKAGE, node.qname()))
         throw REPO_DESCRIPTOR_X.get(info, Util.info(WHICHELEM, node.qname()));
     } catch(final IOException ex) {
@@ -70,8 +68,8 @@ public final class PkgParser {
    * @param pkg package container
    * @throws QueryException query exception
    */
-  private void parseChildren(final GNode node, final Pkg pkg) throws QueryException {
-    for(final GNode gchild : childElements(node)) {
+  private void parseChildren(final XNode node, final Pkg pkg) throws QueryException {
+    for(final GNode gchild : XMLAccess.children(node)) {
       final XNode child = (XNode) gchild;
       final QNm name = child.qname();
       if(eqNS(E_DEPENDENCY, name)) pkg.dep.add(parseDependency(child));
@@ -107,7 +105,7 @@ public final class PkgParser {
    */
   private PkgComponent parseComp(final XNode node) throws QueryException {
     final PkgComponent comp = new PkgComponent();
-    for(final GNode child : childElements(node)) {
+    for(final GNode child : XMLAccess.children(node)) {
       final QNm name = child.qname();
       if(eqNS(A_NAMESPACE, name)) comp.uri = string(child.string());
       else if(eqNS(A_FILE, name)) comp.file = string(child.string());
@@ -118,26 +116,6 @@ public final class PkgParser {
     if(comp.uri == null) throw REPO_DESCRIPTOR_X.get(info, Util.info(MISSCOMP, A_NAMESPACE));
     if(comp.file == null) throw REPO_DESCRIPTOR_X.get(info, Util.info(MISSCOMP, A_FILE));
     return comp;
-  }
-
-  /**
-   * Returns an iterator on all child elements
-   * (text and other nodes will be skipped).
-   * @param node root node
-   * @return child element iterator
-   */
-  static BasicNodeIter childElements(final GNode node) {
-    return new BasicNodeIter() {
-      final BasicNodeIter iter = node.childIter();
-
-      @Override
-      public GNode next() {
-        while(true) {
-          final GNode nd = iter.next();
-          if(nd == null || nd.kind() == Kind.ELEMENT) return nd;
-        }
-      }
-    };
   }
 
   /**
