@@ -36,7 +36,7 @@ public final class BaseXSerializer extends AdaptiveSerializer {
   @Override
   protected void atomic(final Item item) throws IOException {
     // top level: raw binaries, unquoted booleans; everything else is inherited
-    if(depth == 0) {
+    if(depth == 0 && !expression) {
       try {
         if(binary && item instanceof Bin) {
           try(BufferInput bi = item.input(null)) {
@@ -57,7 +57,7 @@ public final class BaseXSerializer extends AdaptiveSerializer {
 
   @Override
   protected Type constructor(final Type type) {
-    return null;
+    return expression ? super.constructor(type) : null;
   }
 
   @Override

@@ -28,6 +28,8 @@ public class AdaptiveSerializer extends OutputSerializer {
   private XMLSerializer xml;
   /** Nesting depth (0 = top level). */
   protected int depth;
+  /** Serialize values as XQuery expressions. */
+  protected final boolean expression;
 
   /**
    * Constructor, specifying serialization options.
@@ -55,7 +57,8 @@ public class AdaptiveSerializer extends OutputSerializer {
 
     if(omit) sopts.set(OMIT_XML_DECLARATION, YesNo.YES);
     indent = sopts.yes(INDENT);
-    if(itemsep == null) itemsep = Token.token("\n");
+    expression = sopts.yes(EXPRESSION);
+    if(itemsep == null) itemsep = Token.token(expression ? ", " : "\n");
   }
 
   @Override
@@ -66,8 +69,18 @@ public class AdaptiveSerializer extends OutputSerializer {
 
   @Override
   public final void serialize(final Item item) throws IOException {
+    if(expression && !more) printChar('(');
     separate();
     super.serialize(item);
+  }
+
+  @Override
+  public void close() throws IOException {
+    if(expression) {
+      if(!more) printChar('(');
+      printChar(')');
+    }
+    super.close();
   }
 
   @Override
@@ -100,6 +113,24 @@ public class AdaptiveSerializer extends OutputSerializer {
   @Override
   protected final void node(final XNode node) throws IOException {
     final Kind kind = node.kind();
+    if(expression && (kind == Kind.ATTRIBUTE || kind == Kind.TEXT || kind == Kind.DOCUMENT)) {
+      if(kind == Kind.ATTRIBUTE) {
+        printChars(Token.token("attribute "));
+        printChars(node.name());
+      } else {
+        printChars(Token.token(kind == Kind.TEXT ? "text" : "document"));
+      }
+      printChars(Token.token(" { "));
+      if(kind == Kind.DOCUMENT) {
+        for(final GNode child : node.childIter()) {
+          if(child instanceof final XNode xnode) node(xnode);
+        }
+      } else {
+        printChars(value(node.string(), true, false, false));
+      }
+      printChars(Token.token(" }"));
+      return;
+    }
     final XMLSerializer ser = xml();
     if(kind == Kind.ATTRIBUTE) ser.attribute(node.name(), node.string(), true);
     else if(kind == Kind.NAMESPACE) ser.namespace(node.name(), node.string(), true);
@@ -112,16 +143,28 @@ public class AdaptiveSerializer extends OutputSerializer {
   protected void atomic(final Item item) throws IOException {
     final Type type = item.type;
     try {
+      final boolean literal = !expression || type.oneOf(INTEGER, DECIMAL) ||
+        type == DOUBLE && Double.isFinite(((ANum) item).dbl());
       if(type == QNAME) {
         printChar('#');
         printChars(((QNm) item).prefixId());
       } else if(type == BOOLEAN) {
         printChars(Token.token(item));
-      } else if(type.instanceOf(NUMERIC)) {
-        printChars(((ANum) item).jsonString());
+      } else if(type.instanceOf(NUMERIC) && literal) {
+        final byte[] number = expression ? item.string(null) : ((ANum) item).jsonString();
+        printChars(number);
+        // decimal point and exponent tell a decimal and a double from an integer literal
+        if(expression) {
+          if(type == DECIMAL && !Token.contains(number, '.')) {
+            printChars(Token.token(".0"));
+          } else if(type == DOUBLE && !Token.contains(number, 'e') &&
+              !Token.contains(number, 'E')) {
+            printChars(Token.token("E0"));
+          }
+        }
       } else {
         final Type tp = constructor(type);
-        if(tp == null && depth == 0) {
+        if(tp == null && depth == 0 && !expression) {
           // top-level string: omit the enclosing quotes (Text output method)
           printChars(item.string(null));
         } else {
@@ -146,6 +189,7 @@ public class AdaptiveSerializer extends OutputSerializer {
    * @return constructor type or {@code null}
    */
   protected Type constructor(final Type type) {
+    if(expression) return type.oneOf(STRING, BOOLEAN, INTEGER) ? null : type;
     return type.instanceOf(STRING) || type.oneOf(UNTYPED_ATOMIC, ANY_URI) ? null :
       type.instanceOf(DURATION) ? DURATION : type;
   }

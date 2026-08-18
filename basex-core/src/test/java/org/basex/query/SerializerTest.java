@@ -361,6 +361,58 @@ public final class SerializerTest extends SandboxTest {
     query(option + INDENT.arg("yes") + "[1], { '2': 3 }", "[ 1 ]\n{ \"2\": 3 }");
   }
 
+  /** Test: expression. */
+  @Test public void expression() {
+    final String option = METHOD.arg("adaptive") + EXPRESSION.arg("yes");
+    // a sequence is parenthesized, whatever its size
+    query(option + "()", "()");
+    query(option + "1", "(1)");
+    query(option + "(1, 'a')", "(1, \"a\")");
+    // strings are quoted at every depth
+    query(option + "'A'", "(\"A\")");
+    query(option + "[ 'A' ]", "([\"A\"])");
+    // the exact type is stated wherever a literal would not yield it
+    query(option + "xs:untypedAtomic('A')", "(xs:untypedAtomic(\"A\"))");
+    query(option + "xs:anyURI('A')", "(xs:anyURI(\"A\"))");
+    query(option + "xs:dayTimeDuration('P1D')", "(xs:dayTimeDuration(\"P1D\"))");
+    query(option + "xs:byte(1)", "(xs:byte(\"1\"))");
+    // a decimal literal needs its decimal point: 1 would be parsed as an integer
+    query(option + "1.5", "(1.5)");
+    query(option + "xs:decimal(1)", "(1.0)");
+    // a double is a literal with an exponent; NaN and the infinities have none
+    query(option + "1e0", "(1E0)");
+    query(option + "1e21", "(1.0E21)");
+    query(option + "xs:double(1000)", "(1000E0)");
+    query(option + "xs:double('NaN')", "(xs:double(\"NaN\"))");
+    query(option + "xs:double('INF')", "(xs:double(\"INF\"))");
+    // no literal exists for a float
+    query(option + "xs:float(2.5)", "(xs:float(\"2.5\"))");
+    // the nodes that have no direct constructor get a computed one
+    query(option + "attribute a { 'v' }", "(attribute a { \"v\" })");
+    query(option + "text { 'v' }", "(text { \"v\" })");
+    query(option + "document { <a/> }", "(document { <a/> })");
+    // the project-specific relaxations of the basex method would not be parsed again
+    query(METHOD.arg("basex") + EXPRESSION.arg("yes") + "true()", "(true())");
+    query(METHOD.arg("basex") + EXPRESSION.arg("yes") + "xs:date('2026-01-01')",
+        "(xs:date(\"2026-01-01\"))");
+
+    // every value is yielded again by the expression it was serialized to
+    for(final String value : new String[] { "'A'", "'a\nb'", "xs:untypedAtomic('A')", "42", "1.5",
+        "xs:decimal(1)", "xs:NCName('X')", "xs:language('en')", "xs:unsignedByte(1)",
+        "xs:gMonthDay('--01-01')", "xs:dateTimeStamp('2001-01-01T01:01:01+01:00')",
+        "1e3", "xs:float(2.5)", "xs:byte(7)", "xs:double('NaN')", "true()",
+        "xs:date('2026-08-17')", "xs:dayTimeDuration('PT30S')", "xs:anyURI('X')",
+        "xs:QName('xml:a')", "xs:base64Binary('QQ==')", "xs:hexBinary('41')", "xs:NCName('n')",
+        "<a b='c'>d</a>", "attribute a { 'v' }", "text { 'v' }", "comment { 'c' }",
+        "processing-instruction p { 'i' }", "document { <a/> }", "{ 'a': [ 1, 2 ] }",
+        "[ 1, 'two' ]", "()", "(1, 'two', <three/>)" }) {
+      query("let $value := " + value +
+          " let $text := serialize($value, { 'method': 'adaptive', 'expression': true() })" +
+          " let $again := xquery:eval($text)" +
+          " return deep-equal($again, $value) and type-of($again) eq type-of($value)", true);
+    }
+  }
+
   /** Test: method=adaptive. */
   @Test public void adaptive() {
     final String option = METHOD.arg("adaptive");

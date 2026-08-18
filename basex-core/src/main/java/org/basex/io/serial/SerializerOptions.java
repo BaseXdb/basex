@@ -145,6 +145,9 @@ public final class SerializerOptions extends Options {
   public static final NumberOption LIMIT = new NumberOption("limit", -1);
   /** Specific serialization parameter: binary serialization. */
   public static final EnumOption<YesNo> BINARY = new EnumOption<>("binary", YesNo.YES, YES_NO);
+  /** Specific serialization parameter: serialize values as XQuery expressions. */
+  public static final EnumOption<YesNo> EXPRESSION =
+      new EnumOption<>("expression", YesNo.NO, YES_NO);
   /** Specific serialization parameter: attribute indentation. */
   public static final EnumOption<YesNo> INDENT_ATTRIBUTES =
       new EnumOption<>("indent-attributes", YesNo.NO, YES_NO);
