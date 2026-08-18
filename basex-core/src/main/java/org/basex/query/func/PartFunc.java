@@ -6,7 +6,6 @@ import static org.basex.query.QueryError.*;
 import java.util.*;
 
 import org.basex.query.*;
-import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -53,7 +52,8 @@ public final class PartFunc extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    if(values(false, cc)) return cc.preEval(this);
+    // create function items at compile time: the resulting function calls can be inlined
+    if(values(false, cc)) return cc.replaceWith(this, value(cc.qc, cc));
 
     final Expr func = body();
     if(func.size() == 1) {
@@ -75,8 +75,19 @@ public final class PartFunc extends Arr {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
+    return value(qc, null);
+  }
+
+  /**
+   * Creates the function items of this partially applied function.
+   * @param qc query context
+   * @param cc compilation context ({@code null} during runtime)
+   * @return function items
+   * @throws QueryException query exception
+   */
+  private Value value(final QueryContext qc, final CompileContext cc) throws QueryException {
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(final Item item : body().value(qc)) vb.add(funcItem(toFunction(item, qc), qc));
+    for(final Item item : body().value(qc)) vb.add(funcItem(toFunction(item, qc), qc, cc));
     return vb.value(this);
   }
 
@@ -85,10 +96,12 @@ public final class PartFunc extends Arr {
    * arguments constructed from the parameters and expressions of this partially applied function.
    * @param func function item to be called
    * @param qc query context
+   * @param cc compilation context ({@code null} during runtime)
    * @return new function item
    * @throws QueryException query exception
    */
-  private FuncItem funcItem(final FItem func, final QueryContext qc) throws QueryException {
+  private FuncItem funcItem(final FItem func, final QueryContext qc, final CompileContext cc)
+      throws QueryException {
     final int el = exprs.length - 1;
     final int nargs = el, arity = func.arity();
     if(nargs != arity) throw arityError(func, nargs, arity, false, info);
@@ -111,8 +124,7 @@ public final class PartFunc extends Arr {
       }
     }
     final AnnList anns = func.annotations();
-    final boolean updating = anns.contains(Annotation.UPDATING);
-    final DynFuncCall expr = new DynFuncCall(info, updating, false, func, args);
+    final Expr expr = func.funcBody(vs, args, null, cc, info);
 
     final FuncType type = FuncType.get(anns, ft.declType, params).withRefinedType(ft.refinedType);
     return new FuncItem(info, expr, params, anns, type, vs.stackSize(), null, qc.focus.copy());

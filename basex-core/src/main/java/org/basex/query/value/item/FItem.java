@@ -101,24 +101,40 @@ public abstract class FItem extends Item implements XQFunction {
       vars[a] = vs.addNew(QNm.EMPTY, argTypes[a], qc, info);
     }
 
+    final Expr body = funcBody(vs, args, ft.declType, cc, info);
+
+    // advertise the target type; keep the body type as refined return type for result typing
+    final FuncType tp = cc != null ? ft.withRefinedType(body.seqType()) : ft;
+    return new FuncItem(info, body, vars, annotations(), tp, vs.stackSize(), funcName());
+  }
+
+  /**
+   * Creates the body of a function item that invokes this function with the specified arguments.
+   * @param vs variable scope with the parameters of the new function item
+   * @param args arguments
+   * @param declType declared return type (can be {@code null})
+   * @param cc compilation context ({@code null} during runtime)
+   * @param ii input info (can be {@code null})
+   * @return function body
+   * @throws QueryException query exception
+   */
+  public final Expr funcBody(final VarScope vs, final Expr[] args, final SeqType declType,
+      final CompileContext cc, final InputInfo ii) throws QueryException {
+
     try {
       if(cc != null) cc.pushScope(vs);
 
       // create new function call (will immediately be inlined/simplified when optimized)
-      Expr body = new DynFuncCall(info, updating(), false, this, args);
+      Expr body = new DynFuncCall(ii, updating(), false, this, args);
       if(cc != null) body = body.optimize(cc);
 
       // add type check if return types differ
-      final SeqType dt = ft.declType;
-      if(!body.seqType().instanceOf(dt)) {
-        body = new TypeCheck(info, body, dt);
+      if(declType != null && !body.seqType().instanceOf(declType)) {
+        body = new TypeCheck(ii, body, declType);
         if(cc != null) body = body.optimize(cc);
       }
-
-      // advertise the target type; keep the body type as refined return type for result typing
-      final FuncType tp = cc != null ? ft.withRefinedType(body.seqType()) : ft;
       body.markTailCalls(null);
-      return new FuncItem(info, body, vars, annotations(), tp, vs.stackSize(), funcName());
+      return body;
     } finally {
       if(cc != null) cc.removeScope();
     }
