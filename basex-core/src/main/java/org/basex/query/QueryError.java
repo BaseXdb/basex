@@ -441,8 +441,6 @@ public enum QueryError {
   STORE_IO_X(STORE, "io", "%"),
   /** Error code. */
   STORE_NAME_X(STORE, "name", "Invalid name: %."),
-  /** Error code. */
-  STORE_UPDATE(STORE, "update", "Store cannot be modified while it is updated."),
 
   // String Module
 

@@ -31,8 +31,6 @@ public final class Stores implements Closeable {
 
   /** Stores. */
   private final HashMap<String, Store> stores = new HashMap<>();
-  /** Names of stores that are currently being updated. */
-  private final HashSet<String> updating = new HashSet<>();
   /** Database context. */
   private final Context context;
 
@@ -87,7 +85,6 @@ public final class Stores implements Closeable {
    */
   public synchronized void put(final String key, final Value value, final String name,
       final InputInfo info, final QueryContext qc) throws QueryException {
-    checkUpdate(name, info);
     final Store store = get(name, true, info, qc);
     final Item ky = Str.get(key);
     store.map = value.isEmpty() ? store.map.remove(ky) : store.map.put(ky, value);
@@ -105,32 +102,6 @@ public final class Stores implements Closeable {
   public synchronized void remove(final String key, final String name, final InputInfo info,
       final QueryContext qc) throws QueryException {
     put(key, Empty.VALUE, name, info, qc);
-  }
-
-  /**
-   * Atomically replaces the entries of a store. No other store operation will be performed
-   * while the supplied function is evaluated.
-   * @param name name of store
-   * @param func function that maps the current entries to the new ones
-   * @param info input info
-   * @param qc query context
-   * @return {@code true} if the entries have changed
-   * @throws QueryException query exception
-   */
-  public synchronized boolean update(final String name, final QueryFunction<XQMap, XQMap> func,
-      final InputInfo info, final QueryContext qc) throws QueryException {
-    final Store store = get(name, true, info, qc);
-    // the monitor is reentrant: lock out modifications by the supplied function
-    if(!updating.add(name)) throw STORE_UPDATE.get(info);
-    try {
-      final XQMap map = func.apply(store.map);
-      if(map == store.map) return false;
-      store.map = map;
-      store.dirty = true;
-      return true;
-    } finally {
-      updating.remove(name);
-    }
   }
 
   /**
@@ -155,22 +126,9 @@ public final class Stores implements Closeable {
   }
 
   /**
-   * Rejects the modification of a store that is currently being updated.
-   * @param name name of store
-   * @param info input info
-   * @throws QueryException query exception
-   */
-  private void checkUpdate(final String name, final InputInfo info) throws QueryException {
-    if(updating.contains(name)) throw STORE_UPDATE.get(info);
-  }
-
-  /**
    * Clears all stores.
-   * @param info input info
-   * @throws QueryException query exception
    */
-  public synchronized void clear(final InputInfo info) throws QueryException {
-    if(!updating.isEmpty()) throw STORE_UPDATE.get(info);
+  public synchronized void clear() {
     stores.clear();
     for(final String name : listStores()) {
       storeFile(name).delete();
@@ -184,7 +142,6 @@ public final class Stores implements Closeable {
    * @throws QueryException query exception
    */
   public synchronized void close(final String name, final InputInfo info) throws QueryException {
-    checkUpdate(name, info);
     try {
       writeStore(name, false);
     } catch(final IOException ex) {
@@ -210,6 +167,37 @@ public final class Stores implements Closeable {
   }
 
   /**
+   * Returns information on a store.
+   * @param name name of store
+   * @param info input info
+   * @return number of entries, and size and modification date of the store file
+   * @throws QueryException query exception
+   */
+  public synchronized XQMap info(final String name, final InputInfo info) throws QueryException {
+    final Store store = stores.get(name);
+    final IOFile file = storeFile(name);
+    final boolean persisted = file.exists();
+
+    long entries = 0;
+    if(store != null) {
+      entries = store.map.structSize();
+    } else if(persisted) {
+      // the number of entries is the first value of the store file: the values are not read
+      try(DataInput in = new DataInput(file)) {
+        entries = in.readNum();
+      } catch(final IOException ex) {
+        throw STORE_IO_X.get(info, ex);
+      }
+    }
+    final MapBuilder mb = new MapBuilder();
+    mb.put("entries", Itr.get(entries));
+    mb.put("size", Itr.get(persisted ? file.length() : 0));
+    mb.put("persisted", Bln.get(persisted));
+    if(persisted) mb.put("modified", Dtm.get(file.timeStamp()));
+    return mb.map();
+  }
+
+  /**
    * Reads a store from disk.
    * @param name name of store
    * @param qc query context
@@ -218,7 +206,6 @@ public final class Stores implements Closeable {
    */
   public synchronized void read(final String name, final InputInfo info, final QueryContext qc)
       throws QueryException {
-    checkUpdate(name, info);
     if(storeFile(name).exists()) {
       readStore(name, info, qc);
     } else {
@@ -243,11 +230,8 @@ public final class Stores implements Closeable {
   /**
    * Deletes a store.
    * @param name name of store
-   * @param info input info
-   * @throws QueryException query exception
    */
-  public synchronized void delete(final String name, final InputInfo info) throws QueryException {
-    checkUpdate(name, info);
+  public synchronized void delete(final String name) {
     stores.remove(name);
     storeFile(name).delete();
   }

@@ -1925,6 +1925,9 @@ public enum Function implements AFunction {
       params(STRING_O, FuncType.get(ITEM_ZM).seqType(), STRING_ZO),
       ITEM_ZM, flag(NDT), STORE_URI, Perm.CREATE),
   /** XQuery function. */
+  _STORE_INFO(StoreInfo::new, "info(name?)",
+      params(STRING_ZO), MAP_O, flag(NDT), STORE_URI, Perm.CREATE),
+  /** XQuery function. */
   _STORE_KEYS(StoreKeys::new, "keys(name?)",
       params(STRING_ZO), STRING_ZM, flag(NDT), STORE_URI, Perm.CREATE),
   /** XQuery function. */
@@ -1938,10 +1941,6 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _STORE_REMOVE(StoreRemove::new, "remove(key, name?)",
       params(STRING_O, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
-  /** XQuery function. */
-  _STORE_UPDATE(StoreUpdate::new, "update(update, name?)",
-      params(FuncType.get(MAP_O, MAP_O).seqType(), STRING_ZO),
-      BOOLEAN_O, flag(NDT), STORE_URI, Perm.CREATE),
   /** XQuery function. */
   _STORE_WRITE(StoreWrite::new, "write(name?)",
       params(STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),

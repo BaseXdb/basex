@@ -1,7 +1,7 @@
 package org.basex.query.func.store;
 
 import org.basex.query.*;
-import org.basex.query.value.seq.*;
+import org.basex.query.value.map.*;
 
 /**
  * Function implementation.
@@ -9,11 +9,11 @@ import org.basex.query.value.seq.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class StoreDelete extends StoreFn {
+public final class StoreInfo extends StoreFn {
   @Override
-  protected Empty item(final QueryContext qc) throws QueryException {
+  protected XQMap item(final QueryContext qc) throws QueryException {
     final String name = toName(arg(0), qc);
-    stores(qc).delete(name);
-    return Empty.VALUE;
+
+    return stores(qc).info(name, info);
   }
 }
