@@ -51,7 +51,8 @@ public final class FnReplace extends RegExFn {
       }
     }
     final RegExpr regExpr = regExpr(pattern, flags, qc);
-    final Matcher matcher = regExpr.pattern.matcher(string(value));
+    final String input = string(value);
+    final Matcher matcher = regExpr.pattern.matcher(input);
 
     if(func) {
       // deprecated: groups are passed on as sequence
@@ -61,13 +62,16 @@ public final class FnReplace extends RegExFn {
       final String[] names = seq ? null : regExpr.getGroupNames();
       final HofArgs args = new HofArgs(2);
       final StringBuilder sb = new StringBuilder();
+      int pos = 0;
       while(matcher.find()) {
         args.set(0, Atm.get(matcher.group())).set(1, groups(matcher, names, qc));
         final Item item = invoke(action, args, qc).atomItem(qc, info);
-        matcher.appendReplacement(sb, item.isEmpty() ? "" :
-          string(item.string(info)).replace("\\", "\\\\").replace("$", "\\$"));
+        // replacements are appended verbatim, so no escaping is required
+        sb.append(input, pos, matcher.start());
+        if(!item.isEmpty()) sb.append(string(item.string(info)));
+        pos = matcher.end();
       }
-      return Str.get(matcher.appendTail(sb).toString());
+      return Str.get(sb.append(input, pos, input.length()).toString());
     }
 
     String string = string(replace);
