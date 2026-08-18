@@ -27,7 +27,6 @@ public final class JobListDetails extends StandardFunc {
     final String id = toStringOrNull(arg(0), qc);
 
     final TokenList ids = id != null ? new TokenList(1).add(id) : qc.context.jobs.ids();
-    final int max = ctx.soptions.get(StaticOptions.LOGMSGMAXLEN);
     final JobPool jobs = ctx.jobs;
     final ValueBuilder vb = new ValueBuilder(qc);
 
@@ -60,7 +59,7 @@ public final class JobListDetails extends StandardFunc {
       elem.attr(Q_READS, jc.locks.reads);
       elem.attr(Q_WRITES, jc.locks.writes);
       elem.attr(Q_TIME, Dtm.local(jc.time, info).string(info));
-      elem.text(Token.chop(Token.normalize(Token.token(jc)), max));
+      elem.text(Token.token(jc));
       vb.add(elem.finish());
     }
     return vb.value(this);

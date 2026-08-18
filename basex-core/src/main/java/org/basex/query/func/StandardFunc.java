@@ -613,7 +613,16 @@ public abstract class StandardFunc extends Arr {
     final IOContent content = toContent(item, qc);
     options.set(JobOptions.BASE_URI, toBaseUri(content.url(), options, JobOptions.BASE_URI));
     final HashMap<String, Value> bindings = toBindings(args, qc);
-    if(service && !bindings.isEmpty()) throw JOBS_SERVICE.get(info);
+    if(service) {
+      if(!bindings.isEmpty()) throw JOBS_SERVICE.get(info);
+      // the id is the only handle for unregistering a service
+      final String id = options.get(JobOptions.ID);
+      if(id == null || id.isEmpty()) throw JOBS_SERVICE_ID.get(info);
+      // runtime restrictions are bound to the calling session, not to a persisted job
+      for(final Option<?> restriction : JobOptions.RESTRICTIONS) {
+        if(options.modified(restriction)) throw JOBS_SERVICE_X.get(info, restriction.name());
+      }
+    }
 
     // copy variable values
     for(final Entry<String, Value> binding : bindings.entrySet()) {

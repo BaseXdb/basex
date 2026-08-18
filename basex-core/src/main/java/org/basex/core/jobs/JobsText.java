@@ -9,6 +9,9 @@ import org.basex.query.value.item.*;
  * @author Christian Gruen
  */
 public interface JobsText {
+  /** Error message. */
+  String SERVICE_ID_X = "Service id already exists: %.";
+
   /** QName. */
   QNm Q_JOBS = new QNm("jobs");
   /** QName. */

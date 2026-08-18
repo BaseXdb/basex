@@ -243,6 +243,16 @@ public class Options implements Iterable<Option<?>> {
   }
 
   /**
+   * Checks if the value of the specified option differs from its default value.
+   * @param option option
+   * @return result of check
+   */
+  public final synchronized boolean modified(final Option<?> option) {
+    final Object value = get(option);
+    return value != null && !value.equals(option.value());
+  }
+
+  /**
    * Returns the requested string.
    * @param option option to be found
    * @return value or {@code null})

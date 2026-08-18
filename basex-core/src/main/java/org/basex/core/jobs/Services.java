@@ -68,9 +68,12 @@ public final class Services {
    * @throws IOException I/O exception
    */
   public synchronized void register(final QueryJobSpec spec) throws IOException {
-    // skip registration if an equal entry exists
+    final String id = spec.options.get(JobOptions.ID);
     for(final QueryJobSpec job : list) {
+      // skip registration if an equal entry exists
       if(job.equals(spec)) return;
+      // reject a second service with the same id: one of them would be dropped at the next startup
+      if(id.equals(job.options.get(JobOptions.ID))) throw new BaseXException(SERVICE_ID_X, id);
     }
     list.add(spec);
     write();
@@ -94,7 +97,10 @@ public final class Services {
     for(final QueryJobSpec spec : list) {
       final FBuilder elem = FElem.build(Q_JOB);
       for(final Option<?> option : spec.options) {
-        elem.attr(new QNm(option.name()), spec.options.get(option));
+        // default values are not persisted: they are reapplied when the file is read
+        if(spec.options.modified(option)) {
+          elem.attr(new QNm(option.name()), spec.options.get(option));
+        }
       }
       root.node(elem.text(spec.query));
     }

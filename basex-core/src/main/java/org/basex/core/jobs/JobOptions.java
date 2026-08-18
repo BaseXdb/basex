@@ -43,4 +43,7 @@ public class JobOptions extends Options {
   public static final StringOption ID = new StringOption("id");
   /** Log entry. */
   public static final StringOption LOG = new StringOption("log");
+
+  /** Runtime restrictions, which must not be assigned to a service. */
+  public static final Option<?>[] RESTRICTIONS = { MEMORY, TIMEOUT, PERMISSION };
 }

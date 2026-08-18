@@ -54,6 +54,8 @@ public class JobEval extends StandardFunc {
       try {
         qc.context.services.register(spec);
       } catch(final IOException ex) {
+        // the service was rejected: the job that was started for it is dropped again
+        qc.context.jobs.remove(job.jc().id());
         throw JOBS_SERVICE_X_X.get(info, ex);
       }
     }

@@ -136,7 +136,17 @@ public final class QueryJob extends Job implements Runnable {
       // create and schedule job task
       final QueryJobTask qjt = new QueryJobTask(this, jobs, delay, interval, cron, first, duration);
       jobs.tasks.put(id, qjt);
-      qjt.schedule();
+      boolean scheduled = false;
+      try {
+        qjt.schedule();
+        scheduled = true;
+      } finally {
+        // a job that was never scheduled must leave no trace of its ID
+        if(!scheduled) {
+          jobs.tasks.remove(id);
+          jobs.results.remove(id);
+        }
+      }
     }
   }
 

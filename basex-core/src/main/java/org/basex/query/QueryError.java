@@ -347,6 +347,10 @@ public enum QueryError {
   /** Error code. */
   JOBS_SERVICE(JOB, "service", "No variables allowed."),
   /** Error code. */
+  JOBS_SERVICE_ID(JOB, "service", "Service requires a job id."),
+  /** Error code. */
+  JOBS_SERVICE_X(JOB, "service", "Option not allowed for services: %."),
+  /** Error code. */
   JOBS_FUNCTION(JOB, "function", "Function items cannot be registered or scheduled."),
   /** Error code. */
   JOBS_SERVICE_X_X(JOB, "service", "Cannot write service: %."),

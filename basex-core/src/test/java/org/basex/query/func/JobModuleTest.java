@@ -289,6 +289,54 @@ public final class JobModuleTest extends SandboxTest {
     query("exists(" + _JOB_SERVICES.args() + "[@id = 'ID'])", false);
   }
 
+  /** Rejects services without id. */
+  @Test public void evalServiceId() {
+    final Function func = _JOB_EVAL;
+    error(func.args("1", " ()", " { 'service': true() }"), JOBS_SERVICE_ID);
+    error(func.args("1", " ()", " { 'id': '', 'service': true() }"), JOBS_SERVICE_ID);
+  }
+
+  /** Rejects runtime restrictions for services. */
+  @Test public void evalServiceOptions() {
+    final Function func = _JOB_EVAL;
+    error(func.args("1", " ()", " { 'id': 'OPT', 'timeout': 10, 'service': true() }"),
+        JOBS_SERVICE_X);
+    error(func.args("1", " ()", " { 'id': 'OPT', 'permission': 'none', 'service': true() }"),
+        JOBS_SERVICE_X);
+    error(func.args("1", " ()", " { 'id': 'OPT', 'timeout': 0, 'service': true() }"),
+        JOBS_SERVICE_X);
+    error(func.args("1", " ()", " { 'id': 'OPT', 'memory': 100, 'service': true() }"),
+        JOBS_SERVICE_X);
+  }
+
+  /** Persists the assigned options of a service, but not the default ones. */
+  @Test public void evalServiceDefaults() {
+    final Function func = _JOB_EVAL;
+    query(func.args("1", " ()", " { 'id': 'DEF', 'start': 'P1D', 'service': true() }"));
+    try {
+      query("count(" + _JOB_SERVICES.args() + "[@id = 'DEF']/(@memory, @permission, @timeout))", 0);
+      query(_JOB_SERVICES.args() + "[@id = 'DEF']/@start/string()", "P1D");
+    } finally {
+      query(_JOB_REMOVE.args("DEF", " { 'service': true() }"));
+    }
+  }
+
+  /** Rejects a second service with the same id. */
+  @Test public void evalServiceDuplicate() {
+    final Function func = _JOB_EVAL;
+    final String options = " { 'id': 'DUP', 'start': 'PT1H', 'service': true() }";
+    query(func.args("1", " ()", options));
+    // drop the scheduled job; the service entry stays behind
+    query(_JOB_REMOVE.args("DUP"));
+    try {
+      error(func.args("2", " ()", options), JOBS_SERVICE_X_X);
+      // the job that was started for the rejected service is dropped as well
+      query("exists(" + _JOB_LIST_DETAILS.args("DUP") + ')', false);
+    } finally {
+      query(_JOB_REMOVE.args("DUP", " { 'service': true() }"));
+    }
+  }
+
   /**
    * Test method.
    */
@@ -351,6 +399,26 @@ public final class JobModuleTest extends SandboxTest {
       for(int c = 0; c < count; c++) context.services.unregister("SERVICE" + c);
     }
     query(services, 0);
+  }
+
+  /**
+   * Test method: a service is executed after a restart.
+   */
+  @Test public void evalServiceRestart() {
+    query(_JOB_EVAL.args("1", " ()", " { 'id': 'RESTART', 'start': 'PT1S', 'service': true() }"));
+    // drop the scheduled job, keep the service
+    query(_JOB_REMOVE.args("RESTART"));
+    // restart: reschedule all services
+    context.services.init(context);
+    final String scheduled = query("exists(" + _JOB_LIST_DETAILS.args("RESTART") + ')');
+
+    // the task is dropped from the list as soon as it has been executed
+    Performance.sleep(3000);
+    final String executed = query("empty(" + _JOB_LIST_DETAILS.args("RESTART") + ')');
+
+    query(_JOB_REMOVE.args("RESTART", " { 'service': true() }"));
+    assertEquals("true", scheduled);
+    assertEquals("true", executed);
   }
 
   /** Test method. */
