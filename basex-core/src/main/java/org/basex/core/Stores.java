@@ -395,7 +395,7 @@ public final class Stores implements Closeable {
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  public static synchronized void write(final DataOutput out, final Value value)
+  public static void write(final DataOutput out, final Value value)
       throws IOException, QueryException {
     out.writeNum(value.seqType().type.index());
     final long size = value.size();
@@ -427,7 +427,7 @@ public final class Stores implements Closeable {
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  public static synchronized Value read(final DataInput in, final QueryContext qc)
+  public static Value read(final DataInput in, final QueryContext qc)
       throws IOException, QueryException  {
     qc.checkStop();
     final int id = in.readNum();

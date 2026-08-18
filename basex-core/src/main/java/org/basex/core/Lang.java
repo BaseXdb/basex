@@ -77,7 +77,7 @@ public final class Lang {
    * @param ext text text extensions
    * @return string
    */
-  static synchronized String lang(final String key, final Object... ext) {
+  static String lang(final String key, final Object... ext) {
     return Util.info(lang(key), ext);
   }
 
@@ -85,7 +85,7 @@ public final class Lang {
    * Parses all available language files and returns the names and credits.
    * @return language arrays
    */
-  public static synchronized String[][] parse() {
+  public static String[][] parse() {
     final StringList langs = new StringList();
     final StringList creds = new StringList();
 
@@ -121,7 +121,7 @@ public final class Lang {
    * @param content file content
    * @return credits
    */
-  private static synchronized String credits(final byte[] content) {
+  private static String credits(final byte[] content) {
     final StringTokenizer st = new StringTokenizer(Token.string(content), "\n");
     st.nextToken();
     return st.nextToken().replace("# ", "");
