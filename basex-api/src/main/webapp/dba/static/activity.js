@@ -28,7 +28,8 @@ function showActivity(json) {
   // the 'Live' checkbox is part of the replaced markup, and the server always renders it as
   // ticked: without this, unticking it would be undone by the answer that is still on its way
   const wasLive = liveOn();
-  for(const [ id, html ] of [["jobs-panel", json.jobs], ["web-panel", json.web], ["db-panel", json.db]]) {
+  for(const [ id, html ] of [["jobs-panel", json.jobs], ["web-panel", json.web],
+      ["db-panel", json.db], ["caches-panel", json.caches]]) {
     const panel = document.getElementById(id);
     if(!panel) continue;
     // the entries are replaced: what the user ticked in the meantime is restored
@@ -64,7 +65,17 @@ _live_actions.activity = refreshActivity;
  * Prepares the activity view: the result of a shown job, and the refresh if it was left on.
  */
 function initActivity() {
-  loadCodeMirror("xml");
+  // the query of the dialog and the definition of a service are edited, a result is only shown
+  loadCodeMirror("xquery", [ "job-query", "job-string" ]);
+
+  // the download of a result that the view has already given up; the browser keeps the page
+  const download = document.getElementById("download-form");
+  if(download) {
+    download.submit();
+    // a reload must not ask for a result that is gone by then
+    hideParams("download");
+  }
+
   // refreshActivity checks the 'Live' state itself
   refreshActivity();
 }

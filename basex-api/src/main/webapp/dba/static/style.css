@@ -619,6 +619,25 @@ body:has(.content.fill) main {
   grid-template-columns: 1fr;
 }
 
+/* fields side by side, for a form with more options than one column holds */
+.field-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: var(--gap);
+}
+
+/* a dialog that spreads its fields over columns needs the room for them */
+dialog:has(.field-columns) {
+  max-width: min(90vw, 48rem);
+}
+
+/* a dialog that asks for a query needs the room as well, and must be given it: a text area
+   is sized in percent, which adds nothing to the intrinsic width its dialog is measured by,
+   so a maximum alone would leave the dialog as narrow as its other fields */
+dialog:has(textarea) {
+  width: min(90vw, 48rem);
+}
+
 /* collapsible content panels: a chevron folds a panel to a labeled strip. It sits just inside
    the scrollbar of the list or editor below it: over the content, so it costs no width, but
    never on the scrollbar itself. The offset is measured by measureScrollbar */
@@ -725,6 +744,10 @@ button.collapse .label {
   }
   /* labels above their controls, so the fields keep the full width */
   .field {
+    grid-template-columns: 1fr;
+  }
+  /* one column of fields: a narrow screen has no room for two */
+  .field-columns {
     grid-template-columns: 1fr;
   }
   /* keep the logs search + ignore fields on one line, letting them shrink to fit */

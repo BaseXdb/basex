@@ -13,52 +13,71 @@ declare variable $dba:CAT := 'activity';
 
 (:~
  : Activity.
- : @param  $sort   table sort key
- : @param  $job    highlighted job
- : @param  $error  error message
- : @param  $info   info message
+ : @param  $sort      table sort key
+ : @param  $job       highlighted job
+ : @param  $download  job whose result is to be downloaded
+ : @param  $error     error message
+ : @param  $info      info message
  : @return page
  :)
 declare
   %rest:GET
   %rest:path('/dba/activity')
-  %rest:query-param('sort',  '{$sort}', 'duration')
-  %rest:query-param('job',   '{$job}')
-  %rest:query-param('error', '{$error}')
-  %rest:query-param('info',  '{$info}')
+  %rest:query-param('sort',     '{$sort}', 'duration')
+  %rest:query-param('job',      '{$job}')
+  %rest:query-param('download', '{$download}')
+  %rest:query-param('error',    '{$error}')
+  %rest:query-param('info',     '{$info}')
   %output:method('html')
 function dba:activity(
-  $sort   as xs:string,
-  $job    as xs:string?,
-  $error  as xs:string?,
-  $info   as xs:string?
+  $sort      as xs:string,
+  $job       as xs:string?,
+  $download  as xs:string?,
+  $error     as xs:string?,
+  $info      as xs:string?
 ) as element(html) {
   (
     <div class='panel'>
       <div id='jobs-panel' class='pane'>{ panels:jobs($sort) }</div>
     </div>,
     if ($job) {
-      let $details := job:list-details($job)
-      return <div class='panel'>{
+      <div class='panel'>{
         (: a job that is done does not change any more: the client stops asking for it :)
-        <div id='job-details' class='pane' data-done='{ panels:job-done($details) }'>{
-          panels:job-details($details) otherwise (
+        <div id='job-details' class='pane' data-done='{ panels:job-done($job) }'>{
+          panels:job-details($job) otherwise (
             <h2>{ 'Job: ' || $job }</h2>, 'Job has expired.'
           )
         }</div>
       }</div>
     },
-    <div class='panel'>
+    (: what a job is doing is what the view is opened for: the reports step back to strips
+       while one is shown :)
+    <div class='panel{ ' collapsed'[$job] }'>
       <div id='web-panel' class='pane'>{ panels:web-sessions() }</div>
     </div>,
-    (: rarely of interest: the panel opens on demand :)
+    (: rarely of interest: the panels open on demand :)
     <div class='panel collapsed'>
       <div id='db-panel' class='pane'>{ panels:db-sessions() }</div>
-    </div>
+    </div>,
+    <div class='panel collapsed'>
+      <div id='caches-panel' class='pane'>{ panels:caches() }</div>
+    </div>,
+    (: outside the panels: they are replaced by the refresh, the dialog is not :)
+    panels:job-dialog(),
+    (: the result of a job that was closed: submitted as soon as the page is there, and the
+       request that fetches the file is what consumes the job :)
+    if ($download) {
+      <form id='download-form' method='post' action='job-result'>
+        <input type='hidden' name='id' value='{ $download }'/>
+      </form>
+    }
   ) => html:wrap({
     (: no widths: the panels share the page in equal parts, and each scrolls on its own :)
     'header' : $dba:CAT,
     'rows'   : '1fr',
+    (: the panels follow the selection, and are not remembered: a stored state is kept by
+       position, and the position of a panel moves when a job is shown :)
+    'panels' : 'auto',
     'scripts': ('cm6', 'editor', 'activity'),
     'init'   : 'initActivity();',
     'info'   : $info,

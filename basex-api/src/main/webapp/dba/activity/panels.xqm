@@ -25,14 +25,17 @@ declare function panels:jobs(
       let $headers := (
         { 'key': 'id', 'label': 'ID' },
         { 'key': 'state', 'label': 'State' },
+        { 'key': 'service', 'label': 'Service' },
         { 'key': 'duration', 'label': 'Dur.', 'type': 'number', 'order': 'desc' },
         { 'key': 'user', 'label': 'User' },
         { 'key': 'time', 'label': 'Time', 'type': 'time', 'order': 'desc' },
         { 'key': 'start', 'label': 'Start', 'type': 'time', 'order': 'desc' }
       )
-      let $entries :=
+      let $services := job:services()
+      let $jobs := job:list-details()
+      let $entries := (
         let $curr := job:current()
-        for $details in job:list-details()
+        for $details in $jobs
         let $id := $details/@id
         (: the job that renders this table is of no interest :)
         where not($id = $curr)
@@ -44,13 +47,26 @@ declare function panels:jobs(
         return {
           'id': $id,
           'state': $details/@state,
+          'service': if ($services/@id = $id) then '✓' else '–',
           'duration': html:duration($sec),
           'user': $details/@user,
           'time': $time,
           'start': $start otherwise $time
+        },
+        (: services without a job are dormant: they are rescheduled when the server is restarted :)
+        for $service in $services
+        let $id := $service/@id
+        where not($id = $jobs/@id)
+        return {
+          'id': $id,
+          'state': 'registered',
+          'service': '✓'
         }
+      )
       let $buttons := (
+        <button type='button' onclick='showDialog("job")'>New…</button>,
         form:button('jobs/remove', 'Remove', ('CHECK', 'CONFIRM')),
+        form:button('jobs/unregister', 'Unregister', ('CHECK', 'CONFIRM')),
         <label title='Refresh the view every second'>{
           <input type='checkbox' id='live' data-live='activity' checked=''
                  onchange='liveChanged()'/>, ' Live'
@@ -72,24 +88,79 @@ declare function panels:jobs(
 };
 
 (:~
- : Creates the details of a job.
- : @param  $details  job details; if empty, the job is unknown
- : @return details, or empty sequence if the job is unknown
+ : Creates the dialog that starts a new job. It is not part of a panel: the panels are replaced
+ : while the view refreshes, which would close the dialog while it is being filled in.
+ : @return dialog
+ :)
+declare function panels:job-dialog() as element(dialog) {
+  form:dialog('job', 'New Job', 'jobs/create', false(), (
+    (: no 'required': the editor hides the text area, and a hidden field that fails validation
+       cannot be focused, which would block the submit without telling the user why :)
+    form:field('Query:',
+      <textarea name='query' id='job-query' class='wide' rows='8'/>, 'stacked'),
+    (: what the job is called and when it runs, next to how it repeats and what is kept :)
+    <div class='field-columns'>{
+      <div>{
+        form:field('Start:', <input type='text' name='start' placeholder='PT10S, 01:00:00'/>),
+        form:field('End:', <input type='text' name='end' placeholder='P7D'/>),
+        (: last in its column, opposite the flag that registers a service: the id is what a
+           service is addressed by later :)
+        form:field('ID:', <input type='text' name='id'/>)
+      }</div>,
+      <div>{
+        form:field('Interval:', <input type='text' name='interval' placeholder='P1D'/>),
+        form:field('Cron:', <input type='text' name='cron' placeholder='0 6 * * MON-FRI'/>),
+        form:checkbox('cache', 'true', false(), 'Cache the result'),
+        (: a service is persisted, so it needs a name to be addressed by later :)
+        form:checkbox('service', 'true', false(), 'Register as service')
+      }</div>
+    }</div>
+  ))
+};
+
+(:~
+ : Creates the details of a job: what is registered for it, what is persisted for it, or both.
+ : @param  $job  job id
+ : @return details, or empty sequence if the id is unknown
  :)
 declare function panels:job-details(
-  $details  as element()?
+  $job  as xs:string?
 ) as element()* {
-  let $job := string($details/@id)
-  where $details
+  let $details := $job[.] ! job:list-details(.)
+  let $service := job:services()[@id = $job]
+  (: an id names a registered job, a persisted definition, or both: a service that has no job
+     is dormant, and its definition is all that is left of it :)
+  let $registered := exists($details)
+  let $persisted := exists($service)
+  where $registered or $persisted
+  (: what is reported is what runs; what is edited is what is stored, as the string of a job is
+     normalized and chopped :)
+  let $report := $details otherwise $service
+  let $query := string($service otherwise $details)
+  (: fetched before the buttons are built: a download is only offered if there is a result :)
+  let $output := if ($details/@state = 'cached') {
+    try {
+      utils:serialize(job:result($job, { 'keep': true() }))
+    } catch * {
+      'Stopped at ' || $err:module || ', ' || $err:line-number || '/' ||
+        $err:column-number || ':' || char('\n') || $err:description
+    }
+  }
   return <form method='post' autocomplete='off'>{
     <input type='hidden' name='id' value='{ $job }'/>,
     (: the heading ends after the id, which can be long and is clipped rather than wrapped :)
-    <h2>{ 'Job: ' || $job }</h2>,
-    <div class='buttons'>{ form:button('jobs/remove', 'Remove') }</div>,
+    <h2>{ (if ($persisted) then 'Service: ' else 'Job: ') || $job }</h2>,
+    <div class='buttons'>{
+      form:button('jobs/remove', 'Remove')[$registered],
+      (: reading a result closes the job: the action gives it up, and the page it leads to
+         fetches the file :)
+      form:button('jobs/download', 'Download')[$output],
+      form:button('jobs/unregister', 'Unregister')[$persisted]
+    }</div>,
 
-    panels:job-information($details),
+    panels:job-information($report),
 
-    let $bindings := job:bindings($job)
+    for $bindings in $details ! job:bindings($job)
     where map:size($bindings) > 0
     return (
       <h3>Query Bindings</h3>,
@@ -106,51 +177,52 @@ declare function panels:job-details(
       </table>
     ),
 
-    if ($details/@state = 'cached') {
-      let $output := try {
-        utils:serialize(job:result($job, { 'keep': true() }))
-      } catch * {
-        'Stopped at ' || $err:module || ', ' || $err:line-number || '/' ||
-          $err:column-number || ':' || char('\n') || $err:description
-      }
-      where $output
-      return (
-        <h3>{
-          'Result', '&#xa0;',
-          form:button('job-result', 'Download')
-        }
-        </h3>,
-        <textarea id='output' readonly='' spellcheck='false'>{ $output }</textarea>
-      )
+    if ($output) {
+      <h3>Result</h3>,
+      <textarea id='output' rows='8' readonly='' spellcheck='false'>{ $output }</textarea>
     },
 
-    <h3>Job String</h3>,
-    <textarea readonly='' spellcheck='false'>{ string($details) }</textarea>
+    (: a stored definition can be replaced; a job string is only shown :)
+    <h3>{
+      if ($persisted) {
+        'Query', '&#xa0;', form:button('jobs/replace', 'Replace')
+      } else {
+        'Job String'
+      }
+    }</h3>,
+    <textarea rows='8' spellcheck='false'>{
+      attribute id { 'job-string' }[$persisted],
+      attribute name { 'query' }[$persisted],
+      attribute readonly { }[not($persisted)],
+      $query
+    }</textarea>
   }</form>
 };
 
 (:~
- : Indicates whether a job has finished, and its details will not change any more.
- : @param  $details  job details; if empty, the job is gone and will not come back
+ : Indicates whether the details of a job will not change any more. A service is done as well:
+ : its query is edited in place, and a refresh would replace the editor while it is used.
+ : @param  $job  job id
  : @return result of check
  :)
 declare function panels:job-done(
-  $details  as element()?
+  $job  as xs:string?
 ) as xs:boolean {
-  empty($details) or $details/@state = 'cached'
+  let $details := $job[.] ! job:list-details(.)
+  return empty($details) or $details/@state = 'cached' or
+    exists(job:services()[@id = $job])
 };
 
 (:~
- : Creates the general information of a job.
- : @param  $details  job details
- : @return heading and table
+ : Creates the general information of a job or a service definition.
+ : @param  $entry  job details or service definition
+ : @return table
  :)
 declare %private function panels:job-information(
-  $details  as element()
-) as element()+ {
-  <h3>General Information</h3>,
+  $entry  as element()
+) as element(table) {
   <table>{
-    for $value in $details/@*
+    for $value in $entry/@*
     for $name in name($value)[. != 'id']
     return <tr>
       <td><b>{ utils:capitalize($name) }</b></td>
@@ -168,7 +240,6 @@ declare function panels:web-sessions() as element()+ {
     <h2>Web Sessions</h2>
     {
       let $headers := (
-        { 'key': 'id', 'label': 'ID', 'type': 'id' },
         { 'key': 'name', 'label': 'Name' },
         { 'key': 'value', 'label': 'Value' },
         { 'key': 'access', 'label': 'Last Access', 'type': 'time', 'order': 'desc' },
@@ -198,7 +269,44 @@ declare function panels:web-sessions() as element()+ {
           'you': $you
         }
       let $buttons := form:button('sessions/kill', 'Kill', ('CHECK', 'CONFIRM'))
-      return table:create($headers, $entries, $buttons)
+      (: a session is killed by its id, which is of no interest of its own :)
+      return table:create($headers, $entries, $buttons, {}, { 'select': 'id' })
+    }
+  </form>
+};
+
+(:~
+ : Creates the contents of the caches panel: what the caches of the server hold, and how often
+ : they were of use. A cache is transient and is managed by the server; what can be done with
+ : it is to give up what it holds.
+ : @return panel contents
+ :)
+declare function panels:caches() as element(form) {
+  <form method='post' autocomplete='off'>
+    {
+      (: the default cache is addressed by an operation that supplies no name :)
+      let $names := distinct-values(('', sort(cache:list(), '?lang=en')))
+      let $headers := (
+        { 'key': 'label', 'label': 'Name' },
+        { 'key': 'entries', 'label': 'Entries', 'type': 'number', 'order': 'desc' },
+        { 'key': 'hits', 'label': 'Hits', 'type': 'number', 'order': 'desc' },
+        { 'key': 'misses', 'label': 'Misses', 'type': 'number', 'order': 'desc' },
+        { 'key': 'evictions', 'label': 'Evicted', 'type': 'number', 'order': 'desc' },
+        { 'key': 'expirations', 'label': 'Expired', 'type': 'number', 'order': 'desc' }
+      )
+      let $entries :=
+        for $cache in $names
+        return map:merge((
+          { 'cache': $cache, 'label': $cache[.] otherwise '(default)' },
+          cache:info($cache)
+        ))
+      let $buttons := (
+        form:button('caches/delete', 'Delete', ('CHECK', 'CONFIRM')),
+        form:button('caches/clear', 'Clear All', 'CONFIRM')
+      )
+      (: the checkbox submits the name: the default cache is addressed by an empty one :)
+      return table:create($headers, $entries, $buttons, {},
+        { 'sticky': <h2>Caches</h2>, 'compact': true(), 'select': 'cache' })
     }
   </form>
 };

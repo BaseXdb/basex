@@ -29,12 +29,13 @@ function dba:ws-message(
 };
 
 (:~
- : Stops a running query if the connection is closed.
+ : Gives up the outcome of a query if the connection is closed. The query keeps running: its
+ : result is cached, and the activity view is where it is then watched and read.
  :)
 declare
   %ws:close('/dba')
 function dba:ws-close() as empty-sequence() {
-  utils:ws-stop()
+  utils:ws-stop(false())
 };
 
 (:~

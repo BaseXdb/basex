@@ -126,8 +126,8 @@ declare function utils:ws-start(
 ) as empty-sequence() {
   let $maxchars := config:get($config:MAXCHARS)
   (: the reader is registered as well: it must be gone before the ID is assigned again :)
-  return ws:set(ws:id(), $utils:JOB, (
-    ws:eval(fn() {
+  return ws:set(ws:id(), $utils:JOB, {
+    'reader': ws:eval(fn() {
       job:wait($id),
       try {
         let $string := serialize(job:result($id), $options)
@@ -146,19 +146,24 @@ declare function utils:ws-start(
         }
       }
     }, (), { 'serializer': { 'method': 'json' } }),
-    $id
-  ))
+    'query': $id
+  })
 };
 
 (:~
- : Stops the jobs that run for the current connection.
+ : Stops the jobs that run for the current connection. The reader is always stopped: once the
+ : connection is gone, it has nothing left to push its outcome to.
+ : @param  $query  also stop the query. A query that is left running keeps its result cached,
+ :                 and can be watched and read in the activity view
  :)
-declare function utils:ws-stop() as empty-sequence() {
-  let $ids := ws:get(ws:id(), $utils:JOB)
+declare function utils:ws-stop(
+  $query  as xs:boolean := true()
+) as empty-sequence() {
+  let $jobs := ws:get(ws:id(), $utils:JOB)
   return (
     ws:delete(ws:id(), $utils:JOB),
     (: wait for the jobs to be unregistered before new ones are started :)
-    for $id in $ids
+    for $id in ($jobs?reader, $jobs?query[$query])
     return (job:remove($id), job:wait($id))
   )
 };
@@ -174,7 +179,8 @@ declare function utils:ws-stop() as empty-sequence() {
 declare function utils:job-id(
   $label  as xs:string
 ) as xs:string {
-  'dba:' || $label || '-' || ws:id()
+  (: the prefix of a connection id is a constant; only its number identifies the connection :)
+  'dba:' || $label || '-' || replace(ws:id(), '^websocket', '')
 };
 
 (:~

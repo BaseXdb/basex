@@ -5,6 +5,7 @@
  :)
 module namespace dba = 'dba/jobs';
 
+import module namespace config = 'dba/lib/config' at '../lib/config.xqm';
 import module namespace utils = 'dba/lib/utils' at '../lib/utils.xqm';
 
 (:~ Top category :)
@@ -23,11 +24,94 @@ function dba:action(
   $action  as xs:string
 ) {
   utils:dispatch($dba:CAT, $action, {
+    'create': fn($args) { {
+      (: a supplied id selects the new job; a generated one is not known before it is started :)
+      'params': { 'job': $args?id }[$args?id],
+      'info'  : 'Job was started.',
+      'run'   : %updating fn() { dba:create($args) }
+    } },
+    'download': fn($args) { {
+      (: the file is fetched by the page this leads to: reading a result closes the job, so the
+         view must not keep showing it :)
+      'params': { 'download': $args?id },
+      'run'   : %updating fn() { () }
+    } },
+    'replace': fn($args) { {
+      'params': { 'job': $args?id },
+      'info'  : utils:info($args?id, 'service', 'replaced'),
+      'run'   : %updating fn() { dba:replace($args?id, $args?query) }
+    } },
     'remove': fn($args) { {
       'info': utils:info($args?id, 'job', 'removed'),
       'run' : %updating fn() { $args?id ! job:remove(.) }
+    } },
+    'unregister': fn($args) { {
+      'info': utils:info($args?id, 'service', 'unregistered'),
+      'run' : %updating fn() { $args?id ! job:remove(., { 'service': true() }) }
     } }
   })
+};
+
+(:~
+ : Starts a job for the query of the dialog. The scheduling options are only supplied if they
+ : were filled in: an empty string is no valid start time, interval or cron expression.
+ : @param  $args  request parameters
+ :)
+declare %private function dba:create(
+  $args  as map(*)
+) as empty-sequence() {
+  let $service := $args?service = 'true'
+  let $options := map:merge((
+    { 'base-uri': dba:base-uri() },
+    (: a job of the DBA is bound by the same limits as its other queries; a service outlives
+       the session that registers it, and must not carry its restrictions :)
+    if (not($service)) { {
+      'timeout'   : config:get($config:TIMEOUT),
+      'memory'    : config:get($config:MEMORY),
+      'permission': config:get($config:PERMISSION)
+    } },
+    { 'service': true() }[$service],
+    { 'cache': true() }[$args?cache = 'true'],
+    for $name in ('id', 'start', 'interval', 'cron', 'end')
+    for $value in $args?($name)[.]
+    return { $name: $value }
+  ))
+  return void(job:eval($args?query, (), $options))
+};
+
+(:~
+ : Returns the base URI of a job that is started here: relative paths resolve against the file
+ : directory, as they do in the editor. A service keeps the URI on disk, where the native path
+ : that config:files-dir returns would not be portable.
+ : @return base URI
+ :)
+declare %private function dba:base-uri() as xs:anyURI {
+  file:path-to-uri(config:files-dir(()))
+};
+
+(:~
+ : Replaces the query of a service, keeping its schedule: a job definition is written as a whole,
+ : so the service is unregistered and registered again.
+ : @param  $id     job id
+ : @param  $query  new query
+ :)
+declare %private function dba:replace(
+  $id     as xs:string,
+  $query  as xs:string
+) as empty-sequence() {
+  let $service := job:services()[@id = $id]
+  let $base-uri := ($service/@base-uri/string())[.] otherwise dba:base-uri()
+  let $options := map:merge((
+    { 'service': true() },
+    for $option in $service/@*
+    return { name($option): string($option) }
+  ))
+  return (
+    (: parsed before anything is removed: a typo must not cost the registration :)
+    void(utils:query-parse($query, $base-uri)),
+    job:remove($id, { 'service': true() }),
+    void(job:eval($query, (), $options))
+  )
 };
 
 (:~

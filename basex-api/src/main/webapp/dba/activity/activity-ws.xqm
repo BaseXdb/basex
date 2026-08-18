@@ -19,15 +19,16 @@ function dba:ws-message(
   $message  as xs:string
 ) as empty-sequence() {
   let $json := parse-json($message)
-  (: the details of the shown job; the client stops asking once the job is done :)
-  let $details := $json?job[.] ! job:list-details(.)
+  (: the shown job; the client stops asking for its details once they are done :)
+  let $job := $json?job[.]
   return utils:ws-send({
     'type': 'panels',
     'jobs': utils:html(panels:jobs($json?sort)),
     'web' : utils:html(panels:web-sessions()),
     'db'  : utils:html(panels:db-sessions()),
-    'job' : utils:html(panels:job-details($details)),
-    'done': panels:job-done($details)
+    'caches': utils:html(panels:caches()),
+    'job' : utils:html(panels:job-details($job)),
+    'done': panels:job-done($job)
   })
 };
 
