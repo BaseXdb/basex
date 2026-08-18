@@ -573,6 +573,21 @@ public class Options implements Iterable<Option<?>> {
   }
 
   /**
+   * Returns an error string for an unknown option, excluding the supplied options.
+   * @param option option
+   * @param map options map
+   * @param info input info (can be {@code null})
+   * @return error string
+   * @throws QueryException query exception
+   */
+  private synchronized String similar(final Object option, final XQMap map, final InputInfo info)
+      throws QueryException {
+    final TreeMap<String, Option<?>> defs = new TreeMap<>(meta.definitions);
+    for(final Item key : map.keys()) defs.remove(name(key, info));
+    return similar(option, defs);
+  }
+
+  /**
    * Returns an error string for an unknown option, followed by a similar or all allowed options.
    * @param option option
    * @param options options
@@ -661,15 +676,13 @@ public class Options implements Iterable<Option<?>> {
    */
   public final synchronized void assign(final XQMap map, final QueryContext qc,
       final InputInfo info) throws QueryException {
-    // reject unknown options; exclude supplied options from the suggestions
+    // reject unknown options
     if(!meta.definitions.isEmpty() && map.structSize() != 0) {
-      final TreeMap<String, Option<?>> defs = new TreeMap<>(meta.definitions);
-      String unknown = null;
       for(final Item key : map.keys()) {
         final String nm = name(key, info);
-        if(defs.remove(nm) == null && unknown == null && !nm.startsWith("Q{")) unknown = nm;
+        if(!meta.definitions.containsKey(nm) && !nm.startsWith("Q{"))
+          throw INVALIDOPTION_X.get(info, similar(nm, map, info));
       }
-      if(unknown != null) throw INVALIDOPTION_X.get(info, similar(unknown, defs));
     }
     map.forEach((key, value) -> assign(key, value, qc, info));
   }
@@ -1002,7 +1015,7 @@ public class Options implements Iterable<Option<?>> {
    * @param value value
    * @return normalized value
    */
-  private static synchronized String normalizeEnum(final String value) {
+  private static String normalizeEnum(final String value) {
     String v = value.trim();
     // Boolean properties
     final Boolean b = Strings.toBoolean(v);

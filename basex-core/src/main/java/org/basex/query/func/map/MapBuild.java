@@ -22,8 +22,7 @@ public final class MapBuild extends MapMerge {
     final Iter input = arg(0).iter(qc);
     final FItem keys = toFunctionOrNull(arg(1), 2, qc);
     final FItem value = toFunctionOrNull(arg(2), 2, qc);
-    final MergeOptions options = toOptions(arg(3), new MergeOptions(), qc);
-    final MapDuplicates dups = duplicates(options, qc, Duplicates.COMBINE);
+    final MapDuplicates dups = duplicates(3, qc, Duplicates.COMBINE);
 
     final HofArgs args = new HofArgs(2, keys, value);
     final MapBuilder builder = new MapBuilder();

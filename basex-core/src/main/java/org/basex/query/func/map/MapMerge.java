@@ -56,8 +56,7 @@ public class MapMerge extends MapFn {
   @Override
   protected XQMap item(final QueryContext qc) throws QueryException {
     final Iter maps = arg(0).unwrappedIter(qc);
-    final MergeOptions options = toOptions(arg(1), new MergeOptions(), qc);
-    final MapDuplicates dups = duplicates(options, qc, Duplicates.USE_FIRST);
+    final MapDuplicates dups = duplicates(1, qc, Duplicates.USE_FIRST);
 
     // empty input: return empty map
     final Item first = qc.next(maps);
@@ -129,27 +128,24 @@ public class MapMerge extends MapFn {
    */
   final void prepareMerge(final int arg, final Duplicates dflt, final CompileContext cc)
       throws QueryException {
-    if(arg(arg) instanceof Value) {
-      MergeOptions options = new MergeOptions();
-      if(defined(arg)) options = toOptions(arg(arg), options, cc.qc);
-      md = duplicates(options, cc.qc, dflt);
-    }
+    if(arg(arg) instanceof Value) md = duplicates(arg, cc.qc, dflt);
   }
 
   /**
    * Creates a merger for duplicate values.
-   * @param options merge options
+   * @param arg options argument
    * @param qc query context
    * @param dflt default duplicate operation
    * @return merger
    * @throws QueryException query exception
    */
-  final MapDuplicates duplicates(final MergeOptions options, final QueryContext qc,
-      final Duplicates dflt) throws QueryException {
+  final MapDuplicates duplicates(final int arg, final QueryContext qc, final Duplicates dflt)
+      throws QueryException {
 
     // return static options instance
     if(md != null) return md;
     // function
+    final MergeOptions options = toOptions(arg(arg), new MergeOptions(), qc);
     final Value duplicates = options.get(MergeOptions.DUPLICATES);
     if(duplicates instanceof FItem) return new Invoke(toFunction(duplicates, 2, qc));
     // fixed option
