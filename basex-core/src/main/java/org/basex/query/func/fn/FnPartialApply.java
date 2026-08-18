@@ -27,7 +27,24 @@ public final class FnPartialApply extends StandardFunc {
   private static final QNm ARGS_NAME = new QNm("arguments");
 
   @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    // pre-evaluate if arguments are values: the resulting function call can be inlined
+    return values(false, cc) ? value(cc.qc, cc) : this;
+  }
+
+  @Override
   public Value value(final QueryContext qc) throws QueryException {
+    return value(qc, null);
+  }
+
+  /**
+   * Creates the partially applied function.
+   * @param qc query context
+   * @param cc compilation context ({@code null} during runtime)
+   * @return function item
+   * @throws QueryException query exception
+   */
+  private Value value(final QueryContext qc, final CompileContext cc) throws QueryException {
     final FItem function = toFunction(arg(0), qc);
     final XQMap arguments = toMap(ARGS_TYPE.coerce(arg(1).value(qc), qc, info, ARGS_NAME, null),
         qc);
@@ -49,26 +66,19 @@ public final class FnPartialApply extends StandardFunc {
     }
     if(placeholders == arity) return function;
 
-    final DynFuncCall funcCall;
     final Var[] params = new Var[placeholders];
-    final SeqType[] argTypes = new SeqType[placeholders];
-    if(placeholders == 0) {
-      funcCall = new DynFuncCall(info, function, funcArgs);
-    } else {
-      final VarScope vs = new VarScope();
-      final Expr[] args = new Expr[placeholders];
-      int p = 0;
-      for(int i = 0; i < arity; ++i) {
-        if(funcArgs[i] == Empty.UNDEFINED) {
-          final Var var = vs.addNew(function.paramName(i), ft.argTypes[i], qc, info);
-          params[p] = var;
-          args[p++] = new VarRef(info, var);
-        }
+    final VarScope vs = new VarScope();
+    for(int i = 0, p = 0; i < arity; ++i) {
+      if(funcArgs[i] == Empty.UNDEFINED) {
+        final Var var = vs.addNew(function.paramName(i), ft.argTypes[i], qc, info);
+        params[p++] = var;
+        funcArgs[i] = new VarRef(info, var);
       }
-      funcCall = new DynFuncCall(info,
-          new PartFunc(info, ExprList.concat(funcArgs, function), placeholders, null), args);
     }
-    return new FuncItem(info, funcCall, params, AnnList.EMPTY,
-        FuncType.get(ft.declType, argTypes).withRefinedType(ft.refinedType), params.length, null);
+    final Expr body = function.funcBody(vs, funcArgs, null, cc, info);
+
+    final FuncType type = FuncType.get(AnnList.EMPTY, ft.declType, params).
+        withRefinedType(ft.refinedType);
+    return new FuncItem(info, body, params, AnnList.EMPTY, type, vs.stackSize(), null);
   }
 }
