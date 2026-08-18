@@ -525,6 +525,11 @@ a.selected {
   color: var(--accent-strong);
 }
 
+/* the root of a breadcrumb: bold, and a link like the others */
+a.root {
+  font-weight: bold;
+}
+
 /* page content: one grid column per panel, separated by the gap rather than by
    panel padding, so that a track width is the width of the content */
 .content {

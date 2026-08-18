@@ -73,7 +73,7 @@ declare function html:wrap(
           <nav class='ellipsis'>{
             if ($user) {
               let $cats := (
-                for $cat in ('Logs', 'Databases', 'Files', 'Activity',
+                for $cat in ('Logs', 'Databases', 'Files', 'Activity', 'Stores',
                   'Users', 'Settings')
                 let $link := <a href='{ lower-case($cat) }'>{ $cat }</a>
                 return if ($link = $header) then <b>{ $link }</b> else $link
