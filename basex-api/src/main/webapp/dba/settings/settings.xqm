@@ -132,14 +132,12 @@ declare
 function dba:action(
   $action  as xs:string
 ) {
-  utils:dispatch($action, {
+  utils:dispatch($dba:CAT, $action, {
     'save': fn($args) { {
-      'page': $dba:CAT,
       'info': 'Settings were saved.',
       'run' : %updating fn() { config:save(html:parameters()) }
     } },
     'gc': fn($args) { {
-      'page': $dba:CAT,
       'info': 'Garbage collection was triggered.',
       'run' : %updating fn() { prof:gc() }
     } }

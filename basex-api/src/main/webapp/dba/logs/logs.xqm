@@ -328,9 +328,8 @@ declare
 function dba:action(
   $action  as xs:string
 ) {
-  utils:dispatch($action, {
+  utils:dispatch($dba:CAT, $action, {
     'delete': fn($args) { {
-      'page': $dba:CAT,
       'info': utils:info($args?name, 'log', 'deleted'),
       'run' : %updating fn() { $args?name ! admin:delete-logs(.) }
     } }

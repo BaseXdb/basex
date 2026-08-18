@@ -120,16 +120,14 @@ declare
 function dba:action(
   $action  as xs:string
 ) {
-  utils:dispatch($action, {
+  utils:dispatch($dba:CAT, $action, {
     'dir-create': fn($args) { {
-      'page': $dba:CAT,
-      'info': `Directory "{ $args?name }" was created.`,
+      'info': utils:info($args?name, 'directory', 'created'),
       'run' : %updating fn() {
         file:create-dir(utils:safe-path(config:files-dir($args?dir), $args?name))
       }
     } },
     'delete': fn($args) { {
-      'page': $dba:CAT,
       'info': utils:info($args?name, 'file', 'deleted'),
       'run' : %updating fn() {
         (: delete all files, ignore reference to parent directory :)
@@ -141,7 +139,6 @@ function dba:action(
       let $dir := config:files-dir($args?dir)
       let $files := $args?files[. instance of map(*)] otherwise {}
       return {
-        'page': $dba:CAT,
         'info': if (map:size($files)) { utils:info(map:keys($files), 'file', 'uploaded') },
         'run' : %updating fn() {
           (: parse all XQuery files; reject files that cannot be parsed :)

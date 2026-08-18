@@ -17,14 +17,14 @@ declare function user-info:parse(
     let $xml := try {
       parse-xml($info)/*
     } catch * {
-      error((), 'User information: XML is not well-formed.')
+      error((), 'User information is not well-formed XML.')
     }
     return if ($xml/self::info) {
       $xml update {
         delete node .//text()[not(normalize-space())]
       }
     } else {
-      error((), 'User information: "info" root element expected.')
+      error((), 'User information has no "info" root element.')
     }
   } else {
     element info { }

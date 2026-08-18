@@ -56,7 +56,7 @@ function dba:users(
     <div class='panel{ ' hidden'[empty($permissions)] }' data-label='Permissions'>
       <div class='pane'>{ $permissions }</div>
     </div>,
-    <div class='panel{ $fold }' data-label='Information'>{ panels:information() }</div>
+    <div class='panel{ $fold }' data-label='General User Data'>{ panels:information() }</div>
   ) => html:wrap({
     'header' : $dba:CAT,
     (: the information panel is only open while no user is shown, where it is one of two
@@ -84,11 +84,10 @@ declare
 function dba:action(
   $action  as xs:string
 ) {
-  utils:dispatch($action, {
+  utils:dispatch($dba:CAT, $action, {
     'create': fn($args) { {
-      'page'  : $dba:CAT,
       'params': { 'name': $args?name },
-      'info'  : `User "{ $args?name }" was created.`,
+      'info'  : utils:info($args?name, 'user', 'created'),
       'run'   : %updating fn() {
         if (user:exists($args?name)) {
           error((), 'User already exists.')
@@ -98,7 +97,6 @@ function dba:action(
       }
     } },
     'drop': fn($args) { {
-      'page': $dba:CAT,
       'info': utils:info($args?name, 'user', 'dropped'),
       'run' : %updating fn() { $args?name ! user:drop(.) }
     } },
@@ -109,7 +107,6 @@ function dba:action(
          it was, so the panel keeps showing the one that was being edited :)
       let $taken := $newname != $name and user:exists($newname)
       return {
-        'page'  : $dba:CAT,
         (: the password is deliberately not carried back: it would end up in the address bar,
            in the browser history and in the log :)
         'params': {
@@ -117,7 +114,7 @@ function dba:action(
           'newname': $newname,
           'perm': $args?perm
         },
-        'info'  : 'User was updated.',
+        'info'  : utils:info($newname, 'user', 'updated'),
         'run'   : %updating fn() {
           if ($taken) {
             error((), 'User already exists.')
@@ -136,7 +133,6 @@ function dba:action(
       }
     },
     'info': fn($args) { {
-      'page': $dba:CAT,
       'info': 'User information was updated.',
       'run' : %updating fn() {
         let $xml := user-info:parse($args?info)
@@ -145,15 +141,13 @@ function dba:action(
       }
     } },
     'pattern-add': fn($args) { {
-      'page'  : $dba:CAT,
       'params': { 'name': $args?name },
-      'info'  : `Pattern "{ $args?pattern }" was created.`,
+      'info'  : utils:info($args?pattern, 'pattern', 'created'),
       'run'   : %updating fn() {
         user:grant($args?name, $args?perm, $args?pattern)
       }
     } },
     'pattern-drop': fn($args) { {
-      'page'  : $dba:CAT,
       'params': { 'name': $args?name },
       'info'  : utils:info($args?pattern, 'pattern', 'dropped'),
       'run'   : %updating fn() { $args?pattern ! user:drop($args?name, .) }

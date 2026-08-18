@@ -98,7 +98,11 @@ declare function panels:user(
             form:field('Permission:',
               panels:permission-select('perm', ($perm otherwise $user/@permission), 5))
           },
-          (: the editor is labelled by the panel it fills, and takes the height that is left :)
+          (: the editor is named apart from the user, and takes the height that is left :)
+          <h3>User Data</h3>,
+          <div class='note'>
+            Custom XML data for this user, with an &lt;info&gt; root element.
+          </div>,
           <textarea name='info' id='editor' spellcheck='false'>{
             serialize(user:info($name), { 'indent': true() })
           }</textarea>
@@ -161,10 +165,10 @@ declare function panels:local-permissions(
  :)
 declare function panels:information() as element()+ {
   <form method='post' action='users/info' autocomplete='off' class='pane column'>
-    <h2>Information</h2>
+    <h2>General User Data</h2>
     <div class='buttons'><button>Update</button></div>
     <div class='note'>
-      Global information. The information of a single user is shown with that user.
+      Custom XML data that belongs to no user in particular, with an &lt;info&gt; root element.
     </div>
     <textarea name='info' id='user-info' spellcheck='false'>{
       serialize(user:info(), { 'indent': true() })
@@ -176,16 +180,16 @@ declare function panels:information() as element()+ {
  : Creates a chooser for a permission.
  : @param  $name      name of the field
  : @param  $selected  selected permission
- : @param  $size      number of permissions to offer, counted from the least privileged
+ : @param  $count     number of permissions to offer, counted from the least privileged
  : @return chooser
  :)
 declare %private function panels:permission-select(
   $name      as xs:string,
   $selected  as xs:anyAtomicType?,
-  $size      as xs:integer
+  $count     as xs:integer
 ) as element(select) {
-  <select name='{ $name }' size='{ $size }'>{
-    for $permission in $config:PERMISSIONS[position() <= $size]
+  <select name='{ $name }'>{
+    for $permission in $config:PERMISSIONS[position() <= $count]
     return element option {
       attribute selected { }[$permission = $selected],
       $permission

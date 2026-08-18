@@ -22,9 +22,8 @@ declare
 function dba:action(
   $action  as xs:string
 ) {
-  utils:dispatch($action, {
+  utils:dispatch($dba:CAT, $action, {
     'kill': fn($args) { {
-      'page': $dba:CAT,
       'info': utils:info($args?id, 'session', 'killed'),
       'run' : %updating fn() {
         $args?id ! sessions:delete(substring-before(., '|'), substring-after(., '|'))

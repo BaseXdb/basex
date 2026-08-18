@@ -172,11 +172,10 @@ declare
 function dba:action(
   $action  as xs:string
 ) {
-  utils:dispatch($action, {
+  utils:dispatch($dba:CAT, $action, {
     'create': fn($args) { {
-      'page'  : $dba:CAT,
       'params': { 'name': $args?name },
-      'info'  : `Database "{ $args?name }" was created.`,
+      'info'  : utils:info($args?name, 'database', 'created'),
       'run'   : %updating fn() {
         if (db:exists($args?name)) {
           error((), 'Database already exists.')
@@ -186,19 +185,16 @@ function dba:action(
       }
     } },
     'drop': fn($args) { {
-      'page': $dba:CAT,
       'info': utils:info($args?name, 'database', 'dropped'),
       'run' : %updating fn() { $args?name ! db:drop(.) }
     } },
     'optimize': fn($args) { {
-      'page': $dba:CAT,
       'info': utils:info($args?name, 'database', 'optimized'),
       'run' : %updating fn() { $args?name ! db:optimize(.) }
     } },
     'optimize-db': fn($args) { {
-      'page'  : $dba:CAT,
       'params': { 'name': $args?name },
-      'info'  : 'Database was optimized.',
+      'info'  : utils:info($args?name, 'database', 'optimized'),
       'run'   : %updating fn() {
         db:optimize($args?name, boolean($args?all),
           form:index-map($args?opts, $args?lang, false()))
@@ -211,21 +207,18 @@ function dba:action(
       dba:rename-database($args, 'copied', %updating fn($from, $to) { db:copy($from, $to) })
     },
     'backups-create': fn($args) { {
-      'page': $dba:CAT,
       'info': utils:info($args?name, 'database', 'backed up'),
       'run' : %updating fn() { $args?name ! db:create-backup(.) }
     } },
     'backups-restore': fn($args) { {
-      'page': $dba:CAT,
       'info': utils:info($args?name, 'backup', 'restored'),
       'run' : %updating fn() { $args?name ! db:restore(.) }
     } },
     'backup-create': fn($args) {
       let $name := string($args?name)
       return {
-        'page'  : $dba:CAT,
         'params': { 'name': $name },
-        'info'  : 'Backup was created.',
+        'info'  : utils:info($name, 'database', 'backed up'),
         'run'   : %updating fn() {
           db:create-backup($name, {
             'comment': $args?comment, 'compress': boolean($args?compress)
@@ -236,7 +229,6 @@ function dba:action(
     'backup-drop': fn($args) {
       let $name := string($args?name)
       return {
-        'page'  : $dba:CAT,
         'params': { 'name': $name },
         'info'  : utils:info($args?backup, 'backup', 'dropped'),
         'run'   : %updating fn() { $args?backup ! db:drop-backup($name || '-' || .) }
@@ -247,7 +239,6 @@ function dba:action(
       (: only the first backup will be restored :)
       let $backup := head($args?backup)
       return {
-        'page'  : $dba:CAT,
         'params': { 'name': $name },
         'info'  : utils:info($backup, 'backup', 'restored'),
         'run'   : %updating fn() { db:restore($name || '-' || $backup) }
@@ -256,7 +247,6 @@ function dba:action(
     'put': fn($args) {
       let $files := $args?files[. instance of map(*)] otherwise {}
       return {
-        'page'  : $dba:CAT,
         'params': { 'name': $args?name },
         'info'  : utils:info(map:keys($files), 'resource', 'added'),
         'run'   : %updating fn() {
@@ -281,9 +271,8 @@ function dba:action(
       let $files := $args?files[. instance of map(*)] otherwise {}
       let $content := head(map:items($files))
       return {
-        'page'  : $dba:CAT,
         'params': { 'name': $args?name, 'resource': $args?resource },
-        'info'  : 'Resource was replaced.',
+        'info'  : utils:info($args?resource, 'resource', 'replaced'),
         'run'   : %updating fn() {
           if (empty($content)) {
             error((), 'No input specified.')
@@ -296,7 +285,6 @@ function dba:action(
       }
     },
     'resource-delete': fn($args) { {
-      'page'  : $dba:CAT,
       'params': { 'name': $args?name },
       'info'  : utils:info($args?resource, 'resource', 'deleted'),
       'run'   : %updating fn() { $args?resource ! db:delete($args?name, .) }
@@ -304,13 +292,12 @@ function dba:action(
     'resource-rename': fn($args) {
       let $exists := db:exists($args?name, $args?target)
       return {
-        'page'  : $dba:CAT,
         (: a rename that fails leaves the resource where it is, and selected :)
         'params': {
           'name': $args?name,
           'resource': if ($exists) then $args?resource else $args?target
         },
-        'info'  : 'Resource was renamed.',
+        'info'  : utils:info($args?resource, 'resource', 'renamed'),
         'run'   : %updating fn() {
           if ($exists) {
             error((), 'Resource already exists.')
@@ -339,10 +326,9 @@ declare %private function dba:rename-database(
   (: the name that was offered for editing is the current one: keeping it is no conflict :)
   let $exists := $args?newname != $args?name and db:exists($args?newname)
   return {
-    'page'  : $dba:CAT,
     (: an operation that fails leaves the database it was started from selected :)
     'params': { 'name': if ($exists) then $args?name else $args?newname },
-    'info'  : `Database was { $action }.`,
+    'info'  : utils:info($args?name, 'database', $action),
     'run'   : %updating fn() {
       if ($exists) {
         error((), 'Database already exists.')

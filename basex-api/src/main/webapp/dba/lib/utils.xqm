@@ -316,11 +316,11 @@ declare function utils:page(
 };
 
 (:~
- : Returns a count info for the specified items.
+ : Returns an info message for the specified items: a single item is named, others are counted.
  : @param  $items   items
  : @param  $name    name of item (singular form)
  : @param  $action  action label (past tense)
- : @return result
+ : @return message
  :)
 declare function utils:info(
   $items   as item()*,
@@ -328,7 +328,12 @@ declare function utils:info(
   $action  as xs:string
 ) as xs:string {
   let $count := count($items)
-  return `{ $count } { $name || (if ($count != 1) then 's were ' else ' was ') || $action }.`
+  return if ($count = 1) {
+    `{ utils:capitalize($name) } "{ $items }" was { $action }.`
+  } else {
+    (: a noun that ends with a consonant and y is pluralized with -ies :)
+    `{ $count } { replace($name, 'y$', 'ie') }s were { $action }.`
+  }
 };
 
 (:~
@@ -355,34 +360,45 @@ declare %updating function utils:redirect(
 };
 
 (:~
- : Runs the requested action and redirects to its target page: an info message is shown if the
- : action succeeds, the error description if it fails.
+ : Runs the requested action and redirects to the page it belongs to: an info message is shown
+ : if the action succeeds, the error description if it fails.
  : The actions of a category are supplied as a map. Each entry assigns an action name to a
  : function that takes the request parameters and returns the following keys:
- : * 'page': target page (mandatory)
  : * 'run': function performing the action (mandatory)
  : * 'params': query parameters of the target page
  : * 'info': info message
  :
+ : @param  $page     page the actions belong to
  : @param  $action   name of action
  : @param  $actions  actions of the category
  : @return redirection
  :)
 declare %updating function utils:dispatch(
+  $page     as xs:string,
   $action   as xs:string,
   $actions  as map(*)
 ) {
   let $entry := $actions?($action) otherwise web:error(404, 'Unknown action: ' || $action)
-  let $target := $entry(request:parameter-map())
-  let $page := utils:page($target?page)
+  let $url := utils:page($page)
+  (: an action can fail before it runs: a parameter that is evaluated is reported like the
+     update it was meant for, not as a server error :)
+  let $target := try {
+    $entry(request:parameter-map())
+  } catch * {
+    { 'error': $err:description }
+  }
   let $params := $target?params otherwise {}
   let $run := $target?run
-  return try {
-    updating $run(),
-    utils:redirect($page, map:merge((
-      $params, { 'info': $target?info }[$target?info]
-    )))
-  } catch * {
-    utils:redirect($page, map:put($params, 'error', $err:description))
+  return if ($target?error) {
+    utils:redirect($url, map:put($params, 'error', $target?error))
+  } else {
+    try {
+      updating $run(),
+      utils:redirect($url, map:merge((
+        $params, { 'info': $target?info }[$target?info]
+      )))
+    } catch * {
+      utils:redirect($url, map:put($params, 'error', $err:description))
+    }
   }
 };

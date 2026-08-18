@@ -22,9 +22,8 @@ declare
 function dba:action(
   $action  as xs:string
 ) {
-  utils:dispatch($action, {
+  utils:dispatch($dba:CAT, $action, {
     'remove': fn($args) { {
-      'page': $dba:CAT,
       'info': utils:info($args?id, 'job', 'removed'),
       'run' : %updating fn() { $args?id ! job:remove(.) }
     } }

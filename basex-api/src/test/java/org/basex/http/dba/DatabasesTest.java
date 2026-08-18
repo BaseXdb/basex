@@ -45,7 +45,7 @@ public final class DatabasesTest extends DBATest {
     assertTrue(create().contains("was created"), "new database not reported");
     assertTrue(get("databases").contains(DB), "database missing from list");
     post("databases/drop", Map.of("name", DB));
-    assertFalse(get("databases").contains(DB), "database still listed after drop");
+    assertFalse(get("databases").contains(DB + "<"), "database still listed after drop");
   }
 
   /**
@@ -86,7 +86,7 @@ public final class DatabasesTest extends DBATest {
   @Test public void rename() throws IOException {
     create();
     assertTrue(post("databases/rename", Map.of("name", DB, "newname", OTHER)).
-        contains("Database was renamed."), "database not renamed");
+        contains("was renamed"), "database not renamed");
     assertTrue(get("databases?name=" + OTHER).contains("Database: "), "renamed database not shown");
     assertFalse(get("databases").contains(DB + "<"), "old name still listed");
   }
@@ -110,7 +110,7 @@ public final class DatabasesTest extends DBATest {
   @Test public void copy() throws IOException {
     create();
     assertTrue(post("databases/copy", Map.of("name", DB, "newname", OTHER)).
-        contains("Database was copied."), "database not copied");
+        contains("was copied"), "database not copied");
     final String page = get("databases");
     assertTrue(page.contains(DB), "source missing");
     assertTrue(page.contains(OTHER), "copy missing");
@@ -124,7 +124,7 @@ public final class DatabasesTest extends DBATest {
     create();
     assertTrue(post("databases/backup-create",
         Map.of("name", DB, "comment", "junit", "compress", "true")).
-        contains("Backup was created."), "backup not created");
+        contains("was backed up"), "backup not created");
 
     final String page = get("databases?name=" + DB);
     assertTrue(page.contains("<td>junit</td>"), "comment of the backup not listed");
@@ -132,7 +132,7 @@ public final class DatabasesTest extends DBATest {
     assertTrue(m.find(), "backup not listed");
 
     assertTrue(post("databases/backup-drop", Map.of("name", DB, "backup", m.group(1))).
-        contains("1 backup was dropped."), "backup not dropped");
+        contains("was dropped"), "backup not dropped");
   }
 
   /**

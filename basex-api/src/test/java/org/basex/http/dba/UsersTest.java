@@ -67,7 +67,7 @@ public final class UsersTest extends DBATest {
    */
   @Test public void update() throws IOException {
     create("read");
-    assertTrue(update(USER, OTHER, "write").contains("User was updated."), "user not updated");
+    assertTrue(update(USER, OTHER, "write").contains("was updated"), "user not updated");
     final String page = get("users?name=" + OTHER);
     assertTrue(page.contains("User: " + OTHER), "renamed user not shown");
     assertTrue(page.contains("<option selected=\"\">write</option>"), "permission not changed");
@@ -107,7 +107,7 @@ public final class UsersTest extends DBATest {
         "pattern not added");
     assertTrue(get("users?name=" + USER).contains("unit*"), "pattern not listed");
     assertTrue(post("users/pattern-drop", Map.of("name", USER, "pattern", "unit*")).
-        contains("1 pattern was dropped."), "pattern not dropped");
+        contains("was dropped"), "pattern not dropped");
   }
 
   /**
@@ -135,7 +135,7 @@ public final class UsersTest extends DBATest {
    */
   @Test public void invalidInformation() throws IOException {
     assertTrue(post("users/info", Map.of("info", "<other/>")).
-        contains("\"info\" root element expected"), "invalid information not rejected");
+        contains("\"info\" root element"), "invalid information not rejected");
   }
 
   /**

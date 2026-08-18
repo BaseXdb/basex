@@ -49,7 +49,7 @@ function dba:file-upload(
     map:for-each($files, fn($file, $content) {
       let $db := replace($file, $utils:BACKUP-ZIP-REGEX, '$1')
       where $name and $db != $name
-      return error((), `Backup of database "{ $db }" was uploaded for "{ $name }": { $file }`)
+      return error((), `Backup "{ $file }" does not belong to database "{ $name }".`)
     }),
     map:for-each($files, fn($file, $content) {
       file:write-binary($dir || $file, $content)

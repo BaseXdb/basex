@@ -76,7 +76,7 @@ public final class ResourcesTest extends DBATest {
   @Test public void rename() throws Exception {
     assertTrue(post("databases/resource-rename",
         Map.of("name", DB, "resource", RESOURCE, "target", "sub/moved.xml")).
-        contains("Resource was renamed."), "resource not renamed");
+        contains("was renamed"), "resource not renamed");
     assertTrue(page("sub/moved.xml").contains("Resource: sub/moved.xml"), "new path not shown");
   }
 
@@ -98,7 +98,7 @@ public final class ResourcesTest extends DBATest {
    */
   @Test public void delete() throws Exception {
     assertTrue(post("databases/resource-delete", Map.of("name", DB, "resource", RESOURCE)).
-        contains("1 resource was deleted."), "resource not deleted");
+        contains("was deleted"), "resource not deleted");
     assertFalse(get("databases?name=" + DB).contains(RESOURCE), "resource still listed");
   }
 
