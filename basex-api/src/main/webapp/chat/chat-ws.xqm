@@ -27,7 +27,7 @@ declare
   %perm:check('/ws/chat')
 function chat-ws:check() as empty-sequence() {
   (: no user in the session: refuse the upgrade with 403 :)
-  if(empty(session:get($chat-util:id))) then web:error(403, 'Please log in.') else ()
+  if (empty(session:get($chat-util:id))) then web:error(403, 'Please log in.') else ()
 };
 
 (:~
@@ -46,11 +46,16 @@ function chat-ws:connect(
   (: the session still knows who logged in :)
   let $name := session:get($chat-util:id)
   return (
-    (: store the name with the new connection (identified by ws:id()) :)
+    (: store the name with the new connection (identified by ws:id()), and the
+     : session it belongs to, so that a logout closes this browser's connections
+     : only (see chat-util:close) :)
     ws:set(ws:id(), $chat-util:id, $name),
+    ws:set(ws:id(), $chat-util:session, session:id()),
     (: greet the new client, and tell everyone else that it joined :)
-    chat-util:system('You joined the "' || chat-util:name($room) || '" room', ws:id()),
-    chat-util:announce('User "' || $name || '" joined the "' || chat-util:name($room) || '" room'),
+    chat-util:system(`You joined the "{ chat-util:name($room) }" room.`, ws:id()),
+    (: fill the message panel with what was said in the room before :)
+    chat-util:history($room),
+    chat-util:announce(`User "{ $name }" joined the "{ chat-util:name($room) }" room.`),
     (: send the updated users list to everyone :)
     chat-util:users(),
     (: log the connection; the request functions read details of the HTTP
@@ -78,6 +83,10 @@ function chat-ws:message(
   return switch($json?type)
     (: a chat message, public or private :)
     case 'message' return chat-util:message($json?text, $json?to, $room)
+    (: the stored messages of the room, or of a private conversation :)
+    case 'history' return chat-util:history(
+      if ($json?to) { chat-util:key(chat-util:user(), $json?to) } else { $room }
+    )
     (: a request for server statistics, answered asynchronously :)
     case 'info'    return chat-ws:info($room)
     (: anything else is unexpected: stop with an error :)
@@ -102,10 +111,10 @@ function chat-ws:close(
   (: the connection is still in the pool while this handler runs (BaseX removes
    : it afterwards, for a client- or server-side close alike). Read the name,
    : forget the connection, tell the others, and refresh everyone's users list. :)
-  let $name := ws:get(ws:id(), $chat-util:id)
+  let $name := chat-util:user()
   return (
     ws:delete(ws:id(), $chat-util:id),
-    $name ! chat-util:announce('User "' || . || '" left the "' || chat-util:name($room) || '" room'),
+    $name ! chat-util:announce(`User "{ . }" left the "{ chat-util:name($room) }" room.`),
     chat-util:users(),
     admin:write-log('Chat close [' || $room || ']: ' || $status ||
       (': ' || $reason)[$reason], 'CHAT')
@@ -113,10 +122,9 @@ function chat-ws:close(
 };
 
 (:~
- : Runs when something fails: the transport (a broken pipe, a protocol
- : error, …), one of the handlers above, or a query started with ws:eval.
- : Its result is not sent to the client, so it is used here for server-side
- : logging only; a handler that wants to reach the client calls ws:send.
+ : Runs when a connection fails on the transport level (a broken pipe, a
+ : protocol error, …). Its result is not sent to the client, so it is used
+ : here for server-side logging only.
  : @param  $room     room the connection belonged to
  : @param  $message  error message
  :)
@@ -126,11 +134,7 @@ function chat-ws:error(
   $room     as xs:string,
   $message  as xs:string
 ) as empty-sequence() {
-  (: the details go to the log; the client is only told that something failed,
-   : so internal error messages do not end up in the chat window. Sending to an
-   : already broken connection does nothing, so the transport case is covered too :)
-  admin:write-log('Chat error [' || $room || ']: ' || $message, 'CHAT'),
-  chat-util:system('Sorry, something went wrong.', ws:id())
+  admin:write-log('Chat error [' || $room || ']: ' || $message, 'CHAT')
 };
 
 (:~
@@ -148,13 +152,16 @@ declare %private function chat-ws:info(
      declare variable $name external;
      let $ids := ws:ids()
      let $here := $ids[ws:path(.) = "/chat/" || $room]
+     let $count := count(distinct-values($ids ! ws:get(., "id")))
+     let $label := if ($count = 1) { "user" } else { "users" }
      return {
        "type": "system",
-       "text": count(distinct-values($ids ! ws:get(., "id"))) || " people online, " ||
-         count($here) || " here in the " || $name || " room",
+       "text": `{ $count } { $label } online, { count($here) } in the "{ $name }" room.`,
        "date": format-time(current-time(), "[H02]:[m02]:[s02]")
      }',
-    { 'room': $room, 'name': chat-util:name($room) }
+    { 'room': $room, 'name': chat-util:name($room) },
+    (: the client parses the pushed result as JSON (see onMessage in chat.js) :)
+    { 'serializer': { 'method': 'json' } }
   ))
 };
 
@@ -164,7 +171,7 @@ declare %private function chat-ws:info(
  :)
 declare %private function chat-ws:heartbeat() as empty-sequence() {
   (: do nothing if the job was already started by an earlier connection :)
-  if(job:list() = 'chat-heartbeat') then () else void(
+  if (job:list() = 'chat-heartbeat') then () else void(
     (: run the given query every 15 seconds ('PT15S'); it
      : pings all clients that are connected at that moment :)
     job:eval('ws:ids() ! ws:ping(.)', (), { 'id': 'chat-heartbeat', 'interval': 'PT15S' })

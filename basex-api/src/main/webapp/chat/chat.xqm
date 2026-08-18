@@ -28,7 +28,7 @@ declare
   %rest:path('/chat')
   %output:method('html')
 function chat:chat() as element() {
-  if(session:get($chat-util:id)) then (
+  if (session:get($chat-util:id)) then (
     chat:main()
   ) else (
     chat:login()
@@ -73,9 +73,8 @@ function chat:login-check(
 declare
   %rest:path('/chat/logout')
 function chat:logout() as element(rest:response) {
-  (: close the chat connections of the user (the '!' makes sure
-   : this only happens if someone is logged in at all) :)
-  session:get($chat-util:id) ! chat-util:close(.),
+  (: close the chat connections of this browser :)
+  chat-util:close(),
   (: forget the user in the session :)
   session:delete($chat-util:id),
   web:redirect('../chat')
@@ -121,7 +120,7 @@ declare %private function chat:login() as element(html) {
         ))
       }</form>
     </div>
-  , '1fr', ())
+  , '1fr', (), ())
 };
 
 (:~
@@ -148,8 +147,8 @@ declare %private function chat:field(
  : @return HTML page
  :)
 declare %private function chat:main() as element(html) {
-  (: the input sends chat messages; the button asks the server for
-   : statistics, which arrive asynchronously (see chat-ws:info / ws:eval) :)
+  (: the input and the Send button send chat messages; 'Who's here?' asks the
+   : server for statistics, which arrive asynchronously (see chat-ws:info) :)
   chat:wrap((
   <div class='panel full'>
     <p class='compose'>
@@ -158,32 +157,33 @@ declare %private function chat:main() as element(html) {
       { ' ' }
       <button type='button' id='send' onclick='sendInput()' disabled='disabled'>Send</button>
       { ' ' }
-      <button type='button' id='cancel' onclick='resetPrivateMsg()'
-              title='Leave private mode' hidden='hidden'>Cancel</button>
-      { ' ' }
       <button type='button' onclick='serverInfo()'>Who’s here?</button>
     </p>
   </div>,
   <div class='panel'>
-    <div id='users'/>
+    <div id='users' class='pane'/>
   </div>,
   <div class='panel'>
-    <div class='note'><b>MESSAGES</b></div>
-    <div id='messages'/>
+    <div class='note'><b>MESSAGES</b><span id='conversation'/></div>
+    <div id='messages' class='pane'/>
   </div>
-  ), '12rem 1fr', <script type='text/javascript' defer='' src='chat/.static/chat.js'/>)
+  ), '12rem 1fr', 'auto 1fr',
+  <script type='text/javascript' defer='' src='chat/.static/chat.js'/>)
 };
 
 (:~
  : Puts the supplied panels into a complete HTML page with header and title.
  : @param $panels   page panels
- : @param $columns  grid track sizes of the panels
+ : @param $columns  grid track widths of the panels
+ : @param $rows     grid track heights; the panels then fill the viewport instead of
+ :   growing with their content, and each panel scrolls on its own
  : @param $headers  extra header elements (scripts, etc.)
  : @return HTML page
  :)
 declare %private function chat:wrap(
   $panels   as item()*,
   $columns  as xs:string,
+  $rows     as xs:string?,
   $headers  as element()*
 ) as element(html) {
   let $user := session:get($chat-util:id)
@@ -213,14 +213,14 @@ declare %private function chat:wrap(
             </h1>
             {
               (: if someone is logged in, show the name and a logout link :)
-              if($user) { <div><b>{ $user }</b> · <a href='chat/logout'>logout</a></div> }
+              if ($user) { <div><b>{ $user }</b> · <a href='chat/logout'>logout</a></div> }
             }
           </div>
           <nav class='ellipsis'>{
             (: logged in: room selector (active room bolded by chat.js) plus the
              : info element for server notices (welcome, join/leave, 'Who''s
              : here?'); logged out: the login prompt, placed here like the DBA :)
-            if($user) {
+            if ($user) {
               let $links := $chat-util:rooms !
                 <a href='#' class='room' data-room='{ . }'>{ chat-util:name(.) }</a>
               return (
@@ -236,10 +236,11 @@ declare %private function chat:wrap(
         <a href='./' class='header-logo'><img src='chat/.static/basex.svg' alt='BaseX'/></a>
       </header>
       <main>
-        <div class='content' style='--columns: { $columns }'>{ $panels }</div>
+        <div class='content{ ' fill'[$rows] }'
+             style='--columns: { $columns }{ $rows ! ('; --rows: ' || .) }'>{ $panels }</div>
       </main>
       <hr/>
-      <footer class='right'><sup>BaseX Team, BSD License</sup></footer>
+      <footer><sup>BaseX Team, BSD License</sup></footer>
     </body>
   </html>
 };

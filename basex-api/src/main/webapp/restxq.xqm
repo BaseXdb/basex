@@ -60,8 +60,8 @@ function page:start(
         <p><b>A live, multi-room chat</b></p>
         <p>Switch between channels, see who is online and which room they are in, and post to the
           whole room or privately to a single person. Messages are pushed instantly over
-          WebSockets, nothing is polled, and the history of a room is stored in a database and
-          served to everyone who joins later. Accounts are the ones you created in the DBA.</p>
+          WebSockets, nothing is polled, and every conversation is kept in a store and served
+          again to everyone who joins later. Accounts are the ones you created in the DBA.</p>
         <p>For the full effect, create multiple users in the DBA, open the chat in two browsers,
           and log in as different users.</p>
 

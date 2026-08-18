@@ -2,18 +2,23 @@
 // chat.xqm); this script opens a WebSocket connection to the selected room
 // and keeps the users list and the messages up-to-date.
 
-// base WebSocket address, built from the page address (a context path is
-// preserved): http(s)://HOST[/PATH]/chat  ->  ws(s)://HOST[/PATH]/ws/chat
+// base WebSocket address, built from the page address (without query and
+// fragment, which the pattern would not match; a context path is preserved):
+// http(s)://HOST[/PATH]/chat  ->  ws(s)://HOST[/PATH]/ws/chat
 // the room name is appended when a room is opened (see openRoom)
-var base = window.location.href.replace(/^http(.*)\/chat\/?$/, "ws$1/ws/chat");
-// the open connection, the current room, and the private-message receiver
-// (empty: the message goes to the whole room)
+var base = (location.origin + location.pathname).
+  replace(/^http(.*)\/chat\/?$/, "ws$1/ws/chat");
+// the open connection and the current room
 var ws = null;
 var room = null;
+// the user whose private conversation is selected (empty: the room), and the
+// store key of the conversation on display. The server states the key with
+// every message and every history, so it is never built here (see chat-util.xqm)
 var to = "";
+var view = null;
 
 // the logged-in user (set by the page, see chat.xqm); used to keep you from
-// starting a private message to yourself
+// starting a private conversation with yourself
 var me = (document.body && document.body.dataset.user) || "";
 
 // connections are kept alive by pings from the server (see chat-ws:heartbeat)
@@ -23,27 +28,30 @@ var me = (document.body && document.body.dataset.user) || "";
 function openRoom(newRoom) {
   if(room === newRoom) return;
   room = newRoom;
-  // reflect the active room in the buttons, clear the message list, leave
-  // any private-message mode
-  document.querySelectorAll(".room").forEach(function(button) {
-    button.classList.toggle("active", button.dataset.room === room);
+  // mark the active room, clear the message list, and leave any private
+  // conversation; the server sends the history of the room on connect
+  document.querySelectorAll(".room").forEach(function(link) {
+    link.classList.toggle("active", link.dataset.room === room);
   });
-  document.getElementById("messages").innerHTML = "";
-  resetPrivateMsg();
-  // drop the old connection without reporting it as a disconnect
-  if(ws) { ws.onclose = null; ws.close(); }
+  clearMessages();
+  to = "";
+  view = null;
+  updateControls();
+  // drop the old connection without reporting it as a disconnect, and ignore
+  // what is still in flight on it (a history that was requested before)
+  if(ws) { ws.onclose = null; ws.onmessage = null; ws.close(); }
   // offer two sub-protocols, newest first; the server picks the first one
   // it supports (see %ws:subprotocol in chat-ws.xqm)
   ws = new WebSocket(base + "/" + room, ["chat.v2", "chat.v1"]);
   ws.onopen = function() {
-    // clear any earlier "offline" notice; the server's welcome fills the area.
+    // clear any earlier disconnect notice; the server's welcome fills the area.
     // the negotiated sub-protocol is a technical detail, kept in the hover text
     // (see %ws:subprotocol in chat-ws.xqm)
     var info = document.getElementById("info");
-    if(info) info.title = ws.protocol ? "connected via " + ws.protocol : "";
+    if(info) info.title = ws.protocol ? "Connected via " + ws.protocol + "." : "";
     showInfo("", "note");
   };
-  ws.onclose = function() { showInfo("offline", "warning"); };
+  ws.onclose = function() { showInfo("Connection to the server was lost.", "warning"); };
   ws.onmessage = onMessage;
 }
 
@@ -62,73 +70,106 @@ function showInfo(text, cls) {
 function onMessage(event) {
   var json = JSON.parse(event.data);
   if(json.type === "message") {
-    // a chat message: show sender and time (all messages in view belong to
-    // the current room), and mark private ones
-    var info = json.from + ", " + json.date + (json.private ? " (private)" : "");
-    addMessage(json.text, info);
+    // a chat message: show it if it belongs to the conversation on display,
+    // and give a hint if a private one arrives while another one is shown
+    if(json.key === view) {
+      addMessage(json);
+    } else if(json.private) {
+      showInfo('Private message from "' + json.from + '".');
+    }
+  } else if(json.type === "history") {
+    // the stored messages of a conversation (see chat-util:history): they are
+    // what the message panel shows from now on, oldest message last
+    view = json.key;
+    clearMessages();
+    json.messages.forEach(addMessage);
   } else if(json.type === "system") {
     // a server notice (welcome, join/leave, "Who's here?"): shown in the
     // header info area, not in the message list
     showInfo(json.text);
   } else if(json.type === "users") {
-    // redraw the users list: online users (with their rooms) are links you can
-    // click to start a private message; offline users are plain text, since
+    // redraw the users list: a user with rooms is online and becomes a link
+    // that opens the private conversation; the others are plain text, since
     // they cannot receive messages
-    var rooms = {};
-    json.active.forEach(function(user) { rooms[user.name] = user.rooms; });
-    var online = "", offline = "";
-    json.users.forEach(function(user) {
-      if(Object.prototype.hasOwnProperty.call(rooms, user)) {
-        var where = rooms[user].length ?
-          " <span class='footnote'>(" + rooms[user].join(", ") + ")</span>" : "";
-        if(user === me) {
-          // yourself: shown in bold, not clickable (you can't message yourself)
-          online += "<b>" + user + "</b>" + where + "<br>";
-        } else {
-          online += "<a href='#' onclick=\"privateMsg('" +
-            user.replace("'", "\\'") + "', event);\">" + user + "</a>" + where + "<br>";
-        }
-      } else {
-        offline += user + "<br>";
-      }
-    });
-    var html = "";
-    if(online) html += "<div class='note'><b>ONLINE USERS</b></div>" + online;
-    if(offline) html += (html ? "<div class='small'></div>" : "") +
-      "<div class='note'><b>OFFLINE USERS</b></div>" + offline;
-    document.getElementById("users").innerHTML = html;
+    var list = document.getElementById("users");
+    list.innerHTML = "";
+    addUsers(list, "ONLINE USERS", json.users.filter(isOnline));
+    addUsers(list, "OFFLINE USERS", json.users.filter(function(user) {
+      return !isOnline(user);
+    }));
+    updateControls();
   } else {
     console.log("UNKNOWN COMMAND", event);
   }
 }
 
-// puts a message on top of the list (newest first)
-function addMessage(html, info) {
-  var div = "<div>" + html + "<div class='footnote'>" + info + "</div></div>";
+// a user is online while at least one connection of theirs is open
+function isOnline(user) {
+  return user.rooms.length > 0;
+}
+
+// adds one section to the users list: a heading, and a line per user. Online
+// users become links, with the rooms they are in appended
+function addUsers(list, label, users) {
+  if(!users.length) return;
+  var note = list.appendChild(document.createElement("div"));
+  note.className = "note";
+  note.appendChild(document.createElement("b")).textContent = label;
+  users.forEach(function(user) {
+    var line = list.appendChild(document.createElement("div"));
+    if(!isOnline(user)) {
+      line.textContent = user.name;
+      return;
+    }
+    if(user.name === me) {
+      // yourself: shown in bold, not clickable (you cannot chat with yourself)
+      line.appendChild(document.createElement("b")).textContent = user.name;
+    } else {
+      var link = line.appendChild(document.createElement("a"));
+      link.href = "#";
+      link.className = "user";
+      link.dataset.user = user.name;
+      link.textContent = user.name;
+    }
+    var where = line.appendChild(document.createElement("span"));
+    where.className = "footnote";
+    where.textContent = " (" + user.rooms.join(", ") + ")";
+  });
+}
+
+// puts a message on top of the list (newest first). The text was serialized by
+// the server, so it cannot smuggle HTML into the page (see chat-util:entry)
+function addMessage(message) {
   var messages = document.getElementById("messages");
-  messages.innerHTML = div + messages.innerHTML;
+  messages.innerHTML = "<div>" + message.text + "<div class='footnote'>" +
+    message.from + ", " + message.date + "</div></div>" + messages.innerHTML;
+}
+
+// empties the message list
+function clearMessages() {
+  document.getElementById("messages").innerHTML = "";
 }
 
 // helper functions
 
-// gets ready to send a private message to the clicked user
-function privateMsg(user, event) {
+// opens the private conversation with the given user: the server answers with
+// its history, and what is typed from now on goes to that user alone
+function openConversation(user) {
   to = user;
-  var placeholder = "Private message to " + user + "…";
-  var input = document.getElementById("input");
-  input.placeholder = placeholder;
-  input.focus();
   resetInput();
   updateControls();
-  // do not follow the clicked link (it points nowhere)
-  event.preventDefault();
+  send("history", "", to);
+  document.getElementById("input").focus();
 }
 
-// switches back from private to public messages
-function resetPrivateMsg() {
+// switches back from a private conversation to the room (escape key, or a
+// click on the room that is already open)
+function closeConversation() {
+  if(!to) return;
   to = "";
-  document.getElementById("input").placeholder = "Message to the room…";
+  resetInput();
   updateControls();
+  send("history", "", "");
 }
 
 // empties the input field
@@ -141,8 +182,8 @@ function keyDown(event) {
   if(event.keyCode === 13) { // enter: send the typed message
     event.preventDefault();
     sendInput();
-  } else if(event.keyCode === 27) { // escape: cancel private message
-    resetPrivateMsg();
+  } else if(event.keyCode === 27) { // escape: back to the room
+    closeConversation();
   }
 }
 
@@ -157,33 +198,37 @@ function sendInput() {
   input.focus();
 }
 
-// keeps the toolbar controls in step with the current state: the Send button
-// label switches between "Send" (room) and "Send private" (recipient selected)
-// and is disabled while the field is empty; the cancel button appears only in
-// private mode, so leaving it needs no keyboard
+// keeps the page in step with the selected conversation: the input hint and the
+// panel heading name it, the users list marks the selected user, and the Send
+// button is disabled while the input field is empty
 function updateControls() {
+  var input = document.getElementById("input");
+  input.placeholder = to ? "Private message to " + to + "…" : "Message to the room…";
   var button = document.getElementById("send");
-  if(button) {
-    button.textContent = to ? "Send private" : "Send";
-    button.disabled = !document.getElementById("input").value;
-  }
-  var cancel = document.getElementById("cancel");
-  if(cancel) cancel.hidden = !to;
+  if(button) button.disabled = !input.value;
+  document.querySelectorAll(".user").forEach(function(link) {
+    link.classList.toggle("active", link.dataset.user === to);
+  });
+  var active = document.querySelector(".room.active");
+  document.getElementById("conversation").textContent =
+    " · " + (to ? "Private chat with " + to : active ? active.textContent : "");
 }
 
 // asks the server for statistics (see chat-ws:info)
 function serverInfo() {
-  ws.send(JSON.stringify({ "type": "info" }));
+  send("info", "", "");
 }
 
 // sends a JSON object to the server, where chat-ws:message
 // takes over (see chat-ws.xqm)
-function send(type, message, to) {
-  ws.send(JSON.stringify({ "type": type, "text": message, "to": to }));
+function send(type, message, user) {
+  if(ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ "type": type, "text": message, "to": user }));
+  }
 }
 
-// wire up the room buttons and open the first room once the page is ready
-// (this script is loaded from the <head>, before the buttons exist)
+// wire up the room links and open the first room once the page is ready
+// (this script is loaded from the <head>, before the links exist)
 window.addEventListener("DOMContentLoaded", function() {
   // enable the Send button only while there is something to send
   document.getElementById("input").addEventListener("input", updateControls);
@@ -191,8 +236,19 @@ window.addEventListener("DOMContentLoaded", function() {
   document.querySelectorAll(".room").forEach(function(link) {
     link.addEventListener("click", function(event) {
       event.preventDefault();
-      openRoom(link.dataset.room);
+      // the room that is already open: leave the private conversation, if any
+      if(link.dataset.room === room) closeConversation();
+      else openRoom(link.dataset.room);
     });
+  });
+  // the users list is redrawn whenever someone joins or leaves, so the click
+  // is caught on the panel, which stays
+  document.getElementById("users").addEventListener("click", function(event) {
+    var link = event.target.closest("a.user");
+    if(link) {
+      event.preventDefault();
+      openConversation(link.dataset.user);
+    }
   });
   openRoom(document.querySelector(".room").dataset.room);
 });
