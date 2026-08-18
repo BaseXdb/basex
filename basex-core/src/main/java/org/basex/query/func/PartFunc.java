@@ -92,19 +92,22 @@ public final class PartFunc extends Arr {
   }
 
   /**
-   * Creates a function item over a dynamic function call to the given function item, with the
-   * arguments constructed from the parameters and expressions of this partially applied function.
+   * Creates a function item that calls the given function item with the arguments and placeholders
+   * of this partially applied function.
    * @param func function item to be called
    * @param qc query context
    * @param cc compilation context ({@code null} during runtime)
-   * @return new function item
+   * @return function item
    * @throws QueryException query exception
    */
-  private FuncItem funcItem(final FItem func, final QueryContext qc, final CompileContext cc)
+  private FItem funcItem(final FItem func, final QueryContext qc, final CompileContext cc)
       throws QueryException {
     final int el = exprs.length - 1;
     final int nargs = el, arity = func.arity();
     if(nargs != arity) throw arityError(func, nargs, arity, false, info);
+
+    // all arguments are placeholders in the original order: return original function
+    if(placeholders == nargs && placeholderPerm == null) return func;
 
     final FuncType ft = func.funcType();
     final Expr[] args = new Expr[nargs];

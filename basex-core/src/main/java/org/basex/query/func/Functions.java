@@ -129,10 +129,8 @@ public final class Functions {
     }
 
     // no placeholders: create dynamic function call
-    // all arguments are placeholders in the original order: return original function expression
     // otherwise, create partially applied function with optional placeholder permutation
     return ph == 0 ? new DynFuncCall(fb.info, expr, args) :
-           ph == args.length && phPerm == null ? expr :
            new PartFunc(fb.info, ExprList.concat(args, expr), ph, phPerm);
   }
 
