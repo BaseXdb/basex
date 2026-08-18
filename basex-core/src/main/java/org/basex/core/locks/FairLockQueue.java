@@ -28,13 +28,14 @@ final class FairLockQueue extends LockQueue {
     if(jobs >= parallel) {
       queue.add(id);
 
-      // loop until job is placed first
-      do {
-        wait();
-      } while(!id.equals(queue.peek()));
-
-      // remove job from queue
-      queue.remove(id);
+      // loop until job is placed first; an interrupt must not leave the ID behind
+      try {
+        do {
+          wait();
+        } while(!id.equals(queue.peek()));
+      } finally {
+        queue.remove(id);
+      }
     }
     jobs++;
   }

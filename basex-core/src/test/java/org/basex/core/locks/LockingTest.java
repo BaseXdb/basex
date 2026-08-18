@@ -7,6 +7,7 @@ import java.util.concurrent.*;
 
 import org.basex.*;
 import org.basex.core.*;
+import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -34,6 +35,37 @@ public final class LockingTest extends SandboxTest {
   private final String[] objects = { "0", "1", "2", "3", "4" };
   /** Empty string array for convenience. */
   private static final String[] NONE = { };
+
+  /**
+   * An acquisition that is interrupted must leave no trace: the thread must not be marked as
+   * holding locks it never received, or its next job fails with "Thread holds locks".
+   * @throws InterruptedException Got interrupted.
+   */
+  @RepeatedTest(REPEAT)
+  public void interruptedAcquisition() throws InterruptedException {
+    // a global reader, held until released explicitly
+    final CountDownLatch held = new CountDownLatch(1);
+    final LockTester reader = new LockTester(null, null, NONE, held);
+    reader.start();
+    assertTrue(held.await(WAIT, TimeUnit.MILLISECONDS), "Reader should hold its lock.");
+
+    // a local writer waits for the global reader; an interrupt flag that is already set makes
+    // that wait throw at once, as RestXqSingleton leaves one behind before a query is registered
+    final Locks locks = new Locks();
+    locks.writes.add(objects[0]);
+    locks.finish(context);
+    Thread.currentThread().interrupt();
+    try {
+      locking.acquire(locks);
+      fail("Acquisition should have been interrupted.");
+    } catch(final InterruptedException ex) {
+      Util.debug(ex);
+    } finally {
+      Thread.interrupted();
+      reader.release();
+    }
+    assertNull(locking.held(), "No locks were acquired, so none must be recorded.");
+  }
 
   /**
    * Single thread acquires both global read lock and a single write lock.

@@ -32,13 +32,14 @@ final class NonfairLockQueue extends LockQueue {
       final Queue<Long> queue = write ? writers : readers;
       queue.add(id);
 
-      // loop until job is placed first (prefer readers)
-      do {
-        wait();
-      } while(jobs >= parallel || write && !readers.isEmpty() || !id.equals(queue.peek()));
-
-      // remove job from queue
-      queue.remove(id);
+      // loop until job is placed first (prefer readers); an interrupt must not leave the ID behind
+      try {
+        do {
+          wait();
+        } while(jobs >= parallel || write && !readers.isEmpty() || !id.equals(queue.peek()));
+      } finally {
+        queue.remove(id);
+      }
     }
     jobs++;
   }

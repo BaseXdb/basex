@@ -35,8 +35,10 @@ final class RestXqSingleton {
     this.qc = qc;
     this.id = id;
     session = conn.requestCtx.state().session(true);
-    queue();
-    register();
+    synchronized(MUTEX) {
+      queue();
+      register();
+    }
   }
 
   /**
@@ -54,8 +56,6 @@ final class RestXqSingleton {
           MUTEX.wait(WAIT);
         } catch(final InterruptedException ex) {
           Util.debug(ex);
-          Thread.currentThread().interrupt();
-          break;
         }
       }
     }
@@ -66,7 +66,7 @@ final class RestXqSingleton {
    */
   private void register() {
     synchronized(MUTEX) {
-      session.setAttribute(id, qc);
+      RequestState.attribute(session, id, qc);
     }
   }
 
@@ -76,7 +76,7 @@ final class RestXqSingleton {
   void unregister() {
     synchronized(MUTEX) {
       if(qc == qc()) {
-        session.removeAttribute(id);
+        RequestState.remove(session, id);
         MUTEX.notifyAll();
       }
     }

@@ -150,9 +150,17 @@ public final class JobPool {
     final Watch watch = new Watch(Performance.memory() + (mb << 20), thread,
         Performance.allocated(thread));
     synchronized(watched) {
+      if(memoryFuture == null) {
+        try {
+          memoryFuture = scheduler.scheduleWithFixedDelay(this::checkMemory,
+              MEMORY_INTERVAL, MEMORY_INTERVAL, TimeUnit.MILLISECONDS);
+        } catch(final RejectedExecutionException ex) {
+          // scheduler has been shut down (application is closing): the job needs no guard
+          Util.debug(ex);
+          return;
+        }
+      }
       watched.put(job, watch);
-      if(memoryFuture == null) memoryFuture = scheduler.scheduleWithFixedDelay(this::checkMemory,
-          MEMORY_INTERVAL, MEMORY_INTERVAL, TimeUnit.MILLISECONDS);
     }
   }
 

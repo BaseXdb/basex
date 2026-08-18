@@ -109,30 +109,43 @@ public final class Locking {
     // queue job if the job limit has been reached (only locking jobs count towards the limit)
     final LockList reads = locks.reads, writes = locks.writes;
     final boolean write = writes.locking(), read = reads.locking(), lock = read || write;
-    if(lock) queue.acquire(id, read, write);
-
-    // apply exclusive lock (global write), or shared lock otherwise
-    if(lock) (writes.global() ? globalLocks.writeLock() : globalLocks.readLock()).lock();
-
-    globalLock.lock();
+    boolean queued = false;
     try {
-      final boolean localWrite = writes.local(), globalRead = reads.global();
-      if(localWrite && globalRead) {
-        // job is both local writer and global reader
-        while(localWriters > 0 || globalReaders > 0) globalCond.await();
-        localWriters++;
-        globalReaders++;
-      } else if(localWrite) {
-        // local write lock: wait for completion of global readers
-        while(globalReaders > 0) globalCond.await();
-        localWriters++;
-      } else if(globalRead) {
-        // global read lock: wait for completion of local writers
-        while(localWriters > 0) globalCond.await();
-        globalReaders++;
+      if(lock) {
+        queue.acquire(id, read, write);
+        queued = true;
+        // apply exclusive lock (global write), or shared lock otherwise
+        (writes.global() ? globalLocks.writeLock() : globalLocks.readLock()).lock();
       }
-    } finally {
-      globalLock.unlock();
+
+      globalLock.lock();
+      try {
+        final boolean localWrite = writes.local(), globalRead = reads.global();
+        if(localWrite && globalRead) {
+          // job is both local writer and global reader
+          while(localWriters > 0 || globalReaders > 0) globalCond.await();
+          localWriters++;
+          globalReaders++;
+        } else if(localWrite) {
+          // local write lock: wait for completion of global readers
+          while(globalReaders > 0) globalCond.await();
+          localWriters++;
+        } else if(globalRead) {
+          // global read lock: wait for completion of local writers
+          while(localWriters > 0) globalCond.await();
+          globalReaders++;
+        }
+      } finally {
+        globalLock.unlock();
+      }
+    } catch(final InterruptedException ex) {
+      // an interrupted acquisition holds nothing: give back what was reserved for it
+      locked.remove(id);
+      if(queued) {
+        (writes.global() ? globalLocks.writeLock() : globalLocks.readLock()).unlock();
+        queue.release();
+      }
+      throw ex;
     }
 
     // assign locks in sorted order (to ensure that write locks will be assigned first)

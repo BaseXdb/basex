@@ -36,6 +36,8 @@ public abstract class Job {
   private final Set<Thread> threads = ConcurrentHashMap.newKeySet();
   /** Job that was registered on the current thread before this one. */
   private Job previous;
+  /** Indicates that the job holds a run slot and must give it up again. */
+  private boolean registered;
 
   /**
    * Returns the job context.
@@ -50,12 +52,18 @@ public abstract class Job {
    * @param ctx context
    */
   public final void register(final Context ctx) {
+    // clear a stale interrupt status: threads are reused, and a pending interrupt would make
+    // the first blocking wait of a lock acquisition fail
+    Thread.interrupted();
+
     previous = CURRENT.get();
     CURRENT.set(this);
     jc.context = ctx;
     ctx.jobs.register(this);
+    registered = true;
     state(JobState.QUEUED);
-    ctx.locking.acquire(this, ctx);
+    // a nested job runs with the locks of its parent: a thread can only hold a single set
+    if(previous == null) ctx.locking.acquire(this, ctx);
     state(JobState.RUNNING);
     jc.performance = new Performance();
     // non-admin users: stop process after timeout
@@ -69,11 +77,18 @@ public abstract class Job {
    * @param ctx context
    */
   public final void unregister(final Context ctx) {
-    stopTimeout();
-    ctx.locking.release();
-    ctx.jobs.unregister(this);
-    CURRENT.set(previous);
-    previous = null;
+    // a job that was never registered has nothing to give up
+    if(!registered) return;
+    try {
+      stopTimeout();
+      if(previous == null) ctx.locking.release();
+    } finally {
+      registered = false;
+      // the job must free its run slot, even if it failed to give up its locks
+      ctx.jobs.unregister(this);
+      CURRENT.set(previous);
+      previous = null;
+    }
   }
 
   /**

@@ -34,8 +34,6 @@ public final class RestXqResponse extends WebResponse {
 
   /** Singleton. */
   private RestXqSingleton singleton;
-  /** Query was registered. */
-  private boolean registered;
   /** Function. */
   private RestXqFunction func;
   /** Status code. */
@@ -75,7 +73,6 @@ public final class RestXqResponse extends WebResponse {
     boolean response;
 
     qc.register(ctx);
-    registered = true;
     try {
       qc.optimize();
 
@@ -145,7 +142,7 @@ public final class RestXqResponse extends WebResponse {
   public void finish() throws IOException, ServletException {
     if(qc != null) {
       qc.close();
-      if(registered) qc.unregister(ctx);
+      qc.unregister(ctx);
     }
     if(singleton != null) singleton.unregister();
   }

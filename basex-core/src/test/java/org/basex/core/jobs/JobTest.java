@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 
+import org.basex.core.*;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -99,6 +100,42 @@ public final class JobTest {
     assertFalse(worker.isAlive(), "blocking operation should have been interrupted");
     assertInstanceOf(JobException.class, caught.get(),
         "interrupt should surface as a JobException");
+  }
+
+  /** A job that is nested in another one on the same thread runs with the locks of its parent. */
+  @Test public void nestedRegistration() {
+    final Context ctx = new Context();
+    try {
+      // registration and its counterpart are paired as they are for web requests, so that a
+      // failure leaves no job behind and reports itself instead of blocking the closing context
+      final Job outer = job();
+      try {
+        outer.register(ctx);
+        final Job inner = job();
+        try {
+          inner.register(ctx);
+        } finally {
+          inner.unregister(ctx);
+        }
+      } finally {
+        outer.unregister(ctx);
+      }
+      assertTrue(ctx.jobs.active.isEmpty(), "every job should have left the pool");
+    } finally {
+      ctx.close();
+    }
+  }
+
+  /** Unregistering a job that was never registered must do nothing. */
+  @Test public void unregisterWithoutRegister() {
+    final Context ctx = new Context();
+    try {
+      // a web response gives up its job in a finally, even if it never got as far as running it
+      job().unregister(ctx);
+      assertTrue(ctx.jobs.active.isEmpty(), "no job should have been touched");
+    } finally {
+      ctx.close();
+    }
   }
 
   /**
