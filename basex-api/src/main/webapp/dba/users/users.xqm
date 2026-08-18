@@ -30,7 +30,7 @@ declare
   %rest:query-param('name',    '{$name}', '')
   %rest:query-param('newname', '{$newname}')
   %rest:query-param('perm',    '{$perm}')
-  %rest:query-param('sort',    '{$sort}', '')
+  %rest:query-param('sort',    '{$sort}', 'name')
   %rest:query-param('info',    '{$info}')
   %rest:query-param('error',   '{$error}')
   %output:method('html')

@@ -234,11 +234,13 @@ public final class Log implements QueryTracer {
   }
 
   /**
-   * Returns all log files.
-   * @return log directory
+   * Returns all log files, most recent first.
+   * @return log files
    */
   public IOFile[] files() {
-    return dir().children(".*\\" + IO.LOGSUFFIX);
+    final IOFile[] files = dir().children(".*\\" + IO.LOGSUFFIX);
+    Arrays.sort(files, (file1, file2) -> file2.name().compareTo(file1.name()));
+    return files;
   }
 
   /**

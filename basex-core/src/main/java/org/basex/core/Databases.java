@@ -101,7 +101,7 @@ public final class Databases {
   }
 
   /**
-   * Returns the names of all backups.
+   * Returns the names of all backups, in descending order.
    * @return backups
    */
   public StringList backups() {
@@ -110,7 +110,7 @@ public final class Databases {
       final String name = file.name();
       if(name.endsWith(IO.ZIPSUFFIX)) backups.add(name.substring(0, name.lastIndexOf('.')));
     }
-    return backups;
+    return backups.sort(Prop.CASE, false);
   }
 
   /**

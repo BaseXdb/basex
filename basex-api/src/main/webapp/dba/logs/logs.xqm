@@ -55,7 +55,7 @@ function dba:logs(
   $page   as xs:string,
   $time   as xs:string?
 ) as element(html) {
-  let $files := reverse(sort(admin:logs()))
+  let $files := admin:logs()
   let $date := $name otherwise string(head($files))
   return (
     <div class='panel'>

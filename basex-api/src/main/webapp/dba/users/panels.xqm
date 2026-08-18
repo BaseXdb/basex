@@ -49,7 +49,7 @@ declare function panels:users(
       form:button('users/drop', 'Drop', ('CHECK', 'CONFIRM'))
     )
     return table:create($headers, $entries, $buttons, {},
-      { 'sort': $sort, 'sticky': <h2>Users</h2> })
+      { 'sort': $sort, 'presort': 'name', 'sticky': <h2>Users</h2> })
   }</form>,
 
   form:dialog('create', 'Create User', 'users/create', false(), (

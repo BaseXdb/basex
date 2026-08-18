@@ -184,11 +184,11 @@ public final class Users {
     for(final User user : users(db, ctx)) {
       table.contents.add(new TokenList().add(user.name()).add(user.permission(db).toString()));
     }
-    return table.sort().toTop(token(ADMIN));
+    return table.toTop(token(ADMIN));
   }
 
   /**
-   * Returns all users, or users that have permissions for a specific database.
+   * Returns all users, or users that have permissions for a specific database, sorted by name.
    * The list will only contain the current user if no admin permissions are available.
    * @param db database (can be {@code null})
    * @param ctx database context
@@ -208,6 +208,7 @@ public final class Users {
         }
       }
     }
+    list.sort(Comparator.comparing(User::name, String.CASE_INSENSITIVE_ORDER));
     return list;
   }
 

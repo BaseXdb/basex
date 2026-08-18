@@ -60,7 +60,8 @@ declare function panels:databases(
           return {
             'name': panels:select($db, { 'name': $db }, $db = $name),
             'size': (),
-            'date': replace(sort($backup)[last()], $utils:BACKUP-REGEX, '$2T$3:$4:$5Z')
+            (: the backups are listed with the most recent one first :)
+            'date': replace(head($backup), $utils:BACKUP-REGEX, '$2T$3:$4:$5Z')
           }
         )
         let $buttons := (
@@ -395,7 +396,6 @@ declare %private function panels:backup-section(
         )
         let $entries :=
           for $backup in db:backups($name)
-          order by $backup descending
           return {
             (: the name is the download: a column that repeats it as a link adds nothing :)
             'backup': fn() {
