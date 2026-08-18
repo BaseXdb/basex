@@ -144,14 +144,8 @@ function loadCodeMirror(language, edit, resize) {
       const reserve = chromeBelowMain();
       const height = elem => stacked() ? EDITOR_MIN_HEIGHT : Math.max(EDITOR_MIN_HEIGHT,
         window.innerHeight - elem.getBoundingClientRect().top - reserve);
-      if(useCM) {
-        for(const elem of document.querySelectorAll(".cm-editor")) {
-          elem.style.height = `${height(elem)}px`;
-        }
-      } else {
-        for(const elem of document.querySelectorAll("textarea")) {
-          elem.style.height = `${height(elem)}px`;
-        }
+      for(const elem of document.querySelectorAll(useCM ? ".cm-editor" : "textarea")) {
+        elem.style.height = `${height(elem)}px`;
       }
     };
     window.addEventListener("load", refresh);
@@ -160,7 +154,22 @@ function loadCodeMirror(language, edit, resize) {
     // no auto-resize (e.g. the users pages): without a height, the editor
     // collapses to a single line. The textarea fallback is sized by style.css
     for(const elem of document.querySelectorAll(".cm-editor")) {
-      elem.style.height = EDITOR_FIXED_HEIGHT;
+      // an editor is as tall as the text area it replaced asked to be
+      const rows = elem.previousElementSibling?.getAttribute("rows");
+      if(rows) {
+        // a row is a rendered line of the content, measured where it is laid out; an editor
+        // that is still hidden has none, and falls back to the declared line height
+        const line = elem.querySelector(".cm-line")?.getBoundingClientRect().height ||
+          parseFloat(getComputedStyle(elem.querySelector(".cm-scroller")).lineHeight);
+        // the box covers border and padding as well, so both are added to the lines
+        const content = getComputedStyle(elem.querySelector(".cm-content")), box =
+          getComputedStyle(elem);
+        elem.style.height = `${rows * line +
+          parseFloat(content.paddingTop) + parseFloat(content.paddingBottom) +
+          parseFloat(box.borderTopWidth) + parseFloat(box.borderBottomWidth)}px`;
+      } else {
+        elem.style.height = EDITOR_FIXED_HEIGHT;
+      }
     }
   }
 }

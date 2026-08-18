@@ -45,6 +45,18 @@ public final class SettingsTest extends DBATest {
   }
 
   /**
+   * The options, the environment variables and the system properties are listed with stable
+   * column widths: a long value is truncated instead of widening the panel.
+   * @throws IOException I/O exception
+   */
+  @Test public void fixedTables() throws IOException {
+    final String page = get("settings");
+    assertTrue(page.contains("<table class=\"fixed\"><colgroup><col style=\"width: 40%\">"),
+        "properties are not listed in tables of fixed width");
+    assertFalse(page.contains("<table><colgroup>"), "table without stable column widths");
+  }
+
+  /**
    * Saves the settings, overriding individual defaults.
    * @param overrides option values to override
    * @return response body

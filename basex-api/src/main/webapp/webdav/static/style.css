@@ -42,11 +42,33 @@
 body {
   font-family: Calibri, Helvetica, sans-serif;
   font-size: 16px;
-  overflow-y: scroll;
   /* no top margin: the sticky header supplies its own top spacing (via padding) */
   margin: 0 var(--gap) var(--gap) var(--gap);
   background-color: var(--bg);
   color: var(--fg);
+  /* the page is at least as tall as the viewport, so that the footer stays at the
+     bottom of short pages and is pushed down by longer content */
+  min-height: calc(100vh - var(--gap));
+  display: flex;
+  flex-direction: column;
+}
+
+/* the content takes the height that the header and the footer leave */
+main {
+  flex: 1;
+}
+/* the rule and the footer are flex items here: they must not be shrunk away, and
+   'float' would be ignored, so the footer is aligned by its text */
+body > hr, body > footer {
+  flex: none;
+}
+/* the default 'margin: .5em auto' of a rule centres it at zero width in a flex column, which
+   makes the line above the footer disappear: only the vertical margins are wanted here */
+body > hr {
+  margin-inline: 0;
+}
+body > footer {
+  text-align: right;
 }
 
 p {
@@ -174,8 +196,6 @@ input:focus, select:focus, button:focus {
   grid-template-columns: var(--columns);
   /* a gutter on either side of the divider that sits in the middle */
   column-gap: calc(var(--gap) * 2);
-  /* keeps a focus ring at the panel top clear of the sticky header */
-  padding-top: 2px;
 }
 .content > .panel {
   /* anchors the divider */
@@ -294,10 +314,6 @@ header {
    header links in the DBA); the link colour (--accent) comes from the `a` rule */
 .room.active {
   font-weight: bold;
-}
-
-p.compose {
-  margin: var(--space) 0;
 }
 
 /* wide enough for the longest hint (the private-message placeholder),

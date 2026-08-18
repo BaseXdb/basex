@@ -12,6 +12,20 @@ import module namespace html = 'dba/lib/html' at 'html.xqm';
 declare variable $table:NUMBER := ('decimal', 'number', 'bytes');
 
 (:~
+ : Creates a table with stable column widths: long values are truncated and expanded via click.
+ : @param  $rows  table rows
+ : @return table
+ :)
+declare function table:pairs(
+  $rows  as element(tr)*
+) as element(table) {
+  <table class='fixed'>{
+    <colgroup><col style='width: 40%'/><col/></colgroup>,
+    $rows
+  }</table>
+};
+
+(:~
  : Creates a property list.
  : @param  $props  properties
  : @return table
@@ -19,7 +33,7 @@ declare variable $table:NUMBER := ('decimal', 'number', 'bytes');
 declare function table:properties(
   $props  as element()
 ) as element(table) {
-  <table>{
+  table:pairs(
     for $header in $props/*
     return (
       <tr>
@@ -36,7 +50,7 @@ declare function table:properties(
         }</td>
       </tr>
     )
-  }</table>
+  )
 };
 
 (:~
@@ -50,8 +64,8 @@ declare function table:properties(
  :     * 'bytes': sorted as numbers, output in a human-readable format
  :     * dateTime', 'time': sorted and output as dates
  :     * 'dynamic': function generating dynamic input; sorted as strings
- :     * 'id': suppressed (only used for creating checkboxes)
  :     * otherwise, sorted and output as strings
+ :   * The 'sort' attribute overrides the type the column is sorted by
  :   * The 'order' attribute defines how sorted values will be ordered:
  :     * 'desc': descending order
  :     * otherwise, ascending order
@@ -64,6 +78,8 @@ declare function table:properties(
  : * Query parameters will be included in table links.
  : * The options argument can have the following keys:
  :   * 'sort': key of the ordered column; if empty, sorting will be disabled
+ :   * 'select': key of the entry value that the checkboxes submit; by default, the value that
+ :     the first column shows
  :   * 'presort': key of pre-sorted column; if identical to sort, entries will not be resorted
  :   * 'page': currently displayed page
  :   * 'count': maximum number of results
@@ -73,6 +89,7 @@ declare function table:properties(
  :   * 'sticky': content placed above the buttons. Everything above the table is then pinned to
  :     the top of the scrolling panel, so that the actions stay reachable while the rows pass
  :     underneath. The key may be present with no content, which pins the buttons alone
+ :   * 'below': content placed below the buttons, above the result summary
  :
  : @param  $headers  table headers
  : @param  $entries  table entries
@@ -98,7 +115,9 @@ declare function table:create(
       let $header := $headers[?key = $key]
       let $value := (
         let $desc := $header?order = 'desc'
-        return switch($header?type) {
+        (: a cell that a function produces is ordered by the text it produces :)
+        let $atomize := fn($v) { if ($v instance of fn(*)) then string-join($v()) else $v }
+        let $convert := switch($header?sort otherwise $header?type) {
           case 'decimal' case 'number' case 'bytes' return
             if ($desc) {
               fn { 0 - number() }
@@ -111,17 +130,19 @@ declare function table:create(
             } else {
               identity(?)
             }
-          case 'dynamic' return
-            fn { if (. instance of fn(*)) then string-join(.()) else . }
           default return
             identity(?)
         }
+        return fn($v) { $convert($atomize($v)) }
       )
       for $entry in $entries
       order by $value($entry($key)) empty greatest collation '?lang=en'
       return $entry
     }
   )
+
+  (: a checkbox submits what identifies its row: a value of its own, or what the row shows :)
+  let $select := $options?select
 
   (: show results; 'all' lists every entry, whatever the configured maximum :)
   let $max-option := if ($options?all) {
@@ -142,6 +163,7 @@ declare function table:create(
     if ($buttons) {
       <div class='buttons'>{ $buttons }</div>
     },
+    $options?below,
     (: result summary :)
     if (not($options?compact)) { element h3 {
       $entries,
@@ -201,10 +223,8 @@ declare function table:create(
             <input type='checkbox' onclick='toggle(this)'/>, ' '
           },
 
-          if ($header?type = 'id') {
-            (: id columns: empty header column :)
-          } else if (empty($sort) or $name = $sort) {
-            (: sorted column, xml column: only display label :)
+          if (empty($sort) or $name = $sort or not($label)) {
+            (: sorted column, xml column, and a column with no label to click: only the label :)
             $label
           } else {
             (: generate sort link :)
@@ -229,9 +249,9 @@ declare function table:create(
           } else if ($type = 'decimal') {
             format-number(if (exists($v)) then number($v) else 0, '0.00')
           } else if ($type = 'dateTime') {
-            html:date(xs:dateTime($v))
+            $v ! html:date(xs:dateTime(.))
           } else if ($type = 'time') {
-            html:time(xs:dateTime($v))
+            $v ! html:time(xs:dateTime(.))
           } else if ($v instance of fn(*)) {
             $v()
           } else {
@@ -243,11 +263,12 @@ declare function table:create(
         return element td {
           attribute class { 'num' }[$type = $table:NUMBER],
           if ($pos = 1 and $buttons) {
-            <input type='checkbox' name='{ $name }' value='{ data($value) }'
+            <input type='checkbox' name='{ $select otherwise $name }'
+              value='{ if ($select) then $entry($select) else data($value) }'
               onclick='buttons(this)'/>,
             ' '
           },
-          if (not($type = 'id')) { $value }
+          $value
         }
       }
     }

@@ -130,7 +130,7 @@ declare %private function html:listing(
         </div>
       </main>
       <hr/>
-      <footer class='right'><sup>BaseX Team, BSD License</sup></footer>
+      <footer><sup>BaseX Team, BSD License</sup></footer>
     </body>
   </html>
 };

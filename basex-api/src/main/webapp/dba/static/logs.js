@@ -38,7 +38,7 @@ function logEntries(key) {
     if(value) message.filters[filter.name.replace(/^f-/, "")] = value;
   }
   // the server stops a search that is superseded by a newer one
-  message.run = _pending = ++_run;
+  message.run = startRequest();
   sendMessage("/logs", message);
 
   // refresh browser history, so that a reload shows what the page shows

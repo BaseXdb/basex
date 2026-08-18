@@ -188,8 +188,6 @@ function applyTab() {
   }
   if(draft) t.edited = true;
   showTab();
-  // the buffer is not empty although nothing was opened: say where its content comes from
-  if(draft) setText("Unsaved draft was restored.", "warning");
 }
 
 /**
@@ -252,7 +250,7 @@ async function closeTab(index) {
   if(active) applyTab();
   else renderTabs();
   storeTabs();
-  setText("File was closed.", "info");
+  setText("", "");
 }
 
 /**
@@ -339,7 +337,7 @@ async function runQuery() {
   setDisabled("stop", true);
   setText("", "");
 
-  const run = _pending = ++_run;
+  const run = startRequest();
   if(!await sendMessage("", {
     type: "run",
     run: run,
@@ -360,8 +358,7 @@ async function stopQuery() {
   if(_editor) _editor.focus();
 
   // drop the number of the run: the result of the stopped query will be ignored
-  _pending = 0;
-  setDisabled("stop", true);
+  endRequest();
   await sendMessage("", { type: "stop" });
   setJob();
 }
@@ -458,15 +455,14 @@ async function loadTab(t) {
     t.saved = editorValue();
     t.edited = false;
     showTab();
-    setText("File was opened.", "info");
+    setText("", "");
     // apply a newer unsaved draft on top of the saved file (undo reverts to disk)
     const draft = localStorage.getItem(draftKey(t));
     if(draft !== null && draft !== t.saved) {
       setEditorValue(draft);
-      // the document differs from the file: mark it, and say so, as it is easily missed
+      // the document differs from the file: mark it
       t.edited = true;
       showTab();
-      setText("Unsaved draft was restored.", "warning");
     }
     storeTabs();
   } catch(response) {

@@ -114,7 +114,7 @@ declare function html:wrap(
         }</div>
       </main>
       <hr/>
-      <footer class='right'><sup>BaseX Team, BSD License</sup></footer>
+      <footer><sup>BaseX Team, BSD License</sup></footer>
       {
         (: the dialogs that replace the browser's confirm and prompt: every page has them,
            and 'method=dialog' hands the clicked button's value back as the answer :)

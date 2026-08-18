@@ -52,16 +52,9 @@ function dba:settings(
       }</input>,
       'stacked')
   }
-  let $fixed-table := fn($rows) {
-    <table class='fixed'>{
-      (: 'fixed': long values are truncated and expanded via click :)
-      <colgroup><col style='width: 40%'/><col/></colgroup>,
-      $rows
-    }</table>
-  }
   let $map-table := fn($map) {
-    $fixed-table(
-      for $key in sort(map:keys($map))
+    table:pairs(
+      for $key in sort(map:keys($map), '?lang=en')
       return <tr>
         <td><b>{ $key }</b></td>
         <td>{ $map($key) }</td>
@@ -91,14 +84,14 @@ function dba:settings(
       <div class='pane'>
         <form method='post' autocomplete='off'>
           <h2>Global Options » { form:button('settings/gc', 'GC') }</h2>
-          { $fixed-table($local/preceding-sibling::tr[not(th)]) }
+          { table:pairs($local/preceding-sibling::tr[not(th)]) }
         </form>
       </div>
     </div>,
     <div class='panel'>
       <div class='pane'>
         <h2>Local Options</h2>
-        { $fixed-table($local/following-sibling::tr) }
+        { table:pairs($local/following-sibling::tr) }
       </div>
     </div>,
     <div class='panel collapsed'>

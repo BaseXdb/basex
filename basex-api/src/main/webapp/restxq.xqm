@@ -85,7 +85,7 @@ function page:start(
           RESTXQ lets you define your own – this page is one.</p>
       </main>
       <hr/>
-      <footer class='right'><sup>BaseX Team, BSD License</sup></footer>
+      <footer><sup>BaseX Team, BSD License</sup></footer>
     </body>
   </html>
 };

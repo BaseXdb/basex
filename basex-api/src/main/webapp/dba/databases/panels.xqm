@@ -33,11 +33,11 @@ declare function panels:databases(
     <form method='post' autocomplete='off' data-sort='{ $sort }' data-page='{ $page }'>
       {
         let $headers := (
-          (: the date is the longest value of a known length, and the count and the size have
-             room to spare; the name keeps its share, as it is the one that identifies a row :)
-          { 'key': 'name', 'label': 'Name', 'type': 'dynamic', 'width': '40%' },
+          (: the date is the longest value of a known length, and the count needs room for its
+             header and sort arrow; the name gives up what it does not need :)
+          { 'key': 'name', 'label': 'Name', 'type': 'dynamic', 'width': '35%' },
           { 'key': 'resources', 'label': 'Count', 'type': 'number', 'order': 'desc',
-            'width': '13%' },
+            'width': '18%' },
           { 'key': 'size', 'label': 'Size', 'type': 'bytes', 'order': 'desc', 'width': '16%' },
           { 'key': 'date', 'label': 'Date', 'type': 'dateTime', 'order': 'desc',
             'width': '31%' }
@@ -117,11 +117,11 @@ declare function panels:database(
       <input type='hidden' name='name' value='{ $name }'/>
       {
         let $headers := (
-          { 'key': 'resource', 'label': 'Name', 'type': 'dynamic', 'width': '45%' },
-          { 'key': 'type', 'label': 'Type', 'width': '13%' },
+          { 'key': 'resource', 'label': 'Name', 'type': 'dynamic', 'width': '47%' },
+          { 'key': 'type', 'label': 'Type', 'width': '10%' },
           { 'key': 'size', 'label': 'Size', 'type': 'number', 'order': 'desc', 'width': '14%' },
           { 'key': 'date', 'label': 'Date', 'type': 'dateTime', 'order': 'desc',
-            'width': '28%' }
+            'width': '29%' }
         )
         let $entries :=
           for $res in utils:slice(db:list-details($name), $page, $sort)
@@ -269,7 +269,7 @@ declare function panels:resource(
       }</div>
     </form>,
     (: the line is reserved: the client writes to it as well :)
-    <div id='note' class='note{ ' strong'[$document?truncated] }'>{ $document?note }</div>,
+    <div id='note' class='note{ ' warn'[$document?note] }'>{ $document?note }</div>,
     if ($document?xml) {
       <input type='text' class='query' name='input' id='input'
              placeholder='Enter your query…' onkeyup='queryResource(false)'/>

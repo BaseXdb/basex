@@ -73,19 +73,8 @@ function showDatabase() {
   mark("databases-panel", _db);
   refreshDatabase();
   refreshResource();
-  requestPanel("backups-panel", { type: "backups", name: _db });
-  requestPanel("information-panel", { type: "information", name: _db });
-}
-
-/**
- * Points out the selected entry of a panel.
- * @param {string} id id of the panel
- * @param {string} value selected value
- */
-function mark(id, value) {
-  for(const link of document.querySelectorAll(`#${id} a[data-select]`)) {
-    link.classList.toggle("selected", link.dataset.select === value);
-  }
+  requestPanel(DB_WS, "backups-panel", { type: "backups", name: _db });
+  requestPanel(DB_WS, "information-panel", { type: "information", name: _db });
 }
 
 /**
@@ -94,7 +83,7 @@ function mark(id, value) {
  * @param {number} page page; if omitted, the first one
  */
 function refreshDatabases(sort, page) {
-  requestPanel("databases-panel", { type: "databases", name: _db }, sort, page);
+  requestPanel(DB_WS, "databases-panel", { type: "databases", name: _db }, sort, page);
 }
 
 /**
@@ -103,7 +92,7 @@ function refreshDatabases(sort, page) {
  * @param {number} page page; if omitted, the first one
  */
 function refreshDatabase(sort, page) {
-  requestPanel("database-panel", { type: "database", name: _db, resource: _resource },
+  requestPanel(DB_WS, "database-panel", { type: "database", name: _db, resource: _resource },
     sort, page);
 }
 
@@ -113,62 +102,6 @@ function refreshDatabase(sort, page) {
  */
 function refreshResource() {
   sendMessage(DB_WS, { type: "resource", name: _db, resource: _resource });
-}
-
-/**
- * Asks the server for a panel. A folded panel is requested as well: opening it must show what
- * is there now, not what was there when it was folded away. The order it shows is kept unless
- * another one is requested; a new order starts at the first page.
- * @param {string} id id of the panel
- * @param {object} message message identifying the panel
- * @param {string} sort sort key; if omitted, the shown order is kept
- * @param {number} page page; if omitted, the first one
- */
-function requestPanel(id, message, sort, page) {
-  const shown = document.querySelector(`#${id} [data-sort]`);
-  sendMessage(DB_WS, Object.assign(message, {
-    sort: sort ?? shown?.dataset.sort ?? "",
-    page: page ?? 1
-  }));
-}
-
-/**
- * Follows the sort and page links of a list panel in place: they name what the panel shows,
- * so the panel is asked for it again instead of the page being reloaded.
- */
-document.addEventListener("click", event => {
-  const link = event.target.closest("a[href]");
-  // a link that selects an entry brings its own handler
-  if(!link || link.dataset.select) return;
-  const panel = link.closest("#databases-panel, #database-panel");
-  if(!panel) return;
-  const params = new URL(link.href, window.location.href).searchParams;
-  if(!params.has("sort") && !params.has("page")) return;
-  event.preventDefault();
-  const sort = params.get("sort") ?? "", page = Number(params.get("page")) || 1;
-  if(panel.id === "databases-panel") refreshDatabases(sort, page);
-  else refreshDatabase(sort, page);
-});
-
-/**
- * Shows a panel that was pushed by the server.
- * @param {string} id id of the panel
- * @param {string} html panel contents
- */
-function fillPanel(id, html) {
-  const pane = document.getElementById(id);
-  pane.innerHTML = html;
-  // a panel with nothing to show is not shown at all, and gives up its grid track
-  const panel = pane.closest(".panel"), empty = !html;
-  if(panel.classList.contains("hidden") !== empty) {
-    panel.classList.toggle("hidden", empty);
-    applyColumns();
-    // lets the editor and the truncated cells adjust to the new widths
-    window.dispatchEvent(new Event("resize"));
-  }
-  // the panel arrives after the shared setup ran, so its buttons are checked here
-  buttons();
-  markTruncated(pane);
 }
 
 /**
@@ -253,7 +186,7 @@ function queryResource(enforce, keep) {
     showNote("Read-only: query result. Clear the query to edit the document again.");
   }
 
-  const run = _pending = ++_run;
+  const run = startRequest();
   sendMessage(DB_WS, {
     type: "query",
     run: run,
@@ -270,8 +203,7 @@ function queryResource(enforce, keep) {
  */
 async function stopQuery() {
   // drop the number of the run: the result of the stopped query will be ignored
-  _pending = 0;
-  setDisabled("stop", true);
+  endRequest();
   await sendMessage(DB_WS, { type: "stop" });
 }
 
@@ -297,18 +229,17 @@ function showDocument(text) {
   _editor.setValue(text);
   editResource(_editable);
   showNote(_editable && indentOn() ?
-    "Whitespace may be stripped when the document is saved." : undefined, true);
+    "Whitespace may be stripped when the document is saved." : undefined);
 }
 
 /**
  * Shows a note below the resource toolbar.
  * @param {string} message message; if omitted, the server-rendered reason is restored
- * @param {boolean} warn emphasize the message
  */
-function showNote(message, warn) {
+function showNote(message) {
   const note = document.getElementById("note");
   if(note) [ note.textContent, note.className ] =
-    message ? [ message, warn ? "note strong" : "note" ] : _note;
+    message ? [ message, "note warn" ] : _note;
 }
 
 /**
@@ -413,6 +344,9 @@ function chooseBackups() {
 /** Ctrl-Enter and the 'Indent' preference re-render what the editor shows. */
 _editor_run = () => queryResource(true);
 _indent_changed = () => queryResource(true);
+
+/** The sort and page links of the list panels are followed in place. */
+followPanelLinks({ "databases-panel": refreshDatabases, "database-panel": refreshDatabase });
 
 /** The endpoint of the view serves the three panels and the queries on a resource. */
 _handlers[DB_WS] = json => {

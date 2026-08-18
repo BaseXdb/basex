@@ -36,6 +36,9 @@ let _run = 0;
 /** Number of the query whose outcome is awaited (0: none). */
 let _pending = 0;
 
+/** Whether the status line reports that a request is still running. */
+let _waiting = false;
+
 /** Handle of the timer that repeats what the 'Live' checkbox controls. */
 let _live;
 
@@ -321,8 +324,7 @@ function socket(path) {
       ws.onclose = () => {
         delete _sockets[path];
         if(_pending) {
-          _pending = 0;
-          setDisabled("stop", true);
+          endRequest();
           setText("Connection to the server was lost.", "error");
         }
       };
@@ -341,7 +343,7 @@ async function sendMessage(path, message) {
   // the server closes the connection without a response if a message exceeds its size limit
   const string = JSON.stringify(message);
   if(string.length > MAX_MESSAGE_LENGTH) {
-    _pending = 0;
+    endRequest();
     showError(`Input is too long (maximum: ${MAX_MESSAGE_LENGTH} characters).`);
     return false;
   }
@@ -349,7 +351,7 @@ async function sendMessage(path, message) {
     (await socket(path)).send(string);
     return true;
   } catch(ex) {
-    _pending = 0;
+    endRequest();
     showError(ex.message);
     return false;
   }
@@ -364,14 +366,24 @@ async function sendMessage(path, message) {
  */
 function showMessage(path, data) {
   const json = JSON.parse(data);
-  if(json.run !== undefined) {
-    // drop the outcome of a request that was stopped or superseded by a newer one
-    if(json.run !== _pending) return;
-    _pending = 0;
-    setDisabled("stop", true);
+  // drop the outcome of a request that was stopped or superseded by a newer one
+  if(json.run !== undefined && json.run !== _pending) return;
+  // the outcome ends the request; so does an error, which is raised before it becomes a job.
+  // The wait message is revoked before a handler writes its own, as an outcome that reports
+  // nothing (a rendered document) would leave the page waiting forever
+  if(json.run !== undefined || json.type === "error") {
+    if(endRequest()) setText("", "");
   }
   if(json.type === "error") showError(json.message, undefined, json);
   _handlers[path]?.(json);
+}
+
+/**
+ * Registers a request whose outcome is awaited.
+ * @returns {number} number of the run
+ */
+function startRequest() {
+  return _pending = ++_run;
 }
 
 /**
@@ -382,9 +394,91 @@ function awaitResult(run) {
   setTimeout(() => {
     if(_pending === run) {
       setText("Please wait…", "warning");
+      _waiting = true;
       setDisabled("stop", false);
     }
   }, RESULT_DELAY);
+}
+
+/**
+ * Gives up the request whose outcome was awaited.
+ * @returns {boolean} whether the status line still reports that it is running
+ */
+function endRequest() {
+  _pending = 0;
+  setDisabled("stop", true);
+  const waiting = _waiting;
+  _waiting = false;
+  return waiting;
+}
+
+/**
+ * Asks the server for a panel. A folded panel is requested as well: opening it must show what
+ * is there now, not what was there when it was folded away. The order it shows is kept unless
+ * another one is requested; a new order starts at the first page.
+ * @param {string} path path of the endpoint that serves the panel
+ * @param {string} id id of the panel
+ * @param {object} message message identifying the panel
+ * @param {string} sort sort key; if omitted, the shown order is kept
+ * @param {number} page page; if omitted, the first one
+ */
+function requestPanel(path, id, message, sort, page) {
+  const shown = document.querySelector(`#${id} [data-sort]`);
+  sendMessage(path, Object.assign(message, {
+    sort: sort ?? shown?.dataset.sort ?? "",
+    page: page ?? 1
+  }));
+}
+
+/**
+ * Shows a panel that was pushed by the server.
+ * @param {string} id id of the panel
+ * @param {string} html panel contents
+ */
+function fillPanel(id, html) {
+  const pane = document.getElementById(id);
+  pane.innerHTML = html;
+  // a panel with nothing to show is not shown at all, and gives up its grid track
+  const panel = pane.closest(".panel"), empty = !html;
+  if(panel.classList.contains("hidden") !== empty) {
+    panel.classList.toggle("hidden", empty);
+    applyColumns();
+    // lets the editor and the truncated cells adjust to the new widths
+    window.dispatchEvent(new Event("resize"));
+  }
+  // the panel arrives after the shared setup ran, so its buttons are checked here
+  buttons();
+  markTruncated(pane);
+}
+
+/**
+ * Points out the selected entry of a panel.
+ * @param {string} id id of the panel
+ * @param {string} value selected value
+ */
+function mark(id, value) {
+  for(const link of document.querySelectorAll(`#${id} a[data-select]`)) {
+    link.classList.toggle("selected", link.dataset.select === value);
+  }
+}
+
+/**
+ * Follows the sort and page links of the list panels in place: they name what a panel shows,
+ * so the panel is asked for it again instead of the page being reloaded.
+ * @param {object} panels function that requests the panel again, per panel id
+ */
+function followPanelLinks(panels) {
+  document.addEventListener("click", event => {
+    const link = event.target.closest("a[href]");
+    // a link that selects an entry brings its own handler
+    if(!link || link.dataset.select) return;
+    const panel = link.closest(Object.keys(panels).map(id => `#${id}`).join(", "));
+    if(!panel) return;
+    const params = new URL(link.href, window.location.href).searchParams;
+    if(!params.has("sort") && !params.has("page")) return;
+    event.preventDefault();
+    panels[panel.id](params.get("sort") ?? "", Number(params.get("page")) || 1);
+  });
 }
 
 /**
@@ -462,6 +556,14 @@ function liveChanged() {
   clearTimeout(_live);
   if(live.checked) _live_actions[live.dataset.live]?.();
 }
+
+/**
+ * Keeps a dialog open when Escape is pressed in one of its editors: there, Escape is how the
+ * focus leaves the editor (Escape, then Tab), not how the dialog is dismissed.
+ */
+document.addEventListener("cancel", (event) => {
+  if(document.activeElement?.closest(".cm-editor")) event.preventDefault();
+}, true);
 
 /**
  * Opens a modal dialog: a form that needs more room than a question can be asked in.
@@ -578,7 +680,7 @@ function shortcuts(event) {
   // ignore key presses while typing or combined with modifier keys
   const target = event.target;
   if(event.ctrlKey || event.metaKey || event.altKey ||
-     target.matches("input, textarea, select") || target.closest(".CodeMirror")) return;
+     target.matches("input, textarea, select") || target.closest(".cm-editor")) return;
   if(event.key === "/") {
     // prefer the main search field (right panel) over column and log-file filters
     for(const selector of [ "#input", "input.filter", "#log-filter" ]) {

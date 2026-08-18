@@ -145,6 +145,20 @@ public final class DatabasesTest extends DBATest {
   }
 
   /**
+   * The properties of a database are listed with stable column widths: a long value is
+   * truncated instead of widening the panel.
+   * @throws IOException I/O exception
+   */
+  @Test public void informationPanel() throws IOException {
+    create();
+    final String page = get("databases?name=" + DB);
+    final int index = page.indexOf("id=\"information-panel\"");
+    assertTrue(index != -1, "information panel missing");
+    assertTrue(page.substring(index).contains("<h2>Information</h2><table class=\"fixed\">"),
+        "properties are not listed in a table of fixed width");
+  }
+
+  /**
    * Creates the test database with the default options.
    * @return response body
    * @throws IOException I/O exception
