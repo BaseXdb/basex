@@ -156,5 +156,7 @@ public final class Lang {
         sb.setLength(0);
       }
     }
+    // restore the texts of the current language
+    read(Prop.language);
   }
 }
