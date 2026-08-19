@@ -8,6 +8,7 @@ import org.basex.query.util.regex.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.seq.*;
 
 /**
  * Function implementation.
@@ -32,9 +33,10 @@ public final class FnMatchingSegments extends RegExFn {
       for(int g = 1; g <= gc; g++) {
         final int s = matcher.start(g);
         if(s >= 0) {
-          final XQShapeMap group = new XQShapeMap(Records.MATCHING_GROUP.get(),
-              Str.get(matcher.group(g)), Itr.get(s + 1));
           final String name = g <= names.length ? names[g - 1] : null;
+          final Value nm = name != null ? Str.get(name) : Empty.VALUE;
+          final XQShapeMap group = new XQShapeMap(Records.CAPTURED_GROUP.get(),
+              Str.get(matcher.group(g)), Itr.get(s + 1), Itr.get(g), nm);
           groups.put(name != null ? Str.get(name) : Itr.get(g), group);
         }
       }

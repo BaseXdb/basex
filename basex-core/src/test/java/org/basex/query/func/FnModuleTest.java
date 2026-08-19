@@ -2649,20 +2649,23 @@ return
     query("count(" + ex2 + ')', 1);
     query(ex2 + "?substring", "08-12-03");
     query(ex2 + "?position", 1);
-    query(ex2 + "?groups?1?group", "08");
+    query(ex2 + "?groups?1?value", "08");
     query(ex2 + "?groups?1?position", 1);
-    query(ex2 + "?groups?2?group", 12);
+    query(ex2 + "?groups?2?value", 12);
     query(ex2 + "?groups?2?position", 4);
-    query(ex2 + "?groups?3?group", "03");
+    query(ex2 + "?groups?3?value", "03");
     query(ex2 + "?groups?3?position", 7);
+    query(ex2 + "?groups?2?nr", 2);
+    query(ex2 + "?groups?2?name", "");
+    query(ex2 + "?groups?3?name => exists()", false);
 
     // example 3: multiple matches with groups
     final String ex3 = func.args("A1,C15,,D24, X50,", "([A-Z])([0-9]+)");
     query("count(" + ex3 + ')', 4);
     query(ex3 + "[2]?substring", "C15");
     query(ex3 + "[2]?position", 4);
-    query(ex3 + "[2]?groups?1?group", "C");
-    query(ex3 + "[2]?groups?2?group", 15);
+    query(ex3 + "[2]?groups?1?value", "C");
+    query(ex3 + "[2]?groups?2?value", 15);
     query(ex3 + "[2]?groups?2?position", 5);
     query(ex3 + "[4]?substring", "X50");
     query(ex3 + "[4]?position", 14);
@@ -2670,8 +2673,8 @@ return
     // example 4: lookahead with captured group outside the matching segment
     final String ex4 = func.args("Chapter 5", "(Chapter|Appendix)(?=\\s+([0-9]+))");
     query(ex4 + "?substring", "Chapter");
-    query(ex4 + "?groups?1?group", "Chapter");
-    query(ex4 + "?groups?2?group", 5);
+    query(ex4 + "?groups?1?value", "Chapter");
+    query(ex4 + "?groups?2?value", 5);
     query(ex4 + "?groups?2?position", 9);
 
     // example 5: zero-length matches via lookahead
@@ -2679,11 +2682,11 @@ return
     query("count(" + ex5 + ')', 3);
     query(ex5 + "[1]?substring", "");
     query(ex5 + "[1]?position", 1);
-    query(ex5 + "[1]?groups?1?group", "There");
+    query(ex5 + "[1]?groups?1?value", "There");
     query(ex5 + "[2]?position", 7);
-    query(ex5 + "[2]?groups?1?group", "we");
+    query(ex5 + "[2]?groups?1?value", "we");
     query(ex5 + "[3]?position", 10);
-    query(ex5 + "[3]?groups?1?group", "go");
+    query(ex5 + "[3]?groups?1?value", "go");
 
     // named capturing groups: keyed by name instead of group number
     final String ex6 = func.args("2026-06-25",
@@ -2691,26 +2694,31 @@ return
     query(ex6 + "?substring", "2026-06-25");
     query(ex6 + "?groups => map:size()", 3);
     query(ex6 + "?groups => map:contains(1)", false);
-    query(ex6 + "?groups?year?group", 2026);
+    query(ex6 + "?groups?year?value", 2026);
     query(ex6 + "?groups?year?position", 1);
-    query(ex6 + "?groups?month?group", "06");
-    query(ex6 + "?groups?day?group", 25);
+    query(ex6 + "?groups?month?value", "06");
+    query(ex6 + "?groups?day?value", 25);
     query(ex6 + "?groups?day?position", 9);
+    query(ex6 + "?groups?month?nr", 2);
+    query(ex6 + "?groups?month?name", "month");
+    query(ex6 + "?groups?*[?nr = 2]?value", "06");
 
     // named group mixed with numbered group
     final String ex7 = func.args("A1", "(?<letter>[A-Z])([0-9]+)");
-    query(ex7 + "?groups?letter?group", "A");
-    query(ex7 + "?groups?2?group", 1);
+    query(ex7 + "?groups?letter?value", "A");
+    query(ex7 + "?groups?2?value", 1);
     query(ex7 + "?groups => map:size()", 2);
     query(ex7 + "?groups => map:contains('letter')", true);
     query(ex7 + "?groups => map:contains(1)", false);
     query(ex7 + "?groups => map:contains(2)", true);
+    query(ex7 + "?groups?letter?nr", 1);
+    query(ex7 + "?groups?2?name => exists()", false);
 
     // named group that does not participate in the match: no entry
     query(func.args("a", "(?<x>a)|(?<y>b)") + "?groups => map:contains('y')", false);
 
     // named group in a lookahead
-    query(func.args("Chapter 5", "Chapter(?=\\s+(?<num>[0-9]+))") + "?groups?num?group", 5);
+    query(func.args("Chapter 5", "Chapter(?=\\s+(?<num>[0-9]+))") + "?groups?num?value", 5);
 
     // errors
     error(func.args("a", "+"), REGINVALID_X);
@@ -3626,8 +3634,8 @@ return
     query("count(" + ms + ')', 4);
     query(ms + "[2]?substring", "C15");
     query(ms + "[2]?position", 4);
-    query(ms + "[2]?groups?1?group", "C");
-    query(ms + "[2]?groups?2?group", 15);
+    query(ms + "[2]?groups?1?value", "C");
+    query(ms + "[2]?groups?2?value", 15);
     query(ms + "[2]?groups?2?position", 5);
 
     error(func.args("+"), REGINVALID_X);

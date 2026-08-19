@@ -809,6 +809,8 @@ public enum Function implements AFunction {
   /** XQuery function. */
   ATTRIBUTE_CONVERSION_PLAN_RECORD(Records.ATTRIBUTE_CONVERSION_PLAN.get()),
   /** XQuery function. */
+  CAPTURED_GROUP_RECORD(Records.CAPTURED_GROUP.get()),
+  /** XQuery function. */
   COMPILED_REGEX_RECORD(Records.COMPILED_REGEX.get()),
   /** XQuery function. */
   DATETIME_RECORD(Records.DATETIME.get()),
@@ -822,8 +824,6 @@ public enum Function implements AFunction {
   LOAD_XQUERY_MODULE_RECORD(Records.LOAD_XQUERY_MODULE.get()),
   /** XQuery function. */
   LOCATION_RECORD(Records.LOCATION.get()),
-  /** XQuery function. */
-  MATCHING_GROUP_RECORD(Records.MATCHING_GROUP.get()),
   /** XQuery function. */
   MATCHING_SEGMENT_RECORD(Records.MATCHING_SEGMENT.get()),
   /** XQuery function. */
