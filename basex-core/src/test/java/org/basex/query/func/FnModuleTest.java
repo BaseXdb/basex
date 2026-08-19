@@ -1782,7 +1782,7 @@ public final class FnModuleTest extends SandboxTest {
 
     check("for $f in ('fn:true', 'fn:position') !" + func.args(" xs:QName(.)", 0) +
         " return (8, 9)[$f()]",
-        "8\n9\n9", exists(func), exists(HoistedFilter.class));
+        "8\n9\n9", exists(func), exists(CachedFilter.class));
     check("for $f in #fn:position return (8, 9)[" + func.args(" $f", 0) + "()]",
         "8\n9", empty(func), exists(CachedFilter.class));
 

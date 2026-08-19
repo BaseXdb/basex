@@ -110,9 +110,8 @@ public final class FnReplicate extends StandardFunc {
     final Expr input = arg(0), count = arg(1);
 
     // single evaluation suffices for deterministic input: drop a redundant repeated-evaluation
-    // flag (it may have been added conservatively for a call through a not-yet-resolved variable)
-    if(defined(2) && arg(2) == Bln.TRUE && !input.has(Flag.NDT, Flag.CNS) &&
-        !input.mayInvokeVariable()) {
+    // flag (it may have been added conservatively for a call of a not-yet-known function)
+    if(defined(2) && arg(2) == Bln.TRUE && !input.has(Flag.NDT, Flag.CNS)) {
       return cc.function(REPLICATE, info, input, count);
     }
 

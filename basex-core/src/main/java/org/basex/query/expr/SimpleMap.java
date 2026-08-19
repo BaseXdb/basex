@@ -323,10 +323,8 @@ public abstract class SimpleMap extends Mapping {
     }
 
     exprType.assign(exprs[ls - 1], new long[] { min, max });
-    // do not drop a map with an empty result that may still have side effects (nondeterministic,
-    // higher-order, or a function invoked through a variable)
-    return size() == 0 && !has(Flag.NDT, Flag.HOF) && !mayInvokeVariable()
-        ? cc.emptySeq(this) : null;
+    // do not drop a map with an empty result that may still have side effects
+    return size() == 0 && !has(Flag.NDT, Flag.HOF) ? cc.emptySeq(this) : null;
   }
 
   /**

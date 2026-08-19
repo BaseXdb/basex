@@ -137,6 +137,21 @@ public final class DynFuncCall extends FuncCall {
   }
 
   /**
+   * Checks if the properties of the invoked function cannot be determined statically.
+   * @param func function expression
+   * @return result of check
+   */
+  private static boolean unknown(final Expr func) {
+    // lookups in maps and arrays have no side effects
+    final Type type = func.seqType().type;
+    if(type instanceof MapType || type instanceof ArrayType) return false;
+    // coercion adopts the properties of the coerced function
+    if(func instanceof final TypeCheck check) return unknown(check.arg(0));
+    // values and inline functions expose the properties of the invoked function
+    return !(func instanceof Value || func instanceof XQFunctionExpr);
+  }
+
+  /**
    * Checks if an expression contains a nondeterministic function item or closure.
    * @param expr expression
    * @return result of check
@@ -273,7 +288,8 @@ public final class DynFuncCall extends FuncCall {
 
   @Override
   public boolean has(final Flag... flags) {
-    return Flag.UPD.oneOf(flags) && updating || Flag.NDT.oneOf(flags) && (ndt || updating) ||
+    return Flag.UPD.oneOf(flags) && updating ||
+        Flag.NDT.oneOf(flags) && (ndt || updating || unknown(body())) ||
         super.has(Flag.remove(flags, Flag.UPD));
   }
 

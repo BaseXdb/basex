@@ -175,7 +175,6 @@ public final class InlineTest extends SandboxTest {
         "ok",
         exists(DynFuncCall.class),
         empty(StaticFunc.class),
-        empty(Closure.class),
-        root(Pipeline.class));
+        root(DynFuncCall.class));
   }
 }

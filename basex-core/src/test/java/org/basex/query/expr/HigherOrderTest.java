@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.*;
 import org.basex.io.*;
+import org.basex.query.func.fn.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -160,26 +161,26 @@ public final class HigherOrderTest extends SandboxTest {
     );
   }
 
-  /** Tests the %nondeterministic annotation. */
+  /** Tests the nondeterministic keyword. */
   @Test public void gh1212() {
-    // FLWOR will be optimized away (empty result)
-    query("for $f in (void#1(?), error#0) let $ignore := $f() return ()", "");
-    // FLWOR expression will be evaluated (due to nondeterministic keyword)
+    // unused bindings are evaluated if the invoked function is unknown or nondeterministic
     query("try {"
-        + "  let $f := error#0 let $err := nondeterministic $f() return ()"
-        + "} catch * { 'ERR' }", "ERR");
-    query("try {"
-        + "  for $f in (void#1(?), error#0)"
-        + "  let $err := nondeterministic $f() return ()"
+        + "  for $f in (void#1(?), error#0) let $ignore := $f() return ()"
         + "} catch * { 'ERR' }", "ERR");
     query("try {"
         + "  let $f := error#0 let $err := $f() return ()"
-        + "} catch * { 'ERR' }", "");
+        + "} catch * { 'ERR' }", "ERR");
     query("try {"
         + "  let $f := function() { fn:error(()) }"
         + "  let $e := $f()"
         + "  return ()"
-        + "} catch * { 'ERR' }", "");
+        + "} catch * { 'ERR' }", "ERR");
+    // the keyword enforces the evaluation of a function that is assumed to be deterministic
+    check("let $f := %basex:inline(0) function() { 1 } let $x := $f() return 'done'",
+        "done", empty(FnVoid.class));
+    check("let $f := %basex:inline(0) function() { 1 }"
+        + " let $x := nondeterministic $f() return 'done'",
+        "done", exists(FnVoid.class));
   }
 
   /** Ensures that updating flag is not assigned before function body is known. */

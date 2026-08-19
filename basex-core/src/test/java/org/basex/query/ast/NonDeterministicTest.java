@@ -192,8 +192,7 @@ public final class NonDeterministicTest extends SandboxTest {
    * Checks that a nondeterministic function item bound to a variable keeps its side effects when a
    * simple map over a constant range is rewritten to a single-evaluation replicate.
    * <p>
-   * Requires the {@link Expr#mayInvokeVariable} check in {@link CompileContext#replicate} and
-   * {@link SimpleMap#dropOps}.
+   * Requires the unknown-function check in {@link DynFuncCall#has}.
    */
   @Test public void simpleMapVariable() {
     query("let $f := function() { " + fileAppend() + " } return (1 to 2) ! $f()", "", "xx");
@@ -203,8 +202,7 @@ public final class NonDeterministicTest extends SandboxTest {
    * Checks that a sequence of nondeterministic function items bound to a variable keeps its side
    * effects when a simple map over a constant range is rewritten to a single-evaluation replicate.
    * <p>
-   * Requires the {@link Expr#mayInvokeVariable} check in {@link CompileContext#replicate} and
-   * {@link SimpleMap#dropOps}.
+   * Requires the unknown-function check in {@link DynFuncCall#has}.
    */
   @Test public void simpleMapSequence() {
     query("let $f := (function() { " + fileAppend() + " }, function() { " + fileAppend() + " }) " +
