@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.build.json.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
@@ -19,7 +20,13 @@ public final class JsonSerialize extends StandardFunc {
   @Override
   protected Str item(final QueryContext qc) throws QueryException {
     final Iter input = arg(0).iter(qc);
-    final JsonSerialOptions options = toOptions(arg(1), new JsonSerialOptions(), qc);
+    final JsonSerialOptions options = options(1, JsonSerialOptions::new, qc);
     return Str.get(serialize(input, FnXmlToJson.options(options), INVALIDOPTION_X, qc));
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    optOptions(1, JsonSerialOptions::new, cc);
+    return this;
   }
 }

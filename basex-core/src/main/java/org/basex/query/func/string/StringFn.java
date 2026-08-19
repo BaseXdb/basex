@@ -5,7 +5,6 @@ import static org.basex.util.ft.FTFlag.*;
 import static org.basex.util.similarity.Levenshtein.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -31,13 +30,13 @@ abstract class StringFn extends StandardFunc {
 
   /**
    * Returns full-text options for normalizing the input.
-   * @param expr expression that yields the string options
+   * @param arg argument index of the string options
    * @param qc query context
    * @return options, or {@code null} if the input is to be compared literally
    * @throws QueryException query exception
    */
-  final FTOpt ftOpt(final Expr expr, final QueryContext qc) throws QueryException {
-    return ftOpt(toOptions(expr, new StringOptions(), qc));
+  final FTOpt ftOpt(final int arg, final QueryContext qc) throws QueryException {
+    return ftOpt(options(arg, StringOptions::new, qc));
   }
 
   /**

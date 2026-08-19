@@ -114,6 +114,8 @@ public class Options implements Iterable<Option<?>> {
   private final StringList user = new StringList();
   /** Options file. */
   private IOFile file;
+  /** Indicates that the options must not be modified anymore. */
+  private boolean sealed;
 
   /**
    * Default constructor.
@@ -230,7 +232,37 @@ public class Options implements Iterable<Option<?>> {
    * @param value value to be assigned
    */
   public final synchronized void put(final Option<?> option, final Object value) {
+    checkSealed(option.name());
     values[option.index() - meta.offset] = option.normalize(value);
+  }
+
+  /**
+   * Assigns a free option.
+   * @param name name of option
+   * @param value value to be assigned
+   */
+  private synchronized void putFree(final String name, final String value) {
+    checkSealed(name);
+    free.put(name, value);
+  }
+
+  /**
+   * Rejects all subsequent modifications of these options.
+   * @param <E> options type
+   * @return self reference
+   */
+  @SuppressWarnings("unchecked")
+  public final synchronized <E extends Options> E seal() {
+    sealed = true;
+    return (E) this;
+  }
+
+  /**
+   * Ensures that the options have not been sealed.
+   * @param name name of option to be modified
+   */
+  private void checkSealed(final String name) {
+    if(sealed) throw Util.notExpected("Sealed options, cannot assign '%'.", name);
   }
 
   /**
@@ -424,7 +456,7 @@ public class Options implements Iterable<Option<?>> {
    */
   public synchronized void assign(final String name, final String value) throws BaseXException {
     if(meta.definitions.isEmpty()) {
-      free.put(name, value);
+      putFree(name, value);
     } else {
       assign(name, value, -1, true);
     }
@@ -444,7 +476,7 @@ public class Options implements Iterable<Option<?>> {
 
     final String nm = name(name, info);
     if(meta.definitions.isEmpty()) {
-      free.put(nm, serialize(value, info));
+      putFree(nm, serialize(value, info));
     } else {
       assign(nm, value, qc, info);
     }
@@ -649,7 +681,7 @@ public class Options implements Iterable<Option<?>> {
   public final synchronized void assign(final MediaType type) throws BaseXException {
     for(final Entry<String, String> entry : type.parameters()) {
       if(meta.definitions.isEmpty()) {
-        free.put(entry.getKey(), entry.getValue());
+        putFree(entry.getKey(), entry.getValue());
       } else {
         assign(entry.getKey(), entry.getValue(), -1, false);
       }

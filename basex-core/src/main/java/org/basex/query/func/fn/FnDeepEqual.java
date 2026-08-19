@@ -18,6 +18,9 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class FnDeepEqual extends StandardFunc {
+  /** Options, parsed at compile time (can be {@code null}). */
+  private DeepEqualOptions options;
+
   @Override
   protected Bln item(final QueryContext qc) throws QueryException {
     return Bln.get(ebv(qc));
@@ -26,25 +29,35 @@ public final class FnDeepEqual extends StandardFunc {
   @Override
   protected boolean test(final QueryContext qc, final long pos) throws QueryException {
     final Iter input1 = arg(0).iter(qc), input2 = arg(1).iter(qc);
-    final Item options = arg(2).item(qc, info);
+    final DeepEqualOptions opts = options != null ? options : options(qc);
 
-    final DeepEqualOptions deo = new DeepEqualOptions();
-    if(options instanceof XQMap) {
-      toOptions(options, deo, qc);
-    } else {
-      deo.set(DeepEqualOptions.COLLATION, toStringOrNull(options, qc));
-    }
-
-    final String collation = deo.get(DeepEqualOptions.COLLATION);
+    final String collation = opts.get(DeepEqualOptions.COLLATION);
     final Collation coll = collation != null ? toCollation(Token.token(collation), qc) : null;
 
-    final DeepEqual de = new DeepEqual(info, coll, qc, deo);
-    final Value ie = deo.get(DeepEqualOptions.ITEMS_EQUAL);
+    final DeepEqual de = new DeepEqual(info, coll, qc, opts);
+    final Value ie = opts.get(DeepEqualOptions.ITEMS_EQUAL);
     if(!ie.isEmpty()) de.itemsEqual = toFunction(ie, 2, qc);
 
     final boolean eq = de.equal(input1, input2);
     if(!eq) de.debug();
     return eq;
+  }
+
+  /**
+   * Returns the comparison options.
+   * @param qc query context
+   * @return options
+   * @throws QueryException query exception
+   */
+  private DeepEqualOptions options(final QueryContext qc) throws QueryException {
+    final Item item = arg(2).item(qc, info);
+    final DeepEqualOptions opts = new DeepEqualOptions();
+    if(item instanceof XQMap) {
+      toOptions(item, opts, qc);
+    } else {
+      opts.set(DeepEqualOptions.COLLATION, toStringOrNull(item, qc));
+    }
+    return opts;
   }
 
   @Override
@@ -59,9 +72,8 @@ public final class FnDeepEqual extends StandardFunc {
    */
   private boolean debug() {
     if(!defined(2)) return false;
-    final Expr options = arg(2);
     // dynamic options: the option may be enabled
-    if(!(options instanceof final Item item)) return true;
+    if(!(arg(2) instanceof final Item item)) return true;
     // string (collation) or empty sequence: no diagnostics
     if(!(item instanceof final XQMap map)) return false;
     return map.value(Str.get(DeepEqualOptions.DEBUG.name())) == Bln.TRUE;
@@ -79,6 +91,8 @@ public final class FnDeepEqual extends StandardFunc {
       if(size1 != -1 && size2 != -1 && size1 != size2)
         return cc.voidAndReturn(input1, cc.voidAndReturn(input2, Bln.FALSE, info), info);
     }
+    // parse constant options
+    if(arg(2) instanceof Value) options = options(cc.qc).seal();
     return this;
   }
 

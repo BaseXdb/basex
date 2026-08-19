@@ -4,6 +4,7 @@ import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.index.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -19,7 +20,7 @@ public final class FtTokens extends FtAccessFn {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
-    final FtFuzzyOptions options = toOptions(arg(2), new FtFuzzyOptions(), qc);
+    final FtFuzzyOptions options = options(2, FtFuzzyOptions::new, qc);
 
     byte[] token = toZeroToken(arg(1), qc);
     if(token.length != 0) {
@@ -38,6 +39,12 @@ public final class FtTokens extends FtAccessFn {
       entries = new IndexEntries(token, IndexType.FULLTEXT);
     }
     return IndexFn.entries(data, entries, this);
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    optOptions(2, FtFuzzyOptions::new, cc);
+    return this;
   }
 
   @Override

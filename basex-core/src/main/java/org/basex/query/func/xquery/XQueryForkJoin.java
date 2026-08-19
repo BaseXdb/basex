@@ -23,7 +23,7 @@ public final class XQueryForkJoin extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value functions = arg(0).unwrappedValue(qc);
-    final TaskOptions options = toOptions(arg(1), new TaskOptions(), qc);
+    final TaskOptions options = options(1, TaskOptions::new, qc);
 
     final long size = functions.size();
     if(size == 0) return Empty.VALUE;
@@ -48,8 +48,9 @@ public final class XQueryForkJoin extends StandardFunc {
       return new DynFuncCall(info, coerceFunc(0, cc)).optimize(cc);
     }
 
+    optOptions(1, TaskOptions::new, cc);
     final Boolean results = options == Empty.UNDEFINED ? Boolean.TRUE :
-      options instanceof Value ? toOptions(options, new TaskOptions(), cc.qc).get(RESULTS) : null;
+      options instanceof Value ? options(1, TaskOptions::new, cc.qc).get(RESULTS) : null;
     if(results == Boolean.TRUE) {
       final FuncType ft = functions.funcType();
       if(ft != null) {

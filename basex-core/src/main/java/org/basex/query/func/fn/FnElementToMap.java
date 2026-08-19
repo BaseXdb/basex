@@ -1,6 +1,7 @@
 package org.basex.query.func.fn;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
@@ -17,7 +18,7 @@ public final class FnElementToMap extends PlanFn {
   @Override
   protected Item item(final QueryContext qc) throws QueryException {
     final Item node = (Item) Types.DOCUMENT_OR_ELEMENT_ZO.coerce(arg(0).value(qc), qc, info);
-    final ElementsOptions options = toOptions(arg(1), new ElementsOptions(), qc);
+    final ElementsOptions options = options(1, ElementsOptions::new, qc);
     if(node.isEmpty()) return Empty.VALUE;
 
     // a document node is represented by its single element child (may be preceded by comments, PIs)
@@ -36,5 +37,11 @@ public final class FnElementToMap extends PlanFn {
     // create result
     final Item value = entry(elem, plan).apply(elem, null, plan, qc);
     return value.isEmpty() ? value : XQMap.get(Str.get(nodeName(elem, null, plan, qc)), value);
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    optOptions(1, ElementsOptions::new, cc);
+    return this;
   }
 }

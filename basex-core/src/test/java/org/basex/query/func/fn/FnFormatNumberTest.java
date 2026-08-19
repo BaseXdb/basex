@@ -87,4 +87,14 @@ public final class FnFormatNumberTest extends SandboxTest {
     query("format-number(0.123456789, '##%')", "12%");
     query("format-number(123456789, '################')", "123456789");
   }
+
+  /** fn:format-number, options argument. */
+  @Test public void formatNumberOptions() {
+    query("format-number(1.5, '0@0', { 'decimal-separator': '@' })", "1@5");
+    query("format-number(1.5, '0.0', {})", "1.5");
+
+    // options must not be assigned to the cached decimal formatter
+    query("string-join((format-number(1.5, '0@0', { 'decimal-separator': '@' }), "
+        + "format-number(1.5, '0.0')), '|')", "1@5|1.5");
+  }
 }

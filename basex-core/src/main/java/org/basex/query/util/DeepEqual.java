@@ -20,7 +20,7 @@ import org.basex.util.*;
  */
 public final class DeepEqual {
   /** Default options. */
-  private static final DeepEqualOptions DEFAULTS = new DeepEqualOptions();
+  private static final DeepEqualOptions DEFAULTS = new DeepEqualOptions().seal();
 
   /** Input info (can be {@code null}). */
   public final InputInfo info;

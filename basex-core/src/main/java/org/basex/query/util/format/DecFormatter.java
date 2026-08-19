@@ -85,7 +85,7 @@ public final class DecFormatter extends FormatUtil {
    * @throws QueryException query exception
    */
   public DecFormatter(final DecFormatOptions options, final InputInfo info) throws QueryException {
-    this.options = options;
+    this.options = options.seal();
 
     // assign map values
     int z = '0';

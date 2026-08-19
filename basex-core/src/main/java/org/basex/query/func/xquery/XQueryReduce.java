@@ -20,7 +20,7 @@ public final class XQueryReduce extends StandardFunc {
     final Value init = arg(1).value(qc);
     final FItem action = toFunction(arg(2), 2, qc);
     final FItem combine = toFunction(arg(3), 2, qc);
-    final TaskOptions options = toOptions(arg(4), new TaskOptions(), qc);
+    final TaskOptions options = options(4, TaskOptions::new, qc);
 
     if(input.size() == 0) return init;
 
@@ -29,9 +29,10 @@ public final class XQueryReduce extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
+  protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0), init = arg(1);
     if(input.seqType().zero()) return init;
+    optOptions(4, TaskOptions::new, cc);
     // result type: union of the seed type and the declared action/combine types
     SeqType st = init.seqType();
     final FuncType at = arg(2).funcType(), ct = arg(3).funcType();

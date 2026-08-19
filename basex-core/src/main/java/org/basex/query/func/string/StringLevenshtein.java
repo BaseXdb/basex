@@ -3,6 +3,7 @@ package org.basex.query.func.string;
 import static org.basex.util.similarity.Levenshtein.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.util.ft.*;
 
@@ -16,11 +17,17 @@ public final class StringLevenshtein extends StringFn {
   @Override
   protected Dbl item(final QueryContext qc) throws QueryException {
     final byte[] value1 = toToken(arg(0), qc), value2 = toToken(arg(1), qc);
-    final FTOpt opt = ftOpt(arg(2), qc);
+    final FTOpt opt = ftOpt(2, qc);
 
     final int[] cps1 = cps(value1, opt), cps2 = cps(value2, opt);
     checkLength(cps1.length);
     checkLength(cps2.length);
     return Dbl.get(distance(cps1, cps2));
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    optOptions(2, StringOptions::new, cc);
+    return this;
   }
 }

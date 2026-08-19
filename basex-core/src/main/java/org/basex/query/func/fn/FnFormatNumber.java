@@ -52,7 +52,7 @@ public final class FnFormatNumber extends StandardFunc {
     // enrich formatter, based on options
     if(dfo != null) {
       try {
-        df = new DecFormatter(toOptions(options, df.options(), qc), info);
+        df = new DecFormatter(toOptions(options, new DecFormatOptions(df.options()), qc), info);
       } catch(final QueryException ex) {
         throw FORMATINV_X.get(info, ex.getLocalizedMessage()).cause(ex);
       }

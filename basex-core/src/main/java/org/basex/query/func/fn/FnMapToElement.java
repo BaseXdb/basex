@@ -9,6 +9,7 @@ import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.expr.constr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
@@ -41,7 +42,7 @@ public final class FnMapToElement extends PlanFn {
   @Override
   protected Item item(final QueryContext qc) throws QueryException {
     final Value value = arg(0).value(qc);
-    final ElementsOptions options = toOptions(arg(1), new ElementsOptions(), qc);
+    final ElementsOptions options = options(1, ElementsOptions::new, qc);
     if(value.isEmpty()) return Empty.VALUE;
 
     final Plan plan = buildPlan(options, qc);
@@ -52,6 +53,12 @@ public final class FnMapToElement extends PlanFn {
     if(map.structSize() != 1) throw MAP_TO_ELEMENT_X.get(info, "Single-entry map expected.");
     final Item key = map.keys().itemAt(0);
     return element(key.string(info), map.get(key), null, plan, qc);
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    optOptions(1, ElementsOptions::new, cc);
+    return this;
   }
 
   /**

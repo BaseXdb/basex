@@ -117,7 +117,7 @@ public final class FnInvisibleXml extends StandardFunc {
    */
   private static final class ParseInvisibleXml extends Arr {
     /** Shared {@link MainOptions} instance to avoid expensive per-parse initialization. */
-    private static final MainOptions OPTIONS = new MainOptions();
+    private static final MainOptions OPTIONS = new MainOptions().seal();
     /** Generated invisible XML parser. */
     private final de.bottlecaps.markup.blitz.Parser parser;
 

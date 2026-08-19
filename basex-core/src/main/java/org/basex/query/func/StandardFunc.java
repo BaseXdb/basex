@@ -10,6 +10,7 @@ import java.nio.file.*;
 import java.time.*;
 import java.util.*;
 import java.util.Map.*;
+import java.util.function.*;
 
 import org.basex.core.*;
 import org.basex.core.jobs.*;
@@ -47,6 +48,10 @@ import org.basex.util.options.*;
 public abstract class StandardFunc extends Arr {
   /** Function definition. */
   public FuncDefinition definition;
+  /** Options, parsed at compile time (can be {@code null}). */
+  private Options staticOptions;
+  /** Argument index of the options parsed at compile time. */
+  private int staticArg = -1;
 
   /**
    * Constructor.
@@ -788,11 +793,13 @@ public abstract class StandardFunc extends Arr {
    */
   protected final HashMap<String, String> toOptions(final Expr expr, final QueryContext qc)
       throws QueryException {
-    return toOptions(expr, new Options(), qc).free();
+    final Options opts = new Options();
+    opts.assign(toEmptyMap(expr, qc), qc, info);
+    return opts.free();
   }
 
   /**
-   * Evaluates an expression and returns options.
+   * Evaluates an expression and assigns the result to the supplied options.
    * @param <E> options type
    * @param expr expression (can be empty)
    * @param options options template
@@ -804,6 +811,39 @@ public abstract class StandardFunc extends Arr {
       final QueryContext qc) throws QueryException {
     options.assign(toEmptyMap(expr, qc), qc, info);
     return options;
+  }
+
+  /**
+   * Returns the options of an argument. An instance that was parsed at compile time by
+   * {@link #optOptions(int, Supplier, CompileContext)} will be reused.
+   * @param <E> options type
+   * @param arg argument index
+   * @param options supplier for the options template
+   * @param qc query context
+   * @return options
+   * @throws QueryException query exception
+   */
+  @SuppressWarnings("unchecked")
+  protected final <E extends Options> E options(final int arg, final Supplier<E> options,
+      final QueryContext qc) throws QueryException {
+    return staticArg == arg ? (E) staticOptions : toOptions(arg(arg), options.get(), qc);
+  }
+
+  /**
+   * Parses constant options at compile time. The resulting instance is shared by all
+   * evaluations of this expression and must not be modified.
+   * @param <E> options type
+   * @param arg argument index
+   * @param options supplier for the options template
+   * @param cc compilation context
+   * @throws QueryException query exception
+   */
+  protected final <E extends Options> void optOptions(final int arg, final Supplier<E> options,
+      final CompileContext cc) throws QueryException {
+    if(arg(arg) instanceof final Value value) {
+      staticOptions = toOptions(value, options.get(), cc.qc).seal();
+      staticArg = arg;
+    }
   }
 
   /**

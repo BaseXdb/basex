@@ -3,6 +3,7 @@ package org.basex.query.func.ft;
 import static org.basex.util.ft.FTFlag.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -22,6 +23,12 @@ public class FtTokenize extends StandardFunc {
     return StrSeq.get(tokens(qc, false));
   }
 
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    optOptions(1, FtLexerOptions::new, cc);
+    return this;
+  }
+
   /**
    * Returns all tokens.
    * @param qc query context
@@ -31,7 +38,7 @@ public class FtTokenize extends StandardFunc {
    */
   protected final TokenList tokens(final QueryContext qc, final boolean all) throws QueryException {
     final Item value = arg(0).atomItem(qc, info);
-    final FtLexerOptions options = toOptions(arg(1), new FtLexerOptions(), qc);
+    final FtLexerOptions options = options(1, FtLexerOptions::new, qc);
 
     final TokenList tl = new TokenList();
     if(!value.isEmpty()) {

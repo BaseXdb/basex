@@ -32,9 +32,9 @@ import org.basex.util.list.*;
  */
 public final class QueryResources {
   /** Default options. */
-  public static final DocOptions DOC_OPTIONS = new DocOptions();
+  public static final DocOptions DOC_OPTIONS = new DocOptions().seal();
   /** Default options for creating new documents (trusted=false: fn-level default). */
-  private static final MainOptions MAIN_OPTIONS = new MainOptions(DOC_OPTIONS, null);
+  private static final MainOptions MAIN_OPTIONS = new MainOptions(DOC_OPTIONS, null).seal();
 
   /** Database context. */
   private final Context context;

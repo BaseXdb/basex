@@ -18,7 +18,7 @@ public final class FnBuildUri extends FnParseUri {
   @Override
   protected Str item(final QueryContext qc) throws QueryException {
     final XQMap parts = toMap(arg(0), qc);
-    final UriOptions options = toOptions(arg(1), new UriOptions(), qc);
+    final UriOptions options = options(1, UriOptions::new, qc);
 
     final TokenBuilder uri = new TokenBuilder();
     final String scheme = get(parts, SCHEME, qc);

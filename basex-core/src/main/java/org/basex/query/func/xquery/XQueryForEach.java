@@ -22,7 +22,7 @@ public final class XQueryForEach extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final Value input = arg(0).value(qc);
     final FItem action = toFunction(arg(1), 2, qc);
-    final TaskOptions options = toOptions(arg(2), new TaskOptions(), qc);
+    final TaskOptions options = options(2, TaskOptions::new, qc);
 
     final long size = input.size();
     if(size == 0) return Empty.VALUE;
@@ -42,6 +42,7 @@ public final class XQueryForEach extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0), action = arg(1);
     if(input.seqType().zero()) return input;
+    optOptions(2, TaskOptions::new, cc);
     // default options: results are collected in input order
     if(arg(2) == Empty.UNDEFINED) {
       final FuncType ft = action.funcType();

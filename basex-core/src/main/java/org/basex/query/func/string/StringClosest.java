@@ -8,6 +8,7 @@ import static org.basex.util.similarity.Levenshtein.*;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -46,7 +47,7 @@ public final class StringClosest extends StringFn {
   public Value value(final QueryContext qc) throws QueryException {
     final byte[] value = toToken(arg(0), qc);
     final Iter candidates = arg(1).atomIter(qc, info);
-    final ClosestOptions options = toOptions(arg(2), new ClosestOptions(), qc);
+    final ClosestOptions options = options(2, ClosestOptions::new, qc);
 
     final double threshold = ((ANum) options.get(ClosestOptions.THRESHOLD)).dbl();
     final int limit = options.get(ClosestOptions.LIMIT);
@@ -109,6 +110,12 @@ public final class StringClosest extends StringFn {
           put(SIMILARITY, Dbl.get(similarities.get(p))).map());
     }
     return vb.value(this);
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    optOptions(2, ClosestOptions::new, cc);
+    return this;
   }
 
   /**

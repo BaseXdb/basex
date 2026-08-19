@@ -1,6 +1,7 @@
 package org.basex.query.func.inspect;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -38,7 +39,7 @@ public final class InspectType extends StandardFunc {
   @Override
   protected Str item(final QueryContext qc) throws QueryException {
     final Value input = arg(0).value(qc);
-    final InspectOptions options = toOptions(arg(1), new InspectOptions(), qc);
+    final InspectOptions options = options(1, InspectOptions::new, qc);
     final Mode mode = options.get(InspectOptions.MODE);
     final boolean item = options.get(InspectOptions.ITEM);
 
@@ -54,5 +55,11 @@ public final class InspectType extends StandardFunc {
       }
     }
     return Str.get((item ? st.with(Occ.EXACTLY_ONE) : st).toString());
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    optOptions(1, InspectOptions::new, cc);
+    return this;
   }
 }

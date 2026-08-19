@@ -3,6 +3,7 @@ package org.basex.query.func.string;
 import static org.basex.util.similarity.Levenshtein.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -25,7 +26,7 @@ public final class StringLevenshteinDistance extends StringFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final byte[] value1 = toToken(arg(0), qc), value2 = toToken(arg(1), qc);
-    final LevenshteinOptions options = toOptions(arg(2), new LevenshteinOptions(), qc);
+    final LevenshteinOptions options = options(2, LevenshteinOptions::new, qc);
 
     final Integer mx = options.get(LevenshteinOptions.MAX);
     final FTOpt opt = ftOpt(options);
@@ -40,5 +41,11 @@ public final class StringLevenshteinDistance extends StringFn {
 
     final int dist = distance(cps1, cps2, mx != null ? mx : -1);
     return dist == -1 ? Empty.VALUE : Itr.get(dist);
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    optOptions(2, LevenshteinOptions::new, cc);
+    return this;
   }
 }

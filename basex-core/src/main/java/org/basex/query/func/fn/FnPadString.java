@@ -3,6 +3,7 @@ package org.basex.query.func.fn;
 import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -39,7 +40,7 @@ public final class FnPadString extends StandardFunc {
   protected Str item(final QueryContext qc) throws QueryException {
     final Item value = arg(0).atomItem(qc, info);
     final long length = toLong(arg(1), qc);
-    final PadOptions options = toOptions(arg(2), new PadOptions(), qc);
+    final PadOptions options = options(2, PadOptions::new, qc);
 
     final byte[] token = value.isEmpty() ? Token.EMPTY : value.string(info);
     final long missing = length - Token.length(token);
@@ -58,6 +59,12 @@ public final class FnPadString extends StandardFunc {
     tb.add(token);
     pad(tb, padding, miss - start);
     return Str.get(tb.finish());
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    optOptions(2, PadOptions::new, cc);
+    return this;
   }
 
   /**
