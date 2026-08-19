@@ -3913,6 +3913,39 @@ return
   }
 
   /** Test method. */
+  @Test public void scan() {
+    final Function func = SCAN;
+
+    query(func.args(" ()", 0, " op('+')"), "[0]");
+    query(func.args(" 1 to 5", 0, " op('+')"), "[0]\n[1]\n[3]\n[6]\n[10]\n[15]");
+    query(func.args(" 1 to 3", " ()", " fn($acc, $item) { $item, $acc }"),
+        "[()]\n[1]\n[(2,1)]\n[(3,2,1)]");
+    query(func.args(" ('a', 'b', 'c')", " ()", " fn($acc, $item, $pos) { $acc, $pos }"),
+        "[()]\n[1]\n[(1,2)]\n[(1,2,3)]");
+
+    // examples of the specification
+    query("tail(" + func.args(" (150, -60, -40, 300, -25)", 0, " op('+')") + ") ! ?*",
+        "150\n90\n50\n350\n325");
+    query("tail(" + func.args(" ('usr', 'local', 'bin')", "",
+        " fn($path, $step) { $path || '/' || $step }") + ") ! ?*",
+        "/usr\n/usr/local\n/usr/local/bin");
+    query("take-while(" + func.args(" (3, 4, 5, 2)", 0, " op('+')") +
+        ", fn($total) { $total?* le 7 })", "[0]\n[3]\n[7]");
+
+    // results are computed lazily
+    query("head(" + func.args(" 1 to 1000000000", 0, " op('+')") + ")", "[0]");
+    query("subsequence(" + func.args(" 1 to 1000000000", 0, " op('+')") + ", 3, 2)", "[3]\n[6]");
+
+    check(func.args(" ()", " (1, 2)", " op('+')"), "[(1,2)]", empty(func));
+    check(func.args(" (1 to 5)[. > 4]", 0, " op('+')"), "[0]\n[5]",
+        type(func, "array(xs:anyAtomicType?)+"));
+
+    error(func.args(" 1 to 5", 0, " fn($acc, $item, $pos, $x) { $acc }"), INVARITY_X_X);
+    error(func.args(" 1 to 5", "a", " fn($acc as xs:integer, $item) { $acc + $item }"),
+        INVTYPE_X);
+  }
+
+  /** Test method. */
   @Test public void schemaType() {
     final Function func = SCHEMA_TYPE;
 

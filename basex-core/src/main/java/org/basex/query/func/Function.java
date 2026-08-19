@@ -625,6 +625,10 @@ public enum Function implements AFunction {
   ROUND_HALF_TO_EVEN(FnRoundHalfToEven::new, "round-half-to-even(value, precision?)",
       params(NUMERIC_ZO, INTEGER_ZO), NUMERIC_ZO),
   /** XQuery function. */
+  SCAN(FnScan::new, "scan(input, init, action)",
+      params(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_O, INTEGER_O).seqType()),
+      ARRAY_ZM),
+  /** XQuery function. */
   SCHEMA_TYPE(FnSchemaType::new, "schema-type(name)",
       params(QNAME_O), Records.SCHEMA_TYPE.get().seqType(Occ.ZERO_OR_ONE)),
   /** XQuery function. */
@@ -1641,10 +1645,6 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _HOF_FOLD_LEFT1(HofFoldLeft1::new, "fold-left1(input, action)",
       params(ITEM_OM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_O, INTEGER_O).seqType()),
-      ITEM_ZM, HOF_URI),
-  /** XQuery function. */
-  _HOF_SCAN_LEFT(HofScanLeft::new, "scan-left(input, zero, action)",
-      params(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_O).seqType()),
       ITEM_ZM, HOF_URI),
   /** XQuery function. */
   _HOF_TOP_K_BY(HofTopKBy::new, "top-k-by(input, key, k)",
