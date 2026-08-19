@@ -58,6 +58,8 @@ public abstract class StandardSerializer extends OutputSerializer {
         throw SERNORM_X.getIO(norm).cause(ex);
       }
     }
+    if(itemsep != null) itemsep = normalize(itemsep, form);
+
     final String maps = sopts.get(USE_CHARACTER_MAPS);
     if(maps.isEmpty()) {
       cmap = null;
