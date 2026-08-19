@@ -19,6 +19,8 @@ public class XMLInput extends InputStream {
   private int ip;
   /** Current line. */
   private int line = 1;
+  /** Number of characters read in the current line. */
+  private int column;
   /** Entity expansion counter. */
   private int exp;
 
@@ -70,7 +72,14 @@ public class XMLInput extends InputStream {
     while(ch == -1 && ip != 0) ch = inputs[--ip].read();
     last[lp++] = ch;
     lp &= 0x0F;
-    if(ip == 0 && ch == '\n') ++line;
+    if(ip == 0) {
+      if(ch == '\n') {
+        ++line;
+        column = 0;
+      } else {
+        ++column;
+      }
+    }
     return ch;
   }
 
@@ -115,7 +124,19 @@ public class XMLInput extends InputStream {
    * @return line
    */
   public int line() {
-    return line;
+    int ln = line;
+    for(int p = pp; p < 0; p++) {
+      if(last[lp + p & 0x0F] == '\n') --ln;
+    }
+    return ln;
+  }
+
+  /**
+   * Returns the column of the next character to be read.
+   * @return column
+   */
+  public int column() {
+    return column + pp + 1;
   }
 
   /**

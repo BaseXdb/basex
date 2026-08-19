@@ -33,8 +33,9 @@ public final class DocOptions extends Options {
   public static final BooleanOption TRUSTED = new BooleanOption(CommonOptions.TRUSTED);
   /** Whether two calls with same URI and options return the same node. */
   public static final BooleanOption STABLE = new BooleanOption("stable", true);
-  /** Request to retain location information (ignored, see {@link FnLocation}). */
-  public static final BooleanOption RETAIN_LOCATION = new BooleanOption("retain-location", false);
+  /** Retain the source location of parsed nodes (see {@link FnLocation}). */
+  public static final BooleanOption RETAIN_LOCATION =
+      new BooleanOption(CommonOptions.RETAIN_LOCATION, false);
 
   /** Custom option (see {@link MainOptions#INTPARSE}). */
   public static final BooleanOption INTPARSE = new BooleanOption(CommonOptions.INTPARSE, false);

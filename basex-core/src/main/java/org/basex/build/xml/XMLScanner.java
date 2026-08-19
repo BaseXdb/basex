@@ -44,6 +44,10 @@ final class XMLScanner extends Job {
   final TokenBuilder token = new TokenBuilder();
   /** Current token type. */
   Type type;
+  /** Line number at which the current token starts. */
+  int tokenLine;
+  /** Column number at which the current token starts. */
+  int tokenColumn;
 
   /** Index for all entity names. */
   private final TokenObjectMap<byte[]> ents = new TokenObjectMap<>();
@@ -136,6 +140,8 @@ final class XMLScanner extends Job {
   boolean more() throws IOException {
     // gets next character from the input stream
     token.reset();
+    tokenLine = input.line();
+    tokenColumn = input.column();
     final int ch = consume();
     if(ch == 0) {
       type = Type.EOF;

@@ -75,10 +75,15 @@ public class XMLParser extends SingleParser {
         // (matching the default parser)
         final boolean ignorable = ws(text) && (strips.peek() || (elms.isEmpty() ? !fragment :
             scanner.elementContent(elms.peek())));
-        if(!ignorable) builder.text(text);
+        if(!ignorable) {
+          location();
+          builder.text(text);
+        }
       } else if(scanner.type == Type.COMMENT) {
+        location();
         builder.comment(scanner.token.toArray());
       } else if(scanner.type == Type.PI) {
+        location();
         builder.pi(scanner.token.toArray());
       } else if(scanner.type == Type.EOF) {
         break;
@@ -97,6 +102,13 @@ public class XMLParser extends SingleParser {
   @Override
   public void close() throws IOException {
     scanner.close();
+  }
+
+  /**
+   * Assigns the start of the current token to the builder.
+   */
+  private void location() {
+    builder.location(scanner.tokenLine, scanner.tokenColumn);
   }
 
   /**
@@ -124,6 +136,7 @@ public class XMLParser extends SingleParser {
       return consume(Type.R_BR);
     }
 
+    final int line = scanner.tokenLine, column = scanner.tokenColumn;
     consume(Type.L_BR);
     atts.reset();
     nsp.reset();
@@ -167,6 +180,7 @@ public class XMLParser extends SingleParser {
     scanner.attributes(raw, atts, stripNS);
 
     // send empty element to builder
+    builder.location(line, column);
     if(scanner.type == Type.CLOSE_R_BR) {
       builder.emptyElem(en, atts, nsp);
       if(elms.isEmpty()) closed = true;

@@ -2512,12 +2512,33 @@ return
   /** Test method. */
   @Test public void location() {
     final Function func = LOCATION;
-    // no location information is retained
+    // locations are only retained on request
     query(func.args(" ()"), "");
     query(func.args(" <a/>"), "");
     query(func.args(" doc('src/test/resources/test.xml')"), "");
-    query(func.args(" parse-xml('<a/>', { 'retain-location': true() })"), "");
+    query(func.args(" parse-xml('<a/>')"), "");
     query("parse-xml('<a/>')/a ! " + func.args(), "");
+
+    final String xml = "'<a>\n  <b/>\n</a>'";
+    final String opts = " { 'retain-location': true() }";
+    final String node = " parse-xml(" + xml + "," + opts + ")//b";
+    query(func.args(node) + " instance of fn:location-record", true);
+    query(func.args(node) + "?line-number", 2);
+    // a document node starts at the beginning of its resource
+    query(func.args(" parse-xml(" + xml + "," + opts + ")") + "?column-number", 1);
+    // the standard parser reports the end of the start tag, the internal parser its start
+    query(func.args(node) + "?column-number", 7);
+    query(func.args(" parse-xml(" + xml + ", { 'retain-location': true(), 'intparse': true() })"
+        + "//b") + "?column-number", 3);
+    query(func.args(" parse-xml-fragment(" + xml + "," + opts + ")//b") + "?column-number", 3);
+    // copied nodes carry no location
+    query(func.args(" <x>{ parse-xml(" + xml + "," + opts + ")//b }</x>/b"), "");
+    // multi-line text: line deltas exceed the single-byte range
+    final String lines = " parse-xml('<a><t>' || string-join((1 to 100) ! 'x', '&#10;') || "
+        + "'</t><b/><t>' || string-join((1 to 20000) ! 'x', '&#10;') || '</t><c/></a>',"
+        + opts + ")";
+    query(func.args(lines + "//b") + "?line-number", 100);
+    query(func.args(lines + "//c") + "?line-number", 20099);
   }
 
   /** Test method. */

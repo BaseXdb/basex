@@ -32,6 +32,8 @@ public interface CommonOptions {
   String DTD = "dtd";
   /** Option name: {@link MainOptions#CATALOG}. */
   String CATALOG = "catalog";
+  /** Option name: {@link MainOptions#RETAINLOCATION}. */
+  String RETAIN_LOCATION = "retain-location";
 
   // Resource retrieval: resolved by name in ParseFn, StandardFunc#trusted, MainOptions
 

@@ -35,6 +35,12 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
   private final Atts nsp = new Atts();
   /** URI of the document to be built (can be {@code null}). */
   private final byte[] docUri;
+  /** Document locator (can be {@code null}). */
+  private Locator locator;
+  /** Line number of the cached text. */
+  private int textLine;
+  /** Column number of the cached text. */
+  private int textColumn;
   /** DTD flag. */
   private boolean dtd;
   /** Element counter. */
@@ -87,6 +93,7 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
   public void startDocument() throws SAXException {
     if(docUri == null) return;
     try {
+      location();
       builder.openDoc(docUri);
     } catch(final IOException ex) {
       throw error(ex);
@@ -116,6 +123,7 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
         atts.add(token(attr.getQName(a)), token(attr.getValue(a)), stripNS);
       }
       final byte[] en = token(name);
+      location();
       builder.openElem(stripNS ? local(en) : en, atts, nsp);
 
       boolean strip = strips.peek();
@@ -151,6 +159,10 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
 
   @Override
   public void characters(final char[] chars, final int start, final int length) {
+    if(sb.isEmpty() && locator != null) {
+      textLine = locator.getLineNumber();
+      textColumn = locator.getColumnNumber();
+    }
     sb.append(chars, start, length);
   }
 
@@ -159,6 +171,7 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
     if(dtd) return;
     try {
       finishText();
+      location();
       builder.pi(token(name + ' ' + content));
     } catch(final IOException ex) {
       throw error(ex);
@@ -170,6 +183,7 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
     if(dtd) return;
     try {
       finishText();
+      location();
       builder.comment(token(new String(chars, start, length)));
     } catch(final IOException ex) {
       throw error(ex);
@@ -183,9 +197,19 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
   private void finishText() throws IOException {
     if(!sb.isEmpty()) {
       final byte[] text = token(sb.toString());
-      if(!(strips.peek() && ws(text))) builder.text(text);
+      if(!(strips.peek() && ws(text))) {
+        builder.location(textLine, textColumn);
+        builder.text(text);
+      }
       sb.setLength(0);
     }
+  }
+
+  /**
+   * Assigns the current source location to the builder.
+   */
+  private void location() {
+    if(locator != null) builder.location(locator.getLineNumber(), locator.getColumnNumber());
   }
 
   /**
@@ -210,7 +234,10 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
 
   // ContentHandler
 
-  /*public void setDocumentLocator(Locator locator) { } */
+  @Override
+  public void setDocumentLocator(final Locator loc) {
+    locator = loc;
+  }
 
   @Override
   public void startPrefixMapping(final String prefix, final String uri) {

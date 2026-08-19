@@ -98,6 +98,8 @@ public abstract class Data {
   public Namespaces nspaces;
   /** Path index, created on demand (can be {@code null}). */
   PathIndex paths;
+  /** Source locations of the parsed nodes (can be {@code null}). */
+  public Locations locations;
   /** Text index. */
   public ValueIndex textIndex;
   /** Attribute value index. */
@@ -519,6 +521,14 @@ public abstract class Data {
   // UPDATE OPERATIONS ============================================================================
 
   /**
+   * Registers a modification of the database.
+   */
+  private void modified() {
+    meta.update();
+    locations = null;
+  }
+
+  /**
    * Updates (renames) the name of an element, attribute or processing instruction.
    * @param pre PRE value of the node to be updated
    * @param kind node kind of the updated node
@@ -526,7 +536,7 @@ public abstract class Data {
    * @param uri namespace URI
    */
   public final void update(final int pre, final int kind, final byte[] name, final byte[] uri) {
-    meta.update();
+    modified();
 
     if(kind == PI) {
       updateText(pre, trim(concat(name, cpToken(' '), atom(pre))), PI);
@@ -584,7 +594,7 @@ public abstract class Data {
     final byte[] val = kind == PI ? trim(concat(name(pre, kind), cpToken(' '), value)) : value;
     if(eq(val, text(pre, kind != ATTR))) return;
 
-    meta.update();
+    modified();
     updateText(pre, val, kind);
     if(kind == DOC) resources.rename(pre, value);
   }
@@ -599,7 +609,7 @@ public abstract class Data {
     final int sCount = source.size();
     if(sCount == 0 || !bufferSize(sCount)) return false;
 
-    meta.update();
+    modified();
 
     // update index structures
     final int tKind = kind(pre), tSize = size(pre, tKind), tPar = parent(pre, tKind);
@@ -687,7 +697,7 @@ public abstract class Data {
    * @param pre PRE value of the node to be deleted
    */
   public final void delete(final int pre) {
-    meta.update();
+    modified();
 
     // delete references in document index
     int kind = kind(pre);
@@ -757,7 +767,7 @@ public abstract class Data {
     final int sCount = source.size();
     if(sCount == 0) return;
 
-    meta.update();
+    modified();
     resources.docs();
 
     // resize buffer to cache more entries

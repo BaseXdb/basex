@@ -2,6 +2,7 @@ package org.basex.build;
 
 import java.io.*;
 
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.util.*;
@@ -76,6 +77,7 @@ public final class MemBuilder extends Builder {
     } finally {
       if(data.meta.updindex) data.idmap.finish(data.meta.lastid);
     }
+    finishLocations();
     return data;
   }
 
@@ -85,6 +87,7 @@ public final class MemBuilder extends Builder {
    */
   public MemBuilder init() {
     data = new MemData(path, nspaces, parser.options);
+    if(parser.options.get(MainOptions.RETAINLOCATION)) locations = new Locations();
     meta = data.meta;
     meta.name = dbName;
     elemNames = data.elemNames;
@@ -101,7 +104,18 @@ public final class MemBuilder extends Builder {
   public MemData finish() {
     meta.lastid = meta.size - 1;
     if(meta.updindex) data.idmap.finish(meta.lastid);
+    finishLocations();
     return data;
+  }
+
+  /**
+   * Trims the collected locations and assigns them to the database.
+   */
+  private void finishLocations() {
+    if(locations != null) {
+      locations.finish();
+      data.locations = locations;
+    }
   }
 
   /**

@@ -29,6 +29,8 @@ public abstract class SingleParser extends Parser {
   @Override
   public final void parse(final Builder build) throws IOException {
     builder = build;
+    // a document node starts at the beginning of its resource
+    builder.location(1, 1);
     builder.openDoc(token(target + source.name()));
     parse();
     builder.closeDoc();

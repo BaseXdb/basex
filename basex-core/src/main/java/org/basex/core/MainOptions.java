@@ -76,6 +76,8 @@ public final class MainOptions extends Options {
   public static final BooleanOption XINCLUDE = new BooleanOption("XINCLUDE", false);
   /** Path to XML Catalog files. */
   public static final StringOption CATALOG = new StringOption("CATALOG", "");
+  /** Flag for retaining the source location of parsed nodes. */
+  public static final BooleanOption RETAINLOCATION = new BooleanOption("RETAINLOCATION", false);
 
   // Adding documents
 
@@ -206,6 +208,7 @@ public final class MainOptions extends Options {
     XMLPARSINGMAP.put(CommonOptions.USE_XSI_SCHEMA_LOCATION, XSILOCATION);
     XMLPARSINGMAP.put(CommonOptions.XINCLUDE, XINCLUDE);
     XMLPARSINGMAP.put(CommonOptions.CATALOG, CATALOG);
+    XMLPARSINGMAP.put(CommonOptions.RETAIN_LOCATION, RETAINLOCATION);
   }
 
   /** XML parsing options. */

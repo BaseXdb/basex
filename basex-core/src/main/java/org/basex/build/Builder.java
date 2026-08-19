@@ -58,6 +58,13 @@ public abstract class Builder extends Job {
   /** Optional path to binary resources. */
   private IOFile binariesDir;
 
+  /** Source locations of the parsed nodes (can be {@code null}). */
+  Locations locations;
+  /** Line number of the nodes to be added next. */
+  private int nodeLine;
+  /** Column number of the nodes to be added next. */
+  private int nodeColumn;
+
   /**
    * Constructor.
    * @param dbName name of database
@@ -66,6 +73,16 @@ public abstract class Builder extends Job {
   Builder(final String dbName, final Parser parser) {
     this.dbName = dbName;
     this.parser = parser;
+  }
+
+  /**
+   * Assigns the source location of the nodes that will be added next.
+   * @param line line number
+   * @param column column number
+   */
+  public final void location(final int line, final int column) {
+    nodeLine = line;
+    nodeColumn = column;
   }
 
   // PUBLIC METHODS ===============================================================================
@@ -112,6 +129,7 @@ public abstract class Builder extends Job {
   public final void openDoc(final byte[] value) throws IOException {
     path.index(0, Data.DOC, level);
     parStack.set(level++, meta.size);
+    addLocation();
     addDoc(value);
     nspaces.open();
   }
@@ -313,6 +331,7 @@ public abstract class Builder extends Job {
     int uriId = nspaces.uriIdForPrefix(prefix, true);
     if(uriId == 0 && prefix.length != 0 && !eq(prefix, XML))
       throw new BuildException(WHICHNS, parser.detailedInfo(), prefix(name));
+    addLocation();
     addElem(dis, nameId, Math.min(IO.MAXATTS, as + 1), uriId, !nsp.isEmpty());
 
     // get and store attribute references
@@ -324,6 +343,7 @@ public abstract class Builder extends Job {
         throw new BuildException(WHICHNS, parser.detailedInfo(), an);
 
       path.index(nameId, Data.ATTR, level + 1, av, meta);
+      addLocation();
       addAttr(nameId, av, Math.min(IO.MAXATTS, a + 1), uriId);
     }
 
@@ -359,6 +379,14 @@ public abstract class Builder extends Job {
     }
 
     path.index(0, kind, l, value, meta);
+    addLocation();
     addText(value, l == 0 ? 1 : meta.size - parStack.get(l - 1), kind);
+  }
+
+  /**
+   * Stores the source location of the node that is about to be added.
+   */
+  private void addLocation() {
+    if(locations != null) locations.add(nodeLine, nodeColumn);
   }
 }
