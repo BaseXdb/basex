@@ -2510,6 +2510,17 @@ return
   }
 
   /** Test method. */
+  @Test public void location() {
+    final Function func = LOCATION;
+    // no location information is retained
+    query(func.args(" ()"), "");
+    query(func.args(" <a/>"), "");
+    query(func.args(" doc('src/test/resources/test.xml')"), "");
+    query(func.args(" parse-xml('<a/>', { 'retain-location': true() })"), "");
+    query("parse-xml('<a/>')/a ! " + func.args(), "");
+  }
+
+  /** Test method. */
   @Test public void lowest() {
     final Function func = LOWEST;
     query(func.args(" ()"), "");
@@ -5071,6 +5082,9 @@ return
     final String details = func.args(
         " { 'schema': " + xsd + ", 'return-error-details': true() }");
     query("exists(" + details + invalid + "?error-details?message)", true);
+    query(details + invalid + "?error-details?location instance of fn:location-record+", true);
+    query(details + invalid + "?error-details[1]?location?line-number"
+        + " instance of xs:positiveInteger", true);
     // the result of an invalid document is discarded while it is still being built
     query("exists(" + details + "(document { <distance>8.5km</distance> })?error-details)", true);
 

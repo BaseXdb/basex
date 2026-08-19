@@ -66,6 +66,8 @@ public final class Types {
   public static final SeqType INTEGER_ZM = INTEGER.seqType(ZERO_OR_MORE);
   /** Positive integer. */
   public static final SeqType POSITIVE_INTEGER_O = POSITIVE_INTEGER.seqType();
+  /** Zero or one positive integer. */
+  public static final SeqType POSITIVE_INTEGER_ZO = POSITIVE_INTEGER.seqType(ZERO_OR_ONE);
   /** Zero or more positive integers. */
   public static final SeqType POSITIVE_INTEGER_ZM = POSITIVE_INTEGER.seqType(ZERO_OR_MORE);
   /** Zero or more bytes. */

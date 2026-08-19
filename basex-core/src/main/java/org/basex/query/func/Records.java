@@ -62,6 +62,12 @@ public enum Records {
     field("functions", MapType.get(BasicType.QNAME,
       MapType.get(BasicType.INTEGER, Types.FUNCTION_O).seqType()).seqType())),
   /** Record definition. */
+  LOCATION(FN_URI, "location",
+    field("system-id", Types.ANY_URI_ZO),
+    field("public-id", Types.STRING_ZO),
+    field("line-number", Types.POSITIVE_INTEGER_ZO),
+    field("column-number", Types.POSITIVE_INTEGER_ZO)),
+  /** Record definition. */
   MATCHING_GROUP(FN_URI, "matching-group",
     field("group", Types.STRING_O),
     field("position", Types.INTEGER_O)),

@@ -450,6 +450,9 @@ public enum Function implements AFunction {
   LOCAL_NAME_FROM_QNAME(FnLocalNameFromQName::new, "local-name-from-QName(value)",
       params(QNAME_ZO), NCNAME_ZO),
   /** XQuery function. */
+  LOCATION(FnLocation::new, "location(node?)",
+      params(NODE_ZO), Records.LOCATION.get().seqType(Occ.ZERO_OR_ONE)),
+  /** XQuery function. */
   LOWER_CASE(FnLowerCase::new, "lower-case(value)",
       params(STRING_ZO), STRING_O),
   /** XQuery function. */
@@ -817,6 +820,8 @@ public enum Function implements AFunction {
   _BIN_INFER_ENCODING_RECORD(Records.INFER_ENCODING.get()),
   /** XQuery function. */
   LOAD_XQUERY_MODULE_RECORD(Records.LOAD_XQUERY_MODULE.get()),
+  /** XQuery function. */
+  LOCATION_RECORD(Records.LOCATION.get()),
   /** XQuery function. */
   MATCHING_GROUP_RECORD(Records.MATCHING_GROUP.get()),
   /** XQuery function. */

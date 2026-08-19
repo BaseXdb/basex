@@ -36,6 +36,9 @@ public class FnParseXmlFragment extends Docs {
     /** Remove whitespace-only text nodes. */
     public static final BooleanOption STRIP_SPACE =
         new BooleanOption(CommonOptions.STRIP_SPACE, false);
+    /** Request to retain location information (ignored, see {@link FnLocation}). */
+    public static final BooleanOption RETAIN_LOCATION =
+        new BooleanOption("retain-location", false);
     /** Custom option (see {@link MainOptions#STRIPNS}). */
     public static final BooleanOption STRIPNS = new BooleanOption(CommonOptions.STRIPNS, false);
   }
