@@ -26,7 +26,7 @@ public final class BaseXPragma extends Pragma {
    */
   public BaseXPragma(final QNm name, final byte[] value) {
     super(name, value);
-    ndt = Token.eq(name.local(), Token.token(QueryText.NONDETERMNISTIC));
+    ndt = Token.eq(name.local(), Token.token(QueryText.NONDETERMINISTIC));
   }
 
   @Override

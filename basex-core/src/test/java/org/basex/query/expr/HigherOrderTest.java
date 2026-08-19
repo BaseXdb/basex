@@ -161,9 +161,8 @@ public final class HigherOrderTest extends SandboxTest {
     );
   }
 
-  /** Tests the nondeterministic keyword. */
+  /** Ensures that unused bindings of dynamic function calls are evaluated. */
   @Test public void gh1212() {
-    // unused bindings are evaluated if the invoked function is unknown or nondeterministic
     query("try {"
         + "  for $f in (void#1(?), error#0) let $ignore := $f() return ()"
         + "} catch * { 'ERR' }", "ERR");
@@ -175,12 +174,9 @@ public final class HigherOrderTest extends SandboxTest {
         + "  let $e := $f()"
         + "  return ()"
         + "} catch * { 'ERR' }", "ERR");
-    // the keyword enforces the evaluation of a function that is assumed to be deterministic
+    // deterministic calls are still dropped
     check("let $f := %basex:inline(0) function() { 1 } let $x := $f() return 'done'",
         "done", empty(FnVoid.class));
-    check("let $f := %basex:inline(0) function() { 1 }"
-        + " let $x := nondeterministic $f() return 'done'",
-        "done", exists(FnVoid.class));
   }
 
   /** Ensures that updating flag is not assigned before function body is known. */

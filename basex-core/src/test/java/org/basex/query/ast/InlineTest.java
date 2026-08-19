@@ -146,7 +146,7 @@ public final class InlineTest extends SandboxTest {
   @Test public void ndtFuncTest() {
     inline(true);
     check("let $a := function($d) { trace($d) }"
-        + "let $b := nondeterministic $a('1st') let $c := nondeterministic $a('2nd') "
+        + "let $b := $a('1st') let $c := $a('2nd') "
         + "return $b", "1st",
         root(Pipeline.class),
         "//FnTrace[. = '1st'] << //FnTrace[. = '2nd']");

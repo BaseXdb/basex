@@ -4906,8 +4906,7 @@ public class QueryParser extends InputParser {
   private Expr updatingFunctionCall() throws QueryException {
     final int p = pos;
     wsConsume(INVOKE);
-    final boolean upd = wsConsumeWs(UPDATING), ndt = wsConsumeWs(NONDETERMINISTIC);
-    if(upd || ndt) {
+    if(wsConsumeWs(UPDATING)) {
       final Expr func = primary();
       if(wsConsume("(")) {
         final InputInfo ii = info();
@@ -4922,8 +4921,8 @@ public class QueryParser extends InputParser {
           if(!wsConsume(")")) throw error(FUNCARG_X, found());
         }
         // skip if primary expression cannot be a function
-        if(upd) qc.updating();
-        return new DynFuncCall(ii, upd, ndt, func, argList.finish());
+        qc.updating();
+        return new DynFuncCall(ii, true, false, func, argList.finish());
       }
     }
     pos = p;
