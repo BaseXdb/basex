@@ -874,6 +874,17 @@ public final class FnModuleTest extends SandboxTest {
     query("deep-equal(1 to 1000000000, 1 to 1000000000)", true);
     query("deep-equal(1 to 1000000000, 1 to 1000000001)", false);
 
+    // function items are compared for equivalence
+    query(func.args(" fn($x) { $x }", " fn($y) { $y }"), true);
+    query(func.args(" fn($x) { $x }", " fn($x) { $x + 1 }"), false);
+    query(func.args(" fn($x) { $x }", " fn($x, $y) { $x }"), false);
+    // closures: captured values are compared with deep equality
+    query("let $n := <a/> return " + func.args(" fn() { $n }", " fn() { $n }"), true);
+    query(func.args(" (let $n := <a/> return fn() { $n })", " (let $m := <a/> return fn() { $m })"),
+        true);
+    query(func.args(" (let $n := 1 return fn() { $n })", " (let $m := 2 return fn() { $m })"),
+        false);
+
     // options that are accepted, but cannot take effect in a processor without schema support
     query(func.args(1, 1, " { 'typed-values': false() }"), true);
     query(func.args(1, 1, " { 'type-annotations': true() }"), true);

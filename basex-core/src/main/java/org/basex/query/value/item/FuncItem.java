@@ -274,14 +274,17 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public boolean deepEqual(final Item item, final DeepEqual deep) {
+  public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
     if(this == item) return true;
     if(item instanceof final FuncItem func) {
-      // functions must have same body and same parameters types (its names can differ)
+      // functions must have same body and same parameter types (their names can differ)
       int a = arity();
       if(a == func.arity()) {
         while(--a >= 0 && params[a].seqType().eq(func.params[a].seqType()));
-        return a == -1 && expr.equals(func.expr);
+        if(a != -1) return false;
+        // captured values (let bindings of a closure) are compared with deep equality
+        return deep != null && expr instanceof final GFLWOR gflwor ?
+          gflwor.deepEqual(func.expr, deep) : expr.equals(func.expr);
       }
     }
     return false;

@@ -82,6 +82,31 @@ public final class GFLWOR extends ParseExpr {
   }
 
   /**
+   * Compares this expression with another one, comparing the values bound by let clauses
+   * (the captured values of a closure) with the {@link DeepEqual} algorithm.
+   * @param ex expression to compare with
+   * @param deep deep equality comparison
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  public boolean deepEqual(final Expr ex, final DeepEqual deep) throws QueryException {
+    if(!(ex instanceof final GFLWOR gflwor) || clauses.size() != gflwor.clauses.size()) {
+      return false;
+    }
+    final Iterator<Clause> iter = gflwor.clauses.iterator();
+    for(final Clause clause : clauses) {
+      final Clause clause2 = iter.next();
+      if(clause instanceof final Let let1 && let1.expr instanceof final Value value1 &&
+          clause2 instanceof final Let let2 && let2.expr instanceof final Value value2) {
+        if(!deep.equal(value1, value2)) return false;
+      } else if(!clause.equals(clause2)) {
+        return false;
+      }
+    }
+    return rtrn.equals(gflwor.rtrn);
+  }
+
+  /**
    * Creates a new evaluator for this FLWOR expression.
    * @return the evaluator
    */
