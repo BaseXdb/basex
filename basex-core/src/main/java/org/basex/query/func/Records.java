@@ -19,6 +19,11 @@ import org.basex.util.hash.*;
  */
 public enum Records {
   /** Record definition. */
+  ARRAY_SORT_KEY(FN_URI, "array-sort-key",
+    field("key", FuncType.get(Types.ANY_ATOMIC_TYPE_ZM, Types.ITEM_ZM).seqType(Occ.ZERO_OR_ONE)),
+    field("collation", Types.STRING_ZO),
+    field("order", EnumType.get("ascending", "descending").seqType(Occ.ZERO_OR_ONE))),
+  /** Record definition. */
   ATTRIBUTE_CONVERSION_PLAN(FN_URI, "attribute-conversion-plan",
     field("type", EnumType.get("integer", "decimal", "double", "boolean", "string", "skip").
         seqType())),
@@ -35,7 +40,7 @@ public enum Records {
     field("timezone", Types.DAY_TIME_DURATION_ZO)
   ),
   /** Record definition. */
-  DIVIDED_DECIMALS(FN_URI, "divided-decimals",
+  DIVISION(FN_URI, "division",
     field("quotient", Types.DECIMAL_O),
     field("remainder", Types.DECIMAL_O)
   ),
@@ -80,6 +85,11 @@ public enum Records {
   RANDOM_NUMBER_GENERATOR(FN_URI, "random-number-generator"),
   /** Record definition. */
   SCHEMA_TYPE(FN_URI, "schema-type"),
+  /** Record definition. */
+  SORT_KEY(FN_URI, "sort-key",
+    field("key", FuncType.get(Types.ANY_ATOMIC_TYPE_ZM, Types.ITEM_O).seqType(Occ.ZERO_OR_ONE)),
+    field("collation", Types.STRING_ZO),
+    field("order", EnumType.get("ascending", "descending").seqType(Occ.ZERO_OR_ONE))),
   /** Record definition. */
   URI_STRUCTURE(FN_URI, "uri-structure",
     field("uri", Types.STRING_ZO),

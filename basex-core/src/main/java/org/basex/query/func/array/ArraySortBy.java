@@ -2,6 +2,7 @@ package org.basex.query.func.array;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -40,6 +41,11 @@ public class ArraySortBy extends SortFn {
     final ArrayBuilder ab = new ArrayBuilder(qc, as);
     for(final int i : index) ab.add(values[i]);
     return ab.array(this);
+  }
+
+  @Override
+  protected RecordType keyRecord() {
+    return Records.ARRAY_SORT_KEY.get();
   }
 
   @Override

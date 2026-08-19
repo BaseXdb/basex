@@ -215,7 +215,7 @@ public enum Function implements AFunction {
       params(ANY_ATOMIC_TYPE_ZM, STRING_ZO), ANY_ATOMIC_TYPE_ZM),
   /** XQuery function. */
   DIVIDE_DECIMALS(FnDivideDecimals::new, "divide-decimals(value, divisor, precision?)",
-      params(DECIMAL_O, DECIMAL_O, INTEGER_ZO), Records.DIVIDED_DECIMALS.get().seqType()),
+      params(DECIMAL_O, DECIMAL_O, INTEGER_ZO), Records.DIVISION.get().seqType()),
   /** XQuery function. */
   DOC(FnDoc::new, "doc(source, options?)",
       params(STRING_ZO, MAP_ZO), DOCUMENT_ZO, flag(NDT)),
@@ -661,7 +661,7 @@ public enum Function implements AFunction {
       ITEM_ZM),
   /** XQuery function. */
   SORT_BY(FnSortBy::new, "sort-by(input, keys)",
-      params(ITEM_ZM, MAP_ZM), ITEM_ZM),
+      params(ITEM_ZM, Records.SORT_KEY.get().seqType(Occ.ZERO_OR_MORE)), ITEM_ZM),
   /** XQuery function. */
   SORT_WITH(FnSortWith::new, "sort-with(input, comparators)",
       params(ITEM_ZM, FuncType.get(INTEGER_O, ITEM_O, ITEM_O).seqType(Occ.ONE_OR_MORE)),
@@ -802,13 +802,15 @@ public enum Function implements AFunction {
   // Predefined record constructor functions
 
   /** XQuery function. */
+  ARRAY_SORT_KEY_RECORD(Records.ARRAY_SORT_KEY.get()),
+  /** XQuery function. */
   ATTRIBUTE_CONVERSION_PLAN_RECORD(Records.ATTRIBUTE_CONVERSION_PLAN.get()),
   /** XQuery function. */
   COMPILED_REGEX_RECORD(Records.COMPILED_REGEX.get()),
   /** XQuery function. */
   DATETIME_RECORD(Records.DATETIME.get()),
   /** XQuery function. */
-  DIVIDED_DECIMALS_RECORD(Records.DIVIDED_DECIMALS.get()),
+  DIVISION_RECORD(Records.DIVISION.get()),
   /** XQuery function. */
   ELEMENT_CONVERSION_PLAN_RECORD(Records.ELEMENT_CONVERSION_PLAN.get()),
   /** XQuery function. */
@@ -827,6 +829,8 @@ public enum Function implements AFunction {
   RANDOM_NUMBER_GENERATOR_RECORD(Records.RANDOM_NUMBER_GENERATOR.get()),
   /** XQuery function. */
   SCHEMA_TYPE_RECORD(Records.SCHEMA_TYPE.get()),
+  /** XQuery function. */
+  SORT_KEY_RECORD(Records.SORT_KEY.get()),
   /** XQuery function. */
   URI_STRUCTURE_RECORD(Records.URI_STRUCTURE.get()),
   /** XQuery function. */
@@ -962,7 +966,8 @@ public enum Function implements AFunction {
       FuncType.get(ANY_ATOMIC_TYPE_ZM, ITEM_ZM).seqType(Occ.ZERO_OR_ONE)), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_SORT_BY(ArraySortBy::new, "sort-by(array, keys)",
-      params(ARRAY_O, MAP_ZM), ARRAY_O, ARRAY_URI),
+      params(ARRAY_O, Records.ARRAY_SORT_KEY.get().seqType(Occ.ZERO_OR_MORE)),
+      ARRAY_O, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_SORT_WITH(ArraySortWith::new, "sort-with(array, comparators)",
       params(ARRAY_O, FuncType.get(INTEGER_O, ITEM_ZM, ITEM_ZM).seqType(Occ.ONE_OR_MORE)),

@@ -40,6 +40,14 @@ public abstract class SortFn extends StandardFunc {
   }
 
   /**
+   * Returns the record type of the sort key definitions.
+   * @return record type
+   */
+  protected RecordType keyRecord() {
+    return Records.SORT_KEY.get();
+  }
+
+  /**
    * Checks if the index is sorted.
    * @param index index
    * @return result of check
@@ -69,11 +77,12 @@ public abstract class SortFn extends StandardFunc {
     final boolean[] invert = new boolean[ms];
     int m = 0;
     for(final Item item : maps) {
-      final XQMap map = toMap(item);
-      if(map.contains(KEY)) keys[m] = toFunction(map.get(KEY), 1, qc);
+      final XQMap map = toRecord(item, keyRecord(), qc);
+      final Value key = map.get(KEY), order = map.get(ORDER);
+      if(!key.isEmpty()) keys[m] = toFunction(key, 1, qc);
       collations[m] = toCollation(map.get(COLLATION), qc);
-      if(map.contains(ORDER)) {
-        invert[m] = toEnum(map.get(ORDER).atomItem(qc, info), Order.class) == Order.DESCENDING;
+      if(!order.isEmpty()) {
+        invert[m] = toEnum(order.atomItem(qc, info), Order.class) == Order.DESCENDING;
       }
       m++;
     }

@@ -215,10 +215,10 @@ public final class ModuleTest extends SandboxTest {
     final IOFile r = new IOFile(sandbox, "r.xqm");
     write(r, "module namespace r = 'r';\n"
         + "declare function r:f() {\n"
-        + "  fn:divided-decimals-record(1, 2),\n"
-        + "  fn:divided-decimals-record#2(3, 4),\n"
-        + "  5 => fn:divided-decimals-record(6),\n"
-        + "  function-lookup(#fn:divided-decimals-record, 2)(7, 8)\n"
+        + "  fn:division-record(1, 2),\n"
+        + "  fn:division-record#2(3, 4),\n"
+        + "  5 => fn:division-record(6),\n"
+        + "  function-lookup(#fn:division-record, 2)(7, 8)\n"
         + "};");
     final IOFile s = new IOFile(sandbox, "s.xqm");
     write(s, "module namespace s = 's';\n"
