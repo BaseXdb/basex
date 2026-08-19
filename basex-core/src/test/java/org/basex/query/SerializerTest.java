@@ -115,16 +115,25 @@ public final class SerializerTest extends SandboxTest {
   /** Test: method=xhtml. */
   @Test public void xhtml() {
     final String option = METHOD.arg("xhtml");
-    query(option + "<html/>", "<html></html>");
+    query(option + "<html/>", "<!DOCTYPE html><html></html>");
+    query(option + HTML_VERSION.arg("4.01") + "<html/>", "<html></html>");
     final String[] empties = { "area", "base", "br", "col", "embed", "hr", "img", "input",
         "link", "meta", "basefont", "frame", "isindex", "param" };
     for(final String e : empties) {
-      query(option + "<html xmlns='http://www.w3.org/1999/xhtml'><" + e + "/></html>",
+      query(option + HTML_VERSION.arg("4.01")
+          + "<html xmlns='http://www.w3.org/1999/xhtml'><" + e + "/></html>",
           "<html xmlns=\"http://www.w3.org/1999/xhtml\"><" + e + " /></html>");
+    }
+    final String[] voids = { "area", "base", "br", "col", "embed", "hr", "img", "input",
+        "link", "meta", "param", "source", "track", "wbr" };
+    for(final String e : voids) {
+      query(option + "<html xmlns='http://www.w3.org/1999/xhtml'><" + e + "/></html>",
+          "<!DOCTYPE html><html xmlns=\"http://www.w3.org/1999/xhtml\"><" + e + "/></html>");
     }
     query(option + INDENT.arg("yes")
         + "<html xmlns='http://www.w3.org/1999/xhtml'><body><pre><u>test</u></pre></body></html>",
-        "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n"
+        "<!DOCTYPE html>\n"
+        + "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n"
         + "  <body>\n"
         + "    <pre><u>test</u></pre>\n"
         + "  </body>\n"
@@ -147,7 +156,7 @@ public final class SerializerTest extends SandboxTest {
         + "      <hr/>\n"
         + "    </a><br/></body>\n"
         + "</html>");
-    query(option + MEDIA_TYPE.arg("application/xhtml+xml")
+    query(option + HTML_VERSION.arg("4.01") + MEDIA_TYPE.arg("application/xhtml+xml")
         + INDENT.arg("yes")
         + INDENT_ATTRIBUTES.arg("yes")
         + "<html xmlns='http://www.w3.org/1999/xhtml' xmlns:svg='http://www.w3.org/2000/svg'>"
@@ -169,13 +178,15 @@ public final class SerializerTest extends SandboxTest {
     query(option
         + "<html xmlns='http://www.w3.org/1999/xhtml'><body><a href='\u8f49\u7fa9.html'"
         + " name='\u8f49\u7fa9'>Link</a></body></html>",
-        "<html xmlns=\"http://www.w3.org/1999/xhtml\"><body><a href=\"%E8%BD%89%E7%BE%A9.html\""
+        "<!DOCTYPE html>"
+        + "<html xmlns=\"http://www.w3.org/1999/xhtml\"><body><a href=\"%E8%BD%89%E7%BE%A9.html\""
         + " name=\"%E8%BD%89%E7%BE%A9\">Link</a></body></html>");
     // URI escaping disabled: raw Unicode is preserved
     query(option + ESCAPE_URI_ATTRIBUTES.arg("no")
         + "<html xmlns='http://www.w3.org/1999/xhtml'><body><a href='\u672a\u8f49\u7fa9.html'"
         + " name='\u672a\u8f49\u7fa9'>Link</a></body></html>",
-        "<html xmlns=\"http://www.w3.org/1999/xhtml\"><body><a href=\"\u672a\u8f49\u7fa9.html\""
+        "<!DOCTYPE html>"
+        + "<html xmlns=\"http://www.w3.org/1999/xhtml\"><body><a href=\"\u672a\u8f49\u7fa9.html\""
         + " name=\"\u672a\u8f49\u7fa9\">Link</a></body></html>");
   }
 
@@ -194,10 +205,24 @@ public final class SerializerTest extends SandboxTest {
   @Test public void html() {
     final String option = METHOD.arg("html");
     query(option + "<html/>", "<!DOCTYPE HTML><html></html>");
+    // prior to HTML5, end tags are omitted for elements with an empty content model
     final String[] empties = { "area", "base", "br", "col", "embed", "hr", "img", "input",
         "link", "meta", "basefont", "frame", "isindex", "param" };
     for(final String e : empties) {
+      query(option + HTML_VERSION.arg("4.01") + '<' + e + "/>", '<' + e + '>');
+    }
+    // with HTML5, end tags are omitted for void elements
+    final String[] voids = { "area", "base", "br", "col", "embed", "hr", "img", "input",
+        "link", "meta", "param", "source", "track", "wbr" };
+    for(final String e : voids) {
       query(option + '<' + e + "/>", '<' + e + '>');
+    }
+    for(final String e : new String[] { "basefont", "frame", "isindex" }) {
+      query(option + '<' + e + "/>", '<' + e + "></" + e + '>');
+      query(option + HTML_VERSION.arg("4.01") + '<' + e + "/>", '<' + e + '>');
+    }
+    for(final String e : new String[] { "source", "track", "wbr" }) {
+      query(option + HTML_VERSION.arg("4.01") + '<' + e + "/>", '<' + e + "></" + e + '>');
     }
 
     query(option + "<html><script>&lt;</script></html>",

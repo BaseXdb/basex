@@ -47,7 +47,7 @@ public final class RESTPostTest extends RESTTest {
    * @throws IOException I/O exception
    */
   @Test public void post4() throws IOException {
-    assertEquals("<html></html>", post("<query xmlns=\"" + URI + "\">"
+    assertEquals("<!DOCTYPE html><html></html>", post("<query xmlns=\"" + URI + "\">"
         + "<text><![CDATA[<html/>]]></text>"
         + "<parameter name='omit-xml-declaration' value='no'/>"
         + "<parameter name='omit-xml-declaration' value='yes'/>"

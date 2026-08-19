@@ -7,7 +7,6 @@ import static org.basex.util.XMLToken.*;
 import java.io.*;
 import java.util.function.*;
 
-import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -19,34 +18,6 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 final class HTMLSerializer extends XhtmlHtmlSerializer {
-  /** (X)HTML: elements with an empty content model. */
-  static final TokenSet EMPTIES = new TokenSet("area", "base", "basefont", "br", "col", "embed",
-      "frame", "hr", "img", "input", "isindex", "link", "meta", "param");
-  /** HTML5: elements with an empty content model. */
-  static final TokenSet EMPTIES5 = new TokenSet("area", "base", "br", "col", "command", "embed",
-      "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr");
-  /** (X)HTML: formatted elements. */
-  static final TokenSet FORMATTEDS = new TokenSet("pre", "script", "style", "textarea", "title");
-  /** (X)HTML: inline elements. */
-  static final TokenSet INLINES = new TokenSet("a", "abbr", "acronym", "b", "bdo", "big", "br",
-      "button", "cite", "code", "del", "dfn", "em", "i", "img", "input", "ins", "kbd", "label",
-      "map", "object", "q", "s", "samp", "script", "select", "small", "span", "strike", "strong",
-      "sub", "sup", "textarea", "tt", "u", "var");
-  /** HTML5: inline elements. */
-  static final TokenSet INLINES5 = new TokenSet("a", "abbr", "area", "audio", "b", "bdi", "bdo",
-      "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "embed",
-      "i", "iframe", "img", "input", "ins", "kbd", "keygen", "label", "map", "mark", "math",
-      "meter", "noscript", "object", "output", "picture", "progress", "q", "rp", "rt", "ruby",
-      "s", "samp", "script", "select", "slot", "small", "span", "strong", "sub", "sup", "svg",
-      "template", "textarea", "time", "u", "var", "video", "wbr");
-  /** (X)HTML: URI attributes. */
-  static final TokenSet URIS = new TokenSet("a@href", "a@name", "applet@codebase", "area@href",
-      "base@href", "blockquote@cite", "body@background", "button@datasrc", "del@cite",
-      "div@datasrc", "form@action", "frame@longdesc", "frame@src", "head@profile",
-      "iframe@longdesc", "iframe@src", "img@longdesc", "img@src", "img@usemap", "input@datasrc",
-      "input@src", "input@usemap", "ins@cite", "link@href", "object@archive", "object@classid",
-      "object@codebase", "object@data", "object@datasrc", "object@usemap", "q@cite", "script@for",
-      "script@src", "select@datasrc", "span@datasrc", "table@datasrc", "textarea@datasrc");
   /** HTML: script elements. */
   private static final TokenSet SCRIPTS = new TokenSet("script", "style");
   /** HTML: boolean attributes. */
@@ -70,7 +41,18 @@ final class HTMLSerializer extends XhtmlHtmlSerializer {
    * @throws IOException I/O exception
    */
   HTMLSerializer(final OutputStream os, final SerializerOptions sopts) throws IOException {
-    super(os, sopts, V50, V401, V40);
+    super(os, sopts, true, V50, V401, V40);
+  }
+
+  @Override
+  byte[] htmlName(final QNm name) {
+    final byte[] uri = name.uri();
+    return uri.length == 0 || html5 && eq(uri, XHTML_URI) ? localName(name) : null;
+  }
+
+  @Override
+  boolean cdataElement(final QNm name) {
+    return htmlName(name) == null;
   }
 
   @Override
@@ -80,10 +62,10 @@ final class HTMLSerializer extends XhtmlHtmlSerializer {
     if(!standalone) delimitAttribute();
     out.print(name);
 
-    // don't append value for boolean attributes
     byte[] val = value;
-    if(!BOOLEAN.isEmpty() || !URIS.isEmpty()) {
-      final byte[] key = concat(lc(elem.string()), AT, lc(name));
+    final byte[] key = attributeKey(name);
+    if(key != null) {
+      // don't append value for boolean attributes
       if(BOOLEAN.contains(key) && eq(lc(name), lc(val))) return;
       // escape URI attributes
       if(escape && URIS.contains(key)) val = encodeUri(val, UriEncoder.ESCAPE);
@@ -150,30 +132,26 @@ final class HTMLSerializer extends XhtmlHtmlSerializer {
     out.print(name.string());
     indAttrLength = out.lineLength();
     sep = indent;
-    if(content && eq(lc(elem.local()), HEAD)) skip++;
+    checkHead();
   }
 
   @Override
   protected void finishOpen() throws IOException {
     super.finishOpen();
-    printCT(false, true);
+    printCT(false);
     if(SCRIPTS.contains(lc(elem.local()))) script++;
   }
 
   @Override
   protected void finishEmpty() throws IOException {
-    byte[] uri = elem.uri();
-    if(uri.length > 0 && !eq(uri, XHTML_URI)) {
+    final byte[] local = htmlName(elem);
+    if(local == null) {
       super.finishEmpty();
     } else {
-      if(printCT(true, true)) return;
+      if(printCT(true)) return;
       out.print(ELEM_C);
-      final byte[] lc = lc(elem.local());
-      if(EMPTIES.contains(lc)) {
-        uri = nsUri(EMPTY);
-        if(uri == null || uri.length == 0) return;
-      }
-      if(html5 && EMPTIES5.contains(lc)) return;
+      // no end tag if the element is expected to be empty
+      if(rules.empties().contains(local)) return;
       sep = false;
       super.finishClose();
     }
@@ -189,21 +167,8 @@ final class HTMLSerializer extends XhtmlHtmlSerializer {
   protected void doctype(final QNm name) throws IOException {
     if(docpub != null || docsys != null) {
       printDoctype(name.local(), docpub, docsys);
-    } else if(html5 && eq(lc(name.local()), HTML)) {
+    } else if(html5 && eq(htmlName(name), HTML)) {
       printDoctype(uc(HTML), null, null);
     }
-  }
-
-  @Override
-  boolean inline() {
-    final TokenSet inlines = html5 ? INLINES5 : INLINES;
-    return inlines.contains(lc(closed.local())) ||
-        opening && inlines.contains(lc(elem.local())) ||
-        super.inline();
-  }
-
-  @Override
-  boolean suppressIndentation(final QNm qname) throws QueryIOException {
-    return FORMATTEDS.contains(lc(qname.local())) || super.suppressIndentation(qname);
   }
 }

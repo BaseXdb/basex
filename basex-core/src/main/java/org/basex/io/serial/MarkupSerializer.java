@@ -18,7 +18,6 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
-import org.basex.util.http.*;
 import org.basex.util.options.*;
 
 /**
@@ -38,8 +37,8 @@ abstract class MarkupSerializer extends StandardSerializer {
   /** Script flag. */
   int script;
 
-  /** HTML5 flag. */
-  final boolean html5;
+  /** Normalized value of the 'html-version' parameter (empty string if absent). */
+  final String htmlVersion;
   /** URI escape flag. */
   final boolean escape;
   /** Standalone 'omit' flag. */
@@ -50,8 +49,6 @@ abstract class MarkupSerializer extends StandardSerializer {
   private final boolean undecl;
   /** Suppress indentation elements. */
   private QNmSet suppress;
-  /** Media type. */
-  private final String media;
   /** Indent attributes. */
   private final boolean indAttr;
   /** Attribute indentation length. */
@@ -61,20 +58,20 @@ abstract class MarkupSerializer extends StandardSerializer {
    * Constructor.
    * @param os output stream
    * @param sopts serialization parameters
+   * @param xml serialize the result as XML
    * @param versions supported versions
    * @throws IOException I/O exception
    */
   protected MarkupSerializer(final OutputStream os, final SerializerOptions sopts,
-      final String... versions) throws IOException {
+      final boolean xml, final String... versions) throws IOException {
 
     super(os, sopts);
 
     String version = sopts.get(VERSION), hv = sopts.get(HTML_VERSION);
     if(hv.matches("\\d+(\\.\\d+)?")) hv = Double.toString(Double.parseDouble(hv));
-    html5 = hv.equals(V50) || versions[0].equals(V50) && hv.isEmpty() &&
-        (version.isEmpty() || version.equals(V50));
     version = checkVersion(VERSION, version, versions);
-    checkVersion(VERSION, hv, V50, V401, V40);
+    checkVersion(HTML_VERSION, hv, V50, V401, V40);
+    htmlVersion = hv;
 
     final boolean omitDecl = sopts.yes(OMIT_XML_DECLARATION);
     final YesNoOmit sa = sopts.get(STANDALONE);
@@ -82,7 +79,6 @@ abstract class MarkupSerializer extends StandardSerializer {
 
     docsys  = sopts.get(DOCTYPE_SYSTEM);
     docpub  = sopts.get(DOCTYPE_PUBLIC);
-    media   = sopts.get(MEDIA_TYPE);
     escape  = sopts.yes(ESCAPE_URI_ATTRIBUTES);
     content = sopts.yes(INCLUDE_CONTENT_TYPE);
     undecl  = sopts.yes(UNDECLARE_PREFIXES);
@@ -91,27 +87,23 @@ abstract class MarkupSerializer extends StandardSerializer {
     if(docsys.isEmpty()) docsys = null;
     if(docpub.isEmpty()) docpub = null;
 
-    final boolean html = this instanceof HTMLSerializer;
-    final boolean xml = this instanceof XMLSerializer || this instanceof XHTMLSerializer;
-    if(xml || html) {
-      if(undecl && version.equals(V10)) throw SERUNDECL.getIO();
-      if(xml) {
-        if(omitDecl) {
-          if(!saomit || !version.equals(V10) && docsys != null) throw SERSTAND.getIO();
-        } else {
-          out.print(PI_O);
-          out.print(DOCDECL1);
-          out.print(version);
-          out.print(DOCDECL2);
-          out.print(sopts.get(ENCODING));
-          if(!saomit) {
-            out.print(DOCDECL3);
-            out.print(sa.toString());
-          }
-          out.print(ATT2);
-          out.print(PI_C);
-          if(indent) out.print('\n');
+    if(undecl && version.equals(V10)) throw SERUNDECL.getIO();
+    if(xml) {
+      if(omitDecl) {
+        if(!saomit || !version.equals(V10) && docsys != null) throw SERSTAND.getIO();
+      } else {
+        out.print(PI_O);
+        out.print(DOCDECL1);
+        out.print(version);
+        out.print(DOCDECL2);
+        out.print(sopts.get(ENCODING));
+        if(!saomit) {
+          out.print(DOCDECL3);
+          out.print(sa.toString());
         }
+        out.print(ATT2);
+        out.print(PI_C);
+        if(indent) out.print('\n');
       }
     }
   }
@@ -387,28 +379,12 @@ abstract class MarkupSerializer extends StandardSerializer {
   }
 
   /**
-   * Prints the content type declaration.
-   * @param empty empty flag
-   * @param html HTML/XHTML flag
-   * @return {@code true} if declaration was printed
-   * @throws IOException I/O exception
+   * Checks if an element may be listed in the 'cdata-section-elements' parameter.
+   * @param name element name
+   * @return result of check
    */
-  protected final boolean printCT(final boolean empty, final boolean html) throws IOException {
-    if(skip != 1) return false;
-    skip++;
-    if(empty) finishOpen();
-    level++;
-    startOpen(new QNm(elem.hasPrefix() ? concat(elem.prefix(), ":", META) : META));
-    if(html5) {
-      attribute(CHARSET, token(encoding), false);
-    } else {
-      attribute(HTTP_EQUIV, CONTENT_TYPE, false);
-      attribute(CONTENT, concat(media.isEmpty() ? MediaType.TEXT_HTML : media, "; ",
-        CHARSET, "=", encoding), false);
-    }
-    out.print(html ? ELEM_C : ELEM_SC);
-    level--;
-    if(empty) finishClose();
+  @SuppressWarnings("unused")
+  boolean cdataElement(final QNm name) {
     return true;
   }
 
@@ -441,10 +417,8 @@ abstract class MarkupSerializer extends StandardSerializer {
   private QNmSet cdata() throws QueryIOException {
     if(cdata == null) {
       cdata = new QNmSet();
-      final boolean html = this instanceof HTMLSerializer;
       for(final QNm name : qnames(CDATA_SECTION_ELEMENTS)) {
-        final byte[] uri = name.uri();
-        if(!html || uri.length != 0 && (!html5 || !eq(uri, XHTML_URI))) cdata.add(name);
+        if(cdataElement(name)) cdata.add(name);
       }
     }
     return cdata;

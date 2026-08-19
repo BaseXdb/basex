@@ -18,7 +18,7 @@ public final class XMLSerializer extends MarkupSerializer {
    * @throws IOException I/O exception
    */
   XMLSerializer(final OutputStream os, final SerializerOptions sopts) throws IOException {
-    super(os, sopts, V10, V11);
+    super(os, sopts, true, V10, V11);
   }
 
   @Override
