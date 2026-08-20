@@ -316,6 +316,44 @@ public final class JNodeTest extends SandboxTest {
         + "=> count()", 8);
   }
 
+  /** Direct key lookup: pruned and unpruned traversals must return the same nodes. */
+  @Test public void axisDirectLookup() {
+    // atomic values: subtrees may be pruned via a direct key lookup
+    final String flat = "{ 'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5 }";
+    // nested values: deeper matches must not be pruned
+    final String deep = "{ 'a': { 'b': { 'a': 1 } } }";
+
+    // context type known at compile time: the step is specialized to a JNode test
+    query(flat + " -> count(descendant::a)", 1);
+    query(flat + " -> count(descendant::z)", 0);
+    query(flat + " -> count(child::a)", 1);
+    query(deep + " -> count(descendant::a)", 2);
+    query(deep + " -> count(descendant::b)", 1);
+    query(deep + " -> count(child::b)", 0);
+
+    // context type unknown at compile time: the results must be the same
+    final String jflat = "parse-json('{ \"a\": 1, \"b\": 2, \"c\": 3, \"d\": 4, \"e\": 5 }')";
+    final String jdeep = "parse-json('{ \"a\": { \"b\": { \"a\": 1 } } }')";
+    query(jflat + " -> count(descendant::a)", 1);
+    query(jflat + " -> count(descendant::z)", 0);
+    query(jflat + " -> count(child::a)", 1);
+    query(jdeep + " -> count(descendant::a)", 2);
+    query(jdeep + " -> count(descendant::b)", 1);
+    query(jdeep + " -> count(child::b)", 0);
+
+    // untyped atomic keys are selected like string keys
+    query("map:merge(({ xs:untypedAtomic('a'): 1 }, { xs:untypedAtomic('b'): 2 }, "
+        + "{ xs:untypedAtomic('c'): 3 }, { xs:untypedAtomic('d'): 4 }, "
+        + "{ xs:untypedAtomic('e'): 5 })) -> count(descendant::a)", 1);
+    // integer keys and array members are never selected by a name test
+    query("map:merge(({ 1: 1 }, { 2: 2 }, { 3: 3 }, { 4: 4 }, { 5: 5 })) "
+        + "-> count(descendant::a)", 0);
+    query("[ 1, 2, 3, 4, 5 ] -> count(descendant::a)", 0);
+    // namespaced and local name tests never select JNodes
+    query(flat + " -> count(descendant::Q{urn:x}a)", 0);
+    query(flat + " -> count(descendant::*:a)", 0);
+  }
+
   /** Ancestor step. */
   @Test public void axisAncestor() {
     query(jtree + "//y/ancestor::y", "");

@@ -17,14 +17,14 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class JNodeTest extends Test {
-  /** Key ({@code null} for wildcard, {@link Empty#VALUE for root node}). */
+  /** Key ({@code null} for wildcard, {@link Empty#VALUE} for root node). */
   public final Item key;
   /** Value type. */
   public final SeqType valueType;
 
   /**
    * Constructor.
-   * @param key key ({@code null} for wildcard, {@link Empty#VALUE for root node})
+   * @param key key ({@code null} for wildcard, {@link Empty#VALUE} for root node)
    * @param valueType value type
    */
   private JNodeTest(final Item key, final SeqType valueType) {
@@ -34,10 +34,10 @@ public final class JNodeTest extends Test {
   }
 
   /**
-   * Creates a new JNode type.
-   * @param key key ({@code null} for wildcard), {@link Empty#VALUE for root node})
+   * Creates a new JNode test.
+   * @param key key ({@code null} for wildcard, {@link Empty#VALUE} for root node)
    * @param valueType value type (can be {@code null})
-   * @return map type
+   * @return test
    */
   public static Test get(final Item key, final SeqType valueType) {
     final SeqType ct = valueType != null ? valueType : Types.ITEM_ZM;
@@ -86,6 +86,20 @@ public final class JNodeTest extends Test {
           valueType.instance(jnode.value);
     }
     return false;
+  }
+
+  /**
+   * Returns the JNode key that is addressed by the specified name.
+   * @param qname name
+   * @return key
+   */
+  public static Item key(final QNm qname) {
+    return Str.get(qname.string());
+  }
+
+  @Override
+  public Item key() {
+    return key != Empty.VALUE ? key : null;
   }
 
   @Override

@@ -43,8 +43,11 @@ public final class NameTest extends Test {
   /** Default element namespace. */
   public final byte[] ns;
 
-  /** Local name; assigned if URI can be ignored at runtime. */
+  /** Local name; assigned if URI can be ignored at runtime (can be {@code null}). */
   public byte[] name;
+
+  /** JNode key; assigned if the test can select a single JNode key (can be {@code null}). */
+  private final Item jkey;
 
   /**
    * Returns a named element test.
@@ -78,6 +81,12 @@ public final class NameTest extends Test {
     this.scope = scope;
     this.ns = ns != null ? ns : Token.EMPTY;
     if(scope == Scope.LOCAL) name = qname.local();
+    jkey = scope == Scope.FLEXIBLE && kind == Kind.GNODE ? JNodeTest.key(qname) : null;
+  }
+
+  @Override
+  public Item key() {
+    return jkey;
   }
 
   @Override

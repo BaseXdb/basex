@@ -48,7 +48,7 @@ public abstract class Test extends ExprInfo {
       // element(*), attribute(*), jnode(*)
       if(s == Scope.ALL || n == QNm.EMPTY) return NodeTest.get(k);
       // jnode(a)
-      if(s == Scope.FLEXIBLE && k == Kind.JNODE) return JNodeTest.get(Str.get(n.string()), null);
+      if(s == Scope.FLEXIBLE && k == Kind.JNODE) return JNodeTest.get(JNodeTest.key(n), null);
     }
     return new NameTest(n, s, k, ns);
   }
@@ -102,7 +102,7 @@ public abstract class Test extends ExprInfo {
 
   /**
    * Optimizes the test.
-   * @param kn kind of step input
+   * @param kn kind of step input (can be {@code null})
    * @param data data reference (can be {@code null}); used to test if the test may be successful
    * @return resulting test, or {@code null} if the test yields no results
    */
@@ -117,6 +117,14 @@ public abstract class Test extends ExprInfo {
    * @return result of check
    */
   public abstract boolean matches(GNode node);
+
+  /**
+   * Returns the JNode key that is exclusively addressed by this test.
+   * @return key, or {@code null} if no or more than one key is addressed
+   */
+  public Item key() {
+    return null;
+  }
 
   /**
    * Checks whether the type of this test is a supertype of the specified type.

@@ -24,7 +24,7 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class JNode extends GNode {
-  /** Key ({@link Empty#VALUE for root node}). */
+  /** Key ({@link Empty#VALUE} for root node). */
   public final Item key;
   /** Value. */
   public final Value value;
@@ -66,9 +66,9 @@ public final class JNode extends GNode {
 
   /**
    * Constructor.
-   * @param key key ({@link Empty#VALUE for root node})
+   * @param key key ({@link Empty#VALUE} for root node)
    * @param value value
-   * @param parent (can be {@code null})
+   * @param parent parent node (can be {@code null})
    * @param index index ({@code -1} if not initialized yet)
    * @param position sequence position (starts with {@code 1})
    */
@@ -221,8 +221,9 @@ public final class JNode extends GNode {
       final boolean direct = !descendant || (
           value instanceof XQMap ? ((MapType) value.type).valueType() :
         ((ArrayType) value.type).valueType()).type.instanceOf(BasicType.ANY_ATOMIC_TYPE);
-      if(direct && test instanceof final JNodeTest nt && nt.key != null && nt.key != Empty.VALUE) {
-        final JNode child = child(nt.key);
+      final Item item = direct && test != null ? test.key() : null;
+      if(item != null) {
+        final JNode child = child(item);
         return child != null ? singleIter(child) : BasicNodeIter.EMPTY;
       }
 
