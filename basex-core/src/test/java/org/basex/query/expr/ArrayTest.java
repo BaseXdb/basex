@@ -14,6 +14,21 @@ import org.junit.jupiter.api.*;
  * @author Christian Gruen
  */
 public final class ArrayTest extends SandboxTest {
+  /** Member types are refined while the array is built. */
+  @Test public void memberTypes() {
+    query("array { (1 to 300) ! (. + 0.5e0) } instance of array(xs:double)", true);
+    query("array { 1 to 300 } instance of array(xs:integer)", true);
+    query("array { (1 to 300) ! string(.) } instance of array(xs:string)", true);
+    query("array { 1, 'a' } instance of array(xs:anyAtomicType)", true);
+    query("array { 1, [ 2 ] } instance of array(xs:double)", false);
+
+    // refined member types must not change the members themselves
+    query("let $a := array { (1 to 300) ! (. + 0.5e0) } "
+        + "return every $i in 1 to 300 satisfies $a($i) eq $i + 0.5e0", true);
+    query("sum(array:items(array { (1 to 300) ! (. + 0.5e0) }))", 45300);
+    query("array { 1, 'a', 2.5e0, true(), { 'k': 1 }, [ 1 ], () } => array:size()", 6);
+  }
+
   /** Constructor. */
   @Test public void squareConstructor() {
     query("[]", "[]");

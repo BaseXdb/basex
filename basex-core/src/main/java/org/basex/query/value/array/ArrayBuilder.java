@@ -15,12 +15,14 @@ public final class ArrayBuilder {
   /** Interruptible job. */
   private final Job job;
 
-  /** Builder, only instantiated if there are at least two items. */
+  /** Builder, only instantiated if there are at least two items (can be {@code null}). */
   private ArrBuilder builder;
   /** Capacity ({@link Long#MIN_VALUE}: create no compact data structures). */
   private final long capacity;
-  /** The first added value is cached. */
+  /** The first added value is cached (can be {@code null}). */
   private Value single;
+  /** Union of all member types (can be {@code null}). */
+  private SeqType memberType;
 
   /**
    * Constructor.
@@ -47,6 +49,10 @@ public final class ArrayBuilder {
    */
   public ArrayBuilder add(final Value value) {
     job.checkStop();
+    // refine the array type
+    final SeqType vt = value.seqType();
+    if(memberType == null) memberType = vt;
+    else if(!vt.eq(memberType)) memberType = memberType.union(vt);
     if(builder == null) {
       final Value sngl = single;
       if(sngl == null) {
@@ -67,7 +73,7 @@ public final class ArrayBuilder {
    * @return array
    */
   public XQArray array() {
-    return array(Types.ARRAY);
+    return array(memberType != null ? ArrayType.get(memberType) : Types.ARRAY);
   }
 
   /**
@@ -91,6 +97,7 @@ public final class ArrayBuilder {
     } finally {
       builder = null;
       single = null;
+      memberType = null;
     }
   }
 

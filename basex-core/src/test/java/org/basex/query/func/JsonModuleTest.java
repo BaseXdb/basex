@@ -13,6 +13,29 @@ import org.junit.jupiter.api.*;
  * @author Christian Gruen
  */
 public final class JsonModuleTest extends SandboxTest {
+  /** Map and array types are refined while parsed values are built. */
+  @Test public void refinedTypes() {
+    final Function func = PARSE_JSON;
+    query(func.args("{ \"a\": 1, \"b\": 2 }") + " instance of map(xs:string, xs:double)", true);
+    query(func.args("{ \"a\": \"x\", \"b\": \"y\" }")
+        + " instance of map(xs:string, xs:string)", true);
+    query(func.args("{ \"a\": 1, \"b\": \"y\" }")
+        + " instance of map(xs:string, xs:anyAtomicType)", true);
+    query(func.args("{ \"a\": { \"b\": 1 } }")
+        + " instance of map(xs:string, map(xs:string, xs:double))", true);
+    query(func.args("[ 1, 2, 3 ]") + " instance of array(xs:double)", true);
+    query(func.args("{ \"a\": null }") + " instance of map(xs:string, empty-sequence())", true);
+
+    // the refined type must not change the parsed values
+    query(func.args("{ \"a\": 1, \"b\": 2.5, \"c\": \"x\", \"d\": null, \"e\": [ 1, 2 ] }")
+        + " => serialize({ 'method': 'json' })",
+        "{\"a\":1,\"b\":2.5,\"c\":\"x\",\"d\":null,\"e\":[1,2]}");
+    // values must survive the resizing of the underlying hash table
+    query("let $m := " + func.args(" '{' || string-join((1 to 500) ! "
+        + "('\"k' || . || '\":' || . || '.5'), ',') || '}'")
+        + " return every $k in 1 to 500 satisfies $m('k' || $k) eq $k + 0.5e0", true);
+  }
+
   /** Test method. */
   @Test public void doc() {
     final Function func = _JSON_DOC;
