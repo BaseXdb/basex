@@ -74,7 +74,7 @@ public final class JNode extends GNode {
    */
   public JNode(final Item key, final Value value, final JNode parent, final long index,
       final long position) {
-    super(NodeType.get(key, value.seqType()));
+    super(NodeType.JNODE);
     this.key = key;
     this.value = value;
     this.parent = parent;
@@ -96,6 +96,12 @@ public final class JNode extends GNode {
    */
   public XQStruct container() {
     return parent != null ? (XQStruct) parent.value.itemAt(position - 1) : null;
+  }
+
+  @Override
+  public SeqType seqType() {
+    if(type == NodeType.JNODE) type = NodeType.get(key, value.seqType());
+    return type.seqType();
   }
 
   @Override

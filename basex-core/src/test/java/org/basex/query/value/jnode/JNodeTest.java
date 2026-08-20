@@ -10,6 +10,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.junit.jupiter.api.*;
 
@@ -102,6 +103,14 @@ public final class JNodeTest extends SandboxTest {
     try(QueryContext qc = new QueryContext(context)) {
       assertEquals(Itr.get(1), axNode.atomItem(qc, null));
     }
+  }
+
+  /** Sequence type. */
+  @Test public void seqType() {
+    assertTrue(rootNode.seqType().type.instanceOf(NodeType.get(Empty.VALUE, Types.MAP_O)));
+    assertTrue(aNode.seqType().type.instanceOf(NodeType.get(Str.get("a"), Types.MAP_O)));
+    assertTrue(axNode.seqType().type.instanceOf(NodeType.get(Str.get("x"), Types.INTEGER_O)));
+    assertFalse(axNode.seqType().type.instanceOf(NodeType.get(Str.get("y"), Types.INTEGER_O)));
   }
 
   /** Instance check. */
