@@ -15,6 +15,8 @@ import org.basex.util.*;
 public abstract class ASet {
   /** Initial default size for new sets. */
   public static final int INITIAL_CAPACITY = 2;
+  /** Hash table of empty sets (shared: its single entry must never be assigned). */
+  private static final int[] EMPTY_TABLE = { 0 };
   /** Hash table buckets. */
   protected int[] buckets;
   /** Pointers to the next entry. */
@@ -23,9 +25,12 @@ public abstract class ASet {
   protected int size = 1;
 
   /**
-   * Empty constructor.
+   * Empty constructor (the hash table will be allocated when the first entry is added).
    */
-  protected ASet() { }
+  protected ASet() {
+    buckets = EMPTY_TABLE;
+    next = EMPTY_TABLE;
+  }
 
   /**
    * Constructor with initial capacity.
@@ -42,8 +47,10 @@ public abstract class ASet {
    * Resets the data structure.
    */
   protected void clear() {
-    Arrays.fill(buckets, 0);
-    size = 1;
+    if(size > 1) {
+      Arrays.fill(buckets, 0);
+      size = 1;
+    }
   }
 
   /**

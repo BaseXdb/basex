@@ -14,14 +14,17 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public class TokenSet extends ASet implements Iterable<byte[]> {
+  /** Hashed keys of empty sets (shared: its single entry must never be assigned). */
+  private static final byte[][] NO_KEYS = new byte[1][];
+
   /** Hashed keys. */
   protected byte[][] keys;
 
   /**
-   * Default constructor.
+   * Default constructor (the hash table will be allocated when the first key is added).
    */
   public TokenSet() {
-    this(INITIAL_CAPACITY);
+    keys = NO_KEYS;
   }
 
   /**
@@ -194,7 +197,7 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
 
   @Override
   public void clear() {
-    Arrays.fill(keys, null);
+    if(size > 1) Arrays.fill(keys, null);
     super.clear();
   }
 
@@ -216,7 +219,7 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
     if(this == obj) return true;
     if(!(obj instanceof final TokenSet ts)) return false;
     if(size != ts.size) return false;
-    for(int k = 1; k <= size; k++) {
+    for(int k = 1; k < size; k++) {
       if(!Token.eq(keys[k], ts.keys[k])) return false;
     }
     return true;

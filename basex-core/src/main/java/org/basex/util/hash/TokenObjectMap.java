@@ -13,14 +13,17 @@ import org.basex.util.*;
  * @param <E> generic value type
  */
 public final class TokenObjectMap<E> extends TokenSet {
+  /** Values of empty maps (shared: its single entry must never be assigned). */
+  private static final Object[] NO_VALUES = new Object[1];
+
   /** Values. */
   private Object[] values;
 
   /**
-   * Default constructor.
+   * Default constructor (the hash table will be allocated when the first key is added).
    */
   public TokenObjectMap() {
-    this(INITIAL_CAPACITY);
+    values = NO_VALUES;
   }
 
   /**
@@ -102,7 +105,7 @@ public final class TokenObjectMap<E> extends TokenSet {
   @Override
   public int remove(final byte[] key) {
     final int i = super.remove(key);
-    values[i] = null;
+    if(i != 0) values[i] = null;
     return i;
   }
 
@@ -114,8 +117,8 @@ public final class TokenObjectMap<E> extends TokenSet {
 
   @Override
   public void clear() {
+    if(size > 1) Arrays.fill(values, null);
     super.clear();
-    Arrays.fill(values, null);
   }
 
   @Override

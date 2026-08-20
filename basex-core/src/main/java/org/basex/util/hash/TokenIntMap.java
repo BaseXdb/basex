@@ -14,14 +14,17 @@ import org.basex.io.out.DataOutput;
  * @author Christian Gruen
  */
 public final class TokenIntMap extends TokenSet {
+  /** Values of empty maps (shared: its single entry must never be assigned). */
+  private static final int[] NO_VALUES = { Integer.MIN_VALUE };
+
   /** Values. */
   private int[] values;
 
   /**
-   * Default constructor.
+   * Default constructor (the hash table will be allocated when the first key is added).
    */
   public TokenIntMap() {
-    this(INITIAL_CAPACITY);
+    values = NO_VALUES;
   }
 
   /**
@@ -91,7 +94,7 @@ public final class TokenIntMap extends TokenSet {
   @Override
   public int remove(final byte[] key) {
     final int i = super.remove(key);
-    values[i] = Integer.MIN_VALUE;
+    if(i != 0) values[i] = Integer.MIN_VALUE;
     return i;
   }
 

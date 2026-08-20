@@ -10,14 +10,17 @@ import java.util.*;
  * @author Christian Gruen
  */
 public final class IntMap extends IntSet {
+  /** Values of empty maps (shared: its single entry must never be assigned). */
+  private static final int[] NO_VALUES = { Integer.MIN_VALUE };
+
   /** Values. */
   private int[] values;
 
   /**
-   * Default constructor.
+   * Default constructor (the hash table will be allocated when the first key is added).
    */
   public IntMap() {
-    this(INITIAL_CAPACITY);
+    values = NO_VALUES;
   }
 
   /**

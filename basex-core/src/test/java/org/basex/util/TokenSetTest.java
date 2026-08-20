@@ -40,6 +40,45 @@ public final class TokenSetTest {
         (byte) (i >>> 24), (byte) (i >> 16), (byte) (i >> 8), (byte) i });
   }
 
+  /** Tests operations on an empty set. */
+  @Test public void emptySet() {
+    final byte[] token = Token.token("x");
+    assertTrue(set.isEmpty(), "Set is not empty.");
+    assertEquals(0, set.size());
+    assertFalse(set.contains(token), "Token was found.");
+    assertEquals(0, set.index(token));
+    assertEquals(0, set.remove(token));
+    assertEquals(0, set.keys().length);
+    assertFalse(set.iterator().hasNext(), "Set is not empty.");
+    assertTrue(set.add(token), "Token was already indexed.");
+    assertTrue(set.contains(token), "Token is missing.");
+    assertEquals(1, set.size());
+  }
+
+  /** Tests the equality of sets. */
+  @Test public void equality() {
+    // empty sets, allocated with different capacities
+    assertEquals(new TokenSet(), new TokenSet());
+    assertEquals(new TokenSet(), new TokenSet(1000));
+
+    // equal tokens, different capacities
+    final TokenSet ts = new TokenSet(1000);
+    for(final byte[] token : LISTS[0]) {
+      set.add(token);
+      ts.add(token);
+    }
+    assertEquals(set, ts);
+
+    // different number of tokens
+    assertNotEquals(set, new TokenSet());
+    ts.add(Token.token("x"));
+    assertNotEquals(set, ts);
+
+    // equal number of tokens, last token differs
+    set.add(Token.token("y"));
+    assertNotEquals(set, ts);
+  }
+
   /**
    * Tests added tokens.
    * @param l index of list

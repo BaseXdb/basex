@@ -10,14 +10,17 @@ import java.util.*;
  * @author Christian Gruen
  */
 public class IntSet extends ASet {
+  /** Hashed keys of empty sets (shared: its single entry must never be assigned). */
+  private static final int[] NO_KEYS = { 0 };
+
   /** Hashed keys. */
   int[] keys;
 
   /**
-   * Default constructor.
+   * Default constructor (the hash table will be allocated when the first key is added).
    */
   public IntSet() {
-    this(INITIAL_CAPACITY);
+    keys = NO_KEYS;
   }
 
   /**
