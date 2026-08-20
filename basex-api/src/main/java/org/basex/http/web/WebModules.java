@@ -140,6 +140,79 @@ public final class WebModules {
   }
 
   /**
+   * Returns an exception for a request that is matched by no RESTXQ function, and assigns
+   * response headers that are required for the status code.
+   * @param conn HTTP connection
+   * @return exception
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   */
+  public HTTPException noMatch(final HTTPConnection conn) throws QueryException, IOException {
+    // collect all functions that are addressed by the requested path
+    final ArrayList<RestXqFunction> funcs = collect(conn, func -> func.matchesPath(conn));
+    if(!funcs.isEmpty()) {
+      // the path is known: report the first constraint that is not satisfied
+      final ArrayList<RestXqFunction> byMethod = new ArrayList<>(funcs);
+      byMethod.removeIf(func -> !func.matchesMethod(conn));
+      if(byMethod.isEmpty()) {
+        final TreeSet<String> allowed = new TreeSet<>();
+        for(final RestXqFunction func : funcs) allowed.addAll(func.methods);
+        // GET functions also serve HEAD requests
+        if(allowed.contains(Method.GET.name())) allowed.add(Method.HEAD.name());
+        final String supported = String.join(", ", allowed);
+        conn.response.setHeader(HTTPText.ALLOW, supported);
+        return HTTPStatus.METHOD_NOT_ALLOWED_X_X.get(conn.method, supported);
+      }
+
+      final ArrayList<RestXqFunction> byType = new ArrayList<>(byMethod);
+      byType.removeIf(func -> !func.matchesConsumes(conn));
+      if(byType.isEmpty()) {
+        // requests without content type are rejected as before
+        final MediaType type = conn.mediaType();
+        if(!type.is(MediaType.ALL_ALL)) {
+          return HTTPStatus.UNSUPPORTED_TYPE_X_X.get(type.type(), types(byMethod, true));
+        }
+      } else if(!Checks.any(byType, func -> func.matchesProduces(conn))) {
+        return HTTPStatus.NOT_ACCEPTABLE_X.get(types(byType, false));
+      }
+    }
+    return HTTPStatus.SERVICE_NOT_FOUND.get();
+  }
+
+  /**
+   * Returns all RESTXQ functions that satisfy the specified constraint.
+   * @param conn HTTP connection
+   * @param constraint constraint to be checked
+   * @return functions
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   */
+  private ArrayList<RestXqFunction> collect(final HTTPConnection conn,
+      final Checks<RestXqFunction> constraint) throws QueryException, IOException {
+    final ArrayList<RestXqFunction> list = new ArrayList<>();
+    for(final WebModule module : cache(conn.context).values()) {
+      for(final RestXqFunction func : module.functions()) {
+        if(constraint.ok(func)) list.add(func);
+      }
+    }
+    return list;
+  }
+
+  /**
+   * Returns a string with the media types of the specified functions.
+   * @param funcs functions
+   * @param consumed return consumed instead of produced media types
+   * @return media types
+   */
+  private static String types(final ArrayList<RestXqFunction> funcs, final boolean consumed) {
+    final TreeSet<String> types = new TreeSet<>();
+    for(final RestXqFunction func : funcs) {
+      for(final MediaType type : consumed ? func.consumes : func.produces) types.add(type.type());
+    }
+    return String.join(", ", types);
+  }
+
+  /**
    * Returns RESTXQ and permissions functions that match the current request.
    * @param conn HTTP connection
    * @param error error code (assigned if error function is to be called)
@@ -151,14 +224,8 @@ public final class WebModules {
   private List<RestXqFunction> find(final HTTPConnection conn, final QNm error, final boolean perm)
       throws QueryException, IOException {
 
-    // collect and sort all functions
-    final ArrayList<RestXqFunction> list = new ArrayList<>();
-    for(final WebModule module : cache(conn.context).values()) {
-      for(final RestXqFunction func : module.functions()) {
-        if(func.matches(conn, error, perm)) list.add(func);
-      }
-    }
-    // sort by specifity
+    // collect all functions and sort them by specifity
+    final ArrayList<RestXqFunction> list = collect(conn, func -> func.matches(conn, error, perm));
     Collections.sort(list);
     return list;
   }

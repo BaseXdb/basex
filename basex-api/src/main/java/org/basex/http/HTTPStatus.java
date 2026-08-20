@@ -30,6 +30,13 @@ public enum HTTPStatus {
   /** Error: 404, "Service not found". */
   SERVICE_NOT_FOUND(SC_NOT_FOUND, "Service not found."),
 
+  /** Error: 405, "Method not allowed". */
+  METHOD_NOT_ALLOWED_X_X(SC_METHOD_NOT_ALLOWED, "Method not allowed: %. Supported: %."),
+  /** Error: 406, "No acceptable media type". */
+  NOT_ACCEPTABLE_X(SC_NOT_ACCEPTABLE, "No acceptable media type. Supported: %."),
+  /** Error: 415, "Unsupported content type". */
+  UNSUPPORTED_TYPE_X_X(SC_UNSUPPORTED_MEDIA_TYPE, "Unsupported content type: %. Supported: %."),
+
   /** Error: 500, "RESTXQ path cannot be resolved.". */
   NO_RESTXQ_DIRECTORY(SC_INTERNAL_SERVER_ERROR, "RESTXQ directory does not exist."),
   /** Error 501, "Method not supported.". */

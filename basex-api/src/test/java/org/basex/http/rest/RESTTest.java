@@ -37,13 +37,4 @@ public abstract class RESTTest extends HTTPTest {
     assertTrue(string.startsWith(prefix),
       '\'' + string + "' does not start with '" + prefix + '\'');
   }
-
-  /**
-   * Checks if a string is contained in another string.
-   * @param str string
-   * @param sub sub string
-   */
-  protected static void assertContains(final String str, final String sub) {
-    if(!str.contains(sub)) fail('\'' + sub + "' not contained in '" + str + "'.");
-  }
 }

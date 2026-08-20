@@ -49,7 +49,7 @@ public class RestXqServlet extends BaseXServlet {
       // OPTIONS: no custom response required
       if(conn.method.equals(Method.OPTIONS.name())) {
         conn.response.setHeader(HTTPText.ALLOW, Stream.of(Method.values()).map(Enum::name).
-            collect(Collectors.joining(",")));
+            collect(Collectors.joining(", ")));
         return;
       }
       // HEAD: evaluate GET, discard body
@@ -57,8 +57,10 @@ public class RestXqServlet extends BaseXServlet {
         conn.method = Method.GET.name();
         func = modules.restxq(conn, null);
         body = false;
+        // restore the original method to report it in the error message
+        if(func == null) conn.method = Method.HEAD.name();
       }
-      if(func == null) throw HTTPStatus.SERVICE_NOT_FOUND.get();
+      if(func == null) throw modules.noMatch(conn);
     }
 
     try {

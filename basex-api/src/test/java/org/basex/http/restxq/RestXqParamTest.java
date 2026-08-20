@@ -1,5 +1,8 @@
 package org.basex.http.restxq;
 
+import java.util.*;
+
+import org.basex.util.http.MediaType;
 import org.junit.jupiter.api.*;
 
 /**
@@ -30,6 +33,29 @@ public final class RestXqParamTest extends RestXqTest {
     // missing assignment: default value is empty sequence
     get("0", "declare %R:path('') %R:query-param('a', '{$v}') " +
             "function m:f($v) { count($v) };", "");
+  }
+
+  /**
+   * Kind of parameter in binding errors.
+   * @throws Exception exception
+   */
+  @Test public void parameterKinds() throws Exception {
+    register("declare %R:path('') %R:query-param('a', '{$a}') "
+        + "function m:f($a as xs:integer) { $a };");
+    assertContains(get(500, "", "a", "x"), "Query parameter 'a'");
+
+    register("declare %R:path('') %R:POST %R:form-param('a', '{$a}') "
+        + "function m:f($a as xs:integer) { $a };");
+    assertContains(post(500, "a=x", MediaType.APPLICATION_X_WWW_FORM_URLENCODED, ""),
+        "Form parameter 'a'");
+
+    register("declare %R:path('') %R:header-param('X-Num', '{$a}') "
+        + "function m:f($a as xs:integer) { $a };");
+    assertContains(send(500, "GET", null, null, Map.of("X-Num", "x"), ""), "Header 'X-Num'");
+
+    register("declare %R:path('') %R:cookie-param('num', '{$a}') "
+        + "function m:f($a as xs:integer) { $a };");
+    assertContains(send(500, "GET", null, null, Map.of("Cookie", "num=x"), ""), "Cookie 'num'");
   }
 
   /**

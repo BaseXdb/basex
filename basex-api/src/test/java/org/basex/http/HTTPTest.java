@@ -8,6 +8,7 @@ import java.net.*;
 import java.net.http.*;
 import java.net.http.HttpRequest.*;
 import java.nio.charset.*;
+import java.util.*;
 
 import org.basex.*;
 import org.basex.core.*;
@@ -29,6 +30,8 @@ public abstract class HTTPTest extends SandboxTest {
   private static BaseXHTTP http;
   /** Root path. */
   private static String rootUrl;
+  /** Headers of the last response. */
+  private static HttpHeaders responseHeaders;
 
   // INITIALIZATION ===============================================================================
 
@@ -200,6 +203,24 @@ public abstract class HTTPTest extends SandboxTest {
    */
   protected static String send(final int status, final String method, final InputStream is,
       final MediaType type, final String path, final Object... params) throws IOException {
+    return send(status, method, is, type, Map.of(), path, params);
+  }
+
+  /**
+   * Executes the specified request with additional request headers.
+   * @param status status code to check
+   * @param method HTTP method
+   * @param is input stream (can be {@code null})
+   * @param type media type (optional, may be {@code null})
+   * @param headers request headers
+   * @param path path of request
+   * @param params query parameters (keys and values)
+   * @return string result
+   * @throws IOException I/O exception
+   */
+  protected static String send(final int status, final String method, final InputStream is,
+      final MediaType type, final Map<String, String> headers, final String path,
+      final Object... params) throws IOException {
 
     final BodyPublisher pub = is != null ? HttpRequest.BodyPublishers.ofInputStream(() -> is) :
       HttpRequest.BodyPublishers.noBody();
@@ -213,16 +234,36 @@ public abstract class HTTPTest extends SandboxTest {
     final URI uri = URI.create(sb.toString());
     final HttpRequest.Builder builder = HttpRequest.newBuilder(uri).method(method, pub);
     if(type != null) builder.setHeader("Content-Type", type.toString());
+    headers.forEach(builder::setHeader);
 
     try {
       final HttpClient client = IOUrl.client(true);
       final HttpResponse<String> response = client.send(builder.build(),
           HttpResponse.BodyHandlers.ofString());
+      responseHeaders = response.headers();
       final String body = response.body();
       assertEquals(status, response.statusCode(), method + ' ' + path + "\nResponse: " + body);
       return body;
     } catch(final InterruptedException ex) {
       throw new IOException(ex);
     }
+  }
+
+  /**
+   * Returns a header of the last response.
+   * @param name name of header
+   * @return value, or {@code null} if the header does not exist
+   */
+  protected static String header(final String name) {
+    return responseHeaders.firstValue(name).orElse(null);
+  }
+
+  /**
+   * Checks if a string is contained in another string.
+   * @param str string
+   * @param sub sub string
+   */
+  protected static void assertContains(final String str, final String sub) {
+    if(!str.contains(sub)) fail('\'' + sub + "' not contained in '" + str + "'.");
   }
 }

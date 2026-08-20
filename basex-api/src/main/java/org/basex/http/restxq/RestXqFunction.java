@@ -49,6 +49,8 @@ public final class RestXqFunction extends WebFunction {
 
   /** Returned media types. */
   public final ArrayList<MediaType> produces = new ArrayList<>();
+  /** Consumed media types. */
+  public final ArrayList<MediaType> consumes = new ArrayList<>();
   /** Query parameters. */
   final ArrayList<WebParam> queryParams = new ArrayList<>();
   /** Form parameters. */
@@ -65,8 +67,6 @@ public final class RestXqFunction extends WebFunction {
   private final ArrayList<WebParam> errorParams = new ArrayList<>();
   /** Cookie parameters. */
   private final ArrayList<WebParam> cookieParams = new ArrayList<>();
-  /** Consumed media types. */
-  private final ArrayList<MediaType> consumes = new ArrayList<>();
   /** Variables of all path templates. */
   private final QNmSet pathVars = new QNmSet();
   /** Index of the assigned path annotation. */
@@ -255,10 +255,12 @@ public final class RestXqFunction extends WebFunction {
 
     // bind query and form parameters
     for(final WebParam rxp : queryParams) {
-      bind(rxp, args, conn.requestCtx.queryValues().get(Str.get(rxp.name())), qc);
+      bind(rxp, args, conn.requestCtx.queryValues().get(Str.get(rxp.name())), qc,
+          "Query parameter");
     }
     for(final WebParam rxp : formParams) {
-      bind(rxp, args, conn.requestCtx.formValues(mopts).get(Str.get(rxp.name())), qc);
+      bind(rxp, args, conn.requestCtx.formValues(mopts).get(Str.get(rxp.name())), qc,
+          "Form parameter");
     }
 
     // bind header parameters
@@ -268,7 +270,7 @@ public final class RestXqFunction extends WebFunction {
       for(final String header : state.headers(rxp.name())) {
         for(final String s : header.split(", *")) tl.add(s);
       }
-      bind(rxp, args, StrSeq.get(tl), qc);
+      bind(rxp, args, StrSeq.get(tl), qc, "Header");
     }
 
     // bind cookie parameters
@@ -280,13 +282,13 @@ public final class RestXqFunction extends WebFunction {
           if(rxp.name().equals(c.getName())) value = Str.get(c.getValue());
         }
       }
-      bind(rxp, args, value, qc);
+      bind(rxp, args, value, qc, "Cookie");
     }
 
     // bind errors
     final XQMap errors = ext instanceof final QueryException qe ? qe.map() : XQMap.empty();
     for(final WebParam rxp : errorParams) {
-      bind(rxp, args, errors.get(Str.get(rxp.name())), qc);
+      bind(rxp, args, errors.get(Str.get(rxp.name())), qc, "Error parameter");
     }
 
     // bind permission information
@@ -304,9 +306,7 @@ public final class RestXqFunction extends WebFunction {
    * @return result of check
    */
   public boolean matches(final HTTPConnection conn, final QNm err, final boolean perm) {
-    // reject if the HTTP method or the consumed/produced media type does not match
-    final boolean methodMatches = methods.isEmpty() || methods.contains(conn.method);
-    if(!methodMatches || !consumes(conn) || !produces(conn)) return false;
+    if(!matchesMethod(conn) || !matchesConsumes(conn) || !matchesProduces(conn)) return false;
 
     if(perm) return permission != null && permission.matches(conn);
     // an error handler with a path is limited to errors that are raised under this path
@@ -315,7 +315,58 @@ public final class RestXqFunction extends WebFunction {
 
     // a method-agnostic target is not triggered by OPTIONS requests (preflight, run as admin)
     final boolean optionsPreflight = methods.isEmpty() && conn.method.equals(Method.OPTIONS.name());
-    return !optionsPreflight && error == null && path != null && path.matches(conn.path());
+    return !optionsPreflight && matchesPath(conn);
+  }
+
+  /**
+   * Checks if the requested path is addressed by this function.
+   * @param conn HTTP connection
+   * @return result of check
+   */
+  public boolean matchesPath(final HTTPConnection conn) {
+    // error handlers are not addressed by a path
+    return error == null && path != null && path.matches(conn.path());
+  }
+
+  /**
+   * Checks if the HTTP method matches.
+   * @param conn HTTP connection
+   * @return result of check
+   */
+  public boolean matchesMethod(final HTTPConnection conn) {
+    return methods.isEmpty() || methods.contains(conn.method);
+  }
+
+  /**
+   * Checks if the consumed content type matches.
+   * @param conn HTTP connection
+   * @return result of check
+   */
+  public boolean matchesConsumes(final HTTPConnection conn) {
+    // check if any combination matches
+    final MediaType mt = conn.mediaType();
+    for(final MediaType consume : consumes) {
+      if(mt.matches(consume)) return true;
+    }
+    // return true if no type is given
+    return consumes.isEmpty();
+  }
+
+  /**
+   * Checks if the produced media type matches.
+   * @param conn HTTP connection
+   * @return result of check
+   */
+  public boolean matchesProduces(final HTTPConnection conn) {
+    // return true if no type is given
+    if(produces.isEmpty()) return true;
+    // check if any combination matches
+    for(final MediaType accept : conn.accepts()) {
+      for(final MediaType produce : produces) {
+        if(produce.matches(accept)) return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -405,49 +456,18 @@ public final class RestXqFunction extends WebFunction {
   }
 
   /**
-   * Checks if the consumed content type matches.
-   * @param conn HTTP connection
-   * @return result of check
-   */
-  private boolean consumes(final HTTPConnection conn) {
-    // check if any combination matches
-    final MediaType mt = conn.mediaType();
-    for(final MediaType consume : consumes) {
-      if(mt.matches(consume)) return true;
-    }
-    // return true if no type is given
-    return consumes.isEmpty();
-  }
-
-  /**
-   * Checks if the produced media type matches.
-   * @param conn HTTP connection
-   * @return result of check
-   */
-  private boolean produces(final HTTPConnection conn) {
-    // return true if no type is given
-    if(produces.isEmpty()) return true;
-    // check if any combination matches
-    for(final MediaType accept : conn.accepts()) {
-      for(final MediaType produce : produces) {
-        if(produce.matches(accept)) return true;
-      }
-    }
-    return false;
-  }
-
-  /**
    * Binds the specified parameter to a variable.
    * @param param parameter
    * @param args argument array
    * @param value values to be bound; the default value is assigned if the argument is empty
    * @param qc query context
+   * @param kind kind of parameter
    * @throws QueryException query exception
    */
   private void bind(final WebParam param, final Expr[] args, final Value value,
-      final QueryContext qc) throws QueryException {
+      final QueryContext qc, final String kind) throws QueryException {
     bind(param.var(), args, value.isEmpty() ? param.value() : value, qc,
-      "Value of '" + param.name() + "'");
+      kind + " '" + param.name() + "'");
   }
 
   /**

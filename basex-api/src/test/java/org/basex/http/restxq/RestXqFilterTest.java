@@ -1,5 +1,10 @@
 package org.basex.http.restxq;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.*;
+
+import org.basex.util.http.MediaType;
 import org.junit.jupiter.api.*;
 
 /**
@@ -37,6 +42,28 @@ public final class RestXqFilterTest extends RestXqTest {
    */
   @Test public void consumesError() throws Exception {
     get(404, "declare %R:path('') %R:consumes('X') function m:f() { 1 };", "");
+  }
+
+  /**
+   * Content types that are not consumed by an existing path.
+   * @throws Exception exception
+   */
+  @Test public void unsupportedType() throws Exception {
+    register("declare %R:POST %R:path('') %R:consumes('application/xml') function m:f() { 1 };");
+    assertEquals("Unsupported content type: text/plain. Supported: application/xml.",
+        post(415, "x", MediaType.TEXT_PLAIN, ""));
+    assertEquals("1", post("<x/>", MediaType.APPLICATION_XML, ""));
+  }
+
+  /**
+   * Media types that are not produced by an existing path.
+   * @throws Exception exception
+   */
+  @Test public void notAcceptable() throws Exception {
+    register("declare %R:path('') %R:produces('application/xml') function m:f() { 1 };");
+    assertEquals("No acceptable media type. Supported: application/xml.",
+        send(406, "GET", null, null, Map.of("Accept", "image/png"), ""));
+    send(200, "GET", null, null, Map.of("Accept", "application/xml"), "");
   }
 
   /**

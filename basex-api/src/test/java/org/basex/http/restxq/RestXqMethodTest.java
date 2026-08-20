@@ -100,6 +100,29 @@ public final class RestXqMethodTest extends RestXqTest {
   }
 
   /**
+   * Methods that are not supported by an existing path.
+   * @throws Exception exception
+   */
+  @Test public void methodNotAllowed() throws Exception {
+    // the path is addressed by another method
+    register("declare %R:GET %R:path('') function m:f() { 'x' };");
+    assertEquals("Method not allowed: POST. Supported: GET, HEAD.",
+        post(405, "", MediaType.TEXT_PLAIN, ""));
+    assertEquals("GET, HEAD", header("Allow"));
+    send(405, "RETRIEVE", null, null, "");
+    // HEAD requests are answered by GET functions
+    register("declare %R:POST %R:path('') function m:f() { 'x' };");
+    head(405, "");
+    assertEquals("POST", header("Allow"));
+    // a method-agnostic function accepts all methods
+    register("declare %R:path('') function m:f() { 'x' };");
+    assertEquals("x", send(200, "RETRIEVE", null, null, ""));
+    // an unknown path is not found
+    register("declare %R:GET %R:path('a') function m:f() { 'x' };");
+    post(404, "", MediaType.TEXT_PLAIN, "");
+  }
+
+  /**
    * {@code %HEAD} method.
    * @throws Exception exception
    */
