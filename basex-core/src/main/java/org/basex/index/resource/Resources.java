@@ -21,18 +21,17 @@ import org.basex.util.list.*;
 public final class Resources implements Index {
   /** Binary resource types. */
   public static final ResourceType[] BINARIES = { ResourceType.BINARY, ResourceType.VALUE };
-  /** Document references. */
-  private final Docs docs;
-  /** Binary files. */
-  private final Binaries bins;
+  /** Data reference. */
+  private final Data data;
+  /** Document references (can be {@code null}). */
+  private Docs docs;
 
   /**
    * Constructor.
    * @param data data reference
    */
   public Resources(final Data data) {
-    docs = new Docs(data);
-    bins = new Binaries(data);
+    this.data = data;
   }
 
   /**
@@ -41,7 +40,7 @@ public final class Resources implements Index {
    * @throws IOException I/O exception
    */
   public synchronized void read(final DataInput in) throws IOException {
-    docs.read(in);
+    documents().read(in);
   }
 
   /**
@@ -50,7 +49,7 @@ public final class Resources implements Index {
    * @throws IOException I/O exception
    */
   public void write(final DataOutput out) throws IOException {
-    docs.write(out);
+    documents().write(out);
   }
 
   /**
@@ -58,7 +57,7 @@ public final class Resources implements Index {
    * @return document nodes (internal representation!)
    */
   public synchronized IntList docs() {
-    return docs.docs();
+    return documents().docs();
   }
 
   /**
@@ -67,7 +66,7 @@ public final class Resources implements Index {
    * @param clip data clip
    */
   public void insert(final int pre, final DataClip clip) {
-    docs.insert(pre, clip);
+    documents().insert(pre, clip);
   }
 
   /**
@@ -76,7 +75,7 @@ public final class Resources implements Index {
    * @param size number of deleted nodes
    */
   public void delete(final int pre, final int size) {
-    docs.delete(pre, size);
+    documents().delete(pre, size);
   }
 
   /**
@@ -85,7 +84,7 @@ public final class Resources implements Index {
    * @param value new name
    */
   public void rename(final int pre, final byte[] value) {
-    docs.rename(pre, value);
+    documents().rename(pre, value);
   }
 
   /**
@@ -104,7 +103,7 @@ public final class Resources implements Index {
    * @return PRE values (internal representation!)
    */
   public synchronized IntList docs(final String path, final boolean dir) {
-    return docs.docs(path, dir);
+    return documents().docs(path, dir);
   }
 
   /**
@@ -113,7 +112,7 @@ public final class Resources implements Index {
    * @return PRE value or {@code -1}
    */
   public int doc(final String path) {
-    return docs.doc(path);
+    return documents().doc(path);
   }
 
   /**
@@ -123,7 +122,7 @@ public final class Resources implements Index {
    * @return paths
    */
   public synchronized StringList paths(final String path, final ResourceType type) {
-    return bins.paths(path, type);
+    return Binaries.paths(data, path, type);
   }
 
   /**
@@ -132,8 +131,8 @@ public final class Resources implements Index {
    * @return result of check
    */
   public synchronized boolean isDir(final String path) {
-    return docs.isDir(path) || bins.isDir(path, ResourceType.BINARY) ||
-        bins.isDir(path, ResourceType.VALUE);
+    return documents().isDir(path) || Binaries.isDir(data, path, ResourceType.BINARY) ||
+        Binaries.isDir(data, path, ResourceType.VALUE);
   }
 
   /**
@@ -144,9 +143,18 @@ public final class Resources implements Index {
    */
   public synchronized TokenObjectMap<ResourceType> children(final String path, final boolean dir) {
     final TokenObjectMap<ResourceType> map = new TokenObjectMap<>();
-    docs.children(path, dir, map);
-    bins.children(path, dir, map);
+    documents().children(path, dir, map);
+    Binaries.children(data, path, dir, map);
     return map;
+  }
+
+  /**
+   * Returns the document references, which are created if they do not exist yet.
+   * @return document references
+   */
+  private synchronized Docs documents() {
+    if(docs == null) docs = new Docs(data);
+    return docs;
   }
 
   // Inherited methods ============================================================================

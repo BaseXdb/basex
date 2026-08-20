@@ -15,24 +15,17 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 final class Binaries {
-  /** Data reference. */
-  private final Data data;
-
-  /**
-   * Constructor.
-   * @param data data reference
-   */
-  Binaries(final Data data) {
-    this.data = data;
-  }
+  /** Private constructor. */
+  private Binaries() { }
 
   /**
    * Returns the database paths to all file resources that match the specified path.
+   * @param data data reference
    * @param type resource type
    * @param path input path
    * @return paths
    */
-  synchronized StringList paths(final String path, final ResourceType type) {
+  static StringList paths(final Data data, final String path, final ResourceType type) {
     final StringList paths = new StringList();
     String norm = MetaData.normPath(path);
     if(norm != null && !data.inMemory()) {
@@ -51,11 +44,12 @@ final class Binaries {
 
   /**
    * Adds the paths of file resources to a map.
+   * @param data data reference
    * @param path path
    * @param dir returns directories instead of files
    * @param map paths and resource types
    */
-  synchronized void children(final String path, final boolean dir,
+  static void children(final Data data, final String path, final boolean dir,
       final TokenObjectMap<ResourceType> map) {
 
     for(final ResourceType type : Resources.BINARIES) {
@@ -73,11 +67,12 @@ final class Binaries {
 
   /**
    * Determines whether the given path is the path to a directory with files.
+   * @param data data reference
    * @param path path
    * @param type resource type
    * @return result of check
    */
-  synchronized boolean isDir(final String path, final ResourceType type) {
+  static boolean isDir(final Data data, final String path, final ResourceType type) {
     final IOFile bin = data.meta.file(path, type);
     return bin != null && bin.isDir();
   }
