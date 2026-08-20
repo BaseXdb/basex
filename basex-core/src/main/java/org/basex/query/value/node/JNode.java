@@ -29,12 +29,12 @@ public final class JNode extends GNode {
   /** Value. */
   public final Value value;
   /** Sequence position (starts with {@code 1}). */
-  public final long position;
+  public final int position;
 
   /** Parent node (can be {@code null}). */
   private final JNode parent;
   /** Child index ({@code -1} if not initialized yet). */
-  private long index;
+  private int index;
 
   /**
    * Root node constructor.
@@ -49,7 +49,7 @@ public final class JNode extends GNode {
    * @param parent parent node
    * @param index index ({@code -1} if not initialized yet)
    */
-  public JNode(final JNode parent, final long index) {
+  public JNode(final JNode parent, final int index) {
     this((XQStruct) parent.value, parent, index, 1);
   }
 
@@ -60,7 +60,7 @@ public final class JNode extends GNode {
    * @param index index ({@code -1} if not initialized yet)
    * @param position sequence position (starts with {@code 1})
    */
-  public JNode(final XQStruct struct, final JNode parent, final long index, final long position) {
+  public JNode(final XQStruct struct, final JNode parent, final int index, final int position) {
     this(struct.keyAt(index), struct.valueAt(index), parent, index, position);
   }
 
@@ -72,8 +72,8 @@ public final class JNode extends GNode {
    * @param index index ({@code -1} if not initialized yet)
    * @param position sequence position (starts with {@code 1})
    */
-  public JNode(final Item key, final Value value, final JNode parent, final long index,
-      final long position) {
+  public JNode(final Item key, final Value value, final JNode parent, final int index,
+      final int position) {
     super(NodeType.JNODE);
     this.key = key;
     this.value = value;
@@ -144,7 +144,7 @@ public final class JNode extends GNode {
     if(r1 != r2) return Integer.signum(r1.id - r2.id);
 
     // same tree: compare the index paths leading from the root to both nodes
-    final long[] p1 = new long[d1], p2 = new long[d2];
+    final int[] p1 = new int[d1], p2 = new int[d2];
     JNode n = this;
     for(int i = d1 - 1; i >= 0; i--) { p1[i] = n.index(); n = n.parent; }
     n = jnode;
@@ -156,10 +156,10 @@ public final class JNode extends GNode {
    * Computes or returns the child index of the key.
    * @return index ({@code -1} for root node)
    */
-  private long index() {
+  private int index() {
     if(parent == null) return -1;
 
-    long i = index;
+    int i = index;
     if(i != -1) return i;
     if(parent.value instanceof final XQMap map) {
       i = 0;
@@ -168,7 +168,7 @@ public final class JNode extends GNode {
         i++;
       }
     } else {
-      i = ((Itr) key).itr() - 1;
+      i = (int) (((Itr) key).itr() - 1);
     }
     index = i;
     return i;
@@ -241,7 +241,7 @@ public final class JNode extends GNode {
         }
         @Override
         public GNode get(final long i) {
-          return new JNode(JNode.this, i);
+          return new JNode(JNode.this, (int) i);
         }
       };
     }
@@ -249,7 +249,7 @@ public final class JNode extends GNode {
     // sequences: multiple scans
     return new BasicNodeIter() {
       XQStruct struct;
-      long p, s, ss;
+      int p, s, ss;
 
       @Override
       public GNode next() {
@@ -258,7 +258,7 @@ public final class JNode extends GNode {
           if(p == value.size()) return null;
           if(value.itemAt(p++) instanceof final XQStruct st) {
             struct = st;
-            ss = st.structSize();
+            ss = (int) st.structSize();
             s = 0;
           } else {
             struct = null;
@@ -282,7 +282,7 @@ public final class JNode extends GNode {
       final double d = num.dbl();
       final long i = (long) d - 1;
       if(d == i + 1 && i >= 0 && i < array.structSize()) {
-        return new JNode(item, array.valueAt(i), this, i, 1);
+        return new JNode(item, array.valueAt(i), this, (int) i, 1);
       }
     }
     return null;
