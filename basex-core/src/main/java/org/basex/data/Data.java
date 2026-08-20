@@ -87,8 +87,10 @@ public abstract class Data {
 
   /** Resource index. */
   public final Resources resources = new Resources(this);
-  /** Meta data. */
-  public final MetaData meta;
+  /** Meta data (read-only if {@link MetaData#shared}; see {@link #meta()}). */
+  public MetaData meta;
+  /** Last (highest) ID assigned to a node. Can be {@code -1} if the database is empty. */
+  public int lastid = -1;
 
   /** Element names. */
   public Names elemNames;
@@ -125,6 +127,7 @@ public abstract class Data {
    */
   protected Data(final MetaData meta) {
     this.meta = meta;
+    lastid = meta.lastid;
   }
 
   /**
@@ -292,6 +295,23 @@ public abstract class Data {
   // RETRIEVING VALUES ============================================================================
 
   /**
+   * Returns the meta data for modifications, replacing a shared instance by a private copy.
+   * @return meta data
+   */
+  public final MetaData meta() {
+    if(meta.shared) meta = new MetaData(meta);
+    return meta;
+  }
+
+  /**
+   * Returns the number of nodes.
+   * @return number of nodes
+   */
+  public final int nodes() {
+    return table.nodes;
+  }
+
+  /**
    * Returns a PRE value for the specified ID.
    * @param id unique node ID
    * @return PRE value or {@code -1} if ID was not found
@@ -300,8 +320,8 @@ public abstract class Data {
     if(meta.updindex) return idmap.pre(id);
 
     // find PRE value in the table; start with specified ID
-    final int size = meta.size;
-    for(int p = Math.max(0, id); p < meta.size; ++p) {
+    final int size = nodes();
+    for(int p = Math.max(0, id); p < nodes(); ++p) {
       if(id == id(p)) return p;
     }
     final int ps = Math.min(size, id);
@@ -381,7 +401,7 @@ public abstract class Data {
     int s = kind == ELEM ? table.read1(pre, 0) >> 3 & IO.MAXATTS : 1;
     // skip additional attributes if value is larger than maximum range
     if(s == IO.MAXATTS) {
-      while(s < meta.size - pre && kind(pre + s) == ATTR) s++;
+      while(s < nodes() - pre && kind(pre + s) == ATTR) s++;
     }
     return s;
   }
@@ -524,7 +544,7 @@ public abstract class Data {
    * Registers a modification of the database.
    */
   private void modified() {
-    meta.update();
+    meta().update();
     locations = null;
   }
 
@@ -688,7 +708,7 @@ public abstract class Data {
     }
 
     // add entries to index structures
-    indexAdd(pre, meta.lastid - sCount + 1, sCount, source);
+    indexAdd(pre, lastid - sCount + 1, sCount, source);
     return true;
   }
 
@@ -870,7 +890,7 @@ public abstract class Data {
   private void updateDist(final int pre, final int size) {
     if(updateDists) {
       int p = pre;
-      while(p < meta.size) {
+      while(p < nodes()) {
         final int k = kind(p);
         if(k == DOC) break;
         dist(p, k, dist(p, k) + size);
@@ -1064,7 +1084,7 @@ public abstract class Data {
    * @return ID
    */
   private int newID() {
-    return ++meta.lastid;
+    return ++lastid;
   }
 
   /**
@@ -1139,6 +1159,6 @@ public abstract class Data {
     final int max = 20;
     final DataPrinter dp = new DataPrinter(this);
     dp.add(0, max);
-    return meta.size > max ? dp + Text.DOTS : dp.toString();
+    return nodes() > max ? dp + Text.DOTS : dp.toString();
   }
 }

@@ -31,6 +31,10 @@ public final class Context {
   public final Services services;
   /** Main options. */
   public final MainOptions options;
+  /** Meta data of main-memory fragments (lazy instantiation, can be {@code null}). */
+  private MetaData sharedMeta;
+  /** Options version of the shared meta data. */
+  private int sharedVersion;
   /** Static options. */
   public final StaticOptions soptions;
   /** Client sessions. */
@@ -146,6 +150,20 @@ public final class Context {
     stores = new Stores(this);
     caches = new Caches(this);
     client = null;
+  }
+
+  /**
+   * Returns shared meta data for main-memory fragments.
+   * @return meta data
+   */
+  public synchronized MetaData sharedMeta() {
+    final int v = options.version();
+    if(sharedMeta == null || sharedVersion != v) {
+      sharedMeta = new MetaData(options);
+      sharedMeta.shared = true;
+      sharedVersion = v;
+    }
+    return sharedMeta;
   }
 
   /**

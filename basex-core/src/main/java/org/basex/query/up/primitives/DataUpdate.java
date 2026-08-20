@@ -41,7 +41,7 @@ public abstract class DataUpdate extends Update {
    * @throws QueryException query exception
    */
   public final void checkLimit(final long size) throws QueryException {
-    if(data.meta.size + size >= Integer.MAX_VALUE) {
+    if(data.nodes() + size >= Integer.MAX_VALUE) {
       throw UPDBERROR_X.get(null, "Update would exceed database node limit.");
     }
   }

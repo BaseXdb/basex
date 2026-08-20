@@ -253,6 +253,8 @@ public final class MainOptions extends Options {
 
   /** Resolver instance (lazy instantiation). */
   private XMLResolver resolver;
+  /** Options version of the resolver. */
+  private int resolverVersion;
   /** Whether external resources may be accessed. */
   private boolean trusted = true;
 
@@ -343,8 +345,14 @@ public final class MainOptions extends Options {
    * @return XML resolver
    */
   public XMLResolver resolver() {
-    final String catalog = get(CATALOG);
-    if(resolver == null || !catalog.equals(resolver.catalog())) resolver = new XMLResolver(catalog);
+    final int v = version();
+    if(resolver == null || resolverVersion != v) {
+      final String catalog = get(CATALOG);
+      if(resolver == null || !catalog.equals(resolver.catalog())) {
+        resolver = new XMLResolver(catalog);
+      }
+      resolverVersion = v;
+    }
     return resolver;
   }
 

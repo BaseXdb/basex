@@ -54,9 +54,9 @@ public final class DiskTableTest extends SandboxTest {
   @BeforeEach public void setUp() throws Exception {
     final Parser parser = Parser.xmlParser(IO.get(TESTFILE));
     data = new DiskBuilder(NAME, parser, context.soptions, context.options).build();
-    size = data.meta.size;
+    size = data.nodes();
     data.close();
-    tda = new TableDiskAccess(data.meta, true);
+    tda = new TableDiskAccess(data.meta, size, true);
 
     final int bc = size * (1 << IO.NODEPOWER);
     storage = new byte[bc];
@@ -81,8 +81,9 @@ public final class DiskTableTest extends SandboxTest {
    */
   private void closeAndReload() {
     try {
+      final int count = tda.nodes;
       tda.close();
-      tda = new TableDiskAccess(data.meta, true);
+      tda = new TableDiskAccess(data.meta, count, true);
     } catch(final IOException ex) {
       fail(Util.message(ex));
     }
@@ -131,14 +132,7 @@ public final class DiskTableTest extends SandboxTest {
    * @return number of entries
    */
   private int tdaSize() {
-    try {
-      final Field f = tda.getClass().getSuperclass().getDeclaredField("meta");
-      f.setAccessible(true);
-      return ((MetaData) f.get(tda)).size;
-    } catch(final Exception ex) {
-      Util.stack(ex);
-      return 0;
-    }
+    return tda.nodes;
   }
 
   /**

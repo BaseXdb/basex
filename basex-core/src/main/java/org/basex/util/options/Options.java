@@ -109,6 +109,8 @@ public class Options implements Iterable<Option<?>> {
   private final Object[] values;
   /** Free option assignments. */
   private final HashMap<String, String> free;
+  /** Number of assignments. */
+  private volatile int version;
 
   /** Options, cached from an input file. */
   private final StringList user = new StringList();
@@ -211,7 +213,7 @@ public class Options implements Iterable<Option<?>> {
    * @param option option
    * @return value (can be {@code null})
    */
-  public final synchronized Object get(final Option<?> option) {
+  public final Object get(final Option<?> option) {
     final int index = option.index() - meta.offset;
     return index >= 0 && index < values.length ? values[index] : null;
   }
@@ -221,7 +223,7 @@ public class Options implements Iterable<Option<?>> {
    * @param name name of option
    * @return value (can be {@code null})
    */
-  public final synchronized Object get(final String name) {
+  public final Object get(final String name) {
     final Option<?> option = meta.definitions.get(name);
     return option != null ? get(option) : null;
   }
@@ -234,6 +236,15 @@ public class Options implements Iterable<Option<?>> {
   public final synchronized void put(final Option<?> option, final Object value) {
     checkSealed(option.name());
     values[option.index() - meta.offset] = option.normalize(value);
+    version++;
+  }
+
+  /**
+   * Returns the number of assignments, which can be used to invalidate cached values.
+   * @return number of assignments
+   */
+  public final int version() {
+    return version;
   }
 
   /**

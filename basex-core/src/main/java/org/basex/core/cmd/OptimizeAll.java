@@ -176,7 +176,7 @@ public final class OptimizeAll extends ACreate {
     DBParser(final DiskData data, final MainOptions options) {
       super(data.meta.original, options);
       this.data = data;
-      size = data.meta.size;
+      size = data.nodes();
     }
 
     @Override

@@ -189,7 +189,7 @@ public final class BXCollection implements Collection {
 
     try {
       data.startUpdate(mopts);
-      data.insert(data.meta.size, -1, new DataClip(md));
+      data.insert(data.nodes(), -1, new DataClip(md));
       data.finishUpdate(mopts);
     } catch(final BaseXException ex) {
       throw (XMLDBException) new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_LOCK).initCause(ex);

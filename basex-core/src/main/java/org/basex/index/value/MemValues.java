@@ -101,7 +101,7 @@ public final class MemValues extends ValueIndex {
 
   @Override
   public IndexCosts costs(final IndexSearch search) {
-    return IndexCosts.get(search instanceof StringRange ? Math.max(1, data.meta.size / 10) :
+    return IndexCosts.get(search instanceof StringRange ? Math.max(1, data.nodes() / 10) :
       lenList.get(values.index(search.token())));
   }
 

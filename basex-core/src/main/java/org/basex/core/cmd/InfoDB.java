@@ -27,7 +27,7 @@ public final class InfoDB extends AInfo {
 
   @Override
   protected boolean run() throws IOException {
-    out.print(db(context.data().meta, false, true));
+    out.print(db(context.data(), false, true));
     return true;
   }
 
@@ -38,18 +38,42 @@ public final class InfoDB extends AInfo {
 
   /**
    * Creates a database information string.
+   * @param data data reference
+   * @param bold header bold flag
+   * @param index add index information
+   * @return info string
+   */
+  public static String db(final Data data, final boolean bold, final boolean index) {
+    return db(data.meta, data.nodes(), bold, index);
+  }
+
+  /**
+   * Creates a database information string.
    * @param meta meta data
-   * @param bold header bold header flag
+   * @param bold header bold flag
    * @param index add index information
    * @return info string
    */
   public static String db(final MetaData meta, final boolean bold, final boolean index) {
+    return db(meta, meta.size, bold, index);
+  }
+
+  /**
+   * Creates a database information string.
+   * @param meta meta data
+   * @param nodes number of nodes
+   * @param bold header bold flag
+   * @param index add index information
+   * @return info string
+   */
+  private static String db(final MetaData meta, final int nodes, final boolean bold,
+      final boolean index) {
     final TokenBuilder tb = new TokenBuilder();
     final String header = (bold ? new TokenBuilder().bold().add('%').norm().toString() : "%") + NL;
     tb.addExt(header, DB_PROPS);
     info(tb, MetaProp.NAME, meta);
     info(tb, MetaProp.SIZE.name(), Performance.formatHuman(meta.dbSize()));
-    info(tb, MetaProp.NODES, meta);
+    info(tb, MetaProp.NODES.name(), nodes);
     info(tb, MetaProp.DOCUMENTS, meta);
     info(tb, MetaProp.BINARIES, meta);
     info(tb, MetaProp.VALUES, meta);

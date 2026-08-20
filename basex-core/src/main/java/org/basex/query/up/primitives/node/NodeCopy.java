@@ -44,9 +44,9 @@ abstract class NodeCopy extends NodeUpdate {
     final GNodeList list = mergeNodeCacheText(nodes);
     nodes = null;
     // build main memory representation of nodes to be copied
-    final int start = memData.meta.size;
+    final int start = memData.nodes();
     new DataBuilder(memData, qc).build(list);
-    insseq = new DataClip(memData, start, memData.meta.size, list.size());
+    insseq = new DataClip(memData, start, memData.nodes(), list.size());
     checkLimit(insseq.size());
   }
 

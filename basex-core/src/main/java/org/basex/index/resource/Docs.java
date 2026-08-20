@@ -85,7 +85,7 @@ final class Docs {
   synchronized IntList docs() {
     if(docList == null) {
       final IntList pres = new IntList();
-      final int is = data.meta.size;
+      final int is = data.nodes();
       for(int pre = 0; pre < is;) {
         final int k = data.kind(pre);
         if(k == Data.DOC) pres.add(pre);

@@ -315,7 +315,7 @@ public final class AtomicUpdateCache {
       /* Update distance for the affected node and all following siblings of nodes
        * on the ancestor-or-self axis. */
       int pre = update.preOfAffectedNode + update.accumulatedShifts;
-      while(pre < data.meta.size && !updatedNodes.contains(pre)) {
+      while(pre < data.nodes() && !updatedNodes.contains(pre)) {
         final int kind = data.kind(pre);
         data.dist(pre, kind, calculateNewDistance(pre, kind));
         updatedNodes.add(pre);
@@ -493,7 +493,7 @@ public final class AtomicUpdateCache {
    * @return list of text merging operations or {@code null}
    */
   private Delete mergeTextNodes(final int pre) {
-    final int s = data.meta.size;
+    final int s = data.nodes();
     final int b = pre + 1;
     // don't leave table
     if(pre >= s || b >= s || pre < 0 || b < 0) return null;

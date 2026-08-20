@@ -81,7 +81,7 @@ final class FolderIterator {
     if(y > height) return false;
 
     final Data data = view.gui.context.data();
-    if(data == null || pre >= data.meta.size) return false;
+    if(data == null || pre >= data.nodes()) return false;
 
     final int kind = data.kind(pre);
     return mode == 2 || (kind == Data.ELEM || kind == Data.DOC) &&
@@ -116,7 +116,7 @@ final class FolderIterator {
     if(open == null) return false;
 
     pre += open[pre] ? 1 : data.size(pre, kind);
-    while(pre < data.meta.size) {
+    while(pre < data.nodes()) {
       kind = data.kind(pre);
       final int p = data.parent(pre, kind);
       // search current root

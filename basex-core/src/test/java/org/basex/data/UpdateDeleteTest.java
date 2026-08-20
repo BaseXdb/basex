@@ -30,14 +30,14 @@ public final class UpdateDeleteTest extends DataUpdateTest {
     data.startUpdate(context.options);
     data.delete(3);
     data.finishUpdate(context.options);
-    assertEquals(size - 1, data.meta.size);
+    assertEquals(size - 1, data.nodes());
     assertArraysEquals(T_PARENTNODE, data.name(3, Data.ELEM));
     assertEquals(oldDocSize - 1, data.size(0, Data.DOC));
     assertEquals(oldRootSize - 1, data.size(1, Data.ELEM));
     assertEquals(oldParSize - 1, data.size(2, Data.ELEM));
     assertEquals(1, data.parent(3, Data.ELEM));
     reload(mainmem);
-    assertEquals(size - 1, data.meta.size);
+    assertEquals(size - 1, data.nodes());
     assertArraysEquals(T_PARENTNODE, data.name(3, Data.ELEM));
     assertEquals(oldDocSize - 1, data.size(0, Data.DOC));
     assertEquals(oldRootSize - 1, data.size(1, Data.ELEM));
@@ -60,13 +60,13 @@ public final class UpdateDeleteTest extends DataUpdateTest {
     data.startUpdate(context.options);
     data.delete(2);
     data.finishUpdate(context.options);
-    assertEquals(size - 2, data.meta.size);
+    assertEquals(size - 2, data.nodes());
     assertArraysEquals(T_PARENTNODE, data.name(2, Data.ELEM));
     assertEquals(oldDocSize - 2, data.size(0, Data.DOC));
     assertEquals(oldRootSize - 2, data.size(1, Data.ELEM));
     assertEquals(1, data.parent(2, Data.ELEM));
     reload(mainmem);
-    assertEquals(size - 2, data.meta.size);
+    assertEquals(size - 2, data.nodes());
     assertArraysEquals(T_PARENTNODE, data.name(2, Data.ELEM));
     assertEquals(oldDocSize - 2, data.size(0, Data.DOC));
     assertEquals(oldRootSize - 2, data.size(1, Data.ELEM));
@@ -89,14 +89,14 @@ public final class UpdateDeleteTest extends DataUpdateTest {
     data.startUpdate(context.options);
     data.delete(6);
     data.finishUpdate(context.options);
-    assertEquals(size - 5, data.meta.size);
+    assertEquals(size - 5, data.nodes());
     assertArraysEquals(T_B, data.name(6, Data.ELEM));
     assertEquals(oldDocSize - 5, data.size(0, Data.DOC));
     assertEquals(oldRootSize - 5, data.size(1, Data.ELEM));
     assertEquals(oldParentSize - 5, data.size(4, Data.ELEM));
     assertEquals(2, data.parent(3, Data.ELEM));
     reload(mainmem);
-    assertEquals(size - 5, data.meta.size);
+    assertEquals(size - 5, data.nodes());
     assertArraysEquals(T_B, data.name(6, Data.ELEM));
     assertEquals(oldDocSize - 5, data.size(0, Data.DOC));
     assertEquals(oldRootSize - 5, data.size(1, Data.ELEM));
@@ -119,7 +119,7 @@ public final class UpdateDeleteTest extends DataUpdateTest {
     data.startUpdate(context.options);
     data.delete(7);
     data.finishUpdate(context.options);
-    assertEquals(size - 1, data.meta.size);
+    assertEquals(size - 1, data.nodes());
     assertArraysEquals(T_CONTEXTNODE, data.name(6, Data.ELEM));
     assertArraysEquals(T_ID, data.name(7, Data.ATTR));
     assertEquals(oldRootSize - 1, data.size(1, Data.ELEM));
@@ -127,7 +127,7 @@ public final class UpdateDeleteTest extends DataUpdateTest {
     assertEquals(6, data.parent(7, Data.ATTR));
     assertEquals(4, data.size(6, Data.ELEM));
     reload(mainmem);
-    assertEquals(size - 1, data.meta.size);
+    assertEquals(size - 1, data.nodes());
     assertArraysEquals(T_CONTEXTNODE, data.name(6, Data.ELEM));
     assertArraysEquals(T_ID, data.name(7, Data.ATTR));
     assertEquals(oldRootSize - 1, data.size(1, Data.ELEM));
@@ -150,8 +150,8 @@ public final class UpdateDeleteTest extends DataUpdateTest {
     data.startUpdate(context.options);
     data.delete(10);
     data.finishUpdate(context.options);
-    assertEquals(size - 1, data.meta.size);
+    assertEquals(size - 1, data.nodes());
     reload(mainmem);
-    assertEquals(size - 1, data.meta.size);
+    assertEquals(size - 1, data.nodes());
   }
 }

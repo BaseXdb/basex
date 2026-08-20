@@ -92,8 +92,8 @@ public class DiskValues extends ValueIndex {
   @Override
   public final IndexCosts costs(final IndexSearch search) {
     return IndexCosts.get(
-      search instanceof StringRange ? Math.max(1, data.meta.size / 10) :
-      search instanceof NumericRange ? Math.max(1, data.meta.size / 3) :
+      search instanceof StringRange ? Math.max(1, data.nodes() / 10) :
+      search instanceof NumericRange ? Math.max(1, data.nodes() / 3) :
       entry(search.token()).size);
   }
 

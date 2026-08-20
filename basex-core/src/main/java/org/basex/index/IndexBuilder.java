@@ -56,7 +56,7 @@ public abstract class IndexBuilder extends Job {
     this.data = data;
     this.type = type;
     splitSize = (int) Math.min(Integer.MAX_VALUE, (long) data.meta.splitsize * splitFactor());
-    size = data.meta.size;
+    size = data.nodes();
     includeNames = new IndexNames(type, data);
     text = type == IndexType.TEXT || type == IndexType.FULLTEXT;
 

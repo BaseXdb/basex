@@ -25,7 +25,7 @@ final class TreeNodeCache {
   TreeNodeCache(final Data data, final boolean atts) {
     final ArrayList<IntList> alil = new ArrayList<>();
 
-    final int ts = data.meta.size;
+    final int ts = data.nodes();
     final IntList roots = data.resources.docs();
     alil.add(new IntList());
     final int rs = roots.size();

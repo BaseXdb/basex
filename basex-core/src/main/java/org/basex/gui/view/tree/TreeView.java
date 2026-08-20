@@ -169,7 +169,7 @@ public final class TreeView extends View {
       if(rl == 0) return;
 
       for(int i = 0; !showAtts && i < rl; ++i) {
-        if(roots[i] >= data.meta.size) break;
+        if(roots[i] >= data.nodes()) break;
         if(data.kind(roots[i]) == Data.ATTR) {
           drawMessage(g, "Enable attributes in Tree Options.");
           return;

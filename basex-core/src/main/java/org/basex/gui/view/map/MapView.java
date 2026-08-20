@@ -314,7 +314,7 @@ public final class MapView extends View {
     }
 
     // check if focused rectangle is valid
-    if(focused != null && focused.pre >= data.meta.size) focused = null;
+    if(focused != null && focused.pre >= data.nodes()) focused = null;
 
     // skip node path view
     final MapRect f = focused;
@@ -565,7 +565,7 @@ public final class MapView extends View {
     final Data data = gui.context.data();
     if(textLen != null || gui.gopts.get(GUIOptions.MAPWEIGHT) == 0) return;
 
-    final int size = data.meta.size;
+    final int size = data.nodes();
     textLen = new int[size];
 
     final IntList pars = new IntList();

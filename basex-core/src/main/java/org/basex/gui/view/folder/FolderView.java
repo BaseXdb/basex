@@ -83,8 +83,8 @@ public final class FolderView extends View {
    */
   private void refreshOpenedNodes() {
     final Data data = gui.context.data();
-    opened = new boolean[data.meta.size];
-    final int is = data.meta.size;
+    opened = new boolean[data.nodes()];
+    final int is = data.nodes();
     for(int pre = 0; pre < is; ++pre) {
       opened[pre] = data.parent(pre, data.kind(pre)) <= 0;
     }
@@ -135,8 +135,8 @@ public final class FolderView extends View {
     if(opened == null) return;
 
     final Data data = gui.context.data();
-    if(opened.length < data.meta.size)
-      opened = Arrays.copyOf(opened, data.meta.size);
+    if(opened.length < data.nodes())
+      opened = Arrays.copyOf(opened, data.nodes());
 
     startY = 0;
     scroll.pos(0);
@@ -420,7 +420,7 @@ public final class FolderView extends View {
       // open/close subtree
       if(e.isShiftDown()) {
         opened[focusPre] = right;
-        final int s = data.meta.size;
+        final int s = data.nodes();
         for(int pre = focusPre + 1;
           pre != s && data.parent(pre, data.kind(pre)) >= focusPre; pre++) {
           opened[pre] = right;
@@ -443,17 +443,17 @@ public final class FolderView extends View {
     }
 
     if(down) {
-      focus = Math.min(data.meta.size - 1, focus + 1);
+      focus = Math.min(data.nodes() - 1, focus + 1);
     } else if(up) {
       focus = Math.max(0, focus - 1);
     } else if(NEXTPAGE.is(e)) {
-      focus = Math.min(data.meta.size - 1, focus + getHeight() / lineH);
+      focus = Math.min(data.nodes() - 1, focus + getHeight() / lineH);
     } else if(PREVPAGE.is(e)) {
       focus = Math.max(0, focus - getHeight() / lineH);
     } else if(TEXTSTART.is(e)) {
       focus = 0;
     } else if(TEXTEND.is(e)) {
-      focus = data.meta.size - 1;
+      focus = data.nodes() - 1;
     }
     if(focus == focusedPos) return;
 

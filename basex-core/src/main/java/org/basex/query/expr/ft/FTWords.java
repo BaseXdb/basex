@@ -223,7 +223,7 @@ public final class FTWords extends FTExpr {
     final FTLexer input = new FTLexer(ftOpt);
     final FTTokens fttokens = ftt.cache(lexer.token());
     return new FTIndexIterator() {
-      final int sz = data.meta.size;
+      final int sz = data.nodes();
       int pre = -1, ps;
 
       @Override
@@ -415,7 +415,7 @@ public final class FTWords extends FTExpr {
     // estimate costs if text is not known at compile time
     if(inputs == null) {
       ii.costs = ii.enforce() ? IndexCosts.ENFORCE_DYNAMIC :
-        IndexCosts.get(Math.max(2, data.meta.size / 30));
+        IndexCosts.get(Math.max(2, data.nodes() / 30));
     } else {
       // summarize number of hits; break loop if no hits are expected
       ii.costs = IndexCosts.ZERO;

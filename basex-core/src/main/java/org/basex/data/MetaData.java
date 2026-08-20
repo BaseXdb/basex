@@ -96,10 +96,14 @@ public final class MetaData {
   /** Dirty flag. */
   public boolean dirty;
 
-  /** Number of nodes. */
+  /** Indicates if this instance is shared and must not be modified. */
+  public boolean shared;
+
+  /** Number of nodes of a closed database (see {@link Data#nodes()}). */
   public int size;
-  /** Last (highest) ID assigned to a node. Can be {@code -1} if database is empty. */
+  /** Last (highest) ID assigned to a node of a closed database (see {@link Data#lastid}). */
   public int lastid = -1;
+
 
   /** Database directory. Set to {@code null} if database is in main memory. */
   private final IOFile dir;
@@ -124,6 +128,49 @@ public final class MetaData {
    */
   public MetaData(final String name, final MainOptions options, final StaticOptions sopts) {
     this(name, sopts.dbPath(name), options);
+  }
+
+  /**
+   * Copy constructor.
+   * @param meta meta data to be copied
+   */
+  public MetaData(final MetaData meta) {
+    name = meta.name;
+    dir = meta.dir;
+    original = meta.original;
+    inputsize = meta.inputsize;
+    time = meta.time;
+    ndocs = meta.ndocs;
+    size = meta.size;
+    lastid = meta.lastid;
+    textindex = meta.textindex;
+    attrindex = meta.attrindex;
+    tokenindex = meta.tokenindex;
+    ftindex = meta.ftindex;
+    updindex = meta.updindex;
+    autooptimize = meta.autooptimize;
+    createtext = meta.createtext;
+    createattr = meta.createattr;
+    createtoken = meta.createtoken;
+    createft = meta.createft;
+    textinclude = meta.textinclude;
+    attrinclude = meta.attrinclude;
+    tokeninclude = meta.tokeninclude;
+    ftinclude = meta.ftinclude;
+    stemming = meta.stemming;
+    casesens = meta.casesens;
+    diacritics = meta.diacritics;
+    stopwords = meta.stopwords;
+    maxcats = meta.maxcats;
+    maxlen = meta.maxlen;
+    splitsize = meta.splitsize;
+    language = meta.language;
+    langOption = meta.langOption;
+    uptodate = meta.uptodate;
+    corrupt = meta.corrupt;
+    dirty = meta.dirty;
+    oldindex = meta.oldindex;
+    docOpts = meta.docOpts;
   }
 
   /**

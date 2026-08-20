@@ -347,7 +347,7 @@ public class DBNode extends XNode {
               for(final GNode nd : ancestorIter(false)) p = ((DBNode) nd).pre;
               size = p + data.size(p, data.kind(p));
             } else {
-              size = data.meta.size;
+              size = data.nodes();
             }
           }
           if(curr == size) return null;

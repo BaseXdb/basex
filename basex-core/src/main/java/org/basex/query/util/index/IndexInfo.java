@@ -191,7 +191,7 @@ public final class IndexInfo {
 
     // estimate costs for dynamic query terms
     costs = enforce() ? IndexCosts.ENFORCE_DYNAMIC :
-      IndexCosts.get(Math.max(1, data.meta.size / 10));
+      IndexCosts.get(Math.max(1, data.nodes() / 10));
     final ValueAccess va = new ValueAccess(info, search, type, test, db);
     return create(va, false, Util.info(OPTINDEX_X_X, type, search), info);
   }

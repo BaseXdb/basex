@@ -25,23 +25,23 @@ public final class UpdateElementTest extends DataUpdateTest {
   public void insertElementAsOnly1(final boolean mainmem) throws IOException {
     setUp(mainmem);
     final Data data = context.data();
-    final long nextid = data.meta.lastid;
+    final long nextid = data.lastid;
     insertElement(3, 0, T_JUNIT, Data.ELEM);
-    assertEquals(size + 1, data.meta.size);
+    assertEquals(size + 1, data.nodes());
     assertEquals(3, data.parent(4, Data.ELEM));
     assertEquals(Data.ATTR, data.kind(9));
     assertEquals(Data.ELEM, data.kind(5));
     assertEquals(1, data.parent(5, Data.ELEM));
     assertEquals(5, data.parent(6, Data.ELEM));
-    assertEquals(nextid + 1, data.meta.lastid);
+    assertEquals(nextid + 1, data.lastid);
     assertArraysEquals(T_JUNIT, data.name(4, Data.ELEM));
     reload(mainmem);
-    assertEquals(size + 1, data.meta.size);
+    assertEquals(size + 1, data.nodes());
     assertEquals(3, data.parent(4, Data.ELEM));
     assertEquals(Data.ATTR, data.kind(9));
     assertEquals(1, data.parent(5, Data.ELEM));
     assertEquals(5, data.parent(6, Data.ELEM));
-    assertEquals(nextid + 1, data.meta.lastid);
+    assertEquals(nextid + 1, data.lastid);
     assertArraysEquals(T_JUNIT, data.name(4, Data.ELEM));
   }
 
@@ -55,23 +55,23 @@ public final class UpdateElementTest extends DataUpdateTest {
   public void insertElementAsOnly2(final boolean mainmem) throws IOException {
     setUp(mainmem);
     final Data data = context.data();
-    final long nextid = data.meta.lastid;
+    final long nextid = data.lastid;
     insertElement(3, 1, T_JUNIT, Data.ELEM);
-    assertEquals(size + 1, data.meta.size);
+    assertEquals(size + 1, data.nodes());
     assertEquals(3, data.parent(4, Data.ELEM));
     assertEquals(Data.ATTR, data.kind(9));
     assertEquals(Data.ELEM, data.kind(5));
     assertEquals(1, data.parent(5, Data.ELEM));
     assertEquals(5, data.parent(6, Data.ELEM));
-    assertEquals(nextid + 1, data.meta.lastid);
+    assertEquals(nextid + 1, data.lastid);
     assertArraysEquals(T_JUNIT, data.name(4, Data.ELEM));
     reload(mainmem);
-    assertEquals(size + 1, data.meta.size);
+    assertEquals(size + 1, data.nodes());
     assertEquals(3, data.parent(4, Data.ELEM));
     assertEquals(Data.ATTR, data.kind(9));
     assertEquals(1, data.parent(5, Data.ELEM));
     assertEquals(5, data.parent(6, Data.ELEM));
-    assertEquals(nextid + 1, data.meta.lastid);
+    assertEquals(nextid + 1, data.lastid);
     assertArraysEquals(T_JUNIT, data.name(4, Data.ELEM));
   }
 
@@ -85,23 +85,23 @@ public final class UpdateElementTest extends DataUpdateTest {
   public void insertElementAsOnly3(final boolean mainmem) throws IOException {
     setUp(mainmem);
     final Data data = context.data();
-    final long nextid = data.meta.lastid;
+    final long nextid = data.lastid;
     insertElement(3, 2, T_JUNIT, Data.ELEM);
-    assertEquals(size + 1, data.meta.size);
+    assertEquals(size + 1, data.nodes());
     assertEquals(3, data.parent(4, Data.ELEM));
     assertEquals(Data.ATTR, data.kind(9));
     assertEquals(Data.ELEM, data.kind(5));
     assertEquals(1, data.parent(5, Data.ELEM));
     assertEquals(5, data.parent(6, Data.ELEM));
-    assertEquals(nextid + 1, data.meta.lastid);
+    assertEquals(nextid + 1, data.lastid);
     assertArraysEquals(T_JUNIT, data.name(4, Data.ELEM));
     reload(mainmem);
-    assertEquals(size + 1, data.meta.size);
+    assertEquals(size + 1, data.nodes());
     assertEquals(3, data.parent(4, Data.ELEM));
     assertEquals(Data.ATTR, data.kind(9));
     assertEquals(1, data.parent(5, Data.ELEM));
     assertEquals(5, data.parent(6, Data.ELEM));
-    assertEquals(nextid + 1, data.meta.lastid);
+    assertEquals(nextid + 1, data.lastid);
     assertArraysEquals(T_JUNIT, data.name(4, Data.ELEM));
   }
 
@@ -115,23 +115,23 @@ public final class UpdateElementTest extends DataUpdateTest {
   public void insertElementAfterAttsAsFirst(final boolean mainmem) throws IOException {
     setUp(mainmem);
     final Data data = context.data();
-    final long nextid = data.meta.lastid;
+    final long nextid = data.lastid;
     insertElement(6, 1, T_JUNIT, Data.ELEM);
-    assertEquals(size + 1, data.meta.size);
+    assertEquals(size + 1, data.nodes());
     assertEquals(Data.ELEM, data.kind(9));
     assertEquals(6, data.parent(9, Data.ELEM));
     assertArraysEquals(T_JUNIT, data.name(9, Data.ELEM));
     assertEquals(6, data.parent(10, Data.ELEM));
     assertEquals(4, data.parent(12, Data.ELEM));
-    assertEquals(nextid + 1, data.meta.lastid);
+    assertEquals(nextid + 1, data.lastid);
     reload(mainmem);
-    assertEquals(size + 1, data.meta.size);
+    assertEquals(size + 1, data.nodes());
     assertEquals(Data.ELEM, data.kind(9));
     assertEquals(6, data.parent(9, Data.ELEM));
     assertArraysEquals(T_JUNIT, data.name(9, Data.ELEM));
     assertEquals(6, data.parent(10, Data.ELEM));
     assertEquals(4, data.parent(12, Data.ELEM));
-    assertEquals(nextid + 1, data.meta.lastid);
+    assertEquals(nextid + 1, data.lastid);
   }
 
   /**
@@ -144,23 +144,23 @@ public final class UpdateElementTest extends DataUpdateTest {
   public void insertElementAfterAttsAsSecond(final boolean mainmem) throws IOException {
     setUp(mainmem);
     final Data data = context.data();
-    final long nextid = data.meta.lastid;
+    final long nextid = data.lastid;
     insertElement(6, 2, T_JUNIT, Data.ELEM);
-    assertEquals(size + 1, data.meta.size);
+    assertEquals(size + 1, data.nodes());
     assertEquals(Data.ELEM, data.kind(9));
     assertArraysEquals(T_JUNIT, data.name(11, Data.ELEM));
     assertEquals(6, data.parent(11, Data.ELEM));
     assertEquals(6, data.parent(9, Data.ELEM));
     assertEquals(4, data.parent(12, Data.ELEM));
-    assertEquals(nextid + 1, data.meta.lastid);
+    assertEquals(nextid + 1, data.lastid);
     reload(mainmem);
-    assertEquals(size + 1, data.meta.size);
+    assertEquals(size + 1, data.nodes());
     assertEquals(Data.ELEM, data.kind(9));
     assertArraysEquals(T_JUNIT, data.name(11, Data.ELEM));
     assertEquals(6, data.parent(11, Data.ELEM));
     assertEquals(6, data.parent(9, Data.ELEM));
     assertEquals(4, data.parent(12, Data.ELEM));
-    assertEquals(nextid + 1, data.meta.lastid);
+    assertEquals(nextid + 1, data.lastid);
   }
 
   /**
@@ -173,23 +173,23 @@ public final class UpdateElementTest extends DataUpdateTest {
   public void insertElementAfterAttsAsLast(final boolean mainmem) throws IOException {
     setUp(mainmem);
     final Data data = context.data();
-    final long nextid = data.meta.lastid;
+    final long nextid = data.lastid;
     insertElement(6, 0, T_JUNIT, Data.ELEM);
-    assertEquals(size + 1, data.meta.size);
+    assertEquals(size + 1, data.nodes());
     assertEquals(Data.ELEM, data.kind(9));
     assertArraysEquals(T_JUNIT, data.name(11, Data.ELEM));
     assertEquals(6, data.parent(11, Data.ELEM));
     assertEquals(6, data.parent(9, Data.ELEM));
     assertEquals(4, data.parent(12, Data.ELEM));
-    assertEquals(nextid + 1, data.meta.lastid);
+    assertEquals(nextid + 1, data.lastid);
     reload(mainmem);
-    assertEquals(size + 1, data.meta.size);
+    assertEquals(size + 1, data.nodes());
     assertEquals(Data.ELEM, data.kind(9));
     assertArraysEquals(T_JUNIT, data.name(11, Data.ELEM));
     assertEquals(6, data.parent(11, Data.ELEM));
     assertEquals(6, data.parent(9, Data.ELEM));
     assertEquals(4, data.parent(12, Data.ELEM));
-    assertEquals(nextid + 1, data.meta.lastid);
+    assertEquals(nextid + 1, data.lastid);
   }
 
   /**
@@ -238,7 +238,7 @@ public final class UpdateElementTest extends DataUpdateTest {
       }
     }
 
-    final MemData md = new MemData(context.options);
+    final MemData md = new MemData(context.sharedMeta());
     md.elem(1, md.elemNames.put(name), 1, 1, 0, false);
     md.insert(0);
     data.startUpdate(context.options);

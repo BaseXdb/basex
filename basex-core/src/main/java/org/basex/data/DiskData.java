@@ -79,6 +79,7 @@ public final class DiskData extends Data {
         }
       }
     }
+    lastid = meta.lastid;
 
     // open data and indexes
     init();
@@ -113,7 +114,7 @@ public final class DiskData extends Data {
     this.paths = paths;
     this.nspaces = nspaces;
     paths.data(this);
-    if(meta.updindex) idmap = new IdPreMap(meta.lastid);
+    if(meta.updindex) idmap = new IdPreMap(lastid);
     init();
   }
 
@@ -122,7 +123,7 @@ public final class DiskData extends Data {
    * @throws IOException I/O exception
    */
   private void init() throws IOException {
-    table = new TableDiskAccess(meta, false);
+    table = new TableDiskAccess(meta, meta.size, false);
     texts = new DataAccess(meta.dbFile(DATATXT));
     values = new DataAccess(meta.dbFile(DATAATV));
   }
@@ -133,6 +134,8 @@ public final class DiskData extends Data {
    */
   private void write() throws IOException {
     if(!meta.dirty) return;
+    meta.size = nodes();
+    meta.lastid = lastid;
 
     try(DataOutput out = new DataOutput(meta.dbFile(DATAINF))) {
       meta.write(out);

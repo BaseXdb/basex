@@ -24,9 +24,10 @@ public final class TableMemAccess extends TableAccess {
   /**
    * Constructor.
    * @param meta meta data
+   * @param nodes number of nodes
    */
-  public TableMemAccess(final MetaData meta) {
-    super(meta);
+  public TableMemAccess(final MetaData meta, final int nodes) {
+    super(meta, nodes);
   }
 
   @Override
@@ -125,16 +126,16 @@ public final class TableMemAccess extends TableAccess {
     updateFirstPre(c + 1, -count);
 
     // decrease table size; update dense flag
-    final int size = meta.size - count;
+    final int size = nodes - count;
     if(pre <= size) dense = false;
     else if(size == 0) dense = true;
-    meta.size = size;
+    nodes = size;
   }
 
   @Override
   public void insert(final int pre, final byte[] entries) {
     final int count = entries.length >>> IO.NODEPOWER;
-    int size = meta.size;
+    int size = nodes;
     if(pre == size) {
       // append entries. if no space is left, append new blocks
       final int bs = blocks.size();
@@ -156,14 +157,14 @@ public final class TableMemAccess extends TableAccess {
     }
     // increase table size, populate table with actual entries
     size += count;
-    meta.size = size;
+    nodes = size;
     copy(entries, pre, pre + count);
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(Util.className(this));
-    sb.append("[size: ").append(meta.size).append("; current: ").append(current).append("; ");
+    sb.append("[size: ").append(nodes).append("; current: ").append(current).append("; ");
     sb.append(blocks.size()).append(" blocks: ");
     for(final TableMemBlock block : blocks) {
       sb.append(block.firstPre).append(' ');
@@ -219,7 +220,7 @@ public final class TableMemAccess extends TableAccess {
    * @return first PRE value
    */
   private int firstPre(final int index) {
-    return index < blocks.size() ? blocks.get(index).firstPre : meta.size;
+    return index < blocks.size() ? blocks.get(index).firstPre : nodes;
   }
 
   /**

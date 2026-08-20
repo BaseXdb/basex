@@ -120,7 +120,7 @@ public final class ReplaceValue extends NodeUpdate {
       if(value.length > 0) {
         // create Data instance for insertion sequence
         // copy all nodes into a single database instance
-        final int p = tmp.meta.size;
+        final int p = tmp.nodes();
         tmp.text(1, value, Data.TEXT);
         tmp.insert(p);
         // add the substituting insertInto statement to the list

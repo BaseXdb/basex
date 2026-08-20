@@ -165,7 +165,7 @@ final class TableData {
     final Data data = ctx.data();
     rows = new IntList();
     for(int pre : ctx.current().pres()) {
-      if(pre >= data.meta.size) break;
+      if(pre >= data.nodes()) break;
       final int s = pre + data.size(pre, data.kind(pre));
       // find first root element name
       do {

@@ -46,7 +46,7 @@ abstract class ContextModifier {
   synchronized void add(final Update update, final QueryContext qc) throws QueryException {
     if(update instanceof final DataUpdate dataUp) {
       // create temporary mem data instance if not available yet
-      if(memData == null) memData = new MemData(qc.context.options);
+      if(memData == null) memData = new MemData(qc.context.sharedMeta());
       dbUpdates.computeIfAbsent(dataUp.data(), d -> new DataUpdates(d, qc)).add(dataUp, memData);
     } else if(update instanceof final NameUpdate nameUp) {
       nameUpdates.computeIfAbsent(nameUp.name(), n -> new NameUpdates()).add(nameUp);
@@ -83,7 +83,7 @@ abstract class ContextModifier {
 
     for(final DataUpdates up : dbUpdates.values()) {
       // create temporary mem data instance if not available yet
-      if(memData == null) memData = new MemData(qc.context.options);
+      if(memData == null) memData = new MemData(qc.context.sharedMeta());
       up.prepare(memData, qc);
       datas.add(up.data());
     }

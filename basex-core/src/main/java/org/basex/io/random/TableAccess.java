@@ -16,15 +16,19 @@ import org.basex.io.*;
 public abstract class TableAccess {
   /** Meta data. */
   final MetaData meta;
+  /** Number of nodes. */
+  public int nodes;
   /** Dirty index flag. */
   boolean dirty;
 
   /**
    * Constructor.
    * @param meta meta data
+   * @param nodes number of nodes
    */
-  TableAccess(final MetaData meta) {
+  TableAccess(final MetaData meta, final int nodes) {
     this.meta = meta;
+    this.nodes = nodes;
   }
 
   /**

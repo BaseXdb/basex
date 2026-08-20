@@ -70,7 +70,7 @@ public final class DataBuilder {
    */
   public void build(final GNodeList nodes) throws QueryException {
     data.meta.update();
-    int next = data.meta.size;
+    int next = data.nodes();
     for(final GNode node : nodes) next = addNode((XNode) node, next, -1);
 
     // see Builder#addElem
@@ -121,7 +121,7 @@ public final class DataBuilder {
   private int addDoc(final XNode node, final int pre) {
     final int size = size(node, false);
     data.doc(size, node.baseURI());
-    final int last = data.meta.size;
+    final int last = data.nodes();
     data.insert(last);
     int next = pre + 1;
     for(final GNode child : node.childIter()) next = addNode((XNode) child, next, pre);
@@ -137,7 +137,7 @@ public final class DataBuilder {
    * @return PRE value of next node
    */
   private int addAttr(final XNode node, final int pre, final int par) {
-    final int last = data.meta.size;
+    final int last = data.nodes();
     final QNm qname = node.qname();
     final byte[] prefix = qname.prefix(), uri = qname.uri();
     // create new namespace entry if this is a prefixed and standalone attribute
@@ -173,7 +173,7 @@ public final class DataBuilder {
       if(marker.mark) {
         // open element
         data.elem(dist++, ftbuilder.name(), 1, 2, uriId, false);
-        data.insert(data.meta.size);
+        data.insert(data.nodes());
         ts++;
       }
       addText(marker.token, marker.mark ? 1 : dist);
@@ -189,7 +189,7 @@ public final class DataBuilder {
    */
   private void addText(final byte[] text, final int dist) {
     data.text(dist, text, Data.TEXT);
-    data.insert(data.meta.size);
+    data.insert(data.nodes());
   }
 
   /**
@@ -202,7 +202,7 @@ public final class DataBuilder {
   private int addPI(final XNode node, final int pre, final int par) {
     final byte[] value = trim(concat(node.name(), cpToken(' '), node.string()));
     data.text(pre - par, value, Data.PI);
-    data.insert(data.meta.size);
+    data.insert(data.nodes());
     return pre + 1;
   }
 
@@ -215,7 +215,7 @@ public final class DataBuilder {
    */
   private int addComm(final XNode node, final int pre, final int par) {
     data.text(pre - par, node.string(), Data.COMM);
-    data.insert(data.meta.size);
+    data.insert(data.nodes());
     return pre + 1;
   }
 
@@ -227,7 +227,7 @@ public final class DataBuilder {
    * @return PRE value of next node
    */
   private int addElem(final XNode node, final int pre, final int par) {
-    final int last = data.meta.size;
+    final int last = data.nodes();
 
     // add new namespaces
     final Atts ns = par == -1 ? node.nsScope(null) : node.namespaces();
@@ -300,14 +300,14 @@ public final class DataBuilder {
 
     if(!node.kind().oneOf(Kind.ELEMENT, Kind.DOCUMENT)) return node;
 
-    final MemData data = new MemData(ctx.options);
+    final MemData data = new MemData(ctx.sharedMeta());
     final DataBuilder db = new DataBuilder(data, null);
     db.build(node);
 
     // flag indicating if namespace should be completely removed
     boolean del = true;
     // loop through all nodes
-    final int size = data.meta.size;
+    final int size = data.nodes();
     for(int pre = 0; pre < size; pre++) {
       // only check elements and attributes
       final int kind = data.kind(pre);
@@ -346,13 +346,13 @@ public final class DataBuilder {
 
     if(!node.kind().oneOf(Kind.ELEMENT, Kind.DOCUMENT)) return node;
 
-    final MemData data = new MemData(ctx.options);
+    final MemData data = new MemData(ctx.sharedMeta());
     final DataBuilder db = new DataBuilder(data, null);
     db.build(node);
 
     // loop through all nodes
     final TokenSet atts = new TokenSet(), uris = new TokenSet(), keep = new TokenSet();
-    final int size = data.meta.size;
+    final int size = data.nodes();
     for(int pre = 0; pre < size; pre++) {
       final int kind = data.kind(pre);
       final boolean attr = kind == Data.ATTR;

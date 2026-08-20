@@ -34,7 +34,7 @@ public final class ViewData {
 
     final boolean atts = opts.get(GUIOptions.MAPATTS);
     final int last = pre + (atts ? 1 : data.attSize(pre, kind));
-    return last == data.meta.size || data.parent(pre, kind) >=
+    return last == data.nodes() || data.parent(pre, kind) >=
       data.parent(last, data.kind(last));
   }
 
@@ -45,7 +45,7 @@ public final class ViewData {
    * @return current path
    */
   public static byte[] path(final Data data, final int pre) {
-    if(data == null || pre >= data.meta.size) return Token.EMPTY;
+    if(data == null || pre >= data.nodes()) return Token.EMPTY;
 
     final IntList pres = new IntList();
     int p = pre, k = data.kind(p);

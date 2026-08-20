@@ -34,15 +34,15 @@ public final class MemData extends Data {
    * @param options main options
    */
   public MemData(final PathIndex paths, final Namespaces nspaces, final MainOptions options) {
-    this(null, null, paths, nspaces, null, null, options);
+    this(null, null, paths, nspaces, null, null, new MetaData(options));
   }
 
   /**
    * Constructor for creating a new, empty database.
-   * @param options main options
+   * @param meta meta data
    */
-  public MemData(final MainOptions options) {
-    this(null, null, options);
+  public MemData(final MetaData meta) {
+    this(null, null, null, null, null, null, meta);
   }
 
   /**
@@ -53,15 +53,15 @@ public final class MemData extends Data {
    * @param nspaces namespaces
    * @param texts texts
    * @param values values
-   * @param options main options
+   * @param meta meta data
    */
   private MemData(final Names elemNames, final Names attrNames, final PathIndex paths,
       final Namespaces nspaces, final TokenSet texts, final TokenSet values,
-      final MainOptions options) {
+      final MetaData meta) {
 
-    super(new MetaData(options));
-    table = new TableMemAccess(meta);
-    if(meta.updindex) idmap = new IdPreMap(meta.lastid);
+    super(meta);
+    table = new TableMemAccess(meta, meta.size);
+    if(meta.updindex) idmap = new IdPreMap(lastid);
     this.texts = texts;
     this.values = values;
     this.elemNames = elemNames == null ? new Names(meta) : elemNames;
@@ -101,7 +101,7 @@ public final class MemData extends Data {
    * @param index index instance
    */
   private void set(final IndexType type, final ValueIndex index) {
-    meta.dirty = true;
+    meta().dirty = true;
     switch(type) {
       case TEXT -> textIndex = index;
       case ATTRIBUTE -> attrIndex = index;

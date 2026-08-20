@@ -95,7 +95,7 @@ public final class DBNew {
           final StaticOptions sopts = ctx.soptions;
           final String dbname = cache ? sopts.createTempDb(name) : name;
           data = cache ? CreateDB.create(dbname, Parser.emptyParser(mopts), ctx, mopts) :
-            new MemData(mopts);
+            new MemData(new MetaData(mopts));
           data.startUpdate(mopts);
           try {
             for(int i = 0; i < is; i++) {
@@ -252,7 +252,7 @@ public final class DBNew {
   private void copy(final Data source, final Data target, final boolean replace)
       throws IOException, QueryException {
     // insert documents
-    target.insert(target.meta.size, -1, new DataClip(source));
+    target.insert(target.nodes(), -1, new DataClip(source));
     // move file resources
     for(final ResourceType type : Resources.BINARIES) {
       final IOFile srcDir = source.meta.dir(type), trgDir = target.meta.dir(type);

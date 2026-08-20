@@ -30,7 +30,7 @@ public final class DataClip {
    * @param data data reference
    */
   public DataClip(final Data data) {
-    this(data, 0, data.meta.size);
+    this(data, 0, data.nodes());
   }
 
   /**

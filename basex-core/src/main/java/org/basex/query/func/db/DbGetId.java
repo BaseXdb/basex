@@ -27,7 +27,7 @@ public class DbGetId extends DbAccessFn {
     final IntList list = new IntList(Seq.initialCapacity(values.size()));
     for(Item item; (item = qc.next(values)) != null;) {
       final int id = (int) toLong(item), pre = pre(id, data);
-      if(pre < 0 || pre >= data.meta.size) throw DB_RANGE_X_X.get(info, data.meta.name, id);
+      if(pre < 0 || pre >= data.nodes()) throw DB_RANGE_X_X.get(info, data.meta.name, id);
       list.add(pre);
     }
     return DBNodeSeq.get(list.ddo().finish(), data, this);

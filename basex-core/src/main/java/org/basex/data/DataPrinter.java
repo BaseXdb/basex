@@ -44,7 +44,7 @@ public final class DataPrinter {
    * @param end last node to be added
    */
   public void add(final int start, final int end) {
-    final int ps = Math.max(0, start), pe = Math.min(data.meta.size, end);
+    final int ps = Math.max(0, start), pe = Math.min(data.nodes(), end);
     for(int p = ps; p < pe; ++p) add(p);
     final byte[] ns = data.nspaces.table(ps, pe);
     if(ns.length != 0) nsp.add(NL).add(ns).add(data.nspaces.toString(ps, pe)).add(NL);

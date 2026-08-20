@@ -25,13 +25,13 @@ public final class TableMemAccessTest extends SandboxTest {
 
   /** Set up method. */
   @BeforeEach public void setUp() {
-    table = new TableMemAccess(new MetaData(context.options));
+    table = new TableMemAccess(new MetaData(context.options), 0);
   }
 
   /** Test method. */
   @Test public void emptyAppend() {
     table.insert(0, new byte[0]);
-    assertEquals(0, table.meta.size);
+    assertEquals(0, table.nodes);
   }
 
   /** Test method. */
@@ -115,7 +115,7 @@ public final class TableMemAccessTest extends SandboxTest {
       ENTRY[0] = (byte) (o + i);
       list.add(ENTRY);
     }
-    table.insert(table.meta.size, list.finish());
+    table.insert(table.nodes, list.finish());
     check(n + o);
   }
 
@@ -177,14 +177,14 @@ public final class TableMemAccessTest extends SandboxTest {
   @Test public void emptyDelete() {
     table.insert(0, ENTRY);
     table.delete(0, 0);
-    assertEquals(1, table.meta.size);
+    assertEquals(1, table.nodes);
   }
 
   /** Test method. */
   @Test public void delete() {
     table.insert(0, ENTRY);
     table.delete(0, 1);
-    assertEquals(0, table.meta.size);
+    assertEquals(0, table.nodes);
   }
 
   /** Test method. */
@@ -225,7 +225,7 @@ public final class TableMemAccessTest extends SandboxTest {
   private void delete(final int n, final boolean first) {
     for(int i = 0; i < n; i++) table.insert(i, ENTRY);
     for(int i = 0; i < n; i++) table.delete(first ? 0 : n - i - 1, 1);
-    assertEquals(0, table.meta.size);
+    assertEquals(0, table.nodes);
   }
 
   /** Test method. */
@@ -255,7 +255,7 @@ public final class TableMemAccessTest extends SandboxTest {
   private void singleDelete(final int n) {
     for(int i = 0; i < n; i++) table.insert(i, ENTRY);
     table.delete(0, n);
-    assertEquals(0, table.meta.size);
+    assertEquals(0, table.nodes);
   }
 
   /** Test method. */
@@ -285,7 +285,7 @@ public final class TableMemAccessTest extends SandboxTest {
       for(int i = 0; i < count; i++) table.insert(0, ENTRY);
     }
     // check table contents
-    assertEquals(n, table.meta.size);
+    assertEquals(n, table.nodes);
     for(int i = 0; i < n; i++) {
       assertEquals(101, table.read1(i, 0));
       assertEquals(255, table.read1(i, 15));
@@ -298,7 +298,7 @@ public final class TableMemAccessTest extends SandboxTest {
    */
   private void check(final int n) {
     // check table size
-    assertEquals(n, table.meta.size);
+    assertEquals(n, table.nodes);
     // check table contents
     for(int i = 0; i < n; i++) {
       assertEquals(i & 0xFF, table.read1(i, 0));

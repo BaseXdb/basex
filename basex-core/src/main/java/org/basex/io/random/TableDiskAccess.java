@@ -49,11 +49,13 @@ public final class TableDiskAccess extends TableAccess {
   /**
    * Constructor.
    * @param meta meta data
+   * @param nodes number of nodes
    * @param write write lock
    * @throws IOException I/O exception
    */
-  public TableDiskAccess(final MetaData meta, final boolean write) throws IOException {
-    super(meta);
+  public TableDiskAccess(final MetaData meta, final int nodes, final boolean write)
+      throws IOException {
+    super(meta, nodes);
 
     // read meta and index data
     try(DataInput in = new DataInput(meta.dbFile(DATATBL + 'i'))) {
@@ -344,7 +346,7 @@ public final class TableDiskAccess extends TableAccess {
       for(int i = page + 1; i < used; ++i) fPreIndex[i] += nr;
       // update cached variables (fpre is not changed)
       nextPre += nr;
-      meta.size += nr;
+      nodes += nr;
       return;
     }
 
@@ -419,11 +421,11 @@ public final class TableDiskAccess extends TableAccess {
     // increment all fpre values after the last modified page
     for(int i = page + 1; i < used; ++i) fPreIndex[i] += nr;
 
-    meta.size += nr;
+    nodes += nr;
 
     // update cached variables
     firstPre = fPreIndex[page];
-    nextPre = page + 1 < used && fPreIndex[page + 1] < meta.size ? fPreIndex[page + 1] : meta.size;
+    nextPre = page + 1 < used && fPreIndex[page + 1] < nodes ? fPreIndex[page + 1] : nodes;
   }
 
   @Override
@@ -472,12 +474,12 @@ public final class TableDiskAccess extends TableAccess {
         else break;
         m = h + l >>> 1;
         fp = fpre(m);
-        np = m == last ? meta.size : fpre(m + 1);
+        np = m == last ? nodes : fpre(m + 1);
       }
       if(l > h) throw Util.notExpected(
           "Data Access out of bounds:" +
           "\n- PRE value: " + pre +
-          "\n- table size: " + meta.size +
+          "\n- table size: " + nodes +
           "\n- first/next PRE value: " + fp + '/' + np +
           "\n- #total/used pages: " + pages + '/' + used +
           "\n- accessed page: " + m + " (" + l + " > " + h + ']');
@@ -493,7 +495,7 @@ public final class TableDiskAccess extends TableAccess {
   private void setPage(final int pre) {
     page = pre;
     firstPre = fpre(pre);
-    nextPre = pre + 1 >= used ? meta.size : fpre(pre + 1);
+    nextPre = pre + 1 >= used ? nodes : fpre(pre + 1);
   }
 
   /**
@@ -566,8 +568,8 @@ public final class TableDiskAccess extends TableAccess {
   private void decreasePre(final int count) {
     final int nextPage = page + 1;
     for(int i = nextPage; i < used; ++i) fPreIndex[i] -= count;
-    meta.size -= count;
-    nextPre = nextPage < used && fPreIndex[nextPage] < meta.size ? fPreIndex[nextPage] : meta.size;
+    nodes -= count;
+    nextPre = nextPage < used && fPreIndex[nextPage] < nodes ? fPreIndex[nextPage] : nodes;
   }
 
   /**
@@ -603,7 +605,7 @@ public final class TableDiskAccess extends TableAccess {
    * @return occupied space
    */
   private int occSpace(final int index) {
-    return (index + 1 < used ? fPreIndex[index + 1] : meta.size) - fPreIndex[index];
+    return (index + 1 < used ? fPreIndex[index + 1] : nodes) - fPreIndex[index];
   }
 
   /**

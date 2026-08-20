@@ -75,10 +75,16 @@ public final class MemBuilder extends Builder {
     try {
       parse();
     } finally {
-      if(data.meta.updindex) data.idmap.finish(data.meta.lastid);
+      data.lastid = data.nodes() - 1;
+      if(data.meta.updindex) data.idmap.finish(data.lastid);
     }
     finishLocations();
     return data;
+  }
+
+  @Override
+  int size() {
+    return data.nodes();
   }
 
   /**
@@ -102,8 +108,8 @@ public final class MemBuilder extends Builder {
    * @return data reference
    */
   public MemData finish() {
-    meta.lastid = meta.size - 1;
-    if(meta.updindex) data.idmap.finish(meta.lastid);
+    data.lastid = data.nodes() - 1;
+    if(meta.updindex) data.idmap.finish(data.lastid);
     finishLocations();
     return data;
   }
@@ -129,14 +135,14 @@ public final class MemBuilder extends Builder {
   @Override
   protected void addDoc(final byte[] value) {
     data.doc(0, value);
-    data.insert(meta.size);
+    data.insert(data.nodes());
   }
 
   @Override
   protected void addElem(final int dist, final int nameId, final int asize, final int uriId,
       final boolean ne) {
     data.elem(dist, nameId, asize, asize, uriId, ne);
-    data.insert(meta.size);
+    data.insert(data.nodes());
 
     if(Prop.debug && (c++ & 0x7FFFF) == 0) Util.err(".");
   }
@@ -144,13 +150,13 @@ public final class MemBuilder extends Builder {
   @Override
   protected void addAttr(final int nameId, final byte[] value, final int dist, final int uriId) {
     data.attr(dist, nameId, value, uriId);
-    data.insert(meta.size);
+    data.insert(data.nodes());
   }
 
   @Override
   protected void addText(final byte[] value, final int dist, final byte kind) {
     data.text(dist, value, kind);
-    data.insert(meta.size);
+    data.insert(data.nodes());
   }
 
   @Override

@@ -70,7 +70,7 @@ public final class IndexCosts implements Comparable<IndexCosts> {
    * @return result of check
    */
   public boolean tooExpensive(final Data data) {
-    return results > data.meta.size;
+    return results > data.nodes();
   }
 
   @Override

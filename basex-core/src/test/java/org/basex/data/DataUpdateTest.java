@@ -65,7 +65,7 @@ public abstract class DataUpdateTest extends SandboxTest {
     set(MainOptions.MAINMEM, mainmem);
     set(MainOptions.STRIPWS, true);
     execute(new CreateDB(NAME, TESTFILE));
-    size = context.data().meta.size;
+    size = context.data().nodes();
   }
 
   /**
@@ -106,8 +106,8 @@ public abstract class DataUpdateTest extends SandboxTest {
   public final void size(final boolean mainmem) {
     setUp(mainmem);
 
-    assertEquals(size, context.data().meta.size, "Unexpected size!");
+    assertEquals(size, context.data().nodes(), "Unexpected size!");
     reload(mainmem);
-    assertEquals(size, context.data().meta.size, "Unexpected size!");
+    assertEquals(size, context.data().nodes(), "Unexpected size!");
   }
 }

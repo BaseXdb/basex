@@ -36,6 +36,8 @@ public final class DiskBuilder extends Builder {
   private final StaticOptions sopts;
   /** Debug counter. */
   private int c;
+  /** Number of nodes. */
+  private int size;
 
   /**
    * Constructor.
@@ -83,7 +85,7 @@ public final class DiskBuilder extends Builder {
       // copy temporary values into database table
       final IOFile tmpFile = meta.dbFile(DATATMP);
       try(DataInput in = new DataInput(tmpFile)) {
-        final TableAccess ta = new TableDiskAccess(meta, true);
+        final TableAccess ta = new TableDiskAccess(meta, size, true);
         try {
           for(; spos < ssize; ++spos) ta.write4(in.readNum(), 8, in.readNum());
         } finally {
@@ -107,7 +109,7 @@ public final class DiskBuilder extends Builder {
     tout.write2(0);
     tout.write5(textRef(value, true));
     tout.write4(0);
-    tout.write4(meta.size++);
+    tout.write4(size++);
   }
 
   @Override
@@ -119,7 +121,7 @@ public final class DiskBuilder extends Builder {
     tout.write1(uriId);
     tout.write4(dist);
     tout.write4(asize);
-    tout.write4(meta.size++);
+    tout.write4(size++);
 
     if(Prop.debug && (c++ & 0x7FFFF) == 0) Util.err(".");
   }
@@ -132,7 +134,7 @@ public final class DiskBuilder extends Builder {
     tout.write2(nameId);
     tout.write5(textRef(value, false));
     tout.write4(uriId);
-    tout.write4(meta.size++);
+    tout.write4(size++);
   }
 
   @Override
@@ -141,7 +143,12 @@ public final class DiskBuilder extends Builder {
     tout.write2(0);
     tout.write5(textRef(value, true));
     tout.write4(dist);
-    tout.write4(meta.size++);
+    tout.write4(size++);
+  }
+
+  @Override
+  int size() {
+    return size;
   }
 
   @Override

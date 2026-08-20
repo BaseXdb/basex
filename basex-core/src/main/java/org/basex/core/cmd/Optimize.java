@@ -36,7 +36,7 @@ public final class Optimize extends ACreate {
   protected boolean run() {
     final Data data = context.data();
     final MetaData meta = data.meta;
-    size = meta.size;
+    size = data.nodes();
 
     return update(data, () -> {
       // reassign autooptimize flag
@@ -74,7 +74,7 @@ public final class Optimize extends ACreate {
     // do nothing if database has been closed
     if(data.closed()) return;
     // GH-676: optimize database and rebuild index structures if ID has turned negative
-    if(data.meta.lastid < data.meta.size - 1) optimizeIds(data);
+    if(data.lastid < data.nodes() - 1) optimizeIds(data);
     // GH-1035: auto-optimize database
     if(data.meta.autooptimize) optimize(data, null);
   }
@@ -113,7 +113,7 @@ public final class Optimize extends ACreate {
       final IntList pars = new IntList(), elemStack = new IntList();
       int n = 0;
 
-      for(int pre = 0; pre < meta.size; ++pre) {
+      for(int pre = 0; pre < data.nodes(); ++pre) {
         final byte kind = (byte) data.kind(pre);
         final int par = data.parent(pre, kind);
         while(!pars.isEmpty() && pars.peek() > par) {

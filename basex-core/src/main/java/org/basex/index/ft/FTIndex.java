@@ -97,7 +97,7 @@ public final class FTIndex extends ValueIndex {
 
     // estimate costs for queries which stretch over multiple index entries
     final FTOpt opt = ((FTLexer) search).ftOpt();
-    return IndexCosts.get(opt.is(FZ) || opt.is(WC) ? Math.max(1, data.meta.size >> 4) :
+    return IndexCosts.get(opt.is(FZ) || opt.is(WC) ? Math.max(1, data.nodes() >> 4) :
       entry(token).size);
   }
 

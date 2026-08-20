@@ -78,7 +78,7 @@ public final class StringRangeAccess extends IndexAccess {
     return new IndexIterator() {
       final boolean text = index.type() == IndexType.TEXT;
       final byte kind = text ? Data.TEXT : Data.ATTR;
-      final int sz = data.meta.size;
+      final int sz = data.nodes();
       int pre = -1;
 
       @Override

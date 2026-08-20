@@ -61,7 +61,7 @@ public final class AtomicUpdatesTest extends SandboxTest {
   @Test public void treeAwareUpdates0() {
     final String doc = "<n1>" + "<n2 att3='0'><n4/><n5><n6/></n5></n2>" + "</n1>";
     final AtomicUpdateCache auc = atomics(doc);
-    final MemData md = new MemData(context.options);
+    final MemData md = new MemData(context.sharedMeta());
     final DataClip ins = elemClip(md, "<d/>", false);
     auc.addDelete(2);
     auc.addInsert(3, 2, ins);
@@ -87,7 +87,7 @@ public final class AtomicUpdatesTest extends SandboxTest {
   @Test public void treeAwareUpdates1() {
     final String doc = "<a><b/></a>";
     final AtomicUpdateCache auc = atomics(doc);
-    final MemData md = new MemData(context.options);
+    final MemData md = new MemData(context.sharedMeta());
     auc.addDelete(2);
     auc.addInsert(3, 2, elemClip(md, "<c/>", false));
     assertEquals(1, auc.updatesSize());
@@ -101,7 +101,7 @@ public final class AtomicUpdatesTest extends SandboxTest {
   @Test public void treeAwareUpdates2() {
     final String doc = "<a><b/></a>";
     final AtomicUpdateCache auc = atomics(doc);
-    final MemData md = new MemData(context.options);
+    final MemData md = new MemData(context.sharedMeta());
     auc.addDelete(2);
     auc.addInsert(3, 2, elemClip(md, "<c/>", false));
     auc.addInsert(3, 1, elemClip(md, "<d/>", false));
@@ -116,7 +116,7 @@ public final class AtomicUpdatesTest extends SandboxTest {
   @Test public void treeAwareUpdates3() {
     final String doc = "<a><b/></a>";
     final AtomicUpdateCache auc = atomics(doc);
-    final MemData md = new MemData(context.options);
+    final MemData md = new MemData(context.sharedMeta());
     auc.addReplace(2, elemClip(md, "<newb/>", false));
     auc.addInsert(3, 1, elemClip(md, "<d/>", false));
     assertEquals(2, auc.updatesSize());
@@ -131,7 +131,7 @@ public final class AtomicUpdatesTest extends SandboxTest {
   @Test public void treeAwareUpdates4() {
     final String doc = "<a><b/></a>";
     final AtomicUpdateCache auc = atomics(doc);
-    final MemData md = new MemData(context.options);
+    final MemData md = new MemData(context.sharedMeta());
     auc.addReplace(2, elemClip(md, "<newb/>", false));
     auc.addInsert(3, 2, elemClip(md, "<c/>", false));
     assertEquals(1, auc.updatesSize());
@@ -170,7 +170,7 @@ public final class AtomicUpdatesTest extends SandboxTest {
 
     // two inserts cannot be merged!
     AtomicUpdateCache auc = atomics(doc);
-    final MemData md = new MemData(context.options);
+    final MemData md = new MemData(context.sharedMeta());
     auc.addInsert(3, 2, elemClip(md, "<c/>", false));
     auc.addInsert(3, 2, elemClip(md, "<d/>", false));
     assertEquals(2, auc.updatesSize());
@@ -218,7 +218,7 @@ public final class AtomicUpdatesTest extends SandboxTest {
   @Test public void updateSequence02() {
     assertThrows(RuntimeException.class, () -> {
       final AtomicUpdateCache auc = atomics("<a><b/></a>");
-      final MemData md = new MemData(context.options);
+      final MemData md = new MemData(context.sharedMeta());
       auc.addDelete(2);
       auc.addReplace(2, elemClip(md, "<newb/>", false));
     }, "Multiple deletes/replaces on node");
@@ -230,7 +230,7 @@ public final class AtomicUpdatesTest extends SandboxTest {
   @Test public void updateSequence03() {
     assertThrows(RuntimeException.class, () -> {
       final AtomicUpdateCache auc = atomics("<a><b/></a>");
-      final MemData md = new MemData(context.options);
+      final MemData md = new MemData(context.sharedMeta());
       auc.addReplace(2, elemClip(md, "<newb/>", false));
       auc.addReplace(2, elemClip(md, "<newb/>", false));
     }, "Multiple deletes/replaces on node");
@@ -286,7 +286,7 @@ public final class AtomicUpdatesTest extends SandboxTest {
   @Test public void updateSequence08() {
     assertThrows(RuntimeException.class, () -> {
       final AtomicUpdateCache auc = atomics("<a><b/></a>");
-      final MemData md = new MemData(context.options);
+      final MemData md = new MemData(context.sharedMeta());
       auc.addDelete(2);
       auc.addInsert(2, 1, elemClip(md, "<dummy/>", false));
     }, "Invalid sequence of delete, insert at location 2");
@@ -298,7 +298,7 @@ public final class AtomicUpdatesTest extends SandboxTest {
   @Test public void updateSequence09() {
     assertThrows(RuntimeException.class, () -> {
       final AtomicUpdateCache auc = atomics("<a><b id='0'/></a>");
-      final MemData md = new MemData(context.options);
+      final MemData md = new MemData(context.sharedMeta());
       auc.addDelete(3);
       auc.addInsert(3, 2, attrClip(md, "id", "1"));
     }, "Invalid sequence of delete, insert at location 3");
@@ -310,7 +310,7 @@ public final class AtomicUpdatesTest extends SandboxTest {
   @Test public void updateSequence10() {
     assertThrows(RuntimeException.class, () -> {
       final AtomicUpdateCache auc = atomics("<a><b/></a>");
-      final MemData md = new MemData(context.options);
+      final MemData md = new MemData(context.sharedMeta());
       auc.addReplace(2, elemClip(md, "<bb/>", false));
       auc.addInsert(2, 1, elemClip(md, "<dummy/>", false));
     }, "Invalid sequence of replace, insert at location 2");
@@ -322,7 +322,7 @@ public final class AtomicUpdatesTest extends SandboxTest {
   @Test public void updateSequence11() {
     assertThrows(RuntimeException.class, () -> {
       final AtomicUpdateCache auc = atomics("<a><b id='0'/></a>");
-      final MemData md = new MemData(context.options);
+      final MemData md = new MemData(context.sharedMeta());
       auc.addReplace(3, attrClip(md, "id", "11"));
       auc.addInsert(3, 2, attrClip(md, "id", "1"));
     }, "Invalid sequence of replace, insert at location 3");
@@ -370,7 +370,7 @@ public final class AtomicUpdatesTest extends SandboxTest {
 
     auc = atomics(doc);
     // mind that dummy insert data instance size==2!
-    final MemData md = new MemData(context.options);
+    final MemData md = new MemData(context.sharedMeta());
     auc.addInsert(3, 1, elemClip(md, "<dummy3/>", true));
     auc.addInsert(3, 1, elemClip(md, "<dummy4/>", true));
     auc.addDelete(3);
@@ -397,7 +397,7 @@ public final class AtomicUpdatesTest extends SandboxTest {
     final String doc = "<n1>" + "<n2>T3</n2>T4<n5/>T6<n7/>"
         + "<n8><n9><n10><n11/><n12/></n10></n9></n8><n13/><n14/>" + "</n1>";
     final AtomicUpdateCache auc = atomics(doc);
-    final MemData md = new MemData(context.options);
+    final MemData md = new MemData(context.sharedMeta());
     auc.addDelete(3);
     auc.addReplace(5, elemClip(md, "dummy1", true));
     auc.addInsert(11, 10, elemClip(md, "dummy2", true));
@@ -429,7 +429,7 @@ public final class AtomicUpdatesTest extends SandboxTest {
     final String doc = "<n1>" + "<n2>T3</n2>T4<n5/>T6<n7/>" + "</n1>";
     final AtomicUpdateCache auc = atomics(doc);
     // MemData needed to build valid DataClip object
-    final MemData md = new MemData(context.options);
+    final MemData md = new MemData(context.sharedMeta());
     auc.addInsert(3, 2, textClip(md, "Tx0"));
     auc.addDelete(3);
     auc.addInsert(4, 2, textClip(md, "Tx01"));
@@ -452,7 +452,7 @@ public final class AtomicUpdatesTest extends SandboxTest {
   private static void checkTextAdjacency(final Data data, final byte[][] texts) {
     int i = 0;
     // find adjacent text nodes
-    while(i + 1 < data.meta.size) {
+    while(i + 1 < data.nodes()) {
       final int a = i++;
       final int b = i;
       final int aKind = data.kind(a);
@@ -466,7 +466,7 @@ public final class AtomicUpdatesTest extends SandboxTest {
     // check order of texts
     i = -1;
     int t = 0;
-    while(++i < data.meta.size) {
+    while(++i < data.nodes()) {
       if(data.kind(i) == Data.TEXT && !eq(data.text(i, true), texts[t++]))
         fail("Invalid text node at position "
           + i);
@@ -480,10 +480,10 @@ public final class AtomicUpdatesTest extends SandboxTest {
    * @return data instance with text node
    */
   private static DataClip textClip(final Data d, final String text) {
-    final int s = d.meta.size;
+    final int s = d.nodes();
     d.text(s + 1, token(text), Data.TEXT);
     d.insert(s);
-    return new DataClip(d, s, d.meta.size);
+    return new DataClip(d, s, d.nodes());
   }
 
   /**
@@ -495,10 +495,10 @@ public final class AtomicUpdatesTest extends SandboxTest {
    * @return data instance with text node
    */
   private static DataClip attrClip(final Data d, final String name, final String value) {
-    final int s = d.meta.size;
+    final int s = d.nodes();
     d.attr(s + 1, d.attrNames.put(token(name)), token(value), -1);
     d.insert(s);
-    return new DataClip(d, s, d.meta.size);
+    return new DataClip(d, s, d.nodes());
   }
 
   /**
@@ -509,14 +509,14 @@ public final class AtomicUpdatesTest extends SandboxTest {
    * @return insertion sequence data instance
    */
   private static DataClip elemClip(final Data d, final String n, final boolean b) {
-    final int s = d.meta.size;
+    final int s = d.nodes();
     d.elem(s + 1, d.elemNames.put(token(n)), 1, b ? 2 : 1, 0, false);
     d.insert(s);
     if(b) {
       d.elem(1, d.elemNames.put(token(n)), 1, 1, 0, false);
       d.insert(s + 1);
     }
-    return new DataClip(d, s, d.meta.size);
+    return new DataClip(d, s, d.nodes());
   }
 
   /**

@@ -99,7 +99,7 @@ public final class Put extends ACreate {
           final DataClip clip = new DataClip(add.tmpData);
           int d = 0;
           if(docs.isEmpty()) {
-            auc.addInsert(data.meta.size, -1, clip);
+            auc.addInsert(data.nodes(), -1, clip);
           } else {
             auc.addReplace(docs.get(d++), clip);
           }

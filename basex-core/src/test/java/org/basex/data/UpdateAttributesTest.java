@@ -29,11 +29,11 @@ public final class UpdateAttributesTest extends DataUpdateTest {
     data.update(7, Data.ATTR, T_NAME, Token.EMPTY);
     data.update(7, Data.ATTR, T_JUNIT);
     data.finishUpdate(context.options);
-    assertEquals(size, data.meta.size);
+    assertEquals(size, data.nodes());
     assertArraysEquals(T_NAME, data.name(7, Data.ATTR));
     assertArraysEquals(T_JUNIT, data.text(7, false));
     reload(mainmem);
-    assertEquals(size, data.meta.size);
+    assertEquals(size, data.nodes());
     assertArraysEquals(T_NAME, data.name(7, Data.ATTR));
     assertArraysEquals(T_JUNIT, data.text(7, false));
   }
@@ -52,10 +52,10 @@ public final class UpdateAttributesTest extends DataUpdateTest {
     data.update(8, Data.ATTR, T_NAME, Token.EMPTY);
     data.update(8, Data.ATTR, T_JUNIT);
     data.finishUpdate(context.options);
-    assertEquals(size, data.meta.size);
+    assertEquals(size, data.nodes());
     assertArraysEquals(T_JUNIT, data.text(8, false));
     reload(mainmem);
-    assertEquals(size, data.meta.size);
+    assertEquals(size, data.nodes());
     assertArraysEquals(T_JUNIT, data.text(8, false));
   }
 
@@ -69,33 +69,33 @@ public final class UpdateAttributesTest extends DataUpdateTest {
   public void addAttribute(final boolean mainmem) throws IOException {
     setUp(mainmem);
     final Data data = context.data();
-    final long nextid = data.meta.lastid;
+    final long nextid = data.lastid;
 
-    final MemData md = new MemData(context.options);
+    final MemData md = new MemData(context.sharedMeta());
     md.attr(1, md.attrNames.put(T_FOO), T_JUNIT, 0);
     md.insert(0);
     data.startUpdate(context.options);
     data.insertAttr(9, 6, new DataClip(md));
     data.finishUpdate(context.options);
-    assertEquals(size + 1, data.meta.size);
+    assertEquals(size + 1, data.nodes());
     assertEquals(size + 1, data.size(0, Data.DOC));
     assertEquals(Data.ATTR, data.kind(9));
     assertEquals(6, data.parent(9, Data.ATTR));
     assertEquals(6, data.parent(8, Data.ATTR));
     assertEquals(6, data.parent(10, Data.ELEM));
     assertEquals(10, data.parent(11, Data.TEXT));
-    assertEquals(nextid + 1, data.meta.lastid);
+    assertEquals(nextid + 1, data.lastid);
     assertArraysEquals(T_FOO, data.name(9, Data.ATTR));
     assertArraysEquals(T_JUNIT, data.text(9, false));
     reload(mainmem);
-    assertEquals(size + 1, data.meta.size);
+    assertEquals(size + 1, data.nodes());
     assertEquals(size + 1, data.size(0, Data.DOC));
     assertEquals(Data.ATTR, data.kind(9));
     assertEquals(6, data.parent(9, Data.ATTR));
     assertEquals(6, data.parent(8, Data.ATTR));
     assertEquals(6, data.parent(10, Data.ELEM));
     assertEquals(10, data.parent(11, Data.TEXT));
-    assertEquals(nextid + 1, data.meta.lastid);
+    assertEquals(nextid + 1, data.lastid);
     assertArraysEquals(T_FOO, data.name(9, Data.ATTR));
     assertArraysEquals(T_JUNIT, data.text(9, false));
   }

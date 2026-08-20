@@ -213,7 +213,7 @@ public final class ValueAccess extends IndexAccess {
     return new IndexIterator() {
       final boolean text = type == IndexType.TEXT;
       final byte kind = text ? Data.TEXT : Data.ATTR;
-      final int sz = data.meta.size;
+      final int sz = data.nodes();
       int pre = -1;
 
       @Override
@@ -243,7 +243,7 @@ public final class ValueAccess extends IndexAccess {
    */
   private DBNodeIter scanEmpty(final Data data) {
     return new DBNodeIter(data) {
-      final int sz = data.meta.size;
+      final int sz = data.nodes();
       int pre = -1;
 
       @Override

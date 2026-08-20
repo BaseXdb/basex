@@ -107,10 +107,17 @@ public abstract class Builder extends Job {
       throw ex;
     }
     parser.close();
-    meta.lastid = meta.size - 1;
+    meta.size = size();
+    meta.lastid = size() - 1;
 
     if(Prop.debug) Util.errln(" " + perf + " (" + Performance.formatMemory() + ')');
   }
+
+  /**
+   * Returns the number of nodes that have been built.
+   * @return number of nodes
+   */
+  abstract int size();
 
   /**
    * Sets the path to the binary database files. The path might differ from the actual database path
@@ -128,7 +135,7 @@ public abstract class Builder extends Job {
    */
   public final void openDoc(final byte[] value) throws IOException {
     path.index(0, Data.DOC, level);
-    parStack.set(level++, meta.size);
+    parStack.set(level++, size());
     addLocation();
     addDoc(value);
     nspaces.open();
@@ -140,15 +147,15 @@ public abstract class Builder extends Job {
    */
   public final void closeDoc() throws IOException {
     final int pre = parStack.get(--level);
-    setSize(pre, meta.size - pre);
+    setSize(pre, size() - pre);
     ++meta.ndocs;
-    nspaces.close(meta.size);
+    nspaces.close(size());
 
     // check if data ranges exceed database limits, based on the storage details in {@link Data}
     checkLimit(elemNames.size(), 0x8000, LIMITELEMS);
     checkLimit(attrNames.size(), 0x8000, LIMITATTS);
     checkLimit(nspaces.size(), 0x100, LIMITNS);
-    if(meta.size < 0) checkLimit(0, 0, LIMITRANGE);
+    if(size() < 0) checkLimit(0, 0, LIMITRANGE);
   }
 
   /**
@@ -175,7 +182,7 @@ public abstract class Builder extends Job {
     addElem(name, att, nsp);
     final int pre = parStack.get(level);
     nspaces.close(pre);
-    if(att.size() >= IO.MAXATTS) setSize(pre, meta.size - pre);
+    if(att.size() >= IO.MAXATTS) setSize(pre, size() - pre);
   }
 
   /**
@@ -186,7 +193,7 @@ public abstract class Builder extends Job {
     checkStop();
     --level;
     final int pre = parStack.get(level);
-    setSize(pre, meta.size - pre);
+    setSize(pre, size() - pre);
     nspaces.close(pre);
   }
 
@@ -316,7 +323,7 @@ public abstract class Builder extends Job {
     path.index(nameId, Data.ELEM, level);
 
     // cache PRE value
-    final int pre = meta.size;
+    final int pre = size();
     // remember ID of element name and parent reference
     elemStack.set(level, nameId);
     parStack.set(level, pre);
@@ -380,7 +387,7 @@ public abstract class Builder extends Job {
 
     path.index(0, kind, l, value, meta);
     addLocation();
-    addText(value, l == 0 ? 1 : meta.size - parStack.get(l - 1), kind);
+    addText(value, l == 0 ? 1 : size() - parStack.get(l - 1), kind);
   }
 
   /**

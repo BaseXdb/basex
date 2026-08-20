@@ -66,12 +66,12 @@ public class FtMark extends StandardFunc {
             if(item == null) return null;
 
             // copy node to main memory data instance
-            final MemData md = new MemData(qc.context.options);
+            final MemData md = new MemData(qc.context.sharedMeta());
             final DataBuilder db = new DataBuilder(md, qc);
             db.ftpos(m, qc.ftPosData, l).build(toNode(item));
 
             final IntList il = new IntList();
-            final int s = md.meta.size;
+            final int s = md.nodes();
             for(int p = 0; p < s; p += md.size(p, md.kind(p))) il.add(p);
             iter = DBNodeSeq.get(il.finish(), md, FtMark.this).iter();
           } finally {

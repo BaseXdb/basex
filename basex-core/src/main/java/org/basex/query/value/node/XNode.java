@@ -252,7 +252,7 @@ public abstract class XNode extends GNode {
    * @throws QueryException query exception
    */
   public final DBNode copy(final QueryContext qc) throws QueryException {
-    return copy(qc.context.options, qc);
+    return copy(qc.context.sharedMeta(), qc);
   }
 
   /**
@@ -263,7 +263,18 @@ public abstract class XNode extends GNode {
    * @throws QueryException query exception
    */
   public final DBNode copy(final MainOptions options, final Job job) throws QueryException {
-    final MemData data = new MemData(options);
+    return copy(new MetaData(options), job);
+  }
+
+  /**
+   * Creates a database node copy from this node.
+   * @param meta meta data
+   * @param job interruptible job (can be {@code null})
+   * @return database node
+   * @throws QueryException query exception
+   */
+  private DBNode copy(final MetaData meta, final Job job) throws QueryException {
+    final MemData data = new MemData(meta);
     new DataBuilder(data, job).build(this);
     return new DBNode(data);
   }
