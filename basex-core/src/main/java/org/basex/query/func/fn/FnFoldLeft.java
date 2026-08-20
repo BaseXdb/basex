@@ -17,7 +17,7 @@ import org.basex.query.value.type.*;
  * @author Christian Gruen
  */
 public class FnFoldLeft extends StandardFunc {
-  /** Condition to check whether loop can be exited and action to produce next result. */
+  /** Exit condition and action producing the next result (can be {@code null}). */
   private FuncItem[] exitOrAction;
 
   @Override

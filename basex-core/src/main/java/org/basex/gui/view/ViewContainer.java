@@ -41,11 +41,11 @@ public final class ViewContainer extends BaseXBack {
   private ViewLayout layout;
   /** Current layout string. */
   private String layoutString;
-  /** Source View. */
+  /** Source View (can be {@code null}). */
   private ViewPanel source;
-  /** Target View. */
+  /** Target View (can be {@code null}). */
   private ViewPanel target;
-  /** Target orientation. */
+  /** Target orientation (can be {@code null}). */
   private Location location;
   /** Temporary mouse position. */
   private Point sp;

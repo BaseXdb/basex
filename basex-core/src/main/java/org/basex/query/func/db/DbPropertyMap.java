@@ -34,7 +34,7 @@ public class DbPropertyMap extends DbAccessFn {
   /**
    * Converts a property value to an XQuery item.
    * @param value value
-   * @return item, or {@code null} for empty sequence
+   * @return item
    */
   static Item item(final Object value) {
     if(value instanceof final Boolean bln) return Bln.get(bln);

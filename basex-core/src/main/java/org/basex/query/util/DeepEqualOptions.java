@@ -79,7 +79,7 @@ public final class DeepEqualOptions extends Options {
     }
   }
 
-  /** QNames. */
+  /** QNames (can be {@code null}). */
   private QNmSet unordered;
 
   /**

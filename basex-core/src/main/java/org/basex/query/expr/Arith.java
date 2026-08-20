@@ -23,7 +23,7 @@ import org.basex.util.hash.*;
 public class Arith extends Arr {
   /** Calculation operator. */
   public final Calc calc;
-  /** Optimized calculation. */
+  /** Optimized calculation (can be {@code null}). */
   CalcOpt calcOpt;
 
   /**

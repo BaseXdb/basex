@@ -88,7 +88,7 @@ final class PlainDoc extends Inspect {
 
   /**
    * Creates a description for the specified function.
-   * @param fname name of function
+   * @param fname name of function (can be {@code null})
    * @param sf function reference (can be {@code null})
    * @param ft function type
    * @param anns annotations
@@ -173,7 +173,7 @@ final class PlainDoc extends Inspect {
 
   /**
    * Attaches type information to the specified element.
-   * @param st sequence type
+   * @param st sequence type (can be {@code null})
    * @param elem element
    */
   private static void type(final SeqType st, final FBuilder elem) {

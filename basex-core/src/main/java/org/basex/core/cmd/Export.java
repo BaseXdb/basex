@@ -25,7 +25,7 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class Export extends Command {
-  /** Currently exported file. */
+  /** Currently exported file (can be {@code null}). */
   private IO progFile;
   /** Current number of exported file. */
   private int progPos;
@@ -76,7 +76,7 @@ public final class Export extends Command {
    * @param data data reference
    * @param path directory
    * @param sopts serialization parameters
-   * @param export calling instance
+   * @param export calling instance (can be {@code null})
    * @throws IOException I/O exception
    */
   public static void export(final Data data, final String path, final SerializerOptions sopts,

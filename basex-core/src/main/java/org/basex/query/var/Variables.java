@@ -165,7 +165,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   }
 
   /**
-   * Returns the variable for the specified QName and module, or {@code null} if it does not exist.
+   * Returns the variable for the specified QName and module.
    * @param name QName
    * @param module module URI
    * @return variable entry, or {@code null}

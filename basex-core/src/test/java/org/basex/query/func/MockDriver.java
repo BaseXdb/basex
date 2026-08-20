@@ -154,7 +154,7 @@ public final class MockDriver implements Driver {
 
   /**
    * Indicates if a statement yields a result set.
-   * @param sql SQL string
+   * @param sql SQL string (can be {@code null})
    * @return result of check
    */
   private static boolean isQuery(final String sql) {
@@ -198,7 +198,7 @@ public final class MockDriver implements Driver {
     /**
      * Returns a type-appropriate default for an unhandled method.
      * @param t return type
-     * @return default value
+     * @return default value, or {@code null} for reference types
      */
     private static Object def(final Class<?> t) {
       if(t == boolean.class) return false;

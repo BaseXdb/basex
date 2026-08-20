@@ -126,7 +126,7 @@ public abstract class IO {
    * If the content of the string value is known in advance, it is advisable
    * to call the direct constructors of the correspondent subclass.
    *
-   * @param location location
+   * @param location location (can be {@code null})
    * @return IO reference
    */
   public static IO get(final String location) {

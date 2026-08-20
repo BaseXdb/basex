@@ -47,8 +47,8 @@ public final class IndexCosts implements Comparable<IndexCosts> {
 
   /**
    * Adds index costs.
-   * @param ic1 first costs
-   * @param ic2 second costs
+   * @param ic1 first costs (can be {@code null})
+   * @param ic2 second costs (can be {@code null})
    * @return new costs
    */
   public static IndexCosts add(final IndexCosts ic1, final IndexCosts ic2) {
@@ -66,7 +66,7 @@ public final class IndexCosts implements Comparable<IndexCosts> {
 
   /**
    * Checks if index access is too expensive.
-   * @param data data reference (can be {@code null})
+   * @param data data reference
    * @return result of check
    */
   public boolean tooExpensive(final Data data) {

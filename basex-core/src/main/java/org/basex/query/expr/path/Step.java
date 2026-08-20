@@ -284,7 +284,7 @@ public abstract class Step extends Preds {
    * Determines the sequence type of the step.
    * @param axis axis
    * @param test test
-   * @param selector selector
+   * @param selector selector (can be {@code null})
    * @param preds predicates
    * @return sequence type
    */

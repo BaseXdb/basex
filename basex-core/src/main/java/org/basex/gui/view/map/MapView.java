@@ -36,20 +36,20 @@ public final class MapView extends View {
   /** Maximum zooming step. */
   private static final int MAXZS = ZS[ZOOMSIZE];
 
-  /** Array of current rectangles. */
+  /** Array of current rectangles (can be {@code null}). */
   private MapRects mainRects;
-  /** Data specific map layout. */
+  /** Data specific map layout (can be {@code null}). */
   private transient MapPainter painter;
-  /** Text lengths. */
+  /** Text lengths (can be {@code null}). */
   private int[] textLen;
 
   /** Rectangle history. */
   private final MapRect[] rectHist = new MapRect[ViewNotifier.MAXHIST];
   /** Current zooming Step (set to 0 when no zooming takes place). */
   private int zoomStep;
-  /** Main rectangle. */
+  /** Main rectangle (can be {@code null}). */
   private MapRect mainRect;
-  /** Dragged rectangle. */
+  /** Dragged rectangle (can be {@code null}). */
   private MapRect selBox;
   /** Flag for zooming in/out. */
   private boolean zoomIn;
@@ -63,7 +63,7 @@ public final class MapView extends View {
   /** Drag tolerance. */
   private int dragTol;
 
-  /** Currently focused rectangle. */
+  /** Currently focused rectangle (can be {@code null}). */
   private MapRect focused;
 
   /** TreeMap. */
@@ -381,7 +381,7 @@ public final class MapView extends View {
   /**
    * Draws image with correct scaling.
    * @param g graphics reference
-   * @param img image to be drawn
+   * @param img image to be drawn (can be {@code null})
    * @param zi zooming factor
    */
   private void drawImage(final Graphics g, final Image img, final int zi) {

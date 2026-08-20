@@ -22,7 +22,7 @@ import org.xml.sax.helpers.*;
 abstract class Validation extends DefaultHandler {
   /** Errors. */
   private final ArrayList<ErrorInfo> errors = new ArrayList<>();
-  /** Schema URL. */
+  /** Schema URL (can be {@code null}). */
   private IOFile schema;
 
   /**

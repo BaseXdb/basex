@@ -27,7 +27,7 @@ public abstract class Docs extends DynamicFn {
   /** Prefix of the {@link CommonOptions#XSD_VALIDATION} value that selects a schema type. */
   private static final String TYPE = "type ";
 
-  /** Query input. */
+  /** Query input (can be {@code null}). */
   QueryInput queryInput;
 
   /**

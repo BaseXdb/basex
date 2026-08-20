@@ -37,11 +37,11 @@ public final class FuncItem extends FItem implements Scope {
   private final AnnList anns;
   /** Size of the stack frame needed for this function. */
   private final int stackSize;
-  /** Input information. */
+  /** Input information (can be {@code null}). */
   private final InputInfo info;
   /** Function name (can be {@code null}). */
   private final QNm name;
-  /** Query focus. */
+  /** Query focus (can be {@code null}). */
   private final QueryFocus focus;
   /** Indicates if the query focus is accessed or modified. */
   private final boolean simple;

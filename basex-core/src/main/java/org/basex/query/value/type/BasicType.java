@@ -943,9 +943,9 @@ public enum BasicType implements Type {
 
   /** Pre/post values (pre, post << 8). */
   private short prePost;
-  /** Sequence types (lazy instantiation). */
+  /** Sequence types (can be {@code null}; lazy instantiation). */
   private EnumMap<Occ, SeqType> seqTypes;
-  /** QName (lazy instantiation). */
+  /** QName (can be {@code null}; lazy instantiation). */
   private QNm qnm;
 
   /**

@@ -48,7 +48,7 @@ public final class QueryInfo {
 
   /** Runtime flag. */
   boolean runtime;
-  /** Query string. */
+  /** Query string (can be {@code null}). */
   String query;
 
   /**
@@ -113,7 +113,7 @@ public final class QueryInfo {
    * @param qp query processor
    * @param printed printed bytes
    * @param hits number of returned hits
-   * @param locks read and write locks
+   * @param locks read and write locks (can be {@code null})
    * @param success success flag
    * @return query string
    */

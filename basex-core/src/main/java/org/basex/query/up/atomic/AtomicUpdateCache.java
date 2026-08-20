@@ -158,7 +158,7 @@ public final class AtomicUpdateCache {
    * Adds the given update to the updates/buffer depending on the type and whether it's
    * been merged or not.
    *
-   * @param update update
+   * @param update update (can be {@code null})
    * @param merged if true, the given update has been merged w/ the recent one
    */
   private void add(final BasicUpdate update, final boolean merged) {

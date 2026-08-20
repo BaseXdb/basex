@@ -25,7 +25,7 @@ import org.basex.util.*;
 public final class Add extends ACreate {
   /** Builder. */
   Builder builder;
-  /** Data to insert. */
+  /** Data to insert (can be {@code null}). */
   Data tmpData;
 
   /**

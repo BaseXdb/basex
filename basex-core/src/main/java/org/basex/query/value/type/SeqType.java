@@ -28,9 +28,9 @@ public final class SeqType {
   public final Type type;
   /** Occurrence indicator. */
   public final Occ occ;
-  /** Array type (lazy instantiation). */
+  /** Array type (can be {@code null}; lazy instantiation). */
   private ArrayType arrayType;
-  /** Map types (lazy instantiation). */
+  /** Map types (can be {@code null}; lazy instantiation). */
   private Map<Type, MapType> mapTypes;
 
   /**

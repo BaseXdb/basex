@@ -28,7 +28,7 @@ import org.xml.sax.*;
 public final class IOUrl extends IO {
   /** Reason phrases. */
   private static final HashMap<Integer, String> REASONS = new HashMap<>();
-  /** Optional SSL context for ignoring certificates. */
+  /** Optional SSL context for ignoring certificates (can be {@code null}). */
   private static SSLContext ssl;
   /** Cached HTTP client instances. */
   private static final HttpClients CLIENTS = new HttpClients(null);

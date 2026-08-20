@@ -22,7 +22,7 @@ public final class EXPathRepo {
   private final HashMap<String, Pkg> pkgDict = new HashMap<>();
   /** Static options. */
   private final StaticOptions sopts;
-  /** Repository path (lazy instantiation). */
+  /** Repository path (can be {@code null}; lazy instantiation). */
   private IOFile repo;
 
   /**

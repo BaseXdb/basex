@@ -31,7 +31,7 @@ public final class BaseXFileChooser {
   private final BaseXWindow win;
   /** Swing file chooser. */
   private final JFileChooser fc;
-  /** File suffix. */
+  /** File suffix (can be {@code null}). */
   private String suffix;
 
   /**

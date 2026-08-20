@@ -83,7 +83,7 @@ public final class DialogOptions extends BaseXBack {
 
   /**
    * Assigns options.
-   * @param data data reference
+   * @param data data reference (can be {@code null})
    */
   void setOptions(final Data data) {
     if(data != null) {

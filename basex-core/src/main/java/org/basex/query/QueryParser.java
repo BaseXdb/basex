@@ -113,7 +113,7 @@ public class QueryParser extends InputParser {
   private String declaration;
   /** XQDoc string of module. */
   private String moduleDoc = "";
-  /** Alternative error. */
+  /** Alternative error (can be {@code null}). */
   private QueryError alter;
   /** Alternative position. */
   private int alterPos;
@@ -2578,7 +2578,7 @@ public class QueryParser extends InputParser {
   /**
    * Parses the NodeTest rule.
    * @param axis axis
-   * @return test or selector
+   * @return test or selector, or {@code null}
    * @throws QueryException query exception
    */
   private ExprInfo nodeTest(final Axis axis) throws QueryException {
@@ -3248,7 +3248,7 @@ public class QueryParser extends InputParser {
   /**
    * Parses the "DirectConstructor" rule.
    * @param root root call
-   * @return query expression
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr dirConstructor(final boolean root) throws QueryException {
@@ -4382,7 +4382,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "NameTestUnion" rule.
-   * @param kind node kind ({@link Kind#ELEMENT} {@link Kind#ATTRIBUTE}, or {@code null}))
+   * @param kind node kind ({@link Kind#ELEMENT}, {@link Kind#ATTRIBUTE}, or {@code null})
    * @return name tests or {@code null}
    * @throws QueryException query exception
    */
@@ -4626,7 +4626,7 @@ public class QueryParser extends InputParser {
   /**
    * Returns an argument of the "FTRange" rule.
    * @param i accept only integers
-   * @return query expression
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr ftAdditive(final boolean i) throws QueryException {
@@ -4931,7 +4931,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "NCName" rule.
-   * @param error optional error message
+   * @param error error message (can be {@code null}); if specified, raised if no NCName is found
    * @param qnmPfx allow NCName as a QName prefix
    * @return name (empty if no token was found)
    * @throws QueryException query exception
@@ -4946,7 +4946,7 @@ public class QueryParser extends InputParser {
   /**
    * Parses the "EQName" rule.
    * @param ns default namespace (can be {@code null}), or {@link #SKIPCHECK} to skip checks
-   * @param error optional error message. If not {@code null}, will be raised if no EQName is found
+   * @param error error message (can be {@code null}); if specified, raised if no EQName is found
    * @return QName or {@code null}
    * @throws QueryException query exception
    */
@@ -4989,7 +4989,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "QName" rule.
-   * @param error optional error message. If not {@code null}, will be raised if no QName is found
+   * @param error error message (can be {@code null}); if specified, raised if no QName is found
    * @return QName string
    * @throws QueryException query exception
    */
@@ -5091,7 +5091,7 @@ public class QueryParser extends InputParser {
   /**
    * Raises an error if the specified expression is {@code null}.
    * @param <E> expression type
-   * @param expr expression
+   * @param expr expression (can be {@code null})
    * @param error error message
    * @return expression
    * @throws QueryException query exception
@@ -5277,7 +5277,7 @@ public class QueryParser extends InputParser {
   /**
    * Adds an expression to the specified array.
    * @param ar input array
-   * @param expr new expression
+   * @param expr new expression (can be {@code null})
    * @throws QueryException query exception
    */
   private void add(final ExprList ar, final Expr expr) throws QueryException {

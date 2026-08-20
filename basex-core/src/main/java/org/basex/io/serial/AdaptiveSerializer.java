@@ -24,7 +24,7 @@ import org.basex.util.*;
 public class AdaptiveSerializer extends OutputSerializer {
   /** Original output stream. */
   private final OutputStream os;
-  /** XML serializer (lazy instantiation). */
+  /** XML serializer (can be {@code null}; lazy instantiation). */
   private XMLSerializer xml;
   /** Nesting depth (0 = top level). */
   protected int depth;

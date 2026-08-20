@@ -53,7 +53,7 @@ public final class NodeType implements Type {
   /** Node test (can be {@code null}). */
   public final Test test;
 
-  /** Sequence types (lazy instantiation). */
+  /** Sequence types (can be {@code null}; lazy instantiation). */
   private EnumMap<Occ, SeqType> seqTypes;
 
   /**
@@ -87,7 +87,7 @@ public final class NodeType implements Type {
 
   /**
    * Returns a JNode type for the specified key and value type.
-   * @param key key ({@code null} for wildcard), {@link Empty#VALUE for root node})
+   * @param key key ({@code null} for wildcard, {@link Empty#VALUE} for root node)
    * @param valueType value type (can be {@code null})
    * @return JNode type
    */

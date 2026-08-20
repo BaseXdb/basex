@@ -45,9 +45,9 @@ public final class Language implements Comparable<Language> {
   }
 
   /**
-   * Returns an instance for the specified language code or {@code null}.
+   * Returns an instance for the specified language code.
    * @param lang name or code of language
-   * @return language code
+   * @return language instance, or {@code null}
    */
   public static Language get(final String lang) {
     final int i = lang.indexOf('-');
@@ -59,7 +59,7 @@ public final class Language implements Comparable<Language> {
   /**
    * Returns an instance for the current language option, or English as default language.
    * @param opts database options
-   * @return language code
+   * @return language instance, or {@code null}
    */
   public static Language get(final MainOptions opts) {
     final Language ln = get(opts.get(MainOptions.LANGUAGE));

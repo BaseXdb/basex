@@ -41,11 +41,11 @@ public final class JsonNodeSerializer extends JsonSerializer {
   /** Node output cache. */
   private final ArrayOutput cache = new ArrayOutput();
 
-  /** Current name of a pair. */
+  /** Current name of a pair (can be {@code null}). */
   private byte[] key;
   /** BaseX JSON serialization. */
   private boolean custom;
-  /** Node serializer. */
+  /** Node serializer (can be {@code null}). */
   private Serializer nodeSerializer;
 
   /**

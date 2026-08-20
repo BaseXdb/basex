@@ -282,7 +282,7 @@ public final class GUIConstants {
   /** Font size of the popups of the text editor. */
   public static int popupFontSize;
 
-  /** Names of available fonts. */
+  /** Names of available fonts (can be {@code null}). */
   private static String[] fonts;
   /** Characters for monospace detection. */
   private static final char[] MONOSPACE =  " !,-.01:<ILMWilmw".toCharArray();

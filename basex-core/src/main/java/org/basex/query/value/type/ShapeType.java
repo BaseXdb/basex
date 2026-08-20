@@ -470,7 +470,7 @@ public class ShapeType extends MapType {
   }
 
   /**
-   * Returns the intersection between two sequence types, or {@code null}, if no such type exists.
+   * Returns the intersection between two sequence types.
    * @param st1 first type
    * @param st2 second type
    * @param pairs pairs of ShapeTypes that are currently being checked, or have been checked before

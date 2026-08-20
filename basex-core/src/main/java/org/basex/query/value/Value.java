@@ -224,7 +224,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
 
   /**
    * Returns a Java representation of the value.
-   * @return Java object
+   * @return Java object, or {@code null} for an empty sequence
    * @throws QueryException query exception
    */
   public abstract Object toJava() throws QueryException;

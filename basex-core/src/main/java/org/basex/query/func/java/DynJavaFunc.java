@@ -27,7 +27,7 @@ final class DynJavaFunc extends DynJavaCall {
   private final String name;
   /** Method candidates. */
   private ArrayList<Method> methods;
-  /** Field candidate. */
+  /** Field candidate (can be {@code null}). */
   private Field field;
 
   /**

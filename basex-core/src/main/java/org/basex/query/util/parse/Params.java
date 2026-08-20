@@ -19,9 +19,9 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class Params {
-  /** Parameters. */
+  /** Parameters (can be {@code null}). */
   private ArrayList<Param> params;
-  /** Return type. */
+  /** Return type (can be {@code null}). */
   private SeqType type;
 
   /**
@@ -111,7 +111,7 @@ public final class Params {
 
   /**
    * Returns the sequence type.
-   * @return sequence type
+   * @return sequence type, or {@code null}
    */
   public SeqType seqType() {
     return type;

@@ -40,7 +40,7 @@ public abstract class CLI extends Main {
     Util.print(PASSWORD + COLS);
     return Util.password();
   };
-  /** Session. */
+  /** Session (can be {@code null}). */
   private Session session;
 
   /**

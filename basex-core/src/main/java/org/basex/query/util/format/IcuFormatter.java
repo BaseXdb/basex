@@ -197,7 +197,7 @@ public final class IcuFormatter extends Formatter {
    * Determine name of rule set for ICU RuleBasedNumberFormat to be used with this format for some
    * given numeral type and format modifier.
    * @param numType numeral type
-   * @param modifier format modifier
+   * @param modifier format modifier (can be {@code null})
    * @return rule set name
    */
   private String ruleSet(final NumeralType numType, final byte[] modifier) {

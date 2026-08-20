@@ -11,7 +11,7 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class FloatList extends ElementList {
-  /** Element container. */
+  /** Element container (can be {@code null}). */
   private float[] list;
 
   /**

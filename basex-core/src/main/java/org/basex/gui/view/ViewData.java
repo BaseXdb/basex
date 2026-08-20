@@ -40,7 +40,7 @@ public final class ViewData {
 
   /**
    * Returns path for the specified PRE value.
-   * @param data data reference
+   * @param data data reference (can be {@code null})
    * @param pre PRE value
    * @return current path
    */

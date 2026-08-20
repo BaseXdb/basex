@@ -16,7 +16,7 @@ final class CsvDirectConverter extends CsvConverter {
   private FBuilder doc;
   /** Root node. */
   private FBuilder root;
-  /** Record node. */
+  /** Record node (can be {@code null}). */
   private FBuilder record;
 
   /**

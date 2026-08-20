@@ -17,7 +17,7 @@ public final class AtomIter extends Iter {
   private final InputInfo info;
   /** Atomizing iterator. */
   private final Iter iter;
-  /** Atomizing iterator. */
+  /** Atomizing iterator (can be {@code null}). */
   private Iter atom;
   /** Size. Arrays may be encountered if value is {@code -1}. */
   private final long size;

@@ -34,7 +34,7 @@ public abstract class Job {
   private static final ThreadLocal<Job> CURRENT = new ThreadLocal<>();
   /** Stoppable threads. */
   private final Set<Thread> threads = ConcurrentHashMap.newKeySet();
-  /** Job that was registered on the current thread before this one. */
+  /** Job that was registered on the current thread before this one (can be {@code null}). */
   private Job previous;
   /** Indicates that the job holds a run slot and must give it up again. */
   private boolean registered;

@@ -149,7 +149,7 @@ public abstract class CsvSerializer extends StandardSerializer {
   /**
    * Prints a field value.
    * @param seqNo field sequence number
-   * @param value field value
+   * @param value field value (can be {@code null})
    * @throws IOException I/O exception
    */
   final void field(final int seqNo, final byte[] value) throws IOException {

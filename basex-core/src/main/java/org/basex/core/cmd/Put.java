@@ -22,7 +22,7 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class Put extends ACreate {
-  /** Add command. */
+  /** Add command (can be {@code null}). */
   private Add add;
 
   /**

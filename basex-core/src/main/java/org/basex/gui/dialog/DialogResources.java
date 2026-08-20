@@ -131,7 +131,7 @@ final class DialogResources extends BaseXBack {
 
   /**
    * Refreshes the given folder node. Removes all its children and reloads it afterward.
-   * @param n folder
+   * @param n folder (can be {@code null})
    */
   private void refreshFolder(final ResourceFolder n) {
     if(n == null) return;

@@ -26,13 +26,13 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
   private final Timer timer = new Timer(100, this);
   /** Information label. */
   private BaseXLabel info;
-  /** Cancel button. */
+  /** Cancel button (can be {@code null}). */
   private BaseXButton cancel;
   /** Memory usage. */
   private BaseXMem mem;
-  /** Executed job. */
+  /** Executed job (can be {@code null}). */
   private Job job;
-  /** Progress bar. */
+  /** Progress bar (can be {@code null}). */
   private JProgressBar bar;
 
   /**

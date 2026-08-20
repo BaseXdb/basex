@@ -92,7 +92,7 @@ final class FormatterFR extends Formatter {
    * @param tb token builder
    * @param n number to be formatted
    * @param numType numeral type
-   * @param suffix suffix
+   * @param suffix suffix (can be {@code null})
    * @param last words appears last
    */
   private static void word(final TokenBuilder tb, final long n, final NumeralType numType,
@@ -171,7 +171,7 @@ final class FormatterFR extends Formatter {
   /**
    * Adds an ordinal suffix.
    * @param numType numeral type
-   * @param suffix suffix
+   * @param suffix suffix (can be {@code null})
    * @param tb token builder
    */
   private static void suffix(final NumeralType numType, final byte[] suffix,

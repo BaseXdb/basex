@@ -76,7 +76,7 @@ public final class QNm extends Item {
   /**
    * Constructor.
    * @param name name (possibly prefixed)
-   * @param uri namespace URI
+   * @param uri namespace URI (can be {@code null}, or an empty or non-empty string)
    */
   public QNm(final String name, final String uri) {
     this(token(name), uri == null ? null : token(uri));
@@ -429,8 +429,8 @@ public final class QNm extends Item {
 
   /**
    * Constructs an internal string representation for the components of a QName.
-   * @param prefix prefix
-   * @param local name (can be {@code null})
+   * @param prefix prefix (can be {@code null})
+   * @param local local name
    * @param uri URI (can be {@code null})
    * @return EQName representation
    */

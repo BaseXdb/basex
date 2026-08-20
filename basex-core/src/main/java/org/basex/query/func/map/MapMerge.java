@@ -50,7 +50,7 @@ public class MapMerge extends MapFn {
     public static final ValueOption DUPLICATES = new ValueOption("duplicates", DUPLICATES_TYPE);
   }
 
-  /** Cached value merger instance. */
+  /** Cached value merger instance (can be {@code null}). */
   MapDuplicates md;
 
   @Override

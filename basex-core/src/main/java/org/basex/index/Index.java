@@ -41,7 +41,7 @@ public interface Index {
    * </ul>
    * Smaller values are better, a value of zero indicates that no results will be returned.
    * @param search index search definition
-   * @return cost estimation
+   * @return cost estimation, or {@code null} if index access is not possible
    */
   IndexCosts costs(IndexSearch search);
 

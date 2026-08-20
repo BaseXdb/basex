@@ -67,7 +67,7 @@ public final class QueryContext extends Job implements Closeable {
   public final NSDynContext ns;
   /** Query resources. */
   public final QueryResources resources;
-  /** Parent query context. */
+  /** Parent query context (can be {@code null}). */
   public final QueryContext parent;
   /** Database context. */
   public final Context context;
@@ -85,10 +85,10 @@ public final class QueryContext extends Job implements Closeable {
   public final LockList locks = new LockList();
   /** Current query focus. */
   public QueryFocus focus = new QueryFocus();
-  /** Date/time values. */
+  /** Date/time values (can be {@code null}). */
   private QueryDateTime dateTime;
 
-  /** Update container; will be created if the first update is evaluated. */
+  /** Update container (can be {@code null}; will be created for the first update). */
   public Updates updates;
   /** User. */
   public User user;
@@ -97,7 +97,7 @@ public final class QueryContext extends Job implements Closeable {
   public FTPosData ftPosData;
   /** Current full-text lexer. */
   public FTLexer ftLexer;
-  /** Current full-text options. */
+  /** Current full-text options (can be {@code null}). */
   private FTOpt ftOpt;
   /** Full-text token positions (needed for highlighting full-text results). */
   public int ftPos;
@@ -136,11 +136,11 @@ public final class QueryContext extends Job implements Closeable {
   /** Data for type constructors. */
   public final ArrayList<QueryParser.TypeCnstr> typeCnstrs = new ArrayList<>();
 
-  /** Main module (root expression). */
+  /** Main module (root expression, can be {@code null}). */
   public MainModule main;
-  /** Context value type. */
+  /** Context value type (can be {@code null}). */
   public SeqType contextType;
-  /** Context scope. */
+  /** Context scope (can be {@code null}). */
   public ContextScope contextValue;
   /** Indicates if context scope exists and is final. */
   public boolean finalContext;
@@ -148,7 +148,7 @@ public final class QueryContext extends Job implements Closeable {
   /** External variables and context to be bound at compile time. */
   private final QNmMap<Value> bindings = new QNmMap<>();
 
-  /** Serialization options. */
+  /** Serialization options (can be {@code null}). */
   private SerializerOptions sopts;
   /** Indicates if the default serialization parameters are used. */
   private boolean defaultOutput;

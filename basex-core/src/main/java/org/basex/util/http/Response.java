@@ -25,7 +25,7 @@ import org.basex.util.*;
  * @author Rositsa Shadura
  */
 public final class Response {
-  /** Input information. */
+  /** Input information (can be {@code null}). */
   private final InputInfo info;
   /** Database options. */
   private final MainOptions options;

@@ -61,7 +61,7 @@ final class XMLScanner extends Job {
   /**
    * Declared attribute.
    * @param tokenized tokenized (non-CDATA) type flag
-   * @param value default value (or {@code null})
+   * @param value default value (can be {@code null})
    */
   private record AttDecl(boolean tokenized, byte[] value) { }
   /** DTD flag. */
@@ -938,7 +938,7 @@ final class XMLScanner extends Job {
    * @param elem element name
    * @param att attribute name
    * @param tokenized non-CDATA (tokenized) type flag
-   * @param value default value (or {@code null})
+   * @param value default value (can be {@code null})
    */
   private void declareAtt(final byte[] elem, final byte[] att, final boolean tokenized,
       final byte[] value) {

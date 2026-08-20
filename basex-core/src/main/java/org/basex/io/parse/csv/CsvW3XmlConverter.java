@@ -32,7 +32,7 @@ public class CsvW3XmlConverter extends CsvConverter {
   private FBuilder doc;
   /** Root node. */
   private FBuilder rows;
-  /** Record node. */
+  /** Record node (can be {@code null}). */
   private FBuilder record;
 
   /**

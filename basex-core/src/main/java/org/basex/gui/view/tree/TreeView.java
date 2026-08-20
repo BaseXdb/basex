@@ -27,7 +27,7 @@ import org.basex.util.list.*;
  * @author Wolfgang Miller
  */
 public final class TreeView extends View {
-  /** TreeBorders Object, contains cached PRE values and borders. */
+  /** TreeBorders Object, contains cached PRE values and borders (can be {@code null}). */
   private TreeSubtree sub;
   /** TreeRects Object, contains cached rectangles. */
   private TreeRects tr;
@@ -49,11 +49,11 @@ public final class TreeView extends View {
   private boolean refreshedFocus;
   /** Distance between the levels. */
   private int levelDistance;
-  /** Image of the current marked nodes. */
+  /** Image of the current marked nodes (can be {@code null}). */
   private BufferedImage markedImage;
   /** If something is selected. */
   private boolean selection;
-  /** The selection rectangle. */
+  /** The selection rectangle (can be {@code null}). */
   private ViewRect selectRect;
   /** The node height. */
   private int nodeHeight;
@@ -61,7 +61,7 @@ public final class TreeView extends View {
   private int topMargin;
   /** Distance between multiple trees. */
   private double treedist;
-  /** Currently focused rectangle. */
+  /** Currently focused rectangle (can be {@code null}). */
   private TreeRect frect;
   /** Level of currently focused rectangle. */
   private int flv = -1;

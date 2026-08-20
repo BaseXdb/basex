@@ -196,7 +196,7 @@ public final class Util {
 
   /**
    * Prints the exception stack trace if the {@link Prop#debug} flag is set.
-   * @param throwable exception
+   * @param throwable exception (can be {@code null})
    */
   public static void debug(final Throwable throwable) {
     if(Prop.debug && throwable != null) stack(throwable);

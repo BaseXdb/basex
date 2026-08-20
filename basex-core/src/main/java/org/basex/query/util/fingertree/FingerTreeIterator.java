@@ -32,7 +32,7 @@ final class FingerTreeIterator<E> implements ListIterator<E> {
   /** Stack pointer. */
   private int nTop;
 
-  /** Current leaf node. */
+  /** Current leaf node (can be {@code null}). */
   private Node<E, E> leaf;
   /** Position inside the current leaf. */
   private int leafPos;

@@ -20,9 +20,9 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public abstract class Query implements Closeable {
-  /** Client output stream. */
+  /** Client output stream (can be {@code null}). */
   protected OutputStream out;
-  /** Cached results. */
+  /** Cached results (can be {@code null}). */
   protected TokenList cache;
 
   /** Cached result types. */

@@ -81,7 +81,7 @@ final class PlotAxis {
   /**
    * Called if the user has changed the caption of the axis. If a new
    * attribute was selected the positions of the plot items are recalculated.
-   * @param attribute attribute selected by the user
+   * @param attribute attribute selected by the user (can be {@code null})
    * @return true if new attribute was selected
    */
   boolean setAxis(final String attribute) {

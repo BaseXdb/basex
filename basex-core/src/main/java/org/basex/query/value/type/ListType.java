@@ -32,7 +32,7 @@ public enum ListType implements Type {
   /** Atom Type. */
   private final BasicType type;
 
-  /** Sequence types (lazy instantiation). */
+  /** Sequence types (can be {@code null}; lazy instantiation). */
   private EnumMap<Occ, SeqType> seqTypes;
 
   /**

@@ -13,7 +13,7 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
   /** Layout: horizontal = true, vertical = false. */
   private final boolean horizontal;
 
-  /** Proportional panel sizes. */
+  /** Proportional panel sizes (can be {@code null}). */
   private double[] propSize;
   /** Panel positions; assigned when a drag operation starts. */
   private double[] dragSize;
@@ -23,7 +23,7 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
   private double[] hiddenSize;
   /** Cached sizes (when panel is hidden). */
   private double[] cachedSize;
-  /** Resize listener. */
+  /** Resize listener (can be {@code null}). */
   private Consumer<double[]> resized;
 
   /** Index of the panel with a fixed pixel size ({@code -1}: proportional). */

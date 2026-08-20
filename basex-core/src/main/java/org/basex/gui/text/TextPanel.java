@@ -65,7 +65,7 @@ public class TextPanel extends BaseXPanel {
   /** Editable flag. */
   private final boolean editable;
 
-  /** Search bar. */
+  /** Search bar (can be {@code null}). */
   protected SearchBar search;
   /** Link listener (can be {@code null}). */
   private LinkListener linkListener;
@@ -418,7 +418,7 @@ public class TextPanel extends BaseXPanel {
 
   /**
    * Returns the search bar.
-   * @return search bar
+   * @return search bar, or {@code null}
    */
   public final SearchBar getSearch() {
     return search;

@@ -20,7 +20,7 @@ import org.basex.util.*;
 abstract class NodeCopy extends NodeUpdate {
   /** Nodes to be inserted. */
   GNodeList nodes;
-  /** Insertion sequence data clip (will be populated by {@link #prepare}). */
+  /** Insertion sequence data clip (can be {@code null}; populated by {@link #prepare}). */
   DataClip insseq;
 
   /**

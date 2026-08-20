@@ -101,7 +101,7 @@ public final class CmdBuilder {
   /**
    * Adds an argument with an optional prefix.
    * @param key keyword prefix (can be {@code null})
-   * @param arg argument string
+   * @param arg argument string (can be {@code null})
    * @return self instance
    */
   public CmdBuilder arg(final String key, final String arg) {

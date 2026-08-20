@@ -92,7 +92,7 @@ public final class XQJConcurrencyTest extends XQJBaseTest {
 
   /**
    * Closes a connection.
-   * @param conn connection to be closed
+   * @param conn connection to be closed (can be {@code null})
    */
   private static void close(final XQConnection conn) {
     if(conn != null) {

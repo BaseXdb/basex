@@ -30,7 +30,7 @@ public final class QueryJobTask implements Runnable {
   public long start;
   /** Next start time as local wall-clock time. */
   private LocalDateTime next;
-  /** Handle for cancelling the scheduled task. */
+  /** Handle for cancelling the scheduled task (can be {@code null}). */
   private ScheduledFuture<?> future;
   /** Indicates that cancellation was requested before the future was assigned. */
   private boolean canceled;

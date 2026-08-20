@@ -27,7 +27,7 @@ final class TextFont {
   private static final StringList MONO = new StringList();
   /** Names of fallback fonts for already visited codepoints. */
   private static final IntObjectMap<String> FALLBACK = new IntObjectMap<>();
-  /** Fonts sorted in descending order by number of glyphs. */
+  /** Fonts sorted in descending order by number of glyphs (can be {@code null}). */
   private static List<Font> cachedFonts;
 
   /** Cached fallback fonts. */

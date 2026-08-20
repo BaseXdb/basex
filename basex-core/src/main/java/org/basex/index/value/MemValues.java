@@ -27,7 +27,7 @@ public final class MemValues extends ValueIndex {
   private ArrayList<int[]> idsList;
   /** ID array lengths. */
   private IntList lenList;
-  /** Order flags. */
+  /** Order flags (can be {@code null}). */
   private BoolList reorder;
 
   /**

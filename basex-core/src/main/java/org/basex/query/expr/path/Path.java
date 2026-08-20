@@ -249,7 +249,7 @@ public abstract class Path extends ParseExpr {
   /**
    * Tries to cast the specified step into an axis step.
    * @param index index
-   * @return axis step, or {@code null})
+   * @return axis step, or {@code null}
    */
   private Step axisStep(final int index) {
     return steps[index] instanceof final Step step ? step : null;
@@ -538,7 +538,7 @@ public abstract class Path extends ParseExpr {
   /**
    * Computes the result size via database statistics.
    * @param rt root at compile time (can be {@code null})
-   * @param data data reference
+   * @param data data reference (can be {@code null})
    * @return number of results (or {@code -1})
    */
   private long size(final Expr rt, final Data data) {

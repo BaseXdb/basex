@@ -309,7 +309,7 @@ public abstract class Formatter extends FormatUtil {
   /**
    * Checks if the specified calendar is supported.
    * @param calendar calendar
-   * @param info input info (can be {@code null})
+   * @param info input info
    * @return result of check
    * @throws QueryException query exception
    */

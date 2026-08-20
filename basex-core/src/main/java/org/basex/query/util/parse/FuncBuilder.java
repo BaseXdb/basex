@@ -19,7 +19,7 @@ import org.basex.util.*;
 public final class FuncBuilder {
   /** Input Info. */
   public final InputInfo info;
-  /** Keyword-based arguments (initialized if required). */
+  /** Keyword-based arguments (can be {@code null}; initialized if required). */
   public QNmMap<Expr> keywords;
   /** Number of placeholders. */
   public int placeholders;
@@ -28,7 +28,7 @@ public final class FuncBuilder {
 
   /** Annotations (literals). */
   public AnnList anns = AnnList.EMPTY;
-  /** Parameters (literals). */
+  /** Parameters (literals, can be {@code null}). */
   public Var[] params;
   /** Variable scope (literals). */
   public VarScope vs;

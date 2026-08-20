@@ -11,7 +11,7 @@ package org.basex.query.util.fingertree;
  * @param <E> element type
  */
 public final class TreeSlice<N, E> {
-  /** A full subtree. */
+  /** A full subtree (can be {@code null}). */
   private FingerTree<N, E> tree;
   /** A partial node. */
   private NodeLike<N, E> partial;

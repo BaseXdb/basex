@@ -26,7 +26,7 @@ public final class ServerQuery extends Job {
   /** Database context. */
   private final Context ctx;
 
-  /** Query processor. */
+  /** Query processor (can be {@code null}). */
   private QueryProcessor qp;
   /** Parsing flag. */
   private boolean parsed;

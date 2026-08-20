@@ -27,8 +27,8 @@ public class DbOptionMap extends StandardFunc {
 
   /**
    * Converts an option value to an XQuery item.
-   * @param value value
-   * @return item, or {@code null} for empty sequence
+   * @param value value (can be {@code null})
+   * @return item
    * @throws QueryException query exception
    */
   static Item item(final Object value) throws QueryException {
@@ -38,8 +38,7 @@ public class DbOptionMap extends StandardFunc {
     if(value instanceof final Options options) {
       final MapBuilder mb = new MapBuilder();
       for(final Option<?> opt : options) {
-        final Item item = item(options.get(opt));
-        if(item != null) mb.put(Str.get(opt.name()), item);
+        mb.put(Str.get(opt.name()), item(options.get(opt)));
       }
       return mb.map();
     }

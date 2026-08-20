@@ -63,7 +63,7 @@ public abstract class ParseFn extends StandardFunc {
    */
   protected abstract Options options(QueryContext qc) throws QueryException;
 
-  /** Input reference. */
+  /** Input reference (can be {@code null}). */
   IO input;
 
   /**

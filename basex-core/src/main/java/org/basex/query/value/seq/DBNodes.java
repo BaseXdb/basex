@@ -53,7 +53,7 @@ public final class DBNodes extends DBNodeSeq {
 
   /**
    * Returns full-text position data.
-   * @return position data
+   * @return position data, or {@code null}
    */
   public FTPosData ftpos() {
     return ftpos;

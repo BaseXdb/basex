@@ -28,7 +28,7 @@ public interface XQFunctionExpr {
   /**
    * Name of the parameter at the given position.
    * @param pos position of the parameter
-   * @return name of the parameter
+   * @return name of the parameter, or {@code null}
    */
   QNm paramName(int pos);
 

@@ -24,7 +24,7 @@ import org.basex.util.options.*;
 public abstract class ParseCsv extends ParseFn {
   /**
    * Returns the default conversion format.
-   * @return format
+   * @return format, or {@code null}
    */
   protected abstract CsvFormat format();
 

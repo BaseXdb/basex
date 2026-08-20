@@ -77,9 +77,9 @@ public final class EditorView extends View {
   /** Context. */
   private final BaseXLabel context;
 
-  /** Query file that has last been evaluated. */
+  /** Query file that has last been evaluated (can be {@code null}). */
   private IOFile execFile;
-  /** Main-memory document. */
+  /** Main-memory document (can be {@code null}). */
   private DBNode doc;
 
   /** Parse counter. */

@@ -27,7 +27,7 @@ public final class PathIndex implements Index {
   private final ArrayList<PathNode> stack = new ArrayList<>();
   /** Data reference. */
   private Data data;
-  /** Root node. */
+  /** Root node (can be {@code null}). */
   private PathNode root;
 
   /**

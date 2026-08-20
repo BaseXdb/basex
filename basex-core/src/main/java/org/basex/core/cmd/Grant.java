@@ -13,7 +13,7 @@ import org.basex.core.users.*;
  * @author Christian Gruen
  */
 public final class Grant extends AUser {
-  /** Permission. */
+  /** Permission (can be {@code null}). */
   private Perm prm;
 
   /**

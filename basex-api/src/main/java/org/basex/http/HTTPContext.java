@@ -17,16 +17,16 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class HTTPContext {
-  /** Static options. */
+  /** Static options (can be {@code null}). */
   private StaticOptions soptions;
-  /** Database context. */
+  /** Database context (can be {@code null}). */
   private Context context;
-  /** Initialized failed. */
+  /** Initialization failure (can be {@code null}). */
   private IOException exception;
-  /** Server instance. */
+  /** Server instance (can be {@code null}). */
   private BaseXServer server;
 
-  /** Singleton instance. */
+  /** Singleton instance (can be {@code null}). */
   private static volatile HTTPContext instance;
 
   /** Private constructor. */
@@ -43,7 +43,7 @@ public final class HTTPContext {
 
   /**
    * Returns the database context.
-   * @return database context
+   * @return database context, or {@code null}
    */
   public Context context() {
     return context;

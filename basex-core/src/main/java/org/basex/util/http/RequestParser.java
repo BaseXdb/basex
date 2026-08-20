@@ -25,7 +25,7 @@ import org.basex.util.*;
  * @author Rositsa Shadura
  */
 public final class RequestParser {
-  /** Input information. */
+  /** Input information (can be {@code null}). */
   private final InputInfo info;
 
   /**
@@ -90,7 +90,7 @@ public final class RequestParser {
    * Parses <http:header/> children of requests and parts.
    * @param iter iterator on request/part children
    * @param headers map for parsed headers
-   * @return next non-header element (or {@code null})
+   * @return next non-header element (can be {@code null})
    */
   private static GNode parseHeaders(final BasicNodeIter iter, final Map<String, String> headers) {
     for(final GNode node : iter) {

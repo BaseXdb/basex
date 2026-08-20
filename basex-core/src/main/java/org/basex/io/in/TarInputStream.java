@@ -17,7 +17,7 @@ public final class TarInputStream extends FilterInputStream {
 
   /** Single byte buffer. */
   private final byte[] buf = new byte[1];
-  /** Current entry. */
+  /** Current entry (can be {@code null}). */
   private TarEntry entry;
   /** Number of read bytes. */
   private long offset;

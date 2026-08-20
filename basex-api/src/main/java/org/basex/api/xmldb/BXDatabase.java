@@ -61,7 +61,7 @@ public final class BXDatabase implements Database {
 
   /**
    * Returns the name of a collection.
-   * @param uri input URI
+   * @param uri input URI (can be {@code null})
    * @return collection name
    * @throws XMLDBException exception
    */

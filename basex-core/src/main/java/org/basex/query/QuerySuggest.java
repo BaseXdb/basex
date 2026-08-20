@@ -21,7 +21,7 @@ final class QuerySuggest extends QueryParser {
   /** Data reference. */
   private final Data data;
 
-  /** Stack of current path nodes. */
+  /** Stack of current path nodes (can be {@code null}). */
   private Stack<ArrayList<PathNode>> stack;
   /** All current path nodes. */
   private ArrayList<PathNode> all;
@@ -29,7 +29,7 @@ final class QuerySuggest extends QueryParser {
   private ArrayList<PathNode> current;
   /** Show or hide completions. */
   private boolean show;
-  /** Last element name. */
+  /** Last element name (can be {@code null}). */
   private byte[] name;
 
   /**

@@ -114,7 +114,7 @@ public abstract class Collation {
 
   /**
    * Returns a collation for the specified collation and input info.
-   * @param coll collation
+   * @param coll collation (can be {@code null})
    * @param info input info (can be {@code null})
    * @return collation instance, or {@code null} for Unicode point collation
    */

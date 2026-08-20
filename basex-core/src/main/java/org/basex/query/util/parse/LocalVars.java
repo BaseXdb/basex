@@ -117,7 +117,7 @@ public final class LocalVars {
   /**
    * Pushes a new variable context onto the stack.
    * @param global create global mapping for non-local variables
-   * @return global map or {@code null})
+   * @return global map or {@code null}
    */
   public HashMap<Var, Expr> pushContext(final boolean global) {
     final HashMap<Var, Expr> map = global ? new HashMap<>() : null;

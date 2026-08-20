@@ -13,7 +13,7 @@ import org.basex.util.*;
 final class MapRects implements Iterable<MapRect> {
   /** Value array. */
   MapRect[] list;
-  /** Sorted values. */
+  /** Sorted values (can be {@code null}). */
   MapRect[] sorted;
   /** Number of entries. */
   int size;

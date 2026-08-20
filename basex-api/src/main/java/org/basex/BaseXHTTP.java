@@ -43,7 +43,7 @@ public final class BaseXHTTP extends CLI {
   private boolean service;
   /** Quiet flag. */
   private boolean quiet;
-  /** Default admin password. */
+  /** Default admin password (can be {@code null}). */
   private String password;
   /** Stop flag. */
   private boolean stop;

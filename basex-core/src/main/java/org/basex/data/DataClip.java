@@ -22,7 +22,7 @@ public final class DataClip {
   public final int end;
   /** Number of contained fragments. */
   public final int fragments;
-  /** Database context. */
+  /** Database context (can be {@code null}). */
   private Context ctx;
 
   /**

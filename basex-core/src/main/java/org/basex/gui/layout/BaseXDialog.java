@@ -203,11 +203,12 @@ public abstract class BaseXDialog extends JDialog implements BaseXWindow {
   }
 
   /**
-   * Static yes/no/cancel dialog. Returns {@code null} if the dialog was canceled.
+   * Static yes/no/cancel dialog.
    * @param gui parent reference
    * @param text text
    * @param buttons additional buttons
-   * @return chosen action ({@link Text#B_YES}, {@link Text#B_NO}, {@link Text#B_CANCEL})
+   * @return chosen action ({@link Text#B_YES}, {@link Text#B_NO}, {@link Text#B_CANCEL}),
+   *         or {@code null} if the dialog was canceled
    */
   public static String yesNoCancel(final GUI gui, final String text, final String... buttons) {
     return new DialogMessage(gui, text.trim(), Msg.YESNOCANCEL, buttons).action();

@@ -21,7 +21,7 @@ public class BufferInput extends InputStream {
   int bsize;
   /** Total length of input to be processed ({@code -1} if unknown). */
   long length;
-  /** Input file. */
+  /** Input file (can be {@code null}). */
   private IO input;
 
   /** Reference to the data input stream (can be {@code null}). */
@@ -93,8 +93,8 @@ public class BufferInput extends InputStream {
   }
 
   /**
-   * Returns the IO reference or {@code null}.
-   * @return file reference
+   * Returns the IO reference.
+   * @return file reference, or {@code null}
    */
   public final IO io() {
     return input;

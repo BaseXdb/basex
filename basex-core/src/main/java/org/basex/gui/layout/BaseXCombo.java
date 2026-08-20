@@ -25,7 +25,7 @@ public class BaseXCombo extends JComboBox<Object> {
   private Options options;
   /** Key to values. */
   private Option<?> optionKey;
-  /** History. */
+  /** History (can be {@code null}). */
   private BaseXHistory history;
   /** Key listener. */
   private KeyListener keys;
@@ -253,8 +253,8 @@ public class BaseXCombo extends JComboBox<Object> {
   }
 
   /**
-   * Returns the editor text field, or {@code null} if the combobox is not editable.
-   * @return text field
+   * Returns the editor text field.
+   * @return text field, or {@code null} if the combo box is not editable
    */
   public BaseXTextField textField() {
     return isEditable() ? (BaseXTextField) getEditor().getEditorComponent() : null;

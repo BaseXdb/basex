@@ -41,9 +41,9 @@ public final class TextView extends View {
   /** Text Area. */
   private final TextPanel text;
 
-  /** Cached command. */
+  /** Cached command (can be {@code null}). */
   private Command cachedCmd;
-  /** Cached nodes. */
+  /** Cached nodes (can be {@code null}). */
   private DBNodes cachedNodes;
 
   /**

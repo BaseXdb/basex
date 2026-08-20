@@ -25,7 +25,7 @@ import org.basex.util.options.*;
 public abstract class ParseJson extends ParseFn {
   /**
    * Returns the default conversion format.
-   * @return format
+   * @return format, or {@code null}
    */
   protected abstract JsonFormat format();
 

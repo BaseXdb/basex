@@ -25,7 +25,7 @@ public final class ThesAccessor {
   /** Requested maximum level. */
   private final long max;
 
-  /** Thesaurus structure. */
+  /** Thesaurus structure (can be {@code null}). */
   private Thesaurus thesaurus;
   /** File reference. */
   private IO file;

@@ -21,7 +21,7 @@ import org.basex.util.ft.*;
 public final class CreateIndex extends ACreate {
   /**
    * Default constructor.
-   * @param type index type, defined in {@link CmdIndex}
+   * @param type index type, defined in {@link CmdIndex} (can be {@code null})
    */
   public CreateIndex(final Object type) {
     super(Perm.WRITE, true, type != null ? type.toString() : null);

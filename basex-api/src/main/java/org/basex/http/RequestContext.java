@@ -30,13 +30,13 @@ public final class RequestContext implements RequestScope {
   public final HttpServletRequest request;
   /** Request state. */
   private final RequestState state;
-  /** Query parameters. */
+  /** Query parameters (can be {@code null}). */
   private XQMap values;
-  /** Form parameters. */
+  /** Form parameters (can be {@code null}). */
   private XQMap form;
-  /** Headers. */
+  /** Headers (can be {@code null}). */
   private XQMap headers;
-  /** Content body. */
+  /** Content body (can be {@code null}). */
   private IO body;
 
   /**

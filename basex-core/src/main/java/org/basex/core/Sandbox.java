@@ -600,7 +600,7 @@ public abstract class Sandbox {
 
   /**
    * Stops a server instance.
-   * @param server server
+   * @param server server (can be {@code null})
    * @throws IOException I/O exception
    */
   public static void stopServer(final BaseXServer server) throws IOException {

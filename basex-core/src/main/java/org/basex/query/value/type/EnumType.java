@@ -22,7 +22,7 @@ public final class EnumType implements Type {
   /** The enumeration values (at least one). */
   private final TokenSet values;
 
-  /** Sequence types (lazy instantiation). */
+  /** Sequence types (can be {@code null}; lazy instantiation). */
   private EnumMap<Occ, SeqType> seqTypes;
 
   /**

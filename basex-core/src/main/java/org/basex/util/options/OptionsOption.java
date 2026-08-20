@@ -12,7 +12,7 @@ import org.basex.util.*;
 public final class OptionsOption<O extends Options> extends Option<O> {
   /** Class. */
   private final Class<O> clazz;
-  /** Default value. */
+  /** Default value (can be {@code null}). */
   private final O value;
 
   /**

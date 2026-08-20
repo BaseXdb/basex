@@ -49,7 +49,7 @@ abstract class JsonXmlConverter extends JsonConverter {
   FBuilder doc;
   /** Current element. */
   FBuilder curr;
-  /** Name of current element/attribute. */
+  /** Name of current element/attribute (can be {@code null}). */
   byte[] name;
 
   /**
@@ -121,7 +121,7 @@ abstract class JsonXmlConverter extends JsonConverter {
   /**
    * Adds a value.
    * @param type JSON type
-   * @param value optional value
+   * @param value value (can be {@code null})
    * @throws QueryException query exception
    */
   abstract void addValue(byte[] type, byte[] value) throws QueryException;

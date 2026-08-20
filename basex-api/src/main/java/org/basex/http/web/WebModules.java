@@ -29,7 +29,7 @@ import org.basex.util.http.*;
  * @author Christian Gruen
  */
 public final class WebModules {
-  /** Singleton instance. */
+  /** Singleton instance (can be {@code null}). */
   private static volatile WebModules instance;
 
   /** RESTXQ path. */
@@ -109,7 +109,7 @@ public final class WebModules {
   /**
    * Returns a RESTXQ function that matches the current request or the specified error code best.
    * @param conn HTTP connection
-   * @param error error code (assigned if error function is to be called)
+   * @param error error code (can be {@code null}; assigned if error function is to be called)
    * @return function, or {@code null} if no function matches
    * @throws QueryException query exception
    * @throws IOException I/O exception
@@ -215,7 +215,7 @@ public final class WebModules {
   /**
    * Returns RESTXQ and permissions functions that match the current request.
    * @param conn HTTP connection
-   * @param error error code (assigned if error function is to be called)
+   * @param error error code (can be {@code null}; assigned if error function is to be called)
    * @param perm permission flag
    * @return list of matching functions, ordered by specifity
    * @throws QueryException query exception

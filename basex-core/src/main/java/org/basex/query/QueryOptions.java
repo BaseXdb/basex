@@ -21,7 +21,7 @@ final class QueryOptions {
   private final HashMap<Option<?>, Object> cachedOpts = new HashMap<>();
   /** Local query options (key/value pairs), supplied by option declarations. */
   private final HashMap<Option<?>, Object> localOpts = new HashMap<>();
-  /** Main options instance (for parsing entries). */
+  /** Main options instance (can be {@code null}; for parsing entries). */
   private MainOptions dummyOptions;
 
   /**

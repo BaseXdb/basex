@@ -18,7 +18,7 @@ import org.basex.io.*;
  * @author Christian Gruen
  */
 final class ProjectList extends JList<String> implements ProjectCommands {
-  /** Font metrics. */
+  /** Font metrics (can be {@code null}). */
   private static FontMetrics fm;
 
   /** Project view. */

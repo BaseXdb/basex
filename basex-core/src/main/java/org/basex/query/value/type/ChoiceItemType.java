@@ -22,7 +22,7 @@ public final class ChoiceItemType implements Type {
   /** Common ancestor type. */
   private final Type union;
 
-  /** Sequence types (lazy instantiation). */
+  /** Sequence types (can be {@code null}; lazy instantiation). */
   private EnumMap<Occ, SeqType> seqTypes;
 
   /**

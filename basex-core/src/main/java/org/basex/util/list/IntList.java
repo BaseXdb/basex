@@ -11,7 +11,7 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class IntList extends ElementList {
-  /** Element container. */
+  /** Element container (can be {@code null}). */
   private int[] list;
 
   /**
@@ -585,8 +585,8 @@ public final class IntList extends ElementList {
 
   /**
    * Compares two tokens and returns an integer.
-   * @param value1 first value
-   * @param value2 second value
+   * @param value1 first value (can be {@code null})
+   * @param value2 second value (can be {@code null})
    * @return result
    */
   private static int cmp(final byte[] value1, final byte[] value2) {

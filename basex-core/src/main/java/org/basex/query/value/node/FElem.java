@@ -40,7 +40,7 @@ public final class FElem extends FNode {
   private QNm name;
   /** Base URI. */
   private final byte[] uri;
-  /** Namespaces. */
+  /** Namespaces (can be {@code null}). */
   private Atts namespaces;
   /** Namespaces inherited from enclosing constructors (can be {@code null}). */
   private Atts nsInherited;

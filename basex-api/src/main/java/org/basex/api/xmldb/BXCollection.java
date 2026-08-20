@@ -29,7 +29,7 @@ public final class BXCollection implements Collection {
   final BXDatabase db;
   /** Database context. */
   final Context ctx;
-  /** Database. */
+  /** Database (can be {@code null}). */
   Data data;
 
   /**

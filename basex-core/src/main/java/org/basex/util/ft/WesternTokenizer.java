@@ -63,7 +63,7 @@ public final class WesternTokenizer extends Tokenizer {
 
   /**
    * Constructor.
-   * @param fto full-text options
+   * @param fto full-text options (can be {@code null})
    */
   public WesternTokenizer(final FTOpt fto) {
     casesens = fto != null && fto.cs != null ? fto.cs : FTCase.INSENSITIVE;

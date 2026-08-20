@@ -34,7 +34,7 @@ import org.basex.util.options.*;
  * @author Michael Seiferle
  */
 public final class Client {
-  /** Input information. */
+  /** Input information (can be {@code null}). */
   private final InputInfo info;
   /** Database options. */
   private final MainOptions options;
@@ -131,8 +131,8 @@ public final class Client {
 
   /**
    * Returns the authentication headers.
-   * @param auth authorization string
-   * @return values values
+   * @param auth authorization string (can be {@code null})
+   * @return values
    */
   public static EnumMap<RequestAttribute, String> authHeaders(final String auth) {
     final EnumMap<RequestAttribute, String> values = new EnumMap<>(RequestAttribute.class);

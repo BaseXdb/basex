@@ -15,7 +15,7 @@ import org.basex.util.*;
 final class ZIPIn extends ArchiveIn {
   /** ZIP input stream. */
   private final ZipInputStream zis;
-  /** Current entry. */
+  /** Current entry (can be {@code null}). */
   private ZipEntry ze;
 
   /**

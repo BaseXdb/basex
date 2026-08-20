@@ -38,7 +38,7 @@ public final class Strings {
   /** UTF32 encoding strings. */
   private static final String[] ALL_UTF32 = { UTF32, "UTF32" };
 
-  /** Available encodings. */
+  /** Available encodings (can be {@code null}). */
   private static String[] encodings;
 
   /** Hidden constructor. */

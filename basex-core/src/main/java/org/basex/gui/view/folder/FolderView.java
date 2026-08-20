@@ -26,7 +26,7 @@ public final class FolderView extends View {
   /** Horizontal offset. */
   private static final int OFFX = 8;
 
-  /** References closed nodes. */
+  /** References closed nodes (can be {@code null}). */
   boolean[] opened;
   /** Line Height. */
   int lineH;

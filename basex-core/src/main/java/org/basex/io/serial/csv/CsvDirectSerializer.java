@@ -32,7 +32,7 @@ public final class CsvDirectSerializer extends CsvSerializer {
 
   /** Contents of current row. */
   private TokenObjectMap<byte[]> data;
-  /** Current attribute value. */
+  /** Current attribute value (can be {@code null}). */
   private byte[] attv;
   /** Map has been serialized. */
   private boolean mapped;

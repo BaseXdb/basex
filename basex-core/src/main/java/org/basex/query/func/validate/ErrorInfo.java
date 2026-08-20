@@ -38,7 +38,7 @@ public final class ErrorInfo {
    * Constructor.
    * @param ex exception
    * @param level type
-   * @param schema schema url
+   * @param schema schema url (can be {@code null})
    */
   public ErrorInfo(final SAXException ex, final Level level, final IO schema) {
     this.level = level;

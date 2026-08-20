@@ -36,7 +36,7 @@ public final class DialogNew extends BaseXDialog {
 
   /** Index creation options. */
   private DialogIndex[] indexes;
-  /** Dialog for importing new resources. */
+  /** Dialog for importing new resources (can be {@code null}). */
   private DialogImport general;
 
   /**

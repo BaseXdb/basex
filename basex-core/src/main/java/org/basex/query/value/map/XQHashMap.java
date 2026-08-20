@@ -13,7 +13,7 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 abstract class XQHashMap extends XQMap {
-  /** Cached immutable variant, for updates. */
+  /** Cached immutable variant, for updates (can be {@code null}). */
   private XQMap trie;
 
   /**

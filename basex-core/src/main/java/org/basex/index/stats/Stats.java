@@ -17,7 +17,7 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class Stats {
-  /** Distinct values (value, number of occurrence). */
+  /** Distinct values (can be {@code null}; value, number of occurrence). */
   public TokenIntMap values;
   /** Minimum value. */
   public double min;

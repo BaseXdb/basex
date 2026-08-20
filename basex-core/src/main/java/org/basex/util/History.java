@@ -58,7 +58,7 @@ public final class History {
 
   /**
    * Constructor.
-   * @param text initial text
+   * @param text initial text (can be {@code null})
    */
   public History(final byte[] text) {
     active = text != null;
@@ -103,7 +103,7 @@ public final class History {
   }
 
   /**
-   * Returns the previous text and decreases the pointer, or returns {@code null}.
+   * Returns the previous text and decreases the pointer.
    * @return previous text or {@code null}
    */
   public byte[] prev() {
@@ -118,7 +118,7 @@ public final class History {
   }
 
   /**
-   * Returns the next text and increases the pointer, or returns {@code null}.
+   * Returns the next text and increases the pointer.
    * @return next text or {@code null}
    */
   public byte[] next() {

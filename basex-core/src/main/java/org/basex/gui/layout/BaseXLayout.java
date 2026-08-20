@@ -45,7 +45,7 @@ public final class BaseXLayout {
       Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx() == InputEvent.CTRL_DOWN_MASK ?
       "ctrl" : "meta";
 
-  /** Key listener for global shortcuts. */
+  /** Key listener for global shortcuts (can be {@code null}). */
   private static KeyListener keys;
 
   /** Private constructor. */
@@ -206,7 +206,7 @@ public final class BaseXLayout {
 
   /**
    * Returns the clipboard contents.
-   * @param clipboard clipboard supplier (optional)
+   * @param clipboard clipboard supplier (can be {@code null})
    * @return clipboard contents
    */
   @SuppressWarnings("unchecked")
@@ -553,7 +553,7 @@ public final class BaseXLayout {
 
   /**
    * Returns a string representation for the specified file.
-   * @param file file
+   * @param file file (can be {@code null})
    * @param full full path
    * @return string
    */

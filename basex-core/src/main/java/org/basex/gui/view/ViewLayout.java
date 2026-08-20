@@ -17,7 +17,7 @@ final class ViewLayout implements ViewComponent {
   final ArrayList<ViewComponent> list = new ArrayList<>();
   /** Proportional size within the parent layout. */
   private double weight = 1;
-  /** Callback that persists the layout after a resize (set by the container, propagated down). */
+  /** Callback persisting the layout after a resize (can be {@code null}; set by the container). */
   Runnable persister;
 
   /**

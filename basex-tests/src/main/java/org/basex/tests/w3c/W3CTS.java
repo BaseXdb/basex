@@ -66,7 +66,7 @@ public abstract class W3CTS extends Main {
   /** Maximum length of result output. */
   private int maxout = 500;
 
-  /** Query filter string. */
+  /** Query filter string (can be {@code null}). */
   private String single;
   /** Flag for printing current time functions into log file. */
   private boolean currTime;

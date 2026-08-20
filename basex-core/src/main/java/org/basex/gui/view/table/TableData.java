@@ -29,7 +29,7 @@ final class TableData {
   final Context ctx;
   /** Root nodes. */
   TokenList roots;
-  /** Rows of the main table. */
+  /** Rows of the main table (can be {@code null}). */
   IntList rootRows;
   /** Pre values of the rows. */
   IntList rows;

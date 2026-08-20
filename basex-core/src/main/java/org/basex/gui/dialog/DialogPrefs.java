@@ -14,7 +14,7 @@ import org.basex.gui.layout.*;
  * @author Christian Gruen
  */
 public final class DialogPrefs extends BaseXDialog {
-  /** Dialog. */
+  /** Dialog (can be {@code null}). */
   private static DialogPrefs dialog;
 
   /** General preferences. */

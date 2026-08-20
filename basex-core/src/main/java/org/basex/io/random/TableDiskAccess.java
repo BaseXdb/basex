@@ -25,14 +25,14 @@ public final class TableDiskAccess extends TableAccess {
   private final Buffers buffers = new Buffers();
   /** File storing all pages. */
   private final RandomAccessFile file;
-  /** Bitmap storing free (=0) and used (=1) pages. */
+  /** Bitmap storing free (=0) and used (=1) pages (can be {@code null}). */
   private BitArray usedPages;
-  /** File lock. */
+  /** File lock (can be {@code null}). */
   private FileLock lock;
 
-  /** First PRE values (ascending order); will be initialized with the first update. */
+  /** First PRE values, ascending (can be {@code null}; set with the first update). */
   private int[] fPreIndex;
-  /** Page index; will be initialized with the first update. */
+  /** Page index (can be {@code null}; set with the first update). */
   private int[] pageIndex;
   /** Total number of pages. */
   private int pages;

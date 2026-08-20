@@ -42,16 +42,16 @@ public final class JobContext {
 
   /** Performance measurements. */
   public Performance performance;
-  /** Database context. */
+  /** Database context (can be {@code null}). */
   public Context context;
 
   /** Root job. */
   private final Job job;
-  /** Job ID. Will be set while job is registered. */
+  /** Job ID. Will be set while job is registered (can be {@code null}). */
   private String id;
-  /** Job name (optional). */
+  /** Job name (can be {@code null}). */
   private String tp;
-  /** Job description (optional). */
+  /** Job description (can be {@code null}). */
   private String desc;
 
   /**

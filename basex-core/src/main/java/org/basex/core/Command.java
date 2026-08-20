@@ -42,7 +42,7 @@ public abstract class Command extends Job {
   /** Convenience access to static options. */
   protected StaticOptions soptions;
 
-  /** Output stream. */
+  /** Output stream (can be {@code null}). */
   protected PrintOutput out;
   /** Optional input source. */
   protected InputSource in;
@@ -284,7 +284,7 @@ public abstract class Command extends Job {
 
   /**
    * Adds the error message to the message buffer {@link #info}.
-   * @param msg error message
+   * @param msg error message (can be {@code null})
    * @param ext error extension
    * @return {@code false}
    */

@@ -53,8 +53,8 @@ public final class FTNot extends FTExpr {
 
   /**
    * Negates a hit.
-   * @param item item
-   * @return specified item
+   * @param item item (can be {@code null})
+   * @return specified item, or {@code null}
    */
   private static FTNode not(final FTNode item) {
     if(item != null) {

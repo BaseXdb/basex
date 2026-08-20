@@ -192,8 +192,8 @@ public abstract class Inspect {
   }
 
   /**
-   * Returns a value for the specified parameter or {@code null}.
-   * @param doc documentation
+   * Returns a value for the specified parameter.
+   * @param doc documentation (can be {@code null})
    * @param name parameter name
    * @return documentation of specified variable or {@code null}
    */

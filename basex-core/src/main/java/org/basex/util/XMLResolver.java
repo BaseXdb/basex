@@ -26,7 +26,7 @@ public final class XMLResolver {
 
   /** Catalog string. */
   private final String catalog;
-  /** Resolver data (catalog string or resolver instance). */
+  /** Resolver data (can be {@code null}; catalog string or resolver instance). */
   private Object resolver;
 
   /**

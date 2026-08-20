@@ -27,7 +27,7 @@ abstract class ContextModifier {
   private final Map<String, NameUpdates> nameUpdates = new HashMap<>();
   /** Update primitives, aggregated separately for each username. */
   private final Map<String, UserUpdates> userUpdates = new HashMap<>();
-  /** Temporary data reference, containing all XML fragments to be inserted. */
+  /** Temporary data reference with all XML fragments to be inserted (can be {@code null}). */
   private MemData memData;
 
   /**

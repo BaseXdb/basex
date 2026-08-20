@@ -47,10 +47,10 @@ public final class MemData extends Data {
 
   /**
    * Constructor for building a new database.
-   * @param elemNames element name index
-   * @param attrNames attribute name index
+   * @param elemNames element name index (can be {@code null})
+   * @param attrNames attribute name index (can be {@code null})
    * @param paths path index
-   * @param nspaces namespaces
+   * @param nspaces namespaces (can be {@code null})
    * @param texts texts
    * @param values values
    * @param meta meta data

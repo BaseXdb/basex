@@ -44,7 +44,7 @@ public final class WebSocket extends Endpoint implements ClientInfo, WsSession {
 
   /** Client WebSocket ID. */
   public String id;
-  /** HTTP Session (invalidated sessions are dropped, possibly from a job thread). */
+  /** HTTP session (can be {@code null}; invalidated ones are dropped, maybe from a job thread). */
   public volatile HttpSession session;
   /** Negotiated sub-protocol ({@code null} if none). */
   public String subprotocol;

@@ -146,7 +146,7 @@ public class FnSum extends NumericFn {
    * Sums up the specified item(s).
    * @param avg calculate average
    * @param qc query context
-   * @return summed up item
+   * @return summed up item, or {@code null} if the input is empty
    * @throws QueryException query exception
    */
   final Item sum(final boolean avg, final QueryContext qc) throws QueryException {

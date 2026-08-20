@@ -71,7 +71,7 @@ final class PlotData {
   /**
    * Called if the user changes the item level displayed in the plot.
    * If a new item was selected, the plot data is recalculated.
-   * @param newItem item selected by the user
+   * @param newItem item selected by the user (can be {@code null})
    * @return {@code true} if a new item was selected and the plot data has been recalculated
    */
   boolean setItem(final String newItem) {

@@ -21,7 +21,7 @@ import org.basex.util.*;
 public class MapType extends FType {
   /** Key type of the map. */
   private final Type keyType;
-  /** Value types (can be {@code null}, indicating that no type was specified). */
+  /** Value type (can be {@code null}, indicating that no type was specified). */
   private final SeqType valueType;
 
   /**
@@ -63,7 +63,7 @@ public class MapType extends FType {
 
   /**
    * Getter for the value type.
-   * @return value type
+   * @return value type, or {@code null} if no type was specified
    */
   public final SeqType valueType() {
     return valueType;

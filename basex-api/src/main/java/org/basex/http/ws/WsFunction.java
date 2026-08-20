@@ -25,11 +25,11 @@ import org.basex.util.*;
 public final class WsFunction extends WebFunction {
   /** Path of the function. */
   public WebPath path;
-  /** Message parameter. */
+  /** Message parameter (can be {@code null}). */
   private WebParam message;
-  /** Close status parameter. */
+  /** Close status parameter (can be {@code null}). */
   private WebParam status;
-  /** Close reason parameter. */
+  /** Close reason parameter (can be {@code null}). */
   private WebParam reason;
   /** Declared sub-protocols. */
   public final StringList subprotocols = new StringList(1);

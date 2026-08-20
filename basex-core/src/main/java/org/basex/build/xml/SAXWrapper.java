@@ -31,7 +31,7 @@ public final class SAXWrapper extends SingleParser {
   /** Processed lines. */
   private int lines;
 
-  /** SAX handler reference. */
+  /** SAX handler reference (can be {@code null}). */
   private SAXHandler saxh;
   /** File length (real or estimated). */
   private long length;

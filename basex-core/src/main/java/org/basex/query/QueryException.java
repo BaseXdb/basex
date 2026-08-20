@@ -64,7 +64,7 @@ public class QueryException extends Exception {
   private SerializerOptions output;
   /** Error reference ({@code null} for dynamic error messages). */
   private QueryError error;
-  /** Error line and column. */
+  /** Error line and column (can be {@code null}). */
   private InputInfo info;
   /** Marked error column. */
   private int markedCol;

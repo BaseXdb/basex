@@ -38,7 +38,7 @@ public final class DBNew {
   private final InputInfo info;
   /** Main options for all inputs to be added. */
   private final List<MainOptions> options;
-  /** New database nodes. */
+  /** New database nodes (can be {@code null}). */
   private Data data;
 
   /**

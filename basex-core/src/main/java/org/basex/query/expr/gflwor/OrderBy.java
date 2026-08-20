@@ -127,7 +127,7 @@ public final class OrderBy extends Clause {
 
   /**
    * Merges the order by clause with the supplied for clause.
-   * @param fr for clause
+   * @param fr for clause (can be {@code null})
    * @param cc compilation context
    * @return success flag
    * @throws QueryException query exception

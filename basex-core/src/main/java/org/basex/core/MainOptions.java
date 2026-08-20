@@ -251,7 +251,7 @@ public final class MainOptions extends Options {
     }
   }
 
-  /** Resolver instance (lazy instantiation). */
+  /** Resolver instance (can be {@code null}; lazy instantiation). */
   private XMLResolver resolver;
   /** Options version of the resolver. */
   private int resolverVersion;

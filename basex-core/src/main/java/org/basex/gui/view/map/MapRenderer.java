@@ -629,7 +629,7 @@ final class MapRenderer {
    * @param rect view rectangle
    * @param x x value
    * @param y y value
-   * @param list token list
+   * @param list token list (can be {@code null})
    */
   void drawToolTip(final MapRect rect, final int x, final int y, final TokenList list) {
     if(list == null || list.isEmpty()) return;

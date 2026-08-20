@@ -32,8 +32,8 @@ interface ProjectCommands {
   String search();
 
   /**
-   * Returns the selected file, or {@code null} if zero or more than one value is selected.
-   * @return selected file
+   * Returns the selected file.
+   * @return selected file, or {@code null} if zero or more than one value is selected
    */
   IOFile selectedFile();
 

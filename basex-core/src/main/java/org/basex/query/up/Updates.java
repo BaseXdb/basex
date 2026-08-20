@@ -63,7 +63,7 @@ public final class Updates {
   public final ContextModifier mod;
   /** All file paths that are targeted during a snapshot by an fn:put expression. */
   public final TokenSet putPaths = new TokenSet();
-  /** Cached outputs. */
+  /** Cached outputs (can be {@code null}). */
   private ValueBuilder output;
 
   /** Mapping between fragment IDs and the temporary data instances

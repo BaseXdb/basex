@@ -31,7 +31,7 @@ public final class DeepEqual {
   /** Options. */
   public final DeepEqualOptions options;
 
-  /** Comparison function (requires {@link #qc} to be assigned). */
+  /** Comparison function (can be {@code null}; requires {@link #qc} to be assigned). */
   public FItem itemsEqual;
   /** Flag for nested node comparisons. */
   public boolean nested;
@@ -198,7 +198,7 @@ public final class DeepEqual {
    * Checks items for deep equality.
    * @param item1 first item
    * @param item2 second item
-   * @return result of check
+   * @return result of check, or {@code null} if the default comparison must be applied
    * @throws QueryException query exception
    */
   public Bln itemsEqual(final Item item1, final Item item2) throws QueryException {

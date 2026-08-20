@@ -110,7 +110,7 @@ public final class BaseXImages {
 
   /**
    * Returns an icon for the specified file.
-   * @param file file reference
+   * @param file file reference (can be {@code null})
    * @return icon
    */
   public static Icon file(final IOFile file) {

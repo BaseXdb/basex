@@ -1118,7 +1118,7 @@ public enum GUIMenuCmd implements GUICommand {
 
   /**
    * Checks if data can be updated.
-   * @param node node instance
+   * @param node node instance (can be {@code null})
    * @param kinds disallowed node kinds
    * @return result of check
    */

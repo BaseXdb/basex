@@ -44,9 +44,9 @@ public final class Log implements QueryTracer {
   /** Maximum length of log messages. */
   private final int maxLen;
 
-  /** Log targets. */
+  /** Log targets (can be {@code null}). */
   private Set<LogTarget> targets;
-  /** Current (daily) log file. */
+  /** Current (daily) log file (can be {@code null}). */
   LogFile file;
 
   /**

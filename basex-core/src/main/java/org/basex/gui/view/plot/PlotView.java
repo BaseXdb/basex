@@ -46,7 +46,7 @@ public final class PlotView extends View {
   /** Dot size in plot view. */
   private final BaseXSlider dots;
 
-  /** Data reference. */
+  /** Data reference (can be {@code null}). */
   private PlotData plotData;
   /** Keeps track of changes in the plot. */
   private boolean plotChanged;
@@ -70,9 +70,9 @@ public final class PlotView extends View {
   private BufferedImage itemImgFocused;
   /** Child node of marked node. */
   private BufferedImage itemImgSub;
-  /** Buffered plot image. */
+  /** Buffered plot image (can be {@code null}). */
   private BufferedImage plotImg;
-  /** Buffered image of marked items. */
+  /** Buffered image of marked items (can be {@code null}). */
   private BufferedImage markedImg;
   /** X coordinate of mouse pointer. */
   private int mouseX;

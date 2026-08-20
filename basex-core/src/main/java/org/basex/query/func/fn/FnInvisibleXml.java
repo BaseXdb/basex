@@ -37,7 +37,7 @@ public final class FnInvisibleXml extends StandardFunc {
   /** The function's argument type. */
   public static final SeqType ARG_TYPE = ChoiceItemType.get(BasicType.STRING,
       NodeType.get(NameTest.get(new QNm("ixml")))).seqType(Occ.ZERO_OR_ONE);
-  /** The invisible XML parser generator. */
+  /** The invisible XML parser generator (can be {@code null}). */
   private Generator generator;
 
   @Override

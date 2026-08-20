@@ -24,7 +24,7 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class CreateDB extends ACreate {
-  /** Parser instance. */
+  /** Parser instance (can be {@code null}). */
   private Parser parser;
 
   /**

@@ -301,7 +301,7 @@ public final class RestXqFunction extends WebFunction {
   /**
    * Checks if an HTTP request matches this function and its constraints.
    * @param conn HTTP connection
-   * @param err error code (assigned if error function is to be called)
+   * @param err error code (can be {@code null}; assigned if error function is to be called)
    * @param perm permission flag
    * @return result of check
    */
@@ -437,7 +437,7 @@ public final class RestXqFunction extends WebFunction {
   /**
    * Adds an HTTP method to the list of supported methods by this RESTXQ function.
    * @param method HTTP method as a string
-   * @param body variable to which the HTTP request body to be bound (optional)
+   * @param body variable to bind the HTTP request body to (can be {@code null})
    * @param declared variable declaration flags
    * @param info input info (can be {@code null})
    * @throws QueryException query exception

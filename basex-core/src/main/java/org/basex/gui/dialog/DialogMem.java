@@ -20,7 +20,7 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class DialogMem extends BaseXDialog {
-  /** Dialog. */
+  /** Dialog (can be {@code null}). */
   private static Dialog dialog;
 
   /** Info text. */

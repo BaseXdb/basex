@@ -32,11 +32,11 @@ public final class RestXqResponse extends WebResponse {
   /** HTTP connection. */
   private final HTTPConnection conn;
 
-  /** Singleton. */
+  /** Singleton (can be {@code null}). */
   private RestXqSingleton singleton;
   /** Function. */
   private RestXqFunction func;
-  /** Status code. */
+  /** Status code (can be {@code null}). */
   private Integer status;
 
   /**

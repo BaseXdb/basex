@@ -21,7 +21,7 @@ import org.basex.util.Token.*;
 public final class Uri extends AStr {
   /** Empty URI. */
   public static final Uri EMPTY = new Uri(Token.EMPTY);
-  /** Parsed URI (lazy instantiation). */
+  /** Parsed URI (can be {@code null}; lazy instantiation). */
   private ParsedUri parsed;
 
   /**

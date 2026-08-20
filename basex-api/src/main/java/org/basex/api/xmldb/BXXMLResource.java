@@ -33,13 +33,13 @@ import org.xmldb.api.modules.*;
 public final class BXXMLResource implements XMLResource {
   /** Collection reference. */
   private final BXCollection coll;
-  /** String ID. */
+  /** String ID (can be {@code null}). */
   private String id;
-  /** Query result. */
+  /** Query result (can be {@code null}). */
   private Item item;
-  /** Cached content. */
+  /** Cached content (can be {@code null}). */
   Object content;
-  /** Data reference. */
+  /** Data reference (can be {@code null}). */
   Data data;
   /** Pre value or result position. */
   int pre;

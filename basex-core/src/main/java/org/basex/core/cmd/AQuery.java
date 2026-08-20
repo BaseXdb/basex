@@ -30,9 +30,9 @@ public abstract class AQuery extends Command {
 
   /** Query string. */
   private final String query;
-  /** Query processor. */
+  /** Query processor (can be {@code null}). */
   private QueryProcessor qp;
-  /** Query info. */
+  /** Query info (can be {@code null}). */
   private QueryInfo info;
   /** Query plan was serialized. */
   private boolean plan;

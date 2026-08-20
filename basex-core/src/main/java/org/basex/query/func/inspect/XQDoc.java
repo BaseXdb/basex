@@ -190,7 +190,7 @@ final class XQDoc extends Inspect {
 
   /**
    * Creates a type element.
-   * @param st sequence type
+   * @param st sequence type (can be {@code null})
    * @param parent parent node
    */
   private void type(final SeqType st, final FBuilder parent) {

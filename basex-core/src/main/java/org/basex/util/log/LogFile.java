@@ -15,7 +15,7 @@ import org.basex.util.list.*;
 public final class LogFile {
   /** File reference. */
   private final IOFile file;
-  /** Output stream. */
+  /** Output stream (can be {@code null}). */
   private FileOutputStream fos;
 
   /**

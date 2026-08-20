@@ -448,7 +448,7 @@ public final class CompileContext {
 
   /**
    * Checks if the conditions are given for inlining a function body.
-   * @param anns annotations (can be {@code null})
+   * @param anns annotations
    * @param expr expression (function body)
    * @return result of check
    */

@@ -75,7 +75,7 @@ public final class DialogProps extends BaseXDialog {
 
   /** Add panel. */
   DialogPut addPanel;
-  /** Resource panel. */
+  /** Resource panel (can be {@code null}). */
   DialogResources resources;
 
   /**

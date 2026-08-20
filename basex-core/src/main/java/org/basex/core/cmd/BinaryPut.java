@@ -36,7 +36,7 @@ public final class BinaryPut extends ACreate {
 
   /**
    * Constructor, specifying a target path and an input.
-   * @param path target path
+   * @param path target path (can be {@code null})
    * @param input input file
    */
   public BinaryPut(final String path, final String input) {

@@ -19,7 +19,7 @@ public abstract class FType implements Type {
   /** Any function placeholder string. */
   static final String[] WILDCARD = { "*" };
 
-  /** Sequence types (lazy instantiation). */
+  /** Sequence types (can be {@code null}; lazy instantiation). */
   private EnumMap<Occ, SeqType> seqTypes;
 
   @Override

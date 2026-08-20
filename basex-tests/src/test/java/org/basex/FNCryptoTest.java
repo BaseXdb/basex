@@ -101,7 +101,7 @@ public final class FNCryptoTest extends SandboxTest {
   /**
    * Runs an updating query and matches the result of the second query
    * against the expected output.
-   * @param first first query
+   * @param first first query (can be {@code null})
    * @param second second query
    * @param expected expected output
    */

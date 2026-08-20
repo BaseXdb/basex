@@ -66,9 +66,9 @@ public final class SearchBar extends BaseXBack {
   /** Escape key listener. */
   private final KeyListener keys;
 
-  /** Search button. */
+  /** Search button (can be {@code null}). */
   private AbstractButton search;
-  /** Current editor reference. */
+  /** Current editor reference (can be {@code null}). */
   private TextPanel editor;
   /** Old search text. */
   private String oldSearch = "";

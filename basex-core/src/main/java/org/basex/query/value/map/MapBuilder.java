@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
 public final class MapBuilder {
   /** Initial capacity. */
   private final long capacity;
-  /** Current map implementation. */
+  /** Current map implementation (can be {@code null}). */
   private XQHashMap map;
   /** Union of all key types (can be {@code null}). */
   private Type keyType;

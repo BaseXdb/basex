@@ -15,7 +15,7 @@ import org.basex.util.*;
 public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementList
     implements Iterable<E> {
 
-  /** Element container. */
+  /** Element container (can be {@code null}). */
   public E[] list;
 
   /**

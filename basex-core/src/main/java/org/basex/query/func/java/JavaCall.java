@@ -51,7 +51,7 @@ public abstract class JavaCall extends Arr {
   public final boolean updating;
   /** Permission. */
   final Perm perm;
-  /** Indicates if function parameters are XQuery types. */
+  /** Indicates if function parameters are XQuery types (can be {@code null}). */
   boolean[] xquery;
 
   /**
@@ -237,7 +237,7 @@ public abstract class JavaCall extends Arr {
 
   /**
    * Converts the specified object to an XQuery value.
-   * @param object result object
+   * @param object result object (can be {@code null})
    * @param qc query context
    * @param info input info (can be {@code null})
    * @param wrap wrap options

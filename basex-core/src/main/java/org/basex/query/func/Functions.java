@@ -139,7 +139,7 @@ public final class Functions {
    * @param qnm function name
    * @param arity number of arguments
    * @param runtime {@code true} if this method is called at runtime
-   * @param info input info (can be {@code null})
+   * @param info input info
    * @param qc query context
    * @return literal if found, {@code null} otherwise
    * @throws QueryException query exception
@@ -278,7 +278,7 @@ public final class Functions {
    * Returns a constructor call.
    * @param name function name
    * @param fb function arguments
-   * @return cast type if found, {@code null} otherwise
+   * @return cast expression
    * @throws QueryException query exception
    */
   private static Cast constructorCall(final QNm name, final FuncBuilder fb) throws QueryException {
@@ -360,7 +360,7 @@ public final class Functions {
    * At runtime, we directly generate a function item.
    * @param expr function body
    * @param fb function arguments
-   * @param ft function type
+   * @param ft function type (can be {@code null})
    * @param name function name
    * @param updating flag for updating functions
    * @param context context-dependent flag

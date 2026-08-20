@@ -160,8 +160,8 @@ public final class For extends ForLet {
   /**
    * Gathers all non-{@code null} variables.
    * @param var var
-   * @param pos pos
-   * @param scope scope
+   * @param pos pos (can be {@code null})
+   * @param scope scope (can be {@code null})
    * @return non-{@code null} variables
    */
   private static Var[] vars(final Var var, final Var pos, final Var scope) {

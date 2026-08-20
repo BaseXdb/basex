@@ -62,9 +62,9 @@ public final class Context {
   private final ClientInfo client;
   /** Current node context. {@code null} if all documents of the current database are referenced. */
   private DBNodes current;
-  /** User reference. */
+  /** User reference (can be {@code null}). */
   private User user;
-  /** Currently opened database. */
+  /** Currently opened database (can be {@code null}). */
   private Data data;
   /** Indicates if the class has been closed/finalized. */
   private boolean closed;
@@ -216,7 +216,7 @@ public final class Context {
 
   /**
    * Returns the current data reference.
-   * @return data reference
+   * @return data reference, or {@code null} if no database is opened
    */
   public Data data() {
     return data;
@@ -289,7 +289,7 @@ public final class Context {
 
   /**
    * Returns the host and port of a client.
-   * @return address (or {@code null})
+   * @return address (can be {@code null})
    */
   public String clientAddress() {
     return client != null ? client.clientAddress() : null;
@@ -297,7 +297,7 @@ public final class Context {
 
   /**
    * Returns the name of the current client or user.
-   * @return username (or {@code null})
+   * @return username (can be {@code null})
    */
   public String clientName() {
     return client != null ? client.clientName() : user != null ? user.name() : null;

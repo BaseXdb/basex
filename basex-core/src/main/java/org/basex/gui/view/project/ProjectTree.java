@@ -189,8 +189,8 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener, Pro
   }
 
   /**
-   * Returns a single selected node, or {@code null} if zero or more than node is selected.
-   * @return selected node or {@code null}
+   * Returns a single selected node.
+   * @return selected node, or {@code null} if zero or more than one node is selected
    */
   ProjectNode selectedNode() {
     final TreePath tp = selectedPath();
@@ -231,11 +231,11 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener, Pro
     return files;
   }
 
-  // PRIVATE METHOS ===============================================================================
+  // PRIVATE METHODS ===============================================================================
 
   /**
-   * Returns the selected path, or returns {@code null} if zero or more than paths are selected.
-   * @return path
+   * Returns the selected path.
+   * @return path, or {@code null} if zero or more than one path is selected
    */
   private TreePath selectedPath() {
     final TreePath[] tps = getSelectionPaths();

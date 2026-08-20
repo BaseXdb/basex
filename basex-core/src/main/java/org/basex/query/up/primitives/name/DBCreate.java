@@ -25,7 +25,7 @@ public final class DBCreate extends NameUpdate {
   private final DBNew newDocs;
   /** Main options. */
   private final MainOptions options;
-  /** Data clip with input. */
+  /** Data clip with input (can be {@code null}). */
   private DataClip clip;
 
   /**

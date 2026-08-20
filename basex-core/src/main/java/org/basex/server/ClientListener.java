@@ -58,7 +58,7 @@ public final class ClientListener extends Thread implements ClientInfo {
   private BufferInput in;
   /** Output stream. */
   private PrintOutput out;
-  /** Current command. */
+  /** Current command (can be {@code null}). */
   private volatile Command command;
   /** Monitor, notified when {@link #command} is cleared (see {@link #close()}). */
   private final Object monitor = new Object();

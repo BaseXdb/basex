@@ -38,7 +38,7 @@ final class Unit {
 
   /** Query string. */
   private String input;
-  /** Currently processed function. */
+  /** Currently processed function (can be {@code null}). */
   private StaticFunc current;
 
   /** Failures. */
@@ -275,7 +275,7 @@ final class Unit {
 
   /**
    * Creates a new element.
-   * @param item item
+   * @param item item (can be {@code null})
    * @param name name (expected/returned)
    * @param count item count (ignore it {@code -1})
    * @return element

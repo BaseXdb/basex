@@ -27,7 +27,7 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 abstract class MarkupSerializer extends StandardSerializer {
-  /** System document type. */
+  /** System document type (can be {@code null}). */
   String docsys;
   /** Public document type. */
   String docpub;
@@ -47,7 +47,7 @@ abstract class MarkupSerializer extends StandardSerializer {
   final boolean content;
   /** Undeclare prefixes. */
   private final boolean undecl;
-  /** Suppress indentation elements. */
+  /** Suppress indentation elements (can be {@code null}). */
   private QNmSet suppress;
   /** Indent attributes. */
   private final boolean indAttr;
@@ -406,7 +406,7 @@ abstract class MarkupSerializer extends StandardSerializer {
     throw SERNOTSUPP_X.getIO(Options.allowed(option, string, (Object[]) allowed));
   }
 
-  /** CData elements. */
+  /** CData elements (can be {@code null}). */
   private QNmSet cdata;
 
   /**

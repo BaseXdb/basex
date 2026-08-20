@@ -454,7 +454,7 @@ public final class QT3TS extends Main {
   /**
    * Assigns the query environment.
    * @param query query
-   * @param env environment
+   * @param env environment (can be {@code null})
    * @return query
    */
   private XQuery environment(final XQuery query, final QT3Env env) {
@@ -464,7 +464,7 @@ public final class QT3TS extends Main {
   /**
    * Assigns the query environment.
    * @param query query
-   * @param env environment
+   * @param env environment (can be {@code null})
    * @param init initializes the sandbox
    * @return query
    */
@@ -560,10 +560,10 @@ public final class QT3TS extends Main {
   }
 
   /**
-   * Returns the specified environment, or {@code null}.
+   * Returns the specified environment.
    * @param envs environments
    * @param ref reference
-   * @return environment
+   * @return environment, or {@code null} if it is not found
    */
   private static QT3Env envs(final ArrayList<QT3Env> envs, final String ref) {
     for(final QT3Env env : envs) {
@@ -621,7 +621,7 @@ public final class QT3TS extends Main {
    * Tests error.
    * @param result query result
    * @param expected expected result
-   * @return optional expected test suite result
+   * @return expected test suite result, or {@code null}
    */
   private String assertError(final QT3Result result, final XdmValue expected) {
     final String exp = asString('@' + CODE, expected);
@@ -644,7 +644,7 @@ public final class QT3TS extends Main {
    * Tests not.
    * @param result query result
    * @param exp expected result
-   * @return optional expected test suite result
+   * @return expected test suite result, or {@code null}
    */
   private String not(final QT3Result result, final XdmValue exp) {
     final TokenBuilder tb = new TokenBuilder();
@@ -659,7 +659,7 @@ public final class QT3TS extends Main {
    * Tests all-of.
    * @param result query result
    * @param exp expected result
-   * @return optional expected test suite result
+   * @return expected test suite result, or {@code null}
    */
   private String allOf(final QT3Result result, final XdmValue exp) {
     final TokenBuilder tb = new TokenBuilder();
@@ -674,7 +674,7 @@ public final class QT3TS extends Main {
    * Tests any-of.
    * @param result query result
    * @param exp expected result
-   * @return optional expected test suite result
+   * @return expected test suite result, or {@code null}
    */
   private String anyOf(final QT3Result result, final XdmValue exp) {
     final TokenBuilder tb = new TokenBuilder();
@@ -690,7 +690,7 @@ public final class QT3TS extends Main {
    * Tests assertion.
    * @param result query result
    * @param expected expected result
-   * @return optional expected test suite result
+   * @return expected test suite result, or {@code null}
    */
   private String assertQuery(final QT3Result result, final XdmValue expected) {
     final String exp = expected.getString();
@@ -708,7 +708,7 @@ public final class QT3TS extends Main {
    * Tests count.
    * @param result query result
    * @param expected expected result
-   * @return optional expected test suite result
+   * @return expected test suite result, or {@code null}
    */
   private static String assertCount(final QT3Result result, final XdmValue expected) {
     final long exp = expected.getInteger();
@@ -720,7 +720,7 @@ public final class QT3TS extends Main {
    * Tests equality.
    * @param result query result
    * @param expected expected result
-   * @return optional expected test suite result
+   * @return expected test suite result, or {@code null}
    */
   private String assertEq(final QT3Result result, final XdmValue expected) {
     final String exp = expected.getString();
@@ -740,7 +740,7 @@ public final class QT3TS extends Main {
    * Tests deep equals.
    * @param result query result
    * @param expected expected result
-   * @return optional expected test suite result
+   * @return expected test suite result, or {@code null}
    */
   private String assertDeepEq(final QT3Result result, final XdmValue expected) {
     final XdmValue exp = environment(new XQuery(expected.getString(), ctx), result.env).value();
@@ -751,7 +751,7 @@ public final class QT3TS extends Main {
    * Tests permutation.
    * @param result query result
    * @param expected expected result
-   * @return optional expected test suite result
+   * @return expected test suite result, or {@code null}
    */
   private String assertPermutation(final QT3Result result, final XdmValue expected) {
     final XdmValue exp = environment(new XQuery(expected.getString(), ctx), result.env).value();
@@ -762,7 +762,7 @@ public final class QT3TS extends Main {
    * Tests the serialized result.
    * @param result query result
    * @param expected expected result
-   * @return optional expected test suite result
+   * @return expected test suite result, or {@code null}
    */
   private String assertXML(final QT3Result result, final XdmValue expected) {
     final String file = asString("@file", expected);
@@ -801,7 +801,7 @@ public final class QT3TS extends Main {
    * Tests the serialized result.
    * @param result query result
    * @param expected expected result
-   * @return optional expected test suite result
+   * @return expected test suite result, or {@code null}
    */
   private String serializationMatches(final QT3Result result, final XdmValue expected) {
     try {
@@ -822,7 +822,7 @@ public final class QT3TS extends Main {
    * Tests a serialization error.
    * @param result returned result
    * @param expected expected result
-   * @return optional expected test suite result
+   * @return expected test suite result, or {@code null}
    */
   private String assertSerializationError(final QT3Result result, final XdmValue expected) {
     final String expCode = asString('@' + CODE, expected);
@@ -848,7 +848,7 @@ public final class QT3TS extends Main {
   /**
    * Serializes values.
    * @param result query result
-   * @return optional expected test suite result
+   * @return expected test suite result, or {@code null}
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
@@ -868,7 +868,7 @@ public final class QT3TS extends Main {
    * Tests string value.
    * @param result query result
    * @param expected expected result
-   * @return optional expected test suite result
+   * @return expected test suite result, or {@code null}
    */
   private String assertStringValue(final QT3Result result, final XdmValue expected) {
     String exp = expected.getString();
@@ -891,7 +891,7 @@ public final class QT3TS extends Main {
    * Tests boolean.
    * @param result query result
    * @param expected expected
-   * @return optional expected test suite result
+   * @return expected test suite result, or {@code null}
    */
   private static String assertBoolean(final QT3Result result, final boolean expected) {
     final XdmValue returned = result.value;
@@ -902,7 +902,7 @@ public final class QT3TS extends Main {
   /**
    * Tests empty sequence.
    * @param result query result
-   * @return optional expected test suite result
+   * @return expected test suite result, or {@code null}
    */
   private static String assertEmpty(final QT3Result result) {
     return result.value == XdmEmpty.EMPTY ? null : "";
@@ -912,7 +912,7 @@ public final class QT3TS extends Main {
    * Tests type.
    * @param result query result
    * @param expected expected result
-   * @return optional expected test suite result
+   * @return expected test suite result, or {@code null}
    */
   private String assertType(final QT3Result result, final XdmValue expected) {
     final String exp = expected.getString();
@@ -932,7 +932,7 @@ public final class QT3TS extends Main {
    * Returns the string representation of a query result.
    * @param query query string
    * @param value optional context value
-   * @return optional expected test suite result
+   * @return expected test suite result, or {@code null}
    */
   String asString(final String query, final XdmValue value) {
     return XQuery.string(query, value, ctx);
@@ -942,7 +942,7 @@ public final class QT3TS extends Main {
    * Returns the boolean representation of a query result.
    * @param query query string
    * @param value optional context value
-   * @return optional expected test suite result
+   * @return expected test suite result, or {@code null}
    */
   boolean asBoolean(final String query, final XdmValue value) {
     final XdmValue val = new XQuery(query, ctx).context(value).value();

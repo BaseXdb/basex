@@ -23,7 +23,7 @@ public abstract class CommandParser {
 
   /** Password reader. */
   PasswordReader pwReader;
-  /** Possible completions. */
+  /** Possible completions (can be {@code null}). */
   Enum<?>[] completions;
   /** Input path. */
   String path = "";

@@ -47,7 +47,7 @@ public final class BaseXScrollBar extends BaseXPanel {
 
   /** Document-space y of the search hits ({@code null} if there are none). */
   private IntList markPos;
-  /** Hits, rasterized to one flag per pixel row of the slider track. */
+  /** Hits, rasterized to one flag per pixel row of the slider track (can be {@code null}). */
   private boolean[] markRows;
   /** Track length the hits were rasterized for. */
   private int markHeight;

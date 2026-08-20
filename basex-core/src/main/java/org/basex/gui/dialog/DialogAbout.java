@@ -19,7 +19,7 @@ import org.basex.gui.listener.*;
  * @author Christian Gruen
  */
 public final class DialogAbout extends BaseXDialog {
-  /** Dialog. */
+  /** Dialog (can be {@code null}). */
   private static DialogAbout dialog;
 
   /**

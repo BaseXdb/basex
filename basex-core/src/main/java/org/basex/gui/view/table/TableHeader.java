@@ -28,7 +28,7 @@ final class TableHeader extends BaseXPanel {
   private final TableView view;
   /** Table Data. */
   private final TableData tdata;
-  /** Temporary Input Box. */
+  /** Temporary Input Box (can be {@code null}). */
   private TableInput box;
   /** Current input column. */
   private int inputCol = -1;

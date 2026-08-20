@@ -19,7 +19,7 @@ import org.basex.query.*;
 public final class CsvParser extends SingleParser {
   /** CSV Parser options. */
   private final CsvParserOptions copts;
-  /** CSV Builder. */
+  /** CSV Builder (can be {@code null}). */
   private CsvBuilder csv;
 
   /**

@@ -20,7 +20,7 @@ import org.basex.util.list.*;
 public final class FTLexer extends FTIterator implements IndexSearch {
   /** Tokenizer. */
   private final Tokenizer tokens;
-  /** Full-text options. */
+  /** Full-text options (can be {@code null}). */
   private final FTOpt ftOpt;
 
   /** Text to be tokenized. */
@@ -32,7 +32,7 @@ public final class FTLexer extends FTIterator implements IndexSearch {
   private FTIterator iter;
   /** The last parsed span. */
   private FTSpan curr;
-  /** The last parsed text. */
+  /** The last parsed text (can be {@code null}). */
   private byte[] ctxt;
 
   /**

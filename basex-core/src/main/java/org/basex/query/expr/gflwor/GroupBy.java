@@ -296,7 +296,7 @@ public final class GroupBy extends Clause {
 
   /**
    * Returns a group specification that can be further rewritten and simplified.
-   * @return group specification
+   * @return group specification, or {@code null} if the clause cannot be rewritten
    */
   GroupSpec group() {
     if(specs.length == 1 && post.length == 0) {

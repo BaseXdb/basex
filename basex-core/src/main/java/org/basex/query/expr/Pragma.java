@@ -22,7 +22,7 @@ public abstract class Pragma extends ExprInfo {
   /**
    * Constructor.
    * @param name name of pragma
-   * @param value optional value
+   * @param value value (can be empty)
    */
   Pragma(final QNm name, final byte[] value) {
     this.name = name;
@@ -33,7 +33,7 @@ public abstract class Pragma extends ExprInfo {
    * Initializes the pragma expression.
    * @param qc query context
    * @param info input info (can be {@code null})
-   * @return state before pragmas was set
+   * @return state before the pragma was set, or {@code null}
    * @throws QueryException query exception
    */
   abstract Object init(QueryContext qc, InputInfo info) throws QueryException;

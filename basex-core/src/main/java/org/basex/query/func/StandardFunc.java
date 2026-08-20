@@ -934,7 +934,7 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Evaluates an expression to a non-updating function item or {@code null}.
+   * Evaluates an expression to a non-updating function item.
    * @param expr expression
    * @param nargs maximum number of supplied arguments
    * @param qc query context

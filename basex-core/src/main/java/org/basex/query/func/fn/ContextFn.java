@@ -86,7 +86,7 @@ public abstract class ContextFn extends StandardFunc {
   /**
    * Optimizes EBV checks.
    * @param cc compilation context
-   * @param expr context expression (can be {@code null})
+   * @param expr context expression
    * @param pred function for creating a predicate (can be {@code null})
    * @return optimized or original expression
    * @throws QueryException query exception

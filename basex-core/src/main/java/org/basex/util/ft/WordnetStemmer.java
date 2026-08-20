@@ -22,11 +22,11 @@ final class WordnetStemmer extends Stemmer {
   private static final String PATTERN = "edu.mit.jwi.%";
   /** Path to the WordNet dictionary files. */
   private static final String PATH = "etc/wndict";
-  /** WordnetStemmer class. */
+  /** WordnetStemmer class (can be {@code null}). */
   private static final Constructor<?> CTR;
-  /** WordnetStemmer.findStems method. */
+  /** WordnetStemmer.findStems method (can be {@code null}). */
   private static final Method FIND_STEMS;
-  /** WordNet dictionary instance. */
+  /** WordNet dictionary instance (can be {@code null}). */
   private static final Object DICT;
 
   static {

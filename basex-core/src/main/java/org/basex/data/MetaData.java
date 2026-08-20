@@ -86,7 +86,7 @@ public final class MetaData {
 
   /** Language of full-text search index (can be {@code null}). */
   private Language language;
-  /** Language option, resolved by {@link #language()}. */
+  /** Language option, resolved by {@link #language()} (can be {@code null}). */
   private String langOption;
 
   /** Indicates if index structures are out-dated. */

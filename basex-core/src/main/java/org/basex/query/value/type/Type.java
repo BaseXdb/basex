@@ -292,7 +292,7 @@ public interface Type {
 
   /**
    * Returns the type ID.
-   * @return ID
+   * @return ID, or {@code null} if the type has no ID
    */
   ID id();
 
@@ -320,7 +320,7 @@ public interface Type {
 
   /**
    * Returns the given type, or the type of the specified expression if it is more specific.
-   * @param expr expression
+   * @param expr expression (can be {@code null})
    * @return node type
    */
   default Type refine(final Expr expr) {
@@ -347,7 +347,7 @@ public interface Type {
 
   /**
    * Returns the node kind.
-   * @return node kind or {@code null})
+   * @return node kind or {@code null}
    */
   default Kind kind() {
     return null;
@@ -355,7 +355,7 @@ public interface Type {
 
   /**
    * Returns the name of the type.
-   * @return name
+   * @return name, or {@code null} if the type has no name
    */
   Object name();
 

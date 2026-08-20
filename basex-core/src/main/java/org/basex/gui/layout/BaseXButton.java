@@ -75,7 +75,7 @@ public final class BaseXButton extends JButton {
    * Initializes an image button.
    * @param button button reference
    * @param icon name of image icon
-   * @param tooltip tooltip text
+   * @param tooltip tooltip text (can be {@code null})
    * @param gui reference to the main window
    */
   private static void init(final AbstractButton button, final String icon, final String tooltip,

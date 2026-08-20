@@ -15,7 +15,7 @@ final class ProcResult {
   final TokenBuilder output = new TokenBuilder();
   /** Process error. */
   final TokenBuilder error = new TokenBuilder();
-  /** Process exception. */
+  /** Process exception (can be {@code null}). */
   IOException exception;
   /** Exit code. */
   int code;

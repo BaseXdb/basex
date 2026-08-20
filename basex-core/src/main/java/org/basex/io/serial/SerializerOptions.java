@@ -322,7 +322,7 @@ public final class SerializerOptions extends Options {
   /**
    * Extracts a character map.
    * @param elem child node
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @return character map or {@code null} if map is invalid
    * @throws QueryException query exception
    */

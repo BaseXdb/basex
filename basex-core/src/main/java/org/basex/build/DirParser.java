@@ -48,7 +48,7 @@ public final class DirParser extends Parser {
 
   /** Last source. */
   private IO lastSrc;
-  /** Parser reference. */
+  /** Parser reference (can be {@code null}). */
   private Parser parser;
   /** Resource counter. */
   private int resources;

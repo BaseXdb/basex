@@ -128,7 +128,7 @@ public class Options implements Iterable<Option<?>> {
 
   /**
    * Constructor with options file.
-   * @param opts options file
+   * @param opts options file (can be {@code null})
    */
   protected Options(final IOFile opts) {
     meta = META.get(getClass());
@@ -298,7 +298,7 @@ public class Options implements Iterable<Option<?>> {
   /**
    * Returns the requested string.
    * @param option option to be found
-   * @return value or {@code null})
+   * @return value or {@code null}
    */
   public final synchronized String get(final StringOption option) {
     return (String) get((Option<?>) option);
@@ -307,7 +307,7 @@ public class Options implements Iterable<Option<?>> {
   /**
    * Returns the requested number.
    * @param option option to be found
-   * @return value or {@code null})
+   * @return value or {@code null}
    */
   public final synchronized Integer get(final NumberOption option) {
     return (Integer) get((Option<?>) option);
@@ -316,7 +316,7 @@ public class Options implements Iterable<Option<?>> {
   /**
    * Returns the requested boolean.
    * @param option option to be found
-   * @return value or {@code null})
+   * @return value or {@code null}
    */
   public final synchronized Boolean get(final BooleanOption option) {
     return (Boolean) get((Option<?>) option);
@@ -325,7 +325,7 @@ public class Options implements Iterable<Option<?>> {
   /**
    * Returns the requested value.
    * @param option option to be found
-   * @return value or {@code null})
+   * @return value or {@code null}
    */
   public final synchronized Value get(final ValueOption option) {
     return (Value) get((Option<?>) option);
@@ -334,7 +334,7 @@ public class Options implements Iterable<Option<?>> {
   /**
    * Returns the requested string array.
    * @param option option to be found
-   * @return value or {@code null})
+   * @return value or {@code null}
    */
   public final synchronized String[] get(final StringsOption option) {
     return (String[]) get((Option<?>) option);
@@ -343,7 +343,7 @@ public class Options implements Iterable<Option<?>> {
   /**
    * Returns the requested integer array.
    * @param option option to be found
-   * @return value or {@code null})
+   * @return value or {@code null}
    */
   public final synchronized int[] get(final NumbersOption option) {
     return (int[]) get((Option<?>) option);
@@ -353,7 +353,7 @@ public class Options implements Iterable<Option<?>> {
    * Returns the requested options.
    * @param option option to be found
    * @param <O> options
-   * @return value or {@code null})
+   * @return value or {@code null}
    */
   @SuppressWarnings("unchecked")
   public final synchronized <O extends Options> O get(final OptionsOption<O> option) {
@@ -364,7 +364,7 @@ public class Options implements Iterable<Option<?>> {
    * Returns the requested enum value.
    * @param option option to be found
    * @param <E> enumeration value
-   * @return value or {@code null})
+   * @return value or {@code null}
    */
   @SuppressWarnings("unchecked")
   public final synchronized <E extends Enum<E>> E get(final EnumOption<E> option) {

@@ -13,7 +13,7 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class ByteList extends ElementList {
-  /** Element container. */
+  /** Element container (can be {@code null}). */
   private byte[] list;
 
   /**

@@ -27,7 +27,7 @@ public final class DialogDeclaration extends BaseXDialog {
   /** Distance from the bottom right corner of the main window. */
   private static final int MARGIN = 20;
 
-  /** Dialog. */
+  /** Dialog (can be {@code null}). */
   private static DialogDeclaration dialog;
 
   /** Declarations that match the current filter. */
@@ -149,7 +149,7 @@ public final class DialogDeclaration extends BaseXDialog {
    * Initializes the dialog with the declarations of the current text.
    * @param decls declarations
    * @param pos current caret position
-   * @param consumer consumer for jumping to a declaration
+   * @param consumer consumer for jumping to a declaration (can be {@code null})
    */
   private void init(final List<Declaration> decls, final int pos, final IntConsumer consumer) {
     // the preselected declaration is not jumped to: the caret is already there

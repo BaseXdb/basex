@@ -38,7 +38,7 @@ public final class IndexInfo {
 
   /** Optimization info. */
   public String optInfo;
-  /** Name test of parent element. */
+  /** Name test of parent element (can be {@code null}). */
   public NameTest test;
   /** Index expression. */
   public Expr expr;
@@ -47,7 +47,7 @@ public final class IndexInfo {
   /** Indicates if the last step addresses a text node. */
   boolean text;
 
-  /** Predicate expression. */
+  /** Predicate expression (can be {@code null}). */
   private IndexPred pred;
 
   /**

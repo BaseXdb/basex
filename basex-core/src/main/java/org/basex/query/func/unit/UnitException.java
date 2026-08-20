@@ -11,9 +11,9 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 final class UnitException extends QueryException {
-  /** Expected item. */
+  /** Expected item (can be {@code null}). */
   final Item expected;
-  /** Returned item. */
+  /** Returned item (can be {@code null}). */
   final Item returned;
   /** Item count. */
   final int count;
@@ -22,8 +22,8 @@ final class UnitException extends QueryException {
    * Default constructor.
    * @param info input info (can be {@code null})
    * @param err error reference
-   * @param expected expected result
-   * @param returned returned result
+   * @param expected expected result (can be {@code null})
+   * @param returned returned result (can be {@code null})
    * @param count item count
    */
   UnitException(final InputInfo info, final QueryError err, final Item returned,

@@ -22,7 +22,7 @@ public final class TypeRef implements Type {
   private InputInfo info;
   /** Referenced type (initially {@code item()}, may itself be a {@code TypeRef}). */
   private Type type = BasicType.ITEM;
-  /** Sequence types (lazy instantiation). */
+  /** Sequence types (can be {@code null}; lazy instantiation). */
   private EnumMap<Occ, SeqType> seqTypes;
 
   /**

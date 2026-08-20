@@ -39,7 +39,7 @@ public final class QueryResources {
   /** Database context. */
   private final Context context;
 
-  /** Module loader. */
+  /** Module loader (can be {@code null}). */
   private ModuleLoader modules;
   /** Collections: single nodes and sequences. */
   private final ArrayList<Value> colls = new ArrayList<>(1);
@@ -317,11 +317,11 @@ public final class QueryResources {
 
   // TEST APIS ====================================================================================
 
-  /** Textual resources. Required for test APIs. */
+  /** Textual resources. Required for test APIs (can be {@code null}). */
   private Map<String, String[]> texts;
-  /** Cached stop word files. Required for test APIs. */
+  /** Cached stop word files. Required for test APIs (can be {@code null}). */
   private Map<String, IO> stop;
-  /** Cached thesaurus files. Required for test APIs. */
+  /** Cached thesaurus files. Required for test APIs (can be {@code null}). */
   private Map<String, IO> thes;
 
   /**
@@ -361,7 +361,7 @@ public final class QueryResources {
    * Adds a document with the specified path. Only called from the test APIs.
    * @param name document identifier (can be {@code null})
    * @param path document path
-   * @param sc static context (can be {@code null})
+   * @param sc static context
    * @throws QueryException query exception
    */
   public void addDoc(final String name, final String path, final StaticContext sc)
@@ -385,7 +385,7 @@ public final class QueryResources {
    * Adds a collection with the specified paths. Only called from the test APIs.
    * @param name name of collection (can be empty string)
    * @param paths documents paths
-   * @param sc static context (can be {@code null})
+   * @param sc static context
    * @throws QueryException query exception
    */
   public void addCollection(final String name, final String[] paths, final StaticContext sc)

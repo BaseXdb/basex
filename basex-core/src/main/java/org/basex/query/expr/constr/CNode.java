@@ -113,7 +113,7 @@ public abstract class CNode extends Arr {
   /**
    * Adds the expression with the specified separator to the query string.
    * @param qs query string builder
-   * @param kind node kind
+   * @param kind node kind (can be {@code null})
    */
   protected void toString(final QueryString qs, final String kind) {
     if(kind != null) qs.token(kind);

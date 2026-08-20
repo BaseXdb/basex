@@ -32,7 +32,7 @@ public final class QueryJob extends Job implements Runnable {
   private final QueryJobResult result = new QueryJobResult(this);
   /** Job specification. */
   private final QueryJobSpec job;
-  /** Notify function. */
+  /** Notify function (can be {@code null}). */
   private final Consumer<QueryJobResult> notify;
   /** Locks held by a caller that waits for this job; {@code null} if not applicable. */
   private final Locks callerLocks;
@@ -42,7 +42,7 @@ public final class QueryJob extends Job implements Runnable {
   /** Permissions granted to the query. */
   private final Perm perm;
 
-  /** Query processor. */
+  /** Query processor (can be {@code null}). */
   private QueryProcessor qp;
   /** Remove flag. */
   private boolean remove;

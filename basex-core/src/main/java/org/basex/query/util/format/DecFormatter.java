@@ -156,7 +156,7 @@ public final class DecFormatter extends FormatUtil {
    * In absence of the colon part, the rendition value defaults to the marker character.
    * @param name the option name
    * @param value the option value
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @return the rendition value
    * @throws QueryException query exception
    */

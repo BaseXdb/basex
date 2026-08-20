@@ -29,7 +29,7 @@ public final class DataBuilder {
   private final Job job;
   /** Target data instance. */
   private final MemData data;
-  /** Full-text result builder. */
+  /** Full-text result builder (can be {@code null}). */
   private DataFTBuilder ftbuilder;
 
   /**

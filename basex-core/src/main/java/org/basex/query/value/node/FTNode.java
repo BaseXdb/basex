@@ -19,7 +19,7 @@ public final class FTNode extends DBNode {
   private final int is;
   /** Full-text matches. */
   private FTMatches matches;
-  /** Score value. */
+  /** Score value (can be {@code null}). */
   private Double score;
 
   /**

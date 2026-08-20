@@ -64,7 +64,7 @@ public final class StaticContext {
 
   /** Static type of context value. */
   public SeqType contextType;
-  /** Sets a custom URI resolver. */
+  /** Sets a custom URI resolver (can be {@code null}). */
   UriResolver resolver;
   /** Sets an XML catalog URI resolver. */
   private final URIResolver uriResolver;
@@ -131,7 +131,7 @@ public final class StaticContext {
   }
 
   /**
-   * Returns an IO representation of the static base URI or {@code null}.
+   * Returns an IO representation of the static base URI.
    * @return IO reference (can be {@code null})
    */
   public IO baseIO() {

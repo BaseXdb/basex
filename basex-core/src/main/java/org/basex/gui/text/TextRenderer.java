@@ -767,7 +767,7 @@ final class TextRenderer extends BaseXBack {
 
   /**
    * Highlights text.
-   * @param range start/end of mark
+   * @param range start/end of mark (can be {@code null})
    * @param iter iterator
    * @param g graphics reference
    * @param color color of the highlighting

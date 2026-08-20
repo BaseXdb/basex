@@ -27,9 +27,9 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public abstract class StandardSerializer extends OutputSerializer {
-  /** Normalization form. */
+  /** Normalization form (can be {@code null}). */
   protected final Form form;
-  /** Character map. */
+  /** Character map (can be {@code null}). */
   protected final IntObjectMap<byte[]> cmap;
 
   /** Include separator. */

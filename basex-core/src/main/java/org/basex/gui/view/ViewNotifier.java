@@ -171,7 +171,7 @@ public final class ViewNotifier {
 
   /**
    * Notifies all views of a context change.
-   * @param nodes new context set (can be {@code null} if root nodes are addressed)
+   * @param nodes new context set
    * @param quick quick switch
    * @param vw the calling view
    */

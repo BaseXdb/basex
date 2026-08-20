@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
 final class StaticVarRef extends ParseExpr {
   /** Variable name. */
   public final QNm name;
-  /** Referenced variable. */
+  /** Referenced variable (can be {@code null}). */
   private StaticVar var;
 
   /**

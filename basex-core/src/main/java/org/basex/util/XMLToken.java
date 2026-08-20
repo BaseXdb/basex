@@ -343,7 +343,7 @@ public final class XMLToken {
    * Decodes an NCName to a token.
    * @param name name
    * @param lax lax decoding
-   * @return token
+   * @return token, or {@code null} if the name cannot be decoded
    */
   public static byte[] decode(final byte[] name, final boolean lax) {
     final int nl = name.length;
@@ -460,9 +460,9 @@ public final class XMLToken {
   }
 
   /**
-   * Returns the Unicode token for the specified entity or {@code null}.
+   * Returns the Unicode token for the specified entity.
    * @param key key
-   * @return Unicode token
+   * @return Unicode token, or {@code null}
    */
   public static byte[] getEntity(final byte[] key) {
     return entities().get(key);

@@ -54,7 +54,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
   private StringList timeStrings = new StringList(4);
   /** Full text. */
   private byte[] all = Token.EMPTY;
-  /** New text. */
+  /** New text (can be {@code null}). */
   private byte[] newText;
   /** Clear text before adding new text. */
   private boolean clear;

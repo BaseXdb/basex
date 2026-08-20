@@ -51,7 +51,7 @@ public final class Lang {
 
   /**
    * Returns the specified string.
-   * @param key key
+   * @param key key (can be {@code null})
    * @return string
    */
   static synchronized String lang(final String key) {

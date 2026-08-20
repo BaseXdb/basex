@@ -38,7 +38,7 @@ public abstract class ParseExpr extends Expr {
       new ConcurrentHashMap<>();
   /** Expression type. */
   public final ExprType exprType;
-  /** Input information. */
+  /** Input information (can be {@code null}). */
   protected InputInfo info;
   /** Iterator-based implementation. */
   private final boolean iterImpl;
@@ -191,7 +191,7 @@ public abstract class ParseExpr extends Expr {
    * Ensures that the specified function expression is (not) updating.
    * Otherwise, throws an exception.
    * @param <T> expression type
-   * @param expr expression (can be {@code null})
+   * @param expr expression
    * @param updating indicates if expression is expected to be updating
    * @return specified expression
    * @throws QueryException query exception

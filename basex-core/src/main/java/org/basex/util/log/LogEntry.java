@@ -29,7 +29,7 @@ public final class LogEntry {
   /** Date. */
   LocalDateTime date;
 
-  /** Cached string representation. */
+  /** Cached string representation (can be {@code null}). */
   private String string;
 
   @Override

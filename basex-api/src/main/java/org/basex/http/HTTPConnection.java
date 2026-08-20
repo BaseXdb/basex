@@ -56,7 +56,7 @@ public final class HTTPConnection implements ClientInfo {
 
   /** Request method. */
   public String method;
-  /** Serialization parameters. */
+  /** Serialization parameters (can be {@code null}). */
   private SerializerOptions serializer;
 
   /**

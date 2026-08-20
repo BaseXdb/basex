@@ -25,7 +25,7 @@ public final class PathCache {
 
   /** Current state. */
   State state = State.INIT;
-  /** Function to check if the context has changed. */
+  /** Function to check if the context has changed (can be {@code null}). */
   Predicate<Value> test;
   /** Cached context. */
   Value context;

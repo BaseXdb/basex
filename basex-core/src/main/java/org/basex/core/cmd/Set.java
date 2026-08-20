@@ -21,7 +21,7 @@ public final class Set extends Command {
    * @param <O> option type
    * @param <V> value type
    * @param option option to be found
-   * @param value value to set (optional, depending on the option)
+   * @param value value to set (can be {@code null}, depending on the option)
    */
   public <O extends Option<V>, V> Set(final O option, final V value) {
     this(option.name(), value);
@@ -30,7 +30,7 @@ public final class Set extends Command {
   /**
    * Default constructor.
    * @param name name of option
-   * @param value value to set (optional, depending on the option)
+   * @param value value to set (can be {@code null}, depending on the option)
    */
   public Set(final String name, final Object value) {
     super(Perm.NONE, name, value == null ? "" : value.toString());

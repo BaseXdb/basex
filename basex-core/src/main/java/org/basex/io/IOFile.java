@@ -200,7 +200,7 @@ public final class IOFile extends IO {
   }
 
   /**
-   * Returns the parent of this file or directory or {@code null} if there is no parent directory.
+   * Returns the parent of this file or directory.
    * @return directory or {@code null}
    */
   public IOFile parent() {
@@ -237,7 +237,7 @@ public final class IOFile extends IO {
 
   /**
    * Returns the children of the path that match the specified filter.
-   * @param filter file filter
+   * @param filter file filter (can be {@code null})
    * @return children
    */
   public IOFile[] children(final FileFilter filter) {
@@ -454,7 +454,7 @@ public final class IOFile extends IO {
    * Adds the relative paths of all descendant files to the specified list.
    * @param io current file
    * @param files file list
-   * @param filter file filter
+   * @param filter file filter (can be {@code null})
    * @param offset string length of root path
    */
   private static void addDescendants(final IOFile io, final StringList files,

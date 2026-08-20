@@ -30,7 +30,7 @@ public enum SerializerMode {
     }
   };
 
-  /** Options (lazy instantiation). */
+  /** Options (can be {@code null}; lazy instantiation). */
   private SerializerOptions options;
 
   /**

@@ -31,7 +31,7 @@ public final class InfoIndex extends AInfo {
 
   /**
    * Default constructor.
-   * @param type optional index type, defined in {@link CmdIndexInfo}
+   * @param type index type, defined in {@link CmdIndexInfo} (can be {@code null})
    */
   public InfoIndex(final Object type) {
     super(true, type != null && type != CmdIndexInfo.NULL ? type.toString() : "");

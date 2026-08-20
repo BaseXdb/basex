@@ -22,9 +22,9 @@ public final class ValueBuilder {
   /** Capacity. */
   private final long capacity;
 
-  /** Builder, instantiated if there is more than one value. */
+  /** Builder, instantiated if there is more than one value (can be {@code null}). */
   private SeqBuilder builder;
-  /** First value. */
+  /** First value (can be {@code null}). */
   private Value single;
   /** Count down for building a tree (ignored if {@code 0} or smaller). */
   private int tree;

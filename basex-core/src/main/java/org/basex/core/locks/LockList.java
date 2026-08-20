@@ -130,7 +130,7 @@ public final class LockList implements Iterable<String> {
    * Locks of type {@link Locking#COLLECTION} and {@link Locking#CONTEXT} will be replaced with the
    * name of the current database, if it exists, or deleted otherwise.
    * The resulting list will be sorted, and duplicates will be removed.
-   * @param name name of currently opened database
+   * @param name name of currently opened database (can be {@code null})
    */
   public void finish(final String name) {
     for(int l = 0; l < list.size(); l++) {

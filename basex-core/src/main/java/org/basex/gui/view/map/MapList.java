@@ -14,7 +14,7 @@ import org.basex.util.list.*;
 final class MapList {
   /** Pre values. */
   final IntList pres;
-  /** Weights array. */
+  /** Weights array (can be {@code null}). */
   double[] weight;
 
   /**
@@ -105,7 +105,7 @@ final class MapList {
 
   /**
    * Returns the numeric weight for the specified input, or 1 as minimum.
-   * @param textLen array holding PRE values to text lengths
+   * @param textLen array holding PRE values to text lengths (can be {@code null})
    * @param data data reference
    * @param i array index
    * @return calculated weight

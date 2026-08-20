@@ -37,7 +37,7 @@ public final class Constr {
   private final FBuilder builder;
   /** Query context. */
   private final QueryContext qc;
-  /** Input information. */
+  /** Input information (can be {@code null}). */
   private final InputInfo info;
   /** Text cache. */
   private final TokenBuilder text = new TokenBuilder();

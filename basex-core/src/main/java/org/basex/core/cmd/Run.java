@@ -16,7 +16,7 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class Run extends Execute {
-  /** Input reference. */
+  /** Input reference (can be {@code null}). */
   private IO file;
 
   /**

@@ -233,7 +233,7 @@ public final class FnBuildDateTime extends DateTimeFn {
 
   /**
    * Checks the timezone component for validity.
-   * @param tz timezone
+   * @param tz timezone (can be {@code null})
    * @param info input info
    * @throws QueryException query exception
    */

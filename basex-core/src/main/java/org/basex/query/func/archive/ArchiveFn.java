@@ -361,7 +361,7 @@ abstract class ArchiveFn extends StandardFunc {
   /**
    * Returns ZIP entries.
    * @param zip ZIP file
-   * @param entries entries to be returned
+   * @param entries entries to be returned (can be {@code null})
    * @return ZIP entries
    */
   static ArrayList<? extends ZipEntry> entries(final ZipFile zip, final HashSet<String> entries) {
@@ -399,7 +399,7 @@ abstract class ArchiveFn extends StandardFunc {
 
   /**
    * Returns a copy of the entry with its name canonicalized (mojibake-fixed), or the entry itself
-   * if it is already canonical (or {@code null}).
+   * if it is already canonical.
    * @param entry source entry (can be {@code null})
    * @return entry with canonical name (can be {@code null})
    */

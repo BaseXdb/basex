@@ -14,9 +14,9 @@ import org.basex.util.*;
 public final class QueryJobResult {
   /** Job. */
   public final Job job;
-  /** Query result. */
+  /** Query result (can be {@code null}). */
   public Value value;
-  /** Exception. */
+  /** Exception (can be {@code null}). */
   public QueryException exception;
   /** Evaluation time (ns). */
   public long time;

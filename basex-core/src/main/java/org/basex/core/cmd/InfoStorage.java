@@ -19,7 +19,7 @@ import org.basex.data.*;
 public final class InfoStorage extends AInfo {
   /**
    * Default constructor.
-   * @param arg arguments (the passed on argument can be {@code null})
+   * @param arg arguments (elements can be {@code null})
    */
   public InfoStorage(final String... arg) {
     super(true, arg.length > 0 && arg[0] != null ? arg[0] : "",

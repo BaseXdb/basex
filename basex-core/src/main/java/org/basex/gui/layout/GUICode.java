@@ -29,7 +29,7 @@ public abstract class GUICode<A> {
 
   /**
    * Invokes the specified thread after all other threads.
-   * @param arg optional argument
+   * @param arg argument (can be {@code null})
    */
   public final void invokeLater(final A arg) {
     final int c = ++counter;

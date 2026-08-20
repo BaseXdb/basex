@@ -33,9 +33,9 @@ final class RestXqError implements Comparable<RestXqError> {
   }
 
   /**
-   * Returns the test at the specified position, or {@code null}.
+   * Returns the test at the specified position.
    * @param index test index
-   * @return test
+   * @return test, or {@code null}
    */
   NameTest get(final int index) {
     return index < tests.size() ? tests.get(index) : null;

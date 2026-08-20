@@ -66,7 +66,7 @@ public final class Reflect {
   }
 
   /**
-   * Returns a reference to the class specified by the pattern, or {@code null}.
+   * Returns a reference to the class specified by the pattern.
    * @param pattern class pattern
    * @param ext optional extension
    * @return reference or {@code null} if the class is not found
@@ -77,7 +77,7 @@ public final class Reflect {
 
   /**
    * Finds a public, protected or private method by name and parameter types.
-   * @param clazz class to search for the method
+   * @param clazz class to search for the method (can be {@code null})
    * @param name method name
    * @param types method parameters
    * @return method, or {@code null} if the method is not found
@@ -101,7 +101,7 @@ public final class Reflect {
 
   /**
    * Returns a class instance.
-   * @param clazz class
+   * @param clazz class (can be {@code null})
    * @param <O> type
    * @return instance, or {@code null} if the class is {@code null}
    */
@@ -115,7 +115,7 @@ public final class Reflect {
 
   /**
    * Invokes the specified method.
-   * @param method method to run
+   * @param method method to run (can be {@code null})
    * @param object object ({@code null} for static methods)
    * @param args arguments
    * @return result of method call, or {@code null} if the method is {@code null}

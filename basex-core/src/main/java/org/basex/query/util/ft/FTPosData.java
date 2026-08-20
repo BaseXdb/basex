@@ -21,7 +21,7 @@ public final class FTPosData {
   private final IdentityHashMap<XNode, FTPos> fragments = new IdentityHashMap<>();
   /** Position references. */
   private FTPos[] pos = new FTPos[1];
-  /** Data reference. */
+  /** Data reference (can be {@code null}). */
   private Data dt;
   /** Number of values. */
   private int size;

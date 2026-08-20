@@ -16,7 +16,7 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class Single extends ParseExpr {
-  /** Expression. */
+  /** Expression (can be {@code null}). */
   public Expr expr;
 
   /**

@@ -26,7 +26,7 @@ public final class DiskTableTest extends SandboxTest {
   /** Test file we do updates with. */
   private static final String TESTFILE = "src/test/resources/xmark.xml";
 
-  /** BlockStorage. */
+  /** BlockStorage (can be {@code null}). */
   private TableDiskAccess tda;
   /** Data reference. */
   private Data data;

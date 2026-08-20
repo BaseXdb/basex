@@ -74,7 +74,7 @@ abstract class DialogParser extends BaseXBack {
   /**
    * Creates an encoding combo box and selects the specified encoding.
    * @param dialog dialog reference
-   * @param encoding original encoding
+   * @param encoding original encoding (can be {@code null})
    * @return combo box
    */
   static BaseXCombo encoding(final BaseXDialog dialog, final String encoding) {

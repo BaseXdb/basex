@@ -23,13 +23,13 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class DiskBuilder extends Builder {
-  /** Database table. */
+  /** Database table (can be {@code null}). */
   private DataOutput tout;
-  /** Database texts. */
+  /** Database texts (can be {@code null}). */
   private DataOutput xout;
-  /** Database values. */
+  /** Database values (can be {@code null}). */
   private DataOutput vout;
-  /** Output stream for temporary values. */
+  /** Output stream for temporary values (can be {@code null}). */
   private DataOutput sout;
 
   /** Static options. */

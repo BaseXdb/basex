@@ -33,7 +33,7 @@ public final class Var extends ExprInfo {
 
   /** Actual type (by type inference). */
   private final ExprType exprType;
-  /** Input expression, from which the data reference and DDO flag will be requested. */
+  /** Input expression, source of the data reference and DDO flag (can be {@code null}). */
   private Expr ex;
 
   /**

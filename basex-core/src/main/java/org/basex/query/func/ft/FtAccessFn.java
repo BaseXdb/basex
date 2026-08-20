@@ -59,7 +59,7 @@ abstract class FtAccessFn extends StandardFunc {
   /**
    * Parses full-text options and returns a full-text expression.
    * @param expr full-text expression
-   * @param opts options specified in the query
+   * @param opts options specified in the query (can be {@code null})
    * @return expression
    */
   final FTExpr ftExpr(final FTExpr expr, final FtIndexOptions opts) {

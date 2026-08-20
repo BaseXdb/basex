@@ -29,7 +29,7 @@ public class CsvXQueryConverter extends CsvConverter {
 
   /** Rows. */
   private final ItemList rows = new ItemList();
-  /** Current row. */
+  /** Current row (can be {@code null}). */
   private TokenList row;
 
   /**

@@ -237,7 +237,7 @@ public class ClientSession extends Session {
    * Executes a command and sends the result to the specified output stream.
    * @param command server command
    * @param arg argument
-   * @param output target output stream
+   * @param output target output stream (can be {@code null})
    * @return string
    * @throws IOException I/O exception
    */

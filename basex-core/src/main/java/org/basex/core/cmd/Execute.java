@@ -23,7 +23,7 @@ import org.basex.util.*;
 public class Execute extends Command {
   /** Commands to execute. */
   final List<Command> commands;
-  /** Error message. */
+  /** Error message (can be {@code null}). */
   String error;
 
   /**

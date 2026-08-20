@@ -151,7 +151,7 @@ public abstract class CsvConverter extends Job {
    * Returns the resulting XQuery value.
    * @param ii input info (can be {@code null})
    * @param qc query context (if {@code null}, result may lack XQuery-specific contents)
-   * @return result
+   * @return result, or {@code null}
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */

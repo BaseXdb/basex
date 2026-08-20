@@ -17,7 +17,7 @@ public final class NewInput {
   public String path;
   /** Resource type (defaults to XML). */
   public ResourceType type = ResourceType.XML;
-  /** Node to be added (only for XML resources). */
+  /** Node to be added (can be {@code null}; only for XML resources). */
   public XNode node;
   /** IO reference to be added ({@code null} for in-memory inputs). */
   public IO io;

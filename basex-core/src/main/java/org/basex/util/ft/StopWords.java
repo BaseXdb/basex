@@ -42,7 +42,7 @@ public final class StopWords {
 
   /**
    * Compiles the stop word list.
-   * @param data data reference
+   * @param data data reference (can be {@code null})
    */
   public void compile(final Data data) {
     // stop words have not been initialized, database is on disk...

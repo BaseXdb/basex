@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
  * @author Christian Gruen
  */
 public abstract class SessionTest extends SandboxTest {
-  /** Output stream. */
+  /** Output stream (can be {@code null}). */
   ArrayOutput out;
   /** Client session. */
   Session session;

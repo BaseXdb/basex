@@ -14,7 +14,7 @@ import org.basex.util.*;
 public class RegExpr {
   /** Pattern. */
   public final Pattern pattern;
-  /** Group info (volatile: lazily set once, may be read from concurrent child contexts). */
+  /** Group info (can be {@code null}; lazily set once, read from concurrent child contexts). */
   private volatile GroupInfo groupInfo;
 
   /**

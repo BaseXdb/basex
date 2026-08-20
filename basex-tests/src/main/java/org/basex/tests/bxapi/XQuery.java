@@ -28,7 +28,7 @@ import org.basex.util.list.*;
 public final class XQuery implements Iterable<XdmItem>, Closeable {
   /** Query processor. */
   private final QueryProcessor qp;
-  /** Query iterator. */
+  /** Query iterator (can be {@code null}). */
   private Iter iter;
 
   /**
@@ -219,8 +219,8 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
   }
 
   /**
-   * Returns the next item, or {@code null} if all items have been returned.
-   * @return next result item
+   * Returns the next item.
+   * @return next result item, or {@code null} if all items have been returned
    * @throws XQueryException exception
    */
   public XdmItem next() {

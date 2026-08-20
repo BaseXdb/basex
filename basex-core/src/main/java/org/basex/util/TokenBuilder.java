@@ -33,7 +33,7 @@ public final class TokenBuilder {
 
   /** Limit for info strings. */
   private static final int LIMIT = 256;
-  /** Byte array, storing all characters as UTF8. */
+  /** Byte array, storing all characters as UTF8 (can be {@code null}). */
   private byte[] chars;
   /** Current token size. */
   private int size;

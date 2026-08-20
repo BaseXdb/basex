@@ -44,9 +44,9 @@ public final class FTWords extends FTExpr {
   boolean simple;
   /** Input database (can be {@code null}). */
   private IndexDb db;
-  /** Pre-evaluated query tokens. */
+  /** Pre-evaluated query tokens (can be {@code null}). */
   private TokenList inputs;
-  /** Full-text options. */
+  /** Full-text options (can be {@code null}). */
   private FTOpt ftOpt;
 
   /**

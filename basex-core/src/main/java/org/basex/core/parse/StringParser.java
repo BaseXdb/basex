@@ -148,7 +148,7 @@ final class StringParser extends CommandParser {
   /**
    * Parses and returns a string, delimited by a semicolon or a space.
    * The input can be wrapped with quotes.
-   * @param cmd referring command; if specified, the result must not be empty
+   * @param cmd referring command (can be {@code null}); if specified, the result must not be empty
    * @return string or {@code null}
    * @throws QueryException query exception
    */
@@ -172,7 +172,7 @@ final class StringParser extends CommandParser {
 
   /**
    * Parses and returns the remaining string.
-   * @param cmd referring command; if specified, the result must not be empty
+   * @param cmd referring command (can be {@code null}); if specified, the result must not be empty
    * @param quotes strip leading and trailing quotes
    * @return remaining string or {@code null}
    * @throws QueryException query exception
@@ -200,7 +200,7 @@ final class StringParser extends CommandParser {
   /**
    * Parses and returns a name. A name may contain letters, numbers and some special
    * characters (see {@link Databases#DBCHARS}).
-   * @param cmd referring command; if specified, the result must not be empty
+   * @param cmd referring command (can be {@code null}); if specified, the result must not be empty
    * @return name
    * @throws QueryException query exception
    */
@@ -221,7 +221,7 @@ final class StringParser extends CommandParser {
   /**
    * Parses and returns a glob expression, which extends {@link #name(Cmd)} function
    * with asterisks, question marks and commands.
-   * @param cmd referring command; if specified, the result must not be empty
+   * @param cmd referring command (can be {@code null}); if specified, the result must not be empty
    * @return glob expression
    * @throws QueryException query exception
    */
@@ -232,7 +232,7 @@ final class StringParser extends CommandParser {
   /**
    * Parses and returns a name, or a glob string that extends a {@link #name(Cmd)}
    * with asterisks, question marks and commands.
-   * @param cmd referring command; if specified, the result must not be empty
+   * @param cmd referring command (can be {@code null}); if specified, the result must not be empty
    * @param glob allow glob syntax
    * @return glob expression
    * @throws QueryException query exception
@@ -255,7 +255,7 @@ final class StringParser extends CommandParser {
   /**
    * Parses and returns the specified keyword.
    * @param key token to be parsed
-   * @param cmd referring command; if specified, the keyword is mandatory
+   * @param cmd referring command (can be {@code null}); if specified, the keyword is mandatory
    * @return result of check
    * @throws QueryException query exception
    */
@@ -273,8 +273,8 @@ final class StringParser extends CommandParser {
 
   /**
    * Parses and returns a string result.
-   * @param string input string or {@code null} if invalid
-   * @param cmd referring command; if specified, the result must not be empty
+   * @param string input string (can be {@code null} if invalid)
+   * @param cmd referring command (can be {@code null}); if specified, the result must not be empty
    * @return string result or {@code null}
    * @throws QueryException query exception
    */
@@ -309,7 +309,7 @@ final class StringParser extends CommandParser {
   /**
    * Returns the found command or throws an exception.
    * @param complete possible completions
-   * @param parent parent command
+   * @param parent parent command (can be {@code null})
    * @param <E> token type
    * @return command, or {@code null} if no nothing can be consumed and if no parent was specified
    * @throws QueryException query exception
@@ -361,7 +361,7 @@ final class StringParser extends CommandParser {
    * Returns all commands that start with the specified user input.
    * @param <T> token type
    * @param en available commands
-   * @param prefix user input
+   * @param prefix user input (can be {@code null})
    * @return completions
    */
   private static <T extends Enum<T>> Enum<?>[] startWith(final Class<T> en, final String prefix) {

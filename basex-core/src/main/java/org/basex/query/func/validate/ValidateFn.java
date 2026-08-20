@@ -133,7 +133,7 @@ abstract class ValidateFn extends StandardFunc {
   /**
    * Returns an input reference (possibly cached) to the first argument.
    * @param item item
-   * @param sopts serializer parameters
+   * @param sopts serializer parameters (can be {@code null})
    * @return item
    * @throws QueryException query exception
    * @throws IOException exception

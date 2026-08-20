@@ -25,9 +25,9 @@ import org.basex.util.http.*;
  * @author Christian Gruen
  */
 public abstract class BaseXServlet extends HttpServlet {
-  /** Servlet-specific user. */
+  /** Servlet-specific user (can be {@code null}). */
   private String username;
-  /** Servlet-specific authentication method. */
+  /** Servlet-specific authentication method (can be {@code null}). */
   private AuthMethod auth;
 
   @Override

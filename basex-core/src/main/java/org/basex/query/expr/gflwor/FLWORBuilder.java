@@ -81,7 +81,7 @@ public final class FLWORBuilder {
   /**
    * Finalizes the GFLWOR expression.
    * @param input input expression
-   * @param where where expression (can be empty)
+   * @param where where expression (can be {@code null})
    * @param rtrn return expression
    * @return expression
    * @throws QueryException query exception

@@ -21,7 +21,7 @@ final class TextLineCache {
   private final IntList ws = new IntList();
   /** Highlighter state at each line start. */
   private final ArrayList<int[]> states = new ArrayList<>();
-  /** Text the cache was built for (staleness guard and edit-diff reference). */
+  /** Text the cache was built for (staleness/edit-diff reference, can be {@code null}). */
   private byte[] text;
   /** Text width the cache was built for (staleness guard). */
   private int width = -1;

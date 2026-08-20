@@ -99,7 +99,7 @@ public final class GUI extends JFrame implements BaseXWindow {
   /** Indicates if a command is running. */
   private boolean running;
 
-  /** Password reader. */
+  /** Password reader (can be {@code null}). */
   private static volatile PasswordReader pwReader;
 
   /**
