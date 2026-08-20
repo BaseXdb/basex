@@ -18,6 +18,11 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 final class NSNode {
+  /** Child nodes of leaf nodes. */
+  private static final NSNode[] EMPTY_NODES = {};
+  /** Values of nodes without namespaces. */
+  private static final int[] EMPTY_VALUES = {};
+
   /** Child nodes. */
   private NSNode[] nodes;
   /** Number of children. */
@@ -35,8 +40,8 @@ final class NSNode {
    */
   NSNode(final int pre) {
     this.pre = pre;
-    values = new int[0];
-    nodes = new NSNode[0];
+    values = EMPTY_VALUES;
+    nodes = EMPTY_NODES;
   }
 
   /**
@@ -191,7 +196,7 @@ final class NSNode {
 
     if(size == 0) {
       // if all nodes are deleted, just create an empty array
-      nodes = new NSNode[0];
+      nodes = EMPTY_NODES;
     } else if(num > 0) {
       // otherwise remove nodes from the child array
       Array.remove(nodes, i, num, sz);

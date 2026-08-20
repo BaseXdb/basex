@@ -20,7 +20,7 @@ import org.basex.util.hash.*;
  * @author Lukas Kircher
  */
 public final class Names extends TokenSet implements Index {
-  /** Statistical information. */
+  /** Statistical information (can be {@code null}). */
   private Stats[] stats;
   /** Meta data. */
   private final MetaData meta;
@@ -31,7 +31,6 @@ public final class Names extends TokenSet implements Index {
    */
   public Names(final MetaData meta) {
     this.meta = meta;
-    stats = new Stats[Array.INITIAL_CAPACITY];
   }
 
   /**
@@ -43,15 +42,16 @@ public final class Names extends TokenSet implements Index {
   public Names(final DataInput in, final MetaData meta) throws IOException {
     super(in);
     this.meta = meta;
-    stats = new Stats[keys.length];
-    for(int i = 1; i < size; i++) stats[i] = new Stats(in);
+    final Stats[] st = stats();
+    for(int i = 1; i < size; i++) st[i] = new Stats(in);
   }
 
   /**
    * Initializes the index.
    */
   public void init() {
-    for(int i = 1; i < size; i++) stats[i] = new Stats();
+    final Stats[] st = stats();
+    for(int i = 1; i < size; i++) st[i] = new Stats();
   }
 
   /**
@@ -71,10 +71,11 @@ public final class Names extends TokenSet implements Index {
    */
   public int store(final byte[] name, final byte[] value) {
     final int i = put(name);
-    Stats s = stats[i];
+    final Stats[] st = stats();
+    Stats s = st[i];
     if(s == null) {
       s = new Stats();
-      stats[i] = s;
+      st[i] = s;
     }
     if(value != null) s.add(value, meta);
     s.count++;
@@ -84,11 +85,12 @@ public final class Names extends TokenSet implements Index {
   @Override
   public void write(final DataOutput out) throws IOException {
     super.write(out);
+    final Stats[] st = stats();
     for(int i = 1; i < size; i++) {
-      Stats s = stats[i];
+      Stats s = st[i];
       if(s == null) {
         s = new Stats();
-        stats[i] = s;
+        st[i] = s;
       }
       s.write(out);
     }
@@ -100,18 +102,28 @@ public final class Names extends TokenSet implements Index {
    * @return statistics (can be {@code null})
    */
   public Stats stats(final int index) {
-    return stats[index];
+    return stats != null ? stats[index] : null;
+  }
+
+  /**
+   * Returns the statistics, which are created if they do not exist yet.
+   * @return statistics
+   */
+  private Stats[] stats() {
+    if(stats == null) stats = new Stats[capacity()];
+    return stats;
   }
 
   @Override
   public byte[] info(final MainOptions options) {
+    final Stats[] st = stats;
     final int[] tl = new int[size];
     tl[0] = 0;
     int len = 0;
     for(int i = 1; i < size; i++) {
       if(len < keys[i].length) len = keys[i].length;
-      if(stats[i] == null) continue;
-      tl[i] = stats[i].count;
+      if(st == null || st[i] == null) continue;
+      tl[i] = st[i].count;
     }
     len += 2;
 
@@ -123,12 +135,12 @@ public final class Names extends TokenSet implements Index {
     tb.add(Text.LI_ENTRIES).addInt(size - 1).add(Text.NL);
     for(int i = 0; i < size - 1; i++) {
       final int o = ordered[i];
-      if(stats[o] == null) continue;
+      if(st == null || st[o] == null) continue;
       final byte[] key = keys[o];
       tb.add("  ").add(key);
       final int kl = len - key.length;
       for(int k = 0; k < kl; ++k) tb.add(' ');
-      tb.add(stats[o] + Text.NL);
+      tb.add(st[o] + Text.NL);
     }
     return tb.finish();
   }
@@ -166,7 +178,7 @@ public final class Names extends TokenSet implements Index {
   @Override
   protected void rehash(final int newSize) {
     super.rehash(newSize);
-    stats = Array.copy(stats, new Stats[newSize]);
+    if(stats != null) stats = Array.copy(stats, new Stats[newSize]);
   }
 
   @Override
