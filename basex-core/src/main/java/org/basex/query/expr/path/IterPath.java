@@ -3,7 +3,6 @@ package org.basex.query.expr.path;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
@@ -29,17 +28,15 @@ public final class IterPath extends AxisPath {
 
   @Override
   protected Iter iterator(final QueryContext qc) {
-    final boolean rt = root != null;
-
     return new Iter() {
-      final int sz = steps.length + (rt ? 0 : -1);
-      final Expr[] exprs = rt ? ExprList.concat(root, steps) : steps;
+      final int offset = root != null ? 1 : 0;
+      final int sz = steps.length - 1 + offset;
       final Iter[] iter = new Iter[sz + 1];
       int pos;
 
       @Override
       public Item next() throws QueryException {
-        if(iter[0] == null) iter[0] = exprs[0].iter(qc);
+        if(iter[0] == null) iter[0] = (root != null ? root : steps[0]).iter(qc);
 
         final QueryFocus qf = qc.focus;
         final Value qv = qf.value;
@@ -51,7 +48,7 @@ public final class IterPath extends AxisPath {
             } else if(pos < sz) {
               qf.value = item;
               pos++;
-              iter[pos] = exprs[pos].iter(qc);
+              iter[pos] = steps[pos - offset].iter(qc);
             } else {
               return item;
             }
