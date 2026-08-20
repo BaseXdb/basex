@@ -18,7 +18,7 @@ public final class FnPartsOfDateTime extends DateTimeFn {
     final ADate value = toGregorianOrNull(arg(0), qc);
     if(value == null) return Empty.VALUE;
 
-    return new XQShapeMap(Records.DATETIME.get(),
+    return XQMap.get(Records.DATETIME.get(),
       value.hasYear()    ? Itr.get(value.yea())     : Empty.VALUE,
       value.hasMonth()   ? Itr.get(value.mon())     : Empty.VALUE,
       value.hasDay()     ? Itr.get(value.day())     : Empty.VALUE,

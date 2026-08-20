@@ -573,7 +573,7 @@ public final class RecordTest extends SandboxTest {
     inline(true);
     // local:rec(...) is inlined and the whole expression constant-folds to a single record
     check("declare record local:rec(a, b); local:rec(1, 2) +:= local:rec(4, 5)",
-        "{\"a\":4,\"b\":5}", empty(RecordPut.class), root(XQShapeMap.class));
+        "{\"a\":4,\"b\":5}", empty(RecordPut.class), root(XQShapeValueMap.class));
   }
 
   /** Tests for the compact record map implementation. */
@@ -583,23 +583,32 @@ public final class RecordTest extends SandboxTest {
     check(map + " => map:get('c')", "", empty());
     check(map + " => map:get(1)", "", empty());
     check(map + " => map:get(<?_ 1?> cast as xs:integer)", "", empty());
-    check(map + " => map:put('b', 3)", "{\"a\":1,\"b\":3}", root(XQShapeMap.class));
-    check(map + " => map:put('b', xs:byte(3))", "{\"a\":1,\"b\":3}", root(XQShapeMap.class));
-    check(map + " => map:put('b', '3')", "{\"a\":1,\"b\":\"3\"}", root(XQShapeMap.class));
-    check(map + " => map:put('c', 3)", "{\"a\":1,\"b\":2,\"c\":3}", root(XQShapeMap.class));
+    check(map + " => map:put('b', 3)", "{\"a\":1,\"b\":3}", root(XQShapeValueMap.class));
+    check(map + " => map:put('b', xs:byte(3))", "{\"a\":1,\"b\":3}", root(XQShapeValueMap.class));
+    check(map + " => map:put('b', '3')", "{\"a\":1,\"b\":\"3\"}", root(XQShapeValueMap.class));
+    check(map + " => map:put('c', 3)", "{\"a\":1,\"b\":2,\"c\":3}", root(XQShapeValueMap.class));
     check(map + " => map:put(xs:untypedAtomic('c'), 3)", "{\"a\":1,\"b\":2,\"c\":3}",
         root(XQTrieMap.class));
     check(map + " => map:put(3, 3)", "{\"a\":1,\"b\":2,3:3}", root(XQTrieMap.class));
-    check("map:entry('a', 1) => map:put('b', 2)", "{\"a\":1,\"b\":2}", root(XQShapeMap.class));
+    check("map:entry('a', 1) => map:put('b', 2)", "{\"a\":1,\"b\":2}",
+        root(XQShapeValueMap.class));
     // fields are only appended if the maximum shape size is not exceeded
     query("let $m := fold-left(1 to 40, {}, fn($m, $i) { map:put($m, 'f' || $i, $i) }) "
         + "return ($m?f40, count(map:keys($m)))", "40\n40");
-    check(map + " => map:remove('b')", "{\"a\":1}", root(XQShapeMap.class));
-    check(map + " => map:remove(xs:untypedAtomic('b'))", "{\"a\":1}", root(XQShapeMap.class));
-    check(map + " => map:remove('c')", "{\"a\":1,\"b\":2}", root(XQShapeMap.class));
-    check(map + " => map:remove(1)", "{\"a\":1,\"b\":2}", root(XQShapeMap.class));
+    check(map + " => map:remove('b')", "{\"a\":1}", root(XQShapeIntMap.class));
+    check(map + " => map:remove(xs:untypedAtomic('b'))", "{\"a\":1}", root(XQShapeIntMap.class));
+    check(map + " => map:remove('c')", "{\"a\":1,\"b\":2}", root(XQShapeValueMap.class));
+    check(map + " => map:remove(1)", "{\"a\":1,\"b\":2}", root(XQShapeValueMap.class));
     check(map + " => map:remove(<?_ 1?> cast as xs:integer)", "{\"a\":1,\"b\":2}",
-        root(XQShapeMap.class));
+        root(XQShapeValueMap.class));
+
+    // a declared record keeps its record type across the inlined representations
+    query("declare record local:r(a, b); local:r(1, 2) instance of local:r", true);
+    query("declare record local:r(a, b); "
+        + "(local:r(1, 2) => map:put('a', 9)) instance of record(*)", false);
+    query("declare record local:r(a); local:r(1) instance of local:r", true);
+    query("declare record local:r(a, b, c, d, e); local:r(1, 2, 3, 4, 5) instance of local:r",
+        true);
 
     map = "{ 'a': 1, 'b': <?_ 2?> cast as xs:integer }";
     check(map + " => map:get('a')", 1, type(ShapeGet.class, "xs:integer"));
@@ -615,7 +624,7 @@ public final class RecordTest extends SandboxTest {
 
   /** {@code map:empty} must be structural: a non-singleton empty record is still empty. */
   @Test public void mapEmpty() {
-    // constructed empty record: an XQShapeMap, not the shared empty map, but still empty
+    // constructed empty record: an XQShapeValueMap, not the shared empty map, but still empty
     query("declare record local:e(); "
         + "declare %basex:inline(0) function local:f() as map(*) { local:e() }; "
         + "map:empty(local:f())", true);
@@ -629,14 +638,14 @@ public final class RecordTest extends SandboxTest {
         + "map:empty(local:f())", false);
   }
 
-  /** A record-typed value that is not a compact XQShapeMap must still support field access. */
+  /** A record-typed value that is not a compact XQShapeValueMap must still support field access. */
   @Test public void recordFieldAccess() {
-    // ShapeGet/ShapeSet index into an XQShapeMap by field position; a record-typed plain map
+    // ShapeGet/ShapeSet index into an XQShapeValueMap by field position; a record-typed plain map
     // (here an XQSingletonMap, kept non-constant so it survives to runtime) must not class-cast
     query("declare function local:f($v) { { 'a': $v }?a }; local:f(1)", 1);   // ShapeGet
     query("map:get({ 'a': (1, 2)[. = 1] }, 'a')", 1);                         // MapGet -> ShapeGet
     query("map:put({ 'a': (1, 2)[. = 1] }, 'a', 5)?a", 5);                    // ShapeSet
-    // a two-field record written out of order is materialized as a field-ordered XQShapeMap,
+    // a two-field record written out of order is materialized as a field-ordered XQShapeValueMap,
     // so positional field access still resolves each field to its own value
     query("declare function local:f($v) { { 'b': $v, 'a': 9 }?a }; local:f(1)", 9);
     query("declare function local:f($v) { { 'b': $v, 'a': 9 }?b }; local:f(1)", 1);

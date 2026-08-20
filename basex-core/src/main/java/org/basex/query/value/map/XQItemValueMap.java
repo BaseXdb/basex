@@ -66,7 +66,7 @@ public final class XQItemValueMap extends XQHashMap {
   public Item shrink(final QueryContext qc) throws QueryException {
     shrinkValues(qc);
     refineType();
-    // see MapBuilder#put for types with compact representation
+    // see XQHashMap#get for key types with compact representation
     return ((MapType) type).keyType().oneOf(BasicType.INTEGER, BasicType.STRING,
         BasicType.UNTYPED_ATOMIC) ? rebuild(qc) : this;
   }

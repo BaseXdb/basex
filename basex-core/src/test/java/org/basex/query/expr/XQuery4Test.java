@@ -716,7 +716,7 @@ public final class XQuery4Test extends SandboxTest {
   @Test public void mapConstructor() {
     check("{}", "{}", root(XQTrieMap.class));
     check("{ 1: 2 }", "{1:2}", root(XQSingletonMap.class));
-    check("{ 1: 2, 3: 4 }", "{1:2,3:4}", root(XQIntMap.class));
+    check("{ 1: 2, 3: 4 }", "{1:2,3:4}", root(XQSmallMap.class));
 
     check("{ () }", "{}", root(XQTrieMap.class));
     check("{ {} }", "{}", root(XQTrieMap.class));
@@ -731,8 +731,8 @@ public final class XQuery4Test extends SandboxTest {
         "{0:0,1:1,2:2,3:3,4:4,5:5,6:6}", root(CMap.class));
     check("{ (1 to 6) ! { .: . } }", "{1:1,2:2,3:3,4:4,5:5,6:6}", root(CMap.class));
 
-    check("{ 'one': 1, { 'two': 2 } }", "{\"one\":1,\"two\":2}", root(XQShapeMap.class));
-    check("{ 'one': 1, { 2: 'two' } }", "{\"one\":1,2:\"two\"}", root(XQItemValueMap.class));
+    check("{ 'one': 1, { 'two': 2 } }", "{\"one\":1,\"two\":2}", root(XQShapeValueMap.class));
+    check("{ 'one': 1, { 2: 'two' } }", "{\"one\":1,2:\"two\"}", root(XQSmallMap.class));
 
     check("{ 0: <a/>, 1: <b/> } => map:size()", 2, root(Itr.class));
     check("{ 0: 0, { 1: 1 } } => map:size()", 2, root(Itr.class));

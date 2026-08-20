@@ -236,7 +236,7 @@ public final class FnXsdValidator extends StandardFunc {
       final boolean valid = errors.isEmpty();
       if(!valid) typed = Empty.VALUE;
       final Value details = !valid && errorDetails ? details(errors, qc) : Empty.VALUE;
-      return new XQShapeMap(Records.VALIDATION_RESULT.get(), Bln.get(valid), typed, details);
+      return XQMap.get(Records.VALIDATION_RESULT.get(), Bln.get(valid), typed, details);
     }
 
     /**
@@ -298,7 +298,7 @@ public final class FnXsdValidator extends StandardFunc {
       for(final ErrorInfo error : errors) {
         final MapBuilder map = new MapBuilder().put("message", error.message);
         if(error.url != null || error.line > 0 || error.column > 0) {
-          map.put("location", new XQShapeMap(Records.LOCATION.get(),
+          map.put("location", XQMap.get(Records.LOCATION.get(),
             error.url != null ? Uri.get(error.url) : Empty.VALUE, Empty.VALUE,
             error.line > 0 ? Itr.get(error.line, BasicType.POSITIVE_INTEGER) : Empty.VALUE,
             error.column > 0 ? Itr.get(error.column, BasicType.POSITIVE_INTEGER) : Empty.VALUE));

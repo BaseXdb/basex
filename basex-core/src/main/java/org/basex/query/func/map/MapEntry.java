@@ -19,10 +19,8 @@ public final class MapEntry extends MapFn {
   protected XQMap item(final QueryContext qc) throws QueryException {
     final Item key = toAtomItem(arg(0), qc);
     final Value value = arg(1).value(qc);
-
-    final XQMap map = XQMap.get(key, value);
-    if(seqType().type instanceof final ShapeType sh) map.type = sh;
-    return map;
+    return seqType().type instanceof final ShapeType sh ? XQMap.get(sh, value) :
+      XQMap.get(key, value);
   }
 
   @Override

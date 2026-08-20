@@ -20,6 +20,10 @@ public final class MapBuilder {
   private final long capacity;
   /** Current map implementation. */
   private XQHashMap map;
+  /** Union of all key types (can be {@code null}). */
+  private Type keyType;
+  /** Union of all value types (can be {@code null}). */
+  private SeqType valueType;
 
   /**
    * Constructor.
@@ -44,19 +48,23 @@ public final class MapBuilder {
    * @throws QueryException query exception
    */
   public MapBuilder put(final Item key, final Value value) throws QueryException {
-    if(map == null) {
-      final Type k = key.type;
-      final SeqType v = value.seqType();
-      final int c = Array.initialCapacity(capacity);
-      final boolean ki = k == BasicType.INTEGER, ks = k == BasicType.STRING,
-          ku = k == BasicType.UNTYPED_ATOMIC;
-      final boolean vi = v.eq(Types.INTEGER_O), vs = v.eq(Types.STRING_O);
-      map = ki ? vi ? new XQIntMap(c) : vs ? new XQIntStrMap(c) : new XQIntValueMap(c) :
-            ks ? vs ? new XQStrMap(c) : vi ? new XQStrIntMap(c) : new XQStrValueMap(c) :
-            ku ? vs ? new XQAtmStrMap(c) : vi ? new XQAtmIntMap(c) : new XQAtmValueMap(c) :
-            new XQItemValueMap(c);
+    // refine the map type while entries are added: no additional pass is required
+    final Type kt = key.type;
+    final SeqType vt = value.seqType();
+    if(valueType == null) {
+      keyType = kt;
+      valueType = vt;
+    } else {
+      if(kt != keyType) keyType = keyType.union(kt);
+      if(!vt.eq(valueType)) valueType = valueType.union(vt);
     }
-    map = map.build(key, value);
+    // small maps are inlined; larger ones are assigned a hash-based representation
+    if(map == null && capacity <= XQSmallMap.MAX_SIZE) {
+      map = XQSmallMap.entry(key, value);
+    } else {
+      if(map == null) map = XQHashMap.get(capacity, kt, vt);
+      map = map.build(key, value);
+    }
     return this;
   }
 
@@ -159,8 +167,10 @@ public final class MapBuilder {
    * @return map
    */
   public XQMap map() {
-    return map == null ? XQMap.empty() : map.structSize() == 1 ?
-      XQMap.get(map.keyAt(0), map.valueAt(0)) : map;
+    if(map == null) return XQMap.empty();
+    final XQMap mp = map.structSize() == 1 ? XQMap.get(map.keyAt(0), map.valueAt(0)) : map;
+    mp.refineType(MapType.get(keyType, valueType));
+    return mp;
   }
 
   /**

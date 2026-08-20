@@ -8,24 +8,24 @@ import org.basex.query.value.type.*;
 import org.basex.util.hash.*;
 
 /**
- * Unmodifiable hash map implementation for strings and values.
+ * Unmodifiable hash map implementation for strings and doubles.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class XQStrValueMap extends XQHashMap {
+public final class XQStrDblMap extends XQHashMap {
   /** Map type. */
-  private static final MapType TYPE = MapType.get(BasicType.STRING, Types.ITEM_ZM);
+  private static final MapType TYPE = MapType.get(BasicType.STRING, Types.DOUBLE_O);
   /** Hash map. */
-  private final TokenObjectMap<Value> map;
+  private final TokenDblMap map;
 
   /**
    * Constructor.
    * @param capacity initial capacity
    */
-  XQStrValueMap(final int capacity) {
+  XQStrDblMap(final int capacity) {
     super(TYPE);
-    map = new TokenObjectMap<>(capacity);
+    map = new TokenDblMap(capacity);
   }
 
   @Override
@@ -48,35 +48,34 @@ public final class XQStrValueMap extends XQHashMap {
   }
 
   @Override
+  public Value items(final QueryContext qc) {
+    final int ls = (int) structSize();
+    final double[] list = new double[ls];
+    for(int l = 0; l < ls; l++) list[l] = map.value(l + 1);
+    return DblSeq.get(list);
+  }
+
+  @Override
   public Str keyAt(final long index) {
     return Str.get(map.key((int) index + 1));
   }
 
   @Override
-  public Value valueAt(final long index) {
-    return map.value((int) index + 1);
-  }
-
-  @Override
-  void valueAt(final int index, final Value value) {
-    map.value(index + 1, value);
+  public Dbl valueAt(final long index) {
+    return Dbl.get(map.value((int) index + 1));
   }
 
   @Override
   XQHashMap build(final Item key, final Value value) throws QueryException {
     final byte[] k = toStr(key);
+    final Dbl v = toDbl(value);
     if(k != null) {
-      map.put(k, value);
-      return this;
+      if(v != null) {
+        map.put(k, v.dbl());
+        return this;
+      }
+      return new XQStrValueMap(map.capacity() - 2).build(this).build(key, value);
     }
     return new XQItemValueMap(map.capacity() - 2).build(this).build(key, value);
-  }
-
-  @Override
-  public Item shrink(final QueryContext qc) throws QueryException {
-    shrinkValues(qc);
-    refineType();
-    final MapType mt = (MapType) type;
-    return compact(mt.keyType(), mt.valueType()) ? rebuild(qc) : this;
   }
 }

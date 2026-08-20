@@ -433,16 +433,17 @@ public final class MapTest extends SandboxTest {
     query("map:build(1, key := fn { 10_000_000_000 })", "{10000000000:1}");
     query("map:build(xs:byte(1)) -> map:keys(.) -> (. instance of xs:byte)", true);
 
-    check("map:merge(({ 1: 1 }, { 2: 2 }, { 3: 3 }))",
-        "{1:1,2:2,3:3}", root(XQIntMap.class));
-    check("map:merge(({ 1: 1 }, { 2: '2' }, { 3: '3' }))",
-        "{1:1,2:\"2\",3:\"3\"}", root(XQIntValueMap.class));
-    check("map:merge(({ 1: 1 }, { 2: '2' }, { '3': '3' }))",
-        "{1:1,2:\"2\",\"3\":\"3\"}", root(XQItemValueMap.class));
-    check("map:merge(({ 1: 1 }, { '2': '2' }, { '3': '3' }))",
-        "{1:1,\"2\":\"2\",\"3\":\"3\"}", root(XQItemValueMap.class));
-    check("map:merge(({ 1: 1 }, { '2': '2' }, { 3: 3 }))",
-        "{1:1,\"2\":\"2\",3:3}", root(XQItemValueMap.class));
+    // more entries than XQSmallMap#MAX_SIZE: hash-based representations
+    check("map:merge(({ 1: 1 }, { 2: 2 }, { 3: 3 }, { 4: 4 }, { 5: 5 }))",
+        "{1:1,2:2,3:3,4:4,5:5}", root(XQIntMap.class));
+    check("map:merge(({ 1: 1 }, { 2: '2' }, { 3: '3' }, { 4: 4 }, { 5: 5 }))",
+        "{1:1,2:\"2\",3:\"3\",4:4,5:5}", root(XQIntValueMap.class));
+    check("map:merge(({ 1: 1 }, { 2: '2' }, { '3': '3' }, { 4: 4 }, { 5: 5 }))",
+        "{1:1,2:\"2\",\"3\":\"3\",4:4,5:5}", root(XQItemValueMap.class));
+    check("map:merge(({ 1: 1 }, { '2': '2' }, { '3': '3' }, { 4: 4 }, { 5: 5 }))",
+        "{1:1,\"2\":\"2\",\"3\":\"3\",4:4,5:5}", root(XQItemValueMap.class));
+    check("map:merge(({ 1: 1 }, { '2': '2' }, { 3: 3 }, { 4: 4 }, { 5: 5 }))",
+        "{1:1,\"2\":\"2\",3:3,4:4,5:5}", root(XQItemValueMap.class));
   }
 
   /** Tests string maps. */
@@ -458,21 +459,29 @@ public final class MapTest extends SandboxTest {
 
     query("map:build(xs:token('1')) -> map:keys(.) -> (. instance of xs:token)", true);
 
-    check("map:merge(({ '1': '1' }, { '2': '2' }, { '3': '3' }))",
-        "{\"1\":\"1\",\"2\":\"2\",\"3\":\"3\"}", root(XQStrMap.class));
-    check("map:merge(({ '1': '1' }, { '2': '2' }, { '3': 3 }))",
-        "{\"1\":\"1\",\"2\":\"2\",\"3\":3}", root(XQStrValueMap.class));
-    check("map:merge(({ '1': '1' }, { '2': '2' }, { 3: '3' }))",
-        "{\"1\":\"1\",\"2\":\"2\",3:\"3\"}", root(XQItemValueMap.class));
-    check("map:merge(({ '1': '1' }, { 2: 2 }, { 3: 3 }))",
-        "{\"1\":\"1\",2:2,3:3}", root(XQItemValueMap.class));
-    check("map:merge(({ '1': '1' }, { 2: 2 }, { '3': '3' }))",
-        "{\"1\":\"1\",2:2,\"3\":\"3\"}", root(XQItemValueMap.class));
+    // more entries than XQSmallMap#MAX_SIZE: hash-based representations
+    check("map:merge(({ '1': '1' }, { '2': '2' }, { '3': '3' }, "
+        + "{ '4': '4' }, { '5': '5' }))",
+        "{\"1\":\"1\",\"2\":\"2\",\"3\":\"3\",\"4\":\"4\",\"5\":\"5\"}", root(XQStrMap.class));
+    check("map:merge(({ '1': '1' }, { '2': '2' }, { '3': 3 }, "
+        + "{ '4': '4' }, { '5': '5' }))",
+        "{\"1\":\"1\",\"2\":\"2\",\"3\":3,\"4\":\"4\",\"5\":\"5\"}", root(XQStrValueMap.class));
+    check("map:merge(({ '1': '1' }, { '2': '2' }, { 3: '3' }, "
+        + "{ '4': '4' }, { '5': '5' }))",
+        "{\"1\":\"1\",\"2\":\"2\",3:\"3\",\"4\":\"4\",\"5\":\"5\"}", root(XQItemValueMap.class));
+    check("map:merge(({ '1': '1' }, { 2: 2 }, { 3: 3 }, "
+        + "{ '4': '4' }, { '5': '5' }))",
+        "{\"1\":\"1\",2:2,3:3,\"4\":\"4\",\"5\":\"5\"}", root(XQItemValueMap.class));
+    check("map:merge(({ '1': '1' }, { 2: 2 }, { '3': '3' }, "
+        + "{ '4': '4' }, { '5': '5' }))",
+        "{\"1\":\"1\",2:2,\"3\":\"3\",\"4\":\"4\",\"5\":\"5\"}", root(XQItemValueMap.class));
 
-    check("map:merge(({ '1': 1 }, { '2': 2 }, { '3': 3 }))",
-        "{\"1\":1,\"2\":2,\"3\":3}", root(XQStrIntMap.class));
-    check("map:merge(({ '1': 1 }, { '2': 2 }, { '3': '3' }))",
-        "{\"1\":1,\"2\":2,\"3\":\"3\"}", root(XQStrValueMap.class));
+    check("map:merge(({ '1': 1 }, { '2': 2 }, { '3': 3 }, { '4': 4 }, { '5': 5 }))",
+        "{\"1\":1,\"2\":2,\"3\":3,\"4\":4,\"5\":5}", root(XQStrIntMap.class));
+    check("map:merge(({ '1': 1 }, { '2': 2 }, { '3': '3' }, { '4': 4 }, { '5': 5 }))",
+        "{\"1\":1,\"2\":2,\"3\":\"3\",\"4\":4,\"5\":5}", root(XQStrValueMap.class));
+    check("map:merge(({ '1': 1e0 }, { '2': 2e0 }, { '3': 3e0 }, { '4': 4e0 }, { '5': 5e0 }))",
+        "{\"1\":1,\"2\":2,\"3\":3,\"4\":4,\"5\":5}", root(XQStrDblMap.class));
   }
 
   /** Tests untyped atomic maps. */
@@ -489,48 +498,132 @@ public final class MapTest extends SandboxTest {
     query("map:build(xs:untypedAtomic('1')) -> map:keys(.) -> (. instance of xs:untypedAtomic)",
         true);
 
+    // more entries than XQSmallMap#MAX_SIZE: hash-based representations
     check("map:merge(({ xs:untypedAtomic('1'): '1' }, "
-        + "{ xs:untypedAtomic('2'): '2' }, "
-        + "{ xs:untypedAtomic('3'): '3' }))",
-        "{\"1\":\"1\",\"2\":\"2\",\"3\":\"3\"}", root(XQAtmStrMap.class));
+        + "{ xs:untypedAtomic('2'): '2' }, { xs:untypedAtomic('3'): '3' }, "
+        + "{ xs:untypedAtomic('4'): '4' }, { xs:untypedAtomic('5'): '5' }))",
+        "{\"1\":\"1\",\"2\":\"2\",\"3\":\"3\",\"4\":\"4\",\"5\":\"5\"}", root(XQAtmStrMap.class));
     check("map:merge(({ xs:untypedAtomic('1'): '1' }, "
-        + "{ xs:untypedAtomic('2'): '2' }, { xs:untypedAtomic('3'): 3 }))",
-        "{\"1\":\"1\",\"2\":\"2\",\"3\":3}", root(XQAtmValueMap.class));
+        + "{ xs:untypedAtomic('2'): '2' }, { xs:untypedAtomic('3'): 3 }, "
+        + "{ xs:untypedAtomic('4'): '4' }, { xs:untypedAtomic('5'): '5' }))",
+        "{\"1\":\"1\",\"2\":\"2\",\"3\":3,\"4\":\"4\",\"5\":\"5\"}", root(XQAtmValueMap.class));
     check("map:merge(({ xs:untypedAtomic('1'): '1' }, "
-        + "{ xs:untypedAtomic('2'): '2' }, { 3: '3' }))",
-        "{\"1\":\"1\",\"2\":\"2\",3:\"3\"}", root(XQItemValueMap.class));
-    check("map:merge(({ xs:untypedAtomic('1'): '1' }, "
-        + "{ 2: 2 }, { 3: 3 }))",
-        "{\"1\":\"1\",2:2,3:3}", root(XQItemValueMap.class));
-    check("map:merge(({ xs:untypedAtomic('1'): '1' }, "
-        + "{ 2: 2 }, { xs:untypedAtomic('3'): '3' }))",
-        "{\"1\":\"1\",2:2,\"3\":\"3\"}", root(XQItemValueMap.class));
+        + "{ xs:untypedAtomic('2'): '2' }, { 3: '3' }, "
+        + "{ xs:untypedAtomic('4'): '4' }, { xs:untypedAtomic('5'): '5' }))",
+        "{\"1\":\"1\",\"2\":\"2\",3:\"3\",\"4\":\"4\",\"5\":\"5\"}", root(XQItemValueMap.class));
+    check("map:merge(({ xs:untypedAtomic('1'): '1' }, { 2: 2 }, { 3: 3 }, "
+        + "{ xs:untypedAtomic('4'): '4' }, { xs:untypedAtomic('5'): '5' }))",
+        "{\"1\":\"1\",2:2,3:3,\"4\":\"4\",\"5\":\"5\"}", root(XQItemValueMap.class));
+    check("map:merge(({ xs:untypedAtomic('1'): '1' }, { 2: 2 }, "
+        + "{ xs:untypedAtomic('3'): '3' }, "
+        + "{ xs:untypedAtomic('4'): '4' }, { xs:untypedAtomic('5'): '5' }))",
+        "{\"1\":\"1\",2:2,\"3\":\"3\",\"4\":\"4\",\"5\":\"5\"}", root(XQItemValueMap.class));
 
     check("map:merge(({ xs:untypedAtomic('1'): xs:untypedAtomic('1') }, "
         + "{ xs:untypedAtomic('2'): xs:untypedAtomic('2') }, "
-        + "{ xs:untypedAtomic('3'): xs:untypedAtomic('3') }))",
-        "{\"1\":\"1\",\"2\":\"2\",\"3\":\"3\"}", root(XQAtmValueMap.class));
+        + "{ xs:untypedAtomic('3'): xs:untypedAtomic('3') }, "
+        + "{ xs:untypedAtomic('4'): xs:untypedAtomic('4') }, "
+        + "{ xs:untypedAtomic('5'): xs:untypedAtomic('5') }))",
+        "{\"1\":\"1\",\"2\":\"2\",\"3\":\"3\",\"4\":\"4\",\"5\":\"5\"}", root(XQAtmValueMap.class));
     check("map:merge(({ xs:untypedAtomic('1'): xs:untypedAtomic('1') }, "
-        + "{ xs:untypedAtomic('2'): xs:untypedAtomic('2') }, { xs:untypedAtomic('3'): 3 }))",
-        "{\"1\":\"1\",\"2\":\"2\",\"3\":3}", root(XQAtmValueMap.class));
-    check("map:merge(({ xs:untypedAtomic('1'): xs:untypedAtomic('1') }, "
-        + "{ xs:untypedAtomic('2'): xs:untypedAtomic('2') }, { 3: xs:untypedAtomic('3') }))",
-        "{\"1\":\"1\",\"2\":\"2\",3:\"3\"}", root(XQItemValueMap.class));
-    check("map:merge(({ xs:untypedAtomic('1'): xs:untypedAtomic('1') }, "
-        + "{ 2: 2 }, { 3: 3 }))",
-        "{\"1\":\"1\",2:2,3:3}", root(XQItemValueMap.class));
-    check("map:merge(({ xs:untypedAtomic('1'): xs:untypedAtomic('1') }, "
-        + "{ 2: 2 }, { xs:untypedAtomic('3'): xs:untypedAtomic('3') }))",
-        "{\"1\":\"1\",2:2,\"3\":\"3\"}", root(XQItemValueMap.class));
+        + "{ xs:untypedAtomic('2'): xs:untypedAtomic('2') }, { 3: xs:untypedAtomic('3') }, "
+        + "{ xs:untypedAtomic('4'): xs:untypedAtomic('4') }, "
+        + "{ xs:untypedAtomic('5'): xs:untypedAtomic('5') }))",
+        "{\"1\":\"1\",\"2\":\"2\",3:\"3\",\"4\":\"4\",\"5\":\"5\"}", root(XQItemValueMap.class));
 
-    check("map:merge(({ xs:untypedAtomic('1'): 1 }, "
-        + "{ xs:untypedAtomic('2'): 2 }, { xs:untypedAtomic('3'): 3 }))",
-        "{\"1\":1,\"2\":2,\"3\":3}", root(XQAtmIntMap.class));
-    check("map:merge(({ xs:untypedAtomic('1'): 1 }, "
-        + "{ xs:untypedAtomic('2'): 2 }, { xs:untypedAtomic('3'): '3' }))",
-        "{\"1\":1,\"2\":2,\"3\":\"3\"}", root(XQAtmValueMap.class));
-    check("map:merge(({ xs:untypedAtomic('1'): 1 }, "
-        + "{ xs:untypedAtomic('2'): 2 }, { 3: 3 }))",
-        "{\"1\":1,\"2\":2,3:3}", root(XQItemValueMap.class));
+    check("map:merge(({ xs:untypedAtomic('1'): 1 }, { xs:untypedAtomic('2'): 2 }, "
+        + "{ xs:untypedAtomic('3'): 3 }, { xs:untypedAtomic('4'): 4 }, "
+        + "{ xs:untypedAtomic('5'): 5 }))",
+        "{\"1\":1,\"2\":2,\"3\":3,\"4\":4,\"5\":5}", root(XQAtmIntMap.class));
+    check("map:merge(({ xs:untypedAtomic('1'): 1 }, { xs:untypedAtomic('2'): 2 }, "
+        + "{ xs:untypedAtomic('3'): '3' }, { xs:untypedAtomic('4'): 4 }, "
+        + "{ xs:untypedAtomic('5'): 5 }))",
+        "{\"1\":1,\"2\":2,\"3\":\"3\",\"4\":4,\"5\":5}", root(XQAtmValueMap.class));
+    check("map:merge(({ xs:untypedAtomic('1'): 1 }, { xs:untypedAtomic('2'): 2 }, "
+        + "{ 3: 3 }, { xs:untypedAtomic('4'): 4 }, { xs:untypedAtomic('5'): 5 }))",
+        "{\"1\":1,\"2\":2,3:3,\"4\":4,\"5\":5}", root(XQItemValueMap.class));
+  }
+
+  /** Tests maps with few entries, which are inlined. */
+  @Test public void smallMaps() {
+    // up to XQSmallMap#MAX_SIZE entries, keys and values are inlined
+    check("map:build(1 to 2)", "{1:1,2:2}", root(XQSmallMap.class));
+    check("map:build(1 to 4)", "{1:1,2:2,3:3,4:4}", root(XQSmallMap.class));
+    check("map:build(1 to 5)", "{1:1,2:2,3:3,4:4,5:5}", root(XQIntMap.class));
+
+    // the map type is refined while entries are added
+    check("map:build(1 to 2)", "{1:1,2:2}", type(XQSmallMap.class, "map(xs:integer, xs:integer)"));
+    check("map:merge(({ 1: 1 }, { '2': 'x' }, { 3: 3 }))", "{1:1,\"2\":\"x\",3:3}",
+        type(XQSmallMap.class, "map(xs:anyAtomicType, xs:anyAtomicType)"));
+
+    // entries are not lost when an inlined map is converted to a hash map
+    query("map:build(('January', 'February', 'March', 'April', 'May', 'June', 'July', "
+        + "'August', 'September', 'October', 'November', 'December'), string-length#1) "
+        + "=> map:size()", 7);
+    query("map:build(1 to 100) => map:size()", 100);
+    query("map:build(1 to 100, value := string#1) => map:size()", 100);
+    query("map:build(1 to 100, key := string#1) => map:size()", 100);
+
+    // the representation is upgraded if a later entry does not fit the first one
+    query("map:merge(({ 1: 1 }, { 2: 2 }, { 3: 3 }, { 4: 4 }, { 'x': 'y' })) => map:size()", 5);
+    query("map:merge(({ 1: 1 }, { 2: 2 }, { 3: 3 }, { 4: 4 }, { 'x': 'y' }))?x", "y");
+    query("map:merge(({ 1: 1 }, { 2: 2 }, { 3: 3 }, { 4: 4 }, { 5: 'y' })) => map:items()",
+        "1\n2\n3\n4\ny");
+
+    // key order is preserved, duplicate keys are replaced in place
+    query("map:merge(({ 3: 3 }, { 1: 1 }, { 2: 2 })) => map:keys()", "3\n1\n2");
+    query("map:merge(({ 3: 3 }, { 1: 1 }, { 3: 'x' }), { 'duplicates': 'use-last' })"
+        + " => map:keys()", "3\n1");
+
+    // lookups with keys that do not match the key type
+    query("map:build(1 to 3) => map:get(true())", "");
+    query("map:build(1 to 3) => map:get('1')", "");
+    query("map:build(1 to 3) => map:get(1e0)", 1);
+    query("map:build((1 to 2) ! string(.)) => map:get(xs:untypedAtomic('1'))", 1);
+    query("map:build((1 to 2) ! string(.)) => map:get(xs:anyURI('2'))", 2);
+  }
+
+  /** Tests maps whose keys are supplied by a shape. */
+  @Test public void shapeMaps() {
+    // values of single-field maps are stored without boxing
+    check("{ 'a': 1 }", "{\"a\":1}", root(XQShapeIntMap.class));
+    check("{ 'a': 1e0 }", "{\"a\":1}", root(XQShapeDblMap.class));
+    check("map:entry('a', 1)", "{\"a\":1}", root(XQShapeIntMap.class));
+    // a single value that cannot be unboxed needs no array
+    check("{ 'a': 'x' }", "{\"a\":\"x\"}", root(XQShapeSingletonMap.class));
+    // several values are stored in an array
+    check("{ 'a': 1, 'b': 2 }", "{\"a\":1,\"b\":2}", root(XQShapeValueMap.class));
+
+    // integer subtypes are not unboxed: the item type must be preserved
+    query("{ 'a': xs:byte(1) }?a instance of xs:byte", true);
+    query("{ 'a': xs:long(1) }?a instance of xs:long", true);
+    query("{ 'a': xs:byte(1) }?a", 1);
+
+    // shapes are preserved by map:put and map:remove
+    check("map:put({ 'a': 1 }, 'b', 2)", "{\"a\":1,\"b\":2}", root(XQShapeValueMap.class));
+    check("map:remove({ 'a': 1, 'b': 2 }, 'b')", "{\"a\":1}", root(XQShapeIntMap.class));
+    query("map:put({ 'a': 1 }, 'a', 2)?a", 2);
+    query("map:put({ 'a': 1 }, 'a', 'x')?a", "x");
+    query("map:put({ 'a': 1 }, 1, 'x')?1", "x");
+    query("map:remove({ 'a': 1 }, 'a')", "{}");
+    query("map:remove({ 'a': 1 }, 'b')?a", 1);
+
+    // shape maps behave like other maps
+    query("{ 'a': 1, 'b': 2 } => map:keys()", "a\nb");
+    query("{ 'a': 1, 'b': 2 } => map:items()", "1\n2");
+    query("{ 'a': 1, 'b': 2 } => map:size()", 2);
+    query("{ 'a': 1, 'b': 2 } => map:contains('b')", true);
+    query("{ 'a': 1, 'b': 2 } => map:contains('c')", false);
+    query("{ 'a': 1, 'b': 2 } => map:get(xs:untypedAtomic('a'))", 1);
+    query("{ 'a': 1, 'b': 2 } => map:get(1)", "");
+    query("{ 'a': 1, 'b': 2 } => map:for-each(fn($k, $v) { $k || $v })", "a1\nb2");
+    query("deep-equal({ 'a': 1, 'b': 2 }, map:merge(({ 'a': 1 }, { 'b': 2 })))", true);
+    query("{ 'a': 1, 'b': 2 } => serialize({ 'method': 'json' })", "{\"a\":1,\"b\":2}");
+
+    // shapes are derived at runtime and cached on the shape they are derived from
+    query("(1 to 2) ! (map:put({ 'a': . }, 'b', .) => map:put('c', .))?c", "1\n2");
+    query("(1 to 2) ! (map:put({ 'a': . }, 'b', .) instance of map(xs:string, xs:integer))",
+        "true\ntrue");
+    query("(1 to 2) ! (map:remove({ 'a': ., 'b': . }, 'b') => map:size())", "1\n1");
   }
 }

@@ -126,7 +126,7 @@ public final class RecordPut extends Arr {
         if(i == 0) throw typeError(update, rt, info);
         values[i - 1] = fields.value(i).seqType().coerce(value, qc, info, null, null);
       });
-      return new XQShapeMap(rt, values);
+      return XQMap.get(rt, values);
     }
 
     // fallback

@@ -18,7 +18,7 @@ import org.basex.query.value.type.*;
  */
 public final class FnDivideDecimals extends StandardFunc {
   @Override
-  protected XQShapeMap item(final QueryContext qc) throws QueryException {
+  protected XQMap item(final QueryContext qc) throws QueryException {
     final BigDecimal value = checkType(arg(0), BasicType.DECIMAL, qc).dec(info);
     final BigDecimal divisor = checkType(arg(1), BasicType.DECIMAL, qc).dec(info);
     final Item precision = arg(2).atomItem(qc, info);
@@ -28,6 +28,6 @@ public final class FnDivideDecimals extends StandardFunc {
         Math.min(1 << 20, toLong(precision)));
     final BigDecimal quotient = value.divide(divisor, scale, RoundingMode.DOWN);
     final BigDecimal remainder = value.subtract(quotient.multiply(divisor));
-    return new XQShapeMap(Records.DIVISION.get(), Dec.get(quotient), Dec.get(remainder));
+    return XQMap.get(Records.DIVISION.get(), Dec.get(quotient), Dec.get(remainder));
   }
 }

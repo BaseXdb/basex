@@ -18,13 +18,13 @@ import org.basex.query.value.map.*;
  */
 public final class BinInferEncoding extends BinFn {
   @Override
-  protected XQShapeMap item(final QueryContext qc) throws QueryException {
+  protected XQMap item(final QueryContext qc) throws QueryException {
     final Bin value = toBin(arg(0), qc);
     final String encoding = toEncodingOrNull(arg(1), BIN_UE_X, qc);
 
     try(TextInput ti = new TextInput(value.input(info), encoding)) {
       final String enc = ti.encoding();
-      return new XQShapeMap(Records.INFER_ENCODING.get(), Str.get(enc), Itr.get(ti.position()));
+      return XQMap.get(Records.INFER_ENCODING.get(), Str.get(enc), Itr.get(ti.position()));
     } catch(final IOException ex) {
       throw BIN_CE_X.get(info, ex);
     }

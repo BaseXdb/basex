@@ -29,7 +29,7 @@ public final class FnLocation extends ContextFn {
     if(line <= 0) return Empty.VALUE;
 
     final byte[] uri = node.root().baseURI();
-    return new XQShapeMap(Records.LOCATION.get(),
+    return XQMap.get(Records.LOCATION.get(),
       uri.length == 0 ? Empty.VALUE : Uri.get(uri, false), Empty.VALUE,
       Itr.get(line, BasicType.POSITIVE_INTEGER),
       column <= 0 ? Empty.VALUE : Itr.get(column, BasicType.POSITIVE_INTEGER));

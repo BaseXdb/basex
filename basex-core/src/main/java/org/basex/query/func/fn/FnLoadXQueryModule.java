@@ -162,7 +162,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
       }
     }
 
-    final XQMap map = new XQShapeMap(Records.LOAD_XQUERY_MODULE.get(),
+    final XQMap map = XQMap.get(Records.LOAD_XQUERY_MODULE.get(),
         variables.map(), functions.map());
     if(modCache != null) modCache.put(cacheKey, map);
     return map;

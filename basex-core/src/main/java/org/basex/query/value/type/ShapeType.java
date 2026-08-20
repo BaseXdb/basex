@@ -27,6 +27,8 @@ public class ShapeType extends MapType {
 
   /** Fields. */
   private final TokenObjectMap<ShapeField> fields;
+  /** Field names as string items (can be {@code null}). */
+  private Str[] keys;
   /** Cached shapes derived from this one (can be {@code null}). */
   private Map<Derived, ShapeType> derived;
 
@@ -167,7 +169,24 @@ public class ShapeType extends MapType {
   public ShapeType add(final String fieldName, final SeqType seqType) {
     // the value type is not recomputed: only used to build recursive built-in records
     fields.put(Token.token(fieldName), new ShapeField(seqType));
+    keys = null;
     return this;
+  }
+
+  /**
+   * Returns the name of the specified field as a string item.
+   * @param index field index (starting with 1)
+   * @return field name
+   */
+  public final Str key(final int index) {
+    Str[] ks = keys;
+    if(ks == null) {
+      final int fs = fields.size();
+      ks = new Str[fs];
+      for(int f = 0; f < fs; f++) ks[f] = Str.get(fields.key(f + 1));
+      keys = ks;
+    }
+    return ks[index - 1];
   }
 
   /**

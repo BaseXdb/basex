@@ -71,6 +71,47 @@ abstract class XQHashMap extends XQMap {
   }
 
   /**
+   * Creates an empty hash map with a representation that is suited for the specified entry.
+   * @param capacity initial capacity
+   * @param keyType type of the first key
+   * @param valueType type of the first value
+   * @return map
+   */
+  static XQHashMap get(final long capacity, final Type keyType, final SeqType valueType) {
+    final int c = Array.initialCapacity(capacity);
+    if(keyType == BasicType.INTEGER) {
+      if(valueType.eq(Types.INTEGER_O)) return new XQIntMap(c);
+      if(valueType.eq(Types.STRING_O)) return new XQIntStrMap(c);
+      return new XQIntValueMap(c);
+    }
+    if(keyType == BasicType.STRING) {
+      if(valueType.eq(Types.STRING_O)) return new XQStrMap(c);
+      if(valueType.eq(Types.INTEGER_O)) return new XQStrIntMap(c);
+      if(valueType.eq(Types.DOUBLE_O)) return new XQStrDblMap(c);
+      return new XQStrValueMap(c);
+    }
+    if(keyType == BasicType.UNTYPED_ATOMIC) {
+      if(valueType.eq(Types.STRING_O)) return new XQAtmStrMap(c);
+      if(valueType.eq(Types.INTEGER_O)) return new XQAtmIntMap(c);
+      return new XQAtmValueMap(c);
+    }
+    return new XQItemValueMap(c);
+  }
+
+  /**
+   * Indicates if {@link #get} provides a compact representation for the specified types.
+   * @param keyType key type
+   * @param valueType value type
+   * @return result of check
+   */
+  static boolean compact(final Type keyType, final SeqType valueType) {
+    if(!valueType.one()) return false;
+    final Type vt = valueType.type;
+    return vt.oneOf(BasicType.INTEGER, BasicType.STRING) ||
+        vt == BasicType.DOUBLE && keyType == BasicType.STRING;
+  }
+
+  /**
    * Builds the map by adding a new key and value.
    * @param key key to insert
    * @param value value to insert
@@ -138,6 +179,15 @@ abstract class XQHashMap extends XQMap {
       return ((Atm) value).string(null);
     }
     return null;
+  }
+
+  /**
+   * Tries to convert the value to a double.
+   * @param value value
+   * @return double item, or {@code null}
+   */
+  static Dbl toDbl(final Value value) {
+    return value.seqType().eq(Types.DOUBLE_O) ? (Dbl) value : null;
   }
 
   /**

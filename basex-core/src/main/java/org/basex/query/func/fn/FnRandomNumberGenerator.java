@@ -31,7 +31,7 @@ public final class FnRandomNumberGenerator extends StandardFunc {
     final long i1 = number.applyAsLong(seed.isEmpty() ? qc.dateTime().nano : seed.hashCode());
     final long i2 = number.applyAsLong(i1);
     // derived from Java's random class
-    return new XQShapeMap(Records.RANDOM_NUMBER_GENERATOR.get(),
+    return XQMap.get(Records.RANDOM_NUMBER_GENERATOR.get(),
       Dbl.get(((i1 >>> 22 << 27) + (i2 >>> 21)) / (double) (1L << 53)),
       FuncType.get(Records.RANDOM_NUMBER_GENERATOR.get().seqType()).cast(nextFunc(i2), qc, info),
       permuteFunc(i1, qc));

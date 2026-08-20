@@ -68,7 +68,7 @@ public final class XQSingletonMap extends XQMap {
     if(key.atomicEqual(k)) return putAt(0, value);
     if(type instanceof final ShapeType sh && key.type == BasicType.STRING) {
       final ShapeType nsh = sh.put(key.string(null), value.seqType());
-      if(nsh != null) return new XQShapeMap(nsh, v, value);
+      if(nsh != null) return XQMap.get(nsh, v, value);
     }
     return empty().put(k, v).put(key, value);
   }

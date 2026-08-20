@@ -80,8 +80,7 @@ public final class XQIntValueMap extends XQHashMap {
   public Item shrink(final QueryContext qc) throws QueryException {
     shrinkValues(qc);
     refineType();
-    // see MapBuilder#put for types with compact representation
-    final SeqType vt = ((MapType) type).valueType();
-    return vt.one() && vt.type.oneOf(BasicType.INTEGER, BasicType.STRING) ? rebuild(qc) : this;
+    final MapType mt = (MapType) type;
+    return compact(mt.keyType(), mt.valueType()) ? rebuild(qc) : this;
   }
 }

@@ -54,7 +54,7 @@ public final class CsvW3Converter extends CsvXQueryConverter {
     // without a query context, the get function is unavailable and no record can be built
     if(qc == null) return new MapBuilder().put(COLUMNS, columns).
         put(COLUMN_INDEX, columnIndex).put(ROWS, rows).map();
-    return new XQShapeMap(Records.PARSED_CSV_STRUCTURE.get(), columns, columnIndex, rows,
+    return XQMap.get(Records.PARSED_CSV_STRUCTURE.get(), columns, columnIndex, rows,
         Get.funcItem(rows, columnIndex, qc, ii));
   }
 

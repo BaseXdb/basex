@@ -64,6 +64,30 @@ public abstract class XQMap extends XQStruct {
     return new XQSingletonMap(key, value);
   }
 
+  /**
+   * Creates a map with a known shape.
+   * @param shape shape
+   * @param values values, one per field
+   * @return map
+   */
+  public static XQMap get(final ShapeType shape, final Value... values) {
+    return values.length == 1 ? get(shape, values[0]) : new XQShapeValueMap(shape, values);
+  }
+
+  /**
+   * Creates a map with a shape that has a single field.
+   * @param shape shape with a single field
+   * @param value value of the field
+   * @return map
+   */
+  public static XQMap get(final ShapeType shape, final Value value) {
+    if(value instanceof final Itr itr && itr.type == BasicType.INTEGER) {
+      return new XQShapeIntMap(shape, itr.itr());
+    }
+    if(value instanceof final Dbl dbl) return new XQShapeDblMap(shape, dbl.dbl());
+    return new XQShapeSingletonMap(shape, value);
+  }
+
   @Override
   public final void write(final DataOutput out) throws IOException, QueryException {
     out.writeNum((int) structSize());
@@ -76,6 +100,14 @@ public abstract class XQMap extends XQStruct {
   @Override
   public final void refineType(final Expr expr) {
     if(this != empty()) super.refineType(expr);
+  }
+
+  /**
+   * Adopts the supplied type if it is more specific than the current one.
+   * @param refined refined type
+   */
+  final void refineType(final Type refined) {
+    if(this != empty() && refined.instanceOf(type)) type = refined;
   }
 
   @Override
@@ -356,7 +388,7 @@ public abstract class XQMap extends XQStruct {
       values[f] = fields.value(f + 1).seqType().coerce(get(Str.get(fields.key(f + 1))),
           qc, ii, null, cc);
     }
-    return new XQShapeMap(rt, values);
+    return get(rt, values);
   }
 
   /**
@@ -422,7 +454,7 @@ public abstract class XQMap extends XQStruct {
       if(cast == null) return null;
       values[f] = cast;
     }
-    return new XQShapeMap(rt, values);
+    return get(rt, values);
   }
 
   @Override

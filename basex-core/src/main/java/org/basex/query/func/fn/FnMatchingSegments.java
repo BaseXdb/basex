@@ -35,12 +35,12 @@ public final class FnMatchingSegments extends RegExFn {
         if(s >= 0) {
           final String name = g <= names.length ? names[g - 1] : null;
           final Value nm = name != null ? Str.get(name) : Empty.VALUE;
-          final XQShapeMap group = new XQShapeMap(Records.CAPTURED_GROUP.get(),
+          final XQMap group = XQMap.get(Records.CAPTURED_GROUP.get(),
               Str.get(matcher.group(g)), Itr.get(s + 1), Itr.get(g), nm);
           groups.put(name != null ? Str.get(name) : Itr.get(g), group);
         }
       }
-      vb.add(new XQShapeMap(Records.MATCHING_SEGMENT.get(),
+      vb.add(XQMap.get(Records.MATCHING_SEGMENT.get(),
           Str.get(matcher.group()), Itr.get(matcher.start() + 1), groups.map()));
     }
     return vb.value();
