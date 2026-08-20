@@ -3,6 +3,7 @@ package org.basex.query.value.type;
 import static java.util.Collections.*;
 
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.function.*;
 
 import org.basex.query.*;
@@ -21,9 +22,13 @@ import org.basex.util.hash.*;
 public class ShapeType extends MapType {
   /** Maximum number of entries in generated shapes. */
   public static final int MAX_GENERATED_SIZE = 32;
+  /** Maximum number of derived shapes that are cached. */
+  private static final int MAX_DERIVED = 64;
 
   /** Fields. */
   private final TokenObjectMap<ShapeField> fields;
+  /** Cached shapes derived from this one (can be {@code null}). */
+  private Map<Derived, ShapeType> derived;
 
   /**
    * Constructor.
@@ -60,7 +65,7 @@ public class ShapeType extends MapType {
    * @return shape, or {@code null} if the maximum size of generated shapes is exceeded
    */
   public final ShapeType put(final byte[] fieldName, final SeqType seqType) {
-    return copy(null, fieldName, seqType);
+    return copy(fieldName, seqType);
   }
 
   /**
@@ -69,24 +74,68 @@ public class ShapeType extends MapType {
    * @return shape
    */
   public final ShapeType remove(final byte[] fieldName) {
-    return copy(fieldName, null, null);
+    return copy(fieldName, null);
   }
 
   /**
-   * Returns an inferred shape with a removed and/or added field.
-   * @param remove name of the field to be removed (can be {@code null})
-   * @param put name of the field to be added or updated (can be {@code null})
-   * @param seqType sequence type of the added field (can be {@code null})
+   * Returns an inferred shape with an updated or removed field.
+   * @param field name of the field to be added or updated, or of the field to be removed
+   * @param seqType sequence type of the added field, {@code null} to remove the field
    * @return shape, or {@code null} if the maximum size of generated shapes is exceeded
    */
-  private ShapeType copy(final byte[] remove, final byte[] put, final SeqType seqType) {
-    if(put != null && !fields.contains(put) && fields.size() >= MAX_GENERATED_SIZE) return null;
+  private ShapeType copy(final byte[] field, final SeqType seqType) {
+    if(seqType != null && !fields.contains(field) && fields.size() >= MAX_GENERATED_SIZE) {
+      return null;
+    }
+    // shapes with query-scoped components must not be cached: they would be retained forever
+    if(detached() && (!(seqType != null && seqType.type instanceof final ShapeType sh) ||
+        sh.detached())) {
+      if(derived == null) derived = new ConcurrentHashMap<>();
+      // do not cache shapes that are derived from arbitrarily many field names
+      if(derived.size() < MAX_DERIVED) {
+        final Derived key = new Derived(field, seqType);
+        ShapeType shape = derived.get(key);
+        if(shape == null) {
+          shape = create(field, seqType);
+          derived.putIfAbsent(key, shape);
+        }
+        return shape;
+      }
+    }
+    return create(field, seqType);
+  }
+
+  /**
+   * Creates a shape with an updated or removed field.
+   * @param field name of the field to be added or updated, or of the field to be removed
+   * @param seqType sequence type of the added field, {@code null} to remove the field
+   * @return shape
+   */
+  private ShapeType create(final byte[] field, final SeqType seqType) {
     final TokenObjectMap<ShapeField> map = new TokenObjectMap<>(fields.size() + 1L);
     for(final byte[] key : fields) {
-      if(remove == null || !Token.eq(remove, key)) map.put(key, fields.get(key));
+      if(seqType != null || !Token.eq(field, key)) map.put(key, fields.get(key));
     }
-    if(put != null) map.put(put, new ShapeField(seqType));
+    if(seqType != null) map.put(field, new ShapeField(seqType));
     return new ShapeType(map);
+  }
+
+  /**
+   * Key of a shape that is derived from another one.
+   * @param field name of the added, updated or removed field
+   * @param seqType sequence type of the added field (can be {@code null})
+   */
+  private record Derived(byte[] field, SeqType seqType) {
+    @Override
+    public boolean equals(final Object obj) {
+      return this == obj || obj instanceof final Derived d && Token.eq(field, d.field) &&
+          Objects.equals(seqType, d.seqType);
+    }
+
+    @Override
+    public int hashCode() {
+      return Token.hashCode(field) + (seqType != null ? seqType.hashCode() * 31 : 0);
+    }
   }
 
   /**

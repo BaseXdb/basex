@@ -8,7 +8,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.hash.*;
 
 /**
- * Unmodifiable hash map implementation for integers and values.
+ * Unmodifiable hash map implementation for integers and strings.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

@@ -8,7 +8,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.hash.*;
 
 /**
- * Unmodifiable hash map implementation for strings and values.
+ * Unmodifiable hash map implementation for untyped atomics and values.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -76,8 +76,7 @@ public final class XQAtmValueMap extends XQHashMap {
   public Item shrink(final QueryContext qc) throws QueryException {
     shrinkValues(qc);
     refineType();
-    // see MapBuilder#put for types with compact representation
-    final SeqType vt = ((MapType) type).valueType();
-    return vt.one() && vt.type.oneOf(BasicType.INTEGER, BasicType.STRING) ? rebuild(qc) : this;
+    final MapType mt = (MapType) type;
+    return compact(mt.keyType(), mt.valueType()) ? rebuild(qc) : this;
   }
 }
