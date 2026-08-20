@@ -3,6 +3,7 @@ package org.basex.query.value.node;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import java.lang.invoke.*;
 import java.util.*;
 import java.util.function.*;
 
@@ -24,6 +25,17 @@ import org.w3c.dom.*;
  * @author Christian Gruen
  */
 public final class FElem extends FNode {
+  /** Handle for materializing a collapsed text child. */
+  private static final VarHandle CONTENT;
+
+  static {
+    try {
+      CONTENT = MethodHandles.lookup().findVarHandle(FElem.class, "content", Object.class);
+    } catch(final ReflectiveOperationException ex) {
+      throw Util.notExpected(ex);
+    }
+  }
+
   /** Element name. */
   private QNm name;
   /** Base URI. */
@@ -34,8 +46,8 @@ public final class FElem extends FNode {
   private Atts nsInherited;
   /** Attributes. */
   private GNode[] attributes;
-  /** Children. */
-  private GNode[] children;
+  /** Children: node array, or the value of a single collapsed text child. */
+  private volatile Object content;
 
   /**
    * Constructor.
@@ -43,7 +55,7 @@ public final class FElem extends FNode {
    * @param uri base URI
    */
   private FElem(final QNm name, final byte[] uri) {
-    super(NodeType.ELEMENT);
+    super(NodeType.ELEMENT, ids(2));
     this.name = name;
     this.uri = uri;
   }
@@ -140,8 +152,30 @@ public final class FElem extends FNode {
     namespaces = ns;
     nsInherited = inherited;
     attributes = at;
-    children = ch;
+    content = ch.length == 1 && ch[0] instanceof final FTxt txt ? txt.string() : ch;
     return this;
+  }
+
+  @Override
+  public byte[] textValue() {
+    final Object cont = content;
+    if(cont instanceof final byte[] value) return value;
+
+    final GNode[] nodes = (GNode[]) cont;
+    return nodes.length == 1 && nodes[0] instanceof final FTxt txt ? txt.string() : null;
+  }
+
+  /**
+   * Returns the children, materializing a collapsed text child.
+   * @return children
+   */
+  private GNode[] children() {
+    final Object cont = content;
+    if(cont instanceof final GNode[] nodes) return nodes;
+
+    final GNode[] nodes = { new FTxt((byte[]) cont, this, id + 1) };
+    final Object witness = CONTENT.compareAndExchange(this, cont, nodes);
+    return witness == cont ? nodes : (GNode[]) witness;
   }
 
   /**
@@ -212,7 +246,8 @@ public final class FElem extends FNode {
 
   @Override
   public byte[] string() {
-    return string(children);
+    final Object cont = content;
+    return cont instanceof final byte[] value ? value : string((GNode[]) cont);
   }
 
   @Override
@@ -239,12 +274,12 @@ public final class FElem extends FNode {
 
   @Override
   public BasicNodeIter childIter(final Test test, final boolean descendant) {
-    return GNodeList.iter(children);
+    return GNodeList.iter(children());
   }
 
   @Override
   public boolean hasChildren() {
-    return children.length != 0;
+    return !(content instanceof final GNode[] nodes) || nodes.length != 0;
   }
 
   @Override
@@ -264,15 +299,33 @@ public final class FElem extends FNode {
     for(final GNode attribute : attributes) {
       elem.node((GNode) attribute.materialize(test, funcs, ii, qc));
     }
-    for(final GNode child : children) elem.node((GNode) child.materialize(test, funcs, ii, qc));
+    final Object cont = content;
+    if(cont instanceof final byte[] value) {
+      elem.node(new FTxt(value));
+    } else {
+      for(final GNode child : (GNode[]) cont) {
+        elem.node((GNode) child.materialize(test, funcs, ii, qc));
+      }
+    }
     return elem.finish();
   }
 
   @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof final FElem f && name.eq(f.name) &&
-        Arrays.equals(children, f.children) && Arrays.equals(attributes, f.attributes) &&
+        sameContent(f) && Arrays.equals(attributes, f.attributes) &&
         Objects.equals(namespaces, f.namespaces) && super.equals(obj);
+  }
+
+  /**
+   * Compares the children with those of another element.
+   * @param elem element to be compared
+   * @return result of check
+   */
+  private boolean sameContent(final FElem elem) {
+    final Object cont = content, cont2 = elem.content;
+    return !(cont instanceof byte[]) && !(cont2 instanceof byte[]) &&
+      Arrays.equals((GNode[]) cont, (GNode[]) cont2);
   }
 
   @Override
@@ -289,17 +342,12 @@ public final class FElem extends FNode {
       tb.add(' ').add(new FNSpace(namespaces.name(n), namespaces.value(n)));
     }
     for(final GNode attr : attributes) tb.add(' ').add(attr);
-    if(hasChildren()) {
-      tb.add('>');
-      final GNode child = children[0];
-      if(child.kind() == Kind.TEXT && children.length == 1) {
-        tb.add(QueryString.toValue(child.string()));
-      } else {
-        tb.add(DOTS);
-      }
-      tb.add("</").add(nm).add('>');
-    } else {
+    if(!hasChildren()) {
       tb.add("/>");
+    } else {
+      final byte[] value = textValue();
+      tb.add('>').add(value != null ? QueryString.toValue(value) : DOTS).
+        add("</").add(nm).add('>');
     }
     qs.token(tb.finish());
   }

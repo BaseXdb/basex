@@ -26,6 +26,15 @@ public abstract class FNode extends XNode {
     super(type);
   }
 
+  /**
+   * Constructor with a pre-allocated node ID.
+   * @param type item type
+   * @param id node ID
+   */
+  FNode(final NodeType type, final int id) {
+    super(type, id);
+  }
+
   @Override
   public final boolean is(final GNode node) {
     return this == node;
@@ -35,7 +44,14 @@ public abstract class FNode extends XNode {
   public final int compare(final GNode node) {
     if(this == node) return 0;
     // fragments: compare node IDs
-    if(node instanceof final FNode fnode) return Integer.signum(id - fnode.id);
+    if(node instanceof final FNode fnode) {
+      // attributes precede the children of their parent, which may have a lower ID
+      if(parent != null && parent == fnode.parent) {
+        final boolean attr = kind() == Kind.ATTRIBUTE;
+        if(attr != (fnode.kind() == Kind.ATTRIBUTE)) return attr ? -1 : 1;
+      }
+      return Integer.signum(id - fnode.id);
+    }
     // find LCA
     if(node instanceof final DBNode dbnode) return compare(this, dbnode);
     // comparison with JNode

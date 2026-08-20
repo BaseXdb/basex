@@ -25,14 +25,33 @@ public abstract class GNode extends Item {
   /** Static node counter. */
   private static final AtomicInteger ID = new AtomicInteger();
   /** Unique node ID. ID can get negative, as subtraction of IDs is used for all comparisons. */
-  public final int id = ID.incrementAndGet();
+  public final int id;
 
   /**
    * Constructor.
    * @param type item type
    */
   GNode(final Type type) {
+    this(type, ids(1));
+  }
+
+  /**
+   * Constructor with a pre-allocated node ID.
+   * @param type item type
+   * @param id node ID
+   */
+  GNode(final Type type, final int id) {
     super(type);
+    this.id = id;
+  }
+
+  /**
+   * Allocates consecutive node IDs.
+   * @param count number of IDs to allocate
+   * @return first allocated ID
+   */
+  static int ids(final int count) {
+    return ID.getAndAdd(count) + 1;
   }
 
   /**

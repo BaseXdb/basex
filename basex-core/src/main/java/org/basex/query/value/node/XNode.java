@@ -48,6 +48,15 @@ public abstract class XNode extends GNode {
     super(type);
   }
 
+  /**
+   * Constructor with a pre-allocated node ID.
+   * @param type item type
+   * @param id node ID
+   */
+  XNode(final NodeType type, final int id) {
+    super(type, id);
+  }
+
   @Override
   public final void write(final DataOutput out) throws IOException {
     final ArrayOutput ao = new ArrayOutput();
@@ -303,6 +312,14 @@ public abstract class XNode extends GNode {
    * @return namespaces or {@code null}
    */
   public Atts nsInherited() {
+    return null;
+  }
+
+  /**
+   * Returns the value of a single text child.
+   * @return value, or {@code null} if the children are not a single text node
+   */
+  public byte[] textValue() {
     return null;
   }
 

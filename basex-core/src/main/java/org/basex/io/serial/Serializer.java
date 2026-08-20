@@ -587,7 +587,7 @@ public abstract class Serializer implements Closeable {
 
       // serialize attributes
       final boolean i = indent;
-      BasicNodeIter iter = node.attributeIter();
+      final BasicNodeIter iter = node.attributeIter();
       for(GNode nd; (nd = iter.next()) != null;) {
         final byte[] n = nd.name(), v = nd.string();
         addAttribute(n, v, canonical ? nsUri(prefix(n)) : null);
@@ -597,10 +597,12 @@ public abstract class Serializer implements Closeable {
       emitNamespaces();
       emitAttributes();
 
-      // serialize children
-      iter = node.childIter();
-      for(GNode n; (n = iter.next()) != null;) {
-        node((XNode) n);
+      // serialize children (a single text child is emitted without materializing a node)
+      final byte[] text = node.textValue();
+      if(text != null) {
+        prepareText(text, null);
+      } else {
+        for(final GNode n : node.childIter()) node((XNode) n);
       }
       closeElement();
       indent = i;

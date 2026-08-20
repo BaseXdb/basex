@@ -28,6 +28,18 @@ public final class FTxt extends FNode {
   }
 
   /**
+   * Constructor for a text child that has been materialized on demand.
+   * @param value text value
+   * @param parent parent element
+   * @param id pre-allocated node ID
+   */
+  FTxt(final byte[] value, final FElem parent, final int id) {
+    super(NodeType.TEXT, id);
+    this.value = value;
+    parent(parent);
+  }
+
+  /**
    * Constructor.
    * @param value text value
    */
