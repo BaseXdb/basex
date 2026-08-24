@@ -519,6 +519,7 @@ public final class TableDiskAccess extends TableAccess {
         final TableReader reader = readers[r];
         if(reader != null) {
           readers[r] = null;
+          reader.closed = true;
           reader.close();
         }
       }
@@ -625,6 +626,8 @@ public final class TableDiskAccess extends TableAccess {
     private final RandomAccessFile file;
     /** Thread this reader is confined to; only assigned while its previous owner is gone. */
     private Thread owner;
+    /** Indicates that the reader was closed by a concurrent update. */
+    private volatile boolean closed;
 
     /** Number of pages to read ahead. */
     private int ahead = 1;
@@ -784,7 +787,29 @@ public final class TableDiskAccess extends TableAccess {
           }
         }
       } catch(final IOException ex) {
-        throw new RuntimeException(Util.info(ex));
+        // queries are compiled before database locks are acquired: a concurrent update may
+        // have closed this reader in the meantime
+        if(!closed) throw new RuntimeException(Util.info(ex));
+        buffers.cursor(pre);
+        final Buffer current = buffers.current();
+        current.pos = pre;
+        readMaster(pre, current);
+      }
+    }
+
+    /**
+     * Reads a page through the master reader.
+     * @param pre page to fetch
+     * @param buffer target buffer
+     */
+    private void readMaster(final int pre, final Buffer buffer) {
+      synchronized(master) {
+        try {
+          master.file.seek((long) pre << IO.BLOCKPOWER);
+          master.file.readFully(buffer.data);
+        } catch(final IOException ex) {
+          throw new RuntimeException(Util.info(ex));
+        }
       }
     }
 
