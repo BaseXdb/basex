@@ -222,7 +222,9 @@ public abstract class HTTPTest extends SandboxTest {
       final MediaType type, final Map<String, String> headers, final String path,
       final Object... params) throws IOException {
 
-    final BodyPublisher pub = is != null ? HttpRequest.BodyPublishers.ofInputStream(() -> is) :
+    // buffer payload: requests with content length can be rejected without closing the connection
+    final BodyPublisher pub = is != null ?
+      HttpRequest.BodyPublishers.ofByteArray(is.readAllBytes()) :
       HttpRequest.BodyPublishers.noBody();
 
     final StringBuilder sb = new StringBuilder(rootUrl + path);
