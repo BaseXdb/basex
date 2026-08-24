@@ -161,7 +161,7 @@ public final class Locking {
   }
 
   /**
-   * Removes locks for the specified job, all in reverse order.
+   * Releases the locks that are held by the calling thread.
    */
   public void release() {
     final Long id = Thread.currentThread().threadId();
