@@ -12,16 +12,23 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class DataAccess implements Closeable {
-  /** Buffer manager. */
-  private final Buffers buffers = new Buffers();
-  /** Reference to the data input stream. */
-  private final RandomAccessFile raf;
+  /** Number of file readers (must be 1 << n). */
+  private static final int READERS = 1 << 4;
+
+  /** File readers, hashed by thread ID (entries can be {@code null}). */
+  private final Reader[] readers = new Reader[READERS];
+  /** Reader with write access; used for updates and if no other reader is available. */
+  private final Reader master;
+  /** File reference. */
+  private final IOFile file;
+  /** Indicates if the file supports thread-confined readers. */
+  private final boolean poolable;
+  /** Indicates if additional readers can be assigned. */
+  private volatile boolean pooled;
   /** File size. */
-  private long length;
+  private volatile long length;
   /** Changed flag. */
   private boolean changed;
-  /** Offset. */
-  private int off;
 
   /**
    * Constructor, initializing the file reader.
@@ -29,14 +36,28 @@ public final class DataAccess implements Closeable {
    * @throws IOException I/O Exception
    */
   public DataAccess(final IOFile file) throws IOException {
-    RandomAccessFile f = null;
+    this(file, false);
+  }
+
+  /**
+   * Constructor, initializing the file reader.
+   * @param file the file to be read
+   * @param poolable assign readers to threads; must be {@code false} if the caller positions
+   *   the cursor and writes in separate calls
+   * @throws IOException I/O Exception
+   */
+  public DataAccess(final IOFile file, final boolean poolable) throws IOException {
+    this.file = file;
+    this.poolable = poolable;
+    pooled = poolable;
+    Reader reader = null;
     try {
-      f = new RandomAccessFile(file.file(), "rw");
-      length = f.length();
-      raf = f;
-      cursor(0);
+      reader = new Reader(true, null);
+      master = reader;
+      length = master.raf.length();
+      master.cursor(0);
     } catch(final IOException ex) {
-      if(f != null) f.close();
+      if(reader != null) reader.raf.close();
       throw ex;
     }
   }
@@ -44,25 +65,32 @@ public final class DataAccess implements Closeable {
   /**
    * Flushes the buffered data.
    */
-  public synchronized void flush() {
-    try {
-      for(final Buffer buffer : buffers.all()) {
-        if(buffer.dirty) writeBlock(buffer);
+  public void flush() {
+    synchronized(master) {
+      try {
+        for(final Buffer buffer : master.buffers.all()) {
+          if(buffer.dirty) master.writeBlock(buffer);
+        }
+        if(changed) {
+          master.raf.setLength(length);
+          changed = false;
+        }
+        // all data has been written: readers can be assigned again
+        pooled = poolable;
+      } catch(final IOException ex) {
+        Util.stack(ex);
       }
-      if(changed) {
-        raf.setLength(length);
-        changed = false;
-      }
-    } catch(final IOException ex) {
-      Util.stack(ex);
     }
   }
 
   @Override
-  public synchronized void close() {
+  public void close() {
     flush();
     try {
-      raf.close();
+      drain();
+      synchronized(master) {
+        master.raf.close();
+      }
     } catch(final IOException ex) {
       Util.stack(ex);
     }
@@ -73,7 +101,7 @@ public final class DataAccess implements Closeable {
    * @return position in the file
    */
   public long cursor() {
-    return buffer(false).pos + off;
+    return reader().position();
   }
 
   /**
@@ -97,17 +125,24 @@ public final class DataAccess implements Closeable {
    * @param pos position
    * @return integer value
    */
-  public synchronized byte read1(final long pos) {
-    cursor(pos);
-    return read1();
+  public byte read1(final long pos) {
+    final Reader reader = reader();
+    if(reader != master) return reader.read1(pos);
+    synchronized(master) {
+      return master.read1(pos);
+    }
   }
 
   /**
    * Reads a byte value.
    * @return integer value
    */
-  public synchronized byte read1() {
-    return (byte) read();
+  public byte read1() {
+    final Reader reader = reader();
+    if(reader != master) return reader.read1();
+    synchronized(master) {
+      return master.read1();
+    }
   }
 
   /**
@@ -115,17 +150,24 @@ public final class DataAccess implements Closeable {
    * @param pos position
    * @return integer value
    */
-  public synchronized int read4(final long pos) {
-    cursor(pos);
-    return read4();
+  public int read4(final long pos) {
+    final Reader reader = reader();
+    if(reader != master) return reader.read4(pos);
+    synchronized(master) {
+      return master.read4(pos);
+    }
   }
 
   /**
    * Reads an integer value.
    * @return integer value
    */
-  public synchronized int read4() {
-    return (read() << 24) + (read() << 16) + (read() << 8) + read();
+  public int read4() {
+    final Reader reader = reader();
+    if(reader != master) return reader.read4();
+    synchronized(master) {
+      return master.read4();
+    }
   }
 
   /**
@@ -133,17 +175,24 @@ public final class DataAccess implements Closeable {
    * @param pos position
    * @return long value
    */
-  public synchronized long read5(final long pos) {
-    cursor(pos);
-    return read5();
+  public long read5(final long pos) {
+    final Reader reader = reader();
+    if(reader != master) return reader.read5(pos);
+    synchronized(master) {
+      return master.read5(pos);
+    }
   }
 
   /**
    * Reads a 5-byte value.
    * @return long value
    */
-  public synchronized long read5() {
-    return ((long) read() << 32) + ((long) read() << 24) + (read() << 16) + (read() << 8) + read();
+  public long read5() {
+    final Reader reader = reader();
+    if(reader != master) return reader.read5();
+    synchronized(master) {
+      return master.read5();
+    }
   }
 
   /**
@@ -151,9 +200,12 @@ public final class DataAccess implements Closeable {
    * @param pos text position
    * @return read num
    */
-  public synchronized int readNum(final long pos) {
-    cursor(pos);
-    return readNum();
+  public int readNum(final long pos) {
+    final Reader reader = reader();
+    if(reader != master) return reader.readNum(pos);
+    synchronized(master) {
+      return master.readNum(pos);
+    }
   }
 
   /**
@@ -162,10 +214,24 @@ public final class DataAccess implements Closeable {
    * @param next read the subsequent value
    * @return read num
    */
-  public synchronized int readNum(final long pos, final boolean next) {
-    cursor(pos);
-    final int value = readNum();
-    return next ? readNum() : value;
+  public int readNum(final long pos, final boolean next) {
+    final Reader reader = reader();
+    if(reader != master) return reader.readNum(pos, next);
+    synchronized(master) {
+      return master.readNum(pos, next);
+    }
+  }
+
+  /**
+   * Reads the next compressed number and returns it as integer.
+   * @return next integer
+   */
+  public int readNum() {
+    final Reader reader = reader();
+    if(reader != master) return reader.readNum();
+    synchronized(master) {
+      return master.readNum();
+    }
   }
 
   /**
@@ -173,18 +239,24 @@ public final class DataAccess implements Closeable {
    * @param pos text position
    * @return text as byte array
    */
-  public synchronized byte[] readToken(final long pos) {
-    cursor(pos);
-    return readToken();
+  public byte[] readToken(final long pos) {
+    final Reader reader = reader();
+    if(reader != master) return reader.readToken(pos);
+    synchronized(master) {
+      return master.readToken(pos);
+    }
   }
 
   /**
    * Reads the next token from disk.
    * @return text as byte array
    */
-  public synchronized byte[] readToken() {
-    final int l = readNum();
-    return readBytes(l);
+  public byte[] readToken() {
+    final Reader reader = reader();
+    if(reader != master) return reader.readToken();
+    synchronized(master) {
+      return master.readToken();
+    }
   }
 
   /**
@@ -193,9 +265,12 @@ public final class DataAccess implements Closeable {
    * @param len length
    * @return byte array
    */
-  public synchronized byte[] readBytes(final long pos, final int len) {
-    cursor(pos);
-    return readBytes(len);
+  public byte[] readBytes(final long pos, final int len) {
+    final Reader reader = reader();
+    if(reader != master) return reader.readBytes(pos, len);
+    synchronized(master) {
+      return master.readBytes(pos, len);
+    }
   }
 
   /**
@@ -203,21 +278,12 @@ public final class DataAccess implements Closeable {
    * @param len length
    * @return byte array
    */
-  public synchronized byte[] readBytes(final int len) {
-    int l = len, ll = IO.BLOCKSIZE - off;
-    final byte[] data = new byte[l];
-    Array.copyToStart(buffer(false).data, off, Math.min(l, ll), data);
-    if(l > ll) {
-      l -= ll;
-      while(l > IO.BLOCKSIZE) {
-        Array.copyFromStart(buffer(true).data, IO.BLOCKSIZE, data, ll);
-        ll += IO.BLOCKSIZE;
-        l -= IO.BLOCKSIZE;
-      }
-      Array.copyFromStart(buffer(true).data, l, data, ll);
+  public byte[] readBytes(final int len) {
+    final Reader reader = reader();
+    if(reader != master) return reader.readBytes(len);
+    synchronized(master) {
+      return master.readBytes(len);
     }
-    off += l;
-    return data;
   }
 
   /**
@@ -225,34 +291,7 @@ public final class DataAccess implements Closeable {
    * @param pos read position
    */
   public void cursor(final long pos) {
-    off = (int) (pos & IO.BLOCKSIZE - 1);
-    final long b = pos - off;
-    if(!buffers.cursor(b)) return;
-
-    final Buffer buffer = buffers.current();
-    try {
-      if(buffer.dirty) writeBlock(buffer);
-      buffer.pos = b;
-      raf.seek(buffer.pos);
-      if(buffer.pos < raf.length())
-        raf.readFully(buffer.data, 0, (int) Math.min(length - buffer.pos, IO.BLOCKSIZE));
-    } catch(final IOException ex) {
-      Util.stack(ex);
-    }
-  }
-
-  /**
-   * Reads the next compressed number and returns it as integer.
-   * @return next integer
-   */
-  public synchronized int readNum() {
-    final int value = read();
-    return switch(value & 0xC0) {
-      case 0    -> value;
-      case 0x40 -> (value - 0x40 << 8) + read();
-      case 0x80 -> (value - 0x80 << 24) + (read() << 16) + (read() << 8) + read();
-      default   -> (read() << 24) + (read() << 16) + (read() << 8) + read();
-    };
+    reader().cursor(pos);
   }
 
   /**
@@ -261,12 +300,13 @@ public final class DataAccess implements Closeable {
    * @param value value to be written
    */
   public void write5(final long pos, final long value) {
-    cursor(pos);
-    write((byte) (value >>> 32));
-    write((byte) (value >>> 24));
-    write((byte) (value >>> 16));
-    write((byte) (value >>> 8));
-    write((byte) value);
+    final Reader writer = writer();
+    writer.cursor(pos);
+    writer.write((byte) (value >>> 32));
+    writer.write((byte) (value >>> 24));
+    writer.write((byte) (value >>> 16));
+    writer.write((byte) (value >>> 8));
+    writer.write((byte) value);
   }
 
   /**
@@ -275,8 +315,9 @@ public final class DataAccess implements Closeable {
    * @param value byte array to be appended
    */
   public void write4(final long pos, final int value) {
-    cursor(pos);
-    write4(value);
+    final Reader writer = writer();
+    writer.cursor(pos);
+    writer.write4(value);
   }
 
   /**
@@ -284,10 +325,7 @@ public final class DataAccess implements Closeable {
    * @param value value to be written
    */
   public void write4(final int value) {
-    write(value >>> 24);
-    write(value >>> 16);
-    write(value >>>  8);
-    write(value);
+    writer().write4(value);
   }
 
   /**
@@ -295,19 +333,7 @@ public final class DataAccess implements Closeable {
    * @param value value to be written
    */
   public void writeNum(final int value) {
-    if(value < 0 || value > 0x3FFFFFFF) {
-      write(0xC0);
-      write(value >>> 24);
-      write(value >>> 16);
-      write(value >>> 8);
-    } else if(value > 0x3FFF) {
-      write(value >>> 24 | 0x80);
-      write(value >>> 16);
-      write(value >>> 8);
-    } else if(value > 0x3F) {
-      write(value >>> 8 | 0x40);
-    }
-    write(value);
+    writer().writeNum(value);
   }
 
   /**
@@ -317,20 +343,7 @@ public final class DataAccess implements Closeable {
    * @param len number of bytes to be written
    */
   public void writeBytes(final byte[] data, final int offset, final int len) {
-    final int last = offset + len;
-    int o = offset;
-
-    while(o < last) {
-      final Buffer buffer = buffer();
-      final int l = Math.min(last - o, IO.BLOCKSIZE - off);
-      Array.copy(data, o, l, buffer.data, off);
-      buffer.dirty = true;
-      off += l;
-      o += l;
-      // adjust file size
-      final long nl = buffer.pos + off;
-      if(nl > length) length(nl);
-    }
+    writer().writeBytes(data, offset, len);
   }
 
   /**
@@ -339,10 +352,11 @@ public final class DataAccess implements Closeable {
    * @param value value to be written
    */
   public void writeToken(final long pos, final byte[] value) {
-    cursor(pos);
+    final Reader writer = writer();
+    writer.cursor(pos);
     final int len = value.length;
-    writeNum(len);
-    writeBytes(value, 0, len);
+    writer.writeNum(len);
+    writer.writeBytes(value, 0, len);
   }
 
   /**
@@ -353,12 +367,13 @@ public final class DataAccess implements Closeable {
    * @return new offset to store text
    */
   public long free(final long pos, final int size) {
+    final Reader writer = writer();
     // old text size (available space)
-    int os = readNum(pos) + (int) (cursor() - pos);
+    int os = writer.readNum(pos) + (int) (writer.position() - pos);
 
     // extend available space by subsequent zero-bytes
-    cursor(pos + os);
-    for(; pos + os < length && os < size && read() == 0xFF; os++);
+    writer.cursor(pos + os);
+    for(; pos + os < length && os < size && writer.read() == 0xFF; os++);
 
     long o = pos;
     if(pos + os == length) {
@@ -369,81 +384,438 @@ public final class DataAccess implements Closeable {
       if(os < size) {
         // gap is too small for new entry...
         // reset cursor to overwrite entry
-        cursor(pos);
+        writer.cursor(pos);
         t = 0;
         // place new entry after last entry
         o = length;
       } else {
         // gap is large enough: set cursor to overwrite remaining bytes
-        cursor(pos + size);
+        writer.cursor(pos + size);
       }
       // fill gap with 0xFF for future updates
-      while(t++ < os) write(0xFF);
+      while(t++ < os) writer.write(0xFF);
     }
     return o;
+  }
+
+  // PRIVATE METHODS ==============================================================================
+
+  /**
+   * Returns a file reader for the current thread.
+   * @return file reader
+   */
+  private Reader reader() {
+    if(!pooled) return master;
+    // a reader is confined to its owner, so its cursor and buffers need no monitor
+    final Thread thread = Thread.currentThread();
+    final Reader reader = readers[(int) (thread.threadId() & READERS - 1)];
+    return reader != null && reader.owner == thread ? reader : newReader(thread);
+  }
+
+  /**
+   * Assigns a file reader to the specified thread.
+   * @param thread thread to assign the reader to
+   * @return file reader
+   */
+  private Reader newReader(final Thread thread) {
+    synchronized(readers) {
+      if(!pooled) return master;
+      final int start = (int) (thread.threadId() & READERS - 1);
+      for(int i = 0; i < READERS; i++) {
+        final int r = start + i & READERS - 1;
+        final Reader reader = readers[r];
+        if(reader == null) {
+          try {
+            final Reader rd = new Reader(false, thread);
+            readers[r] = rd;
+            return rd;
+          } catch(final IOException ex) {
+            // fall back to the master reader (e.g. if too many files are open)
+            Util.debug(ex);
+            return master;
+          }
+        }
+        // adopt the reader of a thread that has terminated
+        if(reader.owner == thread || !reader.owner.isAlive()) {
+          reader.owner = thread;
+          return reader;
+        }
+      }
+      // all readers are in use: fall back to the shared master reader
+      return master;
+    }
+  }
+
+  /**
+   * Returns the master reader and discards the cached data of all other readers.
+   * @return master reader
+   */
+  private Reader writer() {
+    if(pooled) {
+      try {
+        drain();
+      } catch(final IOException ex) {
+        Util.stack(ex);
+      }
+    }
+    return master;
+  }
+
+  /**
+   * Closes all assigned file readers.
+   * @throws IOException I/O exception
+   */
+  private void drain() throws IOException {
+    pooled = false;
+    synchronized(readers) {
+      // no reader can be in flight: the caller holds the write lock of the database
+      for(int r = 0; r < READERS; r++) {
+        final Reader reader = readers[r];
+        if(reader != null) {
+          readers[r] = null;
+          reader.closed = true;
+          reader.raf.close();
+        }
+      }
+    }
   }
 
   /**
    * Sets the file length.
    * @param len file length
    */
-  private synchronized void length(final long len) {
+  private void length(final long len) {
     if(len != length) {
       changed = true;
       length = len;
     }
   }
 
-  // PRIVATE METHODS ==============================================================================
-
   /**
-   * Reads the next byte.
-   * @return next byte
+   * Positional read and write access with an exclusive file handle and buffer pool.
    */
-  private int read() {
-    final Buffer buffer = buffer();
-    return buffer.data[off++] & 0xFF;
-  }
+  private final class Reader {
+    /** Buffer manager. */
+    private final Buffers buffers = new Buffers();
+    /** Reference to the data input stream. */
+    private final RandomAccessFile raf;
+    /** Thread this reader is confined to; only assigned while its previous owner is gone. */
+    private Thread owner;
+    /** Indicates that the reader was closed by a concurrent update. */
+    private volatile boolean closed;
+    /** Offset. */
+    private int off;
 
-  /**
-   * Writes the next byte.
-   * @param value byte to be written
-   */
-  private void write(final int value) {
-    final Buffer buffer = buffer();
-    buffer.dirty = true;
-    buffer.data[off++] = (byte) value;
-    final long nl = buffer.pos + off;
-    if(nl > length) length(nl);
-  }
+    /**
+     * Constructor.
+     * @param write open file for writing
+     * @param owner thread this reader is confined to (can be {@code null})
+     * @throws IOException I/O exception
+     */
+    private Reader(final boolean write, final Thread owner) throws IOException {
+      raf = new RandomAccessFile(file.file(), write ? "rw" : "r");
+      this.owner = owner;
+    }
 
-  /**
-   * Writes the specified block to disk.
-   * @param buffer buffer to write
-   * @throws IOException I/O exception
-   */
-  private void writeBlock(final Buffer buffer) throws IOException {
-    final long pos = buffer.pos, len = Math.min(IO.BLOCKSIZE, length - pos);
-    raf.seek(pos);
-    raf.write(buffer.data, 0, (int) len);
-    buffer.dirty = false;
-  }
+    /**
+     * Returns the current file position.
+     * @return position in the file
+     */
+    private long position() {
+      return buffer(false).pos + off;
+    }
 
-  /**
-   * Returns a buffer which can be used for writing new bytes.
-   * @return buffer
-   */
-  private Buffer buffer() {
-    return buffer(off == IO.BLOCKSIZE);
-  }
+    /**
+     * Reads a byte value from the specified position.
+     * @param pos position
+     * @return integer value
+     */
+    private byte read1(final long pos) {
+      cursor(pos);
+      return read1();
+    }
 
-  /**
-   * Returns the current or next buffer.
-   * @param next next block
-   * @return buffer
-   */
-  private Buffer buffer(final boolean next) {
-    if(next) cursor(buffers.current().pos + IO.BLOCKSIZE);
-    return buffers.current();
+    /**
+     * Reads a byte value.
+     * @return integer value
+     */
+    private byte read1() {
+      return (byte) read();
+    }
+
+    /**
+     * Reads an integer value from the specified position.
+     * @param pos position
+     * @return integer value
+     */
+    private int read4(final long pos) {
+      cursor(pos);
+      return read4();
+    }
+
+    /**
+     * Reads an integer value.
+     * @return integer value
+     */
+    private int read4() {
+      return (read() << 24) + (read() << 16) + (read() << 8) + read();
+    }
+
+    /**
+     * Reads a 5-byte value from the specified file offset.
+     * @param pos position
+     * @return long value
+     */
+    private long read5(final long pos) {
+      cursor(pos);
+      return read5();
+    }
+
+    /**
+     * Reads a 5-byte value.
+     * @return long value
+     */
+    private long read5() {
+      return ((long) read() << 32) + ((long) read() << 24) + (read() << 16) + (read() << 8) +
+        read();
+    }
+
+    /**
+     * Reads a {@link Num} value from disk.
+     * @param pos text position
+     * @return read num
+     */
+    private int readNum(final long pos) {
+      cursor(pos);
+      return readNum();
+    }
+
+    /**
+     * Reads a {@link Num} value from the specified position, or the one that follows it.
+     * @param pos text position
+     * @param next read the subsequent value
+     * @return read num
+     */
+    private int readNum(final long pos, final boolean next) {
+      cursor(pos);
+      final int value = readNum();
+      return next ? readNum() : value;
+    }
+
+    /**
+     * Reads the next compressed number and returns it as integer.
+     * @return next integer
+     */
+    private int readNum() {
+      final int value = read();
+      return switch(value & 0xC0) {
+        case 0    -> value;
+        case 0x40 -> (value - 0x40 << 8) + read();
+        case 0x80 -> (value - 0x80 << 24) + (read() << 16) + (read() << 8) + read();
+        default   -> (read() << 24) + (read() << 16) + (read() << 8) + read();
+      };
+    }
+
+    /**
+     * Reads a token from disk.
+     * @param pos text position
+     * @return text as byte array
+     */
+    private byte[] readToken(final long pos) {
+      cursor(pos);
+      return readToken();
+    }
+
+    /**
+     * Reads the next token from disk.
+     * @return text as byte array
+     */
+    private byte[] readToken() {
+      final int l = readNum();
+      return readBytes(l);
+    }
+
+    /**
+     * Reads a number of bytes from the specified offset.
+     * @param pos position
+     * @param len length
+     * @return byte array
+     */
+    private byte[] readBytes(final long pos, final int len) {
+      cursor(pos);
+      return readBytes(len);
+    }
+
+    /**
+     * Reads a number of bytes.
+     * @param len length
+     * @return byte array
+     */
+    private byte[] readBytes(final int len) {
+      int l = len, ll = IO.BLOCKSIZE - off;
+      final byte[] data = new byte[l];
+      Array.copyToStart(buffer(false).data, off, Math.min(l, ll), data);
+      if(l > ll) {
+        l -= ll;
+        while(l > IO.BLOCKSIZE) {
+          Array.copyFromStart(buffer(true).data, IO.BLOCKSIZE, data, ll);
+          ll += IO.BLOCKSIZE;
+          l -= IO.BLOCKSIZE;
+        }
+        Array.copyFromStart(buffer(true).data, l, data, ll);
+      }
+      off += l;
+      return data;
+    }
+
+    /**
+     * Sets the disk cursor.
+     * @param pos read position
+     */
+    private void cursor(final long pos) {
+      off = (int) (pos & IO.BLOCKSIZE - 1);
+      final long b = pos - off;
+      if(!buffers.cursor(b)) return;
+
+      final Buffer buffer = buffers.current();
+      try {
+        if(buffer.dirty) writeBlock(buffer);
+        buffer.pos = b;
+        raf.seek(buffer.pos);
+        if(buffer.pos < raf.length())
+          raf.readFully(buffer.data, 0, (int) Math.min(length - buffer.pos, IO.BLOCKSIZE));
+      } catch(final IOException ex) {
+        // queries are compiled before database locks are acquired: a concurrent update may
+        // have closed this reader in the meantime
+        if(!closed) {
+          Util.stack(ex);
+        } else {
+          readMaster(buffer);
+        }
+      }
+    }
+
+    /**
+     * Reads a block through the master reader.
+     * @param buffer target buffer
+     */
+    private void readMaster(final Buffer buffer) {
+      synchronized(master) {
+        try {
+          master.raf.seek(buffer.pos);
+          if(buffer.pos < master.raf.length()) {
+            master.raf.readFully(buffer.data, 0,
+                (int) Math.min(length - buffer.pos, IO.BLOCKSIZE));
+          }
+        } catch(final IOException ex) {
+          Util.stack(ex);
+        }
+      }
+    }
+
+    /**
+     * Writes an integer value to the file.
+     * @param value value to be written
+     */
+    private void write4(final int value) {
+      write(value >>> 24);
+      write(value >>> 16);
+      write(value >>>  8);
+      write(value);
+    }
+
+    /**
+     * Writes a number to the file.
+     * @param value value to be written
+     */
+    private void writeNum(final int value) {
+      if(value < 0 || value > 0x3FFFFFFF) {
+        write(0xC0);
+        write(value >>> 24);
+        write(value >>> 16);
+        write(value >>> 8);
+      } else if(value > 0x3FFF) {
+        write(value >>> 24 | 0x80);
+        write(value >>> 16);
+        write(value >>> 8);
+      } else if(value > 0x3F) {
+        write(value >>> 8 | 0x40);
+      }
+      write(value);
+    }
+
+    /**
+     * Writes a byte array to the file.
+     * @param data data containing the bytes to be written
+     * @param offset offset of first byte
+     * @param len number of bytes to be written
+     */
+    private void writeBytes(final byte[] data, final int offset, final int len) {
+      final int last = offset + len;
+      int o = offset;
+
+      while(o < last) {
+        final Buffer buffer = buffer();
+        final int l = Math.min(last - o, IO.BLOCKSIZE - off);
+        Array.copy(data, o, l, buffer.data, off);
+        buffer.dirty = true;
+        off += l;
+        o += l;
+        // adjust file size
+        final long nl = buffer.pos + off;
+        if(nl > length) length(nl);
+      }
+    }
+
+    /**
+     * Reads the next byte.
+     * @return next byte
+     */
+    private int read() {
+      final Buffer buffer = buffer();
+      return buffer.data[off++] & 0xFF;
+    }
+
+    /**
+     * Writes the next byte.
+     * @param value byte to be written
+     */
+    private void write(final int value) {
+      final Buffer buffer = buffer();
+      buffer.dirty = true;
+      buffer.data[off++] = (byte) value;
+      final long nl = buffer.pos + off;
+      if(nl > length) length(nl);
+    }
+
+    /**
+     * Writes the specified block to disk.
+     * @param buffer buffer to write
+     * @throws IOException I/O exception
+     */
+    private void writeBlock(final Buffer buffer) throws IOException {
+      final long pos = buffer.pos, len = Math.min(IO.BLOCKSIZE, length - pos);
+      raf.seek(pos);
+      raf.write(buffer.data, 0, (int) len);
+      buffer.dirty = false;
+    }
+
+    /**
+     * Returns a buffer which can be used for writing new bytes.
+     * @return buffer
+     */
+    private Buffer buffer() {
+      return buffer(off == IO.BLOCKSIZE);
+    }
+
+    /**
+     * Returns the current or next buffer.
+     * @param next next block
+     * @return buffer
+     */
+    private Buffer buffer(final boolean next) {
+      if(next) cursor(buffers.current().pos + IO.BLOCKSIZE);
+      return buffers.current();
+    }
   }
 }

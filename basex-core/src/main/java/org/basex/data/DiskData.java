@@ -124,8 +124,8 @@ public final class DiskData extends Data {
    */
   private void init() throws IOException {
     table = new TableDiskAccess(meta, meta.size, false);
-    texts = new DataAccess(meta.dbFile(DATATXT));
-    values = new DataAccess(meta.dbFile(DATAATV));
+    texts = new DataAccess(meta.dbFile(DATATXT), true);
+    values = new DataAccess(meta.dbFile(DATAATV), true);
   }
 
   /**
