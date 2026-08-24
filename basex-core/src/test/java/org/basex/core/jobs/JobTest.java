@@ -6,6 +6,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 
 import org.basex.core.*;
+import org.basex.core.users.*;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -122,6 +123,42 @@ public final class JobTest {
       }
       assertTrue(ctx.jobs.active.isEmpty(), "every job should have left the pool");
     } finally {
+      ctx.close();
+    }
+  }
+
+  /** A job that fails while acquiring its locks must not keep its run slot. */
+  @Test public void registrationFails() {
+    final Context ctx = new Context();
+    try {
+      // locks are collected by traversing the query: a stack overflow must not block the pool
+      final Job job = new Job() {
+        @Override public void addLocks() {
+          throw new StackOverflowError();
+        }
+      };
+      assertThrows(StackOverflowError.class, () -> job.register(ctx));
+      assertTrue(ctx.jobs.active.isEmpty(), "failed job should have left the pool");
+    } finally {
+      // a wedged job would make the pool wait for it forever
+      ctx.jobs.active.clear();
+      ctx.close();
+    }
+  }
+
+  /** A job that fails after acquiring its locks must give them back. */
+  @Test public void registrationFailsWithLocks() {
+    final Context ctx = new Context();
+    try {
+      // non-admin jobs schedule a timeout, which is rejected once the pool has been closed
+      ctx.user(new User("tester"));
+      ctx.soptions.set(StaticOptions.TIMEOUT, 5);
+      ctx.jobs.close();
+      assertThrows(RejectedExecutionException.class, () -> job().register(ctx));
+      assertTrue(ctx.jobs.active.isEmpty(), "failed job should have left the pool");
+      assertNull(ctx.locking.held(), "failed job should have released its locks");
+    } finally {
+      ctx.jobs.active.clear();
       ctx.close();
     }
   }

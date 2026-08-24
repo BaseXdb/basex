@@ -338,7 +338,8 @@ public final class QueryJob extends Job implements Runnable {
           if(registered) {
             unregister(ctx);
             popJob();
-            result.time += jc.performance.nanoRuntime();
+            // no measurement if the job failed to start
+            if(jc.performance != null) result.time += jc.performance.nanoRuntime();
           }
           qp = null;
         }

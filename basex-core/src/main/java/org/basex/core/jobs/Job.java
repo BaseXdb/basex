@@ -61,14 +61,20 @@ public abstract class Job {
     jc.context = ctx;
     ctx.jobs.register(this);
     registered = true;
-    state(JobState.QUEUED);
-    // a nested job runs with the locks of its parent: a thread can only hold a single set
-    if(previous == null) ctx.locking.acquire(this, ctx);
-    state(JobState.RUNNING);
-    jc.performance = new Performance();
-    // non-admin users: stop process after timeout
-    if(!ctx.user().has(Perm.ADMIN)) {
-      startTimeout(ctx, ctx.soptions.get(StaticOptions.TIMEOUT) * 1000L);
+    try {
+      state(JobState.QUEUED);
+      // a nested job runs with the locks of its parent: a thread can only hold a single set
+      if(previous == null) ctx.locking.acquire(this, ctx);
+      state(JobState.RUNNING);
+      jc.performance = new Performance();
+      // non-admin users: stop process after timeout
+      if(!ctx.user().has(Perm.ADMIN)) {
+        startTimeout(ctx, ctx.soptions.get(StaticOptions.TIMEOUT) * 1000L);
+      }
+    } catch(final Throwable th) {
+      // a job that fails to start is never unregistered: it must give up what it holds
+      unregister(ctx);
+      throw th;
     }
   }
 
@@ -81,14 +87,23 @@ public abstract class Job {
     if(!registered) return;
     try {
       stopTimeout();
-      if(previous == null) ctx.locking.release();
+      // locks are only given back if the acquisition succeeded
+      if(previous == null && ctx.locking.held() != null) ctx.locking.release();
     } finally {
-      registered = false;
       // the job must free its run slot, even if it failed to give up its locks
-      ctx.jobs.unregister(this);
-      CURRENT.set(previous);
-      previous = null;
+      freeSlot(ctx);
     }
+  }
+
+  /**
+   * Frees the run slot of the job and restores the job that was registered before.
+   * @param ctx context
+   */
+  private void freeSlot(final Context ctx) {
+    registered = false;
+    ctx.jobs.unregister(this);
+    CURRENT.set(previous);
+    previous = null;
   }
 
   /**
