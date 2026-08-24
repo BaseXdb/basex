@@ -14,6 +14,8 @@ import org.basex.util.*;
 public final class DataAccess implements Closeable {
   /** Number of file readers (must be 1 << n). */
   private static final int READERS = 1 << 4;
+  /** Maximum number of blocks to read ahead (must be 1 << n, at most half of the buffers). */
+  private static final int AHEAD = 1 << 3;
 
   /** File readers, hashed by thread ID (entries can be {@code null}). */
   private final Reader[] readers = new Reader[READERS];
@@ -505,6 +507,12 @@ public final class DataAccess implements Closeable {
     private volatile boolean closed;
     /** Offset. */
     private int off;
+    /** Number of blocks to read ahead. */
+    private int ahead = 1;
+    /** Block that continues the current sequential run. */
+    private long nextRead = -1;
+    /** Buffer for reading ahead (can be {@code null}). */
+    private byte[] scratch;
 
     /**
      * Constructor.
@@ -681,18 +689,57 @@ public final class DataAccess implements Closeable {
       try {
         if(buffer.dirty) writeBlock(buffer);
         buffer.pos = b;
-        raf.seek(buffer.pos);
-        if(buffer.pos < raf.length())
-          raf.readFully(buffer.data, 0, (int) Math.min(length - buffer.pos, IO.BLOCKSIZE));
+        // blocks that continue a sequential run are fetched in a single request; the master
+        // reader is excluded, as it may hold data that has not been written to disk yet
+        ahead = owner != null && b == nextRead ? Math.min(ahead << 1, AHEAD) : 1;
+        final int count = (int) Math.min(ahead, length - b >> IO.BLOCKPOWER);
+        nextRead = b + ((long) Math.max(count, 1) << IO.BLOCKPOWER);
+        raf.seek(b);
+        if(b < raf.length()) {
+          if(count < 2) {
+            raf.readFully(buffer.data, 0, (int) Math.min(length - b, IO.BLOCKSIZE));
+          } else if(readAhead(b, count)) {
+            // the requested block was evicted while reading ahead: fetch it again
+            final Buffer current = buffers.current();
+            current.pos = b;
+            raf.seek(b);
+            raf.readFully(current.data, 0, IO.BLOCKSIZE);
+          }
+        }
       } catch(final IOException ex) {
         // queries are compiled before database locks are acquired: a concurrent update may
         // have closed this reader in the meantime
         if(!closed) {
           Util.stack(ex);
         } else {
-          readMaster(buffer);
+          buffers.cursor(b);
+          final Buffer current = buffers.current();
+          current.pos = b;
+          readMaster(current);
         }
       }
+    }
+
+    /**
+     * Reads consecutive blocks in a single request and caches them.
+     * @param b first block position
+     * @param count number of blocks
+     * @return flag indicating if the first block was evicted again
+     * @throws IOException I/O exception
+     */
+    private boolean readAhead(final long b, final int count) throws IOException {
+      if(scratch == null) scratch = new byte[AHEAD << IO.BLOCKPOWER];
+      raf.readFully(scratch, 0, count << IO.BLOCKPOWER);
+      Array.copyToStart(scratch, 0, IO.BLOCKSIZE, buffers.current().data);
+      for(int c = 1; c < count; c++) {
+        final long pos = b + ((long) c << IO.BLOCKPOWER);
+        buffers.cursor(pos);
+        final Buffer buffer = buffers.current();
+        if(buffer.dirty) writeBlock(buffer);
+        buffer.pos = pos;
+        Array.copyToStart(scratch, c << IO.BLOCKPOWER, IO.BLOCKSIZE, buffer.data);
+      }
+      return buffers.cursor(b);
     }
 
     /**
