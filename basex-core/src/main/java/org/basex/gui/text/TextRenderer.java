@@ -524,6 +524,25 @@ final class TextRenderer extends BaseXBack {
   }
 
   /**
+   * Returns the text position of the topmost visible line.
+   * @return text position, or {@code -1} if the line cache cannot be used
+   */
+  int topPos() {
+    return cache.positionable(cacheWidth()) ?
+      cache.pos(cache.indexByY(scroll.pos() + fontHeight)) : -1;
+  }
+
+  /**
+   * Returns the scroll position that moves the specified line to the top of the viewport.
+   * @param pos text position ({@code -1} for none)
+   * @return scroll position, or the current one if the line cache cannot be used
+   */
+  int topY(final int pos) {
+    return pos >= 0 && cache.positionable(cacheWidth()) ? lineTop(cache.indexByPos(pos)) :
+      scroll.pos();
+  }
+
+  /**
    * Returns the current vertical cursor position.
    * @return new position
    */

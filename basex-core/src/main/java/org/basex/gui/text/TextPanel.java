@@ -29,11 +29,13 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public class TextPanel extends BaseXPanel {
-  /** Vertical alignment of the caret after scrolling. */
+  /** Vertical anchor of the text after a layout change. */
   private enum Align {
     /** Caret at the top. */ TOP,
     /** Caret in the middle. */ CENTER,
-    /** Caret at the bottom. */ BOTTOM
+    /** Caret at the bottom. */ BOTTOM,
+    /** Scroll position kept. */ KEEP,
+    /** Anchored line kept in place. */ LINE
   }
 
   /** Text editor. */
@@ -212,7 +214,7 @@ public class TextPanel extends BaseXPanel {
     txt = Token.replace(txt, new byte[] { '\r' }, Token.EMPTY);
     if(editor.text(txt)) hist.store(txt, editor.pos(), 0);
     resetError();
-    updateCode.invokeLater();
+    updateCode.invokeLater(Align.KEEP);
   }
 
   /**
@@ -243,7 +245,7 @@ public class TextPanel extends BaseXPanel {
    */
   public final void setSyntax(final Syntax syntax) {
     rend.syntax(syntax);
-    updateCode.invokeLater();
+    updateCode.invokeLater(Align.KEEP);
   }
 
   /**
@@ -283,13 +285,26 @@ public class TextPanel extends BaseXPanel {
   @Override
   public final void setFont(final Font f) {
     super.setFont(f);
-    if(rend != null) {
-      rend.setFont(f);
-      // a visibility change of the scrollbar must be propagated to the layout
-      hpanel.setVisible(!rend.wrap());
-      revalidate();
-      updateCode.invokeLater(Align.BOTTOM);
+    // the renderer is assigned after the first font
+    if(rend == null) return;
+
+    // the anchored line is remembered before the renderer discards the line cache
+    final int size = rend.getFont().getSize(), pos = scroll.pos(), top = anchor();
+    final int y = rend.topY(top);
+    rend.setFont(f);
+    // a visibility change of the scrollbar must be propagated to the layout
+    hpanel.setVisible(!rend.wrap());
+    revalidate();
+    if(isShowing()) {
+      // the position is read after the renderer has reset it for wrapped text
+      final int hpos = hscroll.pos();
+      // the extent must be up-to-date: the new scroll positions are clipped against it
+      rend.computeHeight();
+      scroll.pos(rend.topY(top) - y + pos);
+      // the horizontal position has no line cache: it scales with the font size
+      hscroll.pos((int) ((long) hpos * f.getSize() / size));
     }
+    updateCode.invokeLater(Align.KEEP);
   }
 
   /**
@@ -776,22 +791,34 @@ public class TextPanel extends BaseXPanel {
     editor.atRowEnd(rend.rowEnd());
   }
 
-  /** Recomputes the text height and adjusts the scroll bar ({@code null}: keep the position). */
+  /** Recomputes the text height and adjusts the scroll bars. */
   private final GUICode<Align> updateCode = new GUICode<>() {
     @Override
     public void execute(final Align align) {
       if(!isShowing()) return;
+      // the anchored line is remembered before the layout assigns new positions to the text
+      final int pos = scroll.pos(), top = align == Align.LINE ? anchor() : -1, y = rend.topY(top);
       rend.computeHeight();
-      if(align != null) {
-        scroll(rend.cursorY(), align);
-      } else {
-        // keep the scroll positions within the valid range
-        scroll.pos(scroll.pos());
-        hscroll.pos(hscroll.pos());
-        rend.repaint();
+      switch(align) {
+        case KEEP, LINE -> {
+          scroll.pos(rend.topY(top) - y + pos);
+          // keep the horizontal position within the valid range
+          hscroll.pos(hscroll.pos());
+          rend.repaint();
+        }
+        default -> scroll(rend.cursorY(), align);
       }
     }
   };
+
+  /**
+   * Returns the text position of the line that is anchored if the layout changes.
+   * @return caret line, or topmost line if the caret is not visible ({@code -1}: no cache)
+   */
+  private int anchor() {
+    final int pos = scroll.pos(), caret = editor.pos(), y = rend.topY(caret);
+    return y >= pos && y + rend.fontHeight() <= pos + getHeight() ? caret : rend.topPos();
+  }
 
   /** Refreshes the signature popup ({@code true}: show the signature of a new call). */
   private final GUICode<Boolean> signatureCode = new GUICode<>() {
@@ -813,7 +840,7 @@ public class TextPanel extends BaseXPanel {
         scroll.pos(switch(align) {
           case TOP -> y;
           case CENTER -> y - h / 2;
-          case BOTTOM -> m;
+          default -> m;
         });
       }
     }
@@ -928,12 +955,12 @@ public class TextPanel extends BaseXPanel {
 
   @Override
   public final void componentResized(final ComponentEvent e) {
-    updateCode.invokeLater();
+    updateCode.invokeLater(Align.LINE);
   }
 
   @Override
   public final void componentShown(final ComponentEvent e) {
-    updateCode.invokeLater();
+    updateCode.invokeLater(Align.LINE);
   }
 
   /** Undo/redo command. */
