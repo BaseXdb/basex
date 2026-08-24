@@ -26,6 +26,7 @@ function dba:ws-message(
     'jobs': utils:html(panels:jobs($json?sort)),
     'web' : utils:html(panels:web-sessions()),
     'db'  : utils:html(panels:db-sessions()),
+    'ws'  : utils:html(panels:websockets()),
     'caches': utils:html(panels:caches()),
     'job' : utils:html(panels:job-details($job)),
     'done': panels:job-done($job)

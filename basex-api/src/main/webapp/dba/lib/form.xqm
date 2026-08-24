@@ -126,13 +126,11 @@ declare %private variable $form:INDEX-OPTIONS := ('textindex', 'attrindex', 'tok
  : Creates the index options of a database dialog. Kept next to form:index-map, which turns the
  : same options into the arguments of the database operation.
  : @param  $opts    checked options
- : @param  $lang    language
  : @param  $create  include the options that are reserved for new databases
  : @return form fields
  :)
 declare function form:index-options(
   $opts    as xs:string*,
-  $lang    as xs:string?,
   $create  as xs:boolean
 ) as node()+ {
   <h3>{ form:option('textindex', 'Text Index', $opts) }</h3>,
@@ -142,7 +140,18 @@ declare function form:index-options(
   <h3>{ form:option('ftindex', 'Fulltext Index', $opts) }</h3>,
   form:option('stemming', 'Stemming', $opts),
   form:option('casesens', 'Case Sensitivity', $opts),
-  form:option('diacritics', 'Diacritics', $opts),
+  form:option('diacritics', 'Diacritics', $opts)
+};
+
+(:~
+ : Creates the field that chooses the language of the full-text index. It is labeled, so it
+ : belongs to the fields of a dialog, not to the flags of the index options.
+ : @param  $lang  language
+ : @return form field
+ :)
+declare function form:language-field(
+  $lang  as xs:string?
+) as element(div) {
   form:field('Language:', <input type='text' name='lang' value='{ $lang }'/>)
 };
 
@@ -161,6 +170,69 @@ declare function form:index-map(
   map:merge((
     ($form:INDEX-OPTIONS, 'updindex'[$create]) ! map:entry(., $opts = .),
     $lang ! map:entry('language', .)
+  ))
+};
+
+(:~ Parsers that can be chosen for an input. :)
+declare %private variable $form:PARSERS := ('xml', 'html', 'json', 'csv', 'raw');
+
+(:~ Parsing options that can be assigned when resources are added. :)
+declare %private variable $form:PARSING-OPTIONS := ('intparse', 'dtd', 'stripns', 'stripws',
+  'xinclude', 'addarchives', 'archivename', 'addraw', 'skipcorrupt');
+
+(:~
+ : Creates the fields that decide how an input is read. They are labeled, so they belong to the
+ : fields of a dialog, not to the flags of the parsing options.
+ : @return form fields
+ :)
+declare function form:parsing-fields() as node()+ {
+  (: the parser is applied to every file of the input; it is configured by the options of
+     the server, which the dialog does not repeat :)
+  form:field('Input format:', <select name='parser'>{
+    $form:PARSERS ! element option { . }
+  }</select>),
+  (: the filter selects the files of a directory; the default is assigned by the server :)
+  form:field('Filter:', <input type='text' name='filter' placeholder='*.xml'
+                               title='File patterns, separated by commas'/>)
+};
+
+(:~
+ : Creates the parsing options of a database dialog. Kept next to form:parsing-map, which turns
+ : the same options into the arguments of the database operation.
+ : @param  $opts  checked options
+ : @return form fields
+ :)
+declare function form:parsing-options(
+  $opts  as xs:string*
+) as node()+ {
+  <h3>Parsing Options</h3>,
+  form:option('intparse', 'Use internal XML parser', $opts),
+  form:option('dtd', 'Parse DTDs and entities', $opts),
+  form:option('stripns', 'Strip namespaces', $opts),
+  form:option('stripws', 'Strip whitespace', $opts),
+  form:option('xinclude', 'Use XInclude', $opts),
+  form:option('addarchives', 'Parse files in archives', $opts),
+  form:option('archivename', 'Include name of archive in document path', $opts),
+  form:option('addraw', 'Add other files as binary files', $opts),
+  form:option('skipcorrupt', 'Skip corrupt (non-well-formed) files', $opts)
+};
+
+(:~
+ : Returns the parsing options of a database dialog as database options.
+ : @param  $opts    checked options
+ : @param  $filter  file filter (empty: use the default of the server)
+ : @param  $parser  parser (empty: use the default of the server)
+ : @return database options
+ :)
+declare function form:parsing-map(
+  $opts    as xs:string*,
+  $filter  as xs:string?,
+  $parser  as xs:string?
+) as map(*) {
+  map:merge((
+    $form:PARSING-OPTIONS ! map:entry(., $opts = .),
+    $filter[.] ! map:entry('createfilter', .),
+    $parser[.] ! map:entry('parser', .)
   ))
 };
 

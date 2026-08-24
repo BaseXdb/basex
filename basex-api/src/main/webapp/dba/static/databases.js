@@ -3,10 +3,12 @@
 /** Path of the endpoint that serves the panels and the queries of this view. */
 const DB_WS = "/databases";
 
-/** Selected database and resource. Both are part of the address: a link reproduces what the
-    panels show, and the browser history steps through the selections that were made. */
+/** Selected database and resource, and the directory of the database that is listed. All three
+    are part of the address: a link reproduces what the panels show, and the browser history
+    steps through the selections that were made. */
 let _db = "";
 let _resource = "";
+let _dir = "";
 
 /** Whether the shown document can be edited. */
 let _editable = false;
@@ -29,6 +31,7 @@ function selectDatabase(name) {
   if(name === _db) return;
   _db = name;
   _resource = "";
+  _dir = "";
   pushSelection();
   showDatabase();
 }
@@ -52,17 +55,38 @@ function selectResource(resource) {
 function pushSelection() {
   let url = replaceParam(window.location.href, "name", _db);
   url = replaceParam(url, "resource", _resource);
+  url = replaceParam(url, "dir", _dir);
   window.history.pushState({}, "", url);
+}
+
+/**
+ * Shows another directory of the selected database. The document that is open is left alone:
+ * it belongs to the database, not to the level it was chosen from.
+ * @param {string} dir directory; '..' steps up to the parent directory
+ */
+function enterDbDir(dir) {
+  _dir = dir === ".." ? _dir.replace(/[^/]+\/$/, "") : dir;
+  pushSelection();
+  refreshDatabase();
 }
 
 /**
  * Adopts the selection of the address bar, after a step in the browser history.
  */
 function popSelection() {
+  adoptSelection();
+  showDatabase();
+}
+
+/**
+ * Adopts the selection of the address bar. A link that names a resource alone opens the level
+ * that holds it, as the server does when it renders the page.
+ */
+function adoptSelection() {
   const params = new URLSearchParams(window.location.search);
   _db = params.get("name") ?? "";
   _resource = params.get("resource") ?? "";
-  showDatabase();
+  _dir = params.get("dir") ?? _resource.replace(/[^/]+$/, "");
 }
 
 /**
@@ -92,8 +116,8 @@ function refreshDatabases(sort, page) {
  * @param {number} page page; if omitted, the first one
  */
 function refreshDatabase(sort, page) {
-  requestPanel(DB_WS, "database-panel", { type: "database", name: _db, resource: _resource },
-    sort, page);
+  requestPanel(DB_WS, "database-panel",
+    { type: "database", name: _db, resource: _resource, dir: _dir }, sort, page);
 }
 
 /**
@@ -335,6 +359,17 @@ function replaceResource() {
 }
 
 /**
+ * Derives the target path of the Add dialog from the input that was entered: an input is
+ * stored under its own name, as it is in the GUI.
+ * @param {HTMLInputElement} input input field
+ */
+function deriveTarget(input) {
+  const segments = input.value.split(/[/\\]+/).filter(segment => segment);
+  // the input is stored where the panel is: the level that is listed is the target
+  document.getElementById("add-target").value = _dir + (segments.pop() || "");
+}
+
+/**
  * Opens the file chooser that uploads backups; choosing files submits them.
  */
 function chooseBackups() {
@@ -370,9 +405,7 @@ function initDatabases(editable) {
   // the panels are folded away, not dragged: one mechanism is enough to divide the page
   loadCodeMirror("xml", true, "fill");
 
-  const params = new URLSearchParams(window.location.search);
-  _db = params.get("name") ?? "";
-  _resource = params.get("resource") ?? "";
+  adoptSelection();
   initDocument(editable, undefined);
 
   window.addEventListener("popstate", popSelection);

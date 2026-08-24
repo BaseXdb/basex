@@ -574,6 +574,15 @@ function showDialog(id) {
 }
 
 /**
+ * Indicates whether a dialog is open. A dialog is answered by clicking the button it was
+ * opened from, so a view that refreshes itself must leave that button in the document.
+ * @returns {boolean} dialog state
+ */
+function dialogOpen() {
+  return document.querySelector("dialog[open]") !== null;
+}
+
+/**
  * Opens one of the dialogs that answer a question, and waits for the answer. Their forms are
  * submitted with 'method=dialog', so the clicked button's value is the answer; Escape closes
  * the dialog with an empty one.

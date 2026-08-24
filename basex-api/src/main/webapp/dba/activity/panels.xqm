@@ -5,11 +5,13 @@
  :)
 module namespace panels = 'dba/lib/panels';
 
-import module namespace config = 'dba/lib/config' at '../lib/config.xqm';
 import module namespace form = 'dba/lib/form' at '../lib/form.xqm';
 import module namespace html = 'dba/lib/html' at '../lib/html.xqm';
 import module namespace table = 'dba/lib/table' at '../lib/table.xqm';
 import module namespace utils = 'dba/lib/utils' at '../lib/utils.xqm';
+
+(:~ Maximum length of a session value that is shown in a table cell. :)
+declare %private variable $panels:PREVIEW := 100;
 
 (:~
  : Creates the contents of the jobs panel.
@@ -232,47 +234,136 @@ declare %private function panels:job-information(
 };
 
 (:~
- : Creates the contents of the web sessions panel.
+ : Creates the contents of the web sessions panel: what the sessions of the server hold. A
+ : value that was assigned by a Java application is shown as the object it is.
  : @return panel contents
  :)
 declare function panels:web-sessions() as element()+ {
   <form method='post' autocomplete='off'>
     <h2>Web Sessions</h2>
     {
+      let $current := session:id()
       let $headers := (
-        { 'key': 'name', 'label': 'Name' },
-        { 'key': 'value', 'label': 'Value' },
-        { 'key': 'access', 'label': 'Last Access', 'type': 'time', 'order': 'desc' },
-        { 'key': 'you', 'label': 'You' }
+        (: fixed widths: a value can be long, and is truncated rather than widening the table :)
+        { 'key': 'name', 'label': 'Name', 'type': 'dynamic', 'width': '17%' },
+        { 'key': 'value', 'label': 'Value', 'width': '21%' },
+        (: a time and a flag are as wide as they will ever be: they are given what they need,
+           not a share that grows with the panel. 'Access' rather than 'Last Access': a label
+           that does not fit its column is truncated as a value is :)
+        { 'key': 'access', 'label': 'Access', 'type': 'time', 'order': 'desc',
+          'width': '4.5rem' },
+        { 'key': 'you', 'label': 'You', 'width': '2.5rem' },
+        (: last, and with no width of its own: a session id is long, so it takes what the other
+           columns leave :)
+        { 'key': 'session', 'label': 'Session' }
       )
       let $entries :=
         for $id in sessions:ids()
         (: a session can be dropped between being listed and being read; skip the ones that
            are gone by then, rather than failing the whole panel :)
-        for $access in try { sessions:accessed($id) } catch sessions:not-found { }
-        let $you := if (session:id() = $id) then '✓' else '–'
-        (: supported session ids (application-specific, can be extended) :)
-        for $name in (try { sessions:names($id) } catch sessions:not-found { })
-          [. = ($config:SESSION-KEY, 'id')]
-        let $value := try {
-          sessions:get($id, $name)
-        } catch sessions:get {
-          '–' (: non-XQuery session value :)
-        }
-        let $string := utils:chop(serialize($value, { 'method': 'basex' }), 20)
-        order by $access descending
-        return {
-          'id': $id || '|' || $name,
-          'name': $name,
-          'value': $string,
-          'access': $access,
-          'you': $you
-        }
-      let $buttons := form:button('sessions/kill', 'Kill', ('CHECK', 'CONFIRM'))
-      (: a session is killed by its id, which is of no interest of its own :)
+        for $entry in try {
+          let $access := sessions:accessed($id)
+          (: a session that holds nothing gets a row of its own: it can be closed like any
+             other, and a session that is listed by none of its attributes could not be :)
+          for $name in (sessions:names($id) otherwise '')
+          let $value := if ($name) {
+            (: serialize more characters than requested, as the limit represents number of
+               bytes :)
+            utils:chop(serialize(sessions:get($id, $name), {
+              'method': 'basex', 'limit': $panels:PREVIEW * 2 + 1
+            }), $panels:PREVIEW)
+          }
+          return {
+            'id': $id || '|' || $name,
+            'session': $id,
+            'name': if ($name) { panels:attribute('session', $id, $name) } else { '–' },
+            'value': $value otherwise '–',
+            'access': $access,
+            'you': if ($id = $current) then '✓' else '–'
+          }
+        } catch sessions:not-found { }
+        (: the attributes of a session are listed in one block: they share its access time :)
+        order by $entry?access descending
+        return $entry
+      let $buttons := (
+        form:button('sessions/delete', 'Delete', ('CHECK', 'CONFIRM')),
+        form:button('sessions/close', 'Close', ('CHECK', 'CONFIRM'))
+      )
+      (: the checkbox submits the attribute: a session is not addressed by what it shows :)
       return table:create($headers, $entries, $buttons, {}, { 'select': 'id' })
     }
   </form>
+};
+
+(:~
+ : Creates the link of an attribute: the name that assigns its value.
+ : @param  $kind  what holds the attribute ('session', 'websocket')
+ : @param  $id    id of the session or connection
+ : @param  $name  attribute name
+ : @return function creating the link
+ :)
+declare %private function panels:attribute(
+  $kind  as xs:string,
+  $id    as xs:string,
+  $name  as xs:string
+) as fn() as element(a) {
+  fn() {
+    <a href='#' data-kind='{ $kind }' data-id='{ $id }' data-name='{ $name }'
+       title='Assign a new value' onclick='setAttribute(this.dataset); return false;'>{
+      $name
+    }</a>
+  }
+};
+
+(:~
+ : Creates the dialog that assigns a session attribute. As the dialog that starts a job, it is
+ : not part of a panel: the panels are replaced while the view refreshes.
+ : @return dialog
+ :)
+declare function panels:session-dialog() as element(dialog) {
+  panels:attribute-dialog('session', 'Session:', 'sessions/set')
+};
+
+(:~
+ : Creates the dialog that assigns an attribute of a WebSocket connection.
+ : @return dialog
+ :)
+declare function panels:websocket-dialog() as element(dialog) {
+  panels:attribute-dialog('websocket', 'WebSocket:', 'websockets/set')
+};
+
+(:~
+ : Creates the dialog that assigns an attribute. The ids of its fields are derived from what
+ : holds the attribute, so that the two dialogs of the view do not collide.
+ : @param  $kind    what holds the attribute ('session', 'websocket')
+ : @param  $label   label of the field that names it
+ : @param  $action  action the dialog posts to
+ : @return dialog
+ :)
+declare %private function panels:attribute-dialog(
+  $kind    as xs:string,
+  $label   as xs:string,
+  $action  as xs:string
+) as element(dialog) {
+  form:dialog($kind, 'Set Attribute', $action, false(), (
+    (: what holds the attribute is chosen in the panel; the name is not, so an attribute that
+       it does not hold yet can be assigned as well :)
+    form:field('Name:',
+      <input type='text' name='name' id='{ $kind }-name' class='wide' required=''
+             autofocus=''/>, 'stacked'),
+    (: no 'required': the editor hides the text area, and a hidden field that fails validation
+       cannot be focused, which would block the submit without telling the user why :)
+    form:field('Value:',
+      <textarea name='value' id='{ $kind }-value' class='wide' rows='8'/>, 'stacked'),
+    (: what is assigned is stated below what assigns it; it is nothing to fill in, so it is
+       written out, and submitted by a field of its own :)
+    form:field($label, (
+      <span id='{ $kind }-text'/>,
+      <input type='hidden' name='id' id='{ $kind }-id'/>
+    )),
+    (: filled in by the client if the value it fetched cannot be shown :)
+    <div id='{ $kind }-note' class='note'/>
+  ))
 };
 
 (:~
@@ -307,6 +398,74 @@ declare function panels:caches() as element(form) {
       (: the checkbox submits the name: the default cache is addressed by an empty one :)
       return table:create($headers, $entries, $buttons, {},
         { 'sticky': <h2>Caches</h2>, 'compact': true(), 'select': 'cache' })
+    }
+  </form>
+};
+
+(:~
+ : Creates the contents of the WebSockets panel: the connections that are open, and the paths
+ : they were opened on. What a connection holds is its own; what the server can do with it is
+ : to close it.
+ : @return panel contents
+ :)
+declare function panels:websockets() as element(form) {
+  <form method='post' autocomplete='off'>
+    <h2>WebSockets</h2>
+    {
+      let $headers := (
+        (: fixed widths: a value can be long, and is truncated rather than widening the table :)
+        { 'key': 'name', 'label': 'Name', 'type': 'dynamic', 'width': '16%' },
+        { 'key': 'value', 'label': 'Value', 'width': '22%' },
+        (: how long a connection has been idle; what it was opened on, by whom and from where
+           is stated by the connection itself, which has no column of its own :)
+        { 'key': 'accessed', 'label': 'Access', 'type': 'time', 'order': 'desc',
+          'width': '4.5rem' },
+        { 'key': 'websocket', 'label': 'ID', 'type': 'dynamic', 'width': '14%' },
+        (: last, and with no width of its own: a session id is long, so it takes what the
+           other columns leave :)
+        { 'key': 'session', 'label': 'Session' }
+      )
+      let $entries :=
+        for $ws in ws:list-details()
+        let $id := string($ws/@id)
+        (: a connection can be closed between being listed and being read; skip the ones that
+           are gone by then, rather than failing the whole panel :)
+        for $entry in try {
+          (: a connection that holds nothing gets a row of its own: it can be closed like any
+             other, and a connection that is listed by none of its attributes could not be :)
+          for $name in (sort(ws:names($id), '?lang=en') otherwise '')
+          let $value := if ($name) {
+            (: serialize more characters than requested, as the limit represents number of
+               bytes :)
+            utils:chop(serialize(ws:get($id, $name), {
+              'method': 'basex', 'limit': $panels:PREVIEW * 2 + 1
+            }), $panels:PREVIEW)
+          }
+          return {
+            'id': $id || '|' || $name,
+            (: the tooltip carries what a column of its own would cost more than it is worth:
+               the path, the user and the address of the client, and the time of the handshake :)
+            'websocket': fn() {
+              <span title='{ string-join(($ws/@path, $ws/@user, $ws/@address,
+                'opened ' || html:date(xs:dateTime($ws/@created))), ', ') }'>{ $id }</span>
+            },
+            'name': if ($name) { panels:attribute('websocket', $id, $name) } else { '–' },
+            'value': $value otherwise '–',
+            'accessed': data($ws/@accessed),
+            (: the session that was authenticated for the handshake: it names the row of the
+               Web Sessions panel that the connection belongs to :)
+            'session': data($ws/@session) otherwise '–'
+          }
+        } catch ws:not-found { }
+        (: the attributes of a connection are listed in one block: they share its times :)
+        order by $entry?accessed descending
+        return $entry
+      let $buttons := (
+        form:button('websockets/delete', 'Delete', ('CHECK', 'CONFIRM')),
+        form:button('websockets/close', 'Close', ('CHECK', 'CONFIRM'))
+      )
+      (: the checkbox submits the attribute: a connection is not addressed by what it shows :)
+      return table:create($headers, $entries, $buttons, {}, { 'select': 'id' })
     }
   </form>
 };

@@ -111,6 +111,16 @@ public final class DBATest extends WebappTest {
   }
 
   /**
+   * Runs a query in the context of the HTTP server and returns its result.
+   * @param query query
+   * @return result
+   * @throws Exception exception
+   */
+  static String evaluate(final String query) throws Exception {
+    return new XQuery(query).execute(HTTPContext.get().context());
+  }
+
+  /**
    * Runs a query that cleans up after a test, ignoring what does not exist any more.
    * @param query query
    * @throws Exception exception
@@ -218,6 +228,68 @@ public final class DBATest extends WebappTest {
       final String dialog = dialog(get("databases?name=" + DB), "optimize");
       assertTrue(dialog.contains("value=\"textindex\" checked"), "text index not enabled");
       assertFalse(dialog.contains("value=\"attrindex\" checked"), "attribute index not disabled");
+    }
+
+    /**
+     * Creates a database from an input that the server reads, and adds the same input again:
+     * a target path is what an input is stored under, and what a second run replaces.
+     * @throws Exception exception
+     */
+    @Test public void createWithInput() throws Exception {
+      final IOFile dir = new IOFile(sandbox(), "import");
+      final IOFile sub = new IOFile(dir, "sub");
+      sub.md();
+      new IOFile(dir, "a.xml").write("<a/>");
+      new IOFile(sub, "b.xml").write("<b/>");
+      try {
+        assertTrue(post("databases/create", Map.of("name", DB, "input", dir.path())).
+            contains("was created"), "database not created");
+        assertEquals("a.xml sub/b.xml", resources(), "unexpected resources");
+
+        post("databases/put", Map.of("name", DB, "input", dir.path(), "target", "import"));
+        post("databases/put", Map.of("name", DB, "input", dir.path(), "target", "import"));
+        assertEquals("a.xml import/a.xml import/sub/b.xml sub/b.xml", resources(),
+            "input not replaced by the second run");
+      } finally {
+        dir.delete();
+      }
+    }
+
+    /**
+     * The parser of the create dialog is applied to the input.
+     * @throws Exception exception
+     */
+    @Test public void createWithParser() throws Exception {
+      final IOFile file = new IOFile(sandbox(), "input.json");
+      file.write("{ \"city\": \"Konstanz\" }");
+      try {
+        post("databases/create", Map.of("name", DB, "input", file.path(), "parser", "json",
+            "filter", "*.json"));
+        assertEquals("<json type=\"object\"><city>Konstanz</city></json>",
+            evaluate("db:get('" + DB + "')/*"), "input not parsed as JSON");
+      } finally {
+        file.delete();
+      }
+    }
+
+    /**
+     * An input without a target path is rejected: an empty one would address the database as
+     * a whole, and delete what the input does not supply.
+     * @throws Exception exception
+     */
+    @Test public void inputWithoutTarget() throws Exception {
+      create();
+      assertTrue(post("databases/put", Map.of("name", DB, "input", "x.xml")).
+          contains("Target path is required"), "missing target not reported");
+    }
+
+    /**
+     * Returns the resources of the test database, separated by spaces.
+     * @return resources
+     * @throws Exception exception
+     */
+    private String resources() throws Exception {
+      return evaluate("string-join(sort(db:list('" + DB + "')), ' ')");
     }
 
     /**
@@ -1046,6 +1118,117 @@ public final class DBATest extends WebappTest {
      */
     private static Services services() {
       return HTTPContext.get().context().services;
+    }
+  }
+
+  /**
+   * Tests for the web sessions panel of the Activity view.
+   */
+  @Nested final class Sessions {
+    /** Test attribute. */
+    private static final String ATTRIBUTE = "dba-junit-attribute";
+    /** Pattern that isolates the id of a session from the checkbox of one of its rows. */
+    private static final Pattern SESSION = Pattern.compile("name=\"id\" value=\"(.*?)\\|");
+
+    /**
+     * Removes the test attribute from all sessions after each test.
+     * @throws Exception exception
+     */
+    @AfterEach public void cleanup() throws Exception {
+      discard("sessions:ids() ! sessions:delete(., '" + ATTRIBUTE + "')");
+    }
+
+    /**
+     * The attribute that holds the login is listed.
+     * @throws Exception exception
+     */
+    @Test public void listed() throws Exception {
+      assertTrue(get("activity").contains("data-name=\"dba\""),
+          "login attribute missing from the panel");
+    }
+
+    /**
+     * An attribute is assigned, listed and deleted.
+     * @throws Exception exception
+     */
+    @Test public void assign() throws Exception {
+      final String id = session();
+      assertTrue(post("sessions/set", Map.of("id", id, "name", ATTRIBUTE, "value", "1 + 1")).
+          contains("Attribute \"" + ATTRIBUTE + "\" was assigned."), "attribute not assigned");
+      assertTrue(get("activity").contains(ATTRIBUTE), "attribute missing from the panel");
+
+      assertTrue(post("sessions/delete", Map.of("id", id + '|' + ATTRIBUTE)).
+          contains("Attribute \"" + ATTRIBUTE + "\" was deleted."), "attribute not deleted");
+      assertFalse(get("activity").contains(ATTRIBUTE), "attribute still listed");
+    }
+
+    /**
+     * The value of an attribute is served as the expression that yields it again.
+     * @throws Exception exception
+     */
+    @Test public void value() throws Exception {
+      final String id = session();
+      post("sessions/set", Map.of("id", id, "name", ATTRIBUTE, "value", "'x', 1"));
+      assertTrue(get("session-value?id=" + id + "&name=" + ATTRIBUTE).
+          contains("(\\\"x\\\", 1)"), "value not served as an expression");
+    }
+
+    /**
+     * A value that exceeds the maximum output size is left out, with a note.
+     * @throws Exception exception
+     */
+    @Test public void largeValue() throws Exception {
+      final String id = session();
+      post("sessions/set", Map.of("id", id, "name", ATTRIBUTE,
+          "value", "string-join((1 to 1100000) ! 'x')"));
+      final String answer = get("session-value?id=" + id + "&name=" + ATTRIBUTE);
+      assertTrue(answer.contains("\"text\":\"\""), "large value was served");
+      assertTrue(answer.contains("too large"), "large value was served without a note");
+    }
+
+    /**
+     * A session that holds no attribute is listed, and can be closed.
+     * @throws Exception exception
+     */
+    @Test public void empty() throws Exception {
+      // the login is repeated with fresh cookies, which leaves the first session behind
+      final String id = session();
+      dropCookies();
+      assertFalse(post("login", Map.of("_name", "admin", "_pass", NAME)).contains("_pass"),
+          "second login failed");
+      execute("sessions:delete('" + id + "', 'dba')");
+      assertTrue(get("activity").contains("value=\"" + id + "|\""),
+          "session that holds no attribute is not listed");
+
+      // the row of such a session names no attribute: there is nothing to delete
+      assertTrue(post("sessions/delete", Map.of("id", id + '|')).
+          contains("0 attributes were deleted."), "delete was not a no-op");
+      assertTrue(post("sessions/close", Map.of("id", id + '|')).
+          contains("Session \"" + id + "\" was closed."), "session not closed");
+      assertFalse(sessions().contains(id), "closed session still listed");
+    }
+
+    /**
+     * Returns the id of the session of the test client, which is the only one that is listed.
+     * @return session id
+     * @throws IOException I/O exception
+     */
+    private String session() throws IOException {
+      final Set<String> ids = sessions();
+      assertEquals(1, ids.size(), "unexpected number of sessions: " + ids);
+      return ids.iterator().next();
+    }
+
+    /**
+     * Returns the ids of the listed sessions.
+     * @return session ids
+     * @throws IOException I/O exception
+     */
+    private Set<String> sessions() throws IOException {
+      final Set<String> ids = new HashSet<>();
+      final Matcher matcher = SESSION.matcher(get("activity"));
+      while(matcher.find()) ids.add(matcher.group(1));
+      return ids;
     }
   }
 

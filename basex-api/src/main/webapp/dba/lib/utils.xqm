@@ -36,6 +36,52 @@ declare function utils:query-parse(
 };
 
 (:~
+ : Evaluates a query, considering the configured limits.
+ : @param  $query  query string
+ : @return result
+ :)
+declare function utils:evaluate(
+  $query  as xs:string?
+) as item()* {
+  xquery:eval($query, (), {
+    'permission': config:get($config:PERMISSION),
+    'timeout'   : config:get($config:TIMEOUT),
+    'memory'    : config:get($config:MEMORY),
+    'pass'      : true()
+  })
+};
+
+(:~
+ : Serializes a value as the expression that yields it again, so that what is shown can be
+ : stored back.
+ : @param  $value  value
+ : @return expression text, and whether it was truncated
+ :)
+declare function utils:expression(
+  $value  as item()*
+) as map(*) {
+  let $max := config:get($config:MAXCHARS)
+  (: what holds further values is laid out over several lines :)
+  let $serialized := serialize($value, {
+    'method': 'adaptive', 'expression': true(), 'indent': true(), 'limit': $max * 2 + 1
+  })
+  (: a single item is an expression of its own: the parentheses that the expression method puts
+     around every sequence are dropped for it. A truncated text has lost its closing one, and is
+     left as it is :)
+  let $text := if (count($value) = 1 and starts-with($serialized, '(') and
+      ends-with($serialized, ')')) {
+    substring($serialized, 2, string-length($serialized) - 2)
+  } else {
+    $serialized
+  }
+  let $truncated := string-length($text) > $max
+  return {
+    'text': if ($truncated) { substring($text, 1, $max) } else { $text },
+    'truncated': $truncated
+  }
+};
+
+(:~
  : Serializes a value, considering the specified system limits.
  : @param  $value  value
  : @return string

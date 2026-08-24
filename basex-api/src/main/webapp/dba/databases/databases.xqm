@@ -19,6 +19,7 @@ declare variable $dba:CAT := 'databases';
  : refreshes the panels over the connection the view opens for its queries.
  : @param  $name      selected database
  : @param  $resource  selected resource
+ : @param  $dir       directory that is listed
  : @param  $info      info string
  : @param  $error     error string
  : @return page
@@ -28,20 +29,25 @@ declare
   %rest:path('/dba/databases')
   %rest:query-param('name',     '{$name}', '')
   %rest:query-param('resource', '{$resource}', '')
+  %rest:query-param('dir',      '{$dir}', '')
   %rest:query-param('info',     '{$info}')
   %rest:query-param('error',    '{$error}')
   %output:method('html')
 function dba:databases(
   $name      as xs:string,
   $resource  as xs:string,
+  $dir       as xs:string,
   $info      as xs:string?,
   $error     as xs:string?
 ) as element(html) {
   (: the document is needed twice: its text fills the editor, its properties the panel :)
   let $document := panels:document($name, $resource)
+  (: a link that names a resource alone opens the level that holds it; the client derives the
+     directory in the same way :)
+  let $dir := $dir[.] otherwise replace($resource, '[^/]+$', '')
   (: a panel is labelled in the markup, not by its heading: it keeps its name while it is
      folded away, and while it has nothing to show and is hidden :)
-  let $database := panels:database($name, '', 1, $resource)
+  let $database := panels:database($name, '', 1, $resource, $dir)
   let $information := panels:information($name)
   (: the panels follow the selection, and are not remembered: while a document is shown, what
      it was chosen from steps back to a strip; without one, the lists are what there is to see :)
@@ -180,7 +186,11 @@ function dba:action(
         if (db:exists($args?name)) {
           error((), 'Database already exists.')
         } else {
-          db:create($args?name, (), (), form:index-map($args?opts, $args?lang, true()))
+          (: without an input, an empty database is created :)
+          db:create($args?name, $args?input[.], (), map:merge((
+            form:index-map($args?opts, $args?lang, true()),
+            form:parsing-map($args?opts, $args?filter, $args?parser)
+          )))
         }
       }
     } },
@@ -246,23 +256,35 @@ function dba:action(
     },
     'put': fn($args) {
       let $files := $args?files[. instance of map(*)] otherwise {}
+      let $input := $args?input[.]
+      let $target := $args?target[.]
       return {
         'params': { 'name': $args?name },
-        'info'  : utils:info(map:keys($files), 'resource', 'added'),
+        (: an input may stand for a single file or for the contents of a directory :)
+        'info'  : utils:info((map:keys($files), $input), 'resource', 'added'),
         'run'   : %updating fn() {
-          if (map:size($files) = 0) {
+          if (map:size($files) = 0 and empty($input)) {
             error((), 'No input specified.')
-          } else if ($args?binary) {
-            for key $path value $content in $files
-            return db:put-binary($args?name, $content, $path)
+          } else if ($input and empty($target)) {
+            (: an empty target addresses the database as a whole: what the input does not
+               supply would be deleted :)
+            error((), 'Target path is required.')
           } else {
-            (: the input is parsed here, so that a broken document is reported as an error
-               instead of failing when the pending updates are applied :)
-            let $options := map:merge(
-              ('intparse', 'dtd', 'stripns', 'stripws', 'xinclude') !
-                map:entry(., $args?opts = .))
-            for key $path value $content in $files
-            return db:put($args?name, fetch:binary-doc($content), $path, $options)
+            let $options := form:parsing-map($args?opts, $args?filter, $args?parser)
+            return (
+              if ($args?binary) {
+                for key $path value $content in $files
+                return db:put-binary($args?name, $content, $path)
+              } else {
+                (: the input is parsed here, so that a broken document is reported as an error
+                   instead of failing when the pending updates are applied :)
+                for key $path value $content in $files
+                return db:put($args?name, fetch:binary-doc($content), $path, $options)
+              },
+              (: a directory or an archive is expanded, and the paths it contains are kept
+                 below the target; what is stored there already is replaced :)
+              $input ! db:put($args?name, ., $target, $options)
+            )
           }
         }
       }

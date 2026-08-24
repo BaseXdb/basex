@@ -10,6 +10,10 @@ let _indent_changed;
 /** Link to the CodeMirror editor component. */
 let _editor;
 
+/** All editors, by the id of the text area each of them replaced. The editor of record is
+    among them; the others are only edited and submitted with their form. */
+const _editors = {};
+
 /** Link to the CodeMirror output component. */
 let _output;
 
@@ -62,6 +66,18 @@ function editorValue() {
 }
 
 /**
+ * Assigns the content of one of the editors. Without CodeMirror, all but the first text area
+ * are left as they are, and are written to directly.
+ * @param {string} id id of the text area the editor replaced
+ * @param {string} text new content
+ */
+function setEditorText(id, text) {
+  const editor = _editors[id];
+  if(editor) editor.setValue(text);
+  else document.getElementById(id).value = text;
+}
+
+/**
  * Sets the read-only state of the resource editor (CodeMirror or plain textarea).
  * @param {boolean} readOnly read-only state
  */
@@ -88,9 +104,9 @@ function loadCodeMirror(language, edit, resize) {
       const editorArea = document.getElementById(id);
       if(!editorArea) continue;
       if(_editor) {
-        if(useCM) CM6.fromTextArea(editorArea, { language });
+        if(useCM) _editors[id] = CM6.fromTextArea(editorArea, { language });
       } else if(useCM) {
-        _editor = CM6.fromTextArea(editorArea, {
+        _editor = _editors[id] = CM6.fromTextArea(editorArea, {
           language,
           // Lezer-driven syntax-error gutter, only for the XQuery editor
           parseErrors: language === "xquery",
@@ -106,7 +122,7 @@ function loadCodeMirror(language, edit, resize) {
           _editor.focus();
         };
       } else {
-        _editor = {
+        _editor = _editors[id] = {
           setValue(v) { editorArea.value = v; },
           getValue() { return editorArea.value; },
           clearHistory() {},

@@ -103,6 +103,13 @@ public abstract class WebappTest extends HTTPTest {
   }
 
   /**
+   * Drops the cookies of the client, so that the next login starts a session of its own.
+   */
+  protected static void dropCookies() {
+    ((CookieManager) client.cookieHandler().orElseThrow()).getCookieStore().removeAll();
+  }
+
+  /**
    * Sends a GET request.
    * @param path path relative to the application root
    * @return response body

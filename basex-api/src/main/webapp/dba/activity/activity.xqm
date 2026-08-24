@@ -57,13 +57,18 @@ function dba:activity(
     </div>,
     (: rarely of interest: the panels open on demand :)
     <div class='panel collapsed'>
-      <div id='db-panel' class='pane'>{ panels:db-sessions() }</div>
+      <div id='ws-panel' class='pane'>{ panels:websockets() }</div>
     </div>,
     <div class='panel collapsed'>
       <div id='caches-panel' class='pane'>{ panels:caches() }</div>
     </div>,
-    (: outside the panels: they are replaced by the refresh, the dialog is not :)
+    <div class='panel collapsed'>
+      <div id='db-panel' class='pane'>{ panels:db-sessions() }</div>
+    </div>,
+    (: outside the panels: they are replaced by the refresh, the dialogs are not :)
     panels:job-dialog(),
+    panels:session-dialog(),
+    panels:websocket-dialog(),
     (: the result of a job that was closed: submitted as soon as the page is there, and the
        request that fetches the file is what consumes the job :)
     if ($download) {

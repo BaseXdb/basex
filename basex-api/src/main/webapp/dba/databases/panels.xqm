@@ -86,25 +86,38 @@ declare function panels:databases(
        database gets when nothing is chosen :)
     form:dialog('create', 'Create Database', 'databases/create', false(), (
       form:field('Name:', <input type='text' name='name' autofocus='' required=''/>),
-      form:index-options(('textindex', 'attrindex'), 'en', true())
+      (: the initial content is addressed on the server: a database that is created without
+         it is empty, and is filled by the Add dialog :)
+      form:field('Input:', <input type='text' name='input' class='wide'
+                                  placeholder='File, directory, archive or URL'/>),
+      form:parsing-fields(),
+      form:language-field('en'),
+      (: how the input is parsed, and what is indexed: two columns, as one would be a list
+         that is longer than the screen :)
+      <div class='field-columns'>{
+        <div>{ form:parsing-options(()) }</div>,
+        <div>{ form:index-options(('textindex', 'attrindex'), true()) }</div>
+      }</div>
     ))
   )
 };
 
 (:~
- : Creates the contents of the database panel: the resources of the selected database, its
- : backups, and the index configuration that its next optimization applies.
+ : Creates the contents of the database panel: one level of the selected database, its backups,
+ : and the index configuration that its next optimization applies.
  : @param  $name      selected database
  : @param  $sort      sort key of the resource list
  : @param  $page      current page of the resource list
  : @param  $resource  selected resource
+ : @param  $dir       directory that is listed; empty string for the root of the database
  : @return panel contents; empty if no database is selected
  :)
 declare function panels:database(
   $name      as xs:string?,
   $sort      as xs:string,
   $page      as xs:integer,
-  $resource  as xs:string?
+  $resource  as xs:string?,
+  $dir       as xs:string
 ) as element()* {
   if (not($name)) {
     (: nothing is selected: the panel is not shown, so it needs no placeholder :)
@@ -117,24 +130,43 @@ declare function panels:database(
       <input type='hidden' name='name' value='{ $name }'/>
       {
         let $headers := (
-          { 'key': 'resource', 'label': 'Name', 'type': 'dynamic', 'width': '47%' },
+          { 'key': 'name', 'label': 'Name', 'type': 'dynamic', 'width': '47%' },
           { 'key': 'type', 'label': 'Type', 'width': '10%' },
           { 'key': 'size', 'label': 'Size', 'type': 'number', 'order': 'desc', 'width': '14%' },
           { 'key': 'date', 'label': 'Date', 'type': 'dateTime', 'order': 'desc',
             'width': '29%' }
         )
+        (: one level of the database, directories first; a level is what a database of many
+           resources is browsed by, and what its total is counted over :)
+        let $level :=
+          for $entry in db:dir($name, $dir)
+          order by boolean($entry/self::dir) descending, string($entry) collation '?lang=en'
+          return $entry
         let $entries :=
-          for $res in utils:slice(db:list-details($name), $page, $sort)
-          let $path := string($res)
+          for $entry in utils:slice($level, $page, $sort)
+          let $label := string($entry)
+          let $directory := boolean($entry/self::dir)
+          (: a directory is entered, a resource is opened; the path of a directory ends with a
+             slash, so it is never taken for the resource that is selected :)
+          let $path := $dir || $label || '/'[$directory]
           return {
-            'resource': panels:select($path, { 'name': $name, 'resource': $path },
-              $path = $resource),
-            'type': $res/@type,
-            'size': $res/@size,
-            'date': $res/@modified-date
+            'name': if ($directory) {
+              fn() { panels:enter($label || '/', $name, $path) }
+            } else {
+              panels:select($label, { 'name': $name, 'resource': $path }, $path = $resource)
+            },
+            (: the checkbox submits the full path, which is what an action addresses :)
+            'resource': $path,
+            'type': $entry/@type,
+            'size': $entry/@size,
+            'date': $entry/@modified-date
           }
         (: what applies to the database comes first; the row wraps only if it has to :)
         let $buttons := (
+          <button type='button' onclick='enterDbDir("..")'
+                  title='Go to the parent directory'>{
+            attribute disabled { }[not($dir)], '..'
+          }</button>,
           <button type='button' onclick='renameDatabase()'>Rename…</button>,
           <button type='button' onclick='copyDatabase()'>Copy…</button>,
           <button type='button' onclick='showDialog("optimize")'>Optimize…</button>,
@@ -144,40 +176,60 @@ declare function panels:database(
         let $options := {
           'sort': $sort,
           'page': $page,
-          (: the total is only read while the entries are not re-sorted; enumerating a database
-             of six-figure size for a number that is then discarded is not free :)
-          'count': if ($sort) { () } else { count(db:list($name)) },
+          (: the entries of one level are known, so the total is what they are counted by :)
+          'count': if ($sort) { () } else { count($level) },
+          'select': 'resource',
           (: the database and what can be done with it stay in view while its resources scroll :)
           'sticky': <h2>{
             'Database: ',
-            (: the link clears the selected resource, and with it the document that is shown :)
+            (: the name returns to the root of the database and clears the selected resource,
+               and with it the document that is shown :)
             <a href='{ web:create-url($panels:CAT, { 'name': $name }) }'
-               onclick='selectResource(""); return false;'>{ $name }</a>
+               onclick='enterDbDir(""); selectResource(""); return false;'>{ $name }</a>,
+            (: every step of the path enters the level it names; the document stays open :)
+            (
+              let $steps := tokenize($dir, '/')[.]
+              for $step at $pos in $steps
+              return ('/', panels:enter($step, $name,
+                string-join(subsequence($steps, 1, $pos), '/') || '/'))
+            )
           }</h2>
         }
         return table:create($headers, $entries, $buttons, { 'name': $name }, $options)
       }
     </form>,
 
-    (: the resources are stored under their own names; how they are parsed is chosen here :)
+    (: the resources are stored under their own names; how they are parsed is chosen here.
+       Files are uploaded by the browser, an input is read by the server: either of them
+       adds resources, and both of them may be supplied at once :)
     form:dialog('add', 'Add Resources', 'databases/put', true(), (
       <input type='hidden' name='name' value='{ $name }'/>,
-      form:field('Input:', <input type='file' name='files' multiple='multiple' required=''/>),
-      form:field('Binary Storage:', form:checkbox('binary', 'true', false(), '')),
-      <h3>Parsing Options</h3>,
-      form:option('intparse', 'Use internal XML parser', ()),
-      form:option('dtd', 'Parse DTDs and entities', ()),
-      form:option('stripns', 'Strip namespaces', ()),
-      form:option('stripws', 'Strip whitespace', ()),
-      form:option('xinclude', 'Use XInclude', ())
+      (: what is added, and how it is parsed: two columns, as one would be a list that is
+         longer than the screen :)
+      <div class='field-columns'>{
+        <div>{
+          <h3>Resources</h3>,
+          form:field('Files:', <input type='file' name='files' multiple='multiple'/>),
+          form:field('Input:', <input type='text' name='input' class='wide'
+                                      placeholder='File, directory, archive or URL'
+                                      oninput='deriveTarget(this);'/>),
+          (: the path the input is stored under: it replaces what is found there, and an
+             empty one would address the database as a whole :)
+          form:field('Target:', <input type='text' name='target' id='add-target' class='wide'/>),
+          form:field('Binary Storage:', form:checkbox('binary', 'true', false(), '')),
+          form:parsing-fields()
+        }</div>,
+        <div>{ form:parsing-options(()) }</div>
+      }</div>
     )),
     (: the index configuration is not a report: it is what the next optimization applies :)
     (: one read of the database properties supplies both the index flags and the language :)
     let $info := db:info($name)
     return form:dialog('optimize', 'Optimize Database', 'databases/optimize-db', false(), (
       <input type='hidden' name='name' value='{ $name }'/>,
+      form:language-field($info//language),
       form:checkbox('all', 'true', false(), 'Full optimization'),
-      form:index-options($info//*[text() = 'true']/name(), $info//language, false())
+      form:index-options($info//*[text() = 'true']/name(), false())
     )),
     (: the new name of the database is asked for; the chosen action decides what is done with it :)
     <form method='post' autocomplete='off' id='database-form'>
@@ -337,6 +389,24 @@ declare function panels:document(
       ))[not($editable)]
     }
   }
+};
+
+(:~
+ : Creates a link that enters a directory of a database. The reference is a deep link naming
+ : the directory in full; following it in place leaves the other panels alone.
+ : @param  $label  link label
+ : @param  $name   database
+ : @param  $dir    directory the link refers to
+ : @return function creating the link
+ :)
+declare %private function panels:enter(
+  $label  as xs:string,
+  $name   as xs:string,
+  $dir    as xs:string
+) as element(a) {
+  <a href='{ web:create-url($panels:CAT, { 'name': $name, 'dir': $dir }) }'
+     data-dir='{ $dir }'
+     onclick='enterDbDir(this.dataset.dir); return false;'>{ $label }</a>
 };
 
 (:~

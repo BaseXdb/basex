@@ -5,7 +5,6 @@
  :)
 module namespace panels = 'dba/lib/stores-panels';
 
-import module namespace config = 'dba/lib/config' at '../lib/config.xqm';
 import module namespace form = 'dba/lib/form' at '../lib/form.xqm';
 import module namespace html = 'dba/lib/html' at '../lib/html.xqm';
 import module namespace table = 'dba/lib/table' at '../lib/table.xqm';
@@ -260,28 +259,16 @@ declare function panels:value(
     (: the store itself has no value, and a path that is gone leads to none :)
     { 'exists': false(), 'text': '' }
   } else {
-    let $max := config:get($config:MAXCHARS)
     (: the value is written as the expression that yields it again, so that what is edited here
-       can be stored again; what holds further values is laid out over several lines :)
-    let $serialized := serialize($value, {
-      'method': 'adaptive', 'expression': true(), 'indent': true(), 'limit': $max * 2 + 1
-    })
-    (: a single item is an expression of its own: the parentheses that the expression method
-       puts around every sequence are dropped for it. A truncated text has lost its closing
-       one, and is left as it is :)
-    let $text := if (count($value) = 1 and starts-with($serialized, '(') and
-        ends-with($serialized, ')')) {
-      substring($serialized, 2, string-length($serialized) - 2)
-    } else {
-      $serialized
-    }
-    let $truncated := string-length($text) > $max
+       can be stored again :)
+    let $expression := utils:expression($value)
+    let $truncated := $expression?truncated
     (: a written value is rebuilt along its path, so a step that names a position cannot be :)
     let $addressable := every $step in $path satisfies not($step instance of map(*))
     return {
       'exists'   : true(),
       'editable' : $addressable and not($truncated),
-      'text'     : if ($truncated) { substring($text, 1, $max) } else { $text },
+      'text'     : $expression?text,
       (: reason why the value cannot be replaced :)
       'note': if ($truncated) {
         'Read-only: the value is too large for editing.'

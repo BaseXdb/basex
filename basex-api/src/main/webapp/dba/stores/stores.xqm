@@ -5,7 +5,6 @@
  :)
 module namespace dba = 'dba/stores';
 
-import module namespace config = 'dba/lib/config' at '../lib/config.xqm';
 import module namespace html = 'dba/lib/html' at '../lib/html.xqm';
 import module namespace panels = 'dba/lib/stores-panels' at 'panels.xqm';
 import module namespace utils = 'dba/lib/utils' at '../lib/utils.xqm';
@@ -91,7 +90,7 @@ function dba:store-save(
   $path   as xs:string,
   $query  as xs:string?
 ) {
-  dba:put($name, panels:steps($path), dba:evaluate($query)),
+  dba:put($name, panels:steps($path), utils:evaluate($query)),
   update:output('')
 };
 
@@ -124,7 +123,7 @@ function dba:action(
         'params': dba:selection($args, head($path)),
         'info'  : utils:info($path[last()], 'entry', 'added'),
         (: the value is any XQuery value: it is supplied as the expression that yields it :)
-        'run'   : %updating fn() { dba:add($args?name, $path, dba:evaluate($args?value)) }
+        'run'   : %updating fn() { dba:add($args?name, $path, utils:evaluate($args?value)) }
       }
     },
     'remove': fn($args) {
@@ -242,7 +241,7 @@ declare %private function dba:key(
   $query  as xs:string?,
   $entry  as xs:boolean
 ) as xs:anyAtomicType {
-  let $key := dba:evaluate($query)
+  let $key := utils:evaluate($query)
   return if (count($key) != 1 or not($key instance of xs:anyAtomicType)) {
     error((), 'The key must be a single atomic value.')
   } else if ($entry and not($key instance of xs:string)) {
@@ -250,20 +249,4 @@ declare %private function dba:key(
   } else {
     $key
   }
-};
-
-(:~
- : Evaluates the expression that yields the value of an entry.
- : @param  $query  query string
- : @return value
- :)
-declare %private function dba:evaluate(
-  $query  as xs:string?
-) as item()* {
-  xquery:eval($query, (), {
-    'permission': config:get($config:PERMISSION),
-    'timeout'   : config:get($config:TIMEOUT),
-    'memory'    : config:get($config:MEMORY),
-    'pass'      : true()
-  })
 };

@@ -257,4 +257,75 @@ public final class WsPoolTest extends WsTest {
       close(ws);
     }
   }
+
+  /**
+   * {@code ws:list-details} reports the properties of a connection; an unknown ID yields an
+   * empty sequence.
+   * @throws Exception exception
+   */
+  @Test public void listDetails() throws Exception {
+    register(
+        "declare %ws:message('/p', '{$m}') function m:msg($m) {" +
+        "  switch($m)" +
+        "    case 'own'     return ws:emit(serialize(ws:list-details(ws:id())))" +
+        "    case 'all'     return ws:emit('count=' || count(ws:list-details()))" +
+        "    case 'unknown' return ws:emit('count=' || count(ws:list-details('websocket-none')))" +
+        "    default        return ws:emit('?')" +
+        "};");
+
+    final Listener l = new Listener();
+    final java.net.http.WebSocket ws = connect("/p", l);
+    try {
+      ws.sendText("own", true).get(5, TimeUnit.SECONDS);
+      final String xml = l.pollText();
+      assertTrue(xml.startsWith("<websocket "), "Unexpected element: " + xml);
+      assertTrue(xml.contains("path=\"/p\""), "Path missing: " + xml);
+      assertTrue(xml.contains("created=\""), "Creation time missing: " + xml);
+      assertTrue(xml.contains("accessed=\""), "Access time missing: " + xml);
+
+      ws.sendText("all", true).get(5, TimeUnit.SECONDS);
+      assertEquals("count=1", l.pollText());
+      ws.sendText("unknown", true).get(5, TimeUnit.SECONDS);
+      assertEquals("count=0", l.pollText());
+    } finally {
+      close(ws);
+    }
+  }
+
+  /**
+   * {@code ws:names} lists the attributes of a connection; an unknown ID is rejected.
+   * @throws Exception exception
+   */
+  @Test public void names() throws Exception {
+    register(
+        "declare %ws:message('/p', '{$m}') function m:msg($m) {" +
+        "  let $id := ws:id()" +
+        "  return switch($m)" +
+        "    case 'set'     return (ws:set($id, 'a', 1), ws:set($id, 'b', 2), ws:emit('done'))" +
+        "    case 'delete'  return (ws:delete($id, 'a'), ws:emit('done'))" +
+        "    case 'names'   return ws:emit('names=' || string-join(sort(ws:names($id)), ','))" +
+        "    case 'unknown' return ws:emit(" +
+        "      try { ws:names('websocket-none') } catch ws:not-found { 'not-found' })" +
+        "    default        return ws:emit('?')" +
+        "};");
+
+    final Listener l = new Listener();
+    final java.net.http.WebSocket ws = connect("/p", l);
+    try {
+      ws.sendText("names", true).get(5, TimeUnit.SECONDS);
+      assertEquals("names=", l.pollText());
+      ws.sendText("set", true).get(5, TimeUnit.SECONDS);
+      assertEquals("done", l.pollText());
+      ws.sendText("names", true).get(5, TimeUnit.SECONDS);
+      assertEquals("names=a,b", l.pollText());
+      ws.sendText("delete", true).get(5, TimeUnit.SECONDS);
+      assertEquals("done", l.pollText());
+      ws.sendText("names", true).get(5, TimeUnit.SECONDS);
+      assertEquals("names=b", l.pollText());
+      ws.sendText("unknown", true).get(5, TimeUnit.SECONDS);
+      assertEquals("not-found", l.pollText());
+    } finally {
+      close(ws);
+    }
+  }
 }

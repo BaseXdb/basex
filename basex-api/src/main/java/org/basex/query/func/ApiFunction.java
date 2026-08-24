@@ -215,6 +215,12 @@ public enum ApiFunction implements AFunction {
   _WS_IDS(WsIds::new, "ids()",
       params(), STRING_ZM, WS_URI, Perm.ADMIN),
   /** XQuery function. */
+  _WS_LIST_DETAILS(WsListDetails::new, "list-details(id?)",
+      params(STRING_ZO), ELEMENT_ZM, WS_URI, Perm.ADMIN),
+  /** XQuery function. */
+  _WS_NAMES(WsNames::new, "names(id)",
+      params(STRING_O), STRING_ZM, WS_URI, Perm.ADMIN),
+  /** XQuery function. */
   _WS_PATH(WsPath::new, "path(id)",
       params(STRING_O), STRING_O, WS_URI, Perm.ADMIN),
   /** XQuery function. */

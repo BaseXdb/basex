@@ -111,6 +111,12 @@ th {
   padding: 0 var(--gap) 0 0;
 }
 
+/* a checkbox and the value beside it belong on one line: a column that is sized by its content
+   grows for them, rather than wrapping the value underneath the box */
+th:has(> input[type=checkbox]), td:has(> input[type=checkbox]) {
+  white-space: nowrap;
+}
+
 /* right-aligned numeric table columns (was the deprecated align='right' attribute) */
 .num {
   text-align: right;
@@ -668,19 +674,54 @@ body:has(.content.fill) main {
   border-left: var(--line) solid var(--border);
 }
 
-/* labeled form field: label column, control column.
-   The column is a constant because each field is its own grid: it must fit the longest label */
+/* a group of fields: a form, or one column of a form that spreads its fields over columns.
+   The group is the grid, so its label column is as wide as its longest label asks for */
+form:has(> .field),
+.field-columns > div:has(> .field) {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: var(--gap);
+}
+
+/* what is not a field spans both columns; the break after a checkbox is what a row of the
+   grid does already */
+form:has(> .field) > :not(.field),
+.field-columns > div:has(> .field) > :not(.field) {
+  grid-column: 1 / -1;
+}
+form:has(> .field) > br,
+.field-columns > div:has(> .field) > br {
+  display: none;
+}
+
+/* labeled form field: label column, control column. A field outside a group is its own grid,
+   and its label takes the width it asks for */
 .field {
   display: grid;
-  grid-template-columns: 8rem 1fr;
+  grid-template-columns: max-content 1fr;
+  column-gap: var(--gap);
   align-items: baseline;
-  /* fields belong together, so they sit closer than blocks do; the margin collapses between
-     adjacent fields and separates the first of them from the block above */
+  /* fields belong together, so they sit closer than blocks do; the margin separates them from
+     each other and from the block above */
   margin: calc(var(--space) / 2) 0;
+}
+
+/* a field of a group adopts the columns of its group, which lines up the controls */
+form:has(> .field) > .field:not(.stacked),
+.field-columns > div:has(> .field) > .field:not(.stacked) {
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+}
+
+/* a checkbox that is the control of a field brings its own break, which the row it is placed
+   in already provides */
+.field br {
+  display: none;
 }
 
 /* label above its control, for labels too long for a label column */
 .field.stacked {
+  grid-column: 1 / -1;
   grid-template-columns: 1fr;
 }
 
@@ -804,7 +845,9 @@ button.collapse .label {
     order: -1;
   }
   /* labels above their controls, so the fields keep the full width */
-  .field {
+  .field,
+  form:has(> .field) > .field,
+  .field-columns > div:has(> .field) > .field {
     grid-template-columns: 1fr;
   }
   /* one column of fields: a narrow screen has no room for two */

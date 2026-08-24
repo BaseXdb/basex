@@ -24,7 +24,7 @@ function dba:ws-message(
     case 'databases'   return utils:ws-panel('databases',
       panels:databases($sort, $page, $json?name))
     case 'database'    return utils:ws-panel('database',
-      panels:database($json?name, $sort, $page, $json?resource))
+      panels:database($json?name, $sort, $page, $json?resource, string($json?dir)))
     case 'backups'     return utils:ws-panel('backups', panels:backups($json?name))
     case 'information' return utils:ws-panel('information', panels:information($json?name))
     case 'resource'    return dba:ws-resource($json?name, $json?resource)

@@ -42,6 +42,11 @@ public final class WebSocket extends Endpoint implements ClientInfo, WsSession {
   /** Request context (captured during the handshake). */
   final RequestContext requestCtx;
 
+  /** Time when the connection was opened. */
+  public final long created = System.currentTimeMillis();
+  /** Time when the last message was received. */
+  public volatile long accessed = created;
+
   /** Client WebSocket ID. */
   public String id;
   /** HTTP session (can be {@code null}; invalidated ones are dropped, maybe from a job thread). */
@@ -112,9 +117,12 @@ public final class WebSocket extends Endpoint implements ClientInfo, WsSession {
     sess.setMaxIdleTimeout(idleTimeout);
     if(maxText != -1) sess.setMaxTextMessageBufferSize(maxText);
     if(maxBinary != -1) sess.setMaxBinaryMessageBufferSize(maxBinary);
-    sess.addMessageHandler(String.class, message ->
-      findAndProcess(Annotation._WS_MESSAGE, message));
+    sess.addMessageHandler(String.class, message -> {
+      accessed = System.currentTimeMillis();
+      findAndProcess(Annotation._WS_MESSAGE, message);
+    });
     sess.addMessageHandler(ByteBuffer.class, buffer -> {
+      accessed = System.currentTimeMillis();
       final byte[] payload = new byte[buffer.remaining()];
       buffer.get(payload);
       findAndProcess(Annotation._WS_MESSAGE, payload);
