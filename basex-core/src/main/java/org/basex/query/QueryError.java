@@ -1235,6 +1235,8 @@ public enum QueryError {
   /** Error code. */
   CIRCVAR_X(XQDY, 54, "Static variable depends on itself: %"),
   /** Error code. */
+  CIRCDFLT_X_X(XQDY, 54, "%: Default value of parameter % depends on itself."),
+  /** Error code. */
   CIRCCTX(XQDY, 54, "Context value is not defined."),
   /** Error code. */
   CPIXML_X(XQDY, 64, "Processing instruction has illegal name: %."),

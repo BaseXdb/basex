@@ -15,6 +15,7 @@ import org.basex.query.util.hash.*;
 import org.basex.query.util.parse.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -143,20 +144,29 @@ public final class StaticFuncCall extends FuncCall {
           (Supplier<byte[]>) () -> name.prefixId());
       keywords = null;
     }
-    // adopt default expressions
+    // mark arguments that will be replaced with default expressions
     if(arity > exprs.length) exprs = Arrays.copyOf(exprs, arity);
     for(int a = arity - 1; a >= 0; a--) {
       if(exprs[a] == null) {
-        final Expr dflt = sf.defaults[a];
-        if(dflt == null) throw PARAMMISSING_X_X.get(info, name.prefixId(),
+        if(sf.defaults[a] == null) throw PARAMMISSING_X_X.get(info, name.prefixId(),
             sf.paramName(a).prefixString());
-        exprs[a] = dflt;
+        exprs[a] = Empty.UNDEFINED;
       }
     }
     // check visibility
     if(sf.anns.contains(Annotation.PRIVATE) &&
         !Token.eq(QNm.uri(sf.sc.module), QNm.uri(sc().module))) {
       throw FUNCPRIVATE_X.get(info, name.string());
+    }
+  }
+
+  /**
+   * Adopts the default expressions of the called function.
+   */
+  void assignDefaults() {
+    final int arity = func.arity();
+    for(int a = 0; a < arity; a++) {
+      if(exprs[a] == Empty.UNDEFINED) exprs[a] = func.defaults[a];
     }
   }
 

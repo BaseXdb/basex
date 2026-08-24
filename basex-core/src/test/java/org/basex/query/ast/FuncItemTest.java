@@ -485,6 +485,17 @@ public final class FuncItemTest extends SandboxTest {
       f()""", 1);
   }
 
+  /** Self-referencing default arguments. */
+  @Test public void gh2745() {
+    error("declare function f($f := f()) {}; f()", CIRCDFLT_X_X);
+    error("declare function f($f := g()) {}; declare function g($g := f()) {}; f()", CIRCDFLT_X_X);
+    error("declare record r(a := r()?a); r()?a", CIRCDFLT_X_X);
+
+    query("declare function f($x as xs:int, $y as xs:int := f(3, 4)) { $x + $y }; f(3)", 10);
+    query("declare function f($x as xs:int, $y as xs:int := g(3)) { $x + $y };"
+        + "declare function g($x as xs:int, $y as xs:int := f(3, 4)) { $x + $y }; f(5)", 15);
+  }
+
   /** Function call, wrong argument type. */
   @Test public void gh2526() {
     query("{1: 2}(<x>1</x>)", "");
