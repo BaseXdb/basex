@@ -171,8 +171,11 @@ public class DBNodeSeq extends NativeSeq {
    * @return value
    */
   public static Value get(final int[] pres, final Data data, final Type type, final boolean all) {
-    return pres.length == 0 ? Empty.VALUE : pres.length == 1 ? new DBNode(data, pres[0]) :
-      new DBNodeSeq(pres, data, type == null ? NodeType.NODE : type, all);
+    if(pres.length == 0) return Empty.VALUE;
+    if(pres.length > 1) return new DBNodeSeq(pres, data, type == null ? NodeType.NODE : type, all);
+    // if the node kind is known, it does not need to be looked up in the database
+    final int pre = pres[0];
+    return type == NodeType.DOCUMENT ? new DBNode(data, pre, Data.DOC) : new DBNode(data, pre);
   }
 
   /**
