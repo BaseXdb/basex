@@ -1,5 +1,7 @@
-/** Files: file handling, queries and their results. */
+/** Workspace: file handling, queries and their results. */
 
+/** Path of the endpoint that runs the queries of this view and serves its file panel. */
+const WORKSPACE_WS = "/workspace";
 
 /** Id of the job of the query that is currently evaluated in the editor panel. */
 let _job;
@@ -305,7 +307,7 @@ function enterDir(name) {
  */
 function refreshFiles(sort, dir) {
   if(!document.getElementById("files-panel")) return;
-  sendMessage("", {
+  sendMessage(WORKSPACE_WS, {
     type: "files",
     sort: sort ?? document.querySelector("#files-panel [data-sort]")?.dataset.sort ?? "name",
     dir: dir ?? filesDir()
@@ -338,7 +340,7 @@ async function runQuery() {
   setText("", "");
 
   const run = startRequest();
-  if(!await sendMessage("", {
+  if(!await sendMessage(WORKSPACE_WS, {
     type: "run",
     run: run,
     query: editorValue(),
@@ -359,7 +361,7 @@ async function stopQuery() {
 
   // drop the number of the run: the result of the stopped query will be ignored
   endRequest();
-  await sendMessage("", { type: "stop" });
+  await sendMessage(WORKSPACE_WS, { type: "stop" });
   setJob();
 }
 
@@ -558,7 +560,7 @@ function draftKey(t) {
  */
 function saveDraft() {
   const t = tab();
-  // drafts belong to the Files view; skip on the other CodeMirror pages
+  // drafts belong to the Workspace view; skip on the other CodeMirror pages
   if(!t) return;
   const content = editorValue();
   const key = draftKey(t);
@@ -596,7 +598,7 @@ function checkButtons() {
   setDisabled("saveas", !editorValue());
 }
 
-/** The editor of the Files view runs queries, tracks edits and keeps drafts. */
+/** The editor of the Workspace view runs queries, tracks edits and keeps drafts. */
 _editor_run = runQuery;
 _editor_changed = () => {
   // content the code wrote is not an edit, and must not be saved as a draft
@@ -608,7 +610,7 @@ _editor_changed = () => {
 };
 
 /** The endpoint of the view reports the job of a query, its outcome, and the file panel. */
-_handlers[""] = json => {
+_handlers[WORKSPACE_WS] = json => {
   if(json.type === "job") {
     setJob(json.id);
   } else if(json.type === "files") {
@@ -626,7 +628,7 @@ _handlers[""] = json => {
  * were left open. A deep link names the directory and the file it refers to; both are adopted,
  * so that following it and reloading the page show the same.
  */
-function initFiles() {
+function initWorkspace() {
   loadCodeMirror("xquery", true, "fill");
   initResizers();
 

@@ -1,5 +1,5 @@
 (:~
- : File panel of the Files view.
+ : File panel of the Workspace view.
  :
  : @author Christian Grün, BaseX Team, BSD License
  :)
@@ -10,7 +10,7 @@ import module namespace form = 'dba/lib/form' at '../lib/form.xqm';
 import module namespace table = 'dba/lib/table' at '../lib/table.xqm';
 
 (:~ Page the deep links of the panel refer to. :)
-declare %private variable $panel:CAT := 'files';
+declare %private variable $panel:CAT := 'workspace';
 
 (:~
  : Creates the contents of the file panel.
@@ -72,7 +72,7 @@ declare function panel:files(
         attribute disabled { }[not($parent)], '..'
       }</button>,
       <button type='button' onclick='createDir()'>New dir</button>,
-      form:button('files/delete', 'Delete', ('CHECK', 'CONFIRM')),
+      form:button('workspace/delete', 'Delete', ('CHECK', 'CONFIRM')),
       form:button('files-download', 'Download', 'CHECK'),
       <button type='button' onclick='chooseFiles()'>Upload</button>
     )
@@ -94,7 +94,7 @@ declare function panel:files(
     }</form>,
 
     (: the file chooser is opened by the Upload button and submits what it collects :)
-    <form method='post' action='files/upload' enctype='multipart/form-data' autocomplete='off'
+    <form method='post' action='workspace/upload' enctype='multipart/form-data' autocomplete='off'
           onsubmit='uploading(this);'>
       <input type='hidden' name='dir' value='{ $dir }'/>
       <input type='file' name='files' id='upload' multiple='multiple' hidden=''
@@ -102,7 +102,7 @@ declare function panel:files(
     </form>,
 
     (: the New Dir button asks for a name and submits it :)
-    <form method='post' action='files/dir-create' autocomplete='off' id='dir-create'>
+    <form method='post' action='workspace/dir-create' autocomplete='off' id='dir-create'>
       <input type='hidden' name='dir' value='{ $dir }'/>
       <input type='hidden' name='name' id='dir-name'/>
     </form>

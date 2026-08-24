@@ -1,9 +1,9 @@
 (:~
- : Evaluate queries of the editor via WebSockets.
+ : Run the queries of the workspace view and refresh its file panel via WebSockets.
  :
  : @author Christian Grün, BaseX Team, BSD License
  :)
-module namespace dba = 'dba/editor-ws';
+module namespace dba = 'dba/workspace-ws';
 
 import module namespace config = 'dba/lib/config' at '../lib/config.xqm';
 import module namespace panel = 'dba/lib/file-panel' at 'file-panel.xqm';
@@ -14,7 +14,7 @@ import module namespace utils = 'dba/lib/utils' at '../lib/utils.xqm';
  : @param  $message  message
  :)
 declare
-  %ws:message('/dba', '{$message}')
+  %ws:message('/dba/workspace', '{$message}')
 function dba:ws-message(
   $message  as xs:string
 ) as empty-sequence() {
@@ -33,7 +33,7 @@ function dba:ws-message(
  : result is cached, and the activity view is where it is then watched and read.
  :)
 declare
-  %ws:close('/dba')
+  %ws:close('/dba/workspace')
 function dba:ws-close() as empty-sequence() {
   utils:ws-stop(false())
 };
@@ -43,7 +43,7 @@ function dba:ws-close() as empty-sequence() {
  : @param  $message  error message
  :)
 declare
-  %ws:error('/dba', '{$message}')
+  %ws:error('/dba/workspace', '{$message}')
 function dba:ws-error(
   $message  as xs:string
 ) as empty-sequence() {

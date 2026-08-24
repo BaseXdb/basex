@@ -31,7 +31,9 @@ declare function html:wrap(
   $panels   as element()*,
   $options  as map(*) := {}
 ) as element(html) {
-  let $header := $options?header ! utils:capitalize(.)
+  (: the view is named by its page; the label of its entry is the capitalized name :)
+  let $view := $options?header
+  let $header := $view ! utils:capitalize(.)
   let $user := session:get($config:SESSION-KEY)
   (: only panels get a grid track; a page may supply scripts as well :)
   let $tracks := $panels[tokenize(@class) = 'panel']
@@ -66,43 +68,54 @@ declare function html:wrap(
             </h1>
             {
               if ($user) {
-                <div><b>{ $user }</b> · <a href='logout'>logout</a></div>
+                (: the logout ends the session: it is submitted, not a link that a prefetch
+                   or a link scanner could follow :)
+                <div>
+                  <b>{ $user }</b> · <form method='post' action='logout'>
+                    <button type='submit' class='link'>logout</button>
+                  </form>
+                </div>
               }
             }
           </div>
-          <nav class='ellipsis'>{
+          <div class='header-nav'>{
             if ($user) {
-              let $cats := (
-                for $cat in ('Logs', 'Databases', 'Files', 'Activity', 'Stores',
-                  'Users', 'Settings')
-                let $link := <a href='{ lower-case($cat) }'>{ $cat }</a>
-                return if ($link = $header) then <b>{ $link }</b> else $link
-              )
-              return (
-                head($cats),
-                tail($cats) ! (' · ', .),
-                (1 to 3) ! '&#x2000;'
-              )
+              <nav>
+                <ul>{
+                  for $entry in $config:VIEWS
+                  (: the current view is marked by an attribute, which is what a reader is
+                     told and what the style picks out; the entry stays a link, and a click
+                     on it reloads the starting page of the view :)
+                  return <li>{
+                    element a {
+                      attribute href { $entry },
+                      attribute aria-current { 'page' }[$entry = $view],
+                      utils:capitalize($entry)
+                    }
+                  }</li>
+                }</ul>
+              </nav>
             } else {
               <div class='note'>
                 Please enter your admin credentials:
               </div>
             },
-            <span>{
-              element b {
-                attribute id { 'info' },
-                let $error := $options?error[.], $info := $options?info[.]
-                return if ($error) {
-                  attribute class { 'error' }, $error
-                } else if ($info) {
-                  attribute class { 'info' }, $info
-                }
+            (: a status message, not a navigation entry: the client replaces its text, and
+               the role is what has the replacement announced. It is spelled out, as not
+               every browser maps the implicit role of the element :)
+            element output {
+              attribute id { 'info' },
+              attribute role { 'status' },
+              let $error := $options?error[.], $info := $options?info[.]
+              return if ($error) {
+                attribute class { 'error' }, $error
+              } else if ($info) {
+                attribute class { 'info' }, $info
               }
-            }</span>
-          }</nav>
-          <hr/>
+            }
+          }</div>
         </div>
-        <a href='{ request:context-path() }/' class='header-logo'>
+        <a href='{ request:context-path() }/dba' class='header-logo'>
           <img src='.static/basex.svg' alt='BaseX'/>
         </a>
       </header>

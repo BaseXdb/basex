@@ -8,9 +8,9 @@
  *   table, the job a detail view shows, the info and error message of a redirect. If a colleague
  *   opens the address and sees something else, the value belongs here.
  * - localStorage: what the user set up and expects to find again, and what no one else should
- *   see. Editor drafts, the directory and the open documents of the Files view, panel splits and
- *   collapsed panels, the 'Live' and 'Indent' preferences, the log filter. Keys that describe
- *   one page are scoped with pageKey; the rest are shared by every page of the DBA.
+ *   see. Editor drafts, the directory and the open documents of the Workspace view, panel
+ *   splits and collapsed panels, the 'Live' and 'Indent' preferences, the log filter. Keys
+ *   that describe one page are scoped with pageKey; the rest are shared by every page of the DBA.
  * - Server session: only what the server itself must know, which is the login. Anything else
  *   would make two browsers fight over one value and the server answer differently to the
  *   same request.

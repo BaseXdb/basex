@@ -212,6 +212,20 @@ a:hover {
   text-decoration:underline;
 }
 
+/* a control that acts on the server but reads as a link */
+button.link {
+  border: 0;
+  padding: 0;
+  background: none;
+  font: inherit;
+  color: var(--accent);
+  cursor: pointer;
+}
+
+button.link:hover {
+  text-decoration: underline;
+}
+
 b {
   color: var(--strong);
 }
@@ -359,6 +373,11 @@ header {
   flex: 1;
   /* allow the nav line to shrink and truncate instead of pushing the logo away */
   min-width: 0;
+  /* the rule that closes the header, kept clear of the nav line above it and of the
+     content below it */
+  padding-bottom: .5rem;
+  border-bottom: var(--line) solid var(--border);
+  margin-bottom: .5rem;
 }
 
 .header-top {
@@ -367,6 +386,49 @@ header {
   align-items: flex-start;
   gap: var(--gap);
   flex-wrap: wrap;
+}
+
+/* the logout submits instead of following a link, and is shown as one */
+.header-top form {
+  display: inline;
+}
+
+/* the views and the status message share one line, separated by a gap of their own */
+.header-nav {
+  display: flex;
+  align-items: baseline;
+  column-gap: 1.5rem;
+  /* fixed height so the status glyph (fallback font) can't shift the layout */
+  line-height: 1.4;
+}
+
+.header-nav ul {
+  display: flex;
+  column-gap: .25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* the separator belongs to the line, not to the entries: it is neither read out nor clickable */
+.header-nav li + li::before {
+  content: '\B7';
+  margin-right: .25rem;
+  color: var(--muted);
+}
+
+/* the entry of the current view, marked by the same attribute the client is given */
+.header-nav a[aria-current] {
+  font-weight: bold;
+  color: var(--accent-strong);
+}
+
+/* a long message truncates instead of pushing the views out of the line */
+#info {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .header-logo {
@@ -401,8 +463,6 @@ header {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
-  /* fixed height so the status glyph (fallback font) can't shift the layout */
-  line-height: 1.4;
 }
 
 .warning {
@@ -424,7 +484,7 @@ header {
 .field .note {
   margin-bottom: 0;
 }
-nav .note {
+.header-nav .note {
   /* the header nav is a single row: no spacing before the rule below it */
   margin-bottom: 0;
 }
@@ -440,7 +500,7 @@ nav .note {
   content: "\26A0\00a0";
 }
 
-/* row of actions above a table or an editor; the gap matches the toolbar of the Files view */
+/* row of actions above a table or an editor; the gap matches the toolbar of the Workspace view */
 .buttons {
   display: flex;
   flex-wrap: wrap;
@@ -702,21 +762,17 @@ button.collapse .label {
   /* shorten the page title */
   .title-full { display: none; }
   .title-short { display: inline; }
-  /* let the navigation wrap instead of truncating with an ellipsis */
-  nav.ellipsis {
-    white-space: normal;
-    overflow: visible;
-    text-overflow: clip;
+  /* the views wrap over several lines instead of being squeezed onto one, and the status
+     message takes the line below them */
+  .header-nav {
+    flex-wrap: wrap;
+    column-gap: var(--gap);
   }
-  /* keep the status message on one line: short ones stay inline after the nav
-     links, a long one truncates with an ellipsis instead of wrapping */
+  .header-nav ul {
+    flex-wrap: wrap;
+  }
   #info {
-    display: inline-block;
-    max-width: 100%;
-    vertical-align: bottom;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    flex: 1 1 100%;
   }
   /* stack the side-by-side content panels, drop their dividers */
   .content {

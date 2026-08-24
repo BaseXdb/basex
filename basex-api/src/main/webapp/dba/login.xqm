@@ -129,6 +129,7 @@ function dba:login-check(
  : @return redirection
  :)
 declare
+  %rest:POST
   %rest:path('/dba/logout')
 function dba:logout(
 ) as element(rest:response) {
@@ -156,8 +157,8 @@ declare %private function dba:accept(
   session:set($config:SESSION-KEY, $name),
   admin:write-log('Login: ' || $name, 'DBA'),
 
-  (: redirect to supplied page or main page :)
-  web:redirect($page[.] otherwise 'logs', html:parameters())
+  (: redirect to supplied page or start page :)
+  web:redirect($page[.] otherwise head($config:VIEWS), html:parameters())
 };
 
 (:~

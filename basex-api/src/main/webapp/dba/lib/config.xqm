@@ -20,6 +20,12 @@ declare variable $config:DBA-DIR := (
 (:~ Permission values. :)
 declare variable $config:PERMISSIONS := ('none', 'read', 'write', 'create', 'admin');
 
+(:~ Views, in the order in which the navigation offers them. A view is named by the path of its
+    page, which is also the label of its entry. :)
+declare variable $config:VIEWS := (
+  'workspace', 'databases', 'stores', 'users', 'logs', 'activity', 'settings'
+);
+
 (:~ Maximum length of XML characters. :)
 declare variable $config:MAXCHARS := 'maxchars';
 (:~ Maximum number of table entries. :)

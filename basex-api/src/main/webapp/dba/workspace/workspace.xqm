@@ -1,31 +1,31 @@
 (:~
- : Files: file panel, editor and query results in a single view.
+ : Workspace: file panel, editor and query results in a single view.
  :
  : @author Christian Grün, BaseX Team, BSD License
  :)
-module namespace dba = 'dba/files';
+module namespace dba = 'dba/workspace';
 
 import module namespace config = 'dba/lib/config' at '../lib/config.xqm';
 import module namespace html = 'dba/lib/html' at '../lib/html.xqm';
 import module namespace utils = 'dba/lib/utils' at '../lib/utils.xqm';
 
 (:~ Top category. :)
-declare variable $dba:CAT := 'files';
+declare variable $dba:CAT := 'workspace';
 
 (:~
- : Files: file panel, editor and query results in a single view. The directory of the file panel
- : and the open documents are remembered by the client, which requests what it needs.
+ : Workspace: file panel, editor and query results in a single view. The directory of the file
+ : panel and the open documents are remembered by the client, which requests what it needs.
  : @param  $error  error string
  : @param  $info   info string
  : @return page
  :)
 declare
   %rest:GET
-  %rest:path('/dba/files')
+  %rest:path('/dba/workspace')
   %rest:query-param('error', '{$error}')
   %rest:query-param('info',  '{$info}')
   %output:method('html')
-function dba:files(
+function dba:workspace(
   $error  as xs:string?,
   $info   as xs:string?
 ) as element(html) {
@@ -68,8 +68,8 @@ function dba:files(
     'header' : $dba:CAT,
     'columns': ('25fr', '38fr', '37fr'),
     'rows'   : ('auto', '1fr'),
-    'scripts': ('cm6', 'editor', 'files'),
-    'init'   : 'initFiles();',
+    'scripts': ('cm6', 'editor', 'workspace'),
+    'init'   : 'initWorkspace();',
     'info'   : $info,
     'error'  : $error
   })
@@ -116,7 +116,7 @@ function dba:files-download(
 declare
   %updating
   %rest:POST
-  %rest:path('/dba/files/{$action}')
+  %rest:path('/dba/workspace/{$action}')
 function dba:action(
   $action  as xs:string
 ) {

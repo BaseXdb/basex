@@ -5,6 +5,7 @@
  :)
 module namespace dba = 'dba/common';
 
+import module namespace config = 'dba/lib/config' at 'lib/config.xqm';
 import module namespace html = 'dba/lib/html' at 'lib/html.xqm';
 import module namespace utils = 'dba/lib/utils' at 'lib/utils.xqm';
 
@@ -16,7 +17,8 @@ declare
   %rest:path('/dba')
 function dba:redirect(
 ) as element(rest:response) {
-  web:redirect(utils:page('logs'))
+  (: the start page is the first view the navigation offers :)
+  web:redirect(utils:page(head($config:VIEWS)))
 };
 
 (:~

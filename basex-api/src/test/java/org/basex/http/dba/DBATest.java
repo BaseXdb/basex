@@ -130,7 +130,7 @@ public final class DBATest extends WebappTest {
      * @throws IOException I/O exception
      */
     @Test public void pages() throws IOException {
-      for(final String page : new String[] { "databases", "users", "files", "logs", "activity",
+      for(final String page : new String[] { "databases", "users", "workspace", "logs", "activity",
           "settings" }) {
         final String html = get(page);
         assertTrue(html.contains("<title>DBA"), page + ": not an authenticated DBA page:\n" + html);
@@ -155,7 +155,8 @@ public final class DBATest extends WebappTest {
      * @throws IOException I/O exception
      */
     @Test public void mergedPages() throws IOException {
-      for(final String page : new String[] { "database", "user", "jobs", "sessions", "editor" }) {
+      for(final String page : new String[] { "database", "user", "jobs", "sessions", "editor",
+          "files" }) {
         send(404, "GET", page, null, null);
       }
     }
@@ -874,7 +875,7 @@ public final class DBATest extends WebappTest {
   }
 
   /**
-   * Tests for the WebSocket endpoint of the DBA editor.
+   * Tests for the WebSocket endpoint of the DBA workspace view.
    */
   @Nested final class Query {
     /** Number of the last run. */
@@ -885,7 +886,7 @@ public final class DBATest extends WebappTest {
      * @throws Exception exception
      */
     @BeforeEach public void open() throws Exception {
-      connect("");
+      connect("/workspace");
     }
 
     /**
