@@ -7,7 +7,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
- * Unmodifiable hash map implementation.
+ * Map that stores its entries in a hash table.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -31,12 +31,12 @@ abstract class XQHashMap extends XQMap {
   public abstract Value getOrNull(Item key) throws QueryException;
 
   @Override
-  public XQMap put(final Item key, final Value value) throws QueryException {
+  public final XQMap put(final Item key, final Value value) throws QueryException {
     return trie().put(key, value);
   }
 
   @Override
-  public XQMap putAt(final int index, final Value value) throws QueryException {
+  public final XQMap putAt(final int index, final Value value) throws QueryException {
     return trie().putAt(index, value);
   }
 
@@ -51,7 +51,7 @@ abstract class XQHashMap extends XQMap {
   }
 
   @Override
-  public XQMap remove(final Item key) throws QueryException {
+  public final XQMap remove(final Item key) throws QueryException {
     return getOrNull(key) == null ? this : trie().remove(key);
   }
 
@@ -141,18 +141,9 @@ abstract class XQHashMap extends XQMap {
     for(int i = 0; i < is; i++) valueAt(i, valueAt(i).shrink(qc));
   }
 
-  /**
-   * Transforms the map to an immutable representation.
-   * @return map
-   * @throws QueryException query exception
-   */
-  private XQMap trie() throws QueryException {
-    if(trie == null) {
-      XQMap mp = empty();
-      final long is = structSize();
-      for(int i = 0; i < is; i++) mp = mp.put(keyAt(i), valueAt(i));
-      trie = mp;
-    }
+  @Override
+  XQMap trie() throws QueryException {
+    if(trie == null) trie = super.trie();
     return trie;
   }
 

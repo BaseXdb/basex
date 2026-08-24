@@ -8,7 +8,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.hash.*;
 
 /**
- * Unmodifiable hash map implementation for untyped atomics and values.
+ * Map with untyped atomic keys and arbitrary values.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

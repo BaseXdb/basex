@@ -522,7 +522,7 @@ public final class MixedTest extends SandboxTest {
         new TypeInfo(RangeSeq.class, "xs:integer+", 100));
 
     test("map:build(1 to 3) => map:remove(1)",
-        new TypeInfo(XQTrieMap.class, "map(xs:integer, xs:integer)", 2),
+        new TypeInfo(XQSmallMap.class, "map(xs:integer, xs:integer)", 2),
         new TypeInfo(XQSmallMap.class, "map(xs:integer, xs:integer)", 2));
     test("{ 1: ('x', 1 to 3) => remove(1) }",
         new TypeInfo(XQSingletonMap.class, "map(xs:integer, xs:anyAtomicType+)", 1),

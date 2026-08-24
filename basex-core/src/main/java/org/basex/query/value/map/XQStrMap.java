@@ -8,7 +8,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.hash.*;
 
 /**
- * Unmodifiable hash map implementation for strings.
+ * Map with string keys and string values.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

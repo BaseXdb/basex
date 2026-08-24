@@ -7,14 +7,15 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 
 /**
- * Unmodifiable map implementation with a small number of inlined entries.
+ * Map that stores few entries in a single array.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class XQSmallMap extends XQHashMap {
+public final class XQSmallMap extends XQMap {
   /** Maximum number of entries. */
   static final int MAX_SIZE = 4;
 
@@ -25,19 +26,9 @@ public final class XQSmallMap extends XQHashMap {
    * Constructor.
    * @param entries keys and values, in alternating order
    */
-  private XQSmallMap(final Value[] entries) {
+  XQSmallMap(final Value[] entries) {
     super(Types.MAP);
     this.entries = entries;
-  }
-
-  /**
-   * Creates a map with a single entry.
-   * @param key key
-   * @param value value
-   * @return map
-   */
-  static XQSmallMap entry(final Item key, final Value value) {
-    return new XQSmallMap(new Value[] { key, value });
   }
 
   @Override
@@ -47,8 +38,8 @@ public final class XQSmallMap extends XQHashMap {
 
   @Override
   public Value getOrNull(final Item key) throws QueryException {
-    final int e = index(key);
-    return e < 0 ? null : entries[e + 1];
+    final int i = index(key);
+    return i != -1 ? entries[i + 1] : null;
   }
 
   @Override
@@ -70,13 +61,10 @@ public final class XQSmallMap extends XQHashMap {
   }
 
   @Override
-  XQHashMap build(final Item key, final Value value) throws QueryException {
+  public XQMap put(final Item key, final Value value) throws QueryException {
     final int i = index(key);
-    if(i >= 0) {
-      final Value[] copy = entries.clone();
-      copy[i + 1] = value;
-      return new XQSmallMap(copy);
-    }
+    if(i != -1) return putAt(i >> 1, value);
+
     final int el = entries.length;
     if(el < MAX_SIZE << 1) {
       final Value[] copy = Arrays.copyOf(entries, el + 2);
@@ -84,10 +72,46 @@ public final class XQSmallMap extends XQHashMap {
       copy[el + 1] = value;
       return new XQSmallMap(copy);
     }
+    return trie().put(key, value);
+  }
 
-    XQHashMap mp = XQHashMap.get(MAX_SIZE + 1L, keyAt(0).type, valueAt(0).seqType());
-    for(int e = 0; e < el; e += 2) mp = mp.build((Item) entries[e], entries[e + 1]);
-    return mp.build(key, value);
+  @Override
+  public XQMap putAt(final int index, final Value value) {
+    final int i = (index << 1) + 1;
+    if(value == entries[i]) return this;
+
+    final Value[] copy = entries.clone();
+    copy[i] = value;
+    return new XQSmallMap(copy);
+  }
+
+  @Override
+  public XQMap remove(final Item key) throws QueryException {
+    final int i = index(key);
+    if(i == -1) return this;
+
+    final int el = entries.length;
+    if(el == 2) return empty();
+
+    final Value[] copy = new Value[el - 2];
+    Array.copy(entries, i, copy);
+    Array.copy(entries, i + 2, el - i - 2, copy, i);
+    return new XQSmallMap(copy);
+  }
+
+  @Override
+  public void forEach(final QueryBiConsumer<Item, Value> func) throws QueryException {
+    final int el = entries.length;
+    for(int e = 0; e < el; e += 2) func.accept((Item) entries[e], entries[e + 1]);
+  }
+
+  @Override
+  public boolean test(final QueryBiPredicate<Item, Value> func) throws QueryException {
+    final int el = entries.length;
+    for(int e = 0; e < el; e += 2) {
+      if(!func.test((Item) entries[e], entries[e + 1])) return false;
+    }
+    return true;
   }
 
   @Override

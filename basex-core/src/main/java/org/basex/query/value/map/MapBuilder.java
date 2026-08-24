@@ -1,5 +1,7 @@
 package org.basex.query.value.map;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
@@ -18,7 +20,11 @@ import org.basex.util.hash.*;
 public final class MapBuilder {
   /** Initial capacity. */
   private final long capacity;
-  /** Current map implementation (can be {@code null}). */
+  /** Inlined keys and values, in alternating order (can be {@code null}). */
+  private Value[] entries;
+  /** Number of inlined entries. */
+  private int size;
+  /** Hash map, assigned once the inlined entries overflow (can be {@code null}). */
   private XQHashMap map;
   /** Union of all key types (can be {@code null}). */
   private Type keyType;
@@ -58,12 +64,29 @@ public final class MapBuilder {
       if(kt != keyType) keyType = keyType.union(kt);
       if(!vt.eq(valueType)) valueType = valueType.union(vt);
     }
-    // small maps are inlined; larger ones are assigned a hash-based representation
-    if(map == null && capacity <= XQSmallMap.MAX_SIZE) {
-      map = XQSmallMap.entry(key, value);
-    } else {
-      if(map == null) map = XQHashMap.get(capacity, kt, vt);
+
+    if(map != null) {
       map = map.build(key, value);
+    } else {
+      final int i = index(key);
+      if(i != -1) {
+        entries[i + 1] = value;
+      } else if(size < XQSmallMap.MAX_SIZE) {
+        // entries are inlined: the final representation is chosen in map()
+        final int e = size++ << 1;
+        if(entries == null) entries = new Value[2];
+        else if(e == entries.length) entries = Arrays.copyOf(entries, e << 1);
+        entries[e] = key;
+        entries[e + 1] = value;
+      } else {
+        // too many entries: switch to a hash-based representation
+        map = XQHashMap.get(Math.max(capacity, size + 1L), keyType, valueType);
+        for(int e = 0; e < size; e++) {
+          map = map.build((Item) entries[e << 1], entries[(e << 1) + 1]);
+        }
+        map = map.build(key, value);
+        entries = null;
+      }
     }
     return this;
   }
@@ -141,7 +164,9 @@ public final class MapBuilder {
    * @throws QueryException query exception
    */
   public Value get(final Item key) throws QueryException {
-    return map != null ? map.getOrNull(key) : null;
+    if(map != null) return map.getOrNull(key);
+    final int i = index(key);
+    return i != -1 ? entries[i + 1] : null;
   }
 
   /**
@@ -151,7 +176,21 @@ public final class MapBuilder {
    * @throws QueryException query exception
    */
   public boolean contains(final Item key) throws QueryException {
-    return map != null && map.contains(key);
+    return map != null ? map.contains(key) : index(key) != -1;
+  }
+
+  /**
+   * Returns the offset of an inlined entry with the specified key.
+   * @param key key to look for
+   * @return offset, or {@code -1} if the key does not exist
+   * @throws QueryException query exception
+   */
+  private int index(final Item key) throws QueryException {
+    for(int e = 0; e < size; e++) {
+      final int i = e << 1;
+      if(key.atomicEqual((Item) entries[i])) return i;
+    }
+    return -1;
   }
 
   /**
@@ -159,7 +198,7 @@ public final class MapBuilder {
    * @return map size
    */
   public long size() {
-    return map != null ? map.structSize() : 0;
+    return map != null ? map.structSize() : size;
   }
 
   /**
@@ -167,8 +206,12 @@ public final class MapBuilder {
    * @return map
    */
   public XQMap map() {
-    if(map == null) return XQMap.empty();
-    final XQMap mp = map.structSize() == 1 ? XQMap.get(map.keyAt(0), map.valueAt(0)) : map;
+    if(map == null && size == 0) return XQMap.empty();
+    // the representation is chosen from the number of entries, not from the initial capacity
+    // the inlined entries are copied: the builder may still be used after this call
+    final XQMap mp = map != null ? map :
+      size == 1 ? XQMap.get((Item) entries[0], entries[1]) :
+      new XQSmallMap(Arrays.copyOf(entries, size << 1));
     mp.refineType(MapType.get(keyType, valueType));
     return mp;
   }

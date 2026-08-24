@@ -4,7 +4,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.type.*;
 
 /**
- * Map with a known shape whose values are stored in an array.
+ * Map with a shape whose field values are stored in an array.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

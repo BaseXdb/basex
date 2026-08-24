@@ -88,6 +88,18 @@ public abstract class XQMap extends XQStruct {
     return new XQShapeSingletonMap(shape, value);
   }
 
+  /**
+   * Returns a representation of this map that is based on a hash array mapped trie.
+   * @return map
+   * @throws QueryException query exception
+   */
+  XQMap trie() throws QueryException {
+    XQMap map = empty();
+    final long is = structSize();
+    for(int i = 0; i < is; i++) map = map.put(keyAt(i), valueAt(i));
+    return map;
+  }
+
   @Override
   public final void write(final DataOutput out) throws IOException, QueryException {
     out.writeNum((int) structSize());

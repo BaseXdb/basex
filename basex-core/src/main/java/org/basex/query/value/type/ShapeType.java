@@ -28,7 +28,9 @@ public class ShapeType extends MapType {
   /** Fields. */
   private final TokenObjectMap<ShapeField> fields;
   /** Field names as string items (can be {@code null}). */
-  private Str[] keys;
+  private volatile Str[] keys;
+  /** Cached result of {@link #detached()} (can be {@code null}). */
+  private Boolean detached;
   /** Cached shapes derived from this one (can be {@code null}). */
   private Map<Derived, ShapeType> derived;
 
@@ -170,6 +172,7 @@ public class ShapeType extends MapType {
     // the value type is not recomputed: only used to build recursive built-in records
     fields.put(Token.token(fieldName), new ShapeField(seqType));
     keys = null;
+    detached = null;
     return this;
   }
 
@@ -502,10 +505,18 @@ public class ShapeType extends MapType {
    * @return result of check
    */
   public final boolean detached() {
-    for(final ShapeField rf : fields.values()) {
-      if(rf.init() != null) return false;
+    Boolean d = detached;
+    if(d == null) {
+      d = true;
+      for(final ShapeField rf : fields.values()) {
+        if(rf.init() != null) {
+          d = false;
+          break;
+        }
+      }
+      detached = d;
     }
-    return true;
+    return d;
   }
 
   /**

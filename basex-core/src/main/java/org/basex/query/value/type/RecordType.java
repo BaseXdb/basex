@@ -19,6 +19,8 @@ public final class RecordType extends ShapeType {
   private final QNm name;
   /** Annotations. */
   private final AnnList anns;
+  /** Shape without the record annotation (can be {@code null}). */
+  private ShapeType shape;
 
   /**
    * Constructor for an anonymous record.
@@ -66,7 +68,15 @@ public final class RecordType extends ShapeType {
   @Override
   public ShapeType shape() {
     // the field set of record(*) is unknown: there is no shape to reduce it to
-    return any() ? this : new ShapeType(fields());
+    if(any()) return this;
+    if(shape == null) shape = new ShapeType(fields());
+    return shape;
+  }
+
+  @Override
+  public ShapeType add(final String fieldName, final SeqType seqType) {
+    shape = null;
+    return super.add(fieldName, seqType);
   }
 
   @Override

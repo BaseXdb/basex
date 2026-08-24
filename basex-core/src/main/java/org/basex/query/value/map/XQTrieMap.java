@@ -7,7 +7,7 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 
 /**
- * Hash array mapped trie implementation.
+ * Map that stores its entries in a hash array mapped trie.
  *
  * @author BaseX Team, BSD License
  * @author Leo Woerteler

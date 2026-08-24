@@ -5,7 +5,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 
 /**
- * Map with a single field and an unboxed integer value.
+ * Map with a shape that has a single, unboxed integer field value.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

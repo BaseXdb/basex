@@ -4,7 +4,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.type.*;
 
 /**
- * Map with a shape that has a single field.
+ * Map with a shape that has a single, boxed field value.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

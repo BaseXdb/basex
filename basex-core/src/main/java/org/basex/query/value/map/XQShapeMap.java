@@ -12,7 +12,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Map whose keys are supplied by the shape of the map.
+ * Map whose keys are supplied by its shape.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -51,15 +51,12 @@ public abstract class XQShapeMap extends XQMap {
   public final XQMap put(final Item key, final Value value) throws QueryException {
     final int i = field(key);
     if(i != 0) return putAt(i - 1, value);
+
     if(key.type == BasicType.STRING) {
       final ShapeType sh = shape().put(key.string(null), value.seqType());
       if(sh != null) return get(sh, Array.add(values(), value));
     }
-    // keys that cannot be represented by a shape yield a generic map
-    XQMap map = empty();
-    final int fs = (int) structSize();
-    for(int f = 0; f < fs; f++) map = map.put(keyAt(f), valueAt(f));
-    return map.put(key, value);
+    return trie().put(key, value);
   }
 
   @Override
@@ -70,6 +67,7 @@ public abstract class XQShapeMap extends XQMap {
     final ShapeType tp = st.instanceOf(fields().value(index + 1).seqType()) ? sh.shape() :
       sh.put(fields().key(index + 1), st);
     if(value == valueAt(index) && tp == type) return this;
+
     final Value[] values = values();
     values[index] = value;
     return get(tp, values);
