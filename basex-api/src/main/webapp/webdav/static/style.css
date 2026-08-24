@@ -35,14 +35,14 @@
     --border-light: #444;
     --pre-bg: #2a2a2a;
     --info: #6c6;
-    --warning: #999;
   }
 }
 
 body {
   font-family: Calibri, Helvetica, sans-serif;
   font-size: 16px;
-  /* no top margin: the sticky header supplies its own top spacing (via padding) */
+  /* no top margin: the sticky header supplies its own top spacing (via padding),
+     so it starts flush at the viewport top and pins without any travel */
   margin: 0 var(--gap) var(--gap) var(--gap);
   background-color: var(--bg);
   color: var(--fg);
@@ -90,7 +90,8 @@ h2 {
 h3 {
   font-size: 120%;
   color: var(--muted);
-  margin: .2rem 0 .2rem 0;
+  /* the top margin also separates a heading from the block above it */
+  margin: var(--space) 0 .2rem 0;
 }
 
 table {
@@ -100,7 +101,12 @@ table {
 th {
   vertical-align: top;
   text-align: left;
-  padding: 0 var(--gap) 0rem 0;
+  padding: 0 var(--gap) 0 0;
+}
+
+/* right-aligned numeric table columns (was the deprecated align='right' attribute) */
+.num {
+  text-align: right;
 }
 
 td {
@@ -119,7 +125,7 @@ dl {
 }
 
 dt {
-  margin: var(--space) 0 var(--space) 0;
+  margin: var(--space) 0;
   font-weight: bold;
 }
 
@@ -132,6 +138,20 @@ a:hover {
   text-decoration:underline;
 }
 
+/* a control that acts on the server but reads as a link */
+button.link {
+  border: 0;
+  padding: 0;
+  background: none;
+  font: inherit;
+  color: var(--accent);
+  cursor: pointer;
+}
+
+button.link:hover {
+  text-decoration: underline;
+}
+
 b {
   color: var(--strong);
 }
@@ -141,16 +161,14 @@ code {
   font-size: 90%;
   border: 1px solid var(--border-light);
   border-radius: var(--radius);
-  padding: 0 4px 0 4px;
-  margin: 0 2px 0 2px;
+  padding: 0 4px;
+  margin: 0 2px;
 }
 
 pre {
   font-family: SFMono-Regular, Consolas, Menlo, monospace;
   font-size: 90%;
-  border-color: var(--border-light);
-  border-width: 1px;
-  border-style: solid;
+  border: 1px solid var(--border-light);
   border-radius: var(--radius);
   background-color: var(--pre-bg);
   padding: .5rem;
@@ -159,24 +177,19 @@ pre {
 
 textarea {
   font-family: SFMono-Regular, Consolas, Menlo, monospace;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  outline: none;
   width: 100%;
+  /* the border must not add to the width, or the panel scrolls sideways */
+  box-sizing: border-box;
   resize: vertical;
   background-color: var(--bg);
   color: var(--fg);
 }
 
-input[type=text], input[type=password], input[type=number],
+textarea, input[type=text], input[type=password], input[type=number],
 input[type=submit], select, button {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   outline: none;
-}
-
-input[type=submit], button {
-  padding: 4px 8px;
 }
 
 input[type=text], input[type=password], input[type=number], select {
@@ -187,32 +200,12 @@ input[type=text], input[type=password], input[type=number], select {
   color: var(--fg);
 }
 
-input:focus, select:focus, button:focus {
-  outline: .5px solid var(--fg);
+input[type=submit], button {
+  padding: 4px 8px;
 }
 
-.content {
-  display: grid;
-  grid-template-columns: var(--columns);
-  /* a gutter on either side of the divider that sits in the middle */
-  column-gap: calc(var(--gap) * 2);
-}
-.content > .panel {
-  /* anchors the divider */
-  position: relative;
-  /* lets long content scroll inside the panel instead of widening the track */
-  min-width: 0;
-}
-.content > .full {
-  grid-column: 1 / -1;
-}
-.content > .panel:not(.full) ~ .panel:not(.full)::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: calc(var(--gap) * -1);
-  border-left: var(--line) solid var(--border);
+input:focus, select:focus, button:focus {
+  outline: .5px solid var(--fg);
 }
 
 hr {
@@ -221,8 +214,35 @@ hr {
   background-color: var(--border);
 }
 
-.right {
-  float: right;
+/* page content: one grid column per panel, separated by the gap rather than by
+   panel padding, so that a track width is the width of the content */
+.content {
+  display: grid;
+  grid-template-columns: var(--columns);
+  /* a gutter on either side of the divider that sits in the middle */
+  column-gap: calc(var(--gap) * 2);
+  /* keeps a focus ring at the panel top clear of the sticky header */
+  padding-top: 2px;
+}
+.content > .panel {
+  /* anchors the divider */
+  position: relative;
+  /* lets a long value scroll inside the panel instead of widening the track */
+  min-width: 0;
+}
+/* a panel that spans the whole row: it has no divider, and neither has the panel that
+   starts the row below it */
+.content > .full {
+  grid-column: 1 / -1;
+}
+/* divider, centered in the gap before every panel but the first of a row */
+.content > .panel:not(.full) ~ .panel:not(.full)::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--gap) * -1);
+  border-left: var(--line) solid var(--border);
 }
 
 .error {
@@ -235,27 +255,51 @@ hr {
   font-weight: bold;
 }
 
-.ellipsis {
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  /* fixed row height (matches the DBA header) */
-  line-height: 1.4;
-}
-
 .warning {
   color: var(--warning);
   font-weight: bold;
 }
 
+.ellipsis {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+/* a group of fields: a form, or one column of a form that spreads its fields over columns.
+   The group is the grid, so its label column is as wide as its longest label asks for */
+form:has(> .field) {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: var(--gap);
+}
+
+/* what is not a field spans both columns */
+form:has(> .field) > :not(.field) {
+  grid-column: 1 / -1;
+}
+
+/* labeled form field: label column, control column. A field outside a group is its own grid,
+   and its label takes the width it asks for */
 .field {
   display: grid;
-  grid-template-columns: 8rem 1fr;
+  grid-template-columns: max-content 1fr;
+  column-gap: var(--gap);
   align-items: baseline;
-  /* collapses between adjacent fields, and separates the first from a block above */
-  margin: var(--space) 0;
+  /* fields belong together, so they sit closer than blocks do; the margin separates them from
+     each other and from the block above */
+  margin: calc(var(--space) / 2) 0;
 }
+
+/* a field of a group adopts the columns of its group, which lines up the controls */
+form:has(> .field) > .field:not(.stacked) {
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+}
+
+/* label above its control, for labels too long for a label column */
 .field.stacked {
+  grid-column: 1 / -1;
   grid-template-columns: 1fr;
 }
 
@@ -263,7 +307,7 @@ hr {
   color: var(--muted);
   margin-bottom: var(--space);
 }
-nav .note {
+.header-nav .note {
   /* the header nav is a single row: no spacing before the rule below it */
   margin-bottom: 0;
 }
@@ -273,9 +317,12 @@ nav .note {
   color: var(--muted);
 }
 
+/* the root of a breadcrumb: bold, and a link like the others */
+a.root {
+  font-weight: bold;
+}
 
-
-/* page header (mirrors the DBA layout): pinned to the top while scrolling */
+/* page header: pinned to the top while scrolling */
 header {
   display: flex;
   align-items: flex-start;
@@ -291,6 +338,11 @@ header {
   flex: 1;
   /* allow the nav line to shrink and truncate instead of pushing the logo away */
   min-width: 0;
+  /* the rule that closes the header, kept clear of the nav line above it and of the
+     content below it */
+  padding-bottom: .5rem;
+  border-bottom: var(--line) solid var(--border);
+  margin-bottom: .5rem;
 }
 
 .header-top {
@@ -299,6 +351,49 @@ header {
   align-items: flex-start;
   gap: var(--gap);
   flex-wrap: wrap;
+}
+
+/* a logout submits instead of following a link, and is shown as one */
+.header-top form {
+  display: inline;
+}
+
+/* the navigation and the status message share one line, separated by a gap of their own */
+.header-nav {
+  display: flex;
+  align-items: baseline;
+  column-gap: 1.5rem;
+  /* fixed height so the status glyph (fallback font) can't shift the layout */
+  line-height: 1.4;
+}
+
+.header-nav ul {
+  display: flex;
+  column-gap: .25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* the separator belongs to the line, not to the entries: it is neither read out nor clickable */
+.header-nav li + li::before {
+  content: '\B7';
+  margin-right: .25rem;
+  color: var(--muted);
+}
+
+/* the entry of the current view, marked by the same attribute the client is given */
+.header-nav a[aria-current] {
+  font-weight: bold;
+  color: var(--accent-strong);
+}
+
+/* a long message truncates instead of pushing the navigation out of the line */
+#info {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .header-logo {
@@ -310,38 +405,14 @@ header {
   display: none;
 }
 
-/* room selector: the active room is shown in bold red (like the active
-   header links in the DBA); the link colour (--accent) comes from the `a` rule */
-.room.active {
-  font-weight: bold;
-}
-
-/* wide enough for the longest hint (the private-message placeholder),
-   overriding the generic 200px input width */
-#input {
-  width: 30rem;
-  max-width: 100%;
-}
-
 /* narrow screens */
 @media (max-width: 800px) {
   /* shorten the page title */
   .title-full { display: none; }
   .title-short { display: inline; }
-  /* let the navigation wrap instead of truncating with an ellipsis */
-  nav.ellipsis {
-    white-space: normal;
-    overflow: visible;
-    text-overflow: clip;
-  }
-  /* keep the status message on one line: short ones stay inline after the nav
-     links, a long one truncates with an ellipsis instead of wrapping */
-  #info {
-    display: inline-block;
-    max-width: 100%;
-    vertical-align: bottom;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  /* labels above their controls, so the fields keep the full width */
+  .field,
+  form:has(> .field) > .field {
+    grid-template-columns: 1fr;
   }
 }

@@ -28,10 +28,13 @@ var me = (document.body && document.body.dataset.user) || "";
 function openRoom(newRoom) {
   if(room === newRoom) return;
   room = newRoom;
-  // mark the active room, clear the message list, and leave any private
-  // conversation; the server sends the history of the room on connect
+  // mark the open room, clear the message list, and leave any private
+  // conversation; the server sends the history of the room on connect.
+  // the marker is the attribute the DBA uses for the current view: it is
+  // what a reader is told, and what the style picks out
   document.querySelectorAll(".room").forEach(function(link) {
-    link.classList.toggle("active", link.dataset.room === room);
+    if(link.dataset.room === room) link.setAttribute("aria-current", "page");
+    else link.removeAttribute("aria-current");
   });
   clearMessages();
   to = "";
@@ -207,11 +210,11 @@ function updateControls() {
   var button = document.getElementById("send");
   if(button) button.disabled = !input.value;
   document.querySelectorAll(".user").forEach(function(link) {
-    link.classList.toggle("active", link.dataset.user === to);
+    link.classList.toggle("selected", link.dataset.user === to);
   });
-  var active = document.querySelector(".room.active");
+  var current = document.querySelector(".room[aria-current]");
   document.getElementById("conversation").textContent =
-    " · " + (to ? "Private chat with " + to : active ? active.textContent : "");
+    " · " + (to ? "Private chat with " + to : current ? current.textContent : "");
 }
 
 // asks the server for statistics (see chat-ws:info)

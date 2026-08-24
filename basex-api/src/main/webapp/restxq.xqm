@@ -28,15 +28,17 @@ function page:start(
           <div class='header-top'>
             <h1>BaseX HTTP Services</h1>
           </div>
-          <nav class='ellipsis'>{
-            insert-separator(
-              ('DBA', 'Chat', 'WebDAV', 'REST') ! <a href='{ lower-case(.) }'>{ . }</a>,
-              ' · '
-            )
-          }</nav>
-          <hr/>
+          <div class='header-nav'>
+            <nav>
+              <ul>{
+                (: the separator between the entries is supplied by the style sheet :)
+                ('DBA', 'Chat', 'WebDAV', 'REST') !
+                  <li><a href='{ lower-case(.) }'>{ . }</a></li>
+              }</ul>
+            </nav>
+          </div>
         </div>
-        <a href='/' class='header-logo'><img src='static/basex.svg' alt='BaseX'/></a>
+        <a href='./' class='header-logo'><img src='static/basex.svg' alt='BaseX'/></a>
       </header>
       <main>
         <p>Welcome to the BaseX HTTP Services: sample web applications written in

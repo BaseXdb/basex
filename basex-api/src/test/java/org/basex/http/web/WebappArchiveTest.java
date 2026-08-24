@@ -14,6 +14,7 @@ import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
+import org.basex.util.http.MediaType;
 import org.junit.jupiter.api.*;
 
 /**
@@ -96,7 +97,7 @@ public final class WebappArchiveTest extends HTTPTest {
    * @throws IOException I/O exception
    */
   @Test public void chatLogout() throws IOException {
-    final String page = get(200, "chat/logout");
+    final String page = post(200, "", MediaType.APPLICATION_X_WWW_FORM_URLENCODED, "chat/logout");
     assertTrue(page.contains("action=\"chat/login-check\""), page);
   }
 

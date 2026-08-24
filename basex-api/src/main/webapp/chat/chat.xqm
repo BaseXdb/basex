@@ -71,6 +71,7 @@ function chat:login-check(
  : @return redirection
  :)
 declare
+  %rest:POST
   %rest:path('/chat/logout')
 function chat:logout() as element(rest:response) {
   (: close the chat connections of this browser :)
@@ -212,26 +213,37 @@ declare %private function chat:wrap(
               <span class='title-short'>BaseX Chat</span>
             </h1>
             {
-              (: if someone is logged in, show the name and a logout link :)
-              if ($user) { <div><b>{ $user }</b> · <a href='chat/logout'>logout</a></div> }
+              (: if someone is logged in, show the name and the logout. It ends the
+               : session: it is submitted, not a link that a prefetch could follow :)
+              if ($user) {
+                <div>
+                  <b>{ $user }</b> · <form method='post' action='chat/logout'>
+                    <button type='submit' class='link'>logout</button>
+                  </form>
+                </div>
+              }
             }
           </div>
-          <nav class='ellipsis'>{
-            (: logged in: room selector (active room bolded by chat.js) plus the
-             : info element for server notices (welcome, join/leave, 'Who''s
-             : here?'); logged out: the login prompt, placed here like the DBA :)
+          <div class='header-nav'>{
+            (: logged in: room selector (the open room is marked by chat.js);
+             : logged out: the login prompt, placed here like the DBA :)
             if ($user) {
-              let $links := $chat-util:rooms !
-                <a href='#' class='room' data-room='{ . }'>{ chat-util:name(.) }</a>
-              return (
-                head($links), tail($links) ! (' · ', .),
-                (1 to 2) ! '&#x2000;', <b id='info' class='note'/>
-              )
+              <nav>
+                <ul>{
+                  (: the separator between the rooms is supplied by the style sheet :)
+                  $chat-util:rooms ! <li>
+                    <a href='#' class='room' data-room='{ . }'>{ chat-util:name(.) }</a>
+                  </li>
+                }</ul>
+              </nav>
             } else {
               <div class='note'>Please enter your credentials:</div>
-            }
-          }</nav>
-          <hr/>
+            },
+            (: server notices (welcome, join/leave, 'Who''s here?'): a status message,
+             : not a navigation entry, so the client replaces its text and the role has
+             : the replacement announced :)
+            <output id='info' role='status' class='note'/>
+          }</div>
         </div>
         <a href='./' class='header-logo'><img src='chat/.static/basex.svg' alt='BaseX'/></a>
       </header>

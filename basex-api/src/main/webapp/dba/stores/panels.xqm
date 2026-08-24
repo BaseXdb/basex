@@ -336,10 +336,11 @@ declare %private function panels:breadcrumb(
     return <div class='note ellipsis'>{
       for $label at $pos in $labels
       return (
-        ' » '[$pos > 1],
+        (: text nodes, as two adjacent strings would be separated by a space :)
+        text { ' » ' }[$pos > 1],
         (: the last step leads to the level that is shown, and nowhere to go :)
         if ($pos = count($labels)) {
-          $label
+          text { $label }
         } else {
           <a href='#' data-depth='{ $pos - 1 }'
              onclick='truncatePath(this.dataset.depth); return false;'>{

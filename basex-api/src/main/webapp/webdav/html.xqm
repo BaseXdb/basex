@@ -93,8 +93,8 @@ declare %private function html:listing(
       <meta name='description' content='WebDAV Interface'/>
       <meta name='author' content='BaseX Team, BSD License'/>
       <meta name='robots' content='noindex'/>
-      <link rel='icon' href='/webdav/.static/basex.svg'/>
-      <link rel='stylesheet' type='text/css' href='/webdav/.static/style.css'/>
+      <link rel='icon' href='{ $res:ROOT }/.static/basex.svg'/>
+      <link rel='stylesheet' type='text/css' href='{ $res:ROOT }/.static/style.css'/>
     </head>
     <body>
       <header>
@@ -105,28 +105,29 @@ declare %private function html:listing(
               <span class='title-short'>WebDAV</span>
             </h1>
           </div>
-          <nav class='ellipsis'>{ html:breadcrumb($rc) }</nav>
-          <hr/>
+          <div class='header-nav'>{ html:breadcrumb($rc) }</div>
         </div>
-        <a href='/' class='header-logo'><img src='/webdav/.static/basex.svg' alt='BaseX'/></a>
+        <a href='/' class='header-logo'>
+          <img src='{ $res:ROOT }/.static/basex.svg' alt='BaseX'/>
+        </a>
       </header>
       <main>
         <div class='content' style='--columns: 1fr'>
-        <div class='panel full'>
-        <table>
-          <tr>
-            <th>Name</th>
-            <th>Content Type</th>
-            <th class='right'>Size</th>
-            <th>Modified</th>
-          </tr>
-          {
-            for $child in res:children($rc)
-            order by $child?kind, $child?name
-            return html:entry($child)
-          }
-        </table>
-        </div>
+          <div class='panel'>
+            <table>
+              <tr>
+                <th>Name</th>
+                <th>Content Type</th>
+                <th class='num'>Size</th>
+                <th>Modified</th>
+              </tr>
+              {
+                for $child in res:children($rc)
+                order by $child?kind, $child?name
+                return html:entry($child)
+              }
+            </table>
+          </div>
         </div>
       </main>
       <hr/>
@@ -136,22 +137,35 @@ declare %private function html:listing(
 };
 
 (:~
- : Generates the links to the ancestors of a resource.
+ : Generates the path to a collection: the ancestors are links, the collection itself
+ : is the level that is shown.
  : @param  $rc  resource description
- : @return links
+ : @return breadcrumb
  :)
 declare %private function html:breadcrumb(
   $rc  as res:any
-) as item()* {
+) as element(div) {
   let $steps := tokenize(res:path($rc), '/')[.]
-  let $links := (
-    <a href='{ $res:ROOT }/'>WebDAV</a>,
-    for $step at $pos in $steps
-    return <a href='{ resp:encode(string-join(subsequence($steps, 1, $pos), '/')) }/'>{
-      $step
-    }</a>
-  )
-  return (head($links), tail($links) ! (' / ', .))
+  let $labels := ('WebDAV', $steps)
+  return <div class='note ellipsis'>{
+    for $label at $pos in $labels
+    return (
+      (: text nodes, as two adjacent strings would be separated by a space :)
+      text { ' » ' }[$pos > 1],
+      (: the last step leads to the level that is shown, and nowhere to go :)
+      if ($pos = count($labels)) {
+        text { $label }
+      } else {
+        element a {
+          attribute href {
+            resp:encode(string-join(subsequence($steps, 1, $pos - 1), '/')) || '/'
+          },
+          attribute class { 'root' }[$pos = 1],
+          $label
+        }
+      }
+    )
+  }</div>
 };
 
 (:~
@@ -168,7 +182,7 @@ declare %private function html:entry(
       <a href='{ resp:href($rc) }'>{ $rc?name }{ if (not($resource)) { '/' } }</a>
     </td>
     <td>{ if ($resource) { $rc?content-type } }</td>
-    <td class='right'>{
+    <td class='num'>{
       (: for XML resources, the size is a node count, not a byte length :)
       if ($resource and $rc?type != 'xml') { $rc?size }
     }</td>
