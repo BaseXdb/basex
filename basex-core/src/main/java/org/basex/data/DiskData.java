@@ -293,10 +293,10 @@ public final class DiskData extends Data {
     final long value = textRef(pre);
     if(Inline.inlined(value)) return Inline.unpackLength(value);
 
+    // if the text is compressed, the number of compressed bytes follows the original length;
+    // both values must be read in a single call, as the file cursor is shared
     final DataAccess da = text ? texts : values;
-    final int l = da.readNum(value & Compress.COMPRESS - 1);
-    // if text is compressed, read number of compressed bytes
-    return Compress.compressed(value) ? da.readNum() : l;
+    return da.readNum(value & Compress.COMPRESS - 1, Compress.compressed(value));
   }
 
   /**

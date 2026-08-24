@@ -157,6 +157,18 @@ public final class DataAccess implements Closeable {
   }
 
   /**
+   * Reads a {@link Num} value from the specified position, or the one that follows it.
+   * @param pos text position
+   * @param next read the subsequent value
+   * @return read num
+   */
+  public synchronized int readNum(final long pos, final boolean next) {
+    cursor(pos);
+    final int value = readNum();
+    return next ? readNum() : value;
+  }
+
+  /**
    * Reads a token from disk.
    * @param pos text position
    * @return text as byte array
