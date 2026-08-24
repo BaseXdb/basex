@@ -23,6 +23,8 @@ import org.basex.util.*;
 public final class TableDiskAccess extends TableAccess {
   /** Number of table readers (must be 1 << n). */
   private static final int READERS = 1 << 4;
+  /** Maximum number of pages to read ahead (must be 1 << n, at most half of the buffers). */
+  private static final int AHEAD = 1 << 3;
 
   /** Table readers, hashed by thread ID (entries can be {@code null}). */
   private final TableReader[] readers = new TableReader[READERS];
@@ -624,6 +626,13 @@ public final class TableDiskAccess extends TableAccess {
     /** Thread this reader is confined to; only assigned while its previous owner is gone. */
     private Thread owner;
 
+    /** Number of pages to read ahead. */
+    private int ahead = 1;
+    /** Page that continues the current sequential run. */
+    private int nextRead = -1;
+    /** Buffer for reading ahead (can be {@code null}). */
+    private byte[] scratch;
+
     /** Pointer to current page. */
     private int page = -1;
     /** Pre value of the first entry in the current page. */
@@ -757,12 +766,47 @@ public final class TableDiskAccess extends TableAccess {
           // only reached by the master reader: the table grows during updates
           pages = pre + 1;
         } else {
-          file.seek(buffer.pos << IO.BLOCKPOWER);
-          file.readFully(buffer.data);
+          // pages that continue a sequential run are fetched in a single request; the master
+          // reader is excluded, as the table can grow beyond the file size while it is updated
+          ahead = owner != null && pre == nextRead ? Math.min(ahead << 1, AHEAD) : 1;
+          final int count = Math.min(ahead, pages - pre);
+          nextRead = pre + count;
+          file.seek((long) pre << IO.BLOCKPOWER);
+          if(count == 1) {
+            file.readFully(buffer.data);
+          } else if(readAhead(pre, count)) {
+            // the requested page was evicted while reading ahead: fetch it again
+            final Buffer current = buffers.current();
+            write(current);
+            current.pos = pre;
+            file.seek((long) pre << IO.BLOCKPOWER);
+            file.readFully(current.data);
+          }
         }
       } catch(final IOException ex) {
         throw new RuntimeException(Util.info(ex));
       }
+    }
+
+    /**
+     * Reads consecutive pages in a single request and caches them.
+     * @param pre first page
+     * @param count number of pages
+     * @return flag indicating if the first page was evicted again
+     * @throws IOException I/O exception
+     */
+    private boolean readAhead(final int pre, final int count) throws IOException {
+      if(scratch == null) scratch = new byte[AHEAD << IO.BLOCKPOWER];
+      file.readFully(scratch, 0, count << IO.BLOCKPOWER);
+      Array.copyToStart(scratch, 0, IO.BLOCKSIZE, buffers.current().data);
+      for(int c = 1; c < count; c++) {
+        buffers.cursor(pre + c);
+        final Buffer buffer = buffers.current();
+        write(buffer);
+        buffer.pos = pre + c;
+        Array.copyToStart(scratch, c << IO.BLOCKPOWER, IO.BLOCKSIZE, buffer.data);
+      }
+      return buffers.cursor(pre);
     }
 
     /**
