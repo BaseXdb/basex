@@ -66,6 +66,8 @@ public interface WebText {
   /** Error message. */
   String ARG_TYPE_X_X_X = "% must be of type %, supplied: %.";
   /** Error message. */
+  String ARG_MISSING_X_X = "% is missing (expected type: %).";
+  /** Error message. */
   String PARAM_MISSING_X = "Parameter $% missing in function declaration.";
   /** Error message. */
   String PARAM_DUPL_X = "$% is specified more than once.";
@@ -82,13 +84,13 @@ public interface WebText {
   /** Error message. */
   String METHOD_BODY_X = "Method % cannot have a body.";
   /** Error message. */
-  String BODY_TYPE_X_X = "Body cannot be parsed as %: %.";
+  String BODY_TYPE_X_X = "Body cannot be parsed as %: %";
   /** Error message. */
   String PATH_CONFLICT_X_X = "Multiple functions exist for path \"%\":%";
   /** Error message. */
   String ERROR_CONFLICT_X_X = "Multiple functions exist for error path \"%\":%";
   /** Error message. */
-  String ERROR_QS_X = "Invalid quality factor: qs=%";
+  String ERROR_QS_X = "Quality factor must be in the range 0-1: qs=%.";
 
   /** QName. */
   QNm Q_STATUS = new QNm("status");

@@ -68,7 +68,7 @@ public final class RestXqPathTest extends RestXqTest {
   @Test public void getInteger() throws Exception {
     final String f = "declare %R:path('/{$x}') function m:f($x as xs:int) {$x};";
     get("2", f, "2");
-    get(500, f, "StRiNg");
+    get(400, f, "StRiNg");
   }
 
   /**
@@ -79,7 +79,7 @@ public final class RestXqPathTest extends RestXqTest {
     final String f = "declare %R:path('{$x}/{$y}') function " +
         "m:f($x as xs:integer,$y as xs:integer) {$x*$y};";
     get("6", f, "2/3");
-    get(500, f, "2/x");
+    get(400, f, "2/x");
   }
 
   /**
@@ -163,8 +163,8 @@ public final class RestXqPathTest extends RestXqTest {
         "declare %R:POST %R:path('/t') function m:g() { 2 };", "t");
     // variables of unmatched templates must be optional
     final String u = "declare %R:path('/u') %R:path('/u/{$x}') ";
-    get(500, u + "function m:f($x as xs:string) { $x };", "u");
-    get(500, u + "function m:f($x as xs:string+) { $x };", "u");
+    get(400, u + "function m:f($x as xs:string) { $x };", "u");
+    get(400, u + "function m:f($x as xs:string+) { $x };", "u");
     // only the path that leaves the variable unbound fails
     get("a", u + "function m:f($x as xs:string) { $x };", "u/a");
     // untyped arguments and optional types are fine
@@ -197,7 +197,7 @@ public final class RestXqPathTest extends RestXqTest {
     // variable in template missing
     get(500, "declare %R:path('') function m:f($x) {()};", "");
     // variable must inherit xs:anyAtomicType
-    get(500, "declare %R:path('{$x}') function m:f($x as node()) {$x};", "1");
+    get(400, "declare %R:path('{$x}') function m:f($x as node()) {$x};", "1");
   }
 
   /**

@@ -91,6 +91,16 @@ public abstract class RestXqTest extends HTTPTest {
   }
 
   /**
+   * Installs an additional module and keeps the existing ones.
+   * @param function function to be tested
+   * @throws IOException I/O exception
+   */
+  protected static void add(final String function) throws IOException {
+    module().write(HEADER + function);
+    WebModules.get(context).init(false);
+  }
+
+  /**
    * Returns the XQuery test module.
    * @return test module
    */

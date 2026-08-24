@@ -173,7 +173,12 @@ public final class RestXqResponse extends WebResponse {
           else if(qnm.eq(Q_REASON) || qnm.eq(Q_MESSAGE)); // ignored
           else throw func.error(UNEXP_NODE_X, a);
         }
-        if(sta != null) status = toInt(sta);
+        if(sta != null) {
+          // the status code is validated as in web:error
+          final int code = toInt(sta);
+          if(code <= 0 || code > 999) throw QueryError.WEB_STATUS_X.get(func.function.info, sta);
+          status = code;
+        }
 
         // remember header names to distinguish first occurrence from repetitions
         final Set<String> seen = new HashSet<>();

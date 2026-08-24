@@ -96,8 +96,9 @@ public final class RestXqErrorTest extends RestXqTest {
     get(500, "declare %R:path('') function m:a() { error(xs:QName('x')) };" +
         "declare %R:error('y') function m:b() { 'F' };", "");
     // error (invalid name test)
-    get(500, "declare %R:path('') function m:a() { () };" +
-        "declare %R:error('unknown:*') function m:b() { 'F' };", "");
+    register("declare %R:path('') function m:a() { () };" +
+        "declare %R:error('unknown:*') function m:b() { 'F' };");
+    assertContains(get(500, ""), "No namespace declared for 'unknown:");
     get(500, "declare %R:path('') function m:a() { () };" +
         "declare %R:error('*:In Valid') function m:b() { 'F' };", "");
     get(500, "declare %R:path('') function m:a() { () };" +
@@ -150,6 +151,20 @@ public final class RestXqErrorTest extends RestXqTest {
     register("declare %R:path('') function m:a() { " +
         "web:error(400, { 'code': 42 }, { 'method': 'json' }) };");
     assertEquals("{\"code\":42}", get(400, ""));
+  }
+
+  /**
+   * Values that cannot be bound are rejected as bad requests.
+   * @throws Exception exception
+   */
+  @Test public void bindingError() throws Exception {
+    final String f = "declare %R:path('') %R:query-param('a', '{$a}') " +
+        "function m:f($a as xs:integer) { $a };";
+    register(f);
+    assertEquals("Query parameter 'a' must be of type xs:integer, supplied: \"x\".",
+        get(400, "", "a", "x"));
+    // the application can still handle the error
+    get("caught", f + "declare %R:error('*') function m:e() { 'caught' };", "?a=x");
   }
 
   /**

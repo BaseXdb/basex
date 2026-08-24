@@ -17,10 +17,10 @@ import org.basex.util.hash.*;
 public final class MapEntry extends MapFn {
   @Override
   protected XQMap item(final QueryContext qc) throws QueryException {
-    final Item key = toAtomItem(arg(0), qc);
     final Value value = arg(1).value(qc);
+
     return seqType().type instanceof final ShapeType sh ? XQMap.get(sh, value) :
-      XQMap.get(key, value);
+      XQMap.get(toAtomItem(arg(0), qc), value);
   }
 
   @Override

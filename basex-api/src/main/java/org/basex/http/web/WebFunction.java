@@ -180,11 +180,22 @@ public abstract class WebFunction implements Comparable<WebFunction> {
         try {
           args[p] = value.seqType().instanceOf(st) ? value : st.coerce(value, qc, null);
         } catch(final QueryException ex) {
-          throw error(ARG_TYPE_X_X_X, input, st, value).cause(ex);
+          throw bindError(input, st, value).cause(ex);
         }
         break;
       }
     }
+  }
+
+  /**
+   * Returns an exception for a value that cannot be bound to a function argument.
+   * @param input input description
+   * @param st expected type
+   * @param value supplied value
+   * @return exception
+   */
+  protected QueryException bindError(final String input, final SeqType st, final Value value) {
+    return error(ARG_TYPE_X_X_X, input, st, value);
   }
 
   /**

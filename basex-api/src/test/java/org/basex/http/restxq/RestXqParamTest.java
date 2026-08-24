@@ -1,5 +1,7 @@
 package org.basex.http.restxq;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.*;
 
 import org.basex.util.http.MediaType;
@@ -42,20 +44,30 @@ public final class RestXqParamTest extends RestXqTest {
   @Test public void parameterKinds() throws Exception {
     register("declare %R:path('') %R:query-param('a', '{$a}') "
         + "function m:f($a as xs:integer) { $a };");
-    assertContains(get(500, "", "a", "x"), "Query parameter 'a'");
+    assertContains(get(400, "", "a", "x"), "Query parameter 'a'");
 
     register("declare %R:path('') %R:POST %R:form-param('a', '{$a}') "
         + "function m:f($a as xs:integer) { $a };");
-    assertContains(post(500, "a=x", MediaType.APPLICATION_X_WWW_FORM_URLENCODED, ""),
+    assertContains(post(400, "a=x", MediaType.APPLICATION_X_WWW_FORM_URLENCODED, ""),
         "Form parameter 'a'");
 
     register("declare %R:path('') %R:header-param('X-Num', '{$a}') "
         + "function m:f($a as xs:integer) { $a };");
-    assertContains(send(500, "GET", null, null, Map.of("X-Num", "x"), ""), "Header 'X-Num'");
+    assertContains(send(400, "GET", null, null, Map.of("X-Num", "x"), ""), "Header 'X-Num'");
 
     register("declare %R:path('') %R:cookie-param('num', '{$a}') "
         + "function m:f($a as xs:integer) { $a };");
-    assertContains(send(500, "GET", null, null, Map.of("Cookie", "num=x"), ""), "Cookie 'num'");
+    assertContains(send(400, "GET", null, null, Map.of("Cookie", "num=x"), ""), "Cookie 'num'");
+  }
+
+  /**
+   * Parameters that are required, but not supplied.
+   * @throws Exception exception
+   */
+  @Test public void missingParameter() throws Exception {
+    register("declare %R:path('') %R:query-param('a', '{$a}') "
+        + "function m:f($a as xs:integer) { $a };");
+    assertEquals("Query parameter 'a' is missing (expected type: xs:integer).", get(400, ""));
   }
 
   /**
@@ -73,7 +85,7 @@ public final class RestXqParamTest extends RestXqTest {
     // invalid path template
     get(500, "declare %R:path('') %R:query-param('a', '$a') function m:f($a) { $a };", "?a=2");
     // invalid type cardinality
-    get(500, "declare %R:path('') %R:query-param('a', '{$a}') " +
+    get(400, "declare %R:path('') %R:query-param('a', '{$a}') " +
         "function m:f($a as item()) { () };", "?a=4&a=8");
   }
 }

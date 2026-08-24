@@ -176,6 +176,14 @@ public final class WebModules {
         return HTTPStatus.NOT_ACCEPTABLE_X.get(types(byType, false));
       }
     }
+
+    // nothing was found: report modules that could not be parsed
+    if(conn.context.soptions.get(StaticOptions.RESTXQERRORS)) {
+      for(final WebModule module : cache(conn.context).values()) {
+        final QueryException ex = module.error();
+        if(ex != null) throw ex;
+      }
+    }
     return HTTPStatus.SERVICE_NOT_FOUND.get();
   }
 
@@ -184,11 +192,10 @@ public final class WebModules {
    * @param conn HTTP connection
    * @param constraint constraint to be checked
    * @return functions
-   * @throws QueryException query exception
    * @throws IOException I/O exception
    */
   private ArrayList<RestXqFunction> collect(final HTTPConnection conn,
-      final Checks<RestXqFunction> constraint) throws QueryException, IOException {
+      final Checks<RestXqFunction> constraint) throws IOException {
     final ArrayList<RestXqFunction> list = new ArrayList<>();
     for(final WebModule module : cache(conn.context).values()) {
       for(final RestXqFunction func : module.functions()) {
@@ -218,11 +225,10 @@ public final class WebModules {
    * @param error error code (can be {@code null}; assigned if error function is to be called)
    * @param perm permission flag
    * @return list of matching functions, ordered by specifity
-   * @throws QueryException query exception
    * @throws IOException I/O exception
    */
   private List<RestXqFunction> find(final HTTPConnection conn, final QNm error, final boolean perm)
-      throws QueryException, IOException {
+      throws IOException {
 
     // collect all functions and sort them by specifity
     final ArrayList<RestXqFunction> list = collect(conn, func -> func.matches(conn, error, perm));
@@ -234,10 +240,9 @@ public final class WebModules {
    * Returns permission functions that match the current request.
    * @param conn HTTP connection
    * @return list of function, ordered by relevance
-   * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  public List<RestXqFunction> checks(final HTTPConnection conn) throws QueryException, IOException {
+  public List<RestXqFunction> checks(final HTTPConnection conn) throws IOException {
     return find(conn, null, true);
   }
 
@@ -247,11 +252,10 @@ public final class WebModules {
    * @param ctx database context
    * @param ann annotation (can be {@code null})
    * @return matching functions
-   * @throws QueryException query exception
    * @throws IOException I/O exception
    */
   private ArrayList<WsFunction> findWs(final String pth, final Context ctx, final Annotation ann)
-      throws QueryException, IOException {
+      throws IOException {
     final ArrayList<WsFunction> funcs = new ArrayList<>();
     for(final WebModule mod : cache(ctx).values()) {
       for(final WsFunction func : mod.wsFunctions()) {
@@ -267,11 +271,9 @@ public final class WebModules {
    * @param pth concrete connection path
    * @param ctx database context
    * @return function, or {@code null} if no function matches
-   * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  public WsFunction websocket(final String pth, final Context ctx)
-      throws QueryException, IOException {
+  public WsFunction websocket(final String pth, final Context ctx) throws IOException {
     final ArrayList<WsFunction> funcs = findWs(pth, ctx, null);
     return funcs.isEmpty() ? null : funcs.getFirst();
   }
@@ -443,11 +445,9 @@ public final class WebModules {
    * Returns the module cache.
    * @param ctx database context
    * @return module cache
-   * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private synchronized HashMap<String, WebModule> cache(final Context ctx)
-      throws QueryException, IOException {
+  private synchronized HashMap<String, WebModule> cache(final Context ctx) throws IOException {
 
     final HashMap<String, WebModule> cache;
     if(parsed) {
@@ -476,12 +476,10 @@ public final class WebModules {
    * @param cache cached modules
    * @param old old cache
    * @param files archive files
-   * @throws QueryException query exception
    * @throws IOException I/O exception
    */
   private void parseArchives(final Context ctx, final HashMap<String, WebModule> cache,
-      final HashMap<String, WebModule> old, final ArrayList<IOFile> files)
-      throws QueryException, IOException {
+      final HashMap<String, WebModule> old, final ArrayList<IOFile> files) throws IOException {
 
     final HashMap<String, WebArchive> map = new HashMap<>();
     for(final IOFile file : files) {
@@ -517,12 +515,11 @@ public final class WebModules {
    * @param cache cached modules
    * @param old old cache
    * @param archived archive files (will be assigned)
-   * @throws QueryException query exception
    * @throws IOException I/O exception
    */
   private static void parse(final Context ctx, final IOFile root,
       final HashMap<String, WebModule> cache, final HashMap<String, WebModule> old,
-      final ArrayList<IOFile> archived) throws QueryException, IOException {
+      final ArrayList<IOFile> archived) throws IOException {
 
     // check if directory is to be skipped
     final IOFile[] files = root.children();

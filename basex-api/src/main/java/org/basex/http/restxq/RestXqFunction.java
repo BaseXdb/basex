@@ -247,8 +247,8 @@ public final class RestXqFunction extends WebFunction {
       final Value value;
       try {
         value = Payload.value(body, type, mopts);
-      } catch(final IOException ex) {
-        throw HTTPStatus.BAD_REQUEST_X.get(Util.info(BODY_TYPE_X_X, type, ex));
+      } catch(final IOException | QueryException ex) {
+        throw badRequest(Util.info(BODY_TYPE_X_X, type, ex));
       }
       bind(requestBody, args, value, qc, "Request body");
     }
@@ -385,6 +385,23 @@ public final class RestXqFunction extends WebFunction {
   @Override
   public QueryException error(final String msg, final Object... ext) {
     return error(function.info, msg, ext);
+  }
+
+  @Override
+  protected QueryException bindError(final String input, final SeqType st, final Value value) {
+    return badRequest(value.isEmpty() ? Util.info(ARG_MISSING_X_X, input, st) :
+      Util.info(ARG_TYPE_X_X_X, input, st, value));
+  }
+
+  /**
+   * Returns an exception for input that was supplied by the client.
+   * @param message error message
+   * @return exception
+   */
+  private QueryException badRequest(final String message) {
+    final QNm qname = new QNm(concat(QueryText.STATUS, HttpServletResponse.SC_BAD_REQUEST),
+        QueryText.REST_URI);
+    return new QueryException(function.info, qname, message);
   }
 
   /**
@@ -546,7 +563,8 @@ public final class RestXqFunction extends WebFunction {
       }
 
       // message
-      if(name != null && name.hasPrefix() && !name.hasURI()) throw error(INV_NONS_X, name);
+      if(name != null && name.hasPrefix() && !name.hasURI())
+        throw error(INV_NONS_X, name.prefixString());
       final NameTest nt = scope != null ? (NameTest) Test.get(Kind.ELEMENT, name, scope, null) :
         null;
 

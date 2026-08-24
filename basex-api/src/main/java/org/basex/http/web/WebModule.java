@@ -32,6 +32,8 @@ public final class WebModule {
   private long time = -1;
   /** File content. */
   private String content;
+  /** Error that occurred while parsing the module (can be {@code null}). */
+  private QueryException error;
 
   /**
    * Constructor.
@@ -46,10 +48,9 @@ public final class WebModule {
   /**
    * Checks the module for relevant annotations.
    * @param ctx database context
-   * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  void parse(final Context ctx) throws QueryException, IOException {
+  void parse(final Context ctx) throws IOException {
     final long ts = archive != null ? archive.time() : file.timeStamp();
     if(time == ts) return;
 
@@ -58,6 +59,7 @@ public final class WebModule {
 
     functions.clear();
     wsFunctions.clear();
+    error = null;
 
     try(QueryContext qc = qc(ctx)) {
       // loop through all functions
@@ -80,10 +82,20 @@ public final class WebModule {
         }
       }
     } catch(final QueryException ex) {
-      if(ctx.soptions.get(StaticOptions.RESTXQERRORS)) throw ex;
-      // ignore modules that cannot be parsed
+      // skip modules that cannot be parsed; all other modules stay available
+      functions.clear();
+      wsFunctions.clear();
+      error = ex;
       ctx.log.writeServer(LogType.ERROR, Util.message(ex));
     }
+  }
+
+  /**
+   * Returns the error that occurred while parsing the module.
+   * @return error, or {@code null} if the module was parsed successfully
+   */
+  QueryException error() {
+    return error;
   }
 
   /**

@@ -87,6 +87,15 @@ public final class RestXqFilterTest extends RestXqTest {
   }
 
   /**
+   * Invalid quality factors.
+   * @throws Exception exception
+   */
+  @Test public void qualityFactor() throws Exception {
+    register("declare %R:path('') %R:produces('text/plain;qs=5') function m:f() { 1 };");
+    assertContains(get(500, ""), "Quality factor must be in the range 0-1: qs=5.");
+  }
+
+  /**
    * {@code <restxq:response/>} elements.
    * @throws Exception exception
    */
@@ -117,5 +126,23 @@ public final class RestXqFilterTest extends RestXqTest {
         "<R:response><http:response stat='200'/></R:response> };", "");
     get(500, "declare %R:path('') function m:f() { " +
         "<R:response><http:response>X</http:response></R:response> };", "");
+  }
+
+  /**
+   * Status codes of {@code <http:response/>} elements.
+   * @throws Exception exception
+   */
+  @Test public void responseStatus() throws Exception {
+    final String f = "declare %R:path('') function m:f() { " +
+        "<R:response><http:response status='CODE'/></R:response> };";
+    get(200, f.replace("CODE", "200"), "");
+    get(999, f.replace("CODE", "999"), "");
+    // invalid status codes are rejected as in web:error
+    register(f.replace("CODE", "abc"));
+    assertContains(get(500, ""), "Invalid status code: abc");
+    register(f.replace("CODE", "0"));
+    assertContains(get(500, ""), "Invalid status code: 0");
+    register(f.replace("CODE", "1000"));
+    assertContains(get(500, ""), "Invalid status code: 1000");
   }
 }
