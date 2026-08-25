@@ -88,7 +88,7 @@ public final class Locking {
     job.addLocks();
     // prepare lock strings and acquire locks
     try {
-      acquire(job.jc().locks.finish(ctx));
+      acquire(job.jc().locks.finish(ctx), !job.inheritsSlot());
     } catch(final InterruptedException ex) {
       throw Util.notExpected("Thread was interrupted: %", ex);
     }
@@ -101,6 +101,17 @@ public final class Locking {
    * @throws InterruptedException interrupted exception
    */
   void acquire(final Locks locks) throws InterruptedException {
+    acquire(locks, true);
+  }
+
+  /**
+   * Puts read and write locks for the specified lock lists.
+   * The lists must have been prepared for locking (see {@link Locks#finish(Context)}).
+   * @param locks locks
+   * @param slot occupy a run slot in the lock queue
+   * @throws InterruptedException interrupted exception
+   */
+  private void acquire(final Locks locks, final boolean slot) throws InterruptedException {
     // one thread can only hold a single lock
     final Long id = Thread.currentThread().threadId();
     if(locked.containsKey(id)) throw new IllegalMonitorStateException("Thread holds locks: " + id);
@@ -109,13 +120,18 @@ public final class Locking {
     // queue job if the job limit has been reached (only locking jobs count towards the limit)
     final LockList reads = locks.reads, writes = locks.writes;
     final boolean write = writes.locking(), read = reads.locking(), lock = read || write;
-    boolean queued = false;
+    boolean global = false;
+    locks.slot = false;
     try {
-      if(lock) {
+      // a job that inherits the run slot of a blocked caller must not occupy a second one
+      if(lock && slot) {
         queue.acquire(id, read, write);
-        queued = true;
+        locks.slot = true;
+      }
+      if(lock) {
         // apply exclusive lock (global write), or shared lock otherwise
         (writes.global() ? globalLocks.writeLock() : globalLocks.readLock()).lock();
+        global = true;
       }
 
       globalLock.lock();
@@ -141,10 +157,8 @@ public final class Locking {
     } catch(final InterruptedException ex) {
       // an interrupted acquisition holds nothing: give back what was reserved for it
       locked.remove(id);
-      if(queued) {
-        (writes.global() ? globalLocks.writeLock() : globalLocks.readLock()).unlock();
-        queue.release();
-      }
+      if(global) (writes.global() ? globalLocks.writeLock() : globalLocks.readLock()).unlock();
+      if(locks.slot) queue.release();
       throw ex;
     }
 
@@ -170,36 +184,27 @@ public final class Locking {
     final boolean lock = reads.locking() || writes.locking();
 
     // release all local locks
-    for(final String string : reads) unpin(string).readLock().unlock();
-    for(final String string : writes) unpin(string).writeLock().unlock();
+    for(final String string : reads) unpin(string, false);
+    for(final String string : writes) unpin(string, true);
 
-    // allow next global reader to resume
-    globalLock.lock();
-    try {
-      if(reads.global()) {
-        globalReaders--;
+    // allow next global reader and local writer to resume
+    final boolean globalRead = reads.global(), localWrite = writes.local();
+    if(globalRead || localWrite) {
+      globalLock.lock();
+      try {
+        if(globalRead) globalReaders--;
+        if(localWrite) localWriters--;
         globalCond.signalAll();
+      } finally {
+        globalLock.unlock();
       }
-    } finally {
-      globalLock.unlock();
-    }
-
-    // allow next local writer to resume
-    globalLock.lock();
-    try {
-      if(writes.local()) {
-        localWriters--;
-        globalCond.signalAll();
-      }
-    } finally {
-      globalLock.unlock();
     }
 
     // release exclusive lock (global write), or shared lock otherwise
     if(lock) (writes.global() ? globalLocks.writeLock() : globalLocks.readLock()).unlock();
 
-    // allow next queued job to resume (non-locking jobs were never counted)
-    if(lock) queue.release();
+    // allow next queued job to resume (jobs without a run slot were never counted)
+    if(locks.slot) queue.release();
   }
 
   /**
@@ -225,15 +230,17 @@ public final class Locking {
   }
 
   /**
-   * Unpins a lock string. Removes a lock if pin count is zero.
+   * Releases a lock string and removes the lock if its pin count drops to zero.
    * @param string lock string
-   * @return lock
+   * @param write release write lock
    */
-  private LocalReadWriteLock unpin(final String string) {
+  private void unpin(final String string, final boolean write) {
     synchronized(localLocks) {
+      // the lock must be released before it is dropped: otherwise, another job could pin a new
+      // instance for the same string and enter while this job still holds the old one
       final LocalReadWriteLock lock = localLocks.get(string);
+      (write ? lock.writeLock() : lock.readLock()).unlock();
       if(lock.unpin()) localLocks.remove(string);
-      return lock;
     }
   }
 

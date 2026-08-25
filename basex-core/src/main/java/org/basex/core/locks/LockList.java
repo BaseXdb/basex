@@ -140,7 +140,7 @@ public final class LockList implements Iterable<String> {
         else list.remove(l--);
       }
     }
-    list.sort();
+    list.sort().unique();
   }
 
   @Override

@@ -32,7 +32,7 @@ final class FairLockQueue extends LockQueue {
       try {
         do {
           wait();
-        } while(!id.equals(queue.peek()));
+        } while(jobs >= parallel || !id.equals(queue.peek()));
       } finally {
         queue.remove(id);
       }

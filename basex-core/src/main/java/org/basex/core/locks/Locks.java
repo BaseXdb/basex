@@ -16,6 +16,8 @@ public final class Locks {
   public final LockList reads = new LockList();
   /** Write locks. */
   public final LockList writes = new LockList();
+  /** Indicates that the job occupies a run slot in the lock queue. */
+  boolean slot;
 
   /**
    * Finalizes locks. Replaces context references with current database, sorts entries,
