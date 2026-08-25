@@ -262,41 +262,61 @@ public final class Payload {
   /**
    * Returns a map with multipart form data.
    * @param type media type
+   * @param qc query context (can be {@code null})
    * @return map with file names and contents
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  public XQMap multiForm(final MediaType type) throws IOException, QueryException {
+  public XQMap multiForm(final MediaType type, final QueryContext qc)
+      throws IOException, QueryException {
+    return multiForm(type, qc, SpillOutput.THRESHOLD);
+  }
+
+  /**
+   * Returns a map with multipart form data.
+   * @param type media type
+   * @param qc query context (can be {@code null})
+   * @param threshold spill threshold in bytes
+   * @return map with file names and contents
+   * @throws IOException I/O exception
+   * @throws QueryException query exception
+   */
+  XQMap multiForm(final MediaType type, final QueryContext qc, final int threshold)
+      throws IOException, QueryException {
     // parse boundary, create helper arrays
     final byte[] bound = concat(DASHES, boundary(type)), last = concat(bound, DASHES);
 
     XQMap data = XQMap.empty();
-    final ByteList cont = new ByteList();
+    // contents of the current part; a part that outgrows the threshold is spilled to disk
+    SpillOutput cont = null;
     int lines = -1;
     Str name = Str.EMPTY, filename = Str.EMPTY;
     for(byte[] line; (line = readLine()) != null;) {
       if(lines >= 0) {
-        if(startsWith(line, bound)) {
+        // the closing boundary carries the trailing dashes, so it never matches the separator
+        final boolean closing = matchBoundary(last, line);
+        if(closing || matchBoundary(bound, line)) {
+          cont.close();
           // get old value
           Value value = data.get(name);
           if(filename.string().length != 0) {
             // assign file and contents, join multiple files
             final XQMap map = value instanceof final XQMap m ? m : XQMap.empty();
-            final B64 contents = B64.get(cont.next());
+            final B64 contents = cont.finish(IOERR_X);
             final Value files = new ItemList().add(map.get(filename)).add(contents).value();
             value = map.put(filename, files);
           } else {
             // assign string, join multiple strings
-            final Str v = Str.get(cont.next());
+            final Str v = Str.get(cont.finish().read());
             value = value == null ? v : new ItemList().add(value).add(v).value();
           }
 
           if(!name.isEmpty()) data = data.put(name, value);
           lines = -1;
-          if(eq(line, last)) break;
+          if(closing) break;
         } else {
-          if(lines++ > 0) cont.add(CRLF);
-          cont.add(line);
+          if(lines++ > 0) cont.write(CRLF);
+          cont.write(line);
         }
       } else if(startsWith(lc(line), CONTENT_DISPOSITION)) {
         // get key and file name; match each parameter on its own (the 'name' token also
@@ -305,6 +325,7 @@ public final class Payload {
         name = Str.get(disposition(ln, "name").replaceAll("\\[]", ""));
         filename = Str.get(disposition(ln, "filename"));
       } else if(line.length == 0) {
+        cont = new SpillOutput(qc, threshold);
         lines = 0;
       }
     }

@@ -127,18 +127,20 @@ public final class RequestContext implements RequestScope {
   /**
    * Returns the form parameters.
    * @param options main options
+   * @param qc query context
    * @return parameters
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  public XQMap formValues(final MainOptions options) throws QueryException, IOException {
+  public XQMap formValues(final MainOptions options, final QueryContext qc)
+      throws QueryException, IOException {
     if(form == null) {
       // no live request (WebSocket connection, detached job): no form body
       final MediaType mt = request != null ? state.mediaType() : null;
       if(mt != null && mt.is(MediaType.MULTIPART_FORM_DATA)) {
         // convert multipart parameters encoded in a form
         try(InputStream is = body().inputStream()) {
-          form = new Payload(is, true, null, options).multiForm(mt);
+          form = new Payload(is, true, null, options).multiForm(mt, qc);
         }
       } else if(mt != null && mt.is(MediaType.APPLICATION_X_WWW_FORM_URLENCODED)) {
         // convert URL-encoded parameters
@@ -160,7 +162,9 @@ public final class RequestContext implements RequestScope {
   public IO body() throws IOException {
     if(body == null) {
       final InputStream is = request.getInputStream();
-      body = Payload.binary(state.mediaType()) ? SpillOutput.read(is, null) :
+      // binary and multipart bodies are consumed as streams: spill large ones to disk
+      final MediaType mt = state.mediaType();
+      body = Payload.binary(mt) || mt.isMultipart() ? SpillOutput.read(is, null) :
         new IOContent(BufferInput.get(is).content());
     }
     return body;

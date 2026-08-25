@@ -25,7 +25,7 @@ public final class RequestParameterNames extends ApiFunc {
     try {
       final HashItemSet cache = new HashItemSet(ItemSet.Mode.ATOMIC, info);
       for(final Item name : requestCtx.queryValues().keys()) cache.add(name);
-      for(final Item name : requestCtx.formValues(qc.context.options).keys()) cache.add(name);
+      for(final Item name : requestCtx.formValues(qc.context.options, qc).keys()) cache.add(name);
       return ItemSeq.get(cache.keys(), cache.size(), null);
     } catch(final IOException ex) {
       throw REQUEST_PARAMETER.get(info).cause(ex);

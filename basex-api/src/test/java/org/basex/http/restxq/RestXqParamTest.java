@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
 
+import org.basex.io.in.*;
+import org.basex.util.*;
 import org.basex.util.http.MediaType;
 import org.junit.jupiter.api.*;
 
@@ -58,6 +60,25 @@ public final class RestXqParamTest extends RestXqTest {
     register("declare %R:path('') %R:cookie-param('num', '{$a}') "
         + "function m:f($a as xs:integer) { $a };");
     assertContains(send(400, "GET", null, null, Map.of("Cookie", "num=x"), ""), "Cookie 'num'");
+  }
+
+  /**
+   * Uploaded files are bound as a map with file names and contents. Parts that outgrow the
+   * spill threshold are covered by {@code PayloadTest}, as they cannot be provoked via HTTP.
+   * @throws Exception exception
+   */
+  @Test public void multipartUpload() throws Exception {
+    register("declare %R:path('') %R:POST %R:form-param('files', '{$files}') " +
+        "function m:f($files) { string-join(map:for-each($files, fn($name, $content) { " +
+        "$name || '=' || convert:binary-to-string($content) }), ',') };");
+
+    final byte[] body = Token.token(
+        "--bnd\r\nContent-Disposition: form-data; name=\"files\"; filename=\"a.txt\"\r\n\r\n" +
+        "A\r\n" +
+        "--bnd\r\nContent-Disposition: form-data; name=\"files\"; filename=\"b.txt\"\r\n\r\n" +
+        "BB\r\n--bnd--\r\n");
+    assertEquals("a.txt=A,b.txt=BB", send(200, "POST", new ArrayInput(body),
+        new MediaType("multipart/form-data; boundary=bnd"), ""));
   }
 
   /**

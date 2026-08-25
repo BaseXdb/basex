@@ -26,7 +26,7 @@ public final class RequestParameterMap extends ApiFunc {
     try {
       // cache parameter names
       final XQMap queryValues = requestCtx.queryValues();
-      final XQMap formValues = requestCtx.formValues(qc.context.options);
+      final XQMap formValues = requestCtx.formValues(qc.context.options, qc);
       final HashItemSet names = new HashItemSet(ItemSet.Mode.ATOMIC, info);
       for(final Item name : queryValues.keys()) names.add(name);
       for(final Item name : formValues.keys()) names.add(name);

@@ -259,7 +259,7 @@ public final class RestXqFunction extends WebFunction {
           "Query parameter");
     }
     for(final WebParam rxp : formParams) {
-      bind(rxp, args, conn.requestCtx.formValues(mopts).get(Str.get(rxp.name())), qc,
+      bind(rxp, args, conn.requestCtx.formValues(mopts, qc).get(Str.get(rxp.name())), qc,
           "Form parameter");
     }
 

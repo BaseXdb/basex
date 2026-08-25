@@ -25,7 +25,7 @@ public final class RequestParameter extends ApiFunc {
     try {
       final ValueBuilder vb = new ValueBuilder(qc);
       vb.add(requestCtx.queryValues().get(name));
-      vb.add(requestCtx.formValues(qc.context.options).get(name));
+      vb.add(requestCtx.formValues(qc.context.options, qc).get(name));
       final Value value = vb.value();
       return value.isEmpty() && defined(1) ? arg(1).value(qc) : value;
     } catch(final IOException ex) {

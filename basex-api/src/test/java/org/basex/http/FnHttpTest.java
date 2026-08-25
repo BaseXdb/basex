@@ -995,7 +995,8 @@ public abstract class FnHttpTest extends HTTPTest {
         + "Content-Disposition: form-data; filename=\"photo.jpg\"; name=\"upload\"" + CRLF + CRLF
         + "hello" + CRLF + "--bnd--" + CRLF);
     final Payload payload = new Payload(new ArrayInput(input), true, null, ctx.options);
-    final Value keys = payload.multiForm(new MediaType("multipart/form-data; boundary=bnd")).keys();
+    final MediaType type = new MediaType("multipart/form-data; boundary=bnd");
+    final Value keys = payload.multiForm(type, null).keys();
     assertEquals(1, keys.size());
     assertEquals("upload", string(keys.itemAt(0).string(null)));
   }

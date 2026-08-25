@@ -23,8 +23,8 @@ import org.basex.util.*;
  * @author Vincent Lizzi
  */
 public final class SpillOutput extends OutputStream {
-  /** Threshold in bytes. */
-  private static final int THRESHOLD = 100_000_000;
+  /** Default threshold in bytes. */
+  public static final int THRESHOLD = 100_000_000;
 
   /** Query context for registering the temporary file on spill (can be {@code null}). */
   private final QueryContext qc;
