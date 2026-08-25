@@ -2,6 +2,7 @@ package org.basex.core.jobs;
 
 import org.basex.query.*;
 import org.basex.query.value.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
@@ -18,6 +19,8 @@ public final class QueryJobResult {
   public Value value;
   /** Exception (can be {@code null}). */
   public QueryException exception;
+  /** Query information (can be {@code null}). */
+  public XQMap info;
   /** Evaluation time (ns). */
   public long time;
 
@@ -27,6 +30,7 @@ public final class QueryJobResult {
   public void init() {
     value = null;
     exception = null;
+    info = null;
     time = 0;
   }
 

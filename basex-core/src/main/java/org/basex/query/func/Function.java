@@ -1744,6 +1744,9 @@ public enum Function implements AFunction {
   _JOB_FINISHED(JobFinished::new, "finished(id)",
       params(STRING_O), BOOLEAN_O, flag(NDT), JOB_URI, Perm.ADMIN),
   /** XQuery function. */
+  _JOB_INFO(JobInfo::new, "info(id)",
+      params(STRING_O), MAP_ZO, flag(NDT), JOB_URI, Perm.ADMIN),
+  /** XQuery function. */
   _JOB_LIST(JobList::new, "list()",
       params(), STRING_ZM, flag(NDT), JOB_URI, Perm.ADMIN),
   /** XQuery function. */

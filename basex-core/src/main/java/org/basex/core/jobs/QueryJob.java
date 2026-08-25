@@ -259,7 +259,8 @@ public final class QueryJob extends Job implements Runnable {
       if(log != null) ctx.log.write(LogType.REQUEST, log, null, "JOB:" + id, ctx);
 
       final Performance perf = new Performance();
-      qp = new QueryProcessor(job.query, opts.get(JobOptions.BASE_URI), ctx, null);
+      final QueryInfo qi = opts.get(JobOptions.INFO) ? new QueryInfo(ctx, true) : null;
+      qp = new QueryProcessor(job.query, opts.get(JobOptions.BASE_URI), ctx, qi);
       // modules of the calling application are resolved as they were for the caller
       if(job.resolver != null) qp.uriResolver(job.resolver);
       qp.qc.user = new User(ctx.user()).permission(perm);
@@ -325,6 +326,17 @@ public final class QueryJob extends Job implements Runnable {
         // stop watching before the state is updated, so that a finished job is never stopped
         ctx.jobs.unwatchMemory(this);
 
+        // collect query information before the job is marked as finished
+        if(qi != null && qp != null) {
+          try {
+            final Value value = result.value;
+            result.info = qi.toMap(qp, value != null ? value.size() : 0, jc.locks);
+          } catch(final QueryException ex) {
+            // the information is dropped; it must not replace the outcome of the query
+            Util.debug(ex);
+          }
+        }
+
         // close and invalidate query after result has been assigned. order is important!
         if(opts.get(JobOptions.CACHE) == Boolean.TRUE) {
           ctx.jobs.scheduleResult(this);
@@ -361,7 +373,9 @@ public final class QueryJob extends Job implements Runnable {
         if(remove) ctx.jobs.tasks.remove(id);
         ctx.jobs.notifyChange();
         if(notify != null) notify.accept(result);
-        if(result.value != null && result.value.isEmpty()) ctx.jobs.results.remove(id);
+        // an empty result is dropped, unless query information is attached to it
+        if(result.value != null && result.value.isEmpty() && result.info == null)
+          ctx.jobs.results.remove(id);
       }
     } finally {
       running.set(false);

@@ -621,6 +621,46 @@ public final class JobModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void info() {
+    final Function func = _JOB_INFO;
+
+    // no information is collected by default
+    String id = query(_JOB_EVAL.args("1", " ()", " { 'cache': true() }"));
+    query(_JOB_WAIT.args(id));
+    query(func.args(id), "");
+    query(_JOB_RESULT.args(id), 1);
+
+    // information is cached with the result, and dropped with it
+    id = query(_JOB_EVAL.args("1 + 2", " ()", " { 'cache': true(), 'info': true() }"));
+    query(_JOB_WAIT.args(id));
+    final String info = ' ' + func.args(id);
+    query(_MAP_GET.args(info, "query"), "1 + 2");
+    query(_MAP_GET.args(info, "optimized-query"), 3);
+    query(_MAP_GET.args(' ' + _MAP_GET.args(info, "result"), "items"), 1);
+    query("starts-with(" + _MAP_GET.args(info, "plan") + ", '<QueryPlan')", true);
+    query(_MAP_SIZE.args(' ' + _MAP_GET.args(info, "timing")), 5);
+    // the entries of a phase are an array, whether there is one or several
+    query(_ARRAY_SIZE.args(' ' + _MAP_GET.args(info, "compilation")), 1);
+    query(_JOB_RESULT.args(id), 3);
+    query(func.args(id), "");
+
+    // an empty result is kept as long as information is attached to it
+    id = query(_JOB_EVAL.args("()", " ()", " { 'cache': true(), 'info': true() }"));
+    query(_JOB_WAIT.args(id));
+    query("exists(" + func.args(id) + ')', true);
+    query(_JOB_RESULT.args(id), "");
+
+    // a query that failed has information as well
+    id = query(_JOB_EVAL.args("db:get('db')", " ()", " { 'cache': true(), 'info': true() }"));
+    query(_JOB_WAIT.args(id));
+    query("exists(" + func.args(id) + ')', true);
+    error(_JOB_RESULT.args(id), DB_GET2_X);
+
+    // unknown job
+    query(func.args("12345"), "");
+  }
+
+  /** Test method. */
   @Test public void list() {
     final String id = verySlowQuery();
     try {

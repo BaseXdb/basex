@@ -24,6 +24,8 @@ public class JobOptions extends Options {
   public static final StringOption BASE_URI = new StringOption(CommonOptions.BASE_URI);
   /** Cache result. */
   public static final BooleanOption CACHE = new BooleanOption("cache");
+  /** Collect query information. */
+  public static final BooleanOption INFO = new BooleanOption("info", false);
   /** Maximum amount of megabytes that may be allocated by the query. */
   public static final NumberOption MEMORY = new NumberOption("memory", 0);
   /** Timeout in seconds. */
