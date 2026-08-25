@@ -134,7 +134,12 @@ public final class JobPool {
    * @param job job
    */
   public void scheduleResult(final Job job) {
-    schedule(() -> results.remove(job.jc().id()), timeout);
+    try {
+      schedule(() -> results.remove(job.jc().id()), timeout);
+    } catch(final RejectedExecutionException ex) {
+      // scheduler has been shut down (application is closing): the result is discarded anyway
+      Util.debug(ex);
+    }
   }
 
   /**

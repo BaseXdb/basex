@@ -34,6 +34,8 @@ public abstract class Job {
   private static final ThreadLocal<Job> CURRENT = new ThreadLocal<>();
   /** Stoppable threads. */
   private final Set<Thread> threads = ConcurrentHashMap.newKeySet();
+  /** Resources that are closed if the job is stopped. */
+  private final Set<Closeable> closeables = ConcurrentHashMap.newKeySet();
   /** Job that was registered on the current thread before this one (can be {@code null}). */
   private Job previous;
   /** Indicates that the job holds a run slot and must give it up again. */
@@ -185,6 +187,18 @@ public abstract class Job {
   }
 
   /**
+   * Registers a resource that is closed if the job on the current thread is stopped.
+   * @param closeable resource to register
+   * @return handle that unregisters the resource again
+   */
+  public static Binding closeOnStop(final Closeable closeable) {
+    final Job job = CURRENT.get();
+    if(job == null) return () -> { };
+    job.closeables.add(closeable);
+    return () -> job.closeables.remove(closeable);
+  }
+
+  /**
    * Binds this job to the current thread until the returned handle is closed. Blocking operations
    * started on the thread (see {@link #run(Stoppable)}) can then be interrupted when the job is
    * stopped. Intended for jobs that run on a thread outside {@link #register(Context)} (such as
@@ -215,9 +229,25 @@ public abstract class Job {
     if(stop) {
       stopped = true;
       for(final Thread thread : threads) thread.interrupt();
+      // blocking socket operations do not react to interrupts: close the resource instead
+      for(final Closeable closeable : closeables) {
+        try {
+          closeable.close();
+        } catch(final Exception ex) {
+          Util.debug(ex);
+        }
+      }
     }
     for(final Job job : children) job.state(js);
     if(stop) stopTimeout();
+  }
+
+  /**
+   * Indicates if the job inherits the run slot of a caller that is blocked until it has finished.
+   * @return result of check
+   */
+  public boolean inheritsSlot() {
+    return false;
   }
 
   /**

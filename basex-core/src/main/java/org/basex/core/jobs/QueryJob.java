@@ -369,6 +369,11 @@ public final class QueryJob extends Job implements Runnable {
   }
 
   @Override
+  public boolean inheritsSlot() {
+    return callerLocks != null && callerLocks.locking();
+  }
+
+  @Override
   public void addLocks() {
     qp.addLocks();
   }

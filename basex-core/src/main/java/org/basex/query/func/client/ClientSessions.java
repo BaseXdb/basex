@@ -3,6 +3,8 @@ package org.basex.query.func.client;
 import java.io.*;
 
 import org.basex.api.client.*;
+import org.basex.core.jobs.*;
+import org.basex.core.jobs.Job.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -19,6 +21,8 @@ public final class ClientSessions implements QueryResource {
   private int lastId = -1;
   /** Map with all open sessions and their IDs. */
   private final TokenObjectMap<ClientSession> conns = new TokenObjectMap<>();
+  /** Handle that unregisters the sessions from the job that opened them. */
+  private final Binding binding = Job.closeOnStop(this::close);
 
   /**
    * Adds a session.
@@ -50,6 +54,7 @@ public final class ClientSessions implements QueryResource {
 
   @Override
   public synchronized void close() {
+    binding.close();
     for(final ClientSession cs : conns.values()) {
       try {
         if(cs != null) cs.close();

@@ -97,7 +97,7 @@ public class ClientSession extends Session {
     } catch(final IllegalArgumentException ex) {
       throw new BaseXException(ex);
     }
-    sin = socket.getInputStream();
+    sin = new StoppableInputStream(socket.getInputStream());
 
     // receive challenge: {REALM}:{NONCE}
     final BufferInput bi = BufferInput.get(sin);

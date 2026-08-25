@@ -5,6 +5,8 @@ import static org.basex.util.Token.*;
 import java.sql.*;
 import java.util.*;
 
+import org.basex.core.jobs.*;
+import org.basex.core.jobs.Job.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -24,6 +26,8 @@ public final class JDBCConnections implements QueryResource {
   /** Prepared statements that return auto-generated keys. */
   private final Set<PreparedStatement> genKeys =
       Collections.newSetFromMap(new IdentityHashMap<>());
+  /** Handle that unregisters the connections from the job that opened them. */
+  private final Binding binding = Job.closeOnStop(this::close);
 
   /**
    * Adds a connection.
@@ -91,7 +95,8 @@ public final class JDBCConnections implements QueryResource {
   }
 
   @Override
-  public void close() {
+  public synchronized void close() {
+    binding.close();
     for(final AutoCloseable ac : conns.values()) {
       try {
         if(ac != null) ac.close();
