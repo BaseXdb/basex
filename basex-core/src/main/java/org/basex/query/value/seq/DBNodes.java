@@ -38,7 +38,18 @@ public final class DBNodes extends DBNodeSeq {
    * @param pres PRE values
    */
   public DBNodes(final Data data, final boolean all, final int... pres) {
-    super(pres, data, all ? NodeType.DOCUMENT : NodeType.NODE, all);
+    this(data, all ? NodeType.DOCUMENT : NodeType.NODE, all, pres);
+  }
+
+  /**
+   * Constructor, specifying a database, a node type and PRE values.
+   * @param data data reference
+   * @param type node type
+   * @param all PRE values reference all documents of the database
+   * @param pres PRE values
+   */
+  public DBNodes(final Data data, final NodeType type, final boolean all, final int... pres) {
+    super(pres, data, type, all);
   }
 
   /**

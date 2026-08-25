@@ -79,9 +79,9 @@ public final class QueryResources {
     synchronized(context.datas) { context.datas.pin(data); }
     globalData = true;
 
-    // create context value
+    // create context value; the node type is reused to avoid database lookups
     final boolean all = nodes.all();
-    final Value value = DBNodeSeq.get(new IntList(nodes.pres()), data, all, all);
+    final Value value = DBNodeSeq.get(nodes.pres().clone(), data, nodes.type, all);
 
     // add default collection. use initial node set if it contains all documents of the database.
     // otherwise, create new node set

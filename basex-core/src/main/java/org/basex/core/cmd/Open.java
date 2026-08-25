@@ -9,6 +9,7 @@ import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 
 /**
  * Evaluates the 'open' command and opens a database.
@@ -49,7 +50,8 @@ public final class Open extends Command {
 
         final String path = args[1];
         if(!path.isEmpty()) {
-          context.current(new DBNodes(data, data.resources.docs(path).toArray()));
+          final int[] pres = data.resources.docs(path).toArray();
+          context.current(new DBNodes(data, NodeType.DOCUMENT, false, pres));
         }
         if(data.meta.oldindex()) info(H_INDEX_FORMAT);
         if(data.meta.corrupt)  info(DB_CORRUPT);
