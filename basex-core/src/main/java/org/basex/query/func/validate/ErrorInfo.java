@@ -19,7 +19,7 @@ public final class ErrorInfo {
 
     @Override
     public String toString() {
-      return Strings.capitalize(Enums.string(this));
+      return Strings.titleCase(Enums.string(this));
     }
   }
 

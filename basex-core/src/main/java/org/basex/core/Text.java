@@ -228,10 +228,6 @@ public interface Text {
   /** Index info. */
   String SORTED_LIST = "Sorted List";
 
-  /** Query hits. */
-  String ITEM = "Item";
-  /** Query hits. */
-  String ITEMS = "Items";
   /** Context. */
   String CONTEXT = "Context";
 
@@ -697,45 +693,13 @@ public interface Text {
 
   /** Query info: query. */
   String QUERY = lang("query");
-  /** Query info: optimized query. */
-  String OPTIMIZED_QUERY = lang("optimized_query");
   /** Query info: parsing. */
   String PARSING = lang("parsing");
-  /** Query info: compiling. */
-  String COMPILING = lang("compiling");
-  /** Query info: optimizing. */
-  String OPTIMIZING = lang("optimizing");
-  /** Query info: evaluating. */
-  String EVALUATING = lang("evaluating");
-  /** Query info: querying. */
-  String TIMING = lang("timing");
   /** Query info: result . */
   String RESULT = lang("result");
-  /** Query info: plan. */
-  String QUERY_PLAN = lang("query_plan");
 
   /** Parsing. */
   String PARSING_CC = PARSING + COLS;
-  /** Compiling. */
-  String COMPILING_CC = COMPILING + COLS;
-  /** Optimizing. */
-  String OPTIMIZING_CC = OPTIMIZING + COLS;
-  /** Evaluating. */
-  String EVALUATING_CC = EVALUATING + COLS;
-  /** Printing. */
-  String PRINTING_CC = lang("printing") + COLS;
-  /** Total time. */
-  String TOTAL_TIME_CC = lang("total_time") + COLS;
-  /** Read locking. */
-  String READ_LOCKING_CC = lang("read_locking") + COLS;
-  /** Write locking. */
-  String WRITE_LOCKING_CC = lang("write_locking") + COLS;
-  /** Number. */
-  String NUMBER_CC = lang("number") + COLS;
-  /** Updated. */
-  String UPDATED_CC = lang("updated") + COLS;
-  /** "Printed. */
-  String PRINTED_CC = lang("printed") + COLS;
   /** Number of results. */
   String RESULTS_X = lang("results_%");
   /** Query executed. */

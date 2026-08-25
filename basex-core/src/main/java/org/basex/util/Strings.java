@@ -335,6 +335,21 @@ public final class Strings {
   }
 
   /**
+   * Returns the title case of a hyphenated string: every word is capitalized, and the hyphens
+   * are replaced with spaces.
+   * @param string input string
+   * @return title case
+   */
+  public static String titleCase(final String string) {
+    final StringBuilder sb = new StringBuilder();
+    for(final String word : split(string, '-')) {
+      if(!sb.isEmpty()) sb.append(' ');
+      sb.append(capitalize(word));
+    }
+    return sb.toString();
+  }
+
+  /**
    * Converts the given string to a Java class name. Slashes will be replaced with dots, and
    * the last package segment will be capitalized and camel-cased.
    * @param string string to convert

@@ -4,6 +4,8 @@ import static org.basex.core.Text.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
+import java.util.Map.*;
 import java.util.regex.*;
 
 import org.basex.core.*;
@@ -24,9 +26,14 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class InfoView extends View implements LinkListener, QueryTracer {
-  /** Sections. */
-  private static final String[] SECTIONS = { ALL, COMMAND, Text.ERROR, EVALUATING, COMPILING,
-      OPTIMIZING, OPTIMIZED_QUERY, QUERY, RESULT, TIMING, QUERY_PLAN
+  /** Key of the section that shows everything. */
+  private static final String ALL_KEY = "all";
+  /** Key of the section with the command that was run. */
+  private static final String COMMAND_KEY = "command";
+  /** Keys of the sections, in the order in which they are displayed. */
+  private static final String[] SECTIONS = { ALL_KEY, COMMAND_KEY, QueryInfo.ERROR,
+      QueryInfo.EVALUATION, QueryInfo.RESULT, QueryInfo.OPTIMIZED_QUERY, QueryInfo.OPTIMIZATION,
+      QueryInfo.COMPILATION, QueryInfo.QUERY, QueryInfo.PLAN, QueryInfo.TIMING
   };
 
   /** Error start. */
@@ -47,9 +54,9 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
   /** Painting flag. */
   private boolean paint;
   /** Currently selected section. */
-  private String section = ALL;
-  /** Time measurements. */
-  private IntList times = new IntList(4);
+  private String section = Strings.titleCase(ALL_KEY);
+  /** Time measurements (nanoseconds). */
+  private LongList times = new LongList(4);
   /** Time strings. */
   private StringList timeStrings = new StringList(4);
   /** Full text. */
@@ -80,10 +87,11 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
     header = new BaseXHeader(INFO);
 
     // first assign values, then assign maximal width
-    sections = new BaseXCombo(gui, ALL);
+    sections = new BaseXCombo(gui, Strings.titleCase(ALL_KEY));
     String maxSection = "";
-    for(final String sctn : SECTIONS) {
-      if(sctn.length() > maxSection.length()) maxSection = sctn;
+    for(final String key : SECTIONS) {
+      final String name = Strings.titleCase(key);
+      if(name.length() > maxSection.length()) maxSection = name;
     }
     sections.setPrototypeDisplayValue(maxSection);
     sections.addActionListener(ev -> {
@@ -185,100 +193,75 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
       final boolean reset) {
 
     final TokenBuilder tb = new TokenBuilder().add(all);
-    final StringList eval = new StringList(1);
-    final StringList comp = new StringList(1);
-    final StringList opt = new StringList(1);
-    final StringList plan = new StringList(1);
     final StringList result = new StringList(1);
     final StringList error = new StringList(1);
-    final StringList origqu = new StringList(1);
-    final StringList optqu = new StringList(1);
     final StringList command = new StringList(1);
 
-    final StringList strings = new StringList(5);
-    final IntList tms = new IntList(5);
-
-    final int runs = Math.max(1, gui.context.options.get(MainOptions.RUNS));
-    final String[] split = info.split(NL);
-    final int sl = split.length;
-    for(int s = 0; s < sl; s++) {
-      final String line = split[s];
-      if(line.startsWith(PARSING_CC) || line.startsWith(COMPILING_CC) ||
-          line.startsWith(OPTIMIZING_CC) || line.startsWith(EVALUATING_CC) ||
-          line.startsWith(PRINTING_CC) || line.startsWith(TOTAL_TIME_CC)) {
-        final int t = line.indexOf(" ms");
-        final int d = line.indexOf(':');
-        final int tm = (int) (Double.parseDouble(line.substring(d + 1, t)) * 100);
-        tms.add(tm);
-        final String key = line.substring(0, d).trim();
-        final String val = Performance.formatNano(tm * 10000L * runs, runs);
-        strings.add(LI + key + COLS + val);
-      } else if(line.startsWith(NUMBER_CC) || line.startsWith(UPDATED_CC) ||
-          line.startsWith(PRINTED_CC) || line.startsWith(READ_LOCKING_CC) ||
-          line.startsWith(WRITE_LOCKING_CC)) {
-        result.add(LI + line);
-      } else if(line.equals(COMPILING + COL)) {
-        while(++s < sl && !split[s].isEmpty()) comp.add(split[s]);
-      } else if(line.equals(OPTIMIZING + COL)) {
-        while(++s < sl && !split[s].isEmpty()) opt.add(split[s]);
-      } else if(line.equals(QUERY + COL)) {
-        while(++s < sl && !split[s].isEmpty()) origqu.add(split[s]);
-      } else if(line.equals(OPTIMIZED_QUERY + COL)) {
-        while(++s < sl && !split[s].isEmpty()) optqu.add(split[s]);
-      } else if(line.startsWith(EVALUATING)) {
-        while(++s < sl && split[s].startsWith(LI)) {
-          eval.add(split[s].substring(2).replace('|', '\n'));
-        }
-      } else if(line.equals(QUERY_PLAN + COL)) {
-        while(++s < sl && !split[s].isEmpty()) plan.add(split[s]);
-      } else if(line.equals(Text.ERROR + COL)) {
-        boolean stopped = false;
-        while(++s < sl && !split[s].isEmpty()) {
-          final Matcher matcher = STOPPED.matcher(split[s]);
-          if(!stopped && matcher.find()) {
+    // a query hands its information over as data; everything else is read from the info string
+    final AQuery query = cmd instanceof final AQuery aq ? aq : null;
+    final QueryInfo.Sections qs = query != null ? query.sections() : null;
+    final Map<String, StringList> sctns = new LinkedHashMap<>();
+    times = qs != null ? qs.times() : new LongList(1);
+    if(qs != null) {
+      for(final String key : SECTIONS) {
+        final QueryInfo.Section sctn = qs.sections().get(key);
+        if(sctn != null) sctns.put(Strings.titleCase(key), QueryInfo.lines(sctn));
+      }
+      if(!ok) addError(query.message(), error);
+    } else {
+      final String[] split = info.split(NL);
+      final int sl = split.length;
+      for(int s = 0; s < sl; s++) {
+        final String line = split[s];
+        if(line.equals(Strings.titleCase(QueryInfo.ERROR) + COL)) {
+          boolean stopped = false;
+          while(++s < sl && !split[s].isEmpty()) {
+            final Matcher matcher = STOPPED.matcher(split[s]);
+            if(!stopped && matcher.find()) {
+              final TokenBuilder tmp = new TokenBuilder();
+              tmp.add(STOPPED_AT).uline().add(matcher.group(1)).uline().add(COL);
+              split[s] = tmp.toString();
+              stopped = true;
+            }
+            error.add(split[s]);
+          }
+        } else if(line.equals(STACK_TRACE + COL)) {
+          while(++s < sl && !split[s].isEmpty()) {
             final TokenBuilder tmp = new TokenBuilder();
-            tmp.add(STOPPED_AT).uline().add(matcher.group(1)).uline().add(COL);
-            split[s] = tmp.toString();
-            stopped = true;
+            final String sp = split[s].replaceAll("<.*", "");
+            final boolean last = !sp.equals(split[s]);
+            if(sp.startsWith(LI)) {
+              tmp.add(LI).uline().add(sp.substring(2)).uline();
+            } else {
+              tmp.add(sp);
+            }
+            error.add(tmp.toString());
+            if(last) break;
           }
-          error.add(split[s]);
+        } else if(!ok && !line.isEmpty()) {
+          error.add(line);
         }
-      } else if(line.equals(STACK_TRACE + COL)) {
-        while(++s < sl && !split[s].isEmpty()) {
-          final TokenBuilder tmp = new TokenBuilder();
-          final String sp = split[s].replaceAll("<.*", "");
-          final boolean last = !sp.equals(split[s]);
-          if(sp.startsWith(LI)) {
-            tmp.add(LI).uline().add(sp.substring(2)).uline();
-          } else {
-            tmp.add(sp);
-          }
-          error.add(tmp.toString());
-          if(last) break;
-        }
-      } else if(!ok && !line.isEmpty()) {
-        error.add(line);
       }
     }
 
-    times = tms;
-    timeStrings = strings;
+    timeStrings = sctns.getOrDefault(Strings.titleCase(QueryInfo.TIMING), new StringList(0));
 
-    final boolean test = cmd instanceof Test, query = cmd instanceof AQuery;
+    final boolean test = cmd instanceof Test;
     /* reset old text if:
      * a) deletion was requested by the last function call
      * b) the result contains execution times
      * c) result is not ok and no XQUnit tests are run */
-    if(clear || !tms.isEmpty() || !(ok || test)) {
+    if(clear || !times.isEmpty() || !(ok || test)) {
       tb.reset();
     } else if(test) {
       // XQUnit tests: adopt trace output
-      eval.add(tb.toString().trim());
+      sctns.computeIfAbsent(Strings.titleCase(QueryInfo.EVALUATION), k -> new StringList(1)).
+          add(tb.toString().trim());
       tb.reset();
     }
 
     String inf = null;
-    if(!query) {
+    if(query == null) {
       if(cmd != null) command.add(cmd.toString());
       if(ok && !info.isEmpty()) {
         if(reset) result.add(info.trim());
@@ -286,38 +269,62 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
       }
     }
 
-    final StringList sctns = new StringList().add(ALL);
-    add(COMMAND, command, tb, sctns);
-    add(Text.ERROR, error, tb, sctns);
-    add(EVALUATING, eval, tb, sctns);
-    add(RESULT, result, tb, sctns);
-    add(OPTIMIZED_QUERY, optqu, tb, sctns);
-    add(OPTIMIZING, opt, tb, sctns);
-    add(COMPILING, comp, tb, sctns);
-    add(QUERY, origqu, tb, sctns);
-    add(QUERY_PLAN, plan, tb, sctns);
-    add(TIMING, strings, tb, sctns);
+    final StringList names = new StringList().add(Strings.titleCase(ALL_KEY));
+    add(Strings.titleCase(COMMAND_KEY), command, tb, names);
+    add(Strings.titleCase(QueryInfo.ERROR), error, tb, names);
+    // the result of a command precedes the sections of a query, which has none of its own
+    if(!result.isEmpty()) sctns.put(Strings.titleCase(QueryInfo.RESULT), result);
+    for(final Entry<String, StringList> sctn : sctns.entrySet()) {
+      add(sctn.getKey(), sctn.getValue(), tb, names);
+    }
     if(inf != null) {
       final byte[] prev = tb.next();
       tb.add(inf).nline().add(prev);
     }
     clear = reset;
 
-    // show total time required for running a command
+    // show total time required for running a command; a query has measured it itself
     String total = time;
-    if(!tms.isEmpty()) {
-      total = Performance.formatNano(tms.get(tms.size() - 1) * 10000L * runs, runs);
+    if(!timeStrings.isEmpty()) {
+      total = timeStrings.get(timeStrings.size() - 1).replaceAll(".*" + COLS, "");
     }
-    if(total != null) setTime(TOTAL_TIME_CC + total);
+    if(total != null) setTime(Strings.titleCase(QueryInfo.TOTAL) + COLS + total);
     all = tb.finish();
     newText = all;
 
     // refresh combo box, reassign old value
-    sections.setItems(sctns.toArray());
+    sections.setItems(names.toArray());
     sections.setSelectedItem(section);
 
     repaint();
     return total;
+  }
+
+  /**
+   * Adds the message of a failed query, underlining the position it stopped at and the entries
+   * of its stack trace.
+   * @param message error message
+   * @param error error section
+   */
+  private static void addError(final String message, final StringList error) {
+    boolean stopped = false, trace = false;
+    for(final String line : message.split(NL)) {
+      if(line.isEmpty()) continue;
+      final TokenBuilder tb = new TokenBuilder();
+      final Matcher matcher = STOPPED.matcher(line);
+      if(line.equals(STACK_TRACE + COL)) {
+        trace = true;
+        tb.add(line);
+      } else if(trace && line.startsWith(LI)) {
+        tb.add(LI).uline().add(line.substring(2).replaceAll("<.*", "")).uline();
+      } else if(!stopped && matcher.find()) {
+        tb.add(STOPPED_AT).uline().add(matcher.group(1)).uline().add(COL);
+        stopped = true;
+      } else {
+        tb.add(line);
+      }
+      error.add(tb.toString());
+    }
   }
 
   /**
@@ -377,7 +384,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
       bs = bw / (l - 1);
 
       // find maximum value
-      int m = 1;
+      long m = 1;
       for(int i = 0; i < l - 1; ++i) m = Math.max(m, times.get(i));
 
       // draw focused bar
@@ -393,7 +400,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
       for(int i = 0; i < l - 1; ++i) {
         final int bx = w - bw + bs * i, c = (i == focus ? 4 : 2) + i;
         g.setColor(GUIConstants.color(c));
-        final int p = Math.max(1, times.get(i) * bh / m);
+        final int p = (int) Math.max(1, times.get(i) * bh / m);
         g.fillRect(bx, by + bh - p, bs, p);
         g.setColor(GUIConstants.color(c + 2));
         g.drawRect(bx, by + bh - p, bs, p - 1);

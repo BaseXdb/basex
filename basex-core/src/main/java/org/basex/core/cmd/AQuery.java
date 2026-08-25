@@ -34,6 +34,10 @@ public abstract class AQuery extends Command {
   private QueryProcessor qp;
   /** Query info (can be {@code null}). */
   private QueryInfo info;
+  /** Sections of the query information (can be {@code null}). */
+  private QueryInfo.Sections sections;
+  /** Error message (can be {@code null}). */
+  private String message;
   /** Query plan was serialized. */
   private boolean plan;
   /** Maximum number of results (ignored if negative). */
@@ -112,9 +116,13 @@ public abstract class AQuery extends Command {
     // add query plan, if not done yet, and info string
     queryPlan(true);
     info(info.toString(qp, out.size(), hits, jc().locks, error == null));
+    // the info view is given the same information as data
+    sections = info.toSections(qp, out.size(), hits, jc().locks);
+    message = error;
 
     // error
-    if(error != null) return error(queryinfo ? info() + ERROR + COL + NL + error : error);
+    if(error != null) return error(queryinfo ?
+        info() + Strings.titleCase(QueryInfo.ERROR) + COL + NL + error : error);
     // critical error
     if(exception instanceof final RuntimeException ex) throw ex;
     // success
@@ -181,6 +189,22 @@ public abstract class AQuery extends Command {
   }
 
   /**
+   * Returns the sections of the query information.
+   * @return sections (can be {@code null})
+   */
+  public final QueryInfo.Sections sections() {
+    return sections;
+  }
+
+  /**
+   * Returns the error message of a failed query.
+   * @return message (can be {@code null})
+   */
+  public final String message() {
+    return message;
+  }
+
+  /**
    * Initializes the query processor.
    * @param ctx database context
    * @throws QueryException query exception
@@ -207,12 +231,10 @@ public abstract class AQuery extends Command {
    */
   private void queryPlan(final boolean create) {
     if(create && !plan && options.get(MainOptions.XMLPLAN)) {
-      try {
-        info(NL + QUERY_PLAN + COL);
-        info(qp.toXml().serialize(SerializerMode.INDENT.get()).toString());
+      final String xml = info.planInfo(qp);
+      if(!xml.isEmpty()) {
+        info(xml);
         plan = true;
-      } catch(final QueryIOException ex) {
-        Util.stack(ex);
       }
     }
   }

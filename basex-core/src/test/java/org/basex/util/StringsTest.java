@@ -21,6 +21,15 @@ public final class StringsTest {
   }
 
   /** Test. */
+  @Test public void titleCase() {
+    assertEquals("", Strings.titleCase(""));
+    assertEquals("A", Strings.titleCase("a"));
+    assertEquals("Ab", Strings.titleCase("ab"));
+    assertEquals("A B", Strings.titleCase("a-b"));
+    assertEquals("Optimized Query", Strings.titleCase("optimized-query"));
+  }
+
+  /** Test. */
   @Test public void camelCase() {
     assertEquals("", Strings.camelCase(""));
     assertEquals("a", Strings.camelCase("a"));

@@ -6,6 +6,7 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.io.*;
+import org.basex.query.*;
 import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
@@ -168,7 +169,15 @@ public abstract class BaseXTest extends SandboxTest {
    */
   @Test public void verbose() throws IOException {
     contains(Text.QUERY_EXECUTED_X_X.replaceAll(" *%.*", ""), "-v", "-q1");
-    contains(Text.TOTAL_TIME_CC, "-V", "-q1");
+    contains(Strings.titleCase(QueryInfo.TOTAL) + Text.COLS, "-V", "-q1");
+  }
+
+  /**
+   * Test query plan.
+   * @throws IOException I/O exception
+   */
+  @Test public void plan() throws IOException {
+    contains(Strings.titleCase(QueryInfo.PLAN) + Text.COL, "-x", "-q1");
   }
 
   /**
