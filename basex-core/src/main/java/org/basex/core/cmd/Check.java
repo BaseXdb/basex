@@ -88,8 +88,16 @@ public final class Check extends Command {
   }
 
   @Override
+  public boolean updating(final Context ctx) {
+    return true;
+  }
+
+  @Override
   public void addLocks() {
-    jc().locks.reads.add(Locking.CONTEXT).add(IO.get(args[0]).dbName());
+    // the database may be created or rebuilt (see #run)
+    final Locks locks = jc().locks;
+    locks.reads.add(Locking.CONTEXT);
+    locks.writes.add(IO.get(args[0].trim()).dbName());
   }
 
   @Override

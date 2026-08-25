@@ -60,7 +60,7 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new AlterUser(NAME, NAME), true, USER_LIST);
     ckDBs(new BinaryGet(FILE), false, CTX_LIST);
     ckDBs(new BinaryPut(FILE), true, CTX_LIST);
-    ckDBs(new Check(NAME), false, NAME_CTX);
+    ckDBs(new Check(NAME), CTX_LIST, NAME_LIST);
     ckDBs(new Close(), false, CTX_LIST);
     ckDBs(new Copy(NAME2, NAME), new LockList().add(NAME2), NAME_LIST);
     ckDBs(new CreateBackup(NAME), true, NAME_LIST);
