@@ -383,6 +383,27 @@ public final class DBATest extends WebappTest {
     }
 
     /**
+     * The index panel creates and drops the index it browses; the name indexes that every
+     * database has are rejected.
+     * @throws IOException I/O exception
+     */
+    @Test public void indexCreateAndDrop() throws IOException {
+      create();
+      assertTrue(post("databases/index-create", Map.of("name", DB, "index", "text")).
+          contains("was created"), "index not created");
+      assertTrue(dialog(get("databases?name=" + DB), "optimize").
+          contains("value=\"textindex\" checked"), "text index not enabled");
+
+      assertTrue(post("databases/index-drop", Map.of("name", DB, "index", "text")).
+          contains("was dropped"), "index not dropped");
+      assertFalse(dialog(get("databases?name=" + DB), "optimize").
+          contains("value=\"textindex\" checked"), "text index not disabled");
+
+      assertTrue(post("databases/index-create", Map.of("name", DB, "index", "element-name")).
+          contains("Index cannot be created or dropped."), "name index not rejected");
+    }
+
+    /**
      * Creates the test database with the default options.
      * @return response body
      * @throws IOException I/O exception
@@ -934,6 +955,19 @@ public final class DBATest extends WebappTest {
     }
 
     /**
+     * Several files are searched, newest first: the error names the file that is reached first.
+     * @throws Exception exception
+     */
+    @Test public void severalDates() throws Exception {
+      sendMessage("{ \"type\": \"entries\", \"run\": 1," +
+          " \"dates\": [ \"1999-01-01\", \"1999-12-31\" ], \"sort\": \"\"," +
+          " \"page\": 1, \"time\": \"\", \"ignore\": \"\", \"input\": \"\"," +
+          " \"filters\": { } }");
+      final String message = pollMessage();
+      assertTrue(message.contains("Resource '1999-12-31' not found."), message);
+    }
+
+    /**
      * Returns a request for the log entries of a date that has no log file.
      * @param input search input
      * @param filter filter for the text column
@@ -1038,6 +1072,18 @@ public final class DBATest extends WebappTest {
     }
 
     /**
+     * The outcome carries the query information, rendered as the list that the editor shows
+     * below the result.
+     * @throws Exception exception
+     */
+    @Test public void queryInfo() throws Exception {
+      sendMessage("{ \"type\": \"run\", \"run\": 1, \"query\": \"1 + 1\", \"indent\": false }");
+      final String message = outcome();
+      assertTrue(message.contains("\"info\":\"<dl class="), message);
+      assertTrue(message.contains("<dt>Optimized Query:<\\/dt>"), message);
+    }
+
+    /**
      * Evaluates a query and returns the pushed message.
      * @param query query
      * @return message
@@ -1046,7 +1092,18 @@ public final class DBATest extends WebappTest {
     private String evaluate(final String query) throws Exception {
       sendMessage("{ \"type\": \"run\", \"run\": " + ++run + ", \"query\": \"" +
           query.replace("\\", "\\\\").replace("\"", "\\\"") + "\", \"indent\": false }");
-      return outcome();
+      return withoutInfo(outcome());
+    }
+
+    /**
+     * Drops the query information from an outcome: it is checked by its own test, and its
+     * contents would make every other comparison unreadable.
+     * @param message message
+     * @return message without the query information
+     */
+    private static String withoutInfo(final String message) {
+      final int i = message.lastIndexOf(",\"info\":\"");
+      return i == -1 ? message : message.substring(0, i) + '}';
     }
 
     /**

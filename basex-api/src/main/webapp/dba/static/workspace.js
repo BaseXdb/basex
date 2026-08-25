@@ -19,6 +19,9 @@ const DIR_KEY = "dba-dir";
 const TABS_KEY = "dba-tabs";
 const TAB_KEY = "dba-tab";
 
+/** localStorage key for the 'Query Info' preference. */
+const QUERY_INFO_KEY = "dba-query-info";
+
 /** Documents that are open in the editor, in tab order. A tab is { dir, name, id, saved,
     edited, state }: its identity, the number that tells unnamed documents apart, its on-disk
     content, whether the user typed in it, and the editor state that restores it (undefined
@@ -380,11 +383,51 @@ function resultLanguage(text) {
 /**
  * Shows the result of a query.
  * @param {string} text result
+ * @param {string} info rendered query information (empty if none was collected)
  */
-function showResult(text) {
+function showResult(text, info) {
   setText("Query was successful.", "info");
   if(_output.setLanguage) _output.setLanguage(resultLanguage(text));
   _output.setValue(text);
+  showInfo(info);
+}
+
+/**
+ * Adopts the information of the last query.
+ * @param {string} info rendered query information (empty if none was collected)
+ */
+function showInfo(info) {
+  document.getElementById("info-panel").innerHTML = info ?? "";
+}
+
+/**
+ * Opens or closes the query information.
+ */
+function showInfoPanel() {
+  const on = document.getElementById("query-info").checked;
+  // a panel is folded away by its class: the layout gives every panel a 'display'
+  document.getElementById("info-view").classList.toggle("hidden", !on);
+  document.getElementById("info-resizer").hidden = !on;
+  document.querySelector(".content").classList.toggle("info-closed", !on);
+}
+
+/**
+ * Indicates whether the query information is shown.
+ * @returns {boolean} state of the switch
+ */
+function queryInfoOn() {
+  return localStorage.getItem(QUERY_INFO_KEY) === "yes";
+}
+
+/**
+ * Persists the 'Query Info' preference and opens or closes the information panel.
+ */
+function queryInfoChanged() {
+  try {
+    localStorage.setItem(QUERY_INFO_KEY,
+      document.getElementById("query-info").checked ? "yes" : "no");
+  } catch { /* storage disabled or full: the switch still applies to this page */ }
+  showInfoPanel();
 }
 
 /**
@@ -571,13 +614,6 @@ function saveDraft() {
 }
 
 /**
- * Opens the file chooser of the upload form; choosing files submits it.
- */
-function chooseFiles() {
-  document.getElementById("upload").click();
-}
-
-/**
  * Asks for a name and creates a directory.
  * @returns {Promise} promise
  */
@@ -619,7 +655,9 @@ _handlers[WORKSPACE_WS] = json => {
     // the query has ended: the job is gone, and there is nothing left to jump to
     setJob();
     if(json.type === "stopped") setText("Query was stopped.", "warning");
-    else if(json.type === "result") showResult(json.result);
+    else if(json.type === "result") showResult(json.result, json.info);
+    // the error is reported by showMessage; its information belongs to the pane
+    else if(json.type === "error") showInfo(json.info);
   }
 };
 
@@ -630,6 +668,10 @@ _handlers[WORKSPACE_WS] = json => {
  */
 function initWorkspace() {
   loadCodeMirror("xquery", true, "fill");
+
+  // opened before the resizers are set up: they measure the rows of the grid
+  document.getElementById("query-info").checked = queryInfoOn();
+  showInfoPanel();
   initResizers();
 
   const params = new URLSearchParams(window.location.search);

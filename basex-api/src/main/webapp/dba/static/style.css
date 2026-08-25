@@ -330,14 +330,12 @@ td.num input.filter {
 table.fixed {
   width: 100%;
 }
-/* column widths are percentages: padding must not add to them, or the sum overflows */
+/* column widths are percentages: padding must not add to them, or the sum overflows. A cell
+   that does not fit its column is clipped: it must not scroll the table sideways */
 table.fixed th, table.fixed td {
   box-sizing: border-box;
   /* a full gutter per column costs more than the values are worth in a narrow panel */
   padding-right: .5rem;
-}
-/* a header that does not fit its column must not scroll the table sideways */
-table.fixed th, table.fixed td {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -637,6 +635,10 @@ body:has(.content.fill) main {
   flex: 1;
   min-height: 0;
 }
+/* a closed panel in the last row leaves no track behind */
+.content.info-closed {
+  grid-template-rows: auto 1fr;
+}
 .content.fill > .panel {
   display: flex;
   flex-direction: column;
@@ -661,6 +663,44 @@ body:has(.content.fill) main {
 .content.fill .panel:not(.collapsed) > .pane.column {
   display: flex;
   flex-direction: column;
+}
+
+/* heading of a panel, with the switch that belongs to it on the same line */
+.pane-title {
+  display: flex;
+  align-items: baseline;
+  gap: var(--gap);
+}
+
+/* the rendered query information, which opens below the query result and shares its height.
+   The job details box it off in the same way, so that it is told apart from the blocks that
+   surround it there */
+#info-panel, .pane:has(> .query-info) {
+  padding: 0 var(--gap);
+  border: var(--line) solid var(--border);
+  border-radius: var(--radius);
+}
+
+/* the details of a job: the result, the query information and the query string share the height
+   that the headings and tables leave, which keep the height they need */
+#job-details > * {
+  flex-shrink: 0;
+}
+/* none of the three blocks is squeezed away by a long table or by a small window: the pane
+   scrolls once they no longer fit */
+#job-details > .cm-editor, #job-details > textarea, #job-details > .pane {
+  min-height: 6rem;
+}
+/* the entries sit below their heading; the bullets bring the only indentation */
+.query-info dd {
+  padding-left: 0;
+}
+.query-info ul {
+  margin: 0;
+}
+.query-info pre {
+  white-space: pre-wrap;
+  margin: .2rem 0;
 }
 
 /* divider, centered in the gap before every panel but the first of a row;
@@ -818,6 +858,10 @@ button.collapse .label {
   /* stack the side-by-side content panels, drop their dividers */
   .content {
     grid-template-columns: 1fr;
+  }
+  /* an explicit grid area creates the tracks it names: dropped, the panels stack in source order */
+  .content > .panel[style*="grid-area"] {
+    grid-area: auto !important;
   }
   /* stacked panels grow with their content again, and the page scrolls as usual */
   .content.fill {

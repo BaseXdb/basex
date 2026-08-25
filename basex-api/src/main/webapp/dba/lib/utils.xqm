@@ -175,25 +175,69 @@ declare function utils:ws-start(
   return ws:set(ws:id(), $utils:JOB, {
     'reader': ws:eval(fn() {
       job:wait($id),
-      try {
-        let $string := serialize(job:result($id), $options)
-        return {
-          'type'  : 'result',
-          'run'   : $run,
-          'result': if ($options?limit) { utils:chop($string, $maxchars) } else { $string }
-        }
-      } catch * {
-        {
-          'type'   : 'error',
-          'run'    : $run,
-          'message': $err:description,
-          'line'   : $err:line-number,
-          'column' : $err:column-number
-        }
-      }
+      (: the information is read first: fetching the result discards the cached job :)
+      let $info := job:info($id)
+      return map:merge((
+        try {
+          let $string := serialize(job:result($id), $options)
+          return {
+            'type'  : 'result',
+            'run'   : $run,
+            'result': if ($options?limit) { utils:chop($string, $maxchars) } else { $string }
+          }
+        } catch * {
+          {
+            'type'   : 'error',
+            'run'    : $run,
+            'message': $err:description,
+            'line'   : $err:line-number,
+            'column' : $err:column-number
+          }
+        },
+        { 'info': utils:html(utils:query-info($info)) }[exists($info)]
+      ))
     }, (), { 'serializer': { 'method': 'json' } }),
     'query': $id
   })
+};
+
+(:~
+ : Returns the name with which a key is displayed.
+ : @param  $key  key
+ : @return name
+ :)
+declare %private function utils:title(
+  $key  as xs:string
+) as xs:string {
+  string-join(tokenize($key, '-') ! (upper-case(substring(., 1, 1)) || substring(., 2)), ' ')
+};
+
+(:~
+ : Renders the query information of a job.
+ : @param  $info  query information
+ : @return sections
+ :)
+declare function utils:query-info(
+  $info  as map(*)
+) as element(dl) {
+  <dl class='query-info'>{
+    for $key in map:keys($info)
+    let $value := $info($key)
+    return (
+      <dt>{ utils:title($key) }:</dt>,
+      <dd>{
+        if ($value instance of map(*)) {
+          <ul>{
+            map:for-each($value, fn($name, $entry) { <li>{ utils:title($name) }: { $entry }</li> })
+          }</ul>
+        } else if ($value instance of array(*)) {
+          <ul>{ $value?* ! <li>{ . }</li> }</ul>
+        } else {
+          <pre>{ $value }</pre>
+        }
+      }</dd>
+    )
+  }</dl>
 };
 
 (:~

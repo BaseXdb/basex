@@ -101,12 +101,9 @@ async function newStore() {
  * what was shown before.
  */
 function pushSelection() {
-  let url = replaceParam(window.location.href, "name", _store);
   // the level is stated as a whole, so that an update returns to it; within the store, the
   // entry that is shown is what names the selection
-  url = replaceParam(url, "path", pathToString(_path));
-  url = replaceParam(url, "key", _path.length ? "" : entryKey());
-  window.history.pushState({}, "", url);
+  pushParams({ name: _store, path: pathToString(_path), key: _path.length ? "" : entryKey() });
 }
 
 /**

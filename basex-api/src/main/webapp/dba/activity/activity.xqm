@@ -42,12 +42,15 @@ function dba:activity(
     </div>,
     if ($job) {
       <div class='panel'>{
-        (: a job that is done does not change any more: the client stops asking for it :)
-        <div id='job-details' class='pane' data-done='{ panels:job-done($job) }'>{
+        (: a job that is done does not change any more: the client stops asking for it. The form
+           is the pane: its blocks are laid out in a column, so that the query and the result
+           take the height that the tables leave instead of being fixed to a few lines :)
+        <form method='post' autocomplete='off' id='job-details' class='pane column'
+              data-done='{ panels:job-done($job) }'>{
           panels:job-details($job) otherwise (
             <h2>{ 'Job: ' || $job }</h2>, 'Job has expired.'
           )
-        }</div>
+        }</form>
       }</div>
     },
     (: what a job is doing is what the view is opened for: the reports step back to strips
@@ -80,9 +83,9 @@ function dba:activity(
     (: no widths: the panels share the page in equal parts, and each scrolls on its own :)
     'header' : $dba:CAT,
     'rows'   : '1fr',
-    (: the panels follow the selection, and are not remembered: a stored state is kept by
-       position, and the position of a panel moves when a job is shown :)
-    'panels' : 'auto',
+    (: the details are inserted before the reports, which moves every panel behind them: what
+       is folded away while a job is shown is remembered apart from the overview :)
+    'panels' : 'job'[$job],
     'scripts': ('cm6', 'editor', 'activity'),
     'init'   : 'initActivity();',
     'info'   : $info,

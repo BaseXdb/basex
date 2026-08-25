@@ -63,10 +63,6 @@ let _panels = [];
 /** Whether at least one of the panels can be collapsed. */
 let _collapsible = false;
 
-/** Whether the collapsed panels are remembered. A page whose panel states follow from what it
-    shows assigns them itself, and storing them would fight with that. */
-let _storePanels = true;
-
 /** Longest message that is accepted by the WebSocket endpoints.
     Kept well below the 'maxTextMessageSize' of the WebSocket servlet (see web.xml), which also
     needs to accommodate the UTF-8 encoding of the message. */
@@ -84,9 +80,11 @@ const SPLIT_KEY = "dba-split-";
 /** Smallest a panel gets by dragging, in pixels. */
 const MIN_PANEL_SIZE = 60;
 
-/** localStorage key prefix for the collapsed content panels of a page.
-    Versioned: panel ids used to be row-based, the grid layout numbers them flat. */
-const PANELS_KEY = "dba-panels-v2-";
+/** localStorage key prefix for the collapsed content panels of a page. Only the panels that
+    were folded by hand are stored; the others follow the page, which assigns their state.
+    Versioned: panel ids used to be row-based, the grid layout numbers them flat, and the
+    collapsed ones used to be listed instead of stating the state of both. */
+const PANELS_KEY = "dba-panels-v3-";
 
 /**
  * Returns a localStorage key that describes the current page, not the DBA as a whole.
@@ -198,7 +196,9 @@ function markTruncated(root = document) {
   }
   cells.forEach((cell, i) => {
     if(truncated[i] === null) return;
-    cell.classList.toggle("truncated", truncated[i]);
+    // a cell that holds a link is not expanded: a click on it is the link's, and the checkbox
+    // and the chevron of the cell would compete with it for the same spot
+    cell.classList.toggle("truncated", truncated[i] && !cell.querySelector("a"));
     // the tooltip is the only access to the clipped text
     if(truncated[i]) cell.title = cell.textContent;
     else cell.removeAttribute("title");
@@ -655,6 +655,14 @@ function measureScrollbar() {
 }
 
 /**
+ * Opens a file chooser; choosing files submits the form it belongs to.
+ * @param {string} id id of the file input
+ */
+function chooseUpload(id) {
+  document.getElementById(id).click();
+}
+
+/**
  * Enables or disables an element by id.
  * @param {string} id element id
  * @param {boolean} disabled disabled state
@@ -704,6 +712,25 @@ function shortcuts(event) {
 }
 
 /**
+ * Returns the key the folded panels of the current page are stored under. A panel is addressed
+ * by its position, so a page that shows different panels in its subviews keeps a state for
+ * each of them: the subview is what the page calls itself in 'data-panels'.
+ * @returns {string} key
+ */
+function panelsKey() {
+  const subview = document.querySelector(".content")?.dataset.panels;
+  return pageKey(PANELS_KEY) + (subview ? `/${subview}` : "");
+}
+
+/**
+ * Returns the panels that were folded by hand in the current subview.
+ * @returns {object} collapsed state, by panel id
+ */
+function storedPanels() {
+  return JSON.parse(localStorage.getItem(panelsKey()) ?? "{}");
+}
+
+/**
  * Makes the side-by-side content panels of a page collapsible.
  */
 function initPanels() {
@@ -716,10 +743,8 @@ function initPanels() {
   // every panel owns a grid track, whether or not it can be collapsed
   _panels = panels;
 
-  // if no state was stored yet, or the page owns the states, the markup supplies them
-  _storePanels = content.dataset.panels !== "auto";
-  const stored = _storePanels ? localStorage.getItem(pageKey(PANELS_KEY)) : null;
-  const collapsed = stored?.split(",");
+  // the markup supplies the state of every panel that was not folded by hand
+  const stored = storedPanels();
   panels.forEach((panel, p) => {
     // the label of the collapsed strip is the panel's own, or the first word of its heading:
     // what follows a separator names the entry that is shown, which the panel outlives.
@@ -738,7 +763,7 @@ function initPanels() {
     button.addEventListener("click", () => togglePanel(panel, id));
     panel.prepend(button);
     _collapsible = true;
-    showPanel(panel, collapsed ? collapsed.includes(id) : panel.classList.contains("collapsed"));
+    showPanel(panel, stored[id] ?? panel.classList.contains("collapsed"));
   });
   applyColumns();
 }
@@ -753,13 +778,9 @@ function togglePanel(panel, id) {
   showPanel(panel, collapse);
   applyColumns();
 
-  if(_storePanels) {
-    const key = pageKey(PANELS_KEY);
-    const ids = new Set((localStorage.getItem(key) ?? "").split(",").filter(Boolean));
-    if(collapse) ids.add(id);
-    else ids.delete(id);
-    localStorage.setItem(key, [ ...ids ].join(","));
-  }
+  const stored = storedPanels();
+  stored[id] = collapse;
+  localStorage.setItem(panelsKey(), JSON.stringify(stored));
 
   // lets CodeMirror panes and truncated cells adjust to the new widths
   window.dispatchEvent(new Event("resize"));
@@ -855,6 +876,17 @@ function replaceParam(url, name, value) {
   if(`${value}`) u.searchParams.set(name, value);
   else u.searchParams.delete(name);
   return u.href;
+}
+
+/**
+ * Writes a selection to the address bar, as a step of its own: the back button returns to what
+ * was shown before. A parameter with an empty value is dropped.
+ * @param {object} params selected values, by parameter name
+ */
+function pushParams(params) {
+  let url = window.location.href;
+  for(const [ name, value ] of Object.entries(params)) url = replaceParam(url, name, value);
+  window.history.pushState({}, "", url);
 }
 
 /**

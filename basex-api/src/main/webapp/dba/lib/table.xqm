@@ -8,8 +8,20 @@ module namespace table = 'dba/lib/table';
 import module namespace config = 'dba/lib/config' at 'config.xqm';
 import module namespace html = 'dba/lib/html' at 'html.xqm';
 
-(:~ Number formats. :)
-declare variable $table:NUMBER := ('decimal', 'number', 'bytes');
+(:~ What a column type is ordered by, and what it is shown as. A type that is not listed is
+    ordered and shown as the string it is; a column without a format shows the value itself. :)
+declare %private variable $table:TYPES := {
+  'number'  : { 'order': 'number' },
+  'decimal' : { 'order': 'number',
+                'format': fn($v) { format-number(if (exists($v)) then number($v) else 0, '0.00') } },
+  'bytes'   : { 'order': 'number',
+                'format': fn($v) { prof:human(if (exists($v)) then xs:integer($v) else 0) } },
+  'dateTime': { 'order': 'date', 'format': fn($v) { $v ! html:date(xs:dateTime(.)) } },
+  'time'    : { 'order': 'date', 'format': fn($v) { $v ! html:time(xs:dateTime(.)) } }
+};
+
+(:~ Number formats: the types that are ordered and aligned as numbers. :)
+declare variable $table:NUMBER := map:keys($table:TYPES)[$table:TYPES(.)?order = 'number'];
 
 (:~
  : Creates a table with stable column widths: long values are truncated and expanded via click.
@@ -71,7 +83,6 @@ declare function table:properties(
  :     * otherwise, ascending order
  :   * The 'width' attribute assigns a fixed column width. If widths are supplied, the table
  :     layout gets stable: overflowing values are truncated and can be expanded via clicks.
- :   * The 'main' attribute indicates which column is the main column
  : * The supplied table rows are supplied as elements. Values are contained in attributes; their
  :   names represents the column key.
  : * Supplied buttons will placed on top of the table.
@@ -84,7 +95,6 @@ declare function table:properties(
  :   * 'page': currently displayed page
  :   * 'count': maximum number of results
  :   * 'filters': table row with filter fields, displayed below the header row
- :   * 'compact': suppress the result summary and keep the headers of an empty table
  :   * 'all': list all entries, ignoring the maximum number of table entries
  :   * 'sticky': content placed above the buttons. Everything above the table is then pinned to
  :     the top of the scrolling panel, so that the actions stay reachable while the rows pass
@@ -117,21 +127,18 @@ declare function table:create(
         let $desc := $header?order = 'desc'
         (: a cell that a function produces is ordered by the text it produces :)
         let $atomize := fn($v) { if ($v instance of fn(*)) then string-join($v()) else $v }
-        let $convert := switch($header?sort otherwise $header?type) {
-          case 'decimal' case 'number' case 'bytes' return
-            if ($desc) {
-              fn { 0 - number() }
-            } else {
-              fn { number() }
-            }
-          case 'time' case 'dateTime' return
-            if ($desc) {
-              fn { xs:dateTime('0001-01-01T00:00:00Z') - xs:dateTime(.) }
-            } else {
-              identity(?)
-            }
-          default return
-            identity(?)
+        let $order := $table:TYPES(($header?sort otherwise $header?type) otherwise '')?order
+        let $convert := if ($order = 'number') {
+          if ($desc) {
+            fn { 0 - number() }
+          } else {
+            fn { number() }
+          }
+        } else if ($order = 'date' and $desc) {
+          (: a date is ordered by its lexical form, which only descending has to turn around :)
+          fn { xs:dateTime('0001-01-01T00:00:00Z') - xs:dateTime(.) }
+        } else {
+          identity(?)
         }
         return fn($v) { $convert($atomize($v)) }
       )
@@ -164,8 +171,8 @@ declare function table:create(
       <div class='buttons'>{ $buttons }</div>
     },
     $options?below,
-    (: result summary :)
-    if (not($options?compact)) { element h3 {
+    (: result summary; it is what an empty table is left with :)
+    element h3 {
       $entries,
       if ($entries = 1) then 'Entry' else 'Entries',
 
@@ -190,7 +197,7 @@ declare function table:create(
           $suffix
         }
       }
-    } }
+    }
   )
   return (
     (: the head is pinned to the top of the scrolling panel it sits in :)
@@ -207,7 +214,7 @@ declare function table:create(
       let $first := ($curr-page - 1) * $max-option + 1
       return $sorted-entries[position() >= $first][position() <= $max-option + 1]
     }
-    where exists($shown-entries) or exists($options?filters) or $options?compact
+    where exists($shown-entries) or exists($options?filters)
     let $fixed := some $header in $headers satisfies exists($header?width)
     let $table := element table {
       attribute class { 'fixed' }[$fixed],
@@ -243,16 +250,12 @@ declare function table:create(
 
         (: format value :)
         let $v := $entry($name)
+        let $format := $table:TYPES($type otherwise '')?format
         let $value := try {
-          if ($type = 'bytes') {
-            prof:human(if (exists($v)) then xs:integer($v) else 0)
-          } else if ($type = 'decimal') {
-            format-number(if (exists($v)) then number($v) else 0, '0.00')
-          } else if ($type = 'dateTime') {
-            $v ! html:date(xs:dateTime(.))
-          } else if ($type = 'time') {
-            $v ! html:time(xs:dateTime(.))
+          if (exists($format)) {
+            $format($v)
           } else if ($v instance of fn(*)) {
+            (: a cell that a function produces is what it returns :)
             $v()
           } else {
             string($v)

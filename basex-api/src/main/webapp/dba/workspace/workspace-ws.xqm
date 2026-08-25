@@ -81,8 +81,9 @@ declare %private function dba:ws-run(
   (: relative paths resolve against the opened file, or against the shown directory :)
   let $base-uri := config:files-dir($dir) || $file
   (: two log entries per run, one before and one after the evaluation :)
-  let $options := map:put(utils:job-options($file[.] otherwise 'query', $base-uri),
-    'log', 'DBA editor')
+  let $options := utils:job-options($file[.] otherwise 'query', $base-uri)
+    => map:put('log', 'DBA editor')
+    => map:put('info', true())
   let $id := job:eval($query, (), $options)
   return (
     (: a notification, not an outcome: it carries no run number :)

@@ -118,9 +118,30 @@ declare function form:dialog(
   </dialog>
 };
 
-(:~ Index options that can be assigned when a database is created and optimized. :)
-declare %private variable $form:INDEX-OPTIONS := ('textindex', 'attrindex', 'tokenindex',
-  'ftindex', 'stemming', 'casesens', 'diacritics');
+(:~ Index options that can be assigned when a database is created and optimized. An option
+    that names an index of its own is set apart by a heading; 'create' marks the ones that are
+    reserved for new databases. :)
+declare %private variable $form:INDEX-OPTIONS := (
+  { 'name': 'textindex', 'label': 'Text Index', 'index': true() },
+  { 'name': 'attrindex', 'label': 'Attribute Index', 'index': true() },
+  { 'name': 'tokenindex', 'label': 'Token Index', 'index': true() },
+  { 'name': 'updindex', 'label': 'Incremental Indexing', 'create': true() },
+  { 'name': 'ftindex', 'label': 'Fulltext Index', 'index': true() },
+  { 'name': 'stemming', 'label': 'Stemming' },
+  { 'name': 'casesens', 'label': 'Case Sensitivity' },
+  { 'name': 'diacritics', 'label': 'Diacritics' }
+);
+
+(:~
+ : Returns the index options that a dialog offers.
+ : @param  $create  include the options that are reserved for new databases
+ : @return options
+ :)
+declare %private function form:index-list(
+  $create  as xs:boolean
+) as map(*)+ {
+  $form:INDEX-OPTIONS[$create or empty(?create)]
+};
 
 (:~
  : Creates the index options of a database dialog. Kept next to form:index-map, which turns the
@@ -133,14 +154,9 @@ declare function form:index-options(
   $opts    as xs:string*,
   $create  as xs:boolean
 ) as node()+ {
-  <h3>{ form:option('textindex', 'Text Index', $opts) }</h3>,
-  <h3>{ form:option('attrindex', 'Attribute Index', $opts) }</h3>,
-  <h3>{ form:option('tokenindex', 'Token Index', $opts) }</h3>,
-  form:option('updindex', 'Incremental Indexing', $opts)[$create],
-  <h3>{ form:option('ftindex', 'Fulltext Index', $opts) }</h3>,
-  form:option('stemming', 'Stemming', $opts),
-  form:option('casesens', 'Case Sensitivity', $opts),
-  form:option('diacritics', 'Diacritics', $opts)
+  for $option in form:index-list($create)
+  let $checkbox := form:option($option?name, $option?label, $opts)
+  return if ($option?index) then <h3>{ $checkbox }</h3> else $checkbox
 };
 
 (:~
@@ -168,7 +184,8 @@ declare function form:index-map(
   $create  as xs:boolean
 ) as map(*) {
   map:merge((
-    ($form:INDEX-OPTIONS, 'updindex'[$create]) ! map:entry(., $opts = .),
+    for $option in form:index-list($create)
+    return map:entry($option?name, $opts = $option?name),
     $lang ! map:entry('language', .)
   ))
 };
@@ -177,8 +194,17 @@ declare function form:index-map(
 declare %private variable $form:PARSERS := ('xml', 'html', 'json', 'csv', 'raw');
 
 (:~ Parsing options that can be assigned when resources are added. :)
-declare %private variable $form:PARSING-OPTIONS := ('intparse', 'dtd', 'stripns', 'stripws',
-  'xinclude', 'addarchives', 'archivename', 'addraw', 'skipcorrupt');
+declare %private variable $form:PARSING-OPTIONS := (
+  { 'name': 'intparse', 'label': 'Use internal XML parser' },
+  { 'name': 'dtd', 'label': 'Parse DTDs and entities' },
+  { 'name': 'stripns', 'label': 'Strip namespaces' },
+  { 'name': 'stripws', 'label': 'Strip whitespace' },
+  { 'name': 'xinclude', 'label': 'Use XInclude' },
+  { 'name': 'addarchives', 'label': 'Parse files in archives' },
+  { 'name': 'archivename', 'label': 'Include name of archive in document path' },
+  { 'name': 'addraw', 'label': 'Add other files as binary files' },
+  { 'name': 'skipcorrupt', 'label': 'Skip corrupt (non-well-formed) files' }
+);
 
 (:~
  : Creates the fields that decide how an input is read. They are labeled, so they belong to the
@@ -206,15 +232,8 @@ declare function form:parsing-options(
   $opts  as xs:string*
 ) as node()+ {
   <h3>Parsing Options</h3>,
-  form:option('intparse', 'Use internal XML parser', $opts),
-  form:option('dtd', 'Parse DTDs and entities', $opts),
-  form:option('stripns', 'Strip namespaces', $opts),
-  form:option('stripws', 'Strip whitespace', $opts),
-  form:option('xinclude', 'Use XInclude', $opts),
-  form:option('addarchives', 'Parse files in archives', $opts),
-  form:option('archivename', 'Include name of archive in document path', $opts),
-  form:option('addraw', 'Add other files as binary files', $opts),
-  form:option('skipcorrupt', 'Skip corrupt (non-well-formed) files', $opts)
+  for $option in $form:PARSING-OPTIONS
+  return form:option($option?name, $option?label, $opts)
 };
 
 (:~
@@ -230,7 +249,8 @@ declare function form:parsing-map(
   $parser  as xs:string?
 ) as map(*) {
   map:merge((
-    $form:PARSING-OPTIONS ! map:entry(., $opts = .),
+    for $option in $form:PARSING-OPTIONS
+    return map:entry($option?name, $opts = $option?name),
     $filter[.] ! map:entry('createfilter', .),
     $parser[.] ! map:entry('parser', .)
   ))

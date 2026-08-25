@@ -14,6 +14,9 @@ import module namespace utils = 'dba/lib/utils' at '../lib/utils.xqm';
 (:~ Top category :)
 declare variable $dba:CAT := 'logs';
 
+(:~ Maximum number of entries that a search over several files collects. :)
+declare variable $dba:MAX-ENTRIES := 10000;
+
 (:~ Table columns :)
 declare variable $dba:COLUMNS := (
   { 'key': 'time', 'label': 'Time', 'type': 'dynamic', 'order': 'desc', 'width': '10%' },
@@ -153,7 +156,8 @@ function dba:ws-message(
     utils:ws-stop(),
     let $id := job:eval(dba:entries#7, [
       $json?input,
-      $json?date,
+      (: the checked files, or the one that is opened :)
+      ($json?dates?* otherwise $json?date),
       $json?sort[.] otherwise 'time',
       xs:integer($json?page),
       $json?time,
@@ -186,9 +190,42 @@ function dba:ws-error(
 };
 
 (:~
+ : Returns the searched columns of a log entry: an entry is shown if every term is found in one
+ : of them, and what a term matched is marked in the column that holds it. A column that is
+ : marked is produced when it is shown, as most entries are never rendered.
+ : @param  $columns  searched columns of the entry
+ : @param  $terms    search terms
+ : @param  $joined   terms as one regular expression
+ : @return columns; empty sequence if the entry is not matched
+ :)
+declare %private function dba:searched(
+  $columns  as map(*),
+  $terms    as xs:string*,
+  $joined   as xs:string
+) as map(*)? {
+  if (every $term in $terms satisfies (
+    some $value in $columns?* satisfies matches($value, $term, 'i')
+  )) {
+    map:merge(
+      map:for-each($columns, fn($key, $value) {
+        map:entry($key, if (matches($value, $joined, 'i')) {
+          fn() {
+            for $match in analyze-string($value, $joined, 'i')/*
+            let $string := string($match)
+            return if ($match/self::fn:match) then element b { $string } else $string
+          }
+        } else {
+          $value
+        })
+      })
+    )
+  }
+};
+
+(:~
  : Returns a log entry table.
  : @param  $input    search input
- : @param  $date     name of selected log files
+ : @param  $dates    names of the log files to be searched
  : @param  $sort     table sort key
  : @param  $page     current page
  : @param  $time     timestamp to highlight
@@ -198,18 +235,25 @@ function dba:ws-error(
  :)
 declare function dba:entries(
   $input    as xs:string?,
-  $date     as xs:string,
+  $dates    as xs:string+,
   $sort     as xs:string,
   $page     as xs:integer,
   $time     as xs:string?,
   $ignore   as xs:string?,
   $filters  as map(*)
 ) as element()+ {
+  (: the files are searched newest first, so that the first page is the most recent data :)
+  let $files := reverse(sort(distinct-values($dates), '?lang=en'))
+  (: a single file is what the view was opened on: its date is stated by the panel, and every
+     entry of it is collected. A range of files can hold millions of entries, of which the ones
+     that are not shown are not worth reading :)
+  let $several := count($files) > 1
   let $entries := (
     let $regex-string := matches($input, '[+*?^$(){}|\[\]\\]')
     let $terms := if ($regex-string) then $input else tokenize($input)
     let $joined-terms := if ($regex-string) then $input else string-join($terms, '|')
 
+    for $date in $files
     for $log in reverse(admin:logs($date, true()))
     let $text := string($log)
     where not($ignore and matches($text, $ignore, 'i'))
@@ -224,48 +268,32 @@ declare function dba:entries(
         'type': string($log/@type),
         'text': $text
       }
-      return if ($input) {
-        if (every $term in $terms satisfies (
-          some $v in $map?* satisfies matches($v, $term, 'i')
-        )) {
-          map:merge(
-            map:for-each($map, fn($k, $v) {
-              map:entry($k, (
-                if (matches($v, $joined-terms, 'i')) {
-                  fn() {
-                    for $match in analyze-string($v, $joined-terms, 'i')/*
-                    let $value := string($match)
-                    return if ($match/self::fn:match) then element b { $value } else $value
-                  }
-                } else {
-                  $v
-                }
-              ))
-            })
-          )
-        }
-      } else {
-        $map
-      }
+      return if ($input) { dba:searched($map, $terms, $joined-terms) } else { $map }
     )
 
     let $id := string($log/@time)
+    (: two files hold the same times of day: what names an entry, and what is shown for it,
+       is prefixed by the file it belongs to :)
+    let $label := ($date || ' ')[$several] || $id
     return map:merge((
       $map-results,
       {
-        'id': $id,
+        'id': translate($label, ' ', 'T'),
         'address': string($log/@address),
         'ms': xs:decimal($log/@ms),
         'time': fn() {
-          let $link := html:link($id, $dba:CAT || '-jump',
+          let $link := html:link($label, $dba:CAT || '-jump',
             ({ 'date': $date, 'time': $id }, { 'ignore': $ignore }[$ignore]))
           return if (not($input) and $id = $time) then element b { $link } else $link
         }
       }
     ))
   )
+  (: one entry more than the limit: it is what tells that the search was cut short :)
+  let $max := $dba:MAX-ENTRIES + 1
+  let $shown := if ($several) then subsequence($entries, 1, $max) else $entries
   let $params := map:merge((
-    { 'name': $date, 'input': $input },
+    { 'name': head($files), 'input': $input },
     map:for-each($filters, fn($key, $value) { map:entry('f-' || $key, $value) })
   ))
   (: filter fields, displayed below the table header :)
@@ -282,7 +310,15 @@ declare function dba:entries(
   let $options := {
     'sort': $sort, 'presort': 'time', 'page': $page, 'filters': $filter-row
   }
-  return table:create($dba:COLUMNS, $entries, (), $params, $options)
+  return (
+    (: a search that stopped at the limit reports as much: what it did not reach is not
+       missing from the log, it was not looked at :)
+    <div class='note warn'>{
+      'The search was stopped after ' || $max - 1 || ' entries. ' ||
+      'Choose fewer files, or narrow the search.'
+    }</div>[$several and count($shown) = $max],
+    table:create($dba:COLUMNS, $shown, (), $params, $options)
+  )
 };
 
 (:~

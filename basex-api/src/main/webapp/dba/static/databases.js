@@ -10,6 +10,12 @@ let _db = "";
 let _resource = "";
 let _dir = "";
 
+/** Delay before what was typed into the resource filter is requested, in milliseconds. */
+const FILTER_DELAY = 300;
+
+/** Timer of the pending resource filter; a key is not a request of its own. */
+let _dbFilter;
+
 /** Whether the shown document can be edited. */
 let _editable = false;
 
@@ -53,10 +59,7 @@ function selectResource(resource) {
  * what was shown before.
  */
 function pushSelection() {
-  let url = replaceParam(window.location.href, "name", _db);
-  url = replaceParam(url, "resource", _resource);
-  url = replaceParam(url, "dir", _dir);
-  window.history.pushState({}, "", url);
+  pushParams({ name: _db, resource: _resource, dir: _dir });
 }
 
 /**
@@ -65,6 +68,9 @@ function pushSelection() {
  * @param {string} dir directory; '..' steps up to the parent directory
  */
 function enterDbDir(dir) {
+  // a level and a filter are two ways of looking at the database: entering one gives up the other
+  const filter = document.getElementById("resource-filter");
+  if(filter) filter.value = "";
   _dir = dir === ".." ? _dir.replace(/[^/]+\/$/, "") : dir;
   pushSelection();
   refreshDatabase();
@@ -99,6 +105,29 @@ function showDatabase() {
   refreshResource();
   requestPanel(DB_WS, "backups-panel", { type: "backups", name: _db });
   requestPanel(DB_WS, "information-panel", { type: "information", name: _db });
+  refreshIndex();
+}
+
+/**
+ * Requests the panel that browses an index of the selected database.
+ * @param {string} sort sort key; if omitted, the shown order is kept
+ * @param {number} page page; if omitted, the first one
+ */
+function refreshIndex(sort, page) {
+  requestPanel(DB_WS, "index-panel", { type: "index", name: _db,
+    index: document.getElementById("index-select")?.value ?? "element-name",
+    prefix: document.getElementById("index-prefix")?.value.trim() ?? "" }, sort, page);
+}
+
+/**
+ * Requests the index entries that start with the supplied prefix. Every key is a new request,
+ * so the ones that are typed in a row are collected first; Enter asks at once.
+ * @param {string} key typed key
+ */
+function filterIndex(key) {
+  clearTimeout(_dbFilter);
+  if(key === "Enter") refreshIndex();
+  else _dbFilter = setTimeout(() => refreshIndex(), FILTER_DELAY);
 }
 
 /**
@@ -117,7 +146,51 @@ function refreshDatabases(sort, page) {
  */
 function refreshDatabase(sort, page) {
   requestPanel(DB_WS, "database-panel",
-    { type: "database", name: _db, resource: _resource, dir: _dir }, sort, page);
+    { type: "database", name: _db, resource: _resource, dir: _dir, filter: dbFilter() },
+    sort, page);
+}
+
+/**
+ * Returns what the resource list is filtered by.
+ * @returns {string} filter
+ */
+function dbFilter() {
+  return document.getElementById("resource-filter")?.value.trim() ?? "";
+}
+
+/**
+ * Requests the resources that match the filter. Every key is a new request, so the ones that
+ * are typed in a row are collected first; Enter asks at once.
+ * @param {string} key typed key
+ */
+function filterResources(key) {
+  clearTimeout(_dbFilter);
+  if(key === "Enter") refreshDatabase();
+  else _dbFilter = setTimeout(() => refreshDatabase(), FILTER_DELAY);
+}
+
+/**
+ * Shows a panel whose own controls are part of the replaced markup: the one that was used keeps
+ * the focus, and a field keeps what was typed into it, together with the caret.
+ * @param {string} id id of the panel
+ * @param {string} html panel contents
+ * @param {...string} controls ids of the controls of the panel
+ */
+function keepFocus(id, html, ...controls) {
+  const active = document.activeElement;
+  const focused = controls.includes(active?.id) ? active : null;
+  fillPanel(id, html);
+  if(focused) {
+    const control = document.getElementById(focused.id);
+    if(control) {
+      control.value = focused.value;
+      control.focus();
+      // a text field is resumed where the caret was; a chooser has none
+      if(focused.selectionStart !== null && focused.selectionStart !== undefined) {
+        control.setSelectionRange(focused.selectionStart, focused.selectionEnd);
+      }
+    }
+  }
 }
 
 /**
@@ -369,25 +442,20 @@ function deriveTarget(input) {
   document.getElementById("add-target").value = _dir + (segments.pop() || "");
 }
 
-/**
- * Opens the file chooser that uploads backups; choosing files submits them.
- */
-function chooseBackups() {
-  document.getElementById("upload-backups").click();
-}
-
 /** Ctrl-Enter and the 'Indent' preference re-render what the editor shows. */
 _editor_run = () => queryResource(true);
 _indent_changed = () => queryResource(true);
 
 /** The sort and page links of the list panels are followed in place. */
-followPanelLinks({ "databases-panel": refreshDatabases, "database-panel": refreshDatabase });
+followPanelLinks({ "databases-panel": refreshDatabases, "database-panel": refreshDatabase,
+  "index-panel": refreshIndex });
 
 /** The endpoint of the view serves the three panels and the queries on a resource. */
 _handlers[DB_WS] = json => {
   switch(json.type) {
     case "databases": fillPanel("databases-panel", json.html); break;
-    case "database": fillPanel("database-panel", json.html); break;
+    case "database": keepFocus("database-panel", json.html, "resource-filter"); break;
+    case "index": keepFocus("index-panel", json.html, "index-select", "index-prefix"); break;
     case "backups": fillPanel("backups-panel", json.html); break;
     case "information": fillPanel("information-panel", json.html); break;
     case "resource": showResource(json); break;

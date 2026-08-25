@@ -71,14 +71,14 @@ declare function panel:files(
       <button type='button' onclick='enterDir("..")' title='Go to the parent directory'>{
         attribute disabled { }[not($parent)], '..'
       }</button>,
-      <button type='button' onclick='createDir()'>New dir</button>,
+      <button type='button' onclick='createDir()'>New dir…</button>,
       form:button('workspace/delete', 'Delete', ('CHECK', 'CONFIRM')),
       form:button('files-download', 'Download', 'CHECK'),
-      <button type='button' onclick='chooseFiles()'>Upload</button>
+      <button type='button' onclick='chooseUpload("upload")'>Upload…</button>
     )
     (: the entries are sorted before they are truncated, so the order covers every file :)
     let $options := {
-      'sort': $sort, 'presort': 'name', 'compact': true(),
+      'sort': $sort, 'presort': 'name',
       (: a directory is listed as a whole; its files are not spread over pages :)
       'all': true(),
       (: the panel scrolls as a whole, so its actions are pinned to the top of it :)

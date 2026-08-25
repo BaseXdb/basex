@@ -44,8 +44,8 @@ function dba:users(
 ) as element(html) {
   let $user := panels:user($name, $newname, $perm)
   let $permissions := panels:local-permissions($name)
-  (: the panels follow the selection, and are not remembered: what is attached to no user in
-     particular steps back once one of them is being looked at :)
+  (: the panels follow the selection: what is attached to no user in particular steps back
+     once one of them is being looked at :)
   let $fold := ' collapsed'[$user]
   return (
     <div class='panel' data-label='Users'>
@@ -63,7 +63,9 @@ function dba:users(
        panels: its share is what the two of them then split :)
     'columns': ('25fr', '35fr', '25fr', '25fr'),
     'rows'   : '1fr',
-    'panels' : 'auto',
+    (: a view of its own: what is folded away while a user is shown is not what is folded away
+       while the list is :)
+    'panels' : 'user'[$user],
     'scripts': ('cm6', 'editor'),
     (: both information fields are edited as XML; the selected user's is the one of record :)
     'init'   : 'loadCodeMirror("xml", [ "editor", "user-info" ]);',

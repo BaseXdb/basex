@@ -93,16 +93,21 @@ function editorReadOnly(readOnly) {
  *          or a list of ids. The first one that exists is the editor of record, which _editor
  *          and the page-wide helpers refer to; any further one is edited and submitted with its
  *          form, and nothing else reads it
- * @param {boolean} resize resize text areas to maximum height
+ * @param {boolean|string} resize how the editors are sized: 'fill' leaves it to the panel's
+ *          CSS, a truthy value fits them to the viewport, and none sizes them by the rows
+ *          their text areas asked for
  */
 function loadCodeMirror(language, edit, resize) {
   // CodeMirror 6 is delivered as the self-contained window.CM6 bundle
   // Without it, or on Android, fall back to plain textareas
   const useCM = !!window.CM6 && !/android/i.test(navigator.userAgent);
+  // the text areas this call turned into editors: no other one is sized by it
+  const loaded = [];
   if(edit) {
     for(const id of edit === true ? [ "editor" ] : edit) {
       const editorArea = document.getElementById(id);
       if(!editorArea) continue;
+      loaded.push(id);
       if(_editor) {
         if(useCM) _editors[id] = CM6.fromTextArea(editorArea, { language });
       } else if(useCM) {
@@ -139,6 +144,7 @@ function loadCodeMirror(language, edit, resize) {
 
   const outputArea = document.getElementById("output");
   if(outputArea != null) {
+    loaded.push("output");
     if(useCM) {
       _output = CM6.fromTextArea(outputArea, { language: "xml", readOnly: true });
     } else {
@@ -148,44 +154,62 @@ function loadCodeMirror(language, edit, resize) {
     }
   }
 
-  if(resize === "fill") {
-    // a filled layout gives the editors their share of the panel via CSS
-  } else if(resize) {
-    const refresh = () => {
-      // size each pane from its own top to the viewport bottom, so a tall
-      // sibling column (e.g. a long resource list) can't shrink it
-      // stacked layouts keep the minimum, so the editor does not fill the
-      // viewport and push the output and buttons off-screen
-      // measured once: reading it per element would interleave layout and style writes
-      const reserve = chromeBelowMain();
-      const height = elem => stacked() ? EDITOR_MIN_HEIGHT : Math.max(EDITOR_MIN_HEIGHT,
-        window.innerHeight - elem.getBoundingClientRect().top - reserve);
-      for(const elem of document.querySelectorAll(useCM ? ".cm-editor" : "textarea")) {
-        elem.style.height = `${height(elem)}px`;
-      }
-    };
-    window.addEventListener("load", refresh);
-    window.addEventListener("resize", refresh);
-  } else if(useCM) {
-    // no auto-resize (e.g. the users pages): without a height, the editor
-    // collapses to a single line. The textarea fallback is sized by style.css
-    for(const elem of document.querySelectorAll(".cm-editor")) {
-      // an editor is as tall as the text area it replaced asked to be
-      const rows = elem.previousElementSibling?.getAttribute("rows");
-      if(rows) {
-        // a row is a rendered line of the content, measured where it is laid out; an editor
-        // that is still hidden has none, and falls back to the declared line height
-        const line = elem.querySelector(".cm-line")?.getBoundingClientRect().height ||
-          parseFloat(getComputedStyle(elem.querySelector(".cm-scroller")).lineHeight);
-        // the box covers border and padding as well, so both are added to the lines
-        const content = getComputedStyle(elem.querySelector(".cm-content")), box =
-          getComputedStyle(elem);
-        elem.style.height = `${rows * line +
-          parseFloat(content.paddingTop) + parseFloat(content.paddingBottom) +
-          parseFloat(box.borderTopWidth) + parseFloat(box.borderBottomWidth)}px`;
-      } else {
-        elem.style.height = EDITOR_FIXED_HEIGHT;
-      }
+  // three sizing strategies: 'fill' measures nothing, as the panel gives the editors their
+  // share via CSS; anything else truthy fills the viewport; without one, the rows decide
+  if(resize && resize !== "fill") fitToViewport(useCM);
+  else if(!resize && useCM) fitToRows(loaded);
+}
+
+/**
+ * Sizes the editors of a page from their own top to the bottom of the viewport, and again
+ * whenever the window changes.
+ * @param {boolean} useCM whether CodeMirror replaced the text areas
+ */
+function fitToViewport(useCM) {
+  const refresh = () => {
+    // size each pane from its own top to the viewport bottom, so a tall
+    // sibling column (e.g. a long resource list) can't shrink it
+    // stacked layouts keep the minimum, so the editor does not fill the
+    // viewport and push the output and buttons off-screen
+    // measured once: reading it per element would interleave layout and style writes
+    const reserve = chromeBelowMain();
+    const height = elem => stacked() ? EDITOR_MIN_HEIGHT : Math.max(EDITOR_MIN_HEIGHT,
+      window.innerHeight - elem.getBoundingClientRect().top - reserve);
+    for(const elem of document.querySelectorAll(useCM ? ".cm-editor" : "textarea")) {
+      elem.style.height = `${height(elem)}px`;
+    }
+  };
+  window.addEventListener("load", refresh);
+  window.addEventListener("resize", refresh);
+}
+
+/**
+ * Sizes editors by the lines their text areas asked for (e.g. the users pages): without a
+ * height, an editor collapses to a single line. The text area fallback is sized by style.css.
+ * Only the supplied editors are sized: a page whose panel sizes its editor via CSS must keep
+ * that editor untouched when a second call brings up one of its own, e.g. in a dialog.
+ * @param {Array} ids ids of the text areas that were replaced
+ */
+function fitToRows(ids) {
+  for(const id of ids) {
+    // the editor takes the place after the text area it replaced
+    const elem = document.getElementById(id)?.nextElementSibling;
+    if(!elem?.classList.contains("cm-editor")) continue;
+    // an editor is as tall as the text area it replaced asked to be
+    const rows = elem.previousElementSibling?.getAttribute("rows");
+    if(rows) {
+      // a row is a rendered line of the content, measured where it is laid out; an editor
+      // that is still hidden has none, and falls back to the declared line height
+      const line = elem.querySelector(".cm-line")?.getBoundingClientRect().height ||
+        parseFloat(getComputedStyle(elem.querySelector(".cm-scroller")).lineHeight);
+      // the box covers border and padding as well, so both are added to the lines
+      const content = getComputedStyle(elem.querySelector(".cm-content")), box =
+        getComputedStyle(elem);
+      elem.style.height = `${rows * line +
+        parseFloat(content.paddingTop) + parseFloat(content.paddingBottom) +
+        parseFloat(box.borderTopWidth) + parseFloat(box.borderBottomWidth)}px`;
+    } else {
+      elem.style.height = EDITOR_FIXED_HEIGHT;
     }
   }
 }

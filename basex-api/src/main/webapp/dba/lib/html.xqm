@@ -18,8 +18,8 @@ import module namespace utils = 'dba/lib/utils' at 'utils.xqm';
  : * columns: grid track widths, one per panel; defaults to equal widths
  : * rows: grid track heights; the panels then fill the viewport instead of growing with
  :   their content, and each panel scrolls on its own
- : * panels: 'auto' if the page assigns the collapsed state of its panels itself; it is then
- :   not remembered, as it follows from what the page shows
+ : * panels: name of the subview, if the page shows different panels in different subviews;
+ :   the collapsed state is then remembered for each of them, as it is kept by position
  : * scripts: names of the scripts the page needs, besides the shared one
  : * init: call that prepares the page, evaluated after the shared setup
  :

@@ -47,10 +47,12 @@ function dba:databases(
   let $dir := $dir[.] otherwise replace($resource, '[^/]+$', '')
   (: a panel is labelled in the markup, not by its heading: it keeps its name while it is
      folded away, and while it has nothing to show and is hidden :)
-  let $database := panels:database($name, '', 1, $resource, $dir)
+  let $database := panels:database($name, '', 1, $resource, $dir, '')
   let $information := panels:information($name)
-  (: the panels follow the selection, and are not remembered: while a document is shown, what
-     it was chosen from steps back to a strip; without one, the lists are what there is to see :)
+  let $index := panels:index($name, 'element-name', '', '', 1)
+  (: the panels follow the selection: while a document is shown, what it was chosen from steps
+     back to a strip; without one, the lists are what there is to see. A panel that is folded by
+     hand keeps the state it was given :)
   let $fold := ' collapsed'[$document?exists]
   return (
     <div class='panel no-divider{ $fold }' data-label='Databases'>
@@ -68,16 +70,21 @@ function dba:databases(
     <div class='panel no-divider{ $fold }' data-label='Backups' data-fold='right'>
       <div id='backups-panel' class='pane'>{ panels:backups($name) }</div>
     </div>,
-    (: a report, not a step of the work: it is opened when it is asked for :)
+    (: reports, not steps of the work: they are opened when they are asked for :)
+    <div class='panel no-divider collapsed{ ' hidden'[empty($index)] }' data-label='Indexes'>
+      <div id='index-panel' class='pane'>{ $index }</div>
+    </div>,
     <div class='panel no-divider collapsed{ ' hidden'[empty($information)] }'
          data-label='Information'>
       <div id='information-panel' class='pane'>{ $information }</div>
     </div>
   ) => html:wrap({
     'header' : $dba:CAT,
-    'columns': ('20fr', '25fr', '35fr', '20fr', '20fr'),
+    'columns': ('20fr', '25fr', '35fr', '20fr', '20fr', '20fr'),
     'rows'   : '1fr',
-    'panels' : 'auto',
+    (: a view of its own: what is folded away while a document is shown is not what is folded
+       away while the lists are :)
+    'panels' : 'resource'[$document?exists],
     'scripts': ('cm6', 'editor', 'databases'),
     'init'   : 'initDatabases(' || ($document?editable = true()) || ');',
     'info'   : $info,
@@ -328,7 +335,9 @@ function dba:action(
           }
         }
       }
-    }
+    },
+    'index-create': fn($args) { dba:index($args, true()) },
+    'index-drop': fn($args) { dba:index($args, false()) }
   })
 };
 
@@ -356,6 +365,31 @@ declare %private function dba:rename-database(
         error((), 'Database already exists.')
       } else if ($args?name != $args?newname) {
         updating $update($args?name, $args?newname)
+      }
+    }
+  }
+};
+
+(:~
+ : Returns the action that builds or discards a single index of a database. An optimization
+ : that is limited to one index option leaves the other options of the database as they are.
+ : @param  $args    request parameters
+ : @param  $create  create or drop the index
+ : @return action
+ :)
+declare %private function dba:index(
+  $args    as map(*),
+  $create  as xs:boolean
+) as map(*) {
+  let $index := panels:index-type($args?index)
+  return {
+    'params': { 'name': $args?name },
+    'info'  : utils:info($index?label, 'index', if ($create) { 'created' } else { 'dropped' }),
+    'run'   : %updating fn() {
+      if (empty($index?option)) {
+        error((), 'Index cannot be created or dropped.')
+      } else {
+        db:optimize($args?name, false(), { $index?option: $create })
       }
     }
   }

@@ -39,7 +39,7 @@ function dba:workspace(
           <button type='button' onclick='newFile()' title='Open an empty tab'>New</button>,
           <button id='save' disabled='' onclick='saveFile()'>Save</button>,
           <button id='saveas' disabled='' onclick='saveFile(true)'
-                  title='Save under another name'>Save as</button>,
+                  title='Save under another name'>Save as…</button>,
           <span>&#xa0;&#xa0;</span>,
           <button id='run' onclick='runQuery()' title='Ctrl-Enter'>Run</button>,
           <button id='stop' onclick='stopQuery()' disabled=''>Stop</button>,
@@ -51,23 +51,35 @@ function dba:workspace(
       }</form>
     </div>,
     (: the client knows the directory to be shown, and fills the panel :)
-    <div class='panel no-divider' style='grid-area: 1 / 1 / 3 / 2'>
+    <div class='panel no-divider' style='grid-area: 1 / 1 / -1 / 2'>
       <div id='files-panel' class='pane'/>
       <div class='resizer' data-split='0'/>
     </div>,
     (: the open documents are known to the client, which draws the strip :)
-    <div class='panel no-divider' style='grid-area: 2 / 2 / 3 / 3'>
+    <div class='panel no-divider' style='grid-area: 2 / 2 / -1 / 3'>
       <div id='tabs' class='tabs'/>
       <textarea id='editor' autofocus='' spellcheck='false'/>
       <div class='resizer' data-split='1'/>
     </div>,
-    <div class='panel no-divider' style='grid-area: 1 / 3 / 3 / 4'>
+    (: two panels: the space between them can be dragged :)
+    <div class='panel no-divider' data-label='' style='grid-area: 1 / 3 / 3 / 4'>
+      <div class='pane-title'>
+        <h2>Result</h2>
+        <label title='Show the information of the last query'><input type='checkbox'
+          id='query-info' onchange='queryInfoChanged()'/> Query Info</label>
+      </div>
       <textarea id='output' readonly='' spellcheck='false'/>
+      <div class='resizer-row' id='info-resizer' data-split='0' hidden=''/>
+    </div>,
+    <div class='panel no-divider hidden' data-label='' id='info-view'
+         style='grid-area: 3 / 3 / 4 / 4'>
+      <h2>Query Info</h2>
+      <div id='info-panel' class='pane'/>
     </div>
   ) => html:wrap({
     'header' : $dba:CAT,
     'columns': ('25fr', '38fr', '37fr'),
-    'rows'   : ('auto', '1fr'),
+    'rows'   : ('auto', '1fr', '1fr'),
     'scripts': ('cm6', 'editor', 'workspace'),
     'init'   : 'initWorkspace();',
     'info'   : $info,
