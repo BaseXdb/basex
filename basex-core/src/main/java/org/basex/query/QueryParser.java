@@ -3182,6 +3182,7 @@ public class QueryParser extends InputParser {
     if(expr != null) fb.add(expr, null);
     wsCheck("(");
     if(!wsConsumeWs(")")) {
+      if(!more()) throw error(INCOMPLETE);
       boolean keywordFound = false;
       do {
         final int p = pos;
@@ -3203,7 +3204,7 @@ public class QueryParser extends InputParser {
         if(arg == null) throw error(FUNCARG_X, found());
         if(fb.add(arg, name)) throw error(PARAMTWICE_X, name.prefixString());
       } while(wsConsumeWs(","));
-      if(!consume(")")) throw error(FUNCARG_X, found());
+      if(!consume(")")) throw error(WRONGCHAR_X_X, ")", found());
     }
     return fb;
   }
@@ -4913,12 +4914,13 @@ public class QueryParser extends InputParser {
         final ExprList argList = new ExprList();
 
         if(!wsConsume(")")) {
+          if(!more()) throw error(INCOMPLETE);
           do {
             final Expr expr = single();
             if(expr == null) throw error(FUNCARG_X, found());
             argList.add(expr);
           } while(wsConsume(","));
-          if(!wsConsume(")")) throw error(FUNCARG_X, found());
+          if(!wsConsume(")")) throw error(WRONGCHAR_X_X, ")", found());
         }
         // skip if primary expression cannot be a function
         qc.updating();

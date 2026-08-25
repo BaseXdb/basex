@@ -576,6 +576,15 @@ public final class MixedTest extends SandboxTest {
         + " subsequenc(1, 2, 3)", WHICHFUNC_X, "subsequence");
   }
 
+  /** Incomplete argument list: report the missing token instead of a missing argument. */
+  @Test public void incompleteArgumentList() {
+    error("true(", INCOMPLETE);
+    error("true(1", WRONGCHAR_X_X);
+    error("true(1 2)", WRONGCHAR_X_X);
+    error("true(1,", FUNCARG_X);
+    error("true(,", FUNCARG_X);
+  }
+
   /** Unprefixed call of a user-defined function with wrong arity reports an arity mismatch. */
   @Test public void wrongArityNoNamespace() {
     error("declare function abc($j) { }; abc()", INVNARGS_X_X);
