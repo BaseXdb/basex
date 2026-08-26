@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 import java.net.*;
-import java.net.http.*;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -36,10 +35,10 @@ public final class RESTConcurrencyTest extends SandboxTest {
   /** HTTP server. */
   private static BaseXHTTP http;
 
-  /** Time-out in (ms): increase if running on a slower system. */
-  private static final long TIMEOUT = 2000;
-  /** Socket time-out in (ms). */
-  private static final int SOCKET_TIMEOUT = 3000;
+  /** Time a long-running request occupies the database (ms). */
+  private static final long BLOCK = 3000;
+  /** Socket time-out (ms): must outlast a request that waits for a lock. */
+  private static final int SOCKET_TIMEOUT = 30000;
   /** BaseX HTTP base URL. */
   private static final String REST_URL = REST_ROOT + NAME;
 
@@ -48,12 +47,17 @@ public final class RESTConcurrencyTest extends SandboxTest {
    * @throws Exception if database cannot be created or server cannot be started
    */
   @BeforeEach public void setUp() throws Exception {
+    // -L: start a database server, which the client session below connects to
     final StringList sl = new StringList("-p" + DB_PORT, "-h" + HTTP_PORT, "-s" + STOP_PORT,
-        "-c", "password " + NAME, "-U" + ADMIN, "-z", "-q");
+        "-c", "password " + NAME, "-U" + ADMIN, "-L", "-z", "-q");
     http = new BaseXHTTP(sl.finish());
     try(ClientSession cs = createClient()) {
       cs.execute(new CreateDB(NAME));
     }
+    // warm up: the first request of a server initializes the web application and the query
+    // processor, which takes seconds and would invalidate every timing assumption below
+    final HTTPResponse response = new Get("?query=1").call();
+    assertEquals(200, response.status);
   }
 
   /**
@@ -75,24 +79,21 @@ public final class RESTConcurrencyTest extends SandboxTest {
    */
   @Test public void testMultipleReaders() throws Exception {
     final String number = "63177";
-    final String slowQuery = "?query=(1%20to%20100000000000)%5b.=0%5d";
-    final String fastQuery = "?query=" + number;
-
-    final Get slowAction = new Get(slowQuery);
-    final Get fastAction = new Get(fastQuery);
+    final Get slowAction = new Get(readerQuery());
+    final Get fastAction = new Get("?query=" + number);
 
     final ExecutorService exec = Executors.newFixedThreadPool(2);
-    final Future<HTTPResponse> slow = exec.submit(slowAction);
-    Performance.sleep(TIMEOUT); // delay in order to be sure that the reader has started
-    final Future<HTTPResponse> fast = exec.submit(fastAction);
-
     try {
-      final HTTPResponse result = fast.get();
+      // start the reader and wait until it holds the read lock
+      final Future<HTTPResponse> slow = exec.submit(slowAction);
+      awaitRunning();
+
+      // a second reader is not blocked by the first one
+      final HTTPResponse result = exec.submit(fastAction).get();
       assertEquals(200, result.status);
       assertEquals(number, result.data);
+      assertEquals(200, slow.get().status);
     } finally {
-      slowAction.stop = true;
-      slow.get();
       exec.shutdownNow();
     }
   }
@@ -111,22 +112,18 @@ public final class RESTConcurrencyTest extends SandboxTest {
   @Test public void testReaderWriter() throws Exception {
     // the reader holds a read lock on the database for a bounded time and then terminates,
     // so the writer is blocked only until the reader releases the lock (no forced stop needed)
-    final String readerQuery = "?query=" + URLEncoder.encode(
-        "db:get('" + NAME + "'), prof:sleep(2500)", StandardCharsets.UTF_8);
-    final byte[] content = Token.token("<a/>");
-
-    final Get readerAction = new Get(readerQuery);
-    final Put writerAction = new Put("/test.xml", content);
+    final Get readerAction = new Get(readerQuery());
+    final Put writerAction = new Put("/test.xml", Token.token("<a/>"));
 
     final ExecutorService exec = Executors.newFixedThreadPool(2);
     try {
-      // start the reader and wait until it is running and holds the read lock
+      // start the reader and wait until it holds the read lock
       final Future<HTTPResponse> reader = exec.submit(readerAction);
-      Performance.sleep(800);
+      awaitRunning();
 
       // the writer must not modify the database while the reader holds the read lock
       final Future<HTTPResponse> writer = exec.submit(writerAction);
-      assertThrows(TimeoutException.class, () -> writer.get(1000, TimeUnit.MILLISECONDS));
+      assertThrows(TimeoutException.class, () -> writer.get(BLOCK / 2, TimeUnit.MILLISECONDS));
 
       // as soon as the reader releases the lock, the writer succeeds
       assertEquals(201, writer.get().status);
@@ -165,21 +162,58 @@ public final class RESTConcurrencyTest extends SandboxTest {
     // check if all have finished successfully
     try {
       for(final Future<HTTPResponse> task : tasks) {
-        assertEquals(200, task.get(TIMEOUT, TimeUnit.MILLISECONDS).status);
+        assertEquals(200, task.get().status);
       }
+      // every writer must have added its document
+      assertEquals(Integer.toString(count), new Get(
+          "?query=" + encode("count(db:get('" + NAME + "'))")).call().data);
     } finally {
       exec.shutdownNow();
     }
   }
 
-  // REST API
+  // TOOLBOX ======================================================================================
+
+  /**
+   * Returns a query that holds a read lock on the test database for a bounded time.
+   * @return request string
+   */
+  private static String readerQuery() {
+    return "?query=" + encode("db:get('" + NAME + "'), prof:sleep(" + BLOCK + ")");
+  }
+
+  /**
+   * Waits until a second job is running, i.e. until the request that was started before this call
+   * has acquired its locks. The polling request itself is the first of the two jobs.
+   * @throws Exception error during request execution
+   */
+  private static void awaitRunning() throws Exception {
+    final String request = "?query=" + encode("count(job:list-details()[@state = 'running'])");
+    final long end = System.nanoTime() + BLOCK * 1000000;
+    do {
+      final HTTPResponse response = new Get(request).call();
+      assertEquals(200, response.status);
+      if(Integer.parseInt(response.data) > 1) return;
+      Performance.sleep(10);
+    } while(System.nanoTime() < end);
+    fail("Request did not start within " + BLOCK + " ms.");
+  }
+
+  /**
+   * URL-encodes a query string.
+   * @param query query
+   * @return encoded query
+   */
+  private static String encode(final String query) {
+    return URLEncoder.encode(query, StandardCharsets.UTF_8);
+  }
+
+  // REST API =====================================================================================
 
   /** REST GET request. */
   private static final class Get implements Callable<HTTPResponse> {
     /** Request URI. */
-    protected final URI uri;
-    /** Stop signal. */
-    public volatile boolean stop;
+    private final URI uri;
 
     /**
      * Construct a new GET request.
@@ -193,17 +227,9 @@ public final class RESTConcurrencyTest extends SandboxTest {
     public HTTPResponse call() throws Exception {
       final HttpRequest request = HttpRequest.newBuilder(uri).
           timeout(Duration.ofMillis(SOCKET_TIMEOUT)).build();
-
-      while(!stop) {
-        try {
-          final HttpResponse<String> response = HttpClient.newHttpClient().send(request,
-              HttpResponse.BodyHandlers.ofString());
-          return new HTTPResponse(response.statusCode(), response.body());
-        } catch(final HttpTimeoutException ex) {
-          Util.errln(ex);
-        }
-      }
-      return null;
+      final HttpResponse<String> response = HttpClient.newHttpClient().send(request,
+          HttpResponse.BodyHandlers.ofString());
+      return new HTTPResponse(response.statusCode(), response.body());
     }
   }
 
@@ -214,9 +240,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
     /** Content to send to the server. */
     private final byte[] data;
     /** HTTP method. */
-    protected final Method method;
-    /** Stop signal. */
-    public volatile boolean stop;
+    private final Method method;
 
     /**
      * Construct a new PUT request.
@@ -245,15 +269,8 @@ public final class RESTConcurrencyTest extends SandboxTest {
           method(method.name(), HttpRequest.BodyPublishers.ofByteArray(data)).
           setHeader(HTTPText.CONTENT_TYPE, MediaType.APPLICATION_XML.toString()).
           timeout(Duration.ofMillis(SOCKET_TIMEOUT)).build();
-      while(!stop) {
-        try {
-          return new HTTPResponse(HttpClient.newHttpClient().send(request,
-              HttpResponse.BodyHandlers.discarding()).statusCode());
-        } catch(final HttpTimeoutException ex) {
-          Util.errln(ex);
-        }
-      }
-      return null;
+      return new HTTPResponse(HttpClient.newHttpClient().send(request,
+          HttpResponse.BodyHandlers.discarding()).statusCode());
     }
   }
 
@@ -269,14 +286,12 @@ public final class RESTConcurrencyTest extends SandboxTest {
     }
   }
 
-  // Toolbox
-
   /** Simple HTTP response. */
   private static final class HTTPResponse {
     /** Status code. */
-    public final int status;
+    private final int status;
     /** Response data or {@code null} if no data was returned. */
-    public final String data;
+    private final String data;
 
     /**
      * Constructor.
