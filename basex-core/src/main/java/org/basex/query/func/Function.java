@@ -426,7 +426,7 @@ public enum Function implements AFunction {
       params(STRING_ZO, MAP_ZO), DOCUMENT_FN_ZO, flag(CNS)),
   /** XQuery function. */
   JTREE(FnJtree::new, "jtree(input)",
-      params(MAP_OR_ARRAY_O), JNODE_ROOT.seqType(), flag(CNS)),
+      params(ITEM_ZM), JNODE_ROOT.seqType(), flag(CNS)),
   /** XQuery function. */
   JVALUE(FnJvalue::new, "jvalue(input?)",
       params(JNODE_ZO), ITEM_ZM),

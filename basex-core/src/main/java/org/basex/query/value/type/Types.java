@@ -325,7 +325,7 @@ public final class Types {
   public static final SeqType JNODE_ZM = JNODE.seqType(ZERO_OR_MORE);
 
   /** Root JNode. */
-  public static final NodeType JNODE_ROOT = NodeType.get(Empty.VALUE, MAP_OR_ARRAY_O);
+  public static final NodeType JNODE_ROOT = NodeType.get(Empty.VALUE, null);
 
   /** Type of fn:schema-type-record member 'variety'. */
   public static final EnumType SCHEMA_TYPE_RECORD_VARIETY =
