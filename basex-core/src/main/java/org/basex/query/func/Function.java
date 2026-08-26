@@ -824,8 +824,6 @@ public enum Function implements AFunction {
   /** XQuery function. */
   MATCHING_SEGMENT_RECORD(Records.MATCHING_SEGMENT.get()),
   /** XQuery function. */
-  _ARRAY_MEMBER_RECORD(Records.MEMBER.get()),
-  /** XQuery function. */
   PARSED_CSV_STRUCTURE_RECORD(Records.PARSED_CSV_STRUCTURE.get()),
   /** XQuery function. */
   RANDOM_NUMBER_GENERATOR_RECORD(Records.RANDOM_NUMBER_GENERATOR.get()),
@@ -944,10 +942,10 @@ public enum Function implements AFunction {
       params(ARRAY_ZM), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_MEMBERS(ArrayMembers::new, "members(array)",
-      params(ARRAY_O), Records.MEMBER.get().seqType(Occ.ZERO_OR_MORE), ARRAY_URI),
+      params(ARRAY_O), JNODE_ZM, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_OF_MEMBERS(ArrayOfMembers::new, "of-members(input)",
-      params(Records.MEMBER.get().seqType(Occ.ZERO_OR_MORE)), ARRAY_O, ARRAY_URI),
+      params(JNODE_ZM), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_PUT(ArrayPut::new, "put(array, position, member)",
       params(ARRAY_O, INTEGER_O, ITEM_ZM), ARRAY_O, ARRAY_URI),
