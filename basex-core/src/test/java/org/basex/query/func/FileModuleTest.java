@@ -31,6 +31,8 @@ public final class FileModuleTest extends SandboxTest {
   private static final String PATH3 = PATH + NAME + "/x";
   /** Test path. */
   private static final String PATH4 = PATH + NAME + "/x/y";
+  /** Test path, detouring via the parent directory. */
+  private static final String RELPATH1 = PATH + "../" + sandbox().name() + '/' + NAME;
 
   /** Initializes the test. */
   @AfterEach public void init() {
@@ -374,7 +376,7 @@ public final class FileModuleTest extends SandboxTest {
     query(func.args(PATH1, PATH2));
     query(func.args(PATH2, PATH1));
     query(func.args(PATH1, PATH1));
-    query(func.args(PATH + "../" + NAME + '/' + NAME, PATH1));
+    query(func.args(RELPATH1, PATH1));
     query(_FILE_SIZE.args(PATH1), 1);
     query(_FILE_EXISTS.args(PATH2), false);
 
@@ -444,8 +446,7 @@ public final class FileModuleTest extends SandboxTest {
     // queries
     query(_FILE_WRITE.args(PATH1, " ()"));
     assertEquals(Paths.get(PATH1).toRealPath().toString(), query(func.args(PATH1)));
-    query(func.args(PATH + "../" + NAME + '/' + NAME),
-        Paths.get(PATH + "../" + NAME + '/' + NAME).toRealPath().toString());
+    query(func.args(RELPATH1), Paths.get(RELPATH1).toRealPath().toString());
     error(func.args(PATH1 + NAME), FILE_NOT_FOUND_X);
   }
 
