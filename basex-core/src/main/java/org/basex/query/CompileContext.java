@@ -19,6 +19,7 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -464,5 +465,38 @@ public final class CompileContext {
       limit = qc.context.options.get(MainOptions.INLINELIMIT);
     }
     return expr.exprSize() < limit;
+  }
+
+  /**
+   * Inlines a function body: binds the arguments to the parameters of the function.
+   * @param params function parameters
+   * @param exprs arguments
+   * @param bindings bindings for non-local variables (can be {@code null})
+   * @param body function body
+   * @param declType declared return type (can be {@code null})
+   * @param info input info (can be {@code null})
+   * @return inlined expression
+   * @throws QueryException query exception
+   */
+  public Expr inline(final Var[] params, final Expr[] exprs, final Map<Var, Expr> bindings,
+      final Expr body, final SeqType declType, final InputInfo info) throws QueryException {
+
+    // create let bindings for all parameters and non-local variables
+    final LinkedList<Clause> clauses = new LinkedList<>();
+    final IntObjectMap<Var> vm = new IntObjectMap<>();
+    final int pl = params.length;
+    for(int p = 0; p < pl; p++) {
+      clauses.add(new Let(copy(params[p], vm), exprs[p]).optimize(this));
+    }
+    if(bindings != null) {
+      for(final Map.Entry<Var, Expr> entry : bindings.entrySet()) {
+        clauses.add(new Let(copy(entry.getKey(), vm), entry.getValue()).optimize(this));
+      }
+    }
+
+    // create the return clause
+    final Expr expr = body.copy(this, vm).optimize(this);
+    final Expr rtrn = declType == null ? expr : new TypeCheck(info, expr, declType).optimize(this);
+    return clauses.isEmpty() ? rtrn : new GFLWOR(info, clauses, rtrn).optimize(this);
   }
 }

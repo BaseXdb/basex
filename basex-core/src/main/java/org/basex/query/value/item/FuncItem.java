@@ -19,7 +19,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 
 /**
  * Function item.
@@ -174,21 +173,7 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public Value invokeInternal(final QueryContext qc, final InputInfo ii, final Value[] args)
       throws QueryException {
-
-    final int arity = arity();
-    for(int a = 0; a < arity; a++) qc.set(params[a], args[a]);
-
-    // use shortcut if focus is not accessed
-    if(simple) return expr.value(qc);
-
-    // reset context and evaluate function
-    final QueryFocus qf = qc.focus;
-    qc.focus = focus != null ? focus : new QueryFocus();
-    try {
-      return expr.value(qc);
-    } finally {
-      qc.focus = qf;
-    }
+    return qc.invoke(params, args, expr, simple, focus);
   }
 
   @Override
@@ -224,10 +209,7 @@ public final class FuncItem extends FItem implements Scope {
 
   @Override
   public boolean visit(final ASTVisitor visitor) {
-    for(final Var param : params) {
-      if(!visitor.declared(param)) return false;
-    }
-    return expr.accept(visitor);
+    return visitor.declared(params) && expr.accept(visitor);
   }
 
   @Override
@@ -244,18 +226,7 @@ public final class FuncItem extends FItem implements Scope {
   public Expr inline(final Expr[] exprs, final CompileContext cc) throws QueryException {
     if(!cc.inlineable(anns, expr) || expr.has(Flag.CTX)) return null;
     cc.info(QueryText.OPTINLINE_X, this);
-
-    // create let bindings for all variables
-    final LinkedList<Clause> clauses = new LinkedList<>();
-    final IntObjectMap<Var> vm = new IntObjectMap<>();
-    final int arity = arity();
-    for(int a = 0; a < arity; a++) {
-      clauses.add(new Let(cc.copy(params[a], vm), exprs[a]).optimize(cc));
-    }
-
-    // create the return clause
-    final Expr rtrn = expr.copy(cc, vm).optimize(cc);
-    return clauses.isEmpty() ? rtrn : new GFLWOR(info, clauses, rtrn).optimize(cc);
+    return cc.inline(params, exprs, null, expr, null, info);
   }
 
   @Override

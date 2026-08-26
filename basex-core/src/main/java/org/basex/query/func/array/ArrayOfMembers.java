@@ -3,7 +3,6 @@ package org.basex.query.func.array;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
-import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;

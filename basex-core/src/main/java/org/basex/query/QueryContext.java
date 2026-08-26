@@ -675,6 +675,35 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   /**
+   * Binds the arguments of a function call to the function parameters and evaluates the body.
+   * @param params function parameters
+   * @param args arguments
+   * @param body function body
+   * @param simple indicates if the query focus is neither accessed nor modified
+   * @param qf captured query focus (can be {@code null})
+   * @return result
+   * @throws QueryException query exception
+   */
+  public Value invoke(final Var[] params, final Value[] args, final Expr body,
+      final boolean simple, final QueryFocus qf) throws QueryException {
+
+    final int pl = params.length;
+    for(int p = 0; p < pl; p++) set(params[p], args[p]);
+
+    // use shortcut if focus is not accessed
+    if(simple) return body.value(this);
+
+    // assign captured focus, evaluate function body, restore focus
+    final QueryFocus qfocus = focus;
+    focus = qf != null ? qf : new QueryFocus();
+    try {
+      return body.value(this);
+    } finally {
+      focus = qfocus;
+    }
+  }
+
+  /**
    * Returns a new query focus with the global context value.
    * @return query focus
    */

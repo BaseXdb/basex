@@ -319,22 +319,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     if(!cc.inlineable(anns, expr) || expr.has(Flag.CTX)) return null;
 
     cc.info(OPTINLINE_X, this);
-
-    // create let bindings for all variables
-    final LinkedList<Clause> clauses = new LinkedList<>();
-    final IntObjectMap<Var> vm = new IntObjectMap<>();
-    final int pl = params.length;
-    for(int p = 0; p < pl; p++) {
-      clauses.add(new Let(cc.copy(params[p], vm), exprs[p]).optimize(cc));
-    }
-    for(final Entry<Var, Expr> entry : global.entrySet()) {
-      clauses.add(new Let(cc.copy(entry.getKey(), vm), entry.getValue()).optimize(cc));
-    }
-
-    // create the return clause
-    final Expr body = expr.copy(cc, vm).optimize(cc);
-    final Expr rtrn = declType == null ? body : new TypeCheck(info, body, declType).optimize(cc);
-    return clauses.isEmpty() ? rtrn : new GFLWOR(info, clauses, rtrn).optimize(cc);
+    return cc.inline(params, exprs, global, expr, declType, info);
   }
 
   @Override
@@ -413,10 +398,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     for(final Entry<Var, Expr> entry : global.entrySet()) {
       if(!(entry.getValue().accept(visitor) && visitor.declared(entry.getKey()))) return false;
     }
-    for(final Var param : params) {
-      if(!visitor.declared(param)) return false;
-    }
-    return expr.accept(visitor);
+    return visitor.declared(params) && expr.accept(visitor);
   }
 
   @Override
@@ -508,7 +490,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     if(!global.isEmpty()) {
       final IntObjectMap<Expr> bindings = new IntObjectMap<>();
       cls.global.forEach((var, ex) -> bindings.put(var.slot(), ex));
-      for(final Map.Entry<Var, Expr> entry : global.entrySet()) {
+      for(final Entry<Var, Expr> entry : global.entrySet()) {
         if(!entry.getValue().equals(bindings.get(entry.getKey().slot()))) return false;
       }
     }
