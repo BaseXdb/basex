@@ -1,5 +1,7 @@
 package org.basex.server;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.basex.*;
 import org.basex.api.client.*;
 import org.basex.core.*;
@@ -75,6 +77,9 @@ public final class ServerAddTest extends SandboxTest {
           }
           return null;
         });
+        // every client must have added all of its documents; the database was created with one
+        assertEquals(Integer.toString(clients * runs + 1),
+            cs.execute("XQUERY count(db:get('" + NAME + "'))").trim());
         // drop database
         cs.execute("DROP DB " + NAME);
       }

@@ -19,12 +19,12 @@ import org.junit.jupiter.api.*;
 public abstract class Benchmark extends SandboxTest {
   /** Test document. */
   private static final String INPUT = "src/test/resources/factbook.zip";
+  /** Local vs client/server mode (system property {@code local}). */
+  private static final boolean LOCAL = Boolean.getBoolean("local");
   /** Server reference. */
   private static BaseXServer server;
   /** Session. */
   private static Session session;
-  /** Local vs server flag. */
-  private static boolean local;
 
   /**
    * Initializes the benchmark.
@@ -33,10 +33,8 @@ public abstract class Benchmark extends SandboxTest {
   @BeforeAll public static void init() throws IOException {
     // check if server is (not) running
     final int sp = context.soptions.get(StaticOptions.SERVERPORT);
-    server = local || BaseXServer.ping(S_LOCALHOST, sp) ? null : createServer();
-    session = local ? new LocalSession(context) : createClient();
-
-    // create test database
+    server = LOCAL || BaseXServer.ping(S_LOCALHOST, sp) ? null : createServer();
+    session = LOCAL ? new LocalSession(context) : createClient();
     session.execute(new Set(MainOptions.QUERYINFO, true));
   }
 
@@ -46,6 +44,15 @@ public abstract class Benchmark extends SandboxTest {
    */
   @AfterAll public static void stop() throws IOException {
     stopServer(server);
+  }
+
+  /**
+   * Creates the test database. Every benchmark starts from the same input: many of these
+   * benchmarks are destructive, and a database left over by a previous one measures nothing.
+   * @throws IOException I/O exception
+   */
+  @BeforeEach public void createDB() throws IOException {
+    session.execute(new CreateDB(NAME, INPUT));
   }
 
   /**
@@ -67,17 +74,8 @@ public abstract class Benchmark extends SandboxTest {
    */
   protected static String eval(final int n, final String query) throws IOException {
     // loop through number of runs for a single query
-    check();
     String result = "";
     for(int rn = 0; rn < n; ++rn) result = session.execute(new XQuery(query));
     return result;
-  }
-
-  /**
-   * Creates or opens the test database.
-   * @throws IOException I/O exception
-   */
-  private static void check() throws IOException {
-    session.execute(new Check(INPUT));
   }
 }

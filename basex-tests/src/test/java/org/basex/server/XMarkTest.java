@@ -1,6 +1,7 @@
 package org.basex.server;
 
-import java.io.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.math.*;
 
 import org.basex.*;
@@ -24,14 +25,15 @@ public final class XMarkTest extends SandboxTest {
   /** Test user. */
   private static final String USER = "xmark";
   /** Name of database. */
-  private static final String DB = "111mb";
-  /** Input data of database. */
-  private static final String DBFILE = "https://files.basex.org/xml/xmark.xml";
+  private static final String DB = "xmark";
+  /** Input data of database; a local copy can be passed on with the system property. */
+  private static final String DBFILE =
+      System.getProperty("xmark", "https://files.basex.org/xml/xmark.xml");
 
   /** Test directory. */
   private static final IOFile DIR = new IOFile(Prop.TEMPDIR, "XMark");
   /** Output file. */
-  private static final IOFile FILE = new IOFile(DIR, "master- " + DB + ".graph");
+  private static final IOFile FILE = new IOFile(DIR, "master-" + DB + ".graph");
 
   /** Maximum time per query (ms). */
   private static final int MAX = 2000;
@@ -128,16 +130,25 @@ public final class XMarkTest extends SandboxTest {
       cs.execute("CREATE DB " + DB + " " + DBFILE);
       cs.execute("CREATE USER xmark xmark");
       cs.execute("GRANT read ON " + DB + " TO xmark");
+      // report what is measured: the runtimes are meaningless without the input size
+      Util.println("Input: " + DBFILE);
+      Util.println("Size: " + cs.execute("XQUERY db:property('" + DB + "', 'size')") + " bytes, " +
+          cs.execute("XQUERY count(db:get('" + DB + "')//*)") + " elements");
     }
   }
 
   /**
-   * Initializes the tests.
-   * @throws IOException I/O exception
+   * Drops the test data and stops the server.
+   * @throws Exception any exception
    */
-  @AfterAll public static void close() throws IOException {
-    // only stop server if it has not been running before starting the tests
-    if(server != null) server.stop();
+  @AfterAll public static void close() throws Exception {
+    try(ClientSession cs = createClient(UserText.ADMIN, NAME)) {
+      cs.execute("DROP DB " + DB);
+      cs.execute("DROP USER " + USER);
+    } finally {
+      // only stop server if it has not been running before starting the tests
+      if(server != null) server.stop();
+    }
   }
 
   /**
@@ -151,23 +162,24 @@ public final class XMarkTest extends SandboxTest {
     try(ClientSession cs = createClient(USER, USER)) {
       cs.execute(new Open(DB));
 
-      // ignore first run
-      System.out.println("Warming up...");
+      // ignore first run; remember a fingerprint of the results, which must not change
+      final long[] results = new long[QUERIES.length];
+      Util.println("Warming up...");
       for(int i = 1; i <= 20; i++) {
         if(!exclude.contains(i)) {
           try(ClientQuery cq = cs.query(QUERIES[i - 1])) {
             final Performance p = new Performance();
-            cq.execute();
-            System.out.println(i + ": " + p);
+            results[i - 1] = fingerprint(cq.execute());
+            Util.println(i + ": " + p);
           } catch(final BaseXException ex) {
             // too slow queries will be stopped after client timeout
-            System.out.println(i + ": " + ex);
+            Util.println(i + ": " + ex);
             exclude.add(i);
           }
         }
       }
 
-      System.out.println(Prop.NL + "Testing...");
+      Util.println(Prop.NL + "Testing...");
       for(int i = 1; i <= 20; i++) {
         tb.add(String.format("%02d", i)).add("  ");
         final BigDecimal max = BigDecimal.valueOf(MAX);
@@ -176,18 +188,19 @@ public final class XMarkTest extends SandboxTest {
             tb.add("1000000");
           } else {
             double min = Double.MAX_VALUE;
-            BigDecimal total = BigDecimal.valueOf(0);
+            BigDecimal total = BigDecimal.ZERO;
             int r = 0;
             while(total.compareTo(max) < 0) {
               final Performance p = new Performance();
-              cq.execute();
+              // repeated evaluations of the same query must return the same result
+              assertEquals(results[i - 1], fingerprint(cq.execute()), "Query " + i);
               final double t = Double.parseDouble(p.formatRuntime().replaceAll(" .*", ""));
               total = total.add(BigDecimal.valueOf(t));
               min = Math.min(min, t);
               r++;
             }
             tb.add(Double.toString(min));
-            System.out.println(i + ": " + min + " (" + r + " runs, stopped at " + total + " ms)");
+            Util.println(i + ": " + min + " (" + r + " runs, stopped at " + total + " ms)");
           }
         }
         tb.add(Prop.NL);
@@ -196,5 +209,15 @@ public final class XMarkTest extends SandboxTest {
 
     DIR.md();
     FILE.write(tb.finish());
+  }
+
+  /**
+   * Returns a compact fingerprint of a query result. The results of some queries are several
+   * megabytes in size and are not retained for later comparisons.
+   * @param result serialized query result
+   * @return fingerprint
+   */
+  private static long fingerprint(final String result) {
+    return (long) result.length() << 32 | result.hashCode() & 0xFFFFFFFFL;
   }
 }

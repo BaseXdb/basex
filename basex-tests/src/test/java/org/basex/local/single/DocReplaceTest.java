@@ -29,9 +29,13 @@ public final class DocReplaceTest extends SandboxTest {
     // add documents
     for(int n = 0; n < NQUERIES; n++) execute(new Add(n + IO.XMLSUFFIX, "<a/>"));
     execute(new Flush());
+    query("count(db:get('" + NAME + "'))", NQUERIES);
 
     // replace documents with same content
     for(int n = 0; n < NQUERIES; n++) execute(new Put(n + IO.XMLSUFFIX, "<a/>"));
+
+    // replacements must not have added new documents
+    query("count(db:get('" + NAME + "'))", NQUERIES);
 
     // Drop database
     execute(new DropDB(NAME));

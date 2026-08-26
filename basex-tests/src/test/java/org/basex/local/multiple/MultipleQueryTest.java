@@ -1,6 +1,7 @@
 package org.basex.local.multiple;
 
 import java.util.*;
+import java.util.concurrent.*;
 
 import org.basex.*;
 import org.basex.core.cmd.*;
@@ -18,13 +19,10 @@ import org.junit.jupiter.api.Timeout;
 public final class MultipleQueryTest extends SandboxTest {
   /** Input document. */
   private static final String INPUT = "src/test/resources/factbook.zip";
-  /** Query to be run ("%" may be used as placeholder for dynamic content). */
-  private static final String QUERY = "(//text())[position() = %]";
   /** Maximum position to retrieve. */
   private static final int MAX = 1000;
-
-  /** Random number generator. */
-  static final Random RND = new Random(123);
+  /** Maximum delay between two queries (ms). */
+  private static final int DELAY = 50;
 
   /**
    * Runs the test.
@@ -67,14 +65,24 @@ public final class MultipleQueryTest extends SandboxTest {
   private static void run(final int clients, final int runs) throws Exception {
     // create test database
     execute(new CreateDB(NAME, INPUT));
+    // only request positions that exist
+    final int max = Math.min(MAX, Integer.parseInt(query("count(//text())")));
+
     // run clients, each retrieving the nth text of the database
-    parallel(clients, () -> {
-      for(int r = 0; r < runs; r++) {
-        Performance.sleep((long) (50 * RND.nextDouble()));
-        query(Util.info(QUERY, RND.nextInt() % MAX + 1));
-      }
-      return null;
-    });
+    final ArrayList<Callable<?>> tasks = new ArrayList<>(clients);
+    for(int c = 0; c < clients; c++) {
+      // one generator per client: a shared instance would not be reproducible
+      final Random rnd = new Random(c);
+      tasks.add(() -> {
+        for(int r = 0; r < runs; r++) {
+          Performance.sleep(rnd.nextInt(DELAY));
+          // the position exists, so exactly one text node must be returned
+          query("count((//text())[position() = " + (rnd.nextInt(max) + 1) + "])", 1);
+        }
+        return null;
+      });
+    }
+    parallel(tasks);
     // drop database
     execute(new DropDB(NAME));
   }

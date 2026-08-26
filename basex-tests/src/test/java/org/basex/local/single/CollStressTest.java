@@ -34,7 +34,7 @@ public final class CollStressTest extends SandboxTest {
    */
   @Test public void specificOpened() {
     execute(new Open(NAME));
-    for(int i = 0; i < SIZE; i++) query("collection('" + NAME + '/' + i + "')");
+    for(int i = 0; i < SIZE; i++) query("count(collection('" + NAME + '/' + i + "'))", 1);
   }
 
   /**
@@ -42,7 +42,7 @@ public final class CollStressTest extends SandboxTest {
    */
   @Test public void specificClosed() {
     execute(new Close());
-    for(int i = 0; i < SIZE; i++) query("collection('" + NAME + '/' + i + "')");
+    for(int i = 0; i < SIZE; i++) query("count(collection('" + NAME + '/' + i + "'))", 1);
   }
 
   /**
@@ -50,7 +50,8 @@ public final class CollStressTest extends SandboxTest {
    */
   @Test public void allOpened() {
     execute(new Open(NAME));
-    query("for $i in 0 to " + (SIZE - 1) + " return collection(concat('" + NAME + "/', $i))");
+    query("count(for $i in 0 to " + (SIZE - 1) + " return collection(concat('" + NAME +
+        "/', $i)))", SIZE);
   }
 
   /**
@@ -58,6 +59,7 @@ public final class CollStressTest extends SandboxTest {
    */
   @Test public void allClosed() {
     execute(new Close());
-    query("for $i in 0 to " + (SIZE - 1) + " return collection(concat('" + NAME + "/', $i))");
+    query("count(for $i in 0 to " + (SIZE - 1) + " return collection(concat('" + NAME +
+        "/', $i)))", SIZE);
   }
 }

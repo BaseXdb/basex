@@ -1,5 +1,7 @@
 package org.basex.server;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.basex.*;
 import org.basex.api.client.*;
 import org.junit.jupiter.api.*;
@@ -13,8 +15,11 @@ import org.junit.jupiter.api.*;
  */
 @Timeout(300)
 public final class ServerMemTest extends SandboxTest {
-  /** Query to be run. */
-  private static final String QUERY = "(for $i in 1 to 50000 order by $i return $i)[1]";
+  /** Number of items to be sorted by a single client. */
+  private static final int ITEMS = 50000;
+  /** Query to be run: the random values keep the sequence from being pre-evaluated. */
+  private static final String QUERY =
+      "count(sort((1 to " + ITEMS + ") ! random:integer()))";
   /** Server reference. */
   BaseXServer server;
 
@@ -46,7 +51,7 @@ public final class ServerMemTest extends SandboxTest {
       // run clients, each executing one memory-intensive query
       parallel(clients, () -> {
         try(ClientSession session = createClient()) {
-          session.execute("XQUERY " + QUERY);
+          assertEquals(Integer.toString(ITEMS), session.execute("XQUERY " + QUERY).trim());
         }
         return null;
       });

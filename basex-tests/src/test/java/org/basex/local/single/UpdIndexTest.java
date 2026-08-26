@@ -67,7 +67,7 @@ public final class UpdIndexTest extends SandboxTest {
   public void insertInto(final boolean updindex, final boolean mainmem) {
     init(updindex, mainmem);
     for(int a = 0; a < STEPS; a++) {
-      final int n = MAX * a;
+      final int n = MAX * (a + 1);
       for(int i = 0; i < n; i++) query("insert node <x/> into /*");
       query("count(//x)", n);
       query("delete node //x");
@@ -85,7 +85,7 @@ public final class UpdIndexTest extends SandboxTest {
   public void insertBefore(final boolean updindex, final boolean mainmem) {
     init(updindex, mainmem);
     for(int a = 0; a < STEPS; a++) {
-      final int n = MAX * a;
+      final int n = MAX * (a + 1);
       for(int i = 0; i < n; i++) {
         query("insert node <x/> before /*[1]");
       }
@@ -105,7 +105,7 @@ public final class UpdIndexTest extends SandboxTest {
   public void insertAfter(final boolean updindex, final boolean mainmem) {
     init(updindex, mainmem);
     for(int a = 0; a < STEPS; a++) {
-      final int n = MAX * a;
+      final int n = MAX * (a + 1);
       for(int i = 0; i < n; i++) {
         query("insert node <x/> after /*[last()]");
       }
@@ -125,7 +125,7 @@ public final class UpdIndexTest extends SandboxTest {
   public void insertDeep(final boolean updindex, final boolean mainmem) {
     init(updindex, mainmem);
     for(int a = 0; a < STEPS; a++) {
-      final int n = MAX * a;
+      final int n = MAX * (a + 1);
       for(int i = 0; i < n; i++) {
         query("insert node <x/> into //*[not(*)]");
       }

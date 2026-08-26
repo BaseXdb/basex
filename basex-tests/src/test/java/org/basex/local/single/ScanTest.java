@@ -1,5 +1,7 @@
 package org.basex.local.single;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.io.*;
 import java.util.*;
 
@@ -52,15 +54,9 @@ public final class ScanTest extends SandboxTest {
       bo.write(Token.token("</XML>"));
     }
 
-    // create database
+    // create database, remove generated input
     execute(new CreateDB(NAME, dbfile.path()));
-    // print file contents
-    //Util.outln(dbfile.string());
-    // print database info
-    //Util.outln(new InfoDB().execute(context));
-
-    // delete generated file
-    //assertTrue(dbfile.delete());
+    assertTrue(dbfile.delete());
   }
 
   /**

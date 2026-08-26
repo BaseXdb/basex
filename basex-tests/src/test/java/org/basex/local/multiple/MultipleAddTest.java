@@ -71,7 +71,11 @@ public final class MultipleAddTest extends SandboxTest {
       }
       return null;
     });
+    // every client must have added all of its documents
+    execute(new Open(NAME));
+    query("count(db:get('" + NAME + "'))", clients * runs);
     // drop database
+    execute(new Close());
     execute(new DropDB(NAME));
   }
 }

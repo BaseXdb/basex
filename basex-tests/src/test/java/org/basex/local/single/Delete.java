@@ -1,5 +1,7 @@
 package org.basex.local.single;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.jupiter.api.*;
 
 /**
@@ -15,6 +17,7 @@ public final class Delete extends Benchmark {
    */
   @Test public void root() throws Exception {
     eval("delete node /*");
+    assertEquals(0, count("/*"));
   }
 
   /**
@@ -23,6 +26,7 @@ public final class Delete extends Benchmark {
    */
   @Test public void nodes() throws Exception {
     eval("delete node //node()");
+    assertEquals(0, count("//node()"));
   }
 
   /**
@@ -31,6 +35,7 @@ public final class Delete extends Benchmark {
    */
   @Test public void elements() throws Exception {
     eval("delete node //*");
+    assertEquals(0, count("//*"));
   }
 
   /**
@@ -39,6 +44,7 @@ public final class Delete extends Benchmark {
    */
   @Test public void texts() throws Exception {
     eval("delete node //text()");
+    assertEquals(0, count("//text()"));
   }
 
   /**
@@ -46,9 +52,10 @@ public final class Delete extends Benchmark {
    * @throws Exception exception
    */
   @Test public void texts1000() throws Exception {
-    final String qu = eval("count(//text())");
-    final int n = Math.min(1000, Integer.parseInt(qu.trim()));
+    final int texts = count("//text()");
+    final int n = Math.min(1000, texts);
     eval(n, "delete node (//text())[1]");
+    assertEquals(texts - n, count("//text()"));
   }
 
   /**
@@ -56,7 +63,19 @@ public final class Delete extends Benchmark {
    * @throws Exception exception
    */
   @Test public void textsSingle1000() throws Exception {
-    eval("for $i in 1 to min((1000, count(//text()))) " +
-        "return delete node /descendant::text()[$i]");
+    final int texts = count("//text()");
+    final int n = Math.min(1000, texts);
+    eval("for $i in 1 to " + n + " return delete node /descendant::text()[$i]");
+    assertEquals(texts - n, count("//text()"));
+  }
+
+  /**
+   * Counts the nodes that are addressed by the specified path.
+   * @param path path expression
+   * @return number of nodes
+   * @throws Exception exception
+   */
+  private static int count(final String path) throws Exception {
+    return Integer.parseInt(eval("count(" + path + ')').trim());
   }
 }

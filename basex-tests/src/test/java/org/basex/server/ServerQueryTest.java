@@ -1,6 +1,9 @@
 package org.basex.server;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.*;
+import java.util.concurrent.*;
 
 import org.basex.*;
 import org.basex.api.client.*;
@@ -18,13 +21,11 @@ import org.junit.jupiter.api.*;
 public final class ServerQueryTest extends SandboxTest {
   /** Input document. */
   private static final String INPUT = "src/test/resources/factbook.zip";
-  /** Query to be run ("%" may be used as placeholder for dynamic content). */
-  private static final String QUERY = "(doc('test')//text())[position() = %]";
   /** Maximum position to retrieve. */
   private static final int MAX = 1000;
+  /** Maximum delay between two queries (ms). */
+  private static final int DELAY = 50;
 
-  /** Random number generator. */
-  static final Random RND = new Random();
   /** Server reference. */
   BaseXServer server;
 
@@ -72,19 +73,32 @@ public final class ServerQueryTest extends SandboxTest {
     try {
       // create test database
       try(ClientSession cs = createClient()) {
-        cs.execute("CREATE DB test " + INPUT);
+        cs.execute("CREATE DB " + NAME + ' ' + INPUT);
+        // only request positions that exist
+        final int max = Math.min(MAX, Integer.parseInt(
+            cs.execute("XQUERY count(db:get('" + NAME + "')//text())").trim()));
+
         // run clients, each retrieving the nth text of the database
-        parallel(clients, () -> {
-          try(ClientSession session = createClient()) {
-            for(int r = 0; r < runs; r++) {
-              Performance.sleep((long) (50 * RND.nextDouble()));
-              session.execute("XQUERY " + Util.info(QUERY, RND.nextInt() % MAX + 1));
+        final ArrayList<Callable<?>> tasks = new ArrayList<>(clients);
+        for(int c = 0; c < clients; c++) {
+          // one generator per client: a shared instance would not be reproducible
+          final Random rnd = new Random(c);
+          tasks.add(() -> {
+            try(ClientSession session = createClient()) {
+              for(int r = 0; r < runs; r++) {
+                Performance.sleep(rnd.nextInt(DELAY));
+                // the position exists, so exactly one text node must be returned
+                final String result = session.execute("XQUERY count((db:get('" + NAME +
+                    "')//text())[position() = " + (rnd.nextInt(max) + 1) + "])");
+                assertEquals("1", result.trim());
+              }
             }
-          }
-          return null;
-        });
+            return null;
+          });
+        }
+        parallel(tasks);
         // drop database
-        cs.execute("DROP DB test");
+        cs.execute("DROP DB " + NAME);
       }
     } finally {
       // stop server

@@ -50,21 +50,21 @@ public final class CollAddTest extends SandboxTest {
   }
 
   /**
-   * Adds 1000 documents.
+   * Adds 100 documents, flushing after each update.
    */
   @Test public void add100Force() {
     add(100, true);
   }
 
   /**
-   * Adds 1000 documents.
+   * Adds 1000 documents, flushing after each update.
    */
   @Test public void add1000Force() {
     add(1000, true);
   }
 
   /**
-   * Adds 1000 documents.
+   * Adds 10000 documents, flushing after each update.
    */
   @Test public void add10000Force() {
     add(10000, true);
@@ -81,7 +81,8 @@ public final class CollAddTest extends SandboxTest {
     execute(new CreateDB(NAME));
     // Add documents
     for(int s = 0; s < size; s++) execute(new Add(Integer.toString(s), "<xml/>"));
-    // Close database
+    // Check and close database
+    query("count(db:get('" + NAME + "'))", size);
     execute(new DropDB(NAME));
   }
 }
