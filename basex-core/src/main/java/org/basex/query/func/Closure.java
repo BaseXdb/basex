@@ -500,7 +500,19 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj;
+    if(this == obj) return true;
+    if(!(obj instanceof final Closure cls) || !Var.equalTypes(params, cls.params) ||
+        !Objects.equals(declType, cls.declType) || global.size() != cls.global.size()) return false;
+
+    // non-local variables must be bound to equal expressions
+    if(!global.isEmpty()) {
+      final IntObjectMap<Expr> bindings = new IntObjectMap<>();
+      cls.global.forEach((var, ex) -> bindings.put(var.slot(), ex));
+      for(final Map.Entry<Var, Expr> entry : global.entrySet()) {
+        if(!entry.getValue().equals(bindings.get(entry.getKey().slot()))) return false;
+      }
+    }
+    return super.equals(obj);
   }
 
   @Override

@@ -276,22 +276,31 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
     if(this == item) return true;
-    if(!(item instanceof final FuncItem func) || arity() != func.arity()) return false;
-    // functions must have the same parameter types (their names can differ)
-    for(int a = arity(); --a >= 0;) {
-      if(!params[a].seqType().eq(func.params[a].seqType())) return false;
-    }
+    if(!(item instanceof final FuncItem func) || !Var.equalTypes(params, func.params)) return false;
     // same body; captured values (let bindings of a closure) are compared with deep equality
-    if(!(deep != null && expr instanceof final GFLWOR gflwor ? gflwor.deepEqual(func.expr, deep) :
-      expr.equals(func.expr))) return false;
+    final Expr body = body(), fbody = func.body();
+    if(!(deep != null && body instanceof final GFLWOR gflwor ? gflwor.deepEqual(fbody, deep) :
+      body.equals(fbody))) return false;
     // same captured focus, if either body accesses the context
-    if(simple && func.simple) return true;
-    final QueryFocus qf1 = focus, qf2 = func.focus;
-    if(qf1 == null || qf2 == null) return qf1 == qf2;
-    if(qf1.pos != qf2.pos || qf1.size != qf2.size) return false;
-    final Value v1 = qf1.value, v2 = qf2.value;
-    return v1 == null || v2 == null ? v1 == v2 :
-      deep != null ? deep.equal(v1, v2) : v1.equals(v2);
+    return simple && func.simple || QueryFocus.deepEqual(focus, func.focus, deep);
+  }
+
+  /**
+   * Returns the function body: if this item is a function reference that has not been inlined,
+   * the body of the referenced function is returned.
+   * @return function body
+   */
+  private Expr body() {
+    if(expr instanceof final StaticFuncCall call) {
+      final StaticFunc sf = call.func();
+      final int pl = params.length;
+      if(sf != null && sf.expr != null && call.exprs.length == pl) {
+        int p = pl;
+        while(--p >= 0 && call.exprs[p] instanceof final VarRef ref && ref.var == params[p]);
+        if(p == -1) return sf.expr;
+      }
+    }
+    return expr;
   }
 
   @Override
