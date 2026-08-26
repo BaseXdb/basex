@@ -63,6 +63,16 @@ public class TextInput extends BufferInput {
   }
 
   /**
+   * Constructor for already decoded input, bypassing the encoding detection.
+   * @param array array input
+   * @param decoder decoder
+   */
+  private TextInput(final byte[] array, final TextDecoder decoder) {
+    super(new ArrayInput(array));
+    this.decoder = decoder;
+  }
+
+  /**
    * Reads the first bytes of the input stream to guess the text encoding.
    * @param encoding encoding (ignored if {@code null})
    * @throws IOException I/O exception
@@ -151,8 +161,11 @@ public class TextInput extends BufferInput {
   }
 
   @Override
-  public final byte[] content() throws IOException {
-    return cache().finish();
+  public byte[] content() throws IOException {
+    // read input in one go; adopt it verbatim, or decode it in memory
+    final byte[] bytes = super.content();
+    return decoder.adoptable(bytes) ? bytes :
+      new TextInput(bytes, decoder).fallback(fallback).cache().finish();
   }
 
   /**

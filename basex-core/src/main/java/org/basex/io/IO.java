@@ -152,7 +152,7 @@ public abstract class IO {
    * @throws IOException I/O exception
    */
   public final String readString() throws IOException {
-    return new TextInput(this).cache().toString();
+    return string(new TextInput(this).content());
   }
 
   /**

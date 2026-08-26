@@ -63,6 +63,11 @@ public final class NewlineInput extends TextInput {
   }
 
   @Override
+  public byte[] content() throws IOException {
+    return cache().finish();
+  }
+
+  @Override
   public int read() throws IOException {
     int n = next;
     if(n == -2) {

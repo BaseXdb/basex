@@ -1,6 +1,7 @@
 package org.basex.io.in;
 
 import java.io.*;
+import java.util.*;
 
 import org.basex.io.*;
 import org.basex.util.*;
@@ -13,6 +14,9 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public class BufferInput extends InputStream {
+  /** Size of the input buffer. */
+  private static final int CAPACITY = 1 << 14;
+
   /** Byte buffer. */
   final byte[] array;
   /** Current buffer position. */
@@ -78,7 +82,7 @@ public class BufferInput extends InputStream {
   private BufferInput(final InputStream is, final long length) {
     this.is = is;
     this.length = length;
-    array = new byte[IO.BLOCKSIZE];
+    array = new byte[CAPACITY];
   }
 
   /**
@@ -122,9 +126,9 @@ public class BufferInput extends InputStream {
     final int blen = array.length;
     final byte[] buf = array;
     if(bpos >= bsize) {
-      read += bsize;
       if(bsize == blen) {
         // reset mark if buffer is full
+        read += bsize;
         bmark = -1;
         bsize = 0;
         bpos = 0;
@@ -215,15 +219,38 @@ public class BufferInput extends InputStream {
         // input length is known in advance
         final int sl = Array.checkCapacity(length);
         final byte[] bytes = new byte[sl];
-        for(int c = 0; c < sl; c++) bytes[c] = (byte) readByte();
-        return bytes;
+        final int s = fill(bytes, sl);
+        return s == sl ? bytes : Arrays.copyOf(bytes, s);
       }
       // parse until end of stream
-      final ByteList bl = new ByteList();
-      for(int ch; (ch = readByte()) != -1;) bl.add(ch);
-      return bl.finish();
+      final ByteList list = new ByteList();
+      final byte[] bytes = new byte[CAPACITY];
+      for(int s; (s = fill(bytes, bytes.length)) > 0;) list.add(bytes, 0, s);
+      return list.finish();
     } finally {
       close();
     }
+  }
+
+  /**
+   * Fills the specified array with buffered bytes and bytes from the input stream.
+   * @param bytes target array
+   * @param end target end position
+   * @return number of assigned bytes
+   * @throws IOException I/O exception
+   */
+  private int fill(final byte[] bytes, final int end) throws IOException {
+    // adopt buffered bytes, request the remaining ones from the input stream
+    final int buffered = Math.min(bsize - bpos, end);
+    Array.copy(array, bpos, buffered, bytes, 0);
+    bpos += buffered;
+    int o = buffered;
+    while(o < end) {
+      final int r = is.read(bytes, o, end - o);
+      if(r < 0) break;
+      o += r;
+    }
+    read += o - buffered;
+    return o;
   }
 }

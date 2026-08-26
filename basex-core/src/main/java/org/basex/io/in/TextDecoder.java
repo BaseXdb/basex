@@ -42,6 +42,15 @@ abstract class TextDecoder {
   abstract int read(TextInput ti) throws IOException;
 
   /**
+   * Checks if the specified input is encoded as valid UTF-8 and needs no decoding.
+   * @param bytes input
+   * @return result of check
+   */
+  boolean adoptable(final byte[] bytes) {
+    return bytes.length == 0;
+  }
+
+  /**
    * Returns a decoder for the specified encoding.
    * @param encoding normed encoding
    * @return decoder
@@ -125,6 +134,30 @@ abstract class TextDecoder {
         if(cp < 0x80 || cp > 0xBF) return invalid(cp < 0, Arrays.copyOf(bytes, cp < 0 ? c : c + 1));
       }
       return Token.cp(bytes, 0);
+    }
+
+    @Override
+    boolean adoptable(final byte[] bytes) {
+      final int bl = bytes.length;
+      for(int p = 0; p < bl;) {
+        final byte b = bytes[p];
+        // negative bytes start a multi-byte sequence
+        if(b >= 0) {
+          if(b < 0x20 && b != 0x9 && b != 0xA && b != 0xD) return false;
+          p++;
+        } else {
+          final int cp = b & 0xFF;
+          if(cp < 0xC2 || cp > 0xF4) return false;
+          final int e = p + Token.cl(b);
+          if(e > bl) return false;
+          for(int c = p + 1; c < e; c++) {
+            if((bytes[c] & 0xC0) != 0x80) return false;
+          }
+          if(!XMLToken.valid(Token.cp(bytes, p))) return false;
+          p = e;
+        }
+      }
+      return true;
     }
   }
 
