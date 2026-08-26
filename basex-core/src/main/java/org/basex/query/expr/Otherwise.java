@@ -31,6 +31,14 @@ public final class Otherwise extends Arr {
   }
 
   @Override
+  public boolean navigational() {
+    for(final Expr expr : exprs) {
+      if(!expr.navigational()) return false;
+    }
+    return true;
+  }
+
+  @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final int el = exprs.length - 1;
     for(int e = 0; e < el; e++) {

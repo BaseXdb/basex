@@ -949,6 +949,19 @@ public final class XQuery4Test extends SandboxTest {
     query(func + "local:f(<a>x</a>)", "x");
     error(func + "local:f({ 'a': 1 })", NOCTX_X);
     error(func + "(local:f(<a>x</a>), local:f({ 'a': 1 }))", NOCTX_X);
+
+    // navigational steps: absolute paths, 'otherwise', try/catch, 'if' without 'else'
+    query("count({ 'a': 1 }/(/))", 1);
+    query("count({ 'a': { 'b': 1 } }/(/a))", 1);
+    query("count({ 'a': { 'b': 1 } }/(/a/b))", 1);
+    query("count({ 'a': { 'b': 1 } }/(a otherwise b))", 1);
+    query("count({ 'a': { 'b': 1 } }/(try { a } catch * { b }))", 1);
+    query("count({ 'a': { 'b': 1 } }/(try { a } catch * { b } finally { void(1) }))", 1);
+    query("count({ 'a': { 'b': 1 } }/(if(true()) { a }))", 1);
+    query("count({ 'a': { 'b': 1 } }/(switch(1) case 2 return a default return a))", 1);
+    // XNodes and JNodes may be mixed, all other items raise a type error
+    query("count((<x><a/></x>, { 'a': 1 })/a)", 2);
+    error("(1, <a/>)/a", PATHNODE_X_X_X);
   }
 
   /** Destructuring let. */
