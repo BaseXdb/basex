@@ -85,6 +85,8 @@ public final class QueryContext extends Job implements Closeable {
   public final LockList locks = new LockList();
   /** Current query focus. */
   public QueryFocus focus = new QueryFocus();
+  /** Context value of the caller, referenced by fn:current (can be {@code null}). */
+  public Value current;
   /** Date/time values (can be {@code null}). */
   private QueryDateTime dateTime;
 
@@ -683,12 +685,16 @@ public final class QueryContext extends Job implements Closeable {
     if(simple) return body.value(this);
 
     // assign captured focus, evaluate function body, restore focus
+    // fn:current in the body refers to the query prolog, not to the caller of this function
     final QueryFocus qfocus = focus;
+    final Value qcurrent = current;
     focus = qf != null ? qf : new QueryFocus();
+    current = null;
     try {
       return body.value(this);
     } finally {
       focus = qfocus;
+      current = qcurrent;
     }
   }
 
@@ -698,8 +704,16 @@ public final class QueryContext extends Job implements Closeable {
    */
   public QueryFocus globalFocus() {
     final QueryFocus qf = new QueryFocus();
-    qf.value = finalContext ? contextValue.value : null;
+    qf.value = globalValue();
     return qf;
+  }
+
+  /**
+   * Returns the context value of the query prolog.
+   * @return context value (can be {@code null})
+   */
+  public Value globalValue() {
+    return finalContext ? contextValue.value : null;
   }
 
   /**

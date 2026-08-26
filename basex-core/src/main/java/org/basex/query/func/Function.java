@@ -172,6 +172,9 @@ public enum Function implements AFunction {
   CSV_TO_XML(FnCsvToXml::new, "csv-to-xml(value, options?)",
       params(STRING_ZO, MAP_ZO), DOCUMENT_FN_CSV_ZO, flag(CNS)),
   /** XQuery function. */
+  CURRENT(FnCurrent::new, "current()",
+      params(), ITEM_ZM, flag(Flag.CUR, CTX)),
+  /** XQuery function. */
   CURRENT_DATE(FnCurrentDate::new, "current-date()",
       params(), DATE_O, flag(NDT)),
   /** XQuery function. */

@@ -96,13 +96,15 @@ public final class FuncItemTest extends SandboxTest {
 
   /** Checks that partial functions can use default parameters with context value. */
   @Test public void partAppContextDefault() {
-    query("declare function f($a, $b:= context value) { $a + $b }; 1!f(?)(2)", 3);
-    query("declare function f($a, $b:= context value) { $a + $b }; "
+    query("declare function f($a, $b:= current()) { $a + $b }; 1!f(?)(2)", 3);
+    query("declare function f($a, $b:= 3 + current()) { $a + $b }; 1!f(?)(2)", 6);
+    query("declare function f($a, $b:= 'x' || string(current())) { $a || $b }; 1!f(?)('a')", "ax1");
+    query("declare function f($a, $b:= current()) { $a + $b }; "
         + "let $v := 1!f(?) return 2!$v(3)", 4);
 
-    error("declare function f($a, $b:= context value) { $a + $b }; f(?)(2)", NOCTX_X);
+    error("declare function f($a, $b:= current()) { $a + $b }; f(?)(2)", NOCTX_X);
     error("declare function f() {.}; 1!f() ", NOCTX_X);
-    error("declare function g($x := context value) { $x }; "
+    error("declare function g($x := current()) { $x }; "
         + "let $f := fn() { g() } return 1!$f()", NOCTX_X);
     // all other defaults are evaluated with the focus of the query prolog
     error("declare function f($a, $b:= .) { $a + $b }; 1!f(?)(2)", NOCTX_X);

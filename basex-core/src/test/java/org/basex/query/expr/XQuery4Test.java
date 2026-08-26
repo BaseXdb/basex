@@ -248,14 +248,24 @@ public final class XQuery4Test extends SandboxTest {
     query("declare function local:f($x := 1 + 1) { $x }; local:f()", 2);
     query("declare function local:f($x := 1) { $x }; local:f(2)", 2);
 
-    // 'context value' defaults to the context value of the caller
-    query("declare function local:f($n as node() := context value) { name($n) }; "
+    // fn:current defaults to the context value of the caller
+    query("declare function local:f($n as node() := current()) { name($n) }; "
         + "<a/>/local:f()", "a");
-    query("declare function local:f($n as node() := context value) { name($n) }; "
+    query("declare function local:f($n as node() := current()) { name($n) }; "
         + "local:f(<b/>)", "b");
-    query("declare function local:f($x := context value) { $x }; <a/> ! local:f()", "<a/>");
-    query("declare function local:f($x := context value) { $x }; (1, 2) ! local:f()", "1\n2");
-    error("declare function local:f($x := context value) { $x }; local:f()", NOCTX_X);
+    query("declare function local:f($x := current()) { $x }; <a/> ! local:f()", "<a/>");
+    query("declare function local:f($x := current()) { $x }; (1, 2) ! local:f()", "1\n2");
+    error("declare function local:f($x := current()) { $x }; local:f()", NOCTX_X);
+
+    // fn:current can be used within a larger expression
+    query("declare function local:f($x as xs:string := string(current())) { $x }; "
+        + "<a>1</a> ! local:f()", 1);
+    query("declare function local:f($x := current()/name()) { $x }; <a/> ! local:f()", "a");
+    query("declare function local:f($x := (current(), current())) { count($x) }; "
+        + "<a/> ! local:f()", 2);
+    // the default is bound to the context value of each single call
+    query("declare function local:f($x := 'x' || string(current())) { $x }; "
+        + "(1 ! local:f(), 2 ! local:f#0(), 3 ! local:f())", "x1\nx2\nx3");
 
     // all other defaults are evaluated with the focus of the query prolog
     error("declare function local:f($n as node() := .) { name($n) }; <a/>/local:f()", NOCTX_X);
@@ -263,14 +273,17 @@ public final class XQuery4Test extends SandboxTest {
     query("declare context value := <global/>; "
         + "declare function local:f($n as node() := .) { name($n) }; <a/>/local:f()", "global");
     query("declare context value := <global/>; "
-        + "declare function local:f($n as node() := context value) { name($n) }; <a/>/local:f()",
+        + "declare function local:f($n as node() := current()) { name($n) }; <a/>/local:f()",
         "a");
 
-    // 'context' is still available as a name
-    query("declare function local:context() { 'x' }; "
-        + "declare function local:f($x := local:context()) { $x }; local:f()", "x");
-    query("declare function local:f($x := <context><value>v</value></context>/value) "
-        + "{ string($x) }; local:f()", "v");
+    // outside a default, fn:current is the context value of the query prolog
+    query("declare context value := <global/>; <a/> ! current()", "<global/>");
+    query("declare context value := <global/>; declare variable $v := current(); name($v)",
+        "global");
+    error("<a/> ! current()", NOCTX_X);
+    // the focus of the caller is not passed on to called functions
+    query("declare context value := <global/>; declare function local:g() { name(current()) }; "
+        + "declare function local:f($x := local:g()) { $x }; <a/> ! local:f()", "global");
   }
 
   /** Generalized arrow operator. */

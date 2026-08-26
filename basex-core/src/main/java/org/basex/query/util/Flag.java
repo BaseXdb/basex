@@ -21,6 +21,12 @@ public enum Flag {
    */
   CTX,
   /**
+   * Reference to the focus of the caller within a global focus.
+   * Stripped by the global focus, which reports {@link #CTX} instead.
+   * Example: current()
+   */
+  CUR,
+  /**
    * Nondeterministic code. Cannot be relocated, pre-evaluated or optimized away.
    * Implied by {@link #UPD}: see the constructor of {@link FuncDefinition} and
    * {@code org.basex.query.up.expr.Update#has(Flag...)}.

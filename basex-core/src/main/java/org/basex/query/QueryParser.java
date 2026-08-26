@@ -1249,13 +1249,8 @@ public class QueryParser extends InputParser {
       Expr expr = null;
       if(dflt && wsConsume(":=")) {
         defaults = true;
-        if(wsConsumeWs(CONTEXT, null, VALUEE)) {
-          wsCheck(VALUEE);
-          expr = new ContextValue(info());
-        } else {
-          // other defaults have no access to the focus of the caller
-          expr = new GlobalFocus(info(), single());
-        }
+        // defaults have no access to the focus of the caller (except via fn:current)
+        expr = new GlobalFocus(info(), single());
       } else if(defaults) {
         throw error(PARAMOPTIONAL_X, name);
       }
