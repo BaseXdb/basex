@@ -410,61 +410,60 @@ public final class HTTPConnection implements ClientInfo {
    * @throws IOException I/O exception
    */
   private User login() throws IOException {
+    // request authorization header, check authentication method
+    final String header = request.getHeader(AUTHORIZATION);
+    final String[] am = header != null ? Strings.split(header, ' ', 2) : new String[] { "" };
+    // a missing or mismatching header opens a challenge; it conveys no password to reject
+    if(authMethod != AuthMethod.CUSTOM && authMethod != StaticOptions.AUTHMETHOD.get(am[0]))
+      throw new LoginException(HTTPText.WRONGAUTH_X, authMethod);
+
     try {
       final User user;
       if(authMethod == AuthMethod.CUSTOM) {
         // custom authentication
         user = user(UserText.ADMIN);
+      } else if(authMethod == AuthMethod.BASIC) {
+        final String details = am.length > 1 ? am[1] : "";
+        final String[] creds = Strings.split(Base64.decode(details), ':', 2);
+        user = user(creds[0]);
+        final Algorithm[] algorithms = context.soptions.authAlgorithms();
+        if(creds.length < 2 || !user.matches(creds[1], algorithms))
+          throw new LoginException(user.name());
+        context.users.rehash(user, creds[1], algorithms);
       } else {
-        // request authorization header, check authentication method
-        final String header = request.getHeader(AUTHORIZATION);
-        final String[] am = header != null ? Strings.split(header, ' ', 2) : new String[] { "" };
-        final AuthMethod meth = StaticOptions.AUTHMETHOD.get(am[0]);
-        if(authMethod != meth) throw new LoginException(HTTPText.WRONGAUTH_X, authMethod);
+        final EnumMap<RequestAttribute, String> auth = Client.authHeaders(header);
+        user = user(auth.get(RequestAttribute.USERNAME));
 
-        if(authMethod == AuthMethod.BASIC) {
-          final String details = am.length > 1 ? am[1] : "";
-          final String[] creds = Strings.split(Base64.decode(details), ':', 2);
-          user = user(creds[0]);
-          final Algorithm[] algorithms = context.soptions.authAlgorithms();
-          if(creds.length < 2 || !user.matches(creds[1], algorithms))
-            throw new LoginException(user.name());
-          context.users.rehash(user, creds[1], algorithms);
-        } else {
-          final EnumMap<RequestAttribute, String> auth = Client.authHeaders(header);
-          user = user(auth.get(RequestAttribute.USERNAME));
+        final String nonce = auth.get(RequestAttribute.NONCE);
+        final String cnonce = auth.get(RequestAttribute.CNONCE);
+        String ha1 = user.code(Algorithm.DIGEST, Code.HASH);
+        // reject if no digest hash is stored for the user (digest not enabled in AUTHALGORITHMS)
+        if(ha1 == null) throw new LoginException(user.name());
+        if(Strings.eq(auth.get(RequestAttribute.ALGORITHM), MD5_SESS))
+          ha1 = Strings.md5(ha1 + ':' + nonce + ':' + cnonce);
 
-          final String nonce = auth.get(RequestAttribute.NONCE);
-          final String cnonce = auth.get(RequestAttribute.CNONCE);
-          String ha1 = user.code(Algorithm.DIGEST, Code.HASH);
-          // reject if no digest hash is stored for the user (digest not enabled in AUTHALGORITHMS)
-          if(ha1 == null) throw new LoginException(user.name());
-          if(Strings.eq(auth.get(RequestAttribute.ALGORITHM), MD5_SESS))
-            ha1 = Strings.md5(ha1 + ':' + nonce + ':' + cnonce);
+        final String qop = auth.get(RequestAttribute.QOP);
+        final String ha2 = Strings.md5(method + ':' + auth.get(RequestAttribute.URI));
 
-          final String qop = auth.get(RequestAttribute.QOP);
-          final String ha2 = Strings.md5(method + ':' + auth.get(RequestAttribute.URI));
-
-          final StringBuilder sb = new StringBuilder(ha1).append(':').append(nonce);
-          if(Strings.eq(qop, AUTH)) {
-            sb.append(':').append(auth.get(RequestAttribute.NC));
-            sb.append(':').append(cnonce).append(':').append(qop);
-          }
-          sb.append(':').append(ha2);
-
-          // constant-time comparison of the recomputed and the transmitted response
-          final String rsp = auth.get(RequestAttribute.RESPONSE);
-          if(rsp == null || !MessageDigest.isEqual(token(Strings.md5(sb.toString())), token(rsp)))
-            throw new LoginException(user.name());
+        final StringBuilder sb = new StringBuilder(ha1).append(':').append(nonce);
+        if(Strings.eq(qop, AUTH)) {
+          sb.append(':').append(auth.get(RequestAttribute.NC));
+          sb.append(':').append(cnonce).append(':').append(qop);
         }
+        sb.append(':').append(ha2);
+
+        // constant-time comparison of the recomputed and the transmitted response
+        final String rsp = auth.get(RequestAttribute.RESPONSE);
+        if(rsp == null || !MessageDigest.isEqual(token(Strings.md5(sb.toString())), token(rsp)))
+          throw new LoginException(user.name());
       }
 
       // accept and return user
-      context.blocker.remove(token(remoteAddress));
+      context.blocker.remove(token(remoteAddress), user.name());
       return user;
     } catch(final LoginException ex) {
       // delay users with wrong passwords
-      context.blocker.delay(token(remoteAddress));
+      context.blocker.delay(token(remoteAddress), ex.name());
       throw ex;
     }
   }

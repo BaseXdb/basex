@@ -13,12 +13,16 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class LoginException extends IOException {
+  /** Username (can be {@code null}). */
+  private String name;
+
   /**
    * Constructor.
    * @param name username (can be {@code null})
    */
   public LoginException(final String name) {
     this(ACCESS_DENIED_X, name == null ? "-" : name);
+    this.name = name;
   }
 
   /**
@@ -28,5 +32,13 @@ public final class LoginException extends IOException {
    */
   public LoginException(final String message, final Object... ext) {
     super(Util.info(message, ext));
+  }
+
+  /**
+   * Returns the username.
+   * @return username (can be {@code null})
+   */
+  public String name() {
+    return name;
   }
 }

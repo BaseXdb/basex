@@ -247,12 +247,12 @@ public final class ClientListener extends Thread implements ClientInfo {
         context.user(user);
         // send {OK}
         send(true);
-        context.blocker.remove(address);
+        context.blocker.remove(address, name);
         context.sessions.add(this);
       } else {
         if(!name.isEmpty()) log(LogType.ERROR, Util.info(ACCESS_DENIED_X, name));
         // delay users with wrong passwords
-        context.blocker.delay(address);
+        context.blocker.delay(address, name);
         send(false);
       }
     } catch(final IOException ex) {
