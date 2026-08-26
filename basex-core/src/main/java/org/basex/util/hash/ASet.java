@@ -1,7 +1,6 @@
 package org.basex.util.hash;
 
 import java.util.*;
-import java.util.function.*;
 
 import org.basex.util.*;
 
@@ -75,15 +74,6 @@ public abstract class ASet {
    * @return {@code true} if the hash table was resized
    */
   protected final boolean checkCapacity() {
-    return checkCapacity((index, bucket) -> { });
-  }
-
-  /**
-   * Checks the capacity of the hash table and resizes it if necessary.
-   * @param relocateAction action to be executed while relocating index to new bucket
-   * @return {@code true} if the hash table was resized
-   */
-  protected final boolean checkCapacity(final BiConsumer<Integer, Integer> relocateAction) {
     if(size < capacity()) return false;
 
     final int newSize = size << 1;
@@ -92,7 +82,6 @@ public abstract class ASet {
     for(final int bucket : buckets) {
       for(int i = bucket; i != 0;) {
         final int b = hashCode(i) & newSize - 1, nx = next[i];
-        relocateAction.accept(i, b);
         next[i] = bckts[b];
         bckts[b] = i;
         i = nx;

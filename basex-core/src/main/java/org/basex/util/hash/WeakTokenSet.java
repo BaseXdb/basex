@@ -40,6 +40,7 @@ public final class WeakTokenSet extends ASet {
     final int h = Token.hashCode(key), c = capacity();
     int b = h & c - 1;
     for(int i = buckets[b]; i != 0; i = next[i]) {
+      if(keys[i].hash != h) continue;
       final byte[] stored = keys[i].get();
       if(Token.eq(key, stored)) return stored;
     }
@@ -50,11 +51,11 @@ public final class WeakTokenSet extends ASet {
       s = free;
       free = next[s];
     } else {
-      if(checkCapacity((i, bucket) -> keys[i].bucket = bucket)) b = h & capacity() - 1;
+      if(checkCapacity()) b = h & capacity() - 1;
       s = size++;
     }
     next[s] = buckets[b];
-    keys[s] = new WeakTokenRef(key, b, gcedKeys);
+    keys[s] = new WeakTokenRef(key, h, gcedKeys);
     buckets[b] = s;
     return key;
   }
@@ -65,7 +66,7 @@ public final class WeakTokenSet extends ASet {
    */
   private void cleanUp() {
     for(WeakTokenRef key; (key = (WeakTokenRef) gcedKeys.poll()) != null;) {
-      final int b = key.bucket;
+      final int b = key.hash & capacity() - 1;
       for(int p = 0, i = buckets[b];; p = i, i = next[i]) {
         if(i == 0) throw Util.notExpected();
         if(key != keys[i]) continue;
@@ -84,8 +85,7 @@ public final class WeakTokenSet extends ASet {
 
   @Override
   protected int hashCode(final int index) {
-    final byte[] token = keys[index].get();
-    return token == null ? keys[index].bucket : Token.hashCode(token);
+    return keys[index].hash;
   }
 
   @Override
@@ -107,23 +107,23 @@ public final class WeakTokenSet extends ASet {
   }
 
   /**
-   * A weak reference to a token. It is aware of the bucket where it is currently held in the set.
-   * This allows removal of the key even after the referred token has been garbage collected (and
-   * thus its hash code cannot be calculated any longer).
+   * A weak reference to a token. It caches the hash code of the token. This allows removal of the
+   * key even after the referred token has been garbage collected (and thus its hash code cannot be
+   * calculated any longer).
    */
   private static final class WeakTokenRef extends WeakReference<byte[]> {
-    /** The current bucket where this reference is in. */
-    private int bucket;
+    /** Hash code of the referenced token. */
+    private final int hash;
 
     /**
      * Constructor.
      * @param key the key to be stored
-     * @param bucket the initial bucket of this entry
+     * @param hash hash code of the key
      * @param queue queue for registering this reference to
      */
-    private WeakTokenRef(final byte[] key, final int bucket, final ReferenceQueue<byte[]> queue) {
+    private WeakTokenRef(final byte[] key, final int hash, final ReferenceQueue<byte[]> queue) {
       super(key, queue);
-      this.bucket = bucket;
+      this.hash = hash;
     }
 
     @Override
