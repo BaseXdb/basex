@@ -87,8 +87,7 @@ declare function form:field(
 };
 
 (:~
- : Creates a modal dialog: a form that needs more room than a prompt can offer. It is submitted
- : like any other form, so the action it posts to redirects back to the page it was opened from.
+ : Creates a modal dialog: a form that needs more room than a prompt can offer.
  : @param  $id      id of the dialog; opened by the client with showDialog
  : @param  $title   heading of the dialog; its buttons are the OK and Cancel of every dialog
  : @param  $action  action the form posts to
@@ -103,6 +102,8 @@ declare function form:dialog(
   $upload  as xs:boolean,
   $fields  as node()*
 ) as element(dialog) {
+  (: it is submitted like any other form, so the action it posts to redirects back to the
+     page it was opened from :)
   <dialog id='{ $id }-dialog'>
     <form method='post' action='{ $action }' autocomplete='off'>{
       attribute enctype { 'multipart/form-data' }[$upload],
@@ -118,9 +119,57 @@ declare function form:dialog(
   </dialog>
 };
 
-(:~ Index options that can be assigned when a database is created and optimized. An option
-    that names an index of its own is set apart by a heading; 'create' marks the ones that are
-    reserved for new databases. :)
+(:~
+ : Creates the form of a file chooser: the Upload button opens it, and choosing files submits
+ : what it collects.
+ : @param  $action    action the form posts to
+ : @param  $id        id of the file input; opened by the client with chooseUpload
+ : @param  $multiple  whether several files can be chosen
+ : @param  $fields    hidden fields that state what the files are added to
+ : @return form
+ :)
+declare function form:upload(
+  $action    as xs:string,
+  $id        as xs:string,
+  $multiple  as xs:boolean,
+  $fields    as node()*
+) as element(form) {
+  (: the upload is announced, as it may take a while :)
+  <form method='post' action='{ $action }' enctype='multipart/form-data' autocomplete='off'
+        onsubmit='uploading(this);'>{
+    $fields,
+    <input type='file' name='files' id='{ $id }' hidden=''
+           onchange='this.form.requestSubmit();'>{
+      attribute multiple { 'multiple' }[$multiple]
+    }</input>
+  }</form>
+};
+
+(:~
+ : Creates the form that submits an answer the client asked for: the field that carries it is
+ : filled in by promptSubmit, which then submits the form the field belongs to.
+ : @param  $id      id of the field that carries the answer
+ : @param  $name    name the answer is submitted under
+ : @param  $action  action the form posts to; empty if the client chooses it
+ : @param  $fields  hidden fields that state what the answer applies to
+ : @return form
+ :)
+declare function form:prompt(
+  $id      as xs:string,
+  $name    as xs:string,
+  $action  as xs:string? := (),
+  $fields  as node()* := ()
+) as element(form) {
+  <form method='post' autocomplete='off'>{
+    attribute action { $action }[$action],
+    $fields,
+    <input type='hidden' name='{ $name }' id='{ $id }'/>
+  }</form>
+};
+
+(:~ Index options that can be assigned when a database is created and optimized. :)
+(: an option that names an index of its own is set apart by a heading; 'create' marks the ones
+   that are reserved for new databases :)
 declare %private variable $form:INDEX-OPTIONS := (
   { 'name': 'textindex', 'label': 'Text Index', 'index': true() },
   { 'name': 'attrindex', 'label': 'Attribute Index', 'index': true() },
@@ -144,8 +193,7 @@ declare %private function form:index-list(
 };
 
 (:~
- : Creates the index options of a database dialog. Kept next to form:index-map, which turns the
- : same options into the arguments of the database operation.
+ : Creates the index options of a database dialog.
  : @param  $opts    checked options
  : @param  $create  include the options that are reserved for new databases
  : @return form fields
@@ -154,20 +202,23 @@ declare function form:index-options(
   $opts    as xs:string*,
   $create  as xs:boolean
 ) as node()+ {
+  (: kept next to form:index-map, which turns the same options into the arguments of the
+     database operation :)
   for $option in form:index-list($create)
   let $checkbox := form:option($option?name, $option?label, $opts)
   return if ($option?index) then <h3>{ $checkbox }</h3> else $checkbox
 };
 
 (:~
- : Creates the field that chooses the language of the full-text index. It is labeled, so it
- : belongs to the fields of a dialog, not to the flags of the index options.
+ : Creates the field that chooses the language of the full-text index.
  : @param  $lang  language
  : @return form field
  :)
 declare function form:language-field(
   $lang  as xs:string?
 ) as element(div) {
+  (: the field is labeled, so it belongs to the fields of a dialog, not to the flags of the
+     index options :)
   form:field('Language:', <input type='text' name='lang' value='{ $lang }'/>)
 };
 
@@ -207,11 +258,12 @@ declare %private variable $form:PARSING-OPTIONS := (
 );
 
 (:~
- : Creates the fields that decide how an input is read. They are labeled, so they belong to the
- : fields of a dialog, not to the flags of the parsing options.
+ : Creates the fields that decide how an input is read.
  : @return form fields
  :)
 declare function form:parsing-fields() as node()+ {
+  (: the fields are labeled, so they belong to the fields of a dialog, not to the flags of the
+     parsing options :)
   (: the parser is applied to every file of the input; it is configured by the options of
      the server, which the dialog does not repeat :)
   form:field('Input format:', <select name='parser'>{
@@ -223,14 +275,15 @@ declare function form:parsing-fields() as node()+ {
 };
 
 (:~
- : Creates the parsing options of a database dialog. Kept next to form:parsing-map, which turns
- : the same options into the arguments of the database operation.
+ : Creates the parsing options of a database dialog.
  : @param  $opts  checked options
  : @return form fields
  :)
 declare function form:parsing-options(
   $opts  as xs:string*
 ) as node()+ {
+  (: kept next to form:parsing-map, which turns the same options into the arguments of the
+     database operation :)
   <h3>Parsing Options</h3>,
   for $option in $form:PARSING-OPTIONS
   return form:option($option?name, $option?label, $opts)
@@ -257,14 +310,15 @@ declare function form:parsing-map(
 };
 
 (:~
- : Creates a chooser for the current directory. Its selected value is the resolved directory:
- : the client stores it and sends it back with its next request.
+ : Creates a chooser for the current directory.
  : @param  $dir  current directory
  : @return chooser
  :)
 declare function form:directory(
   $dir  as xs:string
 ) as element(select) {
+  (: the selected value is the resolved directory: the client stores it and sends it back
+     with its next request :)
   <select id='dir' class='wide directory' onchange='changeDir(this.value)'>{
       let $dir-path := fn($path) {
         try {

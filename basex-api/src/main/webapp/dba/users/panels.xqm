@@ -7,6 +7,7 @@ module namespace panels = 'dba/lib/user-panels';
 
 import module namespace config = 'dba/lib/config' at '../lib/config.xqm';
 import module namespace form = 'dba/lib/form' at '../lib/form.xqm';
+import module namespace html = 'dba/lib/html' at '../lib/html.xqm';
 import module namespace table = 'dba/lib/table' at '../lib/table.xqm';
 
 (:~ Page the links of the panels refer to. :)
@@ -22,7 +23,7 @@ declare function panels:users(
   $sort  as xs:string,
   $name  as xs:string?
 ) as element()+ {
-  <form method='post' autocomplete='off'>{
+  <form method='post' autocomplete='off' data-sort='{ $sort }'>{
     let $headers := (
       { 'key': 'name', 'label': 'Name', 'type': 'dynamic', 'width': '45%' },
       { 'key': 'permission', 'label': 'Permission', 'width': '35%' },
@@ -33,13 +34,10 @@ declare function panels:users(
       for $user in user:list-details()
       let $user-name := string($user/@name)
       return {
-        (: the link names the whole selection, so it can be followed and bookmarked :)
-        'name': fn() {
-          <a href='{ web:create-url($panels:CAT, { 'name': $user-name }) }'>{
-            attribute class { 'selected' }[$user-name = $name],
-            $user-name
-          }</a>
-        },
+        (: the link names the whole selection, so it can be followed and bookmarked; the
+           view follows it in place, over the connection it opened for its panels :)
+        'name': html:select($user-name, $panels:CAT, { 'name': $user-name },
+          $user-name = $name, 'name', 'selectUser'),
         'permission': $user/@permission,
         'you': if ($current = $user-name) then '✓' else '–'
       }
@@ -71,6 +69,7 @@ declare function panels:user(
   $newname  as xs:string?,
   $perm     as xs:string?
 ) as element()* {
+  (: the form that submits them is the panel itself and outlives them; see users.xqm :)
   if (not($name) or not(user:exists($name))) {
     (: nothing is selected: the panel is not shown, so it needs no placeholder :)
   } else {
@@ -78,36 +77,27 @@ declare function panels:user(
     (: the admin is the one user whose name and permission are not up for discussion :)
     let $admin := $name eq 'admin'
     return (
-      <form method='post' action='users/update' autocomplete='off' class='pane column'>
-        <h2>{ 'User: ' || $name }</h2>
-        <div class='buttons'><button>Update</button></div>
-        <input type='hidden' name='name' value='{ $name }'/>
-        {
-          if ($admin) {
-            <input type='hidden' name='newname' value='admin'/>,
-            <input type='hidden' name='perm' value='admin'/>
-          } else {
-            form:field('Name:',
-              <input type='text' name='newname' value='{ $newname otherwise $name }'/>)
-          },
-          form:field('Password:', (
-            <input type='password' name='pw' autocomplete='new-password'/>,
-            <div class='note'>…only changed if a new one is entered</div>
-          )),
-          if (not($admin)) {
-            form:field('Permission:',
-              panels:permission-select('perm', ($perm otherwise $user/@permission), 5))
-          },
-          (: the editor is named apart from the user, and takes the height that is left :)
-          <h3>User Data</h3>,
-          <div class='note'>
-            Custom XML data for this user, with an &lt;info&gt; root element.
-          </div>,
-          <textarea name='info' id='editor' spellcheck='false'>{
-            serialize(user:info($name), { 'indent': true() })
-          }</textarea>
-        }
-      </form>
+      <h2>{ 'User: ' || $name }</h2>,
+      <div class='buttons'><button>Update</button></div>,
+      <input type='hidden' name='name' value='{ $name }'/>,
+      if ($admin) {
+        <input type='hidden' name='newname' value='admin'/>,
+        <input type='hidden' name='perm' value='admin'/>
+      } else {
+        form:field('Name:',
+          <input type='text' name='newname' value='{ $newname otherwise $name }'/>)
+      },
+      form:field('Password:', (
+        <input type='password' name='pw' autocomplete='new-password'/>,
+        <div class='note'>…only changed if a new one is entered</div>
+      )),
+      if (not($admin)) {
+        form:field('Permission:',
+          panels:permission-select('perm', ($perm otherwise $user/@permission), 5))
+      },
+      (: the editor is named apart from the user, and takes the height that is left :)
+      <h3>User Data</h3>,
+      panels:info-editor('editor', 'Custom XML data for this user', $name)
     )
   }
 };
@@ -167,13 +157,29 @@ declare function panels:information() as element()+ {
   <form method='post' action='users/info' autocomplete='off' class='pane column'>
     <h2>General User Data</h2>
     <div class='buttons'><button>Update</button></div>
-    <div class='note'>
-      Custom XML data that belongs to no user in particular, with an &lt;info&gt; root element.
-    </div>
-    <textarea name='info' id='user-info' spellcheck='false'>{
-      serialize(user:info(), { 'indent': true() })
-    }</textarea>
+    {
+      panels:info-editor('user-info',
+        'Custom XML data that belongs to no user in particular', ())
+    }
   </form>
+};
+
+(:~
+ : Creates the editor for custom user data, and the note that says what the data belongs to.
+ : @param  $id    id of the editor
+ : @param  $note  what the data belongs to
+ : @param  $name  user; empty sequence for the data that belongs to no user in particular
+ : @return note and editor
+ :)
+declare %private function panels:info-editor(
+  $id    as xs:string,
+  $note  as xs:string,
+  $name  as xs:string?
+) as element()+ {
+  <div class='note'>{ $note }, with an &lt;info&gt; root element.</div>,
+  <textarea name='info' id='{ $id }' spellcheck='false'>{
+    serialize(user:info($name), { 'indent': true() })
+  }</textarea>
 };
 
 (:~

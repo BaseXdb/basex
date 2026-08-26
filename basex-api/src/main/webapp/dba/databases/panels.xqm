@@ -45,7 +45,7 @@ declare function panels:databases(
         let $databases :=
           for $db in utils:slice(db:list-details(), $page, $sort)
           return {
-            'name': panels:select($db, { 'name': $db }, $db = $name),
+            'name': panels:select($db, $db = $name),
             'resources': $db/@resources,
             'size': $db/@size,
             'date': $db/@modified-date
@@ -58,7 +58,7 @@ declare function panels:databases(
           group by $db := replace($backup, $utils:BACKUP-REGEX, '$1')
           where $db and not($db-names = $db)
           return {
-            'name': panels:select($db, { 'name': $db }, $db = $name),
+            'name': panels:select($db, $db = $name),
             'size': (),
             (: the backups are listed with the most recent one first :)
             'date': replace(head($backup), $utils:BACKUP-REGEX, '$2T$3:$4:$5Z')
@@ -132,10 +132,8 @@ declare function panels:database(
     panels:add-dialog($name),
     panels:optimize-dialog($name),
     (: the new name of the database is asked for; the chosen action decides what is done with it :)
-    <form method='post' autocomplete='off' id='database-form'>
-      <input type='hidden' name='name' value='{ $name }'/>
-      <input type='hidden' name='newname' id='database-newname'/>
-    </form>
+    form:prompt('database-newname', 'newname', (),
+      <input type='hidden' name='name' value='{ $name }'/>)
   }
 };
 
@@ -192,7 +190,8 @@ declare %private function panels:resource-list(
           'name': if ($directory) {
             fn() { panels:enter($label || '/', $name, $path) }
           } else {
-            panels:select($label, { 'name': $name, 'resource': $path }, $path = $resource)
+            html:select($label, $panels:CAT, { 'name': $name, 'resource': $path },
+              $path = $resource, 'resource', 'selectResource')
           },
           (: the checkbox submits the full path, which is what an action addresses :)
           'resource': $path,
@@ -210,6 +209,7 @@ declare %private function panels:resource-list(
         <button type='button' onclick='copyDatabase()'>Copy…</button>,
         <button type='button' onclick='showDialog("optimize")'>Optimize…</button>,
         <button type='button' onclick='showDialog("add")'>Add…</button>,
+        form:button('resources-download', 'Download', 'CHECK'),
         form:button('databases/resource-delete', 'Delete', ('CHECK', 'CONFIRM')),
         (: the filter is a control of the list, and shares the row of its buttons :)
         <input type='text' id='resource-filter' class='smallinput' placeholder='Filter'
@@ -255,15 +255,16 @@ declare %private function panels:database-heading(
 };
 
 (:~
- : Creates the dialog that adds resources to a database. The resources are stored under their
- : own names; how they are parsed is chosen here. Files are uploaded by the browser, an input is
- : read by the server: either of them adds resources, and both of them may be supplied at once.
+ : Creates the dialog that adds resources to a database.
  : @param  $name  database
  : @return dialog
  :)
 declare %private function panels:add-dialog(
   $name  as xs:string
 ) as element(dialog) {
+  (: the resources are stored under their own names; how they are parsed is chosen here. Files
+     are uploaded by the browser, an input is read by the server: either of them adds resources,
+     and both of them may be supplied at once :)
   form:dialog('add', 'Add Resources', 'databases/put', true(), (
     <input type='hidden' name='name' value='{ $name }'/>,
     (: what is added, and how it is parsed: two columns, as one would be a list that is
@@ -287,14 +288,14 @@ declare %private function panels:add-dialog(
 };
 
 (:~
- : Creates the dialog that optimizes a database. The index configuration is not a report: it is
- : what the next optimization applies.
+ : Creates the dialog that optimizes a database.
  : @param  $name  database
  : @return dialog
  :)
 declare %private function panels:optimize-dialog(
   $name  as xs:string
 ) as element(dialog) {
+  (: the index configuration is not a report: it is what the next optimization applies :)
   (: one read of the database properties supplies both the index flags and the language :)
   let $info := db:info($name)
   return form:dialog('optimize', 'Optimize Database', 'databases/optimize-db', false(), (
@@ -307,13 +308,14 @@ declare %private function panels:optimize-dialog(
 
 (:~
  : Creates the contents of the backups panel: the backups of the selected database, and the ones
- : of the general data. Both are recovery corners, so the panel opens on demand.
+ : of the general data.
  : @param  $name  selected database
  : @return panel contents
  :)
 declare function panels:backups(
   $name  as xs:string?
 ) as element()+ {
+  (: both are recovery corners, so the panel opens on demand :)
   (: a selected database supersedes the general backups: its own are what is asked for :)
   if ($name) {
     <h2>{ 'Backup: ' || $name }</h2>,
@@ -334,10 +336,11 @@ declare function panels:backups(
 (:~ Number of characters of an index entry that are listed. :)
 declare %private variable $panels:PREVIEW := 200;
 
-(:~ Indexes that can be browsed, how they are labeled, the database option that builds them,
-    and what lists their entries: what a database is built of comes before what it holds. The
-    name indexes are part of every database, so they have no option of their own. An index that
-    holds values looks a prefix up; the others are listed and filtered. :)
+(:~ Indexes that can be browsed, how they are labeled, the option that builds them, and what
+    lists their entries. :)
+(: what a database is built of comes before what it holds. The name indexes are part of every
+   database, so they have no option of their own; an index that holds values looks a prefix up,
+   the others are listed and filtered :)
 declare %private variable $panels:INDEXES := (
   { 'name': 'element-name', 'label': 'Element Names',
     'entries': fn($db, $prefix) { index:element-names($db)[starts-with(., $prefix)] } },
@@ -458,16 +461,16 @@ declare function panels:index(
 };
 
 (:~
- : Returns what an index entry is listed as. A text node holds what it holds: a code block
- : spans lines, and the whitespace between two elements is an entry of its own. What is listed
- : is one line of it, so that the table stays a table, and an entry that holds nothing but
- : whitespace is named instead of shown.
+ : Returns what an index entry is listed as.
  : @param  $entry  index entry
  : @return label
  :)
 declare %private function panels:entry(
   $entry  as element()
 ) as xs:string {
+  (: a text node holds what it holds: a code block spans lines, and the whitespace between two
+     elements is an entry of its own. What is listed is one line of it, so that the table stays a
+     table, and an entry that holds nothing but whitespace is named instead of shown :)
   let $text := normalize-space($entry)
   return if ($text) { utils:chop($text, $panels:PREVIEW) } else { '(whitespace)' }
 };
@@ -521,7 +524,7 @@ declare function panels:resource(
         },
         <button type='button' onclick='renameResource()'>Rename…</button>,
         form:button('db-download', 'Download'),
-        <button type='button' onclick='replaceResource()'>Upload…</button>,
+        <button type='button' onclick='chooseUpload("replace-file")'>Upload…</button>,
         <label>{
           <input type='checkbox' id='indent' onchange='indentChanged()'/>, ' Indent'
         }</label>
@@ -535,25 +538,19 @@ declare function panels:resource(
     },
 
     (: the new path of the resource is asked for and submitted :)
-    <form method='post' action='databases/resource-rename' autocomplete='off' id='rename-form'>
-      <input type='hidden' name='name' value='{ $name }'/>
+    form:prompt('rename-target', 'target', 'databases/resource-rename', (
+      <input type='hidden' name='name' value='{ $name }'/>,
       <input type='hidden' name='resource' value='{ $resource }'/>
-      <input type='hidden' name='target' id='rename-target'/>
-    </form>,
-    <form method='post' action='databases/replace' enctype='multipart/form-data'
-          autocomplete='off' onsubmit='uploading(this);'>
-      <input type='hidden' name='name' value='{ $name }'/>
+    )),
+    form:upload('databases/replace', 'replace-file', false(), (
+      <input type='hidden' name='name' value='{ $name }'/>,
       <input type='hidden' name='resource' value='{ $resource }'/>
-      <input type='file' name='files' id='replace-file' hidden=''
-             onchange='this.form.requestSubmit();'/>
-    </form>
+    ))
   }
 };
 
 (:~
- : Returns the document that is shown in the editor, and what can be done with it. The value is
- : serialized with a bounded limit: db:list-details/@size counts nodes, not characters, so the
- : length of the shown text is only known once the text has been produced.
+ : Returns the document that is shown in the editor, and what can be done with it.
  : @param  $name      selected database
  : @param  $resource  selected resource
  : @return properties: whether the resource exists, is XML, is truncated and can be edited,
@@ -566,41 +563,53 @@ declare function panels:document(
   if (not($name and $resource and db:exists($name, $resource))) {
     { 'exists': false(), 'text': '' }
   } else {
-    let $type := db:type($name, $resource)
+    (: the value is serialized with a bounded limit: db:list-details/@size counts nodes, not
+       characters, so the length of the shown text is only known once the text is there :)
+    let $xml := db:type($name, $resource) = 'xml'
     let $max := config:get($config:MAXCHARS)
-    let $value := if ($type = 'binary') {
-      db:get-binary($name, $resource)
-    } else if ($type = 'value') {
-      db:get-value($name, $resource)
-    } else {
-      db:get($name, $resource)
-    }
+    let $value := panels:resource-value($name, $resource)
     let $text := serialize($value, {
-      'method': if ($type = 'xml') then 'xml' else 'basex',
+      'method': if ($xml) then 'xml' else 'basex',
       'limit': $max * 2 + 1
     })
     let $truncated := string-length($text) > $max
-    let $editable := $type = 'xml' and not($truncated)
-    return {
-      'exists'   : true(),
-      'xml'      : $type = 'xml',
-      'truncated': $truncated,
-      'editable' : $editable,
-      'text'     : if ($editable) then $text else substring($text, 1, $max),
-      (: reason why the resource cannot be edited; extended by the client for query results :)
-      'note': string-join((
-        'Read-only ' || (
-          if ($type = 'xml') then '(too large for editing)' else '(only XML can be edited)'
-        ),
-        ', and truncated: download it to see the full content.'[$truncated]
-      ))[not($editable)]
-    }
+    (: what speaks against editing; the note the client extends for query results is the one
+       that utils:editable composes from it :)
+    return map:merge((
+      { 'exists': true(), 'xml': $xml, 'truncated': $truncated },
+      utils:editable(
+        if ($truncated) { substring($text, 1, $max) } else { $text },
+        (
+          'only XML documents can be edited'[not($xml)],
+          'the document is too large, download it to see all of it'[$truncated]
+        )
+      )
+    ))
   }
 };
 
 (:~
- : Creates a link that enters a directory of a database. The reference is a deep link naming
- : the directory in full; following it in place leaves the other panels alone.
+ : Returns the value of a resource, whatever it is stored as.
+ : @param  $name      database
+ : @param  $resource  resource
+ : @return value
+ :)
+declare function panels:resource-value(
+  $name      as xs:string,
+  $resource  as xs:string
+) as item()* {
+  let $type := db:type($name, $resource)
+  return if ($type = 'xml') {
+    db:get($name, $resource)
+  } else if ($type = 'binary') {
+    db:get-binary($name, $resource)
+  } else {
+    db:get-value($name, $resource)
+  }
+};
+
+(:~
+ : Creates a link that enters a directory of a database.
  : @param  $label  link label
  : @param  $name   database
  : @param  $dir    directory the link refers to
@@ -611,48 +620,34 @@ declare %private function panels:enter(
   $name   as xs:string,
   $dir    as xs:string
 ) as element(a) {
-  <a href='{ web:create-url($panels:CAT, { 'name': $name, 'dir': $dir }) }'
-     data-dir='{ $dir }'
-     onclick='enterDbDir(this.dataset.dir); return false;'>{ $label }</a>
+  (: the reference is a deep link naming the directory in full; following it in place leaves
+     the other panels alone :)
+  html:action($label, 'enterDbDir', { 'dir': $dir },
+    { 'href': web:create-url($panels:CAT, { 'name': $name, 'dir': $dir }) })
 };
 
 (:~
- : Creates a link that selects a database or one of its resources. The reference is a deep link
- : naming the whole selection; following it in place leaves the other panels alone.
- : @param  $label     link label
- : @param  $params    selection the link refers to
+ : Creates a link that selects a database.
+ : @param  $name      database
  : @param  $selected  whether the link refers to what is shown
  : @return function creating the link
  :)
 declare %private function panels:select(
-  $label     as xs:string,
-  $params    as map(*),
+  $name      as xs:string,
   $selected  as xs:boolean
 ) as fn() as element(a) {
-  fn() {
-    <a href='{ web:create-url($panels:CAT, $params) }'>{
-      attribute class { 'selected' }[$selected],
-      if (map:contains($params, 'resource')) {
-        attribute data-select { $params?resource },
-        attribute onclick { 'selectResource(this.dataset.select); return false;' }
-      } else {
-        attribute data-select { $params?name },
-        attribute onclick { 'selectDatabase(this.dataset.select); return false;' }
-      },
-      $label
-    }</a>
-  }
+  html:select($name, $panels:CAT, { 'name': $name }, $selected, 'name', 'selectDatabase')
 };
 
 (:~
- : Creates the backups of a database: a facet of it, not a sibling of its resources. The two
- : sections of the view never show the same backups, so one function serves both.
+ : Creates the backups of a database: a facet of it, not a sibling of its resources.
  : @param  $name  database; empty string for the backups of the general data
  : @return the forms that create, upload and list the backups
  :)
 declare %private function panels:backup-section(
   $name  as xs:string
 ) as element()+ {
+  (: the two sections of the view never show the same backups, so one function serves both :)
   (: one section is shown at a time, so its fields need no names of their own.
      One form for the whole section, so that its actions share a single row of buttons.
      Every button carries its own 'formaction' :)
@@ -701,10 +696,6 @@ declare %private function panels:backup-section(
 
   (: the file chooser is opened by the Upload button and submits what it collects. An upload
      lands in the database directory, so the server checks that it belongs where it is put :)
-  <form method='post' action='backup-upload' enctype='multipart/form-data' autocomplete='off'
-        onsubmit='uploading(this);'>
-    <input type='hidden' name='name' value='{ $name }'/>
-    <input type='file' name='files' id='upload-backups' multiple='multiple' hidden=''
-           onchange='this.form.requestSubmit();'/>
-  </form>
+  form:upload('backup-upload', 'upload-backups', true(),
+    <input type='hidden' name='name' value='{ $name }'/>)
 };

@@ -82,6 +82,25 @@ declare function utils:expression(
 };
 
 (:~
+ : Returns what an editor shows, and what can be done with it.
+ : @param  $text     text the editor shows
+ : @param  $reasons  reasons why the value cannot be edited, as sentence fragments
+ : @return properties: whether the value can be edited, the reason why it cannot, and its text
+ :)
+declare function utils:editable(
+  $text     as xs:string,
+  $reasons  as xs:string*
+) as map(*) {
+  (: everything that speaks against editing is stated in one note; a value that nothing
+     speaks against is edited in place :)
+  {
+    'editable': empty($reasons),
+    'text'    : $text,
+    'note'    : ('Read-only: ' || string-join($reasons, '; ') || '.')[exists($reasons)]
+  }
+};
+
+(:~
  : Serializes a value, considering the specified system limits.
  : @param  $value  value
  : @return string
@@ -89,7 +108,21 @@ declare function utils:expression(
 declare function utils:serialize(
   $value  as item()*
 ) as xs:string {
-  utils:chop(serialize($value, utils:serialize-options(false())), config:get($config:MAXCHARS))
+  utils:preview($value, config:get($config:MAXCHARS))
+};
+
+(:~
+ : Serializes the beginning of a value: what is shown of it where a whole one has no room.
+ : @param  $value  value
+ : @param  $max    maximum number of characters
+ : @return string
+ :)
+declare function utils:preview(
+  $value  as item()*,
+  $max    as xs:integer
+) as xs:string {
+  (: serialize more characters than requested, because limit represents number of bytes :)
+  utils:chop(serialize($value, { 'method': 'basex', 'limit': $max * 2 + 1 }), $max)
 };
 
 (:~
@@ -119,16 +152,38 @@ declare function utils:ws-send(
 };
 
 (:~
- : Renders a panel and pushes it to the client. Empty contents hide the panel, which is why the
- : message is sent even then.
- : @param  $type      type of the panel
+ : Renders a panel and pushes it to the client.
+ : @param  $id        id of the panel
  : @param  $contents  panel contents
  :)
 declare function utils:ws-panel(
-  $type      as xs:string,
+  $id        as xs:string,
   $contents  as element()*
 ) as empty-sequence() {
-  utils:ws-send({ 'type': $type, 'html': utils:html($contents) })
+  (: the panel is named by the block it is filled into, so that the client needs no table of
+     its own to tell one from another. Empty contents hide the panel, which is why the message
+     is sent even then :)
+  utils:ws-send({ 'type': 'panel', 'id': $id, 'html': utils:html($contents) })
+};
+
+(:~
+ : Renders a panel and pushes it, together with the value that the editor beside it holds.
+ : @param  $id        id of the panel
+ : @param  $contents  panel contents
+ : @param  $value     properties of the value: its text, and whether it can be edited
+ :)
+declare function utils:ws-editor(
+  $id        as xs:string,
+  $contents  as element()*,
+  $value     as map(*)
+) as empty-sequence() {
+  utils:ws-send({
+    'type'    : 'editor',
+    'id'      : $id,
+    'html'    : utils:html($contents),
+    'text'    : $value?text,
+    'editable': $value?editable = true()
+  })
 };
 
 (:~
@@ -209,7 +264,7 @@ declare function utils:ws-start(
 declare %private function utils:title(
   $key  as xs:string
 ) as xs:string {
-  string-join(tokenize($key, '-') ! (upper-case(substring(., 1, 1)) || substring(., 2)), ' ')
+  string-join(tokenize($key, '-') ! utils:capitalize(.), ' ')
 };
 
 (:~
@@ -241,14 +296,15 @@ declare function utils:query-info(
 };
 
 (:~
- : Stops the jobs that run for the current connection. The reader is always stopped: once the
- : connection is gone, it has nothing left to push its outcome to.
+ : Stops the jobs that run for the current connection.
  : @param  $query  also stop the query. A query that is left running keeps its result cached,
  :                 and can be watched and read in the activity view
  :)
 declare function utils:ws-stop(
   $query  as xs:boolean := true()
 ) as empty-sequence() {
+  (: the reader is always stopped: once the connection is gone, it has nothing left to push
+     its outcome to :)
   let $jobs := ws:get(ws:id(), $utils:JOB)
   return (
     ws:delete(ws:id(), $utils:JOB),
@@ -259,17 +315,17 @@ declare function utils:ws-stop(
 };
 
 (:~
- : Returns an ID for a job with the specified label. The connection the job is started for
- : completes the name: a name is only reserved once the job starts, so two connections that
- : choose the same one at the same time would collide. A connection starts one job at a time,
- : and gives up the name before it asks for the next one.
+ : Returns an ID for a job with the specified label.
  : @param  $label  label of the job
  : @return job ID
  :)
 declare function utils:job-id(
   $label  as xs:string
 ) as xs:string {
-  (: the prefix of a connection id is a constant; only its number identifies the connection :)
+  (: the connection completes the name: a name is only reserved once the job starts, so two
+     connections that choose the same one at the same time would collide. A connection starts
+     one job at a time, and gives up the name before it asks for the next one.
+     The prefix of a connection id is a constant; only its number identifies the connection :)
   'dba:' || $label || '-' || replace(ws:id(), '^websocket', '')
 };
 
@@ -296,8 +352,7 @@ declare function utils:job-options(
 };
 
 (:~
- : Returns the entries to be shown on the current page. While a table is being sorted, all entries
- : are returned, as sorting and paging are then performed by the table itself.
+ : Returns the entries to be shown on the current page.
  : @param  $entries  all entries
  : @param  $page     current page
  : @param  $sort     sort key
@@ -308,6 +363,8 @@ declare function utils:slice(
   $page     as xs:integer,
   $sort     as xs:string
 ) as item()* {
+  (: while a table is being sorted, all entries are returned: sorting and paging are then
+     performed by the table itself :)
   if ($page and not($sort)) {
     let $max := config:get($config:MAXROWS)
     return subsequence($entries, ($page - 1) * $max + 1, $max)
@@ -334,8 +391,7 @@ declare function utils:chop(
 };
 
 (:~
- : Resolves a relative path against a base directory. Guards file access against path traversal,
- : independent of the servlet container; raises a bad-request error if the path escapes the base.
+ : Resolves a relative path against a base directory.
  : @param  $dir   base directory
  : @param  $name  relative path
  : @return resolved native path, located within the base directory
@@ -344,6 +400,8 @@ declare function utils:safe-path(
   $dir   as xs:string,
   $name  as xs:string
 ) as xs:string {
+  (: guards file access against path traversal, independent of the servlet container: a path
+     that escapes the base is a bad request, never a file :)
   let $base := file:resolve-path($dir)
   let $path := file:resolve-path($name, $base)
   return if (starts-with($path, $base)) {
@@ -354,8 +412,33 @@ declare function utils:safe-path(
 };
 
 (:~
- : Returns files as a download. A single file is sent as it is; several files are packed
- : into an archive, with the supplied name.
+ : Resolves a file of the file panel: the directory the client supplies, and a name below it.
+ : @param  $dir   directory supplied by the client (empty: use the default)
+ : @param  $name  relative path
+ : @return resolved native path, located within the directory
+ :)
+declare function utils:file-path(
+  $dir   as xs:string?,
+  $name  as xs:string
+) as xs:string {
+  (: the two belong together, so that the traversal guard cannot be skipped by resolving apart :)
+  utils:safe-path(config:files-dir($dir), $name)
+};
+
+(:~
+ : Returns the files of an upload: a form parameter is a map of names and contents if files
+ : were chosen, and anything else if none were.
+ : @param  $value  value of the form parameter
+ : @return files, keyed by their name
+ :)
+declare function utils:files(
+  $value  as item()*
+) as map(*) {
+  head($value[. instance of map(*)]) otherwise {}
+};
+
+(:~
+ : Returns files as a download: a single file as it is, several of them in an archive.
  : @param  $paths    paths of the files
  : @param  $archive  name of the archive, without suffix
  : @return rest response and binary data
@@ -364,50 +447,70 @@ declare function utils:download(
   $paths    as xs:string*,
   $archive  as xs:string
 ) as item()+ {
-  if (count($paths) = 1) {
-    utils:attachment(file:name($paths), file:read-binary($paths))
+  utils:archive($paths ! file:name(.), $paths ! file:read-binary(.), $archive)
+};
+
+(:~
+ : Returns named contents as a download: a single one as it is, several of them in an archive.
+ : @param  $names     names of the entries
+ : @param  $contents  contents of the entries
+ : @param  $archive   name of the archive, without suffix
+ : @return rest response and binary data
+ :)
+declare function utils:archive(
+  $names     as xs:string*,
+  $contents  as item()*,
+  $archive   as xs:string
+) as item()+ {
+  if (count($names) = 1) {
+    utils:attachment($names, $contents)
   } else {
-    utils:attachment($archive || '.zip',
-      archive:create($paths ! file:name(.), $paths ! file:read-binary(.)))
+    utils:attachment($archive || '.zip', archive:create($names, $contents))
   }
 };
 
 (:~
- : Returns binary data as a downloadable attachment.
+ : Returns data as a downloadable attachment.
  : @param  $name  name of the file
- : @param  $data  binary data
- : @return rest response and binary data
+ : @param  $data  data of the file
+ : @param  $type  media type; derived from the name if none is supplied
+ : @return rest response and file content
  :)
-declare %private function utils:attachment(
+declare function utils:attachment(
   $name  as xs:string,
-  $data  as xs:base64Binary
+  $data  as item()*,
+  $type  as xs:string? := ()
 ) as item()+ {
-  web:response-header({ 'media-type': web:content-type($name) }, utils:disposition($name)),
+  web:response-header(
+    { 'media-type': $type otherwise web:content-type($name) },
+    utils:disposition($name)
+  ),
   $data
 };
 
 (:~
- : Returns the header that offers a response as a download. The name is encoded: a resource path
- : may contain spaces, commas and characters outside ASCII, all of which a bare name would
- : truncate or misrepresent.
+ : Returns the header that offers a response as a download.
  : @param  $name  name of the file
  : @return response header
  :)
 declare function utils:disposition(
   $name  as xs:string
 ) as map(*) {
+  (: the name is encoded: a resource path may contain spaces, commas and characters outside
+     ASCII, all of which a bare name would truncate or misrepresent :)
   { 'Content-Disposition': "attachment; filename*=UTF-8''" || encode-for-uri($name) }
 };
 
 (:~
- : Returns the URL of a DBA page. The context path is not included: web:redirect resolves
- : absolute locations against the request URI, and thus adds it already.
+ : Returns the URL of a DBA page.
  : @param  $page  name of the page
  : @return URL
  :)
 declare function utils:page(
   $page  as xs:string
 ) as xs:string {
+  (: the context path is not included: web:redirect resolves absolute locations against the
+     request URI, and thus adds it already :)
   '/dba/' || $page
 };
 
@@ -427,9 +530,52 @@ declare function utils:info(
   return if ($count = 1) {
     `{ utils:capitalize($name) } "{ $items }" was { $action }.`
   } else {
-    (: a noun that ends with a consonant and y is pluralized with -ies :)
-    `{ $count } { replace($name, 'y$', 'ie') }s were { $action }.`
+    `{ utils:count($count, $name) } were { $action }.`
   }
+};
+
+(:~
+ : Returns a noun in the form that a number requires.
+ : @param  $count  number of items
+ : @param  $noun   name of item (singular form)
+ : @return noun
+ :)
+declare function utils:plural(
+  $count  as xs:integer,
+  $noun   as xs:string
+) as xs:string {
+  (: a noun that ends with a consonant and y is pluralized with -ies :)
+  if ($count = 1) { $noun } else { replace($noun, 'y$', 'ie') || 's' }
+};
+
+(:~
+ : Returns how many items there are, and what they are called.
+ : @param  $count  number of items
+ : @param  $noun   name of item (singular form)
+ : @return count and noun
+ :)
+declare function utils:count(
+  $count  as xs:integer,
+  $noun   as xs:string
+) as xs:string {
+  `{ $count } { utils:plural($count, $noun) }`
+};
+
+(:~
+ : Returns the message of an error that stopped a query: where it happened, and what it says.
+ : @param  $module       module (can be {@code null})
+ : @param  $line         line number (can be {@code null})
+ : @param  $column       column number (can be {@code null})
+ : @param  $description  error description
+ : @return message
+ :)
+declare function utils:error-message(
+  $module       as xs:string?,
+  $line         as xs:integer?,
+  $column       as xs:integer?,
+  $description  as xs:string?
+) as xs:string {
+  `Stopped at { $module }, { $line }/{ $column }:{ char('\n') }{ $description }`
 };
 
 (:~
@@ -444,29 +590,44 @@ declare function utils:capitalize(
 };
 
 (:~
- : Convenience function for redirecting to another page from update operations.
- : @param  $url     URL
- : @param  $params  query parameters
+ : Returns the redirection that reports the outcome of an action.
+ : @param  $page     page the action belongs to
+ : @param  $params   query parameters of the target page
+ : @param  $message  outcome: an 'info' or an 'error' entry; empty if there is nothing to report
+ : @return redirection
  :)
-declare %updating function utils:redirect(
-  $url     as xs:string,
-  $params  as map(*)
-) {
-  update:output(web:redirect($url, $params))
+declare function utils:outcome(
+  $page     as xs:string,
+  $params   as map(*),
+  $message  as map(*)? := ()
+) as element(rest:response) {
+  (: every action ends in one of these, whether it is run by the dispatcher or by an endpoint
+     of its own: the page it belongs to, with what it did or why it failed :)
+  web:redirect(utils:page($page), map:merge(($params, $message)))
 };
 
 (:~
- : Runs the requested action and redirects to the page it belongs to: an info message is shown
- : if the action succeeds, the error description if it fails.
- : The actions of a category are supplied as a map. Each entry assigns an action name to a
- : function that takes the request parameters and returns the following keys:
- : * 'run': function performing the action (mandatory)
- : * 'params': query parameters of the target page
- : * 'info': info message
- :
+ : Reports the outcome of an update operation; see utils:outcome.
+ : @param  $page     page the action belongs to
+ : @param  $params   query parameters of the target page
+ : @param  $message  outcome: an 'info' or an 'error' entry; empty if there is nothing to report
+ :)
+declare %updating function utils:redirect(
+  $page     as xs:string,
+  $params   as map(*),
+  $message  as map(*)? := ()
+) {
+  update:output(utils:outcome($page, $params, $message))
+};
+
+(:~
+ : Runs the requested action and redirects to the page it belongs to.
  : @param  $page     page the actions belong to
  : @param  $action   name of action
- : @param  $actions  actions of the category
+ : @param  $actions  actions of the category: each entry assigns a name to a function that takes
+ :                   the request parameters and returns 'run' (the function that performs the
+ :                   action, mandatory), 'params' (query parameters of the target page) and
+ :                   'info' (info message)
  : @return redirection
  :)
 declare %updating function utils:dispatch(
@@ -475,7 +636,6 @@ declare %updating function utils:dispatch(
   $actions  as map(*)
 ) {
   let $entry := $actions?($action) otherwise web:error(404, 'Unknown action: ' || $action)
-  let $url := utils:page($page)
   (: an action can fail before it runs: a parameter that is evaluated is reported like the
      update it was meant for, not as a server error :)
   let $target := try {
@@ -485,16 +645,15 @@ declare %updating function utils:dispatch(
   }
   let $params := $target?params otherwise {}
   let $run := $target?run
+  (: an info message is shown if the action succeeds, the error description if it fails :)
   return if ($target?error) {
-    utils:redirect($url, map:put($params, 'error', $target?error))
+    utils:redirect($page, $params, { 'error': $target?error })
   } else {
     try {
       updating $run(),
-      utils:redirect($url, map:merge((
-        $params, { 'info': $target?info }[$target?info]
-      )))
+      utils:redirect($page, $params, { 'info': $target?info }[$target?info])
     } catch * {
-      utils:redirect($url, map:put($params, 'error', $err:description))
+      utils:redirect($page, $params, { 'error': $err:description })
     }
   }
 };

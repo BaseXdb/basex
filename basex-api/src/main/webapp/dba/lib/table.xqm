@@ -7,9 +7,11 @@ module namespace table = 'dba/lib/table';
 
 import module namespace config = 'dba/lib/config' at 'config.xqm';
 import module namespace html = 'dba/lib/html' at 'html.xqm';
+import module namespace utils = 'dba/lib/utils' at 'utils.xqm';
 
-(:~ What a column type is ordered by, and what it is shown as. A type that is not listed is
-    ordered and shown as the string it is; a column without a format shows the value itself. :)
+(:~ What a column type is ordered by, and what it is shown as. :)
+(: a type that is not listed is ordered and shown as the string it is; a column without a
+   format shows the value itself :)
 declare %private variable $table:TYPES := {
   'number'  : { 'order': 'number' },
   'decimal' : { 'order': 'number',
@@ -67,27 +69,24 @@ declare function table:properties(
 
 (:~
  : Creates a table for the specified entries.
- : * The table format is specified by the table headers:
- :   * The element names serve as column keys.
- :   * The string values are the header labels.
- :   * The 'type' attribute defines how the values are formatted and sorted:
+ : @param  $headers  table headers, one per column:
+ :   * 'key': key the column is named by, and the entry value it shows
+ :   * 'label': header label
+ :   * 'type': how the values are formatted and sorted:
  :     * 'number': sorted as numbers
  :     * 'decimal': sorted as numbers, output with two decimal digits
  :     * 'bytes': sorted as numbers, output in a human-readable format
- :     * dateTime', 'time': sorted and output as dates
+ :     * 'dateTime', 'time': sorted and output as dates
  :     * 'dynamic': function generating dynamic input; sorted as strings
  :     * otherwise, sorted and output as strings
- :   * The 'sort' attribute overrides the type the column is sorted by
- :   * The 'order' attribute defines how sorted values will be ordered:
- :     * 'desc': descending order
- :     * otherwise, ascending order
- :   * The 'width' attribute assigns a fixed column width. If widths are supplied, the table
- :     layout gets stable: overflowing values are truncated and can be expanded via clicks.
- : * The supplied table rows are supplied as elements. Values are contained in attributes; their
- :   names represents the column key.
- : * Supplied buttons will placed on top of the table.
- : * Query parameters will be included in table links.
- : * The options argument can have the following keys:
+ :   * 'sort': overrides the type the column is sorted by
+ :   * 'order': 'desc' for descending order, otherwise ascending
+ :   * 'width': fixed column width. If widths are supplied, the table layout gets stable:
+ :     overflowing values are truncated and can be expanded via clicks
+ : @param  $entries  table entries, each of them a map from a column key to its value
+ : @param  $buttons  buttons and other controls, placed above the table
+ : @param  $params   additional query parameters, included in the table links
+ : @param  $options  additional options:
  :   * 'sort': key of the ordered column; if empty, sorting will be disabled
  :   * 'select': key of the entry value that the checkboxes submit; by default, the value that
  :     the first column shows
@@ -100,12 +99,6 @@ declare function table:properties(
  :     the top of the scrolling panel, so that the actions stay reachable while the rows pass
  :     underneath. The key may be present with no content, which pins the buttons alone
  :   * 'below': content placed below the buttons, above the result summary
- :
- : @param  $headers  table headers
- : @param  $entries  table entries
- : @param  $buttons  buttons and other controls, placed above the table
- : @param  $params   additional query parameters
- : @param  $options  additional options
  : @return table
  :)
 declare function table:create(
@@ -171,10 +164,14 @@ declare function table:create(
       <div class='buttons'>{ $buttons }</div>
     },
     $options?below,
-    (: result summary; it is what an empty table is left with :)
+    (: result summary; it is what an empty table is left with. The two forms of the noun are
+       stated, so that a filter that hides rows in the client can restate the summary for the
+       ones it leaves instead of writing the words again; see logFilter :)
     element h3 {
+      attribute data-singular { utils:capitalize(utils:plural(1, 'entry')) },
+      attribute data-plural { utils:capitalize(utils:plural(2, 'entry')) },
       $entries,
-      if ($entries = 1) then 'Entry' else 'Entries',
+      utils:capitalize(utils:plural($entries, 'entry')),
 
       if ($page-option and $last-page != 1) {
         '(Page: ',

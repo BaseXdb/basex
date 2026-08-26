@@ -471,7 +471,7 @@ public final class DBATest extends WebappTest {
       execute("db:put-binary('" + DB + "', xs:base64Binary('SGVsbG8='), 'bin')");
       final String page = page("bin");
       assertTrue(page.contains("initDatabases(false)"), "binary reported as editable");
-      assertTrue(page.contains("only XML can be edited"), "reason not given");
+      assertTrue(page.contains("only XML documents can be edited"), "reason not given");
     }
 
     /**
@@ -609,7 +609,7 @@ public final class DBATest extends WebappTest {
      */
     @Test public void databasesPanel() throws Exception {
       final String message = panel("{ \"type\": \"databases\", \"name\": \"" + DB +
-          "\", \"sort\": \"\", \"page\": 1 }", "databases");
+          "\", \"sort\": \"\", \"page\": 1 }", "panel", "databases-panel");
       assertTrue(message.contains(DB), "database missing from the panel: " + message);
     }
 
@@ -619,7 +619,7 @@ public final class DBATest extends WebappTest {
      */
     @Test public void databasePanel() throws Exception {
       final String message = panel("{ \"type\": \"database\", \"name\": \"" + DB +
-          "\", \"resource\": \"\", \"sort\": \"\", \"page\": 1 }", "database");
+          "\", \"resource\": \"\", \"sort\": \"\", \"page\": 1 }", "panel", "database-panel");
       assertTrue(message.contains(RESOURCE), "resource missing from the panel: " + message);
     }
 
@@ -628,9 +628,9 @@ public final class DBATest extends WebappTest {
      * @throws Exception exception
      */
     @Test public void emptyPanel() throws Exception {
-      assertEquals("{\"type\":\"database\",\"html\":\"\"}",
+      assertEquals("{\"type\":\"panel\",\"id\":\"database-panel\",\"html\":\"\"}",
           panel("{ \"type\": \"database\", \"name\": \"\", \"resource\": \"\"," +
-              " \"sort\": \"\", \"page\": 1 }", "database"));
+              " \"sort\": \"\", \"page\": 1 }", "panel", "database-panel"));
     }
 
     /**
@@ -639,7 +639,7 @@ public final class DBATest extends WebappTest {
      */
     @Test public void resourcePanel() throws Exception {
       final String message = panel("{ \"type\": \"resource\", \"name\": \"" + DB +
-          "\", \"resource\": \"" + RESOURCE + "\" }", "resource");
+          "\", \"resource\": \"" + RESOURCE + "\" }", "editor", "resource-panel");
       assertTrue(message.contains("\"editable\":true"), "document not editable: " + message);
       assertTrue(message.contains("<x><y>1<\\/y><y>2<\\/y><\\/x>"), "document missing: " + message);
     }
@@ -658,13 +658,16 @@ public final class DBATest extends WebappTest {
      * Sends a message and returns the pushed panel.
      * @param message message
      * @param type expected type of the answer
+     * @param id expected id of the panel
      * @return message
      * @throws Exception exception
      */
-    private static String panel(final String message, final String type) throws Exception {
+    private static String panel(final String message, final String type, final String id)
+        throws Exception {
       sendMessage(message);
       final String answer = pollMessage();
-      assertTrue(answer.startsWith("{\"type\":\"" + type + "\""), answer);
+      assertTrue(answer.startsWith("{\"type\":\"" + type + "\",\"id\":\"" + id + "\""),
+          answer);
       return answer;
     }
 
@@ -1353,7 +1356,9 @@ public final class DBATest extends WebappTest {
     private static final String OTHER = "DBA-JUNIT-ZOO";
     /** Link of the child that is looked at. */
     private static final Pattern SELECTED =
-        Pattern.compile("data-step=\"([^\"]*)\"[^>]*class=\"selected\"");
+        Pattern.compile("data-select=\"([^\"]*)\"[^>]*class=\"selected\"");
+    /** Start of the panel that lists the children of a level. */
+    private static final String ENTRIES = "id=\"entries-panel\"";
 
     /**
      * Deletes the test stores after each test.
@@ -1381,11 +1386,11 @@ public final class DBATest extends WebappTest {
     @Test public void addAndRemove() throws IOException {
       assertTrue(add("", false, "'key'", "'value'").contains("Entry \"key\" was added."),
           "entry not added");
-      assertTrue(get("stores?name=" + STORE).contains("data-step=\"key\""),
+      assertTrue(get("stores?name=" + STORE).contains("data-select=\"key\""),
           "entry missing from the list");
       assertTrue(post("stores/remove", Map.of("name", STORE, "path", "", "step", "key")).
           contains("Entry \"key\" was removed."), "entry not removed");
-      assertFalse(get("stores?name=" + STORE).contains("data-step=\"key\""),
+      assertFalse(get("stores?name=" + STORE).contains("data-select=\"key\""),
           "entry still listed after removal");
     }
 
@@ -1412,7 +1417,7 @@ public final class DBATest extends WebappTest {
           "child not added");
 
       final String level = get("stores?name=" + STORE + "&path=map");
-      assertTrue(level.contains("data-step=\"abcde\""), "key not addressed by itself");
+      assertTrue(level.contains("data-select=\"abcde\""), "key not addressed by itself");
       assertFalse(level.contains("{&quot;pos&quot;"), "key addressed by its position");
 
       final String value = get("stores?name=" + STORE + "&path=map.abcde");
@@ -1459,9 +1464,11 @@ public final class DBATest extends WebappTest {
       add("", false, "'apple'", "'a'");
 
       final String page = get("stores?name=" + STORE);
-      assertTrue(page.indexOf("data-step=\"apple\"") < page.indexOf("data-step=\"Zoo\""),
+      assertTrue(page.indexOf("data-select=\"apple\"") < page.indexOf("data-select=\"Zoo\""),
           "entries not sorted, ignoring case");
-      final Matcher matcher = SELECTED.matcher(page);
+      // the store list marks the chosen store in the same way, and comes first: the entry
+      // that is looked at is the one that its own panel points out
+      final Matcher matcher = SELECTED.matcher(page.substring(page.indexOf(ENTRIES)));
       assertTrue(matcher.find(), "no entry is looked at");
       assertEquals("apple", matcher.group(1), "entry of the first row is not the one looked at");
     }
@@ -1567,7 +1574,7 @@ public final class DBATest extends WebappTest {
      */
     @Test public void storesPanel() throws Exception {
       final String message = panel("{ \"type\": \"stores\", \"name\": \"" + STORE +
-          "\", \"sort\": \"\", \"page\": 1 }", "stores");
+          "\", \"sort\": \"\", \"page\": 1 }", "panel", "stores-panel");
       assertTrue(message.contains(STORE), "store missing from the panel: " + message);
     }
 
@@ -1577,7 +1584,8 @@ public final class DBATest extends WebappTest {
      */
     @Test public void entriesPanel() throws Exception {
       final String message = panel("{ \"type\": \"entries\", \"name\": \"" + STORE +
-          "\", \"path\": \"\", \"selected\": \"key\", \"sort\": \"\", \"page\": 1 }", "entries");
+          "\", \"path\": \"\", \"selected\": \"key\", \"sort\": \"\", \"page\": 1 }",
+          "panel", "entries-panel");
       assertTrue(message.contains("key"), "entry missing from the panel: " + message);
     }
 
@@ -1587,7 +1595,7 @@ public final class DBATest extends WebappTest {
      */
     @Test public void value() throws Exception {
       final String message = panel("{ \"type\": \"value\", \"name\": \"" + STORE +
-          "\", \"path\": \"key\" }", "value");
+          "\", \"path\": \"key\" }", "editor", "value-panel");
       assertTrue(message.contains("\"editable\":true"), "value not editable: " + message);
       assertTrue(message.contains("\\\"text\\\""), "value missing: " + message);
     }
@@ -1598,7 +1606,7 @@ public final class DBATest extends WebappTest {
      */
     @Test public void emptyValue() throws Exception {
       final String message = panel("{ \"type\": \"value\", \"name\": \"" + STORE +
-          "\", \"path\": \"none\" }", "value");
+          "\", \"path\": \"none\" }", "editor", "value-panel");
       assertTrue(message.contains("\"html\":\"\""), "panel not hidden: " + message);
       assertTrue(message.contains("\"editable\":false"), "value reported as editable: " + message);
     }
@@ -1617,13 +1625,116 @@ public final class DBATest extends WebappTest {
      * Sends a message and returns the pushed panel.
      * @param message message
      * @param type expected type of the answer
+     * @param id expected id of the panel
      * @return message
      * @throws Exception exception
      */
-    private static String panel(final String message, final String type) throws Exception {
+    private static String panel(final String message, final String type, final String id)
+        throws Exception {
       sendMessage(message);
       final String answer = pollMessage();
-      assertTrue(answer.startsWith("{\"type\":\"" + type + "\""), answer);
+      assertTrue(answer.startsWith("{\"type\":\"" + type + "\",\"id\":\"" + id + "\""),
+          answer);
+      return answer;
+    }
+  }
+
+  /**
+   * Tests for the WebSocket endpoint of the DBA users view, which serves the panels of the
+   * user that is looked at.
+   */
+  @Nested final class UsersSocket {
+    /** Test user. */
+    private static final String USER = "dba-junit-socket";
+
+    /**
+     * Creates a user and opens the connection.
+     * @throws Exception exception
+     */
+    @BeforeEach public void open() throws Exception {
+      execute("user:create('" + USER + "', '', 'read')");
+      connect("/users");
+    }
+
+    /**
+     * Drops the test user.
+     * @throws Exception exception
+     */
+    @AfterEach public void drop() throws Exception {
+      discard("user:drop('" + USER + "')");
+    }
+
+    /**
+     * The user list is pushed as the markup of its panel.
+     * @throws Exception exception
+     */
+    @Test public void usersPanel() throws Exception {
+      final String message = panel("{ \"type\": \"users\", \"name\": \"" + USER +
+          "\", \"sort\": \"name\", \"page\": 1 }", "users-panel");
+      assertTrue(message.contains(USER), "user missing from the panel: " + message);
+    }
+
+    /**
+     * The panel of a user carries what is submitted for it.
+     * @throws Exception exception
+     */
+    @Test public void userPanel() throws Exception {
+      final String message = panel("{ \"type\": \"user\", \"name\": \"" + USER + "\" }",
+          "user-panel");
+      assertTrue(message.contains("User: " + USER), "user panel not served: " + message);
+      assertTrue(message.contains("newname"), "name field missing: " + message);
+    }
+
+    /**
+     * A user that is not selected answers with empty contents, which hides the panel.
+     * @throws Exception exception
+     */
+    @Test public void emptyUser() throws Exception {
+      assertEquals("{\"type\":\"panel\",\"id\":\"user-panel\",\"html\":\"\"}",
+          panel("{ \"type\": \"user\", \"name\": \"\" }", "user-panel"));
+    }
+
+    /**
+     * The admin has no local permissions to overwrite, so its panel stays empty.
+     * @throws Exception exception
+     */
+    @Test public void adminPermissions() throws Exception {
+      assertEquals("{\"type\":\"panel\",\"id\":\"permissions-panel\",\"html\":\"\"}",
+          panel("{ \"type\": \"permissions\", \"name\": \"admin\" }", "permissions-panel"));
+    }
+
+    /**
+     * A local permission is listed in the permissions panel.
+     * @throws Exception exception
+     */
+    @Test public void permissionsPanel() throws Exception {
+      execute("user:grant('" + USER + "', 'write', 'dba-junit-*')");
+      final String message = panel("{ \"type\": \"permissions\", \"name\": \"" + USER +
+          "\" }", "permissions-panel");
+      assertTrue(message.contains("dba-junit-*"), "pattern missing from the panel: " + message);
+    }
+
+    /**
+     * An unknown message type is reported.
+     * @throws Exception exception
+     */
+    @Test public void unknownType() throws Exception {
+      sendMessage("{ \"type\": \"nonsense\" }");
+      final String message = pollMessage();
+      assertTrue(message.contains("Unknown message type: nonsense"), message);
+    }
+
+    /**
+     * Sends a message and returns the pushed panel.
+     * @param message message
+     * @param id expected id of the panel
+     * @return message
+     * @throws Exception exception
+     */
+    private static String panel(final String message, final String id) throws Exception {
+      sendMessage(message);
+      final String answer = pollMessage();
+      assertTrue(answer.startsWith("{\"type\":\"panel\",\"id\":\"" + id + "\""), answer);
       return answer;
     }
   }

@@ -13,22 +13,16 @@ import module namespace utils = 'dba/lib/utils' at '../lib/utils.xqm';
 declare variable $dba:CAT := 'workspace';
 
 (:~
- : Workspace: file panel, editor and query results in a single view. The directory of the file
- : panel and the open documents are remembered by the client, which requests what it needs.
- : @param  $error  error string
- : @param  $info   info string
+ : Workspace: file panel, editor and query results in a single view.
  : @return page
  :)
 declare
   %rest:GET
   %rest:path('/dba/workspace')
-  %rest:query-param('error', '{$error}')
-  %rest:query-param('info',  '{$info}')
   %output:method('html')
-function dba:workspace(
-  $error  as xs:string?,
-  $info   as xs:string?
-) as element(html) {
+function dba:workspace() as element(html) {
+  (: the directory of the file panel and the open documents are remembered by the client,
+     which requests what it needs :)
   (
     (: the grid is placed explicitly: the file panel on the left, the toolbar above the editor,
        and the result beside both of them :)
@@ -81,9 +75,7 @@ function dba:workspace(
     'columns': ('25fr', '38fr', '37fr'),
     'rows'   : ('auto', '1fr', '1fr'),
     'scripts': ('cm6', 'editor', 'workspace'),
-    'init'   : 'initWorkspace();',
-    'info'   : $info,
-    'error'  : $error
+    'init'   : 'initWorkspace();'
   })
 };
 
@@ -110,13 +102,13 @@ function dba:files-download(
     return $path
   return try {
     if (empty($paths)) {
-      web:redirect(utils:page($dba:CAT), { 'error': 'No file was selected.' })
+      utils:outcome($dba:CAT, {}, { 'error': 'No file was selected.' })
     } else {
       (: the archive is named after the current directory :)
       utils:download($paths, file:name(replace($dir, '[/\\]+$', ''))[.] otherwise 'files')
     }
   } catch * {
-    web:redirect(utils:page($dba:CAT), { 'error': 'Download failed: ' || $err:description })
+    utils:outcome($dba:CAT, {}, { 'error': 'Download failed: ' || $err:description })
   }
 };
 
@@ -136,7 +128,7 @@ function dba:action(
     'dir-create': fn($args) { {
       'info': utils:info($args?name, 'directory', 'created'),
       'run' : %updating fn() {
-        file:create-dir(utils:safe-path(config:files-dir($args?dir), $args?name))
+        file:create-dir(utils:file-path($args?dir, $args?name))
       }
     } },
     'delete': fn($args) { {
@@ -149,7 +141,7 @@ function dba:action(
     } },
     'upload': fn($args) {
       let $dir := config:files-dir($args?dir)
-      let $files := $args?files[. instance of map(*)] otherwise {}
+      let $files := utils:files($args?files)
       return {
         'info': if (map:size($files)) { utils:info(map:keys($files), 'file', 'uploaded') },
         'run' : %updating fn() {

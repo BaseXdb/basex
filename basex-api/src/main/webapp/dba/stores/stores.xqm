@@ -17,8 +17,6 @@ declare variable $dba:CAT := 'stores';
  : @param  $name   selected store
  : @param  $path   path of the shown level
  : @param  $key    selected key
- : @param  $info   info string
- : @param  $error  error string
  : @return page
  :)
 declare
@@ -27,15 +25,11 @@ declare
   %rest:query-param('name',  '{$name}', '')
   %rest:query-param('path',  '{$path}')
   %rest:query-param('key',   '{$key}')
-  %rest:query-param('info',  '{$info}')
-  %rest:query-param('error', '{$error}')
   %output:method('html')
 function dba:stores(
   $name   as xs:string,
   $path   as xs:string?,
-  $key    as xs:string?,
-  $info   as xs:string?,
-  $error  as xs:string?
+  $key    as xs:string?
 ) as element(html) {
   (: the default store is named by the empty string, and is what the view opens with. The level
      that is listed is the store, unless the address names a deeper one; within the store, the
@@ -46,28 +40,23 @@ function dba:stores(
   (: a panel is labelled in the markup, not by its heading: it keeps its name while it is
      folded away, and while it has nothing to show and is hidden :)
   return (
-    <div class='panel no-divider' data-label='Stores'>
-      <div id='stores-panel' class='pane'>{ panels:stores('', 1, $name) }</div>
-    </div>,
-    <div class='panel no-divider' data-label='Entries'>
-      <div id='entries-panel' class='pane'>{
-        panels:entries($name, $level, '', 1, $selected)
-      }</div>
-    </div>,
+    html:panel(panels:stores('', 1, $name), { 'id': 'stores-panel', 'label': 'Stores' }),
+    html:panel(panels:entries($name, $level, '', 1, $selected),
+      { 'id': 'entries-panel', 'label': 'Entries' }),
     (: the editor is created once and outlives the panel above it, which is redrawn. The block
        above it is no pane: a pane claims its share of the height, which the editor needs :)
-    <div class='panel no-divider{ ' hidden'[not($value?exists)] }' data-label='Value'>
-      <div id='value-panel'>{ panels:value-panel($value) }</div>
-      <textarea id='editor' spellcheck='false'>{ $value?text }</textarea>
-    </div>
+    html:panel(panels:value-panel($value), {
+      'id'   : 'value-panel',
+      'label': 'Value',
+      'pane' : false(),
+      'extra': <textarea id='editor' spellcheck='false'>{ $value?text }</textarea>
+    })
   ) => html:wrap({
     'header' : $dba:CAT,
     'columns': ('30fr', '35fr', '35fr'),
     'rows'   : '1fr',
     'scripts': ('cm6', 'editor', 'stores'),
-    'init'   : 'initStores(' || ($value?editable = true()) || ');',
-    'info'   : $info,
-    'error'  : $error
+    'init'   : 'initStores(' || ($value?editable = true()) || ');'
   })
 };
 
@@ -231,8 +220,7 @@ declare %private function dba:put(
 };
 
 (:~
- : Returns the key that an expression yields. A map is keyed by any atomic value, so the key
- : is supplied the way the value is.
+ : Returns the key that an expression yields.
  : @param  $query  expression that yields the key
  : @param  $entry  whether the key names an entry of the store
  : @return key
@@ -241,6 +229,7 @@ declare %private function dba:key(
   $query  as xs:string?,
   $entry  as xs:boolean
 ) as xs:anyAtomicType {
+  (: a map is keyed by any atomic value, so the key is supplied the way the value is :)
   let $key := utils:evaluate($query)
   return if (count($key) != 1 or not($key instance of xs:anyAtomicType)) {
     error((), 'The key must be a single atomic value.')

@@ -12,7 +12,6 @@ import module namespace utils = 'dba/lib/utils' at 'lib/utils.xqm';
 
 (:~
  : Permissions: checks the user credentials.
- : Redirects to the login page if a user is not logged in, or if the page is not public.
  : @param  $perm  permission data
  : @return redirection to login page if check was not successful
  :)
@@ -21,6 +20,7 @@ declare
 function dba:check(
   $perm  as map(*)
 ) as element(rest:response)? {
+  (: redirects to the login page if a user is not logged in, or if the page is not public :)
   let $path := $perm?path
   let $allow := $perm?allow
   return if ($allow = 'public') {
@@ -37,12 +37,11 @@ function dba:check(
 
 (:~
  : Permissions: checks the user credentials of a WebSocket handshake.
- : WebSocket URLs have their own address space, so they are not covered by the check above.
- : @return error if a user is not logged in
  :)
 declare
   %perm:check('/ws/dba')
 function dba:ws-check() as empty-sequence() {
+  (: webSocket URLs have their own address space, so they are not covered by the check above :)
   if (empty(session:get($config:SESSION-KEY))) {
     web:error(403, 'Please log in.')
   }
@@ -72,7 +71,7 @@ function dba:login(
   if (session:get($config:SESSION-KEY)) {
     web:redirect('/dba')
   } else {
-    <div class='panel'>
+    html:panel(
       <form method='post'>
         <input type='hidden' name='_page' value='{ $page }'/>
         {
@@ -86,8 +85,8 @@ function dba:login(
             form:button('login', 'Login')
           ))
         }
-      </form>
-    </div>
+      </form>,
+      { 'divider': true(), 'pane': false() })
     => html:wrap({ 'error': $error })
   }
 };

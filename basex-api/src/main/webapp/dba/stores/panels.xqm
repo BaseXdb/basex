@@ -50,8 +50,8 @@ declare function panels:stores(
         let $info := store:info($store)
         return {
           'name': $store,
-          'label': panels:select(($store[.] otherwise $panels:DEFAULT), { 'name': $store },
-            $store = $name),
+          'label': html:select($store[.] otherwise $panels:DEFAULT, $panels:CAT,
+            { 'name': $store }, $store = $name, 'name', 'selectStore'),
           'entries': $info?entries,
           'size': $info?size,
           (: a store that was never written to disk has no date to show :)
@@ -80,10 +80,11 @@ declare function panels:stores(
 
 (:~
  : Creates the contents of the entries panel: the children of the level the path leads to.
- : @param  $name  selected store
- : @param  $path  path of the level; its first step is the key of an entry
- : @param  $sort  sort key of the child list
- : @param  $page  current page of the child list
+ : @param  $name      selected store
+ : @param  $path      path of the level; its first step is the key of an entry
+ : @param  $sort      sort key of the child list
+ : @param  $page      current page of the child list
+ : @param  $selected  child that is looked at
  : @return panel contents
  :)
 declare function panels:entries(
@@ -262,20 +263,15 @@ declare function panels:value(
     (: the value is written as the expression that yields it again, so that what is edited here
        can be stored again :)
     let $expression := utils:expression($value)
-    let $truncated := $expression?truncated
     (: a written value is rebuilt along its path, so a step that names a position cannot be :)
     let $addressable := every $step in $path satisfies not($step instance of map(*))
-    return {
-      'exists'   : true(),
-      'editable' : $addressable and not($truncated),
-      'text'     : $expression?text,
-      (: reason why the value cannot be replaced :)
-      'note': if ($truncated) {
-        'Read-only: the value is too large for editing.'
-      } else if (not($addressable)) {
-        'Read-only: all steps of the path must be strings and integers.'
-      }
-    }
+    return map:merge((
+      { 'exists': true() },
+      utils:editable($expression?text, (
+        'all steps of the path must be strings and integers'[not($addressable)],
+        'the value is too large for editing'[$expression?truncated]
+      ))
+    ))
   }
 };
 
@@ -329,11 +325,8 @@ declare %private function panels:breadcrumb(
         if ($pos = count($labels)) {
           text { $label }
         } else {
-          <a href='#' data-depth='{ $pos - 1 }'
-             onclick='truncatePath(this.dataset.depth); return false;'>{
-            attribute class { 'root' }[$pos = 1],
-            $label
-          }</a>
+          html:action($label, 'truncatePath', { 'depth': $pos - 1 },
+            { 'class': 'root'[$pos = 1] })
         }
       )
     }</div>
@@ -423,11 +416,7 @@ declare %private function panels:child(
   $selected  as xs:boolean
 ) as fn() as element(a) {
   fn() {
-    <a href='#' data-step='{ $child?step }'
-       onclick='selectChild(this.dataset.step); return false;'>{
-      attribute class { 'selected' }[$selected],
-      $child?label
-    }</a>
+    html:action($child?label, 'selectChild', { 'select': $child?step }, { 'selected': $selected })
   }
 };
 
@@ -443,8 +432,10 @@ declare %private function panels:open(
 ) as element(a)? {
   (: an empty map or array is a level as well: it is where its first child is added :)
   if ($value instance of map(*) or $value instance of array(*) or count($value) > 1) {
-    <a href='#' data-step='{ $child?step }' title='Show the entries of this value'
-       onclick='descend(this.dataset.step); return false;'>↘</a>
+    (: the step is named apart from the one that selects a child: the two links sit in the
+       same row, and only the label of a child is pointed out as the selected one :)
+    html:action('↘', 'descend', { 'open': $child?step },
+      { 'title': 'Show the entries of this value' })
   }
 };
 
@@ -456,6 +447,8 @@ declare %private function panels:open(
 declare function panels:step-text(
   $step  as item()
 ) as xs:string {
+  (: the client writes the same texts and must agree on them to the character; see
+     stepToString in stores.js :)
   if ($step instance of map(*)) {
     '{"pos":' || $step?pos || '}'
   } else if ($step instance of xs:string) {
@@ -483,7 +476,8 @@ declare function panels:path(
 };
 
 (:~
- : Returns the steps that the text of a path denotes.
+ : Returns the steps that the text of a path denotes; the client reads them in the same way,
+ : see parsePath in stores.js.
  : @param  $path  path (can be empty)
  : @return steps
  :)
@@ -574,41 +568,6 @@ declare function panels:replace(
 };
 
 (:~
- : Creates a link that selects a store; its reference is a deep link naming the selection.
- : @param  $label     link label
- : @param  $params    selection the link refers to
- : @param  $selected  whether the link refers to what is shown
- : @return function creating the link
- :)
-declare %private function panels:select(
-  $label     as xs:string,
-  $params    as map(*),
-  $selected  as xs:boolean
-) as fn() as element(a) {
-  fn() {
-    <a href='{ web:create-url($panels:CAT, $params) }'>{
-      attribute class { 'selected' }[$selected],
-      attribute data-select { $params?name },
-      attribute onclick { 'selectStore(this.dataset.select); return false;' },
-      $label
-    }</a>
-  }
-};
-
-(:~
- : Returns how much a value holds.
- : @param  $count  number of children
- : @param  $name   name of a child, in singular form
- : @return count
- :)
-declare %private function panels:count(
-  $count  as xs:integer,
-  $name   as xs:string
-) as xs:string {
-  `{ $count } { if ($count = 1) { $name } else { replace($name, 'y$', 'ie') || 's' } }`
-};
-
-(:~
  : Returns the beginning of the serialized value of an entry.
  : @param  $value  value
  : @return the value in a code element, how much a value that holds further values holds, or
@@ -620,19 +579,14 @@ declare %private function panels:preview(
   let $count := count($value)
   (: how many values there are is what a cell can say about a value that holds further ones :)
   return if ($count > 1) {
-    panels:count($count, 'item')
+    utils:count($count, 'item')
   } else if ($value instance of map(*)) {
-    panels:count(map:size($value), 'entry')
+    utils:count(map:size($value), 'entry')
   } else if ($value instance of array(*)) {
-    panels:count(array:size($value), 'member')
+    utils:count(array:size($value), 'member')
   } else if ($value instance of xs:base64Binary or $value instance of xs:hexBinary) {
     (: nothing: a binary has nothing to read :)
   } else {
-    (: serialize more characters than requested, as the limit represents number of bytes :)
-    <code>{
-      utils:chop(serialize($value, {
-        'method': 'basex', 'limit': $panels:PREVIEW * 2 + 1
-      }), $panels:PREVIEW)
-    }</code>
+    <code>{ utils:preview($value, $panels:PREVIEW) }</code>
   }
 };

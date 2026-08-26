@@ -17,6 +17,19 @@
  *
  * Global options that outlive the browser (timeout, memory, permission, table rows) are not
  * state: they are configuration, and live in the .dba.xml of the database directory.
+ *
+ * Two transports carry it, and which one is right follows from a second question: who is
+ * waiting for the answer?
+ *
+ * - HTTP: what has an address, what writes, and what one caller waits for. A view, a download,
+ *   an action, a document. Only HTTP hands a write the transaction and the locks it needs, and
+ *   only an address can be reloaded, bookmarked and passed on.
+ * - WebSocket: what the server pushes into a page that is already open. Panels, the outcome of
+ *   a query, the entries of a log search, the refresh of a live view. Nobody is waiting for a
+ *   reply here: the server states what the page should show now.
+ *
+ * A document is read and written over HTTP, both of them: its write cannot go over the socket,
+ * as a full-size document exceeds MAX_MESSAGE_LENGTH, and the two must not part company.
  */
 
 /** Root of the web application; empty if it is deployed in the root context. HTTP requests are
@@ -29,6 +42,12 @@ const _sockets = {};
 const _handlers = {};
 /** Actions that a 'Live' checkbox starts, by the name in its 'data-live'; a page registers its own. */
 const _live_actions = {};
+/** Selectors of the controls that keep focus while a panel is replaced, by panel id. */
+const _panel_focus = {};
+/** Called once a panel has been filled, by panel id; a page registers its own. */
+const _panel_filled = {};
+/** Pending filter requests, by the id of the field that was typed into. */
+const _filters = {};
 
 /** Number of the last query that was started in the editor panel. */
 let _run = 0;
@@ -46,8 +65,17 @@ let _live;
     where a page has an editor, and absent on the pages that do not load it. */
 let _locate;
 
+/** Path of the endpoint that runs the queries of the page; a page registers its own. */
+let _query_path;
+
+/** Called once a running query has been given up; a page registers its own. */
+let _query_stopped;
+
 /** Delay before a query is reported as running. */
 const RESULT_DELAY = 500;
+
+/** Delay before what was typed into a filter field is requested, in milliseconds. */
+const FILTER_DELAY = 150;
 
 /** localStorage key prefix for the 'Live' checkbox of a page. */
 const LIVE_KEY = "dba-live-";
@@ -60,8 +88,10 @@ const REFRESH_INTERVAL = Number(document.documentElement.dataset.interval) * 100
 /** Content panels of the current page, in grid track order. */
 let _panels = [];
 
-/** Whether at least one of the panels can be collapsed. */
-let _collapsible = false;
+/** Whether the panels occupy one grid track each, in source order — which is what
+    applyColumns rewrites. A page that places its panels by hand (the grid of the Workspace
+    view) sizes its tracks itself, and is left alone. */
+let _tracked = false;
 
 /** Longest message that is accepted by the WebSocket endpoints.
     Kept well below the 'maxTextMessageSize' of the WebSocket servlet (see web.xml), which also
@@ -93,6 +123,43 @@ const PANELS_KEY = "dba-panels-v3-";
  */
 function pageKey(prefix) {
   return prefix + window.location.pathname;
+}
+
+/**
+ * Remembers a value in this browser. Storage may be disabled or full: what cannot be kept is
+ * given up, as everything kept here is a convenience, never state the server needs.
+ * @param {string} key key
+ * @param {*} value value; null drops what was stored
+ */
+function store(key, value) {
+  try {
+    if(value === null) localStorage.removeItem(key);
+    else localStorage.setItem(key, value);
+  } catch { /* storage disabled or full: the value applies to this page and is not kept */ }
+}
+
+/**
+ * Returns a value that was remembered in this browser.
+ * @param {string} key key
+ * @param {string} fallback value to use if none was stored
+ * @returns {string} value
+ */
+function stored(key, fallback = null) {
+  try {
+    return localStorage.getItem(key) ?? fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+/**
+ * Returns what was typed into a field, without the spaces around it.
+ * @param {string} id id of the field
+ * @param {string} fallback value to use if the field is not on the page
+ * @returns {string} value
+ */
+function fieldValue(id, fallback = "") {
+  return document.getElementById(id)?.value.trim() ?? fallback;
 }
 
 /**
@@ -375,6 +442,8 @@ function showMessage(path, data) {
     if(endRequest()) setText("", "");
   }
   if(json.type === "error") showError(json.message, undefined, json);
+  // a panel is named by the block it is filled into, so it needs no case of its own
+  if(json.type === "panel") insertPanel(json.id, json.html);
   _handlers[path]?.(json);
 }
 
@@ -431,13 +500,34 @@ function requestPanel(path, id, message, sort, page) {
 }
 
 /**
+ * Shows a panel that the server pushed, and tells the page that asked for it. What was typed
+ * into a control of the panel is kept: its markup is replaced along with the rest.
+ * @param {string} id id of the panel
+ * @param {string} html panel contents
+ */
+function insertPanel(id, html) {
+  refocus(() => fillPanel(id, html), ...(_panel_focus[id] ?? []));
+  _panel_filled[id]?.();
+}
+
+/**
  * Shows a panel that was pushed by the server.
  * @param {string} id id of the panel
  * @param {string} html panel contents
  */
 function fillPanel(id, html) {
   const pane = document.getElementById(id);
+  // the entries are replaced: what was ticked in the meantime is ticked again. Only the rows
+  // are restored; a checkbox that belongs to a dialog keeps the state it was rendered with
+  const rows = "table input[type=checkbox][name]";
+  const checked = [ ...pane.querySelectorAll(rows) ].filter(input => input.checked);
   pane.innerHTML = html;
+  if(checked.length) {
+    const values = checked.map(input => input.value);
+    for(const input of pane.querySelectorAll(rows)) {
+      input.checked = values.includes(input.value);
+    }
+  }
   // a panel with nothing to show is not shown at all, and gives up its grid track
   const panel = pane.closest(".panel"), empty = !html;
   if(panel.classList.contains("hidden") !== empty) {
@@ -479,6 +569,103 @@ function followPanelLinks(panels) {
     event.preventDefault();
     panels[panel.id](params.get("sort") ?? "", Number(params.get("page")) || 1);
   });
+}
+
+/**
+ * Requests what was typed into a filter field. Every key would be a request of its own, so the
+ * ones that are typed in a row are collected first; Enter asks at once.
+ * @param {string} key typed key
+ * @param {string} id id of the filter field, which its pending request is kept under
+ * @param {Function} action requests what the field names
+ */
+function filterKey(key, id, action) {
+  clearTimeout(_filters[id]);
+  if(key === "Enter") action();
+  else _filters[id] = setTimeout(action, FILTER_DELAY);
+}
+
+/**
+ * Stops the query that is currently evaluated. The server confirms the request with a 'stopped'
+ * message; see showMessage.
+ */
+async function stopQuery() {
+  // drop the number of the run: the result of the stopped query will be ignored
+  endRequest();
+  await sendMessage(_query_path, { type: "stop" });
+  _query_stopped?.();
+}
+
+/**
+ * Replaces part of the page, keeping the focus and the caret of the control that was used: its
+ * markup is replaced as well, and a field must not lose what was typed into it.
+ * @param {Function} fill function that replaces the markup
+ * @param {...string} selectors selectors of the controls that keep the focus
+ */
+function refocus(fill, ...selectors) {
+  const active = document.activeElement;
+  const selector = selectors.find(s => active?.matches(s));
+  fill();
+  if(!selector) return;
+  // the control is found again by its id, or by the name it is submitted under
+  const control = active.id ? document.getElementById(active.id) :
+    document.querySelector(`${selector}[name="${CSS.escape(active.name)}"]`);
+  if(!control) return;
+  control.value = active.value;
+  control.focus();
+  // a text field is resumed where the caret was; a chooser has none
+  if(active.selectionStart != null) {
+    control.setSelectionRange(active.selectionStart, active.selectionEnd);
+  }
+}
+
+/**
+ * Asks for a value and submits it with the form that carries it; see form:prompt. A dismissed
+ * question and an empty answer submit nothing.
+ * @param {string} id id of the field that carries the answer
+ * @param {string} label text of the question
+ * @param {string} value value to start from
+ * @param {string} action action the form posts to; if omitted, the one it was rendered with
+ * @returns {Promise} promise
+ */
+async function promptSubmit(id, label, value, action) {
+  const answer = await promptDialog(label, value);
+  if(!answer) return;
+  const input = document.getElementById(id);
+  if(action) input.form.action = action;
+  input.value = answer;
+  input.form.submit();
+}
+
+/**
+ * Writes the note that says what can be done with what is shown, and why. A note that reports
+ * something the user did not ask for is marked as a warning.
+ * @param {string} id id of the note element
+ * @param {string} message message; if empty, the fallback is restored
+ * @param {Array} fallback text and class to fall back to ([ message, class ])
+ */
+function showNote(id, message, fallback = [ "", "note" ]) {
+  const note = document.getElementById(id);
+  if(note) [ note.textContent, note.className ] = message ? [ message, "note warn" ] : fallback;
+}
+
+/**
+ * Stores what the editor holds and reports the outcome.
+ * @param {string} path path of the endpoint that stores it
+ * @param {object} params query parameters that name what is stored
+ * @param {string} info message that reports the success
+ * @param {Function} done called once it has been stored
+ * @returns {Promise} promise, resolved with true if it was stored
+ */
+async function saveEditor(path, params, info, done) {
+  try {
+    await request(`${path}?${new URLSearchParams(params)}`, editorValue());
+    setText(info, "info");
+    done?.();
+    return true;
+  } catch(response) {
+    showError(response);
+    return false;
+  }
 }
 
 /**
@@ -542,8 +729,8 @@ function liveOn() {
 function initLive() {
   const live = document.getElementById("live");
   if(!live) return;
-  const stored = localStorage.getItem(pageKey(LIVE_KEY));
-  if(stored !== null) live.checked = stored === "true";
+  const state = stored(pageKey(LIVE_KEY));
+  if(state !== null) live.checked = state === "true";
 }
 
 /**
@@ -551,10 +738,21 @@ function initLive() {
  */
 function liveChanged() {
   const live = document.getElementById("live");
-  localStorage.setItem(pageKey(LIVE_KEY), live.checked);
+  store(pageKey(LIVE_KEY), live.checked);
   // a repeat that was already scheduled must not slip through after unticking
   clearTimeout(_live);
   if(live.checked) _live_actions[live.dataset.live]?.();
+}
+
+/**
+ * Schedules the next run of what the 'Live' checkbox controls. Refreshes are chained: the next
+ * one follows the answer that arrived, so a slow request cannot queue up others.
+ * @param {Function} action action to repeat
+ * @param {boolean} live whether the refresh is still on; the checkbox decides if it is omitted
+ */
+function scheduleLive(action, live = liveOn()) {
+  clearTimeout(_live);
+  if(live) _live = setTimeout(action, REFRESH_INTERVAL);
 }
 
 /**
@@ -727,7 +925,7 @@ function panelsKey() {
  * @returns {object} collapsed state, by panel id
  */
 function storedPanels() {
-  return JSON.parse(localStorage.getItem(panelsKey()) ?? "{}");
+  return JSON.parse(stored(panelsKey(), "{}"));
 }
 
 /**
@@ -740,11 +938,13 @@ function initPanels() {
   const panels = [ ...content.children ].filter(p => p.matches(".panel"));
   if(panels.length < 2) return;
 
-  // every panel owns a grid track, whether or not it can be collapsed
+  // every panel owns a grid track, whether or not it can be collapsed — unless the page
+  // places them itself, which the declared grid area gives away
   _panels = panels;
+  _tracked = panels.every(panel => !panel.style.gridArea);
 
   // the markup supplies the state of every panel that was not folded by hand
-  const stored = storedPanels();
+  const state = storedPanels();
   panels.forEach((panel, p) => {
     // the label of the collapsed strip is the panel's own, or the first word of its heading:
     // what follows a separator names the entry that is shown, which the panel outlives.
@@ -762,8 +962,7 @@ function initPanels() {
     button.dataset.title = label;
     button.addEventListener("click", () => togglePanel(panel, id));
     panel.prepend(button);
-    _collapsible = true;
-    showPanel(panel, stored[id] ?? panel.classList.contains("collapsed"));
+    showPanel(panel, state[id] ?? panel.classList.contains("collapsed"));
   });
   applyColumns();
 }
@@ -778,9 +977,9 @@ function togglePanel(panel, id) {
   showPanel(panel, collapse);
   applyColumns();
 
-  const stored = storedPanels();
-  stored[id] = collapse;
-  localStorage.setItem(panelsKey(), JSON.stringify(stored));
+  const state = storedPanels();
+  state[id] = collapse;
+  store(panelsKey(), JSON.stringify(state));
 
   // lets CodeMirror panes and truncated cells adjust to the new widths
   window.dispatchEvent(new Event("resize"));
@@ -812,22 +1011,53 @@ function showPanel(panel, collapse) {
 }
 
 /**
+ * Returns a content panel by the name it is labelled with.
+ * @param {string} label panel label
+ * @returns {HTMLElement} panel
+ */
+function contentPanel(label) {
+  return document.querySelector(`.content > .panel[data-label='${label}']`);
+}
+
+/**
+ * Indicates whether a content panel has anything to show. A panel with nothing is hidden, which
+ * is not the same as one that was folded away.
+ * @param {string} label panel label
+ * @returns {boolean} whether the panel is shown
+ */
+function panelShown(label) {
+  return !contentPanel(label).classList.contains("hidden");
+}
+
+/**
+ * Assigns the collapsed state that follows from what the view shows, and is therefore not
+ * remembered: a view states it whenever its selection changes.
+ * @param {Array} rules collapsed state per panel, as [ label, collapse ] pairs
+ */
+function foldPanels(rules) {
+  for(const [ label, collapse ] of rules) showPanel(contentPanel(label), collapse);
+  applyColumns();
+  // the panels that stay open have grown: what was clipped at the old widths is measured again
+  window.dispatchEvent(new Event("resize"));
+}
+
+/**
  * Resizes the grid tracks: a panel with nothing to show gets none, a collapsed one a strip,
  * and the rest share the freed space.
  */
 function applyColumns() {
-  // pages without collapsible panels keep the track widths they declared;
-  // the editor resizer owns the inline value there
+  // a page that places its panels by hand keeps the tracks it declared
   const content = document.querySelector(".content");
-  if(!content || !_collapsible) return;
+  if(!content || !_tracked) return;
 
   // on narrow screens the panels are stacked; the media query supplies the single column
   const state = p => p.classList.contains("hidden") ? null :
     p.classList.contains("collapsed") ? "min-content" : "";
   const tracks = _panels.map(state);
   if(!stacked() && tracks.some(t => t !== "")) {
-    // the panels that stay open keep the track widths the page declared, and
-    // 'min-content' sizes a folded strip from its rotated label, whatever the font
+    // the panels that stay open keep the width that '--columns' gives them — what the page
+    // declared, or what a drag last wrote there — and 'min-content' sizes a folded strip
+    // from its rotated label, whatever the font
     const widths = getComputedStyle(content).getPropertyValue("--columns").trim().split(/\s+/);
     content.style.gridTemplateColumns = tracks
       .map((t, i) => t === "" ? widths[i] || "1fr" : t)
@@ -890,6 +1120,17 @@ function pushParams(params) {
 }
 
 /**
+ * Registers what a view reads from the address bar: the selection is adopted now, and again
+ * whenever the browser steps through the history.
+ * @param {Function} adopt reads the selection from the address bar
+ * @param {Function} show requests what the selection names
+ */
+function initSelection(adopt, show) {
+  adopt();
+  window.addEventListener("popstate", () => { adopt(); show(); });
+}
+
+/**
  * Makes the panel grid resizable: a '.resizer' drags a split between two columns, a
  * '.resizer-row' one between two rows. 'data-split' numbers the split of its axis, so
  * handles that sit on the same split drag it together.
@@ -900,14 +1141,14 @@ function initResizers() {
 
   // the page declares the initial tracks; a stored split wins, but only if it still fits the
   // grid: a page that changed its layout must not be sized by what an older one stored
-  const stored = JSON.parse(localStorage.getItem(pageKey(SPLIT_KEY)) ?? "{}");
+  const split = JSON.parse(stored(pageKey(SPLIT_KEY), "{}"));
   const style = getComputedStyle(_content);
   const fitting = (tracks, count) =>
     Array.isArray(tracks) && tracks.length === count ? tracks : undefined;
   _split = {
-    column: fitting(stored.column, style.gridTemplateColumns.split(" ").length),
+    column: fitting(split.column, style.gridTemplateColumns.split(" ").length),
     // the first row holds the toolbar, which is not resized
-    row: fitting(stored.row, style.gridTemplateRows.split(" ").length - 1)
+    row: fitting(split.row, style.gridTemplateRows.split(" ").length - 1)
   };
   applySplit();
   window.addEventListener("resize", applySplit);
@@ -919,7 +1160,7 @@ function initResizers() {
         document.removeEventListener("pointermove", drag);
         document.removeEventListener("pointerup", stop);
         handle.releasePointerCapture(e.pointerId);
-        localStorage.setItem(pageKey(SPLIT_KEY), JSON.stringify(_split));
+        store(pageKey(SPLIT_KEY), JSON.stringify(_split));
       };
       document.addEventListener("pointermove", drag);
       document.addEventListener("pointerup", stop);
@@ -943,6 +1184,9 @@ function applySplit() {
   apply("--columns", _split.column, "");
   // the first row holds the toolbar, which keeps the height it needs
   apply("--rows", _split.row, "auto ");
+  // a dragged width is only a weight in '--columns'; what the grid renders is derived from it
+  // by applyColumns, so that has to run again — its inline value would freeze the drag
+  applyColumns();
 }
 
 /**

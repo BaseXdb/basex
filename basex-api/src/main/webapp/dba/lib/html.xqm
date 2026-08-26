@@ -10,21 +10,18 @@ import module namespace utils = 'dba/lib/utils' at 'utils.xqm';
 
 (:~
  : Extends the specified content panels with the page template.
- : Panels are laid out side by side, one grid column each.
- : The following options can be specified:
- : * header: name of the page, which is also the entry marked in the navigation
- : * error: error string
- : * info: info string
- : * columns: grid track widths, one per panel; defaults to equal widths
- : * rows: grid track heights; the panels then fill the viewport instead of growing with
- :   their content, and each panel scrolls on its own
- : * panels: name of the subview, if the page shows different panels in different subviews;
- :   the collapsed state is then remembered for each of them, as it is kept by position
- : * scripts: names of the scripts the page needs, besides the shared one
- : * init: call that prepares the page, evaluated after the shared setup
- :
- : @param  $panels   content panels
- : @param  $options  options
+ : @param  $panels   content panels, laid out side by side, one grid column each
+ : @param  $options  options:
+ :   * header: name of the page, which is also the entry marked in the navigation
+ :   * error: error string; by default, what the address reports
+ :   * info: info string; by default, what the address reports
+ :   * columns: grid track widths, one per panel; defaults to equal widths
+ :   * rows: grid track heights; the panels then fill the viewport instead of growing with
+ :     their content, and each panel scrolls on its own
+ :   * panels: name of the subview, if the page shows different panels in different subviews;
+ :     the collapsed state is then remembered for each of them, as it is kept by position
+ :   * scripts: names of the scripts the page needs, besides the shared one
+ :   * init: call that prepares the page, evaluated after the shared setup
  : @return page
  :)
 declare function html:wrap(
@@ -35,13 +32,19 @@ declare function html:wrap(
   let $view := $options?header
   let $header := $view ! utils:capitalize(.)
   let $user := session:get($config:SESSION-KEY)
+  (: what the last action reported. A page relays it from its address without ever looking at
+     it, so the template fetches it instead of every page declaring, accepting and passing it
+     on; a page that reports something of its own supplies it :)
+  let $info := ($options?info otherwise request:parameter('info'))[.]
+  let $error := ($options?error otherwise request:parameter('error'))[.]
   (: only panels get a grid track; a page may supply scripts as well :)
   let $tracks := $panels[tokenize(@class) = 'panel']
   let $columns := string-join($options?columns otherwise ($tracks ! '1fr'), ' ')
   let $rows := string-join($options?rows, ' ')
   (: the client cannot tell a context path from a subdirectory, so the server states it :)
   return <html lang='en' data-context='{ request:context-path() }'
-               data-interval='{ config:get($config:INTERVAL) }'>
+               data-interval='{ config:get($config:INTERVAL) }'
+               data-xquery='{ $utils:XQUERY-REGEX }'>
     <head>
       <meta charset='utf-8'/>
       <meta http-equiv='Content-Security-Policy'
@@ -106,8 +109,7 @@ declare function html:wrap(
             element output {
               attribute id { 'info' },
               attribute role { 'status' },
-              let $error := $options?error[.], $info := $options?info[.]
-              return if ($error) {
+              if ($error) {
                 attribute class { 'error' }, $error
               } else if ($info) {
                 attribute class { 'info' }, $info
@@ -151,10 +153,87 @@ declare function html:wrap(
         html:js('buttons(); ready();'),
         (: the page is prepared once the shared setup is done :)
         $options?init ! html:js(.),
-        html:js('hideParams("info", "error");')[exists(($options?info, $options?error)[.])]
+        html:js('hideParams("info", "error");')[$info or $error]
       }
     </body>
   </html>
+};
+
+(:~
+ : Creates a content panel of a view: one grid track of the page that html:wrap lays out.
+ : @param  $contents  panel contents
+ : @param  $options   options:
+ :   * id: id of the block that holds the contents. A panel that the server pushes is filled
+ :     into it, and the message that carries it names the block
+ :   * pane: whether that block scrolls on its own; a string adds further classes to it, and
+ :     contents that bring their own block ask for neither (default: true)
+ :   * label: name of the panel, written on the strip it folds to. The empty string leaves the
+ :     panel where it is; no name at all falls back to the heading the panel shows
+ :   * collapsed: whether the panel opens folded away
+ :   * hidden: whether the panel is left out; by default, one with nothing to show is
+ :   * fold: 'right' if the panel folds towards the right edge
+ :   * divider: whether a divider separates the panel from the one before it
+ :   * class: further classes of the panel
+ :   * style: grid placement of the panel
+ :   * panel-id: id of the panel itself
+ :   * extra: content beside the block, which a pushed panel does not replace
+ : @return panel
+ :)
+declare function html:panel(
+  $contents  as node()*,
+  $options   as map(*) := {}
+) as element(div) {
+  let $id := $options?id
+  (: the block that holds the contents; a string names the classes it carries besides 'pane' :)
+  let $pane := $options?pane otherwise true()
+  let $pane-class := if ($pane instance of xs:string) {
+    'pane ' || $pane
+  } else if ($pane) {
+    'pane'
+  }
+  return <div class='{ string-join((
+    'panel',
+    'no-divider'[not($options?divider)],
+    'collapsed'[$options?collapsed],
+    'hidden'[$options?hidden otherwise empty($contents)],
+    $options?class
+  ), ' ') }'>{
+    $options?panel-id ! attribute id { . },
+    $options?style ! attribute style { . },
+    attribute data-label { $options?label }[map:contains($options, 'label')],
+    $options?fold ! attribute data-fold { . },
+    (: the contents get a block of their own if they scroll or are replaced :)
+    if (exists($pane-class) or exists($id)) {
+      element div {
+        $id ! attribute id { . },
+        attribute class { $pane-class }[$pane-class],
+        $contents
+      }
+    } else {
+      $contents
+    },
+    $options?extra
+  }</div>
+};
+
+(:~
+ : Creates the heading of a panel or a block, with the controls that belong to it.
+ : @param  $text      heading text
+ : @param  $controls  controls placed beside the heading
+ : @param  $level     name of the heading element
+ : @return heading and its controls
+ :)
+declare function html:heading(
+  $text      as xs:string,
+  $controls  as item()+,
+  $level     as xs:string := 'h2'
+) as element(div) {
+  (: the controls sit beside the heading, not inside it: a heading that does not fit is
+     clipped, and a button that belongs to it must not be clipped away with it :)
+  <div class='pane-title'>{
+    element { $level } { $text },
+    $controls
+  }</div>
 };
 
 (:~
@@ -173,14 +252,78 @@ declare function html:link(
 };
 
 (:~
- : Returns a formatted representation of a dateTime value. Seconds are dropped: the value tells
- : when a file or database was last touched, which no one counts in seconds.
+ : Creates a link that selects an entry: a deep link naming the whole selection.
+ : @param  $label     link label
+ : @param  $page      page the link refers to
+ : @param  $params    selection the link refers to
+ : @param  $selected  whether the link refers to what is shown
+ : @param  $key       parameter that names the selected entry; empty if the link is followed by
+ :                    loading the page it names
+ : @param  $call      client function that selects the entry
+ : @return function creating the link
+ :)
+declare function html:select(
+  $label     as xs:string,
+  $page      as xs:string,
+  $params    as map(*),
+  $selected  as xs:boolean,
+  $key       as xs:string? := (),
+  $call      as xs:string? := ()
+) as fn() as element(a) {
+  (: the link can be followed and bookmarked; a view that refreshes its panels over its own
+     connection follows it in place, which is what the supplied call does :)
+  let $href := web:create-url($page, $params)
+  return fn() {
+    if ($key) {
+      html:action($label, $call, { 'select': $params?($key) },
+        { 'href': $href, 'selected': $selected })
+    } else {
+      <a href='{ $href }'>{ attribute class { 'selected' }[$selected], $label }</a>
+    }
+  }
+};
+
+(:~
+ : Creates a link that runs a client function instead of being followed.
+ : @param  $label    link label
+ : @param  $call     client function
+ : @param  $data     values the link names
+ : @param  $options  options: 'href' (deep link that the call follows in place; the link refers
+ :                   to no page of its own without it), 'selected' (whether the link refers to
+ :                   what is shown), 'title' (tooltip), 'class' (further classes)
+ : @return link
+ :)
+declare function html:action(
+  $label    as item()*,
+  $call     as xs:string,
+  $data     as map(*),
+  $options  as map(*) := {}
+) as element(a) {
+  (: the values are supplied as data attributes: a link that names a single one hands that
+     value to the function, one that names several hands over all of them. A link that selects
+     an entry names it under 'select', which is what the client points the entry out by :)
+  let $class := string-join(('selected'[$options?selected], $options?class), ' ')
+  return <a href='{ $options?href otherwise '#' }'>{
+    map:for-each($data, fn($name, $value) { attribute { 'data-' || $name } { $value } }),
+    attribute class { $class }[$class],
+    $options?title ! attribute title { . },
+    attribute onclick { $call ||
+      '(this.dataset' || ('.' || head(map:keys($data)))[map:size($data) = 1] ||
+      '); return false;' },
+    $label
+  }</a>
+};
+
+(:~
+ : Returns a formatted representation of a dateTime value.
  : @param  $date  date
  : @return string
  :)
 declare function html:date(
   $date  as xs:dateTime
 ) as xs:string {
+  (: seconds are dropped: the value tells when a file or database was last touched, which
+     no one counts in seconds :)
   format-dateTime(html:adjust($date), '[Y0000]-[M00]-[D00] [H00]:[m00]')
 };
 
@@ -245,10 +388,9 @@ declare function html:parameters() as map(*) {
 };
 
 (:~
- : Creates a new map with query parameters. The returned map contains all
- : current query parameters, and the given ones, prefixed with an underscore.
+ : Creates a new map with query parameters.
  : @param  $map  predefined parameters
- : @return map with query parameters
+ : @return all current query parameters, and the given ones, prefixed with an underscore
  :)
 declare function html:parameters(
   $map  as map(*)?

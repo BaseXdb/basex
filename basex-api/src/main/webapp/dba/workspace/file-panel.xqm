@@ -7,6 +7,7 @@ module namespace panel = 'dba/lib/file-panel';
 
 import module namespace config = 'dba/lib/config' at '../lib/config.xqm';
 import module namespace form = 'dba/lib/form' at '../lib/form.xqm';
+import module namespace html = 'dba/lib/html' at '../lib/html.xqm';
 import module namespace table = 'dba/lib/table' at '../lib/table.xqm';
 
 (:~ Page the deep links of the panel refer to. :)
@@ -49,12 +50,11 @@ declare function panel:files(
            deep links, which name the directory in full :)
         'name': fn() {
           if ($is-dir) {
-            <a href='{ web:create-url($panel:CAT, { 'dir': $dir || $name }) }' data-name='{ $name }'
-               onclick='enterDir(this.dataset.name); return false;'>{ $name }</a>
+            html:action($name, 'enterDir', { 'name': $name },
+              { 'href': web:create-url($panel:CAT, { 'dir': $dir || $name }) })
           } else if ($size <= $limit) {
-            <a href='{ web:create-url($panel:CAT, { 'dir': $dir, 'name': $name }) }'
-               data-name='{ $name }'
-               onclick='openFile(this.dataset.name); return false;'>{ $name }</a>
+            html:action($name, 'openFile', { 'name': $name },
+              { 'href': web:create-url($panel:CAT, { 'dir': $dir, 'name': $name }) })
           } else {
             $name
           }
@@ -71,7 +71,7 @@ declare function panel:files(
       <button type='button' onclick='enterDir("..")' title='Go to the parent directory'>{
         attribute disabled { }[not($parent)], '..'
       }</button>,
-      <button type='button' onclick='createDir()'>New dir…</button>,
+      <button type='button' onclick='createDir()'>New…</button>,
       form:button('workspace/delete', 'Delete', ('CHECK', 'CONFIRM')),
       form:button('files-download', 'Download', 'CHECK'),
       <button type='button' onclick='chooseUpload("upload")'>Upload…</button>
@@ -94,17 +94,11 @@ declare function panel:files(
     }</form>,
 
     (: the file chooser is opened by the Upload button and submits what it collects :)
-    <form method='post' action='workspace/upload' enctype='multipart/form-data' autocomplete='off'
-          onsubmit='uploading(this);'>
-      <input type='hidden' name='dir' value='{ $dir }'/>
-      <input type='file' name='files' id='upload' multiple='multiple' hidden=''
-             onchange='this.form.requestSubmit();'/>
-    </form>,
+    form:upload('workspace/upload', 'upload', true(),
+      <input type='hidden' name='dir' value='{ $dir }'/>),
 
     (: the New Dir button asks for a name and submits it :)
-    <form method='post' action='workspace/dir-create' autocomplete='off' id='dir-create'>
-      <input type='hidden' name='dir' value='{ $dir }'/>
-      <input type='hidden' name='name' id='dir-name'/>
-    </form>
+    form:prompt('dir-name', 'name', 'workspace/dir-create',
+      <input type='hidden' name='dir' value='{ $dir }'/>)
   )
 };

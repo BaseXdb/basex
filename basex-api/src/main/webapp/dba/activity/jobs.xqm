@@ -53,13 +53,14 @@ function dba:action(
 };
 
 (:~
- : Starts a job for the query of the dialog. The scheduling options are only supplied if they
- : were filled in: an empty string is no valid start time, interval or cron expression.
+ : Starts a job for the query of the dialog.
  : @param  $args  request parameters
  :)
 declare %private function dba:create(
   $args  as map(*)
 ) as empty-sequence() {
+  (: the scheduling options are only supplied if they were filled in: an empty string is no
+     valid start time, interval or cron expression :)
   let $service := $args?service = 'true'
   let $options := map:merge((
     { 'base-uri': dba:base-uri() },
@@ -81,11 +82,12 @@ declare %private function dba:create(
 
 (:~
  : Returns the base URI of a job that is started here: relative paths resolve against the file
- : directory, as they do in the editor. A service keeps the URI on disk, where the native path
- : that config:files-dir returns would not be portable.
+ : directory, as they do in the editor.
  : @return base URI
  :)
 declare %private function dba:base-uri() as xs:anyURI {
+  (: a service keeps the URI on disk, where the native path that config:files-dir returns
+     would not be portable :)
   file:path-to-uri(config:files-dir(()))
 };
 
@@ -135,10 +137,8 @@ function dba:job-result(
     try {
       dba:result($id, true(), job:result($id))
     } catch * {
-      dba:result($id, false(),
-        'Stopped at ' || $err:module || ', ' || $err:line-number || '/' ||
-          $err:column-number || ':' || char('\n') || $err:description
-      )
+      dba:result($id, false(), utils:error-message($err:module, $err:line-number,
+        $err:column-number, $err:description))
     }
   }
 };
@@ -155,10 +155,7 @@ declare %private function dba:result(
   $ok      as xs:boolean,
   $result  as item()*
 ) as item()+ {
-  let $name := $id || (if ($ok) then '.txt' else '.log')
-  return web:response-header(
-    { 'media-type': 'application/octet-stream' },
-    utils:disposition($name)
-  ),
-  $result
+  (: whatever a query returned: it is served as bytes, not as what its name suggests :)
+  utils:attachment($id || (if ($ok) then '.txt' else '.log'), $result,
+    'application/octet-stream')
 };

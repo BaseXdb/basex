@@ -32,8 +32,6 @@ declare variable $dba:COLUMNS := (
  : @param  $input  search input
  : @param  $name   name (date) of log file
  : @param  $sort   table sort key
- : @param  $error  error string
- : @param  $info   info string
  : @param  $page   current page
  : @param  $time   timestamp to highlight
  : @return page
@@ -44,8 +42,6 @@ declare
   %rest:query-param('input', '{$input}')
   %rest:query-param('name',  '{$name}')
   %rest:query-param('sort',  '{$sort}', '')
-  %rest:query-param('error', '{$error}')
-  %rest:query-param('info',  '{$info}')
   %rest:query-param('page',  '{$page}', '1')
   %rest:query-param('time',  '{$time}')
   %output:method('html')
@@ -53,16 +49,13 @@ function dba:logs(
   $input  as xs:string?,
   $name   as xs:string?,
   $sort   as xs:string,
-  $error  as xs:string?,
-  $info   as xs:string?,
   $page   as xs:string,
   $time   as xs:string?
 ) as element(html) {
   let $files := admin:logs()
   let $date := $name otherwise string(head($files))
   return (
-    <div class='panel'>
-      <div class='pane'>
+    html:panel(
       <form method='post' id='dates' autocomplete='off'>
         <input type='hidden' name='date' id='date' value='{ $date }'/>
         <input type='hidden' name='sort' id='sort' value='{ $sort }'/>
@@ -83,17 +76,10 @@ function dba:logs(
           let $entries :=
             for $entry in $files
             return {
-              'name': fn() {
-                (: the reference is a deep link naming the file; following it in place asks
-                   for its entries over the connection the view already opened :)
-                html:link($entry, $dba:CAT, ({ 'sort': $sort }, { 'name': $entry })) update {
-                  insert node (
-                    attribute class { 'selected' }[$date = $entry],
-                    attribute data-select { $entry },
-                    attribute onclick { 'selectLog(this.dataset.select); return false;' }
-                  ) into .
-                }
-              },
+              (: the reference is a deep link naming the file; following it in place asks for
+                 its entries over the connection the view already opened :)
+              'name': html:select($entry, $dba:CAT, { 'sort': $sort, 'name': $entry },
+                $date = $entry, 'name', 'selectLog'),
               'size': $entry/@size
             }
           (: the head is pinned, so the actions stay in reach while the files scroll.
@@ -101,17 +87,16 @@ function dba:logs(
           return table:create($headers, $entries, $buttons, {},
             { 'sticky': <h2>Logs</h2>, 'all': true() })
         }</div>
-      </form>
-      </div>
-    </div>,
-    <div class='panel stack-first'>{
+      </form>,
+      { 'divider': true(), 'label': 'Logs' }
+    ),
+    html:panel(
       if ($date) {
-        <div class='pane'>{
         <div class='sticky logbar'>{
           <h3>{ $date }</h3>,
           <input type='hidden' name='name' value='{ $date }'/>,
           <input type='text' id='input' name='input' value='{ $input }' autocomplete='off'
-                 title='Enter regular expression' autofocus='' onkeyup='logEntries(event.key);'/>,
+                 title='Enter regular expression' autofocus='' onkeyup='filterLogs(event.key);'/>,
           <label title='Reload the entries every second'>{
             <input type='checkbox' id='live' data-live='logs' onchange='liveChanged()'/>, ' Live'
           }</label>,
@@ -122,11 +107,13 @@ function dba:logs(
           }</span>
         }</div>,
         <div id='output'/>
-        }</div>
-      }
-    }</div>
+      },
+      (: the panel keeps its track even without a log file to show: it is the whole page
+         beside the list :)
+      { 'divider': true(), 'class': 'stack-first', 'hidden': false(), 'label': $date }
+    )
   ) => html:wrap({
-    'header': $dba:CAT, 'info': $info, 'error': $error, 'columns': ('200px', '1fr'),
+    'header': $dba:CAT, 'columns': ('200px', '1fr'),
     (: the panels fill the viewport and scroll on their own, so their heads can be pinned :)
     'rows': '1fr',
     'scripts': 'logs', 'init': 'initLogs();'[$date]
@@ -191,8 +178,7 @@ function dba:ws-error(
 
 (:~
  : Returns the searched columns of a log entry: an entry is shown if every term is found in one
- : of them, and what a term matched is marked in the column that holds it. A column that is
- : marked is produced when it is shown, as most entries are never rendered.
+ : of them, and what a term matched is marked in the column that holds it.
  : @param  $columns  searched columns of the entry
  : @param  $terms    search terms
  : @param  $joined   terms as one regular expression
@@ -203,6 +189,7 @@ declare %private function dba:searched(
   $terms    as xs:string*,
   $joined   as xs:string
 ) as map(*)? {
+  (: a column that is marked is produced when it is shown, as most entries are never rendered :)
   if (every $term in $terms satisfies (
     some $value in $columns?* satisfies matches($value, $term, 'i')
   )) {
@@ -304,7 +291,7 @@ declare function dba:entries(
       attribute class { 'num' }[$column?type = $table:NUMBER],
       <input type='text' class='filter' name='{ $name }' value='{ $filters($column?key) }'
              placeholder='{ $column?label }' autocomplete='off'
-             title='Filter: { $column?label }' onkeyup='logEntries(event.key);'/>
+             title='Filter: { $column?label }' onkeyup='filterLogs(event.key);'/>
     }
   }
   let $options := {

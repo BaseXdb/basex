@@ -63,8 +63,7 @@ declare %private variable $dba:FILE-NS := 'http://expath.org/ns/file';
 
 (:~
  : Reports an error that no endpoint has handled: the client is sent the error code and its
- : description, never the module and line of the code that raised it. The path is not evaluated;
- : it limits the handler to the DBA, as other RESTXQ applications report their own errors.
+ : description, never the module and line of the code that raised it.
  : @param  $path         path of the request that failed
  : @param  $code         error code
  : @param  $description  error description
@@ -81,6 +80,8 @@ function dba:error(
   $code         as xs:QName?,
   $description  as xs:string?
 ) as item()+ {
+  (: the path is not evaluated; it limits the handler to the DBA, as other RESTXQ applications
+     report their own errors :)
   let $local := $code ! local-name-from-QName(.)
   (: web:error already states the status, and its message needs no code :)
   let $stated := $local[matches(., '^status\d+$')] ! xs:integer(substring(., 7))
@@ -114,12 +115,12 @@ function dba:unknown(
   $path  as xs:string
 ) as element()+ {
   web:response-header((), (), { 'status': 404 }),
-  <div class='panel'>
-    <h2>Page not found:</h2>
+  html:panel((
+    <h2>Page not found:</h2>,
     <ul>
       <li>Page: dba/{ $path }</li>
       <li>Method: { request:method() }</li>
     </ul>
-  </div>
+  ), { 'divider': true(), 'pane': false() })
   => html:wrap()
 };

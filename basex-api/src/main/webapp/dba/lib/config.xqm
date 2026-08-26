@@ -20,8 +20,8 @@ declare variable $config:DBA-DIR := (
 (:~ Permission values. :)
 declare variable $config:PERMISSIONS := ('none', 'read', 'write', 'create', 'admin');
 
-(:~ Views, in the order in which the navigation offers them. A view is named by the path of its
-    page, which is also the label of its entry. :)
+(:~ Views, in the order in which the navigation offers them. :)
+(: a view is named by the path of its page, which is also the label of its entry :)
 declare variable $config:VIEWS := (
   'workspace', 'databases', 'stores', 'users', 'logs', 'activity', 'settings'
 );
@@ -109,14 +109,15 @@ declare function config:save(
 };
 
 (:~
- : Resolves the directory of the file panel. The client remembers it and supplies it with every
- : request; a relative step ('sub', '..') is appended to the path it sends.
+ : Resolves the directory of the file panel.
  : @param  $dir  directory supplied by the client (empty: use the default)
  : @return existing directory, in native notation
  :)
 declare function config:files-dir(
   $dir  as xs:string?
 ) as xs:string {
+  (: the client remembers the directory and supplies it with every request; a relative step
+     ('sub', '..') is appended to the path it sends :)
   let $path := file:path-to-native(file:resolve-path(($dir[.] otherwise $config:DBA-DIR) || '/'))
   (: ensure that the directory can be accessed :)
   return (void(file:list($path)), $path)

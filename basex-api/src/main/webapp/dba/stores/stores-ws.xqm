@@ -23,8 +23,8 @@ function dba:ws-message(
   let $sort := string($json?sort)
   let $page := xs:integer($json?page otherwise 1)
   return switch ($json?type) {
-    case 'stores'  return utils:ws-panel('stores', panels:stores($sort, $page, $name))
-    case 'entries' return utils:ws-panel('entries',
+    case 'stores'  return utils:ws-panel('stores-panel', panels:stores($sort, $page, $name))
+    case 'entries' return utils:ws-panel('entries-panel',
       panels:entries($name, $path, $sort, $page, head(panels:steps($json?selected))))
     case 'value'   return dba:ws-value($name, $path)
     default        return error((), 'Unknown message type: ' || $json?type)
@@ -41,12 +41,7 @@ declare %private function dba:ws-value(
   $path  as item()*
 ) as empty-sequence() {
   let $value := panels:value($name, $path)
-  return utils:ws-send({
-    'type'    : 'value',
-    'html'    : utils:html(panels:value-panel($value)),
-    'text'    : $value?text,
-    'editable': $value?editable = true()
-  })
+  return utils:ws-editor('value-panel', panels:value-panel($value), $value)
 };
 
 (:~

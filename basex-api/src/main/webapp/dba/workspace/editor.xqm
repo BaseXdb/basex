@@ -5,7 +5,6 @@
  :)
 module namespace dba = 'dba/editor';
 
-import module namespace config = 'dba/lib/config' at '../lib/config.xqm';
 import module namespace utils = 'dba/lib/utils' at '../lib/utils.xqm';
 
 (:~
@@ -23,7 +22,7 @@ function dba:editor-open(
   $name  as xs:string,
   $dir   as xs:string?
 ) as xs:string {
-  file:read-text(utils:safe-path(config:files-dir($dir), $name))
+  file:read-text(utils:file-path($dir, $name))
 };
 
 (:~
@@ -44,7 +43,7 @@ function dba:editor-save(
   $dir      as xs:string?,
   $content  as xs:string?
 ) as xs:string {
-  let $path := utils:safe-path(config:files-dir($dir), $name)
+  let $path := utils:file-path($dir, $name)
   let $string := string($content)
   return (
     (: validate file :)

@@ -29,12 +29,13 @@ function dba:ws-message(
 };
 
 (:~
- : Gives up the outcome of a query if the connection is closed. The query keeps running: its
- : result is cached, and the activity view is where it is then watched and read.
+ : Gives up the outcome of a query if the connection is closed.
  :)
 declare
   %ws:close('/dba/workspace')
 function dba:ws-close() as empty-sequence() {
+  (: the query keeps running: its result is cached, and the activity view is where it is then
+     watched and read :)
   utils:ws-stop(false())
 };
 
@@ -59,7 +60,7 @@ declare %private function dba:ws-files(
   $sort  as xs:string?,
   $dir   as xs:string?
 ) as empty-sequence() {
-  utils:ws-panel('files', panel:files($sort otherwise 'name', $dir))
+  utils:ws-panel('files-panel', panel:files($sort[.] otherwise 'name', $dir))
 };
 
 (:~

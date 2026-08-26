@@ -6,8 +6,10 @@ const WORKSPACE_WS = "/workspace";
 /** Id of the job of the query that is currently evaluated in the editor panel. */
 let _job;
 
-/** File names that are treated as XQuery, matching IO.XQSUFFIXES. */
-const XQUERY_SUFFIXES = /\.(xq|xqm|xqy|xql|xqu|xquery|xpath)$/i;
+/** File names that are treated as XQuery. The suffixes are the server's, which knows them
+    from IO.XQSUFFIXES; a list of its own here would go stale the day one is added. */
+const XQUERY_SUFFIXES =
+  new RegExp(document.documentElement.dataset.xquery ?? "^$", "i");
 
 /** localStorage key prefix for unsaved editor drafts; see draftKey. */
 const DRAFT = "dba-draft:";
@@ -97,11 +99,8 @@ function tabModified(t) {
  * and unsaved work is already kept as a draft.
  */
 function storeTabs() {
-  try {
-    localStorage.setItem(TABS_KEY,
-      JSON.stringify(_tabs.map(t => ({ dir: t.dir, name: t.name, id: t.id }))));
-    localStorage.setItem(TAB_KEY, _tab);
-  } catch { /* storage disabled or full: the tabs are restored best-effort */ }
+  store(TABS_KEY, JSON.stringify(_tabs.map(t => ({ dir: t.dir, name: t.name, id: t.id }))));
+  store(TAB_KEY, _tab);
 }
 
 /**
@@ -179,7 +178,7 @@ function applyTab() {
   const t = tab();
   // an unnamed document that was never shown holds its unsaved draft, if it kept one; a file
   // that was never shown is read from disk, and its draft is applied there
-  const draft = t.state === undefined && !t.name ? localStorage.getItem(draftKey(t)) : null;
+  const draft = t.state === undefined && !t.name ? stored(draftKey(t)) : null;
   _writing = true;
   try {
     if(_editor.view && t.state && typeof t.state !== "string") {
@@ -241,7 +240,7 @@ async function closeTab(index) {
       // a failed save must not take the document with it
       if(!await saveFile()) return;
     } else {
-      localStorage.removeItem(draftKey(t));
+      store(draftKey(t), null);
     }
     index = _tabs.indexOf(t);
   }
@@ -283,7 +282,7 @@ function setJob(id) {
  * @returns {string} directory, empty before the first panel was rendered
  */
 function filesDir() {
-  return localStorage.getItem(DIR_KEY) ?? "";
+  return stored(DIR_KEY, "");
 }
 
 /**
@@ -304,31 +303,13 @@ function enterDir(name) {
 
 /**
  * Requests the file panel, keeping the sort order it shows. The answer is pushed back over the
- * connection that the view already opened for its queries; see showFiles.
+ * connection that the view already opened for its queries; showMessage fills the panel.
  * @param {string} sort sort key; if omitted, the shown order is kept
  * @param {string} dir directory; if omitted, the shown directory is kept
  */
 function refreshFiles(sort, dir) {
   if(!document.getElementById("files-panel")) return;
-  sendMessage(WORKSPACE_WS, {
-    type: "files",
-    sort: sort ?? document.querySelector("#files-panel [data-sort]")?.dataset.sort ?? "name",
-    dir: dir ?? filesDir()
-  });
-}
-
-/**
- * Shows the file panel that was pushed by the server.
- * @param {string} html panel contents
- */
-function showFiles(html) {
-  const panel = document.getElementById("files-panel");
-  panel.innerHTML = html;
-  // the chooser shows the directory the server resolved: that is what is remembered
-  localStorage.setItem(DIR_KEY, document.getElementById("dir").value);
-  // the panel arrives after the shared setup ran, so its buttons are checked here
-  buttons();
-  markTruncated(panel);
+  requestPanel(WORKSPACE_WS, "files-panel", { type: "files", dir: dir ?? filesDir() }, sort);
 }
 
 /**
@@ -353,19 +334,6 @@ async function runQuery() {
     file: tab() ? tab().name : ""
   })) return;
   awaitResult(run);
-}
-
-/**
- * Stops the query that is currently evaluated in the editor panel. The server confirms the
- * request with a 'stopped' message; see showMessage.
- */
-async function stopQuery() {
-  if(_editor) _editor.focus();
-
-  // drop the number of the run: the result of the stopped query will be ignored
-  endRequest();
-  await sendMessage(WORKSPACE_WS, { type: "stop" });
-  setJob();
 }
 
 /**
@@ -416,17 +384,14 @@ function showInfoPanel() {
  * @returns {boolean} state of the switch
  */
 function queryInfoOn() {
-  return localStorage.getItem(QUERY_INFO_KEY) === "yes";
+  return stored(QUERY_INFO_KEY) === "yes";
 }
 
 /**
  * Persists the 'Query Info' preference and opens or closes the information panel.
  */
 function queryInfoChanged() {
-  try {
-    localStorage.setItem(QUERY_INFO_KEY,
-      document.getElementById("query-info").checked ? "yes" : "no");
-  } catch { /* storage disabled or full: the switch still applies to this page */ }
+  store(QUERY_INFO_KEY, document.getElementById("query-info").checked ? "yes" : "no");
   showInfoPanel();
 }
 
@@ -502,7 +467,7 @@ async function loadTab(t) {
     showTab();
     setText("", "");
     // apply a newer unsaved draft on top of the saved file (undo reverts to disk)
-    const draft = localStorage.getItem(draftKey(t));
+    const draft = stored(draftKey(t));
     if(draft !== null && draft !== t.saved) {
       setEditorValue(draft);
       // the document differs from the file: mark it
@@ -565,8 +530,8 @@ async function saveFile(saveAs) {
   try {
     await request(`editor-save?${new URLSearchParams({ name: name, dir: dir })}`, text);
     Object.assign(t, { dir: dir, name: name, saved: text, edited: false });
-    localStorage.removeItem(key);
-    localStorage.removeItem(draftKey(t));
+    store(key, null);
+    store(draftKey(t), null);
     showTab();
     setText("File was saved.", "info");
     storeTabs();
@@ -608,8 +573,7 @@ function saveDraft() {
   const content = editorValue();
   const key = draftKey(t);
   try {
-    if(content === t.saved) localStorage.removeItem(key);
-    else localStorage.setItem(key, content);
+    store(key, content === t.saved ? null : content);
   } catch { /* storage disabled or full: drafts are best-effort */ }
 }
 
@@ -617,11 +581,8 @@ function saveDraft() {
  * Asks for a name and creates a directory.
  * @returns {Promise} promise
  */
-async function createDir() {
-  const name = await promptDialog("Name of the new directory:");
-  if(!name) return;
-  document.getElementById("dir-name").value = name;
-  document.getElementById("dir-create").submit();
+function createDir() {
+  return promptSubmit("dir-name", "Name of the new directory:", "");
 }
 
 /**
@@ -634,6 +595,14 @@ function checkButtons() {
   setDisabled("saveas", !editorValue());
 }
 
+/** The queries of the view run on the endpoint that also serves its file panel; the job of a
+    query that is given up is gone with it. */
+_query_path = WORKSPACE_WS;
+_query_stopped = () => {
+  _editor?.focus();
+  setJob();
+};
+
 /** The editor of the Workspace view runs queries, tracks edits and keeps drafts. */
 _editor_run = runQuery;
 _editor_changed = () => {
@@ -645,13 +614,18 @@ _editor_changed = () => {
   saveDraft();
 };
 
-/** The endpoint of the view reports the job of a query, its outcome, and the file panel. */
+/** The chooser of a file panel that has just arrived shows the directory the server resolved:
+    that is the one that is remembered. */
+_panel_filled["files-panel"] = () => {
+  store(DIR_KEY, document.getElementById("dir").value);
+};
+
+/** The file panel is filled by showMessage; what is left is the job of a query and its
+    outcome. */
 _handlers[WORKSPACE_WS] = json => {
   if(json.type === "job") {
     setJob(json.id);
-  } else if(json.type === "files") {
-    showFiles(json.html);
-  } else {
+  } else if(json.type !== "panel") {
     // the query has ended: the job is gone, and there is nothing left to jump to
     setJob();
     if(json.type === "stopped") setText("Query was stopped.", "warning");
@@ -676,7 +650,7 @@ function initWorkspace() {
 
   const params = new URLSearchParams(window.location.search);
   const dir = params.get("dir"), name = params.get("name");
-  if(dir) localStorage.setItem(DIR_KEY, dir);
+  if(dir) store(DIR_KEY, dir);
   hideParams("dir", "name");
 
   refreshFiles();
@@ -685,7 +659,7 @@ function initWorkspace() {
   // are selected. The file panel and the editor stay independent: a document is read from its
   // own directory, whichever one the panel is asked to show
   try {
-    _tabs = JSON.parse(localStorage.getItem(TABS_KEY) ?? "[]").map(t =>
+    _tabs = JSON.parse(stored(TABS_KEY, "[]")).map(t =>
       Object.assign(newTab(t.dir, t.name), { id: t.id ?? 0 }));
   } catch {
     _tabs = [];
@@ -693,7 +667,7 @@ function initWorkspace() {
   // numbers are handed out after the restored ones, so no draft of theirs is overwritten
   _nextId = Math.max(0, ..._tabs.map(t => t.id)) + 1;
   if(!_tabs.length) _tabs.push(newTab(filesDir(), ""));
-  _tab = Math.min(Math.max(0, Number(localStorage.getItem(TAB_KEY)) || 0), _tabs.length - 1);
+  _tab = Math.min(Math.max(0, Number(stored(TAB_KEY)) || 0), _tabs.length - 1);
   renderTabs();
 
   if(name) openFile(name, dir ?? filesDir());

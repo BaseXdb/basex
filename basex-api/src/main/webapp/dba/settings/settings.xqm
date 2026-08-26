@@ -16,20 +16,13 @@ declare variable $dba:CAT := 'settings';
 
 (:~
  : Settings.
- : @param  $info   info string
- : @param  $error  error string
  : @return page
  :)
 declare
   %rest:GET
   %rest:path('/dba/settings')
-  %rest:query-param('info',  '{$info}')
-  %rest:query-param('error', '{$error}')
   %output:method('html')
-function dba:settings(
-  $info   as xs:string?,
-  $error  as xs:string?
-) as element(html) {
+function dba:settings() as element(html) {
   let $system := table:properties(db:system())
   (: boundary between global and local options (keyed by name, not position) :)
   let $local := $system/tr[th/h3 = 'LOCALOPTIONS']
@@ -61,55 +54,44 @@ function dba:settings(
       </tr>
     )
   }
+  let $panel := fn($contents, $options) {
+    html:panel($contents, map:put($options, 'divider', true()))
+  }
   return (
-    <div class='panel'>
-      <div class='pane'>
-        <form method='post' autocomplete='off'>
-          <h2>Settings » { form:button('settings/save', 'Save') }</h2>
-          <h3>Queries</h3>
-          {
-            $number($config:TIMEOUT, 'Timeout, in seconds (0 = disabled)', ()),
-            $number($config:MEMORY, 'Memory limit, in MB (0 = disabled)', ()),
-            $number($config:MAXCHARS, 'Maximum output size', ()),
-            $option($config:PERMISSION, $config:PERMISSIONS, 'Permission')
-          }
-          <h3>Tables</h3>
-          { $number($config:MAXROWS, 'Displayed table rows', ()) }
-          <h3>Live Views</h3>
-          { $number($config:INTERVAL, 'Delay between requests, in seconds', (1, 10)) }
-        </form>
-      </div>
-    </div>,
-    <div class='panel'>
-      <div class='pane'>
-        <form method='post' autocomplete='off'>
-          <h2>Global Options » { form:button('settings/gc', 'GC') }</h2>
-          { table:pairs($local/preceding-sibling::tr[not(th)]) }
-        </form>
-      </div>
-    </div>,
-    <div class='panel'>
-      <div class='pane'>
-        <h2>Local Options</h2>
-        { table:pairs($local/following-sibling::tr) }
-      </div>
-    </div>,
-    <div class='panel collapsed'>
-      <div class='pane'>
-        <h2>Environment Variables</h2>
-        {
-          $map-table(map:build(available-environment-variables(), value := environment-variable#1))
-        }
-      </div>
-    </div>,
-    <div class='panel collapsed'>
-      <div class='pane'>
-        <h2>System Properties</h2>
-        { $map-table(proc:property-map()) }
-      </div>
-    </div>
+    $panel(
+      <form method='post' autocomplete='off'>{
+        html:heading('Settings', form:button('settings/save', 'Save')),
+        <h3>Queries</h3>,
+        $number($config:TIMEOUT, 'Timeout, in seconds (0 = disabled)', ()),
+        $number($config:MEMORY, 'Memory limit, in MB (0 = disabled)', ()),
+        $number($config:MAXCHARS, 'Maximum output size', ()),
+        $option($config:PERMISSION, $config:PERMISSIONS, 'Permission'),
+        <h3>Tables</h3>,
+        $number($config:MAXROWS, 'Displayed table rows', ()),
+        <h3>Live Views</h3>,
+        $number($config:INTERVAL, 'Delay between requests, in seconds', (1, 10))
+      }</form>,
+      { 'label': 'Settings' }),
+    $panel(
+      <form method='post' autocomplete='off'>{
+        html:heading('Global Options', form:button('settings/gc', 'GC')),
+        table:pairs($local/preceding-sibling::tr[not(th)])
+      }</form>,
+      { 'label': 'Global Options' }),
+    $panel((
+      <h2>Local Options</h2>,
+      table:pairs($local/following-sibling::tr)
+    ), { 'label': 'Local Options' }),
+    $panel((
+      <h2>Environment Variables</h2>,
+      $map-table(map:build(available-environment-variables(), value := environment-variable#1))
+    ), { 'label': 'Environment Variables', 'collapsed': true() }),
+    $panel((
+      <h2>System Properties</h2>,
+      $map-table(proc:property-map())
+    ), { 'label': 'System Properties', 'collapsed': true() })
   ) => html:wrap({
-    'header': $dba:CAT, 'info': $info, 'error': $error, 'rows': '1fr'
+    'header': $dba:CAT, 'rows': '1fr'
   })
 };
 

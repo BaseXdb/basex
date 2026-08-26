@@ -44,16 +44,35 @@ function chromeBelowMain() {
  * @returns {boolean} whether output should be indented
  */
 function indentOn() {
-  return localStorage.getItem(INDENT_KEY) === "yes";
+  return stored(INDENT_KEY) === "yes";
 }
 
 /**
  * Persists the 'Indent' preference and, in the resource view, re-renders with it.
  */
 function indentChanged() {
-  localStorage.setItem(INDENT_KEY, document.getElementById("indent").checked ? "yes" : "no");
+  store(INDENT_KEY, document.getElementById("indent").checked ? "yes" : "no");
   // the resource view re-renders immediately; the editor applies it on the next run
   _indent_changed?.();
+}
+
+/**
+ * Restores the stored 'Indent' preference in the checkbox that shows it: the checkbox belongs
+ * to a panel, and is replaced whenever the panel is.
+ */
+function restoreIndent() {
+  const indent = document.getElementById("indent");
+  if(indent) indent.checked = indentOn();
+}
+
+/**
+ * Enables or disables editing: the editor of record, and the button that stores what it holds.
+ * @param {string} id id of the button
+ * @param {boolean} enabled edit state
+ */
+function setEditable(id, enabled) {
+  editorReadOnly(!enabled);
+  setDisabled(id, !enabled);
 }
 
 /**
@@ -139,8 +158,7 @@ function loadCodeMirror(language, edit, resize) {
   }
 
   // the stored 'Indent' preference belongs to the editors, and is restored with them
-  const indent = document.getElementById("indent");
-  if(indent) indent.checked = indentOn();
+  restoreIndent();
 
   const outputArea = document.getElementById("output");
   if(outputArea != null) {

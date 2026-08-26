@@ -10,12 +10,6 @@ let _db = "";
 let _resource = "";
 let _dir = "";
 
-/** Delay before what was typed into the resource filter is requested, in milliseconds. */
-const FILTER_DELAY = 300;
-
-/** Timer of the pending resource filter; a key is not a request of its own. */
-let _dbFilter;
-
 /** Whether the shown document can be edited. */
 let _editable = false;
 
@@ -77,14 +71,6 @@ function enterDbDir(dir) {
 }
 
 /**
- * Adopts the selection of the address bar, after a step in the browser history.
- */
-function popSelection() {
-  adoptSelection();
-  showDatabase();
-}
-
-/**
  * Adopts the selection of the address bar. A link that names a resource alone opens the level
  * that holds it, as the server does when it renders the page.
  */
@@ -115,8 +101,8 @@ function showDatabase() {
  */
 function refreshIndex(sort, page) {
   requestPanel(DB_WS, "index-panel", { type: "index", name: _db,
-    index: document.getElementById("index-select")?.value ?? "element-name",
-    prefix: document.getElementById("index-prefix")?.value.trim() ?? "" }, sort, page);
+    index: fieldValue("index-select", "element-name"),
+    prefix: fieldValue("index-prefix") }, sort, page);
 }
 
 /**
@@ -125,9 +111,7 @@ function refreshIndex(sort, page) {
  * @param {string} key typed key
  */
 function filterIndex(key) {
-  clearTimeout(_dbFilter);
-  if(key === "Enter") refreshIndex();
-  else _dbFilter = setTimeout(() => refreshIndex(), FILTER_DELAY);
+  filterKey(key, "index-prefix", refreshIndex);
 }
 
 /**
@@ -155,7 +139,7 @@ function refreshDatabase(sort, page) {
  * @returns {string} filter
  */
 function dbFilter() {
-  return document.getElementById("resource-filter")?.value.trim() ?? "";
+  return fieldValue("resource-filter");
 }
 
 /**
@@ -164,33 +148,7 @@ function dbFilter() {
  * @param {string} key typed key
  */
 function filterResources(key) {
-  clearTimeout(_dbFilter);
-  if(key === "Enter") refreshDatabase();
-  else _dbFilter = setTimeout(() => refreshDatabase(), FILTER_DELAY);
-}
-
-/**
- * Shows a panel whose own controls are part of the replaced markup: the one that was used keeps
- * the focus, and a field keeps what was typed into it, together with the caret.
- * @param {string} id id of the panel
- * @param {string} html panel contents
- * @param {...string} controls ids of the controls of the panel
- */
-function keepFocus(id, html, ...controls) {
-  const active = document.activeElement;
-  const focused = controls.includes(active?.id) ? active : null;
-  fillPanel(id, html);
-  if(focused) {
-    const control = document.getElementById(focused.id);
-    if(control) {
-      control.value = focused.value;
-      control.focus();
-      // a text field is resumed where the caret was; a chooser has none
-      if(focused.selectionStart !== null && focused.selectionStart !== undefined) {
-        control.setSelectionRange(focused.selectionStart, focused.selectionEnd);
-      }
-    }
-  }
+  filterKey(key, "resource-filter", refreshDatabase);
 }
 
 /**
@@ -208,10 +166,9 @@ function refreshResource() {
 function showResource(json) {
   fillPanel("resource-panel", json.html);
   // every selection asks for the resource panel, so this is where the level is known
-  foldPanels();
+  foldResourcePanels();
   // the 'Indent' preference belongs to the editor, and outlives the panel that shows it
-  const indent = document.getElementById("indent");
-  if(indent) indent.checked = indentOn();
+  restoreIndent();
   initDocument(json.editable, json.text);
 }
 
@@ -220,18 +177,13 @@ function showResource(json) {
  * therefore not remembered: while a document is open, what it was chosen from steps back to a
  * strip; without one, the lists are what there is to see.
  */
-function foldPanels() {
+function foldResourcePanels() {
   // the panel decides, not the selection: a resource that does not exist opens nothing
-  const shown = !document.querySelector("[data-label=Resource]").classList.contains("hidden");
-  for(const [ label, collapse ] of [
+  const shown = panelShown("Resource");
+  foldPanels([
     [ "Databases", shown ], [ "Database", false ], [ "Resource", false ],
     [ "Backups", shown ], [ "Information", true ]
-  ]) {
-    showPanel(document.querySelector(`.content > .panel[data-label='${label}']`), collapse);
-  }
-  applyColumns();
-  // the panels that stay open have grown: what was clipped at the old widths is measured again
-  window.dispatchEvent(new Event("resize"));
+  ]);
 }
 
 /**
@@ -252,7 +204,7 @@ function initDocument(editable, text) {
     // XML resource with indentation enabled: request the indented document
     queryResource(true, true);
   } else {
-    editResource(editable);
+    setEditable("save-resource", editable);
   }
 }
 
@@ -263,7 +215,7 @@ function initDocument(editable, text) {
  *   the action that led here, which the first rendering of the document must not discard
  */
 function queryResource(enforce, keep) {
-  const input = document.getElementById("input")?.value.trim() ?? "";
+  const input = fieldValue("input");
   const indent = indentOn();
   // re-run whenever the query or the indent preference changes
   if(!enforce && _request?.input === input && _request?.indent === indent) return;
@@ -278,9 +230,9 @@ function queryResource(enforce, keep) {
     return;
   }
   // block edits until the result has been received; a query result is read-only
-  editResource(false);
+  setEditable("save-resource", false);
   if(input && _editable) {
-    showNote("Read-only: query result. Clear the query to edit the document again.");
+    showResourceNote("Read-only: query result. Clear the query to edit the document again.");
   }
 
   const run = startRequest();
@@ -293,15 +245,6 @@ function queryResource(enforce, keep) {
     indent: indent
   });
   awaitResult(run);
-}
-
-/**
- * Stops the query that is currently evaluated on the resource.
- */
-async function stopQuery() {
-  // drop the number of the run: the result of the stopped query will be ignored
-  endRequest();
-  await sendMessage(DB_WS, { type: "stop" });
 }
 
 /**
@@ -324,8 +267,8 @@ function showResourceResult(text) {
  */
 function showDocument(text) {
   _editor.setValue(text);
-  editResource(_editable);
-  showNote(_editable && indentOn() ?
+  setEditable("save-resource", _editable);
+  showResourceNote(_editable && indentOn() ?
     "Whitespace may be stripped when the document is saved." : undefined);
 }
 
@@ -333,19 +276,8 @@ function showDocument(text) {
  * Shows a note below the resource toolbar.
  * @param {string} message message; if omitted, the server-rendered reason is restored
  */
-function showNote(message) {
-  const note = document.getElementById("note");
-  if(note) [ note.textContent, note.className ] =
-    message ? [ message, "note warn" ] : _note;
-}
-
-/**
- * Enables or disables editing of the shown document.
- * @param {boolean} enabled edit state
- */
-function editResource(enabled) {
-  editorReadOnly(!enabled);
-  setDisabled("save-resource", !enabled);
+function showResourceNote(message) {
+  showNote("note", message, _note);
 }
 
 /**
@@ -362,16 +294,11 @@ function copyResource() {
 async function saveResource() {
   const content = editorValue();
   const indent = indentOn();
-  let url = `db-save?name=${encodeURIComponent(_db)}&resource=${encodeURIComponent(_resource)}`;
-  if(indent) url += "&indent=true";
-  try {
-    await request(url, content);
+  const params = { name: _db, resource: _resource };
+  if(indent) params.indent = true;
+  if(await saveEditor("db-save", params, "Resource was saved.", refreshDatabase)) {
     // the raw document has changed: request it again
     _saved = indent ? undefined : content;
-    setText("Resource was saved.", "info");
-    refreshDatabase();
-  } catch(response) {
-    showError(response);
   }
 }
 
@@ -380,7 +307,7 @@ async function saveResource() {
  * @returns {Promise} promise
  */
 function renameDatabase() {
-  return promptDatabase("rename", "New name of the database:");
+  return promptSubmit("database-newname", "New name of the database:", _db, "databases/rename");
 }
 
 /**
@@ -388,47 +315,15 @@ function renameDatabase() {
  * @returns {Promise} promise
  */
 function copyDatabase() {
-  return promptDatabase("copy", "Name of the copy:");
-}
-
-/**
- * Asks for a database name and submits it to the requested action.
- * @param {string} action name of the action
- * @param {string} label text of the question
- * @returns {Promise} promise
- */
-async function promptDatabase(action, label) {
-  const name = await promptDialog(label, _db);
-  if(!name) return;
-  document.getElementById("database-form").action = `databases/${action}`;
-  submitPrompt("database-newname", name);
+  return promptSubmit("database-newname", "Name of the copy:", _db, "databases/copy");
 }
 
 /**
  * Asks for a new path for the selected resource and renames it.
  * @returns {Promise} promise
  */
-async function renameResource() {
-  const target = await promptDialog("New path of the resource:", _resource);
-  if(target) submitPrompt("rename-target", target);
-}
-
-/**
- * Fills a hidden field with the value that was asked for and submits the form it belongs to.
- * @param {string} id id of the field
- * @param {string} value value
- */
-function submitPrompt(id, value) {
-  const input = document.getElementById(id);
-  input.value = value;
-  input.form.submit();
-}
-
-/**
- * Opens the file chooser that replaces the selected resource.
- */
-function replaceResource() {
-  document.getElementById("replace-file").click();
+function renameResource() {
+  return promptSubmit("rename-target", "New path of the resource:", _resource);
 }
 
 /**
@@ -442,6 +337,9 @@ function deriveTarget(input) {
   document.getElementById("add-target").value = _dir + (segments.pop() || "");
 }
 
+/** The queries of the view run on the endpoint that also serves its panels. */
+_query_path = DB_WS;
+
 /** Ctrl-Enter and the 'Indent' preference re-render what the editor shows. */
 _editor_run = () => queryResource(true);
 _indent_changed = () => queryResource(true);
@@ -450,15 +348,14 @@ _indent_changed = () => queryResource(true);
 followPanelLinks({ "databases-panel": refreshDatabases, "database-panel": refreshDatabase,
   "index-panel": refreshIndex });
 
-/** The endpoint of the view serves the three panels and the queries on a resource. */
+/** The controls of the list panels keep the focus and the caret while their panel is replaced. */
+_panel_focus["database-panel"] = [ "#resource-filter" ];
+_panel_focus["index-panel"] = [ "#index-select", "#index-prefix" ];
+
+/** The panels of the view are filled by showMessage; what is left is the shown document. */
 _handlers[DB_WS] = json => {
   switch(json.type) {
-    case "databases": fillPanel("databases-panel", json.html); break;
-    case "database": keepFocus("database-panel", json.html, "resource-filter"); break;
-    case "index": keepFocus("index-panel", json.html, "index-select", "index-prefix"); break;
-    case "backups": fillPanel("backups-panel", json.html); break;
-    case "information": fillPanel("information-panel", json.html); break;
-    case "resource": showResource(json); break;
+    case "editor": showResource(json); break;
     case "result": showResourceResult(json.result); break;
     case "stopped": setText("Query was stopped.", "warning"); break;
   }
@@ -473,8 +370,6 @@ function initDatabases(editable) {
   // the panels are folded away, not dragged: one mechanism is enough to divide the page
   loadCodeMirror("xml", true, "fill");
 
-  adoptSelection();
+  initSelection(adoptSelection, showDatabase);
   initDocument(editable, undefined);
-
-  window.addEventListener("popstate", popSelection);
 }

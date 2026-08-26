@@ -21,14 +21,14 @@ function dba:ws-message(
   let $sort := string($json?sort)
   let $page := xs:integer($json?page otherwise 1)
   return switch ($json?type) {
-    case 'databases'   return utils:ws-panel('databases',
+    case 'databases'   return utils:ws-panel('databases-panel',
       panels:databases($sort, $page, $json?name))
-    case 'database'    return utils:ws-panel('database',
+    case 'database'    return utils:ws-panel('database-panel',
       panels:database($json?name, $sort, $page, $json?resource, string($json?dir),
         string($json?filter)))
-    case 'backups'     return utils:ws-panel('backups', panels:backups($json?name))
-    case 'information' return utils:ws-panel('information', panels:information($json?name))
-    case 'index'       return utils:ws-panel('index',
+    case 'backups'     return utils:ws-panel('backups-panel', panels:backups($json?name))
+    case 'information' return utils:ws-panel('information-panel', panels:information($json?name))
+    case 'index'       return utils:ws-panel('index-panel',
       panels:index($json?name, string($json?index), string($json?prefix), $sort, $page))
     case 'resource'    return dba:ws-resource($json?name, $json?resource)
     case 'query'       return dba:ws-query($json?name, $json?resource, $json?query,
@@ -69,17 +69,11 @@ declare %private function dba:ws-resource(
   $resource  as xs:string?
 ) as empty-sequence() {
   let $document := panels:document($name, $resource)
-  return utils:ws-send({
-    'type'    : 'resource',
-    'html'    : utils:html(panels:resource($name, $resource, $document)),
-    'text'    : $document?text,
-    'editable': $document?editable = true()
-  })
+  return utils:ws-editor('resource-panel', panels:resource($name, $resource, $document), $document)
 };
 
 (:~
- : Evaluates a query on a resource and pushes its outcome to the client. The resource is the
- : context of the query; requesting it unchanged is the query '.'.
+ : Evaluates a query on a resource and pushes its outcome to the client.
  : @param  $name      database
  : @param  $resource  resource
  : @param  $query     query string
@@ -93,21 +87,15 @@ declare %private function dba:ws-query(
   $run       as xs:integer,
   $indent    as xs:boolean
 ) as empty-sequence() {
+  (: the resource is the context of the query; requesting it unchanged is the query '.' :)
   (: a query on a large resource takes time: stop one that is superseded by this one :)
   utils:ws-stop(),
   let $id := job:eval(fn(
-    $db        as xs:string,
-    $path      as xs:string,
-    $string    as xs:string
+    $db      as xs:string,
+    $path    as xs:string,
+    $string  as xs:string
   ) {
-    let $type := db:type($db, $path)
-    let $context := head(if ($type = 'xml') {
-      db:get($db, $path)
-    } else if ($type = 'binary') {
-      db:get-binary($db, $path)
-    } else {
-      db:get-value($db, $path)
-    })
+    let $context := head(panels:resource-value($db, $path))
     return xquery:eval($string, { '': $context }, { 'pass': true() })
   }, [ $name, $resource, $query ], utils:job-options($name || '/' || $resource, ()))
   return utils:ws-start($id, $run, utils:serialize-options($indent))

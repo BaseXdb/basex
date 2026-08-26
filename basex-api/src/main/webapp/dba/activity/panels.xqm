@@ -90,11 +90,12 @@ declare function panels:jobs(
 };
 
 (:~
- : Creates the dialog that starts a new job. It is not part of a panel: the panels are replaced
- : while the view refreshes, which would close the dialog while it is being filled in.
+ : Creates the dialog that starts a new job.
  : @return dialog
  :)
 declare function panels:job-dialog() as element(dialog) {
+  (: it is not part of a panel: the panels are replaced while the view refreshes, which would
+     close the dialog while it is being filled in :)
   form:dialog('job', 'New Job', 'jobs/create', false(), (
     (: no 'required': the editor hides the text area, and a hidden field that fails validation
        cannot be focused, which would block the submit without telling the user why :)
@@ -145,8 +146,8 @@ declare function panels:job-details(
     try {
       utils:serialize(job:result($job, { 'keep': true() }))
     } catch * {
-      'Stopped at ' || $err:module || ', ' || $err:line-number || '/' ||
-        $err:column-number || ':' || char('\n') || $err:description
+      utils:error-message($err:module, $err:line-number, $err:column-number,
+        $err:description)
     }
   }
   (: only collected if the job was started with the 'info' option :)
@@ -169,17 +170,15 @@ declare function panels:job-details(
     where map:size($bindings) > 0
     return (
       <h3>Query Bindings</h3>,
-      <table>{
+      (: a bound value can be long, and is truncated rather than widening the table :)
+      table:pairs(
         map:for-each($bindings, fn($key, $value) {
           <tr>
             <td><b>{ if ($key) then '$' || $key else 'Context' }</b></td>
-            <td><code>{
-              utils:chop(serialize($value, { 'method': 'basex' }), 1000)
-            }</code></td>
+            <td><code>{ utils:preview($value, 1000) }</code></td>
           </tr>
         })
-      }
-      </table>
+      )
     ),
 
     if ($output) {
@@ -193,13 +192,11 @@ declare function panels:job-details(
     },
 
     (: a stored definition can be replaced; a job string is only shown :)
-    <h3>{
-      if ($persisted) {
-        'Query', '&#xa0;', form:button('jobs/replace', 'Replace')
-      } else {
-        'Job String'
-      }
-    }</h3>,
+    if ($persisted) {
+      html:heading('Query', form:button('jobs/replace', 'Replace'), 'h3')
+    } else {
+      <h3>Job String</h3>
+    },
     <textarea spellcheck='false'>{
       attribute id { 'job-string' }[$persisted],
       attribute name { 'query' }[$persisted],
@@ -210,14 +207,15 @@ declare function panels:job-details(
 };
 
 (:~
- : Indicates whether the details of a job will not change any more. A service is done as well:
- : its query is edited in place, and a refresh would replace the editor while it is used.
+ : Indicates whether the details of a job will not change any more.
  : @param  $job  job id
  : @return result of check
  :)
 declare function panels:job-done(
   $job  as xs:string?
 ) as xs:boolean {
+  (: a service is done as well: its query is edited in place, and a refresh would replace the
+     editor while it is used :)
   let $details := $job[.] ! job:list-details(.)
   return empty($details) or $details/@state = 'cached' or
     exists(job:services()[@id = $job])
@@ -231,20 +229,18 @@ declare function panels:job-done(
 declare %private function panels:job-information(
   $entry  as element()
 ) as element(table) {
-  <table>{
+  table:pairs(
     for $value in $entry/@*
     for $name in name($value)[. != 'id']
     return <tr>
       <td><b>{ utils:capitalize($name) }</b></td>
       <td>{ string($value) }</td>
     </tr>
-  }</table>
+  )
 };
 
 (:~
- : Creates a panel that lists what sessions or connections hold. Both are addressed by an id
- : and keep named attributes, so both are listed in the same way; what tells them apart are the
- : columns of their own and what is asked of the server for them.
+ : Creates a panel that lists what sessions or connections hold.
  : @param  $kind     what holds the attributes ('session', 'websocket')
  : @param  $actions  endpoint the buttons post to ('sessions', 'websockets')
  : @param  $heading  name of the panel
@@ -259,6 +255,9 @@ declare %private function panels:attribute-panel(
   $columns  as map(*)+,
   $holders  as map(*)*
 ) as element(form) {
+  (: both are addressed by an id and keep named attributes, so both are listed in the same
+     way; what tells them apart are the columns of their own and what is asked of the server for
+     them :)
   <form method='post' autocomplete='off'>
     <h2>{ $heading }</h2>
     {
@@ -284,11 +283,7 @@ declare %private function panels:attribute-panel(
              one that is listed by none of its attributes could not be :)
           for $name in ($holder?names() otherwise '')
           let $value := if ($name) {
-            (: serialize more characters than requested, as the limit represents number of
-               bytes :)
-            utils:chop(serialize($holder?value($name), {
-              'method': 'basex', 'limit': $panels:PREVIEW * 2 + 1
-            }), $panels:PREVIEW)
+            utils:preview($holder?value($name), $panels:PREVIEW)
           }
           return map:merge((
             {
@@ -314,11 +309,11 @@ declare %private function panels:attribute-panel(
 };
 
 (:~
- : Creates the contents of the web sessions panel: what the sessions of the server hold. A
- : value that was assigned by a Java application is shown as the object it is.
+ : Creates the contents of the web sessions panel: what the sessions of the server hold.
  : @return panel contents
  :)
 declare function panels:web-sessions() as element(form) {
+  (: a value that was assigned by a Java application is shown as the object it is :)
   let $current := session:id()
   return panels:attribute-panel('session', 'sessions', 'Web Sessions',
     (
@@ -354,19 +349,19 @@ declare %private function panels:attribute(
   $name  as xs:string
 ) as fn() as element(a) {
   fn() {
-    <a href='#' data-kind='{ $kind }' data-id='{ $id }' data-name='{ $name }'
-       title='Assign a new value' onclick='setAttribute(this.dataset); return false;'>{
-      $name
-    }</a>
+    (: three values, so the call is handed the whole dataset :)
+    html:action($name, 'setAttribute', { 'kind': $kind, 'id': $id, 'name': $name },
+      { 'title': 'Assign a new value' })
   }
 };
 
 (:~
- : Creates the dialog that assigns a session attribute. As the dialog that starts a job, it is
- : not part of a panel: the panels are replaced while the view refreshes.
+ : Creates the dialog that assigns a session attribute.
  : @return dialog
  :)
 declare function panels:session-dialog() as element(dialog) {
+  (: as the dialog that starts a job, it is not part of a panel: the panels are replaced while
+     the view refreshes :)
   panels:attribute-dialog('session', 'Session:', 'sessions/set')
 };
 
@@ -379,8 +374,7 @@ declare function panels:websocket-dialog() as element(dialog) {
 };
 
 (:~
- : Creates the dialog that assigns an attribute. The ids of its fields are derived from what
- : holds the attribute, so that the two dialogs of the view do not collide.
+ : Creates the dialog that assigns an attribute.
  : @param  $kind    what holds the attribute ('session', 'websocket')
  : @param  $label   label of the field that names it
  : @param  $action  action the dialog posts to
@@ -391,6 +385,8 @@ declare %private function panels:attribute-dialog(
   $label   as xs:string,
   $action  as xs:string
 ) as element(dialog) {
+  (: the ids of its fields are derived from what holds the attribute, so that the two dialogs
+     of the view do not collide :)
   form:dialog($kind, 'Set Attribute', $action, false(), (
     (: what holds the attribute is chosen in the panel; the name is not, so an attribute that
        it does not hold yet can be assigned as well :)
@@ -414,11 +410,12 @@ declare %private function panels:attribute-dialog(
 
 (:~
  : Creates the contents of the caches panel: what the caches of the server hold, and how often
- : they were of use. A cache is transient and is managed by the server; what can be done with
- : it is to give up what it holds.
+ : they were of use.
  : @return panel contents
  :)
 declare function panels:caches() as element(form) {
+  (: a cache is transient and is managed by the server; what can be done with it is to give up
+     what it holds :)
   <form method='post' autocomplete='off'>
     {
       (: the default cache is addressed by an operation that supplies no name :)
@@ -450,11 +447,11 @@ declare function panels:caches() as element(form) {
 
 (:~
  : Creates the contents of the WebSockets panel: the connections that are open, and the paths
- : they were opened on. What a connection holds is its own; what the server can do with it is
- : to close it.
+ : they were opened on.
  : @return panel contents
  :)
 declare function panels:websockets() as element(form) {
+  (: what a connection holds is its own; what the server can do with it is to close it :)
   panels:attribute-panel('websocket', 'websockets', 'WebSockets',
     (
       { 'key': 'websocket', 'label': 'ID', 'type': 'dynamic', 'width': '14%' },

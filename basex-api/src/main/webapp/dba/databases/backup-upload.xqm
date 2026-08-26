@@ -27,7 +27,7 @@ function dba:file-upload(
   $name   as xs:string
 ) as element(rest:response) {
   let $dir := db:option('dbpath') || '/'
-  let $files := $files[. instance of map(*)] otherwise {}
+  let $files := utils:files($files)
   (: the panel the upload was started from decides where the backups belong :)
   let $params := { 'name': $name }
   return try {
@@ -54,9 +54,9 @@ function dba:file-upload(
     map:for-each($files, fn($file, $content) {
       file:write-binary($dir || $file, $content)
     }),
-    web:redirect($dba:CAT, map:put($params, 'info',
-      utils:info(map:keys($files), 'backup', 'uploaded')))
+    utils:outcome($dba:CAT, $params,
+      { 'info': utils:info(map:keys($files), 'backup', 'uploaded') })
   } catch * {
-    web:redirect($dba:CAT, map:put($params, 'error', $err:description))
+    utils:outcome($dba:CAT, $params, { 'error': $err:description })
   }
 };

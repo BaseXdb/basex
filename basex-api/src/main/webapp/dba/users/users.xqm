@@ -14,14 +14,11 @@ import module namespace utils = 'dba/lib/utils' at '../lib/utils.xqm';
 declare variable $dba:CAT := 'users';
 
 (:~
- : Users: the users to choose from, and the selected one. The selection is part of the address,
- : so a link reproduces what the panels show.
+ : Users: the users to choose from, and the selected one.
  : @param  $name     selected user
  : @param  $newname  name that was entered but could not be assigned
  : @param  $perm     permission that was entered but could not be assigned
  : @param  $sort     table sort key
- : @param  $info     info string
- : @param  $error    error string
  : @return page
  :)
 declare
@@ -31,32 +28,32 @@ declare
   %rest:query-param('newname', '{$newname}')
   %rest:query-param('perm',    '{$perm}')
   %rest:query-param('sort',    '{$sort}', 'name')
-  %rest:query-param('info',    '{$info}')
-  %rest:query-param('error',   '{$error}')
   %output:method('html')
 function dba:users(
   $name     as xs:string,
   $newname  as xs:string?,
   $perm     as xs:string?,
-  $sort     as xs:string,
-  $info     as xs:string?,
-  $error    as xs:string?
+  $sort     as xs:string
 ) as element(html) {
+  (: the selection is part of the address, so a link reproduces what the panels show :)
   let $user := panels:user($name, $newname, $perm)
   let $permissions := panels:local-permissions($name)
-  (: the panels follow the selection: what is attached to no user in particular steps back
-     once one of them is being looked at :)
-  let $fold := ' collapsed'[$user]
+  let $panel := fn($contents, $options) {
+    html:panel($contents, map:put($options, 'divider', true()))
+  }
   return (
-    <div class='panel' data-label='Users'>
-      <div class='pane'>{ panels:users($sort, $name) }</div>
-    </div>,
-    (: the form is the pane: its editor takes the height that the fields leave :)
-    <div class='panel{ ' hidden'[empty($user)] }' data-label='User'>{ $user }</div>,
-    <div class='panel{ ' hidden'[empty($permissions)] }' data-label='Permissions'>
-      <div class='pane'>{ $permissions }</div>
-    </div>,
-    <div class='panel{ $fold }' data-label='General User Data'>{ panels:information() }</div>
+    $panel(panels:users($sort, $name), { 'id': 'users-panel', 'label': 'Users' }),
+    (: the form is the pane: its editor takes the height that the fields leave. It outlives
+       what it submits, which is replaced when another user is shown :)
+    $panel(
+      <form method='post' action='users/update' autocomplete='off' id='user-panel'
+            class='pane column'>{ $user }</form>,
+      { 'label': 'User', 'pane': false(), 'hidden': empty($user) }),
+    $panel($permissions, { 'id': 'permissions-panel', 'label': 'Permissions' }),
+    (: the panels follow the selection: what is attached to no user in particular steps back
+       once one of them is being looked at :)
+    $panel(panels:information(),
+      { 'label': 'General User Data', 'pane': false(), 'collapsed': exists($user) })
   ) => html:wrap({
     'header' : $dba:CAT,
     (: the information panel is only open while no user is shown, where it is one of two
@@ -66,11 +63,8 @@ function dba:users(
     (: a view of its own: what is folded away while a user is shown is not what is folded away
        while the list is :)
     'panels' : 'user'[$user],
-    'scripts': ('cm6', 'editor'),
-    (: both information fields are edited as XML; the selected user's is the one of record :)
-    'init'   : 'loadCodeMirror("xml", [ "editor", "user-info" ]);',
-    'info'   : $info,
-    'error'  : $error
+    'scripts': ('cm6', 'editor', 'users'),
+    'init'   : 'initUsers();'
   })
 };
 

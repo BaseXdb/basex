@@ -59,27 +59,6 @@ function showLevel() {
 }
 
 /**
- * Shows the entries panel that was pushed by the server.
- * @param {string} html panel contents
- */
-function showEntries(html) {
-  fillPanel("entries-panel", html);
-  syncPath();
-  // the dialog is part of the replaced markup, and brings a new text area with it
-  loadCodeMirror("xquery", [ "add-value" ]);
-  if(_add) {
-    _add = false;
-    _first = false;
-    showDialog("add");
-  } else if(_first) {
-    _first = false;
-    // the marker that opens a child is no choice of one: it brings a title, the label none
-    const link = document.querySelector("#entries-panel a[data-step]:not([title])");
-    if(link) selectChild(link.dataset.step);
-  }
-}
-
-/**
  * Asks for the name of a store and fills it. A store is its entries: an empty one does not
  * exist and would be gone with the next visit, so the first entry is asked for right away.
  * @returns {Promise} promise
@@ -104,16 +83,6 @@ function pushSelection() {
   // the level is stated as a whole, so that an update returns to it; within the store, the
   // entry that is shown is what names the selection
   pushParams({ name: _store, path: pathToString(_path), key: _path.length ? "" : entryKey() });
-}
-
-/**
- * Adopts the selection of the address bar, after a step in the browser history.
- */
-function popSelection() {
-  adoptSelection();
-  mark("stores-panel", _store);
-  refreshStores();
-  showLevel();
 }
 
 /**
@@ -164,24 +133,17 @@ function refreshValue() {
 function showValue(json) {
   fillPanel("value-panel", json.html);
   _editor.setValue(json.text);
-  setDisabled("save-value", !json.editable);
-  editorReadOnly(!json.editable);
+  setEditable("save-value", json.editable);
 }
 
 /**
  * Replaces the value the path leads to with the result of the edited expression.
  * @returns {Promise} promise
  */
-async function saveValue() {
-  const path = encodeURIComponent(pathToString(selectionPath()));
-  try {
-    await request(`store-save?name=${encodeURIComponent(_store)}&path=${path}`, editorValue());
-    setText("Value was stored.", "info");
-    // the level lists the value that has just changed
-    refreshEntries();
-  } catch(response) {
-    showError(response);
-  }
+function saveValue() {
+  // the level lists the value that has just changed
+  return saveEditor("store-save", { name: _store, path: pathToString(selectionPath()) },
+    "Value was stored.", refreshEntries);
 }
 
 /**
@@ -201,10 +163,7 @@ function selectChild(step) {
  * Points out the selected child of the shown level.
  */
 function markSelected() {
-  const step = stepToString(_selected);
-  for(const link of document.querySelectorAll("#entries-panel a[data-step]:not([title])")) {
-    link.classList.toggle("selected", link.dataset.step === step);
-  }
+  mark("entries-panel", stepToString(_selected));
 }
 
 /**
@@ -244,6 +203,7 @@ function selectionPath() {
 
 /**
  * Returns the text of a step: a name that needs no quotes, or JSON with its dots escaped.
+ * The server writes the same texts; see panels:step-text in stores/panels.xqm.
  * @param {*} step step; null if none is selected
  * @returns {string} text; empty if there is no step
  */
@@ -274,7 +234,8 @@ function parseStep(text) {
 }
 
 /**
- * Returns the steps that the text of a path denotes.
+ * Returns the steps that the text of a path denotes; the server reads them in the same way,
+ * see panels:steps in stores/panels.xqm.
  * @param {string} text text
  * @returns {Array} path
  */
@@ -296,13 +257,27 @@ function syncPath() {
 /** The sort and page links of the list panels are followed in place. */
 followPanelLinks({ "stores-panel": refreshStores, "entries-panel": refreshEntries });
 
-/** The endpoint of the view serves its three panels. */
-_handlers[STORES_WS] = json => {
-  switch(json.type) {
-    case "stores": fillPanel("stores-panel", json.html); break;
-    case "entries": showEntries(json.html); break;
-    case "value": showValue(json); break;
+/** A level that has just arrived states the path that was rendered, brings a dialog of its own,
+    and is where a store or a level that was opened shows its first child. */
+_panel_filled["entries-panel"] = () => {
+  syncPath();
+  // the dialog is part of the replaced markup, and brings a new text area with it
+  loadCodeMirror("xquery", [ "add-value" ]);
+  if(_add) {
+    _add = false;
+    _first = false;
+    showDialog("add");
+  } else if(_first) {
+    _first = false;
+    // the label of a child selects it; the marker beside it opens the child instead
+    const link = document.querySelector("#entries-panel a[data-select]");
+    if(link) selectChild(link.dataset.select);
   }
+};
+
+/** The panels of the view are filled by showMessage; what is left is the shown value. */
+_handlers[STORES_WS] = json => {
+  if(json.type === "editor") showValue(json);
 };
 
 /**
@@ -314,11 +289,12 @@ function initStores(editable) {
   // the value is held by an editor that outlives its panel; the dialog brings a second one
   loadCodeMirror("xquery", true, "fill");
   loadCodeMirror("xquery", [ "add-value" ]);
-  adoptSelection();
+  initSelection(adoptSelection, () => {
+    mark("stores-panel", _store);
+    refreshStores();
+    showLevel();
+  });
   // the server opens a store on its first entry: what was rendered is what is shown
   syncPath();
-  setDisabled("save-value", !editable);
-  editorReadOnly(!editable);
-
-  window.addEventListener("popstate", popSelection);
+  setEditable("save-value", editable);
 }

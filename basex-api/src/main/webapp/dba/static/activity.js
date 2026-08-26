@@ -17,7 +17,7 @@ async function refreshActivity() {
     job: done ? "" : params.get("job") ?? ""
   };
   // no connection: retry, rather than leaving the panels frozen for good
-  if(!await sendMessage("/activity", message)) _live = setTimeout(refreshActivity, REFRESH_INTERVAL);
+  if(!await sendMessage("/activity", message)) scheduleLive(refreshActivity);
 }
 
 /**
@@ -32,16 +32,10 @@ function showActivity(json) {
   // form it belongs to: while one is open, the panels are left as they are, and the answer
   // that arrives a second later is applied instead
   if(!dialogOpen()) {
-    for(const [ id, html ] of [["jobs-panel", json.jobs], ["web-panel", json.web],
-        ["db-panel", json.db], ["ws-panel", json.ws], ["caches-panel", json.caches]]) {
-      const panel = document.getElementById(id);
-      if(!panel) continue;
-      // the entries are replaced: what the user ticked in the meantime is restored
-      const checked = [ ...panel.querySelectorAll("input[name]:checked") ].map(i => i.value);
-      panel.innerHTML = html;
-      for(const input of panel.querySelectorAll("input[name]")) {
-        input.checked = checked.includes(input.value);
-      }
+    // every panel is named by the block it is filled into; what was ticked in the meantime is
+    // ticked again by fillPanel
+    for(const [ id, html ] of Object.entries(json.panels)) {
+      if(document.getElementById(id)) fillPanel(id, html);
     }
     // a running job's details are replaced as well; the final ones are applied once, together
     // with the editor for its result, and are then left alone
@@ -50,16 +44,14 @@ function showActivity(json) {
       details.innerHTML = json.job;
       details.dataset.done = json.done;
       if(json.done) loadCodeMirror("xml");
+      buttons();
+      markTruncated(details);
     }
 
     const live = document.getElementById("live");
     if(live) live.checked = wasLive;
-
-    buttons();
-    markTruncated();
   }
-  // the next request follows the answer, so that a slow one cannot queue up others
-  if(wasLive) _live = setTimeout(refreshActivity, REFRESH_INTERVAL);
+  scheduleLive(refreshActivity, wasLive);
 }
 
 /** The activity view keeps its panels up to date over its own connection. */
@@ -86,8 +78,7 @@ async function setAttribute({ kind, id, name }) {
     showError(response, name);
   }
   setEditorText(`${kind}-value`, value.text);
-  const note = document.getElementById(`${kind}-note`);
-  [ note.textContent, note.className ] = value.note ? [ value.note, "note warn" ] : [ "", "note" ];
+  showNote(`${kind}-note`, value.note);
   showDialog(kind);
 }
 

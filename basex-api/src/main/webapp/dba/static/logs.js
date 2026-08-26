@@ -16,8 +16,8 @@ const IGNORE_KEY = "dba-ignore-logs";
  */
 function logEntries(key) {
   const reset = key && key !== "Enter";
-  const input = document.getElementById("input").value.trim();
-  const ignore = document.getElementById("ignore")?.value.trim() ?? "";
+  const input = fieldValue("input");
+  const ignore = fieldValue("ignore");
   const filters = document.querySelectorAll("input.filter");
   // the checked files are the scope of a search; without a search term, and without a
   // selection, the opened file is what is listed
@@ -72,44 +72,31 @@ function logEntries(key) {
 }
 
 /**
- * Follows a sort or page link of the log table: the entries are requested via the open
- * connection instead of reloading the page.
- * @param {HTMLAnchorElement} link clicked link
- */
-function logLink(link) {
-  const params = new URLSearchParams(link.getAttribute("href").replace(/^\?/, ""));
-  if(params.has("sort")) document.getElementById("sort").value = params.get("sort");
-  // a link that does not name a page refers to the first one (a new sort order)
-  document.getElementById("page").value = params.get("page") ?? 1;
-  logEntries();
-}
-
-/**
  * Shows the log entries that were pushed by the server.
  * @param {string} text HTML table
  */
 function showLogEntries(text) {
   setText("", "");
-  // preserve focus and caret of a filter field across the table refresh
-  const active = document.activeElement;
-  const focused = active?.matches("input.filter") && active;
   const output = document.getElementById("output");
-  output.innerHTML = text;
-  markTruncated(output);
-  // the next reload follows the result, so a search that takes longer than the interval
-  // cannot queue up further ones
-  clearTimeout(_live);
-  if(liveOn() && _logFiles === 1) _live = setTimeout(() => logEntries(), REFRESH_INTERVAL);
-  const e = document.getElementById(window.location.hash.replace(/^#/, ""));
-  if(e) e.scrollIntoView();
-  if(focused) {
-    const filter = document.querySelector(`input.filter[name="${focused.name}"]`);
-    if(filter) {
-      filter.value = focused.value;
-      filter.focus();
-      filter.setSelectionRange(focused.selectionStart, focused.selectionEnd);
-    }
-  }
+  // the filter fields belong to the replaced table: the one that was typed into keeps the
+  // focus and the caret
+  refocus(() => {
+    output.innerHTML = text;
+    markTruncated(output);
+    // a range of files is not reloaded: the live refresh follows a single file
+    scheduleLive(() => logEntries(), liveOn() && _logFiles === 1);
+    const e = document.getElementById(window.location.hash.replace(/^#/, ""));
+    if(e) e.scrollIntoView();
+  }, "input.filter");
+}
+
+/**
+ * Requests the entries that were typed for: the search, the ignore filter and the column
+ * filters share one pending request, as a search reads all of them at once.
+ * @param {string} key typed key
+ */
+function filterLogs(key) {
+  filterKey(key, "logs", () => logEntries(key));
 }
 
 /**
@@ -117,8 +104,9 @@ function showLogEntries(text) {
  * @param {string} key typed key
  */
 function ignoreLogs(key) {
-  localStorage.setItem(IGNORE_KEY, document.getElementById("ignore").value);
-  return logEntries(key);
+  // the preference is kept at once; only the search it starts is collected
+  store(IGNORE_KEY, document.getElementById("ignore").value);
+  filterLogs(key);
 }
 
 /**
@@ -126,20 +114,12 @@ function ignoreLogs(key) {
  */
 function initLogs() {
   const ignore = document.getElementById("ignore");
-  if(ignore) ignore.value = localStorage.getItem(IGNORE_KEY) ?? "";
+  if(ignore) ignore.value = stored(IGNORE_KEY, "");
   // the checked files are the scope of the search, so a new selection is a new search.
   // Clicks, not changes: the checkbox of the table header ticks the rows by script, which
   // raises no change event of its own
   document.getElementById("list").addEventListener("click", event => {
     if(event.target.matches("input[type=checkbox]")) logEntries("select");
-  });
-  // sort and page links belong to the rendered table, so they are caught here
-  document.getElementById("output").addEventListener("click", event => {
-    const link = event.target.closest("a[href^='?']");
-    if(link) {
-      event.preventDefault();
-      logLink(link);
-    }
   });
   return logEntries();
 }
@@ -162,9 +142,11 @@ function logFilter() {
       unchecked = true;
     }
   }
-  // the summary counts what is left; the buttons are derived from the selection by buttons()
+  // the summary counts what is left; the words are the ones the table was rendered with, and
+  // the buttons are derived from the selection by buttons()
   const summary = list.querySelector("h3");
-  if(summary) summary.textContent = `${count} ${count === 1 ? "Entry" : "Entries"}`;
+  if(summary) summary.textContent =
+    `${count} ${count === 1 ? summary.dataset.singular : summary.dataset.plural}`;
   buttons();
   if(unchecked) logEntries("filter");
 }
@@ -181,9 +163,7 @@ function selectLog(date) {
   document.getElementById("page").value = 1;
   document.getElementById("time").value = "";
   document.querySelector(".logbar h3").textContent = date;
-  for(const link of document.querySelectorAll("#list a[data-select]")) {
-    link.classList.toggle("selected", link.dataset.select === date);
-  }
+  mark("list", date);
   // the file is part of the address, so a reload shows what the page shows; the fragment
   // named an entry of the previous file
   const url = new URL(replaceParam(window.location.href, "name", date));
@@ -191,6 +171,14 @@ function selectLog(date) {
   window.history.replaceState(null, "", url);
   logEntries();
 }
+
+/** The sort and page links of the entry table are followed in place: they name what the table
+    shows, and the fields that state it are what the next request reads. */
+followPanelLinks({ output: (sort, page) => {
+  document.getElementById("sort").value = sort;
+  document.getElementById("page").value = page;
+  logEntries();
+} });
 
 /** The log view receives its entries as a rendered table. */
 _handlers["/logs"] = json => {

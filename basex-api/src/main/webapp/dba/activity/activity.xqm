@@ -16,8 +16,6 @@ declare variable $dba:CAT := 'activity';
  : @param  $sort      table sort key
  : @param  $job       highlighted job
  : @param  $download  job whose result is to be downloaded
- : @param  $error     error message
- : @param  $info      info message
  : @return page
  :)
 declare
@@ -26,48 +24,42 @@ declare
   %rest:query-param('sort',     '{$sort}', 'duration')
   %rest:query-param('job',      '{$job}')
   %rest:query-param('download', '{$download}')
-  %rest:query-param('error',    '{$error}')
-  %rest:query-param('info',     '{$info}')
   %output:method('html')
 function dba:activity(
   $sort      as xs:string,
   $job       as xs:string?,
-  $download  as xs:string?,
-  $error     as xs:string?,
-  $info      as xs:string?
+  $download  as xs:string?
 ) as element(html) {
-  (
-    <div class='panel'>
-      <div id='jobs-panel' class='pane'>{ panels:jobs($sort) }</div>
-    </div>,
+  let $panel := fn($contents, $options) {
+    html:panel($contents, map:put($options, 'divider', true()))
+  }
+  return (
+    $panel(panels:jobs($sort), { 'id': 'jobs-panel', 'label': 'Jobs' }),
     if ($job) {
-      <div class='panel'>{
-        (: a job that is done does not change any more: the client stops asking for it. The form
-           is the pane: its blocks are laid out in a column, so that the query and the result
-           take the height that the tables leave instead of being fixed to a few lines :)
+      (: a job that is done does not change any more: the client stops asking for it. The form
+         is the pane: its blocks are laid out in a column, so that the query and the result
+         take the height that the tables leave instead of being fixed to a few lines :)
+      $panel(
         <form method='post' autocomplete='off' id='job-details' class='pane column'
               data-done='{ panels:job-done($job) }'>{
           panels:job-details($job) otherwise (
             <h2>{ 'Job: ' || $job }</h2>, 'Job has expired.'
           )
-        }</form>
-      }</div>
+        }</form>,
+        { 'label': 'Job', 'pane': false() }
+      )
     },
     (: what a job is doing is what the view is opened for: the reports step back to strips
        while one is shown :)
-    <div class='panel{ ' collapsed'[$job] }'>
-      <div id='web-panel' class='pane'>{ panels:web-sessions() }</div>
-    </div>,
+    $panel(panels:web-sessions(),
+      { 'id': 'web-panel', 'label': 'Web Sessions', 'collapsed': exists($job) }),
     (: rarely of interest: the panels open on demand :)
-    <div class='panel collapsed'>
-      <div id='ws-panel' class='pane'>{ panels:websockets() }</div>
-    </div>,
-    <div class='panel collapsed'>
-      <div id='caches-panel' class='pane'>{ panels:caches() }</div>
-    </div>,
-    <div class='panel collapsed'>
-      <div id='db-panel' class='pane'>{ panels:db-sessions() }</div>
-    </div>,
+    $panel(panels:websockets(),
+      { 'id': 'ws-panel', 'label': 'WebSockets', 'collapsed': true() }),
+    $panel(panels:caches(),
+      { 'id': 'caches-panel', 'label': 'Caches', 'collapsed': true() }),
+    $panel(panels:db-sessions(),
+      { 'id': 'db-panel', 'label': 'Database Sessions', 'collapsed': true() }),
     (: outside the panels: they are replaced by the refresh, the dialogs are not :)
     panels:job-dialog(),
     panels:session-dialog(),
@@ -87,8 +79,6 @@ function dba:activity(
        is folded away while a job is shown is remembered apart from the overview :)
     'panels' : 'job'[$job],
     'scripts': ('cm6', 'editor', 'activity'),
-    'init'   : 'initActivity();',
-    'info'   : $info,
-    'error'  : $error
+    'init'   : 'initActivity();'
   })
 };

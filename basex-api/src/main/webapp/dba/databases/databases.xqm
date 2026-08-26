@@ -14,14 +14,10 @@ import module namespace utils = 'dba/lib/utils' at '../lib/utils.xqm';
 declare variable $dba:CAT := 'databases';
 
 (:~
- : Databases: the databases, the resources of the selected one, and the selected document. The
- : selection is part of the address, so a link reproduces what the panels show; changing it
- : refreshes the panels over the connection the view opens for its queries.
+ : Databases: the databases, the resources of the selected one, and the selected document.
  : @param  $name      selected database
  : @param  $resource  selected resource
  : @param  $dir       directory that is listed
- : @param  $info      info string
- : @param  $error     error string
  : @return page
  :)
 declare
@@ -30,16 +26,14 @@ declare
   %rest:query-param('name',     '{$name}', '')
   %rest:query-param('resource', '{$resource}', '')
   %rest:query-param('dir',      '{$dir}', '')
-  %rest:query-param('info',     '{$info}')
-  %rest:query-param('error',    '{$error}')
   %output:method('html')
 function dba:databases(
   $name      as xs:string,
   $resource  as xs:string,
-  $dir       as xs:string,
-  $info      as xs:string?,
-  $error     as xs:string?
+  $dir       as xs:string
 ) as element(html) {
+  (: the selection is part of the address, so a link reproduces what the panels show; changing
+     it refreshes the panels over the connection the view opens for its queries :)
   (: the document is needed twice: its text fills the editor, its properties the panel :)
   let $document := panels:document($name, $resource)
   (: a link that names a resource alone opens the level that holds it; the client derives the
@@ -53,31 +47,25 @@ function dba:databases(
   (: the panels follow the selection: while a document is shown, what it was chosen from steps
      back to a strip; without one, the lists are what there is to see. A panel that is folded by
      hand keeps the state it was given :)
-  let $fold := ' collapsed'[$document?exists]
+  let $fold := $document?exists
   return (
-    <div class='panel no-divider{ $fold }' data-label='Databases'>
-      <div id='databases-panel' class='pane'>{ panels:databases('', 1, $name) }</div>
-    </div>,
-    <div class='panel no-divider{ ' hidden'[empty($database)] }' data-label='Database'>
-      <div id='database-panel' class='pane'>{ $database }</div>
-    </div>,
+    html:panel(panels:databases('', 1, $name),
+      { 'id': 'databases-panel', 'label': 'Databases', 'collapsed': $fold }),
+    html:panel($database, { 'id': 'database-panel', 'label': 'Database' }),
     (: the editor is created once and outlives the panel above it, which is redrawn :)
-    <div class='panel no-divider{ ' hidden'[not($document?exists)] }' data-label='Resource'>
-      <div id='resource-panel'>{ panels:resource($name, $resource, $document) }</div>
-      <textarea id='editor' spellcheck='false'>{ $document?text }</textarea>
-    </div>,
+    html:panel(panels:resource($name, $resource, $document), {
+      'id'   : 'resource-panel',
+      'label': 'Resource',
+      'pane' : false(),
+      'extra': <textarea id='editor' spellcheck='false'>{ $document?text }</textarea>
+    }),
     (: both sit at the right edge, so both fold that way; only the last one does so by default :)
-    <div class='panel no-divider{ $fold }' data-label='Backups' data-fold='right'>
-      <div id='backups-panel' class='pane'>{ panels:backups($name) }</div>
-    </div>,
+    html:panel(panels:backups($name),
+      { 'id': 'backups-panel', 'label': 'Backups', 'collapsed': $fold, 'fold': 'right' }),
     (: reports, not steps of the work: they are opened when they are asked for :)
-    <div class='panel no-divider collapsed{ ' hidden'[empty($index)] }' data-label='Indexes'>
-      <div id='index-panel' class='pane'>{ $index }</div>
-    </div>,
-    <div class='panel no-divider collapsed{ ' hidden'[empty($information)] }'
-         data-label='Information'>
-      <div id='information-panel' class='pane'>{ $information }</div>
-    </div>
+    html:panel($index, { 'id': 'index-panel', 'label': 'Indexes', 'collapsed': true() }),
+    html:panel($information,
+      { 'id': 'information-panel', 'label': 'Information', 'collapsed': true() })
   ) => html:wrap({
     'header' : $dba:CAT,
     'columns': ('20fr', '25fr', '35fr', '20fr', '20fr', '20fr'),
@@ -86,9 +74,7 @@ function dba:databases(
        away while the lists are :)
     'panels' : 'resource'[$document?exists],
     'scripts': ('cm6', 'editor', 'databases'),
-    'init'   : 'initDatabases(' || ($document?editable = true()) || ');',
-    'info'   : $info,
-    'error'  : $error
+    'init'   : 'initDatabases(' || ($document?editable = true()) || ');'
   })
 };
 
@@ -108,20 +94,61 @@ function dba:db-download(
   $resource  as xs:string
 ) as item()+ {
   try {
-    web:response-header(
-      { 'media-type': db:content-type($name, $resource) },
-      utils:disposition($resource)
-    ),
-    let $type := db:type($name, $resource)
-    return if ($type = 'xml') {
-      db:get($name, $resource)
-    } else if ($type = 'binary') {
-      db:get-binary($name, $resource)
-    } else {
-      db:get-value($name, $resource)
-    }
+    utils:attachment($resource, panels:resource-value($name, $resource),
+      db:content-type($name, $resource))
   } catch * {
     web:error(404, $err:description)
+  }
+};
+
+(:~
+ : Downloads the checked resources; several of them are packed into an archive.
+ : @param  $name       database
+ : @param  $resources  resources; a directory stands for everything below it
+ : @return rest response and file content
+ :)
+declare
+  %rest:POST
+  %rest:path('/dba/resources-download')
+  %rest:form-param('name',     '{$name}')
+  %rest:form-param('resource', '{$resources}')
+function dba:resources-download(
+  $name       as xs:string,
+  $resources  as xs:string*
+) as item()+ {
+  (: a level is listed with its directories, and db:list resolves either of them to the
+     resources it covers; the same resource may be reached by two of them :)
+  let $paths := distinct-values($resources ! db:list($name, .))
+  return try {
+    if (empty($paths)) {
+      utils:outcome($dba:CAT, { 'name': $name }, { 'error': 'No resource was selected.' })
+    } else {
+      (: the archive is named after the database, as the one of the file panel is named
+         after its directory :)
+      utils:archive($paths, $paths ! dba:content($name, .), $name)
+    }
+  } catch * {
+    utils:outcome($dba:CAT, { 'name': $name },
+      { 'error': 'Download failed: ' || $err:description })
+  }
+};
+
+(:~
+ : Returns the content of a resource, in the form an archive holds it.
+ : @param  $name      database
+ : @param  $resource  resource
+ : @return content
+ :)
+declare %private function dba:content(
+  $name      as xs:string,
+  $resource  as xs:string
+) as item() {
+  let $value := panels:resource-value($name, $resource)
+  return if ($value instance of xs:base64Binary) {
+    $value
+  } else {
+    let $method := if (db:type($name, $resource) = 'xml') { 'xml' } else { 'basex' }
+    return serialize($value, { 'method': $method })
   }
 };
 
@@ -262,7 +289,7 @@ function dba:action(
       }
     },
     'put': fn($args) {
-      let $files := $args?files[. instance of map(*)] otherwise {}
+      let $files := utils:files($args?files)
       let $input := $args?input[.]
       let $target := $args?target[.]
       return {
@@ -297,7 +324,7 @@ function dba:action(
       }
     },
     'replace': fn($args) {
-      let $files := $args?files[. instance of map(*)] otherwise {}
+      let $files := utils:files($args?files)
       let $content := head(map:items($files))
       return {
         'params': { 'name': $args?name, 'resource': $args?resource },
@@ -342,8 +369,7 @@ function dba:action(
 };
 
 (:~
- : Returns the action that renames or copies a database. Both take a new name and reject one
- : that is assigned already.
+ : Returns the action that renames or copies a database.
  : @param  $args    request parameters
  : @param  $action  action label (past tense)
  : @param  $update  database operation
@@ -354,6 +380,7 @@ declare %private function dba:rename-database(
   $action  as xs:string,
   $update  as %updating fn(*)
 ) as map(*) {
+  (: both take a new name and reject one that is assigned already :)
   (: the name that was offered for editing is the current one: keeping it is no conflict :)
   let $exists := $args?newname != $args?name and db:exists($args?newname)
   return {
@@ -371,8 +398,7 @@ declare %private function dba:rename-database(
 };
 
 (:~
- : Returns the action that builds or discards a single index of a database. An optimization
- : that is limited to one index option leaves the other options of the database as they are.
+ : Returns the action that builds or discards a single index of a database.
  : @param  $args    request parameters
  : @param  $create  create or drop the index
  : @return action
@@ -381,6 +407,8 @@ declare %private function dba:index(
   $args    as map(*),
   $create  as xs:boolean
 ) as map(*) {
+  (: an optimization that is limited to one index option leaves the other options of the
+     database as they are :)
   let $index := panels:index-type($args?index)
   return {
     'params': { 'name': $args?name },
