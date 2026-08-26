@@ -366,6 +366,36 @@ final class SyntaxXQuery extends SyntaxMarkup {
   }
 
   @Override
+  int skipBack(final byte[] text, final int pos) {
+    int p = skipWsBack(text, pos);
+    // comments are skipped as well: 'concat((: c :) <a/>, <b/>)'
+    while(p > 0 && text[p] == ')' && text[p - 1] == ':') {
+      final int start = commentStart(text, p);
+      if(start < 0) return -1;
+      p = skipWsBack(text, start);
+    }
+    return p;
+  }
+
+  /**
+   * Returns the start of the comment that ends at the specified position.
+   * @param text text
+   * @param pos position of the closing parenthesis
+   * @return position of the opening parenthesis, or {@code -1} if the comment is not opened
+   */
+  private static int commentStart(final byte[] text, final int pos) {
+    // comments nest: the delimiters of inner comments are counted
+    for(int p = pos - 2, level = 1; p > 0; p--) {
+      if(text[p] == ':') {
+        if(text[p - 1] == '(' && --level == 0) return p - 1;
+      } else if(text[p] == ')' && text[p - 1] == ':') {
+        level++;
+      }
+    }
+    return -1;
+  }
+
+  @Override
   boolean enclosed(final byte[] text, final int pos, final int mode) {
     final int ch = cp(text, pos);
     if(ch != '{' && ch != '}') return false;

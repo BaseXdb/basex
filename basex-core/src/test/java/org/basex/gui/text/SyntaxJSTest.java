@@ -48,6 +48,9 @@ public final class SyntaxJSTest {
     check("this / 2", "KKKK...N");
     // a keyword that expects an operand is followed by a regular expression
     check("return /a/", "KKKKKK.SSS");
+    // block comments do not end an operand
+    check("return /* c */ /a/", "KKKKKK.CCCCCCC.SSS");
+    check("1 /**/ / 2", "N.CCCC...N");
   }
 
   /** Strings, comments and template literals. */

@@ -527,11 +527,22 @@ abstract class Syntax {
    * @return result of check
    */
   final boolean operand(final byte[] text, final int pos) {
-    final int p = skipWsBack(text, pos);
+    final int p = skipBack(text, pos);
     if(p < 0) return false;
     final int ch = cp(text, p);
     if(")]}\"'`*".indexOf(ch) != -1) return true;
     return XMLToken.isNCChar(ch) && operandName(text, p);
+  }
+
+  /**
+   * Returns the position of the last character before the specified position that is neither
+   * whitespace nor part of a comment.
+   * @param text text
+   * @param pos position
+   * @return position ({@code -1} if there is none)
+   */
+  int skipBack(final byte[] text, final int pos) {
+    return skipWsBack(text, pos);
   }
 
   /**

@@ -142,6 +142,32 @@ final class SyntaxJS extends Syntax {
   }
 
   @Override
+  int skipBack(final byte[] text, final int pos) {
+    int p = skipWsBack(text, pos);
+    // block comments are skipped as well: 'return /* c */ /a/'
+    while(p > 0 && text[p] == '/' && text[p - 1] == '*') {
+      final int start = commentStart(text, p);
+      if(start < 0) return -1;
+      p = skipWsBack(text, start);
+    }
+    return p;
+  }
+
+  /**
+   * Returns the start of the block comment that ends at the specified position.
+   * @param text text
+   * @param pos position of the closing slash
+   * @return position of the opening slash, or {@code -1} if the comment is not opened
+   */
+  private static int commentStart(final byte[] text, final int pos) {
+    // block comments do not nest
+    for(int p = pos - 2; p > 0; p--) {
+      if(text[p] == '*' && text[p - 1] == '/') return p - 1;
+    }
+    return -1;
+  }
+
+  @Override
   boolean operandName(final byte[] text, final int pos) {
     // identifiers and numbers end an operand; keywords that expect an expression do not
     final int start = nameStart(text, pos);

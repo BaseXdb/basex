@@ -172,6 +172,10 @@ public final class SyntaxXQueryTest {
     // a keyword is followed by an expression
     check("return <a/>", "KKKKKK.KKKK");
     check("1 < 2", "N...N");
+    // comments do not end an operand
+    check("concat((::) <a/>, <b/>)", "KKKKKK.CCCC.KKKK..KKKK.");
+    check("(: (::) :)<a/>", "CCCCCCCCCCKKKK");
+    check("$a (: c :) < $b", "VV.CCCCCCC...VV");
   }
 
   /** Only brackets in code are paired (see {@link TextRenderer}). */
