@@ -6,8 +6,10 @@
   --gap: 1rem;
   /* vertical separation between blocks */
   --space: .6rem;
-  /* hairline rules and panel dividers */
+  /* every line of the interface: rules, dividers, and the borders of controls */
   --line: .7px;
+  /* the face of code, wherever it is shown */
+  --mono: SFMono-Regular, Consolas, Menlo, monospace;
   /* grab area of the editor's panel resizer */
   --resizer: 15px;
   --radius: 3px;
@@ -43,6 +45,12 @@
     --pre-bg: #2a2a2a;
     --info: #6c6;
   }
+}
+
+/* a declared width is the width the box takes, padding and border included; the layout is
+   built on percentages and grid tracks, which the default box model would overflow */
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
 body {
@@ -169,17 +177,13 @@ td {
   max-width: 14rem;
   margin: 0;
   padding: .15rem .5rem;
-  border: 1px solid var(--border-light);
+  border: var(--line) solid var(--border-light);
   border-bottom: none;
   border-radius: var(--radius) var(--radius) 0 0;
   background: transparent;
   color: var(--muted);
   font-size: 92%;
   white-space: nowrap;
-}
-.tabs .tab > span:first-child {
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 .tabs .tab.active {
   border-color: var(--border);
@@ -236,30 +240,28 @@ b {
   color: var(--strong);
 }
 
-code {
-  font-family: SFMono-Regular, Consolas, Menlo, monospace;
+/* code, however much of it there is */
+code, pre {
+  font-family: var(--mono);
   font-size: 90%;
-  border: 1px solid var(--border-light);
+  border: var(--line) solid var(--border-light);
   border-radius: var(--radius);
+}
+
+code {
   padding: 0 4px;
   margin: 0 2px;
 }
 
 pre {
-  font-family: SFMono-Regular, Consolas, Menlo, monospace;
-  font-size: 90%;
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius);
   background-color: var(--pre-bg);
   padding: .5rem;
   margin: .2rem 0 .5rem 0;
 }
 
 textarea {
-  font-family: SFMono-Regular, Consolas, Menlo, monospace;
+  font-family: var(--mono);
   width: 100%;
-  /* the border must not add to the width, or the panel scrolls sideways */
-  box-sizing: border-box;
   resize: vertical;
   background-color: var(--bg);
   color: var(--fg);
@@ -272,7 +274,7 @@ textarea:not([rows]) {
 
 textarea, input[type=text], input[type=password], input[type=number],
 input[type=submit], select, button {
-  border: 1px solid var(--border);
+  border: var(--line) solid var(--border);
   border-radius: var(--radius);
   outline: none;
 }
@@ -305,7 +307,6 @@ input.smallinput {
 
 input.filter {
   width: 100%;
-  box-sizing: border-box;
 }
 
 /* the directory chooser shares the pinned row with the buttons and takes a line of its own;
@@ -318,7 +319,6 @@ select.directory {
 select.wide, input.wide {
   width: 100%;
   max-width: 350px;
-  box-sizing: border-box;
 }
 
 /* numeric-column filter fields align with their right-aligned values */
@@ -333,7 +333,6 @@ table.fixed {
 /* column widths are percentages: padding must not add to them, or the sum overflows. A cell
    that does not fit its column is clipped: it must not scroll the table sideways */
 table.fixed th, table.fixed td {
-  box-sizing: border-box;
   /* a full gutter per column costs more than the values are worth in a narrow panel */
   padding-right: .5rem;
   white-space: nowrap;
@@ -430,9 +429,6 @@ header {
 /* a long message truncates instead of pushing the views out of the line */
 #info {
   min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .header-logo {
@@ -449,9 +445,6 @@ header {
   overflow-x: auto;
 }
 
-.right {
-  float: right;
-}
 
 .error {
   color: var(--accent);
@@ -463,7 +456,12 @@ header {
   font-weight: bold;
 }
 
-.ellipsis {
+/* one line, clipped where it does not fit: a status message and a panel heading must not
+   push their neighbours out of the row they share, and a tab must not grow with its name */
+.ellipsis,
+#info,
+.content > .panel h2,
+.tabs .tab > span:first-child {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -523,7 +521,6 @@ input.query {
   /* the note above supplies the distance; an input does not collapse its margins */
   margin: 0 0 var(--space) 0;
   width: 100%;
-  box-sizing: border-box;
 }
 
 /* head of a scrolling list: the heading, the actions and the summary stay in reach while
@@ -551,20 +548,14 @@ input.query {
   margin-bottom: var(--space);
 }
 
-/* a heading names one thing, and a long name is clipped rather than wrapped over several
-   lines; the trailing non-breaking space keeps it clear of the collapse chevron */
-.content > .panel h2 {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+/* the trailing non-breaking space keeps a clipped heading clear of the collapse chevron */
 .content > .panel h2::after {
   content: "\00a0";
 }
 
 /* modal dialog: a form with more fields than a prompt can ask for */
 dialog {
-  border: 1px solid var(--border);
+  border: var(--line) solid var(--border);
   border-radius: var(--radius);
   background-color: var(--bg);
   color: var(--fg);
@@ -714,10 +705,10 @@ body:has(.content.fill) main {
   border-left: var(--line) solid var(--border);
 }
 
-/* a group of fields: a form, or one column of a form that spreads its fields over columns.
-   The group is the grid, so its label column is as wide as its longest label asks for */
-form:has(> .field),
-.field-columns > div:has(> .field) {
+/* a group of fields: whatever directly holds them — a form, or one column of a form that
+   spreads its fields over columns. The group is the grid, so its label column is as wide as
+   its longest label asks for */
+:has(> .field) {
   display: grid;
   grid-template-columns: max-content 1fr;
   column-gap: var(--gap);
@@ -725,12 +716,10 @@ form:has(> .field),
 
 /* what is not a field spans both columns; the break after a checkbox is what a row of the
    grid does already */
-form:has(> .field) > :not(.field),
-.field-columns > div:has(> .field) > :not(.field) {
+:has(> .field) > :not(.field) {
   grid-column: 1 / -1;
 }
-form:has(> .field) > br,
-.field-columns > div:has(> .field) > br {
+:has(> .field) > br {
   display: none;
 }
 
@@ -747,8 +736,7 @@ form:has(> .field) > br,
 }
 
 /* a field of a group adopts the columns of its group, which lines up the controls */
-form:has(> .field) > .field:not(.stacked),
-.field-columns > div:has(> .field) > .field:not(.stacked) {
+:has(> .field) > .field:not(.stacked) {
   grid-column: 1 / -1;
   grid-template-columns: subgrid;
 }
@@ -890,8 +878,7 @@ button.collapse .label {
   }
   /* labels above their controls, so the fields keep the full width */
   .field,
-  form:has(> .field) > .field,
-  .field-columns > div:has(> .field) > .field {
+  :has(> .field) > .field {
     grid-template-columns: 1fr;
   }
   /* one column of fields: a narrow screen has no room for two */
@@ -908,7 +895,6 @@ button.collapse .label {
   }
   .logbar #ignore {
     width: 100%;
-    box-sizing: border-box;
   }
 }
 
