@@ -538,7 +538,8 @@ public abstract class Sandbox {
    */
   public static void initSandbox() {
     final IOFile sb = sandbox();
-    //sb.delete();
+    // discard leftovers of a run that could not clean up after itself
+    sb.delete();
     if(!sb.md()) fail("Sandbox could not be created.");
 
     final String path = sb.path();
@@ -671,13 +672,23 @@ public abstract class Sandbox {
    * @throws Exception exception raised in a worker thread, or interruption
    */
   protected static void parallel(final List<? extends Callable<?>> tasks) throws Exception {
-    final ExecutorService pool = Executors.newFixedThreadPool(Math.max(1, tasks.size()));
+    final int size = tasks.size();
+    final ExecutorService pool = Executors.newFixedThreadPool(Math.max(1, size));
     try {
-      final ArrayList<Future<?>> futures = new ArrayList<>(tasks.size());
-      for(final Callable<?> task : tasks) futures.add(pool.submit(task));
-      for(final Future<?> future : futures) future.get();
+      // results are consumed in completion order, so a hanging task cannot mask an error
+      final CompletionService<Object> service = new ExecutorCompletionService<>(pool);
+      final ArrayList<Future<?>> futures = new ArrayList<>(size);
+      for(final Callable<?> task : tasks) futures.add(service.submit(task::call));
+      for(int t = 0; t < size; t++) {
+        try {
+          service.take().get();
+        } catch(final ExecutionException ex) {
+          for(final Future<?> future : futures) future.cancel(true);
+          throw ex;
+        }
+      }
     } finally {
-      pool.shutdown();
+      pool.shutdownNow();
     }
   }
 
