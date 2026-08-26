@@ -215,7 +215,7 @@ public final class WsPoolTest extends WsTest {
         "  let $payload := string-join((1 to 100000) ! 'x')" +
         "  return (1 to " + count + ") ! void(job:eval(" +
         "    'declare variable $m external; declare variable $id external; ws:send($m, $id)'," +
-        "    { 'm': 'm' || . || ':' || $payload, 'id': $id }, { 'start': 'PT1S' }))" +
+        "    { 'm': 'm' || . || ':' || $payload, 'id': $id }, { 'start': 'PT0.3S' }))" +
         "};");
 
     final Listener l = new Listener();

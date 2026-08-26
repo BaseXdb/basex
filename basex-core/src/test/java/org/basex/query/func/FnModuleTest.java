@@ -568,9 +568,9 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("", " 1") + " => boolean()", true);
     query(func.args(" ('', '1')") + " => boolean()", true);
     query(func.args(" 1") + " => boolean()", true);
-    query(func.args("", " 1 to 10000000000") + " => boolean()", true);
-    query(func.args(" (1, 1 to 10000000000)") + " => boolean()", true);
-    query(func.args(" 1", " 1 to 10000000000", "") + " => boolean()", true);
+    query(func.args("", " 1 to 10_000_000_000") + " => boolean()", true);
+    query(func.args(" (1, 1 to 10_000_000_000)") + " => boolean()", true);
+    query(func.args(" 1", " 1 to 10_000_000_000", "") + " => boolean()", true);
   }
 
   /** Test method. */
@@ -609,8 +609,8 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void count() {
     final Function func = COUNT;
 
-    query(func.args(" (1 to 100000000) ! string()"), 100000000);
-    query(func.args(" for $i in 1 to 100000000 return string('x')"), 100000000);
+    query(func.args(" (1 to 100_000_000) ! string()"), 100000000);
+    query(func.args(" for $i in 1 to 100_000_000 return string('x')"), 100000000);
 
     query(func.args(" count(array { <a/>, <b/> }) "), 1);
     query(func.args(" count([ <a/>, <b/> ]) "), 1);
@@ -871,8 +871,8 @@ public final class FnModuleTest extends SandboxTest {
     final Function func = DEEP_EQUAL;
 
     query("let $a := reverse((<a/>, <b/>)) return " + func.args(" $a/.", " $a/."), true);
-    query("deep-equal(1 to 1000000000, 1 to 1000000000)", true);
-    query("deep-equal(1 to 1000000000, 1 to 1000000001)", false);
+    query("deep-equal(1 to 1_000_000_000, 1 to 1_000_000_000)", true);
+    query("deep-equal(1 to 1_000_000_000, 1 to 1_000_000_001)", false);
 
     // function items are compared for equivalence
     query(func.args(" fn($x) { $x }", " fn($y) { $y }"), true);
@@ -932,8 +932,8 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void distinctValues() {
     final Function func = DISTINCT_VALUES;
 
-    query(func.args(" (1 to 100000000) ! 'a'"), "a");
-    query("count(" + func.args(" 1 to 100000000") + ')', 100000000);
+    query(func.args(" (1 to 100_000_000) ! 'a'"), "a");
+    query("count(" + func.args(" 1 to 100_000_000") + ')', 100000000);
     check(func.args(" void(1)"), "", root(VOID));
     check("(1, 3) ! " + func.args(" ."), "1\n3", root(BytSeq.class));
 
@@ -964,14 +964,14 @@ public final class FnModuleTest extends SandboxTest {
     check("(1 to 2) ! " + func.args(" ."), "1\n2", root(RangeSeq.class));
 
     // integer runtime optimizations
-    query("sum(" + func.args(" (3, 1 to 1000000)") + ")", 500000500000L);
-    query("sum(sort(" + func.args(" (3, 1 to 1000000)") + "))", 500000500000L);
-    query("sum(" + func.args(" (3, 1 to 1000000, xs:byte(3))") + ")", 500000500000L);
-    query("sum(sort(" + func.args(" (3, 1 to 1000000, xs:byte(3))") + "))", 500000500000L);
-    query("sum(" + func.args(" (3, 1 to 1000000, xs:byte(-1))") + ")", 500000499999L);
-    query("sum(sort(" + func.args(" (3, 1 to 1000000, xs:byte(-1))") + "))", 500000499999L);
-    query("sum(" + func.args(" (3, 1 to 1000000, xs:byte(-1), -1)") + ")", 500000499999L);
-    query("sum(sort(" + func.args(" (3, 1 to 1000000, xs:byte(-1), -1)") + "))", 500000499999L);
+    query("sum(" + func.args(" (3, 1 to 1_000_000)") + ")", 500000500000L);
+    query("sum(sort(" + func.args(" (3, 1 to 1_000_000)") + "))", 500000500000L);
+    query("sum(" + func.args(" (3, 1 to 1_000_000, xs:byte(3))") + ")", 500000500000L);
+    query("sum(sort(" + func.args(" (3, 1 to 1_000_000, xs:byte(3))") + "))", 500000500000L);
+    query("sum(" + func.args(" (3, 1 to 1_000_000, xs:byte(-1))") + ")", 500000499999L);
+    query("sum(sort(" + func.args(" (3, 1 to 1_000_000, xs:byte(-1))") + "))", 500000499999L);
+    query("sum(" + func.args(" (3, 1 to 1_000_000, xs:byte(-1), -1)") + ")", 500000499999L);
+    query("sum(sort(" + func.args(" (3, 1 to 1_000_000, xs:byte(-1), -1)") + "))", 500000499999L);
 
     query("sum(" + func.args(" (3, 1 to xs:integer(<?_ 10?>))") + ")", 55);
     query("sum(sort(" + func.args(" (3, 1 to xs:integer(<?_ 10?>))") + "))", 55);
@@ -1190,14 +1190,14 @@ public final class FnModuleTest extends SandboxTest {
     check(seq + "count(distinct-values($seq)) != count($seq)", true,  root(EXISTS), exists(func));
 
     // integer runtime optimizations
-    query("sum(" + func.args(" (3, 1 to 1000000)") + ")", 3);
-    query("sum(sort(" + func.args(" (3, 1 to 1000000)") + "))", 3);
-    query("sum(" + func.args(" (3, 1 to 1000000, xs:byte(3))") + ")", 3);
-    query("sum(sort(" + func.args(" (3, 1 to 1000000, xs:byte(3))") + "))", 3);
-    query("sum(" + func.args(" (3, 1 to 1000000, xs:byte(-1))") + ")", 3);
-    query("sum(sort(" + func.args(" (3, 1 to 1000000, xs:byte(-1))") + "))", 3);
-    query("sum(" + func.args(" (3, 1 to 1000000, xs:byte(-1), -1)") + ")", 2);
-    query("sum(sort(" + func.args(" (3, 1 to 1000000, xs:byte(-1), -1)") + "))", 2);
+    query("sum(" + func.args(" (3, 1 to 1_000_000)") + ")", 3);
+    query("sum(sort(" + func.args(" (3, 1 to 1_000_000)") + "))", 3);
+    query("sum(" + func.args(" (3, 1 to 1_000_000, xs:byte(3))") + ")", 3);
+    query("sum(sort(" + func.args(" (3, 1 to 1_000_000, xs:byte(3))") + "))", 3);
+    query("sum(" + func.args(" (3, 1 to 1_000_000, xs:byte(-1))") + ")", 3);
+    query("sum(sort(" + func.args(" (3, 1 to 1_000_000, xs:byte(-1))") + "))", 3);
+    query("sum(" + func.args(" (3, 1 to 1_000_000, xs:byte(-1), -1)") + ")", 2);
+    query("sum(sort(" + func.args(" (3, 1 to 1_000_000, xs:byte(-1), -1)") + "))", 2);
 
     query("sum(" + func.args(" (3, 1 to xs:integer(<?_ 10?>))") + ")", 3);
     query("sum(sort(" + func.args(" (3, 1 to xs:integer(<?_ 10?>))") + "))", 3);
@@ -1444,23 +1444,23 @@ public final class FnModuleTest extends SandboxTest {
         func.args(" 1 to 5", "a", " fn($r, $v) { if($r = 'A') then 'A' else 'z' }"), "A");
 
     // early exits: recognized patterns terminate despite the huge input
-    query(func.args(" 1 to 1000000000", 0,
+    query(func.args(" 1 to 1_000_000_000", 0,
         " fn($r, $v) { if($r >= 10) then $r else $r + $v }"), 10);
-    query(func.args(" 1 to 1000000000", 0,
+    query(func.args(" 1 to 1_000_000_000", 0,
         " fn($r, $v) { if($r < 10) then $r + $v else $r }"), 10);
-    query(func.args(" 1 to 1000000000", " false()",
+    query(func.args(" 1 to 1_000_000_000", " false()",
         " fn($r, $v) { $r or $v = 5 }"), true);
-    query(func.args(" 1 to 1000000000", " true()",
+    query(func.args(" 1 to 1_000_000_000", " true()",
         " fn($r, $v) { $r and $v < 5 }"), false);
-    query(func.args(" 1 to 1000000000", " false()",
+    query(func.args(" 1 to 1_000_000_000", " false()",
         " fn($r, $v) { $r or $v mod 7 = 6 or $v = 3 }"), true);
-    query(func.args(" 1 to 1000000000", " false()",
+    query(func.args(" 1 to 1_000_000_000", " false()",
         " fn($r, $v) { $v = 300 or $r or $v mod 7 = 6 }"), true);
-    query(func.args(" 1 to 1000000000", " true()",
+    query(func.args(" 1 to 1_000_000_000", " true()",
         " fn($r, $v) { $v != 0 and $r and $v < 5 }"), false);
-    query(func.args(" 1 to 1000000000", " ()",
+    query(func.args(" 1 to 1_000_000_000", " ()",
         " fn($r, $v) { $r otherwise $v[. = 5] }"), 5);
-    query(func.args(" 1 to 1000000000", " ()",
+    query(func.args(" 1 to 1_000_000_000", " ()",
         " fn($r, $v) { $r otherwise $v[. = 5] otherwise $v[. = 3] }"), 3);
 
     check(func.args(" ()", " ()", " function($a, $b) { $b }"), "", empty());
@@ -1531,9 +1531,9 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" 1 to 5", 100, " fn($v, $r) { if($r >= 10) then $r else $r + $v }"), 100);
 
     // early exits: recognized patterns terminate despite the huge input
-    query(func.args(" 1 to 1000000000", 0,
+    query(func.args(" 1 to 1_000_000_000", 0,
         " fn($v, $r) { if($r >= 10) then $r else $r + $v }"), 1000000000);
-    query(func.args(" 1 to 1000000000", " ()",
+    query(func.args(" 1 to 1_000_000_000", " ()",
         " fn($v, $r) { $r otherwise $v[. mod 2 = 1] }"), 999999999);
 
     check(func.args(" ()", " ()", " function($a, $b) { $a }"), "", empty());
@@ -1614,7 +1614,7 @@ public final class FnModuleTest extends SandboxTest {
 
     inline(true);
     // pre-compute result size
-    query("count(" + func.args(" 1 to 10000000000", " string#1") + ')', 10000000000L);
+    query("count(" + func.args(" 1 to 10_000_000_000", " string#1") + ')', 10000000000L);
     check("count(" + func.args(" 1 to 20", " function($a) { $a, $a }") + ')',
         40, root(Itr.class));
 
@@ -1643,11 +1643,11 @@ public final class FnModuleTest extends SandboxTest {
     query("sort(" + func.args(" ('aa', 'bb')", " (2, 2)", " substring#2") + ')', "a\nb");
 
     // pre-compute result size
-    check("count(" + func.args(" 1 to 10000000000", " 1 to 10000000000",
+    check("count(" + func.args(" 1 to 10_000_000_000", " 1 to 10_000_000_000",
         " function($a, $b) { 'a' }") + ')', 10000000000L, empty(func));
-    check("count(" + func.args(" 1 to 20000000000", " 1 to 10000000000",
+    check("count(" + func.args(" 1 to 20_000_000_000", " 1 to 10_000_000_000",
         " function($a, $b) { 'a' }") + ')', 10000000000L, empty(func));
-    check("count(" + func.args(" 1 to 10000000000", " 1 to 20000000000",
+    check("count(" + func.args(" 1 to 10_000_000_000", " 1 to 20_000_000_000",
         " function($a, $b) { 'a' }") + ')', 10000000000L, empty(func));
     check("count(" + func.args(" 1 to 20", " 1 to 20", " function($a, $b) { $a, $b }") + ')', 40,
         exists(func));
@@ -2035,13 +2035,13 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void indexOf() {
     final Function func = INDEX_OF;
 
-    query(func.args(" 1 to 1000000", 0), "");
-    query("count(" + func.args(" 1 to 1000000", 0) + ")", 0);
+    query(func.args(" 1 to 1_000_000", 0), "");
+    query("count(" + func.args(" 1 to 1_000_000", 0) + ")", 0);
 
-    query(func.args(" reverse(1 to 1000000)", 1000000), 1);
-    query("count(" + func.args(" reverse(1 to 1000000)", 1000000) + ")", 1);
+    query(func.args(" reverse(1 to 1_000_000)", 1000000), 1);
+    query("count(" + func.args(" reverse(1 to 1_000_000)", 1000000) + ")", 1);
 
-    query("count(" + func.args(" (1 to 1000000) ! 'x'", "x") + ")", 1000000);
+    query("count(" + func.args(" (1 to 1_000_000) ! 'x'", "x") + ")", 1000000);
 
     check(func.args(" replicate(1, 6)", 1), "1\n2\n3\n4\n5\n6", exists(RangeSeq.class));
   }
@@ -2094,16 +2094,16 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void insertBefore() {
     final Function func = INSERT_BEFORE;
     query(func.args(1, 1, 1), "1\n1");
-    query("count(" + func.args(" ()", 2, " 1 to 100000000") + ')', 100000000);
-    query("count(" + func.args(" 1 to 100000000", 3, " ()") + ')', 100000000);
-    query("count(" + func.args(" 1 to 100000000", 4, " 1 to 100000000") + ')', 200000000);
+    query("count(" + func.args(" ()", 2, " 1 to 100_000_000") + ')', 100000000);
+    query("count(" + func.args(" 1 to 100_000_000", 3, " ()") + ')', 100000000);
+    query("count(" + func.args(" 1 to 100_000_000", 4, " 1 to 100_000_000") + ')', 200000000);
 
     // a statically-empty (non-literal) operand is optimized away, side-effects preserved
     check(func.args(" void(<a/>)", wrap(2), " (7, 8)"), "7\n8", empty(func));
     check(func.args(" (7, 8)", wrap(2), " void(<a/>)"), "7\n8", empty(func));
 
-    query("head(" + func.args(" 1 to 100000000", wrap(4), " 1 to 100000000") + ')', 1);
-    query("subsequence(" + func.args(" 1 to 100000000", wrap(2), " 1 to 100000000") + ", 1, 3)",
+    query("head(" + func.args(" 1 to 100_000_000", wrap(4), " 1 to 100_000_000") + ')', 1);
+    query("subsequence(" + func.args(" 1 to 100_000_000", wrap(2), " 1 to 100_000_000") + ", 1, 3)",
         "1\n1\n2");
 
     query("for $p in (0 to 4)" +
@@ -2801,7 +2801,7 @@ return
     check(func.args(" void(123)"), "", empty(func));
     check(func.args(" 123"), 123, empty(func));
     check(func.args(wrap(1)), 1, exists(func));
-    check(func.args(" (0 to 99999999999) ! (1 to 10000000)"), 1, root(Itr.class));
+    check(func.args(" (0 to 99_999_999_999) ! (1 to 10_000_000)"), 1, root(Itr.class));
 
     query(func.args(" #a"), "#a");
 
@@ -3801,7 +3801,7 @@ return
     query(func.args(" 1 to 10000", 10000) + "[1]", "1");
     query(func.args(" 1 to 10000", 10000) + "[10000]", "10000");
     query(func.args(" 1 to 10000", 10000) + "[10001]", "1");
-    query("count(" + func.args(" 1 to 1000000", 1000000) + ")", 1000000000000L);
+    query("count(" + func.args(" 1 to 1_000_000", 1_000_000) + ")", 1000000000000L);
     query("count(" + func.args(func.args(" 1 to 3", 3), 3) + ")", 27);
 
     // single item: total size fits into the integer range
@@ -3984,8 +3984,8 @@ return
         ", fn($total) { $total?* le 7 })", "[0]\n[3]\n[7]");
 
     // results are computed lazily
-    query("head(" + func.args(" 1 to 1000000000", 0, " op('+')") + ")", "[0]");
-    query("subsequence(" + func.args(" 1 to 1000000000", 0, " op('+')") + ", 3, 2)", "[3]\n[6]");
+    query("head(" + func.args(" 1 to 1_000_000_000", 0, " op('+')") + ")", "[0]");
+    query("subsequence(" + func.args(" 1 to 1_000_000_000", 0, " op('+')") + ", 3, 2)", "[3]\n[6]");
 
     check(func.args(" ()", " (1, 2)", " op('+')"), "[(1,2)]", empty(func));
     check(func.args(" (1 to 5)[. > 4]", 0, " op('+')"), "[0]\n[5]",
@@ -4328,10 +4328,10 @@ return
         "1\n2\n3\n4\n5\n6\n1\n2\n3\n4\n5\n6",
         exists(ITEMS_AT), empty(HoistedFilter.class), empty(CachedFilter.class));
 
-    check(func.args(" 1 to 100000000") + "[1]", 1, empty(func));
-    check(func.args(" reverse(1 to 100000000)") + "[1]", 1, empty(func));
-    check(func.args(" (1 to 100000000) ! 1") + "[1]", 1, empty(func));
-    check(func.args(" reverse((1 to 100000000) ! 1)") + "[1]", 1, empty(func));
+    check(func.args(" 1 to 100_000_000") + "[1]", 1, empty(func));
+    check(func.args(" reverse(1 to 100_000_000)") + "[1]", 1, empty(func));
+    check(func.args(" (1 to 100_000_000) ! 1") + "[1]", 1, empty(func));
+    check(func.args(" reverse((1 to 100_000_000) ! 1)") + "[1]", 1, empty(func));
 
     check("(" + _RANDOM_DOUBLE.args() + " =>" + REPLICATE.args(10) + " => " +
         func.args() + ")[. > 1]", "", empty(func));
@@ -4410,7 +4410,7 @@ return
     query(func.args(" ()", ""), "");
     query(func.args(" ()", "x"), "");
     query(func.args("", "x"), "");
-    query(func.args(" (1 to 100000000) ! ''"), "");
+    query(func.args(" (1 to 10_000_000) ! ''"), "");
 
     query(func.args("x", ""), "x");
     query(func.args("x", "x"), "x");
@@ -4425,7 +4425,7 @@ return
     query(func.args(" ()", "") + " => boolean()", false);
     query(func.args(" ()", "x") + " => boolean()", false);
     query(func.args("", "x") + " => boolean()", false);
-    query(func.args(" (1 to 100000000) ! ''") + " => boolean()", false);
+    query(func.args(" (1 to 10_000_000) ! ''") + " => boolean()", false);
 
     query(func.args("x", "") + " => boolean()", true);
     query(func.args("x", "x") + " => boolean()", true);
@@ -4433,8 +4433,8 @@ return
     query(func.args(" ('x', '')", "") + " => boolean()", true);
     query(func.args(" ('', 'x')", "") + " => boolean()", true);
     query(func.args(" ('', 'x')", "x") + " => boolean()", true);
-    query(func.args(" 1 to 100000000") + " => boolean()", true);
-    query(func.args(" (1 to 100000000) ! 'x'") + " => boolean()", true);
+    query(func.args(" 1 to 10_000_000") + " => boolean()", true);
+    query(func.args(" (1 to 10_000_000) ! 'x'") + " => boolean()", true);
   }
 
   /** Test method. */
@@ -4687,14 +4687,14 @@ return
     query(func.args(" 1 to <x>0</x>"), 0);
     query(func.args(" reverse(1 to 10)"), 55);
     query(func.args(" sort(reverse(distinct-values(1 to 4294967295)))"), 9223372034707292160L);
-    error(func.args(" 1 to 10000000000000"), RANGE_X);
+    error(func.args(" 1 to 10_000_000_000_000"), RANGE_X);
 
     query(func.args(" (1 to 10) ! 1"), 10);
     query(func.args(" (1 to 10) ! 10"), 100);
-    query(func.args(" (1 to 1000000) ! 1000000"), 1000000000000L);
+    query(func.args(" (1 to 1_000_000) ! 1_000_000"), 1000000000000L);
     query(func.args(" (1 to 10) ! xs:untypedAtomic('10')"), 100);
     error(func.args(" (1 to 10) ! 'a'"), NUMDUR_X_X);
-    error(func.args(" (1 to 1000000) ! 'b'"), NUMDUR_X_X);
+    error(func.args(" (1 to 1_000_000) ! 'b'"), NUMDUR_X_X);
 
     query("for $i in 1 to 2 return " + func.args(" ()", " $i"), "1\n2");
     query(func.args(" ()", wrap(0)), 0);
@@ -5018,7 +5018,7 @@ return
     query(func.args(1), "");
     query(func.args("1, 2"), "");
     query(func.args("1, 2", true), "");
-    check(func.args(" (1 to 10000000000000) ! string()", true), "", empty());
+    check(func.args(" (1 to 10_000_000_000_000) ! string()", true), "", empty());
 
     error(func.args(" 1 + <a/>"), FUNCCAST_X_X);
     error(func.args(" 1 + <a/>", false), FUNCCAST_X_X);

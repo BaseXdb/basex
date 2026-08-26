@@ -151,7 +151,7 @@ public final class JobModuleTest extends SandboxTest {
     final Function func = _JOB_EVAL;
     final String options = " { 'cache': true(), 'memory': 10 }";
     // job that allocates nothing, but whose limit is exceeded by the heap usage of the other job
-    final String idle = query(func.args("prof:sleep(3000)", " ()", options));
+    final String idle = query(func.args("prof:sleep(1000)", " ()", options));
     final String greedy = query(func.args("(1 to 10000000000000) ! <a/>", " ()", options));
 
     query(_JOB_WAIT.args(greedy));
@@ -218,8 +218,7 @@ public final class JobModuleTest extends SandboxTest {
     Performance.sleep(1200);
     query(_JOB_LIST.args() + "='" + id + '\'', true);
     // job is removed after the end time has been exceeded
-    Performance.sleep(2000);
-    query(_JOB_LIST.args() + "='" + id + '\'', false);
+    assertEquals("true", waitUntil("not(" + _JOB_LIST.args() + "='" + id + "')"));
   }
 
   /** Test method. */
@@ -413,8 +412,7 @@ public final class JobModuleTest extends SandboxTest {
     final String scheduled = query("exists(" + _JOB_LIST_DETAILS.args("RESTART") + ')');
 
     // the task is dropped from the list as soon as it has been executed
-    Performance.sleep(3000);
-    final String executed = query("empty(" + _JOB_LIST_DETAILS.args("RESTART") + ')');
+    final String executed = waitUntil("empty(" + _JOB_LIST_DETAILS.args("RESTART") + ')');
 
     query(_JOB_REMOVE.args("RESTART", " { 'service': true() }"));
     assertEquals("true", scheduled);
@@ -783,5 +781,19 @@ public final class JobModuleTest extends SandboxTest {
     final String id = query(_JOB_EVAL.args(VERY_SLOW_QUERY));
     while(context.jobs.active.get(id) == null) Performance.sleep(1);
     return id;
+  }
+
+  /**
+   * Evaluates a boolean query until it yields true, or until the time limit has been exceeded.
+   * @param query query to evaluate
+   * @return last query result
+   */
+  private static String waitUntil(final String query) {
+    String result = query(query);
+    for(int i = 0; i < 500 && !result.equals("true"); i++) {
+      Performance.sleep(10);
+      result = query(query);
+    }
+    return result;
   }
 }

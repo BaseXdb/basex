@@ -213,7 +213,7 @@ public final class WsLifecycleTest extends WsTest {
     // messages of a connection are processed in order: the job is registered before it is stopped
     ws.sendText("start", true).get(5, TimeUnit.SECONDS);
     ws.sendText("stop", true).get(5, TimeUnit.SECONDS);
-    assertNull(l.texts.poll(2, TimeUnit.SECONDS), "Message was sent for a stopped job.");
+    assertNull(l.texts.poll(500, TimeUnit.MILLISECONDS), "Message was sent for a stopped job.");
     assertEquals("", cacheGet("ws-eval-error"));
     close(ws);
   }

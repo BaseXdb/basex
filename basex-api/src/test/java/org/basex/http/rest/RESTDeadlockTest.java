@@ -45,9 +45,9 @@ public final class RESTDeadlockTest extends RESTTest {
   @Test @Timeout(60) public void globalReadLocalWriteDeadlock() throws Exception {
     final ExecutorService exec = Executors.newFixedThreadPool(3);
     try {
-      // pure local writer; holds its write lock for two seconds
+      // pure local writer; holds its write lock for one second
       final Future<?> p = exec.submit(() -> post("<commands><xquery>db:create('" + DB_P +
-          "'), prof:sleep(2000)</xquery></commands>", MediaType.APPLICATION_XML, ""));
+          "'), prof:sleep(1000)</xquery></commands>", MediaType.APPLICATION_XML, ""));
 
       // give the writer time to acquire its lock
       Thread.sleep(500);

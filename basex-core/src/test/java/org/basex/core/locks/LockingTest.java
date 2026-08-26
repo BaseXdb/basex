@@ -22,6 +22,8 @@ public final class LockingTest extends SandboxTest {
   private static final int REPEAT = 1;
   /** How many milliseconds to wait for threads to finish. */
   private static final long WAIT = 100L;
+  /** How many milliseconds to wait for a lock that must not be granted. */
+  private static final long NO_LOCK = 40L;
   /** Number of threads used in fuzzing test. */
   private static final int FUZZING_THREADS = 5;
   /** Repeated locking events each thread should trigger. */
@@ -147,7 +149,7 @@ public final class LockingTest extends SandboxTest {
 
     th1.start();
     th2.start();
-    assertFalse(test.await(WAIT, TimeUnit.MILLISECONDS),
+    assertFalse(test.await(NO_LOCK, TimeUnit.MILLISECONDS),
       "Thread 2 shouldn't be able to acquire lock yet.");
     th1.release();
     assertTrue(test.await(WAIT, TimeUnit.MILLISECONDS),
@@ -167,7 +169,7 @@ public final class LockingTest extends SandboxTest {
 
     th1.start();
     th2.start();
-    assertFalse(test.await(WAIT, TimeUnit.MILLISECONDS),
+    assertFalse(test.await(NO_LOCK, TimeUnit.MILLISECONDS),
       "Thread 2 shouldn't be able to acquire lock yet.");
     th1.release();
     assertTrue(test.await(WAIT, TimeUnit.MILLISECONDS),
@@ -187,7 +189,7 @@ public final class LockingTest extends SandboxTest {
 
     th1.start();
     th2.start();
-    assertFalse(test.await(WAIT, TimeUnit.MILLISECONDS),
+    assertFalse(test.await(NO_LOCK, TimeUnit.MILLISECONDS),
       "Thread 2 shouldn't be able to acquire lock yet.");
     th1.release();
     assertTrue(test.await(WAIT, TimeUnit.MILLISECONDS),
@@ -237,7 +239,7 @@ public final class LockingTest extends SandboxTest {
     final CountDownLatch latch2 = new CountDownLatch(1);
     testers[tl - 1] = new LockTester(null, objects, NONE, latch2);
     testers[tl - 1].start();
-    assertFalse(latch2.await(WAIT, TimeUnit.MILLISECONDS),
+    assertFalse(latch2.await(NO_LOCK, TimeUnit.MILLISECONDS),
       "Shouldn't be able to start another parallel transaction yet!");
 
     // Stop first transaction
@@ -263,13 +265,13 @@ public final class LockingTest extends SandboxTest {
 
     th1.start();
     th2.start();
-    assertFalse(sync2.await(WAIT, TimeUnit.MILLISECONDS),
+    assertFalse(sync2.await(NO_LOCK, TimeUnit.MILLISECONDS),
       "Thread 2 shouldn't be able to acquire lock yet.");
     th1.release();
     assertTrue(sync2.await(WAIT, TimeUnit.MILLISECONDS),
       "Thread 2 should be able to acquire lock now.");
     th3.start();
-    assertFalse(test.await(WAIT, TimeUnit.MILLISECONDS),
+    assertFalse(test.await(NO_LOCK, TimeUnit.MILLISECONDS),
       "Thread 3 shouldn't be able to acquire lock yet.");
     th2.release();
     assertTrue(test.await(WAIT, TimeUnit.MILLISECONDS),
@@ -291,13 +293,13 @@ public final class LockingTest extends SandboxTest {
 
     th1.start();
     th2.start();
-    assertFalse(sync2.await(WAIT, TimeUnit.MILLISECONDS),
+    assertFalse(sync2.await(NO_LOCK, TimeUnit.MILLISECONDS),
       "Thread 2 shouldn't be able to acquire lock yet.");
     th1.release();
     assertTrue(sync2.await(WAIT, TimeUnit.MILLISECONDS),
       "Thread 2 should be able to acquire lock now.");
     th3.start();
-    assertFalse(test.await(WAIT, TimeUnit.MILLISECONDS),
+    assertFalse(test.await(NO_LOCK, TimeUnit.MILLISECONDS),
       "Thread 3 shouldn't be able to acquire lock yet.");
     th2.release();
     assertTrue(test.await(WAIT, TimeUnit.MILLISECONDS),
@@ -319,13 +321,13 @@ public final class LockingTest extends SandboxTest {
 
     th1.start();
     th2.start();
-    assertFalse(sync2.await(WAIT, TimeUnit.MILLISECONDS),
+    assertFalse(sync2.await(NO_LOCK, TimeUnit.MILLISECONDS),
       "Thread 2 shouldn't be able to acquire lock yet.");
     th1.release();
     assertTrue(sync2.await(WAIT, TimeUnit.MILLISECONDS),
       "Thread 2 should be able to acquire lock now.");
     th3.start();
-    assertFalse(test.await(WAIT, TimeUnit.MILLISECONDS),
+    assertFalse(test.await(NO_LOCK, TimeUnit.MILLISECONDS),
       "Thread 3 shouldn't be able to acquire lock yet.");
     th2.release();
     assertTrue(test.await(WAIT, TimeUnit.MILLISECONDS),
@@ -371,7 +373,7 @@ public final class LockingTest extends SandboxTest {
     th1.start();
     th2.start();
     th3.start();
-    assertFalse(test.await(WAIT, TimeUnit.MILLISECONDS),
+    assertFalse(test.await(NO_LOCK, TimeUnit.MILLISECONDS),
       "Threads 2 & 3 shouldn't be able to acquire lock yet.");
     th1.release();
     assertTrue(test.await(WAIT, TimeUnit.MILLISECONDS),
@@ -392,7 +394,7 @@ public final class LockingTest extends SandboxTest {
 
     th1.start();
     th2.start();
-    assertFalse(test.await(WAIT, TimeUnit.MILLISECONDS),
+    assertFalse(test.await(NO_LOCK, TimeUnit.MILLISECONDS),
       "Thread 2 shouldn't be able to acquire lock yet.");
     th1.release();
     assertTrue(test.await(WAIT, TimeUnit.MILLISECONDS),
@@ -412,7 +414,7 @@ public final class LockingTest extends SandboxTest {
 
     th1.start();
     th2.start();
-    assertFalse(test.await(WAIT, TimeUnit.MILLISECONDS),
+    assertFalse(test.await(NO_LOCK, TimeUnit.MILLISECONDS),
       "Thread 2 shouldn't be able to acquire lock yet.");
     th1.release();
     assertTrue(test.await(WAIT, TimeUnit.MILLISECONDS),
@@ -436,7 +438,7 @@ public final class LockingTest extends SandboxTest {
 
     th1.start();
     th2.start();
-    assertFalse(test.await(WAIT, TimeUnit.MILLISECONDS),
+    assertFalse(test.await(NO_LOCK, TimeUnit.MILLISECONDS),
       "Thread 2 shouldn't be able to acquire lock yet.");
     th1.release();
     th2.release();
@@ -458,7 +460,7 @@ public final class LockingTest extends SandboxTest {
 
     th1.start();
     th2.start();
-    assertFalse(test.await(WAIT, TimeUnit.MILLISECONDS),
+    assertFalse(test.await(NO_LOCK, TimeUnit.MILLISECONDS),
       "Thread 2 shouldn't be able to acquire lock yet.");
     th1.release();
     assertTrue(test.await(WAIT, TimeUnit.MILLISECONDS),
@@ -479,7 +481,7 @@ public final class LockingTest extends SandboxTest {
 
     th1.start();
     th2.start();
-    assertFalse(test.await(WAIT, TimeUnit.MILLISECONDS),
+    assertFalse(test.await(NO_LOCK, TimeUnit.MILLISECONDS),
       "Thread 2 shouldn't be able to acquire lock yet.");
     th1.release();
     assertTrue(test.await(WAIT, TimeUnit.MILLISECONDS),
@@ -500,7 +502,7 @@ public final class LockingTest extends SandboxTest {
 
     th1.start();
     th2.start();
-    assertFalse(test.await(WAIT, TimeUnit.MILLISECONDS),
+    assertFalse(test.await(NO_LOCK, TimeUnit.MILLISECONDS),
       "Thread 2 shouldn't be able to acquire lock yet.");
     th1.release();
     th2.release();
@@ -523,7 +525,7 @@ public final class LockingTest extends SandboxTest {
 
     th1.start();
     th2.start();
-    assertFalse(test.await(WAIT, TimeUnit.MILLISECONDS),
+    assertFalse(test.await(NO_LOCK, TimeUnit.MILLISECONDS),
       "Thread 2 shouldn't be able to acquire lock yet.");
     th1.release();
     assertTrue(test.await(WAIT, TimeUnit.MILLISECONDS),

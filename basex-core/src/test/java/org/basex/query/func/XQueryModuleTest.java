@@ -167,9 +167,9 @@ public final class XQueryModuleTest extends SandboxTest {
   @Test public void evalTimeout() {
     final Function func = _XQUERY_EVAL;
     // queries
-    query("try { " + func.args("(1 to 10000000000000)[. = 0]", " {}", " { 'timeout': 1 }") +
+    query("try { " + func.args("(1 to 10000000000000)[. = 0]", " {}", " { 'timeout': .2 }") +
         " } catch * { () }", "");
-    error(func.args("(1 to 10000000000000)[. = 0]", " {}", " { 'timeout': 1 }"),
+    error(func.args("(1 to 10000000000000)[. = 0]", " {}", " { 'timeout': .2 }"),
         XQUERY_TIMEOUT);
     error(func.args("(1 to 10000000000000)[. = 0]", " {}", " { 'timeout': .1 }"),
         XQUERY_TIMEOUT);

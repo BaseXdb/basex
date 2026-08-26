@@ -258,15 +258,15 @@ public final class CacheModuleTest extends SandboxTest {
     query(_CACHE_INIT.args(" { 'ttl': 1 }"));
     query(_CACHE_PUT.args("key", "TTL"));
     query(_CACHE_GET.args("key"), "TTL");
-    Performance.sleep(1100);
-    query(_CACHE_GET.args("key"), "");
-    query(_CACHE_SIZE.args(), 0);
-    query(_CACHE_INFO.args() + "?expirations", 1);
 
-    // unlimited lifetime
+    // unlimited lifetime; both caches share a single waiting period
     query(_CACHE_INIT.args(" { 'ttl': 0 }", "cache"));
     query(_CACHE_PUT.args("key", "TTL", "cache"));
     Performance.sleep(1100);
+
+    query(_CACHE_GET.args("key"), "");
+    query(_CACHE_SIZE.args(), 0);
+    query(_CACHE_INFO.args() + "?expirations", 1);
     query(_CACHE_GET.args("key", "cache"), "TTL");
     query(_CACHE_INFO.args("cache") + "?expirations", 0);
   }

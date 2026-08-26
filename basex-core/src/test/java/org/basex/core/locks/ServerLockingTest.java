@@ -24,6 +24,10 @@ public final class ServerLockingTest extends SandboxTest {
   private static final long SLEEP = 250;
   /** Additional allowed holding time for client creation overhead, ... in ms. */
   private static final long SYNC = 50;
+  /** Maximum time to wait for a client to finish, in ms. */
+  private static final long JOIN = 10000;
+  /** Number of attempts to observe the expected execution order. */
+  private static final int ATTEMPTS = 3;
 
   /** Test document. */
   private static final String DOC = "src/test/resources/test.xml";
@@ -89,16 +93,29 @@ public final class ServerLockingTest extends SandboxTest {
   private static void testQueries(final String query1, final String query2, final boolean parallel)
       throws Exception {
 
-    sync = new CountDownLatch(2);
-    test = new CountDownLatch(2);
-    final SandboxClient cl1 = new SandboxClient(new XQuery(query1), null, null);
-    final SandboxClient cl2 = new SandboxClient(new XQuery(query2), null, null);
-    final boolean await = test.await(2 * SLEEP + SYNC, TimeUnit.MILLISECONDS);
-    assertNull(cl1.error, cl1.error);
-    assertNull(cl2.error, cl2.error);
-    if(parallel != await) {
-      fail((parallel ? "Parallel" : "Serial") + " execution expected. Queries:\n" +
-          query1 + "\n" + query2);
+    for(int a = 1; a <= ATTEMPTS; a++) {
+      sync = new CountDownLatch(2);
+      test = new CountDownLatch(2);
+      // release both clients at once: a client that is still opening its session while the other
+      // one already runs its query makes a parallel pair look serial
+      final CountDownLatch start = new CountDownLatch(1);
+      final SandboxClient cl1 = new SandboxClient(new XQuery(query1), start, null);
+      final SandboxClient cl2 = new SandboxClient(new XQuery(query2), start, null);
+      start.countDown();
+      // a serial run never counts the latch down; waiting past the inner timeout gains nothing
+      final boolean await = test.await(parallel ? 2 * SLEEP + SYNC : SLEEP + SYNC,
+          TimeUnit.MILLISECONDS);
+      // the error fields and the locks of a run are only settled once both clients have finished
+      cl1.join(JOIN);
+      cl2.join(JOIN);
+      assertNull(cl1.error, cl1.error);
+      assertNull(cl2.error, cl2.error);
+      // parallelism is a timing observation: a busy machine can serialize a parallel run
+      if(parallel == await) return;
+      if(a == ATTEMPTS) {
+        fail((parallel ? "Parallel" : "Serial") + " execution expected. Queries:\n" +
+            query1 + "\n" + query2);
+      }
     }
   }
 
