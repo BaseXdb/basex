@@ -44,9 +44,9 @@ final class DigitalSignature {
   /** Default canonicalization algorithm. */
   private static final byte[] DEFC = token("inclusive-with-comments");
   /** Default digest algorithm. */
-  private static final byte[] DEFD = token("sha1");
+  private static final byte[] DEFD = token("sha256");
   /** Default signature algorithm. */
-  private static final byte[] DEFS = token("rsa_sha1");
+  private static final byte[] DEFS = token("rsa_sha256");
   /** Default signature type enveloped. */
   private static final byte[] DEFT = token("enveloped");
   /** Signature type enveloping. */
@@ -66,7 +66,10 @@ final class DigitalSignature {
     DIGESTS.put(token("sha512"), token(DigestMethod.SHA512));
 
     SIGNATURES.put(token("rsa_sha1"), token(SignatureMethod.RSA_SHA1));
+    SIGNATURES.put(token("rsa_sha256"), token(SignatureMethod.RSA_SHA256));
+    SIGNATURES.put(token("rsa_sha512"), token(SignatureMethod.RSA_SHA512));
     SIGNATURES.put(token("dsa_sha1"), token(SignatureMethod.DSA_SHA1));
+    SIGNATURES.put(token("dsa_sha256"), token(SignatureMethod.DSA_SHA256));
 
     TYPES.add(DEFT);
     TYPES.add(ENVT);
@@ -120,7 +123,7 @@ final class DigitalSignature {
     b = SIGNATURES.get(lc(b));
     if(b == null) throw CX_SIGINV.get(info, sig);
     final String signature = string(b);
-    final String keytype = string(tsig).substring(0, 3);
+    final String keytype = string(lc(tsig)).substring(0, 3);
 
     b = tp;
     if(b.length == 0) b = DEFT;

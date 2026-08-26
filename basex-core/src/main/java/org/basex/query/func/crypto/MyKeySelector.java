@@ -65,11 +65,12 @@ final class MyKeySelector extends KeySelector {
         }
       }
 
+      // the fragment of a signature algorithm URI starts with the name of the key algorithm
+      // (rsa-sha256, dsa-sha1, ...), which is the key we are looking for
       if(pk != null) {
-        final String sa = sm.getAlgorithm();
-        final String ka = pk.getAlgorithm();
-        if("DSA".equalsIgnoreCase(ka) && "http://www.w3.org/2000/09/xmldsig#dsa-sha1".equals(sa) ||
-          "RSA".equalsIgnoreCase(ka) && "http://www.w3.org/2000/09/xmldsig#rsa-sha1".equals(sa)) {
+        final String sa = sm.getAlgorithm(), ka = pk.getAlgorithm();
+        final int hash = sa.indexOf('#');
+        if(hash != -1 && sa.regionMatches(true, hash + 1, ka, 0, ka.length())) {
           return new MyKeySelectorResult(pk);
         }
       }
