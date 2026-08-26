@@ -343,7 +343,7 @@ async function runQuery() {
  */
 function resultLanguage(text) {
   const s = text.replace(/^\s+/, "");
-  if(s[0] === "<") return "xml";
+  if(s[0] === "<") return htmlContent(s) ? "html" : "xml";
   if(s[0] === "{" || s[0] === "[") return "json";
   return "text";
 }
@@ -444,8 +444,17 @@ function contentLanguage(text) {
   const s = (text || "").replace(/^\s+/, "");
   if(!s) return "xquery";
   if(s[0] === "{" || s[0] === "[") return "json";
-  if(s[0] === "<") return /^<!doctype\s+html\b/i.test(s) || /^<html(?:\s|>|$)/i.test(s) ? "html" : "xml";
+  if(s[0] === "<") return htmlContent(s) ? "html" : "xml";
   return "xquery";
+}
+
+/**
+ * Indicates whether serialized markup looks like an HTML document.
+ * @param {string} text text starting at the first non-whitespace character
+ * @returns {boolean} result
+ */
+function htmlContent(text) {
+  return /^<!doctype\s+html\b/i.test(text) || /^<html(?:\s|>|$)/i.test(text);
 }
 
 /**
