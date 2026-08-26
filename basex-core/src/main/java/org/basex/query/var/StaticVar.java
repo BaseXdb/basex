@@ -50,7 +50,7 @@ public final class StaticVar extends StaticDecl {
       compiled = true;
 
       final QueryFocus focus = cc.qc.focus;
-      pushFocus(cc.qc);
+      cc.qc.focus = cc.qc.globalFocus();
       cc.pushScope(vs);
       try {
         expr = expr.compile(cc);
@@ -93,7 +93,7 @@ public final class StaticVar extends StaticDecl {
    */
   Value compute(final QueryContext qc) throws QueryException {
     final QueryFocus focus = qc.focus;
-    pushFocus(qc);
+    qc.focus = qc.globalFocus();
     final int fp = vs.enter(qc);
     try {
       return coerce(expr.value(qc), qc);
@@ -162,16 +162,6 @@ public final class StaticVar extends StaticDecl {
    */
   boolean has(final Flag... flags) {
     return check(flags);
-  }
-
-  /**
-   * Assigns a new query focus with the global context value.
-   * @param qc query context
-   */
-  private static void pushFocus(final QueryContext qc) {
-    final QueryFocus qf = new QueryFocus();
-    qf.value = qc.finalContext ? qc.contextValue.value : null;
-    qc.focus = qf;
   }
 
   @Override

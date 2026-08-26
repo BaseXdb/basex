@@ -675,6 +675,16 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   /**
+   * Returns a new query focus with the global context value.
+   * @return query focus
+   */
+  public QueryFocus globalFocus() {
+    final QueryFocus qf = new QueryFocus();
+    qf.value = finalContext ? contextValue.value : null;
+    return qf;
+  }
+
+  /**
    * Initializes the static date and time context of a query if not done yet.
    * @return self reference
    * @throws QueryException query exception

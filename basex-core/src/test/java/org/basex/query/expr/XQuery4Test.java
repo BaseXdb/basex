@@ -232,6 +232,36 @@ public final class XQuery4Test extends SandboxTest {
     error("function { . + $i }", VARUNDEF_X);
   }
 
+  /** Default values of function parameters. */
+  @Test public void paramDefaults() {
+    query("declare function local:f($x := 1 + 1) { $x }; local:f()", 2);
+    query("declare function local:f($x := 1) { $x }; local:f(2)", 2);
+
+    // 'context value' defaults to the context value of the caller
+    query("declare function local:f($n as node() := context value) { name($n) }; "
+        + "<a/>/local:f()", "a");
+    query("declare function local:f($n as node() := context value) { name($n) }; "
+        + "local:f(<b/>)", "b");
+    query("declare function local:f($x := context value) { $x }; <a/> ! local:f()", "<a/>");
+    query("declare function local:f($x := context value) { $x }; (1, 2) ! local:f()", "1\n2");
+    error("declare function local:f($x := context value) { $x }; local:f()", NOCTX_X);
+
+    // all other defaults are evaluated with the focus of the query prolog
+    error("declare function local:f($n as node() := .) { name($n) }; <a/>/local:f()", NOCTX_X);
+    error("declare function local:f($x := position()) { $x }; (1, 2) ! local:f()", NOCTX_X);
+    query("declare context value := <global/>; "
+        + "declare function local:f($n as node() := .) { name($n) }; <a/>/local:f()", "global");
+    query("declare context value := <global/>; "
+        + "declare function local:f($n as node() := context value) { name($n) }; <a/>/local:f()",
+        "a");
+
+    // 'context' is still available as a name
+    query("declare function local:context() { 'x' }; "
+        + "declare function local:f($x := local:context()) { $x }; local:f()", "x");
+    query("declare function local:f($x := <context><value>v</value></context>/value) "
+        + "{ string($x) }; local:f()", "v");
+  }
+
   /** Generalized arrow operator. */
   @Test public void arrow() {
     query("'x' => {}()", "");
