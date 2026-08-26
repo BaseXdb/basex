@@ -10,9 +10,9 @@ import java.util.*;
  */
 final class NonfairLockQueue extends LockQueue {
   /** Queued readers. */
-  private final Queue<Long> readers = new LinkedList<>();
+  private final Queue<Long> readers = new ArrayDeque<>();
   /** Queued writers. */
-  private final Queue<Long> writers = new LinkedList<>();
+  private final Queue<Long> writers = new ArrayDeque<>();
 
   /**
    * Constructor.

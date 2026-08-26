@@ -10,7 +10,7 @@ import java.util.*;
  */
 final class FairLockQueue extends LockQueue {
   /** Queue. */
-  private final Queue<Long> queue = new LinkedList<>();
+  private final Queue<Long> queue = new ArrayDeque<>();
 
   /**
    * Constructor.

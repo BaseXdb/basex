@@ -41,11 +41,11 @@ public final class JsonW3Converter extends JsonConverter {
   private static final BigDecimal MIN_LONG_BD = BigDecimal.valueOf(Long.MIN_VALUE);
 
   /** Stack for intermediate values. */
-  private final Stack<Value> stack = new Stack<>();
+  private final ArrayDeque<Value> stack = new ArrayDeque<>();
   /** Stack for intermediate arrays. */
-  private final Stack<ArrayBuilder> arrays = new Stack<>();
+  private final ArrayDeque<ArrayBuilder> arrays = new ArrayDeque<>();
   /** Stack for intermediate maps. */
-  private final Stack<MapBuilder> maps = new Stack<>();
+  private final ArrayDeque<MapBuilder> maps = new ArrayDeque<>();
   /** Number format. */
   private final JsonNumberFormat fmt;
 

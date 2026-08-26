@@ -31,7 +31,7 @@ public final class QueryPlan {
   /** Root node. */
   private final FBuilder root;
   /** Node stack. */
-  private final Stack<FBuilder> nodes = new Stack<>();
+  private final ArrayDeque<FBuilder> nodes = new ArrayDeque<>();
   /** Include comprehensive information. */
   private final boolean full;
 
@@ -43,7 +43,7 @@ public final class QueryPlan {
    */
   public QueryPlan(final boolean compiled, final boolean updating, final boolean full) {
     root = FElem.build(Q_QUERY_PLAN).attr(Q_COMPILED, compiled).attr(Q_UPDATING, updating);
-    nodes.add(root);
+    nodes.push(root);
     this.full = full;
   }
 
@@ -62,7 +62,7 @@ public final class QueryPlan {
    */
   public void add(final FBuilder elem, final Object... children) {
     final FBuilder plan = nodes.peek();
-    nodes.add(elem);
+    nodes.push(elem);
 
     for(final Object child : children) {
       if(child instanceof final ExprInfo ei) {

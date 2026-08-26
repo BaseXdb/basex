@@ -22,7 +22,7 @@ final class QuerySuggest extends QueryParser {
   private final Data data;
 
   /** Stack of current path nodes (can be {@code null}). */
-  private Stack<ArrayList<PathNode>> stack;
+  private ArrayDeque<ArrayList<PathNode>> stack;
   /** All current path nodes. */
   private ArrayList<PathNode> all;
   /** Current path nodes. */
@@ -63,8 +63,8 @@ final class QuerySuggest extends QueryParser {
 
   @Override
   void checkInit() {
-    if(stack == null || stack.empty()) {
-      stack = new Stack<>();
+    if(stack == null || stack.isEmpty()) {
+      stack = new ArrayDeque<>();
       all = data.paths().root();
       current = all;
     }
@@ -113,7 +113,7 @@ final class QuerySuggest extends QueryParser {
     if(stack == null) return;
     if(open) {
       checkTest(true);
-      stack.add(new ArrayList<>(current));
+      stack.push(new ArrayList<>(current));
       checkAxis(Axis.CHILD);
     } else {
       current = stack.pop();

@@ -42,10 +42,10 @@ public final class DOMWrapper extends Parser {
   public void parse(final Builder builder) throws IOException {
     builder.openDoc(token(source.path()));
 
-    final Stack<NodeIterator> stack = new Stack<>();
+    final ArrayDeque<NodeIterator> stack = new ArrayDeque<>();
     stack.push(new NodeIterator(doc));
 
-    while(!stack.empty()) {
+    while(!stack.isEmpty()) {
       final NodeIterator ni = stack.peek();
       if(ni.more()) {
         final Node n = ni.curr();
@@ -79,7 +79,7 @@ public final class DOMWrapper extends Parser {
         ++nodes;
       } else {
         stack.pop();
-        if(stack.empty()) break;
+        if(stack.isEmpty()) break;
         builder.closeElem();
       }
     }

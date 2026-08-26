@@ -110,7 +110,7 @@ public class RegExpr {
      */
     public static GroupInfo groupInfo(final String pattern) {
       final GroupScanner gnd = new GroupScanner(pattern);
-      final Stack<Integer> open = new Stack<>();
+      final ArrayDeque<Integer> open = new ArrayDeque<>();
       open.push(0);
       int[] parentGroups = { };
       boolean[] inAssertion = { };

@@ -326,7 +326,7 @@ public final class ViewContainer extends BaseXBack {
     try {
       layout = null;
       int nv = 0;
-      final Stack<ViewLayout> layouts = new Stack<>();
+      final ArrayDeque<ViewLayout> layouts = new ArrayDeque<>();
       // collect all tokens (allows look-ahead for the optional weight tokens)
       final ArrayList<String> tokens = new ArrayList<>();
       final StringTokenizer st = new StringTokenizer(string);
@@ -346,7 +346,7 @@ public final class ViewContainer extends BaseXBack {
           } else {
             layouts.peek().add(view);
           }
-          layouts.add(view);
+          layouts.push(view);
           comp = view;
         } else {
           final ViewPanel view = getView(token);
