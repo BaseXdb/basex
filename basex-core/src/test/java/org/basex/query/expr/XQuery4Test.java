@@ -789,6 +789,16 @@ public final class XQuery4Test extends SandboxTest {
     check("declare namespace x = 'u'; <x:a><x:b/></x:a>/child::{'b'}",
         "<x:b xmlns:x=\"u\"/>", exists(SelectorStep.class));
 
+    // keys that cannot match a name are ignored, they raise no error
+    check("<a><b/></a>/child::{1}", "", exists(SelectorStep.class));
+    check("<a><b/></a>/child::{'x y'}", "", exists(SelectorStep.class));
+    check("<a><b/></a>/child::{xs:date('2020-01-01')}", "", exists(SelectorStep.class));
+    check("<a><b/></a>/child::{1, 'b', xs:date('2020-01-01')}", "<b/>",
+        exists(SelectorStep.class));
+    // string-derived keys match the local name
+    check("<a><b/></a>/child::{xs:untypedAtomic('b')}", "<b/>", exists(SelectorStep.class));
+    check("<a><b/></a>/child::{xs:anyURI('b')}", "<b/>", exists(SelectorStep.class));
+
     // attribute axis
     check("<x a='1' b='2'/>/attribute::{'b'}", "b=\"2\"", exists(SelectorStep.class));
     check("<x a='1' b='2'/>/@{#a}", "a=\"1\"", type(IterStep.class, "attribute(a)?"));
