@@ -898,6 +898,17 @@ public final class XQuery4Test extends SandboxTest {
     query("count([ [['a'],['b']], [['c'],['d']] ]//1//1)", "4");
     query("[ [['a'],['b']], [['c'],['d']] ]//1//1 ! jvalue()[. instance of xs:string]",
         "a\nb\nc");
+
+    // an interpretation that the static input type rules out must not raise an error
+    check("<a>x</a>/data()", "x", empty(SelectorStep.class), empty(If.class));
+    check("<a><b/></a>/name()", "a", empty(SelectorStep.class), empty(If.class));
+    error("{ 'a': 1 }/data()", NOCTX_X);
+    error("[ 1 ]/string()", NOCTX_X);
+    // mixed input: the interpretation is chosen at evaluation time
+    final String func = "declare function local:f($x as item()*) { $x/data() }; ";
+    query(func + "local:f(<a>x</a>)", "x");
+    error(func + "local:f({ 'a': 1 })", NOCTX_X);
+    error(func + "(local:f(<a>x</a>), local:f({ 'a': 1 }))", NOCTX_X);
   }
 
   /** Destructuring let. */

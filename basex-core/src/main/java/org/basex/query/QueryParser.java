@@ -2432,10 +2432,8 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Rewrites non-navigational path steps for JNode navigation (XQuery 4.0, qtspecs #2734):
-   * every step but the leading one, if it is not {@link Expr#navigational() navigational}, is
-   * wrapped in a {@link DynamicStep} (which expands to
-   * {@code if(. instance of node()) then E else child::{ E }}).
+   * Wraps every non-{@link Expr#navigational() navigational} path step but the leading one in a
+   * {@link DynamicStep} for JNode navigation.
    * @param root root expression (can be {@code null})
    * @param steps path steps
    * @return rewritten steps

@@ -4,15 +4,15 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Non-navigational step in a path expression (XQuery 4.0, qtspecs #2734). Before evaluation it is
- * rewritten to {@code if(. instance of node()) then E else child::{ E }}, so that XNodes are
- * navigated while JNodes are selected by key from the child axis.
+ * Non-navigational step in a path expression: XNodes are navigated, JNodes are selected by key
+ * from the child axis.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -37,12 +37,15 @@ public final class DynamicStep extends Single {
     // updating expressions are no JNode selectors
     if(expr.has(Flag.UPD)) return expr;
 
-    // if(. instance of node()) then E else child::{ E }
+    // build only the interpretations that can apply to the static type of the input
     final Expr ctx = new ContextValue(info).optimize(cc);
     final Expr cond = new Instance(info, ctx, Types.NODE_O).optimize(cc);
+    if(cond == Bln.TRUE) return expr;
+
+    final boolean both = cond != Bln.FALSE;
     final Expr selector = new SelectorStep(info, Axis.CHILD,
-        expr.copy(cc, new IntObjectMap<>())).optimize(cc);
-    return new If(info, cond, expr, selector).optimize(cc);
+        both ? expr.copy(cc, new IntObjectMap<>()) : expr).optimize(cc);
+    return both ? new If(info, cond, expr, selector).optimize(cc) : selector;
   }
 
   @Override
