@@ -24,6 +24,9 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class SeqType {
+  /** Number of cached sequence types (all occurrence indicators but {@link Occ#ZERO}). */
+  private static final int OCCS = Occ.values().length - 1;
+
   /** Item type. */
   public final Type type;
   /** Occurrence indicator. */
@@ -51,6 +54,35 @@ public final class SeqType {
    */
   public static SeqType get(final Type type, final Occ occ) {
     return occ == ZERO ? Types.EMPTY_SEQUENCE_Z : type.seqType(occ);
+  }
+
+  /**
+   * Creates a sequence type cache for the specified type.
+   * @param type item type
+   * @return cache
+   */
+  static SeqType[] cache(final Type type) {
+    final SeqType[] cache = new SeqType[OCCS];
+    cache[EXACTLY_ONE.ordinal() - 1] = new SeqType(type, EXACTLY_ONE);
+    return cache;
+  }
+
+  /**
+   * Returns a cached sequence type.
+   * @param cache sequence type cache
+   * @param type item type
+   * @param occ occurrence indicator (no {@link Occ#ZERO})
+   * @return sequence type
+   */
+  static SeqType get(final SeqType[] cache, final Type type, final Occ occ) {
+    assert occ != ZERO;
+    final int o = occ.ordinal() - 1;
+    SeqType st = cache[o];
+    if(st == null) {
+      st = new SeqType(type, occ);
+      cache[o] = st;
+    }
+    return st;
   }
 
   /**

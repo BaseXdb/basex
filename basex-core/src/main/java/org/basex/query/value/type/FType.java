@@ -2,8 +2,6 @@ package org.basex.query.value.type;
 
 import static org.basex.query.QueryError.*;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -19,8 +17,8 @@ public abstract class FType implements Type {
   /** Any function placeholder string. */
   static final String[] WILDCARD = { "*" };
 
-  /** Sequence types (can be {@code null}; lazy instantiation). */
-  private EnumMap<Occ, SeqType> seqTypes;
+  /** Sequence types. */
+  private final SeqType[] seqTypes = SeqType.cache(this);
 
   @Override
   public final boolean isNumber() {
@@ -49,9 +47,7 @@ public abstract class FType implements Type {
 
   @Override
   public final SeqType seqType(final Occ occ) {
-    // cannot be instantiated statically due to circular dependencies
-    if(seqTypes == null) seqTypes = new EnumMap<>(Occ.class);
-    return seqTypes.computeIfAbsent(occ, o -> new SeqType(this, o));
+    return SeqType.get(seqTypes, this, occ);
   }
 
   @Override

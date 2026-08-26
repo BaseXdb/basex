@@ -22,8 +22,8 @@ public final class TypeRef implements Type {
   private InputInfo info;
   /** Referenced type (initially {@code item()}, may itself be a {@code TypeRef}). */
   private Type type = BasicType.ITEM;
-  /** Sequence types (can be {@code null}; lazy instantiation). */
-  private EnumMap<Occ, SeqType> seqTypes;
+  /** Sequence types. */
+  private final SeqType[] seqTypes = SeqType.cache(this);
 
   /**
    * Constructor.
@@ -123,8 +123,7 @@ public final class TypeRef implements Type {
   @Override
   public SeqType seqType(final Occ occ) {
     // wrap this placeholder, so that in-place resolution propagates to all use sites
-    if(seqTypes == null) seqTypes = new EnumMap<>(Occ.class);
-    return seqTypes.computeIfAbsent(occ, o -> new SeqType(this, o));
+    return SeqType.get(seqTypes, this, occ);
   }
 
   @Override

@@ -22,8 +22,8 @@ public final class ChoiceItemType implements Type {
   /** Common ancestor type. */
   private final Type union;
 
-  /** Sequence types (can be {@code null}; lazy instantiation). */
-  private EnumMap<Occ, SeqType> seqTypes;
+  /** Sequence types. */
+  private final SeqType[] seqTypes = SeqType.cache(this);
 
   /**
    * Constructor.
@@ -79,9 +79,7 @@ public final class ChoiceItemType implements Type {
 
   @Override
   public SeqType seqType(final Occ occ) {
-    // cannot be instantiated statically due to circular dependencies
-    if(seqTypes == null) seqTypes = new EnumMap<>(Occ.class);
-    return seqTypes.computeIfAbsent(occ, o -> new SeqType(this, o));
+    return SeqType.get(seqTypes, this, occ);
   }
 
   @Override

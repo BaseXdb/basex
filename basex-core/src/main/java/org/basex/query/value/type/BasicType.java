@@ -943,8 +943,8 @@ public enum BasicType implements Type {
 
   /** Pre/post values (pre, post << 8). */
   private short prePost;
-  /** Sequence types (can be {@code null}; lazy instantiation). */
-  private EnumMap<Occ, SeqType> seqTypes;
+  /** Sequence types. */
+  private final SeqType[] seqTypes = SeqType.cache(this);
   /** QName (can be {@code null}; lazy instantiation). */
   private QNm qnm;
 
@@ -1020,9 +1020,7 @@ public enum BasicType implements Type {
 
   @Override
   public final SeqType seqType(final Occ occ) {
-    // cannot be instantiated statically due to circular dependencies
-    if(seqTypes == null) seqTypes = new EnumMap<>(Occ.class);
-    return seqTypes.computeIfAbsent(occ, o -> new SeqType(this, o));
+    return SeqType.get(seqTypes, this, occ);
   }
 
   /**

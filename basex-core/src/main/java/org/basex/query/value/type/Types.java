@@ -19,7 +19,7 @@ import org.basex.util.hash.*;
  */
 public final class Types {
   /** Zero items (single instance). */
-  public static final SeqType EMPTY_SEQUENCE_Z = ITEM.seqType(ZERO);
+  public static final SeqType EMPTY_SEQUENCE_Z = new SeqType(ITEM, ZERO);
 
   /** Single item. */
   public static final SeqType ITEM_O = ITEM.seqType();
