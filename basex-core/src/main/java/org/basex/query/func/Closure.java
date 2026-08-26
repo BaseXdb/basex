@@ -375,25 +375,26 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   @Override
   public boolean has(final Flag... flags) {
     // closure does not perform any updates
-    if(Flag.UPD.oneOf(flags)) return false;
+    final Flag[] flgs = Flag.remove(flags, Flag.UPD);
+    if(flgs.length == 0) return false;
 
     // handle recursive calls: check which flags are already or currently assigned
-    final ArrayList<Flag> flgs = new ArrayList<>();
-    for(final Flag flag : flags) {
+    final ArrayList<Flag> list = new ArrayList<>();
+    for(final Flag flag : flgs) {
       if(!map.containsKey(flag)) {
         map.put(flag, Boolean.FALSE);
-        flgs.add(flag);
+        list.add(flag);
       }
     }
     // request missing properties
-    for(final Flag flag : flgs) {
+    for(final Flag flag : list) {
       boolean f = false;
       for(final Expr ex : global.values()) f = f || ex.has(flag);
       map.put(flag, f || expr.has(flag));
     }
 
     // evaluate result
-    for(final Flag flag : flags) {
+    for(final Flag flag : flgs) {
       if(map.get(flag)) return true;
     }
     return false;

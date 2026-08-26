@@ -454,7 +454,7 @@ public final class FTWords extends FTExpr {
         if(o.has(flags)) return true;
       }
     }
-    return (db == null || db.has(flags)) && query.has(flags);
+    return db != null && db.has(flags) || query.has(flags);
   }
 
   @Override

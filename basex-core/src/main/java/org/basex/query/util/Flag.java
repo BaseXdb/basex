@@ -44,12 +44,7 @@ public enum Flag {
    * functions arguments.
    * Example: fn:fold-left
    */
-  HOF,
-  /**
-   * Checked to detect if an expression modifies the query focus.
-   * Examples: simple map, filter, path, transform with
-   */
-  FCS;
+  HOF;
 
   /**
    * Checks if this is one of the specified candidates.
