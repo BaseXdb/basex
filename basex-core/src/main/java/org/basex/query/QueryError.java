@@ -1212,6 +1212,8 @@ public enum QueryError {
   UNKNOWNOPTION_X(XPTY, 4, "Unknown option '%'."),
   /** Error code. */
   PATHNODE_X_X_X(XPTY, 4, "%: node expected, % found: %."),
+  /** Error code. */
+  INVCONVERT_X_X(XPTY, 4, "% cannot be cast to %."),
 
   /** Error code. */
   JAVANULL(XPTY, 17, "Java array contains null values."),
@@ -1219,8 +1221,6 @@ public enum QueryError {
   MIXEDRESULTS(XPTY, 18, "Path returns both nodes and non-nodes."),
   /** Error code. */
   NSSENS_X_X(XPTY, 117, "Cannot convert % to %."),
-  /** Error code. */
-  INVCONVERT_X_X(XPTY, 155, "% cannot be cast to %."),
 
   /** Error code. */
   CATTDUPL_X(XQDY, 25, "Duplicate attribute name: %."),

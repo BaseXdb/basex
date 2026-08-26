@@ -44,6 +44,16 @@ public final class Try extends Single {
   }
 
   @Override
+  public boolean navigational() {
+    // the 'finally' clause does not contribute to the result
+    if(!expr.navigational()) return false;
+    for(final Catch ctch : catches) {
+      if(!ctch.expr.navigational()) return false;
+    }
+    return true;
+  }
+
+  @Override
   public void checkUp() throws QueryException {
     // check if no or all try/catch expressions are updating
     final ExprList exprs = new ExprList(catches.length + 2).add(expr);

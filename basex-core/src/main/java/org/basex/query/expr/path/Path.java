@@ -195,7 +195,9 @@ public abstract class Path extends ParseExpr {
     if(expr != this) return expr;
 
     // choose the best path implementation (dummy will be used for type checking)
-    return copyType(get(info, root == null && rt instanceof Dummy ? rt : root, steps));
+    final Expr path = copyType(get(info, root == null && rt instanceof Dummy ? rt : root, steps));
+    if(path instanceof final AxisPath ap) ap.cacheProperties();
+    return path;
   }
 
   @Override
@@ -233,8 +235,7 @@ public abstract class Path extends ParseExpr {
   public final boolean has(final Flag... flags) {
     // Context dependency, positional access: only check root expression.
     // Examples: text(); ./abc; position()/a
-    if(Flag.FCS.oneOf(flags) ||
-       Flag.CTX.oneOf(flags) && (root == null || root.has(Flag.CTX)) ||
+    if(Flag.CTX.oneOf(flags) && (root == null || root.has(Flag.CTX)) ||
        Flag.POS.oneOf(flags) && root != null && root.has(Flag.POS)) return true;
     if(Flag.CNS.oneOf(flags) && seqType().type.intersect(NodeType.JNODE) != null) return true;
     // check remaining flags

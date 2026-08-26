@@ -28,6 +28,18 @@ public abstract class ASTVisitor implements LockCollector {
   }
 
   /**
+   * Notifies the visitor of a list of variable declarations.
+   * @param vars declared variables
+   * @return if more expressions should be visited
+   */
+  public final boolean declared(final Var[] vars) {
+    for(final Var var : vars) {
+      if(!declared(var)) return false;
+    }
+    return true;
+  }
+
+  /**
    * Notifies the visitor of a variable reference.
    * @param ref used variable
    * @return if more expressions should be visited ({@code true} by default)

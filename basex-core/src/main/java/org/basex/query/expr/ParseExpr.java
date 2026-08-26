@@ -564,9 +564,18 @@ public abstract class ParseExpr extends Expr {
   protected final JNode toJNodeOrNull(final Expr expr, final QueryContext qc)
       throws QueryException {
     final Item item = expr.item(qc, info);
-    if(item.isEmpty()) return null;
+    return item.isEmpty() ? null : toJNode(item);
+  }
+
+  /**
+   * Converts an item to a JNode.
+   * @param item item
+   * @return JNode
+   * @throws QueryException query exception
+   */
+  protected final JNode toJNode(final Item item) throws QueryException {
     if(item instanceof final JNode node) return node;
-    throw typeError(item, GNODE, info);
+    throw typeError(item, JNODE, info);
   }
 
   /**

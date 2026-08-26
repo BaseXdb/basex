@@ -49,7 +49,11 @@ public final class If extends Arr {
 
   @Override
   public boolean navigational() {
-    return exprs[0].navigational() && exprs[1].navigational();
+    // an empty branch is equivalent to an omitted 'else' branch
+    for(final Expr expr : exprs) {
+      if(expr != Empty.VALUE && !expr.navigational()) return false;
+    }
+    return true;
   }
 
   @Override

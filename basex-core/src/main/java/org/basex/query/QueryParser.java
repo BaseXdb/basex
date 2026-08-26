@@ -1247,7 +1247,13 @@ public class QueryParser extends InputParser {
       Expr expr = null;
       if(dflt && wsConsume(":=")) {
         defaults = true;
-        expr = single();
+        if(wsConsumeWs(CONTEXT, null, VALUEE)) {
+          wsCheck(VALUEE);
+          expr = new ContextValue(info());
+        } else {
+          // other defaults have no access to the focus of the caller
+          expr = new GlobalFocus(info(), single());
+        }
       } else if(defaults) {
         throw error(PARAMOPTIONAL_X, name);
       }
@@ -2432,10 +2438,8 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Rewrites non-navigational path steps for JNode navigation (XQuery 4.0, qtspecs #2734):
-   * every step but the leading one, if it is not {@link Expr#navigational() navigational}, is
-   * wrapped in a {@link DynamicStep} (which expands to
-   * {@code if(. instance of node()) then E else child::{ E }}).
+   * Wraps every non-{@link Expr#navigational() navigational} path step but the leading one in a
+   * {@link DynamicStep} for JNode navigation.
    * @param root root expression (can be {@code null})
    * @param steps path steps
    * @return rewritten steps

@@ -674,11 +674,11 @@ public final class DbModuleTest extends SandboxTest {
   @Test public void export() {
     final Function func = _DB_EXPORT;
     // exports the database
-    query(func.args(NAME, new IOFile(Prop.TEMPDIR, NAME)));
-    final IOFile path = new IOFile(new IOFile(Prop.TEMPDIR, NAME), XML.replaceAll(".*/", ""));
+    query(func.args(NAME, sandbox()));
+    final IOFile path = new IOFile(sandbox(), XML.replaceAll(".*/", ""));
     query(_FILE_EXISTS.args(path));
     // serializes as text; ensures that the output contains no angle bracket
-    query(func.args(NAME, new IOFile(Prop.TEMPDIR, NAME), " { 'method': 'text' }"));
+    query(func.args(NAME, sandbox(), " { 'method': 'text' }"));
     query("0[contains(" + _FILE_READ_TEXT.args(path) + ", '&lt;')]", "");
     // deletes the exported file
     query(_FILE_DELETE.args(path));

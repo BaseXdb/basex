@@ -430,8 +430,8 @@ public final class JNodeTest extends SandboxTest {
     query("declare context item := { 'a': 1, 'b': 2 }; /b", "{\"b\":2}");
     query("declare context item := { 'a': 1, 'b': 2 }; /* => count()", 2);
     query("declare context item := [ 8, 9 ]; /jnode(2)", "[9]");
-    // an absolute path is no navigational step: it is evaluated as a selector with absent focus
-    error("({ 'a': 1 }) / (/a)", NOCTX_X);
+    // an absolute path is a navigational step: it starts at the root of the context JNode
+    query("({ 'a': 1 }) / (/a)", "{\"a\":1}");
 
     // double slash: descendants of the coerced root JNode
     query("declare context item := { 'a': { 'b': 2 } }; //b", "{\"b\":2}");

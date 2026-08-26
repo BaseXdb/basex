@@ -319,22 +319,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     if(!cc.inlineable(anns, expr) || expr.has(Flag.CTX)) return null;
 
     cc.info(OPTINLINE_X, this);
-
-    // create let bindings for all variables
-    final LinkedList<Clause> clauses = new LinkedList<>();
-    final IntObjectMap<Var> vm = new IntObjectMap<>();
-    final int pl = params.length;
-    for(int p = 0; p < pl; p++) {
-      clauses.add(new Let(cc.copy(params[p], vm), exprs[p]).optimize(cc));
-    }
-    for(final Entry<Var, Expr> entry : global.entrySet()) {
-      clauses.add(new Let(cc.copy(entry.getKey(), vm), entry.getValue()).optimize(cc));
-    }
-
-    // create the return clause
-    final Expr body = expr.copy(cc, vm).optimize(cc);
-    final Expr rtrn = declType == null ? body : new TypeCheck(info, body, declType).optimize(cc);
-    return clauses.isEmpty() ? rtrn : new GFLWOR(info, clauses, rtrn).optimize(cc);
+    return cc.inline(params, exprs, global, expr, declType, info);
   }
 
   @Override
@@ -375,25 +360,26 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   @Override
   public boolean has(final Flag... flags) {
     // closure does not perform any updates
-    if(Flag.UPD.oneOf(flags)) return false;
+    final Flag[] flgs = Flag.remove(flags, Flag.UPD);
+    if(flgs.length == 0) return false;
 
     // handle recursive calls: check which flags are already or currently assigned
-    final ArrayList<Flag> flgs = new ArrayList<>();
-    for(final Flag flag : flags) {
+    final ArrayList<Flag> list = new ArrayList<>();
+    for(final Flag flag : flgs) {
       if(!map.containsKey(flag)) {
         map.put(flag, Boolean.FALSE);
-        flgs.add(flag);
+        list.add(flag);
       }
     }
     // request missing properties
-    for(final Flag flag : flgs) {
+    for(final Flag flag : list) {
       boolean f = false;
       for(final Expr ex : global.values()) f = f || ex.has(flag);
       map.put(flag, f || expr.has(flag));
     }
 
     // evaluate result
-    for(final Flag flag : flags) {
+    for(final Flag flag : flgs) {
       if(map.get(flag)) return true;
     }
     return false;
@@ -412,10 +398,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     for(final Entry<Var, Expr> entry : global.entrySet()) {
       if(!(entry.getValue().accept(visitor) && visitor.declared(entry.getKey()))) return false;
     }
-    for(final Var param : params) {
-      if(!visitor.declared(param)) return false;
-    }
-    return expr.accept(visitor);
+    return visitor.declared(params) && expr.accept(visitor);
   }
 
   @Override
@@ -499,7 +482,19 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj;
+    if(this == obj) return true;
+    if(!(obj instanceof final Closure cls) || !Var.equalTypes(params, cls.params) ||
+        !Objects.equals(declType, cls.declType) || global.size() != cls.global.size()) return false;
+
+    // non-local variables must be bound to equal expressions
+    if(!global.isEmpty()) {
+      final IntObjectMap<Expr> bindings = new IntObjectMap<>();
+      cls.global.forEach((var, ex) -> bindings.put(var.slot(), ex));
+      for(final Entry<Var, Expr> entry : global.entrySet()) {
+        if(!entry.getValue().equals(bindings.get(entry.getKey().slot()))) return false;
+      }
+    }
+    return super.equals(obj);
   }
 
   @Override

@@ -126,10 +126,7 @@ public final class FuncLit extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public boolean visit(final ASTVisitor visitor) {
-    for(final Var var : params) {
-      if(!visitor.declared(var)) return false;
-    }
-    return expr.accept(visitor);
+    return visitor.declared(params) && expr.accept(visitor);
   }
 
   @Override

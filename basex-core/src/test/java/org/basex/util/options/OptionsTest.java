@@ -81,7 +81,7 @@ public final class OptionsTest extends SandboxTest {
     final BooleanOption name = MainOptions.WRITEBACK;
 
     final String input = "<a/>";
-    final IOFile file = new IOFile(Prop.TEMPDIR + NAME + '/' + NAME);
+    final IOFile file = new IOFile(sandbox(), NAME);
     file.write(input);
 
     // check if original file will be updated

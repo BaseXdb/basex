@@ -36,7 +36,7 @@ public final class IterTest extends SandboxTest {
       "replicate(" + w + ", 4)",
       "for-each-pair((" + w + ", 1, 2), ('a', 'b', 'c'), concat#2)",
       "map:for-each({ 1: " + w + ", 2: 'b', 3: 'c' }, concat#2)",
-      "array:members([ " + w + ", 1, 2 ])",
+      "array:members([ " + w + ", 1, 2 ]) ! [ jvalue() ]",
       "array:split([ " + w + ", 1, 2 ])",
       "map:entries({ 1: " + w + ", 2: 'b' })"
     };

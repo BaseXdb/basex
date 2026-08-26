@@ -80,9 +80,6 @@ public enum Records {
     field("groups", MapType.get(ChoiceItemType.get(BasicType.INTEGER, BasicType.STRING),
         CAPTURED_GROUP.get().seqType()).seqType())),
   /** Record definition. */
-  MEMBER(ARRAY_URI, "member",
-    field("value", Types.ITEM_ZM)),
-  /** Record definition. */
   PARSED_CSV_STRUCTURE(FN_URI, "parsed-csv-structure",
     field("columns", Types.STRING_ZM),
     field("column-index", MapType.get(BasicType.STRING, Types.INTEGER_O).seqType(Occ.ZERO_OR_ONE)),

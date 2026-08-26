@@ -3,6 +3,7 @@ package org.basex.query.expr.path;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
@@ -16,6 +17,11 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class AxisPath extends Path {
+  /** Indicates if results can be cached: no free variables, deterministic. */
+  boolean cacheable;
+  /** Indicates if the root expression is independent of the query focus. */
+  boolean independentRoot;
+
   /**
    * Constructor.
    * @param info input info (can be {@code null})
@@ -24,6 +30,14 @@ public abstract class AxisPath extends Path {
    */
   AxisPath(final InputInfo info, final Expr root, final Expr... steps) {
     super(info, NodeType.GNODE, root, steps);
+  }
+
+  /**
+   * Assigns the properties that control the caching of results.
+   */
+  void cacheProperties() {
+    cacheable = !hasFreeVars() && !has(Flag.NDT);
+    independentRoot = root != null && !root.has(Flag.CTX);
   }
 
   @Override

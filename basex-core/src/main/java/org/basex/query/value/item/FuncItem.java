@@ -19,7 +19,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 
 /**
  * Function item.
@@ -174,21 +173,7 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public Value invokeInternal(final QueryContext qc, final InputInfo ii, final Value[] args)
       throws QueryException {
-
-    final int arity = arity();
-    for(int a = 0; a < arity; a++) qc.set(params[a], args[a]);
-
-    // use shortcut if focus is not accessed
-    if(simple) return expr.value(qc);
-
-    // reset context and evaluate function
-    final QueryFocus qf = qc.focus;
-    qc.focus = focus != null ? focus : new QueryFocus();
-    try {
-      return expr.value(qc);
-    } finally {
-      qc.focus = qf;
-    }
+    return qc.invoke(params, args, expr, simple, focus);
   }
 
   @Override
@@ -224,10 +209,7 @@ public final class FuncItem extends FItem implements Scope {
 
   @Override
   public boolean visit(final ASTVisitor visitor) {
-    for(final Var param : params) {
-      if(!visitor.declared(param)) return false;
-    }
-    return expr.accept(visitor);
+    return visitor.declared(params) && expr.accept(visitor);
   }
 
   @Override
@@ -244,18 +226,7 @@ public final class FuncItem extends FItem implements Scope {
   public Expr inline(final Expr[] exprs, final CompileContext cc) throws QueryException {
     if(!cc.inlineable(anns, expr) || expr.has(Flag.CTX)) return null;
     cc.info(QueryText.OPTINLINE_X, this);
-
-    // create let bindings for all variables
-    final LinkedList<Clause> clauses = new LinkedList<>();
-    final IntObjectMap<Var> vm = new IntObjectMap<>();
-    final int arity = arity();
-    for(int a = 0; a < arity; a++) {
-      clauses.add(new Let(cc.copy(params[a], vm), exprs[a]).optimize(cc));
-    }
-
-    // create the return clause
-    final Expr rtrn = expr.copy(cc, vm).optimize(cc);
-    return clauses.isEmpty() ? rtrn : new GFLWOR(info, clauses, rtrn).optimize(cc);
+    return cc.inline(params, exprs, null, expr, null, info);
   }
 
   @Override
@@ -276,18 +247,31 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
     if(this == item) return true;
-    if(item instanceof final FuncItem func) {
-      // functions must have same body and same parameter types (their names can differ)
-      int a = arity();
-      if(a == func.arity()) {
-        while(--a >= 0 && params[a].seqType().eq(func.params[a].seqType()));
-        if(a != -1) return false;
-        // captured values (let bindings of a closure) are compared with deep equality
-        return deep != null && expr instanceof final GFLWOR gflwor ?
-          gflwor.deepEqual(func.expr, deep) : expr.equals(func.expr);
+    if(!(item instanceof final FuncItem func) || !Var.equalTypes(params, func.params)) return false;
+    // same body; captured values (let bindings of a closure) are compared with deep equality
+    final Expr body = body(), fbody = func.body();
+    if(!(deep != null && body instanceof final GFLWOR gflwor ? gflwor.deepEqual(fbody, deep) :
+      body.equals(fbody))) return false;
+    // same captured focus, if either body accesses the context
+    return simple && func.simple || QueryFocus.deepEqual(focus, func.focus, deep);
+  }
+
+  /**
+   * Returns the function body: if this item is a function reference that has not been inlined,
+   * the body of the referenced function is returned.
+   * @return function body
+   */
+  private Expr body() {
+    if(expr instanceof final StaticFuncCall call) {
+      final StaticFunc sf = call.func();
+      final int pl = params.length;
+      if(sf != null && sf.expr != null && call.exprs.length == pl) {
+        int p = pl;
+        while(--p >= 0 && call.exprs[p] instanceof final VarRef ref && ref.var == params[p]);
+        if(p == -1) return sf.expr;
       }
     }
-    return false;
+    return expr;
   }
 
   @Override

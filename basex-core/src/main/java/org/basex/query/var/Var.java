@@ -76,6 +76,29 @@ public final class Var extends ExprInfo {
   }
 
   /**
+   * Checks if two parameter lists have the same types (their names can differ).
+   * @param params1 first parameters
+   * @param params2 second parameters
+   * @return result of check
+   */
+  public static boolean equalTypes(final Var[] params1, final Var[] params2) {
+    final int pl = params1.length;
+    if(pl != params2.length) return false;
+    for(int p = pl; --p >= 0;) {
+      if(!params1[p].seqType().eq(params2[p].seqType())) return false;
+    }
+    return true;
+  }
+
+  /**
+   * Stack slot of this variable.
+   * @return stack slot ({@code -1} if unused)
+   */
+  public int slot() {
+    return slot;
+  }
+
+  /**
    * Sequence type of values bound to this variable.
    * @return sequence type
    */

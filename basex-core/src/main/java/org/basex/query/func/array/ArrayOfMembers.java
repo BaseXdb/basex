@@ -2,7 +2,7 @@ package org.basex.query.func.array;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
@@ -17,20 +17,20 @@ import org.basex.query.value.type.*;
 public final class ArrayOfMembers extends ArrayFn {
   @Override
   protected XQArray item(final QueryContext qc) throws QueryException {
-    final Iter input = arg(0).unwrappedIter(qc);
+    final Iter input = arg(0).iter(qc);
 
     final ArrayBuilder ab = new ArrayBuilder(qc, input.size());
     for(Item item; (item = qc.next(input)) != null;) {
-      ab.add(toRecord(item, Records.MEMBER.get(), qc).get(Str.VALUE));
+      ab.add(toJNode(item).value);
     }
     return ab.array(this);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr input = arg(0);
-    if(input.seqType().type instanceof final MapType mt) {
-      exprType.assign(ArrayType.get(mt.valueType()));
+    final Type type = arg(0).seqType().type;
+    if(type instanceof final NodeType nt && nt.test instanceof final JNodeTest jnt) {
+      exprType.assign(ArrayType.get(jnt.valueType));
     }
     return this;
   }

@@ -232,6 +232,36 @@ public final class XQuery4Test extends SandboxTest {
     error("function { . + $i }", VARUNDEF_X);
   }
 
+  /** Default values of function parameters. */
+  @Test public void paramDefaults() {
+    query("declare function local:f($x := 1 + 1) { $x }; local:f()", 2);
+    query("declare function local:f($x := 1) { $x }; local:f(2)", 2);
+
+    // 'context value' defaults to the context value of the caller
+    query("declare function local:f($n as node() := context value) { name($n) }; "
+        + "<a/>/local:f()", "a");
+    query("declare function local:f($n as node() := context value) { name($n) }; "
+        + "local:f(<b/>)", "b");
+    query("declare function local:f($x := context value) { $x }; <a/> ! local:f()", "<a/>");
+    query("declare function local:f($x := context value) { $x }; (1, 2) ! local:f()", "1\n2");
+    error("declare function local:f($x := context value) { $x }; local:f()", NOCTX_X);
+
+    // all other defaults are evaluated with the focus of the query prolog
+    error("declare function local:f($n as node() := .) { name($n) }; <a/>/local:f()", NOCTX_X);
+    error("declare function local:f($x := position()) { $x }; (1, 2) ! local:f()", NOCTX_X);
+    query("declare context value := <global/>; "
+        + "declare function local:f($n as node() := .) { name($n) }; <a/>/local:f()", "global");
+    query("declare context value := <global/>; "
+        + "declare function local:f($n as node() := context value) { name($n) }; <a/>/local:f()",
+        "a");
+
+    // 'context' is still available as a name
+    query("declare function local:context() { 'x' }; "
+        + "declare function local:f($x := local:context()) { $x }; local:f()", "x");
+    query("declare function local:f($x := <context><value>v</value></context>/value) "
+        + "{ string($x) }; local:f()", "v");
+  }
+
   /** Generalized arrow operator. */
   @Test public void arrow() {
     query("'x' => {}()", "");
@@ -789,6 +819,16 @@ public final class XQuery4Test extends SandboxTest {
     check("declare namespace x = 'u'; <x:a><x:b/></x:a>/child::{'b'}",
         "<x:b xmlns:x=\"u\"/>", exists(SelectorStep.class));
 
+    // keys that cannot match a name are ignored, they raise no error
+    check("<a><b/></a>/child::{1}", "", exists(SelectorStep.class));
+    check("<a><b/></a>/child::{'x y'}", "", exists(SelectorStep.class));
+    check("<a><b/></a>/child::{xs:date('2020-01-01')}", "", exists(SelectorStep.class));
+    check("<a><b/></a>/child::{1, 'b', xs:date('2020-01-01')}", "<b/>",
+        exists(SelectorStep.class));
+    // string-derived keys match the local name
+    check("<a><b/></a>/child::{xs:untypedAtomic('b')}", "<b/>", exists(SelectorStep.class));
+    check("<a><b/></a>/child::{xs:anyURI('b')}", "<b/>", exists(SelectorStep.class));
+
     // attribute axis
     check("<x a='1' b='2'/>/attribute::{'b'}", "b=\"2\"", exists(SelectorStep.class));
     check("<x a='1' b='2'/>/@{#a}", "a=\"1\"", type(IterStep.class, "attribute(a)?"));
@@ -898,6 +938,30 @@ public final class XQuery4Test extends SandboxTest {
     query("count([ [['a'],['b']], [['c'],['d']] ]//1//1)", "4");
     query("[ [['a'],['b']], [['c'],['d']] ]//1//1 ! jvalue()[. instance of xs:string]",
         "a\nb\nc");
+
+    // an interpretation that the static input type rules out must not raise an error
+    check("<a>x</a>/data()", "x", empty(SelectorStep.class), empty(If.class));
+    check("<a><b/></a>/name()", "a", empty(SelectorStep.class), empty(If.class));
+    error("{ 'a': 1 }/data()", NOCTX_X);
+    error("[ 1 ]/string()", NOCTX_X);
+    // mixed input: the interpretation is chosen at evaluation time
+    final String func = "declare function local:f($x as item()*) { $x/data() }; ";
+    query(func + "local:f(<a>x</a>)", "x");
+    error(func + "local:f({ 'a': 1 })", NOCTX_X);
+    error(func + "(local:f(<a>x</a>), local:f({ 'a': 1 }))", NOCTX_X);
+
+    // navigational steps: absolute paths, 'otherwise', try/catch, 'if' without 'else'
+    query("count({ 'a': 1 }/(/))", 1);
+    query("count({ 'a': { 'b': 1 } }/(/a))", 1);
+    query("count({ 'a': { 'b': 1 } }/(/a/b))", 1);
+    query("count({ 'a': { 'b': 1 } }/(a otherwise b))", 1);
+    query("count({ 'a': { 'b': 1 } }/(try { a } catch * { b }))", 1);
+    query("count({ 'a': { 'b': 1 } }/(try { a } catch * { b } finally { void(1) }))", 1);
+    query("count({ 'a': { 'b': 1 } }/(if(true()) { a }))", 1);
+    query("count({ 'a': { 'b': 1 } }/(switch(1) case 2 return a default return a))", 1);
+    // XNodes and JNodes may be mixed, all other items raise a type error
+    query("count((<x><a/></x>, { 'a': 1 })/a)", 2);
+    error("(1, <a/>)/a", PATHNODE_X_X_X);
   }
 
   /** Destructuring let. */

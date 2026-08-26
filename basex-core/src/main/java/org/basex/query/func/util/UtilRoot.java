@@ -22,6 +22,12 @@ import org.basex.query.value.type.*;
  */
 public final class UtilRoot extends StandardFunc {
   @Override
+  public boolean navigational() {
+    // representation of an absolute path expression
+    return true;
+  }
+
+  @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value nodes = arg(0).value(qc);
     if(nodes.seqType().type.kind() == Kind.DOCUMENT) return nodes;

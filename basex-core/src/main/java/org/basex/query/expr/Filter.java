@@ -211,8 +211,7 @@ public abstract class Filter extends Preds {
 
   @Override
   public final boolean has(final Flag... flags) {
-    return Flag.FCS.oneOf(flags) || root.has(flags) ||
-        super.has(Flag.remove(flags, Flag.FCS, Flag.POS, Flag.CTX));
+    return root.has(flags) || super.has(Flag.remove(flags, Flag.POS, Flag.CTX));
   }
 
   @Override

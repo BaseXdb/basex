@@ -297,28 +297,34 @@ public final class ArrayModuleTest extends SandboxTest {
     final Function func = _ARRAY_MEMBERS;
 
     query(func.args(" []"), "");
-    query(func.args(" [ () ]"), "{\"value\":()}");
-    query(func.args(" [ 1 ]"), "{\"value\":1}");
-    query(func.args(" [ 1, 2 ]"), "{\"value\":1}\n{\"value\":2}");
-    query(func.args(" [ (1, 2) ]"), "{\"value\":(1,2)}");
-    query(func.args(" [ (1, 2), 3 ]"), "{\"value\":(1,2)}\n{\"value\":3}");
-    query(func.args(" array { <_>1</_> to 100000 }") + " => foot()", "{\"value\":100000}");
+    query(func.args(" [ () ]") + " =!> jvalue()", "");
+    query(func.args(" [ 1 ]") + " =!> jvalue()", 1);
+    query(func.args(" [ 1, 2 ]") + " =!> jvalue()", "1\n2");
+    query(func.args(" [ (1, 2) ]") + " =!> jvalue()", "1\n2");
+    query(func.args(" [ (1, 2), 3 ]") + " ! string-join(jvalue(), '-')", "1-2\n3");
+    query(func.args(" [ 'a', 'b' ]") + " =!> jkey()", "1\n2");
+    query(func.args(" array { <_>1</_> to 100000 }") + " => foot() =!> jvalue()", 100000);
+    // equivalent to jtree($array)/child::*
+    query("deep-equal(" + func.args(" [ 1, 2 ]") + ", jtree([ 1, 2 ])/child::*)", true);
   }
 
   /** Test method. */
   @Test public void ofMembers() {
     final Function func = _ARRAY_OF_MEMBERS;
     query(func.args(" ()"), "[]");
-    query(func.args(" { 'value': 1 }"), "[1]");
-    query(func.args(" (1 to 3) ! { 'value': . }"), "[1,2,3]");
-    query(func.args(" ({ 'value': 1 }, { 'value': () }, { 'value': 2 to 3 })"),
-        "[1,(),(2,3)]");
+    query(func.args(" jtree(1)"), "[1]");
+    query(func.args(" (1 to 3) =!> jtree()"), "[1,2,3]");
+    query(func.args(" (jtree(1), jtree(()), jtree(2 to 3))"), "[1,(),(2,3)]");
+    query(func.args(" { 'x': 23, 'y': (1 to 5) }/y"), "[(1,2,3,4,5)]");
 
-    query(func.args(" { 'value': <a/> }") + "?1", "<a/>");
-    query(func.args(" ({ 'value': <a/> }, { 'value': () })") + "?1", "<a/>");
-    query(func.args(" ({ 'value': <a/> }, { 'value': () })") + "?*", "<a/>");
+    query(func.args(" jtree(<a/>)") + "?1", "<a/>");
+    query(func.args(" (jtree(<a/>), jtree(()))") + "?1", "<a/>");
+    query(func.args(" (jtree(<a/>), jtree(()))") + "?*", "<a/>");
 
-    query(func.args(" if (<a/>/text()) then { 'value': () } else ()") + " ! array:size(.)", 0);
+    query(func.args(" if (<a/>/text()) then jtree(()) else ()") + " ! array:size(.)", 0);
+    // inverse of array:members
+    query("deep-equal([ 1, (2, 3) ], " + func.args(" array:members([ 1, (2, 3) ])") + ")", true);
+    error(func.args(" 1"), INVTYPE_X);
   }
 
   /** Test method. */

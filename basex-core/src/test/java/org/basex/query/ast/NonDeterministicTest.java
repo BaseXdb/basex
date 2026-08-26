@@ -576,6 +576,33 @@ public final class NonDeterministicTest extends SandboxTest {
   }
 
   /**
+   * Checks that a call of a nondeterministic function is detected if further flags are requested.
+   * <p>
+   * Requires {@link StaticFuncCall#has} to check the remaining flags if {@link Flag#POS} or
+   * {@link Flag#CTX} is requested. The result is queried by {@link Expr#isSimple}, which decides
+   * if {@link CmpHashG} may cache its second operand.
+   */
+  @Test public void staticFuncCallNdt() {
+    query("declare function local:f() as xs:integer* { " + fileAppend() + ", (1, 2) }; " +
+        "count((1 to 5)[. = local:f()])", 2, "xxxxx");
+  }
+
+  /**
+   * Checks that operands of a list that are not requested are dropped.
+   * <p>
+   * Documents why {@link FnHead#opt}, {@link FnFoot#opt}, {@link FnItemsAt#opt} and
+   * {@link FnSubsequence#opt} need no {@link Flag#NDT} check: the runtime may skip these operands
+   * as well.
+   */
+  @Test public void listOperands() {
+    query("head((" + ndtItem(1) + ", " + ndtItem(2) + "))", 1, "x");
+    query("foot((" + ndtItem(1) + ", " + ndtItem(2) + "))", 2, "xx");
+    query("items-at((" + ndtItem(1) + ", " + ndtItem(2) + ", " + ndtItem(3) + "), 2)", 2, "xxx");
+    query("subsequence((" + ndtItem(1) + ", " + ndtItem(2) + ", " + ndtItem(3) + "), 2, 1)",
+        2, "xxxx");
+  }
+
+  /**
    * Checks that the nondeterminism check does not traverse atomic values. Regression: a dynamic
    * call on a large constant array or sequence walked all members at compile time.
    * <p>
@@ -611,6 +638,15 @@ public final class NonDeterministicTest extends SandboxTest {
   @Test public void largeNdtFunctions() {
     query("let $f := array { (1 to 300000) ! (function() { " + fileAppend() + " }, identity#1) } " +
         "for $x in (1 to 2) return $f(1)()", "", "xx");
+  }
+
+  /**
+   * Returns a nondeterministic expression that records a single evaluation and yields an integer.
+   * @param value integer to be returned
+   * @return pragma expression
+   */
+  private String ndtItem(final int value) {
+    return "(# basex:nondeterministic #) { " + fileAppend() + ", " + value + " }";
   }
 
   /**
