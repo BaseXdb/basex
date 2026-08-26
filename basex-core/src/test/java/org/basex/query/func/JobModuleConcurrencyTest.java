@@ -84,6 +84,32 @@ public final class JobModuleConcurrencyTest extends SandboxTest {
   }
 
   /**
+   * Stops many long-running and queued jobs at once and checks that all of them terminate and
+   * that the job pool is emptied again.
+   * @throws Exception exception
+   */
+  @Test @Timeout(60) public void concurrentStop() throws Exception {
+    final int jobs = 100, block = 30000, timeout = 30000;
+
+    // queue more jobs than can run at a time: some are running, the others are still queued
+    final ArrayList<String> ids = new ArrayList<>(jobs);
+    for(int j = 0; j < jobs; j++) ids.add(query(_JOB_EVAL.args("prof:sleep(" + block + ")")));
+
+    // stop all jobs at once: running ones receive a stop signal, queued ones are cancelled
+    final ArrayList<Callable<?>> tasks = new ArrayList<>(jobs);
+    for(final String id : ids) tasks.add(() -> query(_JOB_REMOVE.args(id)));
+    parallel(tasks);
+
+    // the query that asks the question is the only job that may be left
+    final long end = System.nanoTime() + timeout * 1000000L;
+    do {
+      if(Integer.parseInt(query("count(" + _JOB_LIST.args() + ')')) == 1) return;
+      Performance.sleep(20);
+    } while(System.nanoTime() < end);
+    fail("Jobs are still registered: " + query(_JOB_LIST_DETAILS.args()));
+  }
+
+  /**
    * Checks that a running job acquires a database write lock and that an interactive query
    * writing to the same database is blocked until the job releases the lock.
    */
