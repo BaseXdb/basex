@@ -604,6 +604,10 @@ public final class GFLWOR extends ParseExpr {
    * @return change flag
    */
   private boolean cleanDeadVars() {
+    // only group by and order by clauses maintain tuple entries
+    if(!Checks.any(clauses, clause -> clause instanceof GroupBy || clause instanceof OrderBy))
+      return false;
+
     final IntObjectMap<Var> decl = new IntObjectMap<>();
     for(final Clause clause : clauses) {
       for(final Var var : clause.vars()) decl.put(var.id, var);
