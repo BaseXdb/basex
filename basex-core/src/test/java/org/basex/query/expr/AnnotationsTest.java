@@ -28,6 +28,11 @@ public final class AnnotationsTest extends SandboxTest {
     query("declare namespace a='a';declare %a:a(1) %a:b(2) variable $x:=1; $x", 1);
     query("declare namespace a='a';declare %a:a(#x) %a:b(#Q{y}z) variable $x:=1; $x", 1);
     query("declare namespace a='a';declare %a:a(# x) %a:b(# Q{y}z) variable $x:=1; $x", 1);
+
+    // numeric annotation values
+    query("declare %local:x(.1) variable $a := 1; $a", 1);
+    query("declare %local:x(1.) variable $a := 1; $a", 1);
+    error("declare %local:x(.) variable $a := 1; $a", NUMBER_X);
   }
 
   /** Parsing errors and conflicts. */

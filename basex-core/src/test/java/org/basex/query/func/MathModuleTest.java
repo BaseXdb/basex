@@ -58,6 +58,13 @@ public final class MathModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void sin() {
+    final Function func = _MATH_SIN;
+    // empty input, not known at compile time
+    query(func.args(" let $x :=" + _RANDOM_INTEGER.args() + " return ()"), "");
+  }
+
+  /** Test method. */
   @Test public void sinh() {
     final Function func = _MATH_SINH;
     query(func.args(" 0"), 0);

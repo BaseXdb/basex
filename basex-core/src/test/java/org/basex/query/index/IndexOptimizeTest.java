@@ -453,6 +453,34 @@ public final class IndexOptimizeTest extends SandboxTest {
     // integer rewriting; NaN is never >= 25 in XQuery semantics
     execute(new CreateDB(NAME, "<x><a n='NaN'/></x>"));
     check("//a[@n >= 25]", "", empty(ValueAccess.class));
+
+    // double statistics: no exact integer lookup, but numeric range index access
+    execute(new CreateDB(NAME, "<x><a n='1.5'/><a n='2.5'/></x>"));
+    check("//a[@n >= 1 and @n <= 9]", "<a n=\"1.5\"/>\n<a n=\"2.5\"/>",
+        exists(RangeAccess.class));
+    // range outside the indexed values: no results
+    check("//a[@n >= 10 and @n <= 20]", "", empty());
+  }
+
+  /** The database of an index access is supplied by a variable and inlined. */
+  @Test public void inlinedDatabase() {
+    // the function body is optimized before the argument is inlined
+    inline(true);
+
+    // numeric range access
+    execute(new CreateDB(NAME, "<x><a n='1.5'/><a n='2.5'/></x>"));
+    check("declare function local:f($n) { " + _DB_GET.args(" $n") + "//a[@n >= 1 and @n <= 9] };"
+        + "local:f('" + NAME + "')", "<a n=\"1.5\"/>\n<a n=\"2.5\"/>", exists(RangeAccess.class));
+
+    // string range access
+    execute(new CreateDB(NAME, "<x><a>abc</a><a>xyz</a></x>"));
+    check("declare function local:f($n) { " + _DB_GET.args(" $n") + "//a[text() > 'a' "
+        + "and text() < 'z'] }; local:f('" + NAME + "')", "<a>abc</a>\n<a>xyz</a>",
+        exists(StringRangeAccess.class));
+
+    // value index access
+    check("declare function local:f($n) { " + _DB_GET.args(" $n") + "//a[text() = 'abc'] };"
+        + "local:f('" + NAME + "')", "<a>abc</a>", exists(ValueAccess.class));
   }
 
   /**

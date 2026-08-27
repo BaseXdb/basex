@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryError.*;
 
 import org.basex.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.seq.*;
 import org.junit.jupiter.api.*;
@@ -14,6 +15,15 @@ import org.junit.jupiter.api.*;
  * @author Christian Gruen
  */
 public final class ArrayTest extends SandboxTest {
+  /** Array constructors are discarded if only the atomized members are required. */
+  @Test public void simplify() {
+    final String seq = "(1 to 1000000)[. < 3]";
+    // data(array { E }) → data(E)
+    check("data(array { " + seq + " })", "1\n2", empty(CArray.class));
+    // arithmetics: array { E } + 1 → E + 1
+    check("array { head(" + seq + ") } + 1", 2, empty(CArray.class));
+  }
+
   /** Member types are refined while the array is built. */
   @Test public void memberTypes() {
     query("array { (1 to 300) ! (. + 0.5e0) } instance of array(xs:double)", true);

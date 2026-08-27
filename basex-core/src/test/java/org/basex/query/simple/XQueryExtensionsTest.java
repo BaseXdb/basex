@@ -98,4 +98,11 @@ public final class XQueryExtensionsTest extends SandboxTest {
     check("<?_ 2?> -> xs:integer() -> (. * .) -> (. * .)", 16,
         count(Pipeline.class, 1), root(Pipeline.class));
   }
+
+  /** db:copynode pragma. */
+  @Test public void copynode() {
+    query("let $a := <a/> let $b := <_>{ $a }</_> return $b/a is $a", false);
+    query("let $a := <a/> let $b := (# db:copynode false #) { <_>{ $a }</_> } "
+        + "return $b/a is $a", true);
+  }
 }

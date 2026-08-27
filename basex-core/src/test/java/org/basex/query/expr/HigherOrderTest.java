@@ -14,6 +14,12 @@ import org.junit.jupiter.api.*;
  * @author Leo Woerteler
  */
 public final class HigherOrderTest extends SandboxTest {
+  /** An error in the body of an inline function is deferred until the function is called. */
+  @Test public void bodyError() {
+    query("let $f := function() { xs:integer('z') } return 1", 1);
+    error("let $f := function() { xs:integer('z') } return $f()", FUNCCAST_X_X);
+  }
+
   /**
    * Test for name shadowing.
    */

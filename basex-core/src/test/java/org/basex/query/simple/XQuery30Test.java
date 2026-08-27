@@ -76,4 +76,10 @@ public final class XQuery30Test extends SandboxTest {
         + "local:a(42)", 42);
     query("let $seq := (1, 2) return try { <x/>[*] } catch * { zero-or-one($seq) }", "");
   }
+
+  /** Version declarations. */
+  @Test public void version() {
+    query("xquery version '3.0'; <a/>/node()", "");
+    query("xquery version '1.0'; <a/>/node()", "");
+  }
 }

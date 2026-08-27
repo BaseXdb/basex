@@ -501,6 +501,32 @@ public final class FileModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void readTextLines() {
+    final Function func = _FILE_READ_TEXT_LINES;
+    query(_FILE_WRITE_TEXT_LINES.args(PATH1, " ('a', 'b', 'c', 'd', 'e')"));
+    query(func.args(PATH1), "a\nb\nc\nd\ne");
+
+    // positional access is rewritten to offset and length arguments
+    check("head(" + func.args(PATH1) + ')', "a", root(func), empty(HEAD));
+    check("tail(" + func.args(PATH1) + ')', "b\nc\nd\ne", root(func), empty(TAIL));
+    check(ITEMS_AT.args(" " + func.args(PATH1), 3), "c", root(func), empty(ITEMS_AT));
+    check(SUBSEQUENCE.args(" " + func.args(PATH1), 2, 2), "b\nc", root(func),
+        empty(SUBSEQUENCE));
+
+    // bounds of nested calls are merged
+    check("head(" + SUBSEQUENCE.args(" " + func.args(PATH1), 3, 2) + ')', "c", root(func));
+    check("tail(" + func.args(PATH1, "UTF-8", false, 2, 3) + ')', "c\nd", root(func));
+    check("head(" + func.args(PATH1, "UTF-8", false, 2) + ')', "b", root(func));
+
+    // rewrite is skipped if the existing arguments cannot be merged
+    check("head(" + func.args(PATH1, "US-ASCII") + ')', "a", exists(HEAD));
+    check("head(" + func.args(PATH1, "UTF-8", true) + ')', "a", exists(HEAD));
+    final String dyn = " head((1 to 2)[. = 2])";
+    check("head(" + func.args(PATH1, "UTF-8", false, dyn) + ')', "b", exists(HEAD));
+    check("head(" + func.args(PATH1, "UTF-8", false, 2, dyn) + ')', "b", exists(HEAD));
+  }
+
+  /** Test method. */
   @Test public void resolvePath() {
     final Function func = _FILE_RESOLVE_PATH;
     // queries

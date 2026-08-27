@@ -1141,6 +1141,19 @@ public final class UpdateTest extends SandboxTest {
     query(_FILE_EXISTS.args(sandbox() + "test.xml"), true);
   }
 
+  /** Test a single node that is written to multiple output paths. */
+  @Test public void putMerge() {
+    query("declare base-uri \"" + sandbox() + "\"; let $node := <a/> return ("
+        + PUT.args(" $node", "merge1.xml") + ',' + PUT.args(" $node", "merge2.xml") + ')');
+    query(_FILE_EXISTS.args(sandbox() + "merge1.xml"), true);
+    query(_FILE_EXISTS.args(sandbox() + "merge2.xml"), true);
+
+    // the same path can only be used once
+    error("declare base-uri \"" + sandbox() + "\"; let $node := <a/> return ("
+        + PUT.args(" $node", "merge1.xml") + ',' + PUT.args(" $node", "merge1.xml") + ')',
+        UPURIDUP_X);
+  }
+
   /** Allows empty-sequence() as return type for updating functions. */
   @Test public void returnType() {
     query("declare %updating function local:f() as empty-sequence() {delete node <a/>};local:f()");

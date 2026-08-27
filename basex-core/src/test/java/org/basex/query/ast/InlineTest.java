@@ -1,5 +1,7 @@
 package org.basex.query.ast;
 
+import static org.basex.query.QueryError.*;
+
 import org.basex.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
@@ -162,6 +164,40 @@ public final class InlineTest extends SandboxTest {
         "//Let << //Window");
   }
 
+  /** An error raised while inlining into a FLWOR clause is reported at compile time. */
+  @Test public void flworClauseError() {
+    inline(true);
+    error("declare function local:f($s) { "
+        + "for $i in (1 to 1000000)[. < 1] let $x := xs:integer($s) return $x };"
+        + "count(local:f('z'))", FUNCCAST_X_X);
+  }
+
+  /** Tests inlining into the clauses of a FLWOR expression. */
+  @Test public void flworClauses() {
+    // count clause: merged into the positional variable of the for clause
+    check("for $i in 1 to 3 count $c return $c", "1\n2\n3", root(RangeSeq.class));
+    check("let $x := 2 for $i in 1 to 3 count $c where $i = $x return $c", 2,
+        empty(Let.class), empty(Count.class));
+    // count clause after an order by clause: no merge, inlining passes through the clause
+    check("let $x := -1 for $i in (1 to 5)[. != 9] order by $i * $x count $c return $c",
+        "1\n2\n3\n4\n5", empty(Let.class), exists(Count.class));
+
+    // while clause
+    check("let $x := 3 for $i in 1 to 6 while $i < $x return $i", "1\n2",
+        empty(Let.class), exists(While.class));
+
+    // trace clause
+    check("let $x := 'v' for $i in 1 to 2 trace $x return $i", "1\n2", exists(Trace.class));
+
+    // order by clause
+    check("let $x := -1 for $i in (3, 1, 2) order by $i * $x return $i", "3\n2\n1",
+        empty(Let.class), exists(OrderBy.class));
+
+    // window clause
+    check("let $x := 3 for tumbling window $w in (1 to 6) start at $s when $s mod $x = 1 "
+        + "return sum($w)", "6\n15", empty(Let.class), exists(Window.class));
+  }
+
   /** Checks that inlining a nested closure works properly. */
   @Test public void gh1424() {
     inline(true);
@@ -176,5 +212,29 @@ public final class InlineTest extends SandboxTest {
         exists(DynFuncCall.class),
         empty(StaticFunc.class),
         root(DynFuncCall.class));
+  }
+
+  /** Checks that the type checks of inlined functions are merged. */
+  @Test public void typeCheck() {
+    inline(true);
+    check("declare function local:a($e) as xs:string? { local:b($e) }; " +
+        "declare function local:b($e) as xs:string? { $e }; local:a(" + wrap("X") + ")", "X",
+        count(TypeCheck.class, 1));
+    check("declare function local:a($e) as xs:string? { local:b($e) }; " +
+        "declare function local:b($e) as xs:string* { $e }; local:a(" + wrap("X") + ")", "X",
+        count(TypeCheck.class, 1));
+    check("declare function local:a($e) as xs:string* { local:b($e) }; " +
+        "declare function local:b($e) as xs:string? { $e }; local:a(" + wrap("X") + ")", "X",
+        count(TypeCheck.class, 1));
+
+    query("declare function local:f() as item()  { data([ <_/> ]) }; local:f()", "");
+    query("declare function local:f() as item()? { data([ <_/> ]) }; local:f()", "");
+    query("declare function local:f() as item()+ { data([ <_/> ]) }; local:f()", "");
+    query("declare function local:f() as item()* { data([ <_/> ]) }; local:f()", "");
+
+    query("declare function local:f($a) as item()  { data($a) }; local:f(<_/>)", "");
+    query("declare function local:f($a) as item()? { data($a) }; local:f(<_/>)", "");
+    query("declare function local:f($a) as item()+ { data($a) }; local:f(<_/>)", "");
+    query("declare function local:f($a) as item()* { data($a) }; local:f(<_/>)", "");
   }
 }

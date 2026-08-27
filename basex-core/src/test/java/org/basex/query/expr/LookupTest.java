@@ -13,6 +13,13 @@ import org.junit.jupiter.api.*;
  * @author Christian Gruen
  */
 public final class LookupTest extends SandboxTest {
+  /** Multiple inputs and multiple keys are rewritten to a FLWOR expression. */
+  @Test public void multipleInputs() {
+    query("let $ms := ({ 'a': 1, 'b': 2 }, { 'a': 3, 'b': 4 }) return $ms?('a', 'b')",
+        "1\n2\n3\n4");
+    query("let $ms := ([ 1, 2 ], [ 3, 4 ]) return $ms?(1, 2)", "1\n2\n3\n4");
+  }
+
   /** Test. */
   @Test public void map() {
     query("{ 'a': 'b' } ? a", "b");

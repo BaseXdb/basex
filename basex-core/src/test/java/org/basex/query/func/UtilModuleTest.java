@@ -39,6 +39,11 @@ public final class UtilModuleTest extends SandboxTest {
   @Test public void countWithin() {
     final Function func = _UTIL_COUNT_WITHIN;
 
+    // input yields at most one item: the result is known statically
+    final String one = " head(tokenize(" + wrap("a b") + "))";
+    check(func.args(one, 0, 1), true, root(Bln.class));
+    check(func.args(one, 2), false, root(Bln.class));
+
     // minimum
     query(func.args(" ()", -1), true);
     query(func.args(" ()", 0), true);
@@ -184,6 +189,16 @@ public final class UtilModuleTest extends SandboxTest {
 
     check(_UTIL_COUNT_WITHIN.args(" (1 to 100)[. > 90] ! <_>{ . }</_>", 8, 10), true,
         empty(SimpleMap.class));
+  }
+
+  /** Test method. */
+  @Test public void iff() {
+    final Function func = _UTIL_IF;
+
+    // util:if($cond, $then, $else) → if($cond) then $then else $else
+    check(func.args(" (1, 2)[. = 1]", 1, 2), 1, empty(func), exists(If.class));
+    check(func.args(" (1, 2)[. = 3]", 1, 2), 2, empty(func), exists(If.class));
+    check(func.args(" (1, 2)[. = 3]", 1), "", empty(func));
   }
 
   /** Test method. */

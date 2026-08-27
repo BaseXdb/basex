@@ -48,6 +48,85 @@ public final class TypeTest extends SandboxTest {
     // component types need not be eligible; the integer just fails to coerce to an array/map
     error("1 cast as array(element())", INVTYPE_X);
     error("1 cast as map(xs:anyAtomicType, xs:string)", INVTYPE_X);
+
+    query("xs:integer('+1')", 1);
+    error("xs:integer('++1')", FUNCCAST_X_X);
+    query("string('/') castable as xs:QName", false);
+    query("try { '1999-12-31'/. castable as xs:date } catch err:XPTY0004 { 'error' }", "error");
+    query("declare function local:shortcircuit($a) {"
+        + "  if($a castable as xs:double and xs:double($a) gt 0) then $a else 'bar'"
+        + "};"
+        + "local:shortcircuit('foo')", "bar");
+    query("xs:integer(())", "");
+    query("xs:integer#1(())", "");
+    query("xs:integer(?)(())", "");
+    query("('1', '2 3') ! xs:NMTOKENS(.)[1]", "1\n2");
+    error("exactly-one(xs:NMTOKENS(<x>1 2</x>))", EXACTLYONE);
+  }
+
+  /** xs:float. */
+  @Test public void xsFloat() {
+    error("xs:float('Infinity')", FUNCCAST_X_X);
+    error("xs:float('infinity')", FUNCCAST_X_X);
+    query("xs:float('INF') > 0", true);
+    error("xs:float('inf')", FUNCCAST_X_X);
+    error("xs:float('-Infinity')", FUNCCAST_X_X);
+    error("xs:float('-infinity')", FUNCCAST_X_X);
+    query("xs:float('-INF') < 0", true);
+    error("xs:float('-inf')", FUNCCAST_X_X);
+    query("xs:float('+INF') > 0", true);
+  }
+
+  /** xs:double. */
+  @Test public void xsDouble() {
+    error("xs:double('Infinity')", FUNCCAST_X_X);
+    error("xs:double('infinity')", FUNCCAST_X_X);
+    query("xs:double('INF') > 0", true);
+    error("xs:double('inf')", FUNCCAST_X_X);
+    error("xs:double('-Infinity')", FUNCCAST_X_X);
+    error("xs:double('-infinity')", FUNCCAST_X_X);
+    query("xs:double('-INF') < 0", true);
+    error("xs:double('-inf')", FUNCCAST_X_X);
+    query("xs:double('+INF') > 0", true);
+  }
+
+  /** xs:unsignedLong comparisons. */
+  @Test public void unsignedLong() {
+    query("xs:unsignedLong('3') eq 3.1", false);
+    query("3.1 eq xs:unsignedLong('3')", false);
+    query("xs:unsignedLong(3) lt 3.1", true);
+    query("3.1 gt xs:unsignedLong(3)", true);
+    query("compare(3.1, xs:unsignedLong('3'))", 1);
+    query("compare(xs:unsignedLong('3'), 3.1)", -1);
+  }
+
+  /** Node tests. */
+  @Test public void nodeTest() {
+    query("let $d as document-node(element()) := parse-xml('<!--a--><a/>') return name($d/*)", "a");
+    query("let $d as document-node(element(a)) := parse-xml('<!--a--><a/>') return name($d/*)",
+        "a");
+  }
+
+  /** Typeswitch. */
+  @Test public void typeswitch() {
+    query("typeswitch(<a>1</a>) case xs:string return 1 default return 1", 1);
+    query("typeswitch(<a>1</a>) case $a as xs:string return 1 default return 1", 1);
+    query("typeswitch(<a>1</a>) case $a as xs:string return (1, 2) default return (1, 2)", "1\n2");
+    query("(xs:byte(0), xs:short(0), xs:int(0), xs:long(0), 0) ! "
+        + "(typeswitch (.)"
+        + " case xs:byte return 1"
+        + " case xs:short return 2"
+        + " case xs:int return 3"
+        + " case xs:long return 4"
+        + " case xs:decimal | xs:integer return 5"
+        + " default return 6"
+        + ")", "1\n2\n3\n4\n5");
+    query("(0, xs:byte(0)) ! "
+        + "(typeswitch (.)"
+        + " case xs:integer return 1"
+        + " case xs:byte return 2"
+        + " default return 3"
+        + ")", "1\n1");
   }
 
   /** instance of. */

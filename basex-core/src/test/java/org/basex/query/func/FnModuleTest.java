@@ -16,9 +16,11 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.List;
 import org.basex.query.expr.constr.*;
 import org.basex.query.expr.gflwor.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.func.prof.ProfType.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.junit.jupiter.api.Test;
@@ -32,6 +34,8 @@ import org.junit.jupiter.api.Test;
 public final class FnModuleTest extends SandboxTest {
   /** Document. */
   private static final String DOC = "src/test/resources/input.xml";
+  /** Binds five items that are opaque at compile time; the variable must be used more than once. */
+  private static final String OPAQUE = "let $o := (1 to 5) ! data(attribute _ { . }) return ";
   /** Months. */
   private static final String MONTHS = " ('January', 'February', 'March', 'April', 'May', "
       + "'June', 'July', 'August', 'September', 'October', 'November', 'December')";
@@ -617,6 +621,10 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void count() {
     final Function func = COUNT;
 
+    // count(array:members(E)) → array:size(E)
+    check(func.args(" " + _ARRAY_MEMBERS.args(" array { tokenize(" + wrap("a b") + ") }")), 2,
+        exists(_ARRAY_SIZE), empty(_ARRAY_MEMBERS));
+
     query(func.args(" (1 to 100_000_000) ! string()"), 100000000);
     query(func.args(" for $i in 1 to 100_000_000 return string('x')"), 100000000);
 
@@ -624,6 +632,85 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" count([ <a/>, <b/> ]) "), 1);
 
     query(func.args(" data( [ (1 to 6) ! <_>{ 1 }</_> ][. > 0 ] )"), 6);
+
+    // static occurrence: zero-or-one
+    String count = func.args(" " + wrap(1) + "[. = 1]");
+
+    // static result: no need to evaluate count
+    check(count + " <    0", false, root(Bln.class));
+    check(count + " <= -.1", false, root(Bln.class));
+    check(count + " >=   0", true, root(Bln.class));
+    check(count + " > -0.1", true, root(Bln.class));
+    check(count + " =  1.1", false, root(Bln.class));
+    check(count + " != 1.1", true, root(Bln.class));
+    check(count + " =   -1", false, root(Bln.class));
+    check(count + " !=  -1", true, root(Bln.class));
+
+    // rewrite to empty/exists (faster)
+    check(count + " >  0", true, root(CmpSimpleG.class));
+    check(count + " >= 1", true, root(CmpSimpleG.class));
+    check(count + " != 0", true, root(CmpSimpleG.class));
+    check(count + " <  1", false, root(CmpSimpleG.class));
+    check(count + " <= 0", false, root(CmpSimpleG.class));
+    check(count + " =  0", false, root(CmpSimpleG.class));
+
+    // zero-or-one result: no need to evaluate count
+    check(count + " <  2", true, root(Bln.class));
+    check(count + " <= 2", true, root(Bln.class));
+    check(count + " <= 1", true, root(Bln.class));
+    check(count + " != 2", true, root(Bln.class));
+    check(count + " >  1", false, root(Bln.class));
+    check(count + " >= 2", false, root(Bln.class));
+    check(count + " =  2", false, root(Bln.class));
+
+    // no pre-evaluation possible
+    check(count + " != 1", false, root(CmpSimpleG.class));
+    check(count + " =  1", true, root(CmpSimpleG.class));
+    check(count + " - 1 = 0", true, root(CmpSimpleG.class));
+
+    // one-or-more results: no need to evaluate count
+    count = func.args(" (1," + wrap(1) + "[. = 1])");
+    check(count + " >  0", true, root(Bln.class));
+    check(count + " >= 1", true, root(Bln.class));
+    check(count + " != 0", true, root(Bln.class));
+    check(count + " <  1", false, root(Bln.class));
+    check(count + " <= 0", false, root(Bln.class));
+    check(count + " =  0", false, root(Bln.class));
+    check(count + " =  1.1", false, root(Bln.class));
+
+    // no pre-evaluation possible
+    check(count + " != 1", true, exists(func));
+    check(count + " =  1", false, root(_UTIL_COUNT_WITHIN));
+    check(count + " =  2", true, root(_UTIL_COUNT_WITHIN));
+    check(count + " div 2 = 1", true, root(_UTIL_COUNT_WITHIN));
+
+    // GH-1519: count of large sequences
+    query("declare function local:replicate($seq, $n, $out) { "
+        + "  if($n eq 0) then $out "
+        + "  else ( "
+        + "    let $out2 := if($n mod 2 eq 0) then $out else ($out, $seq) "
+        + "    return local:replicate(($seq, $seq), $n idiv 2, $out2) "
+        + "  ) "
+        + "};"
+        + "let $n := 1000000 "
+        + "return ( "
+        + "  count(local:replicate((1, 2, 3), $n, ())) eq 3 * $n, "
+        + "  count(local:replicate((1, 2, 3), $n, ())) = 3 * $n "
+        + ")",
+        "true\ntrue");
+
+    // pre-evaluation, based on database statistics
+    check(func.args(1), 1, exists(Itr.class));
+
+    execute(new CreateDB(NAME, "<xml><a x='y'>1</a><a>2 3</a><a/></xml>"));
+    check(func.args(" //a"), 3, exists(Itr.class));
+    check(func.args(" /xml/a"), 3, exists(Itr.class));
+    check(func.args(" //text()"), 2, exists(Itr.class));
+    check(func.args(" //*"), 4, exists(Itr.class));
+    check(func.args(" //node()"), 6, exists(Itr.class));
+    check(func.args(" //comment()"), 0, exists(Itr.class));
+    check(func.args(" /self::document-node()"), 1, exists(Itr.class));
+    execute(new DropDB(NAME));
   }
 
   /** Test method. */
@@ -999,6 +1086,13 @@ public final class FnModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void doc() {
     final Function func = Function.DOC;
+
+    // local documents are pre-evaluated, remote ones are not
+    check("<a>{" + func.args(DOC) + " }</a>//x", "", exists(DBNode.class));
+    check("if(<x>1</x> = 1) then 2 else" + func.args(DOC), 2, exists(DBNode.class));
+    check("if(<x>1</x> = 1) then 2 else" + func.args("http://abc.de/"), 2, exists(func));
+    check("if(<x>1</x> = 1) then 2 else" + COLLECTION.args("http://abc.de/"), 2,
+        exists(COLLECTION));
 
     final IOFile sandbox = sandbox();
     final BiFunction<String, String, String> write = (name, content) -> {
@@ -1575,6 +1669,12 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void foot() {
     final Function func = FOOT;
 
+    // merge with nested positional functions (the let prevents the operand from being unrolled)
+    check(OPAQUE + "(" + func.args(" " + TAIL.args(" $o")) + ','
+        + func.args(" " + TRUNK.args(" $o")) + ','
+        + func.args(" " + REVERSE.args(" $o")) + ')', "5\n4\n1",
+        empty(TAIL), empty(TRUNK), empty(REVERSE));
+
     query(func.args(" ()"), "");
     query(func.args(1), 1);
     query(func.args(" 1 to 2"), 2);
@@ -1757,6 +1857,9 @@ public final class FnModuleTest extends SandboxTest {
       // fallback to default language
       query(func.args(99, "w", "zu-DE"), "ninety-nine");
     }
+
+    // empty input, not known at compile time
+    query(func.args(" let $x :=" + _RANDOM_INTEGER.args() + " return ()", "0"), "");
   }
 
   /** Test method. */
@@ -1873,6 +1976,13 @@ public final class FnModuleTest extends SandboxTest {
   /** Tests the fn:empty and fn:exists rewritings of their arguments. */
   @Test public void emptyExists() {
     final String seq = " tokenize(" + wrap("a b c") + ", ' ')";
+
+    // exists(map:keys(E)) → map:size(E) > 0, empty(array:members(E)) → array:size(E) = 0
+    check(EXISTS.args(" " + _MAP_KEYS.args(" " + _MAP_MERGE.args(seq + " !" +
+        _MAP_ENTRY.args(" .", 1)))), true, exists(_MAP_SIZE), empty(_MAP_KEYS));
+    check(EMPTY.args(" " + _ARRAY_MEMBERS.args(" array {" + seq + " }")), false,
+        exists(_ARRAY_SIZE), empty(_ARRAY_MEMBERS));
+
     check(EXISTS.args(HEAD.args(seq)), true, root(EXISTS), empty(HEAD));
     check(EMPTY.args(HEAD.args(seq)), false, root(EMPTY), empty(HEAD));
     check(EXISTS.args(FOOT.args(seq)), true, root(EXISTS), empty(FOOT));
@@ -1909,11 +2019,23 @@ public final class FnModuleTest extends SandboxTest {
     check(EXISTS.args(TAIL.args(ndt)), true, exists(TAIL));
     check(EXISTS.args(TRUNK.args(ndt)), true, exists(TRUNK));
     error(EXISTS.args(FOOT.args(ndt)), FUNERR1);
+
+    // empty sequences bound to variables and parameters
+    query("let $a := () return" + EMPTY.args(" $a"), true);
+    query("let $a := () return" + EXISTS.args(" $a"), false);
+    query("declare function local:f($x as empty-sequence()) as xs:boolean {"
+        + EMPTY.args(" $x") + " }; local:f(())", true);
   }
 
   /** Test method. */
   @Test public void head() {
     final Function func = HEAD;
+
+    // merge with nested positional functions (the let prevents the operand from being unrolled)
+    check(OPAQUE + "(" + func.args(" " + TAIL.args(" $o")) + ','
+        + func.args(" " + TRUNK.args(" $o")) + ','
+        + func.args(" " + SUBSEQUENCE.args(" $o", 3)) + ')', "2\n1\n3",
+        empty(TAIL), empty(TRUNK), empty(SUBSEQUENCE));
 
     // pre-evaluate empty sequence
     check(func.args(" ()"), "", empty(func));
@@ -2172,6 +2294,10 @@ public final class FnModuleTest extends SandboxTest {
         "  return insert-before((6, 5), $p, ('x', 'y', 'z'))[$i]" +
         ")",
         "56zyx\n56zyx\n5zyx6\nzyx56\nzyx56");
+
+    // extreme position (no integer underflow)
+    query(func.args(" (1, 2, 3)", " -9223372036854775807 - 1", 99), "99\n1\n2\n3");
+    query(func.args(" (1, 2, 3)", 5, 99), "1\n2\n3\n99");
   }
 
   /** Test method. */
@@ -2283,6 +2409,12 @@ public final class FnModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void itemsAt() {
     final Function func = ITEMS_AT;
+
+    // reversed input and reversed positions (the let prevents the operand from being unrolled)
+    check("let $o := (1 to 5) ! data(attribute _ { . }) "
+        + "let $p := (1 to 3) ! xs:integer(data(attribute _ { . })) return ("
+        + func.args(" " + REVERSE.args(" $o"), 2) + ','
+        + func.args(" $o", " " + REVERSE.args(" $p")) + ')', "4\n3\n2\n1");
 
     query(func.args(" ()", " ()"), "");
     query(func.args(" ()", 1), "");
@@ -2822,6 +2954,8 @@ return
   /** Test method. */
   @Test public void min() {
     final Function func = MIN;
+    // repeated single item: the item is returned without evaluating the sequence
+    check(func.args(" " + REPLICATE.args(1, 3)), 1, root(Itr.class));
     query(func.args(1), 1);
     query(func.args(1.1), 1.1);
     query(func.args(" 1e1"), 10);
@@ -4541,6 +4675,30 @@ return
     check(func.args(" string-join((" + wrap("A") + "," + wrap("B") + "))"), 2, empty(STRING_JOIN));
     check(func.args(" (" + wrap("A") + " || " + wrap("B") + ")"), 2, empty(CONCAT));
 
+    // comparisons with a constant: predicate is always true or always false
+    check("<a/>[" + func.args() + " >  -1]", "<a/>", empty(IterFilter.class));
+    check("<a/>[" + func.args() + " != -1]", "<a/>", empty(IterFilter.class));
+    check("<a/>[" + func.args() + " ge  0]", "<a/>", empty(IterFilter.class));
+    check("<a/>[" + func.args() + " ne 1.1]", "<a/>", empty(IterFilter.class));
+
+    check("<a/>[" + func.args() + " <   0]", "", empty(IterFilter.class));
+    check("<a/>[" + func.args() + " <= -1]", "", empty(IterFilter.class));
+    check("<a/>[" + func.args() + " eq -1]", "", empty(IterFilter.class));
+    check("<a/>[" + func.args() + " eq 1.1]", "", empty(IterFilter.class));
+
+    // comparisons with zero: rewritten to an existence check
+    check("<a/>[" + func.args() + " >  0]", "", exists(SingleIterPath.class));
+    check("<a/>[" + func.args() + " >= 0.5]", "", exists(SingleIterPath.class));
+    check("<a/>[" + func.args() + " ne 0]", "", exists(SingleIterPath.class));
+
+    check("<a/>[" + func.args() + " <  0.5]", "<a/>", exists(SingleIterPath.class));
+    check("<a/>[" + func.args() + " <= 0.5]", "<a/>", exists(SingleIterPath.class));
+    check("<a/>[" + func.args() + " eq 0]", "<a/>", exists(SingleIterPath.class));
+
+    // no rewritings
+    check("<a/>[" + func.args() + " gt 1]", "", exists(func));
+    check("<a/>[" + func.args() + " = <a>1</a>]", "", exists(func));
+
     error("true#0[" + func.args() + ']', FIATOMIZE_X);
   }
 
@@ -4557,6 +4715,16 @@ return
   /** Test method. */
   @Test public void subsequence() {
     final Function func = SUBSEQUENCE;
+
+    // merge with count() of the same input; the size of the input must not be known statically,
+    // otherwise the length is pre-evaluated and an earlier rewrite applies
+    final String opaque = "let $o := tokenize(" + wrap("a b c d e") + ") return ";
+    check(opaque + '(' + func.args(" $o", 1, " count($o) - 1") + ')', "a\nb\nc\nd",
+        empty(func), exists(TRUNK));
+    check(opaque + '(' + func.args(" $o", 1, " count($o) + 10") + ')', "a\nb\nc\nd\ne",
+        empty(func), empty(TRUNK));
+    check(opaque + '(' + func.args(" $o", 3, " count($o) + 1") + ')', "c\nd\ne", exists(func));
+    check(opaque + '(' + func.args(" $o", " count($o)", 0) + ')', "", empty());
 
     // static rewrites
     query(func.args(" ()", 0), "");
@@ -4685,6 +4853,11 @@ return
 
     // GH-2315
     check("(1 to 6) ! " + func.args(" <a/>/*", " .", 1), "", root(_UTIL_RANGE));
+
+    // large offsets and lengths (no integer overflow)
+    query(func.args(" 1 to 2000", 2000, 9223372036854775807L), 2000);
+    query(func.args(" 1 to 5", 2, 9223372036854775807L), "2\n3\n4\n5");
+    query(func.args(" 1 to 5", 3, 2147483648L), "3\n4\n5");
   }
 
   /** Test method. */
@@ -4720,6 +4893,12 @@ return
 
     check(wrap("abc") + "-> " + func.args(" .", 2, " string-length(.)"), "bc",
         empty(STRING_LENGTH));
+
+    // large positions and lengths (no integer overflow)
+    query(func.args("hello", 1, 9223372036854775807L), "hello");
+    query(func.args("hello", 2, 9223372036854775807L), "ello");
+    query(func.args("hello", 3, 2147483648L), "llo");
+    query(func.args("hello", -2, 9223372036854775807L), "hello");
   }
 
   /** Test method. */
@@ -4850,6 +5029,10 @@ return
   /** Test method. */
   @Test public void tail() {
     final Function func = TAIL;
+
+    // merge with nested positional functions (the let prevents the operand from being unrolled)
+    check(OPAQUE + "(" + func.args(" " + func.args(" $o")) + ','
+        + func.args(" " + SUBSEQUENCE.args(" $o", 2, 3)) + ')', "3\n4\n5\n3\n4", empty(func));
 
     // static rewrites
     query(func.args(" ()"), "");
@@ -5070,6 +5253,16 @@ return
         "<a>1</a>\n<a>4</a>", root(SUBSEQUENCE));
 
     query(func.args(" subsequence(<x><a/><a/><a/></x>/*, 3)"), "");
+  }
+
+  /** Test method. */
+  @Test public void unordered() {
+    final Function func = UNORDERED;
+
+    // unordered(E) → E
+    check(func.args(" ()"), "", empty());
+    check(func.args(" (1, 2)"), "1\n2", empty(func));
+    check(func.args(" (1 to 3)[. > 1]"), "2\n3", empty(func));
   }
 
   /** Test method. */

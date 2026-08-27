@@ -27,6 +27,14 @@ public final class SimpleMapTest extends SandboxTest {
     query("(1 to 2) ! <a/>", "<a/>\n<a/>");
   }
 
+  /** Mixed operands. */
+  @Test public void mixed() {
+    query("<a/> ! (('b' ! 'c'), name())", "c\na");
+    query("((1 to 100000) ! 5)[1]", 5);
+    query("<a><b/></a>/b ! ancestor-or-self::node() ! name()", "a\nb");
+    query("<_ a='a' b='b'/> ! (@a, @b) ! string()", "a\nb");
+  }
+
   /** Empty results. */
   @Test public void noResults() {
     check("() ! ()", "", empty());

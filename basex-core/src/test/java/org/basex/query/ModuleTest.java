@@ -1,5 +1,6 @@
 package org.basex.query;
 
+import static org.basex.query.QueryError.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
@@ -14,6 +15,9 @@ import org.junit.jupiter.api.Test;
  * @author Leo Woerteler
  */
 public final class ModuleTest extends SandboxTest {
+  /** Test XQuery module file. */
+  private static final String XQMFILE = "src/test/resources/hello.xqm";
+
   /**
    * Imports a built-in module.
    */
@@ -328,5 +332,52 @@ public final class ModuleTest extends SandboxTest {
     query("import module namespace a = 'A' at '" + a.path() + "';\n"
         + "import module namespace b = 'B' at '" + b.path() + "';\n"
         + "b:make(1) instance of a:rec", true);
+  }
+  /** Catches duplicate module import. */
+  @Test public void duplImport() {
+    error("import module namespace a='world' at '" + XQMFILE + "';" +
+      "import module namespace a='world' at '" + XQMFILE + "'; 1",
+      DUPLMODULE_X);
+  }
+
+  /** Catches duplicate module import with different module URI. */
+  @Test public void duplImportDiffUri() {
+    error("import module namespace a='world' at '" + XQMFILE + "';" +
+      "import module namespace a='galaxy' at '" + XQMFILE + "'; 1",
+      DUPLNSDECL_X);
+  }
+
+  /** Catches duplicate module import. */
+  @Test public void duplLocation() {
+    error("import module namespace a='world' at '" + XQMFILE + "';" +
+      "import module namespace b='galaxy' at '" + XQMFILE + "'; 1",
+      WRONGMODULE_X_X_X);
+  }
+
+  /** Checks static context scoping in variables. */
+  @Test public void varsInModules() {
+    contains("import module namespace a='world' at '" + XQMFILE + "'; $a:eager", "Q{world}foo");
+    contains("import module namespace a='world' at '" + XQMFILE + "'; $a:lazy", "Q{world}foo");
+    contains("import module namespace a='world' at '" + XQMFILE + "'; $a:func()", "Q{world}foo");
+    contains("import module namespace a='world' at '" + XQMFILE + "'; a:inlined()", "Q{world}foo");
+  }
+
+  /** Checks imported module's types. */
+  @Test public void typesInModules() {
+    query("import module namespace a='world' at '" + XQMFILE + "'; '42' cast as a:int", 42);
+    query("import module namespace a='world' at '" + XQMFILE + "';" +
+      "declare type a:private-int as a:int; '42' cast as a:private-int", 42);
+
+    error("import module namespace a='world' at '" + XQMFILE + "';" +
+      "declare type Q{world}int as xs:double; '42' cast as a:int", DUPLTYPE_X);
+    error("import module namespace a='world' at '" + XQMFILE + "'; '42' cast as a:private-int",
+      WHICHCAST_X);
+
+    // constructor functions of imported types
+    query("import module namespace a='world' at '" + XQMFILE + "'; a:int('42')", 42);
+    query("import module namespace a='world' at '" + XQMFILE + "';"
+        + "declare type local:t as a:int; local:t('42')", 42);
+    error("import module namespace a='world' at '" + XQMFILE + "'; a:private-int('42')",
+      FUNCPRIVATE_X);
   }
 }

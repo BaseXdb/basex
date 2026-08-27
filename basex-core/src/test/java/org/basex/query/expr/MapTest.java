@@ -15,6 +15,15 @@ import org.junit.jupiter.api.*;
  * @author Leo Woerteler
  */
 public final class MapTest extends SandboxTest {
+  /** Duplicate keys are rejected while the map constructor is optimized. */
+  @Test public void duplicateKeys() {
+    // all keys are strings: the constructor is treated as a record
+    error("{ 'a': 1, 'a': 2 }", MAPDUPLKEY_X);
+    error("{ 'a': 1, 'b': 2, 'a': 3 }", MAPDUPLKEY_X);
+    // distinct keys are accepted
+    query("{ 'a': 1, 'b': 2 }?a", 1);
+  }
+
   /** A map as key should lead to FOTY0013. */
   @Test public void mapAsKeyTest() {
     error("declare variable $m := { 'a': 'b' };" +

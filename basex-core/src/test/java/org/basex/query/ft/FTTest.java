@@ -457,4 +457,54 @@ public class FTTest extends SandboxTest {
     pre("//fti[text() contains text 'adf' ftor ftnot (ftnot 'adf')]", 31);
     pre("//fti[text() contains text 'adf' ftor ftnot 'adf']", 25, 27, 29, 31, 33);
   }
+
+  /** Thesaurus options. */
+  @Test public void thesaurus() {
+    final String thes = "'src/test/resources/thesaurus.xml'";
+    query("'lucky' contains text 'happy' using thesaurus at " + thes, true);
+    // nested options: the thesaurus lists are merged
+    query("'lucky' contains text ('happy' using thesaurus at " + thes + ") "
+        + "using thesaurus default", true);
+    // the same thesaurus on both levels is only registered once
+    query("'lucky' contains text ('happy' using thesaurus at " + thes + ") "
+        + "using thesaurus at " + thes, true);
+    // the inner level has no thesaurus, the outer one is added
+    query("'lucky' contains text ('happy' using thesaurus default) "
+        + "using thesaurus at " + thes, true);
+  }
+
+  /** Position filters and occurrence indicators with inlined variables. */
+  @Test public void inlinedOperands() {
+    // window filter
+    query("let $n := 3 return 'a b' contains text 'a b' window $n words", true);
+    query("let $n := 1 return 'a b' contains text 'a b' window $n words", false);
+    // occurrence indicator
+    query("let $n := 1 return 'a a' contains text 'a' occurs at least $n times", true);
+    query("let $n := 3 return 'a a' contains text 'a' occurs at least $n times", false);
+    // search term that is not known at compile time
+    pre("//w[text() contains text { " + wrap("hello") + " }]", 14);
+  }
+
+  /** Weight declarations. */
+  @Test public void weight() {
+    query("'a' contains text 'a' weight { 2 }", true);
+    query("'a' contains text 'b' weight { 2 }", false);
+    // a weight of zero discards all matches
+    query("'a' contains text 'a' weight { 0 }", false);
+
+    // the full-text index is not used for weighted expressions
+    pre("//w[text() contains text 'hello' weight { 2 }]", 14);
+    pre("//w[text() contains text 'hello' weight { 0 }]");
+
+    // inline a variable into the weight
+    query("let $w := 2 return 'a' contains text 'a' weight { $w }", true);
+    // inline a variable into the search term, but not into the weight
+    query("let $t := 'a' return 'a' contains text { $t } weight { 2 }", true);
+    // inline a variable that occurs in neither
+    query("let $x := 'a' return ($x, 'a' contains text 'a' weight { 2 })", "a\ntrue");
+
+    // weights are limited to values between -1000 and 1000
+    error("'a' contains text 'a' weight { 1001 }", FTWEIGHT_X);
+    error("'a' contains text 'a' weight { -1001 }", FTWEIGHT_X);
+  }
 }

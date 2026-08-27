@@ -287,4 +287,20 @@ public final class MultiUpdateTest extends SandboxTest {
     error(input + " update { insert nodes attribute new {} before . }", UPPAREMPTY_X);
     error(input + " update { insert nodes attribute new {} after . }", UPPAREMPTY_X);
   }
+
+  /** Multiple updates of a single node: primitives are merged or rejected. */
+  @Test public void mergeUpdates() {
+    final String input = "<xml><a/></xml>";
+
+    // insertions with the same target are merged
+    query(input + " update { insert nodes <x/> as first into ./a,"
+        + " insert nodes <y/> as first into ./a }", "<xml><a><x/><y/></a></xml>");
+
+    // a node can only be renamed, replaced or assigned a new value once
+    error(input + " update { rename node ./a as 'b', rename node ./a as 'c' }", UPMULTREN_X);
+    error(input + " update { replace node ./a with <b/>, replace node ./a with <c/> }",
+        UPMULTREPL_X);
+    error(input + " update { replace value of node ./a with 'b',"
+        + " replace value of node ./a with 'c' }", UPMULTREPV_X);
+  }
 }

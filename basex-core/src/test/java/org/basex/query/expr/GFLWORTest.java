@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.basex.*;
 import org.basex.query.expr.constr.*;
 import org.basex.query.expr.gflwor.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.up.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -21,6 +22,27 @@ import org.junit.jupiter.api.*;
  * @author Leo Woerteler
  */
 public final class GFLWORTest extends SandboxTest {
+  /** FLWOR expressions. */
+  @Test public void flwor() {
+    query("(for $i in 1 to 5 return $i)[3]", 3);
+    query("(for $a in 1 to 5 for $b in 1 to 5 return $a * $b)[7]", 4);
+    query("declare namespace x = 'X'; let $a := <a>0</a> let $b := $a return $b = 0", true);
+    query("for $a in (1, 2) let $b := 'a' where $a = 1 return $a", 1);
+    query("for $a in (1, 2) let $b := 'a'[$a = 1] return $a", "1\n2");
+    query("for $a in (1, 2) let $b := 3 where $b = 4 return $a", "");
+    query("for $a in (1, 2) let $b := 3[. = 4] return $a", "1\n2");
+    query("for $a at $p in (1, 2) where $a = 2 return $p", 2);
+  }
+
+  /** For and let clauses. */
+  @Test public void forLet() {
+    query("for $a in 1 to 2 let $b := 3 return $b", "3\n3");
+    query("for $a in 1 to 2 let $b := 3 let $c := 3 return $c", "3\n3");
+    query("for $a in 1 to 2 let $b := 3 let $b := 4 return $b", "4\n4");
+    query("for $a score $s in 1 let $s := 3 return $s", 3);
+    query("for $a at $p in 1 let $s := $p return $s", 1);
+  }
+
   /** Tests shadowing of outer variables. */
   @Test public void shadowTest() {
     assertEquals("<x>1</x>",
@@ -545,5 +567,28 @@ public final class GFLWORTest extends SandboxTest {
         "1\n2\n1\n2");
     query("for $x in (1, 2) for $y in (for $a in (1, 2, 3) while $a < 3 return $a) return ($x, $y)",
         "1\n1\n1\n2\n2\n1\n2\n2");
+  }
+
+  /** Errors raised at compile time are deferred if an outer clause can prevent them. */
+  @Test public void clauseError() {
+    final String none = "(1 to 1000000)[. < 1]";
+
+    // failing clause: the error is bound to the return clause
+    check("count(for $i in " + none + " let $x := xs:integer('z') return $x)", 0,
+        exists(FnError.class));
+    // failing return clause
+    check("count(for $i in " + none + " return xs:integer('z'))", 0, exists(FnError.class));
+    // no outer clause can prevent the error
+    error("for $i in (1 to 2) let $x := xs:integer('z') return $x", FUNCCAST_X_X);
+  }
+
+  /** Simplifications that discard the FLWOR expression. */
+  @Test public void simplify() {
+    // for $_ allowing empty in () return $_ → ()
+    check("for $x allowing empty in () return $x", "", empty());
+    // exactly one iteration, no referenced variables
+    check("let $x := 1 return 'y'", "y", root(Str.class));
+    // fixed number of iterations, no referenced variables
+    check("for $i in 1 to 2 return 3", "3\n3", root(SingletonSeq.class));
   }
 }

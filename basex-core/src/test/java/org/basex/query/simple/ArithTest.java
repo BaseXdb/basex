@@ -202,4 +202,33 @@ public final class ArithTest extends SandboxTest {
     check("<x _='1'/>/@* * 0  = 0", true, exists(Arith.class));
     check("<x _='1'/>/@* * 0 != 0", false, exists(Arith.class));
   }
+
+  /** Number literals. */
+  @Test public void literals() {
+    query("1.+1.", 2);
+  }
+
+  /** Numeric limits. */
+  @Test public void limits() {
+    query("2 * 4611686018427387903", 9223372036854775806L);
+    error("2 * 4611686018427387904", RANGE_X);
+    query("-2 * 4611686018427387904", -9223372036854775808L);
+    error("4611686018427387905 * -2", RANGE_X);
+    query("xs:decimal('18446744073709551616') idiv -2", -9223372036854775808L);
+    error("xs:decimal('18446744073709551616') idiv 2", RANGE_X);
+    query("xs:decimal('18446744073709551612') idiv 2", 9223372036854775806L);
+    error("-9223372036854775808 idiv -1", RANGE_X);
+    error("-9223372036854775807 - 1024", RANGE_X);
+    error("-9223372036854775808 - 1", RANGE_X);
+  }
+
+  /** Arithmetics with durations. */
+  @Test public void durations() {
+    query("string(.5 * xs:yearMonthDuration('P1Y'))", "P6M");
+    query("string(<_>.5</_> * xs:yearMonthDuration('P1Y'))", "P6M");
+    query("string(xs:yearMonthDuration('P1Y') * .5)", "P6M");
+    query("string(xs:yearMonthDuration('P1Y') * <_>.5</_>)", "P6M");
+    query("string(xs:yearMonthDuration('P1Y') div .5)", "P2Y");
+    query("string(xs:yearMonthDuration('P1Y') div <_>.5</_>)", "P2Y");
+  }
 }

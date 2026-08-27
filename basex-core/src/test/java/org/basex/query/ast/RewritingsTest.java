@@ -18,7 +18,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.seq.tree.*;
-import org.basex.query.var.*;
 import org.basex.util.list.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
@@ -38,611 +37,16 @@ public final class RewritingsTest extends SandboxTest {
     execute(new DropDB(NAME));
   }
 
-  /** Checks if the count function is pre-compiled. */
-  @Test public void preEval() {
-    check("count(1)", 1, exists(Itr.class));
-
-    execute(new CreateDB(NAME, "<xml><a x='y'>1</a><a>2 3</a><a/></xml>"));
-    check("count(//a)", 3, exists(Itr.class));
-    check("count(/xml/a)", 3, exists(Itr.class));
-    check("count(//text())", 2, exists(Itr.class));
-    check("count(//*)", 4, exists(Itr.class));
-    check("count(//node())", 6, exists(Itr.class));
-    check("count(//comment())", 0, exists(Itr.class));
-    check("count(/self::document-node())", 1, exists(Itr.class));
-  }
-
-  /** Checks that ranges with a possibly-empty operand do not get a non-empty result size. */
-  @Test public void rangeEmptyOperand() {
-    // operand is xs:integer? and empty at runtime, so the range is empty
-    final String h = "head((1 to 10)[. > 100])";
-    check("count(" + h + " to " + h + ")", 0);
-    check("exists(" + h + " to " + h + ")", false);
-    check("count(" + h + " to " + h + " + 10)", 0);
-    check("exists(" + h + " to " + h + " + 10)", false);
-    // single-item operands: result is still computed correctly
-    check("let $i := (1 to 10)[. = 5] return count($i to $i)", 1);
-    check("let $i := (1 to 10)[. = 5] return count($i to $i + 4)", 5);
-  }
-
-  /** Checks that dead 'otherwise' operands are dropped in a single optimization pass. */
-  @Test public void otherwiseChop() {
-    check("1 otherwise 2 otherwise 3", 1, empty(Otherwise.class), root(Itr.class));
-    check("count((1, 2) otherwise (3, 4) otherwise 5)", 2, empty(Otherwise.class));
-    check("<a/> otherwise 2 otherwise 3", "<a/>", empty(Otherwise.class));
-    // leading possibly-empty operands are kept
-    check("(1 to 10)[. = <x>11</x>] otherwise 2 otherwise 3", 2, exists(Otherwise.class));
-  }
-
-  /** Checks if descendant-or-self::node() steps are rewritten. */
-  @Test public void mergeDesc() {
-    execute(new CreateDB(NAME, "<a><b>B</b><b><c>C</c></b></a>"));
-
-    check("//*", null, "//@axis = 'descendant'");
-    check("//(b, *)", null, exists(IterPath.class), "//@axis = 'descendant'");
-    check("//(b | *)", null, exists(IterPath.class), "//@axis = 'descendant'");
-    check("//(b | *)[text()]", null, exists(IterPath.class), empty(Union.class),
-        "//@axis = 'descendant'");
-    check("//(b, *)[1]", null, "not(//@axis = 'descendant')");
-  }
-
-  /** Checks if descendant steps are rewritten to child steps. */
-  @Test public void descToChild() {
-    execute(new CreateDB(NAME, "<a><b>B</b><b><c>C</c></b></a>"));
-
-    check("descendant::a", null, "//@axis = 'child'");
-    check("descendant::b", null, "//@axis = 'child'");
-    check("descendant::c", null, "//@axis = 'child'");
-    check("descendant::*", null, "not(//@axis = 'child')");
-  }
-
-  /** Checks EBV optimizations. */
-  @Test public void optimizeEbv() {
-    query("not(<a/>[b])", true);
-    query("empty(<a/>[b])", true);
-    query("exists(<a/>[b])", false);
-
-    query("not(<a/>[b = 'c'])", true);
-    query("empty(<a/>[b = 'c'])", true);
-    query("exists(<a/>[b = 'c'])", false);
-
-    query("let $n := <n/> where $n[<a><b/><b/></a>/*] return $n", "<n/>");
-
-    check("empty(<a>X</a>[text()])", null, "//@axis = 'child'");
-    check("exists(<a>X</a>[text()])", null, "//@axis = 'child'");
-    check("boolean(<a>X</a>[text()])", null, "//@axis = 'child'");
-    check("not(<a>X</a>[text()])", null, "//@axis = 'child'");
-
-    check("if(<a>X</a>[text()]) then 1 else 2", null, "//@axis = 'child'");
-    check("<a>X</a>[text()] and <a/>", null, "//@axis = 'child'");
-    check("<a>X</a>[text()] or <a/>", null, "//Bln = 'true'");
-    check("<a>X</a>[text()] or <a/>[text()]", null, "//@axis = 'child'");
-    check("for $a in <a>X</a> where $a[text()] return $a", null, "//@axis = 'child'");
-
-    check("empty(<a>X</a>/.[text()])", null, "//@axis = 'child'");
-  }
-
-  /** Checks if iterative evaluation of XPaths is used if no duplicates occur. */
-  @Test public void gh1001() {
-    execute(new CreateDB(NAME, "<a id='0' x:id='' x='' xmlns:x='x'><b id='1'/><c id='2'/>"
-        + "<d id='3'/><e id='4'/></a>"));
-    check("(/a/*/../*) ! name()", "b\nc\nd\ne", empty(IterPath.class));
-    check("(exactly-one(/a/b)/../*) ! name()", "b\nc\nd\ne", exists(IterPath.class));
-    check("(/a/*/following::*) ! name()", "c\nd\ne", empty(IterPath.class));
-    check("(exactly-one(/a/b)/following::*) ! name()", "c\nd\ne", exists(IterPath.class));
-    check("(/a/*/following-sibling::*) ! name()", "c\nd\ne", empty(IterPath.class));
-    check("(exactly-one(/a/b)/following-sibling::*) ! name()", "c\nd\ne", exists(IterPath.class));
-    check("(/*/@id/../*) ! name()", "b\nc\nd\ne", empty(IterPath.class));
-    check("(exactly-one(/a)/@id/../*) ! name()", "b\nc\nd\ne", exists(IterPath.class));
-  }
-
-  /** Checks OR optimizations. */
-  @Test public void or() {
-    check("('' or '')", false, empty(Or.class));
-    check("('x' or 'x' = 'x')", true, empty(Or.class));
-    check("(false()   or <x/> = 'x')", false, empty(Or.class));
-    check("(true()    or <x/> = 'x')", true, empty(Or.class));
-    check("('x' = 'x' or <x/> = 'x')", true, empty(Or.class));
-
-    // {@link CmpG} rewritings
-    check("let $x := <x/>     return ($x = 'x' or $x = 'y')", false, empty(Or.class));
-    check("let $x := <x>x</x> return ($x = 'x' or $x = 'y')", true,  empty(Or.class));
-  }
-
-  /** Checks AND optimizations. */
-  @Test public void and() {
-    check("('x' and 'y')", true, empty(And.class));
-    check("('x' and 'x' = 'x')", true, empty(And.class));
-    check("(true()    and <x>x</x> = 'x')", true, empty(And.class));
-    check("(false()   and <x>x</x> = 'x')", false, empty(And.class));
-    check("('x' = 'x' and <x>x</x> = 'x')", true, empty(And.class));
-  }
-
-  /** Checks {@link CmpIR} optimizations. */
-  @Test public void cmpIR() {
-    final Class<CmpIR> cmpir = CmpIR.class;
-    check("(1, 2)[. = 1] = 1 to 2", true, exists(cmpir));
-    check("(1, 2)[. = 3] = 1 to 2", false, exists(cmpir));
-    check("(1, 2)[. = 3] = 1 to 2", false, exists(cmpir));
-
-    // do not rewrite equality comparisons against single integers
-    check("(1, 2)[. = 1] = 1", true, empty(cmpir));
-
-    // flatten predicate: exists(E[. > 3]) → E > 3
-    final String range = " (1 to " + wrap(6) + ')';
-    check(EXISTS.args(range + "[. > 3]"), true, root(cmpir), empty(IterFilter.class));
-    check(EMPTY.args(range + "[. > 9]"), true, root(NOT), exists(cmpir));
-
-    // rewrite to positional test
-    check("(1 to 5)[let $p := position() return $p = 2]", 2,
-        empty(cmpir), empty(Let.class), empty(POSITION));
-    check("1[let $p := position() return $p = 0]", "", empty());
-    check("1[let $p := position() return $p = (-5 to -1)]", "", empty());
-  }
-
-  /** Checks {@link CmpR} optimizations. */
-  @Test public void cmpR() {
-    final Class<CmpR> cmpr = CmpR.class;
-    check("<a>5</a>[text() > 1 and text() < 9]", "<a>5</a>", count(cmpr, 1));
-    check("<a>5</a>[text() > 1 and text() < 9 and <b/>]", "<a>5</a>", count(cmpr, 1));
-    check("<a>5</a>[text() > 1 and . < 9]", "<a>5</a>", count(cmpr, 2));
-
-    // GH-1744
-    check("<a>5</a>[text() < 5 or text() > 5]", "", count(cmpr, 2));
-    check("<a>5</a>[text() > 5 or text() < 5]", "", count(cmpr, 2));
-    check("<a>5</a>[5 > text() or 5 < text()]", "", count(cmpr, 2));
-    check("<a>5</a>[5 < text() or 5 > text()]", "", count(cmpr, 2));
-
-    check("<a>5</a>[text() > 800000000]", "", exists(cmpr));
-    check("<a>5</a>[text() < -800000000]", "", exists(cmpr));
-    check("<a>5</a>[text() <= -800000000]", "", exists(cmpr));
-    check("<a>5</a>[text() > 8000000000000000000]", "", exists(cmpr));
-    check("<a>5</a>[text() < -8000000000000000000]", "", exists(cmpr));
-    check("exists(<x>1234567890.12345678</x>[. = 1234567890.1234567])", false, empty(cmpr));
-    check("exists(<x>1234567890.12345678e0</x>[. = 1234567890.1234567e0])", true, empty(cmpr));
-
-    check("exists(<x>123456789012345678</x> [. = 123456789012345679])", false, empty(cmpr));
-    check("exists(<x>123456789012345678e0</x> [. = 123456789012345679e0])", true, empty(cmpr));
-    check("<a>5</a>[xs:integer(.) > 8000000000000000000]", "", empty(cmpr));
-    check("<a>5</a>[xs:integer(.) < -8000000000000000000]", "", empty(cmpr));
-    check("(1, 1234567890.12345678)[. = 1234567890.1234567]", "", empty(cmpr));
-    check("(1, 123456789012345678 )[. = 123456789012345679]", "", empty(cmpr));
-
-    // rewrite equality comparisons
-    check("(0, 1)[. = 1] >= 1e0", true, exists(cmpr));
-    check("(0e0, 1e0)[. = 1] >= 1", true, exists(cmpr));
-    check("(0e0, 1e0)[. = 1] >= 1e0", true, exists(cmpr));
-    check(wrap("1.1") + ">= 1.1", true, exists(cmpr));
-    check("(0e0, 1e0)[. = 1] >= 1.0", true, exists(cmpr));
-    check("(0e0, 1e0)[. = 1] >= 1.000000000000001", false, exists(cmpr));
-    check("(0e0, 1e0)[. = 1] >= 1.0000000000000001", true, exists(cmpr));
-
-    // do not rewrite decimal/double comparisons
-    check("(0, 1)[. = 1] >= 1.0", true, empty(cmpr));
-    check("(0, 1)[. = 1] >= 1.0000000000000001", false, empty(cmpr));
-    check("(0.0, 1.0)[. = 1] >= 1e0", true, empty(cmpr));
-    check("(0.0, 1.0)[. = 1] >= 1.000000000000001e0", false, empty(cmpr));
-    check("(0.0, 1.0)[. = 1] >= 1.0000000000000001e0", true, empty(cmpr));
-
-    // do not rewrite equality comparisons
-    check("(0, 1)[. = 1] = 1.0", true, empty(cmpr));
-    check("(0, 1)[. = 1] = 1e0", true, empty(cmpr));
-    check("(0e0, 1e0)[. = 1] = 1", true, empty(cmpr));
-    check("(0e0, 1e0)[. = 1] = 1.0", true, empty(cmpr));
-    check("(0e0, 1e0)[. = 1] = 1e0", true, empty(cmpr));
-    check(wrap("1.1") + "= 1.1", true, empty(cmpr));
-
-    // suppressed rewritings
-    check(_RANDOM_DOUBLE.args() + " = 2", false, empty(cmpr));
-    check("(0.1, 1.1)[. != 0] = 1.3", false, empty(cmpr));
-    check("('x', 'y')[. = 'x'] = 'x'", true, empty(cmpr));
-    check("('x', 'x')[. != 'x'] = 1.3", false, empty(cmpr));
-
-    check("(0.1, 1.1)[. = 1.1] = 1.1", true, empty(cmpr));
-
-    // rewrite to positional test
-    check("1[let $p := position() return $p = 0.0]", "", empty());
-    check("(1 to 5)[let $p := position() return $p >= 2.5e0]", "3\n4\n5",
-        root(RangeSeq.class));
-    check("(1 to 5)[let $p := position() return $p <= 2.5e0]", "1\n2",
-        root(RangeSeq.class));
-
-    // flatten predicate: exists(E[text() > 1]) → E/text() > 1
-    check(EXISTS.args(" <a>5</a>[text() > 1]"), true, root(cmpr), empty(IterFilter.class));
-
-    // merge range with equality comparison
-    check("<a>5</a>[text() > 1 and text() = 5]", "<a>5</a>", count(cmpr, 1));
-    // no merge: operator is not '=', operand is no number
-    check("<a>5</a>[text() > 1 and text() != 5]", "", count(cmpr, 1));
-    check("<a>5</a>[text() > 1 and text() = 'x']", "", count(cmpr, 1));
-  }
-
-  /** Checks {@link CmpV} optimizations. */
-  @Test public void cmpV() {
-    final Class<CmpV> cmpv = CmpV.class;
-
-    // swap operands: move count() to the left
-    check("1 eq count((1 to 6)[. > 3])", false, empty(cmpv));
-    check("3 eq count((1 to 6)[. > 3])", true, empty(cmpv));
-
-    // operand may yield no item: comparison is preserved
-    check("head((1 to 2)[. > 5]) eq 1", "", exists(cmpv));
-
-    // operands yield at least one item: result is a single boolean
-    check("(1, (1 to 2)[. > 5]) eq 1", true, type(cmpv, "xs:boolean"));
-  }
-
-  /** Checks {@link CmpSR} optimizations. */
-  @Test public void cmpSR() {
-    check("<a>5</a>[text() > '1' and text() < '9']", "<a>5</a>", count(CmpSR.class, 1));
-    check("<a>5</a>[text() > '1' and text() < '9' and <b/>]", "<a>5</a>", count(CmpSR.class, 1));
-    check("<a>5</a>[text() > '1' and . < '9']", "<a>5</a>", count(CmpSR.class, 2));
-
-    // flatten predicate: exists(E[text() > '1']) → E/text() > '1'
-    check(EXISTS.args(" <a>5</a>[text() > '1']"), true, root(CmpSR.class),
-        empty(IterFilter.class));
-
-    // GH-2194: String range comparisons including/excluding min/max values
-    check("<a>X</a>[. <= 'X' and . >= 'X' ]", "<a>X</a>", count(CmpSimpleG.class, 1));
-    check("<a>X</a>[. <= 'X' and . >  'X' ]", "", empty());
-    check("<a>X</a>[. <  'X' and . >= 'X' ]", "", empty());
-    check("<a>X</a>[. <  'X' and . >  'X' ]", "", empty());
-
-    check("<a>X</a>[. <= 'W' and . >= 'W' ]", "", count(CmpSimpleG.class, 1));
-    check("<a>X</a>[. <= 'W' and . >  'W' ]", "", empty());
-    check("<a>X</a>[. <  'W' and . >= 'W' ]", "", empty());
-    check("<a>X</a>[. <  'W' and . >  'W' ]", "", empty());
-
-    check("<a>X</a>[. <= 'Y' and . >= 'Y' ]", "", count(CmpSimpleG.class, 1));
-    check("<a>X</a>[. <= 'Y' and . >  'Y' ]", "", empty());
-    check("<a>X</a>[. <  'Y' and . >= 'Y' ]", "", empty());
-    check("<a>X</a>[. <  'Y' and . >  'Y' ]", "", empty());
-
-    check("<a>X</a>[. <  'X' and . <  'XX']", "", count(CmpSR.class, 1));
-    check("<a>X</a>[. >= 'X' and . >= 'XX']", "", count(CmpSR.class, 1));
-
-    check("<a>X</a>[.  = 'X' and .  < 'Y' ]", "<a>X</a>", count(CmpSimpleG.class, 1));
-    check("<a>X</a>[. <= 'X' and .  < 'Y' ]", "<a>X</a>", count(CmpSR.class, 1));
-    check("<a>X</a>[. >= 'X' and . <= 'Y' ]", "<a>X</a>", count(CmpSR.class, 1));
-  }
-
-  /** Checks string-length optimizations. */
-  @Test public void stringLength() {
-    check("<a/>[string-length() >  -1]", "<a/>", empty(IterFilter.class));
-    check("<a/>[string-length() != -1]", "<a/>", empty(IterFilter.class));
-    check("<a/>[string-length() ge  0]", "<a/>", empty(IterFilter.class));
-    check("<a/>[string-length() ne 1.1]", "<a/>", empty(IterFilter.class));
-
-    check("<a/>[string-length() <   0]", "", empty(IterFilter.class));
-    check("<a/>[string-length() <= -1]", "", empty(IterFilter.class));
-    check("<a/>[string-length() eq -1]", "", empty(IterFilter.class));
-    check("<a/>[string-length() eq 1.1]", "", empty(IterFilter.class));
-
-    check("<a/>[string-length() >  0]", "", exists(SingleIterPath.class));
-    check("<a/>[string-length() >= 0.5]", "", exists(SingleIterPath.class));
-    check("<a/>[string-length() ne 0]", "", exists(SingleIterPath.class));
-
-    check("<a/>[string-length() <  0.5]", "<a/>", exists(SingleIterPath.class));
-    check("<a/>[string-length() <= 0.5]", "<a/>", exists(SingleIterPath.class));
-    check("<a/>[string-length() eq 0]", "<a/>", exists(SingleIterPath.class));
-
-    check("<a/>[string-length() gt 1]", "", exists(STRING_LENGTH));
-    check("<a/>[string-length() = <a>1</a>]", "", exists(STRING_LENGTH));
-  }
-
-  /** Checks count optimizations. */
-  @Test public void count() {
-    // static occurrence: zero-or-one
-    String count = "count(" + wrap(1) + "[. = 1])";
-
-    // static result: no need to evaluate count
-    check(count + " <    0", false, root(Bln.class));
-    check(count + " <= -.1", false, root(Bln.class));
-    check(count + " >=   0", true, root(Bln.class));
-    check(count + " > -0.1", true, root(Bln.class));
-    check(count + " =  1.1", false, root(Bln.class));
-    check(count + " != 1.1", true, root(Bln.class));
-    check(count + " =   -1", false, root(Bln.class));
-    check(count + " !=  -1", true, root(Bln.class));
-
-    // rewrite to empty/exists (faster)
-    check(count + " >  0", true, root(CmpSimpleG.class));
-    check(count + " >= 1", true, root(CmpSimpleG.class));
-    check(count + " != 0", true, root(CmpSimpleG.class));
-    check(count + " <  1", false, root(CmpSimpleG.class));
-    check(count + " <= 0", false, root(CmpSimpleG.class));
-    check(count + " =  0", false, root(CmpSimpleG.class));
-
-    // zero-or-one result: no need to evaluate count
-    check(count + " <  2", true, root(Bln.class));
-    check(count + " <= 2", true, root(Bln.class));
-    check(count + " <= 1", true, root(Bln.class));
-    check(count + " != 2", true, root(Bln.class));
-    check(count + " >  1", false, root(Bln.class));
-    check(count + " >= 2", false, root(Bln.class));
-    check(count + " =  2", false, root(Bln.class));
-
-    // no pre-evaluation possible
-    check(count + " != 1", false, root(CmpSimpleG.class));
-    check(count + " =  1", true, root(CmpSimpleG.class));
-    check(count + " - 1 = 0", true, root(CmpSimpleG.class));
-
-    // one-or-more results: no need to evaluate count
-    count = "count((1," + wrap(1) + "[. = 1]))";
-    check(count + " >  0", true, root(Bln.class));
-    check(count + " >= 1", true, root(Bln.class));
-    check(count + " != 0", true, root(Bln.class));
-    check(count + " <  1", false, root(Bln.class));
-    check(count + " <= 0", false, root(Bln.class));
-    check(count + " =  0", false, root(Bln.class));
-    check(count + " =  1.1", false, root(Bln.class));
-
-    // no pre-evaluation possible
-    check(count + " != 1", true, exists(COUNT));
-    check(count + " =  1", false, root(_UTIL_COUNT_WITHIN));
-    check(count + " =  2", true, root(_UTIL_COUNT_WITHIN));
-    check(count + " div 2 = 1", true, root(_UTIL_COUNT_WITHIN));
-  }
-
-  /** Checks that empty sequences are eliminated and that singleton lists are flattened. */
-  @Test public void list() {
-    check("((), <x/>, ())", "<x/>", empty(List.class), empty(Empty.class), exists(CElem.class));
-  }
-
-  /** Ensures that fn:doc with URLs will not be rewritten. */
-  @Test public void doc() {
-    check("<a>{ doc('" + FILE + "') }</a>//x", "", exists(DBNode.class));
-    check("if(<x>1</x> = 1) then 2 else doc('" + FILE + "')", 2, exists(DBNode.class));
-    check("if(<x>1</x> = 1) then 2 else doc('http://abc.de/')", 2, exists(DOC));
-    check("if(<x>1</x> = 1) then 2 else collection('http://abc.de/')", 2, exists(COLLECTION));
-  }
-
-  /** Positional predicates. */
-  @Test public void pos() {
-    // check if positional predicates are pre-evaluated
-    check("'a'[1]", "a", exists(Str.class));
-    check("'a'[position() = 1]", "a", "exists(QueryPlan/Str)");
-    check("'a'[position() = 1 to 2]", "a", "exists(QueryPlan/Str)");
-    check("'a'[position() > 0]", "a", "exists(QueryPlan/Str)");
-    check("'a'[position() < 2]", "a", "exists(QueryPlan/Str)");
-    check("'a'[position() >= 1]", "a", "exists(QueryPlan/Str)");
-    check("'a'[position() <= 1]", "a", "exists(QueryPlan/Str)");
-
-    // check if positional predicates are rewritten to utility functions
-    check("for $i in (1, 2) return 'a'[$i]", "a", root(Str.class));
-    check("for $i in (1, 2) return 'a'[position() = $i]", "a", root(Str.class));
-    check("for $i in (1, 2) return 'a'[position() = $i to $i]", "a", root(Str.class));
-
-    check("for $i in (1, 2)[. > 0] return 9[position() = $i to 1]", 9, root(DualMap.class));
-
-    check("for $i in (1, 2)[. > 0] return 9[position() = $i to $i + 1]", 9, exists(_UTIL_RANGE));
-    check("for $i in (1, 2)[. > 0] return 9[position() >= $i]", 9, exists(_UTIL_RANGE));
-    check("for $i in (1, 2)[. > 0] return 9[position() > $i]", "", exists(_UTIL_RANGE));
-    check("for $i in (1, 2)[. > 0] return 9[position() <= $i]", "9\n9", exists(_UTIL_RANGE));
-    check("for $i in (1, 2)[. > 0] return 9[position() < $i]", 9, exists(_UTIL_RANGE));
-
-    // check if positional predicates are rewritten to utility functions
-    String seq = " (0, 1, 2, 3, 3, 4, 5) ";
-    check("for $i in" + seq + "return ('a', 'b')[$i]",
-        "a\nb", exists(StrSeq.class));
-    check("for $i in" + seq + "return ('a', 'b')[position() = $i]",
-        "a\nb", exists(StrSeq.class));
-    check("for $i in" + seq + "return ('a', 'b')[position() = $i and position() = $i]", "a\nb",
-        exists(StrSeq.class));
-    check("for $i in (3, 5, 7, 8, 11, 13) return ('a', 'b')[position() = $i and position() = $i]",
-        "", empty());
-
-    check("for $i in" + seq + "return ('a', 'b')[$i][$i]",
-        "a", count(ITEMS_AT, 2));
-    check("for $i in" + seq + "return ('a', 'b')[position() = $i][position() = $i]",
-        "a", count(ITEMS_AT, 2));
-
-    // check if positional predicates are rewritten to utility functions
-    seq = " (1, 1.1, 1.9, 2, 2.1, 2.2, 2.1, 2.2) ";
-    check("for $i in" + seq + "return ('a', 'b')[position() >= $i]",
-        "a\nb\nb\nb\nb", exists(_UTIL_RANGE));
-    check("for $i in" + seq + "return ('a', 'b')[position() > $i]",
-        "b\nb\nb", exists(_UTIL_RANGE));
-    check("for $i in" + seq + "return ('a', 'b')[position() <= $i]",
-        "a\na\na\na\nb\na\nb\na\nb\na\nb\na\nb", exists(_UTIL_RANGE));
-    check("for $i in" + seq + "return ('a', 'b')[position() < $i]",
-        "a\na\na\na\nb\na\nb\na\nb\na\nb", exists(_UTIL_RANGE));
-
-    // check if multiple positional predicates are rewritten to utility functions
-    check("for $i in" + seq + "return ('a', 'b')[position() < $i][position() < $i]",
-        "a\na\na\na\nb\na\nb\na\nb\na\nb", count(_UTIL_RANGE, 2));
-
-    // check if positional predicates are merged and rewritten to utility functions
-    check("for $i in" + seq + "return ('a', 'b')[position() >= $i and position() <= $i]", "a\nb",
-        exists(ITEMS_AT));
-    check("for $i in" + seq + "return ('a', 'b')[position() <= $i and position() >= $i]",
-        "a\nb", exists(ITEMS_AT));
-    check("for $i in" + seq + "return ('a', 'b')[position() > $i and position() < $i]",
-        "", exists(_UTIL_RANGE));
-    check("for $i in" + seq + "return ('a', 'b')[position() < $i and position() > $i]",
-        "", exists(_UTIL_RANGE));
-
-    // no rewriting possible (conflicting positional predicates)
-    check("for $i in" + seq + "return ('a', 'b')[position() = $i and position() = $i + 1]",
-        "", exists(CachedFilter.class));
-    check("for $i in" + seq + "return ('a', 'b')[position() >= $i and position() > $i]",
-        "b\nb\nb", exists(CachedFilter.class));
-    check("for $i in" + seq + "return ('a', 'b')[position() >= $i and position() >= $i + 1]",
-        "b", exists(CachedFilter.class));
-    check("for $i in" + seq + "return ('a', 'b')[position() < $i and position() < $i + 1]",
-        "a\na\na\na\nb\na\nb\na\nb\na\nb", exists(CachedFilter.class));
-
-    check("(<a/>, <b/>)[last()]",
-        "<b/>", root(CElem.class));
-    check("(<a/>, <b/>[. = ''])[last()]",
-        "<b/>", count(FOOT, 1));
-    check("(<a/>, <b/>)[position() > 1 and position() < 3]",
-        "<b/>", root(CElem.class));
-    check("(<a/>, <b/>[. = ''])[position() > 1 and position() < 3]",
-        "<b/>", root(IterFilter.class));
-    check("(<a/>[. = ''], <b/>)[position() > 1 and position() < 3]",
-        "<b/>", count(ITEMS_AT, 1));
-    check("(<a/>, <b/>)[position() > 1 and position() < 3 and <b/>]",
-        "<b/>", root(CElem.class));
-    check("(<a/>, <b/>[. = ''])[position() > 1 and position() < 3 and <b/>]",
-        "<b/>", root(IterFilter.class));
-    check("(<a/>[. = ''], <b/>)[position() > 1 and position() < 3 and <b/>]",
-        "<b/>", count(ITEMS_AT, 1));
-    check("(<a/>, <b/>)[position() > 1 and position() < 4]",
-        "<b/>", root(CElem.class));
-    check("(<a/>, <b/>[. = ''])[position() > 1 and position() < 4]",
-        "<b/>", empty(List.class), root(IterFilter.class));
-
-    check("<a/>[position() >= last() - 1]",
-        "<a/>", root(CElem.class));
-    check("<a/>[position() > last() - 2]",
-        "<a/>", root(CElem.class));
-    check("<a/>[position() = 0 to 9223372036854775807]",
-        "<a/>", root(CElem.class));
-    check("<a/>[position() = -1 to 9223372036854775807]",
-        "<a/>", root(CElem.class));
-
-    // GH-2219: Bug on node selection with position()
-    check("<a><b/></a>/*[position()  = position()]", "<b/>", empty(POSITION));
-    check("<a><b/></a>/*[position() >= position()]", "<b/>", empty(POSITION));
-    check("<a><b/></a>/*[position() <= position()]", "<b/>", empty(POSITION));
-    check("<a><b/></a>/*[position() >  position()]", "", empty());
-    check("<a><b/></a>/*[position() <  position()]", "", empty());
-    check("<a><b/></a>/*[position() != position()]", "", empty());
-
-    // GH-2224: Unexpected exception, arithmetic operations with positional expression
-    check("document { <X/> }//X[not(position() * 2 = last())]", "<X/>");
-    check("document { <X/> }//X[not(position() + position() = last())]", "<X/>");
-  }
-
-  /** Predicates. */
-  @Test public void preds() {
-    // context value: rewrite if root is of type string or node
-    check("('s', 't')[.]", "s\nt", exists(ContextValue.class));
-    check("<a/>[.]", "<a/>", exists(CElem.class), empty(ContextValue.class));
-    check("<a/>[.][.]", "<a/>", exists(CElem.class), empty(ContextValue.class));
-    check("<a/>/self::*[.][.]", "<a/>", empty(ContextValue.class));
-    check("<a/>/self::*[.][.]", "<a/>", empty(ContextValue.class));
-    check("('a', 'b')[. ! position()]", "a", exists(Pipeline.class));
-    check("(1, 0)[.]", 1, exists(ContextValue.class));
-    error("true#0[.]", ARGTYPE_X_X_X);
-    error("(true#0, false#0)[.]", ARGTYPE_X_X_X);
-
-    // map expression
-    check("'s'['s' ! <a/>]", "s", root(Str.class));
-    check("'s'['s' ! <a/>]", "s", root(Str.class));
-    check("'s'['x' ! <a/> ! <b/>]", "s", root(Str.class));
-    check("'s'['x' ! (<a/>, <b/>) ! <b/>]", "s", root(Str.class));
-    check("'s'['x' ! " + wrapContext() + "[. = 'x']]", "s", root(If.class));
-
-    // path expression
-    check("let $a := <a/> return $a[$a/self::a]", "<a/>", empty(VarRef.class));
-    check("let $a := <a/> return $a[$a]", "<a/>", empty(VarRef.class));
-
-    // drop predicates that do not influence the existence of path results
-    final String node = " <a><b><c/></b></a>";
-    check(EXISTS.args(node + "/b[1]"), true, empty(IntPos.class));
-    check(EMPTY.args(node + "/b[1]"), false, empty(IntPos.class));
-    check(EXISTS.args(node + "/b[last()]"), true, empty(Pos.class));
-    check(EXISTS.args(node + "/b[position() <= 2]"), true, empty(IntPos.class));
-    check(BOOLEAN.args(node + "/b[1]"), true, empty(IntPos.class));
-    check(node + "[b[1]]", "<a><b><c/></b></a>", empty(IntPos.class));
-
-    // other positions, other steps and fn:count are not rewritten
-    check(EXISTS.args(node + "/b[2]"), false, exists(IntPos.class));
-    check(EXISTS.args(node + "/b[1]/c"), true, exists(IntPos.class));
-    check(COUNT.args(node + "/b[1]"), 1, exists(IntPos.class));
-  }
-
-  /** Comparison expressions. */
-  @Test public void cmpG() {
-    check("count(let $s := (-1, 1 to 99999) return $s[. = $s])", 100000, exists(CmpHashG.class));
-  }
-
-  /** Count, big sequences. */
-  @Test public void gh1519() {
-    query("declare function local:replicate($seq, $n, $out) { "
-        + "  if($n eq 0) then $out "
-        + "  else ( "
-        + "    let $out2 := if($n mod 2 eq 0) then $out else ($out, $seq) "
-        + "    return local:replicate(($seq, $seq), $n idiv 2, $out2) "
-        + "  ) "
-        + "};"
-        + "let $n := 1000000 "
-        + "return ( "
-        + "  count(local:replicate((1, 2, 3), $n, ())) eq 3 * $n, "
-        + "  count(local:replicate((1, 2, 3), $n, ())) = 3 * $n "
-        + ")",
-        "true\ntrue");
-  }
-
-  /** Checks simplification of empty path expressions. */
-  @Test public void gh1587() {
-    check("document {}/..", "", empty(CDoc.class));
-    check("function() { document {}/.. }()", "", empty(CDoc.class));
-    check("declare function local:f() { document {}/.. }; local:f()", "", empty(CDoc.class));
-  }
-
-  /**
-   * Remove redundant self steps.
-   */
-  @Test public void selfSteps() {
-    check("<a/>/.", "<a/>", root(CElem.class));
-    check("<a/>/./././.", "<a/>", root(CElem.class));
-    check("<a/>[.]", "<a/>", root(CElem.class));
-    check("<a/>/self::element()", "<a/>", root(CElem.class));
-    check("attribute a { 0 }/self::attribute()", "a=\"0\"", root(CAttr.class));
-    check("<a/>/self::*", "<a/>", root(CElem.class));
-  }
-
-  /** Static optimizations of paths without results (see also gh1630). */
-  @Test public void emptyPath() {
-    // check combination of axis and node test and axis
-    check("<e a='A'/>/attribute::text()", "", empty());
-    check("<e a='A'/>/attribute::attribute()", "a=\"A\"", exists(IterPath.class));
-    check("<e a='A'/>/ancestor::text()", "", empty());
-    check("<e a='A'/>/parent::text()", "", empty());
-    check("<e a='A'/>/parent::*", "", exists(IterPath.class));
-    check("attribute a { 0 }/child::attribute()", "", empty());
-    check("<e a='A'/>/attribute::a/child::attribute()", "", empty());
-
-    // check step after expression that yields document nodes
-    check("document { <a/> }/self::*", "", empty());
-    check("document { <a/> }/self::*", "", empty());
-    check("document { <a/> }/self::text()", "", empty());
-
-    check("document { <a/> }/child::document-node()", "", empty());
-    check("document { <a/> }/child::attribute()", "", empty());
-    check("document { <a/> }/child::*", "<a/>", exists(IterPath.class));
-
-    check("document { <a/> }/descendant-or-self::attribute()", "", empty());
-    check("document { <a/> }/parent::node()", "", empty());
-    check("document { <a/> }/ancestor::node()", "", empty());
-    check("document { <a/> }/following::node()", "", empty());
-    check("document { <a/> }/preceding-sibling::node()", "", empty());
-
-    // skip further tests if previous node type is unknown, or if current test accepts all nodes
-    check("(<a/>," + wrap(1) + "[. = 0])/node()", "", exists(IterStep.class));
-
-    // check step after any other expression
-    check("<a/>/self::text()", "", empty());
-    check("comment {}/child::node()", "", empty());
-    check("text { 0 }/child::node()", "", empty());
-    check("attribute a { 0 }/following-sibling::node()", "", empty());
-    check("attribute a { 0 }/preceding-sibling::node()", "", empty());
-    check("comment {}/following-sibling::node()", "", exists(IterPath.class));
-    check("comment {}/preceding-sibling::node()", "", exists(IterStep.class));
-
-    check("attribute a { 0 }/child::node()", "", empty());
-    check("attribute a { 0 }/descendant::*", "", empty());
-    check("attribute a { 0 }/self::*", "", empty());
-
-    // namespaces
-    check("(<a/>, comment{})/child::namespace-node()", "", empty());
-    check("(<a/>, comment{})/descendant::namespace-node()", "", empty());
-    check("(<a/>, comment{})/attribute::namespace-node()", "", empty());
-    check("(<a/>, comment{})/self::namespace-node()", "", exists(IterStep.class));
-    check("(<a/>, comment{})/descendant-or-self::namespace-node()", "", exists(IterStep.class));
+  /** Database node sequences are simplified to their string and atomized values. */
+  @Test public void dbNodeSeq() {
+    execute(new CreateDB(NAME));
+    execute(new Add("a", "<x>1</x>"));
+    execute(new Add("b", "<x>2</x>"));
+
+    // string context: the documents are replaced with their string values
+    check("string-join(" + _DB_GET.args(NAME) + ")", 12, empty(_DB_GET));
+    // numeric context: the documents are replaced with their atomized values
+    check("sum(" + _DB_GET.args(NAME) + ")", 3, empty(_DB_GET));
   }
 
   /** Casts. */
@@ -667,30 +71,6 @@ public final class RewritingsTest extends SandboxTest {
   @Test public void gh1801() {
     check("{ xs:string(<_/>): '' } instance of map(xs:string, xs:string)", true);
     check("{ string(<_/>): '' } instance of map(xs:string, xs:string)", true);
-  }
-
-  /** Type checks. */
-  @Test public void typeCheck() {
-    inline(true);
-    check("declare function local:a($e) as xs:string? { local:b($e) }; " +
-        "declare function local:b($e) as xs:string? { $e }; local:a(" + wrap("X") + ")", "X",
-        count(TypeCheck.class, 1));
-    check("declare function local:a($e) as xs:string? { local:b($e) }; " +
-        "declare function local:b($e) as xs:string* { $e }; local:a(" + wrap("X") + ")", "X",
-        count(TypeCheck.class, 1));
-    check("declare function local:a($e) as xs:string* { local:b($e) }; " +
-        "declare function local:b($e) as xs:string? { $e }; local:a(" + wrap("X") + ")", "X",
-        count(TypeCheck.class, 1));
-
-    query("declare function local:f() as item()  { data([ <_/> ]) }; local:f()", "");
-    query("declare function local:f() as item()? { data([ <_/> ]) }; local:f()", "");
-    query("declare function local:f() as item()+ { data([ <_/> ]) }; local:f()", "");
-    query("declare function local:f() as item()* { data([ <_/> ]) }; local:f()", "");
-
-    query("declare function local:f($a) as item()  { data($a) }; local:f(<_/>)", "");
-    query("declare function local:f($a) as item()? { data($a) }; local:f(<_/>)", "");
-    query("declare function local:f($a) as item()+ { data($a) }; local:f(<_/>)", "");
-    query("declare function local:f($a) as item()* { data($a) }; local:f(<_/>)", "");
   }
 
   /** Test. */
@@ -751,79 +131,6 @@ public final class RewritingsTest extends SandboxTest {
     check("<a/>/<b/>[2]", "", empty());
     check("<a/>/.[2]", "", empty());
     check("<doc><x/><y/></doc>/*/..[2] ! name()", "", empty());
-  }
-
-  /** Combined kind tests. */
-  @Test public void gh1737() {
-    // merge identical steps, rewrite to iterative path
-    check("<a/>/(* | *)", "", root(IterPath.class), empty(Union.class));
-    check("<a/>/(*, *)",  "", root(IterPath.class), empty(List.class));
-
-    // rewrite to single union node test, rewrite to iterative path
-    check("<a/>/(a | b)", "", root(IterPath.class), empty(Union.class));
-    check("<a/>/(a, b)",  "", root(IterPath.class), empty(List.class));
-
-    // merge descendant-or-self step, rewrite to iterative path
-    check("<a/>//(a | b)", "", root(IterPath.class), empty(Union.class));
-    check("<a/>/(a, b)",   "", root(IterPath.class), empty(List.class));
-
-    // rewrite to single union node test, rewrite to iterative path
-    check("<a/>/(a | b)[text()]", "", root(IterPath.class), empty(Union.class));
-    check("<a/>/(a, b)[text()]",  "", root(IterPath.class), empty(List.class));
-    check("<_><a>x</a><b/></_>/(a, b)[text()]", "<a>x</a>",
-        root(IterPath.class), empty(List.class));
-
-    // rewrite to union expression
-    check("<a/>/(*, @*)", "", root(MixedPath.class), exists(Union.class));
-  }
-
-  /** Merge adjacent steps in path expressions. */
-  @Test public void gh1761() {
-    // merge self steps
-    check("<a/>/self::*/self::a", "<a/>", root(CElem.class));
-    check("<a/>/self::*/self::Q{}a", "<a/>", root(CElem.class));
-
-    check("<a/>/self::*/self::b", "", empty());
-    check("<a/>/self::Q{}*/self::a", "<a/>", root(CElem.class));
-    check("<a/>/self::a/self::*", "<a/>", root(CElem.class));
-    check("<a/>/self::a/self::node()", "<a/>", root(CElem.class));
-
-    // merge descendant and self steps
-    check("document { <a/> }//self::a", "<a/>", count(IterStep.class, 1));
-    check("document { <a/> }//*/self::a", "<a/>", count(IterStep.class, 1));
-
-    // combined kind tests
-    check("document { <a/>, <b/> }/(a, b)/self::a", "<a/>", count(IterStep.class, 1));
-    check("document { <a/>, <b/> }/a/(self::a, self::b)", "<a/>", count(IterStep.class, 1));
-    check("document { <a/>, <b/> }/(a, b)/(self::b, self::a)", "<a/>\n<b/>",
-        count(IterStep.class, 1));
-  }
-
-  /** Merge steps and predicates with self steps. */
-  @Test public void gh1762() {
-    // merge self steps
-    check("<a/>/self::*[self::a]", "<a/>", root(CElem.class));
-    check("<a/>/self::*[self::b]", "", empty());
-    check("<a/>/self::a[self::*]", "<a/>", root(CElem.class));
-    check("<a/>/self::a[self::node()]", "<a/>", root(CElem.class));
-
-    // nested predicates
-    check("<a/>/self::a[self::a[self::a[self::a]]]", "<a/>", root(CElem.class));
-
-    // combined kind test
-    check("document { <a/>, <b/> }/a[self::a | self::b]", "<a/>", count(IterStep.class, 1));
-  }
-
-  /** Path tests. */
-  @Test public void gh1729() {
-    check("let $x := 'g' return <g/>[name() = $x]", "<g/>",
-        root(IterFilter.class), exists(IterFilter.class));
-    check("let $x := 'g' return <g/> ! self::g[name() = $x]", "<g/>",
-        root(IterPath.class));
-    check("let $x := 'g' return <g/> ! self::*[local-name() = $x]", "<g/>",
-        root(CElem.class));
-    check("let $x := 'g' return <g/> ! *[local-name() = $x]", "",
-        root(IterPath.class));
   }
 
   /** Path tests. */
@@ -998,34 +305,6 @@ public final class RewritingsTest extends SandboxTest {
     check("() => void() => prefix-from-QName()", "", root(VOID));
   }
 
-  /** Rewrite name tests to self steps. */
-  @Test public void gh1770() {
-    check("<a/>[node-name() eq xs:QName('a')]", "<a/>", root(CElem.class));
-    check("<a/>[local-name() eq 'a']", "<a/>", root(CElem.class));
-
-    check("<a/>[local-name() = ('a', 'b', '')]", "<a/>", root(CElem.class));
-    check("<a/>[local-name() = 'a' or local-name() = 'b']", "<a/>", root(CElem.class));
-    check("<a/>[node-name() = (xs:QName('a'), xs:QName('b'))]", "<a/>", root(CElem.class));
-    check("<a/>[local-name() = ('a', 'a', 'a')]", "<a/>", root(CElem.class));
-
-    check("(<a/>, <b/>)[. = '!'][local-name() = 'a']", "", empty(LOCAL_NAME));
-
-    check("comment {}[local-name() = '']", "<!---->", root(CComm.class));
-    check("text { 'a' }[local-name() = '']", "a", root(CTxt.class));
-
-    final String prolog = "declare default element namespace 'A'; ";
-    check(prolog + "<a/>[node-name() eq QName('A', 'a')]",
-        "<a xmlns=\"A\"/>", root(CElem.class));
-    check(prolog + "<a/>[namespace-uri() eq 'A']",
-        "<a xmlns=\"A\"/>", root(CElem.class));
-
-    // no rewritings
-    check("<a/>[local-name() != 'a']", "", exists(LOCAL_NAME));
-    check("<a/>[local-name() =" + wrap("a") + "]", "<a/>", exists(LOCAL_NAME));
-    check("<a/>[node-name() = xs:QName(" + wrap("a") + ")]", "<a/>", exists(NODE_NAME));
-    check("parse-xml('<a/>')[name(*) = 'a']", "<a/>", exists(Function.NAME));
-  }
-
   /** Functions with database access. */
   @Test public void gh1788() {
     execute(new CreateDB(NAME, "<x>A</x>"));
@@ -1166,15 +445,6 @@ public final class RewritingsTest extends SandboxTest {
     check("if(void(1)) then () else ()", "", root(VOID), count(VOID, 1));
   }
 
-  /** Redundant predicates in paths. */
-  @Test public void gh1812() {
-    check("<a/>/*[*]/*", "", count(IterPath.class, 1), empty(SingleIterPath.class));
-    check("<a>X</a>/text()[..]/..", "<a>X</a>", empty(SingleIterPath.class));
-
-    // no rewriting
-    check("<a/>/*[*]/text()", "", count(IterPath.class, 1), exists(SingleIterPath.class));
-  }
-
   /** EBV simplifications: if, switch, typeswitch. */
   @Test public void gh1813() {
     // if expression
@@ -1230,26 +500,6 @@ public final class RewritingsTest extends SandboxTest {
     check("(x, void(()))/z", "", empty());
     check("(x | void(()))/z", "", empty());
     check("(if(" + _RANDOM_DOUBLE.args() + ") then x)/z", "", empty());
-  }
-
-  /** List to union in root of path expression. */
-  @Test public void gh1817() {
-    check("<a/>[(b, c)/d]", "", empty(List.class), count(IterPath.class, 1));
-
-    // do not rewrite paths that yield no nodes
-    check("(<a/>, <b/>)/name()", "a\nb", exists(List.class));
-    check("let $_ := <_/> return ($_, $_)/0", "0\n0", exists(SingletonSeq.class));
-  }
-
-  /** List to union. */
-  @Test public void gh1818() {
-    check("<a/>[b, text()]", "", count(SingleIterPath.class, 1),
-        type(IterStep.class, "(element(b)|text())*"));
-
-    // union expression will be further rewritten to single path
-    check("<a/>[b, c]", "", empty(List.class), count(SingleIterPath.class, 1));
-    check("<a/>[(b | c) = '']", "", empty(List.class), count(SingleIterPath.class, 1));
-    check("<a/>[(b | c) = (b | c)]", "", empty(List.class), count(SingleIterPath.class, 2));
   }
 
   /** FLWOR, no results, nondeterministic expressions. */
@@ -1439,63 +689,6 @@ public final class RewritingsTest extends SandboxTest {
     check("<_/>/(<b/>[*] union <c/>[*])", "", exists(Union.class));
   }
 
-  /** Set Expressions. */
-  @Test public void set() {
-    // union
-    check("<_><a/></_>/(a union a)", "<a/>",
-        empty(Union.class), type(IterPath.class, "element(a)*"));
-    check("<_><a/></_>/(a union b)", "<a/>",
-        empty(Union.class), type(IterPath.class, "(element(a)|element(b))*"));
-    check("<_><a/></_>/(*:a union *:b)", "<a/>",
-        empty(Union.class), type(IterPath.class, "(element(*:a)|element(*:b))*"));
-    check("<_><a/></_>/(Q{}a union Q{}b)", "<a/>",
-        empty(Union.class));
-    check("declare namespace a = 'A'; declare namespace b = 'A'; " +
-        "<_><a:a/></_>/(a:a union b:a)", "<a:a xmlns:a=\"A\"/>",
-        empty(Union.class));
-    check("declare namespace a = 'A'; declare namespace b = 'B'; " +
-        "<_><a:a/></_>/(a:a union b:a)", "<a:a xmlns:a=\"A\"/>",
-        empty(Union.class), type(IterPath.class, "(element(a:a)|element(b:a))*"));
-    check("declare namespace a = 'A'; declare namespace b = 'B'; " +
-        "<_><b:a/></_>/(a:a union b:a)", "<b:a xmlns:b=\"B\"/>",
-        empty(Union.class), type(IterPath.class, "(element(a:a)|element(b:a))*"));
-    check("<_><a/></_>/(a union *)", "<a/>",
-        empty(Union.class), type(IterPath.class, "element()*"));
-    check("<_><a/></_>/(* union a)", "<a/>",
-        empty(Union.class), type(IterPath.class, "element()*"));
-    check("<_><a/></_>/(*:a union *)", "<a/>",
-        empty(Union.class), type(IterPath.class, "element()*"));
-    check("<_><a/></_>/(* union *:a)", "<a/>",
-        empty(Union.class), type(IterPath.class, "element()*"));
-    check("<_><a/></_>/(* union Q{uri}a)", "<a/>",
-        empty(Union.class), type(IterPath.class, "element()*"));
-    // intersect
-    check("<_><a/></_>/(node() intersect * intersect a)", "<a/>",
-        empty(Intersect.class), type(IterPath.class, "element(a)*"));
-    check("<_><a/></_>/(a intersect * intersect node())", "<a/>",
-        empty(Intersect.class), type(IterPath.class, "element(a)*"));
-    check("<_><a/></_>/(a intersect b)", "", empty());
-
-    // GH-2599
-    query("let $in := <doc><b/></doc> return $in/(a, b) intersect $in/(b, c)", "<b/>");
-    query("let $in := <doc><b/></doc> return $in/(a, b) intersect $in/(c, b)", "<b/>");
-    query("let $in := <doc><b/></doc> return $in/(b, a) intersect $in/(b, c)", "<b/>");
-    query("let $in := <doc><b/></doc> return $in/(b, a) intersect $in/(c, b)", "<b/>");
-    query("let $in := <doc><b/></doc> return $in/(b, a) intersect $in/b", "<b/>");
-    query("let $in := <doc><b/></doc> return $in/b intersect $in/(b, c)", "<b/>");
-    query("let $in := <doc><b/></doc> return $in/a intersect $in/b", "");
-    query("let $in := <doc><b/></doc> return $in/(a, d) intersect $in/(b, c)", "");
-
-    // except
-    check("<_><a/></_>/(* except text())", "<a/>",
-        empty(Except.class), type(IterPath.class, "element()*"));
-    check("<_><a/></_>/(a except b)", "<a/>",
-        empty(Except.class), type(IterPath.class, "element(a)*"));
-    check("<_><a/></_>/(node() except * except a)", "",
-        count(Except.class, 1), type(MixedPath.class, "node()*"));
-    check("<_><a/></_>/(a except *)", "", empty());
-  }
-
   /** Logical expressions, DNFs/CNFs. */
   @Test public void gh1839() {
     // no rewriting
@@ -1608,21 +801,6 @@ public final class RewritingsTest extends SandboxTest {
     check("for $n in (<a/>, <b/>) return if($n[name() = 'a']) then 1 else 2", "1\n2",
         empty(IterFilter.class));
     check("boolean(<a/>[data()][. = 'A'])", false, empty(BOOLEAN));
-  }
-
-  /** Merge descendant steps. */
-  @Test public void gh1848() {
-    check("<a/>//descendant::*", "", count(IterPath.class, 1), count(IterStep.class, 1));
-    check("<a/>//descendant::text()", "", count(IterPath.class, 1), count(IterStep.class, 1));
-    check("<a/>//(descendant::a, descendant::b)", "",
-        count(IterPath.class, 1), count(IterStep.class, 1));
-  }
-
-  /** Merge steps and predicates with self steps. */
-  @Test public void gh1850() {
-    check("<a/>/*[self::b]", "", count(IterPath.class, 1), empty(SingleIterPath.class));
-    check("<a/>/*[self::b and true()]", "", count(IterPath.class, 1), empty(SingleIterPath.class));
-    check("<a/>/*[self::b][true()]", "", count(IterPath.class, 1), empty(SingleIterPath.class));
   }
 
   /** Name tests in where clauses, index rewritings. */
@@ -1752,19 +930,6 @@ public final class RewritingsTest extends SandboxTest {
     check("<a/>[not(text() = 'a')]['ignored'][text() = 'a']", "", empty());
   }
 
-  /** Remove redundant paths. */
-  @Test public void gh1864() {
-    check("<a/>/*[a]/a", "", count(IterPath.class, 1), empty(SingleIterPath.class));
-    check("<a/>/*[a]/a/b", "", count(IterPath.class, 1), empty(SingleIterPath.class));
-    check("<a/>/*[a/b]/a/b", "", count(IterPath.class, 1), empty(SingleIterPath.class));
-    check("<a/>/*[a]/a[b]/b", "", count(IterPath.class, 1), empty(SingleIterPath.class));
-
-    // GH-2193: Bug on child node selection
-    query("<X><a><b><c/></b><d/></a></X>/*[*/*]/*", "<b><c/></b>\n<d/>");
-    check("<X/>/*[a/b]/a", "", count(IterPath.class, 2));
-    check("<X/>/*[a/b]/a/c", "", count(IterPath.class, 2));
-  }
-
   /** Inline paths in FLWOR expressions. */
   @Test public void gh1865() {
     execute(new CreateDB(NAME, "<a><b c='d'><c/></b><c/></a>"));
@@ -1865,30 +1030,6 @@ public final class RewritingsTest extends SandboxTest {
     check("(0, 1)[. >= 0] ! ((if(.) then 'S' else 'P') = 'X')", "false\nfalse", empty(If.class));
   }
 
-  /** Optimize inlined path steps. */
-  @Test public void gh1886() {
-    execute(new CreateDB(NAME, "<_>X</_>"));
-
-    inline(true);
-    check("function($db) { $db/UNKNOWN }(.)", "", empty());
-    check("let $f := function($a) { $a/UNKNOWN } return ./$f(.)", "", empty());
-    check("function($db) { $db/_[. = 'X'] }(.)", "<_>X</_>", root(ValueAccess.class));
-  }
-
-  /** Cardinality of self steps. */
-  @Test public void gh1887() {
-    check("<a/>[count(self::*) = 1]", "<a/>", root(CElem.class));
-    check("<a/>[self::* = self::*]", "<a/>", root(CElem.class));
-  }
-
-  /** Distinct document order. */
-  @Test public void gh1888() {
-    check("let $a := <a/> return" + DISTINCT_ORDERED_NODES.args(" ($a, $a)"),
-        "<a/>", root(CElem.class));
-    check("let $a := <a/> return ($a, $a)/.",
-        "<a/>", root(CElem.class));
-  }
-
   /** Simple map implementation for two operands. */
   @Test public void gh1889() {
     check("(1 to 2) ! <a/>", "<a/>\n<a/>", root(REPLICATE));
@@ -1922,14 +1063,6 @@ public final class RewritingsTest extends SandboxTest {
   @Test public void gh1893() {
     check("for $a at $p in 6 to 8 return $p", "1\n2\n3", root(RangeSeq.class));
     check("for $a at $p in ('a', 'b') return $p", "1\n2", root(RangeSeq.class));
-  }
-
-  /** Rewrite simple map to path. */
-  @Test public void gh1894() {
-    execute(new CreateDB(NAME, "<xml><a/></xml>"));
-    check("/xml ! a", "<a/>", root(IterPath.class));
-    check("<a/> ! a ! b ! c ! d ! e", "", root(IterPath.class), empty(IterMap.class));
-    check("<a/> ! a ! descendant::x", "", root(DualIterMap.class), exists(IterPath.class));
   }
 
   /** Inline variables into simple map. */
@@ -2048,42 +1181,6 @@ public final class RewritingsTest extends SandboxTest {
     check("function() as element(Q{_}a) { element Q{_}a {} }() " +
         "instance of element(Q{_}a)",
         true, root(Bln.class));
-  }
-
-  /** Axis steps, better typing. */
-  @Test public void gh1909() {
-    // fragments
-    inline(true);
-    check("function() as element(a)? { <a/>/self::a }()",
-        "<a/>", root(CElem.class));
-    check("function() as element(a)? { <a/>/self::Q{}a }()",
-        "<a/>", root(CElem.class));
-    check("function() as element(Q{}a)? { <a/>/self::Q{}a }()",
-        "<a/>", root(CElem.class));
-
-    // database nodes
-    execute(new CreateDB(NAME, "<x>A</x>"));
-    error("function() as element(x)* { x }()[text() = 'A']", NOCTX_X);
-    error("function() as element(x)* { /x }()[text() = 'A']", NOCTX_X);
-    check("function() as element(x)* {" + _DB_GET.args(NAME) + "/x }()[text() = 'A']",
-        "<x>A</x>", exists(ValueAccess.class));
-    check("function() as element(x) {" + _DB_GET.args(NAME) + "/x }()[text() = 'A']",
-        "<x>A</x>", exists(ValueAccess.class));
-    check("function() as document-node() {" + _DB_GET.args(NAME) + " }()/x[text() = 'A']",
-        "<x>A</x>", exists(ValueAccess.class));
-
-    // no rewriting allowed
-    check("function() as element(a)? { <a/>/self::*:a }()",
-        "<a/>", root(CElem.class));
-    check("function() as element(xml:a)? { <xml:a/>/self::xml:* }()",
-        "<xml:a/>", root(CElem.class));
-    error("function() as element(a)? { <xml:a/>/self::xml:a }()", INVTYPE_X);
-  }
-
-  /** Axis followed by attribute step. */
-  @Test public void gh1910() {
-    check("<x/>//@*", null, type("IterStep[@axis = 'descendant-or-self']", "element()*"));
-    check("<x/>/../@*", null, type("IterStep[@axis = 'parent']", "element()?"));
   }
 
   /** Elvis Operator rewritings. */
@@ -2252,11 +1349,6 @@ public final class RewritingsTest extends SandboxTest {
   @Test public void gh1930() {
     check("(1 to 2)[. = (5, 4, 3, 1, 2, 5)]", "1\n2", exists(RangeSeq.class));
     check("distinct-values((5, 3, 4, 2, 1, 6, 1))", "5\n3\n4\n2\n1\n6", root(BytSeq.class));
-  }
-
-  /** Ancestor steps on database and fragment nodes. */
-  @Test public void gh1931() {
-    query("<a>{ (<b><c/></b> update {})/c }</a>/c/ancestor::*", "<a><c/></a>");
   }
 
   /** Rewrite group by to distinct-values(). */
@@ -2500,64 +1592,6 @@ public final class RewritingsTest extends SandboxTest {
     check(input + "/*[normalize-space(.)]", "", checkSteps, exists(NORMALIZE_SPACE));
   }
 
-  /** Axis steps: Rewrites. */
-  @Test public void gh1976() {
-    check("document {}/parent::node()", "", root(Empty.class));
-
-    check("attribute a {}/child::document-node()", "", root(Empty.class));
-    check("attribute a {}/self::document-node()", "", root(Empty.class));
-    check("attribute a {}/descendant-or-self::document-node()", "", root(Empty.class));
-    check("attribute a {}/descendant-or-self::*", "", root(Empty.class));
-
-    check("text { '' }/child::document-node()", "", root(Empty.class));
-    check("text { '' }/self::document-node()", "", root(Empty.class));
-    check("text { '' }/descendant-or-self::document-node()", "", root(Empty.class));
-    check("text { '' }/descendant-or-self::*", "", root(Empty.class));
-
-    check("document {}/ancestor-or-self::node()", "", root(CDoc.class));
-    check("attribute a {}/descendant-or-self::attribute()", "a=\"\"", root(CAttr.class));
-    check("text { '' }/descendant-or-self::text()", "", root(CTxt.class));
-
-    check("text { '' }[self::node()]", "", root(CTxt.class));
-    check("text { '' }[self::text()]", "", root(CTxt.class));
-    check("text { '' }[descendant-or-self::text()]", "", root(CTxt.class));
-    check("document {}[ancestor-or-self::node()]", "", root(CDoc.class));
-    check("document {}[ancestor-or-self::document-node()]", "", root(CDoc.class));
-
-    check("text { '' }[self::element()]", "", empty());
-    check("document {}[ancestor-or-self::element()]", "", empty());
-  }
-
-  /** descendant-or-self → descendant. */
-  @Test public void gh1979() {
-    check("document { <a/> }/descendant-or-self::a", "<a/>",
-        exists("IterStep[@axis = 'descendant']"));
-    check("<a/>/ancestor-or-self::document-node()", "",
-        exists("IterStep[@axis = 'ancestor']"));
-    check("document { <a b='c'/> }/descendant::a//@*", "b=\"c\"",
-        exists("IterStep[@axis = 'descendant']"));
-    check("<a b='c'/>/descendant-or-self::attribute()", "", root(Empty.class));
-    check("document { <a/> }//self::a", "<a/>",
-        exists("IterStep[@axis = 'descendant'][@test = 'a']"));
-
-    check("(document {}, <a/>)/descendant-or-self::document-node()", "",
-        exists("IterStep[@axis = 'self']"));
-
-    check("(<a/> | text { 'a' })/ancestor-or-self::text()", "a",
-        exists("IterStep[@axis = 'self']"));
-    check("(<a/> | text { 'a' })/ancestor-or-self::comment()", "",
-        exists("IterStep[@axis = 'self']"));
-    check("(<a/> | text { 'a' })/ancestor-or-self::attribute()", "",
-        exists("IterStep[@axis = 'self']"));
-    check("(<a/> | text { 'a' })/ancestor-or-self::processing-instruction()", "",
-        exists("IterStep[@axis = 'self']"));
-
-    check("text { 'a' }/ancestor-or-self::text()", "a", root(CTxt.class));
-    check("(<a/> | <b/>)/ancestor-or-self::text()", "", empty());
-    check("document {}/descendant-or-self::document-node()", "", root(CDoc.class));
-    check("(<a/> | <b/>)/descendant-or-self::document-node()", "", empty());
-  }
-
   /** Lookup operator, iterative evaluation. */
   @Test public void gh1984() {
     query("head(([ 2 ], 3) ?1)", 2);
@@ -2617,15 +1651,6 @@ public final class RewritingsTest extends SandboxTest {
     check("(1, 2)[. = 1]", 1, root(Itr.class));
   }
 
-  /** Identical nodes in mixed paths. */
-  @Test public void gh2005() {
-    check("declare context item := <a/>; (.|.)/self::a", "<a/>", empty(Union.class));
-
-    check("<a/> ! (., .)/<b/>", "<b/>\n<b/>", exists(REPLICATE));
-    check(REPLICATE.args(" <a/>", 2) + "/<b/>", "<b/>\n<b/>", exists(REPLICATE));
-    check("declare context item := <a/>; (., .)/<b/>", "<b/>\n<b/>", exists(SingletonSeq.class));
-  }
-
   /** Accessing iterators with known result size. */
   @Test public void gh2029() {
     check("((1 to 1000000000000) ! string())[last()]", 1000000000000L,
@@ -2683,12 +1708,6 @@ public final class RewritingsTest extends SandboxTest {
         "; distinct-values($x)", "a", root(Atm.class));
   }
 
-  /** Steps with zero or one results. */
-  @Test public void gh2034() {
-    check("<a/>/*[1]/*[1]", "", type(IterPath.class, "element()?"));
-    check("(1 to 10000000) ! tail(<a/>/*[1])", "", empty());
-  }
-
   /** Merge redundant casts. */
   @Test public void gh2036() {
     final String loop = "(1 to 6) ! ";
@@ -2724,11 +1743,6 @@ public final class RewritingsTest extends SandboxTest {
         "return <_><a>1</a><a>b</a></_>/a ! $n(.)",
         "1\nNaN",
         empty(TypeCheck.class));
-  }
-
-  /** Predicates with name tests. */
-  @Test public void gh2052() {
-    query("<doc><a/><b/><a/></doc>/a[following::*[1]/self::a]", "");
   }
 
   /** Attribute constructor. */
@@ -3074,45 +2088,6 @@ public final class RewritingsTest extends SandboxTest {
         empty(If.class), empty(And.class));
   }
 
-  /** Static typing: Intersection of name tests. */
-  @Test public void gh2102() {
-    final String xml = "<a xmlns=\"x\"/>";
-    query(xml + "[self::Q{x}a[local-name() = 'a'][namespace-uri() = 'x']]", xml);
-    query(xml + "[self::*:a[local-name() = 'a'][namespace-uri() = 'x']]", xml);
-    query(xml + "[self::*[local-name() = 'a'][namespace-uri() = 'x']]", xml);
-    query(xml + "[self::a[local-name() = 'a'][namespace-uri() = 'x']]", "");
-
-    query("<_><n/></_>/Q{}n instance of element(Q{}n)", true);
-    query("<_><n/></_>/Q{}n instance of element(Q{}o)", false);
-    query("<_><n/></_>/Q{}n instance of element(n)   ", true);
-    query("<_><n/></_>/Q{}n instance of element(o)   ", false);
-    query("<_><n/></_>/Q{}n instance of element()    ", true);
-
-    query("<_><n/></_>/Q{}* instance of element(Q{}n)", true);
-    query("<_><n/></_>/Q{}* instance of element(Q{}o)", false);
-    query("<_><n/></_>/Q{}* instance of element(n)   ", true);
-    query("<_><n/></_>/Q{}* instance of element(o)   ", false);
-    query("<_><n/></_>/Q{}* instance of element()    ", true);
-
-    query("<_><n/></_>/*:n  instance of element(Q{}n)", true);
-    query("<_><n/></_>/*:n  instance of element(Q{}o)", false);
-    query("<_><n/></_>/*:n  instance of element(n)   ", true);
-    query("<_><n/></_>/*:n  instance of element(o)   ", false);
-    query("<_><n/></_>/*:n  instance of element()    ", true);
-
-    query("<_><n/></_>/n    instance of element(Q{}n)", true);
-    query("<_><n/></_>/n    instance of element(Q{}o)", false);
-    query("<_><n/></_>/n    instance of element(n)   ", true);
-    query("<_><n/></_>/n    instance of element(o)   ", false);
-    query("<_><n/></_>/n    instance of element()    ", true);
-
-    query("<_><n/></_>/*    instance of element(Q{}n)", true);
-    query("<_><n/></_>/*    instance of element(Q{}o)", false);
-    query("<_><n/></_>/*    instance of element(n)   ", true);
-    query("<_><n/></_>/*    instance of element(o)   ", false);
-    query("<_><n/></_>/*    instance of element()    ", true);
-  }
-
   /** Embed positional function calls in arguments. */
   @Test public void gh2104() {
     check("head((1 to 10) ! <_>{ . }</_>)", "<_>1</_>", root(CElem.class));
@@ -3123,23 +2098,6 @@ public final class RewritingsTest extends SandboxTest {
     check(TRUNK.args(" (1 to 10)[. > 7] ! (. * .)"), "64\n81", root(DualMap.class));
     check(ITEMS_AT.args(" (1 to 10)[. > 6] ! (. * .)", 2), 64, root(DualMap.class));
     check(FOOT.args(" (1 to 10)[. > 5] ! (. * .)"), 100, root(DualMap.class));
-  }
-
-  /** Check existence of paths in predicates. */
-  @Test public void gh2109() {
-    execute(new CreateDB(NAME, "<a><b/></a>"));
-    check("b", "", empty());
-    check("a/a", "", empty());
-    check("a/a[b]", "", empty());
-    check("a[a]", "", empty());
-
-    check("a[/b]", "", empty());
-    check("a[/a/a]", "", empty());
-    check("a[/a[/b]]", "", empty());
-    check("a[/a/" + _UTIL_ROOT.args(" .") + "/b]", "", empty());
-    check("a[" + _UTIL_ROOT.args(" .") + "/a/" + _UTIL_ROOT.args(" .") + "/b]", "", empty());
-
-    check("a[/a]", "<a><b/></a>", root(IterPath.class), exists(DBNode.class));
   }
 
   /** Full-text search, enforceindex enabled, AIOOB. */
@@ -3155,12 +2113,6 @@ public final class RewritingsTest extends SandboxTest {
         + _DB_GET.args(" $db") + "//text()[. contains text 'A'] "
         + "} "
         + "return $rs", "a");
-  }
-
-  /** Nested database node paths. */
-  @Test public void gh2121() {
-    execute(new CreateDB(NAME, "<x><x/></x>"));
-    query("x[x/(text() | *)]", "");
   }
 
   /** Context item declaration, unknown function. */
@@ -3381,34 +2333,6 @@ public final class RewritingsTest extends SandboxTest {
         "<F/>");
   }
 
-  /** Simplify descendant-or-self steps. */
-  @Test public void gh2223() {
-    check("<A><B/></A>/descendant-or-self::node()/child::*", "<B/>",
-        count(IterStep.class, 1), "//@axis = 'descendant'");
-    check("<A><B/></A>/descendant-or-self::node()/descendant::*", "<B/>",
-        count(IterStep.class, 1), "//@axis = 'descendant'");
-    check("<A/>/descendant-or-self::node()/descendant-or-self::*", "<A/>",
-        count(IterStep.class, 1), "//@axis = 'descendant-or-self'");
-
-    check("<A><B/></A>/descendant-or-self::node()/(* | text())", "<B/>",
-        count(IterStep.class, 1), "//@axis = 'descendant'");
-    check("<A><B/>X</A>/descendant-or-self::node()/(* | text())", "<B/>\nX",
-        count(IterStep.class, 1), "//@axis = 'descendant'");
-    check("<A><B/></A>/descendant-or-self::node()/(descendant::* | text())", "<B/>",
-        count(IterStep.class, 1), "//@axis = 'descendant'");
-    check("<A><B/></A>/descendant-or-self::node()/(* | descendant::text())", "<B/>",
-        count(IterStep.class, 1), "//@axis = 'descendant'");
-
-    check("<A><B/></A>/descendant-or-self::node()/(* | text())[..]", "<B/>",
-        count(IterStep.class, 2), "//@axis = 'descendant'");
-    check("<A><B/>X</A>/descendant-or-self::node()/(* | text())[..]", "<B/>\nX",
-        count(IterStep.class, 2), "//@axis = 'descendant'");
-    check("<A><B/></A>/descendant-or-self::node()/(descendant::* | text())[..]", "<B/>",
-        count(IterStep.class, 2), "//@axis = 'descendant'");
-    check("<A><B/></A>/descendant-or-self::node()/(* | descendant::text())[..]", "<B/>",
-        count(IterStep.class, 2), "//@axis = 'descendant'");
-  }
-
   /** Refine parameter types to arguments types of function call. */
   @Test public void gh2259() {
     check("declare function local:t($a) { if($a instance of xs:integer) then 1 else 's' };" +
@@ -3514,23 +2438,6 @@ public final class RewritingsTest extends SandboxTest {
         + " if($p < 100000) then $self($p + 1, $self) else $p"
         + "}"
         + "return $f(1, $f)", 100000);
-  }
-
-  /** Filter expression, node order. */
-  @Test public void gh2386() {
-    query("let $f := fn { true() } "
-        + "let $a := sort((<x>2</x>, <x>1</x>)) "
-        + "let $b := $a[$f(.)] "
-        + "return ($a, $b)",
-        "<x>1</x>\n<x>2</x>\n<x>1</x>\n<x>2</x>");
-    query("let $f := fn { true() } "
-        + "return sort((<x>2</x>, <x>1</x>)) -> (., .[$f(.)])",
-        "<x>1</x>\n<x>2</x>\n<x>1</x>\n<x>2</x>");
-  }
-
-  /** Nested predicates, axis checks. */
-  @Test public void gh2390() {
-    query("<p><b/></p>/*[.[self::a union self::b/@x]]", "");
   }
 
   /** Repeated evaluation of nondeterministic code. */

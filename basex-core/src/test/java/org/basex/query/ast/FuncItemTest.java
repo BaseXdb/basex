@@ -23,6 +23,18 @@ public final class FuncItemTest extends SandboxTest {
     inline(true);
   }
 
+  /** Function items that access the focus. */
+  @Test public void focus() {
+    query("declare context item := 0; last#0()", 1);
+    query("declare context item := 1; let $f := last#0 return (2, 3)[$f()]", 2);
+  }
+
+  /** Coercion error in a function call: the variable stack must stay intact. */
+  @Test public void coercionError() {
+    query("declare function local:x($x as xs:integer) { $x }; "
+        + "let $a := 0, $b := 1 return try { local:x( (1 to 20) ) } catch * { $a, $b }", "0\n1");
+  }
+
   /** Checks if the identity function is pre-compiled. */
   @Test public void idTest() {
     check("function($x) { $x }(42)",

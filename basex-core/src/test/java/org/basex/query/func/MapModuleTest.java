@@ -189,6 +189,19 @@ public final class MapModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void find() {
+    final Function func = _MAP_FIND;
+
+    // no input, empty map, empty array: no results
+    check(func.args(" ()", "k"), "[]", empty(func));
+    check(func.args(" {}", "k"), "[]", empty(func));
+    check(func.args(" []", "k"), "[]", empty(func));
+
+    query(func.args(" { 'k': 1 }", "k"), "[1]");
+    query(func.args(" { 'k': (1, 2) }", "x"), "[]");
+  }
+
+  /** Test method. */
   @Test public void forEach() {
     final Function func = _MAP_FOR_EACH;
 

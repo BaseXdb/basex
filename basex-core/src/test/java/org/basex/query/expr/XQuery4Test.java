@@ -80,7 +80,6 @@ public final class XQuery4Test extends SandboxTest {
     query("() otherwise 2", 2);
     query("1 otherwise ()", 1);
     query("1 otherwise 2", 1);
-    query("1 otherwise 2 otherwise 3", 1);
 
     query("(1 to 10)[. = 0] otherwise (1 to 10)[. = 0]", "");
     query("(1 to 10)[. = 0] otherwise (1 to 10)[. = 2]", 2);
@@ -138,6 +137,13 @@ public final class XQuery4Test extends SandboxTest {
     check("void(2) otherwise void(3)", "", root(Otherwise.class));
 
     check("<_>6</_>[. = 6] otherwise 7", "<_>6</_>", root(Otherwise.class));
+
+    // dead operands are dropped in a single optimization pass
+    check("1 otherwise 2 otherwise 3", 1, empty(Otherwise.class), root(Itr.class));
+    check("count((1, 2) otherwise (3, 4) otherwise 5)", 2, empty(Otherwise.class));
+    check("<a/> otherwise 2 otherwise 3", "<a/>", empty(Otherwise.class));
+    // leading possibly-empty operands are kept
+    check("(1 to 10)[. = <x>11</x>] otherwise 2 otherwise 3", 2, exists(Otherwise.class));
   }
 
   /** Function items (fn syntax). */

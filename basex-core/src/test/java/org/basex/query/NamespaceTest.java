@@ -889,6 +889,23 @@ public final class NamespaceTest extends SandboxTest {
     query("//Q{B}c", "");
   }
 
+  /** Attribute constructor in an element with a default namespace. */
+  @Test public void attributeConstructor() {
+    query("<n xmlns='u'>{ attribute { 'a' }{ 1 }}</n>/@a/string()", 1);
+  }
+
+  /** URI-qualified names. */
+  @Test public void uriQualifiedName() {
+    query("declare function local:text($t) {$t}; "
+        + "Q{http://www.w3.org/2005/xquery-local-functions}text#1('abc')", "abc");
+    query("declare function Q{http://www.w3.org/2005/xquery-loc"
+        + "al-functions}text($t) {$t}; local:text('abc')", "abc");
+    query("declare function local:text($t) {$t}; "
+        + "Q{http://www.w3.org/2005/xquery-local-functions}text('abc')", "abc");
+    query("declare function local:text($t) {$t}; "
+        + "'abc' => Q{http://www.w3.org/2005/xquery-local-functions}text()", "abc");
+  }
+
   /**
    * Test query.
    */

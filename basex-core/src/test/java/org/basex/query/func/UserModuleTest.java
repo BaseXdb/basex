@@ -184,6 +184,16 @@ public final class UserModuleTest extends SandboxTest {
     error(func.args(NAME, Perm.READ) + ',' + func.args(NAME, Perm.WRITE), USER_UPDATE1_X_X);
     error(func.args(NAME, Perm.READ, 'x') + ',' + func.args(NAME, Perm.WRITE, 'x'),
         USER_UPDATE2_X);
+
+    // distinct patterns of a single user: primitives are merged
+    query(func.args(NAME, Perm.READ, "p1") + ',' + func.args(NAME, Perm.WRITE, "p2"));
+    // distinct users: primitives are not merged
+    query(_USER_CREATE.args(NAME + '2', NAME));
+    try {
+      query(func.args(NAME, Perm.READ, "q") + ',' + func.args(NAME + '2', Perm.WRITE, "q"));
+    } finally {
+      query(_USER_DROP.args(NAME + '2'));
+    }
   }
 
   /** Test method. */
@@ -243,5 +253,21 @@ public final class UserModuleTest extends SandboxTest {
 
     // invalid input
     error(func.args(" <abc/>"), ELM_X_X_X);
+
+    // update global info twice during the same query
+    error(func.args(" <info>C</info>") + ',' + func.args(" <info>D</info>"), USER_INFO_X);
+    // update the info of a single user twice during the same query
+    error(func.args(" <info>C</info>", "admin") + ',' + func.args(" <info>D</info>", "admin"),
+        USER_UPDATE1_X_X);
+
+    // update the info of two distinct users: primitives are not merged
+    query(_USER_CREATE.args(NAME + '2', NAME));
+    try {
+      query(func.args(" <info>C</info>", NAME) + ',' + func.args(" <info>D</info>", NAME + '2'));
+      query(_USER_INFO.args(NAME), "<info>C</info>");
+      query(_USER_INFO.args(NAME + '2'), "<info>D</info>");
+    } finally {
+      query(_USER_DROP.args(NAME + '2'));
+    }
   }
 }

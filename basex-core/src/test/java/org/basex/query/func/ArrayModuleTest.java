@@ -488,6 +488,11 @@ public final class ArrayModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void sort() {
     final Function func = _ARRAY_SORT;
+
+    // nested sort calls are merged
+    check(func.args(" " + func.args(" array { tokenize(" + wrap("b a") + ") }")),
+        "[\"a\",\"b\"]", count(func, 1));
+
     query("([ 2, 1 ], 1)[. instance of array(*)] ! " + func.args(" .", " ()", " identity#1"),
         "[1,2]");
 

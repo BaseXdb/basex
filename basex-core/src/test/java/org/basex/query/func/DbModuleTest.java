@@ -245,6 +245,9 @@ public final class DbModuleTest extends SandboxTest {
     // source database does not exist
     error(func.args(NAME + "alter", NAME), DB_NOBACKUP_X);
 
+    // alter backup twice during the same query
+    error(func.args(NAME, NAME + 'a') + ',' + func.args(NAME, NAME + 'b'), DB_CONFLICT2_X_X);
+
     execute(new DropBackup(NAME));
     error(func.args(NAME, NAME + "alter"), DB_NOBACKUP_X);
   }
@@ -324,6 +327,16 @@ public final class DbModuleTest extends SandboxTest {
     error(func.args(NAME, NAME), DB_CONFLICT4_X);
     // source database does not exist
     error(func.args(NAME + "copy", NAME), DB_GET1_X);
+
+    // copy to the same target twice during the same query
+    error(func.args(NAME, NAME + 'c') + ',' + func.args(NAME, NAME + 'c'), DB_CONFLICT1_X_X);
+    // copy to two targets during the same query: primitives are merged
+    try {
+      query(func.args(NAME, NAME + 'c') + ',' + func.args(NAME, NAME + 'd'));
+      query(_DB_EXISTS.args(NAME + 'c') + " and " + _DB_EXISTS.args(NAME + 'd'), true);
+    } finally {
+      query(_DB_DROP.args(NAME + 'c') + ',' + _DB_DROP.args(NAME + 'd'));
+    }
   }
 
   /** Test method. */
@@ -562,6 +575,9 @@ public final class DbModuleTest extends SandboxTest {
     for(final char ch : INVALID) error(func.args(ch), DB_NAME_X);
     // try to back up non-existing database
     error(func.args(NAME + "backup"), DB_GET1_X);
+
+    // create backup twice during the same query
+    error(func.args(NAME) + ',' + func.args(NAME), DB_CONFLICT2_X_X);
   }
 
   /** Test method. */
@@ -650,6 +666,11 @@ public final class DbModuleTest extends SandboxTest {
     error(func.args(""), DB_NOBACKUP_X);
     // check if drop is called before create
     error(_DB_CREATE_BACKUP.args(NAME) + ',' + func.args(NAME), DB_NOBACKUP_X);
+
+    // drop backup twice during the same query
+    query(_DB_CREATE_BACKUP.args(NAME));
+    error(func.args(NAME) + ',' + func.args(NAME), DB_CONFLICT2_X_X);
+    query(func.args(NAME));
   }
 
   /** Test method. */
@@ -689,6 +710,9 @@ public final class DbModuleTest extends SandboxTest {
     final Function func = _DB_FLUSH;
     query(func.args(NAME));
     error(func.args(NAME + "unknown"), DB_GET2_X);
+
+    // flush twice during the same query: primitives are merged
+    query(func.args(NAME) + ',' + func.args(NAME));
   }
 
   /** Test method. */
@@ -862,6 +886,9 @@ public final class DbModuleTest extends SandboxTest {
     error(func.args(NAME, true), UPDBERROR_X);
     execute(new Close());
     query(func.args(NAME, true));
+
+    // optimize twice during the same query: the 'all' flags are merged
+    query(func.args(NAME) + ',' + func.args(NAME, true));
 
     // commands
     final CmdIndex[] cis = { CmdIndex.TEXT, CmdIndex.ATTRIBUTE, CmdIndex.TOKEN, CmdIndex.FULLTEXT };
@@ -1066,6 +1093,10 @@ public final class DbModuleTest extends SandboxTest {
     // non-string/non-binary atomic inputs rejected
     error(func.args(NAME, 123, "errType"), STRBIN_X_X);
 
+    // store the same path twice during the same query
+    error(func.args(NAME, " xs:hexBinary('41')", "b") + ',' +
+        func.args(NAME, " xs:hexBinary('42')", "b"), DB_CONFLICT5_X);
+
     // GH-2462: replace existing XML resource (hex of '<xml/>')
     query(_DB_PUT.args(NAME, "<xml/>", "mixed"));
     query(func.args(NAME, " xs:hexBinary('3C786D6C2F3E')", "mixed"));
@@ -1128,6 +1159,14 @@ public final class DbModuleTest extends SandboxTest {
     query(func.args(NAME, "test", "newtest"));
     query("count(" + COLLECTION.args(NAME + "/test") + ")", 0);
     query("count(" + COLLECTION.args(NAME + "/newtest") + ")", XMLFILES);
+
+    // rename the same documents twice during the same query
+    error(func.args(NAME, "newtest", "a") + ',' + func.args(NAME, "newtest", "b"), UPMULTREPV_X);
+
+    // rename the same binary resource twice during the same query
+    query(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('41')", "bin/x"));
+    error(func.args(NAME, "bin/x", "bin/a") + ',' + func.args(NAME, "bin/x", "bin/b"),
+        UPPATHREN_X);
 
     // invalid target
     error(func.args(NAME, "input.xml", " ''"), DB_PATH_X);

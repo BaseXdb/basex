@@ -1,5 +1,6 @@
 package org.basex.query.expr;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.*;
@@ -454,6 +455,59 @@ public final class FilterTest extends SandboxTest {
     // not equal: various optimizations are currently discarded
     check(pre + "!= 0          to last() + 1" + post, "", empty());
     check(pre + "!= last() + 1 to last() + 2" + post, "", empty(Pos.class));
+  }
+
+  /** Rewrites of positional predicates to function calls. */
+  @Test public void positionalRewrites() {
+    final String pre = "(1 to 1000000)[. < 6][position() ", post = "]";
+
+    // E[position() = INT to last()] → util:range(E, INT)
+    check(pre + "= 2 to last()" + post, "2\n3\n4\n5", exists(TAIL));
+    check(pre + "= 3 to last()" + post, "3\n4\n5", exists(_UTIL_RANGE));
+
+    // E[position() = (INT1, INT2)] → items-at(E, (INT1, INT2))
+    check(pre + "= (1, 3)" + post, "1\n3", exists(ITEMS_AT));
+    check(pre + "= (3, 1)" + post, "1\n3", exists(ITEMS_AT));
+
+    // positions are not known statically: they are sorted and deduplicated
+    check(pre + "= ((<a>3</a>, <a>1</a>, <a>3</a>) ! xs:integer(.))" + post, "1\n3",
+        exists(ITEMS_AT), exists(SORT), exists(DISTINCT_VALUES));
+  }
+
+  /** The root of a predicate path is dropped: E[./S] → E[S]. */
+  @Test public void contextPath() {
+    // context value as root
+    check("<a><b/></a>[./b]", "<a><b/></a>", empty(ContextValue.class));
+    check("<a><b><c/></b></a>[./b/c]", "<a><b><c/></b></a>", empty(ContextValue.class));
+    check("<a><x/></a>[./b]", "", empty(ContextValue.class));
+    // the root of the predicate equals the root of the filter
+    check("let $n := <a><b/></a> return $n[$n/b]", "<a><b/></a>", empty(ContextValue.class));
+  }
+
+  /** Predicates with mixed operands. */
+  @Test public void predicates() {
+    error("1[1][error()]", FUNERR1);
+    query("1[1][<x/>/a]", "");
+    query("name(<x><a/><b c='d'/></x>/(a, b)[@c])", "b");
+    query("name(<x><a/><b/></x>/(b, a)[self::b])", "b");
+    query("<x><a><b c='d'/></a></x>/(a, b)[@c]", "");
+    query("empty((1, 2, 3)[3][2])", true);
+    query("empty((1, 2, 3)[position() = 3][2])", true);
+    query("1[boolean(max((<a>1</a>, <b>2</b>)))]", 1);
+    query("string(<n><a/><a>x</a></n>/a/text()[.][.])", "x");
+    query("string(<n><a/><a>x</a></n>/a/text()[1][1])", "x");
+    query("1[1 to 2]", 1);
+    query("for $n in 0 to 1 return 'a'[position()= $n to 0]", "");
+    query("for $n in 0 to 1 return ('a', 'b')[position()= $n to 1]", "a\na");
+
+    // GH-1140
+    query("declare function local:test() {"
+        + "for $n in (1, 1) return <_><c/><w/></_>/*[$n[1]] }; local:test()/self::w", "");
+    query("for $n in (2, 2) return (<c><c0/></c>, <d><d0/><d2/></d>)/*[$n[$n]]", "");
+    query("(('XML')[1])[1]", "XML");
+    query("1[position() = 1 to 2]", 1);
+    query("1[position() = (1, 2)]", 1);
+    query("count((text { 'x' }, element x {})[. instance of element()])", 1);
   }
 
   /** GH-2687: NPE from AndExpr filter over ContextValueRef step. */

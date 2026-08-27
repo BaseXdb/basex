@@ -2,14 +2,12 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 
 import org.basex.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
-import org.basex.query.*;
 import org.basex.query.func.prof.ProfType.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
@@ -25,9 +23,6 @@ import org.junit.jupiter.api.Test;
  * @author Christian Gruen
  */
 public final class MixedTest extends SandboxTest {
-  /** Test XQuery module file. */
-  private static final String XQMFILE = "src/test/resources/hello.xqm";
-
   /**
    * Drops the collection.
    */
@@ -36,45 +31,26 @@ public final class MixedTest extends SandboxTest {
     execute(new DropDB(NAME + '2'));
   }
 
-  /** Catches duplicate module import. */
-  @Test public void duplImport() {
-    error("import module namespace a='world' at '" + XQMFILE + "';" +
-      "import module namespace a='world' at '" + XQMFILE + "'; 1",
-      DUPLMODULE_X);
+  /** External and typed variable declarations. */
+  @Test public void variableDecl() {
+    query("declare variable $a external; 1", 1);
+    error("declare variable $a external; $a", VAREMPTY_X);
+    query("declare variable $x as enum('a', 'b') := 'a'; $x", "a");
+    query("declare variable $x as enum('a', 'b') := xs:anyURI('a'); $x", "a");
   }
 
-  /** Catches duplicate module import with different module URI. */
-  @Test public void duplImportDiffUri() {
-    error("import module namespace a='world' at '" + XQMFILE + "';" +
-      "import module namespace a='galaxy' at '" + XQMFILE + "'; 1",
-      DUPLNSDECL_X);
-  }
-
-  /** Catches duplicate module import. */
-  @Test public void duplLocation() {
-    error("import module namespace a='world' at '" + XQMFILE + "';" +
-      "import module namespace b='galaxy' at '" + XQMFILE + "'; 1",
-      WRONGMODULE_X_X_X);
-  }
-
-  /** Checks static context scoping in variables. */
-  @Test public void varsInModules() {
-    contains("import module namespace a='world' at '" + XQMFILE + "'; $a:eager", "Q{world}foo");
-    contains("import module namespace a='world' at '" + XQMFILE + "'; $a:lazy", "Q{world}foo");
-    contains("import module namespace a='world' at '" + XQMFILE + "'; $a:func()", "Q{world}foo");
-    contains("import module namespace a='world' at '" + XQMFILE + "'; a:inlined()", "Q{world}foo");
-  }
-
-  /** Checks imported module's types. */
-  @Test public void typesInModules() {
-    query("import module namespace a='world' at '" + XQMFILE + "'; '42' cast as a:int", 42);
-    query("import module namespace a='world' at '" + XQMFILE + "';" +
-      "declare type a:private-int as a:int; '42' cast as a:private-int", 42);
-
-    error("import module namespace a='world' at '" + XQMFILE + "';" +
-      "declare type Q{world}int as xs:double; '42' cast as a:int", DUPLTYPE_X);
-    error("import module namespace a='world' at '" + XQMFILE + "'; '42' cast as a:private-int",
-      WHICHCAST_X);
+  /** Resolution of declared functions. */
+  @Test public void functionDecl() {
+    query("xquery version '1.0';"
+        + "declare function local:foo() { count(local:bar()) };"
+        + "declare function local:bar() { 42 };"
+        + "local:foo()", 1);
+    query("xquery:eval('"
+        + "declare function local:foo() { count(local:bar()) };"
+        + "declare function local:bar() { 1 };"
+        + "local:foo()')", 1);
+    error("local:a(), local:a(1)", WHICHFUNC_X);
+    query("()/x[function($x as item()){1}(.)]", "");
   }
 
   /** Constructor functions for declared item types. */
@@ -91,13 +67,6 @@ public final class MixedTest extends SandboxTest {
     // forward references, aliases of aliases
     query("declare function local:f() { local:b('42') }; "
         + "declare type local:b as local:a; declare type local:a as xs:integer; local:f()", 42);
-    // types of imported modules
-    query("import module namespace a='world' at '" + XQMFILE + "'; a:int('42')", 42);
-    query("import module namespace a='world' at '" + XQMFILE + "';"
-        + "declare type local:t as a:int; local:t('42')", 42);
-    error("import module namespace a='world' at '" + XQMFILE + "'; a:private-int('42')",
-        FUNCPRIVATE_X);
-
     // constructor functions for union types
     query("declare type local:u as (xs:date | xs:time); "
         + "local:u('12:00:00') instance of xs:time", true);
@@ -546,120 +515,6 @@ public final class MixedTest extends SandboxTest {
     test("array { ('x', 1 to 3) => remove(1) }",
         new TypeInfo(ItemArray.class, "array(xs:anyAtomicType)", 3),
         new TypeInfo(ItemArray.class, "array(xs:integer)", 3));
-  }
-
-  /** Unknown keyword parameter: hint to similar parameter name. */
-  @Test public void unknownKeyword() {
-    // Levenshtein match for typo
-    unknownName("declare function local:x($alpha) { }; local:x(alph := 0)",
-        PARAMUNKNOWN_X_X, "alpha");
-    // prefix fallback for input that is too far in Levenshtein distance
-    unknownName("declare function local:c($langitude, $longitude) { };"
-        + " local:c(langi := 1, longitude := 2)", PARAMUNKNOWN_X_X, "langitude");
-  }
-
-  /** Unknown built-in function: hint to similar function name. */
-  @Test public void unknownFunction() {
-    // Levenshtein match for typo (unprefixed call, hint without fn: prefix)
-    unknownName("coun()", WHICHFUNC_X, "count");
-    // prefix fallback for input that is too far in Levenshtein distance
-    unknownName("all-eq()", WHICHFUNC_X, "all-equal");
-    // shortest name wins among multiple prefix matches
-    unknownName("fold-(1)", WHICHFUNC_X, "fold-left");
-    // no hint for inputs that cover less than half of the closest name
-    noHint("x()", WHICHFUNC_X);
-    // prefix fallback for user-defined function (local: prefix is preserved)
-    unknownName("declare function local:abcde($john) { }; local:abc()",
-        WHICHFUNC_X, "local:abcde");
-    // built-in match preferred over user-defined when both exist
-    unknownName("declare function local:subsequence-after() { };"
-        + " subsequenc(1, 2, 3)", WHICHFUNC_X, "subsequence");
-  }
-
-  /** Incomplete argument list: report the missing token instead of a missing argument. */
-  @Test public void incompleteArgumentList() {
-    error("true(", INCOMPLETE);
-    error("true(1", WRONGCHAR_X_X);
-    error("true(1 2)", WRONGCHAR_X_X);
-    error("true(1,", FUNCARG_X);
-    error("true(,", FUNCARG_X);
-  }
-
-  /** Unprefixed call of a user-defined function with wrong arity reports an arity mismatch. */
-  @Test public void wrongArityNoNamespace() {
-    error("declare function abc($j) { }; abc()", INVNARGS_X_X);
-  }
-
-  /** Unprefixed call of a built-in must still resolve when a same-named user function exists. */
-  @Test public void shadowedBuiltin() {
-    query("declare function abs($x as xs:integer, $y as xs:integer) as xs:integer"
-        + " { $x + $y }; abs(-5)", 5);
-  }
-
-  /** Unknown variable: hint to similar variable name. */
-  @Test public void unknownVariable() {
-    unknownName("for $letter in 1 to 5 return $lette", VARUNDEF_X, "$letter");
-    // innermost binding wins on Levenshtein ties
-    unknownName("let $l1 := 1 let $l2 := 2 return $l", VARUNDEF_X, "$l2");
-  }
-
-  /** Unknown annotation: hint to similar annotation name. */
-  @Test public void unknownAnnotation() {
-    // XQuery namespace (reserved): "private" is the spec annotation
-    unknownName("declare %privte function local:f() { 1 }; local:f()",
-        ANNRESERVED_X, "%private");
-    // BaseX namespace: "lazy" is a valid annotation
-    unknownName("declare %basex:lasy function local:f() { 1 }; local:f()",
-        BASEX_ANN1_X, "%basex:lazy");
-    // prefix fallback for short input
-    unknownName("declare %output:inden('yes') function local:f() { 1 }; local:f()",
-        BASEX_ANN1_X, "%output:indent");
-  }
-
-  /** Unknown atomic type: hint to similar type name. */
-  @Test public void unknownType() {
-    // Levenshtein match for typo
-    unknownName("'a' cast as xs:strin", WHICHCAST_X, "xs:string");
-    // prefix fallback for short input that is too far in Levenshtein distance
-    unknownName("'a' cast as xs:integ", WHICHCAST_X, "xs:integer");
-  }
-
-  /**
-   * Checks that the error message includes a similar-name hint.
-   * @param query query that should fail
-   * @param code expected error code
-   * @param similar expected leading substring of the "maybe: ..." hint
-   */
-  private static void unknownName(final String query, final QueryError code,
-      final String similar) {
-    try {
-      eval(query);
-      fail("Query did not fail.");
-    } catch(final QueryException ex) {
-      assertSame(code, ex.error(), ex.getLocalizedMessage());
-      final String msg = ex.getLocalizedMessage();
-      assertTrue(msg.contains("(maybe: " + similar), msg);
-    } catch(final Exception ex) {
-      fail(ex);
-    }
-  }
-
-  /**
-   * Checks that the error message includes no similar-name hint.
-   * @param query query that should fail
-   * @param code expected error code
-   */
-  private static void noHint(final String query, final QueryError code) {
-    try {
-      eval(query);
-      fail("Query did not fail.");
-    } catch(final QueryException ex) {
-      assertSame(code, ex.error(), ex.getLocalizedMessage());
-      final String msg = ex.getLocalizedMessage();
-      assertFalse(msg.contains("maybe"), msg);
-    } catch(final Exception ex) {
-      fail(ex);
-    }
   }
 
   /**
