@@ -73,7 +73,9 @@ public final class Put extends DBUpdate {
 
   @Override
   public void merge(final Update update) {
-    for(final String path : ((Put) update).paths) paths.add(path);
+    final Put put = (Put) update;
+    for(final String path : put.paths) paths.add(path);
+    options.addAll(put.options);
   }
 
   @Override

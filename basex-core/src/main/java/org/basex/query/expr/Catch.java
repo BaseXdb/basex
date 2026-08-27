@@ -130,10 +130,12 @@ public final class Catch extends Single {
       return false;
     }
 
-    // drop remaining tests in favor or wildcard test
-    if(Checks.any(tests, wildcard) && tests.size() != 1) {
+    // drop remaining tests in favor of wildcard test
+    final int w = Checks.index(tests, wildcard);
+    if(w != -1 && tests.size() != 1) {
+      final Test test = tests.get(w);
       tests.clear();
-      tests.add(NodeTest.ELEMENT);
+      tests.add(test);
       cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, "*");
     }
 
@@ -156,7 +158,8 @@ public final class Catch extends Single {
    * @return result of check
    */
   boolean global() {
-    return tests.size() == 1 && tests.getFirst() instanceof NodeTest;
+    return tests.size() == 1 && tests.getFirst() instanceof final NameTest nt &&
+        nt.scope == NameTest.Scope.ALL;
   }
 
   /**

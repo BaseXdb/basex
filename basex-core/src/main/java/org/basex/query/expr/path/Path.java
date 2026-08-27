@@ -1147,10 +1147,12 @@ public abstract class Path extends ParseExpr {
 
   @Override
   public final boolean inlineable(final InlineContext ic) {
-    // do not replace $v with .:  EXPR/$v
-    if(ic.var != null && ic.expr.has(Flag.CTX)) {
+    // steps are only inlined into if a variable is replaced (see #inline)
+    if(ic.var != null) {
+      final boolean ctx = ic.expr.has(Flag.CTX);
       for(final Expr step : steps) {
-        if(step.uses(ic.var)) return false;
+        // do not replace $v with .:  EXPR/$v
+        if(ctx && step.uses(ic.var) || !step.inlineable(ic)) return false;
       }
     }
     return root == null || root.inlineable(ic);
