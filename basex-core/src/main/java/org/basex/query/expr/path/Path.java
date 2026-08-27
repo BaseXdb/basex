@@ -206,12 +206,16 @@ public abstract class Path extends ParseExpr {
 
     Expr expr = this;
     if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
-      // merge nested predicates. example: if(a[b]) → if(a/b)
-      final Expr last = steps[steps.length - 1];
-      if(last instanceof final Step step && step.exprs.length == 1 &&
-          step.seqType().type instanceof NodeType && !step.exprs[0].seqType().mayBeNumber()) {
-        final Expr ex = step.flattenEbv(this, true, cc);
-        if(ex != step) expr = ex;
+      // drop irrelevant predicate. example: if(a[1]) → if(a)
+      expr = dropPredicate(cc);
+      if(expr == this) {
+        // merge nested predicates. example: if(a[b]) → if(a/b)
+        final Expr last = steps[steps.length - 1];
+        if(last instanceof final Step step && step.exprs.length == 1 &&
+            step.seqType().type instanceof NodeType && !step.exprs[0].seqType().mayBeNumber()) {
+          final Expr ex = step.flattenEbv(this, true, cc);
+          if(ex != step) expr = ex;
+        }
       }
     }
     return cc.simplify(this, expr, mode);
@@ -229,6 +233,17 @@ public abstract class Path extends ParseExpr {
     final Step step = ((Step) list.pop()).removePredicate();
     list.add(cc.get(root, true, () -> step.optimize(cc)));
     return copyType(get(cc, info, root, list.finish()));
+  }
+
+  /**
+   * Removes a trailing predicate that does not influence the existence of results.
+   * @param cc compilation context
+   * @return original or optimized expression
+   * @throws QueryException query exception
+   */
+  public final Expr dropPredicate(final CompileContext cc) throws QueryException {
+    return steps[steps.length - 1] instanceof final Preds preds && preds.keepsResults() ?
+      removePredicate(cc) : this;
   }
 
   @Override

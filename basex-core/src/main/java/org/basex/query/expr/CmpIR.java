@@ -23,7 +23,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class CmpIR extends Single {
+public final class CmpIR extends CmpRange {
   /** Minimum. */
   public final long min;
   /** Maximum. */
@@ -40,7 +40,7 @@ public final class CmpIR extends Single {
    * @param info input info (can be {@code null})
    */
   private CmpIR(final Expr expr, final long min, final long max, final InputInfo info) {
-    super(info, expr, Types.BOOLEAN_O);
+    super(expr, info);
     this.min = min;
     this.max = max;
   }
@@ -185,6 +185,11 @@ public final class CmpIR extends Single {
   @Override
   public boolean indexAccessible(final IndexInfo ii) throws QueryException {
     return ii.type(expr, null) != null && ii.create(min, max, info);
+  }
+
+  @Override
+  Expr with(final Expr operand, final CompileContext cc) throws QueryException {
+    return get(cc, info, operand, min, max);
   }
 
   @Override

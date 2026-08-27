@@ -5,6 +5,7 @@ import static org.basex.query.func.Function.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
@@ -63,6 +64,10 @@ public class FnEmpty extends StandardFunc {
     // exists(distinct-values(E)) → exists(E), empty(distinct-values(E)) → empty(E)
     if(DISTINCT_VALUES.is(input) && !input.arg(0).seqType().mayBeWrapped()) {
       input = input.arg(0);
+    }
+    // exists(E/step[1]) → exists(E/step), empty(E/step[last()]) → empty(E/step)
+    if(input instanceof final Path path) {
+      input = path.dropPredicate(cc);
     }
     // rewrite list to union expression:  exists((nodes1, nodes2)) → exists(nodes1 | nodes2)
     if(input instanceof List && input.seqType().type instanceof NodeType) {

@@ -168,6 +168,11 @@ public final class RewritingsTest extends SandboxTest {
     // do not rewrite equality comparisons against single integers
     check("(1, 2)[. = 1] = 1", true, empty(cmpir));
 
+    // flatten predicate: exists(E[. > 3]) → E > 3
+    final String range = " (1 to " + wrap(6) + ')';
+    check(EXISTS.args(range + "[. > 3]"), true, root(cmpir), empty(IterFilter.class));
+    check(EMPTY.args(range + "[. > 9]"), true, root(NOT), exists(cmpir));
+
     // rewrite to positional test
     check("(1 to 5)[let $p := position() return $p = 2]", 2,
         empty(cmpir), empty(Let.class), empty(POSITION));
@@ -237,6 +242,34 @@ public final class RewritingsTest extends SandboxTest {
 
     // rewrite to positional test
     check("1[let $p := position() return $p = 0.0]", "", empty());
+    check("(1 to 5)[let $p := position() return $p >= 2.5e0]", "3\n4\n5",
+        root(RangeSeq.class));
+    check("(1 to 5)[let $p := position() return $p <= 2.5e0]", "1\n2",
+        root(RangeSeq.class));
+
+    // flatten predicate: exists(E[text() > 1]) → E/text() > 1
+    check(EXISTS.args(" <a>5</a>[text() > 1]"), true, root(cmpr), empty(IterFilter.class));
+
+    // merge range with equality comparison
+    check("<a>5</a>[text() > 1 and text() = 5]", "<a>5</a>", count(cmpr, 1));
+    // no merge: operator is not '=', operand is no number
+    check("<a>5</a>[text() > 1 and text() != 5]", "", count(cmpr, 1));
+    check("<a>5</a>[text() > 1 and text() = 'x']", "", count(cmpr, 1));
+  }
+
+  /** Checks {@link CmpV} optimizations. */
+  @Test public void cmpV() {
+    final Class<CmpV> cmpv = CmpV.class;
+
+    // swap operands: move count() to the left
+    check("1 eq count((1 to 6)[. > 3])", false, empty(cmpv));
+    check("3 eq count((1 to 6)[. > 3])", true, empty(cmpv));
+
+    // operand may yield no item: comparison is preserved
+    check("head((1 to 2)[. > 5]) eq 1", "", exists(cmpv));
+
+    // operands yield at least one item: result is a single boolean
+    check("(1, (1 to 2)[. > 5]) eq 1", true, type(cmpv, "xs:boolean"));
   }
 
   /** Checks {@link CmpSR} optimizations. */
@@ -244,6 +277,10 @@ public final class RewritingsTest extends SandboxTest {
     check("<a>5</a>[text() > '1' and text() < '9']", "<a>5</a>", count(CmpSR.class, 1));
     check("<a>5</a>[text() > '1' and text() < '9' and <b/>]", "<a>5</a>", count(CmpSR.class, 1));
     check("<a>5</a>[text() > '1' and . < '9']", "<a>5</a>", count(CmpSR.class, 2));
+
+    // flatten predicate: exists(E[text() > '1']) → E/text() > '1'
+    check(EXISTS.args(" <a>5</a>[text() > '1']"), true, root(CmpSR.class),
+        empty(IterFilter.class));
 
     // GH-2194: String range comparisons including/excluding min/max values
     check("<a>X</a>[. <= 'X' and . >= 'X' ]", "<a>X</a>", count(CmpSimpleG.class, 1));
@@ -501,6 +538,20 @@ public final class RewritingsTest extends SandboxTest {
     // path expression
     check("let $a := <a/> return $a[$a/self::a]", "<a/>", empty(VarRef.class));
     check("let $a := <a/> return $a[$a]", "<a/>", empty(VarRef.class));
+
+    // drop predicates that do not influence the existence of path results
+    final String node = " <a><b><c/></b></a>";
+    check(EXISTS.args(node + "/b[1]"), true, empty(IntPos.class));
+    check(EMPTY.args(node + "/b[1]"), false, empty(IntPos.class));
+    check(EXISTS.args(node + "/b[last()]"), true, empty(Pos.class));
+    check(EXISTS.args(node + "/b[position() <= 2]"), true, empty(IntPos.class));
+    check(BOOLEAN.args(node + "/b[1]"), true, empty(IntPos.class));
+    check(node + "[b[1]]", "<a><b><c/></b></a>", empty(IntPos.class));
+
+    // other positions, other steps and fn:count are not rewritten
+    check(EXISTS.args(node + "/b[2]"), false, exists(IntPos.class));
+    check(EXISTS.args(node + "/b[1]/c"), true, exists(IntPos.class));
+    check(COUNT.args(node + "/b[1]"), 1, exists(IntPos.class));
   }
 
   /** Comparison expressions. */
@@ -1318,7 +1369,7 @@ public final class RewritingsTest extends SandboxTest {
 
     check("<a/>[empty(b) or empty(c)]", "<a/>", exists(Or.class));
 
-    final String e1 = " (1 to 6)[. = (1, 2)]", e2 = " (1 to 6)[. = (7, 8)]";
+    final String e1 = " tokenize(" + wrap("a b") + ')', e2 = " tokenize(" + wrap("") + ')';
     check(EMPTY.args(e1)  + " and " + EMPTY.args(e2),  false, root(EMPTY));
     check(EXISTS.args(e1) + " or "  + EXISTS.args(e2), true,  root(EXISTS));
     check(EMPTY.args(e1)  + " or "  + EMPTY.args(e2),  true,  root(Or.class));
@@ -2416,8 +2467,8 @@ public final class RewritingsTest extends SandboxTest {
 
   /** EBV tests, count → exists. */
   @Test public void gh1974() {
-    check("boolean(count((1, 2)[. <= 2]))", true, root(EXISTS));
-    check("boolean(count((1, 2)[. >= 3]))", false, root(EXISTS));
+    check("boolean(count(tokenize(" + wrap("a b") + ")))", true, root(EXISTS));
+    check("boolean(count(tokenize(" + wrap("") + ")))", false, root(EXISTS));
 
     check("boolean(string-length(<_/>))", false, root(EXISTS), exists(IterPath.class));
     check("boolean(string-length(" + wrap("A") + "))", true, exists(STRING));
@@ -3204,7 +3255,7 @@ public final class RewritingsTest extends SandboxTest {
     check("(1 to 6)[not(position() != 3)]", 3, root(Itr.class));
     check("(1 to 6)[not(. = 3 or (. != 1 and . != 4))]", "1\n4", empty(NOT));
 
-    final String e1 = " (1 to 6)[. = (1, 2)]", e2 = " (1 to 6)[. = (7, 8)]";
+    final String e1 = " tokenize(" + wrap("a b") + ')', e2 = " tokenize(" + wrap("") + ')';
     check(NOT.args(EMPTY.args(e1)  + " and " + EMPTY.args(e2)),  true , root(EXISTS));
     check(NOT.args(EXISTS.args(e1) + " or "  + EXISTS.args(e2)), false,  root(EMPTY));
     check(NOT.args(EMPTY.args(e1)  + " or "  + EMPTY.args(e2)),  false,  root(And.class));

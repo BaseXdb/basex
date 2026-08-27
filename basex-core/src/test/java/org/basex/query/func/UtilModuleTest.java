@@ -156,31 +156,30 @@ public final class UtilModuleTest extends SandboxTest {
 
     check("(1 to 2) ! (count((1 to 10)[. < 5]) = .)", "false\nfalse", exists(func));
 
-    // merge multiple counts
-    check("let $s := (1 to 6)[. < 5] return empty($s) or count($s) < 5", true,
+    // merge multiple counts (the input must not be rewritten to a comparison)
+    final String let = "let $s := tokenize(" + wrap("a b c d") + ") return ";
+    check(let + "empty($s) or count($s) < 5", true,
         root(func), count(Itr.class, 2), empty(EMPTY));
-    check("let $s := (1 to 6)[. < 5] return exists($s) and count($s) < 5", true,
+    check(let + "exists($s) and count($s) < 5", true,
         root(func), count(Itr.class, 2), empty(EXISTS));
 
-    check("let $s := (1 to 6)[. < 5] return count($s) > 0 and count($s) < 5", true,
+    check(let + "count($s) > 0 and count($s) < 5", true,
         root(func), count(Itr.class, 2), empty(COUNT));
-    check("let $s := (1 to 6)[. < 5] return count($s) >= 0 and count($s) < 5", true,
+    check(let + "count($s) >= 0 and count($s) < 5", true,
         root(func), count(Itr.class, 2), empty(COUNT));
-    check("let $s := (1 to 6)[. < 5] return count($s) > 1 and count($s) > 2", true,
+    check(let + "count($s) > 1 and count($s) > 2", true,
         root(func), count(Itr.class, 1), empty(COUNT));
-    check("let $s := (1 to 6)[. < 5] return count($s) > 1 and count($s) > 2", true,
-        root(func), count(Itr.class, 1), empty(COUNT));
-    check("let $s := (1 to 6)[. < 5] return count($s) > 1 or count($s) > 2", true,
+    check(let + "count($s) > 1 or count($s) > 2", true,
         root(func), count(Itr.class, 1), empty(COUNT));
 
-    check("let $s := (1 to 6)[. < 5] return count($s) < 5 or count($s) > 5", true,
+    check(let + "count($s) < 5 or count($s) > 5", true,
         count(_UTIL_COUNT_WITHIN, 2), empty(COUNT));
 
-    check("let $s := (1 to 6)[. < 5] return count($s) > 0 or count($s) < 5", true,
+    check(let + "count($s) > 0 or count($s) < 5", true,
         root(Bln.class), empty(COUNT));
-    check("let $s := (1 to 6)[. < 5] return count($s) > 0 or count($s) > 2", true,
+    check(let + "count($s) > 0 or count($s) > 2", true,
         root(EXISTS), empty(COUNT));
-    check("let $s := (1 to 6)[. < 5] return empty($s) and count($s) < 5", false,
+    check(let + "empty($s) and count($s) < 5", false,
         root(EMPTY), empty(COUNT));
 
     check(_UTIL_COUNT_WITHIN.args(" (1 to 100)[. > 90] ! <_>{ . }</_>", 8, 10), true,

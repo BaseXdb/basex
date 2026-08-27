@@ -30,7 +30,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class CmpR extends Single {
+public final class CmpR extends CmpRange {
   /** Maximum integer value that can be represented losslessly as double value. */
   private static final double MAX_INTEGER = 1L << 53;
 
@@ -50,7 +50,7 @@ public final class CmpR extends Single {
    * @param info input info (can be {@code null})
    */
   private CmpR(final Expr expr, final double min, final double max, final InputInfo info) {
-    super(info, expr, Types.BOOLEAN_O);
+    super(expr, info);
     this.min = min;
     this.max = max;
   }
@@ -278,6 +278,11 @@ public final class CmpR extends Single {
     final Names names = type == IndexType.TEXT ? data.elemNames : data.attrNames;
     final Stats stats = names.stats(names.index(test.qname.local()));
     return stats != null && StatsType.isNumeric(stats.type) ? stats : null;
+  }
+
+  @Override
+  Expr with(final Expr operand, final CompileContext cc) throws QueryException {
+    return get(cc, info, operand, min, max);
   }
 
   @Override

@@ -204,16 +204,11 @@ public abstract class Cmp extends Arr {
                   if(!success) cmpOp = cmpOp.invert();
                   return new CmpG(info, map.remove(cc, al), op2, cmpOp).optimize(cc);
                 }
-              } else if(success && last instanceof final CmpR cmp) {
+              } else if(success && last instanceof final CmpRange cmp) {
                 // (number ! (. >= 1e0) = true() → number >= 1e0
-                return CmpR.get(cc, info, map.remove(cc, al), cmp.min, cmp.max);
-              } else if(success && last instanceof final CmpIR cmp) {
                 // (integer ! (. >= 1) != false() → integer >= 1
-                return CmpIR.get(cc, info, map.remove(cc, al), cmp.min, cmp.max);
-              } else if(success && last instanceof final CmpSR cmp) {
                 // (string ! (. >= 'b') = true() → string >= 'b'
-                return new CmpSR(map.remove(cc, al), cmp.min, cmp.mni, cmp.max, cmp.mxi, info).
-                    optimize(cc);
+                return cmp.with(map.remove(cc, al), cc);
               }
             }
           }

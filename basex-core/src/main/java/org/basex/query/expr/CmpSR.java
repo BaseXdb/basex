@@ -27,7 +27,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class CmpSR extends Single {
+public final class CmpSR extends CmpRange {
   /** Minimum (can be {@code null} if {@link #max} is assigned). */
   final byte[] min;
   /** Include minimum value. */
@@ -52,7 +52,7 @@ public final class CmpSR extends Single {
   CmpSR(final Expr expr, final byte[] min, final boolean mni, final byte[] max, final boolean mxi,
       final InputInfo info) {
 
-    super(info, expr, Types.BOOLEAN_O);
+    super(expr, info);
     this.min = min;
     this.mni = mni;
     this.max = max;
@@ -199,6 +199,11 @@ public final class CmpSR extends Single {
     tb.add(mni ? '[' : '(').add(min).add(',').add(max).add(mxi ? ']' : ')');
     return ii.create(new StringRangeAccess(info, sr, ii.db), true,
         Util.info(OPTINDEX_X_X, type + " string range", tb), info);
+  }
+
+  @Override
+  Expr with(final Expr operand, final CompileContext cc) throws QueryException {
+    return new CmpSR(operand, min, mni, max, mxi, info).optimize(cc);
   }
 
   @Override

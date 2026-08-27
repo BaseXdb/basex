@@ -281,6 +281,14 @@ public abstract class Preds extends Arr {
       }
     }
 
+    // rewrite to range comparison (general comparisons may already have been rewritten)
+    // a[. > 5]      → a > 5
+    // a[text() > 5] → a/text() > 5
+    if(last instanceof final CmpRange cmp) {
+      final Expr expr = createExpr.apply(cmp.expr, true);
+      if(expr != this) return cmp.with(expr, cc);
+    }
+
     // rewrite to contains text expression (right operand must not depend on context):
     // a[. contains text 'x'] → a contains text 'x'
     // a[text() contains text 'x'] → a/text() contains text 'x'
@@ -296,6 +304,21 @@ public abstract class Preds extends Arr {
     if(rst.zeroOrOne()) return createSimpleMap.apply(last);
 
     return this;
+  }
+
+  /**
+   * Checks if the last predicate always yields a result for a non-empty input sequence.
+   * @return result of check
+   */
+  public final boolean keepsResults() {
+    final int el = exprs.length;
+    if(el == 0) return false;
+    final Expr last = exprs[el - 1];
+    // E[1], E[position() <= 2]
+    if(last instanceof final IntPos pos) return pos.min == 1;
+    // E[last()]
+    if(last instanceof final Pos pos) return Function.LAST.is(pos.expr);
+    return false;
   }
 
   /**
