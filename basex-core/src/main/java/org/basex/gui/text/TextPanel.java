@@ -226,6 +226,7 @@ public class TextPanel extends BaseXPanel {
     setSyntax(!opened || file.hasSuffix(IO.XQSUFFIXES) ? new SyntaxXQuery() :
       file.hasSuffix(IO.JSONSUFFIX) ? new SyntaxJSON() :
       file.hasSuffix(IO.JSSUFFIXES) ? new SyntaxJS() :
+      file.hasSuffix(IO.MDSUFFIXES) ? new SyntaxMD() :
       file.hasSuffix(gui.gopts.xmlSuffixes()) || file.hasSuffix(IO.HTMLSUFFIXES) ||
       file.hasSuffix(IO.XSLSUFFIXES) || file.hasSuffix(IO.BXSSUFFIX) ?
       new SyntaxXML() : Syntax.SIMPLE);

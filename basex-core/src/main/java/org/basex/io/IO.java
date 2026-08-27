@@ -80,6 +80,8 @@ public abstract class IO {
   public static final String[] TXTSUFFIXES = { ".txt", ".text", ".ini", ".conf", ".md", ".log" };
   /** JS file suffixes. */
   public static final String[] JSSUFFIXES = { ".js", ".java", ".ts", ".vue" };
+  /** Markdown suffixes. */
+  public static final String[] MDSUFFIXES = { ".md", ".markdown" };
 
   /** Disk block/page size (12). */
   public static final int BLOCKPOWER = 12;
