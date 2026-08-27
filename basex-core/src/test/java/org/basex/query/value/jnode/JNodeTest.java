@@ -153,6 +153,12 @@ public final class JNodeTest extends SandboxTest {
     query("jtree([ 1, 2 ]) ! (jnode(1) is jnode(1))", true);
     query("jtree([ 1, 2 ]) ! (jnode(1) is jnode(2))", false);
     query("jtree([ 1, 2 ]) ! (jnode(2) is jnode(1))", false);
+
+    // sequence-valued node: children with the same key are told apart by their position
+    query("jtree(({ 'a': 1 }, { 'a': 2 })) ! (a[1] is a[1])", true);
+    query("jtree(({ 'a': 1 }, { 'a': 2 })) ! (a[1] is a[2])", false);
+    query("jtree(({ 'a': 1 }, { 'a': 2 })) ! (a[2] is a[1])", false);
+    query("jtree(({ 'a': 1 }, { 'a': 2 })) ! count(distinct-ordered-nodes((a[1], a[2])))", 2);
   }
 
   /** Comparison. */
@@ -183,6 +189,10 @@ public final class JNodeTest extends SandboxTest {
     query("jtree([ 1, 2 ]) ! (jnode(1) >> jnode(2))", false);
     query("jtree([ 1, 2 ]) ! (jnode(2) << jnode(1))", false);
     query("jtree([ 1, 2 ]) ! (jnode(2) >> jnode(1))", true);
+
+    // sequence-valued node: children with the same key are ordered by their position
+    query("jtree(({ 'a': 1 }, { 'a': 2 })) ! (a[1] << a[2])", true);
+    query("jtree(({ 'a': 1 }, { 'a': 2 })) ! (a[2] << a[1])", false);
   }
 
   /** Root. */

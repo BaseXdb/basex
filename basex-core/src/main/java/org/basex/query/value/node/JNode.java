@@ -143,13 +143,24 @@ public final class JNode extends GNode {
     // different trees: arbitrary but stable order based on the root node ID
     if(r1 != r2) return Integer.signum(r1.id - r2.id);
 
-    // same tree: compare the index paths leading from the root to both nodes
-    final int[] p1 = new int[d1], p2 = new int[d2];
+    // same tree: compare the paths leading from the root to both nodes
+    return Integer.signum(Arrays.compare(path(d1), jnode.path(d2)));
+  }
+
+  /**
+   * Returns the sequence positions and child indexes leading from the root to this node.
+   * @param depth depth of this node
+   * @return path
+   */
+  private int[] path(final int depth) {
+    final int[] path = new int[depth << 1];
     JNode n = this;
-    for(int i = d1 - 1; i >= 0; i--) { p1[i] = n.index(); n = n.parent; }
-    n = jnode;
-    for(int i = d2 - 1; i >= 0; i--) { p2[i] = n.index(); n = n.parent; }
-    return Integer.signum(Arrays.compare(p1, p2));
+    for(int i = depth - 1; i >= 0; i--) {
+      path[i << 1] = n.position;
+      path[i << 1 | 1] = n.index();
+      n = n.parent;
+    }
+    return path;
   }
 
   /**
@@ -184,7 +195,9 @@ public final class JNode extends GNode {
   public byte[] id() {
     final TokenBuilder tb = new TokenBuilder(Token.ID);
     for(JNode n = this; n != null; n = n.parent) {
-      tb.addLong(n.parent != null ? n.index() + 1 : n.id).add('j');
+      if(n.parent != null) tb.addLong(n.position).add('p').addLong(n.index() + 1);
+      else tb.addLong(n.id);
+      tb.add('j');
     }
     return tb.removeLast().finish();
   }
