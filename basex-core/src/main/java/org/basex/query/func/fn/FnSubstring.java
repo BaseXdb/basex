@@ -3,6 +3,7 @@ package org.basex.query.func.fn;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -44,9 +45,15 @@ public final class FnSubstring extends StandardFunc {
     // invalid start offset or zero length: return empty string
     if(start == Integer.MIN_VALUE || length == 0) return Str.EMPTY;
 
+    // substring($string, $start, string-length($string)) → substring($string, $start)
+    final Expr len = arg(2);
+    if(start >= 0 && arg(1) instanceof Value && Function.STRING_LENGTH.is(len) &&
+        len.args().length > 0 && len.arg(0).equals(value) && !value.has(Flag.NDT)) {
+      return cc.function(Function.SUBSTRING, info, value, arg(1));
+    }
+
     // return full string or original expression
-    return start <= 0 && length == Integer.MAX_VALUE &&
-      value.seqType().type.isStringOrUntyped() ?
+    return start <= 0 && length == Integer.MAX_VALUE && value.seqType().type.isStringOrUntyped() ?
       cc.function(Function.STRING, info, value) : this;
   }
 

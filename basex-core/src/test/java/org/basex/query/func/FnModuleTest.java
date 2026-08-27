@@ -4447,6 +4447,8 @@ return
     check("(1 to 6) ! string(.) ! " + func.args(), "1\n1\n1\n1\n1\n1", empty(STRING));
 
     check("boolean(" + func.args(wrap("123")) + ")", true, empty(func));
+    check(func.args(" string-join((" + wrap("A") + "," + wrap("B") + "))"), 2, empty(STRING_JOIN));
+    check(func.args(" (" + wrap("A") + " || " + wrap("B") + ")"), 2, empty(CONCAT));
 
     error("true#0[" + func.args() + ']', FIATOMIZE_X);
   }
@@ -4624,6 +4626,9 @@ return
 
     check(func.args(" ()", wrap(1), wrap(1)), "", root(Str.class));
     check(func.args("", wrap(1), wrap(1)), "", root(Str.class));
+
+    check(wrap("abc") + "-> " + func.args(" .", 2, " string-length(.)"), "bc",
+        empty(STRING_LENGTH));
   }
 
   /** Test method. */

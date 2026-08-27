@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -34,7 +35,28 @@ public final class FnStringLength extends ContextFn {
         return cc.function(STRING_LENGTH, info, value.args());
       }
     }
+    if(STRING_JOIN.is(value)) {
+      final Expr separator = value.arg(1);
+      // string-length(string-join(E)) → sum(E ! string-length(), 0)
+      if(separator == Empty.UNDEFINED || separator == Str.EMPTY) return lengths(value.arg(0), cc);
+    } else if(value instanceof Concat) {
+      // string-length(A || B) → sum((A, B) ! string-length(), 0)
+      return lengths(List.get(cc, info, value.args()), cc);
+    }
     return this;
+  }
+
+  /**
+   * Rewrites the string length of concatenated values to a sum of string lengths.
+   * @param values values to be concatenated
+   * @param cc compilation context
+   * @return sum expression or {@code null}
+   * @throws QueryException query exception
+   */
+  private Expr lengths(final Expr values, final CompileContext cc) throws QueryException {
+    if(values.seqType().mayBeWrapped()) return this;
+    final Expr func = cc.get(values, true, () -> cc.function(STRING_LENGTH, info));
+    return cc.function(SUM, info, SimpleMap.get(cc, info, values, func), Itr.ZERO);
   }
 
   @Override
