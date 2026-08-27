@@ -115,13 +115,62 @@ abstract class Set extends Arr {
    * @throws QueryException query exception
    */
   private Expr mergePaths(final CompileContext cc) throws QueryException {
+    final int el = exprs.length;
+    if(!(this instanceof Union) || el < 3) return mergePaths(exprs, cc);
+
+    // merge operands with identical root and axis: a union @b union c → (a | c) union @b
+    final ExprList list = new ExprList(el);
+    final boolean[] grouped = new boolean[el];
+    boolean merged = false;
+    for(int e = 0; e < el; e++) {
+      if(grouped[e]) continue;
+      final ExprList group = new ExprList(2).add(exprs[e]);
+      for(int f = e + 1; f < el; f++) {
+        if(!grouped[f] && mergeable(exprs[e], exprs[f])) {
+          group.add(exprs[f]);
+          grouped[f] = true;
+        }
+      }
+      final Expr[] ops = group.finish();
+      final Expr expr = ops.length > 1 ? mergePaths(ops, cc) : null;
+      if(expr != null) {
+        list.add(expr);
+        merged = true;
+      } else {
+        list.add(ops);
+      }
+    }
+    return merged ? new Union(info, list.finish()).optimize(cc) : null;
+  }
+
+  /**
+   * Checks if two expressions are single-step paths with identical root and axis.
+   * @param expr1 first expression
+   * @param expr2 second expression
+   * @return result of check
+   */
+  private static boolean mergeable(final Expr expr1, final Expr expr2) {
+    return expr1 instanceof final Path path1 && path1.steps.length == 1 &&
+      expr2 instanceof final Path path2 && path2.steps.length == 1 &&
+      path1.steps[0] instanceof final Step step1 && path2.steps[0] instanceof final Step step2 &&
+      step1.axis == step2.axis && Objects.equals(path1.root, path2.root);
+  }
+
+  /**
+   * Tries to merge single-step paths.
+   * @param ops operands
+   * @param cc compilation context
+   * @return merged expression or {@code null}
+   * @throws QueryException query exception
+   */
+  private Expr mergePaths(final Expr[] ops, final CompileContext cc) throws QueryException {
     Expr root = null;
     Axis axis = null;
-    final int sl = exprs.length;
+    final int sl = ops.length;
     final ArrayList<Step> steps = new ArrayList<>(sl);
 
     // collect common root, common axis, and individual steps
-    for(final Expr expr : exprs) {
+    for(final Expr expr : ops) {
       if(!(expr instanceof final Path path)) return null;
       if(path.steps.length != 1 || !(path.steps[0] instanceof final Step step)) return null;
       if(steps.isEmpty()) {

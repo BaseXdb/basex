@@ -172,7 +172,7 @@ public abstract class Path extends ParseExpr {
     // merge adjacent steps
     if(expr == this) expr = mergeSteps(cc);
     // move predicates downward
-    if(expr == this) expr = movePredicates(cc);
+    if(expr == this) expr = movePredicates();
     // return optimized expression
     if(expr != this) return expr.optimize(cc);
 
@@ -543,8 +543,7 @@ public abstract class Path extends ParseExpr {
    * @return number of results (or {@code -1})
    */
   private long size(final Expr rt, final Data data) {
-    // check if path will yield any results
-    if(root != null && root.size() == 0) return 0;
+    // check if a step will yield no results. example: A/void(.)
     for(final Expr step : steps) {
       if(step.size() == 0) return 0;
     }
@@ -912,9 +911,9 @@ public abstract class Path extends ParseExpr {
     final QueryBiFunction<Expr, Expr, Expr> rewrite = (step, next) -> {
       // do not rewrite (a, b)/<c/>
       if(step == null || next != null && next.has(Flag.CNS)) return step;
-      // (a, b)/c → (a | b)/a
+      // (a, b)/c → (a | b)/c
       if(step instanceof final List lst) return lst.toUnion(cc);
-      // a[b, c] → a[b | c]
+      // (a, b)[c] → (a | b)[c]
       if(step instanceof final Filter fltr && !fltr.mayBePositional() &&
           fltr.root instanceof final List lst) {
         final Expr st = lst.toUnion(cc);
@@ -968,23 +967,19 @@ public abstract class Path extends ParseExpr {
       boolean chngd = false;
       for(int s = 0; s < sl; s++) {
         Expr curr = steps[s];
-        if(curr instanceof final Step crr) {
-          Expr next = s < sl - 1 ? steps[s + 1] : null;
-          if(crr.selector == null && crr.test == NodeTest.NODE && next instanceof final Step stp &&
-              stp.axis == ATTRIBUTE) {
-            // rewrite node test before attribute step: node()/@* → */@*
-            next = Step.get(cc, null, crr.info(), crr.axis, NodeTest.ELEMENT, crr.exprs);
-            curr = cc.replaceWith(curr, next);
-            chngd = true;
-          } else if(next != null) {
-            // merge steps: //* → /descendant::*
-            next = mergeStep(crr, next, s > 0 ? steps[s - 1] : root, cc);
-            if(next != null) {
-              cc.info(QueryText.OPTMERGE_X, next);
-              curr = next;
-              chngd = true;
+        if(curr instanceof final Step crr && s < sl - 1) {
+          final Expr[] merged = mergeStep(crr, steps[s + 1], cc);
+          if(merged != null) {
+            if(merged.length == 1) {
+              // both steps have been merged: //* → /descendant::*
+              cc.info(QueryText.OPTMERGE_X, merged[0]);
+              curr = merged[0];
               s++;
+            } else {
+              // current step has been narrowed: node()/@* → */@*
+              curr = cc.replaceWith(curr, merged[0]);
             }
+            chngd = true;
           }
         }
         stps.add(curr);
@@ -996,27 +991,21 @@ public abstract class Path extends ParseExpr {
 
   /**
    * Moves predicates downward.
-   * @param cc compilation context
    * @return original or new expression
-   * @throws QueryException query exception
    */
-  private Expr movePredicates(final CompileContext cc) throws QueryException {
+  private Expr movePredicates() {
     // examples:
     // a[b]/b     → a/b
     // a[b]/b/c   → a/b/c
     // a[b/c]/b/c → a/b/c
-    return cc.get(root, true, () -> {
-      final int sl = steps.length;
-      for(int s = 0; s < sl; s++) {
-        final Expr curr = steps[s];
-        if(curr instanceof Step) {
-          final Expr ex = movePredicates(s);
-          if(ex != null) return ex;
-        }
-        cc.updateFocus(curr, true);
+    final int sl = steps.length;
+    for(int s = 0; s < sl; s++) {
+      if(steps[s] instanceof Step) {
+        final Expr ex = movePredicates(s);
+        if(ex != null) return ex;
       }
-      return this;
-    });
+    }
+    return this;
   }
 
   /**
@@ -1048,28 +1037,35 @@ public abstract class Path extends ParseExpr {
   /**
    * Merges adjacent steps.
    * @param curr current step
-   * @param next next step
-   * @param prev previous step (can be {@code null})
+   * @param next next expression
    * @param cc compilation context
-   * @return merged expression or {@code null}
+   * @return single merged step, current step followed by narrowed next step, or {@code null}
    * @throws QueryException query exception
    */
-  private static Expr mergeStep(final Step curr, final Expr next, final Expr prev,
-      final CompileContext cc) throws QueryException {
+  private static Expr[] mergeStep(final Step curr, final Expr next, final CompileContext cc)
+      throws QueryException {
 
     // do not merge if current step contains positional predicates
     if(curr.mayBePositional()) return null;
 
-    // merge self steps:  child::*/self::a → child::a
     final Step nxt = next instanceof final Step stp ? stp : null;
+
+    // narrow node test before attribute step:  node()/@* → */@*
+    if(nxt != null && nxt.axis == ATTRIBUTE && curr.selector == null &&
+        curr.test == NodeTest.NODE) {
+      return new Expr[] {
+        Step.get(cc, null, curr.info(), curr.axis, NodeTest.ELEMENT, curr.exprs), next };
+    }
+
+    // merge self steps:  child::*/self::a → child::a
     if(nxt != null && nxt.axis == SELF && !nxt.mayBePositional()) {
       final Test test = curr.test.intersect(nxt.test);
       if(test == null) return null;
       final Expr cs = curr.selector, ns = nxt.selector;
       // two selectors cannot be merged into a single step
       if(cs != null && ns != null) return null;
-      return Step.get(cc, prev, curr.info(), curr.axis, test, cs != null ? cs : ns,
-          ExprList.concat(curr.exprs, nxt.exprs));
+      return new Expr[] { Step.get(cc, null, curr.info(), curr.axis, test, cs != null ? cs : ns,
+          ExprList.concat(curr.exprs, nxt.exprs)) };
     }
 
     // merge descendant-or-self step
@@ -1081,31 +1077,39 @@ public abstract class Path extends ParseExpr {
     // - descendant-or-self::node()/descendant::* → descendant::*
     // - descendant-or-self::node()/descendant-or-self::* → descendant-or-self::*
     final Axis merged = mergedAxis(nxt);
-    if(merged != null)
-      return Step.get(cc, prev, nxt.info(), merged, nxt.test, nxt.selector, nxt.exprs);
+    if(merged != null) return new Expr[] {
+      Step.get(cc, null, nxt.info(), merged, nxt.test, nxt.selector, nxt.exprs) };
 
-    // function for merging steps inside union expressions
+    // function for distributing the step over the operands of a union expression
     final QueryFunction<Expr, Expr> rewrite = expr -> {
-      if(expr instanceof Union) {
-        final Axis axis = commonAxis(expr.args());
-        if(axis != null) {
-          for(final Expr path : expr.args()) {
-            final Path p = (Path) path;
-            final Step s = (Step) p.steps[0];
-            p.steps[0] = Step.get(cc, prev, s.info(), axis, s.test, s.selector, s.exprs);
-          }
-          return expr.optimize(cc);
-        }
+      if(!(expr instanceof final Union union)) return null;
+      final Expr[] args = union.args();
+      final int al = args.length;
+      final Expr[] branches = new Expr[al];
+      for(int a = 0; a < al; a++) {
+        // reject operands that cannot absorb or narrow the step
+        if(!(args[a] instanceof final Path path) || path.root != null ||
+            !(path.steps[0] instanceof final Step stp)) return null;
+        final Expr[] mrgd = mergeStep(curr, stp, cc);
+        if(mrgd == null) return null;
+        final Expr[] stps = path.steps;
+        final ExprList list = new ExprList(stps.length + mrgd.length - 1).add(mrgd);
+        for(int t = 1; t < stps.length; t++) list.add(stps[t]);
+        branches[a] = Path.get(cc, path.info(), null, list.finish());
       }
-      return null;
+      return new Union(union.info(), branches).optimize(cc);
     };
-    // descendant-or-self::node()/(* | text()) → (descendant::text() | (descendant::*)
-    if(next instanceof Union) return rewrite.apply(next);
+    // descendant-or-self::node()/(* | text() | @*)
+    //   → (descendant::* | descendant::text() | descendant-or-self::*/@*)
+    if(next instanceof Union) {
+      final Expr expr = rewrite.apply(next);
+      if(expr != null) return new Expr[] { expr };
+    }
 
     // descendant-or-self::node()/(text()|*)[..] → (descendant::text() | descendant::*)[..]
     if(next instanceof final Filter filter && !filter.mayBePositional()) {
       final Expr expr = rewrite.apply(filter.root);
-      if(expr != null) return Filter.get(cc, filter.info(), expr, filter.exprs);
+      if(expr != null) return new Expr[] { Filter.get(cc, filter.info(), expr, filter.exprs) };
     }
     return null;
   }
@@ -1124,22 +1128,6 @@ public abstract class Path extends ParseExpr {
       }
     }
     return null;
-  }
-
-  /**
-   * Returns the common merged axis of multiple expressions.
-   * @param exprs expressions
-   * @return common axis or {@code null}
-   */
-  private static Axis commonAxis(final Expr... exprs) {
-    Axis common = null;
-    for(final Expr ex : exprs) {
-      if(!(ex instanceof final Path path) || path.root != null) return null;
-      final Axis merged = mergedAxis(path.steps[0]);
-      common = common == merged || common == null ? merged : null;
-      if(common == null) return null;
-    }
-    return common;
   }
 
   @Override
