@@ -38,6 +38,10 @@ public final class ArraySubarray extends ArrayFn {
   @Override
   protected Expr opt(final CompileContext cc) {
     final Expr array = arg(0);
+    // array:subarray($array, 1) → $array
+    if(!defined(2) && arg(1) instanceof final Itr start && start.itr() == 1 &&
+        array.seqType().instanceOf(Types.ARRAY_O)) return array;
+
     if(array.seqType().type instanceof final ArrayType at) exprType.assign(at);
     return this;
   }

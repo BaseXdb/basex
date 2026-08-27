@@ -97,6 +97,10 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" replicate((1 to 100)[. < 3], 100)"), false);
     query(func.args(" reverse((1 to 10) ! string())"), true);
     query(func.args(" sort((1 to 10) ! string())"), true);
+    check(func.args(SORT_BY.args(" (1 to 10) ! string()", " { 'key': data#1 }")), true,
+        empty(SORT_BY));
+    check(func.args(SORT_WITH.args(" (1 to 10) ! string()", " compare#2")), true,
+        empty(SORT_WITH));
 
     final String c = "http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive";
     query(func.args(" ('A', 'a')", c), false);
@@ -137,6 +141,10 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" replicate((1 to 100)[. < 3], 100)"), false);
     query(func.args(" reverse((1 to 10) ! string())"), false);
     query(func.args(" sort((1 to 10) ! string())"), false);
+    check(func.args(SORT_BY.args(" (1 to 10) ! string()", " { 'key': data#1 }")), false,
+        empty(SORT_BY));
+    check(func.args(SORT_WITH.args(" (1 to 10) ! string()", " compare#2")), false,
+        empty(SORT_WITH));
 
     final String c = "http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive";
     query(func.args(" ('A', 'a')", c), true);
@@ -1862,23 +1870,45 @@ public final class FnModuleTest extends SandboxTest {
     error(func.args("", ""), HASH_ALGORITHM_X);
   }
 
-  /** Tests the fn:empty and fn:exists rewritings of fn:head and fn:tail arguments. */
-  @Test public void emptyExistsHeadTail() {
+  /** Tests the fn:empty and fn:exists rewritings of their arguments. */
+  @Test public void emptyExists() {
     final String seq = " tokenize(" + wrap("a b c") + ", ' ')";
     check(EXISTS.args(HEAD.args(seq)), true, root(EXISTS), empty(HEAD));
     check(EMPTY.args(HEAD.args(seq)), false, root(EMPTY), empty(HEAD));
+    check(EXISTS.args(FOOT.args(seq)), true, root(EXISTS), empty(FOOT));
+    check(EMPTY.args(FOOT.args(seq)), false, root(EMPTY), empty(FOOT));
     check(EXISTS.args(TAIL.args(seq)), true, root(_UTIL_COUNT_WITHIN), empty(TAIL));
     check(EMPTY.args(TAIL.args(seq)), false, root(_UTIL_COUNT_WITHIN), empty(TAIL));
+    check(EXISTS.args(TRUNK.args(seq)), true, root(_UTIL_COUNT_WITHIN), empty(TRUNK));
+    check(EMPTY.args(TRUNK.args(seq)), false, root(_UTIL_COUNT_WITHIN), empty(TRUNK));
     check(EXISTS.args(SUBSEQUENCE.args(seq, 2)), true, root(_UTIL_COUNT_WITHIN), empty(TAIL));
+    check(EXISTS.args(SUBSEQUENCE.args(seq, 3)), true, root(_UTIL_COUNT_WITHIN),
+        empty(SUBSEQUENCE));
+    check(EMPTY.args(SUBSEQUENCE.args(seq, 4)), true, root(_UTIL_COUNT_WITHIN),
+        empty(SUBSEQUENCE));
+    check(EXISTS.args(_UTIL_RANGE.args(seq, 2, 3)), true, root(_UTIL_COUNT_WITHIN),
+        empty(_UTIL_RANGE));
+    check(EXISTS.args(ITEMS_AT.args(seq, 3)), true, root(_UTIL_COUNT_WITHIN), empty(ITEMS_AT));
+    check(EMPTY.args(ITEMS_AT.args(seq, 4)), true, root(_UTIL_COUNT_WITHIN), empty(ITEMS_AT));
+    check(EXISTS.args(DISTINCT_VALUES.args(seq)), true, root(EXISTS), empty(DISTINCT_VALUES));
+    check(EMPTY.args(DISTINCT_VALUES.args(seq)), false, root(EMPTY), empty(DISTINCT_VALUES));
 
     final String one = " tokenize(" + wrap("a") + ", ' ')";
     check(EXISTS.args(TAIL.args(one)), false, root(_UTIL_COUNT_WITHIN));
     check(EMPTY.args(TAIL.args(one)), true, root(_UTIL_COUNT_WITHIN));
+    check(EXISTS.args(TRUNK.args(one)), false, root(_UTIL_COUNT_WITHIN));
+    check(EMPTY.args(TRUNK.args(one)), true, root(_UTIL_COUNT_WITHIN));
 
-    // head is rewritten even for nondeterministic input; tail is kept
+    // arrays may be atomized to empty sequences: input is not rewritten
+    check(EMPTY.args(DISTINCT_VALUES.args(" (1 to 3)[. > " + wrap(0) + "] ! [ ]")), true,
+        exists(DISTINCT_VALUES));
+
+    // head is rewritten even for nondeterministic input; other functions are kept
     final String ndt = " (1 to 3) ! (if(. = 3) then error() else .)";
     check(EXISTS.args(HEAD.args(ndt)), true, empty(HEAD));
     check(EXISTS.args(TAIL.args(ndt)), true, exists(TAIL));
+    check(EXISTS.args(TRUNK.args(ndt)), true, exists(TRUNK));
+    error(EXISTS.args(FOOT.args(ndt)), FUNERR1);
   }
 
   /** Test method. */
@@ -2015,6 +2045,35 @@ public final class FnModuleTest extends SandboxTest {
     query(input + "/* ! boolean(" + func.args("a2") + ")", false);
 
     error(func.args("a2", " <a/>"), IDDOC);
+  }
+
+  /** Tests the rewritings of nested calls of idempotent functions. */
+  @Test public void idempotentCalls() {
+    final String number = wrap(3.5);
+    check(ABS.args(ABS.args(number)), 3.5, "count(//FnAbs) = 1");
+    check(FLOOR.args(FLOOR.args(number)), 3, "count(//FnFloor) = 1");
+    check(CEILING.args(CEILING.args(number)), 4, "count(//FnCeiling) = 1");
+    check(ROUND.args(ROUND.args(number)), 4, "count(//FnRound) = 1");
+    check(CEILING.args(FLOOR.args(number)), 3, root(FLOOR), empty(CEILING));
+    check(FLOOR.args(ROUND.args(number)), 4, root(ROUND), empty(FLOOR));
+    check(ROUND.args(CEILING.args(number)), 4, root(CEILING), empty(ROUND));
+    check(ROUND_HALF_TO_EVEN.args(ROUND.args(number)), 4, root(ROUND),
+        empty(ROUND_HALF_TO_EVEN));
+
+    // a precision argument yields non-integral results
+    check(ROUND.args(ROUND.args(number, 2)), 4, "count(//FnRound) = 2");
+    check(ROUND.args(ROUND.args(number), 2), 4, "count(//FnRound) = 2");
+    // fn:abs does not yield integral results
+    check(ABS.args(FLOOR.args(number)), 3, root(ABS), exists(FLOOR));
+
+    final String string = wrap(" a B c ");
+    check(UPPER_CASE.args(UPPER_CASE.args(string)), " A B C ", "count(//FnUpperCase) = 1");
+    check(LOWER_CASE.args(LOWER_CASE.args(string)), " a b c ", "count(//FnLowerCase) = 1");
+    check(NORMALIZE_SPACE.args(NORMALIZE_SPACE.args(string)), "a B c",
+        "count(//FnNormalizeSpace) = 1");
+    // case conversions are not interchangeable
+    check(UPPER_CASE.args(LOWER_CASE.args(string)), " A B C ", root(UPPER_CASE),
+        exists(LOWER_CASE));
   }
 
   /** Test method. */
@@ -3917,6 +3976,38 @@ return
     error(func.args("a.xml", "/db/path/b.xml"), URIARG_X);
     // non-hierarchical base URI
     error(func.args("a.html", "urn:doi:234567"), URIARG_X);
+  }
+
+  /** Tests the rewritings of arguments that only reorder or deduplicate their own input. */
+  @Test public void reorderedInput() {
+    final String seq = " (1 to 6)[. > " + wrap(3) + ']';
+    check(MIN.args(REVERSE.args(seq)), 4, empty(REVERSE));
+    check(MAX.args(REVERSE.args(seq)), 6, empty(REVERSE));
+    check(SUM.args(REVERSE.args(seq)), 15, empty(REVERSE));
+    check(AVG.args(REVERSE.args(seq)), 5, empty(REVERSE));
+
+    check(MIN.args(SORT.args(seq)), 4, empty(SORT));
+    check(SUM.args(SORT.args(seq)), 15, empty(SORT));
+    check(SUM.args(SORT_BY.args(seq, " { 'key': data#1 }")), 15, empty(SORT_BY));
+    check(SUM.args(SORT_WITH.args(seq, " fn($a, $b) { $a - $b }")), 15, empty(SORT_WITH));
+    // the zero argument of fn:sum is preserved
+    check(SUM.args(REVERSE.args(" (1 to 6)[. > " + wrap(6) + ']'), "x"), "x", empty(REVERSE));
+
+    // duplicates are irrelevant for fn:min, fn:max and general comparisons
+    final String dupl = " (1, 1, 2)[. > " + wrap(0) + ']';
+    check(MIN.args(DISTINCT_VALUES.args(dupl)), 1, empty(DISTINCT_VALUES));
+    check(MAX.args(DISTINCT_VALUES.args(dupl)), 2, empty(DISTINCT_VALUES));
+    check(wrap(2) + " = " + DISTINCT_VALUES.args(dupl), true, empty(DISTINCT_VALUES));
+    check(DISTINCT_VALUES.args(DISTINCT_VALUES.args(dupl)), "1\n2",
+        "count(//FnDistinctValues) = 1");
+
+    // duplicates are relevant for fn:sum and fn:all-different
+    check(SUM.args(DISTINCT_VALUES.args(dupl)), 3, exists(DISTINCT_VALUES));
+    check(ALL_DIFFERENT.args(REPLICATE.args(dupl, 2)), false, exists(REPLICATE));
+    // a collation argument is preserved
+    check(MIN.args(DISTINCT_VALUES.args(dupl,
+        "http://www.w3.org/2005/xpath-functions/collation/codepoint")), 1,
+        exists(DISTINCT_VALUES));
   }
 
   /** Test method. */

@@ -56,6 +56,14 @@ public class FnEmpty extends StandardFunc {
     if(HEAD.is(input)) {
       input = input.arg(0);
     }
+    // exists(foot(E)) → exists(E), empty(foot(E)) → empty(E)
+    if(FOOT.is(input) && !input.has(Flag.NDT)) {
+      input = input.arg(0);
+    }
+    // exists(distinct-values(E)) → exists(E), empty(distinct-values(E)) → empty(E)
+    if(DISTINCT_VALUES.is(input) && !input.arg(0).seqType().mayBeWrapped()) {
+      input = input.arg(0);
+    }
     // rewrite list to union expression:  exists((nodes1, nodes2)) → exists(nodes1 | nodes2)
     if(input instanceof List && input.seqType().type instanceof NodeType) {
       input = new Union(info, input.args()).optimize(cc);
@@ -87,13 +95,39 @@ public class FnEmpty extends StandardFunc {
     }
 
     // exists(tail(E)) → util:count-within(E, 2), empty(tail(E)) → util:count-within(E, 0, 1)
-    if(TAIL.is(input) && !input.has(Flag.NDT)) {
-      final Expr seq = input.arg(0);
-      return exists ? cc.function(_UTIL_COUNT_WITHIN, info, seq, Itr.get(2)) :
-        cc.function(_UTIL_COUNT_WITHIN, info, seq, Itr.ZERO, Itr.ONE);
+    // exists(trunk(E)) → util:count-within(E, 2), empty(trunk(E)) → util:count-within(E, 0, 1)
+    if((TAIL.is(input) || TRUNK.is(input)) && !input.has(Flag.NDT)) {
+      return countWithin(input.arg(0), 1, cc);
+    }
+    // exists(subsequence(E, pos)) → util:count-within(E, pos)
+    // empty(subsequence(E, pos)) → util:count-within(E, 0, pos - 1)
+    if((SUBSEQUENCE.is(input) || _UTIL_RANGE.is(input)) && !input.has(Flag.NDT)) {
+      final SeqRange range = SeqRange.get(input, cc);
+      if(range != null && range.length > 0) return countWithin(input.arg(0), range.start, cc);
+    }
+    // exists(items-at(E, pos)) → util:count-within(E, pos)
+    // empty(items-at(E, pos)) → util:count-within(E, 0, pos - 1)
+    // static position will always be greater than 1
+    if(ITEMS_AT.is(input) && !input.has(Flag.NDT) && input.arg(1) instanceof final Itr pos) {
+      return countWithin(input.arg(0), pos.itr() - 1, cc);
     }
 
     return embed(cc, true);
+  }
+
+  /**
+   * Rewrites the function call to a range check on the unwrapped input expression.
+   * @param input input expression
+   * @param skipped number of items skipped by the original expression
+   * @param cc compilation context
+   * @return function
+   * @throws QueryException query exception
+   */
+  private Expr countWithin(final Expr input, final long skipped, final CompileContext cc)
+      throws QueryException {
+    return this instanceof FnExists ?
+      cc.function(_UTIL_COUNT_WITHIN, info, input, Itr.get(skipped + 1)) :
+      cc.function(_UTIL_COUNT_WITHIN, info, input, Itr.ZERO, Itr.get(skipped));
   }
 
   @Override

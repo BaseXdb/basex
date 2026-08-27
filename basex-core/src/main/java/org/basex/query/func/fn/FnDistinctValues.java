@@ -124,6 +124,14 @@ public final class FnDistinctValues extends FnDuplicateValues {
     return this;
   }
 
+  @Override
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    // min(distinct-values($values)) → min($values)
+    // $values = distinct-values($data) → $values = $data
+    final boolean distinct = mode == Simplify.DISTINCT && !defined(1);
+    return cc.simplify(this, distinct ? arg(0) : this, mode);
+  }
+
   /**
    * Rewrites the function call to a duplicate check.
    * @param op comparison operator

@@ -16,4 +16,9 @@ public final class FnCeiling extends NumericFn {
     final ANum value = toNumberOrNull(arg(0), qc);
     return value == null ? Empty.VALUE : value.ceiling();
   }
+
+  @Override
+  boolean integral() {
+    return true;
+  }
 }

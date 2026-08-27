@@ -51,10 +51,11 @@ public final class FnAllEqual extends StandardFunc {
       // all-equal(1 to 10) → false
       if(values instanceof RangeSeq) return Bln.FALSE;
       // all-equal(reverse($data)) → all-equal($data)
-      if(REVERSE.is(values) || SORT.is(values) ||
-          REPLICATE.is(values) && values.arg(1) instanceof Itr) {
+      final Expr reordered = reordered(values);
+      if(reordered != null) return cc.function(ALL_EQUAL, info, reordered);
+      // all-equal(replicate($data, 2)) → all-equal($data)
+      if(REPLICATE.is(values) && values.arg(1) instanceof Itr)
         return cc.function(ALL_EQUAL, info, values.arg(0));
-      }
     }
     return this;
   }

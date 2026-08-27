@@ -354,6 +354,16 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
+   * Returns the input of an expression that only reorders the items of its own input.
+   * @param input input expression
+   * @return input of the expression, or {@code null}
+   */
+  protected static Expr reordered(final Expr input) {
+    return Function.REVERSE.is(input) || Function.SORT.is(input) ||
+      Function.SORT_BY.is(input) || Function.SORT_WITH.is(input) ? input.arg(0) : null;
+  }
+
+  /**
    * Tries to embed a positional function call in the input argument.
    * @param cc compilation context
    * @param skip skip evaluation of remaining operands

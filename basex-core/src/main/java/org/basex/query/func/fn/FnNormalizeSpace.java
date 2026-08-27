@@ -26,6 +26,12 @@ public final class FnNormalizeSpace extends ContextFn {
   }
 
   @Override
+  protected Expr opt(final CompileContext cc) {
+    // normalize-space(normalize-space(E)) → normalize-space(E)
+    return Function.NORMALIZE_SPACE.is(arg(0)) ? arg(0) : this;
+  }
+
+  @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
     if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {

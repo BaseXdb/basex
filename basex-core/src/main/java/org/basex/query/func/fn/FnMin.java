@@ -99,6 +99,14 @@ public class FnMin extends StandardFunc {
   final Expr opt(final boolean min, final CompileContext cc) throws QueryException {
     arg(0, arg -> arg.simplifyFor(Simplify.DATA, cc).simplifyFor(Simplify.DISTINCT, cc));
 
+    // min(reverse($values)) → min($values), max(sort($values)) → max($values)
+    final Expr reordered = reordered(arg(0));
+    if(reordered != null) {
+      final Expr[] args = exprs.clone();
+      args[0] = reordered;
+      return cc.function(min ? Function.MIN : Function.MAX, info, args);
+    }
+
     final Expr expr = optFirst();
     if(expr != this) return expr;
 

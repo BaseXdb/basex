@@ -51,4 +51,9 @@ public class FnRound extends NumericFn {
         Math.min(1 << 20, toLong(precision)));
     return value == null ? Empty.VALUE : value.round(scale, mode);
   }
+
+  @Override
+  final boolean integral() {
+    return !defined(1);
+  }
 }

@@ -16,4 +16,9 @@ public final class FnFloor extends NumericFn {
     final ANum value = toNumberOrNull(arg(0), qc);
     return value == null ? Empty.VALUE : value.floor();
   }
+
+  @Override
+  boolean integral() {
+    return true;
+  }
 }

@@ -1,5 +1,7 @@
 package org.basex.query.func.array;
 
+import static org.basex.query.func.Function.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.array.*;
@@ -21,6 +23,10 @@ public final class ArrayReverse extends ArrayFn {
   @Override
   protected Expr opt(final CompileContext cc) {
     final Expr array = arg(0);
+    // array:reverse(array:reverse($array)) → $array
+    if(_ARRAY_REVERSE.is(array) && array.arg(0).seqType().instanceOf(Types.ARRAY_O))
+      return array.arg(0);
+
     if(array.seqType().type instanceof final ArrayType at) exprType.assign(at);
     return this;
   }

@@ -24,7 +24,7 @@ public final class FnAvg extends FnSum {
     Expr expr = optFirst();
     if(expr != this) return expr;
 
-    expr = opt(true);
+    expr = opt(true, cc);
     if(expr != null) return expr;
 
     final SeqType st = arg(0).seqType();

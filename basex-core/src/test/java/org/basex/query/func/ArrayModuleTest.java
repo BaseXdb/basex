@@ -18,6 +18,8 @@ public final class ArrayModuleTest extends SandboxTest {
   /** Months. */
   private static final String MONTHS = " ('January', 'February', 'March', 'April', 'May', "
       + "'June', 'July', 'August', 'September', 'October', 'November', 'December')";
+  /** Array with two members that is not pre-evaluated at compile time. */
+  private static final String ARRAY = " array { (1 to 3)[. > " + wrap(1) + "] }";
 
   /** Test method. */
   @Test public void append() {
@@ -364,6 +366,12 @@ public final class ArrayModuleTest extends SandboxTest {
     query(func.args(" [ 1, 2 ]"), "[2,1]");
     query(func.args(" [ 1 to 2 ]"), "[(1,2)]");
     query(func.args(" array { 1 to 3 }"), "[3,2,1]");
+
+    // array:reverse(array:reverse($array)) → $array
+    check(func.args(func.args(ARRAY)), "[2,3]", empty(func));
+    // the rewriting requires an argument that is statically known to be a single array
+    check(func.args(func.args(" (1 to 2)[. = " + wrap(1) + "] ! [ . ]")), "[1]",
+        "count(//ArrayReverse) = 2");
   }
 
   /** Test method. */
@@ -377,6 +385,15 @@ public final class ArrayModuleTest extends SandboxTest {
     query(func.args(" array { 1 }"), 1);
     query(func.args(" array { 1, 2 }"), 2);
     query(func.args(" array { 1 to 3 }"), 3);
+
+    // array:size(array:reverse($array)) → array:size($array)
+    check(func.args(_ARRAY_REVERSE.args(ARRAY)), 2, empty(_ARRAY_REVERSE));
+    check(func.args(_ARRAY_SORT.args(ARRAY)), 2, empty(_ARRAY_SORT));
+    check(func.args(_ARRAY_SORT_BY.args(ARRAY, " { 'key': data#1 }")), 2, empty(_ARRAY_SORT_BY));
+    check(func.args(_ARRAY_SORT_WITH.args(ARRAY, " fn($a, $b) { $a - $b }")), 2,
+        empty(_ARRAY_SORT_WITH));
+    // array:size(array:append($array, $member)) → array:size($array) + 1
+    check(func.args(_ARRAY_APPEND.args(ARRAY, 9)), 3, empty(_ARRAY_APPEND));
   }
 
   /** Test method. */
@@ -498,6 +515,10 @@ public final class ArrayModuleTest extends SandboxTest {
     query(func.args(" array { 1 to 5 }", 6), "[]");
     query(func.args(" array { 1 to 5 }", 1, 1), "[1]");
     query(func.args(" array { 1 to 5 }", 2, 3), "[2,3,4]");
+
+    // array:subarray($array, 1) → $array
+    check(func.args(ARRAY, 1), "[2,3]", empty(func));
+    check(func.args(ARRAY, 2), "[3]", exists(func));
 
     error(func.args(" [ 1 ]", 0, 0), ARRAYBOUNDS_X_X);
     error(func.args(" [ 1 ]", 1, " -1"), ARRAYNEG_X);

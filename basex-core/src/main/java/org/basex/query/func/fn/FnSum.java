@@ -34,7 +34,7 @@ public class FnSum extends NumericFn {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr expr = opt(false);
+    final Expr expr = opt(false, cc);
     if(expr != null) return expr;
 
     final Expr values = arg(0), zero = arg(1);
@@ -64,10 +64,19 @@ public class FnSum extends NumericFn {
   /**
    * Pre-evaluates a value expression.
    * @param avg calculate average
+   * @param cc compilation context
    * @return optimized expression or {@code null}
    * @throws QueryException query exception
    */
-  final Expr opt(final boolean avg) throws QueryException {
+  final Expr opt(final boolean avg, final CompileContext cc) throws QueryException {
+    // sum(reverse($values)) → sum($values), avg(sort($values)) → avg($values)
+    final Expr reordered = reordered(arg(0));
+    if(reordered != null) {
+      final Expr[] args = exprs.clone();
+      args[0] = reordered;
+      return cc.function(avg ? Function.AVG : Function.SUM, info, args);
+    }
+
     final Expr values = arg(0);
     if(values instanceof final RangeSeq rs) {
       return range(rs, avg);
