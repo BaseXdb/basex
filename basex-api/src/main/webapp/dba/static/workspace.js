@@ -200,7 +200,7 @@ function applyTab() {
 function showTab() {
   renderTabs();
   checkButtons();
-  if(_editor.setLanguage) _editor.setLanguage(fileLanguage(tab()?.name));
+  if(_editor.setLanguage) _editor.setLanguage(fileLanguage(tab()?.name, editorValue()));
   _editor.focus();
 }
 
@@ -343,7 +343,7 @@ async function runQuery() {
  */
 function resultLanguage(text) {
   const s = text.replace(/^\s+/, "");
-  if(s[0] === "<") return "xml";
+  if(s[0] === "<") return htmlContent(s) ? "html" : "xml";
   if(s[0] === "{" || s[0] === "[") return "json";
   return "text";
 }
@@ -406,17 +406,55 @@ function runnable() {
 }
 
 /**
- * Chooses the editor language from the file name: XQuery (see runnable), else by
- * extension, else plain text.
+ * Chooses the editor language from the file name: XQuery (see runnable), else by suffix or
+ * compound template suffix, else by content for unnamed documents, else plain text.
  * @param {string} name file name (may be empty)
+ * @param {string} text editor content
  * @returns {string} language for _editor.setLanguage
  */
-function fileLanguage(name) {
-  if(!name || XQUERY_SUFFIXES.test(name)) return "xquery";
-  const ext = name.replace(/^.*\./, "").toLowerCase();
-  if([ "xml", "xsd", "xsl", "xslt", "svg", "rng", "rdf", "wsdl", "xhtml" ].includes(ext)) return "xml";
-  if(ext === "json") return "json";
+function fileLanguage(name, text) {
+  if(name) {
+    const lower = name.toLowerCase();
+    if(XQUERY_SUFFIXES.test(lower)) return "xquery";
+    if(suffixed(lower, [ "xml", "xsd", "xsl", "xslt", "svg", "rng", "rdf", "wsdl", "xhtml" ])) return "xml";
+    if(suffixed(lower, [ "html", "htm" ])) return "html";
+    if(suffixed(lower, [ "json" ])) return "json";
+  } else {
+    return contentLanguage(text);
+  }
   return "text";
+}
+
+/**
+ * Indicates whether a file name ends in or wraps a known suffix, as in index.html.template.
+ * @param {string} name lower-case file name
+ * @param {Array<string>} suffixes suffixes
+ * @returns {boolean} result
+ */
+function suffixed(name, suffixes) {
+  return suffixes.some(suffix => name.endsWith(`.${suffix}`) || name.includes(`.${suffix}.`));
+}
+
+/**
+ * Guesses the language of an unnamed document from its content.
+ * @param {string} text editor content
+ * @returns {string} language for _editor.setLanguage
+ */
+function contentLanguage(text) {
+  const s = (text || "").replace(/^\s+/, "");
+  if(!s) return "xquery";
+  if(s[0] === "{" || s[0] === "[") return "json";
+  if(s[0] === "<") return htmlContent(s) ? "html" : "xml";
+  return "xquery";
+}
+
+/**
+ * Indicates whether serialized markup looks like an HTML document.
+ * @param {string} text text starting at the first non-whitespace character
+ * @returns {boolean} result
+ */
+function htmlContent(text) {
+  return /^<!doctype\s+html\b/i.test(text) || /^<html(?:\s|>|$)/i.test(text);
 }
 
 /**
@@ -609,6 +647,7 @@ _editor_changed = () => {
   // content the code wrote is not an edit, and must not be saved as a draft
   if(_writing) return;
   if(tab()) tab().edited = true;
+  if(_editor.setLanguage) _editor.setLanguage(fileLanguage(tab()?.name, editorValue()));
   renderTabs();
   checkButtons();
   saveDraft();
