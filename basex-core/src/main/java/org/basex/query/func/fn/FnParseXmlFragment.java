@@ -9,6 +9,7 @@ import org.basex.build.Parser;
 import org.basex.build.xml.*;
 import org.basex.build.xml.SAXHandler.*;
 import org.basex.core.*;
+import org.basex.core.CommonOptions.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -34,8 +35,8 @@ public class FnParseXmlFragment extends Docs {
     public static final StringOption BASE_URI =
         new StringOption(CommonOptions.BASE_URI, null, Types.ANY_URI_O);
     /** Remove whitespace-only text nodes. */
-    public static final BooleanOption STRIP_SPACE =
-        new BooleanOption(CommonOptions.STRIP_SPACE, false);
+    public static final EnumOption<StripSpace> STRIP_SPACE =
+        new EnumOption<>(CommonOptions.STRIP_SPACE, StripSpace.NONE);
     /** Retain the source location of parsed nodes (see {@link FnLocation}). */
     public static final BooleanOption RETAIN_LOCATION =
         new BooleanOption(CommonOptions.RETAIN_LOCATION, false);

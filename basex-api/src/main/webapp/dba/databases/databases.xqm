@@ -196,7 +196,8 @@ function dba:db-save(
   $indent    as xs:string?
 ) {
   (: indentation is only added for display :)
-  db:put($name, parse-xml($content, { 'strip-space': $indent = 'true' }), $resource),
+  db:put($name, parse-xml($content,
+    { 'strip-space': if ($indent = 'true') { 'all' } else { 'none' } }), $resource),
   update:output('')
 };
 

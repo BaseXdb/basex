@@ -3330,8 +3330,8 @@ return
     query(func.args("<a/>") + "/*[1][not(child::node())]", "<a/>");
     query(func.args("<a/>") + "/*[1][self::a][not(child::node())]", "<a/>");
     query(func.args("<x> <y> </y> </x>"), "<x> <y> </y> </x>");
-    query(func.args("<x> <y> </y> </x>", " { 'strip-space': false() }"), "<x> <y> </y> </x>");
-    query(func.args("<x> <y> </y> </x>", " { 'strip-space': true() }"), "<x><y/></x>");
+    query(func.args("<x> <y> </y> </x>", " { 'strip-space': 'none' }"), "<x> <y> </y> </x>");
+    query(func.args("<x> <y> </y> </x>", " { 'strip-space': 'all' }"), "<x><y/></x>");
     query(func.args("<x:doc xmlns:x='X'/>"), "<x:doc xmlns:x=\"X\"/>");
     query(func.args("<x:doc xmlns:x='X'/>", " { 'stripns': false() }"), "<x:doc xmlns:x=\"X\"/>");
     query(func.args("<x:doc xmlns:x='X'/>", " { 'stripns': true() }"), "<doc/>");
@@ -3397,9 +3397,9 @@ return
   @Test public void parseXmlFragment() {
     final Function func = PARSE_XML_FRAGMENT;
     query(func.args("<x> <y> </y> </x> <z/>"), "<x> <y> </y> </x> <z/>");
-    query(func.args("<x> <y> </y> </x> <z/>", " { 'strip-space': false() }"),
+    query(func.args("<x> <y> </y> </x> <z/>", " { 'strip-space': 'none' }"),
         "<x> <y> </y> </x> <z/>");
-    query(func.args("<x> <y> </y> </x> <z/>", " { 'strip-space': true() }"),
+    query(func.args("<x> <y> </y> </x> <z/>", " { 'strip-space': 'all' }"),
         "<x><y/></x><z/>");
     query(func.args("<x:doc xmlns:x='X'/>"), "<x:doc xmlns:x=\"X\"/>");
     query(func.args("<x:doc xmlns:x='X'/>", " { 'stripns': false() }"), "<x:doc xmlns:x=\"X\"/>");
