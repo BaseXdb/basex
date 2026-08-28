@@ -35,7 +35,7 @@ public final class DbAlterBackup extends DbAccessFn {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return dataLock(arg(0), true, true, visitor) && dataLock(arg(1), true, true, visitor) &&
+    return backupLock(arg(0), true, visitor) && backupLock(arg(1), true, visitor) &&
         visitAll(visitor, exprs);
   }
 }

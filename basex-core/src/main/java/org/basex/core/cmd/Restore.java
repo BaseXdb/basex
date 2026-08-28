@@ -96,14 +96,16 @@ public final class Restore extends ABackup {
 
   @Override
   public void addLocks() {
-    final LockList list = jc().locks.writes;
+    // the backup is only read, the database is overwritten
+    final Locks locks = jc().locks;
     final String name = args[0], db = Databases.name(name);
     if(db.isEmpty()) {
-      list.addGlobal();
+      locks.writes.addGlobal();
     } else {
       // not sure whether database or name of backup file is provided: lock both
-      list.add(name).add(db);
+      locks.writes.add(name).add(db);
     }
+    addBackupLocks(locks.reads, 0);
   }
 
   @Override

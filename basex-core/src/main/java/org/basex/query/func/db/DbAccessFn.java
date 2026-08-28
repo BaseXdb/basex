@@ -109,7 +109,15 @@ abstract class DbAccessFn extends StandardFunc {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return dataLock(arg(0), false, hasUPD(), visitor) && super.accept(visitor);
+    return dataLock(arg(0), false, writeLock(), visitor) && super.accept(visitor);
+  }
+
+  /**
+   * Indicates if the addressed database will be modified.
+   * @return result of check
+   */
+  protected boolean writeLock() {
+    return hasUPD();
   }
 
   /**

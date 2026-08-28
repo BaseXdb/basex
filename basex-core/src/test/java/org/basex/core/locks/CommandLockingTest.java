@@ -44,8 +44,11 @@ public final class CommandLockingTest extends SandboxTest {
   private static final LockList USER_LIST = new LockList().add(Locking.USER);
   /** StringList containing REPO lock string. */
   private static final LockList REPO_LIST = new LockList().add(Locking.REPO);
-  /** StringList containing BACKUP lock string and name. */
-  private static final LockList BACKUP_NAME = new LockList().add(NAME);
+  /** StringList containing the backup lock string of the test database. */
+  private static final LockList BACKUP_LIST = new LockList().add(Locking.backup(NAME));
+  /** StringList containing the backup lock strings of both test databases. */
+  private static final LockList BACKUPS_LIST = new LockList().
+      add(Locking.backup(NAME)).add(Locking.backup(NAME2));
   /** StringList containing java module test lock strings. */
   private static final LockList MODULE_LIST = new LockList().
       add(Locking.BASEX_PREFIX + QueryModuleTest.LOCK);
@@ -56,6 +59,7 @@ public final class CommandLockingTest extends SandboxTest {
   @Test public void commands() {
     ckDBs(new Add(FILE, FILE), true, CTX_LIST);
     ckDBs(new AlterDB(NAME, NAME2), true, new LockList().add(NAME).add(NAME2));
+    ckDBs(new AlterBackup(NAME, NAME2), true, BACKUPS_LIST);
     ckDBs(new AlterPassword(NAME, NAME), true, USER_LIST);
     ckDBs(new AlterUser(NAME, NAME), true, USER_LIST);
     ckDBs(new BinaryGet(FILE), false, CTX_LIST);
@@ -63,13 +67,13 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new Check(NAME), CTX_LIST, NAME_LIST);
     ckDBs(new Close(), false, CTX_LIST);
     ckDBs(new Copy(NAME2, NAME), new LockList().add(NAME2), NAME_LIST);
-    ckDBs(new CreateBackup(NAME), true, NAME_LIST);
+    ckDBs(new CreateBackup(NAME), NAME_LIST, BACKUP_LIST);
     ckDBs(new CreateDB(NAME), CTX_LIST, NAME_LIST);
     ckDBs(new CreateIndex(IndexType.TEXT), true, CTX_LIST);
     ckDBs(new CreateUser(NAME, NAME), true, USER_LIST);
     ckDBs(new Delete(FILE), true, CTX_LIST);
     ckDBs(new Dir(FILE), false, CTX_LIST);
-    ckDBs(new DropBackup(NAME), true, NAME_LIST);
+    ckDBs(new DropBackup(NAME), true, BACKUP_LIST);
     ckDBs(new DropDB(NAME + '*'), true, null);
     ckDBs(new DropDB(NAME), true, NAME_LIST);
     ckDBs(new DropIndex(IndexType.TEXT), true, CTX_LIST);
@@ -100,14 +104,14 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new RepoInstall(REPO + "/pkg3.xar", null), true, REPO_LIST);
     ckDBs(new RepoList(), false, REPO_LIST);
     ckDBs(new RepoDelete("http://www.pkg3.com", null), true, REPO_LIST);
-    ckDBs(new Restore(NAME), true, BACKUP_NAME);
+    ckDBs(new Restore(NAME), BACKUP_LIST, NAME_LIST);
     ckDBs(new Run(FILE), false, null);
     ckDBs(new Set(NAME, NAME), false, NONE);
     ckDBs(new ShowBackups(), false, null);
     ckDBs(new ShowOptions("DBPATH"), false, NONE);
     ckDBs(new ShowSessions(), false, NONE);
-    ckDBs(new ShowUsers(), false, NONE);
-    ckDBs(new ShowUsers(NAME), false, NONE);
+    ckDBs(new ShowUsers(), false, USER_LIST);
+    ckDBs(new ShowUsers(NAME), false, USER_LIST);
     ckDBs(new org.basex.core.cmd.Test(NAME), true, null);
   }
 
@@ -189,6 +193,12 @@ public final class CommandLockingTest extends SandboxTest {
     // updates in a modify clause do not promote read locks
     ckDBs(new XQuery("copy $c := " + _DB_GET.args(NAME) + "/* " +
         "modify delete node $c/x return $c"), false, NAME_LIST);
+    // locks that do not refer to databases are not promoted
+    ckDBs(new XQuery("let $users := " + _USER_LIST.args() + " return delete node " +
+        _DB_GET.args(NAME) + "/*[. = $users]"), USER_LIST, NAME_LIST);
+    // name of a database that is read cannot be resolved statically: global read lock
+    ckDBs(new XQuery(_DB_PUT.args(NAME, " " + _DB_GET.args(
+        " string(" + _RANDOM_INTEGER.args() + ")"), FILE)), null, NAME_LIST);
   }
 
   /** Tests that the first operand of a simple map is evaluated in the outer focus. */
@@ -238,8 +248,8 @@ public final class CommandLockingTest extends SandboxTest {
 
   /** Test user module. */
   @Test public void user() {
-    ckDBs(new XQuery(_USER_LIST.args()), false, NONE);
-    ckDBs(new XQuery(_USER_LIST_DETAILS.args()), false, NONE);
+    ckDBs(new XQuery(_USER_LIST.args()), false, USER_LIST);
+    ckDBs(new XQuery(_USER_LIST_DETAILS.args()), false, USER_LIST);
   }
 
   /** Test database module. */
@@ -283,6 +293,20 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new XQuery(_DB_PUT_BINARY.args(NAME, "binary", "path")), true, NAME_LIST);
     ckDBs(new XQuery(_DB_PUT_VALUE.args(NAME, "value", "path")), true, NAME_LIST);
     ckDBs(new XQuery(_DB_RENAME.args(NAME, FILE, FILE + '2')), true, NAME_LIST);
+
+    // Backups: the database and its backups are locked separately
+    ckDBs(new XQuery(_DB_BACKUPS.args()), false, null);
+    ckDBs(new XQuery(_DB_BACKUPS.args(NAME)), false, BACKUP_LIST);
+    ckDBs(new XQuery(_DB_CREATE_BACKUP.args(NAME)), NAME_LIST, BACKUP_LIST);
+    ckDBs(new XQuery(_DB_DROP_BACKUP.args(NAME)), true, BACKUP_LIST);
+    ckDBs(new XQuery(_DB_ALTER_BACKUP.args(NAME, NAME2)), true, BACKUPS_LIST);
+    ckDBs(new XQuery(_DB_RESTORE.args(NAME)), BACKUP_LIST, NAME_LIST);
+
+    // Copying and renaming: the source is only read by db:copy
+    ckDBs(new XQuery(_DB_COPY.args(NAME, NAME2)), NAME_LIST, NAME2_LIST);
+    ckDBs(new XQuery(_DB_ALTER.args(NAME, NAME2)), true,
+        new LockList().add(NAME).add(NAME2));
+    ckDBs(new XQuery(_DB_EXPORT.args(NAME, FILE)), false, NAME_LIST);
 
     // Helper Functions
     ckDBs(new XQuery(_DB_EXISTS.args(NAME)), false, NAME_LIST);

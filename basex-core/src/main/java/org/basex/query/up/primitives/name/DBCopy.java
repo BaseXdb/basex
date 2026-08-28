@@ -41,8 +41,6 @@ public final class DBCopy extends NameUpdate {
 
   @Override
   public void apply() throws QueryException {
-    close();
-
     try {
       for(final String target : targets) {
         close(target, qc, info);
@@ -63,7 +61,7 @@ public final class DBCopy extends NameUpdate {
 
   @Override
   public void databases(final StringList db) {
-    super.databases(db);
+    // the source database is not modified
     for(final String target : targets) db.add(target);
   }
 

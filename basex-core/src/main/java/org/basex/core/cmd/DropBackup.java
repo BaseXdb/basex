@@ -58,7 +58,7 @@ public final class DropBackup extends ABackup {
 
   @Override
   public void addLocks() {
-    addLocks(jc().locks.writes, 0);
+    addBackupLocks(jc().locks.writes, 0);
   }
 
   @Override

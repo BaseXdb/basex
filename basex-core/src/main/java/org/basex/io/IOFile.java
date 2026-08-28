@@ -347,7 +347,10 @@ public final class IOFile extends IO {
   public void copyTo(final IOFile target) throws IOException {
     // create parent directory of target file
     target.parent().md();
-    Files.copy(toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+    // copy via stream: a path-based copy locks out readers (database files are opened in rw mode)
+    try(InputStream in = Files.newInputStream(toPath())) {
+      Files.copy(in, target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+    }
   }
 
   /**

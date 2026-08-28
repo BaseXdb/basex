@@ -82,8 +82,8 @@ public final class AlterBackup extends ABackup {
   @Override
   public void addLocks() {
     final LockList list = jc().locks.writes;
-    addLocks(list, 0);
-    addLocks(list, 1);
+    addBackupLocks(list, 0);
+    addBackupLocks(list, 1);
   }
 
   @Override

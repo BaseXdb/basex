@@ -159,7 +159,7 @@ public class XQueryEval extends StandardFunc {
 
   @Override
   public final boolean accept(final ASTVisitor visitor) {
-    // locked resources cannot be detected statically
-    return visitor.lock((String) null, false) && super.accept(visitor);
+    // databases cannot be detected statically; the nested query is updating or read-only
+    return visitor.lock((String) null, hasUPD()) && super.accept(visitor);
   }
 }

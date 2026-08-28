@@ -5,7 +5,6 @@ import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -17,7 +16,7 @@ import org.basex.util.list.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class DbBackups extends DbAccessFn {
+public final class DbBackups extends BackupFn {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final String name = toStringOrNull(arg(0), qc);
@@ -40,10 +39,5 @@ public final class DbBackups extends DbAccessFn {
         return elem.finish();
       }
     };
-  }
-
-  @Override
-  public boolean accept(final ASTVisitor visitor) {
-    return visitAll(visitor, args());
   }
 }

@@ -15,7 +15,7 @@ public interface LockCollector {
    * Notifies the visitor of database locks.
    * @param list function supplying lock strings
    * @param write write access
-   * @return if the locks could be resolved statically ({@code true} by default)
+   * @return if more expressions should be visited ({@code true} by default)
    */
   default boolean lock(final Supplier<ArrayList<String>> list, final boolean write) {
     return true;
@@ -23,11 +23,19 @@ public interface LockCollector {
 
   /**
    * Notifies the visitor of a database lock.
-   * @param lock lock string (can be {@code null})
+   * @param lock lock string ({@code null} if all databases need to be locked)
    * @param write write access
-   * @return if the lock could be resolved statically ({@code true} by default)
+   * @return if more expressions should be visited ({@code true} by default)
    */
   default boolean lock(final String lock, final boolean write) {
+    return true;
+  }
+
+  /**
+   * Notifies the visitor of locks whose names and access type cannot be resolved statically.
+   * @return if more expressions should be visited ({@code true} by default)
+   */
+  default boolean unknownLocks() {
     return true;
   }
 

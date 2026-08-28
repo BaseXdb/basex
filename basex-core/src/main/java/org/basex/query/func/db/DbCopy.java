@@ -43,4 +43,10 @@ public class DbCopy extends DbAccessFn {
   public final boolean accept(final ASTVisitor visitor) {
     return dataLock(arg(1), false, true, visitor) && super.accept(visitor);
   }
+
+  @Override
+  protected boolean writeLock() {
+    // the source database is only read
+    return false;
+  }
 }

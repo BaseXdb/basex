@@ -46,20 +46,26 @@ public final class LockVisitor extends ASTVisitor {
 
   @Override
   public boolean lock(final String lock, final boolean write) {
-    final boolean local = lock != null;
-    if(local) {
+    final LockList list = write ? locks.writes : locks.reads;
+    if(lock == null) {
+      // name of database cannot be resolved statically: lock all databases
+      list.addGlobal();
+    } else if(lock != Locking.CONTEXT || level == 0) {
       // if context value is found on top level, it will refer to currently opened database
-      if(lock != Locking.CONTEXT || level == 0) (write ? locks.writes : locks.reads).add(lock);
+      list.add(lock);
     }
-    return local;
+    return true;
   }
 
   @Override
   public boolean lock(final Supplier<ArrayList<String>> list, final boolean write) {
-    for(final String lock : list.get()) {
-      if(!lock(lock, write)) return false;
-    }
+    for(final String lock : list.get()) lock(lock, write);
     return true;
+  }
+
+  @Override
+  public boolean unknownLocks() {
+    return false;
   }
 
   @Override
@@ -151,13 +157,20 @@ public final class LockVisitor extends ASTVisitor {
   }
 
   /**
-   * Promotes all read locks to write locks if an update target could not be resolved statically.
+   * Promotes all database read locks to write locks if an update target could not be resolved
+   * statically.
    */
   public void finish() {
     // sound as all databases that can be reached by the query have been read-locked
-    if(unresolved) {
-      locks.writes.add(locks.reads);
-      locks.reads.reset();
+    if(!unresolved) return;
+    final LockList reads = locks.reads, writes = locks.writes;
+    if(reads.global()) {
+      writes.addGlobal();
+    } else {
+      // users, repositories and backups are never the target of a node update
+      for(final String lock : reads) {
+        if(Locking.database(lock)) writes.add(lock);
+      }
     }
   }
 

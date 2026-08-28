@@ -16,4 +16,10 @@ public final class DbAlter extends DbCopy {
     copy(qc, false);
     return Empty.VALUE;
   }
+
+  @Override
+  protected boolean writeLock() {
+    // the source database is renamed
+    return true;
+  }
 }

@@ -8,6 +8,7 @@ import java.time.*;
 import java.util.zip.*;
 
 import org.basex.core.*;
+import org.basex.core.locks.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
 import org.basex.data.*;
@@ -121,7 +122,10 @@ public final class CreateBackup extends ABackup {
 
   @Override
   public void addLocks() {
-    addLocks(jc().locks.writes, 0);
+    // the database is only read, its backups are extended
+    final Locks locks = jc().locks;
+    addLocks(locks.reads, 0);
+    addBackupLocks(locks.writes, 0);
   }
 
   @Override

@@ -44,6 +44,8 @@ public final class Locking {
   public static final String USER = INTERNAL_PREFIX + "user";
   /** Special lock identifier for repository commands. */
   public static final String REPO = INTERNAL_PREFIX + "repo";
+  /** Prefix for locks on the backups of a database. */
+  private static final String BACKUP_PREFIX = INTERNAL_PREFIX + "backup:";
 
   /** Fair ordering policy; prevents starvation, but reduces parallelism. */
   private final boolean fair;
@@ -242,6 +244,24 @@ public final class Locking {
       (write ? lock.writeLock() : lock.readLock()).unlock();
       if(lock.unpin()) localLocks.remove(string);
     }
+  }
+
+  /**
+   * Indicates if a lock key refers to a database.
+   * @param lock lock key
+   * @return result of check
+   */
+  public static boolean database(final String lock) {
+    return !lock.startsWith(INTERNAL_PREFIX) || Strings.eq(lock, CONTEXT, COLLECTION);
+  }
+
+  /**
+   * Returns the lock key for the backups of a database.
+   * @param db name of the database
+   * @return lock key
+   */
+  public static String backup(final String db) {
+    return BACKUP_PREFIX + db;
   }
 
   /**

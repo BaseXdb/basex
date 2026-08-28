@@ -14,6 +14,7 @@ import java.util.function.*;
 
 import org.basex.core.*;
 import org.basex.core.jobs.*;
+import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.*;
@@ -1040,7 +1041,7 @@ public abstract class StandardFunc extends Arr {
   /**
    * Tries to lock a database supplied by the specified argument.
    * @param expr expression
-   * @param backup backup flag
+   * @param backup the argument may address a backup
    * @param write write access
    * @param visitor visitor
    * @return result of check
@@ -1049,22 +1050,43 @@ public abstract class StandardFunc extends Arr {
       final ASTVisitor visitor) {
     return visitor.lock(() -> {
       final ArrayList<String> list = new ArrayList<>(1);
-      String name = expr instanceof final Str str ? string(str.string()) :
-        expr instanceof final Atm atm ? string(atm.string(info)) : null;
-      if(name != null) {
-        if(backup) {
-          final String db = Databases.name(name);
-          if(db.isEmpty()) {
-            name = db;
-          } else {
-            list.add(db);
-          }
-        }
-        if(name.isEmpty()) name = null;
+      String name = dbName(expr);
+      if(name != null && backup) {
+        final String db = Databases.name(name);
+        if(db.isEmpty()) name = null;
+        else list.add(db);
       }
       list.add(name);
       return list;
     }, write);
+  }
+
+  /**
+   * Tries to lock the backups of a database supplied by the specified argument.
+   * @param expr expression
+   * @param write write access
+   * @param visitor visitor
+   * @return result of check
+   */
+  protected final boolean backupLock(final Expr expr, final boolean write,
+      final ASTVisitor visitor) {
+    return visitor.lock(() -> {
+      final ArrayList<String> list = new ArrayList<>(1);
+      final String name = dbName(expr), db = name == null ? null : Databases.name(name);
+      list.add(db == null || db.isEmpty() ? null : Locking.backup(db));
+      return list;
+    }, write);
+  }
+
+  /**
+   * Returns the database name supplied by the specified argument.
+   * @param expr expression
+   * @return name, or {@code null} if it cannot be resolved statically
+   */
+  private String dbName(final Expr expr) {
+    final String name = expr instanceof final Str str ? string(str.string()) :
+      expr instanceof final Atm atm ? string(atm.string(info)) : null;
+    return name == null || name.isEmpty() ? null : name;
   }
 
   /**
