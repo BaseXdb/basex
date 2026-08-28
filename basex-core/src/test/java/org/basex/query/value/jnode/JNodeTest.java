@@ -154,11 +154,11 @@ public final class JNodeTest extends SandboxTest {
     query("jtree([ 1, 2 ]) ! (jnode(1) is jnode(2))", false);
     query("jtree([ 1, 2 ]) ! (jnode(2) is jnode(1))", false);
 
-    // sequence-valued node: children with the same key are told apart by their position
-    query("jtree(({ 'a': 1 }, { 'a': 2 })) ! (a[1] is a[1])", true);
-    query("jtree(({ 'a': 1 }, { 'a': 2 })) ! (a[1] is a[2])", false);
-    query("jtree(({ 'a': 1 }, { 'a': 2 })) ! (a[2] is a[1])", false);
-    query("jtree(({ 'a': 1 }, { 'a': 2 })) ! count(distinct-ordered-nodes((a[1], a[2])))", 2);
+    // sequence JNode: children with the same key are told apart by their parent
+    query("jtree(({ 'a': 1 }, { 'a': 2 })) ! ((*/a)[1] is (*/a)[1])", true);
+    query("jtree(({ 'a': 1 }, { 'a': 2 })) ! ((*/a)[1] is (*/a)[2])", false);
+    query("jtree(({ 'a': 1 }, { 'a': 2 })) ! ((*/a)[2] is (*/a)[1])", false);
+    query("jtree(({ 'a': 1 }, { 'a': 2 })) ! count(distinct-ordered-nodes(*/a))", 2);
   }
 
   /** Comparison. */
@@ -190,9 +190,9 @@ public final class JNodeTest extends SandboxTest {
     query("jtree([ 1, 2 ]) ! (jnode(2) << jnode(1))", false);
     query("jtree([ 1, 2 ]) ! (jnode(2) >> jnode(1))", true);
 
-    // sequence-valued node: children with the same key are ordered by their position
-    query("jtree(({ 'a': 1 }, { 'a': 2 })) ! (a[1] << a[2])", true);
-    query("jtree(({ 'a': 1 }, { 'a': 2 })) ! (a[2] << a[1])", false);
+    // sequence JNode: children with the same key are ordered by their parent
+    query("jtree(({ 'a': 1 }, { 'a': 2 })) ! ((*/a)[1] << (*/a)[2])", true);
+    query("jtree(({ 'a': 1 }, { 'a': 2 })) ! ((*/a)[2] << (*/a)[1])", false);
   }
 
   /** Root. */
@@ -218,6 +218,37 @@ public final class JNodeTest extends SandboxTest {
     assertFalse(bxyNode.hasChildren());
   }
 
+  /** Sequence JNodes: a value with more than one item gets its own level of children. */
+  @Test public void sequence() {
+    // the children of a sequence JNode are keyed by their position
+    query("jtree({ 'c': (44, 55) })/c => count()", 1);
+    query("jtree({ 'c': (44, 55) })/c/* => count()", 2);
+    query("jtree({ 'c': (44, 55) })/c/* ! jkey()", "1\n2");
+    query("jtree({ 'c': (44, 55) })/c/* ! jvalue()", "44\n55");
+    query("jtree({ 'c': (44, 55) })/c/jnode(2) ! jvalue()", 55);
+    query("jtree({ 'c': (44, 55) })//jnode() => count()", 3);
+
+    // empty and singleton values are leaves
+    query("jtree({ 'c': 44 })/c/* => count()", 0);
+    query("jtree({ 'c': () })/c/* => count()", 0);
+    query("jtree(42)/* => count()", 0);
+    query("jtree(())/* => count()", 0);
+
+    // a root JNode may wrap a sequence as well
+    query("jtree((1, 2, 3))/* ! jkey()", "1\n2\n3");
+    query("jtree((1, 2, 3))/* ! jvalue()", "1\n2\n3");
+
+    // maps and arrays in a sequence are only reachable via the sequence JNode
+    query("jtree(({ 'a': 1 }, { 'a': 2 }))/a => count()", 0);
+    query("jtree(({ 'a': 1 }, { 'a': 2 }))/*/a ! jvalue()", "1\n2");
+    query("jtree(({ 'a': 1 }, { 'a': 2 }))//a ! jvalue()", "1\n2");
+    query("jtree(([ 1 ], [ 2 ]))/*/* ! jvalue()", "1\n2");
+
+    // the parent of a sequence item is the sequence JNode, not the map entry
+    query("jtree({ 'c': (44, 55) })/c/jnode(1)/.. ! jkey()", "c");
+    query("jtree({ 'c': (44, 55) })/c/jnode(1)/ancestor::jnode() => count()", 2);
+  }
+
   /**
    * Deep equality.
    * @throws QueryException query exception
@@ -238,6 +269,12 @@ public final class JNodeTest extends SandboxTest {
     assertEquals(STRING, rootNode.serialize().toString());
     query(JTREE_STRING, STRING);
     query(JTREE_STRING + "/.", STRING);
+
+    // a JNode is wrapped in its container; items of a sequence have none
+    query("jtree({ 'a': 11 })/a", "{\"a\":11}");
+    query("jtree([ 22, 33 ])/*", "[22]\n[33]");
+    query("jtree({ 'c': (44, 55) })/c/*", "44\n55");
+    query("jtree((1, [ 2 ], { 'k': 3 }))/*", "1\n[2]\n{\"k\":3}");
   }
 
   /** Node tests. */

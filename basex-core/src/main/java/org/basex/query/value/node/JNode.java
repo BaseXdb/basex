@@ -28,8 +28,6 @@ public final class JNode extends GNode {
   public final Item key;
   /** Value. */
   public final Value value;
-  /** Sequence position (starts with {@code 1}). */
-  public final int position;
 
   /** Parent node (can be {@code null}). */
   private final JNode parent;
@@ -41,27 +39,18 @@ public final class JNode extends GNode {
    * @param value value
    */
   public JNode(final Value value) {
-    this(Empty.VALUE, value, null, -1, 0);
+    this(Empty.VALUE, value, null, -1);
   }
 
   /**
    * Constructor.
    * @param parent parent node
-   * @param index index ({@code -1} if not initialized yet)
+   * @param index child index
    */
   public JNode(final JNode parent, final int index) {
-    this((XQStruct) parent.value, parent, index, 1);
-  }
-
-  /**
-   * Constructor.
-   * @param struct map or array with key and value
-   * @param parent parent node
-   * @param index index ({@code -1} if not initialized yet)
-   * @param position sequence position (starts with {@code 1})
-   */
-  public JNode(final XQStruct struct, final JNode parent, final int index, final int position) {
-    this(struct.keyAt(index), struct.valueAt(index), parent, index, position);
+    this(parent.value instanceof final XQMap map ? map.keyAt(index) : Itr.get(index + 1),
+      parent.value instanceof final XQStruct struct ? struct.valueAt(index) :
+        parent.value.itemAt(index), parent, index);
   }
 
   /**
@@ -70,16 +59,13 @@ public final class JNode extends GNode {
    * @param value value
    * @param parent parent node (can be {@code null})
    * @param index index ({@code -1} if not initialized yet)
-   * @param position sequence position (starts with {@code 1})
    */
-  public JNode(final Item key, final Value value, final JNode parent, final int index,
-      final int position) {
+  public JNode(final Item key, final Value value, final JNode parent, final int index) {
     super(NodeType.JNODE);
     this.key = key;
     this.value = value;
     this.parent = parent;
     this.index = index;
-    this.position = position;
   }
 
   /**
@@ -92,10 +78,10 @@ public final class JNode extends GNode {
 
   /**
    * Returns the map or array that contains this non-root node.
-   * @return container ({@code null} for the root node)
+   * @return container ({@code null} for a root node or a node with a sequence parent)
    */
   public XQStruct container() {
-    return parent != null ? (XQStruct) parent.value.itemAt(position - 1) : null;
+    return parent != null && parent.value instanceof final XQStruct struct ? struct : null;
   }
 
   @Override
@@ -148,16 +134,15 @@ public final class JNode extends GNode {
   }
 
   /**
-   * Returns the sequence positions and child indexes leading from the root to this node.
+   * Returns the child indexes leading from the root to this node.
    * @param depth depth of this node
    * @return path
    */
   private int[] path(final int depth) {
-    final int[] path = new int[depth * 2];
+    final int[] path = new int[depth];
     JNode n = this;
     for(int i = depth - 1; i >= 0; i--) {
-      path[i * 2] = n.position;
-      path[i * 2 + 1] = n.index();
+      path[i] = n.index();
       n = n.parent;
     }
     return path;
@@ -195,9 +180,7 @@ public final class JNode extends GNode {
   public byte[] id() {
     final TokenBuilder tb = new TokenBuilder(Token.ID);
     for(JNode n = this; n != null; n = n.parent) {
-      if(n.parent != null) tb.addLong(n.position).add('p').addLong(n.index() + 1);
-      else tb.addLong(n.id);
-      tb.add('j');
+      tb.addLong(n.parent != null ? n.index() + 1 : n.id).add('j');
     }
     return tb.removeLast().finish();
   }
@@ -214,7 +197,27 @@ public final class JNode extends GNode {
 
   @Override
   public boolean hasChildren() {
-    return value instanceof final XQStruct struct && struct.structSize() != 0;
+    return childCount() != 0;
+  }
+
+  /**
+   * Returns the number of children: the entries of a map, the members of an array, or the items
+   * of a sequence with more than one item.
+   * @return number of children ({@code 0} for a leaf)
+   */
+  private long childCount() {
+    return value instanceof final XQStruct struct ? struct.structSize() :
+      value.size() > 1 ? value.size() : 0;
+  }
+
+  /**
+   * Returns the static type of the values of the children.
+   * @return type
+   */
+  private Type childType() {
+    return (value instanceof final XQMap map ? ((MapType) map.type).valueType() :
+      value instanceof final XQArray array ? ((ArrayType) array.type).valueType() :
+      value.seqType()).type;
   }
 
   @Override
@@ -224,79 +227,55 @@ public final class JNode extends GNode {
 
   @Override
   public BasicNodeIter childIter(final Test test, final boolean descendant) {
-    // single maps or arrays, leaves
-    if(value instanceof Item) {
-      // leaves have no children
-      if(!(value instanceof final XQStruct struct)) return BasicNodeIter.EMPTY;
+    // leaves have no children
+    final long cs = childCount();
+    if(cs == 0) return BasicNodeIter.EMPTY;
 
-      // direct lookup is always possible for the child axis; for the descendant axis it is
-      // only safe over atomic-leaf values, as nested structures would hide deeper matches
-      final boolean direct = !descendant || (
-          value instanceof XQMap ? ((MapType) value.type).valueType() :
-        ((ArrayType) value.type).valueType()).type.instanceOf(BasicType.ANY_ATOMIC_TYPE);
-      final Item item = direct && test != null ? test.key() : null;
-      if(item != null) {
-        final JNode child = child(item);
-        return child != null ? singleIter(child) : BasicNodeIter.EMPTY;
-      }
-
-      // map or array: sequential scan
-      return new BasicNodeIter() {
-        final long ss = struct.structSize();
-        long s;
-
-        @Override
-        public GNode next() {
-          return s < ss ? get(s++) : null;
-        }
-        @Override
-        public long size() {
-          return ss;
-        }
-        @Override
-        public GNode get(final long i) {
-          return new JNode(JNode.this, (int) i);
-        }
-      };
+    // direct lookup is always possible for the child axis; for the descendant axis it is
+    // only safe over atomic-leaf values, as nested structures would hide deeper matches
+    final boolean direct = !descendant || childType().instanceOf(BasicType.ANY_ATOMIC_TYPE);
+    final Item item = direct && test != null ? test.key() : null;
+    if(item != null) {
+      final JNode child = child(item);
+      return child != null ? singleIter(child) : BasicNodeIter.EMPTY;
     }
 
-    // sequences: multiple scans
+    // map, array or sequence: sequential scan
     return new BasicNodeIter() {
-      XQStruct struct;
-      int p, s, ss;
+      long s;
 
       @Override
       public GNode next() {
-        while(true) {
-          if(struct != null && s < ss) return new JNode(struct, JNode.this, s++, p);
-          if(p == value.size()) return null;
-          if(value.itemAt(p++) instanceof final XQStruct st) {
-            struct = st;
-            ss = (int) st.structSize();
-            s = 0;
-          } else {
-            struct = null;
-          }
-        }
+        return s < cs ? get(s++) : null;
+      }
+      @Override
+      public long size() {
+        return cs;
+      }
+      @Override
+      public GNode get(final long i) {
+        return new JNode(JNode.this, (int) i);
       }
     };
   }
 
   /**
    * Returns the child node selected by a key via direct lookup.
-   * @param item key (map: any atomic key; array: in-range integral numeric key, 1-based)
+   * @param item key (map: any atomic key; array or sequence: in-range integral numeric key,
+   *   1-based)
    * @return child node or {@code null} if no child is selected
    */
   public JNode child(final Item item) {
     if(value instanceof final XQMap map) {
       final Value v = map.value(item);
-      return v != null ? new JNode(item, v, this, -1, 1) : null;
+      return v != null ? new JNode(item, v, this, -1) : null;
     }
-    if(value instanceof final XQArray array && item instanceof final ANum num) {
+    if(item instanceof final ANum num) {
       final double d = num.dbl();
       final long i = (long) d - 1;
-      if(d == i + 1 && i >= 0 && i < array.structSize()) {
-        return new JNode(item, array.valueAt(i), this, (int) i, 1);
+      if(d == i + 1 && i >= 0 && i < childCount()) {
+        return new JNode(item, value instanceof final XQArray array ? array.valueAt(i) :
+          value.itemAt(i), this, (int) i);
       }
     }
     return null;

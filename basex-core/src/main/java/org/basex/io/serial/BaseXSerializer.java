@@ -62,15 +62,17 @@ public final class BaseXSerializer extends AdaptiveSerializer {
 
   @Override
   protected void jnode(final JNode jnode) throws IOException {
-    if(jnode.isRoot()) {
+    final XQStruct container = jnode.container();
+    if(container instanceof XQMap) {
+      map(XQMap.get(jnode.key, jnode.value));
+    } else if(container instanceof XQArray) {
+      array(XQArray.get(jnode.value));
+    } else {
+      // root nodes and items of a sequence have no container
       reset();
       for(final Item item : jnode.value) {
         serialize(item);
       }
-    } else if(jnode.container() instanceof XQArray) {
-      array(XQArray.get(jnode.value));
-    } else {
-      map(XQMap.get(jnode.key, jnode.value));
     }
   }
 }

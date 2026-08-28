@@ -62,8 +62,8 @@ public final class SelectorStep extends Step {
     final GNodeList list = new GNodeList();
     final Value value = focus.value;
     if(axis == Axis.CHILD && keys instanceof final Item key &&
-        toContextNode(value) instanceof final JNode jnode && jnode.value instanceof XQStruct) {
-      // child axis, single key, single struct: direct key lookup
+        toContextNode(value) instanceof final JNode jnode) {
+      // child axis, single key: direct key lookup
       final JNode child = jnode.child(key);
       if(child != null) list.add(child);
     } else {

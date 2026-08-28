@@ -418,9 +418,6 @@ public enum Function implements AFunction {
   JKEY(FnJkey::new, "jkey(input?)",
       params(JNODE_ZO), ANY_ATOMIC_TYPE_ZO),
   /** XQuery function. */
-  JPOSITION(FnJposition::new, "jposition(input?)",
-      params(JNODE_ZO), INTEGER_ZO),
-  /** XQuery function. */
   JSON_DOC(FnJsonDoc::new, "json-doc(source, options?)",
       params(STRING_ZO, MAP_ZO), ITEM_ZO, flag(NDT), FN_URI, Perm.CREATE),
   /** XQuery function. */
