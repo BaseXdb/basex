@@ -17,10 +17,10 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class AxisPath extends Path {
-  /** Indicates if results can be cached: no free variables, deterministic. */
+  /** Indicates if results can be cached. */
   boolean cacheable;
-  /** Indicates if the root expression is independent of the query focus. */
-  boolean independentRoot;
+  /** Indicates if the root expression is static. */
+  boolean staticRoot;
 
   /**
    * Constructor.
@@ -35,9 +35,9 @@ public abstract class AxisPath extends Path {
   /**
    * Assigns the properties that control the caching of results.
    */
-  void cacheProperties() {
+  void optimize() {
     cacheable = !hasFreeVars() && !has(Flag.NDT);
-    independentRoot = root != null && !root.has(Flag.CTX);
+    staticRoot = root != null && !root.has(Flag.CTX);
   }
 
   @Override

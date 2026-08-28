@@ -196,7 +196,7 @@ public abstract class Path extends ParseExpr {
 
     // choose the best path implementation (dummy will be used for type checking)
     final Expr path = copyType(get(info, root == null && rt instanceof Dummy ? rt : root, steps));
-    if(path instanceof final AxisPath ap) ap.cacheProperties();
+    if(path instanceof final AxisPath ap) ap.optimize();
     return path;
   }
 
