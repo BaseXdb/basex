@@ -16,6 +16,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 
 /**
  * Function implementation.
@@ -51,6 +52,12 @@ public final class FnItemsAt extends StandardFunc {
         final Expr input = arg(0);
         if(input.seqType().zeroOrOne()) {
           return l == 0 ? input.item(qc, info) : Empty.VALUE;
+        }
+
+        // direct access, no iterator required
+        if(input instanceof Value || input instanceof VarRef) {
+          final Value value = input.value(qc);
+          return l < value.size() ? value.itemAt(l) : Empty.VALUE;
         }
 
         // fast route if the result size is known

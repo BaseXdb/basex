@@ -139,16 +139,16 @@ public final class SeqType {
    */
   private boolean instance(final Value value, final boolean coerce) {
     final Type dt = TypeRef.deref(this.type);
-    if(eq(value.seqType())) return true;
-
     // check cardinality
     final long size = value.size();
     if(!occ.check(size)) return false;
     if(size == 0) return true;
 
     // try shortcut (type of value may be specific enough)
-    if(!(coerce && dt instanceof FType || dt instanceof ChoiceItemType)) {
-      if(value.type.instanceOf(dt)) return true;
+    if(coerce && dt instanceof FType || dt instanceof ChoiceItemType) {
+      if(eq(value.seqType())) return true;
+    } else if(value.type.instanceOf(dt)) {
+      return true;
     }
     // check single item
     if(size == 1) return instance((Item) value, coerce);

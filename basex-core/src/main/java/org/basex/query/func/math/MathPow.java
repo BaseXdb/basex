@@ -59,6 +59,6 @@ public final class MathPow extends MathFn {
       if(Double.isNaN(exp)) return -1;
       if(Double.isInfinite(exp)) return 1;
     }
-    return pow(base, exp);
+    return exp == 2 ? base * base : pow(base, exp);
   }
 }

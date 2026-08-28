@@ -17,6 +17,9 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public abstract class ANum extends Item {
+  /** Largest integer that has an exact double representation. */
+  private static final long EXACT = 1L << 53;
+
   /**
    * Constructor.
    * @param type type
@@ -155,6 +158,14 @@ public abstract class ANum extends Item {
       if(!Double.isFinite(d)) {
         return d == Double.NEGATIVE_INFINITY ? 1 : d == Double.POSITIVE_INFINITY ? -1 :
           transitive ? 1 : NAN_DUMMY;
+      }
+      // integers below the exact double range can be compared without decimal conversion
+      if(this instanceof Itr) {
+        final long l = itr();
+        if(l >= -EXACT && l <= EXACT) {
+          final double d1 = l;
+          return d1 < d ? -1 : d1 > d ? 1 : 0;
+        }
       }
     }
     return dec(ii).compareTo(num2.dec(ii));

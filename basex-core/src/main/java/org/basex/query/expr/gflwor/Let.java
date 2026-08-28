@@ -46,7 +46,7 @@ public final class Let extends ForLet {
   @Override
   LetEval eval(final Eval sub) {
     if(sub instanceof final LetEval eval) {
-      eval.lets.add(this);
+      eval.add(this);
       return eval;
     }
     return new LetEval(this, sub);
@@ -125,7 +125,7 @@ public final class Let extends ForLet {
   /** Evaluator for a block of {@code let} expressions. */
   private static final class LetEval extends Eval {
     /** Let expressions of the current block, in declaration order. */
-    private final ArrayList<Let> lets;
+    private Let[] lets;
     /** Sub-evaluator. */
     private final Eval sub;
 
@@ -135,9 +135,18 @@ public final class Let extends ForLet {
      * @param sub sub-evaluator
      */
     LetEval(final Let let, final Eval sub) {
-      lets = new ArrayList<>(4);
-      lets.add(let);
+      lets = new Let[] { let };
       this.sub = sub;
+    }
+
+    /**
+     * Appends a let binding to the block.
+     * @param let let binding
+     */
+    void add(final Let let) {
+      final int ls = lets.length;
+      lets = Arrays.copyOf(lets, ls + 1);
+      lets[ls] = let;
     }
 
     @Override
