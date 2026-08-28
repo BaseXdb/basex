@@ -143,7 +143,9 @@ public abstract class Filter extends Preds {
           ex = cc.function(ITEMS_AT, info, add.apply(expr), pred.arg(0));
         } else {
           // E[pos: MIN, MAX] → util:range(E, MIN, MAX)
-          ex = cc.function(_UTIL_RANGE, info, add.apply(expr), pred.arg(0), pred.arg(1));
+          final Expr min = pred.arg(0), max = pred.arg(1);
+          if(min.seqType().one() && max.seqType().one())
+            ex = cc.function(_UTIL_RANGE, info, add.apply(expr), min, max);
         }
       } else if(pred instanceof final Pos pos) {
         final Expr posExpr = pos.expr;
