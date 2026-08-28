@@ -651,6 +651,15 @@ public final class ExprTest extends SandboxTest {
     // GH-2224: Unexpected exception, arithmetic operations with positional expression
     check("document { <X/> }//X[not(position() * 2 = last())]", "<X/>");
     check("document { <X/> }//X[not(position() + position() = last())]", "<X/>");
+
+    // GH-2747: Avoid rewriting positional range predicates to util:range if bounds may be empty
+    final String empty = "let $x := 0\n"
+        + "let $empty := head(for $c at $i in $x where $c != 0 return $i)\n"
+        + "return ";
+    query(empty + "$x[position() >= $empty]", "");
+    query(empty + "$x[position() >  $empty]", "");
+    query(empty + "$x[position() <= $empty]", "");
+    query(empty + "$x[position() <  $empty]", "");
   }
 
   /** Predicates. */
