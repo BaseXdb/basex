@@ -590,7 +590,10 @@ public final class SeqType {
    */
   public boolean mayBeNumber() {
     if(zero()) return false;
-    return type.isNumber() || type == BasicType.ITEM || type == BasicType.ANY_ATOMIC_TYPE;
+    // basic types are checked directly, other types (choice, references) are intersected
+    return type instanceof BasicType ?
+      type.isNumber() || type.oneOf(BasicType.ITEM, BasicType.ANY_ATOMIC_TYPE) :
+      type.intersect(BasicType.NUMERIC) != null;
   }
 
   /**
@@ -608,9 +611,9 @@ public final class SeqType {
    */
   public boolean mayBeWrapped() {
     if(zero()) return false;
-    final Kind kind = type.kind();
-    return type == BasicType.ITEM || kind == Kind.GNODE || kind == Kind.JNODE ||
-        type instanceof FType;
+    // basic types are checked directly, other types (choice, references) are intersected
+    return type instanceof BasicType ? type == BasicType.ITEM :
+      type.intersect(NodeType.JNODE) != null || type.intersect(Types.FUNCTION) != null;
   }
 
   /**

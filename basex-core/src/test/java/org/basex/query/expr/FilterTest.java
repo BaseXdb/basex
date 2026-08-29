@@ -516,4 +516,13 @@ public final class FilterTest extends SandboxTest {
     query("declare function all-whitespace($arg) { normalize-space($arg) = '' };\n"
         + "<a/>/.[true() and all-whitespace('')]", "<a/>");
   }
+
+  /** Predicates with choice item types. */
+  @Test public void choiceItemType() {
+    final String func = "declare function local:f($x as (xs:integer | xs:string)) ";
+    query(func + "{ (10, 20, 30)[$x] }; local:f(2)", 20);
+    query(func + "{ (10, 20, 30)[$x] }; local:f('a')", "10\n20\n30");
+    query(func + "{ (10, 20, 30) ! .[$x] }; local:f(2)", "");
+    query(func + "{ (10, 20, 30) ! .[$x] }; local:f('a')", "10\n20\n30");
+  }
 }

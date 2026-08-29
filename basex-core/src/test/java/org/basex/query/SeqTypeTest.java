@@ -1055,6 +1055,8 @@ public final class SeqTypeTest {
     assertFalse(DATE_TIME_O.mayBeNumber());
     assertFalse(DATE_TIME_STAMP_O.mayBeNumber());
     assertFalse(ERROR_O.mayBeNumber());
+    assertTrue(ChoiceItemType.get(INTEGER, STRING).seqType().mayBeNumber());
+    assertFalse(ChoiceItemType.get(DATE, STRING).seqType().mayBeNumber());
 
     assertTrue(ITEM_O.mayBeWrapped());
     assertTrue(FUNCTION_O.mayBeWrapped());
@@ -1072,6 +1074,10 @@ public final class SeqTypeTest {
     assertFalse(DATE_TIME_O.mayBeWrapped());
     assertFalse(DATE_TIME_STAMP_O.mayBeWrapped());
     assertFalse(ERROR_O.mayBeWrapped());
+    assertTrue(GNODE_O.mayBeWrapped());
+    assertTrue(JNODE.seqType().mayBeWrapped());
+    assertTrue(ChoiceItemType.get(ARRAY, STRING).seqType().mayBeWrapped());
+    assertFalse(ChoiceItemType.get(DATE, STRING).seqType().mayBeWrapped());
   }
 
   /**

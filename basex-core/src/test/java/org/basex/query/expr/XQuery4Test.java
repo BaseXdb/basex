@@ -1143,4 +1143,12 @@ public final class XQuery4Test extends SandboxTest {
     error("string(error())", FUNERR1);
     error("duplicate-values(error())", FUNERR1);
   }
+
+  /** Choice item types. */
+  @Test public void choiceItemType() {
+    final String func = "declare function local:f($x as (xs:string | array(*))) ";
+    query(func + "{ $x = 'b' }; local:f([ 'a', 'b' ])", true);
+    query(func + "{ count(distinct-values($x)) }; local:f([ 'a', 'a' ])", 1);
+    query(func + "{ string-join($x) }; local:f([ 'a', 'b' ])", "ab");
+  }
 }

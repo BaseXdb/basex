@@ -2458,6 +2458,16 @@ public final class RewritingsTest extends SandboxTest {
         empty(CArray.class), root(FnData.class));
   }
 
+  /** Atomization of arrays may yield any number of items. */
+  @Test public void dataArray() {
+    final String array = "declare function local:f($a as array(*)) ";
+    query(array + "{ count(data($a)) }; local:f([ 'a', 'b' ])", 2);
+    query(array + "{ string-join(data($a), '|') }; local:f([ 'a', 'b' ])", "a|b");
+    final String item = "declare function local:f($a as item()) ";
+    query(item + "{ count(data($a)) }; local:f([ 'a', 'b' ])", 2);
+    query(item + "{ count(data($a)) }; local:f('a')", 1);
+  }
+
   /** Context functions are inlined into the left operand of a simple map. */
   @Test public void contextFunction() {
     check("<a>{ " + wrap(2) + " }</a> ! data(.)", 2, empty(SimpleMap.class), root(FnData.class));
