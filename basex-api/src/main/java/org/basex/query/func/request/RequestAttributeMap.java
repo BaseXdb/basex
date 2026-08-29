@@ -15,7 +15,7 @@ import org.basex.query.value.map.*;
  */
 public final class RequestAttributeMap extends ApiFunc {
   @Override
-  protected XQMap item(final QueryContext qc) throws QueryException {
+  public XQMap value(final QueryContext qc) throws QueryException {
     final MapBuilder map = new MapBuilder();
     for(final Entry<String, Object> entry : state(qc).attributes().entrySet()) {
       final Object object = entry.getValue();

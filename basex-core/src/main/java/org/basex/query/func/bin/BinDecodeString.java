@@ -8,6 +8,7 @@ import java.util.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.func.convert.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 
@@ -19,7 +20,7 @@ import org.basex.query.value.seq.*;
  */
 public final class BinDecodeString extends BinFn {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final Bin value = toBinOrNull(arg(0), qc);
     final String encoding = toEncodingOrNull(arg(1), BIN_UE_X, qc);
     final Long offset = toLongOrNull(arg(2), qc);

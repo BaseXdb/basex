@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -44,7 +45,7 @@ public final class CmpN extends Cmp {
   }
 
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final GNode n1 = toGNodeOrNull(exprs[0], qc);
     if(n1 == null) return Empty.VALUE;
     final GNode n2 = toGNodeOrNull(exprs[1], qc);

@@ -20,6 +20,8 @@ public final class MapTest extends SandboxTest {
     // all keys are strings: the constructor is treated as a record
     error("{ 'a': 1, 'a': 2 }", MAPDUPLKEY_X);
     error("{ 'a': 1, 'b': 2, 'a': 3 }", MAPDUPLKEY_X);
+    // the duplicate is only detected after the first key has been constant folded
+    error("{ concat('a', ''): 1, 'a': 2 }", MAPDUPLKEY_X);
     // distinct keys are accepted
     query("{ 'a': 1, 'b': 2 }?a", 1);
   }

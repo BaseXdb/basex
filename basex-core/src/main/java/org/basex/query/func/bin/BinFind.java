@@ -3,6 +3,7 @@ package org.basex.query.func.bin;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 
@@ -14,7 +15,7 @@ import org.basex.query.value.seq.*;
  */
 public final class BinFind extends BinFn {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final Bin value = toBinOrNull(arg(0), qc);
     final Long offset = toLongOrNull(arg(1), qc);
     final Bin search = toBin(arg(2), qc);

@@ -18,7 +18,7 @@ import org.basex.query.value.type.*;
  */
 public final class MapBuild extends MapMerge {
   @Override
-  protected XQMap item(final QueryContext qc) throws QueryException {
+  public XQMap value(final QueryContext qc) throws QueryException {
     final Iter input = arg(0).iter(qc);
     final FItem keys = toFunctionOrNull(arg(1), 2, qc);
     final FItem value = toFunctionOrNull(arg(2), 2, qc);

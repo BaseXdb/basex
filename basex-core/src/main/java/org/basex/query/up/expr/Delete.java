@@ -8,6 +8,7 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.up.*;
 import org.basex.query.up.primitives.node.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -32,7 +33,7 @@ public final class Delete extends Update {
   }
 
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final Iter iter = arg(0).unwrappedIter(qc);
     for(Item item; (item = qc.next(iter)) != null;) {
       if(!(item instanceof final XNode node)) throw UPTRGDELEMPT_X.get(info, item);

@@ -11,7 +11,7 @@ import org.basex.query.value.item.*;
  */
 public final class BinUnpackFloat extends BinFn {
   @Override
-  protected Flt item(final QueryContext qc) throws QueryException {
+  public Flt value(final QueryContext qc) throws QueryException {
     return Flt.get(unpack(qc, 4).getFloat());
   }
 }

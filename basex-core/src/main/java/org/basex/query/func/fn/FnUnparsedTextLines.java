@@ -6,7 +6,6 @@ import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -27,12 +26,6 @@ public final class FnUnparsedTextLines extends FnUnparsedTextAvailable {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     return doc(qc);
-  }
-
-  @Override
-  protected Item item(final QueryContext qc) throws QueryException {
-    // overwrite implementation of superclass
-    return value(qc).item(qc, info);
   }
 
   @Override

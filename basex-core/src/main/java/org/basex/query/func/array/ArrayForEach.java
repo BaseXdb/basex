@@ -16,7 +16,7 @@ import org.basex.query.value.type.*;
  */
 public final class ArrayForEach extends ArrayFn {
   @Override
-  protected XQArray item(final QueryContext qc) throws QueryException {
+  public XQArray value(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
     final FItem action = toFunction(arg(1), 2, qc);
 

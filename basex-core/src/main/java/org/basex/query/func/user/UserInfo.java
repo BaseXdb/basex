@@ -12,7 +12,7 @@ import org.basex.query.value.node.*;
  */
 public final class UserInfo extends UserFn {
   @Override
-  protected XNode item(final QueryContext qc) throws QueryException {
+  public XNode value(final QueryContext qc) throws QueryException {
     final User user = toUser(arg(0), true, qc);
 
     final XNode node = user != null ? user.info() : qc.context.users.info();

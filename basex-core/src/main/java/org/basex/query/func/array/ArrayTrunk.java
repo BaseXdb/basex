@@ -15,7 +15,7 @@ import org.basex.query.value.type.*;
  */
 public final class ArrayTrunk extends ArrayFn {
   @Override
-  protected XQArray item(final QueryContext qc) throws QueryException {
+  public XQArray value(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
     if(array == XQArray.empty()) throw ARRAYEMPTY.get(info);
     return array.subArray(0, array.structSize() - 1, qc);

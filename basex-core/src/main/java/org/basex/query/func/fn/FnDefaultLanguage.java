@@ -14,7 +14,7 @@ import org.basex.query.value.type.*;
  */
 public final class FnDefaultLanguage extends StandardFunc {
   @Override
-  protected Str item(final QueryContext qc) {
+  public Str value(final QueryContext qc) {
     return Str.get(Formatter.EN, BasicType.LANGUAGE);
   }
 }

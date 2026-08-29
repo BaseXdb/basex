@@ -17,7 +17,7 @@ import org.basex.query.value.type.*;
  */
 public final class ArrayBuild extends ArrayFn {
   @Override
-  protected XQArray item(final QueryContext qc) throws QueryException {
+  public XQArray value(final QueryContext qc) throws QueryException {
     final Expr input = arg(0);
     final FItem action = toFunctionOrNull(arg(1), 2, qc);
     if(action == null) return XQArray.items(input.value(qc));

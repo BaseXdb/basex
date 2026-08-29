@@ -15,7 +15,7 @@ import org.basex.query.value.type.*;
  */
 public final class MapRemove extends MapFn {
   @Override
-  protected XQMap item(final QueryContext qc) throws QueryException {
+  public XQMap value(final QueryContext qc) throws QueryException {
     XQMap map = toMap(arg(0), qc);
     final Iter keys = arg(1).atomIter(qc, info);
 

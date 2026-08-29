@@ -8,6 +8,7 @@ import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -87,7 +88,7 @@ public final class CmpV extends Cmp {
   }
 
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final Item item1 = exprs[0].atomItem(qc, info);
     if(item1 == Empty.VALUE) return Empty.VALUE;
     final Item item2 = exprs[1].atomItem(qc, info);

@@ -16,7 +16,7 @@ import org.basex.query.value.map.*;
  */
 public final class JobBindings extends StandardFunc {
   @Override
-  protected XQMap item(final QueryContext qc) throws QueryException {
+  public XQMap value(final QueryContext qc) throws QueryException {
     final String id = toString(arg(0), qc);
     final JobPool jobs = qc.context.jobs;
 

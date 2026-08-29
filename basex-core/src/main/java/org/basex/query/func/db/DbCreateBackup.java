@@ -5,7 +5,7 @@ import static org.basex.query.QueryError.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.name.*;
 import org.basex.query.util.*;
-import org.basex.query.value.item.*;
+import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
 
 /**
@@ -16,7 +16,7 @@ import org.basex.query.value.seq.*;
  */
 public final class DbCreateBackup extends BackupFn {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final String name = toBackup(arg(0), qc);
     final CreateBackupOptions options = toOptions(arg(1), new CreateBackupOptions(), qc);
 

@@ -7,6 +7,7 @@ import java.math.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -20,7 +21,7 @@ import org.basex.util.*;
  */
 public final class FnParseIetfDate extends StandardFunc {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final Item value = arg(0).atomItem(qc, info);
     return value.isEmpty() ? Empty.VALUE : new DateParser(toToken(value), info).parse();
   }

@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -48,7 +49,7 @@ public final class CTxt extends CNode {
   }
 
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final byte[] value = atomValue(qc, false);
     return value != null ? new FTxt(qc.shared.token(value)) : Empty.VALUE;
   }

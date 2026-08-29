@@ -2,6 +2,7 @@ package org.basex.query.func.fn;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
@@ -16,7 +17,7 @@ import org.basex.query.value.type.*;
  */
 public final class FnElementToMap extends PlanFn {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final Item node = (Item) Types.DOCUMENT_OR_ELEMENT_ZO.coerce(arg(0).value(qc), qc, info);
     final ElementsOptions options = options(1, ElementsOptions::new, qc);
     if(node.isEmpty()) return Empty.VALUE;

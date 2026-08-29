@@ -11,7 +11,7 @@ import org.basex.query.value.item.*;
  */
 public final class UserCurrent extends UserFn {
   @Override
-  protected Str item(final QueryContext qc) {
+  public Str value(final QueryContext qc) {
     return Str.get(qc.user.name());
   }
 }

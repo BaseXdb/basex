@@ -57,7 +57,7 @@ public class FnParseUri extends StandardFunc {
       "http", 80L, "https", 443L, "ftp", 21L, "ssh", 22L);
 
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final String value = toStringOrNull(arg(0), qc);
     final UriOptions options = options(1, UriOptions::new, qc);
     if(value == null) return Empty.VALUE;

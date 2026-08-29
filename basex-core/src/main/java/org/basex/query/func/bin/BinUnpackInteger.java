@@ -11,7 +11,7 @@ import org.basex.query.value.item.*;
  */
 public final class BinUnpackInteger extends BinFn {
   @Override
-  protected Itr item(final QueryContext qc) throws QueryException {
+  public Itr value(final QueryContext qc) throws QueryException {
     return unpackInteger(qc, true);
   }
 }

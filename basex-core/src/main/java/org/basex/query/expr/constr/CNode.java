@@ -7,6 +7,7 @@ import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -35,7 +36,7 @@ public abstract class CNode extends Arr {
   }
 
   @Override
-  protected abstract Item item(QueryContext qc) throws QueryException;
+  public abstract Value value(QueryContext qc) throws QueryException;
 
   /**
    * Optimizes the node value.

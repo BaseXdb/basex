@@ -18,7 +18,7 @@ import org.basex.util.*;
  */
 public final class FnStringJoin extends StandardFunc {
   @Override
-  protected Str item(final QueryContext qc) throws QueryException {
+  public Str value(final QueryContext qc) throws QueryException {
     final Iter values = arg(0).atomIter(qc, info);
     final byte[] separator = toZeroToken(arg(1), qc);
 

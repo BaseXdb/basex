@@ -6,7 +6,6 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 
 /**
@@ -20,7 +19,7 @@ public final class FnVoid extends StandardFunc {
   private boolean ndt;
 
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final Expr input = arg(0);
     final boolean skip = toBooleanOrFalse(arg(1), qc);
 

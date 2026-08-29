@@ -13,7 +13,7 @@ import org.basex.query.value.map.*;
  */
 public final class RequestHeaderMap extends ApiFunc {
   @Override
-  protected XQMap item(final QueryContext qc) throws QueryException {
+  public XQMap value(final QueryContext qc) throws QueryException {
     final RequestContext requestCtx = requestContext(qc);
     return requestCtx.headers();
   }

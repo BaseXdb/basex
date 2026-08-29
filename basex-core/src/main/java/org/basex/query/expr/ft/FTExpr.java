@@ -57,13 +57,13 @@ public abstract class FTExpr extends ParseExpr {
   public abstract FTIter iter(QueryContext qc) throws QueryException;
 
   /**
-   * This method is called by the sequential full-text evaluation. It always returns an item.
+   * This method is called by the sequential full-text evaluation.
    * @param qc query context
    * @return resulting item
    * @throws QueryException query exception
    */
   @Override
-  public abstract FTNode item(QueryContext qc) throws QueryException;
+  public abstract FTNode value(QueryContext qc) throws QueryException;
 
   @Override
   public boolean has(final Flag... flags) {

@@ -14,7 +14,7 @@ import org.basex.query.value.item.*;
  */
 public final class FileName extends StandardFunc {
   @Override
-  protected Str item(final QueryContext qc) throws QueryException {
+  public Str value(final QueryContext qc) throws QueryException {
     final Path path = toRawPath(arg(0), qc).getFileName();
     return path == null ? Str.EMPTY : Str.get(path.toString());
   }

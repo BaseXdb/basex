@@ -6,7 +6,7 @@ import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.name.*;
 import org.basex.query.util.*;
-import org.basex.query.value.item.*;
+import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.list.*;
 
@@ -18,7 +18,7 @@ import org.basex.util.list.*;
  */
 public final class DbRestore extends BackupFn {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final String name = toBackup(arg(0), qc);
 
     checkCreate(Databases.name(name), qc);

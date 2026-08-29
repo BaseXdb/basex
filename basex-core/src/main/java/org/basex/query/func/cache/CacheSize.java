@@ -11,7 +11,7 @@ import org.basex.query.value.item.*;
  */
 public final class CacheSize extends CacheFn {
   @Override
-  protected Itr item(final QueryContext qc) throws QueryException {
+  public Itr value(final QueryContext qc) throws QueryException {
     final String name = toZeroString(arg(0), qc);
 
     return Itr.get(caches(qc).size(name));

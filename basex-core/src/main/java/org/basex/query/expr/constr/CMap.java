@@ -146,7 +146,7 @@ public final class CMap extends Arr {
   }
 
   @Override
-  protected XQMap item(final QueryContext qc) throws QueryException {
+  public XQMap value(final QueryContext qc) throws QueryException {
     final int el = exprs.length;
     final MapBuilder mb = new MapBuilder(el >>> 1);
     final QueryBiConsumer<Item, Value> add = (key, value) -> {

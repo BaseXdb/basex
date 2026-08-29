@@ -37,7 +37,7 @@ public final class FnAnalyzeString extends RegExFn {
   private static final QNm Q_POSITION = new QNm("position");
 
   @Override
-  protected FNode item(final QueryContext qc) throws QueryException {
+  public FNode value(final QueryContext qc) throws QueryException {
     final String value = string(toZeroToken(arg(0), qc));
     final byte[] pattern = toToken(arg(1), qc);
     final byte[] flags = toZeroToken(arg(2), qc);

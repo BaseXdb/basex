@@ -12,7 +12,7 @@ import org.basex.query.value.item.*;
  */
 public final class ProfCurrentMs extends StandardFunc {
   @Override
-  protected Itr item(final QueryContext qc) {
+  public Itr value(final QueryContext qc) {
     return Itr.get(System.currentTimeMillis());
   }
 }

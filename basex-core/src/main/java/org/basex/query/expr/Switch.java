@@ -213,11 +213,6 @@ public final class Switch extends ParseExpr {
     return Checks.all(groups, group -> group.rtrn().eager());
   }
 
-  @Override
-  protected Item item(final QueryContext qc) throws QueryException {
-    return expr(qc).item(qc, info);
-  }
-
   /**
    * Tests the conditions and returns the expression to evaluate.
    * @param qc query context

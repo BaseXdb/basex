@@ -6,7 +6,6 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.db.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 
 /**
  * Function implementation.
@@ -16,7 +15,7 @@ import org.basex.query.value.item.*;
  */
 public final class DbPutValue extends DbPutBinary {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
     final Value input = arg(1).value(qc);
     final String path = toDbPath(arg(2), qc);

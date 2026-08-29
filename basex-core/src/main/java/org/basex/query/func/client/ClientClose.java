@@ -5,7 +5,7 @@ import static org.basex.query.QueryError.*;
 import java.io.*;
 
 import org.basex.query.*;
-import org.basex.query.value.item.*;
+import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
 
 /**
@@ -16,7 +16,7 @@ import org.basex.query.value.seq.*;
  */
 public final class ClientClose extends ClientFn {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     try {
       session(qc, true).close();
       return Empty.VALUE;

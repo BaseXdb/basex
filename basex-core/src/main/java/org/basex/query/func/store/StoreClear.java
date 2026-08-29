@@ -11,7 +11,7 @@ import org.basex.query.value.seq.*;
  */
 public final class StoreClear extends StoreFn {
   @Override
-  protected Empty item(final QueryContext qc) {
+  public Empty value(final QueryContext qc) {
     stores(qc).clear();
     return Empty.VALUE;
   }

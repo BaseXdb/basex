@@ -12,7 +12,7 @@ import org.basex.query.value.node.*;
  */
 public final class FnJtree extends StandardFunc {
   @Override
-  protected JNode item(final QueryContext qc) throws QueryException {
+  public JNode value(final QueryContext qc) throws QueryException {
     return new JNode(arg(0).value(qc));
   }
 }

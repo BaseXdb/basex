@@ -14,7 +14,7 @@ import org.basex.query.value.item.*;
  */
 public final class XsltTransformText extends XsltTransform {
   @Override
-  protected Str item(final QueryContext qc) throws QueryException {
+  public Str value(final QueryContext qc) throws QueryException {
     final ArrayOutput result = new ArrayOutput();
     transform(new StreamResult(result), null, qc);
     return Str.get(result.finish());

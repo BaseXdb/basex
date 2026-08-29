@@ -323,7 +323,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  protected FuncItem item(final QueryContext qc) throws QueryException {
+  public FuncItem value(final QueryContext qc) throws QueryException {
     final Expr body;
     if(global.isEmpty()) {
       body = expr;

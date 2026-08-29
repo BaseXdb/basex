@@ -2,6 +2,7 @@ package org.basex.query;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.List;
 
@@ -25,6 +26,11 @@ import org.junit.jupiter.api.*;
 public final class IterTest extends SandboxTest {
   /** Class file suffix. */
   private static final String SUFFIX = ".class";
+  /** Auxiliary expressions: tree nodes that are never evaluated via iterators or values. */
+  private static final Set<String> AUXILIARY = Set.of(
+    "Catch", "Condition", "Count", "For", "FuncRef", "GroupBy", "IndexDynDb", "IndexStaticDb",
+    "Let", "OrderBy", "OrderKey", "SwitchGroup", "Trace", "Where", "While", "Window"
+  );
   /** Consumers that request items of their input by position. */
   private static final String[] CONSUMERS = {
     "reverse(%)", "%[last()]", "items-at(%, (1, 3))", "subsequence(%, 2, 2)", "foot(%)", "head(%)",
@@ -134,6 +140,28 @@ public final class IterTest extends SandboxTest {
   }
 
   /**
+   * Every expression must supply its results via an iterator or a value.
+   * @throws Exception exception
+   */
+  @Test public void iterOrValue() throws Exception {
+    final StringList errors = new StringList();
+    final List<Class<?>> classes = classes("target/classes/org/basex/query");
+    int checked = 0;
+    for(final Class<?> clazz : classes) {
+      // an expression that implements neither method recurses infinitely: the generic value
+      // implementation calls the iterator, which in turn calls the value implementation
+      if(!ParseExpr.class.isAssignableFrom(clazz) || Modifier.isAbstract(clazz.getModifiers()) ||
+        AUXILIARY.contains(clazz.getSimpleName())) continue;
+      checked++;
+      if(!declares(clazz, "iter", QueryContext.class) &&
+         !declares(clazz, "value", QueryContext.class)) errors.add(clazz.getSimpleName());
+    }
+    assertTrue(errors.isEmpty(), "No iter() or value() implementation: " + errors);
+    // ensure that the class scan was successful
+    assertTrue(checked > 0, "No expressions found in " + classes.size() + " classes");
+  }
+
+  /**
    * Returns all expression classes of a directory.
    * @param path directory path
    * @return classes
@@ -163,7 +191,8 @@ public final class IterTest extends SandboxTest {
     for(Class<?> clz = clazz; clz != null && clz != Expr.class && clz != ParseExpr.class &&
         clz != Value.class; clz = clz.getSuperclass()) {
       try {
-        if(clz.getMethod(name, args).getDeclaringClass() == clz) return true;
+        clz.getDeclaredMethod(name, args);
+        return true;
       } catch(final Exception ignore) { }
     }
     return false;

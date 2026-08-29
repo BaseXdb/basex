@@ -13,7 +13,7 @@ import org.basex.query.value.node.*;
  */
 public final class RestWadl extends ApiFunc {
   @Override
-  protected FNode item(final QueryContext qc) throws QueryException {
+  public FNode value(final QueryContext qc) throws QueryException {
     return WebModules.get(qc.context).wadl(request(qc), qc.context);
   }
 }

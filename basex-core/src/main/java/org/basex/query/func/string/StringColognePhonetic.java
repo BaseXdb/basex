@@ -12,7 +12,7 @@ import org.basex.util.similarity.*;
  */
 public final class StringColognePhonetic extends StringFn {
   @Override
-  protected Str item(final QueryContext qc) throws QueryException {
+  public Str value(final QueryContext qc) throws QueryException {
     return str(ColognePhonetic.encode(toToken(arg(0), qc)));
   }
 }

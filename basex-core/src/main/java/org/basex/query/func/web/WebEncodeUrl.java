@@ -14,7 +14,7 @@ import org.basex.query.value.item.*;
  */
 public final class WebEncodeUrl extends WebFn {
   @Override
-  protected Str item(final QueryContext qc) throws QueryException {
+  public Str value(final QueryContext qc) throws QueryException {
     final String value = toString(arg(0), qc);
     return Str.get(URLEncoder.encode(value, StandardCharsets.UTF_8));
   }

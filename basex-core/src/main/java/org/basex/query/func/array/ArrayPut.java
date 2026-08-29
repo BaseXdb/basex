@@ -14,7 +14,7 @@ import org.basex.query.value.type.*;
  */
 public final class ArrayPut extends ArrayFn {
   @Override
-  protected XQArray item(final QueryContext qc) throws QueryException {
+  public XQArray value(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
     final long position = toLong(arg(1), qc);
     final Value member = arg(2).value(qc);

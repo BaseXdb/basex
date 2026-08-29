@@ -15,7 +15,7 @@ import org.basex.query.value.item.*;
  */
 public final class SqlPrepare extends SqlFn {
   @Override
-  protected Uri item(final QueryContext qc) throws QueryException {
+  public Uri value(final QueryContext qc) throws QueryException {
     final Connection conn = connection(qc);
     final String prepStmt = toString(arg(1), qc);
     final StatementOptions options = toOptions(arg(2), new StatementOptions(), qc);

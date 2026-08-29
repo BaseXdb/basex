@@ -12,7 +12,7 @@ import org.basex.query.value.item.*;
  */
 public final class RequestPort extends ApiFunc {
   @Override
-  protected Itr item(final QueryContext qc) throws QueryException {
+  public Itr value(final QueryContext qc) throws QueryException {
     return Itr.get(state(qc).serverPort());
   }
 }

@@ -15,7 +15,7 @@ import org.basex.util.*;
  */
 public final class ProcPropertyMap extends StandardFunc {
   @Override
-  protected XQMap item(final QueryContext qc) throws QueryException {
+  public XQMap value(final QueryContext qc) throws QueryException {
     final MapBuilder map = new MapBuilder();
     for(final Entry<String, String> entry : Prop.entries()) {
       map.put(entry.getKey(), entry.getValue());

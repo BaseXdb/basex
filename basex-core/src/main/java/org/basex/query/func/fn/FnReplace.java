@@ -31,7 +31,7 @@ public final class FnReplace extends RegExFn {
       seqType(Occ.ZERO_OR_ONE);
 
   @Override
-  protected Str item(final QueryContext qc) throws QueryException {
+  public Str value(final QueryContext qc) throws QueryException {
     final byte[] value = toZeroToken(arg(0), qc);
     final byte[] pattern = toToken(arg(1), qc);
     final Item replacement = arg(2).unwrappedItem(qc, info);

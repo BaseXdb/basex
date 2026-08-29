@@ -2,6 +2,7 @@ package org.basex.query.func.bin;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 
@@ -13,7 +14,7 @@ import org.basex.query.value.seq.*;
  */
 public final class BinRotate extends StandardFunc {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final Bin value = toBinOrNull(arg(0), qc);
     final long by = toLong(arg(1), qc);
     if(value == null) return Empty.VALUE;

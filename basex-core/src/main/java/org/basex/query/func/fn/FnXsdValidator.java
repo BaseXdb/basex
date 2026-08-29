@@ -88,7 +88,7 @@ public final class FnXsdValidator extends StandardFunc {
   public static final FuncType VALIDATOR_TYPE = FuncType.get(RESULT_TYPE, TARGET_TYPE);
 
   @Override
-  protected FuncItem item(final QueryContext qc) throws QueryException {
+  public FuncItem value(final QueryContext qc) throws QueryException {
     final XsdValidatorOptions options = toOptions(arg(0), new XsdValidatorOptions(), qc);
     final boolean trusted = trusted(options, qc);
     final boolean xsi = options.get(XsdValidatorOptions.USE_XSI_SCHEMA_LOCATION);
@@ -202,7 +202,7 @@ public final class FnXsdValidator extends StandardFunc {
     }
 
     @Override
-    public Item item(final QueryContext qc) throws QueryException {
+    public Value value(final QueryContext qc) throws QueryException {
       final Item item = arg(0).item(qc, info);
       if(item.isEmpty()) return Empty.VALUE;
 

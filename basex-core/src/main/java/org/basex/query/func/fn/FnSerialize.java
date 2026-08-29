@@ -16,7 +16,7 @@ import org.basex.query.value.item.*;
  */
 public final class FnSerialize extends StandardFunc {
   @Override
-  protected Str item(final QueryContext qc) throws QueryException {
+  public Str value(final QueryContext qc) throws QueryException {
     final Iter input = arg(0).iter(qc);
     final SerializerOptions options = toSerializerOptions(arg(1), qc);
 

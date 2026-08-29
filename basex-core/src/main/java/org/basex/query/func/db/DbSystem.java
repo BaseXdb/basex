@@ -13,7 +13,7 @@ import org.basex.query.value.node.*;
  */
 public final class DbSystem extends StandardFunc {
   @Override
-  protected FNode item(final QueryContext qc) {
+  public FNode value(final QueryContext qc) {
     return DbInfo.toNode(DbAccessFn.Q_SYSTEM, Info.info(qc.context), qc);
   }
 }

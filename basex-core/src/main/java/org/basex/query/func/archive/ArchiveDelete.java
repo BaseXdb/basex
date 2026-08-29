@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
  */
 public final class ArchiveDelete extends ArchiveFn {
   @Override
-  protected B64 item(final QueryContext qc) throws QueryException {
+  public B64 value(final QueryContext qc) throws QueryException {
     final Value entries = arg(1).atomValue(qc, info);
 
     // entries to be deleted

@@ -92,7 +92,7 @@ public final class CmpSR extends CmpRange {
   }
 
   @Override
-  protected Bln item(final QueryContext qc) throws QueryException {
+  public Bln value(final QueryContext qc) throws QueryException {
     return Bln.get(ebv(qc));
   }
 

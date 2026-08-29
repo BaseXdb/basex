@@ -11,7 +11,7 @@ import org.basex.query.value.item.*;
  */
 public final class FnImplicitTimezone extends DynamicFn {
   @Override
-  protected DTDur item(final QueryContext qc) throws QueryException {
+  public DTDur value(final QueryContext qc) throws QueryException {
     return new DTDur(0, qc.dateTime().zone);
   }
 }

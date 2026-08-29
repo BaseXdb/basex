@@ -6,7 +6,7 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.up.primitives.db.*;
-import org.basex.query.value.item.*;
+import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
 
 /**
@@ -17,7 +17,7 @@ import org.basex.query.value.seq.*;
  */
 public final class DbAdd extends DbNew {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
     final NewInput[] inputs = toInputs(qc);
     final HashMap<String, String> options = toOptions(arg(3), qc);

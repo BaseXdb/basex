@@ -27,7 +27,7 @@ public final class Concat extends Arr {
   }
 
   @Override
-  protected Str item(final QueryContext qc) throws QueryException {
+  public Str value(final QueryContext qc) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
     for(final Expr expr : exprs) {
       final Iter iter = expr.atomIter(qc, info);

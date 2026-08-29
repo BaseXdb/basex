@@ -1,6 +1,7 @@
 package org.basex.query.func.fn;
 
 import org.basex.query.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
@@ -31,7 +32,7 @@ public class FnRound extends NumericFn {
   }
 
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final Item mode = arg(2).atomItem(qc, info);
     return round(qc, mode.isEmpty() ? RoundMode.HALF_TO_CEILING : toEnum(mode, RoundMode.class));
   }

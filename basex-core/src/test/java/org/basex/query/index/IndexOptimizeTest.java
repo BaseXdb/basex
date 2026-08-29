@@ -329,6 +329,23 @@ public final class IndexOptimizeTest extends SandboxTest {
     query("(# db:enforceindex #) { head(db:get('" + NAME + "'))//*[text() = 'X'] }", "<x>X</x>");
   }
 
+  /** A variable is inlined into the database reference of an index access. */
+  @Test public void dynamicIndexDb() {
+    execute(new CreateDB(NAME));
+    execute(new Add("1.xml", "<x>X</x>"));
+    execute(new Add("2.xml", "<x>X</x>"));
+    execute(new Optimize());
+    // the variable is the database reference: it is inlined into the index database
+    check("(# db:enforceindex #) { let $d := head(db:get('" + NAME + "'))"
+        + " return $d//*[text() = 'X'] }", "<x>X</x>", exists(ValueAccess.class));
+
+    // the variable is the search term: the index database stays untouched
+    inline(true);
+    check("declare function local:f($v as xs:string) {"
+        + " (# db:enforceindex #) { head(db:get('" + NAME + "'))//*[text() = $v] } };"
+        + "local:f('X')", "<x>X</x>", exists(ValueAccess.class));
+  }
+
   /**
    * Index access with namespaces (#1763).
    */

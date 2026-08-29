@@ -14,7 +14,7 @@ import org.basex.query.value.item.*;
  */
 public final class ProcSystem extends ProcFn {
   @Override
-  protected Str item(final QueryContext qc) throws QueryException {
+  public Str value(final QueryContext qc) throws QueryException {
     final ProcResult result = exec(qc, false);
     if(result.exception != null) throw PROC_ERROR_X.get(info, result.exception);
     if(result.code == 0) return Str.get(result.output.normalize().finish());

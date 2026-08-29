@@ -17,7 +17,7 @@ import org.basex.util.*;
  */
 public final class DbInfo extends DbAccessFn {
   @Override
-  protected FNode item(final QueryContext qc) throws QueryException {
+  public FNode value(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
     return toNode(Q_DATABASE, InfoDB.db(data, false, true), qc);
   }

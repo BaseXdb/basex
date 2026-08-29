@@ -11,7 +11,7 @@ import org.basex.query.value.item.*;
  */
 public final class ConvertStringToBase64 extends ConvertFn {
   @Override
-  protected B64 item(final QueryContext qc) throws QueryException {
+  public B64 value(final QueryContext qc) throws QueryException {
     return B64.get(stringToBinary(qc));
   }
 }

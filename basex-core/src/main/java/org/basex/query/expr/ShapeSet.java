@@ -62,7 +62,7 @@ public final class ShapeSet extends Arr {
   }
 
   @Override
-  protected XQMap item(final QueryContext qc) throws QueryException {
+  public XQMap value(final QueryContext qc) throws QueryException {
     return toMap(exprs[0], qc).putAt(index - 1, exprs[1].value(qc));
   }
 

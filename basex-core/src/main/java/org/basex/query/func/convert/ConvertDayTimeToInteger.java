@@ -13,7 +13,7 @@ import org.basex.query.value.type.*;
  */
 public final class ConvertDayTimeToInteger extends StandardFunc {
   @Override
-  protected Itr item(final QueryContext qc) throws QueryException {
+  public Itr value(final QueryContext qc) throws QueryException {
     final DTDur value = (DTDur) checkType(arg(0), BasicType.DAY_TIME_DURATION, qc);
     return Itr.get(value.ms(info));
   }

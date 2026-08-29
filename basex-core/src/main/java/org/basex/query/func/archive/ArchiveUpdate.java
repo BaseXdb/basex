@@ -15,7 +15,7 @@ import org.basex.query.value.item.*;
  */
 public final class ArchiveUpdate extends ArchiveFn {
   @Override
-  protected B64 item(final QueryContext qc) throws QueryException {
+  public B64 value(final QueryContext qc) throws QueryException {
     final Map<String, Entry<Item, Item>> files = toFiles(arg(1), arg(2), qc);
 
     return rewrite(arg(0), qc, (entry, out) -> {

@@ -13,7 +13,7 @@ import org.basex.util.*;
  */
 public final class FnDecodeFromUri extends StandardFunc {
   @Override
-  protected Str item(final QueryContext qc) throws QueryException {
+  public Str value(final QueryContext qc) throws QueryException {
     return Str.get(XMLToken.decodeUri(toZeroToken(arg(0), qc)));
   }
 }

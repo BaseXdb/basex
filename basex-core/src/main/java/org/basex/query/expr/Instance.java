@@ -58,7 +58,7 @@ public final class Instance extends Single {
   }
 
   @Override
-  protected Bln item(final QueryContext qc) throws QueryException {
+  public Bln value(final QueryContext qc) throws QueryException {
     return Bln.get(ebv(qc));
   }
 

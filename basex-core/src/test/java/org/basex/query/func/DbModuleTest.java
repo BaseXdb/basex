@@ -178,6 +178,10 @@ public final class DbModuleTest extends SandboxTest {
     // duplicate value path within one call: conflict
     error(func.args(NAME, " (1, 2)", " ('clash.val', 'clash.val')"), DB_CONFLICT5_X);
 
+    // two calls in a single query: the conflict is detected when the updates are merged
+    error(func.args(NAME, " xs:hexBinary('41')", " { 'merge.bin': 'binary' }") + ", " +
+        func.args(NAME, " xs:hexBinary('42')", " { 'merge.bin': 'binary' }"), DB_CONFLICT5_X);
+
     // existing binary resource: second db:add against same path is rejected
     query(func.args(NAME, " xs:hexBinary('41')", "exists.bin"));
     error(func.args(NAME, " xs:hexBinary('42')", "exists.bin"), DB_CONFLICT5_X);

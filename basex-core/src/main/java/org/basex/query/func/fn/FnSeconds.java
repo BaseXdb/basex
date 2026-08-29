@@ -3,6 +3,7 @@ package org.basex.query.func.fn;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 
@@ -14,7 +15,7 @@ import org.basex.query.value.type.*;
  */
 public final class FnSeconds extends StandardFunc {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final Item value = arg(0).atomItem(qc, info);
     return value.isEmpty() ? value : new DTDur(checkType(value, BasicType.DECIMAL, qc).dec(info));
   }

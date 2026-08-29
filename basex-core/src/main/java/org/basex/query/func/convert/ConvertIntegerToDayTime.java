@@ -12,7 +12,7 @@ import org.basex.query.value.item.*;
  */
 public final class ConvertIntegerToDayTime extends StandardFunc {
   @Override
-  protected DTDur item(final QueryContext qc) throws QueryException {
+  public DTDur value(final QueryContext qc) throws QueryException {
     return DTDur.get(toLong(arg(0), qc));
   }
 }

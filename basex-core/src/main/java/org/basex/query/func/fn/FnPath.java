@@ -39,7 +39,7 @@ public final class FnPath extends ContextFn {
   private final Map<Long, byte[]> cachedSteps = Collections.synchronizedMap(new StepCache());
 
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     GNode node = toGNodeOrNull(context(qc), qc);
     final XQMap map = toEmptyMap(arg(1), qc);
     final PathOptions options = options(1, PathOptions::new, qc);

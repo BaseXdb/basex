@@ -11,7 +11,7 @@ import org.basex.query.value.item.*;
  */
 public final class FnCurrentTime extends DynamicFn {
   @Override
-  protected Tim item(final QueryContext qc) throws QueryException {
+  public Tim value(final QueryContext qc) throws QueryException {
     return qc.dateTime().time;
   }
 }

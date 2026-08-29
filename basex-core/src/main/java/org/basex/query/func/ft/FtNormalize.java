@@ -1,7 +1,6 @@
 package org.basex.query.func.ft;
 
 import org.basex.query.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -13,13 +12,8 @@ import org.basex.util.*;
  */
 public final class FtNormalize extends FtTokenize {
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
+  public Str value(final QueryContext qc) throws QueryException {
     // overwrite implementation of superclass
-    return item(qc);
-  }
-
-  @Override
-  protected Str item(final QueryContext qc) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
     for(final byte[] token : tokens(qc, true)) tb.add(token);
     return Str.get(tb.finish());

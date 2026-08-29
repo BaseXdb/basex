@@ -15,7 +15,7 @@ import org.basex.query.value.type.*;
  */
 public final class UtilArrayMember extends StandardFunc {
   @Override
-  protected XQArray item(final QueryContext qc) throws QueryException {
+  public XQArray value(final QueryContext qc) throws QueryException {
     return XQArray.get(arg(0).value(qc));
   }
 

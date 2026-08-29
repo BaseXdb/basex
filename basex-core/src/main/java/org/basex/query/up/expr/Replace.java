@@ -9,6 +9,7 @@ import org.basex.query.iter.*;
 import org.basex.query.up.*;
 import org.basex.query.up.primitives.node.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -40,7 +41,7 @@ public final class Replace extends Update {
   }
 
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final Iter iter = arg(0).unwrappedIter(qc);
     FBuilder builder = null;
 

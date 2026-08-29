@@ -11,7 +11,7 @@ import org.basex.query.value.item.*;
  */
 public final class ConvertStringToHex extends ConvertFn {
   @Override
-  protected Hex item(final QueryContext qc) throws QueryException {
+  public Hex value(final QueryContext qc) throws QueryException {
     return new Hex(stringToBinary(qc));
   }
 }

@@ -22,7 +22,7 @@ import org.basex.query.value.type.*;
  */
 public final class FnHead extends StandardFunc {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     // value-based input: return first item
     final Expr input = arg(0);
     final Value value = input.eagerValue(qc);

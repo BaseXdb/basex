@@ -17,7 +17,7 @@ import org.basex.query.value.type.*;
  */
 public class ArraySortBy extends SortFn {
   @Override
-  protected XQArray item(final QueryContext qc) throws QueryException {
+  public XQArray value(final QueryContext qc) throws QueryException {
     return sort(toArray(arg(0), qc), qc);
   }
 

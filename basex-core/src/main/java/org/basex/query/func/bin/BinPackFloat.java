@@ -13,7 +13,7 @@ import org.basex.query.value.item.*;
  */
 public final class BinPackFloat extends BinFn {
   @Override
-  protected B64 item(final QueryContext qc) throws QueryException {
+  public B64 value(final QueryContext qc) throws QueryException {
     final float value = toFloat(arg(0), qc);
     final ByteOrder order = order(arg(1), qc);
     return B64.get(ByteBuffer.wrap(new byte[4]).order(order).putFloat(value).array());

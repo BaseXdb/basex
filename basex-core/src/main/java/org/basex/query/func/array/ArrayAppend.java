@@ -16,7 +16,7 @@ import org.basex.query.value.type.*;
  */
 public final class ArrayAppend extends ArrayFn {
   @Override
-  protected XQArray item(final QueryContext qc) throws QueryException {
+  public XQArray value(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
     final Value member = arg(1).value(qc);
     return array.appendMember(member, qc);

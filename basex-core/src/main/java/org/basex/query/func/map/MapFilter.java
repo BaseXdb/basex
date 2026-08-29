@@ -15,7 +15,7 @@ import org.basex.query.value.type.*;
  */
 public final class MapFilter extends MapFn {
   @Override
-  protected XQMap item(final QueryContext qc) throws QueryException {
+  public XQMap value(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(arg(0), qc);
     final FItem predicate = toFunction(arg(1), 3, qc);
 

@@ -4,7 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
-import org.basex.query.value.item.*;
+import org.basex.query.value.*;
 
 /**
  * Function implementation.
@@ -14,7 +14,7 @@ import org.basex.query.value.item.*;
  */
 public final class DbProperty extends DbPropertyMap {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
     final String key = toString(arg(1), qc);
 

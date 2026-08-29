@@ -14,7 +14,7 @@ import org.basex.util.*;
  */
 public final class ConvertDecodeKey extends ConvertIntegersToBase64 {
   @Override
-  protected Str item(final QueryContext qc) throws QueryException {
+  public Str value(final QueryContext qc) throws QueryException {
     final byte[] key = toToken(arg(0), qc);
     final boolean lax = toBooleanOrFalse(arg(1), qc);
 

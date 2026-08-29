@@ -22,7 +22,7 @@ import org.basex.query.value.type.*;
  */
 public final class FnPut extends StandardFunc {
   @Override
-  protected Empty item(final QueryContext qc) throws QueryException {
+  public Empty value(final QueryContext qc) throws QueryException {
     final XNode node = toNode(arg(0), qc);
     final byte[] source = toZeroToken(arg(1), qc);
     final SerializerOptions options = toSerializerOptions(arg(2), qc);

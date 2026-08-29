@@ -19,7 +19,7 @@ import org.basex.query.value.type.*;
  */
 public final class ArraySort extends ArraySortBy {
   @Override
-  protected XQArray item(final QueryContext qc) throws QueryException {
+  public XQArray value(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc), value = quickValue(array, qc);
     return value != null ? value : sort(array, qc);
   }

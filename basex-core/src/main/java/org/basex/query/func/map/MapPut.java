@@ -17,7 +17,7 @@ import org.basex.query.value.type.*;
  */
 public final class MapPut extends MapFn {
   @Override
-  protected XQMap item(final QueryContext qc) throws QueryException {
+  public XQMap value(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(arg(0), qc);
     final Item key = toAtomItem(arg(1), qc);
     final Value value = arg(2).value(qc);

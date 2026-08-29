@@ -16,7 +16,7 @@ import org.basex.util.list.*;
  */
 public class ConvertIntegersToBase64 extends ConvertFn {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     return bytesToB64(qc);
   }
 

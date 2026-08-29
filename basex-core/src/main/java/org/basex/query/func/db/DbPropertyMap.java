@@ -5,6 +5,7 @@ import java.util.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 
@@ -16,7 +17,7 @@ import org.basex.query.value.map.*;
  */
 public class DbPropertyMap extends DbAccessFn {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
 
     final MapBuilder map = new MapBuilder();

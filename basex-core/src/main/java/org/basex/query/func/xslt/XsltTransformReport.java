@@ -14,7 +14,7 @@ import org.basex.query.value.map.*;
  */
 public final class XsltTransformReport extends XsltTransform {
   @Override
-  protected XQMap item(final QueryContext qc) throws QueryException {
+  public XQMap value(final QueryContext qc) throws QueryException {
     final ArrayOutput result = new ArrayOutput();
     final XsltReport report = new XsltReport(qc);
     transform(new StreamResult(result), report, qc);

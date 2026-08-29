@@ -132,7 +132,7 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public FTNode item(final QueryContext qc) throws QueryException {
+  public FTNode value(final QueryContext qc) throws QueryException {
     final FTTokenizer ftt = get(qc);
     if(ftt.pos == 0) ftt.pos = ++qc.ftPos;
     ftt.matches.reset(ftt.pos);

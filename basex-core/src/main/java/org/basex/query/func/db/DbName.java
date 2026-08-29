@@ -13,7 +13,7 @@ import org.basex.query.value.node.*;
  */
 public final class DbName extends StandardFunc {
   @Override
-  protected Str item(final QueryContext qc) throws QueryException {
+  public Str value(final QueryContext qc) throws QueryException {
     final DBNode dbnode = toDBNode(toNode(arg(0), qc), false);
     return Str.get(dbnode.data().meta.name);
   }

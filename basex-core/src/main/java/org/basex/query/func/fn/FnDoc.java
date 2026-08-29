@@ -2,7 +2,7 @@ package org.basex.query.func.fn;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.value.item.*;
+import org.basex.query.value.*;
 
 /**
  * Function implementation.
@@ -12,7 +12,7 @@ import org.basex.query.value.item.*;
  */
 public final class FnDoc extends FnDocAvailable {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     return doc(qc);
   }
 

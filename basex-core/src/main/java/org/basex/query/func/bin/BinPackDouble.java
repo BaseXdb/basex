@@ -13,7 +13,7 @@ import org.basex.query.value.item.*;
  */
 public final class BinPackDouble extends BinFn {
   @Override
-  protected B64 item(final QueryContext qc) throws QueryException {
+  public B64 value(final QueryContext qc) throws QueryException {
     final double value = toDouble(arg(0), qc);
     final ByteOrder order = order(arg(1), qc);
     return B64.get(ByteBuffer.wrap(new byte[8]).order(order).putDouble(value).array());

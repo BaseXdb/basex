@@ -65,8 +65,7 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Evaluates the expression and returns an iterator on the resulting items.
-   * If this method is not implemented, either {@link #value(QueryContext)} or
-   * {@link #item(QueryContext)} must be implemented instead.
+   * If this method is not implemented, {@link #value(QueryContext)} must be implemented instead.
    * @param qc query context
    * @return iterator
    * @throws QueryException query exception
@@ -75,8 +74,7 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Evaluates the expression and returns the resulting value.
-   * If this method is not implemented, either {@link #iter(QueryContext)} or
-   * {@link #item(QueryContext)} must be implemented instead.
+   * If this method is not implemented, {@link #iter(QueryContext)} must be implemented instead.
    * @param qc query context
    * @return value
    * @throws QueryException query exception
@@ -106,8 +104,6 @@ public abstract class Expr extends ExprInfo {
   /**
    * Evaluates the expression and returns the resulting item,
    * or {@link Empty#VALUE} if the expression yields an empty sequence.
-   * If this method is not implemented, either {@link #iter(QueryContext)} or
-   * {@link #value(QueryContext)} must be implemented instead.
    * @param qc query context
    * @return item or {@link Empty#VALUE}
    * @throws QueryException query exception

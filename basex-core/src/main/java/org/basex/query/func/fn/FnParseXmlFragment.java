@@ -14,6 +14,7 @@ import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.node.*;
@@ -45,7 +46,7 @@ public class FnParseXmlFragment extends Docs {
   }
 
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     return parse(qc, true, toOptions(arg(1), new ParseXmlFragmentOptions(), qc));
   }
 

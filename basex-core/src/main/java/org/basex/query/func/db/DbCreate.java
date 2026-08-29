@@ -5,7 +5,7 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.up.primitives.name.*;
-import org.basex.query.value.item.*;
+import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
 
 /**
@@ -16,7 +16,7 @@ import org.basex.query.value.seq.*;
  */
 public final class DbCreate extends DbNew {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final String database = toName(arg(0), qc);
     checkCreate(database, qc);
     final NewInput[] inputs = toInputs(qc);

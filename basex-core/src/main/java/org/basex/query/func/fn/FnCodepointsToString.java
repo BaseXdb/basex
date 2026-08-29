@@ -23,7 +23,7 @@ public final class FnCodepointsToString extends StandardFunc {
   private boolean singleInt;
 
   @Override
-  protected Str item(final QueryContext qc) throws QueryException {
+  public Str value(final QueryContext qc) throws QueryException {
     final Expr values = arg(0);
 
     // input is single integer

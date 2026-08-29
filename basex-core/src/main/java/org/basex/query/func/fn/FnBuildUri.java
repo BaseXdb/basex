@@ -16,7 +16,7 @@ import org.basex.util.*;
  */
 public final class FnBuildUri extends FnParseUri {
   @Override
-  protected Str item(final QueryContext qc) throws QueryException {
+  public Str value(final QueryContext qc) throws QueryException {
     final XQMap parts = toMap(arg(0), qc);
     final UriOptions options = options(1, UriOptions::new, qc);
 

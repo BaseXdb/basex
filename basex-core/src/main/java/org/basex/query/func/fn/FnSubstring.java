@@ -16,7 +16,7 @@ import org.basex.query.value.seq.*;
  */
 public final class FnSubstring extends StandardFunc {
   @Override
-  protected AStr item(final QueryContext qc) throws QueryException {
+  public AStr value(final QueryContext qc) throws QueryException {
     final AStr value = toZeroStr(arg(0), qc);
 
     final int length = value.length(info);

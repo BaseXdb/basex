@@ -13,7 +13,7 @@ import org.basex.query.value.node.*;
  */
 public class FnName extends FnNodeName {
   @Override
-  protected final Str item(final QueryContext qc) throws QueryException {
+  public final Str value(final QueryContext qc) throws QueryException {
     final XNode node = toNodeOrNull(context(qc), qc);
     return node == null || empty(node.kind()) ? Str.EMPTY : Str.get(name(node));
   }

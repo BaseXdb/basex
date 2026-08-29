@@ -14,7 +14,7 @@ import jakarta.servlet.http.*;
  */
 public final class RequestCookieMap extends ApiFunc {
   @Override
-  protected XQMap item(final QueryContext qc) throws QueryException {
+  public XQMap value(final QueryContext qc) throws QueryException {
     final MapBuilder map = new MapBuilder();
     final Cookie[] cookies = state(qc).cookies();
     if(cookies != null) {

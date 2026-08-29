@@ -20,7 +20,7 @@ import org.basex.util.*;
  */
 public final class ProfVariables extends StandardFunc {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final Value bindings = arg(0).unwrappedValue(qc);
     final String label = toStringOrNull(arg(1), qc);
 

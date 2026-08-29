@@ -11,7 +11,7 @@ import org.basex.query.value.seq.*;
  */
 public final class CacheClear extends CacheFn {
   @Override
-  protected Empty item(final QueryContext qc) throws QueryException {
+  public Empty value(final QueryContext qc) throws QueryException {
     caches(qc).clear();
     return Empty.VALUE;
   }

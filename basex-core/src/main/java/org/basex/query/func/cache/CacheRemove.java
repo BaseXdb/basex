@@ -11,7 +11,7 @@ import org.basex.query.value.seq.*;
  */
 public final class CacheRemove extends CacheFn {
   @Override
-  protected Empty item(final QueryContext qc) throws QueryException {
+  public Empty value(final QueryContext qc) throws QueryException {
     final String key = toString(arg(0), qc);
     final String name = toZeroString(arg(1), qc);
 

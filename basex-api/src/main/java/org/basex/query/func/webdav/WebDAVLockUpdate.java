@@ -19,7 +19,7 @@ import org.basex.util.*;
  */
 public final class WebDAVLockUpdate extends StandardFunc {
   @Override
-  protected Bln item(final QueryContext qc) throws QueryException {
+  public Bln value(final QueryContext qc) throws QueryException {
     final FItem update = toFunction(arg(0), 1, qc);
     final User user = qc.context.user();
 

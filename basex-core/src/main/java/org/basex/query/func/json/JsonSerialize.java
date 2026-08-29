@@ -18,7 +18,7 @@ import org.basex.query.value.item.*;
  */
 public final class JsonSerialize extends StandardFunc {
   @Override
-  protected Str item(final QueryContext qc) throws QueryException {
+  public Str value(final QueryContext qc) throws QueryException {
     final Iter input = arg(0).iter(qc);
     final JsonSerialOptions options = options(1, JsonSerialOptions::new, qc);
     return Str.get(serialize(input, FnXmlToJson.options(options), INVALIDOPTION_X, qc));

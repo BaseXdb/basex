@@ -18,7 +18,7 @@ import org.basex.util.*;
  */
 public final class ArrayJoin extends ArrayFn {
   @Override
-  protected XQArray item(final QueryContext qc) throws QueryException {
+  public XQArray value(final QueryContext qc) throws QueryException {
     final Expr arrays = arg(0);
 
     // create single-member array

@@ -13,7 +13,7 @@ import org.basex.query.value.node.*;
  */
 public final class CryptoValidateSignature extends StandardFunc {
   @Override
-  protected Bln item(final QueryContext qc) throws QueryException {
+  public Bln value(final QueryContext qc) throws QueryException {
     final XNode node = toNode(arg(0), qc);
     return new DigitalSignature(info).validateSignature(node);
   }

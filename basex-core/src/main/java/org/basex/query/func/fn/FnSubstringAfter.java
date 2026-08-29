@@ -19,7 +19,7 @@ import org.basex.query.value.type.*;
  */
 public final class FnSubstringAfter extends StandardFunc {
   @Override
-  protected Str item(final QueryContext qc) throws QueryException {
+  public Str value(final QueryContext qc) throws QueryException {
     final byte[] value = toZeroToken(arg(0), qc);
     final byte[] substring = toZeroToken(arg(1), qc);
     final Collation collation = toCollation(arg(2), qc);

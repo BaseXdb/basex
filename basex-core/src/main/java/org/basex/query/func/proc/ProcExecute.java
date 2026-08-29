@@ -11,7 +11,7 @@ import org.basex.query.value.node.*;
  */
 public final class ProcExecute extends ProcFn {
   @Override
-  protected FNode item(final QueryContext qc) throws QueryException {
+  public FNode value(final QueryContext qc) throws QueryException {
     final ProcResult result = exec(qc, false);
     final boolean ex = result.exception != null;
     if(ex) result.error.add(result.exception.getMessage());

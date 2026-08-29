@@ -2,7 +2,7 @@ package org.basex.query.func.crypto;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.value.item.*;
+import org.basex.query.value.*;
 
 /**
  * Function implementation.
@@ -12,7 +12,7 @@ import org.basex.query.value.item.*;
  */
 public final class CryptoEncrypt extends StandardFunc {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final byte[] value = toBytes(arg(0), qc);
     final String type = toString(arg(1), qc);
     final byte[] key = toBytes(arg(2), qc);

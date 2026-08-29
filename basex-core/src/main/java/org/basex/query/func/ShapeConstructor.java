@@ -55,7 +55,7 @@ public final class ShapeConstructor extends StandardFunc {
   }
 
   @Override
-  protected XQMap item(final QueryContext qc) throws QueryException {
+  public XQMap value(final QueryContext qc) throws QueryException {
     final TokenObjectMap<ShapeField> fields = shapeType.fields();
     final int fs = fields.size(), el = exprs.length;
     final Value[] values = new Value[fs];

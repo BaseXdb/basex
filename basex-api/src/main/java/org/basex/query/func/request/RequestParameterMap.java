@@ -20,7 +20,7 @@ import org.basex.query.value.map.*;
  */
 public final class RequestParameterMap extends ApiFunc {
   @Override
-  protected XQMap item(final QueryContext qc) throws QueryException {
+  public XQMap value(final QueryContext qc) throws QueryException {
     final MapBuilder map = new MapBuilder();
     final RequestContext requestCtx = requestContext(qc);
     try {

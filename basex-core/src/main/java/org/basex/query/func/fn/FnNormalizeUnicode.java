@@ -18,7 +18,7 @@ import org.basex.util.*;
  */
 public final class FnNormalizeUnicode extends StandardFunc {
   @Override
-  protected AStr item(final QueryContext qc) throws QueryException {
+  public AStr value(final QueryContext qc) throws QueryException {
     final AStr value = toZeroStr(arg(0), qc);
     final byte[] form = toTokenOrNull(arg(1), qc);
 

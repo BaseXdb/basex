@@ -20,7 +20,7 @@ import org.basex.util.*;
  */
 public final class FnElementToMapPlan extends PlanFn {
   @Override
-  protected XQMap item(final QueryContext qc) throws QueryException {
+  public XQMap value(final QueryContext qc) throws QueryException {
     final Iter iter = arg(0).unwrappedIter(qc);
 
     // collect element and attribute nodes

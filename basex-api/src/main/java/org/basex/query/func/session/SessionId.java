@@ -11,7 +11,7 @@ import org.basex.query.value.item.*;
  */
 public final class SessionId extends SessionFn {
   @Override
-  protected Str item(final QueryContext qc) throws QueryException {
+  public Str value(final QueryContext qc) throws QueryException {
     final ASession session = session(qc, true);
 
     return session.id();

@@ -16,7 +16,7 @@ import org.basex.query.value.type.*;
  */
 public final class ArrayOfMembers extends ArrayFn {
   @Override
-  protected XQArray item(final QueryContext qc) throws QueryException {
+  public XQArray value(final QueryContext qc) throws QueryException {
     final Iter input = arg(0).iter(qc);
 
     final ArrayBuilder ab = new ArrayBuilder(qc, input.size());

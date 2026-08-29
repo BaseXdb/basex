@@ -58,7 +58,7 @@ public abstract class UserUpdate extends Update {
 
   @Override
   public void merge(final Update update) throws QueryException {
-    final UserUpdate up = (UserUpdate) update;
-    if(user.equals(up.user)) throw USER_UPDATE1_X_X.get(info, name(), operation());
+    // updates are grouped by user name, so two updates of the same type always conflict
+    throw USER_UPDATE1_X_X.get(info, name(), operation());
   }
 }

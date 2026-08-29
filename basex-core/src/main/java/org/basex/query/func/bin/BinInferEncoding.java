@@ -18,7 +18,7 @@ import org.basex.query.value.map.*;
  */
 public final class BinInferEncoding extends BinFn {
   @Override
-  protected XQMap item(final QueryContext qc) throws QueryException {
+  public XQMap value(final QueryContext qc) throws QueryException {
     final Bin value = toBin(arg(0), qc);
     final String encoding = toEncodingOrNull(arg(1), BIN_UE_X, qc);
 

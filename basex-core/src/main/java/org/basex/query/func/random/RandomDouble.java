@@ -17,7 +17,7 @@ public final class RandomDouble extends StandardFunc {
   private static final Random RND = new Random();
 
   @Override
-  protected Dbl item(final QueryContext qc) {
+  public Dbl value(final QueryContext qc) {
     return Dbl.get(RND.nextDouble());
   }
 }

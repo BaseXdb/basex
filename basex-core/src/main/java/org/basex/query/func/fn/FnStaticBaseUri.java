@@ -2,6 +2,7 @@ package org.basex.query.func.fn;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 
@@ -13,7 +14,7 @@ import org.basex.query.value.seq.*;
  */
 public final class FnStaticBaseUri extends StandardFunc {
   @Override
-  protected Item item(final QueryContext qc) {
+  public Value value(final QueryContext qc) {
     final Uri uri = sc().baseURI();
     return uri == Uri.EMPTY ? Empty.VALUE : uri;
   }

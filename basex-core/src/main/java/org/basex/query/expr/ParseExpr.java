@@ -69,7 +69,7 @@ public abstract class ParseExpr extends Expr {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return iterBased ? iter(qc).value(qc, this) : item(qc);
+    return iter(qc).value(qc, this);
   }
 
   @Override
@@ -78,14 +78,13 @@ public abstract class ParseExpr extends Expr {
   }
 
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
-    return iterBased && !seqType().zeroOrOne() ? item(iter(qc), qc) : value(qc).item(qc, info);
+  protected final Item item(final QueryContext qc) throws QueryException {
+    return iterBased ? item(iter(qc), qc) : value(qc).item(qc, info);
   }
 
   @Override
   protected Item atomItem(final QueryContext qc) throws QueryException {
-    return iterBased && !seqType().zeroOrOne() ? item(atomIter(qc), qc) :
-      atomValue(qc).item(qc, info);
+    return iterBased ? item(atomIter(qc), qc) : atomValue(qc).item(qc, info);
   }
 
   /**

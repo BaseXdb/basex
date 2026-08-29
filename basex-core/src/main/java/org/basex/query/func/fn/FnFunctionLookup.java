@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 
@@ -15,7 +16,7 @@ import org.basex.query.value.seq.*;
  */
 public final class FnFunctionLookup extends StandardFunc {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final Expr expr = lookup(qc);
     return expr != null ? expr.item(qc, info) : Empty.VALUE;
   }

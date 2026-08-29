@@ -33,7 +33,7 @@ public class FnUnparsedTextAvailable extends ParseFn {
   }
 
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     try {
       return Bln.get(doc(qc) == Bln.TRUE);
     } catch(final QueryException ex) {

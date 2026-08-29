@@ -18,7 +18,7 @@ import org.basex.query.value.type.*;
  */
 public final class FnDivideDecimals extends StandardFunc {
   @Override
-  protected XQMap item(final QueryContext qc) throws QueryException {
+  public XQMap value(final QueryContext qc) throws QueryException {
     final BigDecimal value = checkType(arg(0), BasicType.DECIMAL, qc).dec(info);
     final BigDecimal divisor = checkType(arg(1), BasicType.DECIMAL, qc).dec(info);
     final Item precision = arg(2).atomItem(qc, info);

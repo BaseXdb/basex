@@ -20,7 +20,7 @@ import org.basex.query.value.item.*;
  */
 public final class WsEval extends WsFn {
   @Override
-  protected Str item(final QueryContext qc) throws QueryException {
+  public Str value(final QueryContext qc) throws QueryException {
     final WsOptions options = toOptions(arg(2), new WsOptions(), qc);
     final QueryJobSpec spec = toJobSpec(arg(0), arg(1), options, false, qc);
     final WebSocket ws = ws(qc);

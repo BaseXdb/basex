@@ -14,7 +14,7 @@ import org.basex.util.http.*;
  */
 public final class WebRedirect extends WebFn {
   @Override
-  protected FNode item(final QueryContext qc) throws QueryException {
+  public FNode value(final QueryContext qc) throws QueryException {
     final String location = createUrl(qc);
     final Long status = toLongOrNull(arg(3), qc);
 

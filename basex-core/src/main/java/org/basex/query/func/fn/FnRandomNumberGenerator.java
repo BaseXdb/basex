@@ -24,7 +24,7 @@ public final class FnRandomNumberGenerator extends StandardFunc {
       FuncType.get(MapType.get(BasicType.STRING, Types.ITEM_O).seqType());
 
   @Override
-  protected XQMap item(final QueryContext qc) throws QueryException {
+  public XQMap value(final QueryContext qc) throws QueryException {
     final Item seed = arg(0).atomItem(qc, info);
 
     final LongUnaryOperator number = l -> l * 0x5DEECE66DL + 0xBL & (1L << 48) - 1;

@@ -14,7 +14,7 @@ import org.basex.query.value.map.*;
  */
 public final class MapSize extends MapFn {
   @Override
-  protected Itr item(final QueryContext qc) throws QueryException {
+  public Itr value(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(arg(0), qc);
     return Itr.get(map.structSize());
   }

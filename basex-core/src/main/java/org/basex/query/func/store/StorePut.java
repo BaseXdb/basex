@@ -12,7 +12,7 @@ import org.basex.query.value.seq.*;
  */
 public final class StorePut extends StoreFn {
   @Override
-  protected Empty item(final QueryContext qc) throws QueryException {
+  public Empty value(final QueryContext qc) throws QueryException {
     final String key = toString(arg(0), qc);
     final Value value = arg(1).value(qc);
     final String name = toName(arg(2), qc);

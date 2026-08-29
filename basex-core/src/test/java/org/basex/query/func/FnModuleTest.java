@@ -2975,6 +2975,9 @@ return
     query(func.args(" (1, 1e1)"), 1);
     query(func.args(" (1, 1.1, 1e1)") + " instance of xs:integer", true);
     query(func.args(wrap(1)) + " instance of xs:double", true);
+    // untyped values are promoted to xs:double, also if they are known at compile time
+    query(func.args(" xs:untypedAtomic('5')") + " instance of xs:double", true);
+    query(MAX.args(" xs:untypedAtomic('5')") + " instance of xs:double", true);
     query(func.args(" [1]"), 1);
     query(func.args(" (7, 6, 6, 6.0, 5.0, 5.0, xs:float('5'), xs:float('4'), xs:float('4'), " +
         "4, 4e0, 3e0, 3e0, 2e0, 2, 2, 1, <x>0</x>, <x>0</x>)"), 0);

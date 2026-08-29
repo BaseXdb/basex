@@ -2452,6 +2452,41 @@ public final class RewritingsTest extends SandboxTest {
         "a\nb");
   }
 
+  /** Array constructors are discarded in atomizing contexts. */
+  @Test public void arrayConstructor() {
+    check("data([ (1, " + wrap(2) + "), 3 ])", "1\n2\n3",
+        empty(CArray.class), root(FnData.class));
+  }
+
+  /** Context functions are inlined into the left operand of a simple map. */
+  @Test public void contextFunction() {
+    check("<a>{ " + wrap(2) + " }</a> ! data(.)", 2, empty(SimpleMap.class), root(FnData.class));
+  }
+
+  /** A compile-time error in a closure body is deferred to the function call. */
+  @Test public void closureError() {
+    query("let $x := 'z' return exists(function() { xs:integer($x) })", true);
+    error("let $x := 'z' return (function() { xs:integer($x) })()", FUNCCAST_X_X);
+  }
+
+  /** Boolean sequences are simplified in comparisons. */
+  @Test public void booleanSequence() {
+    inline(true);
+    unroll(true);
+    final String seq = "for-each((0, 1, 2), boolean#1)";
+    // all values are equal: the sequence is replaced with a single item
+    check("boolean(" + wrap(2) + ") = reverse(subsequence(" + seq + ", 2, 2))", true,
+        empty(BlnSeq.class), root(FnBoolean.class));
+    // mixed values: the sequence is replaced with a canonical two-item sequence
+    check("boolean(" + wrap(2) + ") = reverse(" + seq + ")", true, count(BlnSeq.class, 1));
+  }
+
+  /** A kind test is narrowed down to the node type of the step result. */
+  @Test public void stepNodeTest() {
+    execute(new CreateDB(NAME, "<root><a>t</a><!--c--></root>"));
+    check("//node()[self::text()]", "t", exists("IterStep[@test = 'text()']"));
+  }
+
   /** DualIterMap context value setting. */
   @Test public void gh2569() {
     check("let $node := <X><A/><B/><C/></X>\n"

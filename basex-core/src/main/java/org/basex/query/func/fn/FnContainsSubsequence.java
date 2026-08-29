@@ -16,7 +16,7 @@ import org.basex.query.value.type.*;
  */
 public class FnContainsSubsequence extends StandardFunc {
   @Override
-  protected final Bln item(final QueryContext qc) throws QueryException {
+  public final Bln value(final QueryContext qc) throws QueryException {
     return Bln.get(ebv(qc));
   }
 

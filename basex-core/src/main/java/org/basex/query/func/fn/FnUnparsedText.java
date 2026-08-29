@@ -16,7 +16,7 @@ import org.basex.util.options.*;
  */
 public final class FnUnparsedText extends FnUnparsedTextAvailable {
   @Override
-  protected Str item(final QueryContext qc) throws QueryException {
+  public Str value(final QueryContext qc) throws QueryException {
     return (Str) doc(qc);
   }
 

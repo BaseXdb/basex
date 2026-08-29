@@ -11,7 +11,7 @@ import org.basex.query.value.map.*;
  */
 public final class StoreInfo extends StoreFn {
   @Override
-  protected XQMap item(final QueryContext qc) throws QueryException {
+  public XQMap value(final QueryContext qc) throws QueryException {
     final String name = toName(arg(0), qc);
 
     return stores(qc).info(name, info);

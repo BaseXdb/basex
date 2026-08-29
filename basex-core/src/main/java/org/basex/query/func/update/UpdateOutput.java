@@ -5,7 +5,7 @@ import static org.basex.query.QueryError.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.up.*;
-import org.basex.query.value.item.*;
+import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
 
 /**
@@ -16,7 +16,7 @@ import org.basex.query.value.seq.*;
  */
 public final class UpdateOutput extends StandardFunc {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     if(qc.updates().mod instanceof TransformModifier) throw BASEX_UPDATE.get(info);
 
     qc.updates().addOutput(arg(0).value(qc), qc);

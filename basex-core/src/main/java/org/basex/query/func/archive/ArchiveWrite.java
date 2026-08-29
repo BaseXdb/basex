@@ -10,6 +10,7 @@ import java.util.Map.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 
@@ -21,7 +22,7 @@ import org.basex.query.value.seq.*;
  */
 public final class ArchiveWrite extends ArchiveFn {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final Path path = toPath(arg(0), qc);
     final Map<String, Entry<Item, Item>> files = toFiles(arg(1), arg(2), qc);
     final CreateOptions options = toOptions(arg(3), new CreateOptions(), qc);

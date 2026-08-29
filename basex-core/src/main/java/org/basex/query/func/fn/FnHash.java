@@ -11,6 +11,7 @@ import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
@@ -23,7 +24,7 @@ import org.basex.util.*;
  */
 public final class FnHash extends StandardFunc {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final Item value = arg(0).atomItem(qc, info);
     final String algorithm = toStringOrNull(arg(1), qc);
     return value.isEmpty() ? Empty.VALUE : new Hex(hash(value, algorithm, qc));

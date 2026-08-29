@@ -1,6 +1,7 @@
 package org.basex.query.func.bin;
 
 import org.basex.query.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
@@ -28,7 +29,7 @@ public final class BinOctal extends BinFn {
   }
 
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final byte[] value = toDigits(qc);
     if(value == null) return Empty.VALUE;
     final int tl = value.length;

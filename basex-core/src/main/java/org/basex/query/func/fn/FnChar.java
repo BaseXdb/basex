@@ -15,7 +15,7 @@ import org.basex.util.*;
  */
 public final class FnChar extends StandardFunc {
   @Override
-  protected Str item(final QueryContext qc) throws QueryException {
+  public Str value(final QueryContext qc) throws QueryException {
     final Item value = arg(0).atomItem(qc, info);
 
     if(value instanceof Itr) {

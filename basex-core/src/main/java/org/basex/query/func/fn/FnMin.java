@@ -28,7 +28,7 @@ import org.basex.util.hash.*;
  */
 public class FnMin extends StandardFunc {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     return minmax(true, qc);
   }
 
@@ -122,20 +122,11 @@ public class FnMin extends StandardFunc {
         return values;
       }
       exprType.assign(type);
-      if(values instanceof final Value value && noColl) {
-        Item item = null;
-        final long size = value.size();
-        if(value instanceof final RangeSeq rs) {
-          item = rs.itemAt(min ^ rs.ascending() ? size - 1 : 0);
-        } else if(value instanceof final SingletonSeq ss && ss.singleItem()) {
-          item = value.itemAt(0);
-        } else if(value.size() == 1) {
-          item = (Item) value;
-        }
-        if(item != null) {
-          type = item.seqType().type;
-          if(type.isNumber() || type.instanceOf(STRING)) return item;
-        }
+      if(values instanceof final RangeSeq rs && noColl) {
+        // min(1 to 10) → 1, max(1 to 10) → 10
+        final Item item = rs.itemAt(min ^ rs.ascending() ? rs.size() - 1 : 0);
+        type = item.seqType().type;
+        if(type.isNumber() || type.instanceOf(STRING)) return item;
       }
     }
 

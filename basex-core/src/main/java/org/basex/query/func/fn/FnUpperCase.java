@@ -16,7 +16,7 @@ import org.basex.query.value.item.*;
  */
 public final class FnUpperCase extends StandardFunc {
   @Override
-  protected Str item(final QueryContext qc) throws QueryException {
+  public Str value(final QueryContext qc) throws QueryException {
     final AStr value = toZeroStr(arg(0), qc);
     return Str.get(uc(value.string(info), value.ascii(info)));
   }

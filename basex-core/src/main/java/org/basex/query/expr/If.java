@@ -172,11 +172,6 @@ public final class If extends Arr {
     return exprs[0].eager() && exprs[1].eager();
   }
 
-  @Override
-  protected Item item(final QueryContext qc) throws QueryException {
-    return expr(qc).item(qc, info);
-  }
-
   /**
    * Tests the condition and returns the expression to evaluate.
    * @param qc query context

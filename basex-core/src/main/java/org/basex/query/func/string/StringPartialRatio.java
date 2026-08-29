@@ -14,7 +14,7 @@ import org.basex.util.similarity.*;
  */
 public final class StringPartialRatio extends StringFn {
   @Override
-  protected Dbl item(final QueryContext qc) throws QueryException {
+  public Dbl value(final QueryContext qc) throws QueryException {
     final byte[] value1 = toToken(arg(0), qc), value2 = toToken(arg(1), qc);
     final FTOpt opt = ftOpt(2, qc);
 

@@ -5,7 +5,6 @@ import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 
 /**
@@ -23,11 +22,6 @@ public final class FnData extends ContextFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     return context(qc).atomValue(qc, info);
-  }
-
-  @Override
-  protected Item item(final QueryContext qc) throws QueryException {
-    return context(qc).atomItem(qc, info);
   }
 
   @Override

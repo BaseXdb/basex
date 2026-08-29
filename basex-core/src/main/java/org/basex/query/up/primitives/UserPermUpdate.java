@@ -49,9 +49,7 @@ public abstract class UserPermUpdate extends UserUpdate {
 
   @Override
   public void merge(final Update update) throws QueryException {
-    final UserPermUpdate up = (UserPermUpdate) update;
-    if(!name().equals(up.name())) return;
-    for(final String pattern : up.patterns) {
+    for(final String pattern : ((UserPermUpdate) update).patterns) {
       if(patterns.contains(pattern)) throw pattern.isEmpty()
         ? USER_UPDATE1_X_X.get(info, name(), operation()) : USER_UPDATE2_X.get(info, pattern);
     }

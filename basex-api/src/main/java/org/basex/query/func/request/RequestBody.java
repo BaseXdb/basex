@@ -7,6 +7,7 @@ import java.io.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 
@@ -18,7 +19,7 @@ import org.basex.query.value.seq.*;
  */
 public final class RequestBody extends ApiFunc {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     try {
       final IO body = requestContext(qc).body();
       return body.length() == 0 ? Empty.VALUE : B64.get(body, REQUEST_BODY);

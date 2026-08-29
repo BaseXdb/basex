@@ -11,7 +11,7 @@ import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.up.primitives.*;
-import org.basex.query.value.item.*;
+import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 
 /**
@@ -22,7 +22,7 @@ import org.basex.query.value.node.*;
  */
 public class FetchDoc extends StandardFunc {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     return fetch(toIO(arg(0), qc), qc);
   }
 

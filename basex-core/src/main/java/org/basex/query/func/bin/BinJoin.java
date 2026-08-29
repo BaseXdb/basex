@@ -14,7 +14,7 @@ import org.basex.util.list.*;
  */
 public final class BinJoin extends StandardFunc {
   @Override
-  protected B64 item(final QueryContext qc) throws QueryException {
+  public B64 value(final QueryContext qc) throws QueryException {
     final Iter iter = arg(0).atomIter(qc, info);
     final ByteList bl = new ByteList(iter.size());
     for(Item item; (item = qc.next(iter)) != null;) {

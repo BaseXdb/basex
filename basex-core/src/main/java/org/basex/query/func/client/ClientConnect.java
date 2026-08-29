@@ -16,7 +16,7 @@ import org.basex.query.value.item.*;
  */
 public final class ClientConnect extends ClientFn {
   @Override
-  protected Uri item(final QueryContext qc) throws QueryException {
+  public Uri value(final QueryContext qc) throws QueryException {
     final String host = toString(arg(0), qc);
     final String username = toString(arg(2), qc);
     final String password = toString(arg(3), qc);

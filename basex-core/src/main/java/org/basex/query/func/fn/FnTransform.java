@@ -145,7 +145,7 @@ public final class FnTransform extends StandardFunc {
       new QNm("version", "http://www.w3.org/1999/XSL/Transform");
 
   @Override
-  protected XQMap item(final QueryContext qc) throws QueryException {
+  public XQMap value(final QueryContext qc) throws QueryException {
     final TransformOptions options = options(qc);
     requestedProperties(options);
     version(options);

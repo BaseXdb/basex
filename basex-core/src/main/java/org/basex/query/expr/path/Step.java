@@ -251,13 +251,9 @@ public abstract class Step extends Preds {
     if(optimize(cc, this)) return cc.emptySeq(this);
 
     // performed after predicate optimization: adopt final sequence type if it is more specific
-    if(seqType().type instanceof final NodeType nt) {
-      if(nt.test != null) {
-        if(nt.test.instanceOf(test) && !nt.test.equals(test)) test = nt.test;
-      } else {
-        final NodeType tt = NodeType.get(test);
-        if(nt.instanceOf(tt)) test = NodeTest.get(nt.kind());
-      }
+    if(seqType().type instanceof final NodeType nt && nt.test == null) {
+      final NodeType tt = NodeType.get(test);
+      if(nt.instanceOf(tt)) test = NodeTest.get(nt.kind());
     }
     // choose best implementation
     return copyType(rebuild(exprs));

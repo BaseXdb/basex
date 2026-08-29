@@ -13,7 +13,7 @@ import org.basex.util.*;
  */
 public final class ProfHuman extends StandardFunc {
   @Override
-  protected Str item(final QueryContext qc) throws QueryException {
+  public Str value(final QueryContext qc) throws QueryException {
     return Str.get(Performance.formatHuman(toLong(arg(0), qc)));
   }
 }

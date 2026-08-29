@@ -12,7 +12,7 @@ import org.basex.query.value.item.*;
  */
 public final class XsltVersion extends StandardFunc {
   @Override
-  protected Str item(final QueryContext qc) {
+  public Str value(final QueryContext qc) {
     return Str.get(Xslt.VERSION);
   }
 }

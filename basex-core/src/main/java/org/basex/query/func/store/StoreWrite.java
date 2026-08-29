@@ -11,7 +11,7 @@ import org.basex.query.value.seq.*;
  */
 public final class StoreWrite extends StoreFn {
   @Override
-  protected Empty item(final QueryContext qc) throws QueryException {
+  public Empty value(final QueryContext qc) throws QueryException {
     final String name = toName(arg(0), qc);
     stores(qc).write(name, info);
     return Empty.VALUE;

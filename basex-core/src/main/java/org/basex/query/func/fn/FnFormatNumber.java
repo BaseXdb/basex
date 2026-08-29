@@ -19,7 +19,7 @@ import org.basex.util.*;
  */
 public final class FnFormatNumber extends StandardFunc {
   @Override
-  protected Str item(final QueryContext qc) throws QueryException {
+  public Str value(final QueryContext qc) throws QueryException {
     Item value = arg(0).atomItem(qc, info);
     final byte[] picture = toToken(arg(1), qc);
     final Item options = arg(2).item(qc, info);

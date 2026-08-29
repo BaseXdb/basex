@@ -18,7 +18,7 @@ import org.basex.query.var.*;
  */
 public final class FnRegex extends RegExFn {
   @Override
-  protected XQMap item(final QueryContext qc) throws QueryException {
+  public XQMap value(final QueryContext qc) throws QueryException {
     final byte[] pattern = toToken(arg(0), qc);
     final byte[] flags = toZeroToken(arg(1), qc);
 

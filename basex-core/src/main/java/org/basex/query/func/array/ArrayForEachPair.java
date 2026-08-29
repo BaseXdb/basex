@@ -18,7 +18,7 @@ import org.basex.query.value.type.*;
  */
 public final class ArrayForEachPair extends ArrayFn {
   @Override
-  protected XQArray item(final QueryContext qc) throws QueryException {
+  public XQArray value(final QueryContext qc) throws QueryException {
     final XQArray array1 = toArray(arg(0), qc), array2 = toArray(arg(1), qc);
     final FItem action = toFunction(arg(2), 3, qc);
 

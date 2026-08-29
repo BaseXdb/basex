@@ -3,7 +3,7 @@ package org.basex.query.func.admin;
 import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
-import org.basex.query.value.item.*;
+import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.log.*;
 
@@ -15,7 +15,7 @@ import org.basex.util.log.*;
  */
 public final class AdminWriteLog extends AdminFn {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final String message = toString(arg(0), qc);
     final String type = toStringOrNull(arg(1), qc);
     if(type != null && type.matches(".*\\s.*$")) throw ADMIN_TYPE_X.get(info, type);

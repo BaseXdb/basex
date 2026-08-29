@@ -45,7 +45,7 @@ public final class FTOptions extends FTExpr {
   }
 
   @Override
-  public FTNode item(final QueryContext qc) {
+  public FTNode value(final QueryContext qc) {
     // shouldn't be called, as compile returns argument
     throw Util.notExpected();
   }

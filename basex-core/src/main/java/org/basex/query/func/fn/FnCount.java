@@ -23,7 +23,7 @@ public final class FnCount extends StandardFunc {
   private boolean ndt;
 
   @Override
-  protected Itr item(final QueryContext qc) throws QueryException {
+  public Itr value(final QueryContext qc) throws QueryException {
     // value-based input: return result size
     final Expr input = arg(0);
     final Value value = input.eagerValue(qc);

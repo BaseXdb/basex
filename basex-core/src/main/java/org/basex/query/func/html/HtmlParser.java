@@ -13,7 +13,7 @@ import org.basex.query.value.item.*;
  */
 public final class HtmlParser extends StandardFunc {
   @Override
-  protected Str item(final QueryContext qc) {
+  public Str value(final QueryContext qc) {
     final Parser parser = Parser.PARSER;
     return Str.get(parser != null ? parser.toString() : "");
   }

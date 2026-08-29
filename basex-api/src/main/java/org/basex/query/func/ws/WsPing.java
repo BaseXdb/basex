@@ -1,7 +1,7 @@
 package org.basex.query.func.ws;
 
 import org.basex.query.*;
-import org.basex.query.value.item.*;
+import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
 
 /**
@@ -12,7 +12,7 @@ import org.basex.query.value.seq.*;
  */
 public final class WsPing extends WsFn {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     client(qc).ping();
     return Empty.VALUE;
   }

@@ -3,7 +3,6 @@ package org.basex.query.func.sessions;
 import org.basex.query.*;
 import org.basex.query.func.session.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 
 /**
@@ -14,7 +13,7 @@ import org.basex.query.value.seq.*;
  */
 public final class SessionsSet extends SessionsFn {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final ASession session = session(qc);
     final String key = toString(arg(1), qc);
     final Value value = arg(2).value(qc);

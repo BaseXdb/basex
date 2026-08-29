@@ -15,7 +15,7 @@ import org.basex.query.value.item.*;
  */
 public final class BinPackInteger extends BinFn {
   @Override
-  protected B64 item(final QueryContext qc) throws QueryException {
+  public B64 value(final QueryContext qc) throws QueryException {
     long value = toLong(arg(0), qc);
     final long size = toLong(arg(1), qc);
     final ByteOrder order = order(arg(2), qc);

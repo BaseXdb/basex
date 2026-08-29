@@ -18,7 +18,7 @@ import org.basex.util.*;
  */
 public final class FnQName extends StandardFunc {
   @Override
-  protected QNm item(final QueryContext qc) throws QueryException {
+  public QNm value(final QueryContext qc) throws QueryException {
     final byte[] uri = toZeroToken(arg(0), qc), qname = toToken(arg(1), qc);
     final byte[] name = !contains(qname, ':') && eq(uri, XML_URI)
         ? concat(XML_COLON, qname) : qname;

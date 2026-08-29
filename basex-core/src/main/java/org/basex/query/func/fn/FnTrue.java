@@ -13,7 +13,7 @@ import org.basex.query.value.item.*;
 public final class FnTrue extends StandardFunc {
   // will always be pre-evaluated
   @Override
-  protected Bln item(final QueryContext qc) {
+  public Bln value(final QueryContext qc) {
     return Bln.TRUE;
   }
 }

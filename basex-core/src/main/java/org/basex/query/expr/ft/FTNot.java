@@ -36,8 +36,8 @@ public final class FTNot extends FTExpr {
   }
 
   @Override
-  public FTNode item(final QueryContext qc) throws QueryException {
-    return not(exprs[0].item(qc));
+  public FTNode value(final QueryContext qc) throws QueryException {
+    return not(exprs[0].value(qc));
   }
 
   @Override

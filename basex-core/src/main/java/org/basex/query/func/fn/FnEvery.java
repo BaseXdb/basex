@@ -16,7 +16,7 @@ import org.basex.query.value.type.*;
  */
 public class FnEvery extends StandardFunc {
   @Override
-  protected final Bln item(final QueryContext qc) throws QueryException {
+  public final Bln value(final QueryContext qc) throws QueryException {
     // implementation for dynamic function lookup
     return Bln.get(ebv(qc));
   }

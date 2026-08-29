@@ -46,10 +46,10 @@ public final class FTAnd extends FTExpr {
   }
 
   @Override
-  public FTNode item(final QueryContext qc) throws QueryException {
-    final FTNode item = exprs[0].item(qc);
+  public FTNode value(final QueryContext qc) throws QueryException {
+    final FTNode item = exprs[0].value(qc);
     final int el = exprs.length;
-    for(int e = 1; e < el; e++) and(item, exprs[e].item(qc));
+    for(int e = 1; e < el; e++) and(item, exprs[e].value(qc));
     return item;
   }
 

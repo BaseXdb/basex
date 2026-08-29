@@ -9,7 +9,6 @@ import org.basex.query.CompileContext.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -155,11 +154,6 @@ public final class Typeswitch extends ParseExpr {
   @Override
   public boolean eager() {
     return Checks.all(groups, TypeswitchGroup::eager);
-  }
-
-  @Override
-  protected Item item(final QueryContext qc) throws QueryException {
-    return group(qc).item(qc, info);
   }
 
   /**

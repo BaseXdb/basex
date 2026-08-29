@@ -5,7 +5,7 @@ import static org.basex.query.QueryError.*;
 import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
-import org.basex.query.value.item.*;
+import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
@@ -18,7 +18,7 @@ import org.basex.util.*;
  */
 public final class UserUpdateInfo extends UserFn {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final XNode node = toElem(arg(0), Q_INFO, qc, ELM_X_X_X);
     final User user = toUser(arg(1), true, qc);
 

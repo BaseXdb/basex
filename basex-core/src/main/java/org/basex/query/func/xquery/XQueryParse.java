@@ -44,7 +44,7 @@ public final class XQueryParse extends StandardFunc {
   }
 
   @Override
-  protected FNode item(final QueryContext qc) throws QueryException {
+  public FNode value(final QueryContext qc) throws QueryException {
     final IO query = toContent(arg(0), qc);
     final XQueryOptions options = toOptions(arg(1), new XQueryOptions(), qc);
 

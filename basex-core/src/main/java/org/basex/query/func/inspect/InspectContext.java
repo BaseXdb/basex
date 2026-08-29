@@ -12,7 +12,7 @@ import org.basex.query.value.node.*;
  */
 public final class InspectContext extends StandardFunc {
   @Override
-  protected FNode item(final QueryContext qc) throws QueryException {
+  public FNode value(final QueryContext qc) throws QueryException {
     return new PlainDoc(qc, info).context();
   }
 }

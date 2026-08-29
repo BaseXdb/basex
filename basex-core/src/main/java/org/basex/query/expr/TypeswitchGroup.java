@@ -12,7 +12,6 @@ import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -216,11 +215,6 @@ public final class TypeswitchGroup extends Single {
   @Override
   public boolean eager() {
     return var != null || expr.eager();
-  }
-
-  @Override
-  protected Item item(final QueryContext qc) throws QueryException {
-    return expr.item(qc, info);
   }
 
   /**

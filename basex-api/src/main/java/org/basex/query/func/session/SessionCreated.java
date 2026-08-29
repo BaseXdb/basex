@@ -11,7 +11,7 @@ import org.basex.query.value.item.*;
  */
 public final class SessionCreated extends SessionFn {
   @Override
-  protected Dtm item(final QueryContext qc) throws QueryException {
+  public Dtm value(final QueryContext qc) throws QueryException {
     final ASession session = session(qc, true);
 
     return session.created();

@@ -13,7 +13,7 @@ import org.basex.query.value.node.*;
  */
 public final class FetchBinaryDoc extends FetchDoc {
   @Override
-  protected DBNode item(final QueryContext qc) throws QueryException {
+  public DBNode value(final QueryContext qc) throws QueryException {
     final Bin source = toBin(arg(0), qc);
     // input is streamed: large binaries are not cached in main memory
     return fetch(new IOStream(source.input(info)), qc);

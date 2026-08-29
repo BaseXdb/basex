@@ -13,7 +13,7 @@ import org.basex.query.value.node.*;
  */
 public final class InspectXqdoc extends StandardFunc {
   @Override
-  protected FNode item(final QueryContext qc) throws QueryException {
+  public FNode value(final QueryContext qc) throws QueryException {
     final IOContent content = toContent(toString(arg(0), qc), qc);
     return new XQDoc(qc, info).parse(content);
   }

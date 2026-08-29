@@ -496,6 +496,9 @@ public final class ArrayModuleTest extends SandboxTest {
     query("([ 2, 1 ], 1)[. instance of array(*)] ! " + func.args(" .", " ()", " identity#1"),
         "[1,2]");
 
+    // arrays with a single member are returned as they are
+    check(func.args(" [ 1 ]"), "[1]", empty(func));
+
     query(func.args(" [ 1, 4, 6, 5, 3 ]"), "[1,3,4,5,6]");
     query(func.args(" [ (1, 0), (1, 1), (0, 1), (0, 0) ]"), "[(0,0),(0,1),(1,0),(1,1)]");
     query(func.args(" [ 3, 2, 1 ]", "http://www.w3.org/2005/xpath-functions/collation/codepoint"),

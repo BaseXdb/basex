@@ -14,7 +14,7 @@ import org.basex.query.value.item.*;
  */
 public final class FetchBinary extends FetchDoc {
   @Override
-  protected B64IOLazy item(final QueryContext qc) throws QueryException {
+  public B64IOLazy value(final QueryContext qc) throws QueryException {
     final IO source = toIO(arg(0), qc);
     return new B64IOLazy(source, FETCH_OPEN_X);
   }

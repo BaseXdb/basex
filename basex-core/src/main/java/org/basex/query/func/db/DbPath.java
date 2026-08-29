@@ -14,7 +14,7 @@ import org.basex.query.value.node.*;
  */
 public final class DbPath extends StandardFunc {
   @Override
-  protected Str item(final QueryContext qc) throws QueryException {
+  public Str value(final QueryContext qc) throws QueryException {
     XNode node, parent = toNode(arg(0), qc);
     do {
       node = parent;

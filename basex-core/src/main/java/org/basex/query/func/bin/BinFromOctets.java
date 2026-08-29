@@ -17,7 +17,7 @@ import org.basex.util.list.*;
  */
 public final class BinFromOctets extends StandardFunc {
   @Override
-  protected B64 item(final QueryContext qc) throws QueryException {
+  public B64 value(final QueryContext qc) throws QueryException {
     final Iter values = arg(0).atomIter(qc, info);
     final ByteList bl = new ByteList(Seq.initialCapacity(values.size()));
     for(Item item; (item = qc.next(values)) != null;) {

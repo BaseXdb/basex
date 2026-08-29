@@ -30,8 +30,8 @@ public final class FTMildNot extends FTExpr {
   }
 
   @Override
-  public FTNode item(final QueryContext qc) throws QueryException {
-    return mildnot(exprs[0].item(qc), exprs[1].item(qc));
+  public FTNode value(final QueryContext qc) throws QueryException {
+    return mildnot(exprs[0].value(qc), exprs[1].value(qc));
   }
 
   @Override

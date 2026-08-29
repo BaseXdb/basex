@@ -40,7 +40,7 @@ public final class FnMapToElement extends PlanFn {
   }
 
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final Value value = arg(0).value(qc);
     final ElementsOptions options = options(1, ElementsOptions::new, qc);
     if(value.isEmpty()) return Empty.VALUE;

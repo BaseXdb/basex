@@ -3,7 +3,7 @@ package org.basex.query.func.sql;
 import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
-import org.basex.query.value.item.*;
+import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
 
 /**
@@ -14,7 +14,7 @@ import org.basex.query.value.seq.*;
  */
 public final class SqlClose extends SqlFn {
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     @SuppressWarnings("resource")
     final AutoCloseable ac = get(qc, true);
     try {

@@ -5,7 +5,7 @@ import static org.basex.util.Token.*;
 
 import org.basex.http.ws.*;
 import org.basex.query.*;
-import org.basex.query.value.item.*;
+import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
 
 import jakarta.websocket.CloseReason.*;
@@ -21,7 +21,7 @@ public final class WsClose extends WsFn {
   private static final int MAX_REASON = 123;
 
   @Override
-  protected Item item(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final WebSocket client = client(qc);
     final long status = defined(1) ? toLong(arg(1), qc) : CloseCodes.NORMAL_CLOSURE.getCode();
     // 1005 and 1006 are reserved for internal use and must not be sent (RFC 6455)

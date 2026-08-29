@@ -13,7 +13,7 @@ import org.basex.util.*;
  */
 public final class FileLineSeparator extends StandardFunc {
   @Override
-  protected Str item(final QueryContext qc) {
+  public Str value(final QueryContext qc) {
     return Str.get(Prop.NL);
   }
 }

@@ -12,7 +12,7 @@ import org.basex.query.value.item.*;
  */
 public final class ConvertDateTimeToInteger extends StandardFunc {
   @Override
-  protected Itr item(final QueryContext qc) throws QueryException {
+  public Itr value(final QueryContext qc) throws QueryException {
     return Itr.get(toMs(arg(0), qc));
   }
 }
