@@ -79,6 +79,11 @@ abstract class Set extends Arr {
     return iterative ? iterate(qc).value(qc, this) : nodes(qc);
   }
 
+  @Override
+  public final boolean eager() {
+    return !iterative;
+  }
+
   /**
    * Creates iterators for all expressions.
    * @param qc query context

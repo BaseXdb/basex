@@ -9,6 +9,7 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.List;
 import org.basex.query.func.*;
 import org.basex.query.func.file.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -22,8 +23,13 @@ import org.basex.query.value.type.*;
 public final class FnHead extends StandardFunc {
   @Override
   protected Item item(final QueryContext qc) throws QueryException {
-    final Item input = arg(0).iter(qc).next();
-    return input == null ? Empty.VALUE : input;
+    // value-based input: return first item
+    final Expr input = arg(0);
+    final Value value = input.eagerValue(qc);
+    if(value != null) return value.isEmpty() ? Empty.VALUE : value.itemAt(0);
+
+    final Item item = input.iter(qc).next();
+    return item == null ? Empty.VALUE : item;
   }
 
   @Override

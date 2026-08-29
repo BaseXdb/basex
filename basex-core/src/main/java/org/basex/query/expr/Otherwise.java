@@ -74,6 +74,11 @@ public final class Otherwise extends Arr {
   }
 
   @Override
+  public boolean eager() {
+    return Checks.all(exprs, Expr::eager);
+  }
+
+  @Override
   public Expr compile(final CompileContext cc) throws QueryException {
     final int el = exprs.length;
     for(int e = 0; e < el; e++) {

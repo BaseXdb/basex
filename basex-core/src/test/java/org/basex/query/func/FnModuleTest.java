@@ -684,6 +684,19 @@ public final class FnModuleTest extends SandboxTest {
     check(count + " =  2", true, root(_UTIL_COUNT_WITHIN));
     check(count + " div 2 = 1", true, root(_UTIL_COUNT_WITHIN));
 
+    // comparisons with ranges and variables: no minimum size
+    final String seq = " (1 to 2)[. = " + wrap(3) + "]";
+    count = func.args(seq);
+    check(count + " <= (3 to 5)", true, root(_UTIL_COUNT_WITHIN));
+    check(count + " >= (3 to 5)", false, root(_UTIL_COUNT_WITHIN));
+    check(count + " =  (3 to 5)", false, root(_UTIL_COUNT_WITHIN));
+
+    final String cmps = "declare %basex:inline(0) function local:cmps($input as item()*, "
+        + "$count as xs:integer) { count($input) <= $count, count($input) >= $count, "
+        + "count($input) = $count }; local:cmps(";
+    query(cmps + seq + ", 0)", "true\ntrue\ntrue");
+    query(cmps + seq + ", 1)", "true\nfalse\nfalse");
+
     // GH-1519: count of large sequences
     query("declare function local:replicate($seq, $n, $out) { "
         + "  if($n eq 0) then $out "
@@ -3140,6 +3153,20 @@ return
   }
 
   /** Test method. */
+  @Test public void oneOrMore() {
+    final Function func = ONE_OR_MORE;
+
+    error(func.args(" ()"), ONEORMORE);
+    query("count(" + func.args(" (1 to 3)[. > 0]") + ')', 3);
+
+    // value-based input
+    query("declare %basex:inline(0) function local:f($s as item()*) { foot(" +
+        func.args(" $s") + ") }; local:f((1, 2, 3))", 3);
+    // iterator-based input: results must not be materialized
+    query("head(" + func.args(" (1 to 100_000_000)[. > 0]") + ')', 1);
+  }
+
+  /** Test method. */
   @Test public void op() {
     final Function func = OP;
 
@@ -3990,6 +4017,12 @@ return
     query(func.args(" 1 to 10000", 10000) + "[10000]", "10000");
     query(func.args(" 1 to 10000", 10000) + "[10001]", "1");
     query("count(" + func.args(" 1 to 1_000_000", 1_000_000) + ")", 1000000000000L);
+
+    // value-based input
+    query("declare %basex:inline(0) function local:f($s as item()*) { foot(" +
+        func.args(" $s", 2) + ") }; local:f((1, 2))", 2);
+    // repeated evaluations: results must not be materialized
+    query("head(" + func.args(" random:integer(1)", 100_000_000, " true()") + ')', 0);
     query("count(" + func.args(func.args(" 1 to 3", 3), 3) + ")", 27);
 
     // single item: total size fits into the integer range

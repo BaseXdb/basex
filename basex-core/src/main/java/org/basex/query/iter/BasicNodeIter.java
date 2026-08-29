@@ -2,8 +2,6 @@ package org.basex.query.iter;
 
 import java.util.*;
 
-import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
@@ -30,11 +28,7 @@ public abstract class BasicNodeIter extends NodeIter implements Iterable<GNode> 
       return 0;
     }
     @Override
-    public boolean valueIter() {
-      return true;
-    }
-    @Override
-    public Empty value(final QueryContext qc, final Expr expr) {
+    public Empty value() {
       return Empty.VALUE;
     }
   };

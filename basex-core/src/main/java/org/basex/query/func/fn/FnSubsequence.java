@@ -30,36 +30,39 @@ public class FnSubsequence extends StandardFunc {
 
   @Override
   public final Iter iter(final QueryContext qc) throws QueryException {
+    // value-based input: return subsequence
+    if(eager()) return value(qc).iter();
+
     // no range: return empty sequence
     final SeqRange sr = range(qc);
     if(sr == EMPTY) return Empty.ITER;
 
     // return iterator if all results are returned, of it iterator yields no items
-    final Iter input = arg(0).iter(qc);
-    if(sr == ALL) return input;
+    final Iter iter = arg(0).iter(qc);
+    if(sr == ALL) return iter;
 
     // return empty iterator if no items remain
-    final long size = sr.adjust(input.size());
+    final long size = sr.adjust(iter.size());
     if(sr.length == 0) return Empty.ITER;
 
-    // return subsequence if iterator is value-based
-    if(input.valueIter()) {
-      return input.value(qc, null).subsequence(sr.start, sr.length, qc).iter();
-    }
+    // value-based iterator
+    final Value value = iter.value();
+    if(value != null) return value.subsequence(sr.start, sr.length, qc).iter();
+
     // size is known: create specific iterator
     if(size != -1) {
-      if(sr.length == size) return input;
+      if(sr.length == size) return iter;
 
       return new Iter() {
         long c = sr.start;
 
         @Override
         public Item next() throws QueryException {
-          return c < sr.end ? input.get(c++) : null;
+          return c < sr.end ? iter.get(c++) : null;
         }
         @Override
         public Item get(final long i) throws QueryException {
-          return input.get(sr.start + i);
+          return iter.get(sr.start + i);
         }
         @Override
         public long size() {
@@ -73,7 +76,7 @@ public class FnSubsequence extends StandardFunc {
 
       @Override
       public Item next() throws QueryException {
-        for(Item item; c < sr.end && (item = qc.next(input)) != null;) {
+        for(Item item; c < sr.end && (item = qc.next(iter)) != null;) {
           if(++c > sr.start) return item;
         }
         return null;
@@ -91,15 +94,22 @@ public class FnSubsequence extends StandardFunc {
     final Expr input = arg(0);
     if(sr == ALL) return input.value(qc);
 
+    // value-based input: return subsequence
+    Value value = input.eagerValue(qc);
+    if(value != null) {
+      sr.adjust(value.size());
+      return sr.length == 0 ? Empty.VALUE : value.subsequence(sr.start, sr.length, qc);
+    }
+
     // return empty iterator if no items remain
     final Iter iter = input.iter(qc);
     final long size = sr.adjust(iter.size());
     if(sr.length == 0) return Empty.VALUE;
 
-    // return subsequence if iterator is value-based
-    if(iter.valueIter()) {
-      return iter.value(qc, null).subsequence(sr.start, sr.length, qc);
-    }
+    // value-based iterator
+    value = iter.value();
+    if(value != null) return value.subsequence(sr.start, sr.length, qc);
+
     // size is known: collect by position
     if(size != -1) {
       if(sr.length == size) return iter.value(qc, this);
@@ -115,6 +125,11 @@ public class FnSubsequence extends StandardFunc {
       if(c >= sr.start) vb.add(item);
     }
     return vb.value(this);
+  }
+
+  @Override
+  public final boolean eager() {
+    return arg(0).eager();
   }
 
   /**

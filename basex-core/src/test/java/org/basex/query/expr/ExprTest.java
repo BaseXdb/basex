@@ -304,6 +304,11 @@ public final class ExprTest extends SandboxTest {
     query("if(boolean(<x/>) = false()) then 1 else 2", 2);
     query("if(boolean(<x/>) != false()) then 1 else 2", 1);
     error("if(<x/> = true()) then 1 else 2", FUNCCAST_X_X_X);
+
+    // value-based branches
+    query("tail(if(" + wrap(1) + " = 1) then (1, 2, 3) else (4, 5, 6))", "2\n3");
+    // iterator-based branch: results must not be materialized
+    query("head(if(" + wrap(1) + " = 1) then (1 to 100_000_000)[. > 0] else ())", 1);
   }
 
   /** Range expressions. */
@@ -327,6 +332,9 @@ public final class ExprTest extends SandboxTest {
 
   /** Checks {@link Union} optimizations. */
   @Test public void union() {
+    // value-based evaluation: operands are not in document order
+    query("count((<b/>, <a/>) union <c/>)", 3);
+
     check("<_><a/></_>/(a union a)", "<a/>",
         empty(Union.class), type(IterPath.class, "element(a)*"));
     check("<_><a/></_>/(a union b)", "<a/>",
@@ -408,6 +416,13 @@ public final class ExprTest extends SandboxTest {
         root(Str.class));
     check("typeswitch(()) case empty-sequence() return 'empty' default return 'other'", "empty",
         root(Str.class));
+
+    // value-based branches, with and without variable binding
+    final String ts = "typeswitch(" + wrap(1) + ") case ";
+    query("tail(" + ts + "xs:untypedAtomic return (1, 2, 3) default return (4, 5, 6))", "2\n3");
+    query("tail(" + ts + "$x as xs:untypedAtomic return ($x, 2, 3) default return ())", "2\n3");
+    // iterator-based branch: results must not be materialized
+    query("head(" + ts + "xs:untypedAtomic return (1 to 100_000_000)[. > 0] default return ())", 1);
   }
 
   /** Checks the simplification of catch clauses. */

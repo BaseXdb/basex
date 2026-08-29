@@ -3,8 +3,6 @@ package org.basex.query.value.seq.tree;
 import java.util.*;
 
 import org.basex.core.jobs.*;
-import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -164,11 +162,7 @@ public final class SmallSeq extends TreeSeq {
         return items[(int) i];
       }
       @Override
-      public boolean valueIter() {
-        return true;
-      }
-      @Override
-      public SmallSeq value(final QueryContext qc, final Expr expr) {
+      public SmallSeq value() {
         return SmallSeq.this;
       }
     };

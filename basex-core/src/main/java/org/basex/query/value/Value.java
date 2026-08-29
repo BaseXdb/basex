@@ -103,6 +103,16 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   @Override
+  public final boolean eager() {
+    return true;
+  }
+
+  @Override
+  public final boolean duplicable() {
+    return true;
+  }
+
+  @Override
   protected final Item item(final QueryContext qc) throws QueryException {
     return item(qc, null);
   }

@@ -55,12 +55,9 @@ public final class InlineContext {
     if(uses == VarUsage.NEVER) return true;
 
     // do not inline expensive expressions that are referenced more than once
-    if(uses == VarUsage.MORE_THAN_ONCE && !(
-      expr instanceof Value ||
-      expr instanceof VarRef ||
-      expr instanceof ContextValue ||
-      expr instanceof Path && expr.size() == 1 && !expr.has(Flag.CNS)
-    )) {
+    // (a single-node path is worth inlining, but too expensive to be duplicable)
+    if(uses == VarUsage.MORE_THAN_ONCE && !(expr.duplicable() ||
+      expr instanceof Path && expr.size() == 1 && !expr.has(Flag.CNS))) {
       return false;
     }
 

@@ -8,6 +8,7 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 
@@ -23,11 +24,16 @@ public final class FnCount extends StandardFunc {
 
   @Override
   protected Itr item(final QueryContext qc) throws QueryException {
+    // value-based input: return result size
+    final Expr input = arg(0);
+    final Value value = input.eagerValue(qc);
+    if(value != null) return Itr.get(value.size());
+
     // if the iterator size is unknown or nondeterministic, iterate through all results
-    final Iter input = arg(0).iter(qc);
-    long size = ndt ? -1 : input.size();
+    final Iter iter = input.iter(qc);
+    long size = ndt ? -1 : iter.size();
     if(size == -1) {
-      do ++size; while(qc.next(input) != null);
+      do ++size; while(qc.next(iter) != null);
     }
     return Itr.get(size);
   }

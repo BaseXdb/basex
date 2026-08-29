@@ -55,6 +55,11 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
+  public boolean duplicable() {
+    return true;
+  }
+
+  @Override
   public boolean inlineable(final InlineContext v) {
     return true;
   }

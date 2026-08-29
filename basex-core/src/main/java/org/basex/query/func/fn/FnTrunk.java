@@ -20,15 +20,19 @@ import org.basex.query.value.type.*;
 public final class FnTrunk extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
+    // value-based input: return subsequence
+    if(eager()) return value(qc).iter();
+
     // retrieve and decrement iterator size
-    final Iter input = arg(0).iter(qc);
-    final long size = input.size();
+    final Iter iter = arg(0).iter(qc);
+    final long size = iter.size();
 
     // return empty iterator if iterator yields 0 or 1 items, or if result is an empty sequence
     if(size == 0 || size == 1) return Empty.ITER;
 
     // check if iterator is value-based
-    if(input.valueIter()) return input.value(qc, null).subsequence(0, size - 1, qc).iter();
+    final Value value = iter.value();
+    if(value != null) return value.subsequence(0, size - 1, qc).iter();
 
     // return optimized iterator if result size is known
     if(size != -1) return new Iter() {
@@ -36,11 +40,11 @@ public final class FnTrunk extends StandardFunc {
 
       @Override
       public Item next() throws QueryException {
-        return ++c < size ? qc.next(input) : null;
+        return ++c < size ? qc.next(iter) : null;
       }
       @Override
       public Item get(final long i) throws QueryException {
-        return input.get(i);
+        return iter.get(i);
       }
       @Override
       public long size() {
@@ -50,13 +54,13 @@ public final class FnTrunk extends StandardFunc {
 
     // otherwise, return standard iterator
     return new Iter() {
-      Item last = input.next();
+      Item last = iter.next();
 
       @Override
       public Item next() throws QueryException {
         final Item item = last;
         if(item != null) {
-          last = input.next();
+          last = iter.next();
           if(last == null) return null;
         }
         return item;
@@ -70,6 +74,11 @@ public final class FnTrunk extends StandardFunc {
     final Value input = arg(0).value(qc);
     final long size = input.size();
     return size < 1 ? input : input.subsequence(0, size - 1, qc);
+  }
+
+  @Override
+  public boolean eager() {
+    return arg(0).eager();
   }
 
   @Override

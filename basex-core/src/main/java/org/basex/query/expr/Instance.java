@@ -65,8 +65,12 @@ public final class Instance extends Single {
   @Override
   protected boolean test(final QueryContext qc, final long pos) throws QueryException {
     // check instance of value
+    final Value input = expr.eagerValue(qc);
+    if(input != null) return seqType.instance(input);
+
     final Iter iter = expr.iter(qc);
-    if(iter.valueIter()) return seqType.instance(iter.value(qc, expr));
+    final Value value = iter.value();
+    if(value != null) return seqType.instance(value);
 
     // only check item type
     if(check == 2) {

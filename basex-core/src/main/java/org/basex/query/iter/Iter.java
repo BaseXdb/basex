@@ -44,11 +44,11 @@ public abstract class Iter {
   }
 
   /**
-   * Indicates if this iterator is based on a value.
-   * @return result of check
+   * Returns the value this iterator is based on.
+   * @return value, or {@code null} if the iterator is not based on a value
    */
-  public boolean valueIter() {
-    return false;
+  public Value value() {
+    return null;
   }
 
   /**
@@ -61,6 +61,10 @@ public abstract class Iter {
    * @throws QueryException query exception
    */
   public Value value(final QueryContext qc, final Expr expr) throws QueryException {
+    // value-based iterator?
+    final Value value = value();
+    if(value != null) return value;
+
     // empty sequence?
     final Item item1 = next();
     if(item1 == null) return Empty.VALUE;

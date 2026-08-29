@@ -6,7 +6,6 @@ import static org.basex.query.value.type.NodeType.*;
 import static org.basex.util.Token.*;
 
 import java.util.*;
-import java.util.concurrent.*;
 
 import org.basex.core.users.*;
 import org.basex.data.*;
@@ -34,14 +33,23 @@ import org.basex.util.*;
  */
 public abstract class ParseExpr extends Expr {
   /** Indicates which expressions have an iterator implementation. */
-  private static final ConcurrentHashMap<Class<? extends ParseExpr>, Boolean> ITERIMPLS =
-      new ConcurrentHashMap<>();
+  private static final ClassValue<Boolean> ITERBASED = new ClassValue<>() {
+    @Override
+    protected Boolean computeValue(final Class<?> clazz) {
+      for(Class<?> clz = clazz; clz != ParseExpr.class; clz = clz.getSuperclass()) {
+        try {
+          if(clz.getMethod("iter", QueryContext.class).getDeclaringClass() == clz) return true;
+        } catch(final Exception ignore) { }
+      }
+      return false;
+    }
+  };
   /** Expression type. */
   public final ExprType exprType;
   /** Input information (can be {@code null}). */
   protected InputInfo info;
   /** Iterator-based implementation. */
-  private final boolean iterImpl;
+  private final boolean iterBased;
 
   /**
    * Constructor.
@@ -51,14 +59,7 @@ public abstract class ParseExpr extends Expr {
   protected ParseExpr(final InputInfo info, final SeqType seqType) {
     this.info = info;
     exprType = new ExprType(seqType);
-    iterImpl = ITERIMPLS.computeIfAbsent(getClass(), c -> {
-      for(Class<?> clz = getClass(); clz != ParseExpr.class; clz = clz.getSuperclass()) {
-        try {
-          if(clz.getMethod("iter", QueryContext.class).getDeclaringClass() == clz) return true;
-        } catch(final Exception ignore) { }
-      }
-      return false;
-    });
+    iterBased = ITERBASED.get(getClass());
   }
 
   @Override
@@ -68,17 +69,22 @@ public abstract class ParseExpr extends Expr {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return iterImpl ? iter(qc).value(qc, this) : item(qc);
+    return iterBased ? iter(qc).value(qc, this) : item(qc);
+  }
+
+  @Override
+  public boolean eager() {
+    return !iterBased;
   }
 
   @Override
   protected Item item(final QueryContext qc) throws QueryException {
-    return iterImpl && !seqType().zeroOrOne() ? item(iter(qc), qc) : value(qc).item(qc, info);
+    return iterBased && !seqType().zeroOrOne() ? item(iter(qc), qc) : value(qc).item(qc, info);
   }
 
   @Override
   protected Item atomItem(final QueryContext qc) throws QueryException {
-    return iterImpl && !seqType().zeroOrOne() ? item(atomIter(qc), qc) :
+    return iterBased && !seqType().zeroOrOne() ? item(atomIter(qc), qc) :
       atomValue(qc).item(qc, info);
   }
 

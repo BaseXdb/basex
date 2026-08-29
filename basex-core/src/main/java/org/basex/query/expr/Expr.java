@@ -56,6 +56,13 @@ public abstract class Expr extends ExprInfo {
     return this;
   }
 
+  /* Results should be checked in this order:
+   * 1. eager(), for expressions that supply their result as a value
+   * 2. Iter.value(), for iterators that turn out to be value-based
+   * 3. Iter.size() and Iter.get(long), for known result sizes
+   * 4. Iter.next()
+   */
+
   /**
    * Evaluates the expression and returns an iterator on the resulting items.
    * If this method is not implemented, either {@link #value(QueryContext)} or
@@ -75,6 +82,22 @@ public abstract class Expr extends ExprInfo {
    * @throws QueryException query exception
    */
   public abstract Value value(QueryContext qc) throws QueryException;
+
+  /**
+   * Indicates if the result of this expression is available without creating an iterator.
+   * @return result of check
+   */
+  public abstract boolean eager();
+
+  /**
+   * Returns the value of this expression if it is available without creating an iterator.
+   * @param qc query context
+   * @return value, or {@code null} if an iterator is required
+   * @throws QueryException query exception
+   */
+  public final Value eagerValue(final QueryContext qc) throws QueryException {
+    return eager() ? value(qc) : null;
+  }
 
   // one-arg variants are implemented and invoked on this, two-arg variants are invoked
   // on sub-expressions: they lend the input info to values, which have none of their own.
@@ -483,6 +506,14 @@ public abstract class Expr extends ExprInfo {
    * @return result of check
    */
   public boolean navigational() {
+    return false;
+  }
+
+  /**
+   * Indicates if this expression can be evaluated repeatedly at negligible cost.
+   * @return result of check
+   */
+  public boolean duplicable() {
     return false;
   }
 

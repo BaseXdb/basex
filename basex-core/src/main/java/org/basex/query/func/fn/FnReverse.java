@@ -22,17 +22,21 @@ import org.basex.query.value.seq.*;
 public final class FnReverse extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
+    // value-based input: reverse value
+    if(eager()) return value(qc).iter();
+
     // optimization: reverse sequence
-    final Iter input = arg(0).iter(qc);
+    final Iter iter = arg(0).iter(qc);
 
     // materialize value if number of results is unknown
-    final long size = input.size();
+    final long size = iter.size();
     // no result: empty iterator
     if(size == 0) return Empty.ITER;
     // single result: iterator
-    if(size == 1) return input;
+    if(size == 1) return iter;
     // value-based iterator
-    if(input.valueIter()) return input.value(qc, null).reverse(qc).iter();
+    final Value value = iter.value();
+    if(value != null) return value.reverse(qc).iter();
 
     // size is known: create iterator
     if(size > -1) return new Iter() {
@@ -40,11 +44,11 @@ public final class FnReverse extends StandardFunc {
 
       @Override
       public Item next() throws QueryException {
-        return --c >= 0 ? input.get(c) : null;
+        return --c >= 0 ? iter.get(c) : null;
       }
       @Override
       public Item get(final long i) throws QueryException {
-        return input.get(size - i - 1);
+        return iter.get(size - i - 1);
       }
       @Override
       public long size() {
@@ -52,12 +56,17 @@ public final class FnReverse extends StandardFunc {
       }
     };
     // standard implementation
-    return input.value(qc, this).reverse(qc).iter();
+    return iter.value(qc, this).reverse(qc).iter();
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     return arg(0).value(qc).reverse(qc);
+  }
+
+  @Override
+  public boolean eager() {
+    return arg(0).eager();
   }
 
   @Override

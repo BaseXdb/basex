@@ -29,11 +29,7 @@ public final class Empty extends Item {
       return null;
     }
     @Override
-    public boolean valueIter() {
-      return true;
-    }
-    @Override
-    public Empty value(final QueryContext qc, final Expr expr) {
+    public Empty value() {
       return VALUE;
     }
   };

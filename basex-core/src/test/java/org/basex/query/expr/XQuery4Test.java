@@ -93,6 +93,11 @@ public final class XQuery4Test extends SandboxTest {
     check("void(1) otherwise void(2)", "", root(Otherwise.class));
 
     check("count(void(1) otherwise void(2))", 0, root(COUNT));
+
+    // value-based operands
+    query("tail(void(1) otherwise (1, 2, 3))", "2\n3");
+    // iterator-based operand: results must not be materialized
+    query("head(void(1) otherwise (1 to 100_000_000)[. > 0])", 1);
     query("count((1 to 10)[. = 0] otherwise (1 to 10)[. = 2])", 1);
     query("count((1 to 10)[. = 1] otherwise (1 to 10)[. = 2])", 1);
 
@@ -457,6 +462,12 @@ public final class XQuery4Test extends SandboxTest {
         "x", empty(Switch.class), exists(IterFilter.class));
     check("(1 to 6) ! (switch(.) case 6 to 8 return 'x' case 6 to 8 return '' default return ())",
         "x", empty(Switch.class), exists(IterFilter.class));
+
+    // value-based branches
+    final String sw = "switch(" + wrap(1) + ") case '1' return ";
+    query("tail(" + sw + "(1, 2, 3) default return (4, 5, 6))", "2\n3");
+    // iterator-based branch: results must not be materialized
+    query("head(" + sw + "(1 to 100_000_000)[. > 0] default return ())", 1);
   }
 
   /** Numeric literals. */

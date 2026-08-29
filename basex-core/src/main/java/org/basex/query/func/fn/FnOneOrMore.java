@@ -49,6 +49,11 @@ public final class FnOneOrMore extends StandardFunc {
   }
 
   @Override
+  public boolean eager() {
+    return arg(0).eager();
+  }
+
+  @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0);
     final SeqType st = input.seqType();

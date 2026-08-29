@@ -32,18 +32,26 @@ public final class UtilCountWithin extends StandardFunc {
     final long[] minMax = minMax(qc);
     final long min = minMax[0], max = minMax[1];
 
+    // value-based input: result size is known
+    final Expr input = arg(0);
+    final Value value = input.eagerValue(qc);
+    if(value != null) {
+      final long size = value.size();
+      return size >= min && size <= max;
+    }
+
     // iterative through the results if an iterator is nondeterministic or its size is unknown
-    final Iter input = arg(0).iter(qc);
-    long size = ndt ? -1 : input.size();
+    final Iter iter = input.iter(qc);
+    long size = ndt ? -1 : iter.size();
     if(size == -1) {
       if(ndt) {
-        do ++size; while(qc.next(input) != null);
+        do ++size; while(qc.next(iter) != null);
       } else if(max == Long.MAX_VALUE) {
         // >= min: skip if minimum is reached
-        do ++size; while(size < min && qc.next(input) != null);
+        do ++size; while(size < min && qc.next(iter) != null);
       } else {
         // min - max: skip if maximum is reached
-        do ++size; while(size <= max && qc.next(input) != null);
+        do ++size; while(size <= max && qc.next(iter) != null);
       }
     }
     return size >= min && size <= max;

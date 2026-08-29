@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -19,14 +20,22 @@ import org.basex.query.value.type.*;
 public final class FnFoot extends StandardFunc {
   @Override
   protected Item item(final QueryContext qc) throws QueryException {
+    // value-based input: return last item
+    final Expr input = arg(0);
+    final Value value = input.eagerValue(qc);
+    if(value != null) {
+      final long size = value.size();
+      return size > 0 ? value.itemAt(size - 1) : Empty.VALUE;
+    }
+
     // fast route if the size is known
-    final Iter input = arg(0).iter(qc);
-    final long size = input.size();
-    if(size >= 0) return size > 0 ? input.get(size - 1) : Empty.VALUE;
+    final Iter iter = input.iter(qc);
+    final long size = iter.size();
+    if(size >= 0) return size > 0 ? iter.get(size - 1) : Empty.VALUE;
 
     // loop through all items
     Item last = null;
-    for(Item item; (item = qc.next(input)) != null;) {
+    for(Item item; (item = qc.next(iter)) != null;) {
       last = item;
     }
     return last == null ? Empty.VALUE : last;

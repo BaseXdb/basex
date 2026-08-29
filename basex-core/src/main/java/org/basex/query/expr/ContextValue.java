@@ -41,6 +41,11 @@ public final class ContextValue extends Simple {
   }
 
   @Override
+  public boolean duplicable() {
+    return true;
+  }
+
+  @Override
   public Expr optimize(final CompileContext cc) {
     final Value value = cc.qc.focus.value;
     if(value != null) {

@@ -3,8 +3,6 @@ package org.basex.query.value.seq.tree;
 import java.util.*;
 
 import org.basex.core.jobs.*;
-import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.fingertree.*;
 import org.basex.query.value.*;
@@ -525,11 +523,7 @@ public final class BigSeq extends TreeSeq {
         return itemAt(i);
       }
       @Override
-      public boolean valueIter() {
-        return true;
-      }
-      @Override
-      public BigSeq value(final QueryContext qc, final Expr expr) {
+      public BigSeq value() {
         return BigSeq.this;
       }
     };

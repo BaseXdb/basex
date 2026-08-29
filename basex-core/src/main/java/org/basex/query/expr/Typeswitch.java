@@ -153,6 +153,11 @@ public final class Typeswitch extends ParseExpr {
   }
 
   @Override
+  public boolean eager() {
+    return Checks.all(groups, TypeswitchGroup::eager);
+  }
+
+  @Override
   protected Item item(final QueryContext qc) throws QueryException {
     return group(qc).item(qc, info);
   }

@@ -22,10 +22,8 @@ public final class FnDistinctOrderedNodes extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Iter nodes = arg(0).iter(qc);
-    if(nodes.valueIter()) {
-      final Value value = nodes.value(qc, null);
-      if(value instanceof DBNodeSeq) return value;
-    }
+    final Value value = nodes.value();
+    if(value instanceof DBNodeSeq) return value;
 
     final GNodeBuilder nb = new GNodeBuilder();
     for(Item item; (item = qc.next(nodes)) != null;) nb.add(toGNode(item));

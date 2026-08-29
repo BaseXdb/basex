@@ -41,6 +41,11 @@ public final class FnReplicate extends StandardFunc {
     return vb.value(this);
   }
 
+  @Override
+  public boolean eager() {
+    return arg(0).eager() && singleEval(true);
+  }
+
   /**
    * Returns a singleton sequence, or raises an error if its size exceeds the integer range.
    * @param value value to replicate

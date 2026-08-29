@@ -58,11 +58,7 @@ public abstract class Item extends Value {
         return Item.this;
       }
       @Override
-      public boolean valueIter() {
-        return true;
-      }
-      @Override
-      public Item value(final QueryContext qc, final Expr expr) {
+      public Item value() {
         return Item.this;
       }
     };

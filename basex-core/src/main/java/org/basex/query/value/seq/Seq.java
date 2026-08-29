@@ -75,11 +75,7 @@ public abstract class Seq extends Value {
         return itemAt(i);
       }
       @Override
-      public boolean valueIter() {
-        return true;
-      }
-      @Override
-      public Seq value(final QueryContext qc, final Expr expr) {
+      public Seq value() {
         return Seq.this;
       }
     };

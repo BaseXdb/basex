@@ -21,24 +21,29 @@ import org.basex.query.value.type.*;
 public final class FnTail extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
+    // value-based input: return subsequence
+    if(eager()) return value(qc).iter();
+
     // retrieve and decrement iterator size
-    final Iter input = arg(0).iter(qc);
-    final long size = input.size();
+    final Iter iter = arg(0).iter(qc);
+    final long size = iter.size();
 
     // return empty iterator if iterator yields 0 or 1 items, or if result is an empty sequence
-    if(size == 0 || size == 1 || input.next() == null) return Empty.ITER;
+    if(size == 0 || size == 1 || iter.next() == null) return Empty.ITER;
+
     // value-based iterator
-    if(input.valueIter()) return input.value(qc, null).subsequence(1, size - 1, qc).iter();
+    final Value value = iter.value();
+    if(value != null) return value.subsequence(1, size - 1, qc).iter();
 
     // create iterator
     return new Iter() {
       @Override
       public Item next() throws QueryException {
-        return qc.next(input);
+        return qc.next(iter);
       }
       @Override
       public Item get(final long i) throws QueryException {
-        return input.get(i + 1);
+        return iter.get(i + 1);
       }
       @Override
       public long size() {
@@ -53,6 +58,11 @@ public final class FnTail extends StandardFunc {
     final Value input = arg(0).value(qc);
     final long size = input.size();
     return size <= 1 ? Empty.VALUE : input.subsequence(1, size - 1, qc);
+  }
+
+  @Override
+  public boolean eager() {
+    return arg(0).eager();
   }
 
   @Override

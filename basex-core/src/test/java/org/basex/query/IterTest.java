@@ -3,12 +3,17 @@ package org.basex.query;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
+import java.util.List;
 
 import org.basex.*;
 import org.basex.core.*;
+import org.basex.io.*;
+import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -18,9 +23,13 @@ import org.junit.jupiter.api.*;
  * @author Christian Gruen
  */
 public final class IterTest extends SandboxTest {
+  /** Class file suffix. */
+  private static final String SUFFIX = ".class";
   /** Consumers that request items of their input by position. */
   private static final String[] CONSUMERS = {
-    "reverse(%)", "%[last()]", "items-at(%, (1, 3))", "subsequence(%, 2, 2)", "foot(%)", "head(%)"
+    "reverse(%)", "%[last()]", "items-at(%, (1, 3))", "subsequence(%, 2, 2)", "foot(%)", "head(%)",
+    "tail(%)", "trunk(%)", "remove(%, 2)", "count(%)", "one-or-more(%)", "replicate(%, 2)",
+    "if(" + wrap(1) + " = 1) then % else ()"
   };
 
   /**
@@ -54,7 +63,7 @@ public final class IterTest extends SandboxTest {
           final Iter iter = qp.iter();
           final long size = iter.size();
           // random access is only available for sized iterators that are not based on a value
-          if(size == -1 || iter.valueIter()) continue;
+          if(size == -1 || iter.value() != null) continue;
           assertEquals(items.size(), size, "Wrong size: " + generator);
           for(int i = 0; i < size; i++) {
             final Item item = iter.get(i);
@@ -84,6 +93,80 @@ public final class IterTest extends SandboxTest {
         assertEquals(query(consumer.replace("%", '(' + literals + ')')), query(lazy), lazy);
       }
     }
+  }
+
+  /** Lazy consumers must not materialize their input. */
+  @Test public void lazy() {
+    final String input = "(1 to 100_000_000)[. > 0]";
+    query("head(" + input + ')', 1);
+    query("items-at(" + input + ", 2)", 2);
+    query('(' + input + ")[1]", 1);
+    query("exists(" + input + ')', true);
+    query("head(tail(" + input + "))", 2);
+    query("head(subsequence(" + input + ", 3))", 3);
+    query("head(one-or-more(" + input + "))", 1);
+    query("head(replicate(" + input + ", 2, true()))", 1);
+    query("head(" + input + " otherwise 1)", 1);
+    query("head(if(" + wrap(1) + " = 1) then " + input + " else ())", 1);
+    query("head(switch(" + wrap(1) + ") case '1' return " + input + " default return ())", 1);
+    query("head(typeswitch(" + wrap(1) + ") case xs:untypedAtomic return " + input +
+        " default return ())", 1);
+  }
+
+  /**
+   * Expressions that claim eager evaluation must be able to return a value.
+   * @throws Exception exception
+   */
+  @Test public void eager() throws Exception {
+    final StringList errors = new StringList();
+    final List<Class<?>> classes = classes("target/classes/org/basex/query");
+    int eager = 0;
+    for(final Class<?> clazz : classes) {
+      // an expression that overrides eager() must implement value(): otherwise, its iterator
+      // implementation will call value(), which will call the iterator implementation again
+      if(!declares(clazz, "eager")) continue;
+      eager++;
+      if(!declares(clazz, "value", QueryContext.class)) errors.add(clazz.getSimpleName());
+    }
+    assertTrue(errors.isEmpty(), "No value() implementation: " + errors);
+    // ensure that the class scan was successful
+    assertTrue(eager > 0, "No eager() implementations found in " + classes.size() + " classes");
+  }
+
+  /**
+   * Returns all expression classes of a directory.
+   * @param path directory path
+   * @return classes
+   * @throws Exception exception
+   */
+  private static List<Class<?>> classes(final String path) throws Exception {
+    final List<Class<?>> classes = new ArrayList<>();
+    for(final String desc : new IOFile(path).descendants()) {
+      if(!desc.endsWith(SUFFIX)) continue;
+      final String name = "org.basex.query." +
+          desc.substring(0, desc.length() - SUFFIX.length()).replace('/', '.');
+      final Class<?> clazz = Class.forName(name, false, IterTest.class.getClassLoader());
+      if(Expr.class.isAssignableFrom(clazz)) classes.add(clazz);
+    }
+    return classes;
+  }
+
+  /**
+   * Indicates if a class declares a method itself (base classes are ignored).
+   * @param clazz class
+   * @param name method name
+   * @param args argument types
+   * @return result of check
+   */
+  private static boolean declares(final Class<?> clazz, final String name,
+      final Class<?>... args) {
+    for(Class<?> clz = clazz; clz != null && clz != Expr.class && clz != ParseExpr.class &&
+        clz != Value.class; clz = clz.getSuperclass()) {
+      try {
+        if(clz.getMethod(name, args).getDeclaringClass() == clz) return true;
+      } catch(final Exception ignore) { }
+    }
+    return false;
   }
 
   /**

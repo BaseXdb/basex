@@ -12,7 +12,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -287,7 +286,7 @@ public abstract class Cmp extends Arr {
         if(count instanceof final RangeSeq rs) {
           // count(A) = 3 to 5 → util:within(A, 3, 5)
           args.add(Itr.get(rs.min())).add(Itr.get(rs.max()));
-        } else if(st2.one() && (count instanceof VarRef || count instanceof ContextValue)) {
+        } else if(st2.one() && count.duplicable()) {
           // count(A) = $c → util:within(A, $c)
           args.add(count).add(count);
         }

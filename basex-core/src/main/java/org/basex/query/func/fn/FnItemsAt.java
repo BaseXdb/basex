@@ -16,7 +16,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.query.var.*;
 
 /**
  * Function implementation.
@@ -33,6 +32,11 @@ public final class FnItemsAt extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     return seqType().zeroOrOne() ? evalItem(qc) : evalIter(qc).value(qc, this);
+  }
+
+  @Override
+  public boolean eager() {
+    return seqType().zeroOrOne();
   }
 
   /**
@@ -55,10 +59,8 @@ public final class FnItemsAt extends StandardFunc {
         }
 
         // direct access, no iterator required
-        if(input instanceof Value || input instanceof VarRef) {
-          final Value value = input.value(qc);
-          return l < value.size() ? value.itemAt(l) : Empty.VALUE;
-        }
+        final Value value = input.eagerValue(qc);
+        if(value != null) return l < value.size() ? value.itemAt(l) : Empty.VALUE;
 
         // fast route if the result size is known
         final Iter iter = input.iter(qc);

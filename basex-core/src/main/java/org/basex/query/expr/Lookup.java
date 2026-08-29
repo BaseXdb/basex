@@ -115,8 +115,8 @@ public final class Lookup extends Arr {
             cc.get(input, true, () -> rewrite.apply(ContextValue.get(cc, info), keys)));
       }
 
-      // multiple deterministic keys, inputs are values or variable references
-      if(ks != -1 && (input instanceof Value || input instanceof VarRef)) {
+      // multiple deterministic keys, input can be duplicated and is focus-independent
+      if(ks != -1 && input.duplicable() && !input.has(Flag.CTX)) {
         // single input:  INPUT?KEYS → KEYS ! REWRITE(INPUT, .)
         if(is == 1) return SimpleMap.get(cc, info, keys,
             cc.get(keys, true, () -> rewrite.apply(input, ContextValue.get(cc, info))));
@@ -146,11 +146,11 @@ public final class Lookup extends Arr {
           }
           final Item item = qc.next(lhs);
           if(item == null) return null;
-          rhs = valueIter(item);
+          rhs = lookup(item);
         }
       }
 
-      private Iter valueIter(final Item item) throws QueryException {
+      private Iter lookup(final Item item) throws QueryException {
         final ValueBuilder vb = new ValueBuilder(qc);
         final Iter keyIter = exprs[1].atomIter(qc, info);
         for(Item key; (key = keyIter.next()) != null;) {

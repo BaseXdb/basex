@@ -18,24 +18,29 @@ import org.basex.util.list.*;
 public final class FnRemove extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Iter input = arg(0).iter(qc);
+    // value-based input: remove positions from value
+    if(eager()) return value(qc).iter();
+
+    final Iter iter = arg(0).iter(qc);
     final LongList pos = positions(qc);
 
     // value-based iterator
-    if(input.valueIter() || pos.size() > 1) return value(input.value(qc, null), pos, qc).iter();
+    final Value value = iter.value();
+    if(value != null) return value(value, pos, qc).iter();
+    if(pos.size() > 1) return value(iter.value(qc, null), pos, qc).iter();
 
-    final long size = input.size();
+    final long size = iter.size();
     return new Iter() {
       final long p = pos.get(0);
       long c;
 
       @Override
       public Item next() throws QueryException {
-        return c++ != p || input.next() != null ? input.next() : null;
+        return c++ != p || iter.next() != null ? iter.next() : null;
       }
       @Override
       public Item get(final long i) throws QueryException {
-        return input.get(i < p ? i : i + 1);
+        return iter.get(i < p ? i : i + 1);
       }
       @Override
       public long size() {
@@ -49,6 +54,11 @@ public final class FnRemove extends StandardFunc {
     final Value input = arg(0).value(qc);
     final LongList positions = positions(qc);
     return value(input, positions, qc);
+  }
+
+  @Override
+  public boolean eager() {
+    return arg(0).eager();
   }
 
   /**

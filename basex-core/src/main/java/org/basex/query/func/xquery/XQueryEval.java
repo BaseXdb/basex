@@ -117,12 +117,9 @@ public class XQueryEval extends StandardFunc {
           if(!qctx.main.expr.vacuous()) throw XQUERY_UPDATEEXPECTED.get(info);
         }
 
-        final Value value;
         final Iter iter = qctx.iter();
-        if(iter.valueIter()) {
-          // value-based iterator: return result unchanged
-          value = iter.value(qctx, this);
-        } else {
+        Value value = iter.value();
+        if(value == null) {
           // collect resulting items
           final ValueBuilder vb = new ValueBuilder(qc);
           for(Item item; (item = qctx.next(iter)) != null;) vb.add(item);
