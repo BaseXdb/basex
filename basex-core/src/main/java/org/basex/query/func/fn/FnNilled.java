@@ -22,7 +22,7 @@ public final class FnNilled extends ContextFn {
   }
 
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     // always false, as no schema information is given
     toNodeOrNull(context(qc), qc);
     return false;

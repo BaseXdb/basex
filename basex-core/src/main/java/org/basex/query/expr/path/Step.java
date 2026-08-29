@@ -181,7 +181,7 @@ public abstract class Step extends Preds {
           final GNode node = list.get(p - 1);
           qf.value = node;
           qf.pos = p;
-          if(expr.test(qc, info, p)) list.set(c++, node);
+          if(expr.predicate(qc, info, p)) list.set(c++, node);
         }
         list.size(c);
       }

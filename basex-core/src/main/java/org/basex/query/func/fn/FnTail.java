@@ -32,7 +32,7 @@ public final class FnTail extends StandardFunc {
     if(size == 0 || size == 1 || iter.next() == null) return Empty.ITER;
 
     // value-based iterator
-    final Value value = iter.value();
+    final Value value = iter.eagerValue();
     if(value != null) return value.subsequence(1, size - 1, qc).iter();
 
     // create iterator
@@ -71,11 +71,11 @@ public final class FnTail extends StandardFunc {
     final Expr input = arg(0);
     if(input instanceof Value) return value(cc.qc);
 
-    final long size = input.size();
     final SeqType st = input.seqType();
-    // zero or one result: return empty sequence
-    if(size == 0 || size == 1 || st.zeroOrOne()) return cc.voidAndReturn(input, Empty.VALUE, info);
-    // two results: return last item
+    if(st.zeroOrOne()) return cc.voidAndReturn(input, Empty.VALUE, info);
+
+    // tail(TWO-ITEMS) → foot(TWO-ITEMS)
+    final long size = input.size();
     if(size == 2) return cc.function(FOOT, info, input);
 
     // tail(tail(E)) → subsequence(E, 3)

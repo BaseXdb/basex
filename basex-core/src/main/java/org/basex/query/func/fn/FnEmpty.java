@@ -25,7 +25,7 @@ public class FnEmpty extends StandardFunc {
   }
 
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     final Expr input = arg(0);
     return input.seqType().zeroOrOne() ?
       input.item(qc, info) == Empty.VALUE :

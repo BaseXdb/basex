@@ -51,10 +51,7 @@ public abstract class Expr extends ExprInfo {
    * @return optimized expression
    * @throws QueryException query exception
    */
-  @SuppressWarnings("unused")
-  public Expr optimize(final CompileContext cc) throws QueryException {
-    return this;
-  }
+  public abstract Expr optimize(CompileContext cc) throws QueryException;
 
   /* Results should be checked in this order:
    * 1. eager(), for expressions that supply their result as a value
@@ -97,116 +94,60 @@ public abstract class Expr extends ExprInfo {
     return eager() ? value(qc) : null;
   }
 
-  // one-arg variants are implemented and invoked on this, two-arg variants are invoked
-  // on sub-expressions: they lend the input info to values, which have none of their own.
-  // Merging the variants, or invoking a two-arg variant on this, is endless recursion.
-
   /**
    * Evaluates the expression and returns the resulting item,
    * or {@link Empty#VALUE} if the expression yields an empty sequence.
    * @param qc query context
-   * @return item or {@link Empty#VALUE}
-   * @throws QueryException query exception
-   */
-  protected abstract Item item(QueryContext qc) throws QueryException;
-
-  /**
-   * Same as {@link #item(QueryContext)}, but lends the specified input info to {@link Value}
-   * receivers, which have none of their own.
-   * @param qc query context
    * @param ii input info (can be {@code null})
    * @return item or {@link Empty#VALUE}
    * @throws QueryException query exception
    */
-  @SuppressWarnings("unused")
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return item(qc);
-  }
+  public abstract Item item(QueryContext qc, InputInfo ii) throws QueryException;
 
   /**
-   * Evaluates the expression and returns an iterator on the resulting, atomized items.
-   * @param qc query context
-   * @return iterator
-   * @throws QueryException query exception
-   */
-  protected Iter atomIter(final QueryContext qc) throws QueryException {
-    return toAtomIter(iter(qc), qc, info());
-  }
-
-  /**
-   * Wraps an iterator in an iterator on the atomized items.
-   * @param iter iterator
+   * Returns an iterator for the atomized items of the evaluated expression.
    * @param qc query context
    * @param ii input info (can be {@code null})
    * @return iterator
    * @throws QueryException query exception
    */
-  protected final Iter toAtomIter(final Iter iter, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+  protected final Iter toAtomIter(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Iter iter = iter(qc);
     final SeqType st = seqType();
     if(st.type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) return iter;
+
     long size = iter.size();
     if(size != -1 && st.mayBeWrapped()) size = -1;
     return new AtomIter(iter, qc, ii, size);
   }
 
   /**
-   * Same as {@link #atomIter(QueryContext)}, but lends the specified input info to {@link Value}
-   * receivers, which have none of their own.
+   * Returns an iterator for the atomized items of the evaluated expression.
    * @param qc query context
    * @param ii input info (can be {@code null})
    * @return iterator
    * @throws QueryException query exception
    */
-  @SuppressWarnings("unused")
-  public Iter atomIter(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return atomIter(qc);
-  }
+  public abstract Iter atomIter(QueryContext qc, InputInfo ii) throws QueryException;
 
   /**
    * Evaluates the expression and returns the resulting, atomized item,
    * or {@link Empty#VALUE} if the expression yields an empty sequence.
    * @param qc query context
-   * @return item or {@link Empty#VALUE}
-   * @throws QueryException query exception
-   */
-  protected Item atomItem(final QueryContext qc) throws QueryException {
-    return atomValue(qc).item(qc, info());
-  }
-
-  /**
-   * Same as {@link #atomItem(QueryContext)}, but lends the specified input info to {@link Value}
-   * receivers, which have none of their own.
-   * @param qc query context
    * @param ii input info (can be {@code null})
    * @return item or {@link Empty#VALUE}
    * @throws QueryException query exception
    */
-  @SuppressWarnings("unused")
-  public Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return atomItem(qc);
-  }
+  public abstract Item atomItem(QueryContext qc, InputInfo ii) throws QueryException;
 
   /**
    * Evaluates the expression and returns the atomized items.
    * @param qc query context
-   * @return atomized item
-   * @throws QueryException query exception
-   */
-  protected abstract Value atomValue(QueryContext qc) throws QueryException;
-
-  /**
-   * Same as {@link #atomValue(QueryContext)}, but lends the specified input info to {@link Value}
-   * receivers, which have none of their own.
-   * @param qc query context
    * @param ii input info (can be {@code null})
    * @return atomized item
    * @throws QueryException query exception
    */
-  @SuppressWarnings("unused")
-  public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return atomValue(qc);
-  }
+  public abstract Value atomValue(QueryContext qc, InputInfo ii) throws QueryException;
 
   /**
    * Evaluates the expression and returns an iterator on the resulting, unwrapped items.
@@ -257,56 +198,28 @@ public abstract class Expr extends ExprInfo {
    * @return item
    * @throws QueryException query exception
    */
-  public final Item unwrappedItem(final QueryContext qc, final InputInfo ii)
-      throws QueryException {
+  public final Item unwrappedItem(final QueryContext qc, final InputInfo ii) throws QueryException {
     return unwrappedValue(qc).item(qc, info(ii));
-  }
-
-  /**
-   * Matches this expression against the specified context position.
-   * @param qc query context
-   * @param pos position of context item ({@code 0}: compute effective boolean value instead)
-   * @return result of check
-   * @throws QueryException query exception
-   */
-  protected abstract boolean test(QueryContext qc, long pos) throws QueryException;
-
-  /**
-   * Same as {@link #test(QueryContext, long)}, but lends the specified input info to
-   * {@link Value} receivers, which have none of their own.
-   * @param qc query context
-   * @param ii input info (can be {@code null})
-   * @param pos position of context item ({@code 0}: compute effective boolean value instead)
-   * @return result of check
-   * @throws QueryException query exception
-   */
-  @SuppressWarnings("unused")
-  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
-      throws QueryException {
-    return test(qc, pos);
   }
 
   /**
    * Computes the effective boolean value of this expression.
    * @param qc query context
-   * @return result of check
-   * @throws QueryException query exception
-   */
-  protected final boolean ebv(final QueryContext qc) throws QueryException {
-    return test(qc, 0);
-  }
-
-  /**
-   * Same as {@link #ebv(QueryContext)}, but lends the specified input info to {@link Value}
-   * receivers, which have none of their own.
-   * @param qc query context
    * @param ii input info (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
    */
-  public final boolean ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return test(qc, ii, 0);
-  }
+  public abstract boolean ebv(QueryContext qc, InputInfo ii) throws QueryException;
+
+  /**
+   * Performs a predicate test.
+   * @param qc query context
+   * @param ii input info (can be {@code null})
+   * @param pos position of context item ({@code >= 1})
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  public abstract boolean predicate(QueryContext qc, InputInfo ii, long pos) throws QueryException;
 
   /**
    * Tests if this is a vacuous expression (empty sequence or error function).

@@ -79,7 +79,7 @@ final class SimplePos extends Arr implements CmpPos {
   }
 
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     ctxValue(qc);
 
     final Item min = exprs[0].atomItem(qc, info);

@@ -41,9 +41,9 @@ final class MixedPos extends Single implements CmpPos {
   }
 
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     ctxValue(qc);
-    return expr.value(qc).test(qc, info, qc.focus.pos);
+    return expr.value(qc).predicate(qc, info, qc.focus.pos);
   }
 
   @Override

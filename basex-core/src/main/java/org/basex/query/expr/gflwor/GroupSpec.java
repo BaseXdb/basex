@@ -10,7 +10,6 @@ import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -46,11 +45,6 @@ public final class GroupSpec extends Single {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     return expr.value(qc);
-  }
-
-  @Override
-  protected Item atomItem(final QueryContext qc) throws QueryException {
-    return expr.atomItem(qc, info);
   }
 
   @Override

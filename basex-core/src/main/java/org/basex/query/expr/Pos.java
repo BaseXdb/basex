@@ -160,7 +160,7 @@ public final class Pos extends Single {
   }
 
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     ctxValue(qc);
 
     final Value value = expr.value(qc);

@@ -22,7 +22,7 @@ public final class FnMatches extends RegExFn {
   }
 
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     final byte[] value = toZeroToken(arg(0), qc);
     final byte[] pattern = toToken(arg(1), qc);
     final byte[] flags = toZeroToken(arg(2), qc);

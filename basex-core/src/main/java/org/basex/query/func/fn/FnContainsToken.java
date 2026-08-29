@@ -24,7 +24,7 @@ public final class FnContainsToken extends StandardFunc {
   }
 
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     final byte[] token = trim(toToken(arg(1), qc));
     final Collation collation = toCollation(arg(2), qc);
     if(token.length != 0) {

@@ -58,7 +58,7 @@ public abstract class Item extends Value {
         return Item.this;
       }
       @Override
-      public Item value() {
+      public Item eagerValue() {
         return Item.this;
       }
     };
@@ -94,8 +94,7 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
-      throws QueryException {
+  public boolean ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
     return bool(ii);
   }
 
@@ -257,14 +256,14 @@ public abstract class Item extends Value {
 
   /**
    * {@inheritDoc}
-   * Overwritten by {@link Lazy}, {@link XQMap} and {@link XQArray}.
+   * Overwritten by: {@link Lazy}, {@link XQMap}, {@link XQArray}.
    */
   @Override
   public void cache(final boolean lazy, final InputInfo ii) throws QueryException { }
 
   /**
    * {@inheritDoc}
-   * Overwritten by {@link XQArray}, {@link XQMap}, {@link FuncItem} and {@link XNode}.
+   * Overwritten by: {@link XQArray}, {@link XQMap}, {@link FuncItem}, {@link XNode}.
    */
   @Override
   public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
@@ -273,7 +272,7 @@ public abstract class Item extends Value {
 
   /**
    * {@inheritDoc}
-   * Overwritten by {@link XQArray}, {@link XQMap}, {@link FuncItem} and {@link XNode}.
+   * Overwritten by: {@link XQArray}, {@link XQMap}, {@link FuncItem}, {@link JNode}, {@link XNode}.
    */
   @Override
   public Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {

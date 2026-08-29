@@ -19,7 +19,7 @@ public final class ArrayEmpty extends ArrayFn {
   }
 
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     return toArray(arg(0), qc) == XQArray.empty();
   }
 

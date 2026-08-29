@@ -107,8 +107,8 @@ public final class Itr extends ANum {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final long pos) {
-    return pos > 0 ? value == pos : bool(ii);
+  public boolean predicate(final QueryContext qc, final InputInfo ii, final long pos) {
+    return value == pos;
   }
 
   @Override

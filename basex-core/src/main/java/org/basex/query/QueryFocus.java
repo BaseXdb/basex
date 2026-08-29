@@ -13,9 +13,9 @@ import org.basex.util.*;
 public final class QueryFocus {
   /** Context value (can be {@code null}). */
   public Value value;
-  /** Context position. */
+  /** Context position (1 or greater). */
   public long pos = 1;
-  /** Context size. */
+  /** Context size (1 or greater). */
   public long size = 1;
 
   /**

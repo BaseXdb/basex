@@ -18,7 +18,7 @@ public final class MapEmpty extends MapFn {
   }
 
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     return toMap(arg(0), qc).structSize() == 0;
   }
 

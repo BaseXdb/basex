@@ -17,7 +17,7 @@ public final class LazyIsLazy extends StandardFunc {
   }
 
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     final Item value = toAtomItem(arg(0), qc);
     return value instanceof Lazy;
   }

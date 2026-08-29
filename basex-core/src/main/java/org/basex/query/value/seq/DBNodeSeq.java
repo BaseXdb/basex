@@ -118,7 +118,7 @@ public class DBNodeSeq extends NativeSeq {
       for(final Item item : this) list.add(item.string(null));
       expr = StrSeq.get(list);
     } else if(mode.oneOf(Simplify.DATA, Simplify.NUMBER)) {
-      expr = atomValue(cc.qc);
+      expr = atomValue(cc.qc, null);
     }
     return cc.simplify(this, expr, mode);
   }

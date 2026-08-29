@@ -21,7 +21,7 @@ public final class FnNormalizeSpace extends ContextFn {
   }
 
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     return !Token.ws(toZeroToken(context(qc), qc));
   }
 

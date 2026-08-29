@@ -23,7 +23,7 @@ public final class FnNot extends StandardFunc {
   }
 
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     return !arg(0).ebv(qc, info);
   }
 

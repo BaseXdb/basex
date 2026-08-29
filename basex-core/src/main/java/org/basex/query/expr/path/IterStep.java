@@ -42,7 +42,7 @@ public final class IterStep extends Step {
   }
 
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     for(final GNode node : iterator(qc)) {
       if(test(node, qc)) return true;
     }

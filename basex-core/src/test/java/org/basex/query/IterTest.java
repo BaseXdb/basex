@@ -69,7 +69,7 @@ public final class IterTest extends SandboxTest {
           final Iter iter = qp.iter();
           final long size = iter.size();
           // random access is only available for sized iterators that are not based on a value
-          if(size == -1 || iter.value() != null) continue;
+          if(size == -1 || iter.eagerValue() != null) continue;
           assertEquals(items.size(), size, "Wrong size: " + generator);
           for(int i = 0; i < size; i++) {
             final Item item = iter.get(i);

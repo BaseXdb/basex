@@ -127,7 +127,7 @@ public final class Dummy extends Value {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final long pos) {
+  public boolean ebv(final QueryContext qc, final InputInfo ii) {
     throw Util.notExpected();
   }
 

@@ -53,7 +53,7 @@ public abstract class AxisPath extends Path {
   }
 
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     final Value cached = cache(qc);
     return cached != null ? cached != Empty.VALUE : iterator(qc).next() != null;
   }

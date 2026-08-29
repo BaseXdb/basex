@@ -66,7 +66,7 @@ public class MainModule extends AModule {
   public Iter iter(final QueryContext qc) throws QueryException {
     final int fp = vs.enter(qc);
     final Iter iter = expr.iter(qc);
-    if(iter.value() != null) {
+    if(iter.eagerValue() != null) {
       vs.exit(fp, qc);
       return iter;
     }

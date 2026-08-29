@@ -31,7 +31,7 @@ public final class FnTrunk extends StandardFunc {
     if(size == 0 || size == 1) return Empty.ITER;
 
     // check if iterator is value-based
-    final Value value = iter.value();
+    final Value value = iter.eagerValue();
     if(value != null) return value.subsequence(0, size - 1, qc).iter();
 
     // return optimized iterator if result size is known
@@ -73,7 +73,7 @@ public final class FnTrunk extends StandardFunc {
     // return empty sequence if value has 0 or 1 items
     final Value input = arg(0).value(qc);
     final long size = input.size();
-    return size < 1 ? input : input.subsequence(0, size - 1, qc);
+    return size <= 1 ? Empty.VALUE : input.subsequence(0, size - 1, qc);
   }
 
   @Override
@@ -90,8 +90,8 @@ public final class FnTrunk extends StandardFunc {
     final SeqType st = input.seqType();
     if(st.zeroOrOne()) return cc.voidAndReturn(input, Empty.VALUE, info);
 
+    // trunk(TWO-ITEMS) → head(TWO-ITEMS)
     final long size = input.size();
-    // trunk(TWO-RESULTS) → head(TWO-RESULTS)
     if(size == 2) return cc.function(HEAD, info, input);
 
     if(size != -1) {
@@ -127,5 +127,10 @@ public final class FnTrunk extends StandardFunc {
 
     exprType.assign(st.union(Occ.ZERO), size - 1).data(input);
     return embed(cc, false);
+  }
+
+  @Override
+  public boolean ddo() {
+    return arg(0).ddo();
   }
 }

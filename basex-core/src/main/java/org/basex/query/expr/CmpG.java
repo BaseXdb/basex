@@ -177,7 +177,7 @@ public class CmpG extends Cmp {
   }
 
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     final Iter iter1 = exprs[0].atomIter(qc, info);
     final long size1 = iter1.size();
     if(size1 == 0) return false;

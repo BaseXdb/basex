@@ -35,7 +35,7 @@ public final class FnReverse extends StandardFunc {
     // single result: iterator
     if(size == 1) return iter;
     // value-based iterator
-    final Value value = iter.value();
+    final Value value = iter.eagerValue();
     if(value != null) return value.reverse(qc).iter();
 
     // size is known: create iterator

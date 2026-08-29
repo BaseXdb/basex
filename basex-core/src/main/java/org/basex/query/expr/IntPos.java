@@ -57,7 +57,7 @@ public final class IntPos extends Simple implements CmpPos {
   }
 
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     ctxValue(qc);
     final long p = qc.focus.pos;
     return p >= min && p <= max;

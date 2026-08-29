@@ -21,7 +21,7 @@ public class FnContainsSubsequence extends StandardFunc {
   }
 
   @Override
-  protected final boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected final boolean ebv(final QueryContext qc) throws QueryException {
     final Value input = arg(0).value(qc);
     final Value subsequence = arg(1).value(qc);
     final FItem compare = toFunctionOrNull(arg(2), 2, qc);

@@ -97,7 +97,7 @@ public final class CmpV extends Cmp {
   }
 
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     final Item item1 = exprs[0].atomItem(qc, info);
     if(item1 == Empty.VALUE) return false;
     final Item item2 = exprs[1].atomItem(qc, info);

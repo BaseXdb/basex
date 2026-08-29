@@ -118,7 +118,7 @@ public class XQueryEval extends StandardFunc {
         }
 
         final Iter iter = qctx.iter();
-        Value value = iter.value();
+        Value value = iter.eagerValue();
         if(value == null) {
           // collect resulting items
           final ValueBuilder vb = new ValueBuilder(qc);

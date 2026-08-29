@@ -19,7 +19,7 @@ public final class MapContains extends MapFn {
   }
 
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(arg(0), qc);
     final Item key = toAtomItem(arg(1), qc);
     return map.contains(key);

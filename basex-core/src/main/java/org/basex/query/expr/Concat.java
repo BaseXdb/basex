@@ -39,7 +39,7 @@ public final class Concat extends Arr {
   }
 
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     for(final Expr expr : exprs) {
       final Iter iter = expr.atomIter(qc, info);
       for(Item item; (item = qc.next(iter)) != null;) {

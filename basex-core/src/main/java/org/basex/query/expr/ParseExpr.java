@@ -63,6 +63,11 @@ public abstract class ParseExpr extends Expr {
   }
 
   @Override
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    return this;
+  }
+
+  @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     return value(qc).iter();
   }
@@ -78,32 +83,30 @@ public abstract class ParseExpr extends Expr {
   }
 
   @Override
-  protected final Item item(final QueryContext qc) throws QueryException {
-    return iterBased ? item(iter(qc), qc) : value(qc).item(qc, info);
+  public final Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    if(iterBased) {
+      final Iter iter = iter(qc);
+      final Item item1 = iter.next();
+      if(item1 == null) return Empty.VALUE;
+      final Item item2 = iter.next();
+      if(item2 == null) return item1;
+      throw typeError(item1.append(item2, qc), BasicType.ITEM, info);
+    }
+    return value(qc).item(qc, info);
   }
 
   @Override
-  protected Item atomItem(final QueryContext qc) throws QueryException {
-    return iterBased ? item(atomIter(qc), qc) : atomValue(qc).item(qc, info);
-  }
-
-  /**
-   * Returns a single item, or {@link Empty#VALUE} if the expression yields an empty sequence.
-   * @param iter iterator
-   * @param qc query context
-   * @return item
-   * @throws QueryException query exception
-   */
-  private Item item(final Iter iter, final QueryContext qc) throws QueryException {
-    final Item item1 = iter.next();
-    if(item1 == null) return Empty.VALUE;
-    final Item item2 = iter.next();
-    if(item2 == null) return item1;
-    throw typeError(item1.append(item2, qc), BasicType.ITEM, info);
+  public final Iter atomIter(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return toAtomIter(qc, info);
   }
 
   @Override
-  protected final Value atomValue(final QueryContext qc) throws QueryException {
+  public final Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return atomValue(qc, info).item(qc, info);
+  }
+
+  @Override
+  public final Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
     return value(qc).atomValue(qc, info);
   }
 
@@ -112,10 +115,15 @@ public abstract class ParseExpr extends Expr {
     return value(qc).unwrappedValue(qc);
   }
 
-  @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  /**
+   * Computes the effective boolean value of this expression.
+   * @param qc query context
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     // single item
-    if(seqType().zeroOrOne()) return item(qc).test(qc, info, pos);
+    if(seqType().zeroOrOne()) return item(qc, info).ebv(qc, info);
     // empty sequence?
     final Iter iter = iter(qc);
     final Item item1 = iter.next();
@@ -123,16 +131,20 @@ public abstract class ParseExpr extends Expr {
     // sequence starting with node?
     if(item1 instanceof GNode) return true;
     // single item?
-    Item item2 = iter.next();
-    if(item2 == null) return item1.test(qc, info, pos);
-    // positional sequence?
-    if(pos == 0 || !(item1 instanceof ANum)) throw testError(item1.append(item2, qc), false, info);
-    if(item1.test(qc, info, pos)) return true;
-    do {
-      if(!(item2 instanceof ANum)) throw testError(item1.append(item2, qc), true, info);
-      if(item2.test(qc, info, pos)) return true;
-    } while((item2 = iter.next()) != null);
-    return false;
+    final Item item2 = iter.next();
+    if(item2 == null) return item1.ebv(qc, info);
+    throw testError(item1.append(item2, qc), false, info);
+  }
+
+  @Override
+  public final boolean ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return ebv(qc);
+  }
+
+  @Override
+  public final boolean predicate(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
+    return seqType().mayBeNumber() ? value(qc).predicate(qc, info, pos) : ebv(qc);
   }
 
   @Override
@@ -275,7 +287,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected void checkPerm(final QueryContext qc, final Perm perm, final String name)
       throws QueryException {
-    if(!qc.user.has(perm, name)) throw BASEX_PERMISSION_X_X.get(info(), perm, this);
+    if(!qc.user.has(perm, name)) throw BASEX_PERMISSION_X_X.get(info, perm, this);
   }
 
   /**

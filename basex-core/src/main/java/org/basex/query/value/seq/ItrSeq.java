@@ -72,10 +72,7 @@ public abstract class ItrSeq extends NativeSeq {
   }
 
   @Override
-  public final boolean test(final QueryContext qc, final InputInfo ii, final long pos)
-      throws QueryException {
-
-    if(pos == 0) return super.test(qc, ii, pos);
+  public final boolean predicate(final QueryContext qc, final InputInfo ii, final long pos) {
     final int sz = (int) size;
     for(int i = 0; i < sz; i++) {
       if(itrAt(i) == pos) return true;

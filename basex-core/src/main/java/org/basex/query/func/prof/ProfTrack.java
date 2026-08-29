@@ -57,7 +57,7 @@ public final class ProfTrack extends StandardFunc {
     } else {
       // iterate through results; skip iteration if iterator is based on a value
       final Iter iter = arg(0).iter(qc);
-      if(iter.value() == null) {
+      if(iter.eagerValue() == null) {
         while(qc.next(iter) != null);
       }
     }

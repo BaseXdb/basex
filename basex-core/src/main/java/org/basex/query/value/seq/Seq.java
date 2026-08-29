@@ -53,16 +53,21 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+  public final boolean ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
+    if(itemAt(0) instanceof GNode) return true;
+    throw testError(this, false, ii);
+  }
+
+  @Override
+  public boolean predicate(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
 
-    final Item first = itemAt(0);
-    if(first instanceof GNode) return true;
-    if(pos == 0 || !(first instanceof ANum)) throw testError(this, false, ii);
+    // non-numeric sequences: compute effective boolean value
+    if(!(itemAt(0) instanceof ANum)) return ebv(qc, ii);
 
     for(final Item item : this) {
       if(!(item instanceof ANum)) throw testError(this, true, ii);
-      if(item.test(qc, ii, pos)) return true;
+      if(item.predicate(qc, ii, pos)) return true;
     }
     return false;
   }
@@ -75,7 +80,7 @@ public abstract class Seq extends Value {
         return itemAt(i);
       }
       @Override
-      public Seq value() {
+      public Seq eagerValue() {
         return Seq.this;
       }
     };
@@ -154,12 +159,12 @@ public abstract class Seq extends Value {
     Expr expr = this;
     if(mode == Simplify.STRING && type.instanceOf(NodeType.NODE)) {
       final TokenList list = new TokenList(size);
-      for(final Item item : atomValue(cc.qc)) list.add(item.string(null));
+      for(final Item item : atomValue(cc.qc, null)) list.add(item.string(null));
       expr = StrSeq.get(list);
     } else if(mode.oneOf(Simplify.DATA, Simplify.NUMBER)) {
       final Type at = type.atomic();
       if(at != null && at != type) {
-        expr = atomValue(cc.qc);
+        expr = atomValue(cc.qc, null);
       }
     }
     return cc.simplify(this, expr, mode);

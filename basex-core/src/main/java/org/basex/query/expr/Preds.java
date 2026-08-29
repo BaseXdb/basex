@@ -75,7 +75,7 @@ public abstract class Preds extends Arr {
     try {
       final long pos = qf.pos;
       for(final Expr expr : exprs) {
-        if(!expr.test(qc, info, pos)) return false;
+        if(!expr.predicate(qc, info, pos)) return false;
       }
       return true;
     } finally {

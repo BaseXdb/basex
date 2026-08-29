@@ -64,7 +64,7 @@ public final class IterPosStep extends Step {
             final Value pos = cachedPos[e];
             if(pos != null) {
               final long p = ++currPos[e];
-              if(!pos.test(qc, info, p)) return false;
+              if(!pos.predicate(qc, info, p)) return false;
               // last position reached: early exit
               if(p == pos.itemAt(pos.size() - 1).itr(info)) skip = true;
             } else if(!exprs[e].ebv(qc, info)) {

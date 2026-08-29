@@ -23,7 +23,7 @@ public final class DbExists extends DbAccessFn {
   }
 
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     try {
       final Data data = toData(qc);
       final String path = toDbPathOrNull(arg(1), qc);

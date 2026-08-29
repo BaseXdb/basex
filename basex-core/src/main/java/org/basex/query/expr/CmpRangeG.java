@@ -27,7 +27,7 @@ public final class CmpRangeG extends CmpG {
   }
 
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     final RangeSeq rs = (RangeSeq) exprs[1].value(qc);
     final long min = rs.min(), max = rs.max();
     final Iter iter = exprs[0].atomIter(qc, info);

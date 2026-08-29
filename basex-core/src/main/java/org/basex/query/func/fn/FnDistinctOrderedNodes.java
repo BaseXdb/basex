@@ -22,7 +22,7 @@ public final class FnDistinctOrderedNodes extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Iter nodes = arg(0).iter(qc);
-    final Value value = nodes.value();
+    final Value value = nodes.eagerValue();
     if(value instanceof DBNodeSeq) return value;
 
     final GNodeBuilder nb = new GNodeBuilder();
@@ -31,7 +31,7 @@ public final class FnDistinctOrderedNodes extends StandardFunc {
   }
 
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     final Item item = arg(0).iter(qc).next();
     if(item == null) return false;
     toGNode(item);

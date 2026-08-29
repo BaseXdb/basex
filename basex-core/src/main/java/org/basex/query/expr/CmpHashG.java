@@ -32,7 +32,7 @@ public final class CmpHashG extends CmpG {
   }
 
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     final Iter iter1 = exprs[0].atomIter(qc, info);
     final long size1 = iter1.size();
     if(size1 == 0) return false;
@@ -46,7 +46,7 @@ public final class CmpHashG extends CmpG {
     final long size2 = iter2.size();
     if(size2 == 0) return false;
     // check if iterator is based on value with more than one item, check if caching is enabled
-    final Value value2 = iter2.value();
+    final Value value2 = iter2.eagerValue();
     if(value2 != null && size2 > 1 && cache.active(value2, iter2)) {
       return probe(iter1, cache, qc);
     }

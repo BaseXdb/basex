@@ -54,7 +54,7 @@ public final class CmpN extends Cmp {
   }
 
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     final GNode n1 = toGNodeOrNull(exprs[0], qc);
     if(n1 == null) return false;
     final GNode n2 = toGNodeOrNull(exprs[1], qc);

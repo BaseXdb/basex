@@ -25,7 +25,7 @@ public final class FnAllDifferent extends StandardFunc {
   }
 
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     final Iter values = arg(0).atomIter(qc, info);
     final Collation collation = toCollation(arg(1), qc);
 

@@ -62,7 +62,7 @@ public final class Where extends Clause {
     // where exists($nodes) → where $nodes
     expr = expr.simplifyFor(Simplify.EBV, cc);
     if(expr instanceof Value && !(expr instanceof Bln)) {
-      expr = cc.replaceWith(expr, Bln.get(expr.test(cc.qc, info, 0)));
+      expr = cc.replaceWith(expr, Bln.get(expr.ebv(cc.qc, info)));
     }
     return this;
   }

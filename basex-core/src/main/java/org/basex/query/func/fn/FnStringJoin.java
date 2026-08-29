@@ -39,7 +39,7 @@ public final class FnStringJoin extends StandardFunc {
   }
 
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     final Iter values = arg(0).atomIter(qc, info);
     final boolean separator = toZeroToken(arg(1), qc).length > 0;
 

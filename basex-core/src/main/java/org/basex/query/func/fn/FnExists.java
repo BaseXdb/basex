@@ -13,8 +13,8 @@ import org.basex.query.value.type.*;
  */
 public final class FnExists extends FnEmpty {
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
-    return !super.test(qc, pos);
+  protected boolean ebv(final QueryContext qc) throws QueryException {
+    return !super.ebv(qc);
   }
 
   @Override

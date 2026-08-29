@@ -16,7 +16,7 @@ public final class UserExists extends UserFn {
   }
 
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     return qc.context.users.get(toName(arg(0), false, qc)) != null;
   }
 }

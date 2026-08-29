@@ -116,7 +116,7 @@ public final class Union extends Set {
   }
 
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     for(final Expr expr : exprs) {
       final Item item = expr.iter(qc).next();
       if(item != null) {

@@ -18,7 +18,7 @@ public final class JobFinished extends StandardFunc {
   }
 
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     final String id = toString(arg(0), qc);
     final JobPool pool = qc.context.jobs;
     final QueryJobResult result = pool.results.get(id);

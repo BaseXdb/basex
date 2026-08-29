@@ -24,7 +24,7 @@ public final class FnCodepointEqual extends StandardFunc {
   }
 
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     final Boolean test = test(qc);
     return test != null && test;
   }

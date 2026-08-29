@@ -72,7 +72,7 @@ public abstract class GNode extends Item {
   }
 
   @Override
-  public final boolean test(final QueryContext qc, final InputInfo ii, final long pos) {
+  public final boolean ebv(final QueryContext qc, final InputInfo ii) {
     return true;
   }
 

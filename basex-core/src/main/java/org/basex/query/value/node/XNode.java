@@ -83,7 +83,7 @@ public abstract class XNode extends GNode {
       expr = Str.get(string());
     } else if(mode.oneOf(Simplify.DATA, Simplify.NUMBER)) {
       // data(<a>A</a>) → data(xs:untypedAtomic('A'))
-      expr = atomItem(cc.qc);
+      expr = atomItem(cc.qc, null);
     }
     return cc.simplify(this, expr, mode);
   }

@@ -28,7 +28,7 @@ public abstract class BasicNodeIter extends NodeIter implements Iterable<GNode> 
       return 0;
     }
     @Override
-    public Empty value() {
+    public Empty eagerValue() {
       return Empty.VALUE;
     }
   };

@@ -21,7 +21,7 @@ public final class FnLang extends ContextFn {
   }
 
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     final byte[] lang = lc(toZeroToken(arg(0), qc));
     XNode node = toNodeOrNull(arg(1), qc);
     if(node == null) node = toNode(context(qc), qc);

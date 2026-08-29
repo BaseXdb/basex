@@ -46,13 +46,13 @@ public class CachedFilter extends Filter {
   /**
    * Filters a value by testing each of its items against a predicate.
    * @param value items to filter
-   * @param pred predicate expression
+   * @param expr predicate expression
    * @param qc query context
    * @param qf query focus
    * @return filtered value
    * @throws QueryException query exception
    */
-  final Value eval(final Value value, final Expr pred, final QueryContext qc, final QueryFocus qf)
+  final Value eval(final Value value, final Expr expr, final QueryContext qc, final QueryFocus qf)
       throws QueryException {
     final long vs = value.size();
     qf.size = vs;
@@ -62,7 +62,7 @@ public class CachedFilter extends Filter {
       final Item item = value.itemAt(p - 1);
       qf.value = item;
       qf.pos = p;
-      if(pred.test(qc, info, p)) vb.add(item);
+      if(expr.predicate(qc, info, p)) vb.add(item);
     }
     return vb.value();
   }

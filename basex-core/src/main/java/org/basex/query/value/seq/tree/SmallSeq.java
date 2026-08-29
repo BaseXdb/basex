@@ -162,7 +162,7 @@ public final class SmallSeq extends TreeSeq {
         return items[(int) i];
       }
       @Override
-      public SmallSeq value() {
+      public SmallSeq eagerValue() {
         return SmallSeq.this;
       }
     };

@@ -22,7 +22,7 @@ public class FnContains extends StandardFunc {
   }
 
   @Override
-  protected final boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected final boolean ebv(final QueryContext qc) throws QueryException {
     final byte[] value = toZeroToken(arg(0), qc);
     final byte[] substring = toZeroToken(arg(1), qc);
     final Collation collation = toCollation(arg(2), qc);

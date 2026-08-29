@@ -56,7 +56,7 @@ public abstract class Logical extends Arr {
   }
 
   @Override
-  protected final boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected final boolean ebv(final QueryContext qc) throws QueryException {
     final boolean or = or();
     for(final Expr expr : exprs) {
       if(expr.ebv(qc, info) == or) return or;

@@ -25,7 +25,7 @@ public final class FnRemove extends StandardFunc {
     final LongList pos = positions(qc);
 
     // value-based iterator
-    final Value value = iter.value();
+    final Value value = iter.eagerValue();
     if(value != null) return value(value, pos, qc).iter();
     if(pos.size() > 1) return value(iter.value(qc, null), pos, qc).iter();
 

@@ -29,7 +29,7 @@ public final class Empty extends Item {
       return null;
     }
     @Override
-    public Empty value() {
+    public Empty eagerValue() {
       return VALUE;
     }
   };
@@ -67,7 +67,7 @@ public final class Empty extends Item {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final long pos) {
+  public boolean ebv(final QueryContext qc, final InputInfo ii) {
     return false;
   }
 

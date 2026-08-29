@@ -22,7 +22,7 @@ public class FnEvery extends StandardFunc {
   }
 
   @Override
-  protected final boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected final boolean ebv(final QueryContext qc) throws QueryException {
     // implementation for dynamic function lookup
     final Iter input = arg(0).iter(qc);
     final FItem predicate = toFunctionOrNull(arg(1), 2, qc);

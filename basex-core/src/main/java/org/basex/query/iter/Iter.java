@@ -47,7 +47,7 @@ public abstract class Iter {
    * Returns the value this iterator is based on.
    * @return value, or {@code null} if the iterator is not based on a value
    */
-  public Value value() {
+  public Value eagerValue() {
     return null;
   }
 
@@ -62,7 +62,7 @@ public abstract class Iter {
    */
   public Value value(final QueryContext qc, final Expr expr) throws QueryException {
     // value-based iterator?
-    final Value value = value();
+    final Value value = eagerValue();
     if(value != null) return value;
 
     // empty sequence?

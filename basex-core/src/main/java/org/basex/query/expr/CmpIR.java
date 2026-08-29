@@ -124,7 +124,7 @@ public final class CmpIR extends CmpRange {
   }
 
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     // atomic evaluation of arguments (faster)
     if(single) {
       final Item item = expr.item(qc, info);

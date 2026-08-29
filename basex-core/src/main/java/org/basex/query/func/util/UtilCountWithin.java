@@ -28,7 +28,7 @@ public final class UtilCountWithin extends StandardFunc {
   }
 
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     final long[] minMax = minMax(qc);
     final long min = minMax[0], max = minMax[1];
 

@@ -523,7 +523,7 @@ public final class BigSeq extends TreeSeq {
         return itemAt(i);
       }
       @Override
-      public BigSeq value() {
+      public BigSeq eagerValue() {
         return BigSeq.this;
       }
     };

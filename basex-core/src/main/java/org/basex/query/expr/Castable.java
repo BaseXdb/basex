@@ -47,7 +47,7 @@ public final class Castable extends Convert {
   }
 
   @Override
-  protected boolean test(final QueryContext qc, final long pos) throws QueryException {
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     return seqType.cast(expr.value(qc), false, qc, info) != null;
   }
 
