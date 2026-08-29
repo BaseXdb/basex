@@ -292,8 +292,10 @@ public abstract class Cmp extends Arr {
           args.add(count).add(count);
         }
         if(!args.isEmpty()) {
+          // count(A) >= 3 to 5 → util:within(A, 3)
+          // count(A) <= 3 to 5 → util:within(A, 0, 5)
           if(op == CmpOp.GE) args.remove(args.size() - 1);
-          else if(op == CmpOp.LE) args.set(0, Itr.ONE);
+          else if(op == CmpOp.LE) args.set(0, Itr.ZERO);
         }
       }
     }

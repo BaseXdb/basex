@@ -157,6 +157,51 @@ public final class ExprTest extends SandboxTest {
     check("<a>5</a>[text() > 1 and text() = 'x']", "", count(cmpr, 1));
   }
 
+  /** Checks the rewriting of count comparisons. */
+  @Test public void cmpCount() {
+    final String[] general = { "=", "!=", "<", "<=", ">", ">=" };
+    final String[] ops = { "=", "!=", "<", "<=", ">", ">=", "eq", "ne", "lt", "le", "gt", "ge" };
+    final String prolog = "declare %basex:inline(0) function local:c($input as item()*, " +
+        "$count as xs:integer) as xs:boolean* { count($input) ";
+
+    for(int s = 0; s <= 3; s++) {
+      // result size is unknown at compile time
+      final String count = "count((1 to 3)[. > " + wrap(3 - s) + "])";
+      for(int c = 0; c <= 3; c++) {
+        for(final String op : ops) {
+          final boolean result = compare(s, op, c);
+          // integer literal, variable reference
+          query(count + ' ' + op + ' ' + c, result);
+          query(prolog + op + " $count }; local:c((1 to " + s + "), " + c + ')', result);
+        }
+      }
+      // general comparisons with a range operand
+      for(final String op : general) {
+        boolean result = false;
+        for(int c = 1; c <= 3; c++) result |= compare(s, op, c);
+        query(count + ' ' + op + " (1 to 3)", result);
+      }
+    }
+  }
+
+  /**
+   * Compares a result size with a single operand.
+   * @param size result size
+   * @param op comparison operator
+   * @param count operand
+   * @return result of check
+   */
+  private static boolean compare(final int size, final String op, final int count) {
+    return switch(op) {
+      case "=", "eq" -> size == count;
+      case "!=", "ne" -> size != count;
+      case "<", "lt" -> size < count;
+      case "<=", "le" -> size <= count;
+      case ">", "gt" -> size > count;
+      default -> size >= count;
+    };
+  }
+
   /** Checks {@link CmpV} optimizations. */
   @Test public void cmpV() {
     final Class<CmpV> cmpv = CmpV.class;
