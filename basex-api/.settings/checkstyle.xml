@@ -16,10 +16,6 @@
     <property name="tabWidth" value="2"/>
   </module>
   <module name="TreeWalker">
-    <module name="JavadocStyle">
-      <property name="checkEmptyJavadoc" value="true"/>
-      <property name="checkHtml" value="false"/>
-    </module>
     <module name="ConstantName"/>
     <module name="LocalFinalVariableName"/>
     <module name="LocalVariableName"/>
