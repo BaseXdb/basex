@@ -1259,13 +1259,12 @@ public class TextPanel extends BaseXPanel {
     if(explicit) return true;
     final byte[] text = editor.text();
     final int caret = editor.pos();
-    // the cursor must be placed at the end of the completed string
-    if(caret != editor.completionEnd()) return false;
     // a completion is started by a name character, or by the character before an empty string
     final int ch = caret == start ? Syntax.prev(text, start) : cp(text, start);
     if(!rend.syntax().completeStart(ch) && !XMLToken.isNCStartChar(ch)) return false;
     // a function call is already complete
-    return caret >= text.length || text[caret] != '(';
+    final int end = editor.completionEnd();
+    return end >= text.length || text[end] != '(';
   }
 
   /**
