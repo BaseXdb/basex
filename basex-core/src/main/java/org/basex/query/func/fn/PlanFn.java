@@ -572,9 +572,9 @@ public abstract class PlanFn extends StandardFunc {
       final PlanEntry entry = attributeEntry(attr.qname(), plan);
       // attributes with the type 'skip' are omitted
       if(entry != null && entry.type == PlanType.SKIP) continue;
-      final Str value = Str.get(attr.string());
+      final byte[] value = attr.string();
       mb.put(nodeName(attr.qname(), false, node, plan, qc, marker),
-          entry != null ? entry.cast(value) : value);
+          entry != null ? entry.cast(Str.get(value)) : Atm.get(value));
     }
     return mb;
   }

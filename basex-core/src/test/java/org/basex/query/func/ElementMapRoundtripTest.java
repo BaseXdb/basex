@@ -163,7 +163,7 @@ public final class ElementMapRoundtripTest extends SandboxTest {
     query("element-to-map(<a x='1'><x>2</x></a>, { 'plan': { '@x': { 'type': 'integer' } } })"
         + "?a?x instance of xs:integer", true);
     query("element-to-map(<a x='1'/>, { 'plan': { 'x': { 'layout': 'simple', "
-        + "'type': 'integer' } } })?a?('@x') instance of xs:string", true);
+        + "'type': 'integer' } } })?a?('@x') instance of xs:untypedAtomic", true);
   }
 
   /** Test method. */
@@ -188,6 +188,10 @@ public final class ElementMapRoundtripTest extends SandboxTest {
     roundtrip("<a/>", " { 'plan': { 'a': { 'layout': 'xml' } } }");
     // attribute types
     roundtrip("<a x='1'/>", " { 'plan': { '@x': { 'type': 'integer' } } }");
+    // attributes without a plan entry are untyped
+    query("element-to-map(<a x='1'/>)?a?('@x') instance of xs:untypedAtomic", true);
+    query("element-to-map(<a x='1'/>, { 'plan': { '@x': { 'type': 'string' } } })"
+        + "?a?('@x') instance of xs:untypedAtomic", true);
     roundtrip("<a x='1'>t</a>",
         " { 'attribute-marker': ':', 'plan': { '@x': { 'type': 'integer' } } }");
     roundtrip("<a xmlns:p='u' p:x='1'/>", " { 'plan': { '@Q{u}x': { 'type': 'integer' } } }");
