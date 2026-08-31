@@ -146,6 +146,18 @@ public final class SimpleMapTest extends SandboxTest {
     check("(true(), false()) ! (. = true())", "true\nfalse", root(BlnSeq.class));
   }
 
+  /** Self steps on generalized nodes must not be dropped. */
+  @Test public void generalizedNodes() {
+    query("count((jtree({ 'a': 1 }), <x/>) ! (self::node()))", 1);
+    query("count((jtree({ 'a': 1 }), <x/>) ! (self::jnode()))", 1);
+    query("count((jtree({ 'a': 1 }), <x/>) ! (self::gnode()))", 2);
+    query("count(<x/> ! (self::node()))", 1);
+    query("count({ 'a': 1 } ! (self::gnode()))", 1);
+    // self steps must not be dropped if the context value is no node
+    error("count((1, 2) ! (self::node()))", PATHNODE_X_X_X);
+    error("count((1, 2) ! (self::gnode()))", PATHNODE_X_X_X);
+  }
+
   /** Unrolled operands must not share the mapped expression. */
   @Test public void unrolledOperands() {
     inline(true);

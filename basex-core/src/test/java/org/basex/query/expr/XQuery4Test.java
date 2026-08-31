@@ -873,6 +873,31 @@ public final class XQuery4Test extends SandboxTest {
     error("<a><b/><c/></a>/child::{ if(. instance of node()) then 'b' else 'c' }", NOCTX_X);
   }
 
+  /** Subtype relation of generalized node types. */
+  @Test public void gnodeSubtypes() {
+    // node() is not a supertype of jnode(); gnode() is a supertype of both
+    query("jtree({ 'a': 1 }) instance of node()", false);
+    query("jtree({ 'a': 1 }) instance of gnode()", true);
+    query("<a/> instance of node()", true);
+    query("<a/> instance of gnode()", true);
+    query("<a/> instance of jnode()", false);
+    query("(jtree({ 'a': 1 }), <a/>) instance of gnode()+", true);
+    query("(jtree({ 'a': 1 }), <a/>) instance of node()+", false);
+    // a named test of a specific kind is an instance of the generalized one
+    query("<a/> instance of (jnode(a) | element(a))", true);
+    query("jtree({ 'a': 1 })/a instance of (jnode(a) | element(a))", true);
+    query("jtree({ 'a': 1 })/a instance of jnode(a)", true);
+    // steps and predicates must respect the relation
+    query("count(jtree({ 'a': 1 })[self::node()])", 0);
+    query("count(jtree({ 'a': 1 })[self::gnode()])", 1);
+    query("count(jtree({ 'a': { 'b': 1 } })//b[self::node()])", 0);
+    // fn:name, fn:local-name and fn:node-name declare node()?, which excludes JSON nodes
+    error("jtree({ 'a': 1 })/a ! name()", INVTYPE_X);
+    error("jtree({ 'a': 1 })/a ! local-name()", INVTYPE_X);
+    error("jtree({ 'a': 1 })/a ! node-name()", INVTYPE_X);
+    query("jtree({ 'a': 1 })/a ! string(jkey())", "a");
+  }
+
   /** Path operator: JNode navigation with atomic step results (jkey matching). */
   @Test public void pathJNode() {
     // an atomic step result selects children whose jkey matches

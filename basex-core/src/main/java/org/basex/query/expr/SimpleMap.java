@@ -237,7 +237,9 @@ public abstract class SimpleMap extends Mapping {
       if(filter.root instanceof ContextValue) preds = filter;
     } else if(next instanceof final SingleIterPath path) {
       final Step step = path.step(0);
-      if(step.axis == Axis.SELF && step.test == NodeTest.NODE) preds = step;
+      final Type tp = expr.seqType().type;
+      if(step.axis == Axis.SELF && tp instanceof NodeType &&
+          step.test.subsumes(tp) == Boolean.TRUE) preds = step;
     }
     if(preds != null && !preds.mayBePositional()) return Filter.get(cc, info, expr, preds.exprs);
 

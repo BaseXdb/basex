@@ -156,7 +156,7 @@ public abstract class Test extends ExprInfo {
       }
       return false;
     }
-    return test.kind == kind || test.kind == Kind.NODE;
+    return test instanceof NodeTest && kind.instanceOf(test.kind);
   }
 
   /**

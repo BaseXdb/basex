@@ -129,6 +129,10 @@ public final class JNodeTest extends Test {
       final Item k1 = key, k2 = jt.key;
       return (k2 == null || equals(k1, k2)) && valueType.instanceOf(jt.valueType);
     }
+    if(test instanceof final NameTest nt && kind.instanceOf(nt.kind)) {
+      return nt.scope == NameTest.Scope.ALL || nt.scope == NameTest.Scope.FLEXIBLE &&
+        key != null && key != Empty.VALUE && equals(key, key(nt.qname));
+    }
     return super.instanceOf(test);
   }
 

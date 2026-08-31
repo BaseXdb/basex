@@ -820,6 +820,16 @@ public final class PathTest extends SandboxTest {
         "<a/>", root(CElem.class));
   }
 
+  /** Removed self steps must not drop the document order of generalized nodes. */
+  @Test public void gnodeDocumentOrder() {
+    final String kinds = " ! (if(. instance of jnode()) then 'J' else 'X')";
+    final String seq = "let $s := (jtree({ 'a': 1 }), <x/>) return string-join(";
+    query(seq + "$s/self::gnode()" + kinds + ")", "XJ");
+    query(seq + DISTINCT_ORDERED_NODES.args(" $s") + kinds + ")", "XJ");
+    query(seq + "($s | $s)" + kinds + ")", "XJ");
+    query(seq + "reverse($s)/self::gnode()" + kinds + ")", "XJ");
+  }
+
   /** Filter expression, node order. */
   @Test public void nodeOrder() {
     query("let $f := fn { true() } "

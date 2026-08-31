@@ -510,6 +510,38 @@ public final class FilterTest extends SandboxTest {
     query("count((text { 'x' }, element x {})[. instance of element()])", 1);
   }
 
+  /** Predicates on generalized nodes. */
+  @Test public void generalizedNodes() {
+    query("count((jtree({ 'a': 1 }), <x/>)[self::node()])", 1);
+    query("count((jtree({ 'a': 1 }), <x/>)[exists(self::node())])", 1);
+    query("count((jtree({ 'a': 1 }), <x/>)/self::node())", 1);
+    query("count((jtree({ 'a': 1 }), <x/>)[self::jnode()])", 1);
+    query("count((jtree({ 'a': 1 }), <x/>)[self::gnode()])", 2);
+    query("count(jtree({ 'a': 1 })[self::node()])", 0);
+
+    // predicates must not widen the node test of the step they are attached to
+    final String mix = "let $x := (jtree({ 'a': { 'b': 'x' } }), <r><a><b>x</b></a></r>) return ";
+    query(mix + "count($x/descendant::a)", 2);
+    query(mix + "count($x/descendant::a[. instance of node()])", 1);
+    query(mix + "count($x/descendant::a[. instance of jnode()])", 1);
+    query(mix + "count($x/descendant::a[. instance of element()])", 1);
+    query(mix + "count($x/descendant::b[. instance of node()])", 1);
+    query(mix + "count(($x/descendant::a)[self::node()])", 1);
+
+    // node() is not a supertype of jnode(): the self step must not be merged away
+    final String jb = "let $x := jtree({ 'a': { 'b': 1 } })//b return ";
+    query(jb + "count($x[self::node()])", 0);
+    query(jb + "count(filter($x, fn($n) { boolean($n[self::node()]) }))", 0);
+    query(jb + "count($x => for-each(fn($n) { $n[self::node()] }))", 0);
+    query(jb + "count($x[self::jnode()])", 1);
+
+    // predicates that are rewritten to a self step must not exclude JSON nodes
+    final String mixed = "let $x := (jtree({ 'a': { 'b': 'x' } }), <r><a><b>x</b></a></r>)/a ";
+    query(mixed + "return count($x ! (.[b = 'x'], 'z'))", 4);
+    query(mixed + "return count($x ! ('z', .[b = 'x']))", 4);
+    query(mixed + "return count(for $n in $x return ($n[b = 'x'], 'z'))", 4);
+  }
+
   /** GH-2687: NPE from AndExpr filter over ContextValueRef step. */
   @Test public void gh2687() {
     query("()/.[true() and true()]", "");

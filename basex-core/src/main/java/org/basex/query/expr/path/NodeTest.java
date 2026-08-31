@@ -19,8 +19,6 @@ public class NodeTest extends Test {
     @Override
     public Boolean subsumes(final Type type) { return Boolean.TRUE; }
     @Override
-    public boolean instanceOf(final Test test) { return test == this; }
-    @Override
     public Test intersect(final Test test) { return test; }
   };
   /** JNode test. */
@@ -117,22 +115,18 @@ public class NodeTest extends Test {
   }
 
   @Override
-  public boolean instanceOf(final Test test) {
-    if(this == test) return true;
-    return (test instanceof NodeTest || test instanceof UnionTest) && super.instanceOf(test);
-  }
-
-  @Override
   public Test intersect(final Test test) {
     if(test instanceof NodeTest) {
-      // a intersect * ? a
+      // a intersect * → a
       if(instanceOf(test)) return this;
       if(test.instanceOf(this)) return test;
     } else if(test instanceof UnionTest) {
       return test.intersect(this);
     } else {
-      // a intersect element() ? a
+      // a intersect element() → a
       if(kind == test.kind || kind == Kind.GNODE) return test;
+      if(test.kind == Kind.GNODE && kind.oneOf(Kind.NODE, Kind.JNODE, Kind.ELEMENT))
+        return test.optimize(kind, null);
       if(kind == Kind.NODE && test.kind != Kind.JNODE) return test;
     }
     return null;

@@ -35,7 +35,7 @@ public abstract class Step extends Preds {
   public Expr selector;
 
   /**
-   * Returns a new optimized self::node() step.
+   * Returns a new optimized self::gnode() step.
    * @param cc compilation context
    * @param root root context expression; if {@code null}, the current context will be used
    * @param info input info (can be {@code null})
@@ -45,7 +45,7 @@ public abstract class Step extends Preds {
    */
   public static Expr self(final CompileContext cc, final Expr root, final InputInfo info,
       final Expr... preds) throws QueryException {
-    return self(cc, root, info, NodeTest.NODE, preds);
+    return self(cc, root, info, NodeTest.GNODE, preds);
   }
 
   /**
@@ -136,7 +136,7 @@ public abstract class Step extends Preds {
    * @param preds predicates
    */
   Step(final InputInfo info, final Axis axis, final Test test, final Expr... preds) {
-    super(info, seqType(axis, test, null, preds), preds);
+    super(info, seqType(axis, test, preds), preds);
     this.axis = axis;
     this.test = test;
   }
@@ -264,12 +264,13 @@ public abstract class Step extends Preds {
     final Type type = expr != null ? expr.seqType().type : NodeType.GNODE;
     test = test.optimize(type.kind(), null);
 
-    SeqType st = seqType(axis, test, selector, exprs);
-    if(expr != null && axis == SELF) {
+    SeqType st = seqType(axis, test, exprs);
+    final Type ct = type.instanceOf(Types.MAP_OR_ARRAY) ? NodeType.JNODE : type;
+    if(expr != null && axis == SELF && ct instanceof NodeType) {
       // node test: adopt type of context expression: <a/>/self::gnode()
-      if(test.kind == Kind.GNODE) st = type.seqType(st.occ);
+      if(test.kind == Kind.GNODE) st = ct.seqType(st.occ);
       // no predicates: step will yield single result: $elements/self::element()
-      if(exprs.length == 0 && selector == null && test.subsumes(type) == Boolean.TRUE)
+      if(exprs.length == 0 && selector == null && test.subsumes(ct) == Boolean.TRUE)
         st = st.with(Occ.EXACTLY_ONE);
     }
     exprType.assign(st).data(expr);
@@ -280,18 +281,13 @@ public abstract class Step extends Preds {
    * Determines the sequence type of the step.
    * @param axis axis
    * @param test test
-   * @param selector selector (can be {@code null})
    * @param preds predicates
    * @return sequence type
    */
-  private static SeqType seqType(final Axis axis, final Test test, final Expr selector,
-      final Expr... preds) {
+  private static SeqType seqType(final Axis axis, final Test test, final Expr... preds) {
     final Occ occ = axis == ATTRIBUTE && test.subsumes(NodeType.ATTRIBUTE) == Boolean.FALSE
       // no results: attribute::element()
       ? Occ.ZERO :
-        axis == SELF && test == NodeTest.NODE && selector == null && preds.length == 0
-      // one result: self::node()
-      ? Occ.EXACTLY_ONE :
         axis.oneOf(SELF, PARENT) ||
         axis == ATTRIBUTE && test instanceof final NameTest nt && nt.scope == NameTest.Scope.FULL ||
         preds.length == 1 && preds[0] instanceof final CmpPos cp && cp.exact()

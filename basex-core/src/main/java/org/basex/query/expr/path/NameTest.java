@@ -194,13 +194,13 @@ public final class NameTest extends Test {
   public boolean instanceOf(final Test test) {
     if(this == test) return true;
     if(test instanceof final NameTest nt) {
-      return kind == nt.kind && switch(nt.scope) {
+      return kind.instanceOf(nt.kind) && switch(nt.scope) {
         case LOCAL -> scope.oneOf(Scope.LOCAL, Scope.FLEXIBLE, Scope.FULL) &&
           Token.eq(qname.local(), nt.qname.local());
         case URI -> (scope == Scope.URI || scope == Scope.FULL) &&
           Token.eq(qname.uri(), nt.qname.uri());
         case FLEXIBLE, FULL -> scope.oneOf(Scope.FLEXIBLE, Scope.FULL) && qname.eq(nt.qname);
-        case ALL -> scope == Scope.ALL;
+        case ALL -> true;
       };
     }
     return super.instanceOf(test);

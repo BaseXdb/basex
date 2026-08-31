@@ -162,7 +162,7 @@ public final class NodeType implements Type {
   public boolean instanceOf(final Type type) {
     if(type == this || type == BasicType.ITEM || type == GNODE) return true;
     if(type instanceof final NodeType nt) {
-      if(nt.kind != kind) return kind.instanceOf(nt.kind);
+      if(!kind.instanceOf(nt.kind)) return false;
       return nt.test == null || test != null && test.instanceOf(nt.test);
     }
     if(type instanceof final ChoiceItemType cit) {
@@ -188,8 +188,9 @@ public final class NodeType implements Type {
     if(type instanceof final ChoiceItemType cit) return cit.intersect(this);
     if(instanceOf(type)) return this;
     if(type.instanceOf(this)) return type;
-    if(type instanceof final NodeType nt && kind == nt.kind) {
-      final Test t = test.intersect(nt.test);
+    if(type instanceof final NodeType nt) {
+      final Test t = (test != null ? test : NodeTest.get(kind)).intersect(
+        nt.test != null ? nt.test : NodeTest.get(nt.kind));
       if(t != null) return get(t);
     }
     return null;
