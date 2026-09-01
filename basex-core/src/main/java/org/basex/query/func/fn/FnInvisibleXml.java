@@ -3,6 +3,7 @@ package org.basex.query.func.fn;
 import static org.basex.query.QueryError.*;
 
 import java.io.*;
+import java.util.*;
 
 import org.basex.build.*;
 import org.basex.core.*;
@@ -74,6 +75,17 @@ public final class FnInvisibleXml extends StandardFunc {
     private static final Option[] NO_OPTS = new Blitz.Option[0];
     /** Markup Blitz options for fail-on-error. */
     private static final Option[] FAIL_OPTS = new Blitz.Option[] { Blitz.Option.FAIL_ON_ERROR };
+    /** Maximum number of parser cache entries. */
+    private static final int CACHE_SIZE = 15;
+    /** Generated parser cache. */
+    private static final LinkedHashMap<String, de.bottlecaps.markup.blitz.Parser> PARSERS =
+        new LinkedHashMap<>(CACHE_SIZE + 1, 1.0f, true) {
+          @Override
+          protected boolean removeEldestEntry(
+              final Map.Entry<String, de.bottlecaps.markup.blitz.Parser> eldest) {
+            return size() > CACHE_SIZE;
+          }
+        };
 
     /**
      * Generate a parser from an invisible XML grammar.
@@ -97,7 +109,7 @@ public final class FnInvisibleXml extends StandardFunc {
       final de.bottlecaps.markup.blitz.Parser parser;
       final Blitz.Option[] opts = options.get(IxmlOptions.FAIL_ON_ERROR) ? FAIL_OPTS : NO_OPTS;
       try {
-        parser = xml ? Blitz.generateFromXml(grmmr, opts) : Blitz.generate(grmmr, opts);
+        parser = parser(grmmr, xml, opts);
       } catch(final BlitzParseException ex) {
         throw IXML_GRM_X_X_X.get(info, ex.getOffendingToken(), ex.getLine(), ex.getColumn());
       } catch(final BlitzException ex) {
@@ -109,6 +121,34 @@ public final class FnInvisibleXml extends StandardFunc {
       final ParseInvisibleXml parseFunction = new ParseInvisibleXml(info, parser, arg);
       final FuncType ft = FuncType.get(parseFunction.seqType(), Types.STRING_O);
       return new FuncItem(info, parseFunction, params, AnnList.EMPTY, ft, params.length, null);
+    }
+
+    /**
+     * Returns a cached parser.
+     * @param grammar grammar string
+     * @param xml XML grammar flag
+     * @param opts generation options
+     * @return parser
+     */
+    private de.bottlecaps.markup.blitz.Parser parser(final String grammar, final boolean xml,
+        final Blitz.Option[] opts) {
+      final String key = grammar + "\0" + xml + "\0" + Arrays.toString(opts);
+      de.bottlecaps.markup.blitz.Parser parser;
+      synchronized(PARSERS) {
+        parser = PARSERS.get(key);
+      }
+      if(parser == null) {
+        parser = xml ? Blitz.generateFromXml(grammar, opts) : Blitz.generate(grammar, opts);
+        synchronized(PARSERS) {
+          final de.bottlecaps.markup.blitz.Parser cached = PARSERS.get(key);
+          if(cached != null) {
+            parser = cached;
+          } else {
+            PARSERS.put(key, parser);
+          }
+        }
+      }
+      return parser;
     }
   }
 
