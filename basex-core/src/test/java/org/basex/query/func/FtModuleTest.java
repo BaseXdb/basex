@@ -171,6 +171,10 @@ public final class FtModuleTest extends SandboxTest {
 
     query(COUNT.args(func.args(" //*[text() contains text '1']/../../../../..")), 1);
 
+    // marked nodes are constructed anew for each evaluation
+    query("count(distinct-values(for $i in 1 to 2 return " +
+        GENERATE_ID.args(" " + func.args(" //*[text() contains text '1']")) + "))", 2);
+
     // positions assigned to an ancestor with an identical string value
     query(func.args(" //li[. contains text '1']", "b"), "<li>Exercise <b>1</b></li>");
 

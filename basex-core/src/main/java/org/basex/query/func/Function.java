@@ -548,7 +548,7 @@ public enum Function implements AFunction {
       params(STRING_ZO), DATE_TIME_ZO),
   /** XQuery function. */
   PARSE_HTML(FnParseHtml::new, "parse-html(value, options?)",
-      params(STRING_OR_BINARY_ZO, MAP_ZO), DOCUMENT_HTML_ZO),
+      params(STRING_OR_BINARY_ZO, MAP_ZO), DOCUMENT_HTML_ZO, flag(CNS)),
   /** XQuery function. */
   PARSE_INTEGER(FnParseInteger::new, "parse-integer(value, radix?)",
       params(STRING_ZO, INTEGER_ZO), INTEGER_ZO),
@@ -1622,10 +1622,10 @@ public enum Function implements AFunction {
       params(NODE_ZM), INTEGER_O, FT_URI),
   /** XQuery function. */
   _FT_EXTRACT(FtExtract::new, "extract(nodes, name?, length?)",
-      params(NODE_ZM, STRING_ZO, INTEGER_ZO), NODE_ZM, FT_URI),
+      params(NODE_ZM, STRING_ZO, INTEGER_ZO), NODE_ZM, flag(CNS), FT_URI),
   /** XQuery function. */
   _FT_MARK(FtMark::new, "mark(nodes, name?)",
-      params(NODE_ZM, STRING_ZO), NODE_ZM, FT_URI),
+      params(NODE_ZM, STRING_ZO), NODE_ZM, flag(CNS), FT_URI),
   /** XQuery function. */
   _FT_NORMALIZE(FtNormalize::new, "normalize(value, options?)",
       params(STRING_ZO, MAP_ZO), STRING_O, FT_URI),
@@ -1665,7 +1665,7 @@ public enum Function implements AFunction {
       params(STRING_ZO, MAP_ZO), DOCUMENT_ZO, flag(NDT), HTML_URI, Perm.CREATE),
   /** XQuery function. */
   _HTML_PARSE(HtmlParse::new, "parse(value, options?)",
-      params(STRING_OR_BINARY_ZO, MAP_ZO), DOCUMENT_ZO, HTML_URI),
+      params(STRING_OR_BINARY_ZO, MAP_ZO), DOCUMENT_ZO, flag(CNS), HTML_URI),
   /** XQuery function. */
   _HTML_PARSER(HtmlParser::new, "parser()",
       params(), STRING_O, HTML_URI),
@@ -2053,7 +2053,7 @@ public enum Function implements AFunction {
       params(STRING_O, STRING_ZM, STRING_ZM), EMPTY_SEQUENCE_Z, flag(UPD), USER_URI, Perm.ADMIN),
   /** XQuery function. */
   _USER_INFO(UserInfo::new, "info(name?)",
-      params(STRING_ZO), ELEMENT_O, USER_URI),
+      params(STRING_ZO), ELEMENT_O, flag(CNS), USER_URI),
   /** XQuery function. */
   _USER_LIST(UserList::new, "list()",
       params(), STRING_ZM, flag(NDT), USER_URI),
@@ -2086,7 +2086,7 @@ public enum Function implements AFunction {
       params(GNODE_OR_MAP_OR_ARRAY_ZM), GNODE_ZM, flag(CNS), UTIL_URI),
   /** XQuery function. */
   _UTIL_STRIP_NAMESPACES(UtilStripNamespaces::new, "strip-namespaces(node, prefixes?)",
-      params(NODE_O, STRING_ZM), NODE_O, UTIL_URI),
+      params(NODE_O, STRING_ZM), NODE_O, flag(CNS), UTIL_URI),
   /** XQuery function. */
   _UTIL_VALUES_EXCEPT(UtilValuesExcept::new, "values-except(values, except, collation?)",
       params(ANY_ATOMIC_TYPE_ZM, ANY_ATOMIC_TYPE_ZM, STRING_ZO), ANY_ATOMIC_TYPE_ZM, UTIL_URI),
@@ -2149,7 +2149,7 @@ public enum Function implements AFunction {
       params(INTEGER_O, ITEM_ZM, MAP_ZO), ITEM_ZM, flag(NDT), WEB_URI),
   /** XQuery function. */
   _WEB_REDIRECT(WebRedirect::new, "redirect(url, parameters?, anchor?, status?)",
-      params(STRING_O, MAP_ZO, STRING_ZO, INTEGER_ZO), ELEMENT_O, WEB_URI),
+      params(STRING_O, MAP_ZO, STRING_ZO, INTEGER_ZO), ELEMENT_O, flag(CNS), WEB_URI),
   /** XQuery function. */
   _WEB_RESPONSE_HEADER(WebResponseHeader::new, "response-header(output?, headers?, response?)",
       params(MAP_ZO, MAP_ZO, MAP_ZO), ELEMENT_O, WEB_URI),

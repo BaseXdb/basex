@@ -1156,6 +1156,12 @@ public final class FnModuleTest extends SandboxTest {
     error(func.args(xincDoc, " { 'xinclude': true(), 'trusted': false() }"), EXTERNALRESOURCE_X);
     error("xquery:eval(``[exists(" + func.args(xincDoc, " { 'xinclude': true(), 'trusted': true() }"
         ) + "/root/root)" + "]``, (), {'permission': 'none'})", XQUERY_PERM_X);
+
+    // unstable documents are parsed anew for each evaluation
+    query("count(distinct-values(for $i in 1 to 2 return " +
+        GENERATE_ID.args(" " + func.args(DOC, " { 'stable': false() }")) + "))", 2);
+    query("count(distinct-values(for $i in 1 to 2 return " +
+        GENERATE_ID.args(" " + func.args(DOC, " { 'stable': true() }")) + "))", 1);
   }
 
   /** Test method. */
@@ -1966,6 +1972,11 @@ public final class FnModuleTest extends SandboxTest {
     // GH-1633: ensure that database nodes return identical ID
     query("count(distinct-values((document { <x/> } update {}) ! (*, *) ! " +
         func.args(" .") + "))", 1);
+    // ensure that constructed nodes return distinct IDs
+    query("count(distinct-values(for $i in 1 to 5 return " + func.args(" <y/>") + "))", 5);
+    query("count(distinct-values((1 to 5) ! (<y/> ! " + func.args() + ")))", 5);
+    query("count(distinct-values(for $i in 1 to 5 return " +
+        func.args(" " + PARSE_HTML.args("<x/>")) + "))", 5);
   }
 
   /** Test method. */

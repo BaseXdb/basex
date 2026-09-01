@@ -227,6 +227,10 @@ public final class UtilModuleTest extends SandboxTest {
   @Test public void stripNamespaces() {
     final Function func = _UTIL_STRIP_NAMESPACES;
 
+    // nodes are constructed anew for each evaluation
+    query("count(distinct-values(for $i in 1 to 2 return " +
+        GENERATE_ID.args(" " + func.args(" <x/>")) + "))", 2);
+
     query(func.args(" <x/>"), "<x/>");
     query(func.args(" <x/>", " ()"), "<x/>");
     query(func.args(" <x/>", " ('')"), "<x/>");

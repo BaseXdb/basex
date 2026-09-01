@@ -50,10 +50,21 @@ public abstract class Docs extends DynamicFn {
       source instanceof final Atm atm ? atm.string(null) : null;
   }
 
+  /**
+   * Indicates if repeated calls of the function will return the same nodes.
+   * @param qc query context
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  private boolean stable(final QueryContext qc) throws QueryException {
+    return arg(1) instanceof Value && toOptions(arg(1), new DocOptions(), qc).
+        get(DocOptions.STABLE);
+  }
+
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     // pre-evaluate during dynamic compilation
-    if(cc.dynamic && arg(0) instanceof final Value value) {
+    if(cc.dynamic && arg(0) instanceof final Value value && stable(cc.qc)) {
       // target is empty
       final Item item = value.atomItem(cc.qc, info);
       if(item.isEmpty()) return value(cc.qc);

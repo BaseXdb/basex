@@ -92,6 +92,10 @@ public final class WebModuleTest extends SandboxTest {
 
     // GH-1585
     query("count((" + func.args("a") + " update {})/http:response)", 1);
+
+    // the response element is constructed anew for each evaluation
+    query("count(distinct-values(for $i in 1 to 2 return " +
+        GENERATE_ID.args(" " + func.args("a")) + "))", 2);
   }
 
   /** Test method. */

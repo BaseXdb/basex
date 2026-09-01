@@ -201,6 +201,10 @@ public final class UserModuleTest extends SandboxTest {
     final Function func = _USER_INFO;
     query(func.args(), "<info/>");
     error(func.args("dummy"), USER_UNKNOWN_X);
+
+    // the default element is constructed anew for each evaluation
+    query("count(distinct-values(for $i in 1 to 2 return " +
+        GENERATE_ID.args(" " + func.args()) + "))", 2);
   }
 
   /** Test method. */
