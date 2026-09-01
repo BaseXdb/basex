@@ -70,8 +70,6 @@ public final class MainOptions extends Options {
       CommonOptions.SKIP);
   /** Flag for handling xsi:schemaLocation and xsi:noNamespaceSchemaLocation attributes. */
   public static final BooleanOption XSILOCATION = new BooleanOption("XSILOCATION", true);
-  /** Default for the 'trust-external' and 'trusted' options of XQuery functions. */
-  public static final BooleanOption TRUSTEXTERNAL = new BooleanOption("TRUSTEXTERNAL", false);
   /** Flag for using XInclude. */
   public static final BooleanOption XINCLUDE = new BooleanOption("XINCLUDE", false);
   /** Path to XML Catalog files. */
@@ -148,6 +146,8 @@ public final class MainOptions extends Options {
   public static final BooleanOption DEFAULTDB = new BooleanOption("DEFAULTDB", false);
   /** Forces database creation for unknown documents. */
   public static final BooleanOption FORCECREATE = new BooleanOption("FORCECREATE", false);
+  /** Default for the 'trust-external' and 'trusted' options of XQuery functions. */
+  public static final BooleanOption TRUSTEXTERNAL = new BooleanOption("TRUSTEXTERNAL", false);
   /** Validate string inputs. */
   public static final BooleanOption CHECKSTRINGS = new BooleanOption("CHECKSTRINGS", true);
   /** Levenshtein default error. */
