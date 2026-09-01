@@ -75,15 +75,15 @@ public final class FnInvisibleXml extends StandardFunc {
     private static final Option[] NO_OPTS = new Blitz.Option[0];
     /** Markup Blitz options for fail-on-error. */
     private static final Option[] FAIL_OPTS = new Blitz.Option[] { Blitz.Option.FAIL_ON_ERROR };
-    /** Maximum number of entries. */
-    private static final int MAX = 15;
+    /** Maximum number of parser cache entries. */
+    private static final int CACHE_SIZE = 15;
     /** Generated parser cache. */
     private static final LinkedHashMap<String, de.bottlecaps.markup.blitz.Parser> PARSERS =
-        new LinkedHashMap<>(MAX + 1, 1.0f, true) {
+        new LinkedHashMap<>(CACHE_SIZE + 1, 1.0f, true) {
           @Override
           protected boolean removeEldestEntry(
               final Map.Entry<String, de.bottlecaps.markup.blitz.Parser> eldest) {
-            return size() > MAX;
+            return size() > CACHE_SIZE;
           }
         };
 
