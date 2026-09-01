@@ -1,15 +1,14 @@
 (:~
- : Renders the timing CSV(s) as an aligned Markdown table: BaseX only, or BaseX and Saxon side
- : by side with the BaseX / Saxon ratio.
+ : Renders the per-engine timing logs as one aligned Markdown table: a column group
+ : (total / compile / eval) for every engine, and a reference/engine ratio for each
+ : non-reference engine.
  : @author BaseX Team, BSD License
  : @author Gunther Rademacher
  :)
 declare option output:method "text";
 
-(:~ URI of the BaseX timing.log. :)
-declare variable $basex-log external;
-(:~ URI of the Saxon timing.log ("" for BaseX only). :)
-declare variable $saxon-log external := "";
+(:~ Engines, one per line "name&#9;timing-log-URI", reference first. :)
+declare variable $engines external;
 
 (:~
  : Concatenates a string a number of times.
@@ -62,17 +61,17 @@ declare function local:time(
 };
 
 (:~
- : Formats the BaseX / Saxon ratio as a percentage, or "".
- : @param  $basex  BaseX time
- : @param  $saxon  Saxon time
+ : Formats a reference/engine ratio as a percentage, or "".
+ : @param  $reference  reference time
+ : @param  $engine     engine time
  : @return formatted ratio
  :)
 declare function local:percent(
-  $basex  as xs:decimal?,
-  $saxon  as xs:decimal?
+  $reference  as xs:decimal?,
+  $engine     as xs:decimal?
 ) as xs:string {
-  if(exists($basex) and exists($saxon) and $saxon ne 0)
-  then format-number($basex div $saxon, "0.00 %")
+  if(exists($reference) and exists($engine) and $engine ne 0)
+  then format-number($reference div $engine, "0.00 %")
   else ""
 };
 
@@ -173,42 +172,42 @@ declare function local:table(
   ), "&#10;")
 };
 
-let $has-saxon := normalize-space($saxon-log) ne ""
-let $basex := local:timings($basex-log)
-let $saxon := if ($has-saxon) then local:timings($saxon-log) else map { }
-let $modules := (local:module-names($basex-log), if ($has-saxon) { local:module-names($saxon-log) })
-  => distinct-values() => sort()
-return
-  if ($has-saxon) then
-    local:table(
-      ("Module", "BaseX", "compile", "eval", "Saxon", "compile", "eval", "B / S"),
-      (
-        for $m in $modules
-        let $b := $basex($m), $s := $saxon($m)
-        return array { $m,
-          local:time($b?1), local:time($b?2), local:time($b?3),
-          local:time($s?1), local:time($s?2), local:time($s?3),
-          local:percent($b?1, $s?1) },
-        array { "**Total**",
-          "**" || local:time(local:col($basex, 1)) || "**",
-          "**" || local:time(local:col($basex, 2)) || "**",
-          "**" || local:time(local:col($basex, 3)) || "**",
-          "**" || local:time(local:col($saxon, 1)) || "**",
-          "**" || local:time(local:col($saxon, 2)) || "**",
-          "**" || local:time(local:col($saxon, 3)) || "**",
-          "**" || local:percent(local:col($basex, 1), local:col($saxon, 1)) || "**" }
-      )
-    )
-  else
-    local:table(
-      ("Module", "BaseX", "compile", "eval"),
-      (
-        for $m in $modules
-        let $b := $basex($m)
-        return array { $m, local:time($b?1), local:time($b?2), local:time($b?3) },
-        array { "**Total**",
-          "**" || local:time(local:col($basex, 1)) || "**",
-          "**" || local:time(local:col($basex, 2)) || "**",
-          "**" || local:time(local:col($basex, 3)) || "**" }
-      )
-    )
+(: parse the engines, reference first, each carrying its timings and module names :)
+let $engines-seq :=
+  for $line in tokenize($engines, "&#10;")[normalize-space(.) ne ""]
+  let $parts := tokenize($line, "&#9;")
+  return map {
+    "name": $parts[1],
+    "timings": local:timings($parts[2]),
+    "names": local:module-names($parts[2])
+  }
+let $reference := $engines-seq[1]?timings
+let $reference-name := $engines-seq[1]?name
+let $modules :=
+  (for $e in $engines-seq return $e?names) => distinct-values() => sort()
+let $header :=
+  ("Module",
+   for $e at $i in $engines-seq
+   return ($e?name, "compile", "eval",
+           if ($i gt 1) then $reference-name || "/" || $e?name else ()))
+let $body :=
+  for $m in $modules
+  return array {
+    $m,
+    for $e at $i in $engines-seq
+    let $t := $e?timings($m)
+    return (local:time($t?1), local:time($t?2), local:time($t?3),
+            if ($i gt 1) then local:percent($reference($m)?1, $t?1) else ())
+  }
+let $total :=
+  array {
+    "**Total**",
+    for $e at $i in $engines-seq
+    return ("**" || local:time(local:col($e?timings, 1)) || "**",
+            "**" || local:time(local:col($e?timings, 2)) || "**",
+            "**" || local:time(local:col($e?timings, 3)) || "**",
+            if ($i gt 1)
+            then "**" || local:percent(local:col($reference, 1), local:col($e?timings, 1)) || "**"
+            else ())
+  }
+return local:table($header, ($body, $total))
