@@ -168,6 +168,11 @@ public final class If extends Arr {
   }
 
   @Override
+  protected boolean ebv(final QueryContext qc) throws QueryException {
+    return expr(qc).ebv(qc, info);
+  }
+
+  @Override
   public boolean eager() {
     return exprs[0].eager() && exprs[1].eager();
   }

@@ -14,6 +14,11 @@ import org.basex.query.value.node.*;
 public final class CryptoValidateSignature extends StandardFunc {
   @Override
   public Bln value(final QueryContext qc) throws QueryException {
+    return Bln.get(ebv(qc));
+  }
+
+  @Override
+  protected boolean ebv(final QueryContext qc) throws QueryException {
     final XNode node = toNode(arg(0), qc);
     return new DigitalSignature(info).validateSignature(node);
   }

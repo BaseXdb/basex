@@ -209,6 +209,11 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
+  protected boolean ebv(final QueryContext qc) throws QueryException {
+    return expr(qc).ebv(qc, info);
+  }
+
+  @Override
   public boolean eager() {
     return Checks.all(groups, group -> group.rtrn().eager());
   }

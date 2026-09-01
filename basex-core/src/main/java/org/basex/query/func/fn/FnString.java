@@ -28,6 +28,16 @@ public final class FnString extends ContextFn {
   }
 
   @Override
+  protected boolean ebv(final QueryContext qc) throws QueryException {
+    final Item value = context(qc).item(qc, info);
+
+    if(value.isEmpty()) return false;
+    if(!(value instanceof FItem) || value instanceof XQJava) return value.string(info).length > 0;
+
+    throw FISTRING_X.get(info, value);
+  }
+
+  @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     // string(data(E)) → string(E)
     exprs = simplifyAll(Simplify.STRING, cc);

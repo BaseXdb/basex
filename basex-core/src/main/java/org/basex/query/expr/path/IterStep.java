@@ -42,14 +42,6 @@ public final class IterStep extends Step {
   }
 
   @Override
-  protected boolean ebv(final QueryContext qc) throws QueryException {
-    for(final GNode node : iterator(qc)) {
-      if(test(node, qc)) return true;
-    }
-    return false;
-  }
-
-  @Override
   public IterStep copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new IterStep(info, axis, test.copy(), Arr.copyAll(cc, vm, exprs)));
   }

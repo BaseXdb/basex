@@ -74,6 +74,25 @@ public final class FTContains extends Single {
   }
 
   @Override
+  protected boolean ebv(final QueryContext qc) throws QueryException {
+    // scores and match positions require all items to be evaluated
+    if(qc.scoring || qc.ftPosData != null) return value(qc).bool(info);
+
+    final Iter iter = expr.iter(qc);
+    final FTLexer tmp = qc.ftLexer, lexer = new FTLexer(new FTOpt());
+    qc.ftLexer = lexer;
+    try {
+      for(Item item; (item = qc.next(iter)) != null;) {
+        lexer.init(item.string(info));
+        if(ftexpr.value(qc).matches().matches()) return true;
+      }
+      return false;
+    } finally {
+      qc.ftLexer = tmp;
+    }
+  }
+
+  @Override
   public Expr compile(final CompileContext cc) throws QueryException {
     ftexpr = ftexpr.compile(cc);
     return super.compile(cc);

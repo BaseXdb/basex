@@ -66,11 +66,6 @@ public final class IterPath extends AxisPath {
   }
 
   @Override
-  protected boolean ebv(final QueryContext qc) throws QueryException {
-    return iterator(qc).next() != null;
-  }
-
-  @Override
   public IterPath copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     final Expr rt = root == null ? null : root.copy(cc, vm);
     return copyType(new IterPath(info, rt, Arr.copyAll(cc, vm, steps)));

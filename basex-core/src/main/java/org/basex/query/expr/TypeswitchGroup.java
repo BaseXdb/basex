@@ -213,6 +213,11 @@ public final class TypeswitchGroup extends Single {
   }
 
   @Override
+  protected boolean ebv(final QueryContext qc) throws QueryException {
+    return expr.ebv(qc, info);
+  }
+
+  @Override
   public boolean eager() {
     return var != null || expr.eager();
   }

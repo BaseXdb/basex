@@ -18,7 +18,6 @@ import javax.xml.parsers.*;
 import javax.xml.xpath.*;
 
 import org.basex.query.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -269,7 +268,7 @@ final class DigitalSignature {
    * @return boolean result of validation
    * @throws QueryException query exception
    */
-  Bln validateSignature(final XNode node) throws QueryException {
+  boolean validateSignature(final XNode node) throws QueryException {
     try {
       final Document doc = toDOMNode(node);
       final DOMValidateContext valContext = new DOMValidateContext(new MyKeySelector(), doc);
@@ -278,7 +277,7 @@ final class DigitalSignature {
       valContext.setNode(signl.item(0));
       final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
       final XMLSignature signature = fac.unmarshalXMLSignature(valContext);
-      return Bln.get(signature.validate(valContext));
+      return signature.validate(valContext);
     } catch(final XMLSignatureException | SAXException | ParserConfigurationException |
         IOException ex) {
       throw CX_IOEXC.get(info, ex);
@@ -296,7 +295,7 @@ final class DigitalSignature {
    * @throws ParserConfigurationException exception
    */
   private static Document toDOMNode(final XNode node) throws SAXException, IOException,
-  ParserConfigurationException {
+      ParserConfigurationException {
 
     final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     dbf.setNamespaceAware(true);

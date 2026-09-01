@@ -22,6 +22,11 @@ public final class FnLowerCase extends StandardFunc {
   }
 
   @Override
+  protected boolean ebv(final QueryContext qc) throws QueryException {
+    return toZeroToken(arg(0), qc).length > 0;
+  }
+
+  @Override
   protected Expr opt(final CompileContext cc) {
     // lower-case(lower-case(E)) → lower-case(E)
     return LOWER_CASE.is(arg(0)) ? arg(0) : this;

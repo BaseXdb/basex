@@ -37,11 +37,6 @@ public final class SingleIterPath extends AxisPath {
   }
 
   @Override
-  protected boolean ebv(final QueryContext qc) throws QueryException {
-    return qc.focus.value != Empty.VALUE && steps[0].ebv(qc, info);
-  }
-
-  @Override
   public SingleIterPath copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new SingleIterPath(info, steps[0].copy(cc, vm)));
   }

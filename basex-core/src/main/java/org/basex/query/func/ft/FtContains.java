@@ -18,6 +18,21 @@ import org.basex.util.ft.*;
 public final class FtContains extends FtAccessFn {
   @Override
   public Bln value(final QueryContext qc) throws QueryException {
+    return ftContains(qc).value(qc);
+  }
+
+  @Override
+  protected boolean ebv(final QueryContext qc) throws QueryException {
+    return ftContains(qc).ebv(qc, info);
+  }
+
+  /**
+   * Creates a full-text expression for the specified arguments.
+   * @param qc query context
+   * @return expression
+   * @throws QueryException query exception
+   */
+  private FTContains ftContains(final QueryContext qc) throws QueryException {
     final Value input = arg(0).value(qc), terms = arg(1).value(qc);
     final FtContainsOptions options = options(2, FtContainsOptions::new, qc);
 
@@ -38,7 +53,7 @@ public final class FtContains extends FtAccessFn {
       Itr.get(times.get(FTTimesOptions.MIN)), Itr.get(times.get(FTTimesOptions.MAX)) };
 
     final FTWords ftw = new FTWords(info, terms, mode, occ).ftOpt(opt).optimize(qc);
-    return new FTContains(input, ftExpr(ftw, options), info).value(qc);
+    return new FTContains(input, ftExpr(ftw, options), info);
   }
 
   @Override

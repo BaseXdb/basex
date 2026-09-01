@@ -9,13 +9,11 @@ import org.basex.index.query.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.index.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.index.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -36,9 +34,6 @@ public final class CmpSR extends CmpRange {
   final byte[] max;
   /** Include maximum value. */
   final boolean mxi;
-
-  /** Flag for atomic evaluation. */
-  private boolean single;
 
   /**
    * Constructor.
@@ -92,33 +87,7 @@ public final class CmpSR extends CmpRange {
   }
 
   @Override
-  public Bln value(final QueryContext qc) throws QueryException {
-    return Bln.get(ebv(qc));
-  }
-
-  @Override
-  protected boolean ebv(final QueryContext qc) throws QueryException {
-    // atomic evaluation of arguments (faster)
-    if(single) {
-      final Item item = expr.item(qc, info);
-      return item != Empty.VALUE && eval(item);
-    }
-
-    // iterative evaluation
-    final Iter iter = expr.atomIter(qc, info);
-    for(Item item; (item = qc.next(iter)) != null;) {
-      if(eval(item)) return true;
-    }
-    return false;
-  }
-
-  /**
-   * Evaluates the range for the specified item.
-   * @param item item to be evaluated
-   * @return result of check
-   * @throws QueryException query exception
-   */
-  private boolean eval(final Item item) throws QueryException {
+  boolean inRange(final Item item) throws QueryException {
     if(!item.type.isStringOrUntyped()) throw compareError(item, Str.EMPTY, info);
     final byte[] s = item.string(info);
     final Collation coll = sc().collation;

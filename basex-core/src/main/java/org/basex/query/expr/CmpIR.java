@@ -6,7 +6,6 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.func.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.index.*;
 import org.basex.query.value.*;
@@ -28,9 +27,6 @@ public final class CmpIR extends CmpRange {
   public final long min;
   /** Maximum. */
   public final long max;
-
-  /** Evaluation flag: atomic evaluation. */
-  private boolean single;
 
   /**
    * Constructor.
@@ -119,45 +115,14 @@ public final class CmpIR extends CmpRange {
   }
 
   @Override
-  public Bln value(final QueryContext qc) throws QueryException {
-    return Bln.get(ebv(qc));
+  boolean inRange(final Item item) throws QueryException {
+    final double value = item.dbl(info);
+    return value >= min && value <= max && value == (long) value;
   }
 
   @Override
-  protected boolean ebv(final QueryContext qc) throws QueryException {
-    // atomic evaluation of arguments (faster)
-    if(single) {
-      final Item item = expr.item(qc, info);
-      return item != Empty.VALUE && inRange(item);
-    }
-
-    // pre-evaluate ranges
-    if(expr instanceof Range || expr instanceof RangeSeq) {
-      final Value value = expr.value(qc);
-      final long size = value.size();
-      if(size == 0) return false;
-      if(size == 1) return inRange((Item) value);
-      final RangeSeq rs = (RangeSeq) value;
-      return rs.max() >= min && rs.min() <= max;
-    }
-
-    // iterative evaluation
-    final Iter iter = expr.atomIter(qc, info);
-    for(Item item; (item = qc.next(iter)) != null;) {
-      if(inRange(item)) return true;
-    }
-    return false;
-  }
-
-  /**
-   * Checks if the specified value is within the allowed range.
-   * @param item value to check
-   * @return result of check
-   * @throws QueryException query exception
-   */
-  private boolean inRange(final Item item) throws QueryException {
-    final double value = item.dbl(info);
-    return value >= min && value <= max && value == (long) value;
+  boolean inRange(final RangeSeq seq) {
+    return seq.max() >= min && seq.min() <= max;
   }
 
   @Override

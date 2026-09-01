@@ -22,6 +22,11 @@ public final class FnUpperCase extends StandardFunc {
   }
 
   @Override
+  protected boolean ebv(final QueryContext qc) throws QueryException {
+    return toZeroToken(arg(0), qc).length > 0;
+  }
+
+  @Override
   protected Expr opt(final CompileContext cc) {
     // upper-case(upper-case(E)) → upper-case(E)
     return UPPER_CASE.is(arg(0)) ? arg(0) : this;
