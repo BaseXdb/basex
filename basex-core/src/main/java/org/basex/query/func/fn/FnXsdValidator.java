@@ -44,8 +44,9 @@ import org.xml.sax.*;
 public final class FnXsdValidator extends StandardFunc {
   /** Options for fn:xsd-validator. */
   public static final class XsdValidatorOptions extends Options {
-    /** Whether external resources may be fetched. */
-    public static final BooleanOption TRUSTED = new BooleanOption(CommonOptions.TRUSTED);
+    /** Whether secondary external resources may be fetched. */
+    public static final BooleanOption TRUST_EXTERNAL =
+        new BooleanOption(CommonOptions.TRUST_EXTERNAL);
     /** Use schema components of the static context (ignored: no schema imports are supported). */
     public static final BooleanOption USE_IMPORTED_SCHEMA =
         new BooleanOption("use-imported-schema", true);
@@ -90,7 +91,7 @@ public final class FnXsdValidator extends StandardFunc {
   @Override
   public FuncItem value(final QueryContext qc) throws QueryException {
     final XsdValidatorOptions options = toOptions(arg(0), new XsdValidatorOptions(), qc);
-    final boolean trusted = trusted(options, qc);
+    final boolean trusted = trusted(options, CommonOptions.TRUST_EXTERNAL, qc);
     final boolean xsi = options.get(XsdValidatorOptions.USE_XSI_SCHEMA_LOCATION);
     if(xsi && !trusted) throw EXTERNALRESOURCE_X.get(info, "'use-xsi-schema-location'");
     // as in fn:doc, external resources are only retrieved with additional permissions

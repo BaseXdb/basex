@@ -45,7 +45,9 @@ public interface CommonOptions {
   String NORMALIZE_NEWLINES = "normalize-newlines";
   /** Option name: fallback for invalid characters. */
   String FALLBACK = "fallback";
-  /** Option name: trusted processing. No default: absence means "use FNXMLTRUSTED". */
+  /** Option name: secondary resources. No default: absence means "use TRUSTEXTERNAL". */
+  String TRUST_EXTERNAL = "trust-external";
+  /** Option name: trusted code. No default: absence means "use TRUSTEXTERNAL". */
   String TRUSTED = "trusted";
 
   // Option values

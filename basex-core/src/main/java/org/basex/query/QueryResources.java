@@ -33,7 +33,7 @@ import org.basex.util.list.*;
 public final class QueryResources {
   /** Default options. */
   public static final DocOptions DOC_OPTIONS = new DocOptions().seal();
-  /** Default options for creating new documents (trusted=false: fn-level default). */
+  /** Default options for creating new documents (no external access: fn-level default). */
   private static final MainOptions MAIN_OPTIONS = new MainOptions(DOC_OPTIONS, null).seal();
 
   /** Database context. */
@@ -515,7 +515,7 @@ public final class QueryResources {
     final boolean mainmem = !mopts.get(MainOptions.FORCECREATE);
     if(mainmem) {
       if(!trusted && docOpts == DOC_OPTIONS && mopts.resolver().standard()
-        && !mopts.get(MainOptions.FNXMLTRUSTED)) {
+        && !mopts.get(MainOptions.TRUSTEXTERNAL)) {
         options = MAIN_OPTIONS;
       } else {
         options = new MainOptions(docOpts, mopts);

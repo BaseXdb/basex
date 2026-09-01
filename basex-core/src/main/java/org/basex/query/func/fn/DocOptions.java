@@ -29,8 +29,9 @@ public final class DocOptions extends Options {
   /** Flag for using xsi:schemaLocation. */
   public static final BooleanOption USE_XSI_SCHEMA_LOCATION =
       new BooleanOption(CommonOptions.USE_XSI_SCHEMA_LOCATION, false);
-  /** Whether external resources may be fetched. */
-  public static final BooleanOption TRUSTED = new BooleanOption(CommonOptions.TRUSTED);
+  /** Whether secondary external resources may be fetched. */
+  public static final BooleanOption TRUST_EXTERNAL =
+      new BooleanOption(CommonOptions.TRUST_EXTERNAL);
   /** Whether two calls with same URI and options return the same node. */
   public static final BooleanOption STABLE = new BooleanOption("stable", true);
   /** Retain the source location of parsed nodes (see {@link FnLocation}). */

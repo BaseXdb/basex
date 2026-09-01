@@ -70,8 +70,8 @@ public final class MainOptions extends Options {
       CommonOptions.SKIP);
   /** Flag for handling xsi:schemaLocation and xsi:noNamespaceSchemaLocation attributes. */
   public static final BooleanOption XSILOCATION = new BooleanOption("XSILOCATION", true);
-  /** Default value for the fn-level XML parser 'trusted' option (fn:doc, fn:parse-xml, etc.). */
-  public static final BooleanOption FNXMLTRUSTED = new BooleanOption("FNXMLTRUSTED", false);
+  /** Default for the 'trust-external' and 'trusted' options of XQuery functions. */
+  public static final BooleanOption TRUSTEXTERNAL = new BooleanOption("TRUSTEXTERNAL", false);
   /** Flag for using XInclude. */
   public static final BooleanOption XINCLUDE = new BooleanOption("XINCLUDE", false);
   /** Path to XML Catalog files. */
@@ -310,13 +310,13 @@ public final class MainOptions extends Options {
         put(target, value);
       }
     });
-    final Boolean t = (Boolean) options.get(CommonOptions.TRUSTED);
+    final Boolean t = (Boolean) options.get(CommonOptions.TRUST_EXTERNAL);
     if(parent == null) {
       resolver = null;
       trusted = t == Boolean.TRUE;
     } else {
       setResolver(parent);
-      trusted = t != null ? t : parent.trusted && parent.get(FNXMLTRUSTED);
+      trusted = t != null ? t : parent.trusted && parent.get(TRUSTEXTERNAL);
     }
   }
 

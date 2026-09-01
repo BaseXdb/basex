@@ -149,7 +149,8 @@ public final class FnTransform extends StandardFunc {
     final TransformOptions options = options(qc);
     requestedProperties(options);
     version(options);
-    return saxon() ? new SaxonTransform(this, options, trusted(options, qc), qc).transform() :
+    final boolean trusted = trusted(options, CommonOptions.TRUSTED, qc);
+    return saxon() ? new SaxonTransform(this, options, trusted, qc).transform() :
       jaxp(options, qc);
   }
 
@@ -188,7 +189,7 @@ public final class FnTransform extends StandardFunc {
 
     final String error = Xslt.transform(stylesheet, source,
         tree ? document : new StreamResult(output),
-        options.get(CACHE), trusted(options, qc), qc, tr -> {
+        options.get(CACHE), trusted(options, CommonOptions.TRUSTED, qc), qc, tr -> {
           params.forEach(tr::setParameter);
           properties.forEach((name, value) -> {
             if(OUTPUT_KEYS.contains(name)) tr.setOutputProperty(name, value);
