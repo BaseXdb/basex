@@ -122,7 +122,7 @@ public final class ShapeConstructor extends StandardFunc {
    * @param sh shape
    * @return constructor function definition
    */
-  public static FuncDefinition definition(final ShapeType sh) {
+  private static FuncDefinition definition(final ShapeType sh) {
     final QNm name = sh.name();
     final TokenBuilder tb = new TokenBuilder(name != null ? name.local() :
       Token.token(sh instanceof RecordType ? QueryText.RECORD : QueryText.MAP)).add('(');

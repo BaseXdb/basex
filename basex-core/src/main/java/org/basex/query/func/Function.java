@@ -799,43 +799,6 @@ public enum Function implements AFunction {
   ZERO_OR_ONE(FnZeroOrOne::new, "zero-or-one(input)",
       params(ITEM_ZM), ITEM_ZO),
 
-  // Predefined record constructor functions
-
-  /** XQuery function. */
-  ARRAY_SORT_KEY_RECORD(Records.ARRAY_SORT_KEY.get()),
-  /** XQuery function. */
-  ATTRIBUTE_CONVERSION_PLAN_RECORD(Records.ATTRIBUTE_CONVERSION_PLAN.get()),
-  /** XQuery function. */
-  CAPTURED_GROUP_RECORD(Records.CAPTURED_GROUP.get()),
-  /** XQuery function. */
-  COMPILED_REGEX_RECORD(Records.COMPILED_REGEX.get()),
-  /** XQuery function. */
-  DATETIME_RECORD(Records.DATETIME.get()),
-  /** XQuery function. */
-  DIVISION_RECORD(Records.DIVISION.get()),
-  /** XQuery function. */
-  ELEMENT_CONVERSION_PLAN_RECORD(Records.ELEMENT_CONVERSION_PLAN.get()),
-  /** XQuery function. */
-  _BIN_INFER_ENCODING_RECORD(Records.INFER_ENCODING.get()),
-  /** XQuery function. */
-  LOAD_XQUERY_MODULE_RECORD(Records.LOAD_XQUERY_MODULE.get()),
-  /** XQuery function. */
-  LOCATION_RECORD(Records.LOCATION.get()),
-  /** XQuery function. */
-  MATCHING_SEGMENT_RECORD(Records.MATCHING_SEGMENT.get()),
-  /** XQuery function. */
-  PARSED_CSV_STRUCTURE_RECORD(Records.PARSED_CSV_STRUCTURE.get()),
-  /** XQuery function. */
-  RANDOM_NUMBER_GENERATOR_RECORD(Records.RANDOM_NUMBER_GENERATOR.get()),
-  /** XQuery function. */
-  SCHEMA_TYPE_RECORD(Records.SCHEMA_TYPE.get()),
-  /** XQuery function. */
-  SORT_KEY_RECORD(Records.SORT_KEY.get()),
-  /** XQuery function. */
-  URI_STRUCTURE_RECORD(Records.URI_STRUCTURE.get()),
-  /** XQuery function. */
-  VALIDATION_RESULT_RECORD(Records.VALIDATION_RESULT.get()),
-
   // Map Module
 
   /** XQuery function. */
@@ -2205,14 +2168,6 @@ public enum Function implements AFunction {
 
   /** Function definition. */
   private final FuncDefinition definition;
-
-  /**
-   * Constructs a function signature for a predefined record constructor from a ShapeType.
-   * @param rt record type
-   */
-  Function(final RecordType rt) {
-    this(ShapeConstructor.definition(rt));
-  }
 
   /**
    * Constructs a function signature; calls

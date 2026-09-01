@@ -445,7 +445,6 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" {\"day\": 3,"
         + " \"timezone\": xs:dayTimeDuration('PT1H') }"),
         "---03+01:00");
-    query(func.args(" dateTime-record(day:=4)"), "---04");
     // year 0
     query(func.args(" {\"year\": 0, \"month\": 1, \"day\": 1}"), "0000-01-01");
 

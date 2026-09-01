@@ -216,14 +216,6 @@ public final class ModuleTest extends SandboxTest {
     final IOFile q2 = new IOFile(sandbox, "q2.xqm");
     write(q2, "module namespace q = 'q';\n"
         + "declare %private function x() {42};");
-    final IOFile r = new IOFile(sandbox, "r.xqm");
-    write(r, "module namespace r = 'r';\n"
-        + "declare function r:f() {\n"
-        + "  fn:division-record(1, 2),\n"
-        + "  fn:division-record#2(3, 4),\n"
-        + "  5 => fn:division-record(6),\n"
-        + "  function-lookup(#fn:division-record, 2)(7, 8)\n"
-        + "};");
     final IOFile s = new IOFile(sandbox, "s.xqm");
     write(s, "module namespace s = 's';\n"
         + "import module 's' at '" + s.path() + "';\n"
@@ -237,14 +229,6 @@ public final class ModuleTest extends SandboxTest {
     // private function is visible throughout module, even in different file
     query("import module namespace q = 'q' at '" + q1.path() + "', '" + q2.path() + "';\n"
         + "q:f()", 42);
-
-    // built-in record constructor visible in library module
-    query("import module namespace r = 'r' at '" + r.path() + "';\n"
-        + "r:f()",
-          "{\"quotient\":1,\"remainder\":2}\n"
-        + "{\"quotient\":3,\"remainder\":4}\n"
-        + "{\"quotient\":5,\"remainder\":6}\n"
-        + "{\"quotient\":7,\"remainder\":8}");
 
     // private function reported as such
     error("import module namespace p = 'p' at '" + p.path() + "';\n"

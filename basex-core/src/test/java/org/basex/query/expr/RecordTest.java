@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
 import org.basex.query.func.*;
-import org.basex.query.util.hash.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
@@ -740,15 +739,13 @@ public final class RecordTest extends SandboxTest {
         "0\n0", exists(REPLICATE));
   }
 
-  /** Checks that every built-in record type has a constructor function in {@link Function}. */
-  @Test public void builtInRecordsHaveConstructors() {
-    final QNmSet funcNames = new QNmSet();
-    for(final Function f : Function.values()) {
-      funcNames.add(f.definition().name);
-    }
+  /** Checks that no built-in record type has a constructor function. */
+  @Test public void builtInRecordsHaveNoConstructors() {
     for(final Records record : Records.values()) {
-      assertTrue(funcNames.contains(record.get().name()),
-          "Missing constructor function for " + record);
+      assertFalse(Functions.BUILT_IN.contains(record.get().name()),
+          "Constructor function for " + record);
     }
+    error("fn:division-record(1, 2)", WHICHFUNC_X);
+    error("fn:division-record#2", WHICHFUNC_X);
   }
 }
