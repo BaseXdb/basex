@@ -304,8 +304,8 @@ public final class PathTest extends SandboxTest {
 
   /** Refine node tests. */
   @Test public void gh2464() {
-    String[] tests = { empty(Instance.class), type(IterPath.class, "node()*"),
-        "//IterStep/@test = 'node()'" };
+    String[] tests = { empty(Instance.class), type(IterPath.class, "xnode()*"),
+        "//IterStep/@test = 'xnode()'" };
     check("<a/>/node()[self::node()]", "", tests);
     check("<a/>/node()[. instance of node()]", "", tests);
 
@@ -824,10 +824,10 @@ public final class PathTest extends SandboxTest {
   @Test public void gnodeDocumentOrder() {
     final String kinds = " ! (if(. instance of jnode()) then 'J' else 'X')";
     final String seq = "let $s := (jtree({ 'a': 1 }), <x/>) return string-join(";
-    query(seq + "$s/self::gnode()" + kinds + ")", "XJ");
+    query(seq + "$s/self::node()" + kinds + ")", "XJ");
     query(seq + DISTINCT_ORDERED_NODES.args(" $s") + kinds + ")", "XJ");
     query(seq + "($s | $s)" + kinds + ")", "XJ");
-    query(seq + "reverse($s)/self::gnode()" + kinds + ")", "XJ");
+    query(seq + "reverse($s)/self::node()" + kinds + ")", "XJ");
   }
 
   /** Filter expression, node order. */

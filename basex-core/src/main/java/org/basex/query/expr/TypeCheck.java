@@ -72,7 +72,7 @@ public final class TypeCheck extends Single {
       //   INTEGERS coerce to item() → INTEGERS coerce to xs:integer
       if(cardinality) st = nst;
       // adopt result size and data reference from input expression
-      final Expr dataExpr = type.instanceOf(NodeType.NODE) ? expr : null;
+      final Expr dataExpr = type.instanceOf(NodeType.XNODE) ? expr : null;
       exprType.assign(st, nocc, et.occ == st.occ ? expr.size() : -1).data(dataExpr);
     }
 

@@ -116,7 +116,7 @@ public enum Records {
   /** Record definition. */
   VALIDATION_RESULT(FN_URI, "validation-result",
     field("is-valid", Types.BOOLEAN_O),
-    field("typed-node", Types.NODE_ZO),
+    field("typed-node", Types.XNODE_ZO),
     field("error-details", Types.MAP_ZM)
   );
 

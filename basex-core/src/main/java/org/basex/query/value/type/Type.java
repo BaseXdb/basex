@@ -27,7 +27,7 @@ public interface Type {
     /** array(*).                 */ ARRAY(31),
 
     // node types
-    /** node().                   */ NOD(8),
+    /** xnode().                  */ XND(8),
     /** text().                   */ TXT(9),
     /** processing-instruction(). */ PI(10),
     /** element().                */ ELM(11),
@@ -39,7 +39,7 @@ public interface Type {
     /** schema-element().         */ SCE(17),
     /** schema-attribute().       */ SCA(18),
     /** jnode().                  */ JND(19),
-    /** gnode().                  */ GND(20),
+    /** node().                   */ NOD(20),
 
     // basic types
     /** choice item type.         */ CIT(29),

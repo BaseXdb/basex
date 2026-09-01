@@ -50,7 +50,7 @@ public final class UtilRoot extends StandardFunc {
     if(type.instanceOf(NodeType.DOCUMENT)) return nodes;
 
     Type tp = null;
-    if(type.instanceOf(NodeType.NODE)) {
+    if(type.instanceOf(NodeType.XNODE)) {
       tp = NodeType.DOCUMENT;
     } else if(type.instanceOf(NodeType.JNODE) || type.instanceOf(Types.MAP_OR_ARRAY)) {
       tp = Types.JNODE_ROOT;

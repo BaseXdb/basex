@@ -201,7 +201,7 @@ public final class XdmInfoTest extends SandboxTest {
     // code: 7
     { "function item" },
     // code: 8 and higher
-    { "node()" },
+    { "xnode()" },
     { "text()", "text { 'a' }", "a" },
     { "processing-instruction()", "processing-instruction { 'a' } { 'b' }", "<?a b?>" },
     { "element()", "<a/>", "<a/>" },

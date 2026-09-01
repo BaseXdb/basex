@@ -35,7 +35,7 @@ public abstract class Step extends Preds {
   public Expr selector;
 
   /**
-   * Returns a new optimized self::gnode() step.
+   * Returns a new optimized self::node() step.
    * @param cc compilation context
    * @param root root context expression; if {@code null}, the current context will be used
    * @param info input info (can be {@code null})
@@ -45,7 +45,7 @@ public abstract class Step extends Preds {
    */
   public static Expr self(final CompileContext cc, final Expr root, final InputInfo info,
       final Expr... preds) throws QueryException {
-    return self(cc, root, info, NodeTest.GNODE, preds);
+    return self(cc, root, info, NodeTest.NODE, preds);
   }
 
   /**
@@ -217,7 +217,7 @@ public abstract class Step extends Preds {
   Expr optimize(final Expr root, final CompileContext cc) throws QueryException {
     // updates the static type
     final Expr rt = assignType(root != null ? root : cc.qc.focus.value);
-    Type rtype = rt != null ? rt.seqType().type : NodeType.GNODE;
+    Type rtype = rt != null ? rt.seqType().type : NodeType.NODE;
     if(rtype.instanceOf(Types.MAP_OR_ARRAY)) rtype = NodeType.JNODE;
 
     // choose stricter axis
@@ -261,14 +261,14 @@ public abstract class Step extends Preds {
 
   @Override
   public final Expr assignType(final Expr expr) {
-    final Type type = expr != null ? expr.seqType().type : NodeType.GNODE;
+    final Type type = expr != null ? expr.seqType().type : NodeType.NODE;
     test = test.optimize(type.kind(), null);
 
     SeqType st = seqType(axis, test, exprs);
     final Type ct = type.instanceOf(Types.MAP_OR_ARRAY) ? NodeType.JNODE : type;
     if(expr != null && axis == SELF && ct instanceof NodeType) {
-      // node test: adopt type of context expression: <a/>/self::gnode()
-      if(test.kind == Kind.GNODE) st = ct.seqType(st.occ);
+      // node test: adopt type of context expression: <a/>/self::node()
+      if(test.kind == Kind.NODE) st = ct.seqType(st.occ);
       // no predicates: step will yield single result: $elements/self::element()
       if(exprs.length == 0 && selector == null && test.subsumes(ct) == Boolean.TRUE)
         st = st.with(Occ.EXACTLY_ONE);
@@ -328,7 +328,7 @@ public abstract class Step extends Preds {
 
     // skip processing instructions
     final Kind kind = test.kind;
-    if(kind.oneOf(Kind.GNODE, Kind.PROCESSING_INSTRUCTION)) return null;
+    if(kind.oneOf(Kind.NODE, Kind.PROCESSING_INSTRUCTION)) return null;
 
     final Names names = kind == Kind.ATTRIBUTE ? data.attrNames : data.elemNames;
     final int kn = XNode.dbKind(kind);
@@ -388,7 +388,7 @@ public abstract class Step extends Preds {
    */
   private boolean noMatches() {
     final Kind kind = test.kind;
-    if(kind.oneOf(Kind.GNODE, Kind.NODE)) return false;
+    if(kind.oneOf(Kind.NODE, Kind.XNODE)) return false;
 
     return switch(axis) {
       // attribute::element()
@@ -420,7 +420,7 @@ public abstract class Step extends Preds {
     if(nk == Kind.DOCUMENT && switch(axis) {
       case SELF, ANCESTOR_OR_SELF, FOLLOWING_OR_SELF, FOLLOWING_SIBLING_OR_SELF,
            PRECEDING_OR_SELF, PRECEDING_SIBLING_OR_SELF ->
-        !kind.oneOf(Kind.GNODE, Kind.NODE, Kind.DOCUMENT);
+        !kind.oneOf(Kind.NODE, Kind.XNODE, Kind.DOCUMENT);
       case CHILD, DESCENDANT ->
         kind.oneOf(Kind.DOCUMENT, Kind.ATTRIBUTE);
       case DESCENDANT_OR_SELF ->
@@ -439,7 +439,7 @@ public abstract class Step extends Preds {
         isLeaf(nk);
       // $text/descendant-or-self::text(), ...
       case DESCENDANT_OR_SELF ->
-        isLeaf(nk) && !kind.oneOf(Kind.GNODE, Kind.NODE) && !kind.instanceOf(nk);
+        isLeaf(nk) && !kind.oneOf(Kind.NODE, Kind.XNODE) && !kind.instanceOf(nk);
       // $attribute/following-sibling::, $attribute/preceding-sibling::
       case FOLLOWING_SIBLING, PRECEDING_SIBLING ->
         nk == Kind.ATTRIBUTE;
@@ -561,7 +561,7 @@ public abstract class Step extends Preds {
       return;
     }
     final TokenBuilder tb = new TokenBuilder();
-    if(test == NodeTest.NODE) {
+    if(test == NodeTest.XNODE) {
       if(axis == PARENT) tb.add("..");
       if(axis == SELF) tb.add('.');
     }

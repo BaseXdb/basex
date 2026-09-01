@@ -51,7 +51,7 @@ public final class FnDistinctOrderedNodes extends StandardFunc {
     }
 
     final Type type = nodes.seqType().type;
-    if(type.instanceOf(NodeType.GNODE)) {
+    if(type.instanceOf(NodeType.NODE)) {
       // distinct-ordered-nodes(reverse(*)) → distinct-ordered-nodes(*)
       final Expr reordered = reordered(nodes);
       if(reordered != null) return cc.function(DISTINCT_ORDERED_NODES, info, reordered);

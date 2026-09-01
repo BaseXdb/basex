@@ -376,7 +376,7 @@ public abstract class Expr extends ExprInfo {
       // boolean(<a/>) → true()
       // E[()] → E[false()]
       final SeqType st = seqType();
-      final boolean nodes = st.instanceOf(Types.NODE_OM);
+      final boolean nodes = st.instanceOf(Types.XNODE_OM);
       if((nodes || st.zero()) && !has(Flag.NDT)) expr = Bln.get(nodes);
     } else if(mode == Simplify.COUNT && !(this instanceof Value)) {
       // count(db:get('db')//with-known-result-size) → replicate('', size)

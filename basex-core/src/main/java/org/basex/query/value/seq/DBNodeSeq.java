@@ -131,7 +131,7 @@ public class DBNodeSeq extends NativeSeq {
 
   @Override
   public boolean refineType() {
-    if(type.kind() == Kind.NODE) {
+    if(type.kind() == Kind.XNODE) {
       for(final Item item : this) {
         if(!item.type.eq(type)) return false;
       }
@@ -172,7 +172,7 @@ public class DBNodeSeq extends NativeSeq {
    */
   public static Value get(final int[] pres, final Data data, final Type type, final boolean all) {
     if(pres.length == 0) return Empty.VALUE;
-    if(pres.length > 1) return new DBNodeSeq(pres, data, type == null ? NodeType.NODE : type, all);
+    if(pres.length > 1) return new DBNodeSeq(pres, data, type == null ? NodeType.XNODE : type, all);
     // if the node kind is known, it does not need to be looked up in the database
     final int pre = pres[0];
     return type == NodeType.DOCUMENT ? new DBNode(data, pre, Data.DOC) : new DBNode(data, pre);
@@ -186,7 +186,7 @@ public class DBNodeSeq extends NativeSeq {
    * @return value
    */
   public static Value get(final int[] pres, final Data data, final Expr expr) {
-    return get(pres, data, NodeType.NODE.refine(expr), false);
+    return get(pres, data, NodeType.XNODE.refine(expr), false);
   }
 
   /**

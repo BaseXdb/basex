@@ -75,7 +75,7 @@ public final class GNodeBuilder extends ObjectList<GNode, GNodeBuilder> {
     }
 
     // otherwise, create default sequence
-    return ItemSeq.get(finish(), sz, NodeType.GNODE.refine(expr));
+    return ItemSeq.get(finish(), sz, NodeType.NODE.refine(expr));
   }
 
   /**

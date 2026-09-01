@@ -57,7 +57,7 @@ public final class GNodeList extends ObjectList<GNode, GNodeList> {
       }
       @Override
       public Value value(final QueryContext qc, final Expr expr) {
-        return ItemSeq.get(list, size, NodeType.GNODE.refine(expr));
+        return ItemSeq.get(list, size, NodeType.NODE.refine(expr));
       }
     };
   }
@@ -110,7 +110,7 @@ public final class GNodeList extends ObjectList<GNode, GNodeList> {
       }
       @Override
       public Value value(final QueryContext qc, final Expr expr) {
-        return ItemSeq.get(nodes, nl, NodeType.GNODE.refine(expr));
+        return ItemSeq.get(nodes, nl, NodeType.NODE.refine(expr));
       }
     };
   }

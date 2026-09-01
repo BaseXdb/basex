@@ -172,10 +172,10 @@ public final class Types {
   /** Zero or more string or xs:hex-binary or xs:base64-binary. */
   public static final SeqType STRING_OR_BINARY_ZM = STRING_OR_BINARY.seqType(ZERO_OR_MORE);
 
-  /** Node, string, or binary item (used by db:put). */
-  public static final Type NODE_OR_STRING_OR_BINARY = ChoiceItemType.get(NODE, STRING_OR_BINARY);
-  /** Single node, string, or binary item. */
-  public static final SeqType NODE_OR_STRING_OR_BINARY_O = NODE_OR_STRING_OR_BINARY.seqType();
+  /** XNode, string, or binary item (used by db:put). */
+  public static final Type XNODE_OR_STRING_OR_BINARY = ChoiceItemType.get(XNODE, STRING_OR_BINARY);
+  /** Single XNode, string, or binary item. */
+  public static final SeqType XNODE_OR_STRING_OR_BINARY_O = XNODE_OR_STRING_OR_BINARY.seqType();
 
   /** Resource type enum, used by db:add and db:create as a per-path override. */
   public static final EnumType DB_RESOURCE_TYPE = EnumType.get("xml", "binary", "value");
@@ -188,14 +188,14 @@ public final class Types {
   /** Zero or more database path specs. */
   public static final SeqType DB_PATH_SPEC_ZM = DB_PATH_SPEC.seqType(ZERO_OR_MORE);
 
-  /** Single node. */
-  public static final SeqType NODE_O = NODE.seqType();
-  /** Zero or one nodes. */
-  public static final SeqType NODE_ZO = NODE.seqType(ZERO_OR_ONE);
-  /** Zero or more nodes. */
-  public static final SeqType NODE_ZM = NODE.seqType(ZERO_OR_MORE);
-  /** One or more nodes. */
-  public static final SeqType NODE_OM = NODE.seqType(ONE_OR_MORE);
+  /** Single XNode. */
+  public static final SeqType XNODE_O = XNODE.seqType();
+  /** Zero or one XNodes. */
+  public static final SeqType XNODE_ZO = XNODE.seqType(ZERO_OR_ONE);
+  /** Zero or more XNodes. */
+  public static final SeqType XNODE_ZM = XNODE.seqType(ZERO_OR_MORE);
+  /** One or more XNodes. */
+  public static final SeqType XNODE_OM = XNODE.seqType(ONE_OR_MORE);
   /** One attribute node. */
   public static final SeqType ATTRIBUTE_O = ATTRIBUTE.seqType();
   /** Zero or more attributes. */
@@ -246,11 +246,11 @@ public final class Types {
       NameTest.get(new QNm("csv", FN_URI)))).seqType(ZERO_OR_ONE);
 
   /** Zero or one GNode. */
-  public static final SeqType GNODE_ZO = GNODE.seqType(ZERO_OR_ONE);
+  public static final SeqType NODE_ZO = NODE.seqType(ZERO_OR_ONE);
   /** Zero or more GNodes. */
-  public static final SeqType GNODE_ZM = GNODE.seqType(ZERO_OR_MORE);
+  public static final SeqType NODE_ZM = NODE.seqType(ZERO_OR_MORE);
   /** One or more GNodes. */
-  public static final SeqType GNODE_OM = GNODE.seqType(ONE_OR_MORE);
+  public static final SeqType NODE_OM = NODE.seqType(ONE_OR_MORE);
 
   /** Single NMTOKENS. */
   public static final SeqType NMTOKENS_O = NMTOKENS.seqType();
@@ -314,8 +314,8 @@ public final class Types {
   /** Zero or more maps or arrays. */
   public static final SeqType MAP_OR_ARRAY_ZM = MAP_OR_ARRAY.seqType(Occ.ZERO_OR_MORE);
   /** Zero or more GNodes, maps, or arrays. */
-  public static final SeqType GNODE_OR_MAP_OR_ARRAY_ZM =
-      ChoiceItemType.get(GNODE, MAP, ARRAY).seqType(Occ.ZERO_OR_MORE);
+  public static final SeqType NODE_OR_MAP_OR_ARRAY_ZM =
+      ChoiceItemType.get(NODE, MAP, ARRAY).seqType(Occ.ZERO_OR_MORE);
 
   /** Single JNode. */
   public static final SeqType JNODE_O = JNODE.seqType();
@@ -342,17 +342,17 @@ public final class Types {
   public static final Type ANY_ATOMIC_TYPE_EXPANSION = ChoiceItemType.get(ANY_URI, BASE64_BINARY,
       BOOLEAN, DATE, DATE_TIME, DECIMAL, DOUBLE, DURATION, FLOAT, G_DAY, G_MONTH, G_MONTH_DAY,
       G_YEAR, G_YEAR_MONTH, HEX_BINARY, NOTATION, QNAME, STRING, TIME, UNTYPED_ATOMIC);
-  /** Expansion of node() for comparison with choice item types. */
-  public static final Type NODE_EXPANSION = ChoiceItemType.get(DOCUMENT, ELEMENT, ATTRIBUTE, TEXT,
+  /** Expansion of xnode() for comparison with choice item types. */
+  public static final Type XNODE_EXPANSION = ChoiceItemType.get(DOCUMENT, ELEMENT, ATTRIBUTE, TEXT,
       COMMENT, PROCESSING_INSTRUCTION, NAMESPACE);
+  /** Single expansion of xnode() for comparison with choice item types. */
+  public static final SeqType XNODE_EXPANSION_O = XNODE_EXPANSION.seqType();
+  /** Expansion of node() for comparison with choice item types. */
+  public static final Type NODE_EXPANSION = ChoiceItemType.get(XNODE_EXPANSION, JNODE);
   /** Single expansion of node() for comparison with choice item types. */
   public static final SeqType NODE_EXPANSION_O = NODE_EXPANSION.seqType();
-  /** Expansion of gnode() for comparison with choice item types. */
-  public static final Type GNODE_EXPANSION = ChoiceItemType.get(NODE_EXPANSION, JNODE);
-  /** Single expansion of gnode() for comparison with choice item types. */
-  public static final SeqType GNODE_EXPANSION_O = GNODE_EXPANSION.seqType();
   /** Expansion of item() for comparison with choice item types. */
-  public static final Type ITEM_EXPANSION = ChoiceItemType.get(GNODE_EXPANSION,
+  public static final Type ITEM_EXPANSION = ChoiceItemType.get(NODE_EXPANSION,
       ANY_ATOMIC_TYPE_EXPANSION, FUNCTION);
   /** Single expansion of item() for comparison with choice item types. */
   public static final SeqType ITEM_EXPANSION_O = ITEM_EXPANSION.seqType();

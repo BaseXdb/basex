@@ -399,7 +399,7 @@ public final class ExprTest extends SandboxTest {
     check("<_><a/></_>/(a except b)", "<a/>",
         empty(Except.class), type(IterPath.class, "element(a)*"));
     check("<_><a/></_>/(node() except * except a)", "",
-        count(Except.class, 1), type(MixedPath.class, "node()*"));
+        count(Except.class, 1), type(MixedPath.class, "xnode()*"));
     check("<_><a/></_>/(a except *)", "", empty());
 
     query("count(<a/> except <b/>)", 1);

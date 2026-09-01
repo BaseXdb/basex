@@ -39,7 +39,7 @@ public final class DynamicStep extends Single {
 
     // build only the interpretations that can apply to the static type of the input
     final Expr ctx = new ContextValue(info).optimize(cc);
-    final Expr cond = new Instance(info, ctx, Types.NODE_O).optimize(cc);
+    final Expr cond = new Instance(info, ctx, Types.XNODE_O).optimize(cc);
     if(cond == Bln.TRUE) return expr;
 
     final boolean both = cond != Bln.FALSE;

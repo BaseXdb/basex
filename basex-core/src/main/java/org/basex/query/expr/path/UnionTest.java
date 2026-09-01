@@ -33,10 +33,10 @@ public final class UnionTest extends Test {
    */
   private static Kind unionKind(final Test[] tests) {
     Kind kind = tests[0].kind;
-    for(int i = 1; i < tests.length && kind != Kind.GNODE; ++i) {
+    for(int i = 1; i < tests.length && kind != Kind.NODE; ++i) {
       final Kind kn = tests[i].kind;
       if(kn != kind) {
-        kind = kn == Kind.JNODE || kind == Kind.JNODE ? Kind.GNODE : Kind.NODE;
+        kind = kn == Kind.JNODE || kind == Kind.JNODE ? Kind.NODE : Kind.XNODE;
       }
     }
     return kind;

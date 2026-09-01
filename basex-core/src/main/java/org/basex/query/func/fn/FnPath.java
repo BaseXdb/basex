@@ -27,7 +27,7 @@ public final class FnPath extends ContextFn {
   /** Path options. */
   public static class PathOptions extends Options {
     /** Option. */
-    public static final ValueOption ORIGIN = new ValueOption("origin", Types.GNODE_ZO);
+    public static final ValueOption ORIGIN = new ValueOption("origin", Types.NODE_ZO);
     /** Option. */
     public static final BooleanOption LEXICAL = new BooleanOption("lexical", false);
     /** Option. */

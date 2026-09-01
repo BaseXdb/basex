@@ -79,7 +79,6 @@ public interface QueryText {
   /** Parser token. */ String FTOR = "ftor";
   /** Parser token. */ String FUNCTION = "function";
   /** Parser token. */ String FUZZY = "fuzzy";
-  /** Parser token. */ String GNODE = "gnode";
   /** Parser token. */ String GREATEST = "greatest";
   /** Parser token. */ String GROUP = "group";
   /** Parser token. */ String IDIV = "idiv";
@@ -192,6 +191,7 @@ public interface QueryText {
   /** Parser token. */ String WITHOUT = "without";
   /** Parser token. */ String WORD = "word";
   /** Parser token. */ String WORDS = "words";
+  /** Parser token. */ String XNODE = "xnode";
   /** Parser token. */ String XQUERY = "xquery";
 
   /** Parser token. */ String NAMESPACES = "namespaces";

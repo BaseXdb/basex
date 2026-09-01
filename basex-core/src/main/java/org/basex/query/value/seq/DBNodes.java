@@ -38,7 +38,7 @@ public final class DBNodes extends DBNodeSeq {
    * @param pres PRE values
    */
   public DBNodes(final Data data, final boolean all, final int... pres) {
-    this(data, all ? NodeType.DOCUMENT : NodeType.NODE, all, pres);
+    this(data, all ? NodeType.DOCUMENT : NodeType.XNODE, all, pres);
   }
 
   /**

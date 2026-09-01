@@ -84,7 +84,7 @@ public abstract class Path extends ParseExpr {
       Expr expr = step;
       if(expr instanceof ContextValue) {
         // rewrite context value reference to self step
-        expr = Step.get(expr.info(info), SELF, NodeTest.GNODE);
+        expr = Step.get(expr.info(info), SELF, NodeTest.NODE);
       }
       tmp.add(expr);
       axes = axes && expr instanceof Step;
@@ -109,7 +109,7 @@ public abstract class Path extends ParseExpr {
     // an atomic step result may only replace the path if the context is an XML node
     // examples: 'text', (a union b)
     if(step != null && (step.seqType().instanceOf(Types.ANY_ATOMIC_TYPE_ZM) ?
-        input != null && input.seqType().type.instanceOf(NodeType.NODE) : step.ddo())) {
+        input != null && input.seqType().type.instanceOf(NodeType.XNODE) : step.ddo())) {
       return step;
     }
     // example: (1 to 10)/<xml/>
@@ -530,7 +530,7 @@ public abstract class Path extends ParseExpr {
     // consider JNodes
     final Expr prev = steps.length > 1 ? steps[steps.length - 2] : root != null ? root : rt;
     if(this instanceof MixedPath && st.type.instanceOf(BasicType.ANY_ATOMIC_TYPE) &&
-        (prev == null || !prev.seqType().type.instanceOf(NodeType.NODE))) {
+        (prev == null || !prev.seqType().type.instanceOf(NodeType.XNODE))) {
       st = NodeType.JNODE.seqType();
     }
     Occ occ = Occ.ZERO_OR_MORE;
@@ -722,7 +722,7 @@ public abstract class Path extends ParseExpr {
     /* rewrite if:
      * - previous expression yields XML nodes (otherwise, an error must be raised at runtime)
      * - last expression is no step, and yields a single result or no node */
-    if(!type1.instanceOf(NodeType.NODE) || s2 instanceof Step || size() != 1 &&
+    if(!type1.instanceOf(NodeType.XNODE) || s2 instanceof Step || size() != 1 &&
        !type2.instanceOf(BasicType.ANY_ATOMIC_TYPE) && !type2.instanceOf(Types.FUNCTION))
       return this;
 
@@ -865,7 +865,7 @@ public abstract class Path extends ParseExpr {
         }
         // skip step if it is always successful
         if(newAxis != ANCESTOR && newAxis != ANCESTOR_OR_SELF ||
-            newTest != NodeTest.NODE && newTest != NodeTest.DOCUMENT ||
+            newTest != NodeTest.XNODE && newTest != NodeTest.DOCUMENT ||
             newPreds.length > 0) {
           final Expr expr = invSteps.isEmpty() ?
             indexStep != null ? indexStep : indexRoot : invSteps.peek();
@@ -1067,7 +1067,7 @@ public abstract class Path extends ParseExpr {
 
     // narrow node test before attribute step:  node()/@* → */@*
     if(nxt != null && nxt.axis == ATTRIBUTE && curr.selector == null &&
-        curr.test == NodeTest.NODE) {
+        curr.test == NodeTest.XNODE) {
       return new Expr[] {
         Step.get(cc, null, curr.info(), curr.axis, NodeTest.ELEMENT, curr.exprs), next };
     }
@@ -1085,7 +1085,7 @@ public abstract class Path extends ParseExpr {
 
     // merge descendant-or-self step
     if(curr.axis != DESCENDANT_OR_SELF || curr.exprs.length > 0 || curr.selector != null ||
-        !curr.test.kind.oneOf(Kind.NODE, Kind.JNODE, Kind.GNODE)) return null;
+        !curr.test.kind.oneOf(Kind.XNODE, Kind.JNODE, Kind.NODE)) return null;
 
     // examples:
     // - descendant-or-self::node()/* → descendant::*

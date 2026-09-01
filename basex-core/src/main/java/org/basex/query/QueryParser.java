@@ -60,7 +60,7 @@ public class QueryParser extends InputParser {
   private static final byte[] SKIPCHECK = {};
   /** Reserved keywords. */
   private static final TokenSet KEYWORDS = new TokenSet(
-      ATTRIBUTE, COMMENT, DOCUMENT_NODE, ELEMENT, GNODE, JNODE, NAMESPACE_NODE, NODE,
+      ATTRIBUTE, COMMENT, DOCUMENT_NODE, ELEMENT, JNODE, NAMESPACE_NODE, NODE, XNODE,
       SCHEMA_ATTRIBUTE, SCHEMA_ELEMENT, PROCESSING_INSTRUCTION, TEXT, ARRAY, ENUM, FN,
       FUNCTION, IF, ITEM, MAP, RECORD, SWITCH, TYPE, TYPESWITCH);
 
@@ -2410,7 +2410,7 @@ public class QueryParser extends InputParser {
       if(consume('/')) {
         // two slashes: absolute descendant path
         checkAxis(Axis.DESCENDANT);
-        add(el, new CachedStep(info(), Axis.DESCENDANT_OR_SELF, NodeTest.GNODE));
+        add(el, new CachedStep(info(), Axis.DESCENDANT_OR_SELF, NodeTest.NODE));
         mark();
         expr = step(true);
       } else {
@@ -2463,7 +2463,7 @@ public class QueryParser extends InputParser {
     while(true) {
       if(consume('/')) {
         if(consume('/')) {
-          add(el, new CachedStep(info(), Axis.DESCENDANT_OR_SELF, NodeTest.GNODE));
+          add(el, new CachedStep(info(), Axis.DESCENDANT_OR_SELF, NodeTest.NODE));
           checkAxis(Axis.DESCENDANT);
         } else {
           checkAxis(Axis.CHILD);
@@ -2527,7 +2527,7 @@ public class QueryParser extends InputParser {
     ExprInfo test = null;
     if(wsConsume("..")) {
       axis = Axis.PARENT;
-      test = NodeTest.GNODE;
+      test = NodeTest.NODE;
       checkTest(test, true);
     } else if(consume('@')) {
       axis = Axis.ATTRIBUTE;
@@ -4886,7 +4886,7 @@ public class QueryParser extends InputParser {
     final int s = localVars.openScope();
     Let[] fl = { };
     do {
-      final Var var = newVar(Types.NODE_O);
+      final Var var = newVar(Types.XNODE_O);
       wsCheck(":=");
       final Expr expr = check(single(), INCOMPLETE);
       fl = Array.add(fl, new Let(localVars.add(var), expr));

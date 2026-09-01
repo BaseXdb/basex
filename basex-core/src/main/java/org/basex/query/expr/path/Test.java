@@ -40,11 +40,11 @@ public abstract class Test extends ExprInfo {
    */
   public static Test get(final Kind kind, final QNm qname, final Scope scope, final byte[] ns) {
     final QNm n = qname != null ? qname : QNm.EMPTY;
-    final Kind k = kind != null ? kind : Kind.GNODE;
-    final Scope s = scope == Scope.FLEXIBLE && k.instanceOf(Kind.NODE) ? Scope.FULL :
+    final Kind k = kind != null ? kind : Kind.NODE;
+    final Scope s = scope == Scope.FLEXIBLE && k.instanceOf(Kind.XNODE) ? Scope.FULL :
       scope != null ? scope : k == Kind.PROCESSING_INSTRUCTION ? Scope.LOCAL : Scope.FULL;
 
-    if(k != Kind.GNODE) {
+    if(k != Kind.NODE) {
       // element(*), attribute(*), jnode(*)
       if(s == Scope.ALL || n == QNm.EMPTY) return NodeTest.get(k);
       // jnode(a)

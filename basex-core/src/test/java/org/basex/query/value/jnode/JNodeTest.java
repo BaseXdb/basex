@@ -242,8 +242,8 @@ public final class JNodeTest extends SandboxTest {
 
   /** Node tests. */
   @Test public void nodeTest() {
-    query(jtree + "//gnode() => count()", 7);
-    query(jtree + "//node() => count()", 0);
+    query(jtree + "//node() => count()", 7);
+    query(jtree + "//xnode() => count()", 0);
     query(jtree + "//element() => count()", 0);
     query(jtree + "//jnode() => count()", 7);
     query(jtree + "//jnode(*) => count()", 7);
@@ -370,7 +370,7 @@ public final class JNodeTest extends SandboxTest {
     query(jtree + "//y/ancestor::x", "{\"x\":{\"y\":2}}");
     query(jtree + "//y/ancestor::b", "{\"b\":{\"x\":{\"y\":2}}}");
     query(jtree + "//y/ancestor::* => count()", 4);
-    query(jtree + "//y/ancestor::gnode() => count()", 4);
+    query(jtree + "//y/ancestor::node() => count()", 4);
   }
 
   /** Ancestor-or-self step. */
@@ -379,7 +379,7 @@ public final class JNodeTest extends SandboxTest {
     query(jtree + "//y/ancestor-or-self::x", "{\"x\":{\"y\":2}}");
     query(jtree + "//y/ancestor-or-self::b", "{\"b\":{\"x\":{\"y\":2}}}");
     query(jtree + "//y/ancestor-or-self::* => count()", 6);
-    query(jtree + "//y/ancestor-or-self::gnode() => count()", 6);
+    query(jtree + "//y/ancestor-or-self::node() => count()", 6);
   }
 
   /** Self step. */
@@ -391,8 +391,8 @@ public final class JNodeTest extends SandboxTest {
     query(jtree + "//z/self::z", "{\"z\":2}");
     query(jtree + "//z/self::*", "{\"z\":2}");
     query(jtree + "//z/self::jnode()", "{\"z\":2}");
-    query(jtree + "//z/self::gnode()", "{\"z\":2}");
-    query(jtree + "//z/self::node()", "");
+    query(jtree + "//z/self::node()", "{\"z\":2}");
+    query(jtree + "//z/self::xnode()", "");
   }
 
   /** Parent step. */

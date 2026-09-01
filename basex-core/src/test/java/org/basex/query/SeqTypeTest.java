@@ -34,8 +34,8 @@ public final class SeqTypeTest {
   /** Error type {@code xs:error+} (void category). */
   private static final SeqType ERROR_OM = ERROR.seqType(ONE_OR_MORE);
 
-  /** Type gnode(). */
-  private static final SeqType GNODE_O = GNODE.seqType();
+  /** Type node(). */
+  private static final SeqType NODE_O = NODE.seqType();
   /** Type element(x). */
   private static final SeqType ELEMENT_X_O = NodeType.get(NameTest.get(new QNm("X"))).seqType();
   /** Type element(y). */
@@ -193,7 +193,7 @@ public final class SeqTypeTest {
     assertTrue(ERROR_O.instanceOf(ANY_ATOMIC_TYPE_O));
     assertTrue(ERROR.instanceOf(STRING));
     assertTrue(ERROR.instanceOf(NUMERIC));
-    assertTrue(ERROR.instanceOf(NODE));
+    assertTrue(ERROR.instanceOf(XNODE));
     assertTrue(ERROR.instanceOf(FUNCTION));
     assertTrue(ERROR.instanceOf(MAP));
     assertTrue(ERROR.instanceOf(ARRAY));
@@ -201,7 +201,7 @@ public final class SeqTypeTest {
     assertTrue(ERROR.instanceOf(ChoiceItemType.get(STRING, ELEMENT)));
 
     assertFalse(STRING.instanceOf(ERROR));
-    assertFalse(NODE.instanceOf(ERROR));
+    assertFalse(XNODE.instanceOf(ERROR));
 
     assertTrue(ERROR_ZO.instanceOf(EMPTY_SEQUENCE_Z));
     assertTrue(ERROR_ZO.instanceOf(STRING_ZO));
@@ -259,23 +259,23 @@ public final class SeqTypeTest {
 
     // nodes
 
-    assertTrue(JNODE_O.instanceOf(GNODE_O));
-    assertTrue(NODE_O.instanceOf(GNODE_O));
+    assertTrue(JNODE_O.instanceOf(NODE_O));
+    assertTrue(XNODE_O.instanceOf(NODE_O));
     assertTrue(ELEMENT_O.instanceOf(ITEM_O));
     assertTrue(ELEMENT_O.instanceOf(ELEMENT_O));
-    assertTrue(ATTRIBUTE_O.instanceOf(NODE_O));
+    assertTrue(ATTRIBUTE_O.instanceOf(XNODE_O));
     assertTrue(ATTRIBUTE_O.instanceOf(ATTRIBUTE_O));
-    assertTrue(ELEMENT_X_O.instanceOf(NODE_O));
+    assertTrue(ELEMENT_X_O.instanceOf(XNODE_O));
     assertTrue(ELEMENT_X_O.instanceOf(ELEMENT_O));
     assertTrue(ELEMENT_X_O.instanceOf(ELEMENT_X_O));
 
-    assertFalse(GNODE_O.instanceOf(JNODE_O));
-    assertFalse(GNODE_O.instanceOf(NODE_O));
-    assertFalse(ITEM_O.instanceOf(ELEMENT_O));
-    assertFalse(JNODE_O.instanceOf(NODE_O));
-    assertFalse(JNODE_O.instanceOf(ELEMENT_O));
-    assertFalse(NODE_O.instanceOf(ELEMENT_O));
     assertFalse(NODE_O.instanceOf(JNODE_O));
+    assertFalse(NODE_O.instanceOf(XNODE_O));
+    assertFalse(ITEM_O.instanceOf(ELEMENT_O));
+    assertFalse(JNODE_O.instanceOf(XNODE_O));
+    assertFalse(JNODE_O.instanceOf(ELEMENT_O));
+    assertFalse(XNODE_O.instanceOf(ELEMENT_O));
+    assertFalse(XNODE_O.instanceOf(JNODE_O));
     assertFalse(ATTRIBUTE_O.instanceOf(ELEMENT_O));
     assertFalse(ELEMENT_O.instanceOf(f));
     assertFalse(ELEMENT_O.instanceOf(JNODE_O));
@@ -335,8 +335,8 @@ public final class SeqTypeTest {
       c5 = ChoiceItemType.get(MAP, STRING).seqType(),
       // (function(*) | xs:string)
       c6 = ChoiceItemType.get(FUNCTION, STRING).seqType(),
-      // (node() | jnode())
-      c7 = ChoiceItemType.get(NODE, JNODE).seqType();
+      // (xnode() | jnode())
+      c7 = ChoiceItemType.get(XNODE, JNODE).seqType();
 
     assertTrue(c1.instanceOf(c1));
     assertFalse(c1.instanceOf(c2));
@@ -404,8 +404,8 @@ public final class SeqTypeTest {
     assertTrue(ANY_ATOMIC_TYPE_O.instanceOf(Types.ANY_ATOMIC_TYPE_EXPANSION.seqType()));
     assertTrue(Types.ITEM_EXPANSION.seqType().instanceOf(ITEM_O));
     assertTrue(ITEM_O.instanceOf(Types.ITEM_EXPANSION.seqType()));
-    assertTrue(c7.instanceOf(GNODE_O));
-    assertTrue(GNODE_O.instanceOf(c7));
+    assertTrue(c7.instanceOf(NODE_O));
+    assertTrue(NODE_O.instanceOf(c7));
 
     final TokenObjectMap<ShapeField> fld1 = new TokenObjectMap<>(), fld2 = new TokenObjectMap<>();
     final QNm r1Name = new QNm(Token.token("r1")), r2Name = new QNm(Token.token("r2"));
@@ -446,7 +446,7 @@ public final class SeqTypeTest {
     combine(NORMALIZED_STRING.seqType(), op);
     combine(ATTRIBUTE_O, op);
     combine(ELEMENT_O, op);
-    combine(NODE_O, op);
+    combine(XNODE_O, op);
     combine(DATE_TIME_O, op);
     combine(DATE_TIME_STAMP_O, op);
 
@@ -485,27 +485,27 @@ public final class SeqTypeTest {
     combine(ERROR_O, ERROR_OM, ERROR_OM, op);
 
     combine(ELEMENT_O, STRING_O, ITEM_O, op);
-    combine(JNODE_O, GNODE_O, GNODE_O, op);
-    combine(NODE_O, GNODE_O, GNODE_O, op);
+    combine(JNODE_O, NODE_O, NODE_O, op);
+    combine(XNODE_O, NODE_O, NODE_O, op);
     combine(ELEMENT_O, ITEM_O, ITEM_O, op);
     combine(ELEMENT_O, ELEMENT_O, ELEMENT_O, op);
-    combine(ATTRIBUTE_O, NODE_O, NODE_O, op);
+    combine(ATTRIBUTE_O, XNODE_O, XNODE_O, op);
     combine(ATTRIBUTE_O, ATTRIBUTE_O, ATTRIBUTE_O, op);
-    combine(ELEMENT_X_O, NODE_O, NODE_O, op);
+    combine(ELEMENT_X_O, XNODE_O, XNODE_O, op);
     combine(ELEMENT_X_O, ELEMENT_O, ELEMENT_O, op);
     combine(ELEMENT_X_O, ELEMENT_X_O, ELEMENT_X_O, op);
 
-    combine(GNODE_O, JNODE_O, GNODE_O, op);
-    combine(GNODE_O, NODE_O, GNODE_O, op);
+    combine(NODE_O, JNODE_O, NODE_O, op);
+    combine(NODE_O, XNODE_O, NODE_O, op);
     combine(ITEM_O, ELEMENT_O, ITEM_O, op);
-    combine(JNODE_O, NODE_O, GNODE_O, op);
-    combine(JNODE_O, ELEMENT_O, GNODE_O, op);
-    combine(NODE_O, ELEMENT_O, NODE_O, op);
-    combine(NODE_O, JNODE_O, GNODE_O, op);
-    combine(ATTRIBUTE_O, ELEMENT_O, NODE_O, op);
-    combine(ELEMENT_O, JNODE_O, GNODE_O, op);
-    combine(ELEMENT_X_O, ATTRIBUTE_O, NODE_O, op);
-    combine(GNODE_O, ERROR_O, GNODE_O, op);
+    combine(JNODE_O, XNODE_O, NODE_O, op);
+    combine(JNODE_O, ELEMENT_O, NODE_O, op);
+    combine(XNODE_O, ELEMENT_O, XNODE_O, op);
+    combine(XNODE_O, JNODE_O, NODE_O, op);
+    combine(ATTRIBUTE_O, ELEMENT_O, XNODE_O, op);
+    combine(ELEMENT_O, JNODE_O, NODE_O, op);
+    combine(ELEMENT_X_O, ATTRIBUTE_O, XNODE_O, op);
+    combine(NODE_O, ERROR_O, NODE_O, op);
 
     combine(JNODE_XX_O, JNODE_XX_O, JNODE_XX_O, op);
     combine(JNODE_XX_O, JNODE_XI_O, JNODE_XX_O, op);
@@ -737,7 +737,7 @@ public final class SeqTypeTest {
     combine(NORMALIZED_STRING.seqType(), op);
     combine(ATTRIBUTE_O, op);
     combine(ELEMENT_O, op);
-    combine(NODE_O, op);
+    combine(XNODE_O, op);
     combine(DATE_TIME_O, op);
     combine(DATE_TIME_STAMP_O, op);
 
@@ -773,28 +773,28 @@ public final class SeqTypeTest {
 
     combine(EMPTY_SEQUENCE_Z, ITEM_O, null, op);
 
-    combine(JNODE_O, GNODE_O, JNODE_O, op);
-    combine(NODE_O, GNODE_O, NODE_O, op);
+    combine(JNODE_O, NODE_O, JNODE_O, op);
+    combine(XNODE_O, NODE_O, XNODE_O, op);
     combine(ELEMENT_O, ITEM_O, ELEMENT_O, op);
     combine(ELEMENT_O, ELEMENT_O, ELEMENT_O, op);
-    combine(ATTRIBUTE_O, NODE_O, ATTRIBUTE_O, op);
+    combine(ATTRIBUTE_O, XNODE_O, ATTRIBUTE_O, op);
     combine(ATTRIBUTE_O, ATTRIBUTE_O, ATTRIBUTE_O, op);
-    combine(ELEMENT_X_O, NODE_O, ELEMENT_X_O, op);
+    combine(ELEMENT_X_O, XNODE_O, ELEMENT_X_O, op);
     combine(ELEMENT_X_O, ELEMENT_O, ELEMENT_X_O, op);
     combine(ELEMENT_X_O, ELEMENT_X_O, ELEMENT_X_O, op);
 
     combine(ELEMENT_O, STRING_O, null, op);
-    combine(GNODE_O, JNODE_O, JNODE_O, op);
-    combine(GNODE_O, NODE_O, NODE_O, op);
+    combine(NODE_O, JNODE_O, JNODE_O, op);
+    combine(NODE_O, XNODE_O, XNODE_O, op);
     combine(ITEM_O, ELEMENT_O, ELEMENT_O, op);
-    combine(JNODE_O, NODE_O, null, op);
+    combine(JNODE_O, XNODE_O, null, op);
     combine(JNODE_O, ELEMENT_O, null, op);
-    combine(NODE_O, ELEMENT_O, ELEMENT_O, op);
-    combine(NODE_O, JNODE_O, null, op);
+    combine(XNODE_O, ELEMENT_O, ELEMENT_O, op);
+    combine(XNODE_O, JNODE_O, null, op);
     combine(ATTRIBUTE_O, ELEMENT_O, null, op);
     combine(ELEMENT_O, JNODE_O, null, op);
     combine(ELEMENT_X_O, ATTRIBUTE_O, null, op);
-    combine(GNODE_O, ERROR_O, ERROR_O, op);
+    combine(NODE_O, ERROR_O, ERROR_O, op);
 
     combine(JNODE_XX_O, JNODE_XX_O, JNODE_XX_O, op);
     combine(JNODE_XX_O, JNODE_XI_O, JNODE_XI_O, op);
@@ -836,7 +836,7 @@ public final class SeqTypeTest {
     combine(f5, op);
     combine(f6, op);
 
-    combine(NODE_O, INTEGER_O, null, op);
+    combine(XNODE_O, INTEGER_O, null, op);
     combine(f1, INTEGER_O, null, op);
     combine(f1, ERROR_O, ERROR_O, op);
     combine(f1, f1, f1, op);
@@ -1049,7 +1049,7 @@ public final class SeqTypeTest {
     assertTrue(INTEGER_O.mayBeNumber());
     assertTrue(BYTE.seqType().mayBeNumber());
     assertFalse(STRING_O.mayBeNumber());
-    assertFalse(NODE_O.mayBeNumber());
+    assertFalse(XNODE_O.mayBeNumber());
     assertFalse(ELEMENT_O.mayBeNumber());
     assertFalse(NMTOKENS_O.mayBeNumber());
     assertFalse(DATE_TIME_O.mayBeNumber());
@@ -1068,13 +1068,13 @@ public final class SeqTypeTest {
     assertFalse(INTEGER_O.mayBeWrapped());
     assertFalse(BYTE.seqType().mayBeWrapped());
     assertFalse(STRING_O.mayBeWrapped());
-    assertFalse(NODE_O.mayBeWrapped());
+    assertFalse(XNODE_O.mayBeWrapped());
     assertFalse(ELEMENT_O.mayBeWrapped());
     assertFalse(NMTOKENS_O.mayBeWrapped());
     assertFalse(DATE_TIME_O.mayBeWrapped());
     assertFalse(DATE_TIME_STAMP_O.mayBeWrapped());
     assertFalse(ERROR_O.mayBeWrapped());
-    assertTrue(GNODE_O.mayBeWrapped());
+    assertTrue(NODE_O.mayBeWrapped());
     assertTrue(JNODE.seqType().mayBeWrapped());
     assertTrue(ChoiceItemType.get(ARRAY, STRING).seqType().mayBeWrapped());
     assertFalse(ChoiceItemType.get(DATE, STRING).seqType().mayBeWrapped());

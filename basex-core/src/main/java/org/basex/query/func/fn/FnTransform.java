@@ -77,7 +77,7 @@ public final class FnTransform extends StandardFunc {
     public static final StringOption PACKAGE_NAME = new StringOption("package-name");
     /** Node with the top-level stylesheet package. */
     public static final ValueOption PACKAGE_NODE =
-        new ValueOption("package-node", Types.NODE_ZO, null);
+        new ValueOption("package-node", Types.XNODE_ZO, null);
     /** Text of the top-level stylesheet package. */
     public static final StringOption PACKAGE_TEXT = new StringOption("package-text");
     /** Version of the top-level stylesheet package. */
@@ -96,7 +96,7 @@ public final class FnTransform extends StandardFunc {
     public static final StringOption SOURCE_LOCATION = new StringOption("source-location");
     /** Source node. */
     public static final ValueOption SOURCE_NODE =
-        new ValueOption("source-node", Types.NODE_ZO, null);
+        new ValueOption("source-node", Types.XNODE_ZO, null);
     /** Values of static stylesheet parameters. */
     public static final ValueOption STATIC_PARAMS =
         new ValueOption("static-params", QNAME_MAP, null);
@@ -108,7 +108,7 @@ public final class FnTransform extends StandardFunc {
         new StringOption("stylesheet-location");
     /** Node with the stylesheet. */
     public static final ValueOption STYLESHEET_NODE =
-        new ValueOption("stylesheet-node", Types.NODE_ZO, null);
+        new ValueOption("stylesheet-node", Types.XNODE_ZO, null);
     /** Values of stylesheet parameters. */
     public static final ValueOption STYLESHEET_PARAMS =
         new ValueOption("stylesheet-params", QNAME_MAP, null);

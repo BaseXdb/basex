@@ -569,7 +569,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final GNode toGNode(final Item item) throws QueryException {
     if(item instanceof final GNode node) return node;
-    throw typeError(item, GNODE, info);
+    throw typeError(item, NODE, info);
   }
 
   /**
@@ -627,7 +627,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final XNode toNode(final Item item) throws QueryException {
     if(item instanceof final XNode node) return node;
-    throw typeError(item, NODE, info);
+    throw typeError(item, XNODE, info);
   }
 
   /**

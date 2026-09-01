@@ -109,11 +109,11 @@ public final class JNodeTest extends Test {
 
   @Override
   public Boolean subsumes(final Type type) {
-    // [ 'yes ']/self::gnode();
-    if(kind == Kind.GNODE) return Boolean.TRUE;
+    // [ 'yes ']/self::node();
+    if(kind == Kind.NODE) return Boolean.TRUE;
     // (<who/>, [ 'knows' ])/self::jnode(no-one)
     final Kind kn = type.kind();
-    if(kn == null || kn == Kind.GNODE) return null;
+    if(kn == null || kn == Kind.NODE) return null;
     // <no/>/self::jnode(no)
     if(kn != kind) return Boolean.FALSE;
     // { 'yes': () }/self::jnode(yes), { 'maybe': () }/self::jnode(no)
@@ -138,7 +138,7 @@ public final class JNodeTest extends Test {
 
   @Override
   public Test intersect(final Test test) {
-    if(test == NodeTest.GNODE) return this;
+    if(test == NodeTest.NODE) return this;
     if(test instanceof final JNodeTest jt) {
       final SeqType ct = valueType.intersect(jt.valueType);
       if(ct == null) return null;

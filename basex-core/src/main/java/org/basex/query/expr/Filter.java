@@ -285,7 +285,7 @@ public abstract class Filter extends Preds {
       final Expr ex = root.simplifyFor(mode, cc);
       if(ex != root) expr = get(cc, info, ex, exprs);
     } else if(mode == Simplify.COUNT && exprs.length == 1 &&
-        exprs[0].seqType().instanceOf(Types.NODE_ZO)) {
+        exprs[0].seqType().instanceOf(Types.XNODE_ZO)) {
       // $nodes[@attr] → $nodes ! @attr
       expr = SimpleMap.get(cc, info, root, exprs[0]);
     }

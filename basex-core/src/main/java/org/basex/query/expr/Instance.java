@@ -109,7 +109,7 @@ public final class Instance extends Single {
     // a self step cannot express the check if the data model of the input is unknown:
     // (<a/>, jtree({})) [. instance of node()]
     if(expr instanceof ContextValue && expr.seqType().type instanceof final NodeType it &&
-        it.kind() != Kind.GNODE && seqType.type instanceof final NodeType nt) {
+        it.kind() != Kind.NODE && seqType.type instanceof final NodeType nt) {
       // E[. instance of element(a)] → E[self::a]
       final Test test = nt.test;
       final Expr step = Step.self(cc, null, info, test != null ? test : NodeTest.get(nt.kind()));

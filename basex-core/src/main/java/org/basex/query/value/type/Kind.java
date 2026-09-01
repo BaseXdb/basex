@@ -27,16 +27,16 @@ import org.w3c.dom.Text;
  */
 public enum Kind {
   /** GNode. */
-  GNODE("gnode", null, ID.GND),
+  NODE("node", null, ID.NOD),
 
   /** JNode. */
-  JNODE("jnode", GNODE, ID.JND),
+  JNODE("jnode", NODE, ID.JND),
 
-  /** Node. */
-  NODE("node", GNODE, ID.NOD),
+  /** XNode. */
+  XNODE("xnode", NODE, ID.XND),
 
   /** Text. */
-  TEXT("text", NODE, ID.TXT) {
+  TEXT("text", XNODE, ID.TXT) {
     @Override
     public XNode cast(final Object value, final InputInfo info) {
       if(value instanceof final BXText text) return text.getNode();
@@ -46,7 +46,7 @@ public enum Kind {
   },
 
   /** Processing instruction. */
-  PROCESSING_INSTRUCTION("processing-instruction", NODE, ID.PI) {
+  PROCESSING_INSTRUCTION("processing-instruction", XNODE, ID.PI) {
     @Override
     public XNode cast(final Object value, final InputInfo info) throws QueryException {
       if(value instanceof final BXPI pi) return pi.getNode();
@@ -57,7 +57,7 @@ public enum Kind {
   },
 
   /** Element. */
-  ELEMENT("element", NODE, ID.ELM) {
+  ELEMENT("element", XNODE, ID.ELM) {
     @Override
     public GNode cast(final Object value, final InputInfo info) throws QueryException {
       if(value instanceof final BXElem elem)
@@ -73,7 +73,7 @@ public enum Kind {
   },
 
   /** Document. */
-  DOCUMENT("document-node", NODE, ID.DOC) {
+  DOCUMENT("document-node", XNODE, ID.DOC) {
     @Override
     public XNode cast(final Object value, final InputInfo info) throws QueryException {
       if(value instanceof final BXDoc doc) return doc.getNode();
@@ -95,7 +95,7 @@ public enum Kind {
   },
 
   /** Attribute. */
-  ATTRIBUTE("attribute", NODE, ID.ATT) {
+  ATTRIBUTE("attribute", XNODE, ID.ATT) {
     @Override
     public XNode cast(final Object value, final InputInfo info) throws QueryException {
       if(value instanceof final BXAttr attr) return attr.getNode();
@@ -106,7 +106,7 @@ public enum Kind {
   },
 
   /** Comment. */
-  COMMENT("comment", NODE, ID.COM) {
+  COMMENT("comment", XNODE, ID.COM) {
     @Override
     public XNode cast(final Object value, final InputInfo info) throws QueryException {
       if(value instanceof final BXComm comm) return comm.getNode();
@@ -117,13 +117,13 @@ public enum Kind {
   },
 
   /** Namespace. */
-  NAMESPACE("namespace-node", NODE, ID.NSP),
+  NAMESPACE("namespace-node", XNODE, ID.NSP),
 
   /** Schema-element. */
-  SCHEMA_ELEMENT("schema-element", NODE, ID.SCE),
+  SCHEMA_ELEMENT("schema-element", XNODE, ID.SCE),
 
   /** Schema-attribute. */
-  SCHEMA_ATTRIBUTE("schema-attribute", NODE, ID.SCA);
+  SCHEMA_ATTRIBUTE("schema-attribute", XNODE, ID.SCA);
 
   /** Name. */
   final byte[] name;
@@ -210,7 +210,7 @@ public enum Kind {
   public final Kind union(final Kind kind) {
     if(kind.instanceOf(this)) return this;
     if(parent != null) return parent.union(kind);
-    return GNODE;
+    return NODE;
   }
 
   /**

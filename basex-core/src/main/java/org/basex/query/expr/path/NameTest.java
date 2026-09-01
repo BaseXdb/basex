@@ -81,7 +81,7 @@ public final class NameTest extends Test {
     this.scope = scope;
     this.ns = ns != null ? ns : Token.EMPTY;
     if(scope == Scope.LOCAL) name = qname.local();
-    jkey = scope == Scope.FLEXIBLE && kind == Kind.GNODE ? JNodeTest.key(qname) : null;
+    jkey = scope == Scope.FLEXIBLE && kind == Kind.NODE ? JNodeTest.key(qname) : null;
   }
 
   @Override
@@ -92,8 +92,9 @@ public final class NameTest extends Test {
   @Override
   public Test optimize(final Kind kn, final Data data) {
     // create more specific test
-    if(kn != null && kind == Kind.GNODE) {
-      final Kind k = kn == Kind.JNODE ? Kind.JNODE : kn.instanceOf(Kind.NODE) ? Kind.ELEMENT : null;
+    if(kn != null && kind == Kind.NODE) {
+      final Kind k = kn == Kind.JNODE ? Kind.JNODE : kn.instanceOf(Kind.XNODE) ? Kind.ELEMENT :
+        null;
       if(k != null) return get(k, qname, scope, ns).optimize(kn, data);
     }
 
@@ -106,7 +107,7 @@ public final class NameTest extends Test {
       // no default namespace anywhere: discard no-namespace name test if its local name is unknown
       // (the test is not reduced to local, as a prefixed name may share the same local name)
       if(scope.oneOf(Scope.FLEXIBLE, Scope.FULL) && !qname.hasURI() &&
-          !kind.oneOf(Kind.GNODE, Kind.PROCESSING_INSTRUCTION) &&
+          !kind.oneOf(Kind.NODE, Kind.PROCESSING_INSTRUCTION) &&
           (kind == Kind.ATTRIBUTE || ns.length == 0) && !data.usesDefaultNs()) {
         final byte[] local = qname.local();
         final Names names = kind == Kind.ELEMENT ? data.elemNames : data.attrNames;
@@ -119,13 +120,13 @@ public final class NameTest extends Test {
     // check if test may yield results
     if(scope.oneOf(Scope.FLEXIBLE, Scope.FULL) && !qname.hasURI()) {
       // element and db default namespaces are different: no results
-      if(!kind.oneOf(Kind.GNODE, Kind.ATTRIBUTE) && !Token.eq(dataNs, ns)) return null;
+      if(!kind.oneOf(Kind.NODE, Kind.ATTRIBUTE) && !Token.eq(dataNs, ns)) return null;
       // namespace is irrelevant/identical: only check local name
       name = qname.local();
     }
 
     // check if local element/attribute names occur in database
-    if(!kind.oneOf(Kind.GNODE, Kind.PROCESSING_INSTRUCTION) && name != null) {
+    if(!kind.oneOf(Kind.NODE, Kind.PROCESSING_INSTRUCTION) && name != null) {
       final Names names = kind == Kind.ELEMENT ? data.elemNames : data.attrNames;
       if(!names.contains(name) && !names.contains(Token.concat(Token.XML, ':', name))) return null;
     }
@@ -139,7 +140,7 @@ public final class NameTest extends Test {
 
   @Override
   public boolean matches(final GNode node) {
-    if(kind != Kind.GNODE && kind != node.kind()) return false;
+    if(kind != Kind.NODE && kind != node.kind()) return false;
 
     if(node instanceof final JNode jnode) {
       // JNodes
@@ -176,10 +177,10 @@ public final class NameTest extends Test {
   @Override
   public Boolean subsumes(final Type type) {
     // specific type unknown at compile time
-    if(kind == Kind.GNODE) return null;
+    if(kind == Kind.NODE) return null;
     // (<who/>, [ 'knows' ])/self::no-one
     final Kind kn = type.kind();
-    if(kn == null || kn.oneOf(Kind.GNODE, Kind.NODE)) return null;
+    if(kn == null || kn.oneOf(Kind.NODE, Kind.XNODE)) return null;
     // text { 'no' }/self::no, [ 'no' ]/self::no
     if(kn != kind) return Boolean.FALSE;
     // <yes/>/self::yes, <maybe/>/self::no
@@ -208,7 +209,7 @@ public final class NameTest extends Test {
 
   @Override
   public Test intersect(final Test test) {
-    if(test == NodeTest.GNODE || test == this) return this;
+    if(test == NodeTest.NODE || test == this) return this;
     if(test instanceof final NameTest nt) {
       if(kind == nt.kind) {
         if(scope == Scope.ALL) {
@@ -241,7 +242,7 @@ public final class NameTest extends Test {
   @Override
   public String toString(final boolean type) {
     final String string = nameString();
-    return type && kind == Kind.GNODE ? "(jnode(" + string + ")|element(" + string + "))" :
+    return type && kind == Kind.NODE ? "(jnode(" + string + ")|element(" + string + "))" :
       type || kind.oneOf(Kind.PROCESSING_INSTRUCTION, Kind.ATTRIBUTE) ? kind.toString(string) :
       string;
   }

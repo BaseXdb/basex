@@ -13,7 +13,7 @@ import org.basex.util.*;
  */
 public class NodeTest extends Test {
   /** GNode test. */
-  public static final NodeTest GNODE = new NodeTest(Kind.GNODE) {
+  public static final NodeTest NODE = new NodeTest(Kind.NODE) {
     @Override
     public boolean matches(final GNode node) { return true; }
     @Override
@@ -27,7 +27,7 @@ public class NodeTest extends Test {
     public boolean matches(final GNode node) { return node.kind() == Kind.JNODE; }
   };
   /** XNode test. */
-  public static final NodeTest NODE = new NodeTest(Kind.NODE) {
+  public static final NodeTest XNODE = new NodeTest(Kind.XNODE) {
     @Override
     public boolean matches(final GNode node) { return node.kind() != Kind.JNODE; }
   };
@@ -64,9 +64,9 @@ public class NodeTest extends Test {
    */
   public static NodeTest get(final Kind kind) {
     return switch(kind) {
-      case GNODE                  -> GNODE;
-      case JNODE                  -> JNODE;
       case NODE                   -> NODE;
+      case JNODE                  -> JNODE;
+      case XNODE                  -> XNODE;
       case DOCUMENT               -> DOCUMENT;
       case ELEMENT                -> ELEMENT;
       case ATTRIBUTE              -> ATTRIBUTE;
@@ -85,8 +85,8 @@ public class NodeTest extends Test {
 
   @Override
   public Test optimize(final Kind kn, final Data data) {
-    if(kind == Kind.GNODE && kn != null && kn != kind) {
-      return get(kn == Kind.JNODE  ? Kind.JNODE : Kind.NODE);
+    if(kind == Kind.NODE && kn != null && kn != kind) {
+      return get(kn == Kind.JNODE  ? Kind.JNODE : Kind.XNODE);
     }
     return this;
   }
@@ -98,20 +98,20 @@ public class NodeTest extends Test {
 
   @Override
   public Boolean subsumes(final Type type) {
-    // <yes/>/self::gnode();
-    if(kind == Kind.GNODE) return Boolean.TRUE;
-    // (<who/>, [ 'knows' ])/self::node()
+    // <yes/>/self::node();
+    if(kind == Kind.NODE) return Boolean.TRUE;
+    // (<who/>, [ 'knows' ])/self::xnode()
     final Kind kn = type.kind();
     if(kn == null) return null;
     // <yes/>/self::yes, [ 'yes' ]/self::jnode()
     if(kn == kind) return Boolean.TRUE;
     // <no/>/self::jnode()
-    if(kind == Kind.JNODE) return kn != Kind.GNODE ? Boolean.FALSE : null;
-    // [ 'no' ]/self::node(), <yes/>/self::node()
-    if(kind == Kind.NODE)
-      return kn == Kind.JNODE ? Boolean.FALSE : kn != Kind.GNODE ? Boolean.TRUE : null;
+    if(kind == Kind.JNODE) return kn != Kind.NODE ? Boolean.FALSE : null;
+    // [ 'no' ]/self::xnode(), <yes/>/self::xnode()
+    if(kind == Kind.XNODE)
+      return kn == Kind.JNODE ? Boolean.FALSE : kn != Kind.NODE ? Boolean.TRUE : null;
     // <no/>/self::text()
-    return !kn.oneOf(Kind.NODE, Kind.GNODE) ? Boolean.FALSE : null;
+    return !kn.oneOf(Kind.XNODE, Kind.NODE) ? Boolean.FALSE : null;
   }
 
   @Override
@@ -124,10 +124,10 @@ public class NodeTest extends Test {
       return test.intersect(this);
     } else {
       // a intersect element() → a
-      if(kind == test.kind || kind == Kind.GNODE) return test;
-      if(test.kind == Kind.GNODE && kind.oneOf(Kind.NODE, Kind.JNODE, Kind.ELEMENT))
+      if(kind == test.kind || kind == Kind.NODE) return test;
+      if(test.kind == Kind.NODE && kind.oneOf(Kind.XNODE, Kind.JNODE, Kind.ELEMENT))
         return test.optimize(kind, null);
-      if(kind == Kind.NODE && test.kind != Kind.JNODE) return test;
+      if(kind == Kind.XNODE && test.kind != Kind.JNODE) return test;
     }
     return null;
   }

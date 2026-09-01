@@ -126,8 +126,8 @@ public final class ChoiceItemType implements Type {
     if(type == BasicType.NUMERIC) return Types.NUMERIC_EXPANSION;
     if(type == BasicType.ANY_ATOMIC_TYPE) return Types.ANY_ATOMIC_TYPE_EXPANSION;
     if(type == BasicType.ITEM) return Types.ITEM_EXPANSION;
+    if(type == NodeType.XNODE) return Types.XNODE_EXPANSION;
     if(type == NodeType.NODE) return Types.NODE_EXPANSION;
-    if(type == NodeType.GNODE) return Types.GNODE_EXPANSION;
     return type;
   }
 

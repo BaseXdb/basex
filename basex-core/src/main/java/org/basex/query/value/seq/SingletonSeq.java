@@ -107,7 +107,7 @@ public final class SingletonSeq extends Seq {
     Expr expr = this;
     if(mode == Simplify.DISTINCT || mode == Simplify.PREDICATE && type.isNumber()) {
       expr = value;
-    } else if(mode == Simplify.STRING && type.instanceOf(NodeType.NODE)) {
+    } else if(mode == Simplify.STRING && type.instanceOf(NodeType.XNODE)) {
       expr = get((Value) value.simplifyFor(mode, cc), count());
     } else if(mode.oneOf(Simplify.DATA, Simplify.NUMBER)) {
       final Type at = type.atomic();

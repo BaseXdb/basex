@@ -28,11 +28,11 @@ public final class NodeType implements Type {
   }
 
   /** Node type: GNode. */
-  public static final NodeType GNODE = TYPES.get(Kind.GNODE);
+  public static final NodeType NODE = TYPES.get(Kind.NODE);
   /** Node type: JNode. */
   public static final NodeType JNODE = TYPES.get(Kind.JNODE);
-  /** Node type: node. */
-  public static final NodeType NODE = TYPES.get(Kind.NODE);
+  /** Node type: XNode. */
+  public static final NodeType XNODE = TYPES.get(Kind.XNODE);
   /** Node type: text. */
   public static final NodeType TEXT = TYPES.get(Kind.TEXT);
   /** Node type: processing instruction. */
@@ -117,7 +117,7 @@ public final class NodeType implements Type {
 
   @Override
   public boolean isStringOrUntyped() {
-    return !kind.oneOf(Kind.GNODE, Kind.JNODE);
+    return !kind.oneOf(Kind.NODE, Kind.JNODE);
   }
 
   @Override
@@ -160,7 +160,7 @@ public final class NodeType implements Type {
 
   @Override
   public boolean instanceOf(final Type type) {
-    if(type == this || type == BasicType.ITEM || type == GNODE) return true;
+    if(type == this || type == BasicType.ITEM || type == NODE) return true;
     if(type instanceof final NodeType nt) {
       if(!kind.instanceOf(nt.kind)) return false;
       return nt.test == null || test != null && test.instanceOf(nt.test);
@@ -198,8 +198,8 @@ public final class NodeType implements Type {
 
   @Override
   public BasicType atomic() {
-    return kind.oneOf(Kind.GNODE, Kind.JNODE) ? null :
-      kind == Kind.NODE ? BasicType.ANY_ATOMIC_TYPE :
+    return kind.oneOf(Kind.NODE, Kind.JNODE) ? null :
+      kind == Kind.XNODE ? BasicType.ANY_ATOMIC_TYPE :
       kind.oneOf(Kind.PROCESSING_INSTRUCTION, Kind.COMMENT, Kind.NAMESPACE) ? BasicType.STRING :
       BasicType.UNTYPED_ATOMIC;
   }
@@ -211,7 +211,7 @@ public final class NodeType implements Type {
 
   @Override
   public boolean refinable() {
-    return kind == Kind.NODE;
+    return kind == Kind.XNODE;
   }
 
   @Override
