@@ -410,7 +410,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   IS_NAN(FnIsNaN::new, "is-NaN(value)", params(ANY_ATOMIC_TYPE_O), BOOLEAN_O),
   /** XQuery function. */
-  ITEMS_AT(FnItemsAt::new, "items-at(input, at, sorted?)",
+  ITEMS_AT(FnItemsAt::new, "items-at(input, at, ~sorted?)",
       params(ITEM_ZM, NUMERIC_ZM, BOOLEAN_ZO), ITEM_ZM),
   /** XQuery function. */
   JKEY(FnJkey::new, "jkey(input?)",
@@ -604,7 +604,7 @@ public enum Function implements AFunction {
   REPLACE(FnReplace::new, "replace(value, pattern, replacement?, flags?)",
       params(STRING_ZO, STRING_O, FnReplace.REPLACEMENT_TYPE, STRING_ZO), STRING_O),
   /** XQuery function. */
-  REPLICATE(FnReplicate::new, "replicate(input, count, multiple?)",
+  REPLICATE(FnReplicate::new, "replicate(input, count, ~multiple?)",
       params(ITEM_ZM, INTEGER_O, BOOLEAN_ZO), ITEM_ZM),
   /** XQuery function. */
   RESOLVE_QNAME(FnResolveQName::new, "resolve-QName(value, element)",
@@ -774,7 +774,7 @@ public enum Function implements AFunction {
   URI_COLLECTION(FnUriCollection::new, "uri-collection(source?)",
       params(STRING_ZO), ANY_URI_ZM, flag(NDT)),
   /** XQuery function. */
-  VOID(FnVoid::new, "void(input?, skip?)",
+  VOID(FnVoid::new, "void(input?, ~skip?)",
       params(ITEM_ZM, BOOLEAN_ZO), EMPTY_SEQUENCE_Z, flag(NDT)),
   /** XQuery function. */
   WHILE_DO(FnWhileDo::new, "while-do(input, predicate, action)",
@@ -1546,11 +1546,11 @@ public enum Function implements AFunction {
   _FILE_READ_BINARY(FileReadBinary::new, "read-binary(file, offset?, length?)",
       params(STRING_O, INTEGER_ZO, INTEGER_ZO), BASE64_BINARY_O, flag(NDT), FILE_URI, Perm.CREATE),
   /** XQuery function. */
-  _FILE_READ_TEXT(FileReadText::new, "read-text(file, options?, fallback?)",
+  _FILE_READ_TEXT(FileReadText::new, "read-text(file, options?, ~fallback?)",
       params(STRING_O, ITEM_ZO, BOOLEAN_ZO), STRING_O, flag(NDT), FILE_URI, Perm.CREATE),
   /** XQuery function. */
   _FILE_READ_TEXT_LINES(FileReadTextLines::new,
-      "read-text-lines(file, options?, fallback?, offset?, length?)",
+      "read-text-lines(file, options?, ~fallback?, ~offset?, ~length?)",
       params(STRING_O, ITEM_ZO, BOOLEAN_ZO, INTEGER_ZO, INTEGER_ZO),
       STRING_ZM, flag(NDT), FILE_URI, Perm.CREATE),
   /** XQuery function. */

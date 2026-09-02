@@ -31,6 +31,8 @@ public final class FuncDefinition {
   final Supplier<? extends StandardFunc> supplier;
   /** Minimum and maximum number of arguments. */
   final int[] minMax;
+  /** Number of parameters that are not hidden. */
+  final int visible;
   /** Minimum permission. */
   final Perm perm;
 
@@ -43,8 +45,9 @@ public final class FuncDefinition {
    * Constructs a function signature.
    * @param supplier function implementation constructor
    * @param string descriptive function string, containing the function name and its arguments
-   *   in parentheses. Optional arguments are suffixed with a question mark; three dots
-   *   indicate that the number of arguments of a function is not limited
+   *   in parentheses. Optional arguments are suffixed with a question mark, hidden arguments are
+   *   prefixed with a tilde; three dots indicate that the number of arguments of a function is
+   *   not limited
    * @param types parameter types
    * @param seqType return type
    * @param flags static function properties
@@ -62,13 +65,25 @@ public final class FuncDefinition {
     this.perm = perm;
 
     name = name(string, uri);
-    paramString = paramString(string);
-    minMax = minMax(paramString);
+    final String allParams = paramString(string);
+    minMax = minMax(allParams);
 
-    final String[] prms = split(paramString);
+    final String[] prms = split(allParams);
     final int pl = prms.length;
     params = new QNm[pl];
-    for(int p = 0; p < pl; p++) params[p] = new QNm(prms[p].replaceAll("(\\?|\\.\\.\\.)$", ""));
+    final StringBuilder sb = new StringBuilder();
+    int vsbl = 0;
+    for(int p = 0; p < pl; p++) {
+      final String prm = prms[p];
+      final boolean hidden = Strings.startsWith(prm, '~');
+      if(!hidden) {
+        if(vsbl++ > 0) sb.append(", ");
+        sb.append(prm);
+      }
+      params[p] = new QNm((hidden ? prm.substring(1) : prm).replaceAll("(\\?|\\.\\.\\.)$", ""));
+    }
+    visible = vsbl;
+    paramString = sb.toString();
 
     // treat updating expressions as nondeterministic
     if(flags.contains(Flag.UPD)) flags.add(Flag.NDT);
@@ -166,7 +181,7 @@ public final class FuncDefinition {
   }
 
   /**
-   * Returns the descriptive parameter string.
+   * Returns the descriptive parameter string, excluding hidden parameters.
    * @return parameter string
    */
   public String paramString() {

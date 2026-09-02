@@ -95,7 +95,7 @@ public final class Functions {
     final FuncDefinition fd = builtIn(name);
     if(fd != null) {
       final int min = fd.minMax[0], max = fd.minMax[1];
-      final Expr[] prepared = prepareArgs(fb, fd.params, min, max, fd);
+      final Expr[] prepared = prepareArgs(fb, fd.params, min, max, fd.visible, fd);
       final StandardFunc sf = fd.get(fb.info, prepared);
       if(sf.hasUPD()) qc.updating();
       return sf;
@@ -124,7 +124,7 @@ public final class Functions {
       final int arity = fe.arity();
       final QNm[] names = new QNm[arity];
       for(int a = 0; a < arity; ++a) names[a] = fe.paramName(a);
-      args = prepareArgs(fb, names, expr);
+      args = prepareArgs(fb, names, arity, expr);
       if(ph > 0) phPerm = preparePlaceholders(fb, names, args);
     }
 
@@ -161,7 +161,7 @@ public final class Functions {
     // built-in function
     final FuncDefinition fd = builtIn(name);
     if(fd != null) {
-      final IntList arts = checkArity(arity, fd.minMax[0], fd.minMax[1]);
+      final IntList arts = checkArity(arity, fd.minMax[0], fd.minMax[1], fd.visible);
       if(arts != null) throw wrongArity(arity, arts, true, info, fd);
 
       final FuncType ft = fd.type(arity, fb.anns);
@@ -251,12 +251,13 @@ public final class Functions {
    * Incorporates keywords in the argument list.
    * @param fb function arguments
    * @param names parameter names
+   * @param visible number of parameter names to be reported
    * @param function function (for error messages)
    * @return arguments
    * @throws QueryException query exception
    */
-  static Expr[] prepareArgs(final FuncBuilder fb, final QNm[] names, final Object function)
-      throws QueryException {
+  static Expr[] prepareArgs(final FuncBuilder fb, final QNm[] names, final int visible,
+      final Object function) throws QueryException {
 
     final ExprList list = new ExprList(fb.args());
     final int nl = names.length;
@@ -264,7 +265,8 @@ public final class Functions {
       int n = nl;
       while(--n >= 0 && !qnm.eq(names[n]));
       if(n == -1) {
-        final QNm similar = Levenshtein.similarOrPrefix(qnm.local(), names, QNm::local);
+        final QNm similar = Levenshtein.similarOrPrefix(qnm.local(),
+            Arrays.copyOf(names, visible), QNm::local);
         throw PARAMUNKNOWN_X_X.get(fb.info, function, QueryError.similar(qnm.prefixString(),
             similar != null ? similar.prefixString() : null));
       }
@@ -288,7 +290,7 @@ public final class Functions {
     if(type.oneOf(BasicType.NOTATION, BasicType.ANY_ATOMIC_TYPE))
       throw ABSTRACTFUNC_X.get(fb.info, name.prefixId());
 
-    final Expr[] prepared = prepareArgs(fb, CAST_PARAM, 0, 1, name.string());
+    final Expr[] prepared = prepareArgs(fb, CAST_PARAM, 0, 1, 1, name.string());
     return new Cast(fb.info, prepared.length != 0 ? prepared[0] :
       new ContextValue(fb.info), type.seqType(Occ.ZERO_OR_ONE));
   }
@@ -341,11 +343,25 @@ public final class Functions {
    * @return arities or {@code null}
    */
   public static IntList checkArity(final long nargs, final int min, final int max) {
+    return checkArity(nargs, min, max, max);
+  }
+
+  /**
+   * Checks if the specified number of arguments matches the allowed min/max range.
+   * If not, returns an array with the allowed numbers of parameters.
+   * @param nargs number of supplied arguments
+   * @param min minimum number of allowed arguments
+   * @param max maximum number of allowed arguments
+   * @param visible maximum number of arguments to be reported
+   * @return arities or {@code null}
+   */
+  public static IntList checkArity(final long nargs, final int min, final int max,
+      final int visible) {
     if(nargs >= min && nargs <= max) return null;
 
     final IntList arities = new IntList();
     if(max != Integer.MAX_VALUE) {
-      for(int m = min; m <= max; m++) arities.add(m);
+      for(int m = min; m <= visible; m++) arities.add(m);
     } else {
       arities.add(-min);
     }
@@ -391,14 +407,16 @@ public final class Functions {
    * @param names parameter names
    * @param min minimum number of allowed arguments
    * @param max maximum number of allowed arguments
+   * @param visible number of parameters that are not hidden
    * @param function function (for error messages)
    * @return arguments
    * @throws QueryException query exception
    */
   private static Expr[] prepareArgs(final FuncBuilder fb, final QNm[] names, final int min,
-      final int max, final Object function) throws QueryException {
+      final int max, final int visible, final Object function) throws QueryException {
 
-    final Expr[] args = fb.keywords != null ? prepareArgs(fb, names, function) : fb.args();
+    final Expr[] args = fb.keywords != null ? prepareArgs(fb, names, visible, function) :
+      fb.args();
     final int arity = args.length;
     for(int a = arity - 1; a >= 0; a--) {
       if(args[a] == null) {
@@ -406,7 +424,7 @@ public final class Functions {
         args[a] = Empty.UNDEFINED;
       }
     }
-    final IntList arities = checkArity(arity, min, max);
+    final IntList arities = checkArity(arity, min, max, visible);
     if(arities != null) throw wrongArity(arity, arities, false, fb.info, function);
     return args;
   }
