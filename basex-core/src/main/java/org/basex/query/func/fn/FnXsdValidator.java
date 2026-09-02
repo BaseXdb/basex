@@ -300,8 +300,8 @@ public final class FnXsdValidator extends StandardFunc {
         if(error.url != null || error.line > 0 || error.column > 0) {
           map.put("location", XQMap.get(Records.LOCATION.get(),
             error.url != null ? Uri.get(error.url) : Empty.VALUE, Empty.VALUE,
-            error.line > 0 ? Itr.get(error.line, BasicType.POSITIVE_INTEGER) : Empty.VALUE,
-            error.column > 0 ? Itr.get(error.column, BasicType.POSITIVE_INTEGER) : Empty.VALUE));
+            error.line > 0 ? Itr.get(error.line) : Empty.VALUE,
+            error.column > 0 ? Itr.get(error.column) : Empty.VALUE));
         }
         vb.add(map.map());
       }

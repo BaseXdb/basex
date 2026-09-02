@@ -77,7 +77,6 @@ public abstract class CsvSerializer extends StandardSerializer {
         "Parameters '%' and '%' must differ.", SerializerOptions.CSV_SEPARATOR.name(),
         SerializerOptions.CSV_QUOTE_CHARACTER.name()));
     selectColumns = copts.get(CsvOptions.SELECT_COLUMNS);
-    maxCol = -1;
     for(final int col : selectColumns) {
       if(col > maxCol) maxCol = col;
     }
@@ -119,15 +118,16 @@ public abstract class CsvSerializer extends StandardSerializer {
    */
   final void record(final TokenList entries, final boolean reset) throws IOException {
     int f = 0;
-    if(maxCol < 0) {
+    if(selectColumns.length == 0) {
       for(final byte[] val : entries) field(f++, val);
     } else {
       final byte[][] row = new byte[maxCol][];
       int i = 0;
       for(final byte[] val : entries) {
         if(i == selectColumns.length) break;
+        // non-positive columns are ignored
         final int j = selectColumns[i++] - 1;
-        if(row[j] == null) row[j] = val;
+        if(j >= 0 && row[j] == null) row[j] = val;
       }
       for(final byte[] val : row) {
         field(f++, val == null ? Token.EMPTY : val);

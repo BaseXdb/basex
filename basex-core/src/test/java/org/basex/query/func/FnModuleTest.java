@@ -547,7 +547,8 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("amp"), "&");
     query(func.args("Tab"), "\t");
 
-    error(func.args(0), INVTYPE_X);
+    error(func.args(0), CHARINV_X);
+    error(func.args(-1), CHARINV_X);
     error(func.args(" 0xD800"), CHARINV_X);
     error(func.args(" 0x110000"), CHARINV_X);
     error(func.args(11111111111111L), CHARINV_X);
@@ -4190,6 +4191,15 @@ return
       + "\"13.99\"],[\"2023-07-20\",\"Alice\",\"Aachen\",\"15.00\",\"\",\"\"],[\"2023-07-20\","
       + "\"Charlie\",\"Celle\",\"15.00\",\"GBP\",\"11.99\"]),\"get\":\"(: function :)\"}\n"
       + "11.99");
+
+    // indexes outside the range of the input yield empty fields
+    final String input = " 'a,b,c' || char(10) || 'p,q,r'";
+    query(func.args(input, " { 'select-columns': (3, 0, -1) }") + "?rows",
+        "[\"c\",\"\",\"\"]\n[\"r\",\"\",\"\"]");
+    query(func.args(input) + "?get(0, 1)", "");
+    query(func.args(input) + "?get(-1, 1)", "");
+    query(func.args(input) + "?get(1, 0)", "");
+    query(func.args(input) + "?get(1, -1)", "");
   }
 
   /** Test method. */
@@ -4442,6 +4452,11 @@ return
     query("let $f := " + func.args(" dateTime#2", " {2: xs:time('00:00:00')}") + " return $f("
         + "xs:date('2025-03-01'))", "2025-03-01T00:00:00");
     error(func.args(" name#1", " {1: 42}"), INVTYPE_X);
+
+    // keys outside the arity range are ignored
+    query("let $f := " + func.args(" concat#2", " {0: 'x'}") + " return $f('a', 'b')", "ab");
+    query("let $f := " + func.args(" concat#2", " {-1: 'x'}") + " return $f('a', 'b')", "ab");
+    query("let $f := " + func.args(" concat#2", " {3: 'x'}") + " return $f('a', 'b')", "ab");
   }
 
   /** Test method. */
@@ -6486,6 +6501,7 @@ return
     query(func.args(), "1970-01-01T00:00:00Z");
     query(func.args(0), "1970-01-01T00:00:00Z");
     query(func.args(86400000), "1970-01-02T00:00:00Z");
+    query(func.args(-86400000), "1969-12-31T00:00:00Z");
   }
 
   /** Test method. */
@@ -6825,7 +6841,7 @@ return
     query("exists(" + details + invalid + "?error-details?message)", true);
     query(details + invalid + "?error-details?location instance of fn:location-record+", true);
     query(details + invalid + "?error-details[1]?location?line-number"
-        + " instance of xs:positiveInteger", true);
+        + " instance of xs:integer", true);
     // the result of an invalid document is discarded while it is still being built
     query("exists(" + details + "(document { <distance>8.5km</distance> })?error-details)", true);
 
