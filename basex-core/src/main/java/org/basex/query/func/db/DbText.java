@@ -32,9 +32,14 @@ public class DbText extends DbAccessFn {
   }
 
   @Override
+  protected final void simplifyArgs(final CompileContext cc) throws QueryException {
+    // db:text($db, distinct-values($values)) → db:text($db, $values)
+    arg(1, arg -> arg.simplifyFor(Simplify.DATA, cc).simplifyFor(Simplify.DISTINCT, cc));
+  }
+
+  @Override
   protected final Expr opt(final CompileContext cc) throws QueryException {
     compileData(cc);
-    arg(1, arg -> arg.simplifyFor(Simplify.DATA, cc).simplifyFor(Simplify.DISTINCT, cc));
 
     // count number of results
     final Data data = data();

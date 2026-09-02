@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -111,6 +112,22 @@ public final class Otherwise extends Arr {
     exprType.assign(st != null ? st.type : BasicType.ITEM, occ).data(exprs);
 
     return this;
+  }
+
+  @Override
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    // data(<a>{ $x }</a> otherwise <b/>) → data(xs:untypedAtomic($x) otherwise <b/>)
+    // EBV: all but the last operand must stay, as their emptiness selects the result
+    final int el = exprs.length;
+    Expr[] tmp = null;
+    for(int e = mode.oneOf(Simplify.EBV, Simplify.PREDICATE) ? el - 1 : 0; e < el; e++) {
+      final Expr expr = exprs[e].simplifyFor(mode, cc);
+      if(expr != exprs[e]) {
+        if(tmp == null) tmp = exprs.clone();
+        tmp[e] = expr;
+      }
+    }
+    return cc.simplify(this, tmp != null ? new Otherwise(info, tmp).optimize(cc) : this, mode);
   }
 
   @Override

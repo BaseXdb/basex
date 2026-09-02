@@ -1,6 +1,7 @@
 package org.basex.query.expr;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.util.*;
 import org.basex.query.util.index.*;
 import org.basex.query.value.*;
@@ -55,6 +56,24 @@ public final class Extension extends Single {
   public Expr optimize(final CompileContext cc) {
     return pragma.simplify() && expr instanceof Value &&
         !expr.seqType().mayBeWrapped() ? expr : adoptType(expr);
+  }
+
+  @Override
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    // (# basex:lazy #) { <a>{ $x }</a> } = '' → (# basex:lazy #) { xs:string($x) } = ''
+    final Object state = pragma.init(cc.qc, info);
+    final Expr ex;
+    try {
+      ex = expr.simplifyFor(mode, cc);
+    } finally {
+      pragma.finish(cc.qc, state);
+    }
+    Expr simplified = this;
+    if(ex != expr) {
+      expr = ex;
+      simplified = optimize(cc);
+    }
+    return cc.simplify(this, simplified, mode);
   }
 
   @Override

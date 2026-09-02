@@ -82,6 +82,8 @@ public class FnMin extends StandardFunc {
     if(arg(0).seqType().type.isNumberOrUntyped()) {
       arg(0, arg -> arg.simplifyFor(Simplify.NUMBER, cc));
     }
+    // min(distinct-values($values)) → min($values)
+    arg(0, arg -> arg.simplifyFor(Simplify.DATA, cc).simplifyFor(Simplify.DISTINCT, cc));
   }
 
   @Override
@@ -97,8 +99,6 @@ public class FnMin extends StandardFunc {
    * @throws QueryException query exception
    */
   final Expr opt(final boolean min, final CompileContext cc) throws QueryException {
-    arg(0, arg -> arg.simplifyFor(Simplify.DATA, cc).simplifyFor(Simplify.DISTINCT, cc));
-
     // min(reverse($values)) → min($values), max(sort($values)) → max($values)
     final Expr reordered = reordered(arg(0));
     if(reordered != null) {

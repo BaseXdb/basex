@@ -67,14 +67,14 @@ public final class CompileContext {
      * Numeric arguments.
      * Requested by {@link Arith}, {@link CmpIR}, {@link Range}, {@link StandardFunc} and others.
      * Evaluated by {@link Cast}, {@link TypeCheck}, {@link CNode}, {@link FnData},
-     * {@link FnNumber}, {@link FnReplicate}.
+     * {@link FnReplicate}.
      */
     NUMBER,
     /**
      * Predicate checks.
      * Requested by {@link Preds}.
      * Evaluated by {@link Expr}, {@link FnData}, {@link Cast}, {@link TypeCheck},
-     * {@link SimpleMap}, {@link FnNumber}, {@link FnReplicate}.
+     * {@link SimpleMap}, {@link FnReplicate}.
      */
     PREDICATE,
     /**

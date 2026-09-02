@@ -38,10 +38,13 @@ public final class FnString extends ContextFn {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
+  protected void simplifyArgs(final CompileContext cc) throws QueryException {
     // string(data(E)) → string(E)
     exprs = simplifyAll(Simplify.STRING, cc);
+  }
 
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
     final boolean context = contextAccess();
     final Expr value = context ? cc.qc.focus.value : arg(0);
     if(value != null && value.seqType().eq(Types.STRING_O)) {

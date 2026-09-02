@@ -365,23 +365,11 @@ public abstract class SimpleMap extends Mapping {
   }
 
   @Override
-  public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
-      throws QueryException {
-
-    // do not simplify nondeterministic map, in order to preserve side effects
-    if(Checks.any(exprs, ex -> ex.has(Flag.NDT))) return this;
-
+  final Expr simplifyEbv(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
-    final int el = exprs.length;
-    final Expr last = exprs[el - 1], prev = exprs[el - 2];
-    if(mode.oneOf(Simplify.DATA, Simplify.NUMBER, Simplify.STRING, Simplify.COUNT,
-        Simplify.DISTINCT)) {
-      // distinct-values(@id ! data()) → distinct-values(@id)
-      final Expr lst = cc.get(prev, true, () -> last.simplifyFor(mode, cc));
-      if(lst != last) expr = get(cc, info, new ExprList(el).add(exprs).set(el - 1, lst).finish());
-    }
-
-    if(expr == this && mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
+    if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
+      final int el = exprs.length;
+      final Expr last = exprs[el - 1], prev = exprs[el - 2];
       if(seqType().zeroOrOne() && prev.seqType().type instanceof NodeType && last instanceof Bln) {
         // boolean(@id ! true()) → boolean(@id)
         expr = last == Bln.FALSE ? Bln.FALSE : remove(cc, el - 1);
@@ -390,7 +378,7 @@ public abstract class SimpleMap extends Mapping {
         expr = toPath(mode, cc);
       }
     }
-    return cc.simplify(this, expr, mode);
+    return expr;
   }
 
   @Override

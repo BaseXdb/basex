@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import java.util.function.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -60,6 +61,41 @@ public abstract class Mapping extends Arr {
    * @return result of check
    */
   abstract boolean items();
+
+  @Override
+  public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
+      throws QueryException {
+
+    // do not simplify nondeterministic operands, in order to preserve side effects
+    if(Checks.any(exprs, ex -> ex.has(Flag.NDT))) return this;
+
+    Expr expr = this;
+    final int el = exprs.length;
+    final Expr last = exprs[el - 1];
+    if(mode.oneOf(Simplify.DATA, Simplify.NUMBER, Simplify.STRING, Simplify.COUNT,
+        Simplify.DISTINCT)) {
+      // distinct-values(@id ! data()) → distinct-values(@id)
+      final Expr sx = cc.get(exprs[el - 2], items(), () -> last.simplifyFor(mode, cc));
+      if(sx != last) {
+        exprs[el - 1] = sx;
+        expr = optimize(cc);
+      }
+    }
+    if(expr == this) expr = simplifyEbv(mode, cc);
+    return cc.simplify(this, expr, mode);
+  }
+
+  /**
+   * Simplifies the expression for EBV and predicate checks.
+   * @param mode mode of simplification
+   * @param cc compilation context
+   * @return simplified or original expression
+   * @throws QueryException query exception
+   */
+  @SuppressWarnings("unused")
+  Expr simplifyEbv(final Simplify mode, final CompileContext cc) throws QueryException {
+    return this;
+  }
 
   @Override
   public final boolean has(final Flag... flags) {

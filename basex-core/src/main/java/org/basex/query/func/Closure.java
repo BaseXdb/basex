@@ -9,6 +9,7 @@ import java.util.function.*;
 
 import org.basex.core.*;
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
@@ -268,6 +269,25 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       }
     }
     return copy.optimize(cc);
+  }
+
+  /**
+   * Simplifies the function body.
+   * @param mode mode of simplification
+   * @param cc compilation context
+   * @return simplified or original function
+   * @throws QueryException query exception
+   */
+  public Expr simplifyBody(final Simplify mode, final CompileContext cc) throws QueryException {
+    cc.pushScope(vs);
+    try {
+      final Expr ex = expr.simplifyFor(mode, cc);
+      if(ex == expr) return this;
+      expr = ex;
+    } finally {
+      cc.removeScope(this);
+    }
+    return optimize(cc);
   }
 
   @Override

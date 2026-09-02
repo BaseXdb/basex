@@ -4,6 +4,7 @@ import static org.basex.util.Token.*;
 
 import org.basex.index.*;
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
@@ -36,6 +37,13 @@ public final class FnContainsToken extends StandardFunc {
       }
     }
     return false;
+  }
+
+  @Override
+  protected void simplifyArgs(final CompileContext cc) throws QueryException {
+    super.simplifyArgs(cc);
+    // contains-token(replicate($x, 2), $t) → contains-token($x, $t)
+    arg(0, arg -> arg.simplifyFor(Simplify.DISTINCT, cc));
   }
 
   @Override

@@ -1,6 +1,7 @@
 package org.basex.query.expr;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
@@ -51,6 +52,9 @@ public final class Concat extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
+    // <a>{ $x }</a> || 'b' → xs:string($x) || 'b'
+    exprs = simplifyAll(Simplify.STRING, cc);
+
     // merge adjacent values, ignore empty sequences
     // 'a' || 'b' || $x → 'ab' || $x
     final int el = exprs.length;

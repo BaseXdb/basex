@@ -3,6 +3,7 @@ package org.basex.query.func.fn;
 import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
@@ -59,6 +60,13 @@ public final class FnPadString extends StandardFunc {
     tb.add(token);
     pad(tb, padding, miss - start);
     return Str.get(tb.finish());
+  }
+
+  @Override
+  protected void simplifyArgs(final CompileContext cc) throws QueryException {
+    // pad-string(<a>{ $x }</a>, 5) → pad-string(xs:string($x), 5)
+    arg(0, arg -> arg.simplifyFor(Simplify.STRING, cc));
+    super.simplifyArgs(cc);
   }
 
   @Override

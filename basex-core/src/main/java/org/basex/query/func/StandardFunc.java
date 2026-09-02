@@ -105,6 +105,10 @@ public abstract class StandardFunc extends Arr {
         final Simplify mode = type.instanceOf(BasicType.NUMERIC) ? Simplify.NUMBER :
             type.instanceOf(BasicType.STRING) ? Simplify.STRING : Simplify.DATA;
         arg(a, arg -> arg.simplifyFor(mode, cc));
+      } else if(type instanceof final FuncType ft && ft.declType != null &&
+          ft.declType.instanceOf(Types.ANY_ATOMIC_TYPE_ZM)) {
+        // sort($input, (), fn($x) { data($x) }) → sort($input, (), fn($x) { $x })
+        arg(a, arg -> simplifyFunc(arg, Simplify.DATA, cc));
       }
     }
   }
@@ -323,6 +327,20 @@ public abstract class StandardFunc extends Arr {
       throws QueryException {
     return expr instanceof final FuncItem fi ? fi.refine(argTypes, cc) :
            expr instanceof final Closure cl ? cl.refine(argTypes, cc) : expr;
+  }
+
+  /**
+   * Simplifies the body of a function argument.
+   * @param expr function
+   * @param mode mode of simplification
+   * @param cc compilation context
+   * @return function with simplified body, or original function
+   * @throws QueryException query exception
+   */
+  public static Expr simplifyFunc(final Expr expr, final Simplify mode, final CompileContext cc)
+      throws QueryException {
+    // function items have a fixed stack frame, which a rewritten body may invalidate
+    return expr instanceof final Closure cl ? cl.simplifyBody(mode, cc) : expr;
   }
 
   /**

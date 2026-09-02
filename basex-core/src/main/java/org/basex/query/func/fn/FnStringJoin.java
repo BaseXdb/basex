@@ -3,6 +3,7 @@ package org.basex.query.func.fn;
 import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
@@ -49,6 +50,12 @@ public final class FnStringJoin extends StandardFunc {
       more = true;
     }
     return false;
+  }
+
+  @Override
+  protected void simplifyArgs(final CompileContext cc) throws QueryException {
+    // string-join(<a>{ $x }</a>) → string-join(xs:string($x))
+    exprs = simplifyAll(Simplify.STRING, cc);
   }
 
   @Override

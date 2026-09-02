@@ -18,11 +18,17 @@ import org.basex.util.*;
 public final class FnStringLength extends ContextFn {
   @Override
   public Itr value(final QueryContext qc) throws QueryException {
-    final Item value = context(qc).item(qc, info);
+    final Item value = context(qc).atomItem(qc, info);
     if(value.isEmpty()) return Itr.ZERO;
     // optimization to return pre-computed string length
     if(value instanceof final AStr str) return Itr.get(str.length(info));
     return Itr.get(Token.length(value.string(info)));
+  }
+
+  @Override
+  protected void simplifyArgs(final CompileContext cc) throws QueryException {
+    // string-length(<a>{ $x }</a>) → string-length(xs:string($x))
+    exprs = simplifyAll(Simplify.STRING, cc);
   }
 
   @Override

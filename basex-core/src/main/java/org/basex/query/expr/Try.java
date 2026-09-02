@@ -6,6 +6,7 @@ import static org.basex.query.QueryText.*;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
@@ -106,6 +107,30 @@ public final class Try extends Single {
     exprType.assign(st).data(ExprList.concat(catches, expr));
 
     return this;
+  }
+
+  @Override
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    // data(try { <a>{ $x }</a> } catch * { }) → data(try { xs:untypedAtomic($x) } catch * { })
+    // EBV is skipped: it may discard errors that the catch clauses would handle
+    boolean changed = false;
+    if(mode.oneOf(Simplify.STRING, Simplify.NUMBER, Simplify.DATA, Simplify.COUNT,
+        Simplify.DISTINCT)) {
+      final Expr ex = expr.simplifyFor(mode, cc);
+      if(ex != expr) {
+        expr = ex;
+        changed = true;
+      }
+      for(final Catch ctch : catches) {
+        final Expr cx = ctch.expr.simplifyFor(mode, cc);
+        if(cx != ctch.expr) {
+          ctch.expr = cx;
+          ctch.optimize(cc);
+          changed = true;
+        }
+      }
+    }
+    return cc.simplify(this, changed ? optimize(cc) : this, mode);
   }
 
   @Override
