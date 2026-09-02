@@ -7,9 +7,9 @@
  :)
 declare option output:method "text";
 
-(:~ First result file (reference, e.g. BaseX). :)
+(:~ First result file. :)
 declare variable $a external;
-(:~ Second result file (e.g. Saxon). :)
+(:~ Second result file. :)
 declare variable $b external;
 
 (:~
