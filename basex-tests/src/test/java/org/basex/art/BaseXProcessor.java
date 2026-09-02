@@ -37,7 +37,7 @@ public final class BaseXProcessor implements XQueryProcessor {
     double compile = 0, eval = 0;
     try {
       ctx.options.set(MainOptions.DTD, true);
-      ctx.options.set(MainOptions.FNXMLTRUSTED, true);
+      ctx.options.set(MainOptions.TRUSTEXTERNAL, true);
       // fn:trace / fn:message go to standard error; capture that
       System.setErr(new PrintStream(err, true, StandardCharsets.UTF_8));
       try(QueryProcessor qp = new QueryProcessor(moduleText, module.toUri().toString(), ctx,
