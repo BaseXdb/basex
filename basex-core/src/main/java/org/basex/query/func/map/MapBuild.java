@@ -49,7 +49,7 @@ public final class MapBuild extends MapMerge {
     final boolean fiKey = keys instanceof FuncItem || keys instanceof Closure;
     Type kt = fiKey || keys.size() == 0 ? s1t.type : BasicType.ITEM;
     if(fiKey) {
-      arg(1, arg -> refineFunc(arg, cc, s1t));
+      arg(1, arg -> arg.refineFunc(cc, s1t));
       kt = arg(1).funcType().refinedType.type;
     }
     kt = kt.atomic();
@@ -57,7 +57,7 @@ public final class MapBuild extends MapMerge {
     final boolean fiValue = value instanceof FuncItem || value instanceof Closure;
     SeqType vt = fiValue || value.size() == 0 ? s1t : Types.ITEM_ZM;
     if(fiValue) {
-      arg(2, arg -> refineFunc(arg, cc, s1t));
+      arg(2, arg -> arg.refineFunc(cc, s1t));
       vt = arg(2).funcType().refinedType;
     }
     assignType(kt, vt);

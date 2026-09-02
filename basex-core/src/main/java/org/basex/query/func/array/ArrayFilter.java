@@ -35,7 +35,7 @@ public final class ArrayFilter extends ArrayFn {
     if(array == XQArray.empty()) return array;
 
     if(array.seqType().type instanceof final ArrayType at) {
-      arg(1, arg -> refineFunc(arg, cc, at.valueType(), Types.INTEGER_O));
+      arg(1, arg -> arg.refineFunc(cc, at.valueType(), Types.INTEGER_O));
       exprType.assign(at);
     }
     return this;

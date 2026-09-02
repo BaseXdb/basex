@@ -363,6 +363,34 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
+   * Refines the parameter types of a function expression.
+   * Overwritten by {@link FuncItem} and {@link Closure}.
+   * @param cc compilation context
+   * @param argTypes argument types
+   * @return refined or original expression
+   * @throws QueryException query exception
+   */
+  @SuppressWarnings("unused")
+  public Expr refineFunc(final CompileContext cc, final SeqType... argTypes)
+      throws QueryException {
+    return this;
+  }
+
+  /**
+   * Simplifies the body of a function expression.
+   * Overwritten by {@link Closure}.
+   * @param mode mode of simplification
+   * @param cc compilation context
+   * @return simplified or original expression
+   * @throws QueryException query exception
+   */
+  @SuppressWarnings("unused")
+  public Expr simplifyFunc(final Simplify mode, final CompileContext cc)
+      throws QueryException {
+    return this;
+  }
+
+  /**
    * Simplifies the expression.
    * @param mode mode of simplification
    * @param cc compilation context
@@ -378,7 +406,7 @@ public abstract class Expr extends ExprInfo {
       final SeqType st = seqType();
       final boolean nodes = st.instanceOf(Types.XNODE_OM);
       if((nodes || st.zero()) && !has(Flag.NDT)) expr = Bln.get(nodes);
-    } else if(mode == Simplify.COUNT && !(this instanceof Value)) {
+    } else if(mode.oneOf(Simplify.COUNT, Simplify.EXISTENCE) && !(this instanceof Value)) {
       // count(db:get('db')//with-known-result-size) → replicate('', size)
       final long size = size();
       if(size != -1 && !has(Flag.NDT)) expr = SingletonSeq.get(Str.EMPTY, size);
@@ -454,7 +482,7 @@ public abstract class Expr extends ExprInfo {
    */
   @SuppressWarnings("unused")
   public Expr optimizePos(final CmpOp op, final CompileContext cc) throws QueryException {
-    return simplifyFor(Simplify.NUMBER, cc).simplifyFor(Simplify.DISTINCT, cc);
+    return simplifyFor(Simplify.NUMBER, cc).simplifyFor(Simplify.SET, cc);
   }
 
   /**

@@ -120,7 +120,7 @@ public final class Otherwise extends Arr {
     // EBV: all but the last operand must stay, as their emptiness selects the result
     final int el = exprs.length;
     Expr[] tmp = null;
-    for(int e = mode.oneOf(Simplify.EBV, Simplify.PREDICATE) ? el - 1 : 0; e < el; e++) {
+    for(int e = mode.conditional() ? el - 1 : 0; e < el; e++) {
       final Expr expr = exprs[e].simplifyFor(mode, cc);
       if(expr != exprs[e]) {
         if(tmp == null) tmp = exprs.clone();

@@ -281,10 +281,10 @@ public abstract class Filter extends Preds {
     if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
       // E[a[. = 'x']] → E[a = 'x']
       expr = flattenEbv(root, true, cc);
-    } else if(mode == Simplify.DISTINCT && !mayBePositional()) {
+    } else if(mode.oneOf(Simplify.DISTINCT, Simplify.SET) && !mayBePositional()) {
       final Expr ex = root.simplifyFor(mode, cc);
       if(ex != root) expr = get(cc, info, ex, exprs);
-    } else if(mode == Simplify.COUNT && exprs.length == 1 &&
+    } else if(mode.oneOf(Simplify.COUNT, Simplify.EXISTENCE) && exprs.length == 1 &&
         exprs[0].seqType().instanceOf(Types.XNODE_ZO)) {
       // $nodes[@attr] → $nodes ! @attr
       expr = SimpleMap.get(cc, info, root, exprs[0]);

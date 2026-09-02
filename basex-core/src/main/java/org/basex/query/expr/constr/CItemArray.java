@@ -49,7 +49,7 @@ public final class CItemArray extends Single {
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr ex = this;
     // number(array { 1 }) → number(1)
-    if(mode.oneOf(Simplify.NUMBER, Simplify.DATA)) ex = expr.simplifyFor(mode, cc);
+    if(mode.atomizing()) ex = expr.simplifyFor(mode, cc);
     return cc.simplify(this, ex, mode);
   }
 

@@ -37,7 +37,7 @@ public final class ArrayItems extends ArrayFn {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     final Expr array = arg(0);
-    final Expr expr = mode.oneOf(Simplify.STRING, Simplify.NUMBER, Simplify.DATA) &&
+    final Expr expr = mode.atomizing() &&
         array.seqType().type instanceof ArrayType ? array : this;
     return cc.simplify(this, expr, mode);
   }

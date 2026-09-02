@@ -242,7 +242,7 @@ public final class List extends Arr {
     if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
       // E[A, B] → E[A | B]
       expr = toUnion(cc);
-    } else if(mode == Simplify.DISTINCT) {
+    } else if(mode.oneOf(Simplify.DISTINCT, Simplify.SET)) {
       final int el = exprs.length;
       final ExprList list = new ExprList(el);
       for(final Expr ex : exprs) {

@@ -37,7 +37,7 @@ public final class ArrayIndexWhere extends ArrayFn {
 
     if(arraySize(array) == 1) exprType.assign(Occ.ZERO_OR_ONE);
     if(array.seqType().type instanceof final ArrayType at) {
-      arg(1, arg -> refineFunc(arg, cc, at.valueType(), Types.INTEGER_O));
+      arg(1, arg -> arg.refineFunc(cc, at.valueType(), Types.INTEGER_O));
     }
     return this;
   }

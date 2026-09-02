@@ -105,11 +105,13 @@ public final class SingletonSeq extends Seq {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
-    if(mode == Simplify.DISTINCT || mode == Simplify.PREDICATE && type.isNumber()) {
+    if(mode.oneOf(Simplify.DISTINCT, Simplify.SET) ||
+        mode == Simplify.PREDICATE && type.isNumber()) {
       expr = value;
-    } else if(mode == Simplify.STRING && type.instanceOf(NodeType.XNODE)) {
+    } else if(mode.oneOf(Simplify.STRING, Simplify.STRING_VALUE) &&
+        type.instanceOf(NodeType.XNODE)) {
       expr = get((Value) value.simplifyFor(mode, cc), count());
-    } else if(mode.oneOf(Simplify.DATA, Simplify.NUMBER)) {
+    } else if(mode.atomizing()) {
       final Type at = type.atomic();
       if(at != null && at != type) {
         expr = get((Value) value.simplifyFor(mode, cc), count());

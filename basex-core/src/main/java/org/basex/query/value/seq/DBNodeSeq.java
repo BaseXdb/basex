@@ -113,7 +113,7 @@ public class DBNodeSeq extends NativeSeq {
       throws QueryException {
 
     Expr expr = this;
-    if(mode == Simplify.STRING) {
+    if(mode.oneOf(Simplify.STRING, Simplify.STRING_VALUE)) {
       final TokenList list = new TokenList(size);
       for(final Item item : this) list.add(item.string(null));
       expr = StrSeq.get(list);

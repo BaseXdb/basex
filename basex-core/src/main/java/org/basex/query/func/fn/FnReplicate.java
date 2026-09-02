@@ -154,14 +154,13 @@ public final class FnReplicate extends StandardFunc {
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     // data(replicate(<a>1</a>, 2)) → data(replicate(xs:untypedAtomic('1'), 2))
     // distinct-values(replicate(('a', 'a'), 2)) → distinct-values('a', 2)
-    final Expr input = mode.oneOf(Simplify.STRING, Simplify.NUMBER, Simplify.DATA, Simplify.COUNT,
-        Simplify.DISTINCT) ? arg(0).simplifyFor(mode, cc) : arg(0);
+    final Expr input = !mode.conditional() ? arg(0).simplifyFor(mode, cc) : arg(0);
 
     final long count = arg(1) instanceof final Itr itr ? itr.itr() : -1;
     if(count > 0 && (singleEval(true) || !input.has(Flag.NDT))) {
       // distinct-values(replicate(NODES, 2)) → distinct-values(NODES)
       // VALUE[replicate(NODES, 2)] → VALUE[NODES]
-      if(mode == Simplify.DISTINCT ||
+      if(mode.oneOf(Simplify.DISTINCT, Simplify.SET, Simplify.EXISTENCE) ||
           mode == Simplify.PREDICATE && input.seqType().instanceOf(Types.XNODE_ZM)) {
         return cc.simplify(this, input, mode);
       }

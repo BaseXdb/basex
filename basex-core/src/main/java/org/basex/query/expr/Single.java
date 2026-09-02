@@ -101,7 +101,7 @@ public abstract class Single extends ParseExpr {
     final SeqType est = expr.seqType(), dst = seqType();
     if(est.occ.instanceOf(dst.occ)) {
       final Type et = est.type, dt = dst.type;
-      if(mode == Simplify.STRING && et.isStringOrUntyped() &&
+      if(mode.oneOf(Simplify.STRING, Simplify.STRING_VALUE) && et.isStringOrUntyped() &&
            dt.oneOf(BasicType.STRING, BasicType.UNTYPED_ATOMIC) ||
          mode == Simplify.NUMBER && (et.isUntyped() && dt == BasicType.DOUBLE ||
            et.instanceOf(BasicType.INT) && et.instanceOf(dt)) ||

@@ -44,14 +44,14 @@ public class FnApply extends StandardFunc {
         final int as = Math.max(0, (int) array.structSize());
         final SeqType[] ast = new SeqType[as];
         for(int a = 0; a < as; a++) ast[a] = array.valueAt(a).seqType();
-        arg(0, arg -> refineFunc(arg, cc, ast));
+        arg(0, arg -> arg.refineFunc(cc, ast));
       } else if(ft != null) {
         // argument will be of type array: assign generic array return type to all arguments
         final SeqType[] at = ft.argTypes;
         if(at != null) {
           final SeqType[] ast = new SeqType[at.length];
           Arrays.fill(ast, aat.valueType());
-          arg(0, arg -> refineFunc(arg, cc, ast));
+          arg(0, arg -> arg.refineFunc(cc, ast));
         }
       }
     }

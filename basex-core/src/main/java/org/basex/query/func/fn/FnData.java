@@ -58,15 +58,13 @@ public final class FnData extends ContextFn {
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
     final Expr input = contextAccess() ? ContextValue.get(cc, info) : arg(0);
-    if(mode.oneOf(Simplify.DATA, Simplify.NUMBER, Simplify.STRING)) {
-      // data(<a/>) = '' → <a/> = ''
-      // A[B ! data() = ''] → A[B ! . = '']
+    // data(<a/>) = '' → <a/> = '', A[B ! data() = ''] → A[B ! . = '']
+    // count(data($x)) → count($x), string(data($node)) → string($node)
+    // arrays are excluded if the wrapper is not atomized: string(data([ 1 ]))
+    if(mode.atomizing() || mode.oneOf(Simplify.STRING_VALUE, Simplify.COUNT,
+        Simplify.EXISTENCE) && !input.seqType().mayBeWrapped()) {
       expr = input;
-    } else if(mode == Simplify.COUNT) {
-      // count(data($x)) → count($x)
-      // do not simplify array input: count(data([ 1, 2, 3 ]))
-      if(!input.seqType().mayBeWrapped()) expr = input;
-    } else if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
+    } else if(mode.conditional()) {
       // if(data($node)) → if($node/descendant::text())
       expr = simplifyEbv(input, cc, null);
     }

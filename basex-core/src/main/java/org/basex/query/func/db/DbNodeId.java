@@ -97,7 +97,7 @@ public class DbNodeId extends StandardFunc {
     Expr expr = this;
 
     final Expr input = arg(0);
-    if(mode == Simplify.COUNT) {
+    if(mode.oneOf(Simplify.COUNT, Simplify.EXISTENCE)) {
       // count(db:node-id(db:text($x))) → count(db:text($x))
       if(input.ddo()) expr = input;
     }

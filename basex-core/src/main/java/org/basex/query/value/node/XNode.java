@@ -78,7 +78,7 @@ public abstract class XNode extends GNode {
   public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
       throws QueryException {
     Expr expr = this;
-    if(mode == Simplify.STRING) {
+    if(mode.oneOf(Simplify.STRING, Simplify.STRING_VALUE)) {
       // boolean(<a>A</a>) → boolean('A')
       expr = Str.get(string());
     } else if(mode.oneOf(Simplify.DATA, Simplify.NUMBER)) {

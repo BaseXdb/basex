@@ -378,15 +378,9 @@ public final class FuncItem extends FItem implements Scope {
     return null;
   }
 
-  /**
-   * Creates a new function item with refined types.
-   * @param argTypes argument types
-   * @param cc compilation context
-   * @return original or refined function item
-   * @throws QueryException query context
-   * @see Closure#refine(SeqType[], CompileContext)
-   */
-  public FuncItem refine(final SeqType[] argTypes, final CompileContext cc) throws QueryException {
+  @Override
+  public FuncItem refineFunc(final CompileContext cc, final SeqType... argTypes)
+      throws QueryException {
     // skip refinement if function has too many parameters
     final int nargs = argTypes.length, arity = arity();
     if(nargs >= arity) {

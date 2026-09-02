@@ -1101,9 +1101,9 @@ public final class FnModuleTest extends SandboxTest {
 
     // local documents are pre-evaluated, remote ones are not
     check("<a>{" + func.args(DOC) + " }</a>//x", "", exists(DBNode.class));
-    check("if(<x>1</x> = 1) then 2 else" + func.args(DOC), 2, exists(DBNode.class));
-    check("if(<x>1</x> = 1) then 2 else" + func.args("http://abc.de/"), 2, exists(func));
-    check("if(<x>1</x> = 1) then 2 else" + COLLECTION.args("http://abc.de/"), 2,
+    check("if(" + wrap(1) + "= 1) then 2 else" + func.args(DOC), 2, exists(DBNode.class));
+    check("if(" + wrap(1) + "= 1) then 2 else" + func.args("http://abc.de/"), 2, exists(func));
+    check("if(" + wrap(1) + "= 1) then 2 else" + COLLECTION.args("http://abc.de/"), 2,
         exists(COLLECTION));
 
     final IOFile sandbox = sandbox();
@@ -2342,8 +2342,8 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" (1, 2)", " ('a', 'b')"), "1\na\nb\n2");
 
     check(func.args(1, "a") + " => count()", 1, root(Itr.class));
-    check(func.args(" 1[. = <_>1</_>]", "a"), 1, root(If.class));
-    check(func.args(" (1, 2)[. = <_>3</_>]", " 'a'"), "", root(func));
+    check(func.args(" 1[. =" + wrap(1) + "]", "a"), 1, root(If.class));
+    check(func.args(" (1, 2)[. =" + wrap(3) + "]", " 'a'"), "", root(func));
     check(func.args(" (1, 2)", " 'a'[. = <_/>]"), "1\n2", root(func));
   }
 

@@ -123,7 +123,7 @@ public abstract class ItrSeq extends NativeSeq {
     int[] tmp = null;
     // the rewritings below are limited to values within the int range
     if(width() <= 4) {
-      if(mode == Simplify.PREDICATE) {
+      if(mode.oneOf(Simplify.PREDICATE, Simplify.SET)) {
         // remove duplicates, order data: (2, 1, 2) → 1 to 2
         final IntList list = new IntList(sz);
         for(int i = 0; i < sz; i++) list.add((int) itrAt(i));

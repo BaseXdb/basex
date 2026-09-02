@@ -54,7 +54,7 @@ public final class FnScan extends StandardFunc {
       SeqType ost;
       do {
         final SeqType[] types = { st, itemType, Types.INTEGER_O };
-        arg(2, arg -> refineFunc(action, cc, types));
+        arg(2, arg -> action.refineFunc(cc, types));
         ost = st;
         st = st.union(arg(2).funcType().refinedType);
       } while(!st.eq(ost));

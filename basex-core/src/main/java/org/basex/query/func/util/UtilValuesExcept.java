@@ -54,7 +54,7 @@ public final class UtilValuesExcept extends StandardFunc {
   protected void simplifyArgs(final CompileContext cc) throws QueryException {
     super.simplifyArgs(cc);
     if(!defined(2)) {
-      final QueryFunction<Expr, Expr> rewrite = arg -> arg.simplifyFor(Simplify.DISTINCT, cc);
+      final QueryFunction<Expr, Expr> rewrite = arg -> arg.simplifyFor(Simplify.SET, cc);
       arg(0, rewrite);
       arg(1, rewrite);
     }

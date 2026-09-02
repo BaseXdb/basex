@@ -43,7 +43,7 @@ public final class FnGenerate extends StandardFunc {
       SeqType ost;
       do {
         final SeqType[] types = { st, Types.INTEGER_O };
-        arg(1, arg -> refineFunc(step, cc, types));
+        arg(1, arg -> step.refineFunc(cc, types));
         ost = st;
         st = st.union(arg(1).funcType().refinedType);
       } while(!st.eq(ost));
@@ -57,7 +57,7 @@ public final class FnGenerate extends StandardFunc {
     final Expr init = arg(0), step = arg(1);
 
     Expr expr = this;
-    if(mode == Simplify.DISTINCT ||
+    if(mode.oneOf(Simplify.DISTINCT, Simplify.SET) ||
         mode == Simplify.PREDICATE && seqType().instanceOf(Types.XNODE_ZM)) {
       // 'x' = generate('y', fn { 'y' }) → 'x' = 'y'
       // distinct-values(generate(1, identity#1)) → distinct-values(1)

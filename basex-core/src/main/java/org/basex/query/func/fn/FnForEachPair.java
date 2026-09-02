@@ -58,7 +58,7 @@ public class FnForEachPair extends StandardFunc {
     if(st1.zero()) return cc.voidAndReturn(input2, input1, info);
     if(st2.zero()) return cc.voidAndReturn(input1, input2, info);
 
-    arg(2, arg -> refineFunc(arg, cc, st1.with(Occ.EXACTLY_ONE), st2.with(Occ.EXACTLY_ONE),
+    arg(2, arg -> arg.refineFunc(cc, st1.with(Occ.EXACTLY_ONE), st2.with(Occ.EXACTLY_ONE),
         Types.INTEGER_O));
 
     // assign type after refinement

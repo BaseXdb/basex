@@ -157,11 +157,11 @@ public abstract class Seq extends Value {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
-    if(mode == Simplify.STRING && type.instanceOf(NodeType.XNODE)) {
+    if(mode.oneOf(Simplify.STRING, Simplify.STRING_VALUE) && type.instanceOf(NodeType.XNODE)) {
       final TokenList list = new TokenList(size);
       for(final Item item : atomValue(cc.qc, null)) list.add(item.string(null));
       expr = StrSeq.get(list);
-    } else if(mode.oneOf(Simplify.DATA, Simplify.NUMBER)) {
+    } else if(mode.atomizing()) {
       final Type at = type.atomic();
       if(at != null && at != type) {
         expr = atomValue(cc.qc, null);

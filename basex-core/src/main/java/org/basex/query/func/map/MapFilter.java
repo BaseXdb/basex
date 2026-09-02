@@ -35,7 +35,7 @@ public final class MapFilter extends MapFn {
 
     if(map.seqType().type instanceof final MapType mt) {
       final SeqType kt = mt.keyType().seqType(), vt = mt.valueType();
-      arg(1, arg -> refineFunc(arg, cc, kt, vt, Types.INTEGER_O));
+      arg(1, arg -> arg.refineFunc(cc, kt, vt, Types.INTEGER_O));
       exprType.assign(MapType.get(mt));
     }
     return this;

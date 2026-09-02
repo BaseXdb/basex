@@ -72,8 +72,7 @@ public abstract class Mapping extends Arr {
     Expr expr = this;
     final int el = exprs.length;
     final Expr last = exprs[el - 1];
-    if(mode.oneOf(Simplify.DATA, Simplify.NUMBER, Simplify.STRING, Simplify.COUNT,
-        Simplify.DISTINCT)) {
+    if(!mode.conditional()) {
       // distinct-values(@id ! data()) → distinct-values(@id)
       final Expr sx = cc.get(exprs[el - 2], items(), () -> last.simplifyFor(mode, cc));
       if(sx != last) {

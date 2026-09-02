@@ -57,12 +57,19 @@ public final class CompileContext {
      */
     DATA,
     /**
-     * String arguments.
+     * String arguments: atomized values that are converted to strings.
      * Requested by {@link Cast}, {@link CmpG}, {@link StandardFunc} and others.
      * Evaluated by {@link Cast}, {@link TypeCheck}, {@link CNode}, {@link FnData},
-     * {@link FnString}, {@link FnReplicate}.
+     * {@link FnString}, {@link FnReplicate}, {@link Seq}.
      */
     STRING,
+    /**
+     * String values of items, which are not atomized (arrays and maps have no string value).
+     * Requested by {@link FnString}.
+     * Evaluated by {@link Cast}, {@link TypeCheck}, {@link CNode}, {@link FnData},
+     * {@link FnString}, {@link Seq} and others.
+     */
+    STRING_VALUE,
     /**
      * Numeric arguments.
      * Requested by {@link Arith}, {@link CmpIR}, {@link Range}, {@link StandardFunc} and others.
@@ -78,17 +85,30 @@ public final class CompileContext {
      */
     PREDICATE,
     /**
-     * Distinct values.
-     * Requested by {@link CmpG} and {@link FnDistinctValues}.
+     * Distinct values: duplicates are irrelevant, the order of the results is relevant.
+     * Requested by {@link FnDistinctValues}.
      * Evaluated by {@link Filter}, {@link List}, {@link SimpleMap} and others.
      */
     DISTINCT,
     /**
-     * Count and existence checks.
-     * Requested by {@link FnCount}, {@link FnEmpty} and {@link FnExists}.
+     * Sets: duplicates and the order of the results are irrelevant.
+     * Requested by {@link CmpG}, {@link FnMin}, {@link Pos} and others.
+     * Evaluated by {@link Filter}, {@link List}, {@link FnReverse}, {@link FnSortBy}
+     * and others.
+     */
+    SET,
+    /**
+     * Counts: only the number of results is relevant.
+     * Requested by {@link FnCount} and others.
      * Evaluated by {@link Filter}, {@link GFLWOR}, {@link FnReverse} and others.
      */
-    COUNT;
+    COUNT,
+    /**
+     * Existence checks: only the presence of results is relevant.
+     * Requested by {@link FnEmpty} and {@link FnExists}.
+     * Evaluated by {@link Filter}, {@link GFLWOR}, {@link FnDistinctValues} and others.
+     */
+    EXISTENCE;
 
     /**
      * Checks if this is one of the specified candidates.
@@ -97,6 +117,22 @@ public final class CompileContext {
      */
     public boolean oneOf(final Simplify... candidates) {
       return Enums.oneOf(this, candidates);
+    }
+
+    /**
+     * Indicates if the value is interpreted as a condition.
+     * @return result of check
+     */
+    public boolean conditional() {
+      return oneOf(EBV, PREDICATE);
+    }
+
+    /**
+     * Indicates if the value is atomized.
+     * @return result of check
+     */
+    public boolean atomizing() {
+      return oneOf(DATA, STRING, NUMBER);
     }
   }
 

@@ -39,8 +39,8 @@ public final class FnString extends ContextFn {
 
   @Override
   protected void simplifyArgs(final CompileContext cc) throws QueryException {
-    // string(data(E)) → string(E)
-    exprs = simplifyAll(Simplify.STRING, cc);
+    // string(xs:string($x)) → string($x)
+    exprs = simplifyAll(Simplify.STRING_VALUE, cc);
   }
 
   @Override
@@ -60,7 +60,8 @@ public final class FnString extends ContextFn {
     Expr expr = this;
     final Expr item = contextAccess() ? ContextValue.get(cc, info) : arg(0);
     final SeqType st = item.seqType();
-    if(mode == Simplify.STRING && st.type.isStringOrUntyped() && st.one()) {
+    if(mode.oneOf(Simplify.STRING, Simplify.STRING_VALUE) && st.type.isStringOrUntyped() &&
+        st.one()) {
       // $node[string() = 'x'] → $node[. = 'x']
       expr = item;
     } else if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {

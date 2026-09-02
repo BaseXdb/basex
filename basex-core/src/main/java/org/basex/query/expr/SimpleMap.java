@@ -340,11 +340,7 @@ public abstract class SimpleMap extends Mapping {
     final ExprList steps = new ExprList();
 
     final int el = exprs.length;
-    final QueryFunction<Integer, Expr> simplify = e -> {
-      final Expr expr = exprs[e];
-      return mode == Simplify.DISTINCT || e + 1 == el ? expr.simplifyFor(mode, cc) : expr;
-    };
-    Expr root = simplify.apply(0);
+    Expr root = exprs[0];
     cc.pushFocus(root, true);
     if(root instanceof final AxisPath path) {
       root = path.root;
@@ -352,7 +348,7 @@ public abstract class SimpleMap extends Mapping {
     }
     try {
       for(int e = 1; e < el; e++) {
-        final Expr expr = simplify.apply(e);
+        final Expr expr = e + 1 == el ? exprs[e].simplifyFor(mode, cc) : exprs[e];
         if(!(expr instanceof final AxisPath path)) return this;
         if(path.root != null) return this;
         steps.add(path.steps);

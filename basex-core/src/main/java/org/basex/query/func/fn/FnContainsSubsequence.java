@@ -72,7 +72,7 @@ public class FnContainsSubsequence extends StandardFunc {
     if(sst.zero()) return cc.voidAndReturn(input, Bln.TRUE, info);
 
     if(defined(2)) {
-      arg(2, arg -> refineFunc(arg, cc, ist.with(Occ.EXACTLY_ONE), sst.with(Occ.EXACTLY_ONE)));
+      arg(2, arg -> arg.refineFunc(cc, ist.with(Occ.EXACTLY_ONE), sst.with(Occ.EXACTLY_ONE)));
     }
     return this;
   }

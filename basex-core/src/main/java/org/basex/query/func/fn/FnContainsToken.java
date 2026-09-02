@@ -43,7 +43,7 @@ public final class FnContainsToken extends StandardFunc {
   protected void simplifyArgs(final CompileContext cc) throws QueryException {
     super.simplifyArgs(cc);
     // contains-token(replicate($x, 2), $t) → contains-token($x, $t)
-    arg(0, arg -> arg.simplifyFor(Simplify.DISTINCT, cc));
+    arg(0, arg -> arg.simplifyFor(Simplify.SET, cc));
   }
 
   @Override

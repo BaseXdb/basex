@@ -34,7 +34,7 @@ public class FnEmpty extends StandardFunc {
 
   @Override
   protected final void simplifyArgs(final CompileContext cc) throws QueryException {
-    arg(0, arg -> arg.has(Flag.NDT) ? arg : arg.simplifyFor(Simplify.COUNT, cc));
+    arg(0, arg -> arg.has(Flag.NDT) ? arg : arg.simplifyFor(Simplify.EXISTENCE, cc));
   }
 
   @Override
@@ -59,10 +59,6 @@ public class FnEmpty extends StandardFunc {
     }
     // exists(foot(E)) → exists(E), empty(foot(E)) → empty(E)
     if(FOOT.is(input) && !input.has(Flag.NDT)) {
-      input = input.arg(0);
-    }
-    // exists(distinct-values(E)) → exists(E), empty(distinct-values(E)) → empty(E)
-    if(DISTINCT_VALUES.is(input) && !input.arg(0).seqType().mayBeWrapped()) {
       input = input.arg(0);
     }
     // exists(E/step[1]) → exists(E/step), empty(E/step[last()]) → empty(E/step)

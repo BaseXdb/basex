@@ -114,8 +114,7 @@ public final class Try extends Single {
     // data(try { <a>{ $x }</a> } catch * { }) → data(try { xs:untypedAtomic($x) } catch * { })
     // EBV is skipped: it may discard errors that the catch clauses would handle
     boolean changed = false;
-    if(mode.oneOf(Simplify.STRING, Simplify.NUMBER, Simplify.DATA, Simplify.COUNT,
-        Simplify.DISTINCT)) {
+    if(!mode.conditional()) {
       final Expr ex = expr.simplifyFor(mode, cc);
       if(ex != expr) {
         expr = ex;

@@ -303,7 +303,7 @@ public final class GFLWORTest extends SandboxTest {
         exists(IterFilter.class),
         exists(GFLWOR.class)
     );
-    check("let $x := 0 where $x != <x>0</x> return 42 idiv $x", "",
+    check("let $x := 0 where $x !=" + wrap(0) + "return 42 idiv $x", "",
         exists(If.class),
         "//If/*[2]/@name = 'error'");
   }

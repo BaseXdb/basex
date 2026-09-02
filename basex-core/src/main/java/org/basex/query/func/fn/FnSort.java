@@ -38,7 +38,7 @@ public final class FnSort extends FnSortBy {
     if(st.zero()) return input;
 
     if(defined(2)) {
-      arg(2, arg -> refineFunc(arg, cc, st.with(Occ.EXACTLY_ONE)));
+      arg(2, arg -> arg.refineFunc(cc, st.with(Occ.EXACTLY_ONE)));
     } else if(!defined(1)) {
       if(st.zeroOrOne() && st.type.isSortable()) {
         // sort($sortable) → $sortable  (at most one sortable item)

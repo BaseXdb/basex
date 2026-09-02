@@ -83,7 +83,7 @@ public class FnMin extends StandardFunc {
       arg(0, arg -> arg.simplifyFor(Simplify.NUMBER, cc));
     }
     // min(distinct-values($values)) → min($values)
-    arg(0, arg -> arg.simplifyFor(Simplify.DATA, cc).simplifyFor(Simplify.DISTINCT, cc));
+    arg(0, arg -> arg.simplifyFor(Simplify.SET, cc));
   }
 
   @Override

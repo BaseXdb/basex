@@ -232,15 +232,9 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     return all;
   }
 
-  /**
-   * Returns a copy of this closure with refined parameter types.
-   * @param argTypes argument types
-   * @param cc compilation context
-   * @return original or refined closure
-   * @throws QueryException query exception
-   * @see FuncItem#refine(SeqType[], CompileContext)
-   */
-  public Expr refine(final SeqType[] argTypes, final CompileContext cc) throws QueryException {
+  @Override
+  public Expr refineFunc(final CompileContext cc, final SeqType... argTypes)
+      throws QueryException {
     // skip refinement if function has too many parameters
     final int arity = arity();
     if(argTypes.length < arity) return this;
@@ -271,14 +265,9 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     return copy.optimize(cc);
   }
 
-  /**
-   * Simplifies the function body.
-   * @param mode mode of simplification
-   * @param cc compilation context
-   * @return simplified or original function
-   * @throws QueryException query exception
-   */
-  public Expr simplifyBody(final Simplify mode, final CompileContext cc) throws QueryException {
+  @Override
+  public Expr simplifyFunc(final Simplify mode, final CompileContext cc)
+      throws QueryException {
     cc.pushScope(vs);
     try {
       final Expr ex = expr.simplifyFor(mode, cc);

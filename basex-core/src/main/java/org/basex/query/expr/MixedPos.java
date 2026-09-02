@@ -29,7 +29,7 @@ final class MixedPos extends Single implements CmpPos {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    expr = expr.simplifyFor(Simplify.NUMBER, cc).simplifyFor(Simplify.DISTINCT, cc);
+    expr = expr.simplifyFor(Simplify.NUMBER, cc).simplifyFor(Simplify.SET, cc);
 
     final Expr ex = Pos.get(expr, CmpOp.EQ, info, cc, this);
     return ex != null ? cc.replaceWith(this, ex) : this;
