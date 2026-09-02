@@ -39,18 +39,18 @@ public class FnContainsSubsequence extends StandardFunc {
         return deep.equal(item1, item2);
       };
     }
-    return test(input, subsequence, cmp);
+    return match(input, subsequence, cmp);
   }
 
   /**
-   * Compares two sequences.
+   * Checks if the input matches the subsequence.
    * @param input input sequence
    * @param subsequence subsequence
    * @param cmp comparison function
    * @return result of comparison
    * @throws QueryException query exception
    */
-  boolean test(final Value input, final Value subsequence,
+  boolean match(final Value input, final Value subsequence,
       final QueryBiFunction<Item, Item, Boolean> cmp) throws QueryException {
 
     final long is = input.size(), ss = subsequence.size(), ps = is - ss;

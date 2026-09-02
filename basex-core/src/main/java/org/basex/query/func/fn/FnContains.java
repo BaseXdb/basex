@@ -26,18 +26,18 @@ public class FnContains extends StandardFunc {
     final byte[] value = toZeroToken(arg(0), qc);
     final byte[] substring = toZeroToken(arg(1), qc);
     final Collation collation = toCollation(arg(2), qc);
-    return test(value, substring, collation);
+    return match(value, substring, collation);
   }
 
   /**
-   * Performs the test.
+   * Checks if the value matches the substring.
    * @param value value
    * @param substring substring
    * @param collation collation (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
    */
-  boolean test(final byte[] value, final byte[] substring, final Collation collation)
+  boolean match(final byte[] value, final byte[] substring, final Collation collation)
       throws QueryException {
     return collation == null ? Token.contains(value, substring) :
       collation.contains(value, substring, info);

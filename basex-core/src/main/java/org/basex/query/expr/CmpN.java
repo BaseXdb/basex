@@ -46,20 +46,20 @@ public final class CmpN extends Cmp {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final GNode n1 = toGNodeOrNull(exprs[0], qc);
-    if(n1 == null) return Empty.VALUE;
-    final GNode n2 = toGNodeOrNull(exprs[1], qc);
-    if(n2 == null) return Empty.VALUE;
-    return Bln.get(op.eval(n1, n2));
+    final GNode node1 = toGNodeOrNull(exprs[0], qc);
+    if(node1 == null) return Empty.VALUE;
+    final GNode node2 = toGNodeOrNull(exprs[1], qc);
+    if(node2 == null) return Empty.VALUE;
+    return Bln.get(op.eval(node1, node2));
   }
 
   @Override
   protected boolean ebv(final QueryContext qc) throws QueryException {
-    final GNode n1 = toGNodeOrNull(exprs[0], qc);
-    if(n1 == null) return false;
-    final GNode n2 = toGNodeOrNull(exprs[1], qc);
-    if(n2 == null) return false;
-    return op.eval(n1, n2);
+    final GNode node1 = toGNodeOrNull(exprs[0], qc);
+    if(node1 == null) return false;
+    final GNode node2 = toGNodeOrNull(exprs[1], qc);
+    if(node2 == null) return false;
+    return op.eval(node1, node2);
   }
 
   @Override

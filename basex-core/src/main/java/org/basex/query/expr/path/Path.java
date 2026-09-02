@@ -162,7 +162,7 @@ public abstract class Path extends ParseExpr {
     if(root == null && !cc.nestedFocus()) root = cc.qc.focus.value;
 
     // remove redundant steps, find empty steps
-    Expr expr = simplify(cc);
+    Expr expr = cleanSteps(cc);
     if(expr != this) return expr;
 
     // flatten nested path expressions
@@ -323,12 +323,12 @@ public abstract class Path extends ParseExpr {
   }
 
   /**
-   * Simplifies the path expression.
+   * Removes empty results and redundant steps.
    * @param cc compilation context
    * @return original or optimized expression
    * @throws QueryException query exception
    */
-  private Expr simplify(final CompileContext cc) throws QueryException {
+  private Expr cleanSteps(final CompileContext cc) throws QueryException {
     // root yields no result
     if(root != null && root.seqType().zero()) return cc.emptySeq(this);
 

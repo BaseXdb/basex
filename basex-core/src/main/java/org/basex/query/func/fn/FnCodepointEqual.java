@@ -19,23 +19,23 @@ import org.basex.query.value.type.*;
 public final class FnCodepointEqual extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Boolean test = test(qc);
-    return test != null ? Bln.get(test) : Empty.VALUE;
+    final Boolean equal = equal(qc);
+    return equal != null ? Bln.get(equal) : Empty.VALUE;
   }
 
   @Override
   protected boolean ebv(final QueryContext qc) throws QueryException {
-    final Boolean test = test(qc);
-    return test != null && test;
+    final Boolean equal = equal(qc);
+    return equal != null && equal;
   }
 
   /**
-   * Performs the test.
+   * Compares the two values.
    * @param qc query context
    * @return result of check, or {@code null} if one input is an empty sequence
    * @throws QueryException query exception
    */
-  private Boolean test(final QueryContext qc) throws QueryException {
+  private Boolean equal(final QueryContext qc) throws QueryException {
     final Item value1 = arg(0).atomItem(qc, info);
     if(value1.isEmpty()) return null;
     final Item value2 = arg(1).atomItem(qc, info);

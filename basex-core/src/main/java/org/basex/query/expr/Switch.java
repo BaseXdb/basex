@@ -152,16 +152,16 @@ public final class Switch extends ParseExpr {
       cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
     }
 
-    Expr expr = simplify();
+    Expr expr = toBranch();
     if(expr == this) expr = toIf(cc);
     return expr;
   }
 
   /**
-   * Simplifies a switch expression with identical branches.
+   * Rewrites a switch with identical branches to a single branch.
    * @return new or original expression
    */
-  private Expr simplify() {
+  private Expr toBranch() {
     // only the default branch may be left at this stage
     final Expr expr = groups[0].rtrn();
     for(int g = groups.length - 1; g >= 1; g--) {

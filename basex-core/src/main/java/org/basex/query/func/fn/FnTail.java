@@ -97,7 +97,7 @@ public final class FnTail extends StandardFunc {
     }
     // head(file:read-text-lines(E)) → file:read-text-lines(E, 1)
     if(_FILE_READ_TEXT_LINES.is(input))
-      return FileReadTextLines.opt(this, 1, Long.MAX_VALUE, cc);
+      return FileReadTextLines.merge(this, 1, Long.MAX_VALUE, cc);
 
     // tail(1, 2, 3) → tail(2, 3)
     // tail((1 to 4), 5)) → tail(1 to 4), 5

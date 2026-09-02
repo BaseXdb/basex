@@ -154,7 +154,7 @@ public final class FnItemsAt extends StandardFunc {
         }
         // items-at(file:read-text-lines(E), pos) → file:read-text-lines(E, pos, 1)
         if(_FILE_READ_TEXT_LINES.is(input))
-          return FileReadTextLines.opt(this, l, 1, cc);
+          return FileReadTextLines.merge(this, l, 1, cc);
 
         // items-at((I1, I2, I3), 2) → I2
         // items-at((I, E), 2) → head(E)

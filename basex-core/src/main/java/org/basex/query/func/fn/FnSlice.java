@@ -56,8 +56,8 @@ public class FnSlice extends StandardFunc {
         }
       }
       // input size is unknown: exact range cannot be computed, check original properties
-      final long start = toLong(1, 1, cc.qc), end = toLong(2, Long.MAX_VALUE, cc.qc);
-      if(end == Long.MAX_VALUE && toLong(3, 1, cc.qc) == 1) {
+      final long start = longArg(1, 1, cc.qc), end = longArg(2, Long.MAX_VALUE, cc.qc);
+      if(end == Long.MAX_VALUE && longArg(3, 1, cc.qc) == 1) {
         // slice(E, -1) → foot(E)
         if(start == -1) return cc.function(FOOT, info, input);
         // slice(E, 1) → E
@@ -78,7 +78,7 @@ public class FnSlice extends StandardFunc {
    * @throws QueryException query exception
    */
   protected final Slice slice(final long size, final QueryContext qc) throws QueryException {
-    Slice s = new Slice(size, toLong(1, 0, qc), toLong(2, 0, qc), toLong(3, 0, qc), false);
+    Slice s = new Slice(size, longArg(1, 0, qc), longArg(2, 0, qc), longArg(3, 0, qc), false);
     if(s.step < 0) s = new Slice(size, -s.start, -s.end, -s.step, true);
     s.start = Math.max(1, s.start);
     s.end = Math.min(size, s.end);
@@ -94,7 +94,7 @@ public class FnSlice extends StandardFunc {
    * @return integer
    * @throws QueryException query exception
    */
-  private long toLong(final int i, final long dflt, final QueryContext qc) throws QueryException {
+  private long longArg(final int i, final long dflt, final QueryContext qc) throws QueryException {
     final Item item = arg(i).atomItem(qc, info);
     return item.isEmpty() ? dflt : toLong(item);
   }

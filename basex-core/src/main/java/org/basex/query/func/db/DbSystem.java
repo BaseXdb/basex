@@ -14,6 +14,6 @@ import org.basex.query.value.node.*;
 public final class DbSystem extends StandardFunc {
   @Override
   public FNode value(final QueryContext qc) {
-    return DbInfo.toNode(DbAccessFn.Q_SYSTEM, Info.info(qc.context), qc);
+    return DbInfo.node(DbAccessFn.Q_SYSTEM, Info.info(qc.context), qc);
   }
 }

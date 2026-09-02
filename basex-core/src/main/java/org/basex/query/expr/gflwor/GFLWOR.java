@@ -174,13 +174,13 @@ public final class GFLWOR extends ParseExpr {
     // apply all optimizations in a row until nothing changes anymore
     while(flattenReturn(cc) | flattenFor(cc) | unnestFLWR(cc) | unnestLets(cc) | ifToWhere(cc) |
         forToLet(cc) | slideLetsOut(cc) | inlineForLet(cc) | unusedClauses(cc) | unusedVars(cc) |
-        cleanDeadVars() | optimizeCond(cc, true) | optimizeCond(cc, false) | optimizePos(cc) |
+        cleanDeadVars() | optimizeCond(cc, true) | optimizeCond(cc, false) | posToPred(cc) |
         optimizeOrderBy(cc));
 
     mergeWheres(cc, true);
     mergeWheres(cc, false);
 
-    final Expr expr = simplify(cc);
+    final Expr expr = rewrite(cc);
     if(expr != null) {
       cc.info(QueryText.OPTSIMPLE_X_X, (Supplier<?>) this::description, expr);
       return expr;
@@ -198,12 +198,12 @@ public final class GFLWOR extends ParseExpr {
   }
 
   /**
-   * Simplifies a FLWOR expression.
+   * Rewrites the FLWOR expression.
    * @param cc compilation context
    * @return optimized expression or {@code null}
    * @throws QueryException query exception
    */
-  private Expr simplify(final CompileContext cc) throws QueryException {
+  private Expr rewrite(final CompileContext cc) throws QueryException {
     // replace with expression of 'return' clause if all clauses were removed
     //  return R → R
     final int cs = clauses.size();
@@ -761,7 +761,7 @@ public final class GFLWOR extends ParseExpr {
    * @return change flag
    * @throws QueryException query exception
    */
-  private boolean optimizePos(final CompileContext cc) throws QueryException {
+  private boolean posToPred(final CompileContext cc) throws QueryException {
     boolean changed = false;
     for(int c = 0; c < clauses.size(); c++) {
       final Clause clause = clauses.get(c);

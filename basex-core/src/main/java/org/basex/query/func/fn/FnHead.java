@@ -68,7 +68,7 @@ public final class FnHead extends StandardFunc {
     }
     // head(file:read-text-lines(E)) → file:read-text-lines(E, 0, 1)
     if(_FILE_READ_TEXT_LINES.is(input))
-      return FileReadTextLines.opt(this, 0, 1, cc);
+      return FileReadTextLines.merge(this, 0, 1, cc);
 
     // rewrite list to its arguments or to elvis operator
     if(input instanceof List) {

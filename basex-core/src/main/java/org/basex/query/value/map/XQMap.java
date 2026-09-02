@@ -231,7 +231,7 @@ public abstract class XQMap extends XQStruct {
   /**
    * Tests all entries.
    * @param func predicate function
-   * @return {@code true} if all the check is successful for all entries
+   * @return {@code true} if the check is successful for all entries
    * @throws QueryException query exception
    */
   public abstract boolean test(QueryBiPredicate<Item, Value> func) throws QueryException;

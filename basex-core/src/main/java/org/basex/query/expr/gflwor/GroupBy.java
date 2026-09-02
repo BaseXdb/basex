@@ -186,7 +186,7 @@ public final class GroupBy extends Clause {
        * @param items1 first keys
        * @param items2 second keys
        * @param deeps deep equality comparisons
-       * @return {@code true} if the compare as equal, {@code false} otherwise
+       * @return {@code true} if they compare as equal, {@code false} otherwise
        * @throws QueryException query exception
        */
       private static boolean eq(final Item[] items1, final Item[] items2, final DeepEqual[] deeps)

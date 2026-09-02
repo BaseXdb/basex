@@ -98,7 +98,7 @@ public final class FileReadTextLines extends FileReadFn {
   }
 
   /**
-   * Creates an optimized version of a {@link FileReadTextLines} call.
+   * Merges new bounds into a {@link FileReadTextLines} call.
    * @param func original function (argument is an instance of the function of this class)
    * @param start first item to return (starting from 0)
    * @param length number of items to return
@@ -106,7 +106,7 @@ public final class FileReadTextLines extends FileReadFn {
    * @return optimized function instance; original function otherwise
    * @throws QueryException query exception
    */
-  public static Expr opt(final StandardFunc func, final long start, final long length,
+  public static Expr merge(final StandardFunc func, final long start, final long length,
       final CompileContext cc) throws QueryException {
 
     final Expr[] args = func.arg(0).args();

@@ -244,7 +244,7 @@ public class FnSubsequence extends StandardFunc {
         return cc.function(TAIL, info, input);
       // subsequence(file:read-text-lines(E), pos, length) → file:read-text-lines(E, pos, length)
       if(_FILE_READ_TEXT_LINES.is(input))
-        return FileReadTextLines.opt(this, sr.start, sr.length, cc);
+        return FileReadTextLines.merge(this, sr.start, sr.length, cc);
       // subsequence(replicate(I, count), pos, length) → replicate(I, length)
       if(REPLICATE.is(input)) {
         final Expr[] args = input.args().clone();

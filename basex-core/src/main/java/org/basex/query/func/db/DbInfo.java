@@ -19,7 +19,7 @@ public final class DbInfo extends DbAccessFn {
   @Override
   public FNode value(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
-    return toNode(Q_DATABASE, InfoDB.db(data, false, true), qc);
+    return node(Q_DATABASE, InfoDB.db(data, false, true), qc);
   }
 
   /**
@@ -29,7 +29,7 @@ public final class DbInfo extends DbAccessFn {
    * @param qc query context
    * @return node
    */
-  static FNode toNode(final QNm name, final String string, final QueryContext qc) {
+  static FNode node(final QNm name, final String string, final QueryContext qc) {
     final FBuilder root = FElem.build(name);
 
     FBuilder header = null;
