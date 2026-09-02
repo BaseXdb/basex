@@ -117,7 +117,7 @@ declare function html:wrap(
             }
           }</div>
         </div>
-        <a href='{ request:context-path() }/dba' class='header-logo'>
+        <a href='/' class='header-logo'>
           <img src='.static/basex.svg' alt='BaseX'/>
         </a>
       </header>
