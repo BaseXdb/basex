@@ -189,10 +189,7 @@ public final class Functions {
     // Java function
     final JavaCall java = JavaCall.get(name, fb.args(), qc, info);
     if(java != null) {
-      final SeqType[] sts = new SeqType[arity];
-      Arrays.fill(sts, Types.ITEM_ZM);
-      final SeqType st = FuncType.get(fb.anns, null, sts).seqType();
-      return new FuncLit(info, java, fb.params, fb.anns, st, name, fb.vs);
+      return new Closure(info, java, fb.params, fb.anns, fb.vs, null, null, name, true);
     }
     if(runtime) return null;
 
@@ -369,12 +366,12 @@ public final class Functions {
   }
 
   /**
-   * Creates a function item expression ({@link Closure}, {@link FuncItem}, or {@link FuncLit}).
+   * Creates a function item expression ({@link Closure} or {@link FuncItem}).
    * At parse and compile time, a closure is generated to enable inlining and compilation.
    * At runtime, we directly generate a function item.
    * @param expr function body
    * @param fb function arguments
-   * @param ft function type (can be {@code null})
+   * @param ft function type
    * @param name function name
    * @param updating flag for updating functions
    * @param context context-dependent flag
@@ -387,18 +384,14 @@ public final class Functions {
     final AnnList anns = fb.anns;
     final VarScope vs = fb.vs;
 
-    // context access must be bound to original focus
-    // example: let $f := last#0 return (1, 2)[$f()]
-    if(context) {
-      return new FuncLit(fb.info, expr, params, anns, ft.seqType(), name, vs);
-    }
-    // runtime: create function item
-    if(fb.runtime) {
+    // runtime: create function item (context access is bound to the current focus)
+    if(fb.runtime && !context) {
       return new FuncItem(fb.info, expr, params, anns, ft, vs.stackSize(), name);
     }
-    // otherwise: create closure
-    final SeqType declType = updating ? Types.EMPTY_SEQUENCE_Z : ft != null ? ft.declType : null;
-    return new Closure(fb.info, expr, params, anns, vs, null, declType, name);
+    // otherwise: create closure; context access must be bound to the original focus
+    // example: let $f := last#0 return (1, 2)[$f()]
+    final SeqType declType = updating ? Types.EMPTY_SEQUENCE_Z : ft.declType;
+    return new Closure(fb.info, expr, params, anns, vs, null, declType, name, context);
   }
 
   /**

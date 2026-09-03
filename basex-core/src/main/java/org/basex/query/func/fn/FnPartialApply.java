@@ -5,13 +5,11 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.query.var.*;
 
 /**
  * Function implementation.
@@ -66,19 +64,6 @@ public final class FnPartialApply extends StandardFunc {
     }
     if(placeholders == arity) return function;
 
-    final Var[] params = new Var[placeholders];
-    final VarScope vs = new VarScope();
-    for(int i = 0, p = 0; i < arity; ++i) {
-      if(funcArgs[i] == Empty.UNDEFINED) {
-        final Var var = vs.addNew(function.paramName(i), ft.argTypes[i], qc, info);
-        params[p++] = var;
-        funcArgs[i] = new VarRef(info, var);
-      }
-    }
-    final Expr body = function.funcBody(vs, funcArgs, null, cc, info);
-
-    final FuncType type = FuncType.get(AnnList.EMPTY, ft.declType, params).
-        withRefinedType(ft.refinedType);
-    return new FuncItem(info, body, params, AnnList.EMPTY, type, vs.stackSize(), null);
+    return function.partial(funcArgs, null, qc, cc, info);
   }
 }

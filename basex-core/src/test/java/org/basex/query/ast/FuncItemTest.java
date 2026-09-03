@@ -29,6 +29,32 @@ public final class FuncItemTest extends SandboxTest {
     query("declare context item := 1; let $f := last#0 return (2, 3)[$f()]", 2);
   }
 
+  /** Checks that a named function reference captures the query focus. */
+  @Test public void focusLiteral() {
+    query("(1, 2, 3)[let $f := last#0 return $f()]", 3);
+    query("string-join((7, 8, 9)[let $f := position#0 return $f() = 2])", 8);
+    query("let $f := <b/>/name#0 return <a/>/$f()", "b");
+    query("for $f in (1 to 3) ! xs:double#0 return $f()", "1\n2\n3");
+    query("string('00' ! function-lookup(xs:QName('xs:hexBinary'), 0)())", "00");
+    // the body of an inline function is evaluated without a focus
+    error("let $f := fn() { . } return (1, 2)[$f()]", NOCTX_X);
+    // errors are raised when the function item is created, not when it is called
+    error("23 ! xs:error#0", FUNCCAST_X_X);
+  }
+
+  /** Checks that captured focuses are compared by fn:deep-equal. */
+  @Test public void focusLiteralEquality() {
+    query("let $f := (1, 1) ! xs:string#0 return deep-equal($f[1], $f[2])", true);
+    query("let $f := (1 to 2) ! xs:string#0 return deep-equal($f[1], $f[2])", false);
+    query("let $f := (<a/>, <b/>) ! name#0 return deep-equal($f[1], $f[2])", false);
+  }
+
+  /** Checks that a dynamically looked up function reference keeps its type. */
+  @Test public void focusLiteralType() {
+    query("let $n := xs:QName(('fn:last')[" + _RANDOM_DOUBLE.args() + " < 1]) "
+        + "return function-lookup($n, 0) instance of fn() as xs:integer", true);
+  }
+
   /** Coercion error in a function call: the variable stack must stay intact. */
   @Test public void coercionError() {
     query("declare function local:x($x as xs:integer) { $x }; "
@@ -47,7 +73,7 @@ public final class FuncItemTest extends SandboxTest {
   @Test public void literalTest() {
     check("lower-case#1('FooBar')",
         "foobar",
-        empty(FuncLit.class)
+        empty(Closure.class)
     );
   }
 
@@ -59,12 +85,12 @@ public final class FuncItemTest extends SandboxTest {
     );
   }
 
-  /** Checks if a partial application with non-empty closure is left alone. */
+  /** Checks if a partial application with non-empty closure is rewritten to a closure. */
   @Test public void partApp2Test() {
     check("for $sub in ('a', 'b', 'c', 'd', 'e', 'f')" +
         "return starts-with(?, $sub)('a')",
         "true\nfalse\nfalse\nfalse\nfalse\nfalse",
-        exists(PartFunc.class)
+        empty(PartFunc.class)
     );
   }
 
@@ -93,6 +119,50 @@ public final class FuncItemTest extends SandboxTest {
         "xs:integer\nxs:decimal");
 
     error("let $f := (op('+'), 42, op('-'))(12, ?) return $f(5)", INVTYPE_X);
+  }
+
+  /** Checks that a partial application is rewritten to a closure and inlined. */
+  @Test public void partAppClosure() {
+    check("declare function local:f($a as xs:integer, $b as xs:integer) { $a + $b };" +
+        "for $i in 1 to 2 return local:f(?, $i)(1)",
+        "2\n3",
+        empty(PartFunc.class),
+        empty(Util.className(DynFuncCall.class))
+    );
+  }
+
+  /** Checks that a partial application is not rewritten if an argument must be coerced. */
+  @Test public void partAppCoercion() {
+    // supplied arguments are coerced when the function item is created, not when it is called
+    query("let $data := if(current-date() gt xs:date('2000-01-01')) then 23 else 'x' " +
+        "return try { contains(?, $data) } catch * { string($err:code) }", "err:XPTY0004");
+    query("let $data := if(current-date() gt xs:date('2000-01-01')) then 23 else 'x' " +
+        "return try { partial-apply(contains#2, { 2: $data }) } catch * { string($err:code) }",
+        "err:XPTY0004");
+  }
+
+  /** Checks that a partial application preserves the annotations of the target function. */
+  @Test public void partAppAnnotations() {
+    final String decl = "declare %basex:lazy function local:f($a, $b) { $a };";
+    query(decl + "string-join(function-annotations(local:f(?, 1)) ! map:keys(.) ! string())",
+        "basex:lazy");
+    query(decl + "string-join(function-annotations(partial-apply(local:f#2, { 2: 1 })) ! " +
+        "map:keys(.) ! string())", "basex:lazy");
+  }
+
+  /** Checks that a partial application with only placeholders returns the original function. */
+  @Test public void partAppIdentity() {
+    check("declare function local:f($a, $b) { $a }; local:f(?, ?)(1, 2)",
+        1,
+        empty(PartFunc.class)
+    );
+    query("contains(substring := ?, value := ?)('bar', 'foobar')", true);
+  }
+
+  /** Checks that fn:partial-apply supports maps and arrays. */
+  @Test public void partialApplyStructures() {
+    query("partial-apply({ 'a': 1, 'b': 2 }, {})('b')", 2);
+    query("partial-apply([ 10, 20, 30 ], { 1: 2 })()", 20);
   }
 
   /** Checks that the Y combinator is pre-compiled. */
@@ -132,7 +202,7 @@ public final class FuncItemTest extends SandboxTest {
         "declare function local:b() { 42 };" +
         "local:a#0()",
         42,
-        empty(FuncLit.class)
+        empty(Closure.class)
     );
   }
 

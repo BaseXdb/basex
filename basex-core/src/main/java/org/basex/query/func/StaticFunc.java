@@ -2,7 +2,6 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
 
 import java.util.*;
 import java.util.function.*;
@@ -88,7 +87,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
             refined = true;
           }
         }
-        if(refined) cc.info(OPTREFINED_X, concat(name.prefixId(), '#', pl));
+        if(refined) cc.info(OPTREFINED_X, funcLabel());
       }
 
       // compile function body, handle return type
@@ -239,7 +238,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   @Override
   public Expr inline(final Expr[] exprs, final CompileContext cc) throws QueryException {
     if(!cc.inlineable(anns, expr) || has(Flag.CTX) || dontEnter) return null;
-    cc.info(OPTINLINE_X, (Supplier<?>) () -> concat(name.prefixId(), '#', params.length));
+    cc.info(OPTINLINE_X, (Supplier<?>) this::funcLabel);
     return cc.inline(params, exprs, null, expr, null, info);
   }
 

@@ -6,6 +6,7 @@ import static org.basex.query.QueryError.*;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -62,6 +63,18 @@ public final class PartFunc extends Arr {
         final int nargs = exprs.length - 1, arity = ft.argTypes.length;
         if(nargs != arity) throw arityError(func, nargs, arity, false, info);
 
+        // all arguments are placeholders in the original order: return original function
+        if(placeholders == nargs && placeholderPerm == null) return cc.replaceWith(this, func);
+
+        // FUNC(?, ARG) → fn($param) { FUNC($param, ARG) }: makes the call inlineable.
+        // supplied arguments must already match the parameter types: a closure would coerce them
+        // when the function is called, but coercion errors must be raised by the application
+        boolean rewrite = true;
+        for(int e = 0; e < nargs && rewrite; e++) {
+          rewrite = placeholder(exprs[e]) || exprs[e].seqType().instanceOf(ft.argTypes[e]);
+        }
+        if(rewrite) return cc.replaceWith(this, closure(func, ft, nargs, cc));
+
         final SeqType[] args = new SeqType[placeholders];
         for(int a = 0, e = 0; e < nargs; e++) if(placeholder(exprs[e])) {
           args[placeholderPerm == null ? a : placeholderPerm[a]] = ft.argTypes[e];
@@ -71,6 +84,53 @@ public final class PartFunc extends Arr {
       }
     }
     return this;
+  }
+
+  /**
+   * Rewrites this expression to a closure with one parameter per placeholder.
+   * @param func function expression
+   * @param ft type of the function expression
+   * @param nargs number of arguments
+   * @param cc compilation context
+   * @return closure
+   * @throws QueryException query exception
+   */
+  private Expr closure(final Expr func, final FuncType ft, final int nargs,
+      final CompileContext cc) throws QueryException {
+
+    final XQFunctionExpr xqf = func instanceof final XQFunctionExpr fe ? fe : null;
+    final AnnList anns = ft.anns;
+    final boolean updating = anns.contains(Annotation.UPDATING);
+
+    final Closure closure;
+    final VarScope vs = new VarScope();
+    cc.pushScope(vs);
+    try {
+      // the function and the supplied arguments are evaluated once, when the closure is created
+      final HashMap<Var, Expr> global = new HashMap<>();
+      final Var fn = vs.addNew(new QNm(FUNCTION), func.seqType(), cc.qc, info);
+      global.put(fn, func);
+
+      final Var[] params = new Var[placeholders];
+      final Expr[] args = new Expr[nargs];
+      for(int p = 0, e = 0; e < nargs; e++) {
+        final QNm name = xqf != null ? xqf.paramName(e) : new QNm(ARG + (e + 1));
+        final Var var = vs.addNew(name, ft.argTypes[e], cc.qc, info);
+        if(placeholder(exprs[e])) {
+          params[placeholderPerm == null ? p : placeholderPerm[p]] = var;
+          ++p;
+        } else {
+          global.put(var, exprs[e]);
+        }
+        args[e] = new VarRef(info, var).optimize(cc);
+      }
+      final Expr call = new DynFuncCall(info, updating, false,
+          new VarRef(info, fn).optimize(cc), args).optimize(cc);
+      closure = new Closure(info, call, params, anns, vs, global, ft.declType, null, false);
+    } finally {
+      cc.removeScope();
+    }
+    return closure.optimize(cc);
   }
 
   @Override
@@ -102,8 +162,7 @@ public final class PartFunc extends Arr {
    */
   private FItem funcItem(final FItem func, final QueryContext qc, final CompileContext cc)
       throws QueryException {
-    final int el = exprs.length - 1;
-    final int nargs = el, arity = func.arity();
+    final int nargs = exprs.length - 1, arity = func.arity();
     if(nargs != arity) throw arityError(func, nargs, arity, false, info);
 
     // all arguments are placeholders in the original order: return original function
@@ -111,26 +170,12 @@ public final class PartFunc extends Arr {
 
     final FuncType ft = func.funcType();
     final Expr[] args = new Expr[nargs];
-    final VarScope vs = new VarScope();
-
-    final Var[] params = new Var[placeholders];
-    for(int p = 0, e = 0; e < el; e++) {
+    for(int e = 0; e < nargs; e++) {
       final Expr expr = exprs[e];
-      final SeqType at = ft.argTypes[e];
-      if(placeholder(expr)) {
-        final Var param = vs.addNew(func.paramName(e), at, qc, info);
-        args[e] = new VarRef(info, param);
-        params[placeholderPerm == null ? p : placeholderPerm[p]] = param;
-        ++p;
-      } else {
-        args[e] = at.coerce(expr.value(qc), qc, info);
-      }
+      args[e] = placeholder(expr) ? Empty.UNDEFINED :
+        ft.argTypes[e].coerce(expr.value(qc), qc, info);
     }
-    final AnnList anns = func.annotations();
-    final Expr expr = func.funcBody(vs, args, null, cc, info);
-
-    final FuncType type = FuncType.get(anns, ft.declType, params).withRefinedType(ft.refinedType);
-    return new FuncItem(info, expr, params, anns, type, vs.stackSize(), null, qc.focus.copy());
+    return func.partial(args, placeholderPerm, qc, cc, info);
   }
 
   @Override

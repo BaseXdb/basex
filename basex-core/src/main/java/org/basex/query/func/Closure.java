@@ -43,6 +43,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   private AnnList anns;
   /** Updating flag. */
   private boolean updating;
+  /** Indicates if the query focus is captured; implies that no variables are bound. */
+  private final boolean focus;
 
   /** Map with requested function properties. */
   private final EnumMap<Flag, Boolean> map = new EnumMap<>(Flag.class);
@@ -67,7 +69,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
    */
   public Closure(final InputInfo info, final Expr expr, final Params params, final AnnList anns,
       final VarScope vs, final Map<Var, Expr> global) {
-    this(info, expr, params.vars(), anns, vs, global, params.seqType(), null);
+    this(info, expr, params.vars(), anns, vs, global, params.seqType(), null, false);
   }
 
   /**
@@ -80,9 +82,11 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
    * @param global bindings for non-local variables (can be {@code null})
    * @param declType declared type (can be {@code null})
    * @param name function name (can be {@code null})
+   * @param focus flag for capturing the query focus
    */
   Closure(final InputInfo info, final Expr expr, final Var[] params, final AnnList anns,
-      final VarScope vs, final Map<Var, Expr> global, final SeqType declType, final QNm name) {
+      final VarScope vs, final Map<Var, Expr> global, final SeqType declType, final QNm name,
+      final boolean focus) {
     super(info, expr, Types.FUNCTION_O);
     this.params = params;
     this.anns = anns;
@@ -90,6 +94,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     this.global = global == null ? new HashMap<>() : new HashMap<>(global);
     this.declType = declType == null || declType.eq(Types.ITEM_ZM) ? null : declType;
     this.name = name;
+    this.focus = focus;
   }
 
   @Override
@@ -109,8 +114,9 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public FuncType funcType() {
+    // before optimization, the sequence type is still the generic function type
     final FuncType ft = super.funcType();
-    return ft != null ? ft : FuncType.get(anns, declType, params);
+    return ft.argTypes != null ? ft : FuncType.get(anns, declType, params);
   }
 
   @Override
@@ -129,7 +135,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     compiled = true;
 
     checkUpdating();
-    captureContextIfNeeded(cc);
+    // if the whole focus is captured, single context values need not be bound
+    if(!focus) captureContextIfNeeded(cc);
 
     // compile closure
     for(final Entry<Var, Expr> entry : global.entrySet()) {
@@ -211,9 +218,10 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     exprType.assign(FuncType.get(anns, declType, params).withRefinedType(expr.seqType()));
 
     // only evaluate if:
+    // - no query focus needs to be captured
     // - the closure is empty, so we don't lose variables
     // - the result size is not too large
-    if(global.isEmpty() && !cc.largeResult(expr)) {
+    if(!(focus && expr.has(Flag.CTX)) && global.isEmpty() && !cc.largeResult(expr)) {
       try {
         return cc.preEval(this);
       } catch(final QueryException ex) {
@@ -225,6 +233,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public VarUsage count(final Var var) {
+    // captured focus: the context value is bound to the function body
+    if(focus && var == null) return expr.count(var);
     VarUsage all = VarUsage.NEVER;
     for(final Expr ex : global.values()) {
       if((all = all.plus(ex.count(var))) == VarUsage.MORE_THAN_ONCE) break;
@@ -280,6 +290,15 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public Expr inline(final InlineContext ic) throws QueryException {
+    // captured focus: the context value is bound to the function body
+    if(focus && ic.var == null) {
+      final Expr inlined = expr.inline(ic);
+      if(inlined == null) return null;
+      expr = inlined;
+      map.clear();
+      return optimize(ic.cc);
+    }
+
     boolean changed = false;
     for(final Entry<Var, Expr> entry : global.entrySet()) {
       final Expr inlined = entry.getValue().inline(ic);
@@ -316,7 +335,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
       final Expr ex = expr.copy(cc, innerVars);
       ex.markTailCalls(null);
-      return copyType(new Closure(info, ex, prms, anns, cc.vs(), bindings, declType, name));
+      return copyType(new Closure(info, ex, prms, anns, cc.vs(), bindings, declType, name, focus));
     } finally {
       cc.removeScope();
     }
@@ -344,7 +363,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       body = new GFLWOR(info, clauses, expr);
     }
 
-    final SeqType argType = body.seqType();
+    // the let clauses of a closure do not change the type of the function body
+    final SeqType argType = expr.seqType();
     final Expr checked;
     if(declType == null || argType.instanceOf(declType)) {
       // return type is already correct
@@ -361,8 +381,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       checked = new TypeCheck(info, body, declType);
     }
 
-    final FuncType ft = (FuncType) seqType().type;
-    return new FuncItem(info, checked, params, anns, ft, vs.stackSize(), name);
+    return new FuncItem(info, checked, params, anns, funcType(), vs.stackSize(), name,
+        focus ? qc.focus.copy() : null);
   }
 
   @Override
@@ -395,6 +415,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public boolean inlineable(final InlineContext ic) {
+    if(focus && ic.var == null) return expr.inlineable(ic);
     for(final Expr ex : global.values()) {
       if(!ex.inlineable(ic)) return false;
     }
@@ -492,7 +513,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   public boolean equals(final Object obj) {
     if(this == obj) return true;
     if(!(obj instanceof final Closure cls) || !Var.equalTypes(params, cls.params) ||
-        !Objects.equals(declType, cls.declType) || global.size() != cls.global.size()) return false;
+        !Objects.equals(declType, cls.declType) || focus != cls.focus ||
+        global.size() != cls.global.size()) return false;
 
     // non-local variables must be bound to equal expressions
     if(!global.isEmpty()) {
@@ -517,7 +539,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
         list.add(value);
       });
       list.add(expr);
-      plan.add(plan.create(this), list.toArray());
+      plan.add(plan.create(this, NAME, name == null ? null : name.prefixId()), list.toArray());
       return null;
     });
   }
@@ -534,6 +556,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
           global.forEach((k, v) -> qs.token(LET).token(k).token(":=").token(v));
           qs.token(RETURN);
         }
+        // a named reference captures the query focus: it is not equivalent to an inline function
+        if(name != null) qs.concat("(: ", funcLabel(), " :)");
         qs.token(FN).params(params).token(AS).token(funcType().refinedType).brace(expr);
         if(inlined) qs.token(')');
         return null;

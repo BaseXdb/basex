@@ -5,6 +5,7 @@ import org.basex.query.expr.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 
 /**
  * Interface for possibly non-compiled XQuery functions.
@@ -43,6 +44,15 @@ public interface XQFunctionExpr {
    * @return this function's annotations
    */
   AnnList annotations();
+
+  /**
+   * Returns the name and arity of this function in the syntax of a named function reference.
+   * @return label, or {@code null} if the function is anonymous
+   */
+  default byte[] funcLabel() {
+    final QNm name = funcName();
+    return name == null ? null : Token.concat(name.prefixId(), '#', arity());
+  }
 
   /**
    * Tries to inline this function with the given arguments.

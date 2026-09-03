@@ -426,11 +426,9 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public void toString(final QueryString qs) {
     if(qs.error() && name != null) {
-      qs.concat(name.prefixId(), "#", arity());
+      qs.token(funcLabel());
     } else {
-      if(name != null) {
-        qs.concat("(: ", name.prefixId(), "#", arity(), " :)");
-      }
+      if(name != null) qs.concat("(: ", funcLabel(), " :)");
       qs.token(anns).token(QueryText.FN).params(params);
       qs.token(QueryText.AS).token(funcType().refinedType).brace(expr);
     }

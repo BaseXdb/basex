@@ -10,7 +10,9 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -138,6 +140,43 @@ public abstract class FItem extends Item implements XQFunction {
     } finally {
       if(cc != null) cc.removeScope();
     }
+  }
+
+  /**
+   * Creates a function item in which some of the arguments of this function are bound to values.
+   * @param args coerced arguments, updated by this function ({@link Empty#UNDEFINED} for
+   *   placeholders)
+   * @param perm placeholder parameter permutation (can be {@code null})
+   * @param qc query context
+   * @param cc compilation context ({@code null} during runtime)
+   * @param ii input info (can be {@code null})
+   * @return function item
+   * @throws QueryException query exception
+   */
+  public final FuncItem partial(final Expr[] args, final int[] perm, final QueryContext qc,
+      final CompileContext cc, final InputInfo ii) throws QueryException {
+
+    final FuncType ft = funcType();
+    final int al = args.length;
+    int placeholders = 0;
+    for(final Expr arg : args) {
+      if(arg == Empty.UNDEFINED) ++placeholders;
+    }
+
+    final VarScope vs = new VarScope();
+    final Var[] params = new Var[placeholders];
+    for(int p = 0, a = 0; a < al; a++) {
+      if(args[a] == Empty.UNDEFINED) {
+        final Var var = vs.addNew(paramName(a), ft.argTypes[a], qc, ii);
+        params[perm == null ? p : perm[p]] = var;
+        args[a] = new VarRef(ii, var);
+        ++p;
+      }
+    }
+    final AnnList anns = annotations();
+    final Expr body = funcBody(vs, args, null, cc, ii);
+    final FuncType tp = FuncType.get(anns, ft.declType, params).withRefinedType(ft.refinedType);
+    return new FuncItem(ii, body, params, anns, tp, vs.stackSize(), null);
   }
 
   /**
