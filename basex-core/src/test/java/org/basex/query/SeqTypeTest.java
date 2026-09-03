@@ -1078,6 +1078,21 @@ public final class SeqTypeTest {
     assertTrue(JNODE.seqType().mayBeWrapped());
     assertTrue(ChoiceItemType.get(ARRAY, STRING).seqType().mayBeWrapped());
     assertFalse(ChoiceItemType.get(DATE, STRING).seqType().mayBeWrapped());
+
+    assertTrue(ITEM_O.mayBeJNode());
+    assertTrue(NODE_O.mayBeJNode());
+    assertTrue(JNODE.seqType().mayBeJNode());
+    assertFalse(FUNCTION_O.mayBeJNode());
+    assertFalse(MAP_O.mayBeJNode());
+    assertFalse(ARRAY_O.mayBeJNode());
+    assertFalse(RECORD_O.mayBeJNode());
+    assertFalse(XNODE_O.mayBeJNode());
+    assertFalse(ELEMENT_O.mayBeJNode());
+    assertFalse(ANY_ATOMIC_TYPE_O.mayBeJNode());
+    assertFalse(INTEGER_O.mayBeJNode());
+    assertFalse(ERROR_O.mayBeJNode());
+    assertTrue(ChoiceItemType.get(JNODE, STRING).seqType().mayBeJNode());
+    assertFalse(ChoiceItemType.get(ARRAY, STRING).seqType().mayBeJNode());
   }
 
   /**

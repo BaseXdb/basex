@@ -108,6 +108,11 @@ public final class XQueryModuleTest extends SandboxTest {
     error("declare variable $a := 1;" + func.args("$a"), VARUNDEF_X);
     error("for $a in (1, 2) return" + func.args("$a"), VARUNDEF_X);
 
+    // JNode arguments are unwrapped
+    query(func.args(" " + JTREE.args(" { 'q': '1 + 1' }") + "/q"), 2);
+    query(func.args(" function($a) { $a * 2 }",
+        " " + JTREE.args(" { 'args': [ 21 ] }") + "/args"), 42);
+
     // check updating expressions
     error(func.args("delete node ()"), XQUERY_NOUPDATES);
     error(func.args("declare %updating function local:x() {()}; local:x()"), XQUERY_NOUPDATES);

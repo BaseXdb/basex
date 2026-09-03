@@ -79,15 +79,6 @@ public abstract class Item extends Value {
     return this;
   }
 
-  /**
-   * {@inheritDoc}
-   * Overwritten by {@link JNode}.
-   */
-  @Override
-  public Iter unwrappedIter(final QueryContext qc) throws QueryException {
-    return iter();
-  }
-
   @Override
   public Value unwrappedValue(final QueryContext qc) {
     return this;

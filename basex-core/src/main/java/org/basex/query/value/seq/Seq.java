@@ -149,9 +149,14 @@ public abstract class Seq extends Value {
   public Value unwrappedValue(final QueryContext qc) {
     if(type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) return this;
 
-    final ValueBuilder vb = new ValueBuilder(qc, size);
-    for(final Item item : this) vb.add(item.unwrappedValue(qc));
-    return vb.value(this);
+    for(final Item item : this) {
+      if(item instanceof JNode) {
+        final ValueBuilder vb = new ValueBuilder(qc, size);
+        for(final Item it : this) vb.add(it.unwrappedValue(qc));
+        return vb.value();
+      }
+    }
+    return this;
   }
 
   @Override

@@ -63,6 +63,8 @@ public final class JobModuleTest extends SandboxTest {
     query(func.args("static-base-uri()", " { 'base-uri': 'abc.xq' }"));
     query(func.args("1", " ()", " { 'id': '123' }"));
     query(func.args("1", " ()", " { 'id': 'jobs.xq' }"));
+    // JNode arguments are unwrapped
+    query(func.args(" " + JTREE.args(" { 'q': '1' }") + "/q"));
   }
 
   /** Test method. */

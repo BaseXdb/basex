@@ -175,6 +175,9 @@ public final class InspectModuleTest extends SandboxTest {
     // queries
     query(func.args(" ()", "namespaces") + "?xml", "http://www.w3.org/XML/1998/namespace");
     query("starts-with(" + func.args(" ()", "base-uri") + ", 'file:')", true);
+    // JNode argument is unwrapped
+    query("starts-with(" + func.args(" " + JTREE.args(" { 'f': true#0 }") + "/f", "base-uri") +
+        ", 'file:')", true);
     query(func.args(" ()", "element-namespace"), "");
     query(func.args(" ()", "function-namespace"), "http://www.w3.org/2005/xpath-functions");
     query(func.args(" ()", "collation"),

@@ -610,10 +610,26 @@ public final class SeqType {
    * @return result of check
    */
   public boolean mayBeWrapped() {
+    return mayBe(NodeType.JNODE) || mayBe(Types.FUNCTION);
+  }
+
+  /**
+   * Tests if contents may be JNodes.
+   * @return result of check
+   */
+  public boolean mayBeJNode() {
+    return mayBe(NodeType.JNODE);
+  }
+
+  /**
+   * Tests if contents may be instances of the specified type.
+   * @param tp type to check
+   * @return result of check
+   */
+  private boolean mayBe(final Type tp) {
     if(zero()) return false;
     // basic types are checked directly, other types (choice, references) are intersected
-    return type instanceof BasicType ? type == BasicType.ITEM :
-      type.intersect(NodeType.JNODE) != null || type.intersect(Types.FUNCTION) != null;
+    return type instanceof BasicType ? type == BasicType.ITEM : type.intersect(tp) != null;
   }
 
   /**

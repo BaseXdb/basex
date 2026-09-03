@@ -20,7 +20,7 @@ public final class ArrayFilter extends ArrayFn {
     final XQArray array = toArray(arg(0), qc);
     final FItem predicate = toFunction(arg(1), 2, qc);
 
-    final HofArgs args = new HofArgs(2, predicate).set(0, arg(0).value(qc));
+    final HofArgs args = new HofArgs(2, predicate);
     final ArrayBuilder ab = new ArrayBuilder(qc);
     for(final Value value : array.members()) {
       if(test(predicate, args.set(0, value).inc(), qc)) ab.add(value);

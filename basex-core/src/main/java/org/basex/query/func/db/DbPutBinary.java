@@ -25,7 +25,7 @@ public class DbPutBinary extends DbNew {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
-    final Item input = arg(1).item(qc, info);
+    final Item input = arg(1).unwrappedItem(qc, info);
     final String path = toDbPath(arg(2), qc);
     if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
     if(path.isEmpty()) throw DB_PATH_X.get(info, path);

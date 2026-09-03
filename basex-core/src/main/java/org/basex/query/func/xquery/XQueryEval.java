@@ -62,7 +62,7 @@ public class XQueryEval extends StandardFunc {
     if(qcAnc != null) throw XQUERY_NESTED.get(info);
 
     // resolve query or function to be invoked
-    final Item input = arg(0).item(qc, info);
+    final Item input = arg(0).unwrappedItem(qc, info);
     final FuncItem function = toInvocable(input, qc);
     final IOContent query = function != null ? null : toContent(input, qc);
 

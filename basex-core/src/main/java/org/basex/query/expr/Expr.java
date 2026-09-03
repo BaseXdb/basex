@@ -157,7 +157,7 @@ public abstract class Expr extends ExprInfo {
    */
   public Iter unwrappedIter(final QueryContext qc) throws QueryException {
     final Iter iter = iter(qc);
-    if(!seqType().mayBeWrapped()) return iter;
+    if(!seqType().mayBeJNode()) return iter;
 
     return new Iter() {
       private Iter unwrapped;
@@ -199,7 +199,7 @@ public abstract class Expr extends ExprInfo {
    * @throws QueryException query exception
    */
   public final Item unwrappedItem(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return unwrappedValue(qc).item(qc, info(ii));
+    return seqType().mayBeJNode() ? unwrappedValue(qc).item(qc, info(ii)) : item(qc, info(ii));
   }
 
   /**

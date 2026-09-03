@@ -1091,6 +1091,9 @@ public final class DbModuleTest extends SandboxTest {
     query(_DB_GET_BINARY.args(NAME, "binary1"), "A");
     query(func.args(NAME, " xs:hexBinary('62')", "binary2"));
     query(_DB_GET_BINARY.args(NAME, "binary2"), "b");
+    // JNode input is unwrapped
+    query(func.args(NAME, " " + JTREE.args(" { 'b': xs:hexBinary('43') }") + "/b", "binary3"));
+    query(_DB_GET_BINARY.args(NAME, "binary3"), "C");
 
     // string input: interpreted as URI of an existing file
     error(func.args(NAME, "no-such-file.bin", "errPath"), WHICHRES_X);

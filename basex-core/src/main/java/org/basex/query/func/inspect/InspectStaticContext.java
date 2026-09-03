@@ -22,7 +22,7 @@ import org.basex.util.list.*;
 public final class InspectStaticContext extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item func = arg(0).item(qc, info);
+    final Item func = arg(0).unwrappedItem(qc, info);
     final String key = toString(arg(1), qc);
     final StaticContext sctx;
     if(func.isEmpty()) {

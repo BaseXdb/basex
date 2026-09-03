@@ -622,7 +622,7 @@ public abstract class StandardFunc extends Arr {
       final JobOptions options, final boolean service, final QueryContext qc)
       throws QueryException {
 
-    final Item item = query.item(qc, info);
+    final Item item = query.unwrappedItem(qc, info);
     final FuncItem function = toInvocable(item, qc);
     if(function != null) {
       // a service is written to disk, and a scheduled job outlives the query that created it
@@ -680,7 +680,7 @@ public abstract class StandardFunc extends Arr {
   protected final Value[] toArguments(final Expr expr, final FuncItem function,
       final QueryContext qc) throws QueryException {
 
-    final Item item = expr.item(qc, info);
+    final Item item = expr.unwrappedItem(qc, info);
     final XQArray array = item.isEmpty() ? XQArray.empty() : toArray(item);
     final int as = (int) array.structSize();
     if(as != function.arity()) throw APPLY_X_X.get(info, arguments(as), function, array);
