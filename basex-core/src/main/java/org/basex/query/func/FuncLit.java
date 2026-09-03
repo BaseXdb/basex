@@ -147,6 +147,6 @@ public final class FuncLit extends Single implements Scope, XQFunctionExpr {
   @Override
   public void toString(final QueryString qs) {
     qs.token(anns).concat("(: ", name.prefixId(), "#", params.length, " :)");
-    qs.token(FN).params(params).token(AS).token(funcType().declType).brace(expr);
+    qs.token(FN).params(params).token(AS).token(funcType().refinedType).brace(expr);
   }
 }

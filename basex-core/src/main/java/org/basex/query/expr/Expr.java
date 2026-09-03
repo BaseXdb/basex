@@ -371,8 +371,7 @@ public abstract class Expr extends ExprInfo {
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public Expr refineFunc(final CompileContext cc, final SeqType... argTypes)
-      throws QueryException {
+  public Expr refineFunc(final CompileContext cc, final SeqType... argTypes) throws QueryException {
     return this;
   }
 

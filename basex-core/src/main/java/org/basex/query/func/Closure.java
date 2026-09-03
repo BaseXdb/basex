@@ -233,8 +233,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  public Expr refineFunc(final CompileContext cc, final SeqType... argTypes)
-      throws QueryException {
+  public Expr refineFunc(final CompileContext cc, final SeqType... argTypes) throws QueryException {
     // skip refinement if function has too many parameters
     final int arity = arity();
     if(argTypes.length < arity) return this;
@@ -535,8 +534,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
           global.forEach((k, v) -> qs.token(LET).token(k).token(":=").token(v));
           qs.token(RETURN);
         }
-        qs.token(FN).params(params);
-        qs.token(AS).token(declType != null ? declType : Types.ITEM_ZM).brace(expr);
+        qs.token(FN).params(params).token(AS).token(funcType().refinedType).brace(expr);
         if(inlined) qs.token(')');
         return null;
       });

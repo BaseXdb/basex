@@ -396,11 +396,11 @@ public final class FuncItem extends FItem implements Scope {
       final FuncItem fitem = newType.eq(oldType) ? this :
         (FuncItem) coerceTo(newType, cc.qc, cc, info);
 
-      // drop redundant types
+      // drop redundant type checks, adopt the refined types
       final Var[] vars = fitem.params;
       for(int a = 0; a < arity; a++) {
         final SeqType vt = vars[a].declType;
-        if(vt != null && argTypes[a].instanceOf(vt)) vars[a].declType = null;
+        if(vt != null && argTypes[a].instanceOf(vt)) vars[a].refineType(argTypes[a], cc);
       }
       return fitem;
     }
@@ -432,7 +432,7 @@ public final class FuncItem extends FItem implements Scope {
         qs.concat("(: ", name.prefixId(), "#", arity(), " :)");
       }
       qs.token(anns).token(QueryText.FN).params(params);
-      qs.token(QueryText.AS).token(funcType().declType).brace(expr);
+      qs.token(QueryText.AS).token(funcType().refinedType).brace(expr);
     }
   }
 }

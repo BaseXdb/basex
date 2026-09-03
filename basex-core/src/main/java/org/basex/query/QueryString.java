@@ -4,6 +4,7 @@ import org.basex.io.serial.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.list.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -135,6 +136,23 @@ public final class QueryString {
    */
   public QueryString params(final Object[] params) {
     return tokens(params, ", ", true);
+  }
+
+  /**
+   * Adds function parameters with their declared or inferred types.
+   * @param params parameters to be added
+   * @return self reference
+   */
+  public QueryString params(final Var[] params) {
+    tb.add('(');
+    boolean more = false;
+    for(final Var param : params) {
+      if(more) tb.add(", ");
+      more = true;
+      param.toString(this, param.seqType());
+    }
+    tb.add(')');
+    return this;
   }
 
   /**

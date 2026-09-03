@@ -241,11 +241,20 @@ public final class Var extends ExprInfo {
 
   @Override
   public void toString(final QueryString qs) {
+    toString(qs, declaredType());
+  }
+
+  /**
+   * Adds the variable and the specified type to a query string.
+   * @param qs query string
+   * @param type type to be added
+   */
+  public void toString(final QueryString qs, final SeqType type) {
     if(qs.error()) {
       qs.token(name.varString());
     } else {
       qs.token(id());
-      if(declType != null) qs.token(AS).token(declType);
+      if(!type.eq(Types.ITEM_ZM)) qs.token(AS).token(type);
     }
   }
 }
