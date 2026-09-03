@@ -990,12 +990,71 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" fn($x) { $x }", " fn($x, $y) { $x }"), false);
     // context-dependent references capture the focus
     query("let $f := (<a/>, <b/>) ! fn:name#0 return " + func.args(" $f[1]", " $f[2]"), false);
+    // fn:last and fn:position access a single focus component
+    query(func.args(" (1) ! last#0", " (2) ! last#0"), true);
+    query(func.args(" (1) ! last#0", " (1, 2) ! last#0"), false);
+    query(func.args(" (<a/>) ! last#0", " (<b/>) ! last#0"), true);
+    query("let $f := (1, 2) ! last#0 return " + func.args(" $f[1]", " $f[2]"), true);
+    query(func.args(" (1) ! position#0", " (2) ! position#0"), true);
+    query("let $f := (1, 2) ! position#0 return " + func.args(" $f[1]", " $f[2]"), false);
+    query("let $f := (1, 2) ! position#0 return " + func.args(" $f[1]", " (9) ! position#0"), true);
+    query(func.args(" (1, 2) ! last#0", " (1, 2) ! position#0"), false);
+    // fn:last and fn:position require a context value: an absent one is not equivalent
+    query(func.args(" last#0", " last#0"), true);
+    query(func.args(" position#0", " position#0"), true);
+    query(func.args(" last#0", " (1) ! last#0"), false);
+    query(func.args(" position#0", " (1) ! position#0"), false);
+    query(func.args(" function-lookup(xs:QName('fn:last'), 0)", " (1) ! last#0"), false);
+    query("let $f := (1) ! function-lookup(xs:QName('fn:last'), 0) return " +
+        func.args(" $f", " (2) ! last#0"), true);
+    // a focus is captured in path expressions, but not by a for clause
+    query(func.args(" <a><b/><b/></a>/b ! last#0", " (1, 2) ! last#0"), true);
+    query(func.args(" <a><b/><b/></a>/b ! last#0", " (1) ! last#0"), false);
+    query("let $f := (for $x in (1, 2) return last#0) return " + func.args(" $f[1]", " $f[2]"),
+        true);
+    // coercion preserves equivalence
+    query("let $f as function() as xs:integer := (1) ! last#0 return " +
+        func.args(" $f", " (2) ! last#0"), true);
+    // name and annotations are ignored
+    query("declare namespace a = 'a'; " + func.args(" %a:x fn() { 1 }", " fn() { 1 }"), true);
+    query("declare %private function local:f() { 1 }; " +
+        func.args(" local:f#0", " fn() { 1 }"), true);
+    // a map is never equivalent to another function item
+    query(func.args(" {}", " fn($k) { () }"), false);
+    // partial applications
+    query(func.args(" concat('a', ?)", " concat('b', ?)"), false);
+    query(func.args(" partial-apply(concat#2, { 1: 'a' })", " concat('a', ?)"), true);
+    // references to a recursive function
+    query("declare function local:f($n) { if($n le 1) then 1 else $n * local:f($n - 1) }; " +
+        func.args(" local:f#1", " local:f#1"), true);
+    // an items-equal callback that returns an empty sequence falls back to the default rules
+    final String empty = " { 'items-equal': fn($a, $b) { () } }";
+    query(func.args(" (1) ! last#0", " (2) ! last#0", empty), true);
+    query(func.args(" <a/> ! name#0", " <b/> ! name#0", empty), false);
+    // other functions access the context value, but not its position and size
+    query("let $f := (1, 1) ! string#0 return " + func.args(" $f[1]", " $f[2]"), true);
+    query("let $f := (<a/>, <a/>) ! name#0 return " + func.args(" $f[1]", " $f[2]"), true);
+    // function items in sequences, maps and arrays
+    query("let $f := (1, 2, 3) ! last#0 return " + func.args(" $f", " reverse($f)"), true);
+    query("let $f := (1, 2, 3) ! position#0 return " + func.args(" $f", " reverse($f)"), false);
+    query(func.args(" { 'f': (1) ! last#0 }", " { 'f': (2) ! last#0 }"), true);
+    query("let $f := (1, 2) ! position#0 return " + func.args(" [ $f[1] ]", " [ $f[2] ]"), false);
     // closures: captured values are compared with deep equality
     query("let $n := <a/> return " + func.args(" fn() { $n }", " fn() { $n }"), true);
     query(func.args(" (let $n := <a/> return fn() { $n })", " (let $m := <a/> return fn() { $m })"),
         true);
     query(func.args(" (let $n := 1 return fn() { $n })", " (let $m := 2 return fn() { $m })"),
         false);
+    // captured values of different types, but with equal values
+    query(func.args(" (let $n := 1 return fn() { $n })", " (let $m := 1.0 return fn() { $m })"),
+        true);
+    query(func.args(" (let $n := 'a' return fn() { $n })",
+        " (let $m := xs:untypedAtomic('a') return fn() { $m })"), true);
+    query(func.args(" (let $n := 1 return fn() { $n })", " (let $m := '1' return fn() { $m })"),
+        false);
+    query(func.args(" fn() { 1 }", " fn() { 1.0 }"), true);
+    query(func.args(" fn() { 1 }", " fn() { 2 }"), false);
+    query(func.args(" fn() { 1 }", " fn() { true() }"), false);
 
     // options that are accepted, but cannot take effect in a processor without schema support
     query(func.args(1, 1, " { 'typed-values': false() }"), true);

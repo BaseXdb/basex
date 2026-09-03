@@ -248,12 +248,51 @@ public final class FuncItem extends FItem implements Scope {
   public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
     if(this == item) return true;
     if(!(item instanceof final FuncItem func) || !Var.equalTypes(params, func.params)) return false;
-    // same body; captured values (let bindings of a closure) are compared with deep equality
+    // same body, and same captured focus if either body accesses the context
     final Expr body = body(), fbody = func.body();
-    if(!(deep != null && body instanceof final GFLWOR gflwor ? gflwor.deepEqual(fbody, deep) :
-      body.equals(fbody))) return false;
-    // same captured focus, if either body accesses the context
-    return simple && func.simple || QueryFocus.deepEqual(focus, func.focus, deep);
+    return bodyEqual(body, fbody, deep) && (simple && func.simple || focusEqual(func, body, deep));
+  }
+
+  /**
+   * Checks if the bodies of two function items are equal.
+   * @param body first function body
+   * @param fbody second function body
+   * @param deep comparator (can be {@code null})
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  private static boolean bodyEqual(final Expr body, final Expr fbody, final DeepEqual deep)
+      throws QueryException {
+    if(deep != null) {
+      // captured values are compared with deep equality: bound in a closure, or inlined
+      if(body instanceof final GFLWOR gflwor) return gflwor.deepEqual(fbody, deep);
+      if(body instanceof final Value value && fbody instanceof final Value fvalue)
+        return deep.equal(value, fvalue);
+    }
+    return body.equals(fbody);
+  }
+
+  /**
+   * Checks if the focus components that are accessed by the body of two function items are
+   * deep-equal.
+   * @param func second function item
+   * @param body function body
+   * @param deep comparator (can be {@code null})
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  private boolean focusEqual(final FuncItem func, final Expr body, final DeepEqual deep)
+      throws QueryException {
+    final QueryFocus qf1 = focus, qf2 = func.focus;
+    if(qf1 == null || qf2 == null) return qf1 == qf2;
+    // fn:last and fn:position require a context value, but access only its size or position
+    final boolean lst = LAST.is(body);
+    if(lst || POSITION.is(body)) return (qf1.value == null) == (qf2.value == null) &&
+        (lst ? qf1.size == qf2.size : qf1.pos == qf2.pos);
+    // position and size are relevant if the body performs positional access
+    if(body.has(Flag.POS) && (qf1.pos != qf2.pos || qf1.size != qf2.size)) return false;
+    final Value v1 = qf1.value, v2 = qf2.value;
+    return v1 == null || v2 == null ? v1 == v2 : deep != null ? deep.equal(v1, v2) : v1.equals(v2);
   }
 
   /**
