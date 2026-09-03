@@ -1093,6 +1093,39 @@ public final class SeqTypeTest {
     assertFalse(ERROR_O.mayBeJNode());
     assertTrue(ChoiceItemType.get(JNODE, STRING).seqType().mayBeJNode());
     assertFalse(ChoiceItemType.get(ARRAY, STRING).seqType().mayBeJNode());
+
+    assertTrue(ITEM_O.mayBeFunction());
+    assertTrue(FUNCTION_O.mayBeFunction());
+    assertTrue(MAP_O.mayBeFunction());
+    assertTrue(ARRAY_O.mayBeFunction());
+    assertTrue(RECORD_O.mayBeFunction());
+    assertFalse(ANY_ATOMIC_TYPE_O.mayBeFunction());
+    assertFalse(INTEGER_O.mayBeFunction());
+    assertFalse(STRING_O.mayBeFunction());
+    assertFalse(XNODE_O.mayBeFunction());
+    assertFalse(NODE_O.mayBeFunction());
+    assertFalse(JNODE.seqType().mayBeFunction());
+    assertFalse(ERROR_O.mayBeFunction());
+    assertFalse(ChoiceItemType.get(ARRAY, STRING).seqType().mayBeFunction());
+  }
+
+  /** Checks that in-place resolution of forward references is not cached away. */
+  @Test public void forwardReferences() {
+    // a direct reference denotes item() while unresolved
+    final TypeRef ref = new TypeRef(new QNm("r"), null);
+    final SeqType st = ref.seqType();
+    assertTrue(st.mayBeJNode());
+    assertTrue(st.mayBeNumber());
+    ref.resolve(MAP_O.type);
+    assertFalse(st.mayBeJNode());
+    assertFalse(st.mayBeNumber());
+
+    // a reference in a choice item type is not dereferenced while unresolved
+    final TypeRef ref2 = new TypeRef(new QNm("s"), null);
+    final SeqType choice = ChoiceItemType.get(ref2, STRING).seqType();
+    assertFalse(choice.mayBeJNode());
+    ref2.resolve(JNODE);
+    assertTrue(choice.mayBeJNode());
   }
 
   /**

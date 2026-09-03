@@ -26,6 +26,16 @@ import org.basex.util.*;
 public final class SeqType {
   /** Number of cached sequence types (all occurrence indicators but {@link Occ#ZERO}). */
   private static final int OCCS = Occ.values().length - 1;
+  /** Number of cached checks. */
+  private static final int CHECKS = Check.values().length;
+
+  /** Cached checks. */
+  private enum Check {
+    /** May yield numbers. */ NUMBER,
+    /** May yield function items. */ FUNCTION,
+    /** May be wrapped in a data structure. */ WRAPPED,
+    /** May yield JNodes. */ JNODE
+  }
 
   /** Item type. */
   public final Type type;
@@ -35,6 +45,8 @@ public final class SeqType {
   private ArrayType arrayType;
   /** Map types (can be {@code null}; lazy instantiation). */
   private Map<Type, MapType> mapTypes;
+  /** Cached checks: lower bits flag evaluated checks, upper bits their results. */
+  private int checks;
 
   /**
    * Constructor.
@@ -198,8 +210,9 @@ public final class SeqType {
 
     // arrays, maps, records: structural cast without atomization
     if(dt instanceof ArrayType || dt instanceof MapType) {
-      if(!occ.check(value.size())) return castError(value, error, info);
-      final ValueBuilder vb = new ValueBuilder(qc, value.size());
+      final long size = value.size();
+      if(!occ.check(size)) return castError(value, error, info);
+      final ValueBuilder vb = new ValueBuilder(qc, size);
       for(final Item item : value) {
         qc.checkStop();
         Value cast = null;
@@ -396,9 +409,10 @@ public final class SeqType {
     }
     if(dt instanceof BasicType || dt instanceof EnumType) {
       final Value value = item.atomValue(qc, info);
-      if(value.size() == 1) return coerceAtomic((Item) value, qc, info);
+      final long size = value.size();
+      if(size == 1) return coerceAtomic((Item) value, qc, info);
 
-      final ValueBuilder vb = new ValueBuilder(qc, value.size());
+      final ValueBuilder vb = new ValueBuilder(qc, size);
       for(final Item it : value) {
         final Item cast = coerceAtomic(it, qc, info);
         if(cast == null) return null;
@@ -589,11 +603,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean mayBeNumber() {
-    if(zero()) return false;
-    // basic types are checked directly, other types (choice, references) are intersected
-    return type instanceof BasicType ?
-      type.isNumber() || type.oneOf(BasicType.ITEM, BasicType.ANY_ATOMIC_TYPE) :
-      type.intersect(BasicType.NUMERIC) != null;
+    return mayBe(Check.NUMBER);
   }
 
   /**
@@ -601,7 +611,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean mayBeFunction() {
-    return !zero() && (type == BasicType.ITEM || type instanceof FType);
+    return mayBe(Check.FUNCTION);
   }
 
   /**
@@ -610,7 +620,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean mayBeWrapped() {
-    return mayBe(NodeType.JNODE) || mayBe(Types.FUNCTION);
+    return mayBe(Check.WRAPPED);
   }
 
   /**
@@ -618,7 +628,40 @@ public final class SeqType {
    * @return result of check
    */
   public boolean mayBeJNode() {
-    return mayBe(NodeType.JNODE);
+    return mayBe(Check.JNODE);
+  }
+
+  /**
+   * Returns the cached result of the specified check.
+   * @param check check
+   * @return result of check
+   */
+  private boolean mayBe(final Check check) {
+    final int eval = 1 << check.ordinal(), value = eval << CHECKS;
+    if((checks & eval) != 0) return (checks & value) != 0;
+
+    final boolean result = compute(check);
+    if(!(type instanceof TypeRef || type instanceof ChoiceItemType)) {
+      checks |= eval | (result ? value : 0);
+    }
+    return result;
+  }
+
+  /**
+   * Evaluates the specified check.
+   * @param check check
+   * @return result of check
+   */
+  private boolean compute(final Check check) {
+    if(zero()) return false;
+    return switch(check) {
+      case NUMBER -> type instanceof BasicType ?
+        type.isNumber() || type.oneOf(BasicType.ITEM, BasicType.ANY_ATOMIC_TYPE) :
+        type.intersect(BasicType.NUMERIC) != null;
+      case FUNCTION -> type == BasicType.ITEM || type instanceof FType;
+      case WRAPPED -> mayBe(Check.JNODE) || mayBe(Types.FUNCTION);
+      case JNODE -> mayBe(NodeType.JNODE);
+    };
   }
 
   /**
@@ -627,8 +670,6 @@ public final class SeqType {
    * @return result of check
    */
   private boolean mayBe(final Type tp) {
-    if(zero()) return false;
-    // basic types are checked directly, other types (choice, references) are intersected
     return type instanceof BasicType ? type == BasicType.ITEM : type.intersect(tp) != null;
   }
 
