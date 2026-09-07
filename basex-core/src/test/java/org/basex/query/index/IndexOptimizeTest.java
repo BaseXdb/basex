@@ -329,6 +329,19 @@ public final class IndexOptimizeTest extends SandboxTest {
     query("(# db:enforceindex #) { head(db:get('" + NAME + "'))//*[text() = 'X'] }", "<x>X</x>");
   }
 
+  /** Leaf flags of elements with mixed content, rebuilt by an optimization. */
+  @Test public void optimizeLeaves() {
+    execute(new CreateDB(NAME, "<xml><a>x y</a><a>x <b>y</b></a></xml>"));
+    query("count(//a[. = 'x y'])", 2);
+    query("count(//a[. contains text 'y'])", 2);
+
+    // invalidate and rebuild the name statistics
+    query("insert node <!--c--> into //xml");
+    execute(new Optimize());
+    query("count(//a[. = 'x y'])", 2);
+    query("count(//a[. contains text 'y'])", 2);
+  }
+
   /** A variable is inlined into the database reference of an index access. */
   @Test public void dynamicIndexDb() {
     execute(new CreateDB(NAME));

@@ -131,6 +131,8 @@ public final class Optimize extends ACreate {
           final int id = data.nameId(pre);
           data.elemNames.store(data.elemNames.key(id));
           data.paths().index(id, Data.ELEM, level);
+          // set leaf node information in index
+          if(level > 1) data.elemNames.stats(elemStack.peek()).setLeaf(false);
           pars.push(pre);
           elemStack.push(id);
         } else if(kind == Data.ATTR) {
