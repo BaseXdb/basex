@@ -114,6 +114,11 @@ public enum MetaProp {
     public String value(final MetaData meta) { return meta.ftinclude; }
   },
   /** Property. */
+  FTMIXED(true) {
+    @Override
+    public Boolean value(final MetaData meta) { return meta.ftmixed; }
+  },
+  /** Property. */
   LANGUAGE(true) {
     @Override
     public String value(final MetaData meta) { return meta.language().toString(); }

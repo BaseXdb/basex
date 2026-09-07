@@ -201,6 +201,14 @@ public class BaseXTextField extends JTextField {
   }
 
   /**
+   * Marks the input as valid or invalid.
+   * @param valid valid flag
+   */
+  public final void valid(final boolean valid) {
+    setBackground(valid ? back : GUIConstants.lightRed);
+  }
+
+  /**
    * Checks and assigns the current value.
    * @param assign assign value
    * @return success flag
@@ -208,12 +216,10 @@ public class BaseXTextField extends JTextField {
   private boolean check(final boolean assign) {
     if(option instanceof final NumberOption number) {
       final int num = Strings.toInt(getText());
-      if(num == Integer.MIN_VALUE) {
-        setBackground(GUIConstants.lightRed);
-        return false;
-      }
+      final boolean valid = num != Integer.MIN_VALUE;
+      valid(valid);
+      if(!valid) return false;
       if(assign) options.set(number, num);
-      setBackground(back);
     } else {
       options.set((StringOption) option, getText());
     }

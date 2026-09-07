@@ -28,8 +28,10 @@ final class DialogFT extends DialogIndex {
   private static final int F_DIA = 3;
   /** Stopwords flag. */
   private static final int F_STOP = 4;
+  /** Mixed content flag. */
+  private static final int F_MIXED = 5;
   /** Number of flags. */
-  private static final int FLAGS = 5;
+  private static final int FLAGS = 6;
 
   /** Full-text indexing. */
   private final BaseXCheckBox[] check = new BaseXCheckBox[FLAGS];
@@ -49,7 +51,7 @@ final class DialogFT extends DialogIndex {
    */
   DialogFT(final BaseXDialog dialog, final boolean create) {
     super(dialog);
-    layout(new TableLayout(create ? 10 : 16, 1));
+    layout(new TableLayout(create ? 11 : 18, 1));
 
     final MainOptions opts = dialog.gui().context.options;
     add(new BaseXLabel(H_FULLTEXT_INDEX, true, false).border(0, 0, 6, 0));
@@ -58,11 +60,14 @@ final class DialogFT extends DialogIndex {
     add(ftinc);
 
     final String sw = opts.get(MainOptions.STOPWORDS);
-    final String[] cb = { LANGUAGE, STEMMING, CASE_SENSITIVE, DIACRITICS, STOPWORD_LIST };
-    final String[] desc = { H_LANGUAGE, H_STEMMING, H_CASE, H_DIACRITICS, H_STOPWORDS };
+    final String[] cb = { LANGUAGE, STEMMING, CASE_SENSITIVE, DIACRITICS, STOPWORD_LIST,
+      MIXED_CONTENT };
+    final String[] desc = { H_LANGUAGE, H_STEMMING, H_CASE, H_DIACRITICS, H_STOPWORDS,
+      H_MIXED_CONTENT };
     final boolean[] val = {
       !opts.get(MainOptions.LANGUAGE).isEmpty(), opts.get(MainOptions.STEMMING),
-      opts.get(MainOptions.CASESENS), opts.get(MainOptions.DIACRITICS), !sw.isEmpty() };
+      opts.get(MainOptions.CASESENS), opts.get(MainOptions.DIACRITICS), !sw.isEmpty(),
+      opts.get(MainOptions.FTMIXED) };
 
     final BaseXLabel[] labels = new BaseXLabel[FLAGS];
     final int cl = check.length;
@@ -75,6 +80,10 @@ final class DialogFT extends DialogIndex {
         labels[c] = new BaseXLabel(desc[c], true, false);
       }
     }
+
+    // mixed content: refers to the element names of the input field above
+    add(check[F_MIXED]);
+    if(!create) add(labels[F_MIXED]);
 
     final BaseXBack b1 = new BaseXBack(new ColumnLayout(8)).border(12, 0, 0, 0);
     b1.add(check[F_LANG]);
@@ -123,7 +132,7 @@ final class DialogFT extends DialogIndex {
   }
 
   @Override
-  void action(final boolean enabled) {
+  boolean action(final boolean enabled) {
     for(final BaseXCheckBox c : check) c.setEnabled(enabled);
 
     ftinc.setEnabled(enabled);
@@ -135,6 +144,19 @@ final class DialogFT extends DialogIndex {
     final IO file = IO.get(sw);
     final boolean exists = !sw.isEmpty() && file.exists();
     if(exists) dialog.gui().gopts.set(GUIOptions.DATAPATH, sw);
+
+    // mixed content can only be indexed if element names are specified
+    final boolean valid = !enabled || !check[F_MIXED].isSelected() || mixed();
+    ftinc.valid(valid);
+    return valid;
+  }
+
+  /**
+   * Indicates if mixed content can be indexed, i.e., if element names were specified.
+   * @return result of check
+   */
+  private boolean mixed() {
+    return check[F_MIXED].isSelected() && !ftinc.getText().trim().isEmpty();
   }
 
   @Override
@@ -147,5 +169,7 @@ final class DialogFT extends DialogIndex {
     gui.set(MainOptions.DIACRITICS, check[F_DIA].isSelected());
     gui.set(MainOptions.STOPWORDS, check[F_STOP].isSelected() ? swpath.getText() : "");
     gui.set(MainOptions.FTINCLUDE, ftinc.getText());
+    // the properties dialog ignores the result of the action method: check the input again
+    gui.set(MainOptions.FTMIXED, mixed());
   }
 }

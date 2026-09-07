@@ -1134,6 +1134,8 @@ public interface Text {
   String DIACRITICS = lang("diacritics");
   /** Full-text index using stopword list. */
   String STOPWORD_LIST = lang("stopword_list");
+  /** Full-text index information. */
+  String MIXED_CONTENT = lang("mixed_content");
 
   /** Ascending order. */
   String ASCENDING_ORDER = lang("ascending_order");
@@ -1421,6 +1423,8 @@ public interface Text {
   String H_DIACRITICS = lang("h_diacritics");
   /** Full-text index information. */
   String H_STOPWORDS = lang("h_stopwords");
+  /** Full-text index information. */
+  String H_MIXED_CONTENT = lang("h_mixed_content");
   /** Help on database options. */
   String H_DB_OPTIONS_X = lang("h_db_options_%", OPTIMIZE_ALL);
 

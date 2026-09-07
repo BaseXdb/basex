@@ -53,12 +53,13 @@ public final class DBCreate extends NameUpdate {
 
   @Override
   public void apply() throws QueryException {
+    Data data = null;
     try {
       // close existing database instance; raise error if it is still pinned or locked
       close();
 
       // create new database
-      final Data data = CreateDB.create(name, Parser.emptyParser(options), qc.context, options);
+      data = CreateDB.create(name, Parser.emptyParser(options), qc.context, options);
 
       // add initial documents and optimize database
       if(clip != null) {
@@ -70,10 +71,11 @@ public final class DBCreate extends NameUpdate {
           data.finishUpdate(options);
         }
       }
-      Close.close(data, qc.context);
     } catch(final IOException ex) {
       throw UPDBERROR_X.get(info, ex);
     } finally {
+      // release the database instance, also if the creation was interrupted
+      if(data != null) Close.close(data, qc.context);
       if(clip != null) clip.finish();
     }
   }

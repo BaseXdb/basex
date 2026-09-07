@@ -41,8 +41,9 @@ final class DialogValues extends DialogIndex {
   }
 
   @Override
-  void action(final boolean enabled) {
+  boolean action(final boolean enabled) {
     include.setEnabled(enabled);
+    return true;
   }
 
   @Override

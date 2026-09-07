@@ -92,6 +92,7 @@ declare function panels:databases(
                                   placeholder='File, directory, archive or URL'/>),
       form:parsing-fields(),
       form:language-field('en'),
+      form:ftinclude-field(),
       (: how the input is parsed, and what is indexed: two columns, as one would be a list
          that is longer than the screen :)
       <div class='field-columns'>{
@@ -301,6 +302,7 @@ declare %private function panels:optimize-dialog(
   return form:dialog('optimize', 'Optimize Database', 'databases/optimize-db', false(), (
     <input type='hidden' name='name' value='{ $name }'/>,
     form:language-field($info//language),
+    form:ftinclude-field($info//ftinclude),
     form:checkbox('all', 'true', false(), 'Full optimization'),
     form:index-options($info//*[text() = 'true']/name(), false())
   ))

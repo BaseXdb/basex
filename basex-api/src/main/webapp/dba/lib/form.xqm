@@ -176,6 +176,7 @@ declare %private variable $form:INDEX-OPTIONS := (
   { 'name': 'tokenindex', 'label': 'Token Index', 'index': true() },
   { 'name': 'updindex', 'label': 'Incremental Indexing', 'create': true() },
   { 'name': 'ftindex', 'label': 'Fulltext Index', 'index': true() },
+  { 'name': 'ftmixed', 'label': 'Mixed Content' },
   { 'name': 'stemming', 'label': 'Stemming' },
   { 'name': 'casesens', 'label': 'Case Sensitivity' },
   { 'name': 'diacritics', 'label': 'Diacritics' }
@@ -223,21 +224,38 @@ declare function form:language-field(
 };
 
 (:~
+ : Creates the field that restricts the full-text index to specific element names.
+ : @param  $names  element names
+ : @return form field
+ :)
+declare function form:ftinclude-field(
+  $names  as xs:string? := ()
+) as element(div) {
+  (: the names are what Mixed Content refers to: string values are indexed for these
+     elements, so the option is rejected if no name is supplied :)
+  form:field('Full-text names:', <input type='text' name='ftinclude' value='{ $names }'
+    placeholder='name, *:name, Q{{uri}}name'/>)
+};
+
+(:~
  : Returns the index options of a database dialog as database options.
- : @param  $opts    checked options
- : @param  $lang    language
- : @param  $create  include the options that are reserved for new databases
+ : @param  $opts     checked options
+ : @param  $lang     language
+ : @param  $include  element names of the full-text index
+ : @param  $create   include the options that are reserved for new databases
  : @return database options
  :)
 declare function form:index-map(
-  $opts    as xs:string*,
-  $lang    as xs:string?,
-  $create  as xs:boolean
+  $opts     as xs:string*,
+  $lang     as xs:string?,
+  $include  as xs:string?,
+  $create   as xs:boolean
 ) as map(*) {
   map:merge((
     for $option in form:index-list($create)
     return map:entry($option?name, $opts = $option?name),
-    $lang ! map:entry('language', .)
+    $lang ! map:entry('language', .),
+    $include ! map:entry('ftinclude', .)
   ))
 };
 

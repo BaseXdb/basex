@@ -223,7 +223,7 @@ function dba:action(
         } else {
           (: without an input, an empty database is created :)
           db:create($args?name, $args?input[.], (), map:merge((
-            form:index-map($args?opts, $args?lang, true()),
+            form:index-map($args?opts, $args?lang, $args?ftinclude, true()),
             form:parsing-map($args?opts, $args?filter, $args?parser)
           )))
         }
@@ -242,7 +242,7 @@ function dba:action(
       'info'  : utils:info($args?name, 'database', 'optimized'),
       'run'   : %updating fn() {
         db:optimize($args?name, boolean($args?all),
-          form:index-map($args?opts, $args?lang, false()))
+          form:index-map($args?opts, $args?lang, $args?ftinclude, false()))
       }
     } },
     'rename': fn($args) {

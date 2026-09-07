@@ -14,14 +14,19 @@ import org.basex.query.value.item.*;
 public final class FtCount extends FtAccessFn {
   @Override
   public Itr value(final QueryContext qc) throws QueryException {
-    final FTPosData tmp = qc.ftPosData;
-    qc.ftPosData = new FTPosData();
-    final Iter nodes = arg(0).unwrappedIter(qc);
-    for(Item item; (item = qc.next(nodes)) != null;) {
-      toNode(item);
+    // only the positions of the returned nodes are counted: index requests may yield
+    // additional candidates, which are discarded by the subsequent name tests
+    final FTPosData tmp = qc.ftPosData, ftPosData = new FTPosData();
+    qc.ftPosData = ftPosData;
+    try {
+      int count = 0;
+      final Iter nodes = arg(0).unwrappedIter(qc);
+      for(Item item; (item = qc.next(nodes)) != null;) {
+        count += ftPosData.size(toNode(item));
+      }
+      return Itr.get(count);
+    } finally {
+      qc.ftPosData = tmp;
     }
-    final int size = qc.ftPosData.size();
-    qc.ftPosData = tmp;
-    return Itr.get(size);
   }
 }

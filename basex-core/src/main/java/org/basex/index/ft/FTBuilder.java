@@ -45,6 +45,10 @@ public final class FTBuilder extends IndexBuilder {
     fto.sw = new StopWords(data, meta.stopwords);
     fto.ln = data.meta.language();
 
+    // element names are required; wildcards are allowed (all elements on all levels)
+    if(meta.ftmixed && meta.ftinclude.isEmpty())
+      throw new BaseXException("% requires %.", MainOptions.FTMIXED.name(),
+          MainOptions.FTINCLUDE.name());
     if(!Tokenizer.supportFor(fto.ln))
       throw new BaseXException(NO_TOKENIZER_X, fto.ln);
     if(meta.stemming && !Stemmer.supportFor(fto.ln))
@@ -58,28 +62,12 @@ public final class FTBuilder extends IndexBuilder {
     Util.debugln(detailedInfo());
 
     try {
+      // index the string values of the included elements, or the values of text nodes
+      final boolean mixed = data.meta.ftmixed;
       for(pre = 0; pre < size; ++pre) {
         if((pre & 0x0FFF) == 0) check();
-        if(!indexEntry()) continue;
-
-        // current lexer position
-        final StopWords sw = lexer.ftOpt().sw;
-        lexer.init(data.text(pre, true));
-        int pos = -1;
-        while(lexer.hasNext()) {
-          final byte[] token = lexer.nextToken();
-          ++pos;
-          // skip too long and stopword tokens
-          if(token.length <= data.meta.maxlen && !sw.contains(token)) {
-            // check if main memory is exhausted
-            if((ntok++ & 0xFFFF) == 0 && splitRequired()) {
-              writeIndex(true);
-              clean();
-            }
-            tree.index(token, pre, pos, splits);
-            count++;
-          }
-        }
+        // atomized value of a text node is its own value
+        if(mixed ? indexElement() : indexEntry()) index(data.atom(pre));
       }
 
       // finalize partial or all index structures
@@ -91,6 +79,31 @@ public final class FTBuilder extends IndexBuilder {
       // drop index files
       data.meta.drop(DATAFTX + ".*");
       throw th;
+    }
+  }
+
+  /**
+   * Indexes the tokens of a value.
+   * @param value value to be indexed
+   * @throws IOException I/O exception
+   */
+  private void index(final byte[] value) throws IOException {
+    final StopWords sw = lexer.ftOpt().sw;
+    lexer.init(value);
+    int pos = -1;
+    while(lexer.hasNext()) {
+      final byte[] token = lexer.nextToken();
+      ++pos;
+      // skip too long and stopword tokens
+      if(token.length <= data.meta.maxlen && !sw.contains(token)) {
+        // check if main memory is exhausted
+        if((ntok++ & 0xFFFF) == 0 && splitRequired()) {
+          writeIndex(true);
+          clean();
+        }
+        tree.index(token, pre, pos, splits);
+        count++;
+      }
     }
   }
 

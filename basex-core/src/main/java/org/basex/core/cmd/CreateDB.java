@@ -179,7 +179,14 @@ public final class CreateDB extends ACreate {
       data = Open.open(name, ctx, options, true, true);
     }
 
-    CreateIndex.create(data, null);
+    try {
+      CreateIndex.create(data, null);
+    } catch(final IOException ex) {
+      // remove incompletely created database
+      Close.close(data, ctx);
+      DropDB.drop(data, ctx.soptions);
+      throw ex;
+    }
     return data;
   }
 

@@ -67,6 +67,8 @@ public final class MetaData {
   public String tokeninclude;
   /** Full-text index: names to include. */
   public String ftinclude;
+  /** Full-text index: string values of mixed-content elements. */
+  public boolean ftmixed;
 
   /** Flag for full-text stemming. */
   public boolean stemming;
@@ -157,6 +159,7 @@ public final class MetaData {
     attrinclude = meta.attrinclude;
     tokeninclude = meta.tokeninclude;
     ftinclude = meta.ftinclude;
+    ftmixed = meta.ftmixed;
     stemming = meta.stemming;
     casesens = meta.casesens;
     diacritics = meta.diacritics;
@@ -199,6 +202,7 @@ public final class MetaData {
     attrinclude = options.get(MainOptions.ATTRINCLUDE);
     tokeninclude = options.get(MainOptions.TOKENINCLUDE);
     ftinclude = options.get(MainOptions.FTINCLUDE);
+    ftmixed = options.get(MainOptions.FTMIXED);
     splitsize = options.get(MainOptions.SPLITSIZE);
   }
 
@@ -489,6 +493,7 @@ public final class MetaData {
         case DBATVINC -> attrinclude = v;
         case DBTOKINC -> tokeninclude = v;
         case DBFTXINC -> ftinclude = v;
+        case DBFTMIX -> ftmixed = isTrue(v);
         case DBSPLITS -> splitsize = toInt(v);
         case DBCRTTXT -> createtext = isTrue(v);
         case DBCRTATV -> createattr = isTrue(v);
@@ -532,6 +537,7 @@ public final class MetaData {
     writeInfo(out, DBATVINC,   attrinclude);
     writeInfo(out, DBTOKINC,   tokeninclude);
     writeInfo(out, DBFTXINC,   ftinclude);
+    writeInfo(out, DBFTMIX,    ftmixed);
     writeInfo(out, DBSPLITS,   splitsize);
     writeInfo(out, DBCRTTXT,   createtext);
     writeInfo(out, DBCRTATV,   createattr);

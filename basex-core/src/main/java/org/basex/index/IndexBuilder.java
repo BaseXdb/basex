@@ -90,6 +90,14 @@ public abstract class IndexBuilder extends Job {
   }
 
   /**
+   * Checks if the string value of the current element should be indexed.
+   * @return result of check
+   */
+  protected final boolean indexElement() {
+    return data.kind(pre) == Data.ELEM && includeNames.containsElement(pre);
+  }
+
+  /**
    * Decides whether in-memory temporary index structures are so large
    * that we must flush them to disk before continuing.
    * @return true if structures shall be flushed to disk

@@ -222,6 +222,10 @@ public final class FTWords extends FTExpr {
 
     final FTLexer input = new FTLexer(ftOpt);
     final FTTokens fttokens = ftt.cache(lexer.token());
+    // with mixed content, the string values of the indexed elements are scanned
+    final IndexNames names = data.meta.ftmixed ?
+      new IndexNames(IndexType.FULLTEXT, data) : null;
+    final int kind = names != null ? Data.ELEM : Data.TEXT;
     return new FTIndexIterator() {
       final int sz = data.nodes();
       int pre = -1, ps;
@@ -233,8 +237,9 @@ public final class FTWords extends FTExpr {
       @Override
       public boolean more() {
         while(++pre < sz) {
-          if(data.kind(pre) != Data.TEXT) continue;
-          input.init(data.text(pre, true));
+          if(data.kind(pre) != kind || names != null && !names.containsElement(pre)) continue;
+          // atomized value of a text node is its own value
+          input.init(data.atom(pre));
           ftt.matches.reset(ps);
           try {
             if(contains(fttokens, input, ftt) != 0) return true;

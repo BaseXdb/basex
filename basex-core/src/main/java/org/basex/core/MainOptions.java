@@ -117,6 +117,8 @@ public final class MainOptions extends Options {
 
   // Full-Text
 
+  /** Flag for indexing the string values of mixed-content elements. */
+  public static final BooleanOption FTMIXED = new BooleanOption("FTMIXED", false);
   /** Flag for full-text stemming. */
   public static final BooleanOption STEMMING = new BooleanOption("STEMMING", false);
   /** Flag for full-text case-sensitivity. */
@@ -194,7 +196,7 @@ public final class MainOptions extends Options {
   /** Indexing options. */
   public static final Option<?>[] INDEXING = { MAXCATS, MAXLEN, SPLITSIZE, LANGUAGE, STOPWORDS,
     TEXTINDEX, ATTRINDEX, TOKENINDEX, FTINDEX, TEXTINCLUDE, ATTRINCLUDE, TOKENINCLUDE, FTINCLUDE,
-    STEMMING, CASESENS, DIACRITICS, UPDINDEX, AUTOOPTIMIZE };
+    FTMIXED, STEMMING, CASESENS, DIACRITICS, UPDINDEX, AUTOOPTIMIZE };
 
   /** Mapping of XML parsing options. */
   private static final Map<String, Option<?>> XMLPARSINGMAP = new HashMap<>();

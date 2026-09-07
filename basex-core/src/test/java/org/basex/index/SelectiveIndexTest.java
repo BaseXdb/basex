@@ -80,6 +80,50 @@ public final class SelectiveIndexTest extends SandboxTest {
     }
   }
 
+  /** Tests the full-text index for mixed content. */
+  @Test public void ftMixed() {
+    set(MainOptions.FTINDEX, true);
+    set(MainOptions.FTMIXED, true);
+    try {
+      // element names are required
+      assertThrows(BaseXException.class, () -> new CreateDB(NAME, FILE).execute(context));
+      // wildcards are permitted: all elements are indexed on all levels
+      set(MainOptions.FTINCLUDE, "*");
+      execute(new CreateDB(NAME, FILE));
+      assertTrue(context.data().meta.ftmixed);
+
+      // option is stored in the metadata, and retained by open and optimize calls
+      set(MainOptions.FTINCLUDE, "a");
+      execute(new CreateDB(NAME, FILE));
+      assertTrue(context.data().meta.ftmixed);
+      execute(new Close());
+      execute(new Open(NAME));
+      assertTrue(context.data().meta.ftmixed);
+      execute(new Optimize());
+      assertTrue(context.data().meta.ftmixed);
+      execute(new Close());
+      query("db:optimize('" + NAME + "', true())");
+      execute(new Open(NAME));
+      assertTrue(context.data().meta.ftmixed);
+
+      // option can be revoked, and the full-text index is rebuilt
+      query("db:optimize('" + NAME + "', false(), { 'ftmixed': false() })");
+      assertFalse(context.data().meta.ftmixed);
+
+      // a new index adopts the current option
+      set(MainOptions.FTMIXED, true);
+      execute(new CreateIndex(IndexType.FULLTEXT));
+      assertTrue(context.data().meta.ftmixed);
+      set(MainOptions.FTMIXED, false);
+      execute(new CreateIndex(IndexType.FULLTEXT));
+      assertFalse(context.data().meta.ftmixed);
+    } finally {
+      set(MainOptions.FTMIXED, false);
+      set(MainOptions.FTINCLUDE, "");
+      set(MainOptions.FTINDEX, false);
+    }
+  }
+
   /** Tests the ID functions. */
   @Test public void id() {
     set(MainOptions.TOKENINDEX, true);

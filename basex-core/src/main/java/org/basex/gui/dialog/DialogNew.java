@@ -113,10 +113,9 @@ public final class DialogNew extends BaseXDialog {
     if(general == null) return;
 
     final boolean valid = general.action(comp, true) && options.action();
-    indexes[0].action(textindex.isSelected());
-    indexes[1].action(attrindex.isSelected());
-    indexes[2].action(tokenindex.isSelected());
-    indexes[3].action(ftindex.isSelected());
+    final boolean indexed = indexes[0].action(textindex.isSelected()) &
+        indexes[1].action(attrindex.isSelected()) & indexes[2].action(tokenindex.isSelected()) &
+        indexes[3].action(ftindex.isSelected());
 
     // ...must be located before remaining checks
     if(comp == general.browse || comp == general.input) dbName.setText(general.dbName);
@@ -142,6 +141,12 @@ public final class DialogNew extends BaseXDialog {
         inf = OVERWRITE_DB;
         icon = Msg.WARN;
       }
+    }
+    if(!indexed) {
+      // index options are invalid
+      ok = false;
+      inf = Util.info(INVALID_X, MIXED_CONTENT);
+      icon = Msg.ERROR;
     }
 
     general.info.setText(inf, icon);

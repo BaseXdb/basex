@@ -1597,7 +1597,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM), DOUBLE_ZM, FT_URI),
   /** XQuery function. */
   _FT_SEARCH(FtSearch::new, "search(database, terms, options?)",
-      params(STRING_O, ITEM_ZM, MAP_ZO), TEXT_ZM, flag(NDT), FT_URI),
+      params(STRING_O, ITEM_ZM, MAP_ZO), XNODE_ZM, flag(NDT), FT_URI),
   /** XQuery function. */
   _FT_THESAURUS(FtThesaurus::new, "thesaurus(node, term, options?)",
       params(XNODE_O, STRING_O, MAP_ZO), STRING_ZM, flag(NDT), FT_URI),

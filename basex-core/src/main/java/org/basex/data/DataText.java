@@ -50,6 +50,8 @@ public interface DataText {
   String DBTOKINC = "TOKINC";
   /** Full-text index: names. */
   String DBFTXINC = "FTXINC";
+  /** Full-text index: mixed content. */
+  String DBFTMIX = "FTMIXED";
   /** Full-text stemming. */
   String DBFTST = "FTSTEM";
   /** Full-text language. */

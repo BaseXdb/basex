@@ -38,7 +38,7 @@ public final class IndexInfo {
 
   /** Optimization info. */
   public String optInfo;
-  /** Name test of parent element (can be {@code null}). */
+  /** Name test of the addressed element (can be {@code null}). */
   public NameTest test;
   /** Index expression. */
   public Expr expr;
@@ -47,6 +47,8 @@ public final class IndexInfo {
   /** Indicates if the last step addresses a text node. */
   boolean text;
 
+  /** Axis of the step that applies the name test. */
+  private Axis axis = Axis.PARENT;
   /** Predicate expression (can be {@code null}). */
   private IndexPred pred;
 
@@ -79,32 +81,47 @@ public final class IndexInfo {
     if(last == null) return null;
 
     final Data data = db.data();
+    // indicates if the string values of elements are indexed
+    final boolean mixed = type == IndexType.FULLTEXT && data != null && data.meta.ftmixed;
+
     final Kind kind = last.test.kind;
     if(kind == Kind.TEXT) {
+      // text nodes are not indexed if the string values of elements are indexed
+      if(mixed) return null;
       text = true;
     } else if(kind == Kind.ELEMENT) {
-      // ensure that addressed elements only have text nodes as children
-      // stop if database is unknown/out-dated or if name test is not simple
-      if(data == null || !data.meta.uptodate ||
-          !(last.test instanceof final NameTest nt)) return null;
-      test = nt;
+      // stop if database is unknown or out-dated
+      if(data == null || !data.meta.uptodate) return null;
 
-      // resolve local name for statistics lookup; sound only if its lexical name is unambiguous
-      final byte[] local;
-      if(data.nspaces.isEmpty()) {
-        // no namespaces: one lexical name per local name
-        if(test.name == null) return null;
-        local = test.name;
-      } else if(test.scope == NameTest.Scope.FULL && !test.qname.hasURI() &&
-          !data.usesDefaultNs()) {
-        // no default namespace: full no-namespace test maps to its no-prefix lexical name
-        local = test.qname.local();
-      } else {
+      if(last.test instanceof final NameTest nt) {
+        test = nt;
+      } else if(!mixed || last.test != NodeTest.ELEMENT) {
+        // a wildcard test is only supported if all elements are indexed (checked below)
         return null;
       }
 
-      final Stats stats = data.elemNames.stats(data.elemNames.index(local));
-      if(stats == null || !stats.isLeaf()) return null;
+      if(mixed) {
+        // string values of elements are indexed: the index yields the elements themselves
+        axis = Axis.SELF;
+      } else {
+        // ensure that addressed elements only have text nodes as children:
+        // resolve local name for statistics lookup; sound only if its lexical name is unambiguous
+        final byte[] local;
+        if(data.nspaces.isEmpty()) {
+          // no namespaces: one lexical name per local name
+          if(test.name == null) return null;
+          local = test.name;
+        } else if(test.scope == NameTest.Scope.FULL && !test.qname.hasURI() &&
+            !data.usesDefaultNs()) {
+          // no default namespace: full no-namespace test maps to its no-prefix lexical name
+          local = test.qname.local();
+        } else {
+          return null;
+        }
+
+        final Stats stats = data.elemNames.stats(data.elemNames.index(local));
+        if(stats == null || !stats.isLeaf()) return null;
+      }
       text = true;
     } else if(kind == Kind.ATTRIBUTE) {
       text = false;
@@ -272,20 +289,20 @@ public final class IndexInfo {
   /**
    * Creates an index expression with an inverted axis path.
    * @param root new root expression
-   * @param parent add parent step
+   * @param nameStep add step with the name test of the addressed element
    * @param opt optimization info
    * @param info input info (can be {@code null})
    * @return true
    * @throws QueryException query exception
    */
-  public boolean create(final ParseExpr root, final boolean parent, final String opt,
+  public boolean create(final ParseExpr root, final boolean nameStep, final String opt,
       final InputInfo info) throws QueryException {
 
     final Expr rt;
-    if(test == null || !parent) {
+    if(test == null || !nameStep) {
       rt = root;
     } else {
-      final Expr st = Step.get(cc, root, info, Axis.PARENT, test);
+      final Expr st = Step.get(cc, root, info, axis, test);
       rt = Path.get(cc, info, root, st);
     }
     expr = pred.invert(rt);

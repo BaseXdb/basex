@@ -33,10 +33,20 @@ public final class FTIndexAccess extends Simple {
    * @param db index database
    */
   public FTIndexAccess(final InputInfo info, final FTExpr ftexpr, final IndexDb db) {
-    super(info, Types.TEXT_ZM);
+    super(info, seqType(db.data()));
     this.ftexpr = ftexpr;
     this.db = db;
     exprType.data(db.data());
+  }
+
+  /**
+   * Returns the type of the nodes that are yielded by the full-text index.
+   * @param data data reference (can be {@code null})
+   * @return sequence type
+   */
+  public static SeqType seqType(final Data data) {
+    return data == null ? Types.XNODE_ZM :
+      data.meta.ftmixed ? Types.ELEMENT_ZM : Types.TEXT_ZM;
   }
 
   @Override
@@ -52,8 +62,7 @@ public final class FTIndexAccess extends Simple {
           // cache entry for visualizations or ft:mark/ft:extract
           if(qc.ftPosData != null) {
             final Data data = item.data();
-            qc.ftPosData.language(data.meta.language());
-            qc.ftPosData.add(data, item.pre(), item.matches());
+            qc.ftPosData.add(data, item.pre(), item.matches(), data.meta.language());
           }
           // remove matches reference to save memory
           item.matches(null);

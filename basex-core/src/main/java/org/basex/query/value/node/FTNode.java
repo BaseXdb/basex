@@ -43,7 +43,8 @@ public final class FTNode extends DBNode {
   public FTNode(final FTMatches matches, final Data data, final int pre, final int tl,
       final int is) {
 
-    super(data, pre, null, NodeType.TEXT);
+    // with mixed content, the index refers to elements instead of text nodes
+    super(data, pre, null, data == null ? NodeType.TEXT : type(data.kind(pre)));
     this.matches = matches;
     this.tl = tl;
     this.is = is;
@@ -69,7 +70,7 @@ public final class FTNode extends DBNode {
   public double score() {
     if(score == null) {
       if(matches == null) return 0;
-      score = Scoring.textNode(matches.size(), is, tl, data().textLen(pre(), true));
+      score = Scoring.textNode(matches.size(), is, tl, data().atomLen(pre()));
     }
     return score;
   }

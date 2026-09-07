@@ -26,6 +26,8 @@ final class DataFTBuilder {
   private final int len;
   /** ID of marker element name. */
   private final int name;
+  /** Lexer, adopting the language of the query: the tokenizer defines the token boundaries. */
+  private final FTLexer lexer;
 
   /** Node with the full-text positions of the last text node (can be {@code null}). */
   private XNode ftNode;
@@ -46,6 +48,9 @@ final class DataFTBuilder {
     this.pos = pos;
     this.len = len;
     this.name = name;
+    final FTOpt opt = new FTOpt();
+    opt.ln = pos.language();
+    lexer = new FTLexer(opt).original();
   }
 
   /**
@@ -177,13 +182,9 @@ final class DataFTBuilder {
    * @return start and end offsets of the marked ranges
    */
   private IntList ranges(final FTPos ftp, final byte[] string) {
-    // adopt the language of the query: the tokenizer defines the token boundaries
-    final FTOpt opt = new FTOpt();
-    opt.ln = pos.language();
-
     final IntList list = new IntList();
     int off = 0;
-    for(final FTLexer lexer = new FTLexer(opt).original().init(string); lexer.hasNext();) {
+    for(lexer.init(string); lexer.hasNext();) {
       final FTSpan span = lexer.next();
       final int tl = span.text.length;
       if(!span.del && ftp.contains(span.pos)) list.add(off).add(off + tl);

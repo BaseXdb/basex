@@ -71,8 +71,28 @@ public final class IndexNames {
    * @return result of check
    */
   public boolean contains(final int pre, final boolean text) {
-    final byte[][] qname = text ? data.qname(data.parent(pre, Data.TEXT), Data.ELEM) :
-      data.qname(pre, Data.ATTR);
+    return text ? containsName(data.parent(pre, Data.TEXT), Data.ELEM) :
+      containsName(pre, Data.ATTR);
+  }
+
+  /**
+   * Checks if the name of the addressed element is to be indexed.
+   * @param pre PRE value of an element
+   * @return result of check
+   */
+  public boolean containsElement(final int pre) {
+    return containsName(pre, Data.ELEM);
+  }
+
+  /**
+   * Checks if the name of the addressed database entry is to be indexed.
+   * @param pre PRE value
+   * @param kind node kind
+   * @return result of check
+   */
+  private boolean containsName(final int pre, final int kind) {
+    if(isEmpty()) return true;
+    final byte[][] qname = data.qname(pre, kind);
     qname[0] = local(qname[0]);
     return contains(qname);
   }

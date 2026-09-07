@@ -58,6 +58,7 @@ public final class DBOptimize extends DBUpdate {
     dbopts.assignIfAbsent(MainOptions.ATTRINCLUDE, meta.attrinclude);
     dbopts.assignIfAbsent(MainOptions.TOKENINCLUDE, meta.tokeninclude);
     dbopts.assignIfAbsent(MainOptions.FTINCLUDE, meta.ftinclude);
+    dbopts.assignIfAbsent(MainOptions.FTMIXED, meta.ftmixed);
     dbopts.assignIfAbsent(MainOptions.UPDINDEX, meta.updindex);
     dbopts.assignIfAbsent(MainOptions.AUTOOPTIMIZE, meta.autooptimize);
     dbopts.assignIfAbsent(MainOptions.SPLITSIZE, meta.splitsize);
@@ -78,6 +79,7 @@ public final class DBOptimize extends DBUpdate {
     final String attrinclude = options.get(MainOptions.ATTRINCLUDE);
     final String tokeninclude = options.get(MainOptions.TOKENINCLUDE);
     final String ftinclude = options.get(MainOptions.FTINCLUDE);
+    final boolean ftmixed = options.get(MainOptions.FTMIXED);
     final boolean stemming = options.get(MainOptions.STEMMING);
     final boolean casesens = options.get(MainOptions.CASESENS);
     final boolean diacritics = options.get(MainOptions.DIACRITICS);
@@ -90,8 +92,9 @@ public final class DBOptimize extends DBUpdate {
     final boolean rebuildAttr = !meta.attrinclude.equals(attrinclude) || rebuild;
     final boolean rebuildToken = !meta.tokeninclude.equals(tokeninclude);
     final boolean rebuildFt = !meta.ftinclude.equals(ftinclude) || rebuild ||
-        stemming != meta.stemming || casesens != meta.casesens || diacritics != meta.diacritics ||
-        !language.equals(meta.language()) || !stopwords.equals(meta.stopwords);
+        ftmixed != meta.ftmixed || stemming != meta.stemming || casesens != meta.casesens ||
+        diacritics != meta.diacritics || !language.equals(meta.language()) ||
+        !stopwords.equals(meta.stopwords);
 
     // assign options to meta data
     meta.createtext = options.get(MainOptions.TEXTINDEX);
@@ -107,6 +110,7 @@ public final class DBOptimize extends DBUpdate {
     meta.tokeninclude = tokeninclude;
     meta.maxlen = maxlen;
     meta.ftinclude = ftinclude;
+    meta.ftmixed = ftmixed;
     meta.stemming   = stemming;
     meta.casesens   = casesens;
     meta.diacritics = diacritics;

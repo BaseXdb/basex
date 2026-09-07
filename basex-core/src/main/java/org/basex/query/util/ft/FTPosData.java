@@ -48,10 +48,12 @@ public final class FTPosData {
    * @param data data reference
    * @param pre PRE value
    * @param all full-text matches
+   * @param language language that was used for tokenizing the input (can be {@code null})
    */
-  public void add(final Data data, final int pre, final FTMatches all) {
+  public void add(final Data data, final int pre, final FTMatches all, final Language language) {
     if(dt == null) dt = data;
     else if(dt != data) return;
+    lang = language;
 
     final IntList il = positions(all);
     int c = find(pre);
@@ -71,20 +73,14 @@ public final class FTPosData {
    * Adds position data for a constructed node.
    * @param node node
    * @param all full-text matches
+   * @param language language that was used for tokenizing the input (can be {@code null})
    */
-  public void add(final XNode node, final FTMatches all) {
+  public void add(final XNode node, final FTMatches all, final Language language) {
+    lang = language;
     final IntList il = positions(all);
     final FTPos ftpos = fragments.get(node);
     if(ftpos != null) ftpos.union(il);
     else fragments.put(node, new FTPos(-1, il));
-  }
-
-  /**
-   * Assigns the language that was used for tokenizing the input.
-   * @param language language (can be {@code null})
-   */
-  public void language(final Language language) {
-    lang = language;
   }
 
   /**
@@ -134,14 +130,30 @@ public final class FTPosData {
   }
 
   /**
-   * Returns the number of entries.
-   * @return size
+   * Returns the number of positions that were assigned to a node or one of its descendants.
+   * Positions are assigned to the nodes that are tested by a full-text expression; these can be
+   * the text nodes or the elements below the returned node.
+   * @param node node
+   * @return number of positions
    */
-  public int size() {
-    int c = 0;
-    for(int i = 0; i < size; ++i) c += pos[i].size();
-    for(final FTPos ftpos : fragments.values()) c += ftpos.size();
-    return c;
+  public int size(final XNode node) {
+    int count = 0;
+    if(node instanceof final DBNode dbnode) {
+      final Data data = dbnode.data();
+      if(dt != data) return 0;
+      // entries are sorted by PRE value: check the ones inside the node
+      final int pre = dbnode.pre(), last = pre + data.size(pre, dbnode.dbKind());
+      final int p = find(pre);
+      for(int i = p < 0 ? -p - 1 : p; i < size && pos[i].pre < last; i++) {
+        count += pos[i].size();
+      }
+    } else if(!fragments.isEmpty()) {
+      for(final GNode nd : node.descendantIter(true)) {
+        final FTPos ftpos = nd instanceof final XNode xnode ? fragments.get(xnode) : null;
+        if(ftpos != null) count += ftpos.size();
+      }
+    }
+    return count;
   }
 
   /**

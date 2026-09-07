@@ -41,7 +41,11 @@ public final class FtSearch extends FtAccessFn {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     optOptions(2, FtIndexOptions::new, cc);
-    return compileData(cc);
+    compileData(cc);
+    // the index defines if elements or text nodes are returned
+    final Data data = data();
+    if(data != null) exprType.assign(FTIndexAccess.seqType(data));
+    return this;
   }
 
   @Override

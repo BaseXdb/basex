@@ -451,6 +451,15 @@ public final class DbModuleTest extends SandboxTest {
     query("(# db:parser json #) { " + func.args(NAME, path, "a.json") + " }");
     query(_DB_GET.args(NAME) + "/* ! name()", "json");
 
+    // a failed creation must leave no pinned and no incomplete database
+    final String ftmixed = " { '" + lc(MainOptions.FTINDEX) + "': true(), '" +
+        lc(MainOptions.FTMIXED) + "': true()";
+    error(func.args(NAME, " ()", " ()", ftmixed + " }"), UPDBERROR_X);
+    query(_DB_EXISTS.args(NAME), false);
+    query(func.args(NAME, " ()", " ()",
+        ftmixed + ", '" + lc(MainOptions.FTINCLUDE) + "': 'p' }"));
+    query(_DB_EXISTS.args(NAME), true);
+
     // specify unknown or invalid options
     error(func.args(NAME, " ()", " ()", " { 'xyz': 'abc' }"),
         BASEX_OPTIONS_X);

@@ -49,6 +49,7 @@ public final class CreateIndex extends ACreate {
       case FULLTEXT -> {
         type = IndexType.FULLTEXT;
         data.meta.createft = true;
+        data.meta.ftmixed = options.get(MainOptions.FTMIXED);
         data.meta.stemming = options.get(MainOptions.STEMMING);
         data.meta.casesens = options.get(MainOptions.CASESENS);
         data.meta.diacritics = options.get(MainOptions.DIACRITICS);

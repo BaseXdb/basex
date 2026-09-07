@@ -231,6 +231,18 @@ public final class DBATest extends WebappTest {
     }
 
     /**
+     * Mixed content and the element names it refers to reach the new database, and are offered
+     * again by the optimize dialog.
+     * @throws IOException I/O exception
+     */
+    @Test public void createWithMixedContent() throws IOException {
+      post("databases/create", Map.of("name", DB, "opts", "ftmixed", "ftinclude", "p"));
+      final String dialog = dialog(get("databases?name=" + DB), "optimize");
+      assertTrue(dialog.contains("value=\"ftmixed\" checked"), "mixed content not enabled");
+      assertTrue(dialog.contains("name=\"ftinclude\" value=\"p\""), "element names not offered");
+    }
+
+    /**
      * Creates a database from an input that the server reads, and adds the same input again:
      * a target path is what an input is stored under, and what a second run replaces.
      * @throws Exception exception

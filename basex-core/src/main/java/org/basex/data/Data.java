@@ -277,6 +277,31 @@ public abstract class Data {
   }
 
   /**
+   * Returns the length of the atomized content of a node.
+   * @param pre PRE value
+   * @return length
+   */
+  public final int atomLen(final int pre) {
+    final int kind = kind(pre);
+    return switch(kind) {
+      case TEXT, COMM -> textLen(pre, true);
+      case ATTR -> textLen(pre, false);
+      case PI -> atom(pre).length;
+      default -> {
+        // add lengths of all descendant text nodes
+        int len = 0, p = pre;
+        final int s = p + size(p, kind);
+        while(p < s) {
+          final int k = kind(p);
+          if(k == TEXT) len += textLen(p, true);
+          p += attSize(p, k);
+        }
+        yield len;
+      }
+    };
+  }
+
+  /**
    * Returns the common default namespace of all documents of the database.
    * @return namespace, or {@code null} if there is no common namespace
    */

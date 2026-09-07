@@ -98,6 +98,7 @@ public final class OptimizeAll extends ACreate {
     options.set(MainOptions.TOKENINCLUDE, ometa.tokeninclude);
     options.set(MainOptions.FTINCLUDE, ometa.ftinclude);
     // adopt original full-text index options
+    options.set(MainOptions.FTMIXED, ometa.ftmixed);
     options.set(MainOptions.STEMMING, ometa.stemming);
     options.set(MainOptions.CASESENS, ometa.casesens);
     options.set(MainOptions.DIACRITICS, ometa.diacritics);
