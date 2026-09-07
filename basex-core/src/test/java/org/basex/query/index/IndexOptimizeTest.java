@@ -8,6 +8,7 @@ import org.basex.core.cmd.*;
 import org.basex.index.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.expr.index.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
@@ -191,6 +192,27 @@ public final class IndexOptimizeTest extends SandboxTest {
     query("//a[not(text() = '')]/text()", "1\n2 3");
     query("//text()[not(. = '')]", "1\n2 3");
     query("//a[not(. = '')]/text()", "1\n2 3");
+  }
+
+  /** Checks comparisons that are rewritten to existence tests. */
+  @Test public void existenceComparisons() {
+    execute(new CreateDB(NAME, "<xml><a x='y'>1</a><a>2 3</a></xml>"));
+
+    // comparison without predicate: rewritten for index access
+    indexCheck("//a = '1'", true);
+    indexCheck("//@x = 'y'", true);
+    indexCheck("//text() = '1'", true);
+    indexCheck("/xml/a = '1'", true);
+    indexCheck("some $a in //a satisfies $a = '1'", true);
+    indexCheck("if(//a = '1') then 'y' else 'n'", "y");
+    indexCheck("not(//a = '1')", false);
+    indexCheck("//a = ('1', '4')", true);
+    // no index results: statically evaluated
+    check("//a = '4'", false, root(Bln.class));
+
+    // no index access: comparison is left untouched
+    check("//a[1] = '1'", true, empty(ValueAccess.class));
+    check("//* = '1'", true, empty(ValueAccess.class));
   }
 
   /** Checks the selective index feature. */
