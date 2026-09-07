@@ -61,6 +61,7 @@ public final class FTContains extends Single {
           if(scoring) score += it.score();
           // cache entry for visualizations or ft:mark/ft:extract
           if(ftPosData != null) {
+            ftPosData.language(lexer.ftOpt().ln);
             if(item instanceof final DBNode node) ftPosData.add(node.data(), node.pre(), all);
             else if(item instanceof final XNode node) ftPosData.add(node, all);
           }

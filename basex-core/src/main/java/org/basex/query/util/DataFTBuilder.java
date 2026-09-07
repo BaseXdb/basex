@@ -7,8 +7,9 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.query.util.ft.*;
 import org.basex.query.value.node.*;
-import org.basex.util.*;
+import org.basex.query.value.type.*;
 import org.basex.util.ft.*;
+import org.basex.util.list.*;
 
 /**
  * Constructor for marked full-text results.
@@ -25,6 +26,15 @@ final class DataFTBuilder {
   private final int len;
   /** ID of marker element name. */
   private final int name;
+
+  /** Node with the full-text positions of the last text node (can be {@code null}). */
+  private XNode ftNode;
+  /** Marked ranges in the string value of {@link #ftNode} (can be {@code null}). */
+  private IntList ranges;
+  /** Index of the next marked range. */
+  private int range;
+  /** Offset of the next text node in the string value of {@link #ftNode}. */
+  private int offset;
 
   /**
    * Constructor.
@@ -62,36 +72,46 @@ final class DataFTBuilder {
    * @return added strings, or {@code null} if no full-text positions exist
    */
   ArrayList<DataFTMarker> build(final XNode node) {
+    // positions may have been assigned to the text node or to one of its ancestors
+    XNode nd = node;
+    FTPos ftp = get(nd);
+    while(ftp == null && (nd = nd.parent()) != null) ftp = get(nd);
     // not all nodes have full-text positions
-    FTPos ftp = get(node);
-    for(XNode nd = node.parent(); ftp == null && nd != null; nd = nd.parent()) {
-      // positions may have been assigned to an ancestor with an identical string value
-      final FTPos anc = get(nd);
-      if(anc != null) {
-        if(eq(nd.string(), node.string())) ftp = anc;
-        break;
-      }
-    }
     if(ftp == null) return null;
 
-    final ArrayList<DataFTMarker> marks = new ArrayList<>();
-    final TokenBuilder token = new TokenBuilder();
-    // indicates if the currently parsed text is marked
-    final byte[] string = node.string();
-    for(final FTLexer lexer = new FTLexer().original().init(string); lexer.hasNext();) {
-      final FTSpan span = lexer.next();
-      // check if current text is still to be marked or already marked
-      if(!span.del && ftp.contains(span.pos)) {
-        // write current text node
-        if(!token.isEmpty()) marks.add(new DataFTMarker(token.next(), false));
-        marks.add(new DataFTMarker(span.text, true));
-      } else {
-        // add span
-        token.add(span.text);
-      }
+    // determine marked ranges and offset of the text node in the string value
+    final int off;
+    if(ftNode != null && nd.is(ftNode)) {
+      off = offset;
+    } else {
+      off = offset(node, nd);
+      ranges = ranges(ftp, nd.string());
+      range = 0;
+      ftNode = nd;
     }
+    final byte[] string = node.string();
+    final int sl = string.length;
+    offset = off + sl;
+
+    // split the text into marked and unmarked parts
+    final ArrayList<DataFTMarker> marks = new ArrayList<>();
+    final int rs = ranges.size();
+    int s = 0, r = range;
+    for(; r < rs; r += 2) {
+      final int start = Math.max(ranges.get(r) - off, 0);
+      final int end = Math.min(ranges.get(r + 1) - off, sl);
+      // skip ranges that end before, and stop at ranges that start after the text
+      if(end <= s) continue;
+      if(start >= sl) break;
+      if(start > s) marks.add(new DataFTMarker(subtoken(string, s, start), false));
+      marks.add(new DataFTMarker(subtoken(string, start, end), true));
+      s = end;
+      // range may be continued in the next text node
+      if(end == sl) break;
+    }
+    range = r;
     // write last text node
-    if(!token.isEmpty()) marks.add(new DataFTMarker(token.finish(), false));
+    if(s < sl) marks.add(new DataFTMarker(subtoken(string, s, sl), false));
 
     // chop text
     int ln = -len + string.length;
@@ -148,6 +168,45 @@ final class DataFTBuilder {
       }
     }
     return marks;
+  }
+
+  /**
+   * Returns the marked ranges in a string value.
+   * @param ftp full-text positions
+   * @param string string value
+   * @return start and end offsets of the marked ranges
+   */
+  private IntList ranges(final FTPos ftp, final byte[] string) {
+    // adopt the language of the query: the tokenizer defines the token boundaries
+    final FTOpt opt = new FTOpt();
+    opt.ln = pos.language();
+
+    final IntList list = new IntList();
+    int off = 0;
+    for(final FTLexer lexer = new FTLexer(opt).original().init(string); lexer.hasNext();) {
+      final FTSpan span = lexer.next();
+      final int tl = span.text.length;
+      if(!span.del && ftp.contains(span.pos)) list.add(off).add(off + tl);
+      off += tl;
+    }
+    return list;
+  }
+
+  /**
+   * Returns the offset of a node in the string value of one of its ancestors.
+   * @param node node
+   * @param ancestor ancestor node
+   * @return offset
+   */
+  private static int offset(final XNode node, final XNode ancestor) {
+    int off = 0;
+    for(XNode nd = node; !nd.is(ancestor); nd = nd.parent()) {
+      for(final GNode sibling : nd.precedingSiblingIter(false)) {
+        // comments and processing instructions are no part of the string value
+        if(sibling.kind().oneOf(Kind.ELEMENT, Kind.TEXT)) off += sibling.string().length;
+      }
+    }
+    return off;
   }
 
   /** Data full-text marker. */

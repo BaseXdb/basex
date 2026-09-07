@@ -196,9 +196,20 @@ public final class FtModuleTest extends SandboxTest {
     query(func.args(" <p>Exercise 1</p>[. contains text '1']", "b"), "<p>Exercise <b>1</b></p>");
     query(func.args(" <p><i>Exercise 1</i></p>[. contains text '1']", "b"),
       "<p><i>Exercise <b>1</b></i></p>");
-    // string values differ: no marker
+    // mixed content: positions are assigned to the parent of the marked text nodes
     query(func.args(" <p>Exercise <i>1</i></p>[. contains text '1']", "b"),
-      "<p>Exercise <i>1</i></p>");
+      "<p>Exercise <i><b>1</b></i></p>");
+    query(func.args(" <p>Exe<i>rcise</i> 1</p>[. contains text 'exercise']", "b"),
+      "<p><b>Exe</b><i><b>rcise</b></i> 1</p>");
+    query(func.args(" <p>a <i>b <j>c</j></i> d</p>[. contains text 'b c']", "b"),
+      "<p>a <i><b>b</b> <j><b>c</b></j></i> d</p>");
+    query(func.args(" <p>a<!--c--><?p i?> b</p>[. contains text 'b']", "b"),
+      "<p>a<!--c--><?p i?> <b>b</b></p>");
+    query(func.args(" <p>bb<i>bb</i> b bb<i>bb</i></p>[. contains text 'bbbb']", "m"),
+      "<p><m>bb</m><i><m>bb</m></i> b <m>bb</m><i><m>bb</m></i></p>");
+    query("let $p := <p>b <i>b</i> b</p> return " +
+      func.args(" ($p, $p/i)[. contains text 'b']", "m"),
+      "<p><m>b</m> <i><m>b</m></i> <m>b</m></p>\n<i><m>b</m></i>");
 
     // marker names must be NCNames
     error(func.args(" //*[text() contains text '1'], 'p:m'"), INVALUE_X_X);

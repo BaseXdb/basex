@@ -1,5 +1,6 @@
 package org.basex.query.expr.ft;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.index.*;
@@ -49,7 +50,11 @@ public final class FTIndexAccess extends Simple {
           // assign scoring
           if(qc.scoring) item.score();
           // cache entry for visualizations or ft:mark/ft:extract
-          if(qc.ftPosData != null) qc.ftPosData.add(item.data(), item.pre(), item.matches());
+          if(qc.ftPosData != null) {
+            final Data data = item.data();
+            qc.ftPosData.language(data.meta.language());
+            qc.ftPosData.add(data, item.pre(), item.matches());
+          }
           // remove matches reference to save memory
           item.matches(null);
         }

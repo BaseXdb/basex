@@ -5,6 +5,7 @@ import java.util.*;
 import org.basex.data.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.ft.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
@@ -23,6 +24,8 @@ public final class FTPosData {
   private FTPos[] pos = new FTPos[1];
   /** Data reference (can be {@code null}). */
   private Data dt;
+  /** Language of the tokenized input (can be {@code null}). */
+  private Language lang;
   /** Number of values. */
   private int size;
 
@@ -74,6 +77,22 @@ public final class FTPosData {
     final FTPos ftpos = fragments.get(node);
     if(ftpos != null) ftpos.union(il);
     else fragments.put(node, new FTPos(-1, il));
+  }
+
+  /**
+   * Assigns the language that was used for tokenizing the input.
+   * @param language language (can be {@code null})
+   */
+  public void language(final Language language) {
+    lang = language;
+  }
+
+  /**
+   * Returns the language that was used for tokenizing the input.
+   * @return language (can be {@code null})
+   */
+  public Language language() {
+    return lang;
   }
 
   /**
