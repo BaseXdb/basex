@@ -218,7 +218,8 @@ public class QueryParser extends InputParser {
       wsCheck(";");
 
       // get absolute path
-      final IO baseO = sc.baseIO();
+      IO baseO = sc.baseIO();
+      if(baseO instanceof final IOFile file) baseO = file.normalize();
       final byte[] pth = token(baseO == null ? "" : baseO.path());
       qc.modParsed.put(pth, uri);
       qc.modStack.push(pth);
@@ -964,8 +965,9 @@ public class QueryParser extends InputParser {
   public final void module(final String pth, final String uri, final InputInfo info)
       throws QueryException {
 
-    // get absolute path
-    final IO io = sc.resolve(pth, uri);
+    // get absolute path; resolve file names with different capitalization and symbolic links
+    IO io = sc.resolve(pth, uri);
+    if(io instanceof final IOFile file) io = file.normalize();
     final byte[] tPath = token(io.path());
 
     // check if module has already been parsed
