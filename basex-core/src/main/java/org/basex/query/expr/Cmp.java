@@ -75,6 +75,15 @@ public abstract class Cmp extends Arr {
   }
 
   /**
+   * Checks if strings are compared by codepoint with one of the specified operators.
+   * @param ops candidate operators
+   * @return result of check
+   */
+  final boolean byCodepoint(final CmpOp... ops) {
+    return cmpOp().oneOf(ops) && sc().collation == null;
+  }
+
+  /**
    * If possible, returns an optimized expression with inverted operands.
    * @param cc compilation context
    * @return original or modified expression
@@ -98,7 +107,7 @@ public abstract class Cmp extends Arr {
   public abstract CmpOp cmpOp();
 
   /**
-   * Performs various optimizations.
+   * Performs the optimizations that are valid for value and general comparisons alike.
    * @param cc compilation context
    * @return optimized or original expression
    * @throws QueryException query exception
@@ -112,7 +121,32 @@ public abstract class Cmp extends Arr {
     if(expr == this) expr = optEmptyString(op, cc);
     if(expr == this) expr = optString(op, cc);
     if(expr == this) expr = optStringLength(op, cc);
+    if(expr == this) expr = optSubstring(op, cc);
     return expr;
+  }
+
+  /**
+   * Tries to rewrite a substring comparison to a prefix check.
+   * @param op operator
+   * @param cc compilation context
+   * @return optimized or original expression
+   * @throws QueryException query exception
+   */
+  private Expr optSubstring(final CmpOp op, final CompileContext cc) throws QueryException {
+    // substring(E, 1, 3) = 'abc' → starts-with(E, 'abc')
+    // substring(E, 1, 3) != 'abc' → not(starts-with(E, 'abc'))
+    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    if(!byCodepoint(CmpOp.EQ, CmpOp.NE) || !SUBSTRING.is(expr1) ||
+        expr1.args().length != 3 || !(expr2 instanceof final Item item) ||
+        !item.type.isStringOrUntyped() || !(expr1.arg(1) instanceof final ANum start) ||
+        !(expr1.arg(2) instanceof final ANum length)) return this;
+
+    // the substring must start at the first character and match the length of the compared string
+    // keep: substring(E, 1, 3) = 'ab', which is also true for the two-character string 'ab'
+    if(start.dbl() != 1 || length.dbl() != Token.length(item.string(info))) return this;
+
+    final Expr ex = cc.function(STARTS_WITH, info, expr1.arg(0), item);
+    return op == CmpOp.EQ ? ex : cc.function(NOT, info, ex);
   }
 
   /**

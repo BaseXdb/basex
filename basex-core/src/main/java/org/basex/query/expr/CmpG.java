@@ -81,7 +81,7 @@ public class CmpG extends Cmp {
       op = op.swap();
     }
 
-    // optimize expression
+    // optimizations that apply to value comparisons as well
     expr = opt(cc);
 
     // (if(A) then B else C) = X → if(A) then B = X else C = X
@@ -92,6 +92,8 @@ public class CmpG extends Cmp {
       return new If(info, iff.cond, thn.optimize(cc), els.optimize(cc)).optimize(cc);
     }
 
+    // optimizations that rely on the semantics of general comparisons
+    if(expr == this) expr = optContains(cc);
     if(expr == this) expr = optArith(cc);
     if(expr == this) expr = CmpIR.get(cc, this, false);
     if(expr == this) expr = CmpR.get(cc, this);
@@ -137,6 +139,33 @@ public class CmpG extends Cmp {
 
     // return optimized, pre-evaluated or original expression
     return expr instanceof CmpG ? expr : cc.replaceWith(this, expr);
+  }
+
+  /**
+   * Tries to rewrite a character comparison to a substring check.
+   * @param cc compilation context
+   * @return optimized or original expression
+   * @throws QueryException query exception
+   */
+  private Expr optContains(final CompileContext cc) throws QueryException {
+    // characters(E) = 'a' → contains(E, 'a')
+    // string-to-codepoints(E) = 97 → contains(E, 'a')
+    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    if(!byCodepoint(CmpOp.EQ)) return this;
+
+    Str str = null;
+    if(CHARACTERS.is(expr1) && expr2 instanceof final Str s) {
+      str = s;
+    } else if(STRING_TO_CODEPOINTS.is(expr1) && expr2 instanceof final Itr itr) {
+      final long cp = itr.itr();
+      if(cp >= 0 && cp <= Integer.MAX_VALUE && XMLToken.valid((int) cp)) str = Str.get((int) cp);
+    }
+    if(str == null) return this;
+
+    // reject other strings: they can never be equal to a single character
+    final byte[] token = str.string();
+    return token.length > 0 && Token.cl(token, 0) == token.length ?
+      cc.function(CONTAINS, info, expr1.arg(0), str) : this;
   }
 
   /**
@@ -209,7 +238,7 @@ public class CmpG extends Cmp {
     // //x = 'a' → exists(//x[. = 'a'])
     // an already indexed operand is rejected: it would cause a loop with Preds#flattenEbv
     final Expr expr1 = exprs[0], expr2 = exprs[1];
-    if(op != CmpOp.EQ || sc().collation != null || !(expr1 instanceof AxisPath) ||
+    if(!byCodepoint(CmpOp.EQ) || !(expr1 instanceof AxisPath) ||
         expr2.has(Flag.CTX, Flag.POS, Flag.NDT) || IndexAccess.applied(expr1)) return this;
 
     // the predicate is added to a copy, as the original expression is preserved if it is discarded
@@ -443,7 +472,7 @@ public class CmpG extends Cmp {
   @Override
   public final boolean indexAccessible(final IndexInfo ii) throws QueryException {
     // only equality expressions on default collation can be rewritten
-    if(op != CmpOp.EQ || sc().collation != null) return false;
+    if(!byCodepoint(CmpOp.EQ)) return false;
 
     Expr expr1 = exprs[0];
     IndexType type = null;

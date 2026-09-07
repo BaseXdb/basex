@@ -166,10 +166,15 @@ public abstract class SimpleMap extends Mapping {
             args[0] instanceof ContextValue)) {
           // E ! data(.) → data(E)
           return cc.function(DATA, info, expr);
-        } else if(STRING_TO_CODEPOINTS.is(expr) && CODEPOINTS_TO_STRING.is(next) &&
-            args[0] instanceof ContextValue) {
+        } else if(STRING_TO_CODEPOINTS.is(expr) && (CODEPOINTS_TO_STRING.is(next) ||
+            CHAR.is(next)) && args[0] instanceof ContextValue) {
           // string-to-codepoints(E) ! codepoints-to-string(.) → characters(E)
+          // string-to-codepoints(E) ! char(.) → characters(E)
           return cc.function(CHARACTERS, info, expr.args());
+        } else if(CHARACTERS.is(expr) && STRING_TO_CODEPOINTS.is(next) &&
+            args[0] instanceof ContextValue) {
+          // characters(E) ! string-to-codepoints(.) → string-to-codepoints(E)
+          return cc.function(STRING_TO_CODEPOINTS, info, expr.args());
         }
       }
 

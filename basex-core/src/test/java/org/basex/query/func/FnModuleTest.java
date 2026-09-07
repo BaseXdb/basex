@@ -533,6 +533,14 @@ public final class FnModuleTest extends SandboxTest {
         REPLICATE.args(wrap("A"), 100000) + ')') + ')', 100000, exists(STRING_LENGTH));
     check("string-to-codepoints(" + wrap("AB") + ") ! codepoints-to-string(.)",
         "A\nB", root(func));
+    check("string-to-codepoints(" + wrap("AB") + ") ! char(.)", "A\nB", root(func));
+    check(func.args(wrap("AB")) + " ! string-to-codepoints(.)", "65\n66",
+        root(STRING_TO_CODEPOINTS));
+
+    check(func.args(wrap("AB")) + " = 'B'", true, root(CONTAINS));
+    check(func.args(wrap("A€")) + " = '€'", true, root(CONTAINS));
+    check(func.args(wrap("AB")) + " = 'AB'", false, exists(func));
+    check(func.args(wrap("AB")) + " = ''", false, exists(func));
   }
 
   /** Test method. */
@@ -4820,6 +4828,9 @@ return
 
     query("subsequence(" + func.args(wrap("aaa")) + ", 3)", 97);
     query("subsequence(" + func.args(wrap("äaaa")) + ", 3)", "97\n97");
+
+    check(func.args(wrap("ab")) + " = 98", true, root(CONTAINS));
+    check(func.args(wrap("ab")) + " = 0xD800", false, exists(func));
   }
 
   /** Test method. */
@@ -5003,6 +5014,19 @@ return
 
     check(wrap("abc") + "-> " + func.args(" .", 2, " string-length(.)"), "bc",
         empty(STRING_LENGTH));
+
+    // rewrite to prefix check
+    check(func.args(wrap("abcd"), 1, 3) + " = 'abc'", true, root(STARTS_WITH));
+    check(func.args(wrap("abcd"), 1, 3) + " eq 'abc'", true, root(STARTS_WITH));
+    check(func.args(wrap("abcd"), 1, 3) + " != 'abc'", false, root(NOT));
+    check(func.args(wrap("a€c"), 1, 3) + " = 'a€c'", true, root(STARTS_WITH));
+    check(func.args(wrap("abcd"), 1, 3) + " = xs:untypedAtomic('abc')", true, root(STARTS_WITH));
+    check(func.args(wrap("ab"), 1, 3) + " = 'abc'", false, root(STARTS_WITH));
+    check(func.args(" ()", 1, 3) + " = 'abc'", false, empty(STARTS_WITH));
+    // no rewrite: length differs from the compared string, start is not 1, no equality test
+    check(func.args(wrap("abcd"), 1, 3) + " = 'ab'", false, exists(func));
+    check(func.args(wrap("abcd"), 2, 3) + " = 'bcd'", true, exists(func));
+    check(func.args(wrap("abcd"), 1, 3) + " < 'abd'", true, exists(func));
 
     // large positions and lengths (no integer overflow)
     query(func.args("hello", 1, 9223372036854775807L), "hello");
