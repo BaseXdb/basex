@@ -22,7 +22,7 @@ public final class XQueryReduce extends StandardFunc {
     final FItem combine = toFunction(arg(3), 2, qc);
     final TaskOptions options = options(4, TaskOptions::new, qc);
 
-    if(input.size() == 0) return init;
+    if(input.isEmpty()) return init;
 
     final TaskContext tc = new TaskContext(options, qc, info);
     return tc.invoke(new ReduceTask(tc, input, init, action, combine));

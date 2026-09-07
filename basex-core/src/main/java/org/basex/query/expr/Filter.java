@@ -119,10 +119,10 @@ public abstract class Filter extends Preds {
       // example: (1, 2)[. = 1] → 1[. = 1], 2[. = 1]
       final ExprList unroll = cc.unroll(root, false);
       if(unroll != null) {
-        final long last = root.size() - 1;
-        final ExprList results = new ExprList(unroll.size());
+        final int us = unroll.size();
+        final ExprList results = new ExprList(us);
         for(final Expr ex : unroll) {
-          results.add(get(cc, info, ex, results.size() == last ? exprs :
+          results.add(get(cc, info, ex, results.size() == us - 1 ? exprs :
             copyAll(cc, new IntObjectMap<>(), exprs)));
         }
         return List.get(cc, info, results.finish());

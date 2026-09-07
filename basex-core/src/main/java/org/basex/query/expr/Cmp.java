@@ -60,7 +60,10 @@ public abstract class Cmp extends Arr {
     // move static value to the right: $words = 'words'
     if(!swap) swap = expr1 instanceof Value;
     // move larger input to the right: $small = $large
-    if(!swap) swap = expr1.size() > 1 && expr1.size() > expr2.size();
+    if(!swap) {
+      final long size1 = expr1.size(), size2 = expr2.size();
+      swap = size1 > 1 && size2 != -1 && size1 > size2;
+    }
     // move context item to the left: . = $input
     if(!swap) swap = expr2 instanceof ContextValue && expr2.size() == 1 &&
         !(expr1 instanceof ContextValue);

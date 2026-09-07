@@ -107,7 +107,7 @@ public final class FnRemove extends StandardFunc {
     if(st.zero()) return input;
 
     long sz = -1;
-    if(pos instanceof Item && pos.size() == 1) {
+    if(pos instanceof Item) {
       // position is static...
       final long p = toLong(pos, cc.qc);
       // return all items
@@ -118,7 +118,7 @@ public final class FnRemove extends StandardFunc {
       // skip last item: remove($seq, count($seq)) → trunk($seq)
       if(p == size) return cc.function(Function.TRUNK, info, input);
       // decrement result size
-      sz = size - 1;
+      if(size != -1) sz = size - 1;
     }
 
     exprType.assign(st.union(Occ.ZERO), sz).data(input);
