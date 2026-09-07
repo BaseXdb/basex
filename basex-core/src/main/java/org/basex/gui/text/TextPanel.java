@@ -35,7 +35,15 @@ public class TextPanel extends BaseXPanel {
     /** Caret in the middle. */ CENTER,
     /** Caret at the bottom. */ BOTTOM,
     /** Scroll position kept. */ KEEP,
-    /** Anchored line kept in place. */ LINE
+    /** Anchored line kept in place. */ LINE;
+
+    /**
+     * Indicates if the caret will be scrolled into view.
+     * @return result of check
+     */
+    boolean caret() {
+      return this != KEEP && this != LINE;
+    }
   }
 
   /** Text editor. */
@@ -74,6 +82,8 @@ public class TextPanel extends BaseXPanel {
   /** Edit listener (can be {@code null}). */
   private EditListener editListener;
 
+  /** Alignment of the scheduled layout update (can be {@code null}: no update scheduled). */
+  private Align alignment;
   /** Indicates if the last key press was processed by the completion popup. */
   private boolean completed;
   /** Last number of mouse clicks. */
@@ -214,7 +224,7 @@ public class TextPanel extends BaseXPanel {
     txt = Token.replace(txt, new byte[] { '\r' }, Token.EMPTY);
     if(editor.text(txt)) hist.store(txt, editor.pos(), 0);
     resetError();
-    updateCode.invokeLater(Align.KEEP);
+    update(Align.KEEP);
   }
 
   /**
@@ -246,7 +256,7 @@ public class TextPanel extends BaseXPanel {
    */
   public final void setSyntax(final Syntax syntax) {
     rend.syntax(syntax);
-    updateCode.invokeLater(Align.KEEP);
+    update(Align.KEEP);
   }
 
   /**
@@ -255,7 +265,7 @@ public class TextPanel extends BaseXPanel {
    */
   public final void setCaret(final int pos) {
     editor.pos(pos);
-    updateCode.invokeLater(Align.CENTER);
+    update(Align.CENTER);
     caret(true);
   }
 
@@ -305,7 +315,7 @@ public class TextPanel extends BaseXPanel {
       // the horizontal position has no line cache: it scales with the font size
       hscroll.pos((int) ((long) hpos * f.getSize() / size));
     }
-    updateCode.invokeLater(Align.KEEP);
+    update(Align.KEEP);
   }
 
   /**
@@ -370,7 +380,7 @@ public class TextPanel extends BaseXPanel {
     // no edit notification: the tidied text is written to disk right afterwards
     hist.store(editor.text(), caret, editor.pos());
     resetError();
-    updateCode.invokeLater(Align.CENTER);
+    update(Align.CENTER);
     caret(true);
     return true;
   }
@@ -743,7 +753,7 @@ public class TextPanel extends BaseXPanel {
     if(changed) hist.store(tmp, pos, editor.pos());
     // text, cursor position or selection state has changed
     if(changed || pos != editor.pos() || selected != editor.isSelected()) {
-      updateCode.invokeLater(down ? Align.BOTTOM : Align.TOP);
+      update(down ? Align.BOTTOM : Align.TOP);
     }
     // refresh completions, or show them after a delay if the cursor was moved
     if(hist.active() && (moved || edited)) {
@@ -792,11 +802,24 @@ public class TextPanel extends BaseXPanel {
     editor.atRowEnd(rend.rowEnd());
   }
 
+  /**
+   * Recomputes the text layout after all pending events.
+   * @param align vertical alignment of the caret
+   */
+  private void update(final Align align) {
+    // a scheduled caret alignment is not discarded by a subsequent layout update
+    if(alignment == null || !alignment.caret() || align.caret()) alignment = align;
+    updateCode.invokeLater();
+  }
+
   /** Recomputes the text height and adjusts the scroll bars. */
-  private final GUICode<Align> updateCode = new GUICode<>() {
+  private final GUICode<Void> updateCode = new GUICode<>() {
     @Override
-    public void execute(final Align align) {
+    public void execute(final Void arg) {
+      // the alignment is preserved: an invisible panel is updated as soon as it is shown
       if(!isShowing()) return;
+      final Align align = alignment;
+      alignment = null;
       // the anchored line is remembered before the layout assigns new positions to the text
       final int pos = scroll.pos(), top = align == Align.LINE ? anchor() : -1, y = rend.topY(top);
       rend.computeHeight();
@@ -876,7 +899,7 @@ public class TextPanel extends BaseXPanel {
     if(move != 0) editor.pos(Math.min(editor.size(), caret + move));
 
     // adjust text height
-    updateCode.invokeLater(Align.BOTTOM);
+    update(Align.BOTTOM);
     e.consume();
 
     // refresh completions, or show them after a delay if a completion was started
@@ -931,7 +954,7 @@ public class TextPanel extends BaseXPanel {
       if(old != -1) hist.store(editor.text(), old, editor.pos());
       edited();
     }
-    updateCode.invokeLater(Align.BOTTOM);
+    update(Align.BOTTOM);
   }
 
   /**
@@ -956,12 +979,12 @@ public class TextPanel extends BaseXPanel {
 
   @Override
   public final void componentResized(final ComponentEvent e) {
-    updateCode.invokeLater(Align.LINE);
+    update(Align.LINE);
   }
 
   @Override
   public final void componentShown(final ComponentEvent e) {
-    updateCode.invokeLater(Align.LINE);
+    update(Align.LINE);
   }
 
   /** Undo/redo command. */
