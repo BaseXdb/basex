@@ -226,8 +226,12 @@ public final class CmpR extends CmpRange {
     if(data == null || !data.meta.uptodate || !data.nspaces.isEmpty() ||
         !(expr instanceof final AxisPath path)) return null;
 
-    NameTest test = ii.test;
-    if(test == null) {
+    final NameTest test;
+    if(ii.test != null) {
+      // statistics are only available for a single name
+      if(!(ii.test instanceof final NameTest nt)) return null;
+      test = nt;
+    } else {
       final Step step;
       final int st = path.steps.length - 1;
       if(type == IndexType.TEXT) {

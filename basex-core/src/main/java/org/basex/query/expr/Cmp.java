@@ -107,8 +107,31 @@ public abstract class Cmp extends Arr {
     if(expr == this) expr = optCount(op, cc);
     if(expr == this) expr = optBoolean(op, cc);
     if(expr == this) expr = optEmptyString(op, cc);
+    if(expr == this) expr = optString(op, cc);
     if(expr == this) expr = optStringLength(op, cc);
     return expr;
+  }
+
+  /**
+   * Tries to remove a string conversion of the first operand.
+   * @param op operator
+   * @param cc compilation context
+   * @return optimized or original expression
+   * @throws QueryException query exception
+   */
+  private Expr optString(final CmpOp op, final CompileContext cc) throws QueryException {
+    // string(@a) = 'x' → @a = 'x'
+    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    if(!(this instanceof CmpG) || op != CmpOp.EQ || !STRING.is(expr1) ||
+        expr1.args().length != 1 || !(expr2 instanceof final Value value)) return this;
+
+    final SeqType st = expr1.arg(0).seqType();
+    if(!st.zeroOrOne() || !st.type.isStringOrUntyped()) return this;
+    // an absent operand is converted to an empty string, which must still be matched
+    for(final Item item : value) {
+      if(item.type != BasicType.STRING || item.string(info).length == 0) return this;
+    }
+    return new CmpG(info, expr1.arg(0), expr2, op).optimize(cc);
   }
 
   /**

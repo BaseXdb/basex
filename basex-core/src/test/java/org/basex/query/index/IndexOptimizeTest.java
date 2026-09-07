@@ -213,6 +213,9 @@ public final class IndexOptimizeTest extends SandboxTest {
     // no index access: comparison is left untouched
     check("//a[1] = '1'", true, empty(ValueAccess.class));
     check("//* = '1'", true, empty(ValueAccess.class));
+
+    // operand is already indexed: comparison is left untouched
+    check("if(//a[@x = 'y']/text() = '1') then 'y' else 'n'", "y", count(ValueAccess.class, 1));
   }
 
   /** Checks the selective index feature. */
@@ -274,6 +277,31 @@ public final class IndexOptimizeTest extends SandboxTest {
     indexCheck("//(@y | @z)[. = 'Y']/name()", "y");
   }
 
+  /** Union tests for element values. */
+  @Test public void unionTests() {
+    execute(new CreateDB(NAME, "<xml><a>A</a><b>A</b><c>C<d>D</d></c><f e='A'/></xml>"));
+
+    indexCheck("//(a | b)[. = 'A'] ! name()", "a\nb");
+    indexCheck("//(a | b | zzz)[. = 'A'] ! name()", "a\nb");
+    indexCheck("//*[(a | b) = 'A'] ! name()", "xml");
+
+    // elements with child elements are not addressed by the text index
+    check("//(a | c)[. = 'A'] ! name()", "a", empty(ValueAccess.class));
+    check("//(c | d)[. = 'D'] ! name()", "d", empty(ValueAccess.class));
+    // tests for different node kinds
+    check("//(a | @e)[. = 'A'] ! name()", "a\ne", empty(ValueAccess.class));
+
+    // the values of all names must be indexed
+    try {
+      set(MainOptions.TEXTINCLUDE, "a");
+      execute(new CreateDB(NAME, "<xml><a>A</a><b>A</b></xml>"));
+      check("//(a | b)[. = 'A'] ! name()", "a\nb", empty(ValueAccess.class));
+      indexCheck("//a[. = 'A'] ! name()", "a");
+    } finally {
+      set(MainOptions.TEXTINCLUDE, "");
+    }
+  }
+
   /** Checks if expressions are rewritten for enforced index access. */
   @Test public void pragma() {
     createDoc();
@@ -323,6 +351,21 @@ public final class IndexOptimizeTest extends SandboxTest {
     query("//*[@b = 'A' or text() = 'A']", first + '\n' + second);
   }
 
+  /** Comparisons and filters with lists and unions of paths. */
+  @Test public void unionOperands() {
+    execute(new CreateDB(NAME, "<xml><a>A</a><b>A</b><c><d>A</d></c></xml>"));
+
+    // operands with a common axis are merged into a single step
+    indexCheck("//*[(a, b) = 'A'] ! name()", "xml");
+    indexCheck("//*[(a | b) = 'A'] ! name()", "xml");
+    // comparisons with other operands are distributed
+    indexCheck("//*[(a, c/d) = 'A'] ! name()", "xml");
+    indexCheck("//*[(a | c/d) = 'A'] ! name()", "xml");
+    // predicates are attached to the operands of a union
+    indexCheck("(//a | //c/d)[. = 'A'] ! name()", "a\nd");
+    indexCheck("(//a, //c/d)[. = 'A'] ! name()", "a\nd");
+  }
+
   /** Bug on contains-token() with token index. */
   @Test public void gh2222() {
     final String xml = "<M v=\"a\">a</M>";
@@ -362,6 +405,27 @@ public final class IndexOptimizeTest extends SandboxTest {
     execute(new Optimize());
     query("count(//a[. = 'x y'])", 2);
     query("count(//a[. contains text 'y'])", 2);
+  }
+
+  /** Comparisons with string conversions. */
+  @Test public void stringConversion() {
+    execute(new CreateDB(NAME, "<xml><a x='A'>A</a><b/></xml>"));
+
+    indexCheck("//*[string(@x) = 'A'] ! name()", "a");
+    indexCheck("//*[string(@x) = ('A', 'B')] ! name()", "a");
+    // an absent attribute is converted to an empty string
+    check("//*[string(@x) = ''] ! name()", "xml\nb", empty(ValueAccess.class));
+    // an error is raised if more than one item is supplied
+    check("//*[string(a) = 'A'] ! name()", "xml", empty(ValueAccess.class));
+  }
+
+  /** A single index hit that is discarded by the name test of the index access. */
+  @Test public void filteredIndexHit() {
+    execute(new CreateDB(NAME, "<xml><a>A</a><b>B</b></xml>"));
+    indexCheck("//b[. = 'A']", "");
+    indexCheck("count(//b[. = 'A'])", 0);
+    indexCheck("exists(//b[. = 'A'])", false);
+    indexCheck("empty(//b[. = 'A'])", true);
   }
 
   /** A variable is inlined into the database reference of an index access. */

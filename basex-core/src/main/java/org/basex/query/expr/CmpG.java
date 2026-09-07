@@ -96,6 +96,7 @@ public class CmpG extends Cmp {
     if(expr == this) expr = CmpIR.get(cc, this, false);
     if(expr == this) expr = CmpR.get(cc, this);
     if(expr == this) expr = CmpSR.get(cc, this);
+    if(expr == this) expr = optUnion(cc);
     if(expr == this) expr = optIndex(cc);
     if(expr == this) {
       // skip runtime type check if items are known to be comparable
@@ -178,6 +179,27 @@ public class CmpG extends Cmp {
   }
 
   /**
+   * Tries to distribute a comparison over the operands of a union.
+   * @param cc compilation context
+   * @return optimized or original expression
+   * @throws QueryException query exception
+   */
+  private Expr optUnion(final CompileContext cc) throws QueryException {
+    // (a | b) = 'x' → a = 'x' or b = 'x'
+    // nondeterministic operands are rejected: the second comparison may be skipped
+    final Expr expr2 = exprs[1];
+    if(!(exprs[0] instanceof final Union union) || union.has(Flag.NDT) ||
+        expr2.has(Flag.CTX, Flag.POS, Flag.NDT)) return this;
+
+    final ExprList list = new ExprList(union.exprs.length);
+    for(final Expr operand : union.exprs) {
+      final Expr ex = expr2.copy(cc, new IntObjectMap<>());
+      list.add(new CmpG(info, operand, ex, op).optimize(cc));
+    }
+    return new Or(info, list.finish()).optimize(cc);
+  }
+
+  /**
    * Tries to rewrite a comparison to an existence test with a predicate.
    * @param cc compilation context
    * @return optimized or original expression
@@ -185,29 +207,20 @@ public class CmpG extends Cmp {
    */
   private Expr optIndex(final CompileContext cc) throws QueryException {
     // //x = 'a' → exists(//x[. = 'a'])
-    final Expr expr2 = exprs[1];
-    if(op != CmpOp.EQ || sc().collation != null || !(exprs[0] instanceof AxisPath) ||
-        expr2.has(Flag.CTX, Flag.POS, Flag.NDT)) return this;
+    // an already indexed operand is rejected: it would cause a loop with Preds#flattenEbv
+    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    if(op != CmpOp.EQ || sc().collation != null || !(expr1 instanceof AxisPath) ||
+        expr2.has(Flag.CTX, Flag.POS, Flag.NDT) || IndexAccess.applied(expr1)) return this;
 
     // the predicate is added to a copy, as the original expression is preserved if it is discarded
-    if(!(exprs[0].copy(cc, new IntObjectMap<>()) instanceof final AxisPath path)) return this;
+    if(!(expr1.copy(cc, new IntObjectMap<>()) instanceof final AxisPath path)) return this;
     final Expr pred = cc.get(path, true,
       () -> new CmpG(info, new ContextValue(info), expr2, op).optimize(cc));
     final Expr filtered = path.addPredicates(cc, pred);
 
-    // reject rewriting if no index is used (also prevents a loop with Preds#flattenEbv)
-    return indexed(filtered) ? cc.function(EXISTS, info, filtered) : this;
-  }
-
-  /**
-   * Checks if the specified expression is based on index access.
-   * @param expr expression
-   * @return result of check
-   */
-  private static boolean indexed(final Expr expr) {
-    return expr instanceof IndexAccess || expr.seqType().zero() ||
-        expr instanceof final Path path && path.root != null && indexed(path.root) ||
-        expr instanceof final Filter filter && indexed(filter.root);
+    // reject rewriting if no index is used and if the result is not statically known
+    return IndexAccess.applied(filtered) || filtered.seqType().zero() ?
+      cc.function(EXISTS, info, filtered) : this;
   }
 
   @Override

@@ -243,6 +243,10 @@ public final class List extends Arr {
       // E[A, B] → E[A | B]
       expr = toUnion(cc);
     } else if(mode.oneOf(Simplify.DISTINCT, Simplify.SET)) {
+      // (A, B) = 'X' → (A | B) = 'X'
+      if(mode == Simplify.SET) expr = toUnion(cc);
+      if(expr != this) return cc.simplify(this, expr, mode);
+
       final int el = exprs.length;
       final ExprList list = new ExprList(el);
       for(final Expr ex : exprs) {

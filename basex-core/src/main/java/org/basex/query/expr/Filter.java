@@ -7,6 +7,7 @@ import java.util.function.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.gflwor.*;
+import org.basex.query.expr.index.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -87,6 +88,17 @@ public abstract class Filter extends Preds {
       }
       // convert to axis path: (//x)[text() = 'a'] → //x[text() = 'a']
       if(root instanceof final AxisPath path) return path.addPredicates(cc, exprs);
+
+      // (//x | //y/z)[. = 'a'] → //x[. = 'a'] | //y/z[. = 'a']
+      if(root instanceof final Union union) {
+        final Expr[] operands = distribute(union.exprs, cc);
+        if(operands != null) return cc.replaceWith(this, new Union(info, operands).optimize(cc));
+      }
+      // (//x, //y/z)[. = 'a'] → (//x[. = 'a'], //y/z[. = 'a'])
+      if(root instanceof final List list) {
+        final Expr[] operands = distribute(list.exprs, cc);
+        if(operands != null) return cc.replaceWith(this, List.get(cc, info, operands));
+      }
 
       // rewrite filter with document nodes to path to possibly enable index rewritings
       // example: db:get('db')[.//text() = 'x'] → db:get('db')/.[.//text() = 'x']
@@ -259,6 +271,31 @@ public abstract class Filter extends Preds {
   protected final Expr assignType(final Expr expr) {
     exprType.assign(root.seqType().union(Occ.ZERO)).data(root);
     return root;
+  }
+
+  /**
+   * Attaches the predicates to the specified operands.
+   * @param operands operands of a list or union expression
+   * @param cc compilation context
+   * @return new operands, or {@code null} if no index is used
+   * @throws QueryException query exception
+   */
+  private Expr[] distribute(final Expr[] operands, final CompileContext cc)
+      throws QueryException {
+
+    // nondeterministic predicates would be evaluated twice for nodes in two operands
+    if(Checks.any(exprs, expr -> expr.has(Flag.NDT))) return null;
+
+    final ExprList list = new ExprList(operands.length);
+    boolean applied = false;
+    for(final Expr operand : operands) {
+      // the operands are copied, as the rewrite will be discarded if no index can be applied
+      final IntObjectMap<Var> vm = new IntObjectMap<>();
+      final Expr filter = get(cc, info, operand.copy(cc, vm), Arr.copyAll(cc, vm, exprs));
+      applied = applied || IndexAccess.applied(filter);
+      list.add(filter);
+    }
+    return applied ? list.finish() : null;
   }
 
   /**

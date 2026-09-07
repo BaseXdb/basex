@@ -38,8 +38,8 @@ public final class IndexInfo {
 
   /** Optimization info. */
   public String optInfo;
-  /** Name test of the addressed element (can be {@code null}). */
-  public NameTest test;
+  /** Test for the names of the addressed elements (can be {@code null}). */
+  public Test test;
   /** Index expression. */
   public Expr expr;
   /** Costs of index access ({@code null} if no index access is possible). */
@@ -93,8 +93,8 @@ public final class IndexInfo {
       // stop if database is unknown or out-dated
       if(data == null || !data.meta.uptodate) return null;
 
-      if(last.test instanceof final NameTest nt) {
-        test = nt;
+      if(last.test instanceof NameTest || last.test instanceof UnionTest) {
+        test = last.test;
       } else if(!mixed || last.test != NodeTest.ELEMENT) {
         // a wildcard test is only supported if all elements are indexed (checked below)
         return null;
@@ -103,24 +103,8 @@ public final class IndexInfo {
       if(mixed) {
         // string values of elements are indexed: the index yields the elements themselves
         axis = Axis.SELF;
-      } else {
-        // ensure that addressed elements only have text nodes as children:
-        // resolve local name for statistics lookup; sound only if its lexical name is unambiguous
-        final byte[] local;
-        if(data.nspaces.isEmpty()) {
-          // no namespaces: one lexical name per local name
-          if(test.name == null) return null;
-          local = test.name;
-        } else if(test.scope == NameTest.Scope.FULL && !test.qname.hasURI() &&
-            !data.usesDefaultNs()) {
-          // no default namespace: full no-namespace test maps to its no-prefix lexical name
-          local = test.qname.local();
-        } else {
-          return null;
-        }
-
-        final Stats stats = data.elemNames.stats(data.elemNames.index(local));
-        if(stats == null || !stats.isLeaf()) return null;
+      } else if(!leaf(test, data)) {
+        return null;
       }
       text = true;
     } else if(kind == Kind.ATTRIBUTE) {
@@ -139,12 +123,49 @@ public final class IndexInfo {
     if(data != null) {
       // check if required index exists
       if(!data.meta.index(it)) return null;
-      // check if values of targeted name are indexed
-      final byte[][] qname = pred.qname().test instanceof final NameTest nt ?
-        new byte[][] { nt.qname.local(), nt.qname.uri() } : null;
-      if(!new IndexNames(it, data).contains(qname)) return null;
+      // check if values of targeted names are indexed
+      if(!indexed(pred.qname().test, new IndexNames(it, data))) return null;
     }
     return it;
+  }
+
+  /**
+   * Checks if the elements addressed by a test only have text nodes as children.
+   * @param test node test
+   * @param data data reference
+   * @return result of check
+   */
+  private static boolean leaf(final Test test, final Data data) {
+    if(test instanceof final UnionTest ut) return Checks.all(ut.tests, t -> leaf(t, data));
+    if(!(test instanceof final NameTest nt)) return false;
+
+    // resolve local name for statistics lookup; sound only if its lexical name is unambiguous
+    final byte[] local;
+    if(data.nspaces.isEmpty()) {
+      // no namespaces: one lexical name per local name
+      if(nt.name == null) return false;
+      local = nt.name;
+    } else if(nt.scope == NameTest.Scope.FULL && !nt.qname.hasURI() && !data.usesDefaultNs()) {
+      // no default namespace: full no-namespace test maps to its no-prefix lexical name
+      local = nt.qname.local();
+    } else {
+      return false;
+    }
+
+    final Stats stats = data.elemNames.stats(data.elemNames.index(local));
+    return stats != null && stats.isLeaf();
+  }
+
+  /**
+   * Checks if the values of the names addressed by a test are indexed.
+   * @param test node test
+   * @param names names of the indexed elements and attributes
+   * @return result of check
+   */
+  private static boolean indexed(final Test test, final IndexNames names) {
+    if(test instanceof final UnionTest ut) return Checks.all(ut.tests, t -> indexed(t, names));
+    return names.contains(test instanceof final NameTest nt ?
+      new byte[][] { nt.qname.local(), nt.qname.uri() } : null);
   }
 
   /**

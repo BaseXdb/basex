@@ -35,7 +35,7 @@ public final class ValueAccess extends IndexAccess {
   /** Index type. */
   private final IndexType type;
   /** Parent name test (can be {@code null}). */
-  private final NameTest test;
+  private final Test test;
   /** Token set ({@code null} if expression was specified). */
   private final TokenSet tokens;
   /** Search expression (empty sequence if token set was specified). */
@@ -50,7 +50,7 @@ public final class ValueAccess extends IndexAccess {
    * @param db index database
    */
   public ValueAccess(final InputInfo info, final TokenSet tokens, final IndexType type,
-      final NameTest test, final IndexDb db) {
+      final Test test, final IndexDb db) {
     this(info, type, test, db, Empty.VALUE, tokens);
   }
 
@@ -63,7 +63,7 @@ public final class ValueAccess extends IndexAccess {
    * @param db index database
    */
   public ValueAccess(final InputInfo info, final Expr expr, final IndexType type,
-      final NameTest test, final IndexDb db) {
+      final Test test, final IndexDb db) {
     this(info, type, test, db, expr, null);
   }
 
@@ -77,7 +77,7 @@ public final class ValueAccess extends IndexAccess {
    * @param expr search expression
    * @param tokens tokens (can be {@code null})
    */
-  private ValueAccess(final InputInfo info, final IndexType type, final NameTest test,
+  private ValueAccess(final InputInfo info, final IndexType type, final Test test,
       final IndexDb db, final Expr expr, final TokenSet tokens) {
     super(db, info, test != null ? NodeType.ELEMENT : type == IndexType.TEXT ? NodeType.TEXT :
       NodeType.ATTRIBUTE);
