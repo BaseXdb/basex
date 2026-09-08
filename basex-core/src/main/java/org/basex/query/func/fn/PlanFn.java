@@ -37,8 +37,7 @@ public abstract class PlanFn extends StandardFunc {
     /** Option. */
     public static final ValueOption PLAN = new ValueOption("plan", Types.MAP_ZO);
     /** Option. */
-    public static final EnumOption<Validation> VALIDATION =
-        new EnumOption<>("validation", Validation.STRICT);
+    public static final BooleanOption LIBERAL = new BooleanOption("liberal", false);
   }
 
   /** Content string. */
@@ -68,19 +67,8 @@ public abstract class PlanFn extends StandardFunc {
     String marker;
     /** Content key. */
     Str content = CONTENT;
-    /** Strict validation: raise an error if a value cannot be cast to a prescribed type. */
-    boolean strict = true;
-  }
-
-  /** Validation mode. */
-  enum Validation {
-    /** Raise an error if a value cannot be cast to a prescribed type. */ STRICT,
-    /** Retain the original value if it cannot be cast to a prescribed type. */ LAX;
-
-    @Override
-    public String toString() {
-      return Enums.string(this);
-    }
+    /** Liberal mode: retain values that cannot be cast to a prescribed type. */
+    boolean liberal;
   }
 
   /** Name format. */
@@ -218,9 +206,9 @@ public abstract class PlanFn extends StandardFunc {
     QNm child;
 
     /**
-     * Casts an item to the target type. If a prescribed type cannot be applied, the original
-     * value is retained (lax) or an error is raised (strict); empty and whitespace-only content
-     * is never affected.
+     * Casts an item to the target type. If a prescribed type cannot be applied, an error is
+     * raised, or the original value is retained (liberal mode); empty and whitespace-only
+     * content is never affected.
      * @param item item
      * @param plan plan
      * @return cast item
@@ -245,7 +233,7 @@ public abstract class PlanFn extends StandardFunc {
           Util.debug(ex);
         }
         // value could not be cast to the prescribed type
-        if(plan.strict && explicitType) throw PLAN_TYPE_X_X.get(info, value, type);
+        if(!plan.liberal && explicitType) throw PLAN_TYPE_X_X.get(info, value, type);
       }
       return Atm.get(value);
     }
@@ -283,7 +271,7 @@ public abstract class PlanFn extends StandardFunc {
         try {
           return pe.create(node, parent, plan, qc);
         } catch(final QueryException ex) {
-          // a strict validation error is final; it must not trigger layout fallback
+          // a type error is final; it must not trigger layout fallback
           if(ex.error() == PLAN_TYPE_X_X) throw ex;
           Util.debug(ex);
         }
@@ -377,7 +365,7 @@ public abstract class PlanFn extends StandardFunc {
     plan.name = options.get(ElementsOptions.NAME_FORMAT);
     plan.marker = options.get(ElementsOptions.ATTRIBUTE_MARKER);
     plan.content = Str.get(options.get(ElementsOptions.CONTENT_KEY));
-    plan.strict = options.get(ElementsOptions.VALIDATION) == Validation.STRICT;
+    plan.liberal = options.get(ElementsOptions.LIBERAL);
 
     final Value pln = options.get(ElementsOptions.PLAN);
     if(!pln.isEmpty()) {
@@ -427,14 +415,10 @@ public abstract class PlanFn extends StandardFunc {
             pe.child != null) {
           throw unexpected("child", pe.child, name);
         }
-        if(pe.layout == PlanLayout.SIMPLE || pe.layout == PlanLayout.SIMPLE_PLUS ||
-            pe.attribute) {
-          if(pe.attribute) {
-            if(pe.type == null) throw missing("type", name);
-          } else if(pe.type == PlanType.SKIP) {
-            throw unexpected("type", pe.type, name);
-          }
-        } else if(pe.type != null) {
+        if(pe.layout == PlanLayout.SIMPLE || pe.layout == PlanLayout.SIMPLE_PLUS) {
+          // 'skip' is reserved for attributes
+          if(pe.type == PlanType.SKIP) throw unexpected("type", pe.type, name);
+        } else if(!pe.attribute && pe.type != null) {
           throw unexpected("type", pe.type, name);
         }
       });

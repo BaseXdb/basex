@@ -26,7 +26,7 @@ public enum Records {
   /** Record definition. */
   ATTRIBUTE_CONVERSION_PLAN(FN_URI, "attribute-conversion-plan",
     field("type", EnumType.get("integer", "decimal", "double", "boolean", "string", "skip").
-        seqType())),
+        seqType(Occ.ZERO_OR_ONE))),
   /** Record definition. */
   CAPTURED_GROUP(FN_URI, "captured-group",
     field("value", Types.STRING_O),
