@@ -22,19 +22,20 @@ public final class FnSystemProperties extends StandardFunc {
   @Override
   public XQMap value(final QueryContext qc) throws QueryException {
     return new MapBuilder().
-        put(property("xpath-version"), XPATH_VERSION).
-        put(property("xsd-version"), XSD_VERSION).
-        put(property("product-name"), Str.get(Prop.NAME)).
-        put(property("product-version"), Str.get(Prop.VERSION)).
-        put(property("schema-aware"), Bln.FALSE).
-        put(property("accepts-typed-data"), Bln.FALSE).
-        put(property("supports-xinclude"), Bln.TRUE).
-                   // supports-dtd: false, because id/idref is not fully supported
-        put(property("supports-dtd"), Bln.FALSE).
-        put(property("supports-invisible-xml"), Bln.get(FnInvisibleXml.available())).
-        put(property("supports-dynamic-xquery"), Bln.TRUE).
-                   // supports-dynamic-xslt: false, because fn:transform is not available
-        put(property("supports-dynamic-xslt"), Bln.FALSE).map();
+      put(property("xpath-version"), XPATH_VERSION).
+      put(property("xsd-version"), XSD_VERSION).
+      put(property("product-name"), Str.get(Prop.NAME)).
+      put(property("product-version"), Str.get(Prop.VERSION)).
+      put(property("schema-aware"), Bln.FALSE).
+      put(property("accepts-typed-data"), Bln.FALSE).
+      put(property("supports-xinclude"), Bln.TRUE).
+      put(property("supports-dtd-validation"), Bln.TRUE).
+      // supports-dtd-attribute-typing: false, ID/IDREF attributes are detected by name
+      put(property("supports-dtd-attribute-typing"), Bln.FALSE).
+      put(property("supports-invisible-xml"), Bln.get(FnInvisibleXml.available())).
+      put(property("supports-dynamic-xquery"), Bln.TRUE).
+      // supports-dynamic-xslt: false, because fn:transform is not available
+      put(property("supports-dynamic-xslt"), Bln.FALSE).map();
   }
 
   /**
