@@ -266,7 +266,7 @@ public class QueryParser extends InputParser {
     // checks if the query string contains invalid characters
     for(int i = 0; i < length; i++) {
       final int cp = input[i];
-      if(!XMLToken.valid(cp)) {
+      if(!XMLToken.valid10(cp)) {
         pos = i;
         throw error(MODLEINV_X, currentAsString());
       }
@@ -5060,7 +5060,7 @@ public class QueryParser extends InputParser {
           if(!m) n += 9;
         } while(!consume(';'));
         if(!ok) entityError(p, INVCHARREF_X);
-        if(!XMLToken.valid(n)) entityError(p, INVCHARREF_X);
+        if(!XMLToken.valid10(n)) entityError(p, INVCHARREF_X);
         tb.add(n);
       } else {
         if(consume("lt")) {

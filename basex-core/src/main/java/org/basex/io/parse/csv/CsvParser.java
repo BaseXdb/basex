@@ -158,7 +158,7 @@ public final class CsvParser {
    * @param ch character
    */
   private static void add(final TokenBuilder entry, final int ch) {
-    if(ch != -1) entry.add(XMLToken.valid(ch) ? ch : Token.REPLACEMENT);
+    if(ch != -1) entry.add(XMLToken.valid11(ch) ? ch : Token.REPLACEMENT);
   }
 
   /**

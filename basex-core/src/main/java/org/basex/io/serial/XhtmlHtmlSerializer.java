@@ -83,9 +83,7 @@ abstract class XhtmlHtmlSerializer extends MarkupSerializer {
 
     htmlMethod = html;
     // requested HTML version: 'html-version', 'version' (HTML method only), 5.0 by default
-    final String version = html ? sopts.get(VERSION) : "";
-    final String requested = !htmlVersion.isEmpty() ? htmlVersion :
-        version.isEmpty() ? V50 : version;
+    final String requested = !htmlVersion.isEmpty() ? htmlVersion : html ? version : V50;
     html5 = requested.equals(V50);
     rules = new HtmlRules(html5 ? EMPTIES5 : EMPTIES, html5 ? INLINES5 : INLINES,
         html5 || html);

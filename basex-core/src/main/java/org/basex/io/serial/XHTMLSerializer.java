@@ -21,7 +21,7 @@ final class XHTMLSerializer extends XhtmlHtmlSerializer {
    * @throws IOException I/O exception
    */
   XHTMLSerializer(final OutputStream os, final SerializerOptions sopts) throws IOException {
-    super(os, sopts, false, V11, V10);
+    super(os, sopts, false, V10, V11);
   }
 
   @Override

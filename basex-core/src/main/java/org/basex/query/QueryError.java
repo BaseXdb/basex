@@ -565,7 +565,7 @@ public enum QueryError {
   DATECALC_X_X(FOCA, 5, "Invalid % calculation: %."),
 
   /** Error code. */
-  INVCODE_X(FOCH, 1, "Invalid XML character: %."),
+  INVCODE_X(FOCH, 1, "Character not permitted in a string: %."),
   /** Error code. */
   WHICHCOLL_X(FOCH, 2, "%."),
   /** Error code. */
@@ -862,6 +862,8 @@ public enum QueryError {
   SERSA(SEPM, 4, "If 'standalone' is specified, the root must be a single element."),
   /** Error code. */
   SERDT(SEPM, 4, "If 'doctype-system' is specified, the root must be a single element."),
+  /** Error code. */
+  SERCHAR_X(SERE, 6, "XML 1.0: character cannot be serialized: #x%;."),
   /** Error code. */
   SERENCODING_X(SESU, 7, "%"),
   /** Error code. */

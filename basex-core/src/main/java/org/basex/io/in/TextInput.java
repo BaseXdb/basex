@@ -153,7 +153,7 @@ public class TextInput extends BufferInput {
   @Override
   public int read() throws IOException {
     final int cp = decoder.read(this);
-    if(cp != -1 && !XMLToken.valid(cp)) {
+    if(cp != -1 && !XMLToken.valid11(cp)) {
       if(fallback) return Token.REPLACEMENT;
       throw new InputException(cp);
     }

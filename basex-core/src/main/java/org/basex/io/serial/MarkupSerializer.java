@@ -37,6 +37,8 @@ abstract class MarkupSerializer extends StandardSerializer {
   /** Script flag. */
   int script;
 
+  /** Normalized value of the 'version' parameter (empty string if absent). */
+  final String version;
   /** Normalized value of the 'html-version' parameter (empty string if absent). */
   final String htmlVersion;
   /** URI escape flag. */
@@ -67,9 +69,9 @@ abstract class MarkupSerializer extends StandardSerializer {
 
     super(os, sopts);
 
-    String version = sopts.get(VERSION), hv = sopts.get(HTML_VERSION);
+    String hv = sopts.get(HTML_VERSION);
     if(hv.matches("\\d+(\\.\\d+)?")) hv = Double.toString(Double.parseDouble(hv));
-    version = checkVersion(VERSION, version, versions);
+    version = checkVersion(VERSION, sopts.get(VERSION), versions);
     checkVersion(HTML_VERSION, hv, V50, V401, V40);
     htmlVersion = hv;
 
@@ -306,6 +308,8 @@ abstract class MarkupSerializer extends StandardSerializer {
   @Override
   protected void print(final int cp) throws IOException {
     if(charRef(cp)) {
+      if(cp < 0x20 && cp != '\r' && version.equals(V10))
+        throw SERCHAR_X.getIO(Integer.toHexString(cp));
       printHex(cp);
     } else if(cp == '&') {
       out.print(E_AMP);

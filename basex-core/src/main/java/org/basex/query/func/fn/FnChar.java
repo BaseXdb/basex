@@ -21,7 +21,8 @@ public final class FnChar extends StandardFunc {
     if(value instanceof Itr) {
       // codepoint integer
       final long cp = toLong(value, 1);
-      if(cp >= 0 && cp <= Integer.MAX_VALUE && XMLToken.valid((int) cp)) return Str.get((int) cp);
+      if(cp > 0 && cp <= Integer.MAX_VALUE && XMLToken.valid11((int) cp))
+        return Str.get((int) cp);
     } else {
       // codepoint string
       final byte[] token = toToken(value);

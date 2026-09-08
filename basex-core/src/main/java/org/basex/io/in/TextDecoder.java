@@ -143,7 +143,7 @@ abstract class TextDecoder {
         final byte b = bytes[p];
         // negative bytes start a multi-byte sequence
         if(b >= 0) {
-          if(b < 0x20 && b != 0x9 && b != 0xA && b != 0xD) return false;
+          if(b == 0) return false;
           p++;
         } else {
           final int cp = b & 0xFF;
@@ -153,7 +153,7 @@ abstract class TextDecoder {
           for(int c = p + 1; c < e; c++) {
             if((bytes[c] & 0xC0) != 0x80) return false;
           }
-          if(!XMLToken.valid(Token.cp(bytes, p))) return false;
+          if(!XMLToken.valid11(Token.cp(bytes, p))) return false;
           p = e;
         }
       }

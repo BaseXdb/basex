@@ -392,12 +392,12 @@ public final class JsonParser {
         tb.add("\\r");
       } else if(cp == '\t') {
         tb.add("\\t");
-      } else if(XMLToken.valid(cp) && (cp < 0x7F || cp > 0x9F)) {
+      } else if(cp >= 0x20 && XMLToken.valid11(cp) && (cp < 0x7F || cp > 0x9F)) {
         tb.add(cp);
       } else {
         tb.add("\\u").add(hex(cp, 4));
       }
-    } else if(XMLToken.valid(cp)) {
+    } else if(XMLToken.valid11(cp)) {
       tb.add(cp);
     } else if(conv.fallback == null) {
       tb.add(REPLACEMENT);
@@ -560,7 +560,7 @@ public final class JsonParser {
    * @return current code point
    */
   private String currentAsString() {
-    return !more() ? "END OF INPUT" : !XMLToken.valid(current) || Character.isSpaceChar(current) ?
+    return !more() ? "END OF INPUT" : !XMLToken.valid10(current) || Character.isSpaceChar(current) ?
       Character.getName(current) :
       Character.toString(current);
   }

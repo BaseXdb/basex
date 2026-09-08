@@ -119,7 +119,8 @@ final class HTMLSerializer extends XhtmlHtmlSerializer {
   @Override
   protected void print(final int cp) throws IOException {
     if(script > 0) out.print(cp);
-    else if(cp > 0x7F && cp < 0xA0 && !html5) throw SERILL_X.getIO(Integer.toHexString(cp));
+    else if(!html5 && (cp < 0x20 ? cp != 0x9 && cp != 0xA && cp != 0xD : cp > 0x7F && cp < 0xA0))
+      throw SERILL_X.getIO(Integer.toHexString(cp));
     else if(cp == 0xA0) out.print(E_NBSP);
     else super.print(cp);
   }

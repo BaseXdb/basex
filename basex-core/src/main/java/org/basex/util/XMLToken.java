@@ -127,9 +127,19 @@ public final class XMLToken {
    * @param cp codepoint of the character
    * @return result of check
    */
-  public static boolean valid(final int cp) {
+  public static boolean valid10(final int cp) {
     return cp < 0xD800 ? cp >= 0x20 || cp == 0xA || cp == 0x9 || cp == 0xD :
-      cp >= 0xE000 && cp <= 0xFFFD || cp >= 0x10000 && cp <= 0x10ffff;
+      cp >= 0xE000 && cp <= 0xFFFD || cp >= 0x10000 && cp <= 0x10FFFF;
+  }
+
+  /**
+   * Checks if the specified character is a valid XML 1.1 character.
+   * @param cp codepoint of the character
+   * @return result of check
+   */
+  public static boolean valid11(final int cp) {
+    return cp > 0 && cp < 0xD800 || cp >= 0xE000 && cp <= 0xFFFD ||
+      cp >= 0x10000 && cp <= 0x10FFFF;
   }
 
   /**
@@ -243,7 +253,7 @@ public final class XMLToken {
     final TokenParser tp = new TokenParser(Token.token(value));
     while(tp.more()) {
       final int cp = tp.next();
-      if(valid(cp)) {
+      if(valid11(cp)) {
         tb.add(cp);
       } else {
         if(validate) return null;
@@ -435,7 +445,7 @@ public final class XMLToken {
     }
 
     Token.string(tb.next()).codePoints().forEach(cp ->
-      tb.add(XMLToken.valid(cp) ? cp : Token.REPLACEMENT)
+      tb.add(XMLToken.valid11(cp) ? cp : Token.REPLACEMENT)
     );
     return tb.finish();
   }

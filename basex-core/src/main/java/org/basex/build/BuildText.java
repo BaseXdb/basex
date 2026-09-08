@@ -80,6 +80,10 @@ public interface BuildText {
   /** Scanner error. */
   String WRONGCHAR = "'%' expected, '%' found.";
   /** Scanner error. */
+  String INVCHARREF = "Invalid character reference '&#%'.";
+  /** Scanner error. */
+  String INVENTREF = "Invalid entity reference '&%'.";
+  /** Scanner error. */
   String INVNAME = "Invalid name.";
   /** Scanner error. */
   String INVEND = "Unexpected end.";

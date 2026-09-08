@@ -169,7 +169,7 @@ public class CsvOptions extends Options {
       default -> {
         if(string.codePointCount(0, string.length()) == 1) {
           final int cp = string.codePointAt(0);
-          if(XMLToken.valid(cp)) yield cp;
+          if(XMLToken.valid11(cp)) yield cp;
         }
         yield -1;
       }

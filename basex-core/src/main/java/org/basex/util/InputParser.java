@@ -164,7 +164,7 @@ public class InputParser {
    */
   protected final String currentAsString() {
     final int cp = current();
-    return cp == 0 ? "END OF INPUT" : !XMLToken.valid(cp) || Character.isSpaceChar(cp) ?
+    return cp == 0 ? "END OF INPUT" : !XMLToken.valid10(cp) || Character.isSpaceChar(cp) ?
       Character.getName(cp) :
       Character.toString(cp);
   }

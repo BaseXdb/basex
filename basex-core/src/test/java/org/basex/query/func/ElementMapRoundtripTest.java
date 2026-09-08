@@ -369,8 +369,8 @@ public final class ElementMapRoundtripTest extends SandboxTest {
     // nilled elements
     query("serialize(map-to-element({ 'a': xs:QName('fn:null') }))",
         "<a xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:nil=\"true\"/>");
-    // characters that are not permitted in XML
-    error("serialize(map-to-element({ 'a': codepoints-to-string(1) }))", INVCODE_X);
+    // characters that cannot be serialized as XML 1.0
+    error("serialize(map-to-element({ 'a': codepoints-to-string(1) }))", SERCHAR_X);
     // xml layout
     error("map-to-element({ 'a': '<b>' }, { 'plan': { 'a': { 'layout': 'xml' } } })",
         MAP_TO_ELEMENT_X);

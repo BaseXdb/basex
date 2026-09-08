@@ -78,7 +78,7 @@ public final class FnCodepointsToString extends StandardFunc {
   private static int toCodepoint(final long value, final InputInfo info) throws QueryException {
     if(value >= 0 && value <= Integer.MAX_VALUE) {
       final int cp = (int) value;
-      if(XMLToken.valid(cp)) return cp;
+      if(XMLToken.valid11(cp)) return cp;
     }
     throw INVCODE_X.get(info, "&#x" + Long.toHexString(value) + ';');
   }

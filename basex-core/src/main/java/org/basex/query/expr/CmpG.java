@@ -158,7 +158,8 @@ public class CmpG extends Cmp {
       str = s;
     } else if(STRING_TO_CODEPOINTS.is(expr1) && expr2 instanceof final Itr itr) {
       final long cp = itr.itr();
-      if(cp >= 0 && cp <= Integer.MAX_VALUE && XMLToken.valid((int) cp)) str = Str.get((int) cp);
+      if(cp > 0 && cp <= Integer.MAX_VALUE && XMLToken.valid11((int) cp))
+        str = Str.get((int) cp);
     }
     if(str == null) return this;
 

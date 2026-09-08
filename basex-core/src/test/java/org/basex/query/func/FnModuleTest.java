@@ -488,12 +488,23 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(32), " ");
     query(func.args(" 0x20"), " ");
 
+    // permitted characters (XML 1.1 repertoire)
+    query(func.args(1) + " => string-to-codepoints()", 1);
+    query(func.args(8) + " => string-to-codepoints()", 8);
+    query(func.args(8) + " eq " + func.args("\\b"), true);
+    query(func.args(12) + " eq " + func.args("\\f"), true);
+    query("(1 to 31) ! " + func.args(" .") + " => string-join() => string-length()", 31);
+    query(func.args(" 0xD7FF") + " => string-to-codepoints()", 55295);
+    query(func.args(" 0x10FFFF") + " => string-to-codepoints()", 1114111);
+
     query(func.args("ring"), "\u02DA");
     query(func.args("AMP"), "&");
     query(func.args("amp"), "&");
     query(func.args("Tab"), "\t");
 
-    error(func.args(1), CHARINV_X);
+    error(func.args(0), INVTYPE_X);
+    error(func.args(" 0xD800"), CHARINV_X);
+    error(func.args(" 0x110000"), CHARINV_X);
     error(func.args(11111111111111L), CHARINV_X);
     error(func.args("\\x"), CHARINV_X);
     error(func.args(""), CHARINV_X);
@@ -554,6 +565,17 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" (0x41, 0x42)"), "AB");
     query(func.args(" (0x41 to 0x5A)"), "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
     query(func.args(" (1 to 1000)[. = 0x41]"), "A");
+
+    // permitted characters (XML 1.1 repertoire)
+    query("string-to-codepoints(" + func.args(" 1 to 31") + ") => count()", 31);
+    query("string-to-codepoints(" + func.args(" 1") + ')', 1);
+    query("string-to-codepoints(" + func.args(" 0xD7FF") + ')', 55295);
+    query("string-to-codepoints(" + func.args(" 0x10FFFF") + ')', 1114111);
+
+    error(func.args(" 0"), INVCODE_X);
+    error(func.args(" 0xD800"), INVCODE_X);
+    error(func.args(" 0xFFFE"), INVCODE_X);
+    error(func.args(" 0x110000"), INVCODE_X);
 
     // GH-2326
     query(func.args(" ()") + " => boolean()", false);
@@ -970,7 +992,7 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("%F0%F0%9F%92%A1"), "\uFFFD\uD83D\uDCA1");
 
     query(func.args("%00"), "\uFFFD");
-    query(func.args("%01"), "\uFFFD");
+    query("string-to-codepoints(" + func.args("%01") + ')', 1);
     query(func.args("%09"), "\t");
     query(func.args("%22"), "\"");
     query(func.args("%25"), "%");
@@ -3581,9 +3603,18 @@ return
   @Test public void parseJson() {
     final Function func = PARSE_JSON;
     query(func.args("\"x\\u0000\""), "x\uFFFD");
+
+    // permitted characters are returned, all control characters stay escaped with 'escape'
+    query("string-to-codepoints(" + func.args("\"\\u0001\"") + ')', 1);
+    query("string-to-codepoints(" + func.args("\"\\u001F\"") + ')', 31);
+    query("string-to-codepoints(" + func.args("\"\\u0001\"", " { 'escape': true() }") + ')',
+        "92\n117\n48\n48\n48\n49");
+    query("string-to-codepoints(" + func.args("\"\\u0009\"", " { 'escape': true() }") + ')',
+        "92\n116");
+
     query(func.args("\"a\\bb\\uD801\\uDC02c\\uD803d\\uDC04e\\uD805\\uD806\"",
         " { 'fallback': fn($s) { '[' || $s || ']' } }"),
-        "a[\\b]b\uD801\uDC02c[\\uD803]d[\\uDC04]e[\\uD805][\\uD806]");
+        "a\bb\uD801\uDC02c[\\uD803]d[\\uDC04]e[\\uD805][\\uD806]");
     query("try {" + func.args("nvll") + "} catch * { $err:description }",
         "(1:1): Unexpected JSON value: 'nvll'.");
 
@@ -4363,6 +4394,18 @@ return
     contains(func.args(" <x/>"), "<x/>");
     contains(func.args(" <x/>", " {}"), "<x/>");
     contains(func.args(" <x>a</x>", " { 'method': 'text' }"), "a");
+
+    // control characters: rejected by XML 1.0 and HTML below 5.0, escaped in JSON
+    final String ctrl = " <x>{ codepoints-to-string(1) }</x>";
+    error(func.args(ctrl), SERCHAR_X);
+    error(func.args(ctrl, " { 'method': 'xhtml' }"), SERCHAR_X);
+    query(func.args(ctrl, " { 'method': 'xhtml', 'version': '1.1' }"), "<x>&#x1;</x>");
+    error(func.args(ctrl, " { 'method': 'html', 'html-version': 4.01 }"), SERILL_X);
+    query(func.args(ctrl, " { 'version': '1.1' }"), "<x>&#x1;</x>");
+    query(func.args(ctrl, " { 'method': 'html', 'html-version': 5.0 }"), "<x>&#x1;</x>");
+    query("string-to-codepoints(" + func.args(ctrl, " { 'method': 'text' }") + ')', 1);
+    query(func.args(" [ codepoints-to-string(1) ]", " { 'method': 'json' }"), "[\"\\u0001\"]");
+    query(func.args(" [ codepoints-to-string(31) ]", " { 'method': 'json' }"), "[\"\\u001F\"]");
 
     // character maps
     query(func.args("1;2", " { 'use-character-maps': { ';': ',' } }"), "1,2");
@@ -5430,6 +5473,13 @@ return
     contains(func.args(DOC), "<html");
     contains(func.args(DOC, "US-ASCII"), "<html");
     error(func.args(DOC, "xyz"), RESENCODING_X);
+
+    // permitted characters (XML 1.1 repertoire)
+    final IOFile file = new IOFile(sandbox(), "controls.txt");
+    final StringBuilder sb = new StringBuilder();
+    for(int cp = 1; cp <= 31; cp++) sb.append((char) cp);
+    write(file, sb.toString());
+    query("string-to-codepoints(" + func.args(file.path()) + ") => count()", 31);
   }
 
   /** Test method. */

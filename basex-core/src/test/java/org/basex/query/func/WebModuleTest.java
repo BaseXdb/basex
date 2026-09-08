@@ -45,7 +45,7 @@ public final class WebModuleTest extends SandboxTest {
         "return $s = web:decode-url(web:encode-url($s))", true);
 
     query(func.args("%1"), "\uFFFD");
-    query(func.args("%01"), "\uFFFD");
+    query("string-to-codepoints(" + func.args("%01") + ')', 1);
     query(func.args("%D8%00"), "\uFFFD\uFFFD");
   }
 

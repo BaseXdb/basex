@@ -429,7 +429,7 @@ final class ProjectFiles {
       while(true) {
         final int i = ti.read();
         if(i == -1) return MISSING;
-        if(!XMLToken.valid(i)) return BINARY;
+        if(!XMLToken.valid10(i)) return BINARY;
         final int cp = fold ? Token.lc(i) : i;
         while(j > 0 && cp != search[j]) j = lps[j - 1];
         if(cp == search[j] && ++j == cl) return FOUND;
@@ -518,7 +518,7 @@ final class ProjectFiles {
     try(TextInput ti = new TextInput(file)) {
       final StringBuilder sb = new StringBuilder();
       for(int i; (i = ti.read()) != -1;) {
-        if(!XMLToken.valid(i)) return null;
+        if(!XMLToken.valid10(i)) return null;
         sb.appendCodePoint(i);
       }
       return sb.toString();

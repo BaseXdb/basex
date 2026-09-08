@@ -499,7 +499,7 @@ final class XMLScanner extends Job {
         final boolean h = b == 0x10 && (ch >= 'a' && ch <= 'f' || ch >= 'A' && ch <= 'F');
         if(!m && !h) {
           completeRef(ent);
-          return cpToken('?');
+          throw error(INVCHARREF, ent);
         }
         n *= b;
         n += ch & 0x0F;
@@ -507,7 +507,7 @@ final class XMLScanner extends Job {
         ent.add(ch = nextChar());
       } while(ch != ';');
 
-      if(!valid(n)) return cpToken('?');
+      if(!valid10(n)) throw error(INVCHARREF, ent);
       ent.reset();
       ent.add(n);
       return ent.finish();
@@ -515,7 +515,7 @@ final class XMLScanner extends Job {
 
     // scans predefined entities [68]
     final byte[] name = name(false);
-    if(!consume(';')) return cpToken('?');
+    if(!consume(';')) throw error(INVENTREF, name);
 
     if(!e) return concat(cpToken('&'), name, SEMI);
 
