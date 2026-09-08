@@ -34,6 +34,8 @@ final class TextRenderer extends BaseXBack {
 
   /** Fonts (default, bold). */
   private TextFont font;
+  /** Graphics configuration of the font (can be {@code null}). */
+  private GraphicsConfiguration fontConfig;
   /** Font height. */
   private int fontHeight;
   /** Show invisible characters. */
@@ -99,8 +101,8 @@ final class TextRenderer extends BaseXBack {
     if(opts == null) return;
     cache.reset();
 
-    // the font and its caches are reused until the font or the indentation changes
-    font = new TextFont(f, opts.indent(), this);
+    // the font and its caches are reused until the font, the indentation or the screen changes
+    font(f);
     // text that cannot be edited is always wrapped: it has no horizontal scrolling
     wrap = !edit || opts.get(GUIOptions.WORDWRAP);
     if(wrap) hscroll.pos(0);
@@ -112,6 +114,15 @@ final class TextRenderer extends BaseXBack {
     markline = edit && opts.get(GUIOptions.MARKLINE);
     antiAlias = opts.get(GUIOptions.ANTIALIAS);
     repaint();
+  }
+
+  /**
+   * Creates the text font.
+   * @param f font
+   */
+  private void font(final Font f) {
+    font = new TextFont(f, opts.indent(), this);
+    fontConfig = getGraphicsConfiguration();
   }
 
   @Override
@@ -332,6 +343,12 @@ final class TextRenderer extends BaseXBack {
    * @return layout
    */
   private Layout init(final boolean render, final boolean start) {
+    // character widths depend on the screen: refresh the font if the panel was shown or moved
+    final GraphicsConfiguration gc = getGraphicsConfiguration();
+    if(gc != null && gc != fontConfig) {
+      font(getFont());
+      cache.reset();
+    }
     setStyle(Font.PLAIN);
     syntax.init(GUIConstants.textColor);
 
