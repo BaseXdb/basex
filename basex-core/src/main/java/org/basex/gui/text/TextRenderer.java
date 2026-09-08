@@ -759,6 +759,10 @@ final class TextRenderer extends BaseXBack {
         g.drawLine(x + lh, yy, xe, yy);
         g.drawLine(xe - as, yy - as, xe, yy);
         g.drawLine(xe - as, yy + as, xe, yy);
+      } else if(TextFont.control(cp)) {
+        // draw control picture
+        g.setColor(GUIConstants.gray);
+        font.draw(g, String.valueOf((char) TextFont.picture(cp)), x, y);
       } else if(cp > ' ' && cp < TokenBuilder.PRIVATE_START || cp > TokenBuilder.PRIVATE_END) {
         if(showInvisible && Character.isSpaceChar(cp)) {
           // draw whitespace character

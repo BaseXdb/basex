@@ -147,12 +147,32 @@ final class TextFont {
   private int width(final int cp) {
     if(cp >= TokenBuilder.PRIVATE_START && cp <= TokenBuilder.PRIVATE_END) return 0;
     if(cp == '\t') return charWidth(' ') * indent;
+    // control characters are rendered as control pictures
+    if(control(cp)) return charWidth(picture(cp));
     // combining marks attach to the preceding glyph and take no space of their own
     if(nonspacing(cp)) return 0;
 
     // snap glyphs to the character grid to keep columns aligned in monospaced fonts
     final int width = family(cp).metrics(style).charWidth(cp);
     return cell != 0 && width != 0 ? Math.max(1, (width + cell / 2) / cell) * cell : width;
+  }
+
+  /**
+   * Checks if a codepoint is a control character with a visible representation.
+   * @param cp codepoint
+   * @return result of check
+   */
+  static boolean control(final int cp) {
+    return cp > 0 && cp < ' ' && cp != '\t' && cp != '\n' && cp != '\r';
+  }
+
+  /**
+   * Returns the control picture for a control character.
+   * @param cp codepoint
+   * @return codepoint of the control picture
+   */
+  static int picture(final int cp) {
+    return 0x2400 + cp;
   }
 
   /**
