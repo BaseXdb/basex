@@ -85,10 +85,22 @@ public final class IndexInfo {
     final boolean mixed = type == IndexType.FULLTEXT && data != null && data.meta.ftmixed;
 
     final Kind kind = last.test.kind;
-    if(kind == Kind.TEXT) {
-      // text nodes are not indexed if the string values of elements are indexed
-      if(mixed) return null;
+    // node tests may address the text nodes of leaf elements (checked below)
+    final boolean node = mixed && (last.test == NodeTest.NODE || last.test == NodeTest.XNODE);
+    if(kind == Kind.TEXT || node) {
       text = true;
+      if(mixed) {
+        // text nodes are not indexed: address the parent elements instead
+        // stop if database is out-dated, or if the step has predicates or no downward axis
+        if(!data.meta.uptodate || last.exprs.length > 0 ||
+          !last.axis.oneOf(Axis.CHILD, Axis.DESCENDANT, Axis.DESCENDANT_OR_SELF)) return null;
+        // the string value of a leaf element equals the value of its single text node
+        final Step parent = pred.dropText();
+        if(parent == null || parent.test.kind != Kind.ELEMENT ||
+          !leaf(parent.test, data)) return null;
+        test = parent.test;
+        axis = Axis.SELF;
+      }
     } else if(kind == Kind.ELEMENT) {
       // stop if database is unknown or out-dated
       if(data == null || !data.meta.uptodate) return null;

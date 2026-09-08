@@ -102,6 +102,45 @@ public final class FTIndexQueryTest extends SandboxTest {
     }
   }
 
+  /** Full-text index with the string values of leaf elements. */
+  @Test public void mixedLeaf() {
+    set(MainOptions.FTINDEX, true);
+    set(MainOptions.FTMIXED, true);
+    set(MainOptions.FTINCLUDE, "*");
+    try {
+      // leaf elements: the string value equals the value of the single text node
+      execute(new CreateDB(NAME, "<doc><a><n>A B</n></a><n>C</n></doc>"));
+      check("//n[text() contains text 'A'] ! string()", "A B", exists(FTIndexAccess.class));
+      check("//a[n/text() contains text 'A'] ! name()", "a", exists(FTIndexAccess.class));
+      query(_FT_COUNT.args(" //n[text() contains text 'A']"), 1);
+      // a leaf element has no other children: node tests and descendant steps are rewritten too
+      check("//n[node() contains text 'A'] ! string()", "A B", exists(FTIndexAccess.class));
+      check("//n[.//text() contains text 'A'] ! string()", "A B", exists(FTIndexAccess.class));
+      check("//n[descendant::node() contains text 'A'] ! string()", "A B",
+          exists(FTIndexAccess.class));
+      // other axes are evaluated sequentially
+      check("//n[following::text() contains text 'C'] ! string()", "A B",
+          empty(FTIndexAccess.class));
+      // context steps and predicates on the text step are evaluated sequentially
+      check("//n/text()[. contains text 'A']", "A B", empty(FTIndexAccess.class));
+      check("//n[text()[string-length() > 1] contains text 'A'] ! string()", "A B",
+          empty(FTIndexAccess.class));
+
+      // no leaf elements: tokens may span text nodes, or be split by markup
+      execute(new CreateDB(NAME, "<doc><n>Ger<b>man</b></n><n>German<b>y</b></n></doc>"));
+      check("//n[text() contains text 'German'] ! string()", "Germany",
+          empty(FTIndexAccess.class));
+      check("//n[node() contains text 'German'] ! string()", "Germany",
+          empty(FTIndexAccess.class));
+      // comments and processing instructions split text nodes as well
+      execute(new CreateDB(NAME, "<doc><n>Ger<!--c-->man</n></doc>"));
+      check("//n[text() contains text 'German']", "", empty(FTIndexAccess.class));
+    } finally {
+      set(MainOptions.FTINCLUDE, "");
+      set(MainOptions.FTMIXED, false);
+    }
+  }
+
   /** Mixed content. */
   @Test public void mixedContent() {
     init("<mix>A<sub/>B</mix>");

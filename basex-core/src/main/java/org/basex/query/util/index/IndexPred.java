@@ -47,6 +47,13 @@ abstract class IndexPred {
   abstract Step qname();
 
   /**
+   * Drops a trailing step that addresses text nodes and returns the step that points to their
+   * parent element.
+   * @return step or {@code null}
+   */
+  abstract Step dropText();
+
+  /**
    * Rewrites an inverted path expression.
    * @param root new root expression
    * @return path

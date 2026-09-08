@@ -45,6 +45,15 @@ class IndexContext extends IndexPred {
     return info.step;
   }
 
+  /**
+   * Returns no step, as the parent element is addressed by a preceding step of the path.
+   * @return {@code null}
+   */
+  @Override
+  Step dropText() {
+    return null;
+  }
+
   @Override
   Expr invert(final Expr root) throws QueryException {
     final Step st = info.step;
