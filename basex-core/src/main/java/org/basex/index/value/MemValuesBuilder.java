@@ -30,16 +30,19 @@ public final class MemValuesBuilder extends ValuesBuilder {
 
     final MemValues index = new MemValues(data, type);
     final boolean updindex = data.meta.updindex;
+    final int maxlen = data.meta.maxlen;
     for(pre = 0; pre < size; pre++) {
       if((pre & 0x0FFF) == 0) check();
       if(indexEntry()) {
+        final int id = updindex ? data.id(pre) : pre;
         if(tokenize) {
           for(final byte[] token : distinctTokens(data.text(pre, text))) {
-            index.add(token, updindex ? data.id(pre) : pre);
+            index.add(token, id);
             count++;
           }
-        } else if(data.textLen(pre, text) <= data.meta.maxlen) {
-          index.add(data.text(pre, text), updindex ? data.id(pre) : pre);
+        } else if(data.textLen(pre, text) <= maxlen) {
+          // texts of main-memory instances are references to the keys of the index
+          index.add((int) data.textRef(pre), id);
           count++;
         }
       }

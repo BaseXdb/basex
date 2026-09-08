@@ -192,14 +192,23 @@ public final class MemValues extends ValueIndex {
    * @param vals sorted values
    */
   void add(final byte[] key, final int... vals) {
-    // token index: add values. otherwise, reference existing values
-    final int id = type == IndexType.TOKEN ? values.put(key) : values.index(key), vl = vals.length;
-    // updatable index: if required, resize existing arrays
-    while(idsList.size() < id + 1) idsList.add(null);
-    if(lenList.size() < id + 1) lenList.set(id, 0);
+    // token index: add key. otherwise, reference existing key
+    add(type == IndexType.TOKEN ? values.put(key) : values.index(key), vals);
+  }
 
-    final int len = lenList.get(id), size = len + vl;
-    int[] ids = idsList.get(id);
+  /**
+   * Adds values for an existing key to the index.
+   * @param ref key reference
+   * @param vals sorted values
+   */
+  void add(final int ref, final int... vals) {
+    final int vl = vals.length;
+    // updatable index: if required, resize existing arrays
+    while(idsList.size() < ref + 1) idsList.add(null);
+    if(lenList.size() < ref + 1) lenList.set(ref, 0);
+
+    final int len = lenList.get(ref), size = len + vl;
+    int[] ids = idsList.get(ref);
     if(ids == null) {
       ids = vals;
     } else {
@@ -207,11 +216,11 @@ public final class MemValues extends ValueIndex {
       Array.copyFromStart(vals, vl, ids, len);
       if(ids[len - 1] > vals[0]) {
         if(reorder == null) reorder = new BoolList(values.size());
-        reorder.set(id, true);
+        reorder.set(ref, true);
       }
     }
-    idsList.set(id, ids);
-    lenList.set(id, size);
+    idsList.set(ref, ids);
+    lenList.set(ref, size);
   }
 
   /**
