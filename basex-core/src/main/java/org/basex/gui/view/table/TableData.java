@@ -102,8 +102,8 @@ final class TableData {
 
   /**
    * Initializes the table data.
-   * @param rt optional root node (ignored if -1)
    * @param dt data reference
+   * @param rt optional root node (ignored if -1)
    */
   void init(final Data dt, final int rt) {
     cols = new TableCol[0];

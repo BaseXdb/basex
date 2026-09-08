@@ -33,8 +33,8 @@ public final class DBNodes extends DBNodeSeq {
 
   /**
    * Constructor, specifying a database, PRE values and full-text positions.
-   * @param all PRE values reference all documents of the database
    * @param data data reference
+   * @param all PRE values reference all documents of the database
    * @param pres PRE values
    */
   public DBNodes(final Data data, final boolean all, final int... pres) {

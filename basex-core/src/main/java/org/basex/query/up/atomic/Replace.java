@@ -19,10 +19,10 @@ final class Replace extends StructuralUpdate {
   /**
    * Constructor.
    * @param location PRE value of the target node location
-   * @param clip insertion sequence data clip
    * @param shifts PRE value shifts introduced by update
    * @param acc accumulated shifts
    * @param first PRE value of the first node which distance has to be updated
+   * @param clip insertion sequence data clip
    * @param parent parent node PRE
    */
   Replace(final int location, final int shifts, final int acc, final int first, final DataClip clip,

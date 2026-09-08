@@ -65,8 +65,8 @@ final class TextFont {
   /**
    * Constructor.
    * @param font font
-   * @param comp component
    * @param indent indentation
+   * @param comp component
    */
   TextFont(final Font font, final int indent, final JComponent comp) {
     this.comp = comp;

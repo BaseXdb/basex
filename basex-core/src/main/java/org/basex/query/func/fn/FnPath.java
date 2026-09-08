@@ -139,8 +139,8 @@ public final class FnPath extends ContextFn {
    * Returns a name string for the specified QName.
    * @param qnm QName
    * @param attr attribute flag
-   * @param namespaces namespaces
    * @param lexical lexical flag
+   * @param namespaces namespaces
    * @param qc query context
    * @return name
    * @throws QueryException query exception

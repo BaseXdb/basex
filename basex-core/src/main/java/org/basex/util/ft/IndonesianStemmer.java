@@ -5,7 +5,7 @@ import java.util.*;
 import org.basex.util.*;
 
 /**
- * Indonesian stemming algorithm, derrived from Lucene 3.3.0 Indonesian stemmer
+ * Indonesian stemming algorithm, derived from Lucene 3.3.0 Indonesian stemmer
  * implementation which is based on report "A Study of Stemming Effects on
  * Information Retrieval in Bahasa Indonesia" by Fadillah Z Tala.
  * http://www.illc.uva.nl/Publications/ResearchReports/MoL-2003-02.text.pdf
@@ -102,7 +102,7 @@ final class IndonesianStemmer extends InternalStemmer {
   }
 
   /**
-   * Count syllabes. [p.9] A syllable contains at least one vowel
+   * Count syllables. [p.9] A syllable contains at least one vowel
    * @param tb token builder
    * @return integer
    */

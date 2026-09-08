@@ -72,8 +72,8 @@ public final class FnSubstring extends StandardFunc {
 
   /**
    * Evaluates the length argument.
-   * @param qc query context
    * @param def default length
+   * @param qc query context
    * @return start offset
    * @throws QueryException query exception
    */

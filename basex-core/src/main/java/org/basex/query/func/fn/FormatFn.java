@@ -19,8 +19,8 @@ import org.basex.query.value.type.*;
 abstract class FormatFn extends StandardFunc {
   /**
    * Returns a formatted number.
-   * @param qc query context
    * @param tp input type
+   * @param qc query context
    * @return string or {@link Empty#VALUE}
    * @throws QueryException query exception
    */

@@ -1791,11 +1791,11 @@ public enum QueryError {
 
   /**
    * Returns an arity exception.
-   * @param info input info (can be {@code null})
    * @param expr expression
    * @param supplied expected arity
    * @param expected supplied arity
    * @param param parameter/argument flag
+   * @param info input info (can be {@code null})
    * @return query exception
    */
   public static QueryException arityError(final Expr expr, final int supplied, final int expected,

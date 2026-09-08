@@ -230,7 +230,7 @@ public final class Util {
    * Returns a string and replaces all % characters by the specified extensions
    * (see {@link TokenBuilder#addExt} for details).
    * @param string string to be extended
-   * @param ext text text extensions
+   * @param ext text extensions
    * @return extended string
    */
   public static String info(final Object string, final Object... ext) {
@@ -241,7 +241,7 @@ public final class Util {
    * Returns a token and replaces all % characters by the specified extensions
    * (see {@link TokenBuilder#addExt} for details).
    * @param string string to be extended
-   * @param ext text text extensions
+   * @param ext text extensions
    * @return token
    */
   public static byte[] inf(final Object string, final Object... ext) {

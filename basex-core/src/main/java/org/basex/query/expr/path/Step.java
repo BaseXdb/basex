@@ -209,8 +209,8 @@ public abstract class Step extends Preds {
 
   /**
    * Optimizes the step for the given root expression.
-   * @param cc compilation context
    * @param root root context expression; if {@code null}, the current context will be used
+   * @param cc compilation context
    * @return optimized step or empty sequence
    * @throws QueryException query exception
    */

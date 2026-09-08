@@ -184,7 +184,7 @@ public final class BaseXLayout {
   }
 
   /**
-   * Sets a mnemomic for the specified button.
+   * Sets a mnemonic for the specified button.
    * @param b button
    * @param mnem mnemonics that have already been assigned
    */
@@ -192,7 +192,7 @@ public final class BaseXLayout {
     // do not set mnemonics for Mac! Alt+key used for special characters.
     if(Prop.MAC) return;
 
-    // find and assign unused mnemomic
+    // find and assign unused mnemonic
     final String label = b.getText();
     final int ll = label.length();
     for(int l = 0; l < ll; l++) {

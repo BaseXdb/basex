@@ -48,8 +48,8 @@ public abstract class WebFunction implements Comparable<WebFunction> {
   /**
    * Constructor.
    * @param function user-defined function
-   * @param qc query context
    * @param module web module
+   * @param qc query context
    */
   protected WebFunction(final StaticFunc function, final WebModule module, final QueryContext qc) {
     this.function = function;

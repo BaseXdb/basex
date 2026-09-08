@@ -111,7 +111,7 @@ public final class QueryInfo {
    * Adds some compilation info.
    * @param dynamic dynamic compilation
    * @param string evaluation info
-   * @param ext text text extensions
+   * @param ext text extensions
    */
   void compInfo(final boolean dynamic, final String string, final Object... ext) {
     final Infos infos = dynamic ? optimize : compile;

@@ -38,7 +38,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
    * Declares a new static variable in a given module.
    * @param var variable
    * @param imports imported module URIs
-   * @param expr bound expression, possibly {@code null}
+   * @param expr bound expression (can be {@code null})
    * @param anns annotations
    * @param external {@code external} flag
    * @param vs variable scope

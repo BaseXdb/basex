@@ -53,8 +53,8 @@ public final class BaseXButton extends JButton {
   /**
    * Returns a new image button.
    * @param icon name of image icon
-   * @param toggle toggle flag
    * @param tooltip tooltip text
+   * @param toggle toggle flag
    * @param gui reference to the main window
    * @return button
    */

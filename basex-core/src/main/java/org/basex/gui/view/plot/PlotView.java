@@ -730,8 +730,8 @@ public final class PlotView extends View {
 
   /**
    * Returns a coordinate for a specific double value of an item.
-   * @param d relative coordinate of specific item
    * @param drawX calculated value is x value
+   * @param d relative coordinate of specific item
    * @return absolute coordinate
    */
   private int calcCoordinate(final boolean drawX, final double d) {

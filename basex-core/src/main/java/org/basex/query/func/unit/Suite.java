@@ -29,8 +29,8 @@ public final class Suite {
 
   /**
    * Tests all test functions in the specified path.
-   * @param ctx database context
    * @param root path to test modules
+   * @param ctx database context
    * @param job calling job
    * @return resulting value
    * @throws IOException I/O exception

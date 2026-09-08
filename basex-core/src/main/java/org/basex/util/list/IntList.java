@@ -702,7 +702,7 @@ public final class IntList extends ElementList {
    * Returns the index of the median of the three indexed integers.
    * @param a first offset
    * @param b second offset
-   * @param c thirst offset
+   * @param c third offset
    * @return median
    */
   private int median(final int a, final int b, final int c) {

@@ -65,7 +65,7 @@ public final class GUIMenu extends JMenuBar {
    * Creates a new menu item.
    * @param cmd command
    * @param gui gui reference
-   * @param mnem assigned mnenomics
+   * @param mnem assigned mnemonics
    * @return menu item
    */
   public static JMenuItem newItem(final GUICommand cmd, final GUI gui, final StringBuilder mnem) {

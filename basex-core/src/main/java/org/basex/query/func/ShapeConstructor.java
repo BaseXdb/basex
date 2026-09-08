@@ -43,8 +43,8 @@ public final class ShapeConstructor extends StandardFunc {
 
   /**
    * Returns a constructor function for a shape.
-   * @param sh shape
    * @param ii input info
+   * @param sh shape
    * @param args constructor arguments
    * @return constructor function
    */

@@ -164,8 +164,8 @@ public final class FnInvisibleXml extends StandardFunc {
     /**
      * Constructor.
      * @param info input info (can be {@code null})
-     * @param args function arguments
      * @param parser generated invisible XML parser
+     * @param args function arguments
      */
     private ParseInvisibleXml(final InputInfo info, final de.bottlecaps.markup.blitz.Parser parser,
         final Expr... args) {

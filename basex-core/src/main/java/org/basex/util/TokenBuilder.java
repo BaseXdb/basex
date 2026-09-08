@@ -203,8 +203,8 @@ public final class TokenBuilder {
 
   /**
    * Sets a byte at the specified position.
-   * @param value byte to be set
    * @param pos position
+   * @param value byte to be set
    */
   public void set(final int pos, final byte value) {
     chars[pos] = value;

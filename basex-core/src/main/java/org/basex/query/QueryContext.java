@@ -873,8 +873,8 @@ public final class QueryContext extends Job implements Closeable {
 
   /**
    * Runs code and measures its runtime.
-   * @param code code to run
    * @param runtime value storing the runtime
+   * @param code code to run
    * @param <T> type of result value
    * @return result
    * @throws QueryException query exception

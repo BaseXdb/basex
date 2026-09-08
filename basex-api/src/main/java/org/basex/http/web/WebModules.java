@@ -121,7 +121,7 @@ public final class WebModules {
     final List<RestXqFunction> funcs = find(conn, error, false);
     if(funcs.isEmpty()) return null;
 
-    // multiple functions: check specifity
+    // multiple functions: check specificity
     if(funcs.size() > 1) bestSpec(funcs);
     // multiple functions: check quality factors
     if(funcs.size() > 1) bestQf(funcs, conn);
@@ -224,13 +224,13 @@ public final class WebModules {
    * @param conn HTTP connection
    * @param error error code (can be {@code null}; assigned if error function is to be called)
    * @param perm permission flag
-   * @return list of matching functions, ordered by specifity
+   * @return list of matching functions, ordered by specificity
    * @throws IOException I/O exception
    */
   private List<RestXqFunction> find(final HTTPConnection conn, final QNm error, final boolean perm)
       throws IOException {
 
-    // collect all functions and sort them by specifity
+    // collect all functions and sort them by specificity
     final ArrayList<RestXqFunction> list = collect(conn, func -> func.matches(conn, error, perm));
     Collections.sort(list);
     return list;
@@ -312,7 +312,7 @@ public final class WebModules {
     final ArrayList<WsFunction> funcs = findWs(ws.path, ws.context, ann);
     if(funcs.isEmpty()) return null;
 
-    // multiple functions: check specifity
+    // multiple functions: check specificity
     if(funcs.size() > 1) bestSpec(funcs);
 
     final WsFunction first = funcs.getFirst();
@@ -355,7 +355,7 @@ public final class WebModules {
   }
 
   /**
-   * Filters functions by their specifity.
+   * Filters functions by their specificity.
    * @param funcs list of functions
    */
   private static void bestSpec(final List<? extends WebFunction> funcs) {
@@ -510,8 +510,8 @@ public final class WebModules {
 
   /**
    * Parses the specified path for modules with relevant annotations and caches new entries.
-   * @param root root path
    * @param ctx database context
+   * @param root root path
    * @param cache cached modules
    * @param old old cache
    * @param archived archive files (will be assigned)

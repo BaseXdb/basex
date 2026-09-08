@@ -74,7 +74,7 @@ public final class Lang {
   /**
    * Returns the specified string with some text extensions included.
    * @param key key
-   * @param ext text text extensions
+   * @param ext text extensions
    * @return string
    */
   static String lang(final String key, final Object... ext) {

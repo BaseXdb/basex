@@ -81,7 +81,7 @@ record WebPathMatcher(Pattern pattern, List<QNm> varNames, int segments, BigInte
       if(t1 != t2) return t1 ? 1 : -1;
     }
 
-    // identical specifity
+    // identical specificity
     return 0;
   }
 

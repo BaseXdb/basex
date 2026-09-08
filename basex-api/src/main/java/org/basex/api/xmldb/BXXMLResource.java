@@ -191,8 +191,8 @@ public final class BXXMLResource implements XMLResource {
 
     /**
      * Default constructor.
-     * @param builder memory builder
      * @param resource resource
+     * @param builder memory builder
      */
     BXSAXContentHandler(final BXXMLResource resource, final MemBuilder builder) {
       super(builder);

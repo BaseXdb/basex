@@ -63,8 +63,8 @@ public final class ItemSeq extends Seq {
 
   /**
    * Creates a typed sequence with the items of the specified values.
-   * @param size size of resulting sequence
    * @param items items
+   * @param size size of resulting sequence
    * @param type type (can be {@code null}; only considered if a new sequence is created)
    * @return value
    */

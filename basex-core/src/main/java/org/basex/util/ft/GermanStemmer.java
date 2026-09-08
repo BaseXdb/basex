@@ -161,7 +161,7 @@ final class GermanStemmer extends InternalStemmer {
   }
 
   /**
-   * Removes a particle denotion ("ge") from a term.
+   * Removes a particle denotation ("ge") from a term.
    * @param tb token builder
    * @return token builder
    */

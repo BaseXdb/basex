@@ -395,9 +395,9 @@ public class QueryException extends Exception {
 
   /**
    * Creates the error message from the specified text and extension array.
-   * @param info input info (can be {@code null})
    * @param text text message with optional placeholders
    * @param ext info extensions
+   * @param info input info (can be {@code null})
    * @return argument
    */
   private static String message(final String text, final Object[] ext, final InputInfo info) {

@@ -75,8 +75,8 @@ public class BaseXCombo extends JComboBox<Object> {
    * @param win parent window
    * @param option option
    * @param options options
-   * @param values values
    * @param editable editable flag
+   * @param values values
    */
   private BaseXCombo(final BaseXWindow win, final Option<?> option, final Options options,
       final boolean editable, final String... values) {

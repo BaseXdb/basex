@@ -31,8 +31,8 @@ public final class CAttr extends CName {
   /**
    * Constructor.
    * @param info input info (can be {@code null})
-   * @param name name
    * @param computed computed construction flag
+   * @param name name
    * @param value attribute value
    */
   public CAttr(final InputInfo info, final boolean computed, final Expr name, final Expr... value) {

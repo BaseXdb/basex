@@ -258,8 +258,8 @@ public enum ApiFunction implements AFunction {
    *   indicate that the number of parameters of a function is not limited.
    * @param params parameter types
    * @param seqType return type
-   * @param perm minimum permission
    * @param uri URI
+   * @param perm minimum permission
    */
   ApiFunction(final Supplier<? extends StandardFunc> supplier, final String desc,
       final SeqType[] params, final SeqType seqType, final byte[] uri, final Perm perm) {

@@ -395,8 +395,8 @@ public final class Namespaces {
   /**
    * Deletes the specified number of entries from the namespace structure.
    * @param pre PRE value of the first node to delete
-   * @param data data reference
    * @param size number of entries to be deleted
+   * @param data data reference
    */
   void delete(final int pre, final int size, final Data data) {
     NSNode nd = current.find(pre, data);

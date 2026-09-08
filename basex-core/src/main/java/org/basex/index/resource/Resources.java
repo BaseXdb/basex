@@ -117,8 +117,8 @@ public final class Resources implements Index {
 
   /**
    * Returns the database paths to all file resources that start with the specified path.
-   * @param type resource type
    * @param path input path
+   * @param type resource type
    * @return paths
    */
   public synchronized StringList paths(final String path, final ResourceType type) {

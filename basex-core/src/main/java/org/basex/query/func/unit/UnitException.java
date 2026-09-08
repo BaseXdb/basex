@@ -22,8 +22,8 @@ final class UnitException extends QueryException {
    * Default constructor.
    * @param info input info (can be {@code null})
    * @param err error reference
-   * @param expected expected result (can be {@code null})
    * @param returned returned result (can be {@code null})
+   * @param expected expected result (can be {@code null})
    * @param count item count
    */
   UnitException(final InputInfo info, final QueryError err, final Item returned,

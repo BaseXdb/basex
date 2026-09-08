@@ -25,8 +25,8 @@ public abstract class CNode extends Arr {
   /**
    * Constructor.
    * @param info input info (can be {@code null})
-   * @param computed computed constructor
    * @param seqType sequence type
+   * @param computed computed constructor
    * @param exprs expressions
    */
   CNode(final InputInfo info, final SeqType seqType, final boolean computed,

@@ -9,13 +9,13 @@ package org.basex.query.util.regex;
 public final class CharClass extends RegExp {
   /** Char group of this class. */
   private final CharGroup group;
-  /** Excluded char class, possibly {@code null}. */
+  /** Excluded char class (can be {@code null}). */
   private final CharClass subtract;
 
   /**
    * Constructor.
    * @param group char group
-   * @param subtract excluded char class, possibly {@code null}
+   * @param subtract excluded char class (can be {@code null})
    */
   public CharClass(final CharGroup group, final CharClass subtract) {
     this.group = group;

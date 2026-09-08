@@ -33,8 +33,8 @@ public final class UserUpdateInfo extends UserFn {
 
     /**
      * Constructor.
-     * @param user user ({@code null} if operation is global)
      * @param node info element
+     * @param user user ({@code null} if operation is global)
      * @param qc query context
      * @param info input info (can be {@code null})
      */

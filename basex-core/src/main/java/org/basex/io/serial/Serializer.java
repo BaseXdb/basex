@@ -48,7 +48,7 @@ public abstract class Serializer implements Closeable {
   protected QNm closed = QNm.EMPTY;
   /** Indentation flag. */
   protected boolean indent;
-  /** Canocical serialization flag. */
+  /** Canonical serialization flag. */
   protected boolean canonical;
 
   /** Stack with currently available namespaces. */
@@ -59,8 +59,8 @@ public abstract class Serializer implements Closeable {
   /**
    * Attribute/namespace.
    * @param name attribute name or namespace prefix
-   * @param uri URI (can be {@code null})
    * @param value attribute value (can be {@code null})
+   * @param uri URI (can be {@code null})
    */
   protected record Att(byte[] name, byte[] value, byte[] uri) { }
   /** Attribute collector. */

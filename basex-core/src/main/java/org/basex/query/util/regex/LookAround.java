@@ -1,7 +1,7 @@
 package org.basex.query.util.regex;
 
 /**
- * Lookahaead or lookbehind assertion.
+ * Lookahead or lookbehind assertion.
  *
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher

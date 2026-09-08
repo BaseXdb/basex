@@ -605,9 +605,9 @@ public final class TreeView extends View {
    * Highlights nodes.
    * @param g the graphics reference
    * @param rn root
-   * @param pre pre
-   * @param r rectangle to highlight
    * @param lv level
+   * @param r rectangle to highlight
+   * @param pre pre
    * @param px parent's x value
    * @param t highlight type
    */

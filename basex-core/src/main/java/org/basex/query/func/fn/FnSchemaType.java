@@ -32,9 +32,9 @@ public class FnSchemaType extends StandardFunc {
 
   /**
    * Creates a sequence of type annotations for the specified atomic types.
-   * @param types the types to be annotated
    * @param qc query context
    * @param info input info
+   * @param types the types to be annotated
    * @return the type annotation sequence
    * @throws QueryException query exception
    */
@@ -141,8 +141,8 @@ public class FnSchemaType extends StandardFunc {
 
     /**
      * Create a function item for a new instance.
-     * @param types the types to be annotated
      * @param info input info
+     * @param types the types to be annotated
      * @return the function item
      */
     public static FuncItem funcItem(final InputInfo info, final BasicType... types) {

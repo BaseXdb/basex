@@ -21,8 +21,8 @@ final class Binaries {
   /**
    * Returns the database paths to all file resources that match the specified path.
    * @param data data reference
-   * @param type resource type
    * @param path input path
+   * @param type resource type
    * @return paths
    */
   static StringList paths(final Data data, final String path, final ResourceType type) {

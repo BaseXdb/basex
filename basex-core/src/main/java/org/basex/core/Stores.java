@@ -200,8 +200,8 @@ public final class Stores implements Closeable {
   /**
    * Reads a store from disk.
    * @param name name of store
-   * @param qc query context
    * @param info input info
+   * @param qc query context
    * @throws QueryException query exception
    */
   public synchronized void read(final String name, final InputInfo info, final QueryContext qc)
@@ -275,8 +275,8 @@ public final class Stores implements Closeable {
   /**
    * Reads a store from disk.
    * @param name name of store
-   * @param qc query context
    * @param info input info
+   * @param qc query context
    * @throws QueryException query exception
    */
   private void readStore(final String name, final InputInfo info, final QueryContext qc)

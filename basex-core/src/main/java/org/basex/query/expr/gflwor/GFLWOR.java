@@ -973,8 +973,8 @@ public final class GFLWOR extends ParseExpr {
 
   /**
    * Merges consecutive {@code where}/{@code while} clauses.
-   * @param where merge where/while
    * @param cc compilation context
+   * @param where merge where/while
    * @throws QueryException query exception
    */
   private void mergeWheres(final CompileContext cc, final boolean where) throws QueryException {

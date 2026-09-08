@@ -53,8 +53,8 @@ final class SnowballStemmer extends ExternalStemmer<SnowballStemmer.StemmerClass
   /**
    * Constructs a Snowball stemmer. Call {@link #available()} first to
    * check if the library is available.
-   * @param fti full-text iterator
    * @param lang language of the text to stem
+   * @param fti full-text iterator
    */
   private SnowballStemmer(final Language lang, final FTIterator fti) {
     super(lang, fti);

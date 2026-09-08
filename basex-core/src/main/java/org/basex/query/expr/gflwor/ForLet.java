@@ -29,8 +29,8 @@ abstract sealed class ForLet extends Clause permits For, Let {
    * @param seqType sequence type
    * @param var variables
    * @param expr expression
-   * @param vars variable
    * @param scoring scoring flag
+   * @param vars variable
    */
   ForLet(final InputInfo info, final SeqType seqType, final Var var, final Expr expr,
       final boolean scoring, final Var... vars) {

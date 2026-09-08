@@ -75,8 +75,8 @@ abstract class ContextModifier {
   /**
    * Prepares the update operations and adds all databases to be updated to the specified list.
    * Called by a single thread after query evaluation.
-   * @param qc query context
    * @param datas updated data references
+   * @param qc query context
    * @throws QueryException query exception
    */
   final synchronized void prepare(final HashSet<Data> datas, final QueryContext qc)

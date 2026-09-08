@@ -164,7 +164,7 @@ public final class CompileContext {
   /**
    * Adds some compilation info.
    * @param string evaluation info
-   * @param ext text text extensions
+   * @param ext text extensions
    */
   public void info(final String string, final Object... ext) {
     if(qc.parent == null) qc.info.compInfo(dynamic, string, ext);

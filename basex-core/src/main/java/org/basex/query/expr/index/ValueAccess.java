@@ -205,8 +205,8 @@ public final class ValueAccess extends IndexAccess {
 
   /**
    * Returns a scan-based index iterator, which looks for text nodes with the specified value.
-   * @param data data reference
    * @param value value to be looked up
+   * @param data data reference
    * @return node iterator
    */
   private IndexIterator scan(final byte[] value, final Data data) {

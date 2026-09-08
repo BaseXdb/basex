@@ -462,9 +462,9 @@ public final class JsonParser {
 
   /**
    * Raises an error with the specified message.
+   * @param err error code
    * @param msg error message
    * @param ext error details
-   * @param err error code
    * @return query exception
    */
   private QueryException error(final QueryError err, final String msg, final Object... ext) {

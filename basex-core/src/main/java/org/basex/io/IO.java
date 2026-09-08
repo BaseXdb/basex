@@ -126,7 +126,7 @@ public abstract class IO {
    *   represented as byte array</li>
    * </ul>
    * If the content of the string value is known in advance, it is advisable
-   * to call the direct constructors of the correspondent subclass.
+   * to call the direct constructors of the corresponding subclass.
    *
    * @param location location (can be {@code null})
    * @return IO reference

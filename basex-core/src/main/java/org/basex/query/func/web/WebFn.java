@@ -49,8 +49,8 @@ public abstract class WebFn extends StandardFunc {
    * Creates a URL from the function arguments.
    * @param href host and path
    * @param params query parameters
-   * @param info input info
    * @param sep separator for query parameters
+   * @param info input info
    * @return supplied URL builder
    * @throws QueryException query exception
    */

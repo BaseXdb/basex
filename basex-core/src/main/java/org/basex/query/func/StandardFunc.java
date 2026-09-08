@@ -610,11 +610,11 @@ public abstract class StandardFunc extends Arr {
 
   /**
    * Creates a job specification for a query or a function to be invoked.
+   * @param query query or function to be invoked
+   * @param args variable bindings or function arguments
    * @param options job options
    * @param service register job as service
    * @param qc query context
-   * @param query query or function to be invoked
-   * @param args variable bindings or function arguments
    * @return job specification
    * @throws QueryException query exception
    */
@@ -981,8 +981,8 @@ public abstract class StandardFunc extends Arr {
    * Evaluates an expression to a function item.
    * @param expr expression
    * @param nargs maximum number of supplied arguments
-   * @param qc query context
    * @param updating updating flag
+   * @param qc query context
    * @return function item
    * @throws QueryException query exception
    */

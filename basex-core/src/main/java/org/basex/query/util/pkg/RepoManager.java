@@ -251,8 +251,8 @@ public final class RepoManager {
 
   /**
    * Installs a JAR package.
-   * @param path package path
    * @param content package content
+   * @param path package path
    * @return {@code true} if existing package was replaced
    * @throws QueryException query exception
    * @throws IOException I/O exception
