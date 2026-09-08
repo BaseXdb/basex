@@ -17,34 +17,16 @@ import org.basex.util.*;
  *
  * @author BaseX Team, BSD License
  * @author Dimitar Popov
+ * @param pattern compiled regular expression which matches paths defined by the path annotation
+ * @param varNames variable names defined in the path template
+ * @param segments number of path segments
+ * @param varsPos bit array with variable positions within the path template
  */
-final class WebPathMatcher implements Comparable<WebPathMatcher> {
+record WebPathMatcher(Pattern pattern, List<QNm> varNames, int segments, BigInteger varsPos)
+    implements Comparable<WebPathMatcher> {
   /** Default matcher for empty path templates. */
   private static final WebPathMatcher EMPTY =
-      new WebPathMatcher("/", Collections.emptyList(), 0, ZERO);
-  /** Variable names defined in the path template. */
-  final List<QNm> varNames;
-  /** Number of path segments. */
-  final int segments;
-  /** Bit array with variable positions within the path template. */
-  final BigInteger varsPos;
-  /** Compiled regular expression which matches paths defined by the path annotation. */
-  final Pattern pattern;
-
-  /**
-   * Constructor.
-   * @param regex regular expression which matches paths defined by the path annotation
-   * @param varNames variable names defined in the path template
-   * @param segments segment count
-   * @param varsPos variable position
-   */
-  private WebPathMatcher(final String regex, final List<QNm> varNames, final int segments,
-      final BigInteger varsPos) {
-    this.varNames = varNames;
-    this.segments = segments;
-    this.varsPos = varsPos;
-    pattern = Pattern.compile(regex);
-  }
+      new WebPathMatcher(Pattern.compile("/"), Collections.emptyList(), 0, ZERO);
 
   /**
    * Checks if the given path matches.
@@ -172,7 +154,7 @@ final class WebPathMatcher implements Comparable<WebPathMatcher> {
     decodeAndEscape(literals, result, info, err);
 
     final BigInteger vp = varsPos.cardinality() == 0 ? ZERO : new BigInteger(varsPos.toByteArray());
-    return new WebPathMatcher(result.toString(), varNames, segment + 1, vp);
+    return new WebPathMatcher(Pattern.compile(result.toString()), varNames, segment + 1, vp);
   }
 
   /**

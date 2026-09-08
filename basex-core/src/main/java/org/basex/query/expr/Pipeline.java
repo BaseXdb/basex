@@ -52,7 +52,7 @@ public final class Pipeline extends Mapping {
   }
 
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
+  public Iter iter(final QueryContext qc) {
     return new Iter() {
       QueryFocus qf;
       Iter iter;

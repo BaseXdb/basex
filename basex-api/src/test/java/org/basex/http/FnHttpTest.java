@@ -967,7 +967,7 @@ public abstract class FnHttpTest extends HTTPTest {
         + "</http:multipart></http:request>", Str.get("BODY2"));
     assertEquals(2, r.parts.size());
     // src part takes no body from the list
-    assertEquals(0, r.parts.get(0).contents.size());
+    assertEquals(0, r.parts.getFirst().contents.size());
     // the following part receives the list item
     final Part part = r.parts.get(1);
     assertEquals(1, part.contents.size());

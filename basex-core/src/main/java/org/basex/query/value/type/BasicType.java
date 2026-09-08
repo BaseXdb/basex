@@ -1165,18 +1165,16 @@ public enum BasicType implements Type {
    * @throws QueryException query exception
    */
   final Item checkNum(final Object value, final InputInfo info) throws QueryException {
-    final Item item;
-    if(value instanceof final Value val) {
-      if(val.size() != 1) throw typeError(val, this, info);
-      item = (Item) val;
-    } else if(value instanceof final Number num) {
-      item = num instanceof Double || num instanceof Float ? Dbl.get(num.doubleValue()) :
-        Itr.get(num.longValue());
-    } else if(value instanceof final Character ch) {
-      item = Itr.get(ch);
-    } else {
-      item = Str.get(token(value));
-    }
+    final Item item = switch(value) {
+      case final Value val -> {
+        if(val.size() != 1) throw typeError(val, this, info);
+        yield (Item) val;
+      }
+      case final Number num -> num instanceof Double || num instanceof Float ?
+        Dbl.get(num.doubleValue()) : Itr.get(num.longValue());
+      case final Character ch -> Itr.get(ch);
+      case null, default -> Str.get(token(value));
+    };
     return checkNum(item, info);
   }
 

@@ -138,7 +138,7 @@ public final class SaxonTransform {
     documents.add(new ResultDoc(options.get(BASE_OUTPUT_URI), true));
 
     try {
-      invoke(transformer, documents.get(0).dest);
+      invoke(transformer, documents.getFirst().dest);
     } catch(final QueryRTException ex) {
       throw ex.getCause();
     } catch(final SaxonApiUncheckedException ex) {

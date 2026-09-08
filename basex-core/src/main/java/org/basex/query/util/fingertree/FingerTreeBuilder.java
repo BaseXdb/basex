@@ -128,8 +128,8 @@ public final class FingerTreeBuilder<E> implements Iterable<E> {
      * @param tree the tree to take the contents of
      */
     BufferNode(final FingerTree<N, E> tree) {
-      if(tree instanceof SingletonTree) {
-        prepend(((SingletonTree<N, E>) tree).elem);
+      if(tree instanceof final SingletonTree<N, E> single) {
+        prepend(single.elem);
       } else {
         final DeepTree<N, E> deep = (DeepTree<N, E>) tree;
         for(int i = deep.left.length; --i >= 0;) prepend(deep.left[i]);
@@ -189,12 +189,11 @@ public final class FingerTreeBuilder<E> implements Iterable<E> {
      * @param tree finger tree to append
      */
     void append(final FingerTree<N, E> tree) {
-      if(!(tree instanceof DeepTree)) {
-        if(tree instanceof SingletonTree) append(((SingletonTree<N, E>) tree).elem);
+      if(!(tree instanceof final DeepTree<N, E> deep)) {
+        if(tree instanceof final SingletonTree<N, E> single) append(single.elem);
         return;
       }
 
-      final DeepTree<N, E> deep = (DeepTree<N, E>) tree;
       final Node<N, E>[] ls = deep.left, rs = deep.right;
       final int ll = ls.length;
       final FingerTree<Node<N, E>, E> mid = deep.middle;

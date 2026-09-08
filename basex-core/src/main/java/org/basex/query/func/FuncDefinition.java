@@ -2,6 +2,7 @@ package org.basex.query.func;
 
 import java.util.*;
 import java.util.function.*;
+import java.util.regex.*;
 
 import org.basex.core.users.*;
 import org.basex.query.expr.*;
@@ -18,6 +19,9 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class FuncDefinition {
+  /** Suffix of an optional or repeated parameter. */
+  private static final Pattern PARAM_SUFFIX = Pattern.compile("(\\?|\\.\\.\\.)$");
+
   /** Result type. */
   public final SeqType seqType;
   /** Name of function. */
@@ -80,7 +84,7 @@ public final class FuncDefinition {
         if(vsbl++ > 0) sb.append(", ");
         sb.append(prm);
       }
-      params[p] = new QNm((hidden ? prm.substring(1) : prm).replaceAll("(\\?|\\.\\.\\.)$", ""));
+      params[p] = new QNm(PARAM_SUFFIX.matcher(hidden ? prm.substring(1) : prm).replaceFirst(""));
     }
     visible = vsbl;
     paramString = sb.toString();

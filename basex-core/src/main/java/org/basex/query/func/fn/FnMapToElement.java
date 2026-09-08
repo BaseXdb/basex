@@ -299,8 +299,7 @@ public final class FnMapToElement extends PlanFn {
    */
   private FAttr attribute(final QNm name, final Value value) throws QueryException {
     final Item item = single(value);
-    if(item != null && isNull(item)) throw MAP_TO_ELEMENT_X.get(info,
-        "Null is not allowed as attribute value.");
+    if(isNull(item)) throw MAP_TO_ELEMENT_X.get(info, "Null is not allowed as attribute value.");
     return new FAttr(name, item == null ? EMPTY : atom(item));
   }
 
@@ -422,7 +421,7 @@ public final class FnMapToElement extends PlanFn {
 
   /**
    * Checks if an item is the {@code fn:null} marker.
-   * @param item item
+   * @param item item (can be {@code null})
    * @return result of check
    */
   private static boolean isNull(final Item item) {

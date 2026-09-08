@@ -229,7 +229,7 @@ public final class HtmlParser extends XMLParser {
         if(hopts.get(FAIL_ON_ERROR)) {
           reader.setErrorHandler(new ErrorHandler() {
             @Override
-            public void warning(final SAXParseException e) throws SAXException {
+            public void warning(final SAXParseException e) {
             }
 
             @Override

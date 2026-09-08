@@ -108,10 +108,12 @@ public final class GlobalValues {
    * @throws QueryException query exception
    */
   private static Value result(final StaticVar var, final Object result) throws QueryException {
-    if(result instanceof final Value value) return value;
-    if(result instanceof final RuntimeException ex) throw ex;
-    if(result instanceof final Error ex) throw ex;
-    throw var.error((QueryException) result);
+    return switch(result) {
+      case final Value value -> value;
+      case final RuntimeException ex -> throw ex;
+      case final Error ex -> throw ex;
+      default -> throw var.error((QueryException) result);
+    };
   }
 
   /**

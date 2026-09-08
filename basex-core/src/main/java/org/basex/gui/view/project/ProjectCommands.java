@@ -99,7 +99,7 @@ interface ProjectCommands {
     });
     commands.add(null);
 
-    commands.addAll(Arrays.asList(edit));
+    Collections.addAll(commands, edit);
 
     commands.add(new GUIPopupCmd(REFRESH, BaseXKeys.REFRESH) {
       @Override public void execute() {

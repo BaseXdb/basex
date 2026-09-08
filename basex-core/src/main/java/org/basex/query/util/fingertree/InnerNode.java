@@ -68,13 +68,13 @@ final class InnerNode<N, E> implements Node<Node<N, E>, E> {
   }
 
   @Override
-  public boolean insert(final Node<Node<N, E>, E>[] siblings, final long index, final E val) {
+  public boolean insert(final Node<Node<N, E>, E>[] siblings, final long pos, final E val) {
     final Node<Node<N, E>, E> left = siblings[0], right = siblings[2];
 
     int i = 0;
     final int n = bounds.length;
-    while(index > bounds[i]) i++;
-    final long off = i == 0 ? index : index - bounds[i - 1];
+    while(pos > bounds[i]) i++;
+    final long off = i == 0 ? pos : pos - bounds[i - 1];
 
     @SuppressWarnings("unchecked")
     final Node<N, E>[] subs = (Node<N, E>[]) siblings;
@@ -355,8 +355,8 @@ final class InnerNode<N, E> implements Node<Node<N, E>, E> {
     final NodeLike<N, E> sub = ((PartialInnerNode<N, E>) nodes[pos - 1]).sub;
     final int n = children.length;
     final Node<N, E> a, b;
-    if(sub instanceof Node) {
-      a = (Node<N, E>) sub;
+    if(sub instanceof final Node<N, E> node) {
+      a = node;
       b = children[0];
     } else {
       @SuppressWarnings("unchecked")
@@ -399,12 +399,12 @@ final class InnerNode<N, E> implements Node<Node<N, E>, E> {
    * @param indent indentation depth
    */
   public void toString(final StringBuilder sb, final int indent) {
-    sb.append("  ".repeat(indent)).append("Node(").append(size()).append(")[\n");
+    sb.repeat("  ", indent).append("Node(").append(size()).append(")[\n");
     for(final Node<N, E> sub : children) {
       FingerTree.toString(sub, sb, indent + 1);
       sb.append('\n');
     }
-    sb.append("  ".repeat(indent)).append(']');
+    sb.repeat("  ", indent).append(']');
   }
 
   @Override

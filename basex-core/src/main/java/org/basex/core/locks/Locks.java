@@ -1,7 +1,5 @@
 package org.basex.core.locks;
 
-import java.util.*;
-
 import org.basex.core.*;
 import org.basex.data.*;
 
@@ -63,18 +61,6 @@ public final class Locks {
     // a write lock clashes with any equally-named lock held by the other job
     return writes.intersects(locks.writes) || writes.intersects(locks.reads) ||
         locks.writes.intersects(reads);
-  }
-
-  /**
-   * Returns a readable, comma-separated list of all lock strings.
-   * @return lock strings, including {@code (global)} for a global lock
-   */
-  public String labels() {
-    final ArrayList<String> list = new ArrayList<>();
-    for(final String lock : writes) list.add(lock);
-    for(final String lock : reads) list.add(lock);
-    if(writes.global() || reads.global()) list.add("(global)");
-    return String.join(", ", list);
   }
 
   @Override

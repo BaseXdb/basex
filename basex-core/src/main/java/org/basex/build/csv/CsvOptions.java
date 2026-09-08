@@ -111,7 +111,7 @@ public class CsvOptions extends Options {
    */
   private void validate(final InputInfo info) throws QueryException {
     final IntSet chars = new IntSet();
-    for(final StringOption option : Arrays.asList(SEPARATOR, QUOTE_CHARACTER, COMMENT_MARKER)) {
+    for(final StringOption option : List.of(SEPARATOR, QUOTE_CHARACTER, COMMENT_MARKER)) {
       final String value = get(option);
       // an empty comment marker indicates that comments are not recognized
       if(option == COMMENT_MARKER && value.isEmpty()) continue;

@@ -23,8 +23,6 @@ import org.basex.util.list.*;
  */
 public class FnParseUri extends StandardFunc {
   /** URI part. */
-  static final String URI = "uri";
-  /** URI part. */
   static final String SCHEME = "scheme";
   /** URI part. */
   static final String HIERARCHICAL = "hierarchical";
@@ -50,8 +48,7 @@ public class FnParseUri extends StandardFunc {
   /** File scheme. */
   static final String FILE = "file";
   /** Non-hierarchical schemes. */
-  static final HashSet<String> NON_HIERARCHICAL = new HashSet<>(
-      Arrays.asList("jar", "mailto", "news", "tag", "tel", "urn"));
+  static final Set<String> NON_HIERARCHICAL = Set.of("jar", "mailto", "news", "tag", "tel", "urn");
   /** Scheme/port mappings. */
   static final Map<String, Long> PORTS = Map.of(
       "http", 80L, "https", 443L, "ftp", 21L, "ssh", 22L);

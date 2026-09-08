@@ -68,6 +68,27 @@ public final class SqlModuleTest extends SandboxTest {
     error(conn(func.args(" $c", "select 1")), SQL_TIMEOUT_X);
   }
 
+  /** Test method: statements are released as soon as their results have been retrieved. */
+  @Test public void statementsClosed() {
+    final Function func = _SQL_EXECUTE;
+    // updating statement: closed after the update count has been retrieved
+    MockDriver.updateCount = 1;
+    query(conn(func.args(" $c", "update t set x = 1")), 1);
+    assertEquals(0, MockDriver.openStatements);
+
+    // query statement: closed after the last row has been returned
+    MockDriver.reset();
+    MockDriver.result(new String[] { "id" }, new Object[] { 1 });
+    query(conn(func.args(" $c", "select * from t")));
+    assertEquals(0, MockDriver.openStatements);
+
+    // failing statement: closed as well
+    MockDriver.reset();
+    MockDriver.failure = new SQLException("boom");
+    error(conn(func.args(" $c", "select 1")), SQL_ERROR_X);
+    assertEquals(0, MockDriver.openStatements);
+  }
+
   /** Test method. */
   @Test public void generatedKeys() {
     final Function func = _SQL_EXECUTE;

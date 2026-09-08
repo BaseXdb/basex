@@ -194,14 +194,6 @@ public final class MapBuilder {
   }
 
   /**
-   * Returns the size of the map.
-   * @return map size
-   */
-  public long size() {
-    return map != null ? map.structSize() : size;
-  }
-
-  /**
    * Returns the built map.
    * @return map
    */

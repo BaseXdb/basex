@@ -60,9 +60,9 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
     int level = 0;
     final Node<?, E> digit;
     while(true) {
-      if(curr instanceof SingletonTree) {
+      if(curr instanceof final SingletonTree<?, E> single) {
         // we unpack the contained node one level
-        digit = ((SingletonTree<?, E>) curr).elem;
+        digit = single.elem;
         break;
       }
 
@@ -315,21 +315,20 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
   }
 
   /**
-   * Writes a string representation of the given object to the given strun builder.
+   * Writes a string representation of the given object to the given string builder.
    * @param obj object to write
    * @param sb string builder
    * @param indent indentation level
    */
   static void toString(final Object obj, final StringBuilder sb, final int indent) {
-    if(obj instanceof InnerNode) {
-      ((InnerNode<?, ?>) obj).toString(sb, indent);
-    } else if(obj instanceof PartialInnerNode) {
-      ((PartialInnerNode<?, ?>) obj).toString(sb, indent);
+    if(obj instanceof final InnerNode<?, ?> inner) {
+      inner.toString(sb, indent);
+    } else if(obj instanceof final PartialInnerNode<?, ?> partial) {
+      partial.toString(sb, indent);
     } else {
       boolean fst = true;
       for(final String line : obj.toString().split("\r\n?|\n")) {
-        for(int i = 0; i < indent; i++) sb.append(' ').append(' ');
-        sb.append(line);
+        sb.repeat("  ", indent).append(line);
         if(fst) fst = false;
         else sb.append('\n');
       }

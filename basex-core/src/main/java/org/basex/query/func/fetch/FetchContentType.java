@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 
 import java.io.*;
 import java.net.http.*;
-import java.util.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
@@ -26,8 +25,7 @@ public final class FetchContentType extends FetchDoc {
     if(source instanceof final IOUrl url) {
       try {
         final HttpHeaders headers = url.response().headers();
-        final Optional<String> value = headers.firstValue(HTTPText.CONTENT_TYPE);
-        if(value.isPresent()) mt = new MediaType(value.get());
+        mt = headers.firstValue(HTTPText.CONTENT_TYPE).map(MediaType::new).orElse(null);
       } catch(final IOException ex) {
         throw FETCH_OPEN_X.get(info, ex);
       }

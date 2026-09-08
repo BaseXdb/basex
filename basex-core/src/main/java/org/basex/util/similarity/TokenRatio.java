@@ -70,7 +70,7 @@ public final class TokenRatio {
     final StringBuilder token = new StringBuilder();
     for(final int cp : cps) {
       if(Character.isWhitespace(cp)) {
-        if(token.length() != 0) {
+        if(!token.isEmpty()) {
           tokens.add(token.toString());
           token.setLength(0);
         }
@@ -78,7 +78,7 @@ public final class TokenRatio {
         token.appendCodePoint(cp);
       }
     }
-    if(token.length() != 0) tokens.add(token.toString());
+    if(!token.isEmpty()) tokens.add(token.toString());
     return tokens.toArray(new String[0]);
   }
 

@@ -132,8 +132,8 @@ final class SingletonTree<N, E> extends FingerTree<N, E> {
 
   @Override
   void toString(final StringBuilder sb, final int indent) {
-    sb.append("  ".repeat(indent)).append("Single[\n");
+    sb.repeat("  ", indent).append("Single[\n");
     toString(elem, sb, indent + 1);
-    sb.append('\n').append("  ".repeat(indent)).append(']');
+    sb.append('\n').repeat("  ", indent).append(']');
   }
 }

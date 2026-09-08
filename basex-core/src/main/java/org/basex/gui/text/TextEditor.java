@@ -1129,7 +1129,7 @@ public final class TextEditor {
     int indent = open(), move = 0;
     if(opening) {
       if(closing) {
-        sb.append(" ".repeat(Math.max(0, indent + ind)));
+        sb.repeat(' ', Math.max(0, indent + ind));
         move = indent + ind + 1;
         sb.append('\n');
       } else {
@@ -1139,7 +1139,7 @@ public final class TextEditor {
       // unindent before closing bracket
       indent -= ind;
     }
-    sb.append(" ".repeat(Math.max(0, indent)));
+    sb.repeat(' ', Math.max(0, indent));
     add(sb, false);
     return move;
   }

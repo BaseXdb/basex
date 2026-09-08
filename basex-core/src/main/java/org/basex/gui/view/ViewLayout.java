@@ -27,7 +27,7 @@ final class ViewLayout implements ViewComponent {
    */
   ViewLayout(final boolean horizontal, final ViewComponent... components) {
     this.horizontal = horizontal;
-    list.addAll(Arrays.asList(components));
+    Collections.addAll(list, components);
   }
 
   @Override

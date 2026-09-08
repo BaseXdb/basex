@@ -188,12 +188,12 @@ final class LeafNode implements Node<Item, Item> {
     }
 
     final NodeLike<Item, Item> left = nodes[pos - 1];
-    if(!(left instanceof PartialLeafNode)) {
+    if(!(left instanceof final PartialLeafNode pln)) {
       nodes[pos] = this;
       return pos + 1;
     }
 
-    final Item[] ls = ((PartialLeafNode) left).elems, rs = values;
+    final Item[] ls = pln.elems, rs = values;
     final int l = ls.length, r = rs.length, n = l + r;
     if(n <= TreeSeq.MAX_LEAF) {
       // merge into one node
@@ -216,8 +216,8 @@ final class LeafNode implements Node<Item, Item> {
   }
 
   @Override
-  public NodeLike<Item, Item> slice(final long off, final long size) {
-    final int p = (int) off, n = (int) size;
+  public NodeLike<Item, Item> slice(final long off, final long len) {
+    final int p = (int) off, n = (int) len;
     final Item[] out = new Item[n];
     Array.copyToStart(values, p, n, out);
     return n < TreeSeq.MIN_LEAF ? new PartialLeafNode(out) : new LeafNode(out);
@@ -229,8 +229,8 @@ final class LeafNode implements Node<Item, Item> {
   }
 
   @Override
-  public Item getSub(final int index) {
-    return values[index];
+  public Item getSub(final int pos) {
+    return values[pos];
   }
 
   @Override

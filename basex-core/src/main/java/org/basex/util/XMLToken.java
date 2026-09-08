@@ -45,9 +45,6 @@ public final class XMLToken {
   /** HTML: Non-breaking space entity. */
   public static final byte[] E_NBSP = token("&nbsp;");
 
-  /** Token: size. */
-  public static final byte[] T_SIZE = token("size");
-
   /** Comment output. */
   public static final byte[] COMM_O = token("<!--");
   /** Comment output. */

@@ -36,8 +36,7 @@ final class SyntaxJS extends Syntax {
   private static final int CLASS = 7;
 
   /** Keywords that end an operand: they are followed by a division, not by a regular expression. */
-  private static final HashSet<String> OPERANDS = new HashSet<>(Arrays.asList(
-    "super", "this"));
+  private static final Set<String> OPERANDS = Set.of("super", "this");
 
   // initialize keywords
   static {

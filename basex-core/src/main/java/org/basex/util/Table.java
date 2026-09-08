@@ -50,7 +50,7 @@ public final class Table {
       il.add(l);
       // find next two spaces
       while(++l + 1 < ll && (line[l] != ' ' || line[l + 1] != ' '));
-      header.add(substring(line, il.get(il.size() - 1), l));
+      header.add(substring(line, il.peek(), l));
       while(++l < ll && line[l] == ' ');
     }
     il.add(l);

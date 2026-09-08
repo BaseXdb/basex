@@ -78,7 +78,7 @@ public final class SpillOutput extends OutputStream {
 
   @Override
   public void write(final int b) throws IOException {
-    if(file == null && array.size() == threshold) spill();
+    if(file == null && array.size() >= threshold) spill();
     if(file != null) file.write(b);
     else array.write(b);
   }

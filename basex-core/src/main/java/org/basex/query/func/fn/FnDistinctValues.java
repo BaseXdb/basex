@@ -75,6 +75,7 @@ public final class FnDistinctValues extends FnDuplicateValues {
     // fallback: continue with the values that have already been collected
     final ItemSet set = ItemSet.get(collation, info);
     for(final int i : ints.keys()) set.add(Itr.get(i));
+    // be nice to the garbage collector
     ints = null;
     do {
       if(set.add(item)) vb.add(item);

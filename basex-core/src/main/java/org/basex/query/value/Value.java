@@ -60,7 +60,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   @Override
-  public final Expr optimize(final CompileContext cc) throws QueryException {
+  public final Expr optimize(final CompileContext cc) {
     return this;
   }
 
@@ -292,18 +292,6 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   /**
-   * Checks if this value is materialized and contains no function items.
-   * @param test test to check if a node can be adopted unchanged
-   * @param ii input info (can be {@code null})
-   * @return result of check
-   * @throws QueryException query exception
-   */
-  public final boolean materialized(final Predicate<Data> test, final InputInfo ii)
-      throws QueryException {
-    return materialized(test, false, ii);
-  }
-
-  /**
    * Serializes the value, using the standard XML serializer,
    * and returns the cached result.
    * @return serialized value
@@ -356,9 +344,8 @@ public abstract class Value extends Expr implements Iterable<Item> {
   /**
    * Refines the type of a value.
    * @return if the sequence is homogeneous, i.e., if all items are of the same type
-   * @throws QueryException query exception
    */
-  public abstract boolean refineType() throws QueryException;
+  public abstract boolean refineType();
 
   /**
    * If possible, returns a compactified version of this value.

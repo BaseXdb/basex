@@ -100,14 +100,6 @@ public final class GNodeBuilder extends ObjectList<GNode, GNodeBuilder> {
     ddo = true;
   }
 
-  /**
-   * Returns the shared database.
-   * @return database or {@code null}
-   */
-  public Data data() {
-    return data;
-  }
-
   @Override
   public boolean removeAll(final GNode node) {
     if(data != null && ddo && node instanceof final DBNode dbnode) {

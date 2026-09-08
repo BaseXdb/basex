@@ -12,8 +12,6 @@ import org.basex.io.*;
  * @author Tim Petrowsky
  */
 public final class BufferOutput extends OutputStream {
-  /** Buffer size. */
-  private final int bufsize;
   /** Byte buffer. */
   private final byte[] buffer;
   /** Reference to the data output stream. */
@@ -54,23 +52,22 @@ public final class BufferOutput extends OutputStream {
    */
   BufferOutput(final OutputStream out, final int bufsize) {
     this.out = out;
-    this.bufsize = bufsize;
     buffer = new byte[bufsize];
   }
 
   @Override
   public void write(final int b) throws IOException {
-    if(pos == bufsize) flush();
+    if(pos == buffer.length) flush();
     buffer[pos++] = (byte) b;
   }
 
   @Override
   public void write(final byte[] b, final int off, final int len) throws IOException {
-    if(len >= bufsize) {
+    if(len >= buffer.length) {
       flush();
       out.write(b, off, len);
     } else {
-      if(pos + len > bufsize) flush();
+      if(pos + len > buffer.length) flush();
       System.arraycopy(b, off, buffer, pos, len);
       pos += len;
     }

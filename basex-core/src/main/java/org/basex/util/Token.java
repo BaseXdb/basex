@@ -179,22 +179,16 @@ public final class Token {
    * @return token
    */
   public static byte[] token(final Object object) {
-    if(object instanceof final byte[] bytes) return bytes;
-    if(object instanceof final ArrayOutput ao) return ao.toArray();
-    if(object instanceof final TokenBuilder tb) return tb.toArray();
-    if(object instanceof final Supplier<?> supplier) return token(supplier.get());
-
-    final String s;
-    if(object == null) {
-      s = "null";
-    } else if(object instanceof final Throwable th) {
-      s = Util.message(th);
-    } else if(object instanceof final Class<?> clzz) {
-      s = Util.className(clzz);
-    } else {
-      s = object.toString();
-    }
-    return token(s);
+    return switch(object) {
+      case null -> token("null");
+      case final byte[] bytes -> bytes;
+      case final ArrayOutput ao -> ao.toArray();
+      case final TokenBuilder tb -> tb.toArray();
+      case final Supplier<?> supplier -> token(supplier.get());
+      case final Throwable th -> token(Util.message(th));
+      case final Class<?> clzz -> token(Util.className(clzz));
+      default -> token(object.toString());
+    };
   }
 
   /**

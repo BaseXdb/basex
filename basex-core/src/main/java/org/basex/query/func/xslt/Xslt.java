@@ -3,6 +3,7 @@ package org.basex.query.func.xslt;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.nio.charset.*;
 import java.util.concurrent.*;
 import java.util.function.*;
 
@@ -152,7 +153,7 @@ public final class Xslt {
     final ArrayOutput err = new ArrayOutput();
     try {
       // redirect errors
-      System.setErr(new PrintStream(err));
+      System.setErr(new PrintStream(err, true, StandardCharsets.UTF_8));
       final Transformer tr = transformer(stylesheet, cache, trusted, qc);
       prepare.accept(tr);
       tr.transform(source, result);
@@ -164,12 +165,7 @@ public final class Xslt {
       // collect transformation errors, most specific one last
       final StringList list = new StringList();
       for(Throwable th = ex; th != null; th = th.getCause()) message(list, th.getMessage());
-      try {
-        message(list, new String(err.toArray(), Prop.CHARSET));
-      } catch(final Exception e) {
-        Util.debug(e);
-        message(list, e.getMessage());
-      }
+      message(list, new String(err.toArray(), StandardCharsets.UTF_8));
       return String.join("; ", list.reverse().finish());
     } finally {
       System.setErr(errPS);

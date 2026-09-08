@@ -25,9 +25,9 @@ public final class JNodeTest extends SandboxTest {
   private static JNode emptyNode;
 
   /** String representation. */
-  private static String string = "{\"a\":{\"x\":1,\"y\":{\"z\":2}},\"b\":{\"x\":{\"y\":2}}}";
+  private static final String STRING = "{\"a\":{\"x\":1,\"y\":{\"z\":2}},\"b\":{\"x\":{\"y\":2}}}";
   /** JTree query. */
-  private static String jtree = JTREE.args(" " + string);
+  private static final String JTREE_STRING = JTREE.args(" " + STRING);
   /** Node: root. */
   private static JNode rootNode;
   /** Node: root.a. */
@@ -144,11 +144,11 @@ public final class JNodeTest extends SandboxTest {
     assertFalse(emptyNode.is(rootNode));
     assertFalse(rootNode.is(emptyNode));
 
-    query(jtree + " ! (a is a)", true);
-    query(jtree + " ! (a is b)", false);
-    query(jtree + "/a ! (. is .)", true);
-    query(jtree + " ! (*/.. is .)", true);
-    query(jtree + "//z ! (../z is .)", true);
+    query(JTREE_STRING + " ! (a is a)", true);
+    query(JTREE_STRING + " ! (a is b)", false);
+    query(JTREE_STRING + "/a ! (. is .)", true);
+    query(JTREE_STRING + " ! (*/.. is .)", true);
+    query(JTREE_STRING + "//z ! (../z is .)", true);
 
     query("jtree([ 1, 2 ]) ! (jnode(1) is jnode(1))", true);
     query("jtree([ 1, 2 ]) ! (jnode(1) is jnode(2))", false);
@@ -174,15 +174,15 @@ public final class JNodeTest extends SandboxTest {
     assertTrue(rootNode.compare(emptyNode) != 0);
     assertEquals(0, rootNode.compare(emptyNode) + emptyNode.compare(rootNode));
 
-    query(jtree + " ! (. << .)", false);
-    query(jtree + " ! (. >> .)", false);
-    query(jtree + " ! (a << a)", false);
-    query(jtree + " ! (a >> a)", false);
-    query(jtree + " ! (a << b)", true);
-    query(jtree + " ! (a >> b)", false);
-    query(jtree + "/a ! (. << .)", false);
-    query(jtree + " ! (*/.. << .)", false);
-    query(jtree + " ! (*/.. >> .)", false);
+    query(JTREE_STRING + " ! (. << .)", false);
+    query(JTREE_STRING + " ! (. >> .)", false);
+    query(JTREE_STRING + " ! (a << a)", false);
+    query(JTREE_STRING + " ! (a >> a)", false);
+    query(JTREE_STRING + " ! (a << b)", true);
+    query(JTREE_STRING + " ! (a >> b)", false);
+    query(JTREE_STRING + "/a ! (. << .)", false);
+    query(JTREE_STRING + " ! (*/.. << .)", false);
+    query(JTREE_STRING + " ! (*/.. >> .)", false);
 
     query("jtree([ 1, 2 ]) ! (jnode(1) is jnode(1))", true);
     query("jtree([ 1, 2 ]) ! (jnode(1) << jnode(2))", true);
@@ -235,37 +235,37 @@ public final class JNodeTest extends SandboxTest {
    * @throws QueryIOException query I/O exception
    */
   @Test public void serialize() throws QueryIOException {
-    assertEquals(string, rootNode.serialize().toString());
-    query(jtree, string);
-    query(jtree + "/.", string);
+    assertEquals(STRING, rootNode.serialize().toString());
+    query(JTREE_STRING, STRING);
+    query(JTREE_STRING + "/.", STRING);
   }
 
   /** Node tests. */
   @Test public void nodeTest() {
-    query(jtree + "//node() => count()", 7);
-    query(jtree + "//xnode() => count()", 0);
-    query(jtree + "//element() => count()", 0);
-    query(jtree + "//jnode() => count()", 7);
-    query(jtree + "//jnode(*) => count()", 7);
-    query(jtree + "//jnode(x) => count()", 2);
-    query(jtree + "//jnode(*, xs:integer) => count()", 3);
-    query(jtree + "//jnode(x, xs:integer) => count()", 1);
-    query(jtree + "//jnode('x', xs:integer) => count()", 1);
-    query(jtree + "//jnode(\"x\", xs:integer) => count()", 1);
-    query(jtree + "//jnode(\"x\", xs:numeric) => count()", 1);
-    query(jtree + "//jnode(x, xs:anyAtomicType) => count()", 1);
-    query(jtree + "//jnode(x, item()) => count()", 2);
-    query(jtree + "//jnode(x, map(*)) => count()", 1);
-    query(jtree + "//jnode(x, item()*) => count()", 2);
+    query(JTREE_STRING + "//node() => count()", 7);
+    query(JTREE_STRING + "//xnode() => count()", 0);
+    query(JTREE_STRING + "//element() => count()", 0);
+    query(JTREE_STRING + "//jnode() => count()", 7);
+    query(JTREE_STRING + "//jnode(*) => count()", 7);
+    query(JTREE_STRING + "//jnode(x) => count()", 2);
+    query(JTREE_STRING + "//jnode(*, xs:integer) => count()", 3);
+    query(JTREE_STRING + "//jnode(x, xs:integer) => count()", 1);
+    query(JTREE_STRING + "//jnode('x', xs:integer) => count()", 1);
+    query(JTREE_STRING + "//jnode(\"x\", xs:integer) => count()", 1);
+    query(JTREE_STRING + "//jnode(\"x\", xs:numeric) => count()", 1);
+    query(JTREE_STRING + "//jnode(x, xs:anyAtomicType) => count()", 1);
+    query(JTREE_STRING + "//jnode(x, item()) => count()", 2);
+    query(JTREE_STRING + "//jnode(x, map(*)) => count()", 1);
+    query(JTREE_STRING + "//jnode(x, item()*) => count()", 2);
 
-    query(jtree + "//jnode(X)", "");
-    query(jtree + "//jnode(#Q{}x)", "");
-    query(jtree + "//jnode(1)", "");
-    query(jtree + "//jnode(1.0)", "");
-    query(jtree + "//jnode(1e0)", "");
-    query(jtree + "//jnode(0xF)", "");
-    query(jtree + "//jnode(true())", "");
-    query(jtree + "//jnode(false())", "");
+    query(JTREE_STRING + "//jnode(X)", "");
+    query(JTREE_STRING + "//jnode(#Q{}x)", "");
+    query(JTREE_STRING + "//jnode(1)", "");
+    query(JTREE_STRING + "//jnode(1.0)", "");
+    query(JTREE_STRING + "//jnode(1e0)", "");
+    query(JTREE_STRING + "//jnode(0xF)", "");
+    query(JTREE_STRING + "//jnode(true())", "");
+    query(JTREE_STRING + "//jnode(false())", "");
 
     error("[ 8, 9 ]/jnode(-0x8000000000000000)", RANGE_X);
     query("[ 8, 9 ]/jnode(-0x7FFFFFFFFFFFFFFF)", "");
@@ -282,47 +282,47 @@ public final class JNodeTest extends SandboxTest {
 
   /** Attribute step. */
   @Test public void axisAttribute() {
-    query(jtree + "/@*", "");
-    query(jtree + "/attribute::*", "");
-    query(jtree + "/attribute::attribute()", "");
-    query(jtree + "/attribute::attribute(a)", "");
+    query(JTREE_STRING + "/@*", "");
+    query(JTREE_STRING + "/attribute::*", "");
+    query(JTREE_STRING + "/attribute::attribute()", "");
+    query(JTREE_STRING + "/attribute::attribute(a)", "");
   }
 
   /** Child step. */
   @Test public void axisChild() {
-    query(jtree + "/b", "{\"b\":{\"x\":{\"y\":2}}}");
-    query(jtree + "/b/x", "{\"x\":{\"y\":2}}");
-    query(jtree + "/b/x/y", "{\"y\":2}");
+    query(JTREE_STRING + "/b", "{\"b\":{\"x\":{\"y\":2}}}");
+    query(JTREE_STRING + "/b/x", "{\"x\":{\"y\":2}}");
+    query(JTREE_STRING + "/b/x/y", "{\"y\":2}");
 
-    query(jtree + "/*", "{\"a\":{\"x\":1,\"y\":{\"z\":2}}}\n{\"b\":{\"x\":{\"y\":2}}}");
-    query(jtree + "/*/*", "{\"x\":1}\n{\"y\":{\"z\":2}}\n{\"x\":{\"y\":2}}");
-    query(jtree + "/*/*/*", "{\"z\":2}\n{\"y\":2}");
-    query(jtree + "/*/*/*/*", "");
+    query(JTREE_STRING + "/*", "{\"a\":{\"x\":1,\"y\":{\"z\":2}}}\n{\"b\":{\"x\":{\"y\":2}}}");
+    query(JTREE_STRING + "/*/*", "{\"x\":1}\n{\"y\":{\"z\":2}}\n{\"x\":{\"y\":2}}");
+    query(JTREE_STRING + "/*/*/*", "{\"z\":2}\n{\"y\":2}");
+    query(JTREE_STRING + "/*/*/*/*", "");
 
-    query(jtree + "/* => count()", 2);
-    query(jtree + "/*/* => count()", 3);
-    query(jtree + "/*/*/* => count()", 2);
-    query(jtree + "/*/*/*/* => count()", 0);
+    query(JTREE_STRING + "/* => count()", 2);
+    query(JTREE_STRING + "/*/* => count()", 3);
+    query(JTREE_STRING + "/*/*/* => count()", 2);
+    query(JTREE_STRING + "/*/*/*/* => count()", 0);
   }
 
   /** Descendant step. */
   @Test public void axisDescendant() {
-    query(jtree + "//b", "{\"b\":{\"x\":{\"y\":2}}}");
-    query(jtree + "//x", "{\"x\":1}\n{\"x\":{\"y\":2}}");
-    query(jtree + "//y", "{\"y\":{\"z\":2}}\n{\"y\":2}");
+    query(JTREE_STRING + "//b", "{\"b\":{\"x\":{\"y\":2}}}");
+    query(JTREE_STRING + "//x", "{\"x\":1}\n{\"x\":{\"y\":2}}");
+    query(JTREE_STRING + "//y", "{\"y\":{\"z\":2}}\n{\"y\":2}");
 
-    query(jtree + "//* => count()", 7);
-    query(jtree + "//*//* => count()", 5);
-    query(jtree + "//*//*//* => count()", 2);
-    query(jtree + "//*//*//*//* => count()", 0);
-    query(jtree + "//x => count()", 2);
+    query(JTREE_STRING + "//* => count()", 7);
+    query(JTREE_STRING + "//*//* => count()", 5);
+    query(JTREE_STRING + "//*//*//* => count()", 2);
+    query(JTREE_STRING + "//*//*//*//* => count()", 0);
+    query(JTREE_STRING + "//x => count()", 2);
   }
 
   /** Descendant-or-self step. */
   @Test public void axisDescendantOrSelf() {
-    query(jtree + "/descendant-or-self::* => count()", 8);
-    query(jtree + "/descendant-or-self::*/descendant-or-self::* => count()", 8);
-    query(jtree + "/descendant-or-self::*/descendant-or-self::*/descendant-or-self::* "
+    query(JTREE_STRING + "/descendant-or-self::* => count()", 8);
+    query(JTREE_STRING + "/descendant-or-self::*/descendant-or-self::* => count()", 8);
+    query(JTREE_STRING + "/descendant-or-self::*/descendant-or-self::*/descendant-or-self::* "
         + "=> count()", 8);
   }
 
@@ -366,71 +366,71 @@ public final class JNodeTest extends SandboxTest {
 
   /** Ancestor step. */
   @Test public void axisAncestor() {
-    query(jtree + "//y/ancestor::y", "");
-    query(jtree + "//y/ancestor::x", "{\"x\":{\"y\":2}}");
-    query(jtree + "//y/ancestor::b", "{\"b\":{\"x\":{\"y\":2}}}");
-    query(jtree + "//y/ancestor::* => count()", 4);
-    query(jtree + "//y/ancestor::node() => count()", 4);
+    query(JTREE_STRING + "//y/ancestor::y", "");
+    query(JTREE_STRING + "//y/ancestor::x", "{\"x\":{\"y\":2}}");
+    query(JTREE_STRING + "//y/ancestor::b", "{\"b\":{\"x\":{\"y\":2}}}");
+    query(JTREE_STRING + "//y/ancestor::* => count()", 4);
+    query(JTREE_STRING + "//y/ancestor::node() => count()", 4);
   }
 
   /** Ancestor-or-self step. */
   @Test public void axisAncestorOrSelf() {
-    query(jtree + "//y/ancestor-or-self::y", "{\"y\":{\"z\":2}}\n{\"y\":2}");
-    query(jtree + "//y/ancestor-or-self::x", "{\"x\":{\"y\":2}}");
-    query(jtree + "//y/ancestor-or-self::b", "{\"b\":{\"x\":{\"y\":2}}}");
-    query(jtree + "//y/ancestor-or-self::* => count()", 6);
-    query(jtree + "//y/ancestor-or-self::node() => count()", 6);
+    query(JTREE_STRING + "//y/ancestor-or-self::y", "{\"y\":{\"z\":2}}\n{\"y\":2}");
+    query(JTREE_STRING + "//y/ancestor-or-self::x", "{\"x\":{\"y\":2}}");
+    query(JTREE_STRING + "//y/ancestor-or-self::b", "{\"b\":{\"x\":{\"y\":2}}}");
+    query(JTREE_STRING + "//y/ancestor-or-self::* => count()", 6);
+    query(JTREE_STRING + "//y/ancestor-or-self::node() => count()", 6);
   }
 
   /** Self step. */
   @Test public void axisSelf() {
-    query(jtree + "//*/self::y", "{\"y\":{\"z\":2}}\n{\"y\":2}");
-    query(jtree + "//*/self::z", "{\"z\":2}");
-    query(jtree + "//*/self::w", "");
+    query(JTREE_STRING + "//*/self::y", "{\"y\":{\"z\":2}}\n{\"y\":2}");
+    query(JTREE_STRING + "//*/self::z", "{\"z\":2}");
+    query(JTREE_STRING + "//*/self::w", "");
 
-    query(jtree + "//z/self::z", "{\"z\":2}");
-    query(jtree + "//z/self::*", "{\"z\":2}");
-    query(jtree + "//z/self::jnode()", "{\"z\":2}");
-    query(jtree + "//z/self::node()", "{\"z\":2}");
-    query(jtree + "//z/self::xnode()", "");
+    query(JTREE_STRING + "//z/self::z", "{\"z\":2}");
+    query(JTREE_STRING + "//z/self::*", "{\"z\":2}");
+    query(JTREE_STRING + "//z/self::jnode()", "{\"z\":2}");
+    query(JTREE_STRING + "//z/self::node()", "{\"z\":2}");
+    query(JTREE_STRING + "//z/self::xnode()", "");
   }
 
   /** Parent step. */
   @Test public void axisParent() {
-    query(jtree + "//z/..", "{\"y\":{\"z\":2}}");
-    query(jtree + "//z/../..", "{\"a\":{\"x\":1,\"y\":{\"z\":2}}}");
-    query(jtree + "/*/..", string);
-    query(jtree + "/*/../..", "");
+    query(JTREE_STRING + "//z/..", "{\"y\":{\"z\":2}}");
+    query(JTREE_STRING + "//z/../..", "{\"a\":{\"x\":1,\"y\":{\"z\":2}}}");
+    query(JTREE_STRING + "/*/..", STRING);
+    query(JTREE_STRING + "/*/../..", "");
   }
 
   /** Preceding-sibling step. */
   @Test public void axisPrecedingSibling() {
-    query(jtree + "//y/preceding-sibling::*", "{\"x\":1}");
-    query(jtree + "//x/preceding-sibling::*", "");
+    query(JTREE_STRING + "//y/preceding-sibling::*", "{\"x\":1}");
+    query(JTREE_STRING + "//x/preceding-sibling::*", "");
   }
 
   /** Following-sibling step. */
   @Test public void axisFollowingSibling() {
-    query(jtree + "//y/following-sibling::*", "");
-    query(jtree + "//x/following-sibling::*", "{\"y\":{\"z\":2}}");
+    query(JTREE_STRING + "//y/following-sibling::*", "");
+    query(JTREE_STRING + "//x/following-sibling::*", "{\"y\":{\"z\":2}}");
   }
 
   /** Following step. */
   @Test public void axisFollowing() {
-    query(jtree + "/*/following::* => count()", 3);
-    query(jtree + "/*/following::* => count()", 3);
-    query(jtree + "//z/following::* => count()", 3);
-    query(jtree + "//b/following::* => count()", 0);
-    query(jtree + "//a/following::* => count()", 3);
+    query(JTREE_STRING + "/*/following::* => count()", 3);
+    query(JTREE_STRING + "/*/following::* => count()", 3);
+    query(JTREE_STRING + "//z/following::* => count()", 3);
+    query(JTREE_STRING + "//b/following::* => count()", 0);
+    query(JTREE_STRING + "//a/following::* => count()", 3);
  }
 
   /** Preceding step. */
   @Test public void axisPreceding() {
-    query(jtree + "/*/preceding::* => count()", 4);
-    query(jtree + "//*/preceding::* => count()", 4);
-    query(jtree + "//z/preceding::*", "{\"x\":1}");
-    query(jtree + "//b/preceding::* => count()", 4);
-    query(jtree + "//a/preceding::* => count()", 0);
+    query(JTREE_STRING + "/*/preceding::* => count()", 4);
+    query(JTREE_STRING + "//*/preceding::* => count()", 4);
+    query(JTREE_STRING + "//z/preceding::*", "{\"x\":1}");
+    query(JTREE_STRING + "//b/preceding::* => count()", 4);
+    query(JTREE_STRING + "//a/preceding::* => count()", 0);
  }
 
   /** Absolute path expressions starting at a map or array. */
@@ -481,14 +481,14 @@ public final class JNodeTest extends SandboxTest {
 
   /** Lookups on a path result: the JNode is coerced to its jvalue, the value is returned. */
   @Test public void pathLookup() {
-    query("(" + jtree + "/a)?x", 1);
-    query("(" + jtree + "/a)?y?z", 2);
-    query("(" + jtree + "/b)?x?y", 2);
+    query("(" + JTREE_STRING + "/a)?x", 1);
+    query("(" + JTREE_STRING + "/a)?y?z", 2);
+    query("(" + JTREE_STRING + "/b)?x?y", 2);
     // navigation ('/') and lookup ('?') can be mixed within one expression
-    query("(" + jtree + "/b/x)?y", 2);
+    query("(" + JTREE_STRING + "/b/x)?y", 2);
     query("({ 'a': { 'b': 3 } }/a)?b", 3);
     // lookup on a JNode whose value is atomic raises a type error
-    error("(" + jtree + "//x)?y", LOOKUP_X);
+    error("(" + JTREE_STRING + "//x)?y", LOOKUP_X);
   }
 
   /** EBV. */

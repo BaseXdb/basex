@@ -46,6 +46,8 @@ import jakarta.servlet.http.*;
 public final class RestXqFunction extends WebFunction {
   /** EQName pattern. */
   private static final Pattern EQNAME = Pattern.compile("^Q\\{(.*?)}(.*)$");
+  /** Separator of header values. */
+  private static final Pattern HEADER_SEP = Pattern.compile(", *");
 
   /** Returned media types. */
   public final ArrayList<MediaType> produces = new ArrayList<>();
@@ -268,7 +270,7 @@ public final class RestXqFunction extends WebFunction {
     for(final WebParam rxp : headerParams) {
       final TokenList tl = new TokenList();
       for(final String header : state.headers(rxp.name())) {
-        for(final String s : header.split(", *")) tl.add(s);
+        for(final String value : HEADER_SEP.split(header)) tl.add(value);
       }
       bind(rxp, args, StrSeq.get(tl), qc, "Header");
     }
@@ -429,7 +431,7 @@ public final class RestXqFunction extends WebFunction {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder().append(super.toString());
+    final StringBuilder sb = new StringBuilder(super.toString());
     if(!produces.isEmpty()) sb.append(' ').append(produces);
     return sb.toString();
   }

@@ -183,7 +183,7 @@ public final class DynFuncCall extends FuncCall {
         } else if(item instanceof final XQStruct struct && !atomic(struct.funcType().declType)) {
           if(struct.structSize() > CompileContext.MAX_PREEVAL) return true;
           if(item instanceof final XQArray array) {
-            if(Checks.any(array.members(), m -> mayBeNdt(m))) return true;
+            if(Checks.any(array.members(), DynFuncCall::mayBeNdt)) return true;
           } else if(item instanceof final XQMap map) {
             if(Checks.any(map.entries(), e -> mayBeNdt(e.value()))) return true;
           }

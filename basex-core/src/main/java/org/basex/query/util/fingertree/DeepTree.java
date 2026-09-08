@@ -214,9 +214,9 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
   public DeepTree<N, E> concat(final Node<N, E>[] nodes, final long sz,
       final FingerTree<N, E> other) {
     final DeepTree<N, E> lft = (DeepTree<N, E>) addAll(nodes, sz, false);
-    if(!(other instanceof DeepTree)) return other.isEmpty() ? lft : lft.append(other.head());
+    if(!(other instanceof final DeepTree<N, E> rght))
+      return other.isEmpty() ? lft : lft.append(other.head());
 
-    final DeepTree<N, E> rght = (DeepTree<N, E>) other;
     final Node<N, E>[] as = lft.right, bs = rght.left;
     final int l = as.length, n = l + bs.length, k = (n + MAX_ARITY - 1) / MAX_ARITY;
     @SuppressWarnings("unchecked")
@@ -812,27 +812,27 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
 
   @Override
   void toString(final StringBuilder sb, final int indent) {
-    sb.append("  ".repeat(indent)).append("Deep(").append(size).append(")[\n");
+    sb.repeat("  ", indent).append("Deep(").append(size).append(")[\n");
 
     // left digit
-    sb.append("  ".repeat(indent + 1)).append("Left(").append(leftSize).append(")[\n");
+    sb.repeat("  ", indent + 1).append("Left(").append(leftSize).append(")[\n");
     for(final Node<N, E> e : left) {
       toString(e, sb, indent + 2);
       sb.append('\n');
     }
-    sb.append("  ".repeat(indent + 1)).append("]\n");
+    sb.repeat("  ", indent + 1).append("]\n");
 
     // middle tree
     middle.toString(sb, indent + 1);
     sb.append('\n');
 
     // right digit
-    sb.append("  ".repeat(indent + 1)).append("Right[\n");
+    sb.repeat("  ", indent + 1).append("Right[\n");
     for(final Node<N, E> e : right) {
       toString(e, sb, indent + 2);
       sb.append('\n');
     }
-    sb.append("  ".repeat(indent + 1)).append("]\n").append("  ".repeat(indent)).append(']');
+    sb.repeat("  ", indent + 1).append("]\n").repeat("  ", indent).append(']');
   }
 
   /**

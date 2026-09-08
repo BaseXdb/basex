@@ -13,7 +13,7 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class ArrayOutput extends PrintOutput {
-  /** Byte buffer. */
+  /** Byte buffer (can be {@code null}). */
   private byte[] buffer = new byte[Array.INITIAL_CAPACITY];
 
   /**
@@ -26,7 +26,7 @@ public final class ArrayOutput extends PrintOutput {
   @Override
   public void write(final int b) {
     final int s = (int) size;
-    if(s == max) return;
+    if(s >= max) return;
 
     byte[] bffr = buffer;
     if(s == bffr.length) bffr = Arrays.copyOf(bffr, Array.newCapacity(s));
@@ -53,16 +53,13 @@ public final class ArrayOutput extends PrintOutput {
 
   @Override
   public void print(final byte[] token) {
-    final int tl = token.length;
-    if(tl == 0) return;
     long ll = lineLength;
-    for(int i = 0; i < tl; i++) {
-      final byte b = token[i];
+    for(final byte b : token) {
       if(b == '\n') ll = 0;
       else if((b & 0xC0) != 0x80) ++ll;
     }
     lineLength = ll;
-    write(token, 0, tl);
+    write(token, 0, token.length);
   }
 
   @Override
@@ -86,9 +83,9 @@ public final class ArrayOutput extends PrintOutput {
    * @return array
    */
   public byte[] next() {
-    final byte[] lst = toArray();
+    final byte[] array = toArray();
     reset();
-    return lst;
+    return array;
   }
 
   /**

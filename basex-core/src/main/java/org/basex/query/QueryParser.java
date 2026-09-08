@@ -4141,13 +4141,7 @@ public class QueryParser extends InputParser {
       if(wsConsume("(") && wsConsume(")")) {
         key = Empty.VALUE;
       } else {
-        final Expr expr = literal(true, false);
-        if(expr instanceof final Item item) {
-          key = item;
-        } else if(expr != null) {
-          // error
-          expr.item(qc, info());
-        }
+        key = literal(true, false);
       }
       if(key == null) {
         final byte[] ncname = ncName(null, false);

@@ -51,15 +51,13 @@ public final class StoppableInputStreamTest extends SandboxTest {
     server.createContext("/stall", exchange -> {
       // send headers and a first chunk, then block until the test tears down
       exchange.sendResponseHeaders(200, 0);
-      try(OutputStream os = exchange.getResponseBody()) {
+      try(exchange; OutputStream os = exchange.getResponseBody()) {
         os.write("partial".getBytes());
         os.flush();
         STALLING.release();
         RELEASE.await(60, SECONDS);
       } catch(final InterruptedException ex) {
         Util.debug(ex);
-      } finally {
-        exchange.close();
       }
     });
     server.start();

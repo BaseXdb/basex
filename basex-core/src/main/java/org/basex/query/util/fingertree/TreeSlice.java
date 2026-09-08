@@ -84,9 +84,9 @@ public final class TreeSlice<N, E> {
   <M> TreeSlice<M, E> setNodeLike(final NodeLike<M, E> newNode) {
     @SuppressWarnings("unchecked")
     final TreeSlice<M, E> out = (TreeSlice<M, E>) this;
-    if(newNode instanceof Node) {
+    if(newNode instanceof final Node<M, E> node) {
       out.partial = null;
-      out.tree = new SingletonTree<>((Node<M, E>) newNode);
+      out.tree = new SingletonTree<>(node);
     } else {
       out.partial = newNode;
       out.tree = null;

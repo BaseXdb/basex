@@ -218,10 +218,10 @@ final class FingerTreeIterator<E> implements ListIterator<E> {
           // skip empty middle tree
           deepPos = 1;
           start = curr.right[0];
-        } else if(mid instanceof SingletonTree) {
+        } else if(mid instanceof final SingletonTree<?, E> single) {
           // iterate through the one middle node
           deepPos = 0;
-          start = ((SingletonTree<?, E>) mid).elem;
+          start = single.elem;
         } else {
           final DeepTree<?, E> deep = (DeepTree<?, E>) mid;
           if(++tTop == trees.length) {
@@ -312,9 +312,9 @@ final class FingerTreeIterator<E> implements ListIterator<E> {
           final int l = curr.left.length;
           start = curr.left[l - 1];
           deepPos = -1;
-        } else if(mid instanceof SingletonTree) {
+        } else if(mid instanceof final SingletonTree<?, E> single) {
           // iterate through the one middle node
-          start = ((SingletonTree<?, E>) mid).elem;
+          start = single.elem;
           deepPos = 0;
         } else {
           // go into the middle tree

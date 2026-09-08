@@ -55,7 +55,7 @@ public final class WebPath implements Comparable<WebPath> {
    * @return list of qualified variable names
    */
   public List<QNm> varNames() {
-    return matcher.varNames;
+    return matcher.varNames();
   }
 
   /**
@@ -63,7 +63,7 @@ public final class WebPath implements Comparable<WebPath> {
    * @return regular expression
    */
   public String regex() {
-    return matcher.pattern.pattern();
+    return matcher.pattern().pattern();
   }
 
   @Override

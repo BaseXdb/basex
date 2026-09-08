@@ -32,7 +32,7 @@ public final class FnStringToCodepoints extends StandardFunc {
           return Itr.get(token[(int) i]);
         }
         @Override
-        public Value value(final QueryContext q, final Expr expr) throws QueryException {
+        public Value value(final QueryContext q, final Expr expr) {
           // ASCII: the bytes of the token are the codepoints
           final ValueBuilder vb = new ValueBuilder(q, tl);
           for(final byte b : token) vb.add(b);
@@ -52,7 +52,7 @@ public final class FnStringToCodepoints extends StandardFunc {
         return Itr.get(cp(token, s));
       }
       @Override
-      public Value value(final QueryContext q, final Expr expr) throws QueryException {
+      public Value value(final QueryContext q, final Expr expr) {
         final ValueBuilder vb = new ValueBuilder(q);
         for(int s = 0; s < tl; s += cl(token, s)) vb.add(cp(token, s));
         return vb.value(BasicType.INTEGER);

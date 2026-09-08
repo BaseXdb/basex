@@ -258,47 +258,15 @@ public final class Caches {
 
   /**
    * Cache configuration.
-   *
-   * @author BaseX Team, BSD License
-   * @author Christian Gruen
+   * @param max maximum number of entries
+   * @param ttl lifetime of entries in seconds
    */
-  private static final class Config {
-    /** Maximum number of entries. */
-    private final int max;
-    /** Lifetime of entries in seconds (0 for unlimited lifetime). */
-    private final long ttl;
-
-    /**
-     * Constructor.
-     * @param max maximum number of entries
-     * @param ttl lifetime of entries in seconds
-     */
-    private Config(final int max, final long ttl) {
-      this.max = max;
-      this.ttl = ttl;
-    }
-  }
+  private record Config(int max, long ttl) { }
 
   /**
    * Cache entry.
-   *
-   * @author BaseX Team, BSD License
-   * @author Christian Gruen
-   */
-  private static final class CacheEntry {
-    /** Value. */
-    private final Value value;
-    /** Expiration time in milliseconds. */
-    private final long expires;
-
-    /**
-     * Constructor.
      * @param value value
      * @param expires expiration time in milliseconds
-     */
-    private CacheEntry(final Value value, final long expires) {
-      this.value = value;
-      this.expires = expires;
-    }
-  }
+   */
+  private record CacheEntry(Value value, long expires) { }
 }

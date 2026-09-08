@@ -476,8 +476,7 @@ abstract class ArchiveFn extends StandardFunc {
      * @param entry archive entry (canonical name)
      * @param body lazy supplier for the entry's body
      * @throws IOException I/O exception
-     * @throws QueryException query exception
      */
-    void accept(ZipEntry entry, BodySupplier body) throws IOException, QueryException;
+    void accept(ZipEntry entry, BodySupplier body) throws IOException;
   }
 }

@@ -32,12 +32,12 @@ public abstract class IndexAccess extends Simple {
 
   /**
    * Checks if an expression was rewritten for index access.
-   * @param expr expression
+   * @param expr expression (can be {@code null})
    * @return result of check
    */
   public static boolean applied(final Expr expr) {
     return expr instanceof IndexAccess ||
-        expr instanceof final Path path && path.root != null && applied(path.root) ||
+        expr instanceof final Path path && applied(path.root) ||
         expr instanceof final Filter filter && applied(filter.root);
   }
 

@@ -44,7 +44,7 @@ public final class FnString extends ContextFn {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) {
     final boolean context = contextAccess();
     final Expr value = context ? cc.qc.focus.value : arg(0);
     if(value != null && value.seqType().eq(Types.STRING_O)) {

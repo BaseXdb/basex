@@ -40,7 +40,7 @@ public abstract class FItem extends Item implements XQFunction {
 
   @Override
   public final int compare(final Item item, final Collation coll, final boolean transitive,
-      final QueryContext qc, final InputInfo ii) throws QueryException {
+      final QueryContext qc, final InputInfo ii) {
     throw Util.notExpected();
   }
 

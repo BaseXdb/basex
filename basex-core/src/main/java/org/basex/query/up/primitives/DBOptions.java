@@ -46,15 +46,6 @@ public final class DBOptions {
   }
 
   /**
-   * Returns the value of the specified option.
-   * @param option option
-   * @return main options
-   */
-  public Object get(final Option<?> option) {
-    return map.get(option);
-  }
-
-  /**
    * Assigns the specified option if it has not been assigned before.
    * @param option option
    * @param value value

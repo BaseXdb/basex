@@ -486,7 +486,7 @@ public abstract class JavaCall extends Arr {
       for(final boolean bridge : new boolean[] { false, true }) {
         for(final Method method : clazz.getMethods()) {
           if(bridge == method.isBridge()) {
-            final StringBuilder id = new StringBuilder().append(method.getName()).append('-');
+            final StringBuilder id = new StringBuilder(method.getName()).append('-');
             for(final Class<?> type : method.getParameterTypes()) {
               id.append(type.getName()).append('-');
             }

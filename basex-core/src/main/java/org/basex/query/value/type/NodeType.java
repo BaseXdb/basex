@@ -150,12 +150,8 @@ public final class NodeType implements Type {
 
   @Override
   public boolean eq(final Type type) {
-    if(this == type) return true;
-    if(type instanceof final NodeType nt) {
-      if(nt.kind != kind) return false;
-      if(test == null ? nt.test == null : test.equals(nt.test)) return true;
-    }
-    return false;
+    return this == type || type instanceof final NodeType nt && nt.kind == kind &&
+        Objects.equals(test, nt.test);
   }
 
   @Override

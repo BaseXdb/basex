@@ -142,7 +142,7 @@ public final class BaseXList extends BaseXBack {
             }
           }
           if(!il.isEmpty()) {
-            list.setSelectedValue(values[il.get(il.size() - 1)], true);
+            list.setSelectedValue(values[il.peek()], true);
           }
           list.setSelectedIndices(il.finish());
         }

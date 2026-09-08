@@ -170,10 +170,10 @@ public class TextPanel extends BaseXPanel {
       new ToggleCmd(Text.REGULAR_EXPR, REGEX, sb -> sb.regex),
       new ToggleCmd(Text.DOT_ALL, DOTALL, sb -> sb.dotall), null));
     if(editable) {
-      cmds.addAll(Arrays.asList(new HistoryCmd(true), new HistoryCmd(false), null,
-        new AllCmd(), new CutCmd(), new CopyCmd(), new PasteCmd(), new DelCmd()));
+      Collections.addAll(cmds, new HistoryCmd(true), new HistoryCmd(false), null,
+        new AllCmd(), new CutCmd(), new CopyCmd(), new PasteCmd(), new DelCmd());
     } else {
-      cmds.addAll(Arrays.asList(new AllCmd(), new CopyCmd()));
+      Collections.addAll(cmds, new AllCmd(), new CopyCmd());
     }
     new BaseXPopup(this, cmds.toArray(GUICommand[]::new));
 

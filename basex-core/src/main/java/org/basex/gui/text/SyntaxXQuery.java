@@ -62,8 +62,8 @@ final class SyntaxXQuery extends SyntaxMarkup {
   /** Prolog declaration for boundary whitespace. */
   private static final byte[] BOUNDARY = token("boundary-space");
   /** Clauses of a FLWOR expression (without {@code return}). */
-  private static final HashSet<String> CLAUSES = new HashSet<>(Arrays.asList(
-    COUNT, FOR, GROUP, LET, ORDER, STABLE, WHERE, WINDOW));
+  private static final Set<String> CLAUSES = Set.of(
+    COUNT, FOR, GROUP, LET, ORDER, STABLE, WHERE, WINDOW);
 
   /** Line type: no clause. */
   private static final int NONE = 0;
@@ -876,11 +876,10 @@ final class SyntaxXQuery extends SyntaxMarkup {
    * Returns the name that starts at the specified position.
    * @param text text
    * @param pos position
-   * @return name, or {@code null} if no name starts at the position
+   * @return name, or an empty string if no name starts at the position
    */
   private String startName(final byte[] text, final int pos) {
-    return name(text, pos) && nameStart == pos ? string(text, nameStart, nameEnd - nameStart) :
-      null;
+    return name(text, pos) && nameStart == pos ? string(text, nameStart, nameEnd - nameStart) : "";
   }
 
   @Override

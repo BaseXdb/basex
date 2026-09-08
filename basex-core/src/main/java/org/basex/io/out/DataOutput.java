@@ -53,6 +53,12 @@ public final class DataOutput extends OutputStream {
     ++size;
   }
 
+  @Override
+  public void write(final byte[] b, final int off, final int len) throws IOException {
+    out.write(b, off, len);
+    size += len;
+  }
+
   /**
    * Writes a boolean value.
    * @param b boolean value
@@ -205,11 +211,11 @@ public final class DataOutput extends OutputStream {
    * @throws IOException I/O exception
    */
   public void write5(final long v) throws IOException {
-    write((byte) (v >>> 32));
-    write((byte) (v >>> 24));
-    write((byte) (v >>> 16));
-    write((byte) (v >>>  8));
-    write((byte) v);
+    write((int) (v >>> 32));
+    write((int) (v >>> 24));
+    write((int) (v >>> 16));
+    write((int) (v >>>  8));
+    write((int) v);
   }
 
   /**
@@ -218,14 +224,14 @@ public final class DataOutput extends OutputStream {
    * @throws IOException I/O exception
    */
   private void write8(final long v) throws IOException {
-    write((byte) (v >>> 56));
-    write((byte) (v >>> 48));
-    write((byte) (v >>> 40));
-    write((byte) (v >>> 32));
-    write((byte) (v >>> 24));
-    write((byte) (v >>> 16));
-    write((byte) (v >>>  8));
-    write((byte)  v);
+    write((int) (v >>> 56));
+    write((int) (v >>> 48));
+    write((int) (v >>> 40));
+    write((int) (v >>> 32));
+    write((int) (v >>> 24));
+    write((int) (v >>> 16));
+    write((int) (v >>>  8));
+    write((int)  v);
   }
 
   /**
@@ -234,7 +240,7 @@ public final class DataOutput extends OutputStream {
    * @throws IOException I/O exception
    */
   public void writeBytes(final byte[] bytes) throws IOException {
-    for(final byte b : bytes) write(b);
+    write(bytes, 0, bytes.length);
   }
 
   /**

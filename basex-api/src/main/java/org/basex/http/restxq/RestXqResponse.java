@@ -20,8 +20,6 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.http.*;
 
-import jakarta.servlet.*;
-
 /**
  * This class creates a new HTTP response.
  *
@@ -139,7 +137,7 @@ public final class RestXqResponse extends WebResponse {
   }
 
   @Override
-  public void finish() throws IOException, ServletException {
+  public void finish() {
     if(qc != null) {
       qc.close();
       qc.unregister(ctx);

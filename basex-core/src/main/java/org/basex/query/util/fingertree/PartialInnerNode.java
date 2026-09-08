@@ -33,8 +33,8 @@ final class PartialInnerNode<N, E> implements NodeLike<Node<N, E>, E> {
     @SuppressWarnings("unchecked")
     final NodeLike<N, E>[] buffer = (NodeLike<N, E>[]) out;
     final NodeLike<Node<N, E>, E> left = out[pos - 1];
-    if(left instanceof PartialInnerNode) {
-      buffer[pos - 1] = ((PartialInnerNode<N, E>) left).sub;
+    if(left instanceof final PartialInnerNode<N, E> partial) {
+      buffer[pos - 1] = partial.sub;
       if(sub.append(buffer, pos) == pos) {
         out[pos - 1] = new PartialInnerNode<>(buffer[pos - 1]);
       } else {
@@ -51,9 +51,9 @@ final class PartialInnerNode<N, E> implements NodeLike<Node<N, E>, E> {
     final Node<N, E>[] children = ((InnerNode<N, E>) left).children;
     final int n = children.length;
     final Node<N, E> a, b;
-    if(sub instanceof Node) {
+    if(sub instanceof final Node<N, E> node) {
       a = children[n - 1];
-      b = (Node<N, E>) sub;
+      b = node;
     } else {
       buffer[pos - 1] = children[n - 1];
       if(sub.append(buffer, pos) == pos) {
@@ -102,19 +102,16 @@ final class PartialInnerNode<N, E> implements NodeLike<Node<N, E>, E> {
    * @param indent indentation level
    */
   void toString(final StringBuilder sb, final int indent) {
-    for(int i = 0; i < indent; i++) sb.append(' ').append(' ');
-    sb.append(Util.className(this)).append('[').append('\n');
-    if(sub instanceof InnerNode) {
-      ((InnerNode<?, ?>) sub).toString(sb, indent + 1);
-    } else if(sub instanceof PartialInnerNode) {
-      ((PartialInnerNode<?, ?>) sub).toString(sb, indent + 1);
+    sb.repeat("  ", indent).append(Util.className(this)).append('[').append('\n');
+    if(sub instanceof final InnerNode<?, ?> inner) {
+      inner.toString(sb, indent + 1);
+    } else if(sub instanceof final PartialInnerNode<?, ?> partial) {
+      partial.toString(sb, indent + 1);
     } else {
       for(final String line : sub.toString().split("\r\n?|\n")) {
-        for(int i = 0; i <= indent; i++) sb.append(' ').append(' ');
-        sb.append(line).append('\n');
+        sb.repeat("  ", indent + 1).append(line).append('\n');
       }
     }
-    for(int i = 0; i < indent; i++) sb.append(' ').append(' ');
-    sb.append(']');
+    sb.repeat("  ", indent).append(']');
   }
 }

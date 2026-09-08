@@ -85,14 +85,6 @@ public final class IntSeq extends ItrSeq {
     return get(tmp, type);
   }
 
-  /**
-   * Returns the internal values.
-   * @return values
-   */
-  public int[] values() {
-    return values;
-  }
-
   @Override
   public Object toJava() throws QueryException {
     return type == BasicType.INT ? values : super.toJava();

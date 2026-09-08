@@ -60,11 +60,11 @@ final class JapaneseTokenizer extends Tokenizer {
   /** Parse method. */
   private static Method parse;
   /** Surface field. */
-  private static Field surface;
-  /** feature field. */
-  private static Field feature;
+  private static Field surfaceField;
+  /** Feature field. */
+  private static Field featureField;
   /** Start field. */
-  private static Field start;
+  private static Field startField;
 
   /** Token iterator. */
   private Iterator<Morpheme> tokens;
@@ -98,9 +98,9 @@ final class JapaneseTokenizer extends Tokenizer {
           tagger = clz.getConstructor(String.class).newInstance(dic.path());
           parse = clz.getMethod("parse", CharSequence.class);
           final Class<?> morpheme = Class.forName("net.reduls.igo.Morpheme");
-          surface = morpheme.getField("surface");
-          feature = morpheme.getField("feature");
-          start = morpheme.getField("start");
+          surfaceField = morpheme.getField("surface");
+          featureField = morpheme.getField("feature");
+          startField = morpheme.getField("start");
           available = true;
         } catch(final Exception ex) {
           Util.debug(ex);
@@ -147,9 +147,9 @@ final class JapaneseTokenizer extends Tokenizer {
       final int ms = morpheme.size();
       for(int i = 0; i < ms; i++) {
         final Object m = morpheme.get(i);
-        final String srfc = surface.get(m).toString();
-        final String ftr = feature.get(m).toString();
-        final int strt = start.getInt(m);
+        final String srfc = surfaceField.get(m).toString();
+        final String ftr = featureField.get(m).toString();
+        final int strt = startField.getInt(m);
         if(i != 0) {
           final int l = strt - prev;
           if(l != 0) {
@@ -203,12 +203,12 @@ final class JapaneseTokenizer extends Tokenizer {
     boolean period = false, bs = false, more = false;
 
     for(; cpos < size; cpos++) {
-      String cSrfc = tokenList.get(cpos).getSurface();
+      String cSrfc = tokenList.get(cpos).surface();
       final boolean cMark = tokenList.get(cpos).isMark();
       String nSrfc = null;
       boolean nMark = false;
       if(cpos < size - 1) {
-        nSrfc = tokenList.get(cpos + 1).getSurface();
+        nSrfc = tokenList.get(cpos + 1).surface();
         nMark = tokenList.get(cpos + 1).isMark();
       }
 
@@ -242,7 +242,7 @@ final class JapaneseTokenizer extends Tokenizer {
           if("{".equals(cSrfc)) {
             cpos++;
             for(; cpos < size; cpos++) {
-              cSrfc = tokenList.get(cpos).getSurface();
+              cSrfc = tokenList.get(cpos).surface();
               word.append(cSrfc);
               if("}".equals(cSrfc)) {
                 more = true;
@@ -309,7 +309,7 @@ final class JapaneseTokenizer extends Tokenizer {
    */
   private byte[] get() {
     pos++;
-    String n = currToken.getSurface();
+    String n = currToken.surface();
     final int hinshi = currToken.getHinshi();
     if(st && (hinshi == Morpheme.HINSHI_DOUSHI || hinshi == Morpheme.HINSHI_KEIYOUSHI)) {
       n = currToken.getBaseForm();
@@ -327,7 +327,7 @@ final class JapaneseTokenizer extends Tokenizer {
    */
   private byte[] getSC() {
     final Morpheme m = tokens.next();
-    final String n = m.getSurface();
+    final String n = m.surface();
     if(m.isMark() || m.isAttachedWord()) {
       sc = true;
     } else {
@@ -440,8 +440,12 @@ final class JapaneseTokenizer extends Tokenizer {
     return tb.finish();
   }
 
-  /** Morpheme class. */
-  private static final class Morpheme {
+  /**
+   * Morpheme.
+   * @param surface surface of the morpheme
+   * @param feature feature of the morpheme
+   */
+  private record Morpheme(String surface, String feature) {
     /** A part of speech in the context, NEISHI(Noun). */
     private static final int HINSHI_MEISHI = 1;
     /** A part of speech in the context, RENTAISHI(Pre-noun Adjectival). */
@@ -469,29 +473,6 @@ final class JapaneseTokenizer extends Tokenizer {
     /** A part of speech in the context, Others. */
     private static final int HINSHI_SONOTA = 0;
 
-    /** Surface of morpheme. */
-    private final String mSurface;
-    /** Feature of morpheme. */
-    private final String mFeature;
-
-    /**
-     * Constructor.
-     * @param srfc surface
-     * @param ftr feature
-    */
-    private Morpheme(final String srfc, final String ftr) {
-      mSurface = srfc;
-      mFeature = ftr;
-    }
-
-    /**
-     * Returns surface.
-     * @return Surface
-     */
-    public String getSurface() {
-      return mSurface;
-    }
-
     /**
      * Checks for a mark.
      * @return result
@@ -517,7 +498,7 @@ final class JapaneseTokenizer extends Tokenizer {
     public int getHinshi() {
       // morphological analyzer certainly returns
       // the single ascii char as a "noun".
-      final byte[] s = token(mSurface);
+      final byte[] s = token(surface);
       if(s.length == 1 && !letter(s[0]) && !digit(s[0])) return HINSHI_KIGOU;
       return switch(getPos()) {
         case MEISHI -> HINSHI_MEISHI;
@@ -541,7 +522,7 @@ final class JapaneseTokenizer extends Tokenizer {
      * @return base form
      */
     public String getBaseForm() {
-      return Strings.split(mFeature, ',')[6];
+      return Strings.split(feature, ',')[6];
     }
 
     /**
@@ -549,12 +530,12 @@ final class JapaneseTokenizer extends Tokenizer {
      * @return parts of speech(coding in Japanese)
      */
     private String getPos() {
-      return Strings.split(mFeature, ',')[0];
+      return Strings.split(feature, ',')[0];
     }
 
     @Override
     public String toString() {
-      return mSurface;
+      return surface;
     }
   }
 }

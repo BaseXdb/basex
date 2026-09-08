@@ -39,18 +39,11 @@ final class LeafNode implements Node<Value, Value> {
   }
 
   @Override
-  public LeafNode set(final long pos, final Value value) {
-    final Value[] vals = values.clone();
-    vals[(int) pos] = value;
-    return new LeafNode(vals);
-  }
-
-  @Override
-  public boolean insert(final Node<Value, Value>[] siblings, final long pos, final Value value) {
+  public boolean insert(final Node<Value, Value>[] siblings, final long pos, final Value val) {
     final int p = (int) pos, n = values.length;
     final Value[] vals = new Value[n + 1];
     Array.copy(values, p, vals);
-    vals[p] = value;
+    vals[p] = val;
     Array.copy(values, p, n - p, vals, p + 1);
 
     if(n < TreeArray.MAX_LEAF) {
@@ -97,6 +90,13 @@ final class LeafNode implements Node<Value, Value> {
     siblings[1] = new LeafNode(newLeft);
     siblings[2] = new LeafNode(newRight);
     return true;
+  }
+
+  @Override
+  public LeafNode set(final long pos, final Value val) {
+    final Value[] vals = values.clone();
+    vals[(int) pos] = val;
+    return new LeafNode(vals);
   }
 
   @Override
@@ -188,12 +188,12 @@ final class LeafNode implements Node<Value, Value> {
     }
 
     final NodeLike<Value, Value> left = nodes[pos - 1];
-    if(!(left instanceof PartialLeafNode)) {
+    if(!(left instanceof final PartialLeafNode pln)) {
       nodes[pos] = this;
       return pos + 1;
     }
 
-    final Value[] ls = ((PartialLeafNode) left).elems, rs = values;
+    final Value[] ls = pln.elems, rs = values;
     final int l = ls.length, r = rs.length, n = l + r;
     if(n <= TreeArray.MAX_LEAF) {
       // merge into one node
@@ -216,8 +216,8 @@ final class LeafNode implements Node<Value, Value> {
   }
 
   @Override
-  public NodeLike<Value, Value> slice(final long off, final long size) {
-    final int p = (int) off, n = (int) size;
+  public NodeLike<Value, Value> slice(final long off, final long len) {
+    final int p = (int) off, n = (int) len;
     final Value[] out = new Value[n];
     Array.copyToStart(values, p, n, out);
     return n < TreeArray.MIN_LEAF ? new PartialLeafNode(out) : new LeafNode(out);
@@ -229,8 +229,8 @@ final class LeafNode implements Node<Value, Value> {
   }
 
   @Override
-  public Value getSub(final int index) {
-    return values[index];
+  public Value getSub(final int pos) {
+    return values[pos];
   }
 
   @Override

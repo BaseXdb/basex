@@ -3,7 +3,6 @@ package org.basex.gui.view.project;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
-import java.nio.charset.*;
 import java.nio.file.*;
 import java.util.*;
 
@@ -95,7 +94,7 @@ public final class ProjectFilesTest {
    * @throws IOException I/O exception
    */
   private void write(final String text) throws IOException {
-    Files.write(file, text.getBytes(StandardCharsets.UTF_8));
+    Files.writeString(file, text);
   }
 
   /**

@@ -69,12 +69,12 @@ public interface Node<N, E> extends NodeLike<N, E> {
    * Removes the element at the given position in this node.
    * If this node is merged with one of its neighbors,
    * the middle element of the result array is {@code null}.
-   * @param l left neighbor, possibly {@code null}
-   * @param r right neighbor, possibly {@code null}
+   * @param left left neighbor (can be {@code null})
+   * @param right right neighbor (can be {@code null})
    * @param pos position of the element to delete
    * @return three-element array with the new left neighbor, node and right neighbor
    */
-  NodeLike<N, E>[] remove(Node<N, E> l, Node<N, E> r, long pos);
+  NodeLike<N, E>[] remove(Node<N, E> left, Node<N, E> right, long pos);
 
   /**
    * Extracts a subtree containing the elements at positions {@code off .. off + len - 1}

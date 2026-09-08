@@ -833,8 +833,7 @@ final class XMLScanner extends Job {
             if(!consume('*') && alt) throw error(INVEND);
           } else { // [47] children (element-only content)
             elemContent.add(elem);
-            cp();
-            while(sep()) cp();
+            do { cp(); } while(sep());
             s();
             check(')');
             occ();
@@ -907,8 +906,7 @@ final class XMLScanner extends Job {
     if(name(false) == null) {
       // choice or sequence: '(' cp (sep cp)* ')'
       check('(');
-      cp();
-      while(sep()) cp();
+      do { cp(); } while(sep());
       s();
       check(')');
     }
@@ -942,7 +940,7 @@ final class XMLScanner extends Job {
    */
   private void declareAtt(final byte[] elem, final byte[] att, final boolean tokenized,
       final byte[] value) {
-    attDecls.computeIfAbsent(elem, () -> new TokenObjectMap<>()).
+    attDecls.computeIfAbsent(elem, TokenObjectMap::new).
       computeIfAbsent(att, () -> new AttDecl(tokenized, value));
   }
 

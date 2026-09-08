@@ -297,7 +297,7 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public boolean refineType() throws QueryException {
+  public boolean refineType() {
     return true;
   }
 

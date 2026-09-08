@@ -30,7 +30,7 @@ public final class DataAccessConcurrencyTest extends SandboxTest {
     // texts long enough to be stored compressed: their length is read with two calls
     final StringBuilder sb = new StringBuilder("<x>");
     for(int i = 0; i < 2000; i++) {
-      sb.append("<t>").append("abcdefghij".repeat(30)).append(i).append("</t>");
+      sb.append("<t>").repeat("abcdefghij", 30).append(i).append("</t>");
     }
     execute(new CreateDB(NAME, sb.append("</x>").toString()));
 

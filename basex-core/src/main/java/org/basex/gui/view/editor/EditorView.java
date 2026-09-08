@@ -842,15 +842,13 @@ public final class EditorView extends View {
         replaceAll("\r?\n", "<br/>").replaceAll("(<br/>.*?)<br/>.*", "$1");
       info.setToolTipText("<html>" + tt + "</html>");
 
-      if(th instanceof final QueryIOException ex) {
-        inputInfo = ex.getCause().info();
-      } else if(th instanceof final QueryException ex) {
-        inputInfo = ex.info();
-      } else if(th instanceof final SAXParseException ex) {
-        inputInfo = new InputInfo(path, ex.getLineNumber(), ex.getColumnNumber());
-      } else {
-        inputInfo = new InputInfo(path, 1, 1);
-      }
+      inputInfo = switch(th) {
+        case final QueryIOException ex -> ex.getCause().info();
+        case final QueryException ex -> ex.info();
+        case final SAXParseException ex -> new InputInfo(path, ex.getLineNumber(),
+          ex.getColumnNumber());
+        default -> new InputInfo(path, 1, 1);
+      };
       markError(false);
     }
   }

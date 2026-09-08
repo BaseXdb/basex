@@ -155,9 +155,9 @@ public final class WebPathMatcherTest {
       final BigInteger variables, final QNm... vars) throws Exception {
 
     final WebPathMatcher p = WebPathMatcher.parse(input, null, BASEX_RESTXQ_X);
-    assertEquals(regex, p.pattern.toString());
-    assertEquals(Arrays.asList(vars), p.varNames);
-    assertEquals(segments, p.segments);
-    assertEquals(variables, p.varsPos);
+    assertEquals(regex, p.pattern().toString());
+    assertEquals(List.of(vars), p.varNames());
+    assertEquals(segments, p.segments());
+    assertEquals(variables, p.varsPos());
   }
 }

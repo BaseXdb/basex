@@ -35,8 +35,8 @@ public final class RecordPut extends Arr {
     if(exprs[0] instanceof final RecordPut rp && rp.exprs[1] instanceof final XQMap update1 &&
         exprs[1] instanceof final XQMap update2 && disjoint(update1, update2)) {
       final MapBuilder mb = new MapBuilder();
-      update1.forEach((key, value) -> mb.put(key, value));
-      update2.forEach((key, value) -> mb.put(key, value));
+      update1.forEach(mb::put);
+      update2.forEach(mb::put);
       exprs = new Expr[] { rp.exprs[0], mb.map() };
     }
     // the result carries the record type of the left operand; an inferred shape is no record, but
@@ -131,8 +131,8 @@ public final class RecordPut extends Arr {
 
     // fallback
     final MapBuilder mb = new MapBuilder();
-    record.forEach((key, value) -> mb.put(key, value));
-    update.forEach((key, value) -> mb.put(key, value));
+    record.forEach(mb::put);
+    update.forEach(mb::put);
     return mb.map().coerceTo(rt, qc, info, null);
   }
 

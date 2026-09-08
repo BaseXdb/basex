@@ -64,11 +64,6 @@ public final class DynamicStep extends Single {
   }
 
   @Override
-  public void toXml(final QueryPlan plan) {
-    plan.add(plan.create(this), expr);
-  }
-
-  @Override
   public void toString(final QueryString qs) {
     qs.token(expr);
   }

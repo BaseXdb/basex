@@ -286,7 +286,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
     // show total time required for running a command; a query has measured it itself
     String total = time;
     if(!timeStrings.isEmpty()) {
-      total = timeStrings.get(timeStrings.size() - 1).replaceAll(".*" + COLS, "");
+      total = timeStrings.peek().replaceAll(".*" + COLS, "");
     }
     if(total != null) setTime(Strings.titleCase(QueryInfo.TOTAL) + COLS + total);
     all = tb.finish();
@@ -424,7 +424,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
    * @param info info string with measured time
    */
   private void setTime(final String info) {
-    final StringBuilder sb = new StringBuilder().append(info);
+    final StringBuilder sb = new StringBuilder(info);
     final long ms = Long.parseLong(info.replaceAll("^.+: |\\..+", ""));
     if(ms >= 60000) {
       // append hh:mm:ss format if time exceeds 1 minute

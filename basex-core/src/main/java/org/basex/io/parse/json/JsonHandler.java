@@ -43,9 +43,8 @@ public abstract class JsonHandler extends Job {
 
   /**
    * Called when a JSON object is closed.
-   * @throws QueryException query exception
    */
-  protected abstract void closeObject() throws QueryException;
+  protected abstract void closeObject();
 
   /**
    * Called when a pair of a JSON object is opened.
@@ -74,15 +73,13 @@ public abstract class JsonHandler extends Job {
 
   /**
    * Called when an item of a JSON array is opened.
-   * @throws QueryException query exception
    */
-  protected abstract void openItem() throws QueryException;
+  protected abstract void openItem();
 
   /**
    * Called when an item of a JSON array is closed.
-   * @throws QueryException query exception
    */
-  protected abstract void closeItem() throws QueryException;
+  protected abstract void closeItem();
 
   /**
    * Called when a number literal is encountered.

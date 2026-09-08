@@ -243,17 +243,6 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   /**
-   * Parses the specified query.
-   * @param query query string
-   * @param uri base URI (can be {@code null})
-   * @return main module
-   * @throws QueryException query exception
-   */
-  public MainModule parseMain(final String query, final String uri) throws QueryException {
-    return parseMain(query, uri, null);
-  }
-
-  /**
    * Parses the specified query and assigns the root expression.
    * @param query query string
    * @param uri base URI (can be {@code null})

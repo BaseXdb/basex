@@ -33,17 +33,19 @@ public class DbOptionMap extends StandardFunc {
    * @throws QueryException query exception
    */
   static Item item(final Object value) throws QueryException {
-    if(value == null) return Empty.VALUE;
-    if(value instanceof final Boolean bln) return Bln.get(bln);
-    if(value instanceof final Integer itr) return Itr.get(itr);
-    if(value instanceof final Options options) {
-      final MapBuilder mb = new MapBuilder();
-      for(final Option<?> opt : options) {
-        mb.put(Str.get(opt.name()), item(options.get(opt)));
+    return switch(value) {
+      case null -> Empty.VALUE;
+      case final Boolean bln -> Bln.get(bln);
+      case final Integer itr -> Itr.get(itr);
+      case final Options options -> {
+        final MapBuilder mb = new MapBuilder();
+        for(final Option<?> opt : options) {
+          mb.put(Str.get(opt.name()), item(options.get(opt)));
+        }
+        yield mb.map();
       }
-      return mb.map();
-    }
-    // string or enumeration
-    return Str.get(value.toString());
+      // string or enumeration
+      default -> Str.get(value.toString());
+    };
   }
 }

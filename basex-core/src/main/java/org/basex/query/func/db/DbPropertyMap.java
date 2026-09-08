@@ -38,9 +38,11 @@ public class DbPropertyMap extends DbAccessFn {
    * @return item
    */
   static Item item(final Object value) {
-    if(value instanceof final Boolean bln) return Bln.get(bln);
-    if(value instanceof final Integer itr) return Itr.get(itr);
-    if(value instanceof final Long lng)    return Itr.get(lng);
-    return Str.get(value.toString());
+    return switch(value) {
+      case final Boolean bln -> Bln.get(bln);
+      case final Integer itr -> Itr.get(itr);
+      case final Long lng -> Itr.get(lng);
+      default -> Str.get(value.toString());
+    };
   }
 }

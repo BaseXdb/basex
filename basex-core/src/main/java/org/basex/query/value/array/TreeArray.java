@@ -41,11 +41,11 @@ abstract class TreeArray extends XQArray {
    * Returns an array containing the values at the indices {@code from} to {@code to - 1} in
    * the given array. Its length is always {@code to - from}. If {@code from} is smaller than zero,
    * the first {@code -from} entries in the resulting array are {@code null}.
-   * If {@code to > arr.length} then the last {@code to - arr.length} entries are {@code null}.
-   * If {@code from == 0 && to == arr.length}, the original array is returned.
+   * If {@code to > values.length} then the last {@code to - values.length} entries are
+   * {@code null}. If {@code from == 0 && to == values.length}, the original array is returned.
    * @param values input values
    * @param from first index, inclusive (can be negative)
-   * @param to last index, exclusive (can be greater than {@code arr.length})
+   * @param to last index, exclusive (can be greater than {@code values.length})
    * @return resulting array
    */
   static Value[] slice(final Value[] values, final int from, final int to) {

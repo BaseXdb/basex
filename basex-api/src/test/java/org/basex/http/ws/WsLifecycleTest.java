@@ -236,9 +236,9 @@ public final class WsLifecycleTest extends WsTest {
     try {
       // exceeds the maxTextMessageSize servlet parameter of the deployed web.xml
       ws.sendText("x".repeat(5000000), true).get(5, TimeUnit.SECONDS);
-    } catch(final Exception ignore) {
+    } catch(final Exception ex) {
       // the server drops the connection; the send may fail
-      Util.debug(ignore);
+      Util.debug(ex);
     }
     awaitCache("ws-transport-error", "caught");
   }
@@ -384,8 +384,8 @@ public final class WsLifecycleTest extends WsTest {
       // the server has already closed the connection; ignore any resulting error
       try {
         close(ws);
-      } catch(final Exception ignore) {
-        Util.debug(ignore);
+      } catch(final Exception ex) {
+        Util.debug(ex);
       }
     }
   }
@@ -427,8 +427,8 @@ public final class WsLifecycleTest extends WsTest {
       // the server has already closed the connection; ignore any resulting error
       try {
         close(ws);
-      } catch(final Exception ignore) {
-        Util.debug(ignore);
+      } catch(final Exception ex) {
+        Util.debug(ex);
       }
     }
   }
@@ -455,8 +455,8 @@ public final class WsLifecycleTest extends WsTest {
       // the server has already closed the connection; ignore any resulting error
       try {
         close(ws);
-      } catch(final Exception ignore) {
-        Util.debug(ignore);
+      } catch(final Exception ex) {
+        Util.debug(ex);
       }
     }
   }

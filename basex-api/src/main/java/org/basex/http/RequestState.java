@@ -2,6 +2,7 @@ package org.basex.http;
 
 import java.util.*;
 import java.util.function.*;
+import java.util.regex.*;
 
 import jakarta.servlet.http.*;
 
@@ -18,6 +19,10 @@ public interface RequestState {
   /** Forwarding headers. */
   String[] FORWARDING_HEADERS = { "X-Forwarded-For", "Proxy-Client-IP",
       "WL-Proxy-Client-IP", "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR" };
+  /** Separator of forwarded addresses. */
+  Pattern FORWARDED_SEP = Pattern.compile("\\s*,\\s*");
+  /** IPv4 or IPv6 address. */
+  Pattern IP_ADDRESS = Pattern.compile("^\\[?[:.\\d]+\\]?$");
 
   /**
    * Returns the request method.
@@ -116,7 +121,7 @@ public interface RequestState {
    */
   default MediaType mediaType() {
     final List<String> values = headers(HTTPText.CONTENT_TYPE);
-    return values.isEmpty() ? MediaType.ALL_ALL : new MediaType(values.get(0));
+    return values.isEmpty() ? MediaType.ALL_ALL : new MediaType(values.getFirst());
   }
 
   /**
@@ -126,12 +131,12 @@ public interface RequestState {
   default String originalAddress() {
     for(final String header : FORWARDING_HEADERS) {
       final List<String> values = headers(header);
-      final String value = values.isEmpty() ? null : values.get(0);
+      final String value = values.isEmpty() ? null : values.getFirst();
       // header found: test last (most reliable) part first
       if(value != null && !value.isEmpty()) {
         String ip = null;
-        final String[] entries = value.split("\\s*,\\s*");
-        for(int e = entries.length; --e >= 0 && entries[e].matches("^\\[?[:.\\d]+\\]?$");) {
+        final String[] entries = FORWARDED_SEP.split(value);
+        for(int e = entries.length; --e >= 0 && IP_ADDRESS.matcher(entries[e]).matches();) {
           ip = entries[e];
         }
         if(ip != null) return ip;

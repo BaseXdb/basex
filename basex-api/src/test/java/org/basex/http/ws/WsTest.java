@@ -226,7 +226,7 @@ public abstract class WsTest extends HTTPTest {
     public String pollText() {
       try {
         final String msg = texts.poll(5, TimeUnit.SECONDS);
-        assertNotNull(msg, "No text message received within timeout.");
+        assertNotNull(msg, () -> "No text message received within timeout." + errorInfo());
         return msg;
       } catch(final InterruptedException ex) {
         Thread.currentThread().interrupt();
@@ -241,12 +241,21 @@ public abstract class WsTest extends HTTPTest {
     public byte[] pollBinary() {
       try {
         final byte[] msg = binaries.poll(5, TimeUnit.SECONDS);
-        assertNotNull(msg, "No binary message received within timeout.");
+        assertNotNull(msg, () -> "No binary message received within timeout." + errorInfo());
         return msg;
       } catch(final InterruptedException ex) {
         Thread.currentThread().interrupt();
         throw new RuntimeException(ex);
       }
+    }
+
+    /**
+     * Returns the transport error that aborted the connection.
+     * @return error message, or an empty string
+     */
+    private String errorInfo() {
+      final Throwable th = error;
+      return th != null ? " Connection error: " + th : "";
     }
   }
 }

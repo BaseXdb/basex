@@ -381,7 +381,7 @@ public final class IOFile extends IO {
   @Override
   public String url() {
     final String path = Strings.startsWith(pth, '/') ? pth.substring(1) : pth;
-    final StringBuilder sb = new StringBuilder().append(FILEPREF).append("//");
+    final StringBuilder sb = new StringBuilder(FILEPREF).append("//");
     final int pl = path.length();
     for(int p = 0; p < pl; p++) {
       // replace spaces with %20
@@ -590,7 +590,7 @@ public final class IOFile extends IO {
     }
     if("..".equals(s) && !sl.isEmpty()) {
       // parent step
-      if(sl.get(sl.size() - 1).indexOf(':') == -1) sl.remove(sl.size() - 1);
+      if(sl.peek().indexOf(':') == -1) sl.pop();
     } else if(!".".equals(s) && !s.isEmpty()) {
       // skip self and empty steps
       sl.add(s);

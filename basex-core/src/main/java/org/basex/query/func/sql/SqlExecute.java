@@ -41,15 +41,21 @@ public class SqlExecute extends SqlFn {
     final boolean keys = options.get(StatementOptions.GENERATED_KEYS);
     final boolean nulls = options.get(StatementOptions.NULL);
 
+    // statement is discarded again if it is not passed on to the result iterator
+    Statement stmt = null;
     try {
-      final Statement stmt = conn.createStatement();
+      stmt = conn.createStatement();
       stmt.setQueryTimeout(options.get(StatementOptions.TIMEOUT));
       final int ks = keys ? Statement.RETURN_GENERATED_KEYS : Statement.NO_GENERATED_KEYS;
-      return iter(stmt, true, stmt.execute(statement, ks), keys, nulls);
+      final Iter iter = iter(stmt, true, stmt.execute(statement, ks), keys, nulls);
+      stmt = null;
+      return iter;
     } catch(final SQLTimeoutException ex) {
       throw SQL_TIMEOUT_X.get(info, ex);
     } catch(final SQLException ex) {
       throw SQL_ERROR_X.get(info, ex);
+    } finally {
+      close(stmt);
     }
   }
 
@@ -66,16 +72,23 @@ public class SqlExecute extends SqlFn {
   final Iter iter(final Statement stmt, final boolean close, final boolean result,
       final boolean keys, final boolean nulls) throws QueryException {
 
+    // resources are released here unless they are passed on to the result iterator
+    ResultSet rs = null;
+    boolean release = close;
     try {
-      // updating statement: return auto-generated keys or number of updated rows
-      if(!result) {
-        if(keys) return rows(stmt.getGeneratedKeys(), stmt, close, nulls);
-        return Itr.get(stmt.getUpdateCount()).iter();
-      }
-      // query statement: return result set
-      return rows(stmt.getResultSet(), stmt, close, nulls);
+      // updating statement without generated keys: return number of updated rows
+      if(!result && !keys) return Itr.get(stmt.getUpdateCount()).iter();
+      // otherwise, return rows of result set or auto-generated keys
+      rs = result ? stmt.getResultSet() : stmt.getGeneratedKeys();
+      final Iter iter = rows(rs, stmt, close, nulls);
+      rs = null;
+      release = false;
+      return iter;
     } catch(final SQLException ex) {
       throw SQL_ERROR_X.get(info, ex);
+    } finally {
+      close(rs);
+      if(release) close(stmt);
     }
   }
 

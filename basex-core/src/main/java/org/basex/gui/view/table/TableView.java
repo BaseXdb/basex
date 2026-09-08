@@ -292,7 +292,7 @@ public final class TableView extends View {
     if(LINESTART.is(e)) {
       pre = rows.get(0);
     } else if(LINEEND.is(e)) {
-      pre = rows.get(rows.size() - 1);
+      pre = rows.peek();
     } else if(PREVLINE.is(e)) {
       pre = rows.get(Math.max(0, getOff(pre) - 1));
     } else if(NEXTLINE.is(e)) {

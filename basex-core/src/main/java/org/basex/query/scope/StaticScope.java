@@ -1,6 +1,7 @@
 package org.basex.query.scope;
 
 import java.io.*;
+import java.util.regex.*;
 
 import org.basex.io.*;
 import org.basex.io.in.*;
@@ -22,6 +23,11 @@ import org.basex.util.list.*;
  * @author Leo Woerteler
  */
 public abstract class StaticScope extends ExprInfo implements Scope {
+  /** Leading whitespace and comment characters of a documentation line. */
+  private static final Pattern DOC_PREFIX = Pattern.compile("^\\s*:? *");
+  /** Documentation line that starts with a tag. */
+  private static final Pattern DOC_TAG = Pattern.compile("^@(\\w+)\\s+(.*)$");
+
   /** Static context. */
   public final StaticContext sc;
 
@@ -96,11 +102,12 @@ public abstract class StaticScope extends ExprInfo implements Scope {
     final TokenBuilder input = new TokenBuilder();
     try(NewlineInput nli = new NewlineInput(new IOContent(doc))) {
       while(nli.readLine(input)) {
-        String line = input.toString().replaceAll("^\\s*:? *", "");
-        if(line.matches("^@\\w+\\s+.*")) {
+        String line = DOC_PREFIX.matcher(input.toString()).replaceFirst("");
+        final Matcher tag = DOC_TAG.matcher(line);
+        if(tag.matches()) {
           add.run();
-          key.add(line.replaceAll("^@|\\s+.*", ""));
-          line = line.replaceAll("^@\\w+\\s+", "");
+          key.add(tag.group(1));
+          line = tag.group(2);
         }
         tb.add(line).add('\n');
       }

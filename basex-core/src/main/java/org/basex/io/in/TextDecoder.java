@@ -81,7 +81,7 @@ abstract class TextDecoder {
 
     final int cp = be ? a << 8 | b : a | b << 8;
     if(cp < 0xD800 || cp > 0xDFFF) return cp;
-    if(cp >= 0xDC00 && cp <= 0xDFFF) return invalid(true, (byte) a, (byte) b);
+    if(cp >= 0xDC00) return invalid(true, (byte) a, (byte) b);
 
     final int c = ti.readByte();
     if(c < 0) return invalid(true, (byte) a, (byte) b);

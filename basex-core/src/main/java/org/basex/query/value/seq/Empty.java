@@ -78,7 +78,7 @@ public final class Empty extends Item {
 
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
-      final QueryContext qc, final InputInfo ii) throws QueryException {
+      final QueryContext qc, final InputInfo ii) {
     throw Util.notExpected();
   }
 

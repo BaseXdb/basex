@@ -2,8 +2,6 @@ package org.basex.http.web;
 
 import java.io.*;
 
-import jakarta.servlet.*;
-
 import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -44,10 +42,9 @@ public abstract class WebResponse {
    * @return response type
    * @throws IOException I/O Exception
    * @throws QueryException query exception
-   * @throws ServletException servlet exception
    */
   public final Response create(final WebFunction function, final Object data, final boolean body)
-      throws QueryException, IOException, ServletException {
+      throws QueryException, IOException {
 
     final StaticFunc sf = function.function;
     try {
@@ -86,8 +83,6 @@ public abstract class WebResponse {
 
   /**
    * Finalizes a response.
-   * @throws IOException I/O exception
-   * @throws ServletException servlet exception
    */
-  protected abstract void finish() throws IOException, ServletException;
+  protected abstract void finish();
 }

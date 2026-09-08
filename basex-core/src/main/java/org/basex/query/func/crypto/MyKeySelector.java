@@ -15,30 +15,6 @@ import javax.xml.crypto.dsig.keyinfo.*;
  * @author Lukas Kircher
  */
 final class MyKeySelector extends KeySelector {
-  /**
-   * Wrapper for KeySelector results.
-   *
-   * @author BaseX Team, BSD License
-   * @author Lukas Kircher
-   */
-  private static final class MyKeySelectorResult implements KeySelectorResult {
-    /** Key. */
-    private final Key pk;
-
-    @Override
-    public Key getKey() {
-      return pk;
-    }
-
-    /**
-     * Constructor.
-     * @param key key
-     */
-    MyKeySelectorResult(final PublicKey key) {
-      pk = key;
-    }
-  }
-
   @Override
   public KeySelectorResult select(final KeyInfo ki, final Purpose p, final AlgorithmMethod m,
       final XMLCryptoContext c) throws KeySelectorException {
@@ -71,7 +47,8 @@ final class MyKeySelector extends KeySelector {
         final String sa = sm.getAlgorithm(), ka = pk.getAlgorithm();
         final int hash = sa.indexOf('#');
         if(hash != -1 && sa.regionMatches(true, hash + 1, ka, 0, ka.length())) {
-          return new MyKeySelectorResult(pk);
+          final Key key = pk;
+          return () -> key;
         }
       }
     }

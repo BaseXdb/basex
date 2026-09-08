@@ -1340,11 +1340,6 @@ public interface Text {
       lang("attribute"), COMMENT, lang("pi")
   };
 
-  /** Dialog title for choosing a font. */
-  String CHOOSE_FONT = lang("choose_font");
-
-  /** Dialog title for treemap color schema. */
-  String COLOR_SCHEMA = lang("color_schema");
   /** Color schema information. */
   String RED = lang("red");
   /** Color schema information. */

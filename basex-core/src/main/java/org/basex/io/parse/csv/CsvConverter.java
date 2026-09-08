@@ -27,8 +27,6 @@ public abstract class CsvConverter extends Job {
   public static final Str COLUMN_INDEX = Str.get("column-index");
   /** Rows. */
   public static final Str ROWS = Str.get("rows");
-  /** Get. */
-  public static final Str GET = Str.get("get");
 
   /** QName. */
   protected static final QNm Q_CSV = new QNm("csv");

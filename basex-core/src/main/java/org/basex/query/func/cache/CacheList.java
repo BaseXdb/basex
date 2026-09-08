@@ -12,7 +12,7 @@ import org.basex.query.value.seq.*;
  */
 public final class CacheList extends CacheFn {
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) {
     return StrSeq.get(caches(qc).list());
   }
 }

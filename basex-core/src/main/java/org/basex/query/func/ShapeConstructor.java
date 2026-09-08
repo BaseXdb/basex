@@ -69,7 +69,7 @@ public final class ShapeConstructor extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) {
     // refine the field types of an anonymous shape from the argument types
     final int el = exprs.length;
     final SeqType[] seqTypes = new SeqType[el];

@@ -43,8 +43,6 @@ public final class BaseXHTTP extends CLI {
   private boolean service;
   /** Quiet flag. */
   private boolean quiet;
-  /** Default admin password (can be {@code null}). */
-  private String password;
   /** Stop flag. */
   private boolean stop;
   /** HTTP port. */
@@ -155,7 +153,6 @@ public final class BaseXHTTP extends CLI {
     // the call of this function may already have been triggered during the start of jetty
     hc.init(wac.getServletContext());
     context = hc.context();
-    if(password != null) context.user().password(password, context.soptions.authAlgorithms());
 
     // start daemon for stopping the HTTP server
     final int stopPort = soptions.get(StaticOptions.STOPPORT);

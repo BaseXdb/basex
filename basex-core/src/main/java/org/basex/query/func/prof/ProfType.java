@@ -21,7 +21,7 @@ public final class ProfType extends StandardFunc {
 
     final Value value = expr.value(qc);
     qc.trace(label, () -> {
-      final StringBuilder sb = new StringBuilder().append(info(expr));
+      final StringBuilder sb = new StringBuilder(info(expr));
       if(expr != value) sb.append(" -> ").append(info(value));
       return sb.toString();
     });
@@ -47,7 +47,7 @@ public final class ProfType extends StandardFunc {
   public record TypeInfo(Class<?> clazz, String type, long size) {
     @Override
     public String toString() {
-      final StringBuilder info = new StringBuilder().append(Util.className(clazz));
+      final StringBuilder info = new StringBuilder(Util.className(clazz));
       info.append(" (").append(type);
       if(XQStruct.class.isAssignableFrom(clazz)) {
         info.append(", ").append(size).append(' ').append(size == 1 ? "entry" : "entries");

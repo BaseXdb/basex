@@ -116,7 +116,7 @@ public final class JNode extends GNode {
   }
 
   @Override
-  public Iter unwrappedIter(final QueryContext qc) throws QueryException {
+  public Iter unwrappedIter(final QueryContext qc) {
     return unwrappedValue(qc).iter();
   }
 
@@ -344,8 +344,7 @@ public final class JNode extends GNode {
   }
 
   @Override
-  public boolean materialized(final Predicate<Data> test, final boolean funcs, final InputInfo ii)
-      throws QueryException {
+  public boolean materialized(final Predicate<Data> test, final boolean funcs, final InputInfo ii) {
     return false;
   }
 

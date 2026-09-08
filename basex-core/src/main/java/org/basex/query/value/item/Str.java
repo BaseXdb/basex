@@ -24,8 +24,6 @@ public final class Str extends AStr {
   public static final Str EMPTY = new Str(Token.EMPTY);
   /** Key string. */
   public static final Str KEY = Str.get("key");
-  /** Value string. */
-  public static final Str VALUE = Str.get("value");
 
   /** Unicode character cache. */
   private static final IntObjectMap<Str> CACHE = new IntObjectMap<>();

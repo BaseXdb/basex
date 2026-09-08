@@ -203,8 +203,8 @@ public final class QueryInfo {
    */
   private static Value value(final Section section, final QueryContext qc) throws QueryException {
     final List<Entry> entries = section.entries();
-    if(section.text()) return Str.get(entries.get(0).value());
-    if(entries.get(0).key() != null) {
+    if(section.text()) return Str.get(entries.getFirst().value());
+    if(entries.getFirst().key() != null) {
       final MapBuilder mb = new MapBuilder();
       for(final Entry entry : entries) mb.put(entry.key(), entry.value());
       return mb.map();
@@ -225,7 +225,7 @@ public final class QueryInfo {
   public Sections toSections(final QueryProcessor qp, final long printed, final long hits,
       final Locks locks) {
 
-    final Map<String, Section> map = new LinkedHashMap<>();
+    final SequencedMap<String, Section> map = new LinkedHashMap<>();
     final List<Entry> timing = new ArrayList<>(6);
     final LongList times = new LongList(6);
     time("parsing", parsing.get(), timing, times);
@@ -270,7 +270,7 @@ public final class QueryInfo {
     final StringList sl = new StringList();
     final List<Entry> entries = section.entries();
     if(section.text()) {
-      for(final String line : entries.get(0).value().split("\r?\n", -1)) sl.add(line);
+      for(final String line : entries.getFirst().value().split("\r?\n", -1)) sl.add(line);
     } else {
       for(final Entry entry : entries) {
         sl.add(LI + (entry.key() != null ? Strings.titleCase(entry.key()) + COLS : "") +
@@ -367,7 +367,7 @@ public final class QueryInfo {
    * @param sections sections, keyed by their name
    * @param times times of the query phases (nanoseconds)
    */
-  public record Sections(Map<String, Section> sections, LongList times) { }
+  public record Sections(SequencedMap<String, Section> sections, LongList times) { }
 
   /**
    * Info strings of a single query phase, bounded by a maximum size.

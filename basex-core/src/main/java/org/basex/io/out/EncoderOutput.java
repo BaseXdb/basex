@@ -1,7 +1,6 @@
 package org.basex.io.out;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.nio.*;
@@ -51,11 +50,6 @@ public final class EncoderOutput extends PrintOutput {
       }
     }
     lineLength = cp == '\n' ? 0 : lineLength + 1;
-  }
-
-  @Override
-  public void print(final byte[] token) throws IOException {
-    print(string(token));
   }
 
   @Override

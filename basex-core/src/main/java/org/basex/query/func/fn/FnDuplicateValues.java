@@ -72,6 +72,7 @@ public class FnDuplicateValues extends StandardFunc {
     final ItemSet set1 = ItemSet.get(collation, info), set2 = ItemSet.get(collation, info);
     for(final int i : ints1.keys()) set1.add(Itr.get(i));
     for(final int i : ints2.keys()) set2.add(Itr.get(i));
+    // be nice to the garbage collector
     ints1 = null;
     ints2 = null;
     do {

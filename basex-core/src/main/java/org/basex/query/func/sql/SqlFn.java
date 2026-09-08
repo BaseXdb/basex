@@ -8,6 +8,7 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 import org.basex.util.options.*;
 
 /**
@@ -56,6 +57,19 @@ abstract class SqlFn extends StandardFunc {
    */
   final AutoCloseable get(final QueryContext qc, final boolean close) throws QueryException {
     return conn(qc, 0, close);
+  }
+
+  /**
+   * Closes a JDBC resource, ignoring errors.
+   * @param ac resource (can be {@code null})
+   */
+  static void close(final AutoCloseable ac) {
+    if(ac == null) return;
+    try {
+      ac.close();
+    } catch(final Exception ex) {
+      Util.debug(ex);
+    }
   }
 
   /**

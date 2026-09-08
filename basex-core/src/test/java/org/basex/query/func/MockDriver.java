@@ -54,6 +54,8 @@ public final class MockDriver implements Driver {
   public static SQLException failure;
   /** Bindings captured on each {@code addBatch} call. */
   public static List<List<Object>> batches = new ArrayList<>();
+  /** Number of statements that were created and not closed again. */
+  public static int openStatements;
 
   /** Resets configuration and recordings; call before each test. */
   public static void reset() {
@@ -71,6 +73,7 @@ public final class MockDriver implements Driver {
     queryTimeout = 0;
     failure = null;
     batches = new ArrayList<>();
+    openStatements = 0;
   }
 
   /**
@@ -178,8 +181,8 @@ public final class MockDriver implements Driver {
         case "isClosed": return false;
         case "isWrapperFor": return false;
         case "unwrap": throw new SQLException("Not a wrapper.");
-        case "getWarnings": return null;
-        case "clearWarnings": case "close": return null;
+        case "getWarnings": case "clearWarnings": return null;
+        case "close": closed(); return null;
         default:
       }
       final Object result = call(m, a);
@@ -194,6 +197,9 @@ public final class MockDriver implements Driver {
      * @throws SQLException SQL exception
      */
     abstract Object call(Method m, Object[] a) throws SQLException;
+
+    /** Invoked when the proxied resource is closed. */
+    void closed() { }
 
     /**
      * Returns a type-appropriate default for an unhandled method.
@@ -218,11 +224,13 @@ public final class MockDriver implements Driver {
     Object call(final Method m, final Object[] a) {
       switch(m.getName()) {
         case "createStatement":
+          openStatements++;
           return proxy(Statement.class, new StmtHandler(proxy, null));
         case "prepareStatement":
           final boolean keys = a.length > 1 && a[1] instanceof final Integer i &&
               i == Statement.RETURN_GENERATED_KEYS;
           if(keys) keysRequested = true;
+          openStatements++;
           return proxy(PreparedStatement.class, new StmtHandler(proxy, (String) a[0]));
         case "setAutoCommit": autoCommit = (Boolean) a[0]; return null;
         case "getAutoCommit": return autoCommit;
@@ -248,6 +256,11 @@ public final class MockDriver implements Driver {
     private StmtHandler(final Object conn, final String sql) {
       this.conn = conn;
       this.sql = sql;
+    }
+
+    @Override
+    void closed() {
+      openStatements--;
     }
 
     @Override

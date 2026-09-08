@@ -45,16 +45,6 @@ public final class ExprList extends ObjectList<Expr, ExprList> {
     return new ExprList(first.length + second.length).add(first).add(second).finish();
   }
 
-  /**
-   * Concatenates entries.
-   * @param first first element
-   * @param second next element(s)
-   * @return array
-   */
-  public static Expr[] concat(final Expr first, final Expr... second) {
-    return new ExprList(second.length + 1).add(first).add(second).finish();
-  }
-
   @Override
   protected Expr[] newArray(final int s) {
     return new Expr[s];

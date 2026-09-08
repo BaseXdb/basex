@@ -214,18 +214,6 @@ public enum Kind {
   }
 
   /**
-   * Computes the intersection between this kind and the given one, i.e. the least specific kind
-   * that is subkind of both kinds. If no such type exists, {@code null} is returned.
-   * @param kind other kind
-   * @return intersection type or {@code null}
-   */
-  public final Kind intersect(final Kind kind) {
-    if(instanceOf(kind)) return this;
-    if(kind.instanceOf(this)) return kind;
-    return null;
-  }
-
-  /**
    * Checks if this is one of the specified kinds.
    * @param kinds kinds
    * @return result of check

@@ -35,14 +35,14 @@ public final class QueryInfoTest extends SandboxTest {
     final XQuery query = new XQuery("1 + 2");
     execute(query);
 
-    final Map<String, Section> map = query.sections().sections();
+    final SequencedMap<String, Section> map = query.sections().sections();
     assertEquals(Arrays.asList("timing", "result", "optimized-query", "compilation", "query"),
         new ArrayList<>(map.keySet()));
     assertEquals("3", value(map, "optimized-query"));
     assertEquals("1 + 2", value(map, "query"));
 
     // keys are lower case, and displayed with title case
-    final Entry items = map.get("result").entries().get(0);
+    final Entry items = map.get("result").entries().getFirst();
     assertEquals("items", items.key());
     assertEquals("1", items.value());
     assertEquals(LI + "Items: 1", QueryInfo.lines(map.get("result")).get(0));
@@ -51,8 +51,8 @@ public final class QueryInfoTest extends SandboxTest {
     // one entry per phase, and the total time; the timing is the first section
     assertEquals(6, map.get("timing").entries().size());
     assertEquals(6, query.sections().times().size());
-    assertEquals("total", map.get("timing").entries().get(5).key());
-    assertEquals("parsing", map.values().iterator().next().entries().get(0).key());
+    assertEquals("total", map.get("timing").entries().getLast().key());
+    assertEquals("parsing", map.firstEntry().getValue().entries().getFirst().key());
     assertNull(query.message());
   }
 
@@ -90,6 +90,6 @@ public final class QueryInfoTest extends SandboxTest {
   private static String value(final Map<String, Section> map, final String key) {
     final Section section = map.get(key);
     assertTrue(section.text(), key);
-    return section.entries().get(0).value();
+    return section.entries().getFirst().value();
   }
 }
