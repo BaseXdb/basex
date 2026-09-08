@@ -23,6 +23,7 @@ public final class FnRemove extends StandardFunc {
 
     final Iter iter = arg(0).iter(qc);
     final LongList pos = positions(qc);
+    if(pos.isEmpty()) return iter;
 
     // value-based iterator
     final Value value = iter.eagerValue();
@@ -105,6 +106,7 @@ public final class FnRemove extends StandardFunc {
     final Expr input = arg(0), pos = arg(1);
     final SeqType st = input.seqType();
     if(st.zero()) return input;
+    if(pos.seqType().zero()) return cc.voidAndReturn(pos, input, info);
 
     long sz = -1;
     if(pos instanceof Item) {

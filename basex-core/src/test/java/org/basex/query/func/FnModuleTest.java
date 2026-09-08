@@ -3930,6 +3930,15 @@ return
     query(func.args(" (1, <_>2</_>, 3, 4)", " (0 to 3)"), 4);
     query(func.args(" (1, <_>2</_>, 3, 4)", " (1 to 4)"), "");
     query(func.args(" (1, <_>2</_>, 3, 4)", " (1 to 5)"), "");
+
+    // empty positions
+    query(func.args(" ()", " ()"), "");
+    query(func.args("A", " ()"), "A");
+    query(func.args(" <a>X</a>", " ()"), "<a>X</a>");
+    query(func.args(" (1, <_>2</_>, 3)", " ()"), "1\n<_>2</_>\n3");
+    query(func.args(" tokenize(<_>X Y</_>)", " ()"), "X\nY");
+    query(func.args(" (<a/>, <b/>)", " (1 to 2)[. > <_>5</_>]"), "<a/>\n<b/>");
+    query(func.args(" <a>X</a>", " void(())"), "<a>X</a>");
   }
 
   /** Test method. */
