@@ -1004,6 +1004,120 @@ public final class NamespaceTest extends SandboxTest {
   }
 
   /**
+   * Opens a database that was created with version 12 and updates it.
+   * @throws IOException I/O exception
+   */
+  @Test public void oldVersion() throws IOException {
+    // copy the database files of the frozen instance to the sandbox
+    final IOFile trg = context.soptions.dbPath(NAME);
+    for(final IOFile file : new IOFile("src/test/resources/nsv12").children()) {
+      file.copyTo(new IOFile(trg, file.name()));
+    }
+    final String doc = "<a:root xmlns:a=\"urn:a\" xmlns:b=\"urn:b\">" +
+      "<a:x><c:one xmlns:c=\"urn:c\">1</c:one></a:x>" +
+      "<a:y><c:two xmlns:c=\"urn:c\">2</c:two></a:y>" +
+      "<d:deep xmlns:d=\"urn:d\"><e:in xmlns:e=\"urn:e\"><f:low xmlns:f=\"urn:f\">low</f:low>" +
+      "</e:in></d:deep><g:def xmlns:g=\"urn:g\" xmlns=\"urn:default\"><plain>text</plain></g:def>" +
+      "</a:root>";
+    query(_DB_GET.args(NAME) + " => serialize()", doc);
+    query("namespace-uri-for-prefix('f', " + _DB_GET.args(NAME) + "//*:low)", "urn:f");
+    query(_DB_GET.args(NAME) + "//*:plain/namespace-uri()", "urn:default");
+
+    // update the database: the structure is rewritten in the current format
+    query("insert node <h:new xmlns:h='urn:h'/> into " + _DB_GET.args(NAME) + "/*");
+    execute(new Close());
+    query("namespace-uri-for-prefix('h', " + _DB_GET.args(NAME) + "//*:new)", "urn:h");
+    query("namespace-uri-for-prefix('f', " + _DB_GET.args(NAME) + "//*:low)", "urn:f");
+  }
+
+  /**
+   * Stores a namespace structure that is large enough to be split into several blocks.
+   */
+  @Test public void manyNamespaces() {
+    // number of elements: exceeds the block size of the compressed namespace structure
+    final int count = 1000;
+    // number of sets: exceeds the value range that is inlined in a compressed entry
+    final int sets = 20;
+    final StringBuilder sb = new StringBuilder("<a xmlns:x='X'>");
+    for(int c = 1; c <= count; c++) {
+      sb.append("<b xmlns:p").append(c % sets).append("='U").append(c % sets).append('\'');
+      // varying distances between the elements that declare namespaces
+      if(c % 7 == 0) sb.append("><c/><c/><c/><c/><c/><c/><c/><c/></b>");
+      else sb.append("/>");
+    }
+    final String doc = sb.append("</a>").toString();
+    execute(new CreateDB(NAME, doc));
+
+    // reopen the database and check the declarations around the block boundaries
+    execute(new Close());
+    query(_DB_GET.args(NAME) + " => serialize()", doc.replace('\'', '"'));
+    for(final int c : new int[] { 1, 255, 256, 257, 512, 513, count }) {
+      query("namespace-uri-for-prefix('p" + c % sets + "', " + _DB_GET.args(NAME) +
+          "/a/b[" + c + "])", "U" + c % sets);
+    }
+    // update the database: the structure is inflated and written back
+    query("insert node <d/> into " + _DB_GET.args(NAME) + "/a");
+    execute(new Close());
+    query("count(" + _DB_GET.args(NAME) + "//b[namespace-uri-for-prefix('p1', .) = 'U1'])",
+        count / sets);
+  }
+
+  /**
+   * Stores namespaces whose PRE values are too far apart to be inlined in a compressed entry.
+   */
+  @Test public void distantNamespaces() {
+    // number of elements: exceeds the number of nodes that are stored in the old format
+    final int count = 4200;
+    final StringBuilder sb = new StringBuilder("<a xmlns:x='X'>");
+    for(int c = 1; c <= count; c++) sb.append("<b xmlns:p='U'/>");
+    // gap between two elements that declare namespaces: exceeds two bytes
+    for(int c = 0; c < 20000; c++) sb.append("<f/>");
+    final String doc = sb.append("<b xmlns:q='V'/></a>").toString();
+    execute(new CreateDB(NAME, doc));
+
+    execute(new Close());
+    query(_DB_GET.args(NAME) + " => serialize()", doc.replace('\'', '"'));
+    query("namespace-uri-for-prefix('q', " + _DB_GET.args(NAME) + "/a/b[last()])", "V");
+    query("namespace-uri-for-prefix('p', " + _DB_GET.args(NAME) + "/a/b[1])", "U");
+    query("count(" + _DB_GET.args(NAME) + "//b[namespace-uri-for-prefix('p', .) = 'U'])", count);
+  }
+
+  /**
+   * Checks that the namespace storage format switches with the size of the structure.
+   */
+  @Test public void storageFormat() {
+    final IOFile file = new IOFile(context.soptions.dbPath(NAME), "nsp.basex");
+
+    // check if small structures are stored in the old format
+    execute(new CreateDB(NAME, "<a><b xmlns:p='U'/></a>"));
+    execute(new Close());
+    final boolean legacy = !file.exists();
+
+    // create a structure that is too large for the old format
+    final int count = 4200;
+    final StringBuilder sb = new StringBuilder("<a>");
+    for(int c = 1; c <= count; c++) sb.append("<b xmlns:p='U'/>");
+    execute(new CreateDB(NAME, sb.append("</a>").toString()));
+    execute(new Close());
+    assertTrue(file.exists(), "compressed namespaces expected");
+    query("count(" + _DB_GET.args(NAME) + "//b[namespace-uri-for-prefix('p', .) = 'U'])", count);
+
+    // delete most of the elements: the structure is stored in the old format again
+    query("delete node " + _DB_GET.args(NAME) + "/a/b[position() > 10]");
+    execute(new Close());
+    assertEquals(legacy, !file.exists(), "unexpected storage format");
+    query("count(" + _DB_GET.args(NAME) + "//b[namespace-uri-for-prefix('p', .) = 'U'])", 10);
+
+    // insert the elements again: the compressed format is used once more
+    query("for $i in 1 to " + count + " return insert node <b xmlns:p='U'/> into " +
+        _DB_GET.args(NAME) + "/a");
+    execute(new Close());
+    assertTrue(file.exists(), "compressed namespaces expected");
+    query("count(" + _DB_GET.args(NAME) + "//b[namespace-uri-for-prefix('p', .) = 'U'])",
+        count + 10);
+  }
+
+  /**
    * Creates the specified test databases.
    * @param db database numbers
    */

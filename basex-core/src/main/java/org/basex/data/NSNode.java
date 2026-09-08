@@ -1,14 +1,11 @@
 package org.basex.data;
 
-import static org.basex.core.Text.*;
-
 import java.io.*;
 import java.util.*;
 
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -20,8 +17,6 @@ import org.basex.util.list.*;
 final class NSNode {
   /** Child nodes of leaf nodes. */
   private static final NSNode[] EMPTY_NODES = {};
-  /** Values of nodes without namespaces. */
-  private static final int[] EMPTY_VALUES = {};
 
   /** Child nodes. */
   private NSNode[] nodes;
@@ -29,8 +24,8 @@ final class NSNode {
   private int size;
   /** Parent node. */
   private NSNode parent;
-  /** Dense array with IDs of prefix/namespace URI pairs. */
-  private int[] values;
+  /** ID of the set with the prefix/namespace URI pairs. */
+  private int setId;
   /** Pre value. */
   private int pre;
 
@@ -39,36 +34,59 @@ final class NSNode {
    * @param pre PRE value or {@code -1}
    */
   NSNode(final int pre) {
+    this(pre, 0);
+  }
+
+  /**
+   * Constructor, specifying a set of prefix/namespace URI pairs.
+   * @param pre PRE value or {@code -1}
+   * @param setId ID of the set with the prefix/namespace URI pairs
+   */
+  NSNode(final int pre, final int setId) {
     this.pre = pre;
-    values = EMPTY_VALUES;
+    this.setId = setId;
     nodes = EMPTY_NODES;
   }
 
   /**
-   * Constructor, specifying an input stream.
+   * Constructor for reading instances with an older storage version.
    * @param in input stream
    * @param parent parent reference
+   * @param sets sets of prefix/namespace URI pairs
    * @throws IOException I/O exception
    */
-  NSNode(final DataInput in, final NSNode parent) throws IOException {
+  NSNode(final DataInput in, final NSNode parent, final NSSets sets) throws IOException {
     this.parent = parent;
     pre = in.readNum();
-    values = in.readNums();
+    setId = sets.put(in.readNums());
     size = in.readNum();
     nodes = new NSNode[size];
-    for(int n = 0; n < size; ++n) nodes[n] = new NSNode(in, this);
+    for(int n = 0; n < size; ++n) nodes[n] = new NSNode(in, this, sets);
   }
 
   /**
-   * Writes a single node to disk.
+   * Writes a node and its descendants in the format of databases before version 13.
    * @param out output stream
+   * @param sets sets of prefix/namespace URI pairs
    * @throws IOException I/O exception
    */
-  void write(final DataOutput out) throws IOException {
+  void write(final DataOutput out, final NSSets sets) throws IOException {
     out.writeNum(pre);
-    out.writeNums(values);
+    out.writeNums(sets.get(setId));
     out.writeNum(size);
-    for(int c = 0; c < size; ++c) nodes[c].write(out);
+    for(int c = 0; c < size; ++c) nodes[c].write(out, sets);
+  }
+
+  /**
+   * Counts the nodes of this subtree and stops if the specified limit is exceeded.
+   * @param limit node limit
+   * @return number of nodes (can be larger than the limit)
+   */
+  int count(final int limit) {
+    int count = 1;
+    // the remaining limit is passed on, so that the recursion depth is limited as well
+    for(int c = 0; c < size && count <= limit; ++c) count += nodes[c].count(limit - count);
+    return count;
   }
 
   /**
@@ -105,11 +123,11 @@ final class NSNode {
   }
 
   /**
-   * Returns the IDs of prefix/namespace URI pairs.
-   * @return prefix/namespace URI pairs
+   * Returns the ID of the set with the prefix/namespace URI pairs.
+   * @return set ID
    */
-  int[] values() {
-    return values;
+  int setId() {
+    return setId;
   }
 
   // Requesting Namespaces ========================================================================
@@ -154,20 +172,6 @@ final class NSNode {
       else h = m - 1;
     }
     return l - 1;
-  }
-
-  /**
-   * Returns the ID of the namespace URI for the specified prefix.
-   * @param prefix prefix reference
-   * @return id of the namespace URI, or {@code 0} if none is found
-   */
-  int uri(final int prefix) {
-    final int[] vls = values;
-    final int vl = vls.length;
-    for(int v = 0; v < vl; v += 2) {
-      if(vls[v] == prefix) return vls[v + 1];
-    }
-    return 0;
   }
 
   // Updating Namespaces ==========================================================================
@@ -221,33 +225,33 @@ final class NSNode {
   }
 
   /**
-   * Adds the specified prefix and URI reference.
-   * @param prefix prefix reference
-   * @param uri URI reference
+   * Assigns the children of this node.
+   * @param children child nodes, sorted by their PRE values
    */
-  void add(final int prefix, final int uri) {
-    final int v = values.length;
-    values = Arrays.copyOf(values, v + 2);
-    values[v] = prefix;
-    values[v + 1] = uri;
+  void children(final NSNode[] children) {
+    nodes = children;
+    size = children.length;
+    for(final NSNode child : children) child.parent = this;
+  }
+
+  /**
+   * Adds the specified prefix and URI reference.
+   * @param sets sets of prefix/namespace URI pairs
+   * @param prefixId prefix reference
+   * @param uriId URI reference
+   */
+  void add(final NSSets sets, final int prefixId, final int uriId) {
+    setId = sets.add(setId, prefixId, uriId);
   }
 
   /**
    * Recursively deletes the specified namespace URI reference.
-   * @param uri namespace URI reference
+   * @param sets sets of prefix/namespace URI pairs
+   * @param uriId namespace URI reference
    */
-  void delete(final int uri) {
-    for(int c = 0; c < size; ++c) nodes[c].delete(uri);
-
-    final int vl = values.length;
-    for(int v = 0; v < vl; v += 2) {
-      if(values[v + 1] != uri) continue;
-      final int[] vals = new int[vl - 2];
-      Array.copy(values, v, vals);
-      Array.copy(values, v + 2, vl - v - 2, vals, v);
-      values = vals;
-      break;
-    }
+  void delete(final NSSets sets, final int uriId) {
+    for(int c = 0; c < size; ++c) nodes[c].delete(sets, uriId);
+    setId = sets.delete(setId, uriId);
   }
 
   /**
@@ -271,81 +275,17 @@ final class NSNode {
   // Printing Namespaces ==========================================================================
 
   /**
-   * Prints the node structure for debugging purposes.
-   * @param tb token builder
-   * @param level level
-   * @param ns namespace reference
-   * @param start start PRE value
-   * @param end end PRE value
-   */
-  private void print(final TokenBuilder tb, final int level, final Namespaces ns, final int start,
-      final int end) {
-
-    if(pre >= start && pre <= end) {
-      tb.add(NL);
-      for(int i = 0; i < level; ++i) tb.add("  ");
-      tb.add(this).add(' ');
-      final int[] vls = values;
-      final int vl = vls.length;
-      for(int i = 0; i < vl; i += 2) {
-        if(i != 0) tb.add(' ');
-        tb.add("xmlns");
-        final byte[] p = ns.prefix(vls[i]);
-        if(p.length != 0) tb.add(':');
-        tb.add(p).add("=\"").add(ns.uri(vls[i + 1])).add('"');
-      }
-    }
-    for(int c = 0; c < size; ++c) nodes[c].print(tb, level + 1, ns, start, end);
-  }
-
-  /**
-   * Adds the namespace structure of a node to the specified table.
-   * @param table table
+   * Adds the namespace entries of a node and its descendants to a list.
+   * @param list list with the PRE value, parent PRE value, level and set ID of each entry
+   * @param level level of this node
    * @param start first PRE value
    * @param end last PRE value
-   * @param ns namespace reference
    */
-  void table(final Table table, final int start, final int end, final Namespaces ns) {
-    final int vl = values.length;
-    for(int i = 0; i < vl; i += 2) {
-      if(pre < start || pre > end) continue;
-      final TokenList tl = new TokenList();
-      tl.add(values[i + 1]);
-      tl.add(pre);
-      tl.add(pre - parent.pre);
-      tl.add(ns.prefix(values[i]));
-      tl.add(ns.uri(values[i + 1]));
-      table.contents.add(tl);
+  void entries(final IntList list, final int level, final int start, final int end) {
+    if(parent != null && pre >= start && pre <= end) {
+      list.add(pre).add(parent.pre).add(level).add(setId);
     }
-    for(int i = 0; i < size; i++) nodes[i].table(table, start, end, ns);
-  }
-
-  /**
-   * Adds namespace information for the specified node to a map.
-   * @param map namespace map
-   * @param ns namespace reference
-   */
-  void info(final TokenObjectMap<TokenList> map, final Namespaces ns) {
-    final int vl = values.length;
-    for(int v = 0; v < vl; v += 2) {
-      final byte[] prefix = ns.prefix(values[v]), uri = ns.uri(values[v + 1]);
-      final TokenList prfs = map.computeIfAbsent(uri, () -> new TokenList(1));
-      if(!prfs.contains(prefix)) prfs.add(prefix);
-    }
-    for(int c = 0; c < size; ++c) nodes[c].info(map, ns);
-  }
-
-  /**
-   * Prints the node structure.
-   * @param ns namespace reference
-   * @param start start PRE value
-   * @param end end PRE value
-   * @return string
-   */
-  String toString(final Namespaces ns, final int start, final int end) {
-    final TokenBuilder tb = new TokenBuilder();
-    print(tb, 0, ns, start, end);
-    return tb.toString();
+    for(int c = 0; c < size; ++c) nodes[c].entries(list, level + 1, start, end);
   }
 
   @Override

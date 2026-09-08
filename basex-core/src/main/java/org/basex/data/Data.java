@@ -307,7 +307,7 @@ public abstract class Data {
    * @return namespace, or {@code null} if there is no common namespace
    */
   public byte[] defaultNs() {
-    return nspaces.defaultNs(meta.ndocs);
+    return nspaces.defaultNs(meta.ndocs, this);
   }
 
   /**

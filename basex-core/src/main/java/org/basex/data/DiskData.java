@@ -75,6 +75,7 @@ public final class DiskData extends Data {
           case DBATTS -> attrNames = new Names(in, meta);
           case DBPATH -> paths = new PathIndex(this, in);
           case DBNS   -> nspaces = new Namespaces(in);
+          case DBNSC  -> nspaces = new Namespaces(in, meta.dbFile(DATANSP));
           case DBDOCS -> resources.read(in);
         }
       }
@@ -137,16 +138,18 @@ public final class DiskData extends Data {
     meta.size = nodes();
     meta.lastid = lastid;
 
+    // small namespace structures are stored in the old format, which older versions can read
+    final boolean legacy = nspaces.legacy();
     try(DataOutput out = new DataOutput(meta.dbFile(DATAINF))) {
-      meta.write(out);
+      meta.write(out, legacy ? OLDSTORAGE : STORAGE);
       out.writeToken(token(DBTAGS));
       elemNames.write(out);
       out.writeToken(token(DBATTS));
       attrNames.write(out);
       out.writeToken(token(DBPATH));
       paths.write(out);
-      out.writeToken(token(DBNS));
-      nspaces.write(out);
+      out.writeToken(token(legacy ? DBNS : DBNSC));
+      nspaces.write(out, legacy, meta.dbFile(DATANSP));
       out.writeToken(token(DBDOCS));
       resources.write(out);
       out.write(0);
@@ -165,6 +168,7 @@ public final class DiskData extends Data {
       table.close();
       texts.close();
       values.close();
+      nspaces.close();
       close(IndexType.TEXT);
       close(IndexType.ATTRIBUTE);
       close(IndexType.TOKEN);

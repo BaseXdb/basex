@@ -12,6 +12,7 @@ import org.basex.index.stats.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This class represents a node of the path index.
@@ -59,21 +60,47 @@ public final class PathNode {
   }
 
   /**
-   * Constructor, specifying an input stream.
+   * Constructor, specifying an input stream. The children of the node are not read yet.
    * @param in input stream
-   * @param node parent node
+   * @param node parent node (can be {@code null})
    * @throws IOException I/O exception
    */
-  PathNode(final DataInput in, final PathNode node) throws IOException {
+  private PathNode(final DataInput in, final PathNode node) throws IOException {
     name = (short) in.readNum();
     kind = (byte) in.read();
     in.readNum();
-    final int cl = in.readNum();
+    children = new PathNode[in.readNum()];
     in.readDouble();
-    children = new PathNode[cl];
     stats = new Stats(in);
     parent = node;
-    for(int c = 0; c < cl; ++c) children[c] = new PathNode(in, this);
+  }
+
+  /**
+   * Reads a node and its descendants from the specified input stream.
+   * @param in input stream
+   * @return node
+   * @throws IOException I/O exception
+   */
+  static PathNode read(final DataInput in) throws IOException {
+    // iterative traversal: the depth of the path index is not limited
+    final PathNode root = new PathNode(in, null);
+    final ArrayList<PathNode> stack = new ArrayList<>();
+    final IntList indexes = new IntList();
+    PathNode node = root;
+    for(int i = 0;;) {
+      if(i < node.children.length) {
+        stack.add(node);
+        indexes.push(i + 1);
+        final PathNode child = new PathNode(in, node);
+        node.children[i] = child;
+        node = child;
+        i = 0;
+      } else {
+        if(stack.isEmpty()) return root;
+        node = stack.remove(stack.size() - 1);
+        i = indexes.pop();
+      }
+    }
   }
 
   /**
@@ -131,21 +158,29 @@ public final class PathNode {
    * @param elemNames element names
    */
   void finish(final MetaData meta, final Names elemNames) {
-    boolean leaf = stats.isLeaf();
-    for(final PathNode child : children) {
-      if(child.kind == Data.TEXT) {
-        if(empty != 0) child.stats.add(Token.EMPTY, meta);
-      } else if(child.kind != Data.ATTR) {
-        leaf = false;
+    // iterative traversal: the depth of the path index is not limited
+    final ArrayList<PathNode> stack = new ArrayList<>();
+    stack.add(this);
+    while(!stack.isEmpty()) {
+      final PathNode node = stack.remove(stack.size() - 1);
+      boolean leaf = node.stats.isLeaf();
+      for(final PathNode child : node.children) {
+        if(child.kind == Data.TEXT) {
+          if(node.empty != 0) child.stats.add(Token.EMPTY, meta);
+        } else if(child.kind != Data.ATTR) {
+          leaf = false;
+        }
       }
-    }
-    // an element without a text node child has an empty string value
-    if(empty != 0 && kind == Data.ELEM) elemNames.createStats(name).add(Token.EMPTY, meta);
-    // reset flag: empty values are only to be added once
-    empty = 0;
+      // an element without a text node child has an empty string value
+      if(node.empty != 0 && node.kind == Data.ELEM) {
+        elemNames.createStats(node.name).add(Token.EMPTY, meta);
+      }
+      // reset flag: empty values are only to be added once
+      node.empty = 0;
 
-    stats.setLeaf(leaf);
-    for(final PathNode child : children) child.finish(meta, elemNames);
+      node.stats.setLeaf(leaf);
+      for(final PathNode child : node.children) stack.add(child);
+    }
   }
 
   /**
@@ -154,35 +189,56 @@ public final class PathNode {
    * @throws IOException I/O exception
    */
   void write(final DataOutput out) throws IOException {
-    out.writeNum(name);
-    out.write1(kind);
-    // legacy (required before version 7.1)
-    out.writeNum(0);
-    out.writeNum(children.length);
-    // legacy (required before version 7.1)
-    out.writeDouble(1);
+    // iterative traversal: the depth of the path index is not limited
+    final ArrayList<PathNode> stack = new ArrayList<>();
+    stack.add(this);
+    while(!stack.isEmpty()) {
+      final PathNode node = stack.remove(stack.size() - 1);
+      out.writeNum(node.name);
+      out.write1(node.kind);
+      // legacy (required before version 7.1)
+      out.writeNum(0);
+      out.writeNum(node.children.length);
+      // legacy (required before version 7.1)
+      out.writeDouble(1);
 
-    stats.write(out);
-    for(final PathNode child : children) child.write(out);
+      node.stats.write(out);
+      // add the children in reverse order: they are written from left to right
+      for(int c = node.children.length - 1; c >= 0; c--) stack.add(node.children[c]);
+    }
   }
 
   /**
-   * Recursively adds the node and its descendants to the specified list.
+   * Adds the node and its descendants to the specified list.
    * @param nodes node list
    */
   void addDesc(final ArrayList<PathNode> nodes) {
-    nodes.add(this);
-    for(final PathNode child : children) child.addDesc(nodes);
+    // iterative traversal: the depth of the path index is not limited
+    final ArrayList<PathNode> stack = new ArrayList<>();
+    stack.add(this);
+    while(!stack.isEmpty()) {
+      final PathNode node = stack.remove(stack.size() - 1);
+      nodes.add(node);
+      // add the children in reverse order: the nodes are returned in document order
+      for(int c = node.children.length - 1; c >= 0; c--) stack.add(node.children[c]);
+    }
   }
 
   /**
-   * Recursively adds the node and its descendants to the specified list with the specified name.
+   * Adds the node and its descendants with the specified name to the specified list.
    * @param nodes node list
    * @param nm name ID
    */
   void addDesc(final ArrayList<PathNode> nodes, final int nm) {
-    if(kind == Data.ELEM && nm == name) nodes.add(this);
-    for(final PathNode child : children) child.addDesc(nodes, nm);
+    // iterative traversal: the depth of the path index is not limited
+    final ArrayList<PathNode> stack = new ArrayList<>();
+    stack.add(this);
+    while(!stack.isEmpty()) {
+      final PathNode node = stack.remove(stack.size() - 1);
+      if(node.kind == Data.ELEM && nm == node.name) nodes.add(node);
+      // add the children in reverse order: the nodes are returned in document order
+      for(int c = node.children.length - 1; c >= 0; c--) stack.add(node.children[c]);
+    }
   }
 
   /**

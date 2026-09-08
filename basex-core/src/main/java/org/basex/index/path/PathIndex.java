@@ -55,7 +55,7 @@ public final class PathIndex implements Index {
    * @throws IOException I/O exception
    */
   public PathIndex(final Data data, final DataInput in) throws IOException {
-    root = in.readBool() ? new PathNode(in, null) : new PathNode();
+    root = in.readBool() ? PathNode.read(in) : new PathNode();
     this.data = data;
   }
 

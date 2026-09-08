@@ -12,7 +12,9 @@ public interface DataText {
   // META DATA ====================================================================================
 
   /** Database version; older version cannot open these instances. */
-  String STORAGE = "9.0.1";
+  String STORAGE = "13.0";
+  /** Database version that is written if no compressed namespaces are stored. */
+  String OLDSTORAGE = "9.0.1";
   /** Index version; older version cannot open indexes of these instances. */
   String ISTORAGE = "8.6";
 
@@ -93,8 +95,10 @@ public interface DataText {
   String DBATTS = "ATTS";
   /** Path index. */
   String DBPATH = "PATH";
-  /** Namespace. */
+  /** Namespaces (created before version 13). */
   String DBNS = "NS";
+  /** Compressed namespaces. */
+  String DBNSC = "NSC";
 
   // DATABASE FILES ===============================================================================
 
@@ -118,6 +122,8 @@ public interface DataText {
   String DATAUPD = "upd";
   /** Database - Document path index. */
   String DATAPTH = "pth";
+  /** Database - Namespace leaf entries. */
+  String DATANSP = "nsp";
   /** Database - ID-PRE mapping. */
   String DATAIDP = "idp";
 

@@ -532,10 +532,11 @@ public final class MetaData {
   /**
    * Writes the metadata to the specified output stream.
    * @param out output stream
+   * @param storage database version
    * @throws IOException I/O Exception
    */
-  void write(final DataOutput out) throws IOException {
-    writeInfo(out, DBSTR,      STORAGE);
+  void write(final DataOutput out, final String storage) throws IOException {
+    writeInfo(out, DBSTR,      storage);
     writeInfo(out, DBFNAME,    original);
     writeInfo(out, DBTIME,     time);
     writeInfo(out, IDBSTR,     ISTORAGE);
