@@ -95,14 +95,6 @@ final class TextIterator {
   }
 
   /**
-   * Returns the current string.
-   * @return string
-   */
-  String currString() {
-    return posEnd <= length ? string(text, pos, posEnd - pos) : "";
-  }
-
-  /**
    * Returns the current character.
    * @return current character
    */

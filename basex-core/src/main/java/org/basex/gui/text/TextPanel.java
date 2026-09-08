@@ -177,7 +177,7 @@ public class TextPanel extends BaseXPanel {
     }
     new BaseXPopup(this, cmds.toArray(GUICommand[]::new));
 
-    caretTimer = new Timer(500, e -> rend.caret(!rend.caret()));
+    caretTimer = new Timer(500, e -> rend.blink());
   }
 
   /**

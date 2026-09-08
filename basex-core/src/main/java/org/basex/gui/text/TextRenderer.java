@@ -36,8 +36,6 @@ final class TextRenderer extends BaseXBack {
   private TextFont font;
   /** Font height. */
   private int fontHeight;
-  /** Width of current string. */
-  private int stringWidth;
   /** Show invisible characters. */
   private boolean showInvisible;
   /** Show newlines. */
@@ -52,6 +50,8 @@ final class TextRenderer extends BaseXBack {
   private boolean markline;
   /** Antialiasing type. */
   private String antiAlias;
+  /** Area to be repainted. */
+  private Rectangle clip = new Rectangle();
 
   /** Border offset. */
   private int offset;
@@ -59,31 +59,8 @@ final class TextRenderer extends BaseXBack {
   private int width;
   /** Height of total text area. */
   private int height;
-
-  /** x position at the beginning of a row. */
-  private int startX;
-  /** Current x position. */
-  private int x;
-  /** Current y position. */
-  private int y;
-  /** Current y position of rendered line. */
-  private int lineY;
-  /** Current x position of the row that was left by the last line break. */
-  private int rowX;
-  /** Current y position of the row that was left by the last line break. */
-  private int rowY;
-  /** Current y position of the rendered line that was left by the last line break. */
-  private int rowLineY;
-  /** Indicates if the current token was moved to a new row. */
-  private boolean wrapped;
   /** Indicates if the last scan stopped at the end of a row. */
   private boolean rowEnd;
-  /** Current line number. */
-  private int line;
-  /** Start of the line with the cursor ({@code -1}: not computed yet). */
-  private int caretStart;
-  /** End of the line with the cursor. */
-  private int caretEnd;
 
   /** Line-offset cache (maps document-space y or text position to a line). */
   private final TextLineCache cache = new TextLineCache();
@@ -94,10 +71,6 @@ final class TextRenderer extends BaseXBack {
   private Syntax syntax = Syntax.SIMPLE;
   /** Visibility of text cursor. */
   private boolean caret;
-  /** Color highlighting flag. */
-  private boolean markNext;
-  /** Indicates if the current token is part of a link. */
-  private boolean link;
 
   /**
    * Constructor.
@@ -126,6 +99,8 @@ final class TextRenderer extends BaseXBack {
     if(opts == null) return;
     cache.reset();
 
+    // the font and its caches are reused until the font or the indentation changes
+    font = new TextFont(f, opts.indent(), this);
     // text that cannot be edited is always wrapped: it has no horizontal scrolling
     wrap = !edit || opts.get(GUIOptions.WORDWRAP);
     if(wrap) hscroll.pos(0);
@@ -143,26 +118,30 @@ final class TextRenderer extends BaseXBack {
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
     BaseXLayout.antiAlias(g, antiAlias);
+    // rows outside the requested area are laid out, but not drawn
+    final Rectangle bounds = g.getClipBounds();
+    clip = bounds != null ? bounds : new Rectangle(getWidth(), getHeight());
 
     parentheses.reset();
-    final TextIterator iter = init(g, false);
+    final Layout layout = init(true, false);
+    final TextIterator iter = layout.iter;
     clipText(g);
-    skip(iter);
-    int oldL = line - 1;
-    while(more(iter, g) && y < height) {
-      if(line != oldL && y >= 0) {
-        drawLineNumber(g);
-        oldL = line;
+    skip(layout);
+    int oldL = layout.line - 1;
+    while(more(layout) && layout.y < height) {
+      if(layout.line != oldL && layout.y >= 0) {
+        drawLineNumber(layout, g);
+        oldL = layout.line;
       }
-      write(iter, g);
+      write(layout, g);
     }
-    if(rowStart()) markLine(iter, g);
-    if(line != oldL) drawLineNumber(g);
+    if(rowStart(layout)) markLine(layout, g);
+    if(layout.line != oldL) drawLineNumber(layout, g);
 
-    stringWidth = 0;
+    layout.stringWidth = 0;
     final int s = iter.pos();
-    if(caret && s == iter.caret()) drawCaret(g, x, lineY);
-    if(s == iter.errorPos()) drawError(g);
+    if(caret && s == iter.caret()) drawCaret(g, layout.x, layout.lineY);
+    if(s == iter.errorPos()) drawError(layout, g);
 
     clipAll(g);
     drawLinesSep(g);
@@ -173,16 +152,25 @@ final class TextRenderer extends BaseXBack {
    * @param g graphics reference
    */
   private void clipText(final Graphics g) {
-    final int cx = Math.max(0, sepX() + 1);
-    g.setClip(cx, 0, getWidth() - cx, getHeight());
+    clipAll(g);
+    g.clipRect(Math.max(0, sepX() + 1), 0, getWidth(), getHeight());
   }
 
   /**
-   * Extends the graphics to the whole panel, including the line numbers.
+   * Extends the graphics to the area that was requested to be repainted.
    * @param g graphics reference
    */
   private void clipAll(final Graphics g) {
-    g.setClip(0, 0, getWidth(), getHeight());
+    g.setClip(clip);
+  }
+
+  /**
+   * Indicates if the current row intersects the area to be repainted.
+   * @param layout layout
+   * @return result of check
+   */
+  private boolean rowVisible(final Layout layout) {
+    return layout.lineY < clip.y + clip.height && layout.lineY + fontHeight > clip.y;
   }
 
   /**
@@ -195,22 +183,24 @@ final class TextRenderer extends BaseXBack {
 
   /**
    * Indicates if the current position is at the beginning of a row.
+   * @param layout layout
    * @return result of check
    */
-  private boolean rowStart() {
-    return x == startX;
+  private boolean rowStart(final Layout layout) {
+    return layout.x == layout.startX;
   }
 
   /**
    * Renders the current line number.
+   * @param layout layout
    * @param g graphics reference
    */
-  private void drawLineNumber(final Graphics g) {
-    if(showLines) {
+  private void drawLineNumber(final Layout layout, final Graphics g) {
+    if(showLines && rowVisible(layout)) {
       g.setColor(GUIConstants.gray);
-      final String string = Integer.toString(line);
+      final String string = Integer.toString(layout.line);
       clipAll(g);
-      font.draw(g, string, offset - font.stringWidth(string) - (OFFSET << 1), y);
+      font.draw(g, string, offset - font.stringWidth(string) - (OFFSET << 1), layout.y);
       clipText(g);
     }
   }
@@ -275,12 +265,11 @@ final class TextRenderer extends BaseXBack {
     final int pos = text.jump(dir, select);
     if(pos == -1) return -1;
 
-    final Graphics g = getGraphics();
-    final TextIterator iter = init(g, true);
+    final Layout layout = init(renderable(), true);
     final int idx = lineIndex(pos);
-    if(idx >= 0) position(iter, idx, 0);
-    for(; more(iter, g) && iter.pos() < pos; next(iter));
-    return y;
+    if(idx >= 0) position(layout, idx, 0);
+    for(; more(layout) && layout.iter.pos() < pos; next(layout));
+    return layout.y;
   }
 
   /**
@@ -312,41 +301,50 @@ final class TextRenderer extends BaseXBack {
 
   @Override
   public Dimension getPreferredSize() {
+    final int pad = Math.max(OFFSET, font.charWidth(' '));
+    // the line cache holds the size of the rendered text (wrapped text: only its height)
+    if(!wrap && cache.valid(text.size(), cacheWidth())) {
+      return new Dimension(offset + cache.maxWidth() + pad, cache.endY() + fontHeight);
+    }
+
     // calculate size required for the currently rendered text
-    final Graphics g = getGraphics();
+    final int w = width, h = height;
     width = Integer.MAX_VALUE;
     height = Integer.MAX_VALUE;
-    int maxX = 0;
-    for(final TextIterator iter = init(g, true); more(iter, g); next(iter)) {
-      if(iter.curr() == TokenBuilder.NLINE) maxX = Math.max(x, maxX);
+    try {
+      int maxX = 0;
+      final Layout layout = init(renderable(), true);
+      for(; more(layout); next(layout)) {
+        if(layout.iter.curr() == TokenBuilder.NLINE) maxX = Math.max(layout.x, maxX);
+      }
+      return new Dimension(Math.max(layout.x, maxX) + pad, layout.y + fontHeight);
+    } finally {
+      // the dimensions of the panel must not be invalidated by the calculation
+      width = w;
+      height = h;
     }
-    return new Dimension(Math.max(x, maxX) + Math.max(OFFSET, font.charWidth(' ')), y + fontHeight);
   }
 
   /**
    * Initializes the renderer.
-   * @param g graphics reference (can be {@code null})
+   * @param render indicates if the text can be laid out
    * @param start start at beginning of text or at current scroll position
-   * @return text iterator
+   * @return layout
    */
-  private TextIterator init(final Graphics g, final boolean start) {
-    font = new TextFont(getFont(), opts.indent(), this);
+  private Layout init(final boolean render, final boolean start) {
     setStyle(Font.PLAIN);
     syntax.init(GUIConstants.textColor);
 
     offset = OFFSET;
-    if(g != null && showLines) {
+    if(render && showLines) {
       offset += font.stringWidth(Integer.toString(text.lines())) + (OFFSET << 1);
     }
-    startX = offset - (start ? 0 : hscroll.pos());
-    x = startX;
-    y = fontHeight - (start ? 0 : scroll.pos()) - 2;
-    lineY = y - (fontHeight << 2) / 5;
-    line = 1;
-    link = false;
-    caretStart = -1;
-
-    return new TextIterator(text);
+    final Layout layout = new Layout(new TextIterator(text), render);
+    layout.startX = offset - (start ? 0 : hscroll.pos());
+    layout.x = layout.startX;
+    layout.y = fontHeight - (start ? 0 : scroll.pos()) - 2;
+    layout.lineY = layout.y - (fontHeight << 2) / 5;
+    return layout;
   }
 
   /**
@@ -362,57 +360,57 @@ final class TextRenderer extends BaseXBack {
       return;
     }
 
-    // no graphics reference: the layout cannot be computed, and the cache must not be updated
-    final Graphics g = getGraphics();
-    if(g == null) return;
+    // text that cannot be laid out: the cache must not be updated
+    if(!renderable()) return;
 
     final byte[] txt = text.text();
-    final TextIterator iter = init(g, true);
+    final Layout layout = init(true, true);
+    final TextIterator iter = layout.iter;
     // try to resume from the edited line
     final int r0 = cache.beginUpdate(txt, cacheWidth(), offset);
     int endY;
     if(r0 < 0) {
       cache.reset();
-      cache.add(y, 0, syntax.state());
-      while(more(iter, g)) {
+      cache.add(layout.y, 0, syntax.state());
+      while(more(layout)) {
         // advance the highlighter state so it can be restored when rendering resumes mid-document
         syntax.getColor(iter);
-        if(next(iter)) {
+        if(next(layout)) {
           // the line that was left behind ends at the remembered row position
-          cache.lineWidth(rowX - offset);
-          cache.add(y, iter.posEnd(), syntax.state());
+          cache.lineWidth(layout.rowX - offset);
+          cache.add(layout.y, iter.posEnd(), syntax.state());
         }
       }
-      cache.lineWidth(x - offset);
-      endY = y;
+      cache.lineWidth(layout.x - offset);
+      endY = layout.y;
     } else {
       // resume at the first changed line
       final int sp = cache.startPos();
       final int[] st = cache.startState();
-      y = cache.startY();
-      lineY = y - (fontHeight << 2) / 5;
-      line = r0 + 1;
+      layout.y = cache.startY();
+      layout.lineY = layout.y - (fontHeight << 2) / 5;
+      layout.line = r0 + 1;
       iter.pos(sp);
       iter.posEnd(sp);
       syntax.state(st);
-      cache.add(y, sp, st);
+      cache.add(layout.y, sp, st);
 
       endY = -1;
-      while(more(iter, g)) {
+      while(more(layout)) {
         syntax.getColor(iter);
-        if(next(iter)) {
+        if(next(layout)) {
           final int p = iter.posEnd();
           final int[] state = syntax.state();
-          cache.lineWidth(rowX - offset);
+          cache.lineWidth(layout.rowX - offset);
           // stop as soon as the layout re-converges with the unchanged tail
-          if(cache.splice(p, y, state)) { endY = cache.endY(); break; }
-          cache.add(y, p, state);
+          if(cache.splice(p, layout.y, state)) { endY = cache.endY(); break; }
+          cache.add(layout.y, p, state);
         }
       }
       // no convergence: the edit reached the end of the document
       if(endY < 0) {
-        cache.lineWidth(x - offset);
-        endY = y;
+        cache.lineWidth(layout.x - offset);
+        endY = layout.y;
       }
     }
     cache.finish(txt, cacheWidth(), offset, endY);
@@ -483,16 +481,16 @@ final class TextRenderer extends BaseXBack {
   /**
    * Positions the iterator at the first text line at or above the viewport, using the
    * line-offset cache, so only the visible region is rendered.
-   * @param iter text iterator
+   * @param layout layout
    */
-  private void skip(final TextIterator iter) {
+  private void skip(final Layout layout) {
     if(!cache.positionable(cacheWidth())) return;
     final int top = scroll.pos();
     final int idx = cache.indexByY(top);
     final int p = cache.pos(idx);
     // trust a stale cache only if the pending edit (at the caret) is not above this line
-    if(p > iter.caret() && !cache.valid(text.size(), cacheWidth())) return;
-    position(iter, idx, -top);
+    if(p > layout.iter.caret() && !cache.valid(text.size(), cacheWidth())) return;
+    position(layout, idx, -top);
     // restore the highlighter state captured for this line so colors resume correctly
     syntax.state(cache.state(idx));
   }
@@ -508,19 +506,19 @@ final class TextRenderer extends BaseXBack {
   }
 
   /**
-   * Positions the iterator and renderer at the start of the specified cached line.
-   * @param iter text iterator
+   * Positions the iterator and the layout at the start of the specified cached line.
+   * @param layout layout
    * @param idx cached line index
    * @param dy vertical offset added to the line's document-space y (e.g. {@code -scroll})
    */
-  private void position(final TextIterator iter, final int idx, final int dy) {
-    line = idx + 1;
-    y = cache.y(idx) + dy;
-    lineY = y - (fontHeight << 2) / 5;
-    x = startX;
+  private void position(final Layout layout, final int idx, final int dy) {
+    layout.line = idx + 1;
+    layout.y = cache.y(idx) + dy;
+    layout.lineY = layout.y - (fontHeight << 2) / 5;
+    layout.x = layout.startX;
     final int p = cache.pos(idx);
-    iter.pos(p);
-    iter.posEnd(p);
+    layout.iter.pos(p);
+    layout.iter.posEnd(p);
   }
 
   /**
@@ -547,10 +545,9 @@ final class TextRenderer extends BaseXBack {
    * @return new position
    */
   int cursorY() {
-    final Graphics g = getGraphics();
-    final TextIterator iter = init(g, true);
-    toCaretRow(iter, g);
-    return y - fontHeight;
+    final Layout layout = init(renderable(), true);
+    toCaretRow(layout);
+    return layout.y - fontHeight;
   }
 
   /**
@@ -558,41 +555,40 @@ final class TextRenderer extends BaseXBack {
    * @return position, relative to the text panel, or {@code -1} if the text has not been rendered
    */
   int cursorBottom() {
-    final Graphics g = getGraphics();
-    if(caretIter(g) == null) return -1;
-    return lineY + fontHeight - scroll.pos();
+    final Layout layout = caretLayout();
+    return layout == null ? -1 : layout.lineY + fontHeight - scroll.pos();
   }
 
   /**
    * Moves the iterator to the rendered row with the caret.
-   * @param iter text iterator
-   * @param g graphics reference (can be {@code null})
+   * @param layout layout
    */
-  private void toCaretRow(final TextIterator iter, final Graphics g) {
+  private void toCaretRow(final Layout layout) {
+    final TextIterator iter = layout.iter;
     final int idx = lineIndex(iter.caret());
-    if(idx >= 0) position(iter, idx, 0);
-    for(; more(iter, g) && !iter.edited(); next(iter));
+    if(idx >= 0) position(layout, idx, 0);
+    for(; more(layout) && !iter.edited(); next(layout));
     // the caret is rendered at the end of the previous row: adopt that row
-    if(atRowEnd(iter)) {
-      x = rowX;
-      y = rowY;
-      lineY = rowLineY;
+    if(atRowEnd(layout)) {
+      layout.x = layout.rowX;
+      layout.y = layout.rowY;
+      layout.lineY = layout.rowLineY;
     }
   }
 
   /**
    * Checks if the text has more words to print.
-   * @param iter iterator
-   * @param g graphics reference (can be {@code null})
+   * @param layout layout
    * @return {@code true}} if more strings exist
    */
-  private boolean more(final TextIterator iter, final Graphics g) {
-    wrapped = false;
-    // no valid graphics reference, no more words found: quit
+  private boolean more(final Layout layout) {
+    final TextIterator iter = layout.iter;
+    layout.wrapped = false;
+    // text that cannot be laid out, no more words found: quit
     final int w = width, maxWidth = w - offset;
-    if(g == null || maxWidth <= 0 || !iter.moreStrings(w >> 2)) return false;
+    if(!layout.renderable || maxWidth <= 0 || !iter.moreStrings(w >> 2)) return false;
 
-    final int oldY = y;
+    final int oldY = layout.y;
     int sw = 0;
 
     final int cp = iter.curr();
@@ -601,12 +597,12 @@ final class TextRenderer extends BaseXBack {
     } else if(cp == TokenBuilder.NORM) {
       setStyle(Font.PLAIN);
     } else if(cp == TokenBuilder.ULINE) {
-      link ^= true;
+      layout.link ^= true;
     } else {
       // compute string width, shorten if it exceeds panel width
       sw = font.stringWidth(iter.text(), iter.pos(), iter.posEnd());
       if(wrap && sw > maxWidth) {
-        if(!rowStart()) newline(true);
+        if(!rowStart(layout)) newline(layout, true);
 
         // keep the longest prefix of the token that fits into the row
         final byte[] txt = iter.text();
@@ -623,98 +619,104 @@ final class TextRenderer extends BaseXBack {
       }
     }
     // no space left: move current string into next line
-    if(wrap && sw < maxWidth && sw > w - x) newline(true);
+    if(wrap && sw < maxWidth && sw > w - layout.x) newline(layout, true);
 
-    wrapped = y != oldY;
-    stringWidth = sw;
+    layout.wrapped = layout.y != oldY;
+    layout.stringWidth = sw;
     return true;
   }
 
   /**
    * Jumps to the next line.
+   * @param layout layout
    * @param full add full line height
    */
-  private void newline(final boolean full) {
+  private void newline(final Layout layout, final boolean full) {
     final int h = fontHeight >> (full ? 0 : 1);
     // remember the end of the row that is left behind
-    rowX = x;
-    rowY = y;
-    rowLineY = lineY;
-    x = startX;
-    y += h;
-    lineY += h;
+    layout.rowX = layout.x;
+    layout.rowY = layout.y;
+    layout.rowLineY = layout.lineY;
+    layout.x = layout.startX;
+    layout.y += h;
+    layout.lineY += h;
   }
 
   /**
    * Marks the current line if it contains the cursor.
-   * @param iter iterator
+   * @param layout layout
    * @param g graphics reference
    */
-  private void markLine(final TextIterator iter, final Graphics g) {
+  private void markLine(final Layout layout, final Graphics g) {
     if(!markline) return;
-    if(caretStart == -1) {
+    final TextIterator iter = layout.iter;
+    if(layout.caretStart == -1) {
       // locate the boundaries of the line with the cursor
       final byte[] txt = iter.text();
       final int tl = txt.length;
       int s = iter.caret(), e = s;
       while(s > 0 && txt[s - 1] != '\n') s--;
       while(e < tl && txt[e] != '\n') e++;
-      caretStart = s;
-      caretEnd = e;
+      layout.caretStart = s;
+      layout.caretEnd = e;
     }
     final int pos = iter.pos();
-    if(pos >= caretStart && pos <= caretEnd) {
+    if(pos >= layout.caretStart && pos <= layout.caretEnd) {
       g.setColor(GUIConstants.color3A);
       clipAll(g);
-      g.fillRect(0, lineY, getWidth(), fontHeight);
+      g.fillRect(0, layout.lineY, getWidth(), fontHeight);
       clipText(g);
     }
   }
 
   /**
    * Marks the current line as erroneous.
+   * @param layout layout
    * @param g graphics reference
    */
-  private void markErrorLine(final Graphics g) {
+  private void markErrorLine(final Layout layout, final Graphics g) {
     g.setColor(GUIConstants.colormark2A);
     clipAll(g);
-    g.fillRect(0, lineY, sepX(), fontHeight);
+    g.fillRect(0, layout.lineY, sepX(), fontHeight);
     clipText(g);
   }
 
   /**
    * Finishes the current token.
-   * @param iter iterator
+   * @param layout layout
    * @return new line
    */
-  private boolean next(final TextIterator iter) {
-    final int ch = iter.curr();
+  private boolean next(final Layout layout) {
+    final int ch = layout.iter.curr();
     if(ch == TokenBuilder.NLINE || ch == TokenBuilder.HLINE) {
-      newline(ch == TokenBuilder.NLINE);
-      line++;
+      newline(layout, ch == TokenBuilder.NLINE);
+      layout.line++;
       return true;
     }
-    x += stringWidth;
+    layout.x += layout.stringWidth;
     return false;
   }
 
   /**
    * Writes the current string to the graphics reference.
-   * @param iter iterator
+   * @param layout layout
    * @param g graphics reference
    */
-  private void write(final TextIterator iter, final Graphics g) {
-    if(rowStart()) markLine(iter, g);
+  private void write(final Layout layout, final Graphics g) {
+    final TextIterator iter = layout.iter;
+    if(rowStart(layout)) markLine(layout, g);
 
     // advance the highlighter, and choose color for enabled text, depending on highlighting or link
     final Color syntaxColor = syntax.getColor(iter);
-    final Color color = isEnabled() ? markNext ? GUIConstants.green : link ?
+    final Color color = isEnabled() ? layout.markNext ? GUIConstants.green : layout.link ?
       GUIConstants.color4 : syntaxColor : GUIConstants.gray;
     final int cp = iter.curr();
-    markNext = cp == TokenBuilder.MARK;
+    layout.markNext = cp == TokenBuilder.MARK;
 
     // retrieve first character of current token
     final int pos = iter.pos(), cpos = iter.caret();
+    // position of the current token: it is advanced by the finishing step
+    final int x = layout.x, y = layout.y, lineY = layout.lineY, sw = layout.stringWidth;
 
     // pair brackets in editable code, but not in strings, comments or element content
     final boolean code = edit && (syntax.codeBefore() || syntax.codeAfter());
@@ -736,16 +738,16 @@ final class TextRenderer extends BaseXBack {
     }
 
     // check if text is visible
-    if(y > 0 && x <= width && x + stringWidth >= offset) {
+    if(y > 0 && rowVisible(layout) && x <= width && x + sw >= offset) {
       // mark repeated, selected and found text
       if(edit) {
-        for(final int[] oc : iter.occurrences()) mark(oc, iter, g, GUIConstants.color3A);
+        for(final int[] oc : iter.occurrences()) mark(oc, layout, g, GUIConstants.color3A);
       }
-      mark(iter.selection(), iter, g, GUIConstants.color2A);
-      for(final int[] sr : iter.searchResults()) mark(sr, iter, g, GUIConstants.color2A);
+      mark(iter.selection(), layout, g, GUIConstants.color2A);
+      for(final int[] sr : iter.searchResults()) mark(sr, layout, g, GUIConstants.color2A);
 
       // retrieve first character of current token
-      if(iter.error()) drawError(g);
+      if(iter.error()) drawError(layout, g);
 
       if(showNL && cp == TokenBuilder.NLINE) {
         // draw newline character
@@ -768,52 +770,55 @@ final class TextRenderer extends BaseXBack {
           // draw whitespace character
           final int s = fontHeight / 12 + 1;
           g.setColor(GUIConstants.gray);
-          g.fillRect(x + (stringWidth >> 1), y - fontHeight * 3 / 10, s, s);
+          g.fillRect(x + (sw >> 1), y - fontHeight * 3 / 10, s, s);
         } else {
           // draw non-whitespace string
           g.setColor(color);
-          font.draw(g, iter.currString(), x, y);
+          font.draw(g, iter.text(), pos, iter.posEnd(), x, y);
         }
       }
       // underline linked text
-      if(link) g.drawLine(x, y + 1, x + stringWidth, y + 1);
+      if(layout.link) g.drawLine(x, y + 1, x + sw, y + 1);
       // show cursor: a wrapped token shares its first position with the end of the previous row
       if(caret && iter.edited()) {
-        if(atRowEnd(iter)) drawCaret(g, rowX, rowLineY);
+        if(atRowEnd(layout)) drawCaret(g, layout.rowX, layout.rowLineY);
         else drawCaret(g, x + font.stringWidth(iter.text(), pos, cpos), lineY);
       }
     }
 
     // finish step
-    next(iter);
+    next(layout);
   }
 
   /**
    * Highlights text.
    * @param range start/end of mark (can be {@code null})
-   * @param iter iterator
+   * @param layout layout
    * @param g graphics reference
    * @param color color of the highlighting
    */
-  private void mark(final int[] range, final TextIterator iter, final Graphics g,
+  private void mark(final int[] range, final Layout layout, final Graphics g,
       final Color color) {
     if(range != null) {
+      final TextIterator iter = layout.iter;
       final int pos = iter.pos(), posEnd = iter.posEnd();
       final int ss = Math.max(pos, range[0]), se = Math.min(posEnd, range[1]);
       final int xs = font.stringWidth(iter.text(), pos, ss);
-      final int cw = font.stringWidth(iter.text(), ss, se);
+      final int cw = ss == pos && se == posEnd ? layout.stringWidth :
+        font.stringWidth(iter.text(), ss, se);
       g.setColor(color);
-      g.fillRect(x + xs, lineY, cw, fontHeight);
+      g.fillRect(layout.x + xs, layout.lineY, cw, fontHeight);
     }
   }
 
   /**
    * Indicates if the caret is to be rendered at the end of the previous row.
-   * @param iter text iterator
+   * @param layout layout
    * @return result of check
    */
-  private boolean atRowEnd(final TextIterator iter) {
-    return wrapped && iter.rowEnd() && iter.pos() == iter.caret();
+  private boolean atRowEnd(final Layout layout) {
+    final TextIterator iter = layout.iter;
+    return layout.wrapped && iter.rowEnd() && iter.pos() == iter.caret();
   }
 
   /**
@@ -843,14 +848,16 @@ final class TextRenderer extends BaseXBack {
 
   /**
    * Draws an error marker.
+   * @param layout layout
    * @param g graphics reference
    */
-  private void drawError(final Graphics g) {
-    final int ww = stringWidth == 0 ? font.charWidth(' ') : stringWidth;
+  private void drawError(final Layout layout, final Graphics g) {
+    final int x = layout.x, y = layout.y, sw = layout.stringWidth;
+    final int ww = sw == 0 ? font.charWidth(' ') : sw;
     final int s = Math.max(2, fontHeight / 6);
     g.setColor(GUIConstants.red);
     for(int xp = x; xp < x + ww; xp += 2) g.drawLine(xp - 1, y + 2, xp, y + s + 1);
-    if(edit) markErrorLine(g);
+    if(edit) markErrorLine(layout, g);
   }
 
   /**
@@ -859,29 +866,29 @@ final class TextRenderer extends BaseXBack {
    * @return text iterator
    */
   TextIterator jump(final Point pos) {
-    final Graphics g = getGraphics();
-    final TextIterator iter = init(g, false);
-    scan(iter, g, pos.x, pos.y - fontHeight / 5);
-    iter.link(link);
+    final Layout layout = init(renderable(), false);
+    scan(layout, pos.x, pos.y - fontHeight / 5);
+    final TextIterator iter = layout.iter;
+    iter.link(layout.link);
     return iter;
   }
 
   /**
    * Moves the iterator to the text at the specified coordinates.
-   * @param iter text iterator
-   * @param g graphics reference (can be {@code null})
+   * @param layout layout
    * @param xPos x position
    * @param yPos y position (top of the rendered row)
    */
-  private void scan(final TextIterator iter, final Graphics g, final int xPos, final int yPos) {
-    for(; yPos >= y - fontHeight && more(iter, g); next(iter)) {
+  private void scan(final Layout layout, final int xPos, final int yPos) {
+    final TextIterator iter = layout.iter;
+    for(; yPos >= layout.y - fontHeight && more(layout); next(layout)) {
       // skip row
-      if(yPos >= y) continue;
+      if(yPos >= layout.y) continue;
       // beginning of row
-      if(xPos < x) break;
+      if(xPos < layout.x) break;
       // token found
-      if(xPos < x + stringWidth) {
-        final int p = iter.pos(), sw = xPos - x;
+      if(xPos < layout.x + layout.stringWidth) {
+        final int p = iter.pos(), sw = xPos - layout.x;
         for(int caretP, oldFsw = 0; iter.more();) {
           caretP = iter.pos();
           iter.next();
@@ -896,7 +903,7 @@ final class TextRenderer extends BaseXBack {
       }
     }
     // the scan walked past the target row: its last position is shared with the next row
-    rowEnd = y - fontHeight > yPos;
+    rowEnd = layout.y - fontHeight > yPos;
   }
 
   /**
@@ -907,15 +914,16 @@ final class TextRenderer extends BaseXBack {
    * @return caret and x position, or {@code null} if the text has not been rendered yet
    */
   int[] caretRows(final int count, final int lastX) {
-    final Graphics g = getGraphics();
-    final TextIterator iter = caretIter(g);
-    if(iter == null) return null;
+    final Layout layout = caretLayout();
+    if(layout == null) return null;
 
     // x position of the caret, and top of the target row
+    final TextIterator iter = layout.iter;
     final int cpos = iter.caret();
-    final int xPos = lastX != -1 ? lastX : x + font.stringWidth(iter.text(), iter.pos(), cpos);
-    final int yPos = y - fontHeight + count * fontHeight;
-    return new int[] { scan(g, xPos, yPos).pos(), xPos };
+    final int xPos = lastX != -1 ? lastX :
+      layout.x + font.stringWidth(iter.text(), iter.pos(), cpos);
+    final int yPos = layout.y - fontHeight + count * fontHeight;
+    return new int[] { scan(xPos, yPos).iter.pos(), xPos };
   }
 
   /**
@@ -933,11 +941,11 @@ final class TextRenderer extends BaseXBack {
    */
   void scrollX() {
     if(wrap) return;
-    final Graphics g = getGraphics();
-    final TextIterator iter = caretIter(g);
-    if(iter == null) return;
+    final Layout layout = caretLayout();
+    if(layout == null) return;
     // horizontal position of the cursor in the text (the rendering starts at the left border)
-    final int cx = x + font.stringWidth(iter.text(), iter.pos(), iter.caret());
+    final TextIterator iter = layout.iter;
+    final int cx = layout.x + font.stringWidth(iter.text(), iter.pos(), iter.caret());
     hscroll.pos(Math.min(Math.max(hscroll.pos(), cx - width), cx - offset));
   }
 
@@ -947,37 +955,35 @@ final class TextRenderer extends BaseXBack {
    * @return caret position, or {@code -1} if the text has not been rendered yet
    */
   int caretRow(final boolean end) {
-    final Graphics g = getGraphics();
-    if(caretIter(g) == null) return -1;
-    final int yPos = y - fontHeight;
-    return scan(g, end ? Integer.MAX_VALUE : 0, yPos).pos();
+    final Layout layout = caretLayout();
+    if(layout == null) return -1;
+    final int yPos = layout.y - fontHeight;
+    return scan(end ? Integer.MAX_VALUE : 0, yPos).iter.pos();
   }
 
   /**
    * Initializes the renderer and moves the iterator to the rendered row with the caret.
-   * @param g graphics reference (can be {@code null})
-   * @return text iterator, or {@code null} if the text has not been rendered yet
+   * @return layout, or {@code null} if the text has not been rendered yet
    */
-  private TextIterator caretIter(final Graphics g) {
-    if(g == null) return null;
-    final TextIterator iter = init(g, true);
+  private Layout caretLayout() {
+    if(!renderable()) return null;
+    final Layout layout = init(true, true);
     if(width - offset <= 0) return null;
-    toCaretRow(iter, g);
-    return iter;
+    toCaretRow(layout);
+    return layout;
   }
 
   /**
    * Initializes the renderer and moves the iterator to the text at the specified coordinates.
-   * @param g graphics reference
    * @param xPos x position
    * @param yPos y position (top of the rendered row)
-   * @return text iterator
+   * @return layout
    */
-  private TextIterator scan(final Graphics g, final int xPos, final int yPos) {
-    final TextIterator iter = init(g, true);
-    if(cache.valid(text.size(), cacheWidth())) position(iter, cache.indexByY(yPos), 0);
-    scan(iter, g, xPos, yPos);
-    return iter;
+  private Layout scan(final int xPos, final int yPos) {
+    final Layout layout = init(true, true);
+    if(cache.valid(text.size(), cacheWidth())) position(layout, cache.indexByY(yPos), 0);
+    scan(layout, xPos, yPos);
+    return layout;
   }
 
   /**
@@ -986,6 +992,17 @@ final class TextRenderer extends BaseXBack {
    */
   boolean rowEnd() {
     return rowEnd;
+  }
+
+  /**
+   * Checks if the text can be laid out, i.e. if the panel provides a graphics reference.
+   * @return result of check
+   */
+  private boolean renderable() {
+    final Graphics g = getGraphics();
+    if(g == null) return false;
+    g.dispose();
+    return true;
   }
 
   /**
@@ -1006,11 +1023,12 @@ final class TextRenderer extends BaseXBack {
   }
 
   /**
-   * Returns the cursor flag.
-   * @return cursor flag
+   * Toggles the visibility of the text cursor.
    */
-  boolean caret() {
-    return caret;
+  void blink() {
+    caret ^= true;
+    // the cursor is repainted at the position it was last rendered at
+    repaint(cursor[0], cursor[1] - fontHeight, 2, fontHeight);
   }
 
   /**
@@ -1028,5 +1046,51 @@ final class TextRenderer extends BaseXBack {
    */
   Syntax syntax() {
     return syntax;
+  }
+
+  /** Position and state of a single traversal of the text. */
+  private static final class Layout {
+    /** Text iterator. */
+    private final TextIterator iter;
+    /** Indicates if the text can be laid out. */
+    private final boolean renderable;
+    /** x position at the beginning of a row. */
+    private int startX;
+    /** Current x position. */
+    private int x;
+    /** Current y position. */
+    private int y;
+    /** Current y position of rendered line. */
+    private int lineY;
+    /** Current x position of the row that was left by the last line break. */
+    private int rowX;
+    /** Current y position of the row that was left by the last line break. */
+    private int rowY;
+    /** Current y position of the rendered line that was left by the last line break. */
+    private int rowLineY;
+    /** Indicates if the current token was moved to a new row. */
+    private boolean wrapped;
+    /** Current line number. */
+    private int line = 1;
+    /** Width of current string. */
+    private int stringWidth;
+    /** Indicates if the current token is part of a link. */
+    private boolean link;
+    /** Color highlighting flag. */
+    private boolean markNext;
+    /** Start of the line with the cursor ({@code -1}: not computed yet). */
+    private int caretStart = -1;
+    /** End of the line with the cursor. */
+    private int caretEnd;
+
+    /**
+     * Constructor.
+     * @param iter text iterator
+     * @param renderable indicates if the text can be laid out
+     */
+    private Layout(final TextIterator iter, final boolean renderable) {
+      this.iter = iter;
+      this.renderable = renderable;
+    }
   }
 }

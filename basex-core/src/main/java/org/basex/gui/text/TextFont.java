@@ -32,10 +32,10 @@ final class TextFont {
 
   /** Cached fallback fonts. */
   private final Map<String, FontFamily> fallbacks = new LinkedHashMap<>();
-  /** Cached widths of ASCII characters (plain, bold). */
-  private final int[][] widths = { new int[128], new int[128] };
-  /** Cached font families of ASCII characters (plain, bold). */
-  private final FontFamily[][] families = { new FontFamily[128], new FontFamily[128] };
+  /** Cached character widths and font families (plain, bold). */
+  private final Cache[] caches = { new Cache(), new Cache() };
+  /** Buffer for the characters to be drawn. */
+  private char[] chars = new char[16];
   /** Component. */
   private final JComponent comp;
   /** Font family. */
@@ -129,12 +129,11 @@ final class TextFont {
    * @return width
    */
   int charWidth(final int cp) {
-    if(cp >= 128) return width(cp);
-    final int[] cache = widths[style];
-    int width = cache[cp];
-    if(width == 0) {
+    final Cache cache = caches[style];
+    int width = cache.width(cp);
+    if(width == Integer.MIN_VALUE) {
       width = width(cp);
-      cache[cp] = width;
+      cache.width(cp, width);
     }
     return width;
   }
@@ -158,21 +157,23 @@ final class TextFont {
   }
 
   /**
-   * Checks if a codepoint is a control character with a visible representation.
+   * Checks if a codepoint is a control character that is rendered as a picture.
    * @param cp codepoint
    * @return result of check
    */
   static boolean control(final int cp) {
-    return cp > 0 && cp < ' ' && cp != '\t' && cp != '\n' && cp != '\r';
+    return cp >= 0 && (cp < ' ' && cp != '\t' && cp != '\n' && cp != '\r' ||
+      cp >= 0x7F && cp <= 0x9F);
   }
 
   /**
-   * Returns the control picture for a control character.
+   * Returns the picture for a control character.
    * @param cp codepoint
-   * @return codepoint of the control picture
+   * @return codepoint of the picture
    */
   static int picture(final int cp) {
-    return 0x2400 + cp;
+    // C0 controls have their own pictures, DEL has a symbol, C1 controls have no representation
+    return cp < ' ' ? 0x2400 + cp : cp == 0x7F ? 0x2421 : 0xFFFD;
   }
 
   /**
@@ -186,24 +187,55 @@ final class TextFont {
   }
 
   /**
-   * Draws a string, positioning each character at its computed width.
+   * Draws a string.
    * @param g graphics reference
    * @param string string to draw
    * @param x x position
    * @param y y position
    */
   void draw(final Graphics g, final String string, final int x, final int y) {
-    // a single call would lay out the characters on the device grid: they would drift
-    final char[] chars = string.toCharArray();
-    final int len = chars.length;
+    final int len = string.length();
+    string.getChars(0, len, chars(len), 0);
+    draw(g, len, x, y);
+  }
+
+  /**
+   * Draws a text range.
+   * @param g graphics reference
+   * @param text text
+   * @param start start position
+   * @param end end position
+   * @param x x position
+   * @param y y position
+   */
+  void draw(final Graphics g, final byte[] text, final int start, final int end,
+      final int x, final int y) {
+    int len = 0;
+    for(int p = start; p < end; p += Token.cl(text, p)) {
+      len += Character.toChars(Token.cp(text, p), chars(len + 2), len);
+    }
+    draw(g, len, x, y);
+  }
+
+  /**
+   * Draws the buffered characters, positioning each of them at its computed width.
+   * @param g graphics reference
+   * @param len number of characters
+   * @param x x position
+   * @param y y position
+   */
+  private void draw(final Graphics g, final int len, final int x, final int y) {
+    // the characters cannot be drawn with a single call: it would advance them by the fractional
+    // glyph widths of the font, which drift from the rounded and snapped widths used everywhere
+    final char[] chrs = chars;
     int cx = x;
     Font last = null;
-    for(int i = 0; i < len;) {
-      final int cp = string.codePointAt(i), w = charWidth(cp);
+    for(int c = 0; c < len;) {
+      final int cp = Character.codePointAt(chrs, c, len), w = charWidth(cp);
       // group the base glyph with trailing combining marks, so the font can compose them
-      int end = i + Character.charCount(cp);
+      int end = c + Character.charCount(cp);
       while(end < len) {
-        final int mcp = string.codePointAt(end);
+        final int mcp = Character.codePointAt(chrs, end, len);
         if(!nonspacing(mcp)) break;
         end += Character.charCount(mcp);
       }
@@ -214,11 +246,21 @@ final class TextFont {
           g.setFont(fnt);
           last = fnt;
         }
-        g.drawChars(chars, i, end - i, cx, y);
+        g.drawChars(chrs, c, end - c, cx, y);
       }
       cx += w;
-      i = end;
+      c = end;
     }
+  }
+
+  /**
+   * Returns the character buffer, resized if required.
+   * @param sz required size
+   * @return buffer
+   */
+  private char[] chars(final int sz) {
+    if(chars.length < sz) chars = Arrays.copyOf(chars, Array.newCapacity(sz));
+    return chars;
   }
 
   /**
@@ -227,12 +269,11 @@ final class TextFont {
    * @return font family
    */
   private FontFamily family(final int cp) {
-    if(cp >= 128) return family.font(style).canDisplay(cp) ? family : fallback(cp);
-    final FontFamily[] cache = families[style];
-    FontFamily ff = cache[cp];
+    final Cache cache = caches[style];
+    FontFamily ff = cache.family(cp);
     if(ff == null) {
       ff = family.font(style).canDisplay(cp) ? family : fallback(cp);
-      cache[cp] = ff;
+      cache.family(cp, ff);
     }
     return ff;
   }
@@ -307,6 +348,61 @@ final class TextFont {
    */
   private Font newFont(final String nm) {
     return new Font(nm, PLAIN, size);
+  }
+
+  /** Cached character widths and font families. */
+  private static final class Cache {
+    /** Widths of ASCII characters ({@link Integer#MIN_VALUE}: not cached yet). */
+    private final int[] widths = new int[128];
+    /** Font families of ASCII characters. */
+    private final FontFamily[] families = new FontFamily[128];
+    /** Widths of other characters. */
+    private final IntMap wideWidths = new IntMap();
+    /** Font families of other characters. */
+    private final IntObjectMap<FontFamily> wideFamilies = new IntObjectMap<>();
+
+    /** Constructor. */
+    private Cache() {
+      Arrays.fill(widths, Integer.MIN_VALUE);
+    }
+
+    /**
+     * Returns the cached width of a character.
+     * @param cp codepoint
+     * @return width, or {@link Integer#MIN_VALUE} if it has not been cached yet
+     */
+    private int width(final int cp) {
+      return cp < 128 ? widths[cp] : wideWidths.get(cp);
+    }
+
+    /**
+     * Caches the width of a character.
+     * @param cp codepoint
+     * @param width width
+     */
+    private void width(final int cp, final int width) {
+      if(cp < 128) widths[cp] = width;
+      else wideWidths.put(cp, width);
+    }
+
+    /**
+     * Returns the cached font family of a character.
+     * @param cp codepoint
+     * @return font family, or {@code null} if it has not been cached yet
+     */
+    private FontFamily family(final int cp) {
+      return cp < 128 ? families[cp] : wideFamilies.get(cp);
+    }
+
+    /**
+     * Caches the font family of a character.
+     * @param cp codepoint
+     * @param ff font family
+     */
+    private void family(final int cp, final FontFamily ff) {
+      if(cp < 128) families[cp] = ff;
+      else wideFamilies.put(cp, ff);
+    }
   }
 
   /** Fonts (plain and bold) and metrics. */
