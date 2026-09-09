@@ -1512,6 +1512,22 @@ public final class UpdateTest extends SandboxTest {
     query("declare function local:f() external; delete node <a/>", "");
   }
 
+  /** Namespace nodes as update targets. */
+  @Test public void namespaceTarget() {
+    final String elem = "<a xmlns:p='u'><b/></a>";
+    // namespace nodes are ignored by delete, like nodes without parents
+    query(elem + " update { delete node namespace::p }", "<a xmlns:p=\"u\"><b/></a>");
+    query(elem + " update { delete node (namespace::p, b) }", "<a xmlns:p=\"u\"/>");
+
+    // all other update expressions reject them
+    error(elem + " update { replace node namespace::p with <x/> }", UPTRGNODE_X);
+    error(elem + " update { replace value of node namespace::p with 'v' }", UPTRGNODE_X);
+    error(elem + " update { insert node <x/> before namespace::p }", UPTRGTYP2_X);
+    error(elem + " update { insert node <x/> after namespace::p }", UPTRGTYP2_X);
+    error(elem + " update { insert node <x/> into namespace::p }", UPTRGTYP_X);
+    error(elem + " update { rename node namespace::p as 'q' }", UPWRTRGTYP_X);
+  }
+
   /** Namespace nodes in source sequences. */
   @Test public void namespaceSource() {
     final String ns = "namespace p { 'u' }";

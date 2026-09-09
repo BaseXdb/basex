@@ -800,6 +800,116 @@ public final class PathTest extends SandboxTest {
     query("(" + atts + ")/following-sibling-or-self::node() ! name()", "b\nc");
   }
 
+  /** Namespace axis. */
+  @Test public void namespaceAxis() {
+    final String elem = "<a xmlns:p='u' xmlns:b='v' id='1'><c/></a>";
+    final String let = "let $e := " + elem + " return ";
+
+    // in-scope namespaces, sorted by prefix
+    query(elem + "/namespace::* ! name()", "b\np\nxml");
+    query(elem + "/namespace::p ! string()", "u");
+    query(elem + "/namespace::*:p ! string()", "u");
+    query(elem + "/namespace-node() ! name()", "b\np\nxml");
+    query("<a/>/namespace::* ! string()", "http://www.w3.org/XML/1998/namespace");
+    query(elem + "/c/namespace::* ! name()", "b\np\nxml");
+
+    // node identity, document order and IDs
+    query(let + "$e/namespace::p is $e/namespace::p", "true");
+    query(let + "$e/namespace::p is $e/namespace::b", "false");
+    query(let + "$e/namespace::p is $e/c/namespace::p", "false");
+    query(let + "count($e/namespace::p | $e/namespace::p)", "1");
+    query(let + "$e << $e/namespace::p", "true");
+    query(let + "$e/namespace::p << $e/@id", "true");
+    query(let + "$e/namespace::p << $e/c", "true");
+    query(let + "$e/namespace::b << $e/namespace::p", "true");
+    query(let + "generate-id($e/namespace::p) = generate-id($e/namespace::p)", "true");
+    query(let + "generate-id($e/namespace::p) = generate-id($e/namespace::b)", "false");
+
+    // navigation from namespace nodes
+    query(let + "$e/namespace::p/parent::* is $e", "true");
+    query(let + "root($e/namespace::p) is $e", "true");
+    query(elem + "/namespace::p/following-sibling::node()", "");
+    query(elem + "/namespace::p/preceding-sibling::node()", "");
+    query(elem + "/namespace::p/following::node() ! name()", "c");
+    query(PATH.args(" " + elem + "/namespace::p"),
+        "Q{http://www.w3.org/2005/xpath-functions}root()/namespace::p");
+
+    // steps that never yield results
+    check("<a/>/namespace::element()", "", root(Empty.class));
+    check("<a id='1'/>/@id/namespace::*", "", root(Empty.class));
+    check("text { '' }/namespace::*", "", root(Empty.class));
+    check("document {}/namespace::*", "", root(Empty.class));
+    check("<a/>/namespace::*/parent::document-node()", "", root(Empty.class));
+
+    // dynamic selectors
+    query(elem + "/namespace::{ 'p' } ! string()", "u");
+    query(elem + "/namespace::{ ('b', 'p') } ! string()", "v\nu");
+    query(elem + "/namespace::{ #p } ! string()", "u");
+    query(let + "$e/namespace::{ 'p' } is $e/namespace::p", "true");
+    query("let $p := 'p' return " + elem + "/namespace::{ $p } ! string()", "u");
+
+    // default namespace
+    final String dflt = "<a xmlns='u'><b xmlns=''/></a>";
+    query(dflt + "/namespace::*[not(name())] ! [ local-name(), node-name(), string() ]",
+        "[\"\",(),\"u\"]");
+    query(dflt + "/*:b/namespace::* ! name()", "xml");
+    query(PATH.args(" " + dflt + "/namespace::*[not(name())]"),
+        "Q{http://www.w3.org/2005/xpath-functions}root()/namespace::*"
+        + "[Q{http://www.w3.org/2005/xpath-functions}local-name()=\"\"]");
+    query("declare default element namespace 'x'; " + elem + "/namespace::p ! string()", "u");
+
+    // namespace nodes cannot be serialized
+    error(SERIALIZE.args(" <a/>/namespace::xml"), SERNS_X);
+  }
+
+  /** Namespace axis, database nodes. */
+  @Test public void namespaceAxisDB() {
+    execute(new CreateDB(NAME, "<a xmlns:p='u' xmlns:b='v' id='1'>"
+        + "<c xmlns:q='w'><d/></c><x xmlns='u'><y xmlns=''/></x></a>"));
+
+    query("/a/namespace::* ! name()", "b\np\nxml");
+    query("/a/c/d/namespace::* ! name()", "b\np\nq\nxml");
+    query("/a/*:x/*:y/namespace::* ! name()", "b\np\nxml");
+    query("count(//namespace::*)", 18);
+    query("count(//namespace::p)", 5);
+    query("count(//namespace-node())", 18);
+    query("//namespace::*[1] ! name()", "b\nb\nb\n\nb");
+    query("every $e in //* satisfies deep-equal($e/namespace::* ! name(), "
+        + "sort(in-scope-prefixes($e)))", true);
+
+    // node identity, document order and IDs
+    query("/a/namespace::p is /a/namespace::p", true);
+    query("/a/namespace::p is /a/c/namespace::p", false);
+    query("count(/a/*/../namespace::*)", 3);
+    query("count((/a/namespace::p, /a, /a/namespace::p) | ())", 2);
+    query("/a << /a/namespace::p", true);
+    query("/a/namespace::p << /a/@id", true);
+    query("/a/c/namespace::q << /a/c/d", true);
+    query("/a/namespace::xml << /a/c/namespace::b", true);
+    query("generate-id(/a/namespace::p) = generate-id(/a/namespace::p)", true);
+    query("generate-id(/a/namespace::p) = generate-id(/a/c/namespace::p)", false);
+    query("let $f := <a xmlns:p='u'/>/namespace::p "
+        + "return (/a/namespace::p << $f) ne ($f << /a/namespace::p)", true);
+
+    // navigation from namespace nodes
+    query("/a/c/namespace::q/parent::* is /a/c", true);
+    query("root(/a/c/namespace::q) is /", true);
+    query("/a/c/namespace::q/ancestor::* ! name()", "a\nc");
+    query("/a/namespace::p/following::* ! name()", "c\nd\nx\ny");
+    query("count(/a/c/namespace::q/preceding::node())", 0);
+    query("/a/namespace::{ 'p' } ! string()", "u");
+    query(PATH.args(" /a/c/namespace::q"), "/Q{}a[1]/Q{}c[1]/namespace::q");
+
+    // construction: the binding is copied, the parent is not
+    query("<x>{ /a/namespace::p }</x>", "<x xmlns:p=\"u\"/>");
+    query("count(copy $n := /a/namespace::p modify () return $n/..)", 0);
+
+    // updates: namespace nodes are ignored by delete
+    query("delete node /a/namespace::p");
+    query("/a/namespace::* ! name()", "b\np\nxml");
+    error("rename node /a/namespace::p as 'q'", UPWRTRGTYP_X);
+  }
+
   /** Checks if iterative evaluation is used if no duplicates occur. */
   @Test public void iterativePath() {
     execute(new CreateDB(NAME, "<a id='0' x:id='' x='' xmlns:x='x'><b id='1'/><c id='2'/>"

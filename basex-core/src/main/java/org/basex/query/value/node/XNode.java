@@ -17,6 +17,7 @@ import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
@@ -323,6 +324,25 @@ public abstract class XNode extends GNode {
     return null;
   }
 
+  @Override
+  public final BasicNodeIter namespaceIter(final Test test) {
+    if(kind() != ELEMENT) return BasicNodeIter.EMPTY;
+
+    // in-scope namespaces, sorted by prefix (see #compareNSpace)
+    final Atts atts = nsScope(null);
+    if(!atts.contains(Token.XML)) atts.add(Token.XML, QueryText.XML_URI);
+    final int as = atts.size();
+    final GNodeList list = new GNodeList(as);
+    for(int a = 0; a < as; a++) {
+      final byte[] prefix = atts.name(a), uri = atts.value(a);
+      // skip namespace undeclarations
+      if(prefix.length + uri.length == 0) continue;
+      final FNSpace nspace = new FNSpace(prefix, uri, this);
+      if(test == null || test.matches(nspace)) list.add(nspace);
+    }
+    return list.sort((n1, n2) -> Token.compare(n1.name(), n2.name()), true).iter();
+  }
+
   /**
    * Returns the DTD type flags of an attribute ({@link Data#IS_ID}, {@link Data#IS_IDREFS}).
    * @return type flags
@@ -421,7 +441,9 @@ public abstract class XNode extends GNode {
   public final Uri baseURI(final Uri base, final boolean empty, final InputInfo info)
       throws QueryException {
 
-    if(!kind().oneOf(ELEMENT, DOCUMENT) && parent() == null) {
+    // namespace nodes have no base URI; other leaf nodes inherit it from their parent
+    final Kind kind = kind();
+    if(kind == NAMESPACE || !kind.oneOf(ELEMENT, DOCUMENT) && parent() == null) {
       return empty ? Uri.EMPTY : null;
     }
     Uri uri = Uri.EMPTY;
@@ -475,6 +497,33 @@ public abstract class XNode extends GNode {
     final XNode root1 = (XNode) nl.peek(), root2 = ((XNode) c2).root();
     final boolean db1 = root1 instanceof DBNode, db2 = root2 instanceof DBNode;
     return db1 == db2 ? root1.compare(root2) : db1 ? -1 : 1;
+  }
+
+  /**
+   * Compares two nodes for their unique order, at least one of which is an attached
+   * namespace node.
+   * @param node1 first node
+   * @param node2 node to be compared
+   * @return result of comparison (-1, 0, 1)
+   */
+  static int compareNSpace(final XNode node1, final XNode node2) {
+    // namespace nodes are generated on demand: compare their parent elements instead
+    final XNode par1 = nspaceParent(node1), par2 = nspaceParent(node2);
+    final int diff = (par1 != null ? par1 : node1).compare(par2 != null ? par2 : node2);
+    if(diff != 0) return diff;
+    // namespace nodes follow their element and precede its attributes and children
+    if(par1 == null) return -1;
+    if(par2 == null) return 1;
+    return Integer.signum(Token.compare(node1.name(), node2.name()));
+  }
+
+  /**
+   * Returns the parent element of an attached namespace node.
+   * @param node node
+   * @return parent element, or {@code null} if the node is not an attached namespace node
+   */
+  private static XNode nspaceParent(final XNode node) {
+    return node instanceof FNSpace ? node.parent() : null;
   }
 
   @Override

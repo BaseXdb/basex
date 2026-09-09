@@ -12,6 +12,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -37,8 +38,8 @@ public final class Delete extends Update {
     final Iter iter = arg(0).unwrappedIter(qc);
     for(Item item; (item = qc.next(iter)) != null;) {
       if(!(item instanceof final XNode node)) throw UPTRGDELEMPT_X.get(info, item);
-      // nodes without parents are ignored
-      if(node.parent() == null) continue;
+      // nodes without parents and namespace nodes are ignored
+      if(node.parent() == null || node.kind() == Kind.NAMESPACE) continue;
       final Updates updates = qc.updates();
       final DBNode dbnode = updates.determineDataRef(node, qc);
       checkWrite(dbnode, qc);

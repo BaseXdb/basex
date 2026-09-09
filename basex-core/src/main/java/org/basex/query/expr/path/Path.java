@@ -534,7 +534,7 @@ public abstract class Path extends ParseExpr {
       // results on the same level are non-overlapping and in document order
       final boolean level = nodes != null && PathNodes.sameLevel(nodes);
       switch(axis) {
-        case ATTRIBUTE, SELF -> {
+        case ATTRIBUTE, NAMESPACE, SELF -> {
           // nothing changes
         }
         case PARENT, FOLLOWING_SIBLING, FOLLOWING_SIBLING_OR_SELF -> {

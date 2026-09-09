@@ -5,6 +5,7 @@ import static org.basex.query.QueryError.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -106,6 +107,16 @@ public enum Axis {
       throws QueryException {
       if(node instanceof final JNode jnode) return jnode.itemIter(test);
       throw ITEMAXIS_X.get(info, node.seqType());
+    }
+  },
+
+  /** Namespace axis. */
+  NAMESPACE("namespace", false) {
+    @Override
+    BasicNodeIter iter(final GNode node, final Test test, final InputInfo info)
+      throws QueryException {
+      if(node instanceof JNode) throw NSAXIS_X.get(info, node.seqType());
+      return node.namespaceIter(test);
     }
   },
 
@@ -257,7 +268,7 @@ public enum Axis {
       case FOLLOWING_SIBLING_OR_SELF -> PRECEDING_SIBLING_OR_SELF;
       case FOLLOWING                 -> PRECEDING;
       case FOLLOWING_OR_SELF         -> PRECEDING_OR_SELF;
-      case ITEM                      -> PARENT;
+      case ITEM, NAMESPACE           -> PARENT;
       case PARENT                    -> CHILD;
       case PRECEDING_SIBLING         -> FOLLOWING_SIBLING;
       case PRECEDING_SIBLING_OR_SELF -> FOLLOWING_SIBLING_OR_SELF;
@@ -265,5 +276,13 @@ public enum Axis {
       case PRECEDING_OR_SELF         -> FOLLOWING_OR_SELF;
       case SELF                      -> SELF;
     };
+  }
+
+  /**
+   * Returns the principal node kind of the axis.
+   * @return node kind
+   */
+  public final Kind principal() {
+    return this == ATTRIBUTE ? Kind.ATTRIBUTE : this == NAMESPACE ? Kind.NAMESPACE : Kind.ELEMENT;
   }
 }

@@ -1253,6 +1253,8 @@ public enum QueryError {
   /** Error code. */
   ATTRAXIS_X(XPTY, 4, "Attribute axis: XNode expected, % found."),
   /** Error code. */
+  NSAXIS_X(XPTY, 4, "Namespace axis: XNode expected, % found."),
+  /** Error code. */
   INVCONVERT_X_X(XPTY, 4, "% cannot be cast to %."),
 
   /** Error code. */
@@ -1433,8 +1435,6 @@ public enum QueryError {
   PARAMDOC_X(XQST, 119, "Parameter document: %."),
   /** Error code. */
   NOVISALLOWED(XQST, 125, "No visibility annotation allowed in inline function."),
-  /** Error code. */
-  NSAXIS(XQST, 134, "Namespace axis is not supported."),
   /** Error code. */
   CIRCTYPE_X(XQST, 140, "Type depends on itself: %."),
   /** Error code. */

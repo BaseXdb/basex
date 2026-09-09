@@ -363,6 +363,15 @@ public final class JNodeTest extends SandboxTest {
     error(JTREE_STRING + "/attribute::attribute(a)", ATTRAXIS_X);
   }
 
+  /** Namespace step. */
+  @Test public void axisNamespace() {
+    error(JTREE_STRING + "/namespace::*", NSAXIS_X);
+    error(JTREE_STRING + "/namespace::a", NSAXIS_X);
+    error(JTREE_STRING + "/namespace-node()", NSAXIS_X);
+    error(JTREE_STRING + "/namespace::{ 'a' }", NSAXIS_X);
+    error("{ 'a': 1 }/namespace::*", NSAXIS_X);
+  }
+
   /** Child step. */
   @Test public void axisChild() {
     query(JTREE_STRING + "/b", "{\"b\":{\"x\":{\"y\":2}}}");

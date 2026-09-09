@@ -20,7 +20,7 @@ import org.w3c.dom.*;
  */
 public abstract class FNode extends XNode {
   /** Parent node (can be {@code null}). */
-  private FNode parent;
+  private XNode parent;
 
   /**
    * Constructor.
@@ -28,6 +28,16 @@ public abstract class FNode extends XNode {
    */
   FNode(final NodeType type) {
     super(type);
+  }
+
+  /**
+   * Constructor with a parent node.
+   * @param type item type
+   * @param parent parent node (can be {@code null})
+   */
+  FNode(final NodeType type, final XNode parent) {
+    super(type);
+    this.parent = parent;
   }
 
   /**
@@ -40,18 +50,21 @@ public abstract class FNode extends XNode {
   }
 
   @Override
-  public final boolean is(final GNode node) {
+  public boolean is(final GNode node) {
     return this == node;
   }
 
   @Override
-  public final int compare(final GNode node) {
+  public int compare(final GNode node) {
     if(this == node) return 0;
+    // namespace nodes are compared via their parent elements
+    if(node instanceof final FNSpace nspace && nspace.parent() != null)
+      return compareNSpace(this, nspace);
     // fragments: compare node IDs
     if(node instanceof final FNode fnode) {
       // attributes may be created after the descendants of their parent: compare the parents
-      final FNode n1 = this instanceof FAttr && parent != null ? parent : this;
-      final FNode n2 = fnode instanceof FAttr && fnode.parent != null ? fnode.parent : fnode;
+      final FNode n1 = this instanceof FAttr && parent instanceof final FNode p ? p : this;
+      final FNode n2 = fnode instanceof FAttr && fnode.parent instanceof final FNode p ? p : fnode;
       // an element precedes its attributes
       return n1 != n2 ? Integer.signum(n1.id - n2.id) : n1 == this ? -1 : n2 == fnode ? 1 :
         Integer.signum(id - fnode.id);
@@ -93,7 +106,7 @@ public abstract class FNode extends XNode {
   }
 
   @Override
-  public final byte[] id() {
+  public byte[] id() {
     return Token.concat(Token.ID, id);
   }
 

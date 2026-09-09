@@ -47,7 +47,7 @@ public final class Replace extends Update {
     byte[] text = null;
 
     for(Item item; (item = qc.next(iter)) != null;) {
-      if(!(item instanceof final XNode targ) || targ.kind() == Kind.DOCUMENT)
+      if(!(item instanceof final XNode targ) || targ.kind().oneOf(Kind.DOCUMENT, Kind.NAMESPACE))
         throw UPTRGNODE_X.get(info, item);
 
       final Updates updates = qc.updates();

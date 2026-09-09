@@ -235,8 +235,8 @@ public abstract class Step extends Preds {
       test = t;
       exprType.assign(NodeType.get(t));
     }
-    // $jnode/attribute::x: type error at runtime
-    final boolean typeError = axis == ATTRIBUTE && rtype.seqType().mayBeJNode();
+    // $jnode/attribute::x, $jnode/namespace::x: type error at runtime
+    final boolean typeError = axis.oneOf(ATTRIBUTE, NAMESPACE) && rtype.seqType().mayBeJNode();
     // attribute::element() → (), parent::comment() → ()
     if(!typeError && !selectorMayFail() && (t == null || noMatches() || seqType().zero())) {
       cc.info(QueryText.OPTSTEP_X, this);
@@ -436,6 +436,9 @@ public abstract class Step extends Preds {
       // attribute::element()
       case ATTRIBUTE ->
         kind != Kind.ATTRIBUTE;
+      // namespace::element()
+      case NAMESPACE ->
+        kind != Kind.NAMESPACE;
       // parent::comment()
       case ANCESTOR, PARENT ->
         kind.leaf();
@@ -471,15 +474,15 @@ public abstract class Step extends Preds {
       // $doc/descendant-or-self::attribute()
       case DESCENDANT_OR_SELF ->
         nk == Kind.DOCUMENT && kind == Kind.ATTRIBUTE;
-      // $doc/attribute::, $comment/attribute:: ($jnode/attribute::: type error at runtime)
-      case ATTRIBUTE ->
+      // $doc/attribute::, $text/namespace:: ($jnode/attribute::: type error at runtime)
+      case ATTRIBUTE, NAMESPACE ->
         nk == Kind.DOCUMENT || nk.leaf();
       // $attribute/following-sibling::, $attribute/preceding-sibling::
       case FOLLOWING_SIBLING, PRECEDING_SIBLING ->
-        nk == Kind.ATTRIBUTE;
+        nk.oneOf(Kind.ATTRIBUTE, Kind.NAMESPACE);
       // $attribute/parent::document-node()
       case PARENT ->
-        nk == Kind.ATTRIBUTE && kind == Kind.DOCUMENT;
+        nk.oneOf(Kind.ATTRIBUTE, Kind.NAMESPACE) && kind == Kind.DOCUMENT;
       default ->
         false;
     };

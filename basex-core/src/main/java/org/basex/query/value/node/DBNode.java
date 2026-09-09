@@ -247,6 +247,9 @@ public class DBNode extends XNode {
   @Override
   public final int compare(final GNode node) {
     if(this == node) return 0;
+    // namespace nodes are compared via their parent elements
+    if(node instanceof final FNSpace nspace && nspace.parent() != null)
+      return compareNSpace(this, nspace);
     if(node instanceof final DBNode dbnode && root == dbnode.root) {
       // comparison of database nodes: compare PRE values or database IDs
       final Data ndata = dbnode.data();

@@ -2572,8 +2572,9 @@ public class QueryParser extends InputParser {
         axis = Axis.CHILD;
         test = simpleNodeTest(Kind.ELEMENT, true);
         if(test != null) {
-          if(test == NodeTest.NAMESPACE) throw error(NSAXIS);
-          if(((Test) test).kind == Kind.ATTRIBUTE) axis = Axis.ATTRIBUTE;
+          final Kind kind = ((Test) test).kind;
+          if(kind == Kind.ATTRIBUTE) axis = Axis.ATTRIBUTE;
+          else if(kind == Kind.NAMESPACE) axis = Axis.NAMESPACE;
           checkTest(test, axis != Axis.ATTRIBUTE);
         } else {
           if(error) throw error(STEPMISS_X, found());
@@ -2607,13 +2608,14 @@ public class QueryParser extends InputParser {
     // dynamic node test: enclosed expression
     if(current('{')) return enclosedExpr();
 
+    final Kind principal = axis.principal();
     final ArrayList<Test> list = new ArrayList<>(1);
-    final boolean element = axis != Axis.ATTRIBUTE, paren = consume("(");
+    final boolean paren = consume("(");
     do {
       if(paren) skipWs();
-      final Test test = simpleNodeTest(element ? Kind.ELEMENT : Kind.ATTRIBUTE, true);
+      final Test test = simpleNodeTest(principal, true);
       if(test == null) return null;
-      checkTest(test, element);
+      checkTest(test, principal != Kind.ATTRIBUTE);
       if(!list.contains(test)) list.add(test);
     } while(paren && wsConsume("|"));
     if(paren && !consume(')')) throw error(WRONGCHAR_X_X, ')', found());

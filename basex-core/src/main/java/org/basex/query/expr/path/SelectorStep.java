@@ -33,9 +33,9 @@ public final class SelectorStep extends Step {
    */
   public SelectorStep(final InputInfo info, final Axis axis, final Expr selector,
       final Expr... preds) {
-    this(info, axis, Test.get(axis == Axis.ATTRIBUTE ? Kind.ATTRIBUTE : null, null,
-      NameTest.Scope.ALL, null), selector, preds);
+    this(info, axis, Test.get(kind(axis), null, NameTest.Scope.ALL, null), selector, preds);
   }
+
   /**
    * Constructor.
    * @param info input info (can be {@code null})
@@ -144,7 +144,7 @@ public final class SelectorStep extends Step {
         if(jnode && item.type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) {
           list.add(JNodeTest.get(item, null));
         } else if(item instanceof final QNm qnm) {
-          list.add(Test.get(axis == Axis.ATTRIBUTE ? Kind.ATTRIBUTE : null, qnm, null, null));
+          list.add(Test.get(kind(axis), qnm, null, null));
         } else {
           fold = false;
           break;
@@ -158,6 +158,16 @@ public final class SelectorStep extends Step {
       }
     }
     return super.optimize(root, cc);
+  }
+
+  /**
+   * Returns the node kind of the tests created for the specified axis.
+   * @param axis axis
+   * @return kind ({@code null} for elements and JNodes)
+   */
+  private static Kind kind(final Axis axis) {
+    final Kind kind = axis.principal();
+    return kind == Kind.ELEMENT ? null : kind;
   }
 
   @Override

@@ -78,6 +78,14 @@ public final class FnPath extends ContextFn {
           tb.add(name(qname, false, lexical, namespaces, qc));
         } else if(kind == Kind.PROCESSING_INSTRUCTION) {
           tb.add(kind.toString(Token.string(qname.local())));
+        } else if(kind == Kind.NAMESPACE) {
+          tb.add("namespace::");
+          if(qname.local().length != 0) {
+            tb.add(qname.local());
+          } else {
+            tb.add("*[").add(name(Function.LOCAL_NAME.definition().name, false, lexical,
+                namespaces, qc)).add("()=\"\"]");
+          }
         } else if(kind.oneOf(Kind.COMMENT, Kind.TEXT)) {
           tb.add(type.toString());
         } else if(node instanceof final JNode jnode && jnode.isItem()) {
@@ -105,7 +113,7 @@ public final class FnPath extends ContextFn {
           }
         }
         // optional index
-        if(indexes && !kind.oneOf(Kind.ATTRIBUTE, Kind.JNODE)) {
+        if(indexes && !kind.oneOf(Kind.ATTRIBUTE, Kind.NAMESPACE, Kind.JNODE)) {
           int index = 1;
           for(final GNode nd : node.precedingSiblingIter(false)) {
             qc.checkStop();

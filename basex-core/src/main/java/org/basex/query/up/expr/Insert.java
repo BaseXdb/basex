@@ -61,7 +61,8 @@ public final class Insert extends Update {
       final XNode parent = node.parent();
       final Kind kind = node.kind();
       if(sibling) {
-        if(kind.oneOf(Kind.ATTRIBUTE, Kind.DOCUMENT)) throw UPTRGTYP2_X.get(info, node);
+        if(kind.oneOf(Kind.ATTRIBUTE, Kind.DOCUMENT, Kind.NAMESPACE))
+          throw UPTRGTYP2_X.get(info, node);
         if(parent == null) throw UPPAREMPTY_X.get(info, node);
       } else {
         if(!kind.oneOf(Kind.ELEMENT, Kind.DOCUMENT)) throw UPTRGTYP_X.get(info, node);

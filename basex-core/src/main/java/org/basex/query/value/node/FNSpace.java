@@ -30,9 +30,40 @@ public final class FNSpace extends FNode {
    * @param value value
    */
   public FNSpace(final byte[] name, final byte[] value) {
-    super(NodeType.NAMESPACE);
+    this(name, value, null);
+  }
+
+  /**
+   * Constructor with a parent element.
+   * @param name name
+   * @param value value
+   * @param parent parent element (can be {@code null})
+   */
+  FNSpace(final byte[] name, final byte[] value, final XNode parent) {
+    super(NodeType.NAMESPACE, parent);
     this.name = name;
     this.value = value;
+  }
+
+  @Override
+  public boolean is(final GNode node) {
+    if(this == node) return true;
+    // namespace nodes are generated on demand: compare parent element and prefix
+    final XNode par = parent();
+    return par != null && node instanceof final FNSpace nspace && Token.eq(name, nspace.name) &&
+        par.is(nspace.parent());
+  }
+
+  @Override
+  public int compare(final GNode node) {
+    return parent() != null && node instanceof final XNode xnode ?
+      compareNSpace(this, xnode) : super.compare(node);
+  }
+
+  @Override
+  public byte[] id() {
+    final XNode par = parent();
+    return par == null ? super.id() : Token.concat(par.id(), 'n', name);
   }
 
   @Override
@@ -60,7 +91,9 @@ public final class FNSpace extends FNode {
   @Override
   public FNSpace materialize(final Predicate<Data> test, final boolean funcs, final InputInfo ii,
       final QueryContext qc) {
-    return materialized(test, funcs, ii) ? this : new FNSpace(name, value);
+    final XNode par = parent();
+    return (par != null ? par : this).materialized(test, funcs, ii) ? this :
+      new FNSpace(name, value);
   }
 
   @Override

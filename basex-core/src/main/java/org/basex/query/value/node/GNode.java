@@ -176,6 +176,15 @@ public abstract class GNode extends Item {
   }
 
   /**
+   * Returns a namespace axis iterator.
+   * @param test node test (can be {@code null})
+   * @return iterator
+   */
+  public BasicNodeIter namespaceIter(final Test test) {
+    return BasicNodeIter.EMPTY;
+  }
+
+  /**
    * Returns a child axis iterator.
    * @param test node test (can be {@code null})
    * @param descendant part of descendant traversal (the test may then be ignored)
@@ -249,7 +258,7 @@ public abstract class GNode extends Item {
           GNode node = GNode.this, root = node.parent();
           while(root != null) {
             final BasicNodeIter ir = root.childIter();
-            if(node.kind() != Kind.ATTRIBUTE) {
+            if(!node.kind().oneOf(Kind.ATTRIBUTE, Kind.NAMESPACE)) {
               for(final GNode nd : ir) {
                 if(nd.is(node)) break;
               }
