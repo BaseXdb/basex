@@ -89,19 +89,7 @@ public final class BaseXHTTP extends CLI {
     final Resource resource = new PathResourceFactory().newResource(jettyUri);
     jetty = (Server) new XmlConfiguration(resource).configure();
 
-    // try to use GZIP compression (changed with Jetty 12.1)
-    Supplier<Handler> supplier = () -> wac;
-    if(soptions.get(StaticOptions.GZIP)) {
-      final String clzz = "org.eclipse.jetty.compression.server.CompressionHandler";
-      if(Reflect.available(clzz)) {
-        // create anonymous class, as a lambda expression would yield a ClassNotFoundException
-        // if the compression handler is not included in the classpath
-        supplier = gzip(wac);
-      } else if(Reflect.available("org.eclipse.jetty.server.handler.gzip.GzipHandler")) {
-        Util.errln("Please add " + clzz + " to the classpath to enable GZIP compression");
-      }
-    }
-    jetty.setHandler(supplier);
+    jetty.setHandler(soptions.get(StaticOptions.GZIP) ? gzip(wac) : wac);
     JakartaWebSocketServletContainerInitializer.configure(wac, null);
 
     ServerConnector sc = null;
@@ -240,17 +228,13 @@ public final class BaseXHTTP extends CLI {
    * @param wac web application context
    * @return handler
    */
-  private static Supplier<Handler> gzip(final WebAppContext wac) {
-    return () -> {
-      final CompressionHandler ch = new CompressionHandler();
-      final GzipCompression gc = new GzipCompression();
-      ch.putCompression(gc);
-      final CompressionConfig cc = CompressionConfig.builder().defaults().
-          compressIncludeMethod("PUT").decompressIncludeMethod("PUT").build();
-      ch.putConfiguration("/", cc);
-      ch.setHandler(wac);
-      return ch;
-    };
+  private static Handler gzip(final WebAppContext wac) {
+    final CompressionHandler ch = new CompressionHandler();
+    ch.putCompression(new GzipCompression());
+    ch.putConfiguration("/", CompressionConfig.builder().defaults().
+        compressIncludeMethod("PUT").decompressIncludeMethod("PUT").build());
+    ch.setHandler(wac);
+    return ch;
   }
 
   @Override
