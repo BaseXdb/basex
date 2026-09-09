@@ -1019,20 +1019,15 @@ public enum GUIMenuCmd implements GUICommand {
   C_GO_HOME(GO_HOME, Prop.MAC ? null : "alt HOME", true, false) {
     @Override
     public void execute(final GUI gui) {
-      // skip operation for root context
-      final Context ctx = gui.context;
-      if(ctx.root()) return;
       // jump to database root
-      ctx.invalidate();
-      gui.notify.context(ctx.current(), false, null);
-    }
-  },
-
-  /** Displays the root node in the text view. */
-  C_SHOW_HOME(GO_HOME, null, true, false) {
-    @Override
-    public void execute(final GUI gui) {
-      gui.execute(new XQuery("/"));
+      final Context ctx = gui.context;
+      if(!ctx.root()) {
+        ctx.invalidate();
+        gui.notify.context(ctx.current(), false, null);
+      }
+      // highlight root nodes in all views
+      final Data data = ctx.data();
+      gui.notify.mark(new DBNodes(data, true, data.resources.docs().toArray()), null);
     }
   };
 

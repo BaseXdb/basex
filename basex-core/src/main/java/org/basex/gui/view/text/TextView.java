@@ -34,8 +34,6 @@ public final class TextView extends View {
   /** Search editor. */
   private final SearchEditor editor;
 
-  /** Home button. */
-  private final AbstractButton home;
   /** Info label for total time. */
   private final BaseXLabel label;
   /** Text Area. */
@@ -62,12 +60,8 @@ public final class TextView extends View {
     final AbstractButton save = BaseXButton.get("c_save", SAVE, false, gui);
     save.addActionListener(e -> save());
 
-    home = BaseXButton.command(GUIMenuCmd.C_SHOW_HOME, gui);
-    home.setEnabled(false);
-
     final BaseXToolBar buttons = new BaseXToolBar();
     buttons.add(save);
-    buttons.add(home);
     buttons.add(editor.button());
 
     final BaseXBack north = new BaseXBack(false).layout(new BorderLayout(10, 10));
@@ -148,7 +142,6 @@ public final class TextView extends View {
           ao.setLimit(gui.gopts.get(GUIOptions.MAXTEXT));
           nodes.serialize(Serializer.get(ao, context.options.get(MainOptions.SERIALIZER)));
           size = nodes.size();
-        } else {
         }
         setText(ao, size, null);
         cachedNodes = ao.finished() ? nodes : null;
@@ -156,8 +149,6 @@ public final class TextView extends View {
       } catch(final IOException ex) {
         Util.debug(ex);
       }
-    } else {
-      home.setEnabled(context.data() != null);
     }
   }
 
@@ -217,7 +208,6 @@ public final class TextView extends View {
       if(out.finished()) info += " (" + CHOPPED + ')';
     }
     label.setText(info);
-    home.setEnabled(gui.context.data() != null);
   }
 
   /**
