@@ -59,7 +59,7 @@ enum LogTarget {
    */
   private static BiConsumer<String, String> slf4j() {
     try {
-      final Class<?> factory = Class.forName("org.slf4j.LoggerFactory");
+      final Class<?> factory = Class.forName(ExternalLib.SLF4J.clazz());
       final Class<?> clazz = Class.forName("org.slf4j.Logger");
       final Object logger = factory.getMethod("getLogger", String.class).invoke(null, Prop.NAME);
 

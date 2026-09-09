@@ -869,6 +869,12 @@ public interface Text {
   String GLOBAL_OPTIONS = lang("global_options");
   /** Local Options. */
   String LOCAL_OPTIONS = lang("local_options");
+  /** External libraries (not localized: the entries are product names). */
+  String LIBRARIES = "Libraries";
+  /** Libraries found in the classpath. */
+  String AVAILABLE = "Available";
+  /** Libraries missing in the classpath. */
+  String MISSING = "Missing";
 
   /** Error. */
   String ERROR = lang("error");

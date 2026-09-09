@@ -34,7 +34,7 @@ final class WordnetStemmer extends Stemmer {
     Method findStems = null;
     Object dictionary = null;
     // don't try to find the other classes if Dictionary is not found:
-    final Class<?> dct = Reflect.find(PATTERN, "Dictionary");
+    final Class<?> dct = Reflect.find(ExternalLib.WORDNET.clazz());
     if(dct != null) {
       try {
         final Class<?> wn = Class.forName(Util.info(PATTERN, "morph.WordnetStemmer"));

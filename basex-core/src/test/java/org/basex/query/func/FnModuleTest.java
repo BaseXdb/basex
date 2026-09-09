@@ -1952,7 +1952,7 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" xs:date('2024-01-12Z')", "[Y0001]-[M01]-[D01][Z]", " ()", " ()",
         "America/New_York"), "2024-01-11-05:00");
 
-    if(Prop.ICU) {
+    if(ExternalLib.ICU.available()) {
       query(func.args(" xs:date('2023-12-11')", "[FNn], [MNn] [D], [Y]", "cy"),
           "Dydd Llun, Rhagfyr 11, 2023");
       query(func.args(" xs:date('2023-09-01')", "[MNn]", "es"), "septiembre");
@@ -1981,7 +1981,7 @@ public final class FnModuleTest extends SandboxTest {
 
     query(func.args(1, "Ww", "de"), "Eins");
     query(func.args(1, "Ww;o", "de"), "Erste");
-    if(Prop.ICU) {
+    if(ExternalLib.ICU.available()) {
       query(func.args(1, "Ww;c", "de"), "Ein");
       query(func.args(1, "Ww;o(%spellout-cardinal-feminine-financial)", "bs"), "Jedinica");
       query(func.args(1, "Ww;c(%spellout-ordinal-neuter)", "es"), "Primera");

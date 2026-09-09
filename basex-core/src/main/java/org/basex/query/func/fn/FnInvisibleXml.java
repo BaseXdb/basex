@@ -31,10 +31,6 @@ import de.bottlecaps.markup.blitz.ResultHandler;
  * @author Gunther Rademacher
  */
 public final class FnInvisibleXml extends StandardFunc {
-  /** Required class names. */
-  private static final String[] CLASSES = { "de.bottlecaps.markup.Blitz",
-      "de.bottlecaps.markup.BlitzException", "de.bottlecaps.markup.BlitzParseException",
-      "de.bottlecaps.markup.blitz.ResultHandler"};
   /** The function's argument type. */
   public static final SeqType ARG_TYPE = ChoiceItemType.get(BasicType.STRING,
       NodeType.get(NameTest.get(new QNm("ixml")))).seqType(Occ.ZERO_OR_ONE);
@@ -44,13 +40,8 @@ public final class FnInvisibleXml extends StandardFunc {
   @Override
   public FuncItem value(final QueryContext qc) throws QueryException {
     if(generator == null) {
-      for(final String className : CLASSES) {
-        try {
-          Reflect.forName(className);
-        } catch(final Throwable th) {
-          throw BASEX_CLASSPATH_X_X.get(info, definition.name, className).cause(th);
-        }
-      }
+      final String missing = ExternalLib.MARKUP_BLITZ.missing();
+      if(missing != null) throw BASEX_CLASSPATH_X_X.get(info, definition.name, missing);
       generator = new Generator();
     }
     return generator.generate(qc);
@@ -61,10 +52,7 @@ public final class FnInvisibleXml extends StandardFunc {
    * @return result of check
    */
   public static boolean available() {
-    for(final String className : CLASSES) {
-      if(!Reflect.available(className)) return false;
-    }
-    return true;
+    return ExternalLib.MARKUP_BLITZ.available();
   }
 
   /**

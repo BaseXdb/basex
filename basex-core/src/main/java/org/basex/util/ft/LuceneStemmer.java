@@ -22,7 +22,7 @@ final class LuceneStemmer extends ExternalStemmer<LuceneStemmer.StemmerClass> {
   private static final HashMap<Language, StemmerClass> CLASSES = new HashMap<>();
 
   static {
-    if(Reflect.available(PATTERN, "de.German")) {
+    if(ExternalLib.LUCENE.available()) {
       add(Language.get("cs"), "cz.Czech");
       add(Language.get("es"), "es.SpanishLight");
       add(Language.get("fi"), "fi.FinnishLight");

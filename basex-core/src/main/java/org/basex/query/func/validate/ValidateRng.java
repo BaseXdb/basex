@@ -30,6 +30,9 @@ public class ValidateRng extends ValidateFn {
     return validate(new Validation() {
       @Override
       void validate() throws IOException, QueryException {
+        final String missing = ExternalLib.JING.missing();
+        if(missing != null) throw BASEX_CLASSPATH_X_X.get(info, definition.name, missing);
+
         final IO input = read(toNodeOrAtomItem(arg(0), false, qc), null);
         final Item schema = toNodeOrAtomItem(arg(1), false, qc);
         final boolean compact = toBooleanOrFalse(arg(2), qc);

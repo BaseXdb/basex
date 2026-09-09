@@ -19,8 +19,6 @@ import org.xml.sax.*;
  * @author Christian Gruen
  */
 public final class XMLResolver {
-  /** Path to enhanced XML resolver. */
-  private static final String RESOLVER = "org.xmlresolver.Resolver";
   /** Path to enhanced XML resolver configuration. */
   private static final String CONFIGURATION = "org.xmlresolver.XMLResolverConfiguration";
 
@@ -101,12 +99,13 @@ public final class XMLResolver {
   private Object resolver() {
     if(resolver == null) {
       if(!catalog.isEmpty()) {
-        if(Reflect.available(RESOLVER)) {
+        if(ExternalLib.XML_RESOLVER.available()) {
           // instance of Norm’s enhanced XML resolver
           try {
             final Class<?> cnfgrtn = Class.forName(CONFIGURATION);
             final Object cnf = cnfgrtn.getConstructor(String.class).newInstance(catalog);
-            resolver = Class.forName(RESOLVER).getConstructor(cnfgrtn).newInstance(cnf);
+            resolver = Class.forName(ExternalLib.XML_RESOLVER.clazz()).getConstructor(cnfgrtn).
+                newInstance(cnf);
           } catch(final Throwable th) {
             // catch resolver errors (e.g. NoClassDefFoundError for missing dependencies)
             Util.debug(th);

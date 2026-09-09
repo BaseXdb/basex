@@ -66,7 +66,7 @@ public abstract class Formatter extends FormatUtil {
    * @return formatter instance
    */
   public static Formatter get(final byte[] languageTag) {
-    if(Prop.ICU) return IcuFormatter.get(languageTag);
+    if(ExternalLib.ICU.available()) return IcuFormatter.get(languageTag);
     final Formatter form = getInternal(languageTag);
     return form != null ? form : getInternal(EN);
   }
@@ -87,7 +87,8 @@ public abstract class Formatter extends FormatUtil {
    * @return true if the language is supported
    */
   public static boolean available(final byte[] languageTag) {
-    return Prop.ICU ? IcuFormatter.available(languageTag) : getInternal(languageTag) != null;
+    return ExternalLib.ICU.available() ? IcuFormatter.available(languageTag) :
+      getInternal(languageTag) != null;
   }
 
   /**

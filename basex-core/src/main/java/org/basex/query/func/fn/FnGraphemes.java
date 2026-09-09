@@ -23,7 +23,7 @@ public final class FnGraphemes extends StandardFunc {
     if(value == null) return Empty.VALUE;
 
     final TokenList list = new TokenList();
-    if(Prop.ICU) {
+    if(ExternalLib.ICU.available()) {
       Icu.split(list, value);
     } else {
       final BreakIterator bi = BreakIterator.getCharacterInstance();

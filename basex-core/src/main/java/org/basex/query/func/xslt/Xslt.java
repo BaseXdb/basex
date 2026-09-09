@@ -74,7 +74,7 @@ public final class Xslt {
         } catch(final ReflectiveOperationException ex) {
           Util.debug(ex);
         }
-        s9api = Reflect.available("net.sf.saxon.s9api.Xslt30Transformer");
+        s9api = ExternalLib.SAXON.available();
       } else {
         // unknown: assign classpath
         processor = impl;

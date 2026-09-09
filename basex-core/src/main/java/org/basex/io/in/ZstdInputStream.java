@@ -12,14 +12,12 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class ZstdInputStream extends FilterInputStream {
-  /** Class of the Zstandard implementation. */
-  private static final String CLASS = "io.airlift.compress.zstd.ZstdInputStream";
   /** Constructor of the Zstandard implementation (can be {@code null}). */
   private static final Constructor<?> CONSTRUCTOR;
 
   static {
     Constructor<?> constructor = null;
-    final Class<?> clazz = Reflect.find(CLASS);
+    final Class<?> clazz = Reflect.find(ExternalLib.AIRCOMPRESSOR.clazz());
     if(clazz != null) {
       try {
         constructor = clazz.getConstructor(InputStream.class);
@@ -47,7 +45,8 @@ public final class ZstdInputStream extends FilterInputStream {
    */
   private static InputStream stream(final InputStream is) throws IOException {
     if(CONSTRUCTOR == null) {
-      throw new IOException(Util.info("Zstandard support requires missing class: %.", CLASS));
+      throw new IOException(Util.info("Zstandard support requires missing class: %.",
+          ExternalLib.AIRCOMPRESSOR.clazz()));
     }
     try {
       return (InputStream) CONSTRUCTOR.newInstance(is);

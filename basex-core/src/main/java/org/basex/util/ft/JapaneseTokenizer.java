@@ -20,8 +20,6 @@ final class JapaneseTokenizer extends Tokenizer {
   /** Flag available. */
   private static boolean available;
 
-  /** Name of the Igo tagger class. */
-  private static final String PATTERN = "net.reduls.igo.Tagger";
   /** Name of Japanese dictionary. */
   private static final String LANG = "ja";
 
@@ -89,7 +87,7 @@ final class JapaneseTokenizer extends Tokenizer {
   private boolean sc;
 
   static {
-    final Class<?> clz = Reflect.find(PATTERN);
+    final Class<?> clz = Reflect.find(ExternalLib.IGO.clazz());
     if(clz != null) {
       IOFile dic = new IOFile(LANG);
       if(!dic.exists()) dic = new IOFile(Prop.HOMEDIR, "etc/" + LANG);

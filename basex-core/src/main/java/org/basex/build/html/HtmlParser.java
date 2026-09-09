@@ -165,7 +165,7 @@ public final class HtmlParser extends XMLParser {
   /** Parser type. */
   public enum Parser {
     /** TagSoup parser. */
-    TAGSOUP("TagSoup", "org.ccil.cowan.tagsoup.Parser") {
+    TAGSOUP("TagSoup", ExternalLib.TAGSOUP) {
 
       /** TagSoup URL. */
       private static final String FEATURES = "http://www.ccil.org/~cowan/tagsoup/features/";
@@ -211,16 +211,7 @@ public final class HtmlParser extends XMLParser {
     },
 
     /** Validator.nu parser. */
-    NU("Validator.nu", "nu.validator.htmlparser.sax.HtmlParser",
-        "nu.validator.htmlparser.sax.XmlSerializer",
-        "nu.validator.htmlparser.common.XmlViolationPolicy",
-        "nu.validator.htmlparser.common.Heuristics") {
-
-      /** Class needed for option heuristics=ICU. */
-      private static final String ICU_CLASS_NAME = "com.ibm.icu.text.CharsetDetector";
-      /** Class needed for option heuristics=CHARDET. */
-      private static final String CHARDET_CLASS_NAME =
-          "org.mozilla.intl.chardet.nsICharsetDetectionObserver";
+    NU("Validator.nu", ExternalLib.VALIDATOR_NU) {
 
       @Override
       XMLReader reader(final HtmlOptions hopts, final StringWriter sw) throws SAXException {
@@ -284,11 +275,11 @@ public final class HtmlParser extends XMLParser {
         if(options.contains(HEURISTICS)) {
           switch(options.get(HEURISTICS)) {
             case ALL -> {
-              ensureAvailable(ICU_CLASS_NAME, name, info);
-              ensureAvailable(CHARDET_CLASS_NAME, name, info);
+              ensureAvailable(ExternalLib.ICU, name, info);
+              ensureAvailable(ExternalLib.CHARDET, name, info);
             }
-            case ICU -> ensureAvailable(ICU_CLASS_NAME, name, info);
-            case CHARDET -> ensureAvailable(CHARDET_CLASS_NAME, name, info);
+            case ICU -> ensureAvailable(ExternalLib.ICU, name, info);
+            case CHARDET -> ensureAvailable(ExternalLib.CHARDET, name, info);
             default -> { }
           }
         }
@@ -300,14 +291,14 @@ public final class HtmlParser extends XMLParser {
         if(!options.contains(HEURISTICS)) return true;
         switch(options.get(HEURISTICS)) {
           case ALL -> {
-            if(!Reflect.available(ICU_CLASS_NAME)) return false;
-            if(!Reflect.available(CHARDET_CLASS_NAME)) return false;
+            if(!ExternalLib.ICU.available()) return false;
+            if(!ExternalLib.CHARDET.available()) return false;
           }
           case ICU -> {
-            if(!Reflect.available(ICU_CLASS_NAME)) return false;
+            if(!ExternalLib.ICU.available()) return false;
           }
           case CHARDET -> {
-            if(!Reflect.available(CHARDET_CLASS_NAME)) return false;
+            if(!ExternalLib.CHARDET.available()) return false;
           }
           default -> { }
         }
@@ -325,8 +316,8 @@ public final class HtmlParser extends XMLParser {
 
     /** String representation. */
     private final String string;
-    /** Required classes. */
-    private final String[] classes;
+    /** Required library. */
+    private final ExternalLib lib;
 
     /**
      * Return a reader instance for this parser.
@@ -340,11 +331,11 @@ public final class HtmlParser extends XMLParser {
     /**
      * Constructor.
      * @param string string representation
-     * @param classes required classes
+     * @param lib required library
      */
-    Parser(final String string, final String... classes) {
+    Parser(final String string, final ExternalLib lib) {
       this.string = string;
-      this.classes = classes;
+      this.lib = lib;
     }
 
     /**
@@ -353,14 +344,11 @@ public final class HtmlParser extends XMLParser {
      * @return result of check
      */
     public boolean available(@SuppressWarnings("unused") final HtmlOptions options) {
-      for(final String cl : classes) {
-        if(!Reflect.available(cl)) return false;
-      }
-      return true;
+      return lib.available();
     }
 
     /**
-     * Throws an exception if any of the classes required for this parser are unavailable.
+     * Throws an exception if the library required for this parser is unavailable.
      * @param options HTML options
      * @param name name of function that is asking for this parser
      * @param info input info (can be {@code null})
@@ -368,23 +356,20 @@ public final class HtmlParser extends XMLParser {
      */
     public void ensureAvailable(@SuppressWarnings("unused") final HtmlOptions options,
         final QNm name, final InputInfo info) throws QueryException {
-      for(final String cl : classes) ensureAvailable(cl, name, info);
+      ensureAvailable(lib, name, info);
     }
 
     /**
-     * Throws an exception if a class required for this parser is unavailable.
-     * @param className the class name
+     * Throws an exception if the specified library is unavailable.
+     * @param library external library
      * @param name name of function that is asking for this parser
      * @param info input info (can be {@code null})
      * @throws QueryException query exception,
      */
-    static void ensureAvailable(final String className, final QNm name, final InputInfo info)
+    static void ensureAvailable(final ExternalLib library, final QNm name, final InputInfo info)
         throws QueryException {
-      try {
-        Reflect.forName(className);
-      } catch(final Throwable th) {
-        throw BASEX_CLASSPATH_X_X.get(info, name, className).cause(th);
-      }
+      final String missing = library.missing();
+      if(missing != null) throw BASEX_CLASSPATH_X_X.get(info, name, missing);
     }
 
     /**

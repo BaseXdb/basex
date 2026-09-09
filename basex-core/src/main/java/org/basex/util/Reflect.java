@@ -24,22 +24,6 @@ public final class Reflect {
   }
 
   /**
-   * Checks if the class specified by the pattern is available.
-   * @param pattern class pattern
-   * @param ext optional extension
-   * @return result of check
-   */
-  public static boolean available(final String pattern, final Object... ext) {
-    try {
-      forName(Util.info(pattern, ext));
-      return true;
-    } catch(final Throwable ex) {
-      unexpected(ex);
-      return false;
-    }
-  }
-
-  /**
    * Returns a reference to the specified class.
    * @param name fully qualified class name
    * @return reference, or {@code null} if the class is not found
@@ -90,6 +74,7 @@ public final class Reflect {
         m = clazz.getMethod(name, types);
       } catch(final Throwable ex) {
         unexpected(ex);
+        // lucene-stemmers: stem() is protected in BrazilianStemmer, FrenchStemmer, GermanStemmer
         m = clazz.getDeclaredMethod(name, types);
         m.setAccessible(true);
       }
@@ -101,13 +86,13 @@ public final class Reflect {
 
   /**
    * Returns a class instance.
-   * @param clazz class (can be {@code null})
+   * @param clazz class
    * @param <O> type
-   * @return instance, or {@code null} if the class is {@code null}
+   * @return instance
    */
   public static <O> O get(final Class<O> clazz) {
     try {
-      return clazz != null ? clazz.getDeclaredConstructor().newInstance() : null;
+      return clazz.getDeclaredConstructor().newInstance();
     } catch(final Throwable ex) {
       throw Util.notExpected(ex);
     }
@@ -115,14 +100,14 @@ public final class Reflect {
 
   /**
    * Invokes the specified method.
-   * @param method method to run (can be {@code null})
+   * @param method method to run
    * @param object object ({@code null} for static methods)
    * @param args arguments
-   * @return result of method call, or {@code null} if the method is {@code null}
+   * @return result of method call
    */
   public static Object invoke(final Method method, final Object object, final Object... args) {
     try {
-      return method != null ? method.invoke(object, args) : null;
+      return method.invoke(object, args);
     } catch(final Throwable ex) {
       throw Util.notExpected(ex);
     }

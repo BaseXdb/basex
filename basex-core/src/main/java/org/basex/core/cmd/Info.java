@@ -7,6 +7,7 @@ import java.io.*;
 import org.basex.core.*;
 import org.basex.core.users.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 import org.basex.util.options.*;
 
 /**
@@ -56,6 +57,14 @@ public final class Info extends AInfo {
     final MainOptions opts = context.options;
     tb.add(NL + LOCAL_OPTIONS + NL);
     for(final Option<?> o : opts) info(tb, o.name(), opts.get(o));
+
+    final StringList found = new StringList(), missing = new StringList();
+    for(final ExternalLib lib : ExternalLib.values()) {
+      (lib.available() ? found : missing).add(lib.toString());
+    }
+    tb.add(NL + LIBRARIES + NL);
+    info(tb, AVAILABLE, String.join(", ", found.finish()));
+    info(tb, MISSING, String.join(", ", missing.finish()));
     return tb.toString();
   }
 }

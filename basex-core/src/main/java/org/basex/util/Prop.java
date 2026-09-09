@@ -64,9 +64,6 @@ public final class Prop {
   /** Project home directory. */
   public static final String HOMEDIR;
 
-  /** Availability of ICU. */
-  public static final boolean ICU = Reflect.available("com.ibm.icu.text.BreakIterator");
-
   /** Global options, assigned by the starter classes and the web.xml context parameters. */
   private static final Map<String, String> OPTIONS = new ConcurrentHashMap<>();
 

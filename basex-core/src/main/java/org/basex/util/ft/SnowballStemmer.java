@@ -22,7 +22,7 @@ final class SnowballStemmer extends ExternalStemmer<SnowballStemmer.StemmerClass
   private static final HashMap<Language, StemmerClass> CLASSES = new HashMap<>();
 
   static {
-    if(Reflect.available(PATTERN, "German")) {
+    if(ExternalLib.SNOWBALL.available()) {
       for(final Language l : Language.ALL.values()) {
         final Class<?> clz = Reflect.find(PATTERN, l);
         if(clz == null) continue;
