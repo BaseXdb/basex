@@ -71,15 +71,25 @@ public final class Names extends TokenSet implements Index {
    */
   public int store(final byte[] name, final byte[] value) {
     final int i = put(name);
-    final Stats[] st = stats();
-    Stats s = st[i];
-    if(s == null) {
-      s = new Stats();
-      st[i] = s;
-    }
+    final Stats s = createStats(i);
     if(value != null) s.add(value, meta);
     s.count++;
     return i;
+  }
+
+  /**
+   * Returns the statistics for the key with the specified index, which are created if necessary.
+   * @param index index of name
+   * @return statistics
+   */
+  public Stats createStats(final int index) {
+    final Stats[] st = stats();
+    Stats s = st[index];
+    if(s == null) {
+      s = new Stats();
+      st[index] = s;
+    }
+    return s;
   }
 
   @Override

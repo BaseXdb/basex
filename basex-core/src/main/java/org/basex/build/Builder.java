@@ -107,6 +107,7 @@ public abstract class Builder extends Job {
       throw ex;
     }
     parser.close();
+    path.finish(meta, elemNames);
     meta.size = size();
     meta.lastid = size() - 1;
 

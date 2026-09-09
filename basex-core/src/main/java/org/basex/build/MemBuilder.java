@@ -110,6 +110,7 @@ public final class MemBuilder extends Builder {
   public MemData finish() {
     data.lastid = data.nodes() - 1;
     if(meta.updindex) data.idmap.finish(data.lastid);
+    path.finish(meta, elemNames);
     finishLocations();
     return data;
   }

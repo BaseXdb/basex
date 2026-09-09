@@ -7,6 +7,7 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
+import org.basex.index.name.*;
 import org.basex.index.stats.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
@@ -125,21 +126,11 @@ public final class PathNode {
   }
 
   /**
-   * Finalizes the index and writes the node to the specified output stream.
-   * @param out output stream
+   * Finalizes the node: assigns the leaf flag and the string value of empty elements.
    * @param meta meta data
-   * @throws IOException I/O exception
+   * @param elemNames element names
    */
-  void write(final DataOutput out, final MetaData meta) throws IOException {
-    out.writeNum(name);
-    out.write1(kind);
-    // legacy (required before version 7.1)
-    out.writeNum(0);
-    out.writeNum(children.length);
-    // legacy (required before version 7.1)
-    out.writeDouble(1);
-
-    // update leaf flag
+  void finish(final MetaData meta, final Names elemNames) {
     boolean leaf = stats.isLeaf();
     for(final PathNode child : children) {
       if(child.kind == Data.TEXT) {
@@ -148,10 +139,31 @@ public final class PathNode {
         leaf = false;
       }
     }
+    // an element without a text node child has an empty string value
+    if(empty != 0 && kind == Data.ELEM) elemNames.createStats(name).add(Token.EMPTY, meta);
+    // reset flag: empty values are only to be added once
+    empty = 0;
 
     stats.setLeaf(leaf);
+    for(final PathNode child : children) child.finish(meta, elemNames);
+  }
+
+  /**
+   * Writes the node to the specified output stream.
+   * @param out output stream
+   * @throws IOException I/O exception
+   */
+  void write(final DataOutput out) throws IOException {
+    out.writeNum(name);
+    out.write1(kind);
+    // legacy (required before version 7.1)
+    out.writeNum(0);
+    out.writeNum(children.length);
+    // legacy (required before version 7.1)
+    out.writeDouble(1);
+
     stats.write(out);
-    for(final PathNode child : children) child.write(out, meta);
+    for(final PathNode child : children) child.write(out);
   }
 
   /**

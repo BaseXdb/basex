@@ -8,6 +8,7 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.*;
+import org.basex.index.name.*;
 import org.basex.index.query.*;
 import org.basex.index.stats.*;
 import org.basex.io.in.DataInput;
@@ -65,7 +66,16 @@ public final class PathIndex implements Index {
    */
   public void write(final DataOutput out) throws IOException {
     out.writeBool(root != null);
-    if(root != null) root.write(out, data.meta);
+    if(root != null) root.write(out);
+  }
+
+  /**
+   * Finalizes the index: assigns leaf flags and the string values of empty elements.
+   * @param meta meta data
+   * @param elemNames element names
+   */
+  public void finish(final MetaData meta, final Names elemNames) {
+    root.finish(meta, elemNames);
   }
 
   /**

@@ -151,6 +151,7 @@ public final class Optimize extends ACreate {
         }
         if(cmd != null) cmd.pre = pre;
       }
+      data.paths().finish(meta, data.elemNames);
       meta.ndocs = n;
       meta.uptodate = true;
     }
