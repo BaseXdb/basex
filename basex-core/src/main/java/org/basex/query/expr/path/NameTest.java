@@ -210,25 +210,28 @@ public final class NameTest extends Test {
   @Override
   public Test intersect(final Test test) {
     if(test == NodeTest.NODE || test == this) return this;
-    if(test instanceof final NameTest nt) {
-      if(kind == nt.kind) {
-        if(scope == Scope.ALL) {
-          // *
-          return test;
-        } else if(scope.oneOf(nt.scope, Scope.FLEXIBLE, Scope.FULL)) {
-          // *:local1 = *:local2, Q{uri1}* = Q{uri2}*, Q{uri1}local1 = Q{uri2}local2
-          // Q{uri1}local1 = *:local2, Q{uri1}local1 = Q{uri2}*
-          if(nt.matches(qname)) return this;
-        } else if(nt.scope == Scope.URI) {
-          // *:local1 = Q{uri2}* → Q{uri2}local1
-          return get(kind, new QNm(name, nt.qname.uri()), Scope.FULL, ns);
-        } else {
-          // *:local1 = Q{uri2}local2, Q{uri1}* = Q{uri2}local2, Q{uri1}* = *:local2
-          return test.intersect(this);
-        }
+    if(test instanceof NodeTest || test instanceof UnionTest) return test.intersect(this);
+
+    if(kind != test.kind) {
+      // node(local) = element(local) → element(local) = element(local)
+      if(kind == Kind.NODE && test.kind.oneOf(Kind.ELEMENT, Kind.ATTRIBUTE, Kind.JNODE,
+          Kind.PROCESSING_INSTRUCTION)) return get(test.kind, qname, scope, ns).intersect(test);
+      if(test.kind == Kind.NODE) return test.intersect(this);
+    } else if(test instanceof final NameTest nt) {
+      if(scope == Scope.ALL) {
+        // *
+        return test;
+      } else if(scope.oneOf(nt.scope, Scope.FLEXIBLE, Scope.FULL)) {
+        // *:local1 = *:local2, Q{uri1}* = Q{uri2}*, Q{uri1}local1 = Q{uri2}local2
+        // Q{uri1}local1 = *:local2, Q{uri1}local1 = Q{uri2}*
+        if(nt.matches(qname)) return this;
+      } else if(nt.scope == Scope.URI) {
+        // *:local1 = Q{uri2}* → Q{uri2}local1
+        return get(kind, new QNm(name, nt.qname.uri()), Scope.FULL, ns);
+      } else {
+        // *:local1 = Q{uri2}local2, Q{uri1}* = Q{uri2}local2, Q{uri1}* = *:local2
+        return test.intersect(this);
       }
-    } else if(test instanceof NodeTest || test instanceof UnionTest) {
-      return test.intersect(this);
     }
     return null;
   }
