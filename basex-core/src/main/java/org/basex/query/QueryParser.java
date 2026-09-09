@@ -341,8 +341,9 @@ public class QueryParser extends InputParser {
     // a referenced cast target type must be declared and eligible as a cast target
     for(final TypeRef ref : deferredCastTargets) {
       final SeqType st = declaredTypes.get(ref.name());
-      if(st == null) throw error(WHICHCAST_X, BasicType.similar(ref.name()));
-      ref.resolve(st.type);
+      final RecordType rt = st != null ? null : Records.BUILT_IN.get(ref.name());
+      if(st == null && rt == null) throw error(WHICHCAST_X, BasicType.similar(ref.name()));
+      ref.resolve(st != null ? st.type : rt);
       checkCastTarget(ref, false);
     }
     deferredCastTargets.clear();

@@ -215,13 +215,16 @@ public final class SeqType {
       final ValueBuilder vb = new ValueBuilder(qc, size);
       for(final Item item : value) {
         qc.checkStop();
+        // a JNode never matches the target type: continue with its jvalue
+        final Item it = item instanceof final JNode jnode ?
+            jnode.value.unwrappedItem(qc, info) : item;
         Value cast = null;
         if(dt instanceof final ArrayType at) {
-          if(item instanceof final XQArray array) cast = array.castTo(at, error, qc, info);
+          if(it instanceof final XQArray array) cast = array.castTo(at, error, qc, info);
         } else if(dt instanceof final RecordType rt) {
-          if(item instanceof final XQMap map) cast = map.castTo(rt, error, qc, info);
+          if(it instanceof final XQMap map) cast = map.castTo(rt, error, qc, info);
         } else if(dt instanceof final MapType mt) {
-          if(item instanceof final XQMap map) cast = map.castTo(mt, error, qc, info);
+          if(it instanceof final XQMap map) cast = map.castTo(mt, error, qc, info);
         }
         if(cast == null) return castError(value, error, info);
         vb.add(cast);
