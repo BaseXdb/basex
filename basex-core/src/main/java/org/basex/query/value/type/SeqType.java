@@ -210,18 +210,23 @@ public final class SeqType {
 
     // arrays, maps, records: structural cast without atomization
     if(dt instanceof ArrayType || dt instanceof MapType) {
-      if(!occ.check(value.size())) return castError(value, error, info);
-      if(value.isEmpty()) return Empty.VALUE;
-      final Item item = (Item) value;
-      Value cast = null;
-      if(dt instanceof final ArrayType at) {
-        if(item instanceof final XQArray array) cast = array.castTo(at, error, qc, info);
-      } else if(dt instanceof final RecordType rt) {
-        if(item instanceof final XQMap map) cast = map.castTo(rt, error, qc, info);
-      } else if(dt instanceof final MapType mt) {
-        if(item instanceof final XQMap map) cast = map.castTo(mt, error, qc, info);
+      final long size = value.size();
+      if(!occ.check(size)) return castError(value, error, info);
+      final ValueBuilder vb = new ValueBuilder(qc, size);
+      for(final Item item : value) {
+        qc.checkStop();
+        Value cast = null;
+        if(dt instanceof final ArrayType at) {
+          if(item instanceof final XQArray array) cast = array.castTo(at, error, qc, info);
+        } else if(dt instanceof final RecordType rt) {
+          if(item instanceof final XQMap map) cast = map.castTo(rt, error, qc, info);
+        } else if(dt instanceof final MapType mt) {
+          if(item instanceof final XQMap map) cast = map.castTo(mt, error, qc, info);
+        }
+        if(cast == null) return castError(value, error, info);
+        vb.add(cast);
       }
-      return cast != null ? cast : castError(value, error, info);
+      return vb.value(dt);
     }
 
     // generalized atomic type, list type, union type, enumeration type: atomize, then cast
@@ -233,8 +238,19 @@ public final class SeqType {
       Util.debug(ex);
       return null;
     }
-    if(!occ.check(atom.size())) return castError(value, error, info);
-    return atom.isEmpty() ? Empty.VALUE : castItem((Item) atom, error, qc, info);
+    final long size = atom.size();
+    if(!occ.check(size)) return castError(value, error, info);
+    if(size == 0) return Empty.VALUE;
+    if(size == 1) return castItem((Item) atom, error, qc, info);
+
+    final ValueBuilder vb = new ValueBuilder(qc, size);
+    for(final Item item : atom) {
+      qc.checkStop();
+      final Value cast = castItem(item, error, qc, info);
+      if(cast == null) return null;
+      vb.add(cast);
+    }
+    return vb.value(dt instanceof final ListType lt ? lt.atomic() : dt);
   }
 
   /**
