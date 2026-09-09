@@ -4468,6 +4468,7 @@ return
     error(func.args(" (parse-csv('a'), parse-csv('b'))", " { 'method': 'csv' }"), SERCSV_X_X);
     error(func.args(" (csv-to-arrays('a'), parse-csv('b'))", " { 'method': 'csv' }"), SERCSV_X_X);
     error(func.args(" [ <x>1</x> ]", " { 'method': 'csv' }"), SERCSV_X_X);
+    error(func.args(" true#0", " { 'method': 'csv' }"), SERCSV_X_X);
     error(func.args("x", " { 'method': 'csv' }"), SERCSV_X);
     error(func.args(" { 'no-rows': 1 }", " { 'method': 'csv' }"), SERCSV_X);
     // CSV output method: invalid flat parameters

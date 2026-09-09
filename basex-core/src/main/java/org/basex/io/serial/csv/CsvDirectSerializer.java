@@ -65,6 +65,7 @@ public final class CsvDirectSerializer extends CsvSerializer {
       others = true;
       w3(array);
     } else {
+      if(item instanceof FItem) throw typeError("Map or array", item);
       others = true;
       super.serialize(item);
     }
