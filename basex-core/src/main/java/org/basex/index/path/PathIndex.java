@@ -131,6 +131,62 @@ public final class PathIndex implements Index {
     }
   }
 
+  /**
+   * Adds an entry to a known parent node.
+   * @param node parent node ({@code null} for document nodes)
+   * @param name name ID ({@code 0} for nodes other than elements and attributes)
+   * @param kind node kind
+   * @param value value ({@code null} for element and document nodes)
+   * @return path node of the new entry
+   */
+  public PathNode index(final PathNode node, final int name, final byte kind, final byte[] value) {
+    if(node == null) {
+      root.stats.count++;
+      return root;
+    }
+    // a new text node proves that earlier elements of this path had no text node child
+    final boolean empty = kind == Data.TEXT && node.kind == Data.ELEM &&
+        node.stats.count > 1 && child(node, name, kind) == null;
+    final PathNode child = node.index(name, kind, value, data.meta);
+    if(empty) child.stats.add(Token.EMPTY, data.meta);
+    return child;
+  }
+
+  /**
+   * Returns the path node that represents the specified database node.
+   * @param pre PRE value
+   * @return path node, or {@code null} if the node is not indexed
+   */
+  public PathNode node(final int pre) {
+    // collect ancestor-or-self nodes
+    final IntList pres = new IntList();
+    for(int p = pre; p >= 0; p = data.parent(p, data.kind(p))) pres.add(p);
+    // the path index is rooted in the document node
+    if(pres.isEmpty() || data.kind(pres.peek()) != Data.DOC) return null;
+
+    PathNode node = root;
+    for(int p = pres.size() - 2; p >= 0 && node != null; p--) {
+      final int curr = pres.get(p), kind = data.kind(curr);
+      final int name = kind == Data.ELEM || kind == Data.ATTR ? data.nameId(curr) : 0;
+      node = child(node, name, kind);
+    }
+    return node;
+  }
+
+  /**
+   * Returns the child of a path node with the specified name and kind.
+   * @param node path node
+   * @param name name ID
+   * @param kind node kind
+   * @return child node, or {@code null} if no child exists
+   */
+  private static PathNode child(final PathNode node, final int name, final int kind) {
+    for(final PathNode child : node.children) {
+      if(child.kind == kind && child.name == name) return child;
+    }
+    return null;
+  }
+
   // Traverse Index ===============================================================================
 
   /**

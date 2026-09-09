@@ -154,6 +154,8 @@ public final class Optimize extends ACreate {
       data.paths().finish(meta, data.elemNames);
       meta.ndocs = n;
       meta.uptodate = true;
+      meta.counts = true;
+      meta.complete = true;
     }
 
     // rebuild value indexes

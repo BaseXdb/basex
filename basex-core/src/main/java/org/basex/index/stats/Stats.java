@@ -52,6 +52,8 @@ public final class Stats {
     final int t = in.readNum() & 0xF;
     type = (byte) t;
 
+    min = Double.MAX_VALUE;
+    max = -Double.MAX_VALUE;
     if(isInteger(t) || isDouble(t)) {
       min = in.readDouble();
       max = in.readDouble();
@@ -104,7 +106,10 @@ public final class Stats {
    * @param meta meta data
    */
   public void add(final byte[] value, final MetaData meta) {
-    byte t = type;
+    // reset category types, which are assigned when the statistics are written
+    byte t = isCategory(type) ? isInteger(type) ? INTEGER : isDouble(type) ? DOUBLE : STRING : type;
+    // restart caching if no value has been added yet (the map is discarded when it is written)
+    if(values == null && isNone(t)) values = new TokenIntMap();
     final int vl = value.length;
     // only analyze non-empty values
     if(vl > 0) {

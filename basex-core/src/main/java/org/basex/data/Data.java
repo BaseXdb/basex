@@ -12,6 +12,7 @@ import org.basex.index.name.*;
 import org.basex.index.path.*;
 import org.basex.index.query.*;
 import org.basex.index.resource.*;
+import org.basex.index.stats.*;
 import org.basex.index.value.*;
 import org.basex.io.*;
 import org.basex.io.random.*;
@@ -567,10 +568,80 @@ public abstract class Data {
 
   /**
    * Registers a modification of the database.
+   * @param accuracy metadata that remains accurate
    */
-  private void modified() {
-    meta().update();
+  private void modified(final MetaUpdate accuracy) {
+    meta().update(accuracy);
     locations = null;
+  }
+
+  /**
+   * Adds the nodes of an inserted subtree to the path index and the name statistics.
+   * @param pre PRE value of the first inserted node
+   * @param size number of inserted nodes
+   * @return {@code true} if the metadata could be updated
+   */
+  private boolean indexPaths(final int pre, final int size) {
+    // metadata can only be updated if it was accurate before
+    if(!meta.complete || paths == null) return false;
+
+    final int par = parent(pre, kind(pre));
+    final PathNode node = par == -1 ? null : paths.node(par);
+    if(par != -1 && node == null) return false;
+
+    // stacks of open nodes: PRE values, element name IDs and path nodes
+    final IntList pres = new IntList().add(par);
+    final IntList names = new IntList().add(par != -1 && kind(par) == ELEM ? nameId(par) : 0);
+    final ArrayList<PathNode> nodes = new ArrayList<>();
+    nodes.add(node);
+
+    final int last = pre + size;
+    for(int curr = pre; curr < last; curr++) {
+      final byte kind = (byte) kind(curr);
+      final int parPre = parent(curr, kind);
+      while(pres.peek() > parPre) {
+        pres.pop();
+        names.pop();
+        nodes.removeLast();
+      }
+      final PathNode pn = nodes.getLast();
+      final int name = names.peek();
+      // nodes other than documents must be attached to an existing path node
+      if(pn == null && kind != DOC) return false;
+
+      switch(kind) {
+        case DOC -> {
+          pres.push(curr);
+          names.push(0);
+          nodes.add(paths.index(null, 0, DOC, null));
+        }
+        case ELEM -> {
+          final int id = nameId(curr);
+          elemNames.store(elemNames.key(id));
+          if(name != 0) elemNames.createStats(name).setLeaf(false);
+          pres.push(curr);
+          names.push(id);
+          nodes.add(paths.index(pn, id, ELEM, null));
+        }
+        case ATTR -> {
+          final int id = nameId(curr);
+          final byte[] value = text(curr, false);
+          attrNames.store(attrNames.key(id), value);
+          paths.index(pn, id, ATTR, value);
+        }
+        default -> {
+          final byte[] value = text(curr, true);
+          if(name != 0) {
+            final Stats stats = elemNames.createStats(name);
+            if(kind == TEXT) stats.add(value, meta);
+            else stats.setLeaf(false);
+          }
+          paths.index(pn, 0, kind, value);
+        }
+      }
+    }
+    paths.finish(meta, elemNames);
+    return true;
   }
 
   /**
@@ -581,7 +652,7 @@ public abstract class Data {
    * @param uri namespace URI
    */
   public final void update(final int pre, final int kind, final byte[] name, final byte[] uri) {
-    modified();
+    modified(MetaUpdate.NONE);
 
     if(kind == PI) {
       updateText(pre, trim(concat(name, cpToken(' '), atom(pre))), PI);
@@ -639,7 +710,7 @@ public abstract class Data {
     final byte[] val = kind == PI ? trim(concat(name(pre, kind), cpToken(' '), value)) : value;
     if(eq(val, text(pre, kind != ATTR))) return;
 
-    modified();
+    modified(MetaUpdate.COUNTS);
     updateText(pre, val, kind);
     if(kind == DOC) resources.rename(pre, value);
   }
@@ -654,7 +725,7 @@ public abstract class Data {
     final int sCount = source.size();
     if(sCount == 0 || !bufferSize(sCount)) return false;
 
-    modified();
+    modified(MetaUpdate.COMPLETE);
 
     // update index structures
     final int tKind = kind(pre), tSize = size(pre, tKind), tPar = parent(pre, tKind);
@@ -734,6 +805,8 @@ public abstract class Data {
 
     // add entries to index structures
     indexAdd(pre, lastid - sCount + 1, sCount, source);
+    // register new paths and names; invalidate metadata if this is not possible
+    if(!indexPaths(pre, sCount)) modified(MetaUpdate.NONE);
     return true;
   }
 
@@ -742,7 +815,7 @@ public abstract class Data {
    * @param pre PRE value of the node to be deleted
    */
   public final void delete(final int pre) {
-    modified();
+    modified(MetaUpdate.COMPLETE);
 
     // delete references in document index
     int kind = kind(pre);
@@ -812,7 +885,7 @@ public abstract class Data {
     final int sCount = source.size();
     if(sCount == 0) return;
 
-    modified();
+    modified(MetaUpdate.EXACT);
     resources.docs();
 
     // resize buffer to cache more entries
@@ -901,6 +974,9 @@ public abstract class Data {
 
     // update index structures
     indexAdd(pre, id(pre), sCount, source);
+
+    // register new paths and names; invalidate metadata if this is not possible
+    if(!indexPaths(pre, sCount)) modified(MetaUpdate.NONE);
 
     // finally, update distances
     updateDist(pre + sCount, sCount);

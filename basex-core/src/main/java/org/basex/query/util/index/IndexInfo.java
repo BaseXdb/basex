@@ -92,7 +92,7 @@ public final class IndexInfo {
       if(mixed) {
         // text nodes are not indexed: address the parent elements instead
         // stop if database is out-dated, or if the step has predicates or no downward axis
-        if(!data.meta.uptodate || last.exprs.length > 0 ||
+        if(!data.meta.complete || last.exprs.length > 0 ||
           !last.axis.oneOf(Axis.CHILD, Axis.DESCENDANT, Axis.DESCENDANT_OR_SELF)) return null;
         // the string value of a leaf element equals the value of its single text node
         final Step parent = pred.dropText();
@@ -103,7 +103,7 @@ public final class IndexInfo {
       }
     } else if(kind == Kind.ELEMENT) {
       // stop if database is unknown or out-dated
-      if(data == null || !data.meta.uptodate) return null;
+      if(data == null || !data.meta.complete) return null;
 
       if(last.test instanceof NameTest || last.test instanceof UnionTest) {
         test = last.test;

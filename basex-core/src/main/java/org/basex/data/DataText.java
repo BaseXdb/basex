@@ -70,6 +70,10 @@ public interface DataText {
   String DBSPLITS = "SPLITS";
   /** Up-to-date flag. */
   String DBUPTODATE = "UPTODATE";
+  /** Complete path and name index flag. */
+  String DBCOMPLETE = "COMPLETE";
+  /** Exact statistics counts flag. */
+  String DBCOUNTS = "COUNTS";
   /** Last (highest) ID. */
   String DBLASTID = "LASTID";
   /** Documents. */

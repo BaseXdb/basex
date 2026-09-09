@@ -69,7 +69,7 @@ public final class DataBuilder {
    * @throws QueryException query exception
    */
   public void build(final GNodeList nodes) throws QueryException {
-    data.meta.update();
+    data.meta.update(MetaUpdate.NONE);
     int next = data.nodes();
     for(final GNode node : nodes) next = addNode((XNode) node, next, -1);
 

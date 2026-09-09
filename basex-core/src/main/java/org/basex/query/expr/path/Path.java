@@ -390,8 +390,9 @@ public abstract class Path extends ParseExpr {
   private ArrayList<PathNode> pathNodes(final Expr rt, final boolean stats) {
     // ensure that path starts with document nodes
     final Data data = data();
-    return rt != null && rt.seqType().type.instanceOf(NodeType.DOCUMENT) && data != null &&
-        data.meta.uptodate ? pathNodes(data.paths().root(), stats) : null;
+    if(rt == null || !rt.seqType().type.instanceOf(NodeType.DOCUMENT) || data == null ||
+        !(stats ? data.meta.uptodate : data.meta.complete)) return null;
+    return pathNodes(data.paths().root(), stats);
   }
 
   /**
@@ -568,7 +569,7 @@ public abstract class Path extends ParseExpr {
     // - no database instance is available, outdated, or
     // - if context does not contain all database nodes
     if(rt == null || !rt.seqType().type.instanceOf(NodeType.DOCUMENT) ||
-        data == null || !data.meta.uptodate || data.meta.ndocs != rt.size()) return -1;
+        data == null || !data.meta.counts || data.meta.ndocs != rt.size()) return -1;
 
     ArrayList<PathNode> nodes = data.paths().root();
     long lastSize = 1;
@@ -600,7 +601,7 @@ public abstract class Path extends ParseExpr {
   private ArrayList<PathNode> pathNodes(final int last) {
     // skip request if no path index exists or might be out-of-date
     final Data data = data();
-    if(data == null || !data.meta.uptodate) return null;
+    if(data == null || !data.meta.complete) return null;
 
     ArrayList<PathNode> nodes = data.paths().root();
     for(int s = 0; s <= last; s++) {
@@ -656,7 +657,7 @@ public abstract class Path extends ParseExpr {
     // - if several namespaces occur in the input
     final Data data = data();
     if(rt == null || !rt.seqType().type.instanceOf(NodeType.DOCUMENT) ||
-        data == null || !data.meta.uptodate || data.defaultNs() == null) return this;
+        data == null || !data.meta.complete || data.defaultNs() == null) return this;
 
     final int sl = steps.length;
     for(int s = 0; s < sl; s++) {
@@ -836,7 +837,7 @@ public abstract class Path extends ParseExpr {
     // invert steps that occur before index step, rewrite them to predicates
     final Expr indexStep = indexSteps.isEmpty() ? null : indexSteps.peek();
     final ExprList invSteps = new ExprList(), lastPreds = new ExprList();
-    if(rootTest != NodeTest.DOCUMENT || data == null || !data.meta.uptodate ||
+    if(rootTest != NodeTest.DOCUMENT || data == null || !data.meta.complete ||
         invertSteps(stepIndex)) {
       for(int s = stepIndex; s >= 0; s--) {
         final Axis axis = axisStep(s).axis.invert();

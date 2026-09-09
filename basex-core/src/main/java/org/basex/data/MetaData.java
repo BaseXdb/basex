@@ -91,8 +91,12 @@ public final class MetaData {
   /** Language option, resolved by {@link #language()} (can be {@code null}). */
   private String langOption;
 
-  /** Indicates if index structures are out-dated. */
+  /** Indicates if all metadata is exact. */
   public boolean uptodate = true;
+  /** Indicates if the statistics counts are exact (implied by {@link #uptodate}). */
+  public boolean counts = true;
+  /** Indicates if the path and name indexes are complete (implied by {@link #counts}). */
+  public boolean complete = true;
   /** Indicate if the database may be corrupt. */
   public boolean corrupt;
   /** Dirty flag. */
@@ -170,6 +174,8 @@ public final class MetaData {
     language = meta.language;
     langOption = meta.langOption;
     uptodate = meta.uptodate;
+    counts = meta.counts;
+    complete = meta.complete;
     corrupt = meta.corrupt;
     dirty = meta.dirty;
     oldindex = meta.oldindex;
@@ -464,6 +470,10 @@ public final class MetaData {
    * @throws IOException I/O exception
    */
   void read(final DataInput in) throws IOException {
+    // databases created before version 13 only store the up-to-date flag
+    counts = false;
+    complete = false;
+
     String storage = "", istorage = "";
     while(true) {
       final String k = Token.string(in.readToken());
@@ -502,8 +512,13 @@ public final class MetaData {
         case DBFTST -> stemming = isTrue(v);
         case DBFTCS -> casesens = isTrue(v);
         case DBUPTODATE -> uptodate = isTrue(v);
+        case DBCOUNTS -> counts = isTrue(v);
+        case DBCOMPLETE -> complete = isTrue(v);
       }
     }
+    // restore implications (relevant for databases created before version 13)
+    if(uptodate) counts = true;
+    if(counts) complete = true;
 
     // check version of database storage
     if(!storage.equals(STORAGE) && new Version(storage).compareTo(new Version(
@@ -550,6 +565,8 @@ public final class MetaData {
     writeInfo(out, DBMAXLEN,   maxlen);
     writeInfo(out, DBMAXCATS,  maxcats);
     writeInfo(out, DBUPTODATE, uptodate);
+    writeInfo(out, DBCOUNTS,   counts);
+    writeInfo(out, DBCOMPLETE, complete);
     writeInfo(out, DBLASTID,   lastid);
     final Language ln = language();
     if(ln != null) writeInfo(out, DBFTLN, ln.toString());
@@ -558,12 +575,19 @@ public final class MetaData {
 
   /**
    * Notifies the meta structures of an update and invalidates the indexes.
+   * @param accuracy metadata that remains accurate
    */
-  public void update() {
+  public void update(final MetaUpdate accuracy) {
     // update database timestamp
     time = System.currentTimeMillis();
-    uptodate = false;
     dirty = true;
+    if(accuracy != MetaUpdate.EXACT) {
+      uptodate = false;
+      if(accuracy != MetaUpdate.COUNTS) {
+        counts = false;
+        if(accuracy != MetaUpdate.COMPLETE) complete = false;
+      }
+    }
     if(!updindex) {
       textindex = false;
       attrindex = false;
