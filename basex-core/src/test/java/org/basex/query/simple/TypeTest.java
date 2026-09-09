@@ -24,8 +24,7 @@ public final class TypeTest extends SandboxTest {
     query("42 castable as xs:error?", false);
     query("() cast as xs:error?", "");
     query("xs:error(())", "");
-    query("1 castable as xs:integer+", true);
-    query("(1, 2) castable as xs:integer+", true);
+    query("(1, 2) castable as xs:integer?", false);
     query("[1, 2] castable as array(xs:integer)", true);
     query("[1, 'x'] castable as array(xs:integer)", false);
     query("{ 'a': 1 } castable as record(a as xs:integer)", true);

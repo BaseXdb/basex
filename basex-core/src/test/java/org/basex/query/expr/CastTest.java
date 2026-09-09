@@ -12,26 +12,31 @@ import org.junit.jupiter.api.*;
  * @author Christian Gruen
  */
 public final class CastTest extends SandboxTest {
-  /** Casts to atomic types with an occurrence indicator. */
-  @Test public void sequences() {
+  /** Casts to atomic types, with and without the question mark. */
+  @Test public void singleItems() {
     query("() cast as xs:integer?", "");
-    query("() cast as xs:integer*", "");
     query("1 cast as xs:integer", 1);
-    query("'1' cast as xs:integer+", 1);
-    query("string-join(('1', '2', '3') cast as xs:integer*, ',')", "1,2,3");
-    query("string-join(('1', '2') cast as xs:integer+, ',')", "1,2");
-    query("count((1 to 5) cast as xs:string*)", 5);
-    query("sum(('1', '2', '3') cast as xs:integer+)", 6);
+    query("'1' cast as xs:integer?", 1);
 
-    // the occurrence indicator constrains the result
+    // the input must be a single item, or empty if the question mark is specified
     error("() cast as xs:integer", INVTYPE_X);
-    error("() cast as xs:integer+", INVTYPE_X);
     error("(1, 2) cast as xs:integer", INVTYPE_X);
     error("(1, 2) cast as xs:integer?", INVTYPE_X);
 
     // failing conversions remain dynamic errors
-    error("'x' cast as xs:integer*", FUNCCAST_X_X);
-    error("('1', 'x') cast as xs:integer*", FUNCCAST_X_X);
+    error("'x' cast as xs:integer", FUNCCAST_X_X);
+    error("'x' cast as xs:integer?", FUNCCAST_X_X);
+  }
+
+  /** The cast target has no occurrence indicator: * and + are arithmetic operators. */
+  @Test public void occurrenceIndicators() {
+    query("2 cast as xs:integer * 3", 6);
+    query("2 cast as xs:integer + 3", 5);
+    query("2 cast as xs:integer? * 3", 6);
+
+    error("2 cast as xs:integer*", CALCEXPR);
+    error("2 cast as xs:integer+", CALCEXPR);
+    error("2 castable as xs:integer*", CALCEXPR);
   }
 
   /** Casts to item(). */
@@ -41,7 +46,6 @@ public final class CastTest extends SandboxTest {
     query("{ 'a': 1 } cast as item()", "{\"a\":1}");
     query("(true#0 cast as item()) instance of fn(*)", true);
     query("() cast as item()?", "");
-    query("count((1, 2, 3) cast as item()*)", 3);
 
     // item() only checks the cardinality
     error("() cast as item()", INVTYPE_X);
@@ -55,9 +59,8 @@ public final class CastTest extends SandboxTest {
     query("[[ 1 ], [ 2 ]] cast as array(xs:integer)", "[1,2]");
     query("[] cast as array(xs:integer)", "[]");
     query("[ (1, 2) ] cast as array(xs:string*)", "[(\"1\",\"2\")]");
-    query("count(([ 1 ], [ 2 ]) cast as array(xs:integer)*)", 2);
 
-    // the input is coerced to array(*)*
+    // the input is coerced to array(*) or array(*)?
     error("1 cast as array(xs:integer)", INVTYPE_X);
     error("([ 1 ], [ 2 ]) cast as array(xs:integer)", INVTYPE_X);
     error("[ 'x' ] cast as array(xs:integer)", FUNCCAST_X_X);
@@ -72,7 +75,7 @@ public final class CastTest extends SandboxTest {
 
     // casting the keys must not produce duplicates
     error("{ '1': 'a', '01': 'b' } cast as map(xs:integer, xs:string)", MAPDUPLKEY_X);
-    // the input is coerced to map(*)*
+    // the input is coerced to map(*) or map(*)?
     error("1 cast as map(xs:integer, xs:string)", INVTYPE_X);
     error("{ 'x': 'a' } cast as map(xs:integer, xs:string)", FUNCCAST_X_X);
   }
@@ -99,22 +102,25 @@ public final class CastTest extends SandboxTest {
     error("declare record local:point(x as xs:double, y as xs:double);\n"
         + "fn($p as local:point) { $p }({ 'x': 1, 'y': 2, 'z': 3 })", INVTYPE_X);
 
-    // the input is coerced to map(*)*
+    // the input is coerced to map(*) or map(*)?
     error("1 cast as record(a)", INVTYPE_X);
   }
 
-  /** Casts to list types: the occurrence indicator does not constrain the result. */
+  /** Casts to list types: a single input item may yield several result items. */
   @Test public void lists() {
     query("string-join('a b' cast as xs:IDREFS, ',')", "a,b");
-    // a single input item may produce several items, regardless of the occurrence indicator
     query("count('a b c' cast as xs:IDREFS)", 3);
     query("count('a b c' cast as xs:IDREFS?)", 3);
-    query("count(('a b', 'c d') cast as xs:IDREFS)", 4);
+    query("count(() cast as xs:IDREFS?)", 0);
     query("string-join('a b' cast as xs:NMTOKENS, ',')", "a,b");
 
+    // the question mark constrains the input, not the result
+    error("() cast as xs:IDREFS", INVTYPE_X);
+    error("('a b', 'c d') cast as xs:IDREFS", INVTYPE_X);
+    error("('a b', 'c d') cast as xs:IDREFS?", INVTYPE_X);
+
     // a list type is only permitted as the direct target of a cast: the item type of a sequence
-    // type is an atomic or union type. List types can therefore never be nested, which is why the
-    // occurrence indicator needs to be waived for the cast expression only.
+    // type is an atomic or union type. List types can therefore never be nested.
     error("['a b'] cast as array(xs:IDREFS)", TYPEUNKNOWN_X);
     error("{ 'k': 'a b' } cast as map(xs:string, xs:IDREFS)", TYPEUNKNOWN_X);
     error("{ 'ids': 'a b' } cast as record(ids as xs:IDREFS)", TYPEUNKNOWN_X);
@@ -128,7 +134,6 @@ public final class CastTest extends SandboxTest {
     // record(*) is abstract: only a record can be cast to it
     query("let $r as record(a) := { 'a': 1 } return $r cast as record(*)", "{\"a\":1}");
     error("{ 'a': 1 } cast as record(*)", INVTYPE_X);
-    query("count(([ 1 ], [ 2 ]) cast as array(*)*)", 2);
 
     query("([ 1 ] cast as array(*)) instance of array(*)", true);
     query("({ 'a': 1 } cast as map(*)) instance of map(*)", true);
@@ -150,7 +155,7 @@ public final class CastTest extends SandboxTest {
 
   /** The result of a successful cast is an instance of the target type. */
   @Test public void resultType() {
-    query("(('1', '2') cast as xs:integer*) instance of xs:integer*", true);
+    query("(() cast as xs:integer?) instance of xs:integer?", true);
     query("('1' cast as xs:integer) instance of xs:integer", true);
     query("(['1'] cast as array(xs:integer)) instance of array(xs:integer)", true);
     query("({ '1': 'a' } cast as map(xs:integer, xs:string)) "
@@ -167,11 +172,10 @@ public final class CastTest extends SandboxTest {
 
   /** Castable mirrors cast, but reports failures as false. */
   @Test public void castables() {
-    query("1 castable as xs:integer+", true);
-    query("(1, 2) castable as xs:integer+", true);
+    query("1 castable as xs:integer", true);
     query("(1, 2) castable as xs:integer", false);
-    query("() castable as xs:integer*", true);
-    query("('1', 'x') castable as xs:integer*", false);
+    query("() castable as xs:integer?", true);
+    query("'x' castable as xs:integer?", false);
 
     query("[ '1' ] castable as array(xs:integer)", true);
     query("[ 'x' ] castable as array(xs:integer)", false);
@@ -196,15 +200,15 @@ public final class CastTest extends SandboxTest {
   @Test public void atomization() {
     // nodes are atomized
     query("<x>1</x> cast as xs:integer", 1);
-    query("string-join((<a>1</a>, <b>2</b>) cast as xs:integer*, ',')", "1,2");
     query("string-join(<x>a b</x> cast as xs:IDREFS, ',')", "a,b");
     query("(<x>1</x>/@*, <y a='2'/>/@a) cast as xs:integer", 2);
 
     // arrays are atomized, i.e. flattened into their members
-    query("string-join([ 1, 2 ] cast as xs:integer*, ',')", "1,2");
-    query("string-join([[ 1 ], [ 2 ]] cast as xs:integer*, ',')", "1,2");
-    query("[] cast as xs:integer*", "");
     query("[ 1 ] cast as xs:integer", 1);
+    query("[[ 1 ]] cast as xs:integer", 1);
+    query("[] cast as xs:integer?", "");
+    // the members of [1, 2] atomize to two items, which exceeds the target cardinality
+    error("[ 1, 2 ] cast as xs:integer?", INVTYPE_X);
 
     // maps and functions cannot be atomized
     error("{ 'a': 1 } cast as xs:integer", FIATOMIZE_X);
@@ -216,13 +220,11 @@ public final class CastTest extends SandboxTest {
 
   /** The empty sequence as operand. */
   @Test public void emptySequence() {
-    query("count(() cast as xs:integer*)", 0);
-    query("count(() cast as item()*)", 0);
-    query("count(() cast as array(xs:integer)*)", 0);
+    query("count(() cast as xs:integer?)", 0);
+    query("count(() cast as item()?)", 0);
     query("count(() cast as array(xs:integer)?)", 0);
-    query("count(() cast as map(xs:string, xs:integer)*)", 0);
+    query("count(() cast as map(xs:string, xs:integer)?)", 0);
     query("count(() cast as record(a)?)", 0);
-    query("count(() cast as record(a)*)", 0);
 
     query("() castable as record(a)?", true);
     query("() castable as array(xs:integer)", false);
@@ -235,13 +237,13 @@ public final class CastTest extends SandboxTest {
   @Test public void arrayEdges() {
     query("[] cast as array(xs:integer)", "[]");
     query("[ () ] cast as array(xs:integer*)", "[()]");
-    query("[[ 1, 2 ]] cast as array(xs:integer*)", "[(1,2)]");
     query("[ 1, 2 ] cast as array(xs:integer+)", "[1,2]");
 
     // a member is cast to the member type: its cardinality must match
     error("[ () ] cast as array(xs:integer)", INVTYPE_X);
-    // the members of [[1, 2]] atomize to two items, which do not fit into a single-item member type
+    // the items of a member are cast one by one, so [1, 2] does not atomize to a single item
     error("[[ 1, 2 ]] cast as array(xs:integer)", INVTYPE_X);
+    error("[[ 1, 2 ]] cast as array(xs:integer*)", INVTYPE_X);
     // ...whereas the members of [[1], [2]] atomize to one item each (the example of the PR)
     query("[[ 1 ], [ 2 ], [ 3 ]] cast as array(xs:integer)", "[1,2,3]");
   }
@@ -292,13 +294,13 @@ public final class CastTest extends SandboxTest {
 
   /** Enumeration and choice item types. */
   @Test public void enumsAndChoices() {
-    query("string-join(('a', 'b') cast as enum('a', 'b')*, ',')", "a,b");
-    query("('a', 'b') castable as enum('a', 'b')+", true);
-    query("('a', 'c') castable as enum('a', 'b')*", false);
+    query("'a' cast as enum('a', 'b')", "a");
+    query("'b' castable as enum('a', 'b')", true);
+    query("'c' castable as enum('a', 'b')", false);
     query("[ 'a' ] cast as array(enum('a', 'b'))", "[\"a\"]");
     query("{ 'k': 'a' } cast as map(xs:string, enum('a', 'b'))", "{\"k\":\"a\"}");
 
-    query("('1', '2') cast as (xs:integer | xs:string)*", "1\n2");
+    query("'1' cast as (xs:integer | xs:string)", 1);
     query("({ 'a': '1' } cast as record(a as (xs:integer | xs:date))) ?a", 1);
     query("1 castable as (xs:integer | xs:date)", true);
   }

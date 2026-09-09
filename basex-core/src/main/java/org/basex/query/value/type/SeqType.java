@@ -210,26 +210,21 @@ public final class SeqType {
 
     // arrays, maps, records: structural cast without atomization
     if(dt instanceof ArrayType || dt instanceof MapType) {
-      final long size = value.size();
-      if(!occ.check(size)) return castError(value, error, info);
-      final ValueBuilder vb = new ValueBuilder(qc, size);
-      for(final Item item : value) {
-        qc.checkStop();
-        Value cast = null;
-        if(dt instanceof final ArrayType at) {
-          if(item instanceof final XQArray array) cast = array.castTo(at, error, qc, info);
-        } else if(dt instanceof final RecordType rt) {
-          if(item instanceof final XQMap map) cast = map.castTo(rt, error, qc, info);
-        } else if(dt instanceof final MapType mt) {
-          if(item instanceof final XQMap map) cast = map.castTo(mt, error, qc, info);
-        }
-        if(cast == null) return castError(value, error, info);
-        vb.add(cast);
+      if(!occ.check(value.size())) return castError(value, error, info);
+      if(value.isEmpty()) return Empty.VALUE;
+      final Item item = (Item) value;
+      Value cast = null;
+      if(dt instanceof final ArrayType at) {
+        if(item instanceof final XQArray array) cast = array.castTo(at, error, qc, info);
+      } else if(dt instanceof final RecordType rt) {
+        if(item instanceof final XQMap map) cast = map.castTo(rt, error, qc, info);
+      } else if(dt instanceof final MapType mt) {
+        if(item instanceof final XQMap map) cast = map.castTo(mt, error, qc, info);
       }
-      return vb.value(dt);
+      return cast != null ? cast : castError(value, error, info);
     }
 
-    // generalized atomic type, list type, union type, enumeration type: atomize, then cast items
+    // generalized atomic type, list type, union type, enumeration type: atomize, then cast
     final Value atom;
     try {
       atom = value.atomValue(qc, info);
@@ -238,26 +233,12 @@ public final class SeqType {
       Util.debug(ex);
       return null;
     }
-    // the occurrence indicator does not constrain the result of casting to a list type
-    final long size = atom.size();
-    if(!(dt instanceof ListType) && !occ.check(size)) return castError(value, error, info);
-    if(size == 0) return Empty.VALUE;
-    if(size == 1) return cast((Item) atom, error, qc, info);
-
-    final ValueBuilder vb = new ValueBuilder(qc, size);
-    for(final Item item : atom) {
-      qc.checkStop();
-      final Value cast = cast(item, error, qc, info);
-      if(cast == null) return null;
-      vb.add(cast);
-    }
-    return vb.value(dt instanceof final ListType lt ? lt.atomic() : dt);
+    if(!occ.check(atom.size())) return castError(value, error, info);
+    return atom.isEmpty() ? Empty.VALUE : castItem((Item) atom, error, qc, info);
   }
 
   /**
-   * Converts a component value when casting to an array, map, or record type: returns the value
-   * unchanged if it already matches this type, casts it if this type is a valid cast target, and
-   * raises a type error otherwise.
+   * Casts a component value of an array, map, or record type to this sequence type.
    * @param value value to convert
    * @param error raise error (return {@code null} otherwise)
    * @param qc query context
@@ -268,9 +249,26 @@ public final class SeqType {
   public Value convert(final Value value, final boolean error, final QueryContext qc,
       final InputInfo info) throws QueryException {
     if(instance(value)) return value;
-    if(castTarget(type)) return cast(value, error, qc, info);
-    if(error) throw INVCONVERT_X_X.get(info, value, this);
-    return null;
+
+    // items that match the item type are preserved, all others are cast one by one
+    final SeqType st = with(EXACTLY_ONE);
+    final ValueBuilder vb = new ValueBuilder(qc, value.size());
+    for(final Item item : value) {
+      qc.checkStop();
+      if(instance(item, false)) {
+        vb.add(item);
+      } else if(castTarget(type)) {
+        final Value cast = st.cast(item, error, qc, info);
+        if(cast == null) return null;
+        vb.add(cast);
+      } else if(error) {
+        throw INVCONVERT_X_X.get(info, value, this);
+      } else {
+        return null;
+      }
+    }
+    final Value result = vb.value(TypeRef.deref(type));
+    return occ.check(result.size()) ? result : castError(value, error, info);
   }
 
   /**
@@ -311,7 +309,7 @@ public final class SeqType {
   }
 
   /**
-   * Casts an item to this type.
+   * Casts an atomized item to this type.
    * @param item item to cast
    * @param error raise error (return {@code null} otherwise)
    * @param qc query context
@@ -319,7 +317,7 @@ public final class SeqType {
    * @return cast value
    * @throws QueryException query exception
    */
-  private Value cast(final Item item, final boolean error, final QueryContext qc,
+  private Value castItem(final Item item, final boolean error, final QueryContext qc,
       final InputInfo info) throws QueryException {
 
     final Type dt = TypeRef.deref(this.type);

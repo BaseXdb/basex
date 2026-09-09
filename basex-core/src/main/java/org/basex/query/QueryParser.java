@@ -3995,11 +3995,9 @@ public class QueryParser extends InputParser {
     }
     // check cast eligibility (forward references are re-checked after resolution)
     checkCastTarget(type, false);
-    // occurrence indicator
+    // optional question mark
     skipWs();
-    final Occ occ = consume('?') ? Occ.ZERO_OR_ONE : consume('+') ? Occ.ONE_OR_MORE :
-      consume('*') ? Occ.ZERO_OR_MORE : Occ.EXACTLY_ONE;
-    return type.seqType(occ);
+    return type.seqType(consume('?') ? Occ.ZERO_OR_ONE : Occ.EXACTLY_ONE);
   }
 
   /**
