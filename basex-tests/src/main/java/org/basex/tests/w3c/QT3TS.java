@@ -517,8 +517,7 @@ public final class QT3TS extends Main {
     "'CondExpr-Braced-018', 'CondExpr-Braced-020', 'CondExpr-Braced-021', 'CondExpr-Braced-022', " +
     "'K-CondExpr-Braced-7', 'braced-if-001', 'braced-if-004', 'braced-if-005', 'braced-if-006', " +
     "'braced-if-007', 'braced-if-008', 'PathExpr-10', " +
-    // reserved keywords in computed node constructors - still being discussed in
-    // https://github.com/qt4cg/qtspecs/issues/1528
+    // reserved keywords in computed node constructors (supported by the BaseX parser)
     "'K2-ComputeConAttr-65', 'K2-ComputeConAttr-66', 'K2-ComputeConAttr-72', " +
     "'K2-ComputeConElem-20', 'K2-ComputeConElem-21', 'K2-ComputeConElem-25', " +
     "'K2-ComputeConElem-26', 'K2-ComputeConPI-16', 'K2-ComputeConPI-17', " +
@@ -529,6 +528,10 @@ public final class QT3TS extends Main {
     // too much effort to support in the test suite
     "'fn-available-environment-variables-011', " +
     "'environment-variable-005', 'environment-variable-006', 'environment-variable-007', " +
+    // catalog self-checks: report gaps in the test suite, not in the implementation
+    "'Catalog011', 'Catalog014', " +
+    // depend on the capabilities of the external XSLT and XSD processors
+    "'fn-transform-67', 'fo-test-fn-xsd-validator-002', " +
     "'')";
 
   /**
