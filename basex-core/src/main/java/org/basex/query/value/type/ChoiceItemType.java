@@ -111,7 +111,7 @@ public final class ChoiceItemType implements Type {
     final Type norm = expand(type);
     if(norm instanceof final ChoiceItemType ct) return ct.instanceOf(this);
     for(final Type tp : types) {
-      if(norm.instanceOf(tp)) return true;
+      if(norm.instanceOf(TypeRef.deref(tp))) return true;
     }
     return false;
   }
@@ -123,12 +123,13 @@ public final class ChoiceItemType implements Type {
    * @return expanded type
    */
   private static Type expand(final Type type) {
-    if(type == BasicType.NUMERIC) return Types.NUMERIC_EXPANSION;
-    if(type == BasicType.ANY_ATOMIC_TYPE) return Types.ANY_ATOMIC_TYPE_EXPANSION;
-    if(type == BasicType.ITEM) return Types.ITEM_EXPANSION;
-    if(type == NodeType.XNODE) return Types.XNODE_EXPANSION;
-    if(type == NodeType.NODE) return Types.NODE_EXPANSION;
-    return type;
+    final Type tp = TypeRef.deref(type);
+    if(tp == BasicType.NUMERIC) return Types.NUMERIC_EXPANSION;
+    if(tp == BasicType.ANY_ATOMIC_TYPE) return Types.ANY_ATOMIC_TYPE_EXPANSION;
+    if(tp == BasicType.ITEM) return Types.ITEM_EXPANSION;
+    if(tp == NodeType.XNODE) return Types.XNODE_EXPANSION;
+    if(tp == NodeType.NODE) return Types.NODE_EXPANSION;
+    return tp;
   }
 
   @Override

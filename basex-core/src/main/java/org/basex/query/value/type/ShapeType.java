@@ -310,7 +310,7 @@ public class ShapeType extends MapType {
 
   @Override
   public final boolean instanceOf(final Type type) {
-    return instanceOf(type, emptySet());
+    return instanceOf(TypeRef.deref(type), emptySet());
   }
 
   /**
@@ -325,7 +325,7 @@ public class ShapeType extends MapType {
     }
     if(type instanceof final ChoiceItemType cit) {
       for(final Type tp : cit.types) {
-        if(instanceOf(tp, pairs)) return true;
+        if(instanceOf(TypeRef.deref(tp), pairs)) return true;
       }
       return false;
     }
