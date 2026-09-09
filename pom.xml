@@ -176,6 +176,13 @@
         <scope>provided</scope>
         <optional>true</optional>
       </dependency>
+      <dependency>
+        <groupId>io.airlift</groupId>
+        <artifactId>aircompressor</artifactId>
+        <version>0.27</version>
+        <scope>provided</scope>
+        <optional>true</optional>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 

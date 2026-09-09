@@ -51,6 +51,12 @@ public abstract class IO {
   public static final String TGZSUFFIX = ".tgz";
   /** GZIP file suffix. */
   public static final String GZSUFFIX = ".gz";
+  /** TZSTD file suffix. */
+  public static final String TARZSTSUFFIX = ".tar.zst";
+  /** TZSTD file suffix. */
+  public static final String TZSTSUFFIX = ".tzst";
+  /** ZSTD file suffix. */
+  public static final String ZSTSUFFIX = ".zst";
   /** TAR file suffix. */
   public static final String TARSUFFIX = ".tar";
   /** XAR file suffix. */
@@ -69,7 +75,7 @@ public abstract class IO {
     { XQSUFFIX, XQMSUFFIX, ".xqy", ".xql", ".xqu", ".xquery", ".xpath" };
   /** Archive suffixes. */
   public static final String[] ARCHIVESUFFIXES = {
-    ZIPSUFFIX, GZSUFFIX, TGZSUFFIX, TARSUFFIX, XARSUFFIX,
+    ZIPSUFFIX, GZSUFFIX, TGZSUFFIX, ZSTSUFFIX, TZSTSUFFIX, TARSUFFIX, XARSUFFIX,
     ".docx", ".pptx", ".xlsx", ".odt", ".odp", ".ods", ".epub", ".idml"
   };
   /** XSL suffixes. */
