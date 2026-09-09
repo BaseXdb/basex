@@ -400,6 +400,51 @@ public final class TextEditorTest {
     return editor.pos();
   }
 
+  /** Typing a bracket or quote surrounds the selected text. */
+  @Test public void surround() {
+    // brackets and quotes
+    assertEquals("a(bc)d", surround("abcd", 1, 3, '('));
+    assertEquals("a[bc]d", surround("abcd", 1, 3, '['));
+    assertEquals("a{bc}d", surround("abcd", 1, 3, '{'));
+    assertEquals("a\"bc\"d", surround("abcd", 1, 3, '"'));
+    assertEquals("a'bc'd", surround("abcd", 1, 3, '\''));
+    assertEquals("a`bc`d", surround("abcd", 1, 3, '`'));
+    // backward selection, multiple lines, whole text
+    assertEquals("a(bc)d", surround("abcd", 3, 1, '('));
+    assertEquals("(ab\ncd)", surround("ab\ncd", 0, 5, '('));
+    // closing brackets and other characters replace the selection
+    assertEquals("abcd", surround("abcd", 1, 3, ')'));
+    assertEquals("abcd", surround("abcd", 1, 3, 'x'));
+    // no selection
+    assertEquals("abcd", surround("abcd", 2, 2, '('));
+  }
+
+  /** The text surrounded by a bracket or quote stays selected. */
+  @Test public void surroundSelection() {
+    final TextEditor editor = editor("abcd");
+    editor.select(3, 1);
+    assertTrue(editor.surround('('));
+    assertEquals(4, editor.start());
+    assertEquals(2, editor.end());
+    assertEquals(2, editor.pos());
+  }
+
+  /**
+   * Surrounds the selected text with the specified character.
+   * @param string text
+   * @param start start of the selection
+   * @param end end of the selection
+   * @param ch typed character
+   * @return new text
+   */
+  private static String surround(final String string, final int start, final int end,
+      final char ch) {
+    final TextEditor editor = editor(string);
+    editor.select(start, end);
+    editor.surround(ch);
+    return Token.string(editor.text());
+  }
+
   /**
    * Returns an editor for the specified text.
    * @param string text

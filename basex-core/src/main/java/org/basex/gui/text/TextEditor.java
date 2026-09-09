@@ -1222,6 +1222,26 @@ public final class TextEditor {
   }
 
   /**
+   * Surrounds the selected text with the specified character and its counterpart.
+   * @param ch typed character
+   * @return {@code true} if the text has been surrounded
+   */
+  boolean surround(final char ch) {
+    if(!isSelected() || !opts.get(GUIOptions.AUTO)) return false;
+    final int opening = Syntax.OPENING.indexOf(ch);
+    final int closing = opening != -1 ? Syntax.CLOSING.charAt(opening) :
+      ch == '"' || ch == '\'' || ch == '`' ? ch : 0;
+    if(closing == 0) return false;
+
+    final int s = selMin(), e = selMax();
+    final boolean backward = start > end;
+    insert(new TokenBuilder(e - s + 2).add(ch).add(text, s, e).add(closing).finish(), s, e);
+    // reselect the surrounded text and preserve the direction of the selection
+    select(backward ? e + 1 : s + 1, backward ? s + 1 : e + 1);
+    return true;
+  }
+
+  /**
    * Closes a bracket and unindents leading whitespace.
    */
   private void close() {

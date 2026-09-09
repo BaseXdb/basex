@@ -888,11 +888,15 @@ public class TextPanel extends BaseXPanel {
     final StringBuilder sb = new StringBuilder(1).append(e.getKeyChar());
     final boolean indent = TAB.is(e) && editor.indent(sb, e.isShiftDown());
 
-    // delete marked text
-    final boolean selected = editor.isSelected() && !indent;
-    if(selected) editor.delete();
-
-    final int move = ENTER.is(e) ? editor.enter(sb) : editor.add(sb, selected);
+    // surround or delete marked text
+    final int move;
+    if(editor.surround(e.getKeyChar())) {
+      move = 0;
+    } else {
+      final boolean selected = editor.isSelected() && !indent;
+      if(selected) editor.delete();
+      move = ENTER.is(e) ? editor.enter(sb) : editor.add(sb, selected);
+    }
 
     // refresh history and adjust cursor position
     hist.store(editor.text(), caret, editor.pos());
