@@ -54,9 +54,11 @@ public final class MemValues extends ValueIndex {
       pres = idRange(range).finish();
       size = pres.length;
     } else {
+      // the token set may contain values of deleted nodes that have no index entries
       final int id = values.index(search.token());
-      if(id == 0) return IndexIterator.EMPTY;
+      if(id == 0 || id >= idsList.size()) return IndexIterator.EMPTY;
       size = lenList.get(id);
+      if(size == 0) return IndexIterator.EMPTY;
       final int[] ids = idsList.get(id);
       if(data.meta.updindex) {
         final IntList tmp = new IntList();

@@ -1,5 +1,6 @@
 package org.basex.index;
 
+import static org.basex.query.func.Function.*;
 import static org.basex.util.Token.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -60,6 +61,21 @@ public final class ValueIndexTest extends SandboxTest {
     set(MainOptions.MAINMEM, false);
     set(MainOptions.UPDINDEX, false);
     execute(new DropDB(NAME));
+  }
+
+  /**
+   * Tests index lookups for values whose nodes have been deleted.
+   * @param paramSet test parameters
+   */
+  @ParameterizedTest
+  @MethodSource("generateParams")
+  public void deletedValues(final Collection<Set> paramSet) {
+    for(final Set set : paramSet) execute(set);
+    execute(new CreateDB(NAME, "<x><a d='1'>1</a><a d='2'>2</a></x>"));
+    query("delete node " + _DB_GET.args(NAME) + "/x/a");
+    execute(new Optimize());
+    query("count(" + _DB_TEXT.args(NAME, "1") + ')', 0);
+    query("count(" + _DB_ATTRIBUTE.args(NAME, "1") + ')', 0);
   }
 
   /**
