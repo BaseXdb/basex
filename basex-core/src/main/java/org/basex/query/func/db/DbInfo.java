@@ -57,7 +57,7 @@ public final class DbInfo extends DbAccessFn {
    * @return element builder
    */
   private static FBuilder element(final String label, final QueryContext qc) {
-    final String col = label.replaceAll("[ -:]", "").toLowerCase(Locale.ENGLISH);
+    final String col = label.replaceAll("[ :-]", "").toLowerCase(Locale.ENGLISH);
     return FElem.build(qc.shared.qName(Token.token(col)));
   }
 }

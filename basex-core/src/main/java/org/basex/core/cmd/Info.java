@@ -43,10 +43,10 @@ public final class Info extends AInfo {
   public static String info(final Context context) {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(GENERAL_INFO + COL + NL);
-    info(tb, VERSINFO, Prop.VERSION);
+    info(tb, INFO_VERSION, Prop.VERSION);
 
     final User user = context.user();
-    info(tb, USED_MEM, Performance.formatMemory());
+    info(tb, INFO_USED_MEM, Performance.formatMemory());
 
     if(user.has(Perm.ADMIN)) {
       final StaticOptions sopts = context.soptions;

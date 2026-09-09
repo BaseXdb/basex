@@ -600,7 +600,7 @@ public interface Text {
   /** Resource added. */
   String RES_ADDED_X = lang("res_added_%");
   /** Resource Properties. */
-  String RES_PROPS = lang("res_props");
+  String RES_PROPS = "Resource Properties";
 
   /** Skipped corrupt files. */
   String SKIPPED = lang("skipped");
@@ -863,18 +863,29 @@ public interface Text {
 
   /** Database Properties. */
   String DB_PROPS = lang("db_props");
+
+  // INFO OUTPUT: returned by commands and functions, hence not localized ==========================
+
   /** General Information. */
-  String GENERAL_INFO = lang("general_info");
+  String GENERAL_INFO = "General Information";
   /** Global Options. */
-  String GLOBAL_OPTIONS = lang("global_options");
+  String GLOBAL_OPTIONS = "Global Options";
   /** Local Options. */
-  String LOCAL_OPTIONS = lang("local_options");
+  String LOCAL_OPTIONS = "Local Options";
   /** External libraries (not localized: the entries are product names). */
   String LIBRARIES = "Libraries";
   /** Libraries found in the classpath. */
   String AVAILABLE = "Available";
   /** Libraries missing in the classpath. */
   String MISSING = "Missing";
+  /** Version ({@link #VERSINFO} is the localized variant). */
+  String INFO_VERSION = "Version";
+  /** Used memory ({@link #USED_MEM} is the localized variant). */
+  String INFO_USED_MEM = "Used Memory";
+  /** Database Properties ({@link #DB_PROPS} is the localized variant). */
+  String INFO_DB_PROPS = "Database Properties";
+  /** Indexes ({@link #INDEXES} is the localized variant). */
+  String INFO_INDEXES = "Indexes";
 
   /** Error. */
   String ERROR = lang("error");

@@ -70,7 +70,7 @@ public final class InfoDB extends AInfo {
       final boolean index) {
     final TokenBuilder tb = new TokenBuilder();
     final String header = (bold ? new TokenBuilder().bold().add('%').norm().toString() : "%") + NL;
-    tb.addExt(header, DB_PROPS);
+    tb.addExt(header, INFO_DB_PROPS);
     info(tb, MetaProp.NAME, meta);
     info(tb, MetaProp.SIZE.name(), Performance.formatHuman(meta.dbSize()));
     info(tb, MetaProp.NODES.name(), nodes);
@@ -87,7 +87,7 @@ public final class InfoDB extends AInfo {
     info(tb, MetaProp.INPUTDATE, meta);
 
     if(index) {
-      tb.add(NL).addExt(header, INDEXES);
+      tb.add(NL).addExt(header, INFO_INDEXES);
       if(meta.oldindex()) {
         tb.add(' ' + H_INDEX_FORMAT + NL);
       } else {
