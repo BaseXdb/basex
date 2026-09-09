@@ -223,10 +223,15 @@ public final class ElementMapRoundtripTest extends SandboxTest {
     query("element-to-map(<x xmlns='u'>1</x>, { 'name-format': 'local', "
         + "'plan': { 'Q{u}x': { 'layout': 'simple', 'type': 'string' } } })?x "
         + "instance of xs:untypedAtomic", true);
-    // content that cannot be cast to the requested type is kept as a string
-    roundtrip("<a>x</a>", " { 'plan': { 'a': { 'layout': 'simple', 'type': 'integer' } } }");
+    // content that cannot be cast to the requested type raises an error
+    error("element-to-map(<a>x</a>, "
+        + "{ 'plan': { 'a': { 'layout': 'simple', 'type': 'integer' } } })", PLAN_TYPE_X_X);
+    // in liberal mode, it is kept as a string
+    roundtrip("<a>x</a>",
+        " { 'liberal': true(), 'plan': { 'a': { 'layout': 'simple', 'type': 'integer' } } }");
+    // values beyond the range of xs:integer are treated in the same way
     roundtrip("<a>123456789012345678901234567890</a>",
-        " { 'plan': { 'a': { 'layout': 'simple', 'type': 'integer' } } }");
+        " { 'liberal': true(), 'plan': { 'a': { 'layout': 'simple', 'type': 'integer' } } }");
     // a plan may be applied to other documents
     query("let $o := { 'plan': element-to-map-plan(<a><b>1</b><b>2</b></a>) } "
         + "return serialize(" + convert("<a><b>1</b></a>", " $o") + ")", "<a><b>1</b></a>");
@@ -331,7 +336,9 @@ public final class ElementMapRoundtripTest extends SandboxTest {
     // missing and unexpected keys
     error("element-to-map(<a/>, { 'plan': { 'a': {} } })", INVALIDOPTION_X);
     error("element-to-map(<a/>, { 'plan': { '@x': { 'layout': 'simple' } } })", INVALIDOPTION_X);
-    error("element-to-map(<a/>, { 'plan': { '@x': {} } })", INVALIDOPTION_X);
+    // an attribute entry without a type is equivalent to the type 'string'
+    query("element-to-map(<a x='1'/>, { 'plan': { '@x': {} } })"
+        + "?a?('@x') instance of xs:untypedAtomic", true);
     error("element-to-map(<a>1</a>, { 'plan': { 'a': { 'layout': 'simple', 'type': 'skip' } } })",
         INVALIDOPTION_X);
     error("element-to-map(<a/>, { 'plan': { 'a': { 'layout': 'empty', 'child': 'b' } } })",
