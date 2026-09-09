@@ -272,7 +272,7 @@ public final class RestXqFunction extends WebFunction {
       for(final String header : state.headers(rxp.name())) {
         for(final String value : HEADER_SEP.split(header)) tl.add(value);
       }
-      bind(rxp, args, StrSeq.get(tl), qc, "Header");
+      bind(rxp, args, StrSeq.get(tl, BasicType.UNTYPED_ATOMIC), qc, "Header");
     }
 
     // bind cookie parameters
@@ -281,7 +281,7 @@ public final class RestXqFunction extends WebFunction {
       Value value = Empty.VALUE;
       if(cookies != null) {
         for(final Cookie c : cookies) {
-          if(rxp.name().equals(c.getName())) value = Str.get(c.getValue());
+          if(rxp.name().equals(c.getName())) value = Atm.get(c.getValue());
         }
       }
       bind(rxp, args, value, qc, "Cookie");

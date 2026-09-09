@@ -306,8 +306,8 @@ public final class Payload {
             final Value files = new ItemList().add(map.get(filename)).add(contents).value();
             value = map.put(filename, files);
           } else {
-            // assign string, join multiple strings
-            final Str v = Str.get(cont.finish().read());
+            // assign untyped value (allows implicit coercion), join multiple values
+            final Atm v = Atm.get(cont.finish().read());
             value = value == null ? v : new ItemList().add(value).add(v).value();
           }
 

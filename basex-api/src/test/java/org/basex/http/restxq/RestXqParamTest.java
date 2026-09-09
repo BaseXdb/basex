@@ -63,6 +63,30 @@ public final class RestXqParamTest extends RestXqTest {
   }
 
   /**
+   * Textual parameters are implicitly coerced to the declared argument type.
+   * @throws Exception exception
+   */
+  @Test public void parameterCoercion() throws Exception {
+    final String func = " function m:f($a as xs:date?) { $a + xs:dayTimeDuration('P1D') };";
+    get("2026-09-10", "declare %R:path('') %R:query-param('a', '{$a}')" + func, "?a=2026-09-09");
+    post("2026-09-10", "declare %R:path('') %R:POST %R:form-param('a', '{$a}')" + func, "",
+        "a=2026-09-09", MediaType.APPLICATION_X_WWW_FORM_URLENCODED);
+
+    register("declare %R:path('') %R:POST %R:form-param('a', '{$a}')" + func);
+    final byte[] body = Token.token(
+        "--bnd\r\nContent-Disposition: form-data; name=\"a\"\r\n\r\n2026-09-09\r\n--bnd--\r\n");
+    assertEquals("2026-09-10", send(200, "POST", new ArrayInput(body),
+        new MediaType("multipart/form-data; boundary=bnd"), ""));
+
+    register("declare %R:path('') %R:header-param('X-Date', '{$a}')" + func);
+    assertEquals("2026-09-10", send(200, "GET", null, null, Map.of("X-Date", "2026-09-09"), ""));
+
+    register("declare %R:path('') %R:cookie-param('date', '{$a}')" + func);
+    assertEquals("2026-09-10",
+        send(200, "GET", null, null, Map.of("Cookie", "date=2026-09-09"), ""));
+  }
+
+  /**
    * Uploaded files are bound as a map with file names and contents. Parts that outgrow the
    * spill threshold are covered by {@code PayloadTest}, as they cannot be provoked via HTTP.
    * @throws Exception exception
