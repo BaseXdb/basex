@@ -54,6 +54,7 @@ public final class DbModuleTest extends SandboxTest {
 
   /** Finalizes a test. */
   @AfterEach public void finish() {
+    set(MainOptions.UPDINDEX, false);
     set(MainOptions.TEXTINCLUDE, "");
     set(MainOptions.ATTRINCLUDE, "");
     set(MainOptions.TOKENINCLUDE, "");
@@ -774,6 +775,16 @@ public final class DbModuleTest extends SandboxTest {
     query(func.args(NAME, " (0, 1)") + "//title/text()", "XML");
     error(func.args(NAME, -1), DB_RANGE_X_X);
     error(func.args(NAME, Integer.MAX_VALUE), DB_RANGE_X_X);
+
+    // deleted nodes
+    set(MainOptions.UPDINDEX, true);
+    execute(new CreateDB(NAME, "<a><b/><c/></a>"));
+    query("delete node " + _DB_GET.args(NAME) + "//b");
+    error(func.args(NAME, 2), DB_RANGE_X_X);
+    query(func.args(NAME, 3) + "/name()", "c");
+    execute(new Close());
+    execute(new Open(NAME));
+    error(func.args(NAME, 2), DB_RANGE_X_X);
   }
 
   /** Test method. */

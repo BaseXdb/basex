@@ -30,6 +30,8 @@ public class IdPreMap {
   private int[] incs;
   /** ID values for the PRE, before inserting/deleting a record. */
   private int[] oids;
+  /** Deleted base IDs: sorted, disjoint ranges of first and last IDs (can be {@code null}). */
+  private int[] deleted;
 
   /** Number of records in the table. */
   private int rows;
@@ -61,6 +63,9 @@ public class IdPreMap {
       nids = in.readNums();
       incs = in.readNums();
       oids = in.readNums();
+      // trailing block; missing in files written by older versions
+      final int[] ranges = in.readNums();
+      if(ranges.length != 0) deleted = ranges;
     }
   }
 
@@ -78,6 +83,7 @@ public class IdPreMap {
       out.writeNums(nids);
       out.writeNums(incs);
       out.writeNums(oids);
+      out.writeNums(deleted == null ? new int[0] : deleted);
     }
   }
 
@@ -92,9 +98,11 @@ public class IdPreMap {
   /**
    * Finds the PRE value of a given ID.
    * @param id ID
-   * @return PRE, or -1 if an ID inserted by an update was deleted again (base IDs are never -1)
+   * @return PRE, or -1 if the ID was deleted
    */
   public int pre(final int id) {
+    // deleted base ID
+    if(deleted != null && deleted(id)) return -1;
     // no updates or ID is not affected by updates
     if(rows == 0 || id < pres[0]) return id;
 
@@ -166,6 +174,54 @@ public class IdPreMap {
 
     // add the new interval
     add(pos, pre, id, id + c - 1, inc, oid);
+  }
+
+  /**
+   * Returns the base ID.
+   * @return base ID
+   */
+  public final int baseid() {
+    return baseid;
+  }
+
+  /**
+   * Marks a range of base IDs as deleted.
+   * @param first first ID
+   * @param last last ID
+   */
+  public final void markDeleted(final int first, final int last) {
+    int f = first, l = Math.min(last, baseid);
+    if(f > l) return;
+
+    // merge with overlapping and adjacent ranges
+    final IntList list = new IntList();
+    final int dl = deleted == null ? 0 : deleted.length;
+    int d = 0;
+    for(; d < dl && deleted[d + 1] < f - 1; d += 2) list.add(deleted[d], deleted[d + 1]);
+    for(; d < dl && deleted[d] <= l + 1; d += 2) {
+      f = Math.min(f, deleted[d]);
+      l = Math.max(l, deleted[d + 1]);
+    }
+    list.add(f, l);
+    for(; d < dl; d += 2) list.add(deleted[d], deleted[d + 1]);
+    deleted = list.finish();
+  }
+
+  /**
+   * Checks if a base ID was deleted.
+   * @param id ID
+   * @return result of check
+   */
+  private boolean deleted(final int id) {
+    int low = 0;
+    int high = (deleted.length >> 1) - 1;
+    while(low <= high) {
+      final int mid = low + high >>> 1;
+      if(deleted[(mid << 1) + 1] < id) low = mid + 1;
+      else if(deleted[mid << 1] > id) high = mid - 1;
+      else return true;
+    }
+    return false;
   }
 
   /**
@@ -382,6 +438,6 @@ public class IdPreMap {
       tl.add(pres[i]).add(fids[i]).add(nids[i]).add(incs[i]).add(oids[i]);
       t.contents.add(tl);
     }
-    return t + "\n- BaseID: " + baseid + '\n';
+    return t + "\n- BaseID: " + baseid + "\n- Deleted: " + Arrays.toString(deleted) + '\n';
   }
 }

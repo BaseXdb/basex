@@ -2,9 +2,13 @@ package org.basex.data;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.*;
 import java.util.*;
 
 import org.basex.index.*;
+import org.basex.io.*;
+import org.basex.io.out.DataOutput;
+import org.basex.util.*;
 import org.basex.util.list.*;
 import org.junit.jupiter.api.*;
 
@@ -93,6 +97,77 @@ public final class IdPreMapTest {
       if(RANDOM.nextBoolean() || cnt == 0) insert(RANDOM.nextInt(++cnt), id++);
       else delete(RANDOM.nextInt(cnt--));
       check();
+    }
+  }
+
+  /** Deleted base IDs. */
+  @Test public void deletedBaseIds() {
+    final IdPreMap map = new IdPreMap(10);
+    // delete in the middle
+    map.markDeleted(5, 5);
+    map.delete(5, 5, -1);
+    assertEquals(-1, map.pre(5));
+    assertEquals(4, map.pre(4));
+    assertEquals(5, map.pre(6));
+    // delete at the end
+    map.markDeleted(10, 10);
+    map.delete(9, 10, -1);
+    assertEquals(-1, map.pre(10));
+    assertEquals(8, map.pre(9));
+    // inserted IDs are never marked
+    map.insert(4, 11, 1);
+    map.markDeleted(11, 11);
+    assertEquals(4, map.pre(11));
+  }
+
+  /** Deleted base IDs: merging of ranges. */
+  @Test public void deletedRanges() {
+    final IdPreMap map = new IdPreMap(20);
+    map.markDeleted(3, 4);
+    map.markDeleted(8, 9);
+    map.markDeleted(14, 15);
+    map.markDeleted(2, 2);
+    map.markDeleted(10, 12);
+    map.markDeleted(5, 7);
+    assertTrue(map.toString().contains("[2, 12, 14, 15]"), map.toString());
+    for(int id = 0; id <= 20; id++) {
+      final boolean del = id >= 2 && id <= 12 || id == 14 || id == 15;
+      assertEquals(del ? -1 : id, map.pre(id), "ID " + id);
+    }
+  }
+
+  /** Deleted base IDs: last record, no other updates. */
+  @Test public void deletedLastBaseId() {
+    final IdPreMap map = new IdPreMap(10);
+    map.markDeleted(10, 10);
+    map.delete(10, 10, -1);
+    assertEquals(-1, map.pre(10));
+    assertEquals(9, map.pre(9));
+  }
+
+  /**
+   * Deleted base IDs: persistence, files without trailing block.
+   * @throws IOException I/O exception
+   */
+  @Test public void deletedBaseIdsIO() throws IOException {
+    final IOFile file = new IOFile(Prop.TEMPDIR, "IdPreMapTest.idp");
+    try {
+      final IdPreMap map = new IdPreMap(10);
+      map.markDeleted(5, 5);
+      map.delete(5, 5, -1);
+      map.write(file);
+      assertEquals(-1, new IdPreMap(file).pre(5));
+      assertEquals(5, new IdPreMap(file).pre(6));
+
+      // file written by an older version
+      try(DataOutput out = new DataOutput(file)) {
+        out.writeNum(10);
+        out.writeNum(0);
+        for(int i = 0; i < 5; i++) out.writeNums(new int[0]);
+      }
+      assertEquals(5, new IdPreMap(file).pre(5));
+    } finally {
+      file.delete();
     }
   }
 

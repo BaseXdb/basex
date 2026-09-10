@@ -1226,7 +1226,16 @@ public abstract class Data {
       if(meta.textindex) textIndex.delete(new ValueCache(pre, size, IndexType.TEXT, this));
       if(meta.attrindex) attrIndex.delete(new ValueCache(pre, size, IndexType.ATTRIBUTE, this));
       if(meta.tokenindex) tokenIndex.delete(new ValueCache(pre, size, IndexType.TOKEN, this));
-      if(id != -1) idmap.delete(pre, id, -size);
+      if(id != -1) {
+        // base IDs ascend with PRE values, inserted nodes have no base descendants
+        final int baseid = idmap.baseid();
+        if(id <= baseid) {
+          int last = pre + size - 1;
+          while(id(last) > baseid) last--;
+          idmap.markDeleted(id, id(last));
+        }
+        idmap.delete(pre, id, -size);
+      }
     }
   }
 
