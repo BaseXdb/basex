@@ -1,13 +1,11 @@
 package org.basex.index.ft;
 
-import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
 
 import org.basex.data.*;
-import org.basex.io.*;
 import org.basex.io.random.*;
 
 /**
@@ -22,15 +20,9 @@ final class FTList {
 
   /** Storing PRE and POS values for each token. */
   private final DataAccess dat;
-  /** Structure file. */
-  private final IOFile files;
-  /** Data file. */
-  private final IOFile filed;
   /** Wasted flag. */
   private boolean wasted;
 
-  /** Size file. */
-  private final IOFile sizes;
   /** Token positions. */
   private final int[] tp;
   /** Pointer on current token length. */
@@ -55,19 +47,16 @@ final class FTList {
   /**
    * Constructor, initializing the index structure.
    * @param data data
-   * @param prefix prefix
+   * @param prefix file prefix of the index structure
    * @throws IOException I/O exception
    */
-  FTList(final Data data, final int prefix) throws IOException {
-    files = data.meta.dbFile(DATAFTX + prefix + 'y');
-    filed = data.meta.dbFile(DATAFTX + prefix + 'z');
-    str = new DataAccess(files);
-    dat = new DataAccess(filed);
+  FTList(final Data data, final String prefix) throws IOException {
+    str = new DataAccess(data.meta.dbFile(prefix + 'y'));
+    dat = new DataAccess(data.meta.dbFile(prefix + 'z'));
     tp = new int[data.meta.maxlen + 3];
     final int tl = tp.length;
     Arrays.fill(tp, 0, tl, -1);
-    sizes = data.meta.dbFile(DATAFTX + prefix + 'x');
-    try(DataAccess li = new DataAccess(sizes)) {
+    try(DataAccess li = new DataAccess(data.meta.dbFile(prefix + 'x'))) {
       int is = li.readNum();
       while(--is >= 0) {
         final int p = li.readNum();
@@ -101,14 +90,11 @@ final class FTList {
   }
 
   /**
-   * Closes and deletes the input files.
+   * Closes the input files.
    */
   private void close() {
     str.close();
     dat.close();
-    files.delete();
-    filed.delete();
-    sizes.delete();
   }
 
   /**

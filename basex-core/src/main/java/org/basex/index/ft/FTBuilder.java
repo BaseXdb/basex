@@ -67,11 +67,18 @@ public final class FTBuilder extends IndexBuilder {
       for(pre = 0; pre < size; ++pre) {
         if((pre & 0x0FFF) == 0) check();
         // atomized value of a text node is its own value
-        if(mixed ? indexElement() : indexEntry()) index(data.atom(pre));
+        if(mixed ? indexElement() : indexEntry()) index(pre, data.atom(pre));
       }
 
-      // finalize partial or all index structures
-      write(splits > 0);
+      // write the index, or the last partial index, and merge all partial indexes
+      if(splits == 0) {
+        writeIndex(DATAFTX);
+      } else {
+        writeIndex(partial(splits));
+        final String[] inputs = new String[splits];
+        for(int s = 0; s < splits; s++) inputs[s] = partial(s);
+        merge(inputs, DATAFTX);
+      }
 
       finishIndex();
       return new FTIndex(data);
@@ -84,10 +91,11 @@ public final class FTBuilder extends IndexBuilder {
 
   /**
    * Indexes the tokens of a value.
+   * @param id ID of the value (currently, the PRE value)
    * @param value value to be indexed
    * @throws IOException I/O exception
    */
-  private void index(final byte[] value) throws IOException {
+  private void index(final int id, final byte[] value) throws IOException {
     final StopWords sw = lexer.ftOpt().sw;
     lexer.init(value);
     int pos = -1;
@@ -98,51 +106,58 @@ public final class FTBuilder extends IndexBuilder {
       if(token.length <= data.meta.maxlen && !sw.contains(token)) {
         // check if main memory is exhausted
         if((ntok++ & 0xFFFF) == 0 && splitRequired()) {
-          writeIndex(true);
+          writeIndex(partial(splits));
           clean();
         }
-        tree.index(token, pre, pos, splits);
+        tree.index(token, id, pos, splits);
         count++;
       }
     }
   }
 
   /**
-   * Writes the index data to disk.
-   * @param partial write partial index
+   * Returns the file prefix of a partial index.
+   * @param split split counter
+   * @return prefix
+   */
+  private static String partial(final int split) {
+    return DATAFTX + "tmp" + split;
+  }
+
+  /**
+   * Merges index structures and deletes the input files.
+   * @param inputs file prefixes of the input index structures
+   * @param output file prefix of the output index structure
    * @throws IOException I/O exception
    */
-  private void write(final boolean partial) throws IOException {
-    writeIndex(partial);
-    if(!partial) return;
-
-    // merges temporary index files
-    try(DataOutput outX = new DataOutput(data.meta.dbFile(DATAFTX + 'x'));
-        DataOutput outY = new DataOutput(data.meta.dbFile(DATAFTX + 'y'));
-        DataOutput outZ = new DataOutput(data.meta.dbFile(DATAFTX + 'z'))) {
+  private void merge(final String[] inputs, final String output) throws IOException {
+    final int il = inputs.length;
+    try(DataOutput outX = new DataOutput(data.meta.dbFile(output + 'x'));
+        DataOutput outY = new DataOutput(data.meta.dbFile(output + 'y'));
+        DataOutput outZ = new DataOutput(data.meta.dbFile(output + 'z'))) {
 
       final IntList ind = new IntList();
 
-      // open all temporary sorted lists
-      final FTList[] v = new FTList[splits];
-      for(int b = 0; b < splits; ++b) v[b] = new FTList(data, b);
+      // open all sorted lists
+      final FTList[] v = new FTList[il];
+      for(int b = 0; b < il; ++b) v[b] = new FTList(data, inputs[b]);
 
-      final IntList il = new IntList();
+      final IntList list = new IntList();
       while(check(v)) {
-        il.reset();
+        list.reset();
         int m = 0;
-        il.add(m);
+        list.add(m);
         // find next token to write on disk
-        for(int i = 0; i < splits; ++i) {
+        for(int i = 0; i < il; ++i) {
           if(m == i || v[i].token.length == 0) continue;
           final int l = v[i].token.length - v[m].token.length;
           final int d = compare(v[m].token, v[i].token);
           if(l < 0 || l == 0 && d > 0 || v[m].token.length == 0) {
             m = i;
-            il.reset();
-            il.add(m);
+            list.reset();
+            list.add(m);
           } else if(d == 0 && v[i].token.length > 0) {
-            il.add(i);
+            list.add(i);
           }
         }
 
@@ -156,9 +171,12 @@ public final class FTBuilder extends IndexBuilder {
         // pointer on full-text data
         outY.write5(outZ.size());
         // merge and write data size
-        outY.write4(merge(outZ, il, v));
+        outY.write4(merge(outZ, list, v));
       }
       writeInd(outX, ind, ind.get(ind.size() - 2) + 1, (int) outY.size());
+    }
+    for(final String input : inputs) {
+      for(final char c : new char[] { 'x', 'y', 'z' }) data.meta.dbFile(input + c).delete();
     }
   }
 
@@ -185,14 +203,13 @@ public final class FTBuilder extends IndexBuilder {
 
   /**
    * Writes the current index to disk.
-   * @param partial partial flag
+   * @param prefix file prefix of the index structure
    * @throws IOException I/O exception
    */
-  private void writeIndex(final boolean partial) throws IOException {
-    final String name = DATAFTX + (partial ? splits : "");
-    try(DataOutput outX = new DataOutput(data.meta.dbFile(name + 'x'));
-        DataOutput outY = new DataOutput(data.meta.dbFile(name + 'y'));
-        DataOutput outZ = new DataOutput(data.meta.dbFile(name + 'z'))) {
+  private void writeIndex(final String prefix) throws IOException {
+    try(DataOutput outX = new DataOutput(data.meta.dbFile(prefix + 'x'));
+        DataOutput outY = new DataOutput(data.meta.dbFile(prefix + 'y'));
+        DataOutput outZ = new DataOutput(data.meta.dbFile(prefix + 'z'))) {
 
       final IntList ind = new IntList();
       tree.init();

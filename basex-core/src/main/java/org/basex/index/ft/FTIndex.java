@@ -75,11 +75,21 @@ public final class FTIndex extends ValueIndex {
    * @throws IOException I/O Exception
    */
   public FTIndex(final Data data) throws IOException {
+    this(data, DATAFTX);
+  }
+
+  /**
+   * Constructor, initializing the index structure.
+   * @param data data reference
+   * @param prefix file prefix of the index structure
+   * @throws IOException I/O Exception
+   */
+  FTIndex(final Data data, final String prefix) throws IOException {
     super(data, IndexType.FULLTEXT);
     // cache token length index
-    dataX = new DataAccess(data.meta.dbFile(DATAFTX + 'x'));
-    dataY = new DataAccess(data.meta.dbFile(DATAFTX + 'y'));
-    dataZ = new DataAccess(data.meta.dbFile(DATAFTX + 'z'));
+    dataX = new DataAccess(data.meta.dbFile(prefix + 'x'));
+    dataY = new DataAccess(data.meta.dbFile(prefix + 'y'));
+    dataZ = new DataAccess(data.meta.dbFile(prefix + 'z'));
     positions = new int[data.meta.maxlen + 3];
     final int pl = positions.length;
     Arrays.fill(positions, -1);
