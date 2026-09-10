@@ -95,10 +95,11 @@ public abstract class ValueIndex implements Index {
 
   /**
    * Optimizes the index structure.
+   * @param auto automatic optimization after an update: skip the work if it is not worthwhile
    * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
-  public void optimize() throws IOException { }
+  public void optimize(final boolean auto) throws IOException { }
 
   /**
    * Adds or deletes the specified entries.

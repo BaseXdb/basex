@@ -77,7 +77,7 @@ public final class Optimize extends ACreate {
     // GH-676: optimize database and rebuild index structures if ID has turned negative
     if(data.lastid < data.nodes() - 1) optimizeIds(data);
     // GH-1035: auto-optimize database
-    if(data.meta.autooptimize) optimize(data, null);
+    if(data.meta.autooptimize) optimize(data, false, false, false, false, true, null);
   }
 
   /**
@@ -87,7 +87,7 @@ public final class Optimize extends ACreate {
    * @throws IOException I/O exception
    */
   public static void optimize(final Data data, final Optimize cmd) throws IOException {
-    optimize(data, false, false, false, false, cmd);
+    optimize(data, false, false, false, false, false, cmd);
   }
 
   /**
@@ -97,11 +97,13 @@ public final class Optimize extends ACreate {
    * @param enforceAttr enforce creation or deletion of attribute index
    * @param enforceToken enforce creation or deletion of token index
    * @param enforceFt enforce creation or deletion of full-text index
+   * @param auto automatic optimization after an update
    * @param cmd calling command instance (can be {@code null})
    * @throws IOException I/O exception
    */
-  public static void optimize(final Data data, final boolean enforceText, final boolean enforceAttr,
-      final boolean enforceToken, final boolean enforceFt, final Optimize cmd) throws IOException {
+  public static void optimize(final Data data, final boolean enforceText,
+      final boolean enforceAttr, final boolean enforceToken, final boolean enforceFt,
+      final boolean auto, final Optimize cmd) throws IOException {
 
     // initialize structural indexes
     final MetaData meta = data.meta;
@@ -160,10 +162,10 @@ public final class Optimize extends ACreate {
     }
 
     // rebuild value indexes
-    optimize(IndexType.TEXT, data, meta.createtext, enforceText, cmd);
-    optimize(IndexType.ATTRIBUTE, data, meta.createattr, enforceAttr, cmd);
-    optimize(IndexType.TOKEN, data, meta.createtoken, enforceToken, cmd);
-    optimize(IndexType.FULLTEXT, data, meta.createft, enforceFt, cmd);
+    optimize(IndexType.TEXT, data, meta.createtext, enforceText, auto, cmd);
+    optimize(IndexType.ATTRIBUTE, data, meta.createattr, enforceAttr, auto, cmd);
+    optimize(IndexType.TOKEN, data, meta.createtoken, enforceToken, auto, cmd);
+    optimize(IndexType.FULLTEXT, data, meta.createft, enforceFt, auto, cmd);
   }
 
   /**
@@ -172,16 +174,17 @@ public final class Optimize extends ACreate {
    * @param data data reference
    * @param create new flag
    * @param enforce enforce operation
+   * @param auto automatic optimization after an update
    * @param cmd calling command instance
    * @throws IOException I/O exception
    */
   private static void optimize(final IndexType type, final Data data, final boolean create,
-      final boolean enforce, final Optimize cmd) throws IOException {
+      final boolean enforce, final boolean auto, final Optimize cmd) throws IOException {
 
     // check if flags have changed
     if(create == data.meta.index(type) && !enforce) {
       // optimize existing index
-      if(data.index(type) instanceof final ValueIndex index) index.optimize();
+      if(data.index(type) instanceof final ValueIndex index) index.optimize(auto);
       return;
     }
     // create or drop index
@@ -204,7 +207,7 @@ public final class Optimize extends ACreate {
     if(data.meta.updindex) {
       data.idmap = new IdPreMap(md.lastid);
       for(final IndexType type : IndexType.VALUE_INDEXES) {
-        if(md.index(type)) optimize(type, data, true, true, null);
+        if(md.index(type)) optimize(type, data, true, true, false, null);
       }
     }
   }
