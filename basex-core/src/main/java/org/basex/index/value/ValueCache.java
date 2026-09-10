@@ -24,6 +24,14 @@ public final class ValueCache implements Iterable<byte[]> {
   private final ArrayList<IntList> pos;
 
   /**
+   * Constructor for an empty cache.
+   * @param type index type
+   */
+  ValueCache(final IndexType type) {
+    pos = type == IndexType.TOKEN ? new ArrayList<>() : null;
+  }
+
+  /**
    * Caches the text and ID for a node with specified PRE value.
    * @param pre PRE value
    * @param type index type
@@ -51,8 +59,7 @@ public final class ValueCache implements Iterable<byte[]> {
    * @param data data reference
    */
   public ValueCache(final IntList pres, final IndexType type, final Data data) {
-    pos = type == IndexType.TOKEN ? new ArrayList<>() : null;
-
+    this(type);
     final IndexNames in = new IndexNames(type, data);
     final boolean text = type == IndexType.TEXT;
     final int pl = pres.size(), kind = text ? Data.TEXT : Data.ATTR;
@@ -92,6 +99,16 @@ public final class ValueCache implements Iterable<byte[]> {
    * @param data data reference
    */
   private void addId(final byte[] text, final int pre, final int ps, final Data data) {
+    add(text, data.id(pre), ps);
+  }
+
+  /**
+   * Adds a single ID and position.
+   * @param text text
+   * @param id ID
+   * @param ps position
+   */
+  void add(final byte[] text, final int id, final int ps) {
     final int i = keys.put(text) - 1;
     final boolean exists = i < ids.size();
 
@@ -102,7 +119,7 @@ public final class ValueCache implements Iterable<byte[]> {
       list = new IntList(1);
       ids.add(list);
     }
-    list.add(data.id(pre));
+    list.add(id);
 
     if(pos != null) {
       if(exists) {
@@ -116,20 +133,49 @@ public final class ValueCache implements Iterable<byte[]> {
   }
 
   /**
+   * Removes a single ID and position, if it is cached.
+   * @param text text
+   * @param id ID
+   * @param ps position
+   * @return {@code true} if the entry was removed
+   */
+  boolean remove(final byte[] text, final int id, final int ps) {
+    final int i = keys.index(text) - 1;
+    if(i < 0) return false;
+    final IntList list = ids.get(i), pl = pos != null ? pos.get(i) : null;
+    final int ls = list.size();
+    for(int l = 0; l < ls; l++) {
+      if(list.get(l) == id && (pl == null || pl.get(l) == ps)) {
+        list.remove(l);
+        if(pl != null) pl.remove(l);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Checks if the cache contains no entries.
    * @return result of check
    */
   public boolean isEmpty() {
-    return keys.isEmpty();
+    for(final IntList list : ids) {
+      if(!list.isEmpty()) return false;
+    }
+    return true;
   }
 
   /**
-   * Returns an iterator with all keys in sorted order.
+   * Returns an iterator with all keys that have entries, in sorted order.
    * @return keys iterator
    */
   @Override
   public Iterator<byte[]> iterator() {
-    return new TokenList(keys).sort().iterator();
+    final TokenList list = new TokenList();
+    for(final byte[] key : keys) {
+      if(!ids(key).isEmpty()) list.add(key);
+    }
+    return list.sort().iterator();
   }
 
   /**

@@ -1,10 +1,12 @@
 package org.basex.index.value;
 
 import java.io.*;
+import java.util.*;
 
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -17,6 +19,10 @@ import org.basex.util.list.*;
 public final class UpdatableDiskValues extends DiskValues {
   /** Free slots. */
   private final FreeSlots free = new FreeSlots();
+  /** Pending additions of the current transaction. */
+  private ValueCache adds;
+  /** Keys emptied by the current transaction, with their positions. */
+  private IntObjectMap<byte[]> tombstones = new IntObjectMap<>();
 
   /**
    * Constructor, initializing the index structure.
@@ -35,6 +41,68 @@ public final class UpdatableDiskValues extends DiskValues {
 
   @Override
   public synchronized void add(final ValueCache values) {
+    // deferred: new keys are inserted once per transaction (see #apply)
+    if(adds == null) adds = new ValueCache(type);
+    for(final byte[] key : values) {
+      final IntList ids = values.ids(key), pos = values.pos(key);
+      final int is = ids.size();
+      for(int i = 0; i < is; i++) adds.add(key, ids.get(i), pos != null ? pos.get(i) : 0);
+    }
+  }
+
+  @Override
+  public synchronized void delete(final ValueCache values) {
+    // entries added by the same transaction have not been written yet: discard them instead
+    final ValueCache rest = new ValueCache(type);
+    for(final byte[] key : values) {
+      final IntList ids = values.ids(key), pos = values.pos(key);
+      final int is = ids.size();
+      for(int i = 0; i < is; i++) {
+        final int id = ids.get(i), ps = pos != null ? pos.get(i) : 0;
+        if(adds == null || !adds.remove(key, id, ps)) rest.add(key, id, ps);
+      }
+    }
+    if(!rest.isEmpty()) deleteNow(rest);
+  }
+
+  @Override
+  public synchronized void finishUpdate() {
+    apply();
+  }
+
+  @Override
+  public synchronized void flush() {
+    apply();
+    super.flush();
+  }
+
+  @Override
+  protected byte[] pinned(final int index) {
+    return tombstones.get(index);
+  }
+
+  /**
+   * Removes the emptied keys and inserts the new entries: the key list is rewritten once per
+   * transaction instead of once per node, which makes many small changes cheap.
+   */
+  private void apply() {
+    if(!tombstones.isEmpty()) {
+      final int[] positions = tombstones.keys();
+      Arrays.sort(positions);
+      deleteKeys(new IntList(positions));
+      tombstones = new IntObjectMap<>();
+    }
+    if(adds != null) {
+      if(!adds.isEmpty()) addNow(adds);
+      adds = null;
+    }
+  }
+
+  /**
+   * Adds entries to the index.
+   * @param values value cache
+   */
+  private void addNow(final ValueCache values) {
     // create a sorted list of the new keys and update the old keys
     final TokenList newKeys = new TokenList();
 
@@ -87,20 +155,21 @@ public final class UpdatableDiskValues extends DiskValues {
     size(sz + ns);
   }
 
-  @Override
-  public synchronized void delete(final ValueCache values) {
-    // create a list of the indexes of the keys which should be completely deleted
-    final IntList keys = new IntList();
+  /**
+   * Deletes entries from the index.
+   * @param values value cache
+   */
+  private void deleteNow(final ValueCache values) {
     int p = 0;
     final int sz = size();
     // update ID lists of keys (in ascending order; speeds up binary search)
     for(final byte[] key : values) {
       p = get(key, p, sz);
       if(p < 0) throw Util.notExpected("Key does not exist: '%'", key);
-      if(deleteIds(p, key, values)) keys.add(p);
+      // an emptied key is removed at the end of the transaction
+      if(deleteIds(p, key, values)) tombstones.put(p, key);
       p++;
     }
-    deleteKeys(keys);
   }
 
   @Override
@@ -134,16 +203,17 @@ public final class UpdatableDiskValues extends DiskValues {
       }
     }
 
-    // remove old IDs
-    free.add((int) (idxl.cursor() - off), off);
-
-    // delete cached index entry if no IDs remain
+    // no IDs remain: the entry stays in place with an empty list until the end of the
+    // transaction, so that lookups passing its position see a consistent state
     if(newSize == 0) {
+      idxl.cursor(off);
+      idxl.writeNum(0);
       cache.delete(key);
       return true;
     }
 
-    // write new IDs
+    // remove old IDs, write new IDs
+    free.add((int) (idxl.cursor() - off), off);
     writeIds(key, newIds, newPos, index);
     return false;
   }

@@ -165,7 +165,7 @@ public class DiskValues extends ValueIndex {
   }
 
   @Override
-  public final void flush() {
+  public void flush() {
     idxl.flush();
     idxr.flush();
   }
@@ -326,10 +326,19 @@ public class DiskValues extends ValueIndex {
     final long pos = idxr.read5(index * 5L);
     final int count = idxl.readNum(pos);
     if(key == null) {
-      key = key(idxl.readNum());
+      key = count == 0 ? pinned(index) : key(idxl.readNum());
       ctext.put(index, key);
     }
     return cache.add(key, count, pos + Num.length(count));
+  }
+
+  /**
+   * Returns the key of an entry without IDs, which cannot be derived from a node.
+   * @param index key position
+   * @return key
+   */
+  protected byte[] pinned(final int index) {
+    throw Util.notExpected("No IDs for key %.", index);
   }
 
   /**
