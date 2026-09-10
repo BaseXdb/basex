@@ -30,22 +30,15 @@ public final class DropIndex extends ACreate {
   protected boolean run() {
     final Data data = context.data();
     final CmdIndex ci = getOption(CmdIndex.class);
-    final IndexType type;
-    if(ci == CmdIndex.TEXT) {
-      type = IndexType.TEXT;
-      data.meta.createtext = false;
-    } else if(ci == CmdIndex.ATTRIBUTE) {
-      type = IndexType.ATTRIBUTE;
-      data.meta.createattr = false;
-    } else if(ci == CmdIndex.TOKEN) {
-      type = IndexType.TOKEN;
-      data.meta.createtoken = false;
-    } else if(ci == CmdIndex.FULLTEXT) {
-      type = IndexType.FULLTEXT;
-      data.meta.createft = false;
-    } else {
-      return error(UNKNOWN_CMD_X, this);
-    }
+    final IndexType type = switch(ci) {
+      case TEXT      -> IndexType.TEXT;
+      case ATTRIBUTE -> IndexType.ATTRIBUTE;
+      case TOKEN     -> IndexType.TOKEN;
+      case FULLTEXT  -> IndexType.FULLTEXT;
+      default        -> null;
+    };
+    if(type == null) return error(UNKNOWN_CMD_X, this);
+    data.meta.create(type, false);
     data.meta.names(type, options);
 
     return update(data, () -> {

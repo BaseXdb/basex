@@ -123,14 +123,22 @@ public abstract class ValueIndex implements Index {
     final boolean text = type == IndexType.TEXT;
     if(kind == Data.ATTR) return text ? null : new ValueCache(pre, type, data);
     if(kind != Data.ELEM || !text) return null;
-    // collect child text nodes
+    return new ValueCache(childTexts(pre), type, data);
+  }
+
+  /**
+   * Returns the PRE values of the child text nodes of an element.
+   * @param pre PRE value of the element
+   * @return PRE values
+   */
+  protected final IntList childTexts(final int pre) {
     final IntList pres = new IntList();
-    final int last = pre + data.size(pre, kind);
-    for(int curr = pre + data.attSize(pre, kind); curr < last;) {
-      final int k = data.kind(curr);
-      if(k == Data.TEXT) pres.add(curr);
-      curr += data.size(curr, k);
+    final int last = pre + data.size(pre, Data.ELEM);
+    for(int curr = pre + data.attSize(pre, Data.ELEM); curr < last;) {
+      final int kind = data.kind(curr);
+      if(kind == Data.TEXT) pres.add(curr);
+      curr += data.size(curr, kind);
     }
-    return new ValueCache(pres, type, data);
+    return pres;
   }
 }

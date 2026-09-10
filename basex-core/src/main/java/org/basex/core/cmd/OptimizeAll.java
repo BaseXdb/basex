@@ -10,6 +10,7 @@ import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
+import org.basex.index.*;
 import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
@@ -126,10 +127,7 @@ public final class OptimizeAll extends ACreate {
 
     // adopt original meta data, create new index structures
     final MetaData nmeta = ndata.meta;
-    nmeta.createtext = ometa.createtext;
-    nmeta.createattr = ometa.createattr;
-    nmeta.createtoken = ometa.createtoken;
-    nmeta.createft = ometa.createft;
+    for(final IndexType type : IndexType.VALUE_INDEXES) nmeta.create(type, ometa.create(type));
     nmeta.original = ometa.original;
     nmeta.inputsize = ometa.inputsize;
     nmeta.time = ometa.time;

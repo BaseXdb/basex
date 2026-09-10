@@ -36,7 +36,7 @@ public abstract class IndexBuilder extends Job {
   private final long maxMem = (long) (Runtime.getRuntime().maxMemory() * 0.8);
 
   /** Names and namespace URI of element or attributes to include. */
-  private final IndexNames includeNames;
+  protected final IndexNames includeNames;
 
   /** Current PRE value. */
   protected int pre;
@@ -55,7 +55,7 @@ public abstract class IndexBuilder extends Job {
   protected IndexBuilder(final Data data, final IndexType type) {
     this.data = data;
     this.type = type;
-    splitSize = (int) Math.min(Integer.MAX_VALUE, (long) data.meta.splitsize * splitFactor());
+    splitSize = (int) Math.min(Integer.MAX_VALUE, (long) data.meta.splitsize * splitFactor(type));
     size = data.nodes();
     includeNames = new IndexNames(type, data);
     text = type == IndexType.TEXT || type == IndexType.FULLTEXT;
@@ -79,22 +79,6 @@ public abstract class IndexBuilder extends Job {
   protected void check() throws IOException {
     checkStop();
     if(Prop.debug && (pre & 0x1FFFFF) == 0) Util.err(".");
-  }
-
-  /**
-   * Checks if the current entry should be indexed.
-   * @return result of check
-   */
-  protected final boolean indexEntry() {
-    return data.kind(pre) == (text ? Data.TEXT : Data.ATTR) && includeNames.contains(pre, text);
-  }
-
-  /**
-   * Checks if the string value of the current element should be indexed.
-   * @return result of check
-   */
-  protected final boolean indexElement() {
-    return data.kind(pre) == Data.ELEM && includeNames.containsElement(pre);
   }
 
   /**
@@ -143,7 +127,7 @@ public abstract class IndexBuilder extends Job {
     sb.append(perf).append(" (").append(Performance.formatMemory()).append(").");
     if(splits > 1 && splitSize <= 0) {
       sb.append(" Recommended ").append(MainOptions.SPLITSIZE.name()).append(": ");
-      sb.append((int) Math.ceil((double) count / splits / splitFactor())).append('.');
+      sb.append((int) Math.ceil((double) count / splits / splitFactor(type))).append('.');
     }
     Util.errln(sb);
   }
@@ -155,9 +139,10 @@ public abstract class IndexBuilder extends Job {
    *   <li> Full-text index: 1'000'000</li>
    *   <li> Other value indexes: 100'000</li>
    * </ul>
+   * @param type index type
    * @return split factor
    */
-  private int splitFactor() {
+  public static int splitFactor(final IndexType type) {
     return type == IndexType.FULLTEXT ? 1000000 : 100000;
   }
 

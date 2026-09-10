@@ -33,7 +33,7 @@ public final class MemValuesBuilder extends ValuesBuilder {
     final int maxlen = data.meta.maxlen;
     for(pre = 0; pre < size; pre++) {
       if((pre & 0x0FFF) == 0) check();
-      if(indexEntry()) {
+      if(includeNames.unit(pre)) {
         final int id = updindex ? data.id(pre) : pre;
         if(tokenize) {
           for(final byte[] token : distinctTokens(data.text(pre, text))) {

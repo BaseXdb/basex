@@ -34,21 +34,11 @@ public final class CreateIndex extends ACreate {
     final CmdIndex ci = getOption(CmdIndex.class);
     final IndexType type;
     switch(ci) {
-      case TEXT -> {
-        type = IndexType.TEXT;
-        data.meta.createtext = true;
-      }
-      case ATTRIBUTE -> {
-        type = IndexType.ATTRIBUTE;
-        data.meta.createattr = true;
-      }
-      case TOKEN -> {
-        type = IndexType.TOKEN;
-        data.meta.createtoken = true;
-      }
+      case TEXT -> type = IndexType.TEXT;
+      case ATTRIBUTE -> type = IndexType.ATTRIBUTE;
+      case TOKEN -> type = IndexType.TOKEN;
       case FULLTEXT -> {
         type = IndexType.FULLTEXT;
-        data.meta.createft = true;
         data.meta.ftmixed = options.get(MainOptions.FTMIXED);
         data.meta.stemming = options.get(MainOptions.STEMMING);
         data.meta.casesens = options.get(MainOptions.CASESENS);
@@ -60,6 +50,7 @@ public final class CreateIndex extends ACreate {
         return error(UNKNOWN_CMD_X, this);
       }
     }
+    data.meta.create(type, true);
     data.meta.names(type, options);
     data.meta.splitsize = options.get(MainOptions.SPLITSIZE);
 
@@ -81,10 +72,9 @@ public final class CreateIndex extends ACreate {
    * @throws IOException I/O exception
    */
   static void create(final Data data, final ACreate cmd) throws IOException {
-    if(data.meta.createtext) create(IndexType.TEXT, data, cmd);
-    if(data.meta.createattr) create(IndexType.ATTRIBUTE, data, cmd);
-    if(data.meta.createtoken) create(IndexType.TOKEN, data, cmd);
-    if(data.meta.createft) create(IndexType.FULLTEXT, data, cmd);
+    for(final IndexType type : IndexType.VALUE_INDEXES) {
+      if(data.meta.create(type)) create(type, data, cmd);
+    }
   }
 
   /**

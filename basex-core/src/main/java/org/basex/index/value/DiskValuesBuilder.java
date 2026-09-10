@@ -53,7 +53,7 @@ public final class DiskValuesBuilder extends ValuesBuilder {
       final boolean updindex = data.meta.updindex;
       for(pre = 0; pre < size; pre++) {
         if((pre & 0x0FFF) == 0) check();
-        if(indexEntry()) {
+        if(includeNames.unit(pre)) {
           final int id = updindex ? data.id(pre) : pre;
           if(tokenize) {
             int pos = 0;

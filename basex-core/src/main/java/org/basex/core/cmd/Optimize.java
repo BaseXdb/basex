@@ -3,6 +3,7 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 
 import java.io.*;
+import java.util.*;
 
 import org.basex.core.*;
 import org.basex.core.users.*;
@@ -77,7 +78,7 @@ public final class Optimize extends ACreate {
     // GH-676: optimize database and rebuild index structures if ID has turned negative
     if(data.lastid < data.nodes() - 1) optimizeIds(data);
     // GH-1035: auto-optimize database
-    if(data.meta.autooptimize) optimize(data, false, false, false, false, true, null);
+    if(data.meta.autooptimize) optimize(data, EnumSet.noneOf(IndexType.class), true, null);
   }
 
   /**
@@ -87,22 +88,18 @@ public final class Optimize extends ACreate {
    * @throws IOException I/O exception
    */
   public static void optimize(final Data data, final Optimize cmd) throws IOException {
-    optimize(data, false, false, false, false, false, cmd);
+    optimize(data, EnumSet.noneOf(IndexType.class), false, cmd);
   }
 
   /**
    * Optimizes the structures of a database.
    * @param data data
-   * @param enforceText enforce creation or deletion of text index
-   * @param enforceAttr enforce creation or deletion of attribute index
-   * @param enforceToken enforce creation or deletion of token index
-   * @param enforceFt enforce creation or deletion of full-text index
+   * @param enforce indexes to be created or dropped, regardless of their current state
    * @param auto automatic optimization after an update
    * @param cmd calling command instance (can be {@code null})
    * @throws IOException I/O exception
    */
-  public static void optimize(final Data data, final boolean enforceText,
-      final boolean enforceAttr, final boolean enforceToken, final boolean enforceFt,
+  public static void optimize(final Data data, final EnumSet<IndexType> enforce,
       final boolean auto, final Optimize cmd) throws IOException {
 
     // initialize structural indexes
@@ -162,10 +159,9 @@ public final class Optimize extends ACreate {
     }
 
     // rebuild value indexes
-    optimize(IndexType.TEXT, data, meta.createtext, enforceText, auto, cmd);
-    optimize(IndexType.ATTRIBUTE, data, meta.createattr, enforceAttr, auto, cmd);
-    optimize(IndexType.TOKEN, data, meta.createtoken, enforceToken, auto, cmd);
-    optimize(IndexType.FULLTEXT, data, meta.createft, enforceFt, auto, cmd);
+    for(final IndexType type : IndexType.VALUE_INDEXES) {
+      optimize(type, data, meta.create(type), enforce.contains(type), auto, cmd);
+    }
   }
 
   /**

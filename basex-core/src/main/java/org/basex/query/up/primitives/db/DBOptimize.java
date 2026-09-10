@@ -8,6 +8,7 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
+import org.basex.index.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
 import org.basex.util.*;
@@ -88,13 +89,14 @@ public final class DBOptimize extends DBUpdate {
 
     final MetaData meta = data.meta;
     final boolean rebuild = maxlen != meta.maxlen;
-    final boolean rebuildText = !meta.textinclude.equals(textinclude) || rebuild;
-    final boolean rebuildAttr = !meta.attrinclude.equals(attrinclude) || rebuild;
-    final boolean rebuildToken = !meta.tokeninclude.equals(tokeninclude);
-    final boolean rebuildFt = !meta.ftinclude.equals(ftinclude) || rebuild ||
-        ftmixed != meta.ftmixed || stemming != meta.stemming || casesens != meta.casesens ||
+    final EnumSet<IndexType> enforce = EnumSet.noneOf(IndexType.class);
+    if(!meta.textinclude.equals(textinclude) || rebuild) enforce.add(IndexType.TEXT);
+    if(!meta.attrinclude.equals(attrinclude) || rebuild) enforce.add(IndexType.ATTRIBUTE);
+    if(!meta.tokeninclude.equals(tokeninclude)) enforce.add(IndexType.TOKEN);
+    if(!meta.ftinclude.equals(ftinclude) || rebuild || ftmixed != meta.ftmixed ||
+        stemming != meta.stemming || casesens != meta.casesens ||
         diacritics != meta.diacritics || !language.equals(meta.language()) ||
-        !stopwords.equals(meta.stopwords);
+        !stopwords.equals(meta.stopwords)) enforce.add(IndexType.FULLTEXT);
 
     // assign options to meta data
     meta.createtext = options.get(MainOptions.TEXTINDEX);
@@ -119,7 +121,7 @@ public final class DBOptimize extends DBUpdate {
 
     try {
       if(all) OptimizeAll.optimizeAll(data, qc.context, options, null);
-      else Optimize.optimize(data, rebuildText, rebuildAttr, rebuildToken, rebuildFt, false, null);
+      else Optimize.optimize(data, enforce, false, null);
     } catch(final IOException ex) {
       throw UPDBERROR_X.get(info, ex);
     }

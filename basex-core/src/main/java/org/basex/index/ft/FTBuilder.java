@@ -71,11 +71,10 @@ public final class FTBuilder extends IndexBuilder {
 
     try {
       // index the string values of the included elements, or the values of text nodes
-      final boolean mixed = data.meta.ftmixed;
       for(pre = 0; pre < size; pre++) {
         if((pre & 0x0FFF) == 0) check();
         // atomized value of a text node is its own value
-        if(mixed ? indexElement() : indexEntry()) index(pre, data.atom(pre));
+        if(includeNames.unit(pre)) index(pre, data.atom(pre));
       }
 
       // write the index, or the last partial index, and merge all partial indexes

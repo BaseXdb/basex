@@ -410,6 +410,36 @@ public final class MetaData {
   }
 
   /**
+   * Indicates if the specified index is to be created.
+   * @param type index type
+   * @return result of check
+   */
+  public boolean create(final IndexType type) {
+    return switch(type) {
+      case TEXT      -> createtext;
+      case ATTRIBUTE -> createattr;
+      case TOKEN     -> createtoken;
+      case FULLTEXT  -> createft;
+      default        -> throw Util.notExpected();
+    };
+  }
+
+  /**
+   * Sets if the specified index is to be created.
+   * @param type index type
+   * @param create create flag
+   */
+  public void create(final IndexType type, final boolean create) {
+    switch(type) {
+      case TEXT      -> createtext = create;
+      case ATTRIBUTE -> createattr = create;
+      case TOKEN     -> createtoken = create;
+      case FULLTEXT  -> createft = create;
+      default        -> throw Util.notExpected();
+    }
+  }
+
+  /**
    * Returns the included names for the specified index type.
    * @param type index type
    * @return index

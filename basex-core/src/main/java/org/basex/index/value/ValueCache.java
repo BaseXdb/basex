@@ -62,10 +62,10 @@ public final class ValueCache implements Iterable<byte[]> {
     this(type);
     final IndexNames in = new IndexNames(type, data);
     final boolean text = type == IndexType.TEXT;
-    final int pl = pres.size(), kind = text ? Data.TEXT : Data.ATTR;
+    final int pl = pres.size();
     for(int p = 0; p < pl; p++) {
       final int pre = pres.get(p);
-      if(data.kind(pre) == kind && in.contains(pre, text)) {
+      if(in.unit(pre)) {
         if(type == IndexType.TOKEN) {
           int ps = 0;
           for(final byte[] token : distinctTokens(data.text(pre, false))) {

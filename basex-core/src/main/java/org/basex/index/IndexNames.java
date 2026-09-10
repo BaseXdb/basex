@@ -20,6 +20,8 @@ public final class IndexNames {
   private final Atts qnames = new Atts();
   /** Data reference. */
   private final Data data;
+  /** Index type. */
+  private final IndexType type;
 
   /**
    * Constructor.
@@ -28,6 +30,7 @@ public final class IndexNames {
    */
   public IndexNames(final IndexType type, final Data data) {
     this.data = data;
+    this.type = type;
     final String names = data.meta.names(type);
     final HashSet<String> inc = toSet(names.trim());
     for(final String entry : inc) {
@@ -62,6 +65,25 @@ public final class IndexNames {
    */
   public boolean isEmpty() {
     return qnames.isEmpty();
+  }
+
+  /**
+   * Checks if a node is indexed: a text node with an included parent (text and full-text index),
+   * an attribute with an included name (attribute and token index), or an included element
+   * (full-text index for mixed content).
+   * @param pre PRE value
+   * @return result of check
+   */
+  public boolean unit(final int pre) {
+    final int kind = data.kind(pre);
+    return switch(type) {
+      case TEXT      -> kind == Data.TEXT && contains(pre, true);
+      case ATTRIBUTE,
+           TOKEN     -> kind == Data.ATTR && contains(pre, false);
+      case FULLTEXT  -> data.meta.ftmixed ? kind == Data.ELEM && containsElement(pre) :
+                        kind == Data.TEXT && contains(pre, true);
+      default        -> throw Util.notExpected();
+    };
   }
 
   /**
