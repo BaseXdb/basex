@@ -318,7 +318,15 @@ public class CommandTest extends SandboxTest {
   @Test public final void dropIndex() {
     for(final CmdIndex cmd : CmdIndex.values()) no(new DropIndex(cmd));
     ok(new CreateDB(NAME, FILE));
+    ok(new CreateIndex(CmdIndex.FULLTEXT));
+    // the sandbox server stores its databases in the sandbox root
+    final IOFile path = new IOFile(session instanceof LocalSession ?
+      context.soptions.dbPath() : sandbox(), NAME);
+    final String indexFiles = "(txt|atv|tok|ftx).+\\.basex";
+    assertNotEquals(0, path.children(indexFiles).length);
     for(final CmdIndex cmd : CmdIndex.values()) ok(new DropIndex(cmd));
+    // index files are deleted
+    assertEquals(0, path.children(indexFiles).length);
     no(new DropIndex("x"));
   }
 

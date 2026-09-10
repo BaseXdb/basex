@@ -193,8 +193,8 @@ public final class DiskData extends Data {
 
   @Override
   public void createIndex(final IndexType type, final Command cmd) throws IOException {
-    // close existing index
-    close(type);
+    // close and drop existing index
+    dropIndex(type);
     final IndexBuilder ib = switch(type) {
       case TEXT, ATTRIBUTE, TOKEN -> new DiskValuesBuilder(this, type);
       case FULLTEXT               -> new FTBuilder(this);
@@ -210,8 +210,9 @@ public final class DiskData extends Data {
 
   @Override
   public void dropIndex(final IndexType type) throws BaseXException {
-    close(type);
+    // the reference is invalidated by close: retrieve it first
     final Index index = index(type);
+    close(type);
     if(index != null && !index.drop()) throw new BaseXException(INDEX_NOT_DROPPED_X, type);
   }
 

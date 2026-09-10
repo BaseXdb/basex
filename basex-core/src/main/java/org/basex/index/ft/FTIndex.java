@@ -243,7 +243,7 @@ public final class FTIndex extends ValueIndex {
 
   @Override
   public boolean drop() {
-    return data.meta.drop(DATAFTX + '.');
+    return data.meta.drop(DATAFTX + ".*");
   }
 
   @Override
