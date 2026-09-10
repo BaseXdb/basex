@@ -118,7 +118,7 @@ public abstract class AQuery extends Command {
     info(info.toString(qp, out.size(), hits, jc().locks, error == null));
     // the info view is given the same information as data
     sections = info.toSections(qp, out.size(), hits, jc().locks);
-    message = error;
+    message = error != null ? error : exception != null ? Util.message(exception) : null;
 
     // error
     if(error != null) return error(queryinfo ?
