@@ -2716,6 +2716,9 @@ return
     query(func.args("x", " { 'content': 'module namespace x=\"x\";\ndeclare context item as "
         + "xs:decimal external; declare variable $x:x := .;', 'context-item': 1 }") + "?variables"
         + "?#Q{x}x", 1);
+    query(func.args("x", " { 'content': 'module namespace x=\"x\";\ndeclare context value as "
+        + "xs:decimal* external; declare variable $x:x := .;', 'context-value': (1, 2) }")
+        + "?variables?#Q{x}x", "1\n2");
     query(func.args("x", " { 'content': 'module namespace x=\"x\";\ndeclare variable $x:x := 1;', "
         + "'xquery-version': 4.0 }") + "?variables?#Q{x}x", 1);
 
@@ -2737,6 +2740,13 @@ return
         FUNCNOIMPL_X);
     error(func.args("x", " { 'content': 'module namespace x=\"x\";\ndeclare context item as "
         + "xs:integer external;', 'context-item': 1.0 }"), MODULE_CONTEXT_TYPE_X_X);
+    error(func.args("x", " { 'content': 'module namespace x=\"x\";\ndeclare context value as "
+        + "xs:integer* external;', 'context-value': (1, 2.0) }"), MODULE_CONTEXT_TYPE_X_X);
+    error(func.args("x", " { 'content': 'module namespace x=\"x\";', "
+        + "'context-value': 1, 'context-item': 1 }"), MODULE_CONTEXT_OPTIONS);
+    error(func.args("x", " { 'content': 'module namespace x=\"x\";\ndeclare context value as "
+        + "xs:integer* external; declare variable $x:x := .;', 'context-value': () }")
+        + "?variables?#Q{x}x", NOCTX_X);
 
     // advanced and caching tests
     // run simple HTTP server for module hosting

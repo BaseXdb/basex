@@ -95,7 +95,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
     final QueryContext mqc = new QueryContext(qc, null);
     for(final byte[] uri : qc.modDeclared) mqc.modDeclared.put(uri, qc.modDeclared.get(uri));
     int nParsed = 0;
-    final Value ctx = opt.get(CONTEXT_ITEM);
+    final Value ctx = contextValue(opt);
     if(ctx != null) {
       mqc.contextValue = new ContextScope(ctx, mqc.contextType, new VarScope(), sc(), null, null);
       mqc.finalContext = true;
@@ -169,6 +169,20 @@ public final class FnLoadXQueryModule extends StandardFunc {
   }
 
   /**
+   * Returns the initial context value of the library module.
+   * @param opt options
+   * @return context value, or {@code null} if the context value is absent
+   * @throws QueryException query exception
+   */
+  private Value contextValue(final LoadXQueryModuleOptions opt) throws QueryException {
+    final boolean value = opt.contains(CONTEXT_VALUE), item = opt.contains(CONTEXT_ITEM);
+    if(value && item) throw MODULE_CONTEXT_OPTIONS.get(info);
+    // an empty sequence indicates the absence of a context value
+    final Value ctx = value ? opt.get(CONTEXT_VALUE) : item ? opt.get(CONTEXT_ITEM) : null;
+    return ctx == null || ctx.isEmpty() ? null : ctx;
+  }
+
+  /**
    * Return the repository file path of the XQuery module with the given module URI, or
    * {@code null}, if there is no such module in the repository.
    * @param modUri module URI
@@ -197,6 +211,9 @@ public final class FnLoadXQueryModule extends StandardFunc {
         new ValueOption("location-hints", Types.STRING_ZM);
     /** load-xquery-module option content. */
     public static final StringOption CONTENT = new StringOption("content", null, Types.STRING_ZO);
+    /** load-xquery-module option context-value. */
+    public static final ValueOption CONTEXT_VALUE = new ValueOption("context-value", Types.ITEM_ZM,
+        null);
     /** load-xquery-module option context-item. */
     public static final ValueOption CONTEXT_ITEM = new ValueOption("context-item", Types.ITEM_ZO,
         null);

@@ -729,7 +729,10 @@ public enum QueryError {
       "Parameter for dynamically loaded XQuery module '%' has incorrect type: %."),
   /** Error code. */
   MODULE_CONTEXT_TYPE_X_X(FOQM, 5,
-      "The context item for dynamically loaded XQuery module '%' has incorrect type: %."),
+      "The context value for dynamically loaded XQuery module '%' has incorrect type: %."),
+  /** Error code. */
+  MODULE_CONTEXT_OPTIONS(FOQM, 5,
+      "Options are mutually exclusive: 'context-value', 'context-item'."),
   /** Error code. */
   MODULE_XQUERY_VERSION_X(FOQM, 6, "XQuery version '%' not supported."),
 
