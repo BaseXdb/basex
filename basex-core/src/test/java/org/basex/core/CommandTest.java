@@ -312,6 +312,14 @@ public class CommandTest extends SandboxTest {
     ok(new CreateDB(NAME2));
     ok(new DropDB(NAME + ',' + NAME2));
     no(new DropDB(NAME + ", " + ':'));
+
+    // an opened main-memory database is closed
+    ok(new Set(MainOptions.MAINMEM, true));
+    ok(new CreateDB(NAME));
+    ok(new XQuery("."));
+    ok(new DropDB(NAME));
+    no(new XQuery("."));
+    ok(new Set(MainOptions.MAINMEM, false));
   }
 
   /** Command test. */

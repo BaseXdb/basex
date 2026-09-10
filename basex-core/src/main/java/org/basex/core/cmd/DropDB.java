@@ -29,6 +29,13 @@ public final class DropDB extends ACreate {
     final String pattern = args[0];
     if(!Databases.validPattern(pattern)) return error(NAME_INVALID_X, pattern);
 
+    // close an opened main-memory database, which has no representation on disk
+    final Data data = context.data();
+    if(data != null && data.inMemory() && Databases.regex(pattern).matcher(data.meta.name).matches()
+        && Close.close(context)) {
+      return info(DB_DROPPED_X, data.meta.name);
+    }
+
     // retrieve all databases; return true if no database is found (no error)
     final StringList dbs = context.databases.list(context.user(), pattern);
     if(dbs.isEmpty()) return info(NO_DB_DROPPED);

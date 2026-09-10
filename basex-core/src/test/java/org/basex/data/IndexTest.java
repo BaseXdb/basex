@@ -9,7 +9,6 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
 
@@ -35,27 +34,29 @@ public final class IndexTest extends SandboxTest {
   }
 
   /**
-   * Opens a database with an updatable full-text index that was created with version 12.
+   * Opens a database with a full-text index that was created with version 12 and updates it.
+   * @param updindex incremental index update flag
    * @throws IOException I/O exception
    */
-  @Test public void oldVersionFullText() throws IOException {
-    // close a pinned main-memory instance, copy the database files of the frozen instance
-    execute(new Close());
+  @ParameterizedTest
+  @ValueSource(booleans = {false, true})
+  public void oldVersionFullText(final boolean updindex) throws IOException {
+    // copy the database files of the frozen instance to the sandbox
     final IOFile trg = context.soptions.dbPath(NAME);
-    for(final IOFile file : new IOFile("src/test/resources/ftv12upd").children()) {
-      file.copyTo(new IOFile(trg, file.name()));
-    }
+    final IOFile src = new IOFile("src/test/resources/ftv12" + (updindex ? "upd" : ""));
+    for(final IOFile file : src.children()) file.copyTo(new IOFile(trg, file.name()));
+
     final String ft = _FT_SEARCH.args(NAME, "entry") + " ! string()";
-    query(_DB_INFO.args(NAME) + "//updindex/text()", true);
+    query(_DB_INFO.args(NAME) + "//updindex/text()", updindex);
     query(_DB_INFO.args(NAME) + "//ftindex/text()", true);
     query(ft, "first entry\nsecond entry");
     query(_DB_TEXT.args(NAME, "third one"), "third one");
 
-    // the update invalidates the full-text index; the text index is updated
+    // the update invalidates the full-text index; the text index is kept if it is updatable
     query("replace value of node " + _DB_GET.args(NAME) + "//b with 'new entry'");
     query(_DB_INFO.args(NAME) + "//ftindex/text()", false);
-    query(_DB_INFO.args(NAME) + "//textindex/text()", true);
-    query(_DB_TEXT.args(NAME, "new entry"), "new entry");
+    query(_DB_INFO.args(NAME) + "//textindex/text()", updindex);
+    if(updindex) query(_DB_TEXT.args(NAME, "new entry"), "new entry");
     query(_DB_OPTIMIZE.args(NAME));
     query(_DB_INFO.args(NAME) + "//ftindex/text()", true);
     query(ft, "first entry\nnew entry");
