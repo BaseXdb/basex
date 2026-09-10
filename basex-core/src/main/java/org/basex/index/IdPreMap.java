@@ -32,6 +32,8 @@ public class IdPreMap {
   private int[] oids;
   /** Deleted base IDs: sorted, disjoint ranges of first and last IDs (can be {@code null}). */
   private int[] deleted;
+  /** Indexes of the inserted ID intervals, ordered by first ID (can be {@code null}). */
+  private int[] order;
 
   /** Number of records in the table. */
   private int rows;
@@ -107,16 +109,41 @@ public class IdPreMap {
     if(rows == 0 || id < pres[0]) return id;
 
     if(id > baseid) {
-      // ID was inserted by update
-      for(int i = 0; i < rows; ++i) {
-        if(fids[i] <= id && id <= nids[i]) return pres[i] + id - fids[i];
+      // ID was inserted by update: binary search in the intervals ordered by first ID
+      final int[] ord = order();
+      int low = 0, high = ord.length - 1;
+      while(low <= high) {
+        final int mid = low + high >>> 1, i = ord[mid];
+        if(nids[i] < id) low = mid + 1;
+        else if(fids[i] > id) high = mid - 1;
+        else return pres[i] + id - fids[i];
       }
-    } else {
-      // ID is affected by updates
-      final int i = sortedLastIndexOf(oids, id);
-      return id + incs[i < 0 ? -i - 2 : i];
+      return -1;
     }
-    return -1;
+    // ID is affected by updates
+    final int i = sortedLastIndexOf(oids, id);
+    return id + incs[i < 0 ? -i - 2 : i];
+  }
+
+  /**
+   * Returns the indexes of the inserted ID intervals, ordered by first ID.
+   * @return ordered indexes
+   */
+  private int[] order() {
+    if(order == null) {
+      final IntList indexes = new IntList(rows), keys = new IntList(rows);
+      for(int i = 0; i < rows; i++) {
+        if(fids[i] != INV) {
+          indexes.add(i);
+          keys.add(fids[i]);
+        }
+      }
+      final int[] ord = keys.createOrder(true);
+      final int ol = ord.length;
+      for(int o = 0; o < ol; o++) ord[o] = indexes.get(ord[o]);
+      order = ord;
+    }
+    return order;
   }
 
   /**
@@ -126,6 +153,7 @@ public class IdPreMap {
    * @param c number of inserted records
    */
   public void insert(final int pre, final int id, final int c) {
+    order = null;
     if(rows == 0 && pre == id && id == baseid + 1) {
       // no mapping, and we append at the end => nothing to do
       baseid += c;
@@ -231,6 +259,7 @@ public class IdPreMap {
    * @param c number of deleted records (negative)
    */
   public void delete(final int pre, final int id, final int c) {
+    order = null;
     if(rows == 0 && pre == id && id - c == baseid + 1) {
       // no mapping, and we delete at the end => nothing to do
       baseid += c;
