@@ -552,6 +552,19 @@ public final class FTIndex extends ValueIndex {
     throw Util.notExpected();
   }
 
+  // the full-text index is not updatable yet: updates invalidate it (see MetaData#update)
+  @Override
+  public void delete(final int pre, final int size) { }
+
+  @Override
+  public void insert(final int pre, final int size) { }
+
+  @Override
+  public void rename(final int pre, final int kind) { }
+
+  @Override
+  public void renamed(final int pre, final int kind) { }
+
   @Override
   public void flush() { }
 }

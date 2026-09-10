@@ -138,8 +138,7 @@ public final class DiskData extends Data {
     meta.size = nodes();
     meta.lastid = lastid;
 
-    // small namespace structures are stored in the old format, which older versions can read
-    final boolean legacy = nspaces.legacy();
+    final boolean legacy = legacy();
     try(DataOutput out = new DataOutput(meta.dbFile(DATAINF))) {
       meta.write(out, legacy ? OLDSTORAGE : STORAGE);
       out.writeToken(token(DBTAGS));
@@ -159,11 +158,22 @@ public final class DiskData extends Data {
     meta.dirty = false;
   }
 
+  /**
+   * Indicates if the database is stored in the old format, which older versions can read.
+   * @return result of check
+   */
+  private boolean legacy() {
+    // small namespace structures can be stored in the old format
+    return nspaces.legacy();
+  }
+
   @Override
   public synchronized void close() {
     if(closed) return;
     super.close();
     try {
+      // flush the indexes first, as they may update the meta data
+      for(final ValueIndex index : valueIndexes()) index.flush();
       write();
       table.close();
       texts.close();
@@ -255,6 +265,7 @@ public final class DiskData extends Data {
       if(!upd.delete()) throw Util.notExpected("%: could not delete lock file.", meta.name);
     }
 
+    for(final ValueIndex index : valueIndexes()) index.finishUpdate();
     flush(auto);
     if(!table.lock(false)) throw Util.notExpected("Database '%': could not unlock.", meta.name);
   }
@@ -264,12 +275,11 @@ public final class DiskData extends Data {
     try {
       table.flush(all);
       if(all) {
+        // flush the indexes first, as they may update the meta data
+        for(final ValueIndex index : valueIndexes()) index.flush();
         write();
         texts.flush();
         values.flush();
-        if(textIndex != null) textIndex.flush();
-        if(attrIndex != null) attrIndex.flush();
-        if(tokenIndex != null) tokenIndex.flush();
       }
     } catch(final IOException ex) {
       Util.stack(ex);

@@ -664,39 +664,20 @@ public abstract class Data {
       final int nsPre = kind == ATTR ? parent(pre, kind) : pre;
       final int uriId = nsFlag ? nspaces.add(nsPre, prefix, uri, this) :
         oldUriId != 0 && eq(nspaces.uri(oldUriId), uri) ? oldUriId : 0;
-      final int size = size(pre, kind);
 
       // write IDs of namespace URI and name, and namespace flag
+      final ValueIndex[] indexes = meta.updindex ? valueIndexes() : new ValueIndex[0];
+      for(final ValueIndex index : indexes) index.rename(pre, kind);
       if(kind == ATTR) {
-        // delete old values from attribute indexes
-        if(meta.updindex) {
-          if(meta.attrindex) attrIndex.delete(new ValueCache(pre, IndexType.ATTRIBUTE, this));
-          if(meta.tokenindex) tokenIndex.delete(new ValueCache(pre, IndexType.TOKEN, this));
-        }
         table.write1(pre, 11, uriId);
         table.write2(pre, 1, attrNames.put(name));
         if(nsFlag) table.write2(nsPre, 1, 1 << 15 | nameId(nsPre));
-        // add new values to attribute indexes
-        if(meta.updindex) {
-          if(meta.attrindex) attrIndex.add(new ValueCache(pre, IndexType.ATTRIBUTE, this));
-          if(meta.tokenindex) tokenIndex.add(new ValueCache(pre, IndexType.TOKEN, this));
-        }
       } else {
-        // update element name
-        final IntList pres = new IntList();
-        // update text index
-        if(meta.updindex && meta.textindex) {
-          final int last = pre + size;
-          for(int curr = pre + attSize(pre, kind); curr < last; curr += size(curr, kind(curr))) {
-            if(kind(curr) == TEXT) pres.add(curr);
-          }
-          textIndex.delete(new ValueCache(pres, IndexType.TEXT, this));
-        }
         table.write1(pre, 3, uriId);
         final int nameId = elemNames.put(name);
         table.write2(nsPre, 1, (nsFlag || nsFlag(nsPre) ? 1 << 15 : 0) | nameId);
-        if(!pres.isEmpty()) textIndex.add(new ValueCache(pres, IndexType.TEXT, this));
       }
+      for(final ValueIndex index : indexes) index.renamed(pre, kind);
     }
   }
 
@@ -1223,9 +1204,7 @@ public abstract class Data {
   protected final void indexDelete(final int pre, final int id, final int size) {
     if(id != -1) resources.delete(pre, size);
     if(meta.updindex) {
-      if(meta.textindex) textIndex.delete(new ValueCache(pre, size, IndexType.TEXT, this));
-      if(meta.attrindex) attrIndex.delete(new ValueCache(pre, size, IndexType.ATTRIBUTE, this));
-      if(meta.tokenindex) tokenIndex.delete(new ValueCache(pre, size, IndexType.TOKEN, this));
+      for(final ValueIndex index : valueIndexes()) index.delete(pre, size);
       if(id != -1) {
         // base IDs ascend with PRE values, inserted nodes have no base descendants
         final int baseid = idmap.baseid();
@@ -1250,10 +1229,20 @@ public abstract class Data {
     if(id != -1) resources.insert(pre, clip);
     if(meta.updindex) {
       if(id != -1) idmap.insert(pre, id, size);
-      if(meta.textindex) textIndex.add(new ValueCache(pre, size, IndexType.TEXT, this));
-      if(meta.attrindex) attrIndex.add(new ValueCache(pre, size, IndexType.ATTRIBUTE, this));
-      if(meta.tokenindex) tokenIndex.add(new ValueCache(pre, size, IndexType.TOKEN, this));
+      for(final ValueIndex index : valueIndexes()) index.insert(pre, size);
     }
+  }
+
+  /**
+   * Returns the existing value indexes.
+   * @return value indexes
+   */
+  public final ValueIndex[] valueIndexes() {
+    final ArrayList<ValueIndex> list = new ArrayList<>(4);
+    for(final ValueIndex index : new ValueIndex[] { textIndex, attrIndex, tokenIndex, ftIndex }) {
+      if(index != null) list.add(index);
+    }
+    return list.toArray(ValueIndex[]::new);
   }
 
   // HELPER FUNCTIONS =============================================================================

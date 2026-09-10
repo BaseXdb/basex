@@ -116,6 +116,14 @@ public final class ValueCache implements Iterable<byte[]> {
   }
 
   /**
+   * Checks if the cache contains no entries.
+   * @return result of check
+   */
+  public boolean isEmpty() {
+    return keys.isEmpty();
+  }
+
+  /**
    * Returns an iterator with all keys in sorted order.
    * @return keys iterator
    */

@@ -25,6 +25,42 @@ public final class IndexTest extends SandboxTest {
     set(MainOptions.UPDINDEX, false);
     set(MainOptions.AUTOOPTIMIZE, false);
     set(MainOptions.MAINMEM, false);
+    set(MainOptions.TEXTINCLUDE, "");
+    set(MainOptions.ATTRINCLUDE, "");
+    set(MainOptions.TOKENINCLUDE, "");
+  }
+
+  /**
+   * Renames nodes in and out of the selective indexes.
+   * @param mainmem main memory flag.
+   */
+  @ParameterizedTest
+  @ValueSource(booleans = {false, true})
+  public void updindexRename(final boolean mainmem) {
+    set(MainOptions.MAINMEM, mainmem);
+    set(MainOptions.UPDINDEX, true);
+    set(MainOptions.TOKENINDEX, true);
+    set(MainOptions.TEXTINCLUDE, "a");
+    set(MainOptions.ATTRINCLUDE, "a");
+    set(MainOptions.TOKENINCLUDE, "a");
+    execute(new CreateDB(NAME, "<x><a>A</a><b>B</b><c a='C'/><d b='D'/></x>"));
+    query(_DB_TEXT.args(NAME, "A"), "A");
+    query(_DB_TEXT.args(NAME, "B"), "");
+    query(_DB_ATTRIBUTE.args(NAME, "C") + "/string()", "C");
+    query(_DB_ATTRIBUTE.args(NAME, "D") + "/string()", "");
+    query(_DB_TOKEN.args(NAME, "C") + "/string()", "C");
+    query(_DB_TOKEN.args(NAME, "D") + "/string()", "");
+
+    query("rename node " + _DB_GET.args(NAME) + "//a as 'b'");
+    query("rename node " + _DB_GET.args(NAME) + "//b[. = 'B'] as 'a'");
+    query("rename node " + _DB_GET.args(NAME) + "//@a as 'b'");
+    query("rename node " + _DB_GET.args(NAME) + "//@b[. = 'D'] as 'a'");
+    query(_DB_TEXT.args(NAME, "A"), "");
+    query(_DB_TEXT.args(NAME, "B"), "B");
+    query(_DB_ATTRIBUTE.args(NAME, "C") + "/string()", "");
+    query(_DB_ATTRIBUTE.args(NAME, "D") + "/string()", "D");
+    query(_DB_TOKEN.args(NAME, "C") + "/string()", "");
+    query(_DB_TOKEN.args(NAME, "D") + "/string()", "D");
   }
 
   /**

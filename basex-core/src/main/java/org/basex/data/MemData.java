@@ -115,7 +115,9 @@ public final class MemData extends Data {
   public void startUpdate(final MainOptions opts) { }
 
   @Override
-  public void finishUpdate(final MainOptions opts) { }
+  public void finishUpdate(final MainOptions opts) {
+    for(final ValueIndex index : valueIndexes()) index.finishUpdate();
+  }
 
   @Override
   public void flush(final boolean all) { }
