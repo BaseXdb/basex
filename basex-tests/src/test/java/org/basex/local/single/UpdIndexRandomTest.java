@@ -85,6 +85,9 @@ public final class UpdIndexRandomTest extends SandboxTest {
                "\nDocument: " + doc);
         }
       }
+      // compare index access and scan for a word of the current and of another document
+      queryIndexScan("//a[text() = '" + words.get(offset) + "']");
+      queryIndexScan("//a[text() = '" + words.get(rnd.nextInt(cap)) + "']");
     }
   }
 }

@@ -110,6 +110,19 @@ public abstract class Sandbox {
   }
 
   /**
+   * Checks that a path yields the same result on the sandbox database, where it may be rewritten
+   * for index access, and on a copy of the database, where it is evaluated by a scan.
+   * @param path path expression, starting with a slash
+   */
+  protected static void queryIndexScan(final String path) {
+    final String serialize = " ! serialize(.) => string-join('\\n')";
+    final String indexed = query(_DB_GET.args(NAME) + path + serialize);
+    final String scanned = query("(for $doc in " + _DB_GET.args(NAME) + " return " +
+      transform("$doc", "()", "$input" + path) + ')' + serialize);
+    assertEquals(scanned, indexed, path);
+  }
+
+  /**
    * Checks that a query returns the specified database node {@code pre} values.
    * @param query query returning database nodes
    * @param pre expected pre values
