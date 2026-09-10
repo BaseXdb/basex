@@ -268,6 +268,7 @@ public final class DiskData extends Data {
         values.flush();
         if(textIndex != null) textIndex.flush();
         if(attrIndex != null) attrIndex.flush();
+        if(tokenIndex != null) tokenIndex.flush();
       }
     } catch(final IOException ex) {
       Util.stack(ex);
