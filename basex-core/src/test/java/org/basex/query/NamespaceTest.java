@@ -13,6 +13,7 @@ import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.query.util.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.junit.jupiter.api.Test;
 
@@ -1028,6 +1029,60 @@ public final class NamespaceTest extends SandboxTest {
     execute(new Close());
     query("namespace-uri-for-prefix('h', " + _DB_GET.args(NAME) + "//*:new)", "urn:h");
     query("namespace-uri-for-prefix('f', " + _DB_GET.args(NAME) + "//*:low)", "urn:f");
+  }
+
+  /**
+   * Checks the common default namespace of databases with several documents.
+   */
+  @Test public void defaultNamespace() {
+    // all documents share one default namespace
+    execute(new CreateDB(NAME));
+    execute(new Add("a.xml", "<r xmlns='urn:d'><c/></r>"));
+    execute(new Add("b.xml", "<r xmlns='urn:d'><c/></r>"));
+    execute(new Close());
+    // the name test cannot yield results: the step is discarded at compile time
+    check("count(" + _DB_GET.args(NAME) + "//c)", 0, root(Itr.class));
+    query("count(" + _DB_GET.args(NAME) + "//*:c)", 2);
+    query("declare default element namespace 'urn:d'; count(" + _DB_GET.args(NAME) + "//c)", 2);
+    query("count(" + _DB_GET.args(NAME) + "//Q{urn:d}c)", 2);
+
+    // documents with different default namespaces: no common namespace
+    execute(new CreateDB(NAME));
+    execute(new Add("a.xml", "<r xmlns='urn:d'><c/></r>"));
+    execute(new Add("b.xml", "<r xmlns='urn:e'><c/></r>"));
+    execute(new Close());
+    // no common default namespace: the step is evaluated
+    check("count(" + _DB_GET.args(NAME) + "//c)", 0, empty(Itr.class));
+    query("count(" + _DB_GET.args(NAME) + "//*:c)", 2);
+    query("count(" + _DB_GET.args(NAME) + "//Q{urn:d}c)", 1);
+
+    // a descendant undeclares the default namespace: no common namespace
+    execute(new CreateDB(NAME));
+    execute(new Add("a.xml", "<r xmlns='urn:d'><c/></r>"));
+    execute(new Add("b.xml", "<r xmlns='urn:d'><s xmlns=''><c/></s></r>"));
+    execute(new Close());
+    // no common default namespace: the step must not be discarded
+    check("count(" + _DB_GET.args(NAME) + "//c)", 1, empty(Itr.class));
+    query("count(" + _DB_GET.args(NAME) + "//*:c)", 2);
+    query("count(" + _DB_GET.args(NAME) + "//Q{urn:d}c)", 1);
+  }
+
+  /**
+   * Checks the common default namespace of a compressed namespace structure.
+   */
+  @Test public void manyDefaultNamespaces() {
+    // one namespace node per document: too many for the old format
+    final int count = 4200;
+    query("db:create('" + NAME + "', (1 to " + count + ") ! parse-xml('" +
+        "<r xmlns=\"urn:d\"><c/></r>'), (1 to " + count + ") ! (. || '.xml'))");
+    execute(new Close());
+    assertTrue(new IOFile(context.soptions.dbPath(NAME), "nsp.basex").exists(),
+        "compressed namespaces expected");
+
+    // the name test cannot yield results: the step is discarded at compile time
+    check("count(" + _DB_GET.args(NAME) + "//c)", 0, root(Itr.class));
+    query("count(" + _DB_GET.args(NAME) + "//*:c)", count);
+    query("declare default element namespace 'urn:d'; count(" + _DB_GET.args(NAME) + "//c)", count);
   }
 
   /**

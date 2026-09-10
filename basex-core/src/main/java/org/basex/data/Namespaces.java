@@ -108,16 +108,11 @@ public final class Namespaces {
       // structure has not been modified: leave the leaf entries untouched
       sets.write(out);
       entries.write(out);
+    } else if(legacy) {
+      file.delete();
+      root.write(out, sets);
     } else {
-      // the file with the leaf entries is discarded or overwritten: close the entries first
-      close();
-      entries = null;
-      if(legacy) {
-        file.delete();
-        root.write(out, sets);
-      } else {
-        NSEntries.write(root, sets, out, file);
-      }
+      NSEntries.write(root, sets, out, file);
     }
   }
 
@@ -130,13 +125,13 @@ public final class Namespaces {
 
   /**
    * Returns the mutable namespace tree and inflates the compressed entries if necessary.
-   * The compressed entries are not discarded yet: they may still be accessed by queries that
-   * are compiled before database locks are acquired.
    * @return root node
    */
   private NSNode tree() {
     if(root == null) {
       root = entries.inflate();
+      entries.close();
+      entries = null;
       current = root;
     }
     return root;

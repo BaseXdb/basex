@@ -229,6 +229,7 @@ final class NSNode {
    * @param children child nodes, sorted by their PRE values
    */
   void children(final NSNode[] children) {
+    // the array has no spare capacity: it is resized by the next call of add()
     nodes = children;
     size = children.length;
     for(final NSNode child : children) child.parent = this;

@@ -79,6 +79,7 @@ final class NSSets {
     if(values.length == 0) return 0;
     final int id = index.put(encode(values));
     if(id >= sets.length) sets = Arrays.copyOf(sets, Array.newCapacity(id));
+    // IDs are never reassigned: they are referenced by the nodes of the namespace structure
     if(sets[id] == null) sets[id] = values;
     return id;
   }

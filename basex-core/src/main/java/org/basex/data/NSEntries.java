@@ -159,7 +159,7 @@ final class NSEntries {
   private static final class Header {
     /** Output stream. */
     private final DataOutput out;
-    /** PRE value of the last written node. */
+    /** PRE value of the last written node ({@code -1}: the root has no PRE value). */
     private int last = -1;
     /** PRE value of the last written block. */
     private int blockPre;
