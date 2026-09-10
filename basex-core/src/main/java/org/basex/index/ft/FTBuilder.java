@@ -35,15 +35,24 @@ public final class FTBuilder extends IndexBuilder {
    */
   public FTBuilder(final Data data) throws IOException {
     super(data, IndexType.FULLTEXT);
-    final MetaData meta = data.meta;
     tree = new FTIndexTrees(data.meta.maxlen);
+    lexer = lexer(data);
+  }
 
+  /**
+   * Returns a lexer for the full-text index of the specified database.
+   * @param data data reference
+   * @return lexer
+   * @throws IOException I/O exception
+   */
+  public static FTLexer lexer(final Data data) throws IOException {
+    final MetaData meta = data.meta;
     final FTOpt fto = new FTOpt();
     fto.set(FTFlag.DC, meta.diacritics);
     fto.set(FTFlag.ST, meta.stemming);
     fto.cs = meta.casesens ? FTCase.SENSITIVE : FTCase.INSENSITIVE;
     fto.sw = new StopWords(data, meta.stopwords);
-    fto.ln = data.meta.language();
+    fto.ln = meta.language();
 
     // element names are required; wildcards are allowed (all elements on all levels)
     if(meta.ftmixed && meta.ftinclude.isEmpty())
@@ -53,8 +62,7 @@ public final class FTBuilder extends IndexBuilder {
       throw new BaseXException(NO_TOKENIZER_X, fto.ln);
     if(meta.stemming && !Stemmer.supportFor(fto.ln))
       throw new BaseXException(NO_STEMMER_X, fto.ln);
-
-    lexer = new FTLexer(fto);
+    return new FTLexer(fto);
   }
 
   @Override
