@@ -92,7 +92,7 @@ public class IdPreMap {
   /**
    * Finds the PRE value of a given ID.
    * @param id ID
-   * @return PRE or -1 if the ID is already deleted
+   * @return PRE, or -1 if an ID inserted by an update was deleted again (base IDs are never -1)
    */
   public int pre(final int id) {
     // no updates or ID is not affected by updates
