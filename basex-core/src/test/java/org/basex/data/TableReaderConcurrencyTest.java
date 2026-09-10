@@ -20,7 +20,7 @@ public final class TableReaderConcurrencyTest extends SandboxTest {
 
   /**
    * Reads the table while updates are started and finished, and checks that no read fails.
-   * Queries are compiled before database locks are acquired, so this overlap can occur.
+   * Thread-confined readers are closed by an update, even if they are still in use.
    * @throws Exception exception
    */
   @Test public void staleReader() throws Exception {

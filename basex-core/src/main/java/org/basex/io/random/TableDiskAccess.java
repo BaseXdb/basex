@@ -787,8 +787,7 @@ public final class TableDiskAccess extends TableAccess {
           }
         }
       } catch(final IOException ex) {
-        // queries are compiled before database locks are acquired: a concurrent update may
-        // have closed this reader in the meantime
+        // fall back to the master reader if this one was closed by a concurrent update
         if(!closed) throw new RuntimeException(Util.info(ex));
         buffers.cursor(pre);
         final Buffer current = buffers.current();
