@@ -74,22 +74,14 @@ public final class InfoIndex extends AInfo {
    */
   private static byte[] info(final CmdIndexInfo idx, final Data data, final MainOptions options) {
     return switch(idx) {
-      case ELEMNAME ->
-        info(ELEMENTS, IndexType.ELEMNAME, data, options, true);
-      case ATTRNAME ->
-        info(ATTRIBUTES, IndexType.ATTRNAME, data, options, true);
-      case PATH ->
-        info(PATH_INDEX, IndexType.PATH, data, options, true);
-      case TEXT ->
-        info(TEXT_INDEX, IndexType.TEXT, data, options, data.meta.textindex);
-      case ATTRIBUTE ->
-        info(ATTRIBUTE_INDEX, IndexType.ATTRIBUTE, data, options, data.meta.attrindex);
-      case TOKEN ->
-        info(TOKEN_INDEX, IndexType.TOKEN, data, options, data.meta.tokenindex);
-      case FULLTEXT ->
-        info(FULLTEXT_INDEX, IndexType.FULLTEXT, data, options, data.meta.ftindex);
-      default ->
-        Token.token(LI + NOT_AVAILABLE);
+      case ELEMNAME  -> info(ELEMENTS, IndexType.ELEMNAME, data, options);
+      case ATTRNAME  -> info(ATTRIBUTES, IndexType.ATTRNAME, data, options);
+      case PATH      -> info(PATH_INDEX, IndexType.PATH, data, options);
+      case TEXT      -> info(TEXT_INDEX, IndexType.TEXT, data, options);
+      case ATTRIBUTE -> info(ATTRIBUTE_INDEX, IndexType.ATTRIBUTE, data, options);
+      case TOKEN     -> info(TOKEN_INDEX, IndexType.TOKEN, data, options);
+      case FULLTEXT  -> info(FULLTEXT_INDEX, IndexType.FULLTEXT, data, options);
+      default        -> Token.token(LI + NOT_AVAILABLE);
     };
   }
 
@@ -99,14 +91,14 @@ public final class InfoIndex extends AInfo {
    * @param it index type
    * @param data data reference
    * @param options main options
-   * @param avl states if index is available
    * @return information
    */
   private static byte[] info(final String desc, final IndexType it, final Data data,
-      final MainOptions options, final boolean avl) {
+      final MainOptions options) {
 
     final TokenBuilder tb = new TokenBuilder().add(desc).add(NL);
-    if(avl) tb.add(data.info(it, options));
+    // structural indexes always exist
+    if(!it.value() || data.meta.index(it)) tb.add(data.info(it, options));
     else tb.add(LI).addExt(NOT_AVAILABLE, it).add(NL);
     return tb.add(NL).finish();
   }

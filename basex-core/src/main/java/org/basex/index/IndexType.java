@@ -31,6 +31,14 @@ public enum IndexType {
   /** Value index types. */
   public static final IndexType[] VALUE_INDEXES = { TEXT, ATTRIBUTE, TOKEN, FULLTEXT };
 
+  /**
+   * Indicates if this is a value index type.
+   * @return result of check
+   */
+  public boolean value() {
+    return ordinal() >= TEXT.ordinal();
+  }
+
   @Override
   public String toString() {
     return Enums.string(this);

@@ -105,7 +105,8 @@ public final class DialogProps extends BaseXDialog {
       infos[l].setFont(dmfont);
     }
     // create/drop buttons for values indexes
-    for(int l = IndexType.TEXT.ordinal(); l < ll; l++) {
+    for(int l = 0; l < ll; l++) {
+      if(!TYPES[l].value()) continue;
       buttons[l] = new BaseXButton(this, " ");
       BaseXLayout.setHeight(panels[l], 160);
     }
@@ -279,7 +280,7 @@ public final class DialogProps extends BaseXDialog {
       for(int l = 0; l < ll; l++) {
         // structural index/statistics?
         // updates labels and infos
-        labels[l].setText(l < IndexType.TEXT.ordinal() && outofdate
+        labels[l].setText(!TYPES[l].value() && outofdate
             ? LABELS[l] + " (" + OUT_OF_DATE + ')' : LABELS[l]);
         // update button
         if(buttons[l] != null) buttons[l].setText(exists[l] ? DROP : CREATE);
