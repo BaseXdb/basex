@@ -524,11 +524,11 @@ public final class TextEditor {
     startOfLine(select);
     // skip upward movement at the beginning of the text
     if(l > 0 || pos() != 0) {
-      for(int i = 0; i < -l; ++i) {
+      for(int i = 0; i < -l; i++) {
         back(select);
         startOfLine(select);
       }
-      for(int i = 0; i < l; ++i) {
+      for(int i = 0; i < l; i++) {
         forwardTo(Integer.MAX_VALUE, select);
         forward(select);
       }
@@ -602,7 +602,7 @@ public final class TextEditor {
   void insert(final String str) {
     final int cl = str.length();
     final TokenBuilder tb = new TokenBuilder(cl);
-    for(int c = 0; c < cl; ++c) {
+    for(int c = 0; c < cl; c++) {
       // skip invalid characters
       int ch = str.charAt(c);
       if(ch == '\r' || ch < ' ' && !ws(ch)) continue;

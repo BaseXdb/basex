@@ -386,7 +386,7 @@ public final class GUIConstants {
     final int g = opts.get(GUIOptions.COLORGREEN);
     final int b = opts.get(GUIOptions.COLORBLUE);
     final int cl = COLORS.length;
-    for(int c = 1; c < cl + 1; ++c) {
+    for(int c = 1; c < cl + 1; c++) {
       COLORS[c - 1] = color(Math.max(255 - c * r, 0),
         Math.max(255 - c * g, 0), Math.max(255 - c * b, 0));
     }

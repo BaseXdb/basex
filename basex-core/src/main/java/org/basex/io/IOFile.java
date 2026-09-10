@@ -553,7 +553,7 @@ public final class IOFile extends IO {
     final StringList sl = new StringList();
     final int l = path.length();
     final StringBuilder sb = new StringBuilder(l);
-    for(int i = 0; i < l; ++i) {
+    for(int i = 0; i < l; i++) {
       final char ch = path.charAt(i);
       if(ch == '\\' || ch == '/') add(sb, sl);
       else sb.append(ch);
@@ -561,7 +561,7 @@ public final class IOFile extends IO {
     add(sb, sl);
     if(path.startsWith("\\\\") || path.startsWith("//")) sb.append("//");
     final int size = sl.size();
-    for(int s = 0; s < size; ++s) {
+    for(int s = 0; s < size; s++) {
       if(s != 0 || Strings.startsWith(path, '/')) sb.append('/');
       sb.append(sl.get(s));
     }

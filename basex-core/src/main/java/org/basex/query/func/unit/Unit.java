@@ -65,7 +65,7 @@ final class Unit {
   /**
    * Runs all tests.
    * @param suites root element
-   * @throws IOException query exception
+   * @throws IOException I/O exception
    */
   public void test(final FBuilder suites) throws IOException {
     final FBuilder suite = FElem.build(Q_TESTSUITE).attr(Q_NAME, file.url());

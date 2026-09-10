@@ -125,7 +125,7 @@ public class TextInput extends BufferInput {
    * Sets a new encoding.
    * @param encoding encoding (ignored if {@code null} or an empty string)
    * @return self reference
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   public TextInput encoding(final String encoding) throws IOException {
     if(encoding != null && !encoding.isEmpty()) {

@@ -46,7 +46,7 @@ public final class Group extends RegExp {
 
   /**
    * Return the enclosed expression.
-   * @return the expression.
+   * @return expression
    */
   public RegExp getEncl() {
     return encl;
@@ -61,7 +61,7 @@ public final class Group extends RegExp {
 
   /**
    * Get the back-reference flag.
-   * @return the flag value.
+   * @return flag value
    */
   public boolean hasBackRef() {
     return hasBackRef;
@@ -69,7 +69,7 @@ public final class Group extends RegExp {
 
   /**
    * Get the atom path of this group.
-   * @return the atom path.
+   * @return atom path
    */
   public Integer[] getAtomPath() {
     return atomPath;

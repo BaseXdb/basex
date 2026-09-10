@@ -165,7 +165,7 @@ public final class TypeswitchGroup extends Single {
   /**
    * Finds the matching types from this group for the given sequence types.
    * @param types sequence types
-   * @return the matching types from this group
+   * @return matching types from this group
    */
   ArrayList<SeqType> matchingTypes(final SeqType... types) {
     final ArrayList<SeqType> tmp = new ArrayList<>(seqTypes.length);

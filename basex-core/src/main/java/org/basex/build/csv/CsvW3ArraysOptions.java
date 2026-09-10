@@ -33,7 +33,7 @@ public class CsvW3ArraysOptions extends Options {
    * Convert the options to a {@link CsvParserOptions} object.
    * @param ii input info (can be {@code null})
    * @param format resulting CSV format
-   * @return the CsvParserOptions object
+   * @return CsvParserOptions object
    * @throws QueryException query exception
    */
   public CsvParserOptions finish(final InputInfo ii, final CsvFormat format) throws QueryException {

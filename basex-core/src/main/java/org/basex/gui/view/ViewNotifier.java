@@ -91,7 +91,7 @@ public final class ViewNotifier {
   /**
    * Notifies all views of a focus change.
    * @param pre focused PRE value
-   * @param vw the calling view
+   * @param vw calling view
    */
   public void focus(final int pre, final View vw) {
     if(gui.context.focused == pre) return;
@@ -107,7 +107,7 @@ public final class ViewNotifier {
   /**
    * Notifies all views of a selection change.
    * @param mark marked nodes
-   * @param vw the calling view
+   * @param vw calling view
    */
   public void mark(final DBNodes mark, final View vw) {
     final Context ctx = gui.context;
@@ -127,7 +127,7 @@ public final class ViewNotifier {
    * <li>2: toggle currently focused node</li>
    * </ul>
    * @param mode mark mode
-   * @param vw the calling view
+   * @param vw calling view
    */
   public void mark(final int mode, final View vw) {
     final int f = gui.context.focused;
@@ -173,7 +173,7 @@ public final class ViewNotifier {
    * Notifies all views of a context change.
    * @param nodes new context set
    * @param quick quick switch
-   * @param vw the calling view
+   * @param vw calling view
    */
   public void context(final DBNodes nodes, final boolean quick, final View vw) {
     final Context ctx = gui.context;

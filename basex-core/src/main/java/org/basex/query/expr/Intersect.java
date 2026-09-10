@@ -88,7 +88,7 @@ public final class Intersect extends Set {
     }
 
     final int el = exprs.length;
-    for(int e = 1; e < el && !nodes.isEmpty(); ++e) {
+    for(int e = 1; e < el && !nodes.isEmpty(); e++) {
       nodes.ddo();
       final GNodeBuilder tmp = new GNodeBuilder();
       iter = exprs[e].iter(qc);

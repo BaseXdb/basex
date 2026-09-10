@@ -133,7 +133,7 @@ public final class WebPathMatcherTest {
    * @param path path
    * @param var variable
    * @param value value
-   * @throws Exception arbitrary exception
+   * @throws Exception exception
    */
   private static void testValues(final String template, final String path, final String var,
       final String value) throws Exception {

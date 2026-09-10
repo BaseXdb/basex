@@ -287,7 +287,7 @@ public final class DataAccessTest {
   /** Performance test for {@link DataAccess#writeToken(long, byte[])}. */
   @Test public void testPerfWriteTokenBig() {
     final byte[] token = Token.token(STR_LONG);
-    for(int i = 0; i < 10000; ++i) da.writeToken(da.cursor(), token);
+    for(int i = 0; i < 10000; i++) da.writeToken(da.cursor(), token);
   }
 
   /**
@@ -397,7 +397,7 @@ public final class DataAccessTest {
 
     final int ll = len.length;
     final int[] bytes = Arrays.copyOf(len, ll + tl);
-    for(int t = 0; t < tl; ++t) bytes[ll + t] = toUnsignedByte(token[t]);
+    for(int t = 0; t < tl; t++) bytes[ll + t] = toUnsignedByte(token[t]);
     return bytes;
   }
 

@@ -63,7 +63,7 @@ public final class Exchange {
   /**
    * Sends the request and returns the response.
    * @return HTTP response
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   public HttpResponse<InputStream> send() throws IOException {
     final HttpRequest.Builder rb;

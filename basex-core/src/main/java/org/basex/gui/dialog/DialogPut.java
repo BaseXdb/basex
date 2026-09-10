@@ -61,7 +61,7 @@ final class DialogPut extends BaseXBack {
 
   /**
    * Reacts on user input.
-   * @param comp the action component
+   * @param comp action component
    */
   void action(final Object comp) {
     final String src = general.input();

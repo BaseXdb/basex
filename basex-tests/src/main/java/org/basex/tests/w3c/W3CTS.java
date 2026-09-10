@@ -520,7 +520,7 @@ public abstract class W3CTS extends Main {
 
     final TokenBuilder tb = new TokenBuilder();
     final long ns = nodes.size();
-    for(int n = 0; n < ns; ++n) {
+    for(int n = 0; n < ns; n++) {
       final byte[] nm = nodes.itemAt(n).string(null);
       String src = new IOFile(path).resolve(srcs.get(string(nm))).path();
       if(!tb.isEmpty()) tb.add(", ");
@@ -555,7 +555,7 @@ public abstract class W3CTS extends Main {
       throws QueryException {
 
     final long ns = nodes.size();
-    for(int n = 0; n < ns; ++n) {
+    for(int n = 0; n < ns; n++) {
       final String nm = string(nodes.itemAt(n).string(null));
       final String src = srcs.get(nm);
       final Item item = src == null ? coll(nm, qp) : Str.get(src);
@@ -588,7 +588,7 @@ public abstract class W3CTS extends Main {
       throws QueryException, IOException {
 
     final long ns = nodes.size();
-    for(int n = 0; n < ns; ++n) {
+    for(int n = 0; n < ns; n++) {
       final String file = pth + string(nodes.itemAt(n).string(null)) + IO.XQSUFFIX;
       final IO io = new IOFile(queries, file);
       try(QueryProcessor xq = new QueryProcessor(io.readString(), io.path(), context, null)) {
@@ -639,7 +639,7 @@ public abstract class W3CTS extends Main {
     final TokenBuilder tb = new TokenBuilder();
     final Value nodes = nodes(qu, root);
     final long rs = nodes.size();
-    for(int r = 0; r < rs; ++r) {
+    for(int r = 0; r < rs; r++) {
       if(r != 0) tb.add('/');
       tb.add(nodes.itemAt(r).string(null));
     }

@@ -163,7 +163,7 @@ public final class Let extends ForLet {
      * @param expr expression
      * @param qc query context
      * @return score
-     * @throws QueryException evaluation exception
+     * @throws QueryException query exception
      */
     private static Value score(final Expr expr, final QueryContext qc) throws QueryException {
       final boolean scoring = qc.scoring;

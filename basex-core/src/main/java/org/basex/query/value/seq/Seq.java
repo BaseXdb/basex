@@ -274,7 +274,7 @@ public abstract class Seq extends Value {
   @Override
   public void toString(final QueryString qs) {
     final TokenBuilder tb = new TokenBuilder().add('(');
-    for(int i = 0; i < size && tb.moreInfo(); ++i) {
+    for(int i = 0; i < size && tb.moreInfo(); i++) {
       if(i > 0) tb.add(SEP);
       final Item item = itemAt(i);
       tb.add(qs.error() ? item.toErrorString() : item.toString());

@@ -68,7 +68,7 @@ public final class Escape extends RegExp {
   /**
    * Gets the character escaped by the given single escape.
    * @param single single-char escape sequence
-   * @return the escaped char
+   * @return escaped char
    */
   public static char getCp(final String single) {
     return switch(single.charAt(1)) {

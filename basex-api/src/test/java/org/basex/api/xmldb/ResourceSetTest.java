@@ -20,7 +20,7 @@ public final class ResourceSetTest extends XMLDBBaseTest {
 
   /**
    * Initializes a test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @BeforeEach public void setUp() throws Exception {
     createDB();
@@ -32,7 +32,7 @@ public final class ResourceSetTest extends XMLDBBaseTest {
 
   /**
    * Finalizes a test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @AfterEach public void tearDown() throws Exception {
     collection.close();
@@ -41,7 +41,7 @@ public final class ResourceSetTest extends XMLDBBaseTest {
 
   /**
    * Test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @Test public void testGetResource() throws Exception {
     // request resource
@@ -59,7 +59,7 @@ public final class ResourceSetTest extends XMLDBBaseTest {
 
   /**
    * Test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @Test public void testAddResource() throws Exception {
     // perform two queries
@@ -74,7 +74,7 @@ public final class ResourceSetTest extends XMLDBBaseTest {
 
   /**
    * Test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @Test public void testRemoveResource() throws Exception {
     // perform query and remove result
@@ -85,7 +85,7 @@ public final class ResourceSetTest extends XMLDBBaseTest {
 
   /**
    * Test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @Test public void testGetIterator() throws Exception {
     // test if iterator yields results
@@ -97,7 +97,7 @@ public final class ResourceSetTest extends XMLDBBaseTest {
 
   /**
    * Test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @Test public void testGetMembersAsResource() throws Exception {
     // test created resource
@@ -110,7 +110,7 @@ public final class ResourceSetTest extends XMLDBBaseTest {
 
   /**
    * Test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @Test public void testGetSize() throws Exception {
     // test created resource
@@ -122,7 +122,7 @@ public final class ResourceSetTest extends XMLDBBaseTest {
 
   /**
    * Test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @Test public void testClear() throws Exception {
     // test created resource

@@ -222,7 +222,7 @@ public final class MetaUpdateTest extends SandboxTest {
    * @param updindex incremental value indexes
    */
   @ParameterizedTest
-  @ValueSource(booleans = { true, false })
+  @ValueSource(booleans = {true, false})
   public void rebuild(final boolean updindex) {
     set(MainOptions.UPDINDEX, updindex);
     execute(new CreateDB(NAME, "<x><a id='1'>1</a><a id='2'>2</a></x>"));

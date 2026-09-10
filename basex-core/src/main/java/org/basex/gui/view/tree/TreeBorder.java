@@ -4,7 +4,7 @@ package org.basex.gui.view.tree;
  * Subtree borders.
  * @param level real Level
  * @param start start index
- * @param size  size
+ * @param size size
  *
  * @author BaseX Team, BSD License
  * @author Wolfgang Miller

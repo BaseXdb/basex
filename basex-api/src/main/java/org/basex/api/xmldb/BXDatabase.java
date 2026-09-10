@@ -63,7 +63,7 @@ public final class BXDatabase implements Database {
    * Returns the name of a collection.
    * @param uri input URI (can be {@code null})
    * @return collection name
-   * @throws XMLDBException exception
+   * @throws XMLDBException XMLDB exception
    */
   private String getCollectionName(final String uri) throws XMLDBException {
     // try to extract name of collection; otherwise, throw exception

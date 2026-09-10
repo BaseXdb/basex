@@ -18,7 +18,7 @@ public final class TreeSlice<N, E> {
 
   /**
    * Constructor for whole trees.
-   * @param tree the tree
+   * @param tree tree
    */
   TreeSlice(final FingerTree<N, E> tree) {
     setTree(tree);
@@ -44,7 +44,7 @@ public final class TreeSlice<N, E> {
   /**
    * Getter for a contained full tree, should only be called if {@link #isTree()}
    * returns {@code true}.
-   * @return the contained tree
+   * @return contained tree
    */
   public FingerTree<N, E> getTree() {
     return tree;
@@ -53,7 +53,7 @@ public final class TreeSlice<N, E> {
   /**
    * Getter for a contained partial node, should only be called if {@link #isTree()}
    * returns {@code false}.
-   * @return the contained partial node
+   * @return contained partial node
    */
   public NodeLike<N, E> getPartial() {
     return partial;
@@ -63,7 +63,7 @@ public final class TreeSlice<N, E> {
    * Sets the contents of this slice to the given tree and returns it with the correct type.
    * The value with the current type is invalid afterward and should <i>not</i> be used.
    * @param <M> new node type
-   * @param newTree the new contents
+   * @param newTree new contents
    * @return type-cast version of this slice
    */
   <M> TreeSlice<M, E> setTree(final FingerTree<M, E> newTree) {

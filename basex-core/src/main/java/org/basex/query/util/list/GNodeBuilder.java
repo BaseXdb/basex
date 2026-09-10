@@ -54,7 +54,7 @@ public final class GNodeBuilder extends ObjectList<GNode, GNodeBuilder> {
    * Returns a value with the type of the given expression and invalidates the internal array.
    * Warning: the function must only be called if the builder is discarded afterward.
    * @param expr expression
-   * @return the iterator
+   * @return iterator
    */
   public Value value(final Expr expr) {
     ddo();
@@ -91,7 +91,7 @@ public final class GNodeBuilder extends ObjectList<GNode, GNodeBuilder> {
       // remove duplicates
       int i = 1;
       final GNode[] nodes = list;
-      for(int j = 1; j < sz; ++j) {
+      for(int j = 1; j < sz; j++) {
         while(j < sz && nodes[i - 1].is(nodes[j])) j++;
         if(j < sz) nodes[i++] = nodes[j];
       }
@@ -177,7 +177,7 @@ public final class GNodeBuilder extends ObjectList<GNode, GNodeBuilder> {
   private void sort(final int s, final int e) {
     final GNode[] nodes = list;
     if(e < 7) {
-      for(int i = s; i < e + s; ++i) {
+      for(int i = s; i < e + s; i++) {
         for(int j = i; j > s && nodes[j - 1].compare(nodes[j]) > 0; j--) s(j, j - 1);
       }
       return;
@@ -232,7 +232,7 @@ public final class GNodeBuilder extends ObjectList<GNode, GNodeBuilder> {
    * @param n number of values
    */
   private void s(final int a, final int b, final int n) {
-    for(int i = 0; i < n; ++i) s(a + i, b + i);
+    for(int i = 0; i < n; i++) s(a + i, b + i);
   }
 
   /**

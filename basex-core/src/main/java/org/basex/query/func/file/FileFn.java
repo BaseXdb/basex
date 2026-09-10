@@ -42,7 +42,7 @@ abstract class FileFn extends StandardFunc {
    * @param qc query context
    * @return result
    * @throws QueryException query exception
-   * @throws IOException query exception
+   * @throws IOException I/O exception
    */
   public abstract Value eval(QueryContext qc) throws QueryException, IOException;
 

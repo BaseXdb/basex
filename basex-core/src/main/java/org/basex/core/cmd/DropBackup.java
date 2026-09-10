@@ -18,7 +18,7 @@ import org.basex.util.list.*;
 public final class DropBackup extends ABackup {
   /**
    * Default constructor.
-   * @param pattern database pattern with optional date  ({@code null} for general data)
+   * @param pattern database pattern with optional date ({@code null} for general data)
    */
   public DropBackup(final String pattern) {
     super(pattern != null ? pattern : "");

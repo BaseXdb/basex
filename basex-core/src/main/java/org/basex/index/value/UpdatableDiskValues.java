@@ -22,7 +22,7 @@ public final class UpdatableDiskValues extends DiskValues {
    * Constructor, initializing the index structure.
    * @param data data reference
    * @param type index type
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   public UpdatableDiskValues(final Data data, final IndexType type) throws IOException {
     super(data, type, fileSuffix(type));
@@ -51,7 +51,7 @@ public final class UpdatableDiskValues extends DiskValues {
         final IntList newIds = new IntList(newSize);
         final IntList newPos = pos != null ? new IntList(newSize) : null;
         // add existing IDs
-        for(int o = 0, c = 0; o < oldSize; ++o) {
+        for(int o = 0, c = 0; o < oldSize; o++) {
           c += idxl.readNum();
           newIds.add(c);
           if(newPos != null) newPos.add(idxl.readNum());

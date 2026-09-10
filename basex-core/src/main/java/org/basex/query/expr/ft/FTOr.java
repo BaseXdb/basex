@@ -69,7 +69,7 @@ public final class FTOr extends FTExpr {
       public FTNode next() throws QueryException {
         // find item with the smallest PRE value
         int p = -1;
-        for(int e = 0; e < el; ++e) {
+        for(int e = 0; e < el; e++) {
           if(nodes[e] != null && (p == -1 || nodes[p].pre() > nodes[e].pre())) p = e;
         }
         // no items left - leave
@@ -77,7 +77,7 @@ public final class FTOr extends FTExpr {
 
         // merge all matches
         final FTNode item = nodes[p];
-        for(int e = 0; e < el; ++e) {
+        for(int e = 0; e < el; e++) {
           if(nodes[e] != null && p != e && item.pre() == nodes[e].pre()) {
             or(item, nodes[e]);
             nodes[e] = iters[e].next();

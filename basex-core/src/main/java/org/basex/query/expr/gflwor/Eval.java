@@ -14,7 +14,7 @@ abstract class Eval {
    * to not be called again if it has once returned {@code false}.
    * @param qc query context
    * @return {@code true} if step was made, {@code false} if no more results exist
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   abstract boolean next(QueryContext qc) throws QueryException;
 }

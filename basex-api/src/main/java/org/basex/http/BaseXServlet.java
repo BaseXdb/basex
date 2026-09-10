@@ -78,7 +78,7 @@ public abstract class BaseXServlet extends HttpServlet {
   /**
    * Runs the code.
    * @param conn HTTP connection
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   protected abstract void run(HTTPConnection conn) throws Exception;
 
@@ -137,8 +137,8 @@ public abstract class BaseXServlet extends HttpServlet {
         String body;
         try {
           body = qex.value().serialize(sopts).toString();
-        } catch(final QueryIOException e) {
-          Util.debug(e);
+        } catch(final QueryIOException ex2) {
+          Util.debug(ex2);
           body = qex.getLocalizedMessage();
         }
         conn.error(code, qex.getLocalizedMessage(), body, sopts.mediaType());

@@ -81,7 +81,7 @@ public final class InspectFunctions extends StandardFunc {
    */
   private static void addItems(final ValueBuilder vb, final StaticFunc sf, final QueryContext qc)
       throws QueryException {
-    for(int a = sf.minArity(); a <= sf.arity(); ++a) {
+    for(int a = sf.minArity(); a <= sf.arity(); a++) {
       final FuncBuilder fb = new FuncBuilder(sf.info, a, true);
       // safe cast (no context dependency, runtime evaluation)
       vb.add((FuncItem) Functions.item(sf, fb, qc));

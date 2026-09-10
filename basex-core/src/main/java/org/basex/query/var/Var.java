@@ -208,7 +208,7 @@ public final class Var extends ExprInfo {
    * @param qc query context
    * @param cc compilation context (can be {@code null})
    * @return checked and possibly cast value
-   * @throws QueryException if the check failed
+   * @throws QueryException query exception
    */
   public Value checkType(final Value value, final QueryContext qc, final CompileContext cc)
       throws QueryException {

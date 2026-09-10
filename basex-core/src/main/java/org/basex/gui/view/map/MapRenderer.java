@@ -471,7 +471,7 @@ final class MapRenderer {
     double ll = 0; // line length
     final int[] data0 = data[0], data1 = data[1], data2 = data[2], data3 = data[3], data4 = data[4];
     final int dl0 = data0.length, dl1 = data1.length, dl2 = data2.length, dl3 = data3.length;
-    for(int i = 0; i < dl0; ++i) {
+    for(int i = 0; i < dl0; i++) {
       double wl = data0[i] * rect.thumbf;
       // sum up error, caused by int cast
       error += data0[i] * rect.thumbf - wl;
@@ -516,7 +516,7 @@ final class MapRenderer {
           apm = psl < dl1 && data1[psl] == sl;
           final byte[] tok = new byte[data0[i] + (apm ? 1 : 0)];
           final int ts = tok.length;
-          for(int k = 0; k < ts - (apm ? 1 : 0); ++k) tok[k] = (byte) data3[p + k];
+          for(int k = 0; k < ts - (apm ? 1 : 0); k++) tok[k] = (byte) data3[p + k];
 
           if(apm) {
             tok[ts - 1] = (byte) data4[psl];
@@ -574,7 +574,7 @@ final class MapRenderer {
           final int ts = tok.length;
           l = 0;
 
-          for(int k = 0; k < ts - (apm ? 1 : 0); ++k) {
+          for(int k = 0; k < ts - (apm ? 1 : 0); k++) {
             tok[k] = (byte) data3[p + k];
           }
 
@@ -669,7 +669,7 @@ final class MapRenderer {
     g.setColor(color(20));
     wl = 0;
     final int is = list.size();
-    for(int i = 0; i < is; ++i) {
+    for(int i = 0; i < is; i++) {
       final int l = len.get(i);
       if(wl + l + sw >= wi) {
         yy += fontSize + 1;

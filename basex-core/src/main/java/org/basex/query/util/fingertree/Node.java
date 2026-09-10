@@ -25,13 +25,13 @@ public interface Node<N, E> extends NodeLike<N, E> {
   /**
    * Returns the sub-node at the given position in this node.
    * @param pos index of the sub-node, must be between 0 and {@link #arity()} - 1
-   * @return the sub-node
+   * @return sub-node
    */
   N getSub(int pos);
 
   /**
    * Creates a reversed version of this node.
-   * @return a node with the reverse order of contained elements
+   * @return node with the reverse order of contained elements
    */
   Node<N, E> reverse();
 
@@ -82,7 +82,7 @@ public interface Node<N, E> extends NodeLike<N, E> {
    * This method is only called if {@code len < this.size()} holds.
    * @param off offset of first element
    * @param len number of elements
-   * @return the subtree, possibly under-full
+   * @return subtree, possibly under-full
    */
   NodeLike<N, E> slice(long off, long len);
 }

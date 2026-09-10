@@ -167,11 +167,11 @@ public final class Blake3 {
 
   /**
    * Node.
-   * @param value   value
-   * @param words   words
+   * @param value value
+   * @param words words
    * @param counter counter
-   * @param length  length
-   * @param flags   flags
+   * @param length length
+   * @param flags flags
    */
   private record Node(int[] value, int[] words, long counter, int length, int flags) {
     /**
@@ -259,7 +259,7 @@ public final class Blake3 {
 
     /**
      * Returns cmp.
-     * @return cmp.
+     * @return cmp
      */
     private int cmp() {
       return cmp == 0 ? 1 : 0;

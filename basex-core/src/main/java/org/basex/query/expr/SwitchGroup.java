@@ -37,7 +37,7 @@ public final class SwitchGroup extends Arr {
   @Override
   public void checkUp() throws QueryException {
     final int el = exprs.length;
-    for(int e = 1; e < el; ++e) checkNoUp(exprs[e]);
+    for(int e = 1; e < el; e++) checkNoUp(exprs[e]);
   }
 
   @Override

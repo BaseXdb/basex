@@ -160,7 +160,7 @@ public abstract class Sandbox {
    * @param modify updating expression, make sure to address all target nodes via
    * the $input variable, i.e. delete node $input/a
    * @param rtrn return clause
-   * @return the query formulated with a transform expression
+   * @return query formulated with a transform expression
    */
   protected static String transform(final String input, final String modify, final String rtrn) {
     return
@@ -175,7 +175,7 @@ public abstract class Sandbox {
    * @param input input XML fragment, target of the updating expression
    * @param modification updating expression, make sure to address all target nodes via
    * the $input variable, i.e. delete node $input/a
-   * @return the query formulated with a transform expression
+   * @return query formulated with a transform expression
    */
   protected static String transform(final String input, final String modification) {
     return transform(input, modification, "");
@@ -659,7 +659,7 @@ public abstract class Sandbox {
    * The first error raised in any thread is propagated to the caller.
    * @param count number of parallel threads
    * @param task task to run in each thread
-   * @throws Exception exception raised in a worker thread, or interruption
+   * @throws Exception exception
    */
   protected static void parallel(final int count, final Callable<?> task) throws Exception {
     parallel(Collections.nCopies(count, task));
@@ -669,7 +669,7 @@ public abstract class Sandbox {
    * Runs tasks concurrently (one thread per task) and waits for all to finish.
    * The first error raised in any thread is propagated to the caller.
    * @param tasks tasks to run in parallel
-   * @throws Exception exception raised in a worker thread, or interruption
+   * @throws Exception exception
    */
   protected static void parallel(final List<? extends Callable<?>> tasks) throws Exception {
     final int size = tasks.size();
@@ -710,7 +710,7 @@ public abstract class Sandbox {
      * @param c command string to execute
      * @param start start signal
      * @param stop stop signal
-     * @throws IOException I/O exception while establishing the session
+     * @throws IOException I/O exception
      */
     public SandboxClient(final Command c, final CountDownLatch start, final CountDownLatch stop)
         throws IOException {

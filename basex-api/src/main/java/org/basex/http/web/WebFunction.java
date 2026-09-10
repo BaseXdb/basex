@@ -32,7 +32,7 @@ public abstract class WebFunction implements Comparable<WebFunction> {
 
   /** User-defined function. */
   public final StaticFunc function;
-  /** Web module. Only required if used as function template */
+  /** Web module (only required if used as function template). */
   public final WebModule module;
   /** Serialization parameters. */
   public final SerializerOptions sopts;

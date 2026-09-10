@@ -22,7 +22,7 @@ public final class SqlModuleTest extends SandboxTest {
   private static final String URL = "jdbc:mock:test";
 
   /** Resets the mock driver. */
-  @BeforeEach public void setup() {
+  @BeforeEach public void setUp() {
     MockDriver.reset();
   }
 

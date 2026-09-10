@@ -27,7 +27,7 @@ public interface Scope {
    * Compiles the expression contained in this scope.
    * @param cc compilation context
    * @return compiled expression, or {@code null} if not required
-   * @throws QueryException compilation errors
+   * @throws QueryException query exception
    */
   Expr compile(CompileContext cc) throws QueryException;
 

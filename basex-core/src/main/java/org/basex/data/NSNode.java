@@ -61,7 +61,7 @@ final class NSNode {
     setId = sets.put(in.readNums());
     size = in.readNum();
     nodes = new NSNode[size];
-    for(int n = 0; n < size; ++n) nodes[n] = new NSNode(in, this, sets);
+    for(int n = 0; n < size; n++) nodes[n] = new NSNode(in, this, sets);
   }
 
   /**
@@ -74,7 +74,7 @@ final class NSNode {
     out.writeNum(pre);
     out.writeNums(sets.get(setId));
     out.writeNum(size);
-    for(int c = 0; c < size; ++c) nodes[c].write(out, sets);
+    for(int c = 0; c < size; c++) nodes[c].write(out, sets);
   }
 
   /**
@@ -85,7 +85,7 @@ final class NSNode {
   int count(final int limit) {
     int count = 1;
     // the remaining limit is passed on, so that the recursion depth is limited as well
-    for(int c = 0; c < size && count <= limit; ++c) count += nodes[c].count(limit - count);
+    for(int c = 0; c < size && count <= limit; c++) count += nodes[c].count(limit - count);
     return count;
   }
 
@@ -194,7 +194,7 @@ final class NSNode {
     // number of nodes to be deleted
     int num = 0;
     // determine number of nodes to be deleted
-    for(int n = i; n < sz && nodes[n].pre < upper; ++n, ++num);
+    for(int n = i; n < sz && nodes[n].pre < upper; n++, num++);
     // new size of child array
     size -= num;
 
@@ -251,7 +251,7 @@ final class NSNode {
    * @param uriId namespace URI reference
    */
   void delete(final NSSets sets, final int uriId) {
-    for(int c = 0; c < size; ++c) nodes[c].delete(sets, uriId);
+    for(int c = 0; c < size; c++) nodes[c].delete(sets, uriId);
     setId = sets.delete(setId, uriId);
   }
 
@@ -286,7 +286,7 @@ final class NSNode {
     if(parent != null && pre >= start && pre <= end) {
       list.add(pre).add(parent.pre).add(level).add(setId);
     }
-    for(int c = 0; c < size; ++c) nodes[c].entries(list, level + 1, start, end);
+    for(int c = 0; c < size; c++) nodes[c].entries(list, level + 1, start, end);
   }
 
   @Override

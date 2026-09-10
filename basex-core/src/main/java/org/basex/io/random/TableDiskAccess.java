@@ -246,7 +246,7 @@ public final class TableDiskAccess extends TableAccess {
   @Override
   protected void copy(final byte[] entries, final int first, final int last) {
     dirty();
-    for(int o = 0, i = first; i < last; ++i, o += IO.NODESIZE) {
+    for(int o = 0, i = first; i < last; i++, o += IO.NODESIZE) {
       final int off = master.cursor(i);
       final Buffer buffer = master.buffers.current();
       Array.copy(entries, o, IO.NODESIZE, buffer.data, off);
@@ -360,7 +360,7 @@ public final class TableDiskAccess extends TableAccess {
       buffer.dirty = true;
 
       // increment first pre-values of pages after the last modified page
-      for(int i = master.page + 1; i < used; ++i) fPreIndex[i] += nr;
+      for(int i = master.page + 1; i < used; i++) fPreIndex[i] += nr;
       // update cached variables (fpre is not changed)
       master.nextPre += nr;
       nodes += nr;
@@ -436,7 +436,7 @@ public final class TableDiskAccess extends TableAccess {
     }
 
     // increment all fpre values after the last modified page
-    for(int i = master.page + 1; i < used; ++i) fPreIndex[i] += nr;
+    for(int i = master.page + 1; i < used; i++) fPreIndex[i] += nr;
 
     nodes += nr;
 
@@ -566,7 +566,7 @@ public final class TableDiskAccess extends TableAccess {
    */
   private void decreasePre(final int count) {
     final int nextPage = master.page + 1;
-    for(int i = nextPage; i < used; ++i) fPreIndex[i] -= count;
+    for(int i = nextPage; i < used; i++) fPreIndex[i] -= count;
     nodes -= count;
     master.nextPre = nextPage < used && fPreIndex[nextPage] < nodes ? fPreIndex[nextPage] : nodes;
   }

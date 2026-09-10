@@ -67,13 +67,13 @@ public abstract class IndexBuilder extends Job {
   /**
    * Builds the index structure and returns an index instance.
    * @return index instance
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   public abstract ValueIndex build() throws IOException;
 
   /**
    * Checks if the command was interrupted, and prints some debug output.
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
   protected void check() throws IOException {
@@ -101,7 +101,7 @@ public abstract class IndexBuilder extends Job {
    * Decides whether in-memory temporary index structures are so large
    * that we must flush them to disk before continuing.
    * @return true if structures shall be flushed to disk
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   protected final boolean splitRequired() throws IOException {
     // checks if a fixed split size has been specified

@@ -64,7 +64,7 @@ public final class Response {
    * @param body also return body
    * @param mtype media type provided by the user (can be {@code null})
    * @return result sequence of http:response and content items
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    * @throws QueryException query exception
    */
   public Value getResponse(final HttpResponse<InputStream> response, final boolean body,

@@ -100,7 +100,7 @@ public final class FTPosData {
     final IntSet set = new IntSet();
     for(final FTMatch ftm : all) {
       for(final FTStringMatch sm : ftm) {
-        for(int s = sm.start; s <= sm.end; ++s) set.add(s);
+        for(int s = sm.start; s <= sm.end; s++) set.add(s);
       }
     }
     return new IntList(set.keys()).sort();

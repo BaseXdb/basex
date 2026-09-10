@@ -373,7 +373,7 @@ public abstract class Formatter extends FormatUtil {
    * Returns the formatted fractional part of a decimal number.
    * @param num number
    * @param fp date format
-   * @return the formatted number
+   * @return formatted number
    */
   private byte[] formatFrac(final BigDecimal num, final DateFormat fp) {
     String s = num.toString().replace("0.", "").replaceAll("0+$", "");

@@ -51,7 +51,7 @@ public final class Typeswitch extends ParseExpr {
     checkNoUp(cond);
     final int gl = groups.length;
     final Expr[] tmp = new Expr[gl];
-    for(int g = 0; g < gl; ++g) tmp[g] = groups[g].expr;
+    for(int g = 0; g < gl; g++) tmp[g] = groups[g].expr;
     checkAllUp(tmp);
   }
 

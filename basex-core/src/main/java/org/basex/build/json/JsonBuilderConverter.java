@@ -28,7 +28,7 @@ abstract class JsonBuilderConverter extends JsonHandler {
    * Constructor.
    * @param jopts JSON parser options
    * @param builder database builder
-   * @throws QueryException if the USE_LAST duplicates option is set
+   * @throws QueryException query exception
    */
   JsonBuilderConverter(final JsonParserOptions jopts, final Builder builder)
       throws QueryException {

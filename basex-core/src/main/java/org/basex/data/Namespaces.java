@@ -538,7 +538,7 @@ public final class Namespaces {
     t.header.add(TABLEDIST);
     t.header.add(TABLEPREF);
     t.header.add(TABLEURI);
-    for(int i = 0; i < 3; ++i) t.align.add(true);
+    for(int i = 0; i < 3; i++) t.align.add(true);
 
     final IntList list = range(start, end);
     final int ls = list.size();
@@ -590,7 +590,7 @@ public final class Namespaces {
       final int ks = values.size();
       if(ks > 1 || values.get(0).length != 0) {
         if(values.size() != 1) tb.add("(");
-        for(int k = 0; k < ks; ++k) {
+        for(int k = 0; k < ks; k++) {
           if(k != 0) tb.add(", ");
           tb.add(values.get(k));
         }

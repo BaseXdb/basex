@@ -62,7 +62,7 @@ public final class Table {
     final int s = il.size() - 1;
     while((line = token(scan.nextLine())).length != 0) {
       final TokenList entry = new TokenList();
-      for(int e = 0; e < s; ++e) {
+      for(int e = 0; e < s; e++) {
         entry.add(trim(substring(line, il.get(e), il.get(e + 1))));
       }
       contents.add(entry);
@@ -84,7 +84,7 @@ public final class Table {
    * @return self reference
    */
   public Table toTop(final byte[] top) {
-    for(int i = 0; i < contents.size(); ++i) {
+    for(int i = 0; i < contents.size(); i++) {
       if(eq(top, contents.get(i).get(0))) {
         contents.addFirst(contents.remove(i));
         break;
@@ -100,7 +100,7 @@ public final class Table {
   public byte[] finish() {
     final int[] ind = new int[header.size()];
     final int size = header.size();
-    for(int s = 0; s < size; ++s) {
+    for(int s = 0; s < size; s++) {
       for(final TokenList e : contents) {
         ind[s] = Math.max(ind[s], e.get(s).length);
       }
@@ -108,29 +108,29 @@ public final class Table {
     }
 
     final TokenBuilder tb = new TokenBuilder();
-    for(int u = 0; u < size; ++u) {
+    for(int u = 0; u < size; u++) {
       final byte[] s = header.get(u);
       final int is = ind[u] - s.length + DIST;
       tb.add(s);
-      for(int i = 0; i < is; ++i) tb.add(' ');
+      for(int i = 0; i < is; i++) tb.add(' ');
     }
     tb.add(NL);
-    for(int u = 0; u < size; ++u) {
-      for(int i = 0; i < ind[u] + (u + 1 == size ? 0 : DIST); ++i) tb.add('-');
+    for(int u = 0; u < size; u++) {
+      for(int i = 0; i < ind[u] + (u + 1 == size ? 0 : DIST); i++) tb.add('-');
     }
     tb.add(NL);
     for(final TokenList e : contents) {
-      for(int u = 0; u < size; ++u) {
+      for(int u = 0; u < size; u++) {
         final byte[] s = e.get(u);
         final int is = ind[u] - s.length;
         if(u < align.size() && align.get(u)) {
-          for(int i = 0; i < is; ++i) tb.add(' ');
+          for(int i = 0; i < is; i++) tb.add(' ');
           tb.add(s);
         } else {
           tb.add(s);
-          for(int i = 0; i < is; ++i) tb.add(' ');
+          for(int i = 0; i < is; i++) tb.add(' ');
         }
-        for(int i = 0; i < DIST; ++i) tb.add(' ');
+        for(int i = 0; i < DIST; i++) tb.add(' ');
       }
       tb.add(NL);
     }

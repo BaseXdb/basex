@@ -35,7 +35,7 @@ public final class GUIStatus extends BaseXPanel {
 
   /**
    * Sets the status text.
-   * @param txt the text to be set
+   * @param txt text to be set
    * @param ok success flag
    */
   public void setText(final String txt, final boolean ok) {

@@ -97,7 +97,7 @@ public final class FElem extends FNode {
     final NamedNodeMap at = elem.getAttributes();
     final int al = at.getLength();
 
-    for(int a = 0; a < al; ++a) {
+    for(int a = 0; a < al; a++) {
       final Attr attr = (Attr) at.item(a);
       final byte[] nm = token(attr.getName()), uri = token(attr.getValue());
       if(Token.eq(nm, XMLNS)) {
@@ -194,7 +194,7 @@ public final class FElem extends FNode {
         if(nsMap.get(pref) != null) nsMap.put(pref, token(n.getNamespaceURI()));
       }
       final int len = atts.getLength();
-      for(int i = 0; i < len; ++i) {
+      for(int i = 0; i < len; i++) {
         final Attr a = (Attr) atts.item(i);
         final byte[] name = token(a.getName()), val = token(a.getValue());
         if(Token.eq(name, XMLNS)) {

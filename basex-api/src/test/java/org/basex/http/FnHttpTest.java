@@ -420,7 +420,7 @@ public abstract class FnHttpTest extends HTTPTest {
   /**
    * Tests if errors are thrown when some mandatory attributes are missing in a
    * <http:request/>, <http:body/> or <http:multipart/>.
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   @Test public final void errors() throws IOException {
     // Incorrect requests
@@ -476,7 +476,7 @@ public abstract class FnHttpTest extends HTTPTest {
 
   /**
    * Tests method setRequestContent of HttpClient.
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   @Test public final void writeMultipartMessage() throws IOException {
     final Request request = new Request();
@@ -515,7 +515,7 @@ public abstract class FnHttpTest extends HTTPTest {
 
   /**
    * Tests method setRequestContent of HttpClient.
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   @Test public final void writeMultipartBinary() throws IOException {
     final Request request = new Request();
@@ -539,7 +539,7 @@ public abstract class FnHttpTest extends HTTPTest {
   /**
    * Tests writing of request content with different combinations of the body
    * attributes media-type and method.
-   * @throws IOException IO exception
+   * @throws IOException I/O exception
    */
   @Test public final void writeMessage() throws IOException {
     // Case 1: No method, media-type='text/xml'
@@ -573,7 +573,7 @@ public abstract class FnHttpTest extends HTTPTest {
 
   /**
    * Tests writing of body content when @method is binary and output is xs:base64Binary.
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   @Test public final void writeBase64() throws IOException {
     // Case 1: content is xs:base64Binary
@@ -591,7 +591,7 @@ public abstract class FnHttpTest extends HTTPTest {
 
   /**
    * Tests writing text nodes (children of http:send-request bodies).
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   @Test public final void writeText() throws IOException {
     Request request = new Request();
@@ -608,7 +608,7 @@ public abstract class FnHttpTest extends HTTPTest {
 
   /**
    * Tests writing of body content when @method is binary and output is xs:hexBinary.
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   @Test public final void writeHex() throws IOException {
     // Case 1: content is xs:hexBinary
@@ -626,7 +626,7 @@ public abstract class FnHttpTest extends HTTPTest {
 
   /**
    * Tests writing of request content when @src is set.
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   @Test public final void writeFromResource() throws IOException {
     // Create a file form which will be read
@@ -687,7 +687,7 @@ public abstract class FnHttpTest extends HTTPTest {
 
   /**
    * Tests ResponseHandler.getResponse() with multipart response.
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    * @throws Exception exception
    */
   @Test public final void multipartResponse() throws Exception {
@@ -735,7 +735,7 @@ public abstract class FnHttpTest extends HTTPTest {
 
   /**
    * Tests ResponseHandler.getResponse() with multipart response having preamble and epilogue.
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    * @throws Exception exception
    */
   @Test public final void multipartRespPreamble() throws Exception {
@@ -976,7 +976,7 @@ public abstract class FnHttpTest extends HTTPTest {
 
   /**
    * Tests that an explicit binary method atomizes a node to its string value.
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   @Test public final void writeBinaryMethod() throws IOException {
     final Request request = new Request();

@@ -39,7 +39,7 @@ public final class BaseXList extends BaseXBack {
   /**
    * Default constructor.
    * @param dialog dialog reference
-   * @param choice the input values for the list
+   * @param choice input values for the list
    */
   public BaseXList(final BaseXDialog dialog, final String... choice) {
     this(dialog, true, choice);
@@ -49,7 +49,7 @@ public final class BaseXList extends BaseXBack {
    * Default constructor.
    * @param dialog dialog reference
    * @param single only allow single choices
-   * @param choice the input values for the list
+   * @param choice input values for the list
    */
   public BaseXList(final BaseXDialog dialog, final boolean single, final String... choice) {
     // cache list values
@@ -126,7 +126,7 @@ public final class BaseXList extends BaseXBack {
 
           final IntList il = new IntList();
           final int vl = values.length;
-          for(int v = 0; v < vl; ++v) {
+          for(int v = 0; v < vl; v++) {
             final String value = values[v].trim().toLowerCase(Locale.ENGLISH);
             if(glob) {
               if(value.matches(regex)) il.add(v);
@@ -192,7 +192,7 @@ public final class BaseXList extends BaseXBack {
 
   /**
    * Chooses the specified value in the text field and list.
-   * @param value the value to be set
+   * @param value value to be set
    */
   public void setValue(final String value) {
     list.setSelectedValue(value, true);

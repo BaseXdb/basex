@@ -37,7 +37,7 @@ public final class GUIMenu extends JMenuBar {
     // loop through all menu entries
     final StringBuilder gmnem = new StringBuilder();
     final int bl = MENUBAR.length;
-    for(int b = 0; b < bl; ++b) {
+    for(int b = 0; b < bl; b++) {
       final JMenu menu = new JMenu(MENUBAR[b]);
       BaseXLayout.setMnemonic(menu, gmnem);
       // the state of editor commands changes without triggering a refresh of the controls

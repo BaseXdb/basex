@@ -53,7 +53,7 @@ public final class WeakTokenSetTest {
       // remove some strong references, verify those get garbage collected in the set's references
       Collections.shuffle(strings, random);
       final int count = random.nextInt(strings.size() + 1);
-      for(int i = 0; i < count; ++i) {
+      for(int i = 0; i < count; i++) {
         assertNotNull(strongRefs.remove(strings.get(i)), msgPrefix + "unexpected removal failure");
       }
       System.gc();
@@ -70,8 +70,8 @@ public final class WeakTokenSetTest {
       }
     } catch(final AssertionFailedError e) {
       throw e;
-    } catch(final Throwable t) {
-      throw new AssertionFailedError(msgPrefix + "caught " + t.getClass().getSimpleName(), t);
+    } catch(final Throwable th) {
+      throw new AssertionFailedError(msgPrefix + "caught " + th.getClass().getSimpleName(), th);
     }
   }
 

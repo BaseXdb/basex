@@ -941,7 +941,7 @@ public class Options implements Iterable<Option<?>> {
           // extract numeric value in key
           int num = 0;
           final int ss = name.length();
-          for(int s = 0; s < ss; ++s) {
+          for(int s = 0; s < ss; s++) {
             if(Character.isDigit(name.charAt(s))) {
               num = Strings.toInt(name.substring(s));
               name = name.substring(0, s);

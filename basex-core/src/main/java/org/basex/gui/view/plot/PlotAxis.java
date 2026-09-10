@@ -110,7 +110,7 @@ final class PlotAxis {
     if(il < 1) return;
     co = new double[il];
     final byte[][] vals = new byte[il][];
-    for(int i = 0; i < il; ++i) {
+    for(int i = 0; i < il; i++) {
       byte[] value = getValue(items[i]);
       if(StatsType.isString(type) && value.length > TEXTLENGTH) {
         value = substring(value, 0, TEXTLENGTH);
@@ -127,7 +127,7 @@ final class PlotAxis {
 
       // coordinates for TEXT already calculated in textToNum()
       final int vl = vals.length;
-      for(int v = 0; v < vl; ++v) co[v] = calcPosition(vals[v]);
+      for(int v = 0; v < vl; v++) co[v] = calcPosition(vals[v]);
     }
   }
 
@@ -242,7 +242,7 @@ final class PlotAxis {
   byte[] getValue(final int pre) {
     final Data data = plotData.context.data();
     final int limit = pre + data.size(pre, Data.ELEM);
-    for(int p = pre; p < limit; ++p) {
+    for(int p = pre; p < limit; p++) {
       final int kind = data.kind(p);
       if((elem ? kind == Data.ELEM : kind == Data.ATTR) && attrID == data.nameId(p))
         return data.atom(p);

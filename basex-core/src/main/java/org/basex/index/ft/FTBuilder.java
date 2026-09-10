@@ -31,7 +31,7 @@ public final class FTBuilder extends IndexBuilder {
   /**
    * Constructor.
    * @param data data reference
-   * @throws IOException IOException
+   * @throws IOException I/O exception
    */
   public FTBuilder(final Data data) throws IOException {
     super(data, IndexType.FULLTEXT);
@@ -72,7 +72,7 @@ public final class FTBuilder extends IndexBuilder {
     try {
       // index the string values of the included elements, or the values of text nodes
       final boolean mixed = data.meta.ftmixed;
-      for(pre = 0; pre < size; ++pre) {
+      for(pre = 0; pre < size; pre++) {
         if((pre & 0x0FFF) == 0) check();
         // atomized value of a text node is its own value
         if(mixed ? indexElement() : indexEntry()) index(pre, data.atom(pre));
@@ -148,7 +148,7 @@ public final class FTBuilder extends IndexBuilder {
 
       // open all sorted lists
       final FTList[] v = new FTList[il];
-      for(int b = 0; b < il; ++b) v[b] = new FTList(data, inputs[b]);
+      for(int b = 0; b < il; b++) v[b] = new FTList(data, inputs[b]);
 
       final IntList list = new IntList();
       while(check(v)) {
@@ -156,7 +156,7 @@ public final class FTBuilder extends IndexBuilder {
         int m = 0;
         list.add(m);
         // find next token to write on disk
-        for(int i = 0; i < il; ++i) {
+        for(int i = 0; i < il; i++) {
           if(m == i || v[i].token.length == 0) continue;
           final int l = v[i].token.length - v[m].token.length;
           final int d = compare(v[m].token, v[i].token);
@@ -234,7 +234,7 @@ public final class FTBuilder extends IndexBuilder {
           ind.add(j);
           ind.add(tr);
         }
-        for(int i = 0; i < j; ++i) outY.write1(key[i]);
+        for(int i = 0; i < j; i++) outY.write1(key[i]);
         // write pointer on full-text data
         outY.write5(dr);
         // write full-text data size (number of PRE values)
@@ -268,7 +268,7 @@ public final class FTBuilder extends IndexBuilder {
     // merge full-text data of all sorted lists with the same token
     int s = 0;
     final int is = il.size();
-    for(int j = 0; j < is; ++j) {
+    for(int j = 0; j < is; j++) {
       final int m = il.get(j);
       for(final int p : list[m].prv) tbp.add(Num.num(p));
       for(final int p : list[m].pov) tbo.add(Num.num(p));
@@ -292,7 +292,7 @@ public final class FTBuilder extends IndexBuilder {
    * @param out DataOutput for disk access
    * @param vpre compressed PRE values
    * @param vpos compressed pos values
-   * @throws IOException IOException
+   * @throws IOException I/O exception
    */
   private static void writeFTData(final DataOutput out, final byte[] vpre, final byte[] vpos)
       throws IOException {
@@ -302,8 +302,8 @@ public final class FTBuilder extends IndexBuilder {
     while(np < ns) {
       // full-text data is stored here, with -scoreU, pre1, pos1, ...,
       // -scoreU, preU, posU
-      for(final int l = np + Num.length(vpre, np); np < l; ++np) out.write(vpre[np]);
-      for(final int l = pp + Num.length(vpos, pp); pp < l; ++pp) out.write(vpos[pp]);
+      for(final int l = np + Num.length(vpre, np); np < l; np++) out.write(vpre[np]);
+      for(final int l = pp + Num.length(vpos, pp); pp < l; pp++) out.write(vpos[pp]);
     }
   }
 

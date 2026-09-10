@@ -326,7 +326,7 @@ public final class MainOptions extends Options {
    * Assigns a resolver, which implements the {@link EntityResolver}, {@link LSResourceResolver},
    *   and {@link URIResolver} interfaces.
    * @param rslvr resolver
-   * @throws BaseXException resolver does not implement all required interfaces
+   * @throws BaseXException database exception
    */
   public void setResolver(final Object rslvr) throws BaseXException {
     resolver = new XMLResolver(rslvr);

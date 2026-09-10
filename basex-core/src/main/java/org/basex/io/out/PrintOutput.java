@@ -151,7 +151,7 @@ public class PrintOutput extends OutputStream {
 
   /**
    * Returns the length of the current line in codepoints.
-   * @return the number of codepoints in the current line
+   * @return number of codepoints in the current line
    */
   public long lineLength() {
     return lineLength;

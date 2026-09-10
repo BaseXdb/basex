@@ -347,11 +347,11 @@ public abstract class Data {
 
     // find PRE value in the table; start with specified ID
     final int size = nodes();
-    for(int p = Math.max(0, id); p < nodes(); ++p) {
+    for(int p = Math.max(0, id); p < nodes(); p++) {
       if(id == id(p)) return p;
     }
     final int ps = Math.min(size, id);
-    for(int p = 0; p < ps; ++p) {
+    for(int p = 0; p < ps; p++) {
       if(id == id(p)) return p;
     }
     // ID not found
@@ -434,7 +434,7 @@ public abstract class Data {
 
   /**
    * Finds the specified attribute and returns its value.
-   * @param att the attribute ID of the attribute to be found
+   * @param att attribute ID of the attribute to be found
    * @param pre PRE value
    * @return attribute value or {@code null}
    */
@@ -716,7 +716,7 @@ public abstract class Data {
 
     final Data sData = source.data;
     int sTopPre = source.start;
-    for(int sPre = source.start; sPre < source.end; ++sPre) {
+    for(int sPre = source.start; sPre < source.end; sPre++) {
       // properties of the source node
       final int sKind = sData.kind(sPre);
       final int sSize = sData.size(sPre, sKind);
@@ -879,7 +879,7 @@ public abstract class Data {
     // indicates if database only contains a dummy node
     final Data sdata = source.data;
     int c = 0, sTopPre = source.start;
-    for(int sPre = sTopPre; sPre < source.end; ++sPre, ++c) {
+    for(int sPre = sTopPre; sPre < source.end; sPre++, c++) {
       if(c != 0 && c % bSize == 0) insert(pre + c - bSize);
 
       // values of source node

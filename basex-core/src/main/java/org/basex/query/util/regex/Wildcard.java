@@ -26,7 +26,7 @@ public final class Wildcard extends RegExp {
   /**
    * Getter for the lazily initialized wildcard instances.
    * @param dotAll match-all flag
-   * @return the instance
+   * @return instance
    */
   public static Wildcard get(final boolean dotAll) {
     return dotAll ? ALL : NOLF;

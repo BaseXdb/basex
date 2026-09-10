@@ -27,7 +27,7 @@ public final class TarEntry {
   TarEntry(final byte[] buffer) {
     // file name
     final ByteList result = new ByteList();
-    for(int i = 0; i < 100; ++i) {
+    for(int i = 0; i < 100; i++) {
       if(buffer[i] == 0) break;
       result.add(buffer[i]);
     }
@@ -36,7 +36,7 @@ public final class TarEntry {
     // file size
     long s = 0;
     boolean p = true;
-    for(int i = 124; i < 136; ++i) {
+    for(int i = 124; i < 136; i++) {
       final byte b = buffer[i];
       if(p && (b == ' ' || b == '0')) continue;
       if(b == 0 || b == ' ') break;

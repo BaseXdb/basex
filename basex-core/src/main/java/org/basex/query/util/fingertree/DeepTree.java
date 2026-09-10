@@ -55,7 +55,7 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
    * @param middle middle tree
    * @param right right digit
    * @param size size of this tree
-   * @return the deep node
+   * @return deep node
    */
   static <N, E> DeepTree<N, E> get(final Node<N, E>[] left, final FingerTree<Node<N, E>, E> middle,
       final Node<N, E>[] right, final long size) {
@@ -70,7 +70,7 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
    * @param leftSize size of the left subtree
    * @param right right digit
    * @param size size of this tree
-   * @return the deep node
+   * @return deep node
    */
   static <N, E> DeepTree<N, E> get(final Node<N, E>[] left, final long leftSize,
       final Node<N, E>[] right, final long size) {
@@ -84,7 +84,7 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
    * @param left left digit
    * @param right right digit
    * @param size size of this tree
-   * @return the deep node
+   * @return deep node
    */
   static <N, E> DeepTree<N, E> get(final Node<N, E>[] left, final Node<N, E>[] right,
       final long size) {
@@ -98,7 +98,7 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
    * @param left left digit
    * @param middle middle subtree
    * @param right right digit
-   * @return the deep node
+   * @return deep node
    */
   static <N, E> DeepTree<N, E> get(final Node<N, E>[] left,
       final FingerTree<Node<N, E>, E> middle, final Node<N, E>[] right) {
@@ -112,7 +112,7 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
    * @param <E> element type
    * @param left left digit
    * @param right right digit
-   * @return the deep node
+   * @return deep node
    */
   static <N, E> DeepTree<N, E> get(final Node<N, E>[] left, final Node<N, E>[] right) {
     final long l = size(left), r = size(right);
@@ -701,12 +701,12 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
    * Creates a tree slice from a digit.
    * @param <N> node type
    * @param <E> element type
-   * @param nodes the digit
+   * @param nodes digit
    * @param from element offset
    * @param len number of elements
    * @param buffer buffer to insert the node slice into
    * @param inBuffer initial number of nodes in the buffer
-   * @return the slice
+   * @return slice
    */
   private static <N, E> int splitDigit(final Node<N, E>[] nodes, final long from,
       final long len, final NodeLike<N, E>[] buffer, final int inBuffer) {

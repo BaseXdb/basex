@@ -92,7 +92,7 @@ final class DynJavaFunc extends DynJavaCall {
    * Returns the value of a field.
    * @param qc query context
    * @return result and class instance (instance can be {@code null})
-   * @throws QueryException exception
+   * @throws QueryException query exception
    */
   private Object[] field(final QueryContext qc) throws QueryException {
     final Object instance = instance(values(qc), isStatic(field));
@@ -109,7 +109,7 @@ final class DynJavaFunc extends DynJavaCall {
    * Returns the result of a method invocation.
    * @param qc query context
    * @return result and class instance (instance can be {@code null})
-   * @throws QueryException exception
+   * @throws QueryException query exception
    */
   private Object[] method(final QueryContext qc) throws QueryException {
     final Value[] values = values(qc);

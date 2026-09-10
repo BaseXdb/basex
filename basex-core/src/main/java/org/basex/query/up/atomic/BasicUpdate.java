@@ -41,7 +41,7 @@ public abstract class BasicUpdate {
 
   /**
    * Returns the data to be inserted (for inserts,...).
-   * @return Insertion sequence data instance
+   * @return insertion sequence data instance
    */
   abstract DataClip getInsertionData();
 

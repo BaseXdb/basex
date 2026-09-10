@@ -525,7 +525,7 @@ public enum GUIMenuCmd implements GUICommand {
       final StringBuilder sb = new StringBuilder();
       final DBNodes n = gui.context.copied;
       final long ns = n.size();
-      for(int i = 0; i < ns; ++i) {
+      for(int i = 0; i < ns; i++) {
         if(i > 0) sb.append(',');
         sb.append(openPre(n, i));
       }
@@ -550,7 +550,7 @@ public enum GUIMenuCmd implements GUICommand {
       final StringBuilder sb = new StringBuilder();
       final DBNodes n = gui.context.marked;
       final long ns = n.size();
-      for(int i = 0; i < ns; ++i) {
+      for(int i = 0; i < ns; i++) {
         if(i > 0) sb.append(',');
         sb.append(openPre(n, i));
       }

@@ -48,7 +48,7 @@ public abstract class JsonHandler extends Job {
 
   /**
    * Called when a pair of a JSON object is opened.
-   * @param key the key of the entry
+   * @param key key of the entry
    * @throws QueryException query exception
    */
   protected abstract void openPair(byte[] key) throws QueryException;

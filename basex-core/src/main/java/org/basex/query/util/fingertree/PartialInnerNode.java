@@ -17,7 +17,7 @@ final class PartialInnerNode<N, E> implements NodeLike<Node<N, E>, E> {
 
   /**
    * Constructor.
-   * @param sub the sub-node
+   * @param sub sub-node
    */
   PartialInnerNode(final NodeLike<N, E> sub) {
     this.sub = sub;

@@ -58,7 +58,7 @@ abstract class NodeCopy extends NodeUpdate {
   final void add(final NamePool pool) {
     final Data d = insseq.data;
     final int s = insseq.start, e = insseq.end;
-    for(int p = s; p < e; ++p) {
+    for(int p = s; p < e; p++) {
       final int k = d.kind(p);
       if(k == Data.ATTR || k == Data.ELEM) {
         if(p > s && d.parent(p, k) >= s) break;

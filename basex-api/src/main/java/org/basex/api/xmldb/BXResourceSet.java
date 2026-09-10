@@ -28,7 +28,7 @@ public final class BXResourceSet implements ResourceSet {
     // convert result into resource instances
     final int rs = (int) result.size();
     list = new ArrayList<>(rs);
-    for(int s = 0; s < rs; ++s) list.add(new BXXMLResource(result.itemAt(s), coll));
+    for(int s = 0; s < rs; s++) list.add(new BXXMLResource(result.itemAt(s), coll));
     this.coll = coll;
   }
 

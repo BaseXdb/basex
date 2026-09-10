@@ -87,7 +87,7 @@ public final class DiskBuilder extends Builder {
       try(DataInput in = new DataInput(tmpFile)) {
         final TableAccess ta = new TableDiskAccess(meta, size, true);
         try {
-          for(; spos < ssize; ++spos) ta.write4(in.readNum(), 8, in.readNum());
+          for(; spos < ssize; spos++) ta.write4(in.readNum(), 8, in.readNum());
         } finally {
           ta.close();
         }

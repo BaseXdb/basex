@@ -49,7 +49,7 @@ public final class ServerLockingTest extends SandboxTest {
 
   /**
    * Starts the server.
-   * @throws Exception none expected
+   * @throws Exception exception
    */
   @BeforeAll public static void start() throws Exception {
     server = createServer();
@@ -76,7 +76,7 @@ public final class ServerLockingTest extends SandboxTest {
   /**
    * Handle thread synchronization so both threads/queries have to be inside their locks
    * at the same time to count down {@code test} latch.
-   * @throws Exception none expected
+   * @throws Exception exception
    */
   public static void countDownAndWait() throws Exception {
     sync.countDown();
@@ -88,7 +88,7 @@ public final class ServerLockingTest extends SandboxTest {
    * @param query1 first query
    * @param query2 second query
    * @param parallel execute queries in parallel
-   * @throws Exception none expected
+   * @throws Exception exception
    */
   private static void testQueries(final String query1, final String query2, final boolean parallel)
       throws Exception {
@@ -131,7 +131,7 @@ public final class ServerLockingTest extends SandboxTest {
 
   /**
    * Query no databases.
-   * @throws Exception none expected
+   * @throws Exception exception
    */
   @Test public void noDatabase() throws Exception {
     testQueries(Q, Q, true);
@@ -139,7 +139,7 @@ public final class ServerLockingTest extends SandboxTest {
 
     /**
    * Read same database.
-   * @throws Exception none expected
+   * @throws Exception exception
    */
   @Test public void readDatabase() throws Exception {
     testQueries(
@@ -150,7 +150,7 @@ public final class ServerLockingTest extends SandboxTest {
 
   /**
    * Read two different databases.
-   * @throws Exception none expected
+   * @throws Exception exception
    */
   @Test public void readDatabases() throws Exception {
     testQueries(
@@ -161,7 +161,7 @@ public final class ServerLockingTest extends SandboxTest {
 
   /**
    * Write to the same database twice.
-   * @throws Exception none expected
+   * @throws Exception exception
    */
   @Test public void writeDatabase() throws Exception {
     testQueries(
@@ -172,7 +172,7 @@ public final class ServerLockingTest extends SandboxTest {
 
   /**
    * Write to different databases.
-   * @throws Exception none expected
+   * @throws Exception exception
    */
   @Test public void writeDatabases() throws Exception {
     testQueries(
@@ -183,7 +183,7 @@ public final class ServerLockingTest extends SandboxTest {
 
   /**
    * Read from and write to the same database.
-   * @throws Exception none expected
+   * @throws Exception exception
    */
   @Test public void readWriteDatabase() throws Exception {
     testQueries(
@@ -194,7 +194,7 @@ public final class ServerLockingTest extends SandboxTest {
 
   /**
    * Read from and write to different databases.
-   * @throws Exception none expected
+   * @throws Exception exception
    */
   @Test public void readWriteDatabases() throws Exception {
     testQueries(
@@ -205,7 +205,7 @@ public final class ServerLockingTest extends SandboxTest {
 
   /**
    * Read from a database, perform global write lock.
-   * @throws Exception none expected
+   * @throws Exception exception
    */
   @Test public void readDatabasesGlobalWrite() throws Exception {
     testQueries(
@@ -216,7 +216,7 @@ public final class ServerLockingTest extends SandboxTest {
 
   /**
    * Global write lock twice.
-   * @throws Exception none expected
+   * @throws Exception exception
    */
   @Test public void globalWrites() throws Exception {
     testQueries(
@@ -227,7 +227,7 @@ public final class ServerLockingTest extends SandboxTest {
 
   /**
    * Test XQuery locks.
-   * @throws Exception none expected
+   * @throws Exception exception
    */
   @Test public void xqueryRead() throws Exception {
     final String prolog = "import module namespace qm='java:org.basex.query.func.QueryModuleTest';";
@@ -239,7 +239,7 @@ public final class ServerLockingTest extends SandboxTest {
 
   /**
    * Test XQuery locks.
-   * @throws Exception none expected
+   * @throws Exception exception
    */
   @Test public void xqueryWrite() throws Exception {
     final String prolog = "import module namespace qm = 'org.basex.query.func.QueryModuleTest';";
@@ -251,7 +251,7 @@ public final class ServerLockingTest extends SandboxTest {
 
   /**
    * Load test.
-   * @throws Exception none expected
+   * @throws Exception exception
    */
   @Test public void loadTests() throws Exception {
     final int totalQueries = RUN_COUNT * QUERIES.length;

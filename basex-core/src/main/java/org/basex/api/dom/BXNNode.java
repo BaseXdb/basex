@@ -23,7 +23,7 @@ final class BXNNode extends BXNList implements NamedNodeMap {
   public BXNode getNamedItem(final String name) {
     final byte[] nm = Token.token(name);
     final int s = getLength();
-    for(int i = 0; i < s; ++i) {
+    for(int i = 0; i < s; i++) {
       if(Token.eq(nodes.get(i).name(), nm)) return item(i);
     }
     return null;

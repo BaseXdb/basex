@@ -93,7 +93,7 @@ public abstract class Item extends Value {
    * Returns a string representation of the value.
    * @param ii input info (can be {@code null})
    * @return string value
-   * @throws QueryException if the item cannot be atomized (caused by function or streaming items)
+   * @throws QueryException query exception
    */
   public abstract byte[] string(InputInfo ii) throws QueryException;
 

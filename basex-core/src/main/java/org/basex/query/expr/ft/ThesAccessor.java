@@ -18,7 +18,7 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class ThesAccessor {
-  /** Input Info (can be {@code null}). */
+  /** Input info (can be {@code null}). */
   private final InputInfo info;
   /** Requested relation. */
   private final byte[] relation;

@@ -87,7 +87,7 @@ public abstract class Tokenizer extends LanguageImpl {
   /**
    * Converts the specified token to upper case.
    * @param token token to be converted
-   * @return the converted token
+   * @return converted token
    */
   static byte[] upper(final byte[] token) {
     final int tl = token.length;
@@ -96,7 +96,7 @@ public abstract class Tokenizer extends LanguageImpl {
       while(++i < tl && token[i] == uc(token[i]));
       if(i == tl) return token;
       final byte[] tmp = token.clone();
-      for(; i < tl; ++i) tmp[i] = (byte) uc(tmp[i]);
+      for(; i < tl; i++) tmp[i] = (byte) uc(tmp[i]);
       return tmp;
     }
     final TokenBuilder tb = new TokenBuilder(tl);
@@ -107,7 +107,7 @@ public abstract class Tokenizer extends LanguageImpl {
   /**
    * Converts the specified token to lower case.
    * @param token token to be converted
-   * @return the converted token
+   * @return converted token
    */
   static byte[] lower(final byte[] token) {
     final int tl = token.length;
@@ -116,7 +116,7 @@ public abstract class Tokenizer extends LanguageImpl {
       while(++i < tl && token[i] == lc(token[i]));
       if(i == tl) return token;
       final byte[] tmp = token.clone();
-      for(; i < tl; ++i) tmp[i] = (byte) lc(tmp[i]);
+      for(; i < tl; i++) tmp[i] = (byte) lc(tmp[i]);
       return tmp;
     }
     final TokenBuilder tb = new TokenBuilder(tl);

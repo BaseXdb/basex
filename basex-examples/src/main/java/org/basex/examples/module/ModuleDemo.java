@@ -17,6 +17,9 @@ import org.basex.query.value.node.*;
  * demo:name(demo:create()),
  * ...
  * </pre>
+ *
+ * @author BaseX Team, BSD License
+ * @author Christian Gruen
  */
 public class ModuleDemo extends QueryModule {
   /**

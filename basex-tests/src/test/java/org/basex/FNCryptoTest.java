@@ -37,7 +37,7 @@ public final class FNCryptoTest extends SandboxTest {
 
   /**
    * Creates the keystore.
-   * @throws Exception error during keystore generation
+   * @throws Exception exception
    */
   @BeforeAll public static void start() throws Exception {
     KEYSTORE.delete();

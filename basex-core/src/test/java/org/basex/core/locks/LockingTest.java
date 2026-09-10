@@ -41,7 +41,7 @@ public final class LockingTest extends SandboxTest {
   /**
    * An acquisition that is interrupted must leave no trace: the thread must not be marked as
    * holding locks it never received, or its next job fails with "Thread holds locks".
-   * @throws InterruptedException Got interrupted.
+   * @throws InterruptedException interrupted exception
    */
   @RepeatedTest(REPEAT)
   public void interruptedAcquisition() throws InterruptedException {
@@ -71,7 +71,7 @@ public final class LockingTest extends SandboxTest {
 
   /**
    * Single thread acquires both global read lock and a single write lock.
-   * @throws InterruptedException Got interrupted.
+   * @throws InterruptedException interrupted exception
    */
   @RepeatedTest(REPEAT)
   public void singleThreadGlobalReadLocalWriteTest() throws InterruptedException {
@@ -87,7 +87,7 @@ public final class LockingTest extends SandboxTest {
   /**
    * Several jobs that hold a global read lock and a local write lock at the same time must not
    * deadlock when a pure local writer runs concurrently.
-   * @throws InterruptedException Got interrupted.
+   * @throws InterruptedException interrupted exception
    */
   @RepeatedTest(REPEAT)
   public void globalReadLocalWriteDeadlockTest() throws InterruptedException {
@@ -113,7 +113,7 @@ public final class LockingTest extends SandboxTest {
   /**
    * Non-locking jobs (no read or write locks) must not consume the budget of concurrent locking
    * jobs limited by {@link StaticOptions#PARALLEL}.
-   * @throws InterruptedException Got interrupted.
+   * @throws InterruptedException interrupted exception
    */
   @RepeatedTest(REPEAT)
   public void parallelBudgetTest() throws InterruptedException {
@@ -139,7 +139,7 @@ public final class LockingTest extends SandboxTest {
 
   /**
    * Test for concurrent writes.
-   * @throws InterruptedException Got interrupted.
+   * @throws InterruptedException interrupted exception
    */
   @RepeatedTest(REPEAT)
   public void writeWriteTest() throws InterruptedException {
@@ -159,7 +159,7 @@ public final class LockingTest extends SandboxTest {
 
   /**
    * Fetch write lock, then read lock.
-   * @throws InterruptedException Got interrupted.
+   * @throws InterruptedException interrupted exception
    */
   @RepeatedTest(REPEAT)
   public void writeReadTest() throws InterruptedException {
@@ -179,7 +179,7 @@ public final class LockingTest extends SandboxTest {
 
   /**
    * Fetch read lock, then write lock.
-   * @throws InterruptedException Got interrupted.
+   * @throws InterruptedException interrupted exception
    */
   @RepeatedTest(REPEAT)
   public void readWriteTest() throws InterruptedException {
@@ -199,7 +199,7 @@ public final class LockingTest extends SandboxTest {
 
   /**
    * Fetch two read locks.
-   * @throws InterruptedException Got interrupted.
+   * @throws InterruptedException interrupted exception
    */
   @RepeatedTest(REPEAT)
   public void readReadTest() throws InterruptedException {
@@ -217,7 +217,7 @@ public final class LockingTest extends SandboxTest {
 
   /**
    * Test parallel transaction limit.
-   * @throws InterruptedException Got interrupted.
+   * @throws InterruptedException interrupted exception
    */
   @RepeatedTest(REPEAT)
   public void parallelTransactionLimitTest() throws InterruptedException {
@@ -253,7 +253,7 @@ public final class LockingTest extends SandboxTest {
 
   /**
    * Global locking test.
-   * @throws InterruptedException Got interrupted.
+   * @throws InterruptedException interrupted exception
    */
   @RepeatedTest(REPEAT)
   public void globalWriteLocalWriteLockingTest() throws InterruptedException {
@@ -281,7 +281,7 @@ public final class LockingTest extends SandboxTest {
 
   /**
    * Global locking test.
-   * @throws InterruptedException Got interrupted.
+   * @throws InterruptedException interrupted exception
    */
   @RepeatedTest(REPEAT)
   public void globalWriteLocalReadLockingTest() throws InterruptedException {
@@ -309,7 +309,7 @@ public final class LockingTest extends SandboxTest {
 
   /**
    * Global locking test.
-   * @throws InterruptedException Got interrupted.
+   * @throws InterruptedException interrupted exception
    */
   @RepeatedTest(REPEAT)
   public void globalReadLocalWriteLockingTest() throws InterruptedException {
@@ -337,7 +337,7 @@ public final class LockingTest extends SandboxTest {
 
   /**
    * Global locking test.
-   * @throws InterruptedException Got interrupted.
+   * @throws InterruptedException interrupted exception
    */
   @RepeatedTest(REPEAT)
   public void globalReadLocalReadLockingTest() throws InterruptedException {
@@ -361,7 +361,7 @@ public final class LockingTest extends SandboxTest {
 
   /**
    * Simultaneous read/write lock test.
-   * @throws InterruptedException Got interrupted.
+   * @throws InterruptedException interrupted exception
    */
   @RepeatedTest(REPEAT)
   public void simultaneousReadWriteTest() throws InterruptedException {
@@ -384,7 +384,7 @@ public final class LockingTest extends SandboxTest {
 
   /**
    * Another simultaneous read/write lock test.
-   * @throws InterruptedException Got interrupted.
+   * @throws InterruptedException interrupted exception
    */
   @RepeatedTest(REPEAT)
   public void simultaneousReadWriteTestSingleReadFirst() throws InterruptedException {
@@ -404,7 +404,7 @@ public final class LockingTest extends SandboxTest {
 
   /**
    * Another simultaneous read/write lock test.
-   * @throws InterruptedException Got interrupted.
+   * @throws InterruptedException interrupted exception
    */
   @RepeatedTest(REPEAT)
   public void simultaneousReadWriteTestSingleWriteFirst() throws InterruptedException {
@@ -424,7 +424,7 @@ public final class LockingTest extends SandboxTest {
 
   /**
    * Locks downgrading, the other thread is reader.
-   * @throws InterruptedException Got interrupted.
+   * @throws InterruptedException interrupted exception
    */
   @RepeatedTest(REPEAT)
   public void downgradeOtherReadTest() throws InterruptedException {
@@ -446,7 +446,7 @@ public final class LockingTest extends SandboxTest {
 
   /**
    * Locks downgrading, the other thread is writer.
-   * @throws InterruptedException Got interrupted.
+   * @throws InterruptedException interrupted exception
    */
   @RepeatedTest(REPEAT)
   public void downgradeOtherWriteTest() throws InterruptedException {
@@ -470,7 +470,7 @@ public final class LockingTest extends SandboxTest {
 
   /**
    * Downgrades from global write lock, other fetches local writes locks.
-   * @throws InterruptedException Got interrupted.
+   * @throws InterruptedException interrupted exception
    */
   @RepeatedTest(REPEAT)
   public void downgradeGlobalWriteLockTest() throws InterruptedException {
@@ -491,7 +491,7 @@ public final class LockingTest extends SandboxTest {
 
   /**
    * Downgrades from global write lock, other fetches local writes locks.
-   * @throws InterruptedException Got interrupted.
+   * @throws InterruptedException interrupted exception
    */
   @RepeatedTest(REPEAT)
   public void downgradeToNoWriteLocksTest() throws InterruptedException {
@@ -510,7 +510,7 @@ public final class LockingTest extends SandboxTest {
 
   /**
    * Locks downgrading holding read locks.
-   * @throws InterruptedException Got interrupted.
+   * @throws InterruptedException interrupted exception
    */
   @RepeatedTest(REPEAT)
   public void downgradeHoldingReadLocksTest() throws InterruptedException {
@@ -535,7 +535,7 @@ public final class LockingTest extends SandboxTest {
 
   /**
    * Forces a deadlock.
-   * @throws InterruptedException Got interrupted.
+   * @throws InterruptedException interrupted exception
    */
   @RepeatedTest(REPEAT)
   public void deadlockTest() throws InterruptedException {
@@ -572,7 +572,7 @@ public final class LockingTest extends SandboxTest {
   /**
    * Fuzzing test, watch for deadlocks. Uses multiple threads in parallel which all fetch
    * random locks, hold them for a while, release them and fetch the next one.
-   * @throws InterruptedException Got interrupted.
+   * @throws InterruptedException interrupted exception
    */
   @RepeatedTest(REPEAT)
   public void fuzzingTest() throws InterruptedException {
@@ -602,8 +602,8 @@ public final class LockingTest extends SandboxTest {
               sleep(HOLD_TIME);
               if(!latch.await(FUZZING_THREADS * HOLD_TIME + WAIT, TimeUnit.MILLISECONDS))
                 throw new RuntimeException("Looks like thread is stuck in a deadlock.");
-            } catch(final InterruptedException e) {
-              throw new RuntimeException(e);
+            } catch(final InterruptedException ex) {
+              throw new RuntimeException(ex);
             }
             th.release();
             allDone.countDown();

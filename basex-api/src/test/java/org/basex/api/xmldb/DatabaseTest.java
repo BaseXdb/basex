@@ -18,7 +18,7 @@ public final class DatabaseTest extends XMLDBBaseTest {
 
   /**
    * Initializes a test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @BeforeEach public void setUp() throws Exception {
     createDB();
@@ -34,7 +34,7 @@ public final class DatabaseTest extends XMLDBBaseTest {
 
   /**
    * Test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @Test public void testAcceptsURI() throws Exception {
     database.acceptsURI(PATH);
@@ -49,7 +49,7 @@ public final class DatabaseTest extends XMLDBBaseTest {
 
   /**
    * Test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @Test public void testGetCollection() throws Exception {
     // directly call and close database instance
@@ -94,7 +94,7 @@ public final class DatabaseTest extends XMLDBBaseTest {
 
   /**
    * Test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @Test public void testSetProperty() throws Exception {
     try {

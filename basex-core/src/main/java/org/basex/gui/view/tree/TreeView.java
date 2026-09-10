@@ -168,7 +168,7 @@ public final class TreeView extends View {
       final int rl = roots.length;
       if(rl == 0) return;
 
-      for(int i = 0; !showAtts && i < rl; ++i) {
+      for(int i = 0; !showAtts && i < rl; i++) {
         if(roots[i] >= data.nodes()) break;
         if(data.kind(roots[i]) == Data.ATTR) {
           drawMessage(g, "Enable attributes in Tree Options.");
@@ -255,13 +255,13 @@ public final class TreeView extends View {
     tg.setFont(font);
     BaseXLayout.antiAlias(tg);
 
-    for(int rn = 0; rn < rl; ++rn) {
+    for(int rn = 0; rn < rl; rn++) {
       final int h = sub.subtreeHeight(rn);
-      for(int lv = 0; lv < h; ++lv) {
+      for(int lv = 0; lv < h; lv++) {
         final boolean big = tr.bigRect(sub, rn, lv);
         final TreeRect[] lr = tr.treeRectsPerLevel(rn, lv);
         final int ll = lr.length;
-        for(int i = 0; i < ll; ++i) {
+        for(int i = 0; i < ll; i++) {
           final TreeRect r = lr[i];
           final int pre = sub.prePerIndex(rn, lv, i);
           drawRectangle(tg, rn, lv, r, pre, Draw.RECTANGLE);
@@ -440,7 +440,7 @@ public final class TreeView extends View {
 
   /**
    * Returns draw color.
-   * @param l the current level
+   * @param l current level
    * @param fill if true it returns fill color, rectangle color else
    * @return draw color
    */
@@ -459,8 +459,8 @@ public final class TreeView extends View {
     final int t = y + h, size = sub.maxSubtreeHeight(), rl = roots.length;
     final IntList list = new IntList();
     final int rs = treePerX(x), re = treePerX(x + w);
-    for(int r = Math.max(rs, 0); r <= re; ++r) {
-      for(int i = 0; i < size; ++i) {
+    for(int r = Math.max(rs, 0); r <= re; r++) {
+      for(int i = 0; i < size; i++) {
         final int yL = getYperLevel(i);
         if(i < sub.subtreeHeight(r) && (yL >= y || yL + nodeHeight >= y)
             && (yL <= t || yL + nodeHeight <= t)) {
@@ -471,7 +471,7 @@ public final class TreeView extends View {
             if(rl > 1) {
               final TreeBorder tb = sub.treeBorder(r, i);
               final int si = tb.size();
-              for(int n = 0; n < si; ++n) {
+              for(int n = 0; n < si; n++) {
                 list.add(sub.prePerIndex(r, i, n));
               }
             } else {
@@ -485,7 +485,7 @@ public final class TreeView extends View {
               } while(sPrePos++ < ePrePos);
             }
           } else {
-            for(int j = 0; j < s; ++j) {
+            for(int j = 0; j < s; j++) {
               final TreeRect rect = rlv[j];
               if(rect.contains(x, w)) list.add(sub.prePerIndex(r, i, j));
             }
@@ -521,9 +521,9 @@ public final class TreeView extends View {
     while(rn < rl) {
       final int ml = marked.length;
       final LinkedList<Integer> marklink = new LinkedList<>();
-      for(int m = 0; m < ml; ++m) marklink.add(m, marked[m]);
+      for(int m = 0; m < ml; m++) marklink.add(m, marked[m]);
 
-      for(int lv = 0; lv < sub.subtreeHeight(rn); ++lv) {
+      for(int lv = 0; lv < sub.subtreeHeight(rn); lv++) {
         final int y = getYperLevel(lv);
         final ListIterator<Integer> li = marklink.listIterator();
         if(tr.bigRect(sub, rn, lv)) {
@@ -569,7 +569,7 @@ public final class TreeView extends View {
 
   /**
    * Draws node inside big rectangle.
-   * @param g the graphics reference
+   * @param g graphics reference
    * @param rn root
    * @param lv level
    * @param r rectangle
@@ -587,7 +587,7 @@ public final class TreeView extends View {
 
   /**
    * Draws parent connection.
-   * @param g the graphics reference
+   * @param g graphics reference
    * @param lv level
    * @param r rectangle
    * @param px parent x
@@ -603,7 +603,7 @@ public final class TreeView extends View {
 
   /**
    * Highlights nodes.
-   * @param g the graphics reference
+   * @param g graphics reference
    * @param rn root
    * @param lv level
    * @param r rectangle to highlight
@@ -650,7 +650,7 @@ public final class TreeView extends View {
 
   /**
    * Draws thumbnails.
-   * @param g the graphics reference
+   * @param g graphics reference
    * @param lv level
    * @param pre pre
    * @param r rectangle
@@ -681,7 +681,7 @@ public final class TreeView extends View {
 
   /**
    * Highlights descendants.
-   * @param g the graphics reference
+   * @param g graphics reference
    * @param rn root
    * @param lv level
    * @param r rectangle to highlight
@@ -704,7 +704,7 @@ public final class TreeView extends View {
       } else {
         final TreeBorder bo = sbo[1], bos = sub.treeBorder(rn, lvd);
         final int bs = bo.start() >= bos.start() ? bo.start() - bos.start() : bo.start();
-        for(int j = 0; j < bo.size(); ++j) {
+        for(int j = 0; j < bo.size(); j++) {
           final int dp = sub.prePerIndex(rn, lvd, j + bs);
 
           final TreeRect dr = tr.treeRectPerIndex(rn, lvd, j + bs);
@@ -742,7 +742,7 @@ public final class TreeView extends View {
 
     int lvv = lv, cen = parc;
     final int sl = subt.length;
-    for(int i = 1; i < sl && tr.bigRect(sub, rn, lvv); ++i) {
+    for(int i = 1; i < sl && tr.bigRect(sub, rn, lvv); i++) {
       final TreeBorder bos = sub.treeBorder(rn, lvv), bo = subt[i];
 
       final TreeRect r = tr.treeRectPerIndex(rn, lvv, 0);
@@ -766,7 +766,7 @@ public final class TreeView extends View {
 
       if(lvv + 1 < sub.subtreeHeight(rn) && !tr.bigRect(sub, rn, lvv + 1)) {
         final Data d = gui.context.data();
-        for(int j = bs; j < bs + bo.size(); ++j) {
+        for(int j = bs; j < bs + bo.size(); j++) {
           final int pre = sub.prePerIndex(rn, lvv, j), pos = getBigRectPosition(rn, lvv, pre, r);
           final int k = d.kind(pre), s = d.size(pre, k);
           if(s > 1) highlightDescendants(g, rn, lvv, r, pre, pos,
@@ -826,8 +826,8 @@ public final class TreeView extends View {
       fpre = gui.context.focused;
 
       final int rl = roots.length;
-      for(int r = 0; r < rl; ++r) {
-        for(int i = 0; i < sub.subtreeHeight(r); ++i) {
+      for(int r = 0; r < rl; r++) {
+        for(int i = 0; i < sub.subtreeHeight(r); i++) {
           if(tr.bigRect(sub, r, i)) {
             final int index = sub.preIndex(r, i, fpre);
 
@@ -878,8 +878,8 @@ public final class TreeView extends View {
 
   /**
    * Returns the y-axis value for a given level.
-   * @param level the level
-   * @return the y-axis value
+   * @param level level
+   * @return y-axis value
    */
   private int getYperLevel(final int level) {
     return level * nodeHeight + level * levelDistance + topMargin;
@@ -896,8 +896,8 @@ public final class TreeView extends View {
 
   /**
    * Determines the level of a y-axis value.
-   * @param y the y-axis value
-   * @return the level if inside a node rectangle, -1 else
+   * @param y y-axis value
+   * @return level if inside a node rectangle, -1 else
    */
   private int levelPerY(final int y) {
     final double f = (y - topMargin) / ((double) levelDistance + nodeHeight);
@@ -911,7 +911,7 @@ public final class TreeView extends View {
   private void setLevelDistance() {
     final int h = height - BOTTOM_MARGIN, rl = roots.length;
     int lvs = 0;
-    for(int r = 0; r < rl; ++r) {
+    for(int r = 0; r < rl; r++) {
       final int th = sub.subtreeHeight(r);
       if(th > lvs) lvs = th;
     }
@@ -946,7 +946,7 @@ public final class TreeView extends View {
    */
   private boolean slimToTextChanged() {
     final GUIOptions gopts = gui.gopts;
-    if(gopts.get(GUIOptions.TREESLIMS) == slimToText) return false;
+    if(gopts.get(GUIOptions.TREESLIM) == slimToText) return false;
     slimToText = !slimToText;
     return true;
   }
@@ -979,7 +979,7 @@ public final class TreeView extends View {
 
   /**
    * Returns most sized node.
-   * @param d the data reference
+   * @param d data reference
    * @param rn root
    * @param lv level
    * @param r rectangle
@@ -991,7 +991,7 @@ public final class TreeView extends View {
     final int size = getHitBigRectNodesNum(rn, lv, r), idx = sub.preIndex(rn, lv, p);
     if(idx < 0) return -1;
     int dpre = -1, si = 0;
-    for(int i = 0; i < size; ++i) {
+    for(int i = 0; i < size; i++) {
       final int pre = sub.prePerIndex(rn, lv, i + idx), k = d.kind(pre), s = d.size(pre, k);
       if(s > si) {
         si = s;
@@ -1024,7 +1024,7 @@ public final class TreeView extends View {
         final int fix = sub.preIndex(frn, flv, fpre);
         if(fix + sum + 1 == sub.levelSize(frn, flv)) ++sum;
         final int[] m = new int[sum];
-        for(int i = 0; i < sum; ++i) {
+        for(int i = 0; i < sum; i++) {
           final int pre = sub.prePerIndex(frn, flv, i + fix);
           if(pre == -1) break;
           m[i] = pre;

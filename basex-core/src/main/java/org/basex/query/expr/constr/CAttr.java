@@ -63,9 +63,9 @@ public final class CAttr extends CName {
         nmPrefix = nm.prefix();
       }
       if(eq(nmPrefix, XML) ^ eq(nmUri, XML_URI)) throw CAXML.get(info);
-      if(eq(nmUri, XMLNS_URI)) throw CAINV_.get(info, nmUri);
+      if(eq(nmUri, XMLNS_URI)) throw CAINV_X.get(info, nmUri);
       if(eq(nmPrefix, XMLNS) || nmPrefix.length == 0 && eq(nm.string(), XMLNS))
-        throw CAINV_.get(info, nm.string());
+        throw CAINV_X.get(info, nm.string());
 
       // create new standard namespace to cover most frequent cases
       if(eq(nmPrefix, EMPTY) && !eq(nmUri, EMPTY))

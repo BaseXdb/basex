@@ -276,7 +276,7 @@ public final class DialogProps extends BaseXDialog {
     final boolean outofdate = !data.meta.uptodate;
     if(cmp == this) {
       final int ll = LABELS.length;
-      for(int l = 0; l < ll; ++l) {
+      for(int l = 0; l < ll; l++) {
         // structural index/statistics?
         // updates labels and infos
         labels[l].setText(l < IndexType.TEXT.ordinal() && outofdate

@@ -28,7 +28,7 @@ public final class LineBorder extends RegExp {
    * Getter for the cached LineBorder instance.
    * @param start {@code ^} if {@code true}, {@code $} otherwise
    * @param multi multi-line flag
-   * @return the instance
+   * @return instance
    */
   public static LineBorder get(final boolean start, final boolean multi) {
     final int pos = (start ? 2 : 0) + (multi ? 1 : 0);

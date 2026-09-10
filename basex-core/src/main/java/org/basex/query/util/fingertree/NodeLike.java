@@ -13,7 +13,7 @@ package org.basex.query.util.fingertree;
 public interface NodeLike<N, E> {
   /**
    * Appends this possibly partial node to the given buffer.
-   * @param nodes the buffer
+   * @param nodes buffer
    * @param pos number of nodes in the buffer
    * @return new number of nodes
    */

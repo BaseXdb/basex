@@ -34,8 +34,8 @@ public class FnSchemaType extends StandardFunc {
    * Creates a sequence of type annotations for the specified atomic types.
    * @param qc query context
    * @param info input info
-   * @param types the types to be annotated
-   * @return the type annotation sequence
+   * @param types types to be annotated
+   * @return type annotation sequence
    * @throws QueryException query exception
    */
   protected static Value annotate(final QueryContext qc, final InputInfo info, final Type... types)
@@ -131,7 +131,7 @@ public class FnSchemaType extends StandardFunc {
      * Constructor.
      * @param seqType sequence type of the function item
      * @param info input info
-     * @param types the types to be annotated
+     * @param types types to be annotated
      */
     private TypeAnnotation(final SeqType seqType, final InputInfo info, final BasicType... types) {
       super(info, seqType);
@@ -142,8 +142,8 @@ public class FnSchemaType extends StandardFunc {
     /**
      * Create a function item for a new instance.
      * @param info input info
-     * @param types the types to be annotated
-     * @return the function item
+     * @param types types to be annotated
+     * @return function item
      */
     public static FuncItem funcItem(final InputInfo info, final BasicType... types) {
       final SeqType st = SeqType.get(Records.SCHEMA_TYPE.get(),
@@ -181,8 +181,8 @@ public class FnSchemaType extends StandardFunc {
     /**
      * Constructor.
      * @param info input info
-     * @param type the type to be matched
-     * @param args the arguments
+     * @param type type to be matched
+     * @param args arguments
      */
     private Matches(final InputInfo info, final BasicType type, final Expr... args) {
       super(info, Types.BOOLEAN_O, args);
@@ -191,10 +191,10 @@ public class FnSchemaType extends StandardFunc {
 
     /**
      * Create a function item for a new instance.
-     * @param type the type to be matched
+     * @param type type to be matched
      * @param qc query context
      * @param info input info
-     * @return the function item
+     * @return function item
      */
     public static FuncItem funcItem(final BasicType type, final QueryContext qc,
         final InputInfo info) {

@@ -117,7 +117,7 @@ public final class IntList extends ElementList {
   public boolean contains(final int element) {
     final int s = size;
     final int[] lst = list;
-    for(int i = 0; i < s; ++i) {
+    for(int i = 0; i < s; i++) {
       if(lst[i] == element) return true;
     }
     return false;
@@ -159,7 +159,7 @@ public final class IntList extends ElementList {
     final int[] lst = list;
     final int s = size;
     int ns = 0;
-    for(int i = 0; i < s; ++i) {
+    for(int i = 0; i < s; i++) {
       if(lst[i] != element) lst[ns++] = lst[i];
     }
     size = ns;
@@ -191,7 +191,7 @@ public final class IntList extends ElementList {
 
   /**
    * Returns the uppermost element from the stack.
-   * @return the uppermost element
+   * @return uppermost element
    */
   public int peek() {
     return list[size - 1];
@@ -199,7 +199,7 @@ public final class IntList extends ElementList {
 
   /**
    * Pops the uppermost element from the stack.
-   * @return the popped element
+   * @return popped element
    */
   public int pop() {
     return list[--size];
@@ -251,7 +251,7 @@ public final class IntList extends ElementList {
     if(!isEmpty()) {
       sort();
       int i = 1;
-      for(int j = 1; j < size; ++j) {
+      for(int j = 1; j < size; j++) {
         while(j < size && list[i - 1] == list[j]) j++;
         if(j < size) list[i++] = list[j];
       }
@@ -337,7 +337,7 @@ public final class IntList extends ElementList {
   private void sort(final byte[][] values, final boolean asc, final int start, final int length,
       final boolean num) {
     if(length < 7) {
-      for(int i = start; i < length + start; ++i) {
+      for(int i = start; i < length + start; i++) {
         for(int j = i; j > start; j--) {
           final int h = num ? cmpNum(values[j - 1], values[j]) : cmp(values[j - 1], values[j]);
           if(asc ? h < 0 : h > 0) break;
@@ -398,7 +398,7 @@ public final class IntList extends ElementList {
    */
   private void sort(final double[] values, final boolean asc, final int start, final int length) {
     if(length < 7) {
-      for(int i = start; i < length + start; ++i) {
+      for(int i = start; i < length + start; i++) {
         for(int j = i; j > start; j--) {
           final double h = values[j - 1] - values[j];
           if(asc ? h < 0 : h > 0) break;
@@ -459,7 +459,7 @@ public final class IntList extends ElementList {
    */
   private void sort(final int[] values, final boolean asc, final int start, final int length) {
     if(length < 7) {
-      for(int i = start; i < start + length; ++i) {
+      for(int i = start; i < start + length; i++) {
         for(int j = i; j > start; j--) {
           final int h = values[j - 1] - values[j];
           if(asc ? h < 0 : h > 0) break;
@@ -520,7 +520,7 @@ public final class IntList extends ElementList {
    */
   private void sort(final long[] values, final boolean asc, final int start, final int length) {
     if(length < 7) {
-      for(int i = start; i < length + start; ++i) {
+      for(int i = start; i < length + start; i++) {
         for(int j = i; j > start; j--) {
           final long h = values[j - 1] - values[j];
           if(asc ? h < 0 : h > 0) break;
@@ -662,7 +662,7 @@ public final class IntList extends ElementList {
    * @param length number of elements
    */
   private void swap(final byte[][] values, final int a, final int b, final int length) {
-    for(int i = 0; i < length; ++i) swap(a + i, b + i, values);
+    for(int i = 0; i < length; i++) swap(a + i, b + i, values);
   }
 
   /**
@@ -673,7 +673,7 @@ public final class IntList extends ElementList {
    * @param length number of elements
    */
   private void swap(final double[] values, final int a, final int b, final int length) {
-    for(int i = 0; i < length; ++i) swap(a + i, b + i, values);
+    for(int i = 0; i < length; i++) swap(a + i, b + i, values);
   }
 
   /**
@@ -684,7 +684,7 @@ public final class IntList extends ElementList {
    * @param length number of elements
    */
   private void swap(final int[] values, final int a, final int b, final int length) {
-    for(int i = 0; i < length; ++i) swap(a + i, b + i, values);
+    for(int i = 0; i < length; i++) swap(a + i, b + i, values);
   }
 
   /**
@@ -695,7 +695,7 @@ public final class IntList extends ElementList {
    * @param length number of elements
    */
   private void swap(final long[] values, final int a, final int b, final int length) {
-    for(int i = 0; i < length; ++i) swap(values, a + i, b + i);
+    for(int i = 0; i < length; i++) swap(values, a + i, b + i);
   }
 
   /**

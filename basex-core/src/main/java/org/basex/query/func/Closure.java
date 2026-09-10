@@ -475,7 +475,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   /**
    * Returns an iterator over the non-local bindings of this closure.
-   * @return the iterator
+   * @return iterator
    */
   public Iterator<Entry<Var, Expr>> globalBindings() {
     return global.entrySet().iterator();

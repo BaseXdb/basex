@@ -82,7 +82,7 @@ final class MapPainter {
 
     final int o = gopts.get(GUIOptions.MAPOFFSETS);
     final int rs = rects.size;
-    for(int ri = 0; ri < rs; ++ri) {
+    for(int ri = 0; ri < rs; ri++) {
       // get rectangle information
       final MapRect rect = rects.get(ri);
       final int pre = rect.pre;

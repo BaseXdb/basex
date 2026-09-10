@@ -225,7 +225,7 @@ public final class TokenBuilder {
 
   /**
    * Adds a single byte.
-   * @param value the byte to be added
+   * @param value byte to be added
    * @return self reference
    */
   public TokenBuilder addByte(final byte value) {
@@ -258,7 +258,7 @@ public final class TokenBuilder {
 
   /**
    * Adds a token.
-   * @param token the token to be added
+   * @param token token to be added
    * @return self reference
    */
   public TokenBuilder add(final byte[] token) {
@@ -267,7 +267,7 @@ public final class TokenBuilder {
 
   /**
    * Adds a subtoken.
-   * @param token the token
+   * @param token token
    * @param start start position
    * @param end end position
    * @return self reference
@@ -287,7 +287,7 @@ public final class TokenBuilder {
 
   /**
    * Adds a string.
-   * @param string the string to be added
+   * @param string string to be added
    * @return self reference
    */
   public TokenBuilder add(final String string) {
@@ -296,7 +296,7 @@ public final class TokenBuilder {
 
   /**
    * Adds multiple strings, separated by the specified string.
-   * @param objects the object to be added
+   * @param objects object to be added
    * @param separator separator string
    * @return self reference
    */
@@ -311,7 +311,7 @@ public final class TokenBuilder {
 
   /**
    * Adds an object.
-   * @param object the object to be added
+   * @param object object to be added
    * @return self reference
    */
   public TokenBuilder add(final Object object) {
@@ -331,7 +331,7 @@ public final class TokenBuilder {
   public TokenBuilder addExt(final Object object, final Object... extensions) {
     final byte[] t = token(object);
     final int tl = t.length, el = extensions.length;
-    for(int i = 0, e = 0; i < tl; ++i) {
+    for(int i = 0, e = 0; i < tl; i++) {
       if(t[i] != '%' || e == el) {
         addByte(t[i]);
       } else {

@@ -5,6 +5,9 @@ import org.basex.util.options.*;
 
 /**
  * Process options.
+ *
+ * @author BaseX Team, BSD License
+ * @author Christian Gruen
  */
 public final class ProcOptions extends Options {
   /** Timeout in seconds. */

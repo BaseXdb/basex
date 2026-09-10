@@ -51,7 +51,7 @@ public final class DiskValuesBuilder extends ValuesBuilder {
 
     try {
       final boolean updindex = data.meta.updindex;
-      for(pre = 0; pre < size; ++pre) {
+      for(pre = 0; pre < size; pre++) {
         if((pre & 0x0FFF) == 0) check();
         if(indexEntry()) {
           final int id = updindex ? data.id(pre) : pre;
@@ -110,7 +110,7 @@ public final class DiskValuesBuilder extends ValuesBuilder {
       final IntList ml = new IntList();
       final IntList id = new IntList(), pos = tokenize ? new IntList() : null;
       final DiskValuesMerger[] vm = new DiskValuesMerger[splits];
-      for(int i = 0; i < splits; ++i) vm[i] = new DiskValuesMerger(data, type, i);
+      for(int i = 0; i < splits; i++) vm[i] = new DiskValuesMerger(data, type, i);
 
       // parse through all values
       while(true) {
@@ -123,7 +123,7 @@ public final class DiskValuesBuilder extends ValuesBuilder {
 
         // find index entry with the smallest key
         ml.reset();
-        for(int i = min; i < splits; ++i) {
+        for(int i = min; i < splits; i++) {
           if(vm[i].values.length == 0) continue;
           final int d = compare(vm[min].key, vm[i].key);
           if(d < 0) continue;
@@ -136,7 +136,7 @@ public final class DiskValuesBuilder extends ValuesBuilder {
 
         // parse through all values, cache and sort ID values
         final int ms = ml.size();
-        for(int m = 0; m < ms; ++m) {
+        for(int m = 0; m < ms; m++) {
           final DiskValuesMerger t = vm[ml.get(m)];
           final byte[] values = t.values;
           final int vl = values.length;

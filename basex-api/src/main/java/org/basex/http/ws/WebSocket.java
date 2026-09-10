@@ -102,7 +102,7 @@ public final class WebSocket extends Endpoint implements ClientInfo, WsSession {
    * @param maxText maximum size of text messages ({@code -1}: container default)
    * @param maxBinary maximum size of binary messages ({@code -1}: container default)
    * @return WebSocket, or {@code null} if no function matches the path
-   * @throws QueryException query exception, raised if equally specific paths conflict
+   * @throws QueryException query exception
    * @throws IOException I/O exception
    */
   static WebSocket get(final HttpServletRequest request, final User user, final long idleTimeout,

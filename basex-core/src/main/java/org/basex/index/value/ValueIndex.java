@@ -61,7 +61,8 @@ public abstract class ValueIndex implements Index {
   }
 
   /**
-   * Adds the entries of the specified nodes, called after the nodes have been inserted into the table.
+   * Adds the entries of the specified nodes, called after the nodes have been inserted into the
+   * table.
    * @param pre PRE value of the first node
    * @param size number of nodes
    */

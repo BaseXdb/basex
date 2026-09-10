@@ -61,7 +61,7 @@ public abstract class CLI extends Main {
    * Parses and executes the input string.
    * @param command base URI (name) and command string (value)
    * @return {@code false} if the exit command was sent
-   * @throws IOException database exception
+   * @throws IOException I/O exception
    */
   protected final boolean execute(final Entry<String, String> command) throws IOException {
     final CommandParser cp = CommandParser.get(command.getValue(), context);
@@ -72,7 +72,7 @@ public abstract class CLI extends Main {
    * Execute the commands from the given command parser.
    * @param parser command parser
    * @return {@code false} if the exit command was sent
-   * @throws IOException database exception
+   * @throws IOException I/O exception
    */
   protected final boolean execute(final CommandParser parser) throws IOException {
     try {

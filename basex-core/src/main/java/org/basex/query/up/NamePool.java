@@ -52,7 +52,7 @@ public final class NamePool {
    */
   QNm duplicate() {
     // if node has been deleted, overall count for duplicates must be bigger 2
-    for(int i = 0; i < size; ++i) {
+    for(int i = 0; i < size; i++) {
       final NameCache nc = cache[i];
       if(nc.attr && nc.add > (nc.del ? 2 : 1)) return nc.name;
     }
@@ -65,7 +65,7 @@ public final class NamePool {
    */
   byte[][] nsOK() {
     final Atts at = new Atts();
-    for(int i = 0; i < size; ++i) {
+    for(int i = 0; i < size; i++) {
       final NameCache nc = cache[i];
       if(nc.add <= (nc.del ? 1 : 0)) continue;
       final QNm nm = nc.name;
@@ -87,7 +87,7 @@ public final class NamePool {
    * @return index offset, or -1
    */
   private int index(final QNm name, final boolean at) {
-    for(int i = 0; i < size; ++i) {
+    for(int i = 0; i < size; i++) {
       final NameCache nc = cache[i];
       if(nc.name.eq(name) && nc.attr == at) return i;
     }

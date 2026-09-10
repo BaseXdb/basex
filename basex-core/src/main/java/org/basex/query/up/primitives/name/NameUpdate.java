@@ -36,13 +36,13 @@ public abstract class NameUpdate extends Update implements Comparable<NameUpdate
 
   /**
    * Prepares this operation.
-   * @throws QueryException exception
+   * @throws QueryException query exception
    */
   public abstract void prepare() throws QueryException;
 
   /**
    * Applies this operation.
-   * @throws QueryException exception
+   * @throws QueryException query exception
    */
   public abstract void apply() throws QueryException;
 

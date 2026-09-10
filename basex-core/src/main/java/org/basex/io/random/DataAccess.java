@@ -34,8 +34,8 @@ public final class DataAccess implements Closeable {
 
   /**
    * Constructor, initializing the file reader.
-   * @param file the file to be read
-   * @throws IOException I/O Exception
+   * @param file file to be read
+   * @throws IOException I/O exception
    */
   public DataAccess(final IOFile file) throws IOException {
     this(file, false);
@@ -43,10 +43,10 @@ public final class DataAccess implements Closeable {
 
   /**
    * Constructor, initializing the file reader.
-   * @param file the file to be read
+   * @param file file to be read
    * @param poolable assign readers to threads; must be {@code false} if the caller positions
    *   the cursor and writes in separate calls
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   public DataAccess(final IOFile file, final boolean poolable) throws IOException {
     this.file = file;

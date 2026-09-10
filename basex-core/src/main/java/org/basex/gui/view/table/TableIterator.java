@@ -64,7 +64,7 @@ final class TableIterator {
         // find correct column...
         final TableCol[] cols = tdata.cols;
         final int cl = cols.length;
-        for(col = 0; col < cl; ++col) {
+        for(col = 0; col < cl; col++) {
           if(cols[col].id == id && cols[col].elem == text) return true;
         }
       } else if(k == Data.ELEM) {

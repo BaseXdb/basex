@@ -69,7 +69,7 @@ public final class Optimize extends ACreate {
   /**
    * Optimizes a database after updates.
    * @param data data
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   public static void finish(final Data data) throws IOException {
     // do nothing if database has been closed
@@ -84,7 +84,7 @@ public final class Optimize extends ACreate {
    * Optimizes the structures of a database.
    * @param data data
    * @param cmd calling command instance (can be {@code null})
-   * @throws IOException I/O Exception during index rebuild
+   * @throws IOException I/O exception
    */
   public static void optimize(final Data data, final Optimize cmd) throws IOException {
     optimize(data, false, false, false, false, cmd);
@@ -98,7 +98,7 @@ public final class Optimize extends ACreate {
    * @param enforceToken enforce creation or deletion of token index
    * @param enforceFt enforce creation or deletion of full-text index
    * @param cmd calling command instance (can be {@code null})
-   * @throws IOException I/O Exception during index rebuild
+   * @throws IOException I/O exception
    */
   public static void optimize(final Data data, final boolean enforceText, final boolean enforceAttr,
       final boolean enforceToken, final boolean enforceFt, final Optimize cmd) throws IOException {
@@ -114,7 +114,7 @@ public final class Optimize extends ACreate {
       final IntList pars = new IntList(), elemStack = new IntList();
       int n = 0;
 
-      for(int pre = 0; pre < data.nodes(); ++pre) {
+      for(int pre = 0; pre < data.nodes(); pre++) {
         final byte kind = (byte) data.kind(pre);
         final int par = data.parent(pre, kind);
         while(!pars.isEmpty() && pars.peek() > par) {
@@ -192,12 +192,12 @@ public final class Optimize extends ACreate {
   /**
    * Creates new node IDs and recreates updatable index structures.
    * @param data data
-   * @throws IOException I/O Exception during index rebuild
+   * @throws IOException I/O exception
    */
   private static void optimizeIds(final Data data) throws IOException {
     final MetaData md = data.meta;
     final int size = md.size;
-    for(int pre = 0; pre < size; ++pre) data.id(pre, pre);
+    for(int pre = 0; pre < size; pre++) data.id(pre, pre);
     md.lastid = size - 1;
     md.dirty = true;
 

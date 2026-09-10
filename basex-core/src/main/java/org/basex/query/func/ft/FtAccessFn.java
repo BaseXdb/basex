@@ -42,7 +42,7 @@ abstract class FtAccessFn extends StandardFunc {
     }
 
     opt.assign(parent);
-    if(opt.is(FZ) && opt.is(WC)) throw FT_OPTIONS.get(info, this);
+    if(opt.is(FZ) && opt.is(WC)) throw FT_OPTIONS.get(info);
     if(opt.errors == -1) opt.errors = errors(qc);
     return opt;
   }

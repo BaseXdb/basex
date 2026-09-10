@@ -55,7 +55,7 @@ final class ProjectCache implements Iterable<String> {
    * Recursively populates the cache.
    * @param root root directory
    * @param stop stop function
-   * @throws InterruptedException interruption
+   * @throws InterruptedException interrupted exception
    */
   void scan(final Path root, final Predicate<ProjectCache> stop) throws InterruptedException {
     add(root, stop, new HashSet<>());
@@ -67,7 +67,7 @@ final class ProjectCache implements Iterable<String> {
    * @param root root directory
    * @param stop stop function
    * @param links symbolic links
-   * @throws InterruptedException interruption
+   * @throws InterruptedException interrupted exception
    */
   private void add(final Path root, final Predicate<ProjectCache> stop,
       final HashSet<String> links) throws InterruptedException {

@@ -45,7 +45,7 @@ public interface XQueryProcessor {
 
   /**
    * Prepares the engine (loaders, processors); called once if {@link #available()}.
-   * @throws Exception setup exception
+   * @throws Exception exception
    */
   @SuppressWarnings("unused")
   default void init() throws Exception {
@@ -53,7 +53,7 @@ public interface XQueryProcessor {
 
   /**
    * Releases any resources held by the engine.
-   * @throws Exception teardown exception
+   * @throws Exception exception
    */
   @SuppressWarnings("unused")
   default void close() throws Exception {
@@ -69,7 +69,7 @@ public interface XQueryProcessor {
    * @param bindings external variable bindings
    * @param err sink for captured trace / error output
    * @return {@code {compile, eval}} times in seconds
-   * @throws Exception execution exception
+   * @throws Exception exception
    */
   double[] run(Path module, String moduleText, Path modDir, Path result,
       Map<String, String> bindings, OutputStream err) throws Exception;

@@ -117,7 +117,7 @@ public final class WeakTokenSet extends ASet {
 
     /**
      * Constructor.
-     * @param key the key to be stored
+     * @param key key to be stored
      * @param hash hash code of the key
      * @param queue queue for registering this reference to
      */

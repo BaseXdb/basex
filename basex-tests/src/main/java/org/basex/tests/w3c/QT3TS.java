@@ -816,8 +816,8 @@ public final class QT3TS extends Main {
 
       return environment(new XQuery(query, ctx), result.env).variable("returned", returned).
           variable("expected", expected).value().getBoolean() ? null : expected.getString();
-    } catch(final Exception err) {
-      return Util.info("% (found: %)", expected.getString(), err);
+    } catch(final Exception ex) {
+      return Util.info("% (found: %)", expected.getString(), ex);
     }
   }
 

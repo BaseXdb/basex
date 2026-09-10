@@ -295,7 +295,7 @@ public abstract class Arr extends ParseExpr {
       new ExprList().add(inverse.isInstance(ex) ? ex.args() : new Expr[] { ex });
     final int el = exprs.length;
     final ExprList lefts = new ExprList().add(entries.apply(exprs[0]));
-    for(int e = 1; e < el && !lefts.isEmpty(); ++e) {
+    for(int e = 1; e < el && !lefts.isEmpty(); e++) {
       final ExprList curr = entries.apply(exprs[e]);
       for(int c = lefts.size() - 1; c >= 0; c--) {
         if(!curr.contains(lefts.get(c))) lefts.remove(c);

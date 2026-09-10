@@ -118,7 +118,7 @@ public abstract class FNode extends XNode {
       final TokenObjectMap<byte[]> nsMap) {
     final NodeList ch = node.getChildNodes();
     final int cl = ch.getLength();
-    for(int c = 0; c < cl; ++c) {
+    for(int c = 0; c < cl; c++) {
       final Node child = ch.item(c);
 
       switch(child.getNodeType()) {

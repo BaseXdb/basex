@@ -32,7 +32,7 @@ public final class TableOutput extends OutputStream {
    * Initializes the output.
    * The database suffix will be added to all filenames.
    * @param md meta data
-   * @param fn the file to be written to
+   * @param fn file to be written to
    * @throws IOException I/O exception
    */
   public TableOutput(final MetaData md, final String fn) throws IOException {

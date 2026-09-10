@@ -75,7 +75,7 @@ public abstract class Benchmark extends SandboxTest {
   protected static String eval(final int n, final String query) throws IOException {
     // loop through number of runs for a single query
     String result = "";
-    for(int rn = 0; rn < n; ++rn) result = session.execute(new XQuery(query));
+    for(int rn = 0; rn < n; rn++) result = session.execute(new XQuery(query));
     return result;
   }
 }

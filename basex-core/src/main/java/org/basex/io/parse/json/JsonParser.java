@@ -89,8 +89,8 @@ public final class JsonParser {
       consume('\uFEFF');
       skipWs();
       value();
-    } catch(final StackOverflowError er) {
-      throw error("Input is too deeply nested").cause(er);
+    } catch(final StackOverflowError ex) {
+      throw error("Input is too deeply nested").cause(ex);
     }
     if(more()) throw error("Unexpected trailing content: %", remaining());
   }
@@ -139,7 +139,7 @@ public final class JsonParser {
         final byte[] key = !liberal || current == '"' ? string() : unquoted();
         final boolean dupl = set != null && !set.add(key);
         if(dupl && duplicates == JsonDuplicates.REJECT)
-          throw error(DUPLICATE_JSON_X, "Key \"%\" occurs more than once", key);
+          throw error(DUPLICATE_JSON_X_X_X, "Key \"%\" occurs more than once", key);
         consumeWs(':', true);
         if(dupl && duplicates == JsonDuplicates.USE_FIRST) {
           skipValue();
@@ -226,7 +226,7 @@ public final class JsonParser {
 
   /**
    * Reads an unquoted string literal.
-   * @return the string
+   * @return string
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
@@ -303,7 +303,7 @@ public final class JsonParser {
 
   /**
    * Parses a string literal.
-   * @return the string
+   * @return string
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
@@ -428,7 +428,7 @@ public final class JsonParser {
    * @param ch character to be consumed
    * @param err error flag
    * @return if the character was consumed
-   * @throws QueryException query error
+   * @throws QueryException query exception
    * @throws IOException I/O exception
    */
   private boolean consumeWs(final char ch, final boolean err) throws QueryException, IOException {
@@ -512,12 +512,12 @@ public final class JsonParser {
   /**
    * Consumes input matching the given string, and skips any trailing white space.
    * @param string string to consume
-   * @throws QueryException query exception, in case of mismatch
+   * @throws QueryException query exception
    * @throws IOException I/O exception
    */
   private void consume(final String string) throws QueryException, IOException {
     final long p = pos, l = line, c = col, len = string.length();
-    for(int i = 0; i < len; ++i) {
+    for(int i = 0; i < len; i++) {
       if(!consume(string.charAt(i))) {
         final String s = substring(p, pos) + remaining();
         line = l;
@@ -547,7 +547,7 @@ public final class JsonParser {
    */
   private String remaining() throws IOException {
     tb.reset();
-    for(int i = 0; i < 15 && more(); ++i) {
+    for(int i = 0; i < 15 && more(); i++) {
       final int cp = consume();
       if(cp == '\n') break;
       tb.add(cp);

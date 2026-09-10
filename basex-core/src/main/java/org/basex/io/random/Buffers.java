@@ -25,7 +25,7 @@ final class Buffers {
    * Initializes the buffers.
    */
   void init() {
-    for(int b = 0; b < BUFFERS; ++b) {
+    for(int b = 0; b < BUFFERS; b++) {
       buffer[b] = new Buffer();
     }
   }

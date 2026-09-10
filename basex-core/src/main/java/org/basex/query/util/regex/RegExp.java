@@ -2,6 +2,8 @@ package org.basex.query.util.regex;
 
 /**
  * A node of the regular expression AST.
+ *
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public abstract class RegExp {

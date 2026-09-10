@@ -255,7 +255,7 @@ public final class ArrayRemoveTest extends ArrayTest {
    * Checks that the given array contains the given integers.
    * @param array array to check the contents of
    * @param values integers to look for
-   * @throws AssertionError of the check fails
+   * @throws AssertionError assertion error
    */
   private static void assertContains(final XQArray array, final int... values) {
     final Iterator<Value> iter = array.iterator(0);

@@ -282,8 +282,7 @@ public final class WebModules {
    * Checks if a WebSocket function matches the connection path of the given WebSocket.
    * @param ws WebSocket
    * @return result of check
-   * @throws QueryException query exception, raised if equally specific paths conflict
-   *   for an annotation (all annotations are probed, so no early exit)
+   * @throws QueryException query exception
    * @throws IOException I/O exception
    */
   public boolean websocket(final WebSocket ws) throws QueryException, IOException {

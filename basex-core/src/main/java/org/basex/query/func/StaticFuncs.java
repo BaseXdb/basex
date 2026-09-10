@@ -303,7 +303,7 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
         final ArrayList<StaticFunc> funcs = funcsByName.get(name);
         if(funcs != null) {
           for(final StaticFunc func : funcs) {
-            for(int a = func.min; a <= func.arity(); ++a) arities.add(a);
+            for(int a = func.min; a <= func.arity(); a++) arities.add(a);
           }
         }
       }

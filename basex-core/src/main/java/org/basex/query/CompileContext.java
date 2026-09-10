@@ -180,7 +180,7 @@ public final class CompileContext {
 
   /**
    * Removes and returns the current variable scope.
-   * @return the removed element
+   * @return removed element
    */
   public VarScope removeScope() {
     return scopes.removeLast();
@@ -373,7 +373,7 @@ public final class CompileContext {
    * Compiles an expression or creates an error.
    * @param expr expression
    * @param error return error instead of {@code fn:error} instance
-   * @return compiled expression or error.
+   * @return compiled expression or error
    * @throws QueryException query exception
    */
   public Expr compileOrError(final Expr expr, final boolean error) throws QueryException {

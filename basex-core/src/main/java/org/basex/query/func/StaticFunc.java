@@ -121,7 +121,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   /**
    * Returns the minimum arity.
-   * @return the minimum arity.
+   * @return minimum arity
    */
   public int minArity() {
     return min;

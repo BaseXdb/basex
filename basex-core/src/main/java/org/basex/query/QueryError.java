@@ -161,19 +161,19 @@ public enum QueryError {
   // Cryptographic Module
 
   /** Error code. */
-  CX_CANINV(CX, 1, "Canonicalization algorithm is not supported."),
+  CX_CANINV_X(CX, 1, "Canonicalization algorithm is not supported: %."),
   /** Error code. */
-  CX_DIGINV(CX, 2, "Digest algorithm is not supported."),
+  CX_DIGINV_X(CX, 2, "Digest algorithm is not supported: %."),
   /** Error code. */
-  CX_SIGINV(CX, 3, "Signature algorithm is not supported."),
+  CX_SIGINV_X(CX, 3, "Signature algorithm is not supported: %."),
   /** Error code. */
-  CX_XPINV(CX, 4, "XPath expression is invalid."),
+  CX_XPINV_X(CX, 4, "XPath expression is invalid: %."),
   /** Error code. */
-  CX_INVNM(CX, 5, "Invalid name for $digital-certificate root."),
+  CX_INVNM_X(CX, 5, "Invalid name for $digital-certificate root: %."),
   /** Error code. */
   CX_KSNULL_X(CX, 7, "Key store is null: %"),
   /** Error code. */
-  CX_NOKEY(CX, 12, "Cannot find key for alias in given keystore."),
+  CX_NOKEY_X(CX, 12, "Cannot find key for alias in given keystore: %"),
   /** Error code. */
   CX_INVHASH_X(CX, 13, "Hashing algorithm is not supported: %."),
   /** Error code. */
@@ -193,17 +193,17 @@ public enum QueryError {
   /** Error code. */
   CX_INVALGO_X(CX, 21, "Algorithm is not supported: %."),
   /** Error code. */
-  CX_ALINV_X(CX, 23, "Invalid certificate alias %."),
+  CX_ALINV_X(CX, 23, "Invalid certificate alias: %."),
   /** Error code. */
-  CX_ALGEXC(CX, 24, "Invalid algorithm."),
+  CX_ALGEXC_X(CX, 24, "Invalid algorithm: %"),
   /** Error code. */
-  CX_IOEXC(CX, 25, "IO Exception."),
+  CX_IOEXC_X(CX, 25, "IO exception: %"),
   /** Error code. */
-  CX_KSEXC(CX, 26, "Keystore exception."),
+  CX_KSEXC_X(CX, 26, "Keystore exception: %"),
   /** Error code. */
-  CX_SIGEXC(CX, 27, "Signature exception."),
+  CX_SIGEXC_X(CX, 27, "Signature exception: %"),
   /** Error code. */
-  CX_SIGTYPINV(CX, 28, "Signature type is not supported."),
+  CX_SIGTYPINV_X(CX, 28, "Signature type is not supported: %."),
 
   // CSV Module
 
@@ -299,7 +299,7 @@ public enum QueryError {
   // HTTP Module
 
   /** Invalid URI. */
-  HC_URI_X(HC, 1, "Invalid URI: %"),
+  HC_URI_X(HC, 1, "Invalid URI: %."),
   /** Error code. */
   HC_ERROR_X(HC, 1, "%"),
   /** Error code. */
@@ -343,7 +343,7 @@ public enum QueryError {
   /** Error code. */
   JOBS_RUNNING_X(JOB, "running", "Result is not available yet: %."),
   /** Error code. */
-  JOBS_SELF_X(JOB, "self", "Cannot wait for own job: %"),
+  JOBS_SELF_X(JOB, "self", "Cannot wait for own job: %."),
   /** Error code. */
   JOBS_SERVICE(JOB, "service", "No variables allowed."),
   /** Error code. */
@@ -351,9 +351,9 @@ public enum QueryError {
   /** Error code. */
   JOBS_SERVICE_X(JOB, "service", "Option not allowed for services: %."),
   /** Error code. */
-  JOBS_FUNCTION(JOB, "function", "Function items cannot be registered or scheduled."),
+  JOBS_SERVICE_WRITE_X(JOB, "service", "Cannot write service: %."),
   /** Error code. */
-  JOBS_SERVICE_X_X(JOB, "service", "Cannot write service: %."),
+  JOBS_FUNCTION(JOB, "function", "Function items cannot be registered or scheduled."),
 
   // JSON Module
 
@@ -502,12 +502,12 @@ public enum QueryError {
   /** Error code. */
   VALIDATE_START_X(ErrType.VALIDATE, "init", "Validation cannot be started: %"),
   /** Error code. */
-  VALIDATE_NOTFOUND_X(ErrType.VALIDATE, "not-found", "RelaxNG validation is not available."),
+  VALIDATE_NOTFOUND(ErrType.VALIDATE, "not-found", "RelaxNG validation is not available."),
 
   // Web Module
 
   /** Error code. */
-  WEB_STATUS_X(WEB, "status", "Invalid status code: %"),
+  WEB_STATUS_X(WEB, "status", "Invalid status code: %."),
 
   // WebSocket Module
 
@@ -541,12 +541,12 @@ public enum QueryError {
   // W3 Functions
 
   /** Error code. */
-  APPLY_X_X(FOAP, 1, "% supplied to %: %."),
+  APPLY_X_X_X(FOAP, 1, "% supplied to %: %."),
 
   /** Error code. */
   DIVZERO_X(FOAR, 1, "% cannot be divided by zero."),
   /** Error code. */
-  INVIDIV(FOAR, 2, "Invalid integer division: %."),
+  INVIDIV_X(FOAR, 2, "Invalid integer division: %."),
   /** Error code. */
   RANGE_X(FOAR, 2, "Value out of range: %."),
 
@@ -632,7 +632,7 @@ public enum QueryError {
   /** Error code. */
   FORMATINV_X(FODF, 1290, "%"),
   /** Error code. */
-  PICEMPTY(FODF, 1310, "The picture string must not be empty: '%'"),
+  PICEMPTY_X(FODF, 1310, "The picture string must not be empty: '%'."),
   /** Error code. */
   PICNUM_X(FODF, 1310, "Invalid picture string: '%'."),
   /** Error code. */
@@ -669,7 +669,7 @@ public enum QueryError {
   /** Error code. */
   PLACE_X(FODT, 4, "Unknown place: %."),
   /** Error code. */
-  INVDATETIMEFIELDS_X(FODT, 5, "Invalid combination of date/time fields: %"),
+  INVDATETIMEFIELDS_X(FODT, 5, "Invalid combination of date/time fields: %."),
 
   /** Error code. */
   FUNERR1(FOER, 0, "Halted on error()."),
@@ -693,7 +693,7 @@ public enum QueryError {
   /** Error code. */
   PARSE_JSON_X_X_X(FOJS, 1, "(%:%): %."),
   /** Error code. */
-  DUPLICATE_JSON_X(FOJS, 3, "(%:%): %."),
+  DUPLICATE_JSON_X_X_X(FOJS, 3, "(%:%): %."),
   /** Error code. */
   MERGE_DUPLICATE_X(FOJS, 3, "Key % occurs more than once."),
   /** Error code. */
@@ -715,7 +715,7 @@ public enum QueryError {
   /** Error code. */
   MODULE_URI_EMPTY(FOQM, 1, "Module URI is a zero-length string."),
   /** Error code. */
-  MODULE_NOT_FOUND_X(FOQM, 2, "Module not found: '%'"),
+  MODULE_NOT_FOUND_X(FOQM, 2, "Module not found: %."),
   /** Error code. */
   MODULE_FOUND_MAIN_X(FOQM, 2, "Found main module instead of library module '%'."),
   /** Error code. */
@@ -726,10 +726,10 @@ public enum QueryError {
   MODULE_STATIC_ERROR_X_X(FOQM, 3, "Static error in dynamically loaded XQuery module '%': %"),
   /** Error code. */
   MODULE_PARAMETER_TYPE_X_X(FOQM, 5,
-      "Parameter for dynamically loaded XQuery module '%' has incorrect type: %"),
+      "Parameter for dynamically loaded XQuery module '%' has incorrect type: %."),
   /** Error code. */
   MODULE_CONTEXT_TYPE_X_X(FOQM, 5,
-      "The context item for dynamically loaded XQuery module '%' has incorrect type: %"),
+      "The context item for dynamically loaded XQuery module '%' has incorrect type: %."),
   /** Error code. */
   MODULE_XQUERY_VERSION_X(FOQM, 6, "XQuery version '%' not supported."),
 
@@ -810,7 +810,7 @@ public enum QueryError {
   /** Error code. */
   RESFRAG_X(FOUT, 1170, "URI contains a fragment identifier: %."),
   /** Error code. */
-  RESURI_X(FOUT, 1170, "URI is invalid: %"),
+  RESURI_X(FOUT, 1170, "Invalid URI: %."),
   /** Error code. */
   RESENCODING_X(FOUT, 1190, "%"),
   /** Error code. */
@@ -891,19 +891,19 @@ public enum QueryError {
   /** Error code. */
   SERDUP_X(SEPM, 19, "Serialization parameter '%' is specified twice."),
   /** Error code. */
-  SERNUMBER_X(SERE, 20, "Numeric value cannot be represented: '%'"),
+  SERNUMBER_X(SERE, 20, "Numeric value cannot be represented: '%'."),
   /** Error code. */
   SERJSONFUNC_X(SERE, 21, "% items cannot be serialized."),
   /** Error code. */
-  SERDUPL_X(SERE, 22, "Duplicate name found: '%'"),
+  SERDUPL_X(SERE, 22, "Duplicate name found: '%'."),
   /** Error code. */
   SERJSON(SERE, 23, "Only one item can be serialized with JSON."),
   /** Error code. */
   SERJSONSEQ(SERE, 23, "Value has more than one item."),
   /** Error code. */
-  SERCANONURI(SERE, 24, "Canonical XML serialization failed: found relative namespace URI: '%'"),
+  SERCANONURI_X(SERE, 24, "Canonical XML serialization failed: found relative namespace URI: '%'."),
   /** Error code. */
-  SERCANONROOTS_X(SERE, 24, "Canonical XML serialization failed: not wellformed: '%'"),
+  SERCANONROOTS_X(SERE, 24, "Canonical XML serialization failed: not wellformed: '%'."),
   /** Error code. */
   SERCSV_X(SERE, 25, "%."),
   /** Error code. */
@@ -981,7 +981,7 @@ public enum QueryError {
   /** Error code. */
   RESERVED_X(XPST, 3, "'%' is a reserved keyword."),
   /** Error code. */
-  NOVARNAME(XPST, 3, "Variable name expected, '%' found."),
+  NOVARNAME_X(XPST, 3, "Variable name expected, '%' found."),
   /** Error code. */
   NOVARDECL(XPST, 3, "Expecting variable declaration."),
   /** Error code. */
@@ -1235,9 +1235,9 @@ public enum QueryError {
   /** Error code. */
   CAXML(XQDY, 44, "XML prefix and namespace cannot be rebound."),
   /** Error code. */
-  CAINV_(XQDY, 44, "Invalid attribute prefix/namespace: %."),
+  CAINV_X(XQDY, 44, "Invalid attribute prefix/namespace: %."),
   /** Error code. */
-  CIRCVAR_X(XQDY, 54, "Static variable depends on itself: %"),
+  CIRCVAR_X(XQDY, 54, "Static variable depends on itself: %."),
   /** Error code. */
   CIRCDFLT_X_X(XQDY, 54, "%: Default value of parameter % depends on itself."),
   /** Error code. */
@@ -1253,7 +1253,7 @@ public enum QueryError {
   /** Error code. */
   NOQNNAMENS_X(XQDY, 74, "Namespace prefix not declared: %."),
   /** Error code. */
-  CEXML(XQDY, 96, "XML prefix or namespace cannot be rebound: %/%."),
+  CEXML_X_X(XQDY, 96, "XML prefix or namespace cannot be rebound: %/%."),
   /** Error code. */
   CEINV_X(XQDY, 96, "Invalid element prefix/namespace: %."),
   /** Error code. */

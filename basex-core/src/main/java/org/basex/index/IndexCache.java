@@ -176,7 +176,7 @@ public final class IndexCache {
     final BucketEntry[] tmp = new BucketEntry[newSize];
 
     final int l = buckets.length;
-    for(int i = 0; i < l; ++i) {
+    for(int i = 0; i < l; i++) {
       BucketEntry e = buckets[i];
       buckets[i] = null;
       while(e != null) {

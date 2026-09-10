@@ -51,7 +51,7 @@ public final class JNodeTest extends SandboxTest {
    * Creates nodes for testing.
    * @throws QueryException query exception
    */
-  @BeforeAll public static void setup() throws QueryException {
+  @BeforeAll public static void setUp() throws QueryException {
     // maps (equal strings with single characters have the same identity)
     final XQMap ay = new MapBuilder().put(Str.get("z"), Itr.get(2)).map();
     final XQMap bx = new MapBuilder().put(Str.get("y"), Itr.get(2)).map();

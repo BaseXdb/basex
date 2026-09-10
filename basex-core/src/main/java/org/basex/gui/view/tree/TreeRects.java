@@ -48,7 +48,7 @@ final class TreeRects {
     if(w < 2) return -1;
 
     rects = new TreeRect[rl][][];
-    for(int i = 0; i < rl; ++i) generateRects(sub, i, ds, w, slim);
+    for(int i = 0; i < rl; i++) generateRects(sub, i, ds, w, slim);
     return w;
   }
 
@@ -67,7 +67,7 @@ final class TreeRects {
     final int h = sub.subtreeHeight(rn);
     rects[rn] = new TreeRect[h][];
 
-    for(int lv = 0; lv < h; ++lv) {
+    for(int lv = 0; lv < h; lv++) {
       final double w = dw / sub.levelSize(rn, lv);
       if(w < 2) {
         bigRectangle(rn, lv, ds, dw);
@@ -82,7 +82,7 @@ final class TreeRects {
    * @param rn root
    * @param lv level
    * @param ds draw start
-   * @param w the width
+   * @param w width
    */
   private void bigRectangle(final int rn, final int lv, final int ds, final double w) {
     rects[rn][lv] = new TreeRect[1];
@@ -107,7 +107,7 @@ final class TreeRects {
     rects[rn][lv] = new TreeRect[subSi];
 
     double xx = rn * w * subSi + ds, ww = w;
-    for(int i = 0; i < subSi; ++i) {
+    for(int i = 0; i < subSi; i++) {
       if(slim) {
         final double boxMiddle = xx + ww / 2.0f;
         final byte[] text = text(sub.prePerIndex(rn, lv, i));
@@ -194,8 +194,8 @@ final class TreeRects {
    * @param sub subtree
    * @param rn root number
    * @param lv level
-   * @param pre the PRE value to be found
-   * @return the rectangle containing the given PRE value, {@code null} else
+   * @param pre PRE value to be found
+   * @return rectangle containing the given PRE value, {@code null} else
    */
   TreeRect searchRect(final TreeSubtree sub, final int rn, final int lv, final int pre) {
     final int i = sub.searchPreArrayPos(rn, lv, pre);

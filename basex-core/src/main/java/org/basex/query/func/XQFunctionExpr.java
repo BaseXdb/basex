@@ -58,7 +58,7 @@ public interface XQFunctionExpr {
    * Tries to inline this function with the given arguments.
    * @param exprs arguments
    * @param cc compilation context
-   * @return the expression to inline if successful, {@code null} otherwise
+   * @return expression to inline if successful, {@code null} otherwise
    * @throws QueryException query exception
    */
   Expr inline(Expr[] exprs, CompileContext cc) throws QueryException;

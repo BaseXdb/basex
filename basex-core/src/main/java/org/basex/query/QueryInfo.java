@@ -357,7 +357,7 @@ public final class QueryInfo {
 
   /**
    * Section of the query information.
-   * @param text the entries form a block of text, not a list
+   * @param text entries form a block of text, not a list
    * @param entries entries
    */
   public record Section(boolean text, List<Entry> entries) { }

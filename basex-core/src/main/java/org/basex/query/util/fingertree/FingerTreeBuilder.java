@@ -27,7 +27,7 @@ public final class FingerTreeBuilder<E> implements Iterable<E> {
 
   /**
    * Adds a leaf node to the front of the tree.
-   * @param leaf the leaf node to add
+   * @param leaf leaf node to add
    */
   public void prepend(final Node<E, E> leaf) {
     if(root == null) {
@@ -39,7 +39,7 @@ public final class FingerTreeBuilder<E> implements Iterable<E> {
 
   /**
    * Adds a leaf node to the back of the tree.
-   * @param leaf the leaf node to add
+   * @param leaf leaf node to add
    */
   public void append(final Node<E, E> leaf) {
     if(root == null) {
@@ -65,7 +65,7 @@ public final class FingerTreeBuilder<E> implements Iterable<E> {
 
   /**
    * Builds a finger tree from the current state of this builder.
-   * @return the resulting finger tree
+   * @return resulting finger tree
    */
   public FingerTree<E, E> freeze() {
     return root == null ? FingerTree.empty() : root.freeze();
@@ -117,7 +117,7 @@ public final class FingerTreeBuilder<E> implements Iterable<E> {
 
     /**
      * Constructs a buffered tree containing the given single node.
-     * @param node the initial node
+     * @param node initial node
      */
     BufferNode(final Node<N, E> node) {
       prepend(node);
@@ -125,7 +125,7 @@ public final class FingerTreeBuilder<E> implements Iterable<E> {
 
     /**
      * Constructs a buffered tree containing the same contents as the given tree.
-     * @param tree the tree to take the contents of
+     * @param tree tree to take the contents of
      */
     BufferNode(final FingerTree<N, E> tree) {
       if(tree instanceof final SingletonTree<N, E> single) {
@@ -141,7 +141,7 @@ public final class FingerTreeBuilder<E> implements Iterable<E> {
 
     /**
      * Adds a node to the front of this tree.
-     * @param node the node to add
+     * @param node node to add
      */
     void prepend(final Node<N, E> node) {
       if(inLeft < MAX_DIGIT) {
@@ -164,7 +164,7 @@ public final class FingerTreeBuilder<E> implements Iterable<E> {
 
     /**
      * Adds a node to the back of this tree.
-     * @param node the node to add
+     * @param node node to add
      */
     void append(final Node<N, E> node) {
       if(inRight < MAX_DIGIT) {
@@ -236,7 +236,7 @@ public final class FingerTreeBuilder<E> implements Iterable<E> {
 
     /**
      * Creates an {@link FingerTree} containing the elements of this builder.
-     * @return the finger tree
+     * @return finger tree
      */
     FingerTree<N, E> freeze() {
       final int n = inLeft + inRight;

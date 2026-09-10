@@ -44,7 +44,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
 
   /**
    * Creates a test database and starts BaseXHTTP.
-   * @throws Exception if database cannot be created or server cannot be started
+   * @throws Exception exception
    */
   @BeforeEach public void setUp() throws Exception {
     // -L: start a database server, which the client session below connects to
@@ -75,7 +75,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
    * <li/>start a long running reader;
    * <li/>start a fast reader: it should succeed.
    * </ol>
-   * @throws Exception error during request execution
+   * @throws Exception exception
    */
   @Test public void testMultipleReaders() throws Exception {
     final String number = "63177";
@@ -107,7 +107,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
    * <li/>stop the reader;
    * <li/>start the writer again: it should succeed.
    * </ol>
-   * @throws Exception error during request execution
+   * @throws Exception exception
    */
   @Test public void testReaderWriter() throws Exception {
     // the reader holds a read lock on the database for a bounded time and then terminates,
@@ -140,7 +140,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
    * <li/>start several writers one after another;
    * <li/>all writers should succeed.
    * </ol>
-   * @throws Exception error during request execution
+   * @throws Exception exception
    */
   @Test public void testMultipleWriters() throws Exception {
     final int count = 10;
@@ -185,7 +185,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
   /**
    * Waits until a second job is running, i.e. until the request that was started before this call
    * has acquired its locks. The polling request itself is the first of the two jobs.
-   * @throws Exception error during request execution
+   * @throws Exception exception
    */
   private static void awaitRunning() throws Exception {
     final String request = "?query=" + encode("count(job:list-details()[@state = 'running'])");

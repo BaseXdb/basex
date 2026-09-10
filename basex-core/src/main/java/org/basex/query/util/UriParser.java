@@ -247,7 +247,7 @@ public final class UriParser {
 
   /**
    * Parses an RFC 3986 URI.
-   * @param uri the URI to parse
+   * @param uri URI to parse
    * @return parsed URI
    */
   public static ParsedUri parse(final String uri) {
@@ -259,8 +259,8 @@ public final class UriParser {
         pu.valid = true;
         return pu;
       }
-    } catch(final StackOverflowError er) {
-      Util.debug(er);
+    } catch(final StackOverflowError ex) {
+      Util.debug(ex);
     }
     return ParsedUri.INVALID;
   }

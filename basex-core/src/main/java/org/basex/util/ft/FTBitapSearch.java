@@ -38,7 +38,7 @@ public final class FTBitapSearch {
   /**
    * Constructor.
    * @param iter iterator over the set of elements being searched ("haystack")
-   * @param tokens a list of "needles" (a needle is an array of elements being searched for)
+   * @param tokens list of "needles" (a needle is an array of elements being searched for)
    * @param cmp comparator for comparing two elements for equality
    */
   public FTBitapSearch(final FTIterator iter, final FTTokens tokens, final TokenComparator cmp) {
@@ -72,7 +72,7 @@ public final class FTBitapSearch {
   /**
    * Is there one more match?
    * @return {@code true} if yes
-   * @throws QueryException if an error occurs during search
+   * @throws QueryException query exception
    */
   public boolean hasNext() throws QueryException {
     if(masks.length == 0) return false;
@@ -114,7 +114,7 @@ public final class FTBitapSearch {
   /**
    * Position in the haystack of the next match.
    * @return start position of the match; first position is 0
-   * @throws QueryException if an error occurs during search
+   * @throws QueryException query exception
    */
   public int next() throws QueryException {
     if(hasNext()) {
@@ -137,7 +137,7 @@ public final class FTBitapSearch {
      * @param token1 first token
      * @param token2 second token
      * @return {@code true} if the two are equal
-     * @throws QueryException if an error occurs during comparison
+     * @throws QueryException query exception
      */
     boolean equal(byte[] token1, byte[] token2) throws QueryException;
   }

@@ -158,7 +158,7 @@ public abstract class SessionTest extends SandboxTest {
    * @throws IOException I/O exception
    */
   @Test public final void putBinary() throws IOException {
-    session.execute("CREATE db " + NAME);
+    session.execute("CREATE DB " + NAME);
     session.putBinary("X", new ArrayInput("!"));
     assertEqual("binary", session.query(_DB_TYPE.args(NAME, "X")).execute());
     session.putBinary("X", new ArrayInput(""));

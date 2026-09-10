@@ -65,7 +65,7 @@ public class ValidateXsd extends ValidateFn {
    * Creates a schema factory for the most powerful available XSD implementation.
    * @param options main options
    * @return schema factory
-   * @throws BaseXException factory cannot be created
+   * @throws BaseXException database exception
    * @throws SAXException SAX exception
    */
   public static SchemaFactory factory(final MainOptions options)
@@ -132,7 +132,7 @@ public class ValidateXsd extends ValidateFn {
      * Assigns a property.
      * @param name property name
      * @param value property value
-     * @throws SAXException property is not supported
+     * @throws SAXException SAX exception
      */
     void set(String name, Object value) throws SAXException;
   }

@@ -60,7 +60,7 @@ public final class DiskTableTest extends SandboxTest {
 
     final int bc = size * (1 << IO.NODEPOWER);
     storage = new byte[bc];
-    for(int i = 0; i < bc; ++i) {
+    for(int i = 0; i < bc; i++) {
       storage[i] = (byte) tda.read1(i >> IO.NODEPOWER, i % (1 << IO.NODEPOWER));
     }
     nodes = IO.ENTRIES;
@@ -100,7 +100,7 @@ public final class DiskTableTest extends SandboxTest {
 
     final int startOffset = startNodeNumber << IO.NODEPOWER;
     final int currentOffset = currentNodeNumber << IO.NODEPOWER;
-    for(int i = 0; i < count << IO.NODEPOWER; ++i) {
+    for(int i = 0; i < count << IO.NODEPOWER; i++) {
       final int startByteNum = startOffset + i;
       final int currentByteNum = currentOffset + i;
       final byte startByte = storage[startByteNum];
@@ -314,8 +314,8 @@ public final class DiskTableTest extends SandboxTest {
    * @param count number of entries
    */
   private void assertAreInserted(final int startNum, final int count) {
-    for(int i = 0; i < count; ++i)
-      for(int j = 0; j < 1 << IO.NODEPOWER; ++j)
+    for(int i = 0; i < count; i++)
+      for(int j = 0; j < 1 << IO.NODEPOWER; j++)
         assertEquals(5, tda.read1(startNum + i, j));
   }
 

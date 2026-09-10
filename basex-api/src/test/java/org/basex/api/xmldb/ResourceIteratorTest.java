@@ -20,7 +20,7 @@ public final class ResourceIteratorTest extends XMLDBBaseTest {
 
   /**
    * Initializes a test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @BeforeEach public void setUp() throws Exception {
     createDB();
@@ -32,7 +32,7 @@ public final class ResourceIteratorTest extends XMLDBBaseTest {
 
   /**
    * Finalizes a test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @AfterEach public void tearDown() throws Exception {
     collection.close();
@@ -41,7 +41,7 @@ public final class ResourceIteratorTest extends XMLDBBaseTest {
 
   /**
    * Test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @Test public void testHasMoreResources() throws Exception {
     // test result
@@ -55,7 +55,7 @@ public final class ResourceIteratorTest extends XMLDBBaseTest {
 
   /**
    * Test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @Test public void testNextResource() throws Exception {
     // count down number of results

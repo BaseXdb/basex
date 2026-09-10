@@ -60,7 +60,7 @@ public final class DiskData extends Data {
   /**
    * Default constructor, called from {@link Open#open}.
    * @param meta meta data
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   public DiskData(final MetaData meta) throws IOException {
     super(meta);
@@ -104,7 +104,7 @@ public final class DiskData extends Data {
    * @param attrNames attribute names
    * @param paths path index
    * @param nspaces namespaces
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   public DiskData(final MetaData meta, final Names elemNames, final Names attrNames,
       final PathIndex paths, final Namespaces nspaces) throws IOException {

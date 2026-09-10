@@ -139,7 +139,7 @@ public final class FnDistinctValues extends FnDuplicateValues {
    * @param op comparison operator
    * @param cc compilation context
    * @return new function or {@code null}
-   * @throws QueryException query context
+   * @throws QueryException query exception
    */
   public Expr duplicates(final CmpOp op, final CompileContext cc) throws QueryException {
     if(op == CmpOp.LT) return Bln.FALSE;

@@ -215,7 +215,7 @@ public final class Stores implements Closeable {
 
   /**
    * Writes the current store to disk.
-   * @param name name of store.
+   * @param name name of store
    * @param info input info
    * @throws QueryException query exception
    */

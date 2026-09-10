@@ -129,7 +129,7 @@ public final class Payload {
    * Extracts the parts from a multipart message.
    * @param sep separation boundary
    * @param parts list with all parts (can be {@code null})
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    * @throws QueryException query exception
    */
   private void extractParts(final byte[] sep, final GNodeList parts)
@@ -151,7 +151,7 @@ public final class Payload {
    * @param end closing boundary
    * @param parts list with all parts (can be {@code null})
    * @return success flag
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    * @throws QueryException query exception
    */
   private boolean extractPart(final byte[] sep, final byte[] end, final GNodeList parts)
@@ -213,7 +213,7 @@ public final class Payload {
   /**
    * Reads the next line of an HTTP multipart content.
    * @return line, or {@code null} if end of stream is reached
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   private byte[] readLine() throws IOException {
     final ByteList bl = new ByteList();

@@ -28,7 +28,7 @@ public abstract class Update {
   /**
    * Merges two update operations pointing to the same target.
    * @param update operation to merge with
-   * @throws QueryException exception
+   * @throws QueryException query exception
    */
   public abstract void merge(Update update) throws QueryException;
 

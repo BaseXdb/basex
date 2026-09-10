@@ -189,7 +189,7 @@ public final class StaticFuncCall extends FuncCall {
 
   /**
    * Returns the called function if already known.
-   * @return the function or {@code null}
+   * @return function or {@code null}
    */
   public StaticFunc func() {
     return func;

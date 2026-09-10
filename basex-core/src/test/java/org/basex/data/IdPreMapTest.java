@@ -48,7 +48,7 @@ public final class IdPreMapTest {
   /** Insert correctness: insert values at the end. */
   @Test public void appendCorrectness() {
     final int n = BASEID + ITERATIONS;
-    for(int id = BASEID + 1; id <= n; ++id) {
+    for(int id = BASEID + 1; id <= n; id++) {
       insert(id, id);
       check();
     }
@@ -65,7 +65,7 @@ public final class IdPreMapTest {
   /** Insert correctness: insert values at random positions. */
   @Test public void insertCorrectness() {
     final int n = BASEID + ITERATIONS;
-    for(int id = BASEID + 1; id <= n; ++id) {
+    for(int id = BASEID + 1; id <= n; id++) {
       insert(RANDOM.nextInt(id), id);
       check();
     }
@@ -82,7 +82,7 @@ public final class IdPreMapTest {
   /** Delete correctness: delete values at random positions. */
   @Test public void deleteCorrectness2() {
     final int n = BASEID + ITERATIONS;
-    for(int id = BASEID + 1; id <= n; ++id) insert(RANDOM.nextInt(id), id);
+    for(int id = BASEID + 1; id <= n; id++) insert(RANDOM.nextInt(id), id);
 
     for(int id = n; id > 0; --id) {
       delete(RANDOM.nextInt(id));
@@ -92,7 +92,7 @@ public final class IdPreMapTest {
 
   /** Correctness: randomly insert/delete value at random positions. */
   @Test public void insertDeleteCorrectness() {
-    for(int i = 0, cnt = BASEID + 1, id = BASEID + 1; i < ITERATIONS; ++i) {
+    for(int i = 0, cnt = BASEID + 1, id = BASEID + 1; i < ITERATIONS; i++) {
       // can't delete if all records have been deleted:
       if(RANDOM.nextBoolean() || cnt == 0) insert(RANDOM.nextInt(++cnt), id++);
       else delete(RANDOM.nextInt(cnt--));
@@ -240,8 +240,8 @@ public final class IdPreMapTest {
    */
   private static void searchPerformance(final IdPreMap m) {
     final int n = BASEID + ITERATIONS;
-    for(int id = BASEID + 1; id <= n; ++id) m.insert(RANDOM.nextInt(id), id, 1);
-    for(int i = 0; i < n; ++i) m.pre(i);
+    for(int id = BASEID + 1; id <= n; id++) m.insert(RANDOM.nextInt(id), id, 1);
+    for(int i = 0; i < n; i++) m.pre(i);
   }
 
   /**

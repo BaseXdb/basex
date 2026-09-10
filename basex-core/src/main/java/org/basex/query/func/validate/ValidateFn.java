@@ -136,7 +136,7 @@ abstract class ValidateFn extends StandardFunc {
    * @param sopts serializer parameters (can be {@code null})
    * @return item
    * @throws QueryException query exception
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   protected final IO read(final Item item, final SerializerOptions sopts)
       throws QueryException, IOException {

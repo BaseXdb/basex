@@ -22,7 +22,7 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
 
   /**
    * Initializes a test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @BeforeEach public void setUp() throws Exception {
     createDB();
@@ -34,7 +34,7 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
 
   /**
    * Finalizes a test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @AfterEach public void tearDown() throws Exception {
     collection.close();
@@ -43,7 +43,7 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
 
   /**
    * Test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @Test public void testSetNamespace() throws Exception {
     // overwriting namespaces
@@ -69,7 +69,7 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
 
   /**
    * Test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @Test public void testGetNamespace() throws Exception {
     // testing former namespace
@@ -83,7 +83,7 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
 
   /**
    * Test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @Test public void testRemoveNamespace() throws Exception {
     // set and remove namespace
@@ -99,7 +99,7 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
 
   /**
    * Test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @Test public void testClearNamespace() throws Exception {
     // set and clear namespace
@@ -110,7 +110,7 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
 
   /**
    * Test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @Test public void testQuery() throws Exception {
     // catch query errors
@@ -135,7 +135,7 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
 
   /**
    * Test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @Test public void testQueryResource() throws Exception {
      assertEquals(3, service.queryResource(DOC1, "//node()").getSize(), "Wrong result size");
@@ -151,7 +151,7 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
 
   /**
    * Test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @Test public void testGetName() throws Exception {
     assertEquals("XPathQueryService", service.getName());
@@ -159,7 +159,7 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
 
   /**
    * Test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @Test public void testGetVersion() throws Exception {
     assertEquals("1.0", service.getVersion());

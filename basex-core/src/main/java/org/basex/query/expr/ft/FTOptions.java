@@ -16,7 +16,7 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class FTOptions extends FTExpr {
-  /** FTOptions. */
+  /** Full-text options. */
   private final FTOpt opt;
 
   /**

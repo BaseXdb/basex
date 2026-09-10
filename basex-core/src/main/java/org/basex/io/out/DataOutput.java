@@ -21,7 +21,7 @@ public final class DataOutput extends OutputStream {
 
   /**
    * Constructor, specifying an output stream.
-   * @param out the stream to write to
+   * @param out stream to write to
    */
   public DataOutput(final OutputStream out) {
     this.out = out;

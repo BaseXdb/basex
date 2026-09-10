@@ -9,7 +9,7 @@ package org.basex.gui.view.map;
 abstract class MapAlgo {
   /**
    * Calculates the average aspect Ratios of rectangles given in the list.
-   * @param r Array of rectangles
+   * @param r array of rectangles
    * @return average aspect ratio
    */
   static double lineRatio(final MapRects r) {

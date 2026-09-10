@@ -77,7 +77,7 @@ public abstract class ASTVisitor implements LockCollector {
 
   /**
    * Notifies the visitor of a function item.
-   * @param func the function item
+   * @param func function item
    * @return if more expressions should be visited ({@code true} by default)
    */
   public boolean funcItem(final FuncItem func) {

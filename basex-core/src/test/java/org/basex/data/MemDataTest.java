@@ -23,7 +23,7 @@ public class MemDataTest extends SandboxTest {
 
   /**
    * Set up method; executed before each test.
-   * @throws IOException should never be thrown
+   * @throws IOException I/O exception
    */
   @BeforeEach public void setUp() throws IOException {
     data = new DBNode(new IOContent(XMLSTR)).data();

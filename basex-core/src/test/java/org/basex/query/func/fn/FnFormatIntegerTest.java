@@ -99,7 +99,7 @@ public final class FnFormatIntegerTest extends SandboxTest {
     error("format-integer(123, '١0')", DIFFMAND_X);
     error("format-integer(123, '0١0')", DIFFMAND_X);
     error("format-integer(1234, '٣0٣')", DIFFMAND_X);
-    error("format-integer(1, '')", PICEMPTY);
+    error("format-integer(1, '')", PICEMPTY_X);
     error("format-integer(1234, 'Ww;o())')", INVMODIFIER_X);
     error("format-integer(1500000, '0,000,')", INVGROUP_X);
     error("format-integer(1500000, '11#0,000')", OPTAFTER_X);

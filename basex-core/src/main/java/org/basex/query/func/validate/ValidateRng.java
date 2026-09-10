@@ -92,7 +92,7 @@ public class ValidateRng extends ValidateFn {
           final Object loaded = vdLoadSchema.invoke(vd, schm.inputSource());
           if(loaded == Boolean.TRUE) vdValidate.invoke(vd, input.inputSource());
         } catch(final ClassNotFoundException ex) {
-          throw VALIDATE_NOTFOUND_X.get(info).cause(ex);
+          throw VALIDATE_NOTFOUND.get(info).cause(ex);
         } catch(final Exception ex) {
           throw VALIDATE_ERROR_X.get(info, Util.rootException(ex));
         }

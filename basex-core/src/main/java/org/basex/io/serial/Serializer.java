@@ -256,7 +256,7 @@ public abstract class Serializer implements Closeable {
 
     final byte[] ancUri = nsUri(prefix);
     if(ancUri == null || !eq(ancUri, uri)) {
-      if(canonical && uri.length > 0 && !Uri.get(uri).isAbsolute()) throw SERCANONURI.getIO(uri);
+      if(canonical && uri.length > 0 && !Uri.get(uri).isAbsolute()) throw SERCANONURI_X.getIO(uri);
       attribute(prefix.length == 0 ? XMLNS : concat(XMLNS_COLON, prefix), uri, standalone);
       nspaces.add(prefix, uri);
     }
@@ -405,7 +405,7 @@ public abstract class Serializer implements Closeable {
 
   /**
    * Emits attributes in canonical sorting order and clears the attributes.
-   * @throws IOException I/O exception.
+   * @throws IOException I/O exception
    */
   private void emitAttributes() throws IOException {
     if(canonical) {
@@ -421,7 +421,7 @@ public abstract class Serializer implements Closeable {
 
   /**
    * Emits attributes in canonical sorting order and clears the attributes.
-   * @throws IOException I/O exception.
+   * @throws IOException I/O exception
    */
   private void emitNamespaces() throws IOException {
     if(canonical) {

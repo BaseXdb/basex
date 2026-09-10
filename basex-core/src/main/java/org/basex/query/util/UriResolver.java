@@ -5,6 +5,9 @@ import org.basex.query.value.item.*;
 
 /**
  * Interface for resolving URIs in query modules.
+ *
+ * @author BaseX Team, BSD License
+ * @author Christian Gruen
  */
 @FunctionalInterface
 public interface UriResolver {

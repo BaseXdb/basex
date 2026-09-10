@@ -149,7 +149,7 @@ public final class RestXqResponse extends WebResponse {
    * Builds a response element and creates the serialization parameters.
    * @param response response element
    * @return serialization parameters
-   * @throws QueryException query exception (including unexpected ones)
+   * @throws QueryException query exception
    */
   private SerializerOptions build(final GNode response) throws QueryException {
     // don't allow attributes

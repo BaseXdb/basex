@@ -53,7 +53,7 @@ public abstract class ParseExpr extends Expr {
 
   /**
    * Constructor.
-   * @param info input info (can be {@code null}
+   * @param info input info (can be {@code null})
    * @param seqType sequence type
    */
   protected ParseExpr(final InputInfo info, final SeqType seqType) {
@@ -859,8 +859,8 @@ public abstract class ParseExpr extends Expr {
   /**
    * Converts an item to an array.
    * @param item item to check
-   * @return the array
-   * @throws QueryException if the item is not an array
+   * @return array
+   * @throws QueryException query exception
    */
   protected final XQArray toArray(final Item item) throws QueryException {
     if(item instanceof final XQArray array) return array;

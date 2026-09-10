@@ -35,7 +35,7 @@ public final class JobRemove extends StandardFunc {
       try {
         qc.context.services.unregister(id);
       } catch(final IOException ex) {
-        throw JOBS_SERVICE_X_X.get(info, ex);
+        throw JOBS_SERVICE_WRITE_X.get(info, ex);
       }
     }
     return Empty.VALUE;

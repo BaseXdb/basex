@@ -172,8 +172,8 @@ public final class BXXMLResource implements XMLResource {
     if(handler == null) throw new XMLDBException(ErrorCodes.INVALID_RESOURCE);
     try {
       new XmlParser().contentHandler(handler).parse(new ArrayInput(getContent().toString()));
-    } catch(final Exception pce) {
-      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, pce.getMessage());
+    } catch(final Exception ex) {
+      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
     }
   }
 

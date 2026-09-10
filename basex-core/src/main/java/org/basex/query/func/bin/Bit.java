@@ -7,7 +7,7 @@ package org.basex.query.func.bin;
  * @author Christian Gruen
  */
 enum Bit {
-  /** Or.  */
+  /** Or. */
   OR {
     @Override
     byte eval(final byte b1, final byte b2) {

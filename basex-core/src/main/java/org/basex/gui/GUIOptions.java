@@ -200,7 +200,7 @@ public final class GUIOptions extends Options {
   public static final NumberOption MAPWEIGHT = new NumberOption("MAPWEIGHT", 0);
 
   /** Slim rectangles to text length. */
-  public static final BooleanOption TREESLIMS = new BooleanOption("TREESLIM", true);
+  public static final BooleanOption TREESLIM = new BooleanOption("TREESLIM", true);
   /** Show attributes in treeview. */
   public static final BooleanOption TREEATTS = new BooleanOption("TREEATTS", false);
 

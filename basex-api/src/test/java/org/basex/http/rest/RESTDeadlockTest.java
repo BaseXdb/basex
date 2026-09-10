@@ -30,7 +30,7 @@ public final class RESTDeadlockTest extends RESTTest {
 
   /**
    * Removes the databases created by the test.
-   * @throws Exception arbitrary exception
+   * @throws Exception exception
    */
   @AfterEach public void cleanup() throws Exception {
     post("<commands><xquery>for $d in ('" + DB_P + "', '" + DB_A + "', '" + DB_B +

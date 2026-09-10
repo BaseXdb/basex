@@ -414,7 +414,7 @@ public final class QueryContext extends Job implements Closeable {
         vars.compileAll(cc);
       }
     } catch(final StackOverflowError ex) {
-      throw BASEX_OVERFLOW.get(null, ex);
+      throw BASEX_OVERFLOW.get(null).cause(ex);
     } finally {
       info.runtime = true;
     }
@@ -659,7 +659,7 @@ public final class QueryContext extends Job implements Closeable {
    * Binds an expression to a local variable.
    * @param var variable
    * @param value expression to be bound
-   * @throws QueryException exception
+   * @throws QueryException query exception
    */
   public void set(final Var var, final Value value) throws QueryException {
     stack.set(var, value, this);
@@ -914,7 +914,7 @@ public final class QueryContext extends Job implements Closeable {
    * @param name name of variable
    * @param sc static context
    * @return QName
-   * @throws QueryException query context
+   * @throws QueryException query exception
    */
   private static QNm qname(final String name, final StaticContext sc) throws QueryException {
     return QNm.parse(token(Strings.startsWith(name, '$') ? name.substring(1) : name), null, sc);
@@ -923,7 +923,7 @@ public final class QueryContext extends Job implements Closeable {
   /**
    * Checks whether the given string contains a valid XQuery version number.
    * @param version version string
-   * @return true, if string contains a valid XQuery version number.
+   * @return true, if string contains a valid XQuery version number
    */
   public static boolean isSupported(final String version) {
     return Strings.eq(version, "1.0", "1.1", "3.0", "3.1", "4.0");

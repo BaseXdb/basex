@@ -83,7 +83,7 @@ public abstract class RegExFn extends StandardFunc {
    * Compiles this regular expression to a {@link Pattern}.
    * @param regex regular expression to parse
    * @param modifiers modifiers
-   * @return the pattern
+   * @return pattern
    * @throws QueryException query exception
    */
   private RegExpr parse(final byte[] regex, final byte[] modifiers)

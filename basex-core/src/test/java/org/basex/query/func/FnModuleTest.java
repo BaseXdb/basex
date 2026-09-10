@@ -209,7 +209,7 @@ public final class FnModuleTest extends SandboxTest {
     // code coverage tests
     query("string-length(" + func.args(" reverse#1", " ['a']") + ")", 1);
     query(func.args(" true#0", " [ 1 ]"), true);
-    error(func.args(" concat#2", " [ 'x' ]"), APPLY_X_X);
+    error(func.args(" concat#2", " [ 'x' ]"), APPLY_X_X_X);
     error(func.args(" put#2", " [ <_/>, '' ]"), FUNCUP_X);
   }
 
@@ -364,7 +364,7 @@ public final class FnModuleTest extends SandboxTest {
 
   /**
    * Test method.
-   * @throws IOException IO exception
+   * @throws IOException I/O exception
    */
   @Test public void baseUri() throws IOException {
     final Function func = BASE_URI;
@@ -1274,7 +1274,7 @@ public final class FnModuleTest extends SandboxTest {
 
   /**
    * Test method.
-   * @throws IOException IO exception
+   * @throws IOException I/O exception
    */
   @Test public void documentUri() throws IOException {
     final Function func = DOCUMENT_URI;
@@ -2676,7 +2676,7 @@ return
     // duplicates: reject errors, use-first keeps the first, use-last is unsupported,
     // retain (the default for this format) keeps both
     final String dup = "{\"x\":1,\"x\":2}", ns = "http://www.w3.org/2005/xpath-functions";
-    error(func.args(dup, " { 'duplicates': 'reject' }"), DUPLICATE_JSON_X);
+    error(func.args(dup, " { 'duplicates': 'reject' }"), DUPLICATE_JSON_X_X_X);
     query("try { " + func.args(dup, " { 'duplicates': 'reject' }") +
         " } catch * { $err:description }", "(1:11): Key \"x\" occurs more than once.");
     query(func.args(dup, " { 'duplicates': 'use-first' }"),
@@ -3667,7 +3667,7 @@ return
     // duplicates (maps): reject errors, use-first/use-last select a value, retain is unsupported,
     // the default is use-first
     final String dup = "{\"x\":1,\"x\":2}";
-    error(func.args(dup, " { 'duplicates': 'reject' }"), DUPLICATE_JSON_X);
+    error(func.args(dup, " { 'duplicates': 'reject' }"), DUPLICATE_JSON_X_X_X);
     query("try { " + func.args(dup, " { 'duplicates': 'reject' }") +
         " } catch * { $err:description }", "(1:11): Key \"x\" occurs more than once.");
     query(func.args(dup, " { 'duplicates': 'use-first' }"), "{\"x\":1}");

@@ -28,7 +28,7 @@ public class RegExpr {
 
   /**
    * Returns the parent group IDs of capturing groups.
-   * @return parent group IDs.
+   * @return parent group IDs
    */
   public int[] getParentGroups() {
     if(groupInfo == null) groupInfo = GroupScanner.groupInfo(pattern.pattern());
@@ -37,7 +37,7 @@ public class RegExpr {
 
   /**
    * Returns the assertion flags of capturing groups.
-   * @return assertion flags.
+   * @return assertion flags
    */
   public boolean[] getAssertionFlags() {
     if(groupInfo == null) groupInfo = GroupScanner.groupInfo(pattern.pattern());
@@ -46,7 +46,7 @@ public class RegExpr {
 
   /**
    * Returns the names of capturing groups.
-   * @return names: element i contains the name of capturing group i+1, or {@code null}.
+   * @return names: element i contains the name of capturing group i+1, or {@code null}
    */
   public String[] getGroupNames() {
     if(groupInfo == null) groupInfo = GroupScanner.groupInfo(pattern.pattern());
@@ -94,7 +94,7 @@ public class RegExpr {
 
     /**
      * Constructor.
-     * @param pattern a Java regular expression.
+     * @param pattern Java regular expression
      */
     private GroupScanner(final String pattern) {
       this.pattern = pattern;
@@ -104,8 +104,8 @@ public class RegExpr {
 
     /**
      * Find the parent groups of capturing groups in a Java regular expression.
-     * @param pattern the regular expression.
-     * @return an array indicating the parent group ID for each capturing group, where element i
+     * @param pattern regular expression
+     * @return array indicating the parent group ID for each capturing group, where element i
      * contains the parent group ID of capturing group i+1.
      */
     public static GroupInfo groupInfo(final String pattern) {
@@ -208,7 +208,7 @@ public class RegExpr {
 
     /**
      * Fetch the next code point.
-     * @return the next code point.
+     * @return next code point
      */
     private int nxtCp() {
       final int cp;

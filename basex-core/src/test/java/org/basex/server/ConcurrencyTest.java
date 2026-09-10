@@ -36,7 +36,7 @@ public final class ConcurrencyTest extends SandboxTest {
 
   /**
    * Starts the server.
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   @BeforeEach public void start() throws IOException {
     server = createServer();

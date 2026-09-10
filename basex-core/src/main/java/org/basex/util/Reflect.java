@@ -41,7 +41,7 @@ public final class Reflect {
    * Returns a reference to the specified class, or throws an exception.
    * @param name fully qualified class name
    * @return class reference
-   * @throws ClassNotFoundException class not found
+   * @throws ClassNotFoundException class not found exception
    */
   public static Class<?> forName(final String name) throws ClassNotFoundException {
     final Class<?> c = Class.forName(name);

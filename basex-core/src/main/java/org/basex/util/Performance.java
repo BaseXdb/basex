@@ -140,7 +140,7 @@ public final class Performance {
    * @param count number of times to execute garbage collection
    */
   public static void gc(final int count) {
-    for(int c = 0; c < count; ++c) System.gc();
+    for(int c = 0; c < count; c++) System.gc();
   }
 
   /**

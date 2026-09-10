@@ -30,8 +30,8 @@ final class MyKeySelector extends KeySelector {
       if(s instanceof final KeyValue kv) {
         try {
           pk = kv.getPublicKey();
-        } catch(final KeyException ke) {
-          throw new KeySelectorException(ke);
+        } catch(final KeyException ex) {
+          throw new KeySelectorException(ex);
         }
       } else if(s instanceof final X509Data xd) {
         for(final Object d : xd.getContent()) {

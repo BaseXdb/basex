@@ -330,7 +330,7 @@ public final class JobModuleTest extends SandboxTest {
     // drop the scheduled job; the service entry stays behind
     query(_JOB_REMOVE.args("DUP"));
     try {
-      error(func.args("2", " ()", options), JOBS_SERVICE_X_X);
+      error(func.args("2", " ()", options), JOBS_SERVICE_WRITE_X);
       // the job that was started for the rejected service is dropped as well
       query("exists(" + _JOB_LIST_DETAILS.args("DUP") + ')', false);
     } finally {
@@ -501,9 +501,9 @@ public final class JobModuleTest extends SandboxTest {
     final Function func = _JOB_EXECUTE;
 
     // arity mismatches
-    error(func.args(" fn($a) { $a }"), APPLY_X_X);
-    error(func.args(" fn($a) { $a }", " [ 1, 2 ]"), APPLY_X_X);
-    error(func.args(" fn() { 1 }", " [ 1 ]"), APPLY_X_X);
+    error(func.args(" fn($a) { $a }"), APPLY_X_X_X);
+    error(func.args(" fn($a) { $a }", " [ 1, 2 ]"), APPLY_X_X_X);
+    error(func.args(" fn() { 1 }", " [ 1 ]"), APPLY_X_X_X);
 
     // arguments must be supplied as array
     error(func.args(" fn($a) { $a }", " { 'a': 1 }"), INVTYPE_X);

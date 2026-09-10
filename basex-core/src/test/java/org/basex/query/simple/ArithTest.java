@@ -141,7 +141,7 @@ public final class ArithTest extends SandboxTest {
         empty(ArithSimple.class), empty(GFLWOR.class));
 
     // identical arguments
-    error("for $i in (1, xs:double('NaN')) return $i idiv $i", INVIDIV);
+    error("for $i in (1, xs:double('NaN')) return $i idiv $i", INVIDIV_X);
     check("for $i in (2, 4) return $i idiv $i", "1\n1",
         empty(ArithSimple.class), empty(GFLWOR.class));
 

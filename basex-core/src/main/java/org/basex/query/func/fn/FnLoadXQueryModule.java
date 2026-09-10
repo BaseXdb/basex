@@ -123,7 +123,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
       mqc.compile(true);
       if(mqc.main != null) throw MODULE_FOUND_MAIN_X.get(info, modUri);
       final Iterator<byte[]> it = mqc.modParsed.values().iterator();
-      for(int i = 0; i < nParsed; ++i) it.next();
+      for(int i = 0; i < nParsed; i++) it.next();
       final byte[] uri = it.next();
       if(!Token.eq(modUri, uri)) {
         final String path = src.path();
@@ -137,7 +137,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
     for(final StaticFunc sf : mqc.functions) {
       if(sf.updating()) mqc.updating();
       if(!sf.anns.contains(Annotation.PRIVATE) && Token.eq(sf.name.uri(), modUri)) {
-        for(int a = sf.minArity(); a <= sf.arity(); ++a) {
+        for(int a = sf.minArity(); a <= sf.arity(); a++) {
           final FuncBuilder fb = new FuncBuilder(sf.info, a, true);
           final Expr item = Functions.item(sf, fb, mqc);
           funcs.computeIfAbsent(sf.name, HashMap::new).put(a, item);
@@ -173,7 +173,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
    * {@code null}, if there is no such module in the repository.
    * @param modUri module URI
    * @param context database context
-   * @return the file path of the XQuery module in the repository (maybe {@code null})
+   * @return file path of the XQuery module in the repository (maybe {@code null})
    */
   private static String repoFilePath(final byte[] modUri, final Context context) {
     final String path = Strings.uri2path(Token.string(modUri));

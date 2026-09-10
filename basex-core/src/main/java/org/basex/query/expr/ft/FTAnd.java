@@ -69,7 +69,7 @@ public final class FTAnd extends FTExpr {
       public FTNode next() throws QueryException {
         // find item with the lowest PRE value
         final int il = nodes.length;
-        for(int i = 0; i < il; ++i) {
+        for(int i = 0; i < il; i++) {
           if(nodes[i] == null) return null;
 
           final int d = nodes[0].pre() - nodes[i].pre();
@@ -82,7 +82,7 @@ public final class FTAnd extends FTExpr {
 
         // merge all matches
         final FTNode item = nodes[0];
-        for(int i = 1; i < il; ++i) {
+        for(int i = 1; i < il; i++) {
           and(item, nodes[i]);
           nodes[i] = iters[i].next();
         }

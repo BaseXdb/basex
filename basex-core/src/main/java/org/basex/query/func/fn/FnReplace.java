@@ -81,7 +81,7 @@ public final class FnReplace extends RegExFn {
     } else {
       // standard parsing: raise errors for some special cases
       final int rl = replace.length;
-      for(int r = 0; r < rl; ++r) {
+      for(int r = 0; r < rl; r++) {
         final int n = r + 1 == rl ? 0 : replace[r + 1];
         if(replace[r] == '\\') {
           if(n != '\\' && n != '$') throw REGBACKSLASH_X.get(info, replace);

@@ -53,7 +53,7 @@ public final class QueryJobResult {
   /**
    * Returns the outcome of a query (result or exception).
    * @return value
-   * @throws QueryException exception
+   * @throws QueryException query exception
    */
   public Value get() throws QueryException {
     if(exception != null) throw exception;

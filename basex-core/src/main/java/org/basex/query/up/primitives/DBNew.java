@@ -129,7 +129,7 @@ public final class DBNew {
    * @param target database instance
    * @param replace if {@code true}, existing binary or value resources at the target paths
    *   are overwritten; if {@code false}, a conflict is raised
-   * @throws QueryException exception
+   * @throws QueryException query exception
    */
   public void addTo(final Data target, final boolean replace) throws QueryException {
     try {
@@ -247,7 +247,7 @@ public final class DBNew {
    * @param target target database
    * @param replace overwrite existing binary or value resources instead of raising a conflict
    * @throws IOException I/O exception
-   * @throws QueryException conflict exception
+   * @throws QueryException query exception
    */
   private void copy(final Data source, final Data target, final boolean replace)
       throws IOException, QueryException {

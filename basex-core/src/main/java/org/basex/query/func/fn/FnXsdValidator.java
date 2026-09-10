@@ -163,7 +163,7 @@ public final class FnXsdValidator extends StandardFunc {
    * Returns the serialized node.
    * @param node node
    * @return input
-   * @throws QueryIOException serialization exception
+   * @throws QueryIOException query I/O exception
    */
   private static IOContent source(final XNode node) throws QueryIOException {
     return new IOContent(node.serialize().finish(), Token.string(node.baseURI()));

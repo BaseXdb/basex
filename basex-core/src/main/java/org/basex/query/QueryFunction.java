@@ -5,16 +5,16 @@ package org.basex.query;
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
- * @param <T> the type of the input to the function
- * @param <R> the type of the result of the function
+ * @param <T> type of the input to the function
+ * @param <R> type of the result of the function
  */
 @FunctionalInterface
 public interface QueryFunction<T, R> {
   /**
    * Applies this function to the given argument.
    *
-   * @param t the function argument
-   * @return the function result
+   * @param t function argument
+   * @return function result
    * @throws QueryException query exception
    */
   R apply(T t) throws QueryException;

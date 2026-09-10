@@ -28,7 +28,7 @@ public final class CollectionManagementServiceTest extends XMLDBBaseTest {
 
   /**
    * Initializes a test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @BeforeEach public void setUp() throws Exception {
     createDB();
@@ -40,7 +40,7 @@ public final class CollectionManagementServiceTest extends XMLDBBaseTest {
 
   /**
    * Finalizes a test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @AfterEach public void tearDown() throws Exception {
     collection.close();
@@ -49,7 +49,7 @@ public final class CollectionManagementServiceTest extends XMLDBBaseTest {
 
   /**
    * Test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @Test public void testCreateCollection() throws Exception {
     // create a collection
@@ -65,7 +65,7 @@ public final class CollectionManagementServiceTest extends XMLDBBaseTest {
 
   /**
    * Test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @Test public void testRemoveCollection() throws Exception {
     service.removeCollection(TEMP);
@@ -74,7 +74,7 @@ public final class CollectionManagementServiceTest extends XMLDBBaseTest {
 
   /**
    * Test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @Test public void testGetName() throws Exception {
     assertEquals(CMS, service.getName());
@@ -82,7 +82,7 @@ public final class CollectionManagementServiceTest extends XMLDBBaseTest {
 
   /**
    * Test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @Test public void testGetVersion() throws Exception {
     assertEquals("1.0", service.getVersion());

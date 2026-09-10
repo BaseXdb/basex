@@ -185,10 +185,10 @@ public class QueryParser extends InputParser {
       finish(mm);
       check(mm);
       return mm;
-    } catch(final QueryException expr) {
+    } catch(final QueryException ex) {
       mark();
-      expr.pos(this);
-      throw expr;
+      ex.pos(this);
+      throw ex;
     }
   }
 
@@ -234,10 +234,10 @@ public class QueryParser extends InputParser {
       final LibraryModule lm = new LibraryModule(sc);
       lm.set(funcs, vars, publicTypes, sc.imports, namespaces, options, moduleDoc);
       return lm;
-    } catch(final QueryException expr) {
+    } catch(final QueryException ex) {
       mark();
-      expr.pos(this);
-      throw expr;
+      ex.pos(this);
+      throw ex;
     }
   }
 
@@ -249,8 +249,8 @@ public class QueryParser extends InputParser {
   final SeqType parseSeqType() throws QueryException {
     try {
       return sequenceType();
-    } catch(final QueryException expr) {
-      throw error(CASTTYPE_X, null, expr.getLocalizedMessage()).cause(expr);
+    } catch(final QueryException ex) {
+      throw error(CASTTYPE_X, null, ex.getLocalizedMessage()).cause(ex);
     }
   }
 
@@ -438,7 +438,7 @@ public class QueryParser extends InputParser {
       params.seqType(rt.seqType()).finish(qc, localVars);
       final Var[] pv = params.vars();
       final Expr[] args = new Expr[pv.length];
-      for(int i = 0; i < pv.length; ++i) {
+      for(int i = 0; i < pv.length; i++) {
         args[i] = new VarRef(null, pv[i]);
       }
       expr = ShapeConstructor.get(ii, rt, args);
@@ -983,8 +983,8 @@ public class QueryParser extends InputParser {
       final String query;
       try {
         query = io.readString();
-      } catch(final IOException expr) {
-        throw error(WHICHMODFILE_X, info, io).cause(expr);
+      } catch(final IOException ex) {
+        throw error(WHICHMODFILE_X, info, io).cause(ex);
       }
 
       qc.modStack.push(tPath);
@@ -1221,7 +1221,7 @@ public class QueryParser extends InputParser {
 
     final Var[] pv = params.vars();
     final Expr[] args = new Expr[pv.length];
-    for(int i = 0; i < pv.length; ++i) {
+    for(int i = 0; i < pv.length; i++) {
       args[i] = new VarRef(null, pv[i]);
     }
     final Expr expr = ShapeConstructor.get(ii, rt, args);
@@ -1452,7 +1452,7 @@ public class QueryParser extends InputParser {
    * Parses the "ForClause" rule.
    * Parses the "PositionalVar" rule.
    * @param clauses list of clauses
-   * @throws QueryException parse exception
+   * @throws QueryException query exception
    */
   private void forClause(final LinkedList<Clause> clauses) throws QueryException {
     do {
@@ -1522,7 +1522,7 @@ public class QueryParser extends InputParser {
    * Parses the "LetClause" rule.
    * Parses the "FTScoreVar" rule.
    * @param clauses list of clauses
-   * @throws QueryException parse exception
+   * @throws QueryException query exception
    */
   private void letClause(final LinkedList<Clause> clauses) throws QueryException {
     do {
@@ -1609,8 +1609,8 @@ public class QueryParser extends InputParser {
   /**
    * Parses the "TumblingWindowClause" rule.
    * Parses the "SlidingWindowClause" rule.
-   * @return the window clause
-   * @throws QueryException parse exception
+   * @return window clause
+   * @throws QueryException query exception
    */
   private Window windowClause() throws QueryException {
     final boolean sliding = !wsConsume(TUMBLING) && wsConsume(SLIDING);
@@ -1637,8 +1637,8 @@ public class QueryParser extends InputParser {
   /**
    * Parses the "WindowVars" rule.
    * @param start start condition flag
-   * @return an array containing the current, positional, previous and next variable name
-   * @throws QueryException parse exception
+   * @return array containing the current, positional, previous and next variable name
+   * @throws QueryException query exception
    */
   private Condition windowCond(final boolean start) throws QueryException {
     skipWs();
@@ -3108,7 +3108,7 @@ public class QueryParser extends InputParser {
   private QNm varName() throws QueryException {
     check('$');
     skipWs();
-    return eQName(null, NOVARNAME);
+    return eQName(null, NOVARNAME_X);
   }
 
   /**
@@ -4718,8 +4718,8 @@ public class QueryParser extends InputParser {
               final IO fl = qc.resources.stopWords(string(stringLiteral()), sc);
               try {
                 opt.sw.read(fl, except);
-              } catch(final IOException expr) {
-                throw error(NOSTOPFILE_X, fl).cause(expr);
+              } catch(final IOException ex) {
+                throw error(NOSTOPFILE_X, fl).cause(ex);
               }
             } else if(!union && !except) {
               throw error(FTSTOP);
@@ -5321,7 +5321,7 @@ public class QueryParser extends InputParser {
     final StringBuilder sb = new StringBuilder();
     boolean s = false;
     final int ql = query.length();
-    for(int m = 0, c = 0; c < ql && sb.length() < max; ++c) {
+    for(int m = 0, c = 0; c < ql && sb.length() < max; c++) {
       final char ch = query.charAt(c);
       if(ch == 0x0d) continue;
       if(ch == '(' && c + 1 < ql && query.charAt(c + 1) == ':') {

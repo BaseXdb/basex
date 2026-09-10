@@ -247,7 +247,7 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Returns the size of a structure resulting from this expression.
-   * @return size, or {@code -1} if it is unknown or if the result is not a structure.
+   * @return size, or {@code -1} if it is unknown or if the result is not a structure
    */
   public long structSize() {
     return -1;
@@ -590,7 +590,7 @@ public abstract class Expr extends ExprInfo {
    * Tries to push the given type check inside this expression.
    * @param tc type check to push into the expression
    * @param cc compilation context
-   * @return the resulting expression if successful, {@code null} otherwise
+   * @return resulting expression if successful, {@code null} otherwise
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")

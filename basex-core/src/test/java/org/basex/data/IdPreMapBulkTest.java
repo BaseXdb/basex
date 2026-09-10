@@ -31,7 +31,7 @@ public final class IdPreMapBulkTest extends IdPreMapBulkTestBase {
    * positions.
    */
   @Test public void bulkInsertCorrectness() {
-    for(int k = 0; k < ITER; ++k) {
+    for(int k = 0; k < ITER; k++) {
       setUp();
       for(int c, id = baseid + 1, i = 0; i < opcount; i += c) {
         c = RANDOM.nextInt(BULK) + 1;
@@ -44,7 +44,7 @@ public final class IdPreMapBulkTest extends IdPreMapBulkTestBase {
 
   /** Delete correctness: delete values at random positions. */
   @Test public void bulkDeleteCorrectness() {
-    for(int k = 0; k < ITER; ++k) {
+    for(int k = 0; k < ITER; k++) {
       setUp();
       for(int id = baseid; id > 0;) {
         final int deleteid = RANDOM.nextInt(id);
@@ -59,10 +59,10 @@ public final class IdPreMapBulkTest extends IdPreMapBulkTestBase {
 
   /** Delete correctness: delete values at random positions. */
   @Test public void bulkDeleteCorrectness2() {
-    for(int k = 0; k < ITER; ++k) {
+    for(int k = 0; k < ITER; k++) {
       setUp();
       int n = baseid + 1;
-      for(int i = 0; i < opcount; ++i) {
+      for(int i = 0; i < opcount; i++) {
         final int c = RANDOM.nextInt(BULK) + 1;
         insert(RANDOM.nextInt(n), n, c);
         check();
@@ -88,9 +88,9 @@ public final class IdPreMapBulkTest extends IdPreMapBulkTestBase {
 
   /** Correctness: randomly insert/delete value at random positions. */
   @Test public void bulkInsertDeleteCorrectness() {
-    for(int k = 0; k < ITER; ++k) {
+    for(int k = 0; k < ITER; k++) {
       setUp();
-      for(int i = 0, n = baseid, id = baseid + 1; i < opcount; ++i) {
+      for(int i = 0, n = baseid, id = baseid + 1; i < opcount; i++) {
         final int pre = RANDOM.nextInt(n + 1);
         final int c;
         // can't delete if all records have been deleted:

@@ -69,7 +69,7 @@ public final class DialogInsert extends BaseXDialog {
     final int lkind = gui.gopts.get(GUIOptions.LASTINSERT);
     final int nl = NODE_KINDS.length;
     radio = new BaseXRadio[nl];
-    for(int i = 1; i < nl; ++i) {
+    for(int i = 1; i < nl; i++) {
       radio[i] = new BaseXRadio(this, NODE_KINDS[i], false);
       radio[i].addActionListener(al);
       radio[i].setSelected(i == lkind);
@@ -104,7 +104,7 @@ public final class DialogInsert extends BaseXDialog {
   private void change(final Object src) {
     int n = 0;
     final int rl = radio.length;
-    for(int r = 0; r < rl; ++r) {
+    for(int r = 0; r < rl; r++) {
       if(src == radio[r]) n = r;
     }
     final int h = n == Data.ATTR ? input1.getHeight() : 350;
@@ -130,7 +130,7 @@ public final class DialogInsert extends BaseXDialog {
   @Override
   public void action(final Object cmp) {
     final int nl = NODE_KINDS.length;
-    for(int n = 1; n < nl; ++n) {
+    for(int n = 1; n < nl; n++) {
       if(radio[n].isSelected()) kind = n;
     }
     gui.gopts.set(GUIOptions.LASTINSERT, kind);

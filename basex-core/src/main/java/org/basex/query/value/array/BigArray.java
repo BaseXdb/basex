@@ -377,8 +377,8 @@ public final class BigArray extends TreeArray {
   /**
    * Creates an array from two merged, possibly partial digits.
    * This method requires that the input array's length is not longer than {@code 2 * MAX_DIGIT}.
-   * @param merged the merged digits
-   * @return the array
+   * @param merged merged digits
+   * @return array
    */
   private XQArray fromMerged(final Value[] merged) {
     final int ml = merged.length;

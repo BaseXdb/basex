@@ -11,7 +11,6 @@ import org.basex.core.cmd.*;
  * please see {@link QueryCollection}
  *
  * @author BaseX Team, BSD License
- * @author BaseXTeam
  */
 public final class CreateCollection {
   /**

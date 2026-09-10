@@ -47,7 +47,7 @@ public final class Strings {
   /**
    * Converts the specified string into a long value.
    * @param string string to be converted
-   * @return resulting long value, or {@link Long#MIN_VALUE} if the input is invalid.
+   * @return resulting long value, or {@link Long#MIN_VALUE} if the input is invalid
    */
   public static long toLong(final String string) {
     return Token.toLong(Token.token(string));

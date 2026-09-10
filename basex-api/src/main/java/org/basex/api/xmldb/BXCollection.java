@@ -37,7 +37,7 @@ public final class BXCollection implements Collection {
    * @param name name of the database
    * @param open open existing database
    * @param database database context
-   * @throws XMLDBException exception
+   * @throws XMLDBException XMLDB exception
    */
   public BXCollection(final String name, final boolean open, final Database database)
       throws XMLDBException {
@@ -274,7 +274,7 @@ public final class BXCollection implements Collection {
 
   /**
    * Checks if the collection is currently open.
-   * @throws XMLDBException exception
+   * @throws XMLDBException XMLDB exception
    */
   private void check() throws XMLDBException {
     if(data == null) throw new XMLDBException(ErrorCodes.COLLECTION_CLOSED);
@@ -285,7 +285,7 @@ public final class BXCollection implements Collection {
    * If that's not possible, throws an exception
    * @param resource input resource
    * @return XML resource
-   * @throws XMLDBException exception
+   * @throws XMLDBException XMLDB exception
    */
   private static BXXMLResource checkXML(final Resource resource) throws XMLDBException {
     if(resource instanceof final BXXMLResource res) return res;

@@ -145,7 +145,7 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
     final Component[] m = getComponents();
     final int r = propSize.length;
     int q = 0;
-    for(int n = 0; n < r - 1; ++n) {
+    for(int n = 0; n < r - 1; n++) {
       if(m[(n << 1) + 1] == sep) q = n + 1;
     }
     final int size = splitSize();
@@ -154,14 +154,14 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
     final double v = (dragPos - p) / (horizontal ? getWidth() : getHeight());
     // keep a visible strip of every panel, so it can be enlarged again
     final double min = (double) (anchor >= 0 ? anchorMin : SEPARATOR_SIZE) / size;
-    for(int i = 0; i < q; ++i) {
+    for(int i = 0; i < q; i++) {
       if(dragSize[i] - v / q < min) return;
     }
-    for(int i = q; i < r; ++i) {
+    for(int i = q; i < r; i++) {
       if(dragSize[i] + v / (r - q) < min) return;
     }
-    for(int i = 0; i < q; ++i) propSize[i] = dragSize[i] - v / q;
-    for(int i = q; i < r; ++i) propSize[i] = dragSize[i] + v / (r - q);
+    for(int i = 0; i < q; i++) propSize[i] = dragSize[i] - v / q;
+    for(int i = q; i < r; i++) propSize[i] = dragSize[i] + v / (r - q);
     dragged = true;
     revalidate();
   }
@@ -234,7 +234,7 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
     // calculate proportional size of panels
     if(propSize == null) {
       propSize = new double[panels];
-      for(int c = 0; c < cl; ++c) {
+      for(int c = 0; c < cl; c++) {
         if((c & 1) == 0) propSize[c >> 1] = 1.0d / panels;
       }
     }

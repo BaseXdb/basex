@@ -20,7 +20,7 @@ public final class DbAlterBackup extends DbAccessFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final String name = toName(arg(0), qc), newname = toName(arg(1), qc);
-    if(name.equals(newname)) throw DB_CONFLICT4_X.get(info, name, newname);
+    if(name.equals(newname)) throw DB_CONFLICT4_X.get(info, name);
 
     checkCreate(name, qc);
     final StringList backups = qc.context.databases.backups(name);

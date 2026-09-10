@@ -14,13 +14,13 @@ public final class StatsType {
   public static final byte STRING = 0;
   /** A limited number of distinct strings exists. */
   public static final byte STRING_CATEGORY = 1;
-  /** All values are of type integer.  */
+  /** All values are of type integer. */
   public static final byte INTEGER = 2;
   /** All values are of type double. */
   public static final byte DOUBLE = 3;
   /** No values exist. */
   public static final byte NONE = 4;
-  /** All distinct values are of type integer.  */
+  /** All distinct values are of type integer. */
   public static final byte INTEGER_CATEGORY = 5;
   /** All distinct values are of type double. */
   public static final byte DOUBLE_CATEGORY = 6;

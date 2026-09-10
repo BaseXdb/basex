@@ -48,7 +48,7 @@ public final class ServerQuery extends Job {
    * @param name name of variable
    * @param value value to be bound
    * @param type type
-   * @throws IOException query exception
+   * @throws IOException I/O exception
    */
   public void bind(final String name, final Object value, final String type) throws IOException {
     try {
@@ -62,7 +62,7 @@ public final class ServerQuery extends Job {
    * Binds the context value.
    * @param value value to be bound
    * @param type type
-   * @throws IOException query exception
+   * @throws IOException I/O exception
    */
   public void context(final Object value, final String type) throws IOException {
     try {
@@ -83,7 +83,7 @@ public final class ServerQuery extends Job {
   /**
    * Returns the serialization parameters.
    * @return serialization parameters
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   public String parameters() throws IOException {
     parse();
@@ -93,7 +93,7 @@ public final class ServerQuery extends Job {
   /**
    * Returns {@code true} if the query may perform updates.
    * @return updating flag
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   public boolean updating() throws IOException {
     parse();
@@ -106,7 +106,7 @@ public final class ServerQuery extends Job {
    * @param iterative iterative evaluation
    * @param encode encode results (client/server communication, iterative processing)
    * @param full return full type information (only applicable to iterative evaluation)
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   public void execute(final OutputStream out, final boolean iterative, final boolean encode,
       final boolean full) throws IOException {
@@ -171,7 +171,7 @@ public final class ServerQuery extends Job {
 
   /**
    * Initializes the query.
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   private void parse() throws IOException {
     if(parsed) return;

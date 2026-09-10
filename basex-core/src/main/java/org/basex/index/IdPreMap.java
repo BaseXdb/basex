@@ -54,7 +54,7 @@ public class IdPreMap {
   /**
    * Constructs a map by reading it from a file.
    * @param f file to read from
-   * @throws IOException I/O error while reading from the file
+   * @throws IOException I/O exception
    */
   public IdPreMap(final IOFile f) throws IOException {
     try(DataInput in = new DataInput(f)) {
@@ -74,7 +74,7 @@ public class IdPreMap {
   /**
    * Write the map to the specified file.
    * @param file file to write to
-   * @throws IOException I/O error while writing to the file
+   * @throws IOException I/O exception
    */
   public final void write(final IOFile file) throws IOException {
     try(DataOutput out = new DataOutput(file)) {
@@ -279,7 +279,7 @@ public class IdPreMap {
     final int removeStart = startIndex < rows && pres[startIndex] < pre ?
       startIndex + 1 : startIndex;
     int removeEnd = -1;
-    for(int i = startIndex; i < rows; ++i) {
+    for(int i = startIndex; i < rows; i++) {
       if(end < pres[i] + nids[i] - fids[i]) break;
       removeEnd = i;
     }
@@ -355,7 +355,7 @@ public class IdPreMap {
    * @param with increment value
    */
   private void increment(final int from, final int with) {
-    for(int i = from; i < rows; ++i) {
+    for(int i = from; i < rows; i++) {
       pres[i] += with;
       incs[i] += with;
     }
@@ -461,7 +461,7 @@ public class IdPreMap {
   public String toString() {
     final Table t = new Table();
     t.header.add("PRE").add("FID").add("NID").add("INC").add("OID");
-    for(int i = 0; i < 5; ++i) t.align.add(true);
+    for(int i = 0; i < 5; i++) t.align.add(true);
     for(int i = 0; i < rows; i++) {
       final TokenList tl = new TokenList();
       tl.add(pres[i]).add(fids[i]).add(nids[i]).add(incs[i]).add(oids[i]);

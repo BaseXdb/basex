@@ -117,7 +117,7 @@ public final class MapView extends View {
 
     if(mainRects == null) return;
     final int ms = mainRects.size;
-    for(int mi = 0; mi < ms; ++mi) {
+    for(int mi = 0; mi < ms; mi++) {
       final MapRect rect = mainRects.get(mi);
       if(f == rect.pre || mi + 1 == ms || f < mainRects.get(mi + 1).pre) {
         focused = rect;
@@ -482,7 +482,7 @@ public final class MapView extends View {
     final IntList il = new IntList();
     int np = 0;
     final int rl = mainRects.size;
-    for(int r = 0; r < rl; ++r) {
+    for(int r = 0; r < rl; r++) {
       final MapRect rect = mainRects.get(r);
       if(mainRects.get(r).pre < np) continue;
       if(selBox.contains(rect)) {
@@ -571,7 +571,7 @@ public final class MapView extends View {
     final IntList pars = new IntList();
     int l = 0;
 
-    for(int pre = 0; pre < size; ++pre) {
+    for(int pre = 0; pre < size; pre++) {
       final int kind = data.kind(pre);
       final int par = data.parent(pre, kind);
 

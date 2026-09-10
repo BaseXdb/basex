@@ -42,7 +42,7 @@ public final class ItemList extends ObjectList<Item, ItemList> {
 
   /**
    * Returns a value containing the items in this list.
-   * @return the value
+   * @return value
    */
   public Value value() {
     return value((Type) null);
@@ -51,7 +51,7 @@ public final class ItemList extends ObjectList<Item, ItemList> {
   /**
    * Returns a value with the type of the given expression.
    * @param type type (can be {@code null}; only considered if a new sequence is created)
-   * @return the value
+   * @return value
    */
   public Value value(final Type type) {
     return ItemSeq.get(list, size, type);
@@ -60,7 +60,7 @@ public final class ItemList extends ObjectList<Item, ItemList> {
   /**
    * Returns a value with the type of the given expression.
    * @param expr expression (can be {@code null})
-   * @return the value
+   * @return value
    */
   public Value value(final Expr expr) {
     return ItemSeq.get(list, size, expr != null ? expr.seqType().type : null);

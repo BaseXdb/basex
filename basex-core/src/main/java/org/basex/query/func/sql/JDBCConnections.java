@@ -46,7 +46,7 @@ public final class JDBCConnections implements QueryResource {
    * @param stmt prepared statement
    * @param keys statement returns auto-generated keys
    * @return generated ID
-   * @throws SQLException SQL connection
+   * @throws SQLException SQL exception
    */
   synchronized Uri add(final PreparedStatement stmt, final boolean keys) throws SQLException {
     final String url = string(get(stmt.getConnection())).replaceAll("^(.+)/.+$", "$1");

@@ -74,7 +74,7 @@ public final class LongList extends ElementList {
 
   /**
    * Returns the uppermost element from the stack.
-   * @return the uppermost element
+   * @return uppermost element
    */
   public long peek() {
     return list[size - 1];
@@ -82,7 +82,7 @@ public final class LongList extends ElementList {
 
   /**
    * Pops the uppermost element from the stack.
-   * @return the popped element
+   * @return popped element
    */
   public long pop() {
     return list[--size];
@@ -133,7 +133,7 @@ public final class LongList extends ElementList {
     if(!isEmpty()) {
       sort();
       int i = 1;
-      for(int j = 1; j < size; ++j) {
+      for(int j = 1; j < size; j++) {
         while(j < size && list[i - 1] == list[j]) j++;
         if(j < size) list[i++] = list[j];
       }

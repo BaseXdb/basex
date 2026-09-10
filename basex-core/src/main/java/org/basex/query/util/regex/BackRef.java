@@ -15,7 +15,7 @@ public final class BackRef extends RegExp {
   /**
    * Constructor.
    * @param num capture group number
-   * @param isDifferentBranch the different-branch flag
+   * @param isDifferentBranch different-branch flag
    */
   public BackRef(final int num, final boolean isDifferentBranch) {
     this.num = num;

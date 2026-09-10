@@ -102,7 +102,7 @@ public final class DynFuncCall extends FuncCall {
         if(nargs != arity) throw arityError(func, nargs, arity, false, info);
         // keys of maps and arrays are atomized and checked by the lookup itself
         if(!struct) {
-          for(int a = 0; a < arity; ++a) {
+          for(int a = 0; a < arity; a++) {
             exprs[a] = new TypeCheck(info, exprs[a], ft.argTypes[a]).compile(cc);
           }
         }

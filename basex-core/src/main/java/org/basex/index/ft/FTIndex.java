@@ -72,7 +72,7 @@ public final class FTIndex extends ValueIndex {
   /**
    * Constructor, initializing the index structure.
    * @param data data reference
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   public FTIndex(final Data data) throws IOException {
     this(data, DATAFTX);
@@ -82,7 +82,7 @@ public final class FTIndex extends ValueIndex {
    * Constructor, initializing the index structure.
    * @param data data reference
    * @param prefix file prefix of the index structure
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   FTIndex(final Data data, final String prefix) throws IOException {
     super(data, IndexType.FULLTEXT);

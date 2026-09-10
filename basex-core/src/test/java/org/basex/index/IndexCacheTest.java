@@ -24,7 +24,7 @@ public final class IndexCacheTest {
 
   /** Test for method {@link IndexCache#get(byte[])}. */
   @Test public void testGetNotExisting() {
-    for(int i = 0; i < 4000; ++i) {
+    for(int i = 0; i < 4000; i++) {
       final byte[] key = token("keyAdd" + i);
       final long pointer = i + 5000L;
 
@@ -36,7 +36,7 @@ public final class IndexCacheTest {
 
   /** Test for method {@link IndexCache#add(byte[], int, long)}. */
   @Test public void testAdd() {
-    for(int i = 0; i < 4000; ++i) {
+    for(int i = 0; i < 4000; i++) {
       final byte[] key = token("keyAdd" + i);
       final long pointer = i + 5000L;
 

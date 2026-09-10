@@ -53,7 +53,7 @@ public final class XQJConcurrencyTest extends XQJBaseTest {
 
   /**
    * Runs insert concurrency test.
-   * @throws Exception exceptions
+   * @throws Exception exception
    */
   @Test public void testConcurrentInsert() throws Exception {
     final XQExpression xqpe = xqc.createExpression();

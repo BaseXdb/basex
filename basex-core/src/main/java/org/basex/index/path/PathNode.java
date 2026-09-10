@@ -280,7 +280,7 @@ public final class PathNode {
   byte[] info(final Data data, final int level) {
     final TokenBuilder tb = new TokenBuilder();
     if(level != 0) tb.add(Text.NL);
-    for(int i = 0; i < level << 1; ++i) tb.add(' ');
+    for(int i = 0; i < level << 1; i++) tb.add(' ');
     tb.add(kind == Data.DOC ? DOC : token(data)).add(": " + stats);
     for(final PathNode p : children) tb.add(p.info(data, level + 1));
     return tb.finish();

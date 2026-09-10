@@ -234,7 +234,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
    * @param iter iterator
    * @param type type
    * @return value
-   * @throws QueryIOException query exception
+   * @throws QueryIOException query I/O exception
    */
   private static byte[] value(final BasicNodeIter iter, final byte[] type) throws QueryIOException {
     TokenBuilder tb = null;
@@ -256,7 +256,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
    * @param escaped indicates if value is already escaped
    * @param key key
    * @return escaped value
-   * @throws QueryIOException I/O exception
+   * @throws QueryIOException query I/O exception
    */
   private byte[] escape(final byte[] value, final boolean escaped, final boolean key)
       throws QueryIOException {
@@ -295,7 +295,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
    * Returns an unescaped representation of the value.
    * @param value value to escape
    * @return unescaped token
-   * @throws QueryIOException I/O exception
+   * @throws QueryIOException query I/O exception
    */
   private static byte[] unescape(final byte[] value) throws QueryIOException {
     final TokenBuilder tb = new TokenBuilder();

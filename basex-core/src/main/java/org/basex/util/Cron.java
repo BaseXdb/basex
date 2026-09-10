@@ -42,7 +42,7 @@ public final class Cron {
   /**
    * Constructor.
    * @param expression cron expression with 5 fields, or 6 fields if seconds are supplied
-   * @throws BaseXException expression is invalid
+   * @throws BaseXException database exception
    */
   public Cron(final String expression) throws BaseXException {
     final String[] fields = expression.trim().split("\\s+");
@@ -155,7 +155,7 @@ public final class Cron {
    * @param max maximum value
    * @param names value names (can be {@code null})
    * @return bit set
-   * @throws BaseXException field is invalid
+   * @throws BaseXException database exception
    */
   private static long field(final String field, final int min, final int max, final String[] names)
       throws BaseXException {
@@ -202,7 +202,7 @@ public final class Cron {
    * @param names value names (can be {@code null})
    * @param field field (for error messages)
    * @return numeric value
-   * @throws BaseXException value is invalid
+   * @throws BaseXException database exception
    */
   private static int value(final String value, final int min, final int max, final String[] names,
       final String field) throws BaseXException {
@@ -225,7 +225,7 @@ public final class Cron {
    * @param value value
    * @param field field (for error messages)
    * @return number
-   * @throws BaseXException value is no valid number
+   * @throws BaseXException database exception
    */
   private static int number(final String value, final String field) throws BaseXException {
     final int v = Strings.toInt(value);

@@ -365,8 +365,8 @@ public final class BigSeq extends TreeSeq {
   /**
    * Creates a sequence from two merged, possibly partial digits.
    * This method requires that the input array's length is not longer than {@code 2 * MAX_DIGIT}.
-   * @param merged the merged digits
-   * @return the array
+   * @param merged merged digits
+   * @return array
    */
   private TreeSeq fromMerged(final Item[] merged) {
     final int ml = merged.length;

@@ -115,7 +115,7 @@ public class InputParser {
     int i = pos;
     final int l = string.length();
     if(i + l > length) return false;
-    for(int s = 0; s < l; ++s) {
+    for(int s = 0; s < l; s++) {
       if(input[i++] != string.charAt(s)) return false;
     }
     pos = i;

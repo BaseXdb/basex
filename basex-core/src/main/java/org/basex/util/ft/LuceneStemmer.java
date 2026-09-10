@@ -119,8 +119,8 @@ final class LuceneStemmer extends ExternalStemmer<LuceneStemmer.StemmerClass> {
 
   /**
    * Structure, containing stemming methods.
-   * @param clz   class implementing the stemmer
-   * @param stem  method {@code stem}
+   * @param clz class implementing the stemmer
+   * @param stem method {@code stem}
    * @param chars string indicator
    */
   record StemmerClass(Class<?> clz, Method stem, boolean chars)

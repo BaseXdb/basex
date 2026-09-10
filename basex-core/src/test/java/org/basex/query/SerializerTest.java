@@ -587,7 +587,7 @@ public final class SerializerTest extends SandboxTest {
     query(option + "<x a='1 > 0'>1 > 0</x>", "<x a=\"1 > 0\">1 &gt; 0</x>");
 
     // relative namespace URIs are not allowed
-    error(option + "<x xmlns='relative'/>", SERCANONURI);
+    error(option + "<x xmlns='relative'/>", SERCANONURI_X);
     // document must only have one element root node
     error(option + "document { <x/>, <x/> }", SERCANONROOTS_X);
     // document must only have one element root node (use 'update {}': create database node)

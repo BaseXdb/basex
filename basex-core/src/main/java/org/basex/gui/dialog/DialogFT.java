@@ -71,7 +71,7 @@ final class DialogFT extends DialogIndex {
 
     final BaseXLabel[] labels = new BaseXLabel[FLAGS];
     final int cl = check.length;
-    for(int c = 0; c < cl; ++c) {
+    for(int c = 0; c < cl; c++) {
       check[c] = new BaseXCheckBox(dialog, cb[c], val[c]);
       if(create) {
         check[c].setToolTipText(desc[c]);
@@ -98,7 +98,7 @@ final class DialogFT extends DialogIndex {
     add(b1);
     if(!create) add(labels[F_LANG]);
 
-    for(int f = 1; f < F_STOP; ++f) {
+    for(int f = 1; f < F_STOP; f++) {
       add(check[f]);
       if(!create) add(labels[f]);
     }

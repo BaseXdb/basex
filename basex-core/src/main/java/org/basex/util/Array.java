@@ -218,7 +218,7 @@ public final class Array {
    */
   public static IntList number(final int size) {
     final int[] tmp = new int[size];
-    for(int i = 0; i < size; ++i) tmp[i] = i;
+    for(int i = 0; i < size; i++) tmp[i] = i;
     return new IntList(tmp);
   }
 

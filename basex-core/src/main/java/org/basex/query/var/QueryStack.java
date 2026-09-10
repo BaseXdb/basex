@@ -113,7 +113,7 @@ public final class QueryStack {
    * @param var variable to bind the value to
    * @param value value to bind
    * @param qc query context
-   * @throws QueryException if the value does not have the right type
+   * @throws QueryException query exception
    */
   public void set(final Var var, final Value value, final QueryContext qc) throws QueryException {
     values[start + var.slot] = var.checkType(value, qc, null);

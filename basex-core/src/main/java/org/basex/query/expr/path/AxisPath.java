@@ -62,7 +62,7 @@ public abstract class AxisPath extends Path {
    * Updates the cache and returns a cached value.
    * @param qc query context
    * @return cached value or {@code null}
-   * @throws QueryException query context
+   * @throws QueryException query exception
    */
   private Value cache(final QueryContext qc) throws QueryException {
     final Value value = qc.focus.value;

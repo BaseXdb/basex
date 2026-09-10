@@ -48,7 +48,7 @@ public class BufferInput extends InputStream {
    * Returns a buffered input stream.
    * @param input input to be read
    * @return stream
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   public static BufferInput get(final IO input) throws IOException {
     final InputStream is = input.inputStream();
@@ -58,7 +58,7 @@ public class BufferInput extends InputStream {
   /**
    * Constructor.
    * @param input input to be read
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   public BufferInput(final IO input) throws IOException {
     this(input.inputStream());
@@ -144,7 +144,7 @@ public class BufferInput extends InputStream {
   /**
    * Reads a string from the input stream, suffixed by a {@code 0} byte.
    * @return string
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   public final String readString() throws IOException {
     final ByteList bl = new ByteList();
@@ -155,7 +155,7 @@ public class BufferInput extends InputStream {
   /**
    * Reads a byte array from the input stream, suffixed by a {@code 0} byte.
    * @return token
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   public final byte[] readBytes() throws IOException {
     final ByteList bl = new ByteList();

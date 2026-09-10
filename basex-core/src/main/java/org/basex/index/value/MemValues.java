@@ -62,7 +62,7 @@ public final class MemValues extends ValueIndex {
       final int[] ids = idsList.get(id);
       if(data.meta.updindex) {
         final IntList tmp = new IntList();
-        for(int i = 0; i < size; ++i) tmp.add(data.pre(ids[i]));
+        for(int i = 0; i < size; i++) tmp.add(data.pre(ids[i]));
         pres = tmp.sort().finish();
       } else {
         pres = ids;
@@ -96,7 +96,7 @@ public final class MemValues extends ValueIndex {
       if(compare(key, range.min()) < (range.mni() ? 0 : 1) ||
          compare(key, range.max()) > (range.mxi() ? 0 : -1)) continue;
       final int[] ids = idsList.get(p);
-      for(int i = 0; i < len; ++i) pres.add(upd ? data.pre(ids[i]) : ids[i]);
+      for(int i = 0; i < len; i++) pres.add(upd ? data.pre(ids[i]) : ids[i]);
     }
     return pres.sort();
   }

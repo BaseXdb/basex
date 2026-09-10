@@ -87,7 +87,7 @@ public final class CreateBackup extends ABackup {
    * @param compress compress flag
    * @param sopts static options
    * @param cmd calling command instance (can be {@code null})
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   public static void backup(final String db, final String comment, final boolean compress,
       final StaticOptions sopts, final CreateBackup cmd) throws IOException {

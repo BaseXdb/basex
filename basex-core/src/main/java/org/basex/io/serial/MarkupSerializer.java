@@ -167,7 +167,7 @@ abstract class MarkupSerializer extends StandardSerializer {
   protected void delimitAttribute() throws IOException {
     if(indAttr && out.lineLength() > indAttrLength) {
       out.print('\n');
-      for(int i = 0; i < indAttrLength; ++i) out.print(' ');
+      for(int i = 0; i < indAttrLength; i++) out.print(' ');
     }
     out.print(' ');
   }

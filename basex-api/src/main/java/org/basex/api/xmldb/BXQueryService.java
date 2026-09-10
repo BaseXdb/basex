@@ -116,7 +116,7 @@ public final class BXQueryService implements XPathQueryService {
    * @param query query string
    * @param nodes nodes
    * @return resource set
-   * @throws XMLDBException exception
+   * @throws XMLDBException XMLDB exception
    */
   private BXResourceSet query(final String query, final Value nodes) throws XMLDBException {
     // creates a query instance

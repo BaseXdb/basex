@@ -496,9 +496,9 @@ public abstract class JavaCall extends Arr {
           }
         }
       }
-    } catch(final LinkageError err) {
+    } catch(final LinkageError ex) {
       // referenced class could not be linked (e.g. temporarily unavailable during a rebuild)
-      throw JAVAINIT_X_X.get(info, Util.className(err), err);
+      throw JAVAINIT_X_X.get(info, Util.className(ex), ex);
     }
     return list;
   }

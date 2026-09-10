@@ -73,7 +73,7 @@ public final class OptimizeAll extends ACreate {
    * @param context database context
    * @param options main options
    * @param cmd command reference or {@code null}
-   * @throws IOException I/O Exception during index rebuild
+   * @throws IOException I/O exception
    * @throws BaseXException database exception
    */
   public static void optimizeAll(final Data data, final Context context, final MainOptions options,

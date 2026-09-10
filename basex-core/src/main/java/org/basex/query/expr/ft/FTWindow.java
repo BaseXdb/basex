@@ -96,7 +96,7 @@ public final class FTWindow extends FTFilter {
 
     // find a window offset with no excluded match inside
     final int w = n - pos(end, lexer) + pos(first.start, lexer);
-    for(int s = pos(first.start, lexer) - w; s <= pos(first.start, lexer); ++s) {
+    for(int s = pos(first.start, lexer) - w; s <= pos(first.start, lexer); s++) {
       boolean h = false;
       for(final FTStringMatch sm : excludes) {
         h = pos(sm.start, lexer) >= s && pos(sm.end, lexer) <= s + w;

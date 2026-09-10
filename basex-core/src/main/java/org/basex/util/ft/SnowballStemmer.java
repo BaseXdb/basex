@@ -85,10 +85,10 @@ final class SnowballStemmer extends ExternalStemmer<SnowballStemmer.StemmerClass
 
   /**
    * Methods of a particular stemmer.
-   * @param clz        Class implementing the stemmer.
-   * @param setCurrent Method {@code setCurrent}.
-   * @param stem       Method {@code stem}.
-   * @param getCurrent Method {@code getCurrent}.
+   * @param clz class implementing the stemmer
+   * @param setCurrent method {@code setCurrent}
+   * @param stem method {@code stem}
+   * @param getCurrent method {@code getCurrent}
    */
   record StemmerClass(Class<?> clz, Method setCurrent, Method stem, Method getCurrent)
       implements ExternalStemmer.StemmerClass { }

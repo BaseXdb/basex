@@ -85,7 +85,7 @@ final class FingerTreeIterator<E> implements ListIterator<E> {
    * @param <E> element type
    * @param tree finger tree
    * @param start starting position
-   * @return the iterator
+   * @return iterator
    */
   static <E> ListIterator<E> get(final FingerTree<?, E> tree, final long start) {
     if(tree.isEmpty()) return Collections.emptyListIterator();

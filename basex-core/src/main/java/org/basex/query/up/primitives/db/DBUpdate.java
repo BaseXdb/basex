@@ -31,13 +31,13 @@ public abstract class DBUpdate extends DataUpdate implements Comparable<DBUpdate
 
   /**
    * Applies this operation.
-   * @throws QueryException exception
+   * @throws QueryException query exception
    */
   public abstract void apply() throws QueryException;
 
   /**
    * Prepares this operation.
-   * @throws QueryException exception
+   * @throws QueryException query exception
    */
   public abstract void prepare() throws QueryException;
 }

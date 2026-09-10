@@ -64,7 +64,7 @@ public final class Window extends Clause {
    * @param st start condition
    * @param nd end condition, might be {@code null}
    * @return non-{@code null} variables
-   * @throws QueryException query exception if the variable names are not unique
+   * @throws QueryException query exception
    */
   private static Var[] vars(final Var vr, final Condition st, final Condition nd)
       throws QueryException {
@@ -236,7 +236,7 @@ public final class Window extends Clause {
        * Tries to advance the start of the queue by one element and returns the removed
        * element in case of success, {@code null} otherwise.
        * @return removed element or {@code null}
-       * @throws QueryException evaluation exception
+       * @throws QueryException query exception
        */
       private Item advance() throws QueryException {
         Item item = queue.pollFirst();
@@ -366,7 +366,7 @@ public final class Window extends Clause {
      * Reads the next item from {@code iter} if it is not {@code null} and sets it to
      * {@code null} if it is drained.
      * @return next item or {@code null}
-     * @throws QueryException evaluation exception
+     * @throws QueryException query exception
      */
     final Item next() throws QueryException {
       if(iter == null) return null;
@@ -380,7 +380,7 @@ public final class Window extends Clause {
      * @param qc query context
      * @param sub sub-evaluator
      * @return {@code true} if the next round could be prepared, {@code false} otherwise
-     * @throws QueryException evaluation exception
+     * @throws QueryException query exception
      */
     boolean prepareNext(final QueryContext qc, final Eval sub) throws QueryException {
       if(!sub.next(qc)) return false;
@@ -408,7 +408,7 @@ public final class Window extends Clause {
     /**
      * Reads a new current item and populates the {@code next} variable if it's used.
      * @return next item
-     * @throws QueryException evaluation exception
+     * @throws QueryException query exception
      */
     final boolean readNext() throws QueryException {
       prev = curr;
@@ -431,7 +431,7 @@ public final class Window extends Clause {
      * @param qc query context
      * @return {@code true} if the current binding satisfies the start condition,
      *   {@code false} otherwise
-     * @throws QueryException evaluation exception
+     * @throws QueryException query exception
      */
     final boolean findStart(final QueryContext qc) throws QueryException {
       while(readNext()) {

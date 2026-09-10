@@ -160,7 +160,7 @@ public final class SaxonTransform {
    * @param transformer transformer
    * @param destination destination of the principal result
    * @throws QueryException query exception
-   * @throws SaxonApiException Saxon exception
+   * @throws SaxonApiException Saxon API exception
    */
   private void invoke(final Xslt30Transformer transformer, final Destination destination)
       throws QueryException, SaxonApiException {

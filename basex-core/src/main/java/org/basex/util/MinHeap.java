@@ -48,7 +48,7 @@ public final class MinHeap<K, V> {
 
   /**
    * Removes the minimum from this heap.
-   * @return the removed entry's value
+   * @return removed entry's value
    */
   public V removeMin() {
     final V val = minValue();
@@ -118,7 +118,7 @@ public final class MinHeap<K, V> {
 
   /**
    * Verifies the inner structure of the heap.
-   * @throws IllegalStateException if the invariants do not hold
+   * @throws IllegalStateException illegal state exception
    */
   void verify() {
     verify(0);
@@ -127,7 +127,7 @@ public final class MinHeap<K, V> {
   /**
    * Checks if the heap invariant holds for the node at position {@code i}.
    * @param i position of the node
-   * @throws IllegalStateException if the invariants do not hold
+   * @throws IllegalStateException illegal state exception
    */
   private void verify(final int i) {
     if(2 * i + 1 < size) {

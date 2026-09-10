@@ -360,7 +360,7 @@ public final class SeqType {
    * @param qc query context
    * @param info input info (can be {@code null})
    * @return converted value
-   * @throws QueryException if the conversion was not possible
+   * @throws QueryException query exception
    */
   public Value coerce(final Value value, final QueryContext qc, final InputInfo info)
       throws QueryException {
@@ -375,7 +375,7 @@ public final class SeqType {
    * @param name variable name (used for error message, can be {@code null})
    * @param cc compilation context ({@code null} during runtime)
    * @return converted value
-   * @throws QueryException if the conversion was not possible
+   * @throws QueryException query exception
    */
   public Value coerce(final Value value, final QueryContext qc, final InputInfo info,
       final QNm name, final CompileContext cc) throws QueryException {

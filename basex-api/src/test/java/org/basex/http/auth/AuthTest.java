@@ -47,7 +47,7 @@ public abstract class AuthTest extends HTTPTest {
 
   /**
    * Successful request.
-   * @throws Exception Exception
+   * @throws Exception exception
    */
   @Test public void sendRequestOk() throws Exception {
     assertEquals("200", sendRequest("admin", NAME));
@@ -55,7 +55,7 @@ public abstract class AuthTest extends HTTPTest {
 
   /**
    * Failed request.
-   * @throws Exception Exception
+   * @throws Exception exception
    */
   @Test public void sendRequestFail() throws Exception {
     assertEquals("401", sendRequest("unknown", "wrong"));
@@ -88,7 +88,7 @@ public abstract class AuthTest extends HTTPTest {
    * @param user user
    * @param pass password
    * @return code
-   * @throws Exception Exception
+   * @throws Exception exception
    */
   private static String sendRequest(final String user, final String pass) throws Exception {
     try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(

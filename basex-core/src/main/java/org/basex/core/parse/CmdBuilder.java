@@ -55,7 +55,7 @@ public final class CmdBuilder {
    */
   public CmdBuilder args() {
     final int as = cmd.args.length;
-    for(int a = 0; a < as; ++a) arg(a);
+    for(int a = 0; a < as; a++) arg(a);
     return this;
   }
 

@@ -46,7 +46,7 @@ public final class AdminStressTest extends SandboxTest {
     final CountDownLatch start = new CountDownLatch(1);
     final CountDownLatch stop = new CountDownLatch(NUM);
     final SandboxClient[] clients = new SandboxClient[NUM];
-    for(int i = 0; i < NUM; ++i) clients[i] = new SandboxClient(new ShowSessions(), start, stop);
+    for(int i = 0; i < NUM; i++) clients[i] = new SandboxClient(new ShowSessions(), start, stop);
     start.countDown(); // start all clients
     stop.await();
     for(final SandboxClient c : clients) {

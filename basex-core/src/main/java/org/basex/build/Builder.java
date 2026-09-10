@@ -294,9 +294,9 @@ public abstract class Builder extends Job {
 
   /**
    * Adds a text node to the database.
-   * @param value the token to be added
+   * @param value token to be added
    * @param dist distance to parent
-   * @param kind the node kind
+   * @param kind node kind
    * @throws IOException I/O exception
    */
   protected abstract void addText(byte[] value, int dist, byte kind) throws IOException;
@@ -343,7 +343,7 @@ public abstract class Builder extends Job {
     addElem(dis, nameId, Math.min(IO.MAXATTS, as + 1), uriId, !nsp.isEmpty());
 
     // get and store attribute references
-    for(int a = 0; a < as; ++a) {
+    for(int a = 0; a < as; a++) {
       final byte[] an = atts.name(a), av = atts.value(a), ap = prefix(an);
       nameId = attrNames.store(an, av);
       uriId = nspaces.uriIdForPrefix(ap, false);
@@ -373,8 +373,8 @@ public abstract class Builder extends Job {
 
   /**
    * Adds a simple text, comment or processing instruction to the database.
-   * @param value the value to be added
-   * @param kind the node type
+   * @param value value to be added
+   * @param kind node type
    * @throws IOException I/O exception
    */
   private void addText(final byte[] value, final byte kind) throws IOException {

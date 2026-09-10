@@ -222,7 +222,7 @@ public final class RestXqFunction extends WebFunction {
    * @param qc query context
    * @param mopts main options
    * @return arguments
-   * @throws QueryException exception
+   * @throws QueryException query exception
    * @throws IOException I/O exception
    */
   Expr[] bind(final Object ext, final HTTPConnection conn, final QueryContext qc,
@@ -411,7 +411,7 @@ public final class RestXqFunction extends WebFunction {
    * @param info input info (can be {@code null})
    * @param msg error message
    * @param ext error extension
-   * @return QueryException query exception
+   * @return query exception
    */
   static QueryException error(final InputInfo info, final String msg, final Object... ext) {
     return BASEX_RESTXQ_X.get(info, Util.info(msg, ext));

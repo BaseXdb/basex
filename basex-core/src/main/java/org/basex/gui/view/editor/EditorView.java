@@ -695,8 +695,8 @@ public final class EditorView extends View {
       if(button == B_YES) {
         try {
           file.open();
-        } catch(final IOException ioex) {
-          Util.debug(ioex);
+        } catch(final IOException ex2) {
+          Util.debug(ex2);
           Desktop.getDesktop().open(file.file());
         }
       }
@@ -920,7 +920,7 @@ public final class EditorView extends View {
   private static int pos(final byte[] text, final int line, final int col) {
     final int tl = text.length;
     int ep = tl;
-    for(int t = 0, l = 1, c = 1; t < tl; ++c, t += cl(text, t)) {
+    for(int t = 0, l = 1, c = 1; t < tl; c++, t += cl(text, t)) {
       if(l > line || l == line && c == col) {
         ep = t;
         break;

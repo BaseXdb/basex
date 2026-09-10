@@ -40,7 +40,7 @@ final class GUIToolBar extends BaseXToolBar {
    */
   void refresh() {
     final int cl = commands.length;
-    for(int c = 0; c < cl; ++c) {
+    for(int c = 0; c < cl; c++) {
       final GUICommand cmd = commands[c];
       if(cmd != null) {
         final AbstractButton button = (AbstractButton) getComponent(c);

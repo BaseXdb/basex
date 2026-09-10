@@ -34,7 +34,7 @@ final class TaskContext {
      * Runs the operation.
      * @param pool fork/join pool
      * @return result
-     * @throws Exception any exception
+     * @throws Exception exception
      */
     Value apply(ForkJoinPool pool) throws Exception;
   }

@@ -127,7 +127,7 @@ public final class LocalVars {
 
   /**
    * Pops one variable context from the stack.
-   * @return the removed context's variable scope
+   * @return removed context's variable scope
    */
   public VarScope popContext() {
     return vars.removeLast().vs;

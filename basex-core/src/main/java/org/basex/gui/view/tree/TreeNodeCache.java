@@ -29,18 +29,18 @@ final class TreeNodeCache {
     final IntList roots = data.resources.docs();
     alil.add(new IntList());
     final int rs = roots.size();
-    for(int i = 0; i < rs; ++i) {
+    for(int i = 0; i < rs; i++) {
       final int root = roots.get(i);
       alil.getFirst().add(root);
       final int sh = i + 1 == rs ? ts : roots.get(i + 1);
-      for(int p = root + 1; p < sh; ++p) {
+      for(int p = root + 1; p < sh; p++) {
         final int k = data.kind(p);
         if(!atts && k == Data.ATTR) continue;
         final int par = data.parent(p, k);
         int lv = -1;
         final int is = alil.size();
         while(++lv < is && par != alil.get(lv).peek());
-        for(int j = is; j <= lv + 1; ++j) alil.add(new IntList());
+        for(int j = is; j <= lv + 1; j++) alil.add(new IntList());
         alil.get(lv + 1).add(p);
       }
     }
@@ -74,7 +74,7 @@ final class TreeNodeCache {
   TreeBorder[] subtree(final Data d, final int pre) {
     final TreeBorder[] bo = new TreeBorder[maxLevel];
     if(pre == 0 && d.meta.ndocs == 1) {
-      for(int i = 0; i < maxLevel; ++i) bo[i] = new TreeBorder(i, 0, nodes[i].size());
+      for(int i = 0; i < maxLevel; i++) bo[i] = new TreeBorder(i, 0, nodes[i].size());
       return bo;
     }
 
@@ -86,12 +86,12 @@ final class TreeNodeCache {
     final int np = pre + d.size(pre, d.kind(pre));
     int h = 1;
 
-    for(int i = rl + 1; i < maxLevel; ++i) {
+    for(int i = rl + 1; i < maxLevel; i++) {
       final int min = getMinIndex(i, pre, np);
       if(min == -1) break;
       int c = 0;
       final int ns = nodes[i].size();
-      for(int j = min; j < ns; ++j) {
+      for(int j = min; j < ns; j++) {
         if(nodes[i].get(j) < np) ++c;
         else break;
       }
@@ -109,7 +109,7 @@ final class TreeNodeCache {
   private int[] findPre(final int pre) {
     int pos = -1;
     int l;
-    for(l = 0; l < maxLevel; ++l) {
+    for(l = 0; l < maxLevel; l++) {
       pos = searchPreArrayPos(l, 0, nodes[l].size() - 1, pre);
       if(pos > -1) break;
     }
@@ -122,7 +122,7 @@ final class TreeNodeCache {
    * @param l left array border
    * @param r right array border
    * @param pre PRE value
-   * @return the determined index position
+   * @return determined index position
    */
   int searchPreArrayPos(final int lv, final int l, final int r, final int pre) {
     return searchPreIndex(lv, pre, pre, l, r);

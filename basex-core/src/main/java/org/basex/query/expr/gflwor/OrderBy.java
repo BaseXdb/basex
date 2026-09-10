@@ -65,7 +65,7 @@ public final class OrderBy extends Clause {
       /**
        * Caches and sorts all incoming tuples.
        * @param qc query context
-       * @throws QueryException evaluation exception
+       * @throws QueryException query exception
        */
       private void sort(final QueryContext qc) throws QueryException {
         // keys are stored at odd positions, values at even ones

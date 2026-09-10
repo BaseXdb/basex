@@ -189,7 +189,7 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
     final E[] lst = list;
     final int s = size;
     int ns = 0;
-    for(int i = 0; i < s; ++i) {
+    for(int i = 0; i < s; i++) {
       if(!equals(lst[i], element)) lst[ns++] = lst[i];
     }
     Arrays.fill(lst, ns, s, null);
@@ -210,7 +210,7 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
 
   /**
    * Pops the uppermost element from the stack.
-   * @return the popped element
+   * @return popped element
    */
   public final E pop() {
     final E[] lst = list;

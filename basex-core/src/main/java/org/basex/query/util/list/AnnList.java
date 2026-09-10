@@ -64,7 +64,7 @@ public final class AnnList implements Iterable<Ann> {
   /**
    * Adds an annotation.
    * @param ann annotation to be added
-   * @return a new instance
+   * @return new instance
    */
   public AnnList attach(final Ann ann) {
     final int al = anns.length;
@@ -92,7 +92,7 @@ public final class AnnList implements Iterable<Ann> {
   /**
    * Returns the intersection of these annotations and the given ones.
    * @param list other annotations
-   * @return a new instance with all annotations, or {@code null} if intersection is not possible
+   * @return new instance with all annotations, or {@code null} if intersection is not possible
    */
   public AnnList intersect(final AnnList list) {
     final ArrayList<Ann> tmp = new ArrayList<>();
@@ -124,7 +124,7 @@ public final class AnnList implements Iterable<Ann> {
   /**
    * Returns the unions of these annotations and the given ones.
    * @param list annotations
-   * @return a new instance with annotations that are present in both lists
+   * @return new instance with annotations that are present in both lists
    */
   public AnnList union(final AnnList list) {
     final ArrayList<Ann> tmp = new ArrayList<>();

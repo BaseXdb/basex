@@ -417,7 +417,7 @@ public final class PlotView extends View {
    * @param g graphics reference
    * @param x x coordinate
    * @param y y coordinate
-   * @param focus a focused item is drawn
+   * @param focus focused item is drawn
    * @param marked item is marked
    * @param sub item is a child of a marked node
    */
@@ -664,7 +664,7 @@ public final class PlotView extends View {
 
   /**
    * Creates a buffered image for a given string which serves as axis caption.
-   * @param g Graphics reference
+   * @param g graphics reference
    * @param caption caption string
    * @param im intermediate caption (lighter color)
    * @param imgW image width
@@ -692,7 +692,7 @@ public final class PlotView extends View {
 
   /**
    * Draws intermediate grid lines without caption.
-   * @param g Graphics reference
+   * @param g graphics reference
    * @param drawX draw line for x-axis
    * @param d relative position of grid line
    * @param caption caption to draw (if {@code null}, no caption is drawn)
@@ -863,7 +863,7 @@ public final class PlotView extends View {
     int dist = Integer.MAX_VALUE;
     // all displayed items are tested for focus
     final int pl = plotData.pres.length;
-    for(int i = 0; i < pl && dist != 0; ++i) {
+    for(int i = 0; i < pl && dist != 0; i++) {
       // coordinates and distances for current tested item are calculated
       final int x = calcCoordinate(true, plotData.xAxis.co[i]);
       final int y = calcCoordinate(false, plotData.yAxis.co[i]);

@@ -45,7 +45,7 @@ public abstract class Preds extends Arr {
         final long size = root.size();
         if(size != -1) cc.updateFocus(size);
       }
-      for(int e = 0; e < el; ++e) {
+      for(int e = 0; e < el; e++) {
         exprs[e] = cc.compileOrError(exprs[e], false);
         cc.updateFocus(1);
       }

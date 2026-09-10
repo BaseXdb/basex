@@ -364,7 +364,7 @@ public final class HtmlParser extends XMLParser {
      * @param library external library
      * @param name name of function that is asking for this parser
      * @param info input info (can be {@code null})
-     * @throws QueryException query exception,
+     * @throws QueryException query exception
      */
     static void ensureAvailable(final ExternalLib library, final QNm name, final InputInfo info)
         throws QueryException {
@@ -374,7 +374,7 @@ public final class HtmlParser extends XMLParser {
 
     /**
      * Returns the parser associated with the specified HTML options.
-     * @param options HTML options.
+     * @param options HTML options
      * @return parser (can be {@code null})
      */
     public static Parser of(final HtmlOptions options) {
@@ -384,7 +384,7 @@ public final class HtmlParser extends XMLParser {
     /**
      * Returns the parser associated with the specified HTML options, if any, or the specified
      * default parser.
-     * @param options HTML options.
+     * @param options HTML options
      * @param parser default parser (can be {@code null})
      * @return parser (can be {@code null})
      */

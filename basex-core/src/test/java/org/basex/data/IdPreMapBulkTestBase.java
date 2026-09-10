@@ -105,12 +105,12 @@ public abstract class IdPreMapBulkTestBase {
 
     @Override
     public void insert(final int pre, final int id, final int c) {
-      for(int i = 0; i < c; ++i) idlist.add(pre + i, id + i);
+      for(int i = 0; i < c; i++) idlist.add(pre + i, id + i);
     }
 
     @Override
     public void delete(final int pre, final int id, final int c) {
-      for(int i = 0; i < -c; ++i) idlist.remove(pre);
+      for(int i = 0; i < -c; i++) idlist.remove(pre);
     }
 
     @Override
@@ -136,7 +136,7 @@ public abstract class IdPreMapBulkTestBase {
     public String toString() {
       final StringBuilder spres = new StringBuilder(), sids = new StringBuilder();
       final int is = idlist.size();
-      for(int i = 0; i < is; ++i) {
+      for(int i = 0; i < is; i++) {
         spres.append(i).append(' ');
         sids.append(idlist.get(i)).append(' ');
       }

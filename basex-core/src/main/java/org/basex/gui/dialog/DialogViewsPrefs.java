@@ -23,7 +23,7 @@ final class DialogViewsPrefs extends BaseXBack {
   private final BaseXTextField labels;
 
   /** Slim rectangles to text length. */
-  private final BaseXCheckBox treeSlims;
+  private final BaseXCheckBox treeSlim;
   /** Show attributes. */
   private final BaseXCheckBox treeAtts;
 
@@ -58,7 +58,7 @@ final class DialogViewsPrefs extends BaseXBack {
     final GUIOptions gopts = gui.gopts;
     labels = new BaseXTextField(dialog, GUIOptions.LABELS, gopts);
     mousefocus = new BaseXCheckBox(dialog, RT_FOCUS, GUIOptions.MOUSEFOCUS, gopts);
-    treeSlims = new BaseXCheckBox(dialog, ADJUST_NODES, GUIOptions.TREESLIMS, gopts);
+    treeSlim = new BaseXCheckBox(dialog, ADJUST_NODES, GUIOptions.TREESLIM, gopts);
     treeAtts = new BaseXCheckBox(dialog, SHOW_ATTS, GUIOptions.TREEATTS, gopts);
     mapAlgo = new BaseXCombo(dialog, GUIOptions.MAPALGO, gopts, MAP_LAYOUTS);
     mapOffsets = new BaseXCombo(dialog, GUIOptions.MAPOFFSETS, gopts, MAP_CHOICES);
@@ -85,7 +85,7 @@ final class DialogViewsPrefs extends BaseXBack {
 
     pp = new BaseXBack(new RowLayout());
     pp.add(new BaseXLabel(TREE + COL, true, true));
-    pp.add(treeSlims);
+    pp.add(treeSlim);
     pp.add(treeAtts);
     p.add(pp);
 
@@ -130,7 +130,7 @@ final class DialogViewsPrefs extends BaseXBack {
    */
   boolean action(final Object source) {
     mousefocus.assign();
-    treeSlims.assign();
+    treeSlim.assign();
     treeAtts.assign();
     mapAtts.assign();
     labels.assign();

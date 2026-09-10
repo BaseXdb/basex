@@ -18,7 +18,7 @@ final class LeafNode implements Node<Item, Item> {
 
   /**
    * Constructor.
-   * @param values the values
+   * @param values values
    */
   LeafNode(final Item[] values) {
     this.values = values;

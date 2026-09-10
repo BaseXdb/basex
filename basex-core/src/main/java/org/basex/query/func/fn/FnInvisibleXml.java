@@ -78,7 +78,7 @@ public final class FnInvisibleXml extends StandardFunc {
     /**
      * Generate a parser from an invisible XML grammar.
      * @param qc query context
-     * @return the parsing function
+     * @return parsing function
      * @throws QueryException query exception
      */
     public FuncItem generate(final QueryContext qc) throws QueryException {

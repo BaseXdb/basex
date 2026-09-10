@@ -739,7 +739,7 @@ public abstract class PlanFn extends StandardFunc {
   /**
    * Returns a mixed-layout item.
    * @param node node
-   * @param parent parent (can be {@code null}
+   * @param parent parent (can be {@code null})
    * @param plan plan
    * @param qc query context
    * @param ignoreEmpty ignore empty text nodes

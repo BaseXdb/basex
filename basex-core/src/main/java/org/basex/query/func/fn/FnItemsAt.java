@@ -212,7 +212,7 @@ public final class FnItemsAt extends StandardFunc {
    * of an input expression.
    * @param input input expression
    * @param end end expression (can be {@code Empty#UNDEFINED})
-   * @return length, or {@code Long#MIN_VALUE} if the value cannot be statically retrieved.
+   * @return length, or {@code Long#MIN_VALUE} if the value cannot be statically retrieved
    */
   static long countInputDiff(final Expr input, final Expr end) {
     if(end != Empty.UNDEFINED) {

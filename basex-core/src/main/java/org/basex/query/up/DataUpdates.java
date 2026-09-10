@@ -106,7 +106,7 @@ final class DataUpdates {
     for(int i = 1; i <= sz; i++) nodes.add(nodeUpdates.key(i));
     nodes.sort();
 
-    for(int i = 0; i < sz; ++i) {
+    for(int i = 0; i < sz; i++) {
       final NodeUpdates updates = nodeUpdates.get(nodes.get(i));
       for(final NodeUpdate update : updates.updates) update.prepare(memData, qc);
     }
@@ -289,7 +289,7 @@ final class DataUpdates {
         set.add(pre);
       } else {
         final int ps = pre + data.attSize(pre, Data.ELEM);
-        for(int p = pre + 1; p < ps; ++p) {
+        for(int p = pre + 1; p < ps; p++) {
           if(!set.contains(p)) addAttribute.accept(p);
         }
       }

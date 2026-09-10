@@ -35,7 +35,7 @@ public final class DataPrinter {
     table.header.add(TABLENS);
     table.header.add(TABLEKND);
     table.header.add(TABLECON);
-    for(int i = 0; i < 6; ++i) table.align.add(true);
+    for(int i = 0; i < 6; i++) table.align.add(true);
   }
 
   /**
@@ -45,7 +45,7 @@ public final class DataPrinter {
    */
   public void add(final int start, final int end) {
     final int ps = Math.max(0, start), pe = Math.min(data.nodes(), end);
-    for(int p = ps; p < pe; ++p) add(p);
+    for(int p = ps; p < pe; p++) add(p);
     final byte[] ns = data.nspaces.table(ps, pe);
     if(ns.length != 0) nsp.add(NL).add(ns).add(data.nspaces.toString(ps, pe)).add(NL);
   }

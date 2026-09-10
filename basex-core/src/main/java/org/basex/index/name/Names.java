@@ -149,7 +149,7 @@ public final class Names extends TokenSet implements Index {
       final byte[] key = keys[o];
       tb.add("  ").add(key);
       final int kl = len - key.length;
-      for(int k = 0; k < kl; ++k) tb.add(' ');
+      for(int k = 0; k < kl; k++) tb.add(' ');
       tb.add(st[o] + Text.NL);
     }
     return tb.finish();

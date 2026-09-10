@@ -15,6 +15,6 @@ public enum LogType {
   REQUEST,
   /** OK. */
   OK,
-  /** Error.   */
+  /** Error. */
   ERROR
 }

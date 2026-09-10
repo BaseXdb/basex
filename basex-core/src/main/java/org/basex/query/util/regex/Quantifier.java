@@ -28,7 +28,7 @@ public final class Quantifier extends RegExp {
 
   /**
    * Get minimum number of occurrences.
-   * @return the minimum.
+   * @return minimum
    */
   public int getMin() {
     return min;

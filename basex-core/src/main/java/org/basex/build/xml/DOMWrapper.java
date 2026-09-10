@@ -56,7 +56,7 @@ public final class DOMWrapper extends Parser {
           nsp.reset();
           final NamedNodeMap at = n.getAttributes();
           final int as = at.getLength();
-          for(int a = 0; a < as; ++a) {
+          for(int a = 0; a < as; a++) {
             final Attr attr = (Attr) at.item(a);
             final byte[] an = token(attr.getName()), av = token(attr.getValue());
             if(eq(an, XMLNS)) {

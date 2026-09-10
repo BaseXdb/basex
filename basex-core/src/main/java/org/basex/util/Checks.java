@@ -5,7 +5,7 @@ package org.basex.util;
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
- * @param <T> the type of the input to the predicate
+ * @param <T> type of the input to the predicate
  */
 @FunctionalInterface
 public interface Checks<T> {

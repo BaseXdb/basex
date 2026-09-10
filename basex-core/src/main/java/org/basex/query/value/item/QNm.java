@@ -143,7 +143,7 @@ public final class QNm extends Item {
 
   /**
    * Sets the URI of this QName.
-   * @param u the URI to be set (can be {@code null}, or an empty or non-empty string)
+   * @param u URI to be set (can be {@code null}, or an empty or non-empty string)
    */
   public void uri(final byte[] u) {
     uri = u == null ? null : normalize(u);

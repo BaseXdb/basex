@@ -72,7 +72,7 @@ public abstract class Stemmer extends LanguageImpl {
   /**
    * Stems a word.
    * @param word input word to stem
-   * @return the stem of the word
+   * @return stem of the word
    */
   protected abstract byte[] stem(byte[] word);
 

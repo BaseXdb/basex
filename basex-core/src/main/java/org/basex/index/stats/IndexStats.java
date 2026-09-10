@@ -34,7 +34,7 @@ public final class IndexStats {
     occMax = new int[max];
     txtMin = new byte[max][];
     txtMax = new byte[max][];
-    for(int t = 0; t < max; ++t) {
+    for(int t = 0; t < max; t++) {
       txtMin[t] = Token.EMPTY;
       txtMax[t] = Token.EMPTY;
       occMin[t] = Integer.MAX_VALUE;
@@ -80,7 +80,7 @@ public final class IndexStats {
     tb.add(LI_ENTRIES).addInt(size).add(NL);
     int m = 0;
     int c = 0;
-    for(int o = 0; o < max; ++o) {
+    for(int o = 0; o < max; o++) {
       int tl = txtMin[o].length;
       if(tl == 0) ++c;
       else if(m < tl) m = tl;
@@ -105,7 +105,7 @@ public final class IndexStats {
       final int len) {
 
     final int ol = ocs.length;
-    for(int o = 0; o < ol; ++o) {
+    for(int o = 0; o < ol; o++) {
       final int tl = txt[o].length;
       if(tl == 0) continue;
       tb.add("  ").add(txt[o]);

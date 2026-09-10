@@ -143,7 +143,7 @@ final class DialogResources extends BaseXBack {
 
   /**
    * Reacts on user input.
-   * @param comp the action component
+   * @param comp action component
    */
   void action(final Object comp) {
     if(comp == filter && !filtered) {

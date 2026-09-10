@@ -87,7 +87,7 @@ public abstract class ConsoleReader implements AutoCloseable, PasswordReader {
 
     /**
      * Constructor.
-     * @throws IOException I/O error
+     * @throws IOException I/O exception
      */
     JLineConsoleReader() throws IOException {
       history = new FileHistory(new File(Prop.HOMEDIR, IO.BASEXSUFFIX + "history"));

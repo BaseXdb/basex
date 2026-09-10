@@ -128,7 +128,7 @@ abstract class TextDecoder {
       final int cl = Token.cl((byte) cp);
       final byte[] bytes = new byte[cl];
       bytes[0] = (byte) cp;
-      for(int c = 1; c < cl; ++c) {
+      for(int c = 1; c < cl; c++) {
         cp = ti.readByte();
         bytes[c] = (byte) cp;
         if(cp < 0x80 || cp > 0xBF) return invalid(cp < 0, Arrays.copyOf(bytes, cp < 0 ? c : c + 1));

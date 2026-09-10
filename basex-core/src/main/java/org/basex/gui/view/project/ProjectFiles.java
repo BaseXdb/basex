@@ -78,7 +78,7 @@ final class ProjectFiles {
    * @param content contents filter
    * @param root root directory
    * @return sorted file paths
-   * @throws InterruptedException interruption
+   * @throws InterruptedException interrupted exception
    */
   String[] filter(final String files, final ContentFilter content, final IOFile root)
       throws InterruptedException {
@@ -93,7 +93,7 @@ final class ProjectFiles {
    * @param max maximum number of hits
    * @param job job to be checked for interruptions (can be {@code null})
    * @return sorted file paths
-   * @throws InterruptedException interruption
+   * @throws InterruptedException interrupted exception
    */
   String[] filter(final String files, final ContentFilter content, final IOFile root,
       final int max, final Job job) throws InterruptedException {
@@ -129,7 +129,7 @@ final class ProjectFiles {
    * Refreshes the view after a file has been saved.
    * @param root root directory
    * @param ctx database context
-   * @throws InterruptedException interruption
+   * @throws InterruptedException interrupted exception
    */
   void parse(final IOFile root, final Context ctx) throws InterruptedException {
     final long id = ++parseId;
@@ -192,7 +192,7 @@ final class ProjectFiles {
    * Returns the current file cache.
    * @param root root directory
    * @return ID, or {@code null} if newer file cache exists
-   * @throws InterruptedException interruption
+   * @throws InterruptedException interrupted exception
    */
   private ProjectCache cache(final IOFile root) throws InterruptedException {
     final ProjectCache pc = cache;
@@ -222,7 +222,7 @@ final class ProjectFiles {
    * @param cache file cache
    * @param max maximum number of hits
    * @param job job to be checked for interruptions (can be {@code null})
-   * @throws InterruptedException interruption
+   * @throws InterruptedException interrupted exception
    */
   private static void filter(final String files, final ContentFilter content, final long id,
       final StringList results, final ProjectCache cache, final int max, final Job job)

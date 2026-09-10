@@ -131,7 +131,7 @@ public final class TypeCheck extends Single {
    * Creates an expression that checks the given expression's return type.
    * @param ex expression to check
    * @param cc compilation context
-   * @return the resulting expression, or {@code null} if no type check is necessary
+   * @return resulting expression, or {@code null} if no type check is necessary
    * @throws QueryException query exception
    */
   public Expr check(final Expr ex, final CompileContext cc) throws QueryException {

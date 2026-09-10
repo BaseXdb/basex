@@ -22,28 +22,28 @@ import org.basex.util.*;
  * @author Gunther Rademacher
  */
 public final class FnBuildDateTime extends DateTimeFn {
-  /** Field name: year.     */
+  /** Field name: year. */
   private static final Str YEAR     = Str.get("year");
-  /** Field name: month.    */
+  /** Field name: month. */
   private static final Str MONTH    = Str.get("month");
-  /** Field name: day.      */
+  /** Field name: day. */
   private static final Str DAY      = Str.get("day");
-  /** Field name: hours.    */
+  /** Field name: hours. */
   private static final Str HOURS    = Str.get("hours");
-  /** Field name: minutes.  */
+  /** Field name: minutes. */
   private static final Str MINUTES  = Str.get("minutes");
-  /** Field name: seconds.  */
+  /** Field name: seconds. */
   private static final Str SECONDS  = Str.get("seconds");
   /** Field name: timezone. */
   private static final Str TIMEZONE = Str.get("timezone");
 
-  /** Mask value: year.    */
+  /** Mask value: year. */
   private static final int Y  = 1;
-  /** Mask value: month.   */
+  /** Mask value: month. */
   private static final int MO = 2;
-  /** Mask value: day.     */
+  /** Mask value: day. */
   private static final int D  = 4;
-  /** Mask value: hours.   */
+  /** Mask value: hours. */
   private static final int H  = 8;
   /** Mask value: minutes. */
   private static final int MI = 16;
@@ -165,9 +165,9 @@ public final class FnBuildDateTime extends DateTimeFn {
 
   /**
    * Checks the month component for validity.
-   * @param month the  month to check
+   * @param month month to check
    * @param info input info for error reporting
-   * @throws QueryException if the month is out of range (not between 1 and 12)
+   * @throws QueryException query exception
    */
   private static void checkMonth(final long month, final InputInfo info) throws QueryException {
     if(month < 1 || month > 12) throw INVALIDVALUE_X_X.get(info, MONTH, month);

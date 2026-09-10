@@ -47,7 +47,7 @@ public final class IntFormat extends FormatParser {
     hasExplicitRadix = rc != -1;
 
     final byte[] pres = substring(picture, rc + 1, sc == -1 ? picture.length : sc);
-    if(pres.length == 0) throw PICEMPTY.get(info, picture);
+    if(pres.length == 0) throw PICEMPTY_X.get(info, picture);
     finish(presentation(pres, cpToken('1'), false, false));
     if(sc == -1) return;
 

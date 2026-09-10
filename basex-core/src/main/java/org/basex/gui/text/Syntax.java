@@ -28,7 +28,7 @@ abstract class Syntax {
    * @param extra additional levels this line is indented by
    * @param reference additional levels of the expression this line belongs to
    * @param type syntax-specific type of the line (XQuery: type of its FLWOR clause)
-   * @param separates the separators of the line separate the operands of the enclosing list
+   * @param separates separators of the line separate the operands of the enclosing list
    */
   record Indent(int extra, int reference, int type, boolean separates) {
     /** Line that is not indented. */

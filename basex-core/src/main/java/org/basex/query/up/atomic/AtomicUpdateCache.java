@@ -326,8 +326,8 @@ public final class AtomicUpdateCache {
 
   /**
    * Calculates the new distance value for the given node after updates have been applied.
-   * @param pre the new PRE value of the node after structural updates have been applied
-   * @param kind the KIND value
+   * @param pre new PRE value of the node after structural updates have been applied
+   * @param kind KIND value
    * @return new distance for the given PRE node
    */
   private int calculateNewDistance(final int pre, final int kind) {

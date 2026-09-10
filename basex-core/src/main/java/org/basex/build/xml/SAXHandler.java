@@ -254,8 +254,8 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
   /* public void fatalError(SAXParseException ex) { } */
 
   @Override
-  public void error(final SAXParseException e) throws SAXException {
-    throw new ValidationException(e);
+  public void error(final SAXParseException ex) throws SAXException {
+    throw new ValidationException(ex);
   }
 
   // LexicalHandler

@@ -80,7 +80,7 @@ public abstract class Command extends Job {
    * stream. If an exception occurs, a {@link BaseXException} is thrown.
    * @param ctx database context
    * @param os output stream reference
-   * @throws BaseXException command exception
+   * @throws BaseXException database exception
    */
   public final void execute(final Context ctx, final OutputStream os) throws BaseXException {
     // checks if the command performs updates
@@ -105,7 +105,7 @@ public abstract class Command extends Job {
    * If an exception occurs, a {@link BaseXException} is thrown.
    * @param ctx database context
    * @return string result
-   * @throws BaseXException command exception
+   * @throws BaseXException database exception
    */
   public final String execute(final Context ctx) throws BaseXException {
     final ArrayOutput ao = new ArrayOutput();

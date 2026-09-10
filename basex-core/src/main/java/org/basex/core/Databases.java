@@ -164,7 +164,7 @@ public final class Databases {
 
   /**
    * Checks if the specified character is a valid character for a database name.
-   * @param ch the character to be checked
+   * @param ch character to be checked
    * @param firstLast character is first or last
    * @return result of check
    */

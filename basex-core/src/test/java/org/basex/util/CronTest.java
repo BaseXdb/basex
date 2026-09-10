@@ -16,7 +16,7 @@ import org.junit.jupiter.api.*;
 public final class CronTest {
   /**
    * Tests the fields of an expression.
-   * @throws BaseXException unexpected error
+   * @throws BaseXException database exception
    */
   @Test public void fields() throws BaseXException {
     // minute, hour, day of month, month, day of week
@@ -34,7 +34,7 @@ public final class CronTest {
 
   /**
    * Tests lists, ranges, steps and names.
-   * @throws BaseXException unexpected error
+   * @throws BaseXException database exception
    */
   @Test public void syntax() throws BaseXException {
     next("0,30 * * * *", "2026-07-22T09:41:12", "2026-07-22T10:00:00");
@@ -59,7 +59,7 @@ public final class CronTest {
 
   /**
    * Tests the interaction of day of month and day of week.
-   * @throws BaseXException unexpected error
+   * @throws BaseXException database exception
    */
   @Test public void days() throws BaseXException {
     // only one field is restricted: conjunction
@@ -78,7 +78,7 @@ public final class CronTest {
 
   /**
    * Tests expressions with long gaps between two executions.
-   * @throws BaseXException unexpected error
+   * @throws BaseXException database exception
    */
   @Test public void leapYears() throws BaseXException {
     next("0 0 29 2 *", "2026-07-22T09:41:12", "2028-02-29T00:00:00");
@@ -90,7 +90,7 @@ public final class CronTest {
 
   /**
    * Tests how occurrences are projected onto a time zone with daylight saving.
-   * @throws BaseXException unexpected error
+   * @throws BaseXException database exception
    */
   @Test public void daylightSaving() throws BaseXException {
     // 2027-03-28: 02:00 is followed by 03:00; 2026-10-25: 02:00 occurs twice
@@ -148,7 +148,7 @@ public final class CronTest {
    * @param expression cron expression
    * @param from point in time
    * @param expected expected result
-   * @throws BaseXException unexpected error
+   * @throws BaseXException database exception
    */
   private static void next(final String expression, final String from, final String expected)
       throws BaseXException {

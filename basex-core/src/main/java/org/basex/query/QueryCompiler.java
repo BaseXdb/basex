@@ -34,7 +34,7 @@ final class QueryCompiler {
   /**
    * Compiles the main module.
    * @param cc compilation context
-   * @throws QueryException compilation errors
+   * @throws QueryException query exception
    */
   static void compile(final CompileContext cc) throws QueryException {
     for(final ArrayList<Scope> scps : new QueryCompiler().scopes(cc.qc.main)) {
@@ -92,7 +92,7 @@ final class QueryCompiler {
   /**
    * Adds a new scope and returns its ID.
    * @param scope scope to add
-   * @return the scope ID
+   * @return scope ID
    */
   private int addScope(final Scope scope) {
     final int id = scopes.size();
@@ -148,7 +148,7 @@ final class QueryCompiler {
 
       /**
        * Adds a neighbor of the currently inspected scope.
-       * @param scope the neighbor
+       * @param scope neighbor
        * @return {@code true} for convenience
        */
       private boolean add(final Scope scope) {

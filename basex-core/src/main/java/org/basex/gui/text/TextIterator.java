@@ -205,7 +205,7 @@ final class TextIterator {
     results.clear();
     final IntList starts = searchResults[0], ends = searchResults[1];
     int si = searchIndex;
-    for(final int ss = starts.size(); si < ss; ++si) {
+    for(final int ss = starts.size(); si < ss; si++) {
       final int s = starts.get(si), e = ends.get(si);
       if(s >= posEnd) break;
       results.add(new int[] { s, e });

@@ -196,7 +196,7 @@ final class TableData {
     final TableIterator ti = new TableIterator(data, this);
 
     final int ll = Math.min(nRows, MAXROWS);
-    for(int l = 0; l < ll; ++l) {
+    for(int l = 0; l < ll; l++) {
       // find all row contents and add string lengths
       ti.init(rows.get(l));
       while(ti.more()) cols[ti.col].width += data.textLen(ti.pre, ti.text);
@@ -204,11 +204,11 @@ final class TableData {
 
     // sort columns by string lengths
     final double[] widths = new double[cs];
-    for(int c = 0; c < cs; ++c) widths[c] = cols[c].width;
+    for(int c = 0; c < cs; c++) widths[c] = cols[c].width;
     final int[] il = Array.createOrder(widths, false);
 
     final TableCol[] cl = new TableCol[cs];
-    for(int c = 0; c < cs; ++c) cl[c] = cols[il[c]];
+    for(int c = 0; c < cs; c++) cl[c] = cols[il[c]];
     cols = cl;
 
     setWidths(false);
@@ -247,7 +247,7 @@ final class TableData {
 
     final byte[][] tokens = new byte[rows.size()][];
     final int rs = rows.size();
-    for(int r = 0; r < rs; ++r) {
+    for(int r = 0; r < rs; r++) {
       int p = rows.get(r);
       final int s = p + data.size(p, data.kind(p));
       while(p != s) {

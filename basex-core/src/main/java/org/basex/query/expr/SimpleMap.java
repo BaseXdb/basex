@@ -339,7 +339,7 @@ public abstract class SimpleMap extends Mapping {
    * @param mode mode of simplification
    * @param cc compilation context
    * @return converted or original expression
-   * @throws QueryException query context
+   * @throws QueryException query exception
    */
   private Expr toPath(final Simplify mode, final CompileContext cc) throws QueryException {
     final ExprList steps = new ExprList();

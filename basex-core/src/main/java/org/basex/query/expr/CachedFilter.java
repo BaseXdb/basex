@@ -57,7 +57,7 @@ public class CachedFilter extends Filter {
     final long vs = value.size();
     qf.size = vs;
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(int p = 1; p <= vs; ++p) {
+    for(int p = 1; p <= vs; p++) {
       qc.checkStop();
       final Item item = value.itemAt(p - 1);
       qf.value = item;

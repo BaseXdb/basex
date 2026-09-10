@@ -56,7 +56,7 @@ public final class HofTopKWith extends StandardFunc {
    * {@link QueryRTException} if the comparison throws a {@link QueryException}.
    * @param qc query context
    * @return comparator
-   * @throws QueryException exception
+   * @throws QueryException query exception
    */
   private Comparator<Item> comparator(final QueryContext qc) throws QueryException {
     final FItem comparator = toFunction(arg(1), 2, qc);

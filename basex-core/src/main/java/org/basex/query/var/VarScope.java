@@ -26,7 +26,7 @@ public final class VarScope {
   /**
    * Adds a variable to this scope.
    * @param var variable to be added
-   * @return the variable (for convenience)
+   * @return variable (for convenience)
    */
   public Var add(final Var var) {
     var.slot = vars.size();
@@ -40,7 +40,7 @@ public final class VarScope {
    * @param st type of the variable (can be {@code null})
    * @param qc query context
    * @param info input info (can be {@code null})
-   * @return the variable
+   * @return variable
    */
   public Var addNew(final QNm name, final SeqType st, final QueryContext qc, final InputInfo info) {
     return add(new Var(name, st, qc, info));
@@ -66,7 +66,7 @@ public final class VarScope {
 
   /**
    * Deletes all unused variables from this scope and assigns stack slots.
-   * @param scope the scope
+   * @param scope scope
    */
   public void cleanUp(final Scope scope) {
     final BitSet declared = new BitSet();

@@ -564,15 +564,15 @@ public class ShapeType extends MapType {
 
   /**
    * An ordered pair of objects.
-   * @param o1 first object.
-   * @param o2 second object.
+   * @param o1 first object
+   * @param o2 second object
    */
   private record Pair(Object o1, Object o2) {
     /**
      * Adds this {@code Pair} to the given set of {@code Pair}s, creating a new set if the given set
      * is empty.
      * @param pairs set of {@code Pair}s
-     * @return the augmented set of pairs
+     * @return augmented set of pairs
      */
     public Set<Pair> addTo(final Set<Pair> pairs) {
       if(pairs.isEmpty()) {

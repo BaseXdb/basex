@@ -196,7 +196,7 @@ public final class GUIInput extends BaseXCombo {
   private boolean completionsChanged(final StringList list) {
     final int ls = list.size();
     if(ls != completions.getItemCount()) return true;
-    for(int l = 0; l < ls; ++l) {
+    for(int l = 0; l < ls; l++) {
       if(!list.get(l).equals(completions.getItemAt(l))) return true;
     }
     return false;

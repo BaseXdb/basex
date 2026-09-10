@@ -119,7 +119,7 @@ public final class XMarkTest extends SandboxTest {
 
   /**
    * Initializes the tests.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @BeforeAll public static void init() throws Exception {
     // only start server if it is not already running
@@ -139,7 +139,7 @@ public final class XMarkTest extends SandboxTest {
 
   /**
    * Drops the test data and stops the server.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @AfterAll public static void close() throws Exception {
     try(ClientSession cs = createClient(UserText.ADMIN, NAME)) {
@@ -153,7 +153,7 @@ public final class XMarkTest extends SandboxTest {
 
   /**
    * Runs all tests and generates some test output.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @Test public void test() throws Exception {
     final IntList exclude = new IntList(new int[] { 11, 12 });

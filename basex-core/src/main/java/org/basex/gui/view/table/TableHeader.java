@@ -104,7 +104,7 @@ final class TableHeader extends BaseXPanel {
     w -= bs;
     double x = 0;
     final int nc = tdata.cols.length;
-    for(int n = 0; n < nc; ++n) {
+    for(int n = 0; n < nc; n++) {
       final double cw = w * tdata.cols[n].width;
       final double ce = x + cw;
 
@@ -196,7 +196,7 @@ final class TableHeader extends BaseXPanel {
     double x = 0;
     final TableCol[] cols = tdata.cols;
     final int tl = cols.length;
-    for(int i = 0; i < tl; ++i) {
+    for(int i = 0; i < tl; i++) {
       if(i > 0 && Math.abs(mx - x) < 3) return i;
       x += w * cols[i].width;
     }
@@ -212,21 +212,21 @@ final class TableHeader extends BaseXPanel {
       final double p = (double) (x - mouseX) / (getWidth() - view.scroll.getWidth());
       final double[] ww = new double[tdata.cols.length];
       final int wl = ww.length;
-      for(int w = 0; w < wl; ++w) ww[w] = tdata.cols[w].width;
+      for(int w = 0; w < wl; w++) ww[w] = tdata.cols[w].width;
 
       if(e.isShiftDown()) {
         ww[moveC - 1] += p;
         ww[moveC] -= p;
       } else {
-        for(int i = 0; i < moveC; ++i) ww[i] += p / moveC;
-        for(int i = moveC; i < wl; ++i) ww[i] -= p / (wl - moveC);
+        for(int i = 0; i < moveC; i++) ww[i] += p / moveC;
+        for(int i = moveC; i < wl; i++) ww[i] -= p / (wl - moveC);
       }
       for(final double w : ww) {
         if(w < 0.0001) return;
       }
       mouseX = x;
 
-      for(int w = 0; w < wl; ++w) tdata.cols[w].width = ww[w];
+      for(int w = 0; w < wl; w++) tdata.cols[w].width = ww[w];
     } else if(clickCol != -1) {
       int c = tdata.column(getWidth() - view.scroll.getWidth(), e.getX());
       if(c == -1) c = tdata.cols.length;

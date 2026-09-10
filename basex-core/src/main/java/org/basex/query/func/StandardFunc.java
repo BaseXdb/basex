@@ -683,7 +683,7 @@ public abstract class StandardFunc extends Arr {
     final Item item = expr.unwrappedItem(qc, info);
     final XQArray array = item.isEmpty() ? XQArray.empty() : toArray(item);
     final int as = (int) array.structSize();
-    if(as != function.arity()) throw APPLY_X_X.get(info, arguments(as), function, array);
+    if(as != function.arity()) throw APPLY_X_X_X.get(info, arguments(as), function, array);
 
     // copy persistent database nodes, share everything else with the invoked function
     final Value[] args = new Value[as];
@@ -1047,7 +1047,7 @@ public abstract class StandardFunc extends Arr {
   /**
    * Tries to lock a database supplied by the specified argument.
    * @param expr expression
-   * @param backup the argument may address a backup
+   * @param backup argument may address a backup
    * @param write write access
    * @param visitor visitor
    * @return result of check

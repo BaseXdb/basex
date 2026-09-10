@@ -483,7 +483,7 @@ public final class ArchiveModuleTest extends SandboxTest {
    * reads sizes from the central directory and accepts them. Verifies that local-file paths
    * use the tolerant {@code ZipFile}-based code path; eagerly-materialized binary inputs
    * remain subject to the streaming reader's strictness.
-   * @throws IOException test setup failure
+   * @throws IOException I/O exception
    */
   @Test public void storedWithDataDescriptor() throws IOException {
     final IOFile zip = new IOFile(Prop.TEMPDIR + NAME + "_stored_dd.zip");

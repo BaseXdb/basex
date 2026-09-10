@@ -33,8 +33,8 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
   /**
    * Creates a singleton finger tree containing the given leaf node.
    * @param <E> element type
-   * @param leaf the contained leaf
-   * @return the singleton finger tree
+   * @param leaf contained leaf
+   * @return singleton finger tree
    */
   public static <E> FingerTree<E, E> singleton(final Node<E, E> leaf) {
     return new SingletonTree<>(leaf);
@@ -51,7 +51,7 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
   /**
    * Returns the element at the given position in this tree.
    * @param index index of the element
-   * @return the element
+   * @return element
    */
   public final E get(final long index) {
     // iterate down the spine
@@ -150,7 +150,7 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
   /**
    * Returns the first element of this tree.
    * @return first element
-   * @throws NoSuchElementException if the tree is empty
+   * @throws NoSuchElementException no such element exception
    */
   public abstract Node<N, E> head();
 
@@ -163,7 +163,7 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
   /**
    * Returns the last element of this tree.
    * @return last element
-   * @throws NoSuchElementException if the tree is empty
+   * @throws NoSuchElementException no such element exception
    */
   public abstract Node<N, E> foot();
 
@@ -177,7 +177,7 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
    * Concatenates this finger tree with the given one.
    * @param mid nodes between the two trees
    * @param size sum of the sizes of all nodes in the middle array
-   * @param other the other tree
+   * @param other other tree
    * @return concatenation of both trees
    */
   public abstract FingerTree<N, E> concat(Node<N, E>[] mid, long size, FingerTree<N, E> other);
@@ -203,7 +203,7 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
    * @param pos position of the element to remove
    * @param job interruptible job
    * @return resulting (potentially partial) tree
-   * @throws AssertionError if this tree is empty
+   * @throws AssertionError assertion error
    */
   public abstract TreeSlice<N, E> remove(long pos, Job job);
 
@@ -278,7 +278,7 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
 
   /**
    * Adds all nodes in the given array to the given side of this tree.
-   * @param nodes the nodes
+   * @param nodes nodes
    * @param size sum of the sizes of all nodes in the array
    * @param left insertion direction, {@code true} adds to the left, {@code false} to the right
    * @return resulting tree
@@ -303,7 +303,7 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
    * Creates a {@link ListIterator} over the elements in this tree.
    * @param start starting position
    *   (i.e. the position initially returned by {@link ListIterator#nextIndex()})
-   * @return the list iterator
+   * @return list iterator
    */
   public final ListIterator<E> listIterator(final long start) {
     return FingerTreeIterator.get(this, start);

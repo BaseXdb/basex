@@ -144,7 +144,7 @@ public final class IcuFormatter extends Formatter {
     if(!eq(token(spelloutFormat.getLocale(ULocale.ACTUAL_LOCALE).getLanguage()), EN)) {
       result[0] = (byte) uc(result[0]);
     } else {
-      for(int i = 0; i < result.length; ++i) {
+      for(int i = 0; i < result.length; i++) {
         if(i == 0 || result[i - 1] == ' ' || result[i - 1] == '-') {
           result[i] = (byte) uc(result[i]);
         }
@@ -231,7 +231,7 @@ public final class IcuFormatter extends Formatter {
    * Determine rule set to be used for a given rule set name, by matching that name with supported
    * rule set names.
    * @param name proposed ruleset name
-   * @return a supported rule set name, or {@code null} if none available
+   * @return supported rule set name, or {@code null} if none available
    */
   private String ruleSet(final String name) {
     // try exact match first

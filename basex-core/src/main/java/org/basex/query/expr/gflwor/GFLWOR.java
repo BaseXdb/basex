@@ -108,7 +108,7 @@ public final class GFLWOR extends ParseExpr {
 
   /**
    * Creates a new evaluator for this FLWOR expression.
-   * @return the evaluator
+   * @return evaluator
    */
   private Eval newEval() {
     Eval eval = new StartEval();
@@ -1095,7 +1095,7 @@ public final class GFLWOR extends ParseExpr {
    * @param ex thrown exception
    * @param iter iterator positioned where the failing clause was before
    * @return {@code true} if the GFLWOR expression has to stay
-   * @throws QueryException query exception if the whole expression fails
+   * @throws QueryException query exception
    */
   private boolean clauseError(final QueryException ex, final ListIterator<Clause> iter)
       throws QueryException {

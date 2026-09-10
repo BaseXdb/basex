@@ -42,8 +42,8 @@ public final class XQueryModuleTest extends SandboxTest {
     query(func.args(" fn() { 1 }", " ()", " { 'timeout': 10 }"), 1);
 
     // arity mismatches
-    error(func.args(" fn($a) { $a }"), APPLY_X_X);
-    error(func.args(" fn($a) { $a }", " [ 1, 2 ]"), APPLY_X_X);
+    error(func.args(" fn($a) { $a }"), APPLY_X_X_X);
+    error(func.args(" fn($a) { $a }", " [ 1, 2 ]"), APPLY_X_X_X);
     // arguments must be supplied as array
     error(func.args(" fn($a) { $a }", " { 'a': 1 }"), INVTYPE_X);
     // maps and arrays are neither queries nor invocable functions

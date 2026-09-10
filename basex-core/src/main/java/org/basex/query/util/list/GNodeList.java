@@ -37,7 +37,7 @@ public final class GNodeList extends ObjectList<GNode, GNodeList> {
   /**
    * Returns an iterator over the items in this list.
    * The list must not be modified after the iterator has been requested.
-   * @return the iterator
+   * @return iterator
    */
   public BasicNodeIter iter() {
     return size == 0 ? BasicNodeIter.EMPTY : new BasicNodeIter() {
@@ -64,7 +64,7 @@ public final class GNodeList extends ObjectList<GNode, GNodeList> {
 
   /**
    * Invalidates all entries that are not referenced in the list.
-   * @return the iterator
+   * @return iterator
    */
   public GNodeList clean() {
     Arrays.fill(list, size, list.length, null);
@@ -89,7 +89,7 @@ public final class GNodeList extends ObjectList<GNode, GNodeList> {
   /**
    * Returns a node iterator.
    * @param nodes nodes
-   * @return the iterator
+   * @return iterator
    */
   public static BasicNodeIter iter(final GNode[] nodes) {
     final int nl = nodes.length;

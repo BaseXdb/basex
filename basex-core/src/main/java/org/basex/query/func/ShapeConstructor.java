@@ -17,6 +17,9 @@ import org.basex.util.hash.*;
 
 /**
  * Constructor function for a shape.
+ *
+ * @author BaseX Team, BSD License
+ * @author Christian Gruen
  */
 public final class ShapeConstructor extends StandardFunc {
   /** Shape. */
@@ -36,7 +39,7 @@ public final class ShapeConstructor extends StandardFunc {
     final int fs = fields.size();
     names = new QNm[fs];
     typed = new boolean[fs];
-    for(int f = 1; f <= fs; ++f) {
+    for(int f = 1; f <= fs; f++) {
       names[f - 1] = new QNm(fields.key(f));
     }
   }
@@ -59,7 +62,7 @@ public final class ShapeConstructor extends StandardFunc {
     final TokenObjectMap<ShapeField> fields = shapeType.fields();
     final int fs = fields.size(), el = exprs.length;
     final Value[] values = new Value[fs];
-    for(int f = 0; f < fs; ++f) {
+    for(int f = 0; f < fs; f++) {
       final ShapeField rf = fields.value(f + 1);
       final Expr expr = f < el ? exprs[f] : rf.init();
       final Value value = expr != null ? expr.value(qc) : Empty.VALUE;
@@ -82,7 +85,7 @@ public final class ShapeConstructor extends StandardFunc {
     // skip runtime coercion of values that already match the field type
     final TokenObjectMap<ShapeField> fields = shapeType.fields();
     final int fs = fields.size();
-    for(int f = 0; f < fs; ++f) {
+    for(int f = 0; f < fs; f++) {
       final ShapeField rf = fields.value(f + 1);
       final Expr expr = f < el ? exprs[f] : rf.init();
       typed[f] = expr != null && expr.seqType().instanceOf(rf.seqType());
@@ -128,7 +131,7 @@ public final class ShapeConstructor extends StandardFunc {
       Token.token(sh instanceof RecordType ? QueryText.RECORD : QueryText.MAP)).add('(');
     final TokenObjectMap<ShapeField> fields = sh.fields();
     final int max = fields.size(), min = sh.minFields();
-    for(int i = 1; i <= max; ++i) {
+    for(int i = 1; i <= max; i++) {
       if(i > 1) tb.add(", ");
       tb.add(fields.key(i));
       if(i > min) tb.add('?');
@@ -136,7 +139,7 @@ public final class ShapeConstructor extends StandardFunc {
     final String description = tb.add(')').toString();
 
     final SeqType[] params = new SeqType[max];
-    for(int i = 0; i < max; ++i) {
+    for(int i = 0; i < max; i++) {
       params[i] = fields.value(i + 1).seqType();
     }
 

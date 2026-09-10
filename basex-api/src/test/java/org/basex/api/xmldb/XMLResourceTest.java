@@ -29,7 +29,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
 
   /**
    * Initializes a test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @BeforeEach public void setUp() throws Exception {
     createDB();
@@ -41,7 +41,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
 
   /**
    * Finalizes a test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @AfterEach public void tearDown() throws Exception {
     collection.close();
@@ -50,7 +50,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
 
   /**
    * Test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @Test public void testParentCollection() throws Exception {
     assertEquals(resource.getParentCollection(), collection, "Wrong collection name.");
@@ -58,7 +58,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
 
   /**
    * Test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @Test public void testGetID() throws Exception {
     assertEquals(DOC1, resource.getId(), "Wrong ID.");
@@ -66,7 +66,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
 
   /**
    * Test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @Test public void testGetResourceType() throws Exception {
     assertEquals(XMLResource.RESOURCE_TYPE, resource.getResourceType(),
@@ -75,7 +75,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
 
   /**
    * Test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @Test public void testGetContent() throws Exception {
     compare(DOCPATH + DOC1, resource);
@@ -83,7 +83,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
 
   /**
    * Test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @Test public void testGetDocumentID() throws Exception {
     // ID and document ID should be identical
@@ -92,7 +92,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
 
   /**
    * Test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @Test public void testGetContentAsDOM() throws Exception {
     final Node node = resource.getContentAsDOM();
@@ -103,7 +103,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
 
   /**
    * Test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @Test public void testSetContentAsDOM() throws Exception {
     // store small document
@@ -127,7 +127,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
 
   /**
    * Test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @Test public void testGetContentAsSAX() throws Exception {
     final DefaultHandler ch = new DefaultHandler() {
@@ -147,7 +147,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
 
   /**
    * Test.
-   * @throws Exception any exception
+   * @throws Exception exception
    */
   @Test public void testSetContentAsSAX() throws Exception {
     // store small document
@@ -181,7 +181,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
    * Compares an XML resource with a file on disk.
    * @param file file name
    * @param resource resource
-   * @throws XMLDBException exception
+   * @throws XMLDBException XMLDB exception
    * @throws IOException I/O exception
    */
   private static void compare(final String file, final Resource resource)

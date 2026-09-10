@@ -18,7 +18,7 @@ final class PartialLeafNode implements NodeLike<Item, Item> {
 
   /**
    * Constructor.
-   * @param elems the elements
+   * @param elems elements
    */
   PartialLeafNode(final Item[] elems) {
     this.elems = elems;

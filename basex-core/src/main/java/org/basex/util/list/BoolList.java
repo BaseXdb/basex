@@ -92,7 +92,7 @@ public final class BoolList extends ElementList {
 
   /**
    * Pops the uppermost element from the stack.
-   * @return the popped element
+   * @return popped element
    */
   public boolean pop() {
     return list[--size];

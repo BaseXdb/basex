@@ -11,6 +11,9 @@ import org.basex.util.*;
 
 /**
  * Class loader cache.
+ *
+ * @author BaseX Team, BSD License
+ * @author Gunther Rademacher
  */
 final class ClassLoaderCache {
   /** Default class loader. */
@@ -95,7 +98,7 @@ final class ClassLoaderCache {
     /**
      * Constructor.
      * @param loader class loader
-     * @param lastModified the time stamps collected for the URLs at loader creation time
+     * @param lastModified time stamps collected for the URLs at loader creation time
      */
     private Loader(final URLClassLoader loader, final long[] lastModified) {
       this.loader = loader;

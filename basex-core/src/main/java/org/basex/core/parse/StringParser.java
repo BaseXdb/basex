@@ -351,7 +351,7 @@ final class StringParser extends CommandParser {
    * Prints some command info.
    * @param alt input alternatives
    * @param cmd input completions
-   * @return QueryException query exception
+   * @return query exception
    */
   private QueryException help(final Enum<?>[] alt, final Cmd cmd) {
     return error(alt, SYNTAX + COLS + cmd.help(true));

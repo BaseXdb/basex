@@ -23,7 +23,7 @@ public final class FnInScopeNamespaces extends StandardFunc {
 
     final MapBuilder mb = new MapBuilder();
     final int as = atts.size();
-    for(int a = 0; a < as; ++a) {
+    for(int a = 0; a < as; a++) {
       final byte[] name = atts.name(a), value = atts.value(a);
       final int nl = name.length, vl = value.length;
       if(nl + vl != 0) {

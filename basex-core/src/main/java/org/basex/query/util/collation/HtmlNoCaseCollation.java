@@ -31,7 +31,7 @@ final class HtmlNoCaseCollation extends Collation {
     final int tl = string.length(), sl = sub.length();
     if(sl == 0) return 0;
     if(tl >= sl) {
-      for(int t = mode == Mode.ENDS_WITH ? tl - sl : 0; t < tl; ++t) {
+      for(int t = mode == Mode.ENDS_WITH ? tl - sl : 0; t < tl; t++) {
         for(int s = 0; t + s < tl;) {
           if(compare(string.charAt(t + s), sub.charAt(s)) != 0) break;
           if(++s == sl) return mode == Mode.INDEX_AFTER ? t + s : t;

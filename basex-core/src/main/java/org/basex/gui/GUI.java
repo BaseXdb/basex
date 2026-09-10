@@ -45,7 +45,7 @@ import org.basex.util.options.Options.*;
  * @author Christian Gruen
  */
 public final class GUI extends JFrame implements BaseXWindow {
-  /** Database Context. */
+  /** Database context. */
   public final Context context;
   /** GUI options. */
   public final GUIOptions gopts;

@@ -47,7 +47,7 @@ public final class ServerCommandTest extends CommandTest {
 
   /**
    * Kill test.
-   * @throws IOException on server error
+   * @throws IOException I/O exception
    */
   @Test public void kill() throws IOException {
     ok(new Kill(UserText.ADMIN));

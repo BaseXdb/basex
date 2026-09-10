@@ -154,10 +154,10 @@ public final class DecFormatter extends FormatUtil {
    * Get the rendition value from an option value matching the pattern '.|.:.*', where the first
    * character identifies the marker, and the optional part following a colon is the rendition.
    * In absence of the colon part, the rendition value defaults to the marker character.
-   * @param name the option name
-   * @param value the option value
+   * @param name option name
+   * @param value option value
    * @param info input info (can be {@code null})
-   * @return the rendition value
+   * @return rendition value
    * @throws QueryException query exception
    */
   private static int[] renditionValue(final String name, final byte[] value, final InputInfo info)
@@ -174,7 +174,7 @@ public final class DecFormatter extends FormatUtil {
    * Returns a decimal formatter for the given language.
    * @param languageTag language tag
    * @param info input info (can be {@code null})
-   * @return a decimal formatter, or {@code null} if the language is not supported
+   * @return decimal formatter, or {@code null} if the language is not supported
    * @throws QueryException query exception
    */
   public static DecFormatter forLanguage(final byte[] languageTag, final InputInfo info)
@@ -463,7 +463,7 @@ public final class DecFormatter extends FormatUtil {
       // finalize integer-part-grouping-positions
       final IntList ipgp = pic.groupInt;
       final int igl = ipgp.size();
-      for(int g = 0; g < igl; ++g) ipgp.set(g, pic.minInt + optInt - ipgp.get(g));
+      for(int g = 0; g < igl; g++) ipgp.set(g, pic.minInt + optInt - ipgp.get(g));
 
       // check if integer-part-grouping-positions are regular
       // if yes, they are replaced with a single position
@@ -580,7 +580,7 @@ public final class DecFormatter extends FormatUtil {
       // create integer part
       final int sl = s.length();
       final int il = fracSep == -1 ? sl : fracSep;
-      for(int i = il; i < pic.minInt; ++i) intgr.add(zero);
+      for(int i = il; i < pic.minInt; i++) intgr.add(zero);
       for(int i = 0; i < il; i++) intgr.add(zero + s.charAt(i) - '0');
 
       // squeeze in grouping separators
@@ -601,7 +601,7 @@ public final class DecFormatter extends FormatUtil {
       // create fractional part
       final int fl = fracSep == -1 ? 0 : sl - il - 1;
       if(fl != 0) for(int i = fracSep + 1; i < sl; i++) fract.add(zero + s.charAt(i) - '0');
-      for(int i = fl; i < pic.minFrac; ++i) fract.add(zero);
+      for(int i = fl; i < pic.minFrac; i++) fract.add(zero);
 
       // squeeze in grouping separators in a reverse manner
       final int ul = fract.size();

@@ -289,7 +289,7 @@ public final class PathIndex implements Index {
     // sort by number of occurrences
     final int ns = nodes.size();
     final int[] tmp = new int[ns];
-    for(int i = 0; i < ns; ++i) tmp[i] = nodes.get(i).stats.count;
+    for(int i = 0; i < ns; i++) tmp[i] = nodes.get(i).stats.count;
     final int[] occs = Array.createOrder(tmp, false);
 
     // remove non-text/attribute nodes

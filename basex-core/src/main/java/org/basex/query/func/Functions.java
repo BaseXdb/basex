@@ -123,7 +123,7 @@ public final class Functions {
       final XQFunctionExpr fe = (XQFunctionExpr) expr;
       final int arity = fe.arity();
       final QNm[] names = new QNm[arity];
-      for(int a = 0; a < arity; ++a) names[a] = fe.paramName(a);
+      for(int a = 0; a < arity; a++) names[a] = fe.paramName(a);
       args = prepareArgs(fb, names, arity, expr);
       if(ph > 0) phPerm = preparePlaceholders(fb, names, args);
     }
@@ -375,7 +375,7 @@ public final class Functions {
    * @param name function name
    * @param updating flag for updating functions
    * @param context context-dependent flag
-   * @return the function expression
+   * @return function expression
    */
   private static Expr item(final Expr expr, final FuncBuilder fb, final FuncType ft,
       final QNm name, final boolean updating, final boolean context) {
@@ -429,7 +429,7 @@ public final class Functions {
    * @param fb function arguments
    * @param names parameter names
    * @param args arguments with optional placeholders
-   * @return an integer array, where the value at index i indicates the index in the parameter list
+   * @return integer array, where the value at index i indicates the index in the parameter list
    *         of the partially evaluated function of the i-th placeholder in the (positional) target
    *         function argument list.
    */
@@ -438,14 +438,14 @@ public final class Functions {
     final int[] phPerm = new int[fb.placeholders];
     final int posArgs = fb.arity - fb.keywords.size();
     int p = 0;
-    for(int a = 0; a < posArgs; ++a) {
+    for(int a = 0; a < posArgs; a++) {
       if(PartFunc.placeholder(args[a])) {
         phPerm[p] = p;
         ++p;
       }
     }
     final int nonKwPh = p;
-    for(int a = posArgs; a < fb.arity; ++a) {
+    for(int a = posArgs; a < fb.arity; a++) {
       if(PartFunc.placeholder(args[a])) {
         final QNm name = names[a];
         int i = nonKwPh;

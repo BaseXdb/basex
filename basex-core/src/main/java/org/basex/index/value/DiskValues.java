@@ -43,7 +43,7 @@ public class DiskValues extends ValueIndex {
    * Constructor, initializing the index structure.
    * @param data data reference
    * @param type index type
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   public DiskValues(final Data data, final IndexType type) throws IOException {
     this(data, type, fileSuffix(type));
@@ -54,7 +54,7 @@ public class DiskValues extends ValueIndex {
    * @param data data reference
    * @param type index type
    * @param prefix file prefix
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   DiskValues(final Data data, final IndexType type, final String prefix) throws IOException {
     super(data, type);
@@ -397,7 +397,7 @@ public class DiskValues extends ValueIndex {
     synchronized(monitor) {
       final int entries = size();
       final boolean text = type == IndexType.TEXT;
-      for(int index = 0; index < entries; ++index) {
+      for(int index = 0; index < entries; index++) {
         final int count = idxl.readNum(idxr.read5(index * 5L));
         int id = idxl.readNum();
         final int pre = pre(id);

@@ -22,7 +22,7 @@ final class Formatter {
 
   /**
    * State of a bracketed expression that is currently open.
-   * @param broken the expression is placed on several lines
+   * @param broken expression is placed on several lines
    * @param separated all operands of the expression are placed on separate lines
    * @param indent indentation of the line with the opening bracket
    */
@@ -30,7 +30,7 @@ final class Formatter {
 
   /**
    * State of an element that is currently open.
-   * @param mixed the content of the element contains text
+   * @param mixed content of the element contains text
    * @param level nesting depth of the enclosing content
    */
   private record Element(boolean mixed, int level) { }

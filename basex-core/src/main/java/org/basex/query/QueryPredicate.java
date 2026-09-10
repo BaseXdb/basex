@@ -5,14 +5,14 @@ package org.basex.query;
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
- * @param <T> the type of the input to the predicate
+ * @param <T> type of the input to the predicate
  */
 @FunctionalInterface
 public interface QueryPredicate<T> {
   /**
    * Evaluates this predicate on the given arguments.
    *
-   * @param t the input argument
+   * @param t input argument
    * @return result of check
    * @throws QueryException query exception
    */

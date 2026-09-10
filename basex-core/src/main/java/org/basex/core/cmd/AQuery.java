@@ -67,7 +67,7 @@ public abstract class AQuery extends Command {
         final boolean serialize = options.get(MainOptions.SERIALIZE);
         final boolean optplan = options.get(MainOptions.OPTPLAN);
         final int runs = Math.max(1, options.get(MainOptions.RUNS));
-        for(int r = 0; r < runs; ++r) {
+        for(int r = 0; r < runs; r++) {
           // reuse existing processor instance
           if(r != 0) {
             qp = null;

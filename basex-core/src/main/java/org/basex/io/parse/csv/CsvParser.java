@@ -30,7 +30,7 @@ public final class CsvParser {
   private final int quoteCharacter;
   /** Comment marker, {@code -1} if comments are not recognized. */
   private final int commentMarker;
-  /** Parse quotes.  */
+  /** Parse quotes. */
   private final boolean quotes;
   /** Trim whitespace (see {@link CsvOptions#TRIM_WHITESPACE}). */
   private final boolean trimWhitespace;
@@ -75,7 +75,7 @@ public final class CsvParser {
    * Parses a CSV expression.
    * @param ii input info (can be @null)
    * @throws QueryException query exception
-   * @throws IOException query I/O exception
+   * @throws IOException I/O exception
    */
   public void parse(final InputInfo ii) throws QueryException, IOException {
     final TokenBuilder entry = new TokenBuilder();
@@ -183,7 +183,7 @@ public final class CsvParser {
     if(rowSize == -1) rowSize = fields.size();
     final boolean select = selectColumns.length != 0;
     final int fs = fields.size(), n = select ? selectColumns.length : trimRows ? rowSize : fs;
-    for(int i = 0; i < n; ++i) {
+    for(int i = 0; i < n; i++) {
       final int index = select ? selectColumns[i] - 1 : i;
       final byte[] f = index < fs ? fields.get(index) : Token.EMPTY;
       if(data) {

@@ -331,8 +331,8 @@ public abstract class Job {
     } catch(final IOException | InterruptedException ex) {
       try {
         checkStop();
-      } catch(final JobException je) {
-        throw (JobException) je.initCause(ex);
+      } catch(final JobException ex2) {
+        throw (JobException) ex2.initCause(ex);
       }
       throw ex;
     } finally {

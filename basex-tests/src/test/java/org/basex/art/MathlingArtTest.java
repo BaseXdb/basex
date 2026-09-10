@@ -202,7 +202,7 @@ public class MathlingArtTest {
 
   /**
    * Discovers the available engines (reference first) and prepares an output directory for each.
-   * @throws Exception setup exception
+   * @throws Exception exception
    */
   private static void initProcessors() throws Exception {
     final List<XQueryProcessor> found = new ArrayList<>();
@@ -232,7 +232,7 @@ public class MathlingArtTest {
   /**
    * Locates and unpacks the test data and initialises the engines; skips all tests if the data
    * is missing.
-   * @throws Exception setup exception
+   * @throws Exception exception
    */
   @BeforeAll
   public static void setUp() throws Exception {
@@ -311,7 +311,7 @@ public class MathlingArtTest {
    * @param proc engine
    * @param id module id (path relative to {@code art})
    * @param module module path
-   * @throws Exception execution exception
+   * @throws Exception exception
    */
   private static void runModule(final XQueryProcessor proc, final String id, final Path module)
       throws Exception {
@@ -407,7 +407,7 @@ public class MathlingArtTest {
    * @param baseDir reference result folder
    * @param otherDir other engine's result folder
    * @return combined verdict string
-   * @throws Exception query / I/O exception
+   * @throws Exception exception
    */
   private static String compare(final Path baseDir, final Path otherDir) throws Exception {
     final String primary = xquery(resource("/mathling/compare.xq"),
@@ -478,7 +478,7 @@ public class MathlingArtTest {
   /**
    * Compares every non-reference engine against the reference, then renders and writes
    * {@code timing.md}.
-   * @throws Exception query / I/O exception
+   * @throws Exception exception
    */
   @AfterAll
   public static void report() throws Exception {
@@ -517,7 +517,7 @@ public class MathlingArtTest {
 
   /**
    * Closes every engine.
-   * @throws Exception teardown exception
+   * @throws Exception exception
    */
   @AfterAll public static void closeProcessors() throws Exception {
     if(processors == null) return;
@@ -532,7 +532,7 @@ public class MathlingArtTest {
    * @param query query string
    * @param vars external variable bindings
    * @return serialized result
-   * @throws Exception query exception
+   * @throws Exception exception
    */
   private static String xquery(final String query, final Map<String, Object> vars)
       throws Exception {

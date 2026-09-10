@@ -371,7 +371,7 @@ public final class MetaData {
 
   /**
    * Reads in all meta data.
-   * @throws IOException exception
+   * @throws IOException I/O exception
    */
   public void read() throws IOException {
     try(DataInput di = new DataInput(dbFile(DATAINF))) {
@@ -533,7 +533,7 @@ public final class MetaData {
    * Writes the metadata to the specified output stream.
    * @param out output stream
    * @param storage database version
-   * @throws IOException I/O Exception
+   * @throws IOException I/O exception
    */
   void write(final DataOutput out, final String storage) throws IOException {
     writeInfo(out, DBSTR,      storage);

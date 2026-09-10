@@ -90,7 +90,7 @@ public final class FnAnalyzeString extends RegExFn {
     }
     if(group == 0) {
       final boolean[] assertionFlags = regExpr.getAssertionFlags();
-      for(int g = 1; g <= assertionFlags.length; ++g) {
+      for(int g = 1; g <= assertionFlags.length; g++) {
         if(assertionFlags[g - 1] && matcher.start(g) >= 0) {
           final FBuilder lg = FElem.build(Q_LGROUP);
           final String name = regExpr.getGroupNames()[g - 1];

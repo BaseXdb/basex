@@ -33,7 +33,7 @@ final class TreeSubtree {
     if(rl == 0) return;
     border = new TreeBorder[rl][];
 
-    for(int i = 0; i < rl; ++i) {
+    for(int i = 0; i < rl; i++) {
       border[i] = nc.subtree(d, roots[i]);
     }
   }
@@ -129,7 +129,7 @@ final class TreeSubtree {
    * @param rn root
    * @param lv level
    * @param pre PRE value
-   * @return the determined index position
+   * @return determined index position
    */
   int searchPreArrayPos(final int rn, final int lv, final int pre) {
     return searchPreArrayPos(treeBorder(rn, lv), pre);
@@ -139,7 +139,7 @@ final class TreeSubtree {
    * Determines the index position of given PRE value.
    * @param bo border
    * @param pre PRE value
-   * @return the determined index position
+   * @return determined index position
    */
   private int searchPreArrayPos(final TreeBorder bo, final int pre) {
     return nc.searchPreArrayPos(bo.level(), bo.start(), bo.getEnd(), pre) - bo.start();

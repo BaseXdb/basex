@@ -212,7 +212,7 @@ public final class QueryProcessor extends Job implements Closeable {
    * Optional output declarations within the query will be included in the serializer instance.
    * @param os output stream
    * @return serializer instance
-   * @throws IOException query exception
+   * @throws IOException I/O exception
    * @throws QueryException query exception
    */
   public Serializer serializer(final OutputStream os) throws IOException, QueryException {

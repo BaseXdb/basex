@@ -161,7 +161,7 @@ public final class Token {
   public static byte[][] tokens(final String... strings) {
     final int sl = strings.length;
     final byte[][] tmp = new byte[sl][];
-    for(int s = 0; s < sl; ++s) tmp[s] = token(strings[s]);
+    for(int s = 0; s < sl; s++) tmp[s] = token(strings[s]);
     return tmp;
   }
 
@@ -524,7 +524,7 @@ public final class Token {
     // check for integer value
     int e = s;
     boolean f = false;
-    for(int p = s; p < tl; ++p) {
+    for(int p = s; p < tl; p++) {
       final byte b = token[p];
       if(e == s) {
         if(digit(b) || b == '+') continue;
@@ -549,7 +549,7 @@ public final class Token {
     if(l == 1) return Double.NaN;
     final char[] str = new char[l];
     int sd = 0, se = 0;
-    for(int p = 0; p < l; ++p) {
+    for(int p = 0; p < l; p++) {
       char b = (char) token[s + p];
       if(b == 'e' || b == 'E') {
         // 'e1', '1e', '1e1e1'
@@ -601,7 +601,7 @@ public final class Token {
     if(token[p] == '-' || token[p] == '+') m = token[p++] == '-';
     if(p == end) return Long.MIN_VALUE;
     long v = 0;
-    for(; p < end; ++p) {
+    for(; p < end; p++) {
       final byte b = token[p];
       if(b < '0' || b > '9') break;
       if(v >= MAX_LONG && (b > '7' || v > MAX_LONG)) return Long.MIN_VALUE;
@@ -637,7 +637,7 @@ public final class Token {
     if(token[p] == '-' || token[p] == '+') m = token[p++] == '-';
     if(p == end) return Integer.MIN_VALUE;
     int v = 0;
-    for(; p < end; ++p) {
+    for(; p < end; p++) {
       final byte b = token[p];
       if(b < '0' || b > '9') break;
       if(v >= MAX_INT && (b > '7' || v > MAX_INT)) return Integer.MIN_VALUE;
@@ -726,11 +726,11 @@ public final class Token {
   /**
    * Compares a substring of two tokens lexicographically.
    * @param token first token
-   * @param tFrom the index (inclusive) of the first element in the first token to be compared
-   * @param tTo the index (exclusive) of the last element in the first token to be compared
+   * @param tFrom index (inclusive) of the first element in the first token to be compared
+   * @param tTo index (exclusive) of the last element in the first token to be compared
    * @param compare token to be compared
-   * @param cFrom the index (inclusive) of the first element in the second token to be compared
-   * @param cTo the index (exclusive) of the last element in the second token to be compared
+   * @param cFrom index (inclusive) of the first element in the second token to be compared
+   * @param cTo index (exclusive) of the last element in the second token to be compared
    * @return result of comparison (-1, 0, 1)
    */
   public static int compare(final byte[] token, final int tFrom, final int tTo,
@@ -804,7 +804,7 @@ public final class Token {
    * Returns the position of the specified character.
    * @param token token
    * @param ch character to be found
-   * @return position, or {@code -1} if token is not found.
+   * @return position, or {@code -1} if token is not found
    */
   public static int indexOf(final byte[] token, final int ch) {
     return indexOf(token, ch, 0);
@@ -815,7 +815,7 @@ public final class Token {
    * @param token token
    * @param ch character to be found
    * @param pos start position
-   * @return position, or {@code -1} if token is not found.
+   * @return position, or {@code -1} if token is not found
    */
   public static int indexOf(final byte[] token, final int ch, final int pos) {
     final int tl = token.length;
@@ -835,7 +835,7 @@ public final class Token {
    * Returns the last position of the specified character.
    * @param token token
    * @param ch character to be found
-   * @return position, or {@code -1} if token is not found.
+   * @return position, or {@code -1} if token is not found
    */
   public static int lastIndexOf(final byte[] token, final int ch) {
     final int tl = token.length;
@@ -856,7 +856,7 @@ public final class Token {
    * Returns the position of the specified token.
    * @param token token
    * @param sub token to be found
-   * @return position, or {@code -1} if token is not found.
+   * @return position, or {@code -1} if token is not found
    */
   public static int indexOf(final byte[] token, final byte[] sub) {
     return indexOf(token, sub, 0);
@@ -867,7 +867,7 @@ public final class Token {
    * @param token token
    * @param sub token to be found
    * @param pos start position
-   * @return position, or {@code -1} if token is not found.
+   * @return position, or {@code -1} if token is not found
    */
   public static int indexOf(final byte[] token, final byte[] sub, final int pos) {
     final int sl = sub.length;
@@ -1086,8 +1086,8 @@ public final class Token {
   /**
    * Replaces the specified character and returns the result token.
    * @param token token to be checked
-   * @param search the character to be replaced
-   * @param replace the new character
+   * @param search character to be replaced
+   * @param replace new character
    * @return resulting token
    */
   public static byte[] replace(final byte[] token, final int search, final int replace) {
@@ -1250,7 +1250,7 @@ public final class Token {
 
   /**
    * Checks if the specified character is a whitespace (0x09, 0x0A, 0x0D, 0x20).
-   * @param ch the character to be checked
+   * @param ch character to be checked
    * @return result of check
    */
   public static boolean ws(final int ch) {
@@ -1259,7 +1259,7 @@ public final class Token {
 
   /**
    * Checks if the specified character is a computer letter (A - Z, a - z, _).
-   * @param ch the character to be checked
+   * @param ch character to be checked
    * @return result of check
    */
   public static boolean letter(final int ch) {
@@ -1268,7 +1268,7 @@ public final class Token {
 
   /**
    * Checks if the specified character is a digit (0 - 9).
-   * @param ch the character to be checked
+   * @param ch character to be checked
    * @return result of check
    */
   public static boolean digit(final int ch) {
@@ -1277,7 +1277,7 @@ public final class Token {
 
   /**
    * Checks if the specified character is a computer letter or digit.
-   * @param ch the character to be checked
+   * @param ch character to be checked
    * @return result of check
    */
   public static boolean letterOrDigit(final int ch) {

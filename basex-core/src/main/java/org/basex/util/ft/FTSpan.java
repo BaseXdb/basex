@@ -22,7 +22,7 @@ public final class FTSpan {
    * Constructor.
    * @param text token text
    * @param pos number of tokens parsed before the current token
-   * @param del the token contains delimiters
+   * @param del token contains delimiters
    */
   FTSpan(final byte[] text, final int pos, final boolean del) {
     this.text = text;
