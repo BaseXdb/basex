@@ -2,10 +2,14 @@ package org.basex.data;
 
 import static org.basex.query.func.Function.*;
 
+import java.io.*;
+
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.io.*;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
 
@@ -28,6 +32,34 @@ public final class IndexTest extends SandboxTest {
     set(MainOptions.TEXTINCLUDE, "");
     set(MainOptions.ATTRINCLUDE, "");
     set(MainOptions.TOKENINCLUDE, "");
+  }
+
+  /**
+   * Opens a database with an updatable full-text index that was created with version 12.
+   * @throws IOException I/O exception
+   */
+  @Test public void oldVersionFullText() throws IOException {
+    // close a pinned main-memory instance, copy the database files of the frozen instance
+    execute(new Close());
+    final IOFile trg = context.soptions.dbPath(NAME);
+    for(final IOFile file : new IOFile("src/test/resources/ftv12upd").children()) {
+      file.copyTo(new IOFile(trg, file.name()));
+    }
+    final String ft = _FT_SEARCH.args(NAME, "entry") + " ! string()";
+    query(_DB_INFO.args(NAME) + "//updindex/text()", true);
+    query(_DB_INFO.args(NAME) + "//ftindex/text()", true);
+    query(ft, "first entry\nsecond entry");
+    query(_DB_TEXT.args(NAME, "third one"), "third one");
+
+    // the update invalidates the full-text index; the text index is updated
+    query("replace value of node " + _DB_GET.args(NAME) + "//b with 'new entry'");
+    query(_DB_INFO.args(NAME) + "//ftindex/text()", false);
+    query(_DB_INFO.args(NAME) + "//textindex/text()", true);
+    query(_DB_TEXT.args(NAME, "new entry"), "new entry");
+    query(_DB_OPTIMIZE.args(NAME));
+    query(_DB_INFO.args(NAME) + "//ftindex/text()", true);
+    query(ft, "first entry\nnew entry");
+    query(_DB_TEXT.args(NAME, "new entry"), "new entry");
   }
 
   /**
