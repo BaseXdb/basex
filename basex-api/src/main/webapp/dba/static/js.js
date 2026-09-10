@@ -191,11 +191,21 @@ function selection(form) {
 }
 
 /**
+ * Returns the checkboxes of the entries that a form currently shows. The unnamed one is the
+ * select-all box of the table header, not an entry.
+ * @param {HTMLFormElement} form form
+ * @returns {Array} checkboxes
+ */
+function entries(form) {
+  return [ ...selection(form) ].filter(input => input.name && rowVisible(input));
+}
+
+/**
  * Toggles the selection of all checkboxes in a form.
  * @param {HTMLInputElement} source clicked header checkbox
  */
 function toggle(source) {
-  for(const input of selection(getForm(source))) {
+  for(const input of selection(source.closest("form"))) {
     input.checked = source.checked && rowVisible(input);
   }
   buttons(source);
@@ -206,36 +216,18 @@ function toggle(source) {
  * @param {HTMLInputElement} source clicked checkbox. if undefined, all forms will be refreshed
  */
 function buttons(source) {
-  for(const form of (source ? [ getForm(source) ] : document.querySelectorAll("form"))) {
-    // count selected items and refresh header checkbox
-    let count = 0, checked = 0, header;
-    for(const input of selection(form)) {
-      if(rowVisible(input)) {
-        if(input.name) {
-          count++;
-          if(input.checked) checked++;
-        } else {
-          // the select-all box of the table header; the named ones are the entries
-          header = input;
-        }
-      }
-    }
-    if(header) header.checked = count && count === checked;
+  for(const form of (source ? [ source.closest("form") ] : document.querySelectorAll("form"))) {
+    // refresh the header checkbox: it is ticked once every shown entry is
+    const shown = entries(form);
+    const checked = shown.filter(input => input.checked).length;
+    const header = [ ...selection(form) ].find(input => !input.name && rowVisible(input));
+    if(header) header.checked = checked > 0 && checked === shown.length;
 
     // check button states
     for(const button of form.querySelectorAll("button")) {
-      if(button.getAttribute("data-check")) button.disabled = !checked;
+      if(button.dataset.check) button.disabled = !checked;
     }
   }
-}
-
-/**
- * Returns the enclosing form element.
- * @param {HTMLElement} source element
- * @returns {HTMLFormElement} enclosing form
- */
-function getForm(source) {
-  return source.closest("form");
 }
 
 /**
@@ -291,6 +283,14 @@ function markScrollbars() {
 window.addEventListener("resize", () => markTruncated());
 
 /**
+ * Announces new panel widths: the editors and the truncated cells are laid out for the room
+ * they had, and are measured again for the room they have now.
+ */
+function remeasure() {
+  window.dispatchEvent(new Event("resize"));
+}
+
+/**
  * Asks for confirmation, naming the action and the selected entries. The answer arrives after
  * the click has been dealt with, so the first click is always refused and the button clicks
  * itself again once the action is confirmed; the second click submits its form.
@@ -305,10 +305,7 @@ function confirmAction(button, action) {
   }
   // the entries are named by the table the question is asked from; the number is what the
   // question adds, and a long list of paths would only bury it
-  let count = 0;
-  for(const input of selection(getForm(button))) {
-    if(input.name && input.checked && rowVisible(input)) count++;
-  }
+  const count = entries(button.closest("form")).filter(input => input.checked).length;
   const message = count
     ? `${action} ${count} ${count === 1 ? "entry" : "entries"}?`
     : "Are you sure?";
@@ -533,8 +530,7 @@ function fillPanel(id, html) {
   if(panel.classList.contains("hidden") !== empty) {
     panel.classList.toggle("hidden", empty);
     applyColumns();
-    // lets the editor and the truncated cells adjust to the new widths
-    window.dispatchEvent(new Event("resize"));
+    remeasure();
   }
   // the panel arrives after the shared setup ran, so its buttons are checked here
   buttons();
@@ -693,9 +689,9 @@ function showError(response, info, position) {
   setText(decoded, "error");
 
   // with a line/column and an open editor, make a click on the message jump there
-  const el = document.getElementById("info");
-  el.classList.toggle("locatable", Boolean(line && _locate));
-  if(line && _locate) {
+  const el = document.getElementById("info"), locatable = Boolean(line && _locate);
+  el.classList.toggle("locatable", locatable);
+  if(locatable) {
     el.dataset.line = line;
     el.dataset.column = column;
   } else {
@@ -981,8 +977,7 @@ function togglePanel(panel, id) {
   state[id] = collapse;
   store(panelsKey(), JSON.stringify(state));
 
-  // lets CodeMirror panes and truncated cells adjust to the new widths
-  window.dispatchEvent(new Event("resize"));
+  remeasure();
 }
 
 /**
@@ -1037,8 +1032,7 @@ function panelShown(label) {
 function foldPanels(rules) {
   for(const [ label, collapse ] of rules) showPanel(contentPanel(label), collapse);
   applyColumns();
-  // the panels that stay open have grown: what was clipped at the old widths is measured again
-  window.dispatchEvent(new Event("resize"));
+  remeasure();
 }
 
 /**
@@ -1109,14 +1103,23 @@ function replaceParam(url, name, value) {
 }
 
 /**
+ * Replaces query parameters; parameters with empty values are removed.
+ * @param {string} url URL
+ * @param {object} params values, by parameter name
+ * @returns {string} new url
+ */
+function replaceParams(url, params) {
+  for(const [ name, value ] of Object.entries(params)) url = replaceParam(url, name, value);
+  return url;
+}
+
+/**
  * Writes a selection to the address bar, as a step of its own: the back button returns to what
  * was shown before. A parameter with an empty value is dropped.
  * @param {object} params selected values, by parameter name
  */
 function pushParams(params) {
-  let url = window.location.href;
-  for(const [ name, value ] of Object.entries(params)) url = replaceParam(url, name, value);
-  window.history.pushState({}, "", url);
+  window.history.pushState({}, "", replaceParams(window.location.href, params));
 }
 
 /**

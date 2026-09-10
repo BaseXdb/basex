@@ -28,8 +28,8 @@ function logEntries(key) {
   // the filter fields belong to the rendered table, so they are missing until the first
   // result arrives; empty ones must not count, or the first key press after a search
   // would look like a new search and would jump back to page 1
-  const state = JSON.stringify([ input, ignore, dates,
-    [ ...filters ].map(f => [ f.name, f.value.trim() ]).filter(([ , value ]) => value) ]);
+  const typed = [ ...filters ].map(f => [ f.name, f.value.trim() ]).filter(([ , value ]) => value);
+  const state = JSON.stringify([ input, ignore, dates, typed ]);
   if(reset && _logInput === state) return false;
   _logInput = state;
 
@@ -49,12 +49,9 @@ function logEntries(key) {
     sort: document.getElementById("sort").value,
     page: reset ? 1 : Number(document.getElementById("page").value) || 1,
     time: document.getElementById("time").value,
-    filters: {}
+    // the fields are named after the columns they filter, with a prefix of their own
+    filters: Object.fromEntries(typed.map(([ name, value ]) => [ name.replace(/^f-/, ""), value ]))
   };
-  for(const filter of filters) {
-    const value = filter.value.trim();
-    if(value) message.filters[filter.name.replace(/^f-/, "")] = value;
-  }
   // the server stops a search that is superseded by a newer one
   message.run = startRequest();
   sendMessage("/logs", message).then(sent => {
@@ -64,11 +61,9 @@ function logEntries(key) {
   });
 
   // refresh browser history, so that a reload shows what the page shows
-  let href = replaceParam(window.location.href, "input", input);
-  for(const filter of filters) href = replaceParam(href, filter.name, filter.value.trim());
-  href = replaceParam(href, "page", message.page);
-  href = replaceParam(href, "sort", message.sort);
-  window.history.replaceState(null, "", href);
+  const params = { input: input, page: message.page, sort: message.sort };
+  for(const filter of filters) params[filter.name] = filter.value.trim();
+  window.history.replaceState(null, "", replaceParams(window.location.href, params));
 }
 
 /**

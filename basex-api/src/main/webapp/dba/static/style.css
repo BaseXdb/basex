@@ -113,10 +113,13 @@ table {
   table-layout: fixed;
 }
 
-th {
+th, td {
   vertical-align: top;
-  text-align: left;
   padding: 0 var(--gap) 0 0;
+}
+
+th {
+  text-align: left;
 }
 
 /* a checkbox and the value beside it belong on one line: a column that is sized by its content
@@ -130,17 +133,18 @@ th:has(> input[type=checkbox]), td:has(> input[type=checkbox]) {
   text-align: right;
 }
 
+/* anchors the chevron of an expandable cell */
 td {
-  vertical-align: top;
-  padding: 0 var(--gap) 0 0;
   position: relative;
-  border: 0;
+}
+
+/* grab areas of the panel splits; each straddles the gap it drags, centered on it */
+.resizer, .resizer-row {
+  position: absolute;
 }
 
 .resizer {
-  position: absolute;
   top: 0;
-  /* straddles the gap between the panels, centered on it */
   right: calc((var(--gap) + var(--resizer)) / -2);
   width: var(--resizer);
   height: 100%;
@@ -148,7 +152,6 @@ td {
 }
 
 .resizer-row {
-  position: absolute;
   left: 0;
   bottom: calc((var(--gap) + var(--resizer)) / -2);
   height: var(--resizer);
@@ -199,7 +202,7 @@ td {
   color: var(--accent-strong);
 }
 
-ol, ul, dd {
+ul, dd {
   padding-left: 1.2rem;
   margin-left: 0;
 }
@@ -272,8 +275,7 @@ textarea:not([rows]) {
   height: 200px;
 }
 
-textarea, input[type=text], input[type=password], input[type=number],
-input[type=submit], select, button {
+textarea, input[type=text], input[type=password], input[type=number], select, button {
   border: var(--line) solid var(--border);
   border-radius: var(--radius);
   outline: none;
@@ -287,7 +289,7 @@ input[type=text], input[type=password], input[type=number], select {
   color: var(--fg);
 }
 
-input[type=submit], button {
+button {
   padding: 4px 8px;
 }
 
@@ -344,10 +346,10 @@ table.fixed td.expanded {
   overflow-wrap: anywhere;
 }
 /* chevron on expandable cells */
-table.fixed td.truncated, table.fixed td.expanded {
+table.fixed td:is(.truncated, .expanded) {
   cursor: pointer;
 }
-table.fixed td.truncated::after, table.fixed td.expanded::after {
+table.fixed td:is(.truncated, .expanded)::after {
   position: absolute;
   right: .2rem;
   color: var(--muted);
@@ -431,6 +433,11 @@ header {
   min-width: 0;
 }
 
+/* error message that can be clicked to jump to its line/column in the editor */
+#info.locatable {
+  cursor: pointer;
+}
+
 .header-logo {
   flex: none;
 }
@@ -445,17 +452,6 @@ header {
   overflow-x: auto;
 }
 
-
-.error {
-  color: var(--accent);
-  font-weight: bold;
-}
-
-.info {
-  color: var(--info);
-  font-weight: bold;
-}
-
 /* one line, clipped where it does not fit: a status message and a panel heading must not
    push their neighbours out of the row they share, and a tab must not grow with its name */
 .ellipsis,
@@ -467,12 +463,15 @@ header {
   overflow: hidden;
 }
 
-.warning {
-  color: var(--warning);
+/* the three states of a status message: told apart by their colour, and by a glyph, so that
+   the colour is not the only thing that says which one it is */
+.info, .warning, .error {
   font-weight: bold;
 }
+.info    { color: var(--info); }
+.warning { color: var(--warning); }
+.error   { color: var(--accent); }
 
-/* status glyphs, so state is not conveyed by color alone */
 .info::before    { content: "\2713\00a0"; }
 .warning::before { content: "\21bb\00a0"; }
 .error::before   { content: "\2717\00a0"; }
@@ -482,12 +481,9 @@ header {
   margin-bottom: var(--space);
 }
 /* a note explaining the control above it belongs to its field: the field's own margin is what
-   separates it from what follows */
-.field .note {
-  margin-bottom: 0;
-}
-.header-nav .note {
-  /* the header nav is a single row: no spacing before the rule below it */
+   separates it from what follows. The header nav is a single row, and the rule below it
+   supplies the distance in the same way */
+.field .note, .header-nav .note {
   margin-bottom: 0;
 }
 
@@ -641,7 +637,7 @@ body:has(.content.fill) main {
   display: none;
 }
 /* the scrolling content of a filled panel; editors bring their own scrollbars */
-.content.fill .pane, .content.fill .cm-editor, .content.fill textarea {
+.content.fill :is(.pane, .cm-editor, textarea) {
   flex: 1;
   min-height: 0;
 }
@@ -679,7 +675,7 @@ body:has(.content.fill) main {
 }
 /* none of the three blocks is squeezed away by a long table or by a small window: the pane
    scrolls once they no longer fit */
-#job-details > .cm-editor, #job-details > textarea, #job-details > .pane {
+#job-details > :is(.cm-editor, textarea, .pane) {
   min-height: 6rem;
 }
 /* the entries sit below their heading; the bullets bring the only indentation */
@@ -705,30 +701,21 @@ body:has(.content.fill) main {
   border-left: var(--line) solid var(--border);
 }
 
-/* a group of fields: whatever directly holds them — a form, or one column of a form that
-   spreads its fields over columns. The group is the grid, so its label column is as wide as
-   its longest label asks for */
-:has(> .field) {
+/* label column and control column: the group of fields — whatever directly holds them, a form
+   or one column of a form that spreads its fields over columns — is the grid whose label column
+   is as wide as its longest label asks for, and a field outside a group is its own grid */
+:has(> .field), .field {
   display: grid;
   grid-template-columns: max-content 1fr;
   column-gap: var(--gap);
 }
 
-/* what is not a field spans both columns; the break after a checkbox is what a row of the
-   grid does already */
+/* what is not a field spans both columns */
 :has(> .field) > :not(.field) {
   grid-column: 1 / -1;
 }
-:has(> .field) > br {
-  display: none;
-}
 
-/* labeled form field: label column, control column. A field outside a group is its own grid,
-   and its label takes the width it asks for */
 .field {
-  display: grid;
-  grid-template-columns: max-content 1fr;
-  column-gap: var(--gap);
   align-items: baseline;
   /* fields belong together, so they sit closer than blocks do; the margin separates them from
      each other and from the block above */
@@ -743,7 +730,7 @@ body:has(.content.fill) main {
 
 /* a checkbox that is the control of a field brings its own break, which the row it is placed
    in already provides */
-.field br {
+:has(> .field) > br, .field br {
   display: none;
 }
 
@@ -859,7 +846,7 @@ button.collapse .label {
     height: auto;
     overflow: visible;
   }
-  .content.fill .cm-editor, .content.fill .pane {
+  .content.fill :is(.cm-editor, .pane) {
     min-height: 200px;
   }
   .content > .panel ~ .panel::before {
@@ -896,11 +883,6 @@ button.collapse .label {
   .logbar #ignore {
     width: 100%;
   }
-}
-
-/* error message that can be clicked to jump to its line/column in the editor */
-#info.locatable {
-  cursor: pointer;
 }
 
 /* logs: a file is named by its date and measured in bytes, both of a known length. Neither is

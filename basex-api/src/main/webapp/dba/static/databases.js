@@ -130,16 +130,8 @@ function refreshDatabases(sort, page) {
  */
 function refreshDatabase(sort, page) {
   requestPanel(DB_WS, "database-panel",
-    { type: "database", name: _db, resource: _resource, dir: _dir, filter: dbFilter() },
-    sort, page);
-}
-
-/**
- * Returns what the resource list is filtered by.
- * @returns {string} filter
- */
-function dbFilter() {
-  return fieldValue("resource-filter");
+    { type: "database", name: _db, resource: _resource, dir: _dir,
+      filter: fieldValue("resource-filter") }, sort, page);
 }
 
 /**

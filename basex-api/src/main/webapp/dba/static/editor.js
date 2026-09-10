@@ -71,7 +71,9 @@ function restoreIndent() {
  * @param {boolean} enabled edit state
  */
 function setEditable(id, enabled) {
-  editorReadOnly(!enabled);
+  // CodeMirror is told; the plain text area fallback is the one called 'editor'
+  if(_editor.setOption) _editor.setOption("readOnly", !enabled);
+  else document.getElementById("editor").readOnly = !enabled;
   setDisabled(id, !enabled);
 }
 
@@ -94,15 +96,6 @@ function setEditorText(id, text) {
   const editor = _editors[id];
   if(editor) editor.setValue(text);
   else document.getElementById(id).value = text;
-}
-
-/**
- * Sets the read-only state of the resource editor (CodeMirror or plain textarea).
- * @param {boolean} readOnly read-only state
- */
-function editorReadOnly(readOnly) {
-  if(_editor.setOption) _editor.setOption("readOnly", readOnly);
-  else document.getElementById("editor").readOnly = readOnly;
 }
 
 /**

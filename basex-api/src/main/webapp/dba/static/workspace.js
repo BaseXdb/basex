@@ -179,17 +179,14 @@ function applyTab() {
   // an unnamed document that was never shown holds its unsaved draft, if it kept one; a file
   // that was never shown is read from disk, and its draft is applied there
   const draft = t.state === undefined && !t.name ? stored(draftKey(t)) : null;
-  _writing = true;
-  try {
+  writing(() => {
     if(_editor.view && t.state && typeof t.state !== "string") {
       _editor.view.setState(t.state);
     } else {
       _editor.setValue(typeof t.state === "string" ? t.state : draft ?? "");
       _editor.clearHistory();
     }
-  } finally {
-    _writing = false;
-  }
+  });
   if(draft) t.edited = true;
   showTab();
 }
@@ -331,21 +328,9 @@ async function runQuery() {
     indent: indentOn(),
     // relative paths in the query resolve against the opened file, or against the directory
     dir: tabDir(),
-    file: tab() ? tab().name : ""
+    file: tab()?.name ?? ""
   })) return;
   awaitResult(run);
-}
-
-/**
- * Guesses the result language from its first character.
- * @param {string} text serialized result
- * @returns {string} language for _output.setLanguage
- */
-function resultLanguage(text) {
-  const s = text.replace(/^\s+/, "");
-  if(s[0] === "<") return htmlContent(s) ? "html" : "xml";
-  if(s[0] === "{" || s[0] === "[") return "json";
-  return "text";
 }
 
 /**
@@ -355,7 +340,7 @@ function resultLanguage(text) {
  */
 function showResult(text, info) {
   setText("Query was successful.", "info");
-  if(_output.setLanguage) _output.setLanguage(resultLanguage(text));
+  if(_output.setLanguage) _output.setLanguage(contentLanguage(text, "text"));
   _output.setValue(text);
   showInfo(info);
 }
@@ -420,7 +405,7 @@ function fileLanguage(name, text) {
     if(suffixed(lower, [ "html", "htm" ])) return "html";
     if(suffixed(lower, [ "json" ])) return "json";
   } else {
-    return contentLanguage(text);
+    return contentLanguage(text, "xquery");
   }
   return "text";
 }
@@ -436,25 +421,20 @@ function suffixed(name, suffixes) {
 }
 
 /**
- * Guesses the language of an unnamed document from its content.
- * @param {string} text editor content
- * @returns {string} language for _editor.setLanguage
+ * Guesses the language of a text from its first character: what is neither markup nor JSON is
+ * an editor document, which is XQuery, or a serialized result, which is plain text.
+ * @param {string} text text
+ * @param {string} fallback language of a text that gives nothing away
+ * @returns {string} language for setLanguage
  */
-function contentLanguage(text) {
+function contentLanguage(text, fallback) {
   const s = (text || "").replace(/^\s+/, "");
-  if(!s) return "xquery";
   if(s[0] === "{" || s[0] === "[") return "json";
-  if(s[0] === "<") return htmlContent(s) ? "html" : "xml";
-  return "xquery";
-}
-
-/**
- * Indicates whether serialized markup looks like an HTML document.
- * @param {string} text text starting at the first non-whitespace character
- * @returns {boolean} result
- */
-function htmlContent(text) {
-  return /^<!doctype\s+html\b/i.test(text) || /^<html(?:\s|>|$)/i.test(text);
+  if(s[0] === "<") {
+    // an HTML document announces itself; any other markup is XML
+    return /^<!doctype\s+html\b/i.test(s) || /^<html(?:\s|>|$)/i.test(s) ? "html" : "xml";
+  }
+  return fallback;
 }
 
 /**
@@ -496,7 +476,7 @@ async function loadTab(t) {
     if(_opening !== key || t !== tab()) return;
     // set the baseline before setValue, whose synchronous change event runs saveDraft
     t.saved = disk;
-    setEditorValue(disk);
+    writing(() => _editor.setValue(disk));
     _editor.clearHistory();
     // the editor normalizes line endings: take the baseline back from it, or every file that
     // is stored with CRLF would count as modified the moment it is opened
@@ -507,7 +487,7 @@ async function loadTab(t) {
     // apply a newer unsaved draft on top of the saved file (undo reverts to disk)
     const draft = stored(draftKey(t));
     if(draft !== null && draft !== t.saved) {
-      setEditorValue(draft);
+      writing(() => _editor.setValue(draft));
       // the document differs from the file: mark it
       t.edited = true;
       showTab();
@@ -532,13 +512,14 @@ function modified() {
 }
 
 /**
- * Writes text to the editor without counting it as an edit of the user.
- * @param {string} text text to be shown
+ * Fills the editor from the code, which is no edit of the user: what is written here brings no
+ * draft with it, and leaves the document as modified as it was.
+ * @param {Function} fill function that writes to the editor
  */
-function setEditorValue(text) {
+function writing(fill) {
   _writing = true;
   try {
-    _editor.setValue(text);
+    fill();
   } finally {
     _writing = false;
   }
@@ -587,7 +568,7 @@ async function saveFile(saveAs) {
  * @returns {string} directory
  */
 function tabDir() {
-  return tab() && tab().dir || filesDir();
+  return tab()?.dir || filesDir();
 }
 
 /**
@@ -609,10 +590,7 @@ function saveDraft() {
   // drafts belong to the Workspace view; skip on the other CodeMirror pages
   if(!t) return;
   const content = editorValue();
-  const key = draftKey(t);
-  try {
-    store(key, content === t.saved ? null : content);
-  } catch { /* storage disabled or full: drafts are best-effort */ }
+  store(draftKey(t), content === t.saved ? null : content);
 }
 
 /**
