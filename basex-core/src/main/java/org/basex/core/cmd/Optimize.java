@@ -9,6 +9,7 @@ import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.stats.*;
+import org.basex.index.value.*;
 import org.basex.util.list.*;
 
 /**
@@ -178,7 +179,11 @@ public final class Optimize extends ACreate {
       final boolean enforce, final Optimize cmd) throws IOException {
 
     // check if flags have changed
-    if(create == data.meta.index(type) && !enforce) return;
+    if(create == data.meta.index(type) && !enforce) {
+      // optimize existing index
+      if(data.index(type) instanceof final ValueIndex index) index.optimize();
+      return;
+    }
     // create or drop index
     if(create) CreateIndex.create(type, data, cmd);
     else DropIndex.drop(type, data);
@@ -198,9 +203,9 @@ public final class Optimize extends ACreate {
 
     if(data.meta.updindex) {
       data.idmap = new IdPreMap(md.lastid);
-      if(data.meta.textindex) optimize(IndexType.TEXT, data, true, true, null);
-      if(data.meta.attrindex) optimize(IndexType.ATTRIBUTE, data, true, true, null);
-      if(data.meta.tokenindex) optimize(IndexType.TOKEN, data, true, true, null);
+      for(final IndexType type : IndexType.VALUE_INDEXES) {
+        if(md.index(type)) optimize(type, data, true, true, null);
+      }
     }
   }
 }

@@ -28,6 +28,9 @@ public enum IndexType {
   /** Full-text index. */
   FULLTEXT;
 
+  /** Value index types. */
+  public static final IndexType[] VALUE_INDEXES = { TEXT, ATTRIBUTE, TOKEN, FULLTEXT };
+
   @Override
   public String toString() {
     return Enums.string(this);
