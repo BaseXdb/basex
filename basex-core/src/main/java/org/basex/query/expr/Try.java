@@ -185,7 +185,7 @@ public final class Try extends Single {
     try {
       inlined = expr.inline(ic);
     } catch(final QueryException ex) {
-      inlined = FnError.get(ex, expr);
+      inlined = FnError.get(ex);
     }
     if(inlined != null) expr = inlined;
 

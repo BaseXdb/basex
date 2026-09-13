@@ -2112,7 +2112,7 @@ public enum Function implements AFunction {
       params(STRING_O), STRING_O, WEB_URI),
   /** XQuery function. */
   _WEB_ERROR(WebError::new, "error(status, message, options?)",
-      params(INTEGER_O, ITEM_ZM, MAP_ZO), ITEM_ZM, flag(NDT), WEB_URI),
+      params(INTEGER_O, ITEM_ZM, MAP_ZO), ERROR_O, flag(NDT), WEB_URI),
   /** XQuery function. */
   _WEB_REDIRECT(WebRedirect::new, "redirect(url, parameters?, anchor?, status?)",
       params(STRING_O, MAP_ZO, STRING_ZO, INTEGER_ZO), ELEMENT_O, flag(CNS), WEB_URI),

@@ -590,11 +590,13 @@ public abstract class Expr extends ExprInfo {
    * Tries to push the given type check inside this expression.
    * @param tc type check to push into the expression
    * @param cc compilation context
-   * @return resulting expression if successful, {@code null} otherwise
+   * @return resulting expression if successful (this expression if no check was required),
+   *   {@code null} otherwise
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  protected Expr typeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
+  protected Expr inlineTypeCheck(final TypeCheck tc, final CompileContext cc)
+      throws QueryException {
     return null;
   }
 

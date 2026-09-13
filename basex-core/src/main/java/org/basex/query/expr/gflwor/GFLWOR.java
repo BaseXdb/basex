@@ -1108,7 +1108,7 @@ public final class GFLWOR extends ParseExpr {
           iter.next();
           iter.remove();
         }
-        rtrn = FnError.get(ex, rtrn);
+        rtrn = FnError.get(ex);
         return true;
       }
     }
@@ -1162,8 +1162,13 @@ public final class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public Expr typeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
-    if(tc.seqType().occ != Occ.ZERO_OR_MORE) return null;
+  public Expr inlineTypeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
+    // (for $x in E return R) coerce to T* → for $x in E return (R coerce to T*)
+    // (let $x := E return R) coerce to T → let $x := E return (R coerce to T)
+    if(tc.seqType().occ != Occ.ZERO_OR_MORE) {
+      final long[] minMax = calcSize(false);
+      if(minMax[0] != 1 || minMax[1] != 1) return null;
+    }
     final Expr r = tc.check(rtrn, cc);
     if(r == null) return this;
     rtrn = r;

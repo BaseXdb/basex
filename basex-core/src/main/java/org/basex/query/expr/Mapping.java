@@ -159,7 +159,7 @@ public abstract class Mapping extends Arr {
         inlined = exprs[e].inline(ic);
       } catch(final QueryException ex) {
         // replace original expression with error
-        inlined = FnError.get(ex, exprs[e]);
+        inlined = FnError.get(ex);
       }
       if(inlined != null) {
         exprs[e] = inlined;
@@ -266,7 +266,7 @@ public abstract class Mapping extends Arr {
           inlined = ic.inline(next);
         } catch(final QueryException ex) {
           // replace original expression with error
-          inlined = FnError.get(ex, next);
+          inlined = FnError.get(ex);
         }
         return inlined;
       }

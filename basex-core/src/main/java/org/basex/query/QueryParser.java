@@ -2773,7 +2773,7 @@ public class QueryParser extends InputParser {
     if(expr == null) expr = lookup(null);
     if(expr == null) {
       expr = literal(false, true);
-      if(expr == Dbl.NEGATIVE_ZERO) expr = FnError.get(RANGE_X.get(info(), token), Itr.ZERO);
+      if(expr == Dbl.NEGATIVE_ZERO) expr = FnError.get(RANGE_X.get(info(), token));
     }
     return expr;
   }

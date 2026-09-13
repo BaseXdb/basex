@@ -6,6 +6,7 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -99,7 +100,7 @@ public final class TypeCheck extends Single {
     if(cc.values(true, expr)) return cc.preEval(this);
 
     // push type check inside expression
-    final Expr checked = expr.typeCheck(this, cc);
+    final Expr checked = expr.inlineTypeCheck(this, cc);
     if(checked != null) {
       cc.info(OPTTYPE_X_X, st, checked);
       return checked;
@@ -132,11 +133,26 @@ public final class TypeCheck extends Single {
    * @param ex expression to check
    * @param cc compilation context
    * @return resulting expression, or {@code null} if no type check is necessary
-   * @throws QueryException query exception
    */
-  public Expr check(final Expr ex, final CompileContext cc) throws QueryException {
-    final SeqType st = seqType();
-    return ex.seqType().instanceOf(st) ? null : new TypeCheck(info, ex, st).optimize(cc);
+  public Expr check(final Expr ex, final CompileContext cc) {
+    return check(ex, seqType(), cc);
+  }
+
+  /**
+   * Creates an expression that checks the given expression against the given type.
+   * @param ex expression to check
+   * @param st sequence type
+   * @param cc compilation context
+   * @return resulting expression, or {@code null} if no type check is necessary
+   */
+  public Expr check(final Expr ex, final SeqType st, final CompileContext cc) {
+    if(ex.seqType().instanceOf(st)) return null;
+    try {
+      return new TypeCheck(info, ex, st).optimize(cc);
+    } catch(final QueryException qe) {
+      // the checked expression may never be evaluated: raise the error at runtime
+      return FnError.get(qe);
+    }
   }
 
   @Override

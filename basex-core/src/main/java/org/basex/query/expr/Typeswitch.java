@@ -218,10 +218,12 @@ public final class Typeswitch extends ParseExpr {
   }
 
   @Override
-  public Expr typeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
+  public Expr inlineTypeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
+    // (typeswitch(C) case X return A default return B) coerce to T →
+    //   typeswitch(C) case X return (A coerce to T) default return (B coerce to T)
     boolean changed = false;
     for(final TypeswitchGroup group : groups) {
-      changed |= group.typeCheck(tc, cc) != null;
+      changed |= group.inlineTypeCheck(tc, cc) != null;
     }
     return changed ? optimize(cc) : this;
   }

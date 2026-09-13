@@ -4,7 +4,6 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
-import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -253,16 +252,12 @@ public final class If extends Arr {
   }
 
   @Override
-  public Expr typeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
+  public Expr inlineTypeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
+    // (if(C) then A else B) coerce to T → if(C) then (A coerce to T) else (B coerce to T)
     boolean changed = false;
     final int el = exprs.length;
     for(int e = 0; e < el; e++) {
-      Expr expr = exprs[e];
-      try {
-        expr = tc.check(expr, cc);
-      } catch(final QueryException ex) {
-        expr = FnError.get(ex, expr);
-      }
+      final Expr expr = tc.check(exprs[e], cc);
       if(expr != null) {
         changed = true;
         exprs[e] = expr;

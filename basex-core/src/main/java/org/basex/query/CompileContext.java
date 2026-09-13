@@ -382,7 +382,7 @@ public final class CompileContext {
     } catch(final QueryException ex) {
       // replace original expression with error
       if(error) throw ex;
-      return FnError.get(ex, expr);
+      return FnError.get(ex);
     }
   }
 

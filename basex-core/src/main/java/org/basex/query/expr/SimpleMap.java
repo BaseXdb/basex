@@ -230,7 +230,7 @@ public abstract class SimpleMap extends Mapping {
           return new InlineContext(null, expr, cc).inline(next);
         } catch(final QueryException ex) {
           // replace original expression with error
-          return FnError.get(ex, next);
+          return FnError.get(ex);
         }
       }
     }

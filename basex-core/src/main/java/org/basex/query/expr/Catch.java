@@ -91,7 +91,7 @@ public final class Catch extends Single {
       if(inlined == null) return null;
       expr = inlined;
     } catch(final QueryException ex) {
-      expr = FnError.get(ex, expr);
+      expr = FnError.get(ex);
     }
     return this;
   }

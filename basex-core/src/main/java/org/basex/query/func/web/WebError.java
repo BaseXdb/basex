@@ -5,7 +5,6 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -41,10 +40,5 @@ public final class WebError extends StandardFunc {
   @Override
   public boolean vacuous() {
     return true;
-  }
-
-  @Override
-  protected Expr typeCheck(final TypeCheck tc, final CompileContext cc) {
-    return this;
   }
 }

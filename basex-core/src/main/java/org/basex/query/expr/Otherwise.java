@@ -131,6 +131,23 @@ public final class Otherwise extends Arr {
   }
 
   @Override
+  public Expr inlineTypeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
+    // (A otherwise B) coerce to T → (A coerce to T?) otherwise (B coerce to T)
+    // leading operands may be empty without being selected, so their cardinality is widened
+    final SeqType st = tc.seqType(), lst = st.union(Occ.ZERO);
+    boolean changed = false;
+    final int el = exprs.length;
+    for(int e = 0; e < el; e++) {
+      final Expr expr = tc.check(exprs[e], e < el - 1 ? lst : st, cc);
+      if(expr != null) {
+        changed = true;
+        exprs[e] = expr;
+      }
+    }
+    return changed ? optimize(cc) : this;
+  }
+
+  @Override
   public void markTailCalls(final CompileContext cc) {
     exprs[exprs.length - 1].markTailCalls(cc);
   }

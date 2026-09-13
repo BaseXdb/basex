@@ -136,7 +136,7 @@ public abstract class Preds extends Arr {
         expr = new InlineContext(null, root, cc).inline(expr);
       } catch(final QueryException ex) {
         // replace original expression with error
-        expr = FnError.get(ex, expr);
+        expr = FnError.get(ex);
       }
     }
 

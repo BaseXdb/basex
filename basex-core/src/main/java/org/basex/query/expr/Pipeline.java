@@ -103,6 +103,16 @@ public final class Pipeline extends Mapping {
   }
 
   @Override
+  public Expr inlineTypeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
+    // (A -> B) coerce to T → A -> (B coerce to T)
+    final int last = exprs.length - 1;
+    final Expr ex = tc.check(exprs[last], cc);
+    if(ex == null) return this;
+    exprs[last] = ex;
+    return optimize(cc);
+  }
+
+  @Override
   boolean items() {
     return false;
   }

@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -42,22 +41,15 @@ public final class FnError extends StandardFunc {
     return true;
   }
 
-  @Override
-  protected Expr typeCheck(final TypeCheck tc, final CompileContext cc) {
-    return this;
-  }
-
   /**
    * Creates an instance of this function.
    * @param ex exception to be raised
-   * @param expr expression that caused the error message
    * @return function
    */
-  public static StandardFunc get(final QueryException ex, final Expr expr) {
+  public static StandardFunc get(final QueryException ex) {
     final Str description = Str.get(ex.getLocalizedMessage());
     final FnError sf = (FnError) ERROR.get(ex.info(), ex.qname(), description);
     sf.cause = ex;
-    sf.exprType.assign(expr.seqType());
     return sf;
   }
 }

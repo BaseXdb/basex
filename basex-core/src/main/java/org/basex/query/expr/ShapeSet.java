@@ -46,7 +46,7 @@ public final class ShapeSet extends Arr {
   }
 
   @Override
-  public Expr typeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
+  public Expr inlineTypeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
     // map:put(RECORD, FIELD, VALUE) coerce to T → (RECORD coerce to T) +:= map:entry(FIELD, VALUE)
     final byte[] key = type.fields().key(index);
     if(tc.seqType().type instanceof final ShapeType sh && sh.strict() &&

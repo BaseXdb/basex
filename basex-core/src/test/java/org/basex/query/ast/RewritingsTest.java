@@ -1230,6 +1230,29 @@ public final class RewritingsTest extends SandboxTest {
         "<a/>\n<b/>", empty(Treat.class));
   }
 
+  /** Inline type checks. */
+  @Test public void inlineTypeCheck() {
+    // pipeline
+    check("((# basex:nondeterministic #) {" + wrap(1) + " } -> (if(. = 1) then . else 2)) "
+        + "coerce to xs:integer",
+        1, root(Pipeline.class), exists("Pipeline/If/TypeCheck"));
+    // otherwise: leading operands may be empty
+    check("(" + wrap(1) + "[. = 2] otherwise" + wrap(3) + ") coerce to xs:integer", 3,
+        root(Otherwise.class), exists("Otherwise/TypeCheck[@to = 'xs:integer?']"),
+        exists("Otherwise/TypeCheck[@to = 'xs:integer']"));
+    // FLWOR with let clauses: any cardinality
+    check("(let $a :=" + wrap(1) + " let $b :=" + wrap(2)
+        + " return if($a = $b) then $a else $b) coerce to xs:integer", 2,
+        root(GFLWOR.class), exists("If/TypeCheck"));
+    // failing branch: the error keeps the result type
+    check("(if(" + wrap(1) + " = 2) then 'a' else 1) coerce to xs:integer", 1,
+        type(If.class, "xs:integer"), exists(FnError.class));
+    // no static error if the return clause may never be evaluated
+    check("declare function local:f($x) as xs:integer* { "
+        + "for tumbling window $w in $x start when true() return 'a' }; "
+        + "local:f(" + wrap(0) + "[. = 1])", "", exists(GFLWOR.class));
+  }
+
   /** Rewrite side-effecting let expressions. */
   @Test public void gh1917() {
     check("let $a := (# basex:nondeterministic #) { <a/> } return $a ! name()",

@@ -118,7 +118,7 @@ public final class InlineContext {
         inlined = exprs[e].inline(this);
       } catch(final QueryException ex) {
         if(!error) throw ex;
-        inlined = FnError.get(ex, exprs[e]);
+        inlined = FnError.get(ex);
       }
       if(inlined != null) {
         exprs[e] = inlined;

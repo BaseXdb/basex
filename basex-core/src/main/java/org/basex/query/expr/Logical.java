@@ -119,7 +119,7 @@ public abstract class Logical extends Arr {
         // everything behind the error is dead anyway
         final Expr[] nw = new Expr[e + 1];
         Array.copy(exprs, e, nw);
-        nw[e] = FnError.get(ex, exprs[e]);
+        nw[e] = FnError.get(ex);
         exprs = nw;
         changed = true;
         break;
