@@ -32,8 +32,8 @@ public abstract class IndexBuilder extends Job {
 
   /** Number of index operations to perform before writing a partial index to disk. */
   private final int splitSize;
-  /** Maximum memory to consume. */
-  private final long maxMem = (long) (Runtime.getRuntime().maxMemory() * 0.8);
+  /** Maximum estimated size of the temporary index structures. */
+  private final long maxMem = Runtime.getRuntime().maxMemory() / 2;
 
   /** Names and namespace URI of element or attributes to include. */
   protected final IndexNames includeNames;
@@ -44,8 +44,6 @@ public abstract class IndexBuilder extends Job {
   protected long count;
   /** Number of partial index structures. */
   protected int splits;
-  /** Threshold for freeing memory when estimating main memory consumption. */
-  private int gcCount = -1;
 
   /**
    * Constructor.
@@ -59,9 +57,6 @@ public abstract class IndexBuilder extends Job {
     size = data.nodes();
     includeNames = new IndexNames(type, data);
     text = type == IndexType.TEXT || type == IndexType.FULLTEXT;
-
-    // run garbage collection if memory maximum is already reached
-    if(Performance.memory() >= maxMem) clean();
   }
 
   /**
@@ -84,36 +79,14 @@ public abstract class IndexBuilder extends Job {
   /**
    * Decides whether in-memory temporary index structures are so large
    * that we must flush them to disk before continuing.
+   * @param memory estimated size of the temporary index structures
    * @return true if structures shall be flushed to disk
-   * @throws IOException I/O exception
    */
-  protected final boolean splitRequired() throws IOException {
+  protected final boolean splitRequired(final long memory) {
     // checks if a fixed split size has been specified
-    final boolean split;
-    if(splitSize > 0) {
-      split = count >= (splits + 1L) * splitSize;
-    } else {
-      // if not, estimate how much main memory is left
-      split = Performance.memory() >= maxMem;
-      // stop operation if index splitting degenerates
-      int gc = gcCount;
-      if(split) {
-        if(gc >= 0) throw new BaseXException(OUT_OF_MEM + H_OUT_OF_MEM);
-        gc = 30;
-      } else {
-        gc = Math.max(-1, gc - 1);
-      }
-      gcCount = gc;
-    }
+    final boolean split = splitSize > 0 ? count >= (splits + 1L) * splitSize : memory >= maxMem;
     if(split && Prop.debug) Util.err("|");
     return split;
-  }
-
-  /**
-   * Performs memory cleanup after writing partial memory if necessary.
-   */
-  protected final void clean() {
-    if(splitSize <= 0) Performance.gc(2);
   }
 
   /**

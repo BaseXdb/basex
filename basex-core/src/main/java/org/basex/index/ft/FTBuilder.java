@@ -22,11 +22,9 @@ import org.basex.util.list.*;
  */
 public final class FTBuilder extends IndexBuilder {
   /** Value trees. */
-  private final FTIndexTrees tree;
+  private FTIndexTrees tree;
   /** Word parser. */
   private final FTLexer lexer;
-  /** Number of indexed tokens. */
-  private long ntok;
 
   /**
    * Constructor.
@@ -112,11 +110,11 @@ public final class FTBuilder extends IndexBuilder {
       // skip too long and stopword tokens
       if(token.length <= data.meta.maxlen && !sw.contains(token)) {
         // check if main memory is exhausted
-        if((ntok++ & 0xFFFF) == 0 && splitRequired()) {
+        if((count & 0xFFFF) == 0 && splitRequired(tree.memory())) {
           writeIndex(partial(splits));
-          clean();
+          tree = new FTIndexTrees(data.meta.maxlen);
         }
-        tree.index(token, id, pos, splits);
+        tree.index(token, id, pos);
         count++;
       }
     }
@@ -139,48 +137,63 @@ public final class FTBuilder extends IndexBuilder {
    */
   private void merge(final String[] inputs, final String output) throws IOException {
     final int il = inputs.length;
+    final FTList[] lists = new FTList[il];
     try(DataOutput outX = new DataOutput(data.meta.dbFile(output + 'x'));
         DataOutput outY = new DataOutput(data.meta.dbFile(output + 'y'));
         DataOutput outZ = new DataOutput(data.meta.dbFile(output + 'z'))) {
 
-      final IntList ind = new IntList();
-
       // open all sorted lists
-      final FTList[] v = new FTList[il];
-      for(int b = 0; b < il; b++) v[b] = new FTList(data, inputs[b]);
+      for(int l = 0; l < il; l++) lists[l] = new FTList(data, inputs[l]);
 
-      final IntList list = new IntList();
-      while(check(v)) {
-        list.reset();
-        int m = 0;
-        list.add(m);
-        // find next token to write on disk
-        for(int i = 0; i < il; i++) {
-          if(m == i || v[i].token.length == 0) continue;
-          final int l = v[i].token.length - v[m].token.length;
-          final int d = compare(v[m].token, v[i].token);
-          if(l < 0 || l == 0 && d > 0 || v[m].token.length == 0) {
-            m = i;
-            list.reset();
-            list.add(m);
-          } else if(d == 0 && v[i].token.length > 0) {
-            list.add(i);
+      final IntList ind = new IntList(), same = new IntList();
+      while(true) {
+        // find next token to write to disk: shortest token first, then smallest token
+        byte[] token = null;
+        same.reset();
+        for(int l = 0; l < il; l++) {
+          final byte[] tk = lists[l].token;
+          if(tk.length == 0) continue;
+          final int d = token == null ? -1 : tk.length != token.length ?
+            tk.length - token.length : compare(tk, token);
+          if(d < 0) {
+            token = tk;
+            same.reset();
           }
+          if(d <= 0) same.add(l);
         }
+        if(token == null) break;
 
-        if(ind.isEmpty() || ind.get(ind.size() - 2) < v[m].token.length) {
-          ind.add(v[m].token.length);
+        if(ind.isEmpty() || ind.get(ind.size() - 2) < token.length) {
+          ind.add(token.length);
           ind.add((int) outY.size());
         }
 
         // write token
-        outY.writeBytes(v[m].token);
+        outY.writeBytes(token);
         // pointer on full-text data
         outY.write5(outZ.size());
-        // merge and write data size
-        outY.write4(merge(outZ, list, v));
+        // merge full-text data of all sorted lists with the same token
+        int s = 0;
+        final int ss = same.size();
+        for(int l = 0; l < ss; l++) {
+          final FTList list = lists[same.get(l)];
+          final int[] prv = list.prv, pov = list.pov;
+          final int pl = prv.length;
+          for(int p = 0; p < pl; p++) {
+            outZ.writeNum(prv[p]);
+            outZ.writeNum(pov[p]);
+          }
+          s += pl;
+          list.next();
+        }
+        // write data size
+        outY.write4(s);
       }
-      writeInd(outX, ind, ind.get(ind.size() - 2) + 1, (int) outY.size());
+      writeInd(outX, ind);
+    } finally {
+      for(final FTList list : lists) {
+        if(list != null) list.close();
+      }
     }
     for(final String input : inputs) {
       for(final char c : new char[] { 'x', 'y', 'z' }) data.meta.dbFile(input + c).delete();
@@ -191,21 +204,15 @@ public final class FTBuilder extends IndexBuilder {
    * Writes the token length index to disk.
    * @param outX output
    * @param il token length and offsets
-   * @param ls last token length
-   * @param lp last offset
    * @throws IOException I/O exception
    */
-  private static void writeInd(final DataOutput outX, final IntList il, final int ls, final int lp)
-      throws IOException {
-
+  private static void writeInd(final DataOutput outX, final IntList il) throws IOException {
     final int is = il.size();
     outX.writeNum(is >> 1);
     for(int i = 0; i < is; i += 2) {
       outX.writeNum(il.get(i));
       outX.write4(il.get(i + 1));
     }
-    outX.writeNum(ls);
-    outX.write4(lp);
   }
 
   /**
@@ -220,101 +227,46 @@ public final class FTBuilder extends IndexBuilder {
 
       final IntList ind = new IntList();
       tree.init();
-      long dr = 0;
-      int tr = 0, j = 0;
-      while(tree.more(splits)) {
-        final FTIndexTree t = tree.nextTree();
-        t.next();
-        final byte[] key = t.nextTok();
+      int j = 0;
+      while(tree.more()) {
+        final IndexTree t = tree.nextTree();
+        final int n = t.next();
+        final byte[] key = t.keys.get(n), ids = t.ids.get(n);
 
         if(j < key.length) {
           j = key.length;
           // write index and pointer on first token
           ind.add(j);
-          ind.add(tr);
+          ind.add((int) outY.size());
         }
-        for(int i = 0; i < j; i++) outY.write1(key[i]);
+        outY.writeBytes(key);
         // write pointer on full-text data
-        outY.write5(dr);
+        outY.write5(outZ.size());
         // write full-text data size (number of PRE values)
-        outY.write4(t.nextNumPre());
-        // write compressed PRE and POS arrays
-        writeFTData(outZ, t.nextPres(), t.nextPoss());
-
-        dr = outZ.size();
-        tr = (int) outY.size();
+        outY.write4(entries(ids));
+        // write compressed PRE and POS values: pre1 pos1 pre2 pos2 ...
+        outZ.write(ids, 4, Num.size(ids) - 4);
       }
-      writeInd(outX, ind, ++j, tr);
+      writeInd(outX, ind);
     }
-    tree.initFT();
 
     // increase split counter
     splits++;
   }
 
   /**
-   * Merges temporary indexes for the current token.
-   * @param out full-text data
-   * @param il array mapping
-   * @param list full-text list
-   * @return written size
-   * @throws IOException I/O exception
+   * Returns the number of PRE values in the specified compressed PRE and POS values.
+   * @param ids compressed PRE and POS values
+   * @return number of PRE values
    */
-  private static int merge(final DataOutput out, final IntList il, final FTList[] list)
-      throws IOException {
-
-    final ByteList tbp = new ByteList().add(new byte[4]), tbo = new ByteList().add(new byte[4]);
-    // merge full-text data of all sorted lists with the same token
-    int s = 0;
-    final int is = il.size();
-    for(int j = 0; j < is; j++) {
-      final int m = il.get(j);
-      for(final int p : list[m].prv) tbp.add(Num.num(p));
-      for(final int p : list[m].pov) tbo.add(Num.num(p));
-      s += list[m].size;
-      list[m].next();
+  private static int entries(final byte[] ids) {
+    int n = 0, i = 4;
+    final int is = Num.size(ids);
+    while(i < is) {
+      i += Num.length(ids, i);
+      i += Num.length(ids, i);
+      n++;
     }
-    // write compressed PRE and POS arrays
-    final byte[] pr = tbp.finish();
-    Num.size(pr, pr.length);
-    final byte[] po = tbo.finish();
-    Num.size(po, po.length);
-
-    // write full-text data
-    writeFTData(out, pr, po);
-    return s;
-  }
-
-  /**
-   * Writes full-text data for a single token to disk.
-   * Format: {@code score? pre1 pos1 pre2 pos2 ... (0 score)? pre...}
-   * @param out DataOutput for disk access
-   * @param vpre compressed PRE values
-   * @param vpos compressed pos values
-   * @throws IOException I/O exception
-   */
-  private static void writeFTData(final DataOutput out, final byte[] vpre, final byte[] vpos)
-      throws IOException {
-
-    int np = 4, pp = 4;
-    final int ns = Num.size(vpre);
-    while(np < ns) {
-      // full-text data is stored here, with -scoreU, pre1, pos1, ...,
-      // -scoreU, preU, posU
-      for(final int l = np + Num.length(vpre, np); np < l; np++) out.write(vpre[np]);
-      for(final int l = pp + Num.length(vpos, pp); pp < l; pp++) out.write(vpos[pp]);
-    }
-  }
-
-  /**
-   * Checks if any unprocessed PRE values are remaining.
-   * @param lists lists
-   * @return boolean
-   */
-  private static boolean check(final FTList[] lists) {
-    for(final FTList list : lists) {
-      if(list.token.length > 0) return true;
-    }
-    return false;
+    return n;
   }
 }

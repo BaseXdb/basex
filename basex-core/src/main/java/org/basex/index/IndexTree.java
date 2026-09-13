@@ -1,7 +1,6 @@
 package org.basex.index;
 
 import org.basex.util.*;
-import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -12,25 +11,29 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  * @author Sebastian Gath
  */
-public class IndexTree {
+public final class IndexTree {
   /** Factor for resize. */
-  protected static final double FACTOR = 1.2;
+  private static final double FACTOR = 1.2;
+  /** Estimated overhead of an array object. */
+  private static final int ARRAY = 20;
+  /** Estimated overhead of a tree node. */
+  private static final int NODE = ARRAY + 17;
 
   /** Keys saved in the tree. */
   public final TokenList keys = new TokenList(FACTOR);
-  /** Compressed ID values. */
-  public TokenList ids = new TokenList(FACTOR);
+  /** Compressed ID values (and token positions for token and full-text index). */
+  public final TokenList ids = new TokenList(FACTOR);
 
-  /** Mapping for using existing tree. */
-  protected TokenIntMap maps = new TokenIntMap();
   /** Current iterator node. */
-  protected int cn;
+  private int cn;
+  /** Estimated memory consumption (bytes). */
+  private long memory;
 
   /** Tree structure [left, right, parent]. */
   private final IntList tree = new IntList(FACTOR);
   /** Indicates which nodes have been modified. */
   private final BoolList mod = new BoolList();
-  /** Tokenize keys. */
+  /** Store token positions. */
   private final boolean tokenize;
   /** Tree root node. */
   private int root = -1;
@@ -40,17 +43,7 @@ public class IndexTree {
    * @param type index type
    */
   public IndexTree(final IndexType type) {
-    tokenize = type == IndexType.TOKEN;
-  }
-
-  /**
-   * Indexes the specified key and ID.
-   * @param key key to be indexed
-   * @param id ID to be indexed
-   * @param pos token position (only relevant for token index)
-   */
-  public final void add(final byte[] key, final int id, final int pos) {
-    add(key, id, pos, true);
+    tokenize = type == IndexType.TOKEN || type == IndexType.FULLTEXT;
   }
 
   /**
@@ -59,37 +52,25 @@ public class IndexTree {
    * Otherwise, a new index entry is created.
    * @param key key to be indexed
    * @param id ID to be indexed
-   * @param pos token position (only relevant for token index)
-   * @param exist flag for using existing index
-   * @return int node
+   * @param pos token position (only relevant for token and full-text index)
    */
-  protected final int add(final byte[] key, final int id, final int pos, final boolean exist) {
+  public void add(final byte[] key, final int id, final int pos) {
     // index is empty: create root node
     if(root == -1) {
-      root = newNode(key, id, pos, -1, exist);
-      return root;
+      root = newNode(key, id, pos, -1);
+      return;
     }
 
     int n = root;
     while(true) {
       final int diff = Token.compare(key, keys.get(n));
       if(diff == 0) {
-        if(exist) {
-          addIds(id, pos, n);
-        } else {
-          final int i = maps.get(Num.num(n));
-          if(i < 0) {
-            maps.put(Num.num(n), ids.size());
-            addNewIds(id, pos);
-          } else {
-            addIds(id, pos, i);
-          }
-        }
-        return n;
+        addIds(id, pos, n);
+        return;
       }
       int ch = diff < 0 ? left(n) : right(n);
       if(ch == -1) {
-        ch = newNode(key, id, pos, n, exist);
+        ch = newNode(key, id, pos, n);
         if(diff < 0) {
           setLeft(n, ch);
           adjust(left(n));
@@ -97,7 +78,7 @@ public class IndexTree {
           setRight(n, ch);
           adjust(right(n));
         }
-        return ch;
+        return;
       }
       n = ch;
     }
@@ -107,15 +88,22 @@ public class IndexTree {
    * Returns the number of entries.
    * @return number of entries
    */
-  public final int size() {
+  public int size() {
     return ids.size();
   }
 
   /**
-   * Initializes the index iterator.
-   * will be removed to save memory.
+   * Returns the estimated memory consumption of the tree.
+   * @return memory consumption in bytes
    */
-  public final void init() {
+  public long memory() {
+    return memory;
+  }
+
+  /**
+   * Initializes the index iterator.
+   */
+  public void init() {
     cn = root;
     if(cn != -1) while(left(cn) != -1) cn = left(cn);
   }
@@ -124,7 +112,7 @@ public class IndexTree {
    * Checks if the iterator returns more keys.
    * @return true if more keys exist
    */
-  public final boolean more() {
+  public boolean more() {
     return cn != -1;
   }
 
@@ -132,7 +120,7 @@ public class IndexTree {
    * Returns the next pointer.
    * @return next pointer
    */
-  public final int next() {
+  public int next() {
     /* Last iterator node. */
     final int ln = cn;
     if(right(cn) == -1) {
@@ -154,46 +142,45 @@ public class IndexTree {
   /**
    * Creates a new ID list and adds an ID.
    * @param id ID value
-   * @param pos token position (only relevant for token index)
+   * @param pos token position (only relevant for token and full-text index)
    */
   private void addNewIds(final int id, final int pos) {
     byte[] vs = Num.newNum(id);
     if(tokenize) vs = Num.add(vs, pos);
     ids.add(vs);
+    memory += ARRAY + vs.length;
   }
 
   /**
    * Appends an ID to the ID list specified by n.
    * @param id ID value
-   * @param pos token position (only relevant for token index)
+   * @param pos token position (only relevant for token and full-text index)
    * @param n ID list to append to
    */
   private void addIds(final int id, final int pos, final int n) {
-    byte[] vs = ids.get(n);
-    vs = Num.add(vs, id);
+    final byte[] old = ids.get(n);
+    byte[] vs = Num.add(old, id);
     if(tokenize) vs = Num.add(vs, pos);
     ids.set(n, vs);
+    memory += vs.length - old.length;
   }
 
   /**
    * Creates a new node.
    * @param key node key
    * @param id ID value
-   * @param pos token position (only relevant for token index)
+   * @param pos token position (only relevant for token and full-text index)
    * @param par pointer to parent node
-   * @param exist flag for reusing existing tree
    * @return pointer of the new node
    */
-  private int newNode(final byte[] key, final int id, final int pos, final int par,
-      final boolean exist) {
-
+  private int newNode(final byte[] key, final int id, final int pos, final int par) {
     tree.add(-1); // left node
     tree.add(-1); // right node
     tree.add(par); // parent node
     mod.add(false);
     keys.add(key);
+    memory += NODE + key.length;
     addNewIds(id, pos);
-    if(!exist) maps.put(Num.num(keys.size() - 1), ids.size() - 1);
     return mod.size() - 1;
   }
 

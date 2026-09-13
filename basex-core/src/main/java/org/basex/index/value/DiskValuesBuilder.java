@@ -71,7 +71,6 @@ public final class DiskValuesBuilder extends ValuesBuilder {
       writeIndex(splits > 0);
       if(splits > 1) {
         index = null;
-        clean();
         merge();
       }
 
@@ -88,10 +87,9 @@ public final class DiskValuesBuilder extends ValuesBuilder {
   protected void check() throws IOException {
     super.check();
     // check if main memory is exhausted
-    if(splitRequired()) {
+    if(splitRequired(index.memory())) {
       writeIndex(true);
       index = new IndexTree(type);
-      clean();
     }
   }
 

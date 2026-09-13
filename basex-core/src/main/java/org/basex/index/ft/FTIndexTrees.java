@@ -1,7 +1,9 @@
 package org.basex.index.ft;
 
+import org.basex.index.*;
+
 /**
- * This class provides an array with several {@link FTIndexTree} instances,
+ * This class provides an array with several {@link IndexTree} instances,
  * one for each token length.
  *
  * @author BaseX Team, BSD License
@@ -10,7 +12,7 @@ package org.basex.index.ft;
  */
 final class FTIndexTrees {
   /** For each key length, an extra tree is created. */
-  private final FTIndexTree[] trees;
+  private final IndexTree[] trees;
   /** Pointer on current tree. */
   private int ctree;
 
@@ -19,7 +21,7 @@ final class FTIndexTrees {
    * @param size number of tree instances
    */
   FTIndexTrees(final int size) {
-    trees = new FTIndexTree[size + 1];
+    trees = new IndexTree[size + 1];
   }
 
   /**
@@ -27,52 +29,53 @@ final class FTIndexTrees {
    * @param token token to be indexed
    * @param pre PRE value for the token
    * @param pos pos value of the token
-   * @param index current file ID
    */
-  void index(final byte[] token, final int pre, final int pos, final int index) {
+  void index(final byte[] token, final int pre, final int pos) {
     final int tl = token.length;
-    if(trees[tl] == null) trees[tl] = new FTIndexTree();
-    trees[tl].add(token, pre, pos, index);
+    if(trees[tl] == null) trees[tl] = new IndexTree(IndexType.FULLTEXT);
+    trees[tl].add(token, pre, pos);
   }
 
   /**
-   * Initializes all trees for adding new full-text data.
+   * Returns the estimated memory consumption of all trees.
+   * @return memory consumption in bytes
    */
-  void initFT() {
-    for(final FTIndexTree tree : trees) {
-      if(tree != null) tree.initFT();
+  long memory() {
+    long m = 0;
+    for(final IndexTree tree : trees) {
+      if(tree != null) m += tree.memory();
     }
+    return m;
   }
 
   /**
    * Initializes all trees for iterative traversal.
    */
   void init() {
-    for(final FTIndexTree tree : trees) {
+    for(final IndexTree tree : trees) {
       if(tree != null) tree.init();
     }
-    ctree = -1;
+    ctree = 0;
   }
 
   /**
    * Checks for more tokens.
-   * @param index current index split counter
    * @return boolean more
    */
-  boolean more(final int index) {
-    if(ctree != -1 && trees[ctree].more(index)) return true;
+  boolean more() {
     final int tl = trees.length;
-    while(++ctree < tl) {
-      if(trees[ctree] != null) return more(index);
+    for(; ctree < tl; ctree++) {
+      final IndexTree tree = trees[ctree];
+      if(tree != null && tree.more()) return true;
     }
     return false;
   }
 
   /**
-   * Returns the next token.
-   * @return byte[] next token
+   * Returns the next tree.
+   * @return tree
    */
-  FTIndexTree nextTree() {
+  IndexTree nextTree() {
     return trees[ctree];
   }
 }

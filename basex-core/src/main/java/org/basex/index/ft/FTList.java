@@ -14,7 +14,7 @@ import org.basex.io.random.*;
  * @author BaseX Team, BSD License
  * @author Sebastian Gath
  */
-final class FTList {
+final class FTList implements Closeable {
   /** Empty integer array. */
   private static final int[] NOINTS = {};
 
@@ -36,7 +36,7 @@ final class FTList {
   private final DataAccess str;
 
   /** Current data size. */
-  int size;
+  private int size;
   /** Next token. */
   byte[] token;
   /** Next PRE values. */
@@ -75,7 +75,6 @@ final class FTList {
 
     token = token();
     if(token.length == 0) {
-      wasted = true;
       prv = NOINTS;
       pov = NOINTS;
       close();
@@ -89,10 +88,10 @@ final class FTList {
     }
   }
 
-  /**
-   * Closes the input files.
-   */
-  private void close() {
+  @Override
+  public void close() {
+    if(wasted) return;
+    wasted = true;
     str.close();
     dat.close();
   }

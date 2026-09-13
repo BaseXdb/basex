@@ -27,7 +27,7 @@ public final class IndexFormatTest extends SandboxTest {
     { "atvr", "73ef5ab8d9235efb5ce2ba6ea63a5081" },
     { "tokl", "b85c6290856dc961ed5ec743ff667acb" },
     { "tokr", "df991f03cd2e2f4e486a49abd6a08666" },
-    { "ftxx", "65eac60d76e951a7b7f68b718bd0272a" },
+    { "ftxx", "62a63ef884e8e335f9672bc7d72621c0" },
     { "ftxy", "7973f4993b8dce92d951de67192c7d36" },
     { "ftxz", "4c3356c9b6ed09d9ee43de462251c04a" },
   };
