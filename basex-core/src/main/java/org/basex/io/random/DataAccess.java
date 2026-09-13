@@ -566,7 +566,7 @@ public final class DataAccess implements Closeable {
      * @return integer value
      */
     private int read4() {
-      return (read() << 24) + (read() << 16) + (read() << 8) + read();
+      return read() << 24 | read() << 16 | read() << 8 | read();
     }
 
     /**
@@ -584,8 +584,7 @@ public final class DataAccess implements Closeable {
      * @return long value
      */
     private long read5() {
-      return ((long) read() << 32) + ((long) read() << 24) + (read() << 16) + (read() << 8) +
-        read();
+      return (long) read() << 32 | (long) read() << 24 | read() << 16 | read() << 8 | read();
     }
 
     /**
@@ -618,9 +617,9 @@ public final class DataAccess implements Closeable {
       final int value = read();
       return switch(value & 0xC0) {
         case 0    -> value;
-        case 0x40 -> (value - 0x40 << 8) + read();
-        case 0x80 -> (value - 0x80 << 24) + (read() << 16) + (read() << 8) + read();
-        default   -> (read() << 24) + (read() << 16) + (read() << 8) + read();
+        case 0x40 -> (value & 0x3F) << 8 | read();
+        case 0x80 -> (value & 0x3F) << 24 | read() << 16 | read() << 8 | read();
+        default   -> read() << 24 | read() << 16 | read() << 8 | read();
       };
     }
 

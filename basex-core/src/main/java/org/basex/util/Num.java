@@ -108,8 +108,8 @@ public final class Num {
    * @return array length
    */
   public static int size(final byte[] array) {
-    return ((array[0] & 0xFF) << 24) + ((array[1] & 0xFF) << 16) +
-      ((array[2] & 0xFF) << 8) + (array[3] & 0xFF);
+    return (array[0] & 0xFF) << 24 | (array[1] & 0xFF) << 16 |
+      (array[2] & 0xFF) << 8 | array[3] & 0xFF;
   }
 
   /**

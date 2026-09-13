@@ -160,7 +160,12 @@ public final class DirParser extends Parser {
    * @return stream
    */
   private IOStream newStream(final InputStream is, final String path, final IO input) {
-    return new IOStream(is, archiveName ? input.path() + '/' + path : path);
+    // parsers must not close the archive stream
+    final InputStream in = new FilterInputStream(is) {
+      @Override
+      public void close() { }
+    };
+    return new IOStream(in, archiveName ? input.path() + '/' + path : path);
   }
 
   /**

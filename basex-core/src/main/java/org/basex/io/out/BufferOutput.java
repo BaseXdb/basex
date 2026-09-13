@@ -86,7 +86,8 @@ public final class BufferOutput extends OutputStream {
     try {
       flush();
     } finally {
-      out.close();
+      // keep standard streams open
+      if(out != System.out && out != System.err) out.close();
     }
   }
 }

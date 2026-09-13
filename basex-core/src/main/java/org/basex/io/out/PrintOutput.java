@@ -45,7 +45,7 @@ public class PrintOutput extends OutputStream {
    * @return print output
    */
   public static PrintOutput get(final OutputStream out) {
-    // buffer a ByteArrayOutputStream as well: its synchronized, array-growing writes are costly
+    // buffer all streams that are not buffered yet
     return out instanceof final PrintOutput po ? po : new PrintOutput(
            out instanceof BufferedOutputStream ||
            out instanceof BufferOutput ? out : new BufferOutput(out));
@@ -164,8 +164,7 @@ public class PrintOutput extends OutputStream {
 
   @Override
   public void close() throws IOException {
-    if(os == System.out || os == System.err) flush();
-    else os.close();
+    os.close();
   }
 
   /**
@@ -173,7 +172,7 @@ public class PrintOutput extends OutputStream {
    * @return {@code true} if stream is exhausted
    */
   public boolean finished() {
-    return size == max;
+    return size >= max;
   }
 
   /** Fallback function for encoding problems. */

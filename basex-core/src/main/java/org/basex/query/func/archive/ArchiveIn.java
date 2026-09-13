@@ -27,9 +27,11 @@ abstract class ArchiveIn extends InputStream {
    */
   static ArchiveIn get(final BufferInput bi, final InputInfo info) throws QueryException {
     try {
-      final LookupInput li = new LookupInput(bi);
-      if(li.lookup() == 0x50) return new ZIPIn(li);
-      if(li.lookup() == 0x1f) return new GZIPIn(li);
+      bi.mark(1);
+      final int b = bi.read();
+      bi.reset();
+      if(b == 0x50) return new ZIPIn(bi);
+      if(b == 0x1f) return new GZIPIn(bi);
     } catch(final IOException ex) {
       throw ARCHIVE_ERROR_X.get(info, ex);
     }

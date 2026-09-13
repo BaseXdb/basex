@@ -675,7 +675,7 @@ public final class TableDiskAccess extends TableAccess {
     private int read2(final int pre, final int offset) {
       final int o = offset + cursor(pre);
       final byte[] data = buffers.current().data;
-      return ((data[o] & 0xFF) << 8) + (data[o + 1] & 0xFF);
+      return (data[o] & 0xFF) << 8 | data[o + 1] & 0xFF;
     }
 
     /**
@@ -687,8 +687,8 @@ public final class TableDiskAccess extends TableAccess {
     private int read4(final int pre, final int offset) {
       final int o = offset + cursor(pre);
       final byte[] data = buffers.current().data;
-      return ((data[o] & 0xFF) << 24) + ((data[o + 1] & 0xFF) << 16) +
-        ((data[o + 2] & 0xFF) << 8) + (data[o + 3] & 0xFF);
+      return (data[o] & 0xFF) << 24 | (data[o + 1] & 0xFF) << 16 |
+        (data[o + 2] & 0xFF) << 8 | data[o + 3] & 0xFF;
     }
 
     /**
@@ -700,8 +700,8 @@ public final class TableDiskAccess extends TableAccess {
     private long read5(final int pre, final int offset) {
       final int o = offset + cursor(pre);
       final byte[] data = buffers.current().data;
-      return ((long) (data[o] & 0xFF) << 32) + ((long) (data[o + 1] & 0xFF) << 24) +
-        ((data[o + 2] & 0xFF) << 16) + ((data[o + 3] & 0xFF) << 8) + (data[o + 4] & 0xFF);
+      return (long) (data[o] & 0xFF) << 32 | (long) (data[o + 1] & 0xFF) << 24 |
+        (data[o + 2] & 0xFF) << 16 | (data[o + 3] & 0xFF) << 8 | data[o + 4] & 0xFF;
     }
 
     /**

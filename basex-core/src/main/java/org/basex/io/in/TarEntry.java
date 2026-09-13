@@ -93,13 +93,7 @@ public final class TarEntry {
    * @return file name
    */
   static String name(final ByteList result) {
-    try {
-      return new String(result.toArray(), Prop.CHARSET);
-    } catch(final Exception ex) {
-      // fallback: UTF8
-      Util.debug(ex);
-      return result.toString();
-    }
+    return new String(result.toArray(), Prop.CHARSET);
   }
 
   @Override

@@ -54,6 +54,11 @@ public final class EncoderOutput extends PrintOutput {
 
   @Override
   public void print(final String string) throws IOException {
-    for(final int cp : string.codePoints().toArray()) print(cp);
+    final int sl = string.length();
+    for(int s = 0; s < sl;) {
+      final int cp = string.codePointAt(s);
+      print(cp);
+      s += Character.charCount(cp);
+    }
   }
 }

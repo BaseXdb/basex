@@ -417,7 +417,7 @@ public final class ClientListener extends Thread implements ClientInfo {
       cmd.execute(context);
       success(cmd.info());
     } catch(final BaseXException ex) {
-      si.flush();
+      si.drain();
       error(ex.getMessage());
     }
   }

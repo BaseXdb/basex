@@ -38,10 +38,10 @@ public final class ServerInput extends InputStream {
   }
 
   /**
-   * Flushes the remaining client data.
+   * Skips the remaining client data.
    * @throws IOException I/O exception
    */
-  public void flush() throws IOException {
+  public void drain() throws IOException {
     while(read() != -1);
   }
 }

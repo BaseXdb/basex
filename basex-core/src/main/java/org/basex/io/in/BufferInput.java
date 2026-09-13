@@ -115,6 +115,20 @@ public class BufferInput extends InputStream {
     return readByte();
   }
 
+  @Override
+  public int read(final byte[] bytes, final int off, final int len) throws IOException {
+    if(len == 0) return 0;
+    // fill buffer if it is exhausted
+    final int b = readByte();
+    if(b == -1) return -1;
+    bytes[off] = (byte) b;
+    // copy remaining buffered bytes
+    final int n = Math.min(bsize - bpos, len - 1);
+    System.arraycopy(array, bpos, bytes, off + 1, n);
+    bpos += n;
+    return n + 1;
+  }
+
   /**
    * Returns the next unsigned byte.
    * {@code -1} is returned if all bytes have been read.
@@ -165,7 +179,7 @@ public class BufferInput extends InputStream {
 
   @Override
   public final void close() throws IOException {
-    if(is != null && !(is instanceof FilterInputStream)) is.close();
+    if(is != null) is.close();
   }
 
   /**

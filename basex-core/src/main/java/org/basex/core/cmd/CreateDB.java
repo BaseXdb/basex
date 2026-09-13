@@ -14,7 +14,6 @@ import org.basex.core.parse.Commands.CmdCreate;
 import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.*;
-import org.basex.io.in.*;
 import org.basex.util.*;
 
 /**
@@ -63,8 +62,14 @@ public final class CreateDB extends ACreate {
     try {
       source = sourceToIO(name);
       if(in != null) {
-        final LookupInput li = new LookupInput(source.inputStream());
-        source = li.lookup() == -1 ? null : new IOStream(li, source.name());
+        final PushbackInputStream pi = new PushbackInputStream(source.inputStream());
+        final int b = pi.read();
+        if(b == -1) {
+          source = null;
+        } else {
+          pi.unread(b);
+          source = new IOStream(pi, source.name());
+        }
       }
     } catch(final IOException ex) {
       return error(ex);

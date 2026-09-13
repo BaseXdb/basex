@@ -79,6 +79,7 @@ public class TextInput extends BufferInput {
    */
   private void guess(final String encoding) throws IOException {
     try {
+      mark(0);
       final int a = readByte(), b = readByte(), c = readByte(), d = readByte();
       String enc = normEncoding(encoding, false);
       int skip = 0;
@@ -130,7 +131,7 @@ public class TextInput extends BufferInput {
   public TextInput encoding(final String encoding) throws IOException {
     if(encoding != null && !encoding.isEmpty()) {
       final String enc = normEncoding(encoding, false);
-      decoder = TextDecoder.get(enc != UTF16 ? enc :
+      decoder = TextDecoder.get(!Strings.eq(enc, UTF16) ? enc :
         decoder.encoding.equals(UTF16LE) ? UTF16LE : UTF16BE);
       decoder.fallback = fallback;
     }

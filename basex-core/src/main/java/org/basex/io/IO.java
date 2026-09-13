@@ -12,7 +12,6 @@ import javax.xml.transform.stream.*;
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.in.*;
-import org.basex.io.out.*;
 import org.basex.util.*;
 import org.xml.sax.*;
 
@@ -378,7 +377,7 @@ public abstract class IO {
    * @throws IOException I/O exception
    */
   public static void write(final InputStream in, final OutputStream out) throws IOException {
-    try(BufferInput bi = BufferInput.get(in); BufferOutput bo = BufferOutput.get(out)) {
+    try(in; out) {
       in.transferTo(out);
     }
   }

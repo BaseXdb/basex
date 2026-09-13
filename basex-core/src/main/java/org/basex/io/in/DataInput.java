@@ -39,10 +39,7 @@ public final class DataInput extends BufferInput {
    */
   public byte[] readToken() throws IOException {
     final int l = readNum();
-    if(l == 0) return Token.EMPTY;
-    final byte[] tmp = new byte[l];
-    for(int i = 0; i < l; i++) tmp[i] = (byte) read();
-    return tmp;
+    return l == 0 ? Token.EMPTY : readNBytes(l);
   }
 
   /**
@@ -108,9 +105,9 @@ public final class DataInput extends BufferInput {
     final int v = read();
     return v == -1 ? 0 : switch((v & 0xC0) >>> 6) {
       case 0  -> v;
-      case 1  -> ((v & 0x3F) << 8) + read();
-      case 2  -> ((v & 0x3F) << 24) + (read() << 16) + (read() << 8) + read();
-      default -> (read() << 24) + (read() << 16) + (read() << 8) + read();
+      case 1  -> (v & 0x3F) << 8 | read();
+      case 2  -> (v & 0x3F) << 24 | read() << 16 | read() << 8 | read();
+      default -> read() << 24 | read() << 16 | read() << 8 | read();
     };
   }
 
@@ -142,9 +139,7 @@ public final class DataInput extends BufferInput {
    * @throws IOException I/O exception
    */
   private long read8() throws IOException {
-    return ((long) read() << 56) + ((long) (read() & 255) << 48)
-        + ((long) (read() & 255) << 40) + ((long) (read() & 255) << 32)
-        + ((long) (read() & 255) << 24) + ((read() & 255) << 16)
-        + ((read() & 255) << 8) + (read() & 255);
+    return (long) read() << 56 | (long) read() << 48 | (long) read() << 40 | (long) read() << 32 |
+        (long) read() << 24 | read() << 16 | read() << 8 | read();
   }
 }
