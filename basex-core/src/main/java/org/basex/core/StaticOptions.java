@@ -67,7 +67,7 @@ public final class StaticOptions extends Options {
   /** Keep alive time (seconds) for clients; deactivated if set to 0. */
   public static final NumberOption KEEPALIVE = new NumberOption("KEEPALIVE", 600);
   /** Defines the number of parallel readers. */
-  public static final NumberOption PARALLEL = new NumberOption("PARALLEL", 8);
+  public static final NumberOption PARALLEL = new NumberOption("PARALLEL", 32);
   /** Logging flag. */
   public static final StringOption LOG = new StringOption("LOG", "data");
   /** Log filter. */
