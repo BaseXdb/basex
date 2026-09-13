@@ -107,7 +107,7 @@ public final class FTIndex extends ValueIndex {
 
     // estimate costs for queries which stretch over multiple index entries
     final FTOpt opt = ((FTLexer) search).ftOpt();
-    return IndexCosts.get(opt.is(FZ) || opt.is(WC) ? Math.max(1, data.nodes() >> 4) :
+    return IndexCosts.get(opt.is(FZ) || opt.is(WC) ? Math.max(1, data.nodes() / 16) :
       entry(token).size);
   }
 
@@ -295,7 +295,7 @@ public final class FTIndex extends ValueIndex {
     // binary search
     final int o = tl + ENTRY;
     while(s < e) {
-      final int m = s + (e - s >> 1) / o * o, d = compare(dataY.readBytes(m, tl), token);
+      final int m = s + (e - s) / 2 / o * o, d = compare(dataY.readBytes(m, tl), token);
       if(d == 0) return m;
       if(d < 0) s = m + o;
       else e = m - o;

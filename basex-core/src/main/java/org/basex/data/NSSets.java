@@ -139,7 +139,7 @@ final class NSSets {
    */
   private static byte[] encode(final int[] values) {
     final int vl = values.length;
-    final byte[] token = new byte[vl << 2];
+    final byte[] token = new byte[vl * 4];
     for(int v = 0, t = 0; v < vl; v++) {
       final int value = values[v];
       token[t++] = (byte) (value >> 24);
@@ -156,7 +156,7 @@ final class NSSets {
    * @return prefix/URI pairs
    */
   private static int[] decode(final byte[] token) {
-    final int vl = token.length >>> 2;
+    final int vl = token.length / 4;
     final int[] values = new int[vl];
     for(int v = 0, t = 0; v < vl; v++) {
       values[v] = (token[t++] & 0xFF) << 24 | (token[t++] & 0xFF) << 16 |

@@ -60,13 +60,13 @@ final class QueryCompiler {
    * @param result scopes
    */
   private void tarjan(final int id, final ArrayList<ArrayList<Scope>> result) {
-    final int ixv = id << 1, llv = ixv + 1, idx = next++;
+    final int ixv = id * 2, llv = ixv + 1, idx = next++;
     list.set(ixv, idx);
     list.set(llv, idx);
     stack.push(id);
 
     for(final int w : adjacentTo(id)) {
-      final int ixw = w << 1, llw = ixw + 1;
+      final int ixw = w * 2, llw = ixw + 1;
       if(list.size() <= ixw || list.get(ixw) < 0) {
         // successor w has not yet been visited; recurse on it
         tarjan(w, result);

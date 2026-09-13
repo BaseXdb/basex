@@ -190,7 +190,7 @@ public final class FolderView extends View {
     while(iter.more()) {
       final int kind = data.kind(iter.pre);
       final boolean elem = kind == Data.ELEM || kind == Data.DOC;
-      final int x = OFFX + iter.level * (lineH >> 1) + (elem ? lineH : boxW);
+      final int x = OFFX + iter.level * (lineH / 2) + (elem ? lineH : boxW);
       drawEntry(g, iter.pre, x, iter.y + boxW);
     }
     gui.painting = false;
@@ -264,7 +264,7 @@ public final class FolderView extends View {
         final int kind = data.kind(iter.pre);
         if(kind == Data.ELEM || kind == Data.DOC) {
           // set cursor when moving over tree boxes
-          final int xx = OFFX + iter.level * (lineH >> 1) + lineH - 6;
+          final int xx = OFFX + iter.level * (lineH / 2) + lineH - 6;
           if(x > xx - fsz && x < xx) c = CURSORHAND;
         }
         gui.cursor(c);
@@ -311,10 +311,10 @@ public final class FolderView extends View {
    */
   private void createBoxes() {
     final int s = fontSize;
-    boxMargin = s >> 2;
+    boxMargin = s / 4;
     lineH = s + boxMargin;
     boxW = s - boxMargin;
-    final int sp = Math.max(1, s >> 4);
+    final int sp = Math.max(1, s / 16);
 
     // empty box
     final BufferedImage emptyBox = new BufferedImage(boxW + 1, boxW + 1,
@@ -322,15 +322,15 @@ public final class FolderView extends View {
     Graphics2D g = emptyBox.createGraphics();
     BaseXLayout.antiAlias(g);
     g.setColor(color4);
-    g.fillOval((boxW >> 2) - 1, (boxW >> 2) + 1, boxW >> 1, boxW >> 1);
+    g.fillOval(boxW / 4 - 1, boxW / 4 + 1, boxW / 2, boxW / 2);
     g.setColor(color3);
-    g.fillOval((boxW >> 2) - 2, boxW >> 2, boxW >> 1, boxW >> 1);
+    g.fillOval(boxW / 4 - 2, boxW / 4, boxW / 2, boxW / 2);
 
     openedMarker = new BufferedImage(boxW + 1, boxW + 1, BufferedImage.TYPE_INT_ARGB);
     g = openedMarker.createGraphics();
     BaseXLayout.antiAlias(g);
-    Polygon p = new Polygon(new int[] { 0, boxW, boxW >> 1 }, new int[] {
-        boxW - sp >> 1, boxW - sp >> 1, boxW }, 3);
+    Polygon p = new Polygon(new int[] { 0, boxW, boxW / 2 }, new int[] {
+        (boxW - sp) / 2, (boxW - sp) / 2, boxW }, 3);
     p.translate(0, -1);
     g.setColor(color4);
     g.fillPolygon(p);
@@ -342,8 +342,8 @@ public final class FolderView extends View {
     g = closedMarker.createGraphics();
     BaseXLayout.antiAlias(g);
 
-    p = new Polygon(new int[] { boxW - sp >> 1, boxW, boxW - sp >> 1 },
-        new int[] { 0, boxW >> 1, boxW }, 3);
+    p = new Polygon(new int[] { (boxW - sp) / 2, boxW, (boxW - sp) / 2 },
+        new int[] { 0, boxW / 2, boxW }, 3);
     p.translate(-1, 1);
     g.setColor(color4);
     g.fillPolygon(p);

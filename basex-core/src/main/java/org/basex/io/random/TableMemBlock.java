@@ -24,7 +24,7 @@ final class TableMemBlock {
    * @param compact compact block size
    */
   private TableMemBlock(final boolean compact) {
-    data = new long[(compact ? 1 : IO.BLOCKSIZE) << 1];
+    data = new long[(compact ? 1 : IO.BLOCKSIZE) * 2];
   }
 
   /**
@@ -97,7 +97,7 @@ final class TableMemBlock {
   int delete(final int pre, final int count, final int nextPre) {
     final int first = pre - firstPre, last = first + count, filled = nextPre - firstPre;
     if(last >= filled) return filled - first;
-    System.arraycopy(data, last << 1, data, first << 1, filled - last << 1);
+    System.arraycopy(data, last * 2, data, first * 2, (filled - last) * 2);
     return count;
   }
 
@@ -114,26 +114,26 @@ final class TableMemBlock {
 
     // check if entries can be inserted into existing block
     if(count <= remaining) {
-      resize(last + copy << 1);
-      System.arraycopy(data, first << 1, data, last << 1, copy << 1);
+      resize((last + copy) * 2);
+      System.arraycopy(data, first * 2, data, last * 2, copy * 2);
       return null;
     }
 
     // otherwise, create new blocks
-    resize(IO.BLOCKSIZE << 1);
+    resize(IO.BLOCKSIZE * 2);
     final ArrayList<TableMemBlock> blocks = get(count - remaining, false);
     // create temporary array with final entries
     final int total = filled + count;
-    final long[] longs = new long[total << 1];
-    System.arraycopy(data, 0, longs, 0, first << 1);
-    System.arraycopy(data, first << 1, longs, last << 1, copy << 1);
+    final long[] longs = new long[total * 2];
+    System.arraycopy(data, 0, longs, 0, first * 2);
+    System.arraycopy(data, first * 2, longs, last * 2, copy * 2);
 
     /* redistribute entries evenly:
      * 300 entries: 2 blocks with 150 entries each
      * 301 entries: 2 blocks with 151 and 150 entries
      * 514 entries: 3 blocks with 172, 172 and 170 entries */
     final int bs = blocks.size(), fill = (total + bs) / (bs + 1);
-    final int total2 = total << 1, fill2 = fill << 1;
+    final int total2 = total * 2, fill2 = fill * 2;
     // populate original block
     System.arraycopy(longs, 0, data, 0, fill2);
     // populate new blocks
@@ -154,7 +154,7 @@ final class TableMemBlock {
   private void resize(final int size) {
     final long[] dt = data;
     final int dl = dt.length;
-    if(dl < size) data = Arrays.copyOf(dt, Math.min(Math.max(size, dl << 1), IO.BLOCKSIZE << 1));
+    if(dl < size) data = Arrays.copyOf(dt, Math.min(Math.max(size, dl * 2), IO.BLOCKSIZE * 2));
   }
 
   @Override
@@ -189,7 +189,7 @@ final class TableMemBlock {
    * @return table index
    */
   private int index(final int pre, final int offset) {
-    final int p = pre - firstPre << 1;
+    final int p = (pre - firstPre) * 2;
     return offset < 8 ? p : p + 1;
   }
 }

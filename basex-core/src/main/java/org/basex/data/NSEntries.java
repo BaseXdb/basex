@@ -322,12 +322,12 @@ final class NSEntries {
     }
 
     // sort the entries by their PRE values
-    final int ts = tuples.size() >>> 2;
+    final int ts = tuples.size() / 4;
     final int[] keys = new int[ts];
-    for(int t = 0; t < ts; t++) keys[t] = tuples.get(t << 2);
+    for(int t = 0; t < ts; t++) keys[t] = tuples.get(t * 4);
     final int[] order = Array.createOrder(keys, true);
     for(int t = 0; t < ts; t++) {
-      final int o = order[t] << 2;
+      final int o = order[t] * 4;
       list.add(tuples.get(o)).add(tuples.get(o + 1)).add(tuples.get(o + 2)).add(tuples.get(o + 3));
     }
   }

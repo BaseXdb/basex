@@ -73,16 +73,16 @@ public final class MapBuilder {
         entries[i + 1] = value;
       } else if(size < XQSmallMap.MAX_SIZE) {
         // entries are inlined: the final representation is chosen in map()
-        final int e = size++ << 1;
+        final int e = size++ * 2;
         if(entries == null) entries = new Value[2];
-        else if(e == entries.length) entries = Arrays.copyOf(entries, e << 1);
+        else if(e == entries.length) entries = Arrays.copyOf(entries, e * 2);
         entries[e] = key;
         entries[e + 1] = value;
       } else {
         // too many entries: switch to a hash-based representation
         map = XQHashMap.get(Math.max(capacity, size + 1L), keyType, valueType);
         for(int e = 0; e < size; e++) {
-          map = map.build((Item) entries[e << 1], entries[(e << 1) + 1]);
+          map = map.build((Item) entries[e * 2], entries[e * 2 + 1]);
         }
         map = map.build(key, value);
         entries = null;
@@ -187,7 +187,7 @@ public final class MapBuilder {
    */
   private int index(final Item key) throws QueryException {
     for(int e = 0; e < size; e++) {
-      final int i = e << 1;
+      final int i = e * 2;
       if(key.atomicEqual((Item) entries[i])) return i;
     }
     return -1;
@@ -203,7 +203,7 @@ public final class MapBuilder {
     // the inlined entries are copied: the builder may still be used after this call
     final XQMap mp = map != null ? map :
       size == 1 ? XQMap.get((Item) entries[0], entries[1]) :
-      new XQSmallMap(Arrays.copyOf(entries, size << 1));
+      new XQSmallMap(Arrays.copyOf(entries, size * 2));
     mp.refineType(MapType.get(keyType, valueType));
     return mp;
   }

@@ -292,7 +292,7 @@ final class PlotAxis {
     // small ranges between min and max value
     if(range < 1) {
       final double dec = 1.0d / range;
-      double pow = (int) (Math.floor(StrictMath.log10(dec) + 0.5d) + 1) << 1;
+      double pow = (int) (Math.floor(StrictMath.log10(dec) + 0.5d) + 1) * 2;
       final double fac = (int) StrictMath.pow(10, pow);
       final double tmin = min * fac;
       final double tmax = max * fac;

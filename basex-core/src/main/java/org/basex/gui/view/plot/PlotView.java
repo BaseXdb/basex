@@ -917,7 +917,7 @@ public final class PlotView extends View {
    * @return size value
    */
   private static int sizeFactor() {
-    return Math.max(2, fontSize << 1);
+    return Math.max(2, fontSize * 2);
   }
 
   /**

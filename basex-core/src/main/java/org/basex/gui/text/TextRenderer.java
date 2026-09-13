@@ -211,7 +211,7 @@ final class TextRenderer extends BaseXBack {
       g.setColor(GUIConstants.gray);
       final String string = Integer.toString(layout.line);
       clipAll(g);
-      font.draw(g, string, offset - font.stringWidth(string) - (OFFSET << 1), layout.y);
+      font.draw(g, string, offset - font.stringWidth(string) - OFFSET * 2, layout.y);
       clipText(g);
     }
   }
@@ -354,13 +354,13 @@ final class TextRenderer extends BaseXBack {
 
     offset = OFFSET;
     if(render && showLines) {
-      offset += font.stringWidth(Integer.toString(text.lines())) + (OFFSET << 1);
+      offset += font.stringWidth(Integer.toString(text.lines())) + OFFSET * 2;
     }
     final Layout layout = new Layout(new TextIterator(text), render);
     layout.startX = offset - (start ? 0 : hscroll.pos());
     layout.x = layout.startX;
     layout.y = fontHeight - (start ? 0 : scroll.pos()) - 2;
-    layout.lineY = layout.y - (fontHeight << 2) / 5;
+    layout.lineY = layout.y - fontHeight * 4 / 5;
     return layout;
   }
 
@@ -405,7 +405,7 @@ final class TextRenderer extends BaseXBack {
       final int sp = cache.startPos();
       final int[] st = cache.startState();
       layout.y = cache.startY();
-      layout.lineY = layout.y - (fontHeight << 2) / 5;
+      layout.lineY = layout.y - fontHeight * 4 / 5;
       layout.line = r0 + 1;
       iter.pos(sp);
       iter.posEnd(sp);
@@ -531,7 +531,7 @@ final class TextRenderer extends BaseXBack {
   private void position(final Layout layout, final int idx, final int dy) {
     layout.line = idx + 1;
     layout.y = cache.y(idx) + dy;
-    layout.lineY = layout.y - (fontHeight << 2) / 5;
+    layout.lineY = layout.y - fontHeight * 4 / 5;
     layout.x = layout.startX;
     final int p = cache.pos(idx);
     layout.iter.pos(p);
@@ -603,7 +603,7 @@ final class TextRenderer extends BaseXBack {
     layout.wrapped = false;
     // text that cannot be laid out, no more words found: quit
     final int w = width, maxWidth = w - offset;
-    if(!layout.renderable || maxWidth <= 0 || !iter.moreStrings(w >> 2)) return false;
+    if(!layout.renderable || maxWidth <= 0 || !iter.moreStrings(w / 4)) return false;
 
     final int oldY = layout.y;
     int sw = 0;
@@ -773,7 +773,7 @@ final class TextRenderer extends BaseXBack {
       } else if(showInvisible && cp == '\t') {
         // draw tab arrow
         final int lh = 1 + fontHeight / 12, xe = x + font.charWidth('\t') - lh;
-        final int yy = y - fontHeight * 3 / 10, as = (lh << 1) - 1;
+        final int yy = y - fontHeight * 3 / 10, as = lh * 2 - 1;
         g.setColor(GUIConstants.gray);
         g.drawLine(x + lh, yy, xe, yy);
         g.drawLine(xe - as, yy - as, xe, yy);
@@ -787,7 +787,7 @@ final class TextRenderer extends BaseXBack {
           // draw whitespace character
           final int s = fontHeight / 12 + 1;
           g.setColor(GUIConstants.gray);
-          g.fillRect(x + (sw >> 1), y - fontHeight * 3 / 10, s, s);
+          g.fillRect(x + sw / 2, y - fontHeight * 3 / 10, s, s);
         } else {
           // draw non-whitespace string
           g.setColor(color);

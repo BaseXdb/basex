@@ -28,7 +28,7 @@ public final class Atts extends ElementList {
    * @param capacity array capacity
    */
   public Atts(final long capacity) {
-    list = new byte[Array.initialCapacity(capacity << 1)][];
+    list = new byte[Array.initialCapacity(capacity * 2)][];
   }
 
   /**
@@ -42,12 +42,12 @@ public final class Atts extends ElementList {
 
   @Override
   public int size() {
-    return size >>> 1;
+    return size / 2;
   }
 
   @Override
   public void size(final int sz) {
-    size = sz << 1;
+    size = sz * 2;
   }
 
   /**
@@ -60,7 +60,7 @@ public final class Atts extends ElementList {
     byte[][] lst = list;
     final int s = size;
     if(s == lst.length) {
-      lst = Arrays.copyOf(lst, Array.newCapacity(s >>> 1) << 1);
+      lst = Arrays.copyOf(lst, Array.newCapacity(s / 2) * 2);
       list = lst;
     }
     lst[s] = name;
@@ -118,7 +118,7 @@ public final class Atts extends ElementList {
   public int get(final byte[] name) {
     final byte[][] lst = list;
     for(int p = 0; p < size; p += 2) {
-      if(eq(lst[p], name)) return p >>> 1;
+      if(eq(lst[p], name)) return p / 2;
     }
     return -1;
   }
@@ -129,7 +129,7 @@ public final class Atts extends ElementList {
    * @return name
    */
   public byte[] name(final int index) {
-    return list[index << 1];
+    return list[index * 2];
   }
 
   /**
@@ -138,7 +138,7 @@ public final class Atts extends ElementList {
    * @return value
    */
   public byte[] value(final int index) {
-    return list[(index << 1) + 1];
+    return list[index * 2 + 1];
   }
 
   /**
@@ -148,7 +148,7 @@ public final class Atts extends ElementList {
    * @return self reference
    */
   public Atts value(final int index, final byte[] value) {
-    list[(index << 1) + 1] = value;
+    list[index * 2 + 1] = value;
     return this;
   }
 

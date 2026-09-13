@@ -208,7 +208,7 @@ public final class FTBuilder extends IndexBuilder {
    */
   private static void writeInd(final DataOutput outX, final IntList il) throws IOException {
     final int is = il.size();
-    outX.writeNum(is >> 1);
+    outX.writeNum(is / 2);
     for(int i = 0; i < is; i += 2) {
       outX.writeNum(il.get(i));
       outX.write4(il.get(i + 1));

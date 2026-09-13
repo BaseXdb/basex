@@ -456,12 +456,12 @@ public final class Namespaces {
     if(as == 0) return;
 
     cachedDocs = -1;
-    final int[] values = new int[as << 1];
+    final int[] values = new int[as * 2];
     for(int a = 0; a < as; a++) {
       final byte[] prefix = atts.name(a), uri = atts.value(a);
       final int prefId = prefixes.put(prefix), uriId = uris.put(uri);
-      values[a << 1] = prefId;
-      values[(a << 1) + 1] = uriId;
+      values[a * 2] = prefId;
+      values[a * 2 + 1] = uriId;
       if(prefix.length == 0) defaults.set(level, uriId);
     }
     final NSNode nd = new NSNode(pre, sets.put(values));

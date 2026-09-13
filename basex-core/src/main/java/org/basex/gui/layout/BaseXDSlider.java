@@ -206,7 +206,7 @@ public final class BaseXDSlider extends BaseXPanel {
 
     final boolean focus = hasFocus();
     g.setColor(backColor);
-    g.fillRect(0, hc - s, w, s << 1);
+    g.fillRect(0, hc - s, w, s * 2);
     g.setColor(textColor);
     g.drawLine(0, hc - s, w - 1, hc - s);
     g.drawLine(0, hc - s, 0, hc + s);
@@ -292,7 +292,7 @@ public final class BaseXDSlider extends BaseXPanel {
      * @param s slider reference
      */
     Range(final BaseXDSlider s) {
-      w = s.getWidth() - LABELW - (ARROW << 1);
+      w = s.getWidth() - LABELW - ARROW * 2;
       dist = s.encode(s.max - s.min);
       xs = (int) (s.encode(s.currMin - s.min) * w / dist);
       xe = (s.min == s.max ? w : (int) (s.encode(s.currMax - s.min) * w / dist)) + ARROW;

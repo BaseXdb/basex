@@ -47,7 +47,7 @@ final class MapLayout {
       // title, border
       case 3  -> new MapRect(2, size - 1, 4, size + 1);
       // title, large border
-      case 4  -> new MapRect(size >> 2, size, size >> 1, size + (size >> 2));
+      case 4  -> new MapRect(size / 4, size, size / 2, size + size / 4);
       // no title, no border
       default -> new MapRect(0, 0, 0, 0);
     };

@@ -286,8 +286,8 @@ public final class TreeView extends View {
    * @param message message
    */
   private void drawMessage(final Graphics g, final String message) {
-    final int mw = width >> 1, mh = height >> 1;
-    final int x = mw - (BaseXLayout.width(g, message) >> 1), y = mh + fontHeight;
+    final int mw = width / 2, mh = height / 2;
+    final int x = mw - BaseXLayout.width(g, message) / 2, y = mh + fontHeight;
     g.setColor(textColor);
     g.drawString(message, x, y);
   }

@@ -34,7 +34,7 @@ public final class JaroWinkler {
    * @return distance
    */
   private static double dst(final int[] min, final int[] max) {
-    final int mn = min.length, mx = max.length, r = Math.max((mx >> 1) - 1, 0);
+    final int mn = min.length, mx = max.length, r = Math.max(mx / 2 - 1, 0);
     if(mx == 0) return 1;
 
     final boolean[] o1 = new boolean[mn], o2 = new boolean[mx];
@@ -66,7 +66,7 @@ public final class JaroWinkler {
     int p = 0;
     for(int i = 0; i < mn && i < PREFIX && min[i] == max[i]; i++) p++;
 
-    final double d = m, j = (d / mn + d / mx + (d - (t >> 1)) / d) / 3;
+    final double d = m, j = (d / mn + d / mx + (d - t / 2) / d) / 3;
     final double jw = j < BOOST ? j : j + SCALE * p * (1 - j);
     return Math.round(jw * 100) / 100d;
   }

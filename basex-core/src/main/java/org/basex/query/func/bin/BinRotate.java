@@ -21,7 +21,7 @@ public final class BinRotate extends StandardFunc {
 
     final byte[] bytes = value.binary(info);
     final int bl = bytes.length;
-    final long bits = (long) bl << 3;
+    final long bits = bl * 8L;
     // normalized left rotation amount
     final long r = bits == 0 ? 0 : Math.floorMod(by, bits);
     if(r == 0) return value instanceof final B64 b64 ? b64 : B64.get(bytes);

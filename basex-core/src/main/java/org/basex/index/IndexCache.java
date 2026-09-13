@@ -172,7 +172,7 @@ public final class IndexCache {
   private void rehash() {
     purge();
 
-    final int newSize = size << 1;
+    final int newSize = size * 2;
     final BucketEntry[] tmp = new BucketEntry[newSize];
 
     final int l = buckets.length;

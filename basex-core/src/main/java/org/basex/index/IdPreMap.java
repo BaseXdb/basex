@@ -242,11 +242,11 @@ public class IdPreMap {
    */
   private boolean deleted(final int id) {
     int low = 0;
-    int high = (deleted.length >> 1) - 1;
+    int high = deleted.length / 2 - 1;
     while(low <= high) {
       final int mid = low + high >>> 1;
-      if(deleted[(mid << 1) + 1] < id) low = mid + 1;
-      else if(deleted[mid << 1] > id) high = mid - 1;
+      if(deleted[mid * 2 + 1] < id) low = mid + 1;
+      else if(deleted[mid * 2] > id) high = mid - 1;
       else return true;
     }
     return false;

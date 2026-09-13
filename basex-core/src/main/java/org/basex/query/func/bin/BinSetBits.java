@@ -23,7 +23,7 @@ public final class BinSetBits extends StandardFunc {
 
     final boolean set = toBoolean(arg(2), qc);
     final byte[] tmp = value.binary(info).clone();
-    final long bits = (long) tmp.length << 3;
+    final long bits = tmp.length * 8L;
     final Iter indices = arg(1).atomIter(qc, info);
     for(Item item; (item = qc.next(indices)) != null;) {
       final long index = toLong(item);

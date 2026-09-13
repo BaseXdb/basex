@@ -153,11 +153,11 @@ public final class JNode extends GNode {
    * @return path
    */
   private int[] path(final int depth) {
-    final int[] path = new int[depth << 1];
+    final int[] path = new int[depth * 2];
     JNode n = this;
     for(int i = depth - 1; i >= 0; i--) {
-      path[i << 1] = n.position;
-      path[i << 1 | 1] = n.index();
+      path[i * 2] = n.position;
+      path[i * 2 + 1] = n.index();
       n = n.parent;
     }
     return path;

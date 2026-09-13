@@ -346,7 +346,7 @@ final class TableHeader extends BaseXPanel {
    * @return true for table header, false for input field
    */
   private boolean header(final int y) {
-    return y < getHeight() >> 1;
+    return y < getHeight() / 2;
   }
 
   /**

@@ -183,15 +183,15 @@ public final class GNodeBuilder extends ObjectList<GNode, GNodeBuilder> {
       return;
     }
 
-    int m = s + (e >> 1);
+    int m = s + e / 2;
     if(e > 7) {
       int l = s;
       int n = s + e - 1;
       if(e > 40) {
-        final int k = e >>> 3;
-        l = m(l, l + k, l + (k << 1));
+        final int k = e / 8;
+        l = m(l, l + k, l + k * 2);
         m = m(m - k, m, m + k);
-        n = m(n - (k << 1), n - k, n);
+        n = m(n - k * 2, n - k, n);
       }
       m = m(l, m, n);
     }

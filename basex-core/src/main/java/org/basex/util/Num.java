@@ -170,7 +170,7 @@ public final class Num {
    */
   private static byte[] check(final byte[] a, final int p, final int l) {
     final int s = a.length;
-    return p + l < s ? a : Arrays.copyOf(a, s + Math.max(l, s >> 3));
+    return p + l < s ? a : Arrays.copyOf(a, s + Math.max(l, s / 8));
   }
 
   /**

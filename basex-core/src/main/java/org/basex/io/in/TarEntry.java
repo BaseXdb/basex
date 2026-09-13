@@ -40,7 +40,7 @@ public final class TarEntry {
       final byte b = buffer[i];
       if(p && (b == ' ' || b == '0')) continue;
       if(b == 0 || b == ' ') break;
-      s = (s << 3) + (b - '0');
+      s = s * 8 + (b - '0');
       p = false;
     }
     size = s;

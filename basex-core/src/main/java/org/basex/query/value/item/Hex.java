@@ -85,11 +85,11 @@ public final class Hex extends Bin {
   private static byte[] parse(final byte[] data) {
     final int dl = data.length;
     if((dl & 1) != 0) return null;
-    final byte[] array = new byte[dl >>> 1];
+    final byte[] array = new byte[dl / 2];
     for(int d = 0; d < dl; d += 2) {
       final int n = Token.dec(data[d], data[d + 1]);
       if(n < 0) return null;
-      array[d >>> 1] = (byte) n;
+      array[d / 2] = (byte) n;
     }
     return array;
   }

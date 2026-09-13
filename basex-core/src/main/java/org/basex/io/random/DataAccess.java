@@ -690,7 +690,7 @@ public final class DataAccess implements Closeable {
         buffer.pos = b;
         // blocks that continue a sequential run are fetched in a single request; the master
         // reader is excluded, as it may hold data that has not been written to disk yet
-        ahead = owner != null && b == nextRead ? Math.min(ahead << 1, AHEAD) : 1;
+        ahead = owner != null && b == nextRead ? Math.min(ahead * 2, AHEAD) : 1;
         final int count = (int) Math.min(ahead, length - b >> IO.BLOCKPOWER);
         nextRead = b + ((long) Math.max(count, 1) << IO.BLOCKPOWER);
         raf.seek(b);

@@ -47,7 +47,7 @@ public final class BinShift extends StandardFunc {
       // right shift
       bi = bi.shiftRight(shifts);
     } else {
-      final BigInteger o = BigInteger.ONE.shiftLeft((bl << 3) + 1);
+      final BigInteger o = BigInteger.ONE.shiftLeft(bl * 8 + 1);
       final BigInteger m = o.subtract(BigInteger.ONE).shiftRight(shifts + 1);
       bi = bi.subtract(o).shiftRight(shifts).and(m);
     }

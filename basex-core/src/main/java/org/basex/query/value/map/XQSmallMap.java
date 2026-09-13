@@ -33,7 +33,7 @@ public final class XQSmallMap extends XQMap {
 
   @Override
   public long structSize() {
-    return entries.length >> 1;
+    return entries.length / 2;
   }
 
   @Override
@@ -45,28 +45,28 @@ public final class XQSmallMap extends XQMap {
   @Override
   public Value keys() {
     final int el = entries.length;
-    final Item[] keys = new Item[el >> 1];
-    for(int e = 0; e < el; e += 2) keys[e >> 1] = (Item) entries[e];
-    return ItemSeq.get(keys, el >> 1, ((MapType) type).keyType());
+    final Item[] keys = new Item[el / 2];
+    for(int e = 0; e < el; e += 2) keys[e / 2] = (Item) entries[e];
+    return ItemSeq.get(keys, el / 2, ((MapType) type).keyType());
   }
 
   @Override
   public Item keyAt(final long index) {
-    return (Item) entries[(int) index << 1];
+    return (Item) entries[(int) index * 2];
   }
 
   @Override
   public Value valueAt(final long index) {
-    return entries[((int) index << 1) + 1];
+    return entries[(int) index * 2 + 1];
   }
 
   @Override
   public XQMap put(final Item key, final Value value) throws QueryException {
     final int i = index(key);
-    if(i != -1) return putAt(i >> 1, value);
+    if(i != -1) return putAt(i / 2, value);
 
     final int el = entries.length;
-    if(el < MAX_SIZE << 1) {
+    if(el < MAX_SIZE * 2) {
       final Value[] copy = Arrays.copyOf(entries, el + 2);
       copy[el] = key;
       copy[el + 1] = value;
@@ -77,7 +77,7 @@ public final class XQSmallMap extends XQMap {
 
   @Override
   public XQMap putAt(final int index, final Value value) {
-    final int i = (index << 1) + 1;
+    final int i = index * 2 + 1;
     if(value == entries[i]) return this;
 
     final Value[] copy = entries.clone();

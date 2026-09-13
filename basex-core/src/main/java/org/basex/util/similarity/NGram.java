@@ -53,7 +53,7 @@ public final class NGram {
 
     if(padding) {
       // surround the input with n - 1 boundary characters
-      final int p = n - 1, pl = cl + (p << 1);
+      final int p = n - 1, pl = cl + p * 2;
       final int[] padded = new int[pl];
       Arrays.fill(padded, ' ');
       System.arraycopy(cps, 0, padded, p, cl);

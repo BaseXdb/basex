@@ -12,7 +12,7 @@ import java.util.*;
  */
 public final class MinHeap<K, V> {
   /** Value array. */
-  private Object[] vals = new Object[Array.INITIAL_CAPACITY << 1];
+  private Object[] vals = new Object[Array.INITIAL_CAPACITY * 2];
   /** Comparator. */
   private final Comparator<K> comp;
   /** Size of the heap. */
@@ -32,8 +32,8 @@ public final class MinHeap<K, V> {
    * @param value value
    */
   public void insert(final K key, final V value) {
-    final int s = size << 1;
-    if(s == vals.length) vals = Array.copy(vals, new Object[s << 1]);
+    final int s = size * 2;
+    if(s == vals.length) vals = Array.copy(vals, new Object[s * 2]);
     vals[s] = key;
     vals[s + 1] = value;
 

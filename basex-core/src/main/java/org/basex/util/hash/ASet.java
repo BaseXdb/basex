@@ -76,7 +76,7 @@ public abstract class ASet {
   protected final boolean checkCapacity() {
     if(size < capacity()) return false;
 
-    final int newSize = size << 1;
+    final int newSize = size * 2;
     final int[] bckts = new int[newSize];
 
     for(final int bucket : buckets) {

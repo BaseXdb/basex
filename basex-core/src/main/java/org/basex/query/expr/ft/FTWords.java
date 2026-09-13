@@ -259,7 +259,7 @@ public final class FTWords extends FTExpr {
       @Override
       public int size() {
         // worst case
-        return Math.max(1, sz >>> 1);
+        return Math.max(1, sz / 2);
       }
     };
   }

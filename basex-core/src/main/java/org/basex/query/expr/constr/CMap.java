@@ -148,7 +148,7 @@ public final class CMap extends Arr {
   @Override
   public XQMap value(final QueryContext qc) throws QueryException {
     final int el = exprs.length;
-    final MapBuilder mb = new MapBuilder(el >>> 1);
+    final MapBuilder mb = new MapBuilder(el / 2);
     final QueryBiConsumer<Item, Value> add = (key, value) -> {
       if(mb.contains(key)) throw MAPDUPLKEY_X.get(info, key);
       mb.put(key, value);
@@ -182,7 +182,7 @@ public final class CMap extends Arr {
     for(int e = 0; e < el; e += 2) {
       if(nested(e)) return -1;
     }
-    return el >> 1;
+    return el / 2;
   }
 
   /**

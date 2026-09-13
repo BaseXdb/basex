@@ -414,7 +414,7 @@ public final class TableDiskAccess extends TableAccess {
     final int exp = pages + needed - (pages - used);
     if(exp > fPreIndex.length) {
       // resize directory arrays if existing ones are too small
-      final int ns = Math.max(fPreIndex.length << 1, exp);
+      final int ns = Math.max(fPreIndex.length * 2, exp);
       fPreIndex = Arrays.copyOf(fPreIndex, ns);
       pageIndex = Arrays.copyOf(pageIndex, ns);
     }
@@ -771,7 +771,7 @@ public final class TableDiskAccess extends TableAccess {
         } else {
           // pages that continue a sequential run are fetched in a single request; the master
           // reader is excluded, as the table can grow beyond the file size while it is updated
-          ahead = owner != null && pre == nextRead ? Math.min(ahead << 1, AHEAD) : 1;
+          ahead = owner != null && pre == nextRead ? Math.min(ahead * 2, AHEAD) : 1;
           final int count = Math.min(ahead, pages - pre);
           nextRead = pre + count;
           file.seek((long) pre << IO.BLOCKPOWER);

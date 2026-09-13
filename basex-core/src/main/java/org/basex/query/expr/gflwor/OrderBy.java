@@ -82,14 +82,14 @@ public final class OrderBy extends Clause {
           tuples.add(vals);
         }
 
-        final int len = tuples.size() >>> 1;
+        final int len = tuples.size() / 2;
         final Item[][] ks = new Item[len][];
         perm = new Integer[len];
         tpls = new Value[len][];
         for(int i = 0; i < len; i++) {
           perm[i] = i;
-          tpls[i] = tuples.get(i << 1 | 1);
-          ks[i] = (Item[]) tuples.get(i << 1);
+          tpls[i] = tuples.get(i * 2 + 1);
+          ks[i] = (Item[]) tuples.get(i * 2);
         }
         // be nice to the garbage collector
         tuples = null;

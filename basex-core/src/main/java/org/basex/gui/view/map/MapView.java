@@ -530,21 +530,21 @@ public final class MapView extends View {
     final boolean shift = e.isShiftDown();
     if(PREVLINE.is(e)) {
       mouseY = focused.y + (shift ? focused.h - fs : 0) - 1;
-      if(shift) mouseX = focused.x + (focused.w >> 1);
+      if(shift) mouseX = focused.x + focused.w / 2;
     } else if(NEXTLINE.is(e)) {
       mouseY = focused.y + (shift ? o : focused.h + 1);
-      if(shift) mouseX = focused.x + (focused.w >> 1);
+      if(shift) mouseX = focused.x + focused.w / 2;
     } else if(PREVCHAR.is(e)) {
       mouseX = focused.x + (shift ? focused.w - fs : 0) - 1;
-      if(shift) mouseY = focused.y + (focused.h >> 1);
+      if(shift) mouseY = focused.y + focused.h / 2;
     } else if(NEXTCHAR.is(e)) {
       mouseX = focused.x + (shift ? o : focused.w + 1);
-      if(shift) mouseY = focused.y + (focused.h >> 1);
+      if(shift) mouseY = focused.y + focused.h / 2;
     }
 
-    o = mainRects.get(0).w == getWidth() ? (o >> 1) + 1 : 0;
+    o = mainRects.get(0).w == getWidth() ? o / 2 + 1 : 0;
     mouseX = Math.max(o, Math.min(getWidth() - o - 1, mouseX));
-    mouseY = Math.max(o << 1, Math.min(getHeight() - o - 1, mouseY));
+    mouseY = Math.max(o * 2, Math.min(getHeight() - o - 1, mouseY));
 
     if(focus()) repaint();
   }

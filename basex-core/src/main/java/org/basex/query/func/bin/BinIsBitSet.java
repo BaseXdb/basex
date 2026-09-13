@@ -22,7 +22,7 @@ public final class BinIsBitSet extends StandardFunc {
     if(value == null) return Empty.VALUE;
 
     final byte[] bytes = value.binary(info);
-    final long bits = (long) bytes.length << 3;
+    final long bits = bytes.length * 8L;
     if(index < 0 || index >= bits) throw BIN_IOOR_X_X.get(info, index, bits);
 
     final int i = (int) index;

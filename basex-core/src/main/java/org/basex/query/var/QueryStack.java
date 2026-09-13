@@ -63,7 +63,7 @@ public final class QueryStack {
 
     final int vl = vls.length;
     int ns = vl;
-    while(ns > INIT && end <= ns >> 2) ns >>= 1;
+    while(ns > INIT && end <= ns / 4) ns /= 2;
     if(ns != vl) resize(ns);
   }
 
@@ -73,7 +73,7 @@ public final class QueryStack {
    * @return result of check
    */
   public boolean tco(final int size) {
-    return end + (size << 1) > INIT;
+    return end + size * 2 > INIT;
   }
 
   /**

@@ -347,15 +347,15 @@ public final class IntList extends ElementList {
       return;
     }
 
-    int m = start + (length >> 1);
+    int m = start + length / 2;
     if(length > 7) {
       int l = start;
       int n = start + length - 1;
       if(length > 40) {
-        final int k = length >>> 3;
-        l = median(l, l + k, l + (k << 1));
+        final int k = length / 8;
+        l = median(l, l + k, l + k * 2);
         m = median(m - k, m, m + k);
-        n = median(n - (k << 1), n - k, n);
+        n = median(n - k * 2, n - k, n);
       }
       m = median(l, m, n);
     }
@@ -408,15 +408,15 @@ public final class IntList extends ElementList {
       return;
     }
 
-    int m = start + (length >> 1);
+    int m = start + length / 2;
     if(length > 7) {
       int l = start;
       int n = start + length - 1;
       if(length > 40) {
-        final int k = length >>> 3;
-        l = median(l, l + k, l + (k << 1));
+        final int k = length / 8;
+        l = median(l, l + k, l + k * 2);
         m = median(m - k, m, m + k);
-        n = median(n - (k << 1), n - k, n);
+        n = median(n - k * 2, n - k, n);
       }
       m = median(l, m, n);
     }
@@ -469,15 +469,15 @@ public final class IntList extends ElementList {
       return;
     }
 
-    int m = start + (length >> 1);
+    int m = start + length / 2;
     if(length > 7) {
       int l = start;
       int n = start + length - 1;
       if(length > 40) {
-        final int k = length >>> 3;
-        l = median(l, l + k, l + (k << 1));
+        final int k = length / 8;
+        l = median(l, l + k, l + k * 2);
         m = median(m - k, m, m + k);
-        n = median(n - (k << 1), n - k, n);
+        n = median(n - k * 2, n - k, n);
       }
       m = median(l, m, n);
     }
@@ -530,15 +530,15 @@ public final class IntList extends ElementList {
       return;
     }
 
-    int m = start + (length >> 1);
+    int m = start + length / 2;
     if(length > 7) {
       int l = start;
       int n = start + length - 1;
       if(length > 40) {
-        final int k = length >>> 3;
-        l = median(l, l + k, l + (k << 1));
+        final int k = length / 8;
+        l = median(l, l + k, l + k * 2);
         m = median(m - k, m, m + k);
-        n = median(n - (k << 1), n - k, n);
+        n = median(n - k * 2, n - k, n);
       }
       m = median(l, m, n);
     }

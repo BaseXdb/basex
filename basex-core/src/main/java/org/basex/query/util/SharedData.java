@@ -102,7 +102,7 @@ public final class SharedData {
         if((v & INTERN_PROBE - 1) == 0) {
           job.checkStop();
           // stop if more than half of the tokens seen so far were distinct
-          if(v >= INTERN_PROBE && tokens.size() - before << 1 > v) return;
+          if(v >= INTERN_PROBE && (tokens.size() - before) * 2 > v) return;
         }
         final byte[] value = values[v];
         if(value.length != 0) values[v] = tokens.put(value);

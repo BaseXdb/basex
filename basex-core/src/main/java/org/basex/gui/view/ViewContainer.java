@@ -261,8 +261,8 @@ public final class ViewContainer extends BaseXBack {
     // paint panel which is currently moved somewhere else
     if(target != null && target != source) {
       final Rectangle tr = new Rectangle(absLoc(target), target.getSize());
-      final int minx = tr.width >> 1;
-      final int miny = tr.height >> 1;
+      final int minx = tr.width / 2;
+      final int miny = tr.height / 2;
 
       if(Math.abs(tr.x + tr.width / 2 - sp.x) < tr.width / 3) {
         if(sp.y > tr.y && sp.y < tr.y + miny) {
@@ -296,8 +296,8 @@ public final class ViewContainer extends BaseXBack {
     }
 
     if(location == null) {
-      final int minx = ww >> 2;
-      final int miny = hh >> 2;
+      final int minx = ww / 4;
+      final int miny = hh / 4;
       target = null;
       if(sp.y < miny) {
         pos[3] = miny;

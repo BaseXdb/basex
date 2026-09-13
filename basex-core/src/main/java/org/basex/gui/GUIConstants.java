@@ -477,6 +477,6 @@ public final class GUIConstants {
    */
   private static Color alpha(final Color color, final int a) {
     return new Color(color.getRed(), color.getGreen(), color.getBlue(),
-        dark ? Math.min(255, a << 1) : a);
+        dark ? Math.min(255, a * 2) : a);
   }
 }

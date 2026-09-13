@@ -103,7 +103,7 @@ public final class Levenshtein {
     final byte[] lc = lc(token);
     T best = null;
     // accept names that are at most twice as long as the input
-    int min = (lc.length << 1) + 1;
+    int min = lc.length * 2 + 1;
     for(final T obj : objects) {
       final byte[] compare = token(prepare.apply(obj));
       if(compare != null && compare.length < min && startsWith(lc(compare), lc)) {
@@ -152,7 +152,7 @@ public final class Levenshtein {
       return tl == cl && Arrays.equals(tkn, cmp) ? 0 : Integer.MAX_VALUE;
     }
 
-    final int k = max == 0 ? Math.max(1, cl >> 2) : max;
+    final int k = max == 0 ? Math.max(1, cl / 4) : max;
     final int dist = distance(tkn, cmp, k);
     return dist == -1 ? Integer.MAX_VALUE : dist;
   }

@@ -53,7 +53,7 @@ final class FTFuzzy {
       rejectShort = false;
     } else {
       // dynamic calculation (see Levenshtein): exact search for short tokens
-      k = ql < 4 ? 0 : ql >> 2;
+      k = ql < 4 ? 0 : ql / 4;
       rejectShort = ql >= 4;
     }
     rows = new int[4][];
@@ -76,7 +76,7 @@ final class FTFuzzy {
    */
   int maxLength() {
     // a codepoint occupies up to 4 bytes (tokens with combining characters may be longer)
-    return query.length + k << 2;
+    return (query.length + k) * 4;
   }
 
   /**
@@ -142,7 +142,7 @@ final class FTFuzzy {
    */
   private int row(final int t) {
     final int ql = query.length, lo = Math.max(0, t - k), hi = Math.min(ql - 1, t + k);
-    if(t + 1 >= rows.length) rows = Arrays.copyOf(rows, rows.length << 1);
+    if(t + 1 >= rows.length) rows = Arrays.copyOf(rows, rows.length * 2);
     int[] curr = rows[t + 1];
     if(curr == null) {
       curr = new int[ql + 2];

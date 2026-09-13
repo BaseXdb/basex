@@ -506,7 +506,7 @@ final class MapRenderer {
         // go some tokens backwards form current token
         final int bpsl = data1[psl] == sl ? psl + 1 : psl;
         final int bsl = data1[psl] == sl ? 0 : sl;
-        ll = (sd << 1) + sp;
+        ll = sd * 2 + sp;
         int l;
         int p = cc >= data0[i] ? cc - data0[i] : 0;
         boolean apm;

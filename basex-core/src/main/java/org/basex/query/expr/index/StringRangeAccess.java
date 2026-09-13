@@ -97,7 +97,7 @@ public final class StringRangeAccess extends IndexAccess {
       }
       @Override
       public int size() {
-        return Math.max(1, sz >>> 2);
+        return Math.max(1, sz / 4);
       }
     };
   }

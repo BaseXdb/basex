@@ -128,7 +128,7 @@ final class MapPainter {
         g.setFont(GUIConstants.font);
         renderer.chopText(ViewData.label(gopts, data, pre), rect.x, rect.y, rect.w);
       } else {
-        g.setColor(GUIConstants.color((rect.level << 1) + 8));
+        g.setColor(GUIConstants.color(rect.level * 2 + 8));
         g.setFont(GUIConstants.mfont);
         final byte[] text = ViewData.text(data, pre);
         rect.thumb = renderer.calcHeight(rect, text) >= rect.h;

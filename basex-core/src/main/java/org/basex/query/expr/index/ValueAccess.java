@@ -229,7 +229,7 @@ public final class ValueAccess extends IndexAccess {
       }
       @Override
       public int size() {
-        return Math.max(1, sz >>> 1);
+        return Math.max(1, sz / 2);
       }
     };
   }

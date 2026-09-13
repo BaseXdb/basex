@@ -190,7 +190,7 @@ public final class IndexTree {
    * @return left node
    */
   private int left(final int nd) {
-    return tree.get((nd << 1) + nd);
+    return tree.get(nd * 3);
   }
 
   /**
@@ -199,7 +199,7 @@ public final class IndexTree {
    * @return right node
    */
   private int right(final int nd) {
-    return tree.get((nd << 1) + nd + 1);
+    return tree.get(nd * 3 + 1);
   }
 
   /**
@@ -208,7 +208,7 @@ public final class IndexTree {
    * @return parent node
    */
   private int parent(final int nd) {
-    return tree.get((nd << 1) + nd + 2);
+    return tree.get(nd * 3 + 2);
   }
 
   /**
@@ -217,7 +217,7 @@ public final class IndexTree {
    * @param val left node
    */
   private void setLeft(final int nd, final int val) {
-    tree.set((nd << 1) + nd, val);
+    tree.set(nd * 3, val);
   }
 
   /**
@@ -226,7 +226,7 @@ public final class IndexTree {
    * @param val right node
    */
   private void setRight(final int nd, final int val) {
-    tree.set((nd << 1) + nd + 1, val);
+    tree.set(nd * 3 + 1, val);
   }
 
   /**
@@ -235,7 +235,7 @@ public final class IndexTree {
    * @param val parent node
    */
   private void setParent(final int nd, final int val) {
-    tree.set((nd << 1) + nd + 2, val);
+    tree.set(nd * 3 + 2, val);
   }
 
   /**

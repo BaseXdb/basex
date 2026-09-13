@@ -859,7 +859,7 @@ public class TextPanel extends BaseXPanel {
    */
   private void scroll(final int y, final Align align) {
     if(y != -1) {
-      final int h = getHeight(), m = y + (rend.fontHeight() << 1) - h, p = scroll.pos();
+      final int h = getHeight(), m = y + rend.fontHeight() * 2 - h, p = scroll.pos();
       if(p < m || p > y) {
         scroll.pos(switch(align) {
           case TOP -> y;

@@ -152,7 +152,7 @@ public final class BitArray {
    * @param s new size
    */
   private void resize(final int s) {
-    words = Arrays.copyOf(words, Math.max(words.length << 1, s));
+    words = Arrays.copyOf(words, Math.max(words.length * 2, s));
   }
 
   @Override

@@ -1464,7 +1464,7 @@ public final class Token {
    */
   public static byte[] hex(final byte[] value, final boolean uc) {
     final int vl = value.length, u = uc ? 0x37 : 0x57;
-    final byte[] tmp = new byte[Array.checkCapacity((long) vl << 1)];
+    final byte[] tmp = new byte[Array.checkCapacity(vl * 2L)];
     for(int v = 0, d = 0; v < vl; v++) {
       final int a = value[v], b = a >> 4 & 0x0F, c = a & 0x0F;
       tmp[d++] = (byte) (b + (b > 9 ? u : '0'));
