@@ -3,9 +3,11 @@ package org.basex.query.expr;
 import static java.lang.Double.*;
 import static org.basex.query.QueryText.*;
 
+import java.util.*;
+
 import org.basex.data.*;
 import org.basex.index.*;
-import org.basex.index.name.*;
+import org.basex.index.path.*;
 import org.basex.index.query.*;
 import org.basex.index.stats.*;
 import org.basex.query.*;
@@ -130,8 +132,26 @@ public final class CmpR extends CmpRange {
       final long mn = Math.max((long) Math.ceil(min), 1), mx = (long) Math.floor(max);
       return cc.replaceWith(this, IntPos.get(mn, mx, info));
     }
+    // //a/@n > 100 → false() (statistics report no values in range)
+    if(noMatches(null, expr.data())) return cc.replaceWith(this, Bln.FALSE);
 
     return expr instanceof Value ? cc.preEval(this) : this;
+  }
+
+  @Override
+  public boolean noMatches(final ArrayList<PathNode> nodes, final Data data)
+      throws QueryException {
+    final ArrayList<Stats> list = Path.stats(expr, nodes, data);
+    return list != null && noMatches(list);
+  }
+
+  /**
+   * Checks if the specified statistics contain no values in the range of this expression.
+   * @param stats statistics
+   * @return result of check
+   */
+  private boolean noMatches(final ArrayList<Stats> stats) {
+    return Checks.all(stats, st -> StatsType.isNumeric(st.type) && (st.min > max || st.max < min));
   }
 
   @Override
@@ -185,18 +205,22 @@ public final class CmpR extends CmpRange {
       ii.costs = costs;
     }
 
-    final Stats key = key(ii, type);
-    if(key == null) return false;
-
-    // estimate costs for range access; all values out of range: no results
-    final NumericRange nr = new NumericRange(type, Math.max(min, key.min), Math.min(max, key.max));
-    // skip queries with no results
-    if(nr.min() > nr.max() || nr.max() < key.min || nr.min() > key.max) {
+    // statistics of the indexed values
+    final ArrayList<Stats> stats = ii.stats();
+    if(stats == null || !Checks.all(stats, st -> StatsType.isNumeric(st.type))) return false;
+    // all values out of range: no results
+    if(noMatches(stats)) {
       ii.costs = IndexCosts.get(0);
       return true;
     }
 
-    // estimate costs
+    // estimate costs for the range of the indexed values
+    double kmin = POSITIVE_INFINITY, kmax = NEGATIVE_INFINITY;
+    for(final Stats st : stats) {
+      kmin = Math.min(kmin, st.min);
+      kmax = Math.max(kmax, st.max);
+    }
+    final NumericRange nr = new NumericRange(type, Math.max(min, kmin), Math.min(max, kmax));
     ii.costs = IndexInfo.costs(data, nr);
     if(ii.costs == null) return false;
 
@@ -212,41 +236,6 @@ public final class CmpR extends CmpRange {
     tb.add('[').add(min).add(',').add(max).add(']');
     return ii.create(new RangeAccess(info, nr, ii.db), true,
         Util.info(OPTINDEX_X_X, "range", tb), info);
-  }
-
-  /**
-   * Retrieves the statistics key for the element/attribute name.
-   * @param ii index info
-   * @param type index type
-   * @return key, or {@code null} if statistics are not available
-   */
-  private Stats key(final IndexInfo ii, final IndexType type) {
-    // statistics are not up-to-date
-    final Data data = ii.db.data();
-    if(data == null || !data.meta.uptodate || !data.nspaces.isEmpty() ||
-        !(expr instanceof final AxisPath path)) return null;
-
-    final NameTest test;
-    if(ii.test != null) {
-      // statistics are only available for a single name
-      if(!(ii.test instanceof final NameTest nt)) return null;
-      test = nt;
-    } else {
-      final Step step;
-      final int st = path.steps.length - 1;
-      if(type == IndexType.TEXT) {
-        step = st == 0 ? ii.step : path.step(st - 1);
-      } else {
-        step = path.step(st);
-        if(step.axis != Axis.ATTRIBUTE || step.exprs.length > 0) return null;
-      }
-      if(!(step.test instanceof final NameTest nt) || nt.name == null) return null;
-      test = nt;
-    }
-
-    final Names names = type == IndexType.TEXT ? data.elemNames : data.attrNames;
-    final Stats stats = names.stats(names.index(test.qname.local()));
-    return stats != null && StatsType.isNumeric(stats.type) ? stats : null;
   }
 
   @Override

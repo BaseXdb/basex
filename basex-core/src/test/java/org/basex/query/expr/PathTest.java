@@ -721,7 +721,7 @@ public final class PathTest extends SandboxTest {
     check("(exactly-one(/a/b)/following::*) ! name()", "c\nd\ne", exists(IterPath.class));
     check("(/a/*/following-sibling::*) ! name()", "c\nd\ne", empty(IterPath.class));
     check("(exactly-one(/a/b)/following-sibling::*) ! name()", "c\nd\ne", exists(IterPath.class));
-    check("(/*/@id/../*) ! name()", "b\nc\nd\ne", empty(IterPath.class));
+    check("(/*/@id/../*) ! name()", "b\nc\nd\ne", exists(IterPath.class));
     check("(exactly-one(/a)/@id/../*) ! name()", "b\nc\nd\ne", exists(IterPath.class));
   }
 

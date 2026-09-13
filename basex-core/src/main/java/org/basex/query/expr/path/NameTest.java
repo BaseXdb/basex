@@ -7,6 +7,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Name test.
@@ -45,6 +46,8 @@ public final class NameTest extends Test {
 
   /** Local name; assigned if URI can be ignored at runtime (can be {@code null}). */
   public byte[] name;
+  /** Database name; assigned if the test matches a single name (can be {@code null}). */
+  private byte[] dbName;
 
   /** JNode key; assigned if the test can select a single JNode key (can be {@code null}). */
   private final Item jkey;
@@ -98,39 +101,51 @@ public final class NameTest extends Test {
       if(k != null) return get(k, qname, scope, ns).optimize(kn, data);
     }
 
-    // skip optimizations if data reference is not known at compile time
-    if(data == null) return this;
+    // skip optimizations if the database is unknown or incomplete, or if names are not indexed
+    final boolean elem = kind == Kind.ELEMENT;
+    if(data == null || !data.meta.complete || !elem && kind != Kind.ATTRIBUTE ||
+        !scope.oneOf(Scope.LOCAL, Scope.FLEXIBLE, Scope.FULL)) return this;
 
-    // common default namespace (empty: none declared; null: ambiguous)
-    final byte[] dataNs = data.defaultNs();
-    if(dataNs == null) {
-      // no default namespace anywhere: discard no-namespace name test if its local name is unknown
-      // (the test is not reduced to local, as a prefixed name may share the same local name)
-      if(scope.oneOf(Scope.FLEXIBLE, Scope.FULL) && !qname.hasURI() &&
-          !kind.oneOf(Kind.NODE, Kind.PROCESSING_INSTRUCTION) &&
-          (kind == Kind.ATTRIBUTE || ns.length == 0) && !data.usesDefaultNs()) {
-        final byte[] local = qname.local();
-        final Names names = kind == Kind.ELEMENT ? data.elemNames : data.attrNames;
-        if(!names.contains(local) && !names.contains(Token.concat(Token.XML, ':', local)))
-          return null;
-      }
-      return this;
-    }
-
-    // check if test may yield results
-    if(scope.oneOf(Scope.FLEXIBLE, Scope.FULL) && !qname.hasURI()) {
-      // element and db default namespaces are different: no results
-      if(!kind.oneOf(Kind.NODE, Kind.ATTRIBUTE) && !Token.eq(dataNs, ns)) return null;
-      // namespace is irrelevant/identical: only check local name
-      name = qname.local();
-    }
-
-    // check if local element/attribute names occur in database
-    if(!kind.oneOf(Kind.NODE, Kind.PROCESSING_INSTRUCTION) && name != null) {
-      final Names names = kind == Kind.ELEMENT ? data.elemNames : data.attrNames;
-      if(!names.contains(name) && !names.contains(Token.concat(Token.XML, ':', name))) return null;
-    }
+    // resolve the namespaces of all database names with the same local name
+    final Names names = elem ? data.elemNames : data.attrNames;
+    final TokenList all = names.lexical(qname.local(), !data.nspaces.isEmpty());
+    final TokenList matches = matches(all, data);
+    dbName = matches != null && matches.size() == 1 ? matches.get(0) : null;
+    if(matches == null) return this;
+    // no matching name: no results
+    if(matches.isEmpty()) return null;
+    // all names match: namespace can be ignored at runtime
+    if(matches.size() == all.size()) name = qname.local();
     return this;
+  }
+
+  /**
+   * Returns the database name that is matched by this test.
+   * @return name, or {@code null} if no or several names are matched, or if a name cannot be
+   *   resolved
+   */
+  public byte[] dbName() {
+    return dbName;
+  }
+
+  /**
+   * Returns the database names that are matched by this test.
+   * @param names names with the local name of this test
+   * @param data data reference
+   * @return matching names, or {@code null} if the namespace of a name cannot be resolved
+   */
+  private TokenList matches(final TokenList names, final Data data) {
+    if(scope == Scope.LOCAL) return names;
+
+    final boolean elem = kind == Kind.ELEMENT;
+    final byte[] uri = qname.hasURI() ? qname.uri() : elem ? ns : Token.EMPTY;
+    final TokenList list = new TokenList(names.size());
+    for(final byte[] nm : names) {
+      final byte[] u = data.nsUri(nm, elem);
+      if(u == null) return null;
+      if(Token.eq(u, uri)) list.add(nm);
+    }
+    return list;
   }
 
   @Override

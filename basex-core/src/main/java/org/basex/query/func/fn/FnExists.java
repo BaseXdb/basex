@@ -1,5 +1,9 @@
 package org.basex.query.func.fn;
 
+import java.util.*;
+
+import org.basex.data.*;
+import org.basex.index.path.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
@@ -15,6 +19,12 @@ public final class FnExists extends FnEmpty {
   @Override
   protected boolean ebv(final QueryContext qc) throws QueryException {
     return !super.ebv(qc);
+  }
+
+  @Override
+  public boolean noMatches(final ArrayList<PathNode> nodes, final Data data)
+      throws QueryException {
+    return arg(0).noMatches(nodes, data);
   }
 
   @Override

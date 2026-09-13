@@ -1,5 +1,9 @@
 package org.basex.query.expr;
 
+import java.util.*;
+
+import org.basex.data.*;
+import org.basex.index.path.*;
 import org.basex.index.query.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
@@ -62,6 +66,17 @@ public abstract class Logical extends Arr {
       if(expr.ebv(qc, info) == or) return or;
     }
     return !or;
+  }
+
+  @Override
+  public final boolean noMatches(final ArrayList<PathNode> nodes, final Data data)
+      throws QueryException {
+    // and: a single operand never matches; or: no operand ever matches
+    final boolean or = or();
+    for(final Expr expr : exprs) {
+      if(expr.noMatches(nodes, data) != or) return !or;
+    }
+    return or;
   }
 
   @Override

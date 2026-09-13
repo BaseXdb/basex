@@ -245,6 +245,32 @@ public final class PathIndex implements Index {
   }
 
   /**
+   * Returns the value statistics of the specified path nodes.
+   * Called by the query optimizer.
+   * @param nodes path nodes
+   * @return statistics, or {@code null} if they are outdated or if a node has no values
+   */
+  public ArrayList<Stats> stats(final ArrayList<PathNode> nodes) {
+    if(!data.meta.uptodate) return null;
+
+    final ArrayList<Stats> stats = new ArrayList<>();
+    for(PathNode node : nodes) {
+      // retrieve text child if addressed node is an element
+      if(node.kind == Data.ELEM) {
+        if(!node.stats.isLeaf()) return null;
+        for(final PathNode nd : node.children) {
+          if(nd.kind == Data.TEXT) node = nd;
+        }
+      }
+      // skip nodes others than texts and attributes
+      final int kind = node.kind;
+      if(kind != Data.TEXT && kind != Data.ATTR) return null;
+      stats.add(node.stats);
+    }
+    return stats;
+  }
+
+  /**
    * Returns descendant element and attribute names for the specified start key.
    * Called by the GUI.
    * @param name input key

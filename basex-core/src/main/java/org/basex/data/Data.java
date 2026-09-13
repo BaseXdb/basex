@@ -311,11 +311,15 @@ public abstract class Data {
   }
 
   /**
-   * Checks if a default namespace is declared anywhere in the database.
-   * @return result of check
+   * Resolves the namespace URI of a lexical element or attribute name of the database.
+   * @param name lexical name
+   * @param element element name (attribute otherwise)
+   * @return URI, or {@code null} if the name cannot be resolved
    */
-  public boolean usesDefaultNs() {
-    return nspaces.usesDefaultNs();
+  public byte[] nsUri(final byte[] name, final boolean element) {
+    final byte[] prefix = prefix(name);
+    return prefix.length == 0 ? element ? defaultNs() : EMPTY :
+      eq(prefix, XML) ? XMLToken.XML_URI : nspaces.uniqueUri(prefix);
   }
 
   // RETRIEVING VALUES ============================================================================

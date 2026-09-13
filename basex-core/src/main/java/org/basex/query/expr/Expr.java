@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import java.util.*;
 
 import org.basex.data.*;
+import org.basex.index.path.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.gflwor.*;
@@ -494,6 +495,21 @@ public abstract class Expr extends ExprInfo {
    */
   @SuppressWarnings("unused")
   public boolean indexAccessible(final IndexInfo ii) throws QueryException {
+    return false;
+  }
+
+  /**
+   * Checks if the expression will never match if it is evaluated as predicate, based on the path
+   * summary and the statistics of a database.
+   * This method will be called by the {@link Path} expression.
+   * @param nodes path nodes of the context
+   * @param data data reference
+   * @return true if the predicate will never match
+   * @throws QueryException query exception
+   */
+  @SuppressWarnings("unused")
+  public boolean noMatches(final ArrayList<PathNode> nodes, final Data data)
+      throws QueryException {
     return false;
   }
 

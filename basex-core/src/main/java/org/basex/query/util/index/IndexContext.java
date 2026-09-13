@@ -1,5 +1,8 @@
 package org.basex.query.util.index;
 
+import java.util.*;
+
+import org.basex.index.path.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
@@ -62,5 +65,10 @@ class IndexContext extends IndexPred {
     // attribute index request: add attribute step
     final Expr step = Step.self(info.cc, root, st.info(), st.test);
     return Path.get(root.info(), root, step);
+  }
+
+  @Override
+  ArrayList<PathNode> nodes(final ArrayList<PathNode> nodes) {
+    return nodes;
   }
 }

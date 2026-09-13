@@ -258,29 +258,31 @@ final class NSEntries {
   }
 
   /**
-   * Returns the common default namespace of all documents of the database.
+   * Counts the document root elements that bind the specified prefix to the specified URI.
    * @param ns namespace reference
-   * @param ndocs number of documents
+   * @param prefId ID of prefix
+   * @param uriId ID of URI
    * @param data data reference
-   * @return namespace, or {@code null} if there is no common namespace
+   * @return number of root elements
    */
-  byte[] defaultNs(final Namespaces ns, final int ndocs, final Data data) {
+  int roots(final Namespaces ns, final int prefId, final int uriId, final Data data) {
     final int size = pres.length;
-    // no namespaces defined: default namespace is empty
-    if(size == 0 || size == 1 && leaves[0] == 0) return Token.EMPTY;
-    // give up if the root has inner children or if the number of children differs
-    if(size > 1 || leaves[0] != ndocs) return null;
+    if(size == 0) return 0;
 
-    int id = 0;
+    int count = 0;
+    // leaf entries of the root
     for(int b = 0, bs = blocks(0); b < bs; b++) {
       final Block bl = block(0, b);
       final int cl = bl.pres.length;
       for(int l = 0; l < cl; l++) {
-        id = ns.defaultNs(bl.pres[l], bl.sets[l], id, data);
-        if(id == 0) return null;
+        if(ns.declares(bl.pres[l], bl.sets[l], prefId, uriId, data)) count++;
       }
     }
-    return ns.uri(id);
+    // inner entries of the root
+    for(int n = 1; n < size; n++) {
+      if(parents[n] == 0 && ns.declares(pres[n], setIds[n], prefId, uriId, data)) count++;
+    }
+    return count;
   }
 
   /**

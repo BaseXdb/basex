@@ -7,6 +7,8 @@ import java.util.*;
 
 import org.basex.data.*;
 import org.basex.index.*;
+import org.basex.index.path.*;
+import org.basex.index.stats.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.index.*;
@@ -91,6 +93,9 @@ public class CmpG extends Cmp {
       final Expr els = new CmpG(info, iff.arg(1), expr2.copy(cc, new IntObjectMap<>()), op);
       return new If(info, iff.cond, thn.optimize(cc), els.optimize(cc)).optimize(cc);
     }
+
+    // //a/b = 'x' → false() (statistics report no matching values)
+    if(expr == this && noMatches(null, expr1.data())) return cc.replaceWith(this, Bln.FALSE);
 
     // optimizations that rely on the semantics of general comparisons
     if(expr == this) expr = optContains(cc);
@@ -251,6 +256,24 @@ public class CmpG extends Cmp {
     // reject rewriting if no index is used and if the result is not statically known
     return IndexAccess.applied(filtered) || filtered.seqType().zero() ?
       cc.function(EXISTS, info, filtered) : this;
+  }
+
+  @Override
+  public boolean noMatches(final ArrayList<PathNode> nodes, final Data data)
+      throws QueryException {
+
+    final Expr expr2 = exprs[1];
+    if(!byCodepoint(CmpOp.EQ) || !(expr2 instanceof final Value value) ||
+        !value.seqType().type.isStringOrUntyped()) return false;
+    final ArrayList<Stats> list = Path.stats(exprs[0], nodes, data);
+    if(list == null || !Checks.all(list, stats -> StatsType.isCategory(stats.type))) return false;
+    for(final Item item : value) {
+      final byte[] token = item.string(info);
+      for(final Stats stats : list) {
+        if(stats.values.contains(token)) return false;
+      }
+    }
+    return true;
   }
 
   @Override

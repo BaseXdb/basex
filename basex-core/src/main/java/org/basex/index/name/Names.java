@@ -11,6 +11,7 @@ import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * This class indexes and organizes the element or attribute names used in an XML document.
@@ -113,6 +114,27 @@ public final class Names extends TokenSet implements Index {
    */
   public Stats stats(final int index) {
     return stats != null ? stats[index] : null;
+  }
+
+  /**
+   * Returns all names with the specified local name.
+   * @param local local name
+   * @param namespaces indicates if the database contains namespace declarations
+   * @return names
+   */
+  public TokenList lexical(final byte[] local, final boolean namespaces) {
+    final TokenList list = new TokenList(1);
+    if(namespaces) {
+      for(final byte[] name : this) {
+        if(Token.eq(Token.local(name), local)) list.add(name);
+      }
+    } else {
+      // without declarations, only the xml prefix can occur
+      if(contains(local)) list.add(local);
+      final byte[] xml = Token.concat(Token.XML, ':', local);
+      if(contains(xml)) list.add(xml);
+    }
+    return list;
   }
 
   /**

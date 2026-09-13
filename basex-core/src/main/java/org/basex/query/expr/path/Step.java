@@ -315,16 +315,18 @@ public abstract class Step extends Preds {
   /**
    * Returns the path nodes that are the result of this step.
    * @param nodes initial path nodes
-   * @param stats assess database statistics; if {@code true}, return early if step has predicates
+   * @param stats assess database statistics; if {@code true}, return early if the step has
+   *   predicates or if its axis does not yield all instances of the resulting path nodes
    * @return path nodes, or {@code null} if nodes cannot be collected
    */
-  final ArrayList<PathNode> nodes(final ArrayList<PathNode> nodes, final boolean stats) {
-    // skip steps with predicates or different namespaces
+  public final ArrayList<PathNode> nodes(final ArrayList<PathNode> nodes, final boolean stats) {
+    // skip steps with predicates
     final Data data = data();
-    if(stats && exprs.length != 0 || data == null || data.defaultNs() == null) return null;
+    if(data == null || stats && exprs.length != 0) return null;
 
-    // skip axes other than descendant, child, and attribute
-    if(!axis.oneOf(ATTRIBUTE, CHILD , SELF, DESCENDANT, DESCENDANT_OR_SELF)) return null;
+    // skip axes that cannot be traversed in the path summary
+    if(!axis.down && (stats || !axis.oneOf(PARENT, ANCESTOR, ANCESTOR_OR_SELF, FOLLOWING_SIBLING,
+        FOLLOWING_SIBLING_OR_SELF, PRECEDING_SIBLING, PRECEDING_SIBLING_OR_SELF))) return null;
 
     // skip processing instructions
     final Kind kind = test.kind;
@@ -336,16 +338,33 @@ public abstract class Step extends Preds {
     final Predicate<Test> addNodes = t -> {
       int name = 0;
       if(t instanceof final NameTest nt) {
-        if(nt.name == null) return false;
-        name = names.index(nt.name);
+        final byte[] nm = nt.dbName();
+        name = nm != null ? names.index(nm) : 0;
+        if(name == 0) return false;
       }
       for(final PathNode pn : nodes) {
-        if(axis.oneOf(SELF, DESCENDANT_OR_SELF)) {
-          if(kn == -1 || kn == pn.kind && (name == 0 || name == pn.name)) {
-            if(!tmp.contains(pn)) tmp.add(pn);
+        switch(axis) {
+          case SELF -> add(pn, tmp, name, kn, true);
+          case PARENT -> add(pn.parent, tmp, name, kn, false);
+          case ANCESTOR, ANCESTOR_OR_SELF -> {
+            for(PathNode p = axis == ANCESTOR ? pn.parent : pn; p != null; p = p.parent) {
+              add(p, tmp, name, kn, p == pn);
+            }
+          }
+          case FOLLOWING_SIBLING, FOLLOWING_SIBLING_OR_SELF,
+               PRECEDING_SIBLING, PRECEDING_SIBLING_OR_SELF -> {
+            if(axis.oneOf(FOLLOWING_SIBLING_OR_SELF, PRECEDING_SIBLING_OR_SELF)) {
+              add(pn, tmp, name, kn, true);
+            }
+            if(pn.parent != null && pn.kind != Data.ATTR) {
+              for(final PathNode p : pn.parent.children) add(p, tmp, name, kn, false);
+            }
+          }
+          default -> {
+            if(axis == DESCENDANT_OR_SELF) add(pn, tmp, name, kn, true);
+            desc(pn, tmp, name, kn);
           }
         }
-        if(axis != SELF) add(pn, tmp, name, kn);
       }
       return true;
     };
@@ -362,24 +381,37 @@ public abstract class Step extends Preds {
   }
 
   /**
-   * Adds path nodes to the list if they comply with the given test conditions.
+   * Adds the children or descendants of a path node to the list if they comply with the given
+   * test conditions.
    * @param node root node
    * @param nodes output nodes
    * @param name name ID, or {@code 0} as wildcard
    * @param kind node kind, or {@code -1} for all types
    */
-  private void add(final PathNode node, final ArrayList<PathNode> nodes, final int name,
+  private void desc(final PathNode node, final ArrayList<PathNode> nodes, final int name,
       final int kind) {
 
     for(final PathNode pn : node.children) {
-      if(axis.oneOf(DESCENDANT, DESCENDANT_OR_SELF)) {
-        add(pn, nodes, name, kind);
-      }
-      if(kind == -1 && pn.kind != Data.ATTR ^ axis == ATTRIBUTE ||
-         kind == pn.kind && (name == 0 || name == pn.name)) {
-        if(!nodes.contains(pn)) nodes.add(pn);
-      }
+      if(axis.oneOf(DESCENDANT, DESCENDANT_OR_SELF)) desc(pn, nodes, name, kind);
+      add(pn, nodes, name, kind, false);
     }
+  }
+
+  /**
+   * Adds a path node to the list if it complies with the given test conditions.
+   * @param node path node (can be {@code null})
+   * @param nodes output nodes
+   * @param name name ID, or {@code 0} as wildcard
+   * @param kind node kind, or {@code -1} for all types
+   * @param self node is the context node
+   */
+  private void add(final PathNode node, final ArrayList<PathNode> nodes, final int name,
+      final int kind, final boolean self) {
+
+    if(node == null) return;
+    final boolean ok = kind == -1 ? self || (node.kind == Data.ATTR) == (axis == ATTRIBUTE) :
+      kind == node.kind && (name == 0 || name == node.name);
+    if(ok && !nodes.contains(node)) nodes.add(node);
   }
 
   /**

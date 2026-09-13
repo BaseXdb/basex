@@ -24,6 +24,7 @@ import org.basex.query.util.index.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -382,17 +383,26 @@ public abstract class Path extends ParseExpr {
   }
 
   /**
-   * Returns the path nodes that will result from this path.
+   * Returns the path nodes of a root expression.
    * @param rt root at compile time (can be {@code null})
+   * @param data data reference (can be {@code null})
    * @param stats assess database statistics
    * @return path nodes, or {@code null} if nodes cannot be evaluated
    */
-  private ArrayList<PathNode> pathNodes(final Expr rt, final boolean stats) {
-    // ensure that path starts with document nodes
-    final Data data = data();
-    if(rt == null || !rt.seqType().type.instanceOf(NodeType.DOCUMENT) || data == null ||
-        !(stats ? data.meta.uptodate : data.meta.complete)) return null;
-    return pathNodes(data.paths().root(), stats);
+  private static ArrayList<PathNode> rootNodes(final Expr rt, final Data data,
+      final boolean stats) {
+
+    if(rt == null || data == null || !(stats ? data.meta.uptodate : data.meta.complete))
+      return null;
+    // document nodes: start with the root of the path summary
+    if(rt.seqType().type.instanceOf(NodeType.DOCUMENT)) return data.paths().root();
+    // single database node: resolve its path node (statistics are only exact for documents)
+    if(stats || !(rt instanceof final DBNode node) || node.data() != data) return null;
+    final PathNode pn = data.paths().node(node.pre());
+    if(pn == null) return null;
+    final ArrayList<PathNode> nodes = new ArrayList<>(1);
+    nodes.add(pn);
+    return nodes;
   }
 
   /**
@@ -400,21 +410,21 @@ public abstract class Path extends ParseExpr {
    * @param nodes current path nodes
    * @param stats assess database statistics
    * @return path nodes, or {@code null} if nodes cannot be collected
+   * @throws QueryException query exception
    */
-  final ArrayList<PathNode> pathNodes(final ArrayList<PathNode> nodes, final boolean stats) {
+  final ArrayList<PathNode> pathNodes(final ArrayList<PathNode> nodes, final boolean stats)
+      throws QueryException {
+
     ArrayList<PathNode> pn = nodes;
     for(final Expr expr : steps) {
       if(expr instanceof UtilRoot) {
         pn = UtilRoot.nodes(pn);
       } else if(expr instanceof final Step step) {
         pn = step.nodes(pn, stats);
-        // check if paths within predicates are correct
+        // check if predicates will never match
         if(!stats && pn != null) {
           for(final Expr ex : step.exprs) {
-            if(ex instanceof final AxisPath path && path.root == null) {
-              final ArrayList<PathNode> tmp = path.pathNodes(pn, false);
-              if(tmp != null && tmp.isEmpty()) return tmp;
-            }
+            if(ex.noMatches(pn, step.data())) return new ArrayList<>();
           }
         }
       } else {
@@ -425,31 +435,65 @@ public abstract class Path extends ParseExpr {
     return pn;
   }
 
+  @Override
+  public final boolean noMatches(final ArrayList<PathNode> nodes, final Data data)
+      throws QueryException {
+    // a[b]: relative path will yield no results
+    if(root != null) return false;
+    final ArrayList<PathNode> pn = pathNodes(nodes, false);
+    return pn != null && pn.isEmpty();
+  }
+
+  /**
+   * Checks if all path nodes are located on the same level.
+   * @param nodes path nodes
+   * @return result of check
+   */
+  private static boolean sameLevel(final ArrayList<PathNode> nodes) {
+    final int level = nodes.isEmpty() ? 0 : nodes.getFirst().level();
+    return Checks.all(nodes, node -> node.level() == level);
+  }
+
   /**
    * Returns database statistics for the path nodes that will result from this path.
-   * @return statistics or {@code null}
+   * @return statistics, or {@code null} if they are not available
+   * @throws QueryException query exception
    */
-  public ArrayList<Stats> pathStats() {
-    final ArrayList<PathNode> nodes = pathNodes(root, true);
-    if(nodes == null) return null;
+  public ArrayList<Stats> pathStats() throws QueryException {
+    return pathStats(null);
+  }
 
-    // loop through all nodes
-    final ArrayList<Stats> stats = new ArrayList<>();
-    for(PathNode node : nodes) {
-      // retrieve text child if addressed node is an element
-      if(node.kind == Data.ELEM) {
-        if(!node.stats.isLeaf()) return null;
-        for(final PathNode nd : node.children) {
-          if(nd.kind == Data.TEXT) node = nd;
-        }
-      }
-      // skip nodes others than texts and attributes
-      // check if distinct values are available
-      final int kind = node.kind;
-      if(kind != Data.TEXT && kind != Data.ATTR) return null;
-      stats.add(node.stats);
+  /**
+   * Returns database statistics for the path nodes that will result from this path.
+   * @param nodes path nodes of the context, or {@code null} to start from the root
+   * @return statistics, or {@code null} if they are not available
+   * @throws QueryException query exception
+   */
+  public ArrayList<Stats> pathStats(final ArrayList<PathNode> nodes) throws QueryException {
+    final Data data = data();
+    if(data == null) return null;
+    final ArrayList<PathNode> start = nodes != null ? nodes : rootNodes(root, data, true);
+    final ArrayList<PathNode> pn = start != null ? pathNodes(start, true) : null;
+    return pn != null ? data.paths().stats(pn) : null;
+  }
+
+  /**
+   * Returns database statistics for the results of an expression.
+   * @param expr expression (path or context value)
+   * @param nodes path nodes of the context (can be {@code null})
+   * @param data data reference (can be {@code null})
+   * @return statistics, or {@code null} if they are not available
+   * @throws QueryException query exception
+   */
+  public static ArrayList<Stats> stats(final Expr expr, final ArrayList<PathNode> nodes,
+      final Data data) throws QueryException {
+
+    if(data == null) return null;
+    if(expr instanceof final AxisPath path) {
+      return (nodes == null || path.root == null) && path.data() == data ?
+        path.pathStats(nodes) : null;
     }
-    return stats;
+    return nodes != null && expr instanceof ContextValue ? data.paths().stats(nodes) : null;
   }
 
   /**
@@ -483,9 +527,15 @@ public abstract class Path extends ParseExpr {
     final SeqType st = root.seqType();
     boolean atMostOne = st.zeroOrOne();
     boolean sameDepth = atMostOne || st.type.instanceOf(NodeType.DOCUMENT);
+    // path nodes of the path summary (null: unknown)
+    final Data data = root.data();
+    ArrayList<PathNode> nodes = rootNodes(root, data, false);
 
     for(final Expr expr : steps) {
       final Step step = (Step) expr;
+      if(nodes != null) nodes = step.nodes(nodes, false);
+      // results on the same level are non-overlapping and in document order
+      final boolean level = nodes != null && sameLevel(nodes);
       switch(step.axis) {
         case ATTRIBUTE, SELF -> {
           // nothing changes
@@ -496,12 +546,13 @@ public abstract class Path extends ParseExpr {
         }
         case CHILD -> {
           // order is only ensured if all nodes are on the same level
-          if(!sameDepth) return false;
+          if(!sameDepth && !level) return false;
+          sameDepth = true;
         }
         case DESCENDANT, DESCENDANT_OR_SELF -> {
           // non-overlapping if all nodes are on the same level
           if(!sameDepth) return false;
-          sameDepth = false;
+          sameDepth = level;
         }
         case ANCESTOR, ANCESTOR_OR_SELF, PRECEDING, PRECEDING_OR_SELF, PRECEDING_SIBLING,
              PRECEDING_SIBLING_OR_SELF -> {
@@ -516,6 +567,12 @@ public abstract class Path extends ParseExpr {
         default -> throw Util.notExpected();
       }
       atMostOne &= step.seqType().zeroOrOne();
+      // results are distinct: at most one instance of the resulting path nodes may exist
+      if(nodes != null && data.meta.counts) {
+        long count = 0;
+        for(final PathNode pn : nodes) count += pn.stats.count;
+        if(count <= 1) atMostOne = true;
+      }
     }
     return true;
   }
@@ -594,48 +651,15 @@ public abstract class Path extends ParseExpr {
   }
 
   /**
-   * Returns all summary path nodes for the specified location step.
-   * @param last last step to be checked
-   * @return path nodes, or {@code null} if nodes cannot be retrieved
-   */
-  private ArrayList<PathNode> pathNodes(final int last) {
-    // skip request if no path index exists or might be out-of-date
-    final Data data = data();
-    if(data == null || !data.meta.complete) return null;
-
-    ArrayList<PathNode> nodes = data.paths().root();
-    for(int s = 0; s <= last; s++) {
-      // only follow axis steps
-      final Step curr = axisStep(s);
-      if(curr == null) return null;
-
-      final boolean desc = curr.axis == DESCENDANT;
-      if(!desc && curr.axis != CHILD || !(curr.test instanceof final NameTest test)) return null;
-      if(test.name == null) return null;
-
-      final int name = data.elemNames.index(test.name);
-      final ArrayList<PathNode> tmp = new ArrayList<>();
-      for(final PathNode node : PathIndex.desc(nodes, desc)) {
-        if(node.kind == Data.ELEM && name == node.name) {
-          // skip test if an element name occurs on different levels
-          if(!tmp.isEmpty() && tmp.getFirst().level() != node.level()) return null;
-          tmp.add(node);
-        }
-      }
-      if(tmp.isEmpty()) return null;
-      nodes = tmp;
-    }
-    return nodes;
-  }
-
-  /**
    * Returns an empty sequence if the path will yield no results.
    * @param cc compilation context
    * @param rt root at compile time (can be {@code null})
    * @return original or new expression
+   * @throws QueryException query exception
    */
-  private Expr removeEmpty(final CompileContext cc, final Expr rt) {
-    final ArrayList<PathNode> nodes = pathNodes(rt, false);
+  private Expr removeEmpty(final CompileContext cc, final Expr rt) throws QueryException {
+    final ArrayList<PathNode> rn = rootNodes(rt, data(), false);
+    final ArrayList<PathNode> nodes = rn != null ? pathNodes(rn, false) : null;
     if(nodes != null ? nodes.isEmpty() : emptySteps(rt)) {
       cc.info(QueryText.OPTPATH_X, this);
       return Empty.VALUE;
@@ -651,13 +675,12 @@ public abstract class Path extends ParseExpr {
    * @throws QueryException query exception
    */
   private Expr children(final CompileContext cc, final Expr rt) throws QueryException {
-    // skip optimization...
-    // - if path does not start with document nodes
-    // - if index does not exist or is out-dated
-    // - if several namespaces occur in the input
+    // skip optimization if the path summary is not available for the root nodes,
+    // or if the root nodes are located on different levels
     final Data data = data();
-    if(rt == null || !rt.seqType().type.instanceOf(NodeType.DOCUMENT) ||
-        data == null || !data.meta.complete || data.defaultNs() == null) return this;
+    ArrayList<PathNode> nodes = rootNodes(rt, data, false);
+    if(nodes == null || nodes.isEmpty() || !sameLevel(nodes)) return this;
+    final int rootLevel = nodes.getFirst().level();
 
     final int sl = steps.length;
     for(int s = 0; s < sl; s++) {
@@ -665,45 +688,54 @@ public abstract class Path extends ParseExpr {
       final Step prev = s > 0 ? axisStep(s - 1) : null;
       if(prev != null && prev.exprs.length != 0) break;
 
-      // ignore axes other than descendant, or numeric predicates
+      // follow child and descendant steps with name tests
       final Step curr = axisStep(s);
-      if(curr == null || curr.axis != DESCENDANT || curr.mayBePositional()) continue;
+      if(curr == null || !curr.axis.oneOf(CHILD, DESCENDANT) || !(curr.test instanceof NameTest))
+        break;
+      nodes = curr.nodes(nodes, false);
+      // stop if no elements are found, or if they occur on different levels
+      if(nodes == null || nodes.isEmpty() || !sameLevel(nodes)) break;
 
-      // check if child steps can be retrieved for current step
-      ArrayList<PathNode> nodes = pathNodes(s);
-      if(nodes == null) continue;
+      // ignore axes other than descendant, or numeric predicates
+      if(curr.axis != DESCENDANT || curr.mayBePositional()) continue;
 
-      // cache child steps
-      final ArrayList<QNm> qNames = new ArrayList<>();
-      while(nodes.getFirst().parent != null) {
-        QNm qName = new QNm(data.elemNames.key(nodes.getFirst().name));
-        // skip children with prefixes
-        if(qName.hasPrefix()) return this;
-        for(final PathNode node : nodes) {
-          if(nodes.getFirst().name != node.name) {
-            qName = null;
-            break;
-          }
-        }
-        qNames.add(qName);
-        nodes = PathIndex.parent(nodes);
+      // collect the tests of the child steps
+      final ArrayList<Test> tests = new ArrayList<>();
+      for(ArrayList<PathNode> pn = nodes; pn.getFirst().level() > rootLevel;
+          pn = PathIndex.parent(pn)) {
+        final Test test = test(pn, data);
+        if(test == null) return this;
+        tests.add(test);
       }
       cc.info(QueryText.OPTCHILD_X, steps[s]);
 
       // build new steps
-      int ts = qNames.size();
+      int ts = tests.size();
       final Expr[] stps = new Expr[ts + sl - s - 1];
       for(int t = 0; t < ts; t++) {
         final Expr[] preds = t == ts - 1 ? ((Preds) steps[s]).exprs : new Expr[0];
-        final QNm qName = qNames.get(ts - t - 1);
-        final Test test = Test.get(Kind.ELEMENT, qName, Scope.LOCAL, null);
-        stps[t] = Step.get(cc, root, curr.info(), CHILD, test, preds);
+        stps[t] = Step.get(cc, root, curr.info(), CHILD, tests.get(ts - t - 1), preds);
       }
       while(++s < sl) stps[ts++] = steps[s];
 
       return get(cc, info, root, stps);
     }
     return this;
+  }
+
+  /**
+   * Returns a test for the elements of the specified path nodes.
+   * @param nodes path nodes
+   * @param data data reference
+   * @return test, or {@code null} if the namespace of the name cannot be resolved
+   */
+  private static Test test(final ArrayList<PathNode> nodes, final Data data) {
+    // different names: wildcard test
+    final int name = nodes.getFirst().name;
+    if(!Checks.all(nodes, node -> node.name == name)) return NodeTest.ELEMENT;
+    final byte[] key = data.elemNames.key(name), uri = data.nsUri(key, true);
+    return uri == null ? null :
+      Test.get(Kind.ELEMENT, new QNm(Token.local(key), uri), Scope.FULL, null);
   }
 
   /**
@@ -771,12 +803,14 @@ public abstract class Path extends ParseExpr {
 
     // check if path can be converted to an index access
     final Data data = data();
+    ArrayList<PathNode> nodes = rootNodes(rt, data, false);
     final int sl = steps.length;
     for(int s = 0; s < sl; s++) {
       // only accept descendant steps without positional predicates
       // Example for position predicate: child:x[1] != parent::x[1]
       final Step step = axisStep(s);
       if(step == null || !step.axis.down || step.mayBePositional()) break;
+      if(nodes != null) nodes = step.nodes(nodes, false);
 
       final int el = step.exprs.length;
       if(el > 0) {
@@ -787,7 +821,7 @@ public abstract class Path extends ParseExpr {
 
         // choose the cheapest index access
         for(int e = 0; e < el; e++) {
-          final IndexInfo ii = new IndexInfo(db, cc, step);
+          final IndexInfo ii = new IndexInfo(db, cc, step, nodes);
           if(!step.exprs[e].indexAccessible(ii)) continue;
 
           if(ii.costs.results() == 0) {
@@ -908,10 +942,11 @@ public abstract class Path extends ParseExpr {
       // consider child steps with name test and without predicates
       if(step.axis != CHILD || s != i && step.exprs.length > 0 ||
           !(step.test instanceof final NameTest test)) return true;
-      // only consider local name tests
-      if(test.name == null) return true;
+      // only consider tests that address a single database name
+      final byte[] name = test.dbName();
+      if(name == null) return true;
       // only support unique paths with nodes on the correct level
-      final ArrayList<PathNode> pn = data().paths().desc(test.name);
+      final ArrayList<PathNode> pn = data().paths().desc(name);
       if(pn.size() != 1 || pn.getFirst().level() != s + 1) return true;
     }
     return false;

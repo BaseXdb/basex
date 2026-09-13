@@ -2,6 +2,7 @@ package org.basex.query.util.index;
 
 import static org.basex.query.QueryText.*;
 
+import java.util.*;
 import java.util.concurrent.atomic.*;
 import java.util.function.*;
 
@@ -9,6 +10,7 @@ import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.name.*;
+import org.basex.index.path.*;
 import org.basex.index.query.*;
 import org.basex.index.stats.*;
 import org.basex.query.*;
@@ -51,17 +53,26 @@ public final class IndexInfo {
   private Axis axis = Axis.PARENT;
   /** Predicate expression (can be {@code null}). */
   private IndexPred pred;
+  /** Path nodes of the step (can be {@code null}). */
+  private final ArrayList<PathNode> nodes;
+  /** Path nodes addressed by the predicate (can be {@code null}). */
+  private ArrayList<PathNode> predNodes;
+  /** Indicates if the path nodes of the predicate have been resolved. */
+  private boolean resolved;
 
   /**
    * Constructor.
    * @param db index database
    * @param cc compilation context
    * @param step step containing the rewritable predicate
+   * @param nodes path nodes of the step (can be {@code null})
    */
-  public IndexInfo(final IndexDb db, final CompileContext cc, final Step step) {
+  public IndexInfo(final IndexDb db, final CompileContext cc, final Step step,
+      final ArrayList<PathNode> nodes) {
     this.cc = cc;
     this.db = db;
     this.step = step;
+    this.nodes = nodes;
   }
 
   /**
@@ -143,29 +154,34 @@ public final class IndexInfo {
 
   /**
    * Checks if the elements addressed by a test only have text nodes as children.
-   * @param test node test
+   * @param tst node test
    * @param data data reference
    * @return result of check
    */
-  private static boolean leaf(final Test test, final Data data) {
-    if(test instanceof final UnionTest ut) return Checks.all(ut.tests, t -> leaf(t, data));
-    if(!(test instanceof final NameTest nt)) return false;
+  private boolean leaf(final Test tst, final Data data) {
+    // path summary: check the leaf flags of the addressed elements
+    final ArrayList<PathNode> pn = predNodes();
+    if(pn != null) return Checks.all(pn, node -> node.kind == Data.ELEM && node.stats.isLeaf());
 
-    // resolve local name for statistics lookup; sound only if its lexical name is unambiguous
-    final byte[] local;
-    if(data.nspaces.isEmpty()) {
-      // no namespaces: one lexical name per local name
-      if(nt.name == null) return false;
-      local = nt.name;
-    } else if(nt.scope == NameTest.Scope.FULL && !nt.qname.hasURI() && !data.usesDefaultNs()) {
-      // no default namespace: full no-namespace test maps to its no-prefix lexical name
-      local = nt.qname.local();
-    } else {
-      return false;
-    }
-
-    final Stats stats = data.elemNames.stats(data.elemNames.index(local));
+    // name statistics
+    if(tst instanceof final UnionTest ut) return Checks.all(ut.tests, t -> leaf(t, data));
+    if(!(tst instanceof final NameTest nt)) return false;
+    final byte[] name = nt.dbName();
+    if(name == null) return false;
+    final Stats stats = data.elemNames.stats(data.elemNames.index(name));
     return stats != null && stats.isLeaf();
+  }
+
+  /**
+   * Returns the path nodes that are addressed by the predicate.
+   * @return path nodes, or {@code null} if they cannot be resolved
+   */
+  private ArrayList<PathNode> predNodes() {
+    if(!resolved) {
+      predNodes = nodes != null ? pred.nodes(nodes) : null;
+      resolved = true;
+    }
+    return predNodes;
   }
 
   /**
@@ -208,7 +224,7 @@ public final class IndexInfo {
             addToken(token, type, data, tokens, size);
       };
 
-      Stats stats = null;
+      ArrayList<Stats> stats = null;
       for(final Item item : value) {
         if(item.type.isStringOrUntyped()) {
           // string: exact search
@@ -216,12 +232,14 @@ public final class IndexInfo {
         } else if(item.type.instanceOf(BasicType.INTEGER)) {
           // integers: search indexed lexical forms (for non-canonical values like '+5')
           if(stats == null) {
-            stats = intStats(data);
+            stats = intStats();
             if(stats == null) return false;
           }
           final long v = Token.toLong(item.string(info));
-          for(final byte[] stored : stats.values) {
-            if(Token.toLong(stored) == v && !add.test(stored)) return false;
+          for(final Stats st : stats) {
+            for(final byte[] stored : st.values) {
+              if(Token.toLong(stored) == v && !add.test(stored)) return false;
+            }
           }
         } else {
           return false;
@@ -260,17 +278,19 @@ public final class IndexInfo {
       throws QueryException {
 
     final Data data = db.data();
-    final Stats stats = intStats(data);
+    final ArrayList<Stats> stats = intStats();
     if(stats == null) return false;
 
     // collect indexed lexical forms whose long-value lies in [min..max]
     final IndexType type = text ? IndexType.TEXT : IndexType.ATTRIBUTE;
     final TokenSet tokens = new TokenSet();
     final AtomicInteger size = new AtomicInteger(test == null ? 0 : -1);
-    for(final byte[] token : stats.values) {
-      final long v = Token.toLong(token);
-      if(v < min || v > max) continue;
-      if(!addToken(token, type, data, tokens, size)) return false;
+    for(final Stats st : stats) {
+      for(final byte[] token : st.values) {
+        final long v = Token.toLong(token);
+        if(v < min || v > max) continue;
+        if(!addToken(token, type, data, tokens, size)) return false;
+      }
     }
     final TokenBuilder tb = new TokenBuilder().add('[').addLong(min).add(',').addLong(max).add(']');
     return valueAccess(tokens, size, type, info, tb);
@@ -354,17 +374,37 @@ public final class IndexInfo {
   }
 
   /**
-   * Retrieves the statistics of the targeted element or attribute name.
-   * @param data data reference (can be {@code null})
-   * @return statistics, or {@code null} if not available
+   * Returns the statistics of the targeted elements or attributes.
+   * @return statistics, or {@code null} if they are not available
    */
-  private Stats intStats(final Data data) {
-    if(data == null || !data.meta.uptodate || !data.nspaces.isEmpty()) return null;
-    if(!(pred.qname().test instanceof final NameTest nt) || nt.name == null) return null;
+  public ArrayList<Stats> stats() {
+    final Data data = db.data();
+    if(data == null || !data.meta.uptodate) return null;
+
+    // path summary
+    final ArrayList<PathNode> pn = predNodes();
+    if(pn != null) return data.paths().stats(pn);
+
+    // name statistics
+    if(!(pred.qname().test instanceof final NameTest nt)) return null;
+    final byte[] name = nt.dbName();
+    if(name == null) return null;
     final Names names = text ? data.elemNames : data.attrNames;
-    final Stats stats = names.stats(names.index(nt.qname.local()));
-    return stats == null || !StatsType.isCategory(stats.type) || !StatsType.isInteger(stats.type)
-        ? null : stats;
+    final Stats stats = names.stats(names.index(name));
+    if(stats == null) return null;
+    final ArrayList<Stats> list = new ArrayList<>(1);
+    list.add(stats);
+    return list;
+  }
+
+  /**
+   * Returns the integer-category statistics of the targeted elements or attributes.
+   * @return statistics, or {@code null} if they are not available
+   */
+  private ArrayList<Stats> intStats() {
+    final ArrayList<Stats> list = stats();
+    return list != null && Checks.all(list, stats -> StatsType.isCategory(stats.type) &&
+      StatsType.isInteger(stats.type)) ? list : null;
   }
 
   /**

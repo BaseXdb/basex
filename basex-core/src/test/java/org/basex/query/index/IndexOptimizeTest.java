@@ -419,13 +419,13 @@ public final class IndexOptimizeTest extends SandboxTest {
     check("//*[string(a) = 'A'] ! name()", "xml", empty(ValueAccess.class));
   }
 
-  /** A single index hit that is discarded by the name test of the index access. */
+  /** A value that does not occur below the addressed path: statically discarded. */
   @Test public void filteredIndexHit() {
     execute(new CreateDB(NAME, "<xml><a>A</a><b>B</b></xml>"));
-    indexCheck("//b[. = 'A']", "");
-    indexCheck("count(//b[. = 'A'])", 0);
-    indexCheck("exists(//b[. = 'A'])", false);
-    indexCheck("empty(//b[. = 'A'])", true);
+    check("//b[. = 'A']", "", empty());
+    check("count(//b[. = 'A'])", 0, empty(ValueAccess.class));
+    check("exists(//b[. = 'A'])", false, empty(ValueAccess.class));
+    check("empty(//b[. = 'A'])", true, empty(ValueAccess.class));
   }
 
   /** A variable is inlined into the database reference of an index access. */
@@ -465,13 +465,13 @@ public final class IndexOptimizeTest extends SandboxTest {
     check("/*[b = 'B']", doc, exists(ValueAccess.class));
     check("//*[b = 'B']", doc, exists(ValueAccess.class));
 
-    // local-name wildcard tests are not rewritten (may match names in other namespaces)
-    check("/a[*:b = 'B']", doc, empty(ValueAccess.class));
-    check("//a[*:b = 'B']", doc, empty(ValueAccess.class));
-    check("/*:a[*:b = 'B']", doc, empty(ValueAccess.class));
-    check("//*:a[*:b = 'B']", doc, empty(ValueAccess.class));
-    check("/*[*:b = 'B']", doc, empty(ValueAccess.class));
-    check("//*[*:b = 'B']", doc, empty(ValueAccess.class));
+    // local-name wildcard tests: rewritten, as the local name occurs in a single namespace
+    check("/a[*:b = 'B']", doc, exists(ValueAccess.class));
+    check("//a[*:b = 'B']", doc, exists(ValueAccess.class));
+    check("/*:a[*:b = 'B']", doc, exists(ValueAccess.class));
+    check("//*:a[*:b = 'B']", doc, exists(ValueAccess.class));
+    check("/*[*:b = 'B']", doc, exists(ValueAccess.class));
+    check("//*[*:b = 'B']", doc, exists(ValueAccess.class));
 
     // nonexistent no-namespace names: statically discarded
     check("/a/nonexistent", "", empty());
@@ -495,9 +495,9 @@ public final class IndexOptimizeTest extends SandboxTest {
     // local-name wildcard is evaluated sequentially and matches both elements
     check("count(//*:b[. = 'B'])", "2", empty(ValueAccess.class));
 
-    // 'B' only occurs below the prefixed element: no-namespace test must not match
+    // 'B' only occurs below the prefixed element: no-namespace test is statically discarded
     execute(new CreateDB(NAME, "<a xmlns:x=\"X\"><b>b</b><x:b><c>B</c></x:b></a>"));
-    check("count(/a[b = 'B'])", "0", exists(ValueAccess.class));
+    check("count(/a[b = 'B'])", "0", empty(ValueAccess.class));
   }
 
   /**
@@ -529,13 +529,13 @@ public final class IndexOptimizeTest extends SandboxTest {
     execute(new CreateDB(NAME, "<x><a n='005'/></x>"));
     check("//a[@n = 5]", "<a n=\"005\"/>", exists(ValueAccess.class));
 
-    // namespace declarations on the database: statistics are not consulted, no integer rewrite
+    // namespace declarations on the database: names are resolved, integer rewrite
     execute(new CreateDB(NAME, "<x xmlns:ns='u'><a n='5'/></x>"));
-    check("count(//a[@n = 5])", "1", empty(ValueAccess.class));
+    check("count(//a[@n = 5])", "1", exists(ValueAccess.class));
 
-    // wildcard attribute test: no NameTest name available, no integer rewrite
+    // wildcard attribute test: statistics are retrieved from the path summary, integer rewrite
     execute(new CreateDB(NAME, "<x><a n='5'/></x>"));
-    check("count(//*[@* = 5])", "1", empty(ValueAccess.class));
+    check("count(//*[@* = 5])", "1", exists(ValueAccess.class));
 
     // access closed database
     execute(new Close());

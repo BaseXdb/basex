@@ -1,5 +1,8 @@
 package org.basex.query.util.index;
 
+import java.util.*;
+
+import org.basex.index.path.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
@@ -99,6 +102,13 @@ class IndexPath extends IndexPred {
     steps.add(Step.get(cc, rt, st.info(), step(s + 1).axis.invert(), st.test));
 
     return Path.get(cc, path.info(), rt, steps.finish());
+  }
+
+  @Override
+  ArrayList<PathNode> nodes(final ArrayList<PathNode> nodes) {
+    ArrayList<PathNode> pn = nodes;
+    for(int s = 0; s <= last && pn != null; s++) pn = path.step(s).nodes(pn, false);
+    return pn;
   }
 
   /**

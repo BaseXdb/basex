@@ -39,6 +39,11 @@ public final class Namespaces {
   /** Root node of the mutable namespace tree (can be {@code null}). */
   private NSNode root;
 
+  /** Number of documents for which the common default namespace was cached ({@code -1}: none). */
+  private int cachedDocs = -1;
+  /** Cached common default namespace (can be {@code null}). */
+  private byte[] cachedNs;
+
   /** Stack with references to current default namespaces. */
   private final IntList defaults = new IntList(2);
   /** Current level. Index starts at 1 (required by XQUF operations). */
@@ -190,87 +195,94 @@ public final class Namespaces {
    * @param data data reference
    * @return namespace, or {@code null} if there is no common namespace
    */
-  byte[] defaultNs(final int ndocs, final Data data) {
-    if(root == null) return entries.defaultNs(this, ndocs, data);
-
-    // no namespaces defined: default namespace is empty
-    final int ch = root.children();
-    if(ch == 0) return Token.EMPTY;
-    // give up if number of default namespaces differs from number of documents
-    if(ch != ndocs) return null;
-
-    int id = 0;
-    for(int c = 0; c < ch; c++) {
-      final NSNode child = root.child(c);
-      // give up if the child node has more children
-      if(child.children() > 0) return null;
-      id = defaultNs(child.pre(), child.setId(), id, data);
-      if(id == 0) return null;
+  synchronized byte[] defaultNs(final int ndocs, final Data data) {
+    // the result is cached until the namespaces or the number of documents change
+    if(cachedDocs != ndocs) {
+      cachedNs = defaultNs(ndocs, data, prefixes.index(Token.EMPTY));
+      cachedDocs = ndocs;
     }
-    // return common default namespace
-    return uri(id);
+    return cachedNs;
   }
 
   /**
-   * Checks if a namespace node declares the default namespace of a document.
-   * @param pre PRE value of the node
-   * @param setId set ID
-   * @param id ID of the namespace URI of the preceding nodes ({@code 0}: no node yet)
+   * Computes the common default namespace of all documents of the database.
+   * @param ndocs number of documents
    * @param data data reference
-   * @return ID of the namespace URI, or {@code 0} if the node does not qualify
+   * @param prefId ID of the empty prefix ({@code 0}: unknown)
+   * @return namespace, or {@code null} if there is no common namespace
    */
-  int defaultNs(final int pre, final int setId, final int id, final Data data) {
-    // give up if the node is not attached to the root element of a document
-    if(data.kind(data.parent(pre, Data.ELEM)) != Data.DOC) return 0;
-    // give up if the node has more than one namespace, or if the prefix is not empty
-    final int[] values = sets.get(setId);
-    if(values.length != 2 || prefix(values[0]).length != 0) return 0;
-    // check if all documents have the same default namespace
-    return id == 0 || id == values[1] ? values[1] : 0;
+  private byte[] defaultNs(final int ndocs, final Data data, final int prefId) {
+    // URI that is bound to the empty prefix; give up if it is bound to different URIs
+    final int uriId = uniqueUri(prefId);
+    if(uriId == -1) return null;
+    // no documents, or no default namespace declared anywhere
+    if(ndocs == 0 || uriId == 0) return Token.EMPTY;
+    // the default namespace must be declared by the root elements of all documents
+    final int roots = root == null ? entries.roots(this, prefId, uriId, data) :
+      roots(prefId, uriId, data);
+    return roots == ndocs ? uri(uriId) : null;
   }
 
   /**
-   * Checks if a default namespace is declared anywhere in the database.
-   * @return result of check
+   * Returns the URI that is bound to the specified prefix in the whole database.
+   * @param prefix prefix
+   * @return URI, or {@code null} if the prefix is unbound or bound to different URIs
    */
-  public boolean usesDefaultNs() {
-    if(isEmpty()) return false;
-    // the sets of a compressed structure are compacted, i.e. all of them are referenced
-    if(root == null) {
+  public byte[] uniqueUri(final byte[] prefix) {
+    final int uriId = uniqueUri(prefixes.index(prefix));
+    return uriId > 0 ? uri(uriId) : null;
+  }
+
+  /**
+   * Returns the ID of the URI that is bound to the specified prefix in all namespace sets.
+   * @param prefId ID of prefix ({@code 0}: unknown prefix)
+   * @return ID of URI, {@code 0} if the prefix is unbound, or {@code -1} if it is bound to
+   *   different URIs
+   */
+  private int uniqueUri(final int prefId) {
+    int id = 0;
+    if(prefId != 0) {
       final int ss = sets.size();
       for(int s = 1; s <= ss; s++) {
-        if(usesDefaultNs(sets.get(s))) return true;
+        final int uriId = sets.uri(s, prefId);
+        if(uriId == 0 || uriId == id) continue;
+        if(id != 0) return -1;
+        id = uriId;
       }
-      return false;
     }
-    return usesDefaultNs(root);
+    return id;
   }
 
   /**
-   * Recursively checks a namespace node and its descendants for a default namespace.
-   * @param node namespace node
-   * @return result of check
+   * Counts the document root elements that bind the specified prefix to the specified URI.
+   * @param prefId ID of prefix
+   * @param uriId ID of URI
+   * @param data data reference
+   * @return number of root elements
    */
-  private boolean usesDefaultNs(final NSNode node) {
-    if(usesDefaultNs(sets.get(node.setId()))) return true;
-    final int ch = node.children();
+  private int roots(final int prefId, final int uriId, final Data data) {
+    int count = 0;
+    final int ch = root.children();
     for(int c = 0; c < ch; c++) {
-      if(usesDefaultNs(node.child(c))) return true;
+      final NSNode child = root.child(c);
+      if(declares(child.pre(), child.setId(), prefId, uriId, data)) count++;
     }
-    return false;
+    return count;
   }
 
   /**
-   * Checks a set of prefix/namespace URI pairs for a default namespace.
-   * @param values prefix/URI pairs
+   * Checks if a namespace node of a document root element binds the specified prefix to the
+   * specified URI.
+   * @param pre PRE value of the node
+   * @param setId set ID
+   * @param prefId ID of prefix
+   * @param uriId ID of URI
+   * @param data data reference
    * @return result of check
    */
-  private boolean usesDefaultNs(final int[] values) {
-    final int vl = values.length;
-    for(int v = 0; v < vl; v += 2) {
-      if(prefix(values[v]).length == 0 && uri(values[v + 1]).length != 0) return true;
-    }
-    return false;
+  boolean declares(final int pre, final int setId, final int prefId, final int uriId,
+      final Data data) {
+    return data.kind(data.parent(pre, Data.ELEM)) == Data.DOC && sets.uri(setId, prefId) == uriId;
   }
 
   // Requesting Namespaces Based on Context =======================================================
@@ -443,6 +455,7 @@ public final class Namespaces {
     final int as = atts.size();
     if(as == 0) return;
 
+    cachedDocs = -1;
     final int[] values = new int[as << 1];
     for(int a = 0; a < as; a++) {
       final byte[] prefix = atts.name(a), uri = atts.value(a);
@@ -466,6 +479,7 @@ public final class Namespaces {
    * @return ID of namespace URI
    */
   public int add(final int pre, final byte[] prefix, final byte[] uri, final Data data) {
+    cachedDocs = -1;
     final int prefId = prefixes.put(prefix), uriId = uris.put(uri);
     tree();
     NSNode nd = current.find(pre, data);
@@ -499,6 +513,7 @@ public final class Namespaces {
   public void delete(final byte[] uri) {
     final int id = uris.index(uri);
     if(id != 0) {
+      cachedDocs = -1;
       tree();
       current.delete(sets, id);
     }
@@ -511,6 +526,7 @@ public final class Namespaces {
    * @param data data reference
    */
   void delete(final int pre, final int size, final Data data) {
+    cachedDocs = -1;
     tree();
     NSNode nd = current.find(pre, data);
     if(nd.pre() == pre) nd = nd.parent();

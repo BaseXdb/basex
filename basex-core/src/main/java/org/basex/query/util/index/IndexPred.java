@@ -1,5 +1,8 @@
 package org.basex.query.util.index;
 
+import java.util.*;
+
+import org.basex.index.path.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
@@ -60,4 +63,11 @@ abstract class IndexPred {
    * @throws QueryException query exception
    */
   abstract Expr invert(Expr root) throws QueryException;
+
+  /**
+   * Returns the path nodes that are addressed by the predicate.
+   * @param nodes path nodes of the step
+   * @return path nodes, or {@code null} if nodes cannot be collected
+   */
+  abstract ArrayList<PathNode> nodes(ArrayList<PathNode> nodes);
 }
