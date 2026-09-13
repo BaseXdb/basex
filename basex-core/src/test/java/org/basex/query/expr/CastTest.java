@@ -39,18 +39,16 @@ public final class CastTest extends SandboxTest {
     error("2 castable as xs:integer*", CALCEXPR);
   }
 
-  /** Casts to item(). */
+  /** item() is not a cast target, but it is accepted as a component type. */
   @Test public void items() {
-    query("<x/> cast as item()", "<x/>");
-    query("[ 1 ] cast as item()", "[1]");
-    query("{ 'a': 1 } cast as item()", "{\"a\":1}");
-    query("(true#0 cast as item()) instance of fn(*)", true);
-    query("() cast as item()?", "");
+    error("<x/> cast as item()", SIMPLETYPE_X);
+    error("() cast as item()?", SIMPLETYPE_X);
+    error("1 castable as item()", SIMPLETYPE_X);
 
-    // item() only checks the cardinality
-    error("() cast as item()", INVTYPE_X);
-    error("(1, 2) cast as item()", INVTYPE_X);
-    error("(1, 2) cast as item()?", INVTYPE_X);
+    // members that are instances of the component type are left unchanged
+    query("([ <x/> ] cast as array(item())) instance of array(*)", true);
+    query("({ 1: true#0 } cast as map(xs:integer, item()*)) instance of map(*)", true);
+    error("[ 1, 2 ] cast as array(element())", INVCONVERT_X_X);
   }
 
   /** Casts to array types. */
@@ -213,15 +211,11 @@ public final class CastTest extends SandboxTest {
     // maps and functions cannot be atomized
     error("{ 'a': 1 } cast as xs:integer", FIATOMIZE_X);
     error("true#0 cast as xs:string", FIATOMIZE_X);
-    // ...but item() does not atomize, so it accepts them
-    query("({ 'a': 1 } cast as item()) instance of map(*)", true);
-    query("([ 1, 2 ] cast as item()) instance of array(*)", true);
   }
 
   /** The empty sequence as operand. */
   @Test public void emptySequence() {
     query("count(() cast as xs:integer?)", 0);
-    query("count(() cast as item()?)", 0);
     query("count(() cast as array(xs:integer)?)", 0);
     query("count(() cast as map(xs:string, xs:integer)?)", 0);
     query("count(() cast as record(a)?)", 0);

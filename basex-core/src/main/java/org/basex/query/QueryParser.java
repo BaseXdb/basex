@@ -3966,10 +3966,6 @@ public class QueryParser extends InputParser {
       } else if(ft != null && wsConsume("(")) {
         // array(...), map(...), record(...); function(...) is rejected in checkCastTarget
         type = functionTest(AnnList.EMPTY, ft);
-      } else if(eq(local, token(ITEM)) && wsConsume("(")) {
-        // item()
-        wsCheck(")");
-        type = BasicType.ITEM;
       } else {
         // attach default element namespace, or schema namespace if default is ##any
         if(!name.hasURI()) name.uri(sc.elemNsAny ? XS_URI : sc.elemNS);
@@ -4022,9 +4018,9 @@ public class QueryParser extends InputParser {
     if(tp instanceof final BasicType bt && bt.atomic() != null &&
         !bt.oneOf(BasicType.NOTATION, BasicType.ANY_ATOMIC_TYPE, BasicType.ANY_SIMPLE_TYPE))
       return false;
-    // item(); schema list type; array, map, record types (components are checked while casting)
-    if(!atomic && (tp == BasicType.ITEM || tp instanceof ListType || tp instanceof ArrayType ||
-        tp instanceof MapType)) return false;
+    // schema list type; array, map, record types (components are checked while casting)
+    if(!atomic && (tp instanceof ListType || tp instanceof ArrayType || tp instanceof MapType))
+      return false;
     throw error(INVALIDCAST_X, type);
   }
 

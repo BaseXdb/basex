@@ -33,7 +33,7 @@ public final class TypeTest extends SandboxTest {
     query("string(([1] cast as array(xs:integer))?1)", "1");
     query("string(({ 'a': '2' } cast as record(a as xs:integer))?a)", "2");
     query("true#0 castable as xs:string", false);
-    query("name(<x/> cast as item())", "x");
+    error("<x/> cast as item()", SIMPLETYPE_X);
 
     error("1 castable as xs:integer()", SIMPLETYPE_X);
     error("1 castable as xml:integer", WHICHCAST_X);
