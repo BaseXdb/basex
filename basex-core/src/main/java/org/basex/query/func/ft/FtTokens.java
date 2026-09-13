@@ -31,10 +31,10 @@ public final class FtTokens extends FtAccessFn {
 
     final IndexEntries entries;
     if(token.length != 0 && options.get(FtFuzzyOptions.FUZZY) == Boolean.TRUE) {
-      final int errors = options.contains(FtFuzzyOptions.ERRORS) ?
-        options.get(FtFuzzyOptions.ERRORS) : errors(qc);
       // negative values are treated like 0: the number of errors is computed dynamically
-      entries = new IndexEntries(token, Math.max(0, errors), IndexType.FULLTEXT);
+      final int errors = options.contains(FtFuzzyOptions.ERRORS) ?
+        Math.max(0, options.get(FtFuzzyOptions.ERRORS)) : 0;
+      entries = new IndexEntries(token, errors, IndexType.FULLTEXT);
     } else {
       entries = new IndexEntries(token, IndexType.FULLTEXT);
     }

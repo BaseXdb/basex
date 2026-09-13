@@ -25,8 +25,6 @@ public final class DialogOptions extends BaseXBack {
   private final BaseXTextField maxlen;
   /** Maximum categories. */
   private final BaseXTextField maxcats;
-  /** Index splits. */
-  private final BaseXTextField splitsize;
 
   /**
    * Default constructor.
@@ -39,29 +37,24 @@ public final class DialogOptions extends BaseXBack {
       final MetaData meta = data.meta;
       maxlen = new BaseXTextField(dialog, Integer.toString(meta.maxlen));
       maxcats = new BaseXTextField(dialog, Integer.toString(meta.maxcats));
-      splitsize = new BaseXTextField(dialog, Integer.toString(meta.splitsize));
       updindex = new BaseXCheckBox(dialog, UPD_INDEX, meta.updindex);
       autooptimize = new BaseXCheckBox(dialog, AUTOOPTIMIZE, meta.autooptimize);
     } else {
       final MainOptions opts = gui.context.options;
       maxlen = new BaseXTextField(dialog, MainOptions.MAXLEN, opts);
       maxcats = new BaseXTextField(dialog, MainOptions.MAXCATS, opts);
-      splitsize = new BaseXTextField(dialog, MainOptions.SPLITSIZE, opts);
       updindex = new BaseXCheckBox(dialog, UPD_INDEX, MainOptions.UPDINDEX, opts);
       autooptimize = new BaseXCheckBox(dialog, AUTOOPTIMIZE, MainOptions.AUTOOPTIMIZE, opts);
     }
     maxlen.setColumns(8);
     maxcats.setColumns(8);
-    splitsize.setColumns(8);
 
-    final BaseXBack p = new BaseXBack(new TableLayout(4, 2, 6, 4));
+    final BaseXBack p = new BaseXBack(new TableLayout(2, 2, 6, 4));
     p.border(12, 0, 0, 0);
     p.add(new BaseXLabel(MainOptions.MAXLEN.name() + COL, true, true));
     p.add(maxlen);
     p.add(new BaseXLabel(MainOptions.MAXCATS.name() + COL, true, true));
     p.add(maxcats);
-    p.add(new BaseXLabel(MainOptions.SPLITSIZE.name() + COL, true, true));
-    p.add(splitsize);
 
     border(8);
     layout(new RowLayout());
@@ -78,7 +71,7 @@ public final class DialogOptions extends BaseXBack {
    */
   boolean action() {
     // no short-circuiting, do all checks...
-    return maxlen.check() & maxcats.check() & splitsize.check();
+    return maxlen.check() & maxcats.check();
   }
 
   /**
@@ -96,6 +89,5 @@ public final class DialogOptions extends BaseXBack {
     }
     gui.set(MainOptions.UPDINDEX, updindex.isSelected());
     gui.set(MainOptions.AUTOOPTIMIZE, autooptimize.isSelected());
-    gui.set(MainOptions.SPLITSIZE, Integer.parseInt(splitsize.getText()));
   }
 }

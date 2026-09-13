@@ -13,14 +13,6 @@ final class LocalReadWriteLock extends ReentrantReadWriteLock {
   private int pins;
 
   /**
-   * Constructor.
-   * @param fair fair locking
-   */
-  LocalReadWriteLock(final boolean fair) {
-    super(fair);
-  }
-
-  /**
    * Pins a lock.
    */
   void pin() {

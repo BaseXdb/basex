@@ -62,7 +62,6 @@ public final class DBOptimize extends DBUpdate {
     dbopts.assignIfAbsent(MainOptions.FTMIXED, meta.ftmixed);
     dbopts.assignIfAbsent(MainOptions.UPDINDEX, meta.updindex);
     dbopts.assignIfAbsent(MainOptions.AUTOOPTIMIZE, meta.autooptimize);
-    dbopts.assignIfAbsent(MainOptions.SPLITSIZE, meta.splitsize);
     dbopts.assignIfAbsent(MainOptions.MAXCATS, meta.maxcats);
     dbopts.assignIfAbsent(MainOptions.MAXLEN, meta.maxlen);
     options = dbopts.assignTo(new MainOptions(qc.context.options, false));
@@ -106,7 +105,6 @@ public final class DBOptimize extends DBUpdate {
     meta.maxcats = options.get(MainOptions.MAXCATS);
     meta.updindex = options.get(MainOptions.UPDINDEX);
     meta.autooptimize = options.get(MainOptions.AUTOOPTIMIZE);
-    meta.splitsize = options.get(MainOptions.SPLITSIZE);
     meta.textinclude = textinclude;
     meta.attrinclude = attrinclude;
     meta.tokeninclude = tokeninclude;

@@ -27,7 +27,7 @@ public final class FtSearch extends FtAccessFn {
     final IndexDb db = new IndexStaticDb(data, info);
     final FTMode mode = options.get(FtIndexOptions.MODE);
     // tokenization is dictated by the index; all other options can be inherited from the prolog
-    final FTOpt opt = ftOpt(options, new FTOpt().assign(data.meta).assign(qc.ftOpt()), qc);
+    final FTOpt opt = ftOpt(options, new FTOpt().assign(data.meta).assign(qc.ftOpt()));
 
     final FTWords ftw = new FTWords(info, db, query, mode).ftOpt(opt).optimize(qc);
     return new FTIndexAccess(info, ftExpr(ftw, options), db).iter(qc);

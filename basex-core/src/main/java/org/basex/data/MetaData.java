@@ -83,8 +83,6 @@ public final class MetaData {
   public int maxcats;
   /** Maximum length of index entries. */
   public int maxlen;
-  /** Split size for creating indexes. */
-  public int splitsize;
 
   /** Language of full-text search index (can be {@code null}). */
   private Language language;
@@ -170,7 +168,6 @@ public final class MetaData {
     stopwords = meta.stopwords;
     maxcats = meta.maxcats;
     maxlen = meta.maxlen;
-    splitsize = meta.splitsize;
     language = meta.language;
     langOption = meta.langOption;
     uptodate = meta.uptodate;
@@ -209,7 +206,6 @@ public final class MetaData {
     tokeninclude = options.get(MainOptions.TOKENINCLUDE);
     ftinclude = options.get(MainOptions.FTINCLUDE);
     ftmixed = options.get(MainOptions.FTMIXED);
-    splitsize = options.get(MainOptions.SPLITSIZE);
   }
 
   // STATIC METHODS ===============================================================================
@@ -534,7 +530,6 @@ public final class MetaData {
         case DBTOKINC -> tokeninclude = v;
         case DBFTXINC -> ftinclude = v;
         case DBFTMIX -> ftmixed = isTrue(v);
-        case DBSPLITS -> splitsize = toInt(v);
         case DBCRTTXT -> createtext = isTrue(v);
         case DBCRTATV -> createattr = isTrue(v);
         case DBCRTTOK -> createtoken = isTrue(v);
@@ -584,7 +579,6 @@ public final class MetaData {
     writeInfo(out, DBTOKINC,   tokeninclude);
     writeInfo(out, DBFTXINC,   ftinclude);
     writeInfo(out, DBFTMIX,    ftmixed);
-    writeInfo(out, DBSPLITS,   splitsize);
     writeInfo(out, DBCRTTXT,   createtext);
     writeInfo(out, DBCRTATV,   createattr);
     writeInfo(out, DBCRTTOK,   createtoken);

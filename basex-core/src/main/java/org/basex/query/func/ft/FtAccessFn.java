@@ -3,7 +3,6 @@ package org.basex.query.func.ft;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.ft.FTFlag.*;
 
-import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.func.*;
@@ -22,13 +21,10 @@ abstract class FtAccessFn extends StandardFunc {
    * Parses and returns full-text options.
    * @param opts options specified in the query
    * @param parent options to be inherited for unspecified values
-   * @param qc query context
    * @return options
    * @throws QueryException query exception
    */
-  final FTOpt ftOpt(final FtIndexOptions opts, final FTOpt parent, final QueryContext qc)
-      throws QueryException {
-
+  final FTOpt ftOpt(final FtIndexOptions opts, final FTOpt parent) throws QueryException {
     final FTOpt opt = new FTOpt();
     final Boolean fuzzy = opts.get(FtFuzzyOptions.FUZZY);
     if(fuzzy != null) opt.set(FZ, fuzzy);
@@ -43,17 +39,7 @@ abstract class FtAccessFn extends StandardFunc {
 
     opt.assign(parent);
     if(opt.is(FZ) && opt.is(WC)) throw FT_OPTIONS.get(info);
-    if(opt.errors == -1) opt.errors = errors(qc);
     return opt;
-  }
-
-  /**
-   * Returns the default number of tolerated Levenshtein errors.
-   * @param qc query context
-   * @return errors
-   */
-  static int errors(final QueryContext qc) {
-    return qc.context.options.get(MainOptions.LSERROR);
   }
 
   /**

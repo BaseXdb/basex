@@ -112,8 +112,6 @@ public final class MainOptions extends Options {
   public static final BooleanOption UPDINDEX = new BooleanOption("UPDINDEX", false);
   /** Flag for automatic index updates. */
   public static final BooleanOption AUTOOPTIMIZE = new BooleanOption("AUTOOPTIMIZE", false);
-  /** Index split size. */
-  public static final NumberOption SPLITSIZE = new NumberOption("SPLITSIZE", 0);
 
   // Full-Text
 
@@ -152,8 +150,6 @@ public final class MainOptions extends Options {
   public static final BooleanOption TRUSTEXTERNAL = new BooleanOption("TRUSTEXTERNAL", false);
   /** Validate string inputs. */
   public static final BooleanOption CHECKSTRINGS = new BooleanOption("CHECKSTRINGS", true);
-  /** Levenshtein default error. */
-  public static final NumberOption LSERROR = new NumberOption("LSERROR", 0);
   /** Runs the query results, or only parses it. */
   public static final BooleanOption RUNQUERY = new BooleanOption("RUNQUERY", true);
   /** Number of query executions. */
@@ -194,7 +190,7 @@ public final class MainOptions extends Options {
   // Other options
 
   /** Indexing options. */
-  public static final Option<?>[] INDEXING = { MAXCATS, MAXLEN, SPLITSIZE, LANGUAGE, STOPWORDS,
+  public static final Option<?>[] INDEXING = { MAXCATS, MAXLEN, LANGUAGE, STOPWORDS,
     TEXTINDEX, ATTRINDEX, TOKENINDEX, FTINDEX, TEXTINCLUDE, ATTRINCLUDE, TOKENINCLUDE, FTINCLUDE,
     FTMIXED, STEMMING, CASESENS, DIACRITICS, UPDINDEX, AUTOOPTIMIZE };
 

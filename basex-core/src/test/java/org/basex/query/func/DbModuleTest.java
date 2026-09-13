@@ -418,8 +418,7 @@ public final class DbModuleTest extends SandboxTest {
     }
     assertEquals(false, context.options.get(MainOptions.UPDINDEX));
 
-    final String[] numberOptions = lc(MainOptions.MAXCATS, MainOptions.MAXLEN,
-        MainOptions.SPLITSIZE);
+    final String[] numberOptions = lc(MainOptions.MAXCATS, MainOptions.MAXLEN);
     final String[] boolOptions = lc(MainOptions.TEXTINDEX, MainOptions.ATTRINDEX,
         MainOptions.TOKENINDEX, MainOptions.FTINDEX, MainOptions.STEMMING,
         MainOptions.CASESENS, MainOptions.DIACRITICS);
@@ -924,8 +923,7 @@ public final class DbModuleTest extends SandboxTest {
     final String[] boolOptions = new StringList(indexes).add(lc(MainOptions.STEMMING,
         MainOptions.CASESENS, MainOptions.DIACRITICS)).finish();
     final String[] stringOptions = lc(MainOptions.LANGUAGE, MainOptions.STOPWORDS);
-    final String[] numberOptions = lc(MainOptions.MAXCATS, MainOptions.MAXLEN,
-        MainOptions.SPLITSIZE);
+    final String[] numberOptions = lc(MainOptions.MAXCATS, MainOptions.MAXLEN);
 
     // check single options
     for(final String option : numberOptions)

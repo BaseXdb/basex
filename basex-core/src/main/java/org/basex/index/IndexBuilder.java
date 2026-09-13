@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 
 import java.io.*;
 
-import org.basex.core.*;
 import org.basex.core.jobs.*;
 import org.basex.data.*;
 import org.basex.index.value.*;
@@ -30,8 +29,6 @@ public abstract class IndexBuilder extends Job {
   /** Text node flag. */
   protected final boolean text;
 
-  /** Number of index operations to perform before writing a partial index to disk. */
-  private final int splitSize;
   /** Maximum estimated size of the temporary index structures. */
   private final long maxMem = Runtime.getRuntime().maxMemory() / 2;
 
@@ -53,7 +50,6 @@ public abstract class IndexBuilder extends Job {
   protected IndexBuilder(final Data data, final IndexType type) {
     this.data = data;
     this.type = type;
-    splitSize = (int) Math.min(Integer.MAX_VALUE, (long) data.meta.splitsize * splitFactor(type));
     size = data.nodes();
     includeNames = new IndexNames(type, data);
     text = type == IndexType.TEXT || type == IndexType.FULLTEXT;
@@ -83,8 +79,7 @@ public abstract class IndexBuilder extends Job {
    * @return true if structures shall be flushed to disk
    */
   protected final boolean splitRequired(final long memory) {
-    // checks if a fixed split size has been specified
-    final boolean split = splitSize > 0 ? count >= (splits + 1L) * splitSize : memory >= maxMem;
+    final boolean split = memory >= maxMem;
     if(split && Prop.debug) Util.err("|");
     return split;
   }
@@ -98,25 +93,7 @@ public abstract class IndexBuilder extends Job {
     final StringBuilder sb = new StringBuilder();
     sb.append(' ').append(count / 10000 / 100d).append(" M operations, ");
     sb.append(perf).append(" (").append(Performance.formatMemory()).append(").");
-    if(splits > 1 && splitSize <= 0) {
-      sb.append(" Recommended ").append(MainOptions.SPLITSIZE.name()).append(": ");
-      sb.append((int) Math.ceil((double) count / splits / splitFactor(type))).append('.');
-    }
     Util.errln(sb);
-  }
-
-  /**
-   * Returns the split factor dependent on the index type.
-   * The following values are returned:
-   * <ul>
-   *   <li> Full-text index: 1'000'000</li>
-   *   <li> Other value indexes: 100'000</li>
-   * </ul>
-   * @param type index type
-   * @return split factor
-   */
-  public static int splitFactor(final IndexType type) {
-    return type == IndexType.FULLTEXT ? 1000000 : 100000;
   }
 
   @Override

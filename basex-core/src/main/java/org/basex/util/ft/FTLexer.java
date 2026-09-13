@@ -115,16 +115,6 @@ public final class FTLexer extends FTIterator implements IndexSearch {
   }
 
   /**
-   * Sets the Levenshtein error if it has not been assigned yet.
-   * @param err error
-   * @return self reference
-   */
-  public FTLexer errors(final int err) {
-    if(errors == -1) errors = err;
-    return this;
-  }
-
-  /**
    * Returns the number of allowed Levenshtein errors.
    * @return errors ({@code 0}: dynamic calculation)
    */

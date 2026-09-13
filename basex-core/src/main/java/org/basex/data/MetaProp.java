@@ -162,11 +162,6 @@ public enum MetaProp {
   MAXLEN(true) {
     @Override
     public Integer value(final MetaData meta) { return meta.maxlen; }
-  },
-  /** Property. */
-  SPLITSIZE(true) {
-    @Override
-    public Integer value(final MetaData meta) { return meta.splitsize; }
   };
 
   /** Index property. */

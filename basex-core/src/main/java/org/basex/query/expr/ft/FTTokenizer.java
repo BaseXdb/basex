@@ -40,15 +40,13 @@ public final class FTTokenizer {
   /**
    * Constructor.
    * @param opt full-text options
-   * @param errors levenshtein errors
    * @param info input info (can be {@code null})
    */
-  FTTokenizer(final FTOpt opt, final int errors, final InputInfo info) {
+  FTTokenizer(final FTOpt opt, final InputInfo info) {
     this.opt = opt;
 
     cmp = (in, qu) -> {
-      final Levenshtein ls = opt.is(FZ) ? new Levenshtein(
-          opt.errors != -1 ? opt.errors : errors) : null;
+      final Levenshtein ls = opt.is(FZ) ? new Levenshtein(Math.max(0, opt.errors)) : null;
       FTWildcard ftw = null;
       if(opt.is(WC)) {
         ftw = wcCache.get(qu);

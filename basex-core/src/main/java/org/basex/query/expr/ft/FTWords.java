@@ -5,7 +5,6 @@ import static org.basex.util.ft.FTFlag.*;
 
 import java.util.*;
 
-import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
@@ -155,8 +154,7 @@ public final class FTWords extends FTExpr {
       public FTNode next() throws QueryException {
         if(ftiter == null) {
           final FTTokenizer ftt = FTWords.this.get(qc);
-          final FTLexer lexer = new FTLexer(ftOpt).
-              errors(qc.context.options.get(MainOptions.LSERROR));
+          final FTLexer lexer = new FTLexer(ftOpt);
 
           // length of distinct tokens
           int len = 0;
@@ -388,7 +386,7 @@ public final class FTWords extends FTExpr {
     final ThreadLocal<FTTokenizer> tl = qc.threads.get(this);
     FTTokenizer ftt = tl.get();
     if(ftt == null) {
-      ftt = new FTTokenizer(ftOpt, qc.context.options.get(MainOptions.LSERROR), info);
+      ftt = new FTTokenizer(ftOpt, info);
       tl.set(ftt);
     }
     return ftt;

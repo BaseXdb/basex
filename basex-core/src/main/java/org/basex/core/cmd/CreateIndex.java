@@ -52,7 +52,6 @@ public final class CreateIndex extends ACreate {
     }
     data.meta.create(type, true);
     data.meta.names(type, options);
-    data.meta.splitsize = options.get(MainOptions.SPLITSIZE);
 
     return update(data, () -> {
       create(type, data, this);

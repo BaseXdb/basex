@@ -17,8 +17,6 @@ import org.basex.util.list.*;
  *
  * A maximum of {@link StaticOptions#PARALLEL} concurrent locking jobs is allowed.
  *
- * (Non-)fair locking can be adjusted via the {@link StaticOptions#FAIRLOCK} option.
- *
  * This class prevents locking deadlocks by sorting all strings.
  *
  * Locks can only be released by the same thread which acquired it.
@@ -47,16 +45,13 @@ public final class Locking {
   /** Prefix for locks on the backups of a database. */
   private static final String BACKUP_PREFIX = INTERNAL_PREFIX + "backup:";
 
-  /** Fair ordering policy; prevents starvation, but reduces parallelism. */
-  private final boolean fair;
-
   /** Locks assigned to threads. */
   private final ConcurrentMap<Long, Locks> locked = new ConcurrentHashMap<>();
   /** Lock queue. */
   private final LockQueue queue;
 
   /** Global lock: exclusive lock for global writes, shared lock otherwise. */
-  private final ReentrantReadWriteLock globalLocks;
+  private final ReentrantReadWriteLock globalLocks = new ReentrantReadWriteLock();
   /** Stores one lock for each lock string. */
   private final Map<String, LocalReadWriteLock> localLocks = new HashMap<>();
   /** Lock for queuing local writes and global reads. */
@@ -74,10 +69,7 @@ public final class Locking {
    * @param soptions static options
    */
   public Locking(final StaticOptions soptions) {
-    fair = soptions.get(StaticOptions.FAIRLOCK);
-    globalLocks = new ReentrantReadWriteLock(fair);
-    final int parallel = Math.max(soptions.get(StaticOptions.PARALLEL), 1);
-    queue = fair ? new FairLockQueue(parallel) : new NonfairLockQueue(parallel);
+    queue = new LockQueue(Math.max(soptions.get(StaticOptions.PARALLEL), 1));
   }
 
   /**
@@ -225,7 +217,7 @@ public final class Locking {
   private LocalReadWriteLock pin(final String string) {
     synchronized(localLocks) {
       final LocalReadWriteLock lock = localLocks.computeIfAbsent(string,
-          k -> new LocalReadWriteLock(fair));
+          k -> new LocalReadWriteLock());
       lock.pin();
       return lock;
     }

@@ -29,8 +29,6 @@ public final class StaticOptions extends Options {
   public static final StringOption REPOPATH = new StringOption("REPOPATH", Prop.HOMEDIR + "repo");
   /** Language name. */
   public static final StringOption LANG = new StringOption("LANG", Prop.language);
-  /** Locking strategy. */
-  public static final BooleanOption FAIRLOCK = new BooleanOption("FAIRLOCK", false);
   /** Timeout (seconds) for remembering result of jobs. */
   public static final NumberOption CACHETIMEOUT = new NumberOption("CACHETIMEOUT", 3600);
   /** Write store at shutdown. */
