@@ -58,6 +58,10 @@ public final class JsonNodeSerializer extends JsonSerializer {
       throws IOException {
 
     super(os, sopts);
+    final SerialMethod method = sopts.get(SerializerOptions.JSON_NODE_OUTPUT_METHOD);
+    if(!method.oneOf(SerialMethod.XML, SerialMethod.XHTML, SerialMethod.HTML, SerialMethod.TEXT))
+      throw SERPARAM_X.getIO(Util.info("Invalid value of '%' parameter: '%'.",
+          SerializerOptions.JSON_NODE_OUTPUT_METHOD.name(), method));
     final int tl = typeCache.length;
     for(int t = 0; t < tl; t++) typeCache[t] = new TokenSet();
     atts = jopts.get(JsonOptions.FORMAT) == JsonFormat.ATTRIBUTES;

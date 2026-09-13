@@ -87,6 +87,7 @@ public final class CsvDirectSerializer extends CsvSerializer {
   @Override
   protected void text(final byte[] value, final FTPos ftp) throws IOException {
     if(level == 3) cache(value);
+    else if(level < 3 && !ws(value)) throw SERCSV_X_X.getIO("Unexpected text", Str.get(value));
   }
 
   @Override
