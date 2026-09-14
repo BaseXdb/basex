@@ -11,6 +11,8 @@ import static org.basex.util.Token.*;
 public interface JsonConstants {
   /** Token: json. */
   byte[] JSON = token("json");
+  /** Token: json-lines. */
+  byte[] JSON_LINES = token("json-lines");
   /** Token: type. */
   byte[] TYPE = token("type");
   /** Token: item. */

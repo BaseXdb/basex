@@ -39,6 +39,11 @@ abstract class JsonBuilderConverter extends JsonHandler {
     }
   }
 
+  /**
+   * Initializes the conversion of a JSON value.
+   */
+  abstract void init();
+
   @Override
   protected void closePair() { }
 

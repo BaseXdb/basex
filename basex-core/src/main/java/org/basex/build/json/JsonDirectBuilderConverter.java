@@ -36,6 +36,10 @@ final class JsonDirectBuilderConverter extends JsonBuilderConverter {
     super(jopts, builder);
     strings = jopts.get(JsonOptions.STRINGS);
     lax = jopts.get(JsonOptions.LAX);
+  }
+
+  @Override
+  void init() {
     name = JSON;
   }
 

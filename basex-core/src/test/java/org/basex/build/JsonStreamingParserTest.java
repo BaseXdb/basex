@@ -254,8 +254,56 @@ public final class JsonStreamingParserTest extends SandboxTest {
     query(result, "//pair[@name='name']/data()", "Smith");
   }
 
+  /**
+   * JSON Lines are wrapped in a single root element.
+   * @throws Exception exception
+   */
+  @Test public void jsonLines() throws Exception {
+    final String json = "{\"a\":1}\n[2]\n";
+    for(final JsonOptions.JsonFormat fmt : new JsonOptions.JsonFormat[] { DIRECT, ATTRIBUTES,
+        W3_XML }) {
+      final JsonParserOptions jopts = opts(fmt);
+      jopts.set(JsonParserOptions.JSON_LINES, true);
+      context.options.set(MainOptions.JSONPARSER, jopts);
+      final SingleParser sp = JsonStreamingParser.get(new IOContent(json), context.options);
+      assertInstanceOf(JsonStreamingParser.class, sp);
+      final XNode result = new DBNode(MemBuilder.build(sp), 0);
+      query(result, "count(/json-lines/*)", "2");
+      query(result, "count(/json-lines/*[namespace-uri()])", fmt == W3_XML ? "2" : "0");
+    }
+    query(parseLines(json, DIRECT), "/json-lines/json[2]/_/data()", "2");
+    query(parseLines(json, ATTRIBUTES), "/json-lines/json[2]/item/data()", "2");
+
+    // non-streaming path
+    final JsonParserOptions jopts = opts(DIRECT);
+    jopts.set(JsonParserOptions.JSON_LINES, true);
+    jopts.set(JsonOptions.MERGE, true);
+    context.options.set(MainOptions.JSONPARSER, jopts);
+    final SingleParser sp = JsonStreamingParser.get(new IOContent(json), context.options);
+    assertInstanceOf(JsonParser.class, sp);
+    final XNode result = new DBNode(MemBuilder.build(sp), 0);
+    query(result, "count(/json-lines/json)", "2");
+    query(result, "/json-lines/json[2]/_/data()", "2");
+  }
+
   // ==========================================================================================
   // HELPERS
+
+  /**
+   * Parses JSON Lines with the streaming parser.
+   * @param json JSON content
+   * @param fmt JSON format
+   * @return document node
+   * @throws Exception exception
+   */
+  private static XNode parseLines(final String json, final JsonOptions.JsonFormat fmt)
+      throws Exception {
+    final JsonParserOptions jopts = opts(fmt);
+    jopts.set(JsonParserOptions.JSON_LINES, true);
+    context.options.set(MainOptions.JSONPARSER, jopts);
+    return new DBNode(MemBuilder.build(JsonStreamingParser.get(new IOContent(json),
+        context.options)), 0);
+  }
   // ==========================================================================================
 
   /**

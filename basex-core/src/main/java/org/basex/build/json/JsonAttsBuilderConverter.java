@@ -37,6 +37,11 @@ final class JsonAttsBuilderConverter extends JsonBuilderConverter {
   }
 
   @Override
+  void init() {
+    rootOpened = false;
+  }
+
+  @Override
   protected void openObject() {
     openElem(OBJECT);
   }

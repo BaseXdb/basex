@@ -8,7 +8,9 @@ import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
+import org.basex.io.parse.json.*;
 import org.basex.query.*;
+import org.basex.util.*;
 
 /**
  * Streams a JSON file as events directly to a database builder, bypassing in-memory
@@ -67,7 +69,17 @@ public final class JsonStreamingParser extends SingleParser {
       final JsonBuilderConverter conv = converterFactory.apply(builder);
       final String encoding = jopts.get(JsonParserOptions.ENCODING);
       try(NewlineInput ni = new NewlineInput(source, encoding)) {
-        new org.basex.io.parse.json.JsonParser(ni, jopts, conv).parse(null);
+        final org.basex.io.parse.json.JsonParser parser =
+            new org.basex.io.parse.json.JsonParser(ni, jopts, conv);
+        conv.init();
+        if(jopts.get(JsonParserOptions.JSON_LINES)) {
+          final Atts empty = JsonBuilderConverter.EMPTY_NSP;
+          builder.openElem(JsonConstants.JSON_LINES, empty, empty);
+          while(parser.next(null)) conv.init();
+          builder.closeElem();
+        } else {
+          parser.parse(null);
+        }
       }
     } catch(final UncheckedIOException ex) {
       throw ex.getCause();

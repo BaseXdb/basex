@@ -42,6 +42,11 @@ final class JsonW3XmlBuilderConverter extends JsonBuilderConverter {
   }
 
   @Override
+  void init() {
+    rootOpened = false;
+  }
+
+  @Override
   protected void openObject() {
     openContainer(MAP);
   }
