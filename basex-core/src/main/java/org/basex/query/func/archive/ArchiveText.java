@@ -33,6 +33,8 @@ interface ArchiveText {
 
   /** Packer format: gzip. */
   String GZIP = "gzip";
+  /** Packer format: tar. */
+  String TAR = "tar";
   /** Packer format: zip. */
   String ZIP = "zip";
 }

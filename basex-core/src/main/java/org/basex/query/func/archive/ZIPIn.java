@@ -53,6 +53,11 @@ final class ZIPIn extends ArchiveIn {
   }
 
   @Override
+  public int method() {
+    return -1;
+  }
+
+  @Override
   public void close() {
     try {
       zis.close();

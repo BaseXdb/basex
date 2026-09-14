@@ -229,12 +229,11 @@ abstract class ArchiveFn extends StandardFunc {
     final String format = opts.get(CreateOptions.FORMAT).toLowerCase(Locale.ENGLISH);
     if(format.equals(GZIP) && entries.size() > 1) throw ARCHIVE_SINGLE_X.get(info, format);
 
-    final int level = level(opts);
-    try(ArchiveOut out = ArchiveOut.get(format, info, os)) {
-      out.level(level);
+    final int method = method(opts, format);
+    try(ArchiveOut out = ArchiveOut.get(format, method, info, os)) {
       try {
         for(final Entry<Item, Item> entry : entries.values()) {
-          add(entry, out, level, "", qc);
+          add(entry, out, method, "", qc);
         }
       } catch(final IOException ex) {
         throw ARCHIVE_ERROR_X.get(info, ex);
@@ -243,23 +242,19 @@ abstract class ArchiveFn extends StandardFunc {
   }
 
   /**
-   * Returns the compression level.
+   * Returns the compression method: {@link ZipEntry#STORED} or {@link ZipEntry#DEFLATED}.
    * @param options create options
-   * @return level
+   * @param format archive format (lower case)
+   * @return method
    * @throws QueryException query exception
    */
-  final int level(final CreateOptions options) throws QueryException {
-    int level = ZipEntry.DEFLATED;
-    final String format = options.get(CreateOptions.FORMAT);
+  final int method(final CreateOptions options, final String format) throws QueryException {
     final String alg = options.get(CreateOptions.ALGORITHM);
-    if(alg != null) {
-      if(format.equals(ZIP)  && !Strings.eq(alg, STORED, DEFLATE) ||
-         format.equals(GZIP) && !Strings.eq(alg, DEFLATE)) {
-        throw ARCHIVE_FORMAT_X_X.get(info, CreateOptions.ALGORITHM.name(), alg);
-      }
-      if(Strings.eq(alg, STORED)) level = ZipEntry.STORED;
-    }
-    return level;
+    // default: tar archives are not compressed
+    if(alg == null) return format.equals(TAR) ? ZipEntry.STORED : ZipEntry.DEFLATED;
+    final boolean ok = alg.equals(DEFLATE) || alg.equals(STORED) && !format.equals(GZIP);
+    if(!ok) throw ARCHIVE_FORMAT_X_X.get(info, CreateOptions.ALGORITHM.name(), alg);
+    return alg.equals(STORED) ? ZipEntry.STORED : ZipEntry.DEFLATED;
   }
 
   /**
@@ -287,9 +282,9 @@ abstract class ArchiveFn extends StandardFunc {
       if(archive instanceof final Bin bin) {
         try(BufferInput bi = bin.input(info); ArchiveIn in = ArchiveIn.get(bi, info)) {
           final String format = in.format();
-          if(in instanceof GZIPIn) throw ARCHIVE_MODIFY_X.get(info, format);
+          if(format.equals(GZIP)) throw ARCHIVE_MODIFY_X.get(info, format);
           final SpillOutput so = new SpillOutput(qc);
-          try(ArchiveOut out = ArchiveOut.get(format, info, so)) {
+          try(ArchiveOut out = ArchiveOut.get(format, in.method(), info, so)) {
             while(in.more()) {
               if(action.apply(in.entry(), out)) out.write(in);
             }
@@ -300,7 +295,7 @@ abstract class ArchiveFn extends StandardFunc {
       }
       try(ZipFile zip = new ZipFile(new File(archive.toString()), Strings.CP437)) {
         final SpillOutput so = new SpillOutput(qc);
-        try(ArchiveOut out = ArchiveOut.get(ZIP, info, so)) {
+        try(ArchiveOut out = ArchiveOut.get(ZIP, -1, info, so)) {
           for(final ZipEntry raw : entries(zip, null)) {
             final ZipEntry ze = canonical(raw);
             if(action.apply(ze, out)) {

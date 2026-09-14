@@ -11,6 +11,7 @@ import java.util.zip.*;
 import org.basex.*;
 import org.basex.io.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -34,6 +35,10 @@ public final class ArchiveModuleTest extends SandboxTest {
   private static final String ZIP_SJIS = "src/test/resources/shiftjis.zip";
   /** Test ZIP: UTF-8-encoded entry name but UTF-8 flag not set (non-conformant). */
   private static final String ZIP_UTF8_NO_FLAG = "src/test/resources/utf8_no_bit11.zip";
+  /** Test TAR file (GNU tar). */
+  private static final String TAR = "src/test/resources/tar.tar";
+  /** Test TAR file (bsdtar, pax format: extended headers with path, mtime). */
+  private static final String PAX = "src/test/resources/pax.tar";
   /** Test file. */
   private static final String DIR = "src/test/resources/dir";
 
@@ -63,6 +68,10 @@ public final class ArchiveModuleTest extends SandboxTest {
         " { 'format': 'zip' }"), 1);
     countEntries(func.args(" <archive:entry>X</archive:entry>", "",
         " { 'format': 'gzip' }"), 1);
+    countEntries(func.args(" <archive:entry>X</archive:entry>", "",
+        " { 'format': 'tar' }"), 1);
+    countEntries(func.args(" <archive:entry>X</archive:entry>", "",
+        " { 'format': 'tar', 'algorithm': 'deflate' }"), 1);
 
     // different number of entries and contents
     error(func.args("X", " ()"), ARCHIVE_NUMBER_X_X);
@@ -93,8 +102,126 @@ public final class ArchiveModuleTest extends SandboxTest {
     // algorithm not supported
     error(func.args(" <archive:entry>X</archive:entry>", "", " { 'algorithm': 'unknown' }"),
         ARCHIVE_FORMAT_X_X);
+    error(func.args(" <archive:entry>X</archive:entry>", "",
+        " { 'format': 'gzip', 'algorithm': 'stored' }"), ARCHIVE_FORMAT_X_X);
     // algorithm not supported
     error(func.args(" ('x', 'y')", " ('a', 'b')", " { 'format': 'gzip' }"), ARCHIVE_SINGLE_X);
+  }
+
+  /** Test method. */
+  @Test public void tar() {
+    // archive created by GNU tar
+    query(_ARCHIVE_ENTRIES.args(TAR) + " ! string()", "a.txt\nb.txt");
+    query(_ARCHIVE_ENTRIES.args(TAR) + " ! data(@size)", "11\n5");
+    query(COUNT.args(_ARCHIVE_ENTRIES.args(TAR) + "[@last-modified][not(@compressed-size)]"), 2);
+    query(_ARCHIVE_OPTIONS.args(TAR) + "?format", "tar");
+    query(_ARCHIVE_OPTIONS.args(TAR) + "?algorithm", "stored");
+    query(_ARCHIVE_OPTIONS.args(_FILE_READ_BINARY.args(TAR)) + "?format", "tar");
+    query(COUNT.args(_ARCHIVE_EXTRACT_BINARY.args(TAR)), 2);
+    query(_ARCHIVE_ENTRIES.args(_ARCHIVE_UPDATE.args(TAR, "c.txt", "C")) + " ! string()",
+        "a.txt\nb.txt\nc.txt");
+    query(_ARCHIVE_EXTRACT_TEXT.args(_ARCHIVE_UPDATE.args(TAR, "a.txt", "NEW"), "a.txt"), "NEW");
+    query(_ARCHIVE_ENTRIES.args(_ARCHIVE_DELETE.args(TAR, "a.txt")) + " ! string()", "b.txt");
+
+    // round trip: timestamps, ustar prefix (split at slash), GNU long name, directory, binary
+    final String tar = " { 'format': 'tar' }", tgz = " { 'format': 'tar', 'algorithm': 'deflate' }";
+    final String lastModified = "2024-06-01T12:00:00Z";
+    final String split = "dir/" + "x".repeat(120) + "/file.txt", huge = "y".repeat(300);
+    final String create = _ARCHIVE_CREATE.args(
+        " (<archive:entry last-modified='" + lastModified + "'>a.txt</archive:entry>, '" +
+        split + "', '" + huge + "', 'dir/')", " ('A', 'B', xs:hexBinary('414243'), '')", tar);
+    query(_ARCHIVE_ENTRIES.args(" " + create) + " ! string()", "a.txt\n" + split + '\n' + huge);
+    query(_ARCHIVE_ENTRIES.args(" " + create) + " ! data(@size)", "1\n1\n3");
+    query(_ARCHIVE_ENTRIES.args(" " + create) + "[1] ! data(@last-modified)", lastModified);
+    query(create + " => " + _ARCHIVE_EXTRACT_TEXT.args(), "A\nB\nABC");
+    query(create + " => " + _ARCHIVE_OPTIONS.args() + " => map:get('algorithm')", "stored");
+    query(_ARCHIVE_CREATE.args(" ()", " ()", tar) + " => " + _ARCHIVE_ENTRIES.args() +
+        " => count()", 0);
+    // lazy binary with known size is streamed
+    query(_ARCHIVE_ENTRIES.args(" " + _ARCHIVE_CREATE.args("zip", _FILE_READ_BINARY.args(ZIP),
+        tar)) + " ! xs:integer(@size) = " + _FILE_SIZE.args(ZIP), true);
+    countEntries(_ARCHIVE_CREATE_FROM.args(DIR, tar), 5);
+
+    // gzip-compressed tar
+    final String createGz = _ARCHIVE_CREATE.args(" ('a', 'b')", " ('A', 'B')", tgz);
+    query("starts-with(string(xs:hexBinary(" + createGz + ")), '1F8B')", true);
+    query(createGz + " => " + _ARCHIVE_OPTIONS.args() + " => map:get('format')", "tar");
+    query(createGz + " => " + _ARCHIVE_OPTIONS.args() + " => map:get('algorithm')", "deflate");
+    query(createGz + " => " + _ARCHIVE_EXTRACT_TEXT.args(), "A\nB");
+    query(createGz + " => " + _ARCHIVE_DELETE.args("a") + " => " + _ARCHIVE_OPTIONS.args() +
+        " => map:get('algorithm')", "deflate");
+    query(createGz + " => " + _ARCHIVE_UPDATE.args("c", "C") + " => " +
+        _ARCHIVE_EXTRACT_TEXT.args(), "A\nB\nC");
+
+    // file access
+    final String tmp = Prop.TEMPDIR + NAME + "tar", dir = tmp + "-dir";
+    query(_ARCHIVE_WRITE.args(tmp, " ('a', 'b')", " ('A', 'B')", tgz));
+    query(_ARCHIVE_OPTIONS.args(tmp) + "?algorithm", "deflate");
+    query(_ARCHIVE_EXTRACT_TEXT.args(tmp, "b"), "B");
+    query(_ARCHIVE_EXTRACT_TO.args(dir, tmp));
+    query(_FILE_READ_TEXT.args(dir + "/a"), "A");
+    query(_FILE_DELETE.args(tmp));
+    query(_FILE_DELETE.args(dir, true));
+    error(_ARCHIVE_REFRESH.args(TAR, "x", "x"), ARCHIVE_ZIP_X);
+  }
+
+  /**
+   * Tests pax extended headers (bsdtar): long path and non-ASCII name via {@code path} records,
+   * fractional timestamps via {@code mtime} records, directory entries.
+   */
+  @Test public void tarPax() {
+    final String longName = "deep/" + "p".repeat(60) + '/' + "q".repeat(60) + "/longname.txt";
+    query(_ARCHIVE_ENTRIES.args(PAX) + " ! string()", "short.txt\n" + longName + "\nü.txt");
+    query(_ARCHIVE_ENTRIES.args(PAX) + " ! data(@size)", "5\n4\n6");
+    query("distinct-values(" + _ARCHIVE_ENTRIES.args(PAX) + " ! data(@last-modified))",
+        "2024-06-01T12:00:00.5Z");
+    query(_ARCHIVE_EXTRACT_TEXT.args(PAX), "short\nlong\numlaut");
+    query(_ARCHIVE_EXTRACT_TEXT.args(PAX, "ü.txt"), "umlaut");
+    query(_ARCHIVE_ENTRIES.args(_ARCHIVE_DELETE.args(PAX, longName)) + " ! string()",
+        "short.txt\nü.txt");
+  }
+
+  /**
+   * Tests name lengths at the boundaries of the ustar name and prefix fields.
+   */
+  @Test public void tarNames() {
+    final StringList names = new StringList();
+    // name field: 100 bytes fit, 101 bytes require a split or a GNU long name
+    for(final int len : new int[] { 1, 99, 100, 101, 255, 256 }) names.add("n".repeat(len));
+    // prefix field: 155 bytes fit, 156 bytes do not
+    for(final int len : new int[] { 1, 154, 155, 156 }) {
+      names.add("p".repeat(len) + '/' + "n".repeat(100));
+      names.add("p".repeat(len) + '/' + "n".repeat(101));
+    }
+    // multi-byte characters, deep paths, directories
+    names.add("ü".repeat(60));
+    names.add("a/".repeat(80) + "file");
+    names.add("d".repeat(120) + '/');
+
+    final StringBuilder sb = new StringBuilder();
+    for(final String name : names) sb.append(sb.isEmpty() ? " ('" : "', '").append(name);
+    final String entries = sb.append("')").toString();
+    final String create = _ARCHIVE_CREATE.args(entries, " (1 to " + names.size() + ") ! ''",
+        " { 'format': 'tar' }");
+    // directory entries are omitted by archive:entries
+    names.remove(names.size() - 1);
+    query(_ARCHIVE_ENTRIES.args(" " + create) + " ! string()", String.join("\n", names));
+  }
+
+  /**
+   * Tests the rejection of a corrupted TAR header.
+   * @throws IOException I/O exception
+   */
+  @Test public void tarChecksum() throws IOException {
+    final byte[] bytes = new IOFile(TAR).read();
+    bytes[0]++;
+    final IOFile tar = new IOFile(Prop.TEMPDIR + NAME + "_corrupt.tar");
+    try {
+      tar.write(bytes);
+      error(_ARCHIVE_ENTRIES.args(tar.path()), ARCHIVE_ERROR_X);
+    } finally {
+      tar.delete();
+    }
   }
 
   /** Test method. */

@@ -47,18 +47,17 @@ public final class ArchiveCreateFrom extends ArchiveCreate {
       entries = StrSeq.get(tl);
     }
 
-    final int level = level(options);
     final String format = options.get(CreateOptions.FORMAT).toLowerCase(Locale.ENGLISH);
+    final int method = method(options, format);
     if(format.equals(GZIP) && entries.size() > 1) throw ARCHIVE_SINGLE_X.get(info, format);
     final String dir = rootDir && root.parent() != null ? root.name() + '/' : "";
-    try(ArchiveOut out = ArchiveOut.get(format, info, os)) {
-      out.level(level);
+    try(ArchiveOut out = ArchiveOut.get(format, method, info, os)) {
       try {
         for(final Item item : entries) {
           final IOFile file = new IOFile(root, toString(item, qc));
           if(!file.exists()) throw FILE_NOT_FOUND_X.get(info, file);
           if(file.isDir()) throw FILE_IS_DIR_X.get(info, file);
-          add(new SimpleEntry<>(item, new B64IOLazy(file, FILE_NOT_FOUND_X)), out, level, dir, qc);
+          add(new SimpleEntry<>(item, new B64IOLazy(file, FILE_NOT_FOUND_X)), out, method, dir, qc);
         }
       } catch(final IOException ex) {
         throw ARCHIVE_ERROR_X.get(info, ex);

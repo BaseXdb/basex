@@ -31,7 +31,15 @@ abstract class ArchiveIn extends InputStream {
       final int b = bi.read();
       bi.reset();
       if(b == 0x50) return new ZIPIn(bi);
-      if(b == 0x1f) return new GZIPIn(bi);
+
+      // GZIP or plain input: peek at the first block to detect TAR archives
+      final boolean gzip = b == 0x1f;
+      final PushbackInputStream is = new PushbackInputStream(
+        gzip ? new GZIPInputStream(bi) : bi, TarEntry.BLOCK);
+      final byte[] header = is.readNBytes(TarEntry.BLOCK);
+      is.unread(header);
+      if(TarEntry.isTar(header)) return new TarIn(is, gzip ? ZipEntry.DEFLATED : ZipEntry.STORED);
+      if(gzip) return new GZIPIn(is);
     } catch(final IOException ex) {
       throw ARCHIVE_ERROR_X.get(info, ex);
     }
@@ -56,6 +64,12 @@ abstract class ArchiveIn extends InputStream {
    * @return name
    */
   public abstract String format();
+
+  /**
+   * Returns the compression method of the archive.
+   * @return {@link ZipEntry#STORED}, {@link ZipEntry#DEFLATED}, or {@code -1} if chosen per entry
+   */
+  public abstract int method();
 
   @Override
   public abstract void close();

@@ -28,11 +28,10 @@ public final class ArchiveOptions extends ArchiveFn {
       if(archive instanceof final Bin bin) {
         try(BufferInput bi = bin.input(info); ArchiveIn in = ArchiveIn.get(bi, info)) {
           format = in.format();
-          while(in.more()) {
+          level = in.method();
+          while(level == -1 && in.more()) {
             final ZipEntry ze = in.entry();
-            if(ze.isDirectory()) continue;
-            level = ze.getMethod();
-            break;
+            if(!ze.isDirectory()) level = ze.getMethod();
           }
         }
       } else {

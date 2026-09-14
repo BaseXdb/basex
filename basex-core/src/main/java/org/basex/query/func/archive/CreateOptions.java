@@ -13,6 +13,6 @@ import org.basex.util.options.*;
 public class CreateOptions extends Options {
   /** Archiving format. */
   public static final StringOption FORMAT = new StringOption("format", ZIP);
-  /** Archiving algorithm. */
-  public static final StringOption ALGORITHM = new StringOption("algorithm", DEFLATE);
+  /** Archiving algorithm (can be {@code null}). */
+  public static final StringOption ALGORITHM = new StringOption("algorithm");
 }

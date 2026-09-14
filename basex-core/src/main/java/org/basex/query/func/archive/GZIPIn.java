@@ -13,18 +13,17 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 final class GZIPIn extends ArchiveIn {
-  /** GZIP input stream. */
-  private final GZIPInputStream zis;
+  /** Decompressed input stream. */
+  private final InputStream zis;
   /** Flag. */
   private boolean more;
 
   /**
    * Constructor.
-   * @param is input stream
-   * @throws IOException I/O exception
+   * @param is decompressed input stream
    */
-  GZIPIn(final InputStream is) throws IOException {
-    zis = new GZIPInputStream(is);
+  GZIPIn(final InputStream is) {
+    zis = is;
   }
 
   @Override
@@ -52,6 +51,11 @@ final class GZIPIn extends ArchiveIn {
   @Override
   public String format() {
     return GZIP;
+  }
+
+  @Override
+  public int method() {
+    return ZipEntry.DEFLATED;
   }
 
   @Override

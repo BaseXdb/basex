@@ -83,7 +83,7 @@ public enum QueryError {
   // Archive Module
 
   /** Error code. */
-  ARCHIVE_NAME(ARCHIVE, "descriptor", "Name of ZIP entry must not be empty."),
+  ARCHIVE_NAME(ARCHIVE, "descriptor", "Name of archive entry must not be empty."),
   /** Error code. */
   ARCHIVE_LEVEL_X(ARCHIVE, "descriptor", "Invalid compression level: '%'."),
   /** Error code. */

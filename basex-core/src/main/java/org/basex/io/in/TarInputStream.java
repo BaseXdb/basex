@@ -1,9 +1,11 @@
 package org.basex.io.in;
 
+import static org.basex.io.in.TarEntry.*;
+import static org.basex.util.Token.*;
+
 import java.io.*;
 
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Input stream filter for reading files in the TAR file format.
@@ -12,9 +14,6 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class TarInputStream extends FilterInputStream {
-  /** Block size. */
-  private static final int BLOCK = 512;
-
   /** Single byte buffer. */
   private final byte[] buf = new byte[1];
   /** Current entry (can be {@code null}). */
@@ -81,35 +80,23 @@ public final class TarInputStream extends FilterInputStream {
       while(skip > 0) skip -= skip(skip);
     }
     // read header
-    final byte[] header = new byte[BLOCK];
-    int read = 0;
-    while(read < BLOCK) {
-      final int res = read(header, read, BLOCK - read);
-      if(res < 0) break;
-      read += res;
-    }
-    if(eof(header)) return null;
+    final byte[] header = readNBytes(BLOCK);
+    if(header.length < BLOCK || isEmpty(header)) return null;
 
     // create entry
     entry = new TarEntry(header);
     if(entry.isLongName()) {
       final String name = longName();
       entry = getNextEntry();
-      entry.setName(name);
+      if(entry != null) entry.setName(name);
+    } else if(entry.isPax()) {
+      final byte[] body = readAllBytes();
+      entry = getNextEntry();
+      if(entry != null) pax(body);
+    } else if(entry.isGlobalPax()) {
+      entry = getNextEntry();
     }
     return entry;
-  }
-
-  /**
-   * Checks if end of data is reached.
-   * @param header header data
-   * @return result of check
-   */
-  private static boolean eof(final byte[] header) {
-    for(final byte b : header) {
-      if(b != 0) return false;
-    }
-    return true;
   }
 
   /**
@@ -118,11 +105,48 @@ public final class TarInputStream extends FilterInputStream {
    * @throws IOException I/O exception
    */
   private String longName() throws IOException {
-    // read name, remove trailing zero byte
-    final ByteList result = new ByteList();
-    for(int b; (b = read()) != -1;) result.add(b);
-    final int size = result.size() - 1;
-    if(size >= 0 && result.get(size) == 0) result.size(size);
-    return TarEntry.name(result);
+    // remove trailing zero byte
+    final byte[] body = readAllBytes();
+    int size = body.length;
+    if(size > 0 && body[size - 1] == 0) size--;
+    return string(body, 0, size);
+  }
+
+  /**
+   * Applies the records of a pax extended header to the current entry.
+   * @param body header body
+   * @throws IOException I/O exception
+   */
+  private void pax(final byte[] body) throws IOException {
+    final int bl = body.length;
+    for(int i = 0; i < bl;) {
+      // record: "length key=value\n" (length includes the length field itself)
+      int len = 0, j = i;
+      while(j < bl && body[j] >= '0' && body[j] <= '9') len = len * 10 + body[j++] - '0';
+      final int end = i + len;
+      if(len == 0 || end > bl || j >= end || body[j] != ' ' || body[end - 1] != '\n') {
+        throw new IOException("Invalid pax header.");
+      }
+      final String record = string(body, j + 1, end - j - 2);
+      final int eq = record.indexOf('=');
+      if(eq == -1) throw new IOException("Invalid pax record: " + record);
+
+      final String key = record.substring(0, eq), value = record.substring(eq + 1);
+      switch(key) {
+        case "path" -> entry.setName(value);
+        case "size" -> {
+          final long size = Strings.toLong(value);
+          if(size < 0) throw new IOException("Invalid pax record: " + record);
+          entry.setSize(size);
+        }
+        case "mtime" -> {
+          final double time = toDouble(token(value));
+          if(Double.isNaN(time)) throw new IOException("Invalid pax record: " + record);
+          entry.setTime((long) (time * 1000));
+        }
+        default -> { }
+      }
+      i = end;
+    }
   }
 }
