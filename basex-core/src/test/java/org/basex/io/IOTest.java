@@ -47,7 +47,7 @@ public final class IOTest {
     assertEquals("x", new IOFile("x..xml").dbName());
     // characters that denote multiple letters are expanded, all others are reduced
     assertEquals("Strasse", new IOFile("Straße.xml").dbName());
-    assertEquals("THor", new IOFile("Þor.xml").dbName());
+    assertEquals("Thor", new IOFile("Þor.xml").dbName());
     assertEquals("Malmo", new IOFile("Malmö.xml").dbName());
   }
 
