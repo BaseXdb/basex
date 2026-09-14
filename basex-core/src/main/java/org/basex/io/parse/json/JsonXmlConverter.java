@@ -3,115 +3,109 @@ package org.basex.io.parse.json;
 import static org.basex.io.parse.json.JsonConstants.*;
 import static org.basex.util.Token.*;
 
+import java.io.*;
 import java.util.*;
 
 import org.basex.build.json.*;
+import org.basex.io.parse.*;
 import org.basex.query.*;
-import org.basex.query.value.item.*;
+import org.basex.query.value.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
+import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * This class provides a parse method to convert JSON data to XML nodes.
+ * This class converts JSON data to XML events, which are sent to an {@link XmlHandler}.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 abstract class JsonXmlConverter extends JsonConverter {
-  /** QName. */
-  static final QNm Q_JSON = new QNm(JSON);
-  /** QName. */
-  static final QNm Q_PAIR = new QNm(PAIR);
-  /** QName. */
-  static final QNm Q_ITEM = new QNm(ITEM);
-  /** QName. */
-  static final QNm Q_NAME = new QNm(NAME);
-  /** QName. */
-  static final QNm Q_KEY = new QNm(KEY);
-  /** QName. */
-  static final QNm Q_ESCAPED_KEY = new QNm(ESCAPED_KEY);
-  /** QName. */
-  static final QNm Q_ESCAPED = new QNm(ESCAPED);
+  /** No namespace declarations. */
+  static final Atts NO_NSP = new Atts();
 
-  /** Stack for intermediate nodes. */
-  final Stack<FBuilder> stack = new Stack<>();
+  /** Attributes of the next element. */
+  final Atts atts = new Atts();
+  /** Target of the XML events. */
+  XmlHandler handler;
 
-  /** Map from element name to a pair of all its nodes and the collective node type. */
-  private final TokenObjectMap<TypeCache> names = new TokenObjectMap<>();
+  /** External handler (can be {@code null}). */
+  private final XmlHandler external;
   /** Store types in root. */
   private final boolean merge;
   /** Include string type. */
   private final boolean strings;
-
-  /** Document root. */
-  FBuilder doc;
-  /** Current element. */
-  FBuilder curr;
-  /** Name of current element/attribute (can be {@code null}). */
-  byte[] name;
+  /** Cached types of elements with the same key. */
+  private final TokenObjectMap<TypeCache> names = new TokenObjectMap<>();
+  /** Root element (can be {@code null}). */
+  private FBuilder root;
 
   /**
    * Constructor.
    * @param opts JSON options
+   * @param handler target of XML events (can be {@code null}: nodes will be built)
    */
-  JsonXmlConverter(final JsonParserOptions opts) {
+  JsonXmlConverter(final JsonParserOptions opts, final XmlHandler handler) {
     super(opts);
+    external = handler;
     merge = jopts.get(JsonOptions.MERGE);
     strings = jopts.get(JsonOptions.STRINGS);
-
+    if(merge && handler != null) throw Util.notExpected("Types can only be merged in nodes.");
   }
 
   @Override
   protected void init(final String uri) {
-    doc = FDoc.build(token(uri));
+    handler = external != null ? external : new NodeHandler(uri, merge);
     names.clear();
-    curr = null;
-    name = null;
+    root = null;
   }
 
   @Override
-  protected FNode finish() {
+  protected Value finish() {
+    if(!(handler instanceof final NodeHandler ns)) return Empty.VALUE;
     if(merge) {
       final ByteList[] types = new ByteList[ATTRS.length];
-      for(final TypeCache arr : names.values()) {
-        if(arr != null) {
-          final int tl = TYPES.length;
-          for(int i = 0; i < tl; i++) {
-            if(arr.type == TYPES[i] && (strings || arr.type != STRING)) {
-              if(types[i] == null) types[i] = new ByteList();
-              else types[i].add(' ');
-              types[i].add(arr.name);
-              break;
-            }
-          }
+      for(final TypeCache cache : names.values()) {
+        if(cache.type == null) {
+          // different types: add type attributes to all elements
+          final int es = cache.elems.size();
+          for(int e = 0; e < es; e++) addType(cache.elems.get(e), cache.types.get(e));
+        } else if(strings || cache.type != STRING) {
+          // identical types: add key to the root attribute of the type
+          int t = 0;
+          while(TYPES[t] != cache.type) t++;
+          if(types[t] == null) types[t] = new ByteList();
+          else types[t].add(' ');
+          types[t].add(cache.key);
         }
       }
       final int tl = types.length;
       for(int t = 0; t < tl; t++) {
-        if(types[t] != null) curr.attr(shared.qName(ATTRS[t]), shared.token(types[t].finish()));
+        if(types[t] != null) root.attr(shared.qName(ATTRS[t]), shared.token(types[t].finish()));
       }
     }
-    return doc.node(curr).finish();
+    return ns.finish();
   }
 
   @Override
-  protected void numberLit(final byte[] value) throws QueryException {
+  protected void numberLit(final byte[] value) throws QueryException, IOException {
     addValue(NUMBER, value);
   }
 
   @Override
-  protected void stringLit(final byte[] value) throws QueryException {
+  protected void stringLit(final byte[] value) throws QueryException, IOException {
     addValue(STRING, value);
   }
 
   @Override
-  protected void nullLit() throws QueryException {
+  protected void nullLit() throws QueryException, IOException {
     addValue(NULL, null);
   }
 
   @Override
-  protected void booleanLit(final byte[] value) throws QueryException {
+  protected void booleanLit(final byte[] value) throws QueryException, IOException {
     addValue(BOOLEAN, value);
   }
 
@@ -120,46 +114,56 @@ abstract class JsonXmlConverter extends JsonConverter {
    * @param type JSON type
    * @param value value (can be {@code null})
    * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  abstract void addValue(byte[] type, byte[] value) throws QueryException;
+  abstract void addValue(byte[] type, byte[] value) throws QueryException, IOException;
 
   /**
-   * Adds type information to an element or the type cache.
-   * @param elem element
-   * @param type data type
+   * Opens an element with the assigned attributes.
+   * @param name element name
+   * @param key key for merging types (can be {@code null})
+   * @param type JSON type (can be {@code null})
+   * @param nsp namespace declarations
+   * @throws IOException I/O exception
    */
-  final void processType(final FBuilder elem, final byte[] type) {
-    // merge type information
-    // check if name exists and contains no whitespace
-    if(merge && name != null && !contains(name, ' ')) {
-      // check if name is already known
-      if(names.contains(name)) {
-        final TypeCache cache = names.get(name);
-        if(cache != null && cache.type == type) {
-          // add element if all types are identical
-          cache.add(elem);
-        } else {
-          // different types for same element
-          if(cache != null) {
-            // invalidate cached elements, add type attributes
-            for(final FBuilder val : cache.vals) addType(val, cache.type);
-            names.put(name, null);
-          }
-          // add type attribute, ignore string type
-          addType(elem, type);
+  final void openElem(final byte[] name, final byte[] key, final byte[] type, final Atts nsp)
+      throws IOException {
+    final boolean cache = merge && type != null && key != null && !contains(key, ' ');
+    if(!cache && type != null && (strings || type != STRING)) atts.add(TYPE, type);
+    handler.openElem(name, atts, nsp);
+    atts.reset();
+
+    if(merge) {
+      final FBuilder elem = ((NodeHandler) handler).current();
+      if(root == null) root = elem;
+      if(cache) {
+        TypeCache tc = names.get(key);
+        if(tc == null) {
+          tc = new TypeCache(key, type);
+          names.put(key, tc);
         }
-      } else {
-        // new name: create new type cache
-        names.put(name, new TypeCache(name, type, elem));
+        tc.add(elem, type);
       }
-    } else {
-      // no name, or name with whitespace: add type attribute, ignore string type
-      addType(elem, type);
     }
   }
 
   /**
-   * Adds a type attribute to the specified element. Ignore string types.
+   * Opens an element with the assigned attributes, adds a value and closes the element.
+   * @param name element name
+   * @param key key for merging types (can be {@code null})
+   * @param type JSON type
+   * @param value value (can be {@code null})
+   * @throws IOException I/O exception
+   */
+  final void addValue(final byte[] name, final byte[] key, final byte[] type, final byte[] value)
+      throws IOException {
+    openElem(name, key, type, NO_NSP);
+    if(value != null) handler.text(value);
+    handler.closeElem();
+  }
+
+  /**
+   * Adds a type attribute to the specified element.
    * @param elem element
    * @param type type
    */
@@ -168,35 +172,38 @@ abstract class JsonXmlConverter extends JsonConverter {
   }
 
   /**
-   * A simple container for all elements having the same name.
+   * A container for all elements having the same key.
    * @author Leo Woerteler
    */
   private static final class TypeCache {
-    /** Nodes. */
-    private final ArrayList<FBuilder> vals = new ArrayList<>(1);
-    /** Shared JSON type. */
-    private final byte[] type;
-    /** JSON name. */
-    private final byte[] name;
+    /** Key. */
+    private final byte[] key;
+    /** Elements. */
+    private final ArrayList<FBuilder> elems = new ArrayList<>(1);
+    /** Types of the elements. */
+    private final TokenList types = new TokenList(1);
+    /** Common type (can be {@code null}). */
+    private byte[] type;
 
     /**
      * Constructor.
-     * @param name name
-     * @param type JSON type
-     * @param elem element
+     * @param key key
+     * @param type type
      */
-    private TypeCache(final byte[] name, final byte[] type, final FBuilder elem) {
-      this.name = name;
+    private TypeCache(final byte[] key, final byte[] type) {
+      this.key = key;
       this.type = type;
-      add(elem);
     }
 
     /**
-     * Adds a new element to the list.
-     * @param elem element to add
+     * Adds an element.
+     * @param elem element
+     * @param tp type
      */
-    private void add(final FBuilder elem) {
-      vals.add(elem);
+    private void add(final FBuilder elem, final byte[] tp) {
+      elems.add(elem);
+      types.add(tp);
+      if(tp != type) type = null;
     }
   }
 }

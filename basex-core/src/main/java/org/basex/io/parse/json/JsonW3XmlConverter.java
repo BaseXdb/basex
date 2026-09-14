@@ -3,55 +3,73 @@ package org.basex.io.parse.json;
 import static org.basex.io.parse.json.JsonConstants.*;
 import static org.basex.util.Token.*;
 
+import java.io.*;
+
 import org.basex.build.json.*;
+import org.basex.io.parse.*;
 import org.basex.query.*;
-import org.basex.query.value.node.*;
+import org.basex.util.*;
 
 /**
- * <p>This class converts a JSON document to XML.</p>
+ * This class converts JSON data to XML, using the format defined by fn:json-to-xml.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class JsonW3XmlConverter extends JsonXmlConverter {
-  /** Escape characters. */
+  /** Namespace declaration of the root element. */
+  private static final Atts FN_NSP = new Atts().add(EMPTY, QueryText.FN_URI);
+
+  /** Add escaped attributes. */
   private final boolean escape;
+  /** Key of the next element (can be {@code null}). */
+  private byte[] key;
+  /** Root element has been opened. */
+  private boolean rootOpened;
 
   /**
    * Constructor.
    * @param opts JSON options
+   * @param handler target of XML events (can be {@code null}: nodes will be built)
    */
-  JsonW3XmlConverter(final JsonParserOptions opts) {
-    super(opts);
+  JsonW3XmlConverter(final JsonParserOptions opts, final XmlHandler handler) {
+    super(opts, handler);
     escape = jopts.get(JsonParserOptions.ESCAPE);
   }
 
   @Override
-  protected void openObject() {
-    openOuter(MAP);
+  protected void init(final String uri) {
+    super.init(uri);
+    key = null;
+    rootOpened = false;
   }
 
   @Override
-  protected void closeObject() {
-    closeOuter();
+  protected void openObject() throws IOException {
+    openElem(MAP);
   }
 
   @Override
-  protected void openPair(final byte[] key) {
-    name = shared.token(key);
+  protected void closeObject() throws IOException {
+    handler.closeElem();
+  }
+
+  @Override
+  protected void openPair(final byte[] k) {
+    key = k;
   }
 
   @Override
   protected void closePair() { }
 
   @Override
-  protected void openArray() {
-    openOuter(ARRAY);
+  protected void openArray() throws IOException {
+    openElem(ARRAY);
   }
 
   @Override
-  protected void closeArray() {
-    closeOuter();
+  protected void closeArray() throws IOException {
+    handler.closeElem();
   }
 
   @Override
@@ -61,44 +79,42 @@ public final class JsonW3XmlConverter extends JsonXmlConverter {
   protected void closeItem() { }
 
   @Override
-  void addValue(final byte[] type, final byte[] value) {
-    final byte[] val = value != null ? shared.token(value) : null;
-    final FBuilder elem = element(type).text(val);
-    if(escape && value != null && contains(val, '\\')) elem.attr(Q_ESCAPED, TRUE);
-    if(curr != null) curr.node(elem);
-    else curr = elem;
+  void addValue(final byte[] type, final byte[] value) throws IOException {
+    addKey();
+    if(escape && value != null && contains(value, '\\')) atts.add(ESCAPED, TRUE);
+    openElem(type, null, null, nsp());
+    if(value != null) handler.text(value);
+    handler.closeElem();
   }
 
   /**
-   * Opens an outer entry.
-   * @param type JSON type
+   * Opens a map or array element.
+   * @param name element name
+   * @throws IOException I/O exception
    */
-  private void openOuter(final byte[] type) {
-    curr = element(type);
-    if(stack.isEmpty()) curr.ns();
-    stack.push(curr);
+  private void openElem(final byte[] name) throws IOException {
+    addKey();
+    openElem(name, null, null, nsp());
   }
 
   /**
-   * Closes an outer entry.
+   * Adds the key attributes to the next element.
    */
-  private void closeOuter() {
-    curr = stack.pop();
-    if(!stack.isEmpty()) curr = stack.peek().node(curr);
-  }
-
-  /**
-   * Creates a new element with the given type.
-   * @param type JSON type
-   * @return new element
-   */
-  private FBuilder element(final byte[] type) {
-    final FBuilder elem = FElem.build(shared.qName(type, QueryText.FN_URI));
-    if(name != null) {
-      elem.attr(Q_KEY, name);
-      if(escape && contains(name, '\\')) elem.attr(Q_ESCAPED_KEY, TRUE);
-      name = null;
+  private void addKey() {
+    if(key != null) {
+      atts.add(KEY, key);
+      if(escape && contains(key, '\\')) atts.add(ESCAPED_KEY, TRUE);
+      key = null;
     }
-    return elem;
+  }
+
+  /**
+   * Returns the namespace declarations of the next element.
+   * @return namespace declarations
+   */
+  private Atts nsp() {
+    if(rootOpened) return NO_NSP;
+    rootOpened = true;
+    return FN_NSP;
   }
 }

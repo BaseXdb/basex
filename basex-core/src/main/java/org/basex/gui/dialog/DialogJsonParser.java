@@ -8,6 +8,7 @@ import java.util.*;
 
 import org.basex.build.*;
 import org.basex.build.json.*;
+import org.basex.build.json.JsonParser;
 import org.basex.build.json.JsonOptions.*;
 import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
@@ -122,7 +123,7 @@ final class DialogJsonParser extends DialogParser {
           json = line + '\n' + line;
           final MainOptions mopts = new MainOptions();
           mopts.set(MainOptions.JSONPARSER, jopts);
-          value = new DBNode(MemBuilder.build(JsonStreamingParser.get(new IOContent(json), mopts)));
+          value = new DBNode(MemBuilder.build(new JsonParser(new IOContent(json), mopts, jopts)));
         } else {
           value = JsonConverter.get(jopts).convert(new IOContent(json));
         }

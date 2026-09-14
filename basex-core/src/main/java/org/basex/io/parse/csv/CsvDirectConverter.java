@@ -1,73 +1,94 @@
 package org.basex.io.parse.csv;
 
+import static org.basex.util.Token.*;
+
+import java.io.*;
+
 import org.basex.build.csv.*;
+import org.basex.io.parse.*;
 import org.basex.query.*;
-import org.basex.query.value.node.*;
+import org.basex.query.value.*;
 import org.basex.util.*;
 
 /**
- * This class converts CSV data to XML, using direct or attributes conversion.
+ * This class converts CSV data to XML, using the direct or attributes format.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-final class CsvDirectConverter extends CsvConverter {
-  /** Document node. */
-  private FBuilder doc;
-  /** Root node. */
-  private FBuilder root;
-  /** Record node (can be {@code null}). */
-  private FBuilder record;
+final class CsvDirectConverter extends CsvXmlConverter {
+  /** Element name. */
+  private static final byte[] E_CSV = token("csv");
+  /** Element name. */
+  private static final byte[] E_RECORD = token("record");
+  /** Element name. */
+  private static final byte[] E_ENTRY = token("entry");
+  /** Attribute name. */
+  private static final byte[] NAME = token("name");
+
+  /** Record element is open. */
+  private boolean open;
 
   /**
    * Constructor.
    * @param copts CSV options
+   * @param handler target of XML events (can be {@code null}: nodes will be built)
    */
-  CsvDirectConverter(final CsvParserOptions copts) {
-    super(copts);
+  CsvDirectConverter(final CsvParserOptions copts, final XmlHandler handler) {
+    super(copts, handler);
   }
 
   @Override
-  protected void record() {
-    finishRecord();
-    record = FElem.build(Q_RECORD);
-    col = -1;
+  protected void init(final String uri) throws IOException {
+    super.init(uri);
+    handler.openElem(E_CSV, atts, NO_NSP);
+    open = false;
   }
 
   @Override
   protected void header(final byte[] value) {
-    headers.add(shared.token(attributes ? value : XMLToken.encode(value, lax)));
+    headers.add(attributes ? value : XMLToken.encode(value, lax));
   }
 
   @Override
-  protected void entry(final byte[] value) {
+  protected void record() throws IOException {
+    line++;
+    closeRecord();
+    handler.openElem(E_RECORD, atts, NO_NSP);
+    open = true;
+    col = -1;
+  }
+
+  @Override
+  protected void entry(final byte[] value) throws IOException {
     ++col;
     final byte[] name = headers.get(col);
-    final FBuilder elem;
     if(attributes) {
-      elem = FElem.build(Q_ENTRY).attr(Q_NAME, name);
+      if(name != null) atts.add(NAME, name);
+      handler.openElem(E_ENTRY, atts, NO_NSP);
+      atts.reset();
     } else {
-      elem = FElem.build(name != null ? shared.qName(name) : Q_ENTRY);
+      handler.openElem(name != null ? name : E_ENTRY, atts, NO_NSP);
     }
-    record.node(elem.text(shared.token(value)));
+    handler.text(value);
+    handler.closeElem();
   }
 
   @Override
-  protected void init(final String uri) {
-    doc = FDoc.build(Token.token(uri));
-    root = FElem.build(Q_CSV);
-  }
-
-  @Override
-  protected FNode finish(final InputInfo ii, final QueryContext qc) {
-    finishRecord();
-    return doc.node(root).finish();
+  protected Value finish(final InputInfo ii, final QueryContext qc) throws IOException {
+    closeRecord();
+    handler.closeElem();
+    return super.finish(ii, qc);
   }
 
   /**
-   * Finishes a record.
+   * Closes an open record element.
+   * @throws IOException I/O exception
    */
-  private void finishRecord() {
-    if(record != null) root.node(record);
+  private void closeRecord() throws IOException {
+    if(open) {
+      handler.closeElem();
+      open = false;
+    }
   }
 }

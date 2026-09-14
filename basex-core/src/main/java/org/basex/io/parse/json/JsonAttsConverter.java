@@ -2,114 +2,97 @@ package org.basex.io.parse.json;
 
 import static org.basex.io.parse.json.JsonConstants.*;
 
+import java.io.*;
+
 import org.basex.build.json.*;
-import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
+import org.basex.io.parse.*;
 
 /**
- * This class converts a JSON document to an XML structure. JSON keys will be stored in attributes.
+ * This class converts JSON data to XML, using the attributes format.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
- * @author Leo Woerteler
  */
 public final class JsonAttsConverter extends JsonXmlConverter {
+  /** Key of the next element (can be {@code null}). */
+  private byte[] key;
+  /** Root element has been opened. */
+  private boolean rootOpened;
+
   /**
    * Constructor.
    * @param opts JSON options
+   * @param handler target of XML events (can be {@code null}: nodes will be built)
    */
-  JsonAttsConverter(final JsonParserOptions opts) {
-    super(opts);
+  JsonAttsConverter(final JsonParserOptions opts, final XmlHandler handler) {
+    super(opts, handler);
   }
 
   @Override
-  protected void openObject() {
-    openOuter(OBJECT);
+  protected void init(final String uri) {
+    super.init(uri);
+    key = null;
+    rootOpened = false;
   }
 
   @Override
-  protected void closeObject() {
-    closeOuter();
+  protected void openObject() throws IOException {
+    openElem(OBJECT);
   }
 
   @Override
-  protected void openPair(final byte[] key) {
-    openInner(Q_PAIR);
-    name = shared.token(key);
-    curr.attr(Q_NAME, name);
+  protected void closeObject() throws IOException {
+    handler.closeElem();
   }
 
   @Override
-  protected void closePair() {
-    closeInner();
-    name = null;
+  protected void openPair(final byte[] k) {
+    key = k;
   }
 
   @Override
-  protected void openArray() {
-    openOuter(ARRAY);
+  protected void closePair() { }
+
+  @Override
+  protected void openArray() throws IOException {
+    openElem(ARRAY);
   }
 
   @Override
-  protected void closeArray() {
-    closeOuter();
+  protected void closeArray() throws IOException {
+    handler.closeElem();
   }
 
   @Override
-  protected void openItem() {
-    openInner(Q_ITEM);
-  }
+  protected void openItem() { }
 
   @Override
-  protected void closeItem() {
-    closeInner();
-  }
+  protected void closeItem() { }
 
   @Override
-  void addValue(final byte[] type, final byte[] value) {
-    element(type).text(value != null ? shared.token(value) : null);
+  void addValue(final byte[] type, final byte[] value) throws IOException {
+    openElem(type);
+    if(value != null) handler.text(value);
+    handler.closeElem();
   }
 
   /**
-   * Opens an outer entry.
+   * Opens a pair, item or root element.
    * @param type JSON type
+   * @throws IOException I/O exception
    */
-  private void openOuter(final byte[] type) {
-    stack.push(element(type));
-  }
-
-  /**
-   * Closes an outer entry.
-   */
-  private void closeOuter() {
-    stack.pop();
-  }
-
-  /**
-   * Opens an inner entry.
-   * @param type JSON type
-   */
-  private void openInner(final QNm type) {
-    curr = FElem.build(type);
-    stack.push(curr);
-  }
-
-  /**
-   * Closes an inner entry.
-   */
-  private void closeInner() {
-    curr = stack.pop();
-    if(!stack.isEmpty()) curr = stack.peek().node(curr);
-  }
-
-  /**
-   * Creates a new element with the given type.
-   * @param type JSON type
-   * @return new element
-   */
-  private FBuilder element(final byte[] type) {
-    if(curr == null) curr = FElem.build(Q_JSON);
-    processType(curr, type);
-    return curr;
+  private void openElem(final byte[] type) throws IOException {
+    final byte[] k = key, name;
+    key = null;
+    if(k != null) {
+      atts.add(NAME, k);
+      name = PAIR;
+    } else if(rootOpened) {
+      name = ITEM;
+    } else {
+      rootOpened = true;
+      name = JSON;
+    }
+    openElem(name, k, type, NO_NSP);
   }
 }

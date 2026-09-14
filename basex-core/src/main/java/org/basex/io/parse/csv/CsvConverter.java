@@ -7,6 +7,7 @@ import org.basex.build.csv.CsvOptions.*;
 import org.basex.core.jobs.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
+import org.basex.io.parse.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -28,14 +29,6 @@ public abstract class CsvConverter extends Job {
   /** Rows. */
   public static final Str ROWS = Str.get("rows");
 
-  /** QName. */
-  protected static final QNm Q_CSV = new QNm("csv");
-  /** QName. */
-  protected static final QNm Q_RECORD = new QNm("record");
-  /** QName. */
-  protected static final QNm Q_ENTRY = new QNm("entry");
-  /** QName. */
-  protected static final QNm Q_NAME = new QNm("name");
 
   /** CSV options. */
   protected final CsvParserOptions copts;
@@ -59,11 +52,21 @@ public abstract class CsvConverter extends Job {
    * @return CSV converter
    */
   public static CsvConverter get(final CsvParserOptions copts) {
+    return get(copts, null);
+  }
+
+  /**
+   * Returns a CSV converter for the given configuration.
+   * @param copts options
+   * @param handler target of XML events (can be {@code null}: nodes will be built)
+   * @return CSV converter
+   */
+  public static CsvConverter get(final CsvParserOptions copts, final XmlHandler handler) {
     return switch(copts.get(CsvOptions.FORMAT)) {
       case W3        -> new CsvW3Converter(copts);
       case W3_ARRAYS -> new CsvW3ArraysConverter(copts);
-      case W3_XML    -> new CsvW3XmlConverter(copts);
-      default        -> new CsvDirectConverter(copts);
+      case W3_XML    -> new CsvW3XmlConverter(copts, handler);
+      default        -> new CsvDirectConverter(copts, handler);
     };
   }
 
@@ -137,8 +140,9 @@ public abstract class CsvConverter extends Job {
   /**
    * Initializes the conversion.
    * @param uri base URI
+   * @throws IOException I/O exception
    */
-  protected abstract void init(String uri);
+  protected abstract void init(String uri) throws IOException;
 
   /**
    * Returns the resulting XQuery value.

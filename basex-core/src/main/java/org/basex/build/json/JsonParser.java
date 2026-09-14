@@ -3,14 +3,16 @@ package org.basex.build.json;
 import java.io.*;
 
 import org.basex.build.*;
+import org.basex.build.json.JsonOptions.*;
 import org.basex.core.*;
 import org.basex.io.*;
+import org.basex.io.in.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.util.*;
 
 /**
  * This class parses files in the JSON format
@@ -39,29 +41,30 @@ public final class JsonParser extends SingleParser {
 
   @Override
   protected void parse() throws IOException {
+    final JsonFormat format = jopts.get(JsonOptions.FORMAT);
+    if(format == JsonFormat.W3) {
+      throw new IOException(Util.info("Format '%' cannot be converted to XML.", format));
+    }
     try {
-      final Value value = JsonConverter.get(jopts).convert(source);
-      final Serializer ser = new BuilderSerializer(builder);
-      if(jopts.get(JsonParserOptions.JSON_LINES)) {
-        // wrap documents in a root element
-        builder.openElem(JsonConstants.JSON_LINES, atts, nsp);
-        for(final Item item : value) add((XNode) item, ser);
-        builder.closeElem();
+      final boolean lines = jopts.get(JsonParserOptions.JSON_LINES);
+      if(lines) builder.openElem(JsonConstants.JSON_LINES, atts, nsp);
+      if(jopts.get(JsonOptions.MERGE) &&
+          (format == JsonFormat.DIRECT || format == JsonFormat.ATTRIBUTES)) {
+        // types can only be merged in complete documents
+        final Serializer ser = new BuilderSerializer(builder);
+        for(final Item item : JsonConverter.get(jopts).convert(source)) {
+          for(final GNode child : ((XNode) item).childIter()) ser.serialize(child);
+        }
       } else {
-        add((XNode) value, ser);
+        final JsonConverter converter = JsonConverter.get(jopts, null, builder);
+        final String encoding = jopts.get(JsonParserOptions.ENCODING);
+        try(NewlineInput ni = new NewlineInput(source, encoding)) {
+          converter.convert(ni, "", null, this);
+        }
       }
+      if(lines) builder.closeElem();
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
     }
-  }
-
-  /**
-   * Adds the children of a document node to the database builder.
-   * @param doc document node
-   * @param ser builder serializer
-   * @throws IOException I/O exception
-   */
-  private static void add(final XNode doc, final Serializer ser) throws IOException {
-    for(final GNode child : doc.childIter()) ser.serialize(child);
   }
 }

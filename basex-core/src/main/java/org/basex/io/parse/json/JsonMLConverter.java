@@ -1,82 +1,97 @@
 package org.basex.io.parse.json;
 
-import static org.basex.io.parse.json.JsonConstants.*;
 import static org.basex.query.QueryError.*;
 
+import java.io.*;
+
 import org.basex.build.json.*;
+import org.basex.io.parse.*;
 import org.basex.query.*;
-import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This class converts a <a href="http://jsonml.org">JsonML</a> document to XML.
- * The specified JSON input is first transformed into a tree representation
- * and then converted to an XML document.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  * @author Leo Woerteler
  */
 final class JsonMLConverter extends JsonXmlConverter {
+  /** State: element name expected. */
+  private static final int UNNAMED = 0;
+  /** State: element name assigned. */
+  private static final int NAMED = 1;
+  /** State: attributes assigned. */
+  private static final int ATTRIBUTED = 2;
+  /** State: element opened. */
+  private static final int OPENED = 3;
+
+  /** States of the open elements. */
+  private final IntList states = new IntList();
+  /** Name of the element to be opened (can be {@code null}). */
+  private byte[] name;
+  /** Name of the attribute to be added (can be {@code null}). */
+  private byte[] attribute;
+  /** Attributes object is being parsed. */
+  private boolean inAtts;
+
   /**
    * Constructor.
    * @param opts JSON options
+   * @param handler target of XML events (can be {@code null}: nodes will be built)
    */
-  JsonMLConverter(final JsonParserOptions opts) {
-    super(opts);
+  JsonMLConverter(final JsonParserOptions opts, final XmlHandler handler) {
+    super(opts, handler);
   }
 
   @Override
-  protected FNode finish() {
-    return doc.node(stack.pop()).finish();
+  protected void init(final String uri) {
+    super.init(uri);
+    states.reset();
+    name = null;
+    attribute = null;
+    inAtts = false;
   }
 
   @Override
   protected void openObject() throws QueryException {
-    if(curr == null || name != null || stack.peek() != null)
+    if(inAtts || states.isEmpty() || states.peek() != NAMED) {
       throw error("No object allowed at this stage");
+    }
+    inAtts = true;
   }
 
   @Override
   protected void closeObject() {
-    stack.pop();
-    stack.push(curr);
-    reset();
+    inAtts = false;
+    states.pop();
+    states.add(ATTRIBUTED);
   }
 
   @Override
   protected void openPair(final byte[] key) throws QueryException {
-    name = shared.token(check(key));
+    attribute = check(key);
   }
 
   @Override
   protected void closePair() { }
 
   @Override
-  protected void openArray() throws QueryException {
-    if(!stack.isEmpty()) {
-      if(name == null && curr != null && stack.peek() == null) {
-        stack.pop();
-        stack.push(curr);
-      } else if(name != null || curr != null || stack.peek() == null) {
-        throw error("No array allowed at this stage");
-      }
+  protected void openArray() throws QueryException, IOException {
+    if(inAtts || !states.isEmpty() && states.peek() == UNNAMED) {
+      throw error("No array allowed at this stage");
     }
-    stack.push(null);
-    reset();
+    if(!states.isEmpty()) flush();
+    states.add(UNNAMED);
   }
 
   @Override
-  protected void closeArray() throws QueryException {
-    FBuilder value = stack.pop();
-    if(value == null) {
-      value = curr;
-      reset();
-    }
-    if(value == null) throw error("Missing element name");
-
-    if(stack.isEmpty()) stack.push(value);
-    else stack.peek().node(value);
+  protected void closeArray() throws QueryException, IOException {
+    if(states.peek() == UNNAMED) throw error("Missing element name");
+    flush();
+    handler.closeElem();
+    states.pop();
   }
 
   @Override
@@ -86,29 +101,20 @@ final class JsonMLConverter extends JsonXmlConverter {
   protected void closeItem() { }
 
   @Override
-  void addValue(final byte[] type, final byte[] value) throws QueryException {
-    if(name == null && curr != null && stack.peek() == null) {
-      stack.pop();
-      stack.push(curr);
-      reset();
-    }
-
-    final byte[] val = shared.token(value);
-    if(curr == null) {
-      final FBuilder elem = stack.isEmpty() ? null : stack.peek();
-      if(elem == null) curr = FElem.build(shared.qName(check(val)));
-      else elem.node(new FTxt(val));
-    } else if(name != null) {
-      curr.attr(shared.qName(name), val);
-      name = null;
-    } else {
+  void addValue(final byte[] type, final byte[] value) throws QueryException, IOException {
+    if(inAtts) {
+      atts.add(attribute, value);
+      attribute = null;
+    } else if(states.isEmpty()) {
       throw error("No value allowed at this stage");
+    } else if(states.peek() == UNNAMED) {
+      name = check(value);
+      states.pop();
+      states.add(NAMED);
+    } else {
+      flush();
+      handler.text(value);
     }
-  }
-
-  @Override
-  protected void stringLit(final byte[] value) throws QueryException {
-    addValue(STRING, value);
   }
 
   @Override
@@ -127,10 +133,16 @@ final class JsonMLConverter extends JsonXmlConverter {
   }
 
   /**
-   * Resets the element creation.
+   * Opens the current element if it has not been opened yet.
+   * @throws IOException I/O exception
    */
-  private void reset() {
-    curr = null;
+  private void flush() throws IOException {
+    if(states.peek() != OPENED) {
+      handler.openElem(name, atts, NO_NSP);
+      atts.reset();
+      states.pop();
+      states.add(OPENED);
+    }
   }
 
   /**
@@ -144,9 +156,9 @@ final class JsonMLConverter extends JsonXmlConverter {
   }
 
   /**
-   * Returns the specified name.
+   * Checks if the specified name is a valid NCName.
    * @param name name
-   * @return cached QName
+   * @return name
    * @throws QueryException query exception
    */
   private static byte[] check(final byte[] name) throws QueryException {

@@ -15,14 +15,12 @@ import org.basex.query.value.node.*;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for {@link JsonStreamingParser}: JSON-to-XML via direct builder events
- * (the streaming path, active for format=(DIRECT, ATTRIBUTES) with merge=false,
- * as well as for format=W3_XML.
+ * Tests for {@link JsonParser}: JSON-to-XML via builder events.
  *
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
-public final class JsonStreamingParserTest extends SandboxTest {
+public final class JsonParserTest extends SandboxTest {
   /** JSON test resource. */
   private static final String FILE = "src/test/resources/example.json";
 
@@ -226,21 +224,20 @@ public final class JsonStreamingParserTest extends SandboxTest {
   }
 
   /**
-   * merge=true falls back to the non-streaming path.
+   * merge=true builds nodes before adding them to the database.
    * @throws Exception exception
    */
   @Test public void directMergeOption() throws Exception {
     final JsonParserOptions jopts = new JsonParserOptions();
     jopts.set(JsonOptions.MERGE, true);
     context.options.set(MainOptions.JSONPARSER, jopts);
-    final SingleParser sp = JsonStreamingParser.get(new IOFile(FILE), context.options);
-    assertInstanceOf(JsonParser.class, sp);
+    final SingleParser sp = new JsonParser(new IOFile(FILE), context.options, jopts);
     final XNode result = new DBNode(MemBuilder.build(sp), 0);
     query(result, "//name/data()", "Smith");
   }
 
   /**
-   * merge=true falls back to the non-streaming path.
+   * merge=true builds nodes before adding them to the database.
    * @throws Exception exception
    */
   @Test public void attsMergeOption() throws Exception {
@@ -248,8 +245,7 @@ public final class JsonStreamingParserTest extends SandboxTest {
     jopts.set(JsonOptions.FORMAT, ATTRIBUTES);
     jopts.set(JsonOptions.MERGE, true);
     context.options.set(MainOptions.JSONPARSER, jopts);
-    final SingleParser sp = JsonStreamingParser.get(new IOFile(FILE), context.options);
-    assertInstanceOf(JsonParser.class, sp);
+    final SingleParser sp = new JsonParser(new IOFile(FILE), context.options, jopts);
     final XNode result = new DBNode(MemBuilder.build(sp), 0);
     query(result, "//pair[@name='name']/data()", "Smith");
   }
@@ -265,8 +261,7 @@ public final class JsonStreamingParserTest extends SandboxTest {
       final JsonParserOptions jopts = opts(fmt);
       jopts.set(JsonParserOptions.JSON_LINES, true);
       context.options.set(MainOptions.JSONPARSER, jopts);
-      final SingleParser sp = JsonStreamingParser.get(new IOContent(json), context.options);
-      assertInstanceOf(JsonStreamingParser.class, sp);
+      final SingleParser sp = new JsonParser(new IOContent(json), context.options, jopts);
       final XNode result = new DBNode(MemBuilder.build(sp), 0);
       query(result, "count(/json-lines/*)", "2");
       query(result, "count(/json-lines/*[namespace-uri()])", fmt == W3_XML ? "2" : "0");
@@ -274,13 +269,12 @@ public final class JsonStreamingParserTest extends SandboxTest {
     query(parseLines(json, DIRECT), "/json-lines/json[2]/_/data()", "2");
     query(parseLines(json, ATTRIBUTES), "/json-lines/json[2]/item/data()", "2");
 
-    // non-streaming path
+    // merged types
     final JsonParserOptions jopts = opts(DIRECT);
     jopts.set(JsonParserOptions.JSON_LINES, true);
     jopts.set(JsonOptions.MERGE, true);
     context.options.set(MainOptions.JSONPARSER, jopts);
-    final SingleParser sp = JsonStreamingParser.get(new IOContent(json), context.options);
-    assertInstanceOf(JsonParser.class, sp);
+    final SingleParser sp = new JsonParser(new IOContent(json), context.options, jopts);
     final XNode result = new DBNode(MemBuilder.build(sp), 0);
     query(result, "count(/json-lines/json)", "2");
     query(result, "/json-lines/json[2]/_/data()", "2");
@@ -290,7 +284,7 @@ public final class JsonStreamingParserTest extends SandboxTest {
   // HELPERS
 
   /**
-   * Parses JSON Lines with the streaming parser.
+   * Parses JSON Lines.
    * @param json JSON content
    * @param fmt JSON format
    * @return document node
@@ -301,28 +295,27 @@ public final class JsonStreamingParserTest extends SandboxTest {
     final JsonParserOptions jopts = opts(fmt);
     jopts.set(JsonParserOptions.JSON_LINES, true);
     context.options.set(MainOptions.JSONPARSER, jopts);
-    return new DBNode(MemBuilder.build(JsonStreamingParser.get(new IOContent(json),
-        context.options)), 0);
+    return new DBNode(MemBuilder.build(new JsonParser(new IOContent(json), context.options,
+        jopts)), 0);
   }
   // ==========================================================================================
 
   /**
-   * Parses JSON with both the streaming and non-streaming parsers, asserts they produce
+   * Parses JSON with the database parser and the node converter, asserts that both produce
    * equivalent results, and returns the resulting document node.
    * @param source JSON source
    * @param jopts JSON parser options
-   * @return document node (streaming result)
+   * @return document node (database result)
    * @throws Exception exception
    */
   private static XNode parse(final IO source, final JsonParserOptions jopts) throws Exception {
     context.options.set(MainOptions.JSONPARSER, jopts);
 
-    // streaming parse — verify streaming parser is selected
-    final SingleParser sp = JsonStreamingParser.get(source, context.options);
-    assertInstanceOf(JsonStreamingParser.class, sp);
+    // database parser
+    final SingleParser sp = new JsonParser(source, context.options, jopts);
     final XNode streamResult = new DBNode(MemBuilder.build(sp), 0);
 
-    // non-streaming parse — verify non-streaming converter is selected
+    // node conversion
     final XNode nonStreamResult = (XNode) JsonConverter.get(jopts).convert(source);
     assertNotNull(nonStreamResult);
 
@@ -374,7 +367,7 @@ public final class JsonStreamingParserTest extends SandboxTest {
   }
 
   /**
-   * Asserts that the streaming parser rejects the given JSON with the expected error.
+   * Asserts that the parser rejects the given JSON with the expected error.
    * @param json JSON content
    * @param jopts JSON parser options
    * @param error expected error
@@ -383,8 +376,7 @@ public final class JsonStreamingParserTest extends SandboxTest {
   private static void error(final String json, final JsonParserOptions jopts,
       final QueryError error) throws Exception {
     context.options.set(MainOptions.JSONPARSER, jopts);
-    final SingleParser sp = JsonStreamingParser.get(new IOContent(json), context.options);
-    assertInstanceOf(JsonStreamingParser.class, sp);
+    final SingleParser sp = new JsonParser(new IOContent(json), context.options, jopts);
     try {
       MemBuilder.build(sp);
       fail("Expected parse error for: " + json);

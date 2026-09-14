@@ -2,61 +2,34 @@ package org.basex.io.parse.json;
 
 import static org.basex.io.parse.json.JsonConstants.*;
 
+import java.io.*;
+
 import org.basex.build.json.*;
-import org.basex.query.value.node.*;
+import org.basex.io.parse.*;
 import org.basex.util.*;
 
 /**
- * <p>This class converts a JSON document to XML. The converted XML document is
- * both well readable and lossless, i.e., the converted document can be
- * serialized back to the original JSON representation.</p>
+ * This class converts JSON data to XML, using the direct format.
  *
- * <p>The specified JSON input is first transformed into a tree representation
- * and then converted to an XML document, according to the following rules:</p>
- *
- * <ol>
- * <li>The resulting document has a {@code <json/>} root node.</li>
- * <li>Names (keys) of objects are represented as elements:
- * <ol>
- *   <li>Empty names are represented by a single underscore
- *       ({@code &lt;_&gt;...&lt;/_&gt;}).</li>
- *   <li>Underscore characters are rewritten to two underscores ({@code __}).
- *   </li>
- *   <li>A character that cannot be represented as NCName character is
- *       rewritten to an underscore and its four-digit Unicode.</li>
- * </ol></li>
- * <li>As arrays have no names, {@code <value/>} is used as element name.
- * <li>JSON values are represented as text nodes.</li>
- * <li>The types of values are represented in attributes:
- * <ol>
- *   <li>The value types <i>number</i>, <i>boolean</i>, <i>null</i>,
- *       <i>object</i> and <i>array</i> are represented by a
- *       {@code type} attribute.</li>
- *   <li>The <i>string</i> type is omitted, as it is treated as default type.
- *   </li>
- *   <li>If a name has the same type throughout the document, the {@code type}
- *       attribute will be omitted. Instead, the name will be listed in
- *       additional, type-specific attributes in the root node. The attributes
- *       are named by their type in the plural (<i>numbers</i>, <i>booleans</i>,
- *       <i>nulls</i>, <i>objects</i> and <i>arrays</i>), and the attribute
- *       value contains all names with that type, separated by whitespace.</li>
- * </ol></li>
- * </ol>
+ * <p>The converted XML document is described in the {@link org.basex.query.func.json}
+ * package documentation.</p>
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
- * @author Leo Woerteler
  */
 public final class JsonDirectConverter extends JsonXmlConverter {
   /** Lax QName conversion. */
   private final boolean lax;
+  /** Name of the next element. */
+  private byte[] name;
 
   /**
    * Constructor.
    * @param opts JSON options
+   * @param handler target of XML events (can be {@code null}: nodes will be built)
    */
-  JsonDirectConverter(final JsonParserOptions opts) {
-    super(opts);
+  JsonDirectConverter(final JsonParserOptions opts, final XmlHandler handler) {
+    super(opts, handler);
     lax = jopts.get(JsonOptions.LAX);
   }
 
@@ -67,31 +40,31 @@ public final class JsonDirectConverter extends JsonXmlConverter {
   }
 
   @Override
-  protected void openObject() {
-    openOuter(OBJECT);
+  protected void openObject() throws IOException {
+    openElem(name, name, OBJECT, NO_NSP);
   }
 
   @Override
-  protected void closeObject() {
-    closeOuter();
+  protected void closeObject() throws IOException {
+    handler.closeElem();
   }
 
   @Override
   protected void openPair(final byte[] key) {
-    name = shared.token(XMLToken.encode(key, lax));
+    name = XMLToken.encode(key, lax);
   }
 
   @Override
   protected void closePair() { }
 
   @Override
-  protected void openArray() {
-    openOuter(ARRAY);
+  protected void openArray() throws IOException {
+    openElem(name, name, ARRAY, NO_NSP);
   }
 
   @Override
-  protected void closeArray() {
-    closeOuter();
+  protected void closeArray() throws IOException {
+    handler.closeElem();
   }
 
   @Override
@@ -103,38 +76,7 @@ public final class JsonDirectConverter extends JsonXmlConverter {
   protected void closeItem() { }
 
   @Override
-  void addValue(final byte[] type, final byte[] value) {
-    final byte[] val = value != null ? shared.token(value) : null;
-    final FBuilder elem = element(type).text(val);
-    if(curr != null) curr.node(elem);
-    else curr = elem;
-  }
-
-  /**
-   * Opens an outer entry.
-   * @param type JSON type
-   */
-  private void openOuter(final byte[] type) {
-    curr = element(type);
-    stack.push(curr);
-  }
-
-  /**
-   * Closes an outer entry.
-   */
-  private void closeOuter() {
-    curr = stack.pop();
-    if(!stack.isEmpty()) curr = stack.peek().node(curr);
-  }
-
-  /**
-   * Adds a new element with the given type.
-   * @param type JSON type
-   * @return element
-   */
-  private FBuilder element(final byte[] type) {
-    final FBuilder elem = FElem.build(shared.qName(name));
-    processType(elem, type);
-    return elem;
+  void addValue(final byte[] type, final byte[] value) throws IOException {
+    addValue(name, name, type, value);
   }
 }

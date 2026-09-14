@@ -14,6 +14,7 @@ import org.basex.index.path.*;
 import org.basex.index.resource.*;
 import org.basex.index.stats.*;
 import org.basex.io.*;
+import org.basex.io.parse.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -26,7 +27,7 @@ import org.basex.util.list.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public abstract class Builder extends Job {
+public abstract class Builder extends Job implements XmlHandler {
   /** Tree structure. */
   final PathIndex path = new PathIndex();
   /** Namespace index. */
@@ -166,6 +167,7 @@ public abstract class Builder extends Job {
    * @param nsp namespaces
    * @throws IOException I/O exception
    */
+  @Override
   public final void openElem(final byte[] name, final Atts att, final Atts nsp) throws IOException {
     addElem(name, att, nsp);
     ++level;
@@ -190,6 +192,7 @@ public abstract class Builder extends Job {
    * Closes an element.
    * @throws IOException I/O exception
    */
+  @Override
   public final void closeElem() throws IOException {
     checkStop();
     --level;
@@ -203,6 +206,7 @@ public abstract class Builder extends Job {
    * @param value text value
    * @throws IOException I/O exception
    */
+  @Override
   public final void text(final byte[] value) throws IOException {
     if(value.length != 0) addText(value, Data.TEXT);
   }

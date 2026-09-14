@@ -1,12 +1,13 @@
 package org.basex.io.parse.json;
 
+import java.io.*;
+
 import org.basex.core.jobs.*;
 import org.basex.query.*;
 
 /**
  * Sink for the parse events emitted by {@link JsonParser}, in the style of a SAX content
- * handler. Implementations either build an in-memory XQuery value ({@link JsonConverter})
- * or stream the events onward without materializing a tree.
+ * handler.
  *
  * @author BaseX Team, BSD License
  * @author Leo Woerteler
@@ -26,73 +27,88 @@ public abstract class JsonHandler extends Job {
   /**
    * Called when a JSON object is opened.
    * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  protected abstract void openObject() throws QueryException;
+  protected abstract void openObject() throws QueryException, IOException;
 
   /**
    * Called when a JSON object is closed.
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  protected abstract void closeObject();
+  protected abstract void closeObject() throws QueryException, IOException;
 
   /**
    * Called when a pair of a JSON object is opened.
    * @param key key of the entry
    * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  protected abstract void openPair(byte[] key) throws QueryException;
+  protected abstract void openPair(byte[] key) throws QueryException, IOException;
 
   /**
    * Called when a pair of a JSON object is closed.
    * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  protected abstract void closePair() throws QueryException;
+  protected abstract void closePair() throws QueryException, IOException;
 
   /**
    * Called when a JSON array is opened.
    * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  protected abstract void openArray() throws QueryException;
+  protected abstract void openArray() throws QueryException, IOException;
 
   /**
    * Called when a JSON array is closed.
    * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  protected abstract void closeArray() throws QueryException;
+  protected abstract void closeArray() throws QueryException, IOException;
 
   /**
    * Called when an item of a JSON array is opened.
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  protected abstract void openItem();
+  protected abstract void openItem() throws QueryException, IOException;
 
   /**
    * Called when an item of a JSON array is closed.
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  protected abstract void closeItem();
+  protected abstract void closeItem() throws QueryException, IOException;
 
   /**
    * Called when a number literal is encountered.
    * @param value string representation
    * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  protected abstract void numberLit(byte[] value) throws QueryException;
+  protected abstract void numberLit(byte[] value) throws QueryException, IOException;
 
   /**
    * Called when a string literal is encountered.
    * @param value string representation
    * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  protected abstract void stringLit(byte[] value) throws QueryException;
+  protected abstract void stringLit(byte[] value) throws QueryException, IOException;
 
   /**
    * Called when a {@code null} literal is encountered.
    * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  protected abstract void nullLit() throws QueryException;
+  protected abstract void nullLit() throws QueryException, IOException;
 
   /**
    * Called when a boolean literal is encountered.
    * @param value string representation
    * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  protected abstract void booleanLit(byte[] value) throws QueryException;
+  protected abstract void booleanLit(byte[] value) throws QueryException, IOException;
 }

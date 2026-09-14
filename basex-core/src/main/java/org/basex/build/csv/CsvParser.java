@@ -3,9 +3,12 @@ package org.basex.build.csv;
 import java.io.*;
 
 import org.basex.build.*;
+import org.basex.build.csv.CsvOptions.*;
 import org.basex.core.*;
 import org.basex.io.*;
+import org.basex.io.parse.csv.*;
 import org.basex.query.*;
+import org.basex.util.*;
 
 /**
  * This class parses files in the CSV format and converts them to XML.
@@ -19,8 +22,8 @@ import org.basex.query.*;
 public final class CsvParser extends SingleParser {
   /** CSV Parser options. */
   private final CsvParserOptions copts;
-  /** CSV Builder (can be {@code null}). */
-  private CsvBuilder csv;
+  /** CSV converter (can be {@code null}). */
+  private CsvConverter csv;
 
   /**
    * Constructor.
@@ -35,7 +38,11 @@ public final class CsvParser extends SingleParser {
 
   @Override
   protected void parse() throws IOException {
-    csv = pushJob(new CsvBuilder(copts, builder));
+    final CsvFormat format = copts.get(CsvOptions.FORMAT);
+    if(format == CsvFormat.W3 || format == CsvFormat.W3_ARRAYS) {
+      throw new IOException(Util.info("Format '%' cannot be converted to XML.", format));
+    }
+    csv = pushJob(CsvConverter.get(copts, builder));
     try {
       csv.convert(source);
     } catch(final QueryException ex) {
