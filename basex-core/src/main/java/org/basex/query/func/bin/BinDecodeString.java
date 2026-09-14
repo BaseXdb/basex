@@ -27,18 +27,26 @@ public final class BinDecodeString extends BinFn {
     final Long size = toLongOrNull(arg(3), qc);
     if(value == null) return Empty.VALUE;
 
-    byte[] bytes = value.binary(info);
-    if(offset != null || size != null) {
-      final int bl = bytes.length;
-      final int[] bounds = bounds(offset, offset != null ? size : null, bl);
-      final int o = bounds[0], tl = bounds[1];
-      if(o > 0 || tl < bl) bytes = Arrays.copyOfRange(bytes, o, o + tl);
-    }
-
-    try {
-      return Str.get(ConvertFn.toString(new ArrayInput(bytes), encoding, false));
+    final boolean all = offset == null && size == null;
+    try(BufferInput bi = all ? value.input(info) : input(value, offset, size)) {
+      return Str.get(ConvertFn.toString(bi, encoding, false));
     } catch(final IOException ex) {
       throw BIN_CE_X.get(info, ex);
     }
+  }
+
+  /**
+   * Returns an input stream over the specified part of a binary value.
+   * @param value binary value
+   * @param offset offset (can be {@code null})
+   * @param size size (can be {@code null})
+   * @return input stream
+   * @throws QueryException query exception
+   */
+  private BufferInput input(final Bin value, final Long offset, final Long size)
+      throws QueryException {
+    final byte[] bytes = value.binary(info);
+    final int[] bounds = bounds(offset, offset != null ? size : null, bytes.length);
+    return new ArrayInput(Arrays.copyOfRange(bytes, bounds[0], bounds[0] + bounds[1]));
   }
 }

@@ -756,7 +756,7 @@ public final class DbModuleTest extends SandboxTest {
     query("xs:hexBinary(" + func.args(NAME, "path") + ')', "A");
     query(_DB_DELETE.args(NAME, "path"));
 
-    query("(0 to 5) !" + put.args(NAME, " convert:string-to-base64(string(.))",
+    query("(0 to 5) !" + put.args(NAME, " bin:encode-string(string(.))",
         " 'path' || ."), "");
     query("(0 to 5) !" + func.args(NAME, " 'path' || ."), "0\n1\n2\n3\n4\n5");
     query(func.args(NAME) + " => map:keys() => count()", 6);

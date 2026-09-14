@@ -1232,10 +1232,6 @@ public enum Function implements AFunction {
   _CONVERT_BINARY_TO_INTEGERS(ConvertBinaryToIntegers::new, "binary-to-integers(value)",
       params(BINARY_O), INTEGER_ZM, CONVERT_URI),
   /** XQuery function. */
-  _CONVERT_BINARY_TO_STRING(ConvertBinaryToString::new,
-      "binary-to-string(value, encoding?, fallback?)",
-      params(BINARY_O, STRING_ZO, BOOLEAN_ZO), STRING_O, CONVERT_URI),
-  /** XQuery function. */
   _CONVERT_DATETIME_TO_INTEGER(ConvertDateTimeToInteger::new, "dateTime-to-integer(value)",
       params(DATE_TIME_O), INTEGER_O, CONVERT_URI),
   /** XQuery function. */
@@ -1265,12 +1261,6 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _CONVERT_INTEGER_TO_DAYTIME(ConvertIntegerToDayTime::new, "integer-to-dayTime(value)",
       params(INTEGER_O), DAY_TIME_DURATION_O, CONVERT_URI),
-  /** XQuery function. */
-  _CONVERT_STRING_TO_BASE64(ConvertStringToBase64::new, "string-to-base64(value, encoding?)",
-      params(STRING_O, STRING_ZO), BASE64_BINARY_O, CONVERT_URI),
-  /** XQuery function. */
-  _CONVERT_STRING_TO_HEX(ConvertStringToHex::new, "string-to-hex(value, encoding?)",
-      params(STRING_O, STRING_ZO), HEX_BINARY_O, CONVERT_URI),
 
   // Cryptographic Module
 

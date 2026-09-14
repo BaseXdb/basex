@@ -3394,12 +3394,12 @@ return
         "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body>42</body></html>");
     query(func.args("42", " { 'encoding': '" + Strings.UTF16LE + "' }"),
         "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body>42</body></html>");
-    query(func.args(_CONVERT_STRING_TO_HEX.args("<html><head><meta charset='" + Strings.UTF16LE
-        + "'></head><body>42</body>", Strings.UTF16LE),
+    query(func.args(" xs:hexBinary(" + _BIN_ENCODE_STRING.args("<html><head><meta charset='"
+        + Strings.UTF16LE + "'></head><body>42</body>", Strings.UTF16LE) + ")",
         " { 'encoding': '" + Strings.UTF16LE + "', 'xml-policy': 'ALTER_INFOSET' }"),
         "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><meta charset=\"" + Strings.UTF16LE
         + "\"/></head><body>42</body></html>");
-    query(func.args(_CONVERT_STRING_TO_BASE64.args("<html><head><meta charset='ISO-8859-7'></head>"
+    query(func.args(_BIN_ENCODE_STRING.args("<html><head><meta charset='ISO-8859-7'></head>"
         + "<body>\u20AC</body>", "ISO-8859-7"), " { 'heuristics': 'NONE' }"),
         "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><meta charset=\"ISO-8859-7\"/></head>"
         + "<body>\u20AC</body></html>");
@@ -3705,9 +3705,9 @@ return
     query(func.args("<x:doc xmlns:x='X'/>"), "<x:doc xmlns:x=\"X\"/>");
     query(func.args("<x:doc xmlns:x='X'/>", " { 'stripns': false() }"), "<x:doc xmlns:x=\"X\"/>");
     query(func.args("<x:doc xmlns:x='X'/>", " { 'stripns': true() }"), "<doc/>");
-    query(func.args(_CONVERT_STRING_TO_HEX.args("<?xml version='1.0' encoding='" + Strings.UTF16LE
-        + "'?><x>42</x>", Strings.UTF16LE)), "<x>42</x>");
-    query(func.args(_CONVERT_STRING_TO_BASE64.args("<?xml version='1.0' encoding='ISO-8859-7'?><x>"
+    query(func.args(" xs:hexBinary(" + _BIN_ENCODE_STRING.args("<?xml version='1.0' encoding='"
+        + Strings.UTF16LE + "'?><x>42</x>", Strings.UTF16LE) + ")"), "<x>42</x>");
+    query(func.args(_BIN_ENCODE_STRING.args("<?xml version='1.0' encoding='ISO-8859-7'?><x>"
         + "\u20AC</x>", "ISO-8859-7")), "<x>\u20AC</x>");
 
     final String path = "src/test/resources/parse-xml.entity";
@@ -3775,9 +3775,9 @@ return
     query(func.args("<x:doc xmlns:x='X'/>"), "<x:doc xmlns:x=\"X\"/>");
     query(func.args("<x:doc xmlns:x='X'/>", " { 'stripns': false() }"), "<x:doc xmlns:x=\"X\"/>");
     query(func.args("<x:doc xmlns:x='X'/>", " { 'stripns': true() }"), "<doc/>");
-    query(func.args(_CONVERT_STRING_TO_HEX.args("<?xml version='1.0' encoding='" + Strings.UTF16LE
-        + "'?><x/><y/>", Strings.UTF16LE)), "<x/><y/>");
-    query(func.args(_CONVERT_STRING_TO_BASE64.args("<?xml version='1.0' encoding='ISO-8859-7'?><x>"
+    query(func.args(" xs:hexBinary(" + _BIN_ENCODE_STRING.args("<?xml version='1.0' encoding='"
+        + Strings.UTF16LE + "'?><x/><y/>", Strings.UTF16LE) + ")"), "<x/><y/>");
+    query(func.args(_BIN_ENCODE_STRING.args("<?xml version='1.0' encoding='ISO-8859-7'?><x>"
         + "\u20AC</x><y>\u20AF</y>", "ISO-8859-7")), "<x>\u20AC</x><y>\u20AF</y>");
 
     // GH-2449

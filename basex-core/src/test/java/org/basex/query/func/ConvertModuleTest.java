@@ -23,9 +23,9 @@ public final class ConvertModuleTest extends SandboxTest {
         "66\n97\n115\n101\n88\n32\n105\n115\n32\n99\n111\n111\n108");
     query(func.args(" xs:base64Binary(xs:hexBinary('4261736558'))"), "66\n97\n115\n101\n88");
     query(func.args(" xs:base64Binary(<x>AAE=</x>)"), "0\n1");
-    query(func.args(_CONVERT_STRING_TO_BASE64.args("a")), 97);
-    query(COUNT.args(func.args(_CONVERT_STRING_TO_BASE64.args("\u00e4"))), 2);
-    query(COUNT.args(func.args(_CONVERT_STRING_TO_BASE64.args("123"))), 3);
+    query(func.args(_BIN_ENCODE_STRING.args("a")), 97);
+    query(COUNT.args(func.args(_BIN_ENCODE_STRING.args("\u00e4"))), 2);
+    query(COUNT.args(func.args(_BIN_ENCODE_STRING.args("123"))), 3);
   }
 
   /** Test method. */
@@ -34,18 +34,6 @@ public final class ConvertModuleTest extends SandboxTest {
     // successful queries
     query(func.args(" xs:hexBinary('ff')"), 255);
     query(func.args(" xs:hexBinary('007f8081ff')"), "0\n127\n128\n129\n255");
-  }
-
-  /** Test method. */
-  @Test public void binaryToString() {
-    final Function func = _CONVERT_BINARY_TO_STRING;
-    // successful queries
-    query(func.args(" xs:base64Binary(xs:hexBinary('41'))"), "A");
-    query(func.args(" xs:hexBinary('41')"), "A");
-    query(func.args(" xs:hexBinary('41')", "CP1252"), "A");
-    query(func.args(" xs:hexBinary('12')", "CP1252", true) + " => string-to-codepoints()", 18);
-    query(func.args(" xs:hexBinary('12')", "CP1252", false) + " => string-to-codepoints()", 18);
-    error(func.args(" xs:hexBinary('41')", "X"), CONVERT_ENCODING_X);
   }
 
   /** Test method. */
@@ -170,27 +158,5 @@ public final class ConvertModuleTest extends SandboxTest {
     final Function func = _CONVERT_INTEGER_TO_DAYTIME;
     // successful queries
     query(func.args(" 0"), "PT0S");
-  }
-
-  /** Test method. */
-  @Test public void stringToBase64() {
-    final Function func = _CONVERT_STRING_TO_BASE64;
-    // successful queries
-    query("string( " + func.args("a") + ')', "YQ==");
-    query("string( " + func.args("a", "UTF-8") + ')', "YQ==");
-    query("string( " + func.args("a", "US-ASCII") + ')', "YQ==");
-    error(func.args("\u00fc", "US-ASCII"), CONVERT_BINARY_X_X);
-    error(func.args("a", "X"), CONVERT_ENCODING_X);
-  }
-
-  /** Test method. */
-  @Test public void stringToHex() {
-    final Function func = _CONVERT_STRING_TO_HEX;
-    // successful queries
-    query("string( " + func.args("a") + ')', 61);
-    query("string( " + func.args("a", "UTF-8") + ')', 61);
-    query("string( " + func.args("a", "US-ASCII") + ')', 61);
-    error(func.args("\u00fc", "US-ASCII"), CONVERT_BINARY_X_X);
-    error(func.args("a", "X"), CONVERT_ENCODING_X);
   }
 }

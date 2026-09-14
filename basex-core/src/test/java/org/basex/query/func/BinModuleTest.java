@@ -134,6 +134,11 @@ public final class BinModuleTest extends SandboxTest {
     error(func.args(hex(""), "UTF-8", 0, 1),  BIN_IOOR_X_X);
     error(func.args(hex(""), "X"),            BIN_UE_X);
     error(func.args(hex("FF"), "UTF-8"),      BIN_CE_X);
+
+    // lazy input
+    final String path = "src/test/resources/parse-xml.entity";
+    query(func.args(_FILE_READ_BINARY.args(path)), "<b/>");
+    query(func.args(_FILE_READ_BINARY.args(path), " ()", 1, 1), "b");
   }
 
   /** Test method. */

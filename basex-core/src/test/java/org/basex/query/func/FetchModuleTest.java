@@ -33,11 +33,11 @@ public final class FetchModuleTest extends SandboxTest {
   @Test public void binaryDoc() {
     final Function func = _FETCH_BINARY_DOC;
     // successful queries
-    query(func.args(_CONVERT_STRING_TO_BASE64.args("<x/>")), "<x/>");
+    query(func.args(_BIN_ENCODE_STRING.args("<x/>")), "<x/>");
     final String encoding = "CP1252";
     final String xml = "<x>Ä</x>";
     final String data = "<?xml version=''1.0'' encoding=''" + encoding + "''?>" + xml;
-    query(func.args(_CONVERT_STRING_TO_BASE64.args(" '" + data + '\'', encoding)), xml);
+    query(func.args(_BIN_ENCODE_STRING.args(" '" + data + '\'', encoding)), xml);
   }
 
   /** Test method. */

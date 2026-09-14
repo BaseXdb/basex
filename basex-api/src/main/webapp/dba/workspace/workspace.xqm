@@ -149,7 +149,7 @@ function dba:action(
           void(
             for key $name value $content in $files
             where matches($name, $utils:XQUERY-REGEX, 'i')
-            return utils:query-parse(convert:binary-to-string($content), $dir || $name)
+            return utils:query-parse(bin:decode-string($content), $dir || $name)
           ),
           for key $name value $content in $files
           return file:write-binary(utils:safe-path($dir, $name), $content)

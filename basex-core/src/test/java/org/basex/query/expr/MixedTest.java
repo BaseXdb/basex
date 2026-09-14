@@ -314,7 +314,7 @@ public final class MixedTest extends SandboxTest {
   @Test public void gh2100() {
     query(_DB_CREATE.args("x", " <x>A</x>", "x.xml"));
     query(_DB_GET.args("x") + " ! (delete node x, " +
-        _DB_PUT_BINARY.args("x", " convert:string-to-base64(string(x))", "pth") + ')');
+        _DB_PUT_BINARY.args("x", " bin:encode-string(string(x))", "pth") + ')');
     query(_DB_GET_BINARY.args("x", "pth"), "A");
 
     query(_DB_CREATE.args("x", " <x>A</x>", "x.xml"));

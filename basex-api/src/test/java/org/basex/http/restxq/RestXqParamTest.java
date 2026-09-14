@@ -94,7 +94,7 @@ public final class RestXqParamTest extends RestXqTest {
   @Test public void multipartUpload() throws Exception {
     register("declare %R:path('') %R:POST %R:form-param('files', '{$files}') " +
         "function m:f($files) { string-join(map:for-each($files, fn($name, $content) { " +
-        "$name || '=' || convert:binary-to-string($content) }), ',') };");
+        "$name || '=' || bin:decode-string($content) }), ',') };");
 
     final byte[] body = Token.token(
         "--bnd\r\nContent-Disposition: form-data; name=\"files\"; filename=\"a.txt\"\r\n\r\n" +

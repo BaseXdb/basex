@@ -146,12 +146,6 @@ public enum QueryError {
   // Conversion Module
 
   /** Error code. */
-  CONVERT_STRING_X(CONVERT, "string", "String conversion: %."),
-  /** Error code. */
-  CONVERT_BINARY_X_X(CONVERT, "binary", "Conversion of '%' to encoding '%' failed."),
-  /** Error code. */
-  CONVERT_ENCODING_X(CONVERT, "encoding", "%"),
-  /** Error code. */
   CONVERT_BASE_X(CONVERT, "base", "Unsupported base: %."),
   /** Error code. */
   CONVERT_INTEGER_X_X(CONVERT, "integer", "Invalid digit for base %: %."),

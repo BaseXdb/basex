@@ -482,7 +482,7 @@ public final class FileModuleTest extends SandboxTest {
     query(_FILE_WRITE.args(PATH1, "a\u00e4"));
     query(func.args(PATH1), "a\u00e4");
     // file with two codepoints
-    query(_FILE_WRITE_BINARY.args(PATH1, " " + _CONVERT_STRING_TO_BASE64.args("a\u00e4")));
+    query(_FILE_WRITE_BINARY.args(PATH1, " " + _BIN_ENCODE_STRING.args("a\u00e4")));
     query(func.args(PATH1), "a\u00e4");
   }
 

@@ -1,6 +1,5 @@
 package org.basex.query.func.convert;
 
-import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -9,7 +8,6 @@ import java.nio.charset.*;
 import java.util.*;
 
 import org.basex.io.in.*;
-import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.util.*;
 
@@ -20,22 +18,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class ConvertFn extends StandardFunc {
-  /**
-   * Converts the first argument from a string to a byte array.
-   * @param qc query context
-   * @return resulting value
-   * @throws QueryException query exception
-   */
-  final byte[] stringToBinary(final QueryContext qc) throws QueryException {
-    final byte[] value = toToken(arg(0), qc);
-    final String encoding = toEncodingOrNull(arg(1), CONVERT_ENCODING_X, qc);
-    try {
-      return toBinary(value, encoding);
-    } catch(final CharacterCodingException ex) {
-      throw CONVERT_BINARY_X_X.get(info, value, encoding).cause(ex);
-    }
-  }
-
   /**
    * Converts the first argument from a string to a byte array.
    * @param in input string

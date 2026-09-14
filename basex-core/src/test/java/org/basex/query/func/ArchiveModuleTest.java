@@ -188,23 +188,23 @@ public final class ArchiveModuleTest extends SandboxTest {
         "return count(" + func.args(" $archive", " $entries") + ')', 5);
     // extract single entry
     query("let $extracted := " + func.args(ZIP, "test/input.xml") +
-        "let $string := " + _CONVERT_BINARY_TO_STRING.args(" $extracted") +
+        "let $string := " + _BIN_DECODE_STRING.args(" $extracted") +
         "let $doc := " + PARSE_XML.args(" $string") +
         "return $doc//title/text()", "XML");
     query("let $archive := " + _FILE_READ_BINARY.args(ZIP) +
         "let $extracted := " + func.args(" $archive", "test/input.xml") +
-        "let $string := " + _CONVERT_BINARY_TO_STRING.args(" $extracted") +
+        "let $string := " + _BIN_DECODE_STRING.args(" $extracted") +
         "let $doc := " + PARSE_XML.args(" $string") +
         "return $doc//title/text()", "XML");
     // extract single entry
     query("let $archive := " + _FILE_READ_BINARY.args(ZIP) +
         "let $extracted := " + func.args(" $archive",
             " <archive:entry>test/input.xml</archive:entry>") +
-        "let $string := " + _CONVERT_BINARY_TO_STRING.args(" $extracted") +
+        "let $string := " + _BIN_DECODE_STRING.args(" $extracted") +
         "let $doc := " + PARSE_XML.args(" $string") +
         "return $doc//title/text()", "XML");
     query("let $extracted := " + func.args(ZIP, " <archive:entry>test/input.xml</archive:entry>") +
-        "let $string := " + _CONVERT_BINARY_TO_STRING.args(" $extracted") +
+        "let $string := " + _BIN_DECODE_STRING.args(" $extracted") +
         "let $doc := " + PARSE_XML.args(" $string") +
         "return $doc//title/text()", "XML");
     // extract non-existing entry
@@ -218,29 +218,29 @@ public final class ArchiveModuleTest extends SandboxTest {
     // legacy ZIP with CP437-encoded entry name (UTF-8 flag not set)
     query(_ARCHIVE_ENTRIES.args(ZIP_CP437) + "/text() = 'Prüfung.txt'", true);
     query(COUNT.args(func.args(ZIP_CP437)), 2);
-    query(_CONVERT_BINARY_TO_STRING.args(" " + func.args(ZIP_CP437, "Prüfung.txt")),
+    query(_BIN_DECODE_STRING.args(" " + func.args(ZIP_CP437, "Prüfung.txt")),
         "hello umlaut");
 
     // entry-name decoding across all bit-11/encoding combinations:
     // 1. UTF-8 flag set, UTF-8 (spec-conformant): decoded as UTF-8
     query(_ARCHIVE_ENTRIES.args(ZIP_UTF8) + "/text() = 'Prüfung.txt'", true);
-    query(_CONVERT_BINARY_TO_STRING.args(" " + func.args(ZIP_UTF8, "Prüfung.txt")),
+    query(_BIN_DECODE_STRING.args(" " + func.args(ZIP_UTF8, "Prüfung.txt")),
         "hello utf8");
     // 2. UTF-8 flag not set, ASCII: decoded as CP437 (= ASCII)
     query(_ARCHIVE_ENTRIES.args(ZIP_ASCII) + "/text() = 'plain.txt'", true);
-    query(_CONVERT_BINARY_TO_STRING.args(" " + func.args(ZIP_ASCII, "plain.txt")),
+    query(_BIN_DECODE_STRING.args(" " + func.args(ZIP_ASCII, "plain.txt")),
         "hello ascii");
     // 3. UTF-8 flag not set, Shift_JIS: CP437 fallback yields mojibake but stays readable;
     //    also a negative control for the mojibake heuristic. Shift_JIS bytes 93 FA 96 7B
     //    are not valid UTF-8, so Strings.fixCp437Mojibake leaves the CP437 decoding alone
     query(_ARCHIVE_ENTRIES.args(ZIP_SJIS) + "/text() = 'ô·û{.txt'", true);
-    query(_CONVERT_BINARY_TO_STRING.args(" " + func.args(ZIP_SJIS, "ô·û{.txt")),
+    query(_BIN_DECODE_STRING.args(" " + func.args(ZIP_SJIS, "ô·û{.txt")),
         "hello sjis");
     // 4. UTF-8 flag not set but bytes are actually UTF-8 (Linux zip mis-flag): the CP437
     //    fallback would yield mojibake "Pr├╝fung.txt"; Strings.fixCp437Mojibake recovers
     //    the intended UTF-8 name via the CP437→UTF-8 round-trip heuristic
     query(_ARCHIVE_ENTRIES.args(ZIP_UTF8_NO_FLAG) + "/text() = 'Prüfung.txt'", true);
-    query(_CONVERT_BINARY_TO_STRING.args(" " + func.args(ZIP_UTF8_NO_FLAG, "Prüfung.txt")),
+    query(_BIN_DECODE_STRING.args(" " + func.args(ZIP_UTF8_NO_FLAG, "Prüfung.txt")),
         "hello mojibake");
   }
 
@@ -425,7 +425,7 @@ public final class ArchiveModuleTest extends SandboxTest {
     query(_ARCHIVE_EXTRACT_BINARY.args(tmp), "");
     // binary content round-trip
     query(func.args(tmp, "blob", " xs:hexBinary('414243')"));
-    query(_CONVERT_BINARY_TO_STRING.args(" " + _ARCHIVE_EXTRACT_BINARY.args(tmp, "blob")), "ABC");
+    query(_BIN_DECODE_STRING.args(" " + _ARCHIVE_EXTRACT_BINARY.args(tmp, "blob")), "ABC");
     // archive:entry header preserves last-modified attribute
     final String lastModified = "2024-06-01T12:00:00Z";
     query(func.args(tmp,
@@ -497,7 +497,7 @@ public final class ArchiveModuleTest extends SandboxTest {
       query(_ARCHIVE_ENTRIES.args(path) + "/text()", "x");
       query(_ARCHIVE_OPTIONS.args(path) + "?format", "zip");
       query(_ARCHIVE_EXTRACT_TEXT.args(path, "x"), "hello");
-      query(_CONVERT_BINARY_TO_STRING.args(" " + _ARCHIVE_EXTRACT_BINARY.args(path, "x")),
+      query(_BIN_DECODE_STRING.args(" " + _ARCHIVE_EXTRACT_BINARY.args(path, "x")),
           "hello");
 
       // extract-to: writes to the filesystem

@@ -26,7 +26,7 @@ public final class RestXqBodyTest extends RestXqTest {
     final String payload = sb.toString();
 
     post(payload, "declare %R:POST('{$x}') %R:path('') "
-        + "function m:f($x) { convert:binary-to-string($x) };", "", payload,
+        + "function m:f($x) { bin:decode-string($x) };", "", payload,
         MediaType.APPLICATION_OCTET_STREAM);
   }
 
