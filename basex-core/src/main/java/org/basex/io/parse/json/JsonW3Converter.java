@@ -52,15 +52,10 @@ public final class JsonW3Converter extends JsonConverter {
   /**
    * Constructor.
    * @param opts JSON options
-   * @throws QueryException query exception
    */
-  JsonW3Converter(final JsonParserOptions opts) throws QueryException {
+  JsonW3Converter(final JsonParserOptions opts) {
     super(opts);
     fmt = jopts.get(JsonParserOptions.NUMBER_FORMAT);
-    final JsonDuplicates dupl = jopts.get(JsonParserOptions.DUPLICATES);
-    if(dupl == JsonDuplicates.RETAIN) {
-      throw optionError(JsonParserOptions.DUPLICATES.name(), dupl);
-    }
   }
 
   @Override

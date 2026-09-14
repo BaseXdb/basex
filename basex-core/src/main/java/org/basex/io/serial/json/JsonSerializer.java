@@ -53,7 +53,7 @@ public abstract class JsonSerializer extends StandardSerializer {
       throws IOException {
     return switch(so.get(SerializerOptions.JSON).get(JsonOptions.FORMAT)) {
       case JSONML -> new JsonMLSerializer(os, so);
-      case W3_XML -> new JsonBasicSerializer(os, so);
+      case W3_XML -> new JsonW3XmlSerializer(os, so);
       default     -> new JsonNodeSerializer(os, so);
     };
   }

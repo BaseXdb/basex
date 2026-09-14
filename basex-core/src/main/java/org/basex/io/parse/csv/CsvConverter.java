@@ -75,10 +75,9 @@ public abstract class CsvConverter extends Job {
     this.copts = copts;
     lax = copts.get(CsvOptions.LAX);
     attributes = copts.get(CsvOptions.FORMAT) == CsvFormat.ATTRIBUTES;
-    final Value header = copts.get(CsvOptions.HEADER);
-    if(header.seqType().type.isStringOrUntyped()) {
+    if(copts.header() == null) {
       try {
-        for(final Item columnName : header) header(columnName.string(null));
+        for(final Item name : copts.get(CsvOptions.HEADER)) header(name.string(null));
       } catch(final QueryException ex) {
         throw Util.notExpected(ex);
       }

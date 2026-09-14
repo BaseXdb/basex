@@ -20,9 +20,8 @@ public final class JsonW3XmlConverter extends JsonXmlConverter {
   /**
    * Constructor.
    * @param opts JSON options
-   * @throws QueryException query exception
    */
-  JsonW3XmlConverter(final JsonParserOptions opts) throws QueryException {
+  JsonW3XmlConverter(final JsonParserOptions opts) {
     super(opts);
     escape = jopts.get(JsonParserOptions.ESCAPE);
   }

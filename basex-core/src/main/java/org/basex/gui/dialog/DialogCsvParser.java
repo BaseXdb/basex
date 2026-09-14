@@ -72,7 +72,7 @@ final class DialogCsvParser extends DialogParser {
       format = new BaseXCombo(dialog, formats);
       format.setSelectedItem(copts.get(CsvOptions.FORMAT));
 
-    header = new BaseXCheckBox(dialog, FIRST_LINE_HEADER, copts.get(CsvOptions.HEADER) == Bln.TRUE);
+    header = new BaseXCheckBox(dialog, FIRST_LINE_HEADER, copts.header() == Boolean.TRUE);
     quotes = new BaseXCheckBox(dialog, PARSE_QUOTES, CsvOptions.QUOTES, copts);
     backslashes = new BaseXCheckBox(dialog, BACKSLASHES, CsvOptions.BACKSLASHES, copts);
     lax = new BaseXCheckBox(dialog, LAX_NAME_CONVERSION, CsvOptions.LAX, copts);

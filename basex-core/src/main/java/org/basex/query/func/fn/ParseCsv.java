@@ -1,9 +1,9 @@
 package org.basex.query.func.fn;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.util.*;
 
 import org.basex.build.csv.*;
 import org.basex.build.csv.CsvOptions.*;
@@ -12,6 +12,7 @@ import org.basex.io.parse.csv.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
 
@@ -22,6 +23,14 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public abstract class ParseCsv extends ParseFn {
+  /** Options of fn:csv-to-arrays. */
+  private static final Map<String, Option<?>> W3_ARRAYS_OPTIONS = options(Map.of(),
+      CsvOptions.SEPARATOR, CsvOptions.QUOTE_CHARACTER, CsvOptions.COMMENT_MARKER,
+      CsvOptions.TRIM_WHITESPACE);
+  /** Options of fn:parse-csv and fn:csv-to-xml. */
+  private static final Map<String, Option<?>> W3_OPTIONS = options(W3_ARRAYS_OPTIONS,
+      CsvOptions.HEADER, CsvOptions.SELECT_COLUMNS, CsvOptions.TRIM_ROWS);
+
   /**
    * Returns the default conversion format.
    * @return format, or {@code null}
@@ -30,11 +39,30 @@ public abstract class ParseCsv extends ParseFn {
 
   @Override
   protected final Options options(final QueryContext qc) throws QueryException {
+    final XQMap map = toEmptyMap(arg(1), qc);
+    final CsvParserOptions copts = new CsvParserOptions();
+    copts.assign(map, qc, info);
+
     final CsvFormat format = format();
-    final Options copts = format == CsvFormat.W3 || format == CsvFormat.W3_XML ?
-      new CsvW3Options() : format == CsvFormat.W3_ARRAYS ? new CsvW3ArraysOptions() :
-      new CsvParserOptions();
-    return toOptions(arg(1), copts, qc);
+    if(format != null) {
+      // W3 functions: restricted options, literal single characters, strict quoting
+      final Map<String, Option<?>> allowed = format == CsvFormat.W3_ARRAYS ?
+        W3_ARRAYS_OPTIONS : W3_OPTIONS;
+      for(final Item key : map.keys()) {
+        if(key instanceof QNm) continue;
+        final String name = Token.string(key.string(info));
+        if(!allowed.containsKey(name)) {
+          throw INVALIDOPTION_X.get(info, Options.similar(name, allowed));
+        }
+      }
+      // header strings are column names
+      final Value header = map.get(Str.get(CsvOptions.HEADER.name()));
+      if(!header.isEmpty()) copts.set(CsvOptions.HEADER, header);
+      copts.checkW3(info);
+      copts.set(CsvOptions.STRICT_QUOTING, true);
+      copts.set(CsvOptions.FORMAT, format);
+    }
+    return copts;
   }
 
   @Override
@@ -50,30 +78,19 @@ public abstract class ParseCsv extends ParseFn {
   @Override
   final Value parse(final TextInput ti, final Options options, final QueryContext qc)
       throws QueryException, IOException {
+    return CsvConverter.get((CsvParserOptions) options).convert(ti, "", info, qc);
+  }
 
-    // parse options
-    final CsvFormat format = format();
-    final Options copts = format == CsvFormat.W3 || format == CsvFormat.W3_XML ?
-      new CsvW3Options() : format == CsvFormat.W3_ARRAYS ? new CsvW3ArraysOptions() :
-      new CsvParserOptions();
-    toOptions(arg(1), copts, qc);
-
-    // transfer to common CSV options instance
-    final CsvParserOptions cpopts;
-    if(format == CsvFormat.W3 || format == CsvFormat.W3_XML || format == CsvFormat.W3_ARRAYS) {
-      cpopts = ((CsvW3ArraysOptions) copts).finish(info, format);
-    } else {
-      cpopts = (CsvParserOptions) copts;
-      final Value hdr = copts.get(CsvOptions.HEADER);
-      if(hdr.size() == 1 && hdr.seqType().type.isStringOrUntyped()) {
-        final Boolean b = Strings.toBoolean(string(((Item) hdr).string(null)));
-        if(b != null) copts.put(CsvOptions.HEADER, Bln.get(b));
-      }
-    }
-    if(format != null) cpopts.set(CsvOptions.FORMAT, format);
-
-    // convert data
-    final CsvConverter converter = CsvConverter.get(cpopts);
-    return converter.convert(ti, "", info, qc);
+  /**
+   * Creates a map with the specified options.
+   * @param base options to be copied
+   * @param options options to be added
+   * @return map
+   */
+  private static Map<String, Option<?>> options(final Map<String, Option<?>> base,
+      final Option<?>... options) {
+    final Map<String, Option<?>> map = new HashMap<>(base);
+    for(final Option<?> option : options) map.put(option.name(), option);
+    return map;
   }
 }

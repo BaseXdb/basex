@@ -6,7 +6,6 @@ import java.io.*;
 
 import org.basex.build.*;
 import org.basex.io.parse.json.*;
-import org.basex.query.*;
 import org.basex.util.*;
 
 /**
@@ -29,11 +28,9 @@ final class JsonDirectBuilderConverter extends JsonBuilderConverter {
    * Constructor.
    * @param jopts JSON options
    * @param builder database builder
-   * @throws QueryException query exception
    */
-  JsonDirectBuilderConverter(final JsonParserOptions jopts, final Builder builder)
-      throws QueryException {
-    super(jopts, builder);
+  JsonDirectBuilderConverter(final JsonParserOptions jopts, final Builder builder) {
+    super(builder);
     strings = jopts.get(JsonOptions.STRINGS);
     lax = jopts.get(JsonOptions.LAX);
   }

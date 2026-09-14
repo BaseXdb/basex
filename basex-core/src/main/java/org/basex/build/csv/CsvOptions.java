@@ -36,7 +36,8 @@ public class CsvOptions extends Options {
   /** Option: quote character. */
   public static final StringOption QUOTE_CHARACTER = new StringOption("quote-character", "\"");
   /** Option: comment marker. */
-  public static final StringOption COMMENT_MARKER = new StringOption("comment-marker", "");
+  public static final StringOption COMMENT_MARKER =
+      new StringOption("comment-marker", null, STRING_ZO);
   /** Option: trim whitespace. */
   public static final BooleanOption TRIM_WHITESPACE = new BooleanOption("trim-whitespace", false);
   /** Option: strict quoting (implies QUOTES). */
@@ -100,6 +101,11 @@ public class CsvOptions extends Options {
   public synchronized void assign(final Item name, final Value value, final QueryContext qc,
       final InputInfo info) throws QueryException {
     super.assign(name, value, qc, info);
+    // boolean-like string: convert to boolean (W3 functions: strings are column names)
+    if(get(HEADER) instanceof final Item item && item.type.isStringOrUntyped()) {
+      final Boolean b = Strings.toBoolean(Token.string(item.string(info)));
+      if(b != null) put(HEADER, Bln.get(b));
+    }
     validate(info);
   }
 
@@ -113,7 +119,7 @@ public class CsvOptions extends Options {
     for(final StringOption option : List.of(SEPARATOR, QUOTE_CHARACTER, COMMENT_MARKER)) {
       final String value = get(option);
       // an empty comment marker indicates that comments are not recognized
-      if(option == COMMENT_MARKER && value.isEmpty()) continue;
+      if(option == COMMENT_MARKER && (value == null || value.isEmpty())) continue;
       final int cp = option == SEPARATOR ? separator() : checkCodepoint(value);
       if(cp == -1) throw CSV_SINGLECHAR_X_X.get(info, option.name(), value);
       // newlines are reserved for delimiting rows
@@ -150,7 +156,35 @@ public class CsvOptions extends Options {
    */
   public int commentMarker() {
     final String marker = get(COMMENT_MARKER);
-    return marker.isEmpty() ? -1 : checkCodepoint(marker);
+    return marker == null || marker.isEmpty() ? -1 : checkCodepoint(marker);
+  }
+
+  /**
+   * Returns the header flag.
+   * @return flag, or {@code null} if column names are supplied
+   */
+  public Boolean header() {
+    return get(HEADER) instanceof final Bln bln ? bln.bool(null) : null;
+  }
+
+  /**
+   * Checks if the options conform to the W3 functions.
+   * @param info input info (can be {@code null})
+   * @throws QueryException query exception
+   */
+  public void checkW3(final InputInfo info) throws QueryException {
+    // literal single characters
+    for(final StringOption option : List.of(SEPARATOR, QUOTE_CHARACTER, COMMENT_MARKER)) {
+      final String value = get(option);
+      if(value != null && value.codePointCount(0, value.length()) != 1) {
+        throw CSV_SINGLECHAR_X_X.get(info, option.name(), value);
+      }
+    }
+    // header: boolean or column names
+    final Value header = get(HEADER);
+    if(!BOOLEAN_O.instance(header) && !header.seqType().type.isStringOrUntyped()) {
+      throw typeError(header, BasicType.STRING, info);
+    }
   }
 
   /**

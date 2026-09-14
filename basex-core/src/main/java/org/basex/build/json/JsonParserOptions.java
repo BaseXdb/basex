@@ -1,8 +1,10 @@
 package org.basex.build.json;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.value.type.Types.*;
 
 import org.basex.core.*;
+import org.basex.query.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
 
@@ -71,5 +73,37 @@ public final class JsonParserOptions extends JsonOptions {
    */
   public JsonParserOptions(final JsonParserOptions opts) {
     super(opts);
+  }
+
+  /**
+   * Checks if the options are compatible with the conversion format.
+   * @param info input info (can be {@code null})
+   * @throws QueryException query exception
+   */
+  public void check(final InputInfo info) throws QueryException {
+    final JsonFormat format = get(FORMAT);
+    final boolean w3 = format == JsonFormat.W3;
+    if(get(VALIDATE) != null && format != JsonFormat.W3_XML) throw unknown(VALIDATE, info);
+    if(get(NUMBER_FORMAT) != JsonNumberFormat.DOUBLE && !w3) throw unknown(NUMBER_FORMAT, info);
+    if(!get(NULL).isEmpty() && !w3) throw unknown(NULL, info);
+    // maps cannot retain duplicates, XML formats cannot pick the last one
+    final JsonDuplicates dupl = get(DUPLICATES);
+    if(dupl == (w3 ? JsonDuplicates.RETAIN : JsonDuplicates.USE_LAST)) {
+      throw OPTION_JSON_X.get(info, Util.info("'%':'%' is not supported by the target format.",
+          DUPLICATES.name(), dupl));
+    }
+    if(!get(FALLBACK).isEmpty() && get(ESCAPE)) {
+      throw OPTION_JSON_X.get(info, "Escape cannot be combined with fallback function.");
+    }
+  }
+
+  /**
+   * Returns an error for an option that is unknown to the conversion format.
+   * @param option option
+   * @param info input info (can be {@code null})
+   * @return error
+   */
+  private static QueryException unknown(final Option<?> option, final InputInfo info) {
+    return INVALIDOPTION_X.get(info, Options.unknown(option));
   }
 }

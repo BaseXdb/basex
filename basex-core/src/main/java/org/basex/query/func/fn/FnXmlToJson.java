@@ -8,6 +8,7 @@ import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.func.json.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -33,25 +34,11 @@ public final class FnXmlToJson extends StandardFunc {
     if(indent == null) options.set(JsonSerialOptions.INDENT,
         qc.parameters().get(SerializerOptions.INDENT) == YesNo.YES);
 
-    return Str.get(serialize(node.iter(), options(options), INVALIDOPTION_X, qc));
+    return Str.get(serialize(node.iter(), JsonSerialize.options(options), INVALIDOPTION_X, qc));
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
     return optFirst();
-  }
-
-  /**
-   * Creates parameters for options.
-   * @param jopts JSON options
-   * @return options
-   */
-  public static SerializerOptions options(final JsonSerialOptions jopts) {
-    final SerializerOptions sopts = new SerializerOptions();
-    sopts.set(SerializerOptions.METHOD, SerialMethod.JSON);
-    sopts.set(SerializerOptions.JSON, jopts);
-    final Boolean indent = jopts.get(JsonSerialOptions.INDENT);
-    if(indent != null) sopts.set(SerializerOptions.INDENT, indent ? YesNo.YES : YesNo.NO);
-    return sopts;
   }
 }

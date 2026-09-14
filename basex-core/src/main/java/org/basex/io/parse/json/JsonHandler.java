@@ -2,7 +2,6 @@ package org.basex.io.parse.json;
 
 import org.basex.core.jobs.*;
 import org.basex.query.*;
-import org.basex.util.*;
 
 /**
  * Sink for the parse events emitted by {@link JsonParser}, in the style of a SAX content
@@ -22,17 +21,6 @@ public abstract class JsonHandler extends Job {
    */
   public final void fallback(final QueryFunction<byte[], byte[]> func) {
     fallback = func;
-  }
-
-  /**
-   * Raises an error for an option value that is not supported by the target format.
-   * @param name option name
-   * @param value option value
-   * @return query exception
-   */
-  protected static QueryException optionError(final String name, final Object value) {
-    return QueryError.OPTION_JSON_X.get(null,
-        Util.info("'%':'%' is not supported by the target format.", name, value));
   }
 
   /**

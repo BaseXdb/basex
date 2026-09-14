@@ -3,9 +3,7 @@ package org.basex.build.json;
 import java.io.*;
 
 import org.basex.build.*;
-import org.basex.build.json.JsonParserOptions.*;
 import org.basex.io.parse.json.*;
-import org.basex.query.*;
 import org.basex.util.*;
 
 /**
@@ -26,17 +24,10 @@ abstract class JsonBuilderConverter extends JsonHandler {
 
   /**
    * Constructor.
-   * @param jopts JSON parser options
    * @param builder database builder
-   * @throws QueryException query exception
    */
-  JsonBuilderConverter(final JsonParserOptions jopts, final Builder builder)
-      throws QueryException {
+  JsonBuilderConverter(final Builder builder) {
     this.builder = builder;
-    final JsonDuplicates dupl = jopts.get(JsonParserOptions.DUPLICATES);
-    if(dupl == JsonDuplicates.USE_LAST) {
-      throw optionError(JsonParserOptions.DUPLICATES.name(), dupl);
-    }
   }
 
   /**

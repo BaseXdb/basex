@@ -12,6 +12,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -23,7 +24,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class CsvW3Converter extends CsvXQueryConverter {
+public final class CsvW3Converter extends CsvW3ArraysConverter {
   /**
    * Constructor.
    * @param opts CSV options
@@ -34,22 +35,19 @@ public final class CsvW3Converter extends CsvXQueryConverter {
 
   @Override
   protected Value finish(final InputInfo ii, final QueryContext qc) throws QueryException {
-    final XQMap map = (XQMap) super.finish(ii, qc);
-    Value columns = copts.get(CsvOptions.HEADER);
-    if(columns.seqType().instanceOf(BOOLEAN_O)) {
-      columns = map.get(CsvXQueryConverter.NAMES);
-      if(qc != null) columns = columns.atomValue(qc, ii);
-    }
+    final Value rows = super.finish(ii, qc);
     final MapBuilder columnIndexBuilder = new MapBuilder();
-    int i = 0;
-    for(final Item column : columns) {
-      ++i;
-      if(column.string(ii).length > 0 && !columnIndexBuilder.contains(column)) {
-        columnIndexBuilder.put(column, Itr.get(i));
+    final int hs = headers.size();
+    for(int h = 0; h < hs; h++) {
+      final byte[] header = headers.get(h);
+      if(header.length > 0) {
+        final Str column = Str.get(header);
+        if(!columnIndexBuilder.contains(column)) columnIndexBuilder.put(column, Itr.get(h + 1));
       }
     }
     final XQMap columnIndex = columnIndexBuilder.map();
-    final Value rows = map.get(CsvXQueryConverter.RECORDS);
+    // must be created last: the token list is consumed
+    final Value columns = StrSeq.get(headers);
 
     // without a query context, the get function is unavailable and no record can be built
     if(qc == null) return new MapBuilder().put(COLUMNS, columns).

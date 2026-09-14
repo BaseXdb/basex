@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import java.util.*;
 
 import org.basex.build.json.*;
-import org.basex.build.json.JsonParserOptions.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -55,17 +54,12 @@ abstract class JsonXmlConverter extends JsonConverter {
   /**
    * Constructor.
    * @param opts JSON options
-   * @throws QueryException query exception
    */
-  JsonXmlConverter(final JsonParserOptions opts) throws QueryException {
+  JsonXmlConverter(final JsonParserOptions opts) {
     super(opts);
     merge = jopts.get(JsonOptions.MERGE);
     strings = jopts.get(JsonOptions.STRINGS);
 
-    final JsonDuplicates dupl = jopts.get(JsonParserOptions.DUPLICATES);
-    if(dupl == JsonDuplicates.USE_LAST) {
-      throw optionError(JsonParserOptions.DUPLICATES.name(), dupl);
-    }
   }
 
   @Override

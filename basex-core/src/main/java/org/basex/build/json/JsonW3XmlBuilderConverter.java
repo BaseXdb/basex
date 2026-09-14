@@ -33,11 +33,9 @@ final class JsonW3XmlBuilderConverter extends JsonBuilderConverter {
    * Constructor.
    * @param jopts JSON options
    * @param builder database builder
-   * @throws QueryException query exception
    */
-  JsonW3XmlBuilderConverter(final JsonParserOptions jopts, final Builder builder)
-      throws QueryException {
-    super(jopts, builder);
+  JsonW3XmlBuilderConverter(final JsonParserOptions jopts, final Builder builder) {
+    super(builder);
     escape = jopts.get(JsonParserOptions.ESCAPE);
   }
 

@@ -5,7 +5,6 @@ import java.io.*;
 import org.basex.build.csv.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
-import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -59,7 +58,7 @@ public final class CsvParser {
   public CsvParser(final TextInput input, final CsvParserOptions opts, final CsvConverter conv) {
     this.input = input;
     this.conv = conv;
-    header = opts.get(CsvOptions.HEADER) == Bln.TRUE;
+    header = opts.header() == Boolean.TRUE;
     separator = opts.separator();
     quoteCharacter = opts.quoteCharacter();
     commentMarker = opts.commentMarker();

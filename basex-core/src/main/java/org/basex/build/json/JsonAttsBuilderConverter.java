@@ -6,7 +6,6 @@ import java.io.*;
 
 import org.basex.build.*;
 import org.basex.io.parse.json.*;
-import org.basex.query.*;
 
 /**
  * Converts a JSON document to XML and emits the result as events to a database builder,
@@ -28,11 +27,9 @@ final class JsonAttsBuilderConverter extends JsonBuilderConverter {
    * Constructor.
    * @param jopts JSON options
    * @param builder database builder
-   * @throws QueryException query exception
    */
-  JsonAttsBuilderConverter(final JsonParserOptions jopts, final Builder builder)
-      throws QueryException {
-    super(jopts, builder);
+  JsonAttsBuilderConverter(final JsonParserOptions jopts, final Builder builder) {
+    super(builder);
     strings = jopts.get(JsonOptions.STRINGS);
   }
 

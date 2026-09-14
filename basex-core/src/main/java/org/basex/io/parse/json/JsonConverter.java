@@ -39,6 +39,19 @@ public abstract class JsonConverter extends JsonHandler {
    * @throws QueryException query exception
    */
   public static JsonConverter get(final JsonParserOptions jopts) throws QueryException {
+    return get(jopts, null);
+  }
+
+  /**
+   * Returns a JSON converter for the given configuration.
+   * @param jopts options
+   * @param info input info (can be {@code null})
+   * @return JSON converter
+   * @throws QueryException query exception
+   */
+  public static JsonConverter get(final JsonParserOptions jopts, final InputInfo info)
+      throws QueryException {
+    jopts.check(info);
     return switch(jopts.get(JsonOptions.FORMAT)) {
       case ATTRIBUTES -> new JsonAttsConverter(jopts);
       case JSONML     -> new JsonMLConverter(jopts);

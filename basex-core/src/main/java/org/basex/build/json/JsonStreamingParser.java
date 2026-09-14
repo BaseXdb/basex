@@ -44,9 +44,8 @@ public final class JsonStreamingParser extends SingleParser {
    * @param source document source
    * @param options main options
    * @return JSON parser (streaming or classic)
-   * @throws IOException I/O exception
    */
-  public static SingleParser get(final IO source, final MainOptions options) throws IOException {
+  public static SingleParser get(final IO source, final MainOptions options) {
     final JsonParserOptions jopts = options.get(MainOptions.JSONPARSER);
     final JsonOptions.JsonFormat fmt = jopts.get(FORMAT);
     final boolean merge = jopts.get(MERGE);
@@ -54,7 +53,6 @@ public final class JsonStreamingParser extends SingleParser {
       case W3_XML -> b -> new JsonW3XmlBuilderConverter(jopts, b);
       case DIRECT -> merge ? null : b -> new JsonDirectBuilderConverter(jopts, b);
       case ATTRIBUTES -> merge ? null : b -> new JsonAttsBuilderConverter(jopts, b);
-      case JSONML -> null; // not yet supported; fall back to non-streaming
       default -> null;
     };
     // fallback to non-streaming parser if streaming path is not applicable
@@ -66,6 +64,7 @@ public final class JsonStreamingParser extends SingleParser {
   @Override
   protected void parse() throws IOException {
     try {
+      jopts.check(null);
       final JsonBuilderConverter conv = converterFactory.apply(builder);
       final String encoding = jopts.get(JsonParserOptions.ENCODING);
       try(NewlineInput ni = new NewlineInput(source, encoding)) {

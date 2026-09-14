@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
@@ -18,13 +17,12 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * This class serializes items as JSON. The input must conform to the rules
- * defined in the {@link JsonDirectConverter} and {@link JsonAttsConverter} class.
+ * This class serializes items as JSON. The input must conform to the format of fn:json-to-xml.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class JsonBasicSerializer extends JsonSerializer {
+public final class JsonW3XmlSerializer extends JsonSerializer {
   /** Output key (false for arrays). */
   private boolean printKey;
   /** Printed keys. */
@@ -36,7 +34,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
    * @param sopts serialization parameters
    * @throws IOException I/O exception
    */
-  public JsonBasicSerializer(final OutputStream os, final SerializerOptions sopts)
+  public JsonW3XmlSerializer(final OutputStream os, final SerializerOptions sopts)
       throws IOException {
     super(os, sopts);
   }

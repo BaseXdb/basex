@@ -3,7 +3,6 @@ package org.basex.io.parse.json;
 import static org.basex.io.parse.json.JsonConstants.*;
 
 import org.basex.build.json.*;
-import org.basex.query.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -55,9 +54,8 @@ public final class JsonDirectConverter extends JsonXmlConverter {
   /**
    * Constructor.
    * @param opts JSON options
-   * @throws QueryException query exception
    */
-  JsonDirectConverter(final JsonParserOptions opts) throws QueryException {
+  JsonDirectConverter(final JsonParserOptions opts) {
     super(opts);
     lax = jopts.get(JsonOptions.LAX);
   }

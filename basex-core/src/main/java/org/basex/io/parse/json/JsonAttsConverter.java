@@ -3,7 +3,6 @@ package org.basex.io.parse.json;
 import static org.basex.io.parse.json.JsonConstants.*;
 
 import org.basex.build.json.*;
-import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 
@@ -18,9 +17,8 @@ public final class JsonAttsConverter extends JsonXmlConverter {
   /**
    * Constructor.
    * @param opts JSON options
-   * @throws QueryException query exception
    */
-  JsonAttsConverter(final JsonParserOptions opts) throws QueryException {
+  JsonAttsConverter(final JsonParserOptions opts) {
     super(opts);
   }
 

@@ -14,7 +14,6 @@ import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -82,14 +81,7 @@ public abstract class CsvSerializer extends StandardSerializer {
     for(final int col : selectColumns) {
       if(col > maxCol) maxCol = col;
     }
-    final Value hdr = copts.get(CsvOptions.HEADER);
-    if(Types.BOOLEAN_O.instance(hdr)) {
-      header = ((Bln) hdr).bool(null);
-    } else if(hdr instanceof final Str str) {
-      final Boolean b = Strings.toBoolean(string(str.string()));
-      if(b != null) header = b;
-    }
-    if(sopts.yes(SerializerOptions.CSV_HEADER)) header = true;
+    header = copts.header() == Boolean.TRUE || sopts.yes(SerializerOptions.CSV_HEADER);
   }
 
   /**
