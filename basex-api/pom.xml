@@ -28,10 +28,6 @@
       <artifactId>basex-xqj</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.xmldb</groupId>
-      <artifactId>xmldb-api</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-server</artifactId>
     </dependency>

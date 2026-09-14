@@ -17,9 +17,9 @@ import org.xml.sax.helpers.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class SAXHandler extends DefaultHandler implements LexicalHandler {
+public final class SAXHandler extends DefaultHandler implements LexicalHandler {
   /** Builder reference. */
-  protected final Builder builder;
+  private final Builder builder;
 
   /** Strip namespaces. */
   private final boolean stripNS;
@@ -217,7 +217,7 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
    * @param ex exception
    * @return SAX exception
    */
-  protected static SAXException error(final IOException ex) {
+  private static SAXException error(final IOException ex) {
     final SAXException ioe = new SAXException(Util.message(ex));
     ioe.setStackTrace(ex.getStackTrace());
     return ioe;

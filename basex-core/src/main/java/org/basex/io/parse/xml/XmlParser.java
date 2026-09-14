@@ -42,16 +42,6 @@ public final class XmlParser {
 
   /**
    * Sets a content handler.
-   * @param handler content handler
-   * @return self reference
-   */
-  public XmlParser contentHandler(final ContentHandler handler) {
-    reader.setContentHandler(handler);
-    return this;
-  }
-
-  /**
-   * Sets a content handler.
    * @param stream input stream
    * @throws IOException I/O exception
    * @throws SAXException SAX exception

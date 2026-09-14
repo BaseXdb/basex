@@ -79,7 +79,7 @@ public enum Kind {
       if(value instanceof final BXDoc doc) return doc.getNode();
       try {
         if(value instanceof final Document doc) {
-          return new DBNode(MemBuilder.build(new DOMWrapper(doc, "", new MainOptions())));
+          return new DBNode(MemBuilder.build(new DOMWrapper(doc, new MainOptions())));
         }
         if(value instanceof final DocumentFragment df) {
           final String bu = df.getBaseURI();

@@ -29,11 +29,10 @@ public final class DOMWrapper extends Parser {
   /**
    * Constructor.
    * @param doc document instance
-   * @param filename filename
    * @param options main options
    */
-  public DOMWrapper(final Document doc, final String filename, final MainOptions options) {
-    super(filename, options);
+  public DOMWrapper(final Document doc, final MainOptions options) {
+    super("", options);
     this.doc = doc;
     stripNS = options.get(MainOptions.STRIPNS);
   }
