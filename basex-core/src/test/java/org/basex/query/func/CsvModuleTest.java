@@ -67,8 +67,15 @@ public final class CsvModuleTest extends SandboxTest {
                // was: "<csv><record><entry>X</entry></record></csv>");
     parse("X\n\n", "", "<csv><record><entry>X</entry></record><record/></csv>");
 
-    parse(" ' \" X\"'", "'quotes': true()", "<csv><record><entry> \" X\"</entry></record></csv>");
-    parse(" '\"X \" '", "'quotes': true()", "<csv><record><entry>X  </entry></record></csv>");
+    parse(" ' \" X\"'", "'strict-quoting': false()",
+        "<csv><record><entry> \" X\"</entry></record></csv>");
+    parse(" '\"X \" '", "'strict-quoting': false()",
+        "<csv><record><entry>X  </entry></record></csv>");
+    parse(" ' \" X\"'", "'quotes': false()", "<csv><record><entry> \" X\"</entry></record></csv>");
+    parse(" '\"X \" '", "'quotes': false()", "<csv><record><entry>\"X \" </entry></record></csv>");
+    parseError(" ' \" X\"'", "");
+    parseError(" '\"X \" '", "");
+    parseError(" '\"X'", "");
 
     parse("X\nY", "'header': false(), 'format': 'direct'", "...<entry>X</entry>");
     parse("X\nY", "'header': 'no', 'format': 'direct'", "...<entry>X</entry>");
@@ -133,10 +140,13 @@ public final class CsvModuleTest extends SandboxTest {
     parse("X\n", "'format': 'w3'", "...\"rows\":[\"X\"]");
     parse("X\n\n", "'format': 'w3'", "...\"rows\":([\"X\"],[])");
 
-    parse(" ' \"\"'", "'quotes': true(), 'format': 'w3'", "...\"rows\":[\" \"\"\"]");
-    parse(" ' \" X\"'", "'quotes': true(), 'format': 'w3'", "...\"rows\":[\" \"\" X\"\"\"]");
-    parse(" '\"\" '", "'quotes': true(), 'format': 'w3'", "...\"rows\":[\" \"]");
-    parse(" '\"X \" '", "'quotes': true(), 'format': 'w3'", "...\"rows\":[\"X  \"]");
+    parse(" ' \"\"'", "'strict-quoting': false(), 'format': 'w3'", "...\"rows\":[\" \"\"\"]");
+    parse(" ' \" X\"'", "'strict-quoting': false(), 'format': 'w3'",
+        "...\"rows\":[\" \"\" X\"\"\"]");
+    parse(" '\"\" '", "'strict-quoting': false(), 'format': 'w3'", "...\"rows\":[\" \"]");
+    parse(" '\"X \" '", "'strict-quoting': false(), 'format': 'w3'", "...\"rows\":[\"X  \"]");
+    parseError(" ' \"\"'", "'format': 'w3'");
+    parseError(" '\"X \" '", "'format': 'w3'");
   }
 
   /** Test method. */

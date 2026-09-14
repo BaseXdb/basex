@@ -40,7 +40,7 @@ public class CsvOptions extends Options {
   /** Option: trim whitespace. */
   public static final BooleanOption TRIM_WHITESPACE = new BooleanOption("trim-whitespace", false);
   /** Option: strict quoting (implies QUOTES). */
-  public static final BooleanOption STRICT_QUOTING = new BooleanOption("strict-quoting", false);
+  public static final BooleanOption STRICT_QUOTING = new BooleanOption("strict-quoting", true);
   /** Option: trim-rows. */
   public static final BooleanOption TRIM_ROWS = new BooleanOption("trim-rows", false);
   /** Option: select-columns. */

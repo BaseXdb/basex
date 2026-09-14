@@ -86,6 +86,7 @@ public final class CsvParserTest extends SandboxTest {
    */
   @Test public void separator() {
     copts.set(CsvOptions.HEADER, Bln.TRUE);
+    copts.set(CsvOptions.STRICT_QUOTING, false);
 
     copts.set(CsvOptions.SEPARATOR, "tab");
     execute(new CreateDB(NAME, FILE));
@@ -116,6 +117,7 @@ public final class CsvParserTest extends SandboxTest {
    */
   @Test public void backslash() {
     copts.set(CsvOptions.HEADER, Bln.TRUE);
+    copts.set(CsvOptions.STRICT_QUOTING, false);
 
     // "H \n""U\",a@b.c....
     copts.set(CsvOptions.BACKSLASHES, false);

@@ -63,8 +63,8 @@ public final class CsvParser {
     separator = opts.separator();
     quoteCharacter = opts.quoteCharacter();
     commentMarker = opts.commentMarker();
-    strictQuoting = opts.get(CsvOptions.STRICT_QUOTING);
-    quotes = strictQuoting || opts.get(CsvOptions.QUOTES);
+    quotes = opts.get(CsvOptions.QUOTES);
+    strictQuoting = quotes && opts.get(CsvOptions.STRICT_QUOTING);
     backslashes = opts.get(CsvOptions.BACKSLASHES);
     trimWhitespace = opts.get(CsvOptions.TRIM_WHITESPACE);
     trimRows = opts.get(CsvOptions.TRIM_ROWS);
