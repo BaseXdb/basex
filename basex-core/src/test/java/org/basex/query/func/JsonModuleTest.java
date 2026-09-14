@@ -46,6 +46,7 @@ public final class JsonModuleTest extends SandboxTest {
     final String path = "src/test/resources/example.json";
     query(func.args(path) + "//name ! string()", "Smith");
     query(func.args(path, " { 'format': 'w3' }") + "?name", "Smith");
+    query(func.args(path, " { 'json-lines': true() }") + "//name ! string()", "Smith");
   }
 
   /** Test method. */
@@ -262,6 +263,27 @@ public final class JsonModuleTest extends SandboxTest {
     error(func.args("\"x\"", escFb), JSON_OPTIONS_X);
     query("try { " + func.args("\"x\"", escFb) + " } catch * { $err:description }",
         "Escape cannot be combined with fallback function.");
+  }
+
+  /** Tests the json-lines option of {@code json:parse(...)}. */
+  @Test public void parseJsonLines() {
+    final Function func = _JSON_PARSE;
+    final String w3 = " { 'json-lines': true(), 'format': 'w3' }";
+    query(func.args("{\"a\":1}\n{\"a\":2}", w3) + " ! ?a", "1\n2");
+    query(func.args("\n1\n\n2\n", w3), "1\n2");
+    query(func.args("[\n1\n]\n2", w3) + " => count()", 2);
+    query(func.args("null\n1", w3), 1);
+    query(func.args("", w3), "");
+    query(func.args("1\n2", " { 'json-lines': true() }") + " ! string()", "1\n2");
+    // type information is merged per document
+    query(func.args("{\"a\":1}\n{\"b\":2}", " { 'json-lines': true(), 'merge': true() }") +
+        "[2]/json/@numbers ! string()", "b");
+
+    error(func.args("1 2", w3), JSON_PARSE_X);
+    error(func.args("[1][2]", w3), JSON_PARSE_X);
+    error(func.args("[1]\n[2][3]", w3), JSON_PARSE_X);
+    error(func.args("{\n} {}", w3), JSON_PARSE_X);
+    error(PARSE_JSON.args("1", " { 'json-lines': true() }"), INVALIDOPTION_X);
   }
 
   /** Test method. */

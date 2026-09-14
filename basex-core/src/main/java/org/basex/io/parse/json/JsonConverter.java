@@ -92,9 +92,18 @@ public abstract class JsonConverter extends JsonHandler {
       final Job jb) throws QueryException, IOException {
     job = jb;
     info = ii;
-    init(uri);
-    new JsonParser(input, jopts, this).parse(ii);
-    return finish();
+    final JsonParser parser = new JsonParser(input, jopts, this);
+    if(!jopts.get(JsonParserOptions.JSON_LINES)) {
+      init(uri);
+      parser.parse(ii);
+      return finish();
+    }
+    final ValueBuilder vb = new ValueBuilder(jb);
+    while(true) {
+      init(uri);
+      if(!parser.next(ii)) return vb.value();
+      vb.add(finish());
+    }
   }
 
   /**

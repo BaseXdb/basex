@@ -60,6 +60,11 @@ public final class JsonDirectConverter extends JsonXmlConverter {
   JsonDirectConverter(final JsonParserOptions opts) throws QueryException {
     super(opts);
     lax = jopts.get(JsonOptions.LAX);
+  }
+
+  @Override
+  protected void init(final String uri) {
+    super.init(uri);
     name = JSON;
   }
 

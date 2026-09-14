@@ -55,7 +55,12 @@ public abstract class ParseJson extends ParseFn {
       throws QueryException, IOException {
 
     final JsonFormat format = format();
-    if(format != null) options.set(JsonOptions.FORMAT, format);
+    if(format != null) {
+      if(options.get(JsonParserOptions.JSON_LINES)) {
+        throw INVALIDOPTION_X.get(info, Options.unknown(JsonParserOptions.JSON_LINES));
+      }
+      options.set(JsonOptions.FORMAT, format);
+    }
 
     final JsonConverter converter = JsonConverter.get((JsonParserOptions) options);
     final JsonFormat jf = options.get(JsonOptions.FORMAT);

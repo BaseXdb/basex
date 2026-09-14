@@ -54,6 +54,12 @@ public final class JsonParser {
   private long line = 1;
   /** Current column. */
   private long col = 1;
+  /** Line at the start of the last whitespace sequence. */
+  private long wsLine;
+  /** Input position at the end of the last whitespace sequence. */
+  private long wsPos;
+  /** Indicates if a value was returned by {@link #next(InputInfo)}. */
+  private boolean parsed;
   /** Input buffer, 12 code points needed to hold one complete Unicode-escaped surrogate pair. */
   private final int[] buf = new int[16];
 
@@ -62,8 +68,10 @@ public final class JsonParser {
    * @param input input stream
    * @param opts options
    * @param conv converter
+   * @throws IOException I/O exception
    */
-  public JsonParser(final TextInput input, final JsonParserOptions opts, final JsonHandler conv) {
+  public JsonParser(final TextInput input, final JsonParserOptions opts, final JsonHandler conv)
+      throws IOException {
     this.input = input;
     this.conv = conv;
     liberal = opts.get(JsonParserOptions.LIBERAL);
@@ -74,6 +82,8 @@ public final class JsonParser {
     duplicates = jf == JsonFormat.JSONML ? JsonDuplicates.REJECT :
       dupl != null ? dupl : jf == JsonFormat.W3_XML ? JsonDuplicates.RETAIN :
       JsonDuplicates.USE_FIRST;
+    current = input.read();
+    consume('\uFEFF');
   }
 
   /**
@@ -84,15 +94,41 @@ public final class JsonParser {
    */
   public void parse(final InputInfo ii) throws QueryException, IOException {
     info = ii;
+    skipWs();
+    root();
+    if(more()) throw error("Unexpected trailing content: %", remaining());
+  }
+
+  /**
+   * Parses the next JSON value of a JSON Lines input.
+   * @param ii input info (can be @null)
+   * @return {@code false} if the end of input was reached
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   */
+  public boolean next(final InputInfo ii) throws QueryException, IOException {
+    info = ii;
+    skipWs();
+    if(!more()) return false;
+    if(parsed && (wsPos != pos || wsLine == line)) {
+      throw error("Expected: newline, found: %", currentAsString());
+    }
+    root();
+    parsed = true;
+    return true;
+  }
+
+  /**
+   * Parses a top-level JSON value.
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   */
+  private void root() throws QueryException, IOException {
     try {
-      current = input.read();
-      consume('\uFEFF');
-      skipWs();
       value();
     } catch(final StackOverflowError ex) {
       throw error("Input is too deeply nested").cause(ex);
     }
-    if(more()) throw error("Unexpected trailing content: %", remaining());
   }
 
   /**
@@ -411,15 +447,23 @@ public final class JsonParser {
    * @throws IOException I/O exception
    */
   private void skipWs() throws IOException {
-    while(more()) {
-      switch(current) {
-        // '\u00A0': non-breaking space
-        case ' ', '\t', '\r', '\n', '\u00A0' -> consume();
-        default -> {
-          return;
-        }
-      }
+    if(ws()) {
+      wsLine = line;
+      do consume(); while(ws());
+      wsPos = pos;
     }
+  }
+
+  /**
+   * Checks if the current code point is a whitespace character.
+   * @return result of check
+   */
+  private boolean ws() {
+    return switch(current) {
+      // '\u00A0': non-breaking space
+      case ' ', '\t', '\r', '\n', '\u00A0' -> true;
+      default -> false;
+    };
   }
 
   /**

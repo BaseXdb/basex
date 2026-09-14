@@ -1727,10 +1727,10 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _JSON_DOC(JsonDoc::new, "doc(source, options?)",
-      params(STRING_O, MAP_ZO), ITEM_ZO, flag(NDT), JSON_URI, Perm.CREATE),
+      params(STRING_O, MAP_ZO), ITEM_ZM, flag(NDT), JSON_URI, Perm.CREATE),
   /** XQuery function. */
   _JSON_PARSE(JsonParse::new, "parse(value, options?)",
-      params(STRING_OR_BINARY_ZO, MAP_ZO), ITEM_ZO, JSON_URI),
+      params(STRING_OR_BINARY_ZO, MAP_ZO), ITEM_ZM, JSON_URI),
   /** XQuery function. */
   _JSON_SERIALIZE(JsonSerialize::new, "serialize(input, options?)",
       params(ITEM_ZO, MAP_ZO), STRING_O, JSON_URI),

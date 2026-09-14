@@ -69,8 +69,11 @@ abstract class JsonXmlConverter extends JsonConverter {
   }
 
   @Override
-  protected final void init(final String uri) {
+  protected void init(final String uri) {
     doc = FDoc.build(token(uri));
+    names.clear();
+    curr = null;
+    name = null;
   }
 
   @Override
