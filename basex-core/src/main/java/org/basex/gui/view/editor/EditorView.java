@@ -624,11 +624,13 @@ public final class EditorView extends View {
         // parse: replace empty query with empty sequence (suppresses errors for plain text files)
         parse(input.isEmpty() ? "()" : input, file);
       }
-    } else if(file.hasSuffix(IO.JSONSUFFIX)) {
+    } else if(file.hasSuffix(IO.JSONSUFFIXES)) {
       try {
         final IOContent io = new IOContent(text);
         io.name(file.path());
-        JsonConverter.get(new JsonParserOptions()).convert(io);
+        final JsonParserOptions jopts = new JsonParserOptions();
+        jopts.set(JsonParserOptions.JSON_LINES, file.hasSuffix(IO.JSONLSUFFIX));
+        JsonConverter.get(jopts).convert(io);
         info(null);
       } catch(final QueryException | IOException ex) {
         info(ex);

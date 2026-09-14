@@ -163,7 +163,8 @@ final class DialogImport extends BaseXBack {
 
     if(comp == parsers) {
       parsing.setType(parser);
-      if(multi) createFilter.setText(binary ? "*" : "*." + parser);
+      if(multi) createFilter.setText(binary ? "*" : parser == MainParser.JSON ?
+        "*" + IO.JSONSUFFIX + ",*" + IO.JSONLSUFFIX : "*." + parser);
     }
 
     ok &= empty ? in.isEmpty() || io.exists() : !in.isEmpty() && io.exists();
@@ -227,7 +228,7 @@ final class DialogImport extends BaseXBack {
       if(eq(suf, gui.gopts.xmlSuffixes()) || eq(suf, IO.XSLSUFFIXES)) type = MainParser.XML;
       else if(eq(suf, IO.HTMLSUFFIXES)) type = MainParser.HTML;
       else if(eq(suf, IO.CSVSUFFIX)) type = MainParser.CSV;
-      else if(eq(suf, IO.JSONSUFFIX)) type = MainParser.JSON;
+      else if(eq(suf, IO.JSONSUFFIXES)) type = MainParser.JSON;
     }
     // unknown suffix: analyze first bytes
     if(type == null) type = guess(io);

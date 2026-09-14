@@ -42,6 +42,8 @@ public abstract class IO {
   public static final String CSVSUFFIX = ".csv";
   /** JSON file suffix. */
   public static final String JSONSUFFIX = ".json";
+  /** JSON Lines file suffix. */
+  public static final String JSONLSUFFIX = ".jsonl";
   /** JAR file suffix. */
   public static final String JARSUFFIX = ".jar";
   /** TGZIP file suffix. */
@@ -81,6 +83,8 @@ public abstract class IO {
   public static final String[] XSLSUFFIXES = { ".xsl", ".xslt", ".fo", ".fob" };
   /** HTML suffixes. */
   public static final String[] HTMLSUFFIXES = { ".html", ".htm" };
+  /** JSON suffixes. */
+  public static final String[] JSONSUFFIXES = { JSONSUFFIX, JSONLSUFFIX };
   /** Text suffixes. */
   public static final String[] TXTSUFFIXES = { ".txt", ".text", ".ini", ".conf", ".md", ".log" };
   /** JS file suffixes. */

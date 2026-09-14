@@ -57,7 +57,7 @@ public final class BaseXFileChooser {
     filter(XML_DOCUMENTS, false, win.gui().gopts.xmlSuffixes());
     filter(XSL_DOCUMENTS, false, IO.XSLSUFFIXES);
     filter(HTML_DOCUMENTS, false, IO.HTMLSUFFIXES);
-    filter(JSON_DOCUMENTS, false, IO.JSONSUFFIX);
+    filter(JSON_DOCUMENTS, false, IO.JSONSUFFIXES);
     filter(CSV_DOCUMENTS, false, IO.CSVSUFFIX);
     filter(PLAIN_TEXT, false, IO.TXTSUFFIXES);
     return this;

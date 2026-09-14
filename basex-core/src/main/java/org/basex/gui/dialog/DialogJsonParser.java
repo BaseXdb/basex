@@ -6,6 +6,7 @@ import java.awt.*;
 import java.io.*;
 import java.util.*;
 
+import org.basex.build.*;
 import org.basex.build.json.*;
 import org.basex.build.json.JsonOptions.*;
 import org.basex.core.*;
@@ -17,6 +18,7 @@ import org.basex.io.*;
 import org.basex.io.parse.json.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
+import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**
@@ -43,6 +45,8 @@ final class DialogJsonParser extends DialogParser {
   private final BaseXCombo format;
   /** JSON: liberal. */
   private final BaseXCheckBox liberal;
+  /** JSON: JSON Lines. */
+  private final BaseXCheckBox lines;
   /** JSON: escape. */
   private final BaseXCheckBox escape;
   /** JSON: lax name conversion. */
@@ -69,6 +73,7 @@ final class DialogJsonParser extends DialogParser {
     format.setSelectedItem(jopts.get(JsonOptions.FORMAT));
 
     liberal = new BaseXCheckBox(dialog, LIBERAL_PARSING, JsonParserOptions.LIBERAL, jopts);
+    lines = new BaseXCheckBox(dialog, "JSON Lines", JsonParserOptions.JSON_LINES, jopts);
     escape = new BaseXCheckBox(dialog, ESCAPE_CHARS, JsonParserOptions.ESCAPE, jopts);
     merge = new BaseXCheckBox(dialog, MERGE_TYPES, JsonOptions.MERGE, jopts);
     strings = new BaseXCheckBox(dialog, INCLUDE_STRINGS, JsonOptions.STRINGS, jopts);
@@ -84,6 +89,7 @@ final class DialogJsonParser extends DialogParser {
     pp.add(p);
     p = new BaseXBack(new RowLayout());
     p.add(liberal);
+    p.add(lines);
     p.add(escape);
     p.add(merge);
     p.add(strings);
@@ -101,7 +107,7 @@ final class DialogJsonParser extends DialogParser {
       final boolean jl = jopts.get(JsonParserOptions.LIBERAL);
       final JsonFormat jf = jopts.get(JsonOptions.FORMAT);
       if(active) {
-        final String json;
+        String json;
         if(jf == JsonFormat.JSONML) {
           json = EXAMPLEML;
         } else if(jl) {
@@ -109,7 +115,17 @@ final class DialogJsonParser extends DialogParser {
         } else {
           json = EXAMPLE;
         }
-        final Value value = JsonConverter.get(jopts).convert(new IOContent(json));
+        final Value value;
+        if(jopts.get(JsonParserOptions.JSON_LINES)) {
+          // two single-line copies of the example, converted as on import
+          final String line = json.replaceAll("\n *", " ");
+          json = line + '\n' + line;
+          final MainOptions mopts = new MainOptions();
+          mopts.set(MainOptions.JSONPARSER, jopts);
+          value = new DBNode(MemBuilder.build(JsonStreamingParser.get(new IOContent(json), mopts)));
+        } else {
+          value = JsonConverter.get(jopts).convert(new IOContent(json));
+        }
         example.setText(example(MainParser.JSON.name(), json, value));
       }
     } catch(final QueryException | IOException ex) {
@@ -123,6 +139,7 @@ final class DialogJsonParser extends DialogParser {
     final String enc = encoding.getSelectedItem();
     jopts.set(JsonParserOptions.ENCODING, enc.equals(Strings.UTF8) ? null : enc);
     jopts.set(JsonParserOptions.LIBERAL, liberal.isSelected());
+    jopts.set(JsonParserOptions.JSON_LINES, lines.isSelected());
     jopts.set(JsonParserOptions.ESCAPE, escape.isSelected());
     jopts.set(JsonOptions.MERGE, merge.isSelected());
     jopts.set(JsonOptions.STRINGS, strings.isSelected());
