@@ -19,8 +19,8 @@ public final class FTTokenTest {
   @Test public void expand() {
     assertEquals("ss", fold("ß"));
     assertEquals("SS", fold("ẞ"));
-    assertEquals("AEae", fold("Ææ"));
-    assertEquals("THth", fold("Þþ"));
+    assertEquals("AE ae", fold("Æ æ"));
+    assertEquals("TH th", fold("Þ þ"));
     assertEquals("ffi", fold("ﬃ"));
   }
 
@@ -29,6 +29,35 @@ public final class FTTokenTest {
     assertEquals("oldd", fold("øłđð"));
     assertEquals("Yy", fold("Ȳȳ"));
     assertEquals("aou", fold("ǎǒǔ"));
+    assertEquals("ss", fold("ſẛ"));
+  }
+
+  /** Uppercase expansions are title-cased if a lowercase letter follows. */
+  @Test public void titleCase() {
+    assertEquals("Aesir", fold("Æsir"));
+    assertEquals("AESIR", fold("ÆSIR"));
+    assertEquals("AE", fold("Æ"));
+    assertEquals("Thorr", fold("Þórr"));
+    assertEquals("Oeuvre", fold("Œuvre"));
+    assertEquals("GROSS", fold("GROẞ"));
+    assertEquals("Dzemal", fold("Ǆemal"));
+    // Dutch digraph: both letters are capitalized
+    assertEquals("IJssel", fold("Ĳssel"));
+  }
+
+  /** Compatibility decompositions are folded as well. */
+  @Test public void compatibility() {
+    assertEquals("DZDzdz", fold("Ǆǅǆ"));
+    assertEquals("BaseX", fold("ＢａｓｅＸ"));
+    assertEquals("BaseX", fold("𝐁𝐚𝐬𝐞𝐗"));
+    assertEquals("BaseX", fold("𝘉𝘢𝘴𝘦𝘟"));
+    assertEquals("l", fold("ℓ"));
+    // modifier letters are dropped like combining marks
+    assertEquals("", fold("ᴭ"));
+    // Hangul syllables are not decomposed into jamo
+    assertEquals("한글", fold("한글"));
+    // CJK compatibility ideographs are unified
+    assertEquals("豈", fold("豈"));
   }
 
   /** Folding must not depend on the normalization form of the input. */

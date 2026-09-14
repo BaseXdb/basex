@@ -1,5 +1,7 @@
 package org.basex.util;
 
+import java.text.*;
+
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
@@ -41,15 +43,24 @@ public final class FTToken {
     if(Token.ascii(token)) return token;
 
     final TokenBuilder tb = new TokenBuilder(token.length);
-    Token.forEachCp(token, cp -> {
+    final int tl = token.length;
+    for(int t = 0; t < tl;) {
+      final int cp = Token.cp(token, t);
+      t += Token.cl(token, t);
       if(cp < 0x80) {
         tb.add(cp);
       } else if(!isCombining(Character.getType(cp))) {
-        final byte[] letters = NORM_MULTI.get(cp);
-        if(letters != null) tb.add(letters);
-        else tb.add(noDiacritics(cp));
+        final byte[] letters = letters(cp);
+        if(letters == null) {
+          tb.add(noDiacritics(cp));
+        } else {
+          // title-case an uppercase expansion if a lowercase letter follows (Æsir -> Aesir)
+          final byte[] title = t < tl && Character.isLowerCase(Token.cp(token, t)) ?
+            title(cp) : null;
+          tb.add(title != null ? title : letters);
+        }
       }
-    });
+    }
     return tb.finish();
   }
 
@@ -64,10 +75,48 @@ public final class FTToken {
       list.add(Token.lc(cp));
     } else if(!isCombining(Character.getType(cp))) {
       // fold before lowercasing: expansions are case-preserving (ß -> ss, ẞ -> SS)
-      final byte[] letters = NORM_MULTI.get(cp);
+      final byte[] letters = letters(cp);
       if(letters != null) Token.forEachCp(letters, c -> list.add(Token.lc(c)));
       else list.add(Token.lc(noDiacritics(cp)));
     }
+  }
+
+  /**
+   * Returns the letters that a codepoint is expanded to.
+   * @param cp codepoint
+   * @return letters, or {@code null} if the codepoint is not expanded
+   */
+  private static byte[] letters(final int cp) {
+    final byte[] letters = NORM_MULTI.get(cp);
+    return letters != null || noDiacritics(cp) != cp ? letters : Compat.LETTERS.get(cp);
+  }
+
+  /**
+   * Returns the title-case form of the letters that a codepoint is expanded to.
+   * @param cp codepoint
+   * @return letters, or {@code null} if the expansion has no distinct title-case form
+   */
+  private static byte[] title(final int cp) {
+    final byte[] title = NORM_TITLE.get(cp);
+    return title != null || NORM_MULTI.contains(cp) ? title : Compat.TITLE.get(cp);
+  }
+
+  /**
+   * Returns the title-case form of an expansion.
+   * @param letters letters
+   * @return title-case form, or {@code null} if the expansion does not start with an uppercase
+   *   letter or has no distinct title-case form
+   */
+  private static byte[] title(final byte[] letters) {
+    if(!Character.isUpperCase(Token.cp(letters, 0))) return null;
+    final TokenBuilder tb = new TokenBuilder(letters.length);
+    final int ll = letters.length, fl = Token.cl(letters, 0);
+    for(int l = 0; l < ll; l += Token.cl(letters, l)) {
+      final int cp = Token.cp(letters, l);
+      tb.add(l < fl ? cp : Token.lc(cp));
+    }
+    final byte[] title = tb.finish();
+    return Token.eq(title, letters) ? null : title;
   }
 
   /**
@@ -81,6 +130,48 @@ public final class FTToken {
     if(cp >= 0x1E00 && cp < 0x2000) return NORM_1E00[cp - 0x1E00];
     final int c = NORM_XXXX.get(cp);
     return c == Integer.MIN_VALUE ? cp : c;
+  }
+
+  /**
+   * Compatibility decompositions of all other codepoints, computed on first use.
+   */
+  private static final class Compat {
+    /** Codepoints that are expanded to other letters (fullwidth forms, ligatures, digraphs). */
+    static final IntObjectMap<byte[]> LETTERS = new IntObjectMap<>();
+    /** Title-case forms of the expansions. */
+    static final IntObjectMap<byte[]> TITLE = new IntObjectMap<>();
+
+    static {
+      // BMP without CJK unified ideographs (no decompositions), Hangul syllables (decompose into
+      // jamo) and surrogates; mathematical letters
+      final int[][] ranges = { { 0x80, 0x33FF }, { 0x4DC0, 0x4DFF }, { 0xA000, 0xABFF },
+        { 0xD7A4, 0xD7FF }, { 0xE000, 0xFFFD }, { 0x1D400, 0x1D7FF } };
+      for(final int[] range : ranges) {
+        for(int cp = range[0]; cp <= range[1]; cp++) {
+          // tokens only contain letters and digits
+          if(!Character.isLetterOrDigit(cp) || NORM_MULTI.contains(cp) || noDiacritics(cp) != cp) {
+            continue;
+          }
+          final String string = Character.toString(cp);
+          final String nfkd = Normalizer.normalize(string, Normalizer.Form.NFKD);
+          if(nfkd.equals(string)) continue;
+
+          final TokenBuilder tb = new TokenBuilder();
+          nfkd.codePoints().forEach(c -> {
+            if(!isCombining(Character.getType(c))) {
+              final byte[] letters = NORM_MULTI.get(c);
+              if(letters != null) tb.add(letters);
+              else tb.add(noDiacritics(c));
+            }
+          });
+          final byte[] letters = tb.finish();
+          if(letters.length == 0 || Token.eq(letters, Token.token(string))) continue;
+          LETTERS.put(cp, letters);
+          final byte[] title = title(letters);
+          if(title != null) TITLE.put(cp, title);
+        }
+      }
+    }
   }
 
   /**
@@ -152,7 +243,8 @@ public final class FTToken {
     { '\u016C', 'U'}, { '\u016D', 'u'}, { '\u016E', 'U'}, { '\u016F', 'u'}, { '\u0170', 'U'},
     { '\u0171', 'u'}, { '\u0172', 'U'}, { '\u0173', 'u'}, { '\u0174', 'W'}, { '\u0175', 'w'},
     { '\u0176', 'Y'}, { '\u0177', 'y'}, { '\u0178', 'Y'}, { '\u0179', 'Z'}, { '\u017A', 'z'},
-    { '\u017B', 'Z'}, { '\u017C', 'z'}, { '\u017D', 'Z'}, { '\u017E', 'z'}, { '\u01A0', 'O'},
+    { '\u017B', 'Z'}, { '\u017C', 'z'}, { '\u017D', 'Z'}, { '\u017E', 'z'}, { '\u017F', 's'},
+    { '\u01A0', 'O'},
     { '\u01A1', 'o'}, { '\u01AF', 'U'}, { '\u01B0', 'u'}, { '\u01CD', 'A'}, { '\u01CE', 'a'},
     { '\u01CF', 'I'}, { '\u01D0', 'i'}, { '\u01D1', 'O'}, { '\u01D2', 'o'}, { '\u01D3', 'U'},
     { '\u01D4', 'u'}, { '\u01D5', 'U'}, { '\u01D6', 'u'}, { '\u01D7', 'U'}, { '\u01D8', 'u'},
@@ -229,7 +321,7 @@ public final class FTToken {
     { '\u1E87', 'w'}, { '\u1E88', 'W'}, { '\u1E89', 'w'}, { '\u1E8A', 'X'}, { '\u1E8B', 'x'},
     { '\u1E8C', 'X'}, { '\u1E8D', 'x'}, { '\u1E8E', 'Y'}, { '\u1E8F', 'y'}, { '\u1E90', 'Z'},
     { '\u1E91', 'z'}, { '\u1E92', 'Z'}, { '\u1E93', 'z'}, { '\u1E94', 'Z'}, { '\u1E95', 'z'},
-    { '\u1E96', 'h'}, { '\u1E97', 't'}, { '\u1E98', 'w'}, { '\u1E99', 'y'}, { '\u1E9B', '\u017F'},
+    { '\u1E96', 'h'}, { '\u1E97', 't'}, { '\u1E98', 'w'}, { '\u1E99', 'y'}, { '\u1E9B', 's'},
     { '\u1EA0', 'A'}, { '\u1EA1', 'a'}, { '\u1EA2', 'A'}, { '\u1EA3', 'a'}, { '\u1EA4', 'A'},
     { '\u1EA5', 'a'}, { '\u1EA6', 'A'}, { '\u1EA7', 'a'}, { '\u1EA8', 'A'}, { '\u1EA9', 'a'},
     { '\u1EAA', 'A'}, { '\u1EAB', 'a'}, { '\u1EAC', 'A'}, { '\u1EAD', 'a'}, { '\u1EAE', 'A'},
@@ -367,11 +459,14 @@ public final class FTToken {
     { '\uFB4C', '\u05D1'}, { '\uFB4D', '\u05DB'}, { '\uFB4E', '\u05E4'}
   };
 
-  /** Codepoint mappings for characters that denote more than a single letter. */
+  /**
+   * Codepoint mappings for characters that denote more than a single letter.
+   * An optional third entry overrides the title-case form (first letter uppercase, rest lowercase).
+   */
   private static final String[][] NCMULTI = {
-    // ligatures and digraphs: AE, OE, IJ
+    // ligatures and digraphs: AE, OE, IJ (Dutch capitalizes both letters: IJssel)
     { "Æ", "AE" }, { "æ", "ae" }, { "Ǣ", "AE" }, { "ǣ", "ae" }, { "Ǽ", "AE" }, { "ǽ", "ae" },
-    { "Œ", "OE" }, { "œ", "oe" }, { "Ĳ", "IJ" }, { "ĳ", "ij" },
+    { "Œ", "OE" }, { "œ", "oe" }, { "Ĳ", "IJ", "IJ" }, { "ĳ", "ij" },
     // sharp s: mapped to ss/SS by Unicode full case folding
     { "ß", "ss" }, { "ẞ", "SS" },
     // thorn: no base letter to fall back to
@@ -397,9 +492,16 @@ public final class FTToken {
     for(final char[] aNC : NCXXXX) map.put(aNC[0], aNC[1]);
     NORM_XXXX = map;
 
-    final IntObjectMap<byte[]> multi = new IntObjectMap<>();
-    for(final String[] aNC : NCMULTI) multi.put(aNC[0].codePointAt(0), Token.token(aNC[1]));
+    final IntObjectMap<byte[]> multi = new IntObjectMap<>(), title = new IntObjectMap<>();
+    for(final String[] aNC : NCMULTI) {
+      final int cp = aNC[0].codePointAt(0);
+      final byte[] letters = Token.token(aNC[1]);
+      multi.put(cp, letters);
+      final byte[] tl = aNC.length > 2 ? Token.token(aNC[2]) : title(letters);
+      if(tl != null) title.put(cp, tl);
+    }
     NORM_MULTI = multi;
+    NORM_TITLE = title;
   }
 
   /** Mapping table for codepoints from 0000-0500. */
@@ -410,4 +512,6 @@ public final class FTToken {
   private static final IntMap NORM_XXXX;
   /** Codepoints that are expanded to multiple letters. */
   private static final IntObjectMap<byte[]> NORM_MULTI;
+  /** Title-case forms of the expansions. */
+  private static final IntObjectMap<byte[]> NORM_TITLE;
 }

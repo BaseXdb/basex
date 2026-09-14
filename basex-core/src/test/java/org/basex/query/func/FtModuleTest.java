@@ -225,6 +225,8 @@ public final class FtModuleTest extends SandboxTest {
 
     query(func.args("A bc"), "a bc");
     query(func.args("A bc", " { 'case': 'sensitive' }"), "A bc");
+    query(func.args("Æsir ÆSIR Ĳssel ＢａｓｅＸ", " { 'case': 'sensitive' }"),
+        "Aesir AESIR IJssel BaseX");
     query(func.args("\u00e4", " { 'diacritics': 'sensitive' }"), "\u00e4");
     query(func.args("gifts", " { 'stemming': true() }"), "gift");
 
