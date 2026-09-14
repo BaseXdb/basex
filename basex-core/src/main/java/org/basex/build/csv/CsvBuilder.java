@@ -57,8 +57,6 @@ final class CsvBuilder extends CsvConverter {
   @Override
   public void entry(final byte[] value) throws IOException {
     ++col;
-    if(skipEmpty && value.length == 0) return;
-
     final byte[] elem = Q_ENTRY.string(), name = headers.get(col);
     if(attributes) {
       if(name == null) {

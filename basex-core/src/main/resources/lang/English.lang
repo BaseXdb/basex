@@ -343,7 +343,6 @@ single_cmd           = Single command expected.
 size                 = Size
 size_text_results    = Size of text results
 skip_corrupt_files   = Skip corrupt (non-well-formed) files
-skip_empty           = Skip empty fields
 skipped              = Skipped
 sort                 = Sort
 srv_running          = Server is running or permission was denied

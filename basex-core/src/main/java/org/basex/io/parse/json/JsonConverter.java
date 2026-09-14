@@ -39,13 +39,12 @@ public abstract class JsonConverter extends JsonHandler {
    * @throws QueryException query exception
    */
   public static JsonConverter get(final JsonParserOptions jopts) throws QueryException {
-    // XQUERY and BASIC are deprecated
     return switch(jopts.get(JsonOptions.FORMAT)) {
-      case ATTRIBUTES    -> new JsonAttsConverter(jopts);
-      case JSONML        -> new JsonMLConverter(jopts);
-      case W3, XQUERY    -> new JsonW3Converter(jopts);
-      case W3_XML, BASIC -> new JsonW3XmlConverter(jopts);
-      default            -> new JsonDirectConverter(jopts);
+      case ATTRIBUTES -> new JsonAttsConverter(jopts);
+      case JSONML     -> new JsonMLConverter(jopts);
+      case W3         -> new JsonW3Converter(jopts);
+      case W3_XML     -> new JsonW3XmlConverter(jopts);
+      default         -> new JsonDirectConverter(jopts);
     };
   }
 

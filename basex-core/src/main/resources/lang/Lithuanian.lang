@@ -343,7 +343,6 @@ single_cmd           = Tikimasi vienos komandos.
 size                 = Dydis
 size_text_results    = Teksto rezultatų dydis
 skip_corrupt_files   = Praleisti sugadintus (netaisyklingus) failus
-skip_empty           = Praleisti tuščius laukus
 skipped              = Praleista
 sort                 = Rikiuoti
 srv_running          = Serveris veikia arba prieiga uždrausta

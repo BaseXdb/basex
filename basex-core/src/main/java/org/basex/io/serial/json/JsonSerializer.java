@@ -52,9 +52,9 @@ public abstract class JsonSerializer extends StandardSerializer {
   public static Serializer get(final OutputStream os, final SerializerOptions so)
       throws IOException {
     return switch(so.get(SerializerOptions.JSON).get(JsonOptions.FORMAT)) {
-      case JSONML        -> new JsonMLSerializer(os, so);
-      case W3_XML, BASIC -> new JsonBasicSerializer(os, so);
-      default            -> new JsonNodeSerializer(os, so);
+      case JSONML -> new JsonMLSerializer(os, so);
+      case W3_XML -> new JsonBasicSerializer(os, so);
+      default     -> new JsonNodeSerializer(os, so);
     };
   }
 

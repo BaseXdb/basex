@@ -343,7 +343,6 @@ single_cmd           = 需要一行指令
 size                 = 大小
 size_text_results    = 文本结果大小
 skip_corrupt_files   = 跳过错误（格式不良好的）文件
-skip_empty           = 跳过空字段
 skipped              = 已跳过
 sort                 = 排序
 srv_running          = 服务器已启动或者没有权限

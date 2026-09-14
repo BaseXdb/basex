@@ -72,8 +72,8 @@ public final class JsonParser {
     final JsonFormat jf = opts.get(JsonOptions.FORMAT);
     // JsonML always rejects duplicate attributes, regardless of the duplicates policy
     duplicates = jf == JsonFormat.JSONML ? JsonDuplicates.REJECT :
-      dupl != null ? dupl : jf == JsonFormat.W3_XML || jf == JsonFormat.BASIC ?
-      JsonDuplicates.RETAIN : JsonDuplicates.USE_FIRST;
+      dupl != null ? dupl : jf == JsonFormat.W3_XML ? JsonDuplicates.RETAIN :
+      JsonDuplicates.USE_FIRST;
   }
 
   /**

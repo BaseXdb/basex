@@ -49,7 +49,7 @@ public final class JsonStreamingParser extends SingleParser {
     final JsonOptions.JsonFormat fmt = jopts.get(FORMAT);
     final boolean merge = jopts.get(MERGE);
     final QueryFunction<Builder, JsonBuilderConverter> conv = switch(fmt) {
-      case W3_XML, BASIC -> b -> new JsonW3XmlBuilderConverter(jopts, b);
+      case W3_XML -> b -> new JsonW3XmlBuilderConverter(jopts, b);
       case DIRECT -> merge ? null : b -> new JsonDirectBuilderConverter(jopts, b);
       case ATTRIBUTES -> merge ? null : b -> new JsonAttsBuilderConverter(jopts, b);
       case JSONML -> null; // not yet supported; fall back to non-streaming

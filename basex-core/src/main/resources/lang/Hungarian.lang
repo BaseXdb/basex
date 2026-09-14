@@ -343,7 +343,6 @@ single_cmd           = Egyszerű parancs az elvárt.
 size                 = Méret
 size_text_results    = Szöveges eredmények mérete
 skip_corrupt_files   = Korrupt (nem jól formázott) fájlok
-skip_empty           = Üres mezők kihagyása
 skipped              = Kihagyva
 sort                 = Rendezés
 srv_running          = Szerver fut vagy hozzáférés megtagadva

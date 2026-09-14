@@ -343,7 +343,6 @@ single_cmd           = Tek komut bekleniyor
 size                 = Boyut
 size_text_results    = Metin sonuçlarının boyutu
 skip_corrupt_files   = Bozuk (geçersiz) dosyaları atla
-skip_empty           = Boş alanları atla
 skipped              = Atlandı
 sort                 = Sırala
 srv_running          = Sunucu çalışıyor veya izin reddedildi

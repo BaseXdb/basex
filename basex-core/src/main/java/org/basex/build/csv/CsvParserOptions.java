@@ -12,8 +12,6 @@ import org.basex.util.options.*;
 public final class CsvParserOptions extends CsvOptions {
   /** Option: encoding. */
   public static final StringOption ENCODING = new StringOption(CommonOptions.ENCODING);
-  /** Option: skip empty fields. */
-  public static final BooleanOption SKIP_EMPTY = new BooleanOption("skip-empty", false);
 
   /**
    * Default constructor.

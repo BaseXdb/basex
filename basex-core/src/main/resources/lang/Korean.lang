@@ -343,7 +343,6 @@ single_cmd           = 단일 명령이 필요합니다.
 size                 = 크기
 size_text_results    = 텍스트 결과 크기
 skip_corrupt_files   = 손상된(형식이 잘못된) 파일 건너뛰기
-skip_empty           = 빈 필드 건너뛰기
 skipped              = 건너뜀
 sort                 = 정렬
 srv_running          = 서버가 실행 중이거나 접근이 거부되었습니다

@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests for {@link JsonStreamingParser}: JSON-to-XML via direct builder events
  * (the streaming path, active for format=(DIRECT, ATTRIBUTES) with merge=false,
- * as well as for format=(W3_XML, BASIC).
+ * as well as for format=W3_XML.
  *
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
@@ -171,15 +171,6 @@ public final class JsonStreamingParserTest extends SandboxTest {
     query(result, "count(//fn:number[@key='x'])",    "2");
     query(result, "//fn:number[@key='x'][1]/data()", "1");
     query(result, "//fn:number[@key='x'][2]/data()", "2");
-  }
-
-  /**
-   * BASIC is a deprecated synonym for W3_XML and must use the streaming path.
-   * @throws Exception exception
-   */
-  @Test public void basicFormat() throws Exception {
-    final XNode result = parse(new IOFile(FILE), opts(BASIC));
-    query(result, "local-name(/*)", "map");
   }
 
   /**

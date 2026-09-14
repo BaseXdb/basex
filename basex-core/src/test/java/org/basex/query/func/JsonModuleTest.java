@@ -45,7 +45,7 @@ public final class JsonModuleTest extends SandboxTest {
 
     final String path = "src/test/resources/example.json";
     query(func.args(path) + "//name ! string()", "Smith");
-    query(func.args(path, " { 'format': 'xquery' }") + "?name", "Smith");
+    query(func.args(path, " { 'format': 'w3' }") + "?name", "Smith");
   }
 
   /** Test method. */
@@ -132,8 +132,8 @@ public final class JsonModuleTest extends SandboxTest {
     parse("{ \"x\": 1, \"x\": { \"y\": 2 } }", attsOpt, attsFirst);
     parse("{ \"x\": 1, \"x\": [ 1, 2 ] }", attsOpt, attsFirst);
 
-    // same suppression for the 'basic' (W3 XML) format, as used by fn:json-to-xml
-    final String basicOpt = opt + ", 'format': 'basic'";
+    // same suppression for the 'w3-xml' format, as used by fn:json-to-xml
+    final String basicOpt = opt + ", 'format': 'w3-xml'";
     final String basicFirst = "<map xmlns=\"http://www.w3.org/2005/xpath-functions\">" +
         "<number key=\"x\">1</number></map>";
     parse("{ \"x\": 1, \"x\": { \"y\": 2 } }", basicOpt, basicFirst);
@@ -157,15 +157,15 @@ public final class JsonModuleTest extends SandboxTest {
     query(func.args(in), one);
 
     // xquery format (maps): reject errors, use-first/use-last select a value, retain is unsupported
-    error(func.args(in, " { 'format': 'xquery', 'duplicates': 'reject' }"), JSON_PARSE_X);
-    query(func.args(in, " { 'format': 'xquery', 'duplicates': 'use-first' }"), "{\"x\":1}");
-    query(func.args(in, " { 'format': 'xquery', 'duplicates': 'use-last' }"), "{\"x\":2}");
-    error(func.args(in, " { 'format': 'xquery', 'duplicates': 'retain' }"), JSON_OPTIONS_X);
+    error(func.args(in, " { 'format': 'w3', 'duplicates': 'reject' }"), JSON_PARSE_X);
+    query(func.args(in, " { 'format': 'w3', 'duplicates': 'use-first' }"), "{\"x\":1}");
+    query(func.args(in, " { 'format': 'w3', 'duplicates': 'use-last' }"), "{\"x\":2}");
+    error(func.args(in, " { 'format': 'w3', 'duplicates': 'retain' }"), JSON_OPTIONS_X);
 
     // W3 XML format (basic): the default is 'retain' (both kept), use-last is unsupported
-    query(func.args(in, " { 'format': 'basic' }"), "<map xmlns=\"http://www.w3.org/2005/" +
+    query(func.args(in, " { 'format': 'w3-xml' }"), "<map xmlns=\"http://www.w3.org/2005/" +
         "xpath-functions\"><number key=\"x\">1</number><number key=\"x\">2</number></map>");
-    error(func.args(in, " { 'format': 'basic', 'duplicates': 'use-last' }"), JSON_OPTIONS_X);
+    error(func.args(in, " { 'format': 'w3-xml', 'duplicates': 'use-last' }"), JSON_OPTIONS_X);
 
     // jsonml rejects duplicate object keys regardless of the chosen policy
     error(func.args("[ \"a\", { \"b\": \"1\", \"b\": \"2\" } ]",
@@ -192,10 +192,10 @@ public final class JsonModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void parseXQuery() {
+  @Test public void parseW3() {
     final Function func = _JSON_PARSE;
     // queries
-    String options = " { 'format': 'xquery' }";
+    String options = " { 'format': 'w3' }";
     query(func.args("{}", options), "{}");
     query(func.args("{\"A\":1}", options), "{\"A\":1}");
     query(func.args("{\"\":null}", options), "{\"\":()}");
@@ -225,7 +225,7 @@ public final class JsonModuleTest extends SandboxTest {
     query(func.args("-123.456E0001", options), "-1234.56");
     query(func.args("[ -123.456E0001, 0 ]", options), "[-1234.56,0]");
 
-    options = " { 'format': 'xquery', 'number-format': 'decimal' }";
+    options = " { 'format': 'w3', 'number-format': 'decimal' }";
     String input = "1234567890123456789012345678901234567890";
     query(func.args(input, options), input);
     input = "1234567890123456789012345678901234567890.123456789012345678901234567890123456789";
@@ -240,19 +240,19 @@ public final class JsonModuleTest extends SandboxTest {
         " { 'format': 'jsonml' }"),
         "<A B=\"C\"/>");
     query("array:size(" + func.args("[\"A\",{\"B\":\"C\"}]",
-        " { 'format': 'xquery' }") + ')',
+        " { 'format': 'w3' }") + ')',
         2);
     query(func.args("\"\\t\\u000A\"",
-        " { 'format': 'xquery', 'escape': true(), 'liberal': true() }"),
+        " { 'format': 'w3', 'escape': true(), 'liberal': true() }"),
         "\\t\\n");
     query("string-to-codepoints(" + func.args("\"\\t\\u000A\"",
-        " { 'format': 'xquery', 'escape': false(), 'liberal': true() }") + ')',
+        " { 'format': 'w3', 'escape': false(), 'liberal': true() }") + ')',
         "9\n10");
     // control characters U+007F to U+009F are escaped as well
-    query(func.args("\"\\u007F\\u0080\\u009F\"", " { 'format': 'xquery', 'escape': true() }"),
+    query(func.args("\"\\u007F\\u0080\\u009F\"", " { 'format': 'w3', 'escape': true() }"),
         "\\u007F\\u0080\\u009F");
     query("string-to-codepoints(" + func.args("\"\\u007F\"",
-        " { 'format': 'xquery', 'escape': false() }") + ')', 127);
+        " { 'format': 'w3', 'escape': false() }") + ')', 127);
 
     error(func.args("42", " { 'spec': 'garbage' }"), INVALIDOPTION_X);
 

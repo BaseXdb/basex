@@ -343,7 +343,6 @@ single_cmd           = Slechts een (1) commando verwacht
 size                 = Grootte
 size_text_results    = Grootte van tekstresultaten
 skip_corrupt_files   = Sla non-well-formed bestanden over
-skip_empty           = Lege velden overslaan
 skipped              = Overgeslagen
 sort                 = Sorteer
 srv_running          = Server loopt al of toegang ontzegd

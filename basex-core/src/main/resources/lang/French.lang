@@ -343,7 +343,6 @@ single_cmd           = une seule commande attendue
 size                 = Taille
 size_text_results    = Taille des résultats textuels
 skip_corrupt_files   = Ignorer les fichiers corrompus (mal formés)
-skip_empty           = Ignorer les champs vides
 skipped              = Ignoré
 sort                 = Trier
 srv_running          = Serveur déjà démarré ou permission refusée

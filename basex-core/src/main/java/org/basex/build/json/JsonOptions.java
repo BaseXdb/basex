@@ -25,9 +25,7 @@ public class JsonOptions extends Options {
     /** Attributes. */ ATTRIBUTES,
     /** JsonML. */ JSONML,
     /** fn:parse-json. */ W3,
-    /** fn:json-to-xml. */ W3_XML,
-    /** XQuery (deprecated; use {@link #W3}). */ XQUERY,
-    /** Basic (deprecated; use {@link #W3_XML}). */ BASIC;
+    /** fn:json-to-xml. */ W3_XML;
 
     @Override
     public String toString() {

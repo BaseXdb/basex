@@ -343,7 +343,6 @@ single_cmd           = O singura comanda asteptata
 size                 = Dimensiune
 size_text_results    = Dimensiunea rezultatelor text
 skip_corrupt_files   = Treci peste fisierele corupte (nu foarte bine formatate)
-skip_empty           = Omite câmpurile goale
 skipped              = Trecute peste
 sort                 = Sorteaza
 srv_running          = Serverul este pornit sau permisiunea a fost refuzata

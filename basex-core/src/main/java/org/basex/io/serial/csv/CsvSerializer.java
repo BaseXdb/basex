@@ -52,7 +52,6 @@ public abstract class CsvSerializer extends StandardSerializer {
   public static Serializer get(final OutputStream os, final SerializerOptions so)
       throws IOException {
     return switch(so.get(SerializerOptions.CSV).get(CsvOptions.FORMAT)) {
-      case XQUERY    -> new CsvXQuerySerializer(os, so); // deprecated
       case W3        -> new CsvW3Serializer(os, so);
       case W3_ARRAYS -> new CsvW3ArraysSerializer(os, so);
       case W3_XML    -> new CsvW3XmlSerializer(os, so);

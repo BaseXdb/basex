@@ -47,8 +47,6 @@ public abstract class CsvConverter extends Job {
   protected final boolean attributes;
   /** Lax QName conversion. */
   protected final boolean lax;
-  /** Skip empty fields. */
-  protected final boolean skipEmpty;
 
   /** Input stream. */
   protected TextInput ti;
@@ -65,7 +63,6 @@ public abstract class CsvConverter extends Job {
       case W3        -> new CsvW3Converter(copts);
       case W3_ARRAYS -> new CsvW3ArraysConverter(copts);
       case W3_XML    -> new CsvW3XmlConverter(copts);
-      case XQUERY    -> new CsvXQueryConverter(copts); // deprecated
       default        -> new CsvDirectConverter(copts);
     };
   }
@@ -79,7 +76,6 @@ public abstract class CsvConverter extends Job {
     lax = copts.get(CsvOptions.LAX);
     attributes = copts.get(CsvOptions.FORMAT) == CsvFormat.ATTRIBUTES;
     final Value header = copts.get(CsvOptions.HEADER);
-    skipEmpty = copts.get(CsvParserOptions.SKIP_EMPTY) && header != Bln.FALSE;
     if(header.seqType().type.isStringOrUntyped()) {
       try {
         for(final Item columnName : header) header(columnName.string(null));

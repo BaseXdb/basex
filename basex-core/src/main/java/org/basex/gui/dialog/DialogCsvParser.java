@@ -45,8 +45,6 @@ final class DialogCsvParser extends DialogParser {
   private final BaseXCombo separator;
   /** Lax name conversion. */
   private final BaseXCheckBox lax;
-  /** Skip empty fields. */
-  private final BaseXCheckBox skipEmpty;
   /** Parse quotes. */
   private final BaseXCheckBox quotes;
   /** Backslashes. */
@@ -78,7 +76,6 @@ final class DialogCsvParser extends DialogParser {
     quotes = new BaseXCheckBox(dialog, PARSE_QUOTES, CsvOptions.QUOTES, copts);
     backslashes = new BaseXCheckBox(dialog, BACKSLASHES, CsvOptions.BACKSLASHES, copts);
     lax = new BaseXCheckBox(dialog, LAX_NAME_CONVERSION, CsvOptions.LAX, copts);
-    skipEmpty = new BaseXCheckBox(dialog, SKIP_EMPTY, CsvParserOptions.SKIP_EMPTY, copts);
     example = new TextPanel(dialog, false);
 
     final BaseXBack pp = new BaseXBack(new RowLayout(8));
@@ -95,7 +92,6 @@ final class DialogCsvParser extends DialogParser {
     p.add(quotes);
     p.add(backslashes);
     p.add(lax);
-    p.add(skipEmpty);
     pp.add(p);
     add(pp, BorderLayout.WEST);
     add(example, BorderLayout.CENTER);
@@ -122,7 +118,6 @@ final class DialogCsvParser extends DialogParser {
     copts.set(CsvOptions.LAX, lax.isSelected());
     copts.set(CsvOptions.QUOTES, quotes.isSelected());
     copts.set(CsvOptions.BACKSLASHES, backslashes.isSelected());
-    copts.set(CsvParserOptions.SKIP_EMPTY, skipEmpty.isSelected());
 
     final CsvSep cs = Enums.get(CsvSep.class, separator.getText());
     if(cs != null) copts.set(CsvOptions.SEPARATOR, String.valueOf(cs.sep));

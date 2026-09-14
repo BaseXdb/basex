@@ -343,7 +343,6 @@ single_cmd           = Unuopa komando atendata.
 size                 = Grandeco
 size_text_results    = Grandeco de tekstaj rezultoj
 skip_corrupt_files   = Preterlasi difektitajn (malbone formitajn) dosierojn
-skip_empty           = Preterlasi malplenajn kampojn
 skipped              = Preterlasita
 sort                 = Ordigi
 srv_running          = La servilo funkcias aŭ aliro estis rifuzita

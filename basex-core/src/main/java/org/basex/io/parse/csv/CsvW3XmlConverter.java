@@ -58,8 +58,6 @@ public class CsvW3XmlConverter extends CsvConverter {
   @Override
   protected final void entry(final byte[] value) {
     ++col;
-    if(skipEmpty && value.length == 0) return;
-
     final FBuilder elem = FElem.build(Q_FN_FIELD);
     final byte[] name = headers.get(col);
     if(name != null && name.length > 0) elem.attr(Q_COLUMN, name);

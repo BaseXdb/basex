@@ -113,9 +113,6 @@ public final class DbModuleTest extends SandboxTest {
     query(func.args(NAME, CSV, "csv3.xml",
         " { 'parser': 'csv', 'csvparser': { 'header': true() } }"));
     query("exists(" + _DB_GET.args(NAME, "csv3.xml") + "//City)", true);
-    query(func.args(NAME, CSV, "csv4.xml",
-        " { 'parser': 'csv', 'csvparser': { 'header': true(), 'skip-empty': true() } }"));
-    query("empty(" + _DB_GET.args(NAME, "csv4.xml") + "//City)", true);
 
     final String addcache = " { 'addcache': true() }";
     query(func.args(NAME, " <cache/>", "C1.xml", addcache));

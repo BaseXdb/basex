@@ -42,8 +42,6 @@ final class CsvDirectConverter extends CsvConverter {
   @Override
   protected void entry(final byte[] value) {
     ++col;
-    if(skipEmpty && value.length == 0) return;
-
     final byte[] name = headers.get(col);
     final FBuilder elem;
     if(attributes) {

@@ -26,8 +26,8 @@ public final class CsvRoundtripTest extends SandboxTest {
       "<entry name=\"b\">2</entry></record><record><entry name=\"a\">11</entry>" +
       "<entry name=\"d\">14</entry><entry name=\"b\">12</entry></record></csv>");
     roundtrip(func, "1,2,3,4&#xA;11,12,13,14",
-      "'format': 'xquery', 'select-columns': (1, 4, 17)",
-      "{\"records\":([\"1\",\"4\",\"\"],[\"11\",\"14\",\"\"])}");
+      "'format': 'w3', 'select-columns': (1, 4, 17)",
+      "{\"columns\":(),\"column-index\":{},\"rows\":([\"1\",\"4\",\"\"],[\"11\",\"14\",\"\"])}");
   }
 
   /** Test method. */

@@ -343,7 +343,6 @@ single_cmd           = 単一のコマンドを指定してください。
 size                 = サイズ
 size_text_results    = テキスト結果のサイズ
 skip_corrupt_files   = 不正な（非整形式の）ファイルをスキップする
-skip_empty           = 空のフィールドをスキップ
 skipped              = スキップしました。
 sort                 = ソート
 srv_running          = サーバーが既に起動しているか、権限が足りません

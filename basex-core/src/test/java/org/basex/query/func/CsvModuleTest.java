@@ -46,17 +46,14 @@ public final class CsvModuleTest extends SandboxTest {
     parse("X,#Y", marker, "...<entry>X</entry><entry>#Y</entry>");
     parse("#C\nX,Y", "", "...<entry>#C</entry></record><record><entry>X</entry>");
 
-    final String header = "'header': true()", skipEmpty = "'skip-empty': true()";
+    final String header = "'header': true()";
     parse("X\nY", header, "<csv><record><X>Y</X></record></csv>");
     parse("A,B,C\nX,Y,Z", header, "...<A>X</A><B>Y</B><C>Z</C>");
 
     parse("X\nY", "'format': 'attributes', " + header, "...<entry name=\"X\">Y</entry>");
 
     parse("X,Y\n1,", header, "<csv><record><X>1</X><Y/></record></csv>");
-    parse("X,Y\n1,", skipEmpty + ", " + header, "<csv><record><X>1</X></record></csv>");
-    parse("X,Y\n,1", skipEmpty + ", " + header, "<csv><record><Y>1</Y></record></csv>");
-                                       // was: "<csv/>");
-    parse("X,Y\n,", skipEmpty + ", " + header, "<csv><record/></csv>");
+    parse("X,Y\n,1", header, "<csv><record><X/><Y>1</Y></record></csv>");
 
             // was: "<csv/>");
     parse("\n", "", "<csv><record/></csv>");
@@ -112,39 +109,34 @@ public final class CsvModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void parseXQuery() {
-    parse("X\nY", "'header': false(), 'format': 'xquery'", "{\"records\":([\"X\"],[\"Y\"])}");
-    parse("X\nY", "'header': 'no', 'format': 'xquery'", "{\"records\":([\"X\"],[\"Y\"])}");
-    parse("X\nY", "'header': '0', 'format': 'xquery'", "{\"records\":([\"X\"],[\"Y\"])}");
-    parse("X\nY", "'header': true(), 'format': 'xquery'", "...\"names\":[\"X\"]");
-    parse("X\nY", "'header': 'yes', 'format': 'xquery'", "...\"names\":[\"X\"]");
-    parse("X\nY", "'header': '1', 'format': 'xquery'", "...\"names\":[\"X\"]");
-    parse("X\nY", "'header': '01', 'format': 'xquery'", "{\"names\":[\"01\"],"
-        + "\"records\":([\"X\"],[\"Y\"])}");
-    parse("X\nY", "'header': '1.0', 'format': 'xquery'", "{\"names\":[\"1.0\"],"
-        + "\"records\":([\"X\"],[\"Y\"])}");
-    parse("X\nY", "'header': ('yes', 'no'), 'format': 'xquery'", "{\"names\":[\"yes\",\"no\"],"
-        + "\"records\":([\"X\"],[\"Y\"])}");
-    parse("X\nY", "'header': ' h ' , 'format': 'xquery'", "{\"names\":[\" h \"],"
-        + "\"records\":([\"X\"],[\"Y\"])}");
+  @Test public void parseW3() {
+    parse("X\nY", "'header': false(), 'format': 'w3'", "...\"rows\":([\"X\"],[\"Y\"])");
+    parse("X\nY", "'header': 'no', 'format': 'w3'", "...\"rows\":([\"X\"],[\"Y\"])");
+    parse("X\nY", "'header': '0', 'format': 'w3'", "...\"rows\":([\"X\"],[\"Y\"])");
+    parse("X\nY", "'header': true(), 'format': 'w3'", "...\"columns\":\"X\"");
+    parse("X\nY", "'header': 'yes', 'format': 'w3'", "...\"columns\":\"X\"");
+    parse("X\nY", "'header': '1', 'format': 'w3'", "...\"columns\":\"X\"");
+    parse("X\nY", "'header': '01', 'format': 'w3'", "...\"columns\":\"01\","
+        + "\"column-index\":{\"01\":1},\"rows\":([\"X\"],[\"Y\"])");
+    parse("X\nY", "'header': '1.0', 'format': 'w3'", "...\"columns\":\"1.0\","
+        + "\"column-index\":{\"1.0\":1},\"rows\":([\"X\"],[\"Y\"])");
+    parse("X\nY", "'header': ('yes', 'no'), 'format': 'w3'", "...\"columns\":(\"yes\",\"no\"),"
+        + "\"column-index\":{\"yes\":1,\"no\":2},\"rows\":([\"X\"],[\"Y\"])");
+    parse("X\nY", "'header': ' h ' , 'format': 'w3'", "...\"columns\":\" h \","
+        + "\"column-index\":{\" h \":1},\"rows\":([\"X\"],[\"Y\"])");
 
-    parse("", "'format': 'xquery'", "{\"records\":()}");
-                              // was: "{\"records\":()}");
-    parse("\n", "'format': 'xquery'", "{\"records\":[]}");
-                                // was: "{\"records\":()}");
-    parse("\n\n", "'format': 'xquery'", "{\"records\":([],[])}");
-                                 // was: "{\"records\":[\"X\"]}");
-    parse("\n\nX", "'format': 'xquery'", "{\"records\":([],[],[\"X\"])}");
-                                  // was: "{\"records\":([\"X\"],[\"Y\"])}");
-    parse("X\n\nY", "'format': 'xquery'", "{\"records\":([\"X\"],[],[\"Y\"])}");
-    parse("X\n", "'format': 'xquery'", "{\"records\":[\"X\"]}");
-                                 // was: "{\"records\":[\"X\"]}");
-    parse("X\n\n", "'format': 'xquery'", "{\"records\":([\"X\"],[])}");
+    parse("", "'format': 'w3'", "...\"rows\":()");
+    parse("\n", "'format': 'w3'", "...\"rows\":[]");
+    parse("\n\n", "'format': 'w3'", "...\"rows\":([],[])");
+    parse("\n\nX", "'format': 'w3'", "...\"rows\":([],[],[\"X\"])");
+    parse("X\n\nY", "'format': 'w3'", "...\"rows\":([\"X\"],[],[\"Y\"])");
+    parse("X\n", "'format': 'w3'", "...\"rows\":[\"X\"]");
+    parse("X\n\n", "'format': 'w3'", "...\"rows\":([\"X\"],[])");
 
-    parse(" ' \"\"'", "'quotes': true(), 'format': 'xquery'", "{\"records\":[\" \"\"\"]}");
-    parse(" ' \" X\"'", "'quotes': true(), 'format': 'xquery'", "{\"records\":[\" \"\" X\"\"\"]}");
-    parse(" '\"\" '", "'quotes': true(), 'format': 'xquery'", "{\"records\":[\" \"]}");
-    parse(" '\"X \" '", "'quotes': true(), 'format': 'xquery'", "{\"records\":[\"X  \"]}");
+    parse(" ' \"\"'", "'quotes': true(), 'format': 'w3'", "...\"rows\":[\" \"\"\"]");
+    parse(" ' \" X\"'", "'quotes': true(), 'format': 'w3'", "...\"rows\":[\" \"\" X\"\"\"]");
+    parse(" '\"\" '", "'quotes': true(), 'format': 'w3'", "...\"rows\":[\" \"]");
+    parse(" '\"X \" '", "'quotes': true(), 'format': 'w3'", "...\"rows\":[\"X  \"]");
   }
 
   /** Test method. */
@@ -217,24 +209,24 @@ public final class CsvModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void serializeXQuery() {
-    serial(" { 'records': [ 'A', 'B' ] }",
-        "'format': 'xquery'", "A,B\n");
-    serial(" { 'records': [ 'A', 'B' ] }",
-        "'header': false(), 'format': 'xquery'", "A,B\n");
-    serial(" { 'names': [ 'A', 'B' ], 'records': () }",
-        "'header': true(), 'format': 'xquery'", "A,B\n");
-    serial(" { 'names': [ 'A' ], 'records': [ '1' ] }",
-        "'header': true(), 'format': 'xquery'", "A\n1\n");
+  @Test public void serializeW3() {
+    serial(" { 'rows': [ 'A', 'B' ] }",
+        "'format': 'w3'", "A,B\n");
+    serial(" { 'rows': [ 'A', 'B' ] }",
+        "'header': false(), 'format': 'w3'", "A,B\n");
+    serial(" { 'columns': ('A', 'B'), 'rows': () }",
+        "'header': true(), 'format': 'w3'", "A,B\n");
+    serial(" { 'columns': 'A', 'rows': [ '1' ] }",
+        "'header': true(), 'format': 'w3'", "A\n1\n");
 
-    final String map = "{ 'names': ['A', 'B'], 'records': (['X'], ['Y']) }";
-    serial(map, "'format': 'xquery', 'header': false()", "X\nY\n");
-    serial(map, "'format': 'xquery', 'header': 'no'", "X\nY\n");
-    serial(map, "'format': 'xquery', 'header': '0'", "X\nY\n");
-    serial(map, "'format': 'xquery', 'header': true()", "A,B\nX\nY\n");
-    serial(map, "'format': 'xquery', 'header': 'yes'", "A,B\nX\nY\n");
-    serial(map, "'format': 'xquery', 'header': '1'", "A,B\nX\nY\n");
-    serial(map, "'format': 'xquery', 'header': ('C', 'D')", "X\nY\n");
+    final String map = "{ 'columns': ('A', 'B'), 'rows': (['X'], ['Y']) }";
+    serial(map, "'format': 'w3', 'header': false()", "X\nY\n");
+    serial(map, "'format': 'w3', 'header': 'no'", "X\nY\n");
+    serial(map, "'format': 'w3', 'header': '0'", "X\nY\n");
+    serial(map, "'format': 'w3', 'header': true()", "A,B\nX\nY\n");
+    serial(map, "'format': 'w3', 'header': 'yes'", "A,B\nX\nY\n");
+    serial(map, "'format': 'w3', 'header': '1'", "A,B\nX\nY\n");
+    serial(map, "'format': 'w3', 'header': ('C', 'D')", "X\nY\n");
 
     error(_CSV_SERIALIZE.args(" { 'rows': [ { 'A': '' } ]?*('A') }",
         " { 'format': 'w3' }"), SERCSV_X_X);

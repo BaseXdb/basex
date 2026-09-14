@@ -53,8 +53,7 @@ public class CsvOptions extends Options {
     /** Attributes. */ ATTRIBUTES,
     /** fn:parse-csv. */ W3,
     /** fn:csv-to-arrays. */ W3_ARRAYS,
-    /** fn:csv-to-xml. */ W3_XML,
-    /** XQuery (deprecated; use {@link #W3}). */ XQUERY;
+    /** fn:csv-to-xml. */ W3_XML;
 
     @Override
     public String toString() {

@@ -18,7 +18,7 @@ import org.basex.util.list.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class CsvXQueryConverter extends CsvConverter {
+public abstract class CsvXQueryConverter extends CsvConverter {
   /** String array type. */
   private static final ArrayType STRING_ARRAY = ArrayType.get(Types.STRING_O);
 
