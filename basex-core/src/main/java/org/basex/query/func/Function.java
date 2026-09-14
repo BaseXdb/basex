@@ -1290,6 +1290,10 @@ public enum Function implements AFunction {
   _CRYPTO_HMAC(CryptoHmac::new, "hmac(value, key, algorithm, encoding?)",
       params(STRING_OR_BINARY_O, STRING_OR_BINARY_O, STRING_O, STRING_ZO), STRING_O, CRYPTO_URI),
   /** XQuery function. */
+  _CRYPTO_PBKDF2(CryptoPbkdf2::new, "pbkdf2(password, salt, iterations, length, algorithm?)",
+      params(STRING_O, STRING_OR_BINARY_O, INTEGER_O, INTEGER_O, STRING_ZO), HEX_BINARY_O,
+      CRYPTO_URI),
+  /** XQuery function. */
   _CRYPTO_VALIDATE_SIGNATURE(CryptoValidateSignature::new, "validate-signature(node)",
       params(XNODE_O), BOOLEAN_O, CRYPTO_URI),
 
