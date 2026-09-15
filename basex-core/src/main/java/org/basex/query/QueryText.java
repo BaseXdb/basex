@@ -225,7 +225,6 @@ public interface QueryText {
   /** XQuery prefix. */ byte[] FILE_PREFIX = token("file");
   /** XQuery prefix. */ byte[] FN_PREFIX = token("fn");
   /** XQuery prefix. */ byte[] FT_PREFIX = token("ft");
-  /** XQuery prefix. */ byte[] HOF_PREFIX = token("hof");
   /** XQuery prefix. */ byte[] HTML_PREFIX = token("html");
   /** XQuery prefix. */ byte[] HTTP_PREFIX = token("http");
   /** XQuery prefix. */ byte[] INDEX_PREFIX = token("index");
@@ -308,7 +307,6 @@ public interface QueryText {
   /** BaseX URI. */ byte[] DB_URI = token(BXMODULES_URL + "db");
   /** BaseX URI. */ byte[] FETCH_URI = token(BXMODULES_URL + "fetch");
   /** BaseX URI. */ byte[] FT_URI = token(BXMODULES_URL + "ft");
-  /** BaseX URI. */ byte[] HOF_URI = token(BXMODULES_URL + "hof");
   /** BaseX URI. */ byte[] HTML_URI = token(BXMODULES_URL + "html");
   /** BaseX URI. */ byte[] INDEX_URI = token(BXMODULES_URL + "index");
   /** BaseX URI. */ byte[] INPUT_URI = token(BXMODULES_URL + "input");

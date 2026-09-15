@@ -180,13 +180,6 @@ public final class FuncItemTest extends SandboxTest {
     );
   }
 
-  /** Checks if {@code fold-left1(...)} can be used. */
-  @Test public void foldLeft1Test() {
-    check("hof:fold-left1(1 to 42, function($a, $b) { max(($a, $b)) })",
-        42
-    );
-  }
-
   /** Checks if statically unused functions are compiled at runtime. */
   @Test public void compStatUnusedTest() {
     check("declare function local:foo() { abs(?) };" +

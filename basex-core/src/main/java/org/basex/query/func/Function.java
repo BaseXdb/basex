@@ -23,7 +23,6 @@ import org.basex.query.func.fetch.*;
 import org.basex.query.func.file.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.func.ft.*;
-import org.basex.query.func.hof.*;
 import org.basex.query.func.html.*;
 import org.basex.query.func.http.*;
 import org.basex.query.func.index.*;
@@ -1604,19 +1603,6 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _FT_TOKENS(FtTokens::new, "tokens(database, prefix?, options?)",
       params(STRING_O, STRING_ZO, MAP_ZO), ELEMENT_ZM, flag(NDT), FT_URI),
-
-  // HOF Module
-
-  /** XQuery function. */
-  _HOF_FOLD_LEFT1(HofFoldLeft1::new, "fold-left1(input, action)",
-      params(ITEM_OM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_O, INTEGER_O).seqType()),
-      ITEM_ZM, HOF_URI),
-  /** XQuery function. */
-  _HOF_TOP_K_BY(HofTopKBy::new, "top-k-by(input, key, k)",
-      params(ITEM_ZM, FuncType.get(ITEM_O, ITEM_O).seqType(), INTEGER_O), ITEM_ZM, HOF_URI),
-  /** XQuery function. */
-  _HOF_TOP_K_WITH(HofTopKWith::new, "top-k-with(input, comparator, k)",
-      params(ITEM_ZM, BIPREDICATE_O, INTEGER_O), ITEM_ZM, HOF_URI),
 
   // HTML Module
 
