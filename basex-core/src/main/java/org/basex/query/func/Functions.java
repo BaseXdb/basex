@@ -328,7 +328,8 @@ public final class Functions {
 
     final StaticFuncCall call = staticCall(sf.name, fb, qc);
     if(call.func != null) fb.anns = call.func.anns;
-    return item(call, fb, ft, sf.name, sf.updating, false);
+    // fn:current in a default value refers to the focus of the function reference
+    return item(call, fb, ft, sf.name, sf.updating, call.has(Flag.CTX));
   }
 
   /**

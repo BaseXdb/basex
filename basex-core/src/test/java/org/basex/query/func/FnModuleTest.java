@@ -2058,6 +2058,14 @@ public final class FnModuleTest extends SandboxTest {
         + "for $name in ('f', 'g') return "
         + func.args(" QName('http://www.w3.org/2005/xquery-local-functions', $name)", 0) + "()",
         "X\ny");
+    // fn:current in a default value refers to the focus of the lookup
+    query("declare function local:f($a := current()) { $a }; "
+        + "'lookup' ! " + func.args(" xs:QName('local:f')", 0) + "()", "lookup");
+    query("declare function local:f($a := current()) { $a }; "
+        + "declare function local:g($a := fn:current()) { $a }; "
+        + "for $name in ('f', 'g') return 'lookup' ! "
+        + func.args(" QName('http://www.w3.org/2005/xquery-local-functions', $name)", 0) + "()",
+        "lookup\nlookup");
 
     inline(true);
     check(func.args(" #fn:count", 1) + "((1, 2))", 2, root(Itr.class));
