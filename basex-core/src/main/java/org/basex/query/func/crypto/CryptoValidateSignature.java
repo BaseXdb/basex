@@ -20,6 +20,6 @@ public final class CryptoValidateSignature extends StandardFunc {
   @Override
   protected boolean ebv(final QueryContext qc) throws QueryException {
     final XNode node = toNode(arg(0), qc);
-    return new DigitalSignature(info).validateSignature(node);
+    return new DigitalSignature(info).validateSignature(node, qc);
   }
 }

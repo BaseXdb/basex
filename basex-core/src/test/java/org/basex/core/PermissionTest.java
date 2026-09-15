@@ -71,6 +71,11 @@ public final class PermissionTest extends SandboxTest {
       ok(new XQuery(_DB_PUT_VALUE.args(NAME, "v", "value")), adminSession);
       ok(new XQuery(_FILE_WRITE.args(sandbox() + "file", "file")), adminSession);
       ok(new XQuery(_FILE_WRITE_TEXT.args(sandbox() + "doc.xml", "<x/>")), adminSession);
+      ok(new XQuery(_FILE_WRITE_TEXT.args(sandbox() + "module.xqm",
+          "module namespace m = 'm'; declare function m:f() { 1 };")), adminSession);
+      ok(new XQuery(_FILE_WRITE_TEXT.args(sandbox() + "params.xml",
+          "<serialization-parameters xmlns='http://www.w3.org/2010/xslt-xquery-serialization'/>")),
+          adminSession);
       ok(new Close(), adminSession);
     } catch(final Exception ex) {
       fail(Util.message(ex));
@@ -192,6 +197,28 @@ public final class PermissionTest extends SandboxTest {
     no(new XQuery(DOC.args(sandbox() + "doc.xml")), testSession);
     no(new XQuery(DOC_AVAILABLE.args(sandbox() + "doc.xml")), testSession);
     no(new XQuery(COLLECTION.args(sandbox() + "doc.xml")), testSession);
+
+    // files referenced in the query prolog or body, and query files, require CREATE permission
+    for(final String query : externalQueries()) no(new XQuery(query), testSession);
+    no(new Run(sandbox() + "doc.xml"), testSession);
+
+    // fn:parse-xml: external resources require CREATE permission
+    ok(new XQuery("parse-xml('<x/>')"), testSession);
+    no(new XQuery("parse-xml('<x/>', { 'trust-external': true() })"), testSession);
+    no(new XQuery("parse-xml('<x/>', { 'intparse': true() })"), testSession);
+  }
+
+  /**
+   * Returns queries that access external files.
+   * @return queries
+   */
+  private static String[] externalQueries() {
+    return new String[] {
+      "import module namespace m = 'm' at '" + sandbox() + "module.xqm'; m:f()",
+      "declare option output:parameter-document '" + sandbox() + "params.xml'; 1",
+      "'a' contains text 'a' using stop words at '" + sandbox() + "file'",
+      "'a' contains text 'a' using thesaurus at '" + sandbox() + "doc.xml'"
+    };
   }
 
   /** Tests all commands where read permission is needed. */
@@ -301,6 +328,10 @@ public final class PermissionTest extends SandboxTest {
   @Test public void writePermsNeeded() {
     ok(new Grant("write", NAME), adminSession);
     ok(new Open(NAME2), testSession);
+    // local resources require CREATE permission
+    no(new Add("file.xml", sandbox() + "doc.xml"), testSession);
+    no(new Put("file.xml", sandbox() + "doc.xml"), testSession);
+    no(new BinaryPut("file.bin", sandbox() + "file"), testSession);
     ok(new Rename(NAME2, NAME2 + '2'), testSession);
     ok(new Rename(NAME2 + '2', NAME2), testSession);
 
@@ -397,6 +428,13 @@ public final class PermissionTest extends SandboxTest {
     no(new XQuery(DOC.args(sandbox() + "doc.xml")), testSession);
     no(new XQuery(DOC_AVAILABLE.args(sandbox() + "doc.xml")), testSession);
     no(new XQuery(COLLECTION.args(sandbox() + "doc.xml")), testSession);
+
+    // db:add, db:put, db:put-binary: file paths require CREATE permission
+    no(new XQuery(_DB_ADD.args(NAME, sandbox() + "doc.xml", "doc.xml")), testSession);
+    no(new XQuery(_DB_PUT.args(NAME, sandbox() + "doc.xml", "doc.xml")), testSession);
+    no(new XQuery(_DB_PUT_BINARY.args(NAME, sandbox() + "file", "file")), testSession);
+    // crypto:validate-signature: external references require CREATE permission
+    error(new XQuery(signature()), testSession, "basex:permission");
   }
 
   /** Tests all commands where create permission is needed. */
@@ -404,6 +442,11 @@ public final class PermissionTest extends SandboxTest {
     ok(new Grant("create", NAME), adminSession);
 
     ok(new CreateDB(NAME2, "<xml/>"), testSession);
+    ok(new Add("file.xml", sandbox() + "doc.xml"), testSession);
+    ok(new Put("file.xml", sandbox() + "doc.xml"), testSession);
+    ok(new BinaryPut("file.bin", sandbox() + "file"), testSession);
+    ok(new XQuery("parse-xml('<x/>', { 'intparse': true(), 'trust-external': true() })"),
+        testSession);
     ok(new InfoIndex(), testSession);
     for(final CmdIndex cmd : CmdIndex.values()) {
       ok(new DropIndex(cmd), testSession);
@@ -464,6 +507,10 @@ public final class PermissionTest extends SandboxTest {
     ok(new XQuery(_DB_DELETE.args(NAME, "b.xml")), testSession);
     ok(new XQuery(_DB_CREATE.args(NAME)), testSession);
     ok(new XQuery(_DB_OPTIMIZE.args(NAME)), testSession);
+    // db:add, db:put, db:put-binary: file paths
+    ok(new XQuery(_DB_ADD.args(NAME, sandbox() + "doc.xml", "doc.xml")), testSession);
+    ok(new XQuery(_DB_PUT.args(NAME, sandbox() + "doc.xml", "doc.xml")), testSession);
+    ok(new XQuery(_DB_PUT_BINARY.args(NAME, sandbox() + "file", "file")), testSession);
     ok(new XQuery(_DB_CREATE_BACKUP.args(NAME)), testSession);
     no(new XQuery(_DB_EXPORT.args(NAME, sandbox() + "-export")), testSession);
     ok(new XQuery(_DB_BACKUPS.args()), testSession);
@@ -488,6 +535,12 @@ public final class PermissionTest extends SandboxTest {
     // fn:doc, fn:doc-available: external resources accessible with CREATE permission
     ok(new XQuery(DOC.args(sandbox() + "doc.xml")), testSession);
     ok(new XQuery(DOC_AVAILABLE.args(sandbox() + "doc.xml")), testSession);
+
+    // files referenced in the query prolog or body, and query files
+    for(final String query : externalQueries()) ok(new XQuery(query), testSession);
+    ok(new Run(sandbox() + "doc.xml"), testSession);
+    // crypto:validate-signature: no permission error for external references
+    error(new XQuery(signature()), testSession, "CX0025");
 
     // xquery:parse and xquery:eval: load from URI now permitted with CREATE
     ok(new XQuery(_XQUERY_PARSE.args(" xs:anyURI('" + sandbox() + "doc.xml')")), testSession);
@@ -680,5 +733,20 @@ public final class PermissionTest extends SandboxTest {
     } catch(final IOException expected) {
       Util.debug(expected);
     }
+  }
+
+  /**
+   * Returns a query that validates a signature with a reference to an external file.
+   * @return query
+   */
+  private static String signature() {
+    return _CRYPTO_VALIDATE_SIGNATURE.args(" <x><Signature "
+      + "xmlns='http://www.w3.org/2000/09/xmldsig#'><SignedInfo>"
+      + "<CanonicalizationMethod Algorithm='http://www.w3.org/2001/10/xml-exc-c14n#'/>"
+      + "<SignatureMethod Algorithm='http://www.w3.org/2001/04/xmldsig-more#rsa-sha256'/>"
+      + "<Reference URI='" + new IOFile(sandbox() + "file").url() + "'>"
+      + "<DigestMethod Algorithm='http://www.w3.org/2001/04/xmlenc#sha256'/>"
+      + "<DigestValue>AA==</DigestValue></Reference></SignedInfo>"
+      + "<SignatureValue>AA==</SignatureValue></Signature></x>");
   }
 }

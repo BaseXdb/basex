@@ -51,7 +51,8 @@ public final class BinaryPut extends ACreate {
 
     if(in == null) {
       final IO io = IO.get(args[1]);
-      if(!io.exists() || io.isDir()) return error(RES_NOT_FOUND_X, create ? io : args[1]);
+      if(io.isExternal() && !create) return error(PERM_REQUIRED_X, Perm.CREATE);
+      if(!io.exists() || io.isDir()) return error(RES_NOT_FOUND_X, io);
       in = io.inputSource();
       // set/add name of document
       if((path.isEmpty() || Strings.endsWith(path, '/')) && !(io instanceof IOContent)) {

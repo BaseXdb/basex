@@ -503,7 +503,7 @@ public final class QueryResources {
 
     // check user permissions
     final IO io = input.io;
-    final Perm perm = io instanceof IOFile || io instanceof IOUrl ? Perm.CREATE : Perm.READ;
+    final Perm perm = io.isExternal() ? Perm.CREATE : Perm.READ;
     if(!user.has(perm)) throw BASEX_PERMISSION_X_X.get(info, perm, input.original);
 
     // check if input points to a single file

@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.index.resource.*;
 import org.basex.io.*;
@@ -33,11 +34,13 @@ abstract class DbNew extends DbAccessFn {
    * documents/nodes or IO references parsed as XML (e.g. db:add, db:put).
    * @param input input item (node or string)
    * @param path path argument (optional, can be empty)
+   * @param qc query context
    * @return input container
    * @throws QueryException query exception
    */
-  final NewInput toNewInput(final Item input, final String path) throws QueryException {
-    return toNewInput(input, path, ResourceType.XML);
+  final NewInput toNewInput(final Item input, final String path, final QueryContext qc)
+      throws QueryException {
+    return toNewInput(input, path, ResourceType.XML, qc);
   }
 
   /**
@@ -48,17 +51,18 @@ abstract class DbNew extends DbAccessFn {
    * @param input input item
    * @param path path argument (optional for XML, required for BINARY and VALUE)
    * @param type explicit target resource type, or {@code null} for type dispatch
+   * @param qc query context
    * @return input container
    * @throws QueryException query exception
    */
-  final NewInput toNewInput(final Item input, final String path, final ResourceType type)
-      throws QueryException {
+  final NewInput toNewInput(final Item input, final String path, final ResourceType type,
+      final QueryContext qc) throws QueryException {
     final NewInput ni = new NewInput();
     ni.type = type != null ? type : input.type.isStringOrUntyped() ? ResourceType.XML :
       input instanceof Bin ? ResourceType.BINARY : ResourceType.VALUE;
     switch(ni.type) {
-      case XML    -> fillXmlInput(ni, input, path);
-      case BINARY -> fillBinaryInput(ni, input, path);
+      case XML    -> fillXmlInput(ni, input, path, qc);
+      case BINARY -> fillBinaryInput(ni, input, path, qc);
       case VALUE  -> fillValueInput(ni, input, path);
     }
     return ni;
@@ -69,10 +73,11 @@ abstract class DbNew extends DbAccessFn {
    * @param ni new input container
    * @param input input item (node or string-typed IO reference)
    * @param path path argument (optional, can be empty)
+   * @param qc query context
    * @throws QueryException query exception
    */
-  private void fillXmlInput(final NewInput ni, final Item input, final String path)
-      throws QueryException {
+  private void fillXmlInput(final NewInput ni, final Item input, final String path,
+      final QueryContext qc) throws QueryException {
     if(input instanceof final XNode node) {
       if(Strings.endsWith(path, '/')) throw DB_PATH_X.get(info, path);
 
@@ -98,6 +103,7 @@ abstract class DbNew extends DbAccessFn {
 
     final String string = string(input.string(info));
     final IO io = IO.get(string);
+    if(io.isExternal()) checkPerm(qc, Perm.CREATE);
     if(!io.exists()) throw WHICHRES_X.get(info, string);
 
     // add slash to the target if the addressed file is an archive or directory
@@ -127,13 +133,14 @@ abstract class DbNew extends DbAccessFn {
    * @param ni new input container
    * @param input input item (binary literal or string-typed IO reference)
    * @param path target path (must not be empty)
+   * @param qc query context
    * @throws QueryException query exception
    */
-  private void fillBinaryInput(final NewInput ni, final Item input, final String path)
-      throws QueryException {
+  private void fillBinaryInput(final NewInput ni, final Item input, final String path,
+      final QueryContext qc) throws QueryException {
     if(path.isEmpty() || Strings.endsWith(path, '/')) throw DB_PATH_X.get(info, path);
     ni.path = path;
-    final Object source = toBinarySource(input);
+    final Object source = toBinarySource(input, qc);
     if(source instanceof final Bin bin) ni.value = bin;
     else ni.io = (IO) source;
   }
@@ -177,7 +184,7 @@ abstract class DbNew extends DbAccessFn {
       final PathSpec spec = i < ps ? paths.get(i) : null;
       final String path = spec != null ? spec.path() : "";
       final ResourceType type = spec != null ? spec.type() : null;
-      inputs[i] = toNewInput(value.itemAt(i), path, type);
+      inputs[i] = toNewInput(value.itemAt(i), path, type, qc);
     }
     return inputs;
   }

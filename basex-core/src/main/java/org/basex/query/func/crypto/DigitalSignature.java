@@ -17,6 +17,7 @@ import javax.xml.crypto.dsig.spec.*;
 import javax.xml.parsers.*;
 import javax.xml.xpath.*;
 
+import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -265,10 +266,11 @@ final class DigitalSignature {
   /**
    * Validates a signature.
    * @param node input node
+   * @param qc query context
    * @return boolean result of validation
    * @throws QueryException query exception
    */
-  boolean validateSignature(final XNode node) throws QueryException {
+  boolean validateSignature(final XNode node, final QueryContext qc) throws QueryException {
     try {
       final Document doc = toDOMNode(node);
       final DOMValidateContext valContext = new DOMValidateContext(new MyKeySelector(), doc);
@@ -277,6 +279,15 @@ final class DigitalSignature {
       valContext.setNode(signl.item(0));
       final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
       final XMLSignature signature = fac.unmarshalXMLSignature(valContext);
+      // references to external resources require CREATE permission
+      if(!qc.user.has(Perm.CREATE)) {
+        for(final Reference ref : signature.getSignedInfo().getReferences()) {
+          final String uri = ref.getURI();
+          if(uri != null && !uri.isEmpty() && uri.charAt(0) != '#') {
+            throw BASEX_PERMISSION_X_X.get(info, Perm.CREATE, uri);
+          }
+        }
+      }
       return signature.validate(valContext);
     } catch(final XMLSignatureException | SAXException | ParserConfigurationException |
         IOException ex) {

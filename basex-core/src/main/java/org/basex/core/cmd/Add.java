@@ -82,7 +82,7 @@ public final class Add extends ACreate {
     // check if resource exists
     if(source == null) return error(RES_NOT_FOUND);
     if(!source.exists()) return in != null ? error(RES_NOT_FOUND) :
-        error(RES_NOT_FOUND_X, context.user().has(Perm.CREATE) ? source : args[1]);
+        error(RES_NOT_FOUND_X, source);
 
     if(!Strings.endsWith(path, '/') && (source.isDir() || source.isArchive())) path += '/';
 

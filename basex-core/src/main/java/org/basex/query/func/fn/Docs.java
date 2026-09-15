@@ -126,7 +126,11 @@ public abstract class Docs extends DynamicFn {
     final boolean xsiLocation = !skip &&
         (bool.test(CommonOptions.USE_XSI_SCHEMA_LOCATION) ||
          bool.test(MainOptions.XSILOCATION.name()));
-    if(dtd || xinclude || dtdVal || xsiLocation) checkPerm(qc, Perm.CREATE);
+    // external resources are fetched in trusted mode, and always by the internal DTD parser
+    final boolean trusted = trusted(options, CommonOptions.TRUST_EXTERNAL, qc);
+    if(trusted && (dtd || xinclude || dtdVal || xsiLocation) || intparse && dtd) {
+      checkPerm(qc, Perm.CREATE);
+    }
 
     if(intparse && dtdVal) throw NODTDVALIDATION.get(info);
     if(!skip) {

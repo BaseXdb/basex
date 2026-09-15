@@ -67,6 +67,10 @@ public abstract class ACreate extends Command {
       }
     }
 
+    // local and remote resources require CREATE permission
+    if(io != null && io.isExternal() && !context.user().has(Perm.CREATE)) {
+      throw new BaseXException(PERM_REQUIRED_X, Perm.CREATE);
+    }
     // assign (intermediate) name to input reference
     if(io instanceof IOContent || io instanceof IOStream) {
       if(Strings.endsWith(name, '/')) throw new BaseXException(NAME_INVALID_X, name);

@@ -15,6 +15,7 @@ import java.util.regex.*;
 
 import org.basex.core.*;
 import org.basex.core.locks.*;
+import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.ann.*;
@@ -739,6 +740,7 @@ public class QueryParser extends InputParser {
     if(eq(uri, OUTPUT_URI)) {
       // output declaration
       if(sc.module != null) throw error(OUTPUTLIB_X, name);
+      if(name.equals(SerializerOptions.PARAMETER_DOCUMENT.name())) checkCreate(value, info());
       if(sparams.put(name, new Object[] { value, info() }) != null) throw error(OUTDUPL_X, name);
     } else if(eq(uri, DB_URI)) {
       // project-specific declaration
@@ -953,7 +955,20 @@ public class QueryParser extends InputParser {
       throw error(WHICHMOD_X, mi.info, uri);
     }
     // parse supplied paths
-    for(final byte[] pth : mi.paths) module(string(pth), string(uri), mi.info);
+    for(final byte[] pth : mi.paths) {
+      checkCreate(string(pth), mi.info);
+      module(string(pth), string(uri), mi.info);
+    }
+  }
+
+  /**
+   * Checks if the current user is allowed to access external resources.
+   * @param location location of the resource
+   * @param info input info (can be {@code null})
+   * @throws QueryException query exception
+   */
+  private void checkCreate(final String location, final InputInfo info) throws QueryException {
+    if(!qc.user.has(Perm.CREATE)) throw error(BASEX_PERMISSION_X_X, info, Perm.CREATE, location);
   }
 
   /**
@@ -4711,7 +4726,9 @@ public class QueryParser extends InputParser {
               wsCheck(")");
             } else if(wsConsumeWs(AT)) {
               // optional: resolve URI reference
-              final IO fl = qc.resources.stopWords(string(stringLiteral()), sc);
+              final String location = string(stringLiteral());
+              checkCreate(location, info());
+              final IO fl = qc.resources.stopWords(location, sc);
               try {
                 opt.sw.read(fl, except);
               } catch(final IOException ex) {
@@ -4753,7 +4770,9 @@ public class QueryParser extends InputParser {
     wsCheck(AT);
 
     // optional: resolve URI reference
-    final IO fl = qc.resources.thesaurus(string(stringLiteral()), sc);
+    final String location = string(stringLiteral());
+    checkCreate(location, info());
+    final IO fl = qc.resources.thesaurus(location, sc);
     final byte[] rel = wsConsumeWs(RELATIONSHIP) ? stringLiteral() : EMPTY;
     final Expr[] range = ftRange(true);
     long min = 0, max = Long.MAX_VALUE;

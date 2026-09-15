@@ -31,7 +31,16 @@ public class Execute extends Command {
    * @param input user input
    */
   public Execute(final String input) {
-    super(Perm.NONE, false, input);
+    this(Perm.NONE, input);
+  }
+
+  /**
+   * Constructor for string input with a required permission.
+   * @param perm required permission
+   * @param input user input
+   */
+  Execute(final Perm perm, final String input) {
+    super(perm, false, input);
     commands = new ArrayList<>();
   }
 

@@ -118,6 +118,11 @@ public final class IOUrl extends IO {
   }
 
   @Override
+  public boolean isExternal() {
+    return true;
+  }
+
+  @Override
   public StreamSource streamSource() {
     return new StreamSource(pth);
   }

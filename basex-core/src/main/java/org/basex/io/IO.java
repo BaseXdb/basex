@@ -192,6 +192,14 @@ public abstract class IO {
   }
 
   /**
+   * Tests if this reference points to a local or remote resource.
+   * @return result of check
+   */
+  public boolean isExternal() {
+    return false;
+  }
+
+  /**
    * Tests if the file suffix matches the specified suffixes.
    * @param suffixes suffixes to compare with
    * @return result of check

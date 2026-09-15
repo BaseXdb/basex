@@ -24,7 +24,7 @@ public final class Run extends Execute {
    * @param fl input file
    */
   public Run(final String fl) {
-    super(fl);
+    super(Perm.CREATE, fl);
   }
 
   /**
@@ -38,7 +38,7 @@ public final class Run extends Execute {
       // check file reference
       file = uri.isEmpty() ? IO.get(args[0]) : IO.get(uri).merge(args[0]);
       if(!file.exists() || file.isDir()) {
-        error = Util.info(RES_NOT_FOUND_X, ctx.user().has(Perm.CREATE) ? file : args[0]);
+        error = Util.info(RES_NOT_FOUND_X, file);
       } else {
         try {
           // interpret as commands if input ends with command script suffix

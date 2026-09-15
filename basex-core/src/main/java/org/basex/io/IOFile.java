@@ -148,6 +148,11 @@ public final class IOFile extends IO {
   }
 
   @Override
+  public boolean isExternal() {
+    return true;
+  }
+
+  @Override
   public long timeStamp() {
     return file.lastModified();
   }

@@ -747,14 +747,17 @@ public abstract class ParseExpr extends Expr {
    *   <li>string-typed/untyped atomic items are interpreted as URIs pointing to a file.</li>
    * </ul>
    * @param input input item
+   * @param qc query context
    * @return binary source (a {@link Bin} or an {@link IO} reference)
    * @throws QueryException query exception
    */
-  protected final Object toBinarySource(final Item input) throws QueryException {
+  protected final Object toBinarySource(final Item input, final QueryContext qc)
+      throws QueryException {
     if(input instanceof Bin) return input;
     if(!input.type.isStringOrUntyped()) throw STRBIN_X_X.get(info, input.type, input);
     final String string = string(input.string(info));
     final IO io = IO.get(string);
+    if(io.isExternal()) checkPerm(qc, Perm.CREATE);
     if(!io.exists() || io.isDir()) throw WHICHRES_X.get(info, string);
     return io;
   }

@@ -28,7 +28,7 @@ public class DbPutBinary extends DbNew {
     final String path = toDbPath(arg(2), qc);
     if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
     if(path.isEmpty()) throw DB_PATH_X.get(info, path);
-    final Object source = toBinarySource(input);
+    final Object source = toBinarySource(input, qc);
     return put(data, path, new DBPutBinary(data, source, path, info), qc);
   }
 
