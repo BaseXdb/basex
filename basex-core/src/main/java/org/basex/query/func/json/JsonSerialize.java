@@ -29,8 +29,9 @@ public final class JsonSerialize extends StandardFunc {
   public Str value(final QueryContext qc) throws QueryException {
     Iter input = arg(0).iter(qc);
     JsonSerialOptions options = options(1, JsonSerialOptions::new, qc);
-    final Option<?> option = options.elementsOption();
-    if(option != null) throw INVALIDOPTION_X.get(info, Options.unknown(option));
+    if(options.unsupportedMapping()) {
+      throw INVALIDOPTION_X.get(info, Options.unknown(JsonOptions.MAPPING));
+    }
     if(options.get(JsonOptions.FORMAT) == JsonFormat.W3_MAPPING) {
       try {
         input = elements(input, options, qc).iter();

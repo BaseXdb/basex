@@ -53,8 +53,7 @@ public abstract class JsonSerializer extends StandardSerializer {
   public static Serializer get(final OutputStream os, final SerializerOptions so)
       throws IOException {
     final JsonSerialOptions jopts = so.get(SerializerOptions.JSON);
-    final Option<?> option = jopts.elementsOption();
-    if(option != null) throw SERPARAM_X.getIO(Options.unknown(option));
+    if(jopts.unsupportedMapping()) throw SERPARAM_X.getIO(Options.unknown(JsonOptions.MAPPING));
     return switch(jopts.get(JsonOptions.FORMAT)) {
       case W3_MAPPING -> throw SERPARAM_X.getIO(Util.info(
           "Format '%' is not supported by the serializer.", JsonOptions.JsonFormat.W3_MAPPING));

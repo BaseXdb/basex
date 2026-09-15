@@ -87,8 +87,7 @@ public final class JsonParserOptions extends JsonOptions {
     final JsonNumberFormat nf = get(NUMBER_FORMAT);
     if(nf != null && nf != JsonNumberFormat.DOUBLE && !maps) throw unknown(NUMBER_FORMAT, info);
     if(!get(NULL).isEmpty() && !w3) throw unknown(NULL, info);
-    final Option<?> option = elementsOption();
-    if(option != null) throw unknown(option, info);
+    if(unsupportedMapping()) throw unknown(MAPPING, info);
     // maps cannot retain duplicates, XML formats cannot pick the last one
     final JsonDuplicates dupl = get(DUPLICATES);
     if(dupl == (maps ? JsonDuplicates.RETAIN : JsonDuplicates.USE_LAST)) {

@@ -4,7 +4,9 @@ import static org.basex.util.Token.*;
 
 import java.util.*;
 
+import org.basex.query.*;
 import org.basex.query.util.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -45,12 +47,13 @@ public final class NodeHandler implements XmlHandler {
 
   @Override
   public void openElem(final byte[] name, final Atts atts, final Atts nsp) {
-    final byte[] uri = uri(prefix(name), nsp);
-    final FBuilder elem = FElem.build(uri != null ? shared.qName(name, uri) : shared.qName(name));
+    final FBuilder elem = FElem.build(qName(name, true, nsp));
     final int ns = nsp.size();
     for(int n = 0; n < ns; n++) elem.ns(nsp.name(n), nsp.value(n));
     final int as = atts.size();
-    for(int a = 0; a < as; a++) elem.attr(shared.qName(atts.name(a)), shared.token(atts.value(a)));
+    for(int a = 0; a < as; a++) {
+      elem.attr(qName(atts.name(a), false, nsp), shared.token(atts.value(a)));
+    }
 
     final Elem e = new Elem(elem, ns != 0 ? new Atts(nsp) : NO_NSP, deferred);
     if(ns != 0) declared++;
@@ -61,11 +64,19 @@ public final class NodeHandler implements XmlHandler {
 
   @Override
   public void text(final byte[] value) {
-    if(value.length == 0) return;
-    final Elem elem = elems.peek();
-    final FTxt text = new FTxt(shared.token(value));
-    if(deferred) elem.children.add(text);
-    else elem.builder.node(text);
+    if(value.length != 0) add(new FTxt(shared.token(value)));
+  }
+
+  @Override
+  public void comment(final byte[] value) {
+    add(new FComm(shared.token(value)));
+  }
+
+  @Override
+  public void pi(final byte[] pi) {
+    final int i = indexOf(pi, ' ');
+    final byte[] name = i == -1 ? pi : substring(pi, 0, i);
+    add(new FPI(shared.qName(name), i == -1 ? EMPTY : shared.token(substring(pi, i + 1))));
   }
 
   @Override
@@ -100,6 +111,26 @@ public final class NodeHandler implements XmlHandler {
   }
 
   /**
+   * Finishes the root element without attaching it to a document.
+   * @return root element (can be {@code null})
+   */
+  public FNode root() {
+    if(root == null) return null;
+    if(deferred) complete(root);
+    return root.builder.finish();
+  }
+
+  /**
+   * Adds a child node to the current element.
+   * @param node node
+   */
+  private void add(final GNode node) {
+    final Elem elem = elems.peek();
+    if(deferred) elem.children.add(node);
+    else elem.builder.node(node);
+  }
+
+  /**
    * Attaches the deferred children of an element.
    * @param elem element
    */
@@ -115,12 +146,26 @@ public final class NodeHandler implements XmlHandler {
   }
 
   /**
+   * Returns the QName of an element or attribute.
+   * @param name name
+   * @param element element flag
+   * @param nsp namespace declarations of the element to be opened
+   * @return QName
+   */
+  private QNm qName(final byte[] name, final boolean element, final Atts nsp) {
+    final byte[] prefix = prefix(name);
+    final byte[] uri = element || prefix.length != 0 ? uri(prefix, nsp) : null;
+    return uri != null ? shared.qName(name, uri) : shared.qName(name);
+  }
+
+  /**
    * Resolves the namespace URI of a prefix.
    * @param prefix prefix
    * @param nsp namespace declarations of the element to be opened
    * @return URI (can be {@code null})
    */
   private byte[] uri(final byte[] prefix, final Atts nsp) {
+    if(eq(prefix, XML)) return QueryText.XML_URI;
     byte[] uri = nsp.value(prefix);
     if(uri == null && declared != 0) {
       for(final Elem elem : elems) {

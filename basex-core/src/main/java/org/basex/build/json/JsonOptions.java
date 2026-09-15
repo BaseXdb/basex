@@ -52,10 +52,19 @@ public class JsonOptions extends Options {
   }
 
   /**
-   * Returns an assigned option that is only supported by the w3-mapping format.
-   * @return option or {@code null}
+   * Checks if a mapping is assigned that is not supported by the conversion format.
+   * @return result of check
    */
-  public final Option<?> elementsOption() {
-    return get(FORMAT) != JsonFormat.W3_MAPPING && !get(MAPPING).isEmpty() ? MAPPING : null;
+  public final boolean unsupportedMapping() {
+    return get(FORMAT) != JsonFormat.W3_MAPPING && !get(MAPPING).isEmpty();
+  }
+
+  /**
+   * Checks if type information is merged (only supported by formats with type attributes).
+   * @return result of check
+   */
+  public final boolean merge() {
+    final JsonFormat format = get(FORMAT);
+    return get(MERGE) && (format == JsonFormat.DIRECT || format == JsonFormat.ATTRIBUTES);
   }
 }

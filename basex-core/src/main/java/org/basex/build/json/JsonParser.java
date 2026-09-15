@@ -10,8 +10,13 @@ import org.basex.io.in.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.func.fn.*;
+import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -45,14 +50,19 @@ public final class JsonParser extends SingleParser {
     if(format == JsonFormat.W3) {
       throw new IOException(Util.info("Format '%' cannot be converted to XML.", format));
     }
-    if(format == JsonFormat.W3_MAPPING) {
-      throw new IOException(Util.info("Format '%' is not supported for importing data.", format));
-    }
     try {
       final boolean lines = jopts.get(JsonParserOptions.JSON_LINES);
       if(lines) builder.openElem(JsonConstants.JSON_LINES, atts, nsp);
-      if(jopts.get(JsonOptions.MERGE) &&
-          (format == JsonFormat.DIRECT || format == JsonFormat.ATTRIBUTES)) {
+      if(format == JsonFormat.W3_MAPPING) {
+        // convert parsed values with a conversion plan
+        final JsonMappingOptions mopts = mapping();
+        final String root = mopts.get(JsonMappingOptions.ROOT);
+        final MapToElement converter = new MapToElement(mopts, MapToElement.XML_PREFIX,
+            new SharedData(), options, null);
+        for(final Item item : JsonConverter.get(jopts).convert(source)) {
+          converter.convert(item, root, builder);
+        }
+      } else if(jopts.merge()) {
         // types can only be merged in complete documents
         final Serializer ser = new BuilderSerializer(builder);
         for(final Item item : JsonConverter.get(jopts).convert(source)) {
@@ -69,5 +79,29 @@ public final class JsonParser extends SingleParser {
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
     }
+  }
+
+  /**
+   * Returns the options for the w3-mapping format. If a string is assigned, it is interpreted as
+   * the path to a JSON file with the options.
+   * @return options
+   * @throws IOException I/O exception
+   * @throws QueryException query exception
+   */
+  private JsonMappingOptions mapping() throws IOException, QueryException {
+    Value mapping = jopts.get(JsonOptions.MAPPING);
+    if(mapping instanceof final Str path) {
+      final JsonParserOptions opts = new JsonParserOptions();
+      opts.set(JsonOptions.FORMAT, JsonFormat.W3);
+      mapping = JsonConverter.get(opts).convert(IO.get(Token.string(path.string())));
+    }
+    final JsonMappingOptions mopts = new JsonMappingOptions();
+    if(!mapping.isEmpty()) {
+      if(!(mapping instanceof final XQMap map)) {
+        throw QueryError.typeError(mapping, Types.MAP, null);
+      }
+      mopts.assign(map, null, null);
+    }
+    return mopts;
   }
 }

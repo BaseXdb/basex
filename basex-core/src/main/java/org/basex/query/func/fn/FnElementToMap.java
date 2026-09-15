@@ -48,7 +48,7 @@ public final class FnElementToMap extends PlanFn {
     final Plan plan = buildPlan(options, qc);
 
     // create result
-    final Item value = entry(elem, plan).apply(elem, null, plan, qc);
+    final Item value = apply(entry(elem, plan), elem, null, plan, qc);
     return value.isEmpty() ? value : XQMap.get(Str.get(nodeName(elem, null, plan, qc)), value);
   }
 

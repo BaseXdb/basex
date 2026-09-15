@@ -7,14 +7,12 @@ import java.io.*;
 import org.basex.build.json.*;
 import org.basex.build.json.JsonOptions.*;
 import org.basex.io.in.*;
+import org.basex.io.parse.*;
 import org.basex.io.parse.json.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.*;
-import org.basex.query.value.node.*;
 import org.basex.util.options.*;
 
 /**
@@ -71,7 +69,7 @@ public abstract class ParseJson extends ParseFn {
       final FItem fb = toFunction(fallback, 1, qc);
       converter.fallback(s -> toAtomItem(fb.invoke(qc, info, Str.get(s)), qc).string(info));
     }
-    converter.nullValue(elements ? FnMapToElement.NULL : options.get(JsonParserOptions.NULL));
+    if(!elements) converter.nullValue(options.get(JsonParserOptions.NULL));
     final Value value = converter.convert(ti, "", info, qc);
     return elements ? elements(value, jopts, qc) : value;
   }
@@ -83,19 +81,20 @@ public abstract class ParseJson extends ParseFn {
    * @param qc query context
    * @return document nodes
    * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
   private Value elements(final Value value, final JsonParserOptions options,
-      final QueryContext qc) throws QueryException {
+      final QueryContext qc) throws QueryException, IOException {
     final JsonMappingOptions mopts = toOptions(options.get(JsonOptions.MAPPING),
         new JsonMappingOptions(), qc);
     final String root = mopts.get(JsonMappingOptions.ROOT);
-    final FnMapToElement func = (FnMapToElement) Function.MAP_TO_ELEMENT.get(info);
+    final MapToElement converter = new MapToElement(mopts, PlanFn.uris(qc, sc()), qc.shared,
+        qc.context.options, info);
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final Item item : value) {
-      final Item map = root != null ? XQMap.get(Str.get(root), item) : item;
-      if(!(map instanceof XQMap)) throw MAP_TO_ELEMENT_X.get(info, "Single-entry map expected.");
-      final Value elem = func.convert(map, mopts, qc);
-      vb.add(FDoc.build().node((GNode) elem).finish());
+      final NodeHandler handler = new NodeHandler("", false);
+      converter.convert(item, root, handler);
+      vb.add(handler.finish());
     }
     return vb.value();
   }

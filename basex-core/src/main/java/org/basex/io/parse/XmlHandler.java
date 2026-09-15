@@ -28,6 +28,20 @@ public interface XmlHandler {
   void text(byte[] value) throws IOException;
 
   /**
+   * Adds a comment.
+   * @param value comment text
+   * @throws IOException I/O exception
+   */
+  void comment(byte[] value) throws IOException;
+
+  /**
+   * Adds a processing instruction.
+   * @param pi name and value, separated by a space
+   * @throws IOException I/O exception
+   */
+  void pi(byte[] pi) throws IOException;
+
+  /**
    * Closes the current element.
    * @throws IOException I/O exception
    */

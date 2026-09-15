@@ -8,6 +8,7 @@ import java.util.*;
 import org.basex.build.json.*;
 import org.basex.build.json.JsonParserOptions.*;
 import org.basex.query.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
@@ -55,9 +56,11 @@ public final class JsonW3Converter extends JsonConverter {
    */
   JsonW3Converter(final JsonParserOptions opts) {
     super(opts);
+    final boolean plan = jopts.get(JsonOptions.FORMAT) == JsonOptions.JsonFormat.W3_MAPPING;
     final JsonNumberFormat nf = jopts.get(JsonParserOptions.NUMBER_FORMAT);
-    fmt = nf != null ? nf : jopts.get(JsonOptions.FORMAT) == JsonOptions.JsonFormat.W3_MAPPING ?
-      JsonNumberFormat.ADAPTIVE : JsonNumberFormat.DOUBLE;
+    fmt = nf != null ? nf : plan ? JsonNumberFormat.ADAPTIVE : JsonNumberFormat.DOUBLE;
+    // w3-mapping: JSON null is represented by a nilled element
+    if(plan) nullValue = MapToElement.NULL;
   }
 
   @Override

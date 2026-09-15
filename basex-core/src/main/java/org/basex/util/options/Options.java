@@ -1008,7 +1008,9 @@ public class Options implements Iterable<Option<?>> {
     final SeqType required = option.seqType();
     if(required != null) {
       try {
-        val = required.coerce(value, qc, info);
+        // without query context, values must already have the required type
+        if(qc != null) val = required.coerce(value, qc, info);
+        else if(!required.instance(value)) throw expected.apply(required);
       } catch(final QueryException ex) {
         throw ex.error() == INVTYPE_X ? expected.apply(required) : ex;
       }

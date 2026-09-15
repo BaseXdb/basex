@@ -8,6 +8,8 @@ import org.basex.*;
 import org.basex.build.json.*;
 import org.basex.build.json.JsonParser;
 import org.basex.core.*;
+import org.basex.core.MainOptions.MainParser;
+import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.io.parse.json.*;
 import org.basex.query.*;
@@ -280,6 +282,75 @@ public final class JsonParserTest extends SandboxTest {
     query(result, "/json-lines/json[2]/_/data()", "2");
   }
 
+  /**
+   * Merging types is ignored by formats without type attributes.
+   * @throws Exception exception
+   */
+  @Test public void mergeIgnored() throws Exception {
+    for(final JsonOptions.JsonFormat fmt : new JsonOptions.JsonFormat[] { JSONML, W3_XML }) {
+      final JsonParserOptions jopts = opts(fmt);
+      jopts.set(JsonOptions.MERGE, true);
+      context.options.set(MainOptions.JSONPARSER, jopts);
+      final SingleParser sp = new JsonParser(new IOContent("[\"a\"]"), context.options, jopts);
+      final XNode result = new DBNode(MemBuilder.build(sp), 0);
+      query(result, "count(/*)", "1");
+    }
+  }
+
+  /**
+   * W3_MAPPING: conversion with the options of fn:map-to-element.
+   * @throws Exception exception
+   */
+  @Test public void w3Plan() throws Exception {
+    XNode result = parsePlan("{\"a\":{\"b\":[1,2],\"c\":null}}", "{}");
+    query(result, "string-join(/a/b, ',')", "1,2");
+    query(result, "/a/c/@Q{http://www.w3.org/2001/XMLSchema-instance}nil/data()", "true");
+
+    // root element and plan
+    result = parsePlan("[\"x\",\"y\"]",
+        "{ 'root': 'list', 'plan': { 'list': { 'layout': 'list', 'child': 'entry' } } }");
+    query(result, "string-join(/list/entry, ',')", "x,y");
+
+    // namespaces
+    result = parsePlan("{\"Q{http://u/}a\":{\"b\":\"x\",\"@Q{http://v/}c\":\"1\"}}", "{}");
+    query(result, "namespace-uri(/*/*)", "http://u/");
+    query(result, "namespace-uri(/*/@*)", "http://v/");
+
+    // comments and processing instructions
+    result = parsePlan("{\"a\":[{\"#comment\":\"c\"},\"t\",{\"#processing-instruction\":" +
+        "{\"#target\":\"p\",\"#data\":\"d\"}}]}", "{}");
+    query(result, "/a/comment() || /a/text() || /a/processing-instruction()", "ctd");
+
+    // serialized XML
+    result = parsePlan("{\"a\":\"<p:b xmlns:p='http://u/'>t<!--c--><?p d?></p:b>\"}",
+        "{ 'plan': { 'a': { 'layout': 'xml' } } }");
+    query(result, "namespace-uri(/*) || ' ' || /*/text() || /*/comment() || " +
+        "/*/processing-instruction()", "http://u/ tcd");
+
+    // strict conversion
+    error("[1]", opts(W3_MAPPING), MAP_TO_ELEMENT_X);
+  }
+
+  /**
+   * W3_MAPPING: database import with a mapping file.
+   */
+  @Test public void w3PlanCommand() {
+    final IOFile mapping = new IOFile(sandbox(), "mapping.json");
+    write(mapping, "{ \"root\": \"list\", \"plan\": { \"list\": { \"layout\": \"list\", " +
+        "\"child\": \"entry\" } } }");
+    final IOFile input = new IOFile(sandbox(), "input.json");
+    write(input, "[\"a\",\"b\"]");
+    set(MainOptions.PARSER, MainParser.JSON);
+    try {
+      execute(new Set(MainOptions.JSONPARSER.name(), "format=w3-mapping,mapping=" + mapping.path()));
+      execute(new CreateDB(NAME, input.path()));
+      assertEquals("<list><entry>a</entry><entry>b</entry></list>", query("."));
+      execute(new DropDB(NAME));
+    } finally {
+      set(MainOptions.PARSER, MainParser.XML);
+    }
+  }
+
   // ==========================================================================================
   // HELPERS
 
@@ -327,6 +398,32 @@ public final class JsonParserTest extends SandboxTest {
     }
 
     return streamResult;
+  }
+
+  /**
+   * Parses JSON with the w3-mapping format, asserts that the result equals the one of json:parse,
+   * and returns the resulting document node.
+   * @param json JSON content
+   * @param mapping mapping options, specified as XQuery map
+   * @return document node
+   * @throws Exception exception
+   */
+  private static XNode parsePlan(final String json, final String mapping) throws Exception {
+    final JsonParserOptions jopts = opts(W3_MAPPING);
+    try(QueryProcessor qp = new QueryProcessor(mapping, context)) {
+      jopts.set(JsonOptions.MAPPING, qp.value());
+    }
+    context.options.set(MainOptions.JSONPARSER, jopts);
+    final XNode result = new DBNode(MemBuilder.build(new JsonParser(new IOContent(json),
+        context.options, jopts)), 0);
+
+    try(QueryProcessor qp = new QueryProcessor("declare variable $a external; " +
+        "declare variable $json external; deep-equal($a, json:parse($json, " +
+        "{ 'format': 'w3-mapping', 'mapping': " + mapping + " }))", context)) {
+      qp.variable("a", result).variable("json", json);
+      assertEquals("true", qp.value().serialize().toString());
+    }
+    return result;
   }
 
   /**

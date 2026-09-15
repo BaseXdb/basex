@@ -160,13 +160,6 @@ public abstract class Builder extends Job implements XmlHandler {
     if(size() < 0) checkLimit(0, 0, LIMITRANGE);
   }
 
-  /**
-   * Opens a new element node.
-   * @param name name of element
-   * @param att attributes
-   * @param nsp namespaces
-   * @throws IOException I/O exception
-   */
   @Override
   public final void openElem(final byte[] name, final Atts att, final Atts nsp) throws IOException {
     addElem(name, att, nsp);
@@ -188,10 +181,6 @@ public abstract class Builder extends Job implements XmlHandler {
     if(att.size() >= IO.MAXATTS) setSize(pre, size() - pre);
   }
 
-  /**
-   * Closes an element.
-   * @throws IOException I/O exception
-   */
   @Override
   public final void closeElem() throws IOException {
     checkStop();
@@ -201,30 +190,17 @@ public abstract class Builder extends Job implements XmlHandler {
     nspaces.close(pre);
   }
 
-  /**
-   * Stores a text node.
-   * @param value text value
-   * @throws IOException I/O exception
-   */
   @Override
   public final void text(final byte[] value) throws IOException {
     if(value.length != 0) addText(value, Data.TEXT);
   }
 
-  /**
-   * Stores a comment.
-   * @param value comment text
-   * @throws IOException I/O exception
-   */
+  @Override
   public final void comment(final byte[] value) throws IOException {
     addText(value, Data.COMM);
   }
 
-  /**
-   * Stores a processing instruction.
-   * @param pi processing instruction name and value
-   * @throws IOException I/O exception
-   */
+  @Override
   public final void pi(final byte[] pi) throws IOException {
     addText(pi, Data.PI);
   }

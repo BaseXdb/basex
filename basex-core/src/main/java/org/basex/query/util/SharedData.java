@@ -1,6 +1,7 @@
 package org.basex.query.util;
 
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.core.jobs.*;
 import org.basex.query.*;
@@ -41,10 +42,21 @@ public final class SharedData {
    */
   public QNm parseQName(final byte[] token, final boolean elem, final QueryContext qc,
       final StaticContext sc) {
+    return parseQName(token, elem, prefix -> qc.ns.resolve(prefix, sc));
+  }
+
+  /**
+   * Parses and returns a shared QName.
+   * @param token QName token
+   * @param elem always resolve URI
+   * @param uris resolves the URI of a namespace prefix ({@code null} if the prefix is unbound)
+   * @return QName, or {@code null} if QName cannot be parsed
+   */
+  public QNm parseQName(final byte[] token, final boolean elem, final UnaryOperator<byte[]> uris) {
     final byte[] name = Token.trim(token);
     if(XMLToken.isQName(name)) {
       final byte[] prefix = Token.prefix(name);
-      final byte[] uri = prefix.length != 0 || elem ? qc.ns.resolve(prefix, sc) : null;
+      final byte[] uri = prefix.length != 0 || elem ? uris.apply(prefix) : null;
       return qName(name, uri);
     }
     final byte[][] parsed = QNm.parseExpanded(name, false);

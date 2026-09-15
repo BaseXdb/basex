@@ -230,12 +230,14 @@ public final class Constr {
     }
 
     // add namespaces contributed by namespace nodes in the content sequence
-    for(int n = 0; n < dNs; n++) addNS(inscopeNS, dynamicNs.name(n), dynamicNs.value(n));
+    for(int n = 0; n < dNs; n++) {
+      addNS(inscopeNS, dynamicNs.name(n), dynamicNs.value(n), qc.shared);
+    }
 
     // bind the prefix of the element name; namespace nodes take precedence, so the element is
     // renamed with a generated prefix if its prefix is already bound to another URI (nscons-011)
     if(!eq(nmPrefix, XML) && nmPrefix.length != 0 && nm.hasURI()) {
-      final byte[] npref = addNS(inscopeNS, nmPrefix, nmUri);
+      final byte[] npref = addNS(inscopeNS, nmPrefix, nmUri, qc.shared);
       if(npref != null) {
         builder.rename(qc.shared.qName(concat(npref, cpToken(':'), nm.local()), nmUri));
       }
@@ -254,7 +256,7 @@ public final class Constr {
         final byte[] prefix = qnm.prefix();
         if(eq(prefix, XML)) continue;
 
-        final byte[] auri = qnm.uri(), npref = addNS(inscopeNS, prefix, auri);
+        final byte[] auri = qnm.uri(), npref = addNS(inscopeNS, prefix, auri, qc.shared);
         if(npref != null) {
           final QNm aname = qc.shared.qName(concat(npref, cpToken(':'), qnm.local()), auri);
           attributes.set(a, new FAttr(aname, qc.shared.token(attr.string())));
@@ -270,13 +272,15 @@ public final class Constr {
    * @param inscopeNS in-scope namespaces
    * @param prefix prefix
    * @param uri URI
+   * @param shared shared data references
    * @return resulting prefix or {@code null}
    */
-  private byte[] addNS(final Atts inscopeNS, final byte[] prefix, final byte[] uri) {
+  public static byte[] addNS(final Atts inscopeNS, final byte[] prefix, final byte[] uri,
+      final SharedData shared) {
     final byte[] u = inscopeNS.value(prefix);
     if(u == null) {
       // add undeclared namespace
-      add(inscopeNS, prefix, uri);
+      inscopeNS.add(shared.token(prefix), shared.token(uri));
     } else if(!eq(u, uri)) {
       // prefixes with different URIs exist; new one must be replaced
       byte[] pref = null;
@@ -291,7 +295,7 @@ public final class Constr {
         do {
           pref = concat(prefix, "_", i++);
         } while(inscopeNS.contains(pref));
-        add(inscopeNS, pref, uri);
+        inscopeNS.add(shared.token(pref), shared.token(uri));
       }
       return pref;
     }

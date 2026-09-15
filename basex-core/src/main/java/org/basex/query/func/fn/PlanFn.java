@@ -2,9 +2,12 @@ package org.basex.query.func.fn;
 
 import static org.basex.query.QueryError.*;
 
+import java.util.function.*;
+
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.query.util.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -193,7 +196,7 @@ public abstract class PlanFn extends StandardFunc {
   }
 
   /** Entry of a plan. */
-  final class PlanEntry {
+  static final class PlanEntry {
     /** Attribute flag. */
     boolean attribute;
     /** Layout ({@code null} for attributes). */
@@ -204,152 +207,157 @@ public abstract class PlanFn extends StandardFunc {
     boolean explicitType;
     /** Child (can be {@code null}). */
     QNm child;
+  }
 
-    /**
-     * Casts an item to the target type. If a prescribed type cannot be applied, an error is
-     * raised, or the original value is retained (liberal mode); empty and whitespace-only
-     * content is never affected.
-     * @param item item
-     * @param plan plan
-     * @return cast item
-     * @throws QueryException query exception
-     */
-    Item cast(final Str item, final Plan plan) throws QueryException {
-      final byte[] value = item.string();
-      if(applyType(value)) {
-        try {
-          final Item cast = switch(type) {
-            case BOOLEAN -> {
-              final Boolean b = Bln.parse(value);
-              yield b != null ? Bln.get(b) : null;
-            }
-            case INTEGER -> Itr.get(item.itr(info));
-            case DECIMAL -> Dec.get(item.dec(info));
-            case DOUBLE -> Dbl.get(item.dbl(info));
-            default -> null;
-          };
-          if(cast != null) return cast;
-        } catch(final QueryException ex) {
-          Util.debug(ex);
-        }
-        // value could not be cast to the prescribed type
-        if(!plan.liberal && explicitType) throw PLAN_TYPE_X_X.get(info, value, type);
+  /**
+   * Casts an item to the target type of a plan entry. If a prescribed type cannot be applied,
+   * an error is raised, or the original value is retained (liberal mode); empty and
+   * whitespace-only content is never affected.
+   * @param pe plan entry
+   * @param item item
+   * @param plan plan
+   * @return cast item
+   * @throws QueryException query exception
+   */
+  final Item cast(final PlanEntry pe, final Str item, final Plan plan) throws QueryException {
+    final byte[] value = item.string();
+    if(applyType(pe, value)) {
+      try {
+        final Item cast = switch(pe.type) {
+          case BOOLEAN -> {
+            final Boolean b = Bln.parse(value);
+            yield b != null ? Bln.get(b) : null;
+          }
+          case INTEGER -> Itr.get(item.itr(info));
+          case DECIMAL -> Dec.get(item.dec(info));
+          case DOUBLE -> Dbl.get(item.dbl(info));
+          default -> null;
+        };
+        if(cast != null) return cast;
+      } catch(final QueryException ex) {
+        Util.debug(ex);
       }
-      return Atm.get(value);
+      // value could not be cast to the prescribed type
+      if(!plan.liberal && pe.explicitType) throw PLAN_TYPE_X_X.get(info, value, pe.type);
     }
+    return Atm.get(value);
+  }
 
-    /**
-     * Checks whether a prescribed type is to be applied: a non-string type is prescribed and the
-     * content is neither empty nor whitespace-only.
-     * @param value string value
-     * @return result of check
-     */
-    private boolean applyType(final byte[] value) {
-      return type != null && type != PlanType.STRING && type != PlanType.SKIP &&
-          Token.normalize(value).length != 0;
+  /**
+   * Checks whether a prescribed type is to be applied: a non-string type is prescribed and the
+   * content is neither empty nor whitespace-only.
+   * @param pe plan entry
+   * @param value string value
+   * @return result of check
+   */
+  private static boolean applyType(final PlanEntry pe, final byte[] value) {
+    return pe.type != null && pe.type != PlanType.STRING && pe.type != PlanType.SKIP &&
+        Token.normalize(value).length != 0;
+  }
+
+  /**
+   * Applies the layout of a plan entry.
+   * @param entry plan entry
+   * @param node node
+   * @param parent parent (can be {@code null})
+   * @param plan plan
+   * @param qc query context
+   * @return value
+   * @throws QueryException query exception
+   */
+  final Item apply(final PlanEntry entry, final GNode node, final GNode parent, final Plan plan,
+      final QueryContext qc) throws QueryException {
+
+    PlanEntry pe = entry;
+    if(!valid(pe, node)) {
+      // fall back to the wildcard layout, which must be applicable as well
+      pe = plan.entries.get(QNm.EMPTY);
+      if(pe != null && !valid(pe, node)) pe = null;
     }
-
-    /**
-     * Applies a layout.
-     * @param node node
-     * @param parent parent (can be {@code null})
-     * @param plan plan
-     * @param qc query context
-     * @return value
-     * @throws QueryException query exception
-     */
-    Item apply(final GNode node, final GNode parent, final Plan plan, final QueryContext qc)
-        throws QueryException {
-
-      PlanEntry pe = this;
-      if(!valid(node)) {
-        // fall back to the wildcard layout, which must be applicable as well
-        pe = plan.entries.get(QNm.EMPTY);
-        if(pe != null && !pe.valid(node)) pe = null;
+    if(pe != null) {
+      try {
+        return create(pe, node, parent, plan, qc);
+      } catch(final QueryException ex) {
+        // a type error is final; it must not trigger layout fallback
+        if(ex.error() == PLAN_TYPE_X_X) throw ex;
+        Util.debug(ex);
       }
-      if(pe != null) {
-        try {
-          return pe.create(node, parent, plan, qc);
-        } catch(final QueryException ex) {
-          // a type error is final; it must not trigger layout fallback
-          if(ex.error() == PLAN_TYPE_X_X) throw ex;
-          Util.debug(ex);
-        }
+    }
+    throw PLAN_X_X.get(info, entry.layout, node);
+  }
+
+  /**
+   * Checks if the layout of a plan entry can be applied to a node.
+   * @param pe plan entry
+   * @param node node
+   * @return result of check
+   */
+  private static boolean valid(final PlanEntry pe, final GNode node) {
+    return switch(pe.layout) {
+      case EMPTY, EMPTY_PLUS ->
+        children(Kind.ELEMENT, node).isEmpty() && empty(children(Kind.TEXT, node));
+      case SIMPLE, SIMPLE_PLUS ->
+        children(Kind.ELEMENT, node).isEmpty();
+      case LIST, LIST_PLUS -> {
+        final GNodeList children = children(Kind.ELEMENT, node);
+        yield empty(children(Kind.TEXT, node)) && equalNames(children) &&
+          (pe.child == null || children.isEmpty() || children.get(0).qname().eq(pe.child));
       }
-      throw PLAN_X_X.get(info, layout, node);
-    }
+      case RECORD, SEQUENCE ->
+        empty(children(Kind.TEXT, node));
+      default ->
+        true;
+    };
+  }
 
-    /**
-     * Checks if the layout can be applied to a node.
-     * @param node node
-     * @return result of check
-     */
-    private boolean valid(final GNode node) {
-      return switch(layout) {
-        case EMPTY, EMPTY_PLUS ->
-          children(Kind.ELEMENT, node).isEmpty() && empty(children(Kind.TEXT, node));
-        case SIMPLE, SIMPLE_PLUS ->
-          children(Kind.ELEMENT, node).isEmpty();
-        case LIST, LIST_PLUS -> {
-          final GNodeList children = children(Kind.ELEMENT, node);
-          yield empty(children(Kind.TEXT, node)) && equalNames(children) &&
-            (child == null || children.isEmpty() || children.get(0).qname().eq(child));
-        }
-        case RECORD, SEQUENCE ->
-          empty(children(Kind.TEXT, node));
-        default ->
-          true;
-      };
-    }
+  /**
+   * Applies the layout of a plan entry.
+   * @param pe plan entry
+   * @param node node
+   * @param parent parent (can be {@code null})
+   * @param plan plan
+   * @param qc query context
+   * @return resulting value
+   * @throws QueryException query exception
+   */
+  private Item create(final PlanEntry pe, final GNode node, final GNode parent, final Plan plan,
+      final QueryContext qc) throws QueryException {
 
-    /**
-     * Applies the layout.
-     * @param node node
-     * @param parent parent (can be {@code null})
-     * @param plan plan
-     * @param qc query context
-     * @return resulting value
-     * @throws QueryException query exception
-     */
-    private Item create(final GNode node, final GNode parent, final Plan plan,
-        final QueryContext qc) throws QueryException {
-
-      return switch(layout) {
-        case EMPTY ->
-          Str.EMPTY;
-        case EMPTY_PLUS ->
-          attributes(node, plan, qc).map();
-        case SIMPLE ->
-          cast(Str.get(node.string()), plan);
-        case SIMPLE_PLUS -> {
-          final MapBuilder mb = attributes(node, plan, qc);
-          yield mb.put(contentKey(mb, plan), cast(Str.get(node.string()), plan)).map();
-        }
-        case LIST ->
-          list(node, plan, qc);
-        case LIST_PLUS -> {
-          final MapBuilder mb = attributes(node, plan, qc);
-          // if the plan supplies no child name, the name of the first child is adopted
-          final GNodeList children = children(Kind.ELEMENT, node);
-          final QNm name = child != null ? child :
-            children.isEmpty() ? null : children.get(0).qname();
-          if(name != null) mb.put(nodeName(name, true, node, plan, qc), list(node, plan, qc));
-          yield mb.map();
-        }
-        case RECORD ->
-          record(node, plan, qc);
-        case SEQUENCE ->
-          mixed(node, parent, plan, qc, true);
-        case MIXED ->
-          mixed(node, parent, plan, qc, false);
-        case XML ->
-          xml(node);
-        case DEEP_SKIP ->
-          Empty.VALUE;
-        default ->
-          throw PLAN_X_X.get(null, this, node);
-      };
-    }
+    return switch(pe.layout) {
+      case EMPTY ->
+        Str.EMPTY;
+      case EMPTY_PLUS ->
+        attributes(node, plan, qc).map();
+      case SIMPLE ->
+        cast(pe, Str.get(node.string()), plan);
+      case SIMPLE_PLUS -> {
+        final MapBuilder mb = attributes(node, plan, qc);
+        yield mb.put(contentKey(mb, plan), cast(pe, Str.get(node.string()), plan)).map();
+      }
+      case LIST ->
+        list(node, plan, qc);
+      case LIST_PLUS -> {
+        final MapBuilder mb = attributes(node, plan, qc);
+        // if the plan supplies no child name, the name of the first child is adopted
+        final GNodeList children = children(Kind.ELEMENT, node);
+        final QNm name = pe.child != null ? pe.child :
+          children.isEmpty() ? null : children.get(0).qname();
+        if(name != null) mb.put(nodeName(name, true, node, plan, qc), list(node, plan, qc));
+        yield mb.map();
+      }
+      case RECORD ->
+        record(node, plan, qc);
+      case SEQUENCE ->
+        mixed(node, parent, plan, qc, true);
+      case MIXED ->
+        mixed(node, parent, plan, qc, false);
+      case XML ->
+        xml(node);
+      case DEEP_SKIP ->
+        Empty.VALUE;
+      default ->
+        throw PLAN_X_X.get(null, pe.layout, node);
+    };
   }
 
   /**
@@ -361,6 +369,30 @@ public abstract class PlanFn extends StandardFunc {
    */
   final Plan buildPlan(final ElementsOptions options, final QueryContext qc)
       throws QueryException {
+    return plan(options, uris(qc, sc()), qc.shared, info);
+  }
+
+  /**
+   * Returns a resolver for the URIs of namespace prefixes.
+   * @param qc query context
+   * @param sc static context
+   * @return resolver
+   */
+  static UnaryOperator<byte[]> uris(final QueryContext qc, final StaticContext sc) {
+    return prefix -> qc.ns.resolve(prefix, sc);
+  }
+
+  /**
+   * Builds a conversion plan.
+   * @param options options
+   * @param uris resolves the URI of a namespace prefix ({@code null} if the prefix is unbound)
+   * @param shared shared data references
+   * @param info input info (can be {@code null})
+   * @return conversion plan
+   * @throws QueryException query exception
+   */
+  static Plan plan(final ElementsOptions options, final UnaryOperator<byte[]> uris,
+      final SharedData shared, final InputInfo info) throws QueryException {
     final Plan plan = new Plan();
     plan.name = options.get(ElementsOptions.NAME_FORMAT);
     plan.marker = options.get(ElementsOptions.ATTRIBUTE_MARKER);
@@ -369,57 +401,59 @@ public abstract class PlanFn extends StandardFunc {
 
     final Value pln = options.get(ElementsOptions.PLAN);
     if(!pln.isEmpty()) {
-      toMap(pln, qc).forEach((key, value) -> {
+      map(pln, info).forEach((key, value) -> {
         final byte[] token = key.string(info);
         final boolean attr = Token.startsWith(token, '@');
         final QNm name;
         if(Token.eq(token, Token.cpToken('*'))) {
           name = QNm.EMPTY;
         } else {
-          name = qc.shared.parseQName(attr ? Token.substring(token, 1) : token, true, qc, sc());
+          name = shared.parseQName(attr ? Token.substring(token, 1) : token, true, uris);
         }
         // entries with keys that are no valid names are ignored
         if(name == null) return;
 
         final PlanEntry pe = new PlanEntry();
         pe.attribute = attr;
-        final XQMap map = toMap(value, qc);
+        final XQMap map = map(value, info);
         final Value layout = map.get(LAYOUT);
         if(!layout.isEmpty()) {
-          final String string = toString(layout, qc);
+          final String string = Token.string(token(layout, info));
           pe.layout = Enums.get(PlanLayout.class, string);
-          if(pe.layout == null) throw unexpected("layout", string, name);
+          if(pe.layout == null) throw unexpected("layout", string, name, info);
         }
         final Value type = map.get(TYPE);
         if(!type.isEmpty()) {
-          final String string = toString(type, qc);
+          final String string = Token.string(token(type, info));
           pe.type = Enums.get(PlanType.class, string);
-          if(pe.type == null) throw unexpected("type", string, name);
+          if(pe.type == null) throw unexpected("type", string, name, info);
           pe.explicitType = true;
         }
         final Value child = map.get(CHILD);
         if(!child.isEmpty()) {
-          final byte[] childName = toToken(child, qc);
-          pe.child = qc.shared.parseQName(childName, true, qc, sc());
-          if(pe.child == null) throw unexpected("child", Token.string(childName), name);
+          final byte[] childName = token(child, info);
+          pe.child = shared.parseQName(childName, true, uris);
+          if(pe.child == null) {
+            throw unexpected("child", Token.string(childName), name, info);
+          }
         }
         plan.entries.put(name, pe);
 
         // error handling
         if(pe.layout == null) {
-          if(!pe.attribute) throw missing("layout", name);
+          if(!pe.attribute) throw missing("layout", name, info);
         } else if(pe.attribute) {
-          throw unexpected("layout", pe.layout, name);
+          throw unexpected("layout", pe.layout, name, info);
         }
         if(pe.layout != PlanLayout.LIST && pe.layout != PlanLayout.LIST_PLUS &&
             pe.child != null) {
-          throw unexpected("child", pe.child, name);
+          throw unexpected("child", pe.child, name, info);
         }
         if(pe.layout == PlanLayout.SIMPLE || pe.layout == PlanLayout.SIMPLE_PLUS) {
           // 'skip' is reserved for attributes
-          if(pe.type == PlanType.SKIP) throw unexpected("type", pe.type, name);
+          if(pe.type == PlanType.SKIP) throw unexpected("type", pe.type, name, info);
         } else if(!pe.attribute && pe.type != null) {
-          throw unexpected("type", pe.type, name);
+          throw unexpected("type", pe.type, name, info);
         }
       });
     }
@@ -427,12 +461,37 @@ public abstract class PlanFn extends StandardFunc {
   }
 
   /**
+   * Returns the map of a plan value.
+   * @param value value
+   * @param info input info (can be {@code null})
+   * @return map
+   * @throws QueryException query exception
+   */
+  private static XQMap map(final Value value, final InputInfo info) throws QueryException {
+    if(value instanceof final XQMap map) return map;
+    throw typeError(value, Types.MAP, info);
+  }
+
+  /**
+   * Returns the string of a plan value.
+   * @param value value
+   * @param info input info (can be {@code null})
+   * @return string
+   * @throws QueryException query exception
+   */
+  private static byte[] token(final Value value, final InputInfo info) throws QueryException {
+    if(value instanceof final Item item && item.type.isStringOrUntyped()) return item.string(info);
+    throw typeError(value, BasicType.STRING, info);
+  }
+
+  /**
    * Returns an exception for a missing plan key.
    * @param key key
    * @param name node name
+   * @param info input info (can be {@code null})
    * @return exception
    */
-  private QueryException missing(final String key, final QNm name) {
+  private static QueryException missing(final String key, final QNm name, final InputInfo info) {
     return INVALIDOPTION_X.get(info, Util.info("Missing key '%' (node: %).", key, name));
   }
 
@@ -441,9 +500,11 @@ public abstract class PlanFn extends StandardFunc {
    * @param key key
    * @param value value
    * @param name node name
+   * @param info input info (can be {@code null})
    * @return exception
    */
-  private QueryException unexpected(final String key, final Object value, final QNm name) {
+  private static QueryException unexpected(final String key, final Object value, final QNm name,
+      final InputInfo info) {
     return INVALIDOPTION_X.get(info, Util.info("Unexpected key '%':'%' (node: %).", key, value,
         name));
   }
@@ -593,7 +654,7 @@ public abstract class PlanFn extends StandardFunc {
       if(entry != null && entry.type == PlanType.SKIP) continue;
       final byte[] value = attr.string();
       mb.put(nodeName(attr.qname(), false, node, plan, qc, marker),
-          entry != null ? entry.cast(Str.get(value), plan) : Atm.get(value));
+          entry != null ? cast(entry, Str.get(value), plan) : Atm.get(value));
     }
     return mb;
   }
@@ -701,7 +762,7 @@ public abstract class PlanFn extends StandardFunc {
     final GNodeList children = children(Kind.ELEMENT, node);
     final ArrayBuilder ab = new ArrayBuilder(qc, children.size());
     for(final GNode ch : children) {
-      ab.add(entry(ch, plan).apply(ch, null, plan, qc));
+      ab.add(apply(entry(ch, plan), ch, null, plan, qc));
     }
     return ab.array();
   }
@@ -727,7 +788,7 @@ public abstract class PlanFn extends StandardFunc {
       if(pe.layout != PlanLayout.DEEP_SKIP) {
         final ArrayBuilder ab = new ArrayBuilder(qc, children.size());
         for(final GNode ch : children) {
-          ab.add(pe.apply(ch, node, plan, qc));
+          ab.add(apply(pe, ch, node, plan, qc));
         }
         final XQArray array = ab.array();
         map.put(name, array.structSize() == 1 ? array.valueAt(0) : array);
@@ -759,7 +820,7 @@ public abstract class PlanFn extends StandardFunc {
           new MapBuilder().put(COMMENT, child.string()).map();
         case ELEMENT ->
           new MapBuilder().put(nodeName(child, parent, plan, qc),
-            entry(child, plan).apply(child, node, plan, qc)).map();
+            apply(entry(child, plan), child, node, plan, qc)).map();
         case PROCESSING_INSTRUCTION ->
           new MapBuilder().put(PI, new MapBuilder().put(TARGET, child.name()).
             put(DATA, child.string()).map()).map();

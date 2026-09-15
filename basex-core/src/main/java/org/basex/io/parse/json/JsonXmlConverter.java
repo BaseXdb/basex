@@ -50,7 +50,7 @@ abstract class JsonXmlConverter extends JsonConverter {
   JsonXmlConverter(final JsonParserOptions opts, final XmlHandler handler) {
     super(opts);
     external = handler;
-    merge = jopts.get(JsonOptions.MERGE);
+    merge = jopts.merge();
     strings = jopts.get(JsonOptions.STRINGS);
     if(merge && handler != null) throw Util.notExpected("Types can only be merged in nodes.");
   }

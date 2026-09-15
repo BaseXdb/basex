@@ -14,12 +14,15 @@ import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
+import org.basex.gui.layout.BaseXFileChooser.Mode;
 import org.basex.gui.text.*;
 import org.basex.io.*;
 import org.basex.io.parse.json.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -35,6 +38,9 @@ final class DialogJsonParser extends DialogParser {
   /** Example string for JSONML conversion. */
   private static final String EXAMPLEML = "[ \"Person\",\n" +
       "  { \"born\": \"1984\" },\n  \"John\\nAdam\"\n]";
+  /** Example string for the w3-mapping conversion. */
+  private static final String EXAMPLEPLAN = "{ \"Person\": {\n  \"Name\": \"John\",\n" +
+      "  \"Born\": 1984,\n  \"Langs\": [ \"en\", \"de\" ] } }";
 
   /** Options. */
   private final JsonParserOptions jopts;
@@ -56,6 +62,10 @@ final class DialogJsonParser extends DialogParser {
   private final BaseXCheckBox merge;
   /** JSON: include string types. */
   private final BaseXCheckBox strings;
+  /** JSON: mapping file. */
+  private final BaseXTextField mapping;
+  /** JSON: browse mapping file. */
+  private final BaseXButton browse;
 
   /**
    * Constructor.
@@ -68,10 +78,24 @@ final class DialogJsonParser extends DialogParser {
     encoding = encoding(dialog, jopts.get(JsonParserOptions.ENCODING));
 
     final String[] formats = Arrays.stream(new JsonFormat[] {
-      JsonFormat.DIRECT, JsonFormat.ATTRIBUTES, JsonFormat.JSONML, JsonFormat.W3_XML
+      JsonFormat.DIRECT, JsonFormat.ATTRIBUTES, JsonFormat.JSONML, JsonFormat.W3_XML,
+      JsonFormat.W3_MAPPING
     }).map(JsonFormat::toString).toArray(String[]::new);
     format = new BaseXCombo(dialog, formats);
     format.setSelectedItem(jopts.get(JsonOptions.FORMAT));
+
+    // file with the options of the w3-mapping format
+    final Value path = jopts.get(JsonOptions.MAPPING);
+    mapping = new BaseXTextField(dialog, path instanceof final Str str ?
+      Token.string(str.string()) : "");
+    browse = new BaseXButton(dialog, BROWSE_D);
+    browse.addActionListener(e -> {
+      final GUIOptions gopts = dialog.gui().gopts;
+      final BaseXFileChooser fc = new BaseXFileChooser(dialog, FILE_OR_DIR,
+          gopts.get(GUIOptions.INPUTPATH)).filter(JSON_DOCUMENTS, true, IO.JSONSUFFIX);
+      final IO file = fc.select(Mode.FDOPEN);
+      if(file != null) mapping.setText(file.path());
+    });
 
     liberal = new BaseXCheckBox(dialog, LIBERAL_PARSING, JsonParserOptions.LIBERAL, jopts);
     lines = new BaseXCheckBox(dialog, "JSON Lines", JsonParserOptions.JSON_LINES, jopts);
@@ -99,6 +123,13 @@ final class DialogJsonParser extends DialogParser {
     add(pp, BorderLayout.WEST);
     add(example, BorderLayout.CENTER);
 
+    // mapping file, spanning the full width below the options and the example
+    final BaseXBack mp = new BaseXBack(new BorderLayout(8, 4)).border(8, 0, 0, 0);
+    mp.add(new BaseXLabel("Mapping" + COL, true, true), BorderLayout.NORTH);
+    mp.add(mapping, BorderLayout.CENTER);
+    mp.add(browse, BorderLayout.EAST);
+    add(mp, BorderLayout.SOUTH);
+
     action(true);
   }
 
@@ -107,20 +138,33 @@ final class DialogJsonParser extends DialogParser {
     try {
       final boolean jl = jopts.get(JsonParserOptions.LIBERAL);
       final JsonFormat jf = jopts.get(JsonOptions.FORMAT);
+      final boolean plan = jf == JsonFormat.W3_MAPPING;
+      mapping.setEnabled(plan);
+      browse.setEnabled(plan);
+      // type information is only available in the direct and attributes formats
+      final boolean types = jf == JsonFormat.DIRECT || jf == JsonFormat.ATTRIBUTES;
+      merge.setEnabled(types);
+      strings.setEnabled(types);
+      lax.setEnabled(jf == JsonFormat.DIRECT);
       if(active) {
         String json;
         if(jf == JsonFormat.JSONML) {
           json = EXAMPLEML;
+        } else if(plan) {
+          json = EXAMPLEPLAN;
         } else if(jl) {
           json = EXAMPLE.replace("\"Person\"", "Person").replace(" }", ", }");
         } else {
           json = EXAMPLE;
         }
         final Value value;
-        if(jopts.get(JsonParserOptions.JSON_LINES)) {
-          // two single-line copies of the example, converted as on import
-          final String line = json.replaceAll("\n *", " ");
-          json = line + '\n' + line;
+        final boolean lns = jopts.get(JsonParserOptions.JSON_LINES);
+        if(lns || plan) {
+          // converted as on import; JSON Lines: two single-line copies of the example
+          if(lns) {
+            final String line = json.replaceAll("\n *", " ");
+            json = line + '\n' + line;
+          }
           final MainOptions mopts = new MainOptions();
           mopts.set(MainOptions.JSONPARSER, jopts);
           value = new DBNode(MemBuilder.build(new JsonParser(new IOContent(json), mopts, jopts)));
@@ -146,6 +190,10 @@ final class DialogJsonParser extends DialogParser {
     jopts.set(JsonOptions.STRINGS, strings.isSelected());
     jopts.set(JsonOptions.FORMAT, format.getSelectedItem());
     jopts.set(JsonOptions.LAX, lax.isSelected());
+    // the mapping is only supported by the w3-mapping format
+    final String path = mapping.getText().trim();
+    final boolean plan = jopts.get(JsonOptions.FORMAT) == JsonFormat.W3_MAPPING;
+    jopts.set(JsonOptions.MAPPING, plan && !path.isEmpty() ? Str.get(path) : Empty.VALUE);
   }
 
   @Override
