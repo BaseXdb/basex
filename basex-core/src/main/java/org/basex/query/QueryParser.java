@@ -341,9 +341,14 @@ public class QueryParser extends InputParser {
     deferredMapKeys.clear();
     // a referenced cast target type must be declared and eligible as a cast target
     for(final TypeRef ref : deferredCastTargets) {
-      final SeqType st = declaredTypes.get(ref.name());
-      final RecordType rt = st != null ? null : Records.BUILT_IN.get(ref.name());
-      if(st == null && rt == null) throw error(WHICHCAST_X, BasicType.similar(ref.name()));
+      final QNm name = ref.name();
+      final SeqType st = declaredTypes.get(name);
+      final RecordType rt = st != null ? null : Records.BUILT_IN.get(name);
+      if(st == null && rt == null) {
+        // known schema type that is not simple (xs:anyType, xs:untyped)
+        if(BasicType.get(name, true) != null) throw error(WHICHCAST_X, name.prefixId(XML));
+        throw error(TYPEUNKNOWN_X, BasicType.similar(name));
+      }
       ref.resolve(st != null ? st.type : rt);
       checkCastTarget(ref, false);
     }
@@ -3977,7 +3982,7 @@ public class QueryParser extends InputParser {
       final Type ft = FuncType.get(name);
       if(eq(local, token(ENUM))) {
         // enumeration type
-        if(!wsConsume("(")) throw error(WHICHCAST_X, BasicType.similar(name));
+        if(!wsConsume("(")) throw error(TYPEUNKNOWN_X, BasicType.similar(name));
         type = enumerationType();
       } else if(ft != null && wsConsume("(")) {
         // array(...), map(...), record(...); function(...) is rejected in checkCastTarget
@@ -4084,7 +4089,7 @@ public class QueryParser extends InputParser {
     final byte[] local = name.hasURI() ? null : name.local();
     if(eq(local, token(ENUM))) {
       // enumeration
-      if(!wsConsume("(")) throw error(WHICHCAST_X, BasicType.similar(name));
+      if(!wsConsume("(")) throw error(TYPEUNKNOWN_X, BasicType.similar(name));
       type = enumerationType();
     } else if(wsConsume("(")) {
       // function type

@@ -36,8 +36,9 @@ public final class TypeTest extends SandboxTest {
     error("<x/> cast as item()", SIMPLETYPE_X);
 
     error("1 castable as xs:integer()", SIMPLETYPE_X);
-    error("1 castable as xml:integer", WHICHCAST_X);
-    error("1 castable as integer", WHICHCAST_X);
+    error("1 castable as xml:integer", TYPEUNKNOWN_X);
+    error("1 castable as integer", TYPEUNKNOWN_X);
+    error("1 castable as xs:untyped", WHICHCAST_X);
     error("1 castable as xs:NOTATION", INVALIDCAST_X);
     error("1 castable as xs:anyAtomicType", INVALIDCAST_X);
     error("(42 cast as enum('42')) cast as enum('x')", FUNCCAST_X_X);

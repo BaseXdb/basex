@@ -355,7 +355,7 @@ public final class ModuleTest extends SandboxTest {
     error("import module namespace a='world' at '" + XQMFILE + "';" +
       "declare type Q{world}int as xs:double; '42' cast as a:int", DUPLTYPE_X);
     error("import module namespace a='world' at '" + XQMFILE + "'; '42' cast as a:private-int",
-      WHICHCAST_X);
+      TYPEUNKNOWN_X);
 
     // constructor functions of imported types
     query("import module namespace a='world' at '" + XQMFILE + "'; a:int('42')", 42);

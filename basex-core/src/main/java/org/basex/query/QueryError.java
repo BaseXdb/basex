@@ -1301,7 +1301,7 @@ public enum QueryError {
   /** Error code. */
   VARDUPL_X(XQST, 49, "Duplicate declaration of static variable $%."),
   /** Error code. */
-  WHICHCAST_X(XQST, 52, "Unknown type: %."),
+  WHICHCAST_X(XQST, 52, "Type is not a simple type: %."),
   /** Error code. */
   DUPLCOPYNS(XQST, 55, "Duplicate 'copy-namespace' declaration."),
   /** Error code. */

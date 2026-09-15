@@ -323,7 +323,9 @@ public final class CastTest extends SandboxTest {
     error("1 castable as xs:anyAtomicType", INVALIDCAST_X);
     // a named type must resolve to an eligible type
     error("declare type local:f as fn(*); 1 cast as local:f", INVALIDCAST_X);
-    error("1 cast as local:unknown", WHICHCAST_X);
+    error("1 cast as local:unknown", TYPEUNKNOWN_X);
+    error("1 cast as fn:dateTime-pseudo-record", TYPEUNKNOWN_X);
+    error("1 cast as xs:anyType", WHICHCAST_X);
 
     // a component type need not be a valid cast target; a value that already matches is kept as-is
     query("([ <a/> ] cast as array(element())) instance of array(element())", true);

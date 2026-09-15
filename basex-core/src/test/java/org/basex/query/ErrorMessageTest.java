@@ -84,9 +84,9 @@ public final class ErrorMessageTest extends SandboxTest {
   /** Unknown atomic type: hint to similar type name. */
   @Test public void unknownType() {
     // Levenshtein match for typo
-    unknownName("'a' cast as xs:strin", WHICHCAST_X, "xs:string");
+    unknownName("'a' cast as xs:strin", TYPEUNKNOWN_X, "xs:string");
     // prefix fallback for short input that is too far in Levenshtein distance
-    unknownName("'a' cast as xs:integ", WHICHCAST_X, "xs:integer");
+    unknownName("'a' cast as xs:integ", TYPEUNKNOWN_X, "xs:integer");
   }
 
   /**

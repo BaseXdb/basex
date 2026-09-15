@@ -224,8 +224,8 @@ public final class JavaFunctionTest extends SandboxTest {
   @Test public void javaCast() {
     error("xs:java('x')", WHICHFUNC_X);
     error("java('x')", WHICHFUNC_X);
-    error("'x' cast as xs:java", WHICHCAST_X);
-    error("'x' cast as java", WHICHCAST_X);
+    error("'x' cast as xs:java", TYPEUNKNOWN_X);
+    error("'x' cast as java", TYPEUNKNOWN_X);
   }
 
   /** Static check for Java method/variable names. */
