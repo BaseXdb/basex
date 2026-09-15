@@ -2,14 +2,13 @@ package org.basex.query.up.primitives.node;
 
 import static org.basex.query.QueryError.*;
 
-import java.util.*;
-
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.up.*;
 import org.basex.query.up.atomic.*;
 import org.basex.query.up.primitives.*;
+import org.basex.query.value.map.*;
 import org.basex.util.*;
 
 /**
@@ -35,11 +34,11 @@ public final class ReplaceDoc extends NodeUpdate {
    * @throws QueryException query exception
    */
   public ReplaceDoc(final int pre, final Data data, final NewInput input,
-      final HashMap<String, String> qopts, final QueryContext qc, final InputInfo info)
+      final XQMap qopts, final QueryContext qc, final InputInfo info)
       throws QueryException {
 
     super(UpdateType.REPLACENODE, pre, data, info);
-    final DBOptions dbopts = new DBOptions(qopts, MainOptions.PARSING, info);
+    final DBOptions dbopts = new DBOptions(qopts, MainOptions.PARSING, qc, info);
     final MainOptions mopts = dbopts.assignTo(new MainOptions(qc.context.options, false));
     newDocs = new DBNew(qc, mopts, info, input);
   }

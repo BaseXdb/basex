@@ -3,7 +3,6 @@ package org.basex.query.up.primitives.name;
 import static org.basex.query.QueryError.*;
 
 import java.io.*;
-import java.util.*;
 
 import org.basex.build.*;
 import org.basex.core.*;
@@ -12,6 +11,7 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.up.primitives.*;
+import org.basex.query.value.map.*;
 import org.basex.util.*;
 
 /**
@@ -37,11 +37,11 @@ public final class DBCreate extends NameUpdate {
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public DBCreate(final String name, final NewInput[] inputs, final HashMap<String, String> qopts,
+  public DBCreate(final String name, final NewInput[] inputs, final XQMap qopts,
       final QueryContext qc, final InputInfo info) throws QueryException {
 
     super(UpdateType.DBCREATE, name, qc, info);
-    final DBOptions dbopts = new DBOptions(qopts, MainOptions.CREATING, info);
+    final DBOptions dbopts = new DBOptions(qopts, MainOptions.CREATING, qc, info);
     options = dbopts.assignTo(new MainOptions(qc.context.options, false));
     newDocs = new DBNew(qc, options, info, inputs);
   }

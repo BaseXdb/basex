@@ -19,6 +19,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
+import org.basex.util.options.*;
 
 /**
  * Function implementation.
@@ -213,11 +214,12 @@ abstract class DbNew extends DbAccessFn {
    * @param path target path
    * @param options options
    * @return result of check
+   * @throws QueryException query exception
    */
   final boolean put(final IntList docs, final Data data, final String path,
-      final HashMap<String, String> options) {
-    final String pr = options.get(MainOptions.REPLACE.name().toLowerCase(Locale.ENGLISH));
-    if(pr == null || Strings.toBoolean(pr)) return true;
+      final XQMap options) throws QueryException {
+    final Value pr = options.get(Str.get(MainOptions.REPLACE.name().toLowerCase(Locale.ENGLISH)));
+    if(pr.isEmpty() || Strings.toBoolean(Options.serialize(pr, info))) return true;
 
     boolean add = docs.isEmpty();
     for(final ResourceType type : Resources.BINARIES) {

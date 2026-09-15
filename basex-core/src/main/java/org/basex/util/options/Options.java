@@ -500,7 +500,7 @@ public class Options implements Iterable<Option<?>> {
    * @return name
    * @throws QueryException query exception
    */
-  private static String name(final Item name, final InputInfo info) throws QueryException {
+  public static String name(final Item name, final InputInfo info) throws QueryException {
     if(name instanceof final QNm qnm) {
       // implementation-defined options must have a non-absent namespace
       if(qnm.uri().length == 0) throw INVALIDOPTION_X.get(info,
@@ -518,7 +518,7 @@ public class Options implements Iterable<Option<?>> {
    * @return string
    * @throws QueryException query exception
    */
-  private static String serialize(final Value value, final InputInfo info) throws QueryException {
+  public static String serialize(final Value value, final InputInfo info) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
     for(final Item item : value) {
       if(!tb.isEmpty()) tb.add(' ');

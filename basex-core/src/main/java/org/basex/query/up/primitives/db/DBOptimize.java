@@ -11,6 +11,7 @@ import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
+import org.basex.query.value.map.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.options.*;
@@ -38,7 +39,7 @@ public final class DBOptimize extends DBUpdate {
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public DBOptimize(final Data data, final boolean all, final HashMap<String, String> qopts,
+  public DBOptimize(final Data data, final boolean all, final XQMap qopts,
       final QueryContext qc, final InputInfo info) throws QueryException {
 
     super(UpdateType.DBOPTIMIZE, data, info);
@@ -49,7 +50,7 @@ public final class DBOptimize extends DBUpdate {
         filter(c -> all || c != MainOptions.UPDINDEX).toArray(Option<?>[]::new);
 
     // create options, based on global defaults
-    final DBOptions dbopts = new DBOptions(qopts, supported, info);
+    final DBOptions dbopts = new DBOptions(qopts, supported, qc, info);
     final MetaData meta = data.meta;
     dbopts.assignIfAbsent(MainOptions.TEXTINDEX, meta.createtext);
     dbopts.assignIfAbsent(MainOptions.ATTRINDEX, meta.createattr);

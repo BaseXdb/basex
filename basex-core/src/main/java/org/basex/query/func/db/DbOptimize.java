@@ -1,11 +1,10 @@
 package org.basex.query.func.db;
 
-import java.util.*;
-
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.db.*;
 import org.basex.query.value.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 
 /**
@@ -19,7 +18,7 @@ public final class DbOptimize extends DbNew {
   public Value value(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
     final boolean all = toBooleanOrFalse(arg(1), qc);
-    final HashMap<String, String> options = toOptions(arg(2), qc);
+    final XQMap options = toEmptyMap(arg(2), qc);
 
     qc.updates().add(new DBOptimize(data, all, options, qc, info), qc);
     return Empty.VALUE;

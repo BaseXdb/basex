@@ -1,11 +1,10 @@
 package org.basex.query.func.db;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.up.primitives.name.*;
 import org.basex.query.value.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 
 /**
@@ -20,7 +19,7 @@ public final class DbCreate extends DbNew {
     final String database = toName(arg(0), qc);
     checkCreate(database, qc);
     final NewInput[] inputs = toInputs(qc);
-    final HashMap<String, String> options = toOptions(arg(3), qc);
+    final XQMap options = toEmptyMap(arg(3), qc);
     qc.updates().add(new DBCreate(database, inputs, options, qc, info), qc);
     return Empty.VALUE;
   }

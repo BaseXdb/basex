@@ -2,8 +2,6 @@ package org.basex.query.func.db;
 
 import static org.basex.query.QueryError.*;
 
-import java.util.*;
-
 import org.basex.data.*;
 import org.basex.index.resource.*;
 import org.basex.io.*;
@@ -14,6 +12,7 @@ import org.basex.query.up.primitives.db.*;
 import org.basex.query.up.primitives.node.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.list.*;
 
@@ -29,7 +28,7 @@ public final class DbPut extends DbNew {
     final Data data = toData(qc);
     final Item input = toNodeOrAtomItem(arg(1), false, qc);
     final String path = toDbPath(arg(2), qc);
-    final HashMap<String, String> options = toOptions(arg(3), qc);
+    final XQMap options = toEmptyMap(arg(3), qc);
 
     final Updates updates = qc.updates();
     final IntList docs = data.resources.docs(path);

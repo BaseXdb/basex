@@ -62,6 +62,10 @@ public final class FetchModuleTest extends SandboxTest {
         " { 'parser': 'csv', 'csvparser': 'header=true' }") + "//City"), 3);
     query(COUNT.args(func.args(CSV,
         " { 'parser': 'csv', 'csvparser': { 'header': true() } }") + "//City"), 3);
+    // nested option with a map value
+    query(func.args("src/test/resources/example.json", " { 'parser': 'json', 'jsonparser': " +
+        "{ 'format': 'w3-mapping', 'mapping': { 'root': 'json' } } }") + "/json/name ! string()",
+        "Smith");
     query(COUNT.args(func.args(CSV,
         " { 'parser': 'csv', 'csvparser': { 'header': 'true' } }") + "//City"), 3);
 

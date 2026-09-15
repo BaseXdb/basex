@@ -3,10 +3,12 @@ package org.basex.query.up.primitives;
 import static org.basex.query.QueryError.*;
 
 import java.util.*;
-import java.util.Map.Entry;
 
 import org.basex.core.*;
 import org.basex.query.*;
+import org.basex.query.value.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
 
@@ -24,10 +26,11 @@ public final class DBOptions {
    * Constructor.
    * @param qopts query options
    * @param supported supported options
+   * @param qc query context
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public DBOptions(final HashMap<String, String> qopts, final Option<?>[] supported,
+  public DBOptions(final XQMap qopts, final Option<?>[] supported, final QueryContext qc,
       final InputInfo info) throws QueryException {
 
     final HashMap<String, Option<?>> options = new HashMap<>();
@@ -35,13 +38,27 @@ public final class DBOptions {
       options.put(option.name().toLowerCase(Locale.ENGLISH), option);
     }
 
-    for(final Entry<String, String> entry : qopts.entrySet()) {
-      final String name = entry.getKey();
+    for(final Item key : qopts.keys()) {
+      final String name = Options.name(key, info);
       final Option<?> option = options.get(name);
       if(option == null) throw BASEX_OPTIONS_X.get(info, Options.similar(name, options));
-      final String error = Options.assign(option, entry.getValue(), -1,
+
+      // nested maps and functions cannot be serialized as strings and are assigned with types
+      Value value = qopts.get(key);
+      XQMap typed = XQMap.empty();
+      if(option instanceof OptionsOption && value instanceof final XQMap nested) {
+        final MapBuilder strings = new MapBuilder(), values = new MapBuilder();
+        for(final Item k : nested.keys()) {
+          final Value v = nested.get(k);
+          (v instanceof FItem ? values : strings).put(k, v);
+        }
+        value = strings.map();
+        typed = values.map();
+      }
+      final String error = Options.assign(option, Options.serialize(value, info), -1,
           v -> map.put(option, v), null);
       if(error != null) throw BASEX_OPTIONS_X.get(info, error);
+      if(typed.structSize() != 0) ((Options) map.get(option)).assign(typed, qc, info);
     }
   }
 

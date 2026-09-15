@@ -2,8 +2,6 @@ package org.basex.query.func.db;
 
 import static org.basex.query.QueryError.*;
 
-import java.util.*;
-
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.up.*;
@@ -12,6 +10,7 @@ import org.basex.query.up.primitives.db.*;
 import org.basex.query.up.primitives.node.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.list.*;
 
@@ -46,7 +45,7 @@ public class DbPutBinary extends DbNew {
   final Empty put(final Data data, final String path, final Update up, final QueryContext qc)
       throws QueryException {
 
-    final HashMap<String, String> options = toOptions(arg(3), qc);
+    final XQMap options = toEmptyMap(arg(3), qc);
     final IntList docs = data.resources.docs(path);
     if(put(docs, data, path, options)) {
       // delete XML resources
