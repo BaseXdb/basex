@@ -819,7 +819,7 @@ public abstract class PlanFn extends StandardFunc {
         case COMMENT ->
           new MapBuilder().put(COMMENT, child.string()).map();
         case ELEMENT ->
-          new MapBuilder().put(nodeName(child, parent, plan, qc),
+          new MapBuilder().put(nodeName(child, node, plan, qc),
             apply(entry(child, plan), child, node, plan, qc)).map();
         case PROCESSING_INSTRUCTION ->
           new MapBuilder().put(PI, new MapBuilder().put(TARGET, child.name()).

@@ -1484,6 +1484,13 @@ public final class FnModuleTest extends SandboxTest {
     // content key clashes with attribute name: prepend '#'
     query(func.args(" <a b='1'>x</a>", " { 'attribute-marker': '', 'content-key': 'b' }") +
         "?a => map:keys() => sort()", "#b\nb");
+
+    // names of children of mixed and sequence content are relative to the enclosing element
+    query(func.args(" <b xmlns='urn:u'>text<c>x</c></b>") +
+        " => serialize({ 'method': 'json' })", "{\"Q{urn:u}b\":[\"text\",{\"c\":\"x\"}]}");
+    query(func.args(" <b xmlns='urn:u'><c/><d/><c/></b>") +
+        " => serialize({ 'method': 'json' })",
+        "{\"Q{urn:u}b\":[{\"c\":\"\"},{\"d\":\"\"},{\"c\":\"\"}]}");
   }
 
   /** Test method. */
