@@ -1,7 +1,6 @@
 package org.basex.http.web;
 
 import java.io.*;
-import java.net.*;
 import java.util.*;
 
 import org.basex.io.*;
@@ -73,19 +72,10 @@ public final class WebArchive {
    */
   IO resolve(final String path, final Uri base) {
     if(base == null) return null;
-    final String uri = IO.get(Token.string(base.string())).path();
+    final String uri = IO.get(Token.string(base.string())).merge(path).path();
     if(!uri.startsWith(root)) return null;
 
-    // resolve the path against the directory of the current entry
-    final String rel = uri.substring(root.length());
-    final String dir = rel.substring(0, rel.lastIndexOf('/') + 1);
-    final String entry;
-    try {
-      entry = URI.create(dir).resolve(path).normalize().toString();
-    } catch(final IllegalArgumentException ex) {
-      Util.debug(ex);
-      return null;
-    }
+    final String entry = uri.substring(root.length());
     return entries.containsKey(entry) ? io(entry) : null;
   }
 

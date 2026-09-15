@@ -26,7 +26,13 @@ public final class WebArchiveTest extends HTTPTest {
       "module namespace m = 'http://basex.org/demo';" +
       "import module namespace u = 'http://basex.org/demo/util' at '../lib/util.xqm';" +
       "declare %rest:path('/hello') %rest:GET function m:hello() {" +
-      "  u:name() || ' ' || unparsed-text('../data/text.txt') };",
+      "  u:name() || ' ' || unparsed-text('../data/text.txt') };" +
+      "declare %rest:path('/absolute') %rest:GET function m:absolute() {" +
+      "  resolve-uri('../data/text.txt', static-base-uri()) => unparsed-text() };",
+    "root.xqm",
+      "module namespace r = 'http://basex.org/demo/root';" +
+      "declare %rest:path('/root') %rest:GET function r:root() {" +
+      "  resolve-uri('data/text.txt', static-base-uri()) => unparsed-text() };",
     "lib/util.xqm",
       "module namespace u = 'http://basex.org/demo/util';" +
       "declare function u:name() { 'hello' };",
@@ -56,6 +62,15 @@ public final class WebArchiveTest extends HTTPTest {
    */
   @Test public void resolve() throws IOException {
     get("hello from-the-archive", "hello");
+  }
+
+  /**
+   * Resolves absolute URIs that point into the archive.
+   * @throws IOException I/O exception
+   */
+  @Test public void absolute() throws IOException {
+    get("from-the-archive", "absolute");
+    get("from-the-archive", "root");
   }
 
   /**
