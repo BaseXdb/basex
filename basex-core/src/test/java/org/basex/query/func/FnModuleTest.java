@@ -2050,6 +2050,15 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" #fn:concat", 0) + "()", "");
     query(func.args(" #fn:concat", 2) + "('a', 'b')", "ab");
 
+    // default values that are only reached by the lookup
+    query("declare function local:f($a := upper-case('x')) { $a }; "
+        + func.args(" xs:QName('local:f')", 0) + "()", "X");
+    query("declare function local:f($a := upper-case('x')) { $a }; "
+        + "declare function local:g($a := lower-case('Y')) { $a }; "
+        + "for $name in ('f', 'g') return "
+        + func.args(" QName('http://www.w3.org/2005/xquery-local-functions', $name)", 0) + "()",
+        "X\ny");
+
     inline(true);
     check(func.args(" #fn:count", 1) + "((1, 2))", 2, root(Itr.class));
     check(func.args(" #fn:identity", 1) + "(1)", 1, root(Itr.class));
@@ -2728,6 +2737,9 @@ return
         + "?variables?#Q{x}x", "1\n2");
     query(func.args("x", " { 'content': 'module namespace x=\"x\";\ndeclare variable $x:x := 1;', "
         + "'xquery-version': 4.0 }") + "?variables?#Q{x}x", 1);
+    query(func.args("m", " { 'content': 'module namespace m=\"m\"; "
+        + "declare function m:f($a := upper-case(\"x\")) { $a };' }") + "?functions?#Q{m}f?0()",
+        "X");
 
     // GH-2640
     error("<e xmlns:p='p'>{\n"

@@ -14,6 +14,7 @@ import org.basex.query.util.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
 import org.basex.query.util.parse.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -425,13 +426,19 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
     }
 
     @Override
+    public Value value(final QueryContext qc) throws QueryException {
+      // defaults assigned at runtime are not compiled
+      return expr.value(qc);
+    }
+
+    @Override
     public boolean accept(final ASTVisitor visitor) {
       return expr != null && super.accept(visitor);
     }
 
     @Override
     public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
-      throw Util.notExpected();
+      return expr.copy(cc, vm);
     }
 
     @Override
