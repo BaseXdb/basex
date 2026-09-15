@@ -71,7 +71,7 @@ public final class WebArchive {
    * @return IO reference, or {@code null} if the path is not part of this archive
    */
   IO resolve(final String path, final Uri base) {
-    if(base == null) return null;
+    if(base == null || base == Uri.EMPTY) return null;
     final String uri = IO.get(Token.string(base.string())).merge(path).path();
     if(!uri.startsWith(root)) return null;
 
