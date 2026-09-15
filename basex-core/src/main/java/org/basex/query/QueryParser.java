@@ -973,7 +973,9 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void checkCreate(final String location, final InputInfo info) throws QueryException {
-    if(!qc.user.has(Perm.CREATE)) throw error(BASEX_PERMISSION_X_X, info, Perm.CREATE, location);
+    if(!qc.trusted && !qc.user.has(Perm.CREATE)) {
+      throw error(BASEX_PERMISSION_X_X, info, Perm.CREATE, location);
+    }
   }
 
   /**

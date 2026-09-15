@@ -94,6 +94,8 @@ public final class QueryContext extends Job implements Closeable {
   public Updates updates;
   /** User. */
   public User user;
+  /** Indicates if parsed modules may access external resources without CREATE permission. */
+  public boolean trusted;
 
   /** Cached full-text position data. */
   public FTPosData ftPosData;

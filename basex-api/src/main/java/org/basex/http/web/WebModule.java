@@ -124,7 +124,13 @@ public final class WebModule {
     final QueryContext qc = new QueryContext(ctx);
     final StaticContext sc = archive == null ? null :
       new StaticContext(qc).resolver((path, uri, base) -> archive.resolve(path, base));
-    qc.parse(content, file.path(), sc);
+    // modules of the web application may access external resources
+    qc.trusted = true;
+    try {
+      qc.parse(content, file.path(), sc);
+    } finally {
+      qc.trusted = false;
+    }
     return qc;
   }
 }

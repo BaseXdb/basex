@@ -144,7 +144,7 @@ declare function lock:refresh(
 ) as lock:lock? {
   let $lock := lock:get($token)
   where exists($lock)
-  let $refreshed := $lock +:= { 'timeout': $timeout, 'expires': lock:expires($timeout) }
+  let $refreshed := $lock but with { 'timeout': $timeout, 'expires': lock:expires($timeout) }
   (: the lock may have been released in the meantime :)
   let $stored := webdav:lock-update(fn($entries) {
     if (exists(lock:locks($entries($token)))) {
