@@ -3,12 +3,20 @@ package org.basex.query.func.json;
 import static org.basex.query.QueryError.*;
 
 import org.basex.build.json.*;
+import org.basex.build.json.JsonOptions.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
+import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
+import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * Function implementation.
@@ -19,9 +27,56 @@ import org.basex.query.value.item.*;
 public final class JsonSerialize extends StandardFunc {
   @Override
   public Str value(final QueryContext qc) throws QueryException {
-    final Iter input = arg(0).iter(qc);
-    final JsonSerialOptions options = options(1, JsonSerialOptions::new, qc);
+    Iter input = arg(0).iter(qc);
+    JsonSerialOptions options = options(1, JsonSerialOptions::new, qc);
+    final Option<?> option = options.elementsOption();
+    if(option != null) throw INVALIDOPTION_X.get(info, Options.unknown(option));
+    if(options.get(JsonOptions.FORMAT) == JsonFormat.W3_MAPPING) {
+      try {
+        input = elements(input, options, qc).iter();
+      } catch(final QueryException ex) {
+        throw error(ex, ex.matches(ErrType.FOJS) ? JSON_SERIALIZE_X : null);
+      }
+      options = options.withoutMapping();
+    }
     return Str.get(serialize(input, options(options), INVALIDOPTION_X, qc));
+  }
+
+  /**
+   * Converts document and element nodes to maps.
+   * @param input input
+   * @param options options
+   * @param qc query context
+   * @return converted items
+   * @throws QueryException query exception
+   */
+  private Value elements(final Iter input, final JsonSerialOptions options, final QueryContext qc)
+      throws QueryException {
+    final JsonMappingOptions mopts = toOptions(options.get(JsonOptions.MAPPING),
+        new JsonMappingOptions(), qc);
+    final String root = mopts.get(JsonMappingOptions.ROOT);
+    final FnElementToMap func = (FnElementToMap) Function.ELEMENT_TO_MAP.get(info);
+    final ValueBuilder vb = new ValueBuilder(qc);
+    for(Item item; (item = qc.next(input)) != null;) {
+      if(item instanceof final XNode node &&
+          (node.kind() == Kind.DOCUMENT || node.kind() == Kind.ELEMENT)) {
+        final Value value = func.convert(item, mopts, qc);
+        if(root != null && value instanceof final XQMap map) {
+          // remove the root entry
+          final Item key = map.keys().itemAt(0);
+          if(!Token.eq(key.string(info), Token.token(root))) {
+            throw JSON_SERIALIZE_X.get(info, Util.info("Root element '%' expected, found '%'",
+                root, key.string(info)));
+          }
+          vb.add(map.get(key));
+        } else {
+          vb.add(value);
+        }
+      } else {
+        vb.add(item);
+      }
+    }
+    return vb.value();
   }
 
   @Override

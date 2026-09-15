@@ -19,7 +19,19 @@ public final class FnElementToMap extends PlanFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Item node = (Item) Types.DOCUMENT_OR_ELEMENT_ZO.coerce(arg(0).value(qc), qc, info);
-    final ElementsOptions options = options(1, ElementsOptions::new, qc);
+    return convert(node, options(1, ElementsOptions::new, qc), qc);
+  }
+
+  /**
+   * Converts an element to a map.
+   * @param node document or element node (can be empty)
+   * @param options options
+   * @param qc query context
+   * @return map or empty sequence
+   * @throws QueryException query exception
+   */
+  public Value convert(final Item node, final ElementsOptions options, final QueryContext qc)
+      throws QueryException {
     if(node.isEmpty()) return Empty.VALUE;
 
     // a document node is represented by its single element child (may be preceded by comments, PIs)

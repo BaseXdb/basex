@@ -287,6 +287,73 @@ public final class JsonModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void parseElements() {
+    final Function func = _JSON_PARSE;
+    final String opt = "'format': 'w3-mapping'";
+    parse("{ \"name\": { \"first\": \"Jane\", \"middle\": [ \"E\", \"M\" ] } }", opt,
+        "<name><first>Jane</first><middle>E</middle><middle>M</middle></name>");
+    parse("{ \"a\": 1 }", opt, "<a>1</a>");
+    parse("{ \"a\": 12345678901234567890 }", opt, "<a>12345678901234567890</a>");
+    query(func.args("{ \"a\": 12345678901234567890 }", " { " + opt +
+        ", 'number-format': 'double' }") + " => string() => contains('E')", true);
+    query(func.args("{ \"a\": 1 }", " { " + opt + " }") + " instance of document-node()", true);
+    query(func.args("{ \"a\": null }", " { " + opt + " }") +
+        "/a/@Q{http://www.w3.org/2001/XMLSchema-instance}nil => string()", "true");
+
+    // root element, plan, options of fn:map-to-element
+    parse("[ 1, 2 ]", opt + ", 'mapping': { 'root': 'json', 'plan': { 'json': { 'layout': " +
+        "'list', 'child': 'n' } } }", "<json><n>1</n><n>2</n></json>");
+    parse("{ \"a\": 1, \"b\": 2 }", opt + ", 'mapping': { 'root': 'json' }",
+        "<json><a>1</a><b>2</b></json>");
+    parse("{ \"p\": { \"_id\": \"x\" } }", opt + ", 'mapping': { 'attribute-marker': '_' }",
+        "<p id=\"x\"/>");
+    error(func.args("{}", " { " + opt + ", 'mapping': { 'x': 1 } }"), INVALIDOPTION_X);
+    query(func.args("{\"a\":1}\n{\"a\":2}", " { " + opt + ", 'json-lines': true() }") +
+        " => count()", 2);
+
+    // strict conversion: single-entry maps, valid names
+    error(func.args("[ 1 ]", " { " + opt + " }"), JSON_PARSE_X);
+    error(func.args("{ \"a\": 1, \"b\": 2 }", " { " + opt + " }"), JSON_PARSE_X);
+    error(func.args("{ \"a b\": 1 }", " { " + opt + " }"), JSON_PARSE_X);
+
+    // options are specific to the format
+    error(func.args("{}", " { 'root': 'json' }"), INVALIDOPTION_X);
+    error(func.args("{}", " { 'format': 'w3', 'mapping': {} }"), INVALIDOPTION_X);
+    error(func.args("{}", " { " + opt + ", 'null': 0 }"), INVALIDOPTION_X);
+  }
+
+  /** Test method. */
+  @Test public void serializeElements() {
+    final Function func = _JSON_SERIALIZE;
+    final String opt = "'format': 'w3-mapping'";
+    serial("<name><first>Jane</first></name>", opt, "{\"name\":{\"first\":\"Jane\"}}");
+    serial("document { <json><a>1</a></json> }", opt + ", 'mapping': { 'root': 'json' }",
+        "{\"a\":1}");
+    serial("<a>x</a>", opt + ", 'mapping': { 'plan': { 'a': { 'layout': 'simple', 'type': " +
+        "'boolean' } }, 'liberal': true() }", "{\"a\":\"x\"}");
+    error(func.args(" <a>x</a>", " { " + opt +
+        ", 'mapping': { 'plan': { 'a': { 'layout': 'simple', 'type': 'boolean' } } } }"),
+        JSON_SERIALIZE_X);
+    error(func.args(" <a/>", " { " + opt + ", 'mapping': { 'root': 'json' } }"),
+        JSON_SERIALIZE_X);
+
+    // round trip
+    final String json = "{\"a\":[1,2],\"b\":\"x\"}";
+    final String opts = " { " + opt + ", 'mapping': { 'root': 'json', 'plan': { 'json': { " +
+        "'layout': 'record' } } } }";
+    query(func.args(' ' + _JSON_PARSE.args(json, opts), opts), json);
+
+    // options are specific to the format
+    error(func.args(" <json type='object'/>", " { 'root': 'json' }"), INVALIDOPTION_X);
+    error(func.args(" <json type='object'/>", " { 'mapping': { 'liberal': true() } }"),
+        INVALIDOPTION_X);
+    error(SERIALIZE.args(" <a/>", " { 'method': 'json', 'json': { " + opt + " } }"),
+        SERPARAM_X);
+    error(SERIALIZE.args(" <json type='object'/>", " { 'method': 'json', 'json': { " +
+        "'mapping': { 'root': 'json' } } }"), SERPARAM_X);
+  }
+
+  /** Test method. */
   @Test public void serialize() {
     serial("<json type='object'/>", "", "{}");
     serial("<json objects='json'/>", "", "{}");

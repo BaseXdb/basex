@@ -10,8 +10,11 @@ import org.basex.io.in.*;
 import org.basex.io.parse.json.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
+import org.basex.query.value.node.*;
 import org.basex.util.options.*;
 
 /**
@@ -60,13 +63,40 @@ public abstract class ParseJson extends ParseFn {
       options.set(JsonOptions.FORMAT, format);
     }
 
-    final JsonConverter converter = JsonConverter.get((JsonParserOptions) options, info);
+    final JsonParserOptions jopts = (JsonParserOptions) options;
+    final boolean elements = jopts.get(JsonOptions.FORMAT) == JsonFormat.W3_MAPPING;
+    final JsonConverter converter = JsonConverter.get(jopts, info);
     final Value fallback = options.get(JsonParserOptions.FALLBACK);
     if(!fallback.isEmpty()) {
       final FItem fb = toFunction(fallback, 1, qc);
       converter.fallback(s -> toAtomItem(fb.invoke(qc, info, Str.get(s)), qc).string(info));
     }
-    converter.nullValue(options.get(JsonParserOptions.NULL));
-    return converter.convert(ti, "", info, qc);
+    converter.nullValue(elements ? FnMapToElement.NULL : options.get(JsonParserOptions.NULL));
+    final Value value = converter.convert(ti, "", info, qc);
+    return elements ? elements(value, jopts, qc) : value;
+  }
+
+  /**
+   * Converts maps to document nodes.
+   * @param value parsed value
+   * @param options options
+   * @param qc query context
+   * @return document nodes
+   * @throws QueryException query exception
+   */
+  private Value elements(final Value value, final JsonParserOptions options,
+      final QueryContext qc) throws QueryException {
+    final JsonMappingOptions mopts = toOptions(options.get(JsonOptions.MAPPING),
+        new JsonMappingOptions(), qc);
+    final String root = mopts.get(JsonMappingOptions.ROOT);
+    final FnMapToElement func = (FnMapToElement) Function.MAP_TO_ELEMENT.get(info);
+    final ValueBuilder vb = new ValueBuilder(qc);
+    for(final Item item : value) {
+      final Item map = root != null ? XQMap.get(Str.get(root), item) : item;
+      if(!(map instanceof XQMap)) throw MAP_TO_ELEMENT_X.get(info, "Single-entry map expected.");
+      final Value elem = func.convert(map, mopts, qc);
+      vb.add(FDoc.build().node((GNode) elem).finish());
+    }
+    return vb.value();
   }
 }

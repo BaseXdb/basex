@@ -45,6 +45,9 @@ public final class JsonParser extends SingleParser {
     if(format == JsonFormat.W3) {
       throw new IOException(Util.info("Format '%' cannot be converted to XML.", format));
     }
+    if(format == JsonFormat.W3_MAPPING) {
+      throw new IOException(Util.info("Format '%' is not supported for importing data.", format));
+    }
     try {
       final boolean lines = jopts.get(JsonParserOptions.JSON_LINES);
       if(lines) builder.openElem(JsonConstants.JSON_LINES, atts, nsp);

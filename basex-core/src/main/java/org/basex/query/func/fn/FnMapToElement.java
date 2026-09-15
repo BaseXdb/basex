@@ -28,7 +28,7 @@ import org.basex.util.*;
  */
 public final class FnMapToElement extends PlanFn {
   /** The fn:null QName, representing a nilled element. */
-  private static final QNm NULL = new QNm(token("null"), QueryText.FN_URI);
+  static final QNm NULL = new QNm(token("null"), QueryText.FN_URI);
 
   /** Role that a map key plays in the reconstructed element. */
   private enum Slot {
@@ -42,7 +42,19 @@ public final class FnMapToElement extends PlanFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value value = arg(0).value(qc);
-    final ElementsOptions options = options(1, ElementsOptions::new, qc);
+    return convert(value, options(1, ElementsOptions::new, qc), qc);
+  }
+
+  /**
+   * Converts a map to an element.
+   * @param value map (can be empty)
+   * @param options options
+   * @param qc query context
+   * @return element or empty sequence
+   * @throws QueryException query exception
+   */
+  public Value convert(final Value value, final ElementsOptions options, final QueryContext qc)
+      throws QueryException {
     if(value.isEmpty()) return Empty.VALUE;
 
     final Plan plan = buildPlan(options, qc);

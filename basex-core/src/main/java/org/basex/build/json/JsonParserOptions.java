@@ -23,7 +23,7 @@ public final class JsonParserOptions extends JsonOptions {
   public static final ValueOption FALLBACK = new ValueOption("fallback", FUNCTION_ZO);
   /** Option: number format (parse-json). */
   public static final EnumOption<JsonNumberFormat> NUMBER_FORMAT =
-      new EnumOption<>("number-format", JsonNumberFormat.DOUBLE);
+      new EnumOption<>("number-format", JsonNumberFormat.class);
   /** Option: handle duplicates (parse-json, json-to-xml). */
   public static final EnumOption<JsonDuplicates> DUPLICATES =
       new EnumOption<>("duplicates", JsonDuplicates.class);
@@ -82,13 +82,16 @@ public final class JsonParserOptions extends JsonOptions {
    */
   public void check(final InputInfo info) throws QueryException {
     final JsonFormat format = get(FORMAT);
-    final boolean w3 = format == JsonFormat.W3;
+    final boolean w3 = format == JsonFormat.W3, maps = w3 || format == JsonFormat.W3_MAPPING;
     if(get(VALIDATE) != null && format != JsonFormat.W3_XML) throw unknown(VALIDATE, info);
-    if(get(NUMBER_FORMAT) != JsonNumberFormat.DOUBLE && !w3) throw unknown(NUMBER_FORMAT, info);
+    final JsonNumberFormat nf = get(NUMBER_FORMAT);
+    if(nf != null && nf != JsonNumberFormat.DOUBLE && !maps) throw unknown(NUMBER_FORMAT, info);
     if(!get(NULL).isEmpty() && !w3) throw unknown(NULL, info);
+    final Option<?> option = elementsOption();
+    if(option != null) throw unknown(option, info);
     // maps cannot retain duplicates, XML formats cannot pick the last one
     final JsonDuplicates dupl = get(DUPLICATES);
-    if(dupl == (w3 ? JsonDuplicates.RETAIN : JsonDuplicates.USE_LAST)) {
+    if(dupl == (maps ? JsonDuplicates.RETAIN : JsonDuplicates.USE_LAST)) {
       throw OPTION_JSON_X.get(info, Util.info("'%':'%' is not supported by the target format.",
           DUPLICATES.name(), dupl));
     }

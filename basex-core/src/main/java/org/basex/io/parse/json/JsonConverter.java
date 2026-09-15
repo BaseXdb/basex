@@ -68,7 +68,7 @@ public abstract class JsonConverter extends JsonHandler {
     return switch(jopts.get(JsonOptions.FORMAT)) {
       case ATTRIBUTES -> new JsonAttsConverter(jopts, handler);
       case JSONML     -> new JsonMLConverter(jopts, handler);
-      case W3         -> new JsonW3Converter(jopts);
+      case W3, W3_MAPPING -> new JsonW3Converter(jopts);
       case W3_XML     -> new JsonW3XmlConverter(jopts, handler);
       default         -> new JsonDirectConverter(jopts, handler);
     };

@@ -55,7 +55,9 @@ public final class JsonW3Converter extends JsonConverter {
    */
   JsonW3Converter(final JsonParserOptions opts) {
     super(opts);
-    fmt = jopts.get(JsonParserOptions.NUMBER_FORMAT);
+    final JsonNumberFormat nf = jopts.get(JsonParserOptions.NUMBER_FORMAT);
+    fmt = nf != null ? nf : jopts.get(JsonOptions.FORMAT) == JsonOptions.JsonFormat.W3_MAPPING ?
+      JsonNumberFormat.ADAPTIVE : JsonNumberFormat.DOUBLE;
   }
 
   @Override

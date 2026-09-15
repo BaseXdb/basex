@@ -19,6 +19,7 @@ import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.options.*;
 import org.basex.util.options.Options.*;
 
 /**
@@ -51,7 +52,12 @@ public abstract class JsonSerializer extends StandardSerializer {
    */
   public static Serializer get(final OutputStream os, final SerializerOptions so)
       throws IOException {
-    return switch(so.get(SerializerOptions.JSON).get(JsonOptions.FORMAT)) {
+    final JsonSerialOptions jopts = so.get(SerializerOptions.JSON);
+    final Option<?> option = jopts.elementsOption();
+    if(option != null) throw SERPARAM_X.getIO(Options.unknown(option));
+    return switch(jopts.get(JsonOptions.FORMAT)) {
+      case W3_MAPPING -> throw SERPARAM_X.getIO(Util.info(
+          "Format '%' is not supported by the serializer.", JsonOptions.JsonFormat.W3_MAPPING));
       case JSONML -> new JsonMLSerializer(os, so);
       case W3_XML -> new JsonW3XmlSerializer(os, so);
       default     -> new JsonNodeSerializer(os, so);
