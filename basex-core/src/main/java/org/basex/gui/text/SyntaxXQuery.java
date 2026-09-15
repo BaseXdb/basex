@@ -75,11 +75,11 @@ final class SyntaxXQuery extends SyntaxMarkup {
   private static final String OPERATORS = "=+-<>|!/";
   /** Operator keywords that follow an operand. */
   private static final HashSet<String> INFIX = new HashSet<>(Arrays.asList(
-    AND, CAST, CASTABLE, DIV, EXCEPT, IDIV, INSTANCE, INTERSECT, MOD, OR, OTHERWISE, TO, TREAT,
+    AND, BUT, CAST, CASTABLE, DIV, EXCEPT, IDIV, INSTANCE, INTERSECT, MOD, OR, OTHERWISE, TO, TREAT,
     UNION));
   /** Keywords that are followed by an expression. */
   private static final HashSet<String> DANGLING = new HashSet<>(Arrays.asList(
-    AS, CASE, DEFAULT, ELSE, IN, OF, RETURN, SATISFIES, THEN, WHERE));
+    AS, CASE, DEFAULT, ELSE, IN, OF, RETURN, SATISFIES, THEN, WHERE, WITH));
   static {
     // comparison operators are infix operators as well; every infix operator dangles
     for(final CmpOp op : CmpOp.values()) INFIX.add(op.toValueString());

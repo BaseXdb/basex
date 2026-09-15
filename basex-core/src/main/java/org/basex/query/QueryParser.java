@@ -2087,7 +2087,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr intersect() throws QueryException {
-    Expr expr = recordPut();
+    Expr expr = butWith();
     boolean lastIs = false;
     ExprList el = null;
     while(true) {
@@ -2099,20 +2099,21 @@ public class QueryParser extends InputParser {
       }
       lastIs = is;
       if(el == null) el = new ExprList().add(expr);
-      add(el, recordPut());
+      add(el, butWith());
     }
     return el != null ? intersectExcept(lastIs, el) : expr;
   }
 
   /**
-   * Parses the "RecordPutExpr" rule.
+   * Parses the "ButWithExpr" rule.
    * @return query expression
    * @throws QueryException query exception
    */
-  private Expr recordPut() throws QueryException {
+  private Expr butWith() throws QueryException {
     Expr expr = instanceOf();
-    while(wsConsume("+:=")) {
-      expr = new RecordPut(info(), expr, instanceOf());
+    while(wsConsumeWs(BUT)) {
+      wsCheck(WITH);
+      expr = new ButWith(info(), expr, instanceOf());
     }
     return expr;
   }

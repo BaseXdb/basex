@@ -47,7 +47,7 @@ public final class ShapeSet extends Arr {
 
   @Override
   public Expr inlineTypeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
-    // map:put(RECORD, FIELD, VALUE) coerce to T → (RECORD coerce to T) +:= map:entry(FIELD, VALUE)
+    // map:put(RECORD, KEY, VALUE) coerce to T → (RECORD coerce to T) but with map:entry(KEY, VALUE)
     final byte[] key = type.fields().key(index);
     if(tc.seqType().type instanceof final ShapeType sh && sh.strict() &&
         sh.fields().contains(key) &&
@@ -56,7 +56,7 @@ public final class ShapeSet extends Arr {
         (exprs[0] instanceof ShapeSet || type.instanceOf(sh))) {
       final Expr rec = tc.check(exprs[0], cc);
       final Expr entry = cc.function(_MAP_ENTRY, info, Str.get(key), exprs[1]);
-      return new RecordPut(info, rec != null ? rec : exprs[0], entry).optimize(cc);
+      return new ButWith(info, rec != null ? rec : exprs[0], entry).optimize(cc);
     }
     return null;
   }

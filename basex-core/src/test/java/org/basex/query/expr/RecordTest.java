@@ -147,38 +147,39 @@ public final class RecordTest extends SandboxTest {
         + "local:f(({ 'a': 1 }, { 'a': 2 }))?a", 1);
   }
 
-  /** The {@code +:=} (record put) operator. */
-  @Test public void recordPut() {
-    query("let $r as record(a, b) := { 'a': 1, 'b': 2 } return $r +:= { 'b': 9 }",
+  /** The {@code but with} operator. */
+  @Test public void butWith() {
+    query("let $r as record(a, b) := { 'a': 1, 'b': 2 } return $r but with { 'b': 9 }",
         "{\"a\":1,\"b\":9}");
-    query("let $r as record(a, b) := { 'a': 1, 'b': 2 } return $r +:= { 'a': 7, 'b': 8 }",
+    query("let $r as record(a, b) := { 'a': 1, 'b': 2 } return $r but with { 'a': 7, 'b': 8 }",
         "{\"a\":7,\"b\":8}");
     // left-associative chaining
-    query("let $r as record(a) := { 'a': 1 } return ($r +:= { 'a': 2 }) +:= { 'a': 3 }",
+    query("let $r as record(a) := { 'a': 1 } return ($r but with { 'a': 2 }) but with { 'a': 3 }",
         "{\"a\":3}");
     // coercion applies: an integer is promoted to the required type
-    query("let $r as record(a as xs:double) := { 'a': 1 } return ($r +:= { 'a': 2 })?a", 2);
+    query("let $r as record(a as xs:double) := { 'a': 1 } return ($r but with { 'a': 2 })?a", 2);
     // the result is still a record: looking up an undeclared field errors
-    error("let $r as record(a) := { 'a': 1 } return ($r +:= { 'a': 2 })?b", RECORDFIELD_X_X);
+    error("let $r as record(a) := { 'a': 1 } return ($r but with { 'a': 2 })?b", RECORDFIELD_X_X);
     // an undeclared field in the right operand is a type error
-    error("let $r as record(a) := { 'a': 1 } return $r +:= { 'c': 9 }", INVTYPE_X);
+    error("let $r as record(a) := { 'a': 1 } return $r but with { 'c': 9 }", INVTYPE_X);
     // a value that does not conform to the field type is a type error
-    error("let $r as record(a as xs:integer) := { 'a': 1 } return $r +:= { 'a': 'x' }", INVTYPE_X);
+    error("let $r as record(a as xs:integer) := { 'a': 1 } "
+        + "return $r but with { 'a': 'x' }", INVTYPE_X);
     // the left operand must be a record (a map with non-string keys is not)
-    error("{ 1: 'a' } +:= { 1: 'b' }", INVTYPE_X);
+    error("{ 1: 'a' } but with { 1: 'b' }", INVTYPE_X);
     // a plain map is no record, even if its field set is statically known
-    error("{ 'a': 1 } +:= { 'a': 2 }", INVTYPE_X);
-    error("{ 'a': 1 } +:= { 'b': 2 }", INVTYPE_X);
-    error("let $m := { 'a': 1 } return $m +:= { 'a': 2 }", INVTYPE_X);
+    error("{ 'a': 1 } but with { 'a': 2 }", INVTYPE_X);
+    error("{ 'a': 1 } but with { 'b': 2 }", INVTYPE_X);
+    error("let $m := { 'a': 1 } return $m but with { 'a': 2 }", INVTYPE_X);
     // a record passed through a shape-typed variable is still a record
-    query("declare record local:p(x); let $m as map(*) := local:p(1) return ($m +:= { 'x': 9 })?x",
-        9);
+    query("declare record local:p(x); let $m as map(*) := local:p(1) "
+        + "return ($m but with { 'x': 9 })?x", 9);
     // updates a record built by a named constructor; unmentioned fields are preserved
-    query("declare record local:p(x, y); local:p(1, 2) +:= { 'y': 9 }", "{\"x\":1,\"y\":9}");
-    query("let $r as record(a, b) := { 'a': 1, 'b': 2 } return ($r +:= { 'a': 9 })?b", 2);
+    query("declare record local:p(x, y); local:p(1, 2) but with { 'y': 9 }", "{\"x\":1,\"y\":9}");
+    query("let $r as record(a, b) := { 'a': 1, 'b': 2 } return ($r but with { 'a': 9 })?b", 2);
     // an empty right operand leaves the record unchanged (annotation included)
-    query("let $r as record(a) := { 'a': 1 } return $r +:= {}", "{\"a\":1}");
-    error("let $r as record(a) := { 'a': 1 } return ($r +:= {})?b", RECORDFIELD_X_X);
+    query("let $r as record(a) := { 'a': 1 } return $r but with {}", "{\"a\":1}");
+    error("let $r as record(a) := { 'a': 1 } return ($r but with {})?b", RECORDFIELD_X_X);
   }
 
   /** Width-invariant subtyping and {@code record(*)}. */
@@ -497,82 +498,83 @@ public final class RecordTest extends SandboxTest {
         empty(func.className() + "[@shape]"));
   }
 
-  /** A field update coerced back to its record type is fused into the {@code +:=} operator. */
+  /** A field update coerced back to its record type is fused into the {@code but with} operator. */
   @Test public void typePutCoerce() {
-    // map:put(R, FIELD, VALUE) coerce to RECORD  ->  R +:= map:entry(FIELD, VALUE)
+    // map:put(R, FIELD, VALUE) coerce to RECORD  ->  R but with map:entry(FIELD, VALUE)
     check("let $r as record(a, b) := { 'a': <a/>, 'b': 2 } "
         + "let $s as record(a, b) := map:put($r, 'a', 0) return $s",
-        "{\"a\":0,\"b\":2}", root(RecordPut.class), empty(ShapeSet.class));
+        "{\"a\":0,\"b\":2}", root(ButWith.class), empty(ShapeSet.class));
     // the fused result is a record again: strict field access applies
     error("declare record local:coord(x, y);\n"
         + "declare function local:reset($c as local:coord) as local:coord { map:put($c, 'x', 0) }; "
         + "local:reset(local:coord(<x>1</x>, <y>2</y>))?z", RECORDFIELD_X_X);
     // no fusion when the coercion target is not the record's own (strict) type
     check("let $r as record(a, b) := { 'a': <a/>, 'b': 2 } return map:put($r, 'a', 0)",
-        "{\"a\":0,\"b\":2}", empty(RecordPut.class));
-    // a chain of updates unrolls into +:= operations and the constant updates merge into one
+        "{\"a\":0,\"b\":2}", empty(ButWith.class));
+    // a chain of updates unrolls into but with operations and the constant updates merge into one
     check("let $r as record(a, b) := { 'a': <a/>, 'b': 2 } "
         + "let $s as record(a, b) := $r => map:put('a', 0) => map:put('b', 9) return $s",
         "{\"a\":0,\"b\":9}",
-        root(RecordPut.class), empty(ShapeSet.class), count(RecordPut.class, 1));
+        root(ButWith.class), empty(ShapeSet.class), count(ButWith.class, 1));
     error("declare record local:coord(x, y);\n"
         + "declare function local:reset($c as local:coord) as local:coord "
         + "{ $c => map:put('x', 0) => map:put('y', 0) };\n"
         + "local:reset(local:coord(<x>1</x>, 2))?z", RECORDFIELD_X_X);
   }
 
-  /** Consecutive constant {@code +:=} updates with disjoint keys are merged. */
-  @Test public void recordPutMerge() {
+  /** Consecutive constant {@code but with} updates with disjoint keys are merged. */
+  @Test public void butWithMerge() {
     // disjoint keys merge into one update
     check("declare record local:c(x, y); "
-        + "local:c(<x>1</x>, <x>2</x>) +:= { 'x': 0 } +:= { 'y': 0 }",
-        "{\"x\":0,\"y\":0}", root(RecordPut.class), count(RecordPut.class, 1));
+        + "local:c(<x>1</x>, <x>2</x>) but with { 'x': 0 } but with { 'y': 0 }",
+        "{\"x\":0,\"y\":0}", root(ButWith.class), count(ButWith.class, 1));
     // overlapping keys are not merged (the earlier value is still coerced), but use-last holds
     check("declare record local:c(x, y); "
-        + "local:c(<x>1</x>, <x>2</x>) +:= { 'x': 0 } +:= { 'x': 1 }",
-        "{\"x\":1,\"y\":<x>2</x>}", count(RecordPut.class, 2));
+        + "local:c(<x>1</x>, <x>2</x>) but with { 'x': 0 } but with { 'x': 1 }",
+        "{\"x\":1,\"y\":<x>2</x>}", count(ButWith.class, 2));
     // only the disjoint pair collapses; the overlapping update stays separate
     check("declare record local:c(x, y); "
-        + "local:c(<x>1</x>, <x>2</x>) +:= { 'x': 0 } +:= { 'y': 0 } +:= { 'x': 9 }",
-        "{\"x\":9,\"y\":0}", count(RecordPut.class, 2));
+        + "local:c(<x>1</x>, <x>2</x>) but with { 'x': 0 } but with { 'y': 0 } but with { 'x': 9 }",
+        "{\"x\":9,\"y\":0}", count(ButWith.class, 2));
     // a non-constant update is not merged (the field value is evaluated at runtime)
     check("declare record local:c(x, y); "
-        + "local:c(<x>1</x>, <x>2</x>) +:= { 'x': <n/> } +:= { 'y': 0 }",
-        "{\"x\":<n/>,\"y\":0}", count(RecordPut.class, 2));
+        + "local:c(<x>1</x>, <x>2</x>) but with { 'x': <n/> } but with { 'y': 0 }",
+        "{\"x\":<n/>,\"y\":0}", count(ButWith.class, 2));
     // merging must not drop the shadowed value and mask its coercion error
     error("declare record local:c(x as xs:integer); "
-        + "local:c(1) +:= { 'x': 'y' } +:= { 'x': 3 }", INVTYPE_X);
+        + "local:c(1) but with { 'x': 'y' } but with { 'x': 3 }", INVTYPE_X);
   }
 
   /** An update that supplies every field overwrites the record and drops the merge operator. */
-  @Test public void recordPutCovered() {
+  @Test public void butWithCovered() {
     // a covering constant update makes the left operand dead: the operator folds away entirely
-    check("let $r as record(a, b) := { 'a': 1, 'b': 2 } return $r +:= { 'a': 7, 'b': 8 }",
-        "{\"a\":7,\"b\":8}", empty(RecordPut.class));
-    // record(...) +:= record(...): every field is overwritten by the right operand
-    query("declare record local:rec(a, b); local:rec(1, 2) +:= local:rec(4, 5)",
+    check("let $r as record(a, b) := { 'a': 1, 'b': 2 } return $r but with { 'a': 7, 'b': 8 }",
+        "{\"a\":7,\"b\":8}", empty(ButWith.class));
+    // record(...) but with record(...): every field is overwritten by the right operand
+    query("declare record local:rec(a, b); local:rec(1, 2) but with local:rec(4, 5)",
         "{\"a\":4,\"b\":5}");
     // a non-constant covering update also drops the operator; only the update construction remains
-    check("let $r as record(a, b) := { 'a': 1, 'b': 2 } return $r +:= { 'a': <c/>, 'b': <d/> }",
-        "{\"a\":<c/>,\"b\":<d/>}", empty(RecordPut.class), count(ShapeConstructor.class, 1));
+    check("let $r as record(a, b) := { 'a': 1, 'b': 2 } "
+        + "return $r but with { 'a': <c/>, 'b': <d/> }",
+        "{\"a\":<c/>,\"b\":<d/>}", empty(ButWith.class), count(ShapeConstructor.class, 1));
     // a covering constructor update builds the record type directly: no intermediate + coercion,
     // so the plan carries no TypeCheck (field types differ: integer arguments, double fields)
-    check("declare record local:pt(x as xs:double, y as xs:double);\n"
-        + "declare function f($p as local:pt, $i) as local:pt { $p +:= { 'x': $i, 'y': $i } };\n"
-        + "f(local:pt(0, 0), 3)",
-        "{\"x\":3,\"y\":3}", empty(RecordPut.class), empty(TypeCheck.class));
+    check("declare record pt(x as xs:double, y as xs:double);\n"
+        + "declare function f($p as pt, $i) as pt { $p but with { 'x': $i, 'y': $i } };\n"
+        + "f(pt(0, 0), 3)",
+        "{\"x\":3,\"y\":3}", empty(ButWith.class), empty(TypeCheck.class));
     // coercion still applies on the collapsed path: the integer is promoted to the field type
-    query("let $r as record(a as xs:double) := { 'a': 1 } return ($r +:= { 'a': 2 })?a", 2);
+    query("let $r as record(a as xs:double) := { 'a': 1 } return ($r but with { 'a': 2 })?a", 2);
     // the collapsed result stays a record: an undeclared field in the update still errors
-    error("let $r as record(a) := { 'a': 1 } return $r +:= { 'a': 2, 'c': 3 }", INVTYPE_X);
+    error("let $r as record(a) := { 'a': 1 } return $r but with { 'a': 2, 'c': 3 }", INVTYPE_X);
     // a partial update does NOT trigger the rewrite: the merge is kept, unmentioned fields survive
-    check("declare record local:c(x, y); local:c(<x>1</x>, <y>2</y>) +:= { 'x': 0 }",
-        "{\"x\":0,\"y\":<y>2</y>}", root(RecordPut.class));
+    check("declare record local:c(x, y); local:c(<x>1</x>, <y>2</y>) but with { 'x': 0 }",
+        "{\"x\":0,\"y\":<y>2</y>}", root(ButWith.class));
 
     inline(true);
     // local:rec(...) is inlined and the whole expression constant-folds to a single record
-    check("declare record local:rec(a, b); local:rec(1, 2) +:= local:rec(4, 5)",
-        "{\"a\":4,\"b\":5}", empty(RecordPut.class), root(XQShapeValueMap.class));
+    check("declare record local:rec(a, b); local:rec(1, 2) but with local:rec(4, 5)",
+        "{\"a\":4,\"b\":5}", empty(ButWith.class), root(XQShapeValueMap.class));
   }
 
   /** Tests for the compact record map implementation. */

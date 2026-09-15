@@ -176,10 +176,10 @@ public final class StoreModuleTest extends SandboxTest {
 
     // a record with a node is materialized as a record, detached from the declaring query
     query("declare record r(a, owner as element(*)?); " + func.args("key", " r(1, <owner/>)"), "");
-    query("(" + _STORE_GET.args("key") + " +:= { 'a': 2 })?a", 2);
+    query("(" + _STORE_GET.args("key") + " but with { 'a': 2 })?a", 2);
     query("declare record r(a, owner as element(*)?, n := 42); " +
         func.args("key", " r(1, <owner/>)"), "");
-    query("(" + _STORE_GET.args("key") + " +:= { 'a': 2 })?n", 42);
+    query("(" + _STORE_GET.args("key") + " but with { 'a': 2 })?n", 42);
 
     error(func.args("key", " true#0"), BASEX_FUNCTION_X);
     error(func.args("key", " [ fn() { 123 } ]"), BASEX_FUNCTION_X);

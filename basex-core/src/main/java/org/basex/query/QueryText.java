@@ -28,6 +28,7 @@ public interface QueryText {
   /** Parser token. */ String BASE_URI = "base-uri";
   /** Parser token. */ String BEFORE = "before";
   /** Parser token. */ String BOUNDARY_SPACE = "boundary-space";
+  /** Parser token. */ String BUT = "but";
   /** Parser token. */ String BY = "by";
   /** Parser token. */ String CASE = "case";
   /** Parser token. */ String CAST = "cast";

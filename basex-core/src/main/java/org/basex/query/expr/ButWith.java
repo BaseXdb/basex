@@ -13,26 +13,26 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Record put expression ({@code +:=}).
+ * {@code but with} expression.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class RecordPut extends Arr {
+public final class ButWith extends Arr {
   /**
    * Constructor.
    * @param info input info (can be {@code null})
    * @param record record expression (left operand)
    * @param update update expression (right operand)
    */
-  public RecordPut(final InputInfo info, final Expr record, final Expr update) {
+  public ButWith(final InputInfo info, final Expr record, final Expr update) {
     super(info, Types.RECORD_O, record, update);
   }
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    // RECORD +:= { ... } +:= { ... } → RECORD +:= { ..., ... }
-    if(exprs[0] instanceof final RecordPut rp && rp.exprs[1] instanceof final XQMap update1 &&
+    // RECORD but with { ... } but with { ... } → RECORD but with { ..., ... }
+    if(exprs[0] instanceof final ButWith rp && rp.exprs[1] instanceof final XQMap update1 &&
         exprs[1] instanceof final XQMap update2 && disjoint(update1, update2)) {
       final MapBuilder mb = new MapBuilder();
       update1.forEach(mb::put);
@@ -45,9 +45,9 @@ public final class RecordPut extends Arr {
     if(st.type instanceof final RecordType rt) {
       // the update supplies every field: drop the left operand
       if(covered(exprs[1], rt)) {
-        // RECORD +:= local:rec(1, 2) → local:rec(1, 2): build the record type directly …
+        // RECORD but with local:rec(1, 2) → local:rec(1, 2): build the record type directly …
         final Expr direct = retarget(exprs[1], rt, cc);
-        // … otherwise RECORD +:= { 'a': 1, 'b': 2 } → { 'a': 1, 'b': 2 } coerce to RECORD
+        // … otherwise RECORD but with { 'a': 1, 'b': 2 } → { 'a': 1, 'b': 2 } coerce to RECORD
         return cc.replaceWith(this, direct != null ? direct :
           new TypeCheck(info, exprs[1], rt.seqType()).optimize(cc));
       }
@@ -138,16 +138,16 @@ public final class RecordPut extends Arr {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
-    return copyType(new RecordPut(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm)));
+    return copyType(new ButWith(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm)));
   }
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof RecordPut && super.equals(obj);
+    return this == obj || obj instanceof ButWith && super.equals(obj);
   }
 
   @Override
   public void toString(final QueryString qs) {
-    qs.tokens(exprs, " +:= ", true);
+    qs.tokens(exprs, " but with ", true);
   }
 }
