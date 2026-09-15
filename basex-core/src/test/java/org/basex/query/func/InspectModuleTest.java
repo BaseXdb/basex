@@ -99,6 +99,8 @@ public final class InspectModuleTest extends SandboxTest {
     query("declare function local:x() { 2 }; " + func.args() + "()", 2);
     query("declare function local:x($a := (), $b := (), $c := ()) {}; " + COUNT.args(func.args()),
         4);
+    query("declare function local:x($a := current()) { $a }; "
+        + "'x' ! " + func.args() + "[function-arity(.) = 0]()", "x");
     query("import module namespace hello='world' at '" + url + "';" +
         func.args() + "[last()] instance of function(*)", true);
 

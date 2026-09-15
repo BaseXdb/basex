@@ -11,7 +11,6 @@ import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.util.parse.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 
 /**
  * Function implementation.
@@ -83,8 +82,7 @@ public final class InspectFunctions extends StandardFunc {
       throws QueryException {
     for(int a = sf.minArity(); a <= sf.arity(); a++) {
       final FuncBuilder fb = new FuncBuilder(sf.info, a, true);
-      // safe cast (no context dependency, runtime evaluation)
-      vb.add((FuncItem) Functions.item(sf, fb, qc));
+      vb.add(Functions.item(sf, fb, qc).item(qc, sf.info));
     }
   }
 }
