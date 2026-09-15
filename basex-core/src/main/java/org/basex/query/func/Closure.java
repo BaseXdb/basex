@@ -381,7 +381,10 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       checked = new TypeCheck(info, body, declType);
     }
 
-    return new FuncItem(info, checked, params, anns, funcType(), vs.stackSize(), name,
+    // captured focus: fn:current refers to the current value at creation time
+    final Expr ex = focus && qc.current != null ? CurrentValue.get(qc.current, checked, info) :
+      checked;
+    return new FuncItem(info, ex, params, anns, funcType(), vs.stackSize(), name,
         focus ? qc.focus.copy() : null);
   }
 

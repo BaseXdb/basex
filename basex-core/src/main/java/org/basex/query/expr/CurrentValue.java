@@ -36,6 +36,17 @@ public final class CurrentValue extends Arr {
     return expr.has(Flag.CUR) ? new CurrentValue(info, new ContextValue(info), expr) : expr;
   }
 
+  /**
+   * Binds a captured current value to the fn:current calls of a function body.
+   * @param current captured current value
+   * @param expr function body
+   * @param info input info (can be {@code null})
+   * @return expression
+   */
+  public static Expr get(final Value current, final Expr expr, final InputInfo info) {
+    return expr.has(Flag.CUR) ? new CurrentValue(info, current, expr) : expr;
+  }
+
   @Override
   public Expr optimize(final CompileContext cc) {
     // current() → context value of the caller

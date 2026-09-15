@@ -93,7 +93,9 @@ public final class StaticVar extends StaticDecl {
    */
   Value compute(final QueryContext qc) throws QueryException {
     final QueryFocus focus = qc.focus;
+    final Value current = qc.current;
     qc.focus = qc.globalFocus();
+    qc.current = null;
     final int fp = vs.enter(qc);
     try {
       return coerce(expr.value(qc), qc);
@@ -103,6 +105,7 @@ public final class StaticVar extends StaticDecl {
     } finally {
       vs.exit(fp, qc);
       qc.focus = focus;
+      qc.current = current;
     }
   }
 
