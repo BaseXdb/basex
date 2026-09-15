@@ -6,6 +6,7 @@ import static org.basex.query.func.archive.ArchiveText.*;
 import java.io.*;
 import java.util.zip.*;
 
+import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
@@ -21,7 +22,7 @@ abstract class ArchiveOut implements Closeable {
   /**
    * Returns a new instance of an archive writer.
    * @param format archive format
-   * @param method compression method ({@link ZipEntry#STORED}, {@link ZipEntry#DEFLATED},
+   * @param method compression method ({@link ZipEntry#STORED}, {@link Compression#method},
    *   or {@code -1} if chosen per entry)
    * @param info input info (can be {@code null})
    * @param os output stream
@@ -32,8 +33,9 @@ abstract class ArchiveOut implements Closeable {
       final OutputStream os) throws QueryException {
     try {
       if(format.equals(ZIP)) return new ZIPOut(os);
-      if(format.equals(GZIP)) return new GZIPOut(os);
-      if(format.equals(TAR)) return new TarOut(os, method == ZipEntry.DEFLATED);
+      if(format.equals(TAR)) return new TarOut(os, Compression.get(method));
+      final Compression compr = Compression.get(format);
+      if(compr != null) return new CompressedOut(os, compr);
     } catch(final IOException ex) {
       throw ARCHIVE_ERROR_X.get(info, ex);
     }

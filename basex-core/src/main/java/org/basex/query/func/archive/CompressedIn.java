@@ -1,29 +1,33 @@
 package org.basex.query.func.archive;
 
-import static org.basex.query.func.archive.ArchiveText.*;
 import java.io.*;
 import java.util.zip.*;
 
+import org.basex.io.*;
 import org.basex.util.*;
 
 /**
- * GZIP reader.
+ * Reader for compressed single files.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-final class GZIPIn extends ArchiveIn {
+final class CompressedIn extends ArchiveIn {
   /** Decompressed input stream. */
   private final InputStream zis;
+  /** Compression. */
+  private final Compression compr;
   /** Flag. */
   private boolean more;
 
   /**
    * Constructor.
    * @param is decompressed input stream
+   * @param compr compression
    */
-  GZIPIn(final InputStream is) {
+  CompressedIn(final InputStream is, final Compression compr) {
     zis = is;
+    this.compr = compr;
   }
 
   @Override
@@ -33,9 +37,7 @@ final class GZIPIn extends ArchiveIn {
 
   @Override
   public ZipEntry entry() {
-    final ZipEntry ze = new ZipEntry("");
-    ze.setMethod(ZipEntry.DEFLATED);
-    return ze;
+    return new ZipEntry("");
   }
 
   @Override
@@ -50,12 +52,12 @@ final class GZIPIn extends ArchiveIn {
 
   @Override
   public String format() {
-    return GZIP;
+    return compr.toString();
   }
 
   @Override
   public int method() {
-    return ZipEntry.DEFLATED;
+    return compr.method;
   }
 
   @Override

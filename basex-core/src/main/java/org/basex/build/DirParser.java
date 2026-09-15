@@ -97,12 +97,11 @@ public final class DirParser extends Parser {
       for(final IO f : file.children()) parse(builder, f);
     } else if(archives && input.isArchive()) {
       String name = input.name().toLowerCase(Locale.ENGLISH);
+      final Compression compr = Compression.file(name);
       final InputStream in = input.inputStream();
-      if(name.endsWith(IO.TARSUFFIX) || name.endsWith(IO.TGZSUFFIX) ||
-          name.endsWith(IO.TARGZSUFFIX) || name.endsWith(IO.TZSTSUFFIX) ||
-          name.endsWith(IO.TARZSTSUFFIX)) {
+      if(name.endsWith(IO.TARSUFFIX) || compr != null && compr.tar(name)) {
         // process TAR files
-        try(TarInputStream is = new TarInputStream(decompress(name, in))) {
+        try(TarInputStream is = new TarInputStream(compr != null ? compr.input(in) : in)) {
           for(TarEntry te; (te = is.getNextEntry()) != null;) {
             if(te.isDirectory()) continue;
             source = newStream(is, te.getName(), input);
@@ -110,9 +109,9 @@ public final class DirParser extends Parser {
             parseResource(builder);
           }
         }
-      } else if(name.endsWith(IO.GZSUFFIX) || name.endsWith(IO.ZSTSUFFIX)) {
-        // process GZIP or Zstandard archive
-        try(InputStream is = decompress(name, in)) {
+      } else if(compr != null) {
+        // process compressed file
+        try(InputStream is = compr.input(in)) {
           // generate filename (the optional filename cannot be retrieved from the input stream):
           // drop archive suffix, add .xml if no suffix remains
           name = input.name().replaceAll("\\.[^.]+$", "");
@@ -136,20 +135,6 @@ public final class DirParser extends Parser {
       source = input;
       parseResource(builder);
     }
-  }
-
-  /**
-   * Wraps an input stream with a decompressing stream.
-   * @param name lower-cased file name
-   * @param in input stream
-   * @return decompressing stream, or original stream
-   * @throws IOException I/O exception
-   */
-  private static InputStream decompress(final String name, final InputStream in)
-      throws IOException {
-    if(name.endsWith(IO.GZSUFFIX) || name.endsWith(IO.TGZSUFFIX)) return new GZIPInputStream(in);
-    if(name.endsWith(IO.ZSTSUFFIX) || name.endsWith(IO.TZSTSUFFIX)) return new ZstdInputStream(in);
-    return in;
   }
 
   /**

@@ -31,8 +31,6 @@ interface ArchiveText {
   /** Option: algorithm: unknown. */
   String UNKNOWN = "unknown";
 
-  /** Packer format: gzip. */
-  String GZIP = "gzip";
   /** Packer format: tar. */
   String TAR = "tar";
   /** Packer format: zip. */

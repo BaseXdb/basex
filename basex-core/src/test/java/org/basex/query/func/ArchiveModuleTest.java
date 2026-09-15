@@ -165,6 +165,44 @@ public final class ArchiveModuleTest extends SandboxTest {
     error(_ARCHIVE_REFRESH.args(TAR, "x", "x"), ARCHIVE_ZIP_X);
   }
 
+  /** Test method. */
+  @Test public void zstdXz() {
+    for(final String[] test : new String[][] { { "zstd", "zst", "28B52FFD" },
+      { "xz", "xz", "FD377A585A00" } }) {
+      final String format = test[0], magic = test[2];
+      final String single = " { 'format': '" + format + "' }";
+      final String tar = " { 'format': 'tar', 'algorithm': '" + format + "' }";
+
+      // single files
+      final String create = _ARCHIVE_CREATE.args("x", "X", single);
+      query("starts-with(string(xs:hexBinary(" + create + ")), '" + magic + "')", true);
+      query(create + " => " + _ARCHIVE_EXTRACT_TEXT.args(), "X");
+      query(create + " => " + _ARCHIVE_OPTIONS.args() + " => map:get('format')", format);
+      query(create + " => " + _ARCHIVE_OPTIONS.args() + " => map:get('algorithm')", format);
+      error(create + " => " + _ARCHIVE_DELETE.args("x"), ARCHIVE_MODIFY_X);
+      error(_ARCHIVE_CREATE.args(" ('x', 'y')", " ('X', 'Y')", single), ARCHIVE_SINGLE_X);
+      error(_ARCHIVE_CREATE.args("x", "X", " { 'format': '" + format +
+          "', 'algorithm': 'deflate' }"), ARCHIVE_FORMAT_X_X);
+      error(_ARCHIVE_CREATE.args("x", "X", " { 'algorithm': '" + format + "' }"),
+          ARCHIVE_FORMAT_X_X);
+
+      // compressed tar archives
+      final String createTar = _ARCHIVE_CREATE.args(" ('a', 'b')", " ('A', 'B')", tar);
+      query("starts-with(string(xs:hexBinary(" + createTar + ")), '" + magic + "')", true);
+      query(createTar + " => " + _ARCHIVE_OPTIONS.args() + " => map:get('format')", "tar");
+      query(createTar + " => " + _ARCHIVE_OPTIONS.args() + " => map:get('algorithm')", format);
+      query(createTar + " => " + _ARCHIVE_EXTRACT_TEXT.args(), "A\nB");
+      query(createTar + " => " + _ARCHIVE_UPDATE.args("c", "C") + " => " +
+          _ARCHIVE_OPTIONS.args() + " => map:get('algorithm')", format);
+      countEntries(_ARCHIVE_CREATE_FROM.args(DIR, tar), 5);
+
+      // archive created by GNU tar and the command-line compressor
+      final String file = "src/test/resources/tar.tar." + test[1];
+      query(_ARCHIVE_ENTRIES.args(file) + " ! string()", "a.txt\nb.txt");
+      query(_ARCHIVE_OPTIONS.args(file) + "?algorithm", format);
+    }
+  }
+
   /**
    * Tests pax extended headers (bsdtar): long path and non-ASCII name via {@code path} records,
    * fractional timestamps via {@code mtime} records, directory entries.

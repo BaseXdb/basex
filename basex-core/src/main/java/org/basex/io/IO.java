@@ -47,17 +47,17 @@ public abstract class IO {
   /** JAR file suffix. */
   public static final String JARSUFFIX = ".jar";
   /** TGZIP file suffix. */
-  public static final String TARGZSUFFIX = ".tar.gz";
-  /** TGZIP file suffix. */
   public static final String TGZSUFFIX = ".tgz";
   /** GZIP file suffix. */
   public static final String GZSUFFIX = ".gz";
   /** TZSTD file suffix. */
-  public static final String TARZSTSUFFIX = ".tar.zst";
-  /** TZSTD file suffix. */
   public static final String TZSTSUFFIX = ".tzst";
   /** ZSTD file suffix. */
   public static final String ZSTSUFFIX = ".zst";
+  /** TXZ file suffix. */
+  public static final String TXZSUFFIX = ".txz";
+  /** XZ file suffix. */
+  public static final String XZSUFFIX = ".xz";
   /** TAR file suffix. */
   public static final String TARSUFFIX = ".tar";
   /** XAR file suffix. */
@@ -76,7 +76,8 @@ public abstract class IO {
     { XQSUFFIX, XQMSUFFIX, ".xqy", ".xql", ".xqu", ".xquery", ".xpath" };
   /** Archive suffixes. */
   public static final String[] ARCHIVESUFFIXES = {
-    ZIPSUFFIX, GZSUFFIX, TGZSUFFIX, ZSTSUFFIX, TZSTSUFFIX, TARSUFFIX, XARSUFFIX,
+    ZIPSUFFIX, GZSUFFIX, TGZSUFFIX, ZSTSUFFIX, TZSTSUFFIX, XZSUFFIX, TXZSUFFIX,
+    TARSUFFIX, XARSUFFIX,
     ".docx", ".pptx", ".xlsx", ".odt", ".odp", ".ods", ".epub", ".idml"
   };
   /** XSL suffixes. */

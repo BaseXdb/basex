@@ -31,6 +31,8 @@ public final class AddDeleteTest extends SandboxTest {
   private static final String GZIPFILE = DIR + "xml.gz";
   /** Test Zstandard file. */
   private static final String ZSTDFILE = DIR + "xml.zst";
+  /** Test XZ file. */
+  private static final String XZFILE = DIR + "xml.xz";
   /** Test XML fragment. */
   private static final String XMLFRAG = "<xml a='blu'><foo /></xml>";
   /** Temporary XML file. */
@@ -128,6 +130,16 @@ public final class AddDeleteTest extends SandboxTest {
   @Test public void addZstd() {
     execute(new Add("", ZSTDFILE));
     execute(new Add("bar", ZSTDFILE));
+    execute(new Delete("bar"));
+    assertEquals(1, docs());
+  }
+
+  /**
+   * Adds/deletes an XZ file.
+   */
+  @Test public void addXz() {
+    execute(new Add("", XZFILE));
+    execute(new Add("bar", XZFILE));
     execute(new Delete("bar"));
     assertEquals(1, docs());
   }

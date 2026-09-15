@@ -23,11 +23,11 @@ final class TarOut extends ArchiveOut {
   /**
    * Writing constructor.
    * @param os output stream
-   * @param gzip compress the archive with GZIP
+   * @param compr compression of the archive (can be {@code null})
    * @throws IOException I/O exception
    */
-  TarOut(final OutputStream os, final boolean gzip) throws IOException {
-    tos = new TarOutputStream(gzip ? new GZIPOutputStream(os) : os);
+  TarOut(final OutputStream os, final Compression compr) throws IOException {
+    tos = new TarOutputStream(compr != null ? compr.output(os) : os);
   }
 
   @Override

@@ -49,8 +49,7 @@ public final class ArchiveOptions extends ArchiveFn {
     }
     final MapBuilder mb = new MapBuilder();
     if(format != null) mb.put(CreateOptions.FORMAT.name(), format);
-    if(level >= 0) mb.put(CreateOptions.ALGORITHM.name(),
-        level == 8 ? DEFLATE : level == 0 ? STORED : UNKNOWN);
+    if(level >= 0) mb.put(CreateOptions.ALGORITHM.name(), algorithm(level));
     return mb.map();
   }
 }

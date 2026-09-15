@@ -227,9 +227,7 @@ abstract class ArchiveFn extends StandardFunc {
 
     // check options
     final String format = opts.get(CreateOptions.FORMAT).toLowerCase(Locale.ENGLISH);
-    if(format.equals(GZIP) && entries.size() > 1) throw ARCHIVE_SINGLE_X.get(info, format);
-
-    final int method = method(opts, format);
+    final int method = method(opts, format, entries.size());
     try(ArchiveOut out = ArchiveOut.get(format, method, info, os)) {
       try {
         for(final Entry<Item, Item> entry : entries.values()) {
@@ -242,19 +240,55 @@ abstract class ArchiveFn extends StandardFunc {
   }
 
   /**
-   * Returns the compression method: {@link ZipEntry#STORED} or {@link ZipEntry#DEFLATED}.
+   * Checks the number of entries and returns the compression method.
    * @param options create options
    * @param format archive format (lower case)
-   * @return method
+   * @param entries number of entries
+   * @return {@link ZipEntry#STORED}, {@link ZipEntry#DEFLATED}, or {@link Compression#method}
    * @throws QueryException query exception
    */
-  final int method(final CreateOptions options, final String format) throws QueryException {
-    final String alg = options.get(CreateOptions.ALGORITHM);
+  final int method(final CreateOptions options, final String format, final long entries)
+      throws QueryException {
+    final Compression single = Compression.get(format);
+    if(single != null && entries > 1) throw ARCHIVE_SINGLE_X.get(info, format);
+
     // default: tar archives are not compressed
-    if(alg == null) return format.equals(TAR) ? ZipEntry.STORED : ZipEntry.DEFLATED;
-    final boolean ok = alg.equals(DEFLATE) || alg.equals(STORED) && !format.equals(GZIP);
+    final String alg = options.get(CreateOptions.ALGORITHM);
+    final int method = alg != null ? method(alg) : single != null ? single.method :
+      format.equals(TAR) ? ZipEntry.STORED : ZipEntry.DEFLATED;
+    final boolean ok = single != null ? method == single.method : format.equals(TAR) ?
+      method != -1 : method == ZipEntry.STORED || method == ZipEntry.DEFLATED;
     if(!ok) throw ARCHIVE_FORMAT_X_X.get(info, CreateOptions.ALGORITHM.name(), alg);
-    return alg.equals(STORED) ? ZipEntry.STORED : ZipEntry.DEFLATED;
+
+    final Compression compr = Compression.get(method);
+    final String missing = compr != null ? compr.missing() : null;
+    if(missing != null) throw BASEX_CLASSPATH_X_X.get(info, definition.name, missing);
+    return method;
+  }
+
+  /**
+   * Returns the compression method of an algorithm.
+   * @param algorithm algorithm
+   * @return compression method, or {@code -1} if the algorithm is unknown
+   */
+  static int method(final String algorithm) {
+    if(algorithm.equals(STORED)) return ZipEntry.STORED;
+    if(algorithm.equals(DEFLATE)) return ZipEntry.DEFLATED;
+    // GZIP is represented by the deflate algorithm
+    final Compression compr = Compression.get(algorithm);
+    return compr != null && compr.method != ZipEntry.DEFLATED ? compr.method : -1;
+  }
+
+  /**
+   * Returns the algorithm of a compression method.
+   * @param method compression method
+   * @return algorithm
+   */
+  static String algorithm(final int method) {
+    if(method == ZipEntry.STORED) return STORED;
+    if(method == ZipEntry.DEFLATED) return DEFLATE;
+    final Compression compr = Compression.get(method);
+    return compr != null ? compr.toString() : UNKNOWN;
   }
 
   /**
@@ -266,7 +300,7 @@ abstract class ArchiveFn extends StandardFunc {
    * body to {@code out}, {@code false} skips it (the action may have written a replacement
    * to {@code out} before returning).</p>
    *
-   * <p>GZIP sources are rejected — rewriting requires multi-entry archive support.</p>
+   * <p>Compressed single files are rejected — rewriting requires multi-entry archive support.</p>
    *
    * @param expr archive expression
    * @param qc query context
@@ -282,7 +316,7 @@ abstract class ArchiveFn extends StandardFunc {
       if(archive instanceof final Bin bin) {
         try(BufferInput bi = bin.input(info); ArchiveIn in = ArchiveIn.get(bi, info)) {
           final String format = in.format();
-          if(format.equals(GZIP)) throw ARCHIVE_MODIFY_X.get(info, format);
+          if(Compression.get(format) != null) throw ARCHIVE_MODIFY_X.get(info, format);
           final SpillOutput so = new SpillOutput(qc);
           try(ArchiveOut out = ArchiveOut.get(format, in.method(), info, so)) {
             while(in.more()) {

@@ -3,27 +3,29 @@ package org.basex.query.func.archive;
 import java.io.*;
 import java.util.zip.*;
 
+import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
- * GZIP output.
+ * Writer for compressed single files.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-final class GZIPOut extends ArchiveOut {
-  /** ZIP output stream. */
-  private final GZIPOutputStream zos;
+final class CompressedOut extends ArchiveOut {
+  /** Compressing output stream. */
+  private final OutputStream zos;
 
   /**
    * Writing constructor.
    * @param os output stream
+   * @param compr compression
    * @throws IOException I/O exception
    */
-  GZIPOut(final OutputStream os) throws IOException {
-    zos = new GZIPOutputStream(os);
+  CompressedOut(final OutputStream os, final Compression compr) throws IOException {
+    zos = compr.output(os);
   }
 
   @Override

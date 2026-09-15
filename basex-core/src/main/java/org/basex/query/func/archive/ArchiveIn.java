@@ -5,6 +5,7 @@ import static org.basex.query.QueryError.*;
 import java.io.*;
 import java.util.zip.*;
 
+import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.util.*;
@@ -27,19 +28,21 @@ abstract class ArchiveIn extends InputStream {
    */
   static ArchiveIn get(final BufferInput bi, final InputInfo info) throws QueryException {
     try {
-      bi.mark(1);
-      final int b = bi.read();
+      bi.mark(Compression.MAGIC);
+      byte[] header = bi.readNBytes(Compression.MAGIC);
       bi.reset();
-      if(b == 0x50) return new ZIPIn(bi);
+      if(header.length > 0 && header[0] == 0x50) return new ZIPIn(bi);
 
-      // GZIP or plain input: peek at the first block to detect TAR archives
-      final boolean gzip = b == 0x1f;
+      // compressed or plain input: peek at the first block to detect TAR archives
+      final Compression compr = Compression.get(header);
       final PushbackInputStream is = new PushbackInputStream(
-        gzip ? new GZIPInputStream(bi) : bi, TarEntry.BLOCK);
-      final byte[] header = is.readNBytes(TarEntry.BLOCK);
+        compr != null ? compr.input(bi) : bi, TarEntry.BLOCK);
+      header = is.readNBytes(TarEntry.BLOCK);
       is.unread(header);
-      if(TarEntry.isTar(header)) return new TarIn(is, gzip ? ZipEntry.DEFLATED : ZipEntry.STORED);
-      if(gzip) return new GZIPIn(is);
+      if(TarEntry.isTar(header)) {
+        return new TarIn(is, compr != null ? compr.method : ZipEntry.STORED);
+      }
+      if(compr != null) return new CompressedIn(is, compr);
     } catch(final IOException ex) {
       throw ARCHIVE_ERROR_X.get(info, ex);
     }

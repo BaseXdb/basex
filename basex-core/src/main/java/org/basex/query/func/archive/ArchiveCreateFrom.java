@@ -1,7 +1,6 @@
 package org.basex.query.func.archive;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.func.archive.ArchiveText.*;
 
 import java.io.*;
 import java.util.*;
@@ -48,8 +47,7 @@ public final class ArchiveCreateFrom extends ArchiveCreate {
     }
 
     final String format = options.get(CreateOptions.FORMAT).toLowerCase(Locale.ENGLISH);
-    final int method = method(options, format);
-    if(format.equals(GZIP) && entries.size() > 1) throw ARCHIVE_SINGLE_X.get(info, format);
+    final int method = method(options, format, entries.size());
     final String dir = rootDir && root.parent() != null ? root.name() + '/' : "";
     try(ArchiveOut out = ArchiveOut.get(format, method, info, os)) {
       try {

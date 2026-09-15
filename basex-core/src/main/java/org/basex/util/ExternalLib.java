@@ -23,7 +23,7 @@ package org.basex.util;
  * @author Christian Gruen
  */
 public enum ExternalLib {
-  /** Aircompressor: Zstandard decompression. */
+  /** Aircompressor: Zstandard compression. */
   AIRCOMPRESSOR("Aircompressor", "io.airlift.compress.zstd.ZstdInputStream"),
   /** chardet: charset detection heuristics of the Validator.nu HTML parser. */
   CHARDET("chardet", "org.mozilla.intl.chardet.nsICharsetDetectionObserver"),
@@ -58,7 +58,9 @@ public enum ExternalLib {
   /** Xerces: XSD 1.0 and 1.1 validation. */
   XERCES("Xerces", "org.apache.xerces.jaxp.validation.XMLSchemaFactory"),
   /** XML Resolver: catalog resolution. */
-  XML_RESOLVER("XML Resolver", "org.xmlresolver.Resolver");
+  XML_RESOLVER("XML Resolver", "org.xmlresolver.Resolver"),
+  /** XZ for Java: XZ compression. */
+  XZ("XZ for Java", "org.tukaani.xz.XZInputStream");
 
   /** Library name. */
   private final String name;
