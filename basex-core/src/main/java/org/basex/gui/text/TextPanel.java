@@ -122,6 +122,12 @@ public class TextPanel extends BaseXPanel {
     addMouseMotionListener(this);
     addMouseWheelListener(this);
     addComponentListener(this);
+    // a layout update is postponed while the panel is hidden, e.g. in an inactive tab
+    addHierarchyListener(e -> {
+      if((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0 && isShowing()) {
+        update(Align.LINE);
+      }
+    });
     addMouseListener(this);
     addKeyListener(this);
 
@@ -983,11 +989,6 @@ public class TextPanel extends BaseXPanel {
 
   @Override
   public final void componentResized(final ComponentEvent e) {
-    update(Align.LINE);
-  }
-
-  @Override
-  public final void componentShown(final ComponentEvent e) {
     update(Align.LINE);
   }
 
