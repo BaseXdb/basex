@@ -189,9 +189,13 @@ public final class CastTest extends SandboxTest {
     // an error while atomizing the operand yields false
     query("true#0 castable as xs:string", false);
     query("[ 1, 2 ] castable as xs:integer", false);
+    // a JNode whose jvalue is no single array yields false
+    query("jtree({ 'a': 1 }) castable as array(*)", false);
+    query("jtree({ 'a': (1, 2) })/a castable as array(*)", false);
 
     // an error while evaluating the operand is propagated
     error("(1 div 0) castable as xs:integer", DIVZERO_X);
+    error("({} + 42) castable as xs:integer", FIATOMIZE_X);
   }
 
   /** Atomization of the operand (only for atomic, list, union and enumeration targets). */

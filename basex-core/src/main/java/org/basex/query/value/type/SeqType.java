@@ -216,8 +216,9 @@ public final class SeqType {
       for(final Item item : value) {
         qc.checkStop();
         // a JNode never matches the target type: continue with its jvalue
-        final Item it = item instanceof final JNode jnode ?
-            jnode.value.unwrappedItem(qc, info) : item;
+        final Value val = item.unwrappedValue(qc);
+        if(val.size() != 1) return castError(value, error, info);
+        final Item it = val.itemAt(0);
         Value cast = null;
         if(dt instanceof final ArrayType at) {
           if(it instanceof final XQArray array) cast = array.castTo(at, error, qc, info);
