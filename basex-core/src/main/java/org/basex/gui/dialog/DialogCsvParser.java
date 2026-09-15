@@ -28,8 +28,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 final class DialogCsvParser extends DialogParser {
-  /** CSV example string. */
-  private static final String EXAMPLE = "Name,Born?,Comment\n\"John, Adam\\\",1984,";
+  /** CSV example string ({@code |} is replaced with the chosen separator). */
+  private static final String EXAMPLE = "Name|Born?|Comment\n\"John, Adam\"|1984|Tab\\tStop";
 
   /** Options. */
   private final CsvParserOptions copts;
@@ -101,8 +101,10 @@ final class DialogCsvParser extends DialogParser {
   @Override
   boolean action(final boolean active) {
     try {
-      final Value value = CsvConverter.get(copts).convert(new IOContent(EXAMPLE));
-      example.setText(example(MainParser.CSV.name(), EXAMPLE, value));
+      final int sep = copts.separator();
+      final String csv = EXAMPLE.replace("|", sep == -1 ? "," : Character.toString(sep));
+      final Value value = CsvConverter.get(copts).convert(new IOContent(csv));
+      example.setText(example(MainParser.CSV.name(), csv, value));
     } catch(final QueryException | IOException ex) {
       example.setText(error(ex));
     }
