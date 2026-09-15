@@ -301,7 +301,7 @@ public final class JsonParserTest extends SandboxTest {
    * W3_MAPPING: conversion with the options of fn:map-to-element.
    * @throws Exception exception
    */
-  @Test public void w3Plan() throws Exception {
+  @Test public void w3Mapping() throws Exception {
     XNode result = parsePlan("{\"a\":{\"b\":[1,2],\"c\":null}}", "{}");
     query(result, "string-join(/a/b, ',')", "1,2");
     query(result, "/a/c/@Q{http://www.w3.org/2001/XMLSchema-instance}nil/data()", "true");
@@ -334,7 +334,7 @@ public final class JsonParserTest extends SandboxTest {
   /**
    * W3_MAPPING: database import with a mapping file.
    */
-  @Test public void w3PlanCommand() {
+  @Test public void w3MappingCommand() {
     final IOFile mapping = new IOFile(sandbox(), "mapping.json");
     write(mapping, "{ \"root\": \"list\", \"plan\": { \"list\": { \"layout\": \"list\", " +
         "\"child\": \"entry\" } } }");
@@ -342,7 +342,8 @@ public final class JsonParserTest extends SandboxTest {
     write(input, "[\"a\",\"b\"]");
     set(MainOptions.PARSER, MainParser.JSON);
     try {
-      execute(new Set(MainOptions.JSONPARSER.name(), "format=w3-mapping,mapping=" + mapping.path()));
+      execute(new Set(MainOptions.JSONPARSER.name(), "format=w3-mapping,mapping=" +
+          mapping.path()));
       execute(new CreateDB(NAME, input.path()));
       assertEquals("<list><entry>a</entry><entry>b</entry></list>", query("."));
       execute(new DropDB(NAME));

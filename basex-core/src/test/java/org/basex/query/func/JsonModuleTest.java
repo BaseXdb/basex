@@ -347,8 +347,10 @@ public final class JsonModuleTest extends SandboxTest {
     error(func.args(" <json type='object'/>", " { 'root': 'json' }"), INVALIDOPTION_X);
     error(func.args(" <json type='object'/>", " { 'mapping': { 'liberal': true() } }"),
         INVALIDOPTION_X);
-    error(SERIALIZE.args(" <a/>", " { 'method': 'json', 'json': { " + opt + " } }"),
-        SERPARAM_X);
+    query(SERIALIZE.args(" <a/>", " { 'method': 'json', 'json': { " + opt + " } }"),
+        "{\"a\":\"\"}");
+    query(SERIALIZE.args(" document { <json><a>1</a></json> }", " { 'method': 'json', " +
+        "'json': { " + opt + ", 'mapping': { 'root': 'json' } } }"), "{\"a\":1}");
     error(SERIALIZE.args(" <json type='object'/>", " { 'method': 'json', 'json': { " +
         "'mapping': { 'root': 'json' } } }"), SERPARAM_X);
   }

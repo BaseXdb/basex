@@ -8,10 +8,13 @@ import java.io.*;
 
 import org.basex.build.json.*;
 import org.basex.build.json.JsonOptions.*;
+import org.basex.core.jobs.*;
 import org.basex.io.out.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.func.fn.*;
+import org.basex.query.util.*;
 import org.basex.query.util.ft.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -47,6 +50,12 @@ public final class JsonNodeSerializer extends JsonSerializer {
   private boolean custom;
   /** Node serializer (can be {@code null}). */
   private Serializer nodeSerializer;
+  /** Indicates if nodes are converted with the w3-mapping format. */
+  private final boolean mapped;
+  /** Converter of the w3-mapping format (created on demand). */
+  private ElementToMap mapping;
+  /** Name of the root element of the w3-mapping format (can be {@code null}). */
+  private byte[] root;
 
   /**
    * Constructor.
@@ -66,6 +75,41 @@ public final class JsonNodeSerializer extends JsonSerializer {
     for(int t = 0; t < tl; t++) typeCache[t] = new TokenSet();
     atts = jopts.get(JsonOptions.FORMAT) == JsonFormat.ATTRIBUTES;
     lax = jopts.get(JsonOptions.LAX) || atts;
+    mapped = jopts.get(JsonOptions.FORMAT) == JsonFormat.W3_MAPPING;
+  }
+
+  @Override
+  public void serialize(final Item item) throws IOException {
+    if(mapped && level == 0 && item instanceof final XNode node &&
+        (node.kind() == Kind.DOCUMENT || node.kind() == Kind.ELEMENT)) {
+      final Item value = map(node);
+      super.serialize(value.isEmpty() ? null : value);
+    } else {
+      super.serialize(item);
+    }
+  }
+
+  /**
+   * Converts a document or element node with the w3-mapping format.
+   * @param node node
+   * @return converted value
+   * @throws IOException I/O exception
+   */
+  private Item map(final XNode node) throws IOException {
+    try {
+      if(mapping == null) {
+        final JsonMappingOptions mopts = JsonMappingOptions.get(
+            jopts.get(JsonOptions.MAPPING), qc, null);
+        final String name = mopts.get(JsonMappingOptions.ROOT);
+        root = name != null ? token(name) : null;
+        mapping = new ElementToMap(mopts,
+            qc != null && sc != null ? PlanFn.uris(qc, sc) : PlanFn.XML_PREFIX,
+            qc != null ? qc.shared : new SharedData(), qc != null ? qc : new Job() { }, null);
+      }
+      return mapping.convert(node, root);
+    } catch(final QueryException ex) {
+      throw new QueryIOException(ex);
+    }
   }
 
   @Override

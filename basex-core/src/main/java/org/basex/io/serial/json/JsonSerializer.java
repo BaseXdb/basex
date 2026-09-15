@@ -55,8 +55,6 @@ public abstract class JsonSerializer extends StandardSerializer {
     final JsonSerialOptions jopts = so.get(SerializerOptions.JSON);
     if(jopts.unsupportedMapping()) throw SERPARAM_X.getIO(Options.unknown(JsonOptions.MAPPING));
     return switch(jopts.get(JsonOptions.FORMAT)) {
-      case W3_MAPPING -> throw SERPARAM_X.getIO(Util.info(
-          "Format '%' is not supported by the serializer.", JsonOptions.JsonFormat.W3_MAPPING));
       case JSONML -> new JsonMLSerializer(os, so);
       case W3_XML -> new JsonW3XmlSerializer(os, so);
       default     -> new JsonNodeSerializer(os, so);

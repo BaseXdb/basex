@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -19,37 +18,11 @@ public final class FnElementToMap extends PlanFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Item node = (Item) Types.DOCUMENT_OR_ELEMENT_ZO.coerce(arg(0).value(qc), qc, info);
-    return convert(node, options(1, ElementsOptions::new, qc), qc);
-  }
-
-  /**
-   * Converts an element to a map.
-   * @param node document or element node (can be empty)
-   * @param options options
-   * @param qc query context
-   * @return map or empty sequence
-   * @throws QueryException query exception
-   */
-  public Value convert(final Item node, final ElementsOptions options, final QueryContext qc)
-      throws QueryException {
+    final ElementsOptions options = options(1, ElementsOptions::new, qc);
     if(node.isEmpty()) return Empty.VALUE;
 
-    // a document node is represented by its single element child (may be preceded by comments, PIs)
-    XNode elem = (XNode) node;
-    if(elem.type.instanceOf(NodeType.DOCUMENT)) {
-      for(final GNode child : elem.childIter()) {
-        if(child.kind() == Kind.ELEMENT) {
-          elem = (XNode) child;
-          break;
-        }
-      }
-    }
-
-    final Plan plan = buildPlan(options, qc);
-
-    // create result
-    final Item value = apply(entry(elem, plan), elem, null, plan, qc);
-    return value.isEmpty() ? value : XQMap.get(Str.get(nodeName(elem, null, plan, qc)), value);
+    final ElementToMap mapping = new ElementToMap(options, uris(qc, sc()), qc.shared, qc, info);
+    return mapping.convert((XNode) node, null);
   }
 
   @Override

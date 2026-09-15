@@ -14,9 +14,7 @@ import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -57,7 +55,7 @@ public final class JsonParser extends SingleParser {
         // convert parsed values with a conversion plan
         final JsonMappingOptions mopts = mapping();
         final String root = mopts.get(JsonMappingOptions.ROOT);
-        final MapToElement converter = new MapToElement(mopts, MapToElement.XML_PREFIX,
+        final MapToElement converter = new MapToElement(mopts, PlanFn.XML_PREFIX,
             new SharedData(), options, null);
         for(final Item item : JsonConverter.get(jopts).convert(source)) {
           converter.convert(item, root, builder);
@@ -95,13 +93,6 @@ public final class JsonParser extends SingleParser {
       opts.set(JsonOptions.FORMAT, JsonFormat.W3);
       mapping = JsonConverter.get(opts).convert(IO.get(Token.string(path.string())));
     }
-    final JsonMappingOptions mopts = new JsonMappingOptions();
-    if(!mapping.isEmpty()) {
-      if(!(mapping instanceof final XQMap map)) {
-        throw QueryError.typeError(mapping, Types.MAP, null);
-      }
-      mopts.assign(map, null, null);
-    }
-    return mopts;
+    return JsonMappingOptions.get(mapping, null, null);
   }
 }

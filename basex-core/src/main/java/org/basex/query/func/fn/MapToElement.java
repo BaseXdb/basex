@@ -33,9 +33,6 @@ import org.basex.util.*;
 public final class MapToElement {
   /** The fn:null QName, representing a nilled element. */
   public static final QNm NULL = new QNm(token("null"), QueryText.FN_URI);
-  /** Resolves the predefined xml prefix. */
-  public static final UnaryOperator<byte[]> XML_PREFIX =
-      prefix -> eq(prefix, XML) ? QueryText.XML_URI : null;
   /** No namespace declarations. */
   private static final Atts NO_NSP = new Atts();
 

@@ -85,8 +85,8 @@ public abstract class ParseJson extends ParseFn {
    */
   private Value elements(final Value value, final JsonParserOptions options,
       final QueryContext qc) throws QueryException, IOException {
-    final JsonMappingOptions mopts = toOptions(options.get(JsonOptions.MAPPING),
-        new JsonMappingOptions(), qc);
+    final JsonMappingOptions mopts = JsonMappingOptions.get(options.get(JsonOptions.MAPPING),
+        qc, info);
     final String root = mopts.get(JsonMappingOptions.ROOT);
     final MapToElement converter = new MapToElement(mopts, PlanFn.uris(qc, sc()), qc.shared,
         qc.context.options, info);
