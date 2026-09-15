@@ -143,7 +143,7 @@ public final class FnInvisibleXml extends StandardFunc {
   /**
    * Result function of fn:invisible-xml: parse invisible XML input.
    */
-  private static final class ParseInvisibleXml extends Arr {
+  private static final class ParseInvisibleXml extends FuncItemBody {
     /** Shared {@link MainOptions} instance to avoid expensive per-parse initialization. */
     private static final MainOptions OPTIONS = new MainOptions().seal();
     /** Generated invisible XML parser. */
@@ -157,7 +157,7 @@ public final class FnInvisibleXml extends StandardFunc {
      */
     private ParseInvisibleXml(final InputInfo info, final de.bottlecaps.markup.blitz.Parser parser,
         final Expr... args) {
-      super(info, Types.DOCUMENT_O, args);
+      super(info, Types.DOCUMENT_O, Function.INVISIBLE_XML, args);
       this.parser = parser;
     }
 
@@ -182,11 +182,6 @@ public final class FnInvisibleXml extends StandardFunc {
     @Override
     public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
       return copyType(new ParseInvisibleXml(info, parser, copyAll(cc, vm, args())));
-    }
-
-    @Override
-    public void toString(final QueryString qs) {
-      qs.token("parse-invisible-xml").params(exprs);
     }
   }
 

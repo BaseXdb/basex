@@ -121,7 +121,7 @@ public class FnSchemaType extends StandardFunc {
   /**
    * Function creating the type annotations for given atomic types.
    */
-  private static final class TypeAnnotation extends Arr {
+  private static final class TypeAnnotation extends FuncItemBody {
     /** Sequence type. */
     private final SeqType seqType;
     /** The types to be annotated. */
@@ -134,7 +134,7 @@ public class FnSchemaType extends StandardFunc {
      * @param types types to be annotated
      */
     private TypeAnnotation(final SeqType seqType, final InputInfo info, final BasicType... types) {
-      super(info, seqType);
+      super(info, seqType, Function.SCHEMA_TYPE);
       this.seqType = seqType;
       this.types = types;
     }
@@ -161,17 +161,12 @@ public class FnSchemaType extends StandardFunc {
     public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
       return new TypeAnnotation(seqType, info, types);
     }
-
-    @Override
-    public void toString(final QueryString qs) {
-      qs.token("type-annotation").params(exprs);
-    }
   }
 
   /**
    * Function checking if an item matches a given type.
    */
-  private static final class Matches extends Arr {
+  private static final class Matches extends FuncItemBody {
     /** Function type. */
     private static final FuncType FUNC_TYPE = FuncType.get(Types.BOOLEAN_O,
         Types.ANY_ATOMIC_TYPE_O);
@@ -185,7 +180,7 @@ public class FnSchemaType extends StandardFunc {
      * @param args arguments
      */
     private Matches(final InputInfo info, final BasicType type, final Expr... args) {
-      super(info, Types.BOOLEAN_O, args);
+      super(info, Types.BOOLEAN_O, Function.SCHEMA_TYPE, args);
       this.type = type;
     }
 
@@ -213,11 +208,6 @@ public class FnSchemaType extends StandardFunc {
     @Override
     public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
       return new Matches(info, type, copyAll(cc, vm, args()));
-    }
-
-    @Override
-    public void toString(final QueryString qs) {
-      qs.token("matches").params(exprs);
     }
   }
 }

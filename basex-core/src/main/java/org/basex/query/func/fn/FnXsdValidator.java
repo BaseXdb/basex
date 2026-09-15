@@ -172,7 +172,7 @@ public final class FnXsdValidator extends StandardFunc {
   /**
    * Result function of fn:xsd-validator: validate a node against an assembled schema.
    */
-  private static final class Validate extends Arr {
+  private static final class Validate extends FuncItemBody {
     /** Assembled schema. */
     private final Schema schema;
     /** Return typed node. */
@@ -195,7 +195,7 @@ public final class FnXsdValidator extends StandardFunc {
      */
     private Validate(final InputInfo info, final Schema schema, final boolean typedNode,
         final boolean errorDetails, final boolean xsiLocation, final Expr... args) {
-      super(info, RESULT_TYPE, args);
+      super(info, RESULT_TYPE, Function.XSD_VALIDATOR, args);
       this.schema = schema;
       this.typedNode = typedNode;
       this.errorDetails = errorDetails;
@@ -320,11 +320,6 @@ public final class FnXsdValidator extends StandardFunc {
       return this == obj || obj instanceof final Validate vld && schema == vld.schema &&
           typedNode == vld.typedNode && errorDetails == vld.errorDetails &&
           xsiLocation == vld.xsiLocation && super.equals(obj);
-    }
-
-    @Override
-    public void toString(final QueryString qs) {
-      qs.token("xsd-validate").params(exprs);
     }
   }
 

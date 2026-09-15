@@ -258,12 +258,12 @@ public final class FnModuleTest extends SandboxTest {
     final String q1 = func.args(" <a>42</a>");
     query(q1, "{\"name\":#xs:untypedAtomic,"
         + "\"is-simple\":true(),"
-        + "\"base-type\":fn() as fn:schema-type-record { type-annotation() },"
-        + "\"primitive-type\":fn() as fn:schema-type-record { type-annotation() },"
+        + "\"base-type\":fn() as fn:schema-type-record { (: fn:schema-type :)() },"
+        + "\"primitive-type\":fn() as fn:schema-type-record { (: fn:schema-type :)() },"
         + "\"variety\":\"atomic\","
         + "\"members\":(),"
         + "\"simple-content-type\":(),"
-        + "\"matches\":fn($value) as xs:boolean { matches($value) },"
+        + "\"matches\":fn($value) as xs:boolean { (: fn:schema-type :)($value) },"
         + "\"constructor\":xs:untypedAtomic#1}");
     query(q1 + "?name eq #xs:untypedAtomic", true);
     query(q1 + "?is-simple", true);
@@ -287,12 +287,12 @@ public final class FnModuleTest extends SandboxTest {
     final String q2 = "let $q2 := " + func.args(" xs:unsignedByte(255)") + "\n return $q2";
     query(q2, "{\"name\":#xs:unsignedByte,"
         + "\"is-simple\":true(),"
-        + "\"base-type\":fn() as fn:schema-type-record { type-annotation() },"
-        + "\"primitive-type\":fn() as fn:schema-type-record { type-annotation() },"
+        + "\"base-type\":fn() as fn:schema-type-record { (: fn:schema-type :)() },"
+        + "\"primitive-type\":fn() as fn:schema-type-record { (: fn:schema-type :)() },"
         + "\"variety\":\"atomic\","
         + "\"members\":(),"
         + "\"simple-content-type\":(),"
-        + "\"matches\":fn($value) as xs:boolean { matches($value) },"
+        + "\"matches\":fn($value) as xs:boolean { (: fn:schema-type :)($value) },"
         + "\"constructor\":xs:unsignedByte#1}");
     query(q2 + "?name eq #xs:unsignedByte", true);
     query(q2 + "?is-simple", true);
@@ -3178,7 +3178,7 @@ return
     final String q1 = func.args(" <a>42</a>");
     query(q1, "{\"name\":#xs:untyped,"
         + "\"is-simple\":false(),"
-        + "\"base-type\":fn() as fn:schema-type-record { type-annotation() },"
+        + "\"base-type\":fn() as fn:schema-type-record { (: fn:schema-type :)() },"
         + "\"primitive-type\":(),"
         + "\"variety\":\"mixed\","
         + "\"members\":(),"
@@ -3198,12 +3198,12 @@ return
     final String q2 = func.args(" attribute a {42}");
     query(q2, "{\"name\":#xs:untypedAtomic,"
         + "\"is-simple\":true(),"
-        + "\"base-type\":fn() as fn:schema-type-record { type-annotation() },"
-        + "\"primitive-type\":fn() as fn:schema-type-record { type-annotation() },"
+        + "\"base-type\":fn() as fn:schema-type-record { (: fn:schema-type :)() },"
+        + "\"primitive-type\":fn() as fn:schema-type-record { (: fn:schema-type :)() },"
         + "\"variety\":\"atomic\","
         + "\"members\":(),"
         + "\"simple-content-type\":(),"
-        + "\"matches\":fn($value) as xs:boolean { matches($value) },"
+        + "\"matches\":fn($value) as xs:boolean { (: fn:schema-type :)($value) },"
         + "\"constructor\":xs:untypedAtomic#1}");
     query(q2 + "?name eq #xs:untypedAtomic", true);
     query(q2 + "?is-simple", true);

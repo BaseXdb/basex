@@ -59,7 +59,7 @@ public final class CsvW3Converter extends CsvW3ArraysConverter {
   /**
    * Get function.
    */
-  private static final class Get extends Arr {
+  private static final class Get extends FuncItemBody {
     /** Result rows. */
     private final Value rows;
     /** Column name to index mapping. */
@@ -73,7 +73,7 @@ public final class CsvW3Converter extends CsvW3ArraysConverter {
      * @param args function arguments
      */
     private Get(final InputInfo ii, final Value rows, final XQMap columnIndex, final Expr... args) {
-      super(ii, STRING_O, args);
+      super(ii, STRING_O, Function.PARSE_CSV, args);
       this.rows = rows;
       this.columnIndex = columnIndex;
     }
@@ -100,11 +100,6 @@ public final class CsvW3Converter extends CsvW3ArraysConverter {
     @Override
     public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
       return copyType(new Get(info, rows, columnIndex, copyAll(cc, vm, args())));
-    }
-
-    @Override
-    public void toString(final QueryString qs) {
-      qs.token("csv-get").params(exprs);
     }
 
     /**

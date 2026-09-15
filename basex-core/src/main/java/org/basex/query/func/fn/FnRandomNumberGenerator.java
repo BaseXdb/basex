@@ -21,7 +21,7 @@ public final class FnRandomNumberGenerator extends StandardFunc {
   private static final FuncType PERMUTE_TYPE = FuncType.get(Types.ITEM_ZM, Types.ITEM_ZM);
   /** Type for next function. */
   private static final FuncType NEXT_TYPE =
-      FuncType.get(MapType.get(BasicType.STRING, Types.ITEM_O).seqType());
+      FuncType.get(Records.RANDOM_NUMBER_GENERATOR.get().seqType());
 
   @Override
   public XQMap value(final QueryContext qc) throws QueryException {
@@ -33,7 +33,7 @@ public final class FnRandomNumberGenerator extends StandardFunc {
     // derived from Java's random class
     return XQMap.get(Records.RANDOM_NUMBER_GENERATOR.get(),
       Dbl.get(((i1 >>> 22 << 27) + (i2 >>> 21)) / (double) (1L << 53)),
-      FuncType.get(Records.RANDOM_NUMBER_GENERATOR.get().seqType()).cast(nextFunc(i2), qc, info),
+      nextFunc(i2),
       permuteFunc(i1, qc));
   }
 
