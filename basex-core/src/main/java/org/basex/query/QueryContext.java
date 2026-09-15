@@ -700,19 +700,23 @@ public final class QueryContext extends Job implements Closeable {
 
   /**
    * Returns a new query focus with the global context value.
+   * @param sc static context of the calling expression (can be {@code null})
    * @return query focus
    */
-  public QueryFocus globalFocus() {
+  public QueryFocus globalFocus(final StaticContext sc) {
     final QueryFocus qf = new QueryFocus();
-    qf.value = globalValue();
+    qf.value = globalValue(sc);
     return qf;
   }
 
   /**
    * Returns the context value of the query prolog.
+   * @param sc static context of the calling expression (can be {@code null})
    * @return context value (can be {@code null})
    */
-  public Value globalValue() {
+  public Value globalValue(final StaticContext sc) {
+    // code of a loaded module refers to the prolog of that module
+    if(sc != null && sc.global != null) return sc.global.value;
     return finalContext ? contextValue.value : null;
   }
 

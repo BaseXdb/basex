@@ -64,6 +64,8 @@ public final class StaticContext {
 
   /** Static type of context value. */
   public SeqType contextType;
+  /** Global focus of a loaded module (can be {@code null}). */
+  public QueryFocus global;
   /** Sets a custom URI resolver (can be {@code null}). */
   UriResolver resolver;
   /** Sets an XML catalog URI resolver. */

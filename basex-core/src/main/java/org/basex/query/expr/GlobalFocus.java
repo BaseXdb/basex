@@ -27,7 +27,7 @@ public final class GlobalFocus extends Single {
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
     final QueryFocus focus = cc.qc.focus;
-    cc.qc.focus = cc.qc.globalFocus();
+    cc.qc.focus = cc.qc.globalFocus(sc());
     try {
       expr = expr.compile(cc);
     } finally {
@@ -45,7 +45,7 @@ public final class GlobalFocus extends Single {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final QueryFocus focus = qc.focus;
-    qc.focus = qc.globalFocus();
+    qc.focus = qc.globalFocus(sc());
     try {
       return expr.value(qc);
     } finally {

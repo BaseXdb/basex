@@ -50,7 +50,7 @@ public final class StaticVar extends StaticDecl {
       compiled = true;
 
       final QueryFocus focus = cc.qc.focus;
-      cc.qc.focus = cc.qc.globalFocus();
+      cc.qc.focus = cc.qc.globalFocus(sc);
       cc.pushScope(vs);
       try {
         expr = expr.compile(cc);
@@ -94,7 +94,7 @@ public final class StaticVar extends StaticDecl {
   Value compute(final QueryContext qc) throws QueryException {
     final QueryFocus focus = qc.focus;
     final Value current = qc.current;
-    qc.focus = qc.globalFocus();
+    qc.focus = qc.globalFocus(sc);
     qc.current = null;
     final int fp = vs.enter(qc);
     try {

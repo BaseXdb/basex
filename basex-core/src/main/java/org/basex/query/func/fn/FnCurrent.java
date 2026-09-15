@@ -17,7 +17,7 @@ import org.basex.query.value.*;
 public final class FnCurrent extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value value = qc.current != null ? qc.current : qc.globalValue();
+    final Value value = qc.current != null ? qc.current : qc.globalValue(sc());
     if(value == null) throw NOCTX_X.get(info, this);
     return value;
   }

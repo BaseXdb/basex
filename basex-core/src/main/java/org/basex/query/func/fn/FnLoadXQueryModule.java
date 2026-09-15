@@ -133,6 +133,11 @@ public final class FnLoadXQueryModule extends StandardFunc {
       nParsed = mqc.modParsed.size();
     }
 
+    // code of the loaded module refers to its own global context value
+    final QueryFocus global = mqc.globalFocus(null);
+    for(final StaticFunc sf : mqc.functions) sf.sc.global = global;
+    for(final StaticVar var : mqc.vars) var.sc.global = global;
+
     final QNmMap<Map<Integer, Expr>> funcs = new QNmMap<>();
     for(final StaticFunc sf : mqc.functions) {
       if(sf.updating()) mqc.updating();
