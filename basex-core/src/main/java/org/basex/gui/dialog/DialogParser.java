@@ -24,7 +24,7 @@ abstract class DialogParser extends BaseXBack {
    * Constructor.
    */
   DialogParser() {
-    setLayout(new BorderLayout(16, 0));
+    setLayout(new BorderLayout(4, 0));
   }
 
   /**
