@@ -3,7 +3,6 @@ package org.basex.index.ft;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.util.*;
 
 import org.basex.data.*;
 import org.basex.io.random.*;
@@ -53,17 +52,7 @@ final class FTList implements Closeable {
   FTList(final Data data, final String prefix) throws IOException {
     str = new DataAccess(data.meta.dbFile(prefix + 'y'));
     dat = new DataAccess(data.meta.dbFile(prefix + 'z'));
-    tp = new int[data.meta.maxlen + 3];
-    final int tl = tp.length;
-    Arrays.fill(tp, 0, tl, -1);
-    try(DataAccess li = new DataAccess(data.meta.dbFile(prefix + 'x'))) {
-      int is = li.readNum();
-      while(--is >= 0) {
-        final int p = li.readNum();
-        tp[p] = li.read4();
-      }
-      tp[tl - 1] = (int) str.length();
-    }
+    tp = FTSegment.positions(data, prefix, str.length());
     next();
   }
 

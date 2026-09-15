@@ -163,8 +163,7 @@ public final class DiskData extends Data {
    * @return result of check
    */
   private boolean legacy() {
-    // small namespace structures can be stored in the old format
-    return nspaces.legacy();
+    return nspaces.legacy() && meta.legacy();
   }
 
   @Override

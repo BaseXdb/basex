@@ -32,6 +32,7 @@ public final class IndexUpdateConcurrencyTest extends SandboxTest {
     set(MainOptions.TEXTINDEX, true);
     set(MainOptions.ATTRINDEX, true);
     set(MainOptions.TOKENINDEX, true);
+    set(MainOptions.FTINDEX, true);
     set(MainOptions.AUTOFLUSH, false);
     execute(new CreateDB(NAME, "<root/>"));
   }
@@ -43,6 +44,7 @@ public final class IndexUpdateConcurrencyTest extends SandboxTest {
     execute(new DropDB(NAME));
     set(MainOptions.UPDINDEX, false);
     set(MainOptions.TOKENINDEX, false);
+    set(MainOptions.FTINDEX, false);
     set(MainOptions.AUTOFLUSH, true);
   }
 
@@ -100,8 +102,9 @@ public final class IndexUpdateConcurrencyTest extends SandboxTest {
   }
 
   /**
-   * Looks a word up via the text, attribute and token index and via a full scan. All four counts
-   * are determined by a single query, and hence within a single snapshot of the database.
+   * Looks a word up via the text, attribute, token and full-text index and via a full scan. All
+   * five counts are determined by a single query, and hence within a single snapshot of the
+   * database.
    * @param word word to look up
    * @return number of hits
    */
@@ -112,13 +115,14 @@ public final class IndexUpdateConcurrencyTest extends SandboxTest {
       "  count($db//a[matches(text(), '^" + word + "$')]),\n" +
       "  count($db//a[text() = '" + word + "']),\n" +
       "  count($db//a[@t = '" + word + "']),\n" +
-      "  count($db//a[contains-token(@t, '" + word + "')])\n" +
+      "  count($db//a[contains-token(@t, '" + word + "')]),\n" +
+      "  count($db//a[text() contains text '" + word + "'])\n" +
       ")\n" +
       "return if(count(distinct-values($counts)) = 1) then $counts[1] " +
       "else string-join($counts ! string(), '/')");
-    // a single value means that scan, text, attribute and token index agree
+    // a single value means that scan, text, attribute, token and full-text index agree
     assertFalse(result.contains("/"),
-        "scan/text/attribute/token counts differ for '" + word + "': " + result);
+        "scan/text/attribute/token/full-text counts differ for '" + word + "': " + result);
     return Integer.parseInt(result);
   }
 }

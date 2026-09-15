@@ -7,6 +7,8 @@ import static org.basex.util.ft.FTFlag.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.function.*;
+import java.util.regex.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
@@ -14,7 +16,7 @@ import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.index.stats.*;
 import org.basex.index.value.*;
-import org.basex.io.random.*;
+import org.basex.io.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.util.ft.*;
 import org.basex.util.*;
@@ -39,12 +41,27 @@ import org.basex.util.list.*;
  * Structure: {@code [t0, t1, ... tl, z, s]}
  * {@code t0, t1, ... tl-1} is the token [byte[l]]
  * {@code z} is the pointer on the data entries of the token [long]
- * {@code s} is the number of PRE values, saved in data [int]
+ * {@code s} is the number of references, saved in data [int]
  * </li>
  * <li>File <b>z</b> contains the {@code ID/POS} references.
  *   The values are ordered, but not distinct:
  *   {@code pre1/pos1, pre2/pos2, pre3/pos3, ...} [{@link Num}]</li>
  * </ul>
+ *
+ * <p>If incremental index updates are enabled ({@link MainOptions#UPDINDEX}), the index is
+ * a list of immutable segments, oldest first, each stored in files with the prefix
+ * {@code ftx<n>} and holding node IDs instead of PRE values, followed by an in-memory buffer
+ * ({@link FTBuffer}). The segment numbers are stored in the meta data
+ * ({@link MetaData#ftsegments}). A segment may have a file <b>s</b> with the sorted IDs of the
+ * units (text nodes, or elements if {@link MainOptions#FTMIXED} is enabled) whose references
+ * it supersedes: a reference is live if its node exists and if no newer segment, and not the
+ * buffer, supersedes its unit. Updates are collected as touched node IDs and processed
+ * once per transaction ({@link #finishUpdate()}); the buffer is written as a segment once its
+ * references exceed a threshold, and small segments are merged.</p>
+ *
+ * <p>As long as all node IDs equal their PRE values, the index is stored in the unnumbered
+ * layout, which older versions can read; it is adopted as first segment by the first update
+ * that changes units or shifts PRE values.</p>
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -52,22 +69,34 @@ import org.basex.util.list.*;
 public final class FTIndex extends ValueIndex {
   /** Minimum fixed size for each token entry. */
   static final int ENTRY = 9;
+  /** Suffixes of the files of an index structure. */
+  static final String FILES = "xyz";
+  /** Log file of the buffer. */
+  static final String LOG = DATAFTX + 'b';
+  /** Maximum number of segments before small segments are merged. */
+  private static final int SEGMENTS = 8;
+  /** Number of references or nodes after which a segment is written (lowered by tests). */
+  static int threshold = 100000;
 
-  /** Cached texts. Increases used memory, but speeds up repeated queries. */
-  private final IntObjectMap<byte[]> ctext = new IntObjectMap<>();
+  /** Segments, oldest first. */
+  private FTSegment[] segments;
+  /** Buffer ({@code null} if the index is not updatable). */
+  private FTBuffer buffer;
+  /** Names to include. */
+  private final IndexNames names;
 
-  /** Index storing each unique token length and pointer
-   * on the first token with this length. */
-  private final DataAccess dataX;
-  /** Index storing each token, its data size and pointer on the data. */
-  private final DataAccess dataY;
-  /** Storing PRE and POS values for each token. */
-  private final DataAccess dataZ;
-
-  /** Cache for number of hits and data reference per token. */
-  private final IndexCache cache = new IndexCache();
-  /** Token positions. */
-  private final int[] positions;
+  /** IDs of the nodes touched by the current transaction. */
+  private IntSet touched = new IntSet();
+  /** Last node ID before the current transaction. */
+  private int lastid;
+  /** Largest node ID that may be referenced by a segment. */
+  private int covered;
+  /** Number of the next segment. */
+  private int next;
+  /** Lexer (created on demand). */
+  private FTLexer lexer;
+  /** Closed flag. */
+  private boolean closed;
 
   /**
    * Constructor, initializing the index structure.
@@ -75,29 +104,109 @@ public final class FTIndex extends ValueIndex {
    * @throws IOException I/O exception
    */
   public FTIndex(final Data data) throws IOException {
-    this(data, DATAFTX);
+    super(data, IndexType.FULLTEXT);
+    names = new IndexNames(IndexType.FULLTEXT, data);
+
+    final MetaData meta = data.meta;
+    final int[] numbers = segments(meta.ftsegments);
+    // buffer state: committed log length, buffered references, covered node IDs
+    final long[] state = { -1, 0, data.lastid };
+    if(meta.ftbuffer != null) {
+      final String[] values = Strings.split(meta.ftbuffer, ',');
+      for(int v = 0; v < Math.min(values.length, state.length); v++) {
+        state[v] = Strings.toLong(values[v]);
+      }
+    }
+    covered = (int) state[2];
+    if(meta.updindex) orphans(numbers);
+    if(numbers == null) {
+      // the unnumbered structure is updatable if its PRE values equal the node IDs
+      if(meta.updindex && unnumbered(data)) buffer = new FTBuffer(data, -1, 0);
+      segments = new FTSegment[] { new FTSegment(data, -1, buffer) };
+    } else {
+      buffer = new FTBuffer(data, state[0], (int) state[1]);
+      final int ns = numbers.length;
+      segments = new FTSegment[ns];
+      for(int n = 0; n < ns; n++) {
+        segments[n] = new FTSegment(data, numbers[n], buffer);
+        next = Math.max(next, numbers[n] + 1);
+      }
+      unions();
+    }
+    meta.ftadopt = adoptable();
+    lastid = data.lastid;
   }
 
   /**
-   * Constructor, initializing the index structure.
-   * @param data data reference
-   * @param prefix file prefix of the index structure
-   * @throws IOException I/O exception
+   * Returns the file prefix of a segment.
+   * @param number segment number ({@code -1} for the unnumbered structure)
+   * @return prefix
    */
-  FTIndex(final Data data, final String prefix) throws IOException {
-    super(data, IndexType.FULLTEXT);
-    // cache token length index
-    dataX = new DataAccess(data.meta.dbFile(prefix + 'x'));
-    dataY = new DataAccess(data.meta.dbFile(prefix + 'y'));
-    dataZ = new DataAccess(data.meta.dbFile(prefix + 'z'));
-    positions = new int[data.meta.maxlen + 3];
-    final int pl = positions.length;
-    Arrays.fill(positions, -1);
-    for(int is = dataX.readNum(); --is >= 0;) {
-      final int p = dataX.readNum();
-      positions[p] = dataX.read4();
+  static String segment(final int number) {
+    return number < 0 ? DATAFTX : DATAFTX + number;
+  }
+
+  /**
+   * Indicates if the index of a database can be stored in the unnumbered layout.
+   * @param data data reference
+   * @return result of check
+   */
+  static boolean unnumbered(final Data data) {
+    return !data.meta.ftmixed && data.idmap.isIdentity();
+  }
+
+  /**
+   * Parses the segment numbers of the meta data.
+   * @param segments segment numbers (can be {@code null})
+   * @return numbers, or {@code null} if the index is not segmented
+   */
+  private static int[] segments(final String segments) {
+    if(segments == null) return null;
+    final IntList list = new IntList();
+    for(final String s : Strings.split(segments, ',')) {
+      if(!s.isEmpty()) list.add(Strings.toInt(s));
     }
-    positions[pl - 1] = (int) dataY.length();
+    return list.finish();
+  }
+
+  /**
+   * Compares two tokens in index order: by length, then by bytes.
+   * @param token first token
+   * @param compare second token
+   * @return result of comparison
+   */
+  static int compare(final byte[] token, final byte[] compare) {
+    final int d = token.length - compare.length;
+    return d != 0 ? d : Token.compare(token, compare);
+  }
+
+  /**
+   * Deletes the files of segments that are not listed, and temporary files: leftovers of an
+   * interrupted segment write or merge.
+   * @param numbers segment numbers (can be {@code null})
+   */
+  private void orphans(final int[] numbers) {
+    final Pattern pattern = Pattern.compile(DATAFTX + "(?:(\\d+)[" + FTSegment.SUFFIXES +
+        "]|tmp\\d+[" + FILES + "])" + Pattern.quote(IO.BASEXSUFFIX));
+    for(final IOFile file : data.meta.dbFile(DATAFTX).parent().children()) {
+      final Matcher m = pattern.matcher(file.name());
+      if(!m.matches()) continue;
+      final String number = m.group(1);
+      if(number == null || numbers == null ||
+          Arrays.stream(numbers).noneMatch(n -> n == Strings.toInt(number))) file.delete();
+    }
+  }
+
+  /**
+   * Returns the sources of references: the segments and the buffer.
+   * @return sources
+   */
+  private FTSource[] sources() {
+    final int sl = segments.length;
+    final FTSource[] sources = Arrays.copyOf(segments, sl + (buffer != null ? 1 : 0),
+      FTSource[].class);
+    if(buffer != null) sources[sl] = buffer;
+    return sources;
   }
 
   @Override
@@ -107,92 +216,93 @@ public final class FTIndex extends ValueIndex {
 
     // estimate costs for queries which stretch over multiple index entries
     final FTOpt opt = ((FTLexer) search).ftOpt();
-    return IndexCosts.get(opt.is(FZ) || opt.is(WC) ? Math.max(1, data.nodes() / 16) :
-      entry(token).size);
+    if(opt.is(FZ) || opt.is(WC)) return IndexCosts.get(Math.max(1, data.nodes() / 16));
+
+    // upper bound: superseded and deleted references are counted
+    int count = 0;
+    for(final FTSource source : sources()) count += source.count(token);
+    return IndexCosts.get(count);
   }
 
   @Override
   public synchronized IndexIterator iter(final IndexSearch search) {
     // current search token
-    final FTLexer lexer = (FTLexer) search;
-    final FTOpt opt = lexer.ftOpt();
-    final byte[] token = lexer.token();
+    final FTLexer ftl = (FTLexer) search;
+    final FTOpt opt = ftl.ftOpt();
+    final byte[] token = ftl.token();
+    final FTSource[] sources = sources();
 
     // wildcard search
     if(opt.is(WC)) {
       final FTWildcard wc = new FTWildcard(token);
       if(!wc.valid()) return FTIndexIterator.FTEMPTY;
-      if(!wc.simple()) return wildcards(wc, opt.is(DC), token);
+      if(!wc.simple()) {
+        final IntList pres = new IntList(), poss = new IntList();
+        final boolean full = opt.is(DC);
+        for(final FTSource source : sources) source.wildcards(wc, full, pres, poss);
+        return iter(pres, poss, token);
+      }
     }
 
     // fuzzy search
     if(opt.is(FZ)) {
-      return fuzzy(token, lexer.errors());
+      final IntList pres = new IntList(), poss = new IntList();
+      final FTFuzzy fuzzy = new FTFuzzy(token, ftl.errors());
+      for(final FTSource source : sources) source.fuzzy(fuzzy, pres, poss);
+      return iter(pres, poss, token);
     }
 
-    // return cached or new result
-    final IndexEntry entry = entry(token);
-    if(entry.size > 0) {
-      return iter(entry.offset, entry.size, dataZ, token);
-    }
-
-    // no results
-    return FTIndexIterator.FTEMPTY;
-  }
-
-  /**
-   * Returns a cached index entry.
-   * @param value token to be found or cached
-   * @return cache entry
-   */
-  private IndexEntry entry(final byte[] value) {
-    final IndexEntry entry = cache.get(value);
-    if(entry != null) return entry;
-
-    final long pt = token(value);
-    return pt == -1 ? new IndexEntry(value, 0, 0) :
-      cache.add(value, size(pt, value.length), pointer(pt, value.length));
+    // exact search: the counts of the sources are cached, and an upper bound
+    int size = 0;
+    for(final FTSource source : sources) size += source.count(token);
+    final IntList pres = new IntList(size), poss = new IntList(size);
+    for(final FTSource source : sources) source.exact(token, pres, poss);
+    return iter(pres, poss, token);
   }
 
   @Override
   public EntryIterator entries(final IndexEntries entries) {
     final byte[] token = entries.token();
-    if(entries.errors >= 0) return fuzzyEntries(token, entries.errors);
+    final FTFuzzy fuzzy = entries.errors >= 0 ? new FTFuzzy(token, entries.errors) : null;
+    final FTSource[] sources = sources();
+    final int il = sources.length;
+    final EntryIterator[] iters = new EntryIterator[il];
+    for(int i = 0; i < il; i++) {
+      iters[i] = fuzzy != null ? sources[i].entries(fuzzy) : sources[i].entries(token);
+    }
 
+    // merge the entries in index order, summing up the counts
     return new EntryIterator() {
-      int p = token.length - 1, start, end, nr;
-      boolean inner;
+      final byte[][] heads = new byte[il][];
+      boolean init;
+      int nr;
 
       @Override
       public byte[] next() {
         synchronized(FTIndex.this) {
-          if(inner && start < end) {
-            // loop through all entries with the same character length
-            final byte[] entry = dataY.readBytes(start, p);
-            if(startsWith(entry, token)) {
-              final long poi = dataY.read5();
-              nr = dataY.read4();
-              if(token.length != 0) cache.add(entry, nr, poi);
-              start += p + ENTRY;
-              return entry;
+          // single source: no merge required
+          if(il == 1) {
+            final byte[] head = iters[0].next();
+            nr = iters[0].count();
+            return head;
+          }
+          if(!init) {
+            for(int i = 0; i < il; i++) heads[i] = iters[i].next();
+            init = true;
+          }
+          byte[] min = null;
+          for(final byte[] head : heads) {
+            if(head != null && (min == null || compare(head, min) < 0)) min = head;
+          }
+          if(min == null) return null;
+          nr = 0;
+          for(int i = 0; i < il; i++) {
+            if(heads[i] != null && eq(heads[i], min)) {
+              nr += iters[i].count();
+              heads[i] = iters[i].next();
             }
           }
-          // find next available entry group
-          final int pl = positions.length;
-          while(++p < pl - 1) {
-            start = positions[p];
-            if(start == -1) continue;
-            int c = p + 1;
-            do end = positions[c++]; while(end == -1);
-            nr = 0;
-            inner = true;
-            start = find(token, start, end, p);
-            // jump to inner loop
-            final byte[] n = next();
-            if(n != null) return n;
-          }
-          // all entries processed: return null
-          return null;
+          return min;
         }
       }
 
@@ -203,283 +313,65 @@ public final class FTIndex extends ValueIndex {
     };
   }
 
-  /**
-   * Binary search.
-   * @param token token to look for
-   * @param start start position
-   * @param end end position
-   * @param ti entry length
-   * @return position where the key was found, or would have been found
-   */
-  private int find(final byte[] token, final int start, final int end, final int ti) {
-    final int tl = ti + ENTRY;
-    int s = 0, e = (end - start) / tl;
-    while(s <= e) {
-      final int m = s + e >>> 1, pos = start + m * tl, d = compare(cache(pos, ti), token);
-      if(d == 0) return start + m * tl;
-      if(d < 0) s = m + 1;
-      else e = m - 1;
-    }
-    return start + s * tl;
-  }
-
-  /**
-   * Caches the text at the specified position and with the specified length.
-   * @param pos position
-   * @param ti text length
-   * @return text
-   */
-  private byte[] cache(final int pos, final int ti) {
-    // do not cache texts if the fulltext index contains unusually long tokens
-    if(ti >= 128) return dataY.readBytes(pos, ti);
-
-    // try to find cached text (requested length may vary in full-text requests)
-    final int key = (ti << 24) + pos;
-    return ctext.computeIfAbsent(key, () -> dataY.readBytes(pos, ti));
-  }
-
   @Override
   public synchronized byte[] info(final MainOptions options) {
     final TokenBuilder tb = new TokenBuilder();
-    final long l = dataX.length() + dataY.length() + dataZ.length();
+    long l = 0;
+    for(final FTSource source : sources()) l += source.length();
     tb.add(LI_NAMES).add(data.meta.ftinclude).add(NL);
     tb.add(LI_SIZE).add(Performance.formatHuman(l)).add(NL);
+    if(buffer != null) {
+      tb.add(LI).add("Segments: ").addInt(segments.length).add(NL);
+      tb.add(LI).add("Superseded: ").addInt(superseded()).add(NL);
+      tb.add(LI).add("Buffered: ").addInt(buffer.appended()).add(NL);
+    }
 
     final IndexStats stats = new IndexStats(options.get(MainOptions.MAXSTAT));
-    addOccs(stats);
+    final EntryIterator iter = entries(new IndexEntries(EMPTY, IndexType.FULLTEXT));
+    for(byte[] token; (token = iter.next()) != null;) {
+      final int oc = iter.count();
+      if(stats.adding(oc)) stats.add(token, oc);
+    }
     stats.print(tb);
     return tb.finish();
   }
 
   @Override
   public boolean drop() {
+    data.meta.ftsegments = null;
+    data.meta.ftbuffer = null;
+    data.meta.ftadopt = false;
     return data.meta.drop(DATAFTX + ".*");
   }
 
   @Override
   public synchronized void close() {
-    dataX.close();
-    dataY.close();
-    dataZ.close();
+    if(closed) return;
+    closed = true;
+    for(final FTSegment segment : segments) segment.close();
+    if(buffer != null) buffer.close();
   }
 
   @Override
-  public int size() {
-    final int pl = positions.length;
-    int size = 0, t = pl - 1;
-    while(true) {
-      final int e = t;
-      while(positions[--t] == -1) {
-        if(t == 0) return size;
-      }
-      size += (positions[e] - positions[t]) / (t + ENTRY);
-    }
+  public synchronized int size() {
+    int size = 0;
+    for(final FTSource source : sources()) size += source.size();
+    return size;
   }
 
   /**
-   * Determines the pointer on a token.
-   * @param token token looking for
-   * @return int pointer or {@code -1} if token was not found
-   */
-  private int token(final byte[] token) {
-    final int tl = token.length;
-    // left limit
-    int s = positions[tl];
-    if(s == -1) return -1;
-
-    // find right limit
-    int i = 1, e;
-    do e = positions[tl + i++]; while(e == -1);
-    final int x = e;
-
-    // binary search
-    final int o = tl + ENTRY;
-    while(s < e) {
-      final int m = s + (e - s) / 2 / o * o, d = compare(dataY.readBytes(m, tl), token);
-      if(d == 0) return m;
-      if(d < 0) s = m + o;
-      else e = m - o;
-    }
-    // accept entry if pointer is inside relevant tokens
-    return e != x && s == e && eq(dataY.readBytes(s, tl), token) ? s : -1;
-  }
-
-  /**
-   * Collects all tokens and their sizes found in the index structure.
-   * @param stats statistics
-   */
-  private void addOccs(final IndexStats stats) {
-    int i = 0;
-    final int pl = positions.length;
-    while(i < pl && positions[i] == -1) ++i;
-    int p = positions[i], j = i + 1;
-    while(j < pl && positions[j] == -1) ++j;
-
-    final int max = positions[pl - 1];
-    while(p < max) {
-      final int oc = size(p, i);
-      if(stats.adding(oc)) stats.add(dataY.readBytes(p, i), oc);
-      p += i + ENTRY;
-      if(p == positions[j]) {
-        i = j;
-        while(j + 1 < pl && positions[++j] == -1);
-      }
-    }
-  }
-
-  /**
-   * Gets the pointer on ftdata for a token.
-   * @param pt pointer on token
-   * @param lt length of the token
-   * @return int pointer on ftdata
-   */
-  private long pointer(final long pt, final int lt) {
-    return dataY.read5(pt + lt);
-  }
-
-  /**
-   * Reads the size of ftdata from disk.
-   * @param pt pointer on token
-   * @param lt length of the token
-   * @return size of the ftdata
-   */
-  private int size(final long pt, final int lt) {
-    return dataY.read4(pt + lt + 5);
-  }
-
-  /**
-   * Returns all index entries that are similar to the specified token.
-   * @param token token to look for
-   * @param errors number of allowed errors (dynamic calculation if the value is {@code 0})
-   * @return entry iterator
-   */
-  private EntryIterator fuzzyEntries(final byte[] token, final int errors) {
-    final FTFuzzy fuzzy = new FTFuzzy(dataY, token, errors);
-    final int pl = positions.length, last = Math.min(pl - 2, fuzzy.maxLength());
-
-    return new EntryIterator() {
-      int s = fuzzy.minLength() - 1, i, nr;
-      IntList offsets = new IntList(0);
-
-      @Override
-      public byte[] next() {
-        synchronized(FTIndex.this) {
-          while(true) {
-            // loop through all similar entries with the same character length
-            if(i < offsets.size()) {
-              final int p = offsets.get(i++);
-              nr = FTIndex.this.size(p, s);
-              return dataY.readBytes(p, s);
-            }
-            // find next group of entries
-            if(++s > last) return null;
-            final int p = positions[s];
-            if(p != -1) {
-              int c = s + 1, e = -1;
-              while(c < pl && e == -1) e = positions[c++];
-              offsets = fuzzy.offsets(p, e, s);
-              i = 0;
-            }
-          }
-        }
-      }
-
-      @Override
-      public int count() {
-        return nr;
-      }
-    };
-  }
-
-  /**
-   * Performs a fuzzy search for the specified token.
-   * @param token token to look for
-   * @param errors number of allowed errors (dynamic calculation if the value is {@code 0})
-   * @return iterator
-   */
-  private IndexIterator fuzzy(final byte[] token, final int errors) {
-    final FTFuzzy fuzzy = new FTFuzzy(dataY, token, errors);
-    final int pl = positions.length, e = Math.min(pl - 1, fuzzy.maxLength());
-    final ArrayList<FTIndexIterator> iters = new ArrayList<>();
-    for(int s = fuzzy.minLength(); s <= e; s++) {
-      final int p = positions[s];
-      if(p == -1) continue;
-      int t = s + 1, r = -1;
-      while(t < pl && r == -1) r = positions[t++];
-      final IntList offsets = fuzzy.offsets(p, r, s);
-      final int os = offsets.size();
-      for(int o = 0; o < os; o++) {
-        final int off = offsets.get(o);
-        iters.add(iter(pointer(off, s), size(off, s), dataZ, token));
-      }
-    }
-    return iters.isEmpty() ? FTIndexIterator.FTEMPTY :
-      FTIndexIterator.union(iters.toArray(FTIndexIterator[]::new));
-  }
-
-  /**
-   * Performs a wildcard search for the specified token.
-   * @param wc wildcard matcher
-   * @param full support full range of Unicode characters
-   * @param token original search token
-   * @return iterator
-   */
-  private IndexIterator wildcards(final FTWildcard wc, final boolean full, final byte[] token) {
-    final IntList pr = new IntList(), ps = new IntList();
-    final byte[] prefix = wc.prefix();
-    final int pl = positions.length, l = Math.min(pl - 1, wc.max(full));
-    for(int p = prefix.length; p <= l; p++) {
-      int start = positions[p];
-      if(start == -1) continue;
-      int c = p + 1, end = -1;
-      while(c < pl && end == -1) end = positions[c++];
-      start = find(prefix, start, end, p);
-
-      while(start < end) {
-        final byte[] t = dataY.readBytes(start, p);
-        if(!startsWith(t, prefix)) break;
-        if(wc.match(t)) {
-          dataZ.cursor(pointer(start, p));
-          final int s = size(start, p);
-          for(int d = 0; d < s; d++) {
-            pr.add(dataZ.readNum());
-            ps.add(dataZ.readNum());
-          }
-        }
-        start += p + ENTRY;
-      }
-    }
-    return iter(new FTCache(pr, ps), token);
-  }
-
-  /**
-   * Returns an iterator for an index entry.
-   * @param off offset on entries
-   * @param size number of ID/POS entries
-   * @param da data source
+   * Returns an iterator for the collected references.
+   * @param pres PRE values
+   * @param poss positions
    * @param token index token
    * @return iterator
    */
-  private static FTIndexIterator iter(final long off, final int size, final DataAccess da,
+  private static FTIndexIterator iter(final IntList pres, final IntList poss,
       final byte[] token) {
-    da.cursor(off);
-    final IntList pr = new IntList(size), ps = new IntList(size);
-    for(int c = 0; c < size; c++) {
-      pr.add(da.readNum());
-      ps.add(da.readNum());
-    }
-    return iter(new FTCache(pr, ps), token);
-  }
+    if(pres.isEmpty()) return FTIndexIterator.FTEMPTY;
 
-  /**
-   * Returns an iterator for an index entry.
-   * @param ftc ID cache
-   * @param token index token
-   * @return iterator
-   */
-  private static FTIndexIterator iter(final FTCache ftc, final byte[] token) {
-    final int size = ftc.pre.size();
-
+    final FTCache ftc = new FTCache(pres, poss);
+    final int size = pres.size();
     return new FTIndexIterator() {
       final FTMatches all = new FTMatches();
       int pos, pre, c;
@@ -543,10 +435,7 @@ public final class FTIndex extends ValueIndex {
      * @param ps positions
      */
     private FTCache(final IntList pr, final IntList ps) {
-      final int s = pr.size();
-      final long[] v = new long[s];
-      for(int i = 0; i < s; i++) v[i] = (long) pr.get(i) << 32 | ps.get(i);
-      order = Array.createOrder(v, true);
+      order = Array.createOrder(FTBuilder.pack(pr, ps), true);
       pre = pr;
       pos = ps;
     }
@@ -562,19 +451,411 @@ public final class FTIndex extends ValueIndex {
     throw Util.notExpected();
   }
 
-  // the full-text index is not updatable yet: updates invalidate it (see MetaData#update)
-  @Override
-  public void delete(final int pre, final int size) { }
+  // UPDATES ======================================================================================
 
   @Override
-  public void insert(final int pre, final int size) { }
+  public synchronized void delete(final int pre, final int size) {
+    // the string values of the included ancestors change if text nodes are deleted
+    if(buffer != null && data.meta.ftmixed && (size > 1 || data.kind(pre) == Data.TEXT)) {
+      touchAncestors(pre);
+    }
+  }
 
   @Override
-  public void rename(final int pre, final int kind) { }
+  public synchronized void insert(final int pre, final int size) {
+    if(buffer == null) return;
+    // top-level nodes: roots of inserted subtrees, or an existing node with a new value
+    final int last = pre + size;
+    for(int p = pre; p < last;) {
+      final int kind = data.kind(p);
+      if(kind == Data.ELEM || kind == Data.TEXT || kind == Data.DOC) touched.add(data.id(p));
+      p += data.size(p, kind);
+    }
+    if(data.meta.ftmixed && (size > 1 || data.kind(pre) == Data.TEXT)) touchAncestors(pre);
+  }
+
+  @Override
+  public synchronized void rename(final int pre, final int kind) {
+    if(buffer == null || kind != Data.ELEM) return;
+    if(data.meta.ftmixed) {
+      touched.add(data.id(pre));
+    } else {
+      // the inclusion of the child text nodes depends on the name of the element
+      for(final int p : childTexts(pre).finish()) touched.add(data.id(p));
+    }
+  }
 
   @Override
   public void renamed(final int pre, final int kind) { }
 
   @Override
-  public void flush() { }
+  public synchronized void finishUpdate() {
+    if(buffer == null) return;
+    try {
+      finish();
+    } catch(final IOException ex) {
+      invalidate(ex);
+    }
+  }
+
+  @Override
+  public synchronized void optimize(final boolean auto) {
+    if(buffer == null) return;
+    try {
+      finish();
+      // automatic optimization: skip the merge if few units are superseded
+      if(auto && superseded() * 10L <= data.lastid) return;
+      writeBuffer();
+      // the unnumbered index is clean, nothing to do
+      if(adoptable()) return;
+
+      // a single segment without superseded or deleted references needs no merge
+      final int sl = segments.length;
+      final boolean clean = sl == 1 && segments[0].superseded == null &&
+          data.lastid + 1 == data.nodes();
+      // if all IDs equal their PRE values, the result is written in the unnumbered layout,
+      // which older versions can read (see #adopt)
+      if(unnumbered(data)) {
+        if(clean) {
+          renumber(-1);
+        } else if(sl == 0) {
+          // empty index
+          new FTSegmentWriter(data, DATAFTX).close();
+          segments = new FTSegment[] { new FTSegment(data, -1, buffer) };
+        } else {
+          merge(Array.number(sl).finish(), -1);
+        }
+        updateMeta();
+      } else if(!clean && sl > 0) {
+        merge(Array.number(sl).finish(), next++);
+      }
+    } catch(final IOException ex) {
+      invalidate(ex);
+    }
+  }
+
+  @Override
+  public synchronized void flush() {
+    if(buffer != null) {
+      buffer.flush();
+      updateMeta();
+    }
+  }
+
+  /**
+   * Indicates if the index consists of the unnumbered structure that will be adopted as first
+   * segment by the next update.
+   * @return result of check
+   */
+  private boolean adoptable() {
+    return buffer != null && segments.length == 1 && segments[0].number < 0;
+  }
+
+  /**
+   * Touches the included ancestors of a node.
+   * @param pre PRE value
+   */
+  private void touchAncestors(final int pre) {
+    for(int p = data.parent(pre, data.kind(pre)); p != -1; p = data.parent(p, Data.ELEM)) {
+      if(data.kind(p) != Data.ELEM) break;
+      if(names.containsElement(p)) touched.add(data.id(p));
+    }
+  }
+
+  /**
+   * Adopts the unnumbered structure as first segment.
+   * @throws IOException I/O exception
+   */
+  private void adopt() throws IOException {
+    if(segments[0].size() == 0) {
+      // an empty index (e.g. of a database created without input) is discarded
+      segments[0].close();
+      FTBuilder.drop(data, DATAFTX);
+      segments = new FTSegment[0];
+    } else {
+      renumber(next++);
+      covered = lastid;
+    }
+    updateMeta();
+  }
+
+  /**
+   * Renumbers the first segment by renaming its files.
+   * @param number new segment number ({@code -1} for the unnumbered structure)
+   * @throws IOException I/O exception
+   */
+  private void renumber(final int number) throws IOException {
+    final FTSegment segment = segments[0];
+    segment.close();
+    final String prefix = segment(number);
+    for(final char c : FTSegment.SUFFIXES.toCharArray()) {
+      final IOFile file = data.meta.dbFile(segment.prefix + c);
+      if(file.exists() && !file.rename(data.meta.dbFile(prefix + c))) {
+        throw new IOException("Could not rename " + file + '.');
+      }
+    }
+    segments[0] = new FTSegment(data, number, buffer);
+  }
+
+  /**
+   * Indexes the touched nodes.
+   * @throws IOException I/O exception
+   */
+  private void finish() throws IOException {
+    // units were changed, or PRE values shifted: the index is no longer valid for older versions
+    if(adoptable() && (!touched.isEmpty() || !data.idmap.isIdentity())) adopt();
+    if(!touched.isEmpty()) {
+      // process the nodes in document order, skipping the nodes of indexed subtrees
+      final int[] ids = touched.keys();
+      final IntList pres = new IntList(ids.length), list = new IntList(ids.length);
+      for(final int id : ids) {
+        final int pre = data.pre(id);
+        if(pre != -1) {
+          pres.add(pre);
+          list.add(id);
+        }
+      }
+      final boolean mixed = data.meta.ftmixed;
+      // sorts the PRE values; the order maps each sorted position to the original index
+      final int[] order = pres.createOrder(true);
+      int end = -1;
+      for(int o = 0; o < order.length; o++) {
+        final int pre = pres.get(o), id = list.get(order[o]);
+        if(pre < end) continue;
+        if(id > lastid) {
+          // root of an inserted subtree: index all units
+          final int size = data.size(pre, data.kind(pre));
+          end = pre + size;
+          if(size > threshold) {
+            segment(pre, end, -1);
+          } else {
+            for(int p = pre; p < end; p++) {
+              if(names.unit(p)) put(data.id(p), data.atom(p));
+            }
+          }
+        } else if(data.kind(pre) == (mixed ? Data.ELEM : Data.TEXT)) {
+          // existing node: index it if it is a unit, exclude it otherwise
+          if(!names.unit(pre)) put(id, null);
+          else if(mixed && data.size(pre, Data.ELEM) > threshold) segment(pre, pre + 1, id);
+          else put(id, data.atom(pre));
+        }
+        if(buffer.appended() >= threshold) writeBuffer();
+      }
+      touched = new IntSet();
+    }
+    lastid = data.lastid;
+  }
+
+  /**
+   * Indexes a unit in the buffer.
+   * @param id node ID
+   * @param value value to be indexed ({@code null} if the unit is excluded)
+   * @throws IOException I/O exception
+   */
+  private void put(final int id, final byte[] value) throws IOException {
+    final TokenList toks = new TokenList();
+    final IntList poss = new IntList();
+    if(value != null) {
+      if(lexer == null) lexer = FTBuilder.lexer(data);
+      FTBuilder.tokens(lexer, data.meta.maxlen, value, (token, pos) -> {
+        toks.add(token);
+        poss.add(pos);
+      });
+    }
+    buffer.put(id, toks, poss);
+  }
+
+  /**
+   * Indexes the units of a large subtree, or a single large unit, in a new segment.
+   * @param first PRE value of the first node
+   * @param last PRE value of the last node (exclusive)
+   * @param id ID of the existing unit ({@code -1} for an inserted subtree)
+   * @throws IOException I/O exception
+   */
+  private void segment(final int first, final int last, final int id) throws IOException {
+    // buffered references of the unit are older: write them first
+    if(id != -1 && buffer.supersedes(id)) writeBuffer();
+
+    final int number = next++;
+    final String prefix = segment(number);
+    new FTBuilder(data).build(first, last, prefix);
+    if(id != -1 && segments.length > 0) FTSegment.superseded(data, prefix, new int[] { id });
+    add(number);
+  }
+
+  /**
+   * Writes the buffer as a new segment.
+   * @throws IOException I/O exception
+   */
+  private void writeBuffer() throws IOException {
+    if(buffer.isEmpty()) return;
+
+    final int number = next++;
+    final String prefix = segment(number);
+    buffer.write(prefix);
+    // the oldest segment supersedes nothing
+    if(segments.length > 0) FTSegment.superseded(data, prefix, buffer.superseded(covered));
+    buffer.reset();
+    add(number);
+  }
+
+  /**
+   * Adds a new segment, and merges small segments if there are too many.
+   * @param number segment number
+   * @throws IOException I/O exception
+   */
+  private void add(final int number) throws IOException {
+    final int sl = segments.length;
+    segments = Arrays.copyOf(segments, sl + 1);
+    segments[sl] = new FTSegment(data, number, buffer);
+    covered = data.lastid;
+    unions();
+    updateMeta();
+    policy();
+  }
+
+  /**
+   * Merges small segments if there are too many.
+   * @throws IOException I/O exception
+   */
+  private void policy() throws IOException {
+    final int sl = segments.length;
+    if(sl <= SEGMENTS) return;
+
+    // merge the segments below the size cap (always at least two); large segments are kept
+    final long[] lengths = new long[sl];
+    long total = 0;
+    for(int s = 0; s < sl; s++) {
+      lengths[s] = segments[s].length();
+      total += lengths[s];
+    }
+    final long cap = total / SEGMENTS;
+    final IntList list = new IntList();
+    for(int s = 0; s < sl; s++) {
+      if(lengths[s] <= cap) list.add(s);
+    }
+    merge(list.finish(), next++);
+  }
+
+  /**
+   * Merges segments into a new segment, which takes the position of the newest input.
+   * @param inputs indexes of the segments to be merged, ascending
+   * @param number number of the new segment ({@code -1} for the unnumbered structure)
+   * @throws IOException I/O exception
+   */
+  private void merge(final int[] inputs, final int number) throws IOException {
+    final int il = inputs.length, sl = segments.length, newest = inputs[il - 1];
+    final String prefix = segment(number);
+
+    // a reference is live if its node exists and its unit is not superseded by newer segments
+    final String[] prefixes = new String[il];
+    final IntPredicate[] live = new IntPredicate[il];
+    for(int i = 0; i < il; i++) {
+      final FTSegment segment = segments[inputs[i]];
+      prefixes[i] = segment.prefix;
+      final IntSet newer = segment.newer;
+      live[i] = id -> !newer.contains(id) && !buffer.supersedes(id) && data.pre(id) != -1;
+    }
+    FTBuilder.merge(data, prefixes, prefix, live);
+
+    // supersede set: the sets of the inputs, without the IDs that are superseded by segments
+    // between an input and the output (those segments hold the live references)
+    if(il != newest + 1) {
+      final IntSet set = new IntSet(), between = new IntSet();
+      for(int s = newest, i = il - 1; s >= 0; s--) {
+        final IntSet superseded = segments[s].superseded;
+        if(superseded == null) continue;
+        final boolean input = i >= 0 && inputs[i] == s;
+        for(final int id : superseded.keys()) {
+          if(!input) between.add(id);
+          else if(!between.contains(id)) set.add(id);
+        }
+        if(input) i--;
+      }
+      FTSegment.superseded(data, prefix, set.keys());
+    }
+
+    // replace the inputs by the output
+    final FTSegment[] segs = new FTSegment[sl - il + 1];
+    for(int s = 0, t = 0; s < sl; s++) {
+      if(s == newest) {
+        segs[t++] = new FTSegment(data, number, buffer);
+      } else if(Arrays.binarySearch(inputs, s) < 0) {
+        segs[t++] = segments[s];
+      }
+    }
+    for(final int i : inputs) {
+      segments[i].close();
+      FTBuilder.drop(data, segments[i].prefix);
+    }
+    segments = segs;
+    unions();
+    updateMeta();
+  }
+
+  /**
+   * Assigns each segment the IDs that are superseded by newer segments.
+   */
+  private void unions() {
+    // the set is shared by all segments below a segment without supersede set
+    IntSet acc = new IntSet();
+    for(int s = segments.length - 1; s >= 0; s--) {
+      final FTSegment segment = segments[s];
+      segment.newer = acc;
+      final IntSet superseded = segment.superseded;
+      if(superseded != null && !superseded.isEmpty()) {
+        final IntSet copy = new IntSet(acc.size() + superseded.size());
+        for(final int id : acc.keys()) copy.add(id);
+        for(final int id : superseded.keys()) copy.add(id);
+        acc = copy;
+      }
+    }
+  }
+
+  /**
+   * Returns the number of superseded units, an upper bound.
+   * @return number of units
+   */
+  private int superseded() {
+    int count = buffer.superseded(covered).length;
+    for(final FTSegment segment : segments) {
+      if(segment.superseded != null) count += segment.superseded.size();
+    }
+    return count;
+  }
+
+  /**
+   * Stores the segment numbers in the meta data.
+   */
+  private void updateMeta() {
+    final StringList list = new StringList();
+    for(final FTSegment segment : segments) list.add(Integer.toString(segment.number));
+    final boolean adoptable = adoptable();
+    final String segs = adoptable ? null : String.join(",", list.finish());
+    final String buffered = adoptable ? null :
+      buffer.length() + "," + buffer.appended() + "," + covered;
+    final MetaData meta = data.meta;
+    if(adoptable != meta.ftadopt || !Objects.equals(segs, meta.ftsegments) ||
+        !Objects.equals(buffered, meta.ftbuffer)) {
+      meta.ftsegments = segs;
+      meta.ftbuffer = buffered;
+      meta.ftadopt = adoptable;
+      meta.dirty = true;
+    }
+  }
+
+  /**
+   * Drops the index after an error: an update never fails because of the full-text index.
+   * @param ex exception
+   */
+  private void invalidate(final IOException ex) {
+    Util.stack(ex);
+    close();
+    drop();
+    segments = new FTSegment[0];
+    buffer = null;
+    touched = new IntSet();
+    data.meta.ftindex = false;
+    data.meta.dirty = true;
+  }
 }

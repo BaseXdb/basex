@@ -213,6 +213,14 @@ public class IdPreMap {
   }
 
   /**
+   * Indicates if every ID equals its PRE value.
+   * @return result of check
+   */
+  public final boolean isIdentity() {
+    return rows == 0 && deleted == null;
+  }
+
+  /**
    * Marks a range of base IDs as deleted.
    * @param first first ID
    * @param last last ID

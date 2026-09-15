@@ -5,11 +5,12 @@ import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.util.*;
+import java.util.function.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.*;
-import org.basex.io.out.DataOutput;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.list.*;
@@ -21,10 +22,15 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class FTBuilder extends IndexBuilder {
+  /** Number of tokens after which a partial index is written ({@code 0}: decided by memory). */
+  static int splitTokens;
+
   /** Value trees. */
   private FTIndexTrees tree;
   /** Word parser. */
   private final FTLexer lexer;
+  /** Indicates if node IDs are indexed instead of PRE values (see {@link FTIndex}). */
+  private final boolean ids;
 
   /**
    * Constructor.
@@ -35,6 +41,7 @@ public final class FTBuilder extends IndexBuilder {
     super(data, IndexType.FULLTEXT);
     tree = new FTIndexTrees(data.meta.maxlen);
     lexer = lexer(data);
+    ids = data.meta.updindex;
   }
 
   /**
@@ -68,23 +75,17 @@ public final class FTBuilder extends IndexBuilder {
     Util.debugln(detailedInfo());
 
     try {
-      // index the string values of the included elements, or the values of text nodes
-      for(pre = 0; pre < size; pre++) {
-        if((pre & 0x0FFF) == 0) check();
-        // atomized value of a text node is its own value
-        if(includeNames.unit(pre)) index(pre, data.atom(pre));
-      }
-
-      // write the index, or the last partial index, and merge all partial indexes
-      if(splits == 0) {
-        writeIndex(DATAFTX);
+      // an updatable index is segmented and holds node IDs; if all IDs equal their PRE values,
+      // the unsegmented layout is written, which older versions can read (see FTIndex#adopt)
+      final MetaData meta = data.meta;
+      final boolean segmented = ids && !FTIndex.unnumbered(data);
+      if(segmented && size == 0) {
+        // empty database: the first update will write the first segment
+        meta.ftsegments = "";
       } else {
-        writeIndex(partial(splits));
-        final String[] inputs = new String[splits];
-        for(int s = 0; s < splits; s++) inputs[s] = partial(s);
-        merge(inputs, DATAFTX);
+        build(0, size, segmented ? FTIndex.segment(0) : DATAFTX);
+        meta.ftsegments = segmented ? "0" : null;
       }
-
       finishIndex();
       return new FTIndex(data);
     } catch(final Throwable th) {
@@ -95,12 +96,40 @@ public final class FTBuilder extends IndexBuilder {
   }
 
   /**
-   * Indexes the tokens of a value.
-   * @param id ID of the value (currently, the PRE value)
-   * @param value value to be indexed
+   * Indexes the units of the specified range and writes them to an index structure.
+   * @param first PRE value of the first node
+   * @param last PRE value of the last node (exclusive)
+   * @param prefix file prefix of the index structure
    * @throws IOException I/O exception
    */
-  private void index(final int id, final byte[] value) throws IOException {
+  void build(final int first, final int last, final String prefix) throws IOException {
+    for(pre = first; pre < last; pre++) {
+      if((pre & 0x0FFF) == 0) check();
+      if(includeNames.unit(pre)) index(ids ? data.id(pre) : pre, data.atom(pre));
+    }
+
+    // write the index, or the last partial index, and merge all partial indexes
+    if(splits == 0) {
+      writeIndex(prefix);
+    } else {
+      writeIndex(partial(splits));
+      final String[] inputs = new String[splits];
+      for(int s = 0; s < splits; s++) inputs[s] = partial(s);
+      merge(data, inputs, prefix, null);
+      for(final String input : inputs) drop(data, input);
+    }
+  }
+
+  /**
+   * Passes the tokens of a value to be indexed, and their positions, to a consumer.
+   * @param lexer lexer
+   * @param maxlen maximum token length
+   * @param value value
+   * @param consumer consumer
+   * @throws IOException I/O exception
+   */
+  static void tokens(final FTLexer lexer, final int maxlen, final byte[] value,
+      final TokenConsumer consumer) throws IOException {
     final StopWords sw = lexer.ftOpt().sw;
     lexer.init(value);
     int pos = -1;
@@ -108,16 +137,40 @@ public final class FTBuilder extends IndexBuilder {
       final byte[] token = lexer.nextToken();
       ++pos;
       // skip too long and stopword tokens
-      if(token.length <= data.meta.maxlen && !sw.contains(token)) {
-        // check if main memory is exhausted
-        if((count & 0xFFFF) == 0 && splitRequired(tree.memory())) {
-          writeIndex(partial(splits));
-          tree = new FTIndexTrees(data.meta.maxlen);
-        }
-        tree.index(token, id, pos);
-        count++;
-      }
+      if(token.length <= maxlen && !sw.contains(token)) consumer.accept(token, pos);
     }
+  }
+
+  /**
+   * Consumer of indexed tokens.
+   */
+  interface TokenConsumer {
+    /**
+     * Accepts a token.
+     * @param token token
+     * @param pos position
+     * @throws IOException I/O exception
+     */
+    void accept(byte[] token, int pos) throws IOException;
+  }
+
+  /**
+   * Indexes the tokens of a value.
+   * @param id ID or PRE value of the node
+   * @param value value to be indexed
+   * @throws IOException I/O exception
+   */
+  private void index(final int id, final byte[] value) throws IOException {
+    tokens(lexer, data.meta.maxlen, value, (token, pos) -> {
+      // check if main memory is exhausted
+      if(splitTokens > 0 ? count > 0 && count % splitTokens == 0 :
+        (count & 0xFFFF) == 0 && splitRequired(tree.memory())) {
+        writeIndex(partial(splits));
+        tree = new FTIndexTrees(data.meta.maxlen);
+      }
+      tree.index(token, id, pos);
+      count++;
+    });
   }
 
   /**
@@ -130,88 +183,105 @@ public final class FTBuilder extends IndexBuilder {
   }
 
   /**
-   * Merges index structures and deletes the input files.
+   * Deletes the files of an index structure.
+   * @param data data reference
+   * @param prefix file prefix of the index structure
+   */
+  static void drop(final Data data, final String prefix) {
+    data.meta.drop(prefix + '[' + FTSegment.SUFFIXES + ']');
+  }
+
+  /**
+   * Merges index structures, skipping dead references and sorting the remaining ones if liveness
+   * tests are specified, and keeping all references in input order otherwise.
+   * @param data data reference
    * @param inputs file prefixes of the input index structures
    * @param output file prefix of the output index structure
+   * @param live liveness tests for the references of each input (can be {@code null})
    * @throws IOException I/O exception
    */
-  private void merge(final String[] inputs, final String output) throws IOException {
+  static void merge(final Data data, final String[] inputs, final String output,
+      final IntPredicate[] live) throws IOException {
+
+    // open all sorted lists
     final int il = inputs.length;
     final FTList[] lists = new FTList[il];
-    try(DataOutput outX = new DataOutput(data.meta.dbFile(output + 'x'));
-        DataOutput outY = new DataOutput(data.meta.dbFile(output + 'y'));
-        DataOutput outZ = new DataOutput(data.meta.dbFile(output + 'z'))) {
+    try(FTSegmentWriter writer = new FTSegmentWriter(data, output)) {
+      for(int i = 0; i < il; i++) lists[i] = new FTList(data, inputs[i]);
 
-      // open all sorted lists
-      for(int l = 0; l < il; l++) lists[l] = new FTList(data, inputs[l]);
-
-      final IntList ind = new IntList(), same = new IntList();
+      final IntList list = new IntList(), ids = new IntList(), poss = new IntList();
       while(true) {
-        // find next token to write to disk: shortest token first, then smallest token
-        byte[] token = null;
-        same.reset();
-        for(int l = 0; l < il; l++) {
-          final byte[] tk = lists[l].token;
-          if(tk.length == 0) continue;
-          final int d = token == null ? -1 : tk.length != token.length ?
-            tk.length - token.length : compare(tk, token);
+        // find next token to write on disk, and all lists that contain it
+        list.reset();
+        byte[] token = EMPTY;
+        for(int i = 0; i < il; i++) {
+          final byte[] tok = lists[i].token;
+          if(tok.length == 0) continue;
+          final int d = token.length == 0 ? -1 : FTIndex.compare(tok, token);
           if(d < 0) {
-            token = tk;
-            same.reset();
+            token = tok;
+            list.reset();
           }
-          if(d <= 0) same.add(l);
+          if(d <= 0) list.add(i);
         }
-        if(token == null) break;
+        if(token.length == 0) break;
 
-        if(ind.isEmpty() || ind.get(ind.size() - 2) < token.length) {
-          ind.add(token.length);
-          ind.add((int) outY.size());
-        }
-
-        // write token
-        outY.writeBytes(token);
-        // pointer on full-text data
-        outY.write5(outZ.size());
-        // merge full-text data of all sorted lists with the same token
-        int s = 0;
-        final int ss = same.size();
-        for(int l = 0; l < ss; l++) {
-          final FTList list = lists[same.get(l)];
-          final int[] prv = list.prv, pov = list.pov;
+        // collect the references of the token
+        ids.reset();
+        poss.reset();
+        final int ls = list.size();
+        for(int l = 0; l < ls; l++) {
+          final FTList ftl = lists[list.get(l)];
+          final IntPredicate lv = live != null ? live[list.get(l)] : null;
+          final int[] prv = ftl.prv, pov = ftl.pov;
           final int pl = prv.length;
           for(int p = 0; p < pl; p++) {
-            outZ.writeNum(prv[p]);
-            outZ.writeNum(pov[p]);
+            final int id = prv[p];
+            if(lv == null || lv.test(id)) {
+              ids.add(id);
+              poss.add(pov[p]);
+            }
           }
-          s += pl;
-          list.next();
+          ftl.next();
         }
-        // write data size
-        outY.write4(s);
+        if(ids.isEmpty()) continue;
+
+        if(live != null) sort(ids, poss);
+        writer.write(token, ids, poss);
       }
-      writeInd(outX, ind);
     } finally {
-      for(final FTList list : lists) {
-        if(list != null) list.close();
+      for(final FTList ftl : lists) {
+        if(ftl != null) ftl.close();
       }
-    }
-    for(final String input : inputs) {
-      for(final char c : new char[] { 'x', 'y', 'z' }) data.meta.dbFile(input + c).delete();
     }
   }
 
   /**
-   * Writes the token length index to disk.
-   * @param outX output
-   * @param il token length and offsets
-   * @throws IOException I/O exception
+   * Packs references into long values that sort by ID and position.
+   * @param ids IDs
+   * @param poss positions
+   * @return packed references
    */
-  private static void writeInd(final DataOutput outX, final IntList il) throws IOException {
-    final int is = il.size();
-    outX.writeNum(is / 2);
-    for(int i = 0; i < is; i += 2) {
-      outX.writeNum(il.get(i));
-      outX.write4(il.get(i + 1));
+  static long[] pack(final IntList ids, final IntList poss) {
+    final int is = ids.size();
+    final long[] values = new long[is];
+    for(int i = 0; i < is; i++) values[i] = (long) ids.get(i) << 32 | poss.get(i);
+    return values;
+  }
+
+  /**
+   * Sorts references by ID and position.
+   * @param ids IDs
+   * @param poss positions
+   */
+  static void sort(final IntList ids, final IntList poss) {
+    final long[] values = pack(ids, poss);
+    Arrays.sort(values);
+    final int is = ids.size();
+    for(int i = 0; i < is; i++) {
+      final long v = values[i];
+      ids.set(i, (int) (v >> 32));
+      poss.set(i, (int) v);
     }
   }
 
@@ -221,52 +291,16 @@ public final class FTBuilder extends IndexBuilder {
    * @throws IOException I/O exception
    */
   private void writeIndex(final String prefix) throws IOException {
-    try(DataOutput outX = new DataOutput(data.meta.dbFile(prefix + 'x'));
-        DataOutput outY = new DataOutput(data.meta.dbFile(prefix + 'y'));
-        DataOutput outZ = new DataOutput(data.meta.dbFile(prefix + 'z'))) {
-
-      final IntList ind = new IntList();
+    try(FTSegmentWriter writer = new FTSegmentWriter(data, prefix)) {
       tree.init();
-      int j = 0;
       while(tree.more()) {
         final IndexTree t = tree.nextTree();
         final int n = t.next();
-        final byte[] key = t.keys.get(n), ids = t.ids.get(n);
-
-        if(j < key.length) {
-          j = key.length;
-          // write index and pointer on first token
-          ind.add(j);
-          ind.add((int) outY.size());
-        }
-        outY.writeBytes(key);
-        // write pointer on full-text data
-        outY.write5(outZ.size());
-        // write full-text data size (number of PRE values)
-        outY.write4(entries(ids));
-        // write compressed PRE and POS values: pre1 pos1 pre2 pos2 ...
-        outZ.write(ids, 4, Num.size(ids) - 4);
+        writer.write(t.keys.get(n), t.ids.get(n));
       }
-      writeInd(outX, ind);
     }
 
     // increase split counter
     splits++;
-  }
-
-  /**
-   * Returns the number of PRE values in the specified compressed PRE and POS values.
-   * @param ids compressed PRE and POS values
-   * @return number of PRE values
-   */
-  private static int entries(final byte[] ids) {
-    int n = 0, i = 4;
-    final int is = Num.size(ids);
-    while(i < is) {
-      i += Num.length(ids, i);
-      i += Num.length(ids, i);
-      n++;
-    }
-    return n;
   }
 }

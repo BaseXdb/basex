@@ -104,6 +104,90 @@ public final class FTIndexBaselineTest extends SandboxTest {
   }
 
   /**
+   * Runs small update transactions on a database with an updatable full-text index, and
+   * measures query latency before and after merging the segments.
+   * @throws Exception exception
+   */
+  @Test public void fulltextUpdates() throws Exception {
+    set(MainOptions.UPDINDEX, true);
+    set(MainOptions.FTINDEX, true);
+    long start = System.nanoTime(), cpu = cpu();
+    execute(new CreateDB(NAME, INPUT));
+    Util.println("Create with updatable full-text index: % ms wall, % ms cpu, % MB peak heap",
+      (System.nanoTime() - start) / 1000000, (cpu() - cpu) / 1000000, peakHeap());
+    final int nodes = Integer.parseInt(query("db:info('" + NAME + "')//nodes/text()"));
+
+    // old values are unique after the first run; the second run supersedes the buffered units
+    for(final String run : new String[] { "first", "second" }) {
+      final Random rnd = new Random(0);
+      final long[] times = new long[UPDATES];
+      start = System.nanoTime();
+      cpu = cpu();
+      for(int u = 0; u < UPDATES; u++) {
+        final int pre = rnd.nextInt(nodes);
+        final long c = cpu();
+        query("let $t := (db:get-pre('" + NAME + "', " + pre + ")/descendant-or-self::text())[1] " +
+          "return if(exists($t)) { replace value of node $t with '" + run + ' ' + u + "' }");
+        times[u] = (cpu() - c) / 1000000;
+      }
+      Arrays.sort(times);
+      Util.println("% update transactions (%): % ms wall, % ms cpu, median % ms, max % ms",
+        UPDATES, run, (System.nanoTime() - start) / 1000000, (cpu() - cpu) / 1000000,
+        times[UPDATES / 2], times[UPDATES - 1]);
+    }
+    queries("with buffer");
+    Util.println(execute(new InfoIndex("fulltext")));
+
+    start = System.nanoTime();
+    execute(new Optimize());
+    Util.println("Optimize (merge): % ms wall", (System.nanoTime() - start) / 1000000);
+    queries("after merge");
+    Util.println(execute(new InfoIndex("fulltext")));
+  }
+
+  /**
+   * Adds the document to an empty database with an updatable full-text index.
+   * @throws Exception exception
+   */
+  @Test public void fulltextAdd() throws Exception {
+    set(MainOptions.UPDINDEX, true);
+    set(MainOptions.FTINDEX, true);
+    execute(new CreateDB(NAME));
+    final long start = System.nanoTime(), cpu = cpu();
+    query("db:add('" + NAME + "', '" + INPUT + "')");
+    Util.println("Add with updatable full-text index: % ms wall, % ms cpu, % MB peak heap",
+      (System.nanoTime() - start) / 1000000, (cpu() - cpu) / 1000000, peakHeap());
+    queries("after add");
+    Util.println(execute(new InfoIndex("fulltext")));
+  }
+
+  /**
+   * Measures the latency of the reference queries.
+   * @param label label
+   * @throws Exception exception
+   */
+  private static void queries(final String label) throws Exception {
+    for(final String query : new String[] {
+      "count(ft:search('" + NAME + "', 'will'))",
+      "count(ft:search('" + NAME + "', 'will', map { 'fuzzy': true() }))",
+      "count(db:get('" + NAME + "')//text[text() contains text 'will'])",
+      "count(ft:search('" + NAME + "', 'states'))"
+    }) {
+      final long[] runs = new long[RUNS];
+      String result = "";
+      for(int r = 0; r < RUNS; r++) {
+        final long c = cpu();
+        try(QueryProcessor qp = new QueryProcessor(query, context)) {
+          result = qp.value().serialize().toString();
+        }
+        runs[r] = (cpu() - c) / 1000000;
+      }
+      Util.println("% (%): % hits, cold % ms, warm min % ms", query, label, result, runs[0],
+        Arrays.stream(runs, 1, RUNS).min().getAsLong());
+    }
+  }
+
+  /**
    * Returns the CPU time of the current thread.
    * @return nanoseconds
    */

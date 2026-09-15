@@ -24,10 +24,11 @@ public final class UpdIndexTest extends SandboxTest {
    */
   public static Stream<Arguments> params() {
     return Stream.of(
-      Arguments.of(false, false),
-      Arguments.of(true, false),
-      Arguments.of(false, true),
-      Arguments.of(true, true)
+      Arguments.of(false, false, false),
+      Arguments.of(true, false, false),
+      Arguments.of(false, true, false),
+      Arguments.of(true, true, false),
+      Arguments.of(true, false, true)
     );
   }
 
@@ -40,13 +41,15 @@ public final class UpdIndexTest extends SandboxTest {
    * Initializes the test.
    * @param updindex incremental index update flag.
    * @param mainmem main memory flag.
+   * @param ftindex full-text index flag.
    */
-  private void init(final boolean updindex, final boolean mainmem) {
+  private void init(final boolean updindex, final boolean mainmem, final boolean ftindex) {
     set(MainOptions.UPDINDEX, updindex);
     set(MainOptions.MAINMEM, mainmem);
+    set(MainOptions.TOKENINDEX, true);
+    set(MainOptions.FTINDEX, ftindex);
     execute(new CreateDB(NAME, "<xml/>"));
     set(MainOptions.AUTOFLUSH, false);
-    set(MainOptions.TOKENINDEX, true);
   }
 
   /**
@@ -54,6 +57,7 @@ public final class UpdIndexTest extends SandboxTest {
    */
   @AfterEach public void finish() {
     set(MainOptions.TOKENINDEX, false);
+    set(MainOptions.FTINDEX, false);
     execute(new DropDB(NAME));
   }
 
@@ -61,11 +65,13 @@ public final class UpdIndexTest extends SandboxTest {
    * Incremental test.
    * @param updindex incremental index update flag.
    * @param mainmem main memory flag.
+   * @param ftindex full-text index flag.
    */
   @ParameterizedTest
   @MethodSource("params")
-  public void insertInto(final boolean updindex, final boolean mainmem) {
-    init(updindex, mainmem);
+  public void insertInto(final boolean updindex, final boolean mainmem,
+      final boolean ftindex) {
+    init(updindex, mainmem, ftindex);
     for(int a = 0; a < STEPS; a++) {
       final int n = MAX * (a + 1);
       for(int i = 0; i < n; i++) query("insert node <x/> into /*");
@@ -79,11 +85,13 @@ public final class UpdIndexTest extends SandboxTest {
    * Incremental test.
    * @param updindex incremental index update flag.
    * @param mainmem main memory flag.
+   * @param ftindex full-text index flag.
    */
   @ParameterizedTest
   @MethodSource("params")
-  public void insertBefore(final boolean updindex, final boolean mainmem) {
-    init(updindex, mainmem);
+  public void insertBefore(final boolean updindex, final boolean mainmem,
+      final boolean ftindex) {
+    init(updindex, mainmem, ftindex);
     for(int a = 0; a < STEPS; a++) {
       final int n = MAX * (a + 1);
       for(int i = 0; i < n; i++) {
@@ -99,11 +107,13 @@ public final class UpdIndexTest extends SandboxTest {
    * Incremental test.
    * @param updindex incremental index update flag.
    * @param mainmem main memory flag.
+   * @param ftindex full-text index flag.
    */
   @ParameterizedTest
   @MethodSource("params")
-  public void insertAfter(final boolean updindex, final boolean mainmem) {
-    init(updindex, mainmem);
+  public void insertAfter(final boolean updindex, final boolean mainmem,
+      final boolean ftindex) {
+    init(updindex, mainmem, ftindex);
     for(int a = 0; a < STEPS; a++) {
       final int n = MAX * (a + 1);
       for(int i = 0; i < n; i++) {
@@ -119,11 +129,13 @@ public final class UpdIndexTest extends SandboxTest {
    * Incremental test.
    * @param updindex incremental index update flag.
    * @param mainmem main memory flag.
+   * @param ftindex full-text index flag.
    */
   @ParameterizedTest
   @MethodSource("params")
-  public void insertDeep(final boolean updindex, final boolean mainmem) {
-    init(updindex, mainmem);
+  public void insertDeep(final boolean updindex, final boolean mainmem,
+      final boolean ftindex) {
+    init(updindex, mainmem, ftindex);
     for(int a = 0; a < STEPS; a++) {
       final int n = MAX * (a + 1);
       for(int i = 0; i < n; i++) {
@@ -139,11 +151,13 @@ public final class UpdIndexTest extends SandboxTest {
    * Incremental test.
    * @param updindex incremental index update flag.
    * @param mainmem main memory flag.
+   * @param ftindex full-text index flag.
    */
   @ParameterizedTest
   @MethodSource("params")
-  public void replaceValue(final boolean updindex, final boolean mainmem) {
-    init(updindex, mainmem);
+  public void replaceValue(final boolean updindex, final boolean mainmem,
+      final boolean ftindex) {
+    init(updindex, mainmem, ftindex);
     final Random rnd = new Random();
     final StringBuilder sb = new StringBuilder();
     for(int i = 0; i < MAX * STEPS; i++) {
@@ -151,6 +165,7 @@ public final class UpdIndexTest extends SandboxTest {
       sb.append(ch == '@' ? ' ' : ch);
       query("replace value of node /* with '" + sb + '\'');
       query("string-length(/*)", sb.length());
+      if(ftindex) queryIndexScan("/*[text() contains text 'A.*' using wildcards]");
     }
   }
 }

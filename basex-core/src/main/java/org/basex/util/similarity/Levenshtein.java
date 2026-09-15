@@ -162,7 +162,7 @@ public final class Levenshtein {
    * @param token token
    * @return normalized token
    */
-  private static int[] normalize(final byte[] token) {
+  public static int[] normalize(final byte[] token) {
     final IntList list = new IntList(token.length);
     forEachCp(token, cp -> FTToken.normalize(cp, list));
     return list.finish();

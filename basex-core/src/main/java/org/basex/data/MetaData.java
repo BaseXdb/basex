@@ -69,6 +69,12 @@ public final class MetaData {
   public String ftinclude;
   /** Full-text index: string values of mixed-content elements. */
   public boolean ftmixed;
+  /** Full-text index: numbers of segments, oldest first ({@code null} if not segmented). */
+  public String ftsegments;
+  /** Full-text index: log length, references, covered IDs ({@code null} if not segmented). */
+  public String ftbuffer;
+  /** Full-text index: indicates if unsegmented index will be adopted as first segment. */
+  public boolean ftadopt;
 
   /** Flag for full-text stemming. */
   public boolean stemming;
@@ -162,6 +168,9 @@ public final class MetaData {
     tokeninclude = meta.tokeninclude;
     ftinclude = meta.ftinclude;
     ftmixed = meta.ftmixed;
+    ftsegments = meta.ftsegments;
+    ftbuffer = meta.ftbuffer;
+    ftadopt = meta.ftadopt;
     stemming = meta.stemming;
     casesens = meta.casesens;
     diacritics = meta.diacritics;
@@ -530,6 +539,8 @@ public final class MetaData {
         case DBTOKINC -> tokeninclude = v;
         case DBFTXINC -> ftinclude = v;
         case DBFTMIX -> ftmixed = isTrue(v);
+        case DBFTXSEGS -> ftsegments = v;
+        case DBFTXBUF -> ftbuffer = v;
         case DBCRTTXT -> createtext = isTrue(v);
         case DBCRTATV -> createattr = isTrue(v);
         case DBCRTTOK -> createtoken = isTrue(v);
@@ -579,6 +590,8 @@ public final class MetaData {
     writeInfo(out, DBTOKINC,   tokeninclude);
     writeInfo(out, DBFTXINC,   ftinclude);
     writeInfo(out, DBFTMIX,    ftmixed);
+    if(ftsegments != null) writeInfo(out, DBFTXSEGS, ftsegments);
+    if(ftbuffer != null) writeInfo(out, DBFTXBUF, ftbuffer);
     writeInfo(out, DBCRTTXT,   createtext);
     writeInfo(out, DBCRTATV,   createattr);
     writeInfo(out, DBCRTTOK,   createtoken);
@@ -596,6 +609,15 @@ public final class MetaData {
     final Language ln = language();
     if(ln != null) writeInfo(out, DBFTLN, ln.toString());
     out.write(0);
+  }
+
+  /**
+   * Indicates if the full-text index can be stored in the old format, which older versions can
+   * read: a segmented index holds node IDs, and a mixed-content index element references.
+   * @return result of check
+   */
+  public boolean legacy() {
+    return ftsegments == null && !(ftindex && ftmixed);
   }
 
   /**
@@ -618,7 +640,8 @@ public final class MetaData {
       attrindex = false;
       tokenindex = false;
     }
-    ftindex = false;
+    // only a segmented, or adoptable, full-text index survives updates
+    if(ftsegments == null && !ftadopt) ftindex = false;
   }
 
   /**

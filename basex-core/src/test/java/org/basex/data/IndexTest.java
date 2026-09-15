@@ -1,6 +1,7 @@
 package org.basex.data;
 
 import static org.basex.query.func.Function.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 
@@ -52,11 +53,18 @@ public final class IndexTest extends SandboxTest {
     query(ft, "first entry\nsecond entry");
     query(_DB_TEXT.args(NAME, "third one"), "third one");
 
-    // the update invalidates the full-text index; the text index is kept if it is updatable
+    // the update invalidates the indexes, unless they are updatable: the full-text index of the
+    // old version is then adopted as first segment
     query("replace value of node " + _DB_GET.args(NAME) + "//b with 'new entry'");
-    query(_DB_INFO.args(NAME) + "//ftindex/text()", false);
+    query(_DB_INFO.args(NAME) + "//ftindex/text()", updindex);
     query(_DB_INFO.args(NAME) + "//textindex/text()", updindex);
-    if(updindex) query(_DB_TEXT.args(NAME, "new entry"), "new entry");
+    if(updindex) {
+      query(ft, "first entry\nnew entry");
+      query(_DB_TEXT.args(NAME, "new entry"), "new entry");
+      final IOFile db = context.soptions.dbPath(NAME);
+      assertTrue(new IOFile(db, "ftx0x.basex").exists());
+      assertFalse(new IOFile(db, "ftxx.basex").exists());
+    }
     query(_DB_OPTIMIZE.args(NAME));
     query(_DB_INFO.args(NAME) + "//ftindex/text()", true);
     query(ft, "first entry\nnew entry");

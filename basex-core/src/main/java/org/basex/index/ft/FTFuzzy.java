@@ -21,8 +21,6 @@ final class FTFuzzy {
   /** Infinity (avoids overflows). */
   private static final int INF = Integer.MAX_VALUE / 2;
 
-  /** Token data (see {@link FTIndex}). */
-  private final DataAccess dataY;
   /** Normalized codepoints of the query token. */
   private final int[] query;
   /** Maximum number of errors. */
@@ -37,15 +35,11 @@ final class FTFuzzy {
 
   /**
    * Constructor.
-   * @param dataY token data
    * @param token query token
    * @param errors number of allowed errors (dynamic calculation if the value is {@code 0})
    */
-  FTFuzzy(final DataAccess dataY, final byte[] token, final int errors) {
-    this.dataY = dataY;
-    final IntList list = new IntList(token.length);
-    Token.forEachCp(token, cp -> FTToken.normalize(cp, list));
-    query = list.finish();
+  FTFuzzy(final byte[] token, final int errors) {
+    query = Levenshtein.normalize(token);
 
     final int ql = query.length;
     if(errors > 0) {
@@ -80,13 +74,25 @@ final class FTFuzzy {
   }
 
   /**
+   * Checks if a token is similar to the query token.
+   * @param token token
+   * @return result of check
+   */
+  boolean similar(final byte[] token) {
+    final int[] norm = Levenshtein.normalize(token);
+    if(rejectShort && norm.length < 4) return false;
+    return k == 0 ? Arrays.equals(norm, query) : Levenshtein.distance(norm, query, k) != -1;
+  }
+
+  /**
    * Collects the offsets of all similar tokens in a length group.
+   * @param dataY token data (see {@link FTIndex})
    * @param start offset of first entry
    * @param end offset of last entry (exclusive)
    * @param tl token length
    * @return offsets of matching entries
    */
-  IntList offsets(final int start, final int end, final int tl) {
+  IntList offsets(final DataAccess dataY, final int start, final int end, final int tl) {
     final IntList list = new IntList();
     final int ql = query.length, w = tl + FTIndex.ENTRY;
     // byte offsets and normalized lengths of the codepoint prefixes of the last token
@@ -129,7 +135,7 @@ final class FTFuzzy {
         p += w;
       } else {
         // skip all tokens that start with the dead prefix
-        p = skip(p + w, end, token, b, w);
+        p = skip(dataY, p + w, end, token, b, w);
       }
     }
     return list;
@@ -168,6 +174,7 @@ final class FTFuzzy {
 
   /**
    * Returns the offset of the first token that does not start with the dead prefix.
+   * @param dataY token data
    * @param from offset of the first candidate
    * @param end offset of last entry (exclusive)
    * @param token current token (its first {@code pl} bytes are the dead prefix)
@@ -175,18 +182,19 @@ final class FTFuzzy {
    * @param w width of an index entry
    * @return offset of the first entry with a larger prefix
    */
-  private int skip(final int from, final int end, final byte[] token, final int pl, final int w) {
+  private static int skip(final DataAccess dataY, final int from, final int end,
+      final byte[] token, final int pl, final int w) {
     // gallop, then binary search: cheap for short skips, logarithmic for long ones
     final int e = (end - from) / w;
     int s = 0, step = 1;
-    while(s + step <= e && compare(from + (s + step - 1) * w, token, pl) <= 0) {
+    while(s + step <= e && compare(dataY, from + (s + step - 1) * w, token, pl) <= 0) {
       s += step;
       step <<= 1;
     }
     int t = Math.min(e, s + step);
     while(s < t) {
       final int m = s + t >>> 1;
-      if(compare(from + m * w, token, pl) > 0) t = m;
+      if(compare(dataY, from + m * w, token, pl) > 0) t = m;
       else s = m + 1;
     }
     return from + s * w;
@@ -194,12 +202,14 @@ final class FTFuzzy {
 
   /**
    * Compares the prefix at the specified offset with the prefix of the current token.
+   * @param dataY token data
    * @param offset offset of the token to compare
    * @param token current token
    * @param pl prefix length
    * @return result of comparison (-1, 0, 1)
    */
-  private int compare(final int offset, final byte[] token, final int pl) {
+  private static int compare(final DataAccess dataY, final int offset, final byte[] token,
+      final int pl) {
     return Token.compare(dataY.readBytes(offset, pl), 0, pl, token, 0, pl);
   }
 }

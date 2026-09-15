@@ -4,14 +4,16 @@ import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
+import java.util.stream.*;
 
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.*;
 
 /**
  * This test class performs random incremental updates with random documents.
@@ -26,24 +28,53 @@ public final class UpdIndexRandomTest extends SandboxTest {
   private static final int RUNS = 500;
 
   /**
+   * Test parameters: main memory flag, full-text index flag, mixed-content flag.
+   * @return parameters
+   */
+  public static Stream<Arguments> params() {
+    return Stream.of(
+      Arguments.of(true, false, false),
+      Arguments.of(false, false, false),
+      Arguments.of(false, true, false),
+      Arguments.of(false, true, true)
+    );
+  }
+
+  /**
    * Initializes the test.
    * @param mainmem main memory flag
+   * @param ftindex full-text index flag
+   * @param ftmixed mixed-content flag
    */
-  public void init(final boolean mainmem) {
+  public void init(final boolean mainmem, final boolean ftindex, final boolean ftmixed) {
     set(MainOptions.MAINMEM, mainmem);
     set(MainOptions.UPDINDEX, true);
     set(MainOptions.ATTRINDEX, false);
+    set(MainOptions.FTINDEX, ftindex);
+    set(MainOptions.FTMIXED, ftmixed);
+    set(MainOptions.FTINCLUDE, ftmixed ? "a" : "");
     execute(new CreateDB(NAME));
+  }
+
+  /**
+   * Finishes the test.
+   */
+  @AfterEach public void finish() {
+    set(MainOptions.FTINDEX, false);
+    set(MainOptions.FTMIXED, false);
+    set(MainOptions.FTINCLUDE, "");
   }
 
   /**
    * Incremental test.
    * @param mainmem main memory flag
+   * @param ftindex full-text index flag
+   * @param ftmixed mixed-content flag
    */
   @ParameterizedTest
-  @ValueSource(booleans = {true, false})
-  public void insertInto(final boolean mainmem) {
-    init(mainmem);
+  @MethodSource("params")
+  public void insertInto(final boolean mainmem, final boolean ftindex, final boolean ftmixed) {
+    init(mainmem, ftindex, ftmixed);
 
     final Random rnd = new Random(0);
 
@@ -88,6 +119,11 @@ public final class UpdIndexRandomTest extends SandboxTest {
       // compare index access and scan for a word of the current and of another document
       queryIndexScan("//a[text() = '" + words.get(offset) + "']");
       queryIndexScan("//a[text() = '" + words.get(rnd.nextInt(cap)) + "']");
+      if(ftindex) {
+        final String step = ftmixed ? "//a[. contains text '" : "//a[text() contains text '";
+        queryIndexScan(step + words.get(offset) + "']");
+        queryIndexScan(step + words.get(rnd.nextInt(cap)) + "']");
+      }
     }
   }
 }
