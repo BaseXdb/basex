@@ -87,6 +87,12 @@ public enum Records {
     field("get", FuncType.get(Types.STRING_O, Types.POSITIVE_INTEGER_O,
       ChoiceItemType.get(BasicType.POSITIVE_INTEGER, BasicType.STRING).seqType()).seqType())),
   /** Record definition. */
+  PROC_RESULT(PROC_URI, "result",
+    field("output", Types.STRING_OR_BASE64_BINARY_O),
+    field("error", Types.STRING_O),
+    field("code", Types.INTEGER_ZO)
+  ),
+  /** Record definition. */
   RANDOM_NUMBER_GENERATOR(FN_URI, "random-number-generator"),
   /** Record definition. */
   SCHEMA_TYPE(FN_URI, "schema-type"),

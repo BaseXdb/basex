@@ -1737,7 +1737,8 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _PROC_EXECUTE(ProcExecute::new, "execute(command, arguments?, options?)",
-      params(STRING_O, STRING_ZM, MAP_ZO), ELEMENT_O, flag(NDT), PROC_URI, Perm.ADMIN),
+      params(STRING_O, STRING_ZM, MAP_ZO), Records.PROC_RESULT.get().seqType(), flag(NDT),
+      PROC_URI, Perm.ADMIN),
   /** XQuery function. */
   _PROC_FORK(ProcFork::new, "fork(command, arguments?, options?)",
       params(STRING_O, STRING_ZM, MAP_ZO),
@@ -1753,7 +1754,8 @@ public enum Function implements AFunction {
       params(), STRING_ZM, flag(NDT), PROC_URI, Perm.CREATE),
   /** XQuery function. */
   _PROC_SYSTEM(ProcSystem::new, "system(command, arguments?, options?)",
-      params(STRING_O, STRING_ZM, MAP_ZO), STRING_O, flag(NDT), PROC_URI, Perm.ADMIN),
+      params(STRING_O, STRING_ZM, MAP_ZO), STRING_OR_BASE64_BINARY_O, flag(NDT), PROC_URI,
+      Perm.ADMIN),
 
   // Profiling Module
 

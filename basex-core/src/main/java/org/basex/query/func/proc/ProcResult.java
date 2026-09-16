@@ -2,7 +2,7 @@ package org.basex.query.func.proc;
 
 import java.io.*;
 
-import org.basex.util.*;
+import org.basex.io.out.*;
 
 /**
  * Process result.
@@ -12,13 +12,27 @@ import org.basex.util.*;
  */
 final class ProcResult {
   /** Process output. */
-  final TokenBuilder output = new TokenBuilder();
+  final ArrayOutput output = new ArrayOutput();
   /** Process error. */
-  final TokenBuilder error = new TokenBuilder();
+  final ArrayOutput error = new ArrayOutput();
+  /** Options. */
+  final ProcOptions options;
+  /** Encoding (can be {@code null}). */
+  final String encoding;
   /** Process exception (can be {@code null}). */
   IOException exception;
   /** Exit code. */
   int code;
+
+  /**
+   * Constructor.
+   * @param options options
+   * @param encoding encoding (can be {@code null})
+   */
+  ProcResult(final ProcOptions options, final String encoding) {
+    this.options = options;
+    this.encoding = encoding;
+  }
 
   /**
    * Assigns an exception if none has been assigned yet.

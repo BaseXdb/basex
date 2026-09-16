@@ -1,7 +1,11 @@
 package org.basex.query.func.proc;
 
 import org.basex.query.*;
-import org.basex.query.value.node.*;
+import org.basex.query.func.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
+import org.basex.query.value.seq.*;
+import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -11,17 +15,13 @@ import org.basex.query.value.node.*;
  */
 public final class ProcExecute extends ProcFn {
   @Override
-  public FNode value(final QueryContext qc) throws QueryException {
+  public XQMap value(final QueryContext qc) throws QueryException {
     final ProcResult result = exec(qc, false);
+    final TokenBuilder error = new TokenBuilder(error(result));
     final boolean ex = result.exception != null;
-    if(ex) result.error.add(result.exception.getMessage());
-    final byte[] output = result.output.normalize().finish();
-    final byte[] error = result.error.normalize().finish();
+    if(ex) error.add(Util.message(result.exception));
 
-    final FBuilder root = FElem.build(Q_RESULT);
-    if(output.length != 0) root.node(FElem.build(Q_OUTPUT).text(output));
-    if(error.length != 0) root.node(FElem.build(Q_ERROR).text(error));
-    if(!ex) root.node(FElem.build(Q_CODE).text(result.code));
-    return root.finish();
+    return XQMap.get(Records.PROC_RESULT.get(), output(result), Str.get(error.finish()),
+      ex ? Empty.VALUE : Itr.get(result.code));
   }
 }

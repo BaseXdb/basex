@@ -157,6 +157,10 @@ public final class Types {
   public static final SeqType STRING_OR_BINARY_O = STRING_OR_BINARY.seqType();
   /** Zero or one string or xs:hex-binary or xs:base64-binary. */
   public static final SeqType STRING_OR_BINARY_ZO = STRING_OR_BINARY.seqType(ZERO_OR_ONE);
+  /** String or xs:base64-binary. */
+  public static final Type STRING_OR_BASE64_BINARY = ChoiceItemType.get(STRING, BASE64_BINARY);
+  /** Single string or xs:base64-binary. */
+  public static final SeqType STRING_OR_BASE64_BINARY_O = STRING_OR_BASE64_BINARY.seqType();
 
   /** XNode, string, or binary item (used by db:put). */
   public static final Type XNODE_OR_STRING_OR_BINARY = ChoiceItemType.get(XNODE, STRING_OR_BINARY);

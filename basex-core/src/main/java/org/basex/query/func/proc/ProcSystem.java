@@ -14,14 +14,13 @@ import org.basex.query.value.item.*;
  */
 public final class ProcSystem extends ProcFn {
   @Override
-  public Str value(final QueryContext qc) throws QueryException {
+  public Item value(final QueryContext qc) throws QueryException {
     final ProcResult result = exec(qc, false);
     if(result.exception != null) throw PROC_ERROR_X.get(info, result.exception);
-    if(result.code == 0) return Str.get(result.output.normalize().finish());
+    if(result.code == 0) return output(result);
 
     // create error message
     final QNm name = new QNm("code" + String.format("%04d", result.code), QueryText.PROC_URI);
-    result.error.normalize();
-    throw new QueryException(info, name, string(result.error.normalize().finish()));
+    throw new QueryException(info, name, string(error(result)));
   }
 }
