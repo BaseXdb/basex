@@ -971,6 +971,12 @@ public enum Function implements AFunction {
   _MATH_COS(MathCos::new, "cos(radians)",
       params(DOUBLE_ZO), DOUBLE_ZO, MATH_URI),
   /** XQuery function. */
+  _MATH_COSH(MathCosh::new, "cosh(value)",
+      params(DOUBLE_ZO), DOUBLE_ZO, MATH_URI),
+  /** XQuery function. */
+  _MATH_E(MathE::new, "e()",
+      params(), DOUBLE_O, MATH_URI),
+  /** XQuery function. */
   _MATH_EXP(MathExp::new, "exp(value)",
       params(DOUBLE_ZO), DOUBLE_ZO, MATH_URI),
   /** XQuery function. */
@@ -992,22 +998,13 @@ public enum Function implements AFunction {
   _MATH_SIN(MathSin::new, "sin(radians)",
       params(DOUBLE_ZO), DOUBLE_ZO, MATH_URI),
   /** XQuery function. */
+  _MATH_SINH(MathSinh::new, "sinh(value)",
+      params(DOUBLE_ZO), DOUBLE_ZO, MATH_URI),
+  /** XQuery function. */
   _MATH_SQRT(MathSqrt::new, "sqrt(value)",
       params(DOUBLE_ZO), DOUBLE_ZO, MATH_URI),
   /** XQuery function. */
   _MATH_TAN(MathTan::new, "tan(radians)",
-      params(DOUBLE_ZO), DOUBLE_ZO, MATH_URI),
-
-  // Math Module (custom)
-
-  /** XQuery function. */
-  _MATH_COSH(MathCosh::new, "cosh(value)",
-      params(DOUBLE_ZO), DOUBLE_ZO, MATH_URI),
-  /** XQuery function. */
-  _MATH_E(MathE::new, "e()",
-      params(), DOUBLE_O, MATH_URI),
-  /** XQuery function. */
-  _MATH_SINH(MathSinh::new, "sinh(value)",
       params(DOUBLE_ZO), DOUBLE_ZO, MATH_URI),
   /** XQuery function. */
   _MATH_TANH(MathTanh::new, "tanh(value)",
