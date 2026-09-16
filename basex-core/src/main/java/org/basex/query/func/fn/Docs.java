@@ -126,9 +126,9 @@ public abstract class Docs extends DynamicFn {
     final boolean xsiLocation = !skip &&
         (bool.test(CommonOptions.USE_XSI_SCHEMA_LOCATION) ||
          bool.test(MainOptions.XSILOCATION.name()));
-    // external resources are fetched in trusted mode, and always by the internal DTD parser
+    // external resources are only fetched in trusted mode, or if they are mapped by a catalog
     final boolean trusted = trusted(options, CommonOptions.TRUST_EXTERNAL, qc);
-    if(trusted && (dtd || xinclude || dtdVal || xsiLocation) || intparse && dtd) {
+    if(trusted && (dtd || xinclude || dtdVal || xsiLocation)) {
       checkPerm(qc, Perm.CREATE);
     }
 

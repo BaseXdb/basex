@@ -28,6 +28,9 @@ public final class PermissionTest extends SandboxTest {
   private static final String FOLDER = "src/test/resources/";
   /** Test repository. **/
   private static final String REPO = FOLDER + "repo/";
+  /** Query that parses a document with a catalog-mapped DTD. */
+  private static final String CATALOG_QUERY = "declare option db:catalog '" + FOLDER
+      + "catalog/catalog.xml'; parse-xml(\"<!DOCTYPE xml SYSTEM 'http://dtd.dtd'><doc/>\")";
 
   /** Server reference. */
   private static BaseXServer server;
@@ -205,7 +208,8 @@ public final class PermissionTest extends SandboxTest {
     // fn:parse-xml: external resources require CREATE permission
     ok(new XQuery("parse-xml('<x/>')"), testSession);
     no(new XQuery("parse-xml('<x/>', { 'trust-external': true() })"), testSession);
-    no(new XQuery("parse-xml('<x/>', { 'intparse': true() })"), testSession);
+    ok(new XQuery("parse-xml('<x/>', { 'intparse': true() })"), testSession);
+    no(new XQuery(CATALOG_QUERY), testSession);
   }
 
   /**
@@ -447,6 +451,7 @@ public final class PermissionTest extends SandboxTest {
     ok(new BinaryPut("file.bin", sandbox() + "file"), testSession);
     ok(new XQuery("parse-xml('<x/>', { 'intparse': true(), 'trust-external': true() })"),
         testSession);
+    ok(new XQuery(CATALOG_QUERY), testSession);
     ok(new InfoIndex(), testSession);
     for(final CmdIndex cmd : CmdIndex.values()) {
       ok(new DropIndex(cmd), testSession);

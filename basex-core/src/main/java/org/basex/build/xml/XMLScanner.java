@@ -10,6 +10,7 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.build.*;
+import org.basex.build.xml.SAXHandler.*;
 import org.basex.core.*;
 import org.basex.core.jobs.*;
 import org.basex.io.*;
@@ -51,6 +52,8 @@ final class XMLScanner extends Job {
 
   /** Index for all entity names. */
   private final TokenObjectMap<byte[]> ents = new TokenObjectMap<>();
+  /** Index for external entities (resolved when referenced). */
+  private final TokenObjectMap<IO> extEnts = new TokenObjectMap<>();
   /** Index for all PEReferences. */
   private final TokenObjectMap<byte[]> pents = new TokenObjectMap<>();
   /** Declared attributes per element name (for default values and value normalization). */
@@ -66,6 +69,8 @@ final class XMLScanner extends Job {
   private record AttDecl(boolean tokenized, byte[] value) { }
   /** DTD flag. */
   private final boolean dtd;
+  /** Whether external resources may be accessed. */
+  private final boolean trusted;
   /** Parse fragment. */
   private final boolean fragment;
 
@@ -91,6 +96,7 @@ final class XMLScanner extends Job {
    */
   XMLScanner(final IO file, final MainOptions opts, final boolean fragment) throws IOException {
     this.fragment = fragment;
+    trusted = opts.isTrusted();
     input = new XMLInput(file);
 
     try {
@@ -520,7 +526,15 @@ final class XMLScanner extends Job {
     if(!e) return concat(cpToken('&'), name, SEMI);
 
     byte[] en = ents.get(name);
-    if(en == null) en = getEntity(name);
+    if(en == null) {
+      final IO io = extEnts.get(name);
+      if(io != null) {
+        en = external(io);
+        ents.put(name, en);
+      } else {
+        en = getEntity(name);
+      }
+    }
     return en == null ? REPLACEMENT : en;
   }
 
@@ -661,7 +675,16 @@ final class XMLScanner extends Job {
     if(!s()) throw error(ERRDT);
 
     name(true); // parse root element
-    s(); externalID(true, true); s();
+    s();
+    final IO io = externalID(true);
+    if(io != null) {
+      final XMLInput tin = input;
+      input = new XMLInput(new IOContent(external(io), io.path()));
+      extSubsetDecl();
+      if(!consume((char) 0)) throw error(INVEND);
+      input = tin;
+    }
+    s();
 
     while(consume('[')) {
       s();
@@ -674,12 +697,10 @@ final class XMLScanner extends Job {
   /**
    * Scans an external ID.
    * @param full full flag
-   * @param root root flag
-   * @return ID or {@code null}
+   * @return referenced resource, or {@code null} if no system literal was scanned
    * @throws IOException I/O exception
    */
-  private byte[] externalID(final boolean full, final boolean root) throws IOException {
-    byte[] content = null;
+  private IO externalID(final boolean full) throws IOException {
     final boolean pub = consume(PUBLIC);
     if(pub || consume(SYSTEM)) {
       checkS();
@@ -692,46 +713,45 @@ final class XMLScanner extends Job {
         int ch;
         final TokenBuilder tok = new TokenBuilder();
         while((ch = nextChar()) != qu) tok.add(ch);
-        if(!full) return null;
-        final String name = string(tok.finish());
-        if(!dtd && root) return null;
-
-        final XMLInput tin = input;
-        if(dtd) {
-          try {
-            content = input.io().merge(name).read();
-          } catch(final IOException ex) {
-            throw (BuildException) error(Util.message(ex)).initCause(ex);
-          }
-        } else {
-          content = new byte[0];
-        }
-        input = new XMLInput(new IOContent(content, name));
-
-        if(consume(XDECL)) {
-          check(XML); s();
-          if(version()) checkS();
-          s();
-          if(encoding() == null) throw error(TEXTENC);
-          ch = nextChar();
-          if(s(ch)) ch = nextChar();
-          if(ch != '?') throw error(WRONGCHAR, '?', ch);
-          ch = nextChar();
-          if(ch != '>') throw error(WRONGCHAR, '>', ch);
-          content = Arrays.copyOfRange(content, (int) input.pos(), content.length);
-        }
-
-        s();
-        if(root) {
-          extSubsetDecl();
-          if(!consume((char) 0)) throw error(INVEND);
-        }
-        input = tin;
-      } else {
-        if(full) throw error(SCANQUOTE, (char) qu);
-        prev(1);
+        return full ? input.io().merge(string(tok.finish())) : null;
       }
+      if(full) throw error(SCANQUOTE, (char) qu);
+      prev(1);
     }
+    return null;
+  }
+
+  /**
+   * Reads an external entity and strips its text declaration. [77]
+   * @param io resource
+   * @return content
+   * @throws IOException I/O exception
+   */
+  private byte[] external(final IO io) throws IOException {
+    if(!dtd) return EMPTY;
+    if(!trusted) throw TrustedViolationException.entity(io.url(), false).wrap();
+    byte[] content;
+    try {
+      content = io.read();
+    } catch(final IOException ex) {
+      throw (BuildException) error("%: %", io.url(), Util.message(ex)).initCause(ex);
+    }
+
+    final XMLInput tin = input;
+    input = new XMLInput(new IOContent(content, io.path()));
+    if(consume(XDECL)) {
+      check(XML); s();
+      if(version()) checkS();
+      s();
+      if(encoding() == null) throw error(TEXTENC);
+      int ch = nextChar();
+      if(s(ch)) ch = nextChar();
+      if(ch != '?') throw error(WRONGCHAR, '?', ch);
+      ch = nextChar();
+      if(ch != '>') throw error(WRONGCHAR, '>', ch);
+      content = Arrays.copyOfRange(content, (int) input.pos(), content.length);
+    }
+    input = tin;
     return content;
   }
 
@@ -794,26 +814,29 @@ final class XMLScanner extends Job {
         checkS();
         byte[] val = entityValue(true); //[74]
         if(val == null) {
-          val = externalID(true, false);
-          if(val == null) throw error(INVEND);
+          final IO io = externalID(true);
+          if(io == null) throw error(INVEND);
+          val = external(io);
         }
         s();
         pents.put(key, val);
       } else { // [71] GEDecl
         final byte[] key = name(true);
         checkS();
-        byte[] val = entityValue(false); // [73] EntityDef
-        if(val == null) {
-          val = externalID(true, false);
-          if(val == null) throw error(INVEND);
+        final byte[] val = entityValue(false); // [73] EntityDef
+        if(val != null) {
+          ents.put(key, val);
+        } else {
+          final IO io = externalID(true);
+          if(io == null) throw error(INVEND);
           if(s()) {
             check(ND);
             checkS();
             name(true);
           }
+          extEnts.put(key, io);
         }
         s();
-        ents.put(key, val);
       }
       check('>');
       pe = true;
@@ -883,7 +906,7 @@ final class XMLScanner extends Job {
     } else if(consume(NOTA)) { // [82]
       checkS();
       name(true);
-      s(); externalID(false, false); s();
+      s(); externalID(false); s();
       check('>');
     } else if(consume(XMLToken.COMM_O)) {
       comment();

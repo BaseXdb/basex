@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 
 import java.io.*;
 
+import javax.xml.catalog.*;
 import javax.xml.transform.sax.*;
 
 import org.basex.build.*;
@@ -59,14 +60,22 @@ public final class SAXWrapper extends SingleParser {
       final boolean dtdValidation = options.get(MainOptions.DTDVALIDATION);
       if(!trusted && options.get(MainOptions.XINCLUDE))
         throw new TrustedViolationException("xinclude");
+
+      final EntityResolver er = options.resolver().entityResolver();
       if(!trusted && (dtd || dtdValidation)) {
-        // block external resource access
+        // block external resource access, unless the resource is mapped by a catalog
         reader.setEntityResolver((pubId, sysId) -> {
-          throw new TrustedViolationException(sysId != null ? sysId : pubId != null ? pubId : "");
+          final InputSource mapped = mapped(er, pubId, sysId);
+          if(mapped == null) throw TrustedViolationException.entity(
+              sysId != null ? sysId : pubId != null ? pubId : "", dtdValidation);
+          saxh.resource = mapped.getSystemId();
+          return mapped;
         });
       } else if(reader.getEntityResolver() == null) {
-        final EntityResolver er = options.resolver().entityResolver();
-        if(er != null) reader.setEntityResolver(er);
+        reader.setEntityResolver((pubId, sysId) -> {
+          saxh.resource = sysId;
+          return er != null ? er.resolveEntity(pubId, sysId) : null;
+        });
       }
 
       saxh = new SAXHandler(builder, options.get(MainOptions.STRIPWS),
@@ -74,6 +83,7 @@ public final class SAXWrapper extends SingleParser {
       reader.setDTDHandler(saxh);
       reader.setContentHandler(saxh);
       reader.setProperty("http://xml.org/sax/properties/lexical-handler", saxh);
+      reader.setProperty("http://xml.org/sax/properties/declaration-handler", saxh);
       reader.setErrorHandler(saxh);
 
       reader.parse(is);
@@ -84,17 +94,42 @@ public final class SAXWrapper extends SingleParser {
           spex.getColumnNumber()) + COLS + Util.message(spex);
       throw new IOException(msg, ex);
     } catch(final TrustedViolationException ex) {
-      throw new IOException(Util.info(EXTACCESS_BLOCKED_X, ex.getMessage()), ex);
+      throw ex.wrap();
     } catch(final JobException ex) {
       throw ex;
     } catch(final Exception ex) {
-      // invalid document encoding, catalog raises an error, ...
+      // invalid document encoding, catalog raises an error, external resource cannot be opened...
       final String msg = ex.getCause() != null ? ex.getCause().getMessage() : Util.message(ex);
-      throw new IOException(source.path() + ": " + msg, ex);
+      final String path = saxh != null && saxh.resource != null ? saxh.resource : source.path();
+      throw new IOException(path + ": " + msg, ex);
     } finally {
       try(Reader r = is.getCharacterStream()) { /* no action */ }
       try(InputStream ist = is.getByteStream()) { /* no action */ }
     }
+  }
+
+  /**
+   * Returns the input source of a resource that is mapped by a catalog.
+   * @param er entity resolver (can be {@code null})
+   * @param pubId public ID (can be {@code null})
+   * @param sysId system ID (can be {@code null})
+   * @return input source, or {@code null} if the resource is not mapped
+   * @throws SAXException SAX exception
+   * @throws IOException I/O exception
+   */
+  private static InputSource mapped(final EntityResolver er, final String pubId,
+      final String sysId) throws SAXException, IOException {
+    if(er == null) return null;
+    final InputSource is;
+    try {
+      is = er.resolveEntity(pubId, sysId);
+    } catch(final CatalogException ex) {
+      Util.debug(ex);
+      return null;
+    }
+    // resolvers may return the original resource if no mapping exists
+    final String id = is != null ? is.getSystemId() : null;
+    return id != null && !id.equals(sysId) ? is : null;
   }
 
   /**

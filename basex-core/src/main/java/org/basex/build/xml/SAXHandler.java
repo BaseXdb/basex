@@ -3,13 +3,14 @@ package org.basex.build.xml;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.util.*;
 
 import org.basex.build.*;
+import org.basex.core.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 import org.xml.sax.*;
 import org.xml.sax.ext.*;
-import org.xml.sax.helpers.*;
 
 /**
  * SAX Parser wrapper.
@@ -17,7 +18,7 @@ import org.xml.sax.helpers.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class SAXHandler extends DefaultHandler implements LexicalHandler {
+public final class SAXHandler extends DefaultHandler2 {
   /** Builder reference. */
   private final Builder builder;
 
@@ -41,10 +42,14 @@ public final class SAXHandler extends DefaultHandler implements LexicalHandler {
   private int textLine;
   /** Column number of the cached text. */
   private int textColumn;
+  /** Names of declared external general entities. */
+  private final HashSet<String> externals = new HashSet<>();
   /** DTD flag. */
   private boolean dtd;
   /** Element counter. */
   int nodes;
+  /** External resource that is currently being opened (can be {@code null}). */
+  String resource;
 
   /**
    * Constructor. The document node is opened and closed by the caller.
@@ -246,7 +251,23 @@ public final class SAXHandler extends DefaultHandler implements LexicalHandler {
 
   /*public void endPrefixMapping(String prefix) { } */
   /*public void ignorableWhitespace(char[] ch, int s, int l) { } */
-  /*public void skippedEntity(String name) { } */
+
+  @Override
+  public void skippedEntity(final String name) {
+    // undeclared general entity: resolve HTML entity or add replacement character (see XMLScanner)
+    final char ch = name.charAt(0);
+    if(ch == '%' || ch == '[' || externals.contains(name)) return;
+    final byte[] entity = XMLToken.getEntity(token(name));
+    final char[] chars = entity != null ? string(entity).toCharArray() : new char[] { REPLACEMENT };
+    characters(chars, 0, chars.length);
+  }
+
+  // DeclHandler
+
+  @Override
+  public void externalEntityDecl(final String name, final String pid, final String sid) {
+    externals.add(name);
+  }
 
   // ErrorHandler
 
@@ -270,16 +291,9 @@ public final class SAXHandler extends DefaultHandler implements LexicalHandler {
   }
 
   @Override
-  public void endCDATA() { /* ignored. */ }
-
-  @Override
-  public void endEntity(final String entity) { /* ignored. */ }
-
-  @Override
-  public void startCDATA() { /* ignored. */ }
-
-  @Override
-  public void startEntity(final String entity) { /* ignored. */ }
+  public void startEntity(final String entity) {
+    resource = null;
+  }
 
   /** Validation exception: wrap a SAXParseException such that it can be recognized as a validation
    * exception.
@@ -302,6 +316,26 @@ public final class SAXHandler extends DefaultHandler implements LexicalHandler {
      */
     public TrustedViolationException(final String resource) {
       super(resource);
+    }
+
+    /**
+     * Creates an exception for a blocked DTD or external entity.
+     * @param resource blocked resource identifier
+     * @param validation DTD validation flag
+     * @return exception
+     */
+    public static TrustedViolationException entity(final String resource,
+        final boolean validation) {
+      return new TrustedViolationException(resource + "; enable 'trust-external'" +
+          (validation ? "" : " or disable 'dtd'"));
+    }
+
+    /**
+     * Wraps this exception in an I/O exception.
+     * @return I/O exception
+     */
+    public IOException wrap() {
+      return new IOException(Util.info(Text.EXTACCESS_BLOCKED_X, getMessage()), this);
     }
   }
 }

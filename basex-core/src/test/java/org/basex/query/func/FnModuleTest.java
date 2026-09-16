@@ -3747,6 +3747,17 @@ return
     error(func.args(dtd + "<a>&amp;e;</a>", " { 'trust-external': false() }"), EXTERNALRESOURCE_X);
     query(func.args(dtd + "<a>&amp;e;</a>", " { 'trust-external': true() }"), "<a><b/></a>");
     query(func.args(dtd + "<a>&amp;e;</a>", " { 'dtd': false() }"), "<a/>");
+    error(func.args(dtd + "<a>&amp;e;</a>", " { 'intparse': true(), 'trust-external': false() }"),
+        EXTERNALRESOURCE_X);
+    query(func.args(dtd + "<a>&amp;e;</a>", " { 'intparse': true(), 'trust-external': true() }"),
+        "<a><b/></a>");
+    query(func.args(dtd + "<a>&amp;e;</a>", " { 'intparse': true(), 'dtd': false() }"), "<a/>");
+    // undeclared entities: HTML entity or replacement character
+    final String undeclared = "<!DOCTYPE a SYSTEM 'unknown.dtd'><a>&amp;nbsp;&amp;x;</a>";
+    query(func.args(undeclared, " { 'dtd': false() }"), "<a>\u00A0\uFFFD</a>");
+    query(func.args(undeclared, " { 'dtd': false(), 'intparse': true() }"), "<a>\u00A0\uFFFD</a>");
+    error(func.args(undeclared), EXTERNALRESOURCE_X);
+    error(func.args(undeclared, " { 'intparse': true() }"), EXTERNALRESOURCE_X);
     query(func.args(dtd + "<a>&amp;e;</a>", " { 'dtd': true(), 'trust-external': true() }"),
         "<a><b/></a>");
     query(func.args(dtd + "<b>&amp;e;</b>", " { 'dtd': true(), 'trust-external': true() }"),

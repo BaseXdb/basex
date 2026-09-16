@@ -333,7 +333,7 @@ public final class MainOptions extends Options {
    * @param options main options
    */
   public void setResolver(final MainOptions options) {
-    final XMLResolver rslvr = options.resolver;
+    final XMLResolver rslvr = options.resolver();
     put(CATALOG, rslvr.catalog());
     resolver = rslvr;
   }
