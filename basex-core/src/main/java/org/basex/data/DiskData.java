@@ -314,6 +314,13 @@ public final class DiskData extends Data {
     return da.readNum(value & Compress.COMPRESS - 1, Compress.compressed(value));
   }
 
+  @Override
+  public boolean validText(final int pre, final boolean text) {
+    final long value = textRef(pre);
+    return Inline.inlined(value) ||
+        (value & Compress.COMPRESS - 1) < (text ? texts : values).length();
+  }
+
   /**
    * Returns a text (text, comment, pi) or attribute value.
    * @param offset text offset

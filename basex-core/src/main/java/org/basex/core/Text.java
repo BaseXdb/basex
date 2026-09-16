@@ -488,7 +488,7 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPINSPECT = {
-    "", lang("c_inspect1"), lang("c_inspect2")
+    "([" + S_NAME + "])", lang("c_inspect1"), lang("c_inspect2")
   };
   /** Command help. */
   String[] HELPSET = {

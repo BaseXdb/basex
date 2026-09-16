@@ -568,6 +568,14 @@ public abstract class Data {
    */
   public abstract int textLen(int pre, boolean text);
 
+  /**
+   * Checks if the reference to a text (text, comment, pi, document) or attribute value is valid.
+   * @param pre PRE value
+   * @param text text/attribute flag
+   * @return result of check
+   */
+  public abstract boolean validText(int pre, boolean text);
+
   // UPDATE OPERATIONS ============================================================================
 
   /**

@@ -63,6 +63,18 @@ public enum Records {
     field("offset", Types.INTEGER_O)
   ),
   /** Record definition. */
+  INSPECTION_ISSUE(DB_URI, "inspection-issue",
+    field("check", Types.STRING_O),
+    field("count", Types.INTEGER_O),
+    field("first", Types.INTEGER_ZO)
+  ),
+  /** Record definition. */
+  INSPECTION_RESULT(DB_URI, "inspection-result",
+    field("nodes", Types.INTEGER_O),
+    field("valid", Types.BOOLEAN_O),
+    field("issues", INSPECTION_ISSUE.get().seqType(Occ.ZERO_OR_MORE))
+  ),
+  /** Record definition. */
   LOAD_XQUERY_MODULE(FN_URI, "load-xquery-module",
     field("variables", MapType.get(BasicType.QNAME, Types.ITEM_ZM).seqType()),
     field("functions", MapType.get(BasicType.QNAME,

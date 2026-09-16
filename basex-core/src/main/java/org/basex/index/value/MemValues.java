@@ -112,7 +112,8 @@ public final class MemValues extends ValueIndex {
     final byte[] token = entries.token();
 
     return new EntryIterator() {
-      final int s = values.size();
+      // the token set may contain values of deleted nodes that have no index entries
+      final int s = Math.min(values.size(), lenList.size() - 1);
       int p;
 
       @Override

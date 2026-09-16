@@ -814,6 +814,20 @@ public final class DbModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void inspect() {
+    final Function func = _DB_INSPECT;
+    query(func.args(NAME) + "?valid", true);
+    query("empty(" + func.args(NAME) + "?issues)", true);
+    query(func.args(NAME) + "?nodes = count(" + _DB_GET.args(NAME) +
+        " ! (descendant-or-self::node(), descendant::*/@*))", true);
+
+    execute(new CreateDB(NAME, "<a b='c'>d<!--e--><?f g?></a>"));
+    query(func.args(NAME) + " instance of db:inspection-result-record", true);
+    query(func.args(NAME) + "?nodes", 6);
+    error(func.args(NAME + "unknown"), DB_GET2_X);
+  }
+
+  /** Test method. */
   @Test public void list() {
     // add documents
     final Function func = _DB_LIST;

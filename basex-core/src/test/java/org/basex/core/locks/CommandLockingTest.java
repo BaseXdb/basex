@@ -92,6 +92,7 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new InfoIndex(), false, CTX_LIST);
     ckDBs(new InfoStorage(), false, CTX_LIST);
     ckDBs(new Inspect(), false, CTX_LIST);
+    ckDBs(new Inspect(NAME), false, NAME_LIST);
     ckDBs(new Kill(NAME), true, USER_LIST);
     ckDBs(new List(), false, null);
     ckDBs(new List(NAME), false, NAME_LIST);
@@ -256,6 +257,7 @@ public final class CommandLockingTest extends SandboxTest {
   @Test public void db() {
     // General Functions
     ckDBs(new XQuery(_DB_INFO.args(NAME)), false, NAME_LIST);
+    ckDBs(new XQuery(_DB_INSPECT.args(NAME)), false, NAME_LIST);
     ckDBs(new XQuery(_DB_LIST.args(NAME)), false, NAME_LIST);
     ckDBs(new XQuery(_DB_LIST_DETAILS.args(NAME)), false, NAME_LIST);
     ckDBs(new XQuery(_DB_LIST_DETAILS.args()), false, null);

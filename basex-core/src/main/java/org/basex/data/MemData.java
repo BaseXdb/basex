@@ -143,6 +143,12 @@ public final class MemData extends Data {
   }
 
   @Override
+  public boolean validText(final int pre, final boolean text) {
+    final long value = textRef(pre);
+    return value > 0 && value <= values(text).size();
+  }
+
+  @Override
   public boolean inMemory() {
     return true;
   }

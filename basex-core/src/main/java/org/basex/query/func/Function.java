@@ -1367,6 +1367,9 @@ public enum Function implements AFunction {
   _DB_INFO(DbInfo::new, "info(database)",
       params(STRING_O), ELEMENT_O, flag(NDT, CNS), DB_URI),
   /** XQuery function. */
+  _DB_INSPECT(DbInspect::new, "inspect(database)",
+      params(STRING_O), Records.INSPECTION_RESULT.get().seqType(), flag(NDT), DB_URI),
+  /** XQuery function. */
   _DB_LIST(DbList::new, "list(database?, path?)",
       params(STRING_ZO, STRING_ZO), STRING_ZM, flag(NDT), DB_URI),
   /** XQuery function. */

@@ -126,8 +126,8 @@ final class XMLParser extends CommandParser {
       return new InfoIndex(value(root, TYPE));
     if(e.equals(INFO_STORAGE) && check(root, START + '?', END + '?'))
       return new InfoStorage(value(root, START), value(root, END));
-    if(e.equals(INSPECT) && check(root))
-      return new Inspect();
+    if(e.equals(INSPECT) && check(root, NAME + '?'))
+      return new Inspect(value(root, NAME));
     if(e.equals(KILL) && check(root, TARGET))
       return new Kill(value(root, TARGET));
     if(e.equals(LIST) && check(root, NAME + '?', PATH + '?'))

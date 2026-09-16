@@ -96,7 +96,7 @@ final class StringParser extends CommandParser {
           yield new InfoStorage(arg1, arg1 != null ? number() : null);
         }
       };
-      case INSPECT -> new Inspect();
+      case INSPECT -> new Inspect(name(null));
       case CLOSE -> new Close();
       case LIST -> new List(name(null), string(null));
       case DIR -> new Dir(string(null));
