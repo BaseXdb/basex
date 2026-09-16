@@ -84,6 +84,11 @@ public final class JavaFunctionTest extends SandboxTest {
         "let $a := (Set:add(128), Set:add(128)) return Set:size()", 1);
     query("import module namespace Set = 'java.util.HashSet'; " +
         "let $a := Set:add\u00b7java.lang.Object(128) return Set:size()", 1);
+
+    // an imported class is only addressed as module by the importing query
+    query("xquery:eval(\"import module namespace set = 'java:java.util.HashSet'; set:size()\"), " +
+        "xquery:eval(\"declare namespace set = 'java:java.util.HashSet'; set:new()\")",
+        "0\njava:java.util.HashSet#0");
   }
 
   /** Tests importing a Java class. */

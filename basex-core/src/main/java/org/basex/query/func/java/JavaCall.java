@@ -354,10 +354,10 @@ public abstract class JavaCall extends Arr {
       final String className = classPath(enforce ? uri.substring(JAVA_PREFIX_COLON.length()) :
         Strings.uriToClasspath(Strings.uri2path(uri)));
 
-      // function in imported Java module
+      // function in Java module imported by the calling module
       final ModuleLoader modules = qc.resources.modules();
       final Object module  = modules.findModule(className);
-      if(module != null) {
+      if(module != null && info.sc().imports.contains(qname.uri())) {
         final Method meth = moduleMethod(module, name, args.length, types, qname, qc, info);
         final Requires req = meth.getAnnotation(Requires.class);
         final Perm perm = req == null ? Perm.ADMIN :
