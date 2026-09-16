@@ -2,6 +2,7 @@ package org.basex.query.func.file;
 
 import java.io.*;
 import java.nio.file.*;
+import java.nio.file.attribute.*;
 
 import org.basex.core.jobs.*;
 import org.basex.query.*;
@@ -24,7 +25,7 @@ public final class FileDelete extends FileFn {
       if(recursive) {
         delete(path, qc);
       } else {
-        Files.delete(path);
+        delete(path);
       }
     }
     return Empty.VALUE;
@@ -46,6 +47,23 @@ public final class FileDelete extends FileFn {
         }
       }
     }
-    Files.delete(path);
+    delete(path);
+  }
+
+  /**
+   * Deletes a single path and removes a DOS read-only attribute that prevents the deletion.
+   * @param path path to be deleted
+   * @throws IOException I/O exception
+   */
+  private static void delete(final Path path) throws IOException {
+    try {
+      Files.delete(path);
+    } catch(final AccessDeniedException ex) {
+      final DosFileAttributeView view = Files.getFileAttributeView(path,
+          DosFileAttributeView.class, LinkOption.NOFOLLOW_LINKS);
+      if(view == null || !view.readAttributes().isReadOnly()) throw ex;
+      view.setReadOnly(false);
+      Files.delete(path);
+    }
   }
 }

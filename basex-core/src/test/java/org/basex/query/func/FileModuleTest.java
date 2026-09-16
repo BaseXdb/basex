@@ -219,6 +219,17 @@ public final class FileModuleTest extends SandboxTest {
     // raise no error if file does not exist
     query(func.args(PATH1, true));
     query(func.args(PATH1));
+
+    // read-only files
+    query(_FILE_CREATE_DIR.args(PATH3));
+    query(_FILE_WRITE.args(PATH4, " ()"));
+    assertTrue(new File(PATH4).setReadOnly());
+    query(func.args(PATH4));
+    query(_FILE_EXISTS.args(PATH4), false);
+    query(_FILE_WRITE.args(PATH4, " ()"));
+    assertTrue(new File(PATH4).setReadOnly());
+    query(func.args(PATH1, true));
+    query(_FILE_EXISTS.args(PATH1), false);
   }
 
   /** Test method. */
