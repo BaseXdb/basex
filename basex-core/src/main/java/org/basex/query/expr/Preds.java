@@ -147,7 +147,8 @@ public abstract class Preds extends Arr {
       if(predStep.axis == Axis.SELF && !predStep.mayBePositional() &&
           root instanceof final Step rootStep && !mayBePositional()) {
         final Test test = rootStep.test.intersect(predStep.test);
-        if(test != null) {
+        // an intersection may be less specific than the merged tests (e.g., for records)
+        if(test != null && test.instanceOf(rootStep.test) && test.instanceOf(predStep.test)) {
           cc.info(OPTMERGE_X, predStep);
           rootStep.test = test;
           rootStep.assignType(null);
@@ -219,7 +220,7 @@ public abstract class Preds extends Arr {
     SeqType st = root.seqType();
     for(final Expr expr : exprs) {
       if(expr instanceof final Instance inst && inst.arg(0) instanceof ContextValue) {
-        st = st.intersect(inst.seqType.with(st.occ));
+        st = st.intersect(inst.seqType.matched().with(st.occ));
         // E[. instance of xs:integer][. instance of xs:string] → ()
         if(st == null) return true;
       }

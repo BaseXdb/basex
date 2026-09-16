@@ -82,7 +82,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
         for(int p = 0; p < pl; p++) {
           final Var param = params[p];
           final SeqType cst = callTypes[p], pst = param.seqType();
-          if(!cst.eq(pst) && cst.instanceOf(pst)) {
+          if(!cst.eq(pst) && cst.instanceOf(pst, true)) {
             param.declType = cst;
             refined = true;
           }
@@ -111,7 +111,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       if(callTypes != null) {
         for(int p = 0; p < pl; p++) {
           final Var param = params[p];
-          if(callTypes[p].instanceOf(param.seqType())) param.declType = null;
+          if(callTypes[p].instanceOf(param.seqType(), true)) param.declType = null;
         }
       }
       if(!cc.dynamic) declType = null;

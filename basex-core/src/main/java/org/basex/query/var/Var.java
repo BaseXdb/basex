@@ -175,10 +175,11 @@ public final class Var extends ExprInfo {
       if(declType.occ.intersect(st.occ) == null) {
         throw typeError(declType, st, null, name, info);
       }
-      if(st.instanceOf(declType)) {
+      if(st.instanceOf(declType, true)) {
         if(cc != null) cc.info(OPTTYPE_X, this);
         declType = null;
-      } else if(!st.promotable(declType)) {
+      } else if(!st.promotable(declType) || ShapeType.rebuilds(st.type, declType.type)) {
+        // coercion rebuilds records: the bound type provides no information on the result
         return;
       }
     }
@@ -221,7 +222,7 @@ public final class Var extends ExprInfo {
    * @return {@code true} if the check could be adopted, {@code false} otherwise
    */
   public boolean adoptCheck(final SeqType st) {
-    if(declType != null && !st.instanceOf(declType)) return declType.instanceOf(st);
+    if(declType != null && !st.instanceOf(declType)) return declType.instanceOf(st, true);
     declType = st;
     return true;
   }

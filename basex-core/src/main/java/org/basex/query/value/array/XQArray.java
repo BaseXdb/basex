@@ -333,7 +333,7 @@ public abstract class XQArray extends XQStruct {
   @Override
   public final boolean instanceOf(final Type tp, final boolean coerce) {
     if(coerce && tp instanceof FuncType) return type == tp;
-    if(type.instanceOf(tp)) return true;
+    if(type.instanceOf(tp) && !(coerce && ShapeType.rebuilds(type, tp))) return true;
 
     final SeqType mt;
     if(tp instanceof final ArrayType at) {
@@ -347,7 +347,7 @@ public abstract class XQArray extends XQStruct {
     if(!mt.eq(Types.ITEM_ZM)) {
       // check types of values
       for(final Value value : members()) {
-        if(!mt.instance(value)) return false;
+        if(!mt.instance(value, coerce)) return false;
       }
     }
     return true;

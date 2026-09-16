@@ -117,8 +117,9 @@ public final class JNodeTest extends Test {
     // <no/>/self::jnode(no)
     if(kn != kind) return Boolean.FALSE;
     // { 'yes': () }/self::jnode(yes), { 'maybe': () }/self::jnode(no)
-    if(type instanceof final NodeType ntype && ntype.test instanceof final JNodeTest jt)
-      return jt.instanceOf(this);
+    if(type instanceof final NodeType ntype && ntype.test instanceof final JNodeTest jt) {
+      return jt.instanceOf(this) ? Boolean.TRUE : jt.intersect(this) == null ? Boolean.FALSE : null;
+    }
     // ([], [ 'x' ])/*/self::jnode(1)
     return null;
   }

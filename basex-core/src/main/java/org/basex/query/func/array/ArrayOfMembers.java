@@ -30,7 +30,7 @@ public final class ArrayOfMembers extends ArrayFn {
   protected Expr opt(final CompileContext cc) {
     final Type type = arg(0).seqType().type;
     if(type instanceof final NodeType nt && nt.test instanceof final JNodeTest jnt) {
-      exprType.assign(ArrayType.get(jnt.valueType));
+      exprType.assign(ArrayType.get(jnt.valueType.matched()));
     }
     return this;
   }

@@ -17,6 +17,9 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class Treat extends Single {
+  /** Sequence type to check. */
+  private final SeqType check;
+
   /**
    * Constructor.
    * @param info input info (can be {@code null})
@@ -24,44 +27,42 @@ public final class Treat extends Single {
    * @param seqType sequence type
    */
   public Treat(final InputInfo info, final Expr expr, final SeqType seqType) {
-    super(info, expr, seqType);
+    super(info, expr, seqType.matched());
+    check = seqType;
   }
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    final SeqType st = seqType(), et = expr.seqType();
-
     // skip check if return type is already correct
-    if(et.instanceOf(st)) return cc.replaceWith(this, expr);
+    if(expr.seqType().instanceOf(check)) return cc.replaceWith(this, expr);
     return expr instanceof Value ? cc.preEval(this) : this;
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value value = expr.value(qc);
-    final SeqType st = seqType();
-    if(st.instance(value)) return value;
-    throw NOTREAT_X_X_X.get(info, expr.seqType(), st, expr);
+    if(check.instance(value)) return value;
+    throw NOTREAT_X_X_X.get(info, expr.seqType(), check, expr);
   }
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
-    return copyType(new Treat(info, expr.copy(cc, vm), seqType()));
+    return copyType(new Treat(info, expr.copy(cc, vm), check));
   }
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof final Treat trt && seqType().eq(trt.seqType()) &&
+    return this == obj || obj instanceof final Treat trt && check.eq(trt.check) &&
         super.equals(obj);
   }
 
   @Override
   public void toXml(final QueryPlan plan) {
-    plan.add(plan.create(this, AS, seqType()), expr);
+    plan.add(plan.create(this, AS, check), expr);
   }
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token("(").token(expr).token(TREAT).token(AS).token(seqType()).token(')');
+    qs.token("(").token(expr).token(TREAT).token(AS).token(check).token(')');
   }
 }

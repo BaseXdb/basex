@@ -226,8 +226,8 @@ public final class TypeswitchGroup extends Single {
     final int sl = seqTypes.length;
     if(var == null || sl == 0) return;
 
-    SeqType st = seqTypes[0];
-    for(int s = 1; s < sl; s++) st = st.union(seqTypes[s]);
+    SeqType st = seqTypes[0].matched();
+    for(int s = 1; s < sl; s++) st = st.union(seqTypes[s].matched());
     var.refineType(st, cc);
   }
 

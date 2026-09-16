@@ -33,7 +33,7 @@ public final class WebDAVLocks extends StandardFunc {
     fields.put(Token.token("timeout"), new ShapeField(Types.INTEGER_O));
     fields.put(Token.token("expires"), new ShapeField(Types.DATE_TIME_O));
     fields.put(Token.token("owner"), new ShapeField(Types.ELEMENT_ZO));
-    LOCK = new ShapeType(fields).seqType();
+    LOCK = new RecordType(fields).seqType();
     LOCKS = MapType.get(BasicType.STRING, LOCK).seqType();
   }
 

@@ -6,6 +6,7 @@ import static org.basex.query.func.Function.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -54,7 +55,9 @@ public final class ShapeGet extends Single {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return toMap(expr, qc).valueAt(index - 1);
+    final XQMap map = toMap(expr, qc);
+    assert type.layout(map) : "Map " + map.type + " has no layout of " + type + ": " + this;
+    return map.valueAt(index - 1);
   }
 
   @Override

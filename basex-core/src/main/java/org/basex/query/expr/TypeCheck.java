@@ -50,7 +50,7 @@ public final class TypeCheck extends Single {
     }
 
     final SeqType et = expr.seqType(), nst = et.with(st.occ);
-    cardinality = nst.instanceOf(st);
+    cardinality = nst.instanceOf(st, true);
 
     // refine type check (ignore arrays as coerced result may have a different size)
     if(!et.mayBeWrapped() || !type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) {
@@ -84,7 +84,7 @@ public final class TypeCheck extends Single {
     }
 
     // skip check if return type is correct
-    if(et.instanceOf(st)) {
+    if(et.instanceOf(st, true)) {
       // (1, 3) coerce to xs:integer* → (1, 3)
       cc.info(OPTTYPE_X_X, st, expr);
       return expr;
@@ -146,7 +146,7 @@ public final class TypeCheck extends Single {
    * @return resulting expression, or {@code null} if no type check is necessary
    */
   public Expr check(final Expr ex, final SeqType st, final CompileContext cc) {
-    if(ex.seqType().instanceOf(st)) return null;
+    if(ex.seqType().instanceOf(st, true)) return null;
     try {
       return new TypeCheck(info, ex, st).optimize(cc);
     } catch(final QueryException qe) {

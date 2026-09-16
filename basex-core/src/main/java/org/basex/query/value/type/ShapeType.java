@@ -4,7 +4,6 @@ import static java.util.Collections.*;
 
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
@@ -260,49 +259,36 @@ public class ShapeType extends MapType {
 
   @Override
   public final boolean eq(final Type type) {
-    return eq(type, emptySet(), false);
+    return eq(type, emptySet());
   }
 
   @Override
   public final boolean equals(final Object obj) {
-    return this == obj || obj instanceof final ShapeType sh && eq(sh, emptySet(), true);
+    return this == obj || obj instanceof final ShapeType sh && eq(sh, emptySet());
   }
 
   /**
-   * Checks if this type is equal to the given one.
+   * Checks if this type is equal to the given one, including the field order.
    * @param type other type
    * @param pairs pairs of ShapeTypes that are currently being checked, or have been checked before
-   * @param strict strict comparison (consider field order)
    * @return result of check
    */
-  private boolean eq(final Type type, final Set<Pair> pairs, final boolean strict) {
+  private boolean eq(final Type type, final Set<Pair> pairs) {
     if(this == type) return true;
     if(!(type instanceof final ShapeType sh)) return false;
     // record() (empty record) and record(*) (any record) must remain distinct
-    if(this == Types.RECORD != (sh == Types.RECORD) ||
-        declared() != sh.declared() || fields.size() != sh.fields.size()) return false;
+    if(this == Types.RECORD != (sh == Types.RECORD) || declared() != sh.declared() ||
+        !sameOrder(sh)) return false;
 
-    final Predicate<byte[]> compareFields = key -> {
-      final ShapeField rf1 = fields.get(key), rf2 = sh.fields.get(key);
-      if(rf1 == null || rf2 == null) return false;
-      final SeqType st1 = rf1.seqType(), st2 = rf2.seqType();
+    for(final byte[] key : fields) {
+      final SeqType st1 = fields.get(key).seqType(), st2 = sh.fields.get(key).seqType();
       if(st1.occ != st2.occ) return false;
       final Type tp1 = TypeRef.deref(st1.type), tp2 = TypeRef.deref(st2.type);
       if(tp1 instanceof final ShapeType sh1 && tp2 instanceof final ShapeType sh2) {
         final Pair pair = new Pair(sh1, sh2);
-        return pairs.contains(pair) || sh1.eq(sh2, pair.addTo(pairs), strict);
-      }
-      return tp1.eq(tp2);
-    };
-
-    if(strict) {
-      final Iterator<byte[]> iter = fields.iterator(), iter2 = sh.fields.iterator();
-      for(byte[] key; (key = iter.next()) != null;) {
-        if(!Token.eq(key, iter2.next()) || !compareFields.test(key)) return false;
-      }
-    } else {
-      for(final byte[] key : fields) {
-        if(!compareFields.test(key)) return false;
+        if(!pairs.contains(pair) && !sh1.eq(sh2, pair.addTo(pairs))) return false;
+      } else if(!tp1.eq(tp2)) {
+        return false;
       }
     }
     return true;
@@ -310,22 +296,33 @@ public class ShapeType extends MapType {
 
   @Override
   public final boolean instanceOf(final Type type) {
-    return instanceOf(TypeRef.deref(type), emptySet());
+    // lookups on maps with a static shape access fields by position: the order must be the same
+    return instanceOf(TypeRef.deref(type), emptySet(), true);
+  }
+
+  /**
+   * Checks if a record of this type matches the given type, irrespective of the field order.
+   * @param type type to be checked
+   * @return result of check
+   */
+  public final boolean matches(final Type type) {
+    return instanceOf(TypeRef.deref(type), emptySet(), false);
   }
 
   /**
    * Checks if the current type is an instance of the specified type.
    * @param type type to be checked
    * @param pairs pairs of ShapeTypes that are currently being checked, or have been checked before
+   * @param ordered require the same field order
    * @return result of check
    */
-  private boolean instanceOf(final Type type, final Set<Pair> pairs) {
+  private boolean instanceOf(final Type type, final Set<Pair> pairs, final boolean ordered) {
     if(this == type || type.oneOf(Types.MAP, Types.FUNCTION, BasicType.ITEM)) {
       return true;
     }
     if(type instanceof final ChoiceItemType cit) {
       for(final Type tp : cit.types) {
-        if(instanceOf(TypeRef.deref(tp), pairs)) return true;
+        if(instanceOf(TypeRef.deref(tp), pairs, ordered)) return true;
       }
       return false;
     }
@@ -336,18 +333,24 @@ public class ShapeType extends MapType {
     if(type instanceof final ShapeType sh) {
       // an inferred shape is not an instance of a record (the annotation is an extra guarantee)
       if(sh.declared() && !declared()) return false;
-      if(fields.size() != sh.fields.size()) return false;
+      // record(*) has an unknown field set: it is only an instance of record(*)
+      if(any()) return false;
+      if(ordered ? !sameOrder(sh) : !subFields(sh)) return false;
       for(final byte[] key : sh.fields) {
-        if(!fields.contains(key)) return false;
-        final SeqType fst = fields.get(key).seqType(), shfst = sh.fields.get(key).seqType();
+        // fields that are missing in this type admit the empty sequence (see subFields)
+        final ShapeField field = fields.get(key);
+        if(field == null) continue;
+        final SeqType fst = field.seqType(), shfst = sh.fields.get(key).seqType();
         if(fst != shfst) {
           final Type ft = TypeRef.deref(fst.type), shft = TypeRef.deref(shfst.type);
           if(ft instanceof final ShapeType sh1 && shft instanceof final ShapeType sh2 &&
               !fst.emptyType()) {
             if(!fst.occ.instanceOf(shfst.occ)) return false;
             final Pair pair = new Pair(sh1, sh2);
-            if(!pairs.contains(pair) && !sh1.instanceOf(sh2, pair.addTo(pairs))) return false;
-          } else if(!fst.instanceOf(shfst)) {
+            if(!pairs.contains(pair) && !sh1.instanceOf(sh2, pair.addTo(pairs), ordered)) {
+              return false;
+            }
+          } else if(ordered ? !fst.instanceOf(shfst) : !fst.matches(shfst)) {
             return false;
           }
         }
@@ -388,7 +391,7 @@ public class ShapeType extends MapType {
     if(instanceOf(type)) return type;
 
     if(type instanceof final ShapeType sh) {
-      if(sameFields(sh)) {
+      if(sameOrder(sh)) {
         final TokenObjectMap<ShapeField> map = new TokenObjectMap<>();
         for(final byte[] key : fields) {
           final SeqType fst = fields.get(key).seqType(), shfst = sh.fields.get(key).seqType();
@@ -427,6 +430,83 @@ public class ShapeType extends MapType {
     return true;
   }
 
+  /**
+   * Checks whether the given shape declares all fields of this shape, and whether its other fields
+   * admit the empty sequence.
+   * @param sh other shape
+   * @return result of check
+   */
+  private boolean subFields(final ShapeType sh) {
+    for(final byte[] key : fields) {
+      if(!sh.fields.contains(key)) return false;
+    }
+    for(final byte[] key : sh.fields) {
+      if(!fields.contains(key) && sh.fields.get(key).seqType().oneOrMore()) return false;
+    }
+    return true;
+  }
+
+  /**
+   * Checks if the entries of a map are arranged in the order of the fields of this shape.
+   * @param map map
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  public final boolean layout(final XQStruct map) throws QueryException {
+    final int fs = fields.size();
+    if(map.structSize() != fs) return false;
+    for(int f = 0; f < fs; f++) {
+      final Item key = map.keyAt(f);
+      if(!key.type.isStringOrUntyped() || !Token.eq(key.string(null), fields.key(f + 1))) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Checks if coercion to the target type rebuilds records of the given type.
+   * @param type type
+   * @param target target type
+   * @return result of check
+   */
+  public static boolean rebuilds(final Type type, final Type target) {
+    return records(target) && !TypeRef.deref(type).eq(TypeRef.deref(target));
+  }
+
+  /**
+   * Checks if the specified type contains a record type.
+   * @param type type
+   * @return result of check
+   */
+  private static boolean records(final Type type) {
+    final Type tp = TypeRef.deref(type);
+    if(tp instanceof final ShapeType sh) return sh.declared() && !sh.any();
+    if(tp instanceof final ArrayType at) return records(at.valueType().type);
+    if(tp instanceof final MapType mt) return records(mt.valueType().type);
+    if(tp instanceof final FuncType ft) return ft.declType != null && records(ft.declType.type);
+    if(tp instanceof final ChoiceItemType cit) {
+      for(final Type t : cit.types) {
+        if(records(t)) return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Checks whether this shape and the given one declare the same field names in the same order.
+   * @param sh other shape
+   * @return result of check
+   */
+  private boolean sameOrder(final ShapeType sh) {
+    if(fields.size() != sh.fields.size()) return false;
+    final Iterator<byte[]> iter = fields.iterator(), iter2 = sh.fields.iterator();
+    for(byte[] key; (key = iter.next()) != null;) {
+      if(!Token.eq(key, iter2.next())) return false;
+    }
+    return true;
+  }
+
   @Override
   public final Type intersect(final Type type) {
     return type == this ? this : intersect(type, emptySet());
@@ -453,11 +533,17 @@ public class ShapeType extends MapType {
           if(is == null) return null;
           map.put(key, new ShapeField(is));
         }
+        // records with another field order can match both types: no shape can be assigned
+        if(!sameOrder(sh)) {
+          return MapType.get(keyType().union(sh.keyType()), valueType().union(sh.valueType()));
+        }
         final ShapeType st = name() != null || !sh.declared() || sh.name() == null && declared() ?
           this : sh;
         return st.with(map);
       }
-      return null;
+      // records with missing fields can match both types: no shape can be assigned
+      return declared() && sh.declared() && (subFields(sh) || sh.subFields(this)) ?
+        MapType.get(keyType().union(sh.keyType()), valueType().union(sh.valueType())) : null;
     }
     if(type instanceof final MapType mt) {
       if(mt.keyType().intersect(BasicType.STRING) == null) return null;

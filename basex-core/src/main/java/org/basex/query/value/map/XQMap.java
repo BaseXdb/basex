@@ -284,10 +284,12 @@ public abstract class XQMap extends XQStruct {
 
     try {
       // a map matches a record type only if it is a record, i.e. if it carries a record annotation
-      if(tp instanceof ShapeType) {
-        return type instanceof RecordType && type.instanceOf(tp);
+      if(tp instanceof final ShapeType sh) {
+        // coercion to a record type creates a record with the field order of that type
+        return type instanceof final RecordType rt &&
+            (coerce && !sh.any() ? rt.equals(sh) : rt.matches(sh));
       }
-      if(type.instanceOf(tp)) return true;
+      if(type.instanceOf(tp) && !(coerce && ShapeType.rebuilds(type, tp))) return true;
 
       final Type kt;
       final SeqType vt;
@@ -303,7 +305,8 @@ public abstract class XQMap extends XQStruct {
         return false;
       }
       return kt == null && vt == null || test((key, value) ->
-        (kt == null || kt.seqType().instance(key, coerce)) && (vt == null || vt.instance(value)));
+        (kt == null || kt.seqType().instance(key, coerce)) &&
+        (vt == null || vt.instance(value, coerce)));
     } catch(final QueryException ex) {
       throw Util.notExpected(ex);
     }

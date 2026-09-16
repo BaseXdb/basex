@@ -194,10 +194,15 @@ public final class RecordTest extends SandboxTest {
     query("declare record local:c(a, b); "
         + "fn($r as record(*)) { count(map:keys($r)) }(local:c(1, 2))", 2);
     error("fn($r as record(*)) { count(map:keys($r)) }({ 'a': 1, 'b': 2 })", INVTYPE_X);
+    // record(*) is no subtype of a concrete record type
+    query("fn($r as record()) { 1 } instance of fn(record(*)) as item()*", false);
+    query("fn($r as record(c as xs:integer?)) { 1 } instance of fn(record(*)) as item()*", false);
+    query("fn($r as record(*)) { 1 } instance of fn(record(*)) as item()*", true);
 
-    // record subtyping is width-invariant: the field-name sets must match
+    // a record matches a record type with additional fields that admit the empty sequence
     query("let $r as record(x, y) := { 'x': 1, 'y': 2 } return $r instance of record(x)", false);
-    query("let $r as record(x) := { 'x': 1 } return $r instance of record(x, y)", false);
+    query("let $r as record(x) := { 'x': 1 } return $r instance of record(x, y)", true);
+    query("let $r as record(x) := { 'x': 1 } return $r instance of record(x, y as item())", false);
     // field types are covariant
     query("let $r as record(x as xs:integer) := { 'x': 1 } "
         + "return $r instance of record(x as xs:decimal)", true);
@@ -686,6 +691,118 @@ public final class RecordTest extends SandboxTest {
     // missing field whose type does not admit the empty sequence is an error
     error("let $m as record(a as xs:integer) := {} return $m", INVTYPE_X);
     error("let $m as record(a, b as xs:integer) := { 'a': 1 } return $m", INVTYPE_X);
+
+    // a record of a subtype is annotated with the required type, whether inlined or not
+    final String prolog = "declare record local:A(a as xs:integer); "
+        + "declare record local:B(a as xs:decimal); ";
+    for(final String inline : new String[] { "", "%basex:inline(0) " }) {
+      query(prolog + "declare " + inline + "function local:f($r as local:B) { "
+          + "$r instance of local:A }; local:f(local:A(1))", false);
+    }
+    query(prolog + "let $r as local:B := local:A(1) return $r instance of local:A", false);
+    query(prolog + "let $a as array(local:B) := [ local:A(1) ] "
+        + "return $a instance of array(local:A)", false);
+    query(prolog + "let $r as local:A := local:A(1) return $r instance of local:A", true);
+  }
+
+  /** Records whose type declares the same fields in another order. */
+  @Test public void fieldOrder() {
+    final String prolog = "declare record local:AB(a as xs:integer, b as xs:integer); "
+        + "declare record local:BA(b as xs:integer, a as xs:integer); "
+        + "declare record local:N(r as local:AB); "
+        + "declare record local:M(r as local:BA); "
+        + "declare %basex:inline(0) function local:ab() as local:AB { local:AB(1, 2) }; "
+        + "declare %basex:inline(0) function local:item() as item() { local:ab() }; ";
+
+    // the record matches both types
+    query(prolog + "local:ab() instance of local:BA", true);
+    query(prolog + "local:item() instance of local:BA", true);
+    query(prolog + "[ local:item() ] instance of array(local:BA)", true);
+    query(prolog + "local:N(local:item()) instance of local:M", true);
+
+    // coercion creates a record with the field order of the required type
+    for(final String input : new String[] { "local:ab()", "local:item()" }) {
+      query(prolog + "declare function local:f($r as local:BA) { $r?a }; "
+          + "local:f(" + input + ")", 1);
+      query(prolog + "declare %basex:inline(0) function local:f($r as local:BA) { $r?a }; "
+          + "local:f(" + input + ")", 1);
+      query(prolog + "declare %basex:inline(0) function local:f($r as local:BA) { map:keys($r) }; "
+          + "local:f(" + input + ")", "b\na");
+      query(prolog + "declare %basex:inline(0) function local:f() as local:BA { " + input + " }; "
+          + "map:keys(local:f())", "b\na");
+      query(prolog + "let $r as local:BA := " + input + " return ($r?a, map:keys($r))", "1\nb\na");
+      query(prolog + "let $a as array(local:BA) := [ " + input + " ] return $a(1)?a", 1);
+      query(prolog + "let $m as map(*) := { 'x': " + input + " } "
+          + "let $c as map(xs:string, local:BA) := $m return $c?x?a", 1);
+      query(prolog + "let $n as local:M := local:N(" + input + ") return $n?r?a", 1);
+    }
+
+    // no coercion: lookups must not rely on the field order of the checked type
+    query(prolog + "(local:item() treat as local:BA)?a", 1);
+    query(prolog + "(local:ab() treat as local:BA)?a", 1);
+    query(prolog + "typeswitch(local:item()) case $r as local:BA return $r?a default return 0", 1);
+    query(prolog + "typeswitch(local:ab()) case $r as local:BA return $r?a default return 0", 1);
+    query(prolog + "(local:item()[. instance of local:BA])?a", 1);
+    final String items = "(local:item(), 'x')";
+    query(prolog + items + "[. instance of local:BA]?a", 1);
+    query(prolog + "for $r in " + items + " where $r instance of local:BA return $r?a", 1);
+    query(prolog + "for $i in " + items + " return typeswitch($i) "
+        + "case $r as local:BA return $r?a default return ()", 1);
+    query(prolog + "([ local:item() ], 'x')[. instance of array(local:BA)] ! .(1)?a", 1);
+    query(prolog + "array:of-members(jtree([ local:item(), 'x' ])/jnode(*, local:BA))(1)?a", 1);
+    query(prolog + "count(jtree([ local:item() ])/jnode(*, local:AB)/self::jnode(*, local:BA))", 1);
+    query(prolog + "let $t := jtree([ local:item() ]) "
+        + "return count($t/jnode(*, local:AB) intersect $t/jnode(*, local:BA))", 1);
+    // steps with record tests are not merged into a test that accepts plain maps
+    query(prolog + "count(jtree([ map:merge({ 'a': 1, 'b': local:item()?b }) ])"
+        + "/jnode(*, local:AB)/self::jnode(*, local:BA))", 0);
+
+    // nested record types are compared irrespective of the field order
+    query(prolog + "declare record local:NA(r as array(local:AB)); "
+        + "declare record local:MA(r as array(local:BA)); "
+        + "let $n := local:NA([ local:item() ]) "
+        + "return ($n instance of local:MA, (let $m as local:MA := $n return $m?r(1)?a))",
+        "true\n1");
+
+    // the parameters of a function are coerced when it is called
+    final String func = "declare %basex:inline(0) function local:f() as item() { "
+        + "fn($r as local:AB) { $r?a } }; ";
+    query(prolog + func + "local:f() instance of fn(local:BA) as item()*", true);
+    query(prolog + func + "let $f as fn(local:BA) as item()* := local:f() "
+        + "return $f(local:BA(2, 1))", 1);
+    // the result of a function is coerced if the function is coerced
+    final String result = "declare %basex:inline(0) function local:g() as item() { "
+        + "fn() as local:AB { local:ab() } }; ";
+    query(prolog + result + "local:g() instance of fn() as local:BA", true);
+    query(prolog + result + "let $g as fn() as local:BA := local:g() "
+        + "return ($g()?a, map:keys($g()))", "1\nb\na");
+    query(prolog + "for $i in 1 to 2 "
+        + "return (if($i = 1) then local:ab() else local:BA(2, 1))?a", "1\n1");
+  }
+
+  /** Records whose type lacks fields that admit the empty sequence. */
+  @Test public void missingFields() {
+    final String prolog = "declare record local:A(a as xs:integer); "
+        + "declare record local:AC(a as xs:integer, c as xs:integer?); "
+        + "declare record local:CA(c as xs:integer?, a as xs:integer); "
+        + "declare record local:AD(a as xs:integer, d as xs:integer); "
+        + "declare %basex:inline(0) function local:a() as item() { local:A(1) }; ";
+
+    // the record matches types whose additional fields admit the empty sequence
+    query(prolog + "local:a() instance of local:AC", true);
+    query(prolog + "local:a() instance of local:CA", true);
+    query(prolog + "local:a() instance of local:AD", false);
+    query(prolog + "local:A(1) instance of local:AC", true);
+    query(prolog + "local:A(1) instance of record(a as xs:integer, c)", true);
+    query(prolog + "local:A(1) instance of record(c)", false);
+    query(prolog + "(local:a() treat as local:AC)?a", 1);
+    query(prolog + "(local:a() treat as local:AC)?c", "");
+    query(prolog + "typeswitch(local:a()) case $r as local:CA return $r?a default return 0", 1);
+
+    // coercion adds the missing fields
+    query(prolog + "let $r as local:AC := local:a() return ($r?c, map:keys($r))", "a\nc");
+    query(prolog + "let $r as local:CA := local:A(1) return ($r?a, map:keys($r))", "1\nc\na");
+    error(prolog + "let $r as local:AD := local:a() return $r", INVTYPE_X);
   }
 
   /** Equality of map/record constructors. */

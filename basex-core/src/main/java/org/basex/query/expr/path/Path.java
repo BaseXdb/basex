@@ -1112,7 +1112,8 @@ public abstract class Path extends ParseExpr {
     // merge self steps:  child::*/self::a → child::a
     if(nxt != null && nxt.axis == SELF && !nxt.mayBePositional()) {
       final Test test = curr.test.intersect(nxt.test);
-      if(test == null) return null;
+      // an intersection may be less specific than the merged tests (e.g., for records)
+      if(test == null || !test.instanceOf(curr.test) || !test.instanceOf(nxt.test)) return null;
       final Expr cs = curr.selector, ns = nxt.selector;
       // two selectors cannot be merged into a single step
       if(cs != null && ns != null) return null;

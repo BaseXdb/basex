@@ -366,7 +366,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     // the let clauses of a closure do not change the type of the function body
     final SeqType argType = expr.seqType();
     final Expr checked;
-    if(declType == null || argType.instanceOf(declType)) {
+    if(declType == null || argType.instanceOf(declType, true)) {
       // return type is already correct
       checked = body;
     } else if(body instanceof final Value value) {

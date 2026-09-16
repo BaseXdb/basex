@@ -88,7 +88,7 @@ public final class ShapeConstructor extends StandardFunc {
     for(int f = 0; f < fs; f++) {
       final ShapeField rf = fields.value(f + 1);
       final Expr expr = f < el ? exprs[f] : rf.init();
-      typed[f] = expr != null && expr.seqType().instanceOf(rf.seqType());
+      typed[f] = expr != null && expr.seqType().instanceOf(rf.seqType(), true);
     }
     return this;
   }
