@@ -8,7 +8,7 @@ import java.util.*;
 
 /**
  * Java client for BaseX.
- * Works with BaseX 7.0 and later
+ * Works with BaseX 13.0 and later
  *
  * Documentation: https://docs.basex.org/wiki/Clients
  *
@@ -44,21 +44,19 @@ public final class BaseXClient implements Closeable {
     in = new BufferedInputStream(socket.getInputStream());
     out = socket.getOutputStream();
 
-    // receive server response
-    final String[] response = receive().split(":");
-    final String code, nonce;
-    if(response.length > 1) {
-      // support for digest authentication
-      code = username + ':' + response[0] + ':' + password;
-      nonce = response[1];
-    } else {
-      // support for cram-md5 (Version < 8.0)
-      code = password;
-      nonce = response[0];
-    }
+    // receive challenge: {realm}:{nonce}
+    final String nonce = receive().split(":")[1];
 
+    // request the password parameters: send username and an empty hash
     send(username);
-    send(md5(md5(code) + nonce));
+    send("");
+    out.flush();
+
+    // receive password parameters: {algorithm}:{salt}
+    final String salt = receive().split(":")[1];
+
+    // send hashed password
+    send(sha256(sha256(salt + password) + nonce));
 
     // receive success flag
     if(!ok()) throw new IOException("Access denied.");
@@ -236,15 +234,15 @@ public final class BaseXClient implements Closeable {
   }
 
   /**
-   * Returns an MD5 hash.
-   * @param pw String
-   * @return String
+   * Returns a SHA-256 hash.
+   * @param string string
+   * @return hash (hex string)
    */
-  private static String md5(final String pw) {
+  private static String sha256(final String string) {
     final StringBuilder sb = new StringBuilder();
     try {
-      final MessageDigest md = MessageDigest.getInstance("MD5");
-      md.update(pw.getBytes());
+      final MessageDigest md = MessageDigest.getInstance("SHA-256");
+      md.update(string.getBytes(UTF8));
       for(final byte b : md.digest()) {
         final String s = Integer.toHexString(b & 0xFF);
         if(s.length() == 1) sb.append('0');
