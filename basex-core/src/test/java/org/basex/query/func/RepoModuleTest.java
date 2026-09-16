@@ -71,6 +71,8 @@ public final class RepoModuleTest extends SandboxTest {
     query(_REPO_INSTALL.args(REPO + "pkg4.xar"));
     contains(func.toString(), PKG3);
     contains(func.toString(), PKG4);
+    query("every $package in " + func.args() + " satisfies $package instance of element(package)",
+        true);
     query(_REPO_DELETE.args(PKG4));
     query(_REPO_DELETE.args(PKG3));
   }

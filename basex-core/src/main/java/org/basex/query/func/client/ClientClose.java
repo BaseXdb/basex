@@ -21,7 +21,7 @@ public final class ClientClose extends ClientFn {
       session(qc, true).close();
       return Empty.VALUE;
     } catch(final IOException ex) {
-      throw CLIENT_COMMAND_X.get(info, ex);
+      throw CLIENT_ERROR_X.get(info, ex);
     }
   }
 }

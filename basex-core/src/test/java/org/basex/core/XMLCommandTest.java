@@ -59,6 +59,9 @@ public final class XMLCommandTest extends SandboxTest {
 
     ok("<delete path='X'/>");
 
+    ok("<dir/>");
+    ok("<dir path='X'/>");
+
     ok("<drop-backup name='X'/>");
 
     ok("<drop-db name='X'/>");
@@ -153,6 +156,7 @@ public final class XMLCommandTest extends SandboxTest {
     no("<alter-db name='X' newname='X'>X</alter-db>");
     no("<alter-db name='X'/>");
     no("<alter-db newname='X'/>");
+    no("<alter-user name='X'/>");
   }
 
   /**

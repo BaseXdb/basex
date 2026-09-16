@@ -2,6 +2,8 @@ package org.basex.build;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.nio.charset.*;
+
 import org.basex.*;
 import org.basex.build.csv.*;
 import org.basex.build.csv.CsvOptions.*;
@@ -95,6 +97,17 @@ public final class CsvParserTest extends SandboxTest {
     copts.set(CsvOptions.SEPARATOR, ";");
     execute(new CreateDB(NAME, FILE));
     assertEquals("0", query("count(//Name)"));
+  }
+
+  /**
+   * Adds a CSV file with a custom encoding.
+   * @throws Exception exception
+   */
+  @Test public void encoding() throws Exception {
+    new IOFile(TEMP).write("ä".getBytes(StandardCharsets.ISO_8859_1));
+    copts.set(CsvParserOptions.ENCODING, "ISO-8859-1");
+    execute(new CreateDB(NAME, TEMP));
+    assertEquals("ä", query("string(.)"));
   }
 
   /**

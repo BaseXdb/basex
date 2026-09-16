@@ -403,7 +403,7 @@ public enum Function implements AFunction {
   INSERT_SEPARATOR(FnInsertSeparator::new, "insert-separator(input, separator)",
       params(ITEM_ZM, ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
-  INVISIBLE_XML(FnInvisibleXml::new, "invisible-xml(grammar, options?)",
+  INVISIBLE_XML(FnInvisibleXml::new, "invisible-xml(grammar?, options?)",
       params(FnInvisibleXml.ARG_TYPE, MAP_ZO),
       FuncType.get(DOCUMENT_O, STRING_O).seqType(), flag(HOF)),
   /** XQuery function. */
@@ -1328,8 +1328,8 @@ public enum Function implements AFunction {
   _DB_CREATE(DbCreate::new, "create(database, inputs?, paths?, options?)",
       params(STRING_O, ITEM_ZM, DB_PATH_SPEC_ZM, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
-  _DB_CREATE_BACKUP(DbCreateBackup::new, "create-backup(database, options?)",
-      params(STRING_O, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
+  _DB_CREATE_BACKUP(DbCreateBackup::new, "create-backup(database?, options?)",
+      params(STRING_ZO, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_DELETE(DbDelete::new, "delete(database, path)",
       params(STRING_O, STRING_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
@@ -1340,8 +1340,8 @@ public enum Function implements AFunction {
   _DB_DROP(DbDrop::new, "drop(database)",
       params(ITEM_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
-  _DB_DROP_BACKUP(DbDropBackup::new, "drop-backup(name)",
-      params(STRING_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
+  _DB_DROP_BACKUP(DbDropBackup::new, "drop-backup(name?)",
+      params(STRING_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_EXISTS(DbExists::new, "exists(database, path?)",
       params(STRING_O, STRING_ZO), BOOLEAN_O, flag(NDT), DB_URI),
@@ -1416,8 +1416,8 @@ public enum Function implements AFunction {
   _DB_RENAME(DbRename::new, "rename(database, source, target)",
       params(STRING_O, STRING_O, STRING_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
-  _DB_RESTORE(DbRestore::new, "restore(name)",
-      params(STRING_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
+  _DB_RESTORE(DbRestore::new, "restore(name?)",
+      params(STRING_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_SYSTEM(DbSystem::new, "system()",
       params(), ELEMENT_O, flag(CNS), DB_URI),
@@ -1830,7 +1830,7 @@ public enum Function implements AFunction {
       params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), REPO_URI, Perm.ADMIN),
   /** XQuery function. */
   _REPO_LIST(RepoList::new, "list()",
-      params(), STRING_ZM, flag(NDT), REPO_URI, Perm.ADMIN),
+      params(), ELEMENT_ZM, flag(NDT), REPO_URI, Perm.ADMIN),
 
   // SQL Module
 
@@ -1956,7 +1956,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _UPDATE_APPLY(UpdateApply::new, "apply(function, arguments)",
       params(FUNCTION_O, ARRAY_O),
-      EMPTY_SEQUENCE_Z, flag(POS, CTX, UPD), UPDATE_URI, Perm.ADMIN),
+      EMPTY_SEQUENCE_Z, flag(POS, CTX, UPD), UPDATE_URI),
   /** XQuery function. */
   _UPDATE_CACHE(UpdateCache::new, "cache(reset?)",
       params(BOOLEAN_ZO), ITEM_ZM, flag(NDT), UPDATE_URI),

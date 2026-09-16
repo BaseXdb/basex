@@ -92,7 +92,7 @@ final class XMLParser extends CommandParser {
       return new CreateUser(value(root, NAME), password(root));
     if(e.equals(DELETE) && check(root, PATH))
       return new Delete(value(root, PATH));
-    if(e.equals(DIR) && check(root, PATH))
+    if(e.equals(DIR) && check(root, PATH + '?'))
       return new Dir(value(root, PATH));
     if(e.equals(DROP_BACKUP) && check(root, NAME + '?'))
       return new DropBackup(value(root, NAME));
@@ -133,7 +133,7 @@ final class XMLParser extends CommandParser {
     if(e.equals(LIST) && check(root, NAME + '?', PATH + '?'))
       return new List(value(root, NAME), value(root, PATH));
     if(e.equals(OPEN) && check(root, NAME, PATH + '?'))
-      return new Open(value(root, NAME));
+      return new Open(value(root, NAME), value(root, PATH));
     if(e.equals(OPTIMIZE) && check(root))
       return new Optimize();
     if(e.equals(OPTIMIZE_ALL) && check(root))

@@ -2536,6 +2536,8 @@ public final class FnModuleTest extends SandboxTest {
     // empty $grammar
     query(func.args(" ()") + "(\"s: 'x'.\")",
         "<ixml><rule name=\"s\"><alt><literal string=\"x\"/></alt></rule></ixml>");
+    query(func.args() + "(\"s: 'x'.\")",
+        "<ixml><rule name=\"s\"><alt><literal string=\"x\"/></alt></rule></ixml>");
     // GuntherRademacher/markup-blitz#20
     query(func.args("s : 'ab'**'cd', 'ef'++'gh'.") + "('abcdabefghef')",
         "<s>abcdabefghef</s>");

@@ -7,6 +7,8 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.io.in.*;
+import org.basex.util.http.*;
+import org.basex.util.http.MediaType;
 import org.junit.jupiter.api.*;
 
 /**
@@ -58,6 +60,24 @@ public final class RESTPutTest extends RESTTest {
     get("2", NAME, "query", "count(//text())");
     get("2", "", "query", "count(" + _DB_GET.args(NAME) + "//text())");
     get("1", "", "query", "count(" + _DB_GET.args(NAME, "b") + "/*)");
+    delete(200, NAME);
+  }
+
+  /**
+   * PUT Test: replace or keep a binary resource.
+   * @throws IOException I/O exception
+   */
+  @Test public void putBinary() throws IOException {
+    final String query = _BIN_DECODE_STRING.args(_DB_GET_BINARY.args(NAME, "b.bin"));
+    put(null, NAME);
+    send(201, Method.PUT.name(), new ArrayInput(token("A")), MediaType.APPLICATION_OCTET_STREAM,
+        NAME + "/b.bin");
+    send(201, Method.PUT.name(), new ArrayInput(token("B")), MediaType.APPLICATION_OCTET_STREAM,
+        NAME + "/b.bin", MainOptions.REPLACE.name(), false);
+    get("A", "", "query", query);
+    send(201, Method.PUT.name(), new ArrayInput(token("B")), MediaType.APPLICATION_OCTET_STREAM,
+        NAME + "/b.bin");
+    get("B", "", "query", query);
     delete(200, NAME);
   }
 

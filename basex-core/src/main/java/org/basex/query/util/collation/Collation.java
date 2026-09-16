@@ -101,7 +101,7 @@ public abstract class Collation {
       if(ExternalLib.ICU.available()) opts = new UCAOptions(fallback);
       else if(fallback) opts = new BaseXCollationOptions(fallback);
     }
-    if(opts == null) throw err.get(info, Util.inf("Unknown collation '%'", uri));
+    if(opts == null) throw err.get(info, Util.inf("Unknown collation '%'.", uri));
 
     try {
       final Collation coll = opts.get(args);

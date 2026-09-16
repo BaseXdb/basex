@@ -567,7 +567,7 @@ public final class DbModuleTest extends SandboxTest {
     query("count(" + _DB_BACKUPS.args(NAME) + ")", 1);
 
     // create and drop backup of general data
-    query(func.args(""));
+    query(func.args());
     query("count(" + _DB_BACKUPS.args("") + ")", 1);
     query("count(" + _DB_BACKUPS.args() + ")", 2);
 
@@ -674,6 +674,7 @@ public final class DbModuleTest extends SandboxTest {
     // backup file does not exist
     error(func.args(NAME), DB_NOBACKUP_X);
     error(func.args(""), DB_NOBACKUP_X);
+    error(func.args(), DB_NOBACKUP_X);
     // check if drop is called before create
     error(_DB_CREATE_BACKUP.args(NAME) + ',' + func.args(NAME), DB_NOBACKUP_X);
 
@@ -1253,6 +1254,7 @@ public final class DbModuleTest extends SandboxTest {
     // backup and restore general data
     query(_DB_CREATE_BACKUP.args(""));
     query(func.args(""));
+    query(func.args());
 
     // drop backups
     query(_DB_DROP_BACKUP.args(NAME));

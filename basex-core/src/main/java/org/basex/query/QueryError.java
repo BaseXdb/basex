@@ -561,7 +561,7 @@ public enum QueryError {
   /** Error code. */
   INVCODE_X(FOCH, 1, "Character not permitted in a string: %."),
   /** Error code. */
-  WHICHCOLL_X(FOCH, 2, "%."),
+  WHICHCOLL_X(FOCH, 2, "%"),
   /** Error code. */
   NORMUNI_X(FOCH, 3, "Unsupported normalization form ('%')."),
   /** Error code. */
@@ -1281,7 +1281,7 @@ public enum QueryError {
   /** Error code. */
   DUPLCOLL(XQST, 38, "Duplicate 'collation' declaration."),
   /** Error code. */
-  WHICHDEFCOLL_X(XQST, 38, "%."),
+  WHICHDEFCOLL_X(XQST, 38, "%"),
   /** Error code. */
   FUNCDUPL_X(XQST, 39, "Duplicate parameter name: %."),
   /** Error code. */
@@ -1341,7 +1341,7 @@ public enum QueryError {
   /** Error code. */
   IMPLVAL(XQST, 75, "Validation not supported."),
   /** Error code. */
-  FLWORCOLL_X(XQST, 76, "%."),
+  FLWORCOLL_X(XQST, 76, "%"),
   /** Error code. */
   NOPRAGMA(XQST, 79, "Expecting pragma expression."),
   /** Error code. */

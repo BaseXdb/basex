@@ -95,7 +95,7 @@ public abstract class CsvConverter extends Job {
    * @return result
    */
   public final Value convert(final IO input) throws QueryException, IOException {
-    try(NewlineInput in = new NewlineInput(input)) {
+    try(NewlineInput in = new NewlineInput(input, copts.get(CsvParserOptions.ENCODING))) {
       return convert(in, input.url(), null, null);
     }
   }

@@ -75,7 +75,7 @@ final class RESTPut {
     } else if(xml) {
       session.add(new Put(path), is);
     } else {
-      session.add(new Delete(path)).add(new BinaryPut(path), is);
+      session.add(new BinaryPut(path), is);
     }
     return new RESTExec(session, true);
   }

@@ -483,7 +483,7 @@ public interface Text {
     "  " + lang("c_alterdb") + NL +
     LI + CmdAlter.PASSWORD + " [" + S_NAME + "] ([" + S_PW + "])" + NL +
     "  " + lang("c_alterpw") + NL +
-    LI + CmdAlter.USER  + " [" + S_NAME + "] ([newname]):" + NL +
+    LI + CmdAlter.USER  + " [" + S_NAME + "] [newname]:" + NL +
     "  " + lang("c_alteruser")
   };
   /** Command help. */
