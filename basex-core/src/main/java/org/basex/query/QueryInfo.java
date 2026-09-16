@@ -14,6 +14,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -188,7 +189,7 @@ public final class QueryInfo {
     final MapBuilder mb = new MapBuilder();
     for(final Map.Entry<String, Section> section :
         toSections(qp, -1, hits, locks).sections().entrySet()) {
-      mb.put(section.getKey(), value(section.getValue(), qp.qc));
+      mb.put(section.getKey(), value(section.getValue()));
     }
     return mb.map();
   }
@@ -197,11 +198,10 @@ public final class QueryInfo {
    * Returns the value of a section: a string for a block of text, a map for labeled entries,
    * and an array for a plain list.
    * @param section section
-   * @param qc query context
    * @return value
    * @throws QueryException query exception
    */
-  private static Value value(final Section section, final QueryContext qc) throws QueryException {
+  private static Value value(final Section section) throws QueryException {
     final List<Entry> entries = section.entries();
     if(section.text()) return Str.get(entries.getFirst().value());
     if(entries.getFirst().key() != null) {
@@ -209,9 +209,9 @@ public final class QueryInfo {
       for(final Entry entry : entries) mb.put(entry.key(), entry.value());
       return mb.map();
     }
-    final ArrayBuilder ab = new ArrayBuilder(qc, entries.size());
-    for(final Entry entry : entries) ab.add(Str.get(entry.value()));
-    return ab.array();
+    final TokenList list = new TokenList(entries.size());
+    for(final Entry entry : entries) list.add(entry.value());
+    return XQArray.items(StrSeq.get(list));
   }
 
   /**

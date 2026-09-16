@@ -323,59 +323,66 @@ public final class QueryJob extends Job implements Runnable {
       } catch(final Throwable ex) {
         result.exception = XQUERY_UNEXPECTED_X.get(null, ex);
       } finally {
-        // stop watching before the state is updated, so that a finished job is never stopped
-        ctx.jobs.unwatchMemory(this);
+        // nested blocks: a failing step must not skip the release of the job
+        try {
+          // stop watching before the state is updated, so that a finished job is never stopped
+          ctx.jobs.unwatchMemory(this);
 
-        // collect query information before the job is marked as finished
-        if(qi != null && qp != null) {
+          // collect query information before the job is marked as finished
+          if(qi != null && qp != null) {
+            try {
+              final Value value = result.value;
+              result.info = qi.toMap(qp, value != null ? value.size() : 0, jc.locks);
+            } catch(final QueryException ex) {
+              // the information is dropped; it must not replace the outcome of the query
+              Util.debug(ex);
+            }
+          }
+        } finally {
           try {
-            final Value value = result.value;
-            result.info = qi.toMap(qp, value != null ? value.size() : 0, jc.locks);
-          } catch(final QueryException ex) {
-            // the information is dropped; it must not replace the outcome of the query
-            Util.debug(ex);
+            // close and invalidate query after result has been assigned. order is important!
+            if(opts.get(JobOptions.CACHE) == Boolean.TRUE) {
+              ctx.jobs.scheduleResult(this);
+              state(JobState.CACHED);
+            } else {
+              state(JobState.SCHEDULED);
+            }
+
+            if(qp != null) {
+              qp.close();
+              if(registered) {
+                unregister(ctx);
+                popJob();
+                // no measurement if the job failed to start
+                if(jc.performance != null) result.time += jc.performance.nanoRuntime();
+              }
+              qp = null;
+            }
+
+            // write concluding log entry
+            if(log != null) {
+              final LogType type;
+              String msg = null;
+              if(result.exception != null) {
+                type = LogType.ERROR;
+                msg = result.exception.getMessage();
+              } else {
+                type = LogType.OK;
+              }
+              ctx.log.write(type, msg, perf, "JOB:" + id, ctx);
+            }
+          } finally {
+            // invalidate performance measurements
+            jc.performance = null;
+
+            if(remove) ctx.jobs.tasks.remove(id);
+            ctx.jobs.notifyChange();
+            // an empty result is dropped, unless query information is attached to it
+            if(result.value != null && result.value.isEmpty() && result.info == null)
+              ctx.jobs.results.remove(id);
+            if(notify != null) notify.accept(result);
           }
         }
-
-        // close and invalidate query after result has been assigned. order is important!
-        if(opts.get(JobOptions.CACHE) == Boolean.TRUE) {
-          ctx.jobs.scheduleResult(this);
-          state(JobState.CACHED);
-        } else {
-          state(JobState.SCHEDULED);
-        }
-
-        if(qp != null) {
-          qp.close();
-          if(registered) {
-            unregister(ctx);
-            popJob();
-            // no measurement if the job failed to start
-            if(jc.performance != null) result.time += jc.performance.nanoRuntime();
-          }
-          qp = null;
-        }
-
-        // write concluding log entry, invalidate performance measurements
-        if(log != null) {
-          final LogType type;
-          String msg = null;
-          if(result.exception != null) {
-            type = LogType.ERROR;
-            msg = result.exception.getMessage();
-          } else {
-            type = LogType.OK;
-          }
-          ctx.log.write(type, msg, perf, "JOB:" + id, ctx);
-        }
-        jc.performance = null;
-
-        if(remove) ctx.jobs.tasks.remove(id);
-        ctx.jobs.notifyChange();
-        if(notify != null) notify.accept(result);
-        // an empty result is dropped, unless query information is attached to it
-        if(result.value != null && result.value.isEmpty() && result.info == null)
-          ctx.jobs.results.remove(id);
       }
     } finally {
       running.set(false);

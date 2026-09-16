@@ -656,6 +656,13 @@ public final class JobModuleTest extends SandboxTest {
     query("exists(" + func.args(id) + ')', true);
     error(_JOB_RESULT.args(id), DB_GET2_X);
 
+    // a query that timed out has information as well
+    id = query(_JOB_EVAL.args(VERY_SLOW_QUERY, " ()",
+        " { 'cache': true(), 'info': true(), 'timeout': 0.1 }"));
+    query(_JOB_WAIT.args(id));
+    query(_ARRAY_SIZE.args(' ' + _MAP_GET.args(' ' + func.args(id), "compilation")) + " > 0", true);
+    error(_JOB_RESULT.args(id), XQUERY_TIMEOUT);
+
     // unknown job
     query(func.args("12345"), "");
   }
