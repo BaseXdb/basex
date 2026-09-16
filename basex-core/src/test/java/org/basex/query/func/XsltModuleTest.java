@@ -68,6 +68,12 @@ public final class XsltModuleTest extends SandboxTest {
     query(func.args(doc, ' ' + style) + "?error => exists()", false);
     query(func.args(doc, ' ' + wrap("")) + "?error => exists()", false);
     query(func.args(doc, ' ' + wrap("<xsl:x/>")) + "?error => exists()", true);
+
+    final String messages = wrap("<xsl:template match='/'><xsl:message><m>a</m></xsl:message>" +
+        "<xsl:message>b</xsl:message></xsl:template>");
+    query(func.args(doc, ' ' + messages) + "?messages ! array:size(.)", "1\n1");
+    query(func.args(doc, ' ' + messages) + "?messages[1]?1 ! name()", "m");
+    query(func.args(doc, ' ' + messages) + "?messages?* ! string()", "a\nb");
   }
 
   /** Test method. */

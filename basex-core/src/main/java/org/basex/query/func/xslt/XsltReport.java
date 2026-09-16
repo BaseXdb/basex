@@ -2,7 +2,6 @@ package org.basex.query.func.xslt;
 
 import java.io.*;
 import java.lang.reflect.*;
-import java.util.*;
 import java.util.function.*;
 
 import javax.xml.transform.*;
@@ -18,6 +17,7 @@ import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * XSLT report builder, with focus on the XSLT Saxon processor.
@@ -30,20 +30,20 @@ final class XsltReport {
   private static final Class<?> TI = Reflect.find("net.sf.saxon.jaxp.TransformerImpl");
   /** Saxon XsltController class. */
   private static final Class<?> XC = Reflect.find("net.sf.saxon.trans.XsltController");
-  /** Saxon MessageWarner class. */
-  private static final Class<?> MW = Reflect.find("net.sf.saxon.serialize.MessageWarner");
+  /** Saxon Message class. */
+  private static final Class<?> MSG = Reflect.find("net.sf.saxon.s9api.Message");
 
   /** TransformerImpl.getUnderlyingController method. */
   private static final Method TI_GUC = Reflect.method(TI, "getUnderlyingController");
-  /** MessageWarner.getWriter method. */
-  private static final Method MW_GW = Reflect.method(MW, "getWriter");
-  /** XsltController.setMessageFactory method. */
-  private static final Method MW_SMW = Reflect.method(XC, "setMessageFactory", Supplier.class);
+  /** XsltController.setMessageHandler method. */
+  private static final Method XC_SMH = Reflect.method(XC, "setMessageHandler", Consumer.class);
+  /** Message.getContent method. */
+  private static final Method MSG_GC = Reflect.method(MSG, "getContent");
 
   /** Report map builder. */
   private final MapBuilder report = new MapBuilder();
-  /** Saxon-specific: Message collector. */
-  private final Stack<Object> messages = new Stack<>();
+  /** Saxon-specific: serialized messages. */
+  private final StringList messages = new StringList();
   /** Query context. */
   private final QueryContext qc;
 
@@ -56,21 +56,13 @@ final class XsltReport {
   }
 
   /**
-   * Registers a message factory to collect messages.
+   * Registers a message handler to collect messages.
    * @param tr transformer
    */
   void register(final Transformer tr) {
-    if(tr.getClass() == TI && MW != null && TI_GUC != null && MW_GW != null && MW_SMW != null) {
-      try {
-        final Supplier<Object> supplier = () -> {
-          final Object mw = Reflect.get(MW);
-          messages.add(mw);
-          return mw;
-        };
-        MW_SMW.invoke(TI_GUC.invoke(tr), supplier);
-      } catch(final ReflectiveOperationException ex) {
-        Util.stack(ex);
-      }
+    if(tr.getClass() == TI && TI_GUC != null && XC_SMH != null && MSG_GC != null) {
+      final Consumer<Object> handler = msg -> messages.add(Reflect.invoke(MSG_GC, msg).toString());
+      Reflect.invoke(XC_SMH, Reflect.invoke(TI_GUC, tr), handler);
     }
   }
 
@@ -89,16 +81,11 @@ final class XsltReport {
    */
   void addMessage() throws QueryException {
     final ValueBuilder vb = new ValueBuilder(qc);
-    try {
-      for(final Object message : messages) {
-        final Object writer = MW_GW.invoke(message);
-        final Value value = convert(new IOContent(writer.toString()), false);
-        final ArrayBuilder ab = new ArrayBuilder(qc, value.size());
-        for(final Item item : value) ab.add(item);
-        vb.add(ab.array());
-      }
-    } catch(final Exception ex) {
-      Util.debug(ex);
+    for(final String message : messages) {
+      final Value value = convert(new IOContent(message), false);
+      final ArrayBuilder ab = new ArrayBuilder(qc, value.size());
+      for(final Item item : value) ab.add(item);
+      vb.add(ab.array());
     }
     report.put("messages", vb.value());
   }
