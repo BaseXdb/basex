@@ -166,8 +166,10 @@ public final class QueryInfo {
       }
     }
     if(success) {
+      // name query files, but not directories (the default for query strings)
       final IO baseIO = qp.sc.baseIO();
-      final String name = baseIO == null ? "" : " \"" + baseIO.name() + '"';
+      final String name = baseIO == null || endsWith(qp.sc.baseURI().string(), '/') ? "" :
+        " \"" + baseIO.name() + '"';
       tb.add(NL).addExt(QUERY_EXECUTED_X_X, name, Performance.formatNano(total(), runs));
     }
     return tb.toString();
