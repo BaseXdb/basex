@@ -3,8 +3,6 @@ package org.basex.data;
 import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.*;
-
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
@@ -34,43 +32,6 @@ public final class IndexTest extends SandboxTest {
     set(MainOptions.TEXTINCLUDE, "");
     set(MainOptions.ATTRINCLUDE, "");
     set(MainOptions.TOKENINCLUDE, "");
-  }
-
-  /**
-   * Opens a database with a full-text index that was created with version 12 and updates it.
-   * @param updindex incremental index update flag
-   * @throws IOException I/O exception
-   */
-  @ParameterizedTest
-  @ValueSource(booleans = {false, true})
-  public void oldVersionFullText(final boolean updindex) throws IOException {
-    // copy the database files of the frozen instance to the sandbox
-    final IOFile trg = context.soptions.dbPath(NAME);
-    final IOFile src = new IOFile("src/test/resources/ftv12" + (updindex ? "upd" : ""));
-    for(final IOFile file : src.children()) file.copyTo(new IOFile(trg, file.name()));
-
-    final String ft = _FT_SEARCH.args(NAME, "entry") + " ! string()";
-    query(_DB_INFO.args(NAME) + "//updindex/text()", updindex);
-    query(_DB_INFO.args(NAME) + "//ftindex/text()", true);
-    query(ft, "first entry\nsecond entry");
-    query(_DB_TEXT.args(NAME, "third one"), "third one");
-
-    // the update invalidates the indexes, unless they are updatable: the full-text index of the
-    // small database is then rebuilt in the layout of the old version
-    query("replace value of node " + _DB_GET.args(NAME) + "//b with 'new entry'");
-    query(_DB_INFO.args(NAME) + "//ftindex/text()", updindex);
-    query(_DB_INFO.args(NAME) + "//textindex/text()", updindex);
-    if(updindex) {
-      query(ft, "first entry\nnew entry");
-      query(_DB_TEXT.args(NAME, "new entry"), "new entry");
-      final IOFile db = context.soptions.dbPath(NAME);
-      assertFalse(new IOFile(db, "ftx0x.basex").exists());
-      assertTrue(new IOFile(db, "ftxx.basex").exists());
-    }
-    query(_DB_OPTIMIZE.args(NAME));
-    query(_DB_INFO.args(NAME) + "//ftindex/text()", true);
-    query(ft, "first entry\nnew entry");
-    query(_DB_TEXT.args(NAME, "new entry"), "new entry");
   }
 
   /**

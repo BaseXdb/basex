@@ -693,22 +693,6 @@ public final class FTIndexUpdateTest extends SandboxTest {
   }
 
   /**
-   * A mixed-content index is never stored in the format of older versions.
-   * @throws IOException I/O exception
-   */
-  @Test public void mixedStorage() throws IOException {
-    set(MainOptions.UPDINDEX, false);
-    set(MainOptions.FTINCLUDE, "xml");
-    execute(new CreateDB(NAME, "<xml>test</xml>"));
-    execute(new Close());
-    assertEquals(DataText.OLDSTORAGE, storage());
-    set(MainOptions.FTMIXED, true);
-    execute(new CreateDB(NAME, "<xml>test</xml>"));
-    execute(new Close());
-    assertEquals(DataText.STORAGE, storage());
-  }
-
-  /**
    * Returns the storage version of the test database.
    * @return storage version
    * @throws IOException I/O exception

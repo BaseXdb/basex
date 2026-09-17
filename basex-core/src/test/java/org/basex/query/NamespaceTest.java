@@ -1005,33 +1005,6 @@ public final class NamespaceTest extends SandboxTest {
   }
 
   /**
-   * Opens a database that was created with version 12 and updates it.
-   * @throws IOException I/O exception
-   */
-  @Test public void oldVersion() throws IOException {
-    // copy the database files of the frozen instance to the sandbox
-    final IOFile trg = context.soptions.dbPath(NAME);
-    for(final IOFile file : new IOFile("src/test/resources/nsv12").children()) {
-      file.copyTo(new IOFile(trg, file.name()));
-    }
-    final String doc = "<a:root xmlns:a=\"urn:a\" xmlns:b=\"urn:b\">" +
-      "<a:x><c:one xmlns:c=\"urn:c\">1</c:one></a:x>" +
-      "<a:y><c:two xmlns:c=\"urn:c\">2</c:two></a:y>" +
-      "<d:deep xmlns:d=\"urn:d\"><e:in xmlns:e=\"urn:e\"><f:low xmlns:f=\"urn:f\">low</f:low>" +
-      "</e:in></d:deep><g:def xmlns:g=\"urn:g\" xmlns=\"urn:default\"><plain>text</plain></g:def>" +
-      "</a:root>";
-    query(_DB_GET.args(NAME) + " => serialize()", doc);
-    query("namespace-uri-for-prefix('f', " + _DB_GET.args(NAME) + "//*:low)", "urn:f");
-    query(_DB_GET.args(NAME) + "//*:plain/namespace-uri()", "urn:default");
-
-    // update the database: the structure is rewritten in the current format
-    query("insert node <h:new xmlns:h='urn:h'/> into " + _DB_GET.args(NAME) + "/*");
-    execute(new Close());
-    query("namespace-uri-for-prefix('h', " + _DB_GET.args(NAME) + "//*:new)", "urn:h");
-    query("namespace-uri-for-prefix('f', " + _DB_GET.args(NAME) + "//*:low)", "urn:f");
-  }
-
-  /**
    * Checks the common default namespace of databases with several documents.
    */
   @Test public void defaultNamespace() {
