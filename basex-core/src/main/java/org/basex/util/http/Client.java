@@ -54,12 +54,12 @@ public final class Client {
    * @param href URL to send the request to (can be empty string)
    * @param request request data
    * @param bodies request body
-   * @param qc query context
+   * @param resources query resources
    * @return HTTP response
    * @throws QueryException query exception
    */
   public Value sendRequest(final byte[] href, final XNode request, final Value bodies,
-      final QueryContext qc) throws QueryException {
+      final QueryResources resources) throws QueryException {
 
     final Request req = new RequestParser(info).parse(request, bodies);
     final URI uri = uri(href, req);
@@ -76,8 +76,8 @@ public final class Client {
       mopts.set(MainOptions.HTMLPARSER,
           assign(new HtmlOptions(mopts.get(MainOptions.HTMLPARSER)), req.attribute(HTML)));
 
-      final Exchange exchange = new Exchange(uri, req, client(req, qc));
-      return new Response(info, mopts, exchange, qc).
+      final Exchange exchange = new Exchange(uri, req, client(req, resources));
+      return new Response(info, mopts, exchange, resources).
         getResponse(exchange.send(), body, mediaType);
     } catch(final IOException ex) {
       throw error(ex, info);
@@ -129,14 +129,14 @@ public final class Client {
   /**
    * Returns the HTTP client for a request.
    * @param request request
-   * @param qc query context
+   * @param resources query resources
    * @return client
    */
-  private static HttpClient client(final Request request, final QueryContext qc) {
+  private static HttpClient client(final Request request, final QueryResources resources) {
     final String fw = request.attribute(FOLLOW_REDIRECT);
     final boolean redirect = fw == null || Strings.isTrue(fw);
     return Strings.isTrue(request.attribute(COOKIES)) ?
-      qc.resources.index(HttpClients.class).get(redirect) : IOUrl.client(redirect);
+      resources.index(HttpClients.class).get(redirect) : IOUrl.client(redirect);
   }
 
   /**

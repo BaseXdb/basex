@@ -8,6 +8,7 @@ import java.util.zip.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -81,7 +82,7 @@ final class ZIPOut extends ArchiveOut {
 
     if(stored) {
       // spool the contents to compute checksum and size: avoids reading lazy input twice
-      try(SpillOutput so = new SpillOutput(qc)) {
+      try(SpillOutput so = new SpillOutput(qc.resources.index(TempFiles.class))) {
         final CRC32 crc = new CRC32();
         final long size;
         try(BufferInput bi = bin.input(info)) {

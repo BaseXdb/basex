@@ -9,6 +9,7 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -134,7 +135,8 @@ public final class PayloadTest extends SandboxTest {
       throws Exception {
     final Payload payload = new Payload(new ArrayInput(body), true, null, OPTIONS);
     final MediaType type = new MediaType("multipart/form-data; boundary=bnd");
-    return (XQMap) payload.multiForm(type, qc, threshold).get(Str.get("files"));
+    final TempFiles temp = qc.resources.index(TempFiles.class);
+    return (XQMap) payload.multiForm(type, temp, threshold).get(Str.get("files"));
   }
 
   /**

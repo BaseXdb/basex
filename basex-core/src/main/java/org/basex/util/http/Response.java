@@ -13,6 +13,7 @@ import java.util.regex.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -33,8 +34,8 @@ public final class Response {
   private final MainOptions options;
   /** HTTP exchange (can be {@code null}). */
   private final Exchange exchange;
-  /** Query context (can be {@code null}). */
-  private final QueryContext qc;
+  /** Query resources (can be {@code null}). */
+  private final QueryResources resources;
 
   /**
    * Constructor.
@@ -50,14 +51,14 @@ public final class Response {
    * @param info input info (can be {@code null})
    * @param options main options
    * @param exchange HTTP exchange
-   * @param qc query context
+   * @param resources query resources
    */
   public Response(final InputInfo info, final MainOptions options, final Exchange exchange,
-      final QueryContext qc) {
+      final QueryResources resources) {
     this.info = info;
     this.options = options;
     this.exchange = exchange;
-    this.qc = qc;
+    this.resources = resources;
   }
 
   /**
@@ -104,18 +105,19 @@ public final class Response {
       headers.firstValue(CONTENT_TYPE).map(MediaType::new).orElse(MediaType.TEXT_PLAIN);
     final String encoding = headers.firstValue(CONTENT_ENCODING).orElse("");
 
+    final TempFiles temp = resources != null ? resources.index(TempFiles.class) : null;
     final ItemList items = new ItemList().add((Item) null);
-    if(body && exchange != null && "GET".equals(exchange.method()) &&
-        Payload.binary(type) && !"0".equals(headers.firstValue(CONTENT_LENGTH).orElse(""))) {
+    if(body && exchange != null && Payload.binary(type) &&
+        !"0".equals(headers.firstValue(CONTENT_LENGTH).orElse(""))) {
       // binary result: skip retrieval of response body, return lazy item
       final InputStream is = response.body();
-      qc.resources.add(is);
+      resources.add(is);
       root.node(FElem.build(Q_HTTP_BODY).attr(Q_MEDIA_TYPE, type.type()).finish());
-      items.add(new B64HttpLazy(exchange, is, encoding));
+      items.add(new B64HttpLazy(exchange, is, encoding, temp));
     } else {
       try(InputStream is = response.body()) {
         final Payload payload = new Payload(is, body, info, options);
-        root.node(payload.parse(type, encoding, qc));
+        root.node(payload.parse(type, encoding, temp));
         if(body) items.add(payload.value());
       }
     }

@@ -19,6 +19,7 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.convert.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -317,7 +318,7 @@ abstract class ArchiveFn extends StandardFunc {
         try(BufferInput bi = bin.input(info); ArchiveIn in = ArchiveIn.get(bi, info)) {
           final String format = in.format();
           if(Compression.get(format) != null) throw ARCHIVE_MODIFY_X.get(info, format);
-          final SpillOutput so = new SpillOutput(qc);
+          final SpillOutput so = new SpillOutput(qc.resources.index(TempFiles.class));
           try(ArchiveOut out = ArchiveOut.get(format, in.method(), info, so)) {
             while(in.more()) {
               if(action.apply(in.entry(), out)) out.write(in);
@@ -328,7 +329,7 @@ abstract class ArchiveFn extends StandardFunc {
         }
       }
       try(ZipFile zip = new ZipFile(new File(archive.toString()), Strings.CP437)) {
-        final SpillOutput so = new SpillOutput(qc);
+        final SpillOutput so = new SpillOutput(qc.resources.index(TempFiles.class));
         try(ArchiveOut out = ArchiveOut.get(ZIP, -1, info, so)) {
           for(final ZipEntry raw : entries(zip, null)) {
             final ZipEntry ze = canonical(raw);

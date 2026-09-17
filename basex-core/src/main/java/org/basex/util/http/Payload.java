@@ -19,6 +19,7 @@ import org.basex.io.out.*;
 import org.basex.io.parse.csv.*;
 import org.basex.io.parse.json.*;
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -69,12 +70,12 @@ public final class Payload {
    * Parses the HTTP payload and returns a result body element.
    * @param type media type
    * @param encoding content encoding
-   * @param qc query context
+   * @param temp registry for temporary files (can be {@code null})
    * @return body element
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  FNode parse(final MediaType type, final String encoding, final QueryContext qc)
+  FNode parse(final MediaType type, final String encoding, final TempFiles temp)
       throws IOException, QueryException {
 
     // decompress before parsing (applies to multipart and single-part alike); coding is
@@ -95,7 +96,7 @@ public final class Payload {
       if(payloads != null) {
         // the stream is closed as before, releasing the inflater of a decompressed response
         try(InputStream is = input) {
-          payloads.add(parse(SpillOutput.read(is, qc), type));
+          payloads.add(parse(SpillOutput.read(is, temp), type));
         }
       }
     }
@@ -263,26 +264,26 @@ public final class Payload {
   /**
    * Returns a map with multipart form data.
    * @param type media type
-   * @param qc query context (can be {@code null})
+   * @param temp registry for temporary files (can be {@code null})
    * @return map with file names and contents
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  public XQMap multiForm(final MediaType type, final QueryContext qc)
+  public XQMap multiForm(final MediaType type, final TempFiles temp)
       throws IOException, QueryException {
-    return multiForm(type, qc, SpillOutput.THRESHOLD);
+    return multiForm(type, temp, SpillOutput.THRESHOLD);
   }
 
   /**
    * Returns a map with multipart form data.
    * @param type media type
-   * @param qc query context (can be {@code null})
+   * @param temp registry for temporary files (can be {@code null})
    * @param threshold spill threshold in bytes
    * @return map with file names and contents
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  XQMap multiForm(final MediaType type, final QueryContext qc, final int threshold)
+  XQMap multiForm(final MediaType type, final TempFiles temp, final int threshold)
       throws IOException, QueryException {
     // parse boundary, create helper arrays
     final byte[] bound = concat(DASHES, boundary(type)), last = concat(bound, DASHES);
@@ -326,7 +327,7 @@ public final class Payload {
         name = Str.get(disposition(ln, "name").replaceAll("\\[]", ""));
         filename = Str.get(disposition(ln, "filename"));
       } else if(line.length == 0) {
-        cont = new SpillOutput(qc, threshold);
+        cont = new SpillOutput(temp, threshold);
         lines = 0;
       }
     }

@@ -8,6 +8,7 @@ import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
@@ -140,7 +141,8 @@ public final class RequestContext implements RequestScope {
       if(mt != null && mt.is(MediaType.MULTIPART_FORM_DATA)) {
         // convert multipart parameters encoded in a form
         try(InputStream is = body().inputStream()) {
-          form = new Payload(is, true, null, options).multiForm(mt, qc);
+          form = new Payload(is, true, null, options).multiForm(mt,
+              qc.resources.index(TempFiles.class));
         }
       } else if(mt != null && mt.is(MediaType.APPLICATION_X_WWW_FORM_URLENCODED)) {
         // convert URL-encoded parameters

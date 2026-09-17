@@ -7,6 +7,7 @@ import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -61,7 +62,7 @@ final class TarOut extends ArchiveOut {
         write(entry, bi, size);
       } else {
         // the header requires the size in advance: spool contents of unknown size
-        final IO io = SpillOutput.read(bi, qc);
+        final IO io = SpillOutput.read(bi, qc.resources.index(TempFiles.class));
         try(InputStream is = io.inputStream()) {
           write(entry, is, io.length());
         }

@@ -9,6 +9,7 @@ import java.util.Map.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 
 /**
@@ -20,7 +21,7 @@ import org.basex.query.value.item.*;
 public class ArchiveCreate extends ArchiveFn {
   @Override
   public B64 value(final QueryContext qc) throws QueryException {
-    try(SpillOutput so = new SpillOutput(qc)) {
+    try(SpillOutput so = new SpillOutput(qc.resources.index(TempFiles.class))) {
       create(so, null, qc);
       return so.finish(ARCHIVE_ERROR_X);
     } catch(final IOException ex) {

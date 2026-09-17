@@ -192,6 +192,21 @@ public abstract class FnHttpTest extends HTTPTest {
         ctx)) {
       assertEquals("true,false,true,false", qp.value().serialize().toString());
     }
+
+    // non-GET response body is lazy; the first consumption caches it, the request is not repeated
+    try(QueryProcessor qp = new QueryProcessor(
+        "let $body := " + _HTTP_SEND_REQUEST.args(
+        " <http:request method='post'>"
+        + "<http:body media-type='application/xml'>"
+        + "<query xmlns='http://basex.org/rest'>"
+        + "<text>bin:encode-string(random:uuid())</text>"
+        + "<parameter name='media-type' value='application/octet-stream'/>"
+        + "</query></http:body></http:request>", REST_URL) + "[2] "
+        + "return string-join((lazy:is-lazy($body), lazy:is-cached($body), "
+        + "hash($body, 'md5') = hash($body, 'md5'), lazy:is-cached($body)) ! string(), ',')",
+        ctx)) {
+      assertEquals("true,false,true,true", qp.value().serialize().toString());
+    }
   }
 
   /**

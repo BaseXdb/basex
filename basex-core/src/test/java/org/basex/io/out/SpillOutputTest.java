@@ -8,6 +8,7 @@ import org.basex.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.junit.jupiter.api.*;
@@ -30,7 +31,7 @@ public final class SpillOutputTest extends SandboxTest {
   @Test public void inMemoryPath() throws IOException, QueryException {
     final byte[] data = { 1, 2, 3 };
     try(QueryContext qc = new QueryContext(context);
-        SpillOutput so = new SpillOutput(qc, 1024)) {
+        SpillOutput so = new SpillOutput(qc.resources.index(TempFiles.class), 1024)) {
       so.write(data);
       final B64 result = so.finish(QueryError.ARCHIVE_ERROR_X);
       assertFalse(result instanceof B64Lazy, "expected in-memory item");
@@ -46,7 +47,7 @@ public final class SpillOutputTest extends SandboxTest {
   @Test public void spillPath() throws IOException, QueryException {
     final byte[] data = { 10, 20, 30, 40, 50 };
     try(QueryContext qc = new QueryContext(context);
-        SpillOutput so = new SpillOutput(qc, 3)) {
+        SpillOutput so = new SpillOutput(qc.resources.index(TempFiles.class), 3)) {
       so.write(data);
       final B64 result = so.finish(QueryError.ARCHIVE_ERROR_X);
       assertTrue(result instanceof B64Lazy, "expected lazy (spilled) item");
@@ -63,7 +64,7 @@ public final class SpillOutputTest extends SandboxTest {
     final int before = countTempFiles(tmpDir);
 
     try(QueryContext qc = new QueryContext(context)) {
-      try(SpillOutput so = new SpillOutput(qc, 0)) {
+      try(SpillOutput so = new SpillOutput(qc.resources.index(TempFiles.class), 0)) {
         so.write(new byte[] { 1, 2, 3 });
         so.finish(QueryError.ARCHIVE_ERROR_X);
       }
@@ -94,7 +95,8 @@ public final class SpillOutputTest extends SandboxTest {
   @Test public void readStream() throws IOException {
     final byte[] data = { 1, 2, 3 };
     try(QueryContext qc = new QueryContext(context)) {
-      assertArrayEquals(data, SpillOutput.read(new ArrayInput(data), qc).read());
+      assertArrayEquals(data,
+          SpillOutput.read(new ArrayInput(data), qc.resources.index(TempFiles.class)).read());
     }
   }
 
@@ -105,7 +107,8 @@ public final class SpillOutputTest extends SandboxTest {
     final File tmpDir = new File(Prop.TEMPDIR);
     final int before = countTempFiles(tmpDir);
     try(QueryContext qc = new QueryContext(context)) {
-      assertThrows(IOException.class, () -> SpillOutput.read(failing(), qc));
+      final TempFiles temp = qc.resources.index(TempFiles.class);
+      assertThrows(IOException.class, () -> SpillOutput.read(failing(), temp));
       assertEquals(before, countTempFiles(tmpDir), "spilled file should be discarded at once");
     }
   }
@@ -127,7 +130,7 @@ public final class SpillOutputTest extends SandboxTest {
    */
   @Test public void closeIsIdempotent() throws IOException {
     try(QueryContext qc = new QueryContext(context)) {
-      try(SpillOutput so = new SpillOutput(qc, 0)) {
+      try(SpillOutput so = new SpillOutput(qc.resources.index(TempFiles.class), 0)) {
         so.write(new byte[] { 1 });
         so.close();
         assertDoesNotThrow(so::close);

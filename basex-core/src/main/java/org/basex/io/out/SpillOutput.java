@@ -16,8 +16,8 @@ import org.basex.util.*;
  * The result can be retrieved as an {@link IO} reference via {@link #finish()}, or as a binary item
  * via {@link #finish(QueryError)}, which returns a lazy reference to the temporary file if data was
  * spilled, or an in-memory binary item otherwise.
- * If a query context is supplied, the temporary file is registered with its resources and deleted
- * when the query finishes; otherwise, the caller takes ownership of the returned {@link IOFile}.
+ * If a registry for temporary files is supplied, the temporary file is deleted when the query
+ * finishes; otherwise, the caller takes ownership of the returned {@link IOFile}.
  *
  * @author BaseX Team, BSD License
  * @author Vincent Lizzi
@@ -26,8 +26,8 @@ public final class SpillOutput extends OutputStream {
   /** Default threshold in bytes. */
   public static final int THRESHOLD = 100_000_000;
 
-  /** Query context for registering the temporary file on spill (can be {@code null}). */
-  private final QueryContext qc;
+  /** Registry for temporary files (can be {@code null}). */
+  private final TempFiles temp;
   /** Threshold in bytes before spilling to disk. */
   private final int threshold;
 
@@ -40,19 +40,19 @@ public final class SpillOutput extends OutputStream {
 
   /**
    * Constructor.
-   * @param qc query context (can be {@code null})
+   * @param temp registry for temporary files (can be {@code null})
    */
-  public SpillOutput(final QueryContext qc) {
-    this(qc, THRESHOLD);
+  public SpillOutput(final TempFiles temp) {
+    this(temp, THRESHOLD);
   }
 
   /**
    * Constructor with an explicit spill threshold.
-   * @param qc query context (can be {@code null})
+   * @param temp registry for temporary files (can be {@code null})
    * @param threshold spill threshold in bytes
    */
-  public SpillOutput(final QueryContext qc, final int threshold) {
-    this.qc = qc;
+  public SpillOutput(final TempFiles temp, final int threshold) {
+    this.temp = temp;
     this.threshold = threshold;
   }
 
@@ -60,12 +60,12 @@ public final class SpillOutput extends OutputStream {
    * Reads an input stream, spilling to a temporary file if it outgrows the default threshold.
    * The stream is not closed.
    * @param is input stream
-   * @param qc query context (can be {@code null})
+   * @param temp registry for temporary files (can be {@code null})
    * @return input reference
    * @throws IOException I/O exception
    */
-  public static IO read(final InputStream is, final QueryContext qc) throws IOException {
-    try(SpillOutput so = new SpillOutput(qc)) {
+  public static IO read(final InputStream is, final TempFiles temp) throws IOException {
+    try(SpillOutput so = new SpillOutput(temp)) {
       try {
         is.transferTo(so);
         return so.finish();
@@ -146,7 +146,7 @@ public final class SpillOutput extends OutputStream {
    */
   private void spill() throws IOException {
     io = new IOFile(File.createTempFile(Prop.NAME + '-', IO.TMPSUFFIX));
-    if(qc != null) qc.resources.index(TempFiles.class).add(io);
+    if(temp != null) temp.add(io);
     file = new BufferOutput(io);
     file.write(array.buffer(), 0, (int) array.size());
     array = null;
