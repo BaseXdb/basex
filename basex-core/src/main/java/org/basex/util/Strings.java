@@ -209,7 +209,7 @@ public final class Strings {
    * @param algo hashing algorithm
    * @return hash
    */
-  private static String hash(final String string, final String algo) {
+  public static String hash(final String string, final String algo) {
     try {
       final MessageDigest md = MessageDigest.getInstance(algo);
       return Token.string(Token.hex(md.digest(Token.token(string)), false));

@@ -186,9 +186,9 @@ public final class IOUrl extends IO {
    * @return client
    */
   public static HttpClient client(final boolean redirect, final CookieHandler cookies) {
-    final HttpClient.Builder cb = HttpClient.newBuilder();
+    final HttpClient.Builder cb = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(1));
     if(cookies != null) cb.cookieHandler(cookies);
-    if(ssl != null) cb.sslContext(ssl).connectTimeout(Duration.ofMinutes(1));
+    if(ssl != null) cb.sslContext(ssl);
     return cb.followRedirects(redirect ? Redirect.ALWAYS : Redirect.NEVER).build();
   }
 

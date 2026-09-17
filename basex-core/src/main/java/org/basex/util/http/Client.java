@@ -135,22 +135,69 @@ public final class Client {
    * @return values
    */
   public static EnumMap<RequestAttribute, String> authHeaders(final String auth) {
-    final EnumMap<RequestAttribute, String> values = new EnumMap<>(RequestAttribute.class);
-    if(auth != null) {
-      final String[] parts = Strings.split(auth, ' ', 2);
-      values.put(AUTH_METHOD, parts[0]);
-      if(parts.length > 1) {
-        for(final String header : splitFields(parts[1])) {
-          final String[] kv = Strings.split(header, '=', 2);
-          final String key = kv[0].trim();
-          if(!key.isEmpty() && kv.length == 2) {
-            final RequestAttribute r = Enums.get(RequestAttribute.class, key);
-            if(r != null) values.put(r, Strings.delete(kv[1], '"').trim());
-          }
-        }
+    final ArrayList<EnumMap<RequestAttribute, String>> list = challenges(auth);
+    return list.isEmpty() ? new EnumMap<>(RequestAttribute.class) : list.get(0);
+  }
+
+  /**
+   * Returns the authentication schemes and parameters of a header with one or more challenges.
+   * @param header header value (can be {@code null})
+   * @return values of the single challenges
+   */
+  public static ArrayList<EnumMap<RequestAttribute, String>> challenges(final String header) {
+    final ArrayList<EnumMap<RequestAttribute, String>> list = new ArrayList<>();
+    if(header == null) return list;
+
+    EnumMap<RequestAttribute, String> values = null;
+    for(final String field : splitFields(header)) {
+      String param = field.trim();
+      if(param.isEmpty()) continue;
+
+      // a token that is not followed by "=" starts a new challenge
+      final int pl = param.length();
+      int t = 0;
+      while(t < pl && param.charAt(t) != ' ' && param.charAt(t) != '=') t++;
+      final String rest = param.substring(t).trim();
+      if(!rest.startsWith("=")) {
+        values = new EnumMap<>(RequestAttribute.class);
+        values.put(AUTH_METHOD, param.substring(0, t));
+        list.add(values);
+        param = rest;
+      }
+      if(values == null) continue;
+
+      final String[] kv = Strings.split(param, '=', 2);
+      if(kv.length == 2) {
+        final RequestAttribute r = Enums.get(RequestAttribute.class, kv[0].trim());
+        if(r != null) values.put(r, unquote(kv[1].trim()));
       }
     }
-    return values;
+    return list;
+  }
+
+  /**
+   * Returns the value of a token or quoted string.
+   * @param value value
+   * @return unquoted value
+   */
+  private static String unquote(final String value) {
+    final int vl = value.length();
+    if(vl < 2 || value.charAt(0) != '"' || value.charAt(vl - 1) != '"') return value;
+    final StringBuilder sb = new StringBuilder();
+    for(int v = 1; v < vl - 1; v++) {
+      final char ch = value.charAt(v);
+      sb.append(ch == '\\' && v + 2 < vl ? value.charAt(++v) : ch);
+    }
+    return sb.toString();
+  }
+
+  /**
+   * Returns a quoted string.
+   * @param value value
+   * @return quoted string
+   */
+  public static String quote(final String value) {
+    return '"' + value.replace("\\", "\\\\").replace("\"", "\\\"") + '"';
   }
 
   /**
@@ -167,7 +214,10 @@ public final class Client {
     for(int s = 0; s < sl; s++) {
       final char ch = string.charAt(s);
       if(ch == '"') quoted = !quoted;
-      if(ch == ',' && !quoted) {
+      if(ch == '\\' && quoted && s + 1 < sl) {
+        // escaped character inside a quoted string
+        sb.append(ch).append(string.charAt(++s));
+      } else if(ch == ',' && !quoted) {
         fields.add(sb.toString());
         sb.setLength(0);
       } else {

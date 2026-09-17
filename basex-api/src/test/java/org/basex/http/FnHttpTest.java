@@ -710,20 +710,20 @@ public abstract class FnHttpTest extends HTTPTest {
     final ItemList expected = new ItemList();
     final String content = "<http:response xmlns:http='http://expath.org/ns/http-client' "
         + "status='200' message='OK'>"
-        + "<http:header name='Subject' value='Formatted text mail'/>"
-        + "<http:header name='Content-Type' "
+        + "<http:header name='subject' value='Formatted text mail'/>"
+        + "<http:header name='content-type' "
         + "value='multipart/alternative;boundary=&quot;boundary42&quot;'/>"
-        + "<http:header name='MIME-version' value='1.0'/>"
-        + "<http:header name='From' value='Nathaniel Borenstein "
+        + "<http:header name='mime-version' value='1.0'/>"
+        + "<http:header name='from' value='Nathaniel Borenstein "
         + "&lt;nsb@bellcore.com&gt;'/>"
         + "<http:multipart media-type='multipart/alternative' "
         + "boundary='boundary42'>"
-        + "<http:header name='Content-Type' "
+        + "<http:header name='content-type' "
         + "value='text/plain; charset=us-ascii'/>"
         + "<http:body media-type='text/plain; charset=us-ascii'/>"
-        + "<http:header name='Content-Type' value='text/richtext'/>"
+        + "<http:header name='content-type' value='text/richtext'/>"
         + "<http:body media-type='text/richtext'/>"
-        + "<http:header name='Content-Type' value='text/x-whatever'/>"
+        + "<http:header name='content-type' value='text/x-whatever'/>"
         + "<http:body media-type='text/x-whatever'/>"
         + "</http:multipart>" + "</http:response> ";
     expected.add(new DBNode(new IOContent(content)).childIter().next());
@@ -767,17 +767,17 @@ public abstract class FnHttpTest extends HTTPTest {
     final ItemList expected = new ItemList();
     final String content = "<http:response xmlns:http='http://expath.org/ns/http-client' "
         + "status='200' message='OK'>"
-        + "<http:header name='Subject' value='Formatted text mail'/>"
-        + "<http:header name='To' value='Ned "
+        + "<http:header name='subject' value='Formatted text mail'/>"
+        + "<http:header name='to' value='Ned "
         + "Freed &lt;ned@innosoft.com&gt;'/>"
-        + "<http:header name='Content-Type' value='multipart/mixed;"
+        + "<http:header name='content-type' value='multipart/mixed;"
         + "boundary=&quot;simple boundary&quot;'/>"
-        + "<http:header name='MIME-version' value='1.0'/>"
-        + "<http:header name='From' value='Nathaniel Borenstein "
+        + "<http:header name='mime-version' value='1.0'/>"
+        + "<http:header name='from' value='Nathaniel Borenstein "
         + "&lt;nsb@bellcore.com&gt;'/>"
         + "<http:multipart boundary='simple boundary' media-type='multipart/mixed'>"
         + "<http:body media-type='text/plain'/>"
-        + "<http:header name='Content-type' value='text/plain; "
+        + "<http:header name='content-type' value='text/plain; "
         + "charset=us-ascii'/>"
         + "<http:body media-type='text/plain; charset=us-ascii'/>"
         + "</http:multipart>" + "</http:response>";
@@ -934,6 +934,39 @@ public abstract class FnHttpTest extends HTTPTest {
     assertEquals("a, b", r.headers.get("X-Tag"));
     assertTrue(r.headers.containsKey("X-Empty"));
     assertEquals("", r.headers.get("X-Empty"));
+  }
+
+  /**
+   * Tests that request headers are merged case-insensitively, and cookies with semicolons.
+   * @throws Exception exception
+   */
+  @Test public final void headerCase() throws Exception {
+    final Request r = parse("<http:request " + HTTP_NS + " method='get' href='http://x/'>"
+        + "<http:header name='X-Tag' value='a'/>"
+        + "<http:header name='x-tag' value='b'/>"
+        + "<http:header name='Cookie' value='a=1'/>"
+        + "<http:header name='cookie' value='b=2'/>"
+        + "</http:request>");
+    assertEquals(2, r.headers.size());
+    assertEquals("a, b", r.headers.get("X-TAG"));
+    assertEquals("a=1; b=2", r.headers.get("Cookie"));
+  }
+
+  /**
+   * Tests that methods and headers rejected by the HTTP client are reported as request errors.
+   */
+  @Test public final void invalidHeaders() {
+    for(final String request : new String[] {
+      "<http:request " + HTTP_NS + " method='connect' href='http://x/'/>",
+      "<http:request " + HTTP_NS + " method='g e t' href='http://x/'/>",
+      "<http:request " + HTTP_NS + " method='get' href='http://x/'>"
+        + "<http:header name='Host' value='y'/></http:request>",
+      "<http:request " + HTTP_NS + " method='get' href='http://x/'>"
+        + "<http:header name='X Y' value='z'/></http:request>"
+    }) {
+      final QueryException ex = assertThrows(QueryException.class, () -> parse(request));
+      assertEquals(QueryError.HC_REQ_X, ex.error(), ex.getMessage());
+    }
   }
 
   /**

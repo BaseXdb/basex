@@ -66,6 +66,8 @@ public interface HTTPText {
   String ALLOW = "Allow";
   /** HTTP header string. */
   String SET_COOKIE = "Set-Cookie";
+  /** HTTP header string. */
+  String COOKIE = "Cookie";
 
   /** Content-Disposition (lower case). */
   byte[] CONTENT_DISPOSITION = token("content-disposition");
@@ -110,6 +112,10 @@ public interface HTTPText {
   QNm Q_STATUS = new QNm("status");
   /** QName. */
   QNm Q_MESSAGE = new QNm("message");
+  /** QName. */
+  QNm Q_HREF = new QNm("href");
+  /** QName. */
+  QNm Q_VERSION = new QNm("version");
   /** QName. */
   QNm Q_MEDIA_TYPE = new QNm("media-type");
   /** QName. */

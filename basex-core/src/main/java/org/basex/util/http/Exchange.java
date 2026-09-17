@@ -9,7 +9,6 @@ import java.net.http.*;
 import java.net.http.HttpRequest.*;
 import java.net.http.HttpResponse.*;
 import java.time.*;
-import java.util.Map.*;
 
 import org.basex.core.StaticOptions.*;
 import org.basex.core.jobs.*;
@@ -67,6 +66,7 @@ public final class Exchange {
    */
   public HttpResponse<InputStream> send() throws IOException {
     final HttpRequest.Builder rb;
+    final boolean hasBody;
     try {
       rb = HttpRequest.newBuilder(uri);
 
@@ -77,7 +77,7 @@ public final class Exchange {
       // set method, attach payload
       final String method = request.attribute(METHOD);
       final String src = request.isMultipart ? null : request.payloadAtts.get(SRC);
-      final boolean hasBody = src != null ||
+      hasBody = src != null ||
           !(request.payload.isEmpty() && request.parts.isEmpty());
       if(method != null) {
         if(hasBody) setContentType(rb);
@@ -89,9 +89,7 @@ public final class Exchange {
       request.headers.forEach((name, value) -> {
         if(!(hasBody && name.equalsIgnoreCase(CONTENT_TYPE))) rb.header(name, value);
       });
-      if(Checks.all(request.headers.keySet(), name -> !name.equalsIgnoreCase(ACCEPT))) {
-        rb.header(ACCEPT, MediaType.ALL_ALL.toString());
-      }
+      if(!request.headers.containsKey(ACCEPT)) rb.header(ACCEPT, MediaType.ALL_ALL.toString());
     } catch(final IllegalArgumentException ex) {
       throw new IOException(ex.getMessage(), ex);
     }
@@ -104,11 +102,16 @@ public final class Exchange {
       final boolean sa = Strings.isTrue(request.attribute(SEND_AUTHORIZATION));
       if(sa && request.authMethod == AuthMethod.BASIC) {
         ui.basic(rb);
-      } else {
-        final HttpResponse<InputStream> response = Job.run(() -> client.send(rb.build(), handler));
-        if(!ui.assign(rb, response)) return response;
+        return Job.run(() -> client.send(rb.build(), handler));
       }
-      return Job.run(() -> client.send(rb.build(), handler));
+      // a challenge is expected: wait for it before the body is sent
+      if(hasBody && ui.credentials()) rb.expectContinue(true);
+      final HttpRequest sent = rb.build();
+      final HttpResponse<InputStream> response = Job.run(() -> client.send(sent, handler));
+      final HttpRequest retry = ui.assign(sent, response);
+      if(retry == null) return response;
+      response.body().close();
+      return Job.run(() -> client.send(retry, handler));
     } catch(final InterruptedException | IllegalArgumentException ex) {
       // illegal argument exception may be caused by wrongly encoded redirect URL
       throw new IOException(ex.getMessage(), ex);
@@ -144,14 +147,7 @@ public final class Exchange {
    * @param rb HTTP request builder
    */
   private void setContentType(final HttpRequest.Builder rb) {
-    // look up an explicit Content-Type header (case-insensitively)
-    String ct = null;
-    for(final Entry<String, String> header : request.headers.entrySet()) {
-      if(header.getKey().equalsIgnoreCase(CONTENT_TYPE)) {
-        ct = header.getValue();
-        break;
-      }
-    }
+    String ct = request.headers.get(CONTENT_TYPE);
     if(ct == null) {
       // no header: @media-type of <http:body/> is considered
       ct = request.payloadAtts.get(SerializerOptions.MEDIA_TYPE.name());

@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.http.HTTPText.*;
 
+import java.net.http.*;
 import java.util.*;
 
 import org.basex.core.*;
@@ -57,6 +58,7 @@ public final class RequestParser {
 
       // it is an error if content is set for HTTP methods that do not allow bodies
       final GNode body = parseHeaders(request.childIter(), hr.headers);
+      checkHeaders(hr);
       if(body != null) {
         final QNm pl = body.qname();
         // single part request
@@ -104,8 +106,9 @@ public final class RequestParser {
         if(qn.equals(Q_NAME)) name = string(attr.string());
         else if(qn.equals(Q_VALUE)) value = string(attr.string());
       }
-      // an empty value is legal HTTP; repeated names are comma-merged (RFC 7230)
-      if(!name.isEmpty()) headers.merge(name, value, (a, b) -> a + ", " + b);
+      // an empty value is legal HTTP; repeated names are merged (RFC 9110, RFC 6265)
+      final String sep = name.equalsIgnoreCase(COOKIE) ? "; " : ", ";
+      if(!name.isEmpty()) headers.merge(name, value, (a, b) -> a + sep + b);
     }
     return null;
   }
@@ -188,13 +191,13 @@ public final class RequestParser {
       // check if password is supplied
       final String pw = request.attribute(RequestAttribute.PASSWORD);
       if(pw == null) throw HC_REQ_X.get(info, "Missing attribute: " + RequestAttribute.PASSWORD);
-      // check if authorization method is supplied (default is 'Basic')
-      final String am = request.attribute(RequestAttribute.AUTH_METHOD);
-      if(am != null) {
-        final AuthMethod method = StaticOptions.AUTHMETHOD.get(am);
-        if(method == null) throw HC_REQ_X.get(info, "Invalid authentication method: " + am);
-        request.authMethod = method;
-      }
+    }
+    // check authorization method (default: 'Basic'), which also applies to URI credentials
+    final String am = request.attribute(RequestAttribute.AUTH_METHOD);
+    if(am != null) {
+      final AuthMethod method = StaticOptions.AUTHMETHOD.get(am);
+      if(method == null) throw HC_REQ_X.get(info, "Invalid authentication method: " + am);
+      request.authMethod = method;
     }
 
     // check other parameters
@@ -209,6 +212,21 @@ public final class RequestParser {
       final String s = request.attribute(r);
       if(s != null && !Strings.isTrue(s) && !Strings.isFalse(s))
         throw HC_REQ_X.get(info, "Value of '" + r + "' attribute is no boolean: " + s);
+    }
+  }
+
+  /**
+   * Checks if the method and the headers of a request are accepted by the HTTP client.
+   * @param request request
+   * @throws QueryException query exception
+   */
+  private void checkHeaders(final Request request) throws QueryException {
+    final HttpRequest.Builder rb = HttpRequest.newBuilder();
+    try {
+      rb.method(request.attribute(RequestAttribute.METHOD), HttpRequest.BodyPublishers.noBody());
+      request.headers.forEach(rb::header);
+    } catch(final IllegalArgumentException ex) {
+      throw HC_REQ_X.get(info, ex.getMessage());
     }
   }
 

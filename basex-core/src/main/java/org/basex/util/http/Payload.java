@@ -178,7 +178,8 @@ public final class Payload {
           base64 = value.equalsIgnoreCase(BASE64);
         }
         if(!value.isEmpty() && parts != null) {
-          parts.add(FElem.build(Q_HTTP_HEADER).attr(Q_NAME, key).attr(Q_VALUE, value).finish());
+          parts.add(FElem.build(Q_HTTP_HEADER).attr(Q_NAME, lc(token(key))).
+            attr(Q_VALUE, value).finish());
         }
       }
       l = readLine();

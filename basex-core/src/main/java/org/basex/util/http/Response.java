@@ -3,9 +3,12 @@ package org.basex.util.http;
 import static org.basex.util.http.HTTPText.*;
 
 import java.io.*;
+import java.net.*;
 import java.net.http.*;
+import java.net.http.HttpClient.Version;
 import java.util.*;
 import java.util.Map.*;
+import java.util.regex.*;
 
 import org.basex.core.*;
 import org.basex.io.*;
@@ -74,13 +77,24 @@ public final class Response {
     final int status = response.statusCode();
     final FBuilder root = FElem.build(Q_HTTP_RESPONSE).ns();
     root.attr(Q_STATUS, status).attr(Q_MESSAGE, IOUrl.reason(status));
+    final URI uri = response.uri();
+    if(uri != null) {
+      // drop credentials
+      final String ui = uri.getRawUserInfo();
+      root.attr(Q_HREF, ui == null ? uri.toString() :
+        uri.toString().replaceFirst(Pattern.quote(ui + '@'), ""));
+    }
+    if(response.version() != null) {
+      root.attr(Q_VERSION, response.version() == Version.HTTP_2 ? "HTTP/2" : "HTTP/1.1");
+    }
 
-    // add headers
+    // add headers (names are case-insensitive, and lower-case in HTTP/2)
     for(final Entry<String, List<String>> entry : response.headers().map().entrySet()) {
       final String name = entry.getKey();
       if(name != null) {
+        final String lc = name.toLowerCase(Locale.ENGLISH);
         for(final String value : entry.getValue()) {
-          root.node(FElem.build(Q_HTTP_HEADER).attr(Q_NAME, name).attr(Q_VALUE, value));
+          root.node(FElem.build(Q_HTTP_HEADER).attr(Q_NAME, lc).attr(Q_VALUE, value));
         }
       }
     }

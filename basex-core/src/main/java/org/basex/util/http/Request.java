@@ -17,7 +17,7 @@ public final class Request {
   /** Request attributes. */
   public final EnumMap<RequestAttribute, String> attributes = new EnumMap<>(RequestAttribute.class);
   /** Request headers. */
-  public final HashMap<String, String> headers = new HashMap<>();
+  public final TreeMap<String, String> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
   /** Body or multipart attributes. */
   public final HashMap<String, String> payloadAtts = new HashMap<>();
   /** Payload. */

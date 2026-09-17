@@ -18,6 +18,11 @@ import org.basex.util.Base64;
  * @author Christian Gruen
  */
 public final class UserInfo {
+  /** Supported digest algorithms, indexed by their names in challenges. */
+  private static final Map<String, String> DIGESTS =
+    Map.of(MD5, "MD5", "SHA-256", "SHA-256", "SHA-512-256", "SHA-512/256");
+  /** Suffix of session algorithms. */
+  private static final String SESS = "-SESS";
   /** Original URI. */
   private final URI uri;
   /** Request information (can be {@code null}). */
@@ -60,6 +65,14 @@ public final class UserInfo {
   }
 
   /**
+   * Checks if credentials are available.
+   * @return result of check
+   */
+  public boolean credentials() {
+    return username != null && password != null;
+  }
+
+  /**
    * Assigns a basic authentication string.
    * @param rb HTTP request builder
    */
@@ -69,54 +82,121 @@ public final class UserInfo {
   }
 
   /**
-   * Answers a challenge by adding an authentication header to a request.
-   * @param rb HTTP request builder
+   * Answers a challenge by creating a request with an authentication header.
+   * @param sent request that has been sent
    * @param response HTTP response
-   * @return success flag
+   * @return new request, or {@code null} if the challenge is not answered
    */
-  public boolean assign(final HttpRequest.Builder rb, final HttpResponse<?> response) {
+  public HttpRequest assign(final HttpRequest sent, final HttpResponse<?> response) {
     // no credentials available, server does not expect authentication: skip
-    if(username == null || password == null || response.statusCode() != 401) return false;
+    if(!credentials() || response.statusCode() != 401) return null;
 
-    final String value;
-    if(request.authMethod == AuthMethod.BASIC) {
-      value = Base64.encode(username + ':' + password);
-    } else {
-      // server provides no authentication data: skip
-      final Optional<String> header = response.headers().firstValue(WWW_AUTHENTICATE);
-      if(header.isEmpty()) return false;
-      // server returns other authentication method: skip
-      final EnumMap<RequestAttribute, String> auth = Client.authHeaders(header.get());
-      if(!auth.get(AUTH_METHOD).equals(request.authMethod.toString())) return false;
+    // challenge after redirects: answer it only if it comes from the original origin
+    final HttpRequest last = response.request();
+    final URI target = last.uri();
+    if(!sameOrigin(uri, target)) return null;
 
-      // the challenge may offer several qop values; this client implements "auth" only
-      String qop = auth.get(QOP);
-      if(qop != null) {
-        for(final String q : Strings.split(qop, ',')) {
-          if(q.trim().equals(AUTH)) { qop = AUTH; break; }
-        }
-      }
-      final String opaque = auth.get(OPAQUE),
-          realm = auth.get(REALM),
-          nonce = auth.get(NONCE),
-          nc = "00000001",
-          cnonce = Strings.md5(Long.toString(System.nanoTime())),
-          ha1 = Strings.md5(username + ':' + realm + ':' + password),
-          ha2 = Strings.md5(request.attribute(METHOD) + ':' + uri),
-          rsp = Strings.md5(ha1 + ':' + nonce + ':' + nc + ':' + cnonce + ':' + qop + ':' + ha2);
-      value = USERNAME + "=\"" + username + "\","
-        + REALM + "=\"" + realm + "\","
-        + NONCE + "=\"" + nonce + "\","
-        + URI + "=\"" + uri + "\","
-        + QOP + '=' + qop + ','
-        + NC + '=' + nc + ','
-        + CNONCE + "=\"" + cnonce + "\","
-        + RESPONSE + "=\"" + rsp + "\","
-        + ALGORITHM + '=' + MD5
-        // include the opaque value only if the server provided one
-        + (opaque != null ? "," + OPAQUE + "=\"" + opaque + '"' : "");
+    final String value = request.authMethod == AuthMethod.BASIC ?
+      Base64.encode(username + ':' + password) : digest(response.headers(), last);
+    if(value == null) return null;
+
+    // redirect without body (e.g. 303): drop the content type of the original request
+    final Optional<HttpRequest.BodyPublisher> body = last.bodyPublisher();
+    final boolean bodyless = !last.method().equals(sent.method()) && body.isEmpty();
+    final HttpRequest.Builder rb = HttpRequest.newBuilder(sent,
+      (name, v) -> !(bodyless && name.equalsIgnoreCase(CONTENT_TYPE)));
+    if(!target.equals(sent.uri())) rb.uri(target);
+    if(!last.method().equals(sent.method())) {
+      rb.method(last.method(), body.orElse(HttpRequest.BodyPublishers.noBody()));
+      rb.expectContinue(body.isPresent());
     }
-    rb.header(AUTHORIZATION, request.authMethod + " " + value);
-    return true;
+    return rb.header(AUTHORIZATION, request.authMethod + " " + value).build();
+  }
+
+  /**
+   * Returns the credentials for the first supported digest challenge.
+   * @param headers response headers
+   * @param last request that was answered with the challenge
+   * @return credentials or {@code null}
+   */
+  private String digest(final HttpHeaders headers, final HttpRequest last) {
+    for(final String header : headers.allValues(WWW_AUTHENTICATE)) {
+      for(final EnumMap<RequestAttribute, String> auth : Client.challenges(header)) {
+        if(!request.authMethod.toString().equalsIgnoreCase(auth.get(AUTH_METHOD))) continue;
+
+        // supported algorithms: MD5, SHA-256, SHA-512-256, optionally with session suffix
+        final String algorithm = auth.getOrDefault(ALGORITHM, MD5);
+        String name = algorithm.toUpperCase(Locale.ENGLISH);
+        final boolean sess = name.endsWith(SESS);
+        if(sess) name = name.substring(0, name.length() - SESS.length());
+        final String algo = DIGESTS.get(name);
+        if(algo == null) continue;
+
+        // quality of protection: "auth", or none (RFC 2069); "auth-int" is not supported
+        String qop = null;
+        final String qops = auth.get(QOP);
+        if(qops != null) {
+          for(final String q : Strings.split(qops, ',')) {
+            if(q.trim().equals(AUTH)) qop = AUTH;
+          }
+          if(qop == null) continue;
+        } else if(sess) {
+          continue;
+        }
+
+        final String realm = auth.get(REALM), nonce = auth.get(NONCE), opaque = auth.get(OPAQUE);
+        if(realm == null || nonce == null) continue;
+
+        final String path = last.uri().getRawPath(), query = last.uri().getRawQuery();
+        final String target = (path == null || path.isEmpty() ? "/" : path) +
+            (query != null ? "?" + query : "");
+        final String nc = "00000001", cnonce = Strings.md5(Long.toString(System.nanoTime()));
+
+        String ha1 = Strings.hash(username + ':' + realm + ':' + password, algo);
+        if(sess) ha1 = Strings.hash(ha1 + ':' + nonce + ':' + cnonce, algo);
+        final String ha2 = Strings.hash(last.method() + ':' + target, algo);
+        final String rsp = Strings.hash(ha1 + ':' + nonce + ':' +
+            (qop != null ? nc + ':' + cnonce + ':' + qop + ':' : "") + ha2, algo);
+
+        final StringBuilder sb = new StringBuilder();
+        sb.append(USERNAME).append('=').append(Client.quote(username)).append(',');
+        sb.append(REALM).append('=').append(Client.quote(realm)).append(',');
+        sb.append(NONCE).append('=').append(Client.quote(nonce)).append(',');
+        sb.append(URI).append('=').append(Client.quote(target)).append(',');
+        if(qop != null) {
+          sb.append(QOP).append('=').append(qop).append(',');
+          sb.append(NC).append('=').append(nc).append(',');
+          sb.append(CNONCE).append('=').append(Client.quote(cnonce)).append(',');
+        }
+        sb.append(RESPONSE).append('=').append(Client.quote(rsp)).append(',');
+        sb.append(ALGORITHM).append('=').append(algorithm);
+        // include the opaque value only if the server provided one
+        if(opaque != null) sb.append(',').append(OPAQUE).append('=').append(Client.quote(opaque));
+        return sb.toString();
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Checks if two URIs have the same origin.
+   * @param uri1 first URI
+   * @param uri2 second URI
+   * @return result of check
+   */
+  private static boolean sameOrigin(final URI uri1, final URI uri2) {
+    return String.valueOf(uri1.getScheme()).equalsIgnoreCase(String.valueOf(uri2.getScheme())) &&
+      String.valueOf(uri1.getHost()).equalsIgnoreCase(String.valueOf(uri2.getHost())) &&
+      port(uri1) == port(uri2);
+  }
+
+  /**
+   * Returns the effective port of a URI.
+   * @param uri URI
+   * @return port
+   */
+  private static int port(final URI uri) {
+    final int port = uri.getPort();
+    return port != -1 ? port : "https".equalsIgnoreCase(uri.getScheme()) ? 443 : 80;
   }
 }
