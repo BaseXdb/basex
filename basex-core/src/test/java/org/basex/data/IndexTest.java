@@ -54,7 +54,7 @@ public final class IndexTest extends SandboxTest {
     query(_DB_TEXT.args(NAME, "third one"), "third one");
 
     // the update invalidates the indexes, unless they are updatable: the full-text index of the
-    // old version is then adopted as first segment
+    // small database is then rebuilt in the layout of the old version
     query("replace value of node " + _DB_GET.args(NAME) + "//b with 'new entry'");
     query(_DB_INFO.args(NAME) + "//ftindex/text()", updindex);
     query(_DB_INFO.args(NAME) + "//textindex/text()", updindex);
@@ -62,8 +62,8 @@ public final class IndexTest extends SandboxTest {
       query(ft, "first entry\nnew entry");
       query(_DB_TEXT.args(NAME, "new entry"), "new entry");
       final IOFile db = context.soptions.dbPath(NAME);
-      assertTrue(new IOFile(db, "ftx0x.basex").exists());
-      assertFalse(new IOFile(db, "ftxx.basex").exists());
+      assertFalse(new IOFile(db, "ftx0x.basex").exists());
+      assertTrue(new IOFile(db, "ftxx.basex").exists());
     }
     query(_DB_OPTIMIZE.args(NAME));
     query(_DB_INFO.args(NAME) + "//ftindex/text()", true);

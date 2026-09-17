@@ -60,8 +60,9 @@ import org.basex.util.list.*;
  * references exceed a threshold, and small segments are merged.</p>
  *
  * <p>As long as all node IDs equal their PRE values, the index is stored in the unnumbered
- * layout, which older versions can read; it is adopted as first segment by the first update
- * that changes units or shifts PRE values.</p>
+ * layout, which older versions can read; it is rebuilt by updates that change units of a
+ * database with at most {@link #threshold} nodes, and adopted as first segment by the first
+ * update that changes units of a larger database or shifts PRE values.</p>
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -581,6 +582,18 @@ public final class FTIndex extends ValueIndex {
   }
 
   /**
+   * Rebuilds the unnumbered structure.
+   * @throws IOException I/O exception
+   */
+  private void rebuild() throws IOException {
+    segments[0].close();
+    FTBuilder.drop(data, DATAFTX);
+    new FTBuilder(data).build(0, data.nodes(), DATAFTX);
+    segments[0] = new FTSegment(data, -1, buffer);
+    touched = new IntSet();
+  }
+
+  /**
    * Renumbers the first segment by renaming its files.
    * @param number new segment number ({@code -1} for the unnumbered structure)
    * @throws IOException I/O exception
@@ -604,7 +617,11 @@ public final class FTIndex extends ValueIndex {
    */
   private void finish() throws IOException {
     // units were changed, or PRE values shifted: the index is no longer valid for older versions
-    if(adoptable() && (!touched.isEmpty() || !data.idmap.isIdentity())) adopt();
+    if(adoptable() && (!touched.isEmpty() || !data.idmap.isIdentity())) {
+      // small database whose node IDs still equal their PRE values: keep the old layout
+      if(unnumbered(data) && data.nodes() <= threshold) rebuild();
+      else adopt();
+    }
     if(!touched.isEmpty()) {
       // process the nodes in document order, skipping the nodes of indexed subtrees
       final int[] ids = touched.keys();

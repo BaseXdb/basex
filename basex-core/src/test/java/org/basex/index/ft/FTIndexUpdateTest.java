@@ -33,6 +33,8 @@ public final class FTIndexUpdateTest extends SandboxTest {
   /** Words that fill the buffer. */
   private static final String WORDS =
       " x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 x12 x13 x14 x15 x16 x17 x18 x19 x20";
+  /** Elements that make a database exceed the segment threshold. */
+  private static final String FILL = "<c/>".repeat(THRESHOLD);
 
   /** Lowers the segment threshold. */
   @BeforeAll public static void start() {
@@ -295,7 +297,7 @@ public final class FTIndexUpdateTest extends SandboxTest {
    * @throws IOException I/O exception
    */
   @Test public void reopenUncommitted() throws IOException {
-    execute(new CreateDB(NAME, "<x><a>one</a></x>"));
+    execute(new CreateDB(NAME, "<x><a>one</a>" + FILL + "</x>"));
     execute(new Close());
     query("insert node <a>two</a> into " + _DB_GET.args(NAME) + "/x");
     query("insert node <a>three</a> into " + _DB_GET.args(NAME) + "/x");
@@ -320,7 +322,7 @@ public final class FTIndexUpdateTest extends SandboxTest {
   @ParameterizedTest
   @ValueSource(ints = { 1, 3 })
   public void incompleteRecord(final int cut) throws IOException {
-    execute(new CreateDB(NAME, "<x><a>one</a></x>"));
+    execute(new CreateDB(NAME, "<x><a>one</a>" + FILL + "</x>"));
     query("insert node <a>two</a> into " + _DB_GET.args(NAME) + "/x");
     query("insert node <a>three</a> into " + _DB_GET.args(NAME) + "/x");
     execute(new Close());
@@ -337,7 +339,7 @@ public final class FTIndexUpdateTest extends SandboxTest {
    * Inserted units supersede no references of older segments.
    */
   @Test public void insertSupersedesNothing() {
-    execute(new CreateDB(NAME, "<x><a>one</a></x>"));
+    execute(new CreateDB(NAME, "<x><a>one</a>" + FILL + "</x>"));
     for(int r = 0; r < 3; r++) {
       query("insert node <b>word" + r + WORDS + "</b> into " + _DB_GET.args(NAME) + "/x");
     }
@@ -408,7 +410,7 @@ public final class FTIndexUpdateTest extends SandboxTest {
    * Optimizes an index without segments.
    */
   @Test public void optimizeEmpty() {
-    execute(new CreateDB(NAME, "<x/>"));
+    execute(new CreateDB(NAME, "<x>" + FILL + "</x>"));
     query("insert node <a/> into " + _DB_GET.args(NAME) + "/x");
     assertEquals(0, segments());
     execute(new Optimize());
@@ -652,21 +654,42 @@ public final class FTIndexUpdateTest extends SandboxTest {
       search("other", "other");
       return;
     }
+    // the index of a small database is rebuilt in the old layout
     query("replace value of node " + _DB_GET.args(NAME) + "/xml with 'other'");
-    assertFalse(old.exists());
-    assertTrue(seg.exists());
-    search("test");
-    search("other", "other");
-    // optimization returns to the old layout as long as all IDs equal their PRE values
-    query(_DB_OPTIMIZE.args(NAME));
     assertTrue(old.exists());
     assertFalse(seg.exists());
+    search("test");
     search("other", "other");
     query("delete node " + _DB_GET.args(NAME) + "/xml");
     query(_DB_OPTIMIZE.args(NAME));
     assertFalse(old.exists());
     assertEquals(1, segments());
     search("other");
+  }
+
+  /**
+   * A small database keeps the format of older versions until it exceeds the segment threshold.
+   * @throws IOException I/O exception
+   */
+  @Test public void smallDatabase() throws IOException {
+    execute(new CreateDB(NAME));
+    execute(new Add("x.xml", "<x>one</x>"));
+    execute(new Add("y.xml", "<y>two</y>"));
+    query("replace value of node " + _DB_GET.args(NAME, "x.xml") + "/x with 'three'");
+    execute(new Close());
+    assertEquals(DataText.OLDSTORAGE, storage());
+    assertTrue(file("ftxx").exists());
+    assertEquals(0, supersedeFiles());
+    search("one");
+    search("three", "three");
+
+    query(_DB_ADD.args(NAME, " <z>four" + FILL + "</z>", "z.xml"));
+    execute(new Close());
+    assertEquals(DataText.STORAGE, storage());
+    assertFalse(file("ftxx").exists());
+    search("three", "three");
+    search("four", "four");
+    check("two");
   }
 
   /**
