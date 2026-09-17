@@ -142,6 +142,24 @@ public abstract class FnHttpTest extends HTTPTest {
   }
 
   /**
+   * Tests that the BaseX user agent is sent unless a custom one is specified.
+   * @throws Exception exception
+   */
+  @Test public final void userAgent() throws Exception {
+    final String url = REST_ROOT + "?query=request:header(%22User-Agent%22)";
+    try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+        " <http:request method='get' override-media-type='text/plain'/>", url), ctx)) {
+      assertEquals(IOUrl.AGENT, string(qp.value().itemAt(1).string(null)));
+    }
+    try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
+        " <http:request method='get' override-media-type='text/plain'>"
+        + "<http:header name='user-agent' value='custom'/>"
+        + "</http:request>", url), ctx)) {
+      assertEquals("custom", string(qp.value().itemAt(1).string(null)));
+    }
+  }
+
+  /**
    * Tests sending of body contents linked via the src attribute.
    * @throws Exception exception
    */
@@ -705,6 +723,21 @@ public abstract class FnHttpTest extends HTTPTest {
     } catch(final QueryException ex) {
       Util.debug(ex);
     }
+  }
+
+  /**
+   * Tests that HTTP/2 pseudo-headers are not returned as response headers.
+   * @throws Exception exception
+   */
+  @Test public final void pseudoHeaders() throws Exception {
+    final FakeHttpResponse response = new FakeHttpResponse();
+    response.header(":status", "200");
+    response.header("Content-Type", "text/plain");
+    response.input(token("x"));
+    final String result = new Response(null, ctx.options).getResponse(response, true, null).
+        serialize().toString();
+    assertFalse(result.contains(":status"), result);
+    assertTrue(result.contains("content-type"), result);
   }
 
   /**

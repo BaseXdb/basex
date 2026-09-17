@@ -79,10 +79,10 @@ public final class Response {
       root.attr(Q_VERSION, response.version() == Version.HTTP_2 ? "HTTP/2" : "HTTP/1.1");
     }
 
-    // add headers (names are case-insensitive, and lower-case in HTTP/2)
+    // add headers (names are case-insensitive, lower-case in HTTP/2), skip pseudo-headers
     for(final Entry<String, List<String>> entry : response.headers().map().entrySet()) {
       final String name = entry.getKey();
-      if(name != null) {
+      if(name != null && !name.startsWith(":")) {
         final String lc = name.toLowerCase(Locale.ENGLISH);
         for(final String value : entry.getValue()) {
           root.node(FElem.build(Q_HTTP_HEADER).attr(Q_NAME, lc).attr(Q_VALUE, value));

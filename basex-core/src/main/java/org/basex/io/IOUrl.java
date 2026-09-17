@@ -27,6 +27,9 @@ import org.xml.sax.*;
  * @author Christian Gruen
  */
 public final class IOUrl extends IO {
+  /** User agent sent with HTTP requests. */
+  public static final String AGENT = Prop.NAME + '/' + Prop.VERSION.replace(' ', '-') +
+      " (Java " + Prop.JAVA_VERSION + "; " + Prop.OS + ' ' + Prop.OS_ARCH + ')';
   /** Timeout for connecting, for the response headers and for single reads of the body. */
   private static final Duration TIMEOUT = Duration.ofMinutes(1);
   /** Reason phrases. */
@@ -148,8 +151,7 @@ public final class IOUrl extends IO {
       final URI uri = new URI(pth);
       final HttpRequest.Builder rb = HttpRequest.newBuilder(uri).timeout(TIMEOUT);
       rb.header(HTTPText.ACCEPT, MediaType.ALL_ALL.toString());
-      rb.header(HTTPText.USER_AGENT, Prop.NAME + '/' + Prop.VERSION.replace(' ', '-') +
-          " (Java " + Prop.JAVA_VERSION + "; " + Prop.OS + " " + Prop.OS_ARCH + ')');
+      rb.header(HTTPText.USER_AGENT, AGENT);
       new UserInfo(uri).basic(rb);
       response = Job.run(() -> client.send(rb.build(), handler(TIMEOUT)));
     } catch(final JobException | IOException ex) {

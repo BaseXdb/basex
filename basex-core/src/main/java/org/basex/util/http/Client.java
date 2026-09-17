@@ -117,11 +117,12 @@ public final class Client {
       }
 
       // assign headers to request; the Content-Type of a payload request is already set above,
-      // so skip it here to avoid sending it twice; ensure that Accept header is sent
+      // so skip it here to avoid sending it twice; ensure that Accept and User-Agent are sent
       request.headers.forEach((name, value) -> {
         if(!(hasBody && name.equalsIgnoreCase(CONTENT_TYPE))) rb.header(name, value);
       });
       if(!request.headers.containsKey(ACCEPT)) rb.header(ACCEPT, MediaType.ALL_ALL.toString());
+      if(!request.headers.containsKey(USER_AGENT)) rb.header(USER_AGENT, IOUrl.AGENT);
     } catch(final IllegalArgumentException ex) {
       throw new IOException(ex.getMessage(), ex);
     }
