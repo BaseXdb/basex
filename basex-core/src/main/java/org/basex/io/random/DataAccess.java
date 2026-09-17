@@ -1,6 +1,7 @@
 package org.basex.io.random;
 
 import java.io.*;
+import java.util.*;
 
 import org.basex.io.*;
 import org.basex.util.*;
@@ -691,19 +692,16 @@ public final class DataAccess implements Closeable {
         // blocks that continue a sequential run are fetched in a single request; the master
         // reader is excluded, as it may hold data that has not been written to disk yet
         ahead = owner != null && b == nextRead ? Math.min(ahead * 2, AHEAD) : 1;
-        final int count = (int) Math.min(ahead, length - b >> IO.BLOCKPOWER);
+        final long end = end();
+        final int count = (int) Math.min(ahead, end - b >> IO.BLOCKPOWER);
         nextRead = b + ((long) Math.max(count, 1) << IO.BLOCKPOWER);
-        raf.seek(b);
-        if(b < raf.length()) {
-          if(count < 2) {
-            raf.readFully(buffer.data, 0, (int) Math.min(length - b, IO.BLOCKSIZE));
-          } else if(readAhead(b, count)) {
-            // the requested block was evicted while reading ahead: fetch it again
-            final Buffer current = buffers.current();
-            current.pos = b;
-            raf.seek(b);
-            raf.readFully(current.data, 0, IO.BLOCKSIZE);
-          }
+        if(count < 2) {
+          read(buffer, end);
+        } else if(readAhead(b, count)) {
+          // the requested block was evicted while reading ahead: fetch it again
+          final Buffer current = buffers.current();
+          current.pos = b;
+          read(current, end);
         }
       } catch(final IOException ex) {
         // queries are compiled before database locks are acquired: a concurrent update may
@@ -728,6 +726,7 @@ public final class DataAccess implements Closeable {
      */
     private boolean readAhead(final long b, final int count) throws IOException {
       if(scratch == null) scratch = new byte[AHEAD << IO.BLOCKPOWER];
+      raf.seek(b);
       raf.readFully(scratch, 0, count << IO.BLOCKPOWER);
       Array.copyToStart(scratch, 0, IO.BLOCKSIZE, buffers.current().data);
       for(int c = 1; c < count; c++) {
@@ -748,15 +747,34 @@ public final class DataAccess implements Closeable {
     private void readMaster(final Buffer buffer) {
       synchronized(master) {
         try {
-          master.raf.seek(buffer.pos);
-          if(buffer.pos < master.raf.length()) {
-            master.raf.readFully(buffer.data, 0,
-                (int) Math.min(length - buffer.pos, IO.BLOCKSIZE));
-          }
+          master.read(buffer, master.end());
         } catch(final IOException ex) {
           Util.stack(ex);
         }
       }
+    }
+
+    /**
+     * Reads a block from disk.
+     * @param buffer target buffer
+     * @param end end of the readable data (see {@link #end()})
+     * @throws IOException I/O exception
+     */
+    private void read(final Buffer buffer, final long end) throws IOException {
+      // bytes that have not been written to disk yet are zero
+      final int len = (int) Math.max(0, Math.min(end - buffer.pos, IO.BLOCKSIZE));
+      raf.seek(buffer.pos);
+      raf.readFully(buffer.data, 0, len);
+      Arrays.fill(buffer.data, len, IO.BLOCKSIZE, (byte) 0);
+    }
+
+    /**
+     * Returns the end of the data that can be read from disk.
+     * @return file position
+     * @throws IOException I/O exception
+     */
+    private long end() throws IOException {
+      return Math.min(length, raf.length());
     }
 
     /**

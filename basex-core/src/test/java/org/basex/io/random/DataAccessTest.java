@@ -313,6 +313,32 @@ public final class DataAccessTest {
   }
 
   /**
+   * Reads a partial block from disk after the file has been extended in memory.
+   * @throws IOException I/O exception
+   */
+  @Test public void testReadPartialBlock() throws IOException {
+    da.close();
+    final int blocks = 20;
+    try(RandomAccessFile f = new RandomAccessFile(file.file(), "rw")) {
+      final byte[] data = new byte[IO.BLOCKSIZE];
+      Arrays.fill(data, (byte) -1);
+      f.setLength(0);
+      for(int b = 0; b < blocks; b++) f.write(data);
+      f.write(data, 0, 10);
+    }
+    da = new DataAccess(file);
+    // fill all buffers with the contents of full blocks
+    for(int b = 0; b < blocks; b++) da.read1((long) b << IO.BLOCKPOWER);
+
+    final long partial = (long) blocks << IO.BLOCKPOWER;
+    da.write4(partial + 2L * IO.BLOCKSIZE, INT);
+    assertEquals(-1, da.read1(partial + 9));
+    assertEquals(0, da.read1(partial + 10));
+    assertEquals(0, da.read1(partial + IO.BLOCKSIZE));
+    assertEquals(INT, da.read4(partial + 2L * IO.BLOCKSIZE));
+  }
+
+  /**
    * Check that the test file {@link #file} has the specified unsigned bytes at
    * the specified position.
    * @param pos file position
