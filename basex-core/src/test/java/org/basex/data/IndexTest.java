@@ -29,6 +29,8 @@ public final class IndexTest extends SandboxTest {
     set(MainOptions.UPDINDEX, false);
     set(MainOptions.AUTOOPTIMIZE, false);
     set(MainOptions.MAINMEM, false);
+    set(MainOptions.AUTOFLUSH, true);
+    set(MainOptions.FTINDEX, false);
     set(MainOptions.TEXTINCLUDE, "");
     set(MainOptions.ATTRINCLUDE, "");
     set(MainOptions.TOKENINCLUDE, "");
@@ -69,6 +71,34 @@ public final class IndexTest extends SandboxTest {
     query(_DB_INFO.args(NAME) + "//ftindex/text()", true);
     query(ft, "first entry\nnew entry");
     query(_DB_TEXT.args(NAME, "new entry"), "new entry");
+  }
+
+  /**
+   * Deletes the files of indexes that have been invalidated by an update.
+   * @param autoflush autoflush flag
+   */
+  @ParameterizedTest
+  @ValueSource(booleans = {false, true})
+  public void outdatedFiles(final boolean autoflush) {
+    set(MainOptions.AUTOFLUSH, autoflush);
+    set(MainOptions.FTINDEX, true);
+    execute(new CreateDB(NAME, "<x a='a'>x</x>"));
+    final IOFile db = context.soptions.dbPath(NAME);
+    final String[] files = { "txtl", "txtr", "atvl", "atvr", "ftxx", "ftxy", "ftxz" };
+    for(final String file : files) assertTrue(new IOFile(db, file + ".basex").exists(), file);
+
+    // with autoflush, the files are deleted once the update has been written
+    execute(new Add("y.xml", "<y>y</y>"));
+    for(final String file : files) {
+      assertEquals(autoflush, !new IOFile(db, file + ".basex").exists(), file);
+    }
+    execute(new Flush());
+    for(final String file : files) assertFalse(new IOFile(db, file + ".basex").exists(), file);
+
+    execute(new Close());
+    query(_DB_INFO.args(NAME) + "//textindex/text()", false);
+    query(_DB_INFO.args(NAME) + "//ftindex/text()", false);
+    query("count(" + _DB_GET.args(NAME) + ')', 2);
   }
 
   /**

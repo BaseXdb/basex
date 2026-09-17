@@ -130,10 +130,20 @@ public final class DiskData extends Data {
   }
 
   /**
-   * Writes all meta data to disk.
+   * Writes all meta data to disk and deletes the files of outdated indexes.
    * @throws IOException I/O exception
    */
   private void write() throws IOException {
+    // close outdated indexes, delete their files after the meta data has been written
+    final IndexType[] types = IndexType.VALUE_INDEXES;
+    final Index[] outdated = new Index[types.length];
+    for(int t = 0; t < types.length; t++) {
+      final Index index = index(types[t]);
+      if(index != null && !meta.index(types[t])) {
+        outdated[t] = index;
+        close(types[t]);
+      }
+    }
     if(!meta.dirty) return;
     meta.size = nodes();
     meta.lastid = lastid;
@@ -156,6 +166,10 @@ public final class DiskData extends Data {
     // file may be missing if flag was just enabled
     if(meta.updindex && idmap != null) idmap.write(meta.dbFile(DATAIDP));
     meta.dirty = false;
+    // files that cannot be deleted are ignored: they will be overwritten when an index is created
+    for(final Index index : outdated) {
+      if(index != null) index.drop();
+    }
   }
 
   /**
