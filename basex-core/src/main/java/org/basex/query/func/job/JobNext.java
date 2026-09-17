@@ -28,8 +28,7 @@ public final class JobNext extends StandardFunc {
     if(count < 0) throw JOBS_RANGE_X.get(info, count);
 
     // query clock: repeated calls in a single query yield the same results
-    final LocalDateTime from = qc.dateTime().datm.toJava().toGregorianCalendar().
-        toZonedDateTime().toLocalDateTime();
+    final LocalDateTime from = qc.dateTime().datm.toLocalDateTime();
     final ZoneId zone = ZoneId.systemDefault();
     return new Iter() {
       LocalDateTime dt = from;

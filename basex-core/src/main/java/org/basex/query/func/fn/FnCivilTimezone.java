@@ -20,7 +20,7 @@ public final class FnCivilTimezone extends DateTimeFn {
     final Dtm value = (Dtm) checkType(arg(0), BasicType.DATE_TIME, qc);
     final String place = toStringOrNull(arg(1), qc);
 
-    final Instant instant = value.toJava().toGregorianCalendar().toInstant();
+    final Instant instant = value.toInstant(qc);
     final ZoneId id;
     try {
       id = place != null ? ZoneId.of(place) : ZoneId.systemDefault();

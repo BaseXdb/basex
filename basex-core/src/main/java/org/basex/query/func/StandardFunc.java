@@ -930,10 +930,8 @@ public abstract class StandardFunc extends Arr {
    */
   protected final long toMs(final Expr expr, final QueryContext qc) throws QueryException {
     final Dtm dtm = (Dtm) checkType(expr, BasicType.DATE_TIME, qc);
-    final LocalDateTime ldt = dtm.toLocalDateTime();
     try {
-      return ldt.toInstant(dtm.hasTz() ? ZoneOffset.ofTotalSeconds(dtm.tz() * 60) :
-        ZoneId.systemDefault().getRules().getOffset(ldt)).toEpochMilli();
+      return dtm.toInstant(qc).toEpochMilli();
     } catch(final ArithmeticException | DateTimeException ex) {
       throw INTRANGE_X.get(info, dtm.yea()).cause(ex);
     }

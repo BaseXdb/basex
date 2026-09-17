@@ -567,7 +567,27 @@ public abstract class ADate extends ADateDur {
   public final LocalDateTime toLocalDateTime() {
     final BigDecimal sc = seconds();
     return toLocalDate().atTime(has(HRS) ? hour : 0, has(MIN) ? minute : 0, sc.intValue(),
-        sc.remainder(BigDecimal.ONE).movePointRight(9).intValue());
+        nanos(sc));
+  }
+
+  /**
+   * Returns the date and time as an instant, applying the implicit timezone if the value has none.
+   * @param qc query context (can be {@code null})
+   * @return instant
+   * @throws QueryException query exception
+   */
+  public final Instant toInstant(final QueryContext qc) throws QueryException {
+    final BigDecimal sc = toSeconds(implicitTz(qc));
+    return Instant.ofEpochSecond(sc.longValue(), nanos(sc));
+  }
+
+  /**
+   * Returns the fractional part of the specified seconds in nanoseconds.
+   * @param seconds seconds
+   * @return nanoseconds
+   */
+  private static int nanos(final BigDecimal seconds) {
+    return seconds.remainder(BigDecimal.ONE).movePointRight(9).intValue();
   }
 
   @Override

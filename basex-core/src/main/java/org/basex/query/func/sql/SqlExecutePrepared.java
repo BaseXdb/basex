@@ -128,11 +128,11 @@ public class SqlExecutePrepared extends SqlExecute {
       if(item.isEmpty()) {
         bindNull(i, ps);
       } else if(type == BasicType.DATE) {
-        ps.setDate(i, new java.sql.Date(ms(item)));
+        ps.setDate(i, new java.sql.Date(ms(item, qc)));
       } else if(type == BasicType.TIME) {
-        ps.setTime(i, new Time(ms(item)));
+        ps.setTime(i, new Time(ms(item, qc)));
       } else if(type == BasicType.DATE_TIME) {
-        ps.setTimestamp(i, new Timestamp(ms(item)));
+        ps.setTimestamp(i, new Timestamp(ms(item, qc)));
       } else {
         ps.setObject(i, item.toJava());
       }
@@ -161,9 +161,11 @@ public class SqlExecutePrepared extends SqlExecute {
   /**
    * Returns the milliseconds since the epoch of a date/time item.
    * @param item date, time or dateTime item
+   * @param qc query context
    * @return milliseconds
+   * @throws QueryException query exception
    */
-  private static long ms(final Item item) {
-    return ((ADate) item).toJava().toGregorianCalendar().getTimeInMillis();
+  private static long ms(final Item item, final QueryContext qc) throws QueryException {
+    return ((ADate) item).toInstant(qc).toEpochMilli();
   }
 }
