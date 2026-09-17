@@ -270,16 +270,16 @@ public final class DiskData extends Data {
     // OPTIMIZE ALL will close the database before this function is called
     if(closed) return;
 
-    // remove updating file
+    for(final ValueIndex index : valueIndexes()) index.finishUpdate();
     final boolean auto = opts.get(MainOptions.AUTOFLUSH);
+    flush(auto);
+
+    // remove updating file after all changes have been written
     if(auto) {
       final IOFile upd = meta.updateFile();
       if(!upd.exists()) throw Util.notExpected("%: lock file does not exist.", meta.name);
       if(!upd.delete()) throw Util.notExpected("%: could not delete lock file.", meta.name);
     }
-
-    for(final ValueIndex index : valueIndexes()) index.finishUpdate();
-    flush(auto);
     if(!table.lock(false)) throw Util.notExpected("Database '%': could not unlock.", meta.name);
   }
 
