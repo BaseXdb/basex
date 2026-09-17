@@ -1,8 +1,5 @@
 package org.basex.query.func.db;
 
-import static org.basex.query.func.Function.*;
-
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
@@ -64,9 +61,7 @@ public class DbNodeId extends StandardFunc {
    * @return node ID
    */
   int id(final DBNode node) {
-    final int pre = node.pre();
-    final Data data = node.data();
-    return data.meta.updindex ? data.id(pre) : pre;
+    return node.data().id(node.pre());
   }
 
   /**
@@ -82,11 +77,6 @@ public class DbNodeId extends StandardFunc {
   @Override
   protected final Expr opt(final CompileContext cc) throws QueryException {
     final Expr nodes = arg(0);
-    final Data data = nodes.data();
-    if(data != null && !data.meta.updindex && !(this instanceof DbNodePre)) {
-      // no ID-PRE mapping: work with PRE values
-      return cc.function(_DB_NODE_PRE, info, nodes);
-    }
     exprType.assign(seqType(), nodes.seqType().occ, nodes.size());
     return this;
   }

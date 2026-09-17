@@ -1,7 +1,6 @@
 package org.basex.query.func.db;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.func.Function.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
@@ -35,15 +34,7 @@ public class DbGetId extends DbAccessFn {
 
   @Override
   protected final Expr opt(final CompileContext cc) throws QueryException {
-    compileData(cc);
-
-    final Expr nodes = arg(0);
-    final Data data = nodes.data();
-    if(data != null && !data.meta.updindex && !(this instanceof DbGetPre)) {
-      // no ID-PRE mapping: work with PRE values
-      return cc.function(_DB_GET_PRE, info, nodes);
-    }
-    return this;
+    return compileData(cc);
   }
 
   @Override

@@ -900,6 +900,16 @@ public final class DbModuleTest extends SandboxTest {
     query(func.args(" /html"), 1);
     query(func.args(" / | /html"), "0\n1");
     error(func.args(" <x/> update {}"), DB_NODE_X);
+
+    // IDs of shifted nodes, with and without ID-PRE mapping
+    for(final boolean updindex : new boolean[] { false, true }) {
+      set(MainOptions.UPDINDEX, updindex);
+      execute(new CreateDB(NAME, "<a><b/><c/></a>"));
+      query("delete node /a/b");
+      query(func.args(" /a/c"), 3);
+      query(func.args(" " + _DB_GET.args(NAME) + "/a/c"), 3);
+      query(_DB_GET_ID.args(NAME, " " + func.args(" /a/c")) + "/name()", "c");
+    }
   }
 
   /** Test method. */
