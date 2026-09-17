@@ -2,6 +2,7 @@ package org.basex.util.http;
 
 import static org.basex.util.http.HTTPText.*;
 
+import java.time.*;
 import java.util.*;
 
 import org.basex.core.StaticOptions.AuthMethod;
@@ -14,8 +15,6 @@ import org.basex.query.util.list.*;
  * @author Rositsa Shadura
  */
 public final class Request {
-  /** Request attributes. */
-  public final EnumMap<RequestAttribute, String> attributes = new EnumMap<>(RequestAttribute.class);
   /** Request headers. */
   public final TreeMap<String, String> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
   /** Body or multipart attributes. */
@@ -27,17 +26,34 @@ public final class Request {
   /** Indicator for multipart request. */
   public boolean isMultipart;
 
-  /** Authentication method (Default: basic authentication). */
-  AuthMethod authMethod = AuthMethod.BASIC;
-
-  /**
-   * Returns the value of the specified attribute.
-   * @param name name of request attribute
-   * @return value or {@code null}
-   */
-  String attribute(final RequestAttribute name) {
-    return attributes.get(name);
-  }
+  /** HTTP method (can be {@code null}). */
+  public String method;
+  /** Target URL (can be {@code null}). */
+  public String href;
+  /** Timeout (can be {@code null}). */
+  public Duration timeout;
+  /** Media type that replaces the one of the response (can be {@code null}). */
+  public String overrideMediaType;
+  /** Username (can be {@code null}). */
+  public String username;
+  /** Password (can be {@code null}). */
+  public String password;
+  /** Authentication method. */
+  public AuthMethod authMethod = AuthMethod.BASIC;
+  /** Send credentials before a challenge is received. */
+  public boolean sendAuthorization;
+  /** Follow redirects. */
+  public boolean followRedirect = true;
+  /** Discard the response body. */
+  public boolean statusOnly;
+  /** Use the cookie store of the query. */
+  public boolean cookies;
+  /** CSV parser options (can be {@code null}). */
+  public String csv;
+  /** JSON parser options (can be {@code null}). */
+  public String json;
+  /** HTML parser options (can be {@code null}). */
+  public String html;
 
   /**
    * Returns a valid boundary.

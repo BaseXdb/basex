@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import static org.basex.util.http.HTTPText.*;
 
 import java.io.*;
+import java.util.*;
 import java.util.regex.*;
 import java.util.zip.*;
 
@@ -27,6 +28,7 @@ import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
+import org.basex.util.Base64;
 import org.basex.util.list.*;
 
 /**
@@ -41,8 +43,8 @@ public final class Payload {
   /** XML declaration (end). */
   private static final byte[] DECLEND = token("?>");
 
-  /** Payloads (can be {@code null}). */
-  private final ItemList payloads;
+  /** Parse the contents of the payload. */
+  private final boolean body;
   /** Input stream. */
   private InputStream input;
   /** Input info (can be {@code null}). */
@@ -61,45 +63,39 @@ public final class Payload {
       final MainOptions options) {
 
     this.input = input;
+    this.body = body;
     this.info = info;
     this.options = options;
-    payloads = body ? new ItemList() : null;
   }
 
   /**
-   * Parses the HTTP payload and returns a result body element.
+   * Parses the HTTP payload.
    * @param type media type
    * @param encoding content encoding
    * @param temp registry for temporary files (can be {@code null})
-   * @return body element
+   * @return parsed body
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  FNode parse(final MediaType type, final String encoding, final TempFiles temp)
+  ResponseBody parse(final MediaType type, final String encoding, final TempFiles temp)
       throws IOException, QueryException {
 
     // decompress before parsing (applies to multipart and single-part alike)
     input = decode(input, encoding);
 
-    final FBuilder body;
+    final ResponseBody result = new ResponseBody();
+    result.type = type;
     if(type.isMultipart()) {
       // multipart response
-      final byte[] boundary = boundary(type);
-      body = FElem.build(Q_HTTP_MULTIPART).attr(Q_BOUNDARY, boundary);
-      final GNodeList parts = new GNodeList();
-      extractParts(concat(DASHES, boundary), parts);
-      for(final GNode node : parts) body.node(node);
-    } else {
-      // single part response
-      body = FElem.build(Q_HTTP_BODY);
-      if(payloads != null) {
-        // the stream is closed as before, releasing the inflater of a decompressed response
-        try(InputStream is = input) {
-          payloads.add(parse(SpillOutput.read(is, temp), type));
-        }
+      result.boundary = boundary(type);
+      extractParts(concat(DASHES, result.boundary), result.parts);
+    } else if(body) {
+      // the stream is closed as before, releasing the inflater of a decompressed response
+      try(InputStream is = input) {
+        result.value = parse(SpillOutput.read(is, temp), type);
       }
     }
-    return body.attr(Q_MEDIA_TYPE, type.type()).finish();
+    return result;
   }
 
   /**
@@ -112,14 +108,6 @@ public final class Payload {
   public static InputStream decode(final InputStream input, final String encoding)
       throws IOException {
     return GZIP.equalsIgnoreCase(encoding) ? new GZIPInputStream(input) : input;
-  }
-
-  /**
-   * Returns all payloads.
-   * @return payloads
-   */
-  Value value() {
-    return payloads.value();
   }
 
   /**
@@ -140,11 +128,11 @@ public final class Payload {
   /**
    * Extracts the parts from a multipart message.
    * @param sep separation boundary
-   * @param parts list with all parts (can be {@code null})
+   * @param parts list with all parts
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  private void extractParts(final byte[] sep, final GNodeList parts)
+  private void extractParts(final byte[] sep, final ArrayList<ResponseBody> parts)
       throws IOException, QueryException {
 
     // RFC 1341: Preamble is to be ignored: read till 1st boundary
@@ -161,21 +149,21 @@ public final class Payload {
    * Extracts a part from a multipart message.
    * @param sep separation boundary
    * @param end closing boundary
-   * @param parts list with all parts (can be {@code null})
+   * @param parts list with all parts
    * @return success flag
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  private boolean extractPart(final byte[] sep, final byte[] end, final GNodeList parts)
-      throws IOException, QueryException {
+  private boolean extractPart(final byte[] sep, final byte[] end,
+      final ArrayList<ResponseBody> parts) throws IOException, QueryException {
 
     // check if last line is reached
     byte[] line = readLine();
     if(line == null || matchBoundary(end, line)) return false;
 
-    // content type of part payload - if not defined by header 'Content-Type',
-    // it is equal to 'text/plain' (RFC 1341)
-    MediaType type = MediaType.TEXT_PLAIN;
+    // a part without 'Content-Type' header has the media type 'text/plain' (RFC 1341)
+    final ResponseBody part = new ResponseBody();
+    parts.add(part);
 
     // extract headers
     boolean base64 = false;
@@ -185,19 +173,13 @@ public final class Payload {
         final String key = string(substring(l, 0, pos));
         final String value = string(trim(substring(l, pos + 1)));
         if(key.equalsIgnoreCase(CONTENT_TYPE)) {
-          type = new MediaType(value);
+          part.type = new MediaType(value);
         } else if(key.equalsIgnoreCase(CONTENT_TRANSFER_ENCODING)) {
           base64 = value.equalsIgnoreCase(BASE64);
         }
-        if(!value.isEmpty() && parts != null) {
-          parts.add(FElem.build(Q_HTTP_HEADER).attr(Q_NAME, lc(token(key))).
-            attr(Q_VALUE, value).finish());
-        }
+        part.headers.add(Map.entry(string(lc(token(key))), value));
       }
       l = readLine();
-    }
-    if(parts != null) {
-      parts.add(FElem.build(Q_HTTP_BODY).attr(Q_MEDIA_TYPE, type).finish());
     }
 
     // extract payload
@@ -215,10 +197,10 @@ public final class Payload {
       bl.add(line);
     }
 
-    if(payloads != null) {
-      final String encoding = type.parameter(CHARSET);
-      final byte[] part = new TextInput(new IOContent(bl.finish()), encoding).content();
-      payloads.add(parse(new IOContent(base64 ? Base64.decode(part) : part), type));
+    if(body) {
+      final String encoding = part.type.parameter(CHARSET);
+      final byte[] contents = new TextInput(new IOContent(bl.finish()), encoding).content();
+      part.value = parse(new IOContent(base64 ? Base64.decode(contents) : contents), part.type);
     }
     return true;
   }
@@ -413,8 +395,10 @@ public final class Payload {
     } else if(type.isMultipart()) {
       try(InputStream is = io.inputStream()) {
         final Payload payload = new Payload(is, true, null, options);
-        payload.extractParts(concat(DASHES, payload.boundary(type)), null);
-        return payload.value();
+        final ResponseBody parsed = new ResponseBody();
+        parsed.type = type;
+        payload.extractParts(concat(DASHES, payload.boundary(type)), parsed.parts);
+        return parsed.values();
       }
     } else {
       return B64.get(io, IOERR_X);

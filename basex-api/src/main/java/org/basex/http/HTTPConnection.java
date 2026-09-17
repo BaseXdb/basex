@@ -327,11 +327,11 @@ public final class HTTPConnection implements ClientInfo {
       response.resetBuffer();
       if(code == SC_UNAUTHORIZED && !response.containsHeader(WWW_AUTHENTICATE)) {
         final TokenBuilder header = new TokenBuilder().add(authMethod);
-        header.add(' ').add(RequestAttribute.REALM).add("=\"").add(Prop.NAME).add('"');
+        header.add(' ').add(AuthParam.REALM).add("=\"").add(Prop.NAME).add('"');
         if(authMethod == AuthMethod.DIGEST) {
           final String nonce = Strings.md5(Long.toString(System.nanoTime()));
-          header.add(",").add(RequestAttribute.QOP).add("=\"").add(AUTH);
-          header.add('"').add(',').add(RequestAttribute.NONCE).add("=\"").add(nonce).add('"');
+          header.add(",").add(AuthParam.QOP).add("=\"").add(AUTH);
+          header.add('"').add(',').add(AuthParam.NONCE).add("=\"").add(nonce).add('"');
         }
         response.setHeader(WWW_AUTHENTICATE, header.toString());
       }
@@ -431,29 +431,29 @@ public final class HTTPConnection implements ClientInfo {
           throw new LoginException(user.name());
         context.users.rehash(user, creds[1], algorithms);
       } else {
-        final EnumMap<RequestAttribute, String> auth = Client.authHeaders(header);
-        user = user(auth.get(RequestAttribute.USERNAME));
+        final EnumMap<AuthParam, String> auth = Client.authHeaders(header);
+        user = user(auth.get(AuthParam.USERNAME));
 
-        final String nonce = auth.get(RequestAttribute.NONCE);
-        final String cnonce = auth.get(RequestAttribute.CNONCE);
+        final String nonce = auth.get(AuthParam.NONCE);
+        final String cnonce = auth.get(AuthParam.CNONCE);
         String ha1 = user.code(Algorithm.DIGEST, Code.HASH);
         // reject if no digest hash is stored for the user (digest not enabled in AUTHALGORITHMS)
         if(ha1 == null) throw new LoginException(user.name());
-        if(Strings.eq(auth.get(RequestAttribute.ALGORITHM), MD5_SESS))
+        if(Strings.eq(auth.get(AuthParam.ALGORITHM), MD5_SESS))
           ha1 = Strings.md5(ha1 + ':' + nonce + ':' + cnonce);
 
-        final String qop = auth.get(RequestAttribute.QOP);
-        final String ha2 = Strings.md5(method + ':' + auth.get(RequestAttribute.URI));
+        final String qop = auth.get(AuthParam.QOP);
+        final String ha2 = Strings.md5(method + ':' + auth.get(AuthParam.URI));
 
         final StringBuilder sb = new StringBuilder(ha1).append(':').append(nonce);
         if(Strings.eq(qop, AUTH)) {
-          sb.append(':').append(auth.get(RequestAttribute.NC));
+          sb.append(':').append(auth.get(AuthParam.NC));
           sb.append(':').append(cnonce).append(':').append(qop);
         }
         sb.append(':').append(ha2);
 
         // constant-time comparison of the recomputed and the transmitted response
-        final String rsp = auth.get(RequestAttribute.RESPONSE);
+        final String rsp = auth.get(AuthParam.RESPONSE);
         if(rsp == null || !MessageDigest.isEqual(token(Strings.md5(sb.toString())), token(rsp)))
           throw new LoginException(user.name());
       }

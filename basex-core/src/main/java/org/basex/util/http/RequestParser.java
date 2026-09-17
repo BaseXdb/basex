@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import static org.basex.util.http.HTTPText.*;
 
 import java.net.http.*;
+import java.time.*;
 import java.util.*;
 
 import org.basex.core.*;
@@ -52,7 +53,7 @@ public final class RequestParser {
         final String key = string(attr.name());
         final RequestAttribute r = Enums.get(RequestAttribute.class, key);
         if(r == null) throw HC_REQ_X.get(info, "Unknown attribute: " + key);
-        hr.attributes.put(r, string(attr.string()));
+        assign(hr, r, string(attr.string()));
       }
       checkRequest(hr);
 
@@ -175,44 +176,67 @@ public final class RequestParser {
   }
 
   /**
+   * Assigns the value of a request attribute.
+   * @param request request
+   * @param attribute attribute
+   * @param value attribute value
+   * @throws QueryException query exception
+   */
+  private void assign(final Request request, final RequestAttribute attribute, final String value)
+      throws QueryException {
+    switch(attribute) {
+      case HREF -> request.href = value;
+      case METHOD -> request.method = value.toUpperCase(Locale.ENGLISH);
+      case USERNAME -> request.username = value;
+      case PASSWORD -> request.password = value;
+      case OVERRIDE_MEDIA_TYPE -> request.overrideMediaType = value;
+      case CSV -> request.csv = value;
+      case JSON -> request.json = value;
+      case HTML -> request.html = value;
+      case COOKIES -> request.cookies = bool(attribute, value);
+      case STATUS_ONLY -> request.statusOnly = bool(attribute, value);
+      case FOLLOW_REDIRECT -> request.followRedirect = bool(attribute, value);
+      case SEND_AUTHORIZATION -> request.sendAuthorization = bool(attribute, value);
+      case TIMEOUT -> {
+        final int seconds = Strings.toInt(value);
+        if(seconds <= 0) throw HC_REQ_X.get(info, "Invalid timeout: " + value);
+        request.timeout = Duration.ofSeconds(seconds);
+      }
+      case AUTH_METHOD -> {
+        // the authentication method also applies to credentials in the URI
+        final AuthMethod method = StaticOptions.AUTHMETHOD.get(value);
+        if(method == null) throw HC_REQ_X.get(info, "Invalid authentication method: " + value);
+        request.authMethod = method;
+      }
+    }
+  }
+
+  /**
+   * Returns the boolean value of a request attribute.
+   * @param attribute attribute
+   * @param value attribute value
+   * @return boolean value
+   * @throws QueryException query exception
+   */
+  private boolean bool(final RequestAttribute attribute, final String value)
+      throws QueryException {
+    if(Strings.isTrue(value)) return true;
+    if(Strings.isFalse(value)) return false;
+    throw HC_REQ_X.get(info, "Value of '" + attribute + "' attribute is no boolean: " + value);
+  }
+
+  /**
    * Checks consistency of attributes for <http:request/>.
    * @param request request
    * @throws QueryException query exception
    */
   private void checkRequest(final Request request) throws QueryException {
     // method denotes the HTTP verb and is mandatory
-    final String mth = request.attribute(RequestAttribute.METHOD);
-    if(mth == null) throw HC_REQ_X.get(info, "Missing attribute: " + RequestAttribute.METHOD);
-    request.attributes.put(RequestAttribute.METHOD, mth.toUpperCase(Locale.ENGLISH));
-
-    // check parameters needed in case of authorization
-    final String us = request.attribute(RequestAttribute.USERNAME);
-    if(us != null) {
-      // check if password is supplied
-      final String pw = request.attribute(RequestAttribute.PASSWORD);
-      if(pw == null) throw HC_REQ_X.get(info, "Missing attribute: " + RequestAttribute.PASSWORD);
-    }
-    // check authorization method (default: 'Basic'), which also applies to URI credentials
-    final String am = request.attribute(RequestAttribute.AUTH_METHOD);
-    if(am != null) {
-      final AuthMethod method = StaticOptions.AUTHMETHOD.get(am);
-      if(method == null) throw HC_REQ_X.get(info, "Invalid authentication method: " + am);
-      request.authMethod = method;
-    }
-
-    // check other parameters
-    final String timeout = request.attribute(RequestAttribute.TIMEOUT);
-    if(timeout != null && Strings.toInt(timeout) <= 0)
-      throw HC_REQ_X.get(info, "Invalid timeout: " + timeout);
-
-    for(final RequestAttribute r : new RequestAttribute[] {
-      RequestAttribute.FOLLOW_REDIRECT, RequestAttribute.STATUS_ONLY,
-      RequestAttribute.SEND_AUTHORIZATION, RequestAttribute.COOKIES
-    }) {
-      final String s = request.attribute(r);
-      if(s != null && !Strings.isTrue(s) && !Strings.isFalse(s))
-        throw HC_REQ_X.get(info, "Value of '" + r + "' attribute is no boolean: " + s);
-    }
+    if(request.method == null)
+      throw HC_REQ_X.get(info, "Missing attribute: " + RequestAttribute.METHOD);
+    // a password is required if a username is supplied
+    if(request.username != null && request.password == null)
+      throw HC_REQ_X.get(info, "Missing attribute: " + RequestAttribute.PASSWORD);
   }
 
   /**
@@ -223,7 +247,7 @@ public final class RequestParser {
   private void checkHeaders(final Request request) throws QueryException {
     final HttpRequest.Builder rb = HttpRequest.newBuilder();
     try {
-      rb.method(request.attribute(RequestAttribute.METHOD), HttpRequest.BodyPublishers.noBody());
+      rb.method(request.method, HttpRequest.BodyPublishers.noBody());
       request.headers.forEach(rb::header);
     } catch(final IllegalArgumentException ex) {
       throw HC_REQ_X.get(info, ex.getMessage());

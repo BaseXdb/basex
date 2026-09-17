@@ -355,7 +355,8 @@ public abstract class FnHttpTest extends HTTPTest {
     final RequestParser rp = new RequestParser(null);
     final Request r = rp.parse(dbNode.childIter().next(), Empty.VALUE);
 
-    assertEquals(2, r.attributes.size());
+    assertEquals("POST", r.method);
+    assertEquals(REST_ROOT, r.href);
     assertEquals(2, r.headers.size());
     assertFalse(r.payload.isEmpty());
     assertEquals(1, r.payloadAtts.size());
@@ -384,7 +385,8 @@ public abstract class FnHttpTest extends HTTPTest {
     final RequestParser rp = new RequestParser(null);
     final Request r = rp.parse(dbNode1.childIter().next(), Empty.VALUE);
 
-    assertEquals(2, r.attributes.size());
+    assertEquals("POST", r.method);
+    assertEquals(REST_ROOT, r.href);
     assertEquals(2, r.headers.size());
     assertTrue(r.isMultipart);
     assertEquals(3, r.parts.size());
@@ -434,7 +436,8 @@ public abstract class FnHttpTest extends HTTPTest {
     final RequestParser rp = new RequestParser(null);
     final Request r = rp.parse(dbNode1.childIter().next(), StrSeq.get(bodies));
 
-    assertEquals(2, r.attributes.size());
+    assertEquals("POST", r.method);
+    assertEquals(REST_ROOT, r.href);
     assertEquals(2, r.headers.size());
     assertTrue(r.isMultipart);
     assertEquals(3, r.parts.size());
@@ -933,6 +936,22 @@ public abstract class FnHttpTest extends HTTPTest {
   }
 
   /**
+   * Tests that a part header with an empty value is reported, as the response headers are.
+   * @throws Exception exception
+   */
+  @Test public final void emptyPartHeader() throws Exception {
+    final FakeHttpResponse response = new FakeHttpResponse();
+    response.header("Content-Type", "multipart/mixed; boundary=bnd");
+    response.header("X-Empty", "");
+    response.input(token("--bnd" + CRLF + "Content-Type: text/plain" + CRLF
+        + "Content-Description:" + CRLF + CRLF + "hello" + CRLF + "--bnd--" + CRLF));
+    final Value returned = new Response(null, ctx.options).getResponse(response, true, null);
+    final String xml = string(returned.itemAt(0).serialize().finish());
+    assertTrue(xml.contains("name=\"content-description\" value=\"\""), xml);
+    assertTrue(xml.contains("name=\"x-empty\" value=\"\""), xml);
+  }
+
+  /**
    * Tests that a media type is recognized regardless of the case of its type/subtype.
    * @throws Exception exception
    */
@@ -964,7 +983,9 @@ public abstract class FnHttpTest extends HTTPTest {
   @Test public final void booleanAttributes() throws Exception {
     final Request r = parse("<http:request " + HTTP_NS + " method='get' href='http://x/' "
         + "status-only='1' follow-redirect='yes' send-authorization='off'/>");
-    assertEquals("1", r.attributes.get(RequestAttribute.STATUS_ONLY));
+    assertTrue(r.statusOnly);
+    assertTrue(r.followRedirect);
+    assertFalse(r.sendAuthorization);
   }
 
   /**

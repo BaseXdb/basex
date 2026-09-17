@@ -108,11 +108,35 @@ public final class Response {
     } else {
       try(InputStream is = response.body()) {
         final Payload payload = new Payload(is, body, info, options);
-        root.node(payload.parse(type, encoding, temp));
-        if(body) items.add(payload.value());
+        final ResponseBody parsed = payload.parse(type, encoding, temp);
+        root.node(element(parsed));
+        if(body) items.add(parsed.values());
       }
     }
 
     return items.set(0, root.finish()).value();
   }
+
+  /**
+   * Returns the body element of a parsed response body.
+   * @param body parsed body
+   * @return body element
+   */
+  private static FNode element(final ResponseBody body) {
+    final FBuilder elem;
+    if(body.boundary != null) {
+      elem = FElem.build(Q_HTTP_MULTIPART).attr(Q_BOUNDARY, body.boundary);
+      for(final ResponseBody part : body.parts) {
+        for(final Entry<String, String> header : part.headers) {
+          elem.node(FElem.build(Q_HTTP_HEADER).attr(Q_NAME, header.getKey()).
+            attr(Q_VALUE, header.getValue()));
+        }
+        elem.node(FElem.build(Q_HTTP_BODY).attr(Q_MEDIA_TYPE, part.type));
+      }
+    } else {
+      elem = FElem.build(Q_HTTP_BODY);
+    }
+    return elem.attr(Q_MEDIA_TYPE, body.type.type()).finish();
+  }
+
 }

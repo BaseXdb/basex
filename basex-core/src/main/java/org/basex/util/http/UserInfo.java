@@ -1,7 +1,7 @@
 package org.basex.util.http;
 
 import static org.basex.util.http.HTTPText.*;
-import static org.basex.util.http.RequestAttribute.*;
+import static org.basex.util.http.AuthParam.*;
 
 import java.net.*;
 import java.net.http.*;
@@ -59,8 +59,8 @@ public final class UserInfo {
         password = creds[1];
       }
     } else if(request != null) {
-      username = request.attribute(USERNAME);
-      password = request.attribute(PASSWORD);
+      username = request.username;
+      password = request.password;
     }
   }
 
@@ -120,8 +120,8 @@ public final class UserInfo {
    */
   private String digest(final HttpHeaders headers, final HttpRequest last) {
     for(final String header : headers.allValues(WWW_AUTHENTICATE)) {
-      for(final EnumMap<RequestAttribute, String> auth : Client.challenges(header)) {
-        if(!request.authMethod.toString().equalsIgnoreCase(auth.get(AUTH_METHOD))) continue;
+      for(final EnumMap<AuthParam, String> auth : Client.challenges(header)) {
+        if(!request.authMethod.toString().equalsIgnoreCase(auth.get(SCHEME))) continue;
 
         // supported algorithms: MD5, SHA-256, SHA-512-256, optionally with session suffix
         final String algorithm = auth.getOrDefault(ALGORITHM, MD5);
@@ -183,7 +183,7 @@ public final class UserInfo {
    * @param uri2 second URI
    * @return result of check
    */
-  private static boolean sameOrigin(final URI uri1, final URI uri2) {
+  static boolean sameOrigin(final URI uri1, final URI uri2) {
     return String.valueOf(uri1.getScheme()).equalsIgnoreCase(String.valueOf(uri2.getScheme())) &&
       String.valueOf(uri1.getHost()).equalsIgnoreCase(String.valueOf(uri2.getHost())) &&
       port(uri1) == port(uri2);

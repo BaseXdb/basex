@@ -1,5 +1,6 @@
 package org.basex.http.restxq;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import java.io.*;
@@ -58,6 +59,17 @@ public final class RestXqDigestTest extends RestXqTest {
     + "declare %R:path('digest-redirect') function m:redirect() {"
     + "  <R:response><http:response status='302' " + HTTP_NS + ">"
     + "    <http:header name='Location' value='" + HTTP_ROOT + "digest/auth?a=1'/>"
+    + "  </http:response></R:response>"
+    + "};"
+    + "declare %R:path('redirect-loop') function m:loop() {"
+    + "  <R:response><http:response status='302' " + HTTP_NS + ">"
+    + "    <http:header name='Location' value='" + HTTP_ROOT + "redirect-loop'/>"
+    + "  </http:response></R:response>"
+    + "};"
+    + "declare %R:path('redirect-origin') function m:origin() {"
+    + "  <R:response><http:response status='302' " + HTTP_NS + ">"
+    + "    <http:header name='Location' value='"
+    + HTTP_ROOT.replace("localhost", "127.0.0.1") + "digest-type'/>"
     + "  </http:response></R:response>"
     + "};"
     + "declare %R:path('digest-see-other') function m:see-other() {"
@@ -129,6 +141,19 @@ public final class RestXqDigestTest extends RestXqTest {
       + "auth-method='Digest' username='admin' password='pw'>"
       + "<http:body media-type='text/plain'>x</http:body></http:request>",
       HTTP_ROOT + "digest-see-other") + "[2]", "GET none none");
+  }
+
+  /** A redirect loop is aborted instead of being followed indefinitely. */
+  @Test public void redirectLoop() {
+    error(_HTTP_SEND_REQUEST.args(" <http:request " + HTTP_NS + " method='get'/>",
+      HTTP_ROOT + "redirect-loop"), HC_ERROR_X);
+  }
+
+  /** An Authorization header is not sent to a redirect target with another origin. */
+  @Test public void redirectOrigin() {
+    query(_HTTP_SEND_REQUEST.args(" <http:request " + HTTP_NS + " method='get'>"
+      + "<http:header name='Authorization' value='Basic eDp5'/></http:request>",
+      HTTP_ROOT + "redirect-origin") + "[1]/@status/string()", 401);
   }
 
   /** Requests with credentials and body are sent without waiting for a continue response. */
