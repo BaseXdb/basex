@@ -23,6 +23,6 @@ public final class FileReadText extends FileReadFn {
     final ParseOptions options = options(path, qc);
     final String encoding = options.get(ParseOptions.ENCODING);
     final boolean fallback = options.get(ParseOptions.FALLBACK);
-    return new StrLazy(new IOFile(path), encoding, FILE_IO_ERROR_X, fallback);
+    return new StrLazy(new IOFile(path), encoding, FILE_IO_ERROR_X, fallback, null);
   }
 }

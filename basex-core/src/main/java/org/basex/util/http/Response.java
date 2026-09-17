@@ -8,7 +8,6 @@ import java.net.http.*;
 import java.net.http.HttpClient.Version;
 import java.util.*;
 import java.util.Map.*;
-import java.util.regex.*;
 
 import org.basex.core.*;
 import org.basex.io.*;
@@ -32,8 +31,6 @@ public final class Response {
   private final InputInfo info;
   /** Database options. */
   private final MainOptions options;
-  /** HTTP exchange (can be {@code null}). */
-  private final Exchange exchange;
   /** Query resources (can be {@code null}). */
   private final QueryResources resources;
 
@@ -43,21 +40,19 @@ public final class Response {
    * @param options main options
    */
   public Response(final InputInfo info, final MainOptions options) {
-    this(info, options, null, null);
+    this(info, options, null);
   }
 
   /**
    * Constructor for lazy retrieval of response bodies.
    * @param info input info (can be {@code null})
    * @param options main options
-   * @param exchange HTTP exchange
    * @param resources query resources
    */
-  public Response(final InputInfo info, final MainOptions options, final Exchange exchange,
+  public Response(final InputInfo info, final MainOptions options,
       final QueryResources resources) {
     this.info = info;
     this.options = options;
-    this.exchange = exchange;
     this.resources = resources;
   }
 
@@ -78,12 +73,8 @@ public final class Response {
     final FBuilder root = FElem.build(Q_HTTP_RESPONSE).ns();
     root.attr(Q_STATUS, status).attr(Q_MESSAGE, IOUrl.reason(status));
     final URI uri = response.uri();
-    if(uri != null) {
-      // drop credentials
-      final String ui = uri.getRawUserInfo();
-      root.attr(Q_HREF, ui == null ? uri.toString() :
-        uri.toString().replaceFirst(Pattern.quote(ui + '@'), ""));
-    }
+    final String href = uri != null ? IOUrl.stripUserInfo(uri.toString()) : null;
+    if(href != null) root.attr(Q_HREF, href);
     if(response.version() != null) {
       root.attr(Q_VERSION, response.version() == Version.HTTP_2 ? "HTTP/2" : "HTTP/1.1");
     }
@@ -107,13 +98,13 @@ public final class Response {
 
     final TempFiles temp = resources != null ? resources.index(TempFiles.class) : null;
     final ItemList items = new ItemList().add((Item) null);
-    if(body && exchange != null && Payload.binary(type) &&
+    if(body && resources != null && Payload.binary(type) &&
         !"0".equals(headers.firstValue(CONTENT_LENGTH).orElse(""))) {
       // binary result: skip retrieval of response body, return lazy item
       final InputStream is = response.body();
       resources.add(is);
       root.node(FElem.build(Q_HTTP_BODY).attr(Q_MEDIA_TYPE, type.type()).finish());
-      items.add(new B64HttpLazy(exchange, is, encoding, temp));
+      items.add(new B64HttpLazy(href, is, encoding, temp));
     } else {
       try(InputStream is = response.body()) {
         final Payload payload = new Payload(is, body, info, options);

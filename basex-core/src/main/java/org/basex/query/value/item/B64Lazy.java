@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.function.*;
 
 import org.basex.data.*;
+import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.util.*;
@@ -17,13 +18,28 @@ import org.basex.util.*;
 public abstract class B64Lazy extends B64 implements Lazy {
   /** Caching flag. */
   private boolean cache;
+  /** Contents, assigned on first access (can be {@code null}). */
+  private IO contents;
+
+  /**
+   * Returns the contents of the item; called on first access.
+   * @return input reference
+   * @throws IOException I/O exception
+   */
+  abstract IO source() throws IOException;
 
   /**
    * Opens a stream on the uncached value.
    * @return buffered input
    * @throws IOException I/O exception
    */
-  abstract BufferInput open() throws IOException;
+  private BufferInput open() throws IOException {
+    if(contents == null) {
+      contents = source();
+      if(contents instanceof IOContent) data = contents.read();
+    }
+    return BufferInput.get(contents);
+  }
 
   /**
    * Returns the query exception for a failed access.

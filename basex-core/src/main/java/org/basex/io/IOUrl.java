@@ -337,15 +337,7 @@ public final class IOUrl extends IO {
   public static String toAscii(final String url) {
     final int i = url.indexOf("://") + 3;
     if(i == 2) return url;
-    // find end of authority (first '/', '?' or '#' after the scheme)
-    int j = url.length();
-    for(int k = i; k < j; k++) {
-      final char ch = url.charAt(k);
-      if(ch == '/' || ch == '?' || ch == '#') {
-        j = k;
-        break;
-      }
-    }
+    final int j = authorityEnd(url, i);
     final String authority = url.substring(i, j);
     for(int c = 0; c < authority.length(); c++) {
       if(authority.charAt(c) > 127) {
@@ -356,12 +348,39 @@ public final class IOUrl extends IO {
   }
 
   /**
+   * Removes the user information (credentials) from a URL.
+   * @param url URL string
+   * @return URL without user information
+   */
+  public static String stripUserInfo(final String url) {
+    final int i = url.indexOf("://") + 3;
+    if(i == 2) return url;
+    final int at = url.lastIndexOf('@', authorityEnd(url, i) - 1);
+    return at < i ? url : url.substring(0, i) + url.substring(at + 1);
+  }
+
+  /**
+   * Returns the end offset of the authority of a URL (first '/', '?' or '#' after the scheme).
+   * @param url URL string
+   * @param start start offset of the authority
+   * @return end offset
+   */
+  private static int authorityEnd(final String url, final int start) {
+    final int ul = url.length();
+    for(int u = start; u < ul; u++) {
+      final char ch = url.charAt(u);
+      if(ch == '/' || ch == '?' || ch == '#') return u;
+    }
+    return ul;
+  }
+
+  /**
    * Returns the authority with the host part converted to ASCII (Punycode).
    * @param authority authority string ({@code [userinfo@]host[:port]})
    * @return ASCII-encoded authority, or the original string if encoding fails
    */
   private static String asciiAuthority(final String authority) {
-    final int at = authority.indexOf('@');
+    final int at = authority.lastIndexOf('@');
     final String userInfo = at < 0 ? "" : authority.substring(0, at + 1);
     final String hostPort = at < 0 ? authority : authority.substring(at + 1);
     // skip IPv6 brackets when searching for the port colon

@@ -78,9 +78,8 @@ public final class Payload {
   FNode parse(final MediaType type, final String encoding, final TempFiles temp)
       throws IOException, QueryException {
 
-    // decompress before parsing (applies to multipart and single-part alike); coding is
-    // case-insensitive (RFC 9110)
-    if(GZIP.equalsIgnoreCase(encoding)) input = new GZIPInputStream(input);
+    // decompress before parsing (applies to multipart and single-part alike)
+    input = decode(input, encoding);
 
     final FBuilder body;
     if(type.isMultipart()) {
@@ -101,6 +100,18 @@ public final class Payload {
       }
     }
     return body.attr(Q_MEDIA_TYPE, type.type()).finish();
+  }
+
+  /**
+   * Returns a stream that decodes a response body with the given content coding.
+   * @param input response body
+   * @param encoding content encoding (case-insensitive, RFC 9110)
+   * @return decoded stream
+   * @throws IOException I/O exception
+   */
+  public static InputStream decode(final InputStream input, final String encoding)
+      throws IOException {
+    return GZIP.equalsIgnoreCase(encoding) ? new GZIPInputStream(input) : input;
   }
 
   /**

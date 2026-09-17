@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.io.in.*;
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -20,7 +21,8 @@ public final class FnUnparsedBinary extends ParseFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final String source = toStringOrNull(arg(0), qc);
-    return source == null ? Empty.VALUE : new B64IOLazy(toIO(source, false), RESWHICH_X);
+    return source == null ? Empty.VALUE :
+      new B64IOLazy(toIO(source, false), RESWHICH_X, qc.resources.index(TempFiles.class));
   }
 
   @Override

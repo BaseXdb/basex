@@ -7,8 +7,10 @@ import java.util.function.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
+import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.func.Function;
+import org.basex.query.util.*;
 import org.basex.util.*;
 
 /**
@@ -26,6 +28,10 @@ public final class StrLazy extends AStr implements Lazy {
   private final QueryError error;
   /** Replace invalid input with Unicode replacement character. */
   private final boolean fallback;
+  /** Registry for temporary files; if {@code null}, the input is reopened on each access. */
+  private final TempFiles temp;
+  /** Contents of the input, read on first access (can be {@code null}). */
+  private IO contents;
   /** Caching flag. */
   private boolean cache;
 
@@ -35,13 +41,15 @@ public final class StrLazy extends AStr implements Lazy {
    * @param encoding encoding (can be {@code null})
    * @param error error message to be thrown
    * @param fallback fallback flag
+   * @param temp registry for temporary files (if {@code null}, input is reopened on each access)
    */
   public StrLazy(final IO input, final String encoding, final QueryError error,
-      final boolean fallback) {
+      final boolean fallback, final TempFiles temp) {
     this.input = input;
     this.encoding = encoding;
     this.error = error;
     this.fallback = fallback;
+    this.temp = temp;
   }
 
   @Override
@@ -58,7 +66,7 @@ public final class StrLazy extends AStr implements Lazy {
   @Override
   public TextInput stringInput(final InputInfo ii) throws IOException, QueryException {
     if(cache) cache(ii);
-    return isCached() ? super.stringInput(ii) : get(ii);
+    return isCached() ? super.stringInput(ii) : get(true, ii);
   }
 
   @Override
@@ -69,10 +77,12 @@ public final class StrLazy extends AStr implements Lazy {
 
   @Override
   public void cache(final InputInfo ii) throws QueryException {
+    if(isCached()) return;
     try {
-      if(!isCached()) value = get(ii).content();
+      value = get(false, ii).content();
+      contents = null;
     } catch(final IOException ex) {
-      throw error.get(ii,  input).cause(ex);
+      throw error.get(ii, IOUrl.stripUserInfo(input.toString())).cause(ex);
     }
   }
 
@@ -88,13 +98,15 @@ public final class StrLazy extends AStr implements Lazy {
 
   /**
    * Returns an input stream for the item.
+   * @param keep keep the contents of the input for subsequent accesses
    * @param info input info (can be {@code null})
    * @return stream
    * @throws QueryException query exception
    */
-  private TextInput get(final InputInfo info) throws QueryException {
+  private TextInput get(final boolean keep, final InputInfo info) throws QueryException {
     try {
-      return new NewlineInput(input, encoding).fallback(fallback);
+      if(keep && contents == null && temp != null) contents = SpillOutput.read(input, temp);
+      return new NewlineInput(contents != null ? contents : input, encoding).fallback(fallback);
     } catch(final IOException ex) {
       throw error.get(info, ex);
     }
@@ -135,7 +147,7 @@ public final class StrLazy extends AStr implements Lazy {
     if(isCached()) {
       super.toString(qs);
     } else {
-      qs.function(Function._FILE_READ_TEXT, input);
+      qs.function(Function._FILE_READ_TEXT, IOUrl.stripUserInfo(input.toString()));
     }
   }
 }

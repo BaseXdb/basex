@@ -7,6 +7,9 @@ import static org.basex.util.http.RequestAttribute.*;
 import java.io.*;
 import java.net.*;
 import java.net.http.*;
+import java.net.http.HttpRequest.*;
+import java.net.http.HttpResponse.*;
+import java.time.*;
 import java.util.*;
 import java.util.Map.*;
 
@@ -14,6 +17,8 @@ import org.basex.build.csv.*;
 import org.basex.build.html.*;
 import org.basex.build.json.*;
 import org.basex.core.*;
+import org.basex.core.StaticOptions.*;
+import org.basex.core.jobs.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
@@ -76,12 +81,115 @@ public final class Client {
       mopts.set(MainOptions.HTMLPARSER,
           assign(new HtmlOptions(mopts.get(MainOptions.HTMLPARSER)), req.attribute(HTML)));
 
-      final Exchange exchange = new Exchange(uri, req, client(req, resources));
-      return new Response(info, mopts, exchange, resources).
-        getResponse(exchange.send(), body, mediaType);
+      final HttpResponse<InputStream> response = send(uri, req, client(req, resources));
+      return new Response(info, mopts, resources).getResponse(response, body, mediaType);
     } catch(final IOException ex) {
       throw error(ex, info);
     }
+  }
+
+  /**
+   * Sends the request and returns the response.
+   * @param uri target URI
+   * @param request request data
+   * @param client HTTP client
+   * @return HTTP response
+   * @throws IOException I/O exception
+   */
+  private static HttpResponse<InputStream> send(final URI uri, final Request request,
+      final HttpClient client) throws IOException {
+
+    final String seconds = request.attribute(TIMEOUT);
+    final Duration timeout = seconds != null ? Duration.ofSeconds(Strings.toInt(seconds)) : null;
+    final HttpRequest.Builder rb;
+    try {
+      rb = HttpRequest.newBuilder(uri);
+      if(timeout != null) rb.timeout(timeout);
+
+      // set method, attach payload
+      final String method = request.attribute(METHOD);
+      final String src = request.isMultipart ? null : request.payloadAtts.get(SRC);
+      final boolean hasBody = src != null ||
+          !(request.payload.isEmpty() && request.parts.isEmpty());
+      if(method != null) {
+        if(hasBody) setContentType(rb, request);
+        rb.method(method, hasBody ? publisher(src, request) : BodyPublishers.noBody());
+      }
+
+      // assign headers to request; the Content-Type of a payload request is already set above,
+      // so skip it here to avoid sending it twice; ensure that Accept header is sent
+      request.headers.forEach((name, value) -> {
+        if(!(hasBody && name.equalsIgnoreCase(CONTENT_TYPE))) rb.header(name, value);
+      });
+      if(!request.headers.containsKey(ACCEPT)) rb.header(ACCEPT, MediaType.ALL_ALL.toString());
+    } catch(final IllegalArgumentException ex) {
+      throw new IOException(ex.getMessage(), ex);
+    }
+
+    final BodyHandler<InputStream> handler = IOUrl.handler(timeout);
+
+    // send request (with optional authorization)
+    try {
+      final UserInfo ui = new UserInfo(uri, request);
+      final boolean sa = Strings.isTrue(request.attribute(SEND_AUTHORIZATION));
+      if(sa && request.authMethod == AuthMethod.BASIC) {
+        ui.basic(rb);
+        return Job.run(() -> client.send(rb.build(), handler));
+      }
+      final HttpRequest sent = rb.build();
+      final HttpResponse<InputStream> response = Job.run(() -> client.send(sent, handler));
+      final HttpRequest retry = ui.assign(sent, response);
+      if(retry == null) return response;
+      response.body().close();
+      return Job.run(() -> client.send(retry, handler));
+    } catch(final InterruptedException | IllegalArgumentException ex) {
+      // illegal argument exception may be caused by wrongly encoded redirect URL
+      throw new IOException(ex.getMessage(), ex);
+    }
+  }
+
+  /**
+   * Returns a publisher for the request payload. The contents of file-based sources are streamed;
+   * other payloads are materialized in advance. Live HTTP response streams are not attached
+   * directly, as reading them while sending can deadlock the shared HTTP client.
+   * @param src linked resource (can be {@code null})
+   * @param request request data
+   * @return publisher
+   * @throws IOException I/O exception
+   */
+  private static BodyPublisher publisher(final String src, final Request request)
+      throws IOException {
+    IO io = null;
+    if(src != null) {
+      io = IO.get(src);
+    } else if(request.payload.size() == 1 &&
+        request.payload.get(0) instanceof final B64IOLazy bin && !bin.isCached() &&
+        Checks.all(request.payloadAtts.entrySet(), att ->
+          att.getKey().equals(SerializerOptions.MEDIA_TYPE.name()) &&
+          Payload.binary(new MediaType(att.getValue())))) {
+      io = bin.input();
+    }
+    return io instanceof final IOFile file ?
+      BodyPublishers.ofFile(file.file().toPath()) :
+      BodyPublishers.ofByteArray(payload(request));
+  }
+
+  /**
+   * Sets the content type of the HTTP request.
+   * @param rb HTTP request builder
+   * @param request request data
+   */
+  private static void setContentType(final HttpRequest.Builder rb, final Request request) {
+    String ct = request.headers.get(CONTENT_TYPE);
+    if(ct == null) {
+      // no header: @media-type of <http:body/> is considered
+      ct = request.payloadAtts.get(SerializerOptions.MEDIA_TYPE.name());
+      if(request.isMultipart) ct = Strings.concat(ct, "; ", BOUNDARY, "=", request.boundary());
+    } else if(request.isMultipart && new MediaType(ct).parameter(BOUNDARY) == null) {
+      // multipart header without boundary: append the generated boundary
+      ct = Strings.concat(ct, "; ", BOUNDARY, "=", request.boundary());
+    }
+    rb.header(CONTENT_TYPE, ct);
   }
 
   /**

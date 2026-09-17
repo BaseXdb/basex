@@ -169,31 +169,15 @@ public abstract class FnHttpTest extends HTTPTest {
    * @throws Exception exception
    */
   @Test public final void lazyResponse() throws Exception {
-    // store binary resource
+    // create database
     try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         " <http:request method='put' status-only='true'>"
         + "<http:body media-type='text/xml'><x/></http:body>"
         + "</http:request>", REST_URL), ctx)) {
       checkResponse(qp.value(), 1, 201);
     }
-    try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
-        " <http:request method='put' status-only='true'>"
-        + "<http:body media-type='application/octet-stream'/>"
-        + "</http:request>", REST_URL + "/data.bin", " xs:base64Binary('QmFzZVg=')"), ctx)) {
-      checkResponse(qp.value(), 1, 201);
-    }
 
-    // response body is lazy; repeated consumptions send new requests, nothing is cached
-    try(QueryProcessor qp = new QueryProcessor(
-        "let $body := " + _HTTP_SEND_REQUEST.args(
-        " <http:request method='get'/>", REST_URL + "/data.bin") + "[2] "
-        + "return string-join((lazy:is-lazy($body), lazy:is-cached($body), "
-        + "hash($body, 'md5') = hash($body, 'md5'), lazy:is-cached($body)) ! string(), ',')",
-        ctx)) {
-      assertEquals("true,false,true,false", qp.value().serialize().toString());
-    }
-
-    // non-GET response body is lazy; the first consumption caches it, the request is not repeated
+    // response body is lazy; the first consumption caches it, the request is not repeated
     try(QueryProcessor qp = new QueryProcessor(
         "let $body := " + _HTTP_SEND_REQUEST.args(
         " <http:request method='post'>"
@@ -207,6 +191,29 @@ public abstract class FnHttpTest extends HTTPTest {
         ctx)) {
       assertEquals("true,false,true,true", qp.value().serialize().toString());
     }
+  }
+
+  /**
+   * Tests that the contents of remote resources are retrieved only once.
+   * @throws Exception exception
+   */
+  @Test public final void lazyRemote() throws Exception {
+    // the REST query returns a different result for each request
+    final String url = REST_ROOT + "?query=random:uuid()";
+    try(QueryProcessor qp = new QueryProcessor("let $bin := " + _FETCH_BINARY.args(url)
+        + " return hash($bin, 'md5') = hash($bin, 'md5')", ctx)) {
+      assertEquals("true", qp.value().serialize().toString());
+    }
+
+    final IOFile file1 = new IOFile(sandbox(), "remote1.txt");
+    final IOFile file2 = new IOFile(sandbox(), "remote2.txt");
+    try(QueryProcessor qp = new QueryProcessor("let $text := " + _FETCH_TEXT.args(url)
+        + " return (" + _FILE_WRITE_TEXT.args(file1.path(), " $text") + ", "
+        + _FILE_WRITE_TEXT.args(file2.path(), " $text") + ')', ctx)) {
+      qp.value();
+    }
+    assertEquals(36, file1.read().length);
+    assertEquals(string(file1.read()), string(file2.read()));
   }
 
   /**

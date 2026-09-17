@@ -76,6 +76,20 @@ public final class SpillOutput extends OutputStream {
     }
   }
 
+  /**
+   * Reads the contents of an input, unless it is a local file or in-memory content.
+   * @param input input
+   * @param temp registry for temporary files (can be {@code null})
+   * @return input reference
+   * @throws IOException I/O exception
+   */
+  public static IO read(final IO input, final TempFiles temp) throws IOException {
+    if(input instanceof IOFile || input instanceof IOContent) return input;
+    try(InputStream is = input.inputStream()) {
+      return read(is, temp);
+    }
+  }
+
   @Override
   public void write(final int b) throws IOException {
     if(file == null && array.size() >= threshold) spill();
