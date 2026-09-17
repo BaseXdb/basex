@@ -12,12 +12,16 @@ import java.util.Map.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * HTTP response handler. Reads HTTP response and constructs the
@@ -91,30 +95,76 @@ public final class Response {
     }
 
     // add payload elements and contents
+    final ResponseBody parsed = body(response, body, mtype, href);
+    root.node(element(parsed));
+    final ItemList items = new ItemList().add((Item) null);
+    if(body) items.add(parsed.values());
+
+    return items.set(0, root.finish()).value();
+  }
+
+  /**
+   * Constructs a response record and reads HTTP response content.
+   * @param response HTTP response
+   * @return response record
+   * @throws IOException I/O exception
+   * @throws QueryException query exception
+   */
+  public XQMap getRecord(final HttpResponse<InputStream> response)
+      throws IOException, QueryException {
+
+    final URI uri = response.uri();
+    final String href = uri != null ? IOUrl.stripUserInfo(uri.toString()) : "";
+
+    // header names are lower-cased, pseudo-headers are skipped
+    final MapBuilder headers = new MapBuilder();
+    for(final Entry<String, List<String>> entry : response.headers().map().entrySet()) {
+      final String name = entry.getKey();
+      if(name != null && !name.startsWith(":")) {
+        final TokenList values = new TokenList();
+        for(final String value : entry.getValue()) values.add(value);
+        headers.put(name.toLowerCase(Locale.ENGLISH), StrSeq.get(values));
+      }
+    }
+
+    final ResponseBody parsed = body(response, true, null, href);
+    return XQMap.get(Records.HTTP_RESPONSE.get(), Itr.get(response.statusCode()), headers.map(),
+      parsed.values(), Str.get(href),
+      Str.get(response.version() == Version.HTTP_2 ? "2" : "1.1"));
+  }
+
+  /**
+   * Reads and parses the response body.
+   * @param response HTTP response
+   * @param body also return body
+   * @param mtype media type provided by the user (can be {@code null})
+   * @param href URI of the response (can be {@code null})
+   * @return parsed body
+   * @throws IOException I/O exception
+   * @throws QueryException query exception
+   */
+  private ResponseBody body(final HttpResponse<InputStream> response, final boolean body,
+      final String mtype, final String href) throws IOException, QueryException {
+
     final HttpHeaders headers = response.headers();
     final MediaType type = mtype != null ? new MediaType(mtype) :
       headers.firstValue(CONTENT_TYPE).map(MediaType::new).orElse(MediaType.TEXT_PLAIN);
     final String encoding = headers.firstValue(CONTENT_ENCODING).orElse("");
-
     final TempFiles temp = resources != null ? resources.index(TempFiles.class) : null;
-    final ItemList items = new ItemList().add((Item) null);
+
     if(body && resources != null && Payload.binary(type) &&
         !"0".equals(headers.firstValue(CONTENT_LENGTH).orElse(""))) {
       // binary result: skip retrieval of response body, return lazy item
       final InputStream is = response.body();
       resources.add(is);
-      root.node(FElem.build(Q_HTTP_BODY).attr(Q_MEDIA_TYPE, type.type()).finish());
-      items.add(new B64HttpLazy(href, is, encoding, temp));
-    } else {
-      try(InputStream is = response.body()) {
-        final Payload payload = new Payload(is, body, info, options);
-        final ResponseBody parsed = payload.parse(type, encoding, temp);
-        root.node(element(parsed));
-        if(body) items.add(parsed.values());
-      }
+      final ResponseBody parsed = new ResponseBody();
+      parsed.type = type;
+      parsed.value = new B64HttpLazy(href, is, encoding, temp);
+      return parsed;
     }
-
-    return items.set(0, root.finish()).value();
+    try(InputStream is = response.body()) {
+      return new Payload(is, body, info, options).parse(type, encoding, temp);
+    }
   }
 
   /**

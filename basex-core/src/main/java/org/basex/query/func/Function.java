@@ -1619,6 +1619,10 @@ public enum Function implements AFunction {
   // HTTP Module
 
   /** XQuery function. */
+  _HTTP_GET(HttpGet::new, "get(href, options?)",
+      params(STRING_O, MAP_ZO), Records.HTTP_RESPONSE.get().seqType(), flag(NDT), HTTP_URI,
+      Perm.CREATE),
+  /** XQuery function. */
   _HTTP_SEND_REQUEST(HttpSendRequest::new, "send-request(request, href?, bodies?)",
       params(XNODE_ZO, STRING_ZO, ITEM_ZM), ITEM_OM, flag(NDT), HTTP_URI, Perm.CREATE),
 

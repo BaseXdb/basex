@@ -26,6 +26,7 @@ import org.basex.io.serial.SerializerOptions.*;
 import org.basex.query.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -71,23 +72,52 @@ public final class Client {
 
     final Request req = new RequestParser(info).parse(request, bodies);
     final URI uri = uri(href, req);
-    final boolean body = !req.statusOnly;
-
     final MainOptions mopts = new MainOptions(options);
     try {
-      mopts.set(MainOptions.CSVPARSER,
-          assign(new CsvParserOptions(mopts.get(MainOptions.CSVPARSER)), req.csv));
-      mopts.set(MainOptions.JSONPARSER,
-          assign(new JsonParserOptions(mopts.get(MainOptions.JSONPARSER)), req.json));
-      mopts.set(MainOptions.HTMLPARSER,
-          assign(new HtmlOptions(mopts.get(MainOptions.HTMLPARSER)), req.html));
-
+      parsers(mopts, req);
       final HttpResponse<InputStream> response = send(uri, req, client(req, resources));
-      return new Response(info, mopts, resources).getResponse(response, body,
+      return new Response(info, mopts, resources).getResponse(response, !req.statusOnly,
           req.overrideMediaType);
     } catch(final IOException ex) {
       throw error(ex, info);
     }
+  }
+
+  /**
+   * Sends an HTTP request and returns the response as a record.
+   * @param href URL to send the request to
+   * @param request request data
+   * @param resources query resources
+   * @return response record
+   * @throws QueryException query exception
+   */
+  public XQMap send(final String href, final Request request, final QueryResources resources)
+      throws QueryException {
+
+    final URI uri = uri(Token.token(href), request);
+    final MainOptions mopts = new MainOptions(options);
+    try {
+      parsers(mopts, request);
+      final HttpResponse<InputStream> response = send(uri, request, client(request, resources));
+      return new Response(info, mopts, resources).getRecord(response);
+    } catch(final IOException ex) {
+      throw error(ex, info);
+    }
+  }
+
+  /**
+   * Assigns the parser options of a request.
+   * @param mopts main options
+   * @param request request data
+   * @throws IOException I/O exception
+   */
+  private static void parsers(final MainOptions mopts, final Request request) throws IOException {
+    mopts.set(MainOptions.CSVPARSER,
+        assign(new CsvParserOptions(mopts.get(MainOptions.CSVPARSER)), request.csv));
+    mopts.set(MainOptions.JSONPARSER,
+        assign(new JsonParserOptions(mopts.get(MainOptions.JSONPARSER)), request.json));
+    mopts.set(MainOptions.HTMLPARSER,
+        assign(new HtmlOptions(mopts.get(MainOptions.HTMLPARSER)), request.html));
   }
 
   /**

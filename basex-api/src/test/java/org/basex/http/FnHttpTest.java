@@ -952,6 +952,18 @@ public abstract class FnHttpTest extends HTTPTest {
   }
 
   /**
+   * Tests the response record of the HTTP Client 2.0 functions.
+   * @throws Exception exception
+   */
+  @Test public final void getRecord() throws Exception {
+    try(QueryProcessor qp = new QueryProcessor("string-join(" + _HTTP_GET.args(REST_ROOT)
+        + " ! (?status, ?href, ?http-version, ?body instance of document-node(),"
+        + " exists(?headers?content-type)), ' ')", ctx)) {
+      assertEquals("200 " + REST_ROOT + " 1.1 true true", qp.value().serialize().toString());
+    }
+  }
+
+  /**
    * Tests that a media type is recognized regardless of the case of its type/subtype.
    * @throws Exception exception
    */

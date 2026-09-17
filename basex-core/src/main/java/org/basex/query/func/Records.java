@@ -99,6 +99,14 @@ public enum Records {
     field("get", FuncType.get(Types.STRING_O, Types.POSITIVE_INTEGER_O,
       ChoiceItemType.get(BasicType.POSITIVE_INTEGER, BasicType.STRING).seqType()).seqType())),
   /** Record definition. */
+  HTTP_RESPONSE(HTTP_URI, "response-record",
+    field("status", Types.INTEGER_O),
+    field("headers", MapType.get(BasicType.STRING, Types.STRING_OM).seqType()),
+    field("body", Types.ITEM_ZM),
+    field("href", Types.STRING_O),
+    field("http-version", EnumType.get("1.0", "1.1", "2", "3").seqType())
+  ),
+  /** Record definition. */
   PROC_RESULT(PROC_URI, "result",
     field("output", Types.STRING_OR_BASE64_BINARY_O),
     field("error", Types.STRING_O),
