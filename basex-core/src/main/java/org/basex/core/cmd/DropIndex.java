@@ -61,6 +61,7 @@ public final class DropIndex extends ACreate {
   static void drop(final IndexType type, final Data data) throws IOException {
     data.meta.dirty = true;
     data.meta.index(type, false);
+    data.meta.optimized.remove(type);
     data.dropIndex(type);
   }
 }

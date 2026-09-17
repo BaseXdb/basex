@@ -78,7 +78,7 @@ public final class Optimize extends ACreate {
     // GH-676: optimize database and rebuild index structures if ID has turned negative
     if(data.lastid < data.nodes() - 1) optimizeIds(data);
     // GH-1035: auto-optimize database
-    if(data.meta.autooptimize) optimize(data, EnumSet.noneOf(IndexType.class), true, null);
+    if(data.meta.autooptimize) optimize(data, null);
   }
 
   /**
@@ -88,19 +88,18 @@ public final class Optimize extends ACreate {
    * @throws IOException I/O exception
    */
   public static void optimize(final Data data, final Optimize cmd) throws IOException {
-    optimize(data, EnumSet.noneOf(IndexType.class), false, cmd);
+    optimize(data, EnumSet.noneOf(IndexType.class), cmd);
   }
 
   /**
    * Optimizes the structures of a database.
    * @param data data
    * @param enforce indexes to be created or dropped, regardless of their current state
-   * @param auto automatic optimization after an update
    * @param cmd calling command instance (can be {@code null})
    * @throws IOException I/O exception
    */
   public static void optimize(final Data data, final EnumSet<IndexType> enforce,
-      final boolean auto, final Optimize cmd) throws IOException {
+      final Optimize cmd) throws IOException {
 
     // initialize structural indexes
     final MetaData meta = data.meta;
@@ -158,34 +157,19 @@ public final class Optimize extends ACreate {
       meta.complete = true;
     }
 
-    // rebuild value indexes
+    // create or drop value indexes whose flags have changed, optimize changed indexes
     for(final IndexType type : IndexType.VALUE_INDEXES) {
-      optimize(type, data, meta.create(type), enforce.contains(type), auto, cmd);
+      final boolean create = meta.create(type);
+      if(enforce.contains(type) || create != meta.index(type)) {
+        if(create) CreateIndex.create(type, data, cmd);
+        else DropIndex.drop(type, data);
+      } else if(create && !meta.optimized.contains(type) &&
+          data.index(type) instanceof final ValueIndex index) {
+        index.optimize();
+        meta.optimized.add(type);
+        meta.dirty = true;
+      }
     }
-  }
-
-  /**
-   * Creates or deletes the specified index if the old and new state is different.
-   * @param type index type
-   * @param data data reference
-   * @param create new flag
-   * @param enforce enforce operation
-   * @param auto automatic optimization after an update
-   * @param cmd calling command instance
-   * @throws IOException I/O exception
-   */
-  private static void optimize(final IndexType type, final Data data, final boolean create,
-      final boolean enforce, final boolean auto, final Optimize cmd) throws IOException {
-
-    // check if flags have changed
-    if(create == data.meta.index(type) && !enforce) {
-      // optimize existing index
-      if(data.index(type) instanceof final ValueIndex index) index.optimize(auto);
-      return;
-    }
-    // create or drop index
-    if(create) CreateIndex.create(type, data, cmd);
-    else DropIndex.drop(type, data);
   }
 
   /**
@@ -203,7 +187,7 @@ public final class Optimize extends ACreate {
     if(data.meta.updindex) {
       data.idmap = new IdPreMap(md.lastid);
       for(final IndexType type : IndexType.VALUE_INDEXES) {
-        if(md.index(type)) optimize(type, data, true, true, false, null);
+        if(md.index(type)) CreateIndex.create(type, data, null);
       }
     }
   }

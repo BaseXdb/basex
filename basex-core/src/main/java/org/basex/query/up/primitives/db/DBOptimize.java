@@ -120,7 +120,7 @@ public final class DBOptimize extends DBUpdate {
 
     try {
       if(all) OptimizeAll.optimizeAll(data, qc.context, options, null);
-      else Optimize.optimize(data, enforce, false, null);
+      else Optimize.optimize(data, enforce, null);
     } catch(final IOException ex) {
       throw UPDBERROR_X.get(info, ex);
     }

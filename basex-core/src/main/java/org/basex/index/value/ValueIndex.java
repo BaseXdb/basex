@@ -1,7 +1,5 @@
 package org.basex.index.value;
 
-import java.io.*;
-
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.util.list.*;
@@ -95,11 +93,8 @@ public abstract class ValueIndex implements Index {
 
   /**
    * Optimizes the index structure.
-   * @param auto automatic optimization after an update: skip the work if it is not worthwhile
-   * @throws IOException I/O exception
    */
-  @SuppressWarnings("unused")
-  public void optimize(final boolean auto) throws IOException { }
+  public void optimize() { }
 
   /**
    * Adds or deletes the specified entries.

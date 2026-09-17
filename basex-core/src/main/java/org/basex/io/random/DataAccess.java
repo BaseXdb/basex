@@ -115,6 +115,17 @@ public final class DataAccess implements Closeable {
   }
 
   /**
+   * Sets the file length.
+   * @param len file length
+   */
+  public void length(final long len) {
+    if(len != length) {
+      changed = true;
+      length = len;
+    }
+  }
+
+  /**
    * Checks if more bytes can be read.
    * @return result of check
    */
@@ -483,17 +494,6 @@ public final class DataAccess implements Closeable {
   }
 
   /**
-   * Sets the file length.
-   * @param len file length
-   */
-  private void length(final long len) {
-    if(len != length) {
-      changed = true;
-      length = len;
-    }
-  }
-
-  /**
    * Positional read and write access with an exclusive file handle and buffer pool.
    */
   private final class Reader {
@@ -840,9 +840,12 @@ public final class DataAccess implements Closeable {
      * @throws IOException I/O exception
      */
     private void writeBlock(final Buffer buffer) throws IOException {
+      // blocks behind the end of a truncated file are discarded
       final long pos = buffer.pos, len = Math.min(IO.BLOCKSIZE, length - pos);
-      raf.seek(pos);
-      raf.write(buffer.data, 0, (int) len);
+      if(len > 0) {
+        raf.seek(pos);
+        raf.write(buffer.data, 0, (int) len);
+      }
       buffer.dirty = false;
     }
 

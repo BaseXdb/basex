@@ -382,6 +382,29 @@ public final class FTIndexUpdateTest extends SandboxTest {
   }
 
   /**
+   * Optimizes an unchanged index.
+   */
+  @Test public void optimizeUnchanged() {
+    execute(new CreateDB(NAME, "<x><a>one</a><a>two</a><a>three</a></x>"));
+    query("delete node " + _DB_GET.args(NAME) + "//a[. = 'two']");
+    query("replace value of node " + _DB_GET.args(NAME) + "//a[. = 'one'] with 'four'");
+    execute(new Optimize());
+    final String segments = context.data().meta.ftsegments;
+    assertEquals(1, segments());
+    // attribute changes do not affect the full-text index
+    query("insert node attribute b { 'c' } into " + _DB_GET.args(NAME) + "//a[1]");
+    execute(new Optimize());
+    assertEquals(segments, context.data().meta.ftsegments);
+    execute(new Close());
+    execute(new Open(NAME));
+    execute(new Optimize());
+    assertEquals(segments, context.data().meta.ftsegments);
+    search("four", "four");
+    search("two");
+    check("three");
+  }
+
+  /**
    * Optimizes an index without segments.
    */
   @Test public void optimizeEmpty() {
@@ -397,7 +420,7 @@ public final class FTIndexUpdateTest extends SandboxTest {
   }
 
   /**
-   * Automatic optimization merges the segments once enough units are superseded.
+   * Automatic optimization merges the segments after each update.
    */
   @Test public void autooptimize() {
     set(MainOptions.AUTOOPTIMIZE, true);
@@ -405,13 +428,11 @@ public final class FTIndexUpdateTest extends SandboxTest {
     for(int i = 0; i < 200; i++) doc.append("<a>one</a>");
     doc.append("</x>");
     execute(new CreateDB(NAME, doc.toString()));
-    // few superseded units: segments are written and kept
     for(int r = 0; r < 3; r++) {
       query("insert node <a>word" + r + WORDS + "</a> into " + _DB_GET.args(NAME) + "/x");
       check("x1");
-      assertEquals(r + 2, segments());
+      assertEquals(1, segments());
     }
-    // many superseded units: everything is merged
     query("for $a in (" + _DB_GET.args(NAME) + "//a)[position() <= 50] " +
         "return replace value of node $a with 'two'");
     assertEquals(1, segments());

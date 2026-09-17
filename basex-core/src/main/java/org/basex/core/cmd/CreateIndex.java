@@ -87,5 +87,6 @@ public final class CreateIndex extends ACreate {
     DropIndex.drop(type, data);
     data.createIndex(type, cmd);
     data.meta.index(type, true);
+    data.meta.optimized.add(type);
   }
 }

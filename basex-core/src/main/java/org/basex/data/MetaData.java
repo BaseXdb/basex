@@ -5,6 +5,7 @@ import static org.basex.data.DataText.*;
 import static org.basex.util.Strings.*;
 
 import java.io.*;
+import java.util.*;
 
 import org.basex.build.*;
 import org.basex.core.*;
@@ -101,6 +102,8 @@ public final class MetaData {
   public boolean counts = true;
   /** Indicates if the path and name indexes are complete (implied by {@link #counts}). */
   public boolean complete = true;
+  /** Value indexes whose structures are optimized. */
+  public final EnumSet<IndexType> optimized = EnumSet.noneOf(IndexType.class);
   /** Indicate if the database may be corrupt. */
   public boolean corrupt;
   /** Dirty flag. */
@@ -182,6 +185,7 @@ public final class MetaData {
     uptodate = meta.uptodate;
     counts = meta.counts;
     complete = meta.complete;
+    optimized.addAll(meta.optimized);
     corrupt = meta.corrupt;
     dirty = meta.dirty;
     oldindex = meta.oldindex;
@@ -550,6 +554,9 @@ public final class MetaData {
         case DBUPTODATE -> uptodate = isTrue(v);
         case DBCOUNTS -> counts = isTrue(v);
         case DBCOMPLETE -> complete = isTrue(v);
+        case DBOPTIMIZED -> {
+          for(final String type : split(v, ',')) optimized.add(IndexType.valueOf(type));
+        }
       }
     }
     // restore implications (relevant for databases created before version 13)
@@ -605,6 +612,11 @@ public final class MetaData {
     writeInfo(out, DBUPTODATE, uptodate);
     writeInfo(out, DBCOUNTS,   counts);
     writeInfo(out, DBCOMPLETE, complete);
+    if(!optimized.isEmpty()) {
+      final StringList types = new StringList();
+      for(final IndexType type : optimized) types.add(type.name());
+      writeInfo(out, DBOPTIMIZED, String.join(",", types.finish()));
+    }
     writeInfo(out, DBLASTID,   lastid);
     final Language ln = language();
     if(ln != null) writeInfo(out, DBFTLN, ln.toString());

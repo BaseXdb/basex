@@ -1,10 +1,16 @@
 package org.basex.index;
 
 import static org.basex.query.func.Function.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.io.*;
+import java.util.*;
 
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.data.*;
+import org.basex.io.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
@@ -16,6 +22,9 @@ import org.junit.jupiter.api.Test;
  * @author Christian Gruen
  */
 public final class UpdatableDiskValuesTest extends SandboxTest {
+  /** Second database. */
+  private static final String NAME2 = NAME + '2';
+
   /** Prepares a test. */
   @BeforeEach public void before() {
     set(MainOptions.UPDINDEX, true);
@@ -28,6 +37,7 @@ public final class UpdatableDiskValuesTest extends SandboxTest {
     set(MainOptions.UPDINDEX, false);
     set(MainOptions.TOKENINDEX, false);
     set(MainOptions.AUTOFLUSH, true);
+    set(MainOptions.AUTOOPTIMIZE, false);
   }
 
   /**
@@ -103,6 +113,111 @@ public final class UpdatableDiskValuesTest extends SandboxTest {
   }
 
   /**
+   * Optimization compacts the index files and is skipped if the indexes are unchanged.
+   * @throws IOException I/O exception
+   */
+  @Test public void optimize() throws IOException {
+    execute(new CreateDB(NAME, "<x/>"));
+    final String db = _DB_GET.args(NAME);
+    for(int i = 0; i < 100; i++) {
+      query("insert node <a t='t" + i % 7 + " u'>v" + i % 5 + "</a> into " + db + "/x");
+    }
+    query("for $a in " + db + "//a[. = 'v1'] return replace value of node $a with 'v2'");
+    final String[] files = { "txtl", "atvl", "tokl", "txtr" };
+    final long[] sizes = sizes(files);
+
+    execute(new Optimize());
+    final MetaData meta = context.data().meta;
+    assertEquals(EnumSet.of(IndexType.TEXT, IndexType.ATTRIBUTE, IndexType.TOKEN),
+        meta.optimized);
+    final long[] optimized = sizes(files);
+    for(int f = 0; f < files.length; f++) assertTrue(optimized[f] < sizes[f], files[f]);
+    text("v1");
+    text("v2", Collections.nCopies(40, "v2").toArray(String[]::new));
+    token("t3", Collections.nCopies(14, "t3 u").toArray(String[]::new));
+    check("//a[text() = 'v2']");
+    check("//a[@t = 't4 u']");
+    check("//a[contains-token(@t, 't6')]");
+
+    // the files are identical to those of a new database with the same node IDs
+    final String doc = query(db + " => serialize()");
+    execute(new CreateDB(NAME2, doc));
+    for(final String file : files) {
+      assertArrayEquals(file(NAME2, file).read(), file(NAME, file).read(), file);
+    }
+    execute(new DropDB(NAME2));
+
+    // unchanged indexes are skipped, even if they could be compacted
+    execute(new Open(NAME));
+    query("insert node <a t='x'>y</a> into " + db + "/x");
+    query("delete node " + db + "//a[. = 'y']");
+    assertEquals(EnumSet.noneOf(IndexType.class), context.data().meta.optimized);
+    context.data().meta.optimized.add(IndexType.TEXT);
+    execute(new Optimize());
+    final long[] skipped = sizes(files);
+    assertTrue(skipped[0] > optimized[0]);
+    assertEquals(optimized[1], skipped[1]);
+    execute(new Close());
+    execute(new Open(NAME));
+    assertEquals(EnumSet.of(IndexType.TEXT, IndexType.ATTRIBUTE, IndexType.TOKEN),
+        context.data().meta.optimized);
+  }
+
+  /**
+   * Optimization compacts index files that span several blocks.
+   */
+  @Test public void optimizeBlocks() {
+    execute(new CreateDB(NAME, "<x/>"));
+    // closed database: free slots are dropped after each transaction
+    execute(new Close());
+    final String db = _DB_GET.args(NAME);
+    for(int i = 0; i < 300; i++) {
+      query("insert node <a t='t" + i % 3 + "'>v" + i % 3 + "</a> into " + db + "/x");
+    }
+    final long size = sizes("txtl")[0];
+    assertTrue(size > 3 * IO.BLOCKSIZE, Long.toString(size));
+    execute(new Open(NAME));
+    execute(new Optimize());
+    assertTrue(sizes("txtl")[0] < IO.BLOCKSIZE);
+    execute(new Close());
+    execute(new Open(NAME));
+    text("v1", Collections.nCopies(100, "v1").toArray(String[]::new));
+    check("//a[text() = 'v2']");
+    check("//a[@t = 't0']");
+    query("insert node <a t='t0'>v0</a> into " + db + "/x");
+    check("//a[text() = 'v0']");
+    check("//a[contains-token(@t, 't0')]");
+    query(_DB_INSPECT.args(NAME) + "?valid", true);
+  }
+
+  /**
+   * Automatic optimization compacts index files.
+   */
+  @Test public void autoOptimize() {
+    set(MainOptions.AUTOOPTIMIZE, true);
+    execute(new CreateDB(NAME, "<x/>"));
+    // closed database: free slots are dropped after each transaction
+    execute(new Close());
+    final String db = _DB_GET.args(NAME);
+    final String[] files = { "txtl", "atvl", "tokl" };
+    final long[] max = new long[files.length];
+    for(int i = 0; i < 300; i++) {
+      query("insert node <a t='t" + i % 3 + "'>v" + i % 3 + "</a> into " + db + "/x");
+      final long[] sizes = sizes(files);
+      for(int f = 0; f < files.length; f++) max[f] = Math.max(max[f], sizes[f]);
+    }
+    // without compaction, the text index file exceeds three blocks (see optimizeBlocks)
+    for(int f = 0; f < files.length; f++) assertTrue(max[f] < IO.BLOCKSIZE, files[f]);
+
+    execute(new Open(NAME));
+    text("v1", Collections.nCopies(100, "v1").toArray(String[]::new));
+    check("//a[text() = 'v2']");
+    check("//a[@t = 't0']");
+    check("//a[contains-token(@t, 't1')]");
+    query(_DB_INSPECT.args(NAME) + "?valid", true);
+  }
+
+  /**
    * Pending changes are written when the database is closed without autoflush.
    */
   @Test public void closeWithoutFlush() {
@@ -133,6 +248,25 @@ public final class UpdatableDiskValuesTest extends SandboxTest {
    */
   private static void token(final String token, final String... results) {
     query(_DB_TOKEN.args(NAME, token) + " ! string()", String.join("\n", results));
+  }
+
+  /**
+   * Returns the sizes of database files.
+   * @param names file names
+   * @return sizes
+   */
+  private static long[] sizes(final String... names) {
+    return Arrays.stream(names).mapToLong(name -> file(NAME, name).length()).toArray();
+  }
+
+  /**
+   * Returns a database file.
+   * @param db database
+   * @param name file name
+   * @return file
+   */
+  private static IOFile file(final String db, final String name) {
+    return new IOFile(context.soptions.dbPath(db), name + IO.BASEXSUFFIX);
   }
 
   /**

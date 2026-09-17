@@ -455,10 +455,11 @@ public final class FTIndex extends ValueIndex {
 
   @Override
   public synchronized void delete(final int pre, final int size) {
+    if(buffer == null) return;
+    // references of deleted units remain in the segments until they are merged
+    if(size > 1 || data.kind(pre) != Data.ATTR) data.meta.optimized.remove(type);
     // the string values of the included ancestors change if text nodes are deleted
-    if(buffer != null && data.meta.ftmixed && (size > 1 || data.kind(pre) == Data.TEXT)) {
-      touchAncestors(pre);
-    }
+    if(data.meta.ftmixed && (size > 1 || data.kind(pre) == Data.TEXT)) touchAncestors(pre);
   }
 
   @Override
@@ -472,6 +473,7 @@ public final class FTIndex extends ValueIndex {
       p += data.size(p, kind);
     }
     if(data.meta.ftmixed && (size > 1 || data.kind(pre) == Data.TEXT)) touchAncestors(pre);
+    if(!touched.isEmpty()) data.meta.optimized.remove(type);
   }
 
   @Override
@@ -483,6 +485,7 @@ public final class FTIndex extends ValueIndex {
       // the inclusion of the child text nodes depends on the name of the element
       for(final int p : childTexts(pre).finish()) touched.add(data.id(p));
     }
+    if(!touched.isEmpty()) data.meta.optimized.remove(type);
   }
 
   @Override
@@ -499,12 +502,10 @@ public final class FTIndex extends ValueIndex {
   }
 
   @Override
-  public synchronized void optimize(final boolean auto) {
+  public synchronized void optimize() {
     if(buffer == null) return;
     try {
       finish();
-      // automatic optimization: skip the merge if few units are superseded
-      if(auto && superseded() * 10L <= data.lastid) return;
       writeBuffer();
       // the unnumbered index is clean, nothing to do
       if(adoptable()) return;

@@ -78,6 +78,8 @@ public interface DataText {
   String DBCOMPLETE = "COMPLETE";
   /** Exact statistics counts flag. */
   String DBCOUNTS = "COUNTS";
+  /** Optimized indexes. */
+  String DBOPTIMIZED = "OPTIMIZED";
   /** Last (highest) ID. */
   String DBLASTID = "LASTID";
   /** Documents. */

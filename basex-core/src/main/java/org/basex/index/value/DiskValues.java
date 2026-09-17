@@ -30,7 +30,7 @@ public class DiskValues extends ValueIndex {
   /** ID lists. */
   final DataAccess idxl;
   /** Cached index entries: mapping between keys and index entries. */
-  final IndexCache cache = new IndexCache();
+  IndexCache cache = new IndexCache();
   /** Cached texts: mapping between key positions in the reference file, and the indexed texts. */
   final IntObjectMap<byte[]> ctext = new IntObjectMap<>();
   /** Number of current index entries. */

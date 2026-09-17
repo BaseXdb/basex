@@ -5,6 +5,7 @@ import java.util.*;
 
 import org.basex.data.*;
 import org.basex.index.*;
+import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
@@ -18,7 +19,7 @@ import org.basex.util.list.*;
  */
 public final class UpdatableDiskValues extends DiskValues {
   /** Free slots. */
-  private final FreeSlots free = new FreeSlots();
+  private FreeSlots free = new FreeSlots();
   /** Pending additions of the current transaction. */
   private ValueCache adds;
   /** Keys emptied by the current transaction, with their positions. */
@@ -42,6 +43,7 @@ public final class UpdatableDiskValues extends DiskValues {
   @Override
   public synchronized void add(final ValueCache values) {
     // deferred: new keys are inserted once per transaction (see #apply)
+    data.meta.optimized.remove(type);
     if(adds == null) adds = new ValueCache(type);
     for(final byte[] key : values) {
       final IntList ids = values.ids(key), pos = values.pos(key);
@@ -53,6 +55,7 @@ public final class UpdatableDiskValues extends DiskValues {
   @Override
   public synchronized void delete(final ValueCache values) {
     // entries added by the same transaction have not been written yet: discard them instead
+    data.meta.optimized.remove(type);
     final ValueCache rest = new ValueCache(type);
     for(final byte[] key : values) {
       final IntList ids = values.ids(key), pos = values.pos(key);
@@ -74,6 +77,53 @@ public final class UpdatableDiskValues extends DiskValues {
   public synchronized void flush() {
     apply();
     super.flush();
+  }
+
+  @Override
+  public synchronized void optimize() {
+    apply();
+
+    // skip the ID lists that are already in place
+    final int sz = size();
+    int index = 0;
+    long target = 4;
+    for(; index < sz && idxr.read5(index * 5L) == target; index++) target += length(target);
+
+    // append the remaining ID lists to the end of the file, in key order
+    final long length = idxl.length();
+    long end = length;
+    for(int i = index; i < sz; i++) {
+      final long offset = idxr.read5(i * 5L);
+      final byte[] bytes = idxl.readBytes(offset, length(offset));
+      idxl.cursor(end);
+      idxl.writeBytes(bytes, 0, bytes.length);
+      idxr.write5(i * 5L, target + end - length);
+      end += bytes.length;
+    }
+    // move them behind the ID lists in place, truncate the file
+    for(long off = length; off < end;) {
+      final int len = (int) Math.min(IO.BLOCKSIZE, end - off);
+      final byte[] bytes = idxl.readBytes(off, len);
+      idxl.cursor(target + off - length);
+      idxl.writeBytes(bytes, 0, len);
+      off += len;
+    }
+    idxl.length(target + end - length);
+    // references of removed keys remain at the end of the file
+    idxr.length(sz * 5L);
+    free = new FreeSlots();
+    cache = new IndexCache();
+  }
+
+  /**
+   * Returns the byte length of an ID list.
+   * @param offset offset of the ID list
+   * @return byte length
+   */
+  private int length(final long offset) {
+    final int count = idxl.readNum(offset);
+    for(long c = type == IndexType.TOKEN ? 2L * count : count; c > 0; c--) idxl.readNum();
+    return (int) (idxl.cursor() - offset);
   }
 
   @Override
