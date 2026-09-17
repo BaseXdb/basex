@@ -42,6 +42,8 @@ public abstract class AQuery extends Command {
   private boolean plan;
   /** Maximum number of results (ignored if negative). */
   private int maxResults = -1;
+  /** Indicates if the query has performed updates. */
+  private boolean updated;
 
   /**
    * Protected constructor.
@@ -120,6 +122,13 @@ public abstract class AQuery extends Command {
     sections = info.toSections(qp, out.size(), hits, jc().locks);
     message = error != null ? error : exception != null ? Util.message(exception) : null;
 
+    // release the processor: the commands of a script stay referenced until the script has finished
+    if(qp != null) {
+      updated = qp.updates() != 0;
+      popJob(qp);
+      qp = null;
+    }
+
     // error
     if(error != null) return error(queryinfo ?
         info() + Strings.titleCase(QueryInfo.ERROR) + COL + NL + error : error);
@@ -170,7 +179,7 @@ public abstract class AQuery extends Command {
 
   @Override
   public final boolean updated(final Context ctx) {
-    return qp.updates() != 0;
+    return updated;
   }
 
   @Override
