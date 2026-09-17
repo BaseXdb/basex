@@ -122,9 +122,7 @@ public final class Lang {
    * @return credits
    */
   private static String credits(final byte[] content) {
-    final StringTokenizer st = new StringTokenizer(Token.string(content), "\n");
-    st.nextToken();
-    return st.nextToken().replace("# ", "");
+    return Strings.split(Token.string(content), '\n', 3)[1].replace("# ", "");
   }
 
   /**

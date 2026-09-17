@@ -328,13 +328,11 @@ public final class ViewContainer extends BaseXBack {
       int nv = 0;
       final ArrayDeque<ViewLayout> layouts = new ArrayDeque<>();
       // collect all tokens (allows look-ahead for the optional weight tokens)
-      final ArrayList<String> tokens = new ArrayList<>();
-      final StringTokenizer st = new StringTokenizer(string);
-      while(st.hasMoreTokens()) tokens.add(st.nextToken());
+      final String[] tokens = Strings.split(string.trim(), ' ');
 
-      final int ts = tokens.size();
+      final int ts = tokens.length;
       for(int t = 0; t < ts; t++) {
-        final String token = tokens.get(t);
+        final String token = tokens[t];
         final ViewComponent comp;
         if("-".equals(token)) {
           layouts.pop();
@@ -357,7 +355,7 @@ public final class ViewContainer extends BaseXBack {
         }
         // parse the optional proportional size that may follow a layout or view token
         if(t + 1 < ts) {
-          final String next = tokens.get(t + 1);
+          final String next = tokens[t + 1];
           final char ch = next.charAt(0);
           if(ch >= '0' && ch <= '9' || ch == '.') {
             comp.weight(Double.parseDouble(next));

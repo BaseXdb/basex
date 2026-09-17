@@ -308,7 +308,7 @@ final class TextFont {
     // find new font (first call: sort fonts by number of glyphs)
     if(cachedFonts == null) {
       final String[] names = GUIConstants.fonts();
-      final Map<Font, Integer> map = new HashMap<>(names.length);
+      final Map<Font, Integer> map = HashMap.newHashMap(names.length);
       for(final String name : names) {
         final Font f = newFont(name);
         map.put(f, f.getNumGlyphs());

@@ -1,6 +1,6 @@
 package org.basex.query.func.random;
 
-import java.util.*;
+import java.util.concurrent.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -14,9 +14,6 @@ import org.basex.query.value.item.*;
  * @author Dirk Kirsten
  */
 public final class RandomGaussian extends StandardFunc {
-  /** Random instance. */
-  private static final Random RND = new Random();
-
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final long count = toLong(arg(0), qc);
@@ -26,7 +23,7 @@ public final class RandomGaussian extends StandardFunc {
 
       @Override
       public Item next() {
-        return --c >= 0 ? Dbl.get(RND.nextGaussian()) : null;
+        return --c >= 0 ? Dbl.get(ThreadLocalRandom.current().nextGaussian()) : null;
       }
     };
   }
