@@ -57,6 +57,11 @@ public final class RestXqCookieTest extends RestXqTest {
     query(request("cookies='true'", "cookie-echo"), "none");
   }
 
+  /** Cookies are stored and sent by the HTTP Client 2.0 functions. */
+  @Test public void getCookies() {
+    query(_HTTP_GET.args(HTTP_ROOT + "cookie-set", " { 'cookies': true() }") + "?body", "a=1");
+  }
+
   /**
    * Returns a query that sends a request and returns the response body.
    * @param attribute additional request attribute

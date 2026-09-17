@@ -4,12 +4,8 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.http.HTTPText.*;
 
-import java.net.http.*;
-import java.time.*;
 import java.util.*;
 
-import org.basex.core.*;
-import org.basex.core.StaticOptions.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
@@ -59,14 +55,14 @@ public final class RequestParser {
 
       // it is an error if content is set for HTTP methods that do not allow bodies
       final GNode body = parseHeaders(request.childIter(), hr.headers);
-      checkHeaders(hr);
+      final String error = hr.invalid();
+      if(error != null) throw HC_REQ_X.get(info, error);
       if(body != null) {
         final QNm pl = body.qname();
         // single part request
         if(pl.eq(Q_HTTP_BODY)) {
           parseBody(body, bodies, hr.payloadAtts, hr.payload);
-          hr.isMultipart = false;
-          // multipart request
+        // multipart request
         } else if(pl.eq(Q_HTTP_MULTIPART)) {
           parseMultipart(body, bodies.iter(), hr.payloadAtts, hr.parts);
           hr.isMultipart = true;
@@ -191,23 +187,19 @@ public final class RequestParser {
       case PASSWORD -> request.password = value;
       case OVERRIDE_MEDIA_TYPE -> request.overrideMediaType = value;
       case CSV -> request.csv = value;
+      case XML -> request.xml = value;
+      case PROXY -> request.proxy(value, info);
+      case VERIFY -> request.verify = bool(attribute, value);
       case JSON -> request.json = value;
       case HTML -> request.html = value;
       case COOKIES -> request.cookies = bool(attribute, value);
-      case STATUS_ONLY -> request.statusOnly = bool(attribute, value);
-      case FOLLOW_REDIRECT -> request.followRedirect = bool(attribute, value);
+      case STATUS_ONLY ->
+        request.bodyMode = bool(attribute, value) ? BodyMode.NONE : BodyMode.PARSE;
+      case FOLLOW_REDIRECT -> request.redirects(value, info);
       case SEND_AUTHORIZATION -> request.sendAuthorization = bool(attribute, value);
-      case TIMEOUT -> {
-        final int seconds = Strings.toInt(value);
-        if(seconds <= 0) throw HC_REQ_X.get(info, "Invalid timeout: " + value);
-        request.timeout = Duration.ofSeconds(seconds);
-      }
-      case AUTH_METHOD -> {
-        // the authentication method also applies to credentials in the URI
-        final AuthMethod method = StaticOptions.AUTHMETHOD.get(value);
-        if(method == null) throw HC_REQ_X.get(info, "Invalid authentication method: " + value);
-        request.authMethod = method;
-      }
+      case TIMEOUT -> request.timeout(value, info);
+      // the authentication method also applies to credentials in the URI
+      case AUTH_METHOD -> request.authMethod(value, info);
     }
   }
 
@@ -237,21 +229,6 @@ public final class RequestParser {
     // a password is required if a username is supplied
     if(request.username != null && request.password == null)
       throw HC_REQ_X.get(info, "Missing attribute: " + RequestAttribute.PASSWORD);
-  }
-
-  /**
-   * Checks if the method and the headers of a request are accepted by the HTTP client.
-   * @param request request
-   * @throws QueryException query exception
-   */
-  private void checkHeaders(final Request request) throws QueryException {
-    final HttpRequest.Builder rb = HttpRequest.newBuilder();
-    try {
-      rb.method(request.method, HttpRequest.BodyPublishers.noBody());
-      request.headers.forEach(rb::header);
-    } catch(final IllegalArgumentException ex) {
-      throw HC_REQ_X.get(info, ex.getMessage());
-    }
   }
 
   /**

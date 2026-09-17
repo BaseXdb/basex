@@ -91,6 +91,8 @@ public interface HTTPText {
   /** Auth. */
   String AUTH = "auth";
 
+  /** HTTP header: Accept-Encoding. */
+  String ACCEPT_ENCODING = "Accept-Encoding";
   /** Content encoding: gzip. */
   String GZIP = "gzip";
 

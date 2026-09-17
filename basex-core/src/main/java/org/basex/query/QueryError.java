@@ -307,6 +307,23 @@ public enum QueryError {
   /** Error code. */
   HC_TIMEOUT(HC, 6, "Timeout occurred waiting for the response."),
 
+  /** Error code. */
+  HTTP_INVALID_BODY_X(HTTP, "invalid-body", "%"),
+  /** Error code. */
+  HTTP_INVALID_OPTION_X(HTTP, "invalid-option", "%"),
+  /** Error code. */
+  HTTP_INVALID_URI_X(HTTP, "invalid-uri", "%"),
+  /** Error code. */
+  HTTP_NETWORK_X(HTTP, "network", "%"),
+  /** Error code. */
+  HTTP_PARSE_X(HTTP, "parse", "%"),
+  /** Error code. */
+  HTTP_REDIRECT_X(HTTP, "redirect", "%"),
+  /** Error code. */
+  HTTP_SERIALIZE_X(HTTP, "serialize", "%"),
+  /** Error code. */
+  HTTP_TIMEOUT_X(HTTP, "timeout", "%"),
+
   // Inspection Module
 
   /** Error code. */
@@ -1588,6 +1605,7 @@ public enum QueryError {
     /** Error type. */ CX(EXPERR_PREFIX,  EXPERROR_URI),
     /** Error type. */ FILE(FILE_PREFIX,  FILE_URI),
     /** Error type. */ HC(EXPERR_PREFIX,  EXPERROR_URI),
+    /** Error type. */ HTTP(HTTP_PREFIX,  HTTP_URI),
 
     // W3 errors
 

@@ -1619,9 +1619,41 @@ public enum Function implements AFunction {
   // HTTP Module
 
   /** XQuery function. */
+  _HTTP_DELETE(HttpDelete::new, "delete(href, options?)",
+      params(STRING_O, MAP_ZO), Records.HTTP_RESPONSE.get().seqType(), flag(NDT), HTTP_URI,
+      Perm.CREATE),
+  /** XQuery function. */
   _HTTP_GET(HttpGet::new, "get(href, options?)",
       params(STRING_O, MAP_ZO), Records.HTTP_RESPONSE.get().seqType(), flag(NDT), HTTP_URI,
       Perm.CREATE),
+  /** XQuery function. */
+  _HTTP_HEAD(HttpHead::new, "head(href, options?)",
+      params(STRING_O, MAP_ZO), Records.HTTP_RESPONSE.get().seqType(), flag(NDT), HTTP_URI,
+      Perm.CREATE),
+  /** XQuery function. */
+  _HTTP_OPTIONS(HttpOptions::new, "options(href, options?)",
+      params(STRING_O, MAP_ZO), Records.HTTP_RESPONSE.get().seqType(), flag(NDT), HTTP_URI,
+      Perm.CREATE),
+  /** XQuery function. */
+  _HTTP_PATCH(HttpPatch::new, "patch(href, body?, options?)",
+      params(STRING_O, ITEM_ZM, MAP_ZO), Records.HTTP_RESPONSE.get().seqType(), flag(NDT),
+      HTTP_URI, Perm.CREATE),
+  /** XQuery function. */
+  _HTTP_POST(HttpPost::new, "post(href, body?, options?)",
+      params(STRING_O, ITEM_ZM, MAP_ZO), Records.HTTP_RESPONSE.get().seqType(), flag(NDT),
+      HTTP_URI, Perm.CREATE),
+  /** XQuery function. */
+  _HTTP_PUT(HttpPut::new, "put(href, body?, options?)",
+      params(STRING_O, ITEM_ZM, MAP_ZO), Records.HTTP_RESPONSE.get().seqType(), flag(NDT),
+      HTTP_URI, Perm.CREATE),
+  /** XQuery function. */
+  _HTTP_QUERY(HttpQuery::new, "query(href, body?, options?)",
+      params(STRING_O, ITEM_ZM, MAP_ZO), Records.HTTP_RESPONSE.get().seqType(), flag(NDT),
+      HTTP_URI, Perm.CREATE),
+  /** XQuery function. */
+  _HTTP_SEND(HttpSend::new, "send(href, method, body?, options?)",
+      params(STRING_O, STRING_O, ITEM_ZM, MAP_ZO), Records.HTTP_RESPONSE.get().seqType(),
+      flag(NDT), HTTP_URI, Perm.CREATE),
   /** XQuery function. */
   _HTTP_SEND_REQUEST(HttpSendRequest::new, "send-request(request, href?, bodies?)",
       params(XNODE_ZO, STRING_ZO, ITEM_ZM), ITEM_OM, flag(NDT), HTTP_URI, Perm.CREATE),

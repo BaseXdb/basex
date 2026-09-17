@@ -9,9 +9,9 @@ import org.basex.query.value.map.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class HttpGet extends HttpFn {
+public final class HttpHead extends HttpFn {
   @Override
   public XQMap value(final QueryContext qc) throws QueryException {
-    return send("GET", null, arg(1), qc);
+    return send("HEAD", null, arg(1), qc);
   }
 }

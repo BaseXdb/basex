@@ -141,7 +141,7 @@ public final class RequestContext implements RequestScope {
       if(mt != null && mt.is(MediaType.MULTIPART_FORM_DATA)) {
         // convert multipart parameters encoded in a form
         try(InputStream is = body().inputStream()) {
-          form = new Payload(is, true, null, options).multiForm(mt,
+          form = new Payload(is, BodyMode.PARSE, null, options).multiForm(mt,
               qc.resources.index(TempFiles.class));
         }
       } else if(mt != null && mt.is(MediaType.APPLICATION_X_WWW_FORM_URLENCODED)) {

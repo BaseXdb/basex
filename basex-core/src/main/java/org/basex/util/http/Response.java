@@ -1,5 +1,6 @@
 package org.basex.util.http;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.util.http.HTTPText.*;
 
 import java.io.*;
@@ -13,6 +14,7 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.query.func.Function;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -37,6 +39,8 @@ public final class Response {
   private final MainOptions options;
   /** Query resources (can be {@code null}). */
   private final QueryResources resources;
+  /** Function that requested the response. */
+  private final FuncDefinition definition;
 
   /**
    * Constructor.
@@ -55,50 +59,58 @@ public final class Response {
    */
   public Response(final InputInfo info, final MainOptions options,
       final QueryResources resources) {
+    this(info, options, resources, Function._HTTP_SEND_REQUEST.definition());
+  }
+
+  /**
+   * Constructor.
+   * @param info input info (can be {@code null})
+   * @param options main options
+   * @param resources query resources (can be {@code null})
+   * @param definition function that requests the response
+   */
+  public Response(final InputInfo info, final MainOptions options,
+      final QueryResources resources, final FuncDefinition definition) {
     this.info = info;
     this.options = options;
     this.resources = resources;
+    this.definition = definition;
   }
 
   /**
    * Constructs http:response element and reads HTTP response content.
    * @param response HTTP response
-   * @param body also return body
+   * @param mode representation of the response body
    * @param mtype media type provided by the user (can be {@code null})
+   * @param xml options for parsing XML bodies (can be {@code null})
    * @return result sequence of http:response and content items
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  public Value getResponse(final HttpResponse<InputStream> response, final boolean body,
-      final String mtype) throws IOException, QueryException {
+  public Value getResponse(final HttpResponse<InputStream> response, final BodyMode mode,
+      final String mtype, final MainOptions xml) throws IOException, QueryException {
 
     // construct <http:response/>
     final int status = response.statusCode();
     final FBuilder root = FElem.build(Q_HTTP_RESPONSE).ns();
     root.attr(Q_STATUS, status).attr(Q_MESSAGE, IOUrl.reason(status));
-    final URI uri = response.uri();
-    final String href = uri != null ? IOUrl.stripUserInfo(uri.toString()) : null;
+    final String href = href(response, null);
     if(href != null) root.attr(Q_HREF, href);
     if(response.version() != null) {
       root.attr(Q_VERSION, response.version() == Version.HTTP_2 ? "HTTP/2" : "HTTP/1.1");
     }
 
-    // add headers (names are case-insensitive, lower-case in HTTP/2), skip pseudo-headers
-    for(final Entry<String, List<String>> entry : response.headers().map().entrySet()) {
-      final String name = entry.getKey();
-      if(name != null && !name.startsWith(":")) {
-        final String lc = name.toLowerCase(Locale.ENGLISH);
-        for(final String value : entry.getValue()) {
-          root.node(FElem.build(Q_HTTP_HEADER).attr(Q_NAME, lc).attr(Q_VALUE, value));
-        }
+    headers(response, (name, values) -> {
+      for(final String value : values) {
+        root.node(FElem.build(Q_HTTP_HEADER).attr(Q_NAME, name).attr(Q_VALUE, value));
       }
-    }
+    });
 
     // add payload elements and contents
-    final ResponseBody parsed = body(response, body, mtype, href);
+    final ResponseBody parsed = body(response, mode, mtype, null, xml, href);
     root.node(element(parsed));
     final ItemList items = new ItemList().add((Item) null);
-    if(body) items.add(parsed.values());
+    if(mode != BodyMode.NONE) items.add(parsed.values());
 
     return items.set(0, root.finish()).value();
   }
@@ -106,45 +118,95 @@ public final class Response {
   /**
    * Constructs a response record and reads HTTP response content.
    * @param response HTTP response
+   * @param mode representation of the response body
+   * @param charset character encoding of the body (can be {@code null})
+   * @param xml options for parsing XML bodies (can be {@code null})
    * @return response record
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  public XQMap getRecord(final HttpResponse<InputStream> response)
-      throws IOException, QueryException {
+  public XQMap getRecord(final HttpResponse<InputStream> response, final BodyMode mode,
+      final String charset, final MainOptions xml) throws IOException, QueryException {
 
-    final URI uri = response.uri();
-    final String href = uri != null ? IOUrl.stripUserInfo(uri.toString()) : "";
+    final String href = href(response, "");
 
-    // header names are lower-cased, pseudo-headers are skipped
     final MapBuilder headers = new MapBuilder();
+    headers(response, (name, values) -> {
+      final TokenList list = new TokenList();
+      for(final String value : values) list.add(value);
+      headers.put(name, StrSeq.get(list));
+    });
+
+    final XQMap fields = headers.map();
+    try {
+      final ResponseBody parsed = body(response, mode, null, charset, xml, href);
+      return record(response, href, fields, parsed.values());
+    } catch(final QueryException ex) {
+      if(ex.error() != HC_PARSE_X) throw ex;
+      // the response is supplied as error value, with the body that 'binary' would return
+      throw HTTP_PARSE_X.get(info, ex.getLocalizedMessage()).
+        value(record(response, href, fields, ex.value()));
+    }
+  }
+
+  /**
+   * Returns the URI of a response.
+   * @param response HTTP response
+   * @param fallback value to be returned if the response has no URI (can be {@code null})
+   * @return URI
+   */
+  private static String href(final HttpResponse<InputStream> response, final String fallback) {
+    final URI uri = response.uri();
+    return uri != null ? IOUrl.stripUserInfo(uri.toString()) : fallback;
+  }
+
+  /**
+   * Passes the header fields of a response to a consumer. Field names are converted to lower
+   * case, pseudo-headers are skipped.
+   * @param response HTTP response
+   * @param consumer consumer for field name and values
+   * @throws QueryException query exception
+   */
+  private static void headers(final HttpResponse<InputStream> response,
+      final QueryBiConsumer<String, List<String>> consumer) throws QueryException {
     for(final Entry<String, List<String>> entry : response.headers().map().entrySet()) {
       final String name = entry.getKey();
+      // names are case-insensitive, and lower-case in HTTP/2
       if(name != null && !name.startsWith(":")) {
-        final TokenList values = new TokenList();
-        for(final String value : entry.getValue()) values.add(value);
-        headers.put(name.toLowerCase(Locale.ENGLISH), StrSeq.get(values));
+        consumer.accept(name.toLowerCase(Locale.ENGLISH), entry.getValue());
       }
     }
+  }
 
-    final ResponseBody parsed = body(response, true, null, href);
-    return XQMap.get(Records.HTTP_RESPONSE.get(), Itr.get(response.statusCode()), headers.map(),
-      parsed.values(), Str.get(href),
-      Str.get(response.version() == Version.HTTP_2 ? "2" : "1.1"));
+  /**
+   * Returns a response record.
+   * @param response HTTP response
+   * @param href URI of the response
+   * @param headers response headers
+   * @param body response body
+   * @return record
+   */
+  private static XQMap record(final HttpResponse<InputStream> response, final String href,
+      final XQMap headers, final Value body) {
+    return XQMap.get(Records.HTTP_RESPONSE.get(), Itr.get(response.statusCode()), headers, body,
+      Str.get(href), Str.get(response.version() == Version.HTTP_2 ? "2" : "1.1"));
   }
 
   /**
    * Reads and parses the response body.
    * @param response HTTP response
-   * @param body also return body
+   * @param mode representation of the response body
    * @param mtype media type provided by the user (can be {@code null})
+   * @param charset character encoding of the body (can be {@code null})
+   * @param xml options for parsing XML bodies (can be {@code null})
    * @param href URI of the response (can be {@code null})
    * @return parsed body
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  private ResponseBody body(final HttpResponse<InputStream> response, final boolean body,
-      final String mtype, final String href) throws IOException, QueryException {
+  private ResponseBody body(final HttpResponse<InputStream> response, final BodyMode mode,
+      final String mtype, final String charset, final MainOptions xml, final String href)
+      throws IOException, QueryException {
 
     final HttpHeaders headers = response.headers();
     final MediaType type = mtype != null ? new MediaType(mtype) :
@@ -152,18 +214,21 @@ public final class Response {
     final String encoding = headers.firstValue(CONTENT_ENCODING).orElse("");
     final TempFiles temp = resources != null ? resources.index(TempFiles.class) : null;
 
-    if(body && resources != null && Payload.binary(type) &&
+    final boolean binary = mode == BodyMode.BINARY ||
+      mode == BodyMode.PARSE && Payload.binary(type);
+    if(binary && resources != null &&
         !"0".equals(headers.firstValue(CONTENT_LENGTH).orElse(""))) {
       // binary result: skip retrieval of response body, return lazy item
       final InputStream is = response.body();
       resources.add(is);
       final ResponseBody parsed = new ResponseBody();
       parsed.type = type;
-      parsed.value = new B64HttpLazy(href, is, encoding, temp);
+      parsed.value = new B64HttpLazy(href, is, encoding, temp, definition);
       return parsed;
     }
     try(InputStream is = response.body()) {
-      return new Payload(is, body, info, options).parse(type, encoding, temp);
+      return new Payload(is, mode, charset, info, options).xmlOptions(xml).
+        parse(type, encoding, temp);
     }
   }
 
@@ -188,5 +253,4 @@ public final class Response {
     }
     return elem.attr(Q_MEDIA_TYPE, body.type.type()).finish();
   }
-
 }

@@ -13,6 +13,8 @@ import java.time.*;
 import java.util.*;
 import java.util.Map.*;
 
+import javax.net.ssl.*;
+
 import org.basex.build.csv.*;
 import org.basex.build.html.*;
 import org.basex.build.json.*;
@@ -24,12 +26,15 @@ import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.io.serial.SerializerOptions.*;
 import org.basex.query.*;
+import org.basex.query.func.*;
+import org.basex.query.func.fn.FnParseXml.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
-import org.basex.query.value.map.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.http.HttpClients.*;
 import org.basex.util.options.*;
 
 /**
@@ -40,9 +45,6 @@ import org.basex.util.options.*;
  * @author Michael Seiferle
  */
 public final class Client {
-  /** Maximum number of redirects. */
-  private static final int MAX_REDIRECTS = 5;
-
   /** Input information (can be {@code null}). */
   private final InputInfo info;
   /** Database options. */
@@ -63,21 +65,22 @@ public final class Client {
    * @param href URL to send the request to (can be empty string)
    * @param request request data
    * @param bodies request body
-   * @param resources query resources
+   * @param qc query context
    * @return HTTP response
    * @throws QueryException query exception
    */
   public Value sendRequest(final byte[] href, final XNode request, final Value bodies,
-      final QueryResources resources) throws QueryException {
+      final QueryContext qc) throws QueryException {
 
+    final QueryResources resources = qc.resources;
     final Request req = new RequestParser(info).parse(request, bodies);
     final URI uri = uri(href, req);
     final MainOptions mopts = new MainOptions(options);
     try {
-      parsers(mopts, req);
+      final MainOptions xml = parsers(mopts, req, qc);
       final HttpResponse<InputStream> response = send(uri, req, client(req, resources));
-      return new Response(info, mopts, resources).getResponse(response, !req.statusOnly,
-          req.overrideMediaType);
+      return new Response(info, mopts, resources).getResponse(response, req.bodyMode,
+          req.overrideMediaType, xml);
     } catch(final IOException ex) {
       throw error(ex, info);
     }
@@ -87,37 +90,98 @@ public final class Client {
    * Sends an HTTP request and returns the response as a record.
    * @param href URL to send the request to
    * @param request request data
-   * @param resources query resources
+   * @param qc query context
+   * @param definition function that sends the request
    * @return response record
    * @throws QueryException query exception
    */
-  public XQMap send(final String href, final Request request, final QueryResources resources)
-      throws QueryException {
+  public XQMap send(final String href, final Request request, final QueryContext qc,
+      final FuncDefinition definition) throws QueryException {
 
-    final URI uri = uri(Token.token(href), request);
+    final QueryResources resources = qc.resources;
     final MainOptions mopts = new MainOptions(options);
     try {
-      parsers(mopts, request);
+      final URI uri = uri(Token.token(href), request);
+      final MainOptions xml = parsers(mopts, request, qc);
       final HttpResponse<InputStream> response = send(uri, request, client(request, resources));
-      return new Response(info, mopts, resources).getRecord(response);
+      return new Response(info, mopts, resources, definition).getRecord(response,
+          request.bodyMode, request.charset, xml);
+    } catch(final RedirectException ex) {
+      throw HTTP_REDIRECT_X.get(info, ex.getMessage());
     } catch(final IOException ex) {
-      throw error(ex, info);
+      throw error(ex, info, definition);
     }
   }
 
   /**
-   * Assigns the parser options of a request.
+   * Returns the error of the HTTP Client Module 2.0 that corresponds to an error of version 1.0.
+   * The message of the original error is adopted.
+   * @param ex query exception
+   * @param info input info (can be {@code null})
+   * @return query exception
+   */
+  public static QueryException error(final QueryException ex, final InputInfo info) {
+    final QueryError error = ex.error(), mapped =
+      error == HC_PARSE_X ? HTTP_PARSE_X :
+      error == HC_REQ_X || error == HC_ATTR ? HTTP_INVALID_OPTION_X :
+      error == HC_URL || error == HC_URI_X ? HTTP_INVALID_URI_X :
+      error == HC_TIMEOUT ? HTTP_TIMEOUT_X :
+      error == HC_ERROR_X ? HTTP_NETWORK_X : null;
+    return mapped != null ? mapped.get(info, ex.getLocalizedMessage()) : ex;
+  }
+
+  /**
+   * Assigns the parse options of the HTTP Client Module 2.0.
    * @param mopts main options
    * @param request request data
+   * @param qc query context
+   * @return main options
    * @throws IOException I/O exception
+   * @throws QueryException query exception
    */
-  private static void parsers(final MainOptions mopts, final Request request) throws IOException {
-    mopts.set(MainOptions.CSVPARSER,
-        assign(new CsvParserOptions(mopts.get(MainOptions.CSVPARSER)), request.csv));
-    mopts.set(MainOptions.JSONPARSER,
-        assign(new JsonParserOptions(mopts.get(MainOptions.JSONPARSER)), request.json));
-    mopts.set(MainOptions.HTMLPARSER,
-        assign(new HtmlOptions(mopts.get(MainOptions.HTMLPARSER)), request.html));
+  private MainOptions parsers(final MainOptions mopts, final Request request,
+      final QueryContext qc) throws IOException, QueryException {
+
+    final XQMap map = request.parseOptions;
+    mopts.set(MainOptions.CSVPARSER, assign(
+      new CsvParserOptions(mopts.get(MainOptions.CSVPARSER)), request.csv, map, "csv", qc));
+    mopts.set(MainOptions.JSONPARSER, assign(
+      new JsonParserOptions(mopts.get(MainOptions.JSONPARSER)), request.json, map, "json", qc));
+    mopts.set(MainOptions.HTMLPARSER, assign(
+      new HtmlOptions(mopts.get(MainOptions.HTMLPARSER)), request.html, map, "html", qc));
+
+    if(request.xml == null && !(map != null && map.get(Str.get("xml")) instanceof XQMap))
+      return null;
+
+    final ParseXmlOptions opts = assign(new ParseXmlOptions(), request.xml, map, "xml", qc);
+    // responses are parsed as untrusted input, so external resources are rejected
+    if(opts.get(ParseXmlOptions.TRUST_EXTERNAL) == Boolean.TRUE ||
+       opts.get(ParseXmlOptions.XINCLUDE) ||
+       opts.get(ParseXmlOptions.USE_XSI_SCHEMA_LOCATION)) {
+      throw HC_REQ_X.get(info, "External resources are not permitted for response bodies");
+    }
+    return new MainOptions(opts, qc.context.options).trusted(false);
+  }
+
+  /**
+   * Assigns parser options. They can be supplied as string (version 1.0) or as the entry of a
+   * parse options record (version 2.0).
+   * @param <O> option type
+   * @param opts options
+   * @param string options string (can be {@code null})
+   * @param map parse options (can be {@code null})
+   * @param name entry name
+   * @param qc query context
+   * @return supplied options
+   * @throws IOException I/O exception
+   * @throws QueryException query exception
+   */
+  private <O extends Options> O assign(final O opts, final String string, final XQMap map,
+      final String name, final QueryContext qc) throws IOException, QueryException {
+    if(string != null) opts.assign(string);
+    if(map != null && map.get(Str.get(name)) instanceof final XQMap entry)
+      opts.assign(entry, qc, info);
+    return opts;
   }
 
   /**
@@ -150,10 +214,14 @@ public final class Client {
       // assign headers to request; the Content-Type of a payload request is already set above,
       // so skip it here to avoid sending it twice; ensure that Accept and User-Agent are sent
       request.headers.forEach((name, value) -> {
-        if(!(hasBody && name.equalsIgnoreCase(CONTENT_TYPE))) rb.header(name, value);
+        // a field without value is suppressed, but still overrides an implementation default
+        if(value != null && !(hasBody && name.equalsIgnoreCase(CONTENT_TYPE)))
+          rb.header(name, value);
       });
       if(!request.headers.containsKey(ACCEPT)) rb.header(ACCEPT, MediaType.ALL_ALL.toString());
       if(!request.headers.containsKey(USER_AGENT)) rb.header(USER_AGENT, IOUrl.AGENT);
+      // compressed responses are decoded transparently
+      if(!request.headers.containsKey(ACCEPT_ENCODING)) rb.header(ACCEPT_ENCODING, GZIP);
     } catch(final IllegalArgumentException ex) {
       throw new IOException(ex.getMessage(), ex);
     }
@@ -161,19 +229,19 @@ public final class Client {
     final BodyHandler<InputStream> handler = IOUrl.handler(timeout);
 
     // send request (with optional authorization)
-    final boolean follow = request.followRedirect;
+    final int max = request.redirects;
     try {
       final UserInfo ui = new UserInfo(uri, request);
       if(request.sendAuthorization && request.authMethod == AuthMethod.BASIC) {
         ui.basic(rb);
-        return send(client, rb.build(), handler, follow);
+        return send(client, rb.build(), handler, max);
       }
       final HttpRequest sent = rb.build();
-      final HttpResponse<InputStream> response = send(client, sent, handler, follow);
+      final HttpResponse<InputStream> response = send(client, sent, handler, max);
       final HttpRequest retry = ui.assign(sent, response);
       if(retry == null) return response;
       response.body().close();
-      return send(client, retry, handler, follow);
+      return send(client, retry, handler, max);
     } catch(final InterruptedException | IllegalArgumentException ex) {
       // illegal argument exception may be caused by wrongly encoded redirect URL
       throw new IOException(ex.getMessage(), ex);
@@ -185,13 +253,13 @@ public final class Client {
    * @param client HTTP client
    * @param request request to be sent
    * @param handler response body handler
-   * @param follow follow redirects
+   * @param max maximum number of redirects
    * @return response
    * @throws IOException I/O exception
    * @throws InterruptedException interruption
    */
   private static HttpResponse<InputStream> send(final HttpClient client, final HttpRequest request,
-      final BodyHandler<InputStream> handler, final boolean follow)
+      final BodyHandler<InputStream> handler, final int max)
       throws IOException, InterruptedException {
 
     HttpRequest sent = request;
@@ -199,11 +267,11 @@ public final class Client {
       final HttpRequest current = sent;
       final HttpResponse<InputStream> response = Job.run(() -> client.send(current, handler));
       // if redirects are not followed, the redirect response itself is returned
-      final HttpRequest next = follow ? redirect(current, response) : null;
+      final HttpRequest next = max == 0 ? null : redirect(current, response);
       if(next == null) return response;
-      if(r >= MAX_REDIRECTS) throw new IOException("Too many redirects: " + next.uri());
       // the body of a redirect response is discarded, and the connection is released
       response.body().close();
+      if(r >= max) throw new RedirectException("Too many redirects: " + next.uri());
       sent = next;
     }
   }
@@ -298,9 +366,12 @@ public final class Client {
           Payload.binary(new MediaType(att.getValue())))) {
       io = bin.input();
     }
-    return io instanceof final IOFile file ?
-      BodyPublishers.ofFile(file.file().toPath()) :
-      BodyPublishers.ofByteArray(payload(request));
+    if(io instanceof final IOFile file) return BodyPublishers.ofFile(file.file().toPath());
+    try {
+      return BodyPublishers.ofByteArray(payload(request));
+    } catch(final QueryIOException ex) {
+      throw new SerializeException(ex);
+    }
   }
 
   /**
@@ -311,6 +382,8 @@ public final class Client {
   private static void setContentType(final HttpRequest.Builder rb, final Request request) {
     String ct = request.headers.get(CONTENT_TYPE);
     if(ct == null) {
+      // a suppressed field is not replaced by the media type of the payload
+      if(request.headers.containsKey(CONTENT_TYPE)) return;
       // no header: @media-type of <http:body/> is considered
       ct = request.payloadAtts.get(SerializerOptions.MEDIA_TYPE.name());
       if(request.isMultipart) ct = Strings.concat(ct, "; ", BOUNDARY, "=", request.boundary());
@@ -319,6 +392,32 @@ public final class Client {
       ct = Strings.concat(ct, "; ", BOUNDARY, "=", request.boundary());
     }
     rb.header(CONTENT_TYPE, ct);
+  }
+
+  /**
+   * Exception raised if a request body cannot be serialized.
+   */
+  private static final class SerializeException extends IOException {
+    /**
+     * Constructor.
+     * @param cause causing exception
+     */
+    SerializeException(final QueryIOException cause) {
+      super(Util.message(cause), cause);
+    }
+  }
+
+  /**
+   * Exception raised if more redirects are received than permitted.
+   */
+  private static final class RedirectException extends IOException {
+    /**
+     * Constructor.
+     * @param message error message
+     */
+    RedirectException(final String message) {
+      super(message);
+    }
   }
 
   /**
@@ -334,16 +433,19 @@ public final class Client {
   }
 
   /**
-   * Assigns parser options.
-   * @param <O> option type
-   * @param opts options
-   * @param value value to assign (can be {@code null})
-   * @return supplied options
-   * @throws IOException I/O exception
+   * Returns the query exception for a failed HTTP exchange, with the errors of the version of
+   * the module that the supplied function belongs to.
+   * @param ex I/O exception
+   * @param info input info (can be {@code null})
+   * @param definition function that sent the request
+   * @return query exception
    */
-  private static <O extends Options> O assign(final O opts, final String value) throws IOException {
-    if(value != null) opts.assign(value);
-    return opts;
+  public static QueryException error(final IOException ex, final InputInfo info,
+      final FuncDefinition definition) {
+    if(definition == Function._HTTP_SEND_REQUEST.definition()) return error(ex, info);
+    if(ex instanceof SerializeException) return HTTP_SERIALIZE_X.get(info, Util.message(ex));
+    return (ex instanceof HttpTimeoutException || ex instanceof SocketTimeoutException ?
+      HTTP_TIMEOUT_X : HTTP_NETWORK_X).get(info, Util.message(ex));
   }
 
   /**
@@ -354,13 +456,25 @@ public final class Client {
    * @throws QueryException query exception
    */
   private URI uri(final byte[] href, final Request request) throws QueryException {
-    final String uri = href.length == 0 ? request.href : Token.string(href);
+    String uri = href.length == 0 ? request.href : Token.string(href);
     if(uri == null || uri.isEmpty()) throw HC_URL.get(info);
+    if(request.query != null) {
+      // parameters are appended to an existing query string, but before a fragment identifier
+      final int f = uri.indexOf('#');
+      final String base = f == -1 ? uri : uri.substring(0, f);
+      uri = base + (base.indexOf('?') != -1 ? '&' : '?') + request.query +
+        (f == -1 ? "" : uri.substring(f));
+    }
+    final URI target;
     try {
-      return new URI(IOUrl.toAscii(uri));
+      target = new URI(IOUrl.toAscii(uri));
     } catch(final URISyntaxException ex) {
       throw HC_URI_X.get(info, uri).cause(ex);
     }
+    // only HTTP URIs are supported
+    final String scheme = scheme(target);
+    if(!scheme.equals("http") && !scheme.equals("https")) throw HC_URI_X.get(info, uri);
+    return target;
   }
 
   /**
@@ -368,10 +482,27 @@ public final class Client {
    * @param request request
    * @param resources query resources
    * @return client
+   * @throws QueryException query exception
    */
-  private static HttpClient client(final Request request, final QueryResources resources) {
+  private HttpClient client(final Request request, final QueryResources resources)
+      throws QueryException {
+
     // redirects are followed by this class, not by the JDK client
-    return request.cookies ? resources.index(HttpClients.class).get(false) : IOUrl.client(false);
+    if(request.proxy == null && request.verify && request.certificates == null) {
+      return request.cookies ? resources.index(HttpClients.class).get(false) : IOUrl.client(false);
+    }
+    // requests with a specific connection configuration get their own client
+    final HttpClients clients = resources.index(HttpClients.class);
+    final ClientKey key = new ClientKey(request.cookies, request.verify, request.proxy,
+      request.certificates);
+    final HttpClient cached = clients.get(key);
+    if(cached != null) return cached;
+
+    // the SSL context is only built if no client exists yet: key stores are read from disk
+    final SSLContext context = request.certificates != null ?
+      Certificates.context(request.certificates, request.verify, info) :
+      request.verify ? null : IOUrl.insecure();
+    return clients.add(key, context);
   }
 
   /**
@@ -484,21 +615,19 @@ public final class Client {
     if(request.isMultipart) {
       final String boundary = request.boundary();
       for(final Part part : request.parts) {
-        // write content to cache
-        final ArrayOutput ao = new ArrayOutput();
-        writePayload(part.contents, part.attributes, ao);
-
         // write boundary preceded by "--"
         out.write(Token.concat("--", boundary, CRLF));
 
         // write headers
-        for(final Entry<String, String> header : part.headers.entrySet())
-          writeHeader(header.getKey(), header.getValue(), out);
+        for(final Entry<String, String> header : part.headers.entrySet()) {
+          // a field without value is suppressed, but still overrides the default content type
+          if(header.getValue() != null) writeHeader(header.getKey(), header.getValue(), out);
+        }
         if(!part.headers.containsKey(CONTENT_TYPE))
           writeHeader(CONTENT_TYPE, part.attributes.get(SerializerOptions.MEDIA_TYPE.name()), out);
 
         out.write(CRLF);
-        out.write(ao.finish());
+        writePayload(part.contents, part.attributes, out);
         out.write(CRLF);
       }
       out.write(Token.concat("--", boundary, "--", CRLF));

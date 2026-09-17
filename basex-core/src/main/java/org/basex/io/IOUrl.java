@@ -34,8 +34,19 @@ public final class IOUrl extends IO {
   private static final Duration TIMEOUT = Duration.ofMinutes(1);
   /** Reason phrases. */
   private static final HashMap<Integer, String> REASONS = new HashMap<>();
-  /** Optional SSL context for ignoring certificates (can be {@code null}). */
-  private static SSLContext ssl;
+  /** Accept all server certificates. */
+  private static boolean ignoreCertificates;
+  /** Context that accepts all server certificates (can be {@code null}). */
+  private static SSLContext insecure;
+  /** Trust manager that accepts all server certificates. */
+  private static final X509TrustManager TRUST_ALL = new X509TrustManager() {
+    @Override
+    public X509Certificate[] getAcceptedIssuers() { return null; }
+    @Override
+    public void checkClientTrusted(final X509Certificate[] x509, final String type) { }
+    @Override
+    public void checkServerTrusted(final X509Certificate[] x509, final String type) { }
+  };
   /** Cached HTTP client instances. */
   private static final HttpClients CLIENTS = new HttpClients(null);
 
@@ -202,10 +213,70 @@ public final class IOUrl extends IO {
    * @return client
    */
   public static HttpClient client(final boolean redirect, final CookieHandler cookies) {
+    return client(redirect, cookies, null, null);
+  }
+
+  /**
+   * Returns trust managers that accept all server certificates.
+   * @return trust managers
+   */
+  public static TrustManager[] trustAll() {
+    return new TrustManager[] { TRUST_ALL };
+  }
+
+  /**
+   * Returns a new HTTP client instance.
+   * @param redirect follow redirects
+   * @param cookies cookie handler (can be {@code null})
+   * @param proxy proxy URI, empty string for a direct connection (can be {@code null})
+   * @param context SSL context (can be {@code null})
+   * @return client
+   */
+  public static HttpClient client(final boolean redirect, final CookieHandler cookies,
+      final String proxy, final SSLContext context) {
+
     final HttpClient.Builder cb = HttpClient.newBuilder().connectTimeout(TIMEOUT);
     if(cookies != null) cb.cookieHandler(cookies);
-    if(ssl != null) cb.sslContext(ssl);
+    final SSLContext sc = context != null ? context : ignoreCertificates ? insecure() : null;
+    if(sc != null) cb.sslContext(sc);
+    if(proxy != null) {
+      final InetSocketAddress address = proxy.isEmpty() ? null : proxy(proxy);
+      cb.proxy(address != null ? ProxySelector.of(address) : HttpClient.Builder.NO_PROXY);
+    }
     return cb.followRedirects(redirect ? Redirect.ALWAYS : Redirect.NEVER).build();
+  }
+
+  /**
+   * Returns the address of a proxy URI.
+   * @param proxy proxy URI
+   * @return address, or {@code null} if the URI is invalid
+   */
+  public static InetSocketAddress proxy(final String proxy) {
+    try {
+      final URI uri = new URI(proxy);
+      final String host = uri.getHost();
+      final int port = uri.getPort();
+      return host == null || port == -1 ? null : new InetSocketAddress(host, port);
+    } catch(final URISyntaxException ex) {
+      Util.debug(ex);
+      return null;
+    }
+  }
+
+  /**
+   * Returns a context that accepts all server certificates.
+   * @return context, or {@code null} if none could be created
+   */
+  public static synchronized SSLContext insecure() {
+    if(insecure == null) {
+      try {
+        insecure = SSLContext.getInstance("TLS");
+        insecure.init(null, trustAll(), new SecureRandom());
+      } catch(final NoSuchAlgorithmException | KeyManagementException ex) {
+        Util.stack(ex);
+      }
+    }
+    return insecure;
   }
 
   /**
@@ -274,22 +345,7 @@ public final class IOUrl extends IO {
   public static void ignoreCertificates() {
     System.getProperties().setProperty("jdk.internal.httpclient.disableHostnameVerification",
         Boolean.TRUE.toString());
-
-    try {
-      ssl = SSLContext.getInstance("TLS");
-      ssl.init(null, new TrustManager[] {
-        new X509TrustManager() {
-          @Override
-          public X509Certificate[] getAcceptedIssuers() { return null; }
-          @Override
-          public void checkClientTrusted(final X509Certificate[] x509, final String type) { }
-          @Override
-          public void checkServerTrusted(final X509Certificate[] x509, final String type) { }
-        }
-      }, new SecureRandom());
-    } catch(final NoSuchAlgorithmException | KeyManagementException ex) {
-      Util.stack(ex);
-    }
+    ignoreCertificates = true;
   }
 
   // PRIVATE METHODS ==============================================================================

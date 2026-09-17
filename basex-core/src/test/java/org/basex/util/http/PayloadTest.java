@@ -133,7 +133,7 @@ public final class PayloadTest extends SandboxTest {
    */
   private static XQMap files(final byte[] body, final QueryContext qc, final int threshold)
       throws Exception {
-    final Payload payload = new Payload(new ArrayInput(body), true, null, OPTIONS);
+    final Payload payload = new Payload(new ArrayInput(body), BodyMode.PARSE, null, OPTIONS);
     final MediaType type = new MediaType("multipart/form-data; boundary=bnd");
     final TempFiles temp = qc.resources.index(TempFiles.class);
     return (XQMap) payload.multiForm(type, temp, threshold).get(Str.get("files"));

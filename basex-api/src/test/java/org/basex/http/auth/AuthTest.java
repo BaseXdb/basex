@@ -76,8 +76,8 @@ public abstract class AuthTest extends HTTPTest {
    */
   protected static void responseFail(final String url) {
     try {
-      final HttpResponse<InputStream> request = new IOUrl(url).response();
-      fail("Error expected:\n" + request);
+      final HttpResponse<InputStream> response = new IOUrl(url).response();
+      fail("Error expected:\n" + response);
     } catch(final IOException ex) {
       assertEquals("401", ex.getMessage().replaceAll(":.*", ""));
     }

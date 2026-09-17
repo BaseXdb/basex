@@ -5,7 +5,7 @@ import java.io.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
-import org.basex.query.func.Function;
+import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
@@ -23,6 +23,8 @@ public final class B64HttpLazy extends B64Lazy {
   private final String encoding;
   /** Registry for temporary files (can be {@code null}). */
   private final TempFiles temp;
+  /** Function that created the item. */
+  private final FuncDefinition definition;
   /** Unread body of the original response (consumed by the first access). */
   private InputStream pending;
 
@@ -32,13 +34,15 @@ public final class B64HttpLazy extends B64Lazy {
    * @param pending unread body of the original response
    * @param encoding content encoding of the original response
    * @param temp registry for temporary files (can be {@code null})
+   * @param definition function that creates the item
    */
   public B64HttpLazy(final String href, final InputStream pending, final String encoding,
-      final TempFiles temp) {
+      final TempFiles temp, final FuncDefinition definition) {
     this.href = href;
     this.pending = pending;
     this.encoding = encoding;
     this.temp = temp;
+    this.definition = definition;
   }
 
   @Override
@@ -54,12 +58,12 @@ public final class B64HttpLazy extends B64Lazy {
 
   @Override
   QueryException exception(final IOException ex, final InputInfo ii) {
-    return Client.error(ex, ii);
+    return Client.error(ex, ii, definition);
   }
 
   @Override
   public void toString(final QueryString qs) {
     if(isCached()) super.toString(qs);
-    else qs.function(Function._HTTP_SEND_REQUEST, href);
+    else qs.function(definition, href);
   }
 }

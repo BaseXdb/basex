@@ -71,7 +71,17 @@ public final class QueryString {
    * @return self reference
    */
   public QueryString function(final Function function, final Object... args) {
-    token(function.definition().args(error, args).trim());
+    return function(function.definition(), args);
+  }
+
+  /**
+   * Adds a function call.
+   * @param definition function definition
+   * @param args arguments
+   * @return self reference
+   */
+  public QueryString function(final FuncDefinition definition, final Object... args) {
+    token(definition.args(error, args).trim());
     return this;
   }
 

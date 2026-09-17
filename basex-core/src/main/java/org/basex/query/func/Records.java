@@ -58,6 +58,29 @@ public enum Records {
     field("type", EnumType.get("integer", "decimal", "double", "boolean", "string").
         seqType(Occ.ZERO_OR_ONE))),
   /** Record definition. */
+  HTTP_AUTH(HTTP_URI, "auth",
+    field("username", Types.STRING_O),
+    field("password", Types.STRING_O),
+    field("method", Types.STRING_ZO),
+    field("preemptive", Types.BOOLEAN_ZO)),
+  /** Record definition. */
+  HTTP_PARSE_OPTIONS(HTTP_URI, "parse-options",
+    field("xml", Types.MAP_ZO),
+    field("html", Types.MAP_ZO),
+    field("json", Types.MAP_ZO),
+    field("csv", Types.MAP_ZO)),
+  /** Record definition. */
+  HTTP_PART(HTTP_URI, "part",
+    field("headers", MapType.get(BasicType.STRING, Types.STRING_ZM).seqType(Occ.ZERO_OR_ONE)),
+    field("body", Types.ITEM_ZO)),
+  /** Record definition. */
+  HTTP_RESPONSE(HTTP_URI, "response",
+    field("status", Types.INTEGER_O),
+    field("headers", MapType.get(BasicType.STRING, Types.STRING_OM).seqType()),
+    field("body", Types.ITEM_ZM),
+    field("href", Types.STRING_O),
+    field("version", EnumType.get("1.0", "1.1", "2", "3").seqType())),
+  /** Record definition. */
   INFER_ENCODING(BIN_URI, "infer-encoding",
     field("encoding", Types.STRING_O),
     field("offset", Types.INTEGER_O)
@@ -98,14 +121,6 @@ public enum Records {
     field("rows", ArrayType.get(Types.STRING_O).seqType(Occ.ZERO_OR_MORE)),
     field("get", FuncType.get(Types.STRING_O, Types.POSITIVE_INTEGER_O,
       ChoiceItemType.get(BasicType.POSITIVE_INTEGER, BasicType.STRING).seqType()).seqType())),
-  /** Record definition. */
-  HTTP_RESPONSE(HTTP_URI, "response-record",
-    field("status", Types.INTEGER_O),
-    field("headers", MapType.get(BasicType.STRING, Types.STRING_OM).seqType()),
-    field("body", Types.ITEM_ZM),
-    field("href", Types.STRING_O),
-    field("http-version", EnumType.get("1.0", "1.1", "2", "3").seqType())
-  ),
   /** Record definition. */
   PROC_RESULT(PROC_URI, "result",
     field("output", Types.STRING_OR_BASE64_BINARY_O),

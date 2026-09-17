@@ -1,6 +1,7 @@
 package org.basex.http;
 
 import static org.basex.core.Text.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 import static org.basex.util.Token.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,11 +24,11 @@ import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.QueryError.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -700,7 +701,8 @@ public abstract class FnHttpTest extends HTTPTest {
     // set content encoded in CP1251
     final String test = "\u0442\u0435\u0441\u0442";
     response.input(Charset.forName("CP1251").encode(test).array());
-    final Value returned = new Response(null, ctx.options).getResponse(response, true, null);
+    final Value returned = new Response(null, ctx.options).
+      getResponse(response, BodyMode.PARSE, null, null);
     // compare results
     assertEquals(test, string(returned.itemAt(1).string(null)));
   }
@@ -714,14 +716,14 @@ public abstract class FnHttpTest extends HTTPTest {
     // upper case attribute, quoted string
     response.header("Content-Type", "text/plain; CHARSET=\"CP1252\"");
     response.input(Token.EMPTY);
-    new Response(null, ctx.options).getResponse(response, true, null);
+    new Response(null, ctx.options).getResponse(response, BodyMode.PARSE, null, null);
 
     response.header("Content-Type", "text/plain; ChArSeT=\"\\C\\P\\1\\2\\5\\2\"");
-    new Response(null, ctx.options).getResponse(response, true, null);
+    new Response(null, ctx.options).getResponse(response, BodyMode.PARSE, null, null);
 
     try {
       response.header("Content-Type", "text/plain; CHARSET=\\C\\P\\1\\2\\5\\2");
-      new Response(null, ctx.options).getResponse(response, true, null);
+      new Response(null, ctx.options).getResponse(response, BodyMode.PARSE, null, null);
       fail("Encoding exception expected");
     } catch(final QueryException ex) {
       Util.debug(ex);
@@ -737,7 +739,8 @@ public abstract class FnHttpTest extends HTTPTest {
     response.header(":status", "200");
     response.header("Content-Type", "text/plain");
     response.input(token("x"));
-    final String result = new Response(null, ctx.options).getResponse(response, true, null).
+    final String result = new Response(null, ctx.options).
+      getResponse(response, BodyMode.PARSE, null, null).
         serialize().toString();
     assertFalse(result.contains(":status"), result);
     assertTrue(result.contains("content-type"), result);
@@ -762,7 +765,8 @@ public abstract class FnHttpTest extends HTTPTest {
         + ".... richtext..." + CRLF
         + "--boundary42" + CRLF + "Content-Type: text/x-whatever" + CRLF + CRLF
         + ".... fanciest formatted version  " + CRLF + "..."  + CRLF + "--boundary42--"));
-    final Value returned = new Response(null, ctx.options).getResponse(response, true, null);
+    final Value returned = new Response(null, ctx.options).
+      getResponse(response, BodyMode.PARSE, null, null);
 
     // Construct expected result
     final ItemList expected = new ItemList();
@@ -819,7 +823,8 @@ public abstract class FnHttpTest extends HTTPTest {
         +  CRLF + "--simple boundary--" + CRLF
         + "This is the epilogue.  It is also to be ignored."));
     // Get response as sequence of XQuery items
-    final Value returned = new Response(null, ctx.options).getResponse(response, true, null);
+    final Value returned = new Response(null, ctx.options).
+      getResponse(response, BodyMode.PARSE, null, null);
 
     // Construct expected result
     final ItemList expected = new ItemList();
@@ -860,7 +865,7 @@ public abstract class FnHttpTest extends HTTPTest {
     response.header("Content-Type", "multipart/mixed;boundary=\"" + boundary + '"');
     response.input(new IOFile("src/test/resources/response.txt").read());
 
-    new Response(null, ctx.options).getResponse(response, true, null);
+    new Response(null, ctx.options).getResponse(response, BodyMode.PARSE, null, null);
   }
 
   /**
@@ -872,7 +877,8 @@ public abstract class FnHttpTest extends HTTPTest {
     response.header("Content-Type", "multipart/mixed; boundary=\"a;b\"");
     response.input(token("--a;b" + CRLF + "Content-Type: text/plain" + CRLF + CRLF
         + "hello" + CRLF + "--a;b--" + CRLF));
-    final Value returned = new Response(null, ctx.options).getResponse(response, true, null);
+    final Value returned = new Response(null, ctx.options).
+      getResponse(response, BodyMode.PARSE, null, null);
     assertEquals("hello", string(returned.itemAt(1).string(null)));
   }
 
@@ -886,7 +892,8 @@ public abstract class FnHttpTest extends HTTPTest {
     response.header("Content-Type", "multipart/mixed; boundary=bnd");
     response.input(token("--bnd \t" + CRLF + "Content-Type: text/plain" + CRLF + CRLF
         + "hello" + CRLF + "--bnd--" + CRLF));
-    Value returned = new Response(null, ctx.options).getResponse(response, true, null);
+    Value returned = new Response(null, ctx.options).
+      getResponse(response, BodyMode.PARSE, null, null);
     assertEquals("hello", string(returned.itemAt(1).string(null)));
 
     // padded closing delimiter
@@ -894,7 +901,7 @@ public abstract class FnHttpTest extends HTTPTest {
     response.header("Content-Type", "multipart/mixed; boundary=bnd");
     response.input(token("--bnd" + CRLF + "Content-Type: text/plain" + CRLF + CRLF
         + "hello" + CRLF + "--bnd-- " + CRLF));
-    returned = new Response(null, ctx.options).getResponse(response, true, null);
+    returned = new Response(null, ctx.options).getResponse(response, BodyMode.PARSE, null, null);
     assertEquals("hello", string(returned.itemAt(1).string(null)));
   }
 
@@ -908,7 +915,8 @@ public abstract class FnHttpTest extends HTTPTest {
     response.input(token("--bnd" + CRLF + "Content-Type: text/plain" + CRLF
         + "Content-Transfer-Encoding: Base64" + CRLF + CRLF
         + "aGk=" + CRLF + "--bnd--" + CRLF));
-    final Value returned = new Response(null, ctx.options).getResponse(response, true, null);
+    final Value returned = new Response(null, ctx.options).
+      getResponse(response, BodyMode.PARSE, null, null);
     assertEquals("hi", string(returned.itemAt(1).string(null)));
   }
 
@@ -922,7 +930,8 @@ public abstract class FnHttpTest extends HTTPTest {
     response.header("Content-Type", "application/xml");
     response.header("Content-Encoding", "GzIp");
     response.input(gzip("<doc/>"));
-    Value returned = new Response(null, ctx.options).getResponse(response, true, null);
+    Value returned = new Response(null, ctx.options).
+      getResponse(response, BodyMode.PARSE, null, null);
     assertEquals(NodeType.DOCUMENT, returned.itemAt(1).type);
 
     // multipart
@@ -931,7 +940,7 @@ public abstract class FnHttpTest extends HTTPTest {
     response.header("Content-Encoding", "gzip");
     response.input(gzip("--bnd" + CRLF + "Content-Type: text/plain" + CRLF + CRLF
         + "hello" + CRLF + "--bnd--" + CRLF));
-    returned = new Response(null, ctx.options).getResponse(response, true, null);
+    returned = new Response(null, ctx.options).getResponse(response, BodyMode.PARSE, null, null);
     assertEquals("hello", string(returned.itemAt(1).string(null)));
   }
 
@@ -945,7 +954,8 @@ public abstract class FnHttpTest extends HTTPTest {
     response.header("X-Empty", "");
     response.input(token("--bnd" + CRLF + "Content-Type: text/plain" + CRLF
         + "Content-Description:" + CRLF + CRLF + "hello" + CRLF + "--bnd--" + CRLF));
-    final Value returned = new Response(null, ctx.options).getResponse(response, true, null);
+    final Value returned = new Response(null, ctx.options).
+      getResponse(response, BodyMode.PARSE, null, null);
     final String xml = string(returned.itemAt(0).serialize().finish());
     assertTrue(xml.contains("name=\"content-description\" value=\"\""), xml);
     assertTrue(xml.contains("name=\"x-empty\" value=\"\""), xml);
@@ -957,10 +967,128 @@ public abstract class FnHttpTest extends HTTPTest {
    */
   @Test public final void getRecord() throws Exception {
     try(QueryProcessor qp = new QueryProcessor("string-join(" + _HTTP_GET.args(REST_ROOT)
-        + " ! (?status, ?href, ?http-version, ?body instance of document-node(),"
+        + " ! (?status, ?href, ?version, ?body instance of document-node(),"
         + " exists(?headers?content-type)), ' ')", ctx)) {
       assertEquals("200 " + REST_ROOT + " 1.1 true true", qp.value().serialize().toString());
     }
+  }
+
+  /**
+   * Tests the headers option of the HTTP Client 2.0 functions.
+   * @throws Exception exception
+   */
+  @Test public final void getHeaders() throws Exception {
+    // a custom field is sent
+    try(QueryProcessor qp = new QueryProcessor(_HTTP_GET.args(echo("X-Test"),
+        " { 'headers': { 'X-Test': 'a' } }") + "?body/x/string()", ctx)) {
+      assertEquals("a", qp.value().serialize().toString());
+    }
+    // an empty sequence suppresses the user agent of the implementation
+    try(QueryProcessor qp = new QueryProcessor(_HTTP_GET.args(echo("User-Agent"),
+        " { 'headers': { 'User-Agent': () } }") + "?body/x/string()", ctx)) {
+      assertNotEquals(IOUrl.AGENT, qp.value().serialize().toString());
+    }
+  }
+
+  /**
+   * Tests the encoding option of the HTTP Client 2.0 functions.
+   * @throws Exception exception
+   */
+  @Test public final void getEncoding() throws Exception {
+    final FakeHttpResponse response = new FakeHttpResponse();
+    response.header("Content-Type", "text/plain");
+    response.input(new byte[] { (byte) 0xE4 });
+    final Response resp = new Response(null, ctx.options);
+    final XQMap map = resp.getRecord(response, BodyMode.TEXT, "ISO-8859-1", null);
+    assertEquals("ä", string(map.get(Str.get("body")).itemAt(0).string(null)));
+  }
+
+  /**
+   * Tests that a lazy body raises the errors of the function that created it.
+   */
+  @Test public final void lazyErrors() {
+    // version 2.0
+    final B64HttpLazy lazy = new B64HttpLazy("http://x/", broken(), "", null,
+      _HTTP_GET.definition());
+    QueryException ex = assertThrows(QueryException.class, () -> lazy.string(null));
+    assertSame(HTTP_NETWORK_X, ex.error());
+    assertEquals("http:get(\"http://x/\")", lazy.toString());
+
+    // version 1.0
+    final B64HttpLazy lazy1 = new B64HttpLazy("http://x/", broken(), "", null,
+      _HTTP_SEND_REQUEST.definition());
+    ex = assertThrows(QueryException.class, () -> lazy1.string(null));
+    assertSame(HC_ERROR_X, ex.error());
+  }
+
+  /**
+   * Returns an input stream that fails on the first access.
+   * @return input stream
+   */
+  private static InputStream broken() {
+    return new InputStream() {
+      @Override
+      public int read() throws IOException {
+        throw new IOException("Broken stream");
+      }
+    };
+  }
+
+  /**
+   * Tests that an unparsable body reports the response as error value.
+   * @throws Exception exception
+   */
+  @Test public final void getParseError() throws Exception {
+    final FakeHttpResponse response = new FakeHttpResponse();
+    response.header("Content-Type", "application/xml");
+    response.input(token("<x"));
+    final Response resp = new Response(null, ctx.options);
+    final QueryException ex = assertThrows(QueryException.class, () ->
+      resp.getRecord(response, BodyMode.PARSE, null, null));
+    assertSame(HTTP_PARSE_X, ex.error());
+    final XQMap map = (XQMap) ex.value();
+    assertEquals(200, ((Itr) map.get(Str.get("status")).itemAt(0)).itr());
+    // the body is the one that 'binary' would return
+    assertEquals("PHg=", string(map.get(Str.get("body")).itemAt(0).string(null)));
+  }
+
+  /**
+   * Tests the response-body option of the HTTP Client 2.0 functions.
+   * @throws Exception exception
+   */
+  @Test public final void getResponseBody() throws Exception {
+    final String query = "string-join(("
+      + _HTTP_GET.args(REST_ROOT, " { 'response-body': 'text' }")
+      + "?body instance of xs:string,"
+      + _HTTP_GET.args(REST_ROOT, " { 'response-body': 'binary' }")
+      + "?body instance of xs:base64Binary,"
+      + _HTTP_GET.args(REST_ROOT, " { 'response-body': 'none' }")
+      + " ! empty(?body)), ' ')";
+    try(QueryProcessor qp = new QueryProcessor(query, ctx)) {
+      assertEquals("true true true", qp.value().serialize().toString());
+    }
+  }
+
+  /**
+   * Tests the query option of the HTTP Client 2.0 functions.
+   * @throws Exception exception
+   */
+  @Test public final void getQuery() throws Exception {
+    // parameters are appended to the existing query string and percent-encoded
+    final String url = REST_ROOT + "?query=%3Cx%3E%7Brequest:parameter(%22q%22)%7D%3C/x%3E";
+    try(QueryProcessor qp = new QueryProcessor(_HTTP_GET.args(url,
+        " { 'query': { 'q': 'a b' } }") + "?body/x/string()", ctx)) {
+      assertEquals("a b", qp.value().serialize().toString());
+    }
+  }
+
+  /**
+   * Returns the URL of a service that echoes a header field.
+   * @param name field name
+   * @return URL
+   */
+  private static String echo(final String name) {
+    return REST_ROOT + "?query=%3Cx%3E%7Brequest:header(%22" + name + "%22)%7D%3C/x%3E";
   }
 
   /**
@@ -971,7 +1099,8 @@ public abstract class FnHttpTest extends HTTPTest {
     final FakeHttpResponse response = new FakeHttpResponse();
     response.header("Content-Type", "Application/Xml");
     response.input(token("<doc/>"));
-    final Value returned = new Response(null, ctx.options).getResponse(response, true, null);
+    final Value returned = new Response(null, ctx.options).
+      getResponse(response, BodyMode.PARSE, null, null);
     assertEquals(NodeType.DOCUMENT, returned.itemAt(1).type);
   }
 
@@ -983,7 +1112,8 @@ public abstract class FnHttpTest extends HTTPTest {
     final FakeHttpResponse response = new FakeHttpResponse();
     response.header("Content-Type", "application/xml");
     response.input(token("<?xml-stylesheet type=\"text/xsl\" href=\"s.xsl\"?><doc/>"));
-    final Value returned = new Response(null, ctx.options).getResponse(response, true, null);
+    final Value returned = new Response(null, ctx.options).
+      getResponse(response, BodyMode.PARSE, null, null);
     final String xml = string(returned.itemAt(1).serialize().finish());
     assertTrue(xml.contains("<?xml-stylesheet"), xml);
   }
@@ -995,8 +1125,8 @@ public abstract class FnHttpTest extends HTTPTest {
   @Test public final void booleanAttributes() throws Exception {
     final Request r = parse("<http:request " + HTTP_NS + " method='get' href='http://x/' "
         + "status-only='1' follow-redirect='yes' send-authorization='off'/>");
-    assertTrue(r.statusOnly);
-    assertTrue(r.followRedirect);
+    assertSame(BodyMode.NONE, r.bodyMode);
+    assertEquals(Request.MAX_REDIRECTS, r.redirects);
     assertFalse(r.sendAuthorization);
   }
 
@@ -1004,9 +1134,21 @@ public abstract class FnHttpTest extends HTTPTest {
    * Tests that 'timeout=0' is rejected up front with a specific diagnostic.
    */
   @Test public final void invalidTimeout() {
-    final QueryException ex = assertThrows(QueryException.class, () ->
-        parse("<http:request " + HTTP_NS + " method='get' href='http://x/' timeout='0'/>"));
-    assertTrue(ex.getMessage().contains("Invalid timeout"), ex.getMessage());
+    for(final String timeout : new String[] { "0", "-1", "x" }) {
+      final QueryException ex = assertThrows(QueryException.class, () -> parse("<http:request "
+          + HTTP_NS + " method='get' href='http://x/' timeout='" + timeout + "'/>"));
+      assertTrue(ex.getMessage().contains("Invalid timeout"), ex.getMessage());
+    }
+  }
+
+  /**
+   * Tests that fractions of a second are accepted as timeout.
+   * @throws Exception exception
+   */
+  @Test public final void fractionalTimeout() throws Exception {
+    final Request r = parse("<http:request " + HTTP_NS + " method='get' href='http://x/' "
+        + "timeout='0.5'/>");
+    assertEquals(500, r.timeout.toMillis());
   }
 
   /**
@@ -1115,7 +1257,7 @@ public abstract class FnHttpTest extends HTTPTest {
     final byte[] input = token("--bnd" + CRLF
         + "Content-Disposition: form-data; filename=\"photo.jpg\"; name=\"upload\"" + CRLF + CRLF
         + "hello" + CRLF + "--bnd--" + CRLF);
-    final Payload payload = new Payload(new ArrayInput(input), true, null, ctx.options);
+    final Payload payload = new Payload(new ArrayInput(input), BodyMode.PARSE, null, ctx.options);
     final MediaType type = new MediaType("multipart/form-data; boundary=bnd");
     final Value keys = payload.multiForm(type, null).keys();
     assertEquals(1, keys.size());

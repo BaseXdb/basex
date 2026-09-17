@@ -43,8 +43,12 @@ public final class Payload {
   /** XML declaration (end). */
   private static final byte[] DECLEND = token("?>");
 
-  /** Parse the contents of the payload. */
-  private final boolean body;
+  /** Representation of the payload. */
+  private final BodyMode mode;
+  /** Character encoding that replaces the one of the media type (can be {@code null}). */
+  private final String charset;
+  /** Options for parsing XML payloads (can be {@code null}). */
+  private MainOptions xmlOptions;
   /** Input stream. */
   private InputStream input;
   /** Input info (can be {@code null}). */
@@ -55,17 +59,51 @@ public final class Payload {
   /**
    * Constructor.
    * @param input input stream
-   * @param body create body
+   * @param mode representation of the payload
    * @param info input info (can be {@code null})
    * @param options main options
    */
-  public Payload(final InputStream input, final boolean body, final InputInfo info,
+  public Payload(final InputStream input, final BodyMode mode, final InputInfo info,
       final MainOptions options) {
+    this(input, mode, null, info, options);
+  }
+
+  /**
+   * Constructor.
+   * @param input input stream
+   * @param mode representation of the payload
+   * @param charset character encoding that replaces the one of the media type
+   *   (can be {@code null})
+   * @param info input info (can be {@code null})
+   * @param options main options
+   */
+  public Payload(final InputStream input, final BodyMode mode, final String charset,
+      final InputInfo info, final MainOptions options) {
 
     this.input = input;
-    this.body = body;
+    this.mode = mode;
+    this.charset = charset;
     this.info = info;
     this.options = options;
+  }
+
+  /**
+   * Assigns options for parsing XML payloads.
+   * @param opts options (can be {@code null})
+   * @return self reference
+   */
+  public Payload xmlOptions(final MainOptions opts) {
+    xmlOptions = opts;
+    return this;
+  }
+
+  /**
+   * Returns the character encoding for a media type.
+   * @param type media type
+   * @return encoding (can be {@code null})
+   */
+  private String charsetOf(final MediaType type) {
+    return charset != null ? charset : type.parameter(CHARSET);
   }
 
   /**
@@ -85,14 +123,16 @@ public final class Payload {
 
     final ResponseBody result = new ResponseBody();
     result.type = type;
-    if(type.isMultipart()) {
-      // multipart response
+    // only parsed bodies are split into parts
+    if(type.isMultipart() && (mode == BodyMode.PARSE || mode == BodyMode.NONE)) {
       result.boundary = boundary(type);
       extractParts(concat(DASHES, result.boundary), result.parts);
-    } else if(body) {
+    } else if(mode != BodyMode.NONE) {
       // the stream is closed as before, releasing the inflater of a decompressed response
       try(InputStream is = input) {
-        result.value = parse(SpillOutput.read(is, temp), type);
+        final IO io = SpillOutput.read(is, temp);
+        result.value = mode == BodyMode.BINARY ? B64.get(io, IOERR_X) :
+          mode == BodyMode.TEXT ? text(io, type) : parse(io, type);
       }
     }
     return result;
@@ -111,6 +151,21 @@ public final class Payload {
   }
 
   /**
+   * Returns the string representation of a payload.
+   * @param payload payload
+   * @param type media type
+   * @return string
+   * @throws QueryException query exception
+   */
+  private Value text(final IO payload, final MediaType type) throws QueryException {
+    try {
+      return Str.get(new NewlineInput(payload, charsetOf(type)).content());
+    } catch(final IOException ex) {
+      throw HC_PARSE_X.get(info, ex);
+    }
+  }
+
+  /**
    * Interprets a payload according to content type and returns a corresponding value.
    * @param payload payload
    * @param type media type
@@ -119,9 +174,16 @@ public final class Payload {
    */
   private Value parse(final IO payload, final MediaType type) throws QueryException {
     try {
-      return value(payload, type, options);
+      return value(payload, type, options, charsetOf(type), xmlOptions);
     } catch(final IOException ex) {
-      throw HC_PARSE_X.get(info, ex);
+      // the unparsed payload is attached, so that callers can report it
+      final QueryException qe = HC_PARSE_X.get(info, ex);
+      try {
+        qe.value(B64.get(payload, IOERR_X));
+      } catch(final IOException e) {
+        Util.debug(e);
+      }
+      throw qe;
     }
   }
 
@@ -138,7 +200,7 @@ public final class Payload {
     // RFC 1341: Preamble is to be ignored: read till 1st boundary
     while(true) {
       final byte[] l = readLine();
-      if(l == null) throw HC_REQ_X.get(info, "No body specified for http:part");
+      if(l == null) throw HC_REQ_X.get(info, "No parts found in the multipart body");
       if(matchBoundary(sep, l)) break;
     }
     // parse part
@@ -177,7 +239,7 @@ public final class Payload {
         } else if(key.equalsIgnoreCase(CONTENT_TRANSFER_ENCODING)) {
           base64 = value.equalsIgnoreCase(BASE64);
         }
-        part.headers.add(Map.entry(string(lc(token(key))), value));
+        part.headers.add(Map.entry(key.toLowerCase(Locale.ENGLISH), value));
       }
       l = readLine();
     }
@@ -197,9 +259,9 @@ public final class Payload {
       bl.add(line);
     }
 
-    if(body) {
-      final String encoding = part.type.parameter(CHARSET);
-      final byte[] contents = new TextInput(new IOContent(bl.finish()), encoding).content();
+    if(mode == BodyMode.PARSE) {
+      final byte[] contents =
+        new TextInput(new IOContent(bl.finish()), charsetOf(part.type)).content();
       part.value = parse(new IOContent(base64 ? Base64.decode(contents) : contents), part.type);
     }
     return true;
@@ -363,8 +425,25 @@ public final class Payload {
    */
   public static Value value(final IO body, final MediaType type, final MainOptions options)
       throws IOException, QueryException {
+    return value(body, type, options, null, null);
+  }
 
-    final IO io = prepare(body, type);
+  /**
+   * Returns an XQuery value for the specified payload.
+   * @param body body
+   * @param type media type
+   * @param options main options
+   * @param charset character encoding that replaces the one of the media type
+   *   (can be {@code null})
+   * @param xml options for parsing XML payloads (can be {@code null})
+   * @return value
+   * @throws IOException I/O exception
+   * @throws QueryException query exception
+   */
+  private static Value value(final IO body, final MediaType type, final MainOptions options,
+      final String charset, final MainOptions xml) throws IOException, QueryException {
+
+    final IO io = prepare(body, type, charset);
     if(io.length() == 0) {
       return Empty.VALUE;
     } else if(type.isJSON()) {
@@ -381,7 +460,8 @@ public final class Payload {
       return new DBNode(new HtmlParser(io, options, opts));
     } else if(type.isXml()) {
       // remote input: parse as untrusted
-      return new DBNode(Parser.xmlParser(io, new MainOptions().trusted(false)));
+      return new DBNode(Parser.xmlParser(io, xml != null ? xml :
+        new MainOptions().trusted(false)));
     } else if(type.isText()) {
       return Str.get(io.read());
     } else if(type.is(MediaType.APPLICATION_X_WWW_FORM_URLENCODED)) {
@@ -394,7 +474,7 @@ public final class Payload {
       }
     } else if(type.isMultipart()) {
       try(InputStream is = io.inputStream()) {
-        final Payload payload = new Payload(is, true, null, options);
+        final Payload payload = new Payload(is, BodyMode.PARSE, null, options);
         final ResponseBody parsed = new ResponseBody();
         parsed.type = type;
         payload.extractParts(concat(DASHES, payload.boundary(type)), parsed.parts);
@@ -409,15 +489,19 @@ public final class Payload {
    * Returns a normalized payload. Only text and XML input is materialized.
    * @param body body
    * @param type media type
+   * @param charset character encoding that replaces the one of the media type
+   *   (can be {@code null})
    * @return content
    * @throws IOException I/O exception
    */
-  private static IO prepare(final IO body, final MediaType type) throws IOException {
+  private static IO prepare(final IO body, final MediaType type, final String charset)
+      throws IOException {
     final boolean xml = type.isXml(), text = type.isText();
     if(!(xml || text)) return body;
 
     // convert text to UTF8; skip redundant XML declaration
-    byte[] data = new NewlineInput(body, type.parameter(CHARSET)).content();
+    byte[] data = new NewlineInput(body,
+      charset != null ? charset : type.parameter(CHARSET)).content();
     // '<?xml' is only a declaration if followed by whitespace; otherwise it is a
     // processing instruction such as '<?xml-stylesheet?>', which must be kept
     if(xml && startsWith(data, DECLSTART) && data.length > DECLSTART.length &&

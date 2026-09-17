@@ -10,7 +10,10 @@ import org.basex.util.*;
  */
 public enum RequestAttribute {
   /** CSV. */ CSV,
+  /** XML. */ XML,
   /** Href. */ HREF,
+  /** Proxy. */ PROXY,
+  /** Verify. */ VERIFY,
   /** JSON. */ JSON,
   /** HTML. */ HTML,
   /** Method. */ METHOD,
