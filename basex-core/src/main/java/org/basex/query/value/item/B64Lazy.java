@@ -15,18 +15,8 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class B64Lazy extends B64 implements Lazy {
-  /** Error message. */
-  private final QueryError error;
   /** Caching flag. */
   private boolean cache;
-
-  /**
-   * Constructor.
-   * @param error error message to be thrown
-   */
-  B64Lazy(final QueryError error) {
-    this.error = error;
-  }
 
   /**
    * Opens a stream on the uncached value.
@@ -34,6 +24,14 @@ public abstract class B64Lazy extends B64 implements Lazy {
    * @throws IOException I/O exception
    */
   abstract BufferInput open() throws IOException;
+
+  /**
+   * Returns the query exception for a failed access.
+   * @param ex I/O exception
+   * @param ii input info (can be {@code null})
+   * @return query exception
+   */
+  abstract QueryException exception(IOException ex, InputInfo ii);
 
   @Override
   public final byte[] binary(final InputInfo info) throws QueryException {
@@ -48,7 +46,7 @@ public abstract class B64Lazy extends B64 implements Lazy {
     try {
       return open();
     } catch(final IOException ex) {
-      throw error.get(ii, ex);
+      throw exception(ex, ii);
     }
   }
 
@@ -64,7 +62,7 @@ public abstract class B64Lazy extends B64 implements Lazy {
     try(BufferInput bi = open()) {
       data = bi.content();
     } catch(final IOException ex) {
-      throw error.get(ii, ex);
+      throw exception(ex, ii);
     }
   }
 

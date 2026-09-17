@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.*;
 import java.net.http.*;
 import java.net.http.HttpClient.*;
+import java.net.http.HttpResponse.*;
 import java.security.*;
 import java.security.cert.*;
 import java.time.*;
@@ -26,6 +27,8 @@ import org.xml.sax.*;
  * @author Christian Gruen
  */
 public final class IOUrl extends IO {
+  /** Timeout for connecting, for the response headers and for single reads of the body. */
+  private static final Duration TIMEOUT = Duration.ofMinutes(1);
   /** Reason phrases. */
   private static final HashMap<Integer, String> REASONS = new HashMap<>();
   /** Optional SSL context for ignoring certificates (can be {@code null}). */
@@ -129,7 +132,7 @@ public final class IOUrl extends IO {
 
   @Override
   public InputStream inputStream() throws IOException {
-    return isJarURL(pth) ? url(pth).openStream() : new StoppableInputStream(response().body());
+    return isJarURL(pth) ? url(pth).openStream() : response().body();
   }
 
   /**
@@ -143,12 +146,12 @@ public final class IOUrl extends IO {
     final HttpResponse<InputStream> response;
     try {
       final URI uri = new URI(pth);
-      final HttpRequest.Builder rb = HttpRequest.newBuilder(uri).timeout(Duration.ofMinutes(1));
+      final HttpRequest.Builder rb = HttpRequest.newBuilder(uri).timeout(TIMEOUT);
       rb.header(HTTPText.ACCEPT, MediaType.ALL_ALL.toString());
       rb.header(HTTPText.USER_AGENT, Prop.NAME + '/' + Prop.VERSION.replace(' ', '-') +
           " (Java " + Prop.JAVA_VERSION + "; " + Prop.OS + " " + Prop.OS_ARCH + ')');
       new UserInfo(uri).basic(rb);
-      response = Job.run(() -> client.send(rb.build(), HttpResponse.BodyHandlers.ofInputStream()));
+      response = Job.run(() -> client.send(rb.build(), handler(TIMEOUT)));
     } catch(final JobException | IOException ex) {
       throw ex;
     } catch(final Exception ex) {
@@ -171,6 +174,17 @@ public final class IOUrl extends IO {
   }
 
   /**
+   * Returns a handler for response bodies whose reads are aborted if the job is stopped or a
+   * timeout passes.
+   * @param timeout timeout for a single blocking read (can be {@code null})
+   * @return body handler
+   */
+  public static BodyHandler<InputStream> handler(final Duration timeout) {
+    return info -> BodySubscribers.mapping(BodySubscribers.ofInputStream(),
+        body -> new StoppableInputStream(body, timeout));
+  }
+
+  /**
    * Returns a singleton HTTP client instance.
    * @param redirect follow redirects
    * @return client builder
@@ -186,7 +200,7 @@ public final class IOUrl extends IO {
    * @return client
    */
   public static HttpClient client(final boolean redirect, final CookieHandler cookies) {
-    final HttpClient.Builder cb = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(1));
+    final HttpClient.Builder cb = HttpClient.newBuilder().connectTimeout(TIMEOUT);
     if(cookies != null) cb.cookieHandler(cookies);
     if(ssl != null) cb.sslContext(ssl);
     return cb.followRedirects(redirect ? Redirect.ALWAYS : Redirect.NEVER).build();

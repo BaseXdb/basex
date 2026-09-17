@@ -10,13 +10,14 @@ import java.util.concurrent.atomic.*;
 
 import org.basex.*;
 import org.basex.core.cmd.XQuery;
+import org.basex.query.*;
 import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
 import com.sun.net.httpserver.*;
 
 /**
- * Tests that blocking reads of an HTTP response body are aborted when the running job is stopped.
+ * Tests that blocking reads of HTTP response bodies are aborted if the job is stopped or times out.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -60,6 +61,31 @@ public final class StoppableInputStreamTest extends SandboxTest {
         Util.debug(ex);
       }
     });
+    server.createContext("/timeout", exchange -> {
+      // send headers and a first byte with the requested content type, then stall
+      exchange.getResponseHeaders().add("Content-Type", exchange.getRequestURI().getQuery());
+      exchange.sendResponseHeaders(200, 4);
+      try(exchange; OutputStream os = exchange.getResponseBody()) {
+        os.write('a');
+        os.flush();
+        RELEASE.await(60, SECONDS);
+      } catch(final InterruptedException ex) {
+        Util.debug(ex);
+      }
+    });
+    server.createContext("/slow", exchange -> {
+      // send the body byte by byte, with delays shorter than the timeout
+      exchange.sendResponseHeaders(200, 4);
+      try(exchange; OutputStream os = exchange.getResponseBody()) {
+        for(final char ch : "abcd".toCharArray()) {
+          os.write(ch);
+          os.flush();
+          Thread.sleep(400);
+        }
+      } catch(final InterruptedException ex) {
+        Util.debug(ex);
+      }
+    });
     server.start();
   }
 
@@ -92,6 +118,27 @@ public final class StoppableInputStreamTest extends SandboxTest {
     final String req = "http:send-request(<http:request method='GET' href='" +
         url("/stall") + "'/>)";
     assertInterrupted("xquery:fork-join((function() { " + req + " }, function() { " + req + " }))");
+  }
+
+  /** A stalled response body raises a timeout error, also if it is returned as lazy item. */
+  @Test public void stalledBodyTimesOut() {
+    error(timeoutRequest("/timeout?text/plain"), QueryError.HC_TIMEOUT);
+    error(timeoutRequest("/timeout?application/octet-stream"), QueryError.HC_TIMEOUT);
+  }
+
+  /** A slow response body does not time out as long as data arrives. */
+  @Test public void slowBodySucceeds() {
+    query(timeoutRequest("/slow"), "abcd");
+  }
+
+  /**
+   * Returns a query that requests the string value of a response body with a timeout of 1 second.
+   * @param path request path
+   * @return query
+   */
+  private static String timeoutRequest(final String path) {
+    return "http:send-request(<http:request method='GET' timeout='1' href='" + url(path) +
+        "'/>)[2] => string()";
   }
 
   /**

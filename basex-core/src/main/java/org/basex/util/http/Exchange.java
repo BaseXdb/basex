@@ -30,6 +30,8 @@ public final class Exchange {
   private final Request request;
   /** HTTP client. */
   private final HttpClient client;
+  /** Timeout for the response headers and for single reads of the body (can be {@code null}). */
+  private final Duration timeout;
 
   /**
    * Constructor.
@@ -41,6 +43,8 @@ public final class Exchange {
     this.uri = uri;
     this.request = request;
     this.client = client;
+    final String seconds = request.attribute(TIMEOUT);
+    timeout = seconds != null ? Duration.ofSeconds(Strings.toInt(seconds)) : null;
   }
 
   /**
@@ -68,10 +72,7 @@ public final class Exchange {
     final HttpRequest.Builder rb;
     try {
       rb = HttpRequest.newBuilder(uri);
-
-      // set timeout
-      final String timeout = request.attribute(TIMEOUT);
-      if(timeout != null) rb.timeout(Duration.ofSeconds(Strings.toInt(timeout)));
+      if(timeout != null) rb.timeout(timeout);
 
       // set method, attach payload
       final String method = request.attribute(METHOD);
@@ -93,7 +94,7 @@ public final class Exchange {
       throw new IOException(ex.getMessage(), ex);
     }
 
-    final BodyHandler<InputStream> handler = HttpResponse.BodyHandlers.ofInputStream();
+    final BodyHandler<InputStream> handler = IOUrl.handler(timeout);
 
     // send request (with optional authorization)
     try {

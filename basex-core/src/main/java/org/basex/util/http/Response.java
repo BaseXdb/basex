@@ -12,7 +12,6 @@ import java.util.regex.*;
 
 import org.basex.core.*;
 import org.basex.io.*;
-import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -109,12 +108,12 @@ public final class Response {
     if(body && exchange != null && "GET".equals(exchange.method()) &&
         Payload.binary(type) && !"0".equals(headers.firstValue(CONTENT_LENGTH).orElse(""))) {
       // binary result: skip retrieval of response body, return lazy item
-      final InputStream is = new StoppableInputStream(response.body());
+      final InputStream is = response.body();
       qc.resources.add(is);
       root.node(FElem.build(Q_HTTP_BODY).attr(Q_MEDIA_TYPE, type.type()).finish());
       items.add(new B64HttpLazy(exchange, is, encoding));
     } else {
-      try(InputStream is = new StoppableInputStream(response.body())) {
+      try(InputStream is = response.body()) {
         final Payload payload = new Payload(is, body, info, options);
         root.node(payload.parse(type, encoding, qc));
         if(body) items.add(payload.value());

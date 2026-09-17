@@ -6,6 +6,7 @@ import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.func.Function;
+import org.basex.util.*;
 
 /**
  * Lazy base64 item ({@code xs:base64Binary}) backed by an input reference.
@@ -16,6 +17,8 @@ import org.basex.query.func.Function;
 public final class B64IOLazy extends B64Lazy {
   /** File reference. */
   private final IO input;
+  /** Error message. */
+  private final QueryError error;
 
   /**
    * Constructor.
@@ -23,8 +26,8 @@ public final class B64IOLazy extends B64Lazy {
    * @param error error message to be thrown
    */
   public B64IOLazy(final IO input, final QueryError error) {
-    super(error);
     this.input = input;
+    this.error = error;
   }
 
   /**
@@ -38,6 +41,11 @@ public final class B64IOLazy extends B64Lazy {
   @Override
   BufferInput open() throws IOException {
     return BufferInput.get(input);
+  }
+
+  @Override
+  QueryException exception(final IOException ex, final InputInfo ii) {
+    return error.get(ii, ex);
   }
 
   @Override

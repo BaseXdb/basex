@@ -79,11 +79,21 @@ public final class Client {
       final Exchange exchange = new Exchange(uri, req, client(req, qc));
       return new Response(info, mopts, exchange, qc).
         getResponse(exchange.send(), body, mediaType);
-    } catch(final HttpTimeoutException ex) {
-      throw HC_TIMEOUT.get(info).cause(ex);
     } catch(final IOException ex) {
-      throw HC_ERROR_X.get(info, ex);
+      throw error(ex, info);
     }
+  }
+
+  /**
+   * Returns the query exception for a failed HTTP exchange.
+   * @param ex I/O exception
+   * @param info input info (can be {@code null})
+   * @return query exception
+   */
+  public static QueryException error(final IOException ex, final InputInfo info) {
+    return ex instanceof HttpTimeoutException || ex instanceof SocketTimeoutException ?
+      HC_TIMEOUT.get(info).cause(ex) :
+      HC_ERROR_X.get(info, ex);
   }
 
   /**
