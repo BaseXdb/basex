@@ -158,16 +158,12 @@ public final class FnModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void analyzeString() {
     final Function func = ANALYZE_STRING;
-    query(func.args("a", "", "j") + "//fn:non-match/text()", "a");
-
-    for(final String opt : Arrays.asList(" ()", "j")) {
-      query(func.args("banana", "(b)(x?)", opt), "<analyze-string-result xmlns="
-          + "\"http://www.w3.org/2005/xpath-functions\"><match><group nr=\"1\">b</group>"
-          + "<group nr=\"2\"/></match><non-match>anana</non-match></analyze-string-result>");
-      query(func.args("banana", "(b(x?))", opt), "<analyze-string-result xmlns="
-          + "\"http://www.w3.org/2005/xpath-functions\"><match><group nr=\"1\">b<group nr=\"2\"/>"
-          + "</group></match><non-match>anana</non-match></analyze-string-result>");
-    }
+    query(func.args("banana", "(b)(x?)"), "<analyze-string-result xmlns="
+        + "\"http://www.w3.org/2005/xpath-functions\"><match><group nr=\"1\">b</group>"
+        + "<group nr=\"2\"/></match><non-match>anana</non-match></analyze-string-result>");
+    query(func.args("banana", "(b(x?))"), "<analyze-string-result xmlns="
+        + "\"http://www.w3.org/2005/xpath-functions\"><match><group nr=\"1\">b<group nr=\"2\"/>"
+        + "</group></match><non-match>anana</non-match></analyze-string-result>");
 
     query(func.args("a", ""), "<analyze-string-result xmlns=\"http://www.w3.org/2005/xpath-"
         + "functions\"><match/><non-match>a</non-match><match/></analyze-string-result>");
@@ -2965,7 +2961,6 @@ return
   @Test public void matches() {
     final Function func = MATCHES;
     query(func.args("a", ""), true);
-    query(func.args("a", "", "j"), true);
 
     query(func.args("nop", 'o'), true);
     query(func.args("nöp", 'ö'), true);
@@ -3021,7 +3016,7 @@ return
     query(func.args("1abc", "^\\i\\c*$"), false);
 
     error(func.args("a", "+"), REGINVALID_X);
-    error(func.args("a", "+", "j"), REGINVALID_X);
+    error(func.args("a", ".", "j"), REGFLAG_X);
     error(func.args("a", "[a-\\\\]"), REGINVALID_X);
     error(func.args("-", "([\\d-z]+)"), REGINVALID_X);
   }
@@ -4097,7 +4092,6 @@ return
     query(func.args("ä", "ä", "b"), "b");
     query(func.args("a", ".", "b"), "b");
 
-    query(func.args("a", "", "x", "j"), "xax");
     query(func.args("a", "", "x"), "xax");
 
     // GH-573
@@ -4163,7 +4157,6 @@ return
     query(func.args("bab", "(a)", " fn($_, $__) {}"), "bb");
     query(func.args("bab", "(a)", " fn($_, $__) { '' }"), "bb");
     query(func.args("abcde", "b(.)d", "$1"), "ace");
-    query(func.args("abcde", "b(.)d", "$1", "j"), "ace");
 
     query(func.args("W", ".*", " fn($k, $g) { '~' }"), "~~");
 
@@ -5352,10 +5345,10 @@ return
   /** Test method. */
   @Test public void tokenize() {
     final Function func = TOKENIZE;
-    query(func.args("a", "", "j"), "a");
-    query(func.args(wrap("a"), "", "j"), "a");
-    query(func.args("a", wrap(""), "j"), "a");
-    query(func.args(wrap("a"), wrap(""), "j"), "a");
+    query(func.args("a", ""), "a");
+    query(func.args(wrap("a"), ""), "a");
+    query(func.args("a", wrap("")), "a");
+    query(func.args(wrap("a"), wrap("")), "a");
 
     query("subsequence(" + func.args(wrap("a b c d")) + ", 3)", "c\nd");
     query("subsequence(" + func.args(wrap("a,b,c,d"), ",") + ", 3)", "c\nd");

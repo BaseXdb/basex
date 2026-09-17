@@ -91,7 +91,7 @@ public abstract class RegExFn extends StandardFunc {
 
     // process modifiers
     int flags = 0;
-    boolean strip = false, comments = false, java = false;
+    boolean strip = false, comments = false;
     for(final byte mod : modifiers) {
       if(mod == 'i') flags |= CASE_INSENSITIVE | UNICODE_CASE;
       else if(mod == 'm') flags |= MULTILINE;
@@ -99,14 +99,13 @@ public abstract class RegExFn extends StandardFunc {
       else if(mod == 'q') flags |= LITERAL;
       else if(mod == 'x') strip = true;
       else if(mod == 'c') comments = true;
-      else if(mod == 'j' || mod == '!') java = true;
-      else if(mod != ';') throw REGFLAG_X.get(info, (char) mod);
+      else throw REGFLAG_X.get(info, (char) mod);
     }
 
     try {
-      // Java syntax, literal query: no need to change anything
+      // literal query: no need to change anything
       final Pattern pattern;
-      if(java || (flags & LITERAL) != 0) {
+      if((flags & LITERAL) != 0) {
         pattern = Pattern.compile(string(regex), flags);
       } else {
         final RegExParser parser = new RegExParser(regex, strip, comments,
