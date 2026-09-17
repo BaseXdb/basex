@@ -8,11 +8,12 @@ import java.awt.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
-import java.util.Timer;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 import java.util.regex.*;
 
 import javax.swing.*;
+import javax.swing.Timer;
 
 import org.basex.build.json.*;
 import org.basex.core.*;
@@ -52,6 +53,13 @@ public final class EditorView extends View {
   private static final int SEARCH_DELAY = 100;
   /** Link pattern. */
   private static final Pattern LINK = Pattern.compile("(.*?), (\\d+)/(\\d+)");
+  /** Scheduler for delayed parsing; serializes the parse runs of all editors. */
+  private static final ScheduledExecutorService PARSER =
+      Executors.newSingleThreadScheduledExecutor(runnable -> {
+        final Thread thread = new Thread(runnable, "basex-editor-parser");
+        thread.setDaemon(true);
+        return thread;
+      });
 
   /** Project files. */
   final ProjectView project;
@@ -84,8 +92,6 @@ public final class EditorView extends View {
 
   /** Parse counter. */
   private final AtomicInteger parseID = new AtomicInteger();
-  /** Parse query context. */
-  private final AtomicBoolean parsing = new AtomicBoolean();
   /** Current input info (can be {@code null}). */
   private InputInfo inputInfo;
 
@@ -769,15 +775,14 @@ public final class EditorView extends View {
    * @param id thread ID
    */
   public void pleaseWait(final int id) {
-    new Timer(true).schedule(new TimerTask() {
-      @Override
-      public void run() {
-        if(gui.running(id)) {
-          info.setText(PLEASE_WAIT_D, Msg.SUCCESS).setToolTipText(null);
-          stop.setEnabled(true);
-        }
+    final Timer timer = new Timer(WAIT_DELAY, e -> {
+      if(gui.running(id)) {
+        info.setText(PLEASE_WAIT_D, Msg.SUCCESS).setToolTipText(null);
+        stop.setEnabled(true);
       }
-    }, WAIT_DELAY);
+    });
+    timer.setRepeats(false);
+    timer.start();
   }
 
   /**
@@ -787,25 +792,23 @@ public final class EditorView extends View {
    */
   private void parse(final String input, final IO file) {
     final int id = parseID.incrementAndGet();
-    new Timer(true).schedule(new TimerTask() {
-      @Override
-      public void run() {
-        // let current parser finish; check if thread is obsolete
-        while(parsing.get()) Performance.sleep(1);
-        if(id != parseID.get()) return;
+    PARSER.schedule(() -> {
+      // check if the run is obsolete
+      if(id != parseID.get()) return;
 
-        // parse query
-        parsing.set(true);
-        try(QueryContext qc = new QueryContext(gui.context)) {
-          qc.parse(input, file.path());
-          if(id == parseID.get()) info(null);
-        } catch(final QueryException ex) {
-          if(id == parseID.get()) info(ex);
-        } finally {
-          parsing.set(false);
-        }
+      // parse query, and show the outcome in the event dispatch thread
+      Exception error = null;
+      try(QueryContext qc = new QueryContext(gui.context)) {
+        qc.parse(input, file.path());
+      } catch(final QueryException ex) {
+        error = ex;
       }
-    }, SEARCH_DELAY);
+      final Exception result = error;
+      SwingUtilities.invokeLater(() -> {
+        // discard the outcome of a parse run that has been superseded
+        if(id == parseID.get()) info(result);
+      });
+    }, SEARCH_DELAY, TimeUnit.MILLISECONDS);
   }
 
   /**

@@ -109,15 +109,16 @@ final class DialogResources extends BaseXBack {
       filtered = false;
     });
 
-    new Thread(() -> {
-      tree.setCursor(CURSORWAIT);
+    // expand the tree once the dialog is visible: the root may have many children
+    tree.setCursor(CURSORWAIT);
+    SwingUtilities.invokeLater(() -> {
       tree.expandPath(new TreePath(root.getPath()));
       filterText.setText("/");
       filterText.setEnabled(true);
       tree.setCursor(CURSORARROW);
       filter.setEnabled(true);
       clear.setEnabled(true);
-    }).start();
+    });
   }
 
   /**

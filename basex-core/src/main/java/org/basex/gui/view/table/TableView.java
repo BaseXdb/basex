@@ -14,7 +14,6 @@ import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.view.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -80,17 +79,20 @@ public final class TableView extends View {
     } else {
       if(!more) tdata.resetFilter();
       gui.updating = true;
-      new Thread(() -> {
-        // current zoom step
-        int zoomstep = ZOOM.length;
-        while(--zoomstep >= 0) {
-          scroll.extent(tdata.rows.size() * tdata.rowH(ZOOM[zoomstep]));
+      // current zoom step
+      final int[] zoomstep = { ZOOM.length };
+      final Timer timer = new Timer(25, e -> {
+        if(--zoomstep[0] >= 0) {
+          scroll.extent(tdata.rows.size() * tdata.rowH(ZOOM[zoomstep[0]]));
           repaint();
-          Performance.sleep(25);
+        } else {
+          ((Timer) e.getSource()).stop();
+          gui.updating = false;
+          focus();
         }
-        gui.updating = false;
-        focus();
-      }).start();
+      });
+      timer.setInitialDelay(0);
+      timer.start();
     }
   }
 

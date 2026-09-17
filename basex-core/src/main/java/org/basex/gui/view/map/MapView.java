@@ -217,23 +217,21 @@ public final class MapView extends View {
       repaint();
     } else {
       zoomStep = ZOOMSIZE;
-      new Thread(() -> {
-        focused = null;
+      focused = null;
 
-        // run zooming
-        while(zoomStep > 1) {
-          Performance.sleep(zoomSpeed);
+      // run zooming
+      new Timer(zoomSpeed, e -> {
+        if(zoomStep > 1) {
           --zoomStep;
           repaint();
+        } else {
+          // remove old rectangle and repaint map
+          ((Timer) e.getSource()).stop();
+          zoomStep = 0;
+          gui.updating = false;
+          focus();
+          repaint();
         }
-        // wait until current painting is finished
-        while(gui.painting) Performance.sleep(zoomSpeed);
-
-        // remove old rectangle and repaint map
-        zoomStep = 0;
-        gui.updating = false;
-        focus();
-        repaint();
       }).start();
     }
   }

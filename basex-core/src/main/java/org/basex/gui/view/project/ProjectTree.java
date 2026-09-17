@@ -112,7 +112,7 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener, Pro
             dir.expand();
 
             final String fn = name;
-            new Thread(() -> {
+            SwingUtilities.invokeLater(() -> {
               for(final TreeNode tn : Collections.list(dir.children())) {
                 final ProjectNode child = (ProjectNode) tn;
                 if(child.file != null && child.file.name().equals(fn)) {
@@ -122,7 +122,7 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener, Pro
                   break;
                 }
               }
-            }).start();
+            });
           }
         }
 

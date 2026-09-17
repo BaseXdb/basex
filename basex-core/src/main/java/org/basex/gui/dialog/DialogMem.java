@@ -3,8 +3,6 @@ package org.basex.gui.dialog;
 import static org.basex.core.Text.*;
 
 import java.awt.*;
-import java.util.*;
-import java.util.Timer;
 
 import javax.swing.*;
 
@@ -87,11 +85,8 @@ public final class DialogMem extends BaseXDialog {
    * Add timer for updating display of memory consumption.
    */
   private void addTimer() {
-    new Timer(true).scheduleAtFixedRate(new TimerTask() {
-      @Override
-      public void run() {
-        if(isVisible() && !text.selected()) text.setText(info());
-      }
-    }, 0, 500);
+    new Timer(500, e -> {
+      if(isVisible() && !text.selected()) text.setText(info());
+    }).start();
   }
 }

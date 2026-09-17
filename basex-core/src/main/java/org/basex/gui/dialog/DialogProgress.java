@@ -210,14 +210,16 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
           gui.updating = false;
         }
 
-        // return status information
-        final String time = perf.toString();
-        gui.info.setInfo(info, cmd, time, ok, true);
-        gui.status.setText(cmd + ": " + time, true);
-
-        // close progress window and show error if command failed
-        wait.dispose();
-        if(!ok) BaseXDialog.error(gui, info.equals(INTERRUPTED) ? COMMAND_CANCELED : info);
+        // return status information, close the progress window and report a failed command
+        final String time = perf.toString(), message = info;
+        final boolean success = ok;
+        EventQueue.invokeLater(() -> {
+          gui.info.setInfo(message, cmd, time, success, true);
+          gui.status.setText(cmd + ": " + time, true);
+          wait.dispose();
+          if(!success) BaseXDialog.error(gui,
+            message.equals(INTERRUPTED) ? COMMAND_CANCELED : message);
+        });
       }).start();
 
       // show progress windows until being disposed
