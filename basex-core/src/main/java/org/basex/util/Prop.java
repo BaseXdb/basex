@@ -34,6 +34,9 @@ public final class Prop {
   public static final String NL = System.lineSeparator();
   /** Returns the system's default character set. */
   public static final Charset CHARSET = Charset.defaultCharset();
+  /** Character set of the standard input. */
+  public static final Charset STDIN_CHARSET =
+      Charset.forName(System.getProperty("stdin.encoding", ""), CHARSET);
   /** Java vendor. */
   public static final String JAVA_VENDOR = System.getProperty("java.vendor");
   /** Java version. */

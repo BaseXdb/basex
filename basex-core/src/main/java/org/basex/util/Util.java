@@ -91,7 +91,7 @@ public final class Util {
    * @return string
    */
   public static String input() {
-    final Scanner sc = new Scanner(System.in);
+    final Scanner sc = new Scanner(System.in, Prop.STDIN_CHARSET);
     return sc.hasNextLine() ? sc.nextLine().trim() : "";
   }
 

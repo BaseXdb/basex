@@ -110,7 +110,7 @@ public final class MainParser {
       final String str = sb.toString();
       if(!str.equals("-")) return str;
 
-      final Scanner scanner = new Scanner(System.in).useDelimiter("\0");
+      final Scanner scanner = new Scanner(System.in, Prop.STDIN_CHARSET).useDelimiter("\0");
       return scanner.hasNext() ? scanner.next() : "";
     }
     return "";

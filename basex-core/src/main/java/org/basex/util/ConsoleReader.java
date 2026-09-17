@@ -54,7 +54,7 @@ public abstract class ConsoleReader implements AutoCloseable, PasswordReader {
 
     /** Constructor. */
     SimpleConsoleReader() {
-      in = new BufferedReader(new InputStreamReader(System.in));
+      in = new BufferedReader(new InputStreamReader(System.in, Prop.STDIN_CHARSET));
     }
 
     @Override
