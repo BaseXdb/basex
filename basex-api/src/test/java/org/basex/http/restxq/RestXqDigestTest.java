@@ -66,8 +66,11 @@ public final class RestXqDigestTest extends RestXqTest {
     + "  </http:response></R:response>"
     + "};"
     + "declare %R:path('digest-type') %output:method('text') function m:type() {"
-    + "  if(empty(request:header('Authorization'))) then m:challenge('auth')"
-    + "  else request:method() || ' ' || request:header('Content-Type', 'none')"
+    + "  if(empty(request:header('Authorization'))) then m:challenge('auth') else m:echo()"
+    + "};"
+    + "declare %R:path('echo') %output:method('text') function m:echo() {"
+    + "  string-join((request:method(), request:header('Content-Type', 'none'),"
+    + "    request:header('Expect', 'none')), ' ')"
     + "};";
 
   /**
@@ -125,7 +128,17 @@ public final class RestXqDigestTest extends RestXqTest {
     query(_HTTP_SEND_REQUEST.args(" <http:request " + HTTP_NS + " method='post' "
       + "auth-method='Digest' username='admin' password='pw'>"
       + "<http:body media-type='text/plain'>x</http:body></http:request>",
-      HTTP_ROOT + "digest-see-other") + "[2]", "GET none");
+      HTTP_ROOT + "digest-see-other") + "[2]", "GET none none");
+  }
+
+  /** Requests with credentials and body are sent without waiting for a continue response. */
+  @Test public void expect() {
+    final String request = " <http:request " + HTTP_NS + " method='post' "
+      + "auth-method='Digest' username='admin' password='pw'>"
+      + "<http:body media-type='text/plain'>x</http:body></http:request>";
+    query(_HTTP_SEND_REQUEST.args(request, HTTP_ROOT + "echo") + "[2]", "POST text/plain none");
+    query(_HTTP_SEND_REQUEST.args(request, HTTP_ROOT + "digest-type") + "[2]",
+      "POST text/plain none");
   }
 
   /** Request with body. */

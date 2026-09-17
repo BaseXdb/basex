@@ -68,7 +68,7 @@ public final class UserInfo {
    * Checks if credentials are available.
    * @return result of check
    */
-  public boolean credentials() {
+  private boolean credentials() {
     return username != null && password != null;
   }
 
@@ -108,7 +108,6 @@ public final class UserInfo {
     if(!target.equals(sent.uri())) rb.uri(target);
     if(!last.method().equals(sent.method())) {
       rb.method(last.method(), body.orElse(HttpRequest.BodyPublishers.noBody()));
-      rb.expectContinue(body.isPresent());
     }
     return rb.header(AUTHORIZATION, request.authMethod + " " + value).build();
   }

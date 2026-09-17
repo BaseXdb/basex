@@ -66,7 +66,6 @@ public final class Exchange {
    */
   public HttpResponse<InputStream> send() throws IOException {
     final HttpRequest.Builder rb;
-    final boolean hasBody;
     try {
       rb = HttpRequest.newBuilder(uri);
 
@@ -77,7 +76,7 @@ public final class Exchange {
       // set method, attach payload
       final String method = request.attribute(METHOD);
       final String src = request.isMultipart ? null : request.payloadAtts.get(SRC);
-      hasBody = src != null ||
+      final boolean hasBody = src != null ||
           !(request.payload.isEmpty() && request.parts.isEmpty());
       if(method != null) {
         if(hasBody) setContentType(rb);
@@ -104,8 +103,6 @@ public final class Exchange {
         ui.basic(rb);
         return Job.run(() -> client.send(rb.build(), handler));
       }
-      // a challenge is expected: wait for it before the body is sent
-      if(hasBody && ui.credentials()) rb.expectContinue(true);
       final HttpRequest sent = rb.build();
       final HttpResponse<InputStream> response = Job.run(() -> client.send(sent, handler));
       final HttpRequest retry = ui.assign(sent, response);
