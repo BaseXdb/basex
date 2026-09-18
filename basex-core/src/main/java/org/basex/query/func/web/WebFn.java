@@ -69,6 +69,18 @@ public abstract class WebFn extends StandardFunc {
   }
 
   /**
+   * Checks the range of a status code.
+   * @param status status code
+   * @param info input info
+   * @return status code
+   * @throws QueryException query exception
+   */
+  static int status(final long status, final InputInfo info) throws QueryException {
+    if(status <= 0 || status > 999) throw QueryError.WEB_STATUS_X.get(info, status);
+    return (int) status;
+  }
+
+  /**
    * Creates a REST response.
    * @param response status and message
    * @param headers response headers
@@ -78,6 +90,9 @@ public abstract class WebFn extends StandardFunc {
    */
   final FNode createResponse(final ResponseOptions response, final HashMap<String, String> headers,
       final HashMap<String, String> attributes) throws QueryException {
+
+    final Integer status = response.get(ResponseOptions.STATUS);
+    if(status != null) status(status, info);
 
     // root element
     final FBuilder rrest = FElem.build(HTTPText.Q_REST_RESPONSE).ns();

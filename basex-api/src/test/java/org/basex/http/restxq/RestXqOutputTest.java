@@ -52,5 +52,11 @@ public final class RestXqOutputTest extends RestXqTest {
         "  <http:response status='200'/>" +
         "</R:response>," +
         "1 + <a/> };", "");
+
+    // response element must be the first item
+    get(500, "declare %R:path('') function m:f() { <R:response/>, <R:response/> };", "");
+    get(500, "declare %R:path('') function m:f() { 1, <R:response/> };", "");
+    get(500, "declare %R:path('') %updating function m:f() {" +
+        "update:output((<R:response/>, 1, <R:response/>)) };", "");
   }
 }

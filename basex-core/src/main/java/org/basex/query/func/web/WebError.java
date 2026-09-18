@@ -1,6 +1,5 @@
 package org.basex.query.func.web;
 
-import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import org.basex.io.serial.*;
@@ -23,7 +22,7 @@ public final class WebError extends StandardFunc {
     final long status = toLong(arg(0), qc);
     final Value message = arg(1).value(qc);
     final XQMap options = toEmptyMap(arg(2), qc);
-    if(status <= 0 || status > 999) throw WEB_STATUS_X.get(info, status);
+    WebFn.status(status, info);
 
     // serialization parameters (default: plain text)
     final SerializerOptions sopts = new SerializerOptions();

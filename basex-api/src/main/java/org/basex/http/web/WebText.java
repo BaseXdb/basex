@@ -82,6 +82,8 @@ public interface WebText {
   /** Error message. */
   String HEAD_METHOD = "HEAD method must return a single 'restxq:response' element.";
   /** Error message. */
+  String RESPONSE_FIRST = "Only the first result item can be a 'rest:response' element.";
+  /** Error message. */
   String METHOD_BODY_X = "Method % cannot have a body.";
   /** Error message. */
   String BODY_TYPE_X_X = "Body cannot be parsed as %: %";

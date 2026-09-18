@@ -15,6 +15,7 @@ import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -83,17 +84,22 @@ public final class RestXqResponse extends WebResponse {
       boolean head = true;
 
       // handle special cases
-      if(item != null && item.type == NodeType.ELEMENT) {
-        final GNode node = (XNode) item;
-        if(T_REST_RESPONSE.matches(node)) {
-          // custom response
-          so = build(node);
-          item = iter.next();
-          head = item != null;
-        }
+      if(response(item)) {
+        // custom response
+        so = build((XNode) item);
+        item = iter.next();
+        head = item != null;
       }
       if(head && func.methods.size() == 1 && func.methods.contains(Method.HEAD.name()))
         throw func.error(HEAD_METHOD);
+      // materialized result (e.g. of updating queries): reject misplaced responses in advance
+      final Value value = iter.eagerValue();
+      if(value != null) {
+        final long size = value.size();
+        for(long i = 1; i < size; i++) {
+          if(response(value.itemAt(i))) throw func.error(RESPONSE_FIRST);
+        }
+      }
 
       // initialize serializer
       conn.sopts(so);
@@ -115,7 +121,10 @@ public final class RestXqResponse extends WebResponse {
       if(item != null && body) {
         final OutputStream out = cache != null ? cache : conn.response.getOutputStream();
         try(Serializer ser = Serializer.get(out, so)) {
-          for(; item != null; item = qc.next(iter)) ser.serialize(item);
+          for(; item != null; item = qc.next(iter)) {
+            if(response(item)) throw func.error(RESPONSE_FIRST);
+            ser.serialize(item);
+          }
         } catch(final IOException ex) {
           // client has disconnected: stop the query
           if(cache == null) qc.stop();
@@ -143,6 +152,15 @@ public final class RestXqResponse extends WebResponse {
       qc.unregister(ctx);
     }
     if(singleton != null) singleton.unregister();
+  }
+
+  /**
+   * Checks if the specified item is a response element.
+   * @param item item (can be {@code null})
+   * @return result of check
+   */
+  private static boolean response(final Item item) {
+    return item != null && item.type == NodeType.ELEMENT && T_REST_RESPONSE.matches((XNode) item);
   }
 
   /**

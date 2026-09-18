@@ -21,7 +21,7 @@ public final class WebRedirect extends WebFn {
     final HashMap<String, String> headers = new HashMap<>();
     headers.put(HTTPText.LOCATION, location);
     final ResponseOptions response = new ResponseOptions();
-    response.set(ResponseOptions.STATUS, status != null ? (int) (long) status : 302);
+    response.set(ResponseOptions.STATUS, status != null ? status(status, info) : 302);
     return createResponse(response, headers, null);
   }
 }
