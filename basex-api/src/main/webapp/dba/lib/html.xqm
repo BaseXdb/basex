@@ -328,6 +328,26 @@ declare function html:date(
 };
 
 (:~
+ : Returns a compact representation of a dateTime value with tooltip.
+ : @param  $date  date
+ : @return element with tooltip
+ :)
+declare function html:short-date(
+  $date  as xs:dateTime
+) as element(span) {
+  let $adjusted := html:adjust($date)
+  (: the year is only shown if it is not the current one; the time only if it is :)
+  let $picture := if (year-from-dateTime($adjusted) = year-from-dateTime(current-dateTime())) {
+    '[M00]-[D00] [H00]:[m00]'
+  } else {
+    '[Y0000]-[M00]-[D00]'
+  }
+  return <span title='{ format-dateTime($adjusted, '[Y0000]-[M00]-[D00] [H00]:[m00]:[s00]') }'>{
+    format-dateTime($adjusted, $picture)
+  }</span>
+};
+
+(:~
  : Returns a formatted time representation of a dateTime value with tooltip.
  : @param  $date  date
  : @return element with tooltip

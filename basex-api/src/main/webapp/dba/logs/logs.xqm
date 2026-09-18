@@ -67,7 +67,8 @@ function dba:logs(
             form:button('logs-download', 'Download', 'CHECK'),
             form:button('logs/delete', 'Delete', ('CHECK', 'CONFIRM')),
             <input type='text' id='log-filter' name='log-filter' maxlength='10'
-                   onkeyup='logFilter();' class='smallinput'/>
+                   onkeyup='logFilter();' class='smallinput' placeholder='Date'
+                   title='Show the log files whose date starts with the input, e.g. 2026-09'/>
           )
           let $headers := (
             { 'key': 'name', 'label': 'Name', 'type': 'dynamic' },
@@ -96,7 +97,8 @@ function dba:logs(
           <h3>{ $date }</h3>,
           <input type='hidden' name='name' value='{ $date }'/>,
           <input type='text' id='input' name='input' value='{ $input }' autocomplete='off'
-                 title='Enter regular expression' autofocus='' onkeyup='filterLogs(event.key);'/>,
+                 placeholder='Search, e.g. admin' title='Regular expression of entries to show'
+                 autofocus='' onkeyup='filterLogs(event.key);'/>,
           <label title='Reload the entries every second'>{
             <input type='checkbox' id='live' data-live='logs' onchange='liveChanged()'/>, ' Live'
           }</label>,

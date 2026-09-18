@@ -43,7 +43,8 @@ declare function panels:stores(
         { 'key': 'entries', 'label': 'Count', 'type': 'number', 'order': 'desc',
           'width': '20%' },
         { 'key': 'size', 'label': 'Size', 'type': 'bytes', 'order': 'desc', 'width': '16%' },
-        { 'key': 'modified', 'label': 'Date', 'width': '30%' }
+        { 'key': 'modified', 'label': 'Date', 'type': 'dateTime', 'order': 'desc',
+          'width': '30%' }
       )
       let $entries :=
         for $store in utils:slice($names, $page, $sort)
@@ -55,7 +56,7 @@ declare function panels:stores(
           'entries': $info?entries,
           'size': $info?size,
           (: a store that was never written to disk has no date to show :)
-          'modified': ($info?modified ! html:date(.)) otherwise '–'
+          'modified': $info?modified
         }
       let $buttons := (
         <button type='button' onclick='newStore()'>New…</button>,

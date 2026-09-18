@@ -30,10 +30,10 @@ declare function panel:files(
     <form method='post' autocomplete='off' data-sort='{ $sort }'>{
     <input type='hidden' name='dir' value='{ $dir }'/>,
     let $headers := (
-      { 'key': 'name', 'label': 'Name', 'type': 'dynamic', 'width': '45%' },
-      (: the size never grows beyond four digits and a unit :)
+      { 'key': 'name', 'label': 'Name', 'type': 'dynamic', 'width': '54%' },
+      (: the size never grows beyond four digits and a unit, the short date beyond 11 characters :)
       { 'key': 'size', 'label': 'Size', 'type': 'bytes', 'order': 'desc', 'width': '17%' },
-      { 'key': 'date', 'label': 'Date', 'type': 'dateTime', 'order': 'desc', 'width': '38%' }
+      { 'key': 'date', 'label': 'Date', 'type': 'dateTime', 'order': 'desc', 'width': '29%' }
     )
     let $entries := (
       let $limit := config:get($config:MAXCHARS)
@@ -63,18 +63,19 @@ declare function panel:files(
         'size': $size
       }
     )
-    (: the chooser shares the row of the buttons, so that one block can be pinned; it is not
-       wide enough to fill the line on its own, so the break keeps the buttons underneath :)
+    (: the chooser shares the block of the buttons, so that one block can be pinned; the
+       buttons get a line of their own, which does not wrap, like the toolbar beside it :)
     let $buttons := (
       form:directory($dir),
-      <div class='break'/>,
-      <button type='button' onclick='enterDir("..")' title='Go to the parent directory'>{
-        attribute disabled { }[not($parent)], '..'
-      }</button>,
-      <button type='button' onclick='createDir()'>New…</button>,
-      form:button('workspace/delete', 'Delete', ('CHECK', 'CONFIRM')),
-      form:button('files-download', 'Download', 'CHECK'),
-      <button type='button' onclick='chooseUpload("upload")'>Upload…</button>
+      <div class='row'>{
+        <button type='button' onclick='enterDir("..")' title='Go to the parent directory'>{
+          attribute disabled { }[not($parent)], '..'
+        }</button>,
+        <button type='button' onclick='createDir()'>New…</button>,
+        form:button('workspace/delete', 'Delete', ('CHECK', 'CONFIRM')),
+        form:button('files-download', 'Download', 'CHECK'),
+        <button type='button' onclick='chooseUpload("upload")'>Upload…</button>
+      }</div>
     )
     (: the entries are sorted before they are truncated, so the order covers every file :)
     let $options := {

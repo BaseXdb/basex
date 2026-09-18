@@ -18,7 +18,8 @@ declare %private variable $table:TYPES := {
                 'format': fn($v) { format-number(if (exists($v)) then number($v) else 0, '0.00') } },
   'bytes'   : { 'order': 'number',
                 'format': fn($v) { prof:human(if (exists($v)) then xs:integer($v) else 0) } },
-  'dateTime': { 'order': 'date', 'format': fn($v) { $v ! html:date(xs:dateTime(.)) } },
+  'dateTime': { 'order': 'date',
+                'format': fn($v) { ($v ! html:short-date(xs:dateTime(.))) otherwise '–' } },
   'time'    : { 'order': 'date', 'format': fn($v) { $v ! html:time(xs:dateTime(.)) } }
 };
 

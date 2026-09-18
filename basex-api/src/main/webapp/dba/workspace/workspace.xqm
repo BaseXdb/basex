@@ -24,25 +24,25 @@ function dba:workspace() as element(html) {
   (: the directory of the file panel and the open documents are remembered by the client,
      which requests what it needs :)
   (
-    (: the grid is placed explicitly: the file panel on the left, the toolbar above the editor,
-       and the result beside both of them :)
-    <div class='panel no-divider' style='grid-area: 1 / 2 / 2 / 3'>
-      <form autocomplete='off' action='javascript:void(0);'>{
-        insert-separator((
-          (: files are opened in the file panel and named by their tab :)
-          <button type='button' onclick='newFile()' title='Open an empty tab'>New</button>,
-          <button id='save' disabled='' onclick='saveFile()'>Save</button>,
+    (: the grid is placed explicitly: the file panel on the left, the toolbar above the editor
+       and the result, and the result beside the editor :)
+    <div class='panel no-divider' style='grid-area: 1 / 2 / 2 / 4'>
+      <form class='toolbar' autocomplete='off' action='javascript:void(0);'>
+        <div>
+          { (: files are opened in the file panel and named by their tab :) }
+          <button type='button' onclick='newFile()' title='Open an empty tab'>New</button>
+          <button id='save' disabled='' onclick='saveFile()'>Save</button>
           <button id='saveas' disabled='' onclick='saveFile(true)'
-                  title='Save under another name'>Save as…</button>,
-          <span>&#xa0;&#xa0;</span>,
-          <button id='run' onclick='runQuery()' title='Ctrl-Enter'>Run</button>,
-          <button id='stop' onclick='stopQuery()' disabled=''>Stop</button>,
+                  title='Save under another name'>Save as…</button>
+        </div>
+        <div>
+          <button id='run' onclick='runQuery()' title='Ctrl-Enter'>Run</button>
+          <button id='stop' onclick='stopQuery()' disabled=''>Stop</button>
           <button type='button' id='job' onclick='openJob(event)' disabled=''
-                  title='Show the running query in the job view (Ctrl: new tab)'>Job</button>,
-          <span>&#xa0;</span>,
-          <label><input type='checkbox' id='indent' onchange='indentChanged()'/> Indent</label>
-        ), <span>&#xa0;</span>)
-      }</form>
+                  title='Show the running query in the job view (Ctrl: new tab)'>Job</button>
+        </div>
+        <label><input type='checkbox' id='indent' onchange='indentChanged()'/> Indent</label>
+      </form>
     </div>,
     (: the client knows the directory to be shown, and fills the panel :)
     <div class='panel no-divider' style='grid-area: 1 / 1 / -1 / 2'>
@@ -55,19 +55,25 @@ function dba:workspace() as element(html) {
       <textarea id='editor' autofocus='' spellcheck='false'/>
       <div class='resizer' data-split='1'/>
     </div>,
-    (: two panels: the space between them can be dragged :)
-    <div class='panel no-divider' data-label='' style='grid-area: 1 / 3 / 3 / 4'>
-      <div class='pane-title'>
-        <h2>Result</h2>
+    (: two panels: the space between them can be dragged. The result is headed by a tab,
+       so that its text area starts at the height of the editor :)
+    <div class='panel no-divider' data-label='' style='grid-area: 2 / 3 / 3 / 4'>
+      <div class='tabs'>
+        <span class='tab active' id='result-label'>Result</span>
         <label title='Show the information of the last query'><input type='checkbox'
           id='query-info' onchange='queryInfoChanged()'/> Query Info</label>
       </div>
       <textarea id='output' readonly='' spellcheck='false'/>
+      <div id='output-hint' class='hint'>Ctrl-Enter to run</div>
       <div class='resizer-row' id='info-resizer' data-split='0' hidden=''/>
     </div>,
     <div class='panel no-divider hidden' data-label='' id='info-view'
          style='grid-area: 3 / 3 / 4 / 4'>
-      <h2>Query Info</h2>
+      <div class='tabs'>
+        <span class='tab active'>Query Info</span>
+        { (: the outcome of the last run: its time, or the position of its error :) }
+        <output id='run-info'/>
+      </div>
       <div id='info-panel' class='pane'/>
     </div>
   ) => html:wrap({

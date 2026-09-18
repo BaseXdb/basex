@@ -234,11 +234,13 @@ declare function utils:ws-start(
       let $info := job:info($id)
       return map:merge((
         try {
-          let $string := serialize(job:result($id), $options)
+          let $result := job:result($id)
+          let $string := serialize($result, $options)
           return {
             'type'  : 'result',
             'run'   : $run,
-            'result': if ($options?limit) { utils:chop($string, $maxchars) } else { $string }
+            'result': if ($options?limit) { utils:chop($string, $maxchars) } else { $string },
+            'items' : count($result)
           }
         } catch * {
           {
@@ -249,7 +251,7 @@ declare function utils:ws-start(
             'column' : $err:column-number
           }
         },
-        { 'info': utils:html(utils:query-info($info)) }[exists($info)]
+        { 'info': utils:html(utils:query-info($info)), 'time': $info?timing?total }[exists($info)]
       ))
     }, (), { 'serializer': { 'method': 'json' } }),
     'query': $id

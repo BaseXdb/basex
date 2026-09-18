@@ -319,6 +319,7 @@ async function runQuery() {
 
   setDisabled("stop", true);
   setText("", "");
+  setRunInfo("");
 
   const run = startRequest();
   if(!await sendMessage(WORKSPACE_WS, {
@@ -335,14 +336,44 @@ async function runQuery() {
 
 /**
  * Shows the result of a query.
- * @param {string} text result
+ * @param {object} json message with the result, its number of items, and its evaluation time
+ */
+function showResult(json) {
+  setText("Query was successful.", "info");
+  if(_output.setLanguage) _output.setLanguage(contentLanguage(json.result, "text"));
+  _output.setValue(json.result);
+  document.getElementById("output-hint").hidden = true;
+  const items = json.items;
+  document.getElementById("result-label").textContent =
+    items === undefined ? "Result" : `Result (${items} ${items === 1 ? "item" : "items"})`;
+  setRunInfo(json.time ? `Runtime: ${json.time}` : "");
+  showInfo(json.info);
+}
+
+/**
+ * Reports a failed query at the end of the toolbar, with the position that showError found.
  * @param {string} info rendered query information (empty if none was collected)
  */
-function showResult(text, info) {
-  setText("Query was successful.", "info");
-  if(_output.setLanguage) _output.setLanguage(contentLanguage(text, "text"));
-  _output.setValue(text);
+function showRunError(info) {
+  const { line, column } = document.getElementById("info").dataset;
+  setRunInfo(line ? `Error in line ${line}, column ${column}` : "Error", true,
+    line ? { line: Number(line), column: Number(column) } : undefined);
   showInfo(info);
+}
+
+/**
+ * Shows the outcome of the last run at the end of the toolbar.
+ * @param {string} text outcome (empty to clear it)
+ * @param {boolean} failed whether the run failed
+ * @param {object} position error position ({ line, column }), if a click should jump to it
+ */
+function setRunInfo(text, failed, position) {
+  const info = document.getElementById("run-info");
+  info.textContent = text;
+  info.classList.toggle("failed", Boolean(failed));
+  const locatable = Boolean(position && _locate);
+  info.classList.toggle("locatable", locatable);
+  info.onclick = locatable ? () => _locate(position.line, position.column) : null;
 }
 
 /**
@@ -646,9 +677,10 @@ _handlers[WORKSPACE_WS] = json => {
     // the query has ended: the job is gone, and there is nothing left to jump to
     setJob();
     if(json.type === "stopped") setText("Query was stopped.", "warning");
-    else if(json.type === "result") showResult(json.result, json.info);
-    // the error is reported by showMessage; its information belongs to the pane
-    else if(json.type === "error") showInfo(json.info);
+    else if(json.type === "result") showResult(json);
+    // the error is reported by showMessage, which found its position; its information belongs
+    // to the pane
+    else if(json.type === "error") showRunError(json.info);
   }
 };
 

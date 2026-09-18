@@ -185,6 +185,15 @@ td {
   border-radius: var(--radius) var(--radius) 0 0;
   background: transparent;
   color: var(--muted);
+  /* a tab is a button or a heading: both have the same height */
+  font-family: inherit;
+  font-size: 92%;
+  white-space: nowrap;
+}
+/* a switch that belongs to the tabs, at their right end */
+.tabs > label {
+  margin-left: auto;
+  align-self: center;
   font-size: 92%;
   white-space: nowrap;
 }
@@ -279,6 +288,11 @@ textarea, input[type=text], input[type=password], input[type=number], select, bu
   border: var(--line) solid var(--border);
   border-radius: var(--radius);
   outline: none;
+}
+
+/* a button label is never broken over two lines */
+button {
+  white-space: nowrap;
 }
 
 input[type=text], input[type=password], input[type=number], select {
@@ -434,7 +448,7 @@ header {
 }
 
 /* error message that can be clicked to jump to its line/column in the editor */
-#info.locatable {
+#info.locatable, #run-info.locatable {
   cursor: pointer;
 }
 
@@ -505,6 +519,53 @@ header {
   gap: .3rem;
   margin-bottom: var(--space);
 }
+/* toolbar of the Workspace view: groups of buttons, further apart than the buttons in them */
+.toolbar, .toolbar > div {
+  display: flex;
+  align-items: center;
+  gap: .3rem;
+}
+.toolbar {
+  gap: .9rem;
+}
+/* the outcome of the last run, at the right end of the query information tabs */
+#run-info {
+  margin-left: auto;
+  align-self: center;
+  min-width: 0;
+  font-size: 92%;
+  color: var(--muted);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+#run-info.failed {
+  color: var(--accent);
+}
+
+/* hint over the result area before the first run; the empty editor shows no line numbers */
+#output-hint {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  pointer-events: none;
+}
+#output-hint[hidden] {
+  display: none;
+}
+.panel:has(> #output-hint:not([hidden])) .cm-gutters {
+  display: none;
+}
+
+/* controls on a line of their own, which does not wrap */
+.buttons > .row {
+  display: flex;
+  flex-basis: 100%;
+  gap: inherit;
+}
+
 /* forces the following controls onto a line of their own */
 .buttons .break {
   flex-basis: 100%;
@@ -529,9 +590,9 @@ input.query {
   padding-bottom: var(--space);
 }
 /* the collapse chevron floats over the top right corner: only what shares its line stays clear
-   of it, the rows below use the full width. The search line of the logs is a single row */
-.sticky:not(.logbar) > :first-child,
-.logbar {
+   of it, the rows below use the full width. The search line of the logs is a single row.
+   A panel without a chevron keeps the full width */
+.panel:has(> button.collapse) :is(.sticky:not(.logbar) > :first-child, .logbar) {
   padding-right: calc(var(--scrollbar) + 1rem);
 }
 /* the spacing below the head is the panel's, not the last block's inside it */
