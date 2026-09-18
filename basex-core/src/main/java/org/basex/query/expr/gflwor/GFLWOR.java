@@ -233,18 +233,30 @@ public final class GFLWOR extends ParseExpr {
       //   for $_ allowing empty in () return $_ → ()
       if(cs == 1 && fr.size() == 0 && !fr.has(Flag.NDT) && rtrn instanceof final VarRef vr &&
           vr.var == fr.var) return Empty.VALUE;
+    }
 
-      // rewrite group by to distinct-values
-      //   for $e in E group by $g := G return R
-      //  → for $g in distinct-values(for $e in E return G) return R
-      if(cs == 2 && clauses.get(1) instanceof final GroupBy group) {
-        final GroupSpec spec = group.group();
-        if(spec != null) {
-          final Expr flwor = new GFLWOR(info, clauses.removeFirst(), spec.expr).optimize(cc);
-          final Expr expr = cc.function(Function.DISTINCT_VALUES, info, flwor);
-          clauses.set(0, new For(spec.var, expr).optimize(cc));
-          return optimize(cc);
-        }
+    // rewrite group by to distinct-values
+    //   for $e in E let $l := L where W group by $g := G ... return R
+    //  → for $g in distinct-values(for $e in E let $l := L where W return G) ... return R
+    int g = 0;
+    while(g < cs && (clauses.get(g) instanceof For || clauses.get(g) instanceof Let ||
+        clauses.get(g) instanceof Where)) g++;
+    if(g > 0 && g < cs && clauses.get(g) instanceof final GroupBy group) {
+      final GroupSpec spec = group.group();
+      if(spec != null) {
+        final LinkedList<Clause> prefix = new LinkedList<>(clauses.subList(0, g));
+        clauses.subList(0, g).clear();
+        final Expr flwor = new GFLWOR(info, prefix, spec.expr).optimize(cc);
+        final Expr expr = cc.function(Function.DISTINCT_VALUES, info, flwor);
+        clauses.set(0, new For(spec.var, expr).optimize(cc));
+        return optimize(cc);
+      }
+      final LinkedList<Clause> constant = group.constant(
+          new LinkedList<>(clauses.subList(0, g)), info, cc);
+      if(constant != null) {
+        clauses.subList(0, g + 1).clear();
+        clauses.addAll(0, constant);
+        return optimize(cc);
       }
     }
 
@@ -398,6 +410,12 @@ public final class GFLWOR extends ParseExpr {
           fr.remove(cc, fr.pos);
           changed = true;
         }
+      } else if(clause instanceof final Count cnt && count(cnt.var, pos + 1) == VarUsage.NEVER) {
+        // remove count clause
+        //   for $i in E order by $i count $c return $i → for $i in E order by $i return $i
+        cc.info(QueryText.OPTVAR_X, cnt.var);
+        iter.remove();
+        changed = true;
       }
     }
     return changed;
@@ -775,28 +793,48 @@ public final class GFLWOR extends ParseExpr {
     boolean changed = false;
     for(int c = 0; c < clauses.size(); c++) {
       final Clause clause = clauses.get(c);
-      if(!(clause instanceof final For pos)) continue;
+      if(!(clause instanceof final For pos) || pos.pos == null || pos.empty) continue;
 
-      if(pos.pos == null) continue;
+      // while clauses stop all iterations: only rewrite them if no outer clause iterates
+      final boolean outer = !Checks.all(clauses.subList(0, c),
+          cl -> cl instanceof Let || cl instanceof Where);
 
-      // find where clause ($c = 1)
+      // find where/while clause ($c = 1)
       for(int d = c + 1; d < clauses.size(); d++) {
         final Clause cl = clauses.get(d);
-        if(!(cl instanceof Where)) {
+        final boolean where = cl instanceof Where;
+        if(!where && !(cl instanceof While)) {
           // stop if the clause is no 'for' or 'let' expression or nondeterministic
           if(!(cl instanceof For || cl instanceof Let) || cl.has(Flag.NDT)) break;
           continue;
         }
 
-        Expr expr = ((Where) cl).expr;
+        Expr expr = where ? ((Where) cl).expr : ((While) cl).expr;
         if(expr instanceof final CmpG cmp) expr = CmpIR.get(cc, cmp, true);
-        if(!(expr instanceof final CmpIR cmp) || !(cmp.expr instanceof VarRef)) continue;
+        final boolean match = expr instanceof final CmpIR cmp &&
+            cmp.expr instanceof final VarRef vr && vr.var == pos.pos &&
+            (where || !outer && cmp.min <= 1);
+        // skip non-matching where clauses, stop at non-matching while clauses
+        if(!match) {
+          // for $e at $p in E where P($e, $p) ... → for $e in E[P(., position())] ...
+          if(where && d == c + 1 && count(pos.pos, d + 1) == VarUsage.NEVER &&
+              pos.toPosPredicate(cc, ((Where) cl).expr)) {
+            cc.info(QueryText.OPTPRED_X, ((Where) cl).expr);
+            clauses.remove(d);
+            changed = true;
+            break;
+          }
+          if(where) continue;
+          break;
+        }
+        final CmpIR cmp = (CmpIR) expr;
 
         // remove clause and ensure that the positional variable is only used once
         clauses.remove(d);
         if(count(pos.pos, c) == VarUsage.NEVER) {
           // for $e at $p in E where $p = P ... → for $e in E[position() = P] ...
-          pos.addPredicate(cc, IntPos.get(cmp.min, cmp.max, cmp.info()));
+          // for $e at $p in E while $p <= P ... → for $e in E[position() <= P] ...
+          pos.addPredicate(cc, IntPos.get(where ? cmp.min : 1, cmp.max, cmp.info()));
           cc.info(QueryText.OPTPRED_X, expr);
           changed = true;
         } else {

@@ -12,6 +12,7 @@ import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -140,9 +141,11 @@ public final class OrderBy extends Clause {
       // for $i in 1 to 2 order by 1 return $i → for $i in 1 to 2 return $i
       if(expr instanceof Item) return true;
       // for $i in 1 to 2 order by $i return $i → for $i in sort(1 to 2) return $i
+      // for $i in 1 to 2 order by $i descending return $i
+      // → for $i in sort-by(1 to 2, { 'order': 'descending' }) return $i
       if(fr != null && expr instanceof final VarRef vr && vr.var == fr.var) {
-        fr.expr = cc.function(SORT, info, fr.expr);
-        if(keys[0].desc) fr.expr = cc.function(REVERSE, info, fr.expr);
+        fr.expr = keys[0].desc ? cc.function(SORT_BY, info, fr.expr,
+          XQMap.get(Str.get("order"), Str.get("descending"))) : cc.function(SORT, info, fr.expr);
         return true;
       }
     }

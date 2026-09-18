@@ -451,12 +451,81 @@ public final class GFLWORTest extends SandboxTest {
   /** Inlining of positional variable. */
   @Test public void posVar() {
     check("for $v at $p in (1, 2) where $p = 2 return $v", 2, root(Itr.class));
+
+    final String seq = "(1 to 6)[. > 0]";
+    check("for $v at $p in " + seq + " while $p <= 3 return $v", "1\n2\n3", empty(While.class));
+    check("for $v at $p in " + seq + " while $p >= 2 return $v", "", exists(While.class));
+    check("for $o in 1 to 2 for $v at $p in " + seq + " while $p <= 2 return $v", "1\n2",
+        exists(While.class));
+    check("for $v at $p in " + seq + " while $v < 2 where $p = 3 return $v", "",
+        exists(While.class));
+    check("for $v at $p in " + seq + " for $w in $v where $w = 1 where $p = 3 return $v", "",
+        empty(Where.class));
+    check("let $e := <a/>/b for $v allowing empty at $p in $e where $p = 1 return 1", "",
+        exists(Where.class));
+
+    // positional variables in arbitrary where clauses
+    check("for $v at $p in " + seq + " where $p mod 2 = 0 return $v", "2\n4\n6",
+        empty(GFLWOR.class));
+    check("for $v at $p in (3, 2, 1, 4)[. > 0] where $v = $p return $v", "2\n4",
+        empty(GFLWOR.class));
+    check("for $v at $p in " + seq + " where $p - 1 return $v", "2\n3\n4\n5\n6",
+        empty(GFLWOR.class));
+    check("for $v at $p in " + seq + " where (fn() { $p = 2 })() return $v", 2);
+    check("for $v at $p in " + seq + " where $p mod 3 = 0 return $p", "3\n6",
+        exists(Where.class));
+    check("<x/> ! (for $v at $p in " + seq + " where $p = 1 and . instance of element() "
+        + "return $v)", 1);
+  }
+
+  /** Group by to distinct-values. */
+  @Test public void groupToDistinct() {
+    final String seq = "(1 to 10)[. > 0]";
+    check("for $x in " + seq + " let $k := $x mod 3 where $x > 4 group by $k "
+        + "order by $k descending return $k * 10", "20\n10\n0",
+        exists(DISTINCT_VALUES), empty(GroupBy.class));
+    check("for $x in " + seq + " for $y in 1 to 2 group by $k := $x * $y mod 4 "
+        + "where $k > 0 return $k", "1\n2\n3",
+        exists(DISTINCT_VALUES), empty(GroupBy.class));
+    check("for $x in " + seq + " group by $k := $x mod 2 order by $k return count($x)",
+        "5\n5", exists(GroupBy.class));
+
+    // constant keys
+    check("for $x in " + seq + " group by $k := 1 return ($k, count($x))", "1\n10",
+        empty(GroupBy.class));
+    check("for $x in " + seq + " where $x > 10 group by $k := 1 return count($x)", "",
+        empty(GroupBy.class));
+    check("for $x in " + seq + " let $y := () group by $k := 1 return count($y)", 0,
+        exists(GroupBy.class));
+  }
+
+  /** Unused count clauses. */
+  @Test public void unusedCount() {
+    final String seq = "(3, 1, 2)[. > 0]";
+    check("for $i in " + seq + " order by $i count $c return $i", "1\n2\n3", empty(Count.class));
+    check("for $i in " + seq + " order by $i count $c return $c * 10 + $i", "11\n22\n33",
+        empty(Count.class));
   }
 
   /** Allowing empty. */
   @Test public void allowingEmpty() {
     check("for $x allowing empty in () return $x", "", empty());
-    check("for $x allowing empty in void(1) return $x", "", exists(GFLWOR.class));
+    check("for $x allowing empty in void(1) return $x", "", root(VOID));
+
+    check("for $x allowing empty in head(<x><a/><a/></x>/a) return (name($x), 'x')", "a\nx",
+        empty(GFLWOR.class));
+    check("for $x allowing empty in head(<x/>/a) return (name($x), 'x')", "\nx",
+        empty(GFLWOR.class));
+    check("for $x allowing empty at $p in head(<x/>/a) return $p", 0, exists(For.class));
+  }
+
+  /** Merge order by clause with for clause. */
+  @Test public void orderByMerge() {
+    final String seq = "(<a>1</a>, <b>1</b>, <c>2</c>, <d>1</d>)[text()]";
+    check("for $x in " + seq + " stable order by $x return name($x)", "a\nb\nd\nc",
+        exists(SORT), empty(OrderBy.class));
+    check("for $x in " + seq + " stable order by $x descending return name($x)", "c\na\nb\nd",
+        exists(SORT_BY), empty(REVERSE), empty(OrderBy.class));
   }
 
   /** Merge for/let clauses. */
@@ -507,13 +576,13 @@ public final class GFLWORTest extends SandboxTest {
 
     check("for $i at $p in (1 to 4) where $i <= 3 where $p < 5 "
         + "for $j at $q in ($i to 2) return $q",
-        "1\n2\n1", count(Where.class, 1));
+        "1\n2\n1", empty(Where.class));
     check("for $i at $p in (1 to 4) where $i <= 3 where $p < 5 "
         + "for $j at $q in ($i to 2) where $q < 5 return $q",
-        "1\n2\n1", count(Where.class, 2));
+        "1\n2\n1", count(Where.class, 1));
     check("for $i at $p in (1 to 4) where $i <= 3 where $p < 5 "
         + "for $j at $q in ($i to 2) where $j > 1 where $p < 5 return $q",
-        "2\n1", count(Where.class, 2));
+        "2\n1", count(Where.class, 1));
   }
 
   /** Merge where clauses. */

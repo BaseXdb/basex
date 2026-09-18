@@ -6,6 +6,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -307,6 +308,37 @@ public final class GroupBy extends Clause {
       }
     }
     return null;
+  }
+
+  /**
+   * Rewrites this clause to let and where clauses if all grouping keys are constant.
+   * @param prefix clauses that precede this clause
+   * @param ii input info (can be {@code null})
+   * @param cc compilation context
+   * @return new clauses, or {@code null} if the clause cannot be rewritten
+   * @throws QueryException query exception
+   */
+  LinkedList<Clause> constant(final LinkedList<Clause> prefix, final InputInfo ii,
+      final CompileContext cc) throws QueryException {
+    // tuple count must be derivable from the non-grouping variable: each value must be non-empty
+    if(post.length != 1 || !preExpr[0].seqType().oneOrMore()) return null;
+    for(final GroupSpec spec : specs) {
+      if(!(spec.expr instanceof final Item item) || !item.type.instanceOf(BasicType.ANY_ATOMIC_TYPE)
+          || spec.var.declType != null) return null;
+    }
+
+    // for $x in E group by $k := 1 return R
+    // → let $v := (for $x in E return $x) where exists($v) let $x := $v let $k := 1 return R
+    // (new variable: the type of the post-grouping variable excludes the empty sequence)
+    final LinkedList<Clause> clauses = new LinkedList<>();
+    final Expr flwor = new GFLWOR(ii, prefix, preExpr[0]).optimize(cc);
+    final Var var = cc.vs().addNew(post[0].name, null, cc.qc, ii);
+    clauses.add(new Let(var, flwor).optimize(cc));
+    final Expr exists = cc.function(Function.EXISTS, ii, new VarRef(ii, var).optimize(cc));
+    clauses.add(new Where(exists, ii).optimize(cc));
+    clauses.add(new Let(post[0], new VarRef(ii, var).optimize(cc)).optimize(cc));
+    for(final GroupSpec spec : specs) clauses.add(new Let(spec.var, spec.expr).optimize(cc));
+    return clauses;
   }
 
   @Override

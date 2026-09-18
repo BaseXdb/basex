@@ -2,6 +2,7 @@ package org.basex.query.func.fn;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.gflwor.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
@@ -37,6 +38,14 @@ public final class FnTakeWhile extends StandardFunc {
     if(st.zero()) return input;
 
     arg(1, arg -> arg.refineFunc(cc, st.with(Occ.EXACTLY_ONE), Types.INTEGER_O));
+    final int arity = arity(arg(1));
+    if(arity != -1) {
+      // take-while(INPUT, PREDICATE) →
+      // for $item at $pos in INPUT while PREDICATE($item, $pos) return $item
+      final FLWORBuilder flwor = new FLWORBuilder(arity, cc, info);
+      final Expr cond = flwor.function(this, 1, false);
+      return flwor.finish(input, cond, true, flwor.ref(flwor.item));
+    }
     exprType.assign(st.union(Occ.ZERO)).data(input);
     return this;
   }

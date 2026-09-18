@@ -87,9 +87,25 @@ public final class FLWORBuilder {
    * @throws QueryException query exception
    */
   public Expr finish(final Expr input, final Expr where, final Expr rtrn) throws QueryException {
+    return finish(input, where, false, rtrn);
+  }
+
+  /**
+   * Finalizes the GFLWOR expression with a where or while clause.
+   * @param input input expression
+   * @param cond condition (can be {@code null})
+   * @param whl create while clause (instead of where clause)
+   * @param rtrn return expression
+   * @return expression
+   * @throws QueryException query exception
+   */
+  public Expr finish(final Expr input, final Expr cond, final boolean whl, final Expr rtrn)
+      throws QueryException {
     final LinkedList<Clause> clauses = new LinkedList<>();
     clauses.add(new For(item, pos, null, input, false).optimize(cc));
-    if(where != null) clauses.add(new Where(where, info).optimize(cc));
+    if(cond != null) {
+      clauses.add((whl ? new While(cond, info) : new Where(cond, info)).optimize(cc));
+    }
     return new GFLWOR(info, clauses, rtrn).optimize(cc);
   }
 }

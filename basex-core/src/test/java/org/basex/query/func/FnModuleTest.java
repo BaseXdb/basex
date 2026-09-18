@@ -5340,6 +5340,14 @@ return
         func.args(" 1 to 6", " fn($x) { exists((1 to 100)[$a + $x]) }"),
         "1\n2\n3\n4\n5\n6\n1\n2\n3\n4\n5\n6",
         exists(ITEMS_AT), empty(HoistedFilter.class), empty(CachedFilter.class));
+
+    // rewrite to FLWOR expression
+    check(func.args(" (1 to 6)[. > 0]", " fn($x) { $x < 4 }"), "1\n2\n3",
+        empty(func), exists(While.class));
+    check(func.args(" (1 to 6)[. > 0]", " fn($x, $p) { $p <= 2 }"), "1\n2",
+        empty(func));
+    check("let $f := fn($x) { $x < 3 } return " + func.args(" (1 to 6)[. > 0]", " $f"), "1\n2",
+        empty(func));
   }
 
   /** Test method. */

@@ -180,7 +180,13 @@ public final class For extends ForLet {
   boolean asLet(final List<Clause> clauses, final int p, final CompileContext cc)
       throws QueryException {
 
-    if(!expr.seqType().one()) return false;
+    final SeqType st = expr.seqType();
+    // for $x allowing empty in head(E) → let $x := head(E)
+    if(empty && st.zeroOrOne() && pos == null && score == null && var.declType == null) {
+      clauses.set(p, new Let(var, expr).optimize(cc));
+      return true;
+    }
+    if(!st.one()) return false;
     clauses.set(p, new Let(var, expr).optimize(cc));
     if(score != null) {
       clauses.add(p + 1, new Let(score, new VarRef(info(), var).optimize(cc), true).optimize(cc));
@@ -188,6 +194,29 @@ public final class For extends ForLet {
     if(pos != null) {
       clauses.add(p + 1, new Let(pos, Itr.ONE).optimize(cc));
     }
+    return true;
+  }
+
+  /**
+   * Tries to add an expression that references the positional variable as a predicate.
+   * @param cc compilation context
+   * @param ex expression to add as predicate
+   * @return success flag
+   * @throws QueryException query exception
+   */
+  boolean toPosPredicate(final CompileContext cc, final Expr ex) throws QueryException {
+    if(pos == null || empty || scoring || var.declType != null || !ex.uses(pos) ||
+        ex.has(Flag.CTX, Flag.POS)) return false;
+
+    final Expr pred = cc.get(expr, true, () -> {
+      final InlineContext icPos = new InlineContext(pos, cc.function(POSITION, info), cc);
+      final InlineContext icVar = new InlineContext(var, new ContextValue(info), cc);
+      return icPos.inlineable(ex) && icVar.inlineable(ex) ? icPos.inline(icVar.inline(ex)) : null;
+    });
+    if(pred == null) return false;
+
+    // numeric predicates would be evaluated as positional tests
+    addPredicate(cc, pred.seqType().mayBeNumber() ? cc.function(BOOLEAN, info, pred) : pred);
     return true;
   }
 

@@ -1508,7 +1508,7 @@ public final class RewritingsTest extends SandboxTest {
     check("for $i in (1 to 2)[. >= 0] order by $i return $i", "1\n2",
         empty(OrderBy.class), root(SORT));
     check("for $i in (1 to 2)[. >= 0] order by $i descending return $i", "2\n1",
-        empty(OrderBy.class), root(REVERSE));
+        empty(OrderBy.class), root(SORT_BY));
     check("for $i in (1 to 2)[. >= 0] order by $i return $i * 2", "2\n4",
         empty(OrderBy.class), root(DualMap.class));
     check("let $_ :=" + wrap(1) +
