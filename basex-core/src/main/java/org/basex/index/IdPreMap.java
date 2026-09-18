@@ -5,6 +5,7 @@ import java.util.*;
 
 import org.basex.io.*;
 import org.basex.io.in.DataInput;
+import org.basex.io.out.*;
 import org.basex.io.out.DataOutput;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -18,6 +19,12 @@ import org.basex.util.list.*;
 public class IdPreMap {
   /** Invalid ID value. */
   private static final int INV = -1;
+  /** Logged operation: insert. */
+  private static final int INSERT = 0;
+  /** Logged operation: delete. */
+  private static final int DELETE = 1;
+  /** Logged operation: mark base IDs as deleted. */
+  private static final int MARK = 2;
   /** Base ID value. */
   private int baseid;
   /** PRE values of the inserted/deleted IDs. */
@@ -37,6 +44,10 @@ public class IdPreMap {
 
   /** Number of records in the table. */
   private int rows;
+  /** Operations since the last write, three arguments each ({@code null}: write completely). */
+  private IntList changes;
+  /** File size of the last complete write. */
+  private long written;
 
   /**
    * Constructor.
@@ -69,6 +80,94 @@ public class IdPreMap {
       final int[] ranges = in.readNums();
       if(ranges.length != 0) deleted = ranges;
     }
+    written = f.length();
+    changes = new IntList();
+  }
+
+  /**
+   * Replays the operations of a log.
+   * @param log log file
+   * @param length committed length of the log
+   * @throws IOException I/O exception
+   */
+  public final void replay(final IOFile log, final long length) throws IOException {
+    final byte[] bytes = log.exists() ? log.read() : Token.EMPTY;
+    if(bytes.length < length) throw new IOException("ID/PRE log is incomplete: " + log);
+    final IntList list = changes;
+    changes = null;
+    for(int p = 0; p < length;) {
+      final int[] args = new int[4];
+      for(int a = 0; a < 4; a++) {
+        args[a] = Num.get(bytes, p);
+        p += Num.length(bytes, p);
+      }
+      switch(args[0]) {
+        case INSERT -> insert(args[1], args[2], args[3]);
+        case DELETE -> delete(args[1], args[2], args[3]);
+        case MARK   -> markDeleted(args[1], args[2]);
+        default     -> throw new IOException("ID/PRE log is corrupt: " + log);
+      }
+    }
+    changes = list;
+  }
+
+  /**
+   * Persists the map by appending the operations since the last write to a log, or by
+   * writing the complete map if enforced, if the log would exceed the map, or if appending fails.
+   * @param file map file
+   * @param log log file
+   * @param length committed length of the log
+   * @param complete enforce a complete write
+   * @return new length of the log ({@code 0} if the map was written completely)
+   * @throws IOException I/O exception
+   */
+  public final long write(final IOFile file, final IOFile log, final long length,
+      final boolean complete) throws IOException {
+    if(changes != null) {
+      if(changes.isEmpty() && (length == 0 || !complete)) return length;
+      if(!complete) {
+        final ArrayOutput ao = new ArrayOutput();
+        try(DataOutput out = new DataOutput(ao)) {
+          final int cs = changes.size();
+          for(int c = 0; c < cs; c++) out.writeNum(changes.get(c));
+        }
+        final byte[] bytes = ao.finish();
+        final long ln = length + bytes.length;
+        if(ln <= written) {
+          try(RandomAccessFile raf = new RandomAccessFile(log.file(), "rw")) {
+            raf.seek(length);
+            raf.write(bytes);
+            raf.setLength(ln);
+            changes.reset();
+            return ln;
+          } catch(final IOException ex) {
+            Util.debug(ex);
+          }
+        }
+      }
+    }
+    write(file);
+    written = file.length();
+    changes = new IntList();
+    return 0;
+  }
+
+  /**
+   * Enforces a complete write of the map.
+   */
+  public final void enforceWrite() {
+    changes = null;
+  }
+
+  /**
+   * Records an operation.
+   * @param op operation
+   * @param a first argument
+   * @param b second argument
+   * @param c third argument
+   */
+  private void log(final int op, final int a, final int b, final int c) {
+    if(changes != null) changes.add(op, a, b, c);
   }
 
   /**
@@ -153,6 +252,7 @@ public class IdPreMap {
    * @param c number of inserted records
    */
   public void insert(final int pre, final int id, final int c) {
+    log(INSERT, pre, id, c);
     order = null;
     if(rows == 0 && pre == id && id == baseid + 1) {
       // no mapping, and we append at the end => nothing to do
@@ -226,6 +326,7 @@ public class IdPreMap {
    * @param last last ID
    */
   public final void markDeleted(final int first, final int last) {
+    log(MARK, first, last, 0);
     int f = first, l = Math.min(last, baseid);
     if(f > l) return;
 
@@ -267,6 +368,7 @@ public class IdPreMap {
    * @param c number of deleted records (negative)
    */
   public void delete(final int pre, final int id, final int c) {
+    log(DELETE, pre, id, c);
     order = null;
     if(rows == 0 && pre == id && id - c == baseid + 1) {
       // no mapping, and we delete at the end => nothing to do

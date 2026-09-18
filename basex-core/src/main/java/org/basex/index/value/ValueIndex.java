@@ -1,5 +1,9 @@
 package org.basex.index.value;
 
+import static org.basex.util.Token.*;
+
+import java.util.function.*;
+
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.util.list.*;
@@ -33,30 +37,18 @@ public abstract class ValueIndex implements Index {
   public abstract int size();
 
   /**
-   * Deletes entries from the index.
-   * @param values value cache with [key, id-list] pairs
-   */
-  public abstract void delete(ValueCache values);
-
-  /**
-   * Add entries to the index.
-   * @param values value cache with [key, id-list] pairs
-   */
-  public abstract void add(ValueCache values);
-
-  /**
    * Flushes the buffered data.
+   * @param close database is closed
    */
-  public abstract void flush();
+  public abstract void flush(boolean close);
 
   /**
    * Deletes the entries of the specified nodes, called before the nodes are removed from the table.
    * @param pre PRE value of the first node
    * @param size number of nodes
    */
-  public void delete(final int pre, final int size) {
-    update(new ValueCache(pre, size, type, data), false);
-  }
+  @SuppressWarnings("unused")
+  public void delete(final int pre, final int size) { }
 
   /**
    * Adds the entries of the specified nodes, called after the nodes have been inserted into the
@@ -64,27 +56,24 @@ public abstract class ValueIndex implements Index {
    * @param pre PRE value of the first node
    * @param size number of nodes
    */
-  public void insert(final int pre, final int size) {
-    update(new ValueCache(pre, size, type, data), true);
-  }
+  @SuppressWarnings("unused")
+  public void insert(final int pre, final int size) { }
 
   /**
    * Deletes the entries affected by a rename, called before the name is changed.
    * @param pre PRE value of the node to be renamed
    * @param kind node kind
    */
-  public void rename(final int pre, final int kind) {
-    update(renameCache(pre, kind), false);
-  }
+  @SuppressWarnings("unused")
+  public void rename(final int pre, final int kind) { }
 
   /**
    * Adds the entries affected by a rename, called after the name has been changed.
    * @param pre PRE value of the renamed node
    * @param kind node kind
    */
-  public void renamed(final int pre, final int kind) {
-    update(renameCache(pre, kind), true);
-  }
+  @SuppressWarnings("unused")
+  public void renamed(final int pre, final int kind) { }
 
   /**
    * Finishes an update transaction.
@@ -97,28 +86,36 @@ public abstract class ValueIndex implements Index {
   public void optimize() { }
 
   /**
-   * Adds or deletes the specified entries.
-   * @param values value cache (can be {@code null})
-   * @param add add or delete entries
+   * Returns the units whose inclusion depends on the name of a node: the child text nodes of an
+   * element (text and full-text index), an attribute (attribute and token index), or an element
+   * (full-text index for mixed content).
+   * @param pre PRE value of the renamed node
+   * @param kind node kind
+   * @return PRE values of the units
    */
-  private void update(final ValueCache values, final boolean add) {
-    if(values == null || values.isEmpty()) return;
-    if(add) add(values);
-    else delete(values);
+  protected final IntList renamedUnits(final int pre, final int kind) {
+    final int unit = IndexNames.kind(type, data.meta);
+    if(unit == Data.TEXT) return kind == Data.ELEM ? childTexts(pre) : new IntList(0);
+    return kind == unit ? new IntList(1).add(pre) : new IntList(0);
   }
 
   /**
-   * Returns the entries affected by a rename: the inclusion of text nodes depends on the name of
-   * the parent element, that of attributes on their own name.
-   * @param pre PRE value of the renamed node
-   * @param kind node kind
-   * @return value cache, or {@code null} if no entries are affected
+   * Passes the keys of a node and their positions to a consumer; values exceeding the maximum
+   * length are skipped.
+   * @param data data reference
+   * @param type index type
+   * @param pre PRE value
+   * @param consumer consumer of keys and positions
    */
-  private ValueCache renameCache(final int pre, final int kind) {
+  static void keys(final Data data, final IndexType type, final int pre,
+      final ObjIntConsumer<byte[]> consumer) {
     final boolean text = type == IndexType.TEXT;
-    if(kind == Data.ATTR) return text ? null : new ValueCache(pre, type, data);
-    if(kind != Data.ELEM || !text) return null;
-    return new ValueCache(childTexts(pre), type, data);
+    if(type == IndexType.TOKEN) {
+      int pos = 0;
+      for(final byte[] token : distinctTokens(data.text(pre, false))) consumer.accept(token, pos++);
+    } else if(data.textLen(pre, text) <= data.meta.maxlen) {
+      consumer.accept(data.text(pre, text), 0);
+    }
   }
 
   /**
@@ -126,7 +123,7 @@ public abstract class ValueIndex implements Index {
    * @param pre PRE value of the element
    * @return PRE values
    */
-  protected final IntList childTexts(final int pre) {
+  private IntList childTexts(final int pre) {
     final IntList pres = new IntList();
     final int last = pre + data.size(pre, Data.ELEM);
     for(int curr = pre + data.attSize(pre, Data.ELEM); curr < last;) {

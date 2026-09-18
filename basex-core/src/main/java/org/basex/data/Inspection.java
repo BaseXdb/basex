@@ -169,14 +169,12 @@ public final class Inspection {
     if(checks.contains(Check.TOKEN_INDEX)) run(() -> index(IndexType.TOKEN, Check.TOKEN_INDEX));
 
     if(!data.inMemory()) {
-      final String[] files = { meta.textindex ? DATATXT : null, meta.attrindex ? DATAATV : null,
-        meta.tokenindex ? DATATOK : null };
-      for(final String file : files) {
-        if(file == null) continue;
-        for(final char c : new char[] { 'l', 'r' }) {
-          if(!meta.dbFile(file + c).exists()) add(Check.INDEX_FILES, 1, -1);
-        }
+      final String[] files = { DATATXT, DATAATV, DATATOK };
+      final IndexType[] types = { IndexType.TEXT, IndexType.ATTRIBUTE, IndexType.TOKEN };
+      for(int f = 0; f < files.length; f++) {
+        if(meta.index(types[f])) files(files[f], meta.segments.get(types[f]), "lr");
       }
+      if(meta.ftindex) files(DATAFTX, meta.segments.get(IndexType.FULLTEXT), "xyz");
       if(meta.updateFile().exists()) add(Check.UPDATE_FILE, 1, -1);
     }
   }
@@ -416,6 +414,24 @@ public final class Inspection {
       final int expected = !names.unit(pre) ? 0 : tokenize ?
         distinctTokens(data.text(pre, false)).length : data.textLen(pre, text) <= maxlen ? 1 : 0;
       if(found[pre] != expected) add(check, pre);
+    }
+  }
+
+  /**
+   * Checks if the files of an index structure and of its listed segments exist.
+   * @param prefix file prefix
+   * @param segments segment numbers, separated by commas ({@code null} if not segmented)
+   * @param suffixes suffixes of the files of each structure
+   */
+  private void files(final String prefix, final String segments, final String suffixes) {
+    final int[] numbers = SegmentedIndex.numbers(segments);
+    final StringList prefixes = new StringList();
+    if(numbers == null) prefixes.add(prefix);
+    else for(final int number : numbers) prefixes.add(number < 0 ? prefix : prefix + number);
+    for(final String name : prefixes) {
+      for(final char c : suffixes.toCharArray()) {
+        if(!data.meta.dbFile(name + c).exists()) add(Check.INDEX_FILES, 1, -1);
+      }
     }
   }
 

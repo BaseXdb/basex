@@ -58,6 +58,18 @@ public interface DataText {
   String DBFTXSEGS = "FTXSEGS";
   /** Full-text index: buffer. */
   String DBFTXBUF = "FTXBUF";
+  /** Text index: segments. */
+  String DBTXTSEGS = "TXTSEGS";
+  /** Text index: buffer. */
+  String DBTXTBUF = "TXTBUF";
+  /** Attribute index: segments. */
+  String DBATVSEGS = "ATVSEGS";
+  /** Attribute index: buffer. */
+  String DBATVBUF = "ATVBUF";
+  /** Token index: segments. */
+  String DBTOKSEGS = "TOKSEGS";
+  /** Token index: buffer. */
+  String DBTOKBUF = "TOKBUF";
   /** Full-text stemming. */
   String DBFTST = "FTSTEM";
   /** Full-text language. */
@@ -82,6 +94,8 @@ public interface DataText {
   String DBOPTIMIZED = "OPTIMIZED";
   /** Last (highest) ID. */
   String DBLASTID = "LASTID";
+  /** Committed length of the ID-PRE log. */
+  String DBIDPLOG = "IDPLOG";
   /** Documents. */
   String DBDOCS = "DOCS";
   /** Recreate text index. */
@@ -130,6 +144,8 @@ public interface DataText {
   String DATANSP = "nsp";
   /** Database - ID-PRE mapping. */
   String DATAIDP = "idp";
+  /** Database - ID-PRE log. */
+  String DATAIDPLOG = "idpl";
 
   // TABLE SERIALIZATION ==========================================================================
 

@@ -101,8 +101,14 @@ public final class Optimize extends ACreate {
   public static void optimize(final Data data, final EnumSet<IndexType> enforce,
       final Optimize cmd) throws IOException {
 
-    // initialize structural indexes
+    // write the ID-PRE map completely, so that older versions can read it
     final MetaData meta = data.meta;
+    if(data.idmap != null) {
+      data.idmap.enforceWrite();
+      meta.dirty = true;
+    }
+
+    // initialize structural indexes
     if(!meta.uptodate) {
       data.paths().init();
       data.elemNames.init();

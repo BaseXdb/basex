@@ -112,11 +112,10 @@ public final class PathNode {
    * @return node reference
    */
   PathNode index(final int id, final byte knd, final byte[] value, final MetaData meta) {
-    for(final PathNode child : children) {
-      if(child.kind == knd && child.name == id) {
-        child.index(value, meta);
-        return child;
-      }
+    final PathNode found = child(id, knd);
+    if(found != null) {
+      found.index(value, meta);
+      return found;
     }
 
     final PathNode child = new PathNode(id, knd, this);
@@ -158,11 +157,9 @@ public final class PathNode {
    * @param elemNames element names
    */
   void finish(final MetaData meta, final Names elemNames) {
-    // iterative traversal: the depth of the path index is not limited
-    final ArrayList<PathNode> stack = new ArrayList<>();
-    stack.add(this);
-    while(!stack.isEmpty()) {
-      final PathNode node = stack.remove(stack.size() - 1);
+    final ArrayList<PathNode> nodes = new ArrayList<>();
+    addDesc(nodes, -1);
+    for(final PathNode node : nodes) {
       boolean leaf = node.stats.isLeaf();
       for(final PathNode child : node.children) {
         if(child.kind == Data.TEXT) {
@@ -179,7 +176,6 @@ public final class PathNode {
       node.empty = 0;
 
       node.stats.setLeaf(leaf);
-      for(final PathNode child : node.children) stack.add(child);
     }
   }
 
@@ -189,11 +185,10 @@ public final class PathNode {
    * @throws IOException I/O exception
    */
   void write(final DataOutput out) throws IOException {
-    // iterative traversal: the depth of the path index is not limited
-    final ArrayList<PathNode> stack = new ArrayList<>();
-    stack.add(this);
-    while(!stack.isEmpty()) {
-      final PathNode node = stack.remove(stack.size() - 1);
+    // nodes are written in document order
+    final ArrayList<PathNode> nodes = new ArrayList<>();
+    addDesc(nodes, -1);
+    for(final PathNode node : nodes) {
       out.writeNum(node.name);
       out.write1(node.kind);
       // legacy (required before version 7.1)
@@ -203,31 +198,26 @@ public final class PathNode {
       out.writeDouble(1);
 
       node.stats.write(out);
-      // add the children in reverse order: they are written from left to right
-      for(int c = node.children.length - 1; c >= 0; c--) stack.add(node.children[c]);
     }
   }
 
   /**
-   * Adds the node and its descendants to the specified list.
-   * @param nodes node list
-   */
-  void addDesc(final ArrayList<PathNode> nodes) {
-    // iterative traversal: the depth of the path index is not limited
-    final ArrayList<PathNode> stack = new ArrayList<>();
-    stack.add(this);
-    while(!stack.isEmpty()) {
-      final PathNode node = stack.remove(stack.size() - 1);
-      nodes.add(node);
-      // add the children in reverse order: the nodes are returned in document order
-      for(int c = node.children.length - 1; c >= 0; c--) stack.add(node.children[c]);
-    }
-  }
-
-  /**
-   * Adds the node and its descendants with the specified name to the specified list.
-   * @param nodes node list
+   * Returns the child with the specified name and kind.
    * @param nm name ID
+   * @param knd node kind
+   * @return child, or {@code null} if it does not exist
+   */
+  PathNode child(final int nm, final int knd) {
+    for(final PathNode child : children) {
+      if(child.kind == knd && child.name == nm) return child;
+    }
+    return null;
+  }
+
+  /**
+   * Adds the node and its descendants, or the elements with the specified name, to a list.
+   * @param nodes node list
+   * @param nm name ID of the elements ({@code -1}: all nodes)
    */
   void addDesc(final ArrayList<PathNode> nodes, final int nm) {
     // iterative traversal: the depth of the path index is not limited
@@ -235,7 +225,7 @@ public final class PathNode {
     stack.add(this);
     while(!stack.isEmpty()) {
       final PathNode node = stack.remove(stack.size() - 1);
-      if(node.kind == Data.ELEM && nm == node.name) nodes.add(node);
+      if(nm == -1 || node.kind == Data.ELEM && nm == node.name) nodes.add(node);
       // add the children in reverse order: the nodes are returned in document order
       for(int c = node.children.length - 1; c >= 0; c--) stack.add(node.children[c]);
     }

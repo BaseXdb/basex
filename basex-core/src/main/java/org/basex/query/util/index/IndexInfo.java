@@ -313,7 +313,7 @@ public final class IndexInfo {
     if(ic == null) return false;
     costs = IndexCosts.add(costs, ic);
     final int r = ic.results(), s = size.get();
-    if(s >= 0) size.set(r < 0 || s > 0 && type == IndexType.TOKEN && r > 0 ? -1 : s + r);
+    if(s >= 0) size.set(ic.size() < 0 || s > 0 && type == IndexType.TOKEN && r > 0 ? -1 : s + r);
     return true;
   }
 

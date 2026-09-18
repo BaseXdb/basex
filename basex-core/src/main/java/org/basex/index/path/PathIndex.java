@@ -146,7 +146,7 @@ public final class PathIndex implements Index {
     }
     // a new text node proves that earlier elements of this path had no text node child
     final boolean empty = kind == Data.TEXT && node.kind == Data.ELEM &&
-        node.stats.count > 1 && child(node, name, kind) == null;
+        node.stats.count > 1 && node.child(name, kind) == null;
     final PathNode child = node.index(name, kind, value, data.meta);
     if(empty) child.stats.add(Token.EMPTY, data.meta);
     return child;
@@ -168,23 +168,9 @@ public final class PathIndex implements Index {
     for(int p = pres.size() - 2; p >= 0 && node != null; p--) {
       final int curr = pres.get(p), kind = data.kind(curr);
       final int name = kind == Data.ELEM || kind == Data.ATTR ? data.nameId(curr) : 0;
-      node = child(node, name, kind);
+      node = node.child(name, kind);
     }
     return node;
-  }
-
-  /**
-   * Returns the child of a path node with the specified name and kind.
-   * @param node path node
-   * @param name name ID
-   * @param kind node kind
-   * @return child node, or {@code null} if no child exists
-   */
-  private static PathNode child(final PathNode node, final int name, final int kind) {
-    for(final PathNode child : node.children) {
-      if(child.kind == kind && child.name == name) return child;
-    }
-    return null;
   }
 
   // Traverse Index ===============================================================================
@@ -224,7 +210,7 @@ public final class PathIndex implements Index {
     final ArrayList<PathNode> list = new ArrayList<>();
     for(final PathNode node : nodes) {
       for(final PathNode child : node.children) {
-        if(desc) child.addDesc(list);
+        if(desc) child.addDesc(list, -1);
         else if(!list.contains(child)) list.add(child);
       }
     }
@@ -305,7 +291,7 @@ public final class PathIndex implements Index {
       for(final PathNode node : nodes) {
         if(node.name != id || node.kind != kind) continue;
         for(final PathNode child : node.children) {
-          if(desc) child.addDesc(list);
+          if(desc) child.addDesc(list, -1);
           else list.add(child);
         }
       }

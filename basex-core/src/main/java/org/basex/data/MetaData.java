@@ -70,12 +70,12 @@ public final class MetaData {
   public String ftinclude;
   /** Full-text index: string values of mixed-content elements. */
   public boolean ftmixed;
-  /** Full-text index: numbers of segments, oldest first ({@code null} if not segmented). */
-  public String ftsegments;
-  /** Full-text index: log length, references, covered IDs ({@code null} if not segmented). */
-  public String ftbuffer;
   /** Full-text index: indicates if unsegmented index will be adopted as first segment. */
   public boolean ftadopt;
+  /** Updatable indexes: numbers of segments, oldest first ({@code -1}: base structure). */
+  public final EnumMap<IndexType, String> segments = new EnumMap<>(IndexType.class);
+  /** Updatable indexes: log length, references, covered IDs, and index-specific values. */
+  public final EnumMap<IndexType, String> buffers = new EnumMap<>(IndexType.class);
 
   /** Flag for full-text stemming. */
   public boolean stemming;
@@ -116,6 +116,8 @@ public final class MetaData {
   public int size;
   /** Last (highest) ID assigned to a node of a closed database (see {@link Data#lastid}). */
   public int lastid = -1;
+  /** Committed length of the ID-PRE log ({@code 0} if there is no log). */
+  public long idplog;
 
 
   /** Database directory. Set to {@code null} if database is in main memory. */
@@ -156,6 +158,7 @@ public final class MetaData {
     ndocs = meta.ndocs;
     size = meta.size;
     lastid = meta.lastid;
+    idplog = meta.idplog;
     textindex = meta.textindex;
     attrindex = meta.attrindex;
     tokenindex = meta.tokenindex;
@@ -171,9 +174,9 @@ public final class MetaData {
     tokeninclude = meta.tokeninclude;
     ftinclude = meta.ftinclude;
     ftmixed = meta.ftmixed;
-    ftsegments = meta.ftsegments;
-    ftbuffer = meta.ftbuffer;
     ftadopt = meta.ftadopt;
+    segments.putAll(meta.segments);
+    buffers.putAll(meta.buffers);
     stemming = meta.stemming;
     casesens = meta.casesens;
     diacritics = meta.diacritics;
@@ -529,6 +532,7 @@ public final class MetaData {
         case DBMAXLEN -> maxlen = toInt(v);
         case DBMAXCATS -> maxcats = toInt(v);
         case DBLASTID -> lastid = toInt(v);
+        case DBIDPLOG -> idplog = toLong(v);
         case DBTIME -> time = toLong(v);
         case DBFSIZE -> inputsize = toLong(v);
         case DBFTDC -> diacritics = isTrue(v);
@@ -543,8 +547,14 @@ public final class MetaData {
         case DBTOKINC -> tokeninclude = v;
         case DBFTXINC -> ftinclude = v;
         case DBFTMIX -> ftmixed = isTrue(v);
-        case DBFTXSEGS -> ftsegments = v;
-        case DBFTXBUF -> ftbuffer = v;
+        case DBFTXSEGS -> segments.put(IndexType.FULLTEXT, v);
+        case DBFTXBUF -> buffers.put(IndexType.FULLTEXT, v);
+        case DBTXTSEGS -> segments.put(IndexType.TEXT, v);
+        case DBTXTBUF -> buffers.put(IndexType.TEXT, v);
+        case DBATVSEGS -> segments.put(IndexType.ATTRIBUTE, v);
+        case DBATVBUF -> buffers.put(IndexType.ATTRIBUTE, v);
+        case DBTOKSEGS -> segments.put(IndexType.TOKEN, v);
+        case DBTOKBUF -> buffers.put(IndexType.TOKEN, v);
         case DBCRTTXT -> createtext = isTrue(v);
         case DBCRTATV -> createattr = isTrue(v);
         case DBCRTTOK -> createtoken = isTrue(v);
@@ -597,8 +607,15 @@ public final class MetaData {
     writeInfo(out, DBTOKINC,   tokeninclude);
     writeInfo(out, DBFTXINC,   ftinclude);
     writeInfo(out, DBFTMIX,    ftmixed);
-    if(ftsegments != null) writeInfo(out, DBFTXSEGS, ftsegments);
-    if(ftbuffer != null) writeInfo(out, DBFTXBUF, ftbuffer);
+    final String[][] keys = { { DBFTXSEGS, DBFTXBUF }, { DBTXTSEGS, DBTXTBUF },
+      { DBATVSEGS, DBATVBUF }, { DBTOKSEGS, DBTOKBUF } };
+    final IndexType[] values = { IndexType.FULLTEXT, IndexType.TEXT, IndexType.ATTRIBUTE,
+      IndexType.TOKEN };
+    for(int t = 0; t < values.length; t++) {
+      final String segs = segments.get(values[t]), buffer = buffers.get(values[t]);
+      if(segs != null) writeInfo(out, keys[t][0], segs);
+      if(buffer != null) writeInfo(out, keys[t][1], buffer);
+    }
     writeInfo(out, DBCRTTXT,   createtext);
     writeInfo(out, DBCRTATV,   createattr);
     writeInfo(out, DBCRTTOK,   createtoken);
@@ -618,18 +635,18 @@ public final class MetaData {
       writeInfo(out, DBOPTIMIZED, String.join(",", types.finish()));
     }
     writeInfo(out, DBLASTID,   lastid);
+    if(idplog != 0) writeInfo(out, DBIDPLOG, idplog);
     final Language ln = language();
     if(ln != null) writeInfo(out, DBFTLN, ln.toString());
     out.write(0);
   }
 
   /**
-   * Indicates if the full-text index can be stored in the old format, which older versions can
-   * read: a segmented index holds node IDs, and a mixed-content index element references.
+   * Indicates if the indexes can be stored in the old format, which older versions can read.
    * @return result of check
    */
   public boolean legacy() {
-    return ftsegments == null && !(ftindex && ftmixed);
+    return !(ftindex && ftmixed) && segments.isEmpty() && idplog == 0;
   }
 
   /**
@@ -653,7 +670,7 @@ public final class MetaData {
       tokenindex = false;
     }
     // only a segmented, or adoptable, full-text index survives updates
-    if(ftsegments == null && !ftadopt) ftindex = false;
+    if(!segments.containsKey(IndexType.FULLTEXT) && !ftadopt) ftindex = false;
   }
 
   /**

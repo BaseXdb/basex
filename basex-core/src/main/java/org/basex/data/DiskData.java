@@ -86,9 +86,10 @@ public final class DiskData extends Data {
     init();
     if(meta.updindex) {
       idmap = new IdPreMap(meta.dbFile(DATAIDP));
-      if(meta.textindex) textIndex = new UpdatableDiskValues(this, IndexType.TEXT);
-      if(meta.attrindex) attrIndex = new UpdatableDiskValues(this, IndexType.ATTRIBUTE);
-      if(meta.tokenindex) tokenIndex = new UpdatableDiskValues(this, IndexType.TOKEN);
+      if(meta.idplog != 0) idmap.replay(meta.dbFile(DATAIDPLOG), meta.idplog);
+      if(meta.textindex) textIndex = new SegmentedValues(this, IndexType.TEXT);
+      if(meta.attrindex) attrIndex = new SegmentedValues(this, IndexType.ATTRIBUTE);
+      if(meta.tokenindex) tokenIndex = new SegmentedValues(this, IndexType.TOKEN);
     } else {
       if(meta.textindex) textIndex = new DiskValues(this, IndexType.TEXT);
       if(meta.attrindex) attrIndex = new DiskValues(this, IndexType.ATTRIBUTE);
@@ -131,9 +132,10 @@ public final class DiskData extends Data {
 
   /**
    * Writes all meta data to disk and deletes the files of outdated indexes.
+   * @param close database is closed
    * @throws IOException I/O exception
    */
-  private void write() throws IOException {
+  private void write(final boolean close) throws IOException {
     // close outdated indexes, delete their files after the meta data has been written
     final IndexType[] types = IndexType.VALUE_INDEXES;
     final Index[] outdated = new Index[types.length];
@@ -144,10 +146,16 @@ public final class DiskData extends Data {
         close(types[t]);
       }
     }
+    // a closed database has no ID-PRE log
+    final boolean log = meta.idplog != 0;
+    if(close && log) meta.dirty = true;
     if(!meta.dirty) return;
     meta.size = nodes();
     meta.lastid = lastid;
 
+    // the metadata contains the committed length of the log: write it last
+    meta.idplog = meta.updindex && idmap != null ? idmap.write(meta.dbFile(DATAIDP),
+        meta.dbFile(DATAIDPLOG), meta.idplog, close) : 0;
     final boolean legacy = legacy();
     try(DataOutput out = new DataOutput(meta.dbFile(DATAINF))) {
       meta.write(out, legacy ? OLDSTORAGE : STORAGE);
@@ -163,8 +171,7 @@ public final class DiskData extends Data {
       resources.write(out);
       out.write(0);
     }
-    // file may be missing if flag was just enabled
-    if(meta.updindex && idmap != null) idmap.write(meta.dbFile(DATAIDP));
+    if(log && meta.idplog == 0) meta.dbFile(DATAIDPLOG).delete();
     meta.dirty = false;
     // files that cannot be deleted are ignored: they will be overwritten when an index is created
     for(final Index index : outdated) {
@@ -186,8 +193,8 @@ public final class DiskData extends Data {
     super.close();
     try {
       // flush the indexes first, as they may update the meta data
-      for(final ValueIndex index : valueIndexes()) index.flush();
-      write();
+      for(final ValueIndex index : valueIndexes()) index.flush(true);
+      write(true);
       table.close();
       texts.close();
       values.close();
@@ -289,8 +296,8 @@ public final class DiskData extends Data {
       table.flush(all);
       if(all) {
         // flush the indexes first, as they may update the meta data
-        for(final ValueIndex index : valueIndexes()) index.flush();
-        write();
+        for(final ValueIndex index : valueIndexes()) index.flush(false);
+        write(false);
         texts.flush();
         values.flush();
       }

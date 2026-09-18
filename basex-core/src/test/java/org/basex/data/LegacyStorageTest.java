@@ -30,8 +30,9 @@ public final class LegacyStorageTest extends SandboxTest {
   /** Database files that version 12 knows. */
   private static final Pattern FILES =
       Pattern.compile("(inf|tbli?|txt[lr]?|atv[lr]?|tok[lr]|ftx[xyz]|swl|pth|idp)\\.basex");
-  /** Meta keys of segmented indexes. */
-  private static final String[] SEGMENT_KEYS = { DataText.DBFTXSEGS, DataText.DBFTXBUF };
+  /** Meta keys of segmented indexes and logs. */
+  private static final String[] SEGMENT_KEYS =
+    { DataText.DBFTXSEGS, DataText.DBFTXBUF, DataText.DBIDPLOG };
   /** Test document. */
   private static final String DOC =
       "<x><a>first entry</a><b id='b'>second entry</b><c>third one</c></x>";
@@ -255,6 +256,105 @@ public final class LegacyStorageTest extends SandboxTest {
     execute(new Close());
     query("namespace-uri-for-prefix('h', " + _DB_GET.args(NAME) + "//*:new)", "urn:h");
     query("namespace-uri-for-prefix('f', " + _DB_GET.args(NAME) + "//*:low)", "urn:f");
+  }
+
+  /**
+   * Updates an opened database: the ID-PRE map is logged, replayed when a copy is opened,
+   * and written completely when the database is closed.
+   * @throws IOException I/O exception
+   */
+  @Test public void idPreLog() throws IOException {
+    create(true, Indexes.VALUES, DOC);
+    final IOFile db = context.soptions.dbPath(NAME), log = new IOFile(db, "idpl.basex");
+    final String ids = _DB_GET.args(NAME) + "//node() ! " + _DB_NODE_ID.args(" .");
+    execute(new Open(NAME));
+    query("insert node <n>new</n> as first into " + _DB_GET.args(NAME) + "/x");
+    assertTrue(log.exists());
+    assertTrue(meta().containsKey(DataText.DBIDPLOG));
+    storage(false);
+
+    // open a copy of the committed files
+    final String copy = NAME + "copy";
+    final IOFile trg = context.soptions.dbPath(copy);
+    try {
+      for(final IOFile file : db.children()) file.copyTo(new IOFile(trg, file.name()));
+      assertEquals(query(ids), query(ids.replace(NAME, copy)));
+      query(_DB_GET.args(copy) + "//c ! " + _DB_NODE_ID.args(" .") + " ! " +
+          _DB_GET_ID.args(copy, " .") + " ! string()", "third one");
+    } finally {
+      execute(new DropDB(copy));
+    }
+
+    execute(new Close());
+    assertFalse(log.exists());
+    storage(true);
+  }
+
+  /**
+   * Opens a database with value indexes that was created and incrementally updated with version
+   * 12, and updates it.
+   * @throws IOException I/O exception
+   */
+  @Test public void oldVersionUpdated() throws IOException {
+    copy("v12upd");
+    query(_DB_INFO.args(NAME) + "//updindex/text()", true);
+    // node IDs and PRE values differ; version 12 maps some IDs of deleted nodes to PRE values
+    query(_DB_NODE_ID.args(" (" + _DB_GET.args(NAME) + "//node())[300]"), 630);
+    checkIndexes(false);
+
+    // update the opened database: new and changed values are buffered, anchors are pinned
+    execute(new Open(NAME));
+    final String items = _DB_GET.args(NAME, "a.xml") + "//item";
+    query("delete node (" + items + ")[position() mod 3 = 1]");
+    query("for $n at $p in (" + items + ")[position() mod 4 = 0] return insert node " +
+        "<item t='a{ $p mod 5 } q'>v{ $p mod 7 }</item> after $n");
+    query("for $t in (" + items + ")[position() mod 5 = 2]/text() return " +
+        "replace value of node $t with 's' || string-length($t)");
+    query("for $a in (" + items + ")[position() mod 6 = 3]/@t return " +
+        "replace value of node $a with 'b2 ' || $a");
+    query("for $n in (" + items + ")[position() mod 7 = 4] return rename node $n as 'moved'");
+    query(_DB_DELETE.args(NAME, "c.xml"));
+    checkIndexes(false);
+
+    // small database: the indexes are restored in the layout of version 12
+    execute(new Close());
+    storage(true);
+    checkIndexes(false);
+
+    query(_DB_OPTIMIZE.args(NAME));
+    checkIndexes(false);
+    // new node IDs: the unassigned IDs are no longer mapped
+    query(_DB_OPTIMIZE.args(NAME, true));
+    checkIndexes(true);
+  }
+
+  /**
+   * Checks the test database: it passes the inspection, and the lookups of the text, attribute
+   * and token index match full scans, for present values and for values that have been removed.
+   * @param idPre check if unassigned IDs are mapped to PRE values
+   */
+  private static void checkIndexes(final boolean idPre) {
+    query(_DB_INSPECT.args(NAME) + "?issues[" + idPre + "() or ?check != 'id-pre'] ! " +
+        "(?check || ': ' || ?count)", "");
+    query("let $db := '" + NAME + "'\n" +
+      "let $root := db:get($db)\n" +
+      "let $old := (\n" +
+      "  (0 to 30) ! ('v' || .), (0 to 9) ! ('w' || .), (0 to 9) ! ('r' || .),\n" +
+      "  (0 to 9) ! ('s' || .), (0 to 6) ! ('a' || .), (0 to 3) ! ('b' || .),\n" +
+      "  (0 to 4) ! ('c' || .), (0 to 5) ! ('k' || .), 'q', 'z'\n" +
+      ")\n" +
+      "let $pres := fn($nodes) { string-join($nodes ! db:node-pre(.), ',') }\n" +
+      "return (\n" +
+      "  for $v in distinct-values(($root//text(), $old))\n" +
+      "  where $pres(db:text($db, $v)) != $pres($root//text()[. = $v])\n" +
+      "  return 'text: ' || $v,\n" +
+      "  for $v in distinct-values(($root//@*, $old))\n" +
+      "  where $pres(db:attribute($db, $v)) != $pres($root//@*[. = $v])\n" +
+      "  return 'attribute: ' || $v,\n" +
+      "  for $v in distinct-values(($root//@* ! tokenize(.), $old))\n" +
+      "  where $pres(db:token($db, $v)) != $pres($root//@*[contains-token(., $v)])\n" +
+      "  return 'token: ' || $v\n" +
+      ")", "");
   }
 
   /**

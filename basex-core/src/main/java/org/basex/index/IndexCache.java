@@ -82,35 +82,6 @@ public final class IndexCache {
   }
 
   /**
-   * Deletes a cached entry.
-   * @param key key
-   */
-  public void delete(final byte[] key) {
-    final int hash = Token.hashCode(key);
-    rwl.writeLock().lock();
-
-    try {
-      purge();
-      final int i = indexFor(hash, buckets.length);
-      BucketEntry e = buckets[i], prev = e;
-      while(e != null) {
-        final BucketEntry next = e.next;
-        final IndexEntry entry = e.get();
-        if(entry == null) {
-          delete(i, e, prev, next);
-        } else if(e.hash == hash && Token.eq(entry.key, key)) {
-          delete(i, e, prev, next);
-          break;
-        }
-        prev = e;
-        e = next;
-      }
-    } finally {
-      rwl.writeLock().unlock();
-    }
-  }
-
-  /**
    * Purges stale entries from the cache.
    */
   private void purge() {

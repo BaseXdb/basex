@@ -101,7 +101,7 @@ public abstract class FTIndexIterator implements IndexIterator {
       }
 
       @Override
-      public synchronized int size() {
+      public int size() {
         int c = 0;
         for(final FTIndexIterator iter : iters) c += iter.size();
         return c;
@@ -172,7 +172,7 @@ public abstract class FTIndexIterator implements IndexIterator {
       }
 
       @Override
-      public synchronized int size() {
+      public int size() {
         return Math.min(i1.size(), i2.size());
       }
 

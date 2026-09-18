@@ -2,18 +2,14 @@ package org.basex.index.ft;
 
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.util.*;
-import java.util.function.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
-import org.basex.util.list.*;
 
 /**
  * This class contains common methods for full-text index builders.
@@ -81,10 +77,11 @@ public final class FTBuilder extends IndexBuilder {
       final boolean segmented = ids && !FTIndex.unnumbered(data);
       if(segmented && size == 0) {
         // empty database: the first update will write the first segment
-        meta.ftsegments = "";
+        meta.segments.put(IndexType.FULLTEXT, "");
       } else {
         build(0, size, segmented ? FTIndex.segment(0) : DATAFTX);
-        meta.ftsegments = segmented ? "0" : null;
+        if(segmented) meta.segments.put(IndexType.FULLTEXT, "0");
+        else meta.segments.remove(IndexType.FULLTEXT);
       }
       finishIndex();
       return new FTIndex(data);
@@ -115,7 +112,7 @@ public final class FTBuilder extends IndexBuilder {
       writeIndex(partial(splits));
       final String[] inputs = new String[splits];
       for(int s = 0; s < splits; s++) inputs[s] = partial(s);
-      merge(data, inputs, prefix, null);
+      merge(data, inputs, prefix);
       for(final String input : inputs) drop(data, input);
     }
   }
@@ -192,96 +189,17 @@ public final class FTBuilder extends IndexBuilder {
   }
 
   /**
-   * Merges index structures, skipping dead references and sorting the remaining ones if liveness
-   * tests are specified, and keeping all references in input order otherwise.
+   * Merges partial index structures, keeping all references in input order.
    * @param data data reference
    * @param inputs file prefixes of the input index structures
    * @param output file prefix of the output index structure
-   * @param live liveness tests for the references of each input (can be {@code null})
    * @throws IOException I/O exception
    */
-  static void merge(final Data data, final String[] inputs, final String output,
-      final IntPredicate[] live) throws IOException {
-
-    // open all sorted lists
-    final int il = inputs.length;
-    final FTList[] lists = new FTList[il];
+  private static void merge(final Data data, final String[] inputs, final String output)
+      throws IOException {
     try(FTSegmentWriter writer = new FTSegmentWriter(data, output)) {
-      for(int i = 0; i < il; i++) lists[i] = new FTList(data, inputs[i]);
-
-      final IntList list = new IntList(), ids = new IntList(), poss = new IntList();
-      while(true) {
-        // find next token to write on disk, and all lists that contain it
-        list.reset();
-        byte[] token = EMPTY;
-        for(int i = 0; i < il; i++) {
-          final byte[] tok = lists[i].token;
-          if(tok.length == 0) continue;
-          final int d = token.length == 0 ? -1 : FTIndex.compare(tok, token);
-          if(d < 0) {
-            token = tok;
-            list.reset();
-          }
-          if(d <= 0) list.add(i);
-        }
-        if(token.length == 0) break;
-
-        // collect the references of the token
-        ids.reset();
-        poss.reset();
-        final int ls = list.size();
-        for(int l = 0; l < ls; l++) {
-          final FTList ftl = lists[list.get(l)];
-          final IntPredicate lv = live != null ? live[list.get(l)] : null;
-          final int[] prv = ftl.prv, pov = ftl.pov;
-          final int pl = prv.length;
-          for(int p = 0; p < pl; p++) {
-            final int id = prv[p];
-            if(lv == null || lv.test(id)) {
-              ids.add(id);
-              poss.add(pov[p]);
-            }
-          }
-          ftl.next();
-        }
-        if(ids.isEmpty()) continue;
-
-        if(live != null) sort(ids, poss);
-        writer.write(token, ids, poss);
-      }
-    } finally {
-      for(final FTList ftl : lists) {
-        if(ftl != null) ftl.close();
-      }
-    }
-  }
-
-  /**
-   * Packs references into long values that sort by ID and position.
-   * @param ids IDs
-   * @param poss positions
-   * @return packed references
-   */
-  static long[] pack(final IntList ids, final IntList poss) {
-    final int is = ids.size();
-    final long[] values = new long[is];
-    for(int i = 0; i < is; i++) values[i] = (long) ids.get(i) << 32 | poss.get(i);
-    return values;
-  }
-
-  /**
-   * Sorts references by ID and position.
-   * @param ids IDs
-   * @param poss positions
-   */
-  static void sort(final IntList ids, final IntList poss) {
-    final long[] values = pack(ids, poss);
-    Arrays.sort(values);
-    final int is = ids.size();
-    for(int i = 0; i < is; i++) {
-      final long v = values[i];
-      ids.set(i, (int) (v >> 32));
-      poss.set(i, (int) v);
+      SegmentedIndex.merge(inputs.length, i -> new FTList(data, inputs[i]), writer,
+        FTIndex::compare, null);
     }
   }
 

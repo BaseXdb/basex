@@ -1,7 +1,5 @@
 package org.basex.index.value;
 
-import static org.basex.util.Token.*;
-
 import java.util.*;
 
 import org.basex.data.*;
@@ -15,31 +13,9 @@ import org.basex.util.list.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class ValueCache implements Iterable<byte[]> {
-  /** Keys. */
-  private final TokenSet keys = new TokenSet();
-  /** IDs. */
-  private final ArrayList<IntList> ids = new ArrayList<>();
-  /** Positions. */
-  private final ArrayList<IntList> pos;
-
-  /**
-   * Constructor for an empty cache.
-   * @param type index type
-   */
-  ValueCache(final IndexType type) {
-    pos = type == IndexType.TOKEN ? new ArrayList<>() : null;
-  }
-
-  /**
-   * Caches the text and ID for a node with specified PRE value.
-   * @param pre PRE value
-   * @param type index type
-   * @param data data reference
-   */
-  public ValueCache(final int pre, final IndexType type, final Data data) {
-    this(new IntList(1).add(pre), type, data);
-  }
+final class ValueCache implements Iterable<byte[]> {
+  /** IDs, indexed by keys. */
+  private final TokenObjectMap<IntList> ids = new TokenObjectMap<>();
 
   /**
    * Caches all texts and IDs in the specified database range.
@@ -48,7 +24,7 @@ public final class ValueCache implements Iterable<byte[]> {
    * @param type index type
    * @param data data reference
    */
-  public ValueCache(final int pre, final int size, final IndexType type, final Data data) {
+  ValueCache(final int pre, final int size, final IndexType type, final Data data) {
     this(pres(pre, size), type, data);
   }
 
@@ -58,22 +34,15 @@ public final class ValueCache implements Iterable<byte[]> {
    * @param type index type
    * @param data data reference
    */
-  public ValueCache(final IntList pres, final IndexType type, final Data data) {
-    this(type);
+  ValueCache(final IntList pres, final IndexType type, final Data data) {
     final IndexNames in = new IndexNames(type, data);
-    final boolean text = type == IndexType.TEXT;
     final int pl = pres.size();
     for(int p = 0; p < pl; p++) {
       final int pre = pres.get(p);
       if(in.unit(pre)) {
-        if(type == IndexType.TOKEN) {
-          int ps = 0;
-          for(final byte[] token : distinctTokens(data.text(pre, false))) {
-            addId(token, pre, ps++, data);
-          }
-        } else if(data.textLen(pre, text) <= data.meta.maxlen) {
-          addId(data.text(pre, text), pre, 0, data);
-        }
+        final int id = data.id(pre);
+        ValueIndex.keys(data, type, pre,
+            (key, pos) -> ids.computeIfAbsent(key, IntList::new).add(id));
       }
     }
   }
@@ -92,90 +61,12 @@ public final class ValueCache implements Iterable<byte[]> {
   }
 
   /**
-   * Adds a single node ID and position.
-   * @param text text
-   * @param pre PRE value
-   * @param ps position
-   * @param data data reference
-   */
-  private void addId(final byte[] text, final int pre, final int ps, final Data data) {
-    add(text, data.id(pre), ps);
-  }
-
-  /**
-   * Adds a single ID and position.
-   * @param text text
-   * @param id ID
-   * @param ps position
-   */
-  void add(final byte[] text, final int id, final int ps) {
-    final int i = keys.put(text) - 1;
-    final boolean exists = i < ids.size();
-
-    IntList list;
-    if(exists) {
-      list = ids.get(i);
-    } else {
-      list = new IntList(1);
-      ids.add(list);
-    }
-    list.add(id);
-
-    if(pos != null) {
-      if(exists) {
-        list = pos.get(i);
-      } else {
-        list = new IntList(1);
-        pos.add(list);
-      }
-      list.add(ps);
-    }
-  }
-
-  /**
-   * Removes a single ID and position, if it is cached.
-   * @param text text
-   * @param id ID
-   * @param ps position
-   * @return {@code true} if the entry was removed
-   */
-  boolean remove(final byte[] text, final int id, final int ps) {
-    final int i = keys.index(text) - 1;
-    if(i < 0) return false;
-    final IntList list = ids.get(i), pl = pos != null ? pos.get(i) : null;
-    final int ls = list.size();
-    for(int l = 0; l < ls; l++) {
-      if(list.get(l) == id && (pl == null || pl.get(l) == ps)) {
-        list.remove(l);
-        if(pl != null) pl.remove(l);
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
-   * Checks if the cache contains no entries.
-   * @return result of check
-   */
-  public boolean isEmpty() {
-    for(final IntList list : ids) {
-      if(!list.isEmpty()) return false;
-    }
-    return true;
-  }
-
-  /**
-   * Returns an iterator with all keys that have entries, in sorted order.
+   * Returns an iterator with all keys, in sorted order.
    * @return keys iterator
    */
   @Override
   public Iterator<byte[]> iterator() {
-    final TokenList list = new TokenList();
-    for(final byte[] key : keys) {
-      if(!ids(key).isEmpty()) list.add(key);
-    }
-    return list.sort().iterator();
+    return new TokenList(ids).sort().iterator();
   }
 
   /**
@@ -184,15 +75,6 @@ public final class ValueCache implements Iterable<byte[]> {
    * @return ID list
    */
   IntList ids(final byte[] key) {
-    return ids.get(keys.index(key) - 1);
-  }
-
-  /**
-   * Returns the position list for the specified key.
-   * @param key key
-   * @return ID list or {@code null}
-   */
-  IntList pos(final byte[] key) {
-    return pos != null ? pos.get(keys.index(key) - 1) : null;
+    return ids.get(key);
   }
 }

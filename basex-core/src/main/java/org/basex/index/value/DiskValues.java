@@ -5,7 +5,6 @@ import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.util.concurrent.atomic.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
@@ -24,17 +23,17 @@ import org.basex.util.list.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class DiskValues extends ValueIndex {
+public final class DiskValues extends ValueIndex {
   /** ID references. */
-  final DataAccess idxr;
+  private final DataAccess idxr;
   /** ID lists. */
-  final DataAccess idxl;
+  private final DataAccess idxl;
   /** Cached index entries: mapping between keys and index entries. */
-  IndexCache cache = new IndexCache();
+  private final IndexCache cache = new IndexCache();
   /** Cached texts: mapping between key positions in the reference file, and the indexed texts. */
-  final IntObjectMap<byte[]> ctext = new IntObjectMap<>();
+  private final IntObjectMap<byte[]> ctext = new IntObjectMap<>();
   /** Number of current index entries. */
-  final AtomicInteger size = new AtomicInteger();
+  private final int size;
 
   /** Synchronization object. */
   private final Object monitor = new Object();
@@ -46,25 +45,15 @@ public class DiskValues extends ValueIndex {
    * @throws IOException I/O exception
    */
   public DiskValues(final Data data, final IndexType type) throws IOException {
-    this(data, type, fileSuffix(type));
-  }
-
-  /**
-   * Constructor, initializing the index structure.
-   * @param data data reference
-   * @param type index type
-   * @param prefix file prefix
-   * @throws IOException I/O exception
-   */
-  DiskValues(final Data data, final IndexType type, final String prefix) throws IOException {
     super(data, type);
+    final String prefix = fileSuffix(type);
     idxl = new DataAccess(data.meta.dbFile(prefix + 'l'));
     idxr = new DataAccess(data.meta.dbFile(prefix + 'r'));
-    size.set(idxl.read4());
+    size = idxl.read4();
   }
 
   @Override
-  public final byte[] info(final MainOptions options) {
+  public byte[] info(final MainOptions options) {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(LI_STRUCTURE).add(SORTED_LIST).add(NL);
     tb.add(LI_NAMES).add(data.meta.names(type)).add(NL);
@@ -85,20 +74,19 @@ public class DiskValues extends ValueIndex {
   }
 
   @Override
-  public final int size() {
-    return size.get();
+  public int size() {
+    return size;
   }
 
   @Override
-  public final IndexCosts costs(final IndexSearch search) {
-    return IndexCosts.get(
-      search instanceof StringRange ? Math.max(1, data.nodes() / 10) :
-      search instanceof NumericRange ? Math.max(1, data.nodes() / 3) :
-      entry(search.token()).size);
+  public IndexCosts costs(final IndexSearch search) {
+    if(search instanceof StringRange) return IndexCosts.get(Math.max(1, data.nodes() / 10));
+    if(search instanceof NumericRange) return IndexCosts.get(Math.max(1, data.nodes() / 3));
+    return IndexCosts.exact(entry(search.token()).size);
   }
 
   @Override
-  public final IndexIterator iter(final IndexSearch search) {
+  public IndexIterator iter(final IndexSearch search) {
     final IntList pres;
     if(search instanceof final StringRange range) {
       pres = idRange(range);
@@ -109,34 +97,16 @@ public class DiskValues extends ValueIndex {
       pres = pres(ie.size, ie.offset);
     }
 
-    return new IndexIterator() {
-      final int sz = pres.size();
-      int c;
-
-      @Override
-      public boolean more() {
-        return c < sz;
-      }
-
-      @Override
-      public int pre() {
-        return pres.get(c++);
-      }
-
-      @Override
-      public int size() {
-        return sz;
-      }
-    };
+    return IndexIterator.get(pres.finish());
   }
 
   @Override
-  public final boolean drop() {
+  public boolean drop() {
     return data.meta.drop(fileSuffix(type) + '.');
   }
 
   @Override
-  public final void close() {
+  public void close() {
     synchronized(monitor) {
       idxl.close();
       idxr.close();
@@ -144,17 +114,7 @@ public class DiskValues extends ValueIndex {
   }
 
   @Override
-  public void add(final ValueCache values) {
-    throw Util.notExpected();
-  }
-
-  @Override
-  public void delete(final ValueCache values) {
-    throw Util.notExpected();
-  }
-
-  @Override
-  public final EntryIterator entries(final IndexEntries entries) {
+  public EntryIterator entries(final IndexEntries entries) {
     final byte[] token = entries.token();
     if(token.length == 0) return keys(0, size(), entries.descending);
     if(entries.prefix) return keys(token);
@@ -165,19 +125,7 @@ public class DiskValues extends ValueIndex {
   }
 
   @Override
-  public void flush() {
-    idxl.flush();
-    idxr.flush();
-  }
-
-  /**
-   * Returns the PRE value for the specified ID.
-   * @param id ID value
-   * @return PRE value
-   */
-  protected int pre(final int id) {
-    return id;
-  }
+  public void flush(final boolean close) { }
 
   /**
    * Binary search for key in the {@code idxr} reference file.
@@ -185,20 +133,8 @@ public class DiskValues extends ValueIndex {
    * @param key token to be found
    * @return index of the key, or (-(insertion point) - 1)
    */
-  protected final int get(final byte[] key) {
-    return get(key, 0, size());
-  }
-
-  /**
-   * Binary search for key in the {@code #idxr} reference file.
-   * <p><em>Important:</em> This method is thread-safe.</p>
-   * @param key token to be found
-   * @param first begin of the search interval (inclusive)
-   * @param last end of the search interval (exclusive)
-   * @return index of the key, or (-(insertion point) - 1)
-   */
-  protected final int get(final byte[] key, final int first, final int last) {
-    int l = first, h = last - 1;
+  private int get(final byte[] key) {
+    int l = 0, h = size - 1;
     synchronized(monitor) {
       while(l <= h) {
         final int m = l + h >>> 1;
@@ -326,19 +262,10 @@ public class DiskValues extends ValueIndex {
     final long pos = idxr.read5(index * 5L);
     final int count = idxl.readNum(pos);
     if(key == null) {
-      key = count == 0 ? pinned(index) : key(idxl.readNum());
+      key = key(idxl.readNum());
       ctext.put(index, key);
     }
     return cache.add(key, count, pos + Num.length(count));
-  }
-
-  /**
-   * Returns the key of an entry without IDs, which cannot be derived from a node.
-   * @param index key position
-   * @return key
-   */
-  protected byte[] pinned(final int index) {
-    throw Util.notExpected("No IDs for key %.", index);
   }
 
   /**
@@ -348,16 +275,11 @@ public class DiskValues extends ValueIndex {
    * @param offset offset
    * @return sorted PRE values
    */
-  protected IntList pres(final int sz, final long offset) {
+  private IntList pres(final int sz, final long offset) {
     final IntList pres = new IntList(sz);
     synchronized(monitor) {
       idxl.cursor(offset);
-      for(int i = 0, id = 0; i < sz; i++) {
-        id += idxl.readNum();
-        // token index: skip position
-        if(type == IndexType.TOKEN) idxl.readNum();
-        pres.add(pre(id));
-      }
+      ValueSource.refs(idxl, sz, type == IndexType.TOKEN, pres, null);
     }
     return pres;
   }
@@ -369,7 +291,6 @@ public class DiskValues extends ValueIndex {
    * @return results
    */
   private IntList idRange(final StringRange tok) {
-    // check if min and max are positive integers with the same number of digits
     final IntList pres = new IntList();
     synchronized(monitor) {
       final int i = get(tok.min());
@@ -382,7 +303,7 @@ public class DiskValues extends ValueIndex {
         if(diff > 0 || !tok.mxi() && diff == 0) break;
         // add PRE values
         for(int c = 0; c < count; c++) {
-          pres.add(pre(id));
+          pres.add(id);
           id += idxl.readNum();
         }
       }
@@ -408,17 +329,15 @@ public class DiskValues extends ValueIndex {
       final boolean text = type == IndexType.TEXT;
       for(int index = 0; index < entries; index++) {
         final int count = idxl.readNum(idxr.read5(index * 5L));
-        int id = idxl.readNum();
-        final int pre = pre(id);
-
-        final double v = data.textDbl(pre, text);
+        final int first = idxl.readNum();
+        final double v = data.textDbl(first, text);
         if(v >= min && v <= max) {
           // value is in range
-          for(int c = 0; c < count; c++) {
-            pres.add(pre(id));
-            id += idxl.readNum();
+          for(int c = 0, pre = first; c < count; c++) {
+            pres.add(pre);
+            pre += idxl.readNum();
           }
-        } else if(simple && v > max && data.textLen(pre, text) == len) {
+        } else if(simple && v > max && data.textLen(first, text) == len) {
           // if limits are integers, if min, max and current value have the same
           // string length, and if current value is larger than max, test can be
           // skipped, as all remaining values will be bigger
@@ -435,17 +354,12 @@ public class DiskValues extends ValueIndex {
    * @return key token
    */
   private byte[] key(final int id) {
-    final byte[] text = data.text(pre(id), type == IndexType.TEXT);
+    final byte[] text = data.text(id, type == IndexType.TEXT);
     return type == IndexType.TOKEN ? distinctTokens(text)[idxl.readNum()] : text;
   }
 
-  /**
-   * Returns a string representation of the index structure.
-   * @param all include database contents in the representation. During updates, database lookups
-   *        must be avoided, as the data structures will be inconsistent
-   * @return string
-   */
-  public final String toString(final boolean all) {
+  @Override
+  public String toString() {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(type).add(" INDEX, '").add(data.meta.name).add("':\n");
     final int entries = size();
@@ -454,25 +368,14 @@ public class DiskValues extends ValueIndex {
       final int count = idxl.readNum(pos);
       int id = idxl.readNum();
       tb.add("  ").addInt(index).add(". offset: ").addLong(pos);
-      if(all) {
-        tb.add(", key: \"").add(key(id)).add('"');
-        tb.add(", ids").add("/pres").add(": ").addInt(id).add('/').addInt(pre(id));
-      } else {
-        tb.add(", ids").add(": ").addInt(id);
-      }
+      tb.add(", ids: ").addInt(id);
       for(int c = 1; c < count; c++) {
         id += idxl.readNum();
         tb.add(",").addInt(id);
-        if(all) tb.add('/').addInt(pre(id));
       }
       tb.add("\n");
     }
     return tb.toString();
-  }
-
-  @Override
-  public String toString() {
-    return toString(false);
   }
 
   /**

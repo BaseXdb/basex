@@ -3,6 +3,7 @@ package org.basex.index.ft;
 import java.io.*;
 
 import org.basex.data.*;
+import org.basex.index.*;
 import org.basex.io.out.DataOutput;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -14,7 +15,7 @@ import org.basex.util.list.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-final class FTSegmentWriter implements Closeable {
+final class FTSegmentWriter implements SegmentWriter {
   /** Token length index. */
   private final DataOutput outX;
   /** Tokens and references. */
@@ -66,14 +67,9 @@ final class FTSegmentWriter implements Closeable {
     outZ.write(refs, 4, rs - 4);
   }
 
-  /**
-   * Writes a token with references.
-   * @param token token
-   * @param ids ID or PRE values, sorted
-   * @param poss positions
-   * @throws IOException I/O exception
-   */
-  void write(final byte[] token, final IntList ids, final IntList poss) throws IOException {
+  @Override
+  public void write(final byte[] token, final IntList ids, final IntList poss)
+      throws IOException {
     final int count = ids.size();
     entry(token, count);
     for(int c = 0; c < count; c++) {

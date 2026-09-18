@@ -57,18 +57,6 @@ public final class IndexCacheTest {
     assertCacheEntry(key, size, pointer);
   }
 
-  /** Test for method {@link IndexCache#delete(byte[])}. */
-  @Test public void testDelete() {
-    final byte[] key = token("keyDelete");
-    final int size = 10;
-    final long pointer = 12L;
-
-    cache.add(key, size, pointer);
-    cache.delete(key);
-
-    assertNull(cache.get(key));
-  }
-
   /**
    * Test that new records can be continuously added without hitting
    * {@link OutOfMemoryError}.

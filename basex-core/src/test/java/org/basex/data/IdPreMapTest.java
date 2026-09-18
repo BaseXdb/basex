@@ -171,6 +171,72 @@ public final class IdPreMapTest {
     }
   }
 
+  /**
+   * Replaying the log of random operations yields the same map as a complete write.
+   * @throws IOException I/O exception
+   */
+  @Test public void replay() throws IOException {
+    final IOFile file = new IOFile(Prop.TEMPDIR, "IdPreMapTest.idp");
+    final IOFile log = new IOFile(Prop.TEMPDIR, "IdPreMapTest.idpl");
+    try {
+      final IntList ids = new IntList();
+      for(int id = 0; id <= BASEID; id++) ids.add(id);
+      int lastid = BASEID;
+      final IdPreMap map = new IdPreMap(BASEID);
+      long length = map.write(file, log, 0, false);
+      int complete = 0, appended = 0;
+      for(int i = 0; i < ITERATIONS * 5; i++) {
+        final int ops = RANDOM.nextInt(5) + 1;
+        for(int o = 0; o < ops; o++) {
+          final int pre = RANDOM.nextInt(ids.size() + 1);
+          if(RANDOM.nextBoolean() || pre == ids.size()) {
+            final int c = RANDOM.nextInt(10) + 1;
+            for(int n = 0; n < c; n++) ids.insert(pre + n, lastid + 1 + n);
+            map.insert(pre, lastid + 1, c);
+            lastid += c;
+          } else {
+            final int id = ids.get(pre), baseid = map.baseid();
+            int c = Math.min(RANDOM.nextInt(10) + 1, ids.size() - pre);
+            // base IDs ascend with PRE values, inserted nodes have no base descendants
+            if(id > baseid) {
+              int n = 1;
+              while(n < c && ids.get(pre + n) > baseid) n++;
+              c = n;
+            } else {
+              int last = pre + c - 1;
+              while(ids.get(last) > baseid) last--;
+              map.markDeleted(id, ids.get(last));
+            }
+            map.delete(pre, id, -c);
+            for(int n = 0; n < c; n++) ids.remove(pre);
+          }
+        }
+        length = map.write(file, log, length, false);
+        if(length == 0) complete++;
+        else appended++;
+
+        final IdPreMap read = new IdPreMap(file);
+        if(length != 0) read.replay(log, length);
+        final int[] pres = new int[lastid + 1];
+        Arrays.fill(pres, -1);
+        final int is = ids.size();
+        for(int p = 0; p < is; p++) pres[ids.get(p)] = p;
+        for(int id = 0; id <= lastid; id++) {
+          assertEquals(pres[id], map.pre(id), "ID " + id);
+          assertEquals(pres[id], read.pre(id), "ID " + id);
+        }
+      }
+      assertTrue(complete > 1, "Complete writes: " + complete);
+      assertTrue(appended > complete, "Appended: " + appended + ", complete: " + complete);
+
+      // complete write
+      assertEquals(0, map.write(file, log, length, true));
+    } finally {
+      file.delete();
+      log.delete();
+    }
+  }
+
   /** Insert performance: insert at random positions. */
   @Test public void insertPerformance() {
     insertPerformance(testedmap);

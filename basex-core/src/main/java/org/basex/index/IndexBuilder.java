@@ -26,8 +26,6 @@ public abstract class IndexBuilder extends Job {
   protected final int size;
   /** Index type. */
   protected final IndexType type;
-  /** Text node flag. */
-  protected final boolean text;
 
   /** Maximum estimated size of the temporary index structures. */
   private final long maxMem = Runtime.getRuntime().maxMemory() / 2;
@@ -52,7 +50,6 @@ public abstract class IndexBuilder extends Job {
     this.type = type;
     size = data.nodes();
     includeNames = new IndexNames(type, data);
-    text = type == IndexType.TEXT || type == IndexType.FULLTEXT;
   }
 
   /**

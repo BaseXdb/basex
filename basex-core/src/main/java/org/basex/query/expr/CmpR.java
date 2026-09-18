@@ -210,7 +210,7 @@ public final class CmpR extends CmpRange {
     if(stats == null || !Checks.all(stats, st -> StatsType.isNumeric(st.type))) return false;
     // all values out of range: no results
     if(noMatches(stats)) {
-      ii.costs = IndexCosts.get(0);
+      ii.costs = IndexCosts.ZERO;
       return true;
     }
 

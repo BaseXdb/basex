@@ -11,6 +11,7 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.parse.Commands.*;
 import org.basex.data.*;
+import org.basex.index.*;
 import org.basex.io.*;
 import org.basex.io.in.DataInput;
 import org.basex.util.*;
@@ -354,6 +355,23 @@ public final class FTIndexUpdateTest extends SandboxTest {
   }
 
   /**
+   * Merged segments keep superseding the references of older segments, even if the newest input
+   * of the merge supersedes nothing.
+   */
+  @Test public void mergeSupersedes() {
+    // large first segment, which is not merged
+    execute(new CreateDB(NAME, "<x><a>one</a>" + ("<c>" + WORDS + "</c>").repeat(20) + "</x>"));
+    query("replace value of node " + _DB_GET.args(NAME) + "//a/text() with 'two" + WORDS + "'");
+    for(int r = 0; r < 9; r++) {
+      query("insert node <b>word" + r + WORDS + "</b> into " + _DB_GET.args(NAME) + "/x");
+    }
+    search("one");
+    search("two", "two" + WORDS);
+    check("one");
+    check("two");
+  }
+
+  /**
    * Files that are not listed in the meta data are removed.
    * @throws IOException I/O exception
    */
@@ -391,16 +409,16 @@ public final class FTIndexUpdateTest extends SandboxTest {
     query("delete node " + _DB_GET.args(NAME) + "//a[. = 'two']");
     query("replace value of node " + _DB_GET.args(NAME) + "//a[. = 'one'] with 'four'");
     execute(new Optimize());
-    final String segments = context.data().meta.ftsegments;
+    final String segments = context.data().meta.segments.get(IndexType.FULLTEXT);
     assertEquals(1, segments());
     // attribute changes do not affect the full-text index
     query("insert node attribute b { 'c' } into " + _DB_GET.args(NAME) + "//a[1]");
     execute(new Optimize());
-    assertEquals(segments, context.data().meta.ftsegments);
+    assertEquals(segments, context.data().meta.segments.get(IndexType.FULLTEXT));
     execute(new Close());
     execute(new Open(NAME));
     execute(new Optimize());
-    assertEquals(segments, context.data().meta.ftsegments);
+    assertEquals(segments, context.data().meta.segments.get(IndexType.FULLTEXT));
     search("four", "four");
     search("two");
     check("three");

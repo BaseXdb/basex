@@ -7,30 +7,7 @@ import org.basex.index.*;
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
+ * @param type index type
+ * @param token value to be found
  */
-public final class StringToken implements IndexSearch {
-  /** Index type. */
-  private final IndexType type;
-  /** Index string. */
-  private final byte[] value;
-
-  /**
-   * Constructor.
-   * @param type index type
-   * @param value value to be found
-   */
-  public StringToken(final IndexType type, final byte[] value) {
-    this.type = type;
-    this.value = value;
-  }
-
-  @Override
-  public IndexType type() {
-    return type;
-  }
-
-  @Override
-  public byte[] token() {
-    return value;
-  }
-}
+public record StringToken(IndexType type, byte[] token) implements IndexSearch { }

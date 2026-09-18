@@ -1,7 +1,5 @@
 package org.basex.index.value;
 
-import static org.basex.util.Token.*;
-
 import java.io.*;
 
 import org.basex.data.*;
@@ -14,7 +12,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class MemValuesBuilder extends ValuesBuilder {
+public final class MemValuesBuilder extends IndexBuilder {
   /**
    * Constructor.
    * @param data data reference
@@ -29,17 +27,18 @@ public final class MemValuesBuilder extends ValuesBuilder {
     Util.debugln(detailedInfo());
 
     final MemValues index = new MemValues(data, type);
-    final boolean updindex = data.meta.updindex;
+    final boolean updindex = data.meta.updindex, tokenize = type == IndexType.TOKEN;
+    final boolean text = type == IndexType.TEXT;
     final int maxlen = data.meta.maxlen;
     for(pre = 0; pre < size; pre++) {
       if((pre & 0x0FFF) == 0) check();
       if(includeNames.unit(pre)) {
         final int id = updindex ? data.id(pre) : pre;
         if(tokenize) {
-          for(final byte[] token : distinctTokens(data.text(pre, text))) {
-            index.add(token, id);
+          ValueIndex.keys(data, type, pre, (key, pos) -> {
+            index.add(key, id);
             count++;
-          }
+          });
         } else if(data.textLen(pre, text) <= maxlen) {
           // texts of main-memory instances are references to the keys of the index
           index.add((int) data.textRef(pre), id);

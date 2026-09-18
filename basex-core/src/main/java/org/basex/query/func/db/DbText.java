@@ -50,7 +50,10 @@ public class DbText extends DbAccessFn {
       for(final byte[] token : tokens(cc.qc)) {
         final int tl = token.length;
         if(tl == 0 || tl > data.meta.maxlen) return this;
-        size += data.costs(new StringToken(type, token)).results();
+        // estimates cannot be assigned as result sizes
+        final int s = data.costs(new StringToken(type, token)).size();
+        if(s < 0) return this;
+        size += s;
       }
       exprType.assign(seqType(), size);
     }

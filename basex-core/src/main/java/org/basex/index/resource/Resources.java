@@ -2,13 +2,9 @@ package org.basex.index.resource;
 
 import java.io.*;
 
-import org.basex.core.*;
 import org.basex.data.*;
-import org.basex.index.*;
-import org.basex.index.query.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
-import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
@@ -18,13 +14,13 @@ import org.basex.util.list.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class Resources implements Index {
+public final class Resources {
   /** Binary resource types. */
   public static final ResourceType[] BINARIES = { ResourceType.BINARY, ResourceType.VALUE };
   /** Data reference. */
   private final Data data;
-  /** Document references (can be {@code null}). */
-  private Docs docs;
+  /** Document references. */
+  private final Docs docs;
 
   /**
    * Constructor.
@@ -32,6 +28,7 @@ public final class Resources implements Index {
    */
   public Resources(final Data data) {
     this.data = data;
+    docs = new Docs(data);
   }
 
   /**
@@ -40,7 +37,7 @@ public final class Resources implements Index {
    * @throws IOException I/O exception
    */
   public synchronized void read(final DataInput in) throws IOException {
-    documents().read(in);
+    docs.read(in);
   }
 
   /**
@@ -49,7 +46,7 @@ public final class Resources implements Index {
    * @throws IOException I/O exception
    */
   public void write(final DataOutput out) throws IOException {
-    documents().write(out);
+    docs.write(out);
   }
 
   /**
@@ -57,7 +54,7 @@ public final class Resources implements Index {
    * @return document nodes (internal representation!)
    */
   public synchronized IntList docs() {
-    return documents().docs();
+    return docs.docs();
   }
 
   /**
@@ -66,7 +63,7 @@ public final class Resources implements Index {
    * @param clip data clip
    */
   public void insert(final int pre, final DataClip clip) {
-    documents().insert(pre, clip);
+    docs.insert(pre, clip);
   }
 
   /**
@@ -75,7 +72,7 @@ public final class Resources implements Index {
    * @param size number of deleted nodes
    */
   public void delete(final int pre, final int size) {
-    documents().delete(pre, size);
+    docs.delete(pre, size);
   }
 
   /**
@@ -84,7 +81,7 @@ public final class Resources implements Index {
    * @param value new name
    */
   public void rename(final int pre, final byte[] value) {
-    documents().rename(pre, value);
+    docs.rename(pre, value);
   }
 
   /**
@@ -103,7 +100,7 @@ public final class Resources implements Index {
    * @return PRE values (internal representation!)
    */
   public synchronized IntList docs(final String path, final boolean dir) {
-    return documents().docs(path, dir);
+    return docs.docs(path, dir);
   }
 
   /**
@@ -112,7 +109,7 @@ public final class Resources implements Index {
    * @return PRE value or {@code -1}
    */
   public int doc(final String path) {
-    return documents().doc(path);
+    return docs.doc(path);
   }
 
   /**
@@ -131,7 +128,7 @@ public final class Resources implements Index {
    * @return result of check
    */
   public synchronized boolean isDir(final String path) {
-    return documents().isDir(path) || Binaries.isDir(data, path, ResourceType.BINARY) ||
+    return docs.isDir(path) || Binaries.isDir(data, path, ResourceType.BINARY) ||
         Binaries.isDir(data, path, ResourceType.VALUE);
   }
 
@@ -143,47 +140,8 @@ public final class Resources implements Index {
    */
   public synchronized TokenObjectMap<ResourceType> children(final String path, final boolean dir) {
     final TokenObjectMap<ResourceType> map = new TokenObjectMap<>();
-    documents().children(path, dir, map);
+    docs.children(path, dir, map);
     Binaries.children(data, path, dir, map);
     return map;
-  }
-
-  /**
-   * Returns the document references, which are created if they do not exist yet.
-   * @return document references
-   */
-  private synchronized Docs documents() {
-    if(docs == null) docs = new Docs(data);
-    return docs;
-  }
-
-  // Inherited methods ============================================================================
-
-  @Override
-  public boolean drop() {
-    throw Util.notExpected();
-  }
-
-  @Override
-  public void close() { }
-
-  @Override
-  public IndexIterator iter(final IndexSearch search) {
-    throw Util.notExpected();
-  }
-
-  @Override
-  public IndexCosts costs(final IndexSearch search) {
-    throw Util.notExpected();
-  }
-
-  @Override
-  public byte[] info(final MainOptions options) {
-    throw Util.notExpected();
-  }
-
-  @Override
-  public EntryIterator entries(final IndexEntries entries) {
-    throw Util.notExpected();
   }
 }

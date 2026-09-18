@@ -864,8 +864,8 @@ public abstract class Path extends ParseExpr {
     }
     // only one hit: update sequence type (a name test may discard the indexed node)
     if(index.costs.results() == 1 && indexRoot instanceof final ParseExpr expr) {
-      expr.exprType.assign(expr instanceof IndexAccess && index.test == null ?
-        Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE);
+      expr.exprType.assign(expr instanceof IndexAccess && index.test == null &&
+        index.costs.size() == 1 ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE);
     }
 
     // invert steps that occur before index step, rewrite them to predicates

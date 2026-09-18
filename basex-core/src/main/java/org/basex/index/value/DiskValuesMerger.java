@@ -1,12 +1,13 @@
 package org.basex.index.value;
 
-import static org.basex.util.Token.*;
-
 import java.io.*;
 
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.io.in.DataInput;
+import org.basex.io.random.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This class provides data for merging temporary value indexes.
@@ -14,20 +15,28 @@ import org.basex.io.in.DataInput;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-final class DiskValuesMerger {
-  /** Index instance. */
-  private final DiskValues dv;
+final class DiskValuesMerger implements SegmentReader {
+  /** ID lists. */
+  private final DataAccess idxl;
+  /** References to the ID lists. */
+  private final DataAccess idxr;
   /** Index keys. */
   private final DataInput dk;
   /** File prefix. */
   private final String prefix;
   /** Data reference. */
   private final Data data;
+  /** Indicates if references have positions. */
+  private final boolean token;
+  /** IDs of the current key. */
+  private final IntList ids = new IntList();
+  /** Positions of the current key. */
+  private final IntList poss = new IntList();
 
-  /** Current key. */
-  byte[] key;
-  /** Current values. */
-  byte[] values;
+  /** Current key ({@code null} if all keys have been read). */
+  private byte[] key;
+  /** Indicates if the files have been closed. */
+  private boolean closed;
 
   /**
    * Constructor.
@@ -37,34 +46,57 @@ final class DiskValuesMerger {
    * @throws IOException I/O exception
    */
   DiskValuesMerger(final Data data, final IndexType type, final int id) throws IOException {
-    prefix = DiskValues.fileSuffix(type) + id;
+    prefix = DiskValuesBuilder.partial(type, id);
     dk = new DataInput(data.meta.dbFile(prefix + 't'));
-    dv = new DiskValues(data, type, prefix);
+    idxl = new DataAccess(data.meta.dbFile(prefix + 'l'));
+    idxr = new DataAccess(data.meta.dbFile(prefix + 'r'));
+    // skip the number of keys
+    idxl.read4();
+    token = type == IndexType.TOKEN;
     this.data = data;
     next();
   }
 
-  /**
-   * Jumps to the next value. {@link #values} will have 0 entries if the end of file is reached.
-   * @throws IOException I/O exception
-   */
-  void next() throws IOException {
-    values = nextValues();
-    if(values.length == 0) {
-      dv.close();
-      dk.close();
-      data.meta.drop(prefix + '.');
+  @Override
+  public byte[] key() {
+    return key;
+  }
+
+  @Override
+  public int[] ids() {
+    return ids.toArray();
+  }
+
+  @Override
+  public int[] poss() {
+    return poss.toArray();
+  }
+
+  @Override
+  public void next() throws IOException {
+    ids.reset();
+    poss.reset();
+    if(idxr.cursor() >= idxr.length()) {
+      key = null;
+      close();
     } else {
+      final byte[] values = idxl.readBytes(idxr.read5(), idxl.read4());
+      DiskValuesBuilder.decode(values, values.length, token, ids, poss);
       key = dk.readToken();
     }
   }
 
-  /**
-   * Returns next values. Called by the {@link DiskValuesBuilder}.
-   * @return compressed values
-   */
-  private byte[] nextValues() {
-    return dv.idxr.cursor() >= dv.idxr.length() ? EMPTY :
-      dv.idxl.readBytes(dv.idxr.read5(), dv.idxl.read4());
+  @Override
+  public void close() {
+    if(closed) return;
+    closed = true;
+    idxl.close();
+    idxr.close();
+    try {
+      dk.close();
+    } catch(final IOException ex) {
+      Util.debug(ex);
+    }
+    data.meta.drop(prefix + '.');
   }
 }

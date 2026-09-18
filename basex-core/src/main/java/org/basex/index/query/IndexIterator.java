@@ -18,6 +18,23 @@ public interface IndexIterator {
   };
 
   /**
+   * Returns an iterator for PRE values.
+   * @param pres PRE values, sorted
+   * @return iterator
+   */
+  static IndexIterator get(final int[] pres) {
+    return new IndexIterator() {
+      int p;
+      @Override
+      public boolean more() { return p < pres.length; }
+      @Override
+      public int pre() { return pres[p++]; }
+      @Override
+      public int size() { return pres.length; }
+    };
+  }
+
+  /**
    * Returns true if more results can be returned.
    * @return result of check
    */

@@ -63,7 +63,7 @@ public final class IndexNames {
    * Checks if the list of names is empty.
    * @return result of check
    */
-  public boolean isEmpty() {
+  private boolean isEmpty() {
     return qnames.isEmpty();
   }
 
@@ -75,26 +75,25 @@ public final class IndexNames {
    * @return result of check
    */
   public boolean unit(final int pre) {
-    final int kind = data.kind(pre);
-    return switch(type) {
-      case TEXT      -> kind == Data.TEXT && contains(pre, true);
-      case ATTRIBUTE,
-           TOKEN     -> kind == Data.ATTR && contains(pre, false);
-      case FULLTEXT  -> data.meta.ftmixed ? kind == Data.ELEM && containsElement(pre) :
-                        kind == Data.TEXT && contains(pre, true);
-      default        -> throw Util.notExpected();
-    };
+    final int kind = kind(type, data.meta);
+    return data.kind(pre) == kind && (kind == Data.TEXT ?
+      containsName(data.parent(pre, Data.TEXT), Data.ELEM) : containsName(pre, kind));
   }
 
   /**
-   * Checks if the name of the addressed database entry is to be indexed.
-   * @param pre PRE value
-   * @param text text flag
-   * @return result of check
+   * Returns the node kind of the units of an index: text nodes, attributes, or elements
+   * (full-text index for mixed content).
+   * @param type index type
+   * @param meta meta data
+   * @return node kind
    */
-  public boolean contains(final int pre, final boolean text) {
-    return text ? containsName(data.parent(pre, Data.TEXT), Data.ELEM) :
-      containsName(pre, Data.ATTR);
+  public static int kind(final IndexType type, final MetaData meta) {
+    return switch(type) {
+      case TEXT            -> Data.TEXT;
+      case ATTRIBUTE, TOKEN -> Data.ATTR;
+      case FULLTEXT        -> meta.ftmixed ? Data.ELEM : Data.TEXT;
+      default              -> throw Util.notExpected();
+    };
   }
 
   /**

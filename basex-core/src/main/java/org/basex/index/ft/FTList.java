@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 
 import org.basex.data.*;
+import org.basex.index.*;
 import org.basex.io.random.*;
 
 /**
@@ -13,7 +14,7 @@ import org.basex.io.random.*;
  * @author BaseX Team, BSD License
  * @author Sebastian Gath
  */
-final class FTList implements Closeable {
+final class FTList implements SegmentReader {
   /** Empty integer array. */
   private static final int[] NOINTS = {};
 
@@ -37,11 +38,11 @@ final class FTList implements Closeable {
   /** Current data size. */
   private int size;
   /** Next token. */
-  byte[] token;
+  private byte[] token;
   /** Next PRE values. */
-  int[] prv;
+  private int[] prv;
   /** Next pos values. */
-  int[] pov;
+  private int[] pov;
 
   /**
    * Constructor, initializing the index structure.
@@ -56,10 +57,23 @@ final class FTList implements Closeable {
     next();
   }
 
-  /**
-   * Checks if more tokens are found.
-   */
-  void next() {
+  @Override
+  public byte[] key() {
+    return token.length == 0 ? null : token;
+  }
+
+  @Override
+  public int[] ids() {
+    return prv;
+  }
+
+  @Override
+  public int[] poss() {
+    return pov;
+  }
+
+  @Override
+  public void next() {
     if(wasted) return;
 
     token = token();

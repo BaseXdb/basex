@@ -96,15 +96,7 @@ public final class Names extends TokenSet implements Index {
   @Override
   public void write(final DataOutput out) throws IOException {
     super.write(out);
-    final Stats[] st = stats();
-    for(int i = 1; i < size; i++) {
-      Stats s = st[i];
-      if(s == null) {
-        s = new Stats();
-        st[i] = s;
-      }
-      s.write(out);
-    }
+    for(int i = 1; i < size; i++) createStats(i).write(out);
   }
 
   /**
@@ -150,7 +142,6 @@ public final class Names extends TokenSet implements Index {
   public byte[] info(final MainOptions options) {
     final Stats[] st = stats;
     final int[] tl = new int[size];
-    tl[0] = 0;
     int len = 0;
     for(int i = 1; i < size; i++) {
       if(len < keys[i].length) len = keys[i].length;

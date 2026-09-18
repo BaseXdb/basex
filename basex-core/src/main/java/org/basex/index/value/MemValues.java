@@ -43,7 +43,6 @@ public final class MemValues extends ValueIndex {
     final int s = values.size() + 1;
     idsList = new ArrayList<>(s);
     lenList = new IntList(s);
-    reorder = new BoolList(s);
   }
 
   @Override
@@ -103,8 +102,8 @@ public final class MemValues extends ValueIndex {
 
   @Override
   public IndexCosts costs(final IndexSearch search) {
-    return IndexCosts.get(search instanceof StringRange ? Math.max(1, data.nodes() / 10) :
-      lenList.get(values.index(search.token())));
+    if(search instanceof StringRange) return IndexCosts.get(Math.max(1, data.nodes() / 10));
+    return IndexCosts.exact(lenList.get(values.index(search.token())));
   }
 
   @Override
@@ -168,7 +167,30 @@ public final class MemValues extends ValueIndex {
   }
 
   @Override
-  public void add(final ValueCache cache) {
+  public void delete(final int pre, final int size) {
+    delete(new ValueCache(pre, size, type, data));
+  }
+
+  @Override
+  public void insert(final int pre, final int size) {
+    add(new ValueCache(pre, size, type, data));
+  }
+
+  @Override
+  public void rename(final int pre, final int kind) {
+    delete(new ValueCache(renamedUnits(pre, kind), type, data));
+  }
+
+  @Override
+  public void renamed(final int pre, final int kind) {
+    add(new ValueCache(renamedUnits(pre, kind), type, data));
+  }
+
+  /**
+   * Adds cached entries to the index.
+   * @param cache value cache
+   */
+  private void add(final ValueCache cache) {
     for(final byte[] key : cache) {
       final IntList ids = cache.ids(key);
       if(!ids.isEmpty()) add(key, ids.sort().finish());
@@ -176,15 +198,18 @@ public final class MemValues extends ValueIndex {
     finish();
   }
 
-  @Override
-  public void delete(final ValueCache cache) {
+  /**
+   * Deletes cached entries from the index.
+   * @param cache value cache
+   */
+  private void delete(final ValueCache cache) {
     for(final byte[] key : cache) {
       delete(key, cache.ids(key).sort().finish());
     }
   }
 
   @Override
-  public void flush() { }
+  public void flush(final boolean close) { }
 
   @Override
   public void close() { }

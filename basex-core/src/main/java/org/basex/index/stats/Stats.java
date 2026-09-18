@@ -54,7 +54,7 @@ public final class Stats {
 
     min = Double.MAX_VALUE;
     max = -Double.MAX_VALUE;
-    if(isInteger(t) || isDouble(t)) {
+    if(isNumeric(t)) {
       min = in.readDouble();
       max = in.readDouble();
     }

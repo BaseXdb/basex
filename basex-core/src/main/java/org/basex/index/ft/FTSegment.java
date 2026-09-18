@@ -8,9 +8,6 @@ import java.util.*;
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
-import org.basex.io.*;
-import org.basex.io.in.DataInput;
-import org.basex.io.out.DataOutput;
 import org.basex.io.random.*;
 import org.basex.query.expr.ft.*;
 import org.basex.util.hash.*;
@@ -24,18 +21,12 @@ import org.basex.util.list.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-final class FTSegment implements FTSource {
+final class FTSegment extends IndexSegment implements FTSource {
   /** Suffixes of all segment files. */
   static final String SUFFIXES = FTIndex.FILES + 's';
 
-  /** Data reference. */
-  private final Data data;
-  /** Segment number ({@code -1} for the unnumbered structure). */
-  final int number;
-  /** File prefix. */
-  final String prefix;
   /** Buffer of the updatable index ({@code null} if the references are PRE values). */
-  private final FTBuffer buffer;
+  private final IndexBuffer buffer;
 
   /** Cached texts. Increases used memory, but speeds up repeated queries. */
   private final IntObjectMap<byte[]> ctext = new IntObjectMap<>();
@@ -48,11 +39,6 @@ final class FTSegment implements FTSource {
   /** Token positions. */
   private final int[] positions;
 
-  /** IDs of the units whose older references this segment supersedes (can be {@code null}). */
-  final IntSet superseded;
-  /** IDs superseded by newer segments. */
-  IntSet newer = new IntSet();
-
   /**
    * Constructor, initializing the index structure.
    * @param data data reference
@@ -60,24 +46,12 @@ final class FTSegment implements FTSource {
    * @param buffer buffer of the updatable index ({@code null} if the references are PRE values)
    * @throws IOException I/O exception
    */
-  FTSegment(final Data data, final int number, final FTBuffer buffer) throws IOException {
-    this.data = data;
-    this.number = number;
+  FTSegment(final Data data, final int number, final IndexBuffer buffer) throws IOException {
+    super(data, number, FTIndex.segment(number));
     this.buffer = buffer;
-    prefix = FTIndex.segment(number);
     dataY = new DataAccess(data.meta.dbFile(prefix + 'y'));
     dataZ = new DataAccess(data.meta.dbFile(prefix + 'z'));
     positions = positions(data, prefix, dataY.length());
-
-    final IOFile file = data.meta.dbFile(prefix + 's');
-    if(file.exists()) {
-      superseded = new IntSet();
-      try(DataInput in = new DataInput(file)) {
-        for(final int id : in.readNums()) superseded.add(id);
-      }
-    } else {
-      superseded = null;
-    }
   }
 
   /**
@@ -101,22 +75,6 @@ final class FTSegment implements FTSource {
     }
     positions[positions.length - 1] = (int) length;
     return positions;
-  }
-
-  /**
-   * Writes the supersede set of a segment.
-   * @param data data reference
-   * @param prefix file prefix of the segment
-   * @param ids IDs of the superseded units (nothing is written if empty)
-   * @throws IOException I/O exception
-   */
-  static void superseded(final Data data, final String prefix, final int[] ids)
-      throws IOException {
-    if(ids.length == 0) return;
-    Arrays.sort(ids);
-    try(DataOutput out = new DataOutput(data.meta.dbFile(prefix + 's'))) {
-      out.writeNums(ids);
-    }
   }
 
   @Override
@@ -301,7 +259,7 @@ final class FTSegment implements FTSource {
     int s = 0, e = (end - start) / tl;
     while(s <= e) {
       final int m = s + e >>> 1, pos = start + m * tl, d = compare(cache(pos, ti), token);
-      if(d == 0) return start + m * tl;
+      if(d == 0) return pos;
       if(d < 0) s = m + 1;
       else e = m - 1;
     }
@@ -327,10 +285,8 @@ final class FTSegment implements FTSource {
     return data.meta.dbFile(prefix + 'x').length() + dataY.length() + dataZ.length();
   }
 
-  /**
-   * Closes the index files.
-   */
-  void close() {
+  @Override
+  public void close() {
     dataY.close();
     dataZ.close();
   }
