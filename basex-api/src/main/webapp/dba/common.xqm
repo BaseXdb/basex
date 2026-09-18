@@ -34,9 +34,9 @@ function dba:file(
   $file  as xs:string
 ) as item()+ {
   let $path := 'static/' || $file
-  return if (contains($file, '..')) {
+  return if (contains($file, '..')) then (
     web:error(400, 'Invalid path: ' || $file)
-  } else {
+  ) else (
     try {
       (: the lazy binary is read here: an error must not surface during serialization, and its
          message would name the directory of the application :)
@@ -55,7 +55,7 @@ function dba:file(
     } catch * {
       web:error(404, 'Unknown file: ' || $file)
     }
-  }
+  )
 };
 
 (:~ Namespace of the File Module: its errors are caused by the path that was requested. :)
@@ -86,15 +86,13 @@ function dba:error(
   (: web:error already states the status, and its message needs no code :)
   let $stated := $local[matches(., '^status\d+$')] ! xs:integer(substring(., 7))
   let $status := $stated otherwise (
-    if ($local = 'not-found') { 404 }
-    else if ($code ! namespace-uri-from-QName(.) = $dba:FILE-NS) { 400 }
-    else if (matches($local, '^X[PQ]ST')) { 400 }
-    else { 500 }
+    if ($local = 'not-found') then 404
+    else if ($code ! namespace-uri-from-QName(.) = $dba:FILE-NS) then 400
+    else if (matches($local, '^X[PQ]ST')) then 400
+    else 500
   )
   (: XQuery errors are known by their code alone, the errors of a module by their prefix :)
-  let $name := if ($stated) {
-    ()
-  } else {
+  let $name := if (not($stated)) {
     ($code ! prefix-from-QName(.)[. != 'err'] ! (. || ':') otherwise '') || $local
   }
   return (

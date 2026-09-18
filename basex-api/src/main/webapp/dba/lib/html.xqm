@@ -8,6 +8,39 @@ module namespace html = 'dba/lib/html';
 import module namespace config = 'dba/lib/config' at 'config.xqm';
 import module namespace utils = 'dba/lib/utils' at 'utils.xqm';
 
+(:~ Options of a page; see html:wrap. :)
+declare record html:page-options(
+  header   as xs:string?,
+  error    as xs:string?,
+  info     as xs:string?,
+  columns  as xs:string*,
+  rows     as xs:string*,
+  panels   as xs:string?,
+  scripts  as xs:string*,
+  init     as xs:string?
+);
+
+(:~ Options of a link that runs a client function; see html:action. :)
+declare record html:action-options(
+  href      as xs:string?,
+  selected  as xs:boolean?,
+  title     as xs:string?,
+  class     as xs:string?
+);
+
+(:~ Options of a content panel; see html:panel. :)
+declare record html:panel-options(
+  id         as xs:string?,
+  pane       as (xs:boolean | xs:string)?,
+  label      as xs:string?,
+  collapsed  as xs:boolean?,
+  hidden     as xs:boolean?,
+  fold       as xs:string?,
+  divider    as xs:boolean?,
+  class      as xs:string?,
+  extra      as node()*
+);
+
 (:~
  : Extends the specified content panels with the page template.
  : @param  $panels   content panels, laid out side by side, one grid column each
@@ -26,7 +59,7 @@ import module namespace utils = 'dba/lib/utils' at 'utils.xqm';
  :)
 declare function html:wrap(
   $panels   as element()*,
-  $options  as map(*) := {}
+  $options  as html:page-options := {}
 ) as element(html) {
   (: the view is named by its page; the label of its entry is the capitalized name :)
   let $view := $options?header
@@ -82,7 +115,7 @@ declare function html:wrap(
             }
           </div>
           <div class='header-nav'>{
-            if ($user) {
+            if ($user) then (
               <nav>
                 <ul>{
                   for $entry in $config:VIEWS
@@ -98,20 +131,20 @@ declare function html:wrap(
                   }</li>
                 }</ul>
               </nav>
-            } else {
+            ) else (
               <div class='note'>
                 Please enter your admin credentials:
               </div>
-            },
+            ),
             (: a status message, not a navigation entry: the client replaces its text, and
                the role is what has the replacement announced. It is spelled out, as not
                every browser maps the implicit role of the element :)
             element output {
               attribute id { 'info' },
               attribute role { 'status' },
-              if ($error) {
+              if ($error) then (
                 attribute class { 'error' }, $error
-              } else if ($info) {
+              ) else if ($info) {
                 attribute class { 'info' }, $info
               }
             }
@@ -174,21 +207,19 @@ declare function html:wrap(
  :   * fold: 'right' if the panel folds towards the right edge
  :   * divider: whether a divider separates the panel from the one before it
  :   * class: further classes of the panel
- :   * style: grid placement of the panel
- :   * panel-id: id of the panel itself
  :   * extra: content beside the block, which a pushed panel does not replace
  : @return panel
  :)
 declare function html:panel(
   $contents  as node()*,
-  $options   as map(*) := {}
+  $options   as html:panel-options := {}
 ) as element(div) {
   let $id := $options?id
   (: the block that holds the contents; a string names the classes it carries besides 'pane' :)
   let $pane := $options?pane otherwise true()
-  let $pane-class := if ($pane instance of xs:string) {
+  let $pane-class := if ($pane instance of xs:string) then (
     'pane ' || $pane
-  } else if ($pane) {
+  ) else if ($pane) {
     'pane'
   }
   return <div class='{ string-join((
@@ -198,20 +229,18 @@ declare function html:panel(
     'hidden'[$options?hidden otherwise empty($contents)],
     $options?class
   ), ' ') }'>{
-    $options?panel-id ! attribute id { . },
-    $options?style ! attribute style { . },
-    attribute data-label { $options?label }[map:contains($options, 'label')],
+    $options?label ! attribute data-label { . },
     $options?fold ! attribute data-fold { . },
     (: the contents get a block of their own if they scroll or are replaced :)
-    if (exists($pane-class) or exists($id)) {
+    if ($pane-class or $id) then (
       element div {
         $id ! attribute id { . },
         attribute class { $pane-class }[$pane-class],
         $contents
       }
-    } else {
+    ) else (
       $contents
-    },
+    ),
     $options?extra
   }</div>
 };
@@ -274,12 +303,12 @@ declare function html:select(
      connection follows it in place, which is what the supplied call does :)
   let $href := web:create-url($page, $params)
   return fn() {
-    if ($key) {
-      html:action($label, $call, { 'select': $params?($key) },
+    if ($key) then (
+      html:action($label, $call, { 'select': $params?$key },
         { 'href': $href, 'selected': $selected })
-    } else {
+    ) else (
       <a href='{ $href }'>{ attribute class { 'selected' }[$selected], $label }</a>
-    }
+    )
   }
 };
 
@@ -297,14 +326,14 @@ declare function html:action(
   $label    as item()*,
   $call     as xs:string,
   $data     as map(*),
-  $options  as map(*) := {}
+  $options  as html:action-options := {}
 ) as element(a) {
   (: the values are supplied as data attributes: a link that names a single one hands that
      value to the function, one that names several hands over all of them. A link that selects
      an entry names it under 'select', which is what the client points the entry out by :)
   let $class := string-join(('selected'[$options?selected], $options?class), ' ')
   return <a href='{ $options?href otherwise '#' }'>{
-    map:for-each($data, fn($name, $value) { attribute { 'data-' || $name } { $value } }),
+    for key $name value $value in $data return attribute { 'data-' || $name } { $value },
     attribute class { $class }[$class],
     $options?title ! attribute title { . },
     attribute onclick { $call ||
@@ -337,11 +366,11 @@ declare function html:short-date(
 ) as element(span) {
   let $adjusted := html:adjust($date)
   (: the year is only shown if it is not the current one; the time only if it is :)
-  let $picture := if (year-from-dateTime($adjusted) = year-from-dateTime(current-dateTime())) {
+  let $picture := if (year-from-dateTime($adjusted) = year-from-dateTime(current-dateTime())) then (
     '[M00]-[D00] [H00]:[m00]'
-  } else {
+  ) else (
     '[Y0000]-[M00]-[D00]'
-  }
+  )
   return <span title='{ format-dateTime($adjusted, '[Y0000]-[M00]-[D00] [H00]:[m00]:[s00]') }'>{
     format-dateTime($adjusted, $picture)
   }</span>
@@ -356,8 +385,7 @@ declare function html:time(
   $date  as xs:dateTime
 ) as element(span) {
   let $adjusted := html:adjust($date)
-  let $formatted := format-dateTime($adjusted, '[H00]:[m00]:[s00]')
-  return <span title='{ $adjusted }'>{ $formatted }</span>
+  return <span title='{ $adjusted }'>{ format-dateTime($adjusted, '[H00]:[m00]:[s00]') }</span>
 };
 
 (:~
@@ -368,8 +396,7 @@ declare function html:time(
 declare function html:adjust(
   $date  as xs:dateTime
 ) as xs:dateTime {
-  let $zone := timezone-from-dateTime(current-dateTime())
-  return adjust-dateTime-to-timezone(xs:dateTime($date), $zone)
+  adjust-dateTime-to-timezone($date)
 };
 
 (:~
@@ -382,7 +409,7 @@ declare function html:duration(
 ) as xs:string {
   let $min := $seconds idiv 60
   let $sec := $seconds - $min * 60
-  return (format-number($min, '00') || ':' || format-number($sec, '00'))
+  return `{ format-number($min, '00') }:{ format-number($sec, '00') }`
 };
 
 (:~
@@ -401,10 +428,10 @@ declare function html:js(
  : @return map with query parameters
  :)
 declare function html:parameters() as map(*) {
-  map:merge(
+  {
     for $param in request:parameter-names()[not(starts-with(., '_'))]
     return { $param: request:parameter($param) }
-  )
+  }
 };
 
 (:~
@@ -415,10 +442,8 @@ declare function html:parameters() as map(*) {
 declare function html:parameters(
   $map  as map(*)?
 ) as map(*) {
-  map:merge((
+  {
     html:parameters(),
-    map:for-each($map, fn($name, $value) {
-      map:entry('_' || $name, $value)
-    })
-  ))
+    for key $name value $value in $map return { '_' || $name: $value }
+  }
 };

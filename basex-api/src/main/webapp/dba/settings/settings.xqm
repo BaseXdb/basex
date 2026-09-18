@@ -47,15 +47,16 @@ function dba:settings() as element(html) {
   }
   let $map-table := fn($map) {
     table:pairs(
-      for $key in sort(map:keys($map), '?lang=en')
+      for key $key value $value in $map
+      order by $key collation '?lang=en'
       return <tr>
         <td><b>{ $key }</b></td>
-        <td>{ $map($key) }</td>
+        <td>{ $value }</td>
       </tr>
     )
   }
-  let $panel := fn($contents, $options) {
-    html:panel($contents, map:put($options, 'divider', true()))
+  let $panel := fn($contents, $options as html:panel-options) {
+    html:panel($contents, $options but with { 'divider': true() })
   }
   return (
     $panel(

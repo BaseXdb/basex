@@ -30,8 +30,8 @@ function dba:activity(
   $job       as xs:string?,
   $download  as xs:string?
 ) as element(html) {
-  let $panel := fn($contents, $options) {
-    html:panel($contents, map:put($options, 'divider', true()))
+  let $panel := fn($contents, $options as html:panel-options) {
+    html:panel($contents, $options but with { 'divider': true() })
   }
   return (
     $panel(panels:jobs($sort), { 'id': 'jobs-panel', 'label': 'Jobs' }),

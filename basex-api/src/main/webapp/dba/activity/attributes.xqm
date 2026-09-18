@@ -59,11 +59,11 @@ declare %private function dba:value(
   $value  as item()*
 ) as map(*) {
   let $expression := utils:expression($value)
-  return if ($expression?truncated) {
+  return if ($expression?truncated) then (
     { 'text': '', 'note': 'The value is too large to be shown; supply a new one.' }
-  } else {
+  ) else (
     { 'text': $expression?text, 'note': '' }
-  }
+  )
 };
 
 (:~

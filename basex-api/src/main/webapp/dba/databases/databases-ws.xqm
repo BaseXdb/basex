@@ -97,6 +97,6 @@ declare %private function dba:ws-query(
   ) {
     let $context := head(panels:resource-value($db, $path))
     return xquery:eval($string, { '': $context }, { 'pass': true() })
-  }, [ $name, $resource, $query ], utils:job-options($name || '/' || $resource, ()))
+  }, [ $name, $resource, $query ], utils:job-options(`{ $name }/{ $resource }`, ()))
   return utils:ws-start($id, $run, utils:serialize-options($indent))
 };

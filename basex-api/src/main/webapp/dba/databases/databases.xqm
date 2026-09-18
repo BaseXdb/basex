@@ -74,7 +74,7 @@ function dba:databases(
        away while the lists are :)
     'panels' : 'resource'[$document?exists],
     'scripts': ('cm6', 'editor', 'databases'),
-    'init'   : 'initDatabases(' || ($document?editable = true()) || ');'
+    'init'   : `initDatabases({ $document?editable });`
   })
 };
 
@@ -120,13 +120,13 @@ function dba:resources-download(
      resources it covers; the same resource may be reached by two of them :)
   let $paths := distinct-values($resources ! db:list($name, .))
   return try {
-    if (empty($paths)) {
+    if (empty($paths)) then (
       utils:outcome($dba:CAT, { 'name': $name }, { 'error': 'No resource was selected.' })
-    } else {
+    ) else (
       (: the archive is named after the database, as the one of the file panel is named
          after its directory :)
       utils:archive($paths, $paths ! dba:content($name, .), $name)
-    }
+    )
   } catch * {
     utils:outcome($dba:CAT, { 'name': $name },
       { 'error': 'Download failed: ' || $err:description })
@@ -144,12 +144,12 @@ declare %private function dba:content(
   $resource  as xs:string
 ) as item() {
   let $value := panels:resource-value($name, $resource)
-  return if ($value instance of xs:base64Binary) {
+  return if ($value instance of xs:base64Binary) then (
     $value
-  } else {
-    let $method := if (db:type($name, $resource) = 'xml') { 'xml' } else { 'basex' }
+  ) else (
+    let $method := if (db:type($name, $resource) = 'xml') then 'xml' else 'basex'
     return serialize($value, { 'method': $method })
-  }
+  )
 };
 
 (:~
@@ -163,7 +163,7 @@ declare
 function dba:backup-download(
   $backup  as xs:string
 ) as item()+ {
-  let $path := db:option('dbpath') || '/' || $backup
+  let $path := `{ db:option('dbpath') }/{ $backup }`
   return (
     web:response-header(
       { 'media-type': 'application/octet-stream' },
@@ -197,7 +197,7 @@ function dba:db-save(
 ) {
   (: indentation is only added for display :)
   db:put($name, parse-xml($content,
-    { 'strip-space': if ($indent = 'true') { 'all' } else { 'none' } }), $resource),
+    { 'strip-space': if ($indent = 'true') then 'all' else 'none' }), $resource),
   update:output('')
 };
 
@@ -218,15 +218,15 @@ function dba:action(
       'params': { 'name': $args?name },
       'info'  : utils:info($args?name, 'database', 'created'),
       'run'   : %updating fn() {
-        if (db:exists($args?name)) {
+        if (db:exists($args?name)) then (
           error((), 'Database already exists.')
-        } else {
+        ) else (
           (: without an input, an empty database is created :)
-          db:create($args?name, $args?input[.], (), map:merge((
+          db:create($args?name, $args?input[.], (), {
             form:index-map($args?opts, $args?lang, $args?ftinclude, true()),
             form:parsing-map($args?opts, $args?filter, $args?parser)
-          )))
-        }
+          })
+        )
       }
     } },
     'drop': fn($args) { {
@@ -276,7 +276,7 @@ function dba:action(
       return {
         'params': { 'name': $name },
         'info'  : utils:info($args?backup, 'backup', 'dropped'),
-        'run'   : %updating fn() { $args?backup ! db:drop-backup($name || '-' || .) }
+        'run'   : %updating fn() { $args?backup ! db:drop-backup(`{ $name }-{ . }`) }
       }
     },
     'backup-restore': fn($args) {
@@ -286,7 +286,7 @@ function dba:action(
       return {
         'params': { 'name': $name },
         'info'  : utils:info($backup, 'backup', 'restored'),
-        'run'   : %updating fn() { db:restore($name || '-' || $backup) }
+        'run'   : %updating fn() { db:restore(`{ $name }-{ $backup }`) }
       }
     },
     'put': fn($args) {
@@ -298,29 +298,29 @@ function dba:action(
         (: an input may stand for a single file or for the contents of a directory :)
         'info'  : utils:info((map:keys($files), $input), 'resource', 'added'),
         'run'   : %updating fn() {
-          if (map:size($files) = 0 and empty($input)) {
+          if (map:size($files) = 0 and empty($input)) then (
             error((), 'No input specified.')
-          } else if ($input and empty($target)) {
+          ) else if ($input and empty($target)) then (
             (: an empty target addresses the database as a whole: what the input does not
                supply would be deleted :)
             error((), 'Target path is required.')
-          } else {
+          ) else (
             let $options := form:parsing-map($args?opts, $args?filter, $args?parser)
             return (
-              if ($args?binary) {
+              if ($args?binary) then (
                 for key $path value $content in $files
                 return db:put-binary($args?name, $content, $path)
-              } else {
+              ) else (
                 (: the input is parsed here, so that a broken document is reported as an error
                    instead of failing when the pending updates are applied :)
                 for key $path value $content in $files
                 return db:put($args?name, fetch:binary-doc($content), $path, $options)
-              },
+              ),
               (: a directory or an archive is expanded, and the paths it contains are kept
                  below the target; what is stored there already is replaced :)
               $input ! db:put($args?name, ., $target, $options)
             )
-          }
+          )
         }
       }
     },
@@ -331,13 +331,13 @@ function dba:action(
         'params': { 'name': $args?name, 'resource': $args?resource },
         'info'  : utils:info($args?resource, 'resource', 'replaced'),
         'run'   : %updating fn() {
-          if (empty($content)) {
+          if (empty($content)) then (
             error((), 'No input specified.')
-          } else if (db:type($args?name, $args?resource) = 'xml') {
+          ) else if (db:type($args?name, $args?resource) = 'xml') then (
             db:put($args?name, fetch:binary-doc($content), $args?resource)
-          } else {
+          ) else (
             db:put-binary($args?name, $content, $args?resource)
-          }
+          )
         }
       }
     },
@@ -356,11 +356,11 @@ function dba:action(
         },
         'info'  : utils:info($args?resource, 'resource', 'renamed'),
         'run'   : %updating fn() {
-          if ($exists) {
+          if ($exists) then (
             error((), 'Resource already exists.')
-          } else {
+          ) else (
             db:rename($args?name, $args?resource, $args?target)
-          }
+          )
         }
       }
     },
@@ -380,7 +380,7 @@ declare %private function dba:rename-database(
   $args    as map(*),
   $action  as xs:string,
   $update  as %updating fn(*)
-) as map(*) {
+) as utils:action {
   (: both take a new name and reject one that is assigned already :)
   (: the name that was offered for editing is the current one: keeping it is no conflict :)
   let $exists := $args?newname != $args?name and db:exists($args?newname)
@@ -389,9 +389,9 @@ declare %private function dba:rename-database(
     'params': { 'name': if ($exists) then $args?name else $args?newname },
     'info'  : utils:info($args?name, 'database', $action),
     'run'   : %updating fn() {
-      if ($exists) {
+      if ($exists) then (
         error((), 'Database already exists.')
-      } else if ($args?name != $args?newname) {
+      ) else if ($args?name != $args?newname) {
         updating $update($args?name, $args?newname)
       }
     }
@@ -407,19 +407,19 @@ declare %private function dba:rename-database(
 declare %private function dba:index(
   $args    as map(*),
   $create  as xs:boolean
-) as map(*) {
+) as utils:action {
   (: an optimization that is limited to one index option leaves the other options of the
      database as they are :)
   let $index := panels:index-type($args?index)
   return {
     'params': { 'name': $args?name },
-    'info'  : utils:info($index?label, 'index', if ($create) { 'created' } else { 'dropped' }),
+    'info'  : utils:info($index?label, 'index', if ($create) then 'created' else 'dropped'),
     'run'   : %updating fn() {
-      if (empty($index?option)) {
+      if (empty($index?option)) then (
         error((), 'Index cannot be created or dropped.')
-      } else {
+      ) else (
         db:optimize($args?name, false(), { $index?option: $create })
-      }
+      )
     }
   }
 };

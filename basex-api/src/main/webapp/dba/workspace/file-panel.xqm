@@ -49,15 +49,15 @@ declare function panel:files(
         (: directories are entered and files are opened in place; both references stay
            deep links, which name the directory in full :)
         'name': fn() {
-          if ($is-dir) {
+          if ($is-dir) then (
             html:action($name, 'enterDir', { 'name': $name },
               { 'href': web:create-url($panel:CAT, { 'dir': $dir || $name }) })
-          } else if ($size <= $limit) {
+          ) else if ($size <= $limit) then (
             html:action($name, 'openFile', { 'name': $name },
               { 'href': web:create-url($panel:CAT, { 'dir': $dir, 'name': $name }) })
-          } else {
+          ) else (
             $name
-          }
+          )
         },
         'date': $modified,
         'size': $size
@@ -83,15 +83,9 @@ declare function panel:files(
       (: a directory is listed as a whole; its files are not spread over pages :)
       'all': true(),
       (: the panel scrolls as a whole, so its actions are pinned to the top of it :)
-      'sticky': ()
+      'pinned': true()
     }
-    return table:create($headers, $entries, $buttons, {}, $options) update {
-      (: sort links refresh the panel instead of reloading the page :)
-      for $link in descendant::th/a
-      return insert node attribute onclick {
-        'refreshFiles(new URLSearchParams(this.search).get("sort")); return false;'
-      } into $link
-    }
+    return table:create($headers, $entries, $buttons, {}, $options)
     }</form>,
 
     (: the file chooser is opened by the Upload button and submits what it collects :)

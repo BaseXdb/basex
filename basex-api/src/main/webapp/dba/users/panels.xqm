@@ -70,9 +70,8 @@ declare function panels:user(
   $perm     as xs:string?
 ) as element()* {
   (: the form that submits them is the panel itself and outlives them; see users.xqm :)
-  if (not($name) or not(user:exists($name))) {
-    (: nothing is selected: the panel is not shown, so it needs no placeholder :)
-  } else {
+  (: nothing is selected: the panel is not shown, so it needs no placeholder :)
+  if ($name and user:exists($name)) {
     let $user := user:list-details($name)
     (: the admin is the one user whose name and permission are not up for discussion :)
     let $admin := $name eq 'admin'
@@ -80,13 +79,13 @@ declare function panels:user(
       <h2>{ 'User: ' || $name }</h2>,
       <div class='buttons'><button>Update</button></div>,
       <input type='hidden' name='name' value='{ $name }'/>,
-      if ($admin) {
+      if ($admin) then (
         <input type='hidden' name='newname' value='admin'/>,
         <input type='hidden' name='perm' value='admin'/>
-      } else {
+      ) else (
         form:field('Name:',
           <input type='text' name='newname' value='{ $newname otherwise $name }'/>)
-      },
+      ),
       form:field('Password:', (
         <input type='password' name='pw' autocomplete='new-password'/>,
         <div class='note'>…only changed if a new one is entered</div>
@@ -112,9 +111,8 @@ declare function panels:local-permissions(
   $name  as xs:string?
 ) as element()* {
   (: the admin may do everything everywhere: there is nothing to overwrite :)
-  if (not($name) or not(user:exists($name)) or $name eq 'admin') {
-    (: the panel is not shown, so it needs no placeholder :)
-  } else {
+  (: the panel is not shown, so it needs no placeholder :)
+  if ($name and user:exists($name) and $name ne 'admin') {
     <form method='post' autocomplete='off'>
       <input type='hidden' name='name' value='{ $name }'/>
       {

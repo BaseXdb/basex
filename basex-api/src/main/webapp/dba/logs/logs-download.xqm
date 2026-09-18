@@ -21,7 +21,7 @@ function dba:logs-download(
 ) as item()+ {
   (: an archive of several logs is named after the first and the last date :)
   utils:download(
-    $names ! (db:option('dbpath') || '/.logs/' || . || '.log'),
+    $names ! `{ db:option('dbpath') }/.logs/{ . }.log`,
     string-join(sort($names)[position() = (1, last())], '_')
   )
 };

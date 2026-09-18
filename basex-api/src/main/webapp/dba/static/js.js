@@ -350,7 +350,7 @@ function confirmAction(button, action) {
   // question adds, and a long list of paths would only bury it
   const count = entries(button.closest("form")).filter(input => input.checked).length;
   const message = count
-    ? `${action} ${count} ${count === 1 ? "entry" : "entries"}?`
+    ? `${action} ${plural(count, "entry", "entries")}?`
     : "Are you sure?";
   confirmDialog(message).then(ok => {
     if(ok) {
@@ -359,6 +359,17 @@ function confirmAction(button, action) {
     }
   });
   return false;
+}
+
+/**
+ * Returns a number followed by the singular or plural form of a noun.
+ * @param {number} count number
+ * @param {string} one singular form
+ * @param {string} many plural form
+ * @returns {string} text
+ */
+function plural(count, one, many = `${one}s`) {
+  return `${count} ${count === 1 ? one : many}`;
 }
 
 /**

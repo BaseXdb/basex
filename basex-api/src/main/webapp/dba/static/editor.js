@@ -17,27 +17,11 @@ const _editors = {};
 /** Link to the CodeMirror output component. */
 let _output;
 
-/** Shortest an auto-resized editor gets, and its height on stacked layouts. */
-const EDITOR_MIN_HEIGHT = 200;
-
 /** Height of an editor that is not auto-resized. */
 const EDITOR_FIXED_HEIGHT = "300px";
 
 /** localStorage key for the 'Indent' output preference. */
 const INDENT_KEY = "dba-indent";
-
-/**
- * Returns the height of the page chrome below <main>: the rule, the footer and
- * the body margin. None of it depends on the editor, so it can be measured.
- * @returns {number} height in pixels
- */
-function chromeBelowMain() {
-  let height = parseFloat(getComputedStyle(document.body).marginBottom);
-  for(let el = document.querySelector("main").nextElementSibling; el; el = el.nextElementSibling) {
-    height += el.getBoundingClientRect().height;
-  }
-  return height;
-}
 
 /**
  * Reads the stored 'Indent' output preference.
@@ -105,9 +89,8 @@ function setEditorText(id, text) {
  *          or a list of ids. The first one that exists is the editor of record, which _editor
  *          and the page-wide helpers refer to; any further one is edited and submitted with its
  *          form, and nothing else reads it
- * @param {boolean|string} resize how the editors are sized: 'fill' leaves it to the panel's
- *          CSS, a truthy value fits them to the viewport, and none sizes them by the rows
- *          their text areas asked for
+ * @param {string} resize 'fill' leaves the size of the editors to the panel's CSS; without it,
+ *          they are sized by the rows their text areas asked for
  */
 function loadCodeMirror(language, edit, resize) {
   // CodeMirror 6 is delivered as the self-contained window.CM6 bundle
@@ -165,33 +148,8 @@ function loadCodeMirror(language, edit, resize) {
     }
   }
 
-  // three sizing strategies: 'fill' measures nothing, as the panel gives the editors their
-  // share via CSS; anything else truthy fills the viewport; without one, the rows decide
-  if(resize && resize !== "fill") fitToViewport(useCM);
-  else if(!resize && useCM) fitToRows(loaded);
-}
-
-/**
- * Sizes the editors of a page from their own top to the bottom of the viewport, and again
- * whenever the window changes.
- * @param {boolean} useCM whether CodeMirror replaced the text areas
- */
-function fitToViewport(useCM) {
-  const refresh = () => {
-    // size each pane from its own top to the viewport bottom, so a tall
-    // sibling column (e.g. a long resource list) can't shrink it
-    // stacked layouts keep the minimum, so the editor does not fill the
-    // viewport and push the output and buttons off-screen
-    // measured once: reading it per element would interleave layout and style writes
-    const reserve = chromeBelowMain();
-    const height = elem => stacked() ? EDITOR_MIN_HEIGHT : Math.max(EDITOR_MIN_HEIGHT,
-      window.innerHeight - elem.getBoundingClientRect().top - reserve);
-    for(const elem of document.querySelectorAll(useCM ? ".cm-editor" : "textarea")) {
-      elem.style.height = `${height(elem)}px`;
-    }
-  };
-  window.addEventListener("load", refresh);
-  window.addEventListener("resize", refresh);
+  // 'fill' measures nothing, as the panel gives the editors their share via CSS
+  if(resize !== "fill" && useCM) fitToRows(loaded);
 }
 
 /**

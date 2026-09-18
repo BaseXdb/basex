@@ -9,22 +9,46 @@ import module namespace config = 'dba/lib/config' at 'config.xqm';
 import module namespace html = 'dba/lib/html' at 'html.xqm';
 import module namespace utils = 'dba/lib/utils' at 'utils.xqm';
 
+(:~ Column of a table; see table:create. :)
+declare record table:column(
+  key    as xs:string,
+  label  as xs:string,
+  type   as xs:string?,
+  sort   as xs:string?,
+  order  as xs:string?,
+  width  as xs:string?
+);
+
+(:~ Options of a table; see table:create. :)
+declare record table:options(
+  sort     as xs:string?,
+  presort  as xs:string?,
+  select   as xs:string?,
+  page     as xs:integer?,
+  count    as xs:integer?,
+  filters  as element(tr)?,
+  all      as xs:boolean?,
+  pinned   as xs:boolean?,
+  sticky   as node()*,
+  below    as node()*
+);
+
 (:~ What a column type is ordered by, and what it is shown as. :)
 (: a type that is not listed is ordered and shown as the string it is; a column without a
    format shows the value itself :)
 declare %private variable $table:TYPES := {
   'number'  : { 'order': 'number' },
   'decimal' : { 'order': 'number',
-                'format': fn($v) { format-number(if (exists($v)) then number($v) else 0, '0.00') } },
+                'format': fn($v) { format-number(number($v otherwise 0), '0.00') } },
   'bytes'   : { 'order': 'number',
-                'format': fn($v) { prof:human(if (exists($v)) then xs:integer($v) else 0) } },
+                'format': fn($v) { prof:human(xs:integer($v) otherwise 0) } },
   'dateTime': { 'order': 'date',
                 'format': fn($v) { ($v ! html:short-date(xs:dateTime(.))) otherwise '–' } },
   'time'    : { 'order': 'date', 'format': fn($v) { $v ! html:time(xs:dateTime(.)) } }
 };
 
 (:~ Number formats: the types that are ordered and aligned as numbers. :)
-declare variable $table:NUMBER := map:keys($table:TYPES)[$table:TYPES(.)?order = 'number'];
+declare variable $table:NUMBER := map:keys($table:TYPES)[$table:TYPES?(.)?order = 'number'];
 
 (:~
  : Creates a table with stable column widths: long values are truncated and expanded via click.
@@ -98,59 +122,60 @@ declare function table:properties(
  :   * 'all': list all entries, ignoring the maximum number of table entries
  :   * 'sticky': content placed above the buttons. Everything above the table is then pinned to
  :     the top of the scrolling panel, so that the actions stay reachable while the rows pass
- :     underneath. The key may be present with no content, which pins the buttons alone
+ :     underneath
+ :   * 'pinned': pins the buttons alone, without content above them
  :   * 'below': content placed below the buttons, above the result summary
  : @return table
  :)
 declare function table:create(
-  $headers  as map(*)*,
+  $headers  as table:column*,
   $entries  as map(*)*,
   $buttons  as element()* := (),
   $params   as map(*) := {},
-  $options  as map(*) := {}
+  $options  as table:options := {}
 ) as element()+ {
   (: sort entries :)
   let $sort := $options?sort
   let $sorted-entries := (
     let $key := $sort[.] otherwise head($headers)?key
-    return if (not($sort) or $key = $options?presort) {
+    return if (not($sort) or $key = $options?presort) then (
       $entries
-    } else {
+    ) else (
       let $header := $headers[?key = $key]
       let $value := (
         let $desc := $header?order = 'desc'
         (: a cell that a function produces is ordered by the text it produces :)
         let $atomize := fn($v) { if ($v instance of fn(*)) then string-join($v()) else $v }
-        let $order := $table:TYPES(($header?sort otherwise $header?type) otherwise '')?order
-        let $convert := if ($order = 'number') {
-          if ($desc) {
+        let $order := $table:TYPES?($header?sort otherwise $header?type)?order
+        let $convert := if ($order = 'number') then (
+          if ($desc) then (
             fn { 0 - number() }
-          } else {
+          ) else (
             fn { number() }
-          }
-        } else if ($order = 'date' and $desc) {
+          )
+        ) else if ($order = 'date' and $desc) then (
           (: a date is ordered by its lexical form, which only descending has to turn around :)
           fn { xs:dateTime('0001-01-01T00:00:00Z') - xs:dateTime(.) }
-        } else {
+        ) else (
           identity(?)
-        }
+        )
         return fn($v) { $convert($atomize($v)) }
       )
       for $entry in $entries
-      order by $value($entry($key)) empty greatest collation '?lang=en'
+      order by $value($entry?$key) empty greatest collation '?lang=en'
       return $entry
-    }
+    )
   )
 
   (: a checkbox submits what identifies its row: a value of its own, or what the row shows :)
   let $select := $options?select
 
   (: show results; 'all' lists every entry, whatever the configured maximum :)
-  let $max-option := if ($options?all) {
+  let $max-option := if ($options?all) then (
     max((count($sorted-entries), 1))
-  } else {
+  ) else (
     config:get($config:MAXROWS)
-  }
+  )
   let $count-option := $options?count[not($sort)]
   let $page-option := $options?page
 
@@ -187,33 +212,33 @@ declare function table:create(
         ))[. >= 1 and . <= $last-page])
         for $page at $pos in $pages
         let $suffix := (if ($page = $last-page) then ')' else ' ') ||
-          (if ($pages[$pos + 1] > $page + 1) then ' … ' else ())
-        return if ($curr-page = $page) {
+          ' … '[$pages[$pos + 1] > $page + 1]
+        return if ($curr-page = $page) then (
           $page || $suffix
-        } else {
+        ) else (
           html:link(string($page), '', ($params, { 'page': $page, 'sort': $sort })),
           $suffix
-        }
+        )
       }
     }
   )
   return (
     (: the head is pinned to the top of the scrolling panel it sits in :)
-    if (map:contains($options, 'sticky')) {
+    if ($options?pinned or $options?sticky) then (
       <div class='sticky'>{ $head }</div>
-    } else {
+    ) else (
       $head
-    },
+    ),
 
     (: list of results :)
-    let $shown-entries := if ($count-option) {
+    let $shown-entries := if ($count-option) then (
       $sorted-entries
-    } else {
+    ) else (
       let $first := ($curr-page - 1) * $max-option + 1
       return $sorted-entries[position() >= $first][position() <= $max-option + 1]
-    }
+    )
     where exists($shown-entries) or exists($options?filters)
-    let $fixed := some $header in $headers satisfies exists($header?width)
+    let $fixed := some $header in $headers satisfies $header?width
     let $table := element table {
       attribute class { 'fixed' }[$fixed],
       element tr {
@@ -228,13 +253,13 @@ declare function table:create(
             <input type='checkbox' onclick='toggle(this)'/>, ' '
           },
 
-          if (empty($sort) or $name = $sort or not($label)) {
+          if (empty($sort) or $name = $sort or not($label)) then (
             (: sorted column, xml column, and a column with no label to click: only the label :)
             $label
-          } else {
+          ) else (
             (: generate sort link :)
             html:link($label, '', ($params, { 'sort': $name }))
-          }
+          )
         }
       },
       $options?filters,
@@ -247,17 +272,17 @@ declare function table:create(
         let $type := $header?type
 
         (: format value :)
-        let $v := $entry($name)
-        let $format := $table:TYPES($type otherwise '')?format
+        let $v := $entry?$name
+        let $format := $table:TYPES?$type?format
         let $value := try {
-          if (exists($format)) {
+          if (exists($format)) then (
             $format($v)
-          } else if ($v instance of fn(*)) {
+          ) else if ($v instance of fn(*)) then (
             (: a cell that a function produces is what it returns :)
             $v()
-          } else {
+          ) else (
             string($v)
-          }
+          )
         } catch * {
           $err:description
         }
@@ -265,7 +290,7 @@ declare function table:create(
           attribute class { 'num' }[$type = $table:NUMBER],
           if ($pos = 1 and $buttons) {
             <input type='checkbox' name='{ $select otherwise $name }'
-              value='{ if ($select) then $entry($select) else data($value) }'
+              value='{ if ($select) then $entry?$select else data($value) }'
               onclick='buttons(this)'/>,
             ' '
           },

@@ -32,28 +32,25 @@ function dba:file-upload(
   let $params := { 'name': $name }
   return try {
     (: reject backups with invalid content :)
-    map:for-each($files, fn($file, $content) {
-      let $db := replace($file, $utils:BACKUP-ZIP-REGEX, '$1')
-      let $entries := archive:entries($content) ! data()
-      where not(if ($db) {
-        every $entry in $entries satisfies starts-with($entry, $db || '/') and
-        $entries = $db || '/inf.basex'
-      } else {
-        every $entry in $entries satisfies matches($entry, '\.(xml|basex)')
-      })
-      return error((), 'Invalid backup file: ' || $file)
-    }),
+    for key $file value $content in $files
+    let $db := replace($file, $utils:BACKUP-ZIP-REGEX, '$1')
+    let $entries := archive:entries($content) ! data()
+    where not(if ($db) then (
+      every $entry in $entries satisfies starts-with($entry, $db || '/') and
+      $entries = $db || '/inf.basex'
+    ) else (
+      every $entry in $entries satisfies matches($entry, '\.(xml|basex)')
+    ))
+    return error((), 'Invalid backup file: ' || $file),
     (: reject the backup of another database: it would be invisible in the panel it was uploaded
        from. Without a selected database there is nothing to contradict, and a backup of a
        database that no longer exists is what a recovery starts from :)
-    map:for-each($files, fn($file, $content) {
-      let $db := replace($file, $utils:BACKUP-ZIP-REGEX, '$1')
-      where $name and $db != $name
-      return error((), `Backup "{ $file }" does not belong to database "{ $name }".`)
-    }),
-    map:for-each($files, fn($file, $content) {
-      file:write-binary($dir || $file, $content)
-    }),
+    for key $file in $files
+    let $db := replace($file, $utils:BACKUP-ZIP-REGEX, '$1')
+    where $name and $db != $name
+    return error((), `Backup "{ $file }" does not belong to database "{ $name }".`),
+    for key $file value $content in $files
+    return file:write-binary($dir || $file, $content),
     utils:outcome($dba:CAT, $params,
       { 'info': utils:info(map:keys($files), 'backup', 'uploaded') })
   } catch * {

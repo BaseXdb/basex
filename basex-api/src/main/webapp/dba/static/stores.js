@@ -43,14 +43,6 @@ function selectStore(name) {
 }
 
 /**
- * Returns the key of the entry that is shown.
- * @returns {string} key; empty if the store itself is all that is chosen
- */
-function entryKey() {
-  return selectionPath()[0] ?? "";
-}
-
-/**
  * Requests what the path leads to: the children of the level, and the value itself.
  */
 function showLevel() {
@@ -82,7 +74,8 @@ async function newStore() {
 function pushSelection() {
   // the level is stated as a whole, so that an update returns to it; within the store, the
   // entry that is shown is what names the selection
-  pushParams({ name: _store, path: pathToString(_path), key: _path.length ? "" : entryKey() });
+  pushParams({ name: _store, path: pathToString(_path),
+    key: _path.length ? "" : selectionPath()[0] ?? "" });
 }
 
 /**
@@ -91,8 +84,7 @@ function pushSelection() {
 function adoptSelection() {
   const params = new URLSearchParams(window.location.search);
   _store = params.get("name") ?? "";
-  const path = params.get("path");
-  _path = parsePath(path);
+  _path = parsePath(params.get("path"));
   // within the store, the address names the entry that is shown; deeper, the level is all
   // that is reproduced, and the server states what it rendered
   _selected = _path.length ? null : (params.get("key") || null);
@@ -154,16 +146,9 @@ function saveValue() {
 function selectChild(step) {
   _selected = parseStep(step);
   // the panel is not asked for again: what is marked is all that changes there
-  markSelected();
+  mark("entries-panel", stepToString(_selected));
   pushSelection();
   refreshValue();
-}
-
-/**
- * Points out the selected child of the shown level.
- */
-function markSelected() {
-  mark("entries-panel", stepToString(_selected));
 }
 
 /**

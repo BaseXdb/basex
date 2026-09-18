@@ -23,16 +23,16 @@ function dba:check(
   (: redirects to the login page if a user is not logged in, or if the page is not public :)
   let $path := $perm?path
   let $allow := $perm?allow
-  return if ($allow = 'public') {
+  return if ($allow = 'public') then (
     (: public function, register id for better log entries :)
     request:set-attribute('id', $allow)
-  } else if (session:get($config:SESSION-KEY)) {
+  ) else if (session:get($config:SESSION-KEY)) then (
     (: everything fine, user is logged in :)
-  } else {
+  ) else (
     (: last visited page to redirect to (if there was one) :)
     let $page := replace($path, '^.*dba/?', '')[.]
     return web:redirect(utils:page('login'), html:parameters({ 'page': $page }))
-  }
+  )
 };
 
 (:~
@@ -68,16 +68,15 @@ function dba:login(
   $page   as xs:string?
 ) as element() {
   (: user is already logged in: redirect to main page :)
-  if (session:get($config:SESSION-KEY)) {
+  if (session:get($config:SESSION-KEY)) then (
     web:redirect('/dba')
-  } else {
+  ) else (
     html:panel(
       <form method='post'>
         <input type='hidden' name='_page' value='{ $page }'/>
         {
-          map:for-each(html:parameters(), fn($key, $value) {
-            <input type='hidden' name='{ $key }' value='{ $value }'/>
-          }),
+          for key $key value $value in html:parameters()
+          return <input type='hidden' name='{ $key }' value='{ $value }'/>,
           form:field('Name:', <input type='text' name='_name' value='{ $name }' autofocus=''/>),
           form:field('Password:', (
             <input type='password' name='_pass'/>,
@@ -88,7 +87,7 @@ function dba:login(
       </form>,
       { 'divider': true(), 'pane': false() })
     => html:wrap({ 'error': $error })
-  }
+  )
 };
 
 (:~
@@ -112,11 +111,11 @@ function dba:login-check(
 ) as element(rest:response) {
   try {
     user:check($name, $pass),
-    if (user:list-details($name)/@permission != 'admin') {
+    if (user:list-details($name)/@permission != 'admin') then (
       dba:reject($name, 'Admin credentials required', $page)
-    } else {
+    ) else (
       dba:accept($name, $page)
-    }
+    )
   } catch user:* {
     dba:reject($name, 'Please check your login data', $page),
     prof:sleep(500)

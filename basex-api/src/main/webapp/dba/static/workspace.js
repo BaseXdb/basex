@@ -345,7 +345,7 @@ function showResult(json) {
   document.getElementById("output-hint").hidden = true;
   const items = json.items;
   document.getElementById("result-label").textContent =
-    items === undefined ? "Result" : `Result (${items} ${items === 1 ? "item" : "items"})`;
+    items === undefined ? "Result" : `Result (${plural(items, "item")})`;
   setRunInfo(json.time ? `Runtime: ${json.time}` : "");
   showInfo(json.info);
 }
@@ -533,16 +533,6 @@ async function loadTab(t) {
 }
 
 /**
- * Indicates whether the active document holds unsaved work. Content that the code wrote (a file
- * that was opened) is no reason to treat it as edited; a restored draft is.
- * @returns {boolean} edit state
- */
-function modified() {
-  const t = tab();
-  return t ? tabModified(t) : false;
-}
-
-/**
  * Fills the editor from the code, which is no edit of the user: what is written here brings no
  * draft with it, and leaves the document as modified as it was.
  * @param {Function} fill function that writes to the editor
@@ -638,7 +628,7 @@ function createDir() {
 function checkButtons() {
   setDisabled("run", !runnable());
   // an unchanged document has nothing to save; a copy of it can be saved at any time
-  setDisabled("save", !modified());
+  setDisabled("save", !(tab() && tabModified(tab())));
   setDisabled("saveas", !editorValue());
 }
 
@@ -661,6 +651,10 @@ _editor_changed = () => {
   checkButtons();
   saveDraft();
 };
+
+/** The sort links of the file panel are followed in place; the panel lists a directory as a
+    whole, so it has no pages. */
+followPanelLinks({ "files-panel": sort => refreshFiles(sort) });
 
 /** The chooser of a file panel that has just arrived shows the directory the server resolved:
     that is the one that is remembered. */

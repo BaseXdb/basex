@@ -72,7 +72,7 @@ declare function panels:stores(
            addresses it :)
         'select': 'name',
         (: nothing but the buttons above the list, and they stay in reach :)
-        'sticky': ()
+        'pinned': true()
       }
       return table:create($headers, $entries, $buttons, {}, $options)
     }
@@ -100,7 +100,7 @@ declare function panels:entries(
   (: a path that does not resolve any more is given up; the client adopts the one that is
      rendered, which is why it is stated in the markup :)
   let $resolved := if (exists($root)) { panels:resolve($root, tail($path)) }
-  let $steps := if (exists($resolved)) { $path } else if (exists($root)) { $key } else { () }
+  let $steps := if (exists($resolved)) then $path else if (exists($root)) { $key }
   let $value := $resolved otherwise $root
   let $text := panels:path($steps)
   let $positional := $value instance of array(*) or count($value) > 1
@@ -108,16 +108,16 @@ declare function panels:entries(
   let $sort := $sort[.] otherwise 'label'
   (: a written value is rebuilt along its path, so a step that names a position cannot be :)
   let $editable := every $step in $steps satisfies not($step instance of map(*))
-  let $children := if (empty($steps)) {
+  let $children := if (empty($steps)) then (
     for $entry in store:keys($name)
     return {
       'label': $entry,
       'step': panels:step-text($entry),
       'value': fn() { store:get($entry, $name) }
     }
-  } else {
+  ) else (
     panels:children($value)
-  }
+  )
   (: the child that is looked at; the level it belongs to is what the panel lists :)
   let $marked := $selected ! panels:step-text(.)
   return (
@@ -158,7 +158,7 @@ declare function panels:entries(
           'select': 'step',
           (: what can be done with the level stays in view while its children scroll; the path
              that leads to it is stated below what acts on it :)
-          'sticky': (),
+          'pinned': true(),
           'below': panels:breadcrumb($root, $steps)
         }
         return table:create($headers, $entries, $buttons, { 'name': $name }, $options)
@@ -169,9 +169,9 @@ declare function panels:entries(
       integers.</div>[not($editable)],
 
     (: the index that follows the last child appends one :)
-    panels:add-dialog($name, $text, if ($value instance of array(*)) {
+    panels:add-dialog($name, $text, if ($value instance of array(*)) then (
       array:size($value) + 1
-    } else if ($positional) {
+    ) else if ($positional) {
       count($value) + 1
     })
   )
@@ -230,12 +230,12 @@ declare %private function panels:add-dialog(
     <input type='hidden' name='index' value='{ $index }'/>,
     (: a position is not asked for: a child is appended to the level it belongs to. A key is
        supplied as an expression, as a map is keyed by any atomic value :)
-    if ($index) {
+    if ($index) then (
       <input type='hidden' name='step' value='{ $max }'/>
-    } else {
+    ) else (
       form:field('Key:',
         <input type='text' name='step' placeholder="'key'" required='' autofocus=''/>, 'stacked')
-    },
+    ),
     (: no 'required': the editor hides the text area, and a hidden field that fails validation
        cannot be focused, which would block the submit without telling the user why :)
     form:field('Value:',
@@ -253,27 +253,24 @@ declare %private function panels:add-dialog(
 declare function panels:value(
   $name  as xs:string?,
   $path  as item()*
-) as map(*) {
+) as utils:editor {
   let $key := head($path)
   let $root := if ($key) { store:get($key, $name) }
   let $value := if (exists($root)) { panels:resolve($root, tail($path)) }
-  return if (empty($value)) {
+  return if (empty($value)) then (
     (: the store itself has no value, and a path that is gone leads to none :)
-    { 'exists': false(), 'text': '' }
-  } else {
+    { 'exists': false(), 'text': '', 'editable': false() }
+  ) else (
     (: the value is written as the expression that yields it again, so that what is edited here
        can be stored again :)
     let $expression := utils:expression($value)
     (: a written value is rebuilt along its path, so a step that names a position cannot be :)
     let $addressable := every $step in $path satisfies not($step instance of map(*))
-    return map:merge((
-      { 'exists': true() },
-      utils:editable($expression?text, (
-        'all steps of the path must be strings and integers'[not($addressable)],
-        'the value is too large for editing'[$expression?truncated]
-      ))
+    return utils:editable($expression?text, (
+      'all steps of the path must be strings and integers'[not($addressable)],
+      'the value is too large for editing'[$expression?truncated]
     ))
-  }
+  )
 };
 
 (:~
@@ -282,11 +279,10 @@ declare function panels:value(
  : @return panel contents; empty if the path leads to no value
  :)
 declare function panels:value-panel(
-  $value  as map(*)
+  $value  as utils:editor
 ) as element()* {
-  if (not($value?exists)) {
-    (: nothing is shown: the panel is not shown either, so it needs no placeholder :)
-  } else {
+  (: nothing is shown: the panel is not shown either, so it needs no placeholder :)
+  if ($value?exists) {
     <div class='buttons'>{
       (: enabled by the client once it knows that the value can be edited :)
       <button type='button' id='save-value' onclick='saveValue()' disabled=''>Replace</button>
@@ -305,17 +301,16 @@ declare %private function panels:breadcrumb(
   $root  as item()*,
   $path  as item()*
 ) as element(div)? {
-  if (empty($path)) {
-    (: the top level is where the path starts: there is none to state :)
-  } else {
+  (: the top level is where the path starts: there is none to state :)
+  if (exists($path)) {
     let $labels := (
       'Root',
       for $step at $pos in $path
-      return if ($pos = 1) {
+      return if ($pos = 1) then (
         string($step)
-      } else {
+      ) else (
         panels:label($root, subsequence(tail($path), 1, $pos - 1))
-      }
+      )
     )
     return <div class='note ellipsis'>{
       for $label at $pos in $labels
@@ -323,12 +318,12 @@ declare %private function panels:breadcrumb(
         (: text nodes, as two adjacent strings would be separated by a space :)
         text { ' » ' }[$pos > 1],
         (: the last step leads to the level that is shown, and nowhere to go :)
-        if ($pos = count($labels)) {
+        if ($pos = count($labels)) then (
           text { $label }
-        } else {
+        ) else (
           html:action($label, 'truncatePath', { 'depth': $pos - 1 },
             { 'class': 'root'[$pos = 1] })
-        }
+        )
       )
     }</div>
   }
@@ -344,13 +339,21 @@ declare %private function panels:label(
   $root    as item()*,
   $prefix  as item()*
 ) as xs:string {
-  let $step := $prefix[last()]
-  return if ($step instance of map(*)) {
-    let $parent := panels:resolve($root, subsequence($prefix, 1, count($prefix) - 1))
-    return string(map:keys($parent)[$step?pos])
-  } else {
-    string($step)
-  }
+  let $parent := panels:resolve($root, subsequence($prefix, 1, count($prefix) - 1))
+  return string(panels:key($parent, $prefix[last()]))
+};
+
+(:~
+ : Returns the key of a map entry that a step addresses.
+ : @param  $map   map
+ : @param  $step  step: a key, or the position of a key that is not written down as itself
+ : @return key
+ :)
+declare %private function panels:key(
+  $map   as item()*,
+  $step  as item()
+) as item()? {
+  if ($step instance of map(*)) then map:keys($map)[$step?pos] else $step
 };
 
 (:~
@@ -361,19 +364,15 @@ declare %private function panels:label(
 declare %private function panels:children(
   $value  as item()*
 ) as map(*)* {
-  if ($value instance of map(*)) {
-    for $key at $pos in map:keys($value)
+  if ($value instance of map(*)) then (
+    for key $key value $entry at $pos in $value
     (: a key that is neither a string nor an integer is not written down as itself :)
-    let $step := if ($key instance of (xs:string|xs:integer)) {
-      panels:step-text($key)
-    } else {
-      '{"pos":' || $pos || '}'
-    }
-    return { 'label': string($key), 'step': $step, 'value': fn() { $value($key) } }
-  } else if ($value instance of array(*)) {
-    for $pos in 1 to array:size($value)
-    return { 'label': string($pos), 'step': string($pos), 'value': fn() { $value($pos) } }
-  } else if (count($value) > 1) {
+    let $step := if ($key instance of (xs:string | xs:integer)) then $key else { 'pos': $pos }
+    return { 'label': string($key), 'step': panels:step-text($step), 'value': fn() { $entry } }
+  ) else if ($value instance of array(*)) then (
+    for member $member at $pos in $value
+    return { 'label': string($pos), 'step': string($pos), 'value': fn() { $member } }
+  ) else if (count($value) > 1) {
     (: a sequence is addressed by position, as an array is :)
     for $item at $pos in $value
     return { 'label': string($pos), 'step': string($pos), 'value': fn() { $item } }
@@ -390,20 +389,16 @@ declare function panels:remove(
   $value  as item()*,
   $steps  as item()*
 ) as item()* {
-  if ($value instance of map(*)) {
-    map:remove($value, for $step in $steps return if ($step instance of map(*)) {
-      map:keys($value)[$step?pos]
-    } else {
-      $step
-    })
-  } else if ($value instance of array(*)) {
+  if ($value instance of map(*)) then (
+    map:remove($value, $steps ! panels:key($value, .))
+  ) else if ($value instance of array(*)) then (
     array:remove($value, $steps ! xs:integer(.))
-  } else if (count($value) > 1) {
+  ) else if (count($value) > 1) then (
     (: an item is dropped; a level that is left with a single one is that item :)
     $value[not(position() = ($steps ! xs:integer(.)))]
-  } else {
+  ) else (
     error((), 'Value cannot be descended into: ' || type-of($value))
-  }
+  )
 };
 
 (:~
@@ -432,7 +427,7 @@ declare %private function panels:open(
   $value  as item()*
 ) as element(a)? {
   (: an empty map or array is a level as well: it is where its first child is added :)
-  if ($value instance of map(*) or $value instance of array(*) or count($value) > 1) {
+  if ($value instance of (map(*) | array(*)) or count($value) > 1) {
     (: the step is named apart from the one that selects a child: the two links sit in the
        same row, and only the label of a child is pointed out as the selected one :)
     html:action('↘', 'descend', { 'open': $child?step },
@@ -450,18 +445,18 @@ declare function panels:step-text(
 ) as xs:string {
   (: the client writes the same texts and must agree on them to the character; see
      stepToString in stores.js :)
-  if ($step instance of map(*)) {
+  if ($step instance of map(*)) then (
     '{"pos":' || $step?pos || '}'
-  } else if ($step instance of xs:string) {
+  ) else if ($step instance of xs:string) then (
     (: a name is written as itself; anything else is JSON, whose dots are escaped :)
-    if (matches($step, '^\p{L}[\p{L}\p{N}_-]*$')) {
+    if (matches($step, '^\p{L}[\p{L}\p{N}_-]*$')) then (
       $step
-    } else {
+    ) else (
       replace(serialize($step, { 'method': 'json' }), '\.', '\\u002E')
-    }
-  } else {
+    )
+  ) else (
     string($step)
-  }
+  )
 };
 
 (:~
@@ -487,14 +482,14 @@ declare function panels:steps(
 ) as item()* {
   (: a step escapes the dots of its own, so every dot that is left separates two of them :)
   for $step in tokenize($path[.], '\.')
-  return if (matches($step, '^["{]')) {
+  return if (matches($step, '^["{]')) then (
     let $json := parse-json($step)
-    return if ($json instance of map(*)) { { 'pos': xs:integer($json?pos) } } else { string($json) }
-  } else if (matches($step, '^-?\d+$')) {
+    return if ($json instance of map(*)) then { 'pos': xs:integer($json?pos) } else string($json)
+  ) else if (matches($step, '^-?\d+$')) then (
     xs:integer($step)
-  } else {
+  ) else (
     $step
-  }
+  )
 };
 
 (:~
@@ -507,19 +502,19 @@ declare function panels:resolve(
   $value  as item()*,
   $steps  as item()*
 ) as item()* {
-  if (empty($steps)) {
+  if (empty($steps)) then (
     $value
-  } else {
+  ) else (
     let $step := head($steps)
-    let $child := if ($value instance of map(*)) {
-      $value(if ($step instance of map(*)) { map:keys($value)[$step?pos] } else { $step })
-    } else if ($value instance of array(*)) {
+    let $child := if ($value instance of map(*)) then (
+      $value?(panels:key($value, $step))
+    ) else if ($value instance of array(*)) then (
       $value[$step instance of xs:integer and $step = 1 to array:size($value)]($step)
-    } else if (count($value) > 1 and $step instance of xs:integer) {
+    ) else if (count($value) > 1 and $step instance of xs:integer) {
       $value[$step]
     }
     return if (exists($child)) { panels:resolve($child, tail($steps)) }
-  }
+  )
 };
 
 (:~
@@ -534,38 +529,38 @@ declare function panels:replace(
   $steps  as item()*,
   $new    as item()*
 ) as item()* {
-  if (empty($steps)) {
+  if (empty($steps)) then (
     $new
-  } else {
+  ) else (
     let $step := head($steps)
-    return if ($value instance of map(*)) {
-      map:put($value, $step, panels:replace($value($step), tail($steps), $new))
-    } else if ($value instance of array(*)) {
+    return if ($value instance of map(*)) then (
+      map:put($value, $step, panels:replace($value?$step, tail($steps), $new))
+    ) else if ($value instance of array(*)) then (
       let $size := array:size($value)
-      return if ($step <= $size) {
-        array:put($value, $step, panels:replace($value($step), tail($steps), $new))
-      } else if ($step = $size + 1) {
+      return if ($step <= $size) then (
+        array:put($value, $step, panels:replace($value?$step, tail($steps), $new))
+      ) else if ($step = $size + 1) then (
         array:append($value, panels:replace((), tail($steps), $new))
-      } else {
-        error((), 'No such index: ' || $step || '.')
-      }
-    } else if (count($value) > 1) {
+      ) else (
+        error((), `No such index: { $step }.`)
+      )
+    ) else if (count($value) > 1) then (
       let $size := count($value)
-      return if ($step <= $size + 1) {
+      return if ($step <= $size + 1) then (
         for $pos in 1 to max(($size, $step))
         let $item := $value[$pos]
-        return if ($pos = $step) {
+        return if ($pos = $step) then (
           panels:replace($item, tail($steps), $new)
-        } else {
+        ) else (
           $item
-        }
-      } else {
-        error((), 'No such index: ' || $step || '.')
-      }
-    } else {
+        )
+      ) else (
+        error((), `No such index: { $step }.`)
+      )
+    ) else (
       error((), 'Value cannot be descended into: ' || type-of($value))
-    }
-  }
+    )
+  )
 };
 
 (:~
@@ -579,15 +574,15 @@ declare %private function panels:preview(
 ) as item()* {
   let $count := count($value)
   (: how many values there are is what a cell can say about a value that holds further ones :)
-  return if ($count > 1) {
+  return if ($count > 1) then (
     utils:count($count, 'item')
-  } else if ($value instance of map(*)) {
+  ) else if ($value instance of map(*)) then (
     utils:count(map:size($value), 'entry')
-  } else if ($value instance of array(*)) {
+  ) else if ($value instance of array(*)) then (
     utils:count(array:size($value), 'member')
-  } else if ($value instance of xs:base64Binary or $value instance of xs:hexBinary) {
+  ) else if ($value instance of xs:base64Binary or $value instance of xs:hexBinary) then (
     (: nothing: a binary has nothing to read :)
-  } else {
+  ) else (
     <code>{ utils:preview($value, $panels:PREVIEW) }</code>
-  }
+  )
 };

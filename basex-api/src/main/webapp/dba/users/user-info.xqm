@@ -13,20 +13,20 @@ module namespace user-info = 'dba/lib/user-info';
 declare function user-info:parse(
   $info  as xs:string
 ) as element(info) {
-  if ($info) {
+  if ($info) then (
     let $xml := try {
       parse-xml($info)/*
     } catch * {
       error((), 'User information is not well-formed XML.')
     }
-    return if ($xml/self::info) {
+    return if ($xml/self::info) then (
       $xml update {
         delete node .//text()[not(normalize-space())]
       }
-    } else {
+    ) else (
       error((), 'User information has no "info" root element.')
-    }
-  } else {
+    )
+  ) else (
     element info { }
-  }
+  )
 };

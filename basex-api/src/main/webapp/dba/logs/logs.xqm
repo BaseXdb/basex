@@ -299,8 +299,7 @@ declare function dba:entries(
     (: a search that stopped at the limit reports as much: what it did not reach is not
        missing from the log, it was not looked at :)
     <div class='note warn'>{
-      'The search was stopped after ' || $max - 1 || ' entries. ' ||
-      'Choose fewer files, or narrow the search.'
+      `The search was stopped after { $max - 1 } entries. Choose fewer files, or narrow the search.`
     }</div>[$several and count($shown) = $max],
     table:create($dba:COLUMNS, $shown, (), $params, $options)
   )

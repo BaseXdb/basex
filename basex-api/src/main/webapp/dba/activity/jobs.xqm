@@ -74,7 +74,7 @@ declare %private function dba:create(
     { 'service': true() }[$service],
     { 'cache': true() }[$args?cache = 'true'],
     for $name in ('id', 'start', 'interval', 'cron', 'end')
-    for $value in $args?($name)[.]
+    for $value in $args?$name[.]
     return { $name: $value }
   ))
   return void(job:eval($args?query, (), $options))
@@ -129,18 +129,18 @@ function dba:job-result(
   $id  as xs:string
 ) as item()+ {
   let $details := job:list-details($id)
-  return if (empty($details)) {
+  return if (empty($details)) then (
     dba:result($id, false(), 'Job has expired.')
-  } else if ($details/@state != 'cached') {
+  ) else if ($details/@state != 'cached') then (
     dba:result($id, false(), 'Result is not available yet.')
-  } else {
+  ) else (
     try {
       dba:result($id, true(), job:result($id))
     } catch * {
       dba:result($id, false(), utils:error-message($err:module, $err:line-number,
         $err:column-number, $err:description))
     }
-  }
+  )
 };
 
 (:~

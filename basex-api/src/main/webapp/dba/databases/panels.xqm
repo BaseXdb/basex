@@ -76,7 +76,7 @@ declare function panels:databases(
           'page': $page,
           'count': count($db-names) + count($dropped),
           (: nothing but the buttons above the list, and they stay in reach :)
-          'sticky': ()
+          'pinned': true()
         }
         return table:create($headers, ($databases, $dropped), $buttons, {}, $options)
       }
@@ -122,20 +122,20 @@ declare function panels:database(
   $dir       as xs:string,
   $filter    as xs:string
 ) as element()* {
-  if (not($name)) {
+  if (not($name)) then (
     (: nothing is selected: the panel is not shown, so it needs no placeholder :)
-  } else if (not(db:exists($name))) {
+  ) else if (not(db:exists($name))) then (
     (: the name is only known from the backups of the dropped database :)
     <h2>{ 'Database: ' || $name }</h2>,
     <div class='note'>The database does not exist; one of its backups can be restored.</div>
-  } else {
+  ) else (
     panels:resource-list($name, $sort, $page, $resource, $dir, $filter),
     panels:add-dialog($name),
     panels:optimize-dialog($name),
     (: the new name of the database is asked for; the chosen action decides what is done with it :)
     form:prompt('database-newname', 'newname', (),
       <input type='hidden' name='name' value='{ $name }'/>)
-  }
+  )
 };
 
 (:~
@@ -169,16 +169,16 @@ declare %private function panels:resource-list(
       (: one level of the database, directories first; a level is what a database of many
          resources is browsed by, and what its total is counted over. A filter looks past the
          levels: what it matches is the path of a resource, wherever it is stored :)
-      let $level := if ($filter) {
+      let $level := if ($filter) then (
         let $lower := lower-case($filter)
         for $entry in db:list-details($name)
         where contains(lower-case($entry), $lower)
         return $entry
-      } else {
+      ) else (
         for $entry in db:dir($name, $dir)
         order by boolean($entry/self::dir) descending, string($entry) collation '?lang=en'
         return $entry
-      }
+      )
       let $entries :=
         for $entry in utils:slice($level, $page, $sort)
         let $label := string($entry)
@@ -188,12 +188,12 @@ declare %private function panels:resource-list(
            is named by its full path, as it is not what the shown level holds :)
         let $path := if ($filter) then $label else $dir || $label || '/'[$directory]
         return {
-          'name': if ($directory) {
+          'name': if ($directory) then (
             fn() { panels:enter($label || '/', $name, $path) }
-          } else {
+          ) else (
             html:select($label, $panels:CAT, { 'name': $name, 'resource': $path },
               $path = $resource, 'resource', 'selectResource')
-          },
+          ),
           (: the checkbox submits the full path, which is what an action addresses :)
           'resource': $path,
           'type': $entry/@type,
@@ -221,7 +221,7 @@ declare %private function panels:resource-list(
         'sort': $sort,
         'page': $page,
         (: the entries of one level are known, so the total is what they are counted by :)
-        'count': if ($sort) { () } else { count($level) },
+        'count': if ($sort) then () else count($level),
         'select': 'resource',
         (: the database and what can be done with it stay in view while its resources scroll :)
         'sticky': panels:database-heading($name, $dir)
@@ -319,10 +319,10 @@ declare function panels:backups(
 ) as element()+ {
   (: both are recovery corners, so the panel opens on demand :)
   (: a selected database supersedes the general backups: its own are what is asked for :)
-  if ($name) {
+  if ($name) then (
     <h2>{ 'Backup: ' || $name }</h2>,
     panels:backup-section($name)
-  } else {
+  ) else (
     <h2>Backups</h2>,
     <div class='note'>
       Comprises
@@ -332,7 +332,7 @@ declare function panels:backups(
       <a target='_blank' href='https://docs.basex.org/main/Store_Functions'>stores</a>.
     </div>,
     panels:backup-section('')
-  }
+  )
 };
 
 (:~ Number of characters of an index entry that are listed. :)
@@ -386,9 +386,8 @@ declare function panels:index(
   $sort    as xs:string,
   $page    as xs:integer
 ) as element()* {
-  if (not($name) or not(db:exists($name))) {
-    (: nothing is selected: the panel is not shown, so it needs no placeholder :)
-  } else {
+  (: nothing is selected: the panel is not shown, so it needs no placeholder :)
+  if ($name and db:exists($name)) {
     <form autocomplete='off' action='javascript:void(0);' data-sort='{ $sort }'
           data-page='{ $page }'>
       {
@@ -474,7 +473,7 @@ declare %private function panels:entry(
      elements is an entry of its own. What is listed is one line of it, so that the table stays a
      table, and an entry that holds nothing but whitespace is named instead of shown :)
   let $text := normalize-space($entry)
-  return if ($text) { utils:chop($text, $panels:PREVIEW) } else { '(whitespace)' }
+  return if ($text) then utils:chop($text, $panels:PREVIEW) else '(whitespace)'
 };
 
 (:~
@@ -486,9 +485,8 @@ declare %private function panels:entry(
 declare function panels:information(
   $name  as xs:string?
 ) as element()* {
-  if (not($name) or not(db:exists($name))) {
-    (: nothing is selected: the panel is not shown, so it needs no placeholder :)
-  } else {
+  (: nothing is selected: the panel is not shown, so it needs no placeholder :)
+  if ($name and db:exists($name)) {
     (: a report: what can be changed is asked for by the Optimize dialog :)
     <h2>Information</h2>,
     table:properties(db:info($name))
@@ -506,48 +504,46 @@ declare function panels:information(
 declare function panels:resource(
   $name      as xs:string?,
   $resource  as xs:string?,
-  $document  as map(*)
+  $document  as utils:editor
 ) as element()* {
-  if (not($document?exists)) {
-    (: nothing is selected: the panel is not shown, so it needs no placeholder :)
-  } else {
-    <h2>{ 'Resource: ' || $resource }</h2>,
-    <form method='post' autocomplete='off'>
-      <input type='hidden' name='name' value='{ $name }'/>
+  (: nothing is selected: the panel is not shown, so it needs no placeholder :)
+  if ($document?exists) {
+    let $hidden := (
+      <input type='hidden' name='name' value='{ $name }'/>,
       <input type='hidden' name='resource' value='{ $resource }'/>
-      <div class='buttons'>{
-        (: enabled by the client once it knows that the document can be edited :)
-        <button type='button' id='save-resource' onclick='saveResource()'
-                disabled=''>Save</button>,
-        <button type='button' onclick='copyResource()'>Copy</button>,
-        (: a query on a large document takes time, and can be given up on :)
-        if ($document?xml) {
-          <button type='button' id='stop' onclick='stopQuery()' disabled=''>Stop</button>
-        },
-        <button type='button' onclick='renameResource()'>Rename…</button>,
-        form:button('db-download', 'Download'),
-        <button type='button' onclick='chooseUpload("replace-file")'>Upload…</button>,
-        <label>{
-          <input type='checkbox' id='indent' onchange='indentChanged()'/>, ' Indent'
-        }</label>
-      }</div>
-    </form>,
-    (: the line is reserved: the client writes to it as well :)
-    <div id='note' class='note{ ' warn'[$document?note] }'>{ $document?note }</div>,
-    if ($document?xml) {
-      <input type='text' class='query' name='input' id='input'
-             placeholder='Enter your query…' onkeyup='queryResource(false)'/>
-    },
+    )
+    return (
+      <h2>{ 'Resource: ' || $resource }</h2>,
+      <form method='post' autocomplete='off'>{
+        $hidden,
+        <div class='buttons'>{
+          (: enabled by the client once it knows that the document can be edited :)
+          <button type='button' id='save-resource' onclick='saveResource()'
+                  disabled=''>Save</button>,
+          <button type='button' onclick='copyResource()'>Copy</button>,
+          (: a query on a large document takes time, and can be given up on :)
+          if ($document?xml) {
+            <button type='button' id='stop' onclick='stopQuery()' disabled=''>Stop</button>
+          },
+          <button type='button' onclick='renameResource()'>Rename…</button>,
+          form:button('db-download', 'Download'),
+          <button type='button' onclick='chooseUpload("replace-file")'>Upload…</button>,
+          <label>{
+            <input type='checkbox' id='indent' onchange='indentChanged()'/>, ' Indent'
+          }</label>
+        }</div>
+      }</form>,
+      (: the line is reserved: the client writes to it as well :)
+      <div id='note' class='note{ ' warn'[$document?note] }'>{ $document?note }</div>,
+      if ($document?xml) {
+        <input type='text' class='query' name='input' id='input'
+               placeholder='Enter your query…' onkeyup='queryResource(false)'/>
+      },
 
-    (: the new path of the resource is asked for and submitted :)
-    form:prompt('rename-target', 'target', 'databases/resource-rename', (
-      <input type='hidden' name='name' value='{ $name }'/>,
-      <input type='hidden' name='resource' value='{ $resource }'/>
-    )),
-    form:upload('databases/replace', 'replace-file', false(), (
-      <input type='hidden' name='name' value='{ $name }'/>,
-      <input type='hidden' name='resource' value='{ $resource }'/>
-    ))
+      (: the new path of the resource is asked for and submitted :)
+      form:prompt('rename-target', 'target', 'databases/resource-rename', $hidden),
+      form:upload('databases/replace', 'replace-file', false(), $hidden)
+    )
   }
 };
 
@@ -555,16 +551,16 @@ declare function panels:resource(
  : Returns the document that is shown in the editor, and what can be done with it.
  : @param  $name      selected database
  : @param  $resource  selected resource
- : @return properties: whether the resource exists, is XML, is truncated and can be edited,
- :         the reason why it cannot be edited, and its text
+ : @return properties: whether the resource exists, is XML and can be edited, the reason why
+ :         it cannot be edited, and its text
  :)
 declare function panels:document(
   $name      as xs:string?,
   $resource  as xs:string?
-) as map(*) {
-  if (not($name and $resource and db:exists($name, $resource))) {
-    { 'exists': false(), 'text': '' }
-  } else {
+) as utils:editor {
+  if (not($name and $resource and db:exists($name, $resource))) then (
+    { 'exists': false(), 'text': '', 'editable': false() }
+  ) else (
     (: the value is serialized with a bounded limit: db:list-details/@size counts nodes, not
        characters, so the length of the shown text is only known once the text is there :)
     let $xml := db:type($name, $resource) = 'xml'
@@ -577,17 +573,14 @@ declare function panels:document(
     let $truncated := string-length($text) > $max
     (: what speaks against editing; the note the client extends for query results is the one
        that utils:editable composes from it :)
-    return map:merge((
-      { 'exists': true(), 'xml': $xml, 'truncated': $truncated },
-      utils:editable(
-        if ($truncated) { substring($text, 1, $max) } else { $text },
-        (
-          'only XML documents can be edited'[not($xml)],
-          'the document is too large, download it to see all of it'[$truncated]
-        )
+    return utils:editable(
+      if ($truncated) then substring($text, 1, $max) else $text,
+      (
+        'only XML documents can be edited'[not($xml)],
+        'the document is too large, download it to see all of it'[$truncated]
       )
-    ))
-  }
+    ) but with { 'xml': $xml }
+  )
 };
 
 (:~
@@ -601,13 +594,13 @@ declare function panels:resource-value(
   $resource  as xs:string
 ) as item()* {
   let $type := db:type($name, $resource)
-  return if ($type = 'xml') {
+  return if ($type = 'xml') then (
     db:get($name, $resource)
-  } else if ($type = 'binary') {
+  ) else if ($type = 'binary') then (
     db:get-binary($name, $resource)
-  } else {
+  ) else (
     db:get-value($name, $resource)
-  }
+  )
 };
 
 (:~
@@ -671,7 +664,7 @@ declare %private function panels:backup-section(
             (: the name is the download: a column that repeats it as a link adds nothing :)
             'backup': fn() {
               html:link(substring-after($backup, $name || '-'),
-                'backup/' || encode-for-uri($backup) || '.zip')
+                `backup/{ encode-for-uri($backup) }.zip`)
             },
             'size': $backup/@size,
             'comment': $backup/@comment

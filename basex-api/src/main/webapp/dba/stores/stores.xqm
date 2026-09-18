@@ -56,7 +56,7 @@ function dba:stores(
     'columns': ('30fr', '35fr', '35fr'),
     'rows'   : '1fr',
     'scripts': ('cm6', 'editor', 'stores'),
-    'init'   : 'initStores(' || ($value?editable = true()) || ');'
+    'init'   : `initStores({ $value?editable });`
   })
 };
 
@@ -102,11 +102,11 @@ function dba:action(
       let $steps := panels:steps($args?path)
       let $path := (
         $steps,
-        if ($args?index = 'true') {
+        if ($args?index = 'true') then (
           xs:integer($args?step)
-        } else {
+        ) else (
           dba:key($args?step, empty($steps))
-        }
+        )
       )
       return {
         'params': dba:selection($args, head($path)),
@@ -126,13 +126,13 @@ function dba:action(
         'params': dba:selection($args, ()),
         'info'  : utils:info($steps, 'entry', 'removed'),
         'run'   : %updating fn() {
-          if (empty($path)) {
+          if (empty($path)) then (
             $steps ! store:remove(string(.), $args?name)
-          } else {
+          ) else (
             let $value := store:get($key, $args?name)
             let $level := panels:remove(panels:resolve($value, tail($path)), $steps)
             return store:put($key, panels:replace($value, tail($path), $level), $args?name)
-          }
+          )
         }
       }
     },
@@ -174,10 +174,10 @@ declare %private function dba:selection(
   $key   as xs:string?
 ) as map(*) {
   let $path := $args?path[.]
-  return map:merge((
+  return {
     { 'name': $args?name },
-    if ($path) { { 'path': $path } } else { { 'key': $key }[$key] }
-  ))
+    if ($path) then { 'path': $path } else { 'key': $key }[$key]
+  }
 };
 
 (:~
@@ -193,11 +193,11 @@ declare %private function dba:add(
 ) as empty-sequence() {
   (: a path that resolves leads to an entry that is there; a position past the last one
      resolves to nothing, so a child of a sequence or an array is always appended :)
-  if (exists(panels:resolve(store:get(head($path), $name), tail($path)))) {
-    error((), 'Entry already exists: ' || $path[last()] || '.')
-  } else {
+  if (exists(panels:resolve(store:get(head($path), $name), tail($path)))) then (
+    error((), `Entry already exists: { $path[last()] }.`)
+  ) else (
     dba:put($name, $path, $value)
-  }
+  )
 };
 
 (:~
@@ -212,11 +212,11 @@ declare %private function dba:put(
   $value  as item()*
 ) as empty-sequence() {
   let $key := head($path), $steps := tail($path)
-  return store:put($key, if (empty($steps)) {
+  return store:put($key, if (empty($steps)) then (
     $value
-  } else {
+  ) else (
     panels:replace(store:get($key, $name), $steps, $value)
-  }, $name)
+  ), $name)
 };
 
 (:~
@@ -231,11 +231,11 @@ declare %private function dba:key(
 ) as xs:anyAtomicType {
   (: a map is keyed by any atomic value, so the key is supplied the way the value is :)
   let $key := utils:evaluate($query)
-  return if (count($key) != 1 or not($key instance of xs:anyAtomicType)) {
+  return if (not($key instance of xs:anyAtomicType)) then (
     error((), 'The key must be a single atomic value.')
-  } else if ($entry and not($key instance of xs:string)) {
+  ) else if ($entry and not($key instance of xs:string)) then (
     error((), 'An entry of a store is named by a string.')
-  } else {
+  ) else (
     $key
-  }
+  )
 };

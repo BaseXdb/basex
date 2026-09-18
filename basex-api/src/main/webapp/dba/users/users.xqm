@@ -38,8 +38,8 @@ function dba:users(
   (: the selection is part of the address, so a link reproduces what the panels show :)
   let $user := panels:user($name, $newname, $perm)
   let $permissions := panels:local-permissions($name)
-  let $panel := fn($contents, $options) {
-    html:panel($contents, map:put($options, 'divider', true()))
+  let $panel := fn($contents, $options as html:panel-options) {
+    html:panel($contents, $options but with { 'divider': true() })
   }
   return (
     $panel(panels:users($sort, $name), { 'id': 'users-panel', 'label': 'Users' }),
@@ -85,11 +85,11 @@ function dba:action(
       'params': { 'name': $args?name },
       'info'  : utils:info($args?name, 'user', 'created'),
       'run'   : %updating fn() {
-        if (user:exists($args?name)) {
+        if (user:exists($args?name)) then (
           error((), 'User already exists.')
-        } else {
+        ) else (
           user:create($args?name, $args?pw, $args?perm)
-        }
+        )
       }
     } },
     'drop': fn($args) { {
@@ -112,9 +112,9 @@ function dba:action(
         },
         'info'  : utils:info($newname, 'user', 'updated'),
         'run'   : %updating fn() {
-          if ($taken) {
+          if ($taken) then (
             error((), 'User already exists.')
-          } else if ($name != $newname) {
+          ) else if ($name != $newname) {
             user:alter($name, $newname)
           },
           (: an empty field leaves the password as it is :)

@@ -107,12 +107,12 @@ function dba:files-download(
     where file:is-file($path)
     return $path
   return try {
-    if (empty($paths)) {
+    if (empty($paths)) then (
       utils:outcome($dba:CAT, {}, { 'error': 'No file was selected.' })
-    } else {
+    ) else (
       (: the archive is named after the current directory :)
       utils:download($paths, file:name(replace($dir, '[/\\]+$', ''))[.] otherwise 'files')
-    }
+    )
   } catch * {
     utils:outcome($dba:CAT, {}, { 'error': 'Download failed: ' || $err:description })
   }

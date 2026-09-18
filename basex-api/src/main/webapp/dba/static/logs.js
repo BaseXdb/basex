@@ -136,7 +136,7 @@ function logFilter() {
   // the buttons are derived from the selection by buttons()
   const summary = list.querySelector("h3");
   if(summary) summary.textContent =
-    `${count} ${count === 1 ? summary.dataset.singular : summary.dataset.plural}`;
+    plural(count, summary.dataset.singular, summary.dataset.plural);
   buttons();
   if(unchecked) logEntries("filter");
 }

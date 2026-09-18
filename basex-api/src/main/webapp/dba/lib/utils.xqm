@@ -18,6 +18,22 @@ declare variable $utils:BACKUP-REGEX := '^(.*)-(\d{4}-\d\d-\d\d)-(\d\d)-(\d\d)-(
 (:~ Regular expression for the file names of backups. :)
 declare variable $utils:BACKUP-ZIP-REGEX := '^(.*)-(\d{4}-\d\d-\d\d)-(\d\d)-(\d\d)-(\d\d)\.zip$';
 
+(:~ Action of a page, as returned for the request parameters; see utils:dispatch. :)
+declare record utils:action(
+  run     as %updating fn() as item()*,
+  params  as map(*)?,
+  info    as xs:string?
+);
+
+(:~ Value that an editor shows, and what can be done with it. :)
+declare record utils:editor(
+  exists    as xs:boolean,
+  text      as xs:string,
+  editable  as xs:boolean,
+  note      as xs:string?,
+  xml       as xs:boolean?
+);
+
 (:~
  : Parses a query.
  : @param  $query  query string
@@ -69,14 +85,14 @@ declare function utils:expression(
      around every sequence are dropped for it. A truncated text has lost its closing one, and is
      left as it is :)
   let $text := if (count($value) = 1 and starts-with($serialized, '(') and
-      ends-with($serialized, ')')) {
+      ends-with($serialized, ')')) then (
     substring($serialized, 2, string-length($serialized) - 2)
-  } else {
+  ) else (
     $serialized
-  }
+  )
   let $truncated := string-length($text) > $max
   return {
-    'text': if ($truncated) { substring($text, 1, $max) } else { $text },
+    'text': if ($truncated) then substring($text, 1, $max) else $text,
     'truncated': $truncated
   }
 };
@@ -90,13 +106,14 @@ declare function utils:expression(
 declare function utils:editable(
   $text     as xs:string,
   $reasons  as xs:string*
-) as map(*) {
+) as utils:editor {
   (: everything that speaks against editing is stated in one note; a value that nothing
      speaks against is edited in place :)
   {
+    'exists'  : true(),
     'editable': empty($reasons),
     'text'    : $text,
-    'note'    : ('Read-only: ' || string-join($reasons, '; ') || '.')[exists($reasons)]
+    'note'    : `Read-only: { string-join($reasons, '; ') }.`[exists($reasons)]
   }
 };
 
@@ -175,14 +192,14 @@ declare function utils:ws-panel(
 declare function utils:ws-editor(
   $id        as xs:string,
   $contents  as element()*,
-  $value     as map(*)
+  $value     as utils:editor
 ) as empty-sequence() {
   utils:ws-send({
     'type'    : 'editor',
     'id'      : $id,
     'html'    : utils:html($contents),
     'text'    : $value?text,
-    'editable': $value?editable = true()
+    'editable': $value?editable
   })
 };
 
@@ -207,7 +224,7 @@ declare function utils:ws-error(
   $message   as xs:string
 ) as empty-sequence() {
   (: the log keeps the full text, the client is sent the code and its description :)
-  admin:write-log($category || ': ' || $message, 'DBA'),
+  admin:write-log(`{ $category }: { $message }`, 'DBA'),
   let $text := replace($message, '\s*Stack Trace:.*', '', 's')
   let $line := tokenize($text, '\n')[starts-with(., '[')]
   return utils:ws-send({ 'type': 'error', 'message': head($line) otherwise $text })
@@ -232,14 +249,14 @@ declare function utils:ws-start(
       job:wait($id),
       (: the information is read first: fetching the result discards the cached job :)
       let $info := job:info($id)
-      return map:merge((
+      return {
         try {
           let $result := job:result($id)
           let $string := serialize($result, $options)
           return {
             'type'  : 'result',
             'run'   : $run,
-            'result': if ($options?limit) { utils:chop($string, $maxchars) } else { $string },
+            'result': if ($options?limit) then utils:chop($string, $maxchars) else $string,
             'items' : count($result)
           }
         } catch * {
@@ -252,7 +269,7 @@ declare function utils:ws-start(
           }
         },
         { 'info': utils:html(utils:query-info($info)), 'time': $info?timing?total }[exists($info)]
-      ))
+      }
     }, (), { 'serializer': { 'method': 'json' } }),
     'query': $id
   })
@@ -278,20 +295,19 @@ declare function utils:query-info(
   $info  as map(*)
 ) as element(dl) {
   <dl class='query-info'>{
-    for $key in map:keys($info)
-    let $value := $info($key)
+    for key $key value $value in $info
     return (
       <dt>{ utils:title($key) }:</dt>,
       <dd>{
-        if ($value instance of map(*)) {
+        if ($value instance of map(*)) then (
           <ul>{
-            map:for-each($value, fn($name, $entry) { <li>{ utils:title($name) }: { $entry }</li> })
+            for key $name value $entry in $value return <li>{ utils:title($name) }: { $entry }</li>
           }</ul>
-        } else if ($value instance of array(*)) {
+        ) else if ($value instance of array(*)) then (
           <ul>{ $value?* ! <li>{ . }</li> }</ul>
-        } else {
+        ) else (
           <pre>{ $value }</pre>
-        }
+        )
       }</dd>
     )
   }</dl>
@@ -328,7 +344,7 @@ declare function utils:job-id(
      connections that choose the same one at the same time would collide. A connection starts
      one job at a time, and gives up the name before it asks for the next one.
      The prefix of a connection id is a constant; only its number identifies the connection :)
-  'dba:' || $label || '-' || replace(ws:id(), '^websocket', '')
+  `dba:{ $label }-{ replace(ws:id(), '^websocket', '') }`
 };
 
 (:~
@@ -341,7 +357,7 @@ declare function utils:job-options(
   $label     as xs:string,
   $base-uri  as xs:string?
 ) as map(*) {
-  map:merge((
+  {
     {
       'timeout'   : config:get($config:TIMEOUT),
       'memory'    : config:get($config:MEMORY),
@@ -350,7 +366,7 @@ declare function utils:job-options(
       'id'        : utils:job-id($label)
     },
     { 'base-uri': $base-uri }[$base-uri]
-  ))
+  }
 };
 
 (:~
@@ -367,12 +383,12 @@ declare function utils:slice(
 ) as item()* {
   (: while a table is being sorted, all entries are returned: sorting and paging are then
      performed by the table itself :)
-  if ($page and not($sort)) {
+  if ($page and not($sort)) then (
     let $max := config:get($config:MAXROWS)
     return subsequence($entries, ($page - 1) * $max + 1, $max)
-  } else {
+  ) else (
     $entries
-  }
+  )
 };
 
 (:~
@@ -385,11 +401,11 @@ declare function utils:chop(
   $string  as xs:string,
   $max     as xs:integer
 ) as xs:string {
-  if (string-length($string) > $max) {
+  if (string-length($string) > $max) then (
     substring($string, 1, $max) || '...'
-  } else {
+  ) else (
     $string
-  }
+  )
 };
 
 (:~
@@ -406,11 +422,11 @@ declare function utils:safe-path(
      that escapes the base is a bad request, never a file :)
   let $base := file:resolve-path($dir)
   let $path := file:resolve-path($name, $base)
-  return if (starts-with($path, $base)) {
+  return if (starts-with($path, $base)) then (
     $path
-  } else {
+  ) else (
     web:error(400, 'Invalid path: ' || $name)
-  }
+  )
 };
 
 (:~
@@ -464,11 +480,11 @@ declare function utils:archive(
   $contents  as item()*,
   $archive   as xs:string
 ) as item()+ {
-  if (count($names) = 1) {
+  if (count($names) = 1) then (
     utils:attachment($names, $contents)
-  } else {
+  ) else (
     utils:attachment($archive || '.zip', archive:create($names, $contents))
-  }
+  )
 };
 
 (:~
@@ -485,22 +501,11 @@ declare function utils:attachment(
 ) as item()+ {
   web:response-header(
     { 'media-type': $type otherwise web:content-type($name) },
-    utils:disposition($name)
+    (: the name is encoded: a resource path may contain spaces, commas and characters outside
+       ASCII, all of which a bare name would truncate or misrepresent :)
+    { 'Content-Disposition': "attachment; filename*=UTF-8''" || encode-for-uri($name) }
   ),
   $data
-};
-
-(:~
- : Returns the header that offers a response as a download.
- : @param  $name  name of the file
- : @return response header
- :)
-declare function utils:disposition(
-  $name  as xs:string
-) as map(*) {
-  (: the name is encoded: a resource path may contain spaces, commas and characters outside
-     ASCII, all of which a bare name would truncate or misrepresent :)
-  { 'Content-Disposition': "attachment; filename*=UTF-8''" || encode-for-uri($name) }
 };
 
 (:~
@@ -529,11 +534,11 @@ declare function utils:info(
   $action  as xs:string
 ) as xs:string {
   let $count := count($items)
-  return if ($count = 1) {
+  return if ($count = 1) then (
     `{ utils:capitalize($name) } "{ $items }" was { $action }.`
-  } else {
+  ) else (
     `{ utils:count($count, $name) } were { $action }.`
-  }
+  )
 };
 
 (:~
@@ -547,7 +552,7 @@ declare function utils:plural(
   $noun   as xs:string
 ) as xs:string {
   (: a noun that ends with a consonant and y is pluralized with -ies :)
-  if ($count = 1) { $noun } else { replace($noun, 'y$', 'ie') || 's' }
+  if ($count = 1) then $noun else replace($noun, 'y$', 'ie') || 's'
 };
 
 (:~
@@ -635,27 +640,27 @@ declare %updating function utils:redirect(
 declare %updating function utils:dispatch(
   $page     as xs:string,
   $action   as xs:string,
-  $actions  as map(*)
+  $actions  as map(xs:string, fn(map(*)) as utils:action)
 ) {
-  let $entry := $actions?($action) otherwise web:error(404, 'Unknown action: ' || $action)
+  let $entry := $actions?$action otherwise web:error(404, 'Unknown action: ' || $action)
   (: an action can fail before it runs: a parameter that is evaluated is reported like the
      update it was meant for, not as a server error :)
   let $target := try {
     $entry(request:parameter-map())
   } catch * {
-    { 'error': $err:description }
+    $err:description
   }
-  let $params := $target?params otherwise {}
-  let $run := $target?run
   (: an info message is shown if the action succeeds, the error description if it fails :)
-  return if ($target?error) {
-    utils:redirect($page, $params, { 'error': $target?error })
-  } else {
-    try {
+  return if ($target instance of xs:string) then (
+    utils:redirect($page, {}, { 'error': $target })
+  ) else (
+    let $params := $target?params otherwise {}
+    let $run := $target?run
+    return try {
       updating $run(),
       utils:redirect($page, $params, { 'info': $target?info }[$target?info])
     } catch * {
       utils:redirect($page, $params, { 'error': $err:description })
     }
-  }
+  )
 };

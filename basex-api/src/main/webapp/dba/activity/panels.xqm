@@ -25,7 +25,7 @@ declare function panels:jobs(
     <h2>Jobs</h2>
     {
       let $headers := (
-        { 'key': 'id', 'label': 'ID' },
+        { 'key': 'job', 'label': 'ID', 'type': 'dynamic' },
         { 'key': 'state', 'label': 'State' },
         { 'key': 'service', 'label': 'Service' },
         { 'key': 'duration', 'label': 'Dur.', 'type': 'number', 'order': 'desc' },
@@ -48,6 +48,7 @@ declare function panels:jobs(
         order by $sec descending, $start descending
         return {
           'id': $id,
+          'job': panels:job-link($id),
           'state': $details/@state,
           'service': if ($services/@id = $id) then '✓' else '–',
           'duration': html:duration($sec),
@@ -61,6 +62,7 @@ declare function panels:jobs(
         where not($id = $jobs/@id)
         return {
           'id': $id,
+          'job': panels:job-link($id),
           'state': 'registered',
           'service': '✓'
         }
@@ -74,19 +76,21 @@ declare function panels:jobs(
                  onchange='liveChanged()'/>, ' Live'
         }</label>
       )
-      let $options := { 'sort': $sort, 'presort': 'duration' }
-      return table:create($headers, $entries, $buttons, {}, $options) update {
-        (: replace job ids with links; the separator after the checkbox stays outside :)
-        for $tr in descendant::tr[not(th)]
-        for $text in $tr/td[1]/text()
-        for $id in data($tr/@id)
-        return replace node $text with (
-          substring-before($text, $id),
-          <a href='?job={ $id }'>{ $id }</a>
-        )
-      }
+      let $options := { 'sort': $sort, 'presort': 'duration', 'select': 'id' }
+      return table:create($headers, $entries, $buttons, {}, $options)
     }
   </form>
+};
+
+(:~
+ : Creates the link to the details of a job.
+ : @param  $id  job id
+ : @return function creating the link
+ :)
+declare %private function panels:job-link(
+  $id  as xs:string
+) as fn() as element(a) {
+  fn() { <a href='?job={ $id }'>{ $id }</a> }
 };
 
 (:~
@@ -172,12 +176,11 @@ declare function panels:job-details(
       <h3>Query Bindings</h3>,
       (: a bound value can be long, and is truncated rather than widening the table :)
       table:pairs(
-        map:for-each($bindings, fn($key, $value) {
-          <tr>
-            <td><b>{ if ($key) then '$' || $key else 'Context' }</b></td>
-            <td><code>{ utils:preview($value, 1000) }</code></td>
-          </tr>
-        })
+        for key $key value $value in $bindings
+        return <tr>
+          <td><b>{ if ($key) then '$' || $key else 'Context' }</b></td>
+          <td><code>{ utils:preview($value, 1000) }</code></td>
+        </tr>
       )
     ),
 
@@ -192,11 +195,11 @@ declare function panels:job-details(
     },
 
     (: a stored definition can be replaced; a job string is only shown :)
-    if ($persisted) {
+    if ($persisted) then (
       html:heading('Query', form:button('jobs/replace', 'Replace'), 'h3')
-    } else {
+    ) else (
       <h3>Job String</h3>
-    },
+    ),
     <textarea spellcheck='false'>{
       attribute id { 'job-string' }[$persisted],
       attribute name { 'query' }[$persisted],
@@ -285,15 +288,15 @@ declare %private function panels:attribute-panel(
           let $value := if ($name) {
             utils:preview($holder?value($name), $panels:PREVIEW)
           }
-          return map:merge((
+          return {
             {
-              'id': $id || '|' || $name,
-              'name': if ($name) { panels:attribute($kind, $id, $name) } else { '–' },
+              'id': `{ $id }|{ $name }`,
+              'name': if ($name) then panels:attribute($kind, $id, $name) else '–',
               'value': $value otherwise '–',
               'access': $access
             },
             $holder?columns
-          ))
+          }
         } catch sessions:not-found | ws:not-found { }
         (: the attributes of one holder are listed in one block: they share its access time :)
         order by $entry?access descending

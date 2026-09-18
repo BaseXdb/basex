@@ -62,7 +62,7 @@ declare function form:button(
 ) as element(button) {
   <button>{
     attribute formaction { $action }[$action],
-    attribute onclick { 'return confirmAction(this, "' || $label || '");' }[$options = 'CONFIRM'],
+    attribute onclick { `return confirmAction(this, "{ $label }");` }[$options = 'CONFIRM'],
     attribute data-check { 'check' }[$options = 'CHECK'],
     $label
   }</button>
@@ -251,12 +251,12 @@ declare function form:index-map(
   $include  as xs:string?,
   $create   as xs:boolean
 ) as map(*) {
-  map:merge((
+  {
     for $option in form:index-list($create)
-    return map:entry($option?name, $opts = $option?name),
-    $lang ! map:entry('language', .),
-    $include ! map:entry('ftinclude', .)
-  ))
+    return { $option?name: $opts = $option?name },
+    $lang ! { 'language': . },
+    $include ! { 'ftinclude': . }
+  }
 };
 
 (:~ Parsers that can be chosen for an input. :)
@@ -319,12 +319,12 @@ declare function form:parsing-map(
   $filter  as xs:string?,
   $parser  as xs:string?
 ) as map(*) {
-  map:merge((
+  {
     for $option in $form:PARSING-OPTIONS
-    return map:entry($option?name, $opts = $option?name),
-    $filter[.] ! map:entry('createfilter', .),
-    $parser[.] ! map:entry('parser', .)
-  ))
+    return { $option?name: $opts = $option?name },
+    $filter[.] ! { 'createfilter': . },
+    $parser[.] ! { 'parser': . }
+  }
 };
 
 (:~
@@ -355,18 +355,14 @@ declare function form:directory(
         file:list-roots() ! [ 'Root', string(.) ],
         [ 'Current'   , $dir ]
       )
-      let $selected := head(
-        for $option at $pos in $options
-        where $option(2) = $dir
-        return $pos
-      )
+      let $selected := head(index-where($options, fn($option) { $option?2 = $dir }))
       for $option at $pos in $options
-      let $name := $option(1), $path := $option(2)
+      let $[$name, $path] := $option
       where $path
       return element option {
         attribute value { $path },
         attribute selected { }[$pos = $selected],
-        $path[.] ! (($name || ': ')[$name] || .)
+        `{ $name }: { $path }`
       }
     }</select>
 };

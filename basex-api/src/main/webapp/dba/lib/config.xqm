@@ -54,33 +54,24 @@ declare %private variable $config:DEFAULTS := {
 
 (:~ Currently assigned options. :)
 declare %basex:lazy %private variable $config:OPTIONS := (
-  if (file:exists($config:OPTIONS-FILE)) {
+  if (file:exists($config:OPTIONS-FILE)) then (
     try {
       (: merge defaults with saved options :)
       let $options := fetch:doc($config:OPTIONS-FILE)/options
-      return map:merge(
-        map:for-each($config:DEFAULTS, fn($key, $value) {
-          map:entry($key,
-            let $option := $options/*[name() = $key]
-            return if ($option) {
-              typeswitch($value) {
-                case xs:numeric  return xs:integer($option)
-                case xs:boolean  return xs:boolean($option)
-                default          return xs:string($option)
-              }
-            } else {
-              $value
-            }
-          )
-        })
-      )
+      return {
+        for key $key value $value in $config:DEFAULTS
+        let $option := $options/*[name() = $key]
+        return { $key: if (not($option)) then $value
+          else if ($value instance of xs:numeric) then xs:integer($option)
+          else string($option) }
+      }
     } catch * {
       (: use defaults if an error occurs while parsing the options :)
       $config:DEFAULTS
     }
-  } else {
+  ) else (
     $config:DEFAULTS
-  }
+  )
 );
 
 (:~
@@ -91,7 +82,7 @@ declare %basex:lazy %private variable $config:OPTIONS := (
 declare function config:get(
   $name  as xs:string
 ) as xs:anyAtomicType {
-  $config:OPTIONS($name)
+  $config:OPTIONS?$name
 };
 
 (:~
@@ -102,9 +93,8 @@ declare function config:save(
   $options  as map(*)
 ) as empty-sequence() {
   file:write($config:OPTIONS-FILE, element options {
-    map:for-each($config:DEFAULTS, fn($key, $value) {
-      element { $key } { $options($key) otherwise $value }
-    })
+    for key $key value $value in $config:DEFAULTS
+    return element { $key } { $options?$key otherwise $value }
   })
 };
 
