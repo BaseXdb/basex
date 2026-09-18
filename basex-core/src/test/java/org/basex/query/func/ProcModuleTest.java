@@ -22,10 +22,9 @@ public final class ProcModuleTest extends SandboxTest {
   @Test public void execute() {
     final Function func = _PROC_EXECUTE;
     // queries
-    query("exists(" + func.args("java", "x") + "?code)", true);
-    query("exists(" + func.args("a b c") + "?error[.])", true);
-    query("empty(" + func.args("a b c") + "?code)", true);
-    query(func.args("a b c") + "?output", "");
+    query("exists(" + func.args("java", "x") + "/code)", true);
+    query("exists(" + func.args("a b c") + "/error)", true);
+    query("empty(" + func.args("a b c") + "/(output, code))", true);
 
     error(func.args("java", "-version", " { 'encoding': 'xx' }"), PROC_ENCODING_X);
   }
@@ -126,13 +125,13 @@ public final class ProcModuleTest extends SandboxTest {
     final Function func = _PROC_EXECUTE;
     final String echo = echo();
 
-    query(func.args("java", echo, " { 'input': 'ab' }") + "?output", "ab");
-    query(func.args("java", echo, " { 'input': 'ab' }") + "?code", 0);
-    query(func.args("java", echo, " { 'input': 'ab' }") + "?error", "");
+    query(func.args("java", echo, " { 'input': 'ab' }") + "/output/string()", "ab");
+    query(func.args("java", echo, " { 'input': 'ab' }") + "/code/string()", 0);
+    query("empty(" + func.args("java", echo, " { 'input': 'ab' }") + "/error)", true);
     query(func.args("java", echo, " { 'input': 'ab', 'binary': true() }") +
-        "?output instance of xs:base64Binary", true);
+        "/output/string()", "YWI=");
     // error output is decoded with replacement characters
-    query("contains(" + func.args("java", "x") + "?error, 'x')", true);
+    query("contains(" + func.args("java", "x") + "/error, 'x')", true);
   }
 
   /**

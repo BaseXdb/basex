@@ -1773,8 +1773,7 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _PROC_EXECUTE(ProcExecute::new, "execute(command, arguments?, options?)",
-      params(STRING_O, STRING_ZM, MAP_ZO), Records.PROC_RESULT.get().seqType(), flag(NDT),
-      PROC_URI, Perm.ADMIN),
+      params(STRING_O, STRING_ZM, MAP_ZO), ELEMENT_O, flag(NDT), PROC_URI, Perm.ADMIN),
   /** XQuery function. */
   _PROC_FORK(ProcFork::new, "fork(command, arguments?, options?)",
       params(STRING_O, STRING_ZM, MAP_ZO),
