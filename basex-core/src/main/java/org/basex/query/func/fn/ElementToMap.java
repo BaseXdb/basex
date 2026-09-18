@@ -2,8 +2,6 @@ package org.basex.query.func.fn;
 
 import static org.basex.query.QueryError.*;
 
-import java.util.function.*;
-
 import org.basex.core.jobs.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
@@ -38,18 +36,17 @@ public final class ElementToMap {
   /**
    * Constructor.
    * @param eopts options for converting between elements and maps
-   * @param uris resolves the URI of a namespace prefix ({@code null} if the prefix is unbound)
    * @param shared shared data references
    * @param job interruptible job
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public ElementToMap(final ElementsOptions eopts, final UnaryOperator<byte[]> uris,
-      final SharedData shared, final Job job, final InputInfo info) throws QueryException {
+  public ElementToMap(final ElementsOptions eopts, final SharedData shared, final Job job,
+      final InputInfo info) throws QueryException {
     this.shared = shared;
     this.job = job;
     this.info = info;
-    plan = PlanFn.plan(eopts, uris, shared, info);
+    plan = PlanFn.plan(eopts, shared, info);
   }
 
   /**
@@ -180,7 +177,7 @@ public final class ElementToMap {
       case LIST, LIST_PLUS -> {
         final GNodeList children = PlanFn.children(Kind.ELEMENT, node);
         yield PlanFn.empty(PlanFn.children(Kind.TEXT, node)) && PlanFn.equalNames(children) &&
-          (pe.child == null || children.isEmpty() || children.get(0).qname().eq(pe.child));
+          (children.isEmpty() || children.get(0).qname().eq(pe.child));
       }
       case RECORD, SEQUENCE ->
         PlanFn.empty(PlanFn.children(Kind.TEXT, node));
@@ -213,12 +210,7 @@ public final class ElementToMap {
         list(node);
       case LIST_PLUS -> {
         final MapBuilder mb = attributes(node);
-        // if the plan supplies no child name, the name of the first child is adopted
-        final GNodeList children = PlanFn.children(Kind.ELEMENT, node);
-        final QNm name = pe.child != null ? pe.child :
-          children.isEmpty() ? null : children.get(0).qname();
-        if(name != null) mb.put(nodeName(name, true, node, plan.marker), list(node));
-        yield mb.map();
+        yield mb.put(nodeName(pe.child, true, node, plan.marker), list(node)).map();
       }
       case RECORD ->
         record(node);

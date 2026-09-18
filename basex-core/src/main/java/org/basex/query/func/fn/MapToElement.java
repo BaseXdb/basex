@@ -78,7 +78,7 @@ public final class MapToElement {
     this.shared = shared;
     this.options = new MainOptions(options);
     this.info = info;
-    plan = PlanFn.plan(eopts, uris, shared, info);
+    plan = PlanFn.plan(eopts, shared, info);
     if(plan.marker == null || plan.marker.isEmpty()) throw MAP_TO_ELEMENT_X.get(info,
         "Empty attribute marker is not allowed.");
     marker = token(plan.marker);
@@ -172,10 +172,7 @@ public final class MapToElement {
     } else if(item instanceof final XQArray array) {
       if(list(pe)) {
         // list layout: children are named after the plan's child entry
-        if(attributes != null) {
-          if(pe.child == null) throw MAP_TO_ELEMENT_X.get(info,
-              "Missing child name for list layout.");
-        } else {
+        if(attributes == null) {
           final PlanEntry cpe = PlanFn.entry(pe.child, plan);
           for(final Value member : array.members()) element(pe.child, cpe, member, handler);
         }

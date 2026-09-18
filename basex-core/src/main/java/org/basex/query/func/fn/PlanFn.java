@@ -220,14 +220,13 @@ public abstract class PlanFn extends StandardFunc {
   /**
    * Builds a conversion plan.
    * @param options options
-   * @param uris resolves the URI of a namespace prefix ({@code null} if the prefix is unbound)
    * @param shared shared data references
    * @param info input info (can be {@code null})
    * @return conversion plan
    * @throws QueryException query exception
    */
-  static Plan plan(final ElementsOptions options, final UnaryOperator<byte[]> uris,
-      final SharedData shared, final InputInfo info) throws QueryException {
+  static Plan plan(final ElementsOptions options, final SharedData shared, final InputInfo info)
+      throws QueryException {
     final Plan plan = new Plan();
     plan.name = options.get(ElementsOptions.NAME_FORMAT);
     plan.marker = options.get(ElementsOptions.ATTRIBUTE_MARKER);
@@ -239,18 +238,19 @@ public abstract class PlanFn extends StandardFunc {
       map(pln, info).forEach((key, value) -> {
         final byte[] token = key.string(info);
         final boolean attr = Token.startsWith(token, '@');
-        final QNm name;
-        if(Token.eq(token, Token.cpToken('*'))) {
-          name = QNm.EMPTY;
-        } else {
-          name = shared.parseQName(attr ? Token.substring(token, 1) : token, true, uris);
-        }
-        // entries with keys that are no valid names are ignored
+        final QNm name = Token.eq(token, Token.cpToken('*')) ? QNm.EMPTY :
+          name(attr ? Token.substring(token, 1) : token, shared);
+        // entries with keys in other formats are ignored
         if(name == null) return;
 
         final PlanEntry pe = new PlanEntry();
         pe.attribute = attr;
         final XQMap map = map(value, info);
+        map.forEach((k, v) -> {
+          final byte[] field = k.string(info);
+          if(!Token.eq(field, TYPE.string()) && (attr || !Token.eq(field, LAYOUT.string(),
+              CHILD.string()))) throw unexpected(Token.string(field), v, name, info);
+        });
         final Value layout = map.get(LAYOUT);
         if(!layout.isEmpty()) {
           final String string = Token.string(token(layout, info));
@@ -267,7 +267,7 @@ public abstract class PlanFn extends StandardFunc {
         final Value child = map.get(CHILD);
         if(!child.isEmpty()) {
           final byte[] childName = token(child, info);
-          pe.child = shared.parseQName(childName, true, uris);
+          pe.child = name(childName, shared);
           if(pe.child == null) {
             throw unexpected("child", Token.string(childName), name, info);
           }
@@ -275,13 +275,10 @@ public abstract class PlanFn extends StandardFunc {
         plan.entries.put(name, pe);
 
         // error handling
-        if(pe.layout == null) {
-          if(!pe.attribute) throw missing("layout", name, info);
-        } else if(pe.attribute) {
-          throw unexpected("layout", pe.layout, name, info);
-        }
-        if(pe.layout != PlanLayout.LIST && pe.layout != PlanLayout.LIST_PLUS &&
-            pe.child != null) {
+        if(pe.layout == null && !pe.attribute) throw missing("layout", name, info);
+        if(pe.layout == PlanLayout.LIST || pe.layout == PlanLayout.LIST_PLUS) {
+          if(pe.child == null) throw missing("child", name, info);
+        } else if(pe.child != null) {
           throw unexpected("child", pe.child, name, info);
         }
         if(pe.layout == PlanLayout.SIMPLE || pe.layout == PlanLayout.SIMPLE_PLUS) {
@@ -293,6 +290,19 @@ public abstract class PlanFn extends StandardFunc {
       });
     }
     return plan;
+  }
+
+  /**
+   * Parses a name in the format {@code local} or {@code Q{uri}local}.
+   * @param token token
+   * @param shared shared data references
+   * @return QName, or {@code null} if the token has another format
+   */
+  private static QNm name(final byte[] token, final SharedData shared) {
+    if(XMLToken.isNCName(token)) return shared.qName(token);
+    final byte[][] parsed = QNm.parseExpanded(token, false);
+    return parsed != null && XMLToken.isNCName(parsed[0]) ? shared.qName(parsed[0], parsed[1]) :
+      null;
   }
 
   /**

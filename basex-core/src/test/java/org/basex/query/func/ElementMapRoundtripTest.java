@@ -243,14 +243,13 @@ public final class ElementMapRoundtripTest extends SandboxTest {
     error("element-to-map(<a><b>1</b><b>2</b></a>, "
         + "{ 'plan': { 'a': { 'layout': 'list', 'child': 'z' } } })", PLAN_X_X);
 
-    // a plan may omit the child name: list layouts then accept any child element name
-    query("element-to-map(<a><b/><b/></a>, { 'plan': { 'a': { 'layout': 'list' } } })"
-        + "?a => array:size()", 2);
-    query("element-to-map(<a x='1'><b/><b/></a>, { 'plan': { 'a': { 'layout': 'list-plus' } } })"
-        + "?a => map:keys() => sort()", "@x\nb");
-    // without a child name, the reverse conversion cannot name the children
+    // list layouts require a child name
+    error("element-to-map(<a><b/><b/></a>, { 'plan': { 'a': { 'layout': 'list' } } })",
+        INVALIDOPTION_X);
+    error("element-to-map(<a x='1'><b/><b/></a>, { 'plan': { 'a': { 'layout': 'list-plus' } } })",
+        INVALIDOPTION_X);
     error("map-to-element({ 'a': [ '1', '2' ] }, { 'plan': { 'a': { 'layout': 'list' } } })",
-        MAP_TO_ELEMENT_X);
+        INVALIDOPTION_X);
 
     // the wildcard entry is consulted by the reverse conversion as well
     query("serialize(map-to-element({ 'a': [ '1', '2' ] }, "
@@ -326,6 +325,8 @@ public final class ElementMapRoundtripTest extends SandboxTest {
     query("element-to-map(<a>1</a>, { 'plan': { '': { 'layout': 'empty' } } })?a", 1);
     query("element-to-map(<a>1</a>, { 'plan': { 1: { 'layout': 'empty' } } })?a", 1);
     query("element-to-map(<a>1</a>, { 'plan': { 'z:a': { 'layout': 'empty' } } })?a", 1);
+    query("element-to-map(<a>1</a>, { 'plan': { 'xml:a': { 'layout': 'x' } } })?a", 1);
+    query("element-to-map(<a>1</a>, { 'plan': { 'Q{}p:a': { 'layout': 'x' } } })?a", 1);
     query("element-to-map(<a x='1'/>, { 'plan': { '@x y': { 'type': 'skip' } } })?a?('@x')", 1);
     // layout, type and child values must be valid
     error("element-to-map(<a/>, { 'plan': { 'a': { 'layout': 'x' } } })", INVALIDOPTION_X);
@@ -333,7 +334,15 @@ public final class ElementMapRoundtripTest extends SandboxTest {
         INVALIDOPTION_X);
     error("element-to-map(<a><b/><b/></a>, "
         + "{ 'plan': { 'a': { 'layout': 'list', 'child': 'x y' } } })", INVALIDOPTION_X);
-    // missing and unexpected keys
+    error("element-to-map(<a><b/><b/></a>, "
+        + "{ 'plan': { 'a': { 'layout': 'list', 'child': 'xml:b' } } })", INVALIDOPTION_X);
+    // missing, unexpected and unknown keys, also if a fallback entry exists
+    error("element-to-map(<a>1</a>, { 'plan': { 'a': { 'layout': 'simple', 'x': 1 } } })",
+        INVALIDOPTION_X);
+    error("element-to-map(<a>1</a>, { 'plan': { 'a': { 'layout': 'simple', 'x': 1 }, "
+        + "'*': { 'layout': 'xml' } } })", INVALIDOPTION_X);
+    error("element-to-map(<a x='1'/>, { 'plan': { '@x': { 'type': 'integer', 'x': 1 } } })",
+        INVALIDOPTION_X);
     error("element-to-map(<a/>, { 'plan': { 'a': {} } })", INVALIDOPTION_X);
     error("element-to-map(<a/>, { 'plan': { '@x': { 'layout': 'simple' } } })", INVALIDOPTION_X);
     // an attribute entry without a type is equivalent to the type 'string'

@@ -21,7 +21,7 @@ public final class FnElementToMap extends PlanFn {
     final ElementsOptions options = options(1, ElementsOptions::new, qc);
     if(node.isEmpty()) return Empty.VALUE;
 
-    final ElementToMap mapping = new ElementToMap(options, uris(qc, sc()), qc.shared, qc, info);
+    final ElementToMap mapping = new ElementToMap(options, qc.shared, qc, info);
     return mapping.convert((XNode) node, null);
   }
 

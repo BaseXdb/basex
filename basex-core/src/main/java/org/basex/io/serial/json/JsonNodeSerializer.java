@@ -102,9 +102,8 @@ public final class JsonNodeSerializer extends JsonSerializer {
             jopts.get(JsonOptions.MAPPING), qc, null);
         final String name = mopts.get(JsonMappingOptions.ROOT);
         root = name != null ? token(name) : null;
-        mapping = new ElementToMap(mopts,
-            qc != null && sc != null ? PlanFn.uris(qc, sc) : PlanFn.XML_PREFIX,
-            qc != null ? qc.shared : new SharedData(), qc != null ? qc : new Job() { }, null);
+        mapping = new ElementToMap(mopts, qc != null ? qc.shared : new SharedData(),
+            qc != null ? qc : new Job() { }, null);
       }
       return mapping.convert(node, root);
     } catch(final QueryException ex) {
