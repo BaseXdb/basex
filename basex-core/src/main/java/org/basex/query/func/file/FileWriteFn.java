@@ -7,6 +7,7 @@ import java.io.*;
 import java.nio.charset.*;
 import java.nio.file.*;
 
+import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
@@ -42,6 +43,7 @@ abstract class FileWriteFn extends FileFn {
     final Charset cs = encoding == null || encoding == Strings.UTF8 ? StandardCharsets.UTF_8 :
       Charset.forName(encoding);
 
+    for(final Item item : value) cacheSource(item, path);
     try(PrintOutput out = PrintOutput.get(new FileOutputStream(path.toFile(), append))) {
       if(lines) {
         final byte[] nl = cs == StandardCharsets.UTF_8 ? token(Prop.NL) : Prop.NL.getBytes(cs);
@@ -83,5 +85,22 @@ abstract class FileWriteFn extends FileFn {
     if(parent != null && !Files.exists(parent))
       throw FILE_NO_DIR_X.get(info, parent.toAbsolutePath());
     return path;
+  }
+
+  /**
+   * Reads a lazy item completely if its source is the file that is written.
+   * @param item item to be written
+   * @param path path of the target file
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   */
+  final void cacheSource(final Item item, final Path path) throws QueryException, IOException {
+    // the target is truncated when it is opened, and the item would then be read from it
+    final IO input = item instanceof final StrLazy str ? str.input() :
+      item instanceof final B64IOLazy bin ? bin.input() : null;
+    if(input instanceof IOFile && Files.exists(path) &&
+        Files.isSameFile(Paths.get(input.path()), path)) {
+      ((Lazy) item).cache(info);
+    }
   }
 }

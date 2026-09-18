@@ -667,6 +667,17 @@ public final class FileModuleTest extends SandboxTest {
     query(func.args(PATH1, "hello"));
     query(func.args(PATH1, _LAZY_CACHE.args(_FILE_READ_TEXT.args(PATH1))));
     query(_FILE_READ_TEXT.args(PATH1), "hello");
+    // a lazy item from the target file is read before the target is truncated
+    query(func.args(PATH1, _FILE_READ_TEXT.args(PATH1)));
+    query(_FILE_READ_TEXT.args(PATH1), "hello");
+    query(func.args(PATH1, " string(" + _FILE_READ_TEXT.args(PATH1) + ")"));
+    query(_FILE_READ_TEXT.args(PATH1), "hello");
+    query(_FILE_APPEND_TEXT.args(PATH1, _FILE_READ_TEXT.args(PATH1)));
+    query(_FILE_READ_TEXT.args(PATH1), "hellohello");
+    query(_FILE_WRITE_TEXT_LINES.args(PATH1, _FILE_READ_TEXT.args(PATH1)));
+    query(_FILE_READ_TEXT_LINES.args(PATH1), "hellohello");
+    query(_FILE_WRITE_BINARY.args(PATH1, _FILE_READ_BINARY.args(PATH1)));
+    query(_FILE_READ_TEXT_LINES.args(PATH1), "hellohello");
   }
 
   /** Test method. */

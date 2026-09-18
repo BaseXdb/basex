@@ -52,6 +52,14 @@ public final class StrLazy extends AStr implements Lazy {
     this.temp = temp;
   }
 
+  /**
+   * Returns the input reference.
+   * @return input
+   */
+  public IO input() {
+    return input;
+  }
+
   @Override
   public byte[] string(final InputInfo ii) throws QueryException {
     cache(ii);

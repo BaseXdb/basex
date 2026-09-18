@@ -53,6 +53,7 @@ public class FileWriteBinary extends FileWriteFn {
     } else {
       // default case: no archive, no offset
       final Bin value = toBin(arg(1), qc);
+      cacheSource(value, path);
       try(FileOutputStream out = new FileOutputStream(path.toFile(), append)) {
         IO.write(value.input(info), out);
       }
