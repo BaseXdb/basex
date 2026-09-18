@@ -234,7 +234,7 @@ public abstract class SegmentedIndex extends ValueIndex {
    * @param ex exception
    */
   protected final void invalidate(final IOException ex) {
-    Util.stack(ex);
+    Util.debug(ex);
     close();
     drop();
     segments = new IndexSegment[0];
