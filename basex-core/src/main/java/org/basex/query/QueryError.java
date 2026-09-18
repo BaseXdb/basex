@@ -1768,25 +1768,25 @@ public enum QueryError {
       desc.add(est.occ == Occ.EXACTLY_ONE ? "Item" : "Value");
       desc.add(" of type ").add(est).add(" expected, ");
       // try to find a missing or an unknown record entry:
-      byte[] entry = null;
+      byte[] issue = null;
       if(est.type instanceof final ShapeType sh && !sh.any() && expr instanceof final XQMap map) {
         final TokenObjectMap<ShapeField> fields = sh.fields();
-        for(final byte[] key : fields) {
-          if(map.value(Str.get(key)) == null && fields.get(key).seqType().occ.min > 0) {
-            entry = Token.concat(QueryString.toQuoted(key), " missing");
+        for(final byte[] field : fields) {
+          if(map.value(Str.get(field)) == null && fields.get(field).seqType().occ.min > 0) {
+            issue = Token.concat(QueryString.toQuoted(field), " missing");
             break;
           }
         }
-        if(entry == null) {
+        if(issue == null) {
           for(final Item key : map.keys()) {
             if(key instanceof final Str str && fields.contains(str.string())) continue;
-            entry = Token.concat(key instanceof final Str str ? QueryString.toQuoted(str.string()) :
+            issue = Token.concat(key instanceof final Str str ? QueryString.toQuoted(str.string()) :
               Token.token(key.toString()), " unknown");
             break;
           }
         }
       }
-      if(entry != null) desc.add(entry);
+      if(issue != null) desc.add(issue);
       else desc.add(ist).add(" found");
     } else {
       // add cardinality string

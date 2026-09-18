@@ -19,8 +19,8 @@ import org.basex.util.http.*;
 public final class B64HttpLazy extends B64Lazy {
   /** URI of the response, without credentials (can be {@code null}). */
   private final String href;
-  /** Content encoding of the original response. */
-  private final String encoding;
+  /** Content coding of the original response. */
+  private final String coding;
   /** Registry for temporary files (can be {@code null}). */
   private final TempFiles temp;
   /** Function that created the item. */
@@ -32,15 +32,15 @@ public final class B64HttpLazy extends B64Lazy {
    * Constructor.
    * @param href URI of the response, without credentials (can be {@code null})
    * @param pending unread body of the original response
-   * @param encoding content encoding of the original response
+   * @param coding content coding of the original response
    * @param temp registry for temporary files (can be {@code null})
    * @param definition function that creates the item
    */
-  public B64HttpLazy(final String href, final InputStream pending, final String encoding,
+  public B64HttpLazy(final String href, final InputStream pending, final String coding,
       final TempFiles temp, final FuncDefinition definition) {
     this.href = href;
     this.pending = pending;
-    this.encoding = encoding;
+    this.coding = coding;
     this.temp = temp;
     this.definition = definition;
   }
@@ -51,7 +51,7 @@ public final class B64HttpLazy extends B64Lazy {
     final InputStream is = pending;
     pending = null;
     if(is == null) throw new IOException("Response body is not available anymore.");
-    try(InputStream in = Payload.decode(is, encoding)) {
+    try(InputStream in = Payload.decode(is, coding)) {
       return SpillOutput.read(in, temp);
     }
   }

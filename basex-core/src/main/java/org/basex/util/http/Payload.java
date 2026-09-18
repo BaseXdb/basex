@@ -89,11 +89,11 @@ public final class Payload {
 
   /**
    * Assigns options for parsing XML payloads.
-   * @param opts options (can be {@code null})
+   * @param mopts options (can be {@code null})
    * @return self reference
    */
-  public Payload xmlOptions(final MainOptions opts) {
-    xmlOptions = opts;
+  public Payload xmlOptions(final MainOptions mopts) {
+    xmlOptions = mopts;
     return this;
   }
 
@@ -109,17 +109,17 @@ public final class Payload {
   /**
    * Parses the HTTP payload.
    * @param type media type
-   * @param encoding content encoding
+   * @param coding content coding
    * @param temp registry for temporary files (can be {@code null})
    * @return parsed body
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  ResponseBody parse(final MediaType type, final String encoding, final TempFiles temp)
+  ResponseBody parse(final MediaType type, final String coding, final TempFiles temp)
       throws IOException, QueryException {
 
     // decompress before parsing (applies to multipart and single-part alike)
-    input = decode(input, encoding);
+    input = decode(input, coding);
 
     final ResponseBody result = new ResponseBody();
     result.type = type;
@@ -141,13 +141,13 @@ public final class Payload {
   /**
    * Returns a stream that decodes a response body with the given content coding.
    * @param input response body
-   * @param encoding content encoding (case-insensitive, RFC 9110)
+   * @param coding content coding (case-insensitive, RFC 9110)
    * @return decoded stream
    * @throws IOException I/O exception
    */
-  public static InputStream decode(final InputStream input, final String encoding)
+  public static InputStream decode(final InputStream input, final String coding)
       throws IOException {
-    return GZIP.equalsIgnoreCase(encoding) ? new GZIPInputStream(input) : input;
+    return GZIP.equalsIgnoreCase(coding) ? new GZIPInputStream(input) : input;
   }
 
   /**
@@ -180,8 +180,8 @@ public final class Payload {
       final QueryException qe = HC_PARSE_X.get(info, ex);
       try {
         qe.value(B64.get(payload, IOERR_X));
-      } catch(final IOException e) {
-        Util.debug(e);
+      } catch(final IOException ex2) {
+        Util.debug(ex2);
       }
       throw qe;
     }
@@ -435,13 +435,13 @@ public final class Payload {
    * @param options main options
    * @param charset character encoding that replaces the one of the media type
    *   (can be {@code null})
-   * @param xml options for parsing XML payloads (can be {@code null})
+   * @param xmlOptions options for parsing XML payloads (can be {@code null})
    * @return value
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
   private static Value value(final IO body, final MediaType type, final MainOptions options,
-      final String charset, final MainOptions xml) throws IOException, QueryException {
+      final String charset, final MainOptions xmlOptions) throws IOException, QueryException {
 
     final IO io = prepare(body, type, charset);
     if(io.length() == 0) {
@@ -460,7 +460,7 @@ public final class Payload {
       return new DBNode(new HtmlParser(io, options, opts));
     } else if(type.isXml()) {
       // remote input: parse as untrusted
-      return new DBNode(Parser.xmlParser(io, xml != null ? xml :
+      return new DBNode(Parser.xmlParser(io, xmlOptions != null ? xmlOptions :
         new MainOptions().trusted(false)));
     } else if(type.isText()) {
       return Str.get(io.read());

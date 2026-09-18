@@ -237,8 +237,8 @@ public final class IOUrl extends IO {
 
     final HttpClient.Builder cb = HttpClient.newBuilder().connectTimeout(TIMEOUT);
     if(cookies != null) cb.cookieHandler(cookies);
-    final SSLContext sc = context != null ? context : ignoreCertificates ? insecure() : null;
-    if(sc != null) cb.sslContext(sc);
+    final SSLContext ssl = context != null ? context : ignoreCertificates ? insecure() : null;
+    if(ssl != null) cb.sslContext(ssl);
     if(proxy != null) {
       final InetSocketAddress address = proxy.isEmpty() ? null : proxy(proxy);
       cb.proxy(address != null ? ProxySelector.of(address) : HttpClient.Builder.NO_PROXY);

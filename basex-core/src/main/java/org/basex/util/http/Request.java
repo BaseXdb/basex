@@ -168,9 +168,9 @@ public final class Request {
    * @throws QueryException query exception
    */
   void authMethod(final String name, final InputInfo info) throws QueryException {
-    for(final AuthMethod am : AuthMethod.values()) {
-      if(am.toString().equalsIgnoreCase(name)) {
-        authMethod = am;
+    for(final AuthMethod auth : AuthMethod.values()) {
+      if(auth.toString().equalsIgnoreCase(name)) {
+        authMethod = auth;
         return;
       }
     }

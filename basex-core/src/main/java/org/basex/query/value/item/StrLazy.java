@@ -78,7 +78,7 @@ public final class StrLazy extends AStr implements Lazy {
   }
 
   @Override
-  public void cache(final  boolean lazy, final InputInfo ii) throws QueryException {
+  public void cache(final boolean lazy, final InputInfo ii) throws QueryException {
     if(lazy) cache = true;
     else cache(ii);
   }

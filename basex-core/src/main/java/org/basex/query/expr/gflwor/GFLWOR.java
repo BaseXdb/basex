@@ -1101,8 +1101,9 @@ public final class GFLWOR extends ParseExpr {
       throws QueryException {
     // check if an outer clause can prevent the error
     while(iter.hasPrevious()) {
-      final Clause b4 = iter.previous();
-      if(b4 instanceof For || b4 instanceof Window || b4 instanceof Where || b4 instanceof While) {
+      final Clause before = iter.previous();
+      if(before instanceof For || before instanceof Window || before instanceof Where ||
+          before instanceof While) {
         iter.next();
         while(iter.hasNext()) {
           iter.next();

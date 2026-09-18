@@ -318,9 +318,9 @@ public abstract class SimpleMap extends Mapping {
         min *= es;
         if(max != -1) max *= es;
       } else {
-        final Occ o = expr.seqType().occ;
-        if(o.min == 0) min = 0;
-        if(o.max > 1) max = -1;
+        final Occ occ = expr.seqType().occ;
+        if(occ.min == 0) min = 0;
+        if(occ.max > 1) max = -1;
       }
     }
     final int ls = list.size();

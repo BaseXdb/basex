@@ -21,18 +21,18 @@ public final class SqlPrepare extends SqlFn {
     final StatementOptions options = toOptions(arg(2), new StatementOptions(), qc);
     final boolean keys = options.get(StatementOptions.GENERATED_KEYS);
     // statement is discarded again if it cannot be registered
-    PreparedStatement prep = null;
+    PreparedStatement ps = null;
     try {
       // keep prepared statement
-      prep = keys ? conn.prepareStatement(prepStmt, Statement.RETURN_GENERATED_KEYS) :
+      ps = keys ? conn.prepareStatement(prepStmt, Statement.RETURN_GENERATED_KEYS) :
         conn.prepareStatement(prepStmt);
-      final Uri uri = jdbc(qc).add(prep, keys);
-      prep = null;
+      final Uri uri = jdbc(qc).add(ps, keys);
+      ps = null;
       return uri;
     } catch(final SQLException ex) {
       throw SQL_ERROR_X.get(info, ex);
     } finally {
-      close(prep);
+      close(ps);
     }
   }
 }

@@ -36,13 +36,13 @@ public class ValidateDtd extends ValidateFn {
         final IO schm = dtd != null ? toIO(dtd, true) : null;
 
         // integrate doctype declaration via serialization parameters
-        SerializerOptions sp = null;
+        SerializerOptions sopts = null;
         if(schm != null) {
-          sp = new SerializerOptions();
-          sp.set(SerializerOptions.DOCTYPE_SYSTEM, prepare(schm).url());
+          sopts = new SerializerOptions();
+          sopts.set(SerializerOptions.DOCTYPE_SYSTEM, prepare(schm).url());
         }
 
-        final IO in = read(input, sp);
+        final IO in = read(input, sopts);
         final SAXParserFactory sf = SAXParserFactory.newInstance();
         sf.setValidating(true);
         sf.newSAXParser().parse(in.inputSource(), this);

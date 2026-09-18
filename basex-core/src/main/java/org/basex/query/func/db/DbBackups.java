@@ -25,7 +25,7 @@ public final class DbBackups extends BackupFn {
     final Context ctx = qc.context;
     final StringList backups = name == null ? ctx.databases.backups() : ctx.databases.backups(name);
     return new BasicIter<FNode>(backups.size()) {
-      final IOFile dbPath = ctx.soptions.dbPath();
+      final IOFile dbpath = ctx.soptions.dbPath();
 
       @Override
       public FNode get(final long i) {
@@ -33,7 +33,7 @@ public final class DbBackups extends BackupFn {
         final FBuilder elem = FElem.build(Q_BACKUP).text(backup);
         if(!db.isEmpty()) elem.attr(Q_DATABASE, db);
         elem.attr(Q_DATE, Dtm.get(DateTime.parse(Databases.date(backup))).string(info));
-        elem.attr(Q_SIZE, new IOFile(dbPath, backup + IO.ZIPSUFFIX).length());
+        elem.attr(Q_SIZE, new IOFile(dbpath, backup + IO.ZIPSUFFIX).length());
         final String comment = ShowBackups.comment(backup, ctx);
         if(!comment.isEmpty()) elem.attr(Q_COMMENT, comment);
         return elem.finish();

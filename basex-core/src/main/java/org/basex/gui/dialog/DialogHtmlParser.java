@@ -83,8 +83,8 @@ final class DialogHtmlParser extends DialogParser {
    */
   private static String tooltip(final HtmlOptions opts) {
     final StringBuilder sb = new StringBuilder("<html><b>").append(PARAMETERS).append(":</b><br>");
-    for(final Option<?> so : opts) {
-      sb.append("\u2022 ").append(so).append("<br/>");
+    for(final Option<?> option : opts) {
+      sb.append("\u2022 ").append(option).append("<br/>");
     }
     return sb.append("</html>").toString();
   }

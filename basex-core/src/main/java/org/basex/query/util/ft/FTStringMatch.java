@@ -32,11 +32,11 @@ public final class FTStringMatch implements Comparable<FTStringMatch> {
 
   /**
    * Checks if the match is included in the specified match.
-   * @param mtc match to be compared
+   * @param sm match to be compared
    * @return result of check
    */
-  boolean in(final FTStringMatch mtc) {
-    return start >= mtc.start && end <= mtc.end;
+  boolean in(final FTStringMatch sm) {
+    return start >= sm.start && end <= sm.end;
   }
 
   @Override

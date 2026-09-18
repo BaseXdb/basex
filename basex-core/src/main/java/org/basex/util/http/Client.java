@@ -63,24 +63,24 @@ public final class Client {
   /**
    * Sends an HTTP request and returns the response.
    * @param href URL to send the request to (can be empty string)
-   * @param request request data
+   * @param node request element
    * @param bodies request body
    * @param qc query context
    * @return HTTP response
    * @throws QueryException query exception
    */
-  public Value sendRequest(final byte[] href, final XNode request, final Value bodies,
+  public Value sendRequest(final byte[] href, final XNode node, final Value bodies,
       final QueryContext qc) throws QueryException {
 
     final QueryResources resources = qc.resources;
-    final Request req = new RequestParser(info).parse(request, bodies);
-    final URI uri = uri(href, req);
+    final Request request = new RequestParser(info).parse(node, bodies);
+    final URI uri = uri(href, request);
     final MainOptions mopts = new MainOptions(options);
     try {
-      final MainOptions xml = parsers(mopts, req, qc);
-      final HttpResponse<InputStream> response = send(uri, req, client(req, resources));
-      return new Response(info, mopts, resources).getResponse(response, req.bodyMode,
-          req.overrideMediaType, xml);
+      final MainOptions xmlOptions = parsers(mopts, request, qc);
+      final HttpResponse<InputStream> response = send(uri, request, client(request, resources));
+      return new Response(info, mopts, resources).getResponse(response, request.bodyMode,
+          request.overrideMediaType, xmlOptions);
     } catch(final IOException ex) {
       throw error(ex, info);
     }
@@ -102,10 +102,10 @@ public final class Client {
     final MainOptions mopts = new MainOptions(options);
     try {
       final URI uri = uri(Token.token(href), request);
-      final MainOptions xml = parsers(mopts, request, qc);
+      final MainOptions xmlOptions = parsers(mopts, request, qc);
       final HttpResponse<InputStream> response = send(uri, request, client(request, resources));
       return new Response(info, mopts, resources, definition).getRecord(response,
-          request.bodyMode, request.charset, xml);
+          request.bodyMode, request.charset, xmlOptions);
     } catch(final RedirectException ex) {
       throw HTTP_REDIRECT_X.get(info, ex.getMessage());
     } catch(final IOException ex) {

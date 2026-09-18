@@ -215,10 +215,10 @@ public final class HTTPConnection implements ClientInfo {
 
   /**
    * Assigns serialization parameters.
-   * @param opts serialization parameters
+   * @param sopts serialization parameters
    */
-  public void sopts(final SerializerOptions opts) {
-    serializer = opts;
+  public void sopts(final SerializerOptions sopts) {
+    serializer = sopts;
   }
 
   /**

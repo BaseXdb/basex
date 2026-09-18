@@ -28,13 +28,13 @@ public class FileList extends FileFn {
   public Value eval(final QueryContext qc) throws QueryException, IOException {
     final Path dir = toPath(arg(0), qc).toRealPath();
     final boolean recursive = toBooleanOrFalse(arg(1), qc);
-    final String pattern = toStringOrNull(arg(2), qc);
+    final String glob = toStringOrNull(arg(2), qc);
 
-    final Pattern pttrn = pattern == null ? null :
-      Pattern.compile(IOFile.regex(pattern, false), Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE);
+    final Pattern pattern = glob == null ? null :
+      Pattern.compile(IOFile.regex(glob, false), Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE);
     final TokenList tl = new TokenList();
     final FItem recurse = constantFn(recursive), filter = constantFn(true);
-    list(dir, recurse, new HofArgs(1), pttrn, dir.getNameCount(),
+    list(dir, recurse, new HofArgs(1), pattern, dir.getNameCount(),
         filter, new HofArgs(1), tl, Integer.MAX_VALUE, true, qc);
     return StrSeq.get(tl);
   }

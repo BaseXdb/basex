@@ -119,10 +119,10 @@ public abstract class BaseXServlet extends HttpServlet {
       conn.error(hex.getStatus(), Util.message(hex));
     } else if(ex instanceof LoginException) {
       conn.error(SC_UNAUTHORIZED, Util.message(ex));
-    } else if(ex instanceof final QueryException qex) {
+    } else if(ex instanceof final QueryException qe) {
       int code = SC_INTERNAL_SERVER_ERROR;
       boolean full = conn.context.soptions.get(StaticOptions.RESTXQERRORS);
-      final QNm qname = qex.qname();
+      final QNm qname = qe.qname();
       if(Token.eq(qname.uri(), QueryText.REST_URI)) {
         // status code is encoded in the local name (e.g. 'status404')
         code = Token.toInt(Token.substring(qname.local(), QueryText.STATUS.length));
@@ -131,19 +131,19 @@ public abstract class BaseXServlet extends HttpServlet {
         // insufficient permissions of an authenticated user
         code = SC_FORBIDDEN;
       }
-      final SerializerOptions sopts = qex.output();
+      final SerializerOptions sopts = qe.output();
       if(sopts != null) {
         // render the error value as the response body
         String body;
         try {
-          body = qex.value().serialize(sopts).toString();
+          body = qe.value().serialize(sopts).toString();
         } catch(final QueryIOException ex2) {
           Util.debug(ex2);
-          body = qex.getLocalizedMessage();
+          body = qe.getLocalizedMessage();
         }
-        conn.error(code, qex.getLocalizedMessage(), body, sopts.mediaType());
+        conn.error(code, qe.getLocalizedMessage(), body, sopts.mediaType());
       } else {
-        conn.error(code, full ? Util.message(qex) : qex.getLocalizedMessage());
+        conn.error(code, full ? Util.message(qe) : qe.getLocalizedMessage());
       }
     } else if(ex instanceof IOException) {
       final boolean full = conn.context.soptions.get(StaticOptions.RESTXQERRORS);

@@ -34,12 +34,12 @@ public final class FnDeepEqual extends StandardFunc {
     final String collation = opts.get(DeepEqualOptions.COLLATION);
     final Collation coll = collation != null ? toCollation(Token.token(collation), qc) : null;
 
-    final DeepEqual de = new DeepEqual(info, coll, qc, opts);
+    final DeepEqual deep = new DeepEqual(info, coll, qc, opts);
     final Value ie = opts.get(DeepEqualOptions.ITEMS_EQUAL);
-    if(!ie.isEmpty()) de.itemsEqual = toFunction(ie, 2, qc);
+    if(!ie.isEmpty()) deep.itemsEqual = toFunction(ie, 2, qc);
 
-    final boolean eq = de.equal(input1, input2);
-    if(!eq) de.debug();
+    final boolean eq = deep.equal(input1, input2);
+    if(!eq) deep.debug();
     return eq;
   }
 

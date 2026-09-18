@@ -316,12 +316,12 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
-    final VarScope vsc = new VarScope();
+    final VarScope scope = new VarScope();
 
     final HashMap<Var, Expr> outer = new HashMap<>();
     global.forEach((key, value) -> outer.put(key, value.copy(cc, vm)));
 
-    cc.pushScope(vsc);
+    cc.pushScope(scope);
     try {
       final IntObjectMap<Var> innerVars = new IntObjectMap<>();
       vs.copy(cc, innerVars);

@@ -1354,8 +1354,8 @@ public class QueryParser extends InputParser {
     if(clauses == null) return null;
 
     final TokenObjectMap<Var> curr = new TokenObjectMap<>();
-    for(final Clause fl : clauses)
-      for(final Var var : fl.vars()) curr.put(var.name.unique(), var);
+    for(final Clause clause : clauses)
+      for(final Var var : clause.vars()) curr.put(var.name.unique(), var);
 
     int size;
     do {
@@ -1716,8 +1716,8 @@ public class QueryParser extends InputParser {
         boolean dec = false;
         if(ref != null) {
           // check preceding clauses
-          for(final Clause f : cl) {
-            if(f.declares(ref.var)) {
+          for(final Clause clause : cl) {
+            if(clause.declares(ref.var)) {
               dec = true;
               break;
             }

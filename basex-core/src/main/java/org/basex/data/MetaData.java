@@ -386,8 +386,8 @@ public final class MetaData {
    * @throws IOException I/O exception
    */
   public void read() throws IOException {
-    try(DataInput di = new DataInput(dbFile(DATAINF))) {
-      read(di);
+    try(DataInput in = new DataInput(dbFile(DATAINF))) {
+      read(in);
     }
   }
 

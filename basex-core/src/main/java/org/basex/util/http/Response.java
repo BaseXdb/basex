@@ -82,13 +82,13 @@ public final class Response {
    * @param response HTTP response
    * @param mode representation of the response body
    * @param mtype media type provided by the user (can be {@code null})
-   * @param xml options for parsing XML bodies (can be {@code null})
+   * @param xmlOptions options for parsing XML bodies (can be {@code null})
    * @return result sequence of http:response and content items
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
   public Value getResponse(final HttpResponse<InputStream> response, final BodyMode mode,
-      final String mtype, final MainOptions xml) throws IOException, QueryException {
+      final String mtype, final MainOptions xmlOptions) throws IOException, QueryException {
 
     // construct <http:response/>
     final int status = response.statusCode();
@@ -107,7 +107,7 @@ public final class Response {
     });
 
     // add payload elements and contents
-    final ResponseBody parsed = body(response, mode, mtype, null, xml, href);
+    final ResponseBody parsed = body(response, mode, mtype, null, xmlOptions, href);
     root.node(element(parsed));
     final ItemList items = new ItemList().add((Item) null);
     if(mode != BodyMode.NONE) items.add(parsed.values());
@@ -120,13 +120,13 @@ public final class Response {
    * @param response HTTP response
    * @param mode representation of the response body
    * @param charset character encoding of the body (can be {@code null})
-   * @param xml options for parsing XML bodies (can be {@code null})
+   * @param xmlOptions options for parsing XML bodies (can be {@code null})
    * @return response record
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
   public XQMap getRecord(final HttpResponse<InputStream> response, final BodyMode mode,
-      final String charset, final MainOptions xml) throws IOException, QueryException {
+      final String charset, final MainOptions xmlOptions) throws IOException, QueryException {
 
     final String href = href(response, "");
 
@@ -139,7 +139,7 @@ public final class Response {
 
     final XQMap fields = headers.map();
     try {
-      final ResponseBody parsed = body(response, mode, null, charset, xml, href);
+      final ResponseBody parsed = body(response, mode, null, charset, xmlOptions, href);
       return record(response, href, fields, parsed.values());
     } catch(final QueryException ex) {
       if(ex.error() != HC_PARSE_X) throw ex;
@@ -198,20 +198,20 @@ public final class Response {
    * @param mode representation of the response body
    * @param mtype media type provided by the user (can be {@code null})
    * @param charset character encoding of the body (can be {@code null})
-   * @param xml options for parsing XML bodies (can be {@code null})
+   * @param xmlOptions options for parsing XML bodies (can be {@code null})
    * @param href URI of the response (can be {@code null})
    * @return parsed body
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
   private ResponseBody body(final HttpResponse<InputStream> response, final BodyMode mode,
-      final String mtype, final String charset, final MainOptions xml, final String href)
+      final String mtype, final String charset, final MainOptions xmlOptions, final String href)
       throws IOException, QueryException {
 
     final HttpHeaders headers = response.headers();
     final MediaType type = mtype != null ? new MediaType(mtype) :
       headers.firstValue(CONTENT_TYPE).map(MediaType::new).orElse(MediaType.TEXT_PLAIN);
-    final String encoding = headers.firstValue(CONTENT_ENCODING).orElse("");
+    final String coding = headers.firstValue(CONTENT_ENCODING).orElse("");
     final TempFiles temp = resources != null ? resources.index(TempFiles.class) : null;
 
     final boolean binary = mode == BodyMode.BINARY ||
@@ -223,12 +223,12 @@ public final class Response {
       resources.add(is);
       final ResponseBody parsed = new ResponseBody();
       parsed.type = type;
-      parsed.value = new B64HttpLazy(href, is, encoding, temp, definition);
+      parsed.value = new B64HttpLazy(href, is, coding, temp, definition);
       return parsed;
     }
     try(InputStream is = response.body()) {
-      return new Payload(is, mode, charset, info, options).xmlOptions(xml).
-        parse(type, encoding, temp);
+      return new Payload(is, mode, charset, info, options).xmlOptions(xmlOptions).
+        parse(type, coding, temp);
     }
   }
 

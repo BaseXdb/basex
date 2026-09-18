@@ -76,13 +76,13 @@ public final class Restore extends ABackup {
     // drop existing files
     DropDB.drop(db, sopts);
     // unzip backup
-    final IOFile dbPath = sopts.dbPath(), file = new IOFile(dbPath, backup + IO.ZIPSUFFIX);
+    final IOFile dbpath = sopts.dbPath(), file = new IOFile(dbpath, backup + IO.ZIPSUFFIX);
     try(ZipFile zip = new ZipFile(file.file())) {
       if(cmd != null) cmd.total = zip.size();
       final Enumeration<? extends ZipEntry> enm = zip.entries();
       while(enm.hasMoreElements()) {
         final ZipEntry ze = enm.nextElement();
-        final IOFile trg = new IOFile(dbPath, ze.getName());
+        final IOFile trg = new IOFile(dbpath, ze.getName());
         if(ze.isDirectory()) {
           trg.md();
         } else {

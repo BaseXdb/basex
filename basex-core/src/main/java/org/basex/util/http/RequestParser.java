@@ -36,42 +36,42 @@ public final class RequestParser {
 
   /**
    * Parses an http:request element.
-   * @param request request element (can be {@code null})
+   * @param node request element (can be {@code null})
    * @param bodies request bodies
    * @return parsed request
    * @throws QueryException query exception
    */
-  public Request parse(final GNode request, final Value bodies) throws QueryException {
-    final Request hr = new Request();
+  public Request parse(final GNode node, final Value bodies) throws QueryException {
+    final Request request = new Request();
 
-    if(request != null) {
-      for(final GNode attr : request.attributeIter()) {
+    if(node != null) {
+      for(final GNode attr : node.attributeIter()) {
         final String key = string(attr.name());
-        final RequestAttribute r = Enums.get(RequestAttribute.class, key);
-        if(r == null) throw HC_REQ_X.get(info, "Unknown attribute: " + key);
-        assign(hr, r, string(attr.string()));
+        final RequestAttribute attribute = Enums.get(RequestAttribute.class, key);
+        if(attribute == null) throw HC_REQ_X.get(info, "Unknown attribute: " + key);
+        assign(request, attribute, string(attr.string()));
       }
-      checkRequest(hr);
+      checkRequest(request);
 
       // it is an error if content is set for HTTP methods that do not allow bodies
-      final GNode body = parseHeaders(request.childIter(), hr.headers);
-      final String error = hr.invalid();
+      final GNode body = parseHeaders(node.childIter(), request.headers);
+      final String error = request.invalid();
       if(error != null) throw HC_REQ_X.get(info, error);
       if(body != null) {
         final QNm pl = body.qname();
         // single part request
         if(pl.eq(Q_HTTP_BODY)) {
-          parseBody(body, bodies, hr.payloadAtts, hr.payload);
+          parseBody(body, bodies, request.payloadAtts, request.payload);
         // multipart request
         } else if(pl.eq(Q_HTTP_MULTIPART)) {
-          parseMultipart(body, bodies.iter(), hr.payloadAtts, hr.parts);
-          hr.isMultipart = true;
+          parseMultipart(body, bodies.iter(), request.payloadAtts, request.parts);
+          request.isMultipart = true;
         } else {
           throw HC_REQ_X.get(info, "Unknown payload element: " + body.qname());
         }
       }
     }
-    return hr;
+    return request;
   }
 
   /**

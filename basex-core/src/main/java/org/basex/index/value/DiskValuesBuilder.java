@@ -65,11 +65,11 @@ public final class DiskValuesBuilder extends IndexBuilder {
    * Indexes the units of the specified range and writes them to an index structure.
    * @param first PRE value of the first node
    * @param last PRE value of the last node (exclusive)
-   * @param output writer of the index structure (closed by this method)
+   * @param writer writer of the index structure (closed by this method)
    * @throws IOException I/O exception
    */
-  void build(final int first, final int last, final SegmentWriter output) throws IOException {
-    try(SegmentWriter writer = output) {
+  void build(final int first, final int last, final SegmentWriter writer) throws IOException {
+    try(writer) {
       final boolean updindex = data.meta.updindex;
       for(pre = first; pre < last; pre++) {
         if((pre & 0x0FFF) == 0) check();

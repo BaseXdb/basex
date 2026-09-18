@@ -433,19 +433,19 @@ public abstract class SegmentedIndex extends ValueIndex {
     }
 
     // replace the inputs by the output
-    final IndexSegment[] segs = new IndexSegment[sl - il + 1];
+    final IndexSegment[] updated = new IndexSegment[sl - il + 1];
     for(int s = 0, t = 0; s < sl; s++) {
       if(s == newest) {
-        segs[t++] = open(number);
+        updated[t++] = open(number);
       } else if(Arrays.binarySearch(inputs, s) < 0) {
-        segs[t++] = segments[s];
+        updated[t++] = segments[s];
       }
     }
     for(final int i : inputs) {
       segments[i].close();
       drop(segments[i].prefix);
     }
-    segments = segs;
+    segments = updated;
     unions();
     updateMeta();
   }
@@ -453,10 +453,10 @@ public abstract class SegmentedIndex extends ValueIndex {
   /**
    * Merges segments, skipping dead references.
    * @param inputs segments
-   * @param output writer of the output index structure (closed by this method)
+   * @param writer writer of the output index structure (closed by this method)
    * @throws IOException I/O exception
    */
-  protected final void merge(final IndexSegment[] inputs, final SegmentWriter output)
+  protected final void merge(final IndexSegment[] inputs, final SegmentWriter writer)
       throws IOException {
     // a reference is live if its node exists and its unit is not superseded by newer segments
     final int il = inputs.length;
@@ -465,7 +465,7 @@ public abstract class SegmentedIndex extends ValueIndex {
       final IndexSegment segment = inputs[i];
       live[i] = id -> pre(segment, id) != -1;
     }
-    try(SegmentWriter writer = output) {
+    try(writer) {
       merge(il, i -> reader(inputs[i]), writer, order(), live);
     }
   }

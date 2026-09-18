@@ -72,11 +72,11 @@ public final class RequestOptions extends Options {
     final Request request = new Request();
     request.method = method;
     request.bodyMode = get(RESPONSE_BODY);
-    final String encoding = get(ENCODING);
-    if(encoding != null) {
-      final String error = Strings.checkEncoding(encoding);
+    final String charset = get(ENCODING);
+    if(charset != null) {
+      final String error = Strings.checkEncoding(charset);
       if(error != null) throw HTTP_INVALID_OPTION_X.get(info, error);
-      request.charset = Strings.normEncoding(encoding, false);
+      request.charset = Strings.normEncoding(charset, false);
     }
     if(get(PARSE_OPTIONS) instanceof final XQMap map) request.parseOptions = map;
     request.cookies = get(COOKIES);

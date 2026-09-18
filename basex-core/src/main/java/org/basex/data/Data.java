@@ -889,15 +889,15 @@ public abstract class Data {
     final NSScope nsScope = new NSScope(pre, this);
 
     // indicates if database only contains a dummy node
-    final Data sdata = source.data;
+    final Data sData = source.data;
     int c = 0, sTopPre = source.start;
     for(int sPre = sTopPre; sPre < source.end; sPre++, c++) {
       if(c != 0 && c % bSize == 0) insert(pre + c - bSize);
 
       // values of source node
-      final int sKind = sdata.kind(sPre);
-      final int sSize = sdata.size(sPre, sKind);
-      final int sPar = sdata.parent(sPre, sKind);
+      final int sKind = sData.kind(sPre);
+      final int sSize = sData.size(sPre, sKind);
+      final int sPar = sData.parent(sPre, sKind);
 
       // PRE and DIST value of new node
       final int nPre = pre + c, nDist;
@@ -918,33 +918,33 @@ public abstract class Data {
         case DOC -> {
           // add document
           nsScope.open(nPre);
-          doc(sSize, sdata.text(sPre, true));
+          doc(sSize, sData.text(sPre, true));
           ++meta.ndocs;
         }
         case ELEM -> {
           // add element.
-          final boolean nsFlag = nsScope.open(nPre, sdata.namespaces(sPre));
-          final byte[] name = sdata.name(sPre, sKind);
-          elem(nDist, elemNames.put(name), sdata.attSize(sPre, sKind), sSize,
+          final boolean nsFlag = nsScope.open(nPre, sData.namespaces(sPre));
+          final byte[] name = sData.name(sPre, sKind);
+          elem(nDist, elemNames.put(name), sData.attSize(sPre, sKind), sSize,
               nspaces.uriIdForPrefix(prefix(name), true), nsFlag);
         }
         case TEXT, COMM, PI ->
           // add text, comment or processing instruction
-          text(nDist, sdata.text(sPre, true), sKind);
+          text(nDist, sData.text(sPre, true), sKind);
         case ATTR -> {
           // add attribute
-          final byte[] name = sdata.name(sPre, sKind);
-          int uriId = sdata.uriId(sPre, sKind);
+          final byte[] name = sData.name(sPre, sKind);
+          int uriId = sData.uriId(sPre, sKind);
           // extend namespace scope and write namespace flag if attribute has a new namespaces
           if(uriId != 0) {
-            final byte[] prefix = prefix(name), uri = sdata.nspaces.uri(uriId);
+            final byte[] prefix = prefix(name), uri = sData.nspaces.uri(uriId);
             uriId = nspaces.uriIdForPrefix(prefix, false);
             if(uriId == 0 && !eq(prefix, XML)) {
               uriId = nspaces.add(nsPre, prefix, uri, this);
               table.write2(nsPre, 1, 1 << 15 | nameId(nsPre));
             }
           }
-          attr(nDist, attrNames.put(name), sdata.text(sPre, false), uriId);
+          attr(nDist, attrNames.put(name), sData.text(sPre, false), uriId);
         }
         default -> { }
       }

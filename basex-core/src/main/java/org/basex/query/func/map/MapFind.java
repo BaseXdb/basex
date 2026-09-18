@@ -38,21 +38,21 @@ public final class MapFind extends MapFn {
    * Finds map entries in the specified iterator.
    * @param iter iterator
    * @param key item to be found
-   * @param builder array builder
+   * @param ab array builder
    * @param qc query context
    * @throws QueryException query exception
    */
-  private static void find(final Iter iter, final Item key, final ArrayBuilder builder,
+  private static void find(final Iter iter, final Item key, final ArrayBuilder ab,
       final QueryContext qc) throws QueryException {
 
     for(Item item; (item = qc.next(iter)) != null;) {
       if(item instanceof final XQMap map) {
         final Value value = map.get(key);
-        if(!value.isEmpty()) builder.add(value);
-        map.forEach((k, val) -> find(val.iter(), key, builder, qc));
+        if(!value.isEmpty()) ab.add(value);
+        map.forEach((k, val) -> find(val.iter(), key, ab, qc));
       } else if(item instanceof final XQArray array) {
         for(final Value value : array.members()) {
-          find(value.iter(), key, builder, qc);
+          find(value.iter(), key, ab, qc);
         }
       }
     }

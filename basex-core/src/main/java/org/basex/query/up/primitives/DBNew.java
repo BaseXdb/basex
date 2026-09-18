@@ -93,13 +93,13 @@ public final class DBNew {
           final Context ctx = qc.context;
           final MainOptions mopts = ctx.options;
           final StaticOptions sopts = ctx.soptions;
-          final String dbname = cache ? sopts.createTempDb(name) : name;
-          data = cache ? CreateDB.create(dbname, Parser.emptyParser(mopts), ctx, mopts) :
+          final String dbName = cache ? sopts.createTempDb(name) : name;
+          data = cache ? CreateDB.create(dbName, Parser.emptyParser(mopts), ctx, mopts) :
             new MemData(new MetaData(mopts));
           data.startUpdate(mopts);
           try {
             for(int i = 0; i < is; i++) {
-              final Data tmpData = tmpData(dbname, i, cache);
+              final Data tmpData = tmpData(dbName, i, cache);
               try {
                 copy(tmpData, data, false);
               } finally {
@@ -183,16 +183,16 @@ public final class DBNew {
     if(node != null) return xmlNodeData(name, input, node, mopts);
 
     final StaticOptions sopts = qc.context.soptions;
-    final String dbname = cache ? sopts.createTempDb(name) : name;
+    final String dbName = cache ? sopts.createTempDb(name) : name;
 
     // binary or value resource: empty database, write content directly to its file area
     final boolean file = input.type == ResourceType.BINARY || input.type == ResourceType.VALUE;
     final Parser parser = file ? Parser.emptyParser(mopts) :
       new DirParser(input.io, mopts).target(input.path);
     final Builder builder = file || cache
-      ? new DiskBuilder(dbname, parser, sopts, mopts)
-      : new MemBuilder(dbname, parser);
-    builder.binariesDir(sopts.dbPath(dbname));
+      ? new DiskBuilder(dbName, parser, sopts, mopts)
+      : new MemBuilder(dbName, parser);
+    builder.binariesDir(sopts.dbPath(dbName));
     final Data d = builder.build();
     if(file) writeFileResource(d, input);
     return d;

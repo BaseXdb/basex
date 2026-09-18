@@ -51,8 +51,8 @@ public final class ClientQuery extends ClientFn {
       final Matcher m = QUERYPAT.matcher(ex.getMessage());
       if(m.find()) {
         final String name = m.group(1), msg = m.group(2);
-        final QueryException exc = get(name, msg, info);
-        throw exc == null ? new QueryException(info, new QNm(name), msg) : exc;
+        final QueryException qe = get(name, msg, info);
+        throw qe == null ? new QueryException(info, new QNm(name), msg) : qe;
       }
       throw CLIENT_QUERY_X.get(info, ex);
     } catch(final IOException ex) {

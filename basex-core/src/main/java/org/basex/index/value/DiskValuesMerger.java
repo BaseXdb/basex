@@ -21,7 +21,7 @@ final class DiskValuesMerger implements SegmentReader {
   /** References to the ID lists. */
   private final DataAccess idxr;
   /** Index keys. */
-  private final DataInput dk;
+  private final DataInput idxt;
   /** File prefix. */
   private final String prefix;
   /** Data reference. */
@@ -47,7 +47,7 @@ final class DiskValuesMerger implements SegmentReader {
    */
   DiskValuesMerger(final Data data, final IndexType type, final int id) throws IOException {
     prefix = DiskValuesBuilder.partial(type, id);
-    dk = new DataInput(data.meta.dbFile(prefix + 't'));
+    idxt = new DataInput(data.meta.dbFile(prefix + 't'));
     idxl = new DataAccess(data.meta.dbFile(prefix + 'l'));
     idxr = new DataAccess(data.meta.dbFile(prefix + 'r'));
     // skip the number of keys
@@ -82,7 +82,7 @@ final class DiskValuesMerger implements SegmentReader {
     } else {
       final byte[] values = idxl.readBytes(idxr.read5(), idxl.read4());
       DiskValuesBuilder.decode(values, values.length, token, ids, poss);
-      key = dk.readToken();
+      key = idxt.readToken();
     }
   }
 
@@ -93,7 +93,7 @@ final class DiskValuesMerger implements SegmentReader {
     idxl.close();
     idxr.close();
     try {
-      dk.close();
+      idxt.close();
     } catch(final IOException ex) {
       Util.debug(ex);
     }
