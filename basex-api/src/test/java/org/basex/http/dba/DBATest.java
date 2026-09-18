@@ -593,7 +593,7 @@ public final class DBATest extends WebappTest {
      */
     @Test public void resource() throws Exception {
       assertEquals("{\"type\":\"result\",\"run\":1," +
-          "\"result\":\"<x><y>1<\\/y><y>2<\\/y><\\/x>\"}", evaluate("."));
+          "\"result\":\"<x><y>1<\\/y><y>2<\\/y><\\/x>\",\"items\":1}", evaluate("."));
     }
 
     /**
@@ -601,7 +601,7 @@ public final class DBATest extends WebappTest {
      * @throws Exception exception
      */
     @Test public void context() throws Exception {
-      assertEquals("{\"type\":\"result\",\"run\":1,\"result\":\"1\\n2\"}",
+      assertEquals("{\"type\":\"result\",\"run\":1,\"result\":\"1\\n2\",\"items\":2}",
           evaluate("//y/string()"));
     }
 
@@ -1015,8 +1015,10 @@ public final class DBATest extends WebappTest {
      * @throws Exception exception
      */
     @Test public void query() throws Exception {
-      assertEquals("{\"type\":\"result\",\"run\":1,\"result\":\"2\"}", evaluate("1 + 1"));
-      assertEquals("{\"type\":\"result\",\"run\":2,\"result\":\"ok\"}", evaluate("'ok'"));
+      assertEquals("{\"type\":\"result\",\"run\":1,\"result\":\"2\",\"items\":1}",
+          evaluate("1 + 1"));
+      assertEquals("{\"type\":\"result\",\"run\":2,\"result\":\"ok\",\"items\":1}",
+          evaluate("'ok'"));
     }
 
     /**
@@ -1024,7 +1026,7 @@ public final class DBATest extends WebappTest {
      * @throws Exception exception
      */
     @Test public void update() throws Exception {
-      assertEquals("{\"type\":\"result\",\"run\":1,\"result\":\"<a\\/>\"}",
+      assertEquals("{\"type\":\"result\",\"run\":1,\"result\":\"<a\\/>\",\"items\":1}",
           evaluate("copy $a := <a/> modify delete node $a/@* return $a"));
     }
 
@@ -1033,7 +1035,8 @@ public final class DBATest extends WebappTest {
      * @throws Exception exception
      */
     @Test public void emptyResult() throws Exception {
-      assertEquals("{\"type\":\"result\",\"run\":1,\"result\":\"\"}", evaluate("()"));
+      assertEquals("{\"type\":\"result\",\"run\":1,\"result\":\"\",\"items\":0}",
+          evaluate("()"));
     }
 
     /**
@@ -1070,7 +1073,7 @@ public final class DBATest extends WebappTest {
      * @throws Exception exception
      */
     @Test public void largeQuery() throws Exception {
-      assertEquals("{\"type\":\"result\",\"run\":1,\"result\":\"1\"}",
+      assertEquals("{\"type\":\"result\",\"run\":1,\"result\":\"1\",\"items\":1}",
           evaluate("1 (: " + "x".repeat(100000) + " :)"));
     }
 
