@@ -65,6 +65,7 @@ function enterDbDir(dir) {
   // a level and a filter are two ways of looking at the database: entering one gives up the other
   const filter = document.getElementById("resource-filter");
   if(filter) filter.value = "";
+  storeField("resource-filter", _db);
   _dir = dir === ".." ? _dir.replace(/[^/]+\/$/, "") : dir;
   pushSelection();
   refreshDatabase();
@@ -102,15 +103,15 @@ function showDatabase() {
 function refreshIndex(sort, page) {
   requestPanel(DB_WS, "index-panel", { type: "index", name: _db,
     index: fieldValue("index-select", "element-name"),
-    prefix: fieldValue("index-prefix") }, sort, page);
+    prefix: storedField("index-prefix", _db) }, sort, page);
 }
 
 /**
- * Requests the index entries that start with the supplied prefix. Every key is a new request,
- * so the ones that are typed in a row are collected first; Enter asks at once.
+ * Requests the index entries that start with the supplied prefix.
  * @param {string} key typed key
  */
 function filterIndex(key) {
+  storeField("index-prefix", _db);
   filterKey(key, "index-prefix", refreshIndex);
 }
 
@@ -131,15 +132,15 @@ function refreshDatabases(sort, page) {
 function refreshDatabase(sort, page) {
   requestPanel(DB_WS, "database-panel",
     { type: "database", name: _db, resource: _resource, dir: _dir,
-      filter: fieldValue("resource-filter") }, sort, page);
+      filter: storedField("resource-filter", _db) }, sort, page);
 }
 
 /**
- * Requests the resources that match the filter. Every key is a new request, so the ones that
- * are typed in a row are collected first; Enter asks at once.
+ * Requests the resources that match the filter.
  * @param {string} key typed key
  */
 function filterResources(key) {
+  storeField("resource-filter", _db);
   filterKey(key, "resource-filter", refreshDatabase);
 }
 
@@ -192,8 +193,9 @@ function initDocument(editable, text) {
   const note = document.getElementById("note");
   _note = note ? [ note.textContent, note.className ] : [ "", "note" ];
 
-  if(document.getElementById("input") && indentOn()) {
-    // XML resource with indentation enabled: request the indented document
+  // the query field is rendered empty: what was typed for the database is run again
+  if(restoreField("input", _db) || document.getElementById("input") && indentOn()) {
+    // XML resource with a query or indentation: request the result
     queryResource(true, true);
   } else {
     setEditable("save-resource", editable);
@@ -208,6 +210,7 @@ function initDocument(editable, text) {
  */
 function queryResource(enforce, keep) {
   const input = fieldValue("input");
+  storeField("input", _db);
   const indent = indentOn();
   // re-run whenever the query or the indent preference changes
   if(!enforce && _request?.input === input && _request?.indent === indent) return;
@@ -364,4 +367,7 @@ function initDatabases(editable) {
 
   initSelection(adoptSelection, showDatabase);
   initDocument(editable, undefined);
+  // the lists are rendered unfiltered: what was typed for the database is asked for again
+  if(restoreField("resource-filter", _db)) refreshDatabase();
+  if(restoreField("index-prefix", _db)) refreshIndex();
 }

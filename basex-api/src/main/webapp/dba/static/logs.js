@@ -6,9 +6,6 @@ let _logInput;
 /** Whether the search covers more than one log file. */
 let _logFiles = 1;
 
-/** localStorage key for the logs 'ignore entries' filter. */
-const IGNORE_KEY = "dba-ignore-logs";
-
 /**
  * Queries the entries of the log files that are searched: the checked ones, or the file that
  * is opened.
@@ -27,8 +24,14 @@ function logEntries(key) {
     [ document.getElementById("date").value ];
   // the filter fields belong to the rendered table, so they are missing until the first
   // result arrives; empty ones must not count, or the first key press after a search
-  // would look like a new search and would jump back to page 1
-  const typed = [ ...filters ].map(f => [ f.name, f.value.trim() ]).filter(([ , value ]) => value);
+  // would look like a new search and would jump back to page 1. Before that, the stored ones
+  // are sent, and the server renders them into the fields
+  const typed = filters.length ?
+    [ ...filters ].map(f => [ f.name, f.value.trim() ]).filter(([ , value ]) => value) :
+    JSON.parse(stored(fieldKey("filters"), "[]"));
+  storeField("input");
+  storeField("ignore");
+  store(fieldKey("filters"), typed.length ? JSON.stringify(typed) : null);
   const state = JSON.stringify([ input, ignore, dates, typed ]);
   if(reset && _logInput === state) return false;
   _logInput = state;
@@ -61,9 +64,8 @@ function logEntries(key) {
   });
 
   // refresh browser history, so that a reload shows what the page shows
-  const params = { input: input, page: message.page, sort: message.sort };
-  for(const filter of filters) params[filter.name] = filter.value.trim();
-  window.history.replaceState(null, "", replaceParams(window.location.href, params));
+  window.history.replaceState(null, "", replaceParams(window.location.href,
+    { input: input, page: message.page, sort: message.sort }));
 }
 
 /**
@@ -95,21 +97,13 @@ function filterLogs(key) {
 }
 
 /**
- * Persists the log ignore filter and refreshes the entries.
- * @param {string} key typed key
- */
-function ignoreLogs(key) {
-  // the preference is kept at once; only the search it starts is collected
-  store(IGNORE_KEY, document.getElementById("ignore").value);
-  filterLogs(key);
-}
-
-/**
- * Restores the persisted ignore filter, then loads the log entries.
+ * Restores the stored text fields, then loads the log entries.
  */
 function initLogs() {
-  const ignore = document.getElementById("ignore");
-  if(ignore) ignore.value = stored(IGNORE_KEY, "");
+  // a search of the address wins over the stored one
+  restoreField("input");
+  restoreField("ignore");
+  if(restoreField("log-filter")) logFilter();
   // the checked files are the scope of the search, so a new selection is a new search.
   // Clicks, not changes: the checkbox of the table header ticks the rows by script, which
   // raises no change event of its own
@@ -124,6 +118,7 @@ function initLogs() {
  */
 function logFilter() {
   const value = document.getElementById("log-filter").value;
+  storeField("log-filter");
   const list = document.getElementById("dates");
   let count = 0, unchecked = false;
   for(const input of list.querySelectorAll("input[name=name]")) {

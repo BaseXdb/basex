@@ -9,7 +9,7 @@
  *   opens the address and sees something else, the value belongs here.
  * - localStorage: what the user set up and expects to find again, and what no one else should
  *   see. Editor drafts, the directory and the open documents of the Workspace view, panel
- *   splits and collapsed panels, the 'Live' and 'Indent' preferences, the log filter. Keys
+ *   splits and collapsed panels, the 'Live' and 'Indent' preferences, the text fields. Keys
  *   that describe one page are scoped with pageKey; the rest are shared by every page of the DBA.
  * - Server session: only what the server itself must know, which is the login. Anything else
  *   would make two browsers fight over one value and the server answer differently to the
@@ -111,10 +111,11 @@ const SPLIT_KEY = "dba-split-";
 const MIN_PANEL_SIZE = 60;
 
 /** localStorage key prefix for the collapsed content panels of a page. Only the panels that
-    were folded by hand are stored; the others follow the page, which assigns their state.
-    Versioned: panel ids used to be row-based, the grid layout numbers them flat, and the
-    collapsed ones used to be listed instead of stating the state of both. */
-const PANELS_KEY = "dba-panels-v3-";
+    were folded by hand are stored; the others follow the page, which assigns their state. */
+const PANELS_KEY = "dba-panels-";
+
+/** localStorage key prefix for the text fields of a page. */
+const FIELD_KEY = "dba-field-";
 
 /**
  * Returns a localStorage key that describes the current page, not the DBA as a whole.
@@ -123,6 +124,48 @@ const PANELS_KEY = "dba-panels-v3-";
  */
 function pageKey(prefix) {
   return prefix + window.location.pathname;
+}
+
+/**
+ * Returns the localStorage key of a text field of the current page.
+ * @param {string} id id of the field
+ * @param {string} scope what the field applies to, e.g. a database (can be empty)
+ * @returns {string} key
+ */
+function fieldKey(id, scope = "") {
+  return `${pageKey(FIELD_KEY)}/${id}${scope && "/" + scope}`;
+}
+
+/**
+ * Remembers what was typed into a text field of the current page.
+ * @param {string} id id of the field
+ * @param {string} scope what the field applies to (can be empty)
+ */
+function storeField(id, scope) {
+  const field = document.getElementById(id);
+  if(field) store(fieldKey(id, scope), field.value || null);
+}
+
+/**
+ * Fills an empty text field of the current page with what was typed into it before.
+ * @param {string} id id of the field
+ * @param {string} scope what the field applies to (can be empty)
+ * @returns {string} value of the field
+ */
+function restoreField(id, scope) {
+  const field = document.getElementById(id);
+  if(field && !field.value) field.value = storedField(id, scope);
+  return fieldValue(id);
+}
+
+/**
+ * Returns what was typed into a text field of the current page, without the spaces around it.
+ * @param {string} id id of the field
+ * @param {string} scope what the field applies to (can be empty)
+ * @returns {string} value
+ */
+function storedField(id, scope) {
+  return stored(fieldKey(id, scope), "").trim();
 }
 
 /**

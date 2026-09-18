@@ -105,7 +105,7 @@ function dba:logs(
           <span class='ignore'>{
             <input type='text' id='ignore' class='smallinput' autocomplete='off'
                    placeholder='Ignore, e.g. /dba' title='Regular expression of entries to hide'
-                   onkeyup='ignoreLogs(event.key);'/>
+                   onkeyup='filterLogs(event.key);'/>
           }</span>
         }</div>,
         <div id='output'/>
@@ -138,9 +138,9 @@ function dba:ws-message(
   let $error := head(
     ($json?input[.], $filters?*) ! (try { void(analyze-string('', .)) } catch * { $err:description })
   )
-  return if ($error) {
+  return if ($error) then (
     utils:ws-send({ 'type': 'error', 'run': $run, 'message': $error })
-  } else {
+  ) else (
     (: searching a large log file takes time: stop a search that is superseded by this one :)
     utils:ws-stop(),
     let $id := job:eval(dba:entries#7, [
@@ -154,7 +154,7 @@ function dba:ws-message(
       $filters
     ], { 'cache': true(), 'id': utils:job-id('logs') })
     return utils:ws-start($id, $run, { 'method': 'html' })
-  }
+  )
 };
 
 (:~
@@ -195,19 +195,18 @@ declare %private function dba:searched(
   if (every $term in $terms satisfies (
     some $value in $columns?* satisfies matches($value, $term, 'i')
   )) {
-    map:merge(
-      map:for-each($columns, fn($key, $value) {
-        map:entry($key, if (matches($value, $joined, 'i')) {
-          fn() {
-            for $match in analyze-string($value, $joined, 'i')/*
-            let $string := string($match)
-            return if ($match/self::fn:match) then element b { $string } else $string
-          }
-        } else {
-          $value
-        })
-      })
-    )
+    {
+      for key $key value $value in $columns
+      return { $key: if (matches($value, $joined, 'i')) then (
+        fn() {
+          for $match in analyze-string($value, $joined, 'i')/*
+          let $string := string($match)
+          return if ($match/self::fn:match) then element b { $string } else $string
+        }
+      ) else (
+        $value
+      ) }
+    }
   }
 };
 
@@ -248,7 +247,7 @@ declare function dba:entries(
     where not($ignore and matches($text, $ignore, 'i'))
     (: AND-combine column filters :)
     where every $key in map:keys($filters) satisfies matches(
-      if ($key = 'text') then $text else string($log/@*[name() = $key]), $filters($key), 'i'
+      if ($key = 'text') then $text else string($log/@*[name() = $key]), $filters?$key, 'i'
     )
 
     for $map-results in (
@@ -257,14 +256,14 @@ declare function dba:entries(
         'type': string($log/@type),
         'text': $text
       }
-      return if ($input) { dba:searched($map, $terms, $joined-terms) } else { $map }
+      return if ($input) then dba:searched($map, $terms, $joined-terms) else $map
     )
 
     let $id := string($log/@time)
     (: two files hold the same times of day: what names an entry, and what is shown for it,
        is prefixed by the file it belongs to :)
     let $label := ($date || ' ')[$several] || $id
-    return map:merge((
+    return {
       $map-results,
       {
         'id': translate($label, ' ', 'T'),
@@ -276,22 +275,19 @@ declare function dba:entries(
           return if (not($input) and $id = $time) then element b { $link } else $link
         }
       }
-    ))
+    }
   )
   (: one entry more than the limit: it is what tells that the search was cut short :)
   let $max := $dba:MAX-ENTRIES + 1
   let $shown := if ($several) then subsequence($entries, 1, $max) else $entries
-  let $params := map:merge((
-    { 'name': head($files), 'input': $input },
-    map:for-each($filters, fn($key, $value) { map:entry('f-' || $key, $value) })
-  ))
+  let $params := { 'name': head($files), 'input': $input }
   (: filter fields, displayed below the table header :)
   let $filter-row := element tr {
     for $column in $dba:COLUMNS
     let $name := 'f-' || $column?key
     return element td {
       attribute class { 'num' }[$column?type = $table:NUMBER],
-      <input type='text' class='filter' name='{ $name }' value='{ $filters($column?key) }'
+      <input type='text' class='filter' name='{ $name }' value='{ $filters?($column?key) }'
              placeholder='{ $column?label }' autocomplete='off'
              title='Filter: { $column?label }' onkeyup='filterLogs(event.key);'/>
     }
@@ -327,15 +323,14 @@ function dba:logs-jump(
   $time    as xs:string,
   $ignore  as xs:string?
 ) as element(rest:response) {
-  let $page := head((
+  let $page := head(
     let $max := config:get($config:MAXROWS)
     for $log at $pos in reverse(
       admin:logs($date, true())[not($ignore and matches(., $ignore, 'i'))]
     )
     where $log/@time = $time
-    return ($pos - 1) idiv $max + 1,
-    1
-  ))
+    return ($pos - 1) idiv $max + 1
+  ) otherwise 1
   return web:redirect('/dba/logs', { 'name': $date, 'page': $page, 'time': $time }) update {
     .//*:header/@value ! (replace value of node . with . || '#' || $time)
   }
