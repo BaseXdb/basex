@@ -24,7 +24,7 @@ public final class InspectionTest extends SandboxTest {
   /** Drops the test database. */
   @AfterEach public void finish() {
     set(MainOptions.MAINMEM, false);
-    set(MainOptions.UPDINDEX, false);
+    set(MainOptions.UPDINDEX, true);
     set(MainOptions.TOKENINDEX, false);
     execute(new DropDB(NAME));
   }

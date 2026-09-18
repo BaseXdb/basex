@@ -109,7 +109,7 @@ public final class MainOptions extends Options {
   /** Maximum number of name categories. */
   public static final NumberOption MAXCATS = new NumberOption("MAXCATS", 100);
   /** Flag for activating incremental index structures. */
-  public static final BooleanOption UPDINDEX = new BooleanOption("UPDINDEX", false);
+  public static final BooleanOption UPDINDEX = new BooleanOption("UPDINDEX", true);
   /** Flag for automatic index updates. */
   public static final BooleanOption AUTOOPTIMIZE = new BooleanOption("AUTOOPTIMIZE", false);
 

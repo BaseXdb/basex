@@ -24,7 +24,7 @@ public final class IndexTest extends SandboxTest {
   @AfterEach public void after() {
     execute(new DropDB(NAME));
     set(MainOptions.TOKENINDEX, false);
-    set(MainOptions.UPDINDEX, false);
+    set(MainOptions.UPDINDEX, true);
     set(MainOptions.AUTOOPTIMIZE, false);
     set(MainOptions.MAINMEM, false);
     set(MainOptions.AUTOFLUSH, true);
@@ -42,6 +42,7 @@ public final class IndexTest extends SandboxTest {
   @ValueSource(booleans = {false, true})
   public void outdatedFiles(final boolean autoflush) {
     set(MainOptions.AUTOFLUSH, autoflush);
+    set(MainOptions.UPDINDEX, false);
     set(MainOptions.FTINDEX, true);
     execute(new CreateDB(NAME, "<x a='a'>x</x>"));
     final IOFile db = context.soptions.dbPath(NAME);
@@ -275,6 +276,7 @@ public final class IndexTest extends SandboxTest {
   @ValueSource(booleans = {false, true})
   public void autooptimize(final boolean mainmem) {
     set(MainOptions.MAINMEM, mainmem);
+    set(MainOptions.UPDINDEX, false);
     set(MainOptions.AUTOOPTIMIZE, true);
     execute(new CreateDB(NAME));
     query(_DB_INFO.args(NAME) + "//textindex/text()", true);

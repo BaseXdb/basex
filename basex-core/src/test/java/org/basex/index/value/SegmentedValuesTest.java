@@ -53,7 +53,7 @@ public final class SegmentedValuesTest extends SandboxTest {
   @AfterEach public void after() {
     execute(new DropDB(NAME));
     execute(new DropDB(NAME2));
-    set(MainOptions.UPDINDEX, false);
+    set(MainOptions.UPDINDEX, true);
     set(MainOptions.TOKENINDEX, false);
     set(MainOptions.AUTOFLUSH, true);
     set(MainOptions.AUTOOPTIMIZE, false);

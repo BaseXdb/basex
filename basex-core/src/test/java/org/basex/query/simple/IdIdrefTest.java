@@ -56,7 +56,7 @@ public final class IdIdrefTest extends SandboxTest {
   @AfterEach public void tearDown() {
     execute(new DropDB(NAME));
     set(MainOptions.MAINMEM, false);
-    set(MainOptions.UPDINDEX, false);
+    set(MainOptions.UPDINDEX, true);
     set(MainOptions.TOKENINDEX, false);
   }
 

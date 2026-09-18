@@ -28,7 +28,7 @@ public final class ValueIndexTest extends SandboxTest {
    */
   @AfterEach public void after() {
     set(MainOptions.MAINMEM, false);
-    set(MainOptions.UPDINDEX, false);
+    set(MainOptions.UPDINDEX, true);
     set(MainOptions.FTINDEX, false);
     set(MainOptions.TEXTINCLUDE, "");
     set(MainOptions.ATTRINCLUDE, "");

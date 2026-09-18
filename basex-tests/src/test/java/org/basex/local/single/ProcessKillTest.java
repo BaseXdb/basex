@@ -39,7 +39,7 @@ public final class ProcessKillTest extends SandboxTest {
   /** Drops the test database. */
   @AfterEach public void finish() {
     execute(new DropDB(NAME));
-    set(MainOptions.UPDINDEX, false);
+    set(MainOptions.UPDINDEX, true);
     set(MainOptions.TOKENINDEX, false);
     set(MainOptions.FTINDEX, false);
   }

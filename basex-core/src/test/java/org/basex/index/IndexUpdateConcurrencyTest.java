@@ -42,7 +42,7 @@ public final class IndexUpdateConcurrencyTest extends SandboxTest {
    */
   @AfterEach public void finish() {
     execute(new DropDB(NAME));
-    set(MainOptions.UPDINDEX, false);
+    set(MainOptions.UPDINDEX, true);
     set(MainOptions.TOKENINDEX, false);
     set(MainOptions.FTINDEX, false);
     set(MainOptions.AUTOFLUSH, true);

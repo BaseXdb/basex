@@ -48,7 +48,7 @@ public final class SegmentedValuesConcurrencyTest extends SandboxTest {
   /** Drops the test database and restores the default options. */
   @AfterEach public void finish() {
     execute(new DropDB(NAME));
-    set(MainOptions.UPDINDEX, false);
+    set(MainOptions.UPDINDEX, true);
     set(MainOptions.TOKENINDEX, false);
     set(MainOptions.AUTOFLUSH, true);
   }

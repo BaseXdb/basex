@@ -54,7 +54,7 @@ public final class DbModuleTest extends SandboxTest {
 
   /** Finalizes a test. */
   @AfterEach public void finish() {
-    set(MainOptions.UPDINDEX, false);
+    set(MainOptions.UPDINDEX, true);
     set(MainOptions.TEXTINCLUDE, "");
     set(MainOptions.ATTRINCLUDE, "");
     set(MainOptions.TOKENINCLUDE, "");
@@ -408,12 +408,12 @@ public final class DbModuleTest extends SandboxTest {
     query(_DB_DROP.args(NAME));
 
     // specify index options
-    for(final boolean b : new boolean[] { false, true }) {
+    for(final boolean b : new boolean[] { true, false }) {
       query(func.args(NAME, " ()", " ()",
           " { '" + lc(MainOptions.UPDINDEX) + "': " + b + "() }"));
       query(_DB_INFO.args(NAME) + "//" + lc(MainOptions.UPDINDEX) + "/text()", b);
     }
-    assertEquals(false, context.options.get(MainOptions.UPDINDEX));
+    assertEquals(true, context.options.get(MainOptions.UPDINDEX));
 
     final String[] numberOptions = lc(MainOptions.MAXCATS, MainOptions.MAXLEN);
     final String[] boolOptions = lc(MainOptions.TEXTINDEX, MainOptions.ATTRINDEX,

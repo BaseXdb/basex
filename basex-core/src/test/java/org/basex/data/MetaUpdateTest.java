@@ -35,7 +35,7 @@ public final class MetaUpdateTest extends SandboxTest {
   /** Drops the database. */
   @AfterEach public void tearDown() {
     execute(new DropDB(NAME));
-    set(MainOptions.UPDINDEX, false);
+    set(MainOptions.UPDINDEX, true);
     set(MainOptions.MAINMEM, false);
   }
 

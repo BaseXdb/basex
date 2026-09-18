@@ -94,7 +94,7 @@ public final class StoreTest extends SandboxTest {
       }
     } finally {
       set(MainOptions.TEXTINDEX, false);
-      set(MainOptions.UPDINDEX, false);
+      set(MainOptions.UPDINDEX, true);
     }
   }
 

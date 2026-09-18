@@ -56,7 +56,7 @@ public final class FTIndexUpdateTest extends SandboxTest {
   /** Finalizes a test. */
   @AfterEach public void after() {
     execute(new DropDB(NAME));
-    set(MainOptions.UPDINDEX, false);
+    set(MainOptions.UPDINDEX, true);
     set(MainOptions.FTINDEX, false);
     set(MainOptions.FTMIXED, false);
     set(MainOptions.FTINCLUDE, "");

@@ -52,7 +52,7 @@ public final class LegacyStorageTest extends SandboxTest {
   /** Finalizes a test. */
   @AfterEach public void after() {
     execute(new DropDB(NAME));
-    set(MainOptions.UPDINDEX, false);
+    set(MainOptions.UPDINDEX, true);
     set(MainOptions.TEXTINDEX, true);
     set(MainOptions.ATTRINDEX, true);
     set(MainOptions.TOKENINDEX, false);

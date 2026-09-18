@@ -59,7 +59,7 @@ public final class ValueIndexTest extends SandboxTest {
   /** Set down database. */
   @AfterEach public void setDown() {
     set(MainOptions.MAINMEM, false);
-    set(MainOptions.UPDINDEX, false);
+    set(MainOptions.UPDINDEX, true);
     execute(new DropDB(NAME));
   }
 

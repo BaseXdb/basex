@@ -41,7 +41,7 @@ public final class SegmentedValuesRandomTest extends SandboxTest {
   /** Finalizes a test. */
   @AfterEach public void after() {
     execute(new DropDB(NAME));
-    set(MainOptions.UPDINDEX, false);
+    set(MainOptions.UPDINDEX, true);
     set(MainOptions.TOKENINDEX, false);
     set(MainOptions.TEXTINCLUDE, "");
     set(MainOptions.ATTRINCLUDE, "");
