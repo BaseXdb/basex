@@ -396,12 +396,22 @@ public abstract class XQMap extends XQStruct {
       }
     }
 
-    // build record
+    // build record; a field that cannot be coerced is named in the error message
     final int fs = fields.size();
     final Value[] values = new Value[fs];
     for(int f = 0; f < fs; f++) {
-      values[f] = fields.value(f + 1).seqType().coerce(get(Str.get(fields.key(f + 1))),
-          qc, ii, null, cc);
+      final byte[] key = fields.key(f + 1);
+      final SeqType ft = fields.value(f + 1).seqType();
+      final Value value = getOrNull(Str.get(key));
+      if(value == null && ft.occ.min > 0) throw typeError(this, rt, ii);
+      try {
+        values[f] = ft.coerce(value != null ? value : Empty.VALUE, qc, ii, null, cc);
+      } catch(final QueryException ex) {
+        if(ex.error() != INVTYPE_X) throw ex;
+        final String msg = ex.getLocalizedMessage();
+        throw INVTYPE_X.get(ex.info(), "Field " + Token.string(QueryString.toQuoted(key)) + " of " +
+          rt + ": " + (msg.endsWith(".") ? msg.substring(0, msg.length() - 1) : msg));
+      }
     }
     return get(rt, values);
   }

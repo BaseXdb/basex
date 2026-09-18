@@ -4,6 +4,8 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.function.UnaryOperator;
+
 import org.basex.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
@@ -214,6 +216,33 @@ public final class RecordTest extends SandboxTest {
     query("fn($r as record(x, y as item()*)) { $r }({ 'x': 1 })", "{\"x\":1,\"y\":()}");
     // but a wider record is not narrowed: an extra field is rejected
     error("fn($r as record(x)) { $r }({ 'x': 1, 'y': 2 })", INVTYPE_X);
+  }
+
+  /** Coercion errors name the entry that cannot be coerced. */
+  @Test public void coercionErrors() {
+    final String prolog = "declare record local:in(b as xs:integer); "
+        + "declare record local:r(a as xs:string?, n as xs:string, s as local:in?); "
+        + "declare function local:f($r as local:r) { $r }; ";
+    final UnaryOperator<String> described = map -> prolog
+        + "try { local:f(" + map + ") } catch * { $err:description }";
+
+    // an unknown key is named, not an optional field that is absent
+    query(described.apply("{ 'n': 'x', 'b': 1 }"),
+        "Item of type local:r expected, \"b\" unknown: { \"n\": \"x\", \"b\": 1 }.");
+    query(described.apply("{ 'n': 'x', 1: 2 }"),
+        "Item of type local:r expected, 1 unknown: { \"n\": \"x\", 1: 2 }.");
+    // a missing field is only reported if it does not admit the empty sequence
+    query(described.apply("{ 'a': 'x' }"),
+        "Item of type local:r expected, \"n\" missing: { \"a\": \"x\" }.");
+    // a field that cannot be coerced is named, also in a nested record
+    query(described.apply("{ 'n': () }"),
+        "Field \"n\" of local:r: One item expected (xs:string), 0 found.");
+    query(described.apply("{ 'n': 1 }"),
+        "Field \"n\" of local:r: Item of type xs:string expected, xs:integer found: 1.");
+    query(described.apply("{ 'n': 'x', 's': { 'b': 'y' } }"), "Field \"s\" of local:r: "
+        + "Field \"b\" of local:in: Item of type xs:integer expected, xs:string found: \"y\".");
+    // other errors are passed on
+    error(prolog + "local:f({ 'n': 'x', 's': { 'b': xs:untypedAtomic('y') } })", FUNCCAST_X_X);
   }
 
   /** The field set of {@code record(*)} is unknown: no field access must be folded away. */

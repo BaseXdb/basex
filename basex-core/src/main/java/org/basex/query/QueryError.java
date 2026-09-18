@@ -1767,18 +1767,27 @@ public enum QueryError {
       // cardinality matches, focus on type:
       desc.add(est.occ == Occ.EXACTLY_ONE ? "Item" : "Value");
       desc.add(" of type ").add(est).add(" expected, ");
-      // try to find missing record entry:
-      boolean missing = false;
-      if(est.type instanceof final ShapeType sh && expr instanceof final XQMap map) {
+      // try to find a missing or an unknown record entry:
+      byte[] entry = null;
+      if(est.type instanceof final ShapeType sh && !sh.any() && expr instanceof final XQMap map) {
         final TokenObjectMap<ShapeField> fields = sh.fields();
         for(final byte[] key : fields) {
-          if(map.value(Str.get(key)) != null) continue;
-          desc.add(QueryString.toQuoted(key)).add(" missing");
-          missing = true;
-          break;
+          if(map.value(Str.get(key)) == null && fields.get(key).seqType().occ.min > 0) {
+            entry = Token.concat(QueryString.toQuoted(key), " missing");
+            break;
+          }
+        }
+        if(entry == null) {
+          for(final Item key : map.keys()) {
+            if(key instanceof final Str str && fields.contains(str.string())) continue;
+            entry = Token.concat(key instanceof final Str str ? QueryString.toQuoted(str.string()) :
+              Token.token(key.toString()), " unknown");
+            break;
+          }
         }
       }
-      if(!missing) desc.add(ist).add(" found");
+      if(entry != null) desc.add(entry);
+      else desc.add(ist).add(" found");
     } else {
       // add cardinality string
       desc.add(Strings.capitalize(est.occ.desc)).add(" expected");
