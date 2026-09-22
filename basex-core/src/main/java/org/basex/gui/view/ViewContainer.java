@@ -328,7 +328,7 @@ public final class ViewContainer extends BaseXBack {
       int nv = 0;
       final ArrayDeque<ViewLayout> layouts = new ArrayDeque<>();
       // collect all tokens (allows look-ahead for the optional weight tokens)
-      final String[] tokens = Strings.split(string.trim(), ' ');
+      final String[] tokens = string.trim().split("\\s+");
 
       final int ts = tokens.length;
       for(int t = 0; t < ts; t++) {
