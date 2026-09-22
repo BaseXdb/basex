@@ -81,7 +81,7 @@ public final class GUIConstants {
    * This layout is displayed as soon as a database is opened.
    */
   public static final String VIEWS = "V H " + EDITORVIEW + ' ' + FOLDERVIEW +
-    ' ' + MAPVIEW + ' ' + PLOTVIEW + ' ' + " - H " + TEXTVIEW + ' ' + INFOVIEW +
+    ' ' + MAPVIEW + ' ' + PLOTVIEW + " - H " + TEXTVIEW + ' ' + INFOVIEW +
     ' ' + TABLEVIEW + ' ' + TREEVIEW + ' ' + EXPLOREVIEW + " - -";
 
   // TOOLBAR ======================================================================================
