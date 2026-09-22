@@ -350,6 +350,14 @@ public final class PathTest extends SandboxTest {
     query("document { 'text' } instance of document-node(a)", false);
   }
 
+  /** Name tests must reject processing instructions. */
+  @Test public void gh2764() {
+    query("declare function local:f($done, $todo) {\n"
+        + "  if(empty($todo)) then $done else local:f(($done, head($todo)), tail($todo))\n"
+        + "};\n"
+        + "local:f((), (<e/>, <?pi?>))/self::*", "<e/>");
+  }
+
   /** Static subtyping of named document tests (child tests, not only the node kind). */
   @Test public void docTest() {
     // instance-of check via a typed argument (not a value): static instanceOf/intersect apply
