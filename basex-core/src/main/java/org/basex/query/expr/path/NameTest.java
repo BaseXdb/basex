@@ -155,7 +155,9 @@ public final class NameTest extends Test {
 
   @Override
   public boolean matches(final GNode node) {
-    if(kind != Kind.NODE && kind != node.kind()) return false;
+    final Kind nodeKind = node.kind();
+    if(kind == Kind.NODE ? !nodeKind.oneOf(Kind.ELEMENT, Kind.JNODE) : kind != nodeKind)
+      return false;
 
     if(node instanceof final JNode jnode) {
       // JNodes
