@@ -1,5 +1,6 @@
 package org.basex.query.expr.path;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.expr.path.Axis.*;
 
 import java.util.*;
@@ -148,14 +149,16 @@ public abstract class Step extends Preds {
    * @throws QueryException query exception
    */
   final BasicNodeIter iterator(final QueryContext qc) throws QueryException {
+    final GNode node = toContextNode(qc.focus.value);
+    if(axis == ITEM && !(node instanceof JNode)) throw ITEMAXIS_X.get(info, node.seqType());
     return new BasicNodeIter() {
-      final BasicNodeIter iter = axis.iter(toContextNode(qc.focus.value), test);
+      final BasicNodeIter iter = axis.iter(node, test);
 
       @Override
       public GNode next() {
-        for(GNode node; (node = iter.next()) != null;) {
+        for(GNode nd; (nd = iter.next()) != null;) {
           qc.checkStop();
-          if(test.matches(node)) return node;
+          if(test.matches(nd)) return nd;
         }
         return null;
       }
@@ -457,6 +460,9 @@ public abstract class Step extends Preds {
         kind.oneOf(Kind.DOCUMENT, Kind.ATTRIBUTE);
       case DESCENDANT_OR_SELF ->
         kind == Kind.ATTRIBUTE;
+      // $document/item::*: type error at runtime
+      case ITEM ->
+        false;
       default ->
         true;
     }) return true;

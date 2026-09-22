@@ -544,7 +544,7 @@ public abstract class Path extends ParseExpr {
           // can overlap, preserves level
           if(!atMostOne) return false;
         }
-        case CHILD -> {
+        case CHILD, ITEM -> {
           // order is only ensured if all nodes are on the same level
           if(!sameDepth && !level) return false;
           sameDepth = true;

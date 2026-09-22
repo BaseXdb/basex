@@ -80,6 +80,9 @@ public final class FnPath extends ContextFn {
           tb.add(kind.toString(Token.string(qname.local())));
         } else if(kind.oneOf(Kind.COMMENT, Kind.TEXT)) {
           tb.add(type.toString());
+        } else if(node instanceof final JNode jnode && jnode.isItem()) {
+          // item node: the single node of the item axis of a singleton value
+          tb.add("item::*");
         } else if(parent instanceof JNode) {
           final Item key = ((JNode) node).key;
           final byte[] string = key.string(info);

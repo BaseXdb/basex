@@ -440,6 +440,58 @@ public final class JNodeTest extends SandboxTest {
     query(JTREE_STRING + "/*/../..", "");
   }
 
+  /** Item step: the items of a value, regardless of its cardinality. */
+  @Test public void axisItem() {
+    final String names = "jtree([ { 'm': () }, { 'm': 'H' }, { 'm': ('E', 'D') } ])";
+    // sequence JNode: same nodes as the child axis
+    query("jtree({ 'c': (44, 55) })/c/item::* ! jkey()", "1\n2");
+    query("jtree({ 'c': (44, 55) })/c/item::* ! jvalue()", "44\n55");
+    query("jtree({ 'c': (44, 55) })/c ! (item::jnode(2) is jnode(2))", true);
+    query("jtree({ 'c': (44, 55) })/c/item::*/.. ! jkey()", "c");
+    // empty value: no items
+    query("jtree({ 'c': () })/c/item::* => count()", 0);
+    // singleton: a single item node with key 1 whose parent is the origin
+    query("jtree({ 'c': 44 })/c/item::* ! jkey()", 1);
+    query("jtree({ 'c': 44 })/c/item::* ! jvalue()", 44);
+    query("jtree({ 'c': 44 })/c/item::{ 1 } ! jvalue()", 44);
+    query("jtree({ 'c': 44 })/c/item::{ 2 } => count()", 0);
+    query("jtree({ 'c': 44 })/c/item::*/.. ! jkey()", "c");
+    query("jtree({ 'c': [ 44 ] })/c/item::*/1 ! jvalue()", 44);
+    query("jtree({ 'c': 44 })/c/item::*/item::* ! jkey()", 1);
+    query("jtree(44)/item::* ! jvalue()", 44);
+    query("jtree(44)/item::*/..", 44);
+    // spec example: three leaf JNodes vs. two children
+    query(names + "/*/m/item::* ! jvalue()", "H\nE\nD");
+    query(names + "/*/m/child::* ! jvalue()", "E\nD");
+
+    // item nodes are no children, and they are distinct from them
+    query("jtree({ 'c': [ 44 ] })/c ! (item::* is jnode(1))", false);
+    query("jtree({ 'c': [ 44 ] })/c ! (item::*/1 is jnode(1))", false);
+    query("jtree({ 'c': [ 44 ] })/c ! (item::* is item::*)", true);
+    query("jtree({ 'c': [ 44 ] })/c ! (generate-id(item::*) = generate-id(.))", false);
+    query("jtree({ 'c': [ 44 ] })/c ! (generate-id(item::*) = generate-id(jnode(1)))", false);
+    query("jtree({ 'c': [ 44 ] })/c ! (item::* >> .)", true);
+    query("jtree({ 'c': [ 44 ] })/c ! (item::* >> jnode(1))", true);
+    query("jtree({ 'c': [ 44 ] })/c ! count(item::*/(following-sibling::*, following::*))", 0);
+    query("jtree({ 'c': [ 44 ] })/c/item::*/ancestor::* => count()", 2);
+    query("jtree({ 'c': [ 44 ] })/c//item::* => count()", 2);
+    query("jtree({ 'c': [ 44 ] })//* => count()", 2);
+    query("jtree({ 'c': 44 })/c/item::* ! path()", "/c/item::*");
+    query("jtree({ 'c': [ 44 ] })/c/item::*/1 ! path()", "/c/item::*/1");
+    query("jtree({ 'c': (44, 55) })/c/item::* ! path()", "/c/1\n/c/2");
+
+    // serialization: item nodes have no container
+    query("jtree({ 'c': 44 })/c/item::*", 44);
+    query("jtree({ 'c': [ 44 ] })/c/item::*", "[44]");
+    query("jtree([ { 'c': 44 } ])/*/item::*", "{\"c\":44}");
+    query("jtree({ 'c': 44 })/c/item::* ! string()", 44);
+
+    // item axis on XML nodes
+    error("<a/>/item::*", ITEMAXIS_X);
+    error("document { <a/> }/item::*", ITEMAXIS_X);
+    error("(<a/>, { 'c': 44 })/item::*", ITEMAXIS_X);
+  }
+
   /** Preceding-sibling step. */
   @Test public void axisPrecedingSibling() {
     query(JTREE_STRING + "//y/preceding-sibling::*", "{\"x\":1}");

@@ -24,6 +24,9 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class JNode extends GNode {
+  /** Index of an item node (sorts after all children of its parent). */
+  private static final int ITEM = Integer.MAX_VALUE;
+
   /** Key ({@link Empty#VALUE} for root node). */
   public final Item key;
   /** Value. */
@@ -77,11 +80,21 @@ public final class JNode extends GNode {
   }
 
   /**
+   * Indicates if this node was created by the item axis.
+   * @return result of check
+   */
+  public boolean isItem() {
+    return index == ITEM;
+  }
+
+  /**
    * Returns the map or array that contains this non-root node.
-   * @return container ({@code null} for a root node or a node with a sequence parent)
+   * @return container ({@code null} for a root node, an item node, or a node with a sequence
+   *   parent)
    */
   public XQStruct container() {
-    return parent != null && parent.value instanceof final XQStruct struct ? struct : null;
+    return parent != null && !isItem() && parent.value instanceof final XQStruct struct ?
+      struct : null;
   }
 
   @Override
@@ -180,7 +193,7 @@ public final class JNode extends GNode {
   public byte[] id() {
     final TokenBuilder tb = new TokenBuilder(Token.ID);
     for(JNode n = this; n != null; n = n.parent) {
-      tb.addLong(n.parent != null ? n.index() + 1 : n.id).add('j');
+      tb.addLong(n.parent == null ? n.id : n.isItem() ? 0 : n.index() + 1).add('j');
     }
     return tb.removeLast().finish();
   }
@@ -257,6 +270,18 @@ public final class JNode extends GNode {
         return new JNode(JNode.this, (int) i);
       }
     };
+  }
+
+  /**
+   * Returns an item axis iterator: the children of a sequence JNode, nothing for an empty value,
+   * or a single item node wrapping a singleton value.
+   * @param test node test (can be {@code null})
+   * @return iterator
+   */
+  public BasicNodeIter itemIter(final Test test) {
+    final long size = value.size();
+    return size > 1 ? childIter(test, false) : size == 0 ? BasicNodeIter.EMPTY :
+      singleIter(new JNode(Itr.ONE, value, this, ITEM));
   }
 
   /**

@@ -1231,6 +1231,8 @@ public enum QueryError {
   /** Error code. */
   PATHNODE_X_X_X(XPTY, 4, "%: node expected, % found: %."),
   /** Error code. */
+  ITEMAXIS_X(XPTY, 4, "Item axis: JNode expected, % found."),
+  /** Error code. */
   INVCONVERT_X_X(XPTY, 4, "% cannot be cast to %."),
 
   /** Error code. */

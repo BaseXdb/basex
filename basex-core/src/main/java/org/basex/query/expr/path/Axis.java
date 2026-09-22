@@ -94,6 +94,14 @@ public enum Axis {
     }
   },
 
+  /** Item axis (JNodes only). */
+  ITEM("item", false) {
+    @Override
+    BasicNodeIter iter(final GNode node, final Test test) {
+      return ((JNode) node).itemIter(test);
+    }
+  },
+
   /** Parent axis. */
   PARENT("parent", false) {
     @Override
@@ -194,6 +202,7 @@ public enum Axis {
       case FOLLOWING_SIBLING_OR_SELF -> PRECEDING_SIBLING_OR_SELF;
       case FOLLOWING                 -> PRECEDING;
       case FOLLOWING_OR_SELF         -> PRECEDING_OR_SELF;
+      case ITEM                      -> PARENT;
       case PARENT                    -> CHILD;
       case PRECEDING_SIBLING         -> FOLLOWING_SIBLING;
       case PRECEDING_SIBLING_OR_SELF -> FOLLOWING_SIBLING_OR_SELF;
