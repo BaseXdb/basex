@@ -2548,6 +2548,11 @@ public final class FnModuleTest extends SandboxTest {
     // invalid input with fail option
     error("let $parser := " + func.args("s: ~[\"x\"]*.", " { 'fail-on-error': true() }") + "\n"
         + "return $parser('x')", IXML_INP_X_X_X);
+
+    // GH-2763: xquery:eval timeout or memory limit must be able to stop an ambiguous parse
+    final String ambiguous = func.args("s: s, s | 'a'.").trim() + "('aaaaaaaaaaaaaaaaaaaa')";
+    error(_XQUERY_EVAL.args(ambiguous, " {}", " { 'timeout': .1 }"), XQUERY_TIMEOUT);
+    error(_XQUERY_EVAL.args(ambiguous, " {}", " { 'memory': 10 }"), XQUERY_MEMORY);
   }
 
   /** Test method. */
