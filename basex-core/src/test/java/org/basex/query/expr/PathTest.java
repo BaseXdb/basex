@@ -358,6 +358,12 @@ public final class PathTest extends SandboxTest {
         + "local:f((), (<e/>, <?pi?>))/self::*", "<e/>");
   }
 
+  /** Whitespace after the abbreviated attribute axis ({@code @}). */
+  @Test public void gh2765() {
+    query("<a b='c'/>/@ b", "b=\"c\"");
+    query("<a b='c'/>/@ *", "b=\"c\"");
+  }
+
   /** Static subtyping of named document tests (child tests, not only the node kind). */
   @Test public void docTest() {
     // instance-of check via a typed argument (not a value): static instanceOf/intersect apply

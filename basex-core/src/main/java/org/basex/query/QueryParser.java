@@ -2551,6 +2551,7 @@ public class QueryParser extends InputParser {
       test = NodeTest.NODE;
       checkTest(test, true);
     } else if(consume('@')) {
+      skipWs();
       axis = Axis.ATTRIBUTE;
       test = nodeTest(axis);
       if(test == null) {
@@ -3996,7 +3997,7 @@ public class QueryParser extends InputParser {
         type = ListType.get(name);
         if(type == null) {
           type = BasicType.get(name, false);
-          if(consume("(")) throw error(SIMPLETYPE_X, name.prefixId(XML));
+          if(wsConsume("(")) throw error(SIMPLETYPE_X, name.prefixId(XML));
           if(type == null ? name.eq(BasicType.ANY_SIMPLE_TYPE.qname()) :
             type.oneOf(BasicType.ANY_ATOMIC_TYPE, BasicType.NOTATION))
             throw error(INVALIDCAST_X, name.prefixId(XML));

@@ -343,4 +343,9 @@ public final class CastTest extends SandboxTest {
     error("{ 'a': 1 } cast as record(a as element())", INVCONVERT_X_X);
     query("[ 1 ] castable as array(element())", false);
   }
+
+  /** Whitespace following a cast-target type. */
+  @Test public void gh2765() {
+    query("42 castable as xs:byte(:true:)", true);
+  }
 }
