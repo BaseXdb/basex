@@ -167,7 +167,7 @@ public final class FnInvisibleXml extends StandardFunc {
       try {
         final MemBuilder builder = new MemBuilder(Parser.emptyParser(OPTIONS)).init();
         builder.openDoc(Token.EMPTY);
-        parser.parse(input, new DBResultHandler(builder));
+        parser.parse(input, new DBResultHandler(builder), qc::checkStop);
         builder.closeDoc();
         return new DBNode(builder.finish());
       } catch(final BlitzParseException ex) {
