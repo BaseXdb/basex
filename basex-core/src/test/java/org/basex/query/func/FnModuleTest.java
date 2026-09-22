@@ -2741,6 +2741,9 @@ return
     query(func.args("x", " { 'content': 'module namespace x=\"x\";\ndeclare context value as "
         + "xs:decimal* external; declare variable $x:x := .;', 'context-value': (1, 2) }")
         + "?variables?#Q{x}x", "1\n2");
+    query("empty(" + func.args("x", " { 'content': 'module namespace x=\"x\";\ndeclare context "
+        + "value as xs:decimal* external; declare variable $x:x := .;', 'context-value': () }")
+        + "?variables?#Q{x}x)", true);
     query(func.args("x", " { 'content': 'module namespace x=\"x\";\ndeclare variable $x:x := 1;', "
         + "'xquery-version': 4.0 }") + "?variables?#Q{x}x", 1);
     query(func.args("m", " { 'content': 'module namespace m=\"m\"; "
@@ -2770,7 +2773,7 @@ return
     error(func.args("x", " { 'content': 'module namespace x=\"x\";', "
         + "'context-value': 1, 'context-item': 1 }"), MODULE_CONTEXT_OPTIONS);
     error(func.args("x", " { 'content': 'module namespace x=\"x\";\ndeclare context value as "
-        + "xs:integer* external; declare variable $x:x := .;', 'context-value': () }")
+        + "xs:integer* external; declare variable $x:x := .;', 'context-item': () }")
         + "?variables?#Q{x}x", NOCTX_X);
 
     // advanced and caching tests

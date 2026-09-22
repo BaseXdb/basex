@@ -20,6 +20,7 @@ import org.basex.query.util.parse.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -95,7 +96,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
     final QueryContext mqc = new QueryContext(qc, null);
     for(final byte[] uri : qc.modDeclared) mqc.modDeclared.put(uri, qc.modDeclared.get(uri));
     int nParsed = 0;
-    final Value ctx = contextValue(opt);
+    final Value ctx = contextValue(options, opt);
     if(ctx != null) {
       mqc.contextValue = new ContextScope(ctx, mqc.contextType, new VarScope(), sc(), null, null);
       mqc.finalContext = true;
@@ -175,15 +176,20 @@ public final class FnLoadXQueryModule extends StandardFunc {
 
   /**
    * Returns the initial context value of the library module.
+   * @param options options map
    * @param opt options
    * @return context value, or {@code null} if the context value is absent
    * @throws QueryException query exception
    */
-  private Value contextValue(final LoadXQueryModuleOptions opt) throws QueryException {
-    final boolean value = opt.contains(CONTEXT_VALUE), item = opt.contains(CONTEXT_ITEM);
+  private Value contextValue(final XQMap options, final LoadXQueryModuleOptions opt)
+      throws QueryException {
+    // an empty sequence is a valid context value, so the map entries are checked
+    final boolean value = options.contains(Str.get(CONTEXT_VALUE.name()));
+    final boolean item = options.contains(Str.get(CONTEXT_ITEM.name()));
     if(value && item) throw MODULE_CONTEXT_OPTIONS.get(info);
-    // an empty sequence indicates the absence of a context value
-    final Value ctx = value ? opt.get(CONTEXT_VALUE) : item ? opt.get(CONTEXT_ITEM) : null;
+    if(value) return opt.contains(CONTEXT_VALUE) ? opt.get(CONTEXT_VALUE) : Empty.VALUE;
+    // an empty context item indicates the absence of a context value
+    final Value ctx = item ? opt.get(CONTEXT_ITEM) : null;
     return ctx == null || ctx.isEmpty() ? null : ctx;
   }
 
