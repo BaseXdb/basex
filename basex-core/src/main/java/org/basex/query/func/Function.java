@@ -1084,6 +1084,9 @@ public enum Function implements AFunction {
   _BIN_FIND(BinFind::new, "find(value, offset, search)",
       params(BINARY_ZO, INTEGER_O, BASE64_BINARY_O), INTEGER_ZO, BIN_URI),
   /** XQuery function. */
+  _BIN_FROM_BASE64URL(BinFromBase64url::new, "from-base64url(value)",
+      params(STRING_ZO), BASE64_BINARY_ZO, BIN_URI),
+  /** XQuery function. */
   _BIN_FROM_OCTETS(BinFromOctets::new, "from-octets(values)",
       params(INTEGER_ZM), BASE64_BINARY_O, BIN_URI),
   /** XQuery function. */
@@ -1140,6 +1143,9 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _BIN_SHIFT(BinShift::new, "shift(value, by)",
       params(BINARY_ZO, INTEGER_O), BASE64_BINARY_ZO, BIN_URI),
+  /** XQuery function. */
+  _BIN_TO_BASE64URL(BinToBase64url::new, "to-base64url(value)",
+      params(BINARY_ZO), STRING_ZO, BIN_URI),
   /** XQuery function. */
   _BIN_TO_OCTETS(BinToOctets::new, "to-octets(value)",
       params(BINARY_O), INTEGER_ZM, BIN_URI),
