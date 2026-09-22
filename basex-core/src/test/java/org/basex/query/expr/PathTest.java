@@ -350,6 +350,14 @@ public final class PathTest extends SandboxTest {
     query("document { 'text' } instance of document-node(a)", false);
   }
 
+  /** Name tests must reject processing instructions. */
+  @Test public void gh2764() {
+    query("declare function local:f($done, $todo) {\n"
+        + "  if(empty($todo)) then $done else local:f(($done, head($todo)), tail($todo))\n"
+        + "};\n"
+        + "local:f((), (<e/>, <?pi?>))/self::*", "<e/>");
+  }
+
   /** Whitespace after the abbreviated attribute axis ({@code @}). */
   @Test public void gh2765() {
     query("<a b='c'/>/@ b", "b=\"c\"");
