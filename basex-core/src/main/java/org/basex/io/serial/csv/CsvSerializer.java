@@ -9,6 +9,7 @@ import org.basex.build.csv.*;
 import org.basex.io.parse.csv.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
@@ -97,7 +98,7 @@ public abstract class CsvSerializer extends StandardSerializer {
     if(value == null) return fallback;
     if(value.codePointCount(0, value.length()) == 1) {
       final int cp = value.codePointAt(0);
-      if(cp != '\n') return cp;
+      if(cp != '\n' && cp != '\r') return cp;
     }
     throw SERPARAM_X.getIO(Util.info("Invalid value of '%' parameter: '%'.", name, value));
   }
@@ -147,7 +148,19 @@ public abstract class CsvSerializer extends StandardSerializer {
     // print fields, skip trailing empty contents
     if(seqNo != 0) out.print(separator);
 
+    // character mapping and normalization precede quoting
     byte[] txt = value != null ? value : Token.EMPTY;
+    if(cmap != null) {
+      final TokenBuilder tb = new TokenBuilder(txt.length);
+      final TokenParser tp = new TokenParser(txt);
+      while(tp.more()) {
+        final int cp = tp.next();
+        final byte[] mapped = cmap.get(cp);
+        if(mapped != null) tb.add(mapped);
+        else tb.add(cp);
+      }
+      txt = tb.finish();
+    }
     if(form != null) txt = normalize(txt, form);
     final boolean delim = contains(txt, separator) || contains(txt, '\n');
     final boolean special = contains(txt, '\r') || contains(txt, quoteCharacter)
@@ -181,7 +194,7 @@ public abstract class CsvSerializer extends StandardSerializer {
       if(quotes && (delim || special)) tb.add(quoteCharacter);
       txt = tb.finish();
     }
-    printChars(txt);
+    out.print(txt);
   }
 
   /**
@@ -190,20 +203,26 @@ public abstract class CsvSerializer extends StandardSerializer {
    * @throws IOException I/O exception
    */
   final void w3(final XQMap map) throws IOException {
-    final TokenList tl = new TokenList();
+    // absent entries are treated as empty sequences, other entries are ignored
     try {
-      // print header
-      if(header) {
-        final Value columns = map.getOrNull(CsvConverter.COLUMNS);
-        if(columns == null) throw SERCSV_X.getIO("Map has no 'columns' key");
-        row(columns, tl);
-      }
-      // print rows
+      final Value columns = map.getOrNull(CsvConverter.COLUMNS);
       final Value rows = map.getOrNull(CsvConverter.ROWS);
-      if(rows == null) throw SERCSV_X.getIO("Map has no 'rows' key");
-      for(final Item record : rows) {
-        if(!(record instanceof final XQArray array)) throw typeError("Array", record);
-        row(array.members(), tl);
+      final TokenList tl = new TokenList();
+      if(columns != null) {
+        for(final Item column : columns) {
+          final Item item = coerce(column);
+          if(!(item instanceof Uri || item.type.isStringOrUntyped()))
+            throw typeError("String", column);
+          tl.add(item.string(null));
+        }
+      }
+      if(header && !tl.isEmpty()) record(tl);
+      else tl.reset();
+      if(rows != null) {
+        for(final Item item : rows) {
+          if(!(item instanceof final XQArray array)) throw typeError("Array", item);
+          row(array, tl);
+        }
       }
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
@@ -217,27 +236,54 @@ public abstract class CsvSerializer extends StandardSerializer {
    */
   final void w3(final XQArray array) throws IOException {
     try {
-      row(array.members(), new TokenList());
+      row(array, new TokenList());
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
     }
   }
 
   /**
-   * Serializes a single line (header or contents).
-   * @param line line to be serialized
+   * Serializes a data row.
+   * @param array array with the row members
    * @param tl token list
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private void row(final Iterable<? extends Value> line, final TokenList tl)
-      throws QueryException, IOException {
-    for(final Value value : line) {
-      if(!(value instanceof final Item item) || item instanceof XNode || item instanceof FItem)
-        throw typeError("Single atomic item", value);
-      tl.add(item.string(null));
-    }
+  private void row(final XQArray array, final TokenList tl) throws QueryException, IOException {
+    for(final Value member : array.members()) tl.add(coerce(member).string(null));
     record(tl);
+  }
+
+  /**
+   * Coerces a value to a single atomic item.
+   * @param value value
+   * @return atomic item
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   */
+  private static Item coerce(final Value value) throws QueryException, IOException {
+    final ItemList items = new ItemList();
+    atomize(value, items);
+    if(items.size() != 1) throw typeError("Single atomic item", value);
+    return items.get(0);
+  }
+
+  /**
+   * Atomizes a value, as required by the coercion to {@code xs:anyAtomicType}.
+   * @param value value
+   * @param items atomized items
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   */
+  private static void atomize(final Value value, final ItemList items)
+      throws QueryException, IOException {
+    for(final Item item : value) {
+      if(item instanceof final JNode node) atomize(node.value, items);
+      else if(item instanceof final XQArray array) {
+        for(final Value member : array.members()) atomize(member, items);
+      } else if(item instanceof FItem) throw typeError("Atomic item", item);
+      else items.add(item.atomItem(null, null));
+    }
   }
 
   /**

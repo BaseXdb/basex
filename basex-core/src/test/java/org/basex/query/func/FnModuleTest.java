@@ -4510,18 +4510,37 @@ return
         "a\tb,c\n");
     query(func.args(" { 'rows': [ 'a' || char('\\r') || 'b' ] }", " { 'method': 'csv' }"),
         "\"a\nb\"\n");
+    // CSV output method: mapped characters are normalized and quoted
+    query(func.args(" { 'rows': [ 'a;b' ] }",
+        " { 'method': 'csv', 'use-character-maps': { ';': ',' } }"), "\"a,b\"\n");
+    query(func.args(" { 'rows': [ 'x' ] }",
+        " { 'method': 'csv', 'use-character-maps': { 'x': '\"' } }"), "\"\"\"\"\n");
+    // CSV output method: members are coerced to atomic items and cast to strings
+    query(func.args(" [ <x>1</x>, 2, xs:date('2026-09-22'), [ 'a' ] ]", " { 'method': 'csv' }"),
+        "1,2,2026-09-22,a\n");
+    // CSV output method: absent entries are empty, other entries are ignored
+    query(func.args(" { 'no-rows': 1 }", " { 'method': 'csv' }"), "");
+    query(func.args(" { 'rows': [ 'a' ] }", " { 'method': 'csv', 'csv-header': true() }"),
+        "a\n");
     // CSV output method: invalid structures
     error(func.args(" (parse-csv('a'), parse-csv('b'))", " { 'method': 'csv' }"), SERCSV_X_X);
     error(func.args(" (csv-to-arrays('a'), parse-csv('b'))", " { 'method': 'csv' }"), SERCSV_X_X);
-    error(func.args(" [ <x>1</x> ]", " { 'method': 'csv' }"), SERCSV_X_X);
+    error(func.args(" [ (1, 2) ]", " { 'method': 'csv' }"), SERCSV_X_X);
+    error(func.args(" [ () ]", " { 'method': 'csv' }"), SERCSV_X_X);
+    error(func.args(" [ {} ]", " { 'method': 'csv' }"), SERCSV_X_X);
+    error(func.args(" { 'rows': 1 }", " { 'method': 'csv' }"), SERCSV_X_X);
+    error(func.args(" { 'columns': 1, 'rows': [ 'a' ] }", " { 'method': 'csv' }"), SERCSV_X_X);
     error(func.args(" true#0", " { 'method': 'csv' }"), SERCSV_X_X);
     error(func.args("x", " { 'method': 'csv' }"), SERCSV_X);
-    error(func.args(" { 'no-rows': 1 }", " { 'method': 'csv' }"), SERCSV_X);
     // CSV output method: invalid flat parameters
     error(func.args(" parse-csv('a,b')", " { 'method': 'csv', 'csv-separator': 'XX' }"),
         SERPARAM_X);
     error(func.args(" parse-csv('a,b')", " { 'method': 'csv', 'csv-separator': char('\\n') }"),
         SERPARAM_X);
+    error(func.args(" parse-csv('a,b')", " { 'method': 'csv', 'csv-separator': char('\\r') }"),
+        SERPARAM_X);
+    error(func.args(" parse-csv('a,b')",
+        " { 'method': 'csv', 'csv-quote-character': char('\\r') }"), SERPARAM_X);
     error(func.args(" parse-csv('a,b')", " { 'method': 'csv', 'csv-separator': '\"' }"),
         SERPARAM_X);
 
