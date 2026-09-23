@@ -1123,7 +1123,8 @@ public abstract class Path extends ParseExpr {
 
     // merge descendant-or-self step
     if(curr.axis != DESCENDANT_OR_SELF || curr.exprs.length > 0 || curr.selector != null ||
-        !curr.test.kind.oneOf(Kind.XNODE, Kind.JNODE, Kind.NODE)) return null;
+        curr.test != NodeTest.XNODE && curr.test != NodeTest.JNODE &&
+        curr.test != NodeTest.NODE) return null;
 
     // examples:
     // - descendant-or-self::node()/* → descendant::*

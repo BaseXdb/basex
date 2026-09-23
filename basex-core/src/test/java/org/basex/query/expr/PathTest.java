@@ -364,6 +364,16 @@ public final class PathTest extends SandboxTest {
     query("<a b='c'/>/@ *", "b=\"c\"");
   }
 
+  /** Keep name test when merging descendant-or-self step; preserve narrowed type of self step. */
+  @Test public void gh2768() {
+    check("declare function local:f($html as node()) {\n"
+        + "  $html//text() except $html/descendant-or-self::b//node()\n"
+        + "}; let $html := <a>X</a> return local:f($html)", "X",
+        exists("IterStep[@test = 'b']"));
+    check("declare function local:f($html as node()) { $html/self::b }; local:f#1", "local:f#1",
+        type(IterStep.class, "(jnode(b)|element(b))?"));
+  }
+
   /** Static subtyping of named document tests (child tests, not only the node kind). */
   @Test public void docTest() {
     // instance-of check via a typed argument (not a value): static instanceOf/intersect apply
@@ -463,6 +473,13 @@ public final class PathTest extends SandboxTest {
         count(IterStep.class, 2), "//@axis = 'descendant'");
     check("<A><B/></A>/descendant-or-self::node()/(* | descendant::text())[..]", "<B/>",
         count(IterStep.class, 2), "//@axis = 'descendant'");
+
+    query("<a>X</a>/descendant-or-self::b//node()", "");
+    query("declare function local:f($html as node()) {"
+        + "  $html//text() except $html/descendant-or-self::b//node()"
+        + "};"
+        + "let $html := <a>X</a>"
+        + "return local:f($html)", "X");
   }
 
   /** Ancestor steps on database and fragment nodes. */
