@@ -271,7 +271,7 @@ public abstract class Step extends Preds {
     final Type ct = type.instanceOf(Types.MAP_OR_ARRAY) ? NodeType.JNODE : type;
     if(expr != null && axis == SELF && ct instanceof NodeType) {
       // node test: adopt type of context expression: <a/>/self::node()
-      if(test.kind == Kind.NODE) st = ct.seqType(st.occ);
+      if(test == NodeTest.NODE) st = ct.seqType(st.occ);
       // no predicates: step will yield single result: $elements/self::element()
       if(exprs.length == 0 && selector == null && test.subsumes(ct) == Boolean.TRUE)
         st = st.with(Occ.EXACTLY_ONE);
