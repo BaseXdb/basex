@@ -391,8 +391,10 @@ public final class XQuery4Test extends SandboxTest {
 
     query(prefix + "element(*, xs:untyped)", true);
     query(prefix + "element(*, xs:anyType)", true);
-    error(prefix + "element(*, xs:string)", STATIC_X);
-    error(prefix + "element(*, xs:untypedAtomic)", STATIC_X);
+    query(prefix + "element(*, xs:string)", false);
+    query(prefix + "element(*, xs:untypedAtomic)", false);
+    query(prefix + "element(xml:a, xs:NMTOKENS)", false);
+    query(prefix + "element(xml:a|b, xs:string)", false);
     error(prefix + "element(*, xs:xyz)", TYPEUNDEF_X);
 
     prefix = "<_ xml:a=''/>/@* instance of ";
@@ -413,13 +415,20 @@ public final class XQuery4Test extends SandboxTest {
     query(prefix + "attribute(Q{X}a)", false);
     query(prefix + "attribute(Q{http://www.w3.org/XML/1998/namespace}b)", false);
 
-    query(prefix + "attribute(*, xs:untyped)", true);
     query(prefix + "attribute(*, xs:anyType)", true);
     query(prefix + "attribute(*, xs:anySimpleType)", true);
     query(prefix + "attribute(*, xs:anyAtomicType)", true);
     query(prefix + "attribute(*, xs:untypedAtomic)", true);
-    error(prefix + "attribute(*, xs:string)", STATIC_X);
+    query(prefix + "attribute(*, xs:untyped)", false);
+    query(prefix + "attribute(*, xs:string)", false);
     error(prefix + "attribute(*, xs:xyz)", TYPEUNDEF_X);
+
+    // annotations of untyped nodes
+    query("<_ a=''><b/></_>/(element(*, xs:string), attribute(*, xs:string))", "");
+    query("<_/> ! (typeswitch(.) case element(*, xs:string) return 1 default return 2)", 2);
+    error("declare function local:f($e as element(*, xs:string)) { $e }; local:f(<_/>)",
+        INVTYPE_X);
+    query("<_/> instance of element(*, xs:string)?", false);
   }
 
   /** New if syntax. */

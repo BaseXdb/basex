@@ -4308,11 +4308,10 @@ public class QueryParser extends InputParser {
       if(ann == null) throw error(TYPEUNDEF_X, BasicType.similar(name));
       // parse (and ignore) optional question mark
       if(kind == Kind.ELEMENT) wsConsume("?");
-      if(!ann.oneOf(BasicType.ANY_TYPE, BasicType.UNTYPED) && (kind == Kind.ELEMENT ||
-         !ann.oneOf(BasicType.ANY_SIMPLE_TYPE, BasicType.ANY_ATOMIC_TYPE,
-             BasicType.UNTYPED_ATOMIC))) {
-        throw error(STATIC_X, ann);
-      }
+      // nodes are untyped: elements are annotated with xs:untyped, attributes with xs:untypedAtomic
+      if(!(kind == Kind.ELEMENT ? ann.oneOf(BasicType.ANY_TYPE, BasicType.UNTYPED) :
+        ann.oneOf(BasicType.ANY_TYPE, BasicType.ANY_SIMPLE_TYPE, BasicType.ANY_ATOMIC_TYPE,
+          BasicType.UNTYPED_ATOMIC))) return new AnnotationTest(Test.get(tests), ann);
     }
     return Test.get(tests);
   }

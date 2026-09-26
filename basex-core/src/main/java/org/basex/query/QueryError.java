@@ -1095,8 +1095,6 @@ public enum QueryError {
   /** Error code. */
   INVPLACEHOLDER_X(XPST, 3, "Method call must not have argument placeholders: '%'."),
   /** Error code. */
-  STATIC_X(XPST, 5, "No XML Schema support: %."),
-  /** Error code. */
   VARUNDEF_X(XPST, 8, "Undeclared variable: %."),
   /** Error code. */
   INVISIBLEVAR_X(XPST, 8, "Variable requires missing module import: %."),
