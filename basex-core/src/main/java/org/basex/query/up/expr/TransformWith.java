@@ -46,6 +46,14 @@ public final class TransformWith extends Copy {
   }
 
   @Override
+  public Expr optimize(final CompileContext cc) {
+    // <a/> update { rename node . as 'x' } → <x/>
+    final SeqType st = arg(target()).seqType();
+    exprType.assign(copyType(st.type), st.occ);
+    return this;
+  }
+
+  @Override
   public void checkUp() throws QueryException {
     checkNoUp(arg(target()));
     super.checkUp();

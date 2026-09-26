@@ -109,6 +109,20 @@ public final class UpdateTest extends SandboxTest {
     }
   }
 
+  /** Transform expressions: copied nodes adopt neither the names nor the data of the input. */
+  @Test public void transformCopyType() {
+    createDB("<e><a/></e>");
+    final String doc = _DB_GET.args(NAME);
+    query("copy $n := " + doc + " modify rename node $n/e as 'x' return count($n/x)", 1);
+    query("copy $n := " + doc + "/e modify rename node $n/a as 'x' return count($n/x)", 1);
+    query("let $e := " + doc + "/e return copy $n := $e modify rename node $n/a as 'x' "
+        + "return count($n/x)", 1);
+    query("copy $n := <a/> modify rename node $n as 'b' return $n instance of element(a)", false);
+    query("(<a/> update { rename node . as 'b' }) instance of element(a)", false);
+    query("let $n := <a/> update { rename node . as 'b' } return $n instance of element(a)",
+        false);
+  }
+
   /**
    * Basic insert into.
    */

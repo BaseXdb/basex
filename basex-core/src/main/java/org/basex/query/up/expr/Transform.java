@@ -42,12 +42,19 @@ public final class Transform extends Copy {
 
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
-    // type of let variable must not match expression type (name of node may change)
+    // input is not attached to the variable: the copy has new data, and its name may change
     for(final Let copy : copies) {
-      copy.compile(cc);
-      copy.exprType.assign(copy.expr);
+      copy.expr = copy.expr.compile(cc);
+      copy.var.refineType(copyType(copy.expr.seqType().type).seqType(), cc);
     }
     return super.compile(cc);
+  }
+
+  @Override
+  public Expr optimize(final CompileContext cc) {
+    final SeqType st = arg(target()).seqType();
+    exprType.assign(st.type, st.occ);
+    return this;
   }
 
   @Override
@@ -116,8 +123,15 @@ public final class Transform extends Copy {
 
   @Override
   public Expr inline(final InlineContext ic) throws QueryException {
-    final boolean changed1 = ic.inline(copies), changed2 = ic.inline(args());
-    return changed1 || changed2 ? optimize(ic.cc) : null;
+    boolean changed = ic.inline(args());
+    for(final Let copy : copies) {
+      final Expr inlined = ic.inlineOrNull(copy.expr);
+      if(inlined != null) {
+        copy.expr = inlined;
+        changed = true;
+      }
+    }
+    return changed ? optimize(ic.cc) : null;
   }
 
   @Override

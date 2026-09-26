@@ -26,15 +26,6 @@ abstract class Copy extends Arr {
   }
 
   @Override
-  public final Expr optimize(final CompileContext cc) {
-    // do not assign original sequence type (name of node may change):
-    // <a/> update { rename node . as 'x' } → <x/>
-    final SeqType st = arg(target()).seqType();
-    exprType.assign(st.type, st.occ);
-    return this;
-  }
-
-  @Override
   public void checkUp() throws QueryException {
     final Expr modify = arg(update());
     modify.checkUp();
@@ -47,6 +38,16 @@ abstract class Copy extends Arr {
     final boolean more = arg(update()).accept(visitor);
     visitor.exitModify();
     return more && arg(target()).accept(visitor);
+  }
+
+  /**
+   * Returns the type of copied nodes, without names, which may be changed by updates.
+   * @param type type of the nodes to be copied
+   * @return node type
+   */
+  static NodeType copyType(final Type type) {
+    return type instanceof final NodeType nt && nt.kind().instanceOf(Kind.XNODE) ?
+      NodeType.get(nt.kind()) : NodeType.XNODE;
   }
 
   /**
