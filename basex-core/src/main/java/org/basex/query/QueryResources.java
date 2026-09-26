@@ -344,7 +344,8 @@ public final class QueryResources {
    * @return file reference
    */
   IO stopWords(final String path, final StaticContext sc) {
-    return stop != null ? stop.get(path) : sc.resolve(path);
+    final IO io = stop != null ? stop.get(path) : null;
+    return io != null ? io : sc.resolve(path);
   }
 
   /**
@@ -354,7 +355,8 @@ public final class QueryResources {
    * @return file reference
    */
   IO thesaurus(final String path, final StaticContext sc) {
-    return thes != null ? thes.get(path) : sc.resolve(path);
+    final IO io = thes != null ? thes.get(path) : null;
+    return io != null ? io : sc.resolve(path);
   }
 
   /**

@@ -427,7 +427,8 @@ public final class QT3TS extends Main {
           if(role.equals(".")) query.context(doc);
           else query.variable(role, doc);
         }
-        // bind resources
+        // bind resources (also used as full-text stop word lists and thesauri)
+        final HashMap<String, IO> ft = new HashMap<>();
         for(final HashMap<String, String> src : env.resources) {
           final String file = src.get(FILE);
           if(file == null) continue;
@@ -436,7 +437,9 @@ public final class QT3TS extends Main {
           final String encoding = src.get(QT3Constants.ENCODING);
           query.addResource(uri, path, encoding);
           if(encoding == null) locations.put(uri, new IOFile(path));
+          ft.put(uri, new IOFile(path));
         }
+        if(!ft.isEmpty()) query.qp().qc.resources.ftmaps(ft, ft);
         // bind collections (from source files, or from a query producing arbitrary items)
         if(!env.collQuery.isEmpty()) {
           final XQuery cq = new XQuery(env.collQuery, ctx).baseURI(baseURI);
@@ -537,7 +540,7 @@ public final class QT3TS extends Main {
   /** Flags for dependencies that are not supported. */
   private static final String NOSUPPORT =
     "('schema-location-hint', 'schemaImport', 'schemaValidation', " +
-    "'staticTyping', 'typedData')";
+    "'staticTyping', 'typedData', 'fullText-defaults', 'fullText-ignore', 'fullText-units')";
 
   /** Tests cases to be skipped due to deviations from the spec, or
    * as the testing effort does not justify the outcome. */
