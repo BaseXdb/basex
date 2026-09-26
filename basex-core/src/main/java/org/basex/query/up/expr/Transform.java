@@ -85,7 +85,7 @@ public final class Transform extends Copy {
         if(error != null) throw UPSINGLE_X_X.get(copy.info(), copy.var.name, error);
 
         // create main memory copy of node
-        item = ((XNode) item).copy(qc);
+        item = copy((XNode) item, qc);
         // add resulting node to variable
         qc.set(copy.var, item);
         updates.addData(item.data());

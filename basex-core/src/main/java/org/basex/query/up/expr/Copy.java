@@ -2,9 +2,11 @@ package org.basex.query.up.expr;
 
 import static org.basex.query.QueryError.*;
 
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -38,6 +40,21 @@ abstract class Copy extends Arr {
     final boolean more = arg(update()).accept(visitor);
     visitor.exitModify();
     return more && arg(target()).accept(visitor);
+  }
+
+  /**
+   * Creates a main-memory copy of a node and applies the copy-namespaces mode.
+   * @param node node to be copied
+   * @param qc query context
+   * @return copy
+   * @throws QueryException query exception
+   */
+  final DBNode copy(final XNode node, final QueryContext qc) throws QueryException {
+    final StaticContext sc = info != null ? info.sc() : null;
+    if(sc == null || sc.preserveNS) return node.copy(qc);
+    final MemData data = new MemData(qc.context.sharedMeta());
+    new DataBuilder(data, qc).noPreserve().build(node);
+    return new DBNode(data);
   }
 
   /**

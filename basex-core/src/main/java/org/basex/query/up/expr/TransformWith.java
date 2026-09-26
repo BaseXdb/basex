@@ -72,7 +72,7 @@ public final class TransformWith extends Copy {
         if(!(item instanceof final XNode node)) throw UPSOURCE_X.get(info, item);
 
         // create main memory copy of node
-        final Item copy = node.copy(qc);
+        final Item copy = copy(node, qc);
         // set resulting node as context
         qf.value = copy;
 

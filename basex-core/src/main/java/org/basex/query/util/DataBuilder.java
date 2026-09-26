@@ -31,6 +31,8 @@ public final class DataBuilder {
   private final MemData data;
   /** Full-text result builder (can be {@code null}). */
   private DataFTBuilder ftbuilder;
+  /** Copy-namespaces mode: drop namespaces that are not used by elements and attributes. */
+  private boolean noPreserve;
 
   /**
    * Constructor.
@@ -51,6 +53,15 @@ public final class DataBuilder {
    */
   public DataBuilder ftpos(final byte[] name, final FTPosData pos, final int len) {
     ftbuilder = new DataFTBuilder(pos, len, data.elemNames.put(name));
+    return this;
+  }
+
+  /**
+   * Drops namespaces that are used neither by elements nor by their attributes.
+   * @return self reference
+   */
+  public DataBuilder noPreserve() {
+    noPreserve = true;
     return this;
   }
 
@@ -230,11 +241,12 @@ public final class DataBuilder {
     final int last = data.nodes();
 
     // add new namespaces
-    final Atts ns = par == -1 ? node.nsScope(null) : node.namespaces();
+    final QNm qname = node.qname();
+    Atts ns = par == -1 ? node.nsScope(null) : node.namespaces();
+    if(noPreserve) ns = used(node, qname, ns);
     data.nspaces.open(last, ns);
 
     // collect node properties
-    final QNm qname = node.qname();
     final int nameId = data.elemNames.put(qname.string());
     final int size = size(node, false), asize = size(node, true);
 
@@ -262,6 +274,25 @@ public final class DataBuilder {
     // update size if additional nodes have been added by the descendants
     if(size != cPre - pre) data.size(last, Data.ELEM, cPre - pre);
     return cPre;
+  }
+
+  /**
+   * Returns the namespaces that are used by the name of an element or its attributes.
+   * @param node element
+   * @param qname name of the element
+   * @param ns namespaces
+   * @return used namespaces
+   */
+  private static Atts used(final XNode node, final QNm qname, final Atts ns) {
+    final Atts used = new Atts();
+    final int size = ns.size();
+    for(int n = 0; n < size; n++) {
+      final byte[] prefix = ns.name(n);
+      boolean use = eq(prefix, qname.prefix());
+      for(final GNode attr : node.attributeIter()) use |= eq(prefix, attr.qname().prefix());
+      if(use) used.add(prefix, ns.value(n));
+    }
+    return used;
   }
 
   /**

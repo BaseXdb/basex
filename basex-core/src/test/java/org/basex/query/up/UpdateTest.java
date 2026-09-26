@@ -123,6 +123,20 @@ public final class UpdateTest extends SandboxTest {
         false);
   }
 
+  /** Transform expressions: copy-namespaces mode. */
+  @Test public void transformNoPreserve() {
+    final String xml = "<x:a xmlns:x='u' xmlns:y='v'><b xmlns:z='w' z:q=''><y:c/></b></x:a>";
+    createDB(xml);
+    final String prefixes = " ! string-join(sort(in-scope-prefixes(.)), ',')";
+    for(final String input : new String[] { xml, _DB_GET.args(NAME) + "/*" }) {
+      final String no = "declare copy-namespaces no-preserve, inherit; let $a := " + input;
+      query(no + " return (copy $b := $a/b modify () return $b)" + prefixes, "xml,z");
+      query(no + " return (copy $b := $a/b modify () return $b/*)" + prefixes, "xml,y,z");
+      query(no + " return ($a/b update { })" + prefixes, "xml,z");
+      query("let $a := " + input + " return ($a/b update { })" + prefixes, "x,xml,y,z");
+    }
+  }
+
   /**
    * Basic insert into.
    */
