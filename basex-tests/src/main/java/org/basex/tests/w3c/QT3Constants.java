@@ -36,6 +36,8 @@ interface QT3Constants {
   /** QT3TS String. */
   String ROLE = "role";
   /** QT3TS String. */
+  String MUTABLE = "mutable";
+  /** QT3TS String. */
   String CODE = "code";
   /** QT3TS String. */
   String URI = "uri";

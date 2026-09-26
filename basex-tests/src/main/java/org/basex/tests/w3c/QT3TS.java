@@ -119,6 +119,11 @@ public final class QT3TS extends Main {
     ctx.soptions.set(StaticOptions.DBPATH, SANDPIT + "data");
     parseArgs();
 
+    // output directory of fn:put tests (results/ is reserved for test runs)
+    final IOFile results = new IOFile(file(false, "results/sandpit"));
+    results.delete();
+    results.md();
+
     final Performance perf = new Performance();
 
     final SerializerOptions sopts = new SerializerOptions();
@@ -269,22 +274,87 @@ public final class QT3TS extends Main {
       }
     }
 
-    // retrieve query to be run
+    if(verbose) Util.println(name);
+
+    // run all steps: mutable documents are shared, the first error or the last result is tested
     final Performance perf = new Performance();
-    final String qfile = asString("*:test/@file", test);
+    final QT3Result returned = new QT3Result();
+    returned.env = env;
+    final Map<String, XdmValue> mutable = new LinkedHashMap<>();
+    final StringJoiner queries = new StringJoiner(NL);
+    for(final XdmItem step : new XQuery("*:test", ctx).context(test)) {
+      queries.add(step(test, step, env, base, mutable, returned));
+      if(returned.value == null) break;
+    }
+    final String string = queries.toString();
+
+    if(slow != null) {
+      final long l = perf.nanoRuntime();
+      if(l > 100000000) slow.put(-l, name);
+    }
+
+    final String exp = test(returned, expected);
+    final TokenBuilder tmp = new TokenBuilder();
+    tmp.add(name).add(NL);
+    tmp.add(QueryParser.removeComments(string, maxout)).add(NL);
+
+    boolean err = returned.value == null;
+    String res;
+    try {
+      if(returned.error != null) {
+        res = returned.error.toString();
+      } else if(returned.xqerror != null) {
+        res = returned.xqerror.getCode() + ": " + returned.xqerror.getLocalizedMessage();
+      } else {
+        res = serialize(returned);
+      }
+    } catch(final XQueryException ex) {
+      res = ex.getCode() + ": " + ex.getLocalizedMessage();
+      err = true;
+    } catch(final Throwable ex) {
+      Util.debug(ex);
+      res = returned.value.toString();
+    }
+
+    tmp.add(err ? "Error : " : "Result: ").add(normSpecial(res)).add(NL);
+    if(exp == null) {
+      tmp.add(NL);
+      right.add(tmp.finish());
+      correct++;
+    } else {
+      wrong.add(tmp.add("Expect: ").add(normSpecial(exp)).add(NL).add(NL).finish());
+    }
+    if(report != null) report.addTest(name, exp == null);
+  }
+
+  /**
+   * Runs a single step of a test case.
+   * @param test test case
+   * @param step test step
+   * @param env environment (can be {@code null})
+   * @param base use base URI of test set
+   * @param mutable mutable documents, bound by role
+   * @param returned query result
+   * @return query string
+   * @throws Exception exception
+   */
+  private String step(final XdmItem test, final XdmItem step, final QT3Env env,
+      final boolean base, final Map<String, XdmValue> mutable, final QT3Result returned)
+      throws Exception {
+
+    // retrieve query to be run
+    final String qfile = asString("@file", step);
     String string;
     String qbase = baseURI;
     if(qfile.isEmpty()) {
       // get query string
-      string = asString("*:test", test);
+      string = asString("string()", step);
     } else {
       // get query from file: the file supplies the static base URI
       final IOFile io = new IOFile(baseDir, qfile);
       string = string(io.read());
       qbase = io.path();
     }
-
-    if(verbose) Util.println(name);
 
     // bind variables
     if(env != null) {
@@ -297,7 +367,7 @@ public final class QT3TS extends Main {
       // bind documents
       for(final HashMap<String, String> src : env.sources) {
         final String role = src.get(ROLE);
-        if(role != null && role.startsWith("$")) {
+        if(role != null && role.startsWith("$") && !"true".equals(src.get(DECLARED))) {
           string = "declare variable " + role + " external;" + string;
         }
       }
@@ -333,13 +403,13 @@ public final class QT3TS extends Main {
       locations.put(location.getString(), new IOFile(baseDir, file.getString()));
     }
 
-    final QT3Result returned = new QT3Result();
-    returned.env = env;
-
+    returned.value = null;
     try {
       environment(query, env, true);
       if(env != null) {
-        // bind documents
+        // subsequent steps: first mutable document is the default context value
+        if(!mutable.isEmpty()) query.context(mutable.values().iterator().next());
+        // bind documents (mutable documents are parsed once and shared by all steps)
         for(final HashMap<String, String> src : env.sources) {
           final String file = src.get(FILE), role = src.get(ROLE);
           if(file ==  null) continue;
@@ -349,7 +419,11 @@ public final class QT3TS extends Main {
           query.addDocument(src.get(URI), path);
           if(role == null) continue;
 
-          final XdmValue doc = query.document(src.get(URI) != null ? src.get(URI) : path);
+          XdmValue doc = mutable.get(role);
+          if(doc == null) {
+            doc = query.document(src.get(URI) != null ? src.get(URI) : path);
+            if("true".equals(src.get(MUTABLE))) mutable.put(role, doc);
+          }
           if(role.equals(".")) query.context(doc);
           else query.variable(role, doc);
         }
@@ -407,47 +481,10 @@ public final class QT3TS extends Main {
     } catch(final Throwable ex) {
       // unexpected error (potential bug)
       returned.error = ex;
-      Util.errln("Query: " + name);
+      Util.errln("Query: " + asString("@name", test));
       Util.stack(ex);
     }
-
-    if(slow != null) {
-      final long l = perf.nanoRuntime();
-      if(l > 100000000) slow.put(-l, name);
-    }
-
-    final String exp = test(returned, expected);
-    final TokenBuilder tmp = new TokenBuilder();
-    tmp.add(name).add(NL);
-    tmp.add(QueryParser.removeComments(string, maxout)).add(NL);
-
-    boolean err = returned.value == null;
-    String res;
-    try {
-      if(returned.error != null) {
-        res = returned.error.toString();
-      } else if(returned.xqerror != null) {
-        res = returned.xqerror.getCode() + ": " + returned.xqerror.getLocalizedMessage();
-      } else {
-        res = serialize(returned);
-      }
-    } catch(final XQueryException ex) {
-      res = ex.getCode() + ": " + ex.getLocalizedMessage();
-      err = true;
-    } catch(final Throwable ex) {
-      Util.debug(ex);
-      res = returned.value.toString();
-    }
-
-    tmp.add(err ? "Error : " : "Result: ").add(normSpecial(res)).add(NL);
-    if(exp == null) {
-      tmp.add(NL);
-      right.add(tmp.finish());
-      correct++;
-    } else {
-      wrong.add(tmp.add("Expect: ").add(normSpecial(exp)).add(NL).add(NL).finish());
-    }
-    if(report != null) report.addTest(name, exp == null);
+    return string;
   }
 
 
@@ -500,7 +537,7 @@ public final class QT3TS extends Main {
   /** Flags for dependencies that are not supported. */
   private static final String NOSUPPORT =
     "('schema-location-hint', 'schemaImport', 'schemaValidation', " +
-    "'staticTyping', 'typedData', 'XQUpdate')";
+    "'staticTyping', 'typedData')";
 
   /** Tests cases to be skipped due to deviations from the spec, or
    * as the testing effort does not justify the outcome. */
@@ -532,6 +569,24 @@ public final class QT3TS extends Main {
     "'Catalog011', 'Catalog014', " +
     // depend on the capabilities of the external XSLT and XSD processors
     "'fn-transform-67', 'fo-test-fn-xsd-validator-002', " +
+    // XQuery Update: targets can be empty or contain multiple nodes
+    "'id-insert-expr-027', 'id-insert-expr-028', 'id-rename-expr-007', 'id-rename-expr-008', " +
+    "'id-rename-expr-015', 'id-replace-expr-013', 'id-replace-expr-019', 'id-replace-expr-026', " +
+    "'id-replace-expr-027', 'id-replace-expr-028', 'statictyp-xqupd-003', 'statictyp-xqupd-013', " +
+    "'statictyp-xqupd-014', 'statictyp-xqupd-015', 'statictyp-xqupd-016', 'statictyp-xqupd-021', " +
+    "'statictyp-xqupd-022', 'statictyp-xqupd-023', 'statictyp-xqupd-024', 'statictyp-xqupd-047', " +
+    "'statictyp-xqupd-048', 'statictyp-xqupd-049', 'statictyp-xqupd-053', 'statictyp-xqupd-054', " +
+    "'statictyp-xqupd-055', " +
+    // XQuery Update: copy-namespaces modes are ignored by updates
+    "'id-insert-expr-081-no-inherit', 'id-insert-expr-082-no-inherit', " +
+    "'id-insert-expr-083-no-inherit', 'id-insert-expr-084-no-inherit', " +
+    "'id-insert-expr-085-no-inherit', 'id-insert-expr-086-no-inherit', " +
+    "'id-rename-expr-033-no-inherit', 'id-rename-expr-034-no-inherit', " +
+    "'id-replace-expr-045-no-inherit', " +
+    "'propagateNamespaces02', 'propagateNamespaces03', 'propagateNamespaces04', " +
+    "'propagateNamespaces06', " +
+    // ID attributes are detected by their name
+    "'removeType-valskip-ren-003a', " +
     "'')";
 
   /**
@@ -541,11 +596,14 @@ public final class QT3TS extends Main {
    */
   private boolean supported(final XdmValue test) {
     // the following query generates a result if the specified test is not supported
-    final String query = all ? "*:test[@update = 'true']" : "*:dependency[" +
+    if(all) return true;
+    final String query = "*:dependency[" +
       // skip various features
       "@type = 'feature' and @value = " + NOSUPPORT + " and string(@satisfied) = ('', 'true') or " +
       // skip supported features when test asks for non-support
       "@type = 'feature' and not(@value = " + NOSUPPORT + ") and string(@satisfied) = 'false' or " +
+      // skip revalidation modes other than skip, and tests that ask for non-support of skip
+      "@type = 'revalidation' and (@value = 'skip') = (@satisfied = 'false') or " +
       // skip fully-normalized Unicode tests
       "@type = 'unicode-normalization-form' and @value = 'FULLY-NORMALIZED' or " +
       // skip tests locked to a historical Unicode version (JDK uses a much newer one)
@@ -699,7 +757,9 @@ public final class QT3TS extends Main {
     final String exp = expected.getString();
     try {
       final String query = "declare variable $result external; " + exp;
-      return environment(new XQuery(query, ctx), result.env).context(result.value).variable(
+      // relative URIs are resolved against the test set
+      final XQuery xq = new XQuery(query, ctx).baseURI(baseURI);
+      return environment(xq, result.env).context(result.value).variable(
           "$result", result.value).value().getBoolean() ? null : exp;
     } catch(final XQueryException ex) {
       // should not occur
