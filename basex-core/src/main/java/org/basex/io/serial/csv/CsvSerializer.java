@@ -162,7 +162,8 @@ public abstract class CsvSerializer extends StandardSerializer {
       txt = tb.finish();
     }
     if(form != null) txt = normalize(txt, form);
-    final boolean delim = contains(txt, separator) || contains(txt, '\n');
+    final boolean delim = contains(txt, separator) || contains(txt, '\n') ||
+        !backslashes && contains(txt, '\r');
     final boolean special = contains(txt, '\r') || contains(txt, quoteCharacter)
         || backslashes && contains(txt, '\t');
     if(delim || special || backslashes && contains(txt, '\\')) {
@@ -187,7 +188,7 @@ public abstract class CsvSerializer extends StandardSerializer {
           tp.consume('\n');
           tb.add('\n');
         } else {
-          if(cp == quoteCharacter) tb.add(quoteCharacter);
+          if(quotes && cp == quoteCharacter) tb.add(quoteCharacter);
           tb.add(cp);
         }
       }

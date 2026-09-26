@@ -204,6 +204,10 @@ public final class CsvModuleTest extends SandboxTest {
     serial("<csv><record><A>1\n2</A></record></csv>", "'header': 'yes'", "A\n\"1\n2\"\n");
     serial("<csv><record><A>\"</A></record></csv>", "'header': 'yes'", "A\n\"\"\"\"\n");
     serial("<csv><record><A>1,2</A></record></csv>", "'header': 'yes'", "A\n\"1,2\"\n");
+    serial("<csv><record><A>A\"B</A></record></csv>", "'quotes': false()", "A\"B\n");
+    serial("<csv><record><A>A&#xD;B</A></record></csv>", "", "\"A\nB\"\n");
+    serial("<csv><record><A>A&#xD;B</A></record></csv>", "'quotes': false(), 'backslashes': true()",
+        "A\\rB\n");
     serial("<csv><record><A>1</A></record></csv>", "'header': 'yes'", "A\n1\n");
     serial("<csv><record><A>1</A><B>2</B></record></csv>", "'header': 'yes'", "A,B\n1,2\n");
     serial("<csv><record><A/><A>1</A><A>1</A><A/></record></csv>",
@@ -216,6 +220,8 @@ public final class CsvModuleTest extends SandboxTest {
     serialError("<csv/>", "'x': 'y'");
     serialError("<csv><record><A>1</A></record></csv>", "'separator': ''");
     serialError("<csv><record><A>1</A></record></csv>", "'separator': 'XX'");
+    error(_CSV_SERIALIZE.args(" <csv><record><A>A&#xD;B</A></record></csv>",
+        " { 'quotes': false() }"), CSV_SERIALIZE_X_X);
   }
 
   /** Test method. */
