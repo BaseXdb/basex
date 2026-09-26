@@ -121,6 +121,17 @@ public final class FBuilder {
   }
 
   /**
+   * Adds namespace declarations.
+   * @param ns namespaces
+   * @return self reference
+   */
+  public FBuilder ns(final Atts ns) {
+    final int nl = ns.size();
+    for(int n = 0; n < nl; n++) ns(ns.name(n), ns.value(n));
+    return this;
+  }
+
+  /**
    * Renames the root element (namespace conflict).
    * @param name new name
    */

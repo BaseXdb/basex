@@ -47,10 +47,8 @@ public final class NodeHandler implements XmlHandler {
 
   @Override
   public void openElem(final byte[] name, final Atts atts, final Atts nsp) {
-    final FBuilder elem = FElem.build(qName(name, true, nsp));
-    final int ns = nsp.size();
-    for(int n = 0; n < ns; n++) elem.ns(nsp.name(n), nsp.value(n));
-    final int as = atts.size();
+    final FBuilder elem = FElem.build(qName(name, true, nsp)).ns(nsp);
+    final int ns = nsp.size(), as = atts.size();
     for(int a = 0; a < as; a++) {
       elem.attr(qName(atts.name(a), false, nsp), shared.token(atts.value(a)));
     }

@@ -92,6 +92,10 @@ public final class JsonModuleTest extends SandboxTest {
         "... objects=\"json\" arrays=\"O\" numbers=\"_\"><O><_>1</_></O>");
     parse("{ \"A\" : [ 0, 1 ] }", "'merge': true()",
         "... objects=\"json\" arrays=\"A\" numbers=\"_\"><A><_>0</_><_>1</_>");
+    // merged type attributes are in document order
+    query("let $r := json:parse('{ \"a\": { \"a\": true, \"c\": 1 } }', { 'merge': true() })/json "
+        + "return string-join(($r//c | $r/a/@type | $r/@numbers | $r/a/a) ! name(), ' ')",
+        "numbers type a c");
 
     // errors
     parseError("", "");

@@ -45,12 +45,12 @@ public abstract class FNode extends XNode {
     if(this == node) return 0;
     // fragments: compare node IDs
     if(node instanceof final FNode fnode) {
-      // attributes precede the children of their parent, which may have a lower ID
-      if(parent != null && parent == fnode.parent) {
-        final boolean attr = kind() == Kind.ATTRIBUTE;
-        if(attr != (fnode.kind() == Kind.ATTRIBUTE)) return attr ? -1 : 1;
-      }
-      return Integer.signum(id - fnode.id);
+      // attributes may be created after the descendants of their parent: compare the parents
+      final FNode n1 = this instanceof FAttr && parent != null ? parent : this;
+      final FNode n2 = fnode instanceof FAttr && fnode.parent != null ? fnode.parent : fnode;
+      // an element precedes its attributes
+      return n1 != n2 ? Integer.signum(n1.id - n2.id) : n1 == this ? -1 : n2 == fnode ? 1 :
+        Integer.signum(id - fnode.id);
     }
     // find LCA
     if(node instanceof final DBNode dbnode) return compare(this, dbnode);

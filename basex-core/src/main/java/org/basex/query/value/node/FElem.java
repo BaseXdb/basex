@@ -293,9 +293,7 @@ public final class FElem extends FNode {
 
     if(materialized(test, funcs, ii)) return this;
 
-    final FBuilder elem = build(name);
-    final int ns = namespaces.size();
-    for(int n = 0; n < ns; n++) elem.ns(namespaces.name(n), namespaces.value(n));
+    final FBuilder elem = build(name).ns(namespaces);
     for(final GNode attribute : attributes) {
       elem.node((GNode) attribute.materialize(test, funcs, ii, qc));
     }
