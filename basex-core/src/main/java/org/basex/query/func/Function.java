@@ -781,6 +781,10 @@ public enum Function implements AFunction {
   UNPARSED_TEXT_LINES(FnUnparsedTextLines::new, "unparsed-text-lines(source, options?)",
       params(STRING_ZO, ITEM_ZO), STRING_ZM, flag(NDT), FN_URI, Perm.CREATE),
   /** XQuery function. */
+  UPDATE(FnUpdate::new, "update(value, select, replacement?)",
+      params(NODE_OR_MAP_OR_ARRAY_O, FuncType.get(NODE_ZM, NODE_O).seqType(), ITEM_ZM),
+      NODE_OR_MAP_OR_ARRAY_O, flag(HOF, CNS)),
+  /** XQuery function. */
   UPPER_CASE(FnUpperCase::new, "upper-case(value)",
       params(STRING_ZO), STRING_O),
   /** XQuery function. */

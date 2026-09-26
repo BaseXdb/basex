@@ -1104,7 +1104,7 @@ public abstract class StandardFunc extends Arr {
    * @return function item
    * @throws QueryException query exception
    */
-  private FItem checkArity(final FItem function, final int nargs, final boolean updating)
+  protected final FItem checkArity(final FItem function, final int nargs, final boolean updating)
       throws QueryException {
 
     checkUp(function, updating);

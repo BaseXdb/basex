@@ -51,13 +51,8 @@ public final class CPI extends CName {
     if(eq(lc(nm), XML)) throw CPIXML_X.get(info, nm);
     if(!XMLToken.isNCName(nm)) throw CPIINVAL_X.get(info, nm);
 
-    byte[] value = atomValue(qc, true);
-    int i = -1;
-    final int vl = value.length;
-    while(++i < vl && ws(value[i]));
-    value = substring(value, i);
-
-    return new FPI(qc.shared.qName(nm), qc.shared.token(FPI.parse(value, info)));
+    final byte[] value = FPI.content(atomValue(qc, true), info);
+    return new FPI(qc.shared.qName(nm), qc.shared.token(value));
   }
 
   @Override

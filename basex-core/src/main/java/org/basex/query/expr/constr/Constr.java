@@ -271,27 +271,39 @@ public final class Constr {
       }
     }
 
+    builder.namespaces = inscopeNS;
+    attributeNS(builder, qc);
+    if(inscopeNS.isEmpty()) builder.namespaces = null;
+  }
+
+  /**
+   * Binds the namespaces of the attributes of an element. An attribute whose prefix is bound to
+   * another URI is renamed.
+   * @param builder element builder
+   * @param qc query context
+   */
+  public static void attributeNS(final FBuilder builder, final QueryContext qc) {
     final GNodeList attributes = builder.attributes;
-    if(attributes != null) {
-      final int as = attributes.size();
-      for(int a = 0; a < as; a++) {
-        final GNode attr = attributes.get(a);
-        final QNm qnm = attr.qname();
-        // skip attributes without prefixes or URIs
-        if(!qnm.hasPrefix() || !qnm.hasURI()) continue;
+    if(attributes == null) return;
 
-        // skip XML namespace
-        final byte[] prefix = qnm.prefix();
-        if(eq(prefix, XML)) continue;
+    final int as = attributes.size();
+    for(int a = 0; a < as; a++) {
+      final GNode attr = attributes.get(a);
+      final QNm qnm = attr.qname();
+      // skip attributes without prefixes or URIs
+      if(!qnm.hasPrefix() || !qnm.hasURI()) continue;
 
-        final byte[] auri = qnm.uri(), npref = addNS(inscopeNS, prefix, auri, qc.shared);
-        if(npref != null) {
-          final QNm aname = qc.shared.qName(concat(npref, cpToken(':'), qnm.local()), auri);
-          attributes.set(a, new FAttr(aname, qc.shared.token(attr.string())));
-        }
+      // skip XML namespace
+      final byte[] prefix = qnm.prefix();
+      if(eq(prefix, XML)) continue;
+
+      if(builder.namespaces == null) builder.namespaces = new Atts();
+      final byte[] auri = qnm.uri(), npref = addNS(builder.namespaces, prefix, auri, qc.shared);
+      if(npref != null) {
+        final QNm aname = qc.shared.qName(concat(npref, cpToken(':'), qnm.local()), auri);
+        attributes.set(a, new FAttr(aname, qc.shared.token(attr.string())));
       }
     }
-    builder.namespaces = inscopeNS.isEmpty() ? null : inscopeNS;
   }
 
   /**
