@@ -5169,8 +5169,11 @@ public class QueryParser extends InputParser {
     final int p1 = pos;
     if(!wsConsumeWs(string)) return false;
     final int p2 = pos;
-    alter = expr;
-    alterPos = p2;
+    // keyword followed by colon: QName prefix, no alternative error
+    if(!current(':')) {
+      alter = expr;
+      alterPos = p2;
+    }
     for(final String s : strings) {
       if(wsConsume(s)) {
         pos = p2;

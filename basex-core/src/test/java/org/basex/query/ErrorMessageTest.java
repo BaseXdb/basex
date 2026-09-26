@@ -50,6 +50,13 @@ public final class ErrorMessageTest extends SandboxTest {
     error("true(,", FUNCARG_X);
   }
 
+  /** Keyword used as QName prefix does not trigger an alternative error. */
+  @Test public void keywordPrefix() {
+    error("{ 'a': 2 } => map:keys() ! 1", QUERYEND_X);
+    error("[ 1 ] => array:size() ! 1", QUERYEND_X);
+    error("<a/>/attribute::b ! 1 1", QUERYEND_X);
+  }
+
   /** Unprefixed call of a user-defined function with wrong arity reports an arity mismatch. */
   @Test public void wrongArityNoNamespace() {
     error("declare function abc($j) { }; abc()", INVNARGS_X_X);
