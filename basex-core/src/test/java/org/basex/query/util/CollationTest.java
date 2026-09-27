@@ -77,6 +77,10 @@ public final class CollationTest extends SandboxTest {
     query(prolog + "substring-after('" + smiley + "ab', 'A')", "b");
     query(prolog + "substring-before('" + dotted + "ab', 'B')", dotted + "a");
     query(prolog + "substring-after('" + dotted + "ab', 'A')", "b");
+    query(prolog + "substring-before-last('a" + smiley + "A" + smiley + "b', 'a')",
+        "a" + smiley);
+    query(prolog + "substring-after-last('a" + smiley + "A" + smiley + "b', 'a')",
+        smiley + "b");
     query(prolog + "contains('" + dotted + "ab', 'AB')", true);
     query(prolog + "ends-with('" + smiley + "ab', 'B')", true);
     query(prolog + "starts-with('" + smiley + "ab', '" + smiley + "A')", true);

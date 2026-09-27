@@ -198,6 +198,9 @@ public enum Function implements AFunction {
   DAYS_FROM_DURATION(FnDaysFromDuration::new, "days-from-duration(value)",
       params(DURATION_ZO), INTEGER_ZO),
   /** XQuery function. */
+  DAYS_IN_MONTH(FnDaysInMonth::new, "days-in-month(value)",
+      params(YEAR_MONTH_ZO), INTEGER_ZO),
+  /** XQuery function. */
   DECODE_FROM_URI(FnDecodeFromUri::new, "decode-from-uri(value)",
       params(STRING_ZO), STRING_O),
   /** XQuery function. */
@@ -234,6 +237,9 @@ public enum Function implements AFunction {
   /** XQuery function. */
   DUPLICATE_VALUES(FnDuplicateValues::new, "duplicate-values(values, collation?)",
       params(ANY_ATOMIC_TYPE_ZM, STRING_ZO), ANY_ATOMIC_TYPE_ZM),
+  /** XQuery function. */
+  DURATION_TO_SECONDS(FnDurationToSeconds::new, "duration-to-seconds(value)",
+      params(DAY_TIME_DURATION_ZO), DECIMAL_ZO),
   /** XQuery function. */
   ELEMENT_TO_MAP(FnElementToMap::new, "element-to-map(element, options?)",
       params(DOCUMENT_OR_ELEMENT_ZO, MAP_ZO),
@@ -383,6 +389,9 @@ public enum Function implements AFunction {
   /** XQuery function. */
   INDEX_OF(FnIndexOf::new, "index-of(input, target, collation?)",
       params(ANY_ATOMIC_TYPE_ZM, ANY_ATOMIC_TYPE_O, STRING_ZO), INTEGER_ZM),
+  /** XQuery function. */
+  INDEX_OF_SUBSTRING(FnIndexOfSubstring::new, "index-of-substring(value, substring)",
+      params(STRING_ZO, STRING_O), INTEGER_ZM),
   /** XQuery function. */
   INDEX_WHERE(FnIndexWhere::new, "index-where(input, predicate)",
       params(ITEM_ZM, PREDICATE_O), INTEGER_ZM),
@@ -701,7 +710,15 @@ public enum Function implements AFunction {
   SUBSTRING_AFTER(FnSubstringAfter::new, "substring-after(value, substring, collation?)",
       params(STRING_ZO, STRING_ZO, STRING_ZO), STRING_O),
   /** XQuery function. */
+  SUBSTRING_AFTER_LAST(FnSubstringAfterLast::new,
+      "substring-after-last(value, substring, collation?)",
+      params(STRING_ZO, STRING_ZO, STRING_ZO), STRING_O),
+  /** XQuery function. */
   SUBSTRING_BEFORE(FnSubstringBefore::new, "substring-before(value, substring, collation?)",
+      params(STRING_ZO, STRING_ZO, STRING_ZO), STRING_O),
+  /** XQuery function. */
+  SUBSTRING_BEFORE_LAST(FnSubstringBeforeLast::new,
+      "substring-before-last(value, substring, collation?)",
       params(STRING_ZO, STRING_ZO, STRING_ZO), STRING_O),
   /** XQuery function. */
   SUM(FnSum::new, "sum(values, zero?)",
@@ -739,6 +756,9 @@ public enum Function implements AFunction {
   /** XQuery function. */
   TRANSLATE(FnTranslate::new, "translate(value, replace, with)",
       params(STRING_ZO, STRING_O, STRING_O), STRING_O),
+  /** XQuery function. */
+  TRIM_SPACE(FnTrimSpace::new, "trim-space(value, options?)",
+      params(ANY_ATOMIC_TYPE_ZO, MAP_ZO), STRING_O),
   /** XQuery function. */
   TRUE(FnTrue::new, "true()",
       params(), BOOLEAN_O),

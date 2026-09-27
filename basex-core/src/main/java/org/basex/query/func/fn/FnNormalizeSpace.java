@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -32,9 +33,14 @@ public final class FnNormalizeSpace extends ContextFn {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    final Expr value = arg(0);
     // normalize-space(normalize-space(E)) → normalize-space(E)
-    return Function.NORMALIZE_SPACE.is(arg(0)) ? arg(0) : this;
+    if(Function.NORMALIZE_SPACE.is(value)) return value;
+    // normalize-space(trim-space(E)) → normalize-space(E)
+    if(Function.TRIM_SPACE.is(value) && value.arg(1) instanceof Value)
+      return cc.function(Function.NORMALIZE_SPACE, info, value.arg(0));
+    return this;
   }
 
   @Override

@@ -61,6 +61,9 @@ public final class FnHead extends StandardFunc {
       // head(reverse(E)) → foot(E)
       return cc.function(FOOT, info, input.args());
     }
+    // head(distinct-values(E, C)) → head(data(E))
+    if(DISTINCT_VALUES.is(input))
+      return cc.function(HEAD, info, cc.function(DATA, info, input.arg(0)));
     // head(replicate(E, count)) → head(E)
     if(REPLICATE.is(input)) {
       // static integer will always be greater than 1

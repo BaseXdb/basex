@@ -34,10 +34,28 @@ public abstract class Collation {
 
   /** Search modes. */
   protected enum Mode {
-    /** Default. */      INDEX_OF,
-    /** End position. */ INDEX_AFTER,
-    /** Starts-with. */  STARTS_WITH,
-    /** Ends-with. */    ENDS_WITH
+    /** Default. */              INDEX_OF,
+    /** End position. */         INDEX_AFTER,
+    /** Starts-with. */          STARTS_WITH,
+    /** Ends-with. */            ENDS_WITH,
+    /** Last position. */        LAST_INDEX_OF,
+    /** Last end position. */    LAST_INDEX_AFTER;
+
+    /**
+     * Indicates if the last occurrence is searched for.
+     * @return result of check
+     */
+    boolean last() {
+      return this == LAST_INDEX_OF || this == LAST_INDEX_AFTER;
+    }
+
+    /**
+     * Indicates if the end position of an occurrence is returned.
+     * @return result of check
+     */
+    boolean after() {
+      return this == INDEX_AFTER || this == LAST_INDEX_AFTER;
+    }
   }
 
   /**
@@ -204,6 +222,38 @@ public abstract class Collation {
 
     final String st = string(string);
     final int i = indexOf(st, string(sub), Mode.INDEX_OF, info);
+    return i == -1 ? EMPTY : token(st.substring(0, i));
+  }
+
+  /**
+   * Returns the substring after the last occurrence of a specified string.
+   * @param string string
+   * @param sub substring to be found
+   * @param info input info (can be {@code null})
+   * @return substring
+   * @throws QueryException query exception
+   */
+  public final byte[] afterLast(final byte[] string, final byte[] sub, final InputInfo info)
+      throws QueryException {
+
+    final String st = string(string);
+    final int i = indexOf(st, string(sub), Mode.LAST_INDEX_AFTER, info);
+    return i == -1 ? EMPTY : token(st.substring(i));
+  }
+
+  /**
+   * Returns the substring before the last occurrence of a specified string.
+   * @param string string
+   * @param sub substring to be found
+   * @param info input info (can be {@code null})
+   * @return substring
+   * @throws QueryException query exception
+   */
+  public final byte[] beforeLast(final byte[] string, final byte[] sub, final InputInfo info)
+      throws QueryException {
+
+    final String st = string(string);
+    final int i = indexOf(st, string(sub), Mode.LAST_INDEX_OF, info);
     return i == -1 ? EMPTY : token(st.substring(0, i));
   }
 

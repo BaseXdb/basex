@@ -959,6 +959,24 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void daysInMonth() {
+    final Function func = DAYS_IN_MONTH;
+
+    query(func.args(" xs:date('2024-02-10')"), 29);
+    query(func.args(" xs:date('2023-02-10')"), 28);
+    query(func.args(" xs:date('2000-02-01')"), 29);
+    query(func.args(" xs:date('1900-02-01')"), 28);
+    query(func.args(" xs:dateTime('2024-04-30T23:59:59Z')"), 30);
+    query(func.args(" xs:gYearMonth('2024-12')"), 31);
+    query(func.args(" xs:date('-0004-02-01')"), 29);
+    query(func.args(" <_>2023-02-10</_>"), 28);
+    query(func.args(" ()"), "");
+
+    error(func.args(" xs:gMonth('--02')"), INVTYPE_X);
+    error(func.args(1), INVTYPE_X);
+  }
+
+  /** Test method. */
   @Test public void decodeFromUri() {
     final Function func = DECODE_FROM_URI;
 
@@ -1421,6 +1439,24 @@ public final class FnModuleTest extends SandboxTest {
     query("sum(sort(" + func.args(" (3, 1 to xs:integer(<?_ 10?>), xs:byte(-1))") + "))", 3);
     query("sum(" + func.args(" (3, 1 to xs:integer(<?_ 10?>), xs:byte(-1), -1)") + ")", 2);
     query("sum(sort(" + func.args(" (3, 1 to xs:integer(<?_ 10?>), xs:byte(-1), -1)") + "))", 2);
+  }
+
+  /** Test method. */
+  @Test public void durationToSeconds() {
+    final Function func = DURATION_TO_SECONDS;
+
+    query(func.args(" xs:dayTimeDuration('PT1M')"), 60);
+    query(func.args(" xs:dayTimeDuration('P1DT0.5S')"), 86400.5);
+    query(func.args(" xs:dayTimeDuration('-PT2H')"), -7200);
+    query(func.args(" xs:dayTimeDuration('PT0S')"), 0);
+    query(func.args(" <_>PT3S</_>"), 3);
+    query(func.args(" ()"), "");
+    query(func.args(" xs:dayTimeDuration('PT2M3.456S')") + " => " + SECONDS.args(),
+        "PT2M3.456S");
+    query(SECONDS.args(" 123.456") + " => " + func.args(), 123.456);
+
+    error(func.args(" xs:yearMonthDuration('P1M')"), INVTYPE_X);
+    error(func.args(" xs:duration('PT1S')"), INVTYPE_X);
   }
 
   /** Test method. */
@@ -2201,6 +2237,11 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void head() {
     final Function func = HEAD;
 
+    check(func.args(DISTINCT_VALUES.args(" (" + wrap(2) + ", " + wrap(1) + ", " + wrap(2) + ")")),
+        2, empty(DISTINCT_VALUES));
+    check(func.args(DISTINCT_VALUES.args(" ([ 1, 2 ], 3)[. instance of item()]")), 1,
+        empty(DISTINCT_VALUES));
+
     // merge with nested positional functions (the let prevents the operand from being unrolled)
     check(OPAQUE + "(" + func.args(" " + TAIL.args(" $o")) + ','
         + func.args(" " + TRUNK.args(" $o")) + ','
@@ -2390,6 +2431,38 @@ public final class FnModuleTest extends SandboxTest {
     query("count(" + func.args(" (1 to 1_000_000) ! 'x'", "x") + ")", 1000000);
 
     check(func.args(" replicate(1, 6)", 1), "1\n2\n3\n4\n5\n6", exists(RangeSeq.class));
+  }
+
+  /** Test method. */
+  @Test public void indexOfSubstring() {
+    final Function func = INDEX_OF_SUBSTRING;
+
+    query(func.args("abcabc", "bc"), "2\n5");
+    query(func.args("abcabc", "x"), "");
+    query(func.args("abcabc", "abcabc"), 1);
+    query(func.args("abcabc", "abcabcd"), "");
+    query(func.args("banana", "a"), "2\n4\n6");
+    // occurrences may overlap
+    query(func.args("banana", "ana"), "2\n4");
+    query(func.args("aaaa", "aa"), "1\n2\n3");
+
+    // empty strings
+    query(func.args("abc", ""), "1\n2\n3\n4");
+    query(func.args("", ""), 1);
+    query(func.args(" ()", ""), 1);
+    query(func.args(" ()", "a"), "");
+
+    // positions are counted in characters
+    query(func.args(" char(0x1F600) || 'ab' || char(0x1F600) || 'b'", "b"), "3\n5");
+    query(func.args("äöüäöü", "ü"), "3\n6");
+    query(func.args(" char(0x1F600) || char(0x1F600)", ""), "1\n2\n3");
+
+    // lazy evaluation, compatibility with default collations
+    query("head(" + func.args(" string-join((1 to 1000000) ! 'a')", "a") + ")", 1);
+    query("declare default collation 'http://www.w3.org/2005/xpath-functions/collation/"
+        + "html-ascii-case-insensitive'; " + func.args(wrap("ABC"), "b"), "");
+
+    error(func.args("abc", " ()"), INVTYPE_X);
   }
 
   /** Test method. */
@@ -3983,6 +4056,22 @@ return
     // ensure that the generated numbers do not run into a short cycle
     query("count(distinct-values(fold-left(1 to 50000, " + func.args(1) + ", "
         + "fn($acc, $i) { head($acc) ! (?next(), ?number), tail($acc) }) => tail()))", 50000);
+
+    // take: consistent with number and next
+    query("let $rng := " + func.args(123) + " return deep-equal($rng?take(3), "
+        + "($rng?number, $rng?next()?number, $rng?next()?next()?number))", true);
+    query("let $rng := " + func.args() + " return deep-equal($rng?take(5), "
+        + "fold-left(1 to 5, $rng, fn { head(.) ! (?next(), ?number), tail(.) }) "
+        + "=> tail() => reverse())",
+        true);
+    query("let $rng := " + func.args(1) + " return $rng?take(5) = $rng?take(5)", true);
+    query("count(" + func.args(1) + "?take(1000))", 1000);
+    query("count(distinct-values(" + func.args(1) + "?take(1000000)))", 1000000);
+    query("every $d in " + func.args(1) + "?take(1000) satisfies $d >= 0 and $d < 1", true);
+    query(func.args(1) + "?take(0)", "");
+
+    query(func.args(1) + "?take(xs:byte(2)) => count()", 2);
+    error(func.args(1) + "?take(-1)", INVTYPE_X);
   }
 
   /** Test method. */
@@ -5224,6 +5313,33 @@ return
   }
 
   /** Test method. */
+  @Test public void substringAfterLast() {
+    final Function func = SUBSTRING_AFTER_LAST;
+    final String c = "http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive";
+
+    query(func.args("a/b/c", "/"), "c");
+    query(func.args("a//b//c", "//"), "c");
+    query(func.args("aaa", "aa"), "");
+    query(func.args("a/b/c", "x"), "");
+    query(func.args("a/b/c/", "/"), "");
+    query(func.args("äxöxü", "x"), "ü");
+    query(func.args("aXbxc", "x", c), "c");
+    query(func.args("aXbxcXd", "x", c), "d");
+    query(func.args("aXbxc", "y", c), "");
+    query(func.args("a-A-b", "a", "http://www.w3.org/2013/collation/UCA?strength=primary"),
+        "-b");
+    query(func.args("abc", "--",
+        "http://www.w3.org/2013/collation/UCA?alternate=blanked;strength=primary"), "");
+
+    check(func.args(" ()", wrap(1)), "", root(Str.class));
+    check(func.args("", wrap(1)), "", root(Str.class));
+    check(func.args(wrap(1), wrap(1)), "", root(Str.class));
+    check(func.args(wrap(1), " ()"), "", root(Str.class));
+    check(func.args(wrap(1), ""), "", root(Str.class));
+    check(func.args(wrap("1/2"), "/"), 2, root(func));
+  }
+
+  /** Test method. */
   @Test public void substringBefore() {
     final Function func = SUBSTRING_BEFORE;
     check(func.args(" ()", wrap(1)), "", root(Str.class));
@@ -5244,6 +5360,33 @@ return
 
     check(func.args(wrap(12), wrap(13)), "", root(func));
     check(func.args("A", "B", "?lang=de"), "", root(Str.class));
+  }
+
+  /** Test method. */
+  @Test public void substringBeforeLast() {
+    final Function func = SUBSTRING_BEFORE_LAST;
+    final String c = "http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive";
+
+    query(func.args("a/b/c", "/"), "a/b");
+    query(func.args("a//b//c", "//"), "a//b");
+    query(func.args("aaa", "aa"), "a");
+    query(func.args("a/b/c", "x"), "");
+    query(func.args("/a", "/"), "");
+    query(func.args("äxöxü", "x"), "äxö");
+    query(func.args("aXbxc", "x", c), "aXb");
+    query(func.args("aXbxcXd", "x", c), "aXbxc");
+    query(func.args("aXbxc", "y", c), "");
+    query(func.args("a-A-b", "a", "http://www.w3.org/2013/collation/UCA?strength=primary"),
+        "a-");
+    query(func.args("abc", "--",
+        "http://www.w3.org/2013/collation/UCA?alternate=blanked;strength=primary"), "abc");
+
+    check(func.args(" ()", wrap(1)), "", root(Str.class));
+    check(func.args("", wrap(1)), "", root(Str.class));
+    check(func.args(wrap(1), wrap(1)), "", root(Str.class));
+    check(func.args(wrap(1), " ()"), 1, root(STRING));
+    check(func.args(wrap(1), ""), 1, root(STRING));
+    check(func.args(wrap("1/2"), "/"), 1, root(func));
   }
 
   /** Test method. */
@@ -5489,6 +5632,40 @@ return
 
     query(func.args(" string-join((1 to 100000) ! 'a')",
         " string-join((1 to 100000) ! 'b') || 'a'", ""), "");
+  }
+
+  /** Test method. */
+  @Test public void trimSpace() {
+    final Function func = TRIM_SPACE;
+
+    query(func.args("\t a b \n "), "a b");
+    query(func.args("\t a b \n ", " { 'side': 'start' }"), "a b \n ");
+    query(func.args("\t a b \n ", " { 'side': 'end' }"), "\t a b");
+    query(func.args("\t a b \n ", " { 'side': 'both' }"), "a b");
+    query(func.args("ab"), "ab");
+    query(func.args(" '   '"), "");
+    query(func.args(""), "");
+    query(func.args(" char(0xA0) || 'a'"), " a");
+    query(func.args(" <_> a </_>"), "a");
+    query(func.args(42), 42);
+    query(func.args(" xs:untypedAtomic(' 1 ')"), 1);
+
+    check(func.args(" ()"), "", root(Str.class));
+
+    // rewritings
+    check(func.args(NORMALIZE_SPACE.args(wrap(" a  b "))), "a b", root(NORMALIZE_SPACE));
+    check(func.args(func.args(wrap(" a "))), "a", count(func, 1));
+    check(func.args(func.args(wrap(" a "), " { 'side': 'end' }"), " { 'side': 'end' }"),
+        " a", count(func, 1));
+    check(func.args(func.args(wrap(" a "), " { 'side': 'end' }")), "a", count(func, 2));
+    check(NORMALIZE_SPACE.args(func.args(wrap(" a  b "), " { 'side': 'end' }")), "a b",
+        root(NORMALIZE_SPACE), empty(func));
+    check("count((" + wrap(" ") + ", " + wrap(" x ") + ")[" + func.args(" .") + "])", 1,
+        empty(func));
+    check("boolean(" + func.args(wrap("\t"), " { 'side': 'start' }") + ")", false,
+        empty(func));
+
+    error(func.args("a", " { 'side': 'middle' }"), INVALIDOPTIONVALUE_X);
   }
 
   /** Test method. */

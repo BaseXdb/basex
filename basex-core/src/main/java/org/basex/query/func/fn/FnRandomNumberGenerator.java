@@ -3,6 +3,7 @@ package org.basex.query.func.fn;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -23,6 +24,13 @@ public final class FnRandomNumberGenerator extends StandardFunc {
   /** Type for next function. */
   private static final FuncType NEXT_TYPE =
       FuncType.get(Records.RANDOM_NUMBER_GENERATOR.get().seqType());
+  /** Type for take function. */
+  private static final FuncType TAKE_TYPE =
+      FuncType.get(Types.DOUBLE_ZM, BasicType.NON_NEGATIVE_INTEGER.seqType());
+  /** Parameter name of permute function. */
+  private static final QNm Q_SEQ = new QNm("seq");
+  /** Parameter name of take function. */
+  private static final QNm Q_COUNT = new QNm("count");
 
   @Override
   public XQMap value(final QueryContext qc) throws QueryException {
@@ -42,7 +50,8 @@ public final class FnRandomNumberGenerator extends StandardFunc {
     return XQMap.get(Records.RANDOM_NUMBER_GENERATOR.get(),
       Dbl.get(number(i1, i2)),
       new FuncItem(info, new Next(info, i2), new Var[0], AnnList.EMPTY, NEXT_TYPE, 0, null),
-      permuteFunc(i1, qc, info));
+      permuteFunc(i1, qc, info),
+      takeFunc(state, qc, info));
   }
 
   /**
@@ -73,10 +82,24 @@ public final class FnRandomNumberGenerator extends StandardFunc {
    */
   private static FuncItem permuteFunc(final long seed, final QueryContext qc,
       final InputInfo info) {
-    final Var var = new Var(new QNm("seq"), null, qc, info, 0, null);
+    final Var var = new Var(Q_SEQ, null, qc, info, 0, null);
     final StandardFunc sf = Function._RANDOM_SEEDED_PERMUTATION.get(info, Itr.get(seed),
         new VarRef(info, var));
     return new FuncItem(info, sf, new Var[] { var }, AnnList.EMPTY, PERMUTE_TYPE, 1, null);
+  }
+
+  /**
+   * Creates the function returning the next random numbers.
+   * @param state internal state
+   * @param qc query context
+   * @param info input info (can be {@code null})
+   * @return function returning random numbers
+   */
+  private static FuncItem takeFunc(final long state, final QueryContext qc,
+      final InputInfo info) {
+    final Var var = new Var(Q_COUNT, null, qc, info, 0, null);
+    final Take take = new Take(info, state, new VarRef(info, var));
+    return new FuncItem(info, take, new Var[] { var }, AnnList.EMPTY, TAKE_TYPE, 1, null);
   }
 
   /**
@@ -105,6 +128,48 @@ public final class FnRandomNumberGenerator extends StandardFunc {
     @Override
     public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
       return copyType(new Next(info, state));
+    }
+  }
+
+  /**
+   * Function returning the next random numbers.
+   */
+  private static final class Take extends FuncItemBody {
+    /** Internal state. */
+    private final long state;
+
+    /**
+     * Constructor.
+     * @param info input info (can be {@code null})
+     * @param state internal state
+     * @param args function arguments
+     */
+    private Take(final InputInfo info, final long state, final Expr... args) {
+      super(info, Types.DOUBLE_ZM, Function.RANDOM_NUMBER_GENERATOR, args);
+      this.state = state;
+    }
+
+    @Override
+    public Iter iter(final QueryContext qc) throws QueryException {
+      final long count = toLong(arg(0).atomItem(qc, info), 0);
+
+      return new Iter() {
+        long s = state, c;
+
+        @Override
+        public Item next() {
+          if(c++ == count) return null;
+          // same sequence as ?number, ?next()?number, ...
+          final long i1 = advance(s);
+          s = advance(i1);
+          return Dbl.get(number(i1, s));
+        }
+      };
+    }
+
+    @Override
+    public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
+      return copyType(new Take(info, state, copyAll(cc, vm, args())));
     }
   }
 }

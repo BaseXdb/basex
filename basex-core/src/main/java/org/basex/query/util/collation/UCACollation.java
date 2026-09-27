@@ -70,17 +70,20 @@ final class UCACollation extends Collation {
     final CollationElementIterator iterC = collator.getCollationElementIterator(contains);
 
     final int elemC = next(iterC);
-    if(elemC == NULLORDER) return 0;
+    if(elemC == NULLORDER) return mode.last() ? string.length() : 0;
     final int offC = iterC.getOffset();
+    int last = -1;
     while(true) {
       // find first equal character
       for(int elemS; (elemS = next(iterS)) != elemC;) {
-        if(elemS == NULLORDER || mode == Mode.STARTS_WITH) return -1;
+        if(elemS == NULLORDER || mode == Mode.STARTS_WITH) return last;
       }
 
       final int offS = iterS.getOffset();
       if(startsWith(iterS, iterC)) {
-        if(mode == Mode.INDEX_AFTER) {
+        if(mode.last()) {
+          last = mode.after() ? iterS.getOffset() : offS - 1;
+        } else if(mode == Mode.INDEX_AFTER) {
           return iterS.getOffset();
         } else if(mode == Mode.ENDS_WITH) {
           if(next(iterS) == NULLORDER) return offS - 1;

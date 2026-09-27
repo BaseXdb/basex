@@ -853,6 +853,19 @@ public final class Token {
   }
 
   /**
+   * Returns the last position of the specified token.
+   * @param token token
+   * @param sub token to be found
+   * @return position, or {@code -1} if token is not found
+   */
+  public static int lastIndexOf(final byte[] token, final byte[] sub) {
+    for(int t = token.length - sub.length; t >= 0; --t) {
+      if(startsWith(token, sub, t)) return t;
+    }
+    return -1;
+  }
+
+  /**
    * Returns the position of the specified token.
    * @param token token
    * @param sub token to be found

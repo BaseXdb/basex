@@ -167,7 +167,9 @@ public enum Records {
     final ShapeType rng = RANDOM_NUMBER_GENERATOR.get();
     rng.add("number", Types.DOUBLE_O).
         add("next", FuncType.get(rng.seqType()).seqType()).
-        add("permute", FuncType.get(Types.ITEM_ZM, Types.ITEM_ZM).seqType());
+        add("permute", FuncType.get(Types.ITEM_ZM, Types.ITEM_ZM).seqType()).
+        add("take", FuncType.get(Types.DOUBLE_ZM, BasicType.NON_NEGATIVE_INTEGER.seqType()).
+            seqType());
 
     final ShapeType stp = SCHEMA_TYPE.get();
     stp.add("name", Types.QNAME_ZO).

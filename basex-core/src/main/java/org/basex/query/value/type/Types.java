@@ -246,6 +246,9 @@ public final class Types {
       G_YEAR, G_YEAR_MONTH, G_MONTH, G_MONTH_DAY, G_DAY);
   /** Zero or one Gregorian. */
   public static final SeqType GREGORIAN_ZO = GREGORIAN.seqType(ZERO_OR_ONE);
+  /** Zero or one Gregorian with year and month. */
+  public static final SeqType YEAR_MONTH_ZO =
+      ChoiceItemType.get(DATE_TIME, DATE, G_YEAR_MONTH).seqType(ZERO_OR_ONE);
 
   // types that instantiate sequence types must be placed last to avoid circular dependencies
 

@@ -25,17 +25,22 @@ final class UnicodeNoCaseCollation extends Collation {
     final int[] stringCps = string.codePoints().toArray();
     final int[] subCps = sub.codePoints().toArray();
     final int tl = stringCps.length, sl = subCps.length;
-    if(sl == 0) return 0;
+    if(sl == 0) return mode.last() ? string.length() : 0;
+    int last = -1;
     if(tl >= sl) {
       for(int t = mode == Mode.ENDS_WITH ? tl - sl : 0; t < tl; t++) {
         for(int s = 0; t + s < tl;) {
           if(compare(stringCps[t + s], subCps[s]) != 0) break;
-          if(++s == sl) return string.offsetByCodePoints(0, mode == Mode.INDEX_AFTER ? t + s : t);
+          if(++s == sl) {
+            last = mode.after() ? t + s : t;
+            if(!mode.last()) return string.offsetByCodePoints(0, last);
+            break;
+          }
         }
         if(mode == Mode.STARTS_WITH) return -1;
       }
     }
-    return -1;
+    return last == -1 ? -1 : string.offsetByCodePoints(0, last);
   }
 
   @Override
