@@ -367,11 +367,11 @@ public final class QueryContext extends Job implements Closeable {
     optimized = true;
 
     run(info.optimizing, () -> {
-      // bind context
+      // bind opened database if it is locked by the query
       final StaticContext sc = main.sc;
       if(parent == null && !bindings.contains(QNm.EMPTY)) {
         final DBNodes nodes = context.current();
-        if(nodes != null) bind(null, resources.compile(nodes), null, sc);
+        if(nodes != null && locked(nodes.data())) bind(null, resources.compile(nodes), null, sc);
       }
       final Value value = bindings.get(QNm.EMPTY);
       if(value != null) {
@@ -466,7 +466,14 @@ public final class QueryContext extends Job implements Closeable {
 
   @Override
   public void addLocks() {
-    final Locks jobLocks = jc().locks;
+    addLocks(jc().locks);
+  }
+
+  /**
+   * Adds the locks of the query.
+   * @param jobLocks locks to be extended
+   */
+  private void addLocks(final Locks jobLocks) {
     final LockVisitor visitor = new LockVisitor(jobLocks, updating, contextValue == null);
 
     // locks in main module (can be null if parsing failed)
@@ -487,6 +494,19 @@ public final class QueryContext extends Job implements Closeable {
       list.addGlobal();
     }
     visitor.finish();
+  }
+
+  /**
+   * Checks if the query locks the specified database.
+   * @param data database
+   * @return result of check
+   */
+  private boolean locked(final Data data) {
+    final Locks lcks = new Locks();
+    addLocks(lcks);
+    final String name = data.meta.name;
+    final LockList reads = lcks.finish(context).reads, writes = lcks.writes;
+    return reads.global() || writes.global() || reads.contains(name) || writes.contains(name);
   }
 
   /**
