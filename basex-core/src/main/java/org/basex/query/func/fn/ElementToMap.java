@@ -153,8 +153,8 @@ public final class ElementToMap {
       try {
         return create(pe, node);
       } catch(final QueryException ex) {
-        // a type error is final; it must not trigger layout fallback
-        if(ex.error() == PLAN_TYPE_X_X) throw ex;
+        // type errors and invalid escaped names are final; they must not trigger layout fallback
+        if(ex.error() == PLAN_TYPE_X_X || ex.error() == INVCODE_X) throw ex;
         Util.debug(ex);
       }
     }
@@ -271,8 +271,9 @@ public final class ElementToMap {
    * @param node node
    * @param attributes attributes of the node
    * @return result of check
+   * @throws QueryException query exception
    */
-  private boolean conflict(final GNode node, final GNodeList attributes) {
+  private boolean conflict(final GNode node, final GNodeList attributes) throws QueryException {
     if(attributes.isEmpty() || "@".equals(plan.marker)) return false;
     final TokenSet names = new TokenSet();
     for(final GNode child : PlanFn.children(Kind.ELEMENT, node)) {
@@ -325,8 +326,9 @@ public final class ElementToMap {
    * @param node node
    * @param parent parent (can be {@code null})
    * @return name
+   * @throws QueryException query exception
    */
-  private byte[] nodeName(final GNode node, final GNode parent) {
+  private byte[] nodeName(final GNode node, final GNode parent) throws QueryException {
     return nodeName(node.qname(), node.kind() == Kind.ELEMENT, parent, plan.marker);
   }
 
@@ -337,22 +339,24 @@ public final class ElementToMap {
    * @param parent parent (can be {@code null})
    * @param marker attribute marker (can be {@code null})
    * @return name
+   * @throws QueryException query exception
    */
   private byte[] nodeName(final QNm qnm, final boolean element, final GNode parent,
-      final String marker) {
+      final String marker) throws QueryException {
+    final byte[] uri = qnm.uri();
+    final byte[] local = plan.escape ? PlanFn.decode(qnm.local(), info) : qnm.local();
     // attributes in the xml namespace are always output with the prefix 'xml'
-    final byte[] name = !element && Token.eq(qnm.uri(), QueryText.XML_URI) ?
-      Token.concat(Token.XML, Token.cpToken(':'), qnm.local()) : switch(plan.name) {
+    final byte[] name = !element && Token.eq(uri, QueryText.XML_URI) ?
+      Token.concat(Token.XML, Token.cpToken(':'), local) : switch(plan.name) {
       case EQNAME ->
-        qnm.uri().length != 0 ? qnm.eqName() : qnm.local();
+        uri.length != 0 ? QNm.eqName(uri, local) : local;
       case LEXICAL ->
-        qnm.string();
+        qnm.hasPrefix() ? Token.concat(qnm.prefix(), Token.cpToken(':'), local) : local;
       case LOCAL ->
-        qnm.local();
+        local;
       default ->
-        (element ? parent == null ? qnm.uri().length == 0 :
-          parent.qname().eqUri(qnm) : qnm.uri().length == 0) ? qnm.local() :
-        qnm.eqName();
+        (element ? parent == null ? uri.length == 0 :
+          parent.qname().eqUri(qnm) : uri.length == 0) ? local : QNm.eqName(uri, local);
     };
     return shared.token(!element && marker != null ? Token.concat(marker, name) : name);
   }

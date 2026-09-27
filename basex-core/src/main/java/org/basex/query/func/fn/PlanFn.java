@@ -37,6 +37,8 @@ public abstract class PlanFn extends StandardFunc {
     public static final ValueOption PLAN = new ValueOption("plan", Types.MAP_ZO);
     /** Option. */
     public static final BooleanOption LIBERAL = new BooleanOption("liberal", false);
+    /** Option. */
+    public static final BooleanOption ESCAPE_NAMES = new BooleanOption("escape-names", false);
   }
 
   /** Resolves the predefined xml prefix. */
@@ -51,6 +53,10 @@ public abstract class PlanFn extends StandardFunc {
   static final Str TARGET = Str.get("#target");
   /** Data string. */
   static final Str DATA = Str.get("#data");
+  /** Start of an escape sequence. */
+  private static final byte[] ESC = Token.token("_x");
+  /** Escaped empty name. */
+  private static final byte[] ESC_EMPTY = Token.token("_x_");
   /** Layout string. */
   private static final Str LAYOUT = Str.get("layout");
   /** Type string. */
@@ -70,6 +76,8 @@ public abstract class PlanFn extends StandardFunc {
     Str content;
     /** Liberal mode: retain values that cannot be cast to a prescribed type. */
     boolean liberal;
+    /** Escape names (SQL/XML). */
+    boolean escape;
   }
 
   /** Name format. */
@@ -227,6 +235,7 @@ public abstract class PlanFn extends StandardFunc {
     plan.marker = options.get(ElementsOptions.ATTRIBUTE_MARKER);
     plan.content = Str.get(options.get(ElementsOptions.CONTENT_KEY));
     plan.liberal = options.get(ElementsOptions.LIBERAL);
+    plan.escape = options.get(ElementsOptions.ESCAPE_NAMES);
 
     final Value pln = options.get(ElementsOptions.PLAN);
     if(!pln.isEmpty()) {
@@ -285,6 +294,83 @@ public abstract class PlanFn extends StandardFunc {
       });
     }
     return plan;
+  }
+
+  /**
+   * Encodes the local part of a map key with SQL/XML name escaping.
+   * @param key key
+   * @param prefixed preserve the prefix of a prefixed name
+   * @return encoded key
+   */
+  static byte[] encode(final byte[] key, final boolean prefixed) {
+    final int kl = key.length;
+    if(kl > 1 && key[0] == 'Q' && key[1] == '{') {
+      final int c = Token.indexOf(key, '}');
+      if(c != -1 && Token.indexOf(key, '{', 2) == -1) {
+        return Token.concat(Token.substring(key, 0, c + 1), encode(Token.substring(key, c + 1)));
+      }
+    }
+    final int c = Token.indexOf(key, ':');
+    if(c != -1 && (prefixed || Token.eq(Token.substring(key, 0, c), Token.XML))) {
+      return Token.concat(Token.substring(key, 0, c + 1), encode(Token.substring(key, c + 1)));
+    }
+    return encode(key);
+  }
+
+  /**
+   * Encodes a local name with SQL/XML name escaping.
+   * @param local local name
+   * @return encoded name
+   */
+  private static byte[] encode(final byte[] local) {
+    final int ll = local.length;
+    if(ll == 0) return ESC_EMPTY;
+    if(XMLToken.isNCName(local) && Token.indexOf(local, ESC) == -1) return local;
+    final TokenBuilder tb = new TokenBuilder(ll);
+    for(int l = 0; l < ll; l += Token.cl(local, l)) {
+      final int cp = Token.cp(local, l);
+      final boolean underscore = cp == '_' && l + 1 < ll && local[l + 1] == 'x';
+      if(!underscore && (l == 0 ? XMLToken.isNCStartChar(cp) : XMLToken.isNCChar(cp))) {
+        tb.add(cp);
+      } else {
+        tb.add(ESC).add(Token.hex(cp, cp > 0xFFFF ? 6 : 4)).add('_');
+      }
+    }
+    return tb.finish();
+  }
+
+  /**
+   * Decodes a local name with SQL/XML name escaping.
+   * @param local local name
+   * @param info input info (can be {@code null})
+   * @return decoded name
+   * @throws QueryException query exception
+   */
+  static byte[] decode(final byte[] local, final InputInfo info) throws QueryException {
+    if(Token.eq(local, ESC_EMPTY)) return Token.EMPTY;
+    if(Token.indexOf(local, ESC) == -1) return local;
+    final int ll = local.length;
+    final TokenBuilder tb = new TokenBuilder(ll);
+    for(int l = 0; l < ll;) {
+      // escape sequence: _x, 4 or 6 hex digits, _
+      if(local[l] == '_' && l + 1 < ll && local[l + 1] == 'x') {
+        int e = l + 2, cp = 0;
+        for(int d; e < ll && e - l - 2 < 6 && (d = Token.dec(local[e])) != -1; e++) {
+          cp = cp << 4 | d;
+        }
+        final int hl = e - l - 2;
+        if((hl == 4 || hl == 6) && e < ll && local[e] == '_') {
+          if(!XMLToken.valid11(cp)) {
+            throw INVCODE_X.get(info, "&#x" + Integer.toHexString(cp) + ';');
+          }
+          tb.add(cp);
+          l = e + 1;
+          continue;
+        }
+      }
+      tb.addByte(local[l++]);
+    }
+    return tb.finish();
   }
 
   /**

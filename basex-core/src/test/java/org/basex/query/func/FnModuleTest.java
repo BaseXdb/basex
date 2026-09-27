@@ -1658,7 +1658,7 @@ public final class FnModuleTest extends SandboxTest {
     // content-key option
     query(func.args(" <price currency='USD'>12.16</price>",
         " { 'attribute-marker': '', 'content-key': 'value' }") + "?price?value", "12.16");
-    // content key clashes with attribute name: entries are combined into an array
+    // content key clashes with attribute name: prepend '#'
     query(func.args(" <a b='1'>x</a>", " { 'attribute-marker': '', 'content-key': 'b' }") +
         "?a?b", "1");
     query(func.args(" <a b='1'>x</a>", " { 'attribute-marker': '', 'content-key': 'b' }") +

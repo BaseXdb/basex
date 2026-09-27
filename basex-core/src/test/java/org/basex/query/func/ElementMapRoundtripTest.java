@@ -128,6 +128,11 @@ public final class ElementMapRoundtripTest extends SandboxTest {
 
   /** Test method. */
   @Test public void markerAndContentKey() {
+    // a content key that clashes with an attribute key is prefixed with '#'
+    roundtrip("<a id='zz'>babel</a>", " { 'content-key': '@id' }");
+    roundtrip("<a b='1'>x</a>", " { 'attribute-marker': '', 'content-key': 'b' }");
+    // the content key does not switch the attribute marker to '@'
+    roundtrip("<a x='1'>t</a>", " { 'attribute-marker': 'v', 'content-key': '@c' }");
     roundtrip("<a x='1'>t</a>", " { 'attribute-marker': ':' }");
     roundtrip("<a x='1'>t</a>", " { 'attribute-marker': '#' }");
     roundtrip("<a x='1'>t</a>", " { 'attribute-marker': 'attr:' }");
@@ -267,8 +272,11 @@ public final class ElementMapRoundtripTest extends SandboxTest {
         INVALIDOPTION_X);
 
     // the wildcard entry is consulted by the reverse conversion as well
-    query("serialize(map-to-element({ 'a': [ '1', '2' ] }, "
-        + "{ 'plan': { '*': { 'layout': 'list', 'child': 'b' } } }))", "<a><b>1</b><b>2</b></a>");
+    query("serialize(map-to-element({ 'a': [ [], [] ] }, "
+        + "{ 'plan': { '*': { 'layout': 'list', 'child': 'b' } } }))", "<a><b/><b/></a>");
+    // list members must match the layout of the child ('*' applies to the children as well)
+    error("map-to-element({ 'a': [ '1', '2' ] }, "
+        + "{ 'plan': { '*': { 'layout': 'list', 'child': 'b' } } })", MAP_TO_ELEMENT_X);
     query("serialize(map-to-element({ 'a': '<b x=\"1\"/>' }, "
         + "{ 'plan': { '*': { 'layout': 'xml' } } }))", "<b x=\"1\"/>");
 
@@ -391,11 +399,40 @@ public final class ElementMapRoundtripTest extends SandboxTest {
     // names
     error("map-to-element({ 'Q{u}': 'x' })", MAP_TO_ELEMENT_X);
     error("map-to-element({ 'xmlns:a': 'x' })", MAP_TO_ELEMENT_X);
+    // namespace declarations and duplicate attributes
+    error("map-to-element({ 'a': { '@xmlns': 'x' } })", MAP_TO_ELEMENT_X);
+    error("map-to-element({ 'a': { '@Q{http://www.w3.org/2000/xmlns/}p': 'x' } })",
+        MAP_TO_ELEMENT_X);
+    error("map-to-element({ 'a': { '@Q{http://www.w3.org/2001/XMLSchema-instance}nil': 'true', "
+        + "'#content': xs:QName('fn:null') } })", MAP_TO_ELEMENT_X);
+    error("map-to-element({ 'Q{http://www.w3.org/2000/xmlns/}a': 'x' })", MAP_TO_ELEMENT_X);
+    // the nilled marker may follow attributes in an array
+    query("map-to-element({ 'a': [ { '@id': '1' }, { '#content': xs:QName('fn:null') } ] })"
+        + "/@*/name() => sort()", "id\nxsi:nil");
+    // unprefixed attribute keys are in no namespace
+    query("map-to-element({ 'Q{u}a': { '@x': '1', 'b': '2' } }) ! "
+        + "(@x/namespace-uri(), *:b/namespace-uri())", "\nu");
+    // plan entries with the layout 'error' are ignored
+    query("serialize(map-to-element({ 'a': 'x' }, { 'plan': { 'a': { 'layout': 'error' } } }))",
+        "<a>x</a>");
+    // the default element namespace is not used for lexical names
+    query("declare default element namespace 'u'; "
+        + "namespace-uri(map-to-element({ 'a': 'x' }, { 'name-format': 'lexical' }))", "");
     query("serialize(map-to-element({ 'Q{}a': 'x' }))", "<a>x</a>");
     query("serialize(map-to-element({ xs:QName('a'): 'x' }))", "<a>x</a>");
     // empty values
     query("serialize(map-to-element({ 'a': [] }))", "<a/>");
+    // an empty array under an element key is the content of a single element
+    query("serialize(map-to-element({ 'a': { 'b': [] } }))", "<a><b/></a>");
+    // the empty sequence is treated as the zero-length string
     query("serialize(map-to-element({ 'a': () }))", "<a/>");
+    query("serialize(map-to-element(parse-json('{ \"a\": { \"b\": null, \"@c\": null } }')))",
+        "<a c=\"\"><b/></a>");
+    query("serialize(map-to-element({ 'a': { '@x': '1', '#content': () } }))", "<a x=\"1\"/>");
+    query("serialize(map-to-element({ 'a': () }, { 'plan': { 'a': { 'layout': 'simple' } } }))",
+        "<a/>");
+    error("map-to-element({ 'a': () }, { 'plan': { 'a': { 'layout': 'record' } } })",
+        MAP_TO_ELEMENT_X);
     query("serialize(map-to-element({ 'a': { 'b': {} } }))", "<a><b/></a>");
     // nilled elements
     query("serialize(map-to-element({ 'a': xs:QName('fn:null') }))",
@@ -405,9 +442,16 @@ public final class ElementMapRoundtripTest extends SandboxTest {
     // xml layout
     error("map-to-element({ 'a': '<b>' }, { 'plan': { 'a': { 'layout': 'xml' } } })",
         MAP_TO_ELEMENT_X);
+    // parsed as by fn:parse-xml: internal DTD subsets are accepted, external entities are not
+    query("serialize(map-to-element({ 'a': '<!DOCTYPE b><b/>' }, "
+        + "{ 'plan': { 'a': { 'layout': 'xml' } } }))", "<b/>");
+    query("serialize(map-to-element({ 'a': '<!DOCTYPE b [<!ENTITY e \"x\">]><b>&amp;e;</b>' }, "
+        + "{ 'plan': { 'a': { 'layout': 'xml' } } }))", "<b>x</b>");
+    error("map-to-element({ 'a': '<!DOCTYPE a [<!ENTITY e SYSTEM \"x.xml\">]><a>&amp;e;</a>' }, "
+        + "{ 'plan': { 'a': { 'layout': 'xml' } } })", MAP_TO_ELEMENT_X);
     error("map-to-element({ 'a': '<!--c-->' }, { 'plan': { 'a': { 'layout': 'xml' } } })",
         MAP_TO_ELEMENT_X);
-    error("map-to-element({ 'a': '<!DOCTYPE b><b/>' }, { 'plan': { 'a': { 'layout': 'xml' } } })",
+    error("map-to-element({ 'a': '<!--c--><b/>' }, { 'plan': { 'a': { 'layout': 'xml' } } })",
         MAP_TO_ELEMENT_X);
     // the xml layout ignores the map key: the serialized name wins
     query("serialize(map-to-element({ 'a': '<b x=\"1\">t</b>' }, "
@@ -446,18 +490,110 @@ public final class ElementMapRoundtripTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void planLayouts() {
+    // an array represents a single child if it matches the layout of the child
+    final String record = "'a': { 'layout': 'record' }, ";
+    roundtrip("<a><b>x<i/></b></a>", " { 'plan': { " + record + "'b': { 'layout': 'mixed' } } }");
+    roundtrip("<a><b>x<i/></b><b>y<i/></b></a>",
+        " { 'plan': { " + record + "'b': { 'layout': 'mixed' } } }");
+    roundtrip("<a><b><c/><d/><c/></b></a>",
+        " { 'plan': { " + record + "'b': { 'layout': 'sequence' } } }");
+    roundtrip("<a><b><c>1</c><c>2</c></b></a>",
+        " { 'plan': { " + record + "'b': { 'layout': 'list', 'child': 'c' } } }");
+    roundtrip("<a><b><c>1</c><c>2</c></b><b><c>3</c></b></a>",
+        " { 'plan': { " + record + "'b': { 'layout': 'list', 'child': 'c' } } }");
+    roundtrip("<a><b x='1'><c>1</c></b><b x='2'><c>2</c></b></a>",
+        " { 'plan': { " + record + "'b': { 'layout': 'list-plus', 'child': 'c' } } }");
+    roundtrip("<a x='1'/>", " { 'plan': { 'a': { 'layout': 'list-plus', 'child': 'c' } } }");
+    roundtrip("<a><b>x<i>y</i></b></a>",
+        " { 'plan': element-to-map-plan(<a><b>x<i>y</i></b></a>) }");
+    // without a plan, the array is interpreted as repeated children
+    serialized("<a><b>x<i>y</i></b></a>", null, "<a><b>x</b><b><i>y</i></b></a>");
+    // the element key of list-plus layout must be the child name of the plan
+    error("map-to-element({ 'a': { '@x': '1', 'c': [ 1 ] } }, "
+        + "{ 'plan': { 'a': { 'layout': 'list-plus', 'child': 'b' } } })", MAP_TO_ELEMENT_X);
+    query("serialize(map-to-element({ 'a': { '@x': '1', 'c': [ 1 ] } }, { 'plan': "
+        + "{ 'a': { 'layout': 'list-plus', 'child': 'b' }, 'c': { 'layout': 'simple' }, "
+        + "'*': { 'layout': 'record' } } }))",
+        "<a x=\"1\"><c>1</c></a>");
+
+    // values produced by the fallback layout are recognized
+    final String list = "'r': { 'layout': 'sequence' }, 'a': { 'layout': 'list', 'child': 'b' }, ";
+    roundtrip("<r><a><b>1</b><b>2</b></a><a>t<b>3</b></a></r>",
+        " { 'plan': { " + list + "'*': { 'layout': 'mixed' } } }");
+    roundtrip("<r><a><b>1</b><b>2</b></a><a>t<b>3</b></a></r>",
+        " { 'plan': { " + list + "'*': { 'layout': 'xml' } } }");
+    roundtrip("<r><a><b>1</b><b>2</b></a><a>t</a></r>",
+        " { 'plan': { " + list + "'*': { 'layout': 'mixed' } } }");
+  }
+
+  /** Test method. */
   @Test public void lenient() {
-    // the reverse conversion infers the layout from the value: a contradicting plan is ignored
-    query("serialize(map-to-element({ 'a': { 'b': '1' } }, "
-        + "{ 'plan': { 'a': { 'layout': 'simple' } } }))", "<a><b>1</b></a>");
-    query("serialize(map-to-element({ 'a': 'x' }, { 'plan': { 'a': { 'layout': 'empty' } } }))",
-        "<a>x</a>");
-    query("serialize(map-to-element({ 'a': 'x' }, { 'plan': { 'a': { 'layout': 'record' } } }))",
-        "<a>x</a>");
-    // an attribute that follows text or child elements in an array is hoisted to the element
-    query("serialize(map-to-element({ 'a': [ 'x', { '@id': '1' } ] }))", "<a id=\"1\">x</a>");
-    query("serialize(map-to-element({ 'a': [ { 'b': 'x' }, { '@id': '1' } ] }))",
-        "<a id=\"1\"><b>x</b></a>");
+    // a value that contradicts the plan is rejected
+    error("map-to-element({ 'a': { 'b': '1' } }, { 'plan': { 'a': { 'layout': 'simple' } } })",
+        MAP_TO_ELEMENT_X);
+    error("map-to-element({ 'a': 'x' }, { 'plan': { 'a': { 'layout': 'empty' } } })",
+        MAP_TO_ELEMENT_X);
+    error("map-to-element({ 'a': 'x' }, { 'plan': { 'a': { 'layout': 'record' } } })",
+        MAP_TO_ELEMENT_X);
+    // ...unless it matches the fallback layout
+    query("serialize(map-to-element({ 'a': 'x' }, { 'plan': { 'a': { 'layout': 'record' }, "
+        + "'*': { 'layout': 'simple' } } }))", "<a>x</a>");
+    // attributes and the nilled marker must precede the other array members
+    error("map-to-element({ 'a': [ 'x', { '@id': '1' } ] })", MAP_TO_ELEMENT_X);
+    error("map-to-element({ 'a': [ { 'b': 'x' }, { '@id': '1' } ] })", MAP_TO_ELEMENT_X);
+    error("map-to-element({ 'a': [ 'x', { '#content': xs:QName('fn:null') } ] })",
+        MAP_TO_ELEMENT_X);
+    error("map-to-element({ 'a': [ { '#content': 'x' } ] })", MAP_TO_ELEMENT_X);
+    query("serialize(map-to-element({ 'a': [ { '@id': '1' }, 'x' ] }))", "<a id=\"1\">x</a>");
+    // values that match no layout are rejected
+    error("map-to-element({ 'a': { '#content': 'x', 'b': 'y' } })", MAP_TO_ELEMENT_X);
+    error("map-to-element({ 'a': [ 1, 2 ] })", MAP_TO_ELEMENT_X);
+    error("map-to-element({ 'a': [ { 'b': 1, 'c': 2 } ] })", MAP_TO_ELEMENT_X);
+    error("map-to-element({ 'a': { 'b': 1 } }, { 'plan': { 'a': { 'layout': 'simple-plus' } } })",
+        MAP_TO_ELEMENT_X);
+    error("map-to-element({ 'a': { 'b': [ 1 ], 'c': [ 2 ] } }, "
+        + "{ 'plan': { 'a': { 'layout': 'list-plus', 'child': 'b' } } })", MAP_TO_ELEMENT_X);
+  }
+
+  /** Test method. */
+  @Test public void escapeNames() {
+    final String options = " { 'escape-names': true() }";
+    // map-to-element: keys that are no valid names are escaped
+    query("serialize(map-to-element({ 'first name': { '@1st': 'a', '$ref': 'b', '': 'c', "
+        + "'_x': 'd', 'a:b': 'e', 'created_at': 'f' } }," + options + "))",
+        "<first_x0020_name _x0031_st=\"a\"><_x0024_ref>b</_x0024_ref><_x_>c</_x_>"
+        + "<_x005F_x>d</_x005F_x><a_x003A_b>e</a_x003A_b><created_at>f</created_at>"
+        + "</first_x0020_name>");
+    error("map-to-element({ 'first name': 'x' })", MAP_TO_ELEMENT_X);
+    // element-to-map: escaped names are decoded
+    query("element-to-map(<a_x0020_b _x0031_='x'><_x_/><_x005F_x0020_/><x_x0zz_/></a_x0020_b>,"
+        + options + ") => serialize({ 'method': 'json' })",
+        "{\"a b\":{\"@1\":\"x\",\"\":\"\",\"_x0020_\":\"\",\"x_x0zz_\":\"\"}}");
+    query("element-to-map(<a_x0020_b/>) => map:keys()", "a_x0020_b");
+    // escaped codepoints must be valid XML characters
+    error("element-to-map(<_x0000_/>," + options + ")", INVCODE_X);
+    error("element-to-map(<a><_xD800_/></a>," + options + ")", INVCODE_X);
+    error("element-to-map(<a _xFFFFFF_='x'/>," + options + ")", INVCODE_X);
+    query("element-to-map(<_x0000_/>) => map:keys()", "_x0000_");
+    // round trips
+    for(final String key : new String[] { "first name", "1f600", "$schema", "", "_", "_x",
+        "_x0020_", "a:b", "b-alert/show", "déjà vu" }) {
+      query("let $map := { 'r': { '" + key + "': 'v', '@" + key + "': 'w' } } "
+          + "return deep-equal($map, element-to-map(map-to-element($map," + options + "),"
+          + options + "))", true);
+    }
+  }
+
+  /** Test method. */
+  @Test public void attributeMarker() {
+    // the forward conversion reverts to '@' if attribute and element names conflict
+    roundtrip("<a x='1'><x>2</x></a>", " { 'attribute-marker': '' }");
+    roundtrip("<a x='1'><vx>2</vx></a>", " { 'attribute-marker': 'v' }");
+    roundtrip("<a x='1'><x>2</x><b y='3'><z/></b></a>", " { 'attribute-marker': '#' }");
+    // the marker is decided per map
+    serialized("<a x='1'><x>2</x><b y='3'/></a>", " { 'attribute-marker': '' }",
+        "<a x=\"1\"><x>2</x><b y=\"3\"/></a>");
   }
 
   /** Test method. */
