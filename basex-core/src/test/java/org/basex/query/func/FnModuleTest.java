@@ -3968,6 +3968,9 @@ return
         + "let $rng := " + func.args() + " "
         + "where $rng?next()?number ne $rng?next()?number "
         + "return error()");
+    // ensure that the generated numbers do not run into a short cycle
+    query("count(distinct-values(fold-left(1 to 50000, " + func.args(1) + ", "
+        + "fn($acc, $i) { head($acc) ! (?next(), ?number), tail($acc) }) => tail()))", 50000);
   }
 
   /** Test method. */
