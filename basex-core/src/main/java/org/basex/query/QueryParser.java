@@ -64,6 +64,13 @@ public class QueryParser extends InputParser {
       ATTRIBUTE, COMMENT, DOCUMENT_NODE, ELEMENT, JNODE, NAMESPACE_NODE, NODE, XNODE,
       SCHEMA_ATTRIBUTE, SCHEMA_ELEMENT, PROCESSING_INSTRUCTION, TEXT, ARRAY, ENUM, FN,
       FUNCTION, IF, ITEM, MAP, RECORD, SWITCH, TYPE, TYPESWITCH);
+  /** Comparison operators. */
+  private static final CmpOp[] CMPOPS = CmpOp.values();
+  /** Axes. */
+  private static final Axis[] AXES = Axis.values();
+  /** Keywords of computed constructors. */
+  private static final String[] COMPKINDS = { DOCUMENT, ELEMENT, ATTRIBUTE, NAMESPACE, TEXT,
+    COMMENT, PROCESSING_INSTRUCTION };
 
   /** Query context. */
   public final QueryContext qc;
@@ -112,10 +119,8 @@ public class QueryParser extends InputParser {
   private String declaration;
   /** XQDoc string of module. */
   private String moduleDoc = "";
-  /** Alternative error (can be {@code null}). */
-  private QueryError alter;
-  /** Alternative position. */
-  private int alterPos;
+  /** Error hint for a keyword that was parsed as a name (can be {@code null}). */
+  private Hint hint;
 
   /**
    * Namespaces of an element constructor.
@@ -123,6 +128,14 @@ public class QueryParser extends InputParser {
    * @param inherited inherited namespaces
    */
   private record ConstrNS(Atts nspaces, Atts inherited) { }
+
+  /**
+   * Error hint for a keyword that was parsed as a name.
+   * @param error error
+   * @param pos query position after the keyword
+   * @param ext error arguments
+   */
+  private record Hint(QueryError error, int pos, Object... ext) { }
 
   /**
    * Type constructor data.
@@ -154,10 +167,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses a main module.
    * Parses the "MainModule" rule.
-   * Parses the "Setter" rule.
-   * Parses the "QueryBody (= Expr)" rule.
    * @return module
    * @throws QueryException query exception
    */
@@ -167,7 +177,7 @@ public class QueryParser extends InputParser {
       versionDecl();
 
       final int p = pos;
-      if(wsConsumeWs(MODULE, null, NAMESPACE)) throw error(MAINMOD);
+      if(wsConsumeWs(MODULE, false, NAMESPACE)) throw error(MAINMOD);
       pos = p;
 
       prolog1();
@@ -176,7 +186,7 @@ public class QueryParser extends InputParser {
 
       localVars.pushContext(false);
       final Expr expr = expr();
-      if(expr == null) throw alterError(EXPREMPTY);
+      if(expr == null) throw hintError(EXPREMPTY);
 
       final VarScope vs = localVars.popContext();
       final MainModule mm = new MainModule(expr, vs, sc);
@@ -192,8 +202,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses a library module.
-   * Parses the "ModuleDecl" rule.
+   * Parses the "LibraryModule" rule.
    * @param root indicates if this library is or is not imported by another module
    * @return module
    * @throws QueryException query exception
@@ -279,10 +288,11 @@ public class QueryParser extends InputParser {
    */
   private void finish(final MainModule mm) throws QueryException {
     if(more()) {
-      if(alter != null) throw alterError(null);
+      if(hint != null) throw hintError(null);
       final String rest = remaining();
       pos++;
-      if(mm == null) throw error(MODEXPR, rest);
+      if(mm == null) throw error(MODEXPR);
+      if(rest.startsWith(";")) throw error(QUERYSEMI);
       throw error(QUERYEND_X, rest);
     }
 
@@ -331,8 +341,8 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Resolves references to named types against the types declared in the current module. References
-   * that cannot be resolved locally are deferred until all modules have been parsed.
+   * Resolves references to named types against the types declared in the current module, and
+   * defers the remaining references until all modules have been parsed.
    * @throws QueryException query exception
    */
   private void resolveTypeRefs() throws QueryException {
@@ -412,7 +422,7 @@ public class QueryParser extends InputParser {
 
     if(qc.contextValue != null) {
       final Expr ctx = qc.contextValue.expr;
-      if(ctx.has(Flag.UPD)) throw error(UPCTX, ctx);
+      if(ctx.has(Flag.UPD)) throw error(UPCTX);
     }
 
     if(qc.updating) {
@@ -501,8 +511,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "Prolog" rule.
-   * Parses the "Setter" rule.
+   * Parses the first part of the "Prolog" rule.
    * @throws QueryException query exception
    */
   private void prolog1() throws QueryException {
@@ -558,7 +567,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "Prolog" rule.
+   * Parses the second part of the "Prolog" rule.
    * @throws QueryException query exception
    */
   private void prolog2() throws QueryException {
@@ -633,7 +642,7 @@ public class QueryParser extends InputParser {
         if(wsConsume("(")) {
           do {
             final Item item = literal(true, false);
-            if(item == null) throw error(ANNVALUE_X, currentAsString());
+            if(item == null) throw error(ANNVALUE_X, found());
             items.add(item);
           } while(wsConsume(","));
           wsCheck(")");
@@ -646,13 +655,13 @@ public class QueryParser extends InputParser {
           // reject unknown annotations with pre-defined namespaces, ignore others
           final byte[] uri = name.uri();
           if(NSGlobal.prefix(uri).length != 0 && !eq(uri, LOCAL_URI, ERROR_URI)) {
-            Object hint = name.string();
+            Object hnt = name.string();
             final Annotation similar = Annotation.similar(name);
             if(similar != null) {
-              hint = QueryError.similar(hint, ai.apply(name.hasPrefix() ?
+              hnt = QueryError.similar(hnt, ai.apply(name.hasPrefix() ?
                 concat(name.prefix(), cpToken(':'), similar.name.local()) : similar.name.local()));
             }
-            throw error(NSGlobal.reserved(uri) ? ANNRESERVED_X : BASEX_ANN1_X, ii, ai.apply(hint));
+            throw error(NSGlobal.reserved(uri) ? ANNRESERVED_X : BASEX_ANN1_X, ii, ai.apply(hnt));
           }
           ann = new Ann(ii, name, items.value());
         } else {
@@ -784,7 +793,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "emptyOrderDecl" rule.
+   * Parses the "EmptyOrderDecl" rule.
    * @return true if declaration was found
    * @throws QueryException query exception
    */
@@ -798,9 +807,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "copyNamespacesDecl" rule.
-   * Parses the "PreserveMode" rule.
-   * Parses the "InheritMode" rule.
+   * Parses the "CopyNamespacesDecl", "PreserveMode" and "InheritMode" rules.
    * @throws QueryException query exception
    */
   private void copyNamespacesDecl() throws QueryException {
@@ -868,8 +875,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "SchemaImport" rule.
-   * Parses the "SchemaPrefix" rule.
+   * Parses the "SchemaImport" and "SchemaPrefix" rules.
    * @throws QueryException query exception
    */
   private void schemaImport() throws QueryException {
@@ -1088,7 +1094,7 @@ public class QueryParser extends InputParser {
     Expr expr = null;
     if(wsConsume(":=")) {
       declaration = string(var.name.varString());
-      expr = check(single(), NOVARDECL);
+      expr = check(single(), NOEXPR);
       declaration = null;
     } else if(!external) {
       throw error(WRONGCHAR_X_X, ":=", found());
@@ -1126,13 +1132,12 @@ public class QueryParser extends InputParser {
   private void functionDecl(final AnnList anns) throws QueryException {
     final InputInfo ii = info();
     final int p = pos;
-    final QNm name = eQName(sc.funcNS, FUNCNAME);
+    final QNm name = eQName(sc.funcNS, FUNCNAME_X);
     if(reserved(name, p)) throw error(RESERVED_X, name.local());
 
     wsCheck("(");
-    if(!anns.contains(Annotation.PRIVATE)) {
-      if(sc.module != null && !eq(name.uri(), sc.module.uri())) throw error(MODULENS_X, name);
-    }
+    if(!anns.contains(Annotation.PRIVATE) && sc.module != null && !eq(name.uri(), sc.module.uri()))
+      throw error(MODULENS_X, name.prefixString());
 
     localVars.pushContext(false);
     final Params params = paramList(true);
@@ -1167,7 +1172,7 @@ public class QueryParser extends InputParser {
    */
   private void typeDecl(final AnnList anns) throws QueryException {
     final InputInfo ii = info();
-    final QNm qn = eQName(sc.elemNsAny ? XS_URI : sc.elemNS, TYPENAME);
+    final QNm qn = eQName(sc.elemNsAny ? XS_URI : sc.elemNS, TYPENAME_X);
     if(declaredTypes.contains(qn)) throw error(DUPLTYPE_X, qn.string());
     if(NSGlobal.reserved(qn.uri())) throw error(TYPERESERVED_X, qn.string());
     wsCheck(AS);
@@ -1181,13 +1186,13 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "NamedShapeTypeDecl" rule.
+   * Parses the "NamedRecordTypeDecl" rule.
    * @param anns annotations
    * @throws QueryException query exception
    */
   private void namedShapeTypeDecl(final AnnList anns) throws QueryException {
     final InputInfo ii = info();
-    final QNm qn = eQName(sc.elemNS, TYPENAME);
+    final QNm qn = eQName(sc.elemNS, TYPENAME_X);
     if(declaredTypes.contains(qn)) throw error(DUPLTYPE_X, qn.string());
     if(NSGlobal.reserved(qn.uri())) throw error(TYPERESERVED_X, qn.string());
     wsCheck("(");
@@ -1230,7 +1235,8 @@ public class QueryParser extends InputParser {
       throws QueryException {
     final TypeDecl td = new TypeDecl(qn, st, refs, declaredTypes);
     if(!anns.contains(Annotation.PRIVATE)) {
-      if(sc.module != null && !eq(qn.uri(), sc.module.uri())) throw error(MODULENS_X, qn);
+      if(sc.module != null && !eq(qn.uri(), sc.module.uri()))
+        throw error(MODULENS_X, qn.prefixString());
       publicTypes.put(qn, td);
       qc.namedTypes.put(qn, td);
     }
@@ -1277,7 +1283,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses a ParamList.
+   * Parses the "ParamList" and "ParamListWithDefaults" rules.
    * @param dflt allow default values
    * @return declared variables
    * @throws QueryException query exception
@@ -1297,7 +1303,7 @@ public class QueryParser extends InputParser {
         // defaults have no access to the focus of the caller (except via fn:current)
         expr = new GlobalFocus(info(), single());
       } else if(defaults) {
-        throw error(PARAMOPTIONAL_X, name);
+        throw error(PARAMOPTIONAL_X, name.varString());
       }
       params.add(name, type, expr, ii);
     } while(consume(','));
@@ -1327,12 +1333,12 @@ public class QueryParser extends InputParser {
     final Expr expr = single();
     if(expr == null) {
       if(more()) return null;
-      throw alterError(NOEXPR);
+      throw hintError(NOEXPR);
     }
 
     if(!wsConsume(",")) return expr;
     final ExprList el = new ExprList().add(expr);
-    do add(el, single()); while(wsConsume(","));
+    do el.add(operand(single(), ",")); while(wsConsume(","));
     return new List(info(), el.finish());
   }
 
@@ -1342,7 +1348,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr single() throws QueryException {
-    alter = null;
+    hint = null;
     Expr expr = flwor();
     if(expr == null) expr = quantified();
     if(expr == null) expr = switchh();
@@ -1360,20 +1366,19 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "FLWORExpr" rule.
-   * Parses the "WhereClause" rule.
-   * Parses the "WhileClause" rule.
-   * Parses the "TraceClause" rule.
-   * Parses the "OrderByClause" rule.
-   * Parses the "OrderSpecList" rule.
-   * Parses the "GroupByClause" rule.
+   * Parses the "FLWORExpr" rule and its "IntermediateClause" and "ReturnClause" rules.
    * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr flwor() throws QueryException {
     final int s = localVars.openScope();
     final LinkedList<Clause> clauses = initialClause(null);
-    if(clauses == null) return null;
+    if(clauses == null) {
+      final int p = pos;
+      if(current('r') && wsConsumeWs(RETURN)) addHint(UNEXPRETURN);
+      pos = p;
+      return null;
+    }
 
     final TokenObjectMap<Var> curr = new TokenObjectMap<>();
     for(final Clause clause : clauses)
@@ -1390,24 +1395,20 @@ public class QueryParser extends InputParser {
       } while(size < clauses.size());
 
       if(wsConsumeWs(WHERE)) {
-        alterPos = pos;
-        clauses.add(new Where(check(single(), NOWHERE), info()));
+        clauses.add(new Where(operand(single(), WHERE), info()));
       }
 
       if(wsConsumeWs(WHILE)) {
-        alterPos = pos;
-        clauses.add(new While(check(single(), NOWHILE), info()));
+        clauses.add(new While(operand(single(), WHILE), info()));
       }
 
       if(wsConsumeWs(TRACE)) {
-        alterPos = pos;
-        clauses.add(new Trace(check(single(), NOTRACE), info()));
+        clauses.add(new Trace(operand(single(), TRACE), info()));
       }
 
       if(wsConsumeWs(GROUP)) {
         wsCheck(BY);
         skipWs();
-        alterPos = pos;
         final GroupSpec[] specs = groupSpecs(clauses);
 
         // find all non-grouping variables that aren't shadowed
@@ -1439,7 +1440,6 @@ public class QueryParser extends InputParser {
       if(stable) wsCheck(ORDER);
       if(stable || wsConsumeWs(ORDER)) {
         wsCheck(BY);
-        alterPos = pos;
         OrderKey[] keys = null;
         do {
           final OrderKey key = orderSpec();
@@ -1452,16 +1452,16 @@ public class QueryParser extends InputParser {
         clauses.add(new OrderBy(vs, keys, keys[0].info()));
       }
 
-      if(wsConsumeWs(COUNT, NOCOUNT, "$")) {
+      if(wsConsumeWs(COUNT, true, "$")) {
         final Var var = localVars.add(newVar(Types.INTEGER_O));
         curr.put(var.name.unique(), var);
         clauses.add(new Count(var));
       }
     } while(size < clauses.size());
 
-    if(!wsConsumeWs(RETURN)) throw alterError(FLWORRETURN);
+    if(!wsConsumeWs(RETURN)) throw hintError(FLWORRETURN);
 
-    final Expr rtrn = check(single(), NORETURN);
+    final Expr rtrn = operand(single(), RETURN);
     localVars.closeScope(s);
 
     return new GFLWOR(clauses.peek().info(), clauses, rtrn);
@@ -1476,13 +1476,13 @@ public class QueryParser extends InputParser {
   private LinkedList<Clause> initialClause(final LinkedList<Clause> clauses) throws QueryException {
     LinkedList<Clause> cls = clauses;
     // WindowClause
-    if(wsConsumeWs(FOR, NOWINDOW, SLIDING, TUMBLING)) {
+    if(wsConsumeWs(FOR, false, SLIDING, TUMBLING)) {
       if(cls == null) cls = new LinkedList<>();
       cls.add(windowClause());
     } else {
       // ForClause / LetClause
-      final boolean lt = wsConsumeWs(LET, NOLET, "$", SCORE);
-      final boolean fr = !lt && wsConsumeWs(FOR, NOFOR, "$", MEMBER, KEY, VALUEE);
+      final boolean lt = wsConsumeWs(LET, true, "$", SCORE);
+      final boolean fr = !lt && wsConsumeWs(FOR, true, "$", MEMBER, KEY, VALUEE);
       if(lt || fr) {
         if(cls == null) cls = new LinkedList<>();
         if(lt) letClause(cls);
@@ -1493,8 +1493,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "ForClause" rule.
-   * Parses the "PositionalVar" rule.
+   * Parses the "ForClause" and "PositionalVar" rules.
    * @param clauses list of clauses
    * @throws QueryException query exception
    */
@@ -1510,7 +1509,7 @@ public class QueryParser extends InputParser {
       final Var score = wsConsumeWs(SCORE) ? newVar(Types.DOUBLE_O) : null;
       wsCheck(IN);
       final InputInfo ii = info();
-      final Expr expr = check(single(), NOVARDECL);
+      final Expr expr = check(single(), NOEXPR);
 
       // declare variables after the expression, check for duplicates
       final QNmSet names = new QNmSet();
@@ -1563,8 +1562,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "LetClause" rule.
-   * Parses the "FTScoreVar" rule.
+   * Parses the "LetClause" and "FTScoreVar" rules.
    * @param clauses list of clauses
    * @throws QueryException query exception
    */
@@ -1596,14 +1594,12 @@ public class QueryParser extends InputParser {
       throws QueryException {
 
     wsCheck(":=");
-    final Expr expr = check(single(), NOVARDECL);
+    final Expr expr = check(single(), NOEXPR);
     clauses.add(new Let(localVars.add(var), expr, score));
   }
 
   /**
-   * Parses the "LetSequenceBinding" rule.
-   * Parses the "LetArrayBinding" rule.
-   * Parses the "LetMapBinding" rule.
+   * Parses the "LetSequenceBinding", "LetArrayBinding" and "LetMapBinding" rules.
    * @param ii input info
    * @param clauses list of clauses
    * @throws QueryException query exception
@@ -1629,7 +1625,7 @@ public class QueryParser extends InputParser {
     final Var struct = new Var(vrs.getLast().name, st, qc, ii);
 
     wsCheck(":=");
-    clauses.add(new Let(localVars.add(struct), check(single(), NOVARDECL)));
+    clauses.add(new Let(localVars.add(struct), check(single(), NOEXPR)));
     final VarRef seqRef = new VarRef(ii, struct);
     int i = 0;
     for(final Var var : vrs) {
@@ -1651,8 +1647,7 @@ public class QueryParser extends InputParser {
   private record LetStructBinding(char endCp, SeqType type) { }
 
   /**
-   * Parses the "TumblingWindowClause" rule.
-   * Parses the "SlidingWindowClause" rule.
+   * Parses the "TumblingWindowClause" and "SlidingWindowClause" rules.
    * @return window clause
    * @throws QueryException query exception
    */
@@ -1663,7 +1658,7 @@ public class QueryParser extends InputParser {
 
     final Var var = newVar();
     wsCheck(IN);
-    final Expr expr = check(single(), NOVARDECL);
+    final Expr expr = check(single(), NOEXPR);
 
     // WindowStartCondition
     final Condition start = wsConsume(START) ? windowCond(true) :
@@ -1696,14 +1691,13 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "OrderSpec" rule.
-   * Parses the "OrderModifier" rule.
+   * Parses the "OrderSpec" and "OrderModifier" rules.
    * Empty order specs are ignored, {@code order} is then returned unchanged.
    * @return new order key
    * @throws QueryException query exception
    */
   private OrderKey orderSpec() throws QueryException {
-    final Expr expr = check(single(), ORDERBY);
+    final Expr expr = operand(single(), "order by");
 
     boolean desc = false;
     if(!wsConsumeWs(ASCENDING)) desc = wsConsumeWs(DESCENDING);
@@ -1731,7 +1725,7 @@ public class QueryParser extends InputParser {
       final boolean checksType = var.declType != null;
       if(checksType || wsConsume(":=")) {
         if(checksType) wsCheck(":=");
-        by = check(single(), NOVARDECL);
+        by = check(single(), NOEXPR);
       } else {
         final VarRef ref = localVars.resolveLocal(var.name, var.info);
         // the grouping variable has to be declared by the same FLWOR expression
@@ -1783,8 +1777,8 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr quantified() throws QueryException {
-    final boolean some = wsConsumeWs(SOME, NOSOME, "$");
-    final boolean every = !some && wsConsumeWs(EVERY, NOSOME, "$");
+    final boolean some = wsConsumeWs(SOME, true, "$");
+    final boolean every = !some && wsConsumeWs(EVERY, true, "$");
     if(!some && !every) return null;
 
     final int s = localVars.openScope();
@@ -1812,7 +1806,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr switchh() throws QueryException {
-    if(!wsConsumeWs(SWITCH, NOSWITCH, "(", "{", CASE)) return null;
+    if(!wsConsumeWs(SWITCH, true, "(", "{", CASE)) return null;
 
     final InputInfo ii = info();
     check('(');
@@ -1846,7 +1840,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr typeswitch() throws QueryException {
-    if(!wsConsumeWs(TYPESWITCH, NOTYPESWITCH, "(")) return null;
+    if(!wsConsumeWs(TYPESWITCH, true, "(")) return null;
     final InputInfo ii = info();
     check('(');
     final Expr ts = check(expr(), NOTYPESWITCH);
@@ -1892,7 +1886,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr iff() throws QueryException {
-    if(!wsConsumeWs(IF, IFPAR, "(")) return null;
+    if(!wsConsumeWs(IF, true, "(")) return null;
 
     final LinkedList<InputInfo> infos = new LinkedList<>();
     infos.add(info());
@@ -1901,6 +1895,8 @@ public class QueryParser extends InputParser {
       list.add(check(single(), NOIF));
       if(wsConsumeWs(ELSE)) list.add(check(single(), NOIF));
     } else {
+      skipWs();
+      if(!current('{')) throw error(NOTHEN_X, found());
       list.add(enclosedExpr());
       while(wsConsume(ELSE)) {
         if(!wsConsume(IF)) {
@@ -1942,7 +1938,7 @@ public class QueryParser extends InputParser {
 
     final InputInfo ii = info();
     final ExprList el = new ExprList(2).add(expr);
-    do add(el, and()); while(wsConsumeWs(OR));
+    do el.add(operand(and(), OR)); while(wsConsumeWs(OR));
     return new Or(ii, el.finish());
   }
 
@@ -1953,11 +1949,13 @@ public class QueryParser extends InputParser {
    */
   private Expr and() throws QueryException {
     final Expr expr = comparison();
+    skipWs();
+    if(expr != null && consume("&&")) throw error(UNKNOWNOP_X_X, "&&", "'and'");
     if(!wsConsumeWs(AND)) return expr;
 
     final InputInfo ii = info();
     final ExprList el = new ExprList(2).add(expr);
-    do add(el, comparison()); while(wsConsumeWs(AND));
+    do el.add(operand(comparison(), AND)); while(wsConsumeWs(AND));
     return new And(ii, el.finish());
   }
 
@@ -1969,21 +1967,27 @@ public class QueryParser extends InputParser {
   private Expr comparison() throws QueryException {
     final Expr expr = ftContains();
     if(expr != null) {
-      for(final CmpOp op : CmpOp.values()) {
+      skipWs();
+      final int cp = current();
+      if(!XMLToken.isNCStartChar(cp) && cp != '=' && cp != '!' && cp != '<' && cp != '>') {
+        return expr;
+      }
+      for(final CmpOp op : CMPOPS) {
         if(wsConsumeWs(op.toValueString())) {
-          return new CmpV(info(), expr, check(ftContains(), CMPEXPR), op);
+          return new CmpV(info(), expr, operand(ftContains(), op.toValueString()), op);
         }
       }
-      for(final CmpOp op : CmpOp.values()) {
+      for(final CmpOp op : CMPOPS) {
         for(final String name : op.nodes) {
-          if(wsConsumeWs(name)) return new CmpN(info(), expr, check(ftContains(), CMPEXPR), op);
+          if(wsConsumeWs(name)) return new CmpN(info(), expr, operand(ftContains(), name), op);
         }
       }
-      for(final CmpOp op : CmpOp.values()) {
+      for(final CmpOp op : CMPOPS) {
         if(wsConsume(op.toString())) {
           if(op == CmpOp.LT && current('?')) throw error(CMPEXPR); // longest token rule asks for <?
+          if(op == CmpOp.EQ && current('=')) throw error(UNKNOWNOP_X_X, "==", "'=' or 'eq'");
           skipWs();
-          return new CmpG(info(), expr, check(ftContains(), CMPEXPR), op);
+          return new CmpG(info(), expr, operand(ftContains(), op.toString()), op);
         }
       }
     }
@@ -2021,7 +2025,7 @@ public class QueryParser extends InputParser {
     final Expr expr = stringConcat();
     if(expr == null || !wsConsumeWs(OTHERWISE)) return expr;
     final ExprList el = new ExprList().add(expr);
-    do add(el, stringConcat()); while(wsConsume(OTHERWISE));
+    do el.add(operand(stringConcat(), OTHERWISE)); while(wsConsume(OTHERWISE));
     return new Otherwise(info(), el.finish());
   }
 
@@ -2035,7 +2039,7 @@ public class QueryParser extends InputParser {
     if(expr == null || !consume("||")) return expr;
 
     final ExprList el = new ExprList().add(expr);
-    do add(el, range()); while(wsConsume("||"));
+    do el.add(operand(range(), "||")); while(wsConsume("||"));
     return new Concat(info(), el.finish());
   }
 
@@ -2047,7 +2051,7 @@ public class QueryParser extends InputParser {
   private Expr range() throws QueryException {
     final Expr expr = additive();
     if(!wsConsumeWs(TO)) return expr;
-    return new Range(info(), expr, check(additive(), INCOMPLETE));
+    return new Range(info(), expr, operand(additive(), TO));
   }
 
   /**
@@ -2061,7 +2065,7 @@ public class QueryParser extends InputParser {
       final Calc c = next() != ':' && consume('+') ? Calc.ADD :
         next() != '>' && consume('-') ? Calc.SUBTRACT : null;
       if(c == null) break;
-      expr = new Arith(info(), expr, check(multiplicative(), CALCEXPR), c);
+      expr = new Arith(info(), expr, operand(multiplicative(), c.toString()), c);
     }
     return expr;
   }
@@ -2079,7 +2083,7 @@ public class QueryParser extends InputParser {
         wsConsumeWs(IDIV) ? Calc.DIVIDEINT :
         wsConsumeWs(MOD) ? Calc.MODULO : null;
       if(c == null) break;
-      expr = new Arith(info(), expr, check(union(), CALCEXPR), c);
+      expr = new Arith(info(), expr, operand(union(), c.toString()), c);
     }
     return expr;
   }
@@ -2148,7 +2152,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "IntersectExceptExpr" rule.
+   * Creates an intersect or except expression.
    * @param intersect intersect flag
    * @param el expression list
    * @return expression
@@ -2246,7 +2250,7 @@ public class QueryParser extends InputParser {
     if(expr != null) {
       if(wsConsumeWs("->")) {
         final ExprList el = new ExprList(expr);
-        do add(el, arrow()); while(wsConsumeWs("->"));
+        do el.add(operand(arrow(), "->")); while(wsConsumeWs("->"));
         return new Pipeline(info(), el.finish());
       }
     }
@@ -2275,11 +2279,13 @@ public class QueryParser extends InputParser {
         } else {
           ex = mapConstructor();
           if(ex == null) ex = arrayConstructor();
-          if(ex == null) ex = functionItem();
+          if(ex == null) ex = inlineFunction();
           if(ex == null) {
             final int p = pos;
             name = eQName(null, ARROWSPEC_X);
-            if(reserved(name, p)) throw error(RESERVED_X, name.local());
+            ex = functionRef(name, p);
+            if(ex != null) name = null;
+            else if(reserved(name, p)) throw error(RESERVED_X, name.local());
           }
         }
         final InputInfo ii = info();
@@ -2406,7 +2412,7 @@ public class QueryParser extends InputParser {
         final String key = string(uc(name.local()));
         final MainOptions mopts = qc.context.options;
         final Option<?> option = mopts.option(key);
-        if(option == null) throw error(BASEX_OPTIONSINV_X, mopts.similar(key));
+        if(option == null) throw error(BASEX_OPTIONS_X, mopts.similar(key));
         el.add(new DBPragma(name, option, value));
       } else if(eq(name.prefix(), BASEX_PREFIX)) {
         // project-specific declaration
@@ -2418,7 +2424,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "ItemMapExpr" rule.
+   * Parses the "SimpleMapExpr" rule.
    * @return query expression or {@code null}
    * @throws QueryException query exception
    */
@@ -2428,7 +2434,7 @@ public class QueryParser extends InputParser {
       final int next = next();
       if(next != '=' && next != '!' && wsConsumeWs("!")) {
         final ExprList el = new ExprList().add(expr);
-        do add(el, path()); while(next() != '=' && wsConsumeWs("!"));
+        do el.add(operand(path(), "!")); while(next() != '=' && wsConsumeWs("!"));
         return new CachedMap(info(), el.finish());
       }
     }
@@ -2581,17 +2587,18 @@ public class QueryParser extends InputParser {
         throw error(NOATTNAME);
       }
     } else {
-      for(final Axis ax : Axis.values()) {
-        final int p = pos;
-        if(wsConsume(ax.name)) {
-          if(wsConsumeWs("::")) {
-            alterPos = pos;
-            axis = ax;
-            test = nodeTest(axis);
-            if(test == null) throw error(AXISMISS_X, axis);
-            break;
+      if(XMLToken.isNCStartChar(current())) {
+        for(final Axis ax : AXES) {
+          final int p = pos;
+          if(wsConsume(ax.name)) {
+            if(wsConsumeWs("::")) {
+              axis = ax;
+              test = nodeTest(axis);
+              if(test == null) throw error(AXISMISS_X, axis);
+              break;
+            }
+            pos = p;
           }
-          pos = p;
         }
       }
       if(axis == null) {
@@ -2624,7 +2631,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the NodeTest rule.
+   * Parses the "NodeTest" rule.
    * @param axis axis
    * @return test or selector, or {@code null}
    * @throws QueryException query exception
@@ -2655,9 +2662,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "SimpleNodeTest" rule.
-   * Parses the "NameTest" rule.
-   * Parses the "KindTest" rule.
+   * Parses the "SimpleNodeTest" and "NameTest" rules.
    * @param kind node kind ({@link Kind#ELEMENT}, {@link Kind#ATTRIBUTE}, or
    *   {@code null} for catch clause))
    * @param all check all tests, or only names
@@ -2754,7 +2759,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "Lookup" rule.
+   * Parses the "Lookup" and "UnaryLookup" rules.
    * @param expr expression (can be {@code null})
    * @return query expression or {@code null}
    * @throws QueryException query exception
@@ -2764,7 +2769,12 @@ public class QueryParser extends InputParser {
     if(consume('?') && !wsConsume(",") && !consume(")")) {
       final InputInfo info = info();
       final Expr ctx = expr != null ? expr : new ContextValue(info);
-      return new Lookup(info, ctx, keySpecifier());
+      final Expr lookup = new Lookup(info, ctx, keySpecifier());
+      // hint for a conditional expression written as 'condition ? then : else'
+      final int p2 = pos;
+      if(wsConsume(":") && !current(':') && !current('=')) hint = new Hint(QUERYCOLON, pos);
+      pos = p2;
+      return lookup;
     }
     pos = p;
     return null;
@@ -2794,9 +2804,6 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "PrimaryExpr" rule.
-   * Parses the "VarRef" rule.
-   * Parses the "ContextItem" rule.
-   * Parses the "Literal" rule.
    * @return query expression or {@code null}
    * @throws QueryException query exception
    */
@@ -2809,9 +2816,11 @@ public class QueryParser extends InputParser {
     if(cp == '(') return parenthesized();
     if(cp == '$') return varRef();
     if(cp == '.' && !digit(next())) return contextValue();
-    if(wsConsumeWs(ORDERED, null, "{") || wsConsumeWs(UNORDERED, null, "{")) return enclosedExpr();
+    if(wsConsumeWs(ORDERED, false, "{") || wsConsumeWs(UNORDERED, false, "{")) {
+      return enclosedExpr();
+    }
 
-    Expr expr = functionItem();
+    Expr expr = inlineFunction();
     if(expr == null) expr = functionCall();
     if(expr == null) expr = compConstructor();
     if(expr == null) expr = mapConstructor();
@@ -2842,7 +2851,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "ContextValue" rule.
+   * Parses the "ContextValueRef" rule.
    * @return expression or {@code null}
    * @throws QueryException query exception
    */
@@ -2853,12 +2862,12 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Returns a map constructor.
+   * Parses the "MapConstructor" rule.
    * @return map constructor or {@code null}
    * @throws QueryException query exception
    */
   private CMap mapConstructor() throws QueryException {
-    if(wsConsumeWs(MAP, MAPCONSTR, "{") || current('{')) {
+    if(wsConsumeWs(MAP, true, "{") || current('{')) {
       check('{');
       final InputInfo info = info();
       final ExprList el = new ExprList();
@@ -2882,12 +2891,12 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Returns an array constructor.
+   * Parses the "ArrayConstructor" rule.
    * @return array constructor or {@code null}
    * @throws QueryException query exception
    */
   private Expr arrayConstructor() throws QueryException {
-    if(wsConsumeWs(ARRAY, ARRAYCONSTR, "{")) {
+    if(wsConsumeWs(ARRAY, true, "{")) {
       check('{');
       final Expr expr = expr();
       wsCheck("}");
@@ -2908,20 +2917,19 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "FunctionItemExpr" rule.
-   * Parses the "NamedFunctionRef" rule.
-   * Parses the "LiteralFunctionItem" rule.
-   * Parses the "InlineFunction" rule.
+   * Parses the "InlineFunctionExpr" rule.
    * @return function item or {@code null}
    * @throws QueryException query exception
    */
-  private Expr functionItem() throws QueryException {
+  private Expr inlineFunction() throws QueryException {
     skipWs();
 
     // inline function
     final int p = pos;
     final AnnList anns = annotations(false).check(false, true);
-    if(wsConsume(FUNCTION) || wsConsume(FN)) {
+    final String keyword = wsConsume(FUNCTION) ? FUNCTION : wsConsume(FN) ? FN : null;
+    if(keyword != null) {
+      final boolean word = !XMLToken.isNCChar(current());
       final boolean args = wsConsume("("), focus = !args && current('{');
       if(args || focus) {
         final HashMap<Var, Expr> global = localVars.pushContext(true);
@@ -2942,15 +2950,25 @@ public class QueryParser extends InputParser {
           throw error(NOVISALLOWED);
         return new Closure(info(), expr, params, anns, vs, global);
       }
+      if(word) addHint(EXPECTAFTER_X_X, "'(' or '{'", keyword);
     }
     pos = p;
 
     // annotations not allowed here
     if(!anns.isEmpty()) throw error(NOANN);
+    return null;
+  }
 
-    // named function reference
-    final QNm name = eQName(null, null);
-    if(name != null && wsConsumeWs("#")) {
+  /**
+   * Parses the "NamedFunctionRef" rule.
+   * @param name parsed function name
+   * @param p position of the first character of the name
+   * @return function item or {@code null}
+   * @throws QueryException query exception
+   */
+  private Expr functionRef(final QNm name, final int p) throws QueryException {
+    final int n = pos;
+    if(wsConsumeWs("#")) {
       final Expr num = numericLiteral(Integer.MAX_VALUE, false, false);
       if(reserved(name, p)) {
         if(num != null) throw error(RESERVED_X, name.local());
@@ -2960,12 +2978,12 @@ public class QueryParser extends InputParser {
         return qc.functions.newRef(() -> Functions.item(name, i, false, info, qc));
       }
     }
-    pos = p;
+    pos = n;
     return null;
   }
 
   /**
-   * Parses the "Constant" and "Literal" rule.
+   * Parses the "Literal" and "Constant" rules.
    * @param cnstnt parse additional constants; return error for an invalid range
    * @param dummy return {@link Dbl#NEGATIVE_ZERO} for an invalid range
    * @return query expression or {@code null}
@@ -2990,8 +3008,6 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "NumericLiteral" rule.
-   * Parses the "DecimalLiteral" rule.
-   * Parses the "IntegerLiteral" rule.
    * @param max maximum value for integers (if 0, parse all numeric types)
    * @param mns parse minus character
    * @param dummy return {@link Dbl#NEGATIVE_ZERO} for an invalid range
@@ -3178,7 +3194,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses a variable reference.
+   * Parses the "VarRef" rule.
    * @return variable reference
    * @throws QueryException query exception
    */
@@ -3207,9 +3223,11 @@ public class QueryParser extends InputParser {
   private Expr functionCall() throws QueryException {
     final int p = pos;
     final QNm name = eQName(null, null);
-    if(name != null && !reserved(name, p)) {
+    if(name != null) {
+      final Expr ref = functionRef(name, p);
+      if(ref != null) return ref;
       skipWs();
-      if(current('(')) {
+      if(current('(') && !reserved(name, p)) {
         final FuncBuilder fb = argumentList(true, null);
         return qc.functions.newRef(() -> Functions.get(name, fb, qc));
       }
@@ -3310,8 +3328,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "DirElemConstructor" rule.
-   * Parses the "DirAttributeList" rules.
+   * Parses the "DirElemConstructor" and "DirAttributeList" rules.
    * @param root root call
    * @return query expression or {@code null}
    * @throws QueryException query exception
@@ -3415,7 +3432,7 @@ public class QueryParser extends InputParser {
       final int as = atts.size();
       for(int a = 0; a < as - 1; a++) {
         for(int b = a + 1; b < as; b++) {
-          if(atts.get(a).eq(atts.get(b))) throw error(ATTDUPL_X, atts.get(a));
+          if(atts.get(a).eq(atts.get(b))) throw error(ATTDUPL_X, atts.get(a).prefixString());
         }
       }
     }
@@ -3827,13 +3844,12 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "DirPIConstructor" rule.
-   * Parses the "DirPIContents" rule.
+   * Parses the "DirPIConstructor" and "DirPIContents" rules.
    * @return query expression
    * @throws QueryException query exception
    */
   private Expr dirPI() throws QueryException {
-    final byte[] name = ncName(NOPINAME, false);
+    final byte[] name = ncName(NONCNAME_X, false);
     if(eq(lc(name), XML)) throw error(PIXML_X, name);
 
     final boolean space = skipWs();
@@ -3874,20 +3890,31 @@ public class QueryParser extends InputParser {
    */
   private Expr compConstructor() throws QueryException {
     final int p = pos;
-    final Expr expr = wsConsumeWs(DOCUMENT) ? compDoc() :
-      wsConsumeWs(ELEMENT) ? compElement() :
-      wsConsumeWs(ATTRIBUTE) ? compAttribute() :
-      wsConsumeWs(NAMESPACE) ? compNamespace() :
-      wsConsumeWs(TEXT) ? compText() :
-      wsConsumeWs(COMMENT) ? compComment() :
-      wsConsumeWs(PROCESSING_INSTRUCTION) ? compPI() : null;
-    if(expr == null) pos = p;
-    return expr;
+    for(int c = 0; c < COMPKINDS.length; c++) {
+      final String kind = COMPKINDS[c];
+      if(!wsConsumeWs(kind)) continue;
+      final int k = pos;
+      final Expr expr = switch(c) {
+        case 0 -> compDoc();
+        case 1 -> compElement();
+        case 2 -> compAttribute();
+        case 3 -> compNamespace();
+        case 4 -> compText();
+        case 5 -> compComment();
+        default -> compPI();
+      };
+      if(expr != null) return expr;
+      pos = k;
+      final boolean named = c == 1 || c == 2 || c == 3 || c == 6;
+      addHint(EXPECTAFTER_X_X, named ? "name and '{'" : "'{'", kind);
+      break;
+    }
+    pos = p;
+    return null;
   }
 
   /**
    * Parses the "CompElemConstructor" rule.
-   * Parses the "ContextExpr" rule.
    * @return query expression or {@code null}
    * @throws QueryException query exception
    */
@@ -3939,7 +3966,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses a computed name.
+   * Parses the "CompNodeName" and "CompNodeNCName" rules.
    * @param error error message
    * @param qname QName or NCName
    * @param ns default namespace (can be {@code null})
@@ -4002,7 +4029,7 @@ public class QueryParser extends InputParser {
       // choice item type, e.g. (xs:date | xs:dateTime)
       type = choiceItemType().type;
     } else {
-      final QNm name = eQName(null, TYPEINVALID);
+      final QNm name = eQName(null, TYPEINVALID_X);
       final byte[] local = name.hasURI() ? null : name.local();
       final Type ft = FuncType.get(name);
       if(eq(local, token(ENUM))) {
@@ -4071,19 +4098,19 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "SequenceType" rule.
-   * Parses the "OccurrenceIndicator" rule.
-   * Parses the "KindTest" rule.
+   * Parses the "SequenceType" and "OccurrenceIndicator" rules.
    * @return sequence type
    * @throws QueryException query exception
    */
   private SeqType sequenceType() throws QueryException {
     // empty sequence
-    if(wsConsumeWs(EMPTY_SEQUENCE, INCOMPLETE, "(")) {
+    final int p = pos;
+    if(wsConsumeWs(EMPTY_SEQUENCE) && !current(':')) {
       wsCheck("(");
       wsCheck(")");
       return Types.EMPTY_SEQUENCE_Z;
     }
+    pos = p;
 
     // parse item type and occurrence indicator
     final SeqType st = itemType();
@@ -4096,7 +4123,6 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "ItemType" rule.
-   * Parses the "ParenthesizedItemType" rule.
    * @return item type
    * @throws QueryException query exception
    */
@@ -4110,7 +4136,7 @@ public class QueryParser extends InputParser {
     SeqType st = null;
     Type type;
     boolean function = false;
-    final QNm name = eQName(null, TYPEINVALID);
+    final QNm name = eQName(null, TYPEINVALID_X);
     final byte[] local = name.hasURI() ? null : name.local();
     if(eq(local, token(ENUM))) {
       // enumeration
@@ -4254,7 +4280,7 @@ public class QueryParser extends InputParser {
         skipWs();
         if(current('$')) {
           final QNm qnm = varName();
-          if(!names.add(qnm)) throw FUNCDUPL_X.get(info(), qnm);
+          if(!names.add(qnm)) throw FUNCDUPL_X.get(info(), qnm.varString());
           wsCheck(AS);
         }
         args = Array.add(args, sequenceType());
@@ -4266,7 +4292,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "KindTest" rule without the type name and the opening bracket.
+   * Parses the "XNodeType" rule without the leading keyword and the opening bracket.
    * @param kind node kind
    * @return test
    * @throws QueryException query exception
@@ -4284,7 +4310,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "DocumentTest" rule without the leading keyword and its brackets.
+   * Parses the "DocumentNodeType" rule without the leading keyword and its brackets.
    * @return test or {@code null}
    * @throws QueryException query exception
    */
@@ -4304,7 +4330,8 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "ElementTest" rule without the leading keyword and its brackets.
+   * Parses the "SchemaElementNodeType" and "SchemaAttributeNodeType" rules without the leading
+   * keyword and its brackets.
    * @return error (not supported)
    * @throws QueryException query exception
    */
@@ -4313,8 +4340,8 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "ElementTest" and "AttributeTest" rule without the leading keyword and brackets.
-   * Parses the "TypeName" rule.
+   * Parses the "ElementNodeType", "AttributeNodeType" and "TypeName" rules without the leading
+   * keyword and its brackets.
    * @param kind node kind ({@link Kind#ELEMENT} or {@link Kind#ATTRIBUTE})
    * @return test or {@code null}
    * @throws QueryException query exception
@@ -4339,7 +4366,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "PITest" rule without the leading keyword and its brackets.
+   * Parses the "ProcessingInstructionNodeType" rule without the leading keyword and its brackets.
    * @return test or {@code null}
    * @throws QueryException query exception
    */
@@ -4386,7 +4413,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "TryCatch" rules.
+   * Parses the "TryCatchExpr" rule.
    * @return query expression or {@code null}
    * @throws QueryException query exception
    */
@@ -4398,7 +4425,7 @@ public class QueryParser extends InputParser {
     Catch[] catches = { };
     while(wsConsume(CATCH)) {
       final ArrayList<Test> tests = nameTestUnion(null);
-      if(tests.isEmpty()) throw error(NOCATCH);
+      if(tests.isEmpty()) throw error(EXPECTAFTER_X_X, "error name or '*'", CATCH);
 
       final int s = localVars.openScope();
       final InputInfo ii = info();
@@ -4437,7 +4464,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "FTSelection" rules.
+   * Parses the "FTSelection" rule.
    * @param prg pragma flag
    * @return query expression
    * @throws QueryException query exception
@@ -4821,11 +4848,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr insert() throws QueryException {
-    final int p = pos;
-    if(!wsConsumeWs(INSERT) || !wsConsumeWs(NODE) && !wsConsumeWs(NODES)) {
-      pos = p;
-      return null;
-    }
+    if(!updateKeyword(INSERT)) return null;
 
     final Expr s = check(single(), INCOMPLETE);
     Mode mode = Mode.INTO;
@@ -4843,7 +4866,7 @@ public class QueryParser extends InputParser {
       } else if(wsConsumeWs(BEFORE)) {
         mode = Mode.BEFORE;
       } else {
-        throw error(INCOMPLETE);
+        throw error(INSERTMODE);
       }
     }
     final Expr trg = check(single(), INCOMPLETE);
@@ -4857,11 +4880,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr delete() throws QueryException {
-    final int p = pos;
-    if(!wsConsumeWs(DELETE) || !wsConsumeWs(NODES) && !wsConsumeWs(NODE)) {
-      pos = p;
-      return null;
-    }
+    if(!updateKeyword(DELETE)) return null;
     qc.updating();
     return new Delete(info(), check(single(), INCOMPLETE));
   }
@@ -4872,11 +4891,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr rename() throws QueryException {
-    final int p = pos;
-    if(!wsConsumeWs(RENAME) || !wsConsumeWs(NODE) && !wsConsumeWs(NODES)) {
-      pos = p;
-      return null;
-    }
+    if(!updateKeyword(RENAME)) return null;
 
     final Expr trg = check(single(), INCOMPLETE);
     wsCheck(AS);
@@ -4899,6 +4914,7 @@ public class QueryParser extends InputParser {
       wsCheck(OF);
       if(!wsConsumeWs(NODES)) wsCheck(NODE);
     } else if(!wsConsumeWs(NODE) && !wsConsumeWs(NODES)) {
+      addHint(EXPECTAFTER_X_X, "'node' or 'value of'", REPLACE);
       pos = p;
       return null;
     }
@@ -4911,12 +4927,27 @@ public class QueryParser extends InputParser {
   }
 
   /**
+   * Consumes an update keyword followed by 'node' or 'nodes'.
+   * @param keyword keyword
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  private boolean updateKeyword(final String keyword) throws QueryException {
+    final int p = pos;
+    if(!wsConsumeWs(keyword)) return false;
+    if(wsConsumeWs(NODE) || wsConsumeWs(NODES)) return true;
+    addHint(EXPECTAFTER_X_X, "'node'", keyword);
+    pos = p;
+    return false;
+  }
+
+  /**
    * Parses the "CopyModifyExpr" rule.
    * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr copyModify() throws QueryException {
-    if(!wsConsumeWs(COPY, INCOMPLETE, "$")) return null;
+    if(!wsConsumeWs(COPY, true, "$")) return null;
 
     final int s = localVars.openScope();
     Let[] fl = { };
@@ -4980,7 +5011,7 @@ public class QueryParser extends InputParser {
   private byte[] ncName(final QueryError error, final boolean qnmPfx) throws QueryException {
     token.reset();
     if(ncName(qnmPfx)) return token.toArray();
-    if(error != null) throw error(error, currentAsString());
+    if(error != null) throw error(error, found());
     return EMPTY;
   }
 
@@ -5037,7 +5068,7 @@ public class QueryParser extends InputParser {
   private byte[] qName(final QueryError error) throws QueryException {
     token.reset();
     if(!ncName(true)) {
-      if(error != null) throw error(error, currentAsString());
+      if(error != null) throw error(error, found());
     } else if(consume(':')) {
       if(XMLToken.isNCStartChar(current())) {
         token.add(':');
@@ -5180,27 +5211,29 @@ public class QueryParser extends InputParser {
    * Consumes the specified two strings or jumps back to the old query position. If the strings are
    * found, the cursor is placed after the first token.
    * @param string string to consume (words must not be followed by letters)
-   * @param expr alternative error message (can be {@code null})
+   * @param suggest register an error hint if the subsequent strings are not found
    * @param strings subsequent strings
    * @return result of check
    * @throws QueryException query exception
    */
-  private boolean wsConsumeWs(final String string, final QueryError expr, final String... strings)
+  private boolean wsConsumeWs(final String string, final boolean suggest, final String... strings)
       throws QueryException {
 
     final int p1 = pos;
     if(!wsConsumeWs(string)) return false;
     final int p2 = pos;
-    // keyword followed by colon: QName prefix, no alternative error
-    if(!current(':')) {
-      alter = expr;
-      alterPos = p2;
-    }
     for(final String s : strings) {
       if(wsConsume(s)) {
         pos = p2;
+        hint = null;
         return true;
       }
+    }
+    if(suggest) {
+      pos = p2;
+      addHint(EXPECTAFTER_X_X, "'" + strings[0] + "'", string);
+    } else {
+      hint = null;
     }
     pos = p1;
     return false;
@@ -5308,14 +5341,38 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Returns an alternative error, or the supplied error if no alternative error is registered.
+   * Returns the error of a registered hint, or the supplied error.
    * @param error query error (can be {@code null})
    * @return error
    */
-  private QueryException alterError(final QueryError error) {
-    if(alter == null) return error(error);
-    pos = alterPos;
-    return error(alter);
+  private QueryException hintError(final QueryError error) {
+    if(hint == null) return error(error);
+    pos = hint.pos();
+    return error(hint.error(), hint.ext());
+  }
+
+  /**
+   * Registers a hint for a keyword that was parsed as a name if it is followed by an operand.
+   * @param error error
+   * @param ext error arguments
+   */
+  private void addHint(final QueryError error, final Object... ext) {
+    final int cp = current();
+    final boolean operand = XMLToken.isNCStartChar(cp) || digit(cp) || quote(cp) || cp == '$' ||
+      cp == '{';
+    hint = operand ? new Hint(error, pos, ext) : null;
+  }
+
+  /**
+   * Checks if the operand of the specified operator exists.
+   * @param expr operand (can be {@code null})
+   * @param op operator
+   * @return operand
+   * @throws QueryException query exception
+   */
+  private Expr operand(final Expr expr, final String op) throws QueryException {
+    if(expr == null) throw error(EXPECTAFTER_X_X, "expression", op);
+    return expr;
   }
 
   /**

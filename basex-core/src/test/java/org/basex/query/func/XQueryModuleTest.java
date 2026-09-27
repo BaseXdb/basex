@@ -104,7 +104,7 @@ public final class XQueryModuleTest extends SandboxTest {
     // queries
     query(func.args("1"), 1);
     query(func.args("1 + 2"), 3);
-    error(func.args("1+"), CALCEXPR);
+    error(func.args("1+"), EXPECTAFTER_X_X);
     error("declare variable $a := 1;" + func.args("$a"), VARUNDEF_X);
     error("for $a in (1, 2) return" + func.args("$a"), VARUNDEF_X);
 
@@ -504,7 +504,7 @@ return count($errors[local-name-from-QName(.) = 'XQDY0054'])
     query(func.args("delete node <a/>") + "/name()", "MainModule");
     query(func.args("delete node <a/>") + "/@updating/string()", true);
 
-    error(func.args("1+"), CALCEXPR);
+    error(func.args("1+"), EXPECTAFTER_X_X);
     query("\n\ntry {" + func.args("1 +",
         " { 'pass': true() }") + "} catch * { $err:line-number }", 1);
 

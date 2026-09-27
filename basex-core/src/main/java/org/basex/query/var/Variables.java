@@ -99,7 +99,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
         if(var == null) throw VARUNDEF_X.get(ref.info(),
             QueryError.similar(ref, similarName(ref.name, ur.localNames)));
         if(!Token.eq(modUri, refUri) && !ur.hasImport) {
-          throw INVISIBLEVAR_X.get(ref.info(), ref.name);
+          throw INVISIBLEVAR_X.get(ref.info(), ref.name.varString());
         }
       }
 

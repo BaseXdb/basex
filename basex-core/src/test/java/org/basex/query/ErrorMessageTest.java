@@ -57,6 +57,77 @@ public final class ErrorMessageTest extends SandboxTest {
     error("<a/>/attribute::b ! 1 1", QUERYEND_X);
   }
 
+  /** Keyword parsed as a name: the hint is reported after the keyword. */
+  @Test public void keywordHint() {
+    errorAt("for x in 1 return x", EXPECTAFTER_X_X, 5);
+    errorAt("let x := 1 return x", EXPECTAFTER_X_X, 5);
+    errorAt("for $x in 1 where if group by $x retrun $x", EXPECTAFTER_X_X, 22);
+    errorAt("return 1", UNEXPRETURN, 8);
+    errorAt("copy x := <a/> modify () return x", EXPECTAFTER_X_X, 6);
+    errorAt("delete $x", EXPECTAFTER_X_X, 8);
+    errorAt("insert $a into $b", EXPECTAFTER_X_X, 8);
+    errorAt("rename $a as 'b'", EXPECTAFTER_X_X, 8);
+    errorAt("replace $a with $b", EXPECTAFTER_X_X, 9);
+    errorAt("element a 1", EXPECTAFTER_X_X, 9);
+    errorAt("element { 1 }", EXPECTAFTER_X_X, 9);
+    errorAt("attribute a 1", EXPECTAFTER_X_X, 11);
+    errorAt("text 1", EXPECTAFTER_X_X, 6);
+    errorAt("comment 'x' 1", EXPECTAFTER_X_X, 9);
+    errorAt("function $x { $x }", EXPECTAFTER_X_X, 10);
+    errorAt("fn $x { $x }", EXPECTAFTER_X_X, 4);
+  }
+
+  /** No hint for keywords that are parsed successfully or not followed by an operand. */
+  @Test public void noKeywordHint() {
+    errorAt("if/a 1", QUERYEND_X, 7);
+    errorAt("if/child::a 1", QUERYEND_X, 14);
+    errorAt("for $x in 1 count $c retrun $x", FLWORRETURN, 22);
+    errorAt("map { } 1", QUERYEND_X, 10);
+    errorAt("1 instance of empty-sequence() 2", QUERYEND_X, 33);
+    errorAt("<a/>/text = 1 2", QUERYEND_X, 16);
+    errorAt("<a/>/functions 1", QUERYEND_X, 17);
+    errorAt("fn:abs(1) 2", QUERYEND_X, 12);
+    errorAt("<a/>/element(a) 1", QUERYEND_X, 18);
+    error("{ { }?a : 1 } 2", QUERYEND_X);
+    error("<local:a/>/self::local :*", QUERYEND_X);
+  }
+
+  /** Common mistakes are reported with specific messages. */
+  @Test public void commonMistakes() {
+    errorAt("1; 2", QUERYSEMI, 3);
+    errorAt("1 = 1 ? 2 : 3", QUERYCOLON, 12);
+    errorAt("1 == 2", UNKNOWNOP_X_X, 4);
+    errorAt("(1 && 2)", UNKNOWNOP_X_X, 6);
+    errorAt("try { 1 } catch { 2 }", EXPECTAFTER_X_X, 16);
+    errorAt("if (1) 2 else 3", NOTHEN_X, 8);
+    errorAt("insert node $a in $b", INSERTMODE, 16);
+    errorAt("1 instance of empty-sequence x", WRONGCHAR_X_X, 30);
+    errorAt("for $x in 1 where return $x", UNEXPRETURN, 26);
+    errorAt("for $x in", NOEXPR, 10);
+  }
+
+  /** Missing operands are reported with the operator. */
+  @Test public void missingOperand() {
+    for(final String op : new String[] { "!", "to", "||", "+", "div", "=", "eq", "is", ",", "and",
+        "or", "otherwise", "->" }) {
+      errorMessage("1 " + op, EXPECTAFTER_X_X, "after '" + op + "'");
+    }
+    errorMessage("some x in 1 satisfies x", EXPECTAFTER_X_X, "'$' after 'some'");
+    errorMessage("switch 1 case 1 return 2 default return 3", EXPECTAFTER_X_X,
+        "'(' after 'switch'");
+    errorMessage("map a", EXPECTAFTER_X_X, "'{' after 'map'");
+    errorMessage("for $x in 1 count c return 1", EXPECTAFTER_X_X, "'$' after 'count'");
+  }
+
+  /** Error messages report the complete name that was found. */
+  @Test public void found() {
+    errorMessage("some $x in 1 where $x", WRONGCHAR_X_X, "found 'where'");
+    errorMessage("1 instance xs:integer", WRONGCHAR_X_X, "found 'xs:integer'");
+    errorMessage("1 => 1", ARROWSPEC_X, "found '1'");
+    errorMessage("1 =>", ARROWSPEC_X, "arrow operator.");
+    errorMessage("1 cast as 2", TYPEINVALID_X, "found '2'");
+  }
+
   /** Unprefixed call of a user-defined function with wrong arity reports an arity mismatch. */
   @Test public void wrongArityNoNamespace() {
     error("declare function abc($j) { }; abc()", INVNARGS_X_X);
@@ -104,16 +175,29 @@ public final class ErrorMessageTest extends SandboxTest {
    */
   private static void unknownName(final String query, final QueryError code,
       final String similar) {
-    try {
-      eval(query);
-      fail("Query did not fail.");
-    } catch(final QueryException ex) {
-      assertSame(code, ex.error(), ex.getLocalizedMessage());
-      final String msg = ex.getLocalizedMessage();
-      assertTrue(msg.contains("(maybe: " + similar), msg);
-    } catch(final Exception ex) {
-      fail(ex);
-    }
+    errorMessage(query, code, "(maybe: " + similar);
+  }
+
+  /**
+   * Checks that a query fails with the specified error at the specified column.
+   * @param query query that should fail
+   * @param code expected error code
+   * @param column expected column
+   */
+  private static void errorAt(final String query, final QueryError code, final int column) {
+    final QueryException ex = fails(query, code);
+    assertEquals(column, ex.column(), ex.getLocalizedMessage());
+  }
+
+  /**
+   * Checks that a query fails with the specified error and message.
+   * @param query query that should fail
+   * @param code expected error code
+   * @param text expected substring of the error message
+   */
+  private static void errorMessage(final String query, final QueryError code, final String text) {
+    final String msg = fails(query, code).getLocalizedMessage();
+    assertTrue(msg.contains(text), msg);
   }
 
   /**
@@ -122,15 +206,25 @@ public final class ErrorMessageTest extends SandboxTest {
    * @param code expected error code
    */
   private static void noHint(final String query, final QueryError code) {
+    final String msg = fails(query, code).getLocalizedMessage();
+    assertFalse(msg.contains("maybe"), msg);
+  }
+
+  /**
+   * Evaluates a query that is expected to fail with the specified error.
+   * @param query query that should fail
+   * @param code expected error code
+   * @return raised exception
+   */
+  private static QueryException fails(final String query, final QueryError code) {
     try {
       eval(query);
-      fail("Query did not fail.");
     } catch(final QueryException ex) {
       assertSame(code, ex.error(), ex.getLocalizedMessage());
-      final String msg = ex.getLocalizedMessage();
-      assertFalse(msg.contains("maybe"), msg);
+      return ex;
     } catch(final Exception ex) {
-      fail(ex);
+      return fail(ex);
     }
+    return fail("Query did not fail.");
   }
 }

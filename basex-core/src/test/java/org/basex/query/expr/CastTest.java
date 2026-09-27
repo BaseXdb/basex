@@ -34,9 +34,9 @@ public final class CastTest extends SandboxTest {
     query("2 cast as xs:integer + 3", 5);
     query("2 cast as xs:integer? * 3", 6);
 
-    error("2 cast as xs:integer*", CALCEXPR);
-    error("2 cast as xs:integer+", CALCEXPR);
-    error("2 castable as xs:integer*", CALCEXPR);
+    error("2 cast as xs:integer*", EXPECTAFTER_X_X);
+    error("2 cast as xs:integer+", EXPECTAFTER_X_X);
+    error("2 castable as xs:integer*", EXPECTAFTER_X_X);
   }
 
   /** item() is not a cast target, but it is accepted as a component type. */

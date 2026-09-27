@@ -123,11 +123,18 @@ public class InputParser {
   }
 
   /**
-   * Returns a "found" string, containing the current character.
+   * Returns a "found" string, containing the current name, number or character.
    * @return completion
    */
   protected final byte[] found() {
-    return current() == 0 ? EMPTY : Util.inf(FOUND, currentAsString());
+    final int cp = current();
+    if(cp == 0) return EMPTY;
+    int e = pos + 1;
+    if(XMLToken.isNCStartChar(cp) || digit(cp)) {
+      while(e < length && (XMLToken.isNCChar(input[e]) || input[e] == ':' && e + 1 < length &&
+          XMLToken.isNCStartChar(input[e + 1]))) e++;
+    }
+    return Util.inf(FOUND, e == pos + 1 ? currentAsString() : substring(pos, e));
   }
 
   /**

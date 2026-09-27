@@ -43,7 +43,7 @@ final class QueryOptions {
     final String key = name.toUpperCase(Locale.ENGLISH);
     final MainOptions options = qc.context.options;
     final Option<?> option = options.option(key);
-    if(option == null) throw BASEX_OPTIONSINV_X.get(parser.info(), options.similar(name));
+    if(option == null) throw BASEX_OPTIONS_X.get(parser.info(), options.similar(name));
 
     // try to assign option to dummy options
     if(dummyOptions == null) dummyOptions = new MainOptions(false);

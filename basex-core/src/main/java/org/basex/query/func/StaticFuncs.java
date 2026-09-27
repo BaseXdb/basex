@@ -67,9 +67,11 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
 
     final byte[] modUri = Token.eq(name.uri(), FN_URI) ? FN_URI : QNm.uri(sc.module);
     final StaticFunc sf = new StaticFunc(name, params, expr, anns, vs, info, doc);
-    if(get(sc, name, sf.min, sf.arity(), false) != null) throw DUPLFUNC_X.get(info, name);
+    if(get(sc, name, sf.min, sf.arity(), false) != null)
+      throw DUPLFUNC_X.get(info, name.prefixString());
+
     funcsByModule.computeIfAbsent(modUri, QNmMap::new).computeIfAbsent(name, ArrayList::new).
-        add(sf);
+      add(sf);
     return sf;
   }
 

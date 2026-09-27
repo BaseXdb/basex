@@ -943,17 +943,17 @@ public enum QueryError {
   /** Error code. */
   NUMBER_X(XPST, 3, "Incomplete number: '%'."),
   /** Error code. */
-  QUERYEND_X(XPST, 3, "Unexpected end of query: '%'."),
+  QUERYEND_X(XPST, 3, "Unexpected '%'."),
   /** Error code. */
   MODEXPR(XPST, 3, "No expression allowed in a library module."),
   /** Error code. */
   MAINMOD(XPST, 3, "Library modules cannot be evaluated."),
   /** Error code. */
-  CMPEXPR(XPST, 3, "Comparison is incomplete."),
+  CMPEXPR(XPST, 3, "Incomplete comparison."),
   /** Error code. */
   NOELEMNAME(XPST, 3, "Expecting element name."),
   /** Error code. */
-  ELEMNAME_X(XPST, 3, "Element name expected, '%' found."),
+  ELEMNAME_X(XPST, 3, "Expecting element name%."),
   /** Error code. */
   NOATTNAME(XPST, 3, "Expecting attribute name."),
   /** Error code. */
@@ -977,10 +977,6 @@ public enum QueryError {
   /** Error code. */
   INCOMPLETE(XPST, 3, "Incomplete expression."),
   /** Error code. */
-  MAPCONSTR(XPST, 3, "Incomplete map constructor."),
-  /** Error code. */
-  ARRAYCONSTR(XPST, 3, "Incomplete array constructor."),
-  /** Error code. */
   EVALUNARY(XPST, 3, "Unary operator expects a numeric value."),
   /** Error code. */
   STEPMISS_X(XPST, 3, "Expecting step%."),
@@ -989,15 +985,13 @@ public enum QueryError {
   /** Error code. */
   DECLINCOMPLETE(XPST, 3, "Expecting 'function', 'variable', ..."),
   /** Error code. */
-  FUNCNAME(XPST, 3, "Expecting function name."),
+  FUNCNAME_X(XPST, 3, "Expecting function name%."),
   /** Error code. */
-  TYPENAME(XPST, 3, "Expecting type name."),
+  TYPENAME_X(XPST, 3, "Expecting type name%."),
   /** Error code. */
   RESERVED_X(XPST, 3, "'%' is a reserved keyword."),
   /** Error code. */
-  NOVARNAME_X(XPST, 3, "Variable name expected, '%' found."),
-  /** Error code. */
-  NOVARDECL(XPST, 3, "Expecting variable declaration."),
+  NOVARNAME_X(XPST, 3, "Expecting variable name%."),
   /** Error code. */
   NOFTSELECT_X(XPST, 3, "Expecting quote or opening curly brace%."),
   /** Error code. */
@@ -1005,7 +999,7 @@ public enum QueryError {
   /** Error code. */
   MAPTAAT_X(XPST, 3, "Expecting atomic key type for map, found '%'."),
   /** Error code. */
-  TYPEINVALID(XPST, 3, "Expecting type declaration."),
+  TYPEINVALID_X(XPST, 3, "Expecting type%."),
   /** Error code. */
   NOTYPESWITCH(XPST, 3, "Incomplete typeswitch expression."),
   /** Error code. */
@@ -1013,37 +1007,29 @@ public enum QueryError {
   /** Error code. */
   PRAGMAINV(XPST, 3, "Invalid pragma expression."),
   /** Error code. */
-  CALCEXPR(XPST, 3, "Calculation is incomplete."),
+  INVMAPKEY(XPST, 3, "Expecting key."),
   /** Error code. */
-  INVMAPKEY(XPST, 3, "Invalid key, simple expression expected."),
-  /** Error code. */
-  INVMAPVAL(XPST, 3, "Invalid value, simple expression expected."),
-  /** Error code. */
-  NORETURN(XPST, 3, "Expecting return value."),
-  /** Error code. */
-  NOWHERE(XPST, 3, "Expecting valid expression after 'where'."),
-  /** Error code. */
-  NOWHILE(XPST, 3, "Expecting valid expression after 'while'."),
-  /** Error code. */
-  NOTRACE(XPST, 3, "Expecting valid expression after 'trace'."),
-  /** Error code. */
-  ORDERBY(XPST, 3, "Expecting valid expression after 'order by'."),
+  INVMAPVAL(XPST, 3, "Expecting value."),
   /** Error code. */
   FLWORRETURN(XPST, 3, "Incomplete FLWOR expression, expecting 'return'."),
   /** Error code. */
   NOSOME(XPST, 3, "Incomplete quantifier expression."),
   /** Error code. */
-  IFPAR(XPST, 3, "Expecting '(' after 'if' expression."),
-  /** Error code. */
   NOIF(XPST, 3, "Incomplete 'if' expression."),
   /** Error code. */
-  NOFOR(XPST, 3, "Incomplete 'for' expression."),
+  NOTHEN_X(XPST, 3, "Expecting 'then' or '{'%."),
   /** Error code. */
-  NOLET(XPST, 3, "Incomplete 'let' expression."),
+  INSERTMODE(XPST, 3, "Expecting 'into', 'after' or 'before'."),
   /** Error code. */
-  NOWINDOW(XPST, 3, "Incomplete 'window' expression."),
+  EXPECTAFTER_X_X(XPST, 3, "Expecting % after '%'."),
   /** Error code. */
-  NOCOUNT(XPST, 3, "Incomplete 'count' expression."),
+  UNEXPRETURN(XPST, 3, "Unexpected 'return'."),
+  /** Error code. */
+  UNKNOWNOP_X_X(XPST, 3, "Unknown operator '%', use %."),
+  /** Error code. */
+  QUERYSEMI(XPST, 3, "Unexpected ';', expressions are separated by ','."),
+  /** Error code. */
+  QUERYCOLON(XPST, 3, "Unexpected ':', conditions are written as 'if (...) then ... else ...'."),
   /** Error code. */
   NOCLOSING_X(XPST, 3, "Expecting closing tag </%>."),
   /** Error code. */
@@ -1055,43 +1041,43 @@ public enum QueryError {
   /** Error code. */
   INVNAME_X(XPST, 3, "Invalid QName: '%'."),
   /** Error code. */
-  QNAME_X(XPST, 3, "QName expected, '%' found."),
+  QNAME_X(XPST, 3, "Expecting QName%."),
   /** Error code. */
   PROLOGORDER(XPST, 3, "Default declarations must be declared first."),
   /** Error code. */
   FTRANGE(XPST, 3, "Expecting full-text range."),
   /** Error code. */
-  FTSTOP(XPST, 3, "Stop words expected."),
+  FTSTOP(XPST, 3, "Expecting stop words."),
   /** Error code. */
   FTMATCH_X(XPST, 3, "Unknown match option '%...'."),
   /** Error code. */
-  INTEXP(XPST, 3, "Integer expected."),
+  INTEXP(XPST, 3, "Expecting integer."),
   /** Error code. */
-  VARFUNC(XPST, 3, "Variable or function declaration expected."),
+  VARFUNC(XPST, 3, "Expecting variable or function declaration."),
   /** Error code. */
   NOANN(XPST, 3, "No annotation allowed here."),
   /** Error code. */
   NOCATCH(XPST, 3, "Expecting catch clause."),
   /** Error code. */
-  ANNVALUE_X(XPST, 3, "Literal expected, '%' found."),
+  ANNVALUE_X(XPST, 3, "Expecting literal%."),
   /** Error code. */
   UPDATINGVAR(XPST, 3, "Variable cannot be updating."),
   /** Error code. */
   UPDATINGTYPE(XPST, 3, "Type cannot be updating."),
   /** Error code. */
-  SIMPLETYPE_X(XPST, 3, "Simple type expected, function found: %(."),
+  SIMPLETYPE_X(XPST, 3, "Expecting simple type, found function %(."),
   /** Error code. */
-  KEYSPEC_X(XPST, 3, "No specifier after lookup operator: '%'."),
+  KEYSPEC_X(XPST, 3, "Expecting specifier after lookup operator%."),
   /** Error code. */
-  ARROWSPEC_X(XPST, 3, "No specifier after arrow operator: '%'."),
+  ARROWSPEC_X(XPST, 3, "Expecting specifier after arrow operator%."),
   /** Error code. */
   FORMPROP_X(XPST, 3, "%."),
   /** Error code. */
   CASTTYPE_X(XPST, 3, "%"),
   /** Error code. */
-  NOSTRNCN_X(XPST, 3, "Expecting string or NCName, found '%'."),
+  NOSTRNCN_X(XPST, 3, "Expecting string or NCName%."),
   /** Error code. */
-  NONCNAME_X(XPST, 3, "Expecting NCName, found '%'."),
+  NONCNAME_X(XPST, 3, "Expecting NCName%."),
   /** Error code. */
   INVPLACEHOLDER_X(XPST, 3, "Method call must not have argument placeholders: '%'."),
   /** Error code. */
@@ -1159,7 +1145,7 @@ public enum QueryError {
   JAVAARGS_X_X(XPTY, 4, "% cannot be called with %."),
 
   /** Error code. */
-  NONAME_X(XPTY, 4, "Name expected, '%' found."),
+  NONAME_X(XPTY, 4, "Expecting name%."),
   /** Error code. */
   NONUMBER_X_X(XPTY, 4, "Number expected, % found: %."),
   /** Error code. */
@@ -1179,7 +1165,7 @@ public enum QueryError {
   /** Error code. */
   INVKEY_X_X(XPTY, 4, "Single key expected for % lookup: %."),
   /** Error code. */
-  CALCTYPE_X_X_X_X_X(XPTY, 4, "Arithmetics not defined for % and %: % % %."),
+  CALCTYPE_X_X_X_X_X(XPTY, 4, "Arithmetic not defined for % and %: % % %."),
   /** Error code. */
   INVFUNCITEM_X_X(XPTY, 4, "Function expected, % found: %."),
   /** Error code. */
@@ -1294,7 +1280,7 @@ public enum QueryError {
   /** Error code. */
   DUPLNSDECL_X(XQST, 33, "Duplicate declaration of prefix '%'."),
   /** Error code. */
-  DUPLFUNC_X(XQST, 34, "Duplicate declaration of function '%'."),
+  DUPLFUNC_X(XQST, 34, "Duplicate declaration of function %."),
   /** Error code. */
   DUPLCOLL(XQST, 38, "Duplicate 'collation' declaration."),
   /** Error code. */
@@ -1418,7 +1404,7 @@ public enum QueryError {
   /** Error code. */
   DUPLTYPE_X(XQST, 146, "Duplicate declaration of type %."),
   /** Error code. */
-  PARAMOPTIONAL_X(XQST, 148, "Parameter must be declared as optional: $%."),
+  PARAMOPTIONAL_X(XQST, 148, "Parameter must be declared as optional: %."),
 
   /** Error code. */
   NOATTALL_X(XQTY, 24, "Attribute does not follow root element: %."),

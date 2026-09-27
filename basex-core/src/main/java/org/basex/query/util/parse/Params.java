@@ -75,7 +75,7 @@ public final class Params {
       if(size > 1) {
         final QNmSet names = new QNmSet();
         for(final Param param : params) {
-          if(!names.add(param.name)) throw FUNCDUPL_X.get(param.info, param.name);
+          if(!names.add(param.name)) throw FUNCDUPL_X.get(param.info, param.name.varString());
         }
       }
       // create variables
