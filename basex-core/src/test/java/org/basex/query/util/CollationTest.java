@@ -55,6 +55,33 @@ public final class CollationTest extends SandboxTest {
     query(prolog + "starts-with('aaa', 'aa')", true);
   }
 
+  /** Unicode case-insensitive collation. */
+  @Test public void unicodeCaseInsensitive() {
+    final String prolog = "declare default collation " +
+        "'http://www.w3.org/2005/xpath-functions/collation/unicode-case-insensitive'; ";
+    final String smiley = "😀", kelvin = "K", dotted = "İ";
+
+    query(prolog + "compare('ab', 'AB')", 0);
+    query(prolog + "compare('a', 'AB')", -1);
+    query(prolog + "compare('" + kelvin + "', 'k')", 0);
+    query(prolog + "compare('" + kelvin + "b', 'ka')", 1);
+    query(prolog + "compare('ka', '" + kelvin + "b')", -1);
+    query(prolog + "compare('" + smiley + "a', '" + smiley + "A')", 0);
+    query(prolog + "every $s in ('" + dotted + "', 'i', 'I', 'x') satisfies "
+        + "compare('" + dotted + "', $s) = "
+        + "compare(lower-case('" + dotted + "'), lower-case($s), "
+        + "'http://www.w3.org/2005/xpath-functions/collation/codepoint')", true);
+
+    // offsets of matches refer to the original string
+    query(prolog + "substring-before('" + smiley + "ab', 'B')", smiley + "a");
+    query(prolog + "substring-after('" + smiley + "ab', 'A')", "b");
+    query(prolog + "substring-before('" + dotted + "ab', 'B')", dotted + "a");
+    query(prolog + "substring-after('" + dotted + "ab', 'A')", "b");
+    query(prolog + "contains('" + dotted + "ab', 'AB')", true);
+    query(prolog + "ends-with('" + smiley + "ab', 'B')", true);
+    query(prolog + "starts-with('" + smiley + "ab', '" + smiley + "A')", true);
+  }
+
   /** Tests errors. */
   @Test public void errors() {
     error("compare('a', 'b', 'http://basex.org/collation?unknown=value')", WHICHCOLL_X);

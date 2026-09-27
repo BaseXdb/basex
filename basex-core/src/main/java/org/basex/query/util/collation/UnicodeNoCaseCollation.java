@@ -1,7 +1,5 @@
 package org.basex.query.util.collation;
 
-import java.util.*;
-
 import org.basex.util.*;
 
 /**
@@ -16,28 +14,23 @@ final class UnicodeNoCaseCollation extends Collation {
 
   @Override
   public int compare(final byte[] string, final byte[] compare) {
-    final int sl = string.length, cl = compare.length, l = Math.min(sl, cl);
-    for(int s = 0, c = 0; s < l || c < l; s += Token.cl(string, s), c += Token.cl(compare, c)) {
-      final int cp1 = Token.cp(string, s), cp2 = Token.cp(compare, s);
-      final int d = compare(lc(cp1), lc(cp2));
-      if(d != 0) return d;
-    }
-    return Integer.signum(sl - cl);
+    return Token.compare(Token.lc(string), Token.lc(compare));
   }
 
   @Override
   protected int indexOf(final String string, final String sub, final Mode mode,
       final InputInfo ii) {
 
-    final int[] stringCps = string.toLowerCase(Locale.ENGLISH).codePoints().toArray();
-    final int[] subCps = sub.toLowerCase(Locale.ENGLISH).codePoints().toArray();
+    // each codepoint is a collation unit; offsets refer to the original string
+    final int[] stringCps = string.codePoints().toArray();
+    final int[] subCps = sub.codePoints().toArray();
     final int tl = stringCps.length, sl = subCps.length;
     if(sl == 0) return 0;
     if(tl >= sl) {
       for(int t = mode == Mode.ENDS_WITH ? tl - sl : 0; t < tl; t++) {
         for(int s = 0; t + s < tl;) {
           if(compare(stringCps[t + s], subCps[s]) != 0) break;
-          if(++s == sl) return mode == Mode.INDEX_AFTER ? t + s : t;
+          if(++s == sl) return string.offsetByCodePoints(0, mode == Mode.INDEX_AFTER ? t + s : t);
         }
         if(mode == Mode.STARTS_WITH) return -1;
       }
