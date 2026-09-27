@@ -131,6 +131,11 @@ public final class Otherwise extends Arr {
   }
 
   @Override
+  public Expr inline(final InlineContext ic) throws QueryException {
+    return ic.inline(exprs, true) ? optimize(ic.cc) : null;
+  }
+
+  @Override
   public Expr inlineTypeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
     // (A otherwise B) coerce to T → (A coerce to T?) otherwise (B coerce to T)
     // leading operands may be empty without being selected, so their cardinality is widened

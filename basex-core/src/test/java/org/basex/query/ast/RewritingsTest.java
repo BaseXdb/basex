@@ -2534,4 +2534,10 @@ public final class RewritingsTest extends SandboxTest {
         + "  -> element Y {. except head(.)}",
         "<Y><C/></Y>", exists(DualIterMap.class));
   }
+
+  /** Inlining errors into unevaluated operands of otherwise expressions. */
+  @Test public void otherwiseInlineError() {
+    query("let $x := 0 return " + wrap(1) + "[. = 1] otherwise xs:error($x)", 1);
+    error("let $x := 0 return " + wrap(1) + "[. = 2] otherwise xs:error($x)", FUNCCAST_X_X);
+  }
 }
