@@ -5589,6 +5589,12 @@ return
     for(int cp = 1; cp <= 31; cp++) sb.append((char) cp);
     write(file, sb.toString());
     query("string-to-codepoints(" + func.args(file.path()) + ") => count()", 31);
+
+    // credentials are stripped from error messages
+    for(final String path : new String[] { "x", "x#frag", "%%" }) {
+      query("try { " + func.args("http://user:secret@localhost:1/" + path) + " } " +
+        "catch * { contains($err:description, 'secret') }", false);
+    }
   }
 
   /** Test method. */

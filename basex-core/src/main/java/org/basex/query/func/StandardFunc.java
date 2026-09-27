@@ -575,10 +575,11 @@ public abstract class StandardFunc extends Arr {
     if(io instanceof IOContent && io.path().isEmpty()) {
       if(!content) throw RESURI_X.get(info, uri);
     } else {
-      if(Strings.contains(io.path(), '#')) throw RESFRAG_X.get(info, io);
+      final String path = IOUrl.stripUserInfo(io.toString());
+      if(Strings.contains(io.path(), '#')) throw RESFRAG_X.get(info, path);
       if(io instanceof IOFile && io.isDir()) throw RESDIR_X.get(info, io);
-      if(!io.exists()) throw RESWHICH_X.get(info, io);
-      if(!Uri.get(uri).isValid()) throw RESURI_X.get(info, uri);
+      if(!io.exists()) throw RESWHICH_X.get(info, path);
+      if(!Uri.get(uri).isValid()) throw RESURI_X.get(info, IOUrl.stripUserInfo(uri));
     }
     return io;
   }
