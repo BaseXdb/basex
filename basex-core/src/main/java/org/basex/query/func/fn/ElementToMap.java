@@ -8,6 +8,7 @@ import org.basex.query.*;
 import org.basex.query.func.fn.PlanFn.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -204,13 +205,14 @@ public final class ElementToMap {
         cast(pe, Str.get(node.string()));
       case SIMPLE_PLUS -> {
         final MapBuilder mb = attributes(node);
-        yield mb.put(contentKey(mb), cast(pe, Str.get(node.string()))).map();
+        yield combine(mb, plan.content, cast(pe, Str.get(node.string()))).map();
       }
       case LIST ->
         list(node);
       case LIST_PLUS -> {
         final MapBuilder mb = attributes(node);
-        yield mb.put(nodeName(pe.child, true, node, plan.marker), list(node)).map();
+        final Str key = Str.get(nodeName(pe.child, true, node, plan.marker));
+        yield combine(mb, key, list(node)).map();
       }
       case RECORD ->
         record(node);
@@ -245,16 +247,23 @@ public final class ElementToMap {
    */
   private MapBuilder attributes(final GNode node) throws QueryException {
     final GNodeList attributes = PlanFn.children(Kind.ATTRIBUTE, node);
-    final MapBuilder mb = new MapBuilder(attributes.size());
     // a marker that does not distinguish attributes from child elements is replaced by '@'
     final String marker = conflict(node, attributes) ? "@" : plan.marker;
+    // values of attributes with the same formatted name are combined into an array
+    final TokenObjectMap<ArrayBuilder> cache = new TokenObjectMap<>();
     for(final GNode attr : attributes) {
       final PlanEntry entry = attributeEntry(attr.qname());
       // attributes with the type 'skip' are omitted
       if(entry != null && entry.type == PlanType.SKIP) continue;
       final byte[] value = attr.string();
-      mb.put(nodeName(attr.qname(), false, node, marker),
-          entry != null ? cast(entry, Str.get(value)) : Atm.get(value));
+      cache.computeIfAbsent(nodeName(attr.qname(), false, node, marker),
+          () -> new ArrayBuilder(job)).add(entry != null ? cast(entry, Str.get(value)) :
+          Atm.get(value));
+    }
+    final MapBuilder mb = new MapBuilder(cache.size());
+    for(final byte[] name : cache) {
+      final XQArray array = cache.get(name).array();
+      mb.put(name, array.structSize() == 1 ? array.valueAt(0) : array);
     }
     return mb;
   }
@@ -280,15 +289,25 @@ public final class ElementToMap {
   }
 
   /**
-   * Returns the content key, prepending {@code #} characters to avoid clashes with existing keys.
-   * @param mb map builder with the keys generated so far
-   * @return content key
+   * Adds an entry to an attribute map, combining it with an existing entry into an array.
+   * @param mb attribute map
+   * @param key key
+   * @param value value
+   * @return attribute map
    * @throws QueryException query exception
    */
-  private Str contentKey(final MapBuilder mb) throws QueryException {
-    Str key = plan.content;
-    while(mb.contains(key)) key = Str.get(Token.concat(Token.cpToken('#'), key.string()));
-    return key;
+  private MapBuilder combine(final MapBuilder mb, final Str key, final Value value)
+      throws QueryException {
+    final Value old = mb.get(key);
+    if(old == null) return mb.put(key, value);
+    // attribute values are atomic: an existing array contains combined attribute values
+    final ArrayBuilder ab = new ArrayBuilder(job);
+    if(old instanceof final XQArray array) {
+      for(final Value member : array.members()) ab.add(member);
+    } else {
+      ab.add(old);
+    }
+    return mb.put(key, ab.add(value).array());
   }
 
   /**
@@ -311,7 +330,9 @@ public final class ElementToMap {
    */
   private byte[] nodeName(final QNm qnm, final boolean element, final GNode parent,
       final String marker) {
-    final byte[] name = switch(plan.name) {
+    // attributes in the xml namespace are always output with the prefix 'xml'
+    final byte[] name = !element && Token.eq(qnm.uri(), QueryText.XML_URI) ?
+      Token.concat(Token.XML, Token.cpToken(':'), qnm.local()) : switch(plan.name) {
       case EQNAME ->
         qnm.uri().length != 0 ? qnm.eqName() : qnm.local();
       case LEXICAL ->
@@ -321,7 +342,7 @@ public final class ElementToMap {
       default ->
         (element ? parent == null ? qnm.uri().length == 0 :
           Token.eq(parent.qname().uri(), qnm.uri()) : qnm.uri().length == 0) ? qnm.local() :
-        Token.eq(qnm.uri(), QueryText.XML_URI) ? qnm.string() : qnm.eqName();
+        qnm.eqName();
     };
     return shared.token(!element && marker != null ? Token.concat(marker, name) : name);
   }

@@ -1477,9 +1477,12 @@ public final class FnModuleTest extends SandboxTest {
     // content-key option
     query(func.args(" <price currency='USD'>12.16</price>",
         " { 'attribute-marker': '', 'content-key': 'value' }") + "?price?value", "12.16");
-    // content key clashes with attribute name: prepend '#'
+    // content key clashes with attribute name: entries are combined into an array
     query(func.args(" <a b='1'>x</a>", " { 'attribute-marker': '', 'content-key': 'b' }") +
-        "?a => map:keys() => sort()", "#b\nb");
+        "?a?b?*", "1\nx");
+    query(func.args(" <a b='1' p:b='2' xmlns:p='p'>x</a>",
+        " { 'attribute-marker': '', 'content-key': 'b', 'name-format': 'local' }") +
+        "?a?b?*", "1\n2\nx");
 
     // names of children of mixed and sequence content are relative to the enclosing element
     query(func.args(" <b xmlns='urn:u'>text<c>x</c></b>") +
@@ -1569,8 +1572,9 @@ public final class FnModuleTest extends SandboxTest {
     query("string-to-codepoints(name(" + func.args(" { codepoints-to-string(119070): 'x' }")
         + "))", 119070);
 
-    // strict: an empty attribute-marker cannot distinguish attributes from elements
-    error("map-to-element({ 'a': 'x' }, { 'attribute-marker': '' })", MAP_TO_ELEMENT_X);
+    // with an empty attribute-marker, all keys denote attributes
+    query("map-to-element({ 'a': 'x' }, { 'attribute-marker': '' })", "<a>x</a>");
+    query("map-to-element({ 'a': { 'b': 'x' } }, { 'attribute-marker': '' })", "<a b=\"x\"/>");
     // xml layout must contain exactly one element (no extra/leading content silently dropped)
     error("map-to-element({ 'a': '<b/><c/>' }, { 'plan': { 'a': { 'layout': 'xml' } } })",
         MAP_TO_ELEMENT_X);

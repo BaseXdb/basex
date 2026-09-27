@@ -109,6 +109,21 @@ public final class ElementMapRoundtripTest extends SandboxTest {
     query(NS + "deep-equal(<a p:x='1'/>, "
         + convert("<a p:x='1'/>", " { 'name-format': 'lexical' }") + ")", true);
     serialized("<x xmlns='http://e'>1</x>", " { 'name-format': 'lexical' }", "<x>1</x>");
+    // attributes in the xml namespace are always output with the xml prefix
+    for(final String format : new String[] { "default", "eqname", "local", "lexical" }) {
+      final String options = " { 'name-format': '" + format + "' }";
+      query("element-to-map(<a xml:lang='de'/>," + options + ")?a => map:keys()", "@xml:lang");
+      roundtrip("<a xml:lang='de'>x</a>", options);
+    }
+    query("serialize(map-to-element({ 'a': "
+        + "{ '@Q{http://www.w3.org/XML/1998/namespace}lang': 'de' } }))", "<a xml:lang=\"de\"/>");
+    query("serialize(map-to-element({ 'Q{http://www.w3.org/XML/1998/namespace}a': { 'b': '' } }))",
+        "<xml:a><xml:b/></xml:a>");
+    // attributes with the same formatted name are combined into an array
+    query("element-to-map(<a xmlns:p='p' xmlns:q='q' p:x='1' q:x='2' x='3'/>, "
+        + "{ 'name-format': 'local' })?a?('@x') => array:size()", 3);
+    error(convert("<a xmlns:p='p' xmlns:q='q' p:x='1' q:x='2'/>", " { 'name-format': 'local' }"),
+        MAP_TO_ELEMENT_X);
   }
 
   /** Test method. */
@@ -122,7 +137,7 @@ public final class ElementMapRoundtripTest extends SandboxTest {
     roundtrip("<a x='1'>t</a>", " { 'attribute-marker': ':', 'content-key': ':v' }");
 
     // an empty marker cannot distinguish attributes from child elements
-    error(convert("<a><b>1</b></a>", " { 'attribute-marker': '' }"), MAP_TO_ELEMENT_X);
+    serialized("<a><b>1</b></a>", " { 'attribute-marker': '' }", "<a b=\"1\"/>");
     // a child element name that starts with the marker is restored as an attribute
     serialized("<a><bc>1</bc></a>", " { 'attribute-marker': 'b' }", "<a c=\"1\"/>");
     // a child element name that equals the marker leaves an empty name

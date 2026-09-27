@@ -79,8 +79,6 @@ public final class MapToElement {
     this.options = new MainOptions(options);
     this.info = info;
     plan = PlanFn.plan(eopts, shared, info);
-    if(plan.marker == null || plan.marker.isEmpty()) throw MAP_TO_ELEMENT_X.get(info,
-        "Empty attribute marker is not allowed.");
     marker = token(plan.marker);
   }
 
@@ -503,10 +501,11 @@ public final class MapToElement {
       throw MAP_TO_ELEMENT_X.get(info, "Namespace declaration is not allowed as attribute.");
     }
 
-    // synthesize a prefix for namespaced attributes (forward conversion loses prefixes)
-    if(!element && qnm.uri().length != 0 && !qnm.hasPrefix() &&
-        !eq(qnm.uri(), QueryText.XML_URI)) {
-      qnm = shared.qName(concat(token("ns:"), qnm.local()), qnm.uri());
+    // synthesize a prefix for namespaced attributes (forward conversion loses prefixes);
+    // names in the xml namespace are always bound to the xml prefix
+    final boolean xml = eq(qnm.uri(), QueryText.XML_URI);
+    if((!element && qnm.uri().length != 0 || xml) && !qnm.hasPrefix()) {
+      qnm = shared.qName(concat(xml ? XML : token("ns"), cpToken(':'), qnm.local()), qnm.uri());
     }
     return qnm;
   }
