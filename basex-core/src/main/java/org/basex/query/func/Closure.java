@@ -46,8 +46,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   /** Indicates if the query focus is captured; implies that no variables are bound. */
   private final boolean focus;
 
-  /** Map with requested function properties. */
-  private final EnumMap<Flag, Boolean> map = new EnumMap<>(Flag.class);
+  /** Cached function properties. */
+  private final FlagCache props;
   /** Compilation flag. */
   private boolean compiled;
   /** Indicates if code is currently being compiled or evaluated. */
@@ -92,6 +92,12 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     this.anns = anns;
     this.vs = vs;
     this.global = global == null ? new HashMap<>() : new HashMap<>(global);
+    props = new FlagCache(flag -> {
+      for(final Expr ex : this.global.values()) {
+        if(ex.has(flag)) return true;
+      }
+      return this.expr.has(flag);
+    });
     this.declType = declType == null || declType.eq(Types.ITEM_ZM) ? null : declType;
     this.name = name;
     this.focus = focus;
@@ -295,7 +301,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       final Expr inlined = expr.inline(ic);
       if(inlined == null) return null;
       expr = inlined;
-      map.clear();
+      props.clear();
       return optimize(ic.cc);
     }
 
@@ -310,7 +316,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     if(!changed) return null;
 
     // invalidate cached flags, optimize closure
-    map.clear();
+    props.clear();
     return optimize(ic.cc);
   }
 
@@ -394,26 +400,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     final Flag[] flgs = Flag.remove(flags, Flag.UPD);
     if(flgs.length == 0) return false;
 
-    // handle recursive calls: check which flags are already or currently assigned
-    final ArrayList<Flag> list = new ArrayList<>();
-    for(final Flag flag : flgs) {
-      if(!map.containsKey(flag)) {
-        map.put(flag, Boolean.FALSE);
-        list.add(flag);
-      }
-    }
-    // request missing properties
-    for(final Flag flag : list) {
-      boolean f = false;
-      for(final Expr ex : global.values()) f = f || ex.has(flag);
-      map.put(flag, f || expr.has(flag));
-    }
-
-    // evaluate result
-    for(final Flag flag : flgs) {
-      if(map.get(flag)) return true;
-    }
-    return false;
+    return props.has(flgs);
   }
 
   @Override

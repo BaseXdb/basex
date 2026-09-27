@@ -11,6 +11,7 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.java.*;
+import org.basex.query.util.*;
 import org.basex.query.util.pkg.ClassLoaderCache.*;
 import org.basex.util.*;
 
@@ -21,6 +22,13 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class ModuleLoader {
+  /**
+   * Parsed package.
+   * @param pkg package
+   * @param modDir module directory
+   */
+  private record Parsed(Pkg pkg, IOFile modDir) { }
+
   /** Database context. */
   private final Context context;
   /** Java modules. */
@@ -90,7 +98,7 @@ public final class ModuleLoader {
           }
         }
         if(id != null) {
-          addRepo(id, new HashSet<>(), new HashSet<>(), qp, info);
+          addRepo(id, qp, info);
           return true;
         }
       }
@@ -215,55 +223,63 @@ public final class ModuleLoader {
   }
 
   /**
-   * Adds a package from the package repository.
+   * Adds a package and the packages it depends on from the package repository.
    * @param id package ID
-   * @param toLoad list with packages to be loaded
-   * @param loaded already loaded packages
    * @param qp query parser
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  private void addRepo(final String id, final HashSet<String> toLoad, final HashSet<String> loaded,
-      final QueryParser qp, final InputInfo info) throws QueryException {
+  private void addRepo(final String id, final QueryParser qp, final InputInfo info)
+      throws QueryException {
 
-    // return if package is already loaded
-    if(loaded.contains(id)) return;
+    final HashMap<String, Parsed> parsed = new HashMap<>();
+    new Cycles<String>() {
+      @Override
+      protected Iterable<String> next(final String pkgId) throws QueryException {
+        // find package in package dictionary
+        Pkg pkg = context.repo.pkgDict().get(pkgId);
+        if(pkg == null) throw REPO_NOTFOUND_X.get(info, pkgId);
+        final IOFile pkgPath = context.repo.path(pkg.path());
 
-    // find package in package dictionary
-    Pkg pkg = context.repo.pkgDict().get(id);
-    if(pkg == null) throw REPO_NOTFOUND_X.get(info, id);
-    final IOFile pkgPath = context.repo.path(pkg.path());
+        // parse package descriptor
+        final IO pkgDesc = new IOFile(pkgPath, PkgText.DESCRIPTOR);
+        if(!pkgDesc.exists()) Util.debugln(PkgText.MISSDESC, pkgId);
 
-    // parse package descriptor
-    final IO pkgDesc = new IOFile(pkgPath, PkgText.DESCRIPTOR);
-    if(!pkgDesc.exists()) Util.debugln(PkgText.MISSDESC, id);
+        pkg = new PkgParser(info).parse(pkgDesc);
+        final IOFile modDir = pkg.modDir(pkgPath);
+        try {
+          addLoader(pkgUrls(pkgPath, modDir, info));
+        } catch(final Throwable th) {
+          final Throwable t = Util.rootException(th);
+          throw MODINIT_X_X_X.get(info, pkg.name, t.getMessage(), Util.className(t)).cause(th);
+        }
+        parsed.put(pkgId, new Parsed(pkg, modDir));
 
-    pkg = new PkgParser(info).parse(pkgDesc);
-    final IOFile modDir = pkg.modDir(pkgPath);
-    try {
-      addLoader(pkgUrls(pkgPath, modDir, info));
-    } catch(final Throwable th) {
-      final Throwable t = Util.rootException(th);
-      throw MODINIT_X_X_X.get(info, pkg.name, t.getMessage(), Util.className(t)).cause(th);
-    }
-
-    // package has dependencies. they have to be loaded first
-    // (put package in list with packages to be loaded)
-    if(!pkg.dep.isEmpty()) toLoad.add(id);
-    for(final PkgDep dep : pkg.dep) {
-      if(dep.name != null) {
-        // we consider only package dependencies here
-        final String depId = new PkgValidator(context.repo, info).depPkg(dep);
-        if(depId == null) throw REPO_NOTFOUND_X.get(info, dep.name);
-        if(toLoad.contains(depId)) throw CIRCMODULE.get(info);
-        addRepo(depId, toLoad, loaded, qp, info);
+        // package dependencies are loaded first; only package dependencies are considered
+        final ArrayList<String> deps = new ArrayList<>();
+        for(final PkgDep dep : pkg.dep) {
+          if(dep.name != null) {
+            final String depId = new PkgValidator(context.repo, info).depPkg(dep);
+            if(depId == null) throw REPO_NOTFOUND_X.get(info, dep.name);
+            deps.add(depId);
+          }
+        }
+        return deps;
       }
-    }
-    for(final PkgComponent comp : pkg.comps) {
-      qp.module(new IOFile(modDir, comp.file).path(), comp.uri, info);
-    }
-    toLoad.remove(id);
-    loaded.add(id);
+
+      @Override
+      protected void finish(final String pkgId) throws QueryException {
+        final Parsed p = parsed.get(pkgId);
+        for(final PkgComponent comp : p.pkg.comps) {
+          qp.module(new IOFile(p.modDir, comp.file).path(), comp.uri, info);
+        }
+      }
+
+      @Override
+      protected QueryException error(final String pkgId) {
+        return CIRCPKG_X.get(info, pkgId);
+      }
+    }.visit(id);
   }
 
   /**

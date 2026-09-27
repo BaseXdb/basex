@@ -122,16 +122,11 @@ public final class DynFuncCall extends FuncCall {
 
     // try to inline the function; avoid recursive inlining
     if(func instanceof final XQFunctionExpr fe) {
-      if(!cc.inlined.contains(fe)) {
+      final Expr inlined = cc.enter(fe, () -> {
         checkUp(fe, updating);
-        cc.inlined.push(fe);
-        try {
-          final Expr inlined = fe.inline(Arrays.copyOf(exprs, nargs), cc);
-          if(inlined != null) return inlined;
-        } finally {
-          cc.inlined.pop();
-        }
-      }
+        return fe.inline(Arrays.copyOf(exprs, nargs), cc);
+      });
+      if(inlined != null) return inlined;
     }
     return this;
   }

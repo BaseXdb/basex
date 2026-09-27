@@ -1253,9 +1253,9 @@ public enum QueryError {
   /** Error code. */
   CIRCVAR_X(XQDY, 54, "Static variable depends on itself: %."),
   /** Error code. */
-  CIRCDFLT_X_X(XQDY, 54, "%: Default value of parameter % depends on itself."),
+  CIRCDFLT_X_X(XQDY, 54, "Default value depends on itself: %($%)."),
   /** Error code. */
-  CIRCCTX(XQDY, 54, "Context value is not defined."),
+  CIRCCTX(XQDY, 54, "Context value depends on itself."),
   /** Error code. */
   CPIXML_X(XQDY, 64, "Processing instruction has illegal name: %."),
   /** Error code. */
@@ -1372,7 +1372,7 @@ public enum QueryError {
   /** Error code. */
   INVCHARREF_X(XQST, 90, "Invalid XML 1.0 character: %."),
   /** Error code. */
-  CIRCMODULE(XQST, 93, "Circular module declaration."),
+  CIRCPKG_X(XQST, 93, "Package depends on itself: %."),
   /** Error code. */
   GVARNOTDEFINED_X(XQST, 94, "Undeclared grouping variable: %."),
   /** Error code. */
@@ -1414,7 +1414,7 @@ public enum QueryError {
   /** Error code. */
   NSAXIS(XQST, 134, "Namespace axis is not supported."),
   /** Error code. */
-  TYPECYCLE_X(XQST, 140, "Cyclic type declaration: %."),
+  CIRCTYPE_X(XQST, 140, "Type depends on itself: %."),
   /** Error code. */
   DUPLTYPE_X(XQST, 146, "Duplicate declaration of type %."),
   /** Error code. */

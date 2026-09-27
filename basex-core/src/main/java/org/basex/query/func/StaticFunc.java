@@ -37,8 +37,6 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   /** Updating flag. */
   final boolean updating;
 
-  /** Indicates if the function is currently being compiled. */
-  private boolean dontEnter;
   /** Indicates if the query focus is accessed or modified. */
   private boolean simple;
 
@@ -91,12 +89,14 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       }
 
       // compile function body, handle return type
-      dontEnter = true;
       cc.pushFocus(null, false);
       cc.pushScope(vs);
       try {
-        expr = expr.compile(cc);
-        if(declType != null) expr = new TypeCheck(info, expr, declType).optimize(cc);
+        cc.enter(this, () -> {
+          expr = expr.compile(cc);
+          if(declType != null) expr = new TypeCheck(info, expr, declType).optimize(cc);
+          return null;
+        });
       } catch(final QueryException ex) {
         expr = FnError.get(ex);
       } finally {
@@ -105,7 +105,6 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       }
       // convert all function calls in tail position to proper tail calls
       expr.markTailCalls(cc);
-      dontEnter = false;
 
       // dynamic compilation: remove redundant type declarations
       if(callTypes != null) {
@@ -237,7 +236,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    */
   @Override
   public Expr inline(final Expr[] exprs, final CompileContext cc) throws QueryException {
-    if(!cc.inlineable(anns, expr) || has(Flag.CTX) || dontEnter) return null;
+    if(!cc.inlineable(anns, expr) || has(Flag.CTX)) return null;
     cc.info(OPTINLINE_X, (Supplier<?>) this::funcLabel);
     return cc.inline(params, exprs, null, expr, null, info);
   }

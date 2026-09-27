@@ -1,7 +1,6 @@
 package org.basex.query.value.type;
 
 import java.io.*;
-import java.util.*;
 
 import org.basex.io.in.DataInput;
 import org.basex.query.*;
@@ -86,21 +85,6 @@ public final class TypeRef implements Type {
     Type tp = type;
     while(tp instanceof final TypeRef ref) tp = ref.type;
     return tp;
-  }
-
-  /**
-   * Checks if this reference is part of a cycle of type references
-   * (which would make {@link #deref()} loop indefinitely).
-   * @return result of check
-   */
-  public boolean cyclic() {
-    final Set<TypeRef> visited = Collections.newSetFromMap(new IdentityHashMap<>());
-    Type tp = this;
-    while(tp instanceof final TypeRef ref) {
-      if(!visited.add(ref)) return true;
-      tp = ref.type;
-    }
-    return false;
   }
 
   @Override

@@ -1,7 +1,5 @@
 package org.basex.query.scope;
 
-import java.util.*;
-
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -21,7 +19,7 @@ public abstract class StaticDecl extends StaticScope {
   public AnnList anns;
 
   /** Cached properties of the expression. */
-  private final EnumMap<Flag, Boolean> props = new EnumMap<>(Flag.class);
+  private final FlagCache props = new FlagCache(flag -> expr.has(flag));
 
   /**
    * Constructor.
@@ -55,22 +53,7 @@ public abstract class StaticDecl extends StaticScope {
    * @see Expr#has(Flag...)
    */
   protected final boolean check(final Flag... flags) {
-    if(expr == null) return false;
-    // handle recursive references: check which flags have already been assigned
-    final ArrayList<Flag> flgs = new ArrayList<>();
-    for(final Flag flag : flags) {
-      if(!props.containsKey(flag)) {
-        props.put(flag, false);
-        flgs.add(flag);
-      }
-    }
-    // cache flags for remaining, new properties
-    for(final Flag flag : flgs) props.put(flag, expr.has(flag));
-    // evaluate result
-    for(final Flag flag : flags) {
-      if(props.get(flag)) return true;
-    }
-    return false;
+    return expr != null && props.has(flags);
   }
 
   /**

@@ -5,7 +5,7 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.hash.*;
-import org.basex.query.value.type.*;
+import org.basex.query.util.parse.*;
 import org.basex.query.var.*;
 import org.basex.util.hash.*;
 
@@ -21,7 +21,7 @@ public abstract class AModule extends StaticScope {
   /** Static variables. */
   public ArrayList<StaticVar> vars;
   /** Public types. */
-  public QNmMap<SeqType> types;
+  public QNmMap<TypeDecl> types;
   /** URIs of modules. */
   public TokenSet modules;
   /** Namespaces. */
@@ -48,7 +48,7 @@ public abstract class AModule extends StaticScope {
    * @param dc documentation string
    */
   public void set(final ArrayList<StaticFunc> fn, final ArrayList<StaticVar> vr,
-      final QNmMap<SeqType> tp, final TokenSet md, final TokenObjectMap<byte[]> ns,
+      final QNmMap<TypeDecl> tp, final TokenSet md, final TokenObjectMap<byte[]> ns,
       final QNmMap<String> opts, final String dc) {
     funcs = fn;
     vars = vr;

@@ -143,8 +143,8 @@ public final class CompileContext {
   public final QueryContext qc;
   /** Dynamic compilation. */
   public final boolean dynamic;
-  /** Currently inlined function expressions. */
-  public final ArrayDeque<XQFunctionExpr> inlined = new ArrayDeque<>();
+  /** Functions whose bodies are currently compiled or inlined. */
+  private final ArrayDeque<XQFunctionExpr> entered = new ArrayDeque<>();
 
   /** Variable scope list. */
   private final ArrayDeque<VarScope> scopes = new ArrayDeque<>();
@@ -168,6 +168,25 @@ public final class CompileContext {
    */
   public void info(final String string, final Object... ext) {
     if(qc.parent == null) qc.info.compInfo(dynamic, string, ext);
+  }
+
+  /**
+   * Runs code on the body of a function, unless the body is already being compiled or inlined.
+   * @param <T> result type
+   * @param func function
+   * @param code code to be run
+   * @return result, or {@code null} if the body is already being compiled or inlined
+   * @throws QueryException query exception
+   */
+  public <T> T enter(final XQFunctionExpr func, final QuerySupplier<T> code)
+      throws QueryException {
+    if(entered.contains(func)) return null;
+    entered.push(func);
+    try {
+      return code.get();
+    } finally {
+      entered.pop();
+    }
   }
 
   /**

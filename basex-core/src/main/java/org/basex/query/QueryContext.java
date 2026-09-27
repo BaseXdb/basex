@@ -36,6 +36,7 @@ import org.basex.query.util.collation.*;
 import org.basex.query.util.ft.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
+import org.basex.query.util.parse.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -133,8 +134,8 @@ public final class QueryContext extends Job implements Closeable {
   /** Stack of module files that are currently parsed. */
   public final TokenList modStack = new TokenList();
 
-  /** Public types of all parsed modules (for resolving cross-module references). */
-  public final QNmMap<SeqType> namedTypes = new QNmMap<>();
+  /** Public type declarations of all parsed modules (for resolving cross-module references). */
+  public final QNmMap<TypeDecl> namedTypes = new QNmMap<>();
   /** Type references that could not be resolved within their module (resolved after parsing). */
   public final ArrayList<TypeRef> deferredTypeRefs = new ArrayList<>();
   /** Data for type constructors. */

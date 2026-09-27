@@ -31,10 +31,12 @@ import org.basex.util.similarity.*;
  * @author Christian Gruen
  */
 public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> {
-  /** Default value that is currently being checked. */
-  private static final byte CHECKING = 1;
-  /** Default value that has been checked. */
-  private static final byte CHECKED = 2;
+  /**
+   * Default value of a function parameter.
+   * @param func function
+   * @param index parameter index
+   */
+  private record Default(StaticFunc func, int index) { }
 
   /** Functions grouped by declaring module, then by QName, with lists of overloads. */
   private final TokenObjectMap<QNmMap<ArrayList<StaticFunc>>> funcsByModule =
@@ -123,57 +125,46 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
     unresolvedRefs.clear();
 
     // reject circular default values before assigning them
-    final Map<StaticFunc, byte[]> states = new IdentityHashMap<>();
-    for(final StaticFuncCall call : unassignedCalls) checkDefaults(call, states);
+    final Cycles<Default> cycles = new Cycles<>() {
+      @Override
+      protected Iterable<Default> next(final Default dflt) {
+        // inspect function calls; function items are skipped, as they are invoked at runtime
+        final ArrayList<Default> list = new ArrayList<>();
+        dflt.func.defaults[dflt.index].accept(new ASTVisitor() {
+          @Override
+          public boolean staticFuncCall(final StaticFuncCall call) {
+            if(call.func() != null) add(call, list);
+            return true;
+          }
+        });
+        return list;
+      }
+
+      @Override
+      protected QueryException error(final Default dflt) {
+        final StaticFunc func = dflt.func;
+        return CIRCDFLT_X_X.get(func.defaults[dflt.index].info(func.info), func.name.prefixId(),
+            func.paramName(dflt.index).prefixString());
+      }
+    };
+    final ArrayList<Default> list = new ArrayList<>();
+    for(final StaticFuncCall call : unassignedCalls) add(call, list);
+    for(final Default dflt : list) cycles.visit(dflt);
     for(final StaticFuncCall call : unassignedCalls) call.assignDefaults();
     unassignedCalls.clear();
   }
 
   /**
-   * Checks the default values that will be assigned to a function call.
+   * Adds the default values that will be assigned to a function call.
    * @param call function call
-   * @param states states of the checked default values
-   * @throws QueryException query exception
+   * @param list list of default values
    */
-  private static void checkDefaults(final StaticFuncCall call,
-      final Map<StaticFunc, byte[]> states) throws QueryException {
-
+  private static void add(final StaticFuncCall call, final ArrayList<Default> list) {
     final StaticFunc func = call.func();
     final int arity = func.arity();
     for(int a = 0; a < arity; a++) {
-      if(call.arg(a) == Empty.UNDEFINED) checkDefault(func, a, call.info(), states);
+      if(call.arg(a) == Empty.UNDEFINED) list.add(new Default(func, a));
     }
-  }
-
-  /**
-   * Checks if the default value of a function parameter refers to itself.
-   * @param func function
-   * @param index parameter index
-   * @param info input info (can be {@code null})
-   * @param states states of the checked default values
-   * @throws QueryException query exception
-   */
-  private static void checkDefault(final StaticFunc func, final int index, final InputInfo info,
-      final Map<StaticFunc, byte[]> states) throws QueryException {
-
-    final byte[] state = states.computeIfAbsent(func, f -> new byte[f.arity()]);
-    if(state[index] == CHECKED) return;
-    if(state[index] == CHECKING) throw CIRCDFLT_X_X.get(info, func.name.prefixId(),
-        func.paramName(index).prefixString());
-    state[index] = CHECKING;
-
-    // inspect function calls; function items are skipped, as they are invoked at runtime
-    final ArrayList<StaticFuncCall> calls = new ArrayList<>(1);
-    func.defaults[index].accept(new ASTVisitor() {
-      @Override
-      public boolean staticFuncCall(final StaticFuncCall call) {
-        if(call.func() != null) calls.add(call);
-        return true;
-      }
-    });
-    for(final StaticFuncCall call : calls) checkDefaults(call, states);
-
-    state[index] = CHECKED;
   }
 
   /**

@@ -75,7 +75,7 @@ public final class StaticFuncCall extends FuncCall {
 
     // try to inline the function
     if(!selfRecursive()) {
-      final Expr inlined = func.inline(exprs, cc);
+      final Expr inlined = cc.enter(func, () -> func.inline(exprs, cc));
       if(inlined != null) return inlined;
     }
 
