@@ -31,6 +31,8 @@ public final class StaticContext {
   public final NSContext ns = new NSContext();
   /** Look up documents in databases. */
   public final boolean withdb;
+  /** Favor the opened database when looking up documents. */
+  public final boolean defaultdb;
 
   /** Default collation (default collection ({@link QueryText#COLLATION_URI}): {@code null}). */
   public Collation collation;
@@ -81,6 +83,7 @@ public final class StaticContext {
   public StaticContext(final QueryContext qc) {
     final MainOptions mopts = qc.context.options;
     withdb = mopts.get(MainOptions.WITHDB);
+    defaultdb = mopts.get(MainOptions.DEFAULTDB);
     uriResolver = mopts.resolver().uriResolver();
   }
 

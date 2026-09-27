@@ -88,6 +88,8 @@ public abstract class Docs extends DynamicFn {
             // add local lock if argument may reference a database
             queryInput = queryInput(uri);
             if(queryInput != null && queryInput.dbName != null) list.add(queryInput.dbName);
+            // lock opened database if it will be favored
+            if(sc().defaultdb) list.add(Locking.COLLECTION);
           } else {
             // empty sequence: default collection; otherwise, enforce global lock
             list.add(arg(0).seqType().zero() ? Locking.COLLECTION : null);
