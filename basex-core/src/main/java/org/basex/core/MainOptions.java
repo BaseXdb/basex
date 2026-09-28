@@ -94,6 +94,8 @@ public final class MainOptions extends Options {
   public static final BooleanOption TOKENINDEX = new BooleanOption("TOKENINDEX", false);
   /** Flag for creating a full-text index. */
   public static final BooleanOption FTINDEX = new BooleanOption("FTINDEX", false);
+  /** Flag for creating a thesaurus index. */
+  public static final BooleanOption THESINDEX = new BooleanOption("THESINDEX", false);
 
   /** Text index: names to include. */
   public static final NamesOption TEXTINCLUDE = new NamesOption("TEXTINCLUDE", "");
@@ -191,8 +193,8 @@ public final class MainOptions extends Options {
 
   /** Indexing options. */
   public static final Option<?>[] INDEXING = { MAXCATS, MAXLEN, LANGUAGE, STOPWORDS,
-    TEXTINDEX, ATTRINDEX, TOKENINDEX, FTINDEX, TEXTINCLUDE, ATTRINCLUDE, TOKENINCLUDE, FTINCLUDE,
-    FTMIXED, STEMMING, CASESENS, DIACRITICS, UPDINDEX, AUTOOPTIMIZE };
+    TEXTINDEX, ATTRINDEX, TOKENINDEX, FTINDEX, THESINDEX, TEXTINCLUDE, ATTRINCLUDE, TOKENINCLUDE,
+    FTINCLUDE, FTMIXED, STEMMING, CASESENS, DIACRITICS, UPDINDEX, AUTOOPTIMIZE };
 
   /** Mapping of XML parsing options. */
   private static final Map<String, Option<?>> XMLPARSINGMAP = new HashMap<>();

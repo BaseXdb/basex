@@ -44,6 +44,8 @@ public interface DataText {
   String DBTOKIDX = "TOKINDEX";
   /** Full-text index. */
   String DBFTXIDX = "FTXINDEX";
+  /** Thesaurus index. */
+  String DBTHSIDX = "THSINDEX";
   /** Text index: names. */
   String DBTXTINC = "TXTINC";
   /** Attribute index: names. */
@@ -106,6 +108,8 @@ public interface DataText {
   String DBCRTTOK = "CRTTOK";
   /** Recreate full-text index. */
   String DBCRTFTX = "CRTFTX";
+  /** Recreate thesaurus index. */
+  String DBCRTTHS = "CRTTHS";
 
   /** Tags. */
   String DBTAGS = "TAGS";
@@ -134,6 +138,8 @@ public interface DataText {
   String DATATOK = "tok";
   /** Database - Full-text index. */
   String DATAFTX = "ftx";
+  /** Database - Thesaurus index. */
+  String DATATHS = "ths";
   /** Database - Stopword list. */
   String DATASWL = "swl";
   /** Database - Updating flag. */

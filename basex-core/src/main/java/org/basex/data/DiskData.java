@@ -13,6 +13,7 @@ import org.basex.index.*;
 import org.basex.index.ft.*;
 import org.basex.index.name.*;
 import org.basex.index.path.*;
+import org.basex.index.thes.*;
 import org.basex.index.value.*;
 import org.basex.io.*;
 import org.basex.io.in.DataInput;
@@ -56,6 +57,8 @@ public final class DiskData extends Data {
   private DataAccess texts;
   /** Values access file. */
   private DataAccess values;
+  /** Thesaurus index (can be {@code null}). */
+  private ThesIndex thesIndex;
 
   /**
    * Default constructor, called from {@link Open#open}.
@@ -203,6 +206,7 @@ public final class DiskData extends Data {
       close(IndexType.ATTRIBUTE);
       close(IndexType.TOKEN);
       close(IndexType.FULLTEXT);
+      if(thesIndex != null) thesIndex.close();
     } catch(final IOException ex) {
       Util.stack(ex);
     }
@@ -235,6 +239,35 @@ public final class DiskData extends Data {
       set(type, ib.build());
     } finally {
       if(cmd != null) cmd.popJob();
+    }
+  }
+
+  /**
+   * Returns the thesaurus index.
+   * @return index
+   * @throws IOException I/O exception
+   */
+  public synchronized ThesIndex thesIndex() throws IOException {
+    if(thesIndex == null) thesIndex = new ThesIndex(this);
+    return thesIndex;
+  }
+
+  /**
+   * Creates or drops the thesaurus index.
+   * @param create create or drop index
+   * @throws IOException I/O exception
+   */
+  public synchronized void thesIndex(final boolean create) throws IOException {
+    if(thesIndex != null) {
+      thesIndex.close();
+      thesIndex = null;
+    }
+    meta.drop(DATATHS + ".*");
+    meta.thesindex = false;
+    meta.dirty = true;
+    if(create) {
+      ThesIndex.create(this);
+      meta.thesindex = true;
     }
   }
 

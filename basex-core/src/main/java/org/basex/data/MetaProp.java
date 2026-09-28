@@ -94,6 +94,11 @@ public enum MetaProp {
     public Boolean value(final MetaData meta) { return meta.ftindex; }
   },
   /** Property. */
+  THESINDEX(true) {
+    @Override
+    public Boolean value(final MetaData meta) { return meta.thesindex; }
+  },
+  /** Property. */
   TEXTINCLUDE(true) {
     @Override
     public String value(final MetaData meta) { return meta.textinclude; }

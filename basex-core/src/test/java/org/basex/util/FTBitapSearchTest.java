@@ -128,7 +128,11 @@ public final class FTBitapSearchTest {
       new TestData(
           new String[] { "token1", "token2", "token3" },
           new String[][] { { "token2" }, { "token1", "token2" } },
-          new int[] { 0})};
+          new int[] { 0}),
+      new TestData(
+          new String[] { "token1", "token2" },
+          new String[][] { { }, { "token2" } },
+          new int[] { 1 })};
 
   /** Pre-initialized {@link FTBitapSearch} objects. */
   private FTBitapSearch[] searches;

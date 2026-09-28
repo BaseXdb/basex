@@ -46,6 +46,8 @@ public final class MetaData {
   public boolean tokenindex;
   /** Indicates if a full-text index exists. */
   public boolean ftindex;
+  /** Indicates if a thesaurus index exists. */
+  public boolean thesindex;
 
   /** Flag for activated automatic index update. */
   public boolean updindex;
@@ -60,6 +62,8 @@ public final class MetaData {
   public boolean createtoken;
   /** Indicates if the full-text index is to be recreated. */
   public boolean createft;
+  /** Indicates if the thesaurus index is to be recreated. */
+  public boolean createthes;
   /** Text index: names to include. */
   public String textinclude;
   /** Attribute index: names to include. */
@@ -163,12 +167,14 @@ public final class MetaData {
     attrindex = meta.attrindex;
     tokenindex = meta.tokenindex;
     ftindex = meta.ftindex;
+    thesindex = meta.thesindex;
     updindex = meta.updindex;
     autooptimize = meta.autooptimize;
     createtext = meta.createtext;
     createattr = meta.createattr;
     createtoken = meta.createtoken;
     createft = meta.createft;
+    createthes = meta.createthes;
     textinclude = meta.textinclude;
     attrinclude = meta.attrinclude;
     tokeninclude = meta.tokeninclude;
@@ -208,6 +214,7 @@ public final class MetaData {
     createattr = options.get(MainOptions.ATTRINDEX);
     createtoken = options.get(MainOptions.TOKENINDEX);
     createft = options.get(MainOptions.FTINDEX);
+    createthes = options.get(MainOptions.THESINDEX);
     diacritics = options.get(MainOptions.DIACRITICS);
     stemming = options.get(MainOptions.STEMMING);
     casesens = options.get(MainOptions.CASESENS);
@@ -542,6 +549,7 @@ public final class MetaData {
         case DBATVIDX -> attrindex = isTrue(v);
         case DBTOKIDX -> tokenindex = isTrue(v);
         case DBFTXIDX -> ftindex = isTrue(v);
+        case DBTHSIDX -> thesindex = isTrue(v);
         case DBTXTINC -> textinclude = v;
         case DBATVINC -> attrinclude = v;
         case DBTOKINC -> tokeninclude = v;
@@ -559,6 +567,7 @@ public final class MetaData {
         case DBCRTATV -> createattr = isTrue(v);
         case DBCRTTOK -> createtoken = isTrue(v);
         case DBCRTFTX -> createft = isTrue(v);
+        case DBCRTTHS -> createthes = isTrue(v);
         case DBFTST -> stemming = isTrue(v);
         case DBFTCS -> casesens = isTrue(v);
         case DBUPTODATE -> uptodate = isTrue(v);
@@ -602,6 +611,7 @@ public final class MetaData {
     writeInfo(out, DBATVIDX,   attrindex);
     writeInfo(out, DBTOKIDX,   tokenindex);
     writeInfo(out, DBFTXIDX,   ftindex);
+    writeInfo(out, DBTHSIDX,   thesindex);
     writeInfo(out, DBTXTINC,   textinclude);
     writeInfo(out, DBATVINC,   attrinclude);
     writeInfo(out, DBTOKINC,   tokeninclude);
@@ -620,6 +630,7 @@ public final class MetaData {
     writeInfo(out, DBCRTATV,   createattr);
     writeInfo(out, DBCRTTOK,   createtoken);
     writeInfo(out, DBCRTFTX,   createft);
+    writeInfo(out, DBCRTTHS,   createthes);
     writeInfo(out, DBFTST,     stemming);
     writeInfo(out, DBFTCS,     casesens);
     writeInfo(out, DBFTDC,     diacritics);
@@ -671,6 +682,7 @@ public final class MetaData {
     }
     // only a segmented, or adoptable, full-text index survives updates
     if(!segments.containsKey(IndexType.FULLTEXT) && !ftadopt) ftindex = false;
+    thesindex = false;
   }
 
   /**

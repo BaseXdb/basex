@@ -162,27 +162,20 @@ public final class FTWords extends FTExpr {
           for(final byte[] input : unique(inputs != null ? inputs : inputs(qc))) {
             lexer.init(input);
             if(!lexer.hasNext()) return null;
+            while(lexer.hasNext()) len += lexer.nextToken().length;
 
-            int d = 0;
-            FTIndexIterator iter = null;
-            final StopWords sw = ftOpt.sw;
-            do {
-              final byte[] token = lexer.nextToken();
-              len += token.length;
-              if(sw != null && sw.contains(token)) {
-                ++d;
-              } else {
-                final FTIndexIterator ir = lexer.token().length > data.meta.maxlen ?
-                  scan(lexer, ftt, data) : (FTIndexIterator) data.iter(lexer);
-                ir.pos(++qc.ftPos);
-                if(iter == null) {
-                  iter = ir;
-                } else {
-                  iter = FTIndexIterator.intersect(iter, ir, ++d);
-                  d = 0;
-                }
+            FTIndexIterator iter = iter(lexer.init(input), ftt, data, qc);
+            // thesaurus: add the results of the terms that extend the query term
+            if(ftOpt.th != null) {
+              final ArrayList<FTIndexIterator> iters = new ArrayList<>();
+              if(iter != null) iters.add(iter);
+              for(final byte[] term : ftt.thesaurus(input)) {
+                final FTIndexIterator ir = iter(lexer.init(term), ftt, data, qc);
+                if(ir != null) iters.add(ir);
               }
-            } while(lexer.hasNext());
+              iter = iters.isEmpty() ? null : iters.size() == 1 ? iters.getFirst() :
+                FTIndexIterator.union(iters.toArray(FTIndexIterator[]::new));
+            }
 
             if(iter != null) {
               // create or combine iterator
@@ -208,18 +201,49 @@ public final class FTWords extends FTExpr {
   }
 
   /**
+   * Returns an index iterator for the tokens of a query term.
+   * @param lexer lexer, initialized with the query term
+   * @param ftt full-text tokenizer
+   * @param data data reference
+   * @param qc query context
+   * @return iterator, or {@code null} if all tokens are stop words
+   */
+  private FTIndexIterator iter(final FTLexer lexer, final FTTokenizer ftt, final Data data,
+      final QueryContext qc) {
+    final StopWords sw = ftOpt.sw;
+    FTIndexIterator iter = null;
+    int d = 0;
+    while(lexer.hasNext()) {
+      final byte[] token = lexer.nextToken();
+      if(sw != null && sw.contains(token)) {
+        ++d;
+      } else {
+        final FTIndexIterator ir = lexer.token().length > data.meta.maxlen ?
+          scan(lexer, ftt, data) : (FTIndexIterator) data.iter(lexer);
+        ir.pos(++qc.ftPos);
+        if(iter == null) {
+          iter = ir;
+        } else {
+          iter = FTIndexIterator.intersect(iter, ir, ++d);
+          d = 0;
+        }
+      }
+    }
+    return iter;
+  }
+
+  /**
    * Returns a scan-based index iterator.
    * @param lexer lexer, including the queried value
    * @param ftt full-text tokenizer
    * @param data data reference
    * @return node iterator
-   * @throws QueryException query exception
    */
-  private FTIndexIterator scan(final FTLexer lexer, final FTTokenizer ftt, final Data data)
-      throws QueryException {
-
+  private FTIndexIterator scan(final FTLexer lexer, final FTTokenizer ftt, final Data data) {
     final FTLexer input = new FTLexer(ftOpt);
-    final FTTokens fttokens = ftt.cache(lexer.token());
+    // the token has already been normalized, and extended by thesaurus terms
+    final FTTokens fttokens = new FTTokens();
+    fttokens.add(new TokenList(1).add(lexer.token()));
     // with mixed content, the string values of the indexed elements are scanned
     final IndexNames names = data.meta.ftmixed ?
       new IndexNames(IndexType.FULLTEXT, data) : null;
@@ -336,7 +360,7 @@ public final class FTWords extends FTExpr {
     final boolean and = !ftt.first && (mode == FTMode.ALL || mode == FTMode.ALL_WORDS);
     final FTBitapSearch bs = new FTBitapSearch(input.init(), tokens, ftt.cmp);
     while(bs.hasNext()) {
-      final int s = bs.next(), e = s + tokens.firstSize() - 1;
+      final int s = bs.next(), e = s + bs.size() - 1;
       if(and) matches.and(s, e);
       else matches.or(s, e);
       count++;
@@ -386,14 +410,14 @@ public final class FTWords extends FTExpr {
     final ThreadLocal<FTTokenizer> tl = qc.threads.get(this);
     FTTokenizer ftt = tl.get();
     if(ftt == null) {
-      ftt = new FTTokenizer(ftOpt, info);
+      ftt = new FTTokenizer(ftOpt, qc, info);
       tl.set(ftt);
     }
     return ftt;
   }
 
   @Override
-  public boolean indexAccessible(final IndexInfo ii) {
+  public boolean indexAccessible(final IndexInfo ii) throws QueryException {
     /* if the following conditions yield true, the index is accessed:
      * - all query terms are statically available
      * - no FTTimes option is specified
@@ -425,19 +449,24 @@ public final class FTWords extends FTExpr {
       final FTLexer lexer = new FTLexer(ftOpt);
       final TokenSet ts = new TokenSet();
       final StopWords sw = ftOpt.sw;
-      for(final byte[] input : inputs) {
-        lexer.init(input);
-        while(lexer.hasNext()) {
-          final byte[] token = lexer.nextToken();
-          if(!ts.add(token) || sw != null && sw.contains(token)) continue;
+      for(final byte[] input : unique(inputs)) {
+        // thesaurus: include the terms that extend the query term
+        final TokenList terms = new TokenList(1).add(input);
+        if(ftOpt.th != null) terms.add(get(ii.cc.qc).thesaurus(input));
+        for(final byte[] term : terms) {
+          lexer.init(term);
+          while(lexer.hasNext()) {
+            final byte[] token = lexer.nextToken();
+            if(!ts.add(token) || sw != null && sw.contains(token)) continue;
 
-          // don't use index if token starts with a wildcard
-          if(ftOpt.is(WC) && token[0] == '.') return false;
-          // favor full-text index requests over exact queries
-          final IndexCosts ic = IndexInfo.costs(data, lexer);
-          if(ic == null) return false;
-          final int r = ic.results();
-          if(r != 0) ii.costs = IndexCosts.add(ii.costs, IndexCosts.get(Math.max(2, r / 100)));
+            // don't use index if token starts with a wildcard
+            if(ftOpt.is(WC) && token[0] == '.') return false;
+            // favor full-text index requests over exact queries
+            final IndexCosts ic = IndexInfo.costs(data, lexer);
+            if(ic == null) return false;
+            final int r = ic.results();
+            if(r != 0) ii.costs = IndexCosts.add(ii.costs, IndexCosts.get(Math.max(2, r / 100)));
+          }
         }
       }
     }

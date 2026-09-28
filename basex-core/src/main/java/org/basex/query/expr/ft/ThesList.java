@@ -3,6 +3,7 @@ package org.basex.query.expr.ft;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.util.ft.*;
 import org.basex.util.list.*;
 
 /**
@@ -38,12 +39,15 @@ public final class ThesList {
   /**
    * Finds a thesaurus term.
    * @param term term to be found
+   * @param opt full-text options
+   * @param qc query context
    * @return result list
    * @throws QueryException query exception
    */
-  byte[][] find(final byte[] term) throws QueryException {
+  byte[][] find(final byte[] term, final FTOpt opt, final QueryContext qc)
+      throws QueryException {
     final TokenList tl = new TokenList();
-    for(final ThesAccessor th : list) tl.add(th.find(term));
+    for(final ThesAccessor th : list) tl.add(th.find(term, opt, qc));
     return tl.finish();
   }
 

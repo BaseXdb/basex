@@ -326,15 +326,41 @@ public final class FtModuleTest extends SandboxTest {
     final Function func = _FT_THESAURUS;
     final String doc = " doc('src/test/resources/thesaurus.xml')";
 
-    query(func.args(doc, "happy"), "lucky\nhappy");
+    query(func.args(doc, "happy"), "lucky");
     query(func.args(doc, "happy", " { 'levels': 0 }"), "");
-    query(func.args(doc, "happy", " { 'levels': 5 }"), "lucky\nhappy");
-    query(func.args(doc, "happy", " { 'relationship': 'RT' }"), "lucky\nhappy");
+    query(func.args(doc, "happy", " { 'levels': 5 }"), "lucky");
+    query(func.args(doc, "happy", " { 'relationship': 'RT' }"), "lucky");
     query(func.args(doc, "happy", " { 'relationship': 'XYZ' }"), "");
 
     // index options are rejected
     error(func.args(doc, "happy", " { 'fuzzy': true() }"), INVALIDOPTION_X);
     error(func.args(doc, "happy", " { 'mode': 'all' }"), INVALIDOPTION_X);
+
+    // terms are expanded on the lowest level on which they are found
+    final String levels = " <thesaurus>"
+        + "<entry><term>a</term><synonym><term>x</term><relationship>RT</relationship></synonym>"
+        + "<synonym><term>c</term><relationship>RT</relationship></synonym></entry>"
+        + "<entry><term>x</term><synonym><term>c</term><relationship>RT</relationship></synonym>"
+        + "</entry><entry><term>c</term><synonym><term>d</term><relationship>RT</relationship>"
+        + "</synonym></entry></thesaurus>";
+    query(func.args(levels, "a", " { 'levels': 1 }"), "x\nc");
+    query(func.args(levels, "a", " { 'levels': 2 }"), "x\nc\nd");
+
+    // inverse relationships
+    final String bt = " <thesaurus><entry><term>hardware</term><synonym><term>computers</term>"
+        + "<relationship>BT</relationship></synonym></entry></thesaurus>";
+    query(func.args(bt, "computers", " { 'relationship': 'NT' }"), "hardware");
+    query(func.args(bt, "hardware", " { 'relationship': 'BT' }"), "computers");
+
+    // groups of equivalent terms
+    final String eq = " <thesaurus><entry><term>flower</term>"
+        + "<synonym><term>Blume</term><relationship>EQ</relationship></synonym>"
+        + "<synonym><term>fleur</term><relationship>EQ</relationship></synonym></entry>"
+        + "<entry><term>fleur</term><synonym><term>bloom</term><relationship>RT</relationship>"
+        + "</synonym></entry></thesaurus>";
+    query(func.args(eq, "blume", " { 'levels': 1 }"), "fleur\nflower");
+    query(func.args(eq, "flower", " { 'relationship': 'EQ' }"), "Blume\nfleur");
+    query(func.args(eq, "blume", " { 'levels': 2 }"), "fleur\nflower\nbloom");
   }
 
   /** Test method. */

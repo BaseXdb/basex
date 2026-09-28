@@ -203,6 +203,8 @@ public final class PermissionTest extends SandboxTest {
 
     // files referenced in the query prolog or body, and query files, require CREATE permission
     for(final String query : externalQueries()) no(new XQuery(query), testSession);
+    // thesaurus databases require READ permission
+    no(new XQuery("'a' contains text 'a' using thesaurus at '" + NAME + "'"), testSession);
     no(new Run(sandbox() + "doc.xml"), testSession);
 
     // fn:parse-xml: external resources require CREATE permission
@@ -267,6 +269,7 @@ public final class PermissionTest extends SandboxTest {
     ok(new XQuery("1"), testSession);
     ok(new XQuery("delete node <a/>"), testSession);
     no(new XQuery("for $n in " + _DB_GET.args(NAME) + "//xml return delete node $n"), testSession);
+    ok(new XQuery("'a' contains text 'a' using thesaurus at '" + NAME + "'"), testSession);
 
     no(new XQuery(_DB_OPTIMIZE.args(NAME)), testSession);
     ok(new XQuery(_DB_ATTRIBUTE.args(NAME, "x")), testSession);

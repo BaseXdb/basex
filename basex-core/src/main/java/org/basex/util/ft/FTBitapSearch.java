@@ -91,7 +91,7 @@ public final class FTBitapSearch {
       for(int i = 0; i < ml; i++) {
         final int id = sorted[i];
         final TokenList n = tokens.get(id);
-        final BitSet m = masks[id];
+        final BitSet m = masks[i];
         // compare each element from the needle and set the corresponding bit:
         for(int k = n.size(); k >= 1; k--) {
           m.set(k, m.get(k - 1) && cmp.equal(current, n.get(k - 1)));
@@ -122,6 +122,14 @@ public final class FTBitapSearch {
       return pos - tokens.get(match).size();
     }
     throw new NoSuchElementException();
+  }
+
+  /**
+   * Returns the number of tokens of the most recent match.
+   * @return number of tokens
+   */
+  public int size() {
+    return tokens.get(match).size();
   }
 
   /**

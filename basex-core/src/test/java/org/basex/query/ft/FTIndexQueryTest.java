@@ -59,6 +59,39 @@ public final class FTIndexQueryTest extends SandboxTest {
     assertQuery(_FT_MARK.args(" //*[text() contains text 'A' ftand 'B'], 'b'"));
   }
 
+  /** Thesaurus: query terms are extended in the index path as well. */
+  @Test public void thesaurus() {
+    init("<x><w>lucky</w><w>a still life</w><w>still</w><w>life</w><w>l.cky</w>"
+        + "<w>stillleben</w></x>");
+    final String db = NAME + "thes";
+    execute(new CreateDB(db, "<thesaurus>"
+        + "<entry><term>happy</term><synonym><term>lucky</term>"
+        + "<relationship>RT</relationship></synonym></entry>"
+        + "<entry><term>stillleben</term><synonym><term>still life</term>"
+        + "<relationship>RT</relationship></synonym></entry>"
+        + "<entry><term>glad</term><synonym><term>l.cky</term>"
+        + "<relationship>RT</relationship></synonym></entry></thesaurus>"));
+    try {
+      final String thes = " using thesaurus at '" + db + "']";
+      final String[][] queries = {
+        { "//w[text() contains text 'happy'" + thes, "lucky" },
+        { "//w[text() contains text 'stillleben'" + thes, "a still life\nstillleben" },
+        { "//w[text() contains text 'glad' using wildcards" + thes, "l.cky" },
+        { "//w[text() contains text 'happy glad' any word" + thes, "lucky\nl.cky" },
+        { "//w[text() contains text { 'stil.*' } using wildcards ftor { 'happy' }" + thes,
+          "lucky\na still life\nstill\nstillleben" }
+      };
+      for(final String[] query : queries) {
+        final String qu = query[0] + " ! string()";
+        assertQuery(qu);
+        check(qu, query[1], exists(FTIndexAccess.class));
+        assertQuery(_FT_MARK.args(" " + query[0]));
+      }
+    } finally {
+      execute(new DropDB(db));
+    }
+  }
+
   /** Counts must not include index candidates that are discarded by the following name test. */
   @Test public void count() {
     init("<xml><a>A</a><b>A</b></xml>");

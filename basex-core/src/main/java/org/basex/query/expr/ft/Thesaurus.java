@@ -2,11 +2,14 @@ package org.basex.query.expr.ft;
 
 import static org.basex.util.Token.*;
 
+import java.util.*;
 import java.util.function.*;
 
 import org.basex.query.util.list.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
+import org.basex.util.ft.*;
 import org.basex.util.hash.*;
 
 /**
@@ -24,15 +27,19 @@ public final class Thesaurus {
   private static final byte[] SYNONYM = token("synonym");
   /** Element name: term. */
   private static final byte[] TERM = token("term");
+  /** Relationship between equivalent terms. */
+  public static final byte[] EQ = token("EQ");
 
   /** Map with thesaurus entries. */
   private final TokenObjectMap<ThesEntry> entries = new TokenObjectMap<>();
+  /** Groups of equivalent terms. */
+  private final ArrayList<ThesEntry[]> groups = new ArrayList<>();
   /** Relationships. */
   private static final TokenObjectMap<byte[]> RSHIPS = new TokenObjectMap<>();
 
   static {
     RSHIPS.put(token("NT"), token("BT"));
-    RSHIPS.put(token("BT"), token("BT"));
+    RSHIPS.put(token("BT"), token("NT"));
     RSHIPS.put(token("BTG"), token("NTG"));
     RSHIPS.put(token("NTG"), token("BTG"));
     RSHIPS.put(token("BTP"), token("NTP"));
@@ -44,40 +51,118 @@ public final class Thesaurus {
 
   /**
    * Constructor.
-   * @param root thesaurus root node
+   * @param opt full-text options for normalizing terms
+   * @param roots thesaurus root nodes
    */
-  public Thesaurus(final XNode root) {
-    for(final GNode entry : elements(root, ENTRY, true)) build(entry);
+  public Thesaurus(final FTOpt opt, final XNode... roots) {
+    final FTLexer lexer = new FTLexer(opt);
+    for(final XNode root : roots) {
+      for(final GNode entry : elements(root, ENTRY, true)) build(entry, lexer);
+    }
   }
 
   /**
-   * Returns a thesaurus entry for the specified term.
+   * Normalizes a term.
    * @param term term
+   * @param lexer lexer
+   * @return normalized term
+   */
+  public static byte[] normalize(final byte[] term, final FTLexer lexer) {
+    final TokenBuilder tb = new TokenBuilder();
+    lexer.init(term);
+    while(lexer.hasNext()) {
+      if(!tb.isEmpty()) tb.add(' ');
+      tb.add(lexer.nextToken());
+    }
+    return tb.finish();
+  }
+
+  /**
+   * Returns all normalized terms.
+   * @return normalized terms
+   */
+  public byte[][] keys() {
+    return entries.keys();
+  }
+
+  /**
+   * Returns the term for the specified normalized term.
+   * @param key normalized term
+   * @return term
+   */
+  public byte[] term(final byte[] key) {
+    return entries.get(key).term;
+  }
+
+  /**
+   * Passes the synonyms of a term and their relationships to the specified action.
+   * @param key normalized term
+   * @param action action, receiving normalized synonym and relationship
+   */
+  public void synonyms(final byte[] key, final BiConsumer<byte[], byte[]> action) {
+    final ThesEntry entry = entries.get(key);
+    for(int n = 0; n < entry.size; n++) action.accept(entry.synonyms[n].key, entry.relations[n]);
+  }
+
+  /**
+   * Returns the groups of equivalent terms.
+   * @return normalized terms of each group
+   */
+  public byte[][][] groups() {
+    final int gs = groups.size();
+    final byte[][][] keys = new byte[gs][][];
+    for(int g = 0; g < gs; g++) {
+      final ThesEntry[] group = groups.get(g);
+      final int gl = group.length;
+      keys[g] = new byte[gl][];
+      for(int m = 0; m < gl; m++) keys[g][m] = group[m].key;
+    }
+    return keys;
+  }
+
+  /**
+   * Returns a thesaurus entry for the specified normalized term.
+   * @param key normalized term
    * @return node or {@code null}
    */
-  ThesEntry get(final byte[] term) {
-    return entries.get(term);
+  ThesEntry get(final byte[] key) {
+    return entries.get(key);
   }
 
   /**
    * Populates the thesaurus.
    * @param entry thesaurus entry
+   * @param lexer lexer for normalizing terms
    */
-  private void build(final GNode entry) {
+  private void build(final GNode entry, final FTLexer lexer) {
+    // terms without tokens are skipped
     final Function<GNode, ThesEntry> find = node -> {
-      final byte[] term = value(node, TERM);
-      return entries.computeIfAbsent(term, () -> new ThesEntry(term));
+      final byte[] term = value(node, TERM), key = normalize(term, lexer);
+      return key.length == 0 ? null : entries.computeIfAbsent(key, () -> new ThesEntry(term, key));
     };
 
     final ThesEntry term = find.apply(entry);
+    final ArrayList<ThesEntry> group = new ArrayList<>();
     for(final GNode synonym : elements(entry, SYNONYM, false)) {
       final ThesEntry syn = find.apply(synonym);
-      final byte[] value = value(synonym, RELATIONSHIP);
-      term.add(syn, value);
-
-      final byte[] rship = RSHIPS.get(value);
-      if(rship != null) syn.add(term, rship);
-      build(synonym);
+      if(term != null && syn != null) {
+        final byte[] value = value(synonym, RELATIONSHIP);
+        if(eq(value, EQ)) {
+          // equivalent terms: all terms of the group are related to each other
+          group.add(syn);
+        } else {
+          term.add(syn, value);
+          final byte[] rship = RSHIPS.get(value);
+          if(rship != null) syn.add(term, rship);
+        }
+      }
+      build(synonym, lexer);
+    }
+    if(!group.isEmpty()) {
+      group.add(term);
+      final ThesEntry[] members = group.toArray(ThesEntry[]::new);
+      for(final ThesEntry member : members) member.add(members);
+      groups.add(members);
     }
   }
 

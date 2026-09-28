@@ -1,10 +1,17 @@
 package org.basex.query.ft;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.query.func.Function.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.io.*;
 
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.io.*;
+import org.basex.query.func.*;
+import org.basex.util.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
@@ -471,6 +478,127 @@ public class FTTest extends SandboxTest {
     // the inner level has no thesaurus, the outer one is added
     query("'lucky' contains text ('happy' using thesaurus default) "
         + "using thesaurus at " + thes, true);
+  }
+
+  /**
+   * Thesaurus index.
+   * @throws IOException I/O exception
+   */
+  @Test public void thesaurusIndex() throws IOException {
+    final String db = NAME + "thes", file = "src/test/resources/thesaurus.xml";
+    query(_DB_CREATE.args(db, file, "thesaurus.xml", " { 'thesindex': true() }"));
+    query(_DB_INFO.args(db) + "//thesindex/string()", true);
+
+    final String thes = " using thesaurus at '" + db + "'";
+    query("'lucky' contains text 'happy'" + thes, true);
+    query("'happy' contains text 'lucky'" + thes, true);
+    query("'unlucky' contains text 'happy'" + thes, false);
+    query("deep-equal(" + _FT_THESAURUS.args(_DB_GET.args(db), "happy") + ", " +
+        _FT_THESAURUS.args(Function.DOC.args(file), "happy") + ")", true);
+    thesInfo("'lucky' contains text 'happy'" + thes, "Thesaurus \"" + db + "\": index");
+    thesInfo("'lucky' contains text 'happy' using case sensitive" + thes,
+        "Thesaurus \"" + db + "\": main memory (full-text options differ)");
+
+    // terms are normalized with the full-text options
+    for(final String th : new String[] { thes, " using thesaurus at '" + file + "'" }) {
+      query("'LUCKY' contains text 'Häppy'" + th, true);
+      query("'lucky' contains text 'Happy' using case sensitive" + th, false);
+      query("'lucky' contains text 'häppy' using diacritics sensitive" + th, false);
+      query("'lucky' contains text 'happies'" + th, false);
+      query("'lucky' contains text 'happies' using stemming" + th, true);
+      query("'lucky' contains text 'happy.*' using wildcards" + th, false);
+    }
+
+    // updates invalidate the index, optimization recreates it
+    query(_DB_ADD.args(db, " <x/>", "x.xml"));
+    query(_DB_INFO.args(db) + "//thesindex/string()", false);
+    query("'lucky' contains text 'happy'" + thes, true);
+    thesInfo("'lucky' contains text 'happy'" + thes,
+        "Thesaurus \"" + db + "\": main memory (index is outdated)");
+    query(_DB_OPTIMIZE.args(db));
+    query(_DB_INFO.args(db) + "//thesindex/string()", true);
+
+    // the index adopts the full-text options of the database
+    query(_DB_OPTIMIZE.args(db, false, " { 'stemming': true() }"));
+    query(_DB_INFO.args(db) + "//thesindex/string()", true);
+    query("'lucky' contains text 'happies'" + thes, true);
+
+    // indexes of other formats are ignored, optimization recreates them
+    new IOFile(context.soptions.dbPath(db), "thsr.basex").write(Token.token("x"));
+    thesInfo("'lucky' contains text 'happy'" + thes,
+        "Thesaurus \"" + db + "\": main memory (index format is outdated)");
+    query(_DB_OPTIMIZE.args(db));
+    thesInfo("'lucky' contains text 'happy'" + thes, "Thesaurus \"" + db + "\": index");
+    query(_DB_DROP.args(db));
+  }
+
+  /** Thesaurus index: levels and groups of equivalent terms. */
+  @Test public void thesaurusGroups() {
+    final String db = NAME + "thes", thes = "<thesaurus><entry><term>flower</term>"
+        + "<synonym><term>Blume</term><relationship>EQ</relationship></synonym>"
+        + "<synonym><term>fleur</term><relationship>EQ</relationship></synonym></entry>"
+        + "<entry><term>fleur</term><synonym><term>bloom</term><relationship>RT</relationship>"
+        + "</synonym></entry>"
+        + "<entry><term>blossom</term>"
+        + "<synonym><term>Blüte</term><relationship>EQ</relationship></synonym>"
+        + "<synonym><term>flower</term><relationship>EQ</relationship></synonym></entry>"
+        + "</thesaurus>";
+    query(_DB_CREATE.args(db, " " + thes, "thesaurus.xml", " { 'thesindex': true() }"));
+
+    // index and main memory yield the same results
+    for(final String options : new String[] { " {}", " { 'levels': 1 }", " { 'levels': 2 }",
+        " { 'relationship': 'EQ' }", " { 'relationship': 'RT' }" }) {
+      for(final String term : new String[] { "flower", "blume", "fleur", "bloom", "blossom",
+          "blüte" }) {
+        query("deep-equal(" + _FT_THESAURUS.args(_DB_GET.args(db), term, options) + ", " +
+            _FT_THESAURUS.args(" " + thes, term, options) + ")", true);
+      }
+    }
+    // a term in two groups: the members of both groups are found on the first level
+    query(_FT_THESAURUS.args(_DB_GET.args(db), "flower", " { 'levels': 1 }"),
+        "Blume\nfleur\nBlüte\nblossom");
+    // groups sharing a term are not merged: the other group is found on the second level
+    query(_FT_THESAURUS.args(_DB_GET.args(db), "blume", " { 'levels': 1 }"), "fleur\nflower");
+    query(_FT_THESAURUS.args(_DB_GET.args(db), "blume", " { 'levels': 2 }"),
+        "fleur\nflower\nbloom\nBlüte\nblossom");
+
+    // minimum and maximum level
+    final String th = " using thesaurus at '" + db + "'";
+    query("'bloom' contains text 'blume'" + th + " exactly 2 levels", true);
+    query("'fleur' contains text 'blume'" + th + " exactly 2 levels", false);
+    query("'fleur' contains text 'blume'" + th + " exactly 1 levels", true);
+    query("'bloom' contains text 'blume'" + th + " exactly 1 levels", false);
+    query(_DB_DROP.args(db));
+  }
+
+  /**
+   * Checks that the query info reports the expected thesaurus source.
+   * @param query query
+   * @param expected expected info
+   */
+  private static void thesInfo(final String query, final String expected) {
+    set(MainOptions.QUERYINFO, true);
+    try {
+      final XQuery xq = new XQuery(query);
+      execute(xq);
+      assertTrue(xq.info().contains(expected), xq.info());
+    } finally {
+      set(MainOptions.QUERYINFO, false);
+    }
+  }
+
+  /** Thesaurus terms with wildcard characters. */
+  @Test public void thesaurusWildcards() {
+    final String db = NAME + "thes";
+    query(_DB_CREATE.args(db, " <thesaurus><entry><term>happy</term><synonym>"
+        + "<term>l.cky</term><relationship>RT</relationship></synonym></entry></thesaurus>",
+        "thesaurus.xml"));
+    final String thes = " using thesaurus at '" + db + "'";
+    query("'lucky' contains text 'happy' using wildcards" + thes, false);
+    query("'l.cky' contains text 'happy' using wildcards" + thes, true);
+    thesInfo("'l.cky' contains text 'happy'" + thes,
+        "Thesaurus \"" + db + "\": main memory (no index)");
+    query(_DB_DROP.args(db));
   }
 
   /** Position filters and occurrence indicators with inlined variables. */

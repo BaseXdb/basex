@@ -8,6 +8,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
+import org.basex.util.ft.*;
 
 /**
  * Function implementation.
@@ -16,25 +17,30 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class FtThesaurus extends StandardFunc {
-  /** Most recently used thesaurus (can be {@code null}). */
-  private Thesaurus thesaurus;
+  /** Most recently used thesaurus accessor (can be {@code null}). */
+  private ThesAccessor accessor;
   /** Most recently supplied root node (can be {@code null}). */
   private XNode nd;
+  /** Most recently requested relation (can be {@code null}). */
+  private byte[] rel;
+  /** Most recently requested maximum level. */
+  private long lvl;
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final XNode node = toNode(arg(0), qc);
     final byte[] term = toToken(arg(1), qc);
     final FtThesaurusOptions options = options(2, FtThesaurusOptions::new, qc);
-
-    if(nd == null || !nd.is(node)) {
-      thesaurus = new Thesaurus(node);
-      nd = node;
-    }
     final byte[] relation = Token.token(options.get(FtThesaurusOptions.RELATIONSHIP));
     final long levels = options.get(FtThesaurusOptions.LEVELS);
 
-    return StrSeq.get(new ThesAccessor(thesaurus, relation, levels, info).find(term));
+    if(nd == null || !nd.is(node) || !Token.eq(rel, relation) || lvl != levels) {
+      accessor = new ThesAccessor(node, relation, levels, info);
+      nd = node;
+      rel = relation;
+      lvl = levels;
+    }
+    return StrSeq.get(accessor.find(term, new FTOpt().assign(qc.ftOpt()), qc));
   }
 
   @Override

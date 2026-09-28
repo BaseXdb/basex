@@ -56,6 +56,7 @@ public final class DBOptimize extends DBUpdate {
     dbopts.assignIfAbsent(MainOptions.ATTRINDEX, meta.createattr);
     dbopts.assignIfAbsent(MainOptions.TOKENINDEX, meta.createtoken);
     dbopts.assignIfAbsent(MainOptions.FTINDEX, meta.createft);
+    dbopts.assignIfAbsent(MainOptions.THESINDEX, meta.createthes);
     dbopts.assignIfAbsent(MainOptions.TEXTINCLUDE, meta.textinclude);
     dbopts.assignIfAbsent(MainOptions.ATTRINCLUDE, meta.attrinclude);
     dbopts.assignIfAbsent(MainOptions.TOKENINCLUDE, meta.tokeninclude);
@@ -103,6 +104,7 @@ public final class DBOptimize extends DBUpdate {
     meta.createattr = options.get(MainOptions.ATTRINDEX);
     meta.createtoken = options.get(MainOptions.TOKENINDEX);
     meta.createft = options.get(MainOptions.FTINDEX);
+    meta.createthes = options.get(MainOptions.THESINDEX);
     meta.maxcats = options.get(MainOptions.MAXCATS);
     meta.updindex = options.get(MainOptions.UPDINDEX);
     meta.autooptimize = options.get(MainOptions.AUTOOPTIMIZE);

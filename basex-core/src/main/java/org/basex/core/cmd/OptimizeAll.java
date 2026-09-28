@@ -128,6 +128,7 @@ public final class OptimizeAll extends ACreate {
     // adopt original meta data, create new index structures
     final MetaData nmeta = ndata.meta;
     for(final IndexType type : IndexType.VALUE_INDEXES) nmeta.create(type, ometa.create(type));
+    nmeta.createthes = ometa.createthes;
     nmeta.original = ometa.original;
     nmeta.inputsize = ometa.inputsize;
     nmeta.time = ometa.time;

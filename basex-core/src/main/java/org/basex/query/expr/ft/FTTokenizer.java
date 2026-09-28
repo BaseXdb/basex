@@ -29,6 +29,8 @@ public final class FTTokenizer {
   private final TokenObjectMap<FTTokens> cache = new TokenObjectMap<>();
   /** Full-text options. */
   private final FTOpt opt;
+  /** Query context. */
+  private final QueryContext qc;
 
   /** All matches. */
   FTMatches matches = new FTMatches();
@@ -40,10 +42,12 @@ public final class FTTokenizer {
   /**
    * Constructor.
    * @param opt full-text options
+   * @param qc query context
    * @param info input info (can be {@code null})
    */
-  FTTokenizer(final FTOpt opt, final InputInfo info) {
+  FTTokenizer(final FTOpt opt, final QueryContext qc, final InputInfo info) {
     this.opt = opt;
+    this.qc = qc;
 
     cmp = (in, qu) -> {
       final Levenshtein ls = opt.is(FZ) ? new Levenshtein(Math.max(0, opt.errors)) : null;
@@ -92,7 +96,7 @@ public final class FTTokenizer {
 
       // if thesaurus is required, add the terms which extend the query:
       if(opt.th != null) {
-        for(final byte[] thes : opt.th.find(input)) {
+        for(final byte[] thes : thesaurus(input)) {
           // parse each extension term to a set of tokens:
           final TokenList tl = new TokenList(1);
           lexer.init(thes);
@@ -103,5 +107,33 @@ public final class FTTokenizer {
       }
     }
     return tokens;
+  }
+
+  /**
+   * Returns the thesaurus terms that extend a query term.
+   * @param input query term
+   * @return terms, with escaped wildcard characters if wildcards are enabled
+   * @throws QueryException query exception
+   */
+  byte[][] thesaurus(final byte[] input) throws QueryException {
+    final byte[][] terms = opt.th.find(input, opt, qc);
+    if(opt.is(WC)) {
+      for(int t = 0; t < terms.length; t++) terms[t] = escape(terms[t]);
+    }
+    return terms;
+  }
+
+  /**
+   * Escapes wildcard characters, so that a thesaurus term is matched literally.
+   * @param term term
+   * @return escaped term
+   */
+  private static byte[] escape(final byte[] term) {
+    final TokenBuilder tb = new TokenBuilder(term.length);
+    for(final byte b : term) {
+      if(b == '.' || b == '\\') tb.addByte((byte) '\\');
+      tb.addByte(b);
+    }
+    return tb.finish();
   }
 }

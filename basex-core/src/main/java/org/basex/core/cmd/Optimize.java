@@ -11,6 +11,7 @@ import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.stats.*;
 import org.basex.index.value.*;
+import org.basex.util.ft.*;
 import org.basex.util.list.*;
 
 /**
@@ -175,6 +176,11 @@ public final class Optimize extends ACreate {
         meta.optimized.add(type);
         meta.dirty = true;
       }
+    }
+    // create or drop thesaurus index, or recreate it if the full-text options have changed
+    if(data instanceof final DiskData dd && (meta.createthes != meta.thesindex ||
+        meta.thesindex && !dd.thesIndex().compatible(new FTOpt().assign(meta)))) {
+      dd.thesIndex(meta.createthes);
     }
   }
 

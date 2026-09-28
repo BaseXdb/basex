@@ -74,6 +74,7 @@ public final class CreateIndex extends ACreate {
     for(final IndexType type : IndexType.VALUE_INDEXES) {
       if(data.meta.create(type)) create(type, data, cmd);
     }
+    if(data.meta.createthes && data instanceof final DiskData dd) dd.thesIndex(true);
   }
 
   /**

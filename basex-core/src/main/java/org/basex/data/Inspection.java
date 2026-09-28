@@ -175,6 +175,7 @@ public final class Inspection {
         if(meta.index(types[f])) files(files[f], meta.segments.get(types[f]), "lr");
       }
       if(meta.ftindex) files(DATAFTX, meta.segments.get(IndexType.FULLTEXT), "xyz");
+      if(meta.thesindex) files(DATATHS, null, "lterg");
       if(meta.updateFile().exists()) add(Check.UPDATE_FILE, 1, -1);
     }
   }
