@@ -314,13 +314,14 @@ public final class FTIndex extends SegmentedIndex {
     final int[] order = Array.createOrder(pack(pres, poss), true);
     final int size = pres.size();
     return new FTIndexIterator() {
-      final FTMatches all = new FTMatches();
+      FTMatches all;
       int pos, pre, c;
 
       @Override
       public boolean more() {
         if(c == size) return false;
-        all.reset(pos);
+        // new container: consumers may keep the matches after advancing the iterator
+        all = new FTMatches(pos);
         int o = order[c];
         pre = pres.get(o);
         all.or(poss.get(o));

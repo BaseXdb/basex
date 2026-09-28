@@ -238,7 +238,7 @@ public final class FTWords extends FTExpr {
           if(data.kind(pre) != kind || names != null && !names.containsElement(pre)) continue;
           // atomized value of a text node is its own value
           input.init(data.atom(pre));
-          ftt.matches.reset(ps);
+          ftt.matches = new FTMatches(ps);
           try {
             if(contains(fttokens, input, ftt) != 0) return true;
           } catch(final QueryException ex) {
