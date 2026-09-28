@@ -592,4 +592,19 @@ public final class FuncItemTest extends SandboxTest {
     query("let $m := { 1: 0 } return $m({ \"x\": 1e0 }?x)", "0");
     query("let $m := { 1: 0 } return $m(1e0)", "0");
   }
+
+  /** Refined parameter types, functions invoked without static calls. */
+  @Test public void refineParams() {
+    final String func = "declare function local:f($a as xs:string?, $n as xs:integer) {"
+        + " $a, if($n > 0) { local:f((), $n - 1) } }; ";
+    query(func + "local:f((), 1), "
+        + "inspect:functions()[function-name(.) = xs:QName('local:f')]('x', 1)", "x");
+    query(func + "local:f((), 1), "
+        + "for $n in ('f', 'g') return function-lookup(xs:QName('local:' || $n), 2) ! .('x', 1)",
+        "x");
+    query("load-xquery-module('m', { 'content': \"module namespace m = 'm';"
+        + "declare function m:f($a as xs:string?, $n as xs:integer) {"
+        + " $a, if($n > 0) { m:f((), $n - 1) } };\" })"
+        + "?functions(QName('m', 'f'))?2('x', 1)", "x");
+  }
 }

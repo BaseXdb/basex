@@ -308,7 +308,7 @@ public final class QueryContext extends Job implements Closeable {
         }
         // create and assign function call
         final StaticFuncCall call = new StaticFuncCall(sf.name, args, null, sf.info);
-        call.setFunc(sf);
+        functions.setFunc(call, sf);
         main = new MainModule(call, new VarScope(), sf.sc);
         updating = sf.updating();
         return;

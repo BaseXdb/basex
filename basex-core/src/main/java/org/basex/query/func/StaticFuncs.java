@@ -47,6 +47,8 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
   private final ArrayList<StaticFuncCall> unassignedCalls = new ArrayList<>();
   /** Function calls by function. */
   private final Map<StaticFunc, ArrayList<StaticFuncCall>> callsMap = new IdentityHashMap<>();
+  /** Indicates if functions may be invoked without registered function calls. */
+  private boolean exposed;
 
   /**
    * Declares a new user-defined function.
@@ -101,21 +103,30 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
     final StaticFunc func = get(info.sc(), name, arity, dynamic);
     if(func != null) {
       if(func.expr == null) throw FUNCNOIMPL_X.get(func.info, func.name.prefixString());
-      call.setFunc(func);
+      setFunc(call, func);
       // default values can only be assigned once all function calls have been resolved
       if(arity < func.arity()) {
         if(dynamic) call.assignDefaults();
         else unassignedCalls.add(call);
       }
       if(func.updating) qc.updating();
-      // update map for direct lookups of function calls
-      callsMap.computeIfAbsent(func, k -> new ArrayList<>(1)).add(call);
     } else {
       final JavaCall java = JavaCall.get(name, call.exprs, qc, info);
       if(java == null) throw unknownFunctionError(name, arity, info);
       call.setExternal(java);
       if(java.updating) qc.updating();
     }
+  }
+
+  /**
+   * Assigns a function to a static function call and registers the call.
+   * @param call function call
+   * @param func function
+   * @throws QueryException query exception
+   */
+  public void setFunc(final StaticFuncCall call, final StaticFunc func) throws QueryException {
+    call.setFunc(func);
+    callsMap.computeIfAbsent(func, k -> new ArrayList<>(1)).add(call);
   }
 
   /**
@@ -182,6 +193,7 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
    * @param cc compilation context
    */
   public void compileAll(final CompileContext cc) {
+    exposed = true;
     for(final StaticFunc func : this) func.compile(cc);
   }
 
@@ -252,12 +264,12 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
   /**
    * Returns the unions of the sequences types for function calls of the specified function.
    * @param func function
-   * @return sequence types, or {@code null} if function is not referenced
+   * @return sequence types, or {@code null} if not all calls of the function are known
    */
   SeqType[] seqTypes(final StaticFunc func) {
     final ArrayList<StaticFuncCall> calls = callsMap.get(func);
     final int sl = func.arity();
-    if(calls == null || calls.isEmpty() || sl == 0) return null;
+    if(exposed || calls == null || sl == 0) return null;
 
     final SeqType[] seqTypes = new SeqType[sl];
     for(final StaticFuncCall call : calls) {
