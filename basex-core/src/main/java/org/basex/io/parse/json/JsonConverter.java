@@ -116,19 +116,36 @@ public abstract class JsonConverter extends JsonHandler {
    */
   public final Value convert(final TextInput input, final String uri, final InputInfo ii,
       final Job jb) throws QueryException, IOException {
+    final ValueBuilder vb = new ValueBuilder(jb);
+    convert(input, uri, ii, jb, vb::add);
+    return vb.value();
+  }
+
+  /**
+   * Converts the specified input and passes on each resulting value.
+   * @param input input
+   * @param uri uri (can be empty)
+   * @param ii input info (can be {@code null})
+   * @param jb interruptible job
+   * @param consumer consumer of the converted values
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   */
+  public final void convert(final TextInput input, final String uri, final InputInfo ii,
+      final Job jb, final ValueConsumer consumer) throws QueryException, IOException {
     job = jb;
     info = ii;
     final JsonParser parser = new JsonParser(input, jopts, this);
     if(!jopts.get(JsonParserOptions.JSON_LINES)) {
       init(uri);
       parser.parse(ii);
-      return finish();
-    }
-    final ValueBuilder vb = new ValueBuilder(jb);
-    while(true) {
-      init(uri);
-      if(!parser.next(ii)) return vb.value();
-      vb.add(finish());
+      consumer.accept(finish());
+    } else {
+      while(true) {
+        init(uri);
+        if(!parser.next(ii)) break;
+        consumer.accept(finish());
+      }
     }
   }
 
@@ -143,4 +160,18 @@ public abstract class JsonConverter extends JsonHandler {
    * @return result
    */
   protected abstract Value finish();
+
+  /**
+   * Consumer of converted values.
+   */
+  @FunctionalInterface
+  public interface ValueConsumer {
+    /**
+     * Processes a converted value.
+     * @param value value
+     * @throws QueryException query exception
+     * @throws IOException I/O exception
+     */
+    void accept(Value value) throws QueryException, IOException;
+  }
 }

@@ -51,27 +51,32 @@ public final class JsonParser extends SingleParser {
     try {
       final boolean lines = jopts.get(JsonParserOptions.JSON_LINES);
       if(lines) builder.openElem(JsonConstants.JSON_LINES, atts, nsp);
+      final JsonConverter jc;
+      final JsonConverter.ValueConsumer consumer;
       if(format == JsonFormat.W3_MAPPING) {
         // convert parsed values with a conversion plan
         final JsonMappingOptions mopts = mapping();
         final String root = mopts.get(JsonMappingOptions.ROOT);
         final MapToElement converter = new MapToElement(mopts, PlanFn.XML_PREFIX,
             new SharedData(), options, null);
-        for(final Item item : JsonConverter.get(jopts).convert(source)) {
-          converter.convert(item, root, builder);
-        }
+        jc = JsonConverter.get(jopts);
+        consumer = value -> {
+          for(final Item item : value) converter.convert(item, root, builder);
+        };
       } else if(jopts.merge()) {
         // types can only be merged in complete documents
         final Serializer ser = new BuilderSerializer(builder);
-        for(final Item item : JsonConverter.get(jopts).convert(source)) {
-          for(final GNode child : ((XNode) item).childIter()) ser.serialize(child);
-        }
+        jc = JsonConverter.get(jopts);
+        consumer = value -> {
+          for(final GNode child : ((XNode) value).childIter()) ser.serialize(child);
+        };
       } else {
-        final JsonConverter converter = JsonConverter.get(jopts, null, builder);
-        final String encoding = jopts.get(JsonParserOptions.ENCODING);
-        try(NewlineInput ni = new NewlineInput(source, encoding)) {
-          converter.convert(ni, "", null, this);
-        }
+        jc = JsonConverter.get(jopts, null, builder);
+        consumer = value -> { };
+      }
+      final String encoding = jopts.get(JsonParserOptions.ENCODING);
+      try(NewlineInput ni = new NewlineInput(source, encoding)) {
+        jc.convert(ni, "", null, this, consumer);
       }
       if(lines) builder.closeElem();
     } catch(final QueryException ex) {
