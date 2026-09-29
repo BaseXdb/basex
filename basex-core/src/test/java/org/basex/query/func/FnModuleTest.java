@@ -1479,10 +1479,15 @@ public final class FnModuleTest extends SandboxTest {
         " { 'attribute-marker': '', 'content-key': 'value' }") + "?price?value", "12.16");
     // content key clashes with attribute name: entries are combined into an array
     query(func.args(" <a b='1'>x</a>", " { 'attribute-marker': '', 'content-key': 'b' }") +
-        "?a?b?*", "1\nx");
+        "?a?b", "1");
+    query(func.args(" <a b='1'>x</a>", " { 'attribute-marker': '', 'content-key': 'b' }") +
+        "?a?'#b'", "x");
     query(func.args(" <a b='1' p:b='2' xmlns:p='p'>x</a>",
         " { 'attribute-marker': '', 'content-key': 'b', 'name-format': 'local' }") +
-        "?a?b?*", "1\n2\nx");
+        "?a?b?*", "1\n2");
+    query(func.args(" <a b='1' p:b='2' xmlns:p='p'>x</a>",
+        " { 'attribute-marker': '', 'content-key': 'b', 'name-format': 'local' }") +
+        "?a?'#b'", "x");
 
     // names of children of mixed and sequence content are relative to the enclosing element
     query(func.args(" <b xmlns='urn:u'>text<c>x</c></b>") +

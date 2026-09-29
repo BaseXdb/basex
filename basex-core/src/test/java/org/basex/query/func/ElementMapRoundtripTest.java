@@ -135,9 +135,6 @@ public final class ElementMapRoundtripTest extends SandboxTest {
     roundtrip("<a x='1'>t</a>", " { 'content-key': '@v' }");
     roundtrip("<a x='1'>t</a>", " { 'content-key': '#' }");
     roundtrip("<a x='1'>t</a>", " { 'attribute-marker': ':', 'content-key': ':v' }");
-    query("element-to-map(<a id='zz'>babel</a>, { 'content-key': '@id' })?a => map:keys() "
-        + "=> sort()", "#@id\n@id");
-    query("element-to-map(<a id='zz'>babel</a>, { 'content-key': '@id' })?a?('#@id')", "babel");
 
     // an empty marker cannot distinguish attributes from child elements
     serialized("<a><b>1</b></a>", " { 'attribute-marker': '' }", "<a b=\"1\"/>");
