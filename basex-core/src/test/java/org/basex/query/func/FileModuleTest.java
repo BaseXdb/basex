@@ -505,6 +505,7 @@ public final class FileModuleTest extends SandboxTest {
     error(func.args(PATH), FILE_IS_DIR_X);
     query(_FILE_WRITE.args(PATH1, "a\u00e4"));
     query(func.args(PATH1), "a\u00e4");
+    query(func.args(PATH1, " { 'encoding': () }"), "a\u00e4");
     error(func.args(PATH1, "UNKNOWN"), FILE_UNKNOWN_ENCODING_X);
     assertEquals(3, query(func.args(PATH1, "CP1252")).length());
     query(_FILE_WRITE_BINARY.args(PATH1, " xs:hexBinary('00')"));
@@ -516,6 +517,7 @@ public final class FileModuleTest extends SandboxTest {
     final Function func = _FILE_READ_TEXT_LINES;
     query(_FILE_WRITE_TEXT_LINES.args(PATH1, " ('a', 'b', 'c', 'd', 'e')"));
     query(func.args(PATH1), "a\nb\nc\nd\ne");
+    query(func.args(PATH1, " { 'encoding': () }"), "a\nb\nc\nd\ne");
 
     // positional access is rewritten to offset and length arguments
     check("head(" + func.args(PATH1) + ')', "a", root(func), empty(HEAD));
