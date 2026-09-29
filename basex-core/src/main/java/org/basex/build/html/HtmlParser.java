@@ -100,7 +100,6 @@ public final class HtmlParser extends XMLParser {
       }
       return new IOContent(token(sw.toString()), io.name());
     } catch(final SAXException ex) {
-      Util.errln(ex);
       throw INVHTML_X.getIO(ex.getLocalizedMessage());
     }
   }
