@@ -284,6 +284,19 @@ public final class XQuery4Test extends SandboxTest {
     // the focus of the caller is not passed on to called functions
     query("declare context value := <global/>; declare function local:g() { name(current()) }; "
         + "declare function local:f($x := local:g()) { $x }; <a/> ! local:f()", "global");
+    query("declare context value := <global/>; "
+        + "declare function local:f($x := fn() { name(current()) }()) { $x }; <a/> ! local:f()",
+        "global");
+    query("declare context value := <global/>; "
+        + "declare function local:f($f := fn() { name(current()) }) { $f() }; <a/> ! local:f()",
+        "global");
+    // function-lookup: the context value of the lookup call is used
+    query("declare context value := <global/>; "
+        + "declare function local:f($x := name(current())) { $x }; "
+        + "<a/> ! function-lookup(xs:QName('local:f'), 0)()", "a");
+    query("declare context value := <global/>; "
+        + "declare function local:f($x := name(current())) { $x }; "
+        + "let $f := <a/> ! function-lookup(xs:QName('local:f'), 0) return <b/> ! $f()", "a");
     // lazy variables are evaluated with the current value of the query prolog
     query("declare context value := <global/>; "
         + "declare %basex:lazy variable $v := name(current()); "
