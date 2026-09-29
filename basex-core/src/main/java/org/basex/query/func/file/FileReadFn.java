@@ -25,6 +25,9 @@ abstract class FileReadFn extends FileFn {
         Types.STRING_ZO);
     /** Fallback option. */
     public static final BooleanOption FALLBACK = new BooleanOption(CommonOptions.FALLBACK, false);
+    /** Normalize newlines. */
+    public static final BooleanOption NORMALIZE_NEWLINES =
+        new BooleanOption(CommonOptions.NORMALIZE_NEWLINES, true);
   }
 
   /**

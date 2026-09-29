@@ -28,6 +28,8 @@ public final class StrLazy extends AStr implements Lazy {
   private final QueryError error;
   /** Replace invalid input with Unicode replacement character. */
   private final boolean fallback;
+  /** Normalize newlines. */
+  private final boolean normalize;
   /** Registry for temporary files; if {@code null}, the input is reopened on each access. */
   private final TempFiles temp;
   /** Contents of the input, read on first access (can be {@code null}). */
@@ -41,14 +43,16 @@ public final class StrLazy extends AStr implements Lazy {
    * @param encoding encoding (can be {@code null})
    * @param error error message to be thrown
    * @param fallback fallback flag
+   * @param normalize normalize newlines
    * @param temp registry for temporary files (if {@code null}, input is reopened on each access)
    */
   public StrLazy(final IO input, final String encoding, final QueryError error,
-      final boolean fallback, final TempFiles temp) {
+      final boolean fallback, final boolean normalize, final TempFiles temp) {
     this.input = input;
     this.encoding = encoding;
     this.error = error;
     this.fallback = fallback;
+    this.normalize = normalize;
     this.temp = temp;
   }
 
@@ -114,7 +118,9 @@ public final class StrLazy extends AStr implements Lazy {
   private TextInput get(final boolean keep, final InputInfo info) throws QueryException {
     try {
       if(keep && contents == null && temp != null) contents = SpillOutput.read(input, temp);
-      return new NewlineInput(contents != null ? contents : input, encoding).fallback(fallback);
+      final IO io = contents != null ? contents : input;
+      final TextInput ti = normalize ? new NewlineInput(io, encoding) : new TextInput(io, encoding);
+      return ti.fallback(fallback);
     } catch(final IOException ex) {
       throw error.get(info, ex);
     }
@@ -144,7 +150,7 @@ public final class StrLazy extends AStr implements Lazy {
     if(this == obj) return true;
     if(obj instanceof final StrLazy str) {
       if(input.eq(str.input) && Objects.equals(encoding, str.encoding) && error == str.error &&
-          fallback == str.fallback) return true;
+          fallback == str.fallback && normalize == str.normalize) return true;
     }
     // items may be different, but result may be equal...
     return super.equals(obj);

@@ -112,12 +112,11 @@ public final class FileReadTextLines extends FileReadFn {
     final Expr[] args = func.arg(0).args();
     final int al = args.length;
 
-    final Str encoding = Str.get(Strings.UTF8);
-    final Bln validate = Bln.FALSE;
+    final Expr options = al > 1 ? args[1] : Empty.VALUE;
+    final Expr fallback = al > 2 ? args[2] : Empty.VALUE;
 
     // skip optimization if existing function cannot be merged with new bounds
-    if(al > 1 && !args[1].equals(encoding) ||
-       al > 2 && !args[2].equals(validate) ||
+    if(!(options instanceof Value) || !(fallback instanceof Value) ||
        al > 3 && !(args[3] instanceof Itr) ||
        al > 4 && !(args[4] instanceof Itr)) return func;
 
@@ -131,7 +130,7 @@ public final class FileReadTextLines extends FileReadFn {
     if(length < l) l = length;
 
     // create new function instance
-    final Expr[] newArgs = { args[0], encoding, validate, Itr.get(s + 1), Itr.get(l) };
+    final Expr[] newArgs = { args[0], options, fallback, Itr.get(s + 1), Itr.get(l) };
     return cc.function(Function._FILE_READ_TEXT_LINES, func.info(), newArgs);
   }
 }

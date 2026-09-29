@@ -510,6 +510,15 @@ public final class FileModuleTest extends SandboxTest {
     assertEquals(3, query(func.args(PATH1, "CP1252")).length());
     query(_FILE_WRITE_BINARY.args(PATH1, " xs:hexBinary('00')"));
     error(func.args(PATH1), FILE_IO_ERROR_X);
+
+    // newline normalization
+    query(_FILE_WRITE_BINARY.args(PATH1, " xs:hexBinary('610D0A620D63')"));
+    query(STRING_TO_CODEPOINTS.args(" " + func.args(PATH1)), "97\n10\n98\n10\n99");
+    query(STRING_TO_CODEPOINTS.args(" " + func.args(PATH1, " { 'normalize-newlines': false() }")),
+        "97\n13\n10\n98\n13\n99");
+    // byte order mark
+    query(_FILE_WRITE_BINARY.args(PATH1, " xs:hexBinary('FEFF0061')"));
+    query(func.args(PATH1), "a");
   }
 
   /** Test method. */
@@ -518,6 +527,12 @@ public final class FileModuleTest extends SandboxTest {
     query(_FILE_WRITE_TEXT_LINES.args(PATH1, " ('a', 'b', 'c', 'd', 'e')"));
     query(func.args(PATH1), "a\nb\nc\nd\ne");
     query(func.args(PATH1, " { 'encoding': () }"), "a\nb\nc\nd\ne");
+    query(func.args(PATH1, " { 'normalize-newlines': false() }"), "a\nb\nc\nd\ne");
+
+    // byte order mark
+    query(_FILE_WRITE_BINARY.args(PATH2, " xs:hexBinary('FEFF0061000D000A0062')"));
+    query(func.args(PATH2), "a\nb");
+    query("head(" + func.args(PATH2) + ')', "a");
 
     // positional access is rewritten to offset and length arguments
     check("head(" + func.args(PATH1) + ')', "a", root(func), empty(HEAD));
@@ -530,10 +545,11 @@ public final class FileModuleTest extends SandboxTest {
     check("head(" + SUBSEQUENCE.args(" " + func.args(PATH1), 3, 2) + ')', "c", root(func));
     check("tail(" + func.args(PATH1, "UTF-8", false, 2, 3) + ')', "c\nd", root(func));
     check("head(" + func.args(PATH1, "UTF-8", false, 2) + ')', "b", root(func));
+    check("head(" + func.args(PATH1, "US-ASCII") + ')', "a", root(func));
+    check("head(" + func.args(PATH1, "UTF-8", true) + ')', "a", root(func));
 
     // rewrite is skipped if the existing arguments cannot be merged
-    check("head(" + func.args(PATH1, "US-ASCII") + ')', "a", exists(HEAD));
-    check("head(" + func.args(PATH1, "UTF-8", true) + ')', "a", exists(HEAD));
+    check("head(" + func.args(PATH1, " <_>UTF-8</_>") + ')', "a", exists(HEAD));
     final String dyn = " head((1 to 2)[. = 2])";
     check("head(" + func.args(PATH1, "UTF-8", false, dyn) + ')', "b", exists(HEAD));
     check("head(" + func.args(PATH1, "UTF-8", false, 2, dyn) + ')', "b", exists(HEAD));
