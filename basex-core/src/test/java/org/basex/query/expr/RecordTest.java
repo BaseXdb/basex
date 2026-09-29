@@ -753,6 +753,12 @@ public final class RecordTest extends SandboxTest {
     // coercion re-annotates the record
     query(prolog + "fn($q as local:Q) { $q instance of local:Q }(local:P(1, 2))", true);
 
+    // the type is identified by its name across separately compiled queries
+    query(prolog + _STORE_PUT.args("record", " local:P(1, 2)"));
+    query(prolog + _STORE_GET.args("record") + " instance of local:P", true);
+    query(prolog + _STORE_GET.args("record") + " instance of local:Q", false);
+    query(_STORE_CLEAR.args());
+
     // structural record types are matched by the entries of a record
     query("let $r as record(x as xs:decimal) := { 'x': 1 } "
         + "return $r instance of record(x as xs:integer)", true);

@@ -229,8 +229,18 @@ public class ShapeType extends MapType {
    * Returns the identity of a nominative record type.
    * @return identity, or {@code null} for structural record types and shapes
    */
-  Object identity() {
+  QNm identity() {
     return null;
+  }
+
+  /**
+   * Checks if this type and the specified type have the same identity.
+   * @param sh shape type
+   * @return result of check
+   */
+  private boolean sameIdentity(final ShapeType sh) {
+    final QNm id = identity(), shid = sh.identity();
+    return id == null ? shid == null : shid != null && id.eq(shid);
   }
 
   /**
@@ -287,7 +297,7 @@ public class ShapeType extends MapType {
     if(!(type instanceof final ShapeType sh)) return false;
     // record() (empty record) and record(*) (any record) must remain distinct
     if(this == Types.RECORD != (sh == Types.RECORD) || declared() != sh.declared() ||
-        identity() != sh.identity() || !sameOrder(sh)) return false;
+        !sameIdentity(sh) || !sameOrder(sh)) return false;
 
     for(final byte[] key : fields) {
       final SeqType st1 = fields.get(key).seqType(), st2 = sh.fields.get(key).seqType();
@@ -362,7 +372,7 @@ public class ShapeType extends MapType {
       // record(*) has an unknown field set: it is only an instance of record(*)
       if(any()) return false;
       // a nominative record type is only a subtype of itself and of structural record types
-      if(sh.identity() != null && sh.identity() != identity()) return false;
+      if(sh.identity() != null && !sameIdentity(sh)) return false;
       if(ordered ? !sameOrder(sh) : !sameFields(sh)) return false;
       for(final byte[] key : sh.fields) {
         final SeqType fst = fields.get(key).seqType(), shfst = sh.fields.get(key).seqType();
@@ -535,8 +545,8 @@ public class ShapeType extends MapType {
 
     if(type instanceof final ShapeType sh) {
       // a record has the fields of its type, and a single nominative record type
-      final Object id = identity(), shid = sh.identity();
-      if(!sameFields(sh) || id != null && shid != null && id != shid) return null;
+      final QNm id = identity(), shid = sh.identity();
+      if(!sameFields(sh) || id != null && shid != null && !id.eq(shid)) return null;
       final TokenObjectMap<ShapeField> map = new TokenObjectMap<>();
       for(final byte[] key : fields) {
         final SeqType is = intersect(fields.get(key).seqType(), sh.fields.get(key).seqType(),

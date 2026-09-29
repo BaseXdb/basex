@@ -19,8 +19,6 @@ public final class RecordType extends ShapeType {
   private final QNm name;
   /** Annotations. */
   private final AnnList anns;
-  /** Identity of a nominative record type, shared by its copies (can be {@code null}). */
-  private final Object identity;
   /** Shape without the record annotation (can be {@code null}). */
   private ShapeType shape;
 
@@ -39,22 +37,9 @@ public final class RecordType extends ShapeType {
    * @param anns annotations
    */
   public RecordType(final TokenObjectMap<ShapeField> fields, final QNm name, final AnnList anns) {
-    this(fields, name, anns, name != null ? new Object() : null);
-  }
-
-  /**
-   * Constructor for a copy of a record.
-   * @param fields field declarations
-   * @param name record name (can be {@code null})
-   * @param anns annotations
-   * @param identity identity of the nominative record type (can be {@code null})
-   */
-  private RecordType(final TokenObjectMap<ShapeField> fields, final QNm name, final AnnList anns,
-      final Object identity) {
     super(fields);
     this.name = name;
     this.anns = anns;
-    this.identity = identity;
   }
 
   @Override
@@ -63,13 +48,13 @@ public final class RecordType extends ShapeType {
   }
 
   @Override
-  Object identity() {
-    return identity;
+  QNm identity() {
+    return name;
   }
 
   @Override
   public RecordType with(final TokenObjectMap<ShapeField> map) {
-    return new RecordType(map, name, anns, identity);
+    return new RecordType(map, name, anns);
   }
 
   @Override
@@ -101,7 +86,7 @@ public final class RecordType extends ShapeType {
 
   @Override
   public ShapeType detach() {
-    return detached() ? this : new RecordType(detachedFields(), name, anns, identity);
+    return detached() ? this : new RecordType(detachedFields(), name, anns);
   }
 
   @Override
