@@ -91,7 +91,7 @@ public final class CastTest extends SandboxTest {
     error("{} cast as record(a as xs:integer)", INVCONVERT_X_X);
     error("{ 'a': 1 } cast as record(a as xs:integer, b as xs:integer)", INVCONVERT_X_X);
 
-    // named record types (the use case of issue #2644)
+    // nominative record types (the use case of issue #2644)
     query("declare record local:point(x as xs:double, y as xs:double);\n"
         + "{ 'x': '1', 'y': '2' } cast as local:point", "{\"x\":1,\"y\":2}");
     // a map that coercion would reject can be cast

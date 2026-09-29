@@ -596,7 +596,7 @@ public class QueryParser extends InputParser {
         } else if(wsConsumeWs(RECORD)) {
           // types cannot be updating
           if(anns.contains(Annotation.UPDATING)) throw error(UPDATINGTYPE);
-          namedShapeTypeDecl(anns.check(false, true));
+          nominativeRecordTypeDecl(anns.check(false, true));
         } else if(!anns.isEmpty()) {
           throw error(VARFUNC);
         } else {
@@ -1186,11 +1186,11 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "NamedRecordTypeDecl" rule.
+   * Parses the "NominativeRecordTypeDecl" rule.
    * @param anns annotations
    * @throws QueryException query exception
    */
-  private void namedShapeTypeDecl(final AnnList anns) throws QueryException {
+  private void nominativeRecordTypeDecl(final AnnList anns) throws QueryException {
     final InputInfo ii = info();
     final QNm qn = eQName(sc.elemNS, TYPENAME_X);
     if(declaredTypes.contains(qn)) throw error(DUPLTYPE_X, qn.string());

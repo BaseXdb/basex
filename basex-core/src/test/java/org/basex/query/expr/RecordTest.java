@@ -201,15 +201,15 @@ public final class RecordTest extends SandboxTest {
     query("fn($r as record(c as xs:integer?)) { 1 } instance of fn(record(*)) as item()*", false);
     query("fn($r as record(*)) { 1 } instance of fn(record(*)) as item()*", true);
 
-    // a record matches a record type with additional fields that admit the empty sequence
+    // a record only matches record types with the same fields
     query("let $r as record(x, y) := { 'x': 1, 'y': 2 } return $r instance of record(x)", false);
-    query("let $r as record(x) := { 'x': 1 } return $r instance of record(x, y)", true);
+    query("let $r as record(x) := { 'x': 1 } return $r instance of record(x, y)", false);
     query("let $r as record(x) := { 'x': 1 } return $r instance of record(x, y as item())", false);
     // field types are covariant
     query("let $r as record(x as xs:integer) := { 'x': 1 } "
         + "return $r instance of record(x as xs:decimal)", true);
 
-    // a record is an instance of a structurally equal shape
+    // a nominative record type is a subtype of a structural one with the same fields
     query("declare record local:coord(x, y); local:coord(1, 2) instance of record(x, y)", true);
 
     // function-argument coercion widens a narrower record (a missing field becomes ())
@@ -734,12 +734,38 @@ public final class RecordTest extends SandboxTest {
     query(prolog + "let $r as local:A := local:A(1) return $r instance of local:A", true);
   }
 
+  /** Nominative and structural record types. */
+  @Test public void nominative() {
+    final String prolog = "declare record local:P(x, y); "
+        + "declare record local:Q(x, y); "
+        + "declare type local:S as record(x, y); ";
+
+    // a nominative record type is matched by its own instances
+    query(prolog + "local:P(1, 2) instance of local:P", true);
+    query(prolog + "local:P(1, 2) instance of local:Q", false);
+    query(prolog + "let $s as local:S := { 'x': 1, 'y': 2 } return $s instance of local:P", false);
+    query(prolog + "typeswitch(local:P(1, 2)) case local:Q return 'Q' case local:P return 'P' "
+        + "default return ()", "P");
+    // ...and is a subtype of structural record types with the same fields
+    query(prolog + "local:P(1, 2) instance of local:S", true);
+    query(prolog + "local:P(1, 2) instance of record(x, y)", true);
+    query(prolog + "local:P(1, 2) instance of record(x, y, z as item()?)", false);
+    // coercion re-annotates the record
+    query(prolog + "fn($q as local:Q) { $q instance of local:Q }(local:P(1, 2))", true);
+
+    // structural record types are matched by the entries of a record
+    query("let $r as record(x as xs:decimal) := { 'x': 1 } "
+        + "return $r instance of record(x as xs:integer)", true);
+    query("let $r as record(x as xs:decimal) := { 'x': 1.5 } "
+        + "return $r instance of record(x as xs:integer)", false);
+  }
+
   /** Records whose type declares the same fields in another order. */
   @Test public void fieldOrder() {
     final String prolog = "declare record local:AB(a as xs:integer, b as xs:integer); "
-        + "declare record local:BA(b as xs:integer, a as xs:integer); "
+        + "declare type local:BA as record(b as xs:integer, a as xs:integer); "
         + "declare record local:N(r as local:AB); "
-        + "declare record local:M(r as local:BA); "
+        + "declare type local:M as record(r as local:BA); "
         + "declare %basex:inline(0) function local:ab() as local:AB { local:AB(1, 2) }; "
         + "declare %basex:inline(0) function local:item() as item() { local:ab() }; ";
 
@@ -788,7 +814,7 @@ public final class RecordTest extends SandboxTest {
 
     // nested record types are compared irrespective of the field order
     query(prolog + "declare record local:NA(r as array(local:AB)); "
-        + "declare record local:MA(r as array(local:BA)); "
+        + "declare type local:MA as record(r as array(local:BA)); "
         + "let $n := local:NA([ local:item() ]) "
         + "return ($n instance of local:MA, (let $m as local:MA := $n return $m?r(1)?a))",
         "true\n1");
@@ -796,7 +822,8 @@ public final class RecordTest extends SandboxTest {
     // the parameters of a function are coerced when it is called
     final String func = "declare %basex:inline(0) function local:f() as item() { "
         + "fn($r as local:AB) { $r?a } }; ";
-    query(prolog + func + "local:f() instance of fn(local:BA) as item()*", true);
+    // a structural record type is no subtype of a nominative one
+    query(prolog + func + "local:f() instance of fn(local:BA) as item()*", false);
     query(prolog + func + "let $f as fn(local:BA) as item()* := local:f() "
         + "return $f(local:BA(2, 1))", 1);
     // the result of a function is coerced if the function is coerced
@@ -817,16 +844,15 @@ public final class RecordTest extends SandboxTest {
         + "declare record local:AD(a as xs:integer, d as xs:integer); "
         + "declare %basex:inline(0) function local:a() as item() { local:A(1) }; ";
 
-    // the record matches types whose additional fields admit the empty sequence
-    query(prolog + "local:a() instance of local:AC", true);
-    query(prolog + "local:a() instance of local:CA", true);
+    // the record does not match types with additional fields
+    query(prolog + "local:a() instance of local:AC", false);
+    query(prolog + "local:a() instance of local:CA", false);
     query(prolog + "local:a() instance of local:AD", false);
-    query(prolog + "local:A(1) instance of local:AC", true);
-    query(prolog + "local:A(1) instance of record(a as xs:integer, c)", true);
+    query(prolog + "local:A(1) instance of local:AC", false);
+    query(prolog + "local:A(1) instance of record(a as xs:integer, c)", false);
     query(prolog + "local:A(1) instance of record(c)", false);
-    query(prolog + "(local:a() treat as local:AC)?a", 1);
-    query(prolog + "(local:a() treat as local:AC)?c", "");
-    query(prolog + "typeswitch(local:a()) case $r as local:CA return $r?a default return 0", 1);
+    error(prolog + "(local:a() treat as local:AC)?a", NOTREAT_X_X_X);
+    query(prolog + "typeswitch(local:a()) case $r as local:CA return $r?a default return 0", 0);
 
     // coercion adds the missing fields
     query(prolog + "let $r as local:AC := local:a() return ($r?c, map:keys($r))", "a\nc");
@@ -882,7 +908,7 @@ public final class RecordTest extends SandboxTest {
         + "'BA': 0, 'BB': 0, 'BC': 0, 'BD': 0, 'BE': 0, 'BF': 0, 'BG': <a/> }";
     check("(" + constr + ", " + constr + ")?AA", "0\n0", exists(REPLICATE));
 
-    // named record (runtime evaluation)
+    // nominative record (runtime evaluation)
     check("declare record local:r(AA, AB); (local:r(0, <a/>), local:r(0, <a/>))?AA",
         "0\n0", exists(REPLICATE));
   }

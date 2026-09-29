@@ -7,6 +7,7 @@ import java.util.concurrent.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
@@ -43,7 +44,7 @@ public class ShapeType extends MapType {
   }
 
   /**
-   * Creates a shape or an anonymous record.
+   * Creates a shape or a structural record type.
    * @param fields field declarations
    * @param declared declared flag
    * @return shape
@@ -225,6 +226,14 @@ public class ShapeType extends MapType {
   }
 
   /**
+   * Returns the identity of a nominative record type.
+   * @return identity, or {@code null} for structural record types and shapes
+   */
+  Object identity() {
+    return null;
+  }
+
+  /**
    * Indicates if this is the abstract {@code record(*)} type, which matches any record. Its field
    * set is unknown, so no assumptions must be made about the presence or absence of a field.
    * @return result of check
@@ -278,7 +287,7 @@ public class ShapeType extends MapType {
     if(!(type instanceof final ShapeType sh)) return false;
     // record() (empty record) and record(*) (any record) must remain distinct
     if(this == Types.RECORD != (sh == Types.RECORD) || declared() != sh.declared() ||
-        !sameOrder(sh)) return false;
+        identity() != sh.identity() || !sameOrder(sh)) return false;
 
     for(final byte[] key : fields) {
       final SeqType st1 = fields.get(key).seqType(), st2 = sh.fields.get(key).seqType();
@@ -310,6 +319,23 @@ public class ShapeType extends MapType {
   }
 
   /**
+   * Checks if the entries of a record match the fields of this structural record type.
+   * @param map record
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  public final boolean matches(final XQMap map) throws QueryException {
+    // records contain all fields of their type
+    if(!strict() || identity() != null || !(map.type instanceof final ShapeType sh) ||
+        !sameFields(sh)) return false;
+    final int fs = fields.size();
+    for(int f = 1; f <= fs; f++) {
+      if(!fields.value(f).seqType().instance(map.getOrNull(key(f)), false)) return false;
+    }
+    return true;
+  }
+
+  /**
    * Checks if the current type is an instance of the specified type.
    * @param type type to be checked
    * @param pairs pairs of ShapeTypes that are currently being checked, or have been checked before
@@ -335,12 +361,11 @@ public class ShapeType extends MapType {
       if(sh.declared() && !declared()) return false;
       // record(*) has an unknown field set: it is only an instance of record(*)
       if(any()) return false;
-      if(ordered ? !sameOrder(sh) : !subFields(sh)) return false;
+      // a nominative record type is only a subtype of itself and of structural record types
+      if(sh.identity() != null && sh.identity() != identity()) return false;
+      if(ordered ? !sameOrder(sh) : !sameFields(sh)) return false;
       for(final byte[] key : sh.fields) {
-        // fields that are missing in this type admit the empty sequence (see subFields)
-        final ShapeField field = fields.get(key);
-        if(field == null) continue;
-        final SeqType fst = field.seqType(), shfst = sh.fields.get(key).seqType();
+        final SeqType fst = fields.get(key).seqType(), shfst = sh.fields.get(key).seqType();
         if(fst != shfst) {
           final Type ft = TypeRef.deref(fst.type), shft = TypeRef.deref(shfst.type);
           if(ft instanceof final ShapeType sh1 && shft instanceof final ShapeType sh2 &&
@@ -431,22 +456,6 @@ public class ShapeType extends MapType {
   }
 
   /**
-   * Checks whether the given shape declares all fields of this shape, and whether its other fields
-   * admit the empty sequence.
-   * @param sh other shape
-   * @return result of check
-   */
-  private boolean subFields(final ShapeType sh) {
-    for(final byte[] key : fields) {
-      if(!sh.fields.contains(key)) return false;
-    }
-    for(final byte[] key : sh.fields) {
-      if(!fields.contains(key) && sh.fields.get(key).seqType().oneOrMore()) return false;
-    }
-    return true;
-  }
-
-  /**
    * Checks if the entries of a map are arranged in the order of the fields of this shape.
    * @param map map
    * @return result of check
@@ -525,25 +534,23 @@ public class ShapeType extends MapType {
     if(type.instanceOf(this)) return type;
 
     if(type instanceof final ShapeType sh) {
-      if(sameFields(sh)) {
-        final TokenObjectMap<ShapeField> map = new TokenObjectMap<>();
-        for(final byte[] key : fields) {
-          final SeqType is = intersect(fields.get(key).seqType(), sh.fields.get(key).seqType(),
-              pairs);
-          if(is == null) return null;
-          map.put(key, new ShapeField(is));
-        }
-        // records with another field order can match both types: no shape can be assigned
-        if(!sameOrder(sh)) {
-          return MapType.get(keyType().union(sh.keyType()), valueType().union(sh.valueType()));
-        }
-        final ShapeType st = name() != null || !sh.declared() || sh.name() == null && declared() ?
-          this : sh;
-        return st.with(map);
+      // a record has the fields of its type, and a single nominative record type
+      final Object id = identity(), shid = sh.identity();
+      if(!sameFields(sh) || id != null && shid != null && id != shid) return null;
+      final TokenObjectMap<ShapeField> map = new TokenObjectMap<>();
+      for(final byte[] key : fields) {
+        final SeqType is = intersect(fields.get(key).seqType(), sh.fields.get(key).seqType(),
+            pairs);
+        if(is == null) return null;
+        map.put(key, new ShapeField(is));
       }
-      // records with missing fields can match both types: no shape can be assigned
-      return declared() && sh.declared() && (subFields(sh) || sh.subFields(this)) ?
-        MapType.get(keyType().union(sh.keyType()), valueType().union(sh.valueType())) : null;
+      // records with another field order can match both types: no shape can be assigned
+      if(!sameOrder(sh)) {
+        return MapType.get(keyType().union(sh.keyType()), valueType().union(sh.valueType()));
+      }
+      final ShapeType st = name() != null || !sh.declared() || sh.name() == null && declared() ?
+        this : sh;
+      return st.with(map);
     }
     if(type instanceof final MapType mt) {
       if(mt.keyType().intersect(BasicType.STRING) == null) return null;

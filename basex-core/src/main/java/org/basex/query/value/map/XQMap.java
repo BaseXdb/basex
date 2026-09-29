@@ -287,7 +287,7 @@ public abstract class XQMap extends XQStruct {
       if(tp instanceof final ShapeType sh) {
         // coercion to a record type creates a record with the field order of that type
         return type instanceof final RecordType rt &&
-            (coerce && !sh.any() ? rt.equals(sh) : rt.matches(sh));
+            (coerce && !sh.any() ? rt.equals(sh) : rt.matches(sh) || sh.matches(this));
       }
       if(type.instanceOf(tp) && !(coerce && ShapeType.rebuilds(type, tp))) return true;
 
