@@ -205,7 +205,7 @@ public final class ElementToMap {
         cast(pe, Str.get(node.string()));
       case SIMPLE_PLUS -> {
         final MapBuilder mb = attributes(node);
-        yield combine(mb, plan.content, cast(pe, Str.get(node.string()))).map();
+        yield mb.put(contentKey(mb), cast(pe, Str.get(node.string()))).map();
       }
       case LIST ->
         list(node);
@@ -286,6 +286,18 @@ public final class ElementToMap {
           names.contains(nodeName(attr, node))) return true;
     }
     return false;
+  }
+
+  /**
+   * Returns the content key, prepending {@code #} characters to avoid clashes with existing keys.
+   * @param mb map builder with the keys generated so far
+   * @return content key
+   * @throws QueryException query exception
+   */
+  private Str contentKey(final MapBuilder mb) throws QueryException {
+    Str key = plan.content;
+    while(mb.contains(key)) key = Str.get(Token.concat(Token.cpToken('#'), key.string()));
+    return key;
   }
 
   /**
