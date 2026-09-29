@@ -67,11 +67,11 @@ sub add {
   shift->sendInput(9, shift, shift);
 }
 
-sub replace {
+sub put {
   shift->sendInput(12, shift, shift);
 }
 
-sub store {
+sub put_binary {
   shift->sendInput(13, shift, shift);
 }
 
@@ -119,14 +119,10 @@ sub sendInput {
   my $str = shift;
   my $input = shift;
 
+  # prefix 0x00 and 0xFF bytes with 0xFF
+  $input =~ s/([\x00\xFF])/\xFF$1/g;
   $self->send(chr($code).$str);
-  foreach my $b(unpack("C*", $input)) {
-    if($b == 0xFF || $b == 0x00) {
-      $self->{sock}->send(0xFF);
-    }
-    $self->{sock}->send(chr($b));
-  }
-  $self->{sock}->send(chr(0));
+  $self->send($input);
 
   $self->{info} = $self->_receive();
   die $self->{info} if !$self->ok();
@@ -136,74 +132,76 @@ sub sendInput {
 
 package Query;
 
-our $session;
-our @cache;
-our $pos;
-our $id;
-
 sub new {
   my $class = shift;
-  $session = shift;
-  my $cmd = shift;
-  my $self = bless({}, $class);
-  $id = exc(chr(0), $cmd);
+  my $self = bless({ session => shift, cache => [], pos => 0 }, $class);
+  $self->{id} = $self->exc(chr(0), shift);
   return $self;
 }
 
 sub bind {
-  shift;
+  my $self = shift;
   my $name = shift;
   my $value = shift;
   my $type = shift;
   $type = "" if !$type;
-  exc(chr(3), $id.chr(0).$name.chr(0).$value.chr(0).$type);
-  undef @cache;
+  $self->exc(chr(3), $self->{id}.chr(0).$name.chr(0).$value.chr(0).$type);
+  $self->{cache} = [];
 }
 
 sub context {
-  shift;
+  my $self = shift;
   my $value = shift;
   my $type = shift;
   $type = "" if !$type;
-  exc(chr(14), $id.chr(0).$value.chr(0).$type);
-  undef @cache;
+  $self->exc(chr(14), $self->{id}.chr(0).$value.chr(0).$type);
+  $self->{cache} = [];
 }
 
 sub execute {
-  return exc(chr(5), $id);
+  my $self = shift;
+  return $self->exc(chr(5), $self->{id});
 }
 
 sub more {
-  if(!@cache) {
-    $session->send(chr(4).$id.chr(0));
-    push(@cache, $session->_receive()) while $session->_read();
+  my $self = shift;
+  my $session = $self->{session};
+  if(!@{$self->{cache}}) {
+    $session->send(chr(4).$self->{id});
+    push(@{$self->{cache}}, $session->_receive()) while $session->_read();
     die $session->_receive() if !$session->ok();
-    $pos = 0;
+    $self->{pos} = 0;
   }
-  my $more = $pos < @cache;
-  undef @cache if !$more;
+  my $more = $self->{pos} < @{$self->{cache}};
+  $self->{cache} = [] if !$more;
   return $more;
 }
 
 sub next {
-  return more() && $cache[$pos++];
+  my $self = shift;
+  return $self->more() && $self->{cache}[$self->{pos}++];
 }
 
 sub info {
-  return exc(chr(6), $id);
+  my $self = shift;
+  return $self->exc(chr(6), $self->{id});
 }
 
 sub options {
-  return exc(chr(7), $id);
+  my $self = shift;
+  return $self->exc(chr(7), $self->{id});
 }
 
 sub close {
-  exc(chr(2), $id);
+  my $self = shift;
+  $self->exc(chr(2), $self->{id});
 }
 
 sub exc {
+  my $self = shift;
   my $cmd = shift;
   my $arg = shift;
+  my $session = $self->{session};
   $session->send($cmd.$arg);
   my $s = $session->_receive();
   die $session->_receive() if !$session->ok();

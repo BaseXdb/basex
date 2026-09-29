@@ -115,23 +115,23 @@ class Session
     }
 
     /**
-     * Replaces content at the specified path by the given document.
+     * Puts (adds or replaces) a document in the opened database.
      *
      * @param string $path filesystem-like path
      * @param string $input XML string
      */
-    public function replace($path, $input)
+    public function put($path, $input)
     {
         $this->sendCmd(12, $path, $input);
     }
 
     /**
-     * Stores binary content at the specified path.
+     * Puts (adds or replaces) a binary resource in the opened database.
      *
      * @param string $path filesystem-like path
      * @param string $input binary data
      */
-    public function store($path, $input)
+    public function putBinary($path, $input)
     {
         $this->sendCmd(13, $path, $input);
     }
@@ -162,26 +162,17 @@ class Session
     public function readString()
     {
         $com = "";
-        while (($d = $this->read()) != chr(0))
+        while (($d = $this->read()) !== chr(0))
         {
+            // 0x00 and 0xFF bytes are prefixed with 0xFF
+            if ($d === chr(255)) {
+                $d = $this->read();
+            }
             $com .= $d;
-            $sUnread = substr($this->buffer, $this->bpos);
-            $sBeforeZero = strstr($sUnread, chr(0), true);
-
-            if ($sBeforeZero === false)
-            {
-               $com .= $sUnread;
-               $this->bpos = $this->bsize;
-            }
-            else
-            {
-                $iLen = strlen($sBeforeZero);
-                if ($iLen > 0)
-                {
-                    $com .= $sBeforeZero;
-                    $this->bpos += $iLen;
-                }
-            }
+            // copy all bytes up to the next 0x00 or 0xFF byte
+            $len = strcspn($this->buffer, "\x00\xFF", $this->bpos, $this->bsize - $this->bpos);
+            $com .= substr($this->buffer, $this->bpos, $len);
+            $this->bpos += $len;
         }
         return $com;
     }
@@ -237,6 +228,8 @@ class Session
 
     private function sendCmd($code, $arg, $input)
     {
+        // prefix 0x00 and 0xFF bytes with 0xFF (see Server Protocol)
+        $input = preg_replace('/[\x00\xFF]/', "\xFF$0", $input);
         $this->send(chr($code).$arg.chr(0).$input.chr(0));
         $this->info = $this->receive();
         if (!$this->ok()) {

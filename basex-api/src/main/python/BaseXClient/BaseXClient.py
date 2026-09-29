@@ -1,16 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Python 2.7.3 and 3.x client for BaseX.
+Python 3 client for BaseX.
 Works with BaseX 13.0 and later
-
-Requires Python 3.x or Python 2.x having some backports like bytearray.
-(I've tested Python 3.2.3, and Python 2.7.3 on Fedora 16 linux x86_64.)
-
-LIMITATIONS:
-
-* binary content would corrupt, maybe. (I didn't test it)
-* also, will fail to extract stored binary content, maybe.
-  (both my code, and original don't care escaped 0xff.)
 
 Documentation: https://docs.basex.org/wiki/Clients
 
@@ -64,19 +55,23 @@ or ``recv_single_byte()``."""
 
     # Reads until terminator byte is found.
     def recv_until_terminator(self):
-        """recv a nul(or specified as terminator_byte)-terminated whole string
-from previously fetched buffer."""
+        """recv a nul-terminated whole string from previously fetched buffer.
+0x00 and 0xFF bytes prefixed with 0xFF are unescaped."""
         result_bytes = bytearray()
         while True:
             self.__fill_buffer()
-            pos = self.__buf.find(self.terminator, self.__bpos, self.__bsize)
-            if pos >= 0:
-                result_bytes.extend(self.__buf[self.__bpos:pos])
-                self.__bpos = pos + 1
-                break
-            result_bytes.extend(self.__buf[self.__bpos:self.__bsize])
-            self.__bpos = self.__bsize
-        return result_bytes
+            start, end = self.__bpos, self.__bsize
+            # find next 0x00 or 0xFF byte, copy all bytes before it
+            pos = min((p for p in (self.__buf.find(0, start, end),
+                                   self.__buf.find(0xFF, start, end)) if p >= 0), default=end)
+            result_bytes.extend(self.__buf[start:pos])
+            self.__bpos = pos
+            if pos == end:
+                continue
+            self.__bpos += 1
+            if self.__buf[pos] == 0:
+                return result_bytes
+            result_bytes.append(self.recv_single_byte())
 
     def sendall(self, data):
         """sendall with specified byte encoding if data is not bytearray, bytes
@@ -158,20 +153,16 @@ class Session:
         """Adds a new resource to the opened database."""
         self.__send_input(9, path, content)
 
-    def replace(self, path, content):
-        """Replaces a resource with the specified input."""
+    def put(self, path, content):
+        """Puts (adds or replaces) a document in the opened database."""
         self.__send_input(12, path, content)
 
-    def store(self, path, content):
-        """Stores a binary resource in the opened database.
-
-api won't escape 0x00, 0xff automatically, so you must do it
-yourself explicitly."""
-        # ------------------------------------------
-        # chr(13) + path + chr(0) + content + chr(0)
-        self.__send_binary_input(13, path, content)
-        #
-        # ------------------------------------------
+    def put_binary(self, path, content):
+        """Puts (adds or replaces) a binary resource in the opened database.
+The content must be of type bytes or bytearray."""
+        if not isinstance(content, (bytearray, bytes)):
+            raise ValueError("Content must be bytearray or bytes, not " + str(type(content)))
+        self.__send_input(13, path, content)
 
     def info(self):
         """Return process information"""
@@ -191,33 +182,12 @@ yourself explicitly."""
         self.__swrapper.sendall(value + chr(0))
 
     def __send_input(self, code, arg, content):
-        """internal. don't care."""
-        self.__swrapper.sendall(chr(code) + arg + chr(0) + content + chr(0))
-        self.__info = self.recv_c_str()
-        if not self.server_response_success():
-            raise IOError(self.info())
-
-    def __send_binary_input(self, code, path, content):
-        """internal. don't care."""
-        # at this time, we can't use __send_input itself because of encoding
-        # problem. we have to build bytearray directly.
+        """Sends a command with an argument and input: 0x00 and 0xFF bytes are prefixed with 0xFF."""
+        encoding = self.__swrapper.send_bytes_encoding
         if not isinstance(content, (bytearray, bytes)):
-            raise ValueError("Sorry, content must be bytearray or bytes, not " +
-                             str(type(content)))
-
-        # ------------------------------------------
-        # chr(code) + path + chr(0) + content + chr(0)
-        data = bytearray([code])
-        try:
-            data.extend(path)
-        except:
-            data.extend(path.encode('utf-8'))
-        data.extend([0])
-        data.extend(content)
-        data.extend([0])
-        #
-        # ------------------------------------------
-        self.__swrapper.sendall(data)
+            content = content.encode(encoding)
+        content = bytes(content).replace(b'\xff', b'\xff\xff').replace(b'\x00', b'\xff\x00')
+        self.__swrapper.sendall(bytes([code]) + arg.encode(encoding) + b'\x00' + content + b'\x00')
         self.__info = self.recv_c_str()
         if not self.server_response_success():
             raise IOError(self.info())
@@ -232,11 +202,8 @@ yourself explicitly."""
         return self.recv_c_str()
 
     def iter_receive(self):
-        """iter_receive() -> (typecode, item)
-
-iterate while the query returns items.
-typecode list is in https://docs.basex.org/wiki/Server_Protocol:_Types
-"""
+        """Iterates over the items returned by a query, and yields them as strings.
+The type codes (see https://docs.basex.org/main/Server_Protocol#type_ids) are skipped."""
         result = list()
         self.__swrapper.clear_buffer()
         typecode = self.__swrapper.recv_single_byte()

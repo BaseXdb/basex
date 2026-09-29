@@ -65,11 +65,11 @@ module BaseXClient
       sendCmd(9.chr, path, input)
     end
 
-    def replace(path, input)
+    def put(path, input)
       sendCmd(12.chr, path, input)
     end
 
-    def store(path, input)
+    def put_binary(path, input)
       sendCmd(13.chr, path, input)
     end
 
@@ -100,7 +100,9 @@ module BaseXClient
     end
 
     def sendCmd(cmd, arg, input)
-      send(cmd + arg + 0.chr + input)
+      # prefix 0x00 and 0xFF bytes with 0xFF
+      send(cmd + arg)
+      send(input.b.gsub(/[\x00\xFF]/n) { |c| "\xFF".b + c })
       @info = receive
       if !ok
         raise @info
