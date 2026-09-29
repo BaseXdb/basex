@@ -47,8 +47,8 @@ public final class MapFind extends MapFn {
 
     for(Item item; (item = qc.next(iter)) != null;) {
       if(item instanceof final XQMap map) {
-        final Value value = map.get(key);
-        if(!value.isEmpty()) ab.add(value);
+        final Value value = map.getOrNull(key);
+        if(value != null) ab.add(value);
         map.forEach((k, val) -> find(val.iter(), key, ab, qc));
       } else if(item instanceof final XQArray array) {
         for(final Value value : array.members()) {

@@ -199,6 +199,10 @@ public final class MapModuleTest extends SandboxTest {
 
     query(func.args(" { 'k': 1 }", "k"), "[1]");
     query(func.args(" { 'k': (1, 2) }", "x"), "[]");
+
+    // empty values
+    query(func.args(" { 'k': () }", "k"), "[()]");
+    query(func.args(" (1, { 'k': { 'k': 2 } }, [ [ { 'k': () } ] ])", "k") + " => array:size()", 3);
   }
 
   /** Test method. */
