@@ -12,6 +12,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.util.options.*;
 
 /**
@@ -27,7 +28,8 @@ public class FnUnparsedTextAvailable extends ParseFn {
     public static final BooleanOption NORMALIZE_NEWLINES =
         new BooleanOption(CommonOptions.NORMALIZE_NEWLINES);
     /** Encoding option. */
-    public static final StringOption ENCODING = new StringOption(CommonOptions.ENCODING);
+    public static final StringOption ENCODING = new StringOption(CommonOptions.ENCODING, null,
+        Types.STRING_ZO);
     /** Fallback option. */
     public static final BooleanOption FALLBACK = new BooleanOption(CommonOptions.FALLBACK, false);
   }

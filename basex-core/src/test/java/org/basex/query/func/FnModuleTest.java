@@ -3953,6 +3953,13 @@ return
   }
 
   /** Test method. */
+  @Test public void path() {
+    final Function func = PATH;
+    query(func.args(" <a><b/></a>/b", " { 'namespaces': () }") + " = " +
+        func.args(" <a><b/></a>/b", " { 'namespaces': {} }"), true);
+  }
+
+  /** Test method. */
   @Test public void randomNumberGenerator() {
     final Function func = RANDOM_NUMBER_GENERATOR;
 
@@ -5589,6 +5596,7 @@ return
     final Function func = UNPARSED_TEXT;
     contains(func.args(DOC), "<html");
     contains(func.args(DOC, "US-ASCII"), "<html");
+    contains(func.args(DOC, " { 'encoding': () }"), "<html");
     error(func.args(DOC, "xyz"), RESENCODING_X);
 
     // permitted characters (XML 1.1 repertoire)
@@ -5606,9 +5614,17 @@ return
   }
 
   /** Test method. */
+  @Test public void unparsedTextAvailable() {
+    final Function func = UNPARSED_TEXT_AVAILABLE;
+    query(func.args(DOC), true);
+    query(func.args(DOC, " { 'encoding': () }"), true);
+  }
+
+  /** Test method. */
   @Test public void unparsedTextLines() {
     final Function func = UNPARSED_TEXT_LINES;
     query(func.args(" ()"), "");
+    query("exists(" + func.args(DOC, " { 'encoding': () }") + ")", true);
   }
 
   /** Test method. */

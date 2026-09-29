@@ -31,7 +31,7 @@ public final class FnPath extends ContextFn {
     /** Option. */
     public static final BooleanOption LEXICAL = new BooleanOption("lexical", false);
     /** Option. */
-    public static final ValueOption NAMESPACES = new ValueOption("namespaces", Types.MAP_O);
+    public static final ValueOption NAMESPACES = new ValueOption("namespaces", Types.MAP_ZO);
     /** Option. */
     public static final BooleanOption INDEXES = new BooleanOption("indexes", true);
   }
