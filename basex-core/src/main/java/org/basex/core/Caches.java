@@ -1,7 +1,10 @@
 package org.basex.core;
 
+import java.io.*;
 import java.util.*;
+import java.util.concurrent.locks.*;
 
+import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -19,6 +22,8 @@ public final class Caches {
   private final HashMap<String, Cache> caches = new HashMap<>();
   /** Configurations of initialized caches. */
   private final HashMap<String, Config> configs = new HashMap<>();
+  /** Locks for computing values, indexed by the hash codes of cache names and keys. */
+  private final ReentrantLock[] locks = new ReentrantLock[64];
   /** Database context. */
   private final Context context;
 
@@ -28,6 +33,7 @@ public final class Caches {
    */
   public Caches(final Context context) {
     this.context = context;
+    Arrays.setAll(locks, i -> new ReentrantLock());
   }
 
   /**
@@ -63,6 +69,40 @@ public final class Caches {
     }
     cache.hits++;
     return entry.value;
+  }
+
+  /**
+   * Returns a value, or computes and stores it if it is missing.
+   * @param key key
+   * @param name name of cache
+   * @param compute computes the value to be stored
+   * @return value
+   * @throws QueryException query exception
+   */
+  public Value get(final String key, final String name, final QuerySupplier<Value> compute)
+      throws QueryException {
+    Value value = get(key, name);
+    if(value != null) return value;
+
+    final ReentrantLock lock = locks[(name + '\0' + key).hashCode() & locks.length - 1];
+    try {
+      Job.run(() -> {
+        lock.lockInterruptibly();
+        return null;
+      });
+    } catch(final IOException | InterruptedException ex) {
+      throw new JobException(Text.INTERRUPTED, ex);
+    }
+    try {
+      value = get(key, name);
+      if(value == null) {
+        value = compute.get();
+        put(key, value, name);
+      }
+      return value;
+    } finally {
+      lock.unlock();
+    }
   }
 
   /**

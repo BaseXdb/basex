@@ -77,6 +77,18 @@ public final class CacheModuleTest extends SandboxTest {
     query(func.args("key", " function() { 'NOT' + 'INVOKED' }"), "GET-OR-PUT");
     query(_CACHE_GET.args("key"), "GET-OR-PUT");
     query(_CACHE_SIZE.args(), 1);
+
+    // concurrent calls: compute value only once
+    final String compute = func.args("parallel", " function() { " +
+        _PROF_SLEEP.args(200) + ", " + _RANDOM_UUID.args() + " }");
+    query("count(distinct-values(" + _XQUERY_FORK_JOIN.args(" (1 to 4) ! fn() { " +
+        compute + " }") + "))", 1);
+    // failed computation: compute value again
+    query("try { " + func.args("failed", " function() { error() }") + " } catch * { }");
+    query(func.args("failed", " function() { 'COMPUTED' }"), "COMPUTED");
+    // nested call with the same key
+    query(func.args("nested", " function() { " + func.args("nested", " function() { 1 }") +
+        " + 1 }"), 2);
   }
 
   /** Test method. */

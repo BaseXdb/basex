@@ -18,11 +18,6 @@ public final class CacheGetOrPut extends CacheFn {
     final FItem put = toFunction(arg(1), 0, qc);
     final String name = toZeroString(arg(2), qc);
 
-    Value value = caches(qc).get(key, name);
-    if(value == null) {
-      value = invoke(put, new HofArgs(0), qc);
-      cache(key, value, name, qc);
-    }
-    return value;
+    return caches(qc).get(key, name, () -> compact(invoke(put, new HofArgs(0), qc), qc));
   }
 }
