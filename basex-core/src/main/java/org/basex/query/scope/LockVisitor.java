@@ -146,7 +146,15 @@ public final class LockVisitor extends ASTVisitor {
   @Override
   public boolean transferred(final Expr expr) {
     // a function item is invoked by another query, which registers its own locks
-    return expr instanceof FuncItem || expr.accept(this);
+    if(expr instanceof FuncItem) return true;
+    // only the non-local bindings of an inline function are evaluated by the calling query
+    if(expr instanceof final Closure closure) {
+      for(final Iterator<Map.Entry<Var, Expr>> iter = closure.globalBindings(); iter.hasNext();) {
+        if(!iter.next().getValue().accept(this)) return false;
+      }
+      return true;
+    }
+    return expr.accept(this);
   }
 
   /**

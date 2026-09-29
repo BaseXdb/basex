@@ -342,6 +342,14 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new XQuery(_UPDATE_OUTPUT.args("foo")), true, NONE);
   }
 
+  /** Jobs module: the body of an invoked function is locked by the job, not by the caller. */
+  @Test public void job() {
+    ckDBs(new XQuery("let $p := " + _RANDOM_UUID.args() + " return " + _JOB_EVAL.args(
+        " %updating fn() { " + _DB_PUT_BINARY.args(NAME, "", " $p") + " }")), false, NONE);
+    ckDBs(new XQuery("let $d := " + _DB_GET.args(NAME) + " return " + _JOB_EVAL.args(
+        " fn() { $d, " + _DB_GET.args(NAME2) + " }")), false, NAME_LIST);
+  }
+
   /** Test repository module. */
   @Test public void repository() {
     ckDBs(new XQuery(_REPO_LIST.args()), false, REPO_LIST);
