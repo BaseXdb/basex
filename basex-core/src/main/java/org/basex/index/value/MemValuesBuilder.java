@@ -25,6 +25,7 @@ public final class MemValuesBuilder extends IndexBuilder {
   @Override
   public MemValues build() throws IOException {
     Util.debugln(detailedInfo());
+    includeNames.check();
 
     final MemValues index = new MemValues(data, type);
     final boolean updindex = data.meta.updindex, tokenize = type == IndexType.TOKEN;

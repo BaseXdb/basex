@@ -124,6 +124,34 @@ public final class SelectiveIndexTest extends SandboxTest {
     }
   }
 
+  /** Tests the separators and the validation of included names. */
+  @Test public void names() {
+    try {
+      // commas and whitespace separate names; separators in braced URIs are preserved
+      for(final String names : new String[] { "a,b", "a b", " a ,\n b ", "a,,b" }) {
+        set(MainOptions.TEXTINCLUDE, names);
+        assertEquals("a,b", context.options.get(MainOptions.TEXTINCLUDE));
+      }
+      set(MainOptions.TEXTINCLUDE, "Q{u, v}a");
+      assertEquals("Q{u, v}a", context.options.get(MainOptions.TEXTINCLUDE));
+
+      // sequences in option maps
+      execute(new Close());
+      query("db:create('" + NAME + "', '" + FILE + "', (), { 'textinclude': ('a', 'Q{ns}c') })");
+      query("db:info('" + NAME + "')//textinclude/string()", "a,Q{ns}c");
+      execute(new Open(NAME));
+      assertEquals(2, context.data().textIndex.size());
+
+      // invalid names are rejected
+      for(final String names : new String[] { "a 1", "Q{id}" }) {
+        set(MainOptions.TEXTINCLUDE, names);
+        assertThrows(BaseXException.class, () -> new CreateDB(NAME, FILE).execute(context));
+      }
+    } finally {
+      set(MainOptions.TEXTINCLUDE, "");
+    }
+  }
+
   /** Tests the ID functions. */
   @Test public void id() {
     set(MainOptions.TOKENINDEX, true);
@@ -131,7 +159,7 @@ public final class SelectiveIndexTest extends SandboxTest {
       final String idref = "idref=\"B C\"";
       final String file = "<xml id=\"A\" " + idref + "/>";
       final String[] includes = {
-        "", "*", "Q{}*", "Q{id}",
+        "", "*", "Q{}*",
         "Q{}id", "id", "*:id", "Q{}idref", "idref", "*:idref",
         "Q{}x", "Q{}x", "x", "*:x", "Q{}x",
         // does not work, as it would currently indicate that IDREF is included in the index

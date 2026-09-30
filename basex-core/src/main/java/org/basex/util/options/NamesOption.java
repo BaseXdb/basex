@@ -1,16 +1,17 @@
 package org.basex.util.options;
 
+import java.util.*;
 import java.util.regex.*;
 
 /**
- * Option containing a list of names, from which whitespace is removed.
+ * Option containing a list of names, separated by commas or whitespace.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class NamesOption extends StringOption {
-  /** Whitespace pattern. */
-  private static final Pattern WHITESPACE = Pattern.compile("\\s+");
+  /** Separators outside braced URIs. */
+  private static final Pattern SEPARATORS = Pattern.compile("[,\\s]+(?![^{]*})");
 
   /**
    * Default constructor.
@@ -18,20 +19,20 @@ public final class NamesOption extends StringOption {
    * @param value value
    */
   public NamesOption(final String name, final String value) {
-    super(name, strip(value));
+    super(name, String.join(",", split(value)));
   }
 
   @Override
   Object normalize(final Object value) {
-    return strip((String) value);
+    return String.join(",", split((String) value));
   }
 
   /**
-   * Removes whitespace from a value.
+   * Splits a list of names into entries.
    * @param value value
-   * @return normalized value
+   * @return entries
    */
-  private static String strip(final String value) {
-    return WHITESPACE.matcher(value).replaceAll("");
+  public static List<String> split(final String value) {
+    return Arrays.stream(SEPARATORS.split(value)).filter(s -> !s.isEmpty()).toList();
   }
 }

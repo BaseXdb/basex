@@ -69,6 +69,7 @@ public final class FTBuilder extends IndexBuilder {
   @Override
   public FTIndex build() throws IOException {
     Util.debugln(detailedInfo());
+    includeNames.check();
 
     try {
       // an updatable index is segmented and holds node IDs; if all IDs equal their PRE values,

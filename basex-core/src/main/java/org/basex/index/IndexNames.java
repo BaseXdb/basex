@@ -2,12 +2,12 @@ package org.basex.index;
 
 import static org.basex.util.Token.*;
 
-import java.util.*;
-
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.options.*;
 
 /**
  * Names and namespace URIs of elements/attribute to index.
@@ -22,6 +22,8 @@ public final class IndexNames {
   private final Data data;
   /** Index type. */
   private final IndexType type;
+  /** First invalid entry (can be {@code null}). */
+  private String invalid;
 
   /**
    * Constructor.
@@ -31,9 +33,7 @@ public final class IndexNames {
   public IndexNames(final IndexType type, final Data data) {
     this.data = data;
     this.type = type;
-    final String names = data.meta.names(type);
-    final HashSet<String> inc = toSet(names.trim());
-    for(final String entry : inc) {
+    for(final String entry : NamesOption.split(data.meta.names(type))) {
       // global wildcard: ignore all assignments
       if(entry.equals("*") || entry.equals("*:*")) {
         qnames.reset();
@@ -52,11 +52,19 @@ public final class IndexNames {
         name = token(entry);
         uri = EMPTY;
       } else { // invalid
-        Util.debugln("Included name is invalid: %", entry);
+        if(invalid == null) invalid = entry;
         continue;
       }
       qnames.add(name, uri);
     }
+  }
+
+  /**
+   * Raises an error if an included name is invalid.
+   * @throws BaseXException database exception
+   */
+  public void check() throws BaseXException {
+    if(invalid != null) throw new BaseXException("Invalid name for % index: %.", type, invalid);
   }
 
   /**
@@ -138,34 +146,6 @@ public final class IndexNames {
       }
     }
     return false;
-  }
-
-  /**
-   * Returns a set of all entries of the requested string (separated by commas).
-   * @param names names
-   * @return map
-   */
-  private static HashSet<String> toSet(final String names) {
-    final HashSet<String> set = new HashSet<>();
-    final StringBuilder value = new StringBuilder();
-    final int sl = names.length();
-    for(int s = 0; s < sl; s++) {
-      final char ch = names.charAt(s);
-      if(ch == ',') {
-        if(s + 1 == sl || names.charAt(s + 1) != ',') {
-          if(!value.isEmpty()) {
-            set.add(value.toString().trim());
-            value.setLength(0);
-          }
-          continue;
-        }
-        // literal commas are escaped by a second comma
-        s++;
-      }
-      value.append(ch);
-    }
-    if(!value.isEmpty()) set.add(value.toString().trim());
-    return set;
   }
 
   /**

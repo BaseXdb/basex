@@ -48,6 +48,7 @@ public final class DiskValuesBuilder extends IndexBuilder {
   @Override
   public ValueIndex build() throws IOException {
     Util.debugln(detailedInfo());
+    includeNames.check();
 
     final String prefix = DiskValues.fileSuffix(type);
     try {
