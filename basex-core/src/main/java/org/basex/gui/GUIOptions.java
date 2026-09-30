@@ -85,7 +85,7 @@ public final class GUIOptions extends Options {
   /** Flag for activated info view. */
   public static final BooleanOption SHOWINFO = new BooleanOption("SHOWINFO", true);
   /** Flag for activated map view. */
-  public static final BooleanOption SHOWMAP = new BooleanOption("SHOWMAP", true);
+  public static final BooleanOption SHOWMAP = new BooleanOption("SHOWMAP", false);
   /** Flag for activated table view. */
   public static final BooleanOption SHOWTABLE = new BooleanOption("SHOWTABLE", false);
   /** Flag for activated result view. */
