@@ -31,6 +31,8 @@ public class XMLParser extends SingleParser {
   private final XMLScanner scanner;
   /** Names of opened elements. */
   private final TokenList elms = new TokenList();
+  /** Raw names of the attributes of the current element. */
+  private final TokenList attNames = new TokenList();
   /** Parse fragment. */
   private final boolean fragment;
   /** Closed root element. */
@@ -140,6 +142,7 @@ public class XMLParser extends SingleParser {
     consume(Type.L_BR);
     atts.reset();
     nsp.reset();
+    attNames.reset();
 
     // get element name
     final byte[] raw = consumeToken(Type.ELEMNAME);
@@ -149,6 +152,8 @@ public class XMLParser extends SingleParser {
     // parse optional attributes
     while(scanner.type != Type.R_BR && scanner.type != Type.CLOSE_R_BR) {
       final byte[] an = consumeToken(Type.ATTNAME);
+      if(attNames.contains(an)) throw new BuildException(DUPLATT, detailedInfo(), an);
+      attNames.add(an);
       skipSpace();
       consume(Type.EQ);
       skipSpace();

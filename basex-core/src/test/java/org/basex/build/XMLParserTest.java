@@ -78,7 +78,7 @@ public final class XMLParserTest extends SandboxTest {
     // build document with various number of arguments (30..33)
     for(int a = 30; a <= 33; a++) {
       final StringBuilder doc = new StringBuilder("<_");
-      for(int i = 0; i < a; i++) doc.append(" a").append(a).append("=''");
+      for(int i = 0; i < a; i++) doc.append(" a").append(i).append("=''");
       doc.append("/>");
 
       execute(new CreateDB(NAME, doc.toString()));
@@ -308,5 +308,29 @@ public final class XMLParserTest extends SandboxTest {
 
     execute(new CreateDB(NAME, "<a a:a='x' b:a='y' c:a='z' xmlns:a='a' xmlns:b='b' xmlns:c='c'/>"));
     query("/a/@* ! name()", "a\na_1\na_2");
+  }
+
+  /** Characters that are invalid in XML 1.0. */
+  @Test public void invalidChars() {
+    set(MainOptions.DTD, true);
+    final String doc = "<!DOCTYPE a [<!ENTITY e \"\u0001\">]><a b='\u0008'>\u0001&e;\u007F</a>";
+    final String expected = "65533\n65533\n65533\n127";
+    execute(new CreateDB(NAME, doc));
+    query("(a/@b, a) ! string-to-codepoints(.)", expected);
+
+    final IOFile file = new IOFile(sandbox(), "chars.xml");
+    write(file, doc);
+    execute(new CreateDB(NAME, file.path()));
+    query("(a/@b, a) ! string-to-codepoints(.)", expected);
+  }
+
+  /** Duplicate attributes. */
+  @Test public void duplicateAttributes() {
+    for(final boolean stripNS : new boolean[] { false, true }) {
+      set(MainOptions.STRIPNS, stripNS);
+      for(final String doc : new String[] { "<a b='1' b='2'/>", "<a xmlns:p='u' xmlns:p='v'/>" }) {
+        assertThrows(BaseXException.class, () -> new CreateDB(NAME, doc).execute(context));
+      }
+    }
   }
 }

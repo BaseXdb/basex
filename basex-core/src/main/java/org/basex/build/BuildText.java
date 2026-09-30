@@ -30,6 +30,8 @@ public interface BuildText {
   String DOCOPEN = "%: Closing element </%> expected.";
   /** Parser error. */
   String MOREROOTS = "%: No elements allowed after closed root element.";
+  /** Parser error. */
+  String DUPLATT = "%: Duplicate attribute '%'.";
 
   /** Scanner error. */
   String BEFOREROOT = "No text allowed before root element.";

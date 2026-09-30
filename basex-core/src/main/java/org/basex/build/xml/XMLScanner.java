@@ -600,7 +600,7 @@ final class XMLScanner extends Job {
         check(';');
         if(!input.add(val, true)) throw error(ENTITY);
       } else {
-        return ch;
+        return valid10(ch) ? ch : 0xFFFD;
       }
     }
   }
