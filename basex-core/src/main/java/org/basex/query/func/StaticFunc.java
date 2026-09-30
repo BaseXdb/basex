@@ -90,7 +90,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
       // compile function body, handle return type
       cc.pushFocus(null, false);
-      cc.pushScope(vs);
+      cc.pushScope(vs, anns);
       try {
         cc.enter(this, () -> {
           expr = expr.compile(cc);
@@ -100,7 +100,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       } catch(final QueryException ex) {
         expr = FnError.get(ex);
       } finally {
-        cc.removeScope(this);
+        cc.removeScope(this, anns);
         cc.removeFocus();
       }
       // convert all function calls in tail position to proper tail calls

@@ -12,6 +12,7 @@ import org.basex.core.jobs.*;
 import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -152,6 +153,12 @@ public class XQueryEval extends StandardFunc {
     } finally {
       if(to != null) to.cancel();
     }
+  }
+
+  @Override
+  public final Expr compile(final CompileContext cc) throws QueryException {
+    evalFunc();
+    return super.compile(cc);
   }
 
   @Override

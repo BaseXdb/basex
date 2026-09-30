@@ -51,7 +51,7 @@ public final class TransferVisitor extends ASTVisitor {
    */
   public static void check(final FItem function, final InputInfo ii) throws QueryException {
     final String dep = dependency(function);
-    if(dep != null) throw BASEX_TRANSFER_X_X.get(ii, dep, function);
+    if(dep != null) throw BASEX_EVAL_X_X.get(ii, dep, function);
   }
 
   @Override

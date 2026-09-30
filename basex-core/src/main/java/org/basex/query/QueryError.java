@@ -37,7 +37,7 @@ public enum QueryError {
   /** Error code. */
   BASEX_FUNCTION_X(BASEX, "function", "Value is a function: %."),
   /** Error code. */
-  BASEX_TRANSFER_X_X(BASEX, "transfer", "Function depends on %: %."),
+  BASEX_EVAL_X_X(BASEX, "eval", "Function depends on %: %."),
   /** Error code. */
   BASEX_WHICH_X(BASEX, "function", "Function not found: %."),
   /** Error code. */

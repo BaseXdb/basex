@@ -151,11 +151,11 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       entry.getKey().refineType(bound.seqType(), cc);
     }
 
-    cc.pushClosure(vs);
+    cc.pushScope(vs, anns);
     try {
       expr = cc.compileOrError(expr, false);
     } finally {
-      cc.removeClosure(this);
+      cc.removeScope(this, anns);
     }
     expr.markTailCalls(cc);
 
@@ -178,7 +178,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public Expr optimize(final CompileContext cc) {
-    cc.pushClosure(vs);
+    cc.pushScope(vs, anns);
     try {
       // inline all values in the closure
       final Iterator<Entry<Var, Expr>> iter = global.entrySet().iterator();
@@ -217,7 +217,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     } catch(final QueryException ex) {
       expr = FnError.get(ex);
     } finally {
-      cc.removeClosure(this);
+      cc.removeScope(this, anns);
     }
 
     // declared type for instance-of/coercion (item()* if none), body type as refined return type
@@ -275,11 +275,11 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       if(!param.seqType().eq(before)) {
         final InlineContext ic = new InlineContext(param, new VarRef(info, param).optimize(cc), cc);
         if(ic.inlineable(copy.expr)) {
-          cc.pushClosure(copy.vs);
+          cc.pushScope(copy.vs, copy.anns);
           try {
             copy.expr = ic.inline(copy.expr);
           } finally {
-            cc.removeClosure(copy);
+            cc.removeScope(copy, copy.anns);
           }
         }
       }
@@ -290,13 +290,13 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   @Override
   public Expr simplifyFunc(final Simplify mode, final CompileContext cc)
       throws QueryException {
-    cc.pushClosure(vs);
+    cc.pushScope(vs, anns);
     try {
       final Expr ex = expr.simplifyFor(mode, cc);
       if(ex == expr) return this;
       expr = ex;
     } finally {
-      cc.removeClosure(this);
+      cc.removeScope(this, anns);
     }
     return optimize(cc);
   }
@@ -306,11 +306,11 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     // captured focus: the context value is bound to the function body
     if(focus && ic.var == null) {
       final Expr inlined;
-      ic.cc.pushClosure(vs);
+      ic.cc.pushScope(vs, anns);
       try {
         inlined = expr.inline(ic);
       } finally {
-        ic.cc.removeClosure(this);
+        ic.cc.removeScope(this, anns);
       }
       if(inlined == null) return null;
       expr = inlined;
@@ -482,6 +482,15 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
    */
   public Iterator<Entry<Var, Expr>> globalBindings() {
     return global.entrySet().iterator();
+  }
+
+  /**
+   * Annotates the function for evaluation in another query.
+   */
+  void eval() {
+    if(!anns.contains(Annotation._BASEX_EVAL)) {
+      anns = anns.attach(new Ann(info, Annotation._BASEX_EVAL, Empty.VALUE));
+    }
   }
 
   /**

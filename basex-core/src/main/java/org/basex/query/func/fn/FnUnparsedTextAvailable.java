@@ -51,7 +51,7 @@ public class FnUnparsedTextAvailable extends ParseFn {
     if(source == Empty.VALUE) return value(cc.qc);
 
     // pre-evaluate during dynamic compilation if target is not a remote URL
-    if(cc.dynamic && source instanceof Value) {
+    if(cc.dynamicContext() && source instanceof Value) {
       try {
         input = toIO(toString(source, cc.qc), false);
         if(!(input instanceof IOUrl)) return value(cc.qc);

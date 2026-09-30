@@ -138,6 +138,7 @@ final class QueryCompiler {
 
       @Override
       public boolean subScope(final Scope scope) {
+        scope.reset();
         return scope.visit(this);
       }
 

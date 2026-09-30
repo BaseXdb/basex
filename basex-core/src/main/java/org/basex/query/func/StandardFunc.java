@@ -24,6 +24,7 @@ import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.scope.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
@@ -350,7 +351,7 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected final Expr compileData(final CompileContext cc) throws QueryException {
-    if(cc.openData() && defined(0) && arg(0) instanceof Value) {
+    if(cc.dynamicContext() && defined(0) && arg(0) instanceof Value) {
       final Data data = toData(cc.qc);
       exprType.data(data);
       cc.info(OPTOPEN_X, data.meta.name);
@@ -650,6 +651,20 @@ public abstract class StandardFunc extends Arr {
       bindings.put(binding.getKey(), binding.getValue().materialize(n -> false, true, info, qc));
     }
     return new QueryJobSpec(options, bindings, content, sc().resolver());
+  }
+
+  /**
+   * Annotates the inline functions of the first two arguments for evaluation in another query.
+   */
+  protected final void evalFunc() {
+    final ASTVisitor visitor = new ASTVisitor() {
+      @Override
+      public boolean subScope(final Scope scope) {
+        if(scope instanceof final Closure closure) closure.eval();
+        return true;
+      }
+    };
+    for(int a = 0; a < 2 && defined(a); a++) arg(a).accept(visitor);
   }
 
   /**

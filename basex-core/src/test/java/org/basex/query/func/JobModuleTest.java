@@ -520,13 +520,13 @@ public final class JobModuleTest extends SandboxTest {
     error(func.args(" [ 1 ]"), INVTYPE_X);
 
     // dependencies on the calling query
-    error(func.args(" fn() { . }"), BASEX_TRANSFER_X_X);
-    error(func.args(" fn() { position() }"), BASEX_TRANSFER_X_X);
+    error(func.args(" fn() { . }"), BASEX_EVAL_X_X);
+    error(func.args(" fn() { position() }"), BASEX_EVAL_X_X);
     error("declare variable $v := Q{java:java.lang.Math}abs(-1); " + func.args(" fn() { $v }"),
-        BASEX_TRANSFER_X_X);
-    error(func.args(" fn() { Q{java:java.lang.Math}abs(-1) }"), BASEX_TRANSFER_X_X);
+        BASEX_EVAL_X_X);
+    error(func.args(" fn() { Q{java:java.lang.Math}abs(-1) }"), BASEX_EVAL_X_X);
     // dependency in a function supplied as argument
-    error(func.args(" fn($f) { $f() }", " [ fn() { . } ]"), BASEX_TRANSFER_X_X);
+    error(func.args(" fn($f) { $f() }", " [ fn() { . } ]"), BASEX_EVAL_X_X);
 
     // errors of the invoked function are passed on
     error(func.args(" fn() { 1 + '' }"), CALCTYPE_X_X_X_X_X);
@@ -537,23 +537,59 @@ public final class JobModuleTest extends SandboxTest {
     final Function func = _JOB_EXECUTE;
     query(_DB_CREATE.args(NAME, " <r><x>a</x></r>", "doc.xml"));
 
-    // closure bodies are compiled without databases: no index rewrite, even if called locally
+    // closure bodies are optimized with databases if the function is called locally
+    final String path = _DB_GET.args(NAME) + "//x[text() = $p]";
     check("declare %basex:inline function local:f() { " +
         "let $p := string(" + _DB_GET.args(NAME) + ") " +
-        "let $f := fn() { " + _DB_GET.args(NAME) + "//x[text() = $p] } " +
+        "let $f := fn() { " + path + " } " +
+        "return $f() }; local:f()", "<x>a</x>", exists(ValueAccess.class));
+    // ...but not if they are annotated for evaluation in another query
+    check("declare %basex:inline function local:f() { " +
+        "let $p := string(" + _DB_GET.args(NAME) + ") " +
+        "let $f := %basex:eval fn() { " + path + " } " +
         "return $f() }; local:f()", "<x>a</x>", empty(ValueAccess.class));
+
+    // closures that reach the job via a function call must be annotated
+    final String run = "declare %basex:inline(0) function local:run($f) { " +
+        func.args(" $f") + " }; ";
+    error(run + "declare %basex:inline function local:f() { " +
+        "let $p := string(" + _DB_GET.args(NAME) + ") " +
+        "return local:run(fn() { " + path + " }) }; local:f()", BASEX_EVAL_X_X);
+    query(run + "declare %basex:inline function local:f() { " +
+        "let $p := string(" + _DB_GET.args(NAME) + ") " +
+        "return local:run(%basex:eval fn() { " + path + " }) }; local:f()", "<x>a</x>");
+
+    // inline functions in the bindings are annotated as well
+    query("let $p := string(" + _DB_GET.args(NAME) + ") " +
+        "return " + func.args(" fn($f) { $f() }", " [ fn() { " + path + " } ]"), "<x>a</x>");
+    // captured functions must be annotated
+    query("let $p := string(" + _DB_GET.args(NAME) + ") " +
+        "let $f := %basex:eval fn() { " + path + " } " +
+        "return " + func.args(" fn() { $f() }"), "<x>a</x>");
+
+    // modules loaded at runtime are only compiled once, with databases
+    query("let $module := load-xquery-module('m', { 'content': " +
+        "'module namespace m = \"m\"; declare function m:f() { " +
+        "let $p := string(" + _DB_GET.args(NAME) + ") " +
+        "return " + func.args(" fn() { " + path + " }") + " };' }) " +
+        "return $module?functions?(QName('m', 'f'))?0()", "<x>a</x>");
+
+    // named functions: references share the body with direct calls
+    final String named = "function local:f() { " + _DB_GET.args(NAME) + "//x[text() = 'a'] }; " +
+        "local:f(), " + func.args(" local:f#0");
+    error("declare %basex:inline(0) " + named, BASEX_EVAL_X_X);
+    query("declare %basex:inline(0) %basex:eval " + named, "<x>a</x>\n<x>a</x>");
 
     // static variables with persistent values are not copied
     error("declare variable $v := " + _DB_GET.args(NAME) + "; " +
-        func.args(" fn() { count($v//x) }"), BASEX_TRANSFER_X_X);
+        func.args(" fn() { count($v//x) }"), BASEX_EVAL_X_X);
 
-    // dynamic context: a job returns the time of the calling query
-    // if the closure body was optimized in the dynamic pass
+    // dynamic context: a job returns its own time
     query("declare %basex:inline function local:f() { " +
         "let $p := string(" + _DB_GET.args(NAME) + ") " +
         "return " + func.args(" fn() { $p, current-dateTime() }") + "[2] }; " +
         "let $t := current-dateTime() return (" + _PROF_SLEEP.args(10) + ", local:f() = $t)",
-        true);
+        false);
     query("let $t := current-dateTime() return (" + _PROF_SLEEP.args(10) + ", " +
         func.args(" fn() { current-dateTime() }") + " = $t)", false);
   }

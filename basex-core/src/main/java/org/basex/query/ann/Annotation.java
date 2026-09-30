@@ -26,6 +26,8 @@ public enum Annotation {
   UPDATING("updating()", params(), XQ_URI, false),
 
   /** XQuery annotation. */
+  _BASEX_EVAL("eval()", params(), BASEX_URI),
+  /** XQuery annotation. */
   _BASEX_INLINE("inline(limit?)", params(INTEGER), BASEX_URI),
   /** XQuery annotation. */
   _BASEX_LAZY("lazy()", params(), BASEX_URI),

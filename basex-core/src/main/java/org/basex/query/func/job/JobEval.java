@@ -7,6 +7,7 @@ import java.io.*;
 import org.basex.core.jobs.*;
 import org.basex.core.locks.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -61,6 +62,12 @@ public class JobEval extends StandardFunc {
       }
     }
     return Str.get(job.jc().id());
+  }
+
+  @Override
+  public final Expr compile(final CompileContext cc) throws QueryException {
+    evalFunc();
+    return super.compile(cc);
   }
 
   @Override

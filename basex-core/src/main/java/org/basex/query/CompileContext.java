@@ -145,8 +145,8 @@ public final class CompileContext {
   public final boolean dynamic;
   /** Functions whose bodies are currently compiled or inlined. */
   private final ArrayDeque<XQFunctionExpr> entered = new ArrayDeque<>();
-  /** Number of closure bodies that are currently compiled or optimized. */
-  private int closures;
+  /** Number of function bodies for evaluation in other queries that are currently compiled. */
+  private int evals;
 
   /** Variable scope list. */
   private final ArrayDeque<VarScope> scopes = new ArrayDeque<>();
@@ -217,30 +217,32 @@ public final class CompileContext {
   }
 
   /**
-   * Pushes the variable scope of a closure body to the stack.
+   * Pushes the variable scope of a function body to the stack.
    * @param vs variable scope
+   * @param anns annotations of the function
    */
-  public void pushClosure(final VarScope vs) {
+  public void pushScope(final VarScope vs, final AnnList anns) {
     pushScope(vs);
-    closures++;
+    if(anns.contains(Annotation._BASEX_EVAL)) evals++;
   }
 
   /**
-   * Removes the variable scope of a closure body from the stack.
-   * @param closure closure
+   * Removes the variable scope of a function body from the stack.
+   * @param scope scope
+   * @param anns annotations of the function
    */
-  public void removeClosure(final Closure closure) {
-    closures--;
-    removeScope(closure);
+  public void removeScope(final Scope scope, final AnnList anns) {
+    if(anns.contains(Annotation._BASEX_EVAL)) evals--;
+    removeScope(scope);
   }
 
   /**
-   * Indicates if databases can be opened and accessed at compile time.
+   * Indicates if the dynamic context (databases, current time) can be accessed at compile time.
    * @return result of check
    */
-  public boolean openData() {
-    // closure bodies may be passed on to other queries (jobs), which must not share databases
-    return dynamic && closures == 0;
+  public boolean dynamicContext() {
+    // functions annotated with %basex:eval are passed on to other queries (jobs)
+    return dynamic && evals == 0;
   }
 
   /**

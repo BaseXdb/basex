@@ -50,10 +50,10 @@ public final class XQueryModuleTest extends SandboxTest {
     error(func.args(" { 'a': 1 }"), INVTYPE_X);
     error(func.args(" [ 1 ]"), INVTYPE_X);
     // dependencies on the calling query
-    error(func.args(" fn() { . }"), BASEX_TRANSFER_X_X);
+    error(func.args(" fn() { . }"), BASEX_EVAL_X_X);
     error("declare variable $v := Q{java:java.lang.Math}abs(-1); " + func.args(" fn() { $v }"),
-        BASEX_TRANSFER_X_X);
-    error(func.args(" fn() { Q{java:java.lang.Math}abs(-1) }"), BASEX_TRANSFER_X_X);
+        BASEX_EVAL_X_X);
+    error(func.args(" fn() { Q{java:java.lang.Math}abs(-1) }"), BASEX_EVAL_X_X);
     // updating functions
     error(func.args(" %updating fn() { delete node <a/> }"), XQUERY_NOUPDATES);
   }
