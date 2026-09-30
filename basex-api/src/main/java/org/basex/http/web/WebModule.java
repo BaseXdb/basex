@@ -23,13 +23,13 @@ public final class WebModule {
   private final ArrayList<RestXqFunction> functions = new ArrayList<>();
   /** Supported WebSocket methods. */
   private final ArrayList<WsFunction> wsFunctions = new ArrayList<>();
+  /** Timestamps of the module file and its imports, indexed by file path. */
+  private final HashMap<String, Long> files = new HashMap<>();
   /** File reference. */
   private final IO file;
   /** Web archive the module is stored in (can be {@code null}). */
   private final WebArchive archive;
 
-  /** Parsing timestamp, initially {{@code -1}. */
-  private long time = -1;
   /** File content. */
   private String content;
   /** Error that occurred while parsing the module (can be {@code null}). */
@@ -51,17 +51,21 @@ public final class WebModule {
    * @throws IOException I/O exception
    */
   void parse(final Context ctx) throws IOException {
-    final long ts = archive != null ? archive.time() : file.timeStamp();
-    if(time == ts) return;
+    // archived modules are parsed once (modified archives are reloaded as a whole)
+    if(content != null && Checks.all(files.entrySet(),
+        entry -> new IOFile(entry.getKey()).timeStamp() == entry.getValue())) return;
 
-    time = ts;
+    files.clear();
+    if(archive == null) files.put(file.path(), file.timeStamp());
     content = file.readString();
 
     functions.clear();
     wsFunctions.clear();
     error = null;
 
-    try(QueryContext qc = qc(ctx)) {
+    final QueryContext qc = new QueryContext(ctx);
+    try(qc) {
+      parse(qc);
       // loop through all functions
       final String name = file.name();
       for(final StaticFunc sf : qc.functions) {
@@ -87,6 +91,15 @@ public final class WebModule {
       wsFunctions.clear();
       error = ex;
       ctx.log.writeServer(LogType.ERROR, Util.message(ex));
+    } finally {
+      // record imported modules, even if parsing failed
+      if(archive == null) {
+        for(final byte[] path : qc.modParsed) {
+          if(IO.get(Token.string(path)) instanceof final IOFile io) {
+            files.putIfAbsent(io.path(), io.timeStamp());
+          }
+        }
+      }
     }
   }
 
@@ -122,6 +135,16 @@ public final class WebModule {
    */
   public QueryContext qc(final Context ctx) throws QueryException {
     final QueryContext qc = new QueryContext(ctx);
+    parse(qc);
+    return qc;
+  }
+
+  /**
+   * Parses the module with the specified query context.
+   * @param qc query context
+   * @throws QueryException query exception
+   */
+  private void parse(final QueryContext qc) throws QueryException {
     final StaticContext sc = archive == null ? null :
       new StaticContext(qc).resolver((path, uri, base) -> archive.resolve(path, base));
     // modules of the web application may access external resources
@@ -131,6 +154,5 @@ public final class WebModule {
     } finally {
       qc.trusted = false;
     }
-    return qc;
   }
 }

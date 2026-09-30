@@ -45,14 +45,6 @@ public final class WebArchive {
   }
 
   /**
-   * Returns the time stamp of the archive.
-   * @return time stamp
-   */
-  long time() {
-    return time;
-  }
-
-  /**
    * Returns references to all XQuery modules of the archive.
    * @return module references
    */

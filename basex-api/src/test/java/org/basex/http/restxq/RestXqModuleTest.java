@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.core.*;
 import org.basex.http.*;
+import org.basex.http.web.*;
+import org.basex.io.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -25,6 +27,23 @@ public final class RestXqModuleTest extends RestXqTest {
     // the parse error is reported for requests that match no function
     assertContains(get(500, "broken"), "No binding defined for $unbound.");
     assertContains(get(500, "unknown"), "No binding defined for $unbound.");
+  }
+
+  /**
+   * Modules are parsed again if an imported module has been changed.
+   * @throws Exception exception
+   */
+  @Test public void importedModule() throws Exception {
+    register("import module namespace lib = 'lib' at 'lib.xqm';" +
+      "declare %R:path('imported') function m:f() { lib:f() };");
+    assertContains(get(500, "imported"), "lib.xqm");
+
+    // create imported module; simulate cache update after idle time
+    final String path = context.soptions.get(StaticOptions.WEBPATH);
+    new IOFile(path, "lib.xqm").write("module namespace lib = 'lib';" +
+      "declare function lib:f() { 'x' };");
+    WebModules.get(context).init(true);
+    assertEquals("x", get(200, "imported"));
   }
 
   /**
