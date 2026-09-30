@@ -16,9 +16,11 @@ import org.basex.query.scope.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Function item.
@@ -332,96 +334,105 @@ public final class FuncItem extends FItem implements Scope {
    * @param init initial expression
    * @param left indicates if this is a left/right fold
    * @param array indicates if an array is processed
+   * @param empty only check if the iteration can be exited when the result gets empty
    * @param cc compilation context
    * @return constant value, early-exit expressions, or {@code null}
    * @throws QueryException query exception
    */
   public Object fold(final Expr input, final Expr init, final boolean left, final boolean array,
-      final CompileContext cc) throws QueryException {
+      final boolean empty, final CompileContext cc) throws QueryException {
+
+    if(input.has(Flag.NDT)) return null;
 
     final int arity = arity();
-    if(!input.has(Flag.NDT)) {
-      final IntFunction<Var> param = i -> i < arity ? params[i] : null;
-      final Var value = param.apply(left ? 1 : 0), result = param.apply(left ? 0 : 1),
-          pos = param.apply(2);
-      final BiPredicate<Expr, Var> isRef = (ex, var) -> ex instanceof final VarRef vr &&
-          vr.var.equals(var);
+    final IntFunction<Var> param = i -> i < arity ? params[i] : null;
+    final Var value = param.apply(left ? 1 : 0), result = param.apply(left ? 0 : 1),
+        pos = param.apply(2);
+    final Predicate<Expr> isResult = ex -> ex instanceof final VarRef vr &&
+        vr.var.equals(result);
 
-      // fold-left(INPUT, INIT, fn($result, $value) { $result }) → INIT
-      if(isRef.test(expr, result)) return init;
-
-      if(input.seqType().oneOrMore()) {
-        // fold-left(INPUT, INIT, fn($result, $value) { VALUE }) → VALUE
-        if(!array && expr instanceof Value) return expr;
-        // fold-left(INPUT, INIT, fn($result, $value) { $value }) → foot($value)
-        if(isRef.test(expr, value)) return cc.function(
-            left ? array ? _ARRAY_FOOT : FOOT : array ? _ARRAY_HEAD : HEAD, info, input);
-      }
-
-      Expr exit = null, action = null;
-      final Expr expr1 = expr.arg(0), expr2 = expr.arg(1);
-      final boolean ref1 = isRef.test(expr1, result), ref2 = isRef.test(expr2, result);
-      if(expr instanceof final If iff) {
-        if(!(iff.cond.uses(value) || iff.cond.uses(pos) || iff.cond.has(Flag.NDT))) {
-          if(ref1) {
-            // if(COND) then $result else ACTION → exit on COND
-            exit = iff.cond;
-            action = expr2;
-          } else if(ref2) {
-            // if(COND) then ACTION else $result → exit on not(COND)
-            exit = cc.function(NOT, info, iff.cond);
-            action = expr1;
-          } else if(iff.cond instanceof final CmpG cmp) {
-            final Expr op1 = cmp.arg(0), op2 = cmp.arg(1);
-            final SeqType st1 = op1.seqType(), st2 = op2.seqType();
-            // strings: restrict to default collation (value equality must imply identity)
-            if(isRef.test(op1, result) && op2 instanceof Item && st1.eq(st2) &&
-                (st1.instanceOf(Types.DECIMAL_O) ||
-                 st1.instanceOf(Types.STRING_O) && cmp.sc().collation == null)) {
-              if(cmp.cmpOp() == CmpOp.EQ && op2.equals(expr1)) {
-                // if($result = ITEM) then ITEM else ACTION → exit on equality
-                exit = iff.cond;
-                action = expr2;
-              } else if(cmp.cmpOp() == CmpOp.NE && op2.equals(expr2)) {
-                // if($result != ITEM) then ACTION else ITEM → exit on not(inequality)
-                exit = cc.function(NOT, info, iff.cond);
-                action = expr1;
-              }
-            }
-          }
+    Expr exit = null, action = null;
+    if(empty) {
+      if(result != null && !result.seqType().oneOrMore() &&
+          !expr.has(Flag.NDT, Flag.UPD, Flag.CTX)) {
+        // ACTION yields () for $result := () → exit on empty($result)
+        final InlineContext ic = new InlineContext(result, Empty.VALUE, cc);
+        final Expr copy = expr.copy(cc, new IntObjectMap<>());
+        if(ic.inlineable(copy) && ic.inline(copy) == Empty.VALUE) {
+          exit = cc.function(EMPTY, info, new VarRef(info, result));
+          action = expr;
         }
-      } else if(init.seqType().eq(Types.BOOLEAN_O) && expr instanceof final Logical logical &&
-          !expr.has(Flag.NDT)) {
-        // $result or  ACTION → exit on boolean($result)
-        // $result and ACTION → exit on not($result)
-        final ExprList list = new ExprList(logical.exprs.length - 1);
-        Expr ref = null;
-        for(final Expr op : logical.exprs) {
-          if(ref == null && isRef.test(op, result)) ref = op;
-          else list.add(op);
-        }
-        if(ref != null && !list.isEmpty()) {
-          final boolean or = logical instanceof Or;
-          exit = cc.function(or ? BOOLEAN : NOT, info, ref);
-          action = list.size() == 1 ? cc.function(BOOLEAN, info, list.peek()) :
-            (or ? new Or(info, list.finish()) : new And(info, list.finish())).optimize(cc);
-        }
-      } else if(expr instanceof final Otherwise otherwise &&
-          isRef.test(otherwise.exprs[0], result)) {
-        // $result otherwise ACTION → exit on exists($result)
-        final Expr[] ops = otherwise.exprs;
-        exit = cc.function(EXISTS, info, ops[0]);
-        action = new Otherwise(info, Arrays.copyOfRange(ops, 1, ops.length)).optimize(cc);
       }
-
-      if(exit != null) {
-        return new FuncItem[] {
-          new FuncItem(info, exit, params, anns, funcType(), stackSize, null, focus),
-          new FuncItem(info, action, params, anns, funcType(), stackSize, null, focus)
-        };
-      }
+      return exitOrAction(exit, action);
     }
-    return null;
+
+    // fold-left(INPUT, INIT, fn($result, $value) { $result }) → INIT
+    if(isResult.test(expr)) return init;
+
+    if(input.seqType().oneOrMore()) {
+      // fold-left(INPUT, INIT, fn($result, $value) { VALUE }) → VALUE
+      if(!array && expr instanceof Value) return expr;
+      // fold-left(INPUT, INIT, fn($result, $value) { $value }) → foot($value)
+      if(expr instanceof final VarRef vr && vr.var.equals(value)) return cc.function(
+          left ? array ? _ARRAY_FOOT : FOOT : array ? _ARRAY_HEAD : HEAD, info, input);
+    }
+
+    if(expr instanceof final If iff &&
+        !(iff.cond.uses(value) || iff.cond.uses(pos) || iff.cond.has(Flag.NDT))) {
+      // checks if a branch returns the unchanged result
+      final BiPredicate<Expr, CmpOp> keeps = (branch, op) -> {
+        if(isResult.test(branch)) return true;
+        if(!(iff.cond instanceof final CmpG cmp) || cmp.cmpOp() != op) return false;
+        final Expr op1 = cmp.arg(0), op2 = cmp.arg(1);
+        final SeqType st1 = op1.seqType();
+        // strings: restrict to default collation (value equality must imply identity)
+        return isResult.test(op1) && op2 instanceof Item && op2.equals(branch) &&
+            st1.eq(op2.seqType()) && (st1.instanceOf(Types.DECIMAL_O) ||
+            st1.instanceOf(Types.STRING_O) && cmp.sc().collation == null);
+      };
+      if(keeps.test(iff.arg(0), CmpOp.EQ)) {
+        // if(COND) then $result else ACTION → exit on COND
+        // if($result = ITEM) then ITEM else ACTION → exit on COND
+        exit = iff.cond;
+        action = iff.arg(1);
+      } else if(keeps.test(iff.arg(1), CmpOp.NE)) {
+        // if(COND) then ACTION else $result → exit on not(COND)
+        // if($result != ITEM) then ACTION else ITEM → exit on not(COND)
+        exit = cc.function(NOT, info, iff.cond);
+        action = iff.arg(0);
+      }
+    } else if(expr instanceof final Logical logical && init.seqType().eq(Types.BOOLEAN_O) &&
+        !expr.has(Flag.NDT)) {
+      // $result or  ACTION → exit on boolean($result)
+      // $result and ACTION → exit on not($result)
+      final ExprList ops = new ExprList().add(logical.exprs);
+      int r = ops.size();
+      while(--r >= 0 && !isResult.test(ops.get(r)));
+      if(r != -1 && ops.size() > 1) {
+        final boolean or = logical instanceof Or;
+        exit = cc.function(or ? BOOLEAN : NOT, info, ops.remove(r));
+        action = (or ? new Or(info, ops.finish()) : new And(info, ops.finish())).optimize(cc);
+      }
+    } else if(expr instanceof final Otherwise otherwise && isResult.test(otherwise.exprs[0])) {
+      // $result otherwise ACTION → exit on exists($result)
+      final Expr[] ops = otherwise.exprs;
+      exit = cc.function(EXISTS, info, ops[0]);
+      action = new Otherwise(info, Arrays.copyOfRange(ops, 1, ops.length)).optimize(cc);
+    }
+    return exitOrAction(exit, action);
+  }
+
+  /**
+   * Creates function items for an early exit condition and the resulting action.
+   * @param exit exit condition (can be {@code null})
+   * @param action action (can be {@code null})
+   * @return function items, or {@code null} if no exit condition is supplied
+   */
+  private FuncItem[] exitOrAction(final Expr exit, final Expr action) {
+    return exit == null ? null : new FuncItem[] {
+      new FuncItem(info, exit, params, anns, funcType(), stackSize, null, focus),
+      new FuncItem(info, action, params, anns, funcType(), stackSize, null, focus)
+    };
   }
 
   @Override

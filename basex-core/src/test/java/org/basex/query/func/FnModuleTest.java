@@ -1760,6 +1760,14 @@ public final class FnModuleTest extends SandboxTest {
         " fn($r, $v) { $r otherwise $v[. = 5] }"), 5);
     query(func.args(" 1 to 1_000_000_000", " ()",
         " fn($r, $v) { $r otherwise $v[. = 5] otherwise $v[. = 3] }"), 3);
+    query(func.args(" 1 to 1_000_000_000", " 1 to 10",
+        " fn($r, $v) { $r[. > $v] }"), "");
+    query(func.args(" 1 to 1_000_000_000", " <_><a/><b/></_>/*",
+        " fn($r, $v) { $r except head($r) }"), "");
+    query(func.args(" 1 to 1_000_000_000", " <_><a/><b/></_>/*",
+        " fn($r, $v) { if(exists($r)) { $r intersect tail($r) } }"), "");
+    query(func.args(" (1 to 5) ! 1", " 1 to 10", " fn($r, $v) { $r[. > $v] }"),
+        "2\n3\n4\n5\n6\n7\n8\n9\n10");
 
     check(func.args(" ()", " ()", " function($a, $b) { $b }"), "", empty());
 

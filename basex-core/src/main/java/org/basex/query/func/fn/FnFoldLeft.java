@@ -19,6 +19,8 @@ import org.basex.query.value.type.*;
 public class FnFoldLeft extends StandardFunc {
   /** Exit condition and action producing the next result (can be {@code null}). */
   private FuncItem[] exitOrAction;
+  /** Indicates if the exit condition checks if the result is empty. */
+  private boolean exitOnEmpty;
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
@@ -108,14 +110,6 @@ public class FnFoldLeft extends StandardFunc {
     if(array ? input == XQArray.empty() : ist.zero()) return cc.voidAndReturn(input, init, info);
 
     final SeqType zst = init.seqType();
-    if(action instanceof final FuncItem fiAction && exitOrAction == null) {
-      final Object fold = fiAction.fold(input, init, left, array, cc);
-      if(fold instanceof final Expr expr) return expr;
-      if(fold instanceof final FuncItem[] fi) {
-        exitOrAction = fi;
-        cc.info(QueryText.OPTEXIT_X, this);
-      }
-    }
     if(action instanceof FuncItem || action instanceof Closure) {
       final SeqType i1t = array ? ist.type instanceof final ArrayType at ? at.valueType() :
         Types.ITEM_O : ist.with(Occ.EXACTLY_ONE);
@@ -127,6 +121,23 @@ public class FnFoldLeft extends StandardFunc {
         st = st.union(arg(2).funcType().refinedType);
       } while(!st.eq(ost));
       exprType.assign(st);
+
+      // analyze refined action (more specific types) and original action (may be wrapped)
+      final Expr[] funcs = arg(2) == action ? new Expr[] { action } : new Expr[] { arg(2), action };
+      for(final boolean empty : new boolean[] { false, true }) {
+        for(final Expr func : funcs) {
+          // exits on empty results are replaced by other exits
+          if(func instanceof final FuncItem fi && (exitOrAction == null || exitOnEmpty && !empty)) {
+            final Object fold = fi.fold(input, init, left, array, empty, cc);
+            if(fold instanceof final Expr expr) return expr;
+            if(fold instanceof final FuncItem[] eoa) {
+              exitOrAction = eoa;
+              exitOnEmpty = empty;
+              cc.info(QueryText.OPTEXIT_X, this);
+            }
+          }
+        }
+      }
     } else {
       final FuncType ft = action.funcType();
       if(ft != null) exprType.assign(ist.oneOrMore() ? ft.refinedType : zst.union(ft.refinedType));
