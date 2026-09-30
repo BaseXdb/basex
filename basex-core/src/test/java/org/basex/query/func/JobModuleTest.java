@@ -14,6 +14,7 @@ import org.basex.core.jobs.*;
 import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.expr.index.*;
 import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
@@ -491,6 +492,13 @@ public final class JobModuleTest extends SandboxTest {
     query("declare function local:g($n) { if($n) then local:g($n - 1) else 'done' }; " +
         func.args(" fn() { local:g(3) }"), "done");
 
+    // database access in a closure of an inlined function
+    query(_DB_CREATE.args(NAME));
+    query("declare %basex:inline function local:f($k) { " +
+        "let $p := count(" + _DB_GET.args(NAME) + ") || $k " +
+        "return " + func.args(" fn() { " + _DB_EXISTS.args(NAME, " $p") + ", count(" +
+        _DB_GET.args(NAME, " $p") + ") }") + " }; local:f('x')", "false\n0");
+
     // the function keeps the static context of the query that created it
     query("declare default element namespace 'x'; " +
         func.args(" fn() { namespace-uri(<a/>) }"), "x");
@@ -522,6 +530,32 @@ public final class JobModuleTest extends SandboxTest {
 
     // errors of the invoked function are passed on
     error(func.args(" fn() { 1 + '' }"), CALCTYPE_X_X_X_X_X);
+  }
+
+  /** Limits of compiling closures that may be passed on to jobs. */
+  @Test public void executeFunctionLimits() {
+    final Function func = _JOB_EXECUTE;
+    query(_DB_CREATE.args(NAME, " <r><x>a</x></r>", "doc.xml"));
+
+    // closure bodies are compiled without databases: no index rewrite, even if called locally
+    check("declare %basex:inline function local:f() { " +
+        "let $p := string(" + _DB_GET.args(NAME) + ") " +
+        "let $f := fn() { " + _DB_GET.args(NAME) + "//x[text() = $p] } " +
+        "return $f() }; local:f()", "<x>a</x>", empty(ValueAccess.class));
+
+    // static variables with persistent values are not copied
+    error("declare variable $v := " + _DB_GET.args(NAME) + "; " +
+        func.args(" fn() { count($v//x) }"), BASEX_TRANSFER_X_X);
+
+    // dynamic context: a job returns the time of the calling query
+    // if the closure body was optimized in the dynamic pass
+    query("declare %basex:inline function local:f() { " +
+        "let $p := string(" + _DB_GET.args(NAME) + ") " +
+        "return " + func.args(" fn() { $p, current-dateTime() }") + "[2] }; " +
+        "let $t := current-dateTime() return (" + _PROF_SLEEP.args(10) + ", local:f() = $t)",
+        true);
+    query("let $t := current-dateTime() return (" + _PROF_SLEEP.args(10) + ", " +
+        func.args(" fn() { current-dateTime() }") + " = $t)", false);
   }
 
   /** Runs function items as asynchronous jobs. */

@@ -350,7 +350,7 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected final Expr compileData(final CompileContext cc) throws QueryException {
-    if(cc.dynamic && defined(0) && arg(0) instanceof Value) {
+    if(cc.openData() && defined(0) && arg(0) instanceof Value) {
       final Data data = toData(cc.qc);
       exprType.data(data);
       cc.info(OPTOPEN_X, data.meta.name);

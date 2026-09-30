@@ -145,6 +145,8 @@ public final class CompileContext {
   public final boolean dynamic;
   /** Functions whose bodies are currently compiled or inlined. */
   private final ArrayDeque<XQFunctionExpr> entered = new ArrayDeque<>();
+  /** Number of closure bodies that are currently compiled or optimized. */
+  private int closures;
 
   /** Variable scope list. */
   private final ArrayDeque<VarScope> scopes = new ArrayDeque<>();
@@ -212,6 +214,33 @@ public final class CompileContext {
    */
   public void removeScope(final Scope scope) {
     removeScope().cleanUp(scope);
+  }
+
+  /**
+   * Pushes the variable scope of a closure body to the stack.
+   * @param vs variable scope
+   */
+  public void pushClosure(final VarScope vs) {
+    pushScope(vs);
+    closures++;
+  }
+
+  /**
+   * Removes the variable scope of a closure body from the stack.
+   * @param closure closure
+   */
+  public void removeClosure(final Closure closure) {
+    closures--;
+    removeScope(closure);
+  }
+
+  /**
+   * Indicates if databases can be opened and accessed at compile time.
+   * @return result of check
+   */
+  public boolean openData() {
+    // closure bodies may be passed on to other queries (jobs), which must not share databases
+    return dynamic && closures == 0;
   }
 
   /**

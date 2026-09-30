@@ -29,6 +29,6 @@ public final class DbGet extends DbAccessFn {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    return cc.dynamic && values(true, cc) ? value(cc.qc) : compileData(cc);
+    return cc.openData() && values(true, cc) ? value(cc.qc) : compileData(cc);
   }
 }

@@ -64,7 +64,7 @@ public abstract class Docs extends DynamicFn {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     // pre-evaluate during dynamic compilation
-    if(cc.dynamic && arg(0) instanceof final Value value && stable(cc.qc)) {
+    if(cc.openData() && arg(0) instanceof final Value value && stable(cc.qc)) {
       // target is empty
       final Item item = value.atomItem(cc.qc, info);
       if(item.isEmpty()) return value(cc.qc);
