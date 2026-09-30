@@ -1345,6 +1345,10 @@ public enum Function implements AFunction {
   _DB_COPY(DbCopy::new, "copy(database, newname)",
       params(STRING_O, STRING_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
+  _DB_COUNTS(DbCounts::new, "counts(nodes, values, options?)",
+      params(NODE_ZM, FuncType.get(ANY_ATOMIC_TYPE_ZM, NODE_O).seqType(), MAP_ZO),
+      MapType.get(BasicType.ANY_ATOMIC_TYPE, INTEGER_O).seqType(), DB_URI),
+  /** XQuery function. */
   _DB_CREATE(DbCreate::new, "create(database, inputs?, paths?, options?)",
       params(STRING_O, ITEM_ZM, DB_PATH_SPEC_ZM, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */

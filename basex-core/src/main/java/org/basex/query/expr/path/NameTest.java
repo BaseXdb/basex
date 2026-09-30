@@ -130,6 +130,16 @@ public final class NameTest extends Test {
 
   /**
    * Returns the database names that are matched by this test.
+   * @param data data reference
+   * @return matching names, or {@code null} if the namespace of a name cannot be resolved
+   */
+  public TokenList dbNames(final Data data) {
+    final Names names = kind == Kind.ATTRIBUTE ? data.attrNames : data.elemNames;
+    return matches(names.lexical(qname.local(), !data.nspaces.isEmpty()), data);
+  }
+
+  /**
+   * Returns the database names that are matched by this test.
    * @param names names with the local name of this test
    * @param data data reference
    * @return matching names, or {@code null} if the namespace of a name cannot be resolved

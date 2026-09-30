@@ -231,6 +231,8 @@ public final class Types {
   public static final SeqType DOCUMENT_FN_CSV_ZO = NodeType.get(new DocTest(
       NameTest.get(new QNm("csv", FN_URI)))).seqType(ZERO_OR_ONE);
 
+  /** Single GNode. */
+  public static final SeqType NODE_O = NODE.seqType();
   /** Zero or one GNode. */
   public static final SeqType NODE_ZO = NODE.seqType(ZERO_OR_ONE);
   /** Zero or more GNodes. */

@@ -342,6 +342,51 @@ public final class DbModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void counts() {
+    final Function func = _DB_COUNTS;
+    execute(new CreateDB(NAME, "<works>"
+        + "<w y='1905'><c>A</c><c>B</c><c>A</c></w><w y='1911'><c x='1'>B</c></w><w/>"
+        + "</works>"));
+    final String nodes = " db:get('" + NAME + "')//w";
+
+    // values are counted once per node, in the order in which they are found
+    query(entries(func.args(nodes, " fn { c }")), "A=1\nB=2");
+    query(entries(func.args(nodes, " fn { c/@x }")), "1=1");
+    query(entries(func.args(nodes, " fn($w as element(w)) { $w/c }")), "A=1\nB=2");
+    query(entries(func.args(" <a><b>x</b><b>x</b></a>", " fn { b }")), "x=1");
+
+    // options
+    query(entries(func.args(nodes, " fn { c }", " { 'missing': 'none' }")),
+        "A=1\nB=2\nnone=1");
+    query(entries(func.args(nodes, " fn { c }", " { 'missing': 'A' }")), "A=2\nB=2");
+    query(entries(func.args(nodes, " fn { @y }", " { 'width': 10 }")), "1900=1\n1910=1");
+    query(func.args(nodes, " fn { @y }", " { 'width': 10 }") + " => map:keys() => head()"
+        + " instance of xs:double", true);
+
+    // other functions are invoked for each node
+    query(entries(func.args(nodes, " fn($w) { $w/c ! lower-case(.) }")), "a=1\nb=2");
+    query("declare function local:f($values as fn(node()) as xs:anyAtomicType*) {"
+        + func.args(nodes, " $values") + "}; " + entries("local:f(fn { c })"), "A=1\nB=2");
+
+    // namespaces
+    execute(new CreateDB(NAME, "<w xmlns:p='u'><p:c>A</p:c><c>B</c></w>"));
+    query("declare namespace p = 'u'; " + entries(func.args(nodes, " fn { p:c }")), "A=1");
+    query(entries(func.args(nodes, " fn { *:c }")), "A=1\nB=1");
+
+    error(func.args(nodes, " fn { c }", " { 'width': 0 }"), INVALIDVALUE_X_X);
+    error(func.args(nodes, " fn($a, $b) { $a }"), INVARITY_X_X);
+  }
+
+  /**
+   * Returns a query that converts value counts to strings.
+   * @param counts query that returns value counts
+   * @return query
+   */
+  private static String entries(final String counts) {
+    return "map:for-each(" + counts + ", fn($k, $v) { $k || '=' || $v })";
+  }
+
+  /** Test method. */
   @Test public void create() {
     final Function func = _DB_CREATE;
     execute(new Close());

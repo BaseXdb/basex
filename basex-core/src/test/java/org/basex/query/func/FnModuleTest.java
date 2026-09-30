@@ -237,6 +237,13 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(" <?_ 1?>", " #a"), false, root(func));
     check(func.args(" <?_ 1?>", " true()"), false, root(func));
 
+    // floating-point numbers
+    query(func.args(" xs:float(<?_ 0.5?>)", " xs:double(<?_ 0.5?>)"), true);
+    query(func.args(" xs:float(<?_ 0.1?>)", " xs:double(<?_ 0.1?>)"), false);
+    query(func.args(" xs:double(<?_ -0?>)", " xs:double(<?_ 0?>)"), true);
+    query(func.args(" xs:double(<?_ 0.1?>)", " xs:decimal(<?_ 0.1?>)"), false);
+    query("count(distinct-values((1e0, xs:float(1), 1, 0.1e0, xs:float(0.1), 0.1)))", 4);
+
     error(func.args(" ()", " <?_ 1?>"), INVTYPE_X);
     error(func.args(" <?_ 1?>", " ()"), INVTYPE_X);
     error(func.args(" true#0", " 1"), FIATOMIZE_X);

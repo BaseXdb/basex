@@ -58,6 +58,9 @@ public abstract class ANum extends Item {
       final boolean n1 = Double.isNaN(d1), n2 = Double.isNaN(d2);
       if(n1 || n2) return n1 == n2;
       if(Double.isInfinite(d1) || Double.isInfinite(d2)) return d1 == d2;
+      // floating-point numbers are exact double values
+      if((this instanceof Dbl || this instanceof Flt) &&
+          (item instanceof Dbl || item instanceof Flt)) return d1 == d2;
       return dec(null).compareTo(item.dec(null)) == 0;
     }
     return false;
