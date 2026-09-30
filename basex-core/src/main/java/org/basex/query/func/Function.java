@@ -1254,9 +1254,6 @@ public enum Function implements AFunction {
   _CONVERT_DATETIME_TO_INTEGER(ConvertDateTimeToInteger::new, "dateTime-to-integer(value)",
       params(DATE_TIME_O), INTEGER_O, CONVERT_URI),
   /** XQuery function. */
-  _CONVERT_DAYTIME_TO_INTEGER(ConvertDayTimeToInteger::new, "dayTime-to-integer(value)",
-      params(DAY_TIME_DURATION_O), INTEGER_O, CONVERT_URI),
-  /** XQuery function. */
   _CONVERT_DECODE_KEY(ConvertDecodeKey::new, "decode-key(key, lax?)",
       params(STRING_O, BOOLEAN_ZO), STRING_O, CONVERT_URI),
   /** XQuery function. */
@@ -1277,9 +1274,6 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _CONVERT_INTEGER_TO_DATETIME(ConvertIntegerToDateTime::new, "integer-to-dateTime(value)",
       params(INTEGER_O), DATE_TIME_STAMP_O, CONVERT_URI),
-  /** XQuery function. */
-  _CONVERT_INTEGER_TO_DAYTIME(ConvertIntegerToDayTime::new, "integer-to-dayTime(value)",
-      params(INTEGER_O), DAY_TIME_DURATION_O, CONVERT_URI),
 
   // Cryptographic Module
 

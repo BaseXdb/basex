@@ -56,14 +56,6 @@ public final class ConvertModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void dayTimeDurationToInteger() {
-    final Function func = _CONVERT_DAYTIME_TO_INTEGER;
-    // successful queries
-    query(func.args(" xs:dayTimeDuration('PT0S')"), 0);
-    error(func.args(" xs:dayTimeDuration('PT10000000000000000S')"), INTRANGE_X);
-  }
-
-  /** Test method. */
   @Test public void decodeKey() {
     final Function func = _CONVERT_DECODE_KEY;
     query(func.args("_"), "");
@@ -151,12 +143,5 @@ public final class ConvertModuleTest extends SandboxTest {
     final Function func = _CONVERT_INTEGER_TO_DATETIME;
     // successful queries
     query(func.args(" 0"), "1970-01-01T00:00:00Z");
-  }
-
-  /** Test method. */
-  @Test public void integerToDateTimeDuration() {
-    final Function func = _CONVERT_INTEGER_TO_DAYTIME;
-    // successful queries
-    query(func.args(" 0"), "PT0S");
   }
 }
