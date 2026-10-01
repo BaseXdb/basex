@@ -47,7 +47,7 @@ public class Arith extends Arr {
     // 1 + position() → position() + 1
     Expr expr1 = exprs[0], expr2 = exprs[1];
     if((calc == Calc.ADD || calc == Calc.MULTIPLY) && expr1 instanceof Value &&
-        !(expr2 instanceof Value)) {
+        expr1.seqType().type.isNumberOrUntyped() && !(expr2 instanceof Value)) {
       cc.info(OPTSWAP_X, this);
       exprs[0] = expr2;
       exprs[1] = expr1;
