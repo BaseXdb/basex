@@ -68,6 +68,20 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void adjustDateTimeToTimezone() {
+    final Function func = ADJUST_DATETIME_TO_TIMEZONE;
+    final String dtm = " xs:dateTime('2026-01-01T00:00:00Z')";
+
+    query(func.args(dtm, " xs:dayTimeDuration('PT1H')"), "2026-01-01T01:00:00+01:00");
+    query(func.args(dtm, " xs:duration('PT1H')"), "2026-01-01T01:00:00+01:00");
+    query(func.args(dtm, " <_>-PT2H</_>"), "2025-12-31T22:00:00-02:00");
+    query(func.args(dtm, " ()"), "2026-01-01T00:00:00");
+
+    error(func.args(dtm, " xs:duration('P1M')"), INVTYPE_X);
+    error(func.args(dtm, " 'PT1H'"), INVTYPE_X);
+  }
+
+  /** Test method. */
   @Test public void allDifferent() {
     final Function func = ALL_DIFFERENT;
 
@@ -1206,6 +1220,19 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void divideDecimals() {
+    final Function func = DIVIDE_DECIMALS;
+
+    query(func.args(7, 2) + "?quotient", 3);
+    query(func.args(" xs:double(7)", 2) + "?quotient", 3);
+    query(func.args(" xs:float(7.5)", 2) + "?remainder", 1.5);
+    query(func.args(" <_>7</_>", 2) + "?quotient", 3);
+
+    error(func.args(" xs:double('INF')", 2), INVALUE_X_X);
+    error(func.args(" '7'", 2), INVTYPE_X);
+  }
+
+  /** Test method. */
   @Test public void doc() {
     final Function func = Function.DOC;
 
@@ -1462,8 +1489,12 @@ public final class FnModuleTest extends SandboxTest {
         "PT2M3.456S");
     query(SECONDS.args(" 123.456") + " => " + func.args(), 123.456);
 
+    query(func.args(" xs:duration('PT1S')"), 1);
+
     error(func.args(" xs:yearMonthDuration('P1M')"), INVTYPE_X);
-    error(func.args(" xs:duration('PT1S')"), INVTYPE_X);
+    error(func.args(" xs:duration('P1M')"), INVTYPE_X);
+    error(func.args(" xs:duration('P1Y0M2D')"), INVTYPE_X);
+    error(func.args(" 'PT3S'"), INVTYPE_X);
   }
 
   /** Test method. */
@@ -4585,6 +4616,19 @@ return
     query(func.args(" #xs:integer") + " ? matches(23)", true);
     query(func.args(" #xs:numeric") + " ? variety", "union");
     query(func.args(" #xs:numeric") + " ? members() ? name", "#xs:double\n#xs:float\n#xs:decimal");
+  }
+
+  /** Test method. */
+  @Test public void seconds() {
+    final Function func = SECONDS;
+
+    query(func.args(1.5), "PT1.5S");
+    query(func.args(" xs:double(1.5)"), "PT1.5S");
+    query(func.args(" xs:float(2)"), "PT2S");
+    query(func.args(" <_>3</_>"), "PT3S");
+    query(func.args(" ()"), "");
+
+    error(func.args(" '1'"), INVTYPE_X);
   }
 
   /** Test method. */

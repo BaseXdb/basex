@@ -871,7 +871,7 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Evaluates an expression and returns an item if it has the specified type.
+   * Evaluates an expression and coerces the resulting item to the specified type.
    * @param expr expression
    * @param type expected type
    * @param qc query context
@@ -880,8 +880,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final Item checkType(final Expr expr, final BasicType type, final QueryContext qc)
       throws QueryException {
-    final Item item = expr.atomItem(qc, info);
-    return item.type.isUntyped() ? type.cast(item, qc, info) : checkType(item, type);
+    return (Item) type.seqType().coerce(expr.atomItem(qc, info), qc, info);
   }
 
   /**

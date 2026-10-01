@@ -40,7 +40,7 @@ abstract class DateTimeFn extends StandardFunc {
     final ADate date = toDate(value, type, qc);
     final boolean empty = zone.isEmpty(), undefined = defined(1) && empty;
     // without a zone argument, the implicit timezone of the query is assigned
-    final DTDur dur = !empty ? (DTDur) checkType(zone, DAY_TIME_DURATION) :
+    final DTDur dur = !empty ? (DTDur) checkType(zone, DAY_TIME_DURATION, qc) :
       undefined ? null : new DTDur(0, qc.dateTime().zone);
     return date.timeZone(dur, undefined, info);
   }
