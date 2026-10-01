@@ -1351,7 +1351,7 @@ public final class DBATest extends WebappTest {
      * @throws Exception exception
      */
     @Test public void clear() throws Exception {
-      assertTrue(post("caches/clear", Map.of()).contains("All caches and their options were cleared."),
+      assertTrue(post("caches/clear", Map.of()).contains("All caches and their options cleared."),
           "caches not cleared");
       assertFalse(get("activity").contains(CACHE), "cache still listed");
     }
