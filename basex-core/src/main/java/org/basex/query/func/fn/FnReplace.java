@@ -64,7 +64,7 @@ public final class FnReplace extends RegExFn {
       final StringBuilder sb = new StringBuilder();
       int pos = 0;
       while(matcher.find()) {
-        args.set(0, Atm.get(matcher.group())).set(1, groups(matcher, names, qc));
+        args.set(0, Atm.get(matcher.group())).set(1, groups(matcher, regExpr, names, qc));
         final Item item = invoke(action, args, qc).atomItem(qc, info);
         // replacements are appended verbatim, so no escaping is required
         sb.append(input, pos, matcher.start());
@@ -75,7 +75,7 @@ public final class FnReplace extends RegExFn {
     }
 
     String string = string(replace);
-    if((regExpr.pattern.flags() & Pattern.LITERAL) != 0) {
+    if(contains(flags, 'q')) {
       // literal parsing: add backslashes
       string = string.replace("\\", "\\\\").replace("$", "\\$");
     } else {
@@ -86,8 +86,7 @@ public final class FnReplace extends RegExFn {
         if(replace[r] == '\\') {
           if(n != '\\' && n != '$') throw REGBACKSLASH_X.get(info, replace);
           ++r;
-        } else if(replace[r] == '$' && (r == 0 || replace[r - 1] != '\\') &&
-            !digit(n) && n != '<') {
+        } else if(replace[r] == '$' && !digit(n) && n != '<') {
           throw REGDOLLAR_X.get(info, replace);
         }
       }
@@ -114,9 +113,15 @@ public final class FnReplace extends RegExFn {
               sb.append("${").append(name).append('}');
               s = i + 1;
             } else {
-              if(i < sl && Character.isDigit(string.charAt(i))) i++;
-              final int n = Integer.parseInt(string.substring(s, i));
-              if(n <= matcher.groupCount()) sb.append('$').append(n);
+              // take all digits, drop trailing ones while the number exceeds the group count
+              while(i < sl && digit(string.charAt(i))) i++;
+              final int gc = regExpr.groupCount(matcher);
+              int e = i;
+              while(e - s > 1 && (e - s > 9 || Integer.parseInt(string.substring(s, e)) > gc)) e--;
+              final int n = Integer.parseInt(string.substring(s, e));
+              if(n <= gc) sb.append('$').append(regExpr.group(n));
+              // escape dropped digits: they must not extend the group number
+              for(; e < i; e++) sb.append('\\').append(string.charAt(e));
               s = i;
             }
           } else {
@@ -133,25 +138,26 @@ public final class FnReplace extends RegExFn {
   /**
    * Returns the capturing groups of the current match.
    * @param matcher matcher
+   * @param regExpr regular expression
    * @param names group names, or {@code null} if groups are to be returned as sequence
    * @param qc query context
    * @return groups
    * @throws QueryException query exception
    */
-  private static Value groups(final Matcher matcher, final String[] names, final QueryContext qc)
-      throws QueryException {
-    final int gc = matcher.groupCount();
+  private static Value groups(final Matcher matcher, final RegExpr regExpr, final String[] names,
+      final QueryContext qc) throws QueryException {
+    final int gc = regExpr.groupCount(matcher);
     if(names == null) {
       final ValueBuilder vb = new ValueBuilder(qc);
       for(int g = 1; g <= gc; g++) {
-        final String group = matcher.group(g);
+        final String group = matcher.group(regExpr.group(g));
         vb.add(group == null ? Atm.EMPTY : Atm.get(group));
       }
       return vb.value();
     }
     final MapBuilder groups = new MapBuilder();
     for(int g = 1; g <= gc; g++) {
-      final String group = matcher.group(g);
+      final String group = matcher.group(regExpr.group(g));
       if(group != null) {
         final String name = g <= names.length ? names[g - 1] : null;
         groups.put(name != null ? Str.get(name) : Itr.get(g), Atm.get(group));

@@ -9,18 +9,30 @@ package org.basex.query.util.regex;
 public final class Literal extends RegExp {
   /** Code point. */
   private final int codepoint;
+  /** Case-insensitive matching. */
+  private final boolean insensitive;
 
   /**
    * Constructor.
    * @param codepoint Unicode code point
+   * @param insensitive case-insensitive matching
    */
-  public Literal(final int codepoint) {
+  public Literal(final int codepoint, final boolean insensitive) {
     this.codepoint = codepoint;
+    this.insensitive = insensitive;
   }
 
   @Override
   void toRegEx(final StringBuilder sb) {
-    sb.append(escape(codepoint));
+    final int[] variants = insensitive ? CaseVariants.get(codepoint) : null;
+    if(variants != null) {
+      // character class (also valid as a nested class within a character class)
+      sb.append('[');
+      for(final int v : variants) sb.append(Escape.escape(v));
+      sb.append(']');
+    } else {
+      sb.append(escape(codepoint));
+    }
   }
 
   /**
@@ -33,7 +45,7 @@ public final class Literal extends RegExp {
       case '\t' -> "\\t";
       case '\r' -> "\\r";
       case '\n' -> "\\n";
-      case '\\', '|', '.', '?', '*', '+', '(', ')', '{', '}', '$', '-', '[', ']', '^' ->
+      case '\\', '|', '.', '?', '*', '+', '(', ')', '{', '}', '$', '-', '[', ']', '^', '&' ->
         "\\" + (char) cp;
       default -> {
         if(cp < 128 && !Character.isISOControl(cp)) yield String.valueOf((char) cp);

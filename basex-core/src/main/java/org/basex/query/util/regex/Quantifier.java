@@ -27,11 +27,11 @@ public final class Quantifier extends RegExp {
   }
 
   /**
-   * Get minimum number of occurrences.
-   * @return minimum
+   * Indicates if this quantifier makes an atom optional ({@code ?}).
+   * @return result of check
    */
-  public int getMin() {
-    return min;
+  public boolean optional() {
+    return min == 0 && max == 1;
   }
 
   @Override

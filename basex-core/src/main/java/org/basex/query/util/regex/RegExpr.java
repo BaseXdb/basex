@@ -14,16 +14,38 @@ import org.basex.util.*;
 public class RegExpr {
   /** Pattern. */
   public final Pattern pattern;
+  /** Java numbers of the capturing groups (can be {@code null} if they are identical). */
+  private final int[] groups;
   /** Group info (can be {@code null}; lazily set once, read from concurrent child contexts). */
   private volatile GroupInfo groupInfo;
 
   /**
    * Constructor.
    * @param pattern pattern
+   * @param groups Java numbers of the capturing groups (can be {@code null})
    */
-  public RegExpr(final Pattern pattern) {
+  public RegExpr(final Pattern pattern, final int[] groups) {
     this.pattern = pattern;
+    this.groups = groups;
     groupInfo = null;
+  }
+
+  /**
+   * Returns the number of capturing groups.
+   * @param matcher matcher
+   * @return number of groups
+   */
+  public int groupCount(final Matcher matcher) {
+    return groups != null ? groups.length - 1 : matcher.groupCount();
+  }
+
+  /**
+   * Returns the Java number of a capturing group.
+   * @param group group number
+   * @return Java number
+   */
+  public int group(final int group) {
+    return groups != null ? groups[group] : group;
   }
 
   /**
@@ -31,8 +53,7 @@ public class RegExpr {
    * @return parent group IDs
    */
   public int[] getParentGroups() {
-    if(groupInfo == null) groupInfo = GroupScanner.groupInfo(pattern.pattern());
-    return groupInfo.parentGroups;
+    return groupInfo().parentGroups;
   }
 
   /**
@@ -40,8 +61,7 @@ public class RegExpr {
    * @return assertion flags
    */
   public boolean[] getAssertionFlags() {
-    if(groupInfo == null) groupInfo = GroupScanner.groupInfo(pattern.pattern());
-    return groupInfo.assertionFlags;
+    return groupInfo().assertionFlags;
   }
 
   /**
@@ -49,8 +69,35 @@ public class RegExpr {
    * @return names: element i contains the name of capturing group i+1, or {@code null}
    */
   public String[] getGroupNames() {
-    if(groupInfo == null) groupInfo = GroupScanner.groupInfo(pattern.pattern());
-    return groupInfo.groupNames;
+    return groupInfo().groupNames;
+  }
+
+  /**
+   * Returns the group info, skipping the groups that have been added to the Java pattern.
+   * @return group info
+   */
+  private GroupInfo groupInfo() {
+    if(groupInfo == null) {
+      // literal patterns have no groups
+      GroupInfo info = GroupScanner.groupInfo(
+          (pattern.flags() & Pattern.LITERAL) != 0 ? "" : pattern.pattern());
+      if(groups != null) {
+        final int gl = groups.length - 1;
+        final int[] parents = new int[gl], xquery = new int[info.parentGroups.length + 1];
+        final boolean[] flags = new boolean[gl];
+        final String[] names = new String[gl];
+        for(int g = 1; g <= gl; g++) xquery[groups[g]] = g;
+        for(int g = 1; g <= gl; g++) {
+          final int j = groups[g] - 1;
+          parents[g - 1] = xquery[info.parentGroups[j]];
+          flags[g - 1] = info.assertionFlags[j];
+          names[g - 1] = info.groupNames[j];
+        }
+        info = new GroupInfo(parents, flags, names);
+      }
+      groupInfo = info;
+    }
+    return groupInfo;
   }
 
   /**

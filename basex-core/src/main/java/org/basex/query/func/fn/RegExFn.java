@@ -4,6 +4,7 @@ import static java.util.regex.Pattern.*;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
+import java.util.function.*;
 import java.util.regex.*;
 
 import org.basex.query.*;
@@ -80,6 +81,24 @@ public abstract class RegExFn extends StandardFunc {
   }
 
   /**
+   * Returns a function that maps string indexes to character positions.
+   * @param string string
+   * @return function
+   */
+  static IntUnaryOperator positions(final String string) {
+    final int sl = string.length();
+    if(string.codePointCount(0, sl) == sl) return i -> i + 1;
+    final int[] positions = new int[sl + 1];
+    int p = 1;
+    for(int i = 0; i < sl; i++) {
+      positions[i] = p;
+      if(!Character.isHighSurrogate(string.charAt(i))) p++;
+    }
+    positions[sl] = p;
+    return i -> positions[i];
+  }
+
+  /**
    * Compiles this regular expression to a {@link Pattern}.
    * @param regex regular expression to parse
    * @param modifiers modifiers
@@ -89,12 +108,12 @@ public abstract class RegExFn extends StandardFunc {
   private RegExpr parse(final byte[] regex, final byte[] modifiers)
       throws QueryException {
 
-    // process modifiers
+    // process modifiers (case variants for the 'i' flag are added to the pattern)
     int flags = 0;
-    boolean strip = false, comments = false;
+    boolean insensitive = false, strip = false, comments = false;
     for(final byte mod : modifiers) {
-      if(mod == 'i') flags |= CASE_INSENSITIVE | UNICODE_CASE;
-      else if(mod == 'm') flags |= MULTILINE;
+      if(mod == 'i') insensitive = true;
+      else if(mod == 'm') flags |= MULTILINE | UNIX_LINES;
       else if(mod == 's') flags |= DOTALL;
       else if(mod == 'q') flags |= LITERAL;
       else if(mod == 'x') strip = true;
@@ -103,16 +122,22 @@ public abstract class RegExFn extends StandardFunc {
     }
 
     try {
-      // literal query: no need to change anything
-      final Pattern pattern;
-      if((flags & LITERAL) != 0) {
-        pattern = Pattern.compile(string(regex), flags);
-      } else {
+      if((flags & LITERAL) == 0) {
         final RegExParser parser = new RegExParser(regex, strip, comments,
-            (flags & DOTALL) != 0, (flags & MULTILINE) != 0, (flags & CASE_INSENSITIVE) != 0);
-        pattern = Pattern.compile(parser.parse().toString(), flags);
+            (flags & DOTALL) != 0, (flags & MULTILINE) != 0, insensitive);
+        String string = parser.parse().toString();
+        // supplementary character after lookbehinds: makes Java count code points in them
+        if(string.contains("(?<=") || string.contains("(?<!")) {
+          string += "|(?!)" + Character.toString(0x10000);
+        }
+        return new RegExpr(Pattern.compile(string, flags), parser.groups());
       }
-      return new RegExpr(pattern);
+      if(insensitive) {
+        final StringBuilder sb = new StringBuilder();
+        string(regex).codePoints().forEach(cp -> sb.append(new Literal(cp, true)));
+        return new RegExpr(Pattern.compile(sb.toString()), null);
+      }
+      return new RegExpr(Pattern.compile(string(regex), flags), null);
     } catch(final PatternSyntaxException | ParseException | TokenMgrError ex) {
       throw REGINVALID_X.get(info, regex).cause(ex);
     }

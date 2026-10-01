@@ -189,6 +189,18 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("go", "\\b(?=(?<w>\\w+))"), "<analyze-string-result xmlns="
         + "\"http://www.w3.org/2005/xpath-functions\"><match><lookahead-group name=\"w\" nr=\"1\" "
         + "value=\"go\" position=\"1\"/></match><non-match>go</non-match></analyze-string-result>");
+
+    // positions are counted in characters
+    query(func.args("𝄞b", "(?=(b))") + "//@position/string()", 2);
+    // ordinary groups after lookahead groups that exceed the match
+    query(func.args("abc", "(a)(?=(bc))(b)"), "<analyze-string-result xmlns="
+        + "\"http://www.w3.org/2005/xpath-functions\"><match><group nr=\"1\">a</group>"
+        + "<group nr=\"3\">b</group><lookahead-group nr=\"2\" value=\"bc\" position=\"2\"/>"
+        + "</match><non-match>c</non-match></analyze-string-result>");
+    // nested groups captured in previous iterations are skipped
+    query(func.args("ab", "((a)|b)+"), "<analyze-string-result xmlns="
+        + "\"http://www.w3.org/2005/xpath-functions\"><match>a<group nr=\"1\">b</group>"
+        + "</match></analyze-string-result>");
   }
 
   /** Test method. */
@@ -3125,6 +3137,56 @@ return
     query(func.args("a", "[A-\\\\]"), false);
     query(func.args("\\", "[A-\\\\]"), true);
 
+    // multi-line mode: empty string, only newline characters separate lines
+    query(func.args("", "^$", "m"), true);
+    query(func.args("a&#xa;b", "^b", "m"), true);
+    query(func.args("a&#xd;b", "^b", "m"), false);
+    query(func.args("a&#x2028;b", "^b", "m"), false);
+    query(func.args("a&#x85;b", "a$", "m"), false);
+    query(func.args("a&#xa;", "&#xa;$", "m"), false);
+    query(func.args("", "\\B", "m"), true);
+
+    // back-references to unmatched groups match a zero-length string
+    query(func.args("b", "^(?:(a)|b)\\1$"), true);
+    query(func.args("b", "^(?!(a))b\\1$"), true);
+    query(func.args("ab", "^(?:(a)|b)\\1$"), false);
+    query(func.args("aaaba", "^(a)*b\\1$"), true);
+
+    // lookbehind assertions: escapes matching supplementary characters
+    query(func.args("𝄞b", "(?<=\\p{So})b"), true);
+    query(func.args("𝄞b", "(?<!\\p{So})b"), false);
+    query(func.args("a𝄞b", "(?<=a\\p{So}|xy)b"), true);
+    query(func.args("𝄞b", "(?<=[^𝄞])b"), false);
+    // word boundaries after supplementary characters
+    query(func.args("𝄞-", "^𝄞\\b"), true);
+    query(func.args("𝄞𝄞", "^𝄞\\B"), true);
+    query(func.args("𝄞", "𝄞\\b$"), true);
+
+    // nested class subtractions
+    query(func.args("e", "^[a-z-[aeiou-[e]]]$"), true);
+    query(func.args("a", "^[a-z-[aeiou-[e]]]$"), false);
+    query(func.args("b", "^[a-z-[^b]]$"), true);
+
+    // ampersands are no class intersections
+    query(func.args("&amp;", "[&amp;&amp;]"), true);
+    query(func.args("a", "[a&amp;&amp;b]"), true);
+    query(func.args("&amp;", "[!-&amp;&amp;]"), true);
+
+    // case-insensitive mode: case variants of literals and ranges
+    query(func.args("_", "[@-Z]", "i"), false);
+    query(func.args("m", "[@-Z]", "i"), true);
+    query(func.args("&#x212A;", "[A-Z]", "i"), true);
+    query(func.args("&#x212A;", "k", "i"), true);
+    query(func.args("ẞ", "ß", "i"), true);
+    query(func.args("i", "İ", "i"), false);
+    query(func.args("q", "[^Q]", "i"), false);
+    query(func.args("o", "[A-Z-[IO]]", "i"), false);
+    query(func.args("A", "\\p{Ll}", "i"), false);
+    query(func.args("DUD", "([md])[aeiou]\\1", "i"), true);
+    query(func.args("i", "İ", "qi"), false);
+    query(func.args("&#x212A;.", "k.", "qi"), true);
+    query(func.args("kx", "k.", "qi"), false);
+
     query(func.args("babadad", "^((.)?a\\2)+$"), true);
     query(func.args("x", "(a)|\\1"), true);
 
@@ -3163,6 +3225,10 @@ return
 
     // empty sequence input → empty sequence
     query(func.args(" ()", "x"), "");
+
+    // positions are counted in characters
+    query(func.args("𝄞a𝄞b", "a|(b)") + "?position", "2\n4");
+    query(func.args("𝄞a𝄞b", "a|(b)") + "?groups?1?position", 4);
 
     // example 1: word matches, no groups
     final String ex1 = func.args("The cat sat on the mat.", "\\w+");
@@ -4281,6 +4347,15 @@ return
 
     // GH-2698: lookback for escaped dollar signs in replacement must look beyond first backslash
     query(func.args("full stop.", "\\.", "\\\\$1"), "full stop\\");
+    // optional named group with back-reference: keep the name
+    query(func.args("aba", "(?<n>a)?b\\k<n>", "[$<n>]"), "[a]");
+    // groups with back-references: group numbers in the replacement string
+    query(func.args("ab", "(a)\\1?(b)", "[$2|$20|$3]"), "[b|b0|]");
+    // literal, case-insensitive search: replacement is literal as well
+    query(func.args("A$B.b", "b", "$\\", "qi"), "A$$\\.$\\");
+    // escaped backslash, followed by an unescaped dollar sign
+    error(func.args("x$", "\\$", "\\\\$"), REGDOLLAR_X);
+    error("for $s in ('ab', 'c$') return " + func.args(" $s", "\\$", "\\\\$"), REGDOLLAR_X);
 
     query(func.args("Chapter 9", "[0-9]+", " fn($k, $g) { string(number($k) + 1) }"),
         "Chapter 10");
@@ -5611,6 +5686,11 @@ return
 
   /** Test method. */
   @Test public void tokenize() {
+    // iterative evaluation: skip zero-length matches at the start and end
+    query("count(" + TOKENIZE.args(" <?_ ab?>", "a?") + ')', 3);
+    query("string-join(" + TOKENIZE.args(" <?_ abc?>", "") + " ! ('[' || . || ']'))",
+        "[a][b][c]");
+
     final Function func = TOKENIZE;
     query(func.args("a", ""), "a");
     query(func.args(wrap("a"), ""), "a");

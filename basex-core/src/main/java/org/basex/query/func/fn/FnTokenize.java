@@ -57,13 +57,19 @@ public final class FnTokenize extends RegExFn {
     final Pattern p = pattern(pattern, flags, qc);
     return vl == 0 ? Empty.ITER : new Iter() {
       final String string = Token.string(value);
+      final int len = string.length();
       final Matcher matcher = p.matcher(string);
       int start;
 
       @Override
       public Item next() {
-        return start == -1 ? null : matcher.find() ?
-          next(matcher.start(), matcher.end()) : next(string.length(), -1);
+        if(start == -1) return null;
+        while(matcher.find()) {
+          // skip zero-length matches at the start and end of the string
+          final int ms = matcher.start(), me = matcher.end();
+          if(ms != len && me != 0) return next(ms, me);
+        }
+        return next(len, -1);
       }
 
       private Str next(final int end, final int next) {

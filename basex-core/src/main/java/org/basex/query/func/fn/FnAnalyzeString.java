@@ -3,6 +3,7 @@ package org.basex.query.func.fn;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import java.util.function.*;
 import java.util.regex.*;
 
 import org.basex.query.*;
@@ -44,11 +45,12 @@ public final class FnAnalyzeString extends RegExFn {
 
     final RegExpr regExpr = regExpr(pattern, flags, qc);
     final Matcher matcher = regExpr.pattern.matcher(value);
+    final IntUnaryOperator positions = positions(value);
     final FBuilder root = FElem.build(Q_ANALYZE_STRING_RESULT).ns();
     int start = 0;
     while(matcher.find()) {
       if(start != matcher.start()) nonmatch(value.substring(start, matcher.start()), root);
-      match(matcher, value, root, 0, regExpr);
+      match(matcher, value, root, 0, regExpr, positions);
       start = matcher.end();
     }
     if(start != value.length()) nonmatch(value.substring(start), root);
@@ -62,10 +64,11 @@ public final class FnAnalyzeString extends RegExFn {
    * @param parent parent
    * @param group group number
    * @param regExpr regExpr
+   * @param positions mapping from string indexes to character positions
    * @return next group number and position in string
    */
   private static int[] match(final Matcher matcher, final String string, final FBuilder parent,
-      final int group, final RegExpr regExpr) {
+      final int group, final RegExpr regExpr, final IntUnaryOperator positions) {
 
     final FBuilder node = FElem.build(group == 0 ? Q_MATCH : Q_MGROUP);
     if(group > 0) {
@@ -74,15 +77,23 @@ public final class FnAnalyzeString extends RegExFn {
       node.attr(Q_NR, group);
     }
 
-    final int start = matcher.start(group), end = matcher.end(group), gc = matcher.groupCount();
+    final int jg = regExpr.group(group), gc = regExpr.groupCount(matcher);
+    final int start = matcher.start(jg), end = matcher.end(jg);
     int[] pos = { group + 1, start }; // group and position in string
-    while(pos[0] <= gc && matcher.end(pos[0]) <= end
-        && (matcher.start(pos[0]) < end || regExpr.getParentGroups()[pos[0] - 1] == group)) {
-      final int st = matcher.start(pos[0]);
-      if(st >= 0 && !regExpr.getAssertionFlags()[pos[0] - 1]) { // group matched
-        if(pos[1] < st) node.text(string.substring(pos[1], st));
-        pos = match(matcher, string, node, pos[0], regExpr);
-      } else pos[0]++; // skip it
+    while(pos[0] <= gc) {
+      final int g = pos[0], j = regExpr.group(g), st = matcher.start(j);
+      // skip lookahead groups: they may exceed the match, and they are added at the end
+      if(!regExpr.getAssertionFlags()[g - 1]) {
+        // stop at groups outside the current group
+        if(matcher.end(j) > end || st >= end && regExpr.getParentGroups()[g - 1] != group) break;
+        // skip unmatched groups and groups captured in previous iterations
+        if(st >= pos[1]) {
+          if(pos[1] < st) node.text(string.substring(pos[1], st));
+          pos = match(matcher, string, node, g, regExpr, positions);
+          continue;
+        }
+      }
+      pos[0]++;
     }
     if(pos[1] < end) {
       node.text(string.substring(pos[1], end));
@@ -91,13 +102,14 @@ public final class FnAnalyzeString extends RegExFn {
     if(group == 0) {
       final boolean[] assertionFlags = regExpr.getAssertionFlags();
       for(int g = 1; g <= assertionFlags.length; g++) {
-        if(assertionFlags[g - 1] && matcher.start(g) >= 0) {
+        final int j = regExpr.group(g), st = matcher.start(j);
+        if(assertionFlags[g - 1] && st >= 0) {
           final FBuilder lg = FElem.build(Q_LGROUP);
           final String name = regExpr.getGroupNames()[g - 1];
           if(name != null) lg.attr(Q_NAME, name);
           lg.attr(Q_NR, g);
-          lg.attr(Q_VALUE, string.substring(matcher.start(g), matcher.end(g)));
-          lg.attr(Q_POSITION, matcher.start(g) + 1);
+          lg.attr(Q_VALUE, string.substring(st, matcher.end(j)));
+          lg.attr(Q_POSITION, positions.applyAsInt(st));
           node.node(lg);
         }
       }

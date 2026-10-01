@@ -10,6 +10,7 @@ import java.util.regex.*;
 import org.basex.query.*;
 import org.basex.query.util.regex.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 import static org.basex.util.Token.*;
 import static java.util.regex.Pattern.*;
 
@@ -33,6 +34,10 @@ public class RegExParser implements RegExParserConstants {
   private boolean dotAll;
   /** Multi-line matching mode, {@code ^} and {@code $} match on line bounds. */
   private boolean multiLine;
+  /** Opened (positive) and closed (negative) capturing groups, in the order of the pattern. */
+  private final IntList events = new IntList();
+  /** Java numbers of the capturing groups (index: group number). */
+  private int[] javaGroups;
   /** Case-insensitive matching mode. */
   private boolean insensitive;
 
@@ -53,6 +58,28 @@ public class RegExParser implements RegExParserConstants {
     insensitive = insens;
   }
 
+  /**
+   * Returns the Java numbers of the capturing groups.
+   * @return numbers (index: group number), or {@code null} if they are identical
+   */
+  public int[] groups() {
+    return javaGroups;
+  }
+
+  /**
+   * Assigns Java numbers to the capturing groups and to the markers of groups with back-references.
+   */
+  private void number() {
+    final int[] java = new int[groups + 1];
+    int n = 0;
+    for(final int e : events.finish()) {
+      if(e > 0) java[e] = ++n;
+      else if(closed.get(-e).hasBackRef()) closed.get(-e).setMarker(++n);
+    }
+    for(int g = 1; g <= groups; g++) closed.get(g).setNumber(java[g]);
+    if(n != groups) javaGroups = java;
+  }
+
 /**
    * Root production.
    * @return expression
@@ -61,6 +88,7 @@ public class RegExParser implements RegExParserConstants {
   final public   RegExp parse() throws ParseException {RegExp regex;
     regex = regExp(false);
     jj_consume_token(0);
+number();
 {if ("" != null) return regex;}
     throw new Error("Missing return statement in function");
 }
@@ -318,23 +346,25 @@ if(lookbehind) {if (true) throw new ParseException("Lookbehind assertions must n
       }
     case PAR_OPEN:{
       jj_consume_token(PAR_OPEN);
-final int grp = ++groups;
+final int grp = ++groups; events.add(grp);
       nd = regExp(false);
       jj_consume_token(PAR_CLOSE);
 if(lookbehind) {if (true) throw new ParseException("Lookbehind assertions must not contain parenthesized expressions.");}
         final Group g = new Group(nd, true, atomPath.toArray(new Integer[atomPath.size()]));
         closed.put(grp, g);
+        events.add(-grp);
         nd = g;
       break;
       }
     case NAMED_PAR_OPEN:{
       jj_consume_token(NAMED_PAR_OPEN);
-final int ngrp = ++groups; final String name = (String) token.getValue();
+final int ngrp = ++groups; events.add(ngrp); final String name = (String) token.getValue();
       nd = regExp(false);
       jj_consume_token(PAR_CLOSE);
 if(lookbehind) {if (true) throw new ParseException("Lookbehind assertions must not contain parenthesized expressions.");}
         final Group g = new Group(nd, true, name, atomPath.toArray(new Integer[atomPath.size()]));
         closed.put(ngrp, g);
+        events.add(-ngrp);
         names.put(name, ngrp);
         nd = g;
       break;
@@ -374,7 +404,7 @@ if(lookbehind) {if (true) throw new ParseException("Lookbehind assertions must n
       jj_consume_token(-1);
       throw new ParseException();
     }
-{if ("" != null) return new Literal(token.image.codePointAt(0));}
+{if ("" != null) return new Literal(token.image.codePointAt(0), insensitive);}
     throw new Error("Missing return statement in function");
 }
 
@@ -415,7 +445,6 @@ final Integer num = names.get((String) token.getValue());
 final Group g = closed.get(backref);
       if(g == null)
         {if (true) throw new ParseException("Illegal back-reference: \\" + backref);}
-      g.setHasBackRef();
       int diff = 0;
       while(atomPath.get(diff) == g.getAtomPath()[diff]) {
         ++diff;
@@ -424,7 +453,8 @@ final Group g = closed.get(backref);
       // a different branch than the group, so the backref can be flagged accordingly, and later be
       // omitted at serialization time.
       final boolean isDifferentBranch = (diff & 1) == 0;
-      {if ("" != null) return new BackRef(backref, isDifferentBranch);}
+      if(!isDifferentBranch) g.setHasBackRef();
+      {if ("" != null) return new BackRef(g, isDifferentBranch, insensitive);}
     throw new Error("Missing return statement in function");
 }
 
@@ -485,7 +515,7 @@ nd = Wildcard.get(dotAll);
     }
 final RegExp esc = Escape.get(token.image);
       if(esc == null) {if (true) throw new ParseException("Unknown escape: " + token);}
-      {if ("" != null) return insensitive && token.kind == CAT_ESC ? new CaseSensitive(esc) : esc;}
+      {if ("" != null) return esc;}
     throw new Error("Missing return statement in function");
 }
 
@@ -611,7 +641,7 @@ if(a == '-' && !isBegin && getToken(1).kind != BR_CLOSE && getToken(1).kind != E
         throw new ParseException();
       }
     }
-{if ("" != null) return b == -1 ? new Literal(a) : new CharRange(a, b, insensitive);}
+{if ("" != null) return b == -1 ? new Literal(a, insensitive) : new CharRange(a, b, insensitive);}
     throw new Error("Missing return statement in function");
 }
 
@@ -684,7 +714,7 @@ re = LineBorder.get(false, multiLine);
       }
     case WORD_BOUNDARY:{
       jj_consume_token(WORD_BOUNDARY);
-re = WordBoundary.get(token.image, multiLine);
+re = WordBoundary.get(token.image);
       break;
       }
     case POS_LOOKAHEAD:

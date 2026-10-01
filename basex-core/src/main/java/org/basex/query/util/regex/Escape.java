@@ -171,7 +171,7 @@ public final class Escape extends RegExp {
    */
   static char[] escape(final int cp) {
     return switch(cp) {
-      case '[', ']', '-', '\\', '^' -> new char[] { '\\', (char) cp };
+      case '[', ']', '-', '\\', '^', '&' -> new char[] { '\\', (char) cp };
       case '\n' -> new char[] { '\\', 'n' };
       case '\r' -> new char[] { '\\', 'r' };
       case '\t' -> new char[] { '\\', 't' };

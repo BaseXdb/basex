@@ -36,17 +36,11 @@ public final class LineBorder extends RegExp {
     return INSTANCES[pos];
   }
 
-  /**
-   * Return the end-of-string pattern to be used, depending on multi-line mode.
-   * @param multi multi-line flag
-   * @return end-of-line pattern
-   */
-  public static String eos(final boolean multi) {
-    return multi ? "$" : "\\z";
-  }
-
   @Override
   void toRegEx(final StringBuilder sb) {
-    sb.append(start ? "^" : eos(multi));
+    // multi-line mode: start of string, or after a newline that is not the last character;
+    // before a newline, or at the end of a string that does not end with a newline
+    sb.append(!multi ? start ? "^" : "\\z" :
+      start ? "(?:\\A|^)" : "(?:(?=\\n)|\\z(?<!\\n))");
   }
 }

@@ -12,39 +12,36 @@ public final class WordBoundary extends RegExp {
   /** Image. */
   private final String img;
   /** Cached instances. */
-  private static final WordBoundary[] INSTANCES = new WordBoundary[4];
+  private static final WordBoundary[] INSTANCES = new WordBoundary[2];
 
   /**
    * Constructor.
    * @param positive true for word-boundary, false for non-word-boundary
-   * @param multi multi-line flag
    */
-  private WordBoundary(final boolean positive, final boolean multi) {
-    final String eos = LineBorder.eos(multi);
+  private WordBoundary(final boolean positive) {
+    // boundaries are defined by the start and end of the string, not of lines
     if(positive) {
-      img = "(?:(?<="      + Escape.WORD     + ")(?:(?=" + Escape.NOT_WORD + ")|" + eos + ")"
-          +   "|(?<=(?:^|" + Escape.NOT_WORD + "))(?="   + Escape.WORD     + "))";
+      img = "(?:(?<="      + Escape.WORD     + ")(?:(?=" + Escape.NOT_WORD + ")|\\z)"
+          +   "|(?<=\\A|" + Escape.NOT_WORD + ")(?="    + Escape.WORD     + "))";
     } else {
       img = "(?:(?<="      + Escape.WORD     + ")(?="     + Escape.WORD     + ")"
-          +   "|(?<=(?:^|" + Escape.NOT_WORD + "))(?:(?=" + Escape.NOT_WORD + ")|" + eos + ")"
-          +   "|^" + eos + ")";
+          +   "|(?<=\\A|" + Escape.NOT_WORD + ")(?:(?=" + Escape.NOT_WORD + ")|\\z))";
     }
   }
 
   /**
    * Creates a regular expression from the given word boundary escape sequence.
    * @param esc escape sequence
-   * @param multi multi-line flag
    * @return regular expression
    */
-  public static WordBoundary get(final String esc, final boolean multi) {
+  public static WordBoundary get(final String esc) {
     final boolean positive = switch(esc.charAt(1)) {
       case 'b' -> true;
       case 'B' -> false;
       default  -> throw Util.notExpected();
     };
-    final int pos = (positive ? 2 : 0) + (multi ? 1 : 0);
-    if(INSTANCES[pos] == null) INSTANCES[pos] = new WordBoundary(positive, multi);
+    final int pos = positive ? 1 : 0;
+    if(INSTANCES[pos] == null) INSTANCES[pos] = new WordBoundary(positive);
     return INSTANCES[pos];
   }
 

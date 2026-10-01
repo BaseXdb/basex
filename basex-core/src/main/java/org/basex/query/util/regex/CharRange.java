@@ -37,22 +37,9 @@ public final class CharRange extends RegExp {
 
   @Override
   void toRegEx(final StringBuilder sb) {
-    append(sb, left, right);
+    sb.append(Escape.escape(left)).append('-').append(Escape.escape(right));
     if(insensitive) {
-      final int ll = Character.toLowerCase(left), lr = Character.toLowerCase(right);
-      if((ll != left || lr != right) && ll <= lr) append(sb, ll, lr);
-      final int ul = Character.toUpperCase(left), ur = Character.toUpperCase(right);
-      if((ul != left || ur != right) && ul <= ur) append(sb, ul, ur);
+      for(final int v : CaseVariants.get(left, right)) sb.append(Escape.escape(v));
     }
-  }
-
-  /**
-   * Appends an escaped range to the string builder.
-   * @param sb string builder
-   * @param lo lower bound
-   * @param hi upper bound
-   */
-  private static void append(final StringBuilder sb, final int lo, final int hi) {
-    sb.append(Escape.escape(lo)).append('-').append(Escape.escape(hi));
   }
 }

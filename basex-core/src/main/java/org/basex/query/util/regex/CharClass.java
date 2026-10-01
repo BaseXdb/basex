@@ -29,10 +29,10 @@ public final class CharClass extends RegExp {
     if(wrap) sb.append('[');
     group.toRegEx(sb);
     if(wrap) sb.append(']');
+    // subtraction: intersection with the complement of the (possibly nested) excluded class
     if(subtract != null) {
-      subtract.group.negative ^= true;
-      subtract.toRegEx(sb.append("&&"));
-      subtract.group.negative ^= true;
+      subtract.toRegEx(sb.append("&&[^"));
+      sb.append(']');
     }
     sb.append(']');
   }

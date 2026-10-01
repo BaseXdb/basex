@@ -1,5 +1,6 @@
 package org.basex.query.func.fn;
 
+import java.util.function.*;
 import java.util.regex.*;
 
 import org.basex.query.*;
@@ -26,22 +27,23 @@ public final class FnMatchingSegments extends RegExFn {
     final RegExpr regExpr = regExpr(pattern, flags, qc);
     final String[] names = regExpr.getGroupNames();
     final Matcher matcher = regExpr.pattern.matcher(value);
+    final IntUnaryOperator positions = positions(value);
     final ValueBuilder vb = new ValueBuilder(qc);
     while(matcher.find()) {
       final MapBuilder groups = new MapBuilder();
-      final int gc = matcher.groupCount();
+      final int gc = regExpr.groupCount(matcher);
       for(int g = 1; g <= gc; g++) {
-        final int s = matcher.start(g);
+        final int j = regExpr.group(g), s = matcher.start(j);
         if(s >= 0) {
           final String name = g <= names.length ? names[g - 1] : null;
           final Value nm = name != null ? Str.get(name) : Empty.VALUE;
           final XQMap group = XQMap.get(Records.CAPTURED_GROUP.get(),
-              Str.get(matcher.group(g)), Itr.get(s + 1), Itr.get(g), nm);
+              Str.get(matcher.group(j)), Itr.get(positions.applyAsInt(s)), Itr.get(g), nm);
           groups.put(name != null ? Str.get(name) : Itr.get(g), group);
         }
       }
       vb.add(XQMap.get(Records.MATCHING_SEGMENT.get(),
-          Str.get(matcher.group()), Itr.get(matcher.start() + 1), groups.map()));
+          Str.get(matcher.group()), Itr.get(positions.applyAsInt(matcher.start())), groups.map()));
     }
     return vb.value();
   }
