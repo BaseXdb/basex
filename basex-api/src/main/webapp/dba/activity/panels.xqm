@@ -31,7 +31,7 @@ declare function panels:jobs(
         { 'key': 'duration', 'label': 'Dur.', 'type': 'number', 'order': 'desc' },
         { 'key': 'user', 'label': 'User', 'type': 'dynamic' },
         { 'key': 'session', 'label': 'Session', 'type': 'dynamic' },
-        { 'key': 'locks', 'label': 'Locks', 'type': 'dynamic' },
+        { 'key': 'locks', 'label': 'Locks' },
         { 'key': 'time', 'label': 'Time', 'type': 'time', 'order': 'desc' },
         { 'key': 'start', 'label': 'Start', 'type': 'time', 'order': 'desc' }
       )
@@ -123,7 +123,7 @@ declare %private function panels:job-user(
   $details  as element(job)
 ) as fn() as item()* {
   let $user := string($details/@user)
-  let $address := $details/@address ! html:address(.)
+  let $address := $details/@address ! html:localhost(.)
   return fn() {
     if ($address) then <span title='{ $address }'>{ $user }</span> else $user
   }
@@ -132,16 +132,15 @@ declare %private function panels:job-user(
 (:~
  : Creates the locks of a job: the databases it reads and writes.
  : @param  $details  job details
- : @return function creating the locks
+ : @return locks
  :)
 declare %private function panels:job-locks(
   $details  as element(job)
-) as fn() as xs:string {
-  let $locks := (
+) as xs:string {
+  string-join((
     ('R: ' || $details/@reads)[not($details/@reads = ('', '(none)'))],
     ('W: ' || $details/@writes)[not($details/@writes = ('', '(none)'))]
-  )
-  return fn() { string-join($locks, ' · ')[.] otherwise '–' }
+  ), ' · ')[.] otherwise '–'
 };
 
 (:~
@@ -299,9 +298,9 @@ declare %private function panels:job-information(
  : @param  $actions  endpoint the buttons post to ('sessions', 'websockets')
  : @param  $heading  name of the panel
  : @param  $columns  table headers that the panel adds before the shared ones
- : @param  $after    table headers that the panel adds after the shared ones
  : @param  $holders  what is listed: the id, what is read for it (attribute values as previews),
  :                   and its own column values
+ : @param  $after    table headers that the panel adds after the shared ones
  : @return panel contents
  :)
 declare %private function panels:attribute-panel(
@@ -309,8 +308,8 @@ declare %private function panels:attribute-panel(
   $actions  as xs:string,
   $heading  as xs:string,
   $columns  as map(*)+,
-  $after    as map(*)*,
-  $holders  as map(*)*
+  $holders  as map(*)*,
+  $after    as map(*)* := ()
 ) as element(form) {
   (: both are addressed by an id and keep named attributes, so both are listed in the same
      way; what tells them apart are the columns of their own and what is asked of the server for
@@ -364,8 +363,6 @@ declare function panels:web-sessions() as element(form) {
       { 'key': 'session', 'label': 'Session', 'type': 'dynamic', 'width': '7rem' },
       { 'key': 'you', 'label': 'You', 'width': '2.5rem' }
     ),
-    (: a session that is not accessed again is discarded at this time :)
-    { 'key': 'expires', 'label': 'Expires', 'type': 'time', 'width': '4.5rem' },
     for $session in sessions:list-details()
     let $id := string($session/@id)
     return {
@@ -378,7 +375,9 @@ declare function panels:web-sessions() as element(form) {
         'you': if ($id = $current) then '✓' else '–',
         'expires': data($session/@expires)
       }
-    }
+    },
+    (: a session that is not accessed again is discarded at this time :)
+    after := { 'key': 'expires', 'label': 'Expires', 'type': 'time', 'width': '4.5rem' }
   )
 };
 
@@ -393,23 +392,12 @@ declare %private function panels:session(
   $created  as xs:anyAtomicType? := ()
 ) as fn() as element(span) {
   (: the id of a servlet container starts with a prefix that all sessions share :)
-  let $title := string-join(($id, $created ! ('created ' || panels:exact(.))), ', ')
+  let $title := string-join(($id, $created ! ('created ' || html:exact(xs:dateTime(.)))), ', ')
   return fn() {
     <span class='nowrap' title='{ $title }' data-session='{ $id }'>{
       '…' || substring($id, string-length($id) - 7)
     }</span>
   }
-};
-
-(:~
- : Formats a time with its date and seconds, as it is forwarded to administrators.
- : @param  $time  time
- : @return formatted time
- :)
-declare %private function panels:exact(
-  $time  as xs:anyAtomicType
-) as xs:string {
-  format-dateTime(html:adjust(xs:dateTime($time)), '[Y0000]-[M00]-[D00] [H00]:[m00]:[s00]')
 };
 
 (:~
@@ -443,21 +431,20 @@ declare %private function panels:attributes(
 
 (:~
  : Creates the links to the jobs that the DBA runs for a connection.
- : @param  $jobs  ids of the query and of the job that pushes its outcome to the client
+ : @param  $jobs        ids of the query and of the job that pushes its outcome to the client
+ : @param  $registered  ids of the registered jobs
  : @return links
  :)
 declare %private function panels:dba-jobs(
-  $jobs  as map(*)
+  $jobs        as map(*),
+  $registered  as xs:string*
 ) as node()* {
   (: the ids are kept after the jobs are done: only a job that is still registered is linked :)
-  let $registered := job:list()
-  return (
-    if ($jobs?query = $registered) then panels:job-link($jobs?query)()
-    else text { $jobs?query || ' (finished)' },
-    if ($jobs?reader = $registered) {
-      text { ' (reader: ' }, panels:job-link($jobs?reader)(), text { ')' }
-    }
-  )
+  if ($jobs?query = $registered) then panels:job-link($jobs?query)()
+  else text { $jobs?query || ' (finished)' },
+  if ($jobs?reader = $registered) {
+    text { ' (reader: ' }, panels:job-link($jobs?reader)(), text { ')' }
+  }
 };
 
 (:~
@@ -571,12 +558,12 @@ declare function panels:caches() as element(form) {
  :)
 declare function panels:websockets() as element(form) {
   (: what a connection holds is its own; what the server can do with it is to close it :)
-  panels:attribute-panel('websocket', 'websockets', 'WebSockets',
+  let $registered := job:list()
+  return panels:attribute-panel('websocket', 'websockets', 'WebSockets',
     (
       { 'key': 'websocket', 'label': 'Connection', 'type': 'dynamic', 'width': '9rem' },
       { 'key': 'session', 'label': 'Session', 'type': 'dynamic', 'width': '7rem' }
     ),
-    (),
     for $ws in ws:list-details()
     let $id := string($ws/@id)
     let $path := string($ws/@path)
@@ -588,7 +575,7 @@ declare function panels:websockets() as element(form) {
       (: the jobs that the DBA runs for a connection link to their details :)
       'value': fn($name) {
         let $value := ws:get($id, $name)
-        return if ($dba and $name = $utils:JOB) then panels:dba-jobs($value)
+        return if ($dba and $name = $utils:JOB) then panels:dba-jobs($value, $registered)
         else utils:preview($value, $panels:PREVIEW)
       },
       'columns': {
@@ -597,8 +584,8 @@ declare function panels:websockets() as element(form) {
            worth: the id, the user and the address of the client, and the time of the
            handshake :)
         'websocket': fn() {
-          <span class='nowrap' title='{ string-join(($id, $ws/@user, html:address($ws/@address),
-            'opened ' || panels:exact($ws/@created)), ', ') }'>{
+          <span class='nowrap' title='{ string-join(($id, $ws/@user, html:localhost($ws/@address),
+            'opened ' || html:exact($ws/@created)), ', ') }'>{
             if ($dba) then 'DBA: ' || utils:capitalize(replace($path, '^/?dba/?', ''))
             else $path
           }</span>

@@ -336,7 +336,9 @@ declare function html:action(
     for key $name value $value in $data return attribute { 'data-' || $name } { $value },
     attribute class { $class }[$class],
     $options?title ! attribute title { . },
-    attribute onclick { $call ||
+    (: the function is named as a global: in an inline handler, a plain name is looked up on the
+       element first (a function named 'setAttribute' would not be called) :)
+    attribute onclick { 'window.' || $call ||
       '(this.dataset' || ('.' || head(map:keys($data)))[map:size($data) = 1] ||
       '); return false;' },
     $label
@@ -344,16 +346,14 @@ declare function html:action(
 };
 
 (:~
- : Returns a formatted representation of a dateTime value.
+ : Returns an exact representation of a dateTime value, as it is forwarded to administrators.
  : @param  $date  date
  : @return string
  :)
-declare function html:date(
+declare function html:exact(
   $date  as xs:dateTime
 ) as xs:string {
-  (: seconds are dropped: the value tells when a file or database was last touched, which
-     no one counts in seconds :)
-  format-dateTime(html:adjust($date), '[Y0000]-[M00]-[D00] [H00]:[m00]')
+  format-dateTime(html:adjust($date), '[Y0000]-[M00]-[D00] [H00]:[m00]:[s00]')
 };
 
 (:~
@@ -371,7 +371,7 @@ declare function html:short-date(
   ) else (
     '[Y0000]-[M00]-[D00]'
   )
-  return <span title='{ format-dateTime($adjusted, '[Y0000]-[M00]-[D00] [H00]:[m00]:[s00]') }'>{
+  return <span title='{ html:exact($date) }'>{
     format-dateTime($adjusted, $picture)
   }</span>
 };
@@ -389,17 +389,25 @@ declare function html:time(
 };
 
 (:~
- : Formats a client address, with the loopback address shown as localhost.
+ : Formats a client address, with the logged address as tooltip.
  : @param  $address  address, optionally followed by a port
  : @return element with the address
  :)
 declare function html:address(
   $address  as xs:string
 ) as element(span) {
-  <span title='{ $address }'>{
-    replace($address, '^(\[?(0:0:0:0:0:0:0:1|::1)\]?|127\.\d+\.\d+\.\d+)(:\d+)?$',
-      'localhost$3')
-  }</span>
+  <span title='{ $address }'>{ html:localhost($address) }</span>
+};
+
+(:~
+ : Returns a client address with the loopback address replaced by localhost.
+ : @param  $address  address, optionally followed by a port
+ : @return address
+ :)
+declare function html:localhost(
+  $address  as xs:string
+) as xs:string {
+  replace($address, '^(\[?(0:0:0:0:0:0:0:1|::1)\]?|127\.\d+\.\d+\.\d+)(:\d+)?$', 'localhost$3')
 };
 
 (:~

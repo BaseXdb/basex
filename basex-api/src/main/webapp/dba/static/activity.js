@@ -6,14 +6,16 @@ const ADDED_MS = 3000;
 const _added = new Map();
 /** Id of the web session whose rows are pointed at (null if none). */
 let _related = null;
+
 /**
  * Highlights the rows of all panels that belong to the web session that is pointed at.
  */
 function markRelated() {
   for(const row of document.querySelectorAll("tr.related")) row.classList.remove("related");
   if(_related === null) return;
-  for(const label of document.querySelectorAll("span[data-session]")) {
-    if(label.dataset.session === _related) label.closest("tr")?.classList.add("related");
+  const selector = `span[data-session="${CSS.escape(_related)}"]`;
+  for(const label of document.querySelectorAll(selector)) {
+    label.closest("tr")?.classList.add("related");
   }
 }
 
@@ -49,6 +51,11 @@ function showActivity(json) {
   // form it belongs to: while one is open, the panels are left as they are, and the answer
   // that arrives a second later is applied instead
   if(!dialogOpen()) {
+    // rows whose fade is over are forgotten, including the ones that are gone
+    const now = Date.now();
+    for(const [ key, time ] of _added) {
+      if(now - time >= ADDED_MS) _added.delete(key);
+    }
     // every panel is named by the block it is filled into; what was ticked in the meantime is
     // ticked again by fillPanel
     for(const [ id, html ] of Object.entries(json.panels)) {
@@ -57,17 +64,14 @@ function showActivity(json) {
         // rows are named by what they list: a name that was not shown before marks a new entry
         const ids = new Set([ ...pane.querySelectorAll("tr[id]") ].map(row => row.id));
         fillPanel(id, html);
-        const now = Date.now();
         for(const row of pane.querySelectorAll("tr[id]")) {
           const key = `${id}/${row.id}`;
           if(!ids.has(row.id)) _added.set(key, now);
           // a row is replaced while it fades in: the fade is resumed where it was
-          const elapsed = now - (_added.get(key) ?? -ADDED_MS);
-          if(elapsed < ADDED_MS) {
+          const time = _added.get(key);
+          if(time !== undefined) {
             row.classList.add("added");
-            row.style.setProperty("--added-delay", `-${elapsed}ms`);
-          } else {
-            _added.delete(key);
+            row.style.setProperty("--added-delay", `-${now - time}ms`);
           }
         }
       }

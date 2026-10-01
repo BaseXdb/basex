@@ -248,7 +248,7 @@ declare function dba:entries(
     (: AND-combine column filters; an address is found by what is shown and by what is logged :)
     where every $key in map:keys($filters) satisfies (
       let $value := if ($key = 'text') then $text else string($log/@*[name() = $key])
-      let $shown := if ($key = 'address') then string(html:address($value))
+      let $shown := if ($key = 'address') then html:localhost($value)
       return some $string in ($value, $shown) satisfies matches($string, $filters?$key, 'i')
     )
 
@@ -262,6 +262,7 @@ declare function dba:entries(
     )
 
     let $id := string($log/@time)
+    let $address := string($log/@address)
     (: two files hold the same times of day: what names an entry, and what is shown for it,
        is prefixed by the file it belongs to :)
     let $label := ($date || ' ')[$several] || $id
@@ -269,7 +270,7 @@ declare function dba:entries(
       $map-results,
       {
         'id': translate($label, ' ', 'T'),
-        'address': fn() { html:address(string($log/@address)) },
+        'address': fn() { html:address($address) },
         'ms': xs:decimal($log/@ms),
         'time': fn() {
           let $link := html:link($label, $dba:CAT || '-jump',
