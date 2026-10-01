@@ -1,7 +1,5 @@
 package org.basex.data;
 
-import java.util.*;
-
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -20,19 +18,19 @@ final class NSScope {
   private final IntList preStack = new IntList();
   /** Root namespace. */
   private final NSNode root;
-  /** Tracks existing nodes. */
-  private final ArrayList<NSNode> cache;
 
   /**
    * Default constructor.
    * @param pre PRE value
+   * @param count number of nodes to be inserted
    * @param data data reference
    */
-  NSScope(final int pre, final Data data) {
+  NSScope(final int pre, final int count, final Data data) {
     this.data = data;
     nspaces = data.nspaces;
     root = nspaces.cursor();
-    cache = nspaces.cache(pre);
+    // move existing namespace nodes behind the inserted nodes
+    for(final NSNode node : nspaces.cache(pre)) node.incrementPre(count);
   }
 
   /**
@@ -71,14 +69,6 @@ final class NSScope {
     nspaces.open(pre, ns);
     preStack.push(pre);
     return !ns.isEmpty();
-  }
-
-  /**
-   * Shifts cached namespaces by the specified value.
-   * @param diff shift
-   */
-  void shift(final int diff) {
-    for(final NSNode node : cache) node.incrementPre(diff);
   }
 
   /**

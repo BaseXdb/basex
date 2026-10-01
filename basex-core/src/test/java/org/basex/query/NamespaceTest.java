@@ -9,9 +9,11 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.*;
 
 import org.basex.*;
+import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.io.*;
+import org.basex.query.expr.index.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -429,6 +431,97 @@ public final class NamespaceTest extends SandboxTest {
     execute(new CreateDB(NAME, "<a xmlns='u'><b/></a>"));
     query("insert node <c/> into " + _DB_GET.args(NAME) + "/*:a/*:b");
     query(_DB_GET.args(NAME), "<a xmlns='u'><b><c xmlns=''/></b></a>");
+  }
+
+  /**
+   * Serializes a namespace URI that equals a prefix.
+   */
+  @Test public void serializeUriPrefix() {
+    query("parse-xml('<r xmlns:u=\"U\"><x xmlns=\"u\"/></r>')//*:x",
+        "<x xmlns='u' xmlns:u='U'/>");
+  }
+
+  /**
+   * Checks the common default namespace of documents with multiple root elements.
+   */
+  @Test public void defaultNsRoots() {
+    execute(new CreateDB(NAME));
+    query(_DB_ADD.args(NAME, " document { <a xmlns='X'/>, <b xmlns='X'/> }", "d1.xml"));
+    query(_DB_ADD.args(NAME, " <c/>", "d2.xml"));
+    query("count(" + _DB_GET.args(NAME) + "//c)", 1);
+
+    execute(new CreateDB(NAME));
+    query(_DB_ADD.args(NAME, " document { <a xmlns='X'/>, <b/> }", "d1.xml"));
+    query(_DB_ADD.args(NAME, " <c xmlns='X'/>", "d2.xml"));
+    query("count(" + _DB_GET.args(NAME) + "//b)", 1);
+
+    // root element added to a document
+    execute(new CreateDB(NAME, "<a xmlns='X'/>"));
+    query("count(//*:a)", 1);
+    query("insert node <b/> into /");
+    query("count(//b)", 1);
+  }
+
+  /**
+   * Resolves the namespaces of names that are bound to different URIs in a database.
+   */
+  @Test public void nsUri() {
+    final StringBuilder sb = new StringBuilder("<root>");
+    for(int i = 1; i <= 100; i++) sb.append("<entry><title>t").append(i).append("</title></entry>");
+    execute(new CreateDB(NAME, sb.append("<div xmlns='X'><p/></div></root>").toString()));
+    check("count(//entry[title = 't5'])", 1, exists(ValueAccess.class));
+    query("count(//p)", 0);
+    query("declare default element namespace 'X'; count(//p)", 1);
+
+    // name bound to different URIs
+    execute(new CreateDB(NAME,
+        "<root><title>t</title><div xmlns='X'><title>t</title></div></root>"));
+    query("count(//title[. = 't'])", 1);
+    query("declare default element namespace 'X'; count(//title[. = 't'])", 1);
+
+    // prefix bound to different URIs
+    execute(new CreateDB(NAME, "<root xmlns:p='A'><p:a p:x='1'/><x xmlns:p='B'><p:b p:y='2'/></x>" +
+        "</root>"));
+    query("declare namespace p = 'A'; count(//p:a), count(//p:b), count(//@p:x), count(//@p:y)",
+        "1\n0\n1\n0");
+    query("declare namespace p = 'B'; count(//p:a), count(//p:b), count(//@p:x), count(//@p:y)",
+        "0\n1\n0\n1");
+  }
+
+  /**
+   * Checks the limit for distinct namespaces in updates.
+   */
+  @Test public void namespaceLimit() {
+    final String root = _DB_GET.args(NAME) + "/r";
+    final String elems = " ! element { QName('U' || ., 'e') } {}";
+
+    // inserted elements
+    execute(new CreateDB(NAME, "<r/>"));
+    query("insert node (1 to 200)" + elems + " into " + root);
+    error("insert node (201 to 300)" + elems + " into " + root, BASEX_LIMIT_X_X);
+    query("count(" + root + "/*)", 200);
+
+    // renamed elements
+    execute(new CreateDB(NAME, "<r/>"));
+    query("insert node (1 to 300) ! <e/> into " + root);
+    error("for $e at $p in " + root + "/e return rename node $e as QName('U' || $p, 'e')",
+        BASEX_LIMIT_X_X);
+    query("count(" + root + "/e)", 300);
+
+    // added documents
+    execute(new CreateDB(NAME, "<r/>"));
+    error(_DB_ADD.args(NAME, " <a>{ (1 to 150)" + elems + " }</a>", "a.xml") + ", " +
+        _DB_ADD.args(NAME, " <b>{ (151 to 300)" + elems + " }</b>", "b.xml"), BASEX_LIMIT_X_X);
+    query(_DB_GET.args(NAME) + " ! name(*)", "r");
+
+    // added documents (command)
+    final StringBuilder a = new StringBuilder("<a>"), b = new StringBuilder("<b>");
+    for(int i = 1; i <= 150; i++) a.append("<e xmlns='U").append(i).append("'/>");
+    for(int i = 151; i <= 300; i++) b.append("<e xmlns='U").append(i).append("'/>");
+    execute(new CreateDB(NAME, a.append("</a>").toString()));
+    assertThrows(BaseXException.class,
+        () -> new Add("b.xml", b.append("</b>").toString()).execute(context));
+    query("count(" + _DB_GET.args(NAME) + ")", 1);
   }
 
   /**

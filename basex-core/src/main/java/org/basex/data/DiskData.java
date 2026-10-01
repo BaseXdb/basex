@@ -391,6 +391,11 @@ public final class DiskData extends Data {
     return false;
   }
 
+  @Override
+  public long heapSize(final boolean text) {
+    return (text ? texts : values).length();
+  }
+
   // UPDATE OPERATIONS ============================================================================
 
   @Override

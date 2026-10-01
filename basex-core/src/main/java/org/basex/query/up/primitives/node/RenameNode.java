@@ -38,6 +38,12 @@ public final class RenameNode extends NodeUpdate {
   public void prepare(final MemData memData, final QueryContext qc) { }
 
   @Override
+  public void limits(final NameLimits limits) {
+    final int kind = data.kind(pre);
+    if(kind != Data.PI) limits.add(name, kind == Data.ELEM);
+  }
+
+  @Override
   public void merge(final Update update) throws QueryException {
     throw UPMULTREN_X.get(info, node());
   }

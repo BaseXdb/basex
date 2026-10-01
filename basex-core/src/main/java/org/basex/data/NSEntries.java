@@ -8,6 +8,7 @@ import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.io.random.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -258,31 +259,32 @@ final class NSEntries {
   }
 
   /**
-   * Counts the document root elements that bind the specified prefix to the specified URI.
+   * Collects the document root elements that bind the specified prefix to the specified URI.
    * @param ns namespace reference
    * @param prefId ID of prefix
    * @param uriId ID of URI
    * @param data data reference
-   * @return number of root elements
+   * @param roots PRE values of the root elements
    */
-  int roots(final Namespaces ns, final int prefId, final int uriId, final Data data) {
+  void roots(final Namespaces ns, final int prefId, final int uriId, final Data data,
+      final IntSet roots) {
     final int size = pres.length;
-    if(size == 0) return 0;
+    if(size == 0) return;
 
-    int count = 0;
     // leaf entries of the root
     for(int b = 0, bs = blocks(0); b < bs; b++) {
       final Block bl = block(0, b);
       final int cl = bl.pres.length;
       for(int l = 0; l < cl; l++) {
-        if(ns.declares(bl.pres[l], bl.sets[l], prefId, uriId, data)) count++;
+        if(ns.declares(bl.pres[l], bl.sets[l], prefId, uriId, data)) roots.add(bl.pres[l]);
       }
     }
     // inner entries of the root
     for(int n = 1; n < size; n++) {
-      if(parents[n] == 0 && ns.declares(pres[n], setIds[n], prefId, uriId, data)) count++;
+      if(parents[n] == 0 && ns.declares(pres[n], setIds[n], prefId, uriId, data)) {
+        roots.add(pres[n]);
+      }
     }
-    return count;
   }
 
   /**

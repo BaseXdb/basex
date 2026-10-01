@@ -53,6 +53,14 @@ public final class ReplaceValue extends NodeUpdate {
   public void prepare(final MemData memData, final QueryContext qc) { }
 
   @Override
+  public void limits(final NameLimits limits) {
+    if(substituted()) return;
+    // processing instructions: name and value are stored as a single text
+    final int kind = data.kind(pre);
+    limits.add(value.length + (kind == Data.PI ? data.textLen(pre, true) : 0), kind != Data.ATTR);
+  }
+
+  @Override
   public void merge(final Update update) throws QueryException {
     throw UPMULTREPV_X.get(info, node());
   }

@@ -103,6 +103,8 @@ public abstract class Data {
   PathIndex paths;
   /** Source locations of the parsed nodes (can be {@code null}). */
   public Locations locations;
+  /** Namespace URIs of the names (can be {@code null}). */
+  private NSNames nsNames;
   /** Text index. */
   public ValueIndex textIndex;
   /** Attribute value index. */
@@ -318,8 +320,15 @@ public abstract class Data {
    */
   public byte[] nsUri(final byte[] name, final boolean element) {
     final byte[] prefix = prefix(name);
-    return prefix.length == 0 ? element ? defaultNs() : EMPTY :
-      eq(prefix, XML) ? XMLToken.XML_URI : nspaces.uniqueUri(prefix);
+    if(prefix.length == 0 && !element) return EMPTY;
+    if(eq(prefix, XML)) return XMLToken.XML_URI;
+    final byte[] uri = prefix.length == 0 ? defaultNs() : nspaces.uniqueUri(prefix);
+    if(uri != null) return uri;
+
+    // resolve the URI of the specific name
+    NSNames nsn = nsNames;
+    if(nsn == null) nsNames = nsn = new NSNames(this);
+    return nsn.uri(name, element);
   }
 
   // RETRIEVING VALUES ============================================================================
@@ -582,6 +591,15 @@ public abstract class Data {
   public abstract int textLen(int pre, boolean text);
 
   /**
+   * Returns the size of the file that stores texts or attribute values.
+   * @param text text or attribute value flag
+   * @return size in bytes ({@code 0} for main-memory instances)
+   */
+  public long heapSize(@SuppressWarnings("unused") final boolean text) {
+    return 0;
+  }
+
+  /**
    * Checks if the reference to a text (text, comment, pi, document) or attribute value is valid.
    * @param pre PRE value
    * @param text text/attribute flag
@@ -598,6 +616,8 @@ public abstract class Data {
   private void modified(final MetaUpdate accuracy) {
     meta().update(accuracy);
     locations = null;
+    nsNames = null;
+    nspaces.modified();
   }
 
   /**
@@ -862,10 +882,14 @@ public abstract class Data {
    * @param source clip with source data
    */
   public final void insertAttr(final int pre, final int par, final DataClip source) {
-    // #1168/2: store one by one (otherwise, namespace declarations may be added more than once)
-    for(int s = 0; s < source.fragments; s++) {
-      final int start = source.start + s;
-      insert(pre + s, par, new DataClip(source.data, start, start + 1));
+    if(nspaces.isEmpty() && source.data.nspaces.isEmpty()) {
+      insert(pre, par, source);
+    } else {
+      // #1168/2: store one by one (otherwise, namespace declarations may be added more than once)
+      for(int s = 0; s < source.fragments; s++) {
+        final int start = source.start + s;
+        insert(pre + s, par, new DataClip(source.data, start, start + 1));
+      }
     }
     attSize(par, ELEM, attSize(par, ELEM) + source.size());
   }
@@ -892,7 +916,7 @@ public abstract class Data {
     bufferSize(bSize);
 
     // organize namespaces to avoid duplicate declarations
-    final NSScope nsScope = new NSScope(pre, this);
+    final NSScope nsScope = new NSScope(pre, sCount, this);
 
     // indicates if database only contains a dummy node
     final Data sData = source.data;
@@ -905,7 +929,6 @@ public abstract class Data {
       // values of source node
       final int sKind = sData.kind(sPre);
       final int sSize = sData.size(sPre, sKind);
-      final int sPar = sData.parent(sPre, sKind);
 
       // PRE and DIST value of new node
       final int nPre = pre + c, nDist;
@@ -916,7 +939,7 @@ public abstract class Data {
         sTopPre += sSize;
       } else {
         // handle descendant node: calculate distance based on source database
-        nDist = sPre - sPar;
+        nDist = sData.dist(sPre, sKind);
       }
       // documents: use -1 as namespace root
       final int nsPre = sKind == DOC ? -1 : nPre - nDist;
@@ -953,7 +976,6 @@ public abstract class Data {
         }
         default -> { }
       }
-      nsScope.shift(1);
     }
     // finalize and update namespace structure
     nsScope.close();

@@ -98,7 +98,11 @@ final class DataUpdates {
    */
   void prepare(final MemData memData, final QueryContext qc) throws QueryException {
     // Prepare/check database operations
-    for(final DBUpdate update : dbUpdates) update.prepare();
+    final NameLimits limits = new NameLimits(data);
+    for(final DBUpdate update : dbUpdates) {
+      update.prepare();
+      update.limits(limits);
+    }
 
     // Prepare/check XQUP primitives:
     final int sz = nodeUpdates.size();
@@ -108,8 +112,13 @@ final class DataUpdates {
 
     for(int i = 0; i < sz; i++) {
       final NodeUpdates updates = nodeUpdates.get(nodes.get(i));
-      for(final NodeUpdate update : updates.updates) update.prepare(memData, qc);
+      for(final NodeUpdate update : updates.updates) {
+        update.prepare(memData, qc);
+        update.limits(limits);
+      }
     }
+    // check if names and namespaces exceed the database limits
+    limits.check();
 
     // check attribute duplicates
     int p = nodes.size() - 1;

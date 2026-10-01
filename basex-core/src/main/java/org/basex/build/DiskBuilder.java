@@ -174,6 +174,10 @@ public final class DiskBuilder extends Builder {
     final byte[] packed = Compress.pack(value);
     final DataOutput store = text ? xout : vout;
     final long offset = store.size();
+    // offsets must not overlap with the flags of text references
+    if(offset >= Compress.COMPRESS) {
+      throw new BuildException(BuildText.LIMITRANGE, parser.detailedInfo());
+    }
     store.writeToken(packed);
     return packed == value ? offset : Compress.COMPRESS | offset;
   }

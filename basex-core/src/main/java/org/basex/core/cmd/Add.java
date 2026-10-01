@@ -10,6 +10,8 @@ import org.basex.core.parse.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.*;
+import org.basex.query.*;
+import org.basex.query.up.*;
 import org.basex.query.up.atomic.*;
 import org.basex.util.*;
 
@@ -115,9 +117,16 @@ public final class Add extends ACreate {
 
       if(!data.inMemory()) builder.binariesDir(soptions.dbPath(name));
       tmpData = builder.build();
+
+      // check if the database limits would be exceeded
+      final NameLimits limits = new NameLimits(data);
+      limits.add(new DataClip(tmpData));
+      limits.check();
       return true;
     } catch(final IOException ex) {
       return error(ex);
+    } catch(final QueryException ex) {
+      return error(ex.getMessage());
     }
   }
 

@@ -206,12 +206,19 @@ public final class Namespaces {
    * @return namespace, or {@code null} if there is no common namespace
    */
   synchronized byte[] defaultNs(final int ndocs, final Data data) {
-    // the result is cached until the namespaces or the number of documents change
+    // the result is cached until the database is modified
     if(cachedDocs != ndocs) {
       cachedNs = defaultNs(ndocs, data, prefixes.index(Token.EMPTY));
       cachedDocs = ndocs;
     }
     return cachedNs;
+  }
+
+  /**
+   * Invalidates the cached common default namespace.
+   */
+  synchronized void modified() {
+    cachedDocs = -1;
   }
 
   /**
@@ -228,9 +235,35 @@ public final class Namespaces {
     // no documents, or no default namespace declared anywhere
     if(ndocs == 0 || uriId == 0) return Token.EMPTY;
     // the default namespace must be declared by the root elements of all documents
-    final int roots = root == null ? entries.roots(this, prefId, uriId, data) :
-      roots(prefId, uriId, data);
-    return roots == ndocs ? uri(uriId) : null;
+    final IntSet roots = new IntSet();
+    if(root == null) entries.roots(this, prefId, uriId, data, roots);
+    else roots(prefId, uriId, data, roots);
+    return allRoots(roots, ndocs, data) ? uri(uriId) : null;
+  }
+
+  /**
+   * Checks if the specified elements comprise all root elements of all documents.
+   * @param roots PRE values of root elements
+   * @param ndocs number of documents
+   * @param data data reference
+   * @return result of check
+   */
+  private static boolean allRoots(final IntSet roots, final int ndocs, final Data data) {
+    final IntSet docs = new IntSet();
+    final int rs = roots.size();
+    for(int r = 1; r <= rs; r++) docs.add(data.parent(roots.key(r), Data.ELEM));
+    if(docs.size() != ndocs) return false;
+
+    final int ds = docs.size();
+    for(int d = 1; d <= ds; d++) {
+      final int doc = docs.key(d), end = doc + data.size(doc, Data.DOC);
+      for(int pre = doc + 1; pre < end;) {
+        final int kind = data.kind(pre);
+        if(kind == Data.ELEM && !roots.contains(pre)) return false;
+        pre += data.size(pre, kind);
+      }
+    }
+    return true;
   }
 
   /**
@@ -264,20 +297,18 @@ public final class Namespaces {
   }
 
   /**
-   * Counts the document root elements that bind the specified prefix to the specified URI.
+   * Collects the document root elements that bind the specified prefix to the specified URI.
    * @param prefId ID of prefix
    * @param uriId ID of URI
    * @param data data reference
-   * @return number of root elements
+   * @param roots PRE values of the root elements
    */
-  private int roots(final int prefId, final int uriId, final Data data) {
-    int count = 0;
+  private void roots(final int prefId, final int uriId, final Data data, final IntSet roots) {
     final int ch = root.children();
     for(int c = 0; c < ch; c++) {
       final NSNode child = root.child(c);
-      if(declares(child.pre(), child.setId(), prefId, uriId, data)) count++;
+      if(declares(child.pre(), child.setId(), prefId, uriId, data)) roots.add(child.pre());
     }
-    return count;
   }
 
   /**
@@ -582,6 +613,30 @@ public final class Namespaces {
       }
     }
     return t.contents.isEmpty() ? Token.EMPTY : t.finish();
+  }
+
+  /**
+   * Returns the ID of the specified prefix.
+   * @param prefix prefix
+   * @return ID, or {@code 0} if the prefix is unknown
+   */
+  int prefixId(final byte[] prefix) {
+    return prefixes.index(prefix);
+  }
+
+  /**
+   * Returns the namespace nodes that bind the specified prefix.
+   * @param prefId ID of prefix
+   * @return PRE values of the nodes and IDs of the bound URIs, in ascending PRE order
+   */
+  synchronized IntList bindings(final int prefId) {
+    final IntList list = range(0, Integer.MAX_VALUE), bindings = new IntList();
+    final int ls = list.size();
+    for(int l = 0; l < ls; l += 4) {
+      final int uriId = sets.uri(list.get(l + 3), prefId);
+      if(uriId != 0) bindings.add(list.get(l)).add(uriId);
+    }
+    return bindings;
   }
 
   /**

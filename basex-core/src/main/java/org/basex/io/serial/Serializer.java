@@ -502,7 +502,7 @@ public abstract class Serializer implements Closeable {
 
         // database contains namespaces: add declarations
         if(nsExist) {
-          nsSet.add(nsUri);
+          nsSet.add(nsPrefix);
           int p = pre;
           do {
             final Atts ns = data.namespaces(p);

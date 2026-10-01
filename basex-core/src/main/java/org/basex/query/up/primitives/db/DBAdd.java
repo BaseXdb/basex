@@ -8,6 +8,7 @@ import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.resource.*;
 import org.basex.query.*;
+import org.basex.query.up.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.value.map.*;
 import org.basex.util.*;
@@ -88,7 +89,11 @@ public final class DBAdd extends DBUpdate {
   public void prepare() throws QueryException {
     size = newDocs.inputs.size();
     clip = newDocs.prepare(data.meta.name, false);
-    checkLimit(clip.size());
+  }
+
+  @Override
+  public void limits(final NameLimits limits) {
+    if(clip != null) limits.add(clip);
   }
 
   @Override

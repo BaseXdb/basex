@@ -1,9 +1,7 @@
 package org.basex.query.up.primitives;
 
-import static org.basex.query.QueryError.*;
-
 import org.basex.data.*;
-import org.basex.query.*;
+import org.basex.query.up.*;
 import org.basex.util.*;
 
 /**
@@ -36,13 +34,8 @@ public abstract class DataUpdate extends Update {
   }
 
   /**
-   * Checks if the node limit is exceeded.
-   * @param size nodes to be added
-   * @throws QueryException query exception
+   * Registers the names, namespaces, nodes and texts that are added to the database.
+   * @param limits name limits
    */
-  public final void checkLimit(final long size) throws QueryException {
-    if(data.nodes() + size >= Integer.MAX_VALUE) {
-      throw UPDBERROR_X.get(null, "Update would exceed database node limit.");
-    }
-  }
+  public void limits(@SuppressWarnings("unused") final NameLimits limits) { }
 }
