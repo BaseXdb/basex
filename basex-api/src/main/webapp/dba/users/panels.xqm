@@ -25,9 +25,10 @@ declare function panels:users(
 ) as element()+ {
   <form method='post' autocomplete='off' data-sort='{ $sort }'>{
     let $headers := (
-      { 'key': 'name', 'label': 'Name', 'type': 'dynamic', 'width': '45%' },
-      { 'key': 'permission', 'label': 'Permission', 'width': '35%' },
-      { 'key': 'you', 'label': 'You', 'width': '20%' }
+      (: the values of a known format get the width they need; the name takes the rest :)
+      { 'key': 'name', 'label': 'Name', 'type': 'dynamic' },
+      { 'key': 'permission', 'label': 'Permission', 'width': '6.5rem' },
+      { 'key': 'you', 'label': 'You', 'width': '3rem' }
     )
     let $entries := (
       let $current := session:get($config:SESSION-KEY)

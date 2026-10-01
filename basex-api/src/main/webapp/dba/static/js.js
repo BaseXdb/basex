@@ -61,6 +61,12 @@ let _waiting = false;
 /** Handle of the timer that repeats what the 'Live' checkbox controls. */
 let _live;
 
+/** Whether the pointer is over a table, whose rows a refresh would replace under it. */
+let _overTable = false;
+
+/** Whether a pointer button is pressed: a refresh would swallow the click it ends with. */
+let _pressed = false;
+
 /** Moves the editor to a line and column that an error message names; registered by editor.js
     where a page has an editor, and absent on the pages that do not load it. */
 let _locate;
@@ -77,6 +83,9 @@ const RESULT_DELAY = 500;
 /** Delay before what was typed into a filter field is requested, in milliseconds. */
 const FILTER_DELAY = 150;
 
+/** Delay before a held refresh checks again whether it may run, in milliseconds. */
+const HOLD_DELAY = 200;
+
 /** localStorage key prefix for the 'Live' checkbox of a page. */
 const LIVE_KEY = "dba-live-";
 
@@ -87,6 +96,12 @@ const REFRESH_INTERVAL = Number(document.documentElement.dataset.interval) * 100
 
 /** Content panels of the current page, in grid track order. */
 let _panels = [];
+
+/** Markup that a pane was last filled with, by pane. */
+const _filled = new WeakMap();
+
+/** Panes that were sorted or filtered: they are shown from the top once they arrive. */
+const _toTop = new Set();
 
 /** Whether the panels occupy one grid track each, in source order — which is what
     applyColumns rewrites. A page that places its panels by hand (the grid of the Workspace
@@ -535,7 +550,7 @@ function endRequest() {
 /**
  * Asks the server for a panel. A folded panel is requested as well: opening it must show what
  * is there now, not what was there when it was folded away. The order it shows is kept unless
- * another one is requested; a new order starts at the first page.
+ * another one is requested.
  * @param {string} path path of the endpoint that serves the panel
  * @param {string} id id of the panel
  * @param {object} message message identifying the panel
@@ -543,6 +558,8 @@ function endRequest() {
  * @param {number} page page; if omitted, the first one
  */
 function requestPanel(path, id, message, sort, page) {
+  // the panel is marked until it arrives; style.css fades it if that takes a while
+  document.getElementById(id)?.classList.add("loading");
   const shown = document.querySelector(`#${id} [data-sort]`);
   sendMessage(path, Object.assign(message, {
     sort: sort ?? shown?.dataset.sort ?? "",
@@ -573,6 +590,10 @@ function fillPanel(id, html) {
   const rows = "table input[type=checkbox][name]";
   const checked = [ ...pane.querySelectorAll(rows) ].filter(input => input.checked);
   pane.innerHTML = html;
+  pane.classList.remove("loading");
+  if(_toTop.delete(id)) pane.closest(".pane")?.scrollTo(0, 0);
+  // remembered for a live refresh, which leaves an unchanged panel alone
+  _filled.set(pane, html);
   if(checked.length) {
     const values = checked.map(input => input.value);
     for(const input of pane.querySelectorAll(rows)) {
@@ -617,9 +638,102 @@ function followPanelLinks(panels) {
     const params = new URL(link.href, window.location.href).searchParams;
     if(!params.has("sort") && !params.has("page")) return;
     event.preventDefault();
-    panels[panel.id](params.get("sort") ?? "", Number(params.get("page")) || 1);
+    // a sort link keeps the number of entries that are shown, and starts at the top
+    if(!params.has("page")) _toTop.add(panel.id);
+    panels[panel.id](params.get("sort") ?? "", Number(params.get("page")) || shownPages(panel.id));
   });
 }
+
+/**
+ * Returns the number of pages that a list panel shows.
+ * @param {string} id id of the panel
+ * @returns {number} number of pages
+ */
+function shownPages(id) {
+  return Number(document.querySelector(`#${id} [data-page]`)?.dataset.page) || 1;
+}
+
+/**
+ * Follows a link that loads more entries once it is scrolled close to view.
+ * @param {HTMLElement} link link
+ */
+function loadMore(link) {
+  // the panel that scrolls is what the link is clipped by, not the window
+  const observer = new IntersectionObserver(entries => {
+    if(entries.some(entry => entry.isIntersecting)) {
+      observer.disconnect();
+      link.click();
+    }
+  }, { root: link.closest(".pane"), rootMargin: "200px" });
+  observer.observe(link);
+}
+
+/** Restacks the pinned heads when one of them changes its height. */
+const _stickyObserver = new ResizeObserver(() => pinHeads());
+
+/**
+ * Stacks the pinned heads of a page, and pins the header of a table below the heads above it.
+ */
+function pinHeads() {
+  // document order: the outer heads are placed first
+  for(const head of document.querySelectorAll(".sticky")) {
+    const block = head.parentElement;
+    // what is pinned above the block is inherited, once its own value is dropped
+    block.style.removeProperty("--sticky-height");
+    const above = parseFloat(getComputedStyle(block).getPropertyValue("--sticky-height")) || 0;
+    head.style.top = `${above}px`;
+    block.style.setProperty("--sticky-height", `${above + head.getBoundingClientRect().height}px`);
+  }
+}
+
+/**
+ * Names the shortcut of a control in its tooltip.
+ * @param {HTMLElement} root part of the page that was added
+ */
+function hintShortcuts(root) {
+  const hint = (control, key) => {
+    const title = control.title;
+    // the keys a title names are listed in parentheses at its end
+    const keys = title.match(/\(([^)]*)\)$/)?.[1].split(", ") ?? [ title ];
+    if(keys.includes(key)) return;
+    control.title = title.endsWith(")") ? `${title.slice(0, -1)}, ${key})` :
+      title ? `${title} (${key})` : key;
+  };
+  // the controls are the ones that the shortcuts click; see shortcuts
+  const controls = [ root, ...root.querySelectorAll("button, #live") ];
+  for(const button of controls.filter(c => c.matches(".content button"))) {
+    const text = button.textContent.trim();
+    if(button === pageButton(label => label.startsWith("New"))) hint(button, "N");
+    else if(text === "..") hint(button, "Backspace");
+    else if(/^(Drop|Delete)$/.test(text) && button.matches("[onclick*=confirmAction]")) {
+      hint(button, "Del");
+    }
+  }
+  const live = controls.find(c => c.id === "live")?.closest("label");
+  if(live) hint(live, "L");
+}
+
+/** Watches the links, heads and controls with shortcuts that a page or a panel brings along. */
+new MutationObserver(mutations => {
+  const added = (node, selector) => node.matches(selector) ? [ node ] :
+    node.querySelectorAll(selector);
+  for(const mutation of mutations) {
+    for(const node of mutation.addedNodes) {
+      if(node.nodeType !== Node.ELEMENT_NODE) continue;
+      for(const link of added(node, ".more a")) loadMore(link);
+      hintShortcuts(node);
+      const heads = added(node, ".sticky");
+      for(const head of heads) _stickyObserver.observe(head);
+      // a hidden page reports no sizes, so the new heads are measured at once
+      if(heads.length) pinHeads();
+    }
+  }
+  // a chosen row whose table was replaced is chosen again, where it is shown now
+  if(_row && !_row.isConnected) {
+    _row = _rowKey && document.querySelector(`.content ${_rowKey}`);
+    _row?.classList.add("current");
+  }
+}).observe(document.documentElement, { childList: true, subtree: true });
 
 /**
  * Requests what was typed into a filter field. Every key would be a request of its own, so the
@@ -725,6 +839,8 @@ async function saveEditor(path, params, info, done) {
  * @param {object} position optional error position ({ line, column })
  */
 function showError(response, info, position) {
+  // a panel that was asked for will not arrive
+  for(const pane of document.querySelectorAll(".loading")) pane.classList.remove("loading");
   if(response.status === 460) return;
 
   // normalize error message
@@ -802,7 +918,44 @@ function liveChanged() {
  */
 function scheduleLive(action, live = liveOn()) {
   clearTimeout(_live);
-  if(live) _live = setTimeout(action, REFRESH_INTERVAL);
+  if(live) _live = setTimeout(() => runLive(action), REFRESH_INTERVAL);
+}
+
+/**
+ * Runs what the 'Live' checkbox controls, or holds it while a table is pointed at, clicked, or
+ * worked with by keys.
+ * @param {Function} action action to run
+ */
+function runLive(action) {
+  // a row that is chosen with the keys would be replaced, and the choice lost with it. While a
+  // filter or search field is focused, what is typed is waited for: the list is updated
+  const typing = document.activeElement?.matches("input[type=text], input[type=search]");
+  if(!typing && (_overTable || _pressed || _row?.isConnected)) {
+    _live = setTimeout(() => runLive(action), HOLD_DELAY);
+  } else {
+    action();
+  }
+}
+
+/** Tracks what holds a live refresh: a table under the pointer, and a pressed button. */
+document.addEventListener("pointerover", event => {
+  const table = event.target.closest(".content table");
+  _overTable = table !== null;
+  if(table) _rowTable = table;
+  // a button released outside the window reports no 'pointerup'
+  _pressed = event.buttons !== 0;
+});
+document.addEventListener("pointerout", event => {
+  // the pointer has left the window
+  if(!event.relatedTarget) _overTable = false;
+});
+document.addEventListener("pointerdown", () => {
+  _pressed = true;
+  // the pointer takes over from the keys: a live view need not wait for the chosen row
+  selectRow(null);
+});
+for(const type of [ "pointerup", "pointercancel" ]) {
+  document.addEventListener(type, () => _pressed = false);
 }
 
 /**
@@ -859,9 +1012,27 @@ function askQuestion(message, answers) {
     const button = document.createElement("button");
     button.value = value;
     button.textContent = label;
+    // 'Yes' and 'No' are chosen with their first letter
+    if(ANSWER_KEYS[label]) button.dataset.key = ANSWER_KEYS[label];
     return button;
   }));
   return askDialog("confirm");
+}
+
+/** Keys that choose an answer of a question, by the label of the answer. */
+const ANSWER_KEYS = { Yes: "y", No: "n" };
+
+/**
+ * Chooses the answer of a question whose key was pressed, with or without Alt.
+ * @param {Event} event keydown event
+ */
+function answerKey(event) {
+  if(event.ctrlKey || event.metaKey) return;
+  const button = event.currentTarget.querySelector(`button[data-key='${event.key.toLowerCase()}']`);
+  if(button) {
+    event.preventDefault();
+    button.click();
+  }
 }
 
 /**
@@ -870,7 +1041,7 @@ function askQuestion(message, answers) {
  * @returns {Promise} promise, resolved with true if the action was confirmed
  */
 async function confirmDialog(message) {
-  return await askQuestion(message, [ [ "ok", "OK" ], [ "", "Cancel" ] ]) === "ok";
+  return await askQuestion(message, [ [ "ok", "Yes" ], [ "", "No" ] ]) === "ok";
 }
 
 /**
@@ -940,15 +1111,76 @@ async function copy(text) {
 function shortcuts(event) {
   if(event.key === "Escape") {
     setText("", "");
+    selectRow(null);
+    // an editor of the page is left with Escape, so that the keys of the page work again; the
+    // editor may need the key itself, and the one of a dialog is left by closing the dialog
+    if(!event.defaultPrevented && !dialogOpen() && event.target.closest(".cm-editor, #editor")) {
+      document.activeElement.blur();
+    }
     return;
   }
-  // ignore key presses while typing or combined with modifier keys
   const target = event.target;
-  if(event.ctrlKey || event.metaKey || event.altKey ||
-     target.matches("input, textarea, select") || target.closest(".cm-editor")) return;
-  if(event.key === "/") {
+  // a single-line field has no use for the arrow keys: they leave it for the rows of its table,
+  // or of the table of its panel
+  if((event.key === "ArrowDown" || event.key === "ArrowUp") && !dialogOpen() &&
+     !(event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) &&
+     target.matches("input[type=text], input[type=search], input:not([type])")) {
+    const table = target.closest("table") ||
+      target.closest(".panel")?.querySelector("table:has(tbody tr)");
+    if(table) {
+      event.preventDefault();
+      target.blur();
+      if(_row?.closest("table") !== table) selectRow(null);
+      _rowTable = table;
+      moveRow(event.key === "ArrowDown" ? 1 : -1);
+    }
+    return;
+  }
+  // ignore key presses while typing, combined with modifier keys, or while a dialog is open;
+  // a checkbox or a button is no place to type in
+  if(event.ctrlKey || event.metaKey || event.altKey || dialogOpen() ||
+     target.matches("textarea, select, input:not([type=checkbox], [type=button], [type=submit], " +
+       "[type=file])") || target.closest(".cm-editor")) return;
+  // a focused control keeps what Enter and Space do to it
+  const control = target.matches("a, button, input");
+  // 'g' and a letter go to a view
+  if(_go && Date.now() - _go < GO_DELAY) {
+    _go = 0;
+    const view = GO_VIEWS[event.key];
+    if(view) {
+      event.preventDefault();
+      window.location.href = view;
+    }
+    return;
+  }
+  // a shortcut may move the focus to a field, which must not receive the key as well
+  if([ "g", "n", "e", "l", "j", "k", "Delete" ].includes(event.key)) event.preventDefault();
+  if(event.key === "g") {
+    _go = Date.now();
+  } else if(event.key === "n") {
+    pageButton(text => text.startsWith("New"))?.click();
+  } else if(event.key === "Delete") {
+    dropRows();
+  } else if(event.key === "Backspace" && !control) {
+    event.preventDefault();
+    pageButton(text => text === "..")?.click();
+  } else if(event.key === "e") {
+    _editor?.focus();
+  } else if(event.key === "l") {
+    const live = document.getElementById("live");
+    if(live && !live.disabled) live.click();
+  } else if(event.key === "j" || event.key === "k") {
+    moveRow(event.key === "j" ? 1 : -1);
+  } else if(event.key === "Home" || event.key === "End") {
+    event.preventDefault();
+    moveRow(event.key === "End" ? Infinity : -Infinity);
+  } else if(event.key === "PageDown" || event.key === "PageUp") {
+    // the table that is worked with scrolls, not the one that was scrolled last
+    event.preventDefault();
+    moveRow((event.key === "PageDown" ? 1 : -1) * pageRows(rowTable()));
+  } else if(event.key === "/") {
     // prefer the main search field (right panel) over column and log-file filters
-    for(const selector of [ "#input", "input.filter", "#log-filter" ]) {
+    for(const selector of [ "#input", "#resource-filter", "input.filter", "#log-filter" ]) {
       const field = document.querySelector(selector);
       if(field) {
         event.preventDefault();
@@ -956,7 +1188,207 @@ function shortcuts(event) {
         break;
       }
     }
+  } else if(event.key === "?") {
+    event.preventDefault();
+    showShortcuts();
+  } else if(event.key === "ArrowDown" || event.key === "ArrowUp") {
+    event.preventDefault();
+    moveRow(event.key === "ArrowDown" ? 1 : -1);
+  } else if(event.key === "ArrowLeft" || event.key === "ArrowRight") {
+    event.preventDefault();
+    moveTable(event.key === "ArrowRight" ? 1 : -1);
+  } else if(event.key === "Enter" && _row?.isConnected && !control) {
+    // the row is opened by the link that names it
+    event.preventDefault();
+    _row.querySelector("a[href]")?.click();
+  } else if(event.key === " " && _row?.isConnected && !control) {
+    event.preventDefault();
+    _row.querySelector("input[type=checkbox]")?.click();
   }
+}
+
+/** Views that 'g' and a key go to. */
+const GO_VIEWS = { w: "workspace", d: "databases", s: "stores", u: "users", l: "logs",
+  a: "activity", x: "settings" };
+
+/** Time in which the key that follows 'g' is expected, in milliseconds. */
+const GO_DELAY = 1000;
+
+/** Time at which 'g' was pressed, or 0. */
+let _go = 0;
+
+/**
+ * Returns the first enabled button of the page whose label is accepted.
+ * @param {Function} accept function that tests a label
+ * @returns {HTMLElement} button (can be null)
+ */
+function pageButton(accept) {
+  return [ ...document.querySelectorAll(".content button:not(:disabled)") ]
+    .find(button => button.offsetParent && accept(button.textContent.trim())) ?? null;
+}
+
+/**
+ * Drops or deletes the ticked rows of the table that is worked with, or else the chosen row.
+ */
+function dropRows() {
+  const table = (_row?.isConnected && _row.closest("table")) || (_rowTable?.isConnected && _rowTable);
+  const form = table?.closest("form");
+  if(!form) return;
+  // without a ticked row, the chosen one is ticked; the button asks before it drops anything
+  if(!form.querySelector("tbody input[type=checkbox]:checked")) {
+    _row?.closest("form") === form && _row.querySelector("input[type=checkbox]")?.click();
+  }
+  [ ...form.querySelectorAll("button[onclick*=confirmAction]:not(:disabled)") ]
+    .find(button => /^(Drop|Delete)$/.test(button.textContent.trim()))?.click();
+}
+
+/** Shortcuts of the editor of a page, as [ key, description ] pairs; a page registers its own. */
+const _editor_shortcuts = [];
+
+/** Table row that is chosen with the arrow keys. */
+let _row = null;
+
+/** Selector of the chosen row, by which it is found again in a table that was replaced. */
+let _rowKey = null;
+
+/** Table that the pointer was last over: the arrow keys move through its rows. */
+let _rowTable = null;
+
+/**
+ * Chooses a table row, or none.
+ * @param {HTMLElement} row row (can be null)
+ */
+function selectRow(row) {
+  _row?.classList.remove("current");
+  _row = row;
+  // what names the row, so that it is chosen again when its table is replaced
+  const value = row?.querySelector("td input[type=checkbox]")?.value;
+  _rowKey = row?.id ? `tr#${CSS.escape(row.id)}` : value !== undefined ?
+    `tr:has(> td input[type=checkbox][value="${CSS.escape(value)}"])` : null;
+  if(row) {
+    row.classList.add("current");
+    row.scrollIntoView({ block: "nearest" });
+    // a focus in another table would take the keys back to it
+    const focused = document.activeElement?.closest(".content table");
+    if(focused && focused !== row.closest("table")) document.activeElement.blur();
+  }
+}
+
+/**
+ * Returns the tables of the page that have rows to choose, in the order of their panels.
+ * @returns {Array} tables
+ */
+function rowTables() {
+  return [ ...document.querySelectorAll(".content table:has(tbody tr)") ].filter(t => t.offsetParent);
+}
+
+/**
+ * Returns the table that is worked with: the one with the focus, the one of the chosen row, the
+ * one pointed at last, or else the widest one, which is the main list of the page.
+ * @returns {HTMLElement} table (can be undefined)
+ */
+function rowTable() {
+  return document.activeElement?.closest(".content table") ||
+    (_row?.isConnected && _row.closest("table")) || (_rowTable?.isConnected && _rowTable) ||
+    rowTables().sort((a, b) => b.offsetWidth - a.offsetWidth)[0];
+}
+
+/**
+ * Returns the rows of a table that can be chosen.
+ * @param {HTMLElement} table table (can be undefined)
+ * @returns {Array} rows
+ */
+function tableRows(table) {
+  // rows that a filter in the client hides are skipped
+  return [ ...table?.querySelectorAll("tbody tr") ?? [] ].filter(row => row.offsetParent);
+}
+
+/**
+ * Moves the chosen row of the table that is worked with.
+ * @param {number} step 1 for the next row, -1 for the previous one, ±Infinity for the last or first
+ */
+function moveRow(step) {
+  const rows = tableRows(rowTable());
+  if(!rows.length) return;
+  // the chosen row, or else the row with the focus, is where the move starts
+  const focused = document.activeElement?.closest("tbody tr");
+  const index = rows.includes(_row) ? rows.indexOf(_row) : rows.indexOf(focused);
+  selectRow(rows[Math.abs(step) === Infinity ? (step > 0 ? rows.length - 1 : 0) :
+    index === -1 ? (step > 0 ? 0 : rows.length - 1) :
+    Math.min(Math.max(index + step, 0), rows.length - 1)]);
+}
+
+/**
+ * Returns the number of rows of a table that one page of its panel shows.
+ * @param {HTMLElement} table table (can be undefined)
+ * @returns {number} number of rows, at least 1
+ */
+function pageRows(table) {
+  const pane = table?.closest(".pane"), row = tableRows(table)[0];
+  if(!pane || !row) return 1;
+  // the pinned heads and the header take their share of the panel; one row is kept in view
+  const visible = pane.clientHeight - (table.tHead?.offsetHeight ?? 0) -
+    (parseFloat(getComputedStyle(table).getPropertyValue("--sticky-height")) || 0);
+  return Math.max(1, Math.floor(visible / row.offsetHeight) - 1);
+}
+
+/**
+ * Chooses the first row of the next or the previous table of the page.
+ * @param {number} step 1 for the next table, -1 for the previous one
+ */
+function moveTable(step) {
+  const tables = rowTables(), index = tables.indexOf(rowTable());
+  const table = tables[Math.min(Math.max(index + step, 0), tables.length - 1)];
+  if(table) {
+    _rowTable = table;
+    selectRow(tableRows(table)[0] ?? null);
+  }
+}
+
+/** Shortcuts of the page, as [ key, description ] pairs. */
+const PAGE_SHORTCUTS = [
+  [ "G W/D/S/U/L/A/X", "Go to a view (X: Settings)" ],
+  [ "/", "Search or filter" ],
+  [ "Enter", "Open the chosen row" ],
+  [ "Space", "Tick the chosen row" ],
+  [ "Del", "Drop or delete the ticked rows, or the chosen one" ],
+  [ "Backspace", "Go up one level" ],
+  [ "N", "Create a new entry" ],
+  [ "L", "Switch the live view on or off" ],
+  [ "Esc", "Close, clear the message" ],
+  [ "?", "Show these shortcuts" ]
+];
+
+/** Shortcuts of an editor, as [ key, description ] pairs; see _editor_shortcuts for more. */
+const EDITOR_SHORTCUTS = [
+  [ "E", "Go to the editor" ],
+  [ "Ctrl+F", "Find and replace" ],
+  [ "Ctrl+[/]", "Indent less or more" ],
+  [ "Alt+↑/↓", "Move the lines up or down" ],
+  [ "Ctrl+Shift+K", "Delete the lines" ],
+  [ "Ctrl+Space", "Complete the input" ],
+  [ "Esc", "Leave the editor" ]
+];
+
+/**
+ * Shows the keyboard shortcuts: those of the page, and those of its editor if it has one.
+ */
+function showShortcuts() {
+  document.getElementById("shortcuts")?.remove();
+  const dialog = document.createElement("dialog");
+  dialog.id = "shortcuts";
+  const column = (title, shortcuts) => `<div><h3>${title}</h3>` + shortcuts.map(([ key, text ]) =>
+    `<div class='field'><span><kbd>${key}</kbd></span><div>${text}</div></div>`).join("") + "</div>";
+  // laid out like the other dialogs: a heading, a field per shortcut, and a button that closes.
+  // The editor is a page of its own, which is created after the page in some views
+  const editor = document.querySelector(".content .cm-editor, .content #editor");
+  dialog.innerHTML = "<form method='dialog'><h2>Keyboard Shortcuts</h2>" +
+    `<div class='${editor ? "field-columns" : ""}'>${column("Page", PAGE_SHORTCUTS)}` +
+    (editor ? column("Editor", [ EDITOR_SHORTCUTS[0], ..._editor_shortcuts,
+      ...EDITOR_SHORTCUTS.slice(1) ]) : "") +
+    "</div><div class='buttons'><button>Close</button></div></form>";
+  document.body.append(dialog);
+  dialog.showModal();
 }
 
 /**
@@ -1127,6 +1559,9 @@ function ready() {
   // statically rendered tables are not marked by their own code
   markTruncated();
   document.addEventListener("keydown", shortcuts);
+  document.getElementById("confirm-dialog")?.addEventListener("keydown", answerKey);
+  // the labels of the buttons are complete once the page is parsed
+  hintShortcuts(document.body);
   document.getElementById("info")?.addEventListener("click", jumpToError);
   initLive();
 }

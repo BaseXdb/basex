@@ -58,21 +58,8 @@ function dba:settings() as element(html) {
   let $panel := fn($contents, $options as html:panel-options) {
     html:panel($contents, $options but with { 'divider': true() })
   }
+  (: the options of the server are shown first, the settings of the DBA last :)
   return (
-    $panel(
-      <form method='post' autocomplete='off'>{
-        html:heading('Settings', form:button('settings/save', 'Save')),
-        <h3>Queries</h3>,
-        $number($config:TIMEOUT, 'Timeout, in seconds (0 = disabled)', ()),
-        $number($config:MEMORY, 'Memory limit, in MB (0 = disabled)', ()),
-        $number($config:MAXCHARS, 'Maximum output size', ()),
-        $option($config:PERMISSION, $config:PERMISSIONS, 'Permission'),
-        <h3>Tables</h3>,
-        $number($config:MAXROWS, 'Displayed table rows', ()),
-        <h3>Live Views</h3>,
-        $number($config:INTERVAL, 'Delay between requests, in seconds', (1, 10))
-      }</form>,
-      { 'label': 'Settings' }),
     $panel(
       <form method='post' autocomplete='off'>{
         html:heading('Global Options', form:button('settings/gc', 'GC')),
@@ -86,11 +73,23 @@ function dba:settings() as element(html) {
     $panel((
       <h2>Environment Variables</h2>,
       $map-table(map:build(available-environment-variables(), value := environment-variable#1))
-    ), { 'label': 'Environment Variables', 'collapsed': true() }),
+    ), { 'label': 'Environment Variables' }),
     $panel((
       <h2>System Properties</h2>,
       $map-table(proc:property-map())
-    ), { 'label': 'System Properties', 'collapsed': true() })
+    ), { 'label': 'System Properties' }),
+    $panel(
+      <form method='post' autocomplete='off'>{
+        html:heading('Settings', form:button('settings/save', 'Save')),
+        <h3>Queries</h3>,
+        $number($config:TIMEOUT, 'Timeout, in seconds (0 = disabled)', ()),
+        $number($config:MEMORY, 'Memory limit, in MB (0 = disabled)', ()),
+        $number($config:MAXCHARS, 'Maximum output size', ()),
+        $option($config:PERMISSION, $config:PERMISSIONS, 'Permission'),
+        <h3>Live Views</h3>,
+        $number($config:INTERVAL, 'Delay between requests, in seconds', (1, 10))
+      }</form>,
+      { 'label': 'Settings' })
   ) => html:wrap({
     'header': $dba:CAT, 'rows': '1fr'
   })

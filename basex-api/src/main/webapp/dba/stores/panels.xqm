@@ -22,7 +22,7 @@ declare %private variable $panels:PREVIEW := 100;
 (:~
  : Creates the contents of the stores panel: the stores to choose from, and what they hold.
  : @param  $sort  sort key of the store list
- : @param  $page  current page of the store list
+ : @param  $page  number of shown pages of the store list
  : @param  $name  selected store
  : @return panel contents
  :)
@@ -39,12 +39,13 @@ declare function panels:stores(
   return <form method='post' autocomplete='off' data-sort='{ $sort }' data-page='{ $page }'>
     {
       let $headers := (
-        { 'key': 'label', 'label': 'Name', 'type': 'dynamic', 'width': '28%' },
+        (: the values of a known format get the width they need; the name takes the rest :)
+        { 'key': 'label', 'label': 'Name', 'type': 'dynamic' },
         { 'key': 'entries', 'label': 'Count', 'type': 'number', 'order': 'desc',
-          'width': '20%' },
-        { 'key': 'size', 'label': 'Size', 'type': 'bytes', 'order': 'desc', 'width': '16%' },
+          'width': '4rem' },
+        { 'key': 'size', 'label': 'Size', 'type': 'bytes', 'order': 'desc', 'width': '4.75rem' },
         { 'key': 'modified', 'label': 'Date', 'type': 'dateTime', 'order': 'desc',
-          'width': '30%' }
+          'width': '5.75rem' }
       )
       let $entries :=
         for $store in utils:slice($names, $page, $sort)
@@ -84,7 +85,7 @@ declare function panels:stores(
  : @param  $name      selected store
  : @param  $path      path of the level; its first step is the key of an entry
  : @param  $sort      sort key of the child list
- : @param  $page      current page of the child list
+ : @param  $page      number of shown pages of the child list
  : @param  $selected  child that is looked at
  : @return panel contents
  :)

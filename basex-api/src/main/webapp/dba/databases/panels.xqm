@@ -18,7 +18,7 @@ declare %private variable $panels:CAT := 'databases';
  : Creates the contents of the databases panel: the databases to choose from, and the backups
  : that belong to no database of their own.
  : @param  $sort  sort key of the database list
- : @param  $page  current page of the database list
+ : @param  $page  number of shown pages of the database list
  : @param  $name  selected database
  : @return panel contents
  :)
@@ -33,14 +33,13 @@ declare function panels:databases(
     <form method='post' autocomplete='off' data-sort='{ $sort }' data-page='{ $page }'>
       {
         let $headers := (
-          (: the date is the longest value of a known length, and the count needs room for its
-             header and sort arrow; the name gives up what it does not need :)
-          { 'key': 'name', 'label': 'Name', 'type': 'dynamic', 'width': '35%' },
+          (: the values of a known format get the width they need; the name takes the rest :)
+          { 'key': 'name', 'label': 'Name', 'type': 'dynamic' },
           { 'key': 'resources', 'label': 'Count', 'type': 'number', 'order': 'desc',
-            'width': '18%' },
-          { 'key': 'size', 'label': 'Size', 'type': 'bytes', 'order': 'desc', 'width': '16%' },
+            'width': '4rem' },
+          { 'key': 'size', 'label': 'Size', 'type': 'bytes', 'order': 'desc', 'width': '4.75rem' },
           { 'key': 'date', 'label': 'Date', 'type': 'dateTime', 'order': 'desc',
-            'width': '31%' }
+            'width': '5.75rem' }
         )
         let $databases :=
           for $db in utils:slice(db:list-details(), $page, $sort)
@@ -108,7 +107,7 @@ declare function panels:databases(
  : and the index configuration that its next optimization applies.
  : @param  $name      selected database
  : @param  $sort      sort key of the resource list
- : @param  $page      current page of the resource list
+ : @param  $page      number of shown pages of the resource list
  : @param  $resource  selected resource
  : @param  $dir       directory that is listed; empty string for the root of the database
  : @param  $filter    filter for the resource paths; empty string to list the directory
@@ -142,7 +141,7 @@ declare function panels:database(
  : Creates the list of one level of a database, or of what a filter finds in it.
  : @param  $name      database
  : @param  $sort      table sort key
- : @param  $page      current page
+ : @param  $page      number of shown pages
  : @param  $resource  selected resource
  : @param  $dir       shown directory
  : @param  $filter    resource filter
@@ -160,11 +159,12 @@ declare %private function panels:resource-list(
     <input type='hidden' name='name' value='{ $name }'/>
     {
       let $headers := (
-        { 'key': 'name', 'label': 'Name', 'type': 'dynamic', 'width': '47%' },
-        { 'key': 'type', 'label': 'Type', 'width': '10%' },
-        { 'key': 'size', 'label': 'Size', 'type': 'number', 'order': 'desc', 'width': '14%' },
+        (: the values of a known format get the width they need; the name takes the rest :)
+        { 'key': 'name', 'label': 'Name', 'type': 'dynamic' },
+        { 'key': 'type', 'label': 'Type', 'width': '3.5rem' },
+        { 'key': 'size', 'label': 'Size', 'type': 'number', 'order': 'desc', 'width': '4.5rem' },
         { 'key': 'date', 'label': 'Date', 'type': 'dateTime', 'order': 'desc',
-          'width': '29%' }
+          'width': '5.75rem' }
       )
       (: one level of the database, directories first; a level is what a database of many
          resources is browsed by, and what its total is counted over. A filter looks past the
@@ -376,7 +376,7 @@ declare function panels:index-type(
  : @param  $index   index that is listed
  : @param  $prefix  prefix of the entries to be listed
  : @param  $sort    sort key of the entry list
- : @param  $page    current page of the entry list
+ : @param  $page    number of shown pages of the entry list
  : @return panel contents; empty if no existing database is selected
  :)
 declare function panels:index(
@@ -431,7 +431,7 @@ declare function panels:index(
         return try {
           let $entries := $type?entries($name, $prefix)
           (: one entry more than the page needs: it is what tells that there are further ones :)
-          let $max := config:get($config:MAXROWS) * $page + 1
+          let $max := $config:ROWS * $page + 1
           let $shown := subsequence($entries, 1, $max)
           let $note := <div class='note'>{
             'More entries exist; supply a prefix to narrow the list.'

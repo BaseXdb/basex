@@ -30,13 +30,14 @@ function dba:workspace() as element(html) {
       <form class='toolbar' autocomplete='off' action='javascript:void(0);'>
         <div>
           { (: files are opened in the file panel and named by their tab :) }
-          <button type='button' onclick='newFile()' title='Open an empty tab'>New</button>
-          <button id='save' disabled='' onclick='saveFile()'>Save</button>
+          <button type='button' onclick='newFile()' title='Open an empty tab (Alt+N)'>New</button>
+          <button id='save' disabled='' onclick='saveFile()'
+                  title='Save the file (Alt+S, Ctrl+S)'>Save</button>
           <button id='saveas' disabled='' onclick='saveFile(true)'
-                  title='Save under another name'>Save as…</button>
+                  title='Save under another name (Alt+Shift+S, Ctrl+Shift+S)'>Save as…</button>
         </div>
         <div>
-          <button id='run' onclick='runQuery()' title='Ctrl-Enter'>Run</button>
+          <button id='run' onclick='runQuery()' title='Run the query (Alt+Enter, Ctrl+Enter)'>Run</button>
           <button id='stop' onclick='stopQuery()' disabled=''>Stop</button>
           <button type='button' id='job' onclick='openJob(event)' disabled=''
                   title='Show the running query in the job view (Ctrl: new tab)'>Job</button>

@@ -371,9 +371,9 @@ declare function utils:job-options(
 };
 
 (:~
- : Returns the entries to be shown on the current page.
+ : Returns the entries of the shown pages.
  : @param  $entries  all entries
- : @param  $page     current page
+ : @param  $page     number of shown pages
  : @param  $sort     sort key
  : @return entries to display
  :)
@@ -382,11 +382,10 @@ declare function utils:slice(
   $page     as xs:integer,
   $sort     as xs:string
 ) as item()* {
-  (: while a table is being sorted, all entries are returned: sorting and paging are then
+  (: while a table is being sorted, all entries are returned: sorting and slicing are then
      performed by the table itself :)
   if ($page and not($sort)) then (
-    let $max := config:get($config:MAXROWS)
-    return subsequence($entries, ($page - 1) * $max + 1, $max)
+    subsequence($entries, 1, min(($page * $config:ROWS, $config:MAX-SHOWN)))
   ) else (
     $entries
   )

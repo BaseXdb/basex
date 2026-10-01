@@ -58,9 +58,10 @@ function showActivity(json) {
     }
     // every panel is named by the block it is filled into; what was ticked in the meantime is
     // ticked again by fillPanel
+    // a panel that has not changed is left alone, along with what is pointed at in it
     for(const [ id, html ] of Object.entries(json.panels)) {
       const pane = document.getElementById(id);
-      if(pane) {
+      if(pane && _filled.get(pane) !== html) {
         // rows are named by what they list: a name that was not shown before marks a new entry
         const ids = new Set([ ...pane.querySelectorAll("tr[id]") ].map(row => row.id));
         fillPanel(id, html);

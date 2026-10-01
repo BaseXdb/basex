@@ -26,10 +26,13 @@ declare variable $config:VIEWS := (
   'workspace', 'databases', 'stores', 'users', 'logs', 'activity', 'settings'
 );
 
+(:~ Number of entries that a table shows at once. :)
+declare variable $config:ROWS := 100;
+(:~ Maximum number of entries that a table shows by asking for more. :)
+declare variable $config:MAX-SHOWN := 10_000;
+
 (:~ Maximum length of XML characters. :)
 declare variable $config:MAXCHARS := 'maxchars';
-(:~ Maximum number of table entries. :)
-declare variable $config:MAXROWS := 'maxrows';
 (:~ Query timeout. :)
 declare variable $config:TIMEOUT := 'timeout';
 (:~ Maximal memory consumption. :)
@@ -45,7 +48,6 @@ declare %private variable $config:OPTIONS-FILE := $config:DBA-DIR || '.dba.xml';
 (:~ Default options. :)
 declare %private variable $config:DEFAULTS := {
   $config:MAXCHARS   : 1_000_000,
-  $config:MAXROWS    : 100,
   $config:TIMEOUT    : 60,
   $config:MEMORY     : 8_000,
   $config:PERMISSION : 'admin',

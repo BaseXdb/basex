@@ -679,12 +679,51 @@ _handlers[WORKSPACE_WS] = json => {
 };
 
 /**
+ * Handles the keyboard shortcuts of the view, which also work while the editor is focused.
+ * @param {Event} event keydown event
+ */
+function workspaceKeys(event) {
+  if(dialogOpen()) return;
+  const key = event.key.toLowerCase();
+  const ctrl = event.ctrlKey || event.metaKey;
+  // Alt is the key of all actions of the view; Ctrl+S and Ctrl+Enter are known from elsewhere
+  let action;
+  if((ctrl || event.altKey) && !(ctrl && event.altKey) && key === "s") {
+    // the browser must not offer to save the page, whether or not there is anything to save
+    action = () => document.getElementById(event.shiftKey ? "saveas" : "save").click();
+  } else if(event.altKey && !ctrl && key === "enter") {
+    action = runQuery;
+  } else if(event.altKey && !ctrl && key === "n") {
+    action = newFile;
+  } else if(event.altKey && !ctrl && key === "w") {
+    action = () => closeTab(_tab);
+  } else if(event.altKey && !ctrl && (key === "pageup" || key === "pagedown")) {
+    action = () => selectTab(_tab + (key === "pagedown" ? 1 : -1));
+  }
+  if(action) {
+    event.preventDefault();
+    action();
+  }
+}
+
+/** The shortcuts of the view, as the overview of the shortcuts lists them. */
+_editor_shortcuts.push(
+  [ "Alt+Enter", "Run the query (also Ctrl+Enter)" ],
+  [ "Alt+S", "Save (also Ctrl+S)" ],
+  [ "Alt+Shift+S", "Save as… (also Ctrl+Shift+S)" ],
+  [ "Alt+N", "Open an empty tab" ],
+  [ "Alt+W", "Close the tab" ],
+  [ "Alt+PgUp/PgDn", "Show the previous or next tab" ]
+);
+
+/**
  * Prepares the view: the editors, the draggable splits, the file panel, and the documents that
  * were left open. A deep link names the directory and the file it refers to; both are adopted,
  * so that following it and reloading the page show the same.
  */
 function initWorkspace() {
   loadCodeMirror("xquery", true, "fill");
+  document.addEventListener("keydown", workspaceKeys);
 
   // opened before the resizers are set up: they measure the rows of the grid
   document.getElementById("query-info").checked = queryInfoOn();

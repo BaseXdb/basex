@@ -24,7 +24,7 @@ function logEntries(key) {
     [ document.getElementById("date").value ];
   // the filter fields belong to the rendered table, so they are missing until the first
   // result arrives; empty ones must not count, or the first key press after a search
-  // would look like a new search and would jump back to page 1. Before that, the stored ones
+  // would look like a new search. Before that, the stored ones
   // are sent, and the server renders them into the fields
   const typed = filters.length ?
     [ ...filters ].map(f => [ f.name, f.value.trim() ]).filter(([ , value ]) => value) :
@@ -35,6 +35,8 @@ function logEntries(key) {
   const state = JSON.stringify([ input, ignore, dates, typed ]);
   if(reset && _logInput === state) return false;
   _logInput = state;
+  // a new search or filter starts at the top
+  if(reset) _toTop.add("output");
 
   // a range of files is not reloaded every second: the live refresh follows a single file
   _logFiles = dates.length;
@@ -50,7 +52,8 @@ function logEntries(key) {
     ignore: ignore,
     dates: dates,
     sort: document.getElementById("sort").value,
-    page: reset ? 1 : Number(document.getElementById("page").value) || 1,
+    // a new search or filter keeps the number of entries that are shown
+    page: Number(document.getElementById("page").value) || 1,
     time: document.getElementById("time").value,
     // the fields are named after the columns they filter, with a prefix of their own
     filters: Object.fromEntries(typed.map(([ name, value ]) => [ name.replace(/^f-/, ""), value ]))
@@ -64,8 +67,10 @@ function logEntries(key) {
   });
 
   // refresh browser history, so that a reload shows what the page shows
+  // the number of shown pages is not kept: a reload starts with the first one, unless an entry
+  // that was jumped to has to be shown again
   window.history.replaceState(null, "", replaceParams(window.location.href,
-    { input: input, page: message.page, sort: message.sort }));
+    { input: input, page: message.time ? message.page : "", sort: message.sort }));
 }
 
 /**
@@ -79,6 +84,7 @@ function showLogEntries(text) {
   // focus and the caret
   refocus(() => {
     output.innerHTML = text;
+    if(_toTop.delete("output")) output.closest(".pane")?.scrollTo(0, 0);
     markTruncated(output);
     // a range of files is not reloaded: the live refresh follows a single file
     scheduleLive(() => logEntries(), liveOn() && _logFiles === 1);

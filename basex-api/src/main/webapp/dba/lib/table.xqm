@@ -116,7 +116,7 @@ declare function table:properties(
  :   * 'select': key of the entry value that the checkboxes submit; by default, the value that
  :     the first column shows
  :   * 'presort': key of pre-sorted column; if identical to sort, entries will not be resorted
- :   * 'page': currently displayed page
+ :   * 'page': number of pages that are shown; a link below the table shows one more
  :   * 'count': maximum number of results
  :   * 'filters': table row with filter fields, displayed below the header row
  :   * 'all': list all entries, ignoring the maximum number of table entries
@@ -174,14 +174,13 @@ declare function table:create(
   let $max-option := if ($options?all) then (
     max((count($sorted-entries), 1))
   ) else (
-    config:get($config:MAXROWS)
+    $config:ROWS
   )
   let $count-option := $options?count[not($sort)]
-  let $page-option := $options?page
-
+  let $page := max(($options?page, 1))
   let $entries := $count-option otherwise count($sorted-entries)
-  let $last-page := ($entries - 1) idiv $max-option + 1
-  let $curr-page := min((max(($page-option, 1)), $last-page))
+  (: the entries of the shown pages, but not more than a table is meant to hold :)
+  let $last := min(($page * $max-option, $entries, $config:MAX-SHOWN[not($options?all)]))
 
   (: everything above the table :)
   let $head := (
@@ -199,27 +198,7 @@ declare function table:create(
       $entries,
       utils:capitalize(utils:plural($entries, 'entry')),
 
-      if ($page-option and $last-page != 1) {
-        '(Page: ',
-        let $pages := sort(distinct-values((
-          1,
-          $curr-page - $last-page idiv 10,
-          $curr-page - 1,
-          $curr-page,
-          $curr-page + 1,
-          $curr-page + $last-page idiv 10,
-          $last-page
-        ))[. >= 1 and . <= $last-page])
-        for $page at $pos in $pages
-        let $suffix := (if ($page = $last-page) then ')' else ' ') ||
-          ' … '[$pages[$pos + 1] > $page + 1]
-        return if ($curr-page = $page) then (
-          $page || $suffix
-        ) else (
-          html:link(string($page), '', ($params, { 'page': $page, 'sort': $sort })),
-          $suffix
-        )
-      }
+      <span class='range'>{ $last } shown</span>[$last < $entries]
     }
   )
   return (
@@ -231,74 +210,90 @@ declare function table:create(
     ),
 
     (: list of results :)
-    let $shown-entries := if ($count-option) then (
-      $sorted-entries
-    ) else (
-      let $first := ($curr-page - 1) * $max-option + 1
-      return $sorted-entries[position() >= $first][position() <= $max-option + 1]
-    )
+    let $shown-entries := $sorted-entries[position() <= $last]
     where exists($shown-entries) or exists($options?filters)
     let $fixed := some $header in $headers satisfies $header?width
     let $table := element table {
       attribute class { 'fixed' }[$fixed],
-      element tr {
-        for $header at $pos in $headers
-        let $name := $header?key
-        let $label := upper-case($header?label)
-        return element th {
-          attribute class { 'num' }[$header?type = $table:NUMBER],
-          attribute style { 'width: ' || $header?width }[$header?width],
+      (: the header and the filters stay in view while the entries scroll :)
+      element thead {
+        element tr {
+          for $header at $pos in $headers
+          let $name := $header?key
+          let $label := upper-case($header?label)
+          return element th {
+            attribute class { 'num' }[$header?type = $table:NUMBER],
+            attribute style { 'width: ' || $header?width }[$header?width],
 
-          if ($pos = 1 and $buttons) {
-            <input type='checkbox' onclick='toggle(this)'/>, ' '
-          },
+            if ($pos = 1 and $buttons) {
+              <input type='checkbox' onclick='toggle(this)'/>, ' '
+            },
 
-          if (empty($sort) or $name = $sort or not($label)) then (
-            (: sorted column, xml column, and a column with no label to click: only the label :)
-            $label
-          ) else (
-            (: generate sort link :)
-            html:link($label, '', ($params, { 'sort': $name }))
-          )
-        }
+            if (empty($sort) or $name = $sort or not($label)) then (
+              (: sorted column, xml column, and a column with no label to click: only the label :)
+              $label
+            ) else (
+              (: generate sort link :)
+              html:link($label, '', ($params, { 'sort': $name }))
+            )
+          }
+        },
+        $options?filters
       },
-      $options?filters,
 
-      for $entry in $shown-entries[position() <= $max-option]
-      return element tr {
-        $entry?id ! attribute id { . },
-        for $header at $pos in $headers
-        let $name := $header?key
-        let $type := $header?type
+      element tbody {
+        for $entry in $shown-entries
+        return element tr {
+          $entry?id ! attribute id { . },
+          for $header at $pos in $headers
+          let $name := $header?key
+          let $type := $header?type
 
-        (: format value :)
-        let $v := $entry?$name
-        let $format := $table:TYPES?$type?format
-        let $value := try {
-          if (exists($format)) then (
-            $format($v)
-          ) else if ($v instance of fn(*)) then (
-            (: a cell that a function produces is what it returns :)
-            $v()
-          ) else (
-            string($v)
-          )
-        } catch * {
-          $err:description
-        }
-        return element td {
-          attribute class { 'num' }[$type = $table:NUMBER],
-          if ($pos = 1 and $buttons) {
-            <input type='checkbox' name='{ $select otherwise $name }'
-              value='{ if ($select) then $entry?$select else data($value) }'
-              onclick='buttons(this)'/>,
-            ' '
-          },
-          $value
+          (: format value :)
+          let $v := $entry?$name
+          let $format := $table:TYPES?$type?format
+          let $value := try {
+            if (exists($format)) then (
+              $format($v)
+            ) else if ($v instance of fn(*)) then (
+              (: a cell that a function produces is what it returns :)
+              $v()
+            ) else (
+              string($v)
+            )
+          } catch * {
+            $err:description
+          }
+          return element td {
+            attribute class { 'num' }[$type = $table:NUMBER],
+            if ($pos = 1 and $buttons) {
+              <input type='checkbox' name='{ $select otherwise $name }'
+                value='{ if ($select) then $entry?$select else data($value) }'
+                onclick='buttons(this)'/>,
+              ' '
+            },
+            $value
+          }
         }
       }
     }
-    (: horizontal scroll on narrow screens :)
-    return element div { attribute class { 'scroll' }, $table }
+    return (
+      (: horizontal scroll on narrow screens :)
+      element div { attribute class { 'scroll' }, $table },
+      (: entries that follow are shown by asking for the next page, up to the limit :)
+      if ($last < $entries) {
+        if ($last < $config:MAX-SHOWN) then (
+          (: an empty link, followed as soon as it is scrolled to; see js.js :)
+          <div class='more'>{
+            html:link('', '', ($params, { 'page': $page + 1, 'sort': $sort }))
+          }</div>
+        ) else (
+          <div class='note'>{
+            ``[Only the first `{ format-integer($last, '#,##0') }` entries are shown. ]``,
+            'Use a filter to narrow the list.'
+          }</div>
+        )
+      }
+    )
   )
 };

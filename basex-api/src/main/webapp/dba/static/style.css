@@ -27,9 +27,14 @@
   --strong: #333;
   --border: #AAA;
   --border-light: #DDD;
-  --pre-bg: #F8F8F8;
-  /* table rows that belong to the session that is pointed at, and rows added by a refresh */
-  --row-related: #EEE;
+  /* the face of code, buttons and strips, and of what is pointed at */
+  --shade: #F8F8F8;
+  --shade-hover: #EEE;
+  /* the rule below a heading or a table header, as on docs.basex.org */
+  --rule: #C66;
+  /* a table row that is selected */
+  --row-selected: #FBEDED;
+  /* a table row that was added by a refresh */
   --row-added: #E3F3E3;
   --info: #090;
   --warning: #999;
@@ -45,8 +50,10 @@
     --strong: #ccc;
     --border: #555;
     --border-light: #444;
-    --pre-bg: #2a2a2a;
-    --row-related: #333;
+    --shade: #2a2a2a;
+    --shade-hover: #333;
+    --rule: #844;
+    --row-selected: #3a2526;
     --row-added: #253a25;
     --info: #6c6;
   }
@@ -56,6 +63,13 @@
    built on percentages and grid tracks, which the default box model would overflow */
 *, *::before, *::after {
   box-sizing: border-box;
+}
+
+/* many panels scroll side by side: thin scrollbars in the colour of the borders keep them calm.
+   The probe of measureScrollbar is subject to the rule as well, so its width stays right */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
 }
 
 body {
@@ -103,7 +117,7 @@ h1 {
 
 h2 {
   font-size: 150%;
-  color: var(--accent);
+  color: var(--accent-strong);
   margin: 0 0 .2rem 0;
 }
 
@@ -116,15 +130,71 @@ h3 {
 
 table {
   table-layout: fixed;
+  /* the cells own their lines, so that the lines of a pinned header move along with it; as
+     every cell draws a bottom line only, none of them doubles up */
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
+/* the header and the filters of a list stay in view while the entries scroll, right below what
+   is pinned above them; js.js measures its height */
+thead {
+  position: sticky;
+  top: var(--sticky-height, 0);
+  z-index: 1;
+  background-color: var(--bg);
+}
+
+/* lines between the rows, and a stronger one below the header, as on docs.basex.org */
 th, td {
   vertical-align: top;
-  padding: 0 var(--gap) 0 0;
+  padding: 1px var(--gap) 1px 0;
+  border-bottom: var(--line) solid var(--border-light);
 }
 
 th {
   text-align: left;
+  border-bottom-color: var(--rule);
+}
+
+/* the row that is pointed at, and the rows that are selected */
+tr:has(> td):not(:has(input.filter)):hover {
+  background-color: var(--shade);
+}
+/* the rows that belong to the web session that is pointed at, in all panels */
+tr.related {
+  background-color: var(--shade-hover);
+}
+tr:has(> td input[type=checkbox]:checked) {
+  background-color: var(--row-selected);
+}
+
+/* checkboxes share the border and the corners of buttons and fields; a checked box is filled with
+   the accent and carries a white tick */
+input[type=checkbox] {
+  appearance: none;
+  width: 13px;
+  height: 13px;
+  margin: 0 5px 0 0;
+  vertical-align: -1px;
+  border: var(--line) solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg) center / 9px no-repeat;
+  cursor: pointer;
+  /* the focus is marked inside the box: a ring outside would be clipped by a panel that scrolls */
+  outline: none;
+  &:hover:not(:disabled) {
+    border-color: var(--rule);
+  }
+  &:checked {
+    border-color: var(--accent);
+    background-color: var(--accent);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M1.5 5.2 4 7.5 8.5 2.5' fill='none' stroke='%23fff' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  }
+}
+/* outside the rows of a table, a list of options gets some air between its lines */
+label:has(> input[type=checkbox]) {
+  line-height: 1.4;
 }
 
 /* a checkbox and the value beside it belong on one line: a column that is sized by its content
@@ -153,7 +223,7 @@ td {
   right: calc((var(--gap) + var(--resizer)) / -2);
   width: var(--resizer);
   height: 100%;
-  cursor: col-resize;
+  cursor: e-resize;
 }
 
 .resizer-row {
@@ -161,7 +231,7 @@ td {
   bottom: calc((var(--gap) + var(--resizer)) / -2);
   height: var(--resizer);
   width: 100%;
-  cursor: row-resize;
+  cursor: n-resize;
 }
 
 /* strip of open documents above the editor; scrolls rather than wrapping, so the editor
@@ -188,7 +258,7 @@ td {
   border: var(--line) solid var(--border-light);
   border-bottom: none;
   border-radius: var(--radius) var(--radius) 0 0;
-  background: transparent;
+  background: var(--shade);
   color: var(--muted);
   /* a tab is a button or a heading: both have the same height */
   font-family: inherit;
@@ -202,10 +272,16 @@ td {
   font-size: 92%;
   white-space: nowrap;
 }
+button.tab:not(.active):hover {
+  background: var(--shade-hover);
+  cursor: pointer;
+}
+/* the active tab joins the editor below it, and is marked by a bar in the colour of the rules */
 .tabs .tab.active {
   border-color: var(--border);
   background: var(--bg);
   color: var(--fg);
+  box-shadow: inset 0 2px var(--rule);
 }
 .tabs .close {
   margin-left: .4rem;
@@ -271,7 +347,7 @@ code {
 }
 
 pre {
-  background-color: var(--pre-bg);
+  background-color: var(--shade);
   padding: .5rem;
   margin: .2rem 0 .5rem 0;
 }
@@ -289,31 +365,97 @@ textarea:not([rows]) {
   height: 200px;
 }
 
-textarea, input[type=text], input[type=password], input[type=number], select, button {
+textarea, input[type=text], input[type=password], input[type=number], select, button,
+input[type=file]::file-selector-button {
   border: var(--line) solid var(--border);
   border-radius: var(--radius);
   outline: none;
 }
 
 /* a button label is never broken over two lines */
-button {
+button, input[type=file]::file-selector-button {
+  padding: 4px 8px;
   white-space: nowrap;
 }
 
+/* fields are written in the face of the page, as buttons are */
 input[type=text], input[type=password], input[type=number], select {
   padding: 4px;
   width: 200px;
-  /* entry fields keep themed colours; buttons stay native so disabled greys out */
   background-color: var(--bg);
   color: var(--fg);
+  font: inherit;
 }
 
-button {
-  padding: 4px 8px;
+/* a selection is drawn like a field, with a chevron instead of the native arrow */
+select {
+  appearance: none;
+  padding-right: 22px;
+  background: var(--bg) right 7px center / 9px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23888' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  cursor: pointer;
 }
 
-input:focus, select:focus, button:focus {
-  outline: .5px solid var(--fg);
+/* buttons, and the one of a file chooser, share the flat face of the code buttons on
+   docs.basex.org; the link-like, the folding and the tab buttons bring their own */
+button:not(.link, .collapse, .tab, .close), input[type=file]::file-selector-button {
+  background-color: var(--shade);
+  color: var(--fg);
+  font: inherit;
+  cursor: pointer;
+}
+button:not(.link, .collapse, .tab, .close):hover:not(:disabled),
+input[type=file]::file-selector-button:hover {
+  background-color: var(--shade-hover);
+}
+:is(button, input[type=checkbox]):disabled {
+  opacity: .5;
+  cursor: default;
+}
+
+/* the focus is marked inside the border: a ring outside would be clipped by a panel that scrolls */
+:is(input:not([type=checkbox]), select, textarea):focus {
+  border-color: var(--rule);
+  box-shadow: inset 0 0 0 .5px var(--rule);
+}
+:is(button, input[type=checkbox]):focus-visible {
+  border-color: var(--fg);
+  box-shadow: inset 0 0 0 .5px var(--fg);
+}
+/* a link is tinted instead, as a table cell clips what sticks out of it */
+a:focus-visible {
+  outline: none;
+  border-radius: 2px;
+  background-color: color-mix(in srgb, var(--accent) 15%, transparent);
+  text-decoration: underline;
+}
+/* whatever else takes the focus, such as a pane that scrolls, is ringed inside its own box */
+:focus-visible {
+  outline-offset: -2px;
+}
+
+/* the table row that is chosen with the arrow keys; it scrolls into view below the pinned
+   header of its table */
+tr.current {
+  background-color: var(--shade-hover);
+  box-shadow: inset 2px 0 var(--rule);
+}
+tbody tr {
+  scroll-margin-top: calc(var(--sticky-height, 0px) + 3.5rem);
+}
+
+/* a key, as the overview of the keyboard shortcuts names it */
+kbd {
+  font-family: var(--mono);
+  font-size: 85%;
+  padding: 0 .3rem;
+  border: var(--line) solid var(--border);
+  border-radius: var(--radius);
+  background-color: var(--shade);
+}
+
+/* what reacts to the pointer changes its shade softly */
+button, tr, input[type=checkbox], input[type=file]::file-selector-button {
+  transition: background-color .1s, border-color .1s;
 }
 
 hr {
@@ -363,10 +505,6 @@ table.fixed th, table.fixed td {
 table.fixed td.expanded {
   white-space: normal;
   overflow-wrap: anywhere;
-}
-/* the rows that belong to the web session that is pointed at, in all panels */
-tr.related {
-  background-color: var(--row-related);
 }
 /* a row that a refresh added fades in: what happened is seen without comparing tables */
 tr.added > td {
@@ -486,6 +624,11 @@ header {
 .scroll {
   overflow-x: auto;
 }
+/* a panel that scrolls on its own scrolls sideways as well; the wrapper would otherwise be the
+   box that the header of its table is pinned to */
+.content.fill .pane .scroll {
+  overflow: visible;
+}
 
 /* one line, clipped where it does not fit: a status message and a panel heading must not
    push their neighbours out of the row they share, and a tab must not grow with its name */
@@ -496,6 +639,32 @@ header {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
+}
+
+/* how many of the entries of a long list are shown, after the number of entries */
+.range {
+  margin-left: .6rem;
+  font-size: 85%;
+  font-weight: normal;
+  color: var(--muted);
+}
+
+/* the empty link below a list that loads the entries that follow, as soon as it is in view */
+.more a {
+  display: block;
+  height: 1px;
+}
+
+/* logs: a failed request is set off as a badge, so that it stands out in a long list */
+.log-failed {
+  color: var(--accent-strong);
+}
+
+/* a panel that was asked for again is faded until it arrives. The fade sets in late, so that a
+   quick answer does not flicker, and is undone at once */
+.loading {
+  opacity: .5;
+  transition: opacity .2s .2s;
 }
 
 /* the three states of a status message: told apart by their colour, and by a glyph, so that
@@ -510,6 +679,16 @@ header {
 .info::before    { content: "\2713\00a0"; }
 .warning::before { content: "\21bb\00a0"; }
 .error::before   { content: "\2717\00a0"; }
+
+/* a badge, tinted with its own colour: the message of the header, and a failed request in the
+   logs. It keeps the height of the line, so that it does not shift the header, and the tint
+   sets it off, so that it needs no bold face */
+#info:is(.info, .warning, .error), .log-failed {
+  padding: 0 .4rem;
+  border-radius: var(--radius);
+  background-color: color-mix(in srgb, currentColor 12%, transparent);
+  font-weight: normal;
+}
 
 .note {
   color: var(--muted);
@@ -562,6 +741,33 @@ header {
 }
 #run-info.failed {
   color: var(--accent);
+}
+
+/* code editors are framed like the code boxes on docs.basex.org. The theme is injected after
+   this stylesheet: the rules are one class more specific than the theme's, so that they win */
+body .cm-editor {
+  border: var(--line) solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+/* the theme rings a focused editor in cyan, a colour that is used nowhere else */
+body .cm-editor.cm-focused {
+  outline: none;
+  box-shadow: none;
+  border-color: var(--rule);
+}
+.cm-editor .cm-scroller {
+  font-family: var(--mono);
+}
+/* the gutter is set apart by its shade; a second line next to the frame is not needed */
+.cm-editor .cm-gutters {
+  background-color: var(--shade);
+  border-right: var(--line) solid var(--border-light);
+  color: var(--muted);
+}
+.cm-editor .cm-activeLineGutter {
+  background-color: var(--shade-hover);
+  color: var(--fg);
 }
 
 /* hint over the result area before the first run; the empty editor shows no line numbers */
@@ -620,6 +826,10 @@ input.query {
 .sticky > :last-child {
   margin-bottom: 0;
 }
+/* nor is a margin above it: it would leave the head, which then moves before it is pinned */
+.sticky > :first-child {
+  margin-top: 0;
+}
 
 /* the heading names a database or a path; what can be done with it starts its own line */
 #database-panel h2, #resource-panel > h2 {
@@ -634,15 +844,22 @@ input.query {
 /* modal dialog: a form with more fields than a prompt can ask for */
 dialog {
   border: var(--line) solid var(--border);
-  border-radius: var(--radius);
+  border-radius: calc(var(--radius) * 2);
   background-color: var(--bg);
   color: var(--fg);
-  padding: var(--gap);
+  padding: calc(var(--gap) * 1.25);
   max-width: min(90vw, 32rem);
   max-height: 85vh;
+  box-shadow: 0 4px 16px rgb(0 0 0 / 12%);
+}
+/* the title of a dialog is underlined like the headings on docs.basex.org */
+dialog h2 {
+  padding-bottom: .2rem;
+  border-bottom: var(--line) solid var(--rule);
+  margin-bottom: var(--space);
 }
 dialog::backdrop {
-  background-color: rgb(0 0 0 / 40%);
+  background-color: rgb(0 0 0 / 15%);
 }
 /* the row that closes the dialog: set apart from the fields, and where a dialog ends */
 dialog .buttons {
@@ -790,6 +1007,8 @@ body:has(.content.fill) main {
   display: grid;
   grid-template-columns: max-content 1fr;
   column-gap: var(--gap);
+  /* a group that is stretched, e.g. next to a longer one, keeps its rows at their height */
+  align-content: start;
 }
 
 /* what is not a field spans both columns */
@@ -833,6 +1052,10 @@ body:has(.content.fill) main {
 dialog:has(.field-columns) {
   max-width: min(90vw, 48rem);
 }
+/* the shortcuts are described in a line each, and their keys can be long */
+#shortcuts {
+  max-width: min(90vw, 62rem);
+}
 
 /* a dialog that asks for a query needs the room as well, and must be given it: a text area
    is sized in percent, which adds nothing to the intrinsic width its dialog is measured by,
@@ -851,8 +1074,9 @@ button.collapse {
   right: calc(var(--scrollbar) + .5rem);
   /* the pinned head of a list is raised, and would otherwise be painted over the button */
   z-index: 2;
-  padding: 0;
+  padding: 0 .2rem .1rem;
   border: none;
+  border-radius: var(--radius);
   background: none;
   color: var(--muted);
   font-family: inherit;
@@ -871,6 +1095,7 @@ button.collapse {
 }
 button.collapse:hover {
   color: var(--accent);
+  background-color: var(--shade-hover);
 }
 .panel.collapsed > :not(button.collapse) {
   display: none;
@@ -879,13 +1104,20 @@ button.collapse:hover {
 .panel.collapsed .cm-editor {
   display: none !important;
 }
+/* a folded panel is a strip of its own height, shaded so that it reads as something to open */
 .panel.collapsed > button.collapse {
   position: static;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: .4rem;
+  height: 100%;
+  padding: .4rem .25rem;
+  background-color: var(--shade);
   font-size: 110%;
+  &:hover {
+    background-color: var(--shade-hover);
+  }
 }
 /* only the title rotates, the arrow stays upright */
 button.collapse .label {
@@ -941,10 +1173,6 @@ button.collapse .label {
   button.collapse .label {
     writing-mode: horizontal-tb;
   }
-  /* logs: show the search panel above the file list on narrow screens */
-  .content > .panel.stack-first {
-    order: -1;
-  }
   /* labels above their controls, so the fields keep the full width */
   .field,
   :has(> .field) > .field {
@@ -978,11 +1206,6 @@ button.collapse .label {
   display: flex;
   align-items: baseline;
   gap: .5rem;
-  /* separate the search line from the results below it */
-  margin-bottom: .75rem;
-}
-.logbar h3 {
-  margin: 0;
 }
 .logbar .ignore {
   margin-left: auto;

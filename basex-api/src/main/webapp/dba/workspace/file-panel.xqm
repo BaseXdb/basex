@@ -30,10 +30,11 @@ declare function panel:files(
     <form method='post' autocomplete='off' data-sort='{ $sort }'>{
     <input type='hidden' name='dir' value='{ $dir }'/>,
     let $headers := (
-      { 'key': 'name', 'label': 'Name', 'type': 'dynamic', 'width': '54%' },
-      (: the size never grows beyond four digits and a unit, the short date beyond 11 characters :)
-      { 'key': 'size', 'label': 'Size', 'type': 'bytes', 'order': 'desc', 'width': '17%' },
-      { 'key': 'date', 'label': 'Date', 'type': 'dateTime', 'order': 'desc', 'width': '29%' }
+      { 'key': 'name', 'label': 'Name', 'type': 'dynamic' },
+      (: the size never grows beyond four digits and a unit, the short date beyond 11 characters;
+         the name takes the rest :)
+      { 'key': 'size', 'label': 'Size', 'type': 'bytes', 'order': 'desc', 'width': '4rem' },
+      { 'key': 'date', 'label': 'Date', 'type': 'dateTime', 'order': 'desc', 'width': '5.75rem' }
     )
     let $entries := (
       let $limit := config:get($config:MAXCHARS)

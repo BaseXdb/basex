@@ -59,9 +59,11 @@ function dba:databases(
       'pane' : false(),
       'extra': <textarea id='editor' spellcheck='false'>{ $document?text }</textarea>
     }),
-    (: both sit at the right edge, so both fold that way; only the last one does so by default :)
-    html:panel(panels:backups($name),
-      { 'id': 'backups-panel', 'label': 'Backups', 'collapsed': $fold, 'fold': 'right' }),
+    (: both sit at the right edge, so both fold that way; only the last one does so by default.
+       The backups are shown on the top level, and step back once a database is chosen :)
+    html:panel(panels:backups($name), {
+      'id': 'backups-panel', 'label': 'Backups', 'collapsed': boolean($name), 'fold': 'right'
+    }),
     (: reports, not steps of the work: they are opened when they are asked for :)
     html:panel($index, { 'id': 'index-panel', 'label': 'Indexes', 'collapsed': true() }),
     html:panel($information,
@@ -70,9 +72,9 @@ function dba:databases(
     'header' : $dba:CAT,
     'columns': ('20fr', '25fr', '35fr', '20fr', '20fr', '20fr'),
     'rows'   : '1fr',
-    (: a view of its own: what is folded away while a document is shown is not what is folded
-       away while the lists are :)
-    'panels' : 'resource'[$document?exists],
+    (: a view of its own per level: what is folded away while a document is shown is not what
+       is folded away while a database or the list of databases is; see foldResourcePanels :)
+    'panels' : if ($document?exists) then 'resource' else if ($name) then 'database' else (),
     'scripts': ('cm6', 'editor', 'databases'),
     'init'   : `initDatabases({ $document?editable });`
   })

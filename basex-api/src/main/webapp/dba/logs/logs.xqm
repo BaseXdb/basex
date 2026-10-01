@@ -17,14 +17,15 @@ declare variable $dba:CAT := 'logs';
 (:~ Maximum number of entries that a search over several files collects. :)
 declare variable $dba:MAX-ENTRIES := 10000;
 
-(:~ Table columns :)
+(:~ Table columns. :)
 declare variable $dba:COLUMNS := (
-  { 'key': 'time', 'label': 'Time', 'type': 'dynamic', 'order': 'desc', 'width': '10%' },
-  { 'key': 'address', 'label': 'Address', 'type': 'dynamic', 'width': '18%' },
-  { 'key': 'user', 'label': 'User', 'type': 'dynamic', 'width': '10%' },
-  { 'key': 'type', 'label': 'Type', 'type': 'dynamic', 'width': '10%' },
-  { 'key': 'ms', 'label': 'ms', 'type': 'decimal', 'order': 'desc', 'width': '7%' },
-  { 'key': 'text', 'label': 'Text', 'type': 'dynamic', 'width': '45%' }
+  (: the values of a known format get the width they need; the text takes the rest :)
+  { 'key': 'time', 'label': 'Time', 'type': 'dynamic', 'order': 'desc', 'width': '6.5rem' },
+  { 'key': 'address', 'label': 'Address', 'type': 'dynamic', 'width': '11rem' },
+  { 'key': 'user', 'label': 'User', 'type': 'dynamic', 'width': '11rem' },
+  { 'key': 'type', 'label': 'Type', 'type': 'dynamic', 'width': '4.5rem' },
+  { 'key': 'ms', 'label': 'ms', 'type': 'decimal', 'order': 'desc', 'width': '5rem' },
+  { 'key': 'text', 'label': 'Text', 'type': 'dynamic' }
 );
 
 (:~
@@ -32,7 +33,7 @@ declare variable $dba:COLUMNS := (
  : @param  $input  search input
  : @param  $name   name (date) of log file
  : @param  $sort   table sort key
- : @param  $page   current page
+ : @param  $page   number of shown pages
  : @param  $time   timestamp to highlight
  : @return page
  :)
@@ -54,7 +55,32 @@ function dba:logs(
 ) as element(html) {
   let $files := admin:logs()
   let $date := $name otherwise string(head($files))
+  (: the entries come first: the files are a choice that is rarely made, as the latest log is
+     what is looked at :)
   return (
+    html:panel(
+      if ($date) {
+        <div class='sticky logbar'>{
+          <h3>{ $date }</h3>,
+          <input type='hidden' name='name' value='{ $date }'/>,
+          <input type='text' id='input' name='input' value='{ $input }' autocomplete='off'
+                 placeholder='Search, e.g. admin' title='Regular expression of entries to show'
+                 autofocus='' onkeyup='filterLogs(event.key);'/>,
+          <label title='Reload the entries every second'>{
+            <input type='checkbox' id='live' data-live='logs' onchange='liveChanged()'/>, ' Live'
+          }</label>,
+          <span class='ignore'>{
+            <input type='text' id='ignore' class='smallinput' autocomplete='off'
+                   placeholder='Ignore, e.g. /dba' title='Regular expression of entries to hide'
+                   onkeyup='filterLogs(event.key);'/>
+          }</span>
+        }</div>,
+        <div id='output'/>
+      },
+      (: the panel keeps its track even without a log file to show: it is the whole page
+         beside the list :)
+      { 'divider': true(), 'hidden': false(), 'label': $date }
+    ),
     html:panel(
       <form method='post' id='dates' autocomplete='off'>
         <input type='hidden' name='date' id='date' value='{ $date }'/>
@@ -90,32 +116,9 @@ function dba:logs(
         }</div>
       </form>,
       { 'divider': true(), 'label': 'Logs' }
-    ),
-    html:panel(
-      if ($date) {
-        <div class='sticky logbar'>{
-          <h3>{ $date }</h3>,
-          <input type='hidden' name='name' value='{ $date }'/>,
-          <input type='text' id='input' name='input' value='{ $input }' autocomplete='off'
-                 placeholder='Search, e.g. admin' title='Regular expression of entries to show'
-                 autofocus='' onkeyup='filterLogs(event.key);'/>,
-          <label title='Reload the entries every second'>{
-            <input type='checkbox' id='live' data-live='logs' onchange='liveChanged()'/>, ' Live'
-          }</label>,
-          <span class='ignore'>{
-            <input type='text' id='ignore' class='smallinput' autocomplete='off'
-                   placeholder='Ignore, e.g. /dba' title='Regular expression of entries to hide'
-                   onkeyup='filterLogs(event.key);'/>
-          }</span>
-        }</div>,
-        <div id='output'/>
-      },
-      (: the panel keeps its track even without a log file to show: it is the whole page
-         beside the list :)
-      { 'divider': true(), 'class': 'stack-first', 'hidden': false(), 'label': $date }
     )
   ) => html:wrap({
-    'header': $dba:CAT, 'columns': ('200px', '1fr'),
+    'header': $dba:CAT, 'columns': ('1fr', '200px'),
     (: the panels fill the viewport and scroll on their own, so their heads can be pinned :)
     'rows': '1fr',
     'scripts': 'logs', 'init': 'initLogs();'[$date]
@@ -215,7 +218,7 @@ declare %private function dba:searched(
  : @param  $input    search input
  : @param  $dates    names of the log files to be searched
  : @param  $sort     table sort key
- : @param  $page     current page
+ : @param  $page     number of shown pages
  : @param  $time     timestamp to highlight
  : @param  $ignore   regular expression of entries to hide
  : @param  $filters  column filters
@@ -266,9 +269,16 @@ declare function dba:entries(
     (: two files hold the same times of day: what names an entry, and what is shown for it,
        is prefixed by the file it belongs to :)
     let $label := ($date || ' ')[$several] || $id
+    (: a failed request is told apart by its type: an error, an HTTP client or server error, or
+       a WebSocket close code other than 1000, 1001 (closed in order) and 1005 (no code) :)
+    let $type := $map-results?type
+    let $failed := matches($log/@type, '^(ERROR|[45]\d\d|10(0[2-46-9]|1[0-5]))$')
     return {
-      $map-results,
+      map:remove($map-results, 'type'),
       {
+        'type': if ($failed) then fn() {
+          <span class='log-failed'>{ if ($type instance of fn(*)) then $type() else $type }</span>
+        } else $type,
         'id': translate($label, ' ', 'T'),
         'address': fn() { html:address($address) },
         'ms': xs:decimal($log/@ms),
@@ -296,7 +306,9 @@ declare function dba:entries(
     }
   }
   let $options := {
-    'sort': $sort, 'presort': 'time', 'page': $page, 'filters': $filter-row
+    'sort': $sort, 'presort': 'time', 'page': $page, 'filters': $filter-row,
+    (: the number of entries stays in view below the search line :)
+    'pinned': true()
   }
   return (
     (: a search that stopped at the limit reports as much: what it did not reach is not
@@ -326,12 +338,11 @@ function dba:logs-jump(
   $ignore  as xs:string?
 ) as element(rest:response) {
   let $page := head(
-    let $max := config:get($config:MAXROWS)
     for $log at $pos in reverse(
       admin:logs($date, true())[not($ignore and matches(., $ignore, 'i'))]
     )
     where $log/@time = $time
-    return ($pos - 1) idiv $max + 1
+    return ($pos - 1) idiv $config:ROWS + 1
   ) otherwise 1
   return web:redirect('/dba/logs', { 'name': $date, 'page': $page, 'time': $time }) update {
     .//*:header/@value ! (replace value of node . with . || '#' || $time)

@@ -141,7 +141,11 @@ function refreshDatabase(sort, page) {
  */
 function filterResources(key) {
   storeField("resource-filter", _db);
-  filterKey(key, "resource-filter", refreshDatabase);
+  // the filtered list keeps the number of entries that are shown, and starts at the top
+  filterKey(key, "resource-filter", () => {
+    _toTop.add("database-panel");
+    refreshDatabase(undefined, shownPages("database-panel"));
+  });
 }
 
 /**
@@ -166,17 +170,23 @@ function showResource(json) {
 }
 
 /**
- * Assigns the collapsed state of the panels, which follows from what the view shows and is
- * therefore not remembered: while a document is open, what it was chosen from steps back to a
- * strip; without one, the lists are what there is to see.
+ * Assigns the collapsed state of the panels for the level that the view shows.
  */
 function foldResourcePanels() {
   // the panel decides, not the selection: a resource that does not exist opens nothing
   const shown = panelShown("Resource");
+  // every level keeps the panels that were folded by hand on it; see panelsKey
+  const content = document.querySelector(".content");
+  if(shown) content.dataset.panels = "resource";
+  else if(_db) content.dataset.panels = "database";
+  else delete content.dataset.panels;
+  const folded = storedPanels();
+  // a document folds what it was chosen from; the backups are shown on the top level only
   foldPanels([
     [ "Databases", shown ], [ "Database", false ], [ "Resource", false ],
-    [ "Backups", shown ], [ "Information", true ]
-  ]);
+    [ "Backups", shown || Boolean(_db) ], [ "Information", true ]
+  ].map(([ label, collapse ]) =>
+    [ label, folded[_panels.indexOf(contentPanel(label))] ?? collapse ]));
 }
 
 /**
@@ -337,6 +347,7 @@ _query_path = DB_WS;
 
 /** Ctrl-Enter and the 'Indent' preference re-render what the editor shows. */
 _editor_run = () => queryResource(true);
+_editor_shortcuts.push([ "Ctrl+Enter", "Run the query of the resource" ]);
 _indent_changed = () => queryResource(true);
 
 /** The sort and page links of the list panels are followed in place. */
