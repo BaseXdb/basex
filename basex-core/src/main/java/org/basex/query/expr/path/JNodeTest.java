@@ -52,7 +52,9 @@ public final class JNodeTest extends Test {
    */
   public static boolean equals(final Item s1, final Item s2) {
     try {
-      return s1 == null || s2 == null ? s1 == s2 : s1.atomicEqual(s2);
+      // the empty key of a root JNode is no atomic item
+      return s1 == null || s2 == null || s1 == Empty.VALUE || s2 == Empty.VALUE ? s1 == s2 :
+        s1.atomicEqual(s2);
     } catch(final QueryException ex) {
       throw Util.notExpected(ex);
     }
