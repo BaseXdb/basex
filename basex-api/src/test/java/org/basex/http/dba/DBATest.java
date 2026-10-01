@@ -871,7 +871,7 @@ public final class DBATest extends WebappTest {
     /** Default option values (a save persists every field, so all must be supplied). */
     private static final Map<String, String> DEFAULTS = Map.of(
         "timeout", "60", "memory", "8000", "maxchars", "1000000",
-        "permission", "admin", "maxrows", "100");
+        "permission", "admin");
 
     /**
      * Restores the default settings after each test.
@@ -894,7 +894,7 @@ public final class DBATest extends WebappTest {
      * @throws IOException I/O exception
      */
     @Test public void saveRoundTrip() throws IOException {
-      assertTrue(save(Map.of("maxrows", "7")).contains("Settings were saved."),
+      assertTrue(save(Map.of("timeout", "7")).contains("Settings were saved."),
           "settings not saved");
       assertTrue(get("settings").contains("value=\"7\""), "changed value not persisted");
     }
@@ -1202,8 +1202,8 @@ public final class DBATest extends WebappTest {
   @Nested final class Sessions {
     /** Test attribute. */
     private static final String ATTRIBUTE = "dba-junit-attribute";
-    /** Pattern that isolates the id of a session from the checkbox of one of its rows. */
-    private static final Pattern SESSION = Pattern.compile("name=\"id\" value=\"(.*?)\\|");
+    /** Pattern that isolates the id of a session from its label. */
+    private static final Pattern SESSION = Pattern.compile("data-session=\"(.*?)\"");
 
     /**
      * Removes the test attribute from all sessions after each test.
@@ -1232,7 +1232,7 @@ public final class DBATest extends WebappTest {
           contains("Attribute \"" + ATTRIBUTE + "\" was assigned."), "attribute not assigned");
       assertTrue(get("activity").contains(ATTRIBUTE), "attribute missing from the panel");
 
-      assertTrue(post("sessions/delete", Map.of("id", id + '|' + ATTRIBUTE)).
+      assertTrue(post("sessions/delete", Map.of("id", id, "name", ATTRIBUTE)).
           contains("Attribute \"" + ATTRIBUTE + "\" was deleted."), "attribute not deleted");
       assertFalse(get("activity").contains(ATTRIBUTE), "attribute still listed");
     }
@@ -1272,13 +1272,9 @@ public final class DBATest extends WebappTest {
       assertFalse(post("login", Map.of("_name", "admin", "_pass", NAME)).contains("_pass"),
           "second login failed");
       execute("sessions:delete('" + id + "', 'dba')");
-      assertTrue(get("activity").contains("value=\"" + id + "|\""),
+      assertTrue(get("activity").contains("value=\"" + id + "\""),
           "session that holds no attribute is not listed");
-
-      // the row of such a session names no attribute: there is nothing to delete
-      assertTrue(post("sessions/delete", Map.of("id", id + '|')).
-          contains("0 attributes were deleted."), "delete was not a no-op");
-      assertTrue(post("sessions/close", Map.of("id", id + '|')).
+      assertTrue(post("sessions/close", Map.of("id", id)).
           contains("Session \"" + id + "\" was closed."), "session not closed");
       assertFalse(sessions().contains(id), "closed session still listed");
     }
@@ -1355,7 +1351,7 @@ public final class DBATest extends WebappTest {
      * @throws Exception exception
      */
     @Test public void clear() throws Exception {
-      assertTrue(post("caches/clear", Map.of()).contains("All caches were cleared."),
+      assertTrue(post("caches/clear", Map.of()).contains("All caches and their options were cleared."),
           "caches not cleared");
       assertFalse(get("activity").contains(CACHE), "cache still listed");
     }
