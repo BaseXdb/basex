@@ -33,19 +33,37 @@ public final class DynamicStep extends Single {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) throws QueryException {
-    // updating expressions are no JNode selectors
-    if(expr.has(Flag.UPD)) return expr;
+  public Expr compile(final CompileContext cc) throws QueryException {
+    return rewrite(true, cc);
+  }
 
-    // build only the interpretations that can apply to the static type of the input
+  @Override
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    return rewrite(false, cc);
+  }
+
+  /**
+   * Builds the interpretations that can apply to the static type of the input.
+   * @param compile compile the step expression
+   * @param cc compilation context
+   * @return resulting expression
+   * @throws QueryException query exception
+   */
+  private Expr rewrite(final boolean compile, final CompileContext cc) throws QueryException {
+    // updating expressions are no JNode selectors
+    if(expr.has(Flag.UPD)) return compile ? expr.compile(cc) : expr;
+
     final Expr ctx = new ContextValue(info).optimize(cc);
     final Expr cond = new Instance(info, ctx, Types.XNODE_O).optimize(cc);
-    if(cond == Bln.TRUE) return expr;
+    if(cond == Bln.TRUE) return compile ? expr.compile(cc) : expr;
 
+    // the selector is compiled with an absent focus
     final boolean both = cond != Bln.FALSE;
-    final Expr selector = new SelectorStep(info, Axis.CHILD,
-        both ? expr.copy(cc, new IntObjectMap<>()) : expr).optimize(cc);
-    return both ? new If(info, cond, expr, selector).optimize(cc) : selector;
+    final Expr step = new SelectorStep(info, Axis.CHILD,
+        both ? expr.copy(cc, new IntObjectMap<>()) : expr);
+    final Expr selector = compile ? step.compile(cc) : step.optimize(cc);
+    return both ? new If(info, cond, compile ? expr.compile(cc) : expr, selector).optimize(cc) :
+      selector;
   }
 
   @Override

@@ -280,7 +280,8 @@ public abstract class XQMap extends XQStruct {
   @Override
   public final boolean instanceOf(final Type tp, final boolean coerce) {
     if(type == tp) return true;
-    if(coerce && tp instanceof FuncType) return false;
+    // typed function types enforce function coercion
+    if(coerce && tp instanceof FuncType && tp != Types.FUNCTION) return false;
 
     try {
       // a map matches a record type only if it is a record, i.e. if it carries a record annotation

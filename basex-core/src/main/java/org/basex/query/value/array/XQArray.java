@@ -332,7 +332,8 @@ public abstract class XQArray extends XQStruct {
 
   @Override
   public final boolean instanceOf(final Type tp, final boolean coerce) {
-    if(coerce && tp instanceof FuncType) return type == tp;
+    // typed function types enforce function coercion
+    if(coerce && tp instanceof FuncType && tp != Types.FUNCTION) return type == tp;
     if(type.instanceOf(tp) && !(coerce && ShapeType.rebuilds(type, tp))) return true;
 
     final SeqType mt;

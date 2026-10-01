@@ -144,7 +144,7 @@ public abstract class Path extends ParseExpr {
       rt = cc.qc.focus.value;
     }
 
-    cc.get(rt, true, () -> {
+    cc.get(focus(rt), true, () -> {
       final int sl = steps.length;
       for(int s = 0; s < sl; s++) {
         final Expr step = cc.compileOrError(steps[s], root == null && s == 0);
@@ -155,6 +155,17 @@ public abstract class Path extends ParseExpr {
     });
 
     return optimize(cc);
+  }
+
+  /**
+   * Returns the focus of the first step: maps and arrays are converted to JNodes.
+   * @param rt root expression (can be {@code null})
+   * @return focus expression (can be {@code null})
+   */
+  private Expr focus(final Expr rt) {
+    // function items other than maps and arrays will be rejected at runtime
+    return rt != null && rt.seqType().type.instanceOf(Types.FUNCTION) ?
+      Function.JTREE.get(info, rt) : rt;
   }
 
   @Override
@@ -1225,7 +1236,7 @@ public abstract class Path extends ParseExpr {
     final CompileContext cc = ic.cc;
     final int sl = steps.length;
     final Expr rt = root != null ? root : cc.qc.focus.value;
-    if(changed) cc.get(rt, true, () -> {
+    if(changed) cc.get(focus(rt), true, () -> {
       for(int s = 0; s < sl; s++) {
         steps[s] = steps[s].optimize(cc);
         cc.updateFocus(steps[s], true);
@@ -1233,7 +1244,7 @@ public abstract class Path extends ParseExpr {
       return null;
     });
 
-    changed |= ic.var != null && cc.ok(rt, true, () -> {
+    changed |= ic.var != null && cc.ok(focus(rt), true, () -> {
       boolean chngd = false;
       for(int s = 0; s < sl; s++) {
         final Expr step = steps[s].inline(ic);
