@@ -358,9 +358,13 @@ public final class FuncItem extends FItem implements Scope {
         // ACTION yields () for $result := () → exit on empty($result)
         final InlineContext ic = new InlineContext(result, Empty.VALUE, cc);
         final Expr copy = expr.copy(cc, new IntObjectMap<>());
-        if(ic.inlineable(copy) && ic.inline(copy) == Empty.VALUE) {
-          exit = cc.function(EMPTY, info, new VarRef(info, result));
-          action = expr;
+        try {
+          if(ic.inlineable(copy) && ic.inline(copy) == Empty.VALUE) {
+            exit = cc.function(EMPTY, info, new VarRef(info, result));
+            action = expr;
+          }
+        } catch(final QueryException ignore) {
+          // ACTION raises an error for $result := (): no early exit
         }
       }
       return exitOrAction(exit, action);
