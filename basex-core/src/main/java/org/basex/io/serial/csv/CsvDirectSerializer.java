@@ -7,6 +7,7 @@ import java.io.*;
 
 import org.basex.build.csv.*;
 import org.basex.build.csv.CsvOptions.CsvFormat;
+import org.basex.io.parse.csv.*;
 import org.basex.io.serial.*;
 import org.basex.query.util.ft.*;
 import org.basex.query.value.array.*;
@@ -72,7 +73,9 @@ public final class CsvDirectSerializer extends CsvSerializer {
   }
 
   @Override
-  protected void startOpen(final QNm name) {
+  protected void startOpen(final QNm name) throws IOException {
+    if(level == 0 && name.eq(CsvW3XmlConverter.Q_FN_CSV))
+      throw SERCSV_X.getIO("Result of fn:csv-to-xml requires format 'w3-xml'");
     if(level == 1) data = new TokenObjectMap<>();
     attv = null;
   }

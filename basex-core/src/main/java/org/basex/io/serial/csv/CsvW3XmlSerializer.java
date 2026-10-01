@@ -66,12 +66,22 @@ public final class CsvW3XmlSerializer extends CsvSerializer {
 
   @Override
   protected void finishClose() throws IOException {
-    if(level != 2 || !elem.eq(CsvW3XmlConverter.Q_FN_ROW)) return;
-    if(header) {
-      record(headers, false);
-      header = false;
+    if(level == 0) {
+      // input without rows: print non-empty header
+      if(header && !headers.isEmpty()) printHeader();
+    } else if(level == 2 && elem.eq(CsvW3XmlConverter.Q_FN_ROW)) {
+      if(header) printHeader();
+      record(data);
     }
-    record(data);
+  }
+
+  /**
+   * Prints the header.
+   * @throws IOException I/O exception
+   */
+  private void printHeader() throws IOException {
+    record(headers, false);
+    header = false;
   }
 
   @Override

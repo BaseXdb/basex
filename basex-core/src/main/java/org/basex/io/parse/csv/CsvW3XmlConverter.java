@@ -19,6 +19,8 @@ import org.basex.util.*;
  */
 public final class CsvW3XmlConverter extends CsvXmlConverter {
   /** QName. */
+  public static final QNm Q_FN_CSV = new QNm("csv", QueryText.FN_URI);
+  /** QName. */
   public static final QNm Q_FN_ROW = new QNm("row", QueryText.FN_URI);
   /** QName. */
   public static final QNm Q_FN_COLUMN = new QNm("column", QueryText.FN_URI);

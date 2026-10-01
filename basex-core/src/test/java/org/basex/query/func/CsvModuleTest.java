@@ -249,6 +249,15 @@ public final class CsvModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void serializeW3Xml() {
+    final String options = "'header': true(), 'format': 'w3-xml'";
+    serial(_CSV_PARSE.args("A,B", " { " + options + " }"), options, "A,B\n");
+    serial(_CSV_PARSE.args("", " { " + options + " }"), options, "");
+    serial(_CSV_PARSE.args("A,B\n1,2", " { " + options + " }"), options, "A,B\n1,2\n");
+    error(_CSV_SERIALIZE.args(CSV_TO_XML.args("A")), SERCSV_X);
+  }
+
+  /** Test method. */
   @Test public void gh2428() {
     final Function func = _CSV_SERIALIZE;
     final String xml = " <csv xmlns='http://www.w3.org/2005/xpath-functions'><columns><column>x"
