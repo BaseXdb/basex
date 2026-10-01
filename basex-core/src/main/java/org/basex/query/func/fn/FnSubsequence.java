@@ -150,14 +150,14 @@ public class FnSubsequence extends StandardFunc {
    * @throws QueryException query exception
    */
   private SeqRange range(final QueryContext qc) throws QueryException {
-    double start = toDouble(arg(1), qc);
+    double start = number(arg(1).atomItem(qc, info), true);
     final Item end = arg(2).atomItem(qc, info);
     if(Double.isNaN(start)) return EMPTY;
 
     final long s = start(start);
     long e = Long.MAX_VALUE;
     if(!end.isEmpty()) {
-      start = toDouble(end);
+      start = number(end, false);
       if(Double.isNaN(start) || s == Long.MIN_VALUE && start == Double.POSITIVE_INFINITY) {
         return EMPTY;
       }
@@ -169,6 +169,26 @@ public class FnSubsequence extends StandardFunc {
     // return all values, no values, or the specified range
     final SeqRange sr = new SeqRange(Math.max(0, s - 1), e);
     return sr.length == 0 ? EMPTY : sr;
+  }
+
+  /**
+   * Converts a position argument to a double, rounding decimals without loss of precision.
+   * @param item item
+   * @param first first position
+   * @return double value
+   * @throws QueryException query exception
+   */
+  private double number(final Item item, final boolean first) throws QueryException {
+    return item instanceof final Dec dec ? dec.round(0, mode(first)).dbl(info) : toDouble(item);
+  }
+
+  /**
+   * Returns the rounding mode for decimal positions.
+   * @param first first position
+   * @return rounding mode
+   */
+  protected FnRound.RoundMode mode(@SuppressWarnings("unused") final boolean first) {
+    return FnRound.RoundMode.HALF_TO_CEILING;
   }
 
   /**

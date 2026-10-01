@@ -1,5 +1,7 @@
 package org.basex.query.func.fn;
 
+import java.math.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -66,6 +68,7 @@ public final class FnSubstring extends StandardFunc {
   private int start(final QueryContext qc) throws QueryException {
     final Item start = toAtomItem(arg(1), qc);
     if(start instanceof final Itr itr) return limit(itr.itr() - 1);
+    if(start instanceof final Dec dec) return limit(round(dec) - 1);
     final double dbl = start.dbl(info);
     return Double.isNaN(dbl) ? Integer.MIN_VALUE : subPos(dbl);
   }
@@ -80,7 +83,18 @@ public final class FnSubstring extends StandardFunc {
   private int length(final int def, final QueryContext qc) throws QueryException {
     final Item length = arg(2).atomItem(qc, info);
     return length.isEmpty() ? def : length instanceof final Itr itr ? limit(itr.itr()) :
-      subPos(length.dbl(info) + 1);
+      length instanceof final Dec dec ? limit(round(dec)) : subPos(length.dbl(info) + 1);
+  }
+
+  /**
+   * Rounds a decimal without loss of precision.
+   * @param dec decimal value
+   * @return rounded value, limited to the integer range
+   */
+  private long round(final Dec dec) {
+    final BigDecimal bd = dec.round(0, FnRound.RoundMode.HALF_TO_CEILING).dec(info);
+    return bd.max(BigDecimal.valueOf(Integer.MIN_VALUE)).
+        min(BigDecimal.valueOf(Integer.MAX_VALUE)).longValue();
   }
 
   /**

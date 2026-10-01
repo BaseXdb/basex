@@ -23,6 +23,11 @@ public final class UtilRange extends FnSubsequence {
   }
 
   @Override
+  protected FnRound.RoundMode mode(final boolean first) {
+    return first ? FnRound.RoundMode.CEILING : FnRound.RoundMode.FLOOR;
+  }
+
+  @Override
   protected boolean range() {
     return true;
   }

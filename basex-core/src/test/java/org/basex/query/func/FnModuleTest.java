@@ -5178,6 +5178,12 @@ return
     query(func.args("A", " xs:double('NaN')"), "");
     query(func.args("A", 1, " xs:double('NaN')"), "");
 
+    // decimals are rounded without loss of precision
+    query(func.args(" 1 to 5", " 2.4999999999999999999"), "2\n3\n4\n5");
+    query(func.args(" 1 to 5", 1, " 2.4999999999999999999"), "1\n2");
+    query(func.args(" 1 to 5", " 0.4999999999999999999", " 2.5000000000000000001"), "1\n2");
+    query(func.args(" 1 to 5", " -0.5", 2.5), "1\n2");
+
     // known result size, iterative evaluation
     query(func.args(" (1 to 2) ! (. + 1)", 2), 3);
     query(func.args(" (1 to 3) ! (. + 1)", 2, 1), 3);
@@ -5348,6 +5354,11 @@ return
     query(func.args("hello", 2, 9223372036854775807L), "ello");
     query(func.args("hello", 3, 2147483648L), "llo");
     query(func.args("hello", -2, 9223372036854775807L), "hello");
+
+    // decimals are rounded without loss of precision
+    query(func.args("abcde", " 2.4999999999999999999"), "bcde");
+    query(func.args("abcde", 1, " 2.4999999999999999999"), "ab");
+    query(func.args("abcde", " -1.5", 4.5), "abc");
   }
 
   /** Test method. */

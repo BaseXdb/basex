@@ -221,6 +221,10 @@ public final class UtilModuleTest extends SandboxTest {
     query(func.args(" (<a/>, <b/>)", 3, 4), "");
 
     query(func.args(" (<a/>, <b/>)[name()]", 1, 9223372036854775807L), "<a/>\n<b/>");
+
+    // decimals are rounded without loss of precision
+    query(func.args(" 1 to 5", " 2.0000000000000000001", 5), "3\n4\n5");
+    query(func.args(" 1 to 5", 1, " 2.9999999999999999999"), "1\n2");
   }
 
   /** Test method. */
