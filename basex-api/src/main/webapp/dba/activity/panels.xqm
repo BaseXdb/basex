@@ -353,7 +353,7 @@ declare %private function panels:attribute(
 ) as fn() as element(a) {
   fn() {
     (: three values, so the call is handed the whole dataset :)
-    html:action($name, 'setAttribute', { 'kind': $kind, 'id': $id, 'name': $name },
+    html:action($name, 'editAttribute', { 'kind': $kind, 'id': $id, 'name': $name },
       { 'title': 'Assign a new value' })
   }
 };

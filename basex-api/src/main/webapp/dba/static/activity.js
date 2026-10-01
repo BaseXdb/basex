@@ -65,7 +65,7 @@ _live_actions.activity = refreshActivity;
  * @param {DOMStringMap} data dataset of the link: what holds the attribute ('session',
  *          'websocket'), its id, and the name of the attribute
  */
-async function setAttribute({ kind, id, name }) {
+async function editAttribute({ kind, id, name }) {
   document.getElementById(`${kind}-id`).value = id;
   document.getElementById(`${kind}-text`).textContent = id;
   document.getElementById(`${kind}-name`).value = name;
