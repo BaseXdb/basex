@@ -68,8 +68,10 @@ enum LogTarget {
         methods.put(level, clazz.getMethod(level, String.class));
       }
       return (type, text) -> {
+        // HTTP client errors are warnings, server errors are errors
         final String level = Strings.eqic(type, "trace", "debug", "warn", "error") ?
-          type.toLowerCase(Locale.ENGLISH) : "info";
+          type.toLowerCase(Locale.ENGLISH) : type.matches("4\\d\\d") ? "warn" :
+          type.matches("5\\d\\d") ? "error" : "info";
         // logging must never interfere with the caller
         try {
           methods.get(level).invoke(logger, text);

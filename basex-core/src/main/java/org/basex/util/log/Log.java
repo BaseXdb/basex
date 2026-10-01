@@ -130,7 +130,7 @@ public final class Log implements QueryTracer {
 
     if(noTargets()) return;
 
-    String inf = info != null ? info.trim().replaceAll("\\s+", " ") : "";
+    String inf = normalize(info);
     if(exclude(type, inf, address)) return;
 
     // normalize info string
@@ -150,7 +150,8 @@ public final class Log implements QueryTracer {
     entry.date = LocalDateTime.now();
     entry.time = DateTime.TIME.format(entry.date);
     entry.address = addr;
-    entry.user = user != null ? user : UserText.ADMIN;
+    // tabs and newlines would break the columns of the log file
+    entry.user = user != null ? normalize(user) : UserText.ADMIN;
     entry.type = type.toString();
     entry.info = inf;
     if(perf != null) entry.runtime = perf.toString();
@@ -205,18 +206,27 @@ public final class Log implements QueryTracer {
 
     final boolean found = exclude.matcher(info).find();
 
-    // cache entries that may have multiple log entries (log types, HTTP status; see AdminLogs#logs)
-    if(address != null && (type == LogType.REQUEST || type == LogType.OK || type == LogType.ERROR ||
-        type.toString().matches("\\d+"))) {
-      // find matching entry, remove outdated entries
+    // the entry that concludes an excluded request is excluded as well (see AdminLogs#logs)
+    if(address != null) {
       final long ms = System.currentTimeMillis();
-      final boolean cached = cache.containsKey(address);
-      cache.values().removeIf(time -> cached || ms - time >= 3_600_000);
-      if(cached) return true;
-      // cache new entry
-      if(found) cache.put(address, ms);
+      cache.values().removeIf(time -> ms - time >= 3_600_000);
+      if(type == LogType.REQUEST) {
+        if(found) cache.put(address, ms);
+        else cache.remove(address);
+      } else if(type == LogType.OK || type == LogType.ERROR || type.toString().matches("\\d+")) {
+        if(cache.remove(address) != null) return true;
+      }
     }
     return found;
+  }
+
+  /**
+   * Normalizes a string to a single line.
+   * @param string string (can be {@code null})
+   * @return normalized string
+   */
+  private static String normalize(final String string) {
+    return string != null ? string.trim().replaceAll("\\s+", " ") : "";
   }
 
   /**

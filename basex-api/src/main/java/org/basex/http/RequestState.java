@@ -22,7 +22,8 @@ public interface RequestState {
   /** Separator of forwarded addresses. */
   Pattern FORWARDED_SEP = Pattern.compile("\\s*,\\s*");
   /** IPv4 or IPv6 address. */
-  Pattern IP_ADDRESS = Pattern.compile("^\\[?[:.\\d]+\\]?$");
+  Pattern IP_ADDRESS = Pattern.compile(
+      "^(\\d{1,3}(\\.\\d{1,3}){3}|\\[?[\\da-fA-F]*:[:.\\da-fA-F]*\\]?)$");
 
   /**
    * Returns the request method.

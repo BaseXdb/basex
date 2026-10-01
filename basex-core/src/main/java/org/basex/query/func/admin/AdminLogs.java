@@ -109,7 +109,7 @@ public final class AdminLogs extends AdminFn {
           if(entry.address != null) {
             elem.attr(Q_TIME, entry.time).attr(Q_ADDRESS, entry.address);
             elem.attr(Q_USER, entry.user).attr(Q_TYPE, entry.type);
-            if(entry.ms != BigDecimal.ZERO) elem.attr(Q_MS, entry.ms);
+            if(entry.ms.signum() != 0) elem.attr(Q_MS, entry.ms);
           }
           return elem.finish();
         }
