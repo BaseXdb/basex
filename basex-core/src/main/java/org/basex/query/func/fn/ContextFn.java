@@ -1,12 +1,13 @@
 package org.basex.query.func.fn;
 
+import java.util.*;
+
 import org.basex.core.locks.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -78,7 +79,10 @@ public abstract class ContextFn extends StandardFunc {
     // create new expression with inlined context value
     if(ic.var == null && !(ic.expr instanceof ContextValue) && contextAccess()) {
       // $v ! string() → string($v)
-      inlined = definition.get(info, ExprList.concat(args, ic.copy()));
+      final int ci = contextIndex();
+      final Expr[] ctxArgs = Arrays.copyOf(args, Math.max(args.length, ci + 1));
+      ctxArgs[ci] = ic.copy();
+      inlined = definition.get(info, ctxArgs);
     }
     return inlined != null ? inlined.optimize(ic.cc) : null;
   }
