@@ -389,6 +389,20 @@ declare function html:time(
 };
 
 (:~
+ : Formats a client address, with the loopback address shown as localhost.
+ : @param  $address  address, optionally followed by a port
+ : @return element with the address
+ :)
+declare function html:address(
+  $address  as xs:string
+) as element(span) {
+  <span title='{ $address }'>{
+    replace($address, '^(\[?(0:0:0:0:0:0:0:1|::1)\]?|127\.\d+\.\d+\.\d+)(:\d+)?$',
+      'localhost$3')
+  }</span>
+};
+
+(:~
  : Returns a dateTime value adjusted to the current time zone.
  : @param  $date  date
  : @return adjusted value

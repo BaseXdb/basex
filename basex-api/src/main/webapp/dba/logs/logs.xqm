@@ -20,7 +20,7 @@ declare variable $dba:MAX-ENTRIES := 10000;
 (:~ Table columns :)
 declare variable $dba:COLUMNS := (
   { 'key': 'time', 'label': 'Time', 'type': 'dynamic', 'order': 'desc', 'width': '10%' },
-  { 'key': 'address', 'label': 'Address', 'width': '18%' },
+  { 'key': 'address', 'label': 'Address', 'type': 'dynamic', 'width': '18%' },
   { 'key': 'user', 'label': 'User', 'type': 'dynamic', 'width': '10%' },
   { 'key': 'type', 'label': 'Type', 'type': 'dynamic', 'width': '10%' },
   { 'key': 'ms', 'label': 'ms', 'type': 'decimal', 'order': 'desc', 'width': '7%' },
@@ -245,9 +245,11 @@ declare function dba:entries(
     for $log in reverse(admin:logs($date, true()))
     let $text := string($log)
     where not($ignore and matches($text, $ignore, 'i'))
-    (: AND-combine column filters :)
-    where every $key in map:keys($filters) satisfies matches(
-      if ($key = 'text') then $text else string($log/@*[name() = $key]), $filters?$key, 'i'
+    (: AND-combine column filters; an address is found by what is shown and by what is logged :)
+    where every $key in map:keys($filters) satisfies (
+      let $value := if ($key = 'text') then $text else string($log/@*[name() = $key])
+      let $shown := if ($key = 'address') then string(html:address($value))
+      return some $string in ($value, $shown) satisfies matches($string, $filters?$key, 'i')
     )
 
     for $map-results in (
@@ -267,7 +269,7 @@ declare function dba:entries(
       $map-results,
       {
         'id': translate($label, ' ', 'T'),
-        'address': string($log/@address),
+        'address': fn() { html:address(string($log/@address)) },
         'ms': xs:decimal($log/@ms),
         'time': fn() {
           let $link := html:link($label, $dba:CAT || '-jump',
