@@ -416,6 +416,57 @@ public final class NamespaceTest extends SandboxTest {
     query("/", "<A xmlns='A'><B/><C/></A>");
   }
 
+  /**
+   * Inserts elements without namespace below an element with a default namespace.
+   */
+  @Test public void insertNoNamespace() {
+    query(transform("<a xmlns='u'/>", "insert node <b><c/></b> into $input"),
+        "<a xmlns='u'><b xmlns=''><c/></b></a>");
+    query(transform("<a xmlns='u'/>", "insert node <b xmlns='u'/> into $input"),
+        "<a xmlns='u'><b/></a>");
+    query(transform("<a/>", "insert node <b/> into $input"), "<a><b/></a>");
+
+    execute(new CreateDB(NAME, "<a xmlns='u'><b/></a>"));
+    query("insert node <c/> into " + _DB_GET.args(NAME) + "/*:a/*:b");
+    query(_DB_GET.args(NAME), "<a xmlns='u'><b><c xmlns=''/></b></a>");
+  }
+
+  /**
+   * Checks namespace conflicts in pending updates.
+   */
+  @Test public void updateConflicts() {
+    // elements of a replacement do not conflict with each other
+    query(transform("<r xmlns='u'><a/></r>",
+        "replace node $input/*:a with (<a/>, <b xmlns='u'/>)"),
+        "<r xmlns='u'><a xmlns=''/><b/></r>");
+    query(transform("<r><a/></r>",
+        "replace node $input/a with (<p:a xmlns:p='x'/>, <p:b xmlns:p='y'/>)"),
+        "<r><p:a xmlns:p='x'/><p:b xmlns:p='y'/></r>");
+    // attributes inserted into a replaced element
+    query(transform("<r><a/></r>",
+        "replace node $input/a with <p:a xmlns:p='w'/>, " +
+        "insert node attribute { QName('u', 'p:x') } {} into $input/a"),
+        "<r><p:a xmlns:p='w'/></r>");
+
+    // conflicting attributes
+    error(transform("<r a=''/>",
+        "replace node $input/@a with " +
+        "(attribute { QName('x', 'p:a') } {}, attribute { QName('y', 'p:b') } {})"),
+        UPNSCONFL2_X_X);
+    error(transform("<r/>",
+        "insert node attribute { QName('x', 'p:a') } {} into $input, " +
+        "insert node attribute { QName('y', 'p:b') } {} into $input"),
+        UPNSCONFL2_X_X);
+    // renamed element and inserted attribute
+    error(transform("<r/>",
+        "rename node $input as QName('w', 'p:r'), " +
+        "insert node attribute { QName('u', 'p:x') } {} into $input"),
+        UPNSCONFL2_X_X);
+    // renamed element without namespace, inherited default namespace
+    error(transform("<r xmlns='u'><a/></r>", "rename node $input/*:a as QName('', 'a')"),
+        UPNSCONFL_X_X);
+  }
+
   /** Test query. */
   @Test public void copy5() {
     query(

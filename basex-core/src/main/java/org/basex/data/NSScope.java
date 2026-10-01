@@ -66,8 +66,7 @@ final class NSScope {
     final int as = nsp.size();
     for(int a = 0; a < as; a++) {
       final byte[] prefix = nsp.name(a), uri = nsp.value(a);
-      final int uriId = nspaces.uriIdForPrefix(prefix, true);
-      if(uriId == 0 || uriId != nspaces.uriId(uri)) ns.add(prefix, uri);
+      if(nspaces.declare(nspaces.uriIdForPrefix(prefix, true), uri)) ns.add(prefix, uri);
     }
     nspaces.open(pre, ns);
     preStack.push(pre);

@@ -181,6 +181,16 @@ public final class Namespaces {
   }
 
   /**
+   * Checks if a namespace URI must be declared for a prefix with the specified binding.
+   * @param uriId ID of the namespace URI currently bound to the prefix ({@code 0}: none)
+   * @param uri namespace URI
+   * @return result of check
+   */
+  public boolean declare(final int uriId, final byte[] uri) {
+    return uriId == 0 ? uri.length != 0 : uriId != uriId(uri);
+  }
+
+  /**
    * Returns the ID of the specified namespace URI.
    * @param uri namespace URI
    * @return ID, or {@code 0} if no entry is found

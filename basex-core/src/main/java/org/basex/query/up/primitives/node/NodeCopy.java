@@ -51,20 +51,14 @@ abstract class NodeCopy extends NodeUpdate {
   }
 
   /**
-   * Adds top entries from the temporary data instance to the name pool,
-   * which is used for finding duplicate attributes and namespace conflicts.
+   * Adds the inserted attributes to the name pool.
    * @param pool name pool
    */
   final void add(final NamePool pool) {
     final Data d = insseq.data;
-    final int s = insseq.start, e = insseq.end;
-    for(int p = s; p < e; p++) {
-      final int k = d.kind(p);
-      if(k == Data.ATTR || k == Data.ELEM) {
-        if(p > s && d.parent(p, k) >= s) break;
-        final byte[][] qname = d.qname(p, k);
-        pool.add(new QNm(qname[0], qname[1]), XNode.type(k));
-      }
+    for(int p = insseq.start; p < insseq.end; p++) {
+      final byte[][] qname = d.qname(p, Data.ATTR);
+      pool.add(new QNm(qname[0], qname[1]), NodeType.ATTRIBUTE);
     }
   }
 

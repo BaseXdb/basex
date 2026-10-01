@@ -526,6 +526,19 @@ public abstract class Data {
   }
 
   /**
+   * Returns the namespaces defined for the specified element, plus the namespace of its name.
+   * @param pre PRE value of an element
+   * @return prefixes and URIs
+   */
+  public final Atts elemNamespaces(final int pre) {
+    final Atts nsp = namespaces(pre);
+    final byte[][] qname = qname(pre, ELEM);
+    final byte[] prefix = prefix(qname[0]);
+    if(!nsp.contains(prefix) && !eq(prefix, XML)) nsp.add(prefix, qname[1]);
+    return nsp;
+  }
+
+  /**
    * Returns the reference to a text (text, comment, pi, pi, document) or attribute value.
    * @param pre PRE value
    * @return disk offset
@@ -674,20 +687,18 @@ public abstract class Data {
       final int oldUriId = nspaces.uriIdForPrefix(prefix, pre, this);
       final boolean nsFlag = oldUriId == 0 && uri.length != 0 && !eq(prefix, XML);
       final int nsPre = kind == ATTR ? parent(pre, kind) : pre;
-      final int uriId = nsFlag ? nspaces.add(nsPre, prefix, uri, this) :
+      final int uriId = nsFlag ? declare(nsPre, prefix, uri) :
         oldUriId != 0 && eq(nspaces.uri(oldUriId), uri) ? oldUriId : 0;
 
-      // write IDs of namespace URI and name, and namespace flag
+      // write IDs of namespace URI and name
       final ValueIndex[] indexes = meta.updindex ? valueIndexes() : new ValueIndex[0];
       for(final ValueIndex index : indexes) index.rename(pre, kind);
       if(kind == ATTR) {
         table.write1(pre, 11, uriId);
         table.write2(pre, 1, attrNames.put(name));
-        if(nsFlag) table.write2(nsPre, 1, 1 << 15 | nameId(nsPre));
       } else {
         table.write1(pre, 3, uriId);
-        final int nameId = elemNames.put(name);
-        table.write2(nsPre, 1, (nsFlag || nsFlag(nsPre) ? 1 << 15 : 0) | nameId);
+        table.write2(pre, 1, (nsFlag(pre) ? 1 << 15 : 0) | elemNames.put(name));
       }
       for(final ValueIndex index : indexes) index.renamed(pre, kind);
     }
@@ -752,21 +763,16 @@ public abstract class Data {
           doc(sSize, sData.text(sPre, true));
           ++meta.ndocs;
         }
-        case ELEM -> {
-          // add element
-          final byte[] en = sData.name(sPre, sKind);
-          elem(cDist, elemNames.put(en), sData.attSize(sPre, sKind), sSize,
-              nspaces.uriIdForPrefix(prefix(en), true), false);
-        }
+        case ELEM ->
+          // add element (rapid replace is only used without namespaces)
+          elem(cDist, elemNames.put(sData.name(sPre, sKind)), sData.attSize(sPre, sKind), sSize,
+              0, false);
         case TEXT, COMM, PI ->
           // add text
           text(cDist, sData.text(sPre, true), sKind);
-        case ATTR -> {
+        case ATTR ->
           // add attribute
-          final byte[] an = sData.name(sPre, sKind);
-          attr(cDist, attrNames.put(an), sData.text(sPre, false),
-              nspaces.uriIdForPrefix(prefix(an), false));
-        }
+          attr(cDist, attrNames.put(sData.name(sPre, sKind)), sData.text(sPre, false), 0);
         default -> { }
       }
     }
@@ -890,6 +896,8 @@ public abstract class Data {
 
     // indicates if database only contains a dummy node
     final Data sData = source.data;
+    // indicates if namespaces need to be considered
+    final boolean ns = !nspaces.isEmpty() || !sData.nspaces.isEmpty();
     int c = 0, sTopPre = source.start;
     for(int sPre = sTopPre; sPre < source.end; sPre++, c++) {
       if(c != 0 && c % bSize == 0) insert(pre + c - bSize);
@@ -922,8 +930,8 @@ public abstract class Data {
           ++meta.ndocs;
         }
         case ELEM -> {
-          // add element.
-          final boolean nsFlag = nsScope.open(nPre, sData.namespaces(sPre));
+          // add element
+          final boolean nsFlag = nsScope.open(nPre, ns ? sData.elemNamespaces(sPre) : new Atts());
           final byte[] name = sData.name(sPre, sKind);
           elem(nDist, elemNames.put(name), sData.attSize(sPre, sKind), sSize,
               nspaces.uriIdForPrefix(prefix(name), true), nsFlag);
@@ -939,10 +947,7 @@ public abstract class Data {
           if(uriId != 0) {
             final byte[] prefix = prefix(name), uri = sData.nspaces.uri(uriId);
             uriId = nspaces.uriIdForPrefix(prefix, false);
-            if(uriId == 0 && !eq(prefix, XML)) {
-              uriId = nspaces.add(nsPre, prefix, uri, this);
-              table.write2(nsPre, 1, 1 << 15 | nameId(nsPre));
-            }
+            if(uriId == 0 && !eq(prefix, XML)) uriId = declare(nsPre, prefix, uri);
           }
           attr(nDist, attrNames.put(name), sData.text(sPre, false), uriId);
         }
@@ -1049,6 +1054,18 @@ public abstract class Data {
   private void attSize(final int pre, final int kind, final int value) {
     // the magic value 31 is used to signal that there are 31 or more attributes
     if(kind == ELEM) table.write1(pre, 0, Math.min(value, IO.MAXATTS) << 3 | ELEM);
+  }
+
+  /**
+   * Declares a namespace for the specified element.
+   * @param pre PRE value of the element
+   * @param prefix prefix
+   * @param uri namespace URI
+   * @return ID of the namespace URI
+   */
+  private int declare(final int pre, final byte[] prefix, final byte[] uri) {
+    nsFlag(pre, true);
+    return nspaces.add(pre, prefix, uri, this);
   }
 
   /**

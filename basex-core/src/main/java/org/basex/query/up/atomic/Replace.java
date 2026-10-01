@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import java.util.*;
 
 import org.basex.data.*;
+import org.basex.util.*;
 
 /**
  * Replaces a node in the database with an insertion sequence.
@@ -48,9 +49,8 @@ final class Replace extends StructuralUpdate {
   void apply(final Data data) {
     try {
       // if possible, replace values or overwrite database entries
-      if(data.nspaces.isEmpty() && clip.data.nspaces.isEmpty() && (
-        lazyReplace(data) || data.replace(location, clip)
-      )) return;
+      final boolean ns = !data.nspaces.isEmpty() || !clip.data.nspaces.isEmpty();
+      if(lazyReplace(data, ns) || !ns && data.replace(location, clip)) return;
 
       // otherwise, delete old entries and insert new ones
       final int kind = data.kind(location), par = data.parent(location, kind);
@@ -69,9 +69,10 @@ final class Replace extends StructuralUpdate {
    * Lazy Replace implementation. Checks if the replace operation can be substituted with
    * cheaper value updates. If structural changes have to be made no substitution takes place.
    * @param data destination data reference
+   * @param ns indicates if the source or destination data contains namespaces
    * @return true if operation was successful
    */
-  private boolean lazyReplace(final Data data) {
+  private boolean lazyReplace(final Data data, final boolean ns) {
     final Data src = clip.data;
     final int srcSize = clip.size();
     // check for equal subtree size
@@ -91,15 +92,20 @@ final class Replace extends StructuralUpdate {
         // check elements, attributes and processing instructions
         final byte[] srcName = src.name(s, sk);
         final byte[] trgName = data.name(t, tk);
-        if(!eq(srcName, trgName)) valueUpdates.add(Rename.getInstance(data, t, srcName, EMPTY));
+        if(!eq(srcName, trgName)) {
+          // with namespaces, only processing instructions can be renamed
+          if(ns && sk != Data.PI) return false;
+          valueUpdates.add(Rename.getInstance(data, t, srcName, EMPTY));
+        }
         switch(sk) {
           case Data.ELEM -> {
-            // check size of elements
-            if(src.attSize(s, sk) != data.attSize(t, tk) || src.size(s, sk) != data.size(t, tk))
-              return false;
+            // check size and namespaces of elements
+            if(src.attSize(s, sk) != data.attSize(t, tk) || src.size(s, sk) != data.size(t, tk) ||
+                ns && !namespaces(data, s, t)) return false;
           }
           case Data.ATTR -> {
-            // check attribute values
+            // check namespaces and values of attributes
+            if(ns && !eq(src.qname(s, sk)[1], data.qname(t, tk)[1])) return false;
             final byte[] av = src.text(s, false);
             if(!eq(data.text(t, false), av))
               valueUpdates.add(UpdateValue.getInstance(data, t, av));
@@ -120,6 +126,31 @@ final class Replace extends StructuralUpdate {
     }
     for(final BasicUpdate update : valueUpdates) update.apply(data);
     return true;
+  }
+
+  /**
+   * Checks if the target element has the namespace and declarations that an insertion of the
+   * source element would yield.
+   * @param data destination data reference
+   * @param s PRE value of the source element
+   * @param t PRE value of the target element
+   * @return result of check
+   */
+  private boolean namespaces(final Data data, final int s, final int t) {
+    final Data src = clip.data;
+    if(!eq(src.qname(s, Data.ELEM)[1], data.qname(t, Data.ELEM)[1])) return false;
+    // without declarations, the names resolve to the same namespace in the same scope
+    if(!src.nsFlag(s) && !data.nsFlag(t)) return true;
+
+    // namespaces of the source element that are not in scope of the target parent
+    final Atts nsp = src.elemNamespaces(s), ns = new Atts();
+    final int par = data.parent(t, Data.ELEM);
+    for(int a = 0; a < nsp.size(); a++) {
+      final byte[] prefix = nsp.name(a), uri = nsp.value(a);
+      final int uriId = data.nspaces.uriIdForPrefix(prefix, par, data);
+      if(data.nspaces.declare(uriId, uri)) ns.add(prefix, uri);
+    }
+    return ns.equals(data.namespaces(t));
   }
 
   @Override
