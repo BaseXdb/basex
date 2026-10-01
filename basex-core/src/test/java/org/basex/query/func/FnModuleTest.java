@@ -5969,6 +5969,11 @@ return
 
     // GH-2139: Simplify inlined nondeterministic code
     check("let $doc := doc('" + DOC + "') let $a := 1 return $a", 1, root(Itr.class));
+
+    // keep vacuous body of updating closure
+    query("declare function local:f($f as fn(xs:string) as empty-sequence()) {"
+        + "fn($a) { %updating fn() { " + func.args(" $a ! $f(.)") + " } } };"
+        + "let $u := local:f(fn($x) { () })('a') return updating $u()", "");
   }
 
   /** Test method. */

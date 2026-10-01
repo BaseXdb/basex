@@ -35,7 +35,8 @@ public final class FnVoid extends StandardFunc {
     final Expr input = arg(0);
     ndt = input.has(Flag.NDT);
     if(ndt) {
-      if(input.size() == 0) return input;
+      // keep wrapper if input is not vacuous (required for bodies of updating functions)
+      if(input.size() == 0 && input.vacuous()) return input;
     } else if(defined(1) && arg(1) instanceof Value && toBoolean(arg(1), cc.qc)) {
       return Empty.VALUE;
     }
