@@ -28,7 +28,7 @@ function dba:action(
       'run' : %updating fn() { $args?cache ! cache:delete(.) }
     } },
     'clear': fn($args) { {
-      'info': 'All caches were cleared.',
+      'info': 'All caches and their options were cleared.',
       'run' : %updating fn() { cache:clear() }
     } }
   })

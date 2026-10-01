@@ -124,6 +124,13 @@ public final class CacheModuleTest extends SandboxTest {
     query("(0 to " + cachemax + ") ! " + _CACHE_PUT.args(" string()", " ."));
     query(func.args() + "?entries", cachemax);
     query(func.args() + "?evictions", 1);
+
+    // limits: defaults, or the options of an initialized cache
+    query(func.args("unknown") + "?max-entries", cachemax);
+    query(func.args("unknown") + "?ttl", context.soptions.get(StaticOptions.CACHETTL));
+    query(_CACHE_INIT.args(" { 'max-entries': 2, 'ttl': 0 }", "unknown"));
+    query(func.args("unknown") + "?max-entries", 2);
+    query(func.args("unknown") + "?ttl", 0);
   }
 
   /** Test method. */

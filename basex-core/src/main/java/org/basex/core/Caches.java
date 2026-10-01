@@ -122,14 +122,17 @@ public final class Caches {
   /**
    * Returns statistics of a cache.
    * @param name name of cache
-   * @return number of entries, hits, misses, evicted and expired entries
+   * @return number of entries, limits, hits, misses, evicted and expired entries
    * @throws QueryException query exception
    */
   public synchronized XQMap info(final String name) throws QueryException {
     final Cache cache = caches.get(name);
     if(cache != null) cache.cleanup();
+    final Config config = cache != null ? cache.config : config(name);
     return new MapBuilder().
       put("entries", Itr.get(cache != null ? cache.size() : 0)).
+      put("max-entries", Itr.get(config.max)).
+      put("ttl", Itr.get(config.ttl)).
       put("hits", Itr.get(cache != null ? cache.hits : 0)).
       put("misses", Itr.get(cache != null ? cache.misses : 0)).
       put("evictions", Itr.get(cache != null ? cache.evictions : 0)).
@@ -208,10 +211,18 @@ public final class Caches {
    * @return cache
    */
   private Cache create(final String name) {
-    Config config = configs.get(name);
-    if(config == null) config = new Config(context.soptions.get(StaticOptions.CACHEMAX),
+    return new Cache(config(name));
+  }
+
+  /**
+   * Returns the configuration of a cache.
+   * @param name name of cache
+   * @return configuration
+   */
+  private Config config(final String name) {
+    final Config config = configs.get(name);
+    return config != null ? config : new Config(context.soptions.get(StaticOptions.CACHEMAX),
       context.soptions.get(StaticOptions.CACHETTL));
-    return new Cache(config);
   }
 
   /**

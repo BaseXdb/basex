@@ -528,6 +528,8 @@ declare function panels:caches() as element(form) {
       let $headers := (
         { 'key': 'label', 'label': 'Name' },
         { 'key': 'entries', 'label': 'Entries', 'type': 'number', 'order': 'desc' },
+        { 'key': 'max-entries', 'label': 'Limit', 'type': 'number', 'order': 'desc' },
+        { 'key': 'lifetime', 'label': 'Lifetime' },
         { 'key': 'hits', 'label': 'Hits', 'type': 'number', 'order': 'desc' },
         { 'key': 'misses', 'label': 'Misses', 'type': 'number', 'order': 'desc' },
         { 'key': 'evictions', 'label': 'Evicted', 'type': 'number', 'order': 'desc' },
@@ -535,9 +537,21 @@ declare function panels:caches() as element(form) {
       )
       let $entries :=
         for $cache in $names
+        let $info := cache:info($cache)
+        let $lookups := $info?hits + $info?misses
+        (: the first map takes precedence: its hits are supplemented by the hit rate :)
         return map:merge((
-          { 'cache': $cache, 'label': $cache[.] otherwise '(default)' },
-          cache:info($cache)
+          {
+            'cache': $cache,
+            'label': $cache[.] otherwise '(default)',
+            'lifetime': if ($info?ttl = 0) then 'unlimited' else (
+              string(seconds($info?ttl)) => replace('[PT]', '') => lower-case()
+            ),
+            'hits': if ($lookups = 0) then 0 else (
+              $info?hits || ' (' || format-number($info?hits div $lookups, '0%') || ')'
+            )
+          },
+          $info
         ))
       let $buttons := (
         form:button('caches/delete', 'Delete', ('CHECK', 'CONFIRM')),
