@@ -33,6 +33,10 @@ public interface JobsText {
   /** QName. */
   QNm Q_USER = new QNm("user");
   /** QName. */
+  QNm Q_ADDRESS = new QNm("address");
+  /** QName. */
+  QNm Q_SESSION = new QNm("session");
+  /** QName. */
   QNm Q_READS = new QNm("reads");
   /** QName. */
   QNm Q_WRITES = new QNm("writes");

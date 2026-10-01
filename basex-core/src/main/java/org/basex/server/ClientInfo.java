@@ -26,6 +26,14 @@ public interface ClientInfo {
   String clientName();
 
   /**
+   * Returns the ID of the session of the current client.
+   * @return session ID (can be {@code null})
+   */
+  default String clientSession() {
+    return null;
+  }
+
+  /**
    * Returns the name of a client, taken from the specified object or from the logged-in user.
    * @param id object with user ID (can be {@code null})
    * @param ctx database context

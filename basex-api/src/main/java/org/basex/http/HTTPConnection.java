@@ -291,6 +291,11 @@ public final class HTTPConnection implements ClientInfo {
     return clientName(value, context);
   }
 
+  @Override
+  public String clientSession() {
+    return RequestState.id(requestCtx.state().session(false));
+  }
+
   /**
    * Sends the proprietary 460 status code and the exception message as info.
    * @param ex job exception

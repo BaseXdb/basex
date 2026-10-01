@@ -304,6 +304,14 @@ public final class Context {
   }
 
   /**
+   * Returns the ID of the session of a client.
+   * @return session ID (can be {@code null})
+   */
+  public String clientSession() {
+    return client != null ? client.clientSession() : null;
+  }
+
+  /**
    * Assigns an external object.
    * @param object external object
    */
@@ -334,7 +342,7 @@ public final class Context {
    * @return detached context
    */
   public Context detach() {
-    final String address = clientAddress(), name = clientName();
+    final String address = clientAddress(), name = clientName(), session = clientSession();
     final Context ctx = new Context(this, new ClientInfo() {
       @Override
       public String clientAddress() {
@@ -343,6 +351,10 @@ public final class Context {
       @Override
       public String clientName() {
         return name;
+      }
+      @Override
+      public String clientSession() {
+        return session;
       }
     });
     ctx.external.clear();

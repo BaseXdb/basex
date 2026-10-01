@@ -173,6 +173,9 @@ public enum ApiFunction implements AFunction {
   _SESSIONS_IDS(SessionsIds::new, "ids()",
       params(), STRING_ZM, SESSIONS_URI, Perm.ADMIN),
   /** XQuery function. */
+  _SESSIONS_LIST_DETAILS(SessionsListDetails::new, "list-details(id?)",
+      params(STRING_ZO), ELEMENT_ZM, SESSIONS_URI, Perm.ADMIN),
+  /** XQuery function. */
   _SESSIONS_NAMES(SessionsNames::new, "names(id)",
       params(STRING_O), STRING_ZM, SESSIONS_URI, Perm.ADMIN),
   /** XQuery function. */

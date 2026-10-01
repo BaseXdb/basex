@@ -49,6 +49,8 @@ public final class JobListDetails extends StandardFunc {
       elem.attr(Q_TYPE, jc.type());
       elem.attr(Q_STATE, job.state.name().toLowerCase(Locale.ENGLISH));
       elem.attr(Q_USER, jc.context.clientName());
+      elem.attr(Q_ADDRESS, jc.context.clientAddress());
+      elem.attr(Q_SESSION, jc.context.clientSession());
       if(ms >= 0) elem.attr(Q_DURATION, DTDur.get(ms).string(info));
       if(jt != null) {
         elem.attr(Q_START, Dtm.local(jt.start, info).string(info));
