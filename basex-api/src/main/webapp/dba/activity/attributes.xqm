@@ -123,24 +123,13 @@ declare %private function dba:actions(
         void($set($args?id, $args?name, utils:evaluate($args?value)))
       }
     } },
-    'delete': fn($args) {
-      (: an attribute is addressed by what holds it, which is of no interest of its own; the
-         row of a holder that holds nothing names no attribute to delete :)
-      let $ids := $args?id[substring-after(., '|')]
-      return {
-        'info': utils:info($ids ! substring-after(., '|'), 'attribute', 'deleted'),
-        'run' : %updating fn() {
-          void($ids ! $delete(substring-before(., '|'), substring-after(., '|')))
-        }
-      }
-    },
-    'close': fn($args) {
-      (: a holder is closed as a whole, however many of its attributes were checked :)
-      let $ids := distinct-values($args?id ! substring-before(., '|'))
-      return {
-        'info': utils:info($ids, $noun, 'closed'),
-        'run' : %updating fn() { void($ids ! $close(.)) }
-      }
-    }
+    'delete': fn($args) { {
+      'info': utils:info($args?name, 'attribute', 'deleted'),
+      'run' : %updating fn() { void($delete($args?id, $args?name)) }
+    } },
+    'close': fn($args) { {
+      'info': utils:info($args?id, $noun, 'closed'),
+      'run' : %updating fn() { void($args?id ! $close(.)) }
+    } }
   }
 };

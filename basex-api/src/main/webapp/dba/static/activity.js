@@ -1,5 +1,22 @@
 /** Activity view: jobs and sessions of the server. */
 
+/** Duration of the fade of a row that was added by a refresh, in milliseconds. */
+const ADDED_MS = 3000;
+/** Times when rows were added, keyed by panel and row id. */
+const _added = new Map();
+/** Id of the web session whose rows are pointed at (null if none). */
+let _related = null;
+/**
+ * Highlights the rows of all panels that belong to the web session that is pointed at.
+ */
+function markRelated() {
+  for(const row of document.querySelectorAll("tr.related")) row.classList.remove("related");
+  if(_related === null) return;
+  for(const label of document.querySelectorAll("span[data-session]")) {
+    if(label.dataset.session === _related) label.closest("tr")?.classList.add("related");
+  }
+}
+
 /**
  * Requests the panels of the activity view. The answer is pushed back by the server;
  * see showActivity, which asks for the next one.
@@ -35,7 +52,25 @@ function showActivity(json) {
     // every panel is named by the block it is filled into; what was ticked in the meantime is
     // ticked again by fillPanel
     for(const [ id, html ] of Object.entries(json.panels)) {
-      if(document.getElementById(id)) fillPanel(id, html);
+      const pane = document.getElementById(id);
+      if(pane) {
+        // rows are named by what they list: a name that was not shown before marks a new entry
+        const ids = new Set([ ...pane.querySelectorAll("tr[id]") ].map(row => row.id));
+        fillPanel(id, html);
+        const now = Date.now();
+        for(const row of pane.querySelectorAll("tr[id]")) {
+          const key = `${id}/${row.id}`;
+          if(!ids.has(row.id)) _added.set(key, now);
+          // a row is replaced while it fades in: the fade is resumed where it was
+          const elapsed = now - (_added.get(key) ?? -ADDED_MS);
+          if(elapsed < ADDED_MS) {
+            row.classList.add("added");
+            row.style.setProperty("--added-delay", `-${elapsed}ms`);
+          } else {
+            _added.delete(key);
+          }
+        }
+      }
     }
     // a running job's details are replaced as well; the final ones are applied once, together
     // with the editor for its result, and are then left alone
@@ -50,6 +85,8 @@ function showActivity(json) {
 
     const live = document.getElementById("live");
     if(live) live.checked = wasLive;
+    // the replaced rows are highlighted again
+    markRelated();
   }
   scheduleLive(refreshActivity, wasLive);
 }
@@ -96,6 +133,17 @@ function initActivity() {
     // a reload must not ask for a result that is gone by then
     hideParams("download");
   }
+
+  // the rows are replaced by the refresh: the pointer is followed on the whole page, and a row
+  // stands for the session it names
+  document.addEventListener("mouseover", event => {
+    const label = event.target.closest?.("tr")?.querySelector("span[data-session]");
+    const session = label?.dataset.session ?? null;
+    if(session !== _related) {
+      _related = session;
+      markRelated();
+    }
+  });
 
   // refreshActivity checks the 'Live' state itself
   refreshActivity();

@@ -92,15 +92,17 @@ declare function form:field(
  : @param  $title   heading of the dialog; its buttons are the OK and Cancel of every dialog
  : @param  $action  action the form posts to
  : @param  $upload  whether the dialog submits files
- : @param  $fields  form fields
+ : @param  $fields   form fields
+ : @param  $buttons  buttons between OK and Cancel
  : @return dialog
  :)
 declare function form:dialog(
-  $id      as xs:string,
-  $title   as xs:string,
-  $action  as xs:string,
-  $upload  as xs:boolean,
-  $fields  as node()*
+  $id       as xs:string,
+  $title    as xs:string,
+  $action   as xs:string,
+  $upload   as xs:boolean,
+  $fields   as node()*,
+  $buttons  as element(button)* := ()
 ) as element(dialog) {
   (: it is submitted like any other form, so the action it posts to redirects back to the
      page it was opened from :)
@@ -112,6 +114,7 @@ declare function form:dialog(
       $fields,
       <div class='buttons'>{
         <button>OK</button>,
+        $buttons,
         (: 'dialog' closes the dialog instead of submitting it: native, and needs no script :)
         <button formmethod='dialog' formnovalidate=''>Cancel</button>
       }</div>

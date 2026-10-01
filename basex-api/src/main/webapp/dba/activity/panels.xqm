@@ -26,20 +26,22 @@ declare function panels:jobs(
     {
       let $headers := (
         { 'key': 'job', 'label': 'ID', 'type': 'dynamic' },
-        { 'key': 'state', 'label': 'State' },
+        { 'key': 'state', 'label': 'State', 'type': 'dynamic' },
         { 'key': 'service', 'label': 'Service' },
         { 'key': 'duration', 'label': 'Dur.', 'type': 'number', 'order': 'desc' },
-        { 'key': 'user', 'label': 'User' },
+        { 'key': 'user', 'label': 'User', 'type': 'dynamic' },
+        { 'key': 'session', 'label': 'Session', 'type': 'dynamic' },
+        { 'key': 'locks', 'label': 'Locks', 'type': 'dynamic' },
         { 'key': 'time', 'label': 'Time', 'type': 'time', 'order': 'desc' },
         { 'key': 'start', 'label': 'Start', 'type': 'time', 'order': 'desc' }
       )
       let $services := job:services()
       let $jobs := job:list-details()
       let $entries := (
+        (: the job that renders this table is of no interest :)
         let $curr := job:current()
         for $details in $jobs
         let $id := $details/@id
-        (: the job that renders this table is of no interest :)
         where not($id = $curr)
         let $sec := (xs:dayTimeDuration($details/@duration) div xs:dayTimeDuration('PT1S'))
           otherwise 0
@@ -49,10 +51,14 @@ declare function panels:jobs(
         return {
           'id': $id,
           'job': panels:job-link($id),
-          'state': $details/@state,
+          'state': panels:job-state($details/@state),
           'service': if ($services/@id = $id) then '✓' else '–',
           'duration': html:duration($sec),
-          'user': $details/@user,
+          (: the address of the client is rarely of interest; the session names the row of the
+             Web Sessions panel that the job was started from :)
+          'user': panels:job-user($details),
+          'session': ($details/@session ! panels:session(.)) otherwise '–',
+          'locks': panels:job-locks($details),
           'time': $time,
           'start': $start otherwise $time
         },
@@ -63,7 +69,7 @@ declare function panels:jobs(
         return {
           'id': $id,
           'job': panels:job-link($id),
-          'state': 'registered',
+          'state': panels:job-state('registered'),
           'service': '✓'
         }
       )
@@ -90,7 +96,52 @@ declare function panels:jobs(
 declare %private function panels:job-link(
   $id  as xs:string
 ) as fn() as element(a) {
-  fn() { <a href='?job={ $id }'>{ $id }</a> }
+  fn() { <a class='nowrap' href='?job={ $id }'>{ $id }</a> }
+};
+
+(:~
+ : Creates the state of a job.
+ : @param  $state  state
+ : @return function creating the state
+ :)
+declare %private function panels:job-state(
+  $state  as xs:string
+) as fn() as item() {
+  (: a queued job waits for the locks of another one: it is what a user asks about :)
+  fn() {
+    if ($state = 'queued') then <b title='Waiting for locks held by other jobs'>queued</b>
+    else $state
+  }
+};
+
+(:~
+ : Creates the user of a job, with the address of its client as tooltip.
+ : @param  $details  job details
+ : @return function creating the user
+ :)
+declare %private function panels:job-user(
+  $details  as element(job)
+) as fn() as item()* {
+  let $user := string($details/@user)
+  let $address := $details/@address ! html:address(.)
+  return fn() {
+    if ($address) then <span title='{ $address }'>{ $user }</span> else $user
+  }
+};
+
+(:~
+ : Creates the locks of a job: the databases it reads and writes.
+ : @param  $details  job details
+ : @return function creating the locks
+ :)
+declare %private function panels:job-locks(
+  $details  as element(job)
+) as fn() as xs:string {
+  let $locks := (
+    ('R: ' || $details/@reads)[not($details/@reads = ('', '(none)'))],
+    ('W: ' || $details/@writes)[not($details/@writes = ('', '(none)'))]
+  )
+  return fn() { string-join($locks, ' · ')[.] otherwise '–' }
 };
 
 (:~
@@ -247,8 +298,10 @@ declare %private function panels:job-information(
  : @param  $kind     what holds the attributes ('session', 'websocket')
  : @param  $actions  endpoint the buttons post to ('sessions', 'websockets')
  : @param  $heading  name of the panel
- : @param  $columns  table headers that the panel adds to the shared ones
- : @param  $holders  what is listed: the id, what is read for it, and its own column values
+ : @param  $columns  table headers that the panel adds before the shared ones
+ : @param  $after    table headers that the panel adds after the shared ones
+ : @param  $holders  what is listed: the id, what is read for it (attribute values as previews),
+ :                   and its own column values
  : @return panel contents
  :)
 declare %private function panels:attribute-panel(
@@ -256,6 +309,7 @@ declare %private function panels:attribute-panel(
   $actions  as xs:string,
   $heading  as xs:string,
   $columns  as map(*)+,
+  $after    as map(*)*,
   $holders  as map(*)*
 ) as element(form) {
   (: both are addressed by an id and keep named attributes, so both are listed in the same
@@ -265,15 +319,14 @@ declare %private function panels:attribute-panel(
     <h2>{ $heading }</h2>
     {
       let $headers := (
-        (: fixed widths: a value can be long, and is truncated rather than widening the table :)
-        { 'key': 'name', 'label': 'Name', 'type': 'dynamic', 'width': '17%' },
-        { 'key': 'value', 'label': 'Value', 'width': '21%' },
+        (: the columns of the holder come first: the first one carries the checkbox :)
+        $columns,
+        { 'key': 'attributes', 'label': 'Attributes', 'type': 'dynamic' },
         (: a time is as wide as it will ever be: it is given what it needs, not a share that
-           grows with the panel. 'Access' rather than 'Last Access': a label that does not fit
-           its column is truncated as a value is :)
+           grows with the panel :)
         { 'key': 'access', 'label': 'Access', 'type': 'time', 'order': 'desc',
           'width': '4.5rem' },
-        $columns
+        $after
       )
       let $entries :=
         for $holder in $holders
@@ -281,31 +334,19 @@ declare %private function panels:attribute-panel(
         (: what is listed can be gone before it is read; skip it, rather than failing the whole
            panel. Everything that is asked of the server for a holder is asked for here :)
         for $entry in try {
-          let $access := $holder?access()
-          (: one that holds nothing gets a row of its own: it can be closed like any other, and
-             one that is listed by none of its attributes could not be :)
-          for $name in ($holder?names() otherwise '')
-          let $value := if ($name) {
-            utils:preview($holder?value($name), $panels:PREVIEW)
-          }
+          let $values := map:build($holder?names(), value := $holder?value)
           return {
             {
-              'id': `{ $id }|{ $name }`,
-              'name': if ($name) then panels:attribute($kind, $id, $name) else '–',
-              'value': $value otherwise '–',
-              'access': $access
+              'id': $id,
+              'attributes': panels:attributes($kind, $id, $values),
+              'access': $holder?access()
             },
             $holder?columns
           }
         } catch sessions:not-found | ws:not-found { }
-        (: the attributes of one holder are listed in one block: they share its access time :)
         order by $entry?access descending
         return $entry
-      let $buttons := (
-        form:button($actions || '/delete', 'Delete', ('CHECK', 'CONFIRM')),
-        form:button($actions || '/close', 'Close', ('CHECK', 'CONFIRM'))
-      )
-      (: the checkbox submits the attribute: a holder is not addressed by what it shows :)
+      let $buttons := form:button($actions || '/close', 'Close', ('CHECK', 'CONFIRM'))
       return table:create($headers, $entries, $buttons, {}, { 'select': 'id' })
     }
   </form>
@@ -320,42 +361,103 @@ declare function panels:web-sessions() as element(form) {
   let $current := session:id()
   return panels:attribute-panel('session', 'sessions', 'Web Sessions',
     (
-      { 'key': 'you', 'label': 'You', 'width': '2.5rem' },
-      (: last, and with no width of its own: a session id is long, so it takes what the other
-         columns leave :)
-      { 'key': 'session', 'label': 'Session' }
+      { 'key': 'session', 'label': 'Session', 'type': 'dynamic', 'width': '7rem' },
+      { 'key': 'you', 'label': 'You', 'width': '2.5rem' }
     ),
-    for $id in sessions:ids()
+    (: a session that is not accessed again is discarded at this time :)
+    { 'key': 'expires', 'label': 'Expires', 'type': 'time', 'width': '4.5rem' },
+    for $session in sessions:list-details()
+    let $id := string($session/@id)
     return {
       'id': $id,
-      'access': fn() { sessions:accessed($id) },
+      'access': fn() { data($session/@accessed) },
       'names': fn() { sessions:names($id) },
-      'value': fn($name) { sessions:get($id, $name) },
+      'value': fn($name) { utils:preview(sessions:get($id, $name), $panels:PREVIEW) },
       'columns': {
-        'session': $id,
-        'you': if ($id = $current) then '✓' else '–'
+        'session': panels:session($id, $session/@created),
+        'you': if ($id = $current) then '✓' else '–',
+        'expires': data($session/@expires)
       }
     }
   )
 };
 
 (:~
- : Creates the link of an attribute: the name that assigns its value.
- : @param  $kind  what holds the attribute ('session', 'websocket')
- : @param  $id    id of the session or connection
- : @param  $name  attribute name
- : @return function creating the link
+ : Creates the label of a web session: the end of its id, which is shown in full as tooltip.
+ : @param  $id       session id
+ : @param  $created  creation time (can be empty)
+ : @return function creating the label
  :)
-declare %private function panels:attribute(
-  $kind  as xs:string,
-  $id    as xs:string,
-  $name  as xs:string
-) as fn() as element(a) {
-  fn() {
-    (: three values, so the call is handed the whole dataset :)
-    html:action($name, 'editAttribute', { 'kind': $kind, 'id': $id, 'name': $name },
-      { 'title': 'Assign a new value' })
+declare %private function panels:session(
+  $id       as xs:string,
+  $created  as xs:anyAtomicType? := ()
+) as fn() as element(span) {
+  (: the id of a servlet container starts with a prefix that all sessions share :)
+  let $title := string-join(($id, $created ! ('created ' || panels:exact(.))), ', ')
+  return fn() {
+    <span class='nowrap' title='{ $title }' data-session='{ $id }'>{
+      '…' || substring($id, string-length($id) - 7)
+    }</span>
   }
+};
+
+(:~
+ : Formats a time with its date and seconds, as it is forwarded to administrators.
+ : @param  $time  time
+ : @return formatted time
+ :)
+declare %private function panels:exact(
+  $time  as xs:anyAtomicType
+) as xs:string {
+  format-dateTime(html:adjust(xs:dateTime($time)), '[Y0000]-[M00]-[D00] [H00]:[m00]:[s00]')
+};
+
+(:~
+ : Creates the attributes of a session or connection: each name links to the dialog that edits it.
+ : @param  $kind    what holds the attributes ('session', 'websocket')
+ : @param  $id      id of the session or connection
+ : @param  $values  previews of the attribute values: strings or nodes
+ : @return function creating the attributes
+ :)
+declare %private function panels:attributes(
+  $kind    as xs:string,
+  $id      as xs:string,
+  $values  as map(xs:string, item()*)
+) as fn() as item()+ {
+  fn() {
+    (
+      for $name at $pos in map:keys($values)
+      return (
+        (: text nodes: adjacent strings would be separated by spaces :)
+        text { '; ' }[$pos > 1],
+        (: three values, so the call is handed the whole dataset :)
+        html:action($name, 'editAttribute', { 'kind': $kind, 'id': $id, 'name': $name },
+          { 'title': 'Edit or delete the attribute' }),
+        text { ': ' },
+        for $value in $values?$name
+        return if ($value instance of node()) then $value else text { $value }
+      )
+    ) otherwise '–'
+  }
+};
+
+(:~
+ : Creates the links to the jobs that the DBA runs for a connection.
+ : @param  $jobs  ids of the query and of the job that pushes its outcome to the client
+ : @return links
+ :)
+declare %private function panels:dba-jobs(
+  $jobs  as map(*)
+) as node()* {
+  (: the ids are kept after the jobs are done: only a job that is still registered is linked :)
+  let $registered := job:list()
+  return (
+    if ($jobs?query = $registered) then panels:job-link($jobs?query)()
+    else text { $jobs?query || ' (finished)' },
+    if ($jobs?reader = $registered) {
+      text { ' (reader: ' }, panels:job-link($jobs?reader)(), text { ')' }
+    }
+  )
 };
 
 (:~
@@ -365,7 +467,7 @@ declare %private function panels:attribute(
 declare function panels:session-dialog() as element(dialog) {
   (: as the dialog that starts a job, it is not part of a panel: the panels are replaced while
      the view refreshes :)
-  panels:attribute-dialog('session', 'Session:', 'sessions/set')
+  panels:attribute-dialog('session', 'Session:', 'sessions')
 };
 
 (:~
@@ -373,24 +475,24 @@ declare function panels:session-dialog() as element(dialog) {
  : @return dialog
  :)
 declare function panels:websocket-dialog() as element(dialog) {
-  panels:attribute-dialog('websocket', 'WebSocket:', 'websockets/set')
+  panels:attribute-dialog('websocket', 'WebSocket:', 'websockets')
 };
 
 (:~
- : Creates the dialog that assigns an attribute.
- : @param  $kind    what holds the attribute ('session', 'websocket')
- : @param  $label   label of the field that names it
- : @param  $action  action the dialog posts to
+ : Creates the dialog that assigns or deletes an attribute.
+ : @param  $kind     what holds the attribute ('session', 'websocket')
+ : @param  $label    label of the field that names it
+ : @param  $actions  endpoint the dialog posts to ('sessions', 'websockets')
  : @return dialog
  :)
 declare %private function panels:attribute-dialog(
-  $kind    as xs:string,
-  $label   as xs:string,
-  $action  as xs:string
+  $kind     as xs:string,
+  $label    as xs:string,
+  $actions  as xs:string
 ) as element(dialog) {
   (: the ids of its fields are derived from what holds the attribute, so that the two dialogs
      of the view do not collide :)
-  form:dialog($kind, 'Set Attribute', $action, false(), (
+  form:dialog($kind, 'Attribute', $actions || '/set', false(), (
     (: what holds the attribute is chosen in the panel; the name is not, so an attribute that
        it does not hold yet can be assigned as well :)
     form:field('Name:',
@@ -408,7 +510,7 @@ declare %private function panels:attribute-dialog(
     )),
     (: filled in by the client if the value it fetched cannot be shown :)
     <div id='{ $kind }-note' class='note'/>
-  ))
+  ), <button formaction='{ $actions }/delete'>Delete</button>)
 };
 
 (:~
@@ -457,28 +559,39 @@ declare function panels:websockets() as element(form) {
   (: what a connection holds is its own; what the server can do with it is to close it :)
   panels:attribute-panel('websocket', 'websockets', 'WebSockets',
     (
-      { 'key': 'websocket', 'label': 'ID', 'type': 'dynamic', 'width': '14%' },
-      (: last, and with no width of its own: a session id is long, so it takes what the
-         other columns leave :)
-      { 'key': 'session', 'label': 'Session' }
+      { 'key': 'websocket', 'label': 'Connection', 'type': 'dynamic', 'width': '9rem' },
+      { 'key': 'session', 'label': 'Session', 'type': 'dynamic', 'width': '7rem' }
     ),
+    (),
     for $ws in ws:list-details()
     let $id := string($ws/@id)
+    let $path := string($ws/@path)
+    let $dba := matches($path, '^/?dba(/|$)')
     return {
       'id': $id,
       'access': fn() { data($ws/@accessed) },
       'names': fn() { sort(ws:names($id), '?lang=en') },
-      'value': fn($name) { ws:get($id, $name) },
+      (: the jobs that the DBA runs for a connection link to their details :)
+      'value': fn($name) {
+        let $value := ws:get($id, $name)
+        return if ($dba and $name = $utils:JOB) then panels:dba-jobs($value)
+        else utils:preview($value, $panels:PREVIEW)
+      },
       'columns': {
-        (: the tooltip carries what a column of its own would cost more than it is worth:
-           the path, the user and the address of the client, and the time of the handshake :)
+        (: the connection is named by the path it was opened on, a view of the DBA by its
+           name. The tooltip carries what a column of its own would cost more than it is
+           worth: the id, the user and the address of the client, and the time of the
+           handshake :)
         'websocket': fn() {
-          <span title='{ string-join(($ws/@path, $ws/@user, $ws/@address,
-            'opened ' || html:date(xs:dateTime($ws/@created))), ', ') }'>{ $id }</span>
+          <span class='nowrap' title='{ string-join(($id, $ws/@user, html:address($ws/@address),
+            'opened ' || panels:exact($ws/@created)), ', ') }'>{
+            if ($dba) then 'DBA: ' || utils:capitalize(replace($path, '^/?dba/?', ''))
+            else $path
+          }</span>
         },
         (: the session that was authenticated for the handshake: it names the row of the
            Web Sessions panel that the connection belongs to :)
-        'session': data($ws/@session) otherwise '–'
+        'session': ($ws/@session ! panels:session(.)) otherwise '–'
       }
     }
   )
@@ -495,6 +608,8 @@ declare function panels:db-sessions() as element()+ {
       { 'key': 'address', 'label': 'Address' },
       { 'key': 'user', 'label': 'User' }
     ),
-    admin:sessions() ! { 'address': @address, 'user': @user }
+    for $session in admin:sessions()
+    let $address := string($session/@address)
+    return { 'address': fn() { html:address($address) }, 'user': $session/@user }
   )
 };

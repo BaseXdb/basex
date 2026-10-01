@@ -8,7 +8,7 @@ module namespace utils = 'dba/lib/utils';
 import module namespace config = 'dba/lib/config' at 'config.xqm';
 
 (:~ WebSocket attribute: id of the job that runs for the current connection. :)
-declare %private variable $utils:JOB := 'dba-job';
+declare variable $utils:JOB := 'dba-job';
 
 (:~ Regular expression for XQuery files; matches the suffixes of IO.XQSUFFIXES. :)
 declare variable $utils:XQUERY-REGEX := '\.(xq|xqm|xqy|xql|xqu|xquery|xpath)$';
@@ -270,7 +270,8 @@ declare function utils:ws-start(
         },
         { 'info': utils:html(utils:query-info($info)), 'time': $info?timing?total }[exists($info)]
       }
-    }, (), { 'serializer': { 'method': 'json' } }),
+    (: named after the query: the name cannot be taken by another job of the DBA :)
+    }, (), { 'id': $id || '/reader', 'serializer': { 'method': 'json' } }),
     'query': $id
   })
 };

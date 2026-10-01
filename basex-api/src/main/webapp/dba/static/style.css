@@ -28,6 +28,9 @@
   --border: #AAA;
   --border-light: #DDD;
   --pre-bg: #F8F8F8;
+  /* table rows that belong to the session that is pointed at, and rows added by a refresh */
+  --row-related: #EEE;
+  --row-added: #E3F3E3;
   --info: #090;
   --warning: #999;
 }
@@ -43,6 +46,8 @@
     --border: #555;
     --border-light: #444;
     --pre-bg: #2a2a2a;
+    --row-related: #333;
+    --row-added: #253a25;
     --info: #6c6;
   }
 }
@@ -358,6 +363,22 @@ table.fixed th, table.fixed td {
 table.fixed td.expanded {
   white-space: normal;
   overflow-wrap: anywhere;
+}
+/* the rows that belong to the web session that is pointed at, in all panels */
+tr.related {
+  background-color: var(--row-related);
+}
+/* a row that a refresh added fades in: what happened is seen without comparing tables */
+tr.added > td {
+  /* the delay is negative if the row was replaced while it faded in (see ADDED_MS) */
+  animation: added 3s ease-out var(--added-delay, 0s);
+}
+@keyframes added {
+  from { background-color: var(--row-added); }
+}
+/* identifiers: a line may otherwise break after a hyphen, a space or an ellipsis */
+.nowrap {
+  white-space: nowrap;
 }
 /* chevron on expandable cells */
 table.fixed td:is(.truncated, .expanded) {
