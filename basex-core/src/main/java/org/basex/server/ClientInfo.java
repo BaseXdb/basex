@@ -56,4 +56,17 @@ public interface ClientInfo {
     // user is unknown
     return null;
   }
+
+  /**
+   * Returns a client address in a uniform notation, with IPv6 addresses enclosed in brackets.
+   * @param host host address (can be {@code null})
+   * @param port port ({@code -1}: no port)
+   * @return address (can be {@code null})
+   */
+  static String address(final String host, final int port) {
+    if(host == null) return null;
+    final String address = host.indexOf(':') == -1 || host.startsWith("[") ? host :
+      '[' + host + ']';
+    return port != -1 ? address + ':' + port : address;
+  }
 }

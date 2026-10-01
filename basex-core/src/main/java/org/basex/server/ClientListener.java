@@ -327,12 +327,12 @@ public final class ClientListener extends Thread implements ClientInfo {
 
   @Override
   public String clientAddress() {
-    return socket.getInetAddress().getHostAddress() + ':' + socket.getPort();
+    return ClientInfo.address(socket.getInetAddress().getHostAddress(), socket.getPort());
   }
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("[").append(clientAddress()).append(']');
+    final StringBuilder sb = new StringBuilder(clientAddress());
     if(context.data() != null) sb.append(COLS).append(context.data().meta.name);
     return sb.toString();
   }

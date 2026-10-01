@@ -274,7 +274,7 @@ public final class HTTPConnection implements ClientInfo {
 
   @Override
   public String clientAddress() {
-    return originalAddress != null ? originalAddress + ':' + remotePort : null;
+    return ClientInfo.address(originalAddress, remotePort);
   }
 
   @Override

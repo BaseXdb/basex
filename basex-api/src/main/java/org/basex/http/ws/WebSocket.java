@@ -153,7 +153,8 @@ public final class WebSocket extends Endpoint implements ClientInfo, WsSession {
 
   @Override
   public String clientAddress() {
-    return requestCtx.state().originalAddress();
+    final RequestState state = requestCtx.state();
+    return ClientInfo.address(state.originalAddress(), state.remotePort());
   }
 
   @Override
