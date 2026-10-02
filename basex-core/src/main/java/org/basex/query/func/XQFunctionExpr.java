@@ -55,6 +55,34 @@ public interface XQFunctionExpr {
   }
 
   /**
+   * Returns the function name and its parameter names for error messages.
+   * @return string, or {@code null} if the parameters are not named
+   */
+  default String paramString() {
+    return null;
+  }
+
+  /**
+   * Returns the name and the parameter names of the specified function for error messages.
+   * @param func function
+   * @param min number of required parameters
+   * @return string
+   */
+  static String paramString(final XQFunctionExpr func, final int min) {
+    final QNm name = func.funcName();
+    final TokenBuilder tb = new TokenBuilder();
+    tb.add(name != null ? name.prefixString() : QueryText.FN).add('(');
+    final int arity = func.arity();
+    for(int a = 0; a < arity; a++) {
+      if(a > 0) tb.add(", ");
+      if(name == null) tb.add('$');
+      tb.add(func.paramName(a).prefixString());
+      if(a >= min) tb.add('?');
+    }
+    return tb.add(')').toString();
+  }
+
+  /**
    * Tries to inline this function with the given arguments.
    * @param exprs arguments
    * @param cc compilation context

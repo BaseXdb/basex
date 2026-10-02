@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.ErrType.*;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -1829,7 +1830,7 @@ public enum QueryError {
    */
   public static QueryException applyError(final Object function, final long nargs,
       final int arity, final boolean exact, final InputInfo info) {
-    return APPLY_X_X.get(info, function, arity(arguments(nargs), exact ? arity : -arity));
+    return APPLY_X_X.get(info, label(function), arity(arguments(nargs), exact ? arity : -arity));
   }
 
   /**
@@ -1844,7 +1845,17 @@ public enum QueryError {
   public static QueryException arityError(final Expr expr, final int supplied, final int expected,
       final boolean param, final InputInfo info) {
     final String input = param ? "Function with " + parameters(supplied) : arguments(supplied);
-    return INVARITY_X_X.get(info, expr, arity(input, expected));
+    return INVARITY_X_X.get(info, label(expr), arity(input, expected));
+  }
+
+  /**
+   * Returns the label of a function for arity errors.
+   * @param function function
+   * @return function name and parameter names, or the function itself
+   */
+  private static Object label(final Object function) {
+    final String string = function instanceof final XQFunctionExpr fe ? fe.paramString() : null;
+    return string != null ? string : function;
   }
 
   /**

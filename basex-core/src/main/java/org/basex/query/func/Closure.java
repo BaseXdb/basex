@@ -119,6 +119,11 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
+  public String paramString() {
+    return XQFunctionExpr.paramString(this, params.length);
+  }
+
+  @Override
   public FuncType funcType() {
     // before optimization, the sequence type is still the generic function type
     final FuncType ft = super.funcType();

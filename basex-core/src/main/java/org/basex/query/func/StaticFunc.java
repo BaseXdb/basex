@@ -144,19 +144,9 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     return params[pos].name;
   }
 
-  /**
-   * Returns the function name and its parameter names for error messages.
-   * @return string
-   */
+  @Override
   public String paramString() {
-    final TokenBuilder tb = new TokenBuilder().add(name.prefixString()).add('(');
-    final int pl = params.length;
-    for(int p = 0; p < pl; p++) {
-      if(p > 0) tb.add(", ");
-      tb.add(params[p].name.prefixString());
-      if(p >= min) tb.add('?');
-    }
-    return tb.add(')').toString();
+    return XQFunctionExpr.paramString(this, min);
   }
 
   @Override

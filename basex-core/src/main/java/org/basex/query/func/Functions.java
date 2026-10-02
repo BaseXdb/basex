@@ -89,13 +89,13 @@ public final class Functions {
     final QNm name = funcName(qnm, fb.arity, fb.info, qc);
 
     // constructor function
-    if(eq(name.uri(), XS_URI)) return constructorCall(name, fb);
+    if(eq(name.uri(), XS_URI)) return constructorCall(name, fb, false);
 
     // built-in function
     final FuncDefinition fd = builtIn(name);
     if(fd != null) {
       final int min = fd.minMax[0], max = fd.minMax[1];
-      final Expr[] prepared = prepareArgs(fb, fd.params, min, max, fd.visible, fd);
+      final Expr[] prepared = prepareArgs(fb, fd.params, min, max, fd.visible, false, fd);
       final StandardFunc sf = fd.get(fb.info, prepared);
       if(sf.hasUPD()) qc.updating();
       return sf;
@@ -153,7 +153,7 @@ public final class Functions {
     // constructor function
     if(eq(name.uri(), XS_URI)) {
       if(arity > 0) fb.add(CAST_PARAM[0], Types.ANY_ATOMIC_TYPE_ZO, qc);
-      final Cast expr = constructorCall(name, fb);
+      final Cast expr = constructorCall(name, fb, true);
       final FuncType ft = FuncType.get(fb.anns, expr.castType(), fb.params);
       return item(expr, fb, ft, name, false, arity == 0);
     }
@@ -261,17 +261,20 @@ public final class Functions {
    * Returns a constructor call.
    * @param name function name
    * @param fb function arguments
+   * @param literal literal flag
    * @return cast expression
    * @throws QueryException query exception
    */
-  private static Cast constructorCall(final QNm name, final FuncBuilder fb) throws QueryException {
+  private static Cast constructorCall(final QNm name, final FuncBuilder fb, final boolean literal)
+      throws QueryException {
     Type type = ListType.get(name);
     if(type == null) type = BasicType.get(name, false);
     if(type == null) throw WHICHFUNC_X.get(fb.info, BasicType.similar(name));
     if(type.oneOf(BasicType.NOTATION, BasicType.ANY_ATOMIC_TYPE))
       throw ABSTRACTFUNC_X.get(fb.info, name.prefixId());
 
-    final Expr[] prepared = prepareArgs(fb, CAST_PARAM, 0, 1, 1, name.string());
+    final Expr[] prepared = prepareArgs(fb, CAST_PARAM, 0, 1, 1, literal,
+        Strings.concat(name.prefixString(), "(value?)"));
     return new Cast(fb.info, prepared.length != 0 ? prepared[0] :
       new ContextValue(fb.info), type.seqType(Occ.ZERO_OR_ONE));
   }
@@ -386,12 +389,14 @@ public final class Functions {
    * @param min minimum number of allowed arguments
    * @param max maximum number of allowed arguments
    * @param visible number of parameters that are not hidden
+   * @param literal literal flag
    * @param function function (for error messages)
    * @return arguments
    * @throws QueryException query exception
    */
   private static Expr[] prepareArgs(final FuncBuilder fb, final QNm[] names, final int min,
-      final int max, final int visible, final Object function) throws QueryException {
+      final int max, final int visible, final boolean literal, final Object function)
+      throws QueryException {
 
     final Expr[] args = fb.keywords != null ? prepareArgs(fb, names, visible, function) :
       fb.args();
@@ -403,7 +408,7 @@ public final class Functions {
       }
     }
     final IntList arities = checkArity(arity, min, max, visible);
-    if(arities != null) throw wrongArity(function, arity, arities, false, fb.info);
+    if(arities != null) throw wrongArity(function, arity, arities, literal, fb.info);
     return args;
   }
 

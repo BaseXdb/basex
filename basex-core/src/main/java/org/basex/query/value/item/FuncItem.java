@@ -109,6 +109,11 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
+  public String paramString() {
+    return XQFunctionExpr.paramString(this, params.length);
+  }
+
+  @Override
   public String funcIdentity() {
     final QNm qnm = funcName();
     final TokenBuilder tb = new TokenBuilder();
