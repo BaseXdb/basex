@@ -516,9 +516,7 @@ public abstract class SegmentedIndex extends ValueIndex {
       throws IOException {
     for(final char c : suffixes.toCharArray()) {
       final IOFile file = data.meta.dbFile(from + c);
-      if(file.exists() && !file.rename(data.meta.dbFile(to + c))) {
-        throw new IOException("Could not rename " + file + '.');
-      }
+      if(file.exists()) file.moveTo(data.meta.dbFile(to + c), true);
     }
   }
 

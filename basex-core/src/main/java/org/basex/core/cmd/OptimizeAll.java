@@ -146,7 +146,7 @@ public final class OptimizeAll extends ACreate {
     // move file resources to new database
     for(final ResourceType type : Resources.BINARIES) {
       final IOFile bin = ometa.dir(type);
-      if(bin.exists()) bin.rename(nmeta.dir(type));
+      if(bin.exists()) bin.moveTo(nmeta.dir(type), false);
     }
 
     // drop old database, rename temporary database

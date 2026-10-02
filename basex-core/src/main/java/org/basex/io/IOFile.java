@@ -510,15 +510,6 @@ public final class IOFile extends IO {
   }
 
   /**
-   * Renames a file to the specified path. The path must not exist yet.
-   * @param target target reference
-   * @return success flag
-   */
-  public boolean rename(final IOFile target) {
-    return file.renameTo(target.file);
-  }
-
-  /**
    * Copies a file to another target.
    * @param target target
    * @throws IOException I/O exception
@@ -531,12 +522,32 @@ public final class IOFile extends IO {
   }
 
   /**
-   * Moves a file to another target.
+   * Moves or renames a file or directory and creates missing parent directories of the target.
    * @param target target
+   * @param replace replace an existing target file
    * @throws IOException I/O exception
    */
-  public void moveTo(final IOFile target) throws IOException {
-    Files.move(toPath(), target.createParent(), StandardCopyOption.REPLACE_EXISTING);
+  public void moveTo(final IOFile target, final boolean replace) throws IOException {
+    move(toPath(), target.createParent(), replace);
+  }
+
+  /**
+   * Moves a file or directory, handling case-only renames via an intermediate path.
+   * @param src source path
+   * @param trg target path
+   * @param replace replace an existing target file
+   * @throws IOException I/O exception
+   */
+  public static void move(final Path src, final Path trg, final boolean replace)
+      throws IOException {
+    Path path = src;
+    final String s = src.getFileName().toString(), t = trg.getFileName().toString();
+    if(!s.equals(t) && s.equalsIgnoreCase(t)) {
+      path = src.resolveSibling(UUID.randomUUID().toString());
+      Files.move(src, path);
+    }
+    if(replace) Files.move(path, trg, StandardCopyOption.REPLACE_EXISTING);
+    else Files.move(path, trg);
   }
 
   @Override

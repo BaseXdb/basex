@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.nio.file.*;
 import java.util.*;
 import java.util.List;
 
@@ -259,12 +258,8 @@ public final class DBNew {
         trgDir.md();
         for(final String path : srcDir.descendants()) {
           final IOFile srcFile = new IOFile(srcDir, path), trgFile = new IOFile(trgDir, path);
-          if(trgFile.exists()) {
-            if(!replace) throw DB_CONFLICT5_X.get(info, path);
-            trgFile.delete();
-          }
-          trgFile.parent().md();
-          Files.move(Paths.get(srcFile.path()), Paths.get(trgFile.path()));
+          if(!replace && trgFile.exists()) throw DB_CONFLICT5_X.get(info, path);
+          srcFile.moveTo(trgFile, true);
         }
       }
     }

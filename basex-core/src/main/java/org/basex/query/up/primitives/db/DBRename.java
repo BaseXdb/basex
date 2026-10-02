@@ -2,6 +2,7 @@ package org.basex.query.up.primitives.db;
 
 import static org.basex.query.QueryError.*;
 
+import java.io.*;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -39,18 +40,18 @@ public final class DBRename extends DBUpdate {
   }
 
   @Override
-  public void apply() {
-    map.forEach((source, target) -> {
-      final IOFile src = new IOFile(source), trg = new IOFile(target);
+  public void apply() throws QueryException {
+    for(final Entry<String, String> entry : map.entrySet()) {
+      final IOFile src = new IOFile(entry.getKey()), trg = new IOFile(entry.getValue());
       if(src.exists()) {
-        if(trg.exists()) {
-          trg.delete();
-        } else {
-          trg.parent().md();
+        trg.delete();
+        try {
+          src.moveTo(trg, false);
+        } catch(final IOException ex) {
+          throw UPDBPUT_X.get(info, trg).cause(ex);
         }
-        src.rename(trg);
       }
-    });
+    }
   }
 
   @Override

@@ -5,7 +5,6 @@ import static org.basex.query.QueryError.*;
 import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.*;
-import java.util.*;
 
 import org.basex.core.jobs.*;
 import org.basex.io.*;
@@ -45,7 +44,7 @@ public class FileCopy extends FileFn {
     // or case difference on case-insensitive file systems)
     if(Files.exists(trg) && Files.isSameFile(src, trg)) {
       // adjust capitalization of the file name if necessary
-      if(!copy && !src.toString().equals(trg.toString())) move(src, trg);
+      if(!copy && !src.toString().equals(trg.toString())) IOFile.move(src, trg, true);
       return;
     }
 
@@ -107,25 +106,8 @@ public class FileCopy extends FileFn {
       if(copy) {
         Files.copy(src, trg, StandardCopyOption.REPLACE_EXISTING);
       } else {
-        move(src, trg);
+        IOFile.move(src, trg, true);
       }
     }
-  }
-
-  /**
-   * Moves a file or directory, handling case-only differences on case-insensitive
-   * file systems via an intermediate path.
-   * @param src source path
-   * @param trg target path
-   * @throws IOException I/O exception
-   */
-  private static void move(final Path src, final Path trg) throws IOException {
-    Path path = src;
-    final String s = src.getFileName().toString(), t = trg.getFileName().toString();
-    if(!s.equals(t) && s.equalsIgnoreCase(t)) {
-      path = src.resolveSibling(UUID.randomUUID().toString());
-      Files.move(src, path);
-    }
-    Files.move(path, trg, StandardCopyOption.REPLACE_EXISTING);
   }
 }

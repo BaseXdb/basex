@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
 import java.util.*;
 
 import javax.swing.*;
@@ -321,12 +322,15 @@ public final class ProjectView extends BaseXPanel {
       final IOFile old = node.file;
       final IOFile updated = new IOFile(old.file().getParent(), name);
       // rename file or show error dialog
-      if(old.rename(updated)) {
+      try {
+        old.moveTo(updated, false);
         // update tab references if file or directory could be renamed
         gui.editor.rename(old, updated);
         return updated;
+      } catch(final IOException ex) {
+        Util.debug(ex);
+        BaseXDialog.error(gui, Util.info(FILE_NOT_RENAMED_X, old));
       }
-      BaseXDialog.error(gui, Util.info(FILE_NOT_RENAMED_X, old));
     }
     return null;
   }

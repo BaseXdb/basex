@@ -2,10 +2,13 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
+import java.io.*;
+
 import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.Cmd;
 import org.basex.core.parse.Commands.CmdAlter;
+import org.basex.util.*;
 
 /**
  * Evaluates the 'alter database' command and renames a database.
@@ -64,7 +67,13 @@ public final class AlterDB extends ACreate {
 
     // drop target database
     DropDB.drop(target, sopts);
-    return sopts.dbPath(source).rename(sopts.dbPath(target));
+    try {
+      sopts.dbPath(source).moveTo(sopts.dbPath(target), false);
+      return true;
+    } catch(final IOException ex) {
+      Util.debug(ex);
+      return false;
+    }
   }
 
   @Override

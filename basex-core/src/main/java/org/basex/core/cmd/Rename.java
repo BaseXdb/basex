@@ -3,6 +3,8 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
+import java.io.*;
+
 import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.index.resource.*;
@@ -66,12 +68,13 @@ public final class Rename extends ACreate {
       for(final ResourceType type : Resources.BINARIES) {
         final IOFile src = data.meta.file(source, type);
         if(src != null && src.exists()) {
-          final IOFile trg = new IOFile(data.meta.dir(type), target);
-          if(!trg.parent().md() || !src.rename(trg)) {
-            ok = !info(NAME_INVALID_X, target);
-          } else {
+          try {
+            src.moveTo(new IOFile(data.meta.dir(type), target), false);
             // discard directories that have been emptied
             src.parent().deleteEmpty(data.meta.dir(type));
+          } catch(final IOException ex) {
+            Util.debug(ex);
+            ok = !info(NAME_INVALID_X, target);
           }
           c++;
         }

@@ -359,7 +359,7 @@ final class ProjectFilter extends BaseXBack {
     for(final String rel : backups) {
       final IOFile file = new IOFile(root, rel);
       try {
-        new IOFile(backupDir, rel).moveTo(file);
+        new IOFile(backupDir, rel).moveTo(file, true);
         reverted++;
       } catch(final IOException ex) {
         // file may not be writable
