@@ -53,14 +53,12 @@ public final class Delete extends ACreate {
    * @return number of deleted files
    */
   static int binaries(final Data data, final String path, final ResourceType type) {
-    int size = 0;
     final IOFile bin = data.meta.file(path, type);
-    if(bin != null && bin.exists()) {
-      size += bin.isDir() ? bin.descendants().size() : 1;
-      bin.delete();
-      // discard directories that have been emptied
-      bin.parent().deleteEmpty(data.meta.dir(type));
-    }
+    if(bin == null || !bin.exists()) return 0;
+    final int size = bin.files();
+    bin.delete();
+    // discard directories that have been emptied
+    bin.parent().deleteEmpty(data.meta.dir(type));
     return size;
   }
 }

@@ -226,7 +226,6 @@ public final class DBNew {
   private void writeFileResource(final Data d, final NewInput input)
       throws IOException, QueryException {
     final IOFile file = d.meta.file(input.path, input.type);
-    file.parent().md();
     if(input.type == ResourceType.BINARY) {
       try(InputStream is = input.value instanceof final Bin bin ? bin.input(info) :
         input.io.inputStream()) {

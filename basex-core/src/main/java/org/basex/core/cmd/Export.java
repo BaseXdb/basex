@@ -112,8 +112,6 @@ public final class Export extends Command {
         export.checkStop();
         export.progFile = io;
       }
-      // create dir if necessary
-      io.parent().md();
 
       // serialize file
       try(PrintOutput po = new PrintOutput(unique(target, io.path()))) {

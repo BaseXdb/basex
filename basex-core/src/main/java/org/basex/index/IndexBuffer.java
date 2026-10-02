@@ -80,8 +80,7 @@ public class IndexBuffer {
     final int ts = toks.size();
     if(loaded) index(id, toks, poss);
     else appended += ts;
-    if(log == null) log = new DataOutput(BufferOutput.get(
-        new FileOutputStream(file.file(), true)));
+    if(log == null) log = new DataOutput(BufferOutput.get(file.outputStream(true)));
     length += log.writeNum(id) + log.writeNum(ts);
     for(int t = 0; t < ts; t++) {
       length += log.writeToken(toks.get(t)) + log.writeNum(poss.get(t));

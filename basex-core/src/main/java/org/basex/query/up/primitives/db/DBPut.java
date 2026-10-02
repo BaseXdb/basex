@@ -47,7 +47,6 @@ public final class DBPut extends DBUpdate {
   public void apply() throws QueryException {
     for(final byte[] path : paths) {
       final IOFile bin = data.meta.file(string(path), ResourceType.VALUE);
-      bin.parent().md();
       try(DataOutput out = new DataOutput(bin)) {
         Stores.write(out, paths.get(path));
       } catch(final IOException ex) {

@@ -190,7 +190,6 @@ public class Options implements Iterable<Option<?>> {
         skip = eq(contents, tmp.finish());
       }
       if(!skip) {
-        file.parent().md();
         file.write(contents);
       }
     } catch(final Exception ex) {

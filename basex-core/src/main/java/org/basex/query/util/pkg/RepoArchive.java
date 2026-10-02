@@ -108,7 +108,6 @@ public final class RepoArchive {
         if(ze.isDirectory()) {
           trg.md();
         } else {
-          trg.parent().md();
           trg.write(in);
         }
       }

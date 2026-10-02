@@ -321,9 +321,7 @@ public final class MetaData {
    * @return number of resources
    */
   public int resources(final ResourceType type) {
-    final int[] files = { 0 };
-    if(dir != null) dir(type).walk(null, (path, attrs) -> files[0]++);
-    return files[0];
+    return dir != null ? dir(type).files() : 0;
   }
 
   /**

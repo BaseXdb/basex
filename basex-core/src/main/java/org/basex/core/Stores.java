@@ -309,7 +309,6 @@ public final class Stores implements Closeable {
       if(size == 0) {
         file.delete();
       } else {
-        file.parent().md();
         try(DataOutput out = new DataOutput(file)) {
           out.writeNum((int) size);
           for(final XQMap.Entry e : map.entries()) {

@@ -200,7 +200,6 @@ public final class BaseXHTTP extends CLI {
         // update file in resource path if it has changed
         if(!dir.exists() || !Token.eq(data, dir.read())) {
           Util.errln("Updating " +  dir);
-          dir.parent().md();
           dir.write(data);
         }
       }
@@ -217,7 +216,6 @@ public final class BaseXHTTP extends CLI {
     if(create) {
       // create configuration file
       Util.errln("Creating " +  target);
-      target.parent().md();
       target.write(data);
     }
     return target;

@@ -98,9 +98,8 @@ public final class BinaryPut extends ACreate {
    * @throws IOException I/O exception
    */
   public static void put(final InputSource in, final IOFile file) throws IOException {
-    // add directory if it does not exist anyway
+    // replace directory with the same name
     if(file.isDir()) file.delete();
-    file.parent().md();
 
     try(PrintOutput po = new PrintOutput(file)) {
       final Reader r = in.getCharacterStream();

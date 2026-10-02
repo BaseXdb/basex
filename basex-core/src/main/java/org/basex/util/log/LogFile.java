@@ -27,8 +27,7 @@ public final class LogFile {
    */
   static LogFile create(final String name, final IOFile dir) throws IOException {
     final LogFile lf = new LogFile(name, dir);
-    dir.md();
-    lf.fos = new FileOutputStream(lf.file.file(), true);
+    lf.fos = lf.file.outputStream(true);
     return lf;
   }
 

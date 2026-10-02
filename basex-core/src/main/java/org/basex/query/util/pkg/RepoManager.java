@@ -355,7 +355,6 @@ public final class RepoManager {
    */
   private static boolean write(final IOFile target, final byte[] content) throws IOException {
     final boolean exists = target.exists();
-    if(!target.parent().md()) throw new BaseXException("Could not create %.", target);
     target.write(content);
     return exists;
   }
@@ -381,7 +380,6 @@ public final class RepoManager {
           trg = new IOFile(repo, name);
         }
         if(trg != null) {
-          if(!trg.parent().md()) throw new BaseXException("Could not create %.", trg);
           trg.write(jarFile.getInputStream(entry));
         }
       }

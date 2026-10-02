@@ -89,7 +89,6 @@ public final class Restore extends ABackup {
           if(ze.isDirectory()) {
             trg.md();
           } else {
-            trg.parent().md();
             trg.write(zip.getInputStream(ze));
           }
         }

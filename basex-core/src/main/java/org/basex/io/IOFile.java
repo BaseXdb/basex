@@ -181,12 +181,34 @@ public final class IOFile extends IO {
   }
 
   /**
-   * Returns an output stream.
+   * Returns an output stream and creates missing parent directories.
    * @return output stream
    * @throws IOException I/O exception
    */
   public FileOutputStream outputStream() throws IOException {
-    return new FileOutputStream(file);
+    return outputStream(false);
+  }
+
+  /**
+   * Returns an output stream and creates missing parent directories.
+   * @param append append to an existing file
+   * @return output stream
+   * @throws IOException I/O exception
+   */
+  public FileOutputStream outputStream(final boolean append) throws IOException {
+    createParent();
+    return new FileOutputStream(file, append);
+  }
+
+  /**
+   * Creates missing parent directories.
+   * @return path to this file
+   * @throws IOException I/O exception
+   */
+  private Path createParent() throws IOException {
+    final Path path = toPath(), parent = path.getParent();
+    if(parent != null && !Files.isDirectory(parent)) Files.createDirectories(parent);
+    return path;
   }
 
   /**
@@ -281,6 +303,17 @@ public final class IOFile extends IO {
   }
 
   /**
+   * Returns the number of files: {@code 1} for a file, the number of descendants for a directory.
+   * @return number of files ({@code 0} if the path does not exist)
+   */
+  public int files() {
+    if(!isDir()) return exists() ? 1 : 0;
+    final int[] files = { 0 };
+    walk(null, (path, attrs) -> files[0]++);
+    return files[0];
+  }
+
+  /**
    * Returns the summed size of all regular descendant files.
    * @param job job for interrupting the operation (can be {@code null})
    * @return size
@@ -360,7 +393,7 @@ public final class IOFile extends IO {
    * @throws IOException I/O exception
    */
   public void write(final byte[] bytes) throws IOException {
-    Files.write(toPath(), bytes);
+    Files.write(createParent(), bytes);
   }
 
   /**
@@ -369,7 +402,7 @@ public final class IOFile extends IO {
    * @throws IOException I/O exception
    */
   public void write(final InputStream is) throws IOException {
-    Files.copy(is, toPath(), StandardCopyOption.REPLACE_EXISTING);
+    Files.copy(is, createParent(), StandardCopyOption.REPLACE_EXISTING);
   }
 
   /**
@@ -491,11 +524,9 @@ public final class IOFile extends IO {
    * @throws IOException I/O exception
    */
   public void copyTo(final IOFile target) throws IOException {
-    // create parent directory of target file
-    target.parent().md();
     // copy via stream: a path-based copy locks out readers (database files are opened in rw mode)
     try(InputStream in = Files.newInputStream(toPath())) {
-      Files.copy(in, target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+      target.write(in);
     }
   }
 
@@ -505,8 +536,7 @@ public final class IOFile extends IO {
    * @throws IOException I/O exception
    */
   public void moveTo(final IOFile target) throws IOException {
-    target.parent().md();
-    Files.move(toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+    Files.move(toPath(), target.createParent(), StandardCopyOption.REPLACE_EXISTING);
   }
 
   @Override
