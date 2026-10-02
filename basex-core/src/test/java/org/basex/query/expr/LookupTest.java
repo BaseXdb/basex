@@ -61,6 +61,12 @@ public final class LookupTest extends SandboxTest {
   }
 
   /** Test. */
+  @Test public void string() {
+    query("serialize(fn($m) { $m?a, $m?1, $m?*, $m?('a b') }, { 'method': 'adaptive' })",
+        "fn($m) as item()* { ($m?a, $m?1, $m?*, $m?(\"a b\")) }");
+  }
+
+  /** Test. */
   @Test public void unary() {
     query("({ 1: 'm' }, array { 'a' }) ! ?*", "m\na");
     query("array { 1 }[?1] ! ?1", 1);

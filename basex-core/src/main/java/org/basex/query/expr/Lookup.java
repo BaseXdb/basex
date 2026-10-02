@@ -180,16 +180,16 @@ public final class Lookup extends Arr {
     qs.token(exprs[0]).token('?');
 
     final Expr keys = exprs[1];
-    Object key = null;
+    byte[] key = null;
     if(keys == WILDCARD) {
       key = WILDCARD.string();
     } else if(keys instanceof final Str str) {
-      if(XMLToken.isNCName(str.string())) key = str.toJava();
+      if(XMLToken.isNCName(str.string())) key = str.string();
     } else if(keys instanceof final Itr itr) {
       final long l = itr.itr();
-      if(l >= 0) key = l;
+      if(l >= 0) key = Token.token(l);
     }
-    if(key != null) qs.token(key);
+    if(key != null) qs.value(key);
     else qs.paren(keys);
   }
 }
