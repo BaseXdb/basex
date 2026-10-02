@@ -115,8 +115,6 @@ public final class QueryContext extends Job implements Closeable {
   public TokenObjectMap<Collation> collations;
   /** Profiling results. */
   public final QueryProfiler profiler = new QueryProfiler(this);
-  /** Perform tail-call optimizations. */
-  public boolean tco;
 
   /** Function for the next tail call. */
   public XQFunction tcFunc;
@@ -340,9 +338,7 @@ public final class QueryContext extends Job implements Closeable {
     compiled = true;
 
     run(info.compiling, () -> {
-      // assign tail call option after compiling options
       options.compile();
-      tco = context.options.get(MainOptions.TAILCALLS) >= 0;
 
       // bind external variables
       if(parent == null) {
