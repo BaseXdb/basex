@@ -500,6 +500,18 @@ return count($errors[local-name-from-QName(.) = 'XQDY0054'])
     final String lib = "module namespace x='x'; declare function x:x() { 1 + 2 };";
     query(func.args(lib) + "/name()", "LibraryModule");
     query(func.args(lib, " { 'compile': true() }") + "/name()", "LibraryModule");
+    query(func.args(lib, " { 'optimize': true() }") + "/name()", "LibraryModule");
+
+    // optimization: databases are opened, index rewrites are applied
+    execute(new CreateDB(NAME, "<x><a id='i'/></x>"));
+    try {
+      final String path = "db:get('" + NAME + "')//a[@id = 'i']";
+      query("exists(" + func.args(path, " { 'compile': true() }") + "//ValueAccess)", false);
+      query("exists(" + func.args(path, " { 'optimize': true() }") + "//ValueAccess)", true);
+      query(func.args(path, " { 'optimize': true() }") + "/QueryPlan/@compiled/string()", true);
+    } finally {
+      execute(new DropDB(NAME));
+    }
 
     query(func.args("delete node <a/>") + "/name()", "MainModule");
     query(func.args("delete node <a/>") + "/@updating/string()", true);

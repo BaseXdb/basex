@@ -367,6 +367,13 @@ public final class CommandLockingTest extends SandboxTest {
   @Test public void xqueryModule() {
     ckDBs(new XQuery(_XQUERY_EVAL.args("1")), false, null);
     ckDBs(new XQuery(_XQUERY_EVAL.args(FILE)), false, null);
+
+    ckDBs(new XQuery(_XQUERY_PARSE.args("1")), false, NONE);
+    ckDBs(new XQuery(_XQUERY_PARSE.args("1", " { 'compile': true() }")), false, NONE);
+    ckDBs(new XQuery(_XQUERY_PARSE.args("1", " { 'optimize': false() }")), false, NONE);
+    ckDBs(new XQuery(_XQUERY_PARSE.args("1", " { 'optimize': true() }")), false, null);
+    ckDBs(new XQuery(_XQUERY_PARSE.args("1", " map:entry('optimize', <_>true</_>)")), false,
+        null);
   }
 
   /**
