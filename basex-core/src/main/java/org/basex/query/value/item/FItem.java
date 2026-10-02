@@ -86,7 +86,7 @@ public abstract class FItem extends Item implements XQFunction {
 
     final InputInfo info = info(ii);
     final int arity = arity(), nargs = argTypes.length;
-    if(nargs < arity) throw arityError(this, arity, nargs, false, info);
+    if(nargs < arity) throw arityError(this, arity, nargs, true, info);
 
     // optimize: skip coercion if current type equals new type
     if(type.eq(ft)) return this;

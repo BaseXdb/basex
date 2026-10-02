@@ -18,7 +18,6 @@ import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.QueryModule.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -457,7 +456,7 @@ public abstract class JavaCall extends Arr {
   static QueryException noMember(final String name, final String[] types, final int arity,
       final IntList arities, final byte[][] names, final InputInfo info, final String member) {
     // functions with different arities
-    if(!arities.isEmpty()) return Functions.wrongArity(arity, arities, false, info, member);
+    if(!arities.isEmpty()) return wrongArity(member, arity, arities, false, info);
 
     // find similar field/method names
     final byte[] nm = token(name);

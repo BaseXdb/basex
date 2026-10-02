@@ -162,7 +162,7 @@ public final class Functions {
     final FuncDefinition fd = builtIn(name);
     if(fd != null) {
       final IntList arts = checkArity(arity, fd.minMax[0], fd.minMax[1], fd.visible);
-      if(arts != null) throw wrongArity(arity, arts, true, info, fd);
+      if(arts != null) throw wrongArity(fd, arity, arts, true, info);
 
       final FuncType ft = fd.type(arity, fb.anns);
       final QNm[] names = fd.paramNames(arity);
@@ -193,7 +193,7 @@ public final class Functions {
     }
     if(runtime) return null;
 
-    throw qc.functions.unknownFunctionError(name, arity, info);
+    throw qc.functions.unknownFunctionError(name, arity, true, info);
   }
 
   /**
@@ -217,22 +217,6 @@ public final class Functions {
     if(qc.functions.get(sc, name, arity, false) != null) return name;
     final QNm dflt = new QNm(name.local(), FN_URI);
     return builtIn(dflt) == null && qc.functions.exists(sc, name) ? name : dflt;
-  }
-
-  /**
-   * Raises an error for the wrong number of function arguments.
-   * @param nargs number of supplied arguments
-   * @param arities available arities (if single arity is negative, function is variadic)
-   * @param literal literal flag
-   * @param info input info (can be {@code null})
-   * @param function function (for error messages)
-   * @return error
-   */
-  public static QueryException wrongArity(final int nargs, final IntList arities,
-      final boolean literal, final InputInfo info, final Object function) {
-
-    final String arity = arity(literal ? "Arity " + nargs : arguments(nargs), arities);
-    return INVNARGS_X_X.get(info, function, arity);
   }
 
   /**
@@ -419,7 +403,7 @@ public final class Functions {
       }
     }
     final IntList arities = checkArity(arity, min, max, visible);
-    if(arities != null) throw wrongArity(arity, arities, false, fb.info, function);
+    if(arities != null) throw wrongArity(function, arity, arities, false, fb.info);
     return args;
   }
 

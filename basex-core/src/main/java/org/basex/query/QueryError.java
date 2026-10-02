@@ -552,7 +552,7 @@ public enum QueryError {
   // W3 Functions
 
   /** Error code. */
-  APPLY_X_X_X(FOAP, 1, "% supplied to %: %."),
+  APPLY_X_X(FOAP, 1, "%: %."),
 
   /** Error code. */
   DIVZERO_X(FOAR, 1, "% cannot be divided by zero."),
@@ -1802,10 +1802,39 @@ public enum QueryError {
   }
 
   /**
+   * Returns an exception for a function call or reference with the wrong number of arguments.
+   * @param function function (for error messages)
+   * @param nargs number of supplied arguments
+   * @param arities allowed arities (if single arity is negative, function is variadic)
+   * @param literal literal flag
+   * @param info input info (can be {@code null})
+   * @return query exception
+   */
+  public static QueryException wrongArity(final Object function, final int nargs,
+      final IntList arities, final boolean literal, final InputInfo info) {
+    final String input = literal ? "Arity " + nargs : arguments(nargs);
+    return INVNARGS_X_X.get(info, function, arity(input, arities));
+  }
+
+  /**
+   * Returns an exception for a function that cannot be applied to the supplied arguments.
+   * @param function function
+   * @param nargs number of supplied arguments
+   * @param arity arity of the function
+   * @param exact exact flag (if false, more arguments may be supplied)
+   * @param info input info (can be {@code null})
+   * @return query exception
+   */
+  public static QueryException applyError(final Object function, final long nargs,
+      final int arity, final boolean exact, final InputInfo info) {
+    return APPLY_X_X.get(info, function, arity(arguments(nargs), exact ? arity : -arity));
+  }
+
+  /**
    * Returns an arity exception.
    * @param expr expression
-   * @param supplied expected arity
-   * @param expected supplied arity
+   * @param supplied supplied arity
+   * @param expected expected arity
    * @param param parameter/argument flag
    * @param info input info (can be {@code null})
    * @return query exception
@@ -1813,8 +1842,7 @@ public enum QueryError {
   public static QueryException arityError(final Expr expr, final int supplied, final int expected,
       final boolean param, final InputInfo info) {
     final String input = param ? "Function with " + parameters(supplied) : arguments(supplied);
-    final String arity = arity(input, new IntList().add(expected));
-    return INVARITY_X_X.get(info, arity, expr);
+    return INVARITY_X_X.get(info, expr, arity(input, expected));
   }
 
   /**
@@ -1880,6 +1908,16 @@ public enum QueryError {
    */
   public static String parameters(final long number) {
     return number + " " + Strings.plural("parameter", number);
+  }
+
+  /**
+   * Returns an information string for the supplied input and a single expected arity.
+   * @param supplied arguments
+   * @param arity expected arity (if negative, function is variadic)
+   * @return string
+   */
+  public static String arity(final String supplied, final int arity) {
+    return arity(supplied, new IntList().add(arity));
   }
 
   /**

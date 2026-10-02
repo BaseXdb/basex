@@ -1,5 +1,6 @@
 package org.basex.query.func.java;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.lang.reflect.*;
@@ -8,7 +9,6 @@ import java.util.*;
 import org.basex.core.MainOptions.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
@@ -61,7 +61,7 @@ final class DynJavaConstr extends DynJavaCall {
     if(!constrs.isEmpty()) return true;
     if(!enforce) return false;
 
-    throw Functions.wrongArity(arity, arities, false, info, name());
+    throw wrongArity(name(), arity, arities, false, info);
   }
 
   @Override

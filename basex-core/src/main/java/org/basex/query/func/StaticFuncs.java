@@ -112,7 +112,7 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
       if(func.updating) qc.updating();
     } else {
       final JavaCall java = JavaCall.get(name, call.exprs, qc, info);
-      if(java == null) throw unknownFunctionError(name, arity, info);
+      if(java == null) throw unknownFunctionError(name, arity, false, info);
       call.setExternal(java);
       if(java.updating) qc.updating();
     }
@@ -285,10 +285,11 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
    * Creates an exception for an unknown function.
    * @param name function name
    * @param arity function arity
+   * @param literal literal flag
    * @param info input info
    * @return query exception
    */
-  QueryException unknownFunctionError(final QNm name, final int arity,
+  QueryException unknownFunctionError(final QNm name, final int arity, final boolean literal,
       final InputInfo info) {
 
     final byte[] funcUri = name.uri();
@@ -303,6 +304,7 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
       if(info.sc().imports.contains(funcUri)) modules.add(funcUri);
     }
     final IntList arities = new IntList();
+    final ArrayList<StaticFunc> candidates = new ArrayList<>(1);
     for(final byte[] module : modules) {
       final QNmMap<ArrayList<StaticFunc>> funcsByName = funcsByModule.get(module);
       if(funcsByName != null) {
@@ -310,13 +312,15 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
         if(funcs != null) {
           for(final StaticFunc func : funcs) {
             for(int a = func.min; a <= func.arity(); a++) arities.add(a);
+            candidates.add(func);
           }
         }
       }
     }
-    return arities.isEmpty()
-        ? similarError(name, info)
-        : Functions.wrongArity(arity, arities, false, info, name.prefixString());
+    if(arities.isEmpty()) return similarError(name, info);
+    // single candidate: include parameter names
+    return wrongArity(candidates.size() == 1 ? candidates.get(0).paramString() :
+      name.prefixString(), arity, arities, literal, info);
   }
 
   /**

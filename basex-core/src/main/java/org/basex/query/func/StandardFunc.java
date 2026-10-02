@@ -699,7 +699,8 @@ public abstract class StandardFunc extends Arr {
     final Item item = expr.unwrappedItem(qc, info);
     final XQArray array = item.isEmpty() ? XQArray.empty() : toArray(item);
     final int as = (int) array.structSize();
-    if(as != function.arity()) throw APPLY_X_X_X.get(info, arguments(as), function, array);
+    final int ar = function.arity();
+    if(as != ar) throw applyError(function, as, ar, true, info);
 
     // copy persistent database nodes, share everything else with the invoked function
     final Value[] args = new Value[as];
