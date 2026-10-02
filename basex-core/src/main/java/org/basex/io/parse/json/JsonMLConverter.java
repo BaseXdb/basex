@@ -56,9 +56,10 @@ final class JsonMLConverter extends JsonXmlConverter {
 
   @Override
   protected void openObject() throws QueryException {
-    if(inAtts || states.isEmpty() || states.peek() != NAMED) {
-      throw error("No object allowed at this stage");
-    }
+    if(inAtts) throw error("String expected as attribute value, object found");
+    if(states.isEmpty()) throw error("Array expected, object found");
+    if(states.peek() == UNNAMED) throw error("Element name expected, object found");
+    if(states.peek() != NAMED) throw error("Attribute object must directly follow element name");
     inAtts = true;
   }
 
@@ -79,10 +80,11 @@ final class JsonMLConverter extends JsonXmlConverter {
 
   @Override
   protected void openArray() throws QueryException, IOException {
-    if(inAtts || !states.isEmpty() && states.peek() == UNNAMED) {
-      throw error("No array allowed at this stage");
+    if(inAtts) throw error("String expected as attribute value, array found");
+    if(!states.isEmpty()) {
+      if(states.peek() == UNNAMED) throw error("Element name expected, array found");
+      flush();
     }
-    if(!states.isEmpty()) flush();
     states.add(UNNAMED);
   }
 
@@ -106,7 +108,7 @@ final class JsonMLConverter extends JsonXmlConverter {
       atts.add(attribute, value);
       attribute = null;
     } else if(states.isEmpty()) {
-      throw error("No value allowed at this stage");
+      throw error("Array expected, string found");
     } else if(states.peek() == UNNAMED) {
       name = check(value);
       states.pop();
@@ -152,7 +154,7 @@ final class JsonMLConverter extends JsonXmlConverter {
    * @return exception
    */
   private static QueryException error(final String msg, final Object... ext) {
-    return JSON_PARSE_X.get(null, Util.info(msg, ext) + '.');
+    return JSON_PARSE_X.get(null, "JsonML: " + Util.info(msg, ext) + '.');
   }
 
   /**
