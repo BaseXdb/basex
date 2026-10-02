@@ -44,7 +44,7 @@ abstract class FileWriteFn extends FileFn {
       Charset.forName(encoding);
 
     for(final Item item : value) cacheSource(item, path);
-    try(PrintOutput out = PrintOutput.get(new FileOutputStream(path.toFile(), append))) {
+    try(PrintOutput out = PrintOutput.get(output(path, append))) {
       if(lines) {
         final byte[] nl = cs == StandardCharsets.UTF_8 ? token(Prop.NL) : Prop.NL.getBytes(cs);
         for(final Item item : value) {
@@ -80,11 +80,22 @@ abstract class FileWriteFn extends FileFn {
    */
   final Path toTarget(final Expr expr, final QueryContext qc) throws QueryException {
     final Path path = toPath(expr, qc);
-    if(Files.isDirectory(path)) throw FILE_IS_DIR_X.get(info, path.toAbsolutePath());
+    if(Files.isDirectory(path)) throw FILE_IS_DIR_X.get(info, absolute(path));
     final Path parent = path.getParent();
-    if(parent != null && !Files.exists(parent))
-      throw FILE_NO_DIR_X.get(info, parent.toAbsolutePath());
+    if(parent != null && !Files.exists(parent)) throw FILE_NO_DIR_X.get(info, absolute(parent));
     return path;
+  }
+
+  /**
+   * Opens an output stream for writing or appending to a file.
+   * @param path path to the file
+   * @param append append flag
+   * @return output stream
+   * @throws IOException I/O exception
+   */
+  static OutputStream output(final Path path, final boolean append) throws IOException {
+    return append ? Files.newOutputStream(path, StandardOpenOption.CREATE,
+      StandardOpenOption.APPEND) : Files.newOutputStream(path);
   }
 
   /**

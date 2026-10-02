@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import java.io.*;
 import java.nio.file.*;
+import java.nio.file.attribute.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
@@ -34,30 +35,39 @@ public class FileCopy extends FileFn {
       throws QueryException, IOException {
 
     final Path src = absolute(toPath(arg(0), qc));
-    if(!Files.exists(src)) throw FILE_NOT_FOUND_X.get(info, src);
+    // copy: links are resolved; move: links are moved as such and may be dangling
+    final BasicFileAttributes attrs;
+    try {
+      attrs = copy ? Files.readAttributes(src, BasicFileAttributes.class) :
+        Files.readAttributes(src, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
+    } catch(final NoSuchFileException ignore) {
+      throw FILE_NOT_FOUND_X.get(info, src);
+    }
+    final boolean dir = attrs.isDirectory() && (copy || !IOFile.isLink(attrs));
     Path trg = absolute(toPath(arg(1), qc));
 
     // source and target refer to the same file (identical path, symbolic link,
     // or case difference on case-insensitive file systems)
-    if(Files.exists(trg) && Files.isSameFile(src, trg)) {
-      // adjust capitalization of the file name if necessary
-      if(!copy && !src.toString().equals(trg.toString())) IOFile.move(src, trg, true);
+    if(Files.exists(trg) && Files.exists(src) && Files.isSameFile(src, trg)) {
+      // adjust capitalization of the file name if necessary (but never replace a link target)
+      final String s = src.toString(), t = trg.toString();
+      if(!copy && !IOFile.isLink(attrs) && !s.equals(t) && s.equalsIgnoreCase(t)) {
+        IOFile.move(src, trg, true);
+      }
       return;
     }
 
     if(Files.isDirectory(trg)) {
       // target is a directory: attach file name
       trg = trg.resolve(src.getFileName());
-      if(!Files.isDirectory(src) && Files.isDirectory(trg))
-        throw FILE_IS_DIR_X.get(info, trg);
-    } else if(Files.exists(trg) && Files.isDirectory(src)) {
+      if(!dir && Files.isDirectory(trg)) throw FILE_IS_DIR_X.get(info, trg);
+    } else if(dir && Files.exists(trg)) {
       // if target is file, source cannot be a directory
       throw FILE_IS_DIR_X.get(info, src);
     }
 
     // reject targets located inside the source directory
-    if(Files.isDirectory(src) && trg.startsWith(src))
-      throw FILE_CYCLIC_X_X.get(info, trg, src);
+    if(dir && trg.startsWith(src)) throw FILE_CYCLIC_X_X.get(info, trg, src);
 
     IOFile.relocate(src, trg, copy, qc);
   }

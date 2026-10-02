@@ -2,6 +2,7 @@ package org.basex.query.func.file;
 
 import static org.basex.query.QueryError.*;
 
+import java.io.*;
 import java.nio.file.*;
 
 import org.basex.core.*;
@@ -36,8 +37,10 @@ abstract class FileReadFn extends FileFn {
    * @param qc query context
    * @return options
    * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  final ParseOptions options(final Path path, final QueryContext qc) throws QueryException {
+  final ParseOptions options(final Path path, final QueryContext qc)
+      throws QueryException, IOException {
     final Item options = arg(1).unwrappedItem(qc, info);
 
     final ParseOptions po = new ParseOptions();
@@ -51,9 +54,7 @@ abstract class FileReadFn extends FileFn {
     final boolean fallback = toBooleanOrFalse(arg(2), qc);
     if(fallback) po.set(ParseOptions.FALLBACK, true);
 
-    if(!Files.exists(path)) throw FILE_NOT_FOUND_X.get(info, path.toAbsolutePath());
-    if(Files.isDirectory(path)) throw FILE_IS_DIR_X.get(info, path.toAbsolutePath());
-    if(!Files.isReadable(path)) throw FILE_ACCESS_X.get(info, path.toAbsolutePath());
+    checkReadable(path);
     return po;
   }
 }

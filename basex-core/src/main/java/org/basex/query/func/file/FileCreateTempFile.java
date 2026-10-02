@@ -42,23 +42,24 @@ public class FileCreateTempFile extends FileFn {
 
     if(Files.isRegularFile(root)) throw FILE_NO_DIR_X.get(info, root);
 
-    // choose non-existing file path
+    // create directory or file; choose another name if the path exists
     final Random rnd = new Random();
-    Path file;
-    do {
+    while(true) {
       final StringBuilder path = new StringBuilder();
       if(prefix != null) path.append(prefix);
       path.append(rnd.nextLong());
       if(suffix != null) path.append(suffix);
-      file = root.resolve(path.toString());
-    } while(Files.exists(file));
-
-    // create directory or file
-    if(directory) {
-      Files.createDirectory(file);
-    } else {
-      Files.createFile(file);
+      final Path file = root.resolve(path.toString());
+      try {
+        if(directory) {
+          Files.createDirectory(file);
+        } else {
+          Files.createFile(file);
+        }
+        return get(file, directory);
+      } catch(final FileAlreadyExistsException ignore) {
+        // choose another name
+      }
     }
-    return get(file, directory);
   }
 }

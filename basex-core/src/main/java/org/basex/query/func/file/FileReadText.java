@@ -2,6 +2,7 @@ package org.basex.query.func.file;
 
 import static org.basex.query.QueryError.*;
 
+import java.io.*;
 import java.nio.file.*;
 
 import org.basex.io.*;
@@ -17,7 +18,7 @@ import org.basex.query.value.item.*;
  */
 public final class FileReadText extends FileReadFn {
   @Override
-  public Value eval(final QueryContext qc) throws QueryException {
+  public Value eval(final QueryContext qc) throws QueryException, IOException {
     final Path path = toPath(arg(0), qc);
 
     final ParseOptions options = options(path, qc);

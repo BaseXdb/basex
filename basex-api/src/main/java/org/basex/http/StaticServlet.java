@@ -3,6 +3,8 @@ package org.basex.http;
 import static jakarta.servlet.http.HttpServletResponse.*;
 
 import java.io.*;
+import java.nio.file.*;
+import java.nio.file.attribute.*;
 
 import org.basex.core.*;
 import org.basex.io.*;
@@ -36,10 +38,20 @@ public final class StaticServlet extends BaseXServlet {
   protected void run(final HTTPConnection conn) throws Exception {
     final String path = conn.path();
     final IOFile file = new IOFile(base, path);
-    if(file.isDir() || !file.exists() || !inside(file)) throw HTTPStatus.NOT_FOUND_X.get(path);
+    final Path source;
+    final BasicFileAttributes attrs;
+    try {
+      source = file.file().toPath();
+      attrs = Files.readAttributes(source, BasicFileAttributes.class);
+    } catch(final InvalidPathException | NoSuchFileException ignore) {
+      throw HTTPStatus.NOT_FOUND_X.get(path);
+    }
+    if(attrs.isDirectory() || !source.toRealPath().startsWith(base.file().toPath().toRealPath())) {
+      throw HTTPStatus.NOT_FOUND_X.get(path);
+    }
 
     // report unchanged resources; timestamps are sent with a granularity of seconds
-    final long modified = file.timeStamp() / 1000 * 1000;
+    final long modified = attrs.lastModifiedTime().toMillis() / 1000 * 1000;
     if(conn.request.getDateHeader(HTTPText.IF_MODIFIED_SINCE) >= modified) {
       conn.response.setStatus(SC_NOT_MODIFIED);
       conn.log(SC_NOT_MODIFIED, "");
@@ -47,20 +59,9 @@ public final class StaticServlet extends BaseXServlet {
     }
 
     conn.response.setContentType(MediaType.get(file.path()).toString());
-    conn.response.setContentLengthLong(file.length());
+    conn.response.setContentLengthLong(attrs.size());
     conn.response.setDateHeader(HTTPText.LAST_MODIFIED, modified);
     conn.response.getOutputStream().write(file.read());
     conn.log(SC_OK, "");
-  }
-
-  /**
-   * Checks if a file is located inside the base directory.
-   * @param file file to be checked
-   * @return result of check
-   * @throws IOException I/O exception
-   */
-  private boolean inside(final IOFile file) throws IOException {
-    return file.file().getCanonicalPath().startsWith(
-      base.file().getCanonicalPath() + File.separator);
   }
 }

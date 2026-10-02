@@ -66,17 +66,25 @@ public final class AlterBackup extends ABackup {
       throws IOException {
 
     final IOFile src = sopts.dbPath(name + IO.ZIPSUFFIX);
-    final IOFile trg = sopts.dbPath(newname + '-' + Databases.date(name) + IO.ZIPSUFFIX);
+    final String base = newname + '-' + Databases.date(name);
+    // write to a temporary file: source and target may be the same file
+    final IOFile tmp = sopts.dbPath(base + IO.TMPSUFFIX);
 
     final byte[] data = new byte[IO.BLOCKSIZE];
     try(BufferInput bi = new BufferInput(src); ZipInputStream in = new ZipInputStream(bi);
-        BufferOutput bo = new BufferOutput(trg); ZipOutputStream out = new ZipOutputStream(bo)) {
+        BufferOutput bo = new BufferOutput(tmp); ZipOutputStream out = new ZipOutputStream(bo)) {
       for(ZipEntry ze; (ze = in.getNextEntry()) != null;) {
         out.putNextEntry(new ZipEntry(newname + '/' + ze.getName().replaceAll("^.*/", "")));
         for(int c; (c = in.read(data)) != -1;) out.write(data, 0, c);
       }
+    } catch(final IOException ex) {
+      tmp.delete();
+      throw ex;
     }
-    src.delete();
+    // replace target, delete source unless it was the target
+    final IOFile zip = sopts.dbPath(base + IO.ZIPSUFFIX);
+    tmp.moveTo(zip, true);
+    if(!src.sameFile(zip)) src.delete();
   }
 
   @Override

@@ -3,6 +3,8 @@ package org.basex.query.func.file;
 import static org.basex.query.QueryError.*;
 
 import java.io.*;
+import java.nio.*;
+import java.nio.channels.*;
 import java.nio.file.*;
 
 import org.basex.io.*;
@@ -39,22 +41,23 @@ public class FileWriteBinary extends FileWriteFn {
     if(offset != null) {
       // write file chunk
       final byte[] value = toBin(arg(1), qc).binary(info);
-      try(RandomAccessFile raf = new RandomAccessFile(path.toFile(), "rw")) {
-        final long length = raf.length();
+      try(FileChannel fc = FileChannel.open(path, StandardOpenOption.CREATE,
+          StandardOpenOption.WRITE)) {
+        final long length = fc.size();
         if(offset < 0 || offset > length) throw FILE_OUT_OF_RANGE_X_X.get(info, offset, length);
-        raf.seek(offset);
-        raf.write(value);
+        final ByteBuffer buffer = ByteBuffer.wrap(value);
+        for(long pos = offset; buffer.hasRemaining();) pos += fc.write(buffer, pos);
       }
     } else if(arg(1) instanceof final ArchiveCreate ac) {
       // optimization: stream archive to disk (archive:create, archive:create-from)
-      try(BufferOutput out = BufferOutput.get(new FileOutputStream(path.toFile(), append))) {
+      try(BufferOutput out = BufferOutput.get(output(path, append))) {
         ac.create(out, new IOFile(path), qc);
       }
     } else {
       // default case: no archive, no offset
       final Bin value = toBin(arg(1), qc);
       cacheSource(value, path);
-      try(FileOutputStream out = new FileOutputStream(path.toFile(), append)) {
+      try(OutputStream out = output(path, append)) {
         IO.write(value.input(info), out);
       }
     }

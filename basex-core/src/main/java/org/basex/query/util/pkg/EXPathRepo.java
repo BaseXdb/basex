@@ -118,9 +118,9 @@ public final class EXPathRepo {
     if(repo == null) {
       repo = new IOFile(sopts.get(StaticOptions.REPOPATH));
       // ignore directories starting with dot (#1122)
-      for(final IOFile path : repo.children(IOFile.NO_HIDDEN)) {
-        if(path.isDir()) readPkg(path);
-      }
+      repo.children((name, attrs) -> {
+        if(attrs.isDirectory() && !IOFile.isDotFile(name)) readPkg(new IOFile(repo, name + '/'));
+      });
     }
     return this;
   }

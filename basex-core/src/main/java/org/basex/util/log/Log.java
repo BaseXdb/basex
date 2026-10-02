@@ -244,12 +244,14 @@ public final class Log implements QueryTracer {
   }
 
   /**
-   * Returns all log files, most recent first.
-   * @return log files
+   * Returns the dates and sizes of all log files, most recent first.
+   * @return dates and sizes
    */
-  public IOFile[] files() {
-    final IOFile[] files = dir().children(".*\\" + IO.LOGSUFFIX);
-    Arrays.sort(files, (file1, file2) -> file2.name().compareTo(file1.name()));
+  public Map<String, Long> files() {
+    final TreeMap<String, Long> files = new TreeMap<>(Comparator.reverseOrder());
+    dir().children((name, attrs) -> {
+      if(name.endsWith(IO.LOGSUFFIX)) files.put(name.replace(IO.LOGSUFFIX, ""), attrs.size());
+    });
     return files;
   }
 

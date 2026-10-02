@@ -23,7 +23,7 @@ import org.xml.sax.*;
  */
 public final class IOFile extends IO {
   /** Ignore files starting with a dot. */
-  public static final FileFilter NO_HIDDEN = file -> !Strings.startsWith(file.getName(), '.');
+  public static final FileFilter NO_HIDDEN = file -> !isDotFile(file.getName());
   /** Pattern for valid file names. */
   private static final Pattern VALIDNAME =
       Pattern.compile("^[^\\\\/" + (Prop.WIN ? ":*?\"<>|" : "") + "]+$");
@@ -273,7 +273,7 @@ public final class IOFile extends IO {
    */
   public IOFile[] children(final FileFilter filter) {
     final ArrayList<IOFile> io = new ArrayList<>();
-    walk(1, filter, (path, attrs) ->
+    walk(1, filter, true, (path, attrs) ->
       io.add(new IOFile(path.toFile(), attrs.isDirectory() ? "/" : "")));
     return io.toArray(IOFile[]::new);
   }
@@ -325,14 +325,32 @@ public final class IOFile extends IO {
 
   /**
    * Returns the summed size of all regular descendant files.
+   * @return size
+   */
+  public long size() {
+    return size(true, null);
+  }
+
+  /**
+   * Returns the summed size of all regular descendant files.
+   * @param links follow links to directories (links to files are always resolved)
    * @param job job for interrupting the operation (can be {@code null})
    * @return size
    */
-  public long size(final Job job) {
+  public long size(final boolean links, final Job job) {
     final long[] size = { 0 };
-    walk(null, (path, attrs) -> {
+    walk(Integer.MAX_VALUE, null, links, (path, attrs) -> {
       if(job != null) job.checkStop();
-      if(attrs.isRegularFile()) size[0] += attrs.size();
+      BasicFileAttributes atts = attrs;
+      if(atts.isSymbolicLink()) {
+        try {
+          atts = Files.readAttributes(path, BasicFileAttributes.class);
+        } catch(final IOException ex) {
+          Util.debug(ex);
+          return;
+        }
+      }
+      if(atts.isRegularFile()) size[0] += atts.size();
     });
     return size[0];
   }
@@ -342,7 +360,7 @@ public final class IOFile extends IO {
    * @param visitor visitor for the name and the attributes of a file or directory
    */
   public void children(final BiConsumer<String, BasicFileAttributes> visitor) {
-    walk(1, null, (path, attrs) -> visitor.accept(path.getFileName().toString(), attrs));
+    walk(1, null, true, (path, attrs) -> visitor.accept(path.getFileName().toString(), attrs));
   }
 
   /**
@@ -351,26 +369,30 @@ public final class IOFile extends IO {
    * @param visitor visitor for the path and the attributes of a file
    */
   public void walk(final FileFilter filter, final BiConsumer<Path, BasicFileAttributes> visitor) {
-    walk(Integer.MAX_VALUE, filter, visitor);
+    walk(Integer.MAX_VALUE, filter, true, visitor);
   }
 
   /**
    * Visits all non-filtered descendant files, and the directories at the maximum depth.
    * @param depth maximum depth
    * @param filter file filter (can be {@code null})
+   * @param links follow links (otherwise, they are not descended into)
    * @param visitor visitor for the path and the attributes of a file or directory
    */
-  private void walk(final int depth, final FileFilter filter,
+  private void walk(final int depth, final FileFilter filter, final boolean links,
       final BiConsumer<Path, BasicFileAttributes> visitor) {
     if(!isDir()) return;
-    final Path root = file.toPath();
+    final Set<FileVisitOption> options = links ? EnumSet.of(FileVisitOption.FOLLOW_LINKS) :
+      EnumSet.noneOf(FileVisitOption.class);
     try {
-      Files.walkFileTree(root, EnumSet.of(FileVisitOption.FOLLOW_LINKS), depth,
-          new SimpleFileVisitor<>() {
+      // the root is resolved even if links are not followed
+      final Path root = links ? file.toPath() : file.toPath().toRealPath();
+      Files.walkFileTree(root, options, depth, new SimpleFileVisitor<>() {
         @Override
         public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) {
-          return dir.equals(root) || filter == null || filter.accept(dir.toFile()) ?
-            FileVisitResult.CONTINUE : FileVisitResult.SKIP_SUBTREE;
+          return dir.equals(root) || (links || !isLink(attrs)) &&
+            (filter == null || filter.accept(dir.toFile())) ? FileVisitResult.CONTINUE :
+            FileVisitResult.SKIP_SUBTREE;
         }
         @Override
         public FileVisitResult visitFile(final Path path, final BasicFileAttributes attrs) {
@@ -499,10 +521,17 @@ public final class IOFile extends IO {
    * @param dir directory
    * @param path relative path (e.g. the name of an archive entry)
    * @return resolved path, or {@code null} if no segments are left
+   * @throws IOException I/O exception
    */
-  public static Path resolve(final Path dir, final String path) {
+  public static Path resolve(final Path dir, final String path) throws IOException {
+    final Path relative;
+    try {
+      relative = Paths.get(path).normalize();
+    } catch(final InvalidPathException ex) {
+      throw new IOException(ex);
+    }
     Path resolved = dir;
-    for(final Path part : Paths.get(path).normalize()) {
+    for(final Path part : relative) {
       final String p = part.toString();
       if(!p.equals("..") && !p.equals(".")) resolved = resolved.resolve(part);
     }
@@ -550,14 +579,26 @@ public final class IOFile extends IO {
    */
   public static void move(final Path src, final Path trg, final boolean replace)
       throws IOException {
-    Path path = src;
+    final CopyOption[] options = replace ?
+      new CopyOption[] { StandardCopyOption.REPLACE_EXISTING } : new CopyOption[0];
     final String s = src.getFileName().toString(), t = trg.getFileName().toString();
-    if(!s.equals(t) && s.equalsIgnoreCase(t)) {
-      path = src.resolveSibling(UUID.randomUUID().toString());
-      Files.move(src, path);
+    if(s.equals(t) || !s.equalsIgnoreCase(t) || !Objects.equals(src.getParent(), trg.getParent())) {
+      Files.move(src, trg, options);
+    } else {
+      // case-only rename: move via an intermediate path, restore the source if this fails
+      final Path tmp = src.resolveSibling(UUID.randomUUID().toString());
+      Files.move(src, tmp);
+      try {
+        Files.move(tmp, trg, options);
+      } catch(final IOException ex) {
+        try {
+          Files.move(tmp, src);
+        } catch(final IOException ex2) {
+          ex.addSuppressed(ex2);
+        }
+        throw ex;
+      }
     }
-    if(replace) Files.move(path, trg, StandardCopyOption.REPLACE_EXISTING);
-    else Files.move(path, trg);
   }
 
   /**
@@ -617,6 +658,19 @@ public final class IOFile extends IO {
   @Override
   public boolean eq(final IO io) {
     return io instanceof IOFile && equals(pth, io.pth);
+  }
+
+  /**
+   * Checks if this file and the specified file are the same existing file on the file system.
+   * @param io file to compare
+   * @return result of check
+   */
+  public boolean sameFile(final IOFile io) {
+    try {
+      return Files.isSameFile(toPath(), io.toPath());
+    } catch(final IOException ignore) {
+      return false;
+    }
   }
 
   @Override
@@ -680,8 +734,17 @@ public final class IOFile extends IO {
    * @return result of check
    */
   public static boolean isHidden(final String name, final BasicFileAttributes attrs) {
-    return Strings.startsWith(name, '.') || name.equals("node_modules") ||
+    return isDotFile(name) || name.equals("node_modules") ||
         attrs instanceof final DosFileAttributes dos && dos.isHidden();
+  }
+
+  /**
+   * Checks if a file name starts with a dot.
+   * @param name file name
+   * @return result of check
+   */
+  public static boolean isDotFile(final String name) {
+    return Strings.startsWith(name, '.');
   }
 
   /**

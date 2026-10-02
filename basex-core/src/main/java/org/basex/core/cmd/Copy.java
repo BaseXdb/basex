@@ -64,10 +64,10 @@ public final class Copy extends Command {
   public static void copy(final String source, final String target, final StaticOptions sopts,
       final Copy cmd) throws IOException {
 
-    // drop target database
-    DropDB.drop(target, sopts);
-
+    // reject target that is the source, then drop target database
     final IOFile src = sopts.dbPath(source), trg = sopts.dbPath(target);
+    if(src.sameFile(trg)) throw new BaseXException(DB_NOT_COPIED_X, source);
+    DropDB.drop(target, sopts);
     final StringList files = src.descendants();
     if(cmd != null) cmd.tf = files.size();
 

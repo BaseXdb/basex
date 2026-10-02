@@ -179,16 +179,17 @@ public final class RepoManager {
       paths.add(pkg.path());
     }
     // ignore files and directories starting with dot (#1122)
-    for(final IOFile child : repo.path().children(IOFile.NO_HIDDEN)) {
-      final String name = child.name();
-      if(!child.isDir()) {
+    final IOFile root = repo.path();
+    root.children((name, attrs) -> {
+      if(IOFile.isDotFile(name)) return;
+      if(!attrs.isDirectory()) {
         add(name.replaceAll("\\..*", "").replace('/', '.'), name, map);
       } else if(!paths.contains(name)) {
-        for(final String path : child.descendants(IOFile.NO_HIDDEN)) {
+        for(final String path : new IOFile(root, name).descendants(IOFile.NO_HIDDEN)) {
           add(name + '.' + path.replaceAll("\\..*", "").replace('/', '.'), name + '/' + path, map);
         }
       }
-    }
+    });
     // add web applications: archives in the RESTXQ directory with a web descriptor
     final IOFile restxq = context.soptions.restxqPath();
     if(restxq.exists()) {

@@ -2,6 +2,7 @@ package org.basex.query.func.db;
 
 import static org.basex.query.QueryError.*;
 
+import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.name.*;
 import org.basex.query.util.*;
@@ -29,7 +30,11 @@ public class DbCopy extends DbAccessFn {
    */
   final void copy(final QueryContext qc, final boolean keep) throws QueryException {
     final String name = toName(arg(0), qc), newname = toName(arg(1), qc);
-    if(name.equals(newname)) throw DB_CONFLICT4_X.get(info, name);
+    // copy: reject names that refer to the same database (e.g. if only the case differs)
+    final StaticOptions sopts = qc.context.soptions;
+    if(name.equals(newname) || keep && sopts.dbPath(name).sameFile(sopts.dbPath(newname))) {
+      throw DB_CONFLICT4_X.get(info, name);
+    }
 
     // source database does not exist
     checkCreate(name, qc);

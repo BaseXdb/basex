@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import java.io.*;
 import java.nio.file.*;
+import java.nio.file.attribute.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -55,6 +56,23 @@ abstract class FileFn extends StandardFunc {
   static Str get(final Path path, final boolean dir) {
     final String string = path.toString();
     return Str.get(dir && !string.endsWith(File.separator) ? string + File.separator : string);
+  }
+
+  /**
+   * Checks if the specified path points to a readable file.
+   * @param path path
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   */
+  final void checkReadable(final Path path) throws QueryException, IOException {
+    final BasicFileAttributes attrs;
+    try {
+      attrs = Files.readAttributes(path, BasicFileAttributes.class);
+    } catch(final NoSuchFileException ignore) {
+      throw FILE_NOT_FOUND_X.get(info, absolute(path));
+    }
+    if(attrs.isDirectory()) throw FILE_IS_DIR_X.get(info, absolute(path));
+    if(!Files.isReadable(path)) throw FILE_ACCESS_X.get(info, absolute(path));
   }
 
   /**

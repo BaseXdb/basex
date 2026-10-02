@@ -8,6 +8,7 @@ import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.Cmd;
 import org.basex.core.parse.Commands.CmdAlter;
+import org.basex.io.*;
 import org.basex.util.*;
 
 /**
@@ -65,10 +66,11 @@ public final class AlterDB extends ACreate {
   public static synchronized boolean alter(final String source, final String target,
       final StaticOptions sopts) {
 
-    // drop target database
-    DropDB.drop(target, sopts);
+    // drop target database (unless it is the source, e.g. if only the case differs)
+    final IOFile src = sopts.dbPath(source), trg = sopts.dbPath(target);
+    if(!src.sameFile(trg)) DropDB.drop(target, sopts);
     try {
-      sopts.dbPath(source).moveTo(sopts.dbPath(target), false);
+      src.moveTo(trg, false);
       return true;
     } catch(final IOException ex) {
       Util.debug(ex);

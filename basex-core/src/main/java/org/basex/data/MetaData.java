@@ -312,7 +312,7 @@ public final class MetaData {
    * @return database size
    */
   public long dbSize() {
-    return dir != null ? dir.size(null) : 0;
+    return dir != null ? dir.size() : 0;
   }
 
   /**

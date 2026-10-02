@@ -7,7 +7,6 @@ import java.io.*;
 import java.math.*;
 import java.util.*;
 
-import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -43,10 +42,8 @@ public final class AdminLogs extends AdminFn {
    */
   private Value list(final QueryContext qc) {
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(final IOFile file : qc.context.log.files()) {
-      final String date = file.name().replace(IO.LOGSUFFIX, "");
-      vb.add(FElem.build(Q_FILE).attr(Q_SIZE, file.length()).text(date).finish());
-    }
+    qc.context.log.files().forEach((date, size) ->
+      vb.add(FElem.build(Q_FILE).attr(Q_SIZE, size).text(date).finish()));
     return vb.value(this);
   }
 

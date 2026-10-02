@@ -21,26 +21,9 @@ public final class FileSize extends FileFn {
     final Path path = toPath(arg(0), qc);
     final boolean recursive = toBooleanOrFalse(arg(1), qc);
 
-    final long size;
-    if(recursive) {
-      size = size(path, qc);
-    } else {
-      final BasicFileAttributes attrs = Files.readAttributes(path, BasicFileAttributes.class);
-      size = attrs.isDirectory() ? 0 : attrs.size();
-    }
-    return Itr.get(size);
-  }
-
-  /**
-   * Recursively computes the file size.
-   * @param path current path
-   * @param qc query context
-   * @return file size
-   * @throws IOException I/O exception
-   */
-  private static long size(final Path path, final QueryContext qc) throws IOException {
+    // directories: sum up the sizes of the descendants, without descending into links
     final BasicFileAttributes attrs = Files.readAttributes(path, BasicFileAttributes.class);
-    return attrs.isDirectory() ? new IOFile(path).size(qc) :
-      attrs.isRegularFile() ? attrs.size() : 0;
+    return Itr.get(!attrs.isDirectory() ? attrs.size() :
+      recursive ? new IOFile(path).size(false, qc) : 0);
   }
 }

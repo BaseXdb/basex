@@ -87,7 +87,7 @@ public final class Databases {
       if(all && name.endsWith(IO.ZIPSUFFIX)) {
         final String[] split = ZIPPATTERN.split(name);
         if(split.length > 0 && !split[0].equals(name)) entry = split[0];
-      } else if(attrs.isDirectory() && !Strings.startsWith(name, '.')) {
+      } else if(attrs.isDirectory() && !IOFile.isDotFile(name)) {
         entry = name;
       }
       // add entry if it has not already been added, matches the pattern, and is accessible

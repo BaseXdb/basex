@@ -154,7 +154,7 @@ public final class Add extends ACreate {
     // create disk instances for large documents
     // (does not work for input streams and directories)
     final IO source = parser.source();
-    final long fl = source instanceof final IOFile src && src.isDir() ? src.size(null) :
+    final long fl = source instanceof final IOFile src && src.isDir() ? src.size() :
       source.length();
 
     // check free memory

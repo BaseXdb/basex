@@ -258,8 +258,12 @@ public final class DBNew {
         trgDir.md();
         for(final String path : srcDir.descendants()) {
           final IOFile srcFile = new IOFile(srcDir, path), trgFile = new IOFile(trgDir, path);
-          if(!replace && trgFile.exists()) throw DB_CONFLICT5_X.get(info, path);
-          srcFile.moveTo(trgFile, true);
+          // existing targets may be directories, which cannot be replaced by a move
+          if(trgFile.exists()) {
+            if(!replace) throw DB_CONFLICT5_X.get(info, path);
+            trgFile.delete();
+          }
+          srcFile.moveTo(trgFile, false);
         }
       }
     }
