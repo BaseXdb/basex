@@ -89,7 +89,7 @@ public class RegExParser implements RegExParserConstants {
     regex = regExp(false);
     jj_consume_token(0);
 number();
-{if ("" != null) return regex;}
+      {if ("" != null) return regex;}
     throw new Error("Missing return statement in function");
 }
 
@@ -793,13 +793,7 @@ re = LookAround.get(behind, positive, re);
     finally { jj_save(3, xla); }
   }
 
-  private boolean jj_3_2()
- {
-    if (jj_3R_posCharGroup_348_5_5()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_XmlChar_401_5_11()
+  private boolean jj_3R_XmlChar_431_5_11()
  {
     Token xsp;
     xsp = jj_scanpos;
@@ -816,7 +810,7 @@ re = LookAround.get(behind, positive, re);
     return false;
   }
 
-  private boolean jj_3R_posCharGroup_349_7_7()
+  private boolean jj_3R_posCharGroup_379_7_7()
  {
     Token xsp;
     xsp = jj_scanpos;
@@ -830,15 +824,15 @@ re = LookAround.get(behind, positive, re);
     return false;
   }
 
-  private boolean jj_3R_charRange_371_7_9()
+  private boolean jj_3R_charRange_401_7_9()
  {
-    if (jj_3R_XmlChar_401_5_11()) return true;
+    if (jj_3R_XmlChar_431_5_11()) return true;
     return false;
   }
 
   private boolean jj_3_3()
  {
-    if (jj_3R_charRange_365_5_6()) return true;
+    if (jj_3R_charRange_395_5_6()) return true;
     return false;
   }
 
@@ -848,12 +842,12 @@ re = LookAround.get(behind, positive, re);
     xsp = jj_scanpos;
     if (jj_3_3()) {
     jj_scanpos = xsp;
-    if (jj_3R_posCharGroup_349_7_7()) return true;
+    if (jj_3R_posCharGroup_379_7_7()) return true;
     }
     return false;
   }
 
-  private boolean jj_3R_posCharGroup_348_5_5()
+  private boolean jj_3R_posCharGroup_378_5_5()
  {
     Token xsp;
     if (jj_3_4()) return true;
@@ -864,38 +858,38 @@ re = LookAround.get(behind, positive, re);
     return false;
   }
 
-  private boolean jj_3R_charOrEsc_389_7_13()
+  private boolean jj_3R_charOrEsc_419_7_13()
  {
     if (jj_scan_token(SINGLE_ESC)) return true;
     return false;
   }
 
-  private boolean jj_3R_charOrEsc_388_7_12()
+  private boolean jj_3R_charOrEsc_418_7_12()
  {
-    if (jj_3R_XmlChar_401_5_11()) return true;
+    if (jj_3R_XmlChar_431_5_11()) return true;
     return false;
   }
 
-  private boolean jj_3R_charRange_365_7_8()
+  private boolean jj_3R_charRange_395_7_8()
  {
-    if (jj_3R_charOrEsc_388_5_10()) return true;
+    if (jj_3R_charOrEsc_418_5_10()) return true;
     if (jj_scan_token(CHAR)) return true;
-    if (jj_3R_charOrEsc_388_5_10()) return true;
+    if (jj_3R_charOrEsc_418_5_10()) return true;
     return false;
   }
 
-  private boolean jj_3R_charOrEsc_388_5_10()
+  private boolean jj_3R_charOrEsc_418_5_10()
  {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3R_charOrEsc_388_7_12()) {
+    if (jj_3R_charOrEsc_418_7_12()) {
     jj_scanpos = xsp;
-    if (jj_3R_charOrEsc_389_7_13()) return true;
+    if (jj_3R_charOrEsc_419_7_13()) return true;
     }
     return false;
   }
 
-  private boolean jj_3R_charRange_365_5_6()
+  private boolean jj_3R_charRange_395_5_6()
  {
     Token xsp;
     xsp = jj_scanpos;
@@ -903,10 +897,16 @@ re = LookAround.get(behind, positive, re);
     jj_semLA = getToken(2).kind == CHAR && "-".equals(getToken(2).image)
         && getToken(3).kind != BR_CLOSE && getToken(3).kind != EOF;
     jj_lookingAhead = false;
-    if (!jj_semLA || jj_3R_charRange_365_7_8()) {
+    if (!jj_semLA || jj_3R_charRange_395_7_8()) {
     jj_scanpos = xsp;
-    if (jj_3R_charRange_371_7_9()) return true;
+    if (jj_3R_charRange_401_7_9()) return true;
     }
+    return false;
+  }
+
+  private boolean jj_3_2()
+ {
+    if (jj_3R_posCharGroup_378_5_5()) return true;
     return false;
   }
 
