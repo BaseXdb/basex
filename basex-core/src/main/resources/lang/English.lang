@@ -122,6 +122,7 @@ explorer             = Explorer
 export               = Export
 external_variables   = External variables
 file                 = File
+file_changed_%       = "%" has been changed on disk.\nDo you want to overwrite it?
 file_exists_%        = "%" already exists.\nDo you want to replace it?
 file_filter          = File Filter
 file_not_deleted_%   = "%" could not be deleted.

@@ -677,6 +677,8 @@ public interface Text {
   String FILE_NOT_SAVED_X = lang("file_not_saved_%");
   /** File dialog replace information. */
   String FILE_EXISTS_X = lang("file_exists_%");
+  /** File changed on disk. */
+  String FILE_CHANGED_X = lang("file_changed_%");
   /** Dir dialog replace information. */
   String FILES_REPLACE_X = lang("files_replace_%");
 

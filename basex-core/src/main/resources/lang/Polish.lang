@@ -122,6 +122,7 @@ explorer             = Eksplorator
 export               = Eksportuj
 external_variables   = Zmienne zewnętrzne
 file                 = Plik
+file_changed_%       = "%" został zmieniony na dysku.\nCzy chcesz go nadpisać?
 file_exists_%        = "%" już istnieje.\nCzy chcesz go zastąpić?
 file_filter          = Filtr plików
 file_not_deleted_%   = Nie można usunąć "%".

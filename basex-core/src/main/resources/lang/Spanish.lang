@@ -122,6 +122,7 @@ explorer             = Explorador
 export               = Exportar
 external_variables   = External Variables
 file                 = Fichero
+file_changed_%       = "%" ha sido modificado en el disco.\n¿Quiere usted sobrescribirlo?
 file_exists_%        = "%" ya existe.\n¿Quiere usted reemplazarlo?
 file_filter          = Filtro de archivos
 file_not_deleted_%   = "%" no pudo ser borrado.

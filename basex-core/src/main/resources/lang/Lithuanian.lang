@@ -122,6 +122,7 @@ explorer             = Naršyklė
 export               = Eksportuoti
 external_variables   = Išoriniai kintamieji
 file                 = Failas
+file_changed_%       = „%“ buvo pakeistas diske.\nAr norite jį perrašyti?
 file_exists_%        = „%“ jau yra.\nAr norite jį pakeisti?
 file_filter          = Failų filtras
 file_not_deleted_%   = Nepavyko ištrinti „%“.

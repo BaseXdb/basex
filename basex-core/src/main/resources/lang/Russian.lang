@@ -122,6 +122,7 @@ explorer             = Обозреватель
 export               = Экспорт
 external_variables   = Внешние переменные
 file                 = Файл
+file_changed_%       = "%" был изменён на диске.\nПерезаписать его?
 file_exists_%        = "%" уже существует.\nЗаменить его?
 file_filter          = Фильтр файлов
 file_not_deleted_%   = Не получилось удалить файл "%".

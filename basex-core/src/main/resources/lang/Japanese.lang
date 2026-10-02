@@ -122,6 +122,7 @@ explorer             = エクスプローラ
 export               = エクスポート
 external_variables   = 外部変数
 file                 = ファイル
+file_changed_%       = ファイル "%" はディスク上で変更されています。\n上書きしてよろしいですか？
 file_exists_%        = ファイル "%" は既に存在します。\n置換してよろしいですか？
 file_filter          = ファイルフィルター
 file_not_deleted_%   = ファイル "%" を削除できませんでした。

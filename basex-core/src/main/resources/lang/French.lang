@@ -122,6 +122,7 @@ explorer             = Explorer
 export               = Exporter
 external_variables   = Variables externes
 file                 = Fichier
+file_changed_%       = "%" a été modifié sur le disque.\nVoulez-vous l’écraser ?
 file_exists_%        = "%" existe déjà.\nVoulez-vous le remplacer ?
 file_filter          = Filtre de fichier
 file_not_deleted_%   = Impossible de supprimer "%".

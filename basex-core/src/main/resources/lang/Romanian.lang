@@ -122,6 +122,7 @@ explorer             = Explorer
 export               = Exporta
 external_variables   = Variabilă externă
 file                 = Fișier
+file_changed_%       = "%" a fost modificat pe disc.\nDoriţi să-l suprascrieţi?
 file_exists_%        = "%" deja există. \n Doriţi să-l înlocuiasc?
 file_filter          = Filtru fișiere
 file_not_deleted_%   = "%" nu a putut fi şters.

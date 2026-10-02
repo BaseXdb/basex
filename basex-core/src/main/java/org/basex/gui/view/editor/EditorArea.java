@@ -30,15 +30,19 @@ public final class EditorArea extends TextPanel {
   private IOFile file;
   /** Flag indicating that the editor contents are assigned to a file. */
   private boolean opened;
-  /** Flag for modified content. */
-  private boolean modified;
+  /** Modification state shown in the tab label. */
+  boolean marked;
   /** Last input. */
   byte[] last;
 
   /** View reference. */
   private final EditorView view;
-  /** Timestamp of the assigned file. */
+  /** Timestamp of the assigned file when it was last read or written. */
   private long timeStamp;
+  /** Timestamp of the assigned file when it was last checked. */
+  private long checked;
+  /** Timestamp of the assigned file when it was last polled. */
+  private long polled;
 
   /**
    * Constructor.
@@ -75,15 +79,7 @@ public final class EditorArea extends TextPanel {
    * @return result of check
    */
   public boolean modified() {
-    return modified;
-  }
-
-  /**
-   * Sets the modified flag.
-   * @param mod modified flag
-   */
-  void modified(final boolean mod) {
-    modified = mod;
+    return hist.modified();
   }
 
   /**
@@ -149,25 +145,52 @@ public final class EditorArea extends TextPanel {
   public void reopen(final boolean enforce) {
     // skip if editor contents are not assigned to a file, or if they are up-to-date
     final long ts = file.timeStamp();
-    if(!opened || timeStamp == ts && !enforce) return;
-    timeStamp = ts;
+    if(!opened || checked == ts && !enforce) return;
+    checked = ts;
 
     // do not discard modifications without confirmation (skipped if file was deleted)
-    if(file.exists() && modified &&
+    if(file.exists() && modified() &&
         !BaseXDialog.confirm(gui, Util.info(REVERT_FILE_X, file.name()))) return;
 
-    try {
-      // reopens the file
-      setText(file.read());
-      file(file, false);
-      view.run(this, Action.PARSE);
-    } catch(final IOException ex) {
+    if(!load(true)) {
       // file was deleted or cannot be accessed: flag editor contents as modified
       hist.invalidate();
       view.refreshControls(this, true);
-      Util.debug(ex);
-      BaseXDialog.error(gui, Util.info(FILE_NOT_OPENED_X, file));
     }
+  }
+
+  /**
+   * Reloads unmodified editor contents if the assigned file has been changed on disk.
+   */
+  void refresh() {
+    if(!opened || modified() || !isShowing()) return;
+    // skip deleted files and files that are still being written
+    final long ts = file.timeStamp(), pl = polled;
+    polled = ts;
+    // inaccessible files are retried with the next poll
+    if(ts != 0 && ts != checked && ts == pl) load(false);
+  }
+
+  /**
+   * Reads the assigned file into the editor.
+   * @param report report errors
+   * @return success flag
+   */
+  private boolean load(final boolean report) {
+    // take timestamp before reading: concurrent changes are detected by the next check
+    final long ts = file.timeStamp();
+    try {
+      setText(file.read());
+    } catch(final IOException ex) {
+      Util.debug(ex);
+      if(report) BaseXDialog.error(gui, Util.info(FILE_NOT_OPENED_X, file));
+      return false;
+    }
+    file(file, false);
+    timeStamp = ts;
+    checked = ts;
+    view.run(this, Action.PARSE);
+    return true;
   }
 
   /**
@@ -184,10 +207,16 @@ public final class EditorArea extends TextPanel {
    * @return success flag
    */
   boolean save(final IOFile io) {
+    final boolean rename = io != file;
+    // file was changed on disk: confirm overwrite, or adopt changes before tidying the contents
+    final long ts = file.timeStamp();
+    if(!rename && opened && ts != 0 && ts != timeStamp && (modified() ?
+        !BaseXDialog.confirm(gui, Util.info(FILE_CHANGED_X, file)) : !load(true))) return false;
+
     final GUIOptions gopts = gui.gopts;
     final boolean trim = gopts.get(GUIOptions.TRIMLINES), nl = gopts.get(GUIOptions.FINALNL);
-    final boolean tidied = (trim || nl) && tidy(trim, nl), rename = io != file;
-    if(rename || modified || tidied || !opened) {
+    final boolean tidied = (trim || nl) && tidy(trim, nl);
+    if(rename || modified() || tidied || !opened) {
       if(!write(io, rename)) return false;
       file(io, true);
       return true;
@@ -249,6 +278,7 @@ public final class EditorArea extends TextPanel {
     }
     opened = true;
     timeStamp = file.timeStamp();
+    checked = timeStamp;
     hist.save();
     view.refreshHistory(file);
     view.refreshControls(this, true);

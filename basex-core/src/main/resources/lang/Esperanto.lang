@@ -122,6 +122,7 @@ explorer             = Esplorilo
 export               = Eksporti
 external_variables   = Eksteraj variabloj
 file                 = Dosiero
+file_changed_%       = "%" estis ŝanĝita sur la disko.\nĈu vi volas anstataŭigi ĝin?
 file_exists_%        = "%" jam ekzistas.\nĈu vi volas anstataŭigi ĝin?
 file_filter          = Dosierfiltrilo
 file_not_deleted_%   = Ne eblis forigi "%".

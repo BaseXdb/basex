@@ -122,6 +122,7 @@ explorer             = Verkenner
 export               = Exporteer
 external_variables   = External Variables
 file                 = Bestand
+file_changed_%       = "%" is op schijf gewijzigd.\nWil je het overschrijven?
 file_exists_%        = "%" bestaat al.\nWil je het vervangen?
 file_filter          = Bestandsfilter
 file_not_deleted_%   = "%" kon niet verwijderd worden.

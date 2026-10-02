@@ -122,6 +122,7 @@ explorer             = Explorer
 export               = Exportieren
 external_variables   = Externe Variablen
 file                 = Datei
+file_changed_%       = "%" wurde auf der Festplatte geändert.\nWollen Sie die Datei überschreiben?
 file_exists_%        = "%" besteht bereits.\nWollen Sie sie ersetzen?
 file_filter          = Datei-Filter
 file_not_deleted_%   = "%" konnte nicht gelöscht werden.

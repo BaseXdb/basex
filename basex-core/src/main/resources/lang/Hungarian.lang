@@ -122,6 +122,7 @@ explorer             = Intéző
 export               = Exportálás
 external_variables   = Külső változók
 file                 = Fájl
+file_changed_%       = "%" megváltozott a lemezen.\nFelülírja?
 file_exists_%        = "%" már létezik.\nLecseréli?
 file_filter          = Fájlszűrő
 file_not_deleted_%   = "%" fájlt nem sikerült törölni.

@@ -122,6 +122,7 @@ explorer             = Esploratore
 export               = Esporta
 external_variables   = Variables externas
 file                 = Documento
+file_changed_%       = Il documento "%" è stato modificato su disco.\nVuoi sovrascriverlo?
 file_exists_%        = Il documento "%" esiste già.\nVuoi sovrascriverlo?
 file_filter          = Filtro File
 file_not_deleted_%   = "%" non può essere cancellato.

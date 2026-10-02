@@ -122,6 +122,7 @@ explorer             = 탐색기
 export               = 내보내기
 external_variables   = 외부 변수
 file                 = 파일
+file_changed_%       = "%"이(가) 디스크에서 변경되었습니다.\n덮어쓰시겠습니까?
 file_exists_%        = "%"이(가) 이미 존재합니다.\n바꾸시겠습니까?
 file_filter          = 파일 필터
 file_not_deleted_%   = "%"을(를) 삭제할 수 없습니다.

@@ -122,6 +122,7 @@ explorer             = Penelusur
 export               = Ekspor
 external_variables   = Variabel eksternal
 file                 = Berkas
+file_changed_%       = "%" telah diubah di disk.\nApakah anda ingin menimpanya?
 file_exists_%        = "%" sudah ada.\nApakah anda ingin menggantinya?
 file_filter          = Saringan Berkas
 file_not_deleted_%   = "%" tidak dapat dihapus.

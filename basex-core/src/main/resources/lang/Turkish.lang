@@ -122,6 +122,7 @@ explorer             = Gezgin
 export               = Dışa aktar
 external_variables   = Harici değişkenler
 file                 = Dosya
+file_changed_%       = "%" diskte değiştirildi.\nÜzerine yazmak ister misiniz?
 file_exists_%        = "%" zaten mevcut\nÜzerine yazmak ister misiniz?
 file_filter          = Dosya filtresi
 file_not_deleted_%   = "%" silinemedi

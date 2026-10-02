@@ -122,6 +122,7 @@ explorer             = Нээгч
 export               = экспортлох
 external_variables   = External Variables
 file                 = Файл
+file_changed_%       = "%" дискэн дээр өөрчлөгдсөн байна.\nҮүнийг дарж бичих үү?
 file_exists_%        = "%" аль хэдийнэ үүссэн байна.\nҮүнийг шинээр үүсгэх үү?
 file_filter          = Файлын шүүлтүүр
 file_not_deleted_%   = Файл "%" нь устгагдаагүй байна.

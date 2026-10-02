@@ -188,6 +188,12 @@ public final class EditorView extends View {
 
     refreshLayout();
 
+    // reload the visible editor if its file has been changed on disk
+    new Timer(1000, e -> {
+      final EditorArea edit = getEditor();
+      if(edit != null) edit.refresh();
+    }).start();
+
     // add listeners
     saveB.addActionListener(e -> {
       final JPopupMenu pop = new JPopupMenu();
@@ -1001,10 +1007,10 @@ public final class EditorView extends View {
    */
   void refreshControls(final EditorArea edit, final boolean enforce) {
     // update modification flag
-    final boolean modified = edit.hist != null && edit.hist.modified();
-    if(modified == edit.modified() && !enforce) return;
+    final boolean modified = edit.modified();
+    if(modified == edit.marked && !enforce) return;
 
-    edit.modified(modified);
+    edit.marked = modified;
 
     // update tab title
     String title = edit.file().name();

@@ -122,6 +122,7 @@ explorer             = 浏览器
 export               = 导出
 external_variables   = 外部变量
 file                 = 文件
+file_changed_%       = "%" 已在磁盘上被修改，\n确定覆盖么？
 file_exists_%        = "%" 已经存在，\n确定替换么？
 file_filter          = 文件过滤器
 file_not_deleted_%   = 不能删除"%"
