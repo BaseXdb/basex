@@ -143,7 +143,6 @@ public final class ElementToMap {
    * @throws QueryException query exception
    */
   private Item apply(final PlanEntry entry, final GNode node) throws QueryException {
-
     PlanEntry pe = entry;
     if(!valid(pe, node)) {
       // fall back to the wildcard layout, which must be applicable as well
@@ -195,7 +194,6 @@ public final class ElementToMap {
    * @throws QueryException query exception
    */
   private Item create(final PlanEntry pe, final GNode node) throws QueryException {
-
     return switch(pe.layout) {
       case EMPTY ->
         Str.EMPTY;
@@ -409,7 +407,6 @@ public final class ElementToMap {
    * @throws QueryException query exception
    */
   private XQArray mixed(final GNode node, final boolean ignoreEmpty) throws QueryException {
-
     final ArrayBuilder ab = new ArrayBuilder(job);
     for(final GNode attr : PlanFn.children(Kind.ATTRIBUTE, node)) {
       ab.add(new MapBuilder().put(nodeName(attr, node), attr.string()).map());

@@ -104,13 +104,8 @@ public abstract class PlanFn extends StandardFunc {
       for(final GNode node : nodes) {
         final byte[] value = node.string(), trimmed = Token.trim(value);
         if(dbl) {
-          try {
-            final double d = Dbl.parse(value, null);
-            if(Double.isNaN(d) || Double.isInfinite(d)) dbl = false;
-          } catch(final QueryException ex) {
-            Util.debug(ex);
-            dbl = false;
-          }
+          final double d = Token.toDouble(value);
+          if(Double.isNaN(d) || Double.isInfinite(d)) dbl = false;
         }
         if(integer) {
           if(integerLexical(trimmed)) leadingZero |= leadingZero(trimmed);
