@@ -371,6 +371,9 @@ public final class JsonModuleTest extends SandboxTest {
     serial("<json type='array'><_ type='string'>x</_></json>", "", "[\"x\"]");
     serial("<json type='array'><_ type='number'>1</_></json>", "", "[1]");
     serial("<json numbers=\"_\" type='array'><_>1</_></json>", "", "[1]");
+    serial("<json type='object'><city>Kraków</city></json>", "", "{\"city\":\"Kraków\"}");
+    serial("<Kraków a='Kraków'>Kraków</Kraków>", "'format': 'jsonml'",
+        "[\"Kraków\", {\"a\":\"Kraków\"},\"Kraków\"]");
 
     serialError("<json type='o'/>", ""); // invalid type
     serialError("<json type='array'><_ type='number'/></json>", ""); // value needed

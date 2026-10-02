@@ -42,7 +42,7 @@ public final class JsonMLSerializer extends JsonSerializer {
     }
     out.print('[');
     out.print('"');
-    for(final byte ch : name.local()) printChar(ch);
+    printChars(name.local());
     out.print('"');
     att = false;
   }
@@ -61,12 +61,10 @@ public final class JsonMLSerializer extends JsonSerializer {
       att = true;
     }
     out.print('"');
-    for(final byte ch : Token.local(name)) printChar(ch);
+    printChars(Token.local(name));
     out.print('"');
     out.print(':');
-    out.print('"');
-    for(final byte ch : Token.normalize(value, form)) printChar(ch);
-    out.print('"');
+    string(value);
   }
 
   @Override
@@ -79,7 +77,7 @@ public final class JsonMLSerializer extends JsonSerializer {
     out.print(',');
     indent();
     out.print('"');
-    for(final byte ch : value) printChar(ch);
+    printChars(value);
     out.print('"');
   }
 

@@ -217,9 +217,7 @@ public final class JsonNodeSerializer extends JsonSerializer {
   protected void text(final byte[] value, final FTPos ftp) throws IOException {
     final byte[] type = types.get(level - 1);
     if(eq(type, STRING)) {
-      out.print('"');
-      for(final byte ch : normalize(value, form)) printChar(ch);
-      out.print('"');
+      string(value);
     } else if(eq(type, BOOLEAN)) {
       if(!eq(value, TRUE, FALSE))
         throw error("Value of <%> is no boolean: \"%\"", opened.get(level - 1), value);
