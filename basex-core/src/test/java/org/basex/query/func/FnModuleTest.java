@@ -4466,6 +4466,8 @@ return
 
     query(func.args(" 1[. = 1]", 2), "1\n1");
     error(func.args(" <a/>", -1), INVTYPE_X);
+    error("for $a in " + func.args(" <a/>", wrap(-1) + " cast as xs:integer") + " return $a",
+        INVTYPE_X);
 
     check(func.args(" <a/>", 0), "", empty());
     check(func.args(" ()", wrap(2)), "", empty());

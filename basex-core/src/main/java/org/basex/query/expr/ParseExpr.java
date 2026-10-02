@@ -545,7 +545,8 @@ public abstract class ParseExpr extends Expr {
   protected final long toLong(final Item item, final long min) throws QueryException {
     final long v = toLong(item);
     if(v >= min) return v;
-    throw typeError(item, INTEGER, info);
+    throw typeError(item, min == 0 ? NON_NEGATIVE_INTEGER : min == 1 ? POSITIVE_INTEGER : INTEGER,
+      info);
   }
 
   /**
