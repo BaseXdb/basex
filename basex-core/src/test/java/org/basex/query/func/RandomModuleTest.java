@@ -49,7 +49,10 @@ public final class RandomModuleTest extends SandboxTest {
     final Function func = _RANDOM_SEEDED_DOUBLE;
     // queries
     final int s = 12345;
-    query(func.args(s, 1), new Random(s).nextDouble());
+    query(func.args(s, 1), new SplittableRandom(s).nextDouble());
+    // neighboring seeds yield unrelated first numbers
+    query("let $n := (1 to 100) ! " + func.args(" .", 1)
+        + " return max($n) - min($n) > 0.5", true);
   }
 
   /** Test method. */
@@ -57,8 +60,10 @@ public final class RandomModuleTest extends SandboxTest {
     final Function func = _RANDOM_SEEDED_INTEGER;
     // queries
     final int s = 12345;
-    query(func.args(s, 1), new Random(s).nextInt());
-    query(func.args(s, 1, 1000000), new Random(s).nextInt(1000000));
+    query(func.args(s, 1), new SplittableRandom(s).nextInt());
+    query(func.args(s, 1, 1000000), new SplittableRandom(s).nextInt(1000000));
+    // neighboring seeds yield unrelated first numbers
+    query("count(distinct-values((1 to 100) ! " + func.args(" .", 1, 64) + ")) > 30", true);
     error(func.args(1, -1), QueryError.RANGE_NEGATIVE_X);
     error(func.args(1, 1, -1), QueryError.RANDOM_BOUNDS_X);
     error(func.args(1, 1, 8000000000L), QueryError.RANDOM_BOUNDS_X);

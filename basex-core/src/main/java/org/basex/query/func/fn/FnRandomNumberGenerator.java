@@ -1,5 +1,7 @@
 package org.basex.query.func.fn;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -31,6 +33,8 @@ public final class FnRandomNumberGenerator extends StandardFunc {
   private static final QNm Q_SEQ = new QNm("seq");
   /** Parameter name of take function. */
   private static final QNm Q_COUNT = new QNm("count");
+  /** State increment of {@link SplittableRandom} (one step per number). */
+  private static final long GAMMA = 0x9E3779B97F4A7C15L;
 
   @Override
   public XQMap value(final QueryContext qc) throws QueryException {
@@ -46,31 +50,13 @@ public final class FnRandomNumberGenerator extends StandardFunc {
    * @return random number generator
    */
   private static XQMap generator(final long state, final QueryContext qc, final InputInfo info) {
-    final long i1 = advance(state), i2 = advance(i1);
+    final SplittableRandom random = new SplittableRandom(state);
+    final Next next = new Next(info, state + GAMMA);
     return XQMap.get(Records.RANDOM_NUMBER_GENERATOR.get(),
-      Dbl.get(number(i1, i2)),
-      new FuncItem(info, new Next(info, i2), new Var[0], AnnList.EMPTY, NEXT_TYPE, 0, null),
-      permuteFunc(i1, qc, info),
+      Dbl.get(random.nextDouble()),
+      new FuncItem(info, next, new Var[0], AnnList.EMPTY, NEXT_TYPE, 0, null),
+      permuteFunc(random.nextLong(), qc, info),
       takeFunc(state, qc, info));
-  }
-
-  /**
-   * Computes the next internal state (derived from Java's random class).
-   * @param state current state
-   * @return next state
-   */
-  private static long advance(final long state) {
-    return state * 0x5DEECE66DL + 0xBL & (1L << 48) - 1;
-  }
-
-  /**
-   * Computes a random number from two internal states.
-   * @param i1 first state
-   * @param i2 second state
-   * @return random number
-   */
-  private static double number(final long i1, final long i2) {
-    return ((i1 >>> 22 << 27) + (i2 >>> 21)) / (double) (1L << 53);
   }
 
   /**
@@ -154,15 +140,13 @@ public final class FnRandomNumberGenerator extends StandardFunc {
       final long count = toLong(arg(0).atomItem(qc, info), 0);
 
       return new Iter() {
-        long s = state, c;
+        // same sequence as ?number, ?next()?number, ...
+        final SplittableRandom random = new SplittableRandom(state);
+        long c;
 
         @Override
         public Item next() {
-          if(c++ == count) return null;
-          // same sequence as ?number, ?next()?number, ...
-          final long i1 = advance(s);
-          s = advance(i1);
-          return Dbl.get(number(i1, s));
+          return c++ == count ? null : Dbl.get(random.nextDouble());
         }
       };
     }

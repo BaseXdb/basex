@@ -4159,6 +4159,10 @@ return
         + "  $m2('next')()('number') = $m1('next')()('number'), "
         + "  deep-equal($m1('permute')($seq), $m2('permute')($seq))"
         + ") satisfies true()", true);
+    // ensure that neighboring seeds yield unrelated first numbers
+    query("let $n := (1 to 100) ! " + func.args(" .") + "?number "
+        + "return max($n) - min($n) > 0.5 and count(distinct-values($n ! floor(. * 10))) > 5",
+        true);
     // ensure that the generator has no mutable state
     query("for $i in 1 to 100 "
         + "let $rng := " + func.args() + " "

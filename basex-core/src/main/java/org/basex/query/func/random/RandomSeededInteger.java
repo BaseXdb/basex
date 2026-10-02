@@ -25,7 +25,7 @@ public final class RandomSeededInteger extends StandardFunc {
     if(max != null && (max < 1 || max > Integer.MAX_VALUE)) throw RANDOM_BOUNDS_X.get(info, max);
 
     return new Iter() {
-      final Random r = new Random(seed);
+      final SplittableRandom r = new SplittableRandom(seed);
       final int mx = (int) (max != null ? (long) max : 0);
       long c = count;
 

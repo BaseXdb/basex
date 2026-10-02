@@ -21,7 +21,7 @@ public final class RandomSeededPermutation extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final long seed = toLong(arg(0), qc);
     final ItemList items = new ItemList();
-    final Random r = new Random(seed);
+    final SplittableRandom r = new SplittableRandom(seed);
 
     final Iter iter = arg(1).iter(qc);
     for(Item item1; (item1 = qc.next(iter)) != null;) {

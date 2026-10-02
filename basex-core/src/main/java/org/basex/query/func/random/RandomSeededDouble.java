@@ -23,7 +23,7 @@ public final class RandomSeededDouble extends StandardFunc {
     if(count < 0) throw RANGE_NEGATIVE_X.get(info, count);
 
     return new Iter() {
-      final Random r = new Random(seed);
+      final SplittableRandom r = new SplittableRandom(seed);
       long c = count;
 
       @Override
