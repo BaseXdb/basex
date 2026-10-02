@@ -47,6 +47,27 @@ public final class RestXqModuleTest extends RestXqTest {
   }
 
   /**
+   * Directories with an ignore file are skipped.
+   * @throws Exception exception
+   */
+  @Test public void ignoredDirectory() throws Exception {
+    register("declare %R:path('ok') function m:f() { 'x' };");
+    final IOFile dir = new IOFile(context.soptions.get(StaticOptions.WEBPATH), "sub/");
+    new IOFile(dir, "sub.xqm").write("module namespace sub = 'sub';" +
+      "declare %rest:path('sub') function sub:f() { 'y' };");
+    final IOFile ignore = new IOFile(dir, IO.IGNORESUFFIX);
+    ignore.write("");
+
+    WebModules.get(context).init(false);
+    assertEquals("x", get(200, "ok"));
+    get(404, "sub");
+
+    assertTrue(ignore.delete());
+    WebModules.get(context).init(false);
+    assertEquals("y", get(200, "sub"));
+  }
+
+  /**
    * Parse errors are hidden if {@link StaticOptions#RESTXQERRORS} is disabled.
    * @throws Exception exception
    */
