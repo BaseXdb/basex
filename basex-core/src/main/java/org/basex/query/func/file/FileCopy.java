@@ -4,14 +4,11 @@ import static org.basex.query.QueryError.*;
 
 import java.io.*;
 import java.nio.file.*;
-import java.nio.file.attribute.*;
 
-import org.basex.core.jobs.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -62,52 +59,6 @@ public class FileCopy extends FileFn {
     if(Files.isDirectory(src) && trg.startsWith(src))
       throw FILE_CYCLIC_X_X.get(info, trg, src);
 
-    relocate(src, trg, copy, qc);
-  }
-
-  /**
-   * Recursively relocates files.
-   * @param src source path
-   * @param trg target path
-   * @param copy copy or move files
-   * @param job job
-   * @throws IOException I/O exception
-   */
-  public static void relocate(final Path src, final Path trg, final boolean copy, final Job job)
-      throws IOException {
-
-    job.checkStop();
-    // copy: links are resolved; move: links are moved as such
-    final BasicFileAttributes attrs = Files.readAttributes(src, BasicFileAttributes.class,
-        LinkOption.NOFOLLOW_LINKS);
-    final boolean dir = IOFile.isLink(attrs) ? copy && Files.isDirectory(src) :
-      attrs.isDirectory();
-    if(dir) {
-      if(!Files.exists(trg)) {
-        // move: rename directory as a whole if possible
-        if(!copy) {
-          try {
-            Files.move(src, trg);
-            return;
-          } catch(final IOException ex) {
-            Util.debug(ex);
-          }
-        }
-        Files.createDirectory(trg);
-      }
-      try(DirectoryStream<Path> children = Files.newDirectoryStream(src)) {
-        for(final Path child : children) {
-          relocate(child, trg.resolve(child.getFileName()), copy, job);
-        }
-      }
-      if(!copy) Files.delete(src);
-    } else {
-      if(!Files.exists(trg.getParent())) Files.createDirectories(trg.getParent());
-      if(copy) {
-        Files.copy(src, trg, StandardCopyOption.REPLACE_EXISTING);
-      } else {
-        IOFile.move(src, trg, true);
-      }
-    }
+    IOFile.relocate(src, trg, copy, qc);
   }
 }

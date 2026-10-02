@@ -7,10 +7,8 @@ import java.util.*;
 import javax.xml.namespace.*;
 
 import org.basex.core.*;
-import org.basex.core.jobs.*;
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.func.file.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.format.*;
 import org.basex.query.value.*;
@@ -208,9 +206,8 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
     try {
       final Path target = Paths.get(dir.path(), "sandpit");
       if(source != null) {
-        final Job job = new Job() { };
-        if(Files.exists(target)) IOFile.delete(target, job);
-        FileCopy.relocate(source, target, true, job);
+        IOFile.delete(target, null);
+        IOFile.relocate(source, target, true, null);
       }
       qp.qc.resources.sandpit(target);
     } catch(final IOException ex) {

@@ -206,7 +206,17 @@ public final class IOFile extends IO {
    * @throws IOException I/O exception
    */
   private Path createParent() throws IOException {
-    final Path path = toPath(), parent = path.getParent();
+    return createParent(toPath());
+  }
+
+  /**
+   * Creates missing parent directories of the specified path.
+   * @param path path
+   * @return path
+   * @throws IOException I/O exception
+   */
+  private static Path createParent(final Path path) throws IOException {
+    final Path parent = path.getParent();
     if(parent != null && !Files.isDirectory(parent)) Files.createDirectories(parent);
     return path;
   }
@@ -548,6 +558,60 @@ public final class IOFile extends IO {
     }
     if(replace) Files.move(path, trg, StandardCopyOption.REPLACE_EXISTING);
     else Files.move(path, trg);
+  }
+
+  /**
+   * Copies or moves a file or directory recursively and merges directories with existing ones.
+   * @param src source path
+   * @param trg target path
+   * @param copy copy (resolving links) or move (keeping links)
+   * @param job job for interrupting the operation (can be {@code null})
+   * @throws IOException I/O exception
+   */
+  public static void relocate(final Path src, final Path trg, final boolean copy, final Job job)
+      throws IOException {
+    transfer(src, createParent(trg), copy, job);
+  }
+
+  /**
+   * Copies or moves a file or directory recursively to a target with an existing parent.
+   * @param src source path
+   * @param trg target path
+   * @param copy copy (resolving links) or move (keeping links)
+   * @param job job for interrupting the operation (can be {@code null})
+   * @throws IOException I/O exception
+   */
+  private static void transfer(final Path src, final Path trg, final boolean copy, final Job job)
+      throws IOException {
+
+    if(job != null) job.checkStop();
+    final BasicFileAttributes attrs = Files.readAttributes(src, BasicFileAttributes.class,
+        LinkOption.NOFOLLOW_LINKS);
+    final boolean dir = isLink(attrs) ? copy && Files.isDirectory(src) : attrs.isDirectory();
+    if(dir) {
+      if(!Files.exists(trg)) {
+        // move: rename directory as a whole if possible
+        if(!copy) {
+          try {
+            move(src, trg, false);
+            return;
+          } catch(final IOException ex) {
+            Util.debug(ex);
+          }
+        }
+        Files.createDirectory(trg);
+      }
+      try(DirectoryStream<Path> children = Files.newDirectoryStream(src)) {
+        for(final Path child : children) {
+          transfer(child, trg.resolve(child.getFileName()), copy, job);
+        }
+      }
+      if(!copy) delete(src);
+    } else if(copy) {
+      Files.copy(src, trg, StandardCopyOption.REPLACE_EXISTING);
+    } else {
+      move(src, trg, true);
+    }
   }
 
   @Override
