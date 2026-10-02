@@ -59,6 +59,7 @@ public final class DynamicStep extends Single {
 
     // the selector is compiled with an absent focus
     final boolean both = cond != Bln.FALSE;
+    if(!both && expr.has(Flag.CTX)) throw QueryError.SELECTORCTX_X.get(expr.info(info), expr);
     final Expr step = new SelectorStep(info, Axis.CHILD,
         both ? expr.copy(cc, new IntObjectMap<>()) : expr);
     final Expr selector = compile ? step.compile(cc) : step.optimize(cc);

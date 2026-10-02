@@ -926,6 +926,8 @@ public enum QueryError {
   /** Error code. */
   NOCTX_X(XPDY, 2, "%: Context value is undefined."),
   /** Error code. */
+  SELECTORCTX_X(XPDY, 2, "%: Key selector has no focus; use ! instead of /."),
+  /** Error code. */
   VAREMPTY_X(XPDY, 2, "No value assigned to %."),
   /** Error code. */
   NODOC_X(XPDY, 50, "Input has no root node: %."),

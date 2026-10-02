@@ -5,6 +5,7 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -55,6 +56,13 @@ public final class SelectorStep extends Step {
     qc.focus = new QueryFocus();
     try {
       keys = selector.atomValue(qc, info);
+    } catch(final QueryException ex) {
+      // focus-dependent step on JNodes: suggest simple map operator
+      if(ex.error() == QueryError.NOCTX_X && selector.has(Flag.CTX) &&
+          (focus.value instanceof JNode || focus.value instanceof XQStruct)) {
+        throw QueryError.SELECTORCTX_X.get(ex.info(), selector);
+      }
+      throw ex;
     } finally {
       qc.focus = focus;
     }

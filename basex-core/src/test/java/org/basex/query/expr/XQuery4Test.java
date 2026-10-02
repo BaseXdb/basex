@@ -914,7 +914,7 @@ public final class XQuery4Test extends SandboxTest {
 
     // focus-dependent selector: evaluated with an absent focus, hence a dynamic error
     error("<a><b name='b'/><c name='x'/></a>/child::{ @name }", NOCTX_X);
-    error("let $m := { 'a': 'a', 'b': 'x' } return $m/child::{ string(.) }", NOCTX_X);
+    error("let $m := { 'a': 'a', 'b': 'x' } return $m/child::{ string(.) }", SELECTORCTX_X);
     // the selector must not be optimized with the focus of the step
     error("<a><b/><c/></a>/child::{ if(. instance of node()) then 'b' else 'c' }", NOCTX_X);
   }
@@ -1035,8 +1035,8 @@ public final class XQuery4Test extends SandboxTest {
     // mixed input: the interpretation is chosen at evaluation time
     final String func = "declare function local:f($x as item()*) { $x/data() }; ";
     query(func + "local:f(<a>x</a>)", "x");
-    error(func + "local:f({ 'a': 1 })", NOCTX_X);
-    error(func + "(local:f(<a>x</a>), local:f({ 'a': 1 }))", NOCTX_X);
+    error(func + "local:f({ 'a': 1 })", SELECTORCTX_X);
+    error(func + "(local:f(<a>x</a>), local:f({ 'a': 1 }))", SELECTORCTX_X);
 
     // navigational steps: absolute paths, 'otherwise', try/catch, 'if' without 'else'
     query("count({ 'a': 1 }/(/))", 1);
