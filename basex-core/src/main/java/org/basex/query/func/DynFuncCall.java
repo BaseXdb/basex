@@ -199,12 +199,16 @@ public final class DynFuncCall extends FuncCall {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return body() instanceof final FItem func ? eval(func, qc, tco) : iterate(qc).value(qc, this);
+    final Value funcs = body().unwrappedValue(qc);
+    return funcs instanceof final FItem func ? eval(func, qc, tco) :
+      iterate(funcs.iter(), qc).value(qc, this);
   }
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return body() instanceof final FItem func ? eval(func, qc, tco).iter() : iterate(qc);
+    final Value funcs = body().unwrappedValue(qc);
+    return funcs instanceof final FItem func ? eval(func, qc, tco).iter() :
+      iterate(funcs.iter(), qc);
   }
 
   /**
@@ -225,28 +229,23 @@ public final class DynFuncCall extends FuncCall {
 
   /**
    * Evaluates multiple function items.
+   * @param iter function items
    * @param qc query context
    * @return iterator
-   * @throws QueryException query exception
    */
-  private Iter iterate(final QueryContext qc) throws QueryException {
+  private Iter iterate(final Iter iter, final QueryContext qc) {
     return new Iter() {
-      final Iter iter = body().unwrappedIter(qc);
-      Item next = iter.next();
-      boolean first = true;
       Iter value;
 
       @Override
       public Item next() throws QueryException {
         while(true) {
           if(value == null) {
-            final Item item = next;
+            final Item item = iter.next();
             if(item == null) return null;
+            // a tail call would discard all other results: only allowed for a single function item
             if(item instanceof final FItem fi) {
-              // a tail call discards all other results: eliminate it for a single function item
-              next = iter.next();
-              value = eval(fi, qc, tco && first && next == null).iter();
-              first = false;
+              value = eval(fi, qc, false).iter();
             } else {
               throw INVFUNCITEM_X_X.get(info, item.seqType(), item);
             }
