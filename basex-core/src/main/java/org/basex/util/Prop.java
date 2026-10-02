@@ -96,7 +96,7 @@ public final class Prop {
     String version = atts.getValue("Implementation-Version");
     if(version != null && version.contains("-SNAPSHOT")) {
       final String build = atts.getValue("Implementation-Build");
-      if(build != null) version += ' ' + build;
+      if(build != null && !build.isBlank()) version += ' ' + build;
     } else {
       version = CURRENT_VERSION;
     }

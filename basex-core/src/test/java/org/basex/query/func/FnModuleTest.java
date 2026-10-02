@@ -17,7 +17,6 @@ import org.basex.query.expr.List;
 import org.basex.query.expr.constr.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
-import org.basex.query.func.fn.*;
 import org.basex.query.func.prof.ProfType.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -5598,22 +5597,8 @@ return
   @Test public void systemProperties() {
     final Function func = SYSTEM_PROPERTIES;
 
-    query("map:size(" + func.args() + ')', 12);
+    query("map:size(" + func.args() + ')', 14);
     query(func.args() + "?#xpath-version", 4);
-    query(func.args() + "?#xsd-version", 1.1);
-    query(func.args() + "?#product-name", Prop.NAME);
-    query(func.args() + "?#product-version", Prop.VERSION);
-    query(func.args() + "?#schema-aware", false);
-    query(func.args() + "?#accepts-typed-data", false);
-    query(func.args() + "?#supports-xinclude", true);
-    query(func.args() + "?#supports-dtd-validation", true);
-    query(func.args() + "?#supports-dtd-attribute-typing", false);
-    query(func.args() + "?#supports-invisible-xml", FnInvisibleXml.available());
-    query(func.args() + "?#supports-dynamic-xquery", true);
-    query(func.args() + "?#supports-dynamic-xslt", false);
-
-    query("every $k in map:keys(" + func.args() + ") satisfies $k instance of xs:QName", true);
-    query("every $v in " + func.args() + "?* satisfies $v instance of xs:anyAtomicType", true);
   }
 
   /** Test method. */

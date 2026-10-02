@@ -34,8 +34,9 @@ public final class FnSystemProperties extends StandardFunc {
       put(property("supports-dtd-attribute-typing"), Bln.FALSE).
       put(property("supports-invisible-xml"), Bln.get(FnInvisibleXml.available())).
       put(property("supports-dynamic-xquery"), Bln.TRUE).
-      // supports-dynamic-xslt: false, because fn:transform is not available
-      put(property("supports-dynamic-xslt"), Bln.FALSE).map();
+      put(property("supports-dynamic-xslt"), Bln.TRUE).
+      put(property("supports-binary-library"), Bln.TRUE).
+      put(property("supports-file-library"), Bln.TRUE).map();
   }
 
   /**
