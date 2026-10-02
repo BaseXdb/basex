@@ -419,6 +419,20 @@ public final class IndexOptimizeTest extends SandboxTest {
     check("//*[string(a) = 'A'] ! name()", "xml", empty(ValueAccess.class));
   }
 
+  /** Nested paths with multiple predicates. */
+  @Test public void nestedPredicates() {
+    execute(new CreateDB(NAME, "<xml><o><i><p>A</p><q>1</q></i><i><p>B</p><q>2</q></i></o>"
+        + "<o><i><p>A</p><q>2</q></i></o></xml>"));
+    indexCheck("count(//o[i[p = 'A'][q = '2']])", 1);
+    indexCheck("count(//o[i[q = '2'][p = 'A']])", 1);
+    indexCheck("count(//o[i[p = 'A' and q = '2']])", 1);
+    indexCheck("count(//o[i[p = 'B'][q = '2']])", 1);
+    indexCheck("count(//o[i[p = 'B'][q = '1']])", 0);
+    // positional predicates are respected
+    query("count(//o[i[2][p = 'A']])", 0);
+    query("count(//o[i[2][p = 'B']])", 1);
+  }
+
   /** A value that does not occur below the addressed path: statically discarded. */
   @Test public void filteredIndexHit() {
     execute(new CreateDB(NAME, "<xml><a>A</a><b>B</b></xml>"));

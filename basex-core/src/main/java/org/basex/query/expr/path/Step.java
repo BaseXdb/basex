@@ -534,7 +534,7 @@ public abstract class Step extends Preds {
    * @return resulting step instance
    */
   final Step removePredicate() {
-    return copyType(rebuild(Arrays.copyOfRange(exprs, 0, exprs.length - 1)));
+    return rebuild(Arrays.copyOfRange(exprs, 0, exprs.length - 1));
   }
 
   /**

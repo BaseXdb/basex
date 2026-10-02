@@ -2540,4 +2540,13 @@ public final class RewritingsTest extends SandboxTest {
     query("let $x := 0 return " + wrap(1) + "[. = 1] otherwise xs:error($x)", 1);
     error("let $x := 0 return " + wrap(1) + "[. = 2] otherwise xs:error($x)", FUNCCAST_X_X);
   }
+
+  /** Dropped positional predicates: the path may yield multiple results. */
+  @Test public void droppedPositionalPredicate() {
+    final String doc = "<o><i/><i x='1'/></o>";
+    query("count(" + doc + "[i[not(@x)][1]])", 1);
+    query("count(" + doc + "[i[not(@x)][last()]])", 1);
+    query("count(" + doc + "[i[starts-with(@x, '1')][1]])", 1);
+    query("count(" + doc + "[i[not(@x)][@x][1]])", 0);
+  }
 }

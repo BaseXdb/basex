@@ -221,10 +221,9 @@ public abstract class Path extends ParseExpr {
       // drop irrelevant predicate. example: if(a[1]) → if(a)
       expr = dropPredicate(cc);
       if(expr == this) {
-        // merge nested predicates. example: if(a[b]) → if(a/b)
+        // merge nested predicates. examples: if(a[b]) → if(a/b), if(a[b][c]) → if(a[b]/c)
         final Expr last = steps[steps.length - 1];
-        if(last instanceof final Step step && step.exprs.length == 1 &&
-            step.seqType().type instanceof NodeType && !step.exprs[0].seqType().mayBeNumber()) {
+        if(last instanceof final Step step) {
           final Expr ex = step.flattenEbv(this, true, cc);
           if(ex != step) expr = ex;
         }
@@ -244,7 +243,8 @@ public abstract class Path extends ParseExpr {
     final ExprList list = new ExprList(steps.length).add(steps);
     final Step step = ((Step) list.pop()).removePredicate();
     list.add(cc.get(root, true, () -> step.optimize(cc)));
-    return copyType(get(cc, info, root, list.finish()));
+    // the type is not adopted: the path may yield more results without the predicate
+    return get(cc, info, root, list.finish());
   }
 
   /**
