@@ -1,6 +1,7 @@
 package org.basex.query.util.pkg;
 
 import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 import java.util.zip.*;
 
@@ -101,7 +102,9 @@ public final class RepoArchive {
   void unzip(final IOFile target) throws IOException {
     try(ZipInputStream in = new ZipInputStream(new ArrayInput(data))) {
       for(ZipEntry ze; (ze = in.getNextEntry()) != null;) {
-        final IOFile trg = new IOFile(target, ze.getName());
+        final Path path = IOFile.resolve(target.file().toPath(), ze.getName());
+        if(path == null) continue;
+        final IOFile trg = new IOFile(path);
         if(ze.isDirectory()) {
           trg.md();
         } else {

@@ -92,7 +92,7 @@ public final class DialogExport extends BaseXDialog {
     ok = !pth.isEmpty();
     if(ok) gui.gopts.setFile(GUIOptions.INPUTPATH, file);
 
-    final String text = file.isDir() && file.children().length > 0 ? DIR_NOT_EMPTY : null;
+    final String text = file.hasChildren() ? DIR_NOT_EMPTY : null;
     info.setText(text, ok ? Msg.WARN : Msg.ERROR);
     enableOK(buttons, B_OK, ok);
   }

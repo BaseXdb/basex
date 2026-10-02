@@ -72,9 +72,10 @@ public class FileList extends FileFn {
             throws IOException {
           if(path.equals(root)) throw new NotDirectoryException(path.toString());
           qc.checkStop();
-          final boolean link = attrs.isSymbolicLink() && Files.isDirectory(path);
-          if(link) links.add(path);
-          (attrs.isDirectory() || link ? dirs : files).add(path);
+          final boolean dir = attrs.isDirectory() ||
+              attrs.isSymbolicLink() && Files.isDirectory(path);
+          if(dir && IOFile.isLink(attrs)) links.add(path);
+          (dir ? dirs : files).add(path);
           return FileVisitResult.CONTINUE;
         }
         @Override

@@ -82,13 +82,12 @@ public final class Databases {
     final Pattern pt = pattern == null ? null : regex(pattern);
     final StringList list = new StringList();
     final HashSet<String> map = new HashSet<>();
-    for(final IOFile file : soptions.dbPath().children()) {
-      final String name = file.name();
+    soptions.dbPath().children((name, attrs) -> {
       String entry = null;
       if(all && name.endsWith(IO.ZIPSUFFIX)) {
         final String[] split = ZIPPATTERN.split(name);
         if(split.length > 0 && !split[0].equals(name)) entry = split[0];
-      } else if(file.isDir() && !Strings.startsWith(name, '.')) {
+      } else if(attrs.isDirectory() && !Strings.startsWith(name, '.')) {
         entry = name;
       }
       // add entry if it has not already been added, matches the pattern, and is accessible
@@ -96,7 +95,7 @@ public final class Databases {
           (user == null || user.has(Perm.READ, entry))) {
         list.add(entry);
       }
-    }
+    });
     return list.sort(false);
   }
 

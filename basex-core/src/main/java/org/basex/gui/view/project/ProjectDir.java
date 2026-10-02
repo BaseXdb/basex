@@ -36,16 +36,19 @@ final class ProjectDir extends ProjectNode {
   void expand() {
     final ArrayList<IOFile> newDirs = new ArrayList<>(), newFiles = new ArrayList<>();
     final boolean showHidden = view.gui.gopts.get(GUIOptions.SHOWHIDDEN);
-    for(final IOFile child : file.children()) {
-      if(child.ignore()) {
-        newDirs.clear();
-        newFiles.clear();
-        newFiles.add(child);
-        break;
+    final String[] ignore = { null };
+    file.children((name, attrs) -> {
+      if(IOFile.ignore(name)) {
+        ignore[0] = name;
+      } else if(showHidden || !IOFile.isHidden(name, attrs)) {
+        final boolean dir = attrs.isDirectory();
+        (dir ? newDirs : newFiles).add(new IOFile(file, dir ? name + '/' : name));
       }
-      if(showHidden || !child.isHidden()) {
-        (child.isDir() ? newDirs : newFiles).add(child);
-      }
+    });
+    if(ignore[0] != null) {
+      newDirs.clear();
+      newFiles.clear();
+      newFiles.add(new IOFile(file, ignore[0]));
     }
     newDirs.sort(COMP);
     newFiles.sort(COMP);
@@ -84,7 +87,7 @@ final class ProjectDir extends ProjectNode {
    * Adds a dummy node if a directory contains entries.
    */
   private void addDummy() {
-    if(file.children().length != 0) add(new ProjectFile(null, view));
+    if(file.hasChildren()) add(new ProjectFile(null, view));
   }
 
   /**

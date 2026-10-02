@@ -2,6 +2,7 @@ package org.basex.gui.view.project;
 
 import java.io.*;
 import java.nio.file.*;
+import java.nio.file.attribute.*;
 import java.util.*;
 import java.util.function.*;
 
@@ -72,42 +73,41 @@ final class ProjectCache implements Iterable<String> {
   private void add(final Path root, final Predicate<ProjectCache> stop,
       final HashSet<String> links) throws InterruptedException {
 
-    // check if file cache was replaced or invalidated
+    // check if file cache was replaced or invalidated; stop if maximum has been reached
     if(stop.test(this)) throw new InterruptedException();
+    if(cache.size() == max) return;
 
     try {
-      // follow symbolic links only once
-      if(Files.isSymbolicLink(root) && !links.add(root.toRealPath().toString())) return;
-
-      final ArrayList<Path> dirs = new ArrayList<>();
-      final ArrayList<IOFile> files = new ArrayList<>();
-      try(DirectoryStream<Path> paths = Files.newDirectoryStream(root)) {
-        for(final Path path : paths) {
-          // skip hidden files, cancel parsing if directory contains .ignore file
-          final IOFile io = new IOFile(path);
-          if(io.ignore()) return;
-          if(showHidden || !io.isHidden()) {
-            if(Files.isDirectory(path)) {
-              dirs.add(path);
-            } else {
-              files.add(io);
-            }
-          }
-        }
-      }
-
-      // traverse directories
-      for(final Path dir : dirs) {
-        add(dir, stop, links);
-      }
-
-      // add files; stop traversal if maximum has been exceeded
-      for(final IOFile file : files) {
-        if(cache.size() == max) return;
-        cache.add(file.path());
-      }
+      // follow symbolic links and junctions only once
+      final BasicFileAttributes attrs = Files.readAttributes(root, BasicFileAttributes.class,
+          LinkOption.NOFOLLOW_LINKS);
+      if(IOFile.isLink(attrs) && !links.add(root.toRealPath().toString())) return;
     } catch(final IOException ex) {
       Util.debug(ex);
+      return;
+    }
+
+    // skip hidden files, cancel parsing if directory contains .ignore file
+    final ArrayList<Path> dirs = new ArrayList<>(), files = new ArrayList<>();
+    final boolean[] ignore = { false };
+    new IOFile(root).children((name, attrs) -> {
+      if(IOFile.ignore(name)) {
+        ignore[0] = true;
+      } else if(showHidden || !IOFile.isHidden(name, attrs)) {
+        (attrs.isDirectory() ? dirs : files).add(root.resolve(name));
+      }
+    });
+    if(ignore[0]) return;
+
+    // traverse directories
+    for(final Path dir : dirs) {
+      add(dir, stop, links);
+    }
+
+    // add files; stop traversal if maximum has been exceeded
+    for(final Path file : files) {
+      if(cache.size() == max) return;
+      cache.add(new IOFile(file).path());
     }
   }
 

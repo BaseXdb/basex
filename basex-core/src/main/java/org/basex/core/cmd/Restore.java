@@ -3,6 +3,7 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 
 import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 import java.util.zip.*;
 
@@ -82,12 +83,15 @@ public final class Restore extends ABackup {
       final Enumeration<? extends ZipEntry> enm = zip.entries();
       while(enm.hasMoreElements()) {
         final ZipEntry ze = enm.nextElement();
-        final IOFile trg = new IOFile(dbpath, ze.getName());
-        if(ze.isDirectory()) {
-          trg.md();
-        } else {
-          trg.parent().md();
-          trg.write(zip.getInputStream(ze));
+        final Path path = IOFile.resolve(dbpath.file().toPath(), ze.getName());
+        if(path != null) {
+          final IOFile trg = new IOFile(path);
+          if(ze.isDirectory()) {
+            trg.md();
+          } else {
+            trg.parent().md();
+            trg.write(zip.getInputStream(ze));
+          }
         }
         if(cmd != null) cmd.curr++;
       }

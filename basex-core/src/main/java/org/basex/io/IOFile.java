@@ -230,17 +230,8 @@ public final class IOFile extends IO {
    * @return children
    */
   public IOFile[] children(final String regex) {
-    final File[] children = file.listFiles();
-    if(children == null) return new IOFile[0];
-
-    final ArrayList<IOFile> io = new ArrayList<>();
     final Pattern pattern = Pattern.compile(regex, Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE);
-    for(final File child : children) {
-      if(pattern.matcher(child.getName()).matches()) {
-        io.add(child.isDirectory() ? new IOFile(child.getPath() + '/') : new IOFile(child));
-      }
-    }
-    return io.toArray(IOFile[]::new);
+    return children(f -> pattern.matcher(f.getName()).matches());
   }
 
   /**
@@ -249,14 +240,23 @@ public final class IOFile extends IO {
    * @return children
    */
   public IOFile[] children(final FileFilter filter) {
-    final File[] children = filter == null ? file.listFiles() : file.listFiles(filter);
-    if(children == null) return new IOFile[0];
-
-    final ArrayList<IOFile> io = new ArrayList<>(children.length);
-    for(final File child : children) {
-      io.add(child.isDirectory() ? new IOFile(child + "/") : new IOFile(child));
-    }
+    final ArrayList<IOFile> io = new ArrayList<>();
+    walk(1, filter, (path, attrs) ->
+      io.add(new IOFile(path.toFile(), attrs.isDirectory() ? "/" : "")));
     return io.toArray(IOFile[]::new);
+  }
+
+  /**
+   * Checks if the path is a directory with at least one child.
+   * @return result of check
+   */
+  public boolean hasChildren() {
+    try(DirectoryStream<Path> paths = Files.newDirectoryStream(toPath())) {
+      return paths.iterator().hasNext();
+    } catch(final IOException ex) {
+      Util.debug(ex);
+      return false;
+    }
   }
 
   /**
@@ -397,8 +397,8 @@ public final class IOFile extends IO {
       @Override
       public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs)
           throws IOException {
-        // Windows junctions (reparse points): delete the link, not the target
-        if(!attrs.isOther()) return FileVisitResult.CONTINUE;
+        // Windows junctions: delete the link, not the target
+        if(!isLink(attrs)) return FileVisitResult.CONTINUE;
         delete(dir);
         return FileVisitResult.SKIP_SUBTREE;
       }
@@ -440,6 +440,30 @@ public final class IOFile extends IO {
       view.setReadOnly(false);
       Files.delete(path);
     }
+  }
+
+  /**
+   * Checks if the attributes, read without following links, belong to a symbolic link or junction.
+   * @param attrs file attributes
+   * @return result of check
+   */
+  public static boolean isLink(final BasicFileAttributes attrs) {
+    return attrs.isSymbolicLink() || attrs.isDirectory() && attrs.isOther();
+  }
+
+  /**
+   * Resolves an untrusted relative path against a directory, dropping roots, "." and "..".
+   * @param dir directory
+   * @param path relative path (e.g. the name of an archive entry)
+   * @return resolved path, or {@code null} if no segments are left
+   */
+  public static Path resolve(final Path dir, final String path) {
+    Path resolved = dir;
+    for(final Path part : Paths.get(path).normalize()) {
+      final String p = part.toString();
+      if(!p.equals("..") && !p.equals(".")) resolved = resolved.resolve(part);
+    }
+    return resolved.equals(dir) ? null : resolved;
   }
 
   /**
@@ -545,19 +569,23 @@ public final class IOFile extends IO {
   }
 
   /**
-   * Checks if a file is hidden.
+   * Checks if a file with the specified name and attributes is hidden.
+   * @param name file name
+   * @param attrs attributes of the directory listing
    * @return result of check
    */
-  public boolean isHidden() {
-    return file.isHidden() || Strings.startsWith(name(), '.') || name().equals("node_modules");
+  public static boolean isHidden(final String name, final BasicFileAttributes attrs) {
+    return Strings.startsWith(name, '.') || name.equals("node_modules") ||
+        attrs instanceof final DosFileAttributes dos && dos.isHidden();
   }
 
   /**
-   * Checks if the parent directory of this file can be ignored.
+   * Checks if a file with the specified name indicates that its parent directory can be ignored.
+   * @param name file name
    * @return result of check
    */
-  public boolean ignore() {
-    return name().equals(".ignore");
+  public static boolean ignore(final String name) {
+    return name.equals(".ignore");
   }
 
   // STATIC METHODS ===============================================================================

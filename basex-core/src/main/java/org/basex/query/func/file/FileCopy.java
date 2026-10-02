@@ -4,12 +4,15 @@ import static org.basex.query.QueryError.*;
 
 import java.io.*;
 import java.nio.file.*;
+import java.nio.file.attribute.*;
 import java.util.*;
 
 import org.basex.core.jobs.*;
+import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
+import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -75,8 +78,24 @@ public class FileCopy extends FileFn {
       throws IOException {
 
     job.checkStop();
-    if(Files.isDirectory(src)) {
-      if(!Files.exists(trg)) Files.createDirectory(trg);
+    // copy: links are resolved; move: links are moved as such
+    final BasicFileAttributes attrs = Files.readAttributes(src, BasicFileAttributes.class,
+        LinkOption.NOFOLLOW_LINKS);
+    final boolean dir = IOFile.isLink(attrs) ? copy && Files.isDirectory(src) :
+      attrs.isDirectory();
+    if(dir) {
+      if(!Files.exists(trg)) {
+        // move: rename directory as a whole if possible
+        if(!copy) {
+          try {
+            Files.move(src, trg);
+            return;
+          } catch(final IOException ex) {
+            Util.debug(ex);
+          }
+        }
+        Files.createDirectory(trg);
+      }
       try(DirectoryStream<Path> children = Files.newDirectoryStream(src)) {
         for(final Path child : children) {
           relocate(child, trg.resolve(child.getFileName()), copy, job);
