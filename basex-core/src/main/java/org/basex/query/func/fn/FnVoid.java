@@ -7,6 +7,8 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.var.*;
+import org.basex.util.hash.*;
 
 /**
  * Function implementation.
@@ -41,5 +43,12 @@ public final class FnVoid extends StandardFunc {
       return Empty.VALUE;
     }
     return this;
+  }
+
+  @Override
+  public StandardFunc copy(final CompileContext cc, final IntObjectMap<Var> vm) {
+    final FnVoid sf = (FnVoid) super.copy(cc, vm);
+    sf.ndt = ndt;
+    return sf;
   }
 }

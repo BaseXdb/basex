@@ -10,7 +10,9 @@ import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Function implementation.
@@ -66,6 +68,13 @@ public final class FnCodepointsToString extends StandardFunc {
   @Override
   protected boolean values(final boolean limit, final CompileContext cc) {
     return super.values(true, cc);
+  }
+
+  @Override
+  public StandardFunc copy(final CompileContext cc, final IntObjectMap<Var> vm) {
+    final FnCodepointsToString sf = (FnCodepointsToString) super.copy(cc, vm);
+    sf.singleInt = singleInt;
+    return sf;
   }
 
   /**

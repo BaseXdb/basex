@@ -9,7 +9,9 @@ import org.basex.query.util.collation.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Function implementation.
@@ -99,5 +101,12 @@ public final class FnDeepEqual extends StandardFunc {
   @Override
   public int hofOffsets() {
     return functionOption(2) ? Integer.MAX_VALUE : 0;
+  }
+
+  @Override
+  public StandardFunc copy(final CompileContext cc, final IntObjectMap<Var> vm) {
+    final FnDeepEqual sf = (FnDeepEqual) super.copy(cc, vm);
+    sf.options = options;
+    return sf;
   }
 }

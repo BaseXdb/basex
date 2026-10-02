@@ -12,7 +12,9 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.map.XQMap.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.options.*;
 
 /**
@@ -166,6 +168,13 @@ public class MapMerge extends MapFn {
   @Override
   public int hofOffsets() {
     return functionOption(1) ? Integer.MAX_VALUE : 0;
+  }
+
+  @Override
+  public StandardFunc copy(final CompileContext cc, final IntObjectMap<Var> vm) {
+    final MapMerge sf = (MapMerge) super.copy(cc, vm);
+    sf.md = md;
+    return sf;
   }
 
   /**

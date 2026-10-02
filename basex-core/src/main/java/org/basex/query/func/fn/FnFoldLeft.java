@@ -9,6 +9,8 @@ import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
+import org.basex.util.hash.*;
 
 /**
  * Function implementation.
@@ -143,5 +145,13 @@ public class FnFoldLeft extends StandardFunc {
       if(ft != null) exprType.assign(ist.oneOrMore() ? ft.refinedType : zst.union(ft.refinedType));
     }
     return this;
+  }
+
+  @Override
+  public StandardFunc copy(final CompileContext cc, final IntObjectMap<Var> vm) {
+    final FnFoldLeft sf = (FnFoldLeft) super.copy(cc, vm);
+    sf.exitOrAction = exitOrAction;
+    sf.exitOnEmpty = exitOnEmpty;
+    return sf;
   }
 }

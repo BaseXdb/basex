@@ -11,6 +11,8 @@ import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.var.*;
+import org.basex.util.hash.*;
 
 /**
  * Function implementation.
@@ -138,5 +140,12 @@ public final class UtilCountWithin extends StandardFunc {
       max = mx != null ? mx : Long.MAX_VALUE;
     }
     return new long[] { min, max };
+  }
+
+  @Override
+  public StandardFunc copy(final CompileContext cc, final IntObjectMap<Var> vm) {
+    final UtilCountWithin sf = (UtilCountWithin) super.copy(cc, vm);
+    sf.ndt = ndt;
+    return sf;
   }
 }

@@ -1849,6 +1849,11 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(" (1, 2)[. = 0]", 1, " function($r as xs:integer, $a) { $r + $r }"), 1,
         type(func, "xs:integer"));
 
+    // early exits: preserved when the fold is copied
+    query("declare function local:f() { [" + func.args(" 1 to 1_000_000_000", 0,
+        " fn($r, $v) { if($r >= 10) then $r else $r + $v }") + "] };"
+        + "for value $f in { 'a': fn() { local:f() }, 'b': fn() { 0 } } return $f()", "[10]\n0");
+
     // should not be unrolled
     check(func.args(" 1 to 6", 0, " function($a, $b) { $a + $b }"), 21,
         exists(func));
@@ -5975,6 +5980,12 @@ return
     query("declare function local:f($f as fn(xs:string) as empty-sequence()) {"
         + "fn($a) { %updating fn() { " + func.args(" $a ! $f(.)") + " } } };"
         + "let $u := local:f(fn($x) { () })('a') return updating $u()", "");
+
+    // evaluate nondeterministic input if the function is copied
+    inline(true);
+    error("declare function local:f() { [" + func.args(" (random:double(), error())", true)
+        + "] }; for value $f in { 'a': fn() { local:f() }, 'b': fn() { 0 } } return $f()",
+        FUNERR1);
   }
 
   /** Test method. */

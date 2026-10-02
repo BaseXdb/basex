@@ -11,6 +11,8 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
+import org.basex.util.hash.*;
 
 /**
  * Function implementation.
@@ -77,5 +79,12 @@ public final class FnCount extends StandardFunc {
       expr = input.seqType().type instanceof NodeType ? input : cc.function(EXISTS, info, exprs);
     }
     return cc.simplify(this, expr, mode);
+  }
+
+  @Override
+  public StandardFunc copy(final CompileContext cc, final IntObjectMap<Var> vm) {
+    final FnCount sf = (FnCount) super.copy(cc, vm);
+    sf.ndt = ndt;
+    return sf;
   }
 }
