@@ -248,6 +248,14 @@ public abstract class SimpleMap extends Mapping {
     }
     if(preds != null && !preds.mayBePositional()) return Filter.get(cc, info, expr, preds.exprs);
 
+    // A ! (if(B) then C else D) → if(B) then A ! C else A ! D
+    if(next instanceof final If iff && !iff.cond.has(Flag.CTX, Flag.POS, Flag.NDT) &&
+        !expr.has(Flag.NDT)) {
+      cc.info(OPTUNSWITCH_X, iff.cond);
+      return new If(iff.info(), iff.cond, get(cc, info, expr, iff.exprs[0]),
+        get(cc, info, expr.copy(cc, new IntObjectMap<>()), iff.exprs[1])).optimize(cc);
+    }
+
     // A ! (if(B) then C else () → A[B] ! C
     if(next instanceof final If iff && iff.exprs[1] == Empty.VALUE && !iff.exprs[0].has(Flag.POS) &&
         !iff.cond.seqType().mayBeNumber()) {
