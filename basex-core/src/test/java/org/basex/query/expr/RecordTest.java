@@ -545,11 +545,10 @@ public final class RecordTest extends SandboxTest {
     // no fusion when the coercion target is not the record's own (strict) type
     check("let $r as record(a, b) := { 'a': <a/>, 'b': 2 } return map:put($r, 'a', 0)",
         "{\"a\":0,\"b\":2}", empty(ButWith.class));
-    // a chain of updates unrolls into but with operations and the constant updates merge into one
+    // a chain of updates unrolls into but with operations, which merge and cover all fields
     check("let $r as record(a, b) := { 'a': <a/>, 'b': 2 } "
         + "let $s as record(a, b) := $r => map:put('a', 0) => map:put('b', 9) return $s",
-        "{\"a\":0,\"b\":9}",
-        root(ButWith.class), empty(ShapeSet.class), count(ButWith.class, 1));
+        "{\"a\":0,\"b\":9}", empty(ButWith.class), empty(ShapeSet.class));
     error("declare record local:coord(x, y);\n"
         + "declare function local:reset($c as local:coord) as local:coord "
         + "{ $c => map:put('x', 0) => map:put('y', 0) };\n"
@@ -559,21 +558,48 @@ public final class RecordTest extends SandboxTest {
   /** Consecutive constant {@code but with} updates with disjoint keys are merged. */
   @Test public void butWithMerge() {
     // disjoint keys merge into one update
+    check("declare record local:c(x, y, z); "
+        + "local:c(<x>1</x>, <x>2</x>, 3) but with { 'x': 0 } but with { 'y': 0 }",
+        "{\"x\":0,\"y\":0,\"z\":3}", root(ButWith.class), count(ButWith.class, 1));
+    // ... and are dropped if they cover all fields
     check("declare record local:c(x, y); "
         + "local:c(<x>1</x>, <x>2</x>) but with { 'x': 0 } but with { 'y': 0 }",
-        "{\"x\":0,\"y\":0}", root(ButWith.class), count(ButWith.class, 1));
+        "{\"x\":0,\"y\":0}", empty(ButWith.class));
     // overlapping keys are not merged (the earlier value is still coerced), but use-last holds
     check("declare record local:c(x, y); "
         + "local:c(<x>1</x>, <x>2</x>) but with { 'x': 0 } but with { 'x': 1 }",
         "{\"x\":1,\"y\":<x>2</x>}", count(ButWith.class, 2));
     // only the disjoint pair collapses; the overlapping update stays separate
-    check("declare record local:c(x, y); "
-        + "local:c(<x>1</x>, <x>2</x>) but with { 'x': 0 } but with { 'y': 0 } but with { 'x': 9 }",
-        "{\"x\":9,\"y\":0}", count(ButWith.class, 2));
-    // a non-constant update is not merged (the field value is evaluated at runtime)
-    check("declare record local:c(x, y); "
-        + "local:c(<x>1</x>, <x>2</x>) but with { 'x': <n/> } but with { 'y': 0 }",
-        "{\"x\":<n/>,\"y\":0}", count(ButWith.class, 2));
+    check("declare record local:c(x, y, z); local:c(<x>1</x>, <x>2</x>, 3) "
+        + "but with { 'x': 0 } but with { 'y': 0 } but with { 'x': 9 }",
+        "{\"x\":9,\"y\":0,\"z\":3}", count(ButWith.class, 2));
+    // non-constant updates with disjoint keys are merged as well
+    check("declare record local:c(x, y, z); "
+        + "local:c(<x>1</x>, <x>2</x>, 3) but with { 'x': <n/> } but with { 'y': 0 }",
+        "{\"x\":<n/>,\"y\":0,\"z\":3}", count(ButWith.class, 1));
+    check("declare record local:c(x as xs:integer, y, z);\n"
+        + "declare function local:f($c as local:c, $i, $j) as local:c {"
+        + " $c => map:put('x', $i) => map:put('y', $j) };\n"
+        + "local:f(local:c(1, 2, 3), 4, <y/>)",
+        "{\"x\":4,\"y\":<y/>,\"z\":3}", count(ButWith.class, 1), empty(ShapeSet.class));
+    // ... coercion errors are still raised
+    error("declare record local:c(x as xs:integer, y, z); "
+        + "local:c(1, 2, 3) but with { 'x': string(<_>y</_>) } but with { 'y': 0 }", INVTYPE_X);
+    // a record constructor coerces its arguments: not merged
+    check("declare record local:c(x, y, z); declare record local:d(x as xs:double); "
+        + "local:c(1, 2, 3) but with local:d(<x>4</x>) but with { 'y': <y/> }",
+        "{\"x\":4,\"y\":<y/>,\"z\":3}", count(ButWith.class, 2));
+    // constant operands are pre-evaluated
+    check("let $r as record(x, y, z) := { 'x': 1, 'y': 2, 'z': 3 } return $r but with { 'z': 0 }",
+        "{\"x\":1,\"y\":2,\"z\":0}", empty(ButWith.class), root(XQShapeValueMap.class));
+    error("let $r as record(x, y, z) := { 'x': 1, 'y': 2, 'z': 3 } return $r but with { 'q': 0 }",
+        INVTYPE_X);
+    // empty updates are dropped
+    check("declare record local:c(x, y); local:c(<x/>, 1) but with { }",
+        "{\"x\":<x/>,\"y\":1}", empty(ButWith.class));
+    query("declare record local:c(x, y); "
+        + "local:c(<x/>, 1) but with map:remove({ 'x': 0 }, string(<_>x</_>))",
+        "{\"x\":<x/>,\"y\":1}");
     // merging must not drop the shadowed value and mask its coercion error
     error("declare record local:c(x as xs:integer); "
         + "local:c(1) but with { 'x': 'y' } but with { 'x': 3 }", INVTYPE_X);
