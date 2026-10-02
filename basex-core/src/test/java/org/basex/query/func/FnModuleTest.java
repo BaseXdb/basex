@@ -616,6 +616,16 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void collation() {
+    final Function func = COLLATION;
+    final String coll = func.args(" { 'lang': 'de', 'numeric': true() }");
+
+    query(coll, "http://www.w3.org/2013/collation/UCA?lang=de;numeric=yes");
+    query(COLLATION_AVAILABLE.args(" " + coll), true);
+    query(COMPARE.args("a", "b", " " + coll), -1);
+  }
+
+  /** Test method. */
   @Test public void concat() {
     final Function func = CONCAT;
 
