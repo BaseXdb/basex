@@ -157,6 +157,8 @@ final class TaskContext {
     } catch(final Exception ex) {
       // timeout: discard branch errors and report the timeout
       if(group.state == JobState.TIMEOUT) throw XQUERY_TIMEOUT.get(info);
+      // stopped caller: report the regular interruption
+      qc.checkStop();
       // pass on query and job exceptions
       final Throwable e = Util.rootException(ex);
       if(e instanceof final QueryException qe) throw qe;
