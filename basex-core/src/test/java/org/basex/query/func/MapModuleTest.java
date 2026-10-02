@@ -358,8 +358,10 @@ public final class MapModuleTest extends SandboxTest {
     // GH-1954
     query(func.args(" if (<a/>/text()) then {} else ()") + " ! map:keys(.)", "");
 
-    // map:merge → map:put
-    check(func.args(" (map:entry(1, <a/>), { 1: <b/> })") + "?*", "<a/>", empty(func));
+    // entry order is preserved
+    query(func.args(" (map:entry(1, <a/>), { 1: <b/> })") + "?*", "<a/>");
+    query("map:keys(" + func.args(" ({ 'a': " + wrap(1) + " }, { 'b': " + wrap(2) + " })") +
+        ")", "a\nb");
 
     query(func.args(" ({ 1: <x/> })"), "{1:<x/>}");
     query(func.args(" ({ 1: <x/> }, { 1: <y/> })"), "{1:<x/>}");

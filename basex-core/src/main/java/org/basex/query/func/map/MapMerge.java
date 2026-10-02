@@ -1,7 +1,6 @@
 package org.basex.query.func.map;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -106,13 +105,6 @@ public class MapMerge extends MapFn {
       final SeqType st = arg(0).seqType();
       if(st.one()) return arg(0);
 
-      // map:merge((map:entry($k, $v), $map)) → map:put($map, $k, $v)
-      if(!defined(1) && arg(0) instanceof List && arg(0).args().length == 2) {
-        final Expr[] args = arg(0).args();
-        if(_MAP_ENTRY.is(args[0]) && args[1].seqType().instanceOf(Types.MAP_O)) {
-          return cc.function(_MAP_PUT, info, args[1], args[0].arg(0), args[0].arg(1));
-        }
-      }
       final MapType mt = (MapType) st.type;
       assignType(mt.keyType(), mt.valueType());
     }
