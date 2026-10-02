@@ -12,7 +12,7 @@ import module namespace utils = 'dba/lib/utils' at 'utils.xqm';
 declare record html:page-options(
   header   as xs:string?,
   error    as xs:string?,
-  info     as xs:string?,
+  divided  as xs:boolean?,
   columns  as xs:string*,
   rows     as xs:string*,
   panels   as xs:string?,
@@ -31,13 +31,11 @@ declare record html:action-options(
 (:~ Options of a content panel; see html:panel. :)
 declare record html:panel-options(
   id         as xs:string?,
-  pane       as (xs:boolean | xs:string)?,
+  pane       as xs:boolean?,
   label      as xs:string?,
   collapsed  as xs:boolean?,
   hidden     as xs:boolean?,
   fold       as xs:string?,
-  divider    as xs:boolean?,
-  class      as xs:string?,
   extra      as node()*
 );
 
@@ -47,7 +45,7 @@ declare record html:panel-options(
  : @param  $options  options:
  :   * header: name of the page, which is also the entry marked in the navigation
  :   * error: error string; by default, what the address reports
- :   * info: info string; by default, what the address reports
+ :   * divided: whether dividers separate the panels; a resizer separates them otherwise
  :   * columns: grid track widths, one per panel; defaults to equal widths
  :   * rows: grid track heights; the panels then fill the viewport instead of growing with
  :     their content, and each panel scrolls on its own
@@ -68,7 +66,7 @@ declare function html:wrap(
   (: what the last action reported. A page relays it from its address without ever looking at
      it, so the template fetches it instead of every page declaring, accepting and passing it
      on; a page that reports something of its own supplies it :)
-  let $info := ($options?info otherwise request:parameter('info'))[.]
+  let $info := request:parameter('info')[.]
   let $error := ($options?error otherwise request:parameter('error'))[.]
   (: only panels get a grid track; a page may supply scripts as well :)
   let $tracks := $panels[tokenize(@class) = 'panel']
@@ -155,7 +153,7 @@ declare function html:wrap(
         </a>
       </header>
       <main>
-        <div class='content{ ' fill'[$rows] }'
+        <div class='content{ ' fill'[$rows] }{ ' divided'[$options?divided] }'
              style='--columns: { $columns }{ $rows[.] ! ('; --rows: ' || .) }'>{
           $options?panels ! attribute data-panels { . },
           $panels
@@ -198,15 +196,13 @@ declare function html:wrap(
  : @param  $options   options:
  :   * id: id of the block that holds the contents. A panel that the server pushes is filled
  :     into it, and the message that carries it names the block
- :   * pane: whether that block scrolls on its own; a string adds further classes to it, and
- :     contents that bring their own block ask for neither (default: true)
+ :   * pane: whether that block scrolls on its own; contents that bring their own block ask for
+ :     neither (default: true)
  :   * label: name of the panel, written on the strip it folds to. The empty string leaves the
  :     panel where it is; no name at all falls back to the heading the panel shows
  :   * collapsed: whether the panel opens folded away
  :   * hidden: whether the panel is left out; by default, one with nothing to show is
  :   * fold: 'right' if the panel folds towards the right edge
- :   * divider: whether a divider separates the panel from the one before it
- :   * class: further classes of the panel
  :   * extra: content beside the block, which a pushed panel does not replace
  : @return panel
  :)
@@ -215,27 +211,19 @@ declare function html:panel(
   $options   as html:panel-options := {}
 ) as element(div) {
   let $id := $options?id
-  (: the block that holds the contents; a string names the classes it carries besides 'pane' :)
   let $pane := $options?pane otherwise true()
-  let $pane-class := if ($pane instance of xs:string) then (
-    'pane ' || $pane
-  ) else if ($pane) {
-    'pane'
-  }
   return <div class='{ string-join((
     'panel',
-    'no-divider'[not($options?divider)],
     'collapsed'[$options?collapsed],
-    'hidden'[$options?hidden otherwise empty($contents)],
-    $options?class
+    'hidden'[$options?hidden otherwise empty($contents)]
   ), ' ') }'>{
     $options?label ! attribute data-label { . },
     $options?fold ! attribute data-fold { . },
     (: the contents get a block of their own if they scroll or are replaced :)
-    if ($pane-class or $id) then (
+    if ($pane or $id) then (
       element div {
         $id ! attribute id { . },
-        attribute class { $pane-class }[$pane-class],
+        attribute class { 'pane' }[$pane],
         $contents
       }
     ) else (
@@ -286,8 +274,7 @@ declare function html:link(
  : @param  $page      page the link refers to
  : @param  $params    selection the link refers to
  : @param  $selected  whether the link refers to what is shown
- : @param  $key       parameter that names the selected entry; empty if the link is followed by
- :                    loading the page it names
+ : @param  $key       parameter that names the selected entry
  : @param  $call      client function that selects the entry
  : @return function creating the link
  :)
@@ -296,19 +283,14 @@ declare function html:select(
   $page      as xs:string,
   $params    as map(*),
   $selected  as xs:boolean,
-  $key       as xs:string? := (),
-  $call      as xs:string? := ()
+  $key       as xs:string,
+  $call      as xs:string
 ) as fn() as element(a) {
   (: the link can be followed and bookmarked; a view that refreshes its panels over its own
      connection follows it in place, which is what the supplied call does :)
   let $href := web:create-url($page, $params)
   return fn() {
-    if ($key) then (
-      html:action($label, $call, { 'select': $params?$key },
-        { 'href': $href, 'selected': $selected })
-    ) else (
-      <a href='{ $href }'>{ attribute class { 'selected' }[$selected], $label }</a>
-    )
+    html:action($label, $call, { 'select': $params?$key }, { 'href': $href, 'selected': $selected })
   }
 };
 

@@ -20,12 +20,12 @@ declare variable $dba:MAX-ENTRIES := 10000;
 (:~ Table columns. :)
 declare variable $dba:COLUMNS := (
   (: the values of a known format get the width they need; the text takes the rest :)
-  { 'key': 'time', 'label': 'Time', 'type': 'dynamic', 'order': 'desc', 'width': '6.5rem' },
-  { 'key': 'address', 'label': 'Address', 'type': 'dynamic', 'width': '11rem' },
-  { 'key': 'user', 'label': 'User', 'type': 'dynamic', 'width': '11rem' },
-  { 'key': 'type', 'label': 'Type', 'type': 'dynamic', 'width': '4.5rem' },
+  { 'key': 'time', 'label': 'Time', 'order': 'desc', 'width': '7rem' },
+  { 'key': 'address', 'label': 'Address', 'width': '11rem' },
+  { 'key': 'user', 'label': 'User', 'width': '11rem' },
+  { 'key': 'type', 'label': 'Type', 'width': '4.5rem' },
   { 'key': 'ms', 'label': 'ms', 'type': 'decimal', 'order': 'desc', 'width': '5rem' },
-  { 'key': 'text', 'label': 'Text', 'type': 'dynamic' }
+  { 'key': 'text', 'label': 'Text' }
 );
 
 (:~
@@ -62,7 +62,6 @@ function dba:logs(
       if ($date) {
         <div class='sticky logbar'>{
           <h3>{ $date }</h3>,
-          <input type='hidden' name='name' value='{ $date }'/>,
           <input type='text' id='input' name='input' value='{ $input }' autocomplete='off'
                  placeholder='Search, e.g. admin' title='Regular expression of entries to show'
                  autofocus='' onkeyup='filterLogs(event.key);'/>,
@@ -79,25 +78,25 @@ function dba:logs(
       },
       (: the panel keeps its track even without a log file to show: it is the whole page
          beside the list :)
-      { 'divider': true(), 'hidden': false(), 'label': $date }
+      { 'hidden': false(), 'label': $date }
     ),
     html:panel(
       <form method='post' id='dates' autocomplete='off'>
-        <input type='hidden' name='date' id='date' value='{ $date }'/>
-        <input type='hidden' name='sort' id='sort' value='{ $sort }'/>
-        <input type='hidden' name='page' id='page' value='{ $page }'/>
-        <input type='hidden' name='time' id='time' value='{ $time }'/>
+        <input type='hidden' id='date' value='{ $date }'/>
+        <input type='hidden' id='sort' value='{ $sort }'/>
+        <input type='hidden' id='page' value='{ $page }'/>
+        <input type='hidden' id='time' value='{ $time }'/>
         <div id='list'>{
           (: the filter is a control of the list, and shares the row of its buttons :)
           let $buttons := (
             form:button('logs-download', 'Download', 'CHECK'),
             form:button('logs/delete', 'Delete', ('CHECK', 'CONFIRM')),
-            <input type='text' id='log-filter' name='log-filter' maxlength='10'
+            <input type='text' id='log-filter' maxlength='10'
                    onkeyup='logFilter();' class='smallinput' placeholder='Date'
                    title='Show the log files whose date starts with the input, e.g. 2026-09'/>
           )
           let $headers := (
-            { 'key': 'name', 'label': 'Name', 'type': 'dynamic' },
+            { 'key': 'name', 'label': 'Name' },
             { 'key': 'size', 'label': 'Size', 'type': 'bytes' }
           )
           let $entries :=
@@ -115,10 +114,10 @@ function dba:logs(
             { 'sticky': <h2>Logs</h2>, 'all': true() })
         }</div>
       </form>,
-      { 'divider': true(), 'label': 'Logs' }
+      { 'label': 'Logs' }
     )
   ) => html:wrap({
-    'header': $dba:CAT, 'columns': ('1fr', '200px'),
+    'header': $dba:CAT, 'divided': true(), 'columns': ('1fr', '200px'),
     (: the panels fill the viewport and scroll on their own, so their heads can be pinned :)
     'rows': '1fr',
     'scripts': 'logs', 'init': 'initLogs();'[$date]
@@ -149,7 +148,7 @@ function dba:ws-message(
     let $id := job:eval(dba:entries#7, [
       $json?input,
       (: the checked files, or the one that is opened :)
-      ($json?dates?* otherwise $json?date),
+      $json?dates?*,
       $json?sort[.] otherwise 'time',
       xs:integer($json?page),
       $json?time,
@@ -322,8 +321,9 @@ declare function dba:entries(
 
 (:~
  : Redirects to the URL that returns logs for the specified timestamp.
- : @param  $date  date
- : @param  $time  time
+ : @param  $date    date
+ : @param  $time    time
+ : @param  $ignore  regular expression of entries to hide
  : @return redirection
  :)
 declare
@@ -344,7 +344,7 @@ function dba:logs-jump(
     where $log/@time = $time
     return ($pos - 1) idiv $config:ROWS + 1
   ) otherwise 1
-  return web:redirect('/dba/logs', { 'name': $date, 'page': $page, 'time': $time }) update {
+  return web:redirect(utils:page($dba:CAT), { 'name': $date, 'page': $page, 'time': $time }) update {
     .//*:header/@value ! (replace value of node . with . || '#' || $time)
   }
 };

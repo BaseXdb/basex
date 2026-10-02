@@ -186,7 +186,7 @@ function foldResourcePanels() {
     [ "Databases", shown ], [ "Database", false ], [ "Resource", false ],
     [ "Backups", shown || Boolean(_db) ], [ "Information", true ]
   ].map(([ label, collapse ]) =>
-    [ label, folded[_panels.indexOf(contentPanel(label))] ?? collapse ]));
+    [ label, folded[label] ?? collapse ]));
 }
 
 /**
@@ -363,7 +363,6 @@ _handlers[DB_WS] = json => {
   switch(json.type) {
     case "editor": showResource(json); break;
     case "result": showResourceResult(json.result); break;
-    case "stopped": setText("Query was stopped.", "warning"); break;
   }
 };
 
@@ -377,7 +376,7 @@ function initDatabases(editable) {
   loadCodeMirror("xml", true, "fill");
 
   initSelection(adoptSelection, showDatabase);
-  initDocument(editable, undefined);
+  initDocument(editable);
   // the lists are rendered unfiltered: what was typed for the database is asked for again
   if(restoreField("resource-filter", _db)) refreshDatabase();
   if(restoreField("index-prefix", _db)) refreshIndex();

@@ -26,7 +26,7 @@ function dba:workspace() as element(html) {
   (
     (: the grid is placed explicitly: the file panel on the left, the toolbar above the editor
        and the result, and the result beside the editor :)
-    <div class='panel no-divider' style='grid-area: 1 / 2 / 2 / 4'>
+    <div class='panel' style='grid-area: 1 / 2 / 2 / 4'>
       <form class='toolbar' autocomplete='off' action='javascript:void(0);'>
         <div>
           { (: files are opened in the file panel and named by their tab :) }
@@ -46,19 +46,19 @@ function dba:workspace() as element(html) {
       </form>
     </div>,
     (: the client knows the directory to be shown, and fills the panel :)
-    <div class='panel no-divider' style='grid-area: 1 / 1 / -1 / 2'>
+    <div class='panel' style='grid-area: 1 / 1 / -1 / 2'>
       <div id='files-panel' class='pane'/>
       <div class='resizer' data-split='0'/>
     </div>,
     (: the open documents are known to the client, which draws the strip :)
-    <div class='panel no-divider' style='grid-area: 2 / 2 / -1 / 3'>
+    <div class='panel' style='grid-area: 2 / 2 / -1 / 3'>
       <div id='tabs' class='tabs'/>
       <textarea id='editor' autofocus='' spellcheck='false'/>
       <div class='resizer' data-split='1'/>
     </div>,
     (: two panels: the space between them can be dragged. The result is headed by a tab,
        so that its text area starts at the height of the editor :)
-    <div class='panel no-divider' data-label='' style='grid-area: 2 / 3 / 3 / 4'>
+    <div class='panel' data-label='' style='grid-area: 2 / 3 / 3 / 4'>
       <div class='tabs'>
         <span class='tab active' id='result-label'>Result</span>
         <label title='Show the information of the last query'><input type='checkbox'
@@ -68,7 +68,7 @@ function dba:workspace() as element(html) {
       <div id='output-hint' class='hint'>Ctrl-Enter to run</div>
       <div class='resizer-row' id='info-resizer' data-split='0' hidden=''/>
     </div>,
-    <div class='panel no-divider hidden' data-label='' id='info-view'
+    <div class='panel hidden' data-label='' id='info-view'
          style='grid-area: 3 / 3 / 4 / 4'>
       <div class='tabs'>
         <span class='tab active'>Query Info</span>
@@ -90,7 +90,7 @@ function dba:workspace() as element(html) {
  : Downloads the selected files; several files are packed into an archive.
  : @param  $names  names of files
  : @param  $dir    directory of the file panel
- : @return binary data
+ : @return rest response and file content, or redirection
  :)
 declare
   %rest:POST

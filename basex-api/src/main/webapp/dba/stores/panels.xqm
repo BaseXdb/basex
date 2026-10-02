@@ -40,12 +40,12 @@ declare function panels:stores(
     {
       let $headers := (
         (: the values of a known format get the width they need; the name takes the rest :)
-        { 'key': 'label', 'label': 'Name', 'type': 'dynamic' },
+        { 'key': 'label', 'label': 'Name' },
         { 'key': 'entries', 'label': 'Count', 'type': 'number', 'order': 'desc',
           'width': '4rem' },
         { 'key': 'size', 'label': 'Size', 'type': 'bytes', 'order': 'desc', 'width': '4.75rem' },
         { 'key': 'modified', 'label': 'Date', 'type': 'dateTime', 'order': 'desc',
-          'width': '5.75rem' }
+          'width': '6.5rem' }
       )
       let $entries :=
         for $store in utils:slice($names, $page, $sort)
@@ -94,7 +94,7 @@ declare function panels:entries(
   $path      as item()*,
   $sort      as xs:string,
   $page      as xs:integer,
-  $selected  as item()? := ()
+  $selected  as item()?
 ) as element()+ {
   let $key := head($path)
   let $root := if ($key) { store:get($key, $name) }
@@ -107,8 +107,7 @@ declare function panels:entries(
   let $positional := $value instance of array(*) or count($value) > 1
   (: the level opens by what its children are named or numbered by :)
   let $sort := $sort[.] otherwise 'label'
-  (: a written value is rebuilt along its path, so a step that names a position cannot be :)
-  let $editable := every $step in $steps satisfies not($step instance of map(*))
+  let $editable := panels:addressable($steps)
   let $children := if (empty($steps)) then (
     for $entry in store:keys($name)
     return {
@@ -129,10 +128,10 @@ declare function panels:entries(
       {
         let $headers := (
           (: a position is ordered by its value, not as the string it is labelled by :)
-          { 'key': 'label', 'label': 'Key', 'type': 'dynamic', 'width': '30%',
+          { 'key': 'label', 'label': 'Key', 'width': '30%',
             'sort': 'number'[$positional] },
-          { 'key': 'value', 'label': 'Value', 'type': 'dynamic', 'width': '40%' },
-          { 'key': 'type', 'label': 'Type', 'type': 'dynamic', 'width': '22%' }
+          { 'key': 'value', 'label': 'Value', 'width': '40%' },
+          { 'key': 'type', 'label': 'Type', 'width': '22%' }
         )
         (: the type and the value of a child are only produced for the rows that are shown:
            a store may hold values that are expensive to inspect :)
@@ -237,10 +236,7 @@ declare %private function panels:add-dialog(
       form:field('Key:',
         <input type='text' name='step' placeholder="'key'" required='' autofocus=''/>, 'stacked')
     ),
-    (: no 'required': the editor hides the text area, and a hidden field that fails validation
-       cannot be focused, which would block the submit without telling the user why :)
-    form:field('Value:',
-      <textarea name='value' id='add-value' class='wide' rows='8'/>, 'stacked')
+    form:editor-field('Value:', 'value', 'add-value')
   ))
 };
 
@@ -265,10 +261,8 @@ declare function panels:value(
     (: the value is written as the expression that yields it again, so that what is edited here
        can be stored again :)
     let $expression := utils:expression($value)
-    (: a written value is rebuilt along its path, so a step that names a position cannot be :)
-    let $addressable := every $step in $path satisfies not($step instance of map(*))
     return utils:editable($expression?text, (
-      'all steps of the path must be strings and integers'[not($addressable)],
+      'all steps of the path must be strings and integers'[not(panels:addressable($path))],
       'the value is too large for editing'[$expression?truncated]
     ))
   )
@@ -491,6 +485,18 @@ declare function panels:steps(
   ) else (
     $step
   )
+};
+
+(:~
+ : Checks if the value a path leads to can be written.
+ : @param  $steps  steps of the path
+ : @return result of check
+ :)
+declare function panels:addressable(
+  $steps  as item()*
+) as xs:boolean {
+  (: a written value is rebuilt along its path, so a step that names a position cannot be :)
+  every $step in $steps satisfies not($step instance of map(*))
 };
 
 (:~

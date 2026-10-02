@@ -71,6 +71,9 @@ let _pressed = false;
     where a page has an editor, and absent on the pages that do not load it. */
 let _locate;
 
+/** Link to the CodeMirror editor component. */
+let _editor;
+
 /** Path of the endpoint that runs the queries of the page; a page registers its own. */
 let _query_path;
 
@@ -208,6 +211,30 @@ function stored(key, fallback = null) {
   } catch {
     return fallback;
   }
+}
+
+/**
+ * Returns a JSON value that was remembered in this browser, if it has the expected shape.
+ * @param {string} key key
+ * @param {*} fallback value to use if none was stored, or if it is malformed or outdated
+ * @param {Function} valid function that checks the parsed value
+ * @returns {*} value
+ */
+function storedJson(key, fallback, valid) {
+  try {
+    const value = JSON.parse(stored(key));
+    if(value !== null && valid(value)) return value;
+  } catch { /* malformed: an older or foreign value is given up */ }
+  return fallback;
+}
+
+/**
+ * Indicates whether a value is a plain object, as stored by JSON.stringify.
+ * @param {*} value value
+ * @returns {boolean} result of check
+ */
+function isRecord(value) {
+  return typeof value === "object" && !Array.isArray(value);
 }
 
 /**
@@ -508,6 +535,7 @@ function showMessage(path, data) {
     if(endRequest()) setText("", "");
   }
   if(json.type === "error") showError(json.message, undefined, json);
+  if(json.type === "stopped") setText("Query was stopped.", "warning");
   // a panel is named by the block it is filled into, so it needs no case of its own
   if(json.type === "panel") insertPanel(json.id, json.html);
   _handlers[path]?.(json);
@@ -658,13 +686,14 @@ function shownPages(id) {
  * @param {HTMLElement} link link
  */
 function loadMore(link) {
-  // the panel that scrolls is what the link is clipped by, not the window
+  // the viewport is the root: a stacked pane grows with its content and would always contain
+  // the link. A pane that scrolls on its own clips the link anyway; scrollMargin extends it
   const observer = new IntersectionObserver(entries => {
     if(entries.some(entry => entry.isIntersecting)) {
       observer.disconnect();
       link.click();
     }
-  }, { root: link.closest(".pane"), rootMargin: "200px" });
+  }, { rootMargin: "200px", scrollMargin: "200px" });
   observer.observe(link);
 }
 
@@ -705,9 +734,7 @@ function hintShortcuts(root) {
     const text = button.textContent.trim();
     if(button === pageButton(label => label.startsWith("New"))) hint(button, "N");
     else if(text === "..") hint(button, "Backspace");
-    else if(/^(Drop|Delete)$/.test(text) && button.matches("[onclick*=confirmAction]")) {
-      hint(button, "Del");
-    }
+    else if(dropButton(button)) hint(button, "Del");
   }
   const live = controls.find(c => c.id === "live")?.closest("label");
   if(live) hint(live, "L");
@@ -1228,6 +1255,16 @@ function pageButton(accept) {
 }
 
 /**
+ * Indicates whether a button drops or deletes the ticked rows of its table.
+ * @param {HTMLElement} button button
+ * @returns {boolean} result of check
+ */
+function dropButton(button) {
+  return button.matches("[onclick*=confirmAction]") &&
+    /^(Drop|Delete)$/.test(button.textContent.trim());
+}
+
+/**
  * Drops or deletes the ticked rows of the table that is worked with, or else the chosen row.
  */
 function dropRows() {
@@ -1238,8 +1275,7 @@ function dropRows() {
   if(!form.querySelector("tbody input[type=checkbox]:checked")) {
     _row?.closest("form") === form && _row.querySelector("input[type=checkbox]")?.click();
   }
-  [ ...form.querySelectorAll("button[onclick*=confirmAction]:not(:disabled)") ]
-    .find(button => /^(Drop|Delete)$/.test(button.textContent.trim()))?.click();
+  [ ...form.querySelectorAll("button:not(:disabled)") ].find(dropButton)?.click();
 }
 
 /** Shortcuts of the editor of a page, as [ key, description ] pairs; a page registers its own. */
@@ -1392,9 +1428,9 @@ function showShortcuts() {
 }
 
 /**
- * Returns the key the folded panels of the current page are stored under. A panel is addressed
- * by its position, so a page that shows different panels in its subviews keeps a state for
- * each of them: the subview is what the page calls itself in 'data-panels'.
+ * Returns the key the folded panels of the current page are stored under. A page that shows
+ * different panels in its subviews keeps a state for each of them: the subview is what the page
+ * calls itself in 'data-panels'.
  * @returns {string} key
  */
 function panelsKey() {
@@ -1404,10 +1440,23 @@ function panelsKey() {
 
 /**
  * Returns the panels that were folded by hand in the current subview.
- * @returns {object} collapsed state, by panel id
+ * @returns {object} collapsed state, by panel label
  */
 function storedPanels() {
-  return JSON.parse(stored(panelsKey(), "{}"));
+  // a panel is named by its label, not by its position: a panel that is added, removed or moved
+  // in a later version leaves the state of the others alone
+  const state = storedJson(panelsKey(), {}, isRecord);
+  return Object.fromEntries(Object.entries(state).filter(([ label, collapse ]) =>
+    typeof collapse === "boolean" && _panels.some(panel => panelLabel(panel) === label)));
+}
+
+/**
+ * Returns the label of a collapsible content panel.
+ * @param {HTMLElement} panel panel
+ * @returns {string} label (can be null)
+ */
+function panelLabel(panel) {
+  return panel.querySelector(":scope > button.collapse")?.dataset.title ?? null;
 }
 
 /**
@@ -1425,8 +1474,6 @@ function initPanels() {
   _panels = panels;
   _tracked = panels.every(panel => !panel.style.gridArea);
 
-  // the markup supplies the state of every panel that was not folded by hand
-  const state = storedPanels();
   panels.forEach((panel, p) => {
     // the label of the collapsed strip is the panel's own, or the first word of its heading:
     // what follows a separator names the entry that is shown, which the panel outlives.
@@ -1434,7 +1481,6 @@ function initPanels() {
     const heading = panel.querySelector("h2, h3");
     const label = panel.dataset.label ?? heading?.textContent.split(/[»:]/)[0].trim();
     if(!label) return;
-    const id = `${p}`;
     const button = document.createElement("button");
     button.type = "button";
     button.className = "collapse";
@@ -1442,25 +1488,30 @@ function initPanels() {
     // of a page that ends with more than one of them says so itself
     button.dataset.right = panel.dataset.fold === "right" || p === panels.length - 1;
     button.dataset.title = label;
-    button.addEventListener("click", () => togglePanel(panel, id));
+    button.addEventListener("click", () => togglePanel(panel));
     panel.prepend(button);
-    showPanel(panel, state[id] ?? panel.classList.contains("collapsed"));
   });
+  // the markup supplies the state of every panel that was not folded by hand
+  const state = storedPanels();
+  for(const panel of panels) {
+    const label = panelLabel(panel);
+    if(label) showPanel(panel, state[label] ?? panel.classList.contains("collapsed"));
+  }
   applyColumns();
 }
 
 /**
  * Collapses or expands a content panel and persists the new state.
  * @param {HTMLElement} panel panel to be toggled
- * @param {string} id panel id
  */
-function togglePanel(panel, id) {
+function togglePanel(panel) {
   const collapse = !panel.classList.contains("collapsed");
   showPanel(panel, collapse);
   applyColumns();
 
+  // what is written back is the state of the panels that exist: older entries are dropped
   const state = storedPanels();
-  state[id] = collapse;
+  state[panelLabel(panel)] = collapse;
   store(panelsKey(), JSON.stringify(state));
 
   remeasure();
@@ -1633,7 +1684,7 @@ function initResizers() {
 
   // the page declares the initial tracks; a stored split wins, but only if it still fits the
   // grid: a page that changed its layout must not be sized by what an older one stored
-  const split = JSON.parse(stored(pageKey(SPLIT_KEY), "{}"));
+  const split = storedJson(pageKey(SPLIT_KEY), {}, isRecord);
   const style = getComputedStyle(_content);
   const fitting = (tracks, count) =>
     Array.isArray(tracks) && tracks.length === count ? tracks : undefined;

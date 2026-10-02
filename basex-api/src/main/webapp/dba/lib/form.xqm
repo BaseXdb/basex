@@ -49,6 +49,24 @@ declare function form:checkbox(
 };
 
 (:~
+ : Creates a chooser.
+ : @param  $name      name of the field
+ : @param  $values    values to offer
+ : @param  $selected  selected value
+ : @return chooser
+ :)
+declare function form:select(
+  $name      as xs:string,
+  $values    as xs:string*,
+  $selected  as xs:anyAtomicType?
+) as element(select) {
+  <select name='{ $name }'>{
+    for $value in $values
+    return element option { attribute selected { }[$value = $selected], $value }
+  }</select>
+};
+
+(:~
  : Creates a button.
  : @param  $action   button action
  : @param  $label    label
@@ -61,7 +79,7 @@ declare function form:button(
   $options  as enum('CONFIRM', 'CHECK')* := ()
 ) as element(button) {
   <button>{
-    attribute formaction { $action }[$action],
+    attribute formaction { $action },
     attribute onclick { `return confirmAction(this, "{ $label }");` }[$options = 'CONFIRM'],
     attribute data-check { 'check' }[$options = 'CHECK'],
     $label
@@ -84,6 +102,23 @@ declare function form:field(
     <span>{ $label }</span>,
     <div>{ $control }</div>
   }</div>
+};
+
+(:~
+ : Creates a stacked field with a text area that an editor replaces.
+ : @param  $label  field label
+ : @param  $name   name of the text area
+ : @param  $id     id of the text area
+ : @return field
+ :)
+declare function form:editor-field(
+  $label  as xs:string,
+  $name   as xs:string,
+  $id     as xs:string
+) as element(div) {
+  (: no 'required': the editor hides the text area, and a hidden field that fails validation
+     cannot be focused, which would block the submit without telling the user why :)
+  form:field($label, <textarea name='{ $name }' id='{ $id }' class='wide' rows='8'/>, 'stacked')
 };
 
 (:~
@@ -160,8 +195,8 @@ declare function form:upload(
 declare function form:prompt(
   $id      as xs:string,
   $name    as xs:string,
-  $action  as xs:string? := (),
-  $fields  as node()* := ()
+  $action  as xs:string?,
+  $fields  as node()*
 ) as element(form) {
   <form method='post' autocomplete='off'>{
     attribute action { $action }[$action],

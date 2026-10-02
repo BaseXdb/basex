@@ -28,14 +28,7 @@ function dba:settings() as element(html) {
   let $local := $system/tr[th/h3 = 'LOCALOPTIONS']
   (: the labels are full sentences: they are placed above their control :)
   let $option := fn($key, $values, $label) {
-    form:field($label,
-      <select name='{ $key }'>{
-        let $selected := config:get($key)
-        for $value in $values
-        return element option { attribute selected { }[$value = $selected], $value }
-      }</select>,
-      'stacked'
-    )
+    form:field($label, form:select($key, $values, config:get($key)), 'stacked')
   }
   (: the bounds of an option restrict its field; without them, any number is accepted :)
   let $number := fn($key, $label, $range) {
@@ -55,30 +48,27 @@ function dba:settings() as element(html) {
       </tr>
     )
   }
-  let $panel := fn($contents, $options as html:panel-options) {
-    html:panel($contents, $options but with { 'divider': true() })
-  }
   (: the options of the server are shown first, the settings of the DBA last :)
   return (
-    $panel(
+    html:panel(
       <form method='post' autocomplete='off'>{
         html:heading('Global Options', form:button('settings/gc', 'GC')),
         table:pairs($local/preceding-sibling::tr[not(th)])
       }</form>,
       { 'label': 'Global Options' }),
-    $panel((
+    html:panel((
       <h2>Local Options</h2>,
       table:pairs($local/following-sibling::tr)
     ), { 'label': 'Local Options' }),
-    $panel((
+    html:panel((
       <h2>Environment Variables</h2>,
       $map-table(map:build(available-environment-variables(), value := environment-variable#1))
     ), { 'label': 'Environment Variables' }),
-    $panel((
+    html:panel((
       <h2>System Properties</h2>,
       $map-table(proc:property-map())
     ), { 'label': 'System Properties' }),
-    $panel(
+    html:panel(
       <form method='post' autocomplete='off'>{
         html:heading('Settings', form:button('settings/save', 'Save')),
         <h3>Queries</h3>,
@@ -91,7 +81,7 @@ function dba:settings() as element(html) {
       }</form>,
       { 'label': 'Settings' })
   ) => html:wrap({
-    'header': $dba:CAT, 'rows': '1fr'
+    'header': $dba:CAT, 'divided': true(), 'rows': '1fr'
   })
 };
 

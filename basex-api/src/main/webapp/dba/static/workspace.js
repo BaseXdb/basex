@@ -195,10 +195,17 @@ function applyTab() {
  * Refreshes what the strip shows of the active document, and returns the focus to the editor.
  */
 function showTab() {
+  refreshTab();
+  _editor.focus();
+}
+
+/**
+ * Refreshes the strip, the buttons and the language of the editor for the active document.
+ */
+function refreshTab() {
+  if(_editor.setLanguage) _editor.setLanguage(fileLanguage(tab()?.name, editorValue()));
   renderTabs();
   checkButtons();
-  if(_editor.setLanguage) _editor.setLanguage(fileLanguage(tab()?.name, editorValue()));
-  _editor.focus();
 }
 
 /**
@@ -260,7 +267,7 @@ async function closeTab(index) {
  * @param {Event} event click event
  */
 function openJob(event) {
-  const target = event?.ctrlKey || event?.metaKey ? "_blank" : "activity";
+  const target = event.ctrlKey || event.metaKey ? "_blank" : "activity";
   if(_job) window.open(`activity?job=${encodeURIComponent(_job)}`, target);
 }
 
@@ -305,7 +312,6 @@ function enterDir(name) {
  * @param {string} dir directory; if omitted, the shown directory is kept
  */
 function refreshFiles(sort, dir) {
-  if(!document.getElementById("files-panel")) return;
   requestPanel(WORKSPACE_WS, "files-panel", { type: "files", dir: dir ?? filesDir() }, sort);
 }
 
@@ -608,7 +614,6 @@ function draftKey(t) {
  */
 function saveDraft() {
   const t = tab();
-  // drafts belong to the Workspace view; skip on the other CodeMirror pages
   if(!t) return;
   const content = editorValue();
   store(draftKey(t), content === t.saved ? null : content);
@@ -646,9 +651,7 @@ _editor_changed = () => {
   // content the code wrote is not an edit, and must not be saved as a draft
   if(_writing) return;
   if(tab()) tab().edited = true;
-  if(_editor.setLanguage) _editor.setLanguage(fileLanguage(tab()?.name, editorValue()));
-  renderTabs();
-  checkButtons();
+  refreshTab();
   saveDraft();
 };
 
@@ -670,8 +673,7 @@ _handlers[WORKSPACE_WS] = json => {
   } else if(json.type !== "panel") {
     // the query has ended: the job is gone, and there is nothing left to jump to
     setJob();
-    if(json.type === "stopped") setText("Query was stopped.", "warning");
-    else if(json.type === "result") showResult(json);
+    if(json.type === "result") showResult(json);
     // the error is reported by showMessage, which found its position; its information belongs
     // to the pane
     else if(json.type === "error") showRunError(json.info);
@@ -740,19 +742,16 @@ function initWorkspace() {
   // the strip is restored as a whole; only the active document is read, the others when they
   // are selected. The file panel and the editor stay independent: a document is read from its
   // own directory, whichever one the panel is asked to show
-  try {
-    _tabs = JSON.parse(stored(TABS_KEY, "[]")).map(t =>
-      Object.assign(newTab(t.dir, t.name), { id: t.id ?? 0 }));
-  } catch {
-    _tabs = [];
-  }
+  _tabs = storedJson(TABS_KEY, [], Array.isArray)
+    .filter(t => isRecord(t) && typeof t.dir === "string" && typeof t.name === "string")
+    .map(t => Object.assign(newTab(t.dir, t.name), { id: Number.isInteger(t.id) ? t.id : 0 }));
   // numbers are handed out after the restored ones, so no draft of theirs is overwritten
   _nextId = Math.max(0, ..._tabs.map(t => t.id)) + 1;
   if(!_tabs.length) _tabs.push(newTab(filesDir(), ""));
   _tab = Math.min(Math.max(0, Number(stored(TAB_KEY)) || 0), _tabs.length - 1);
   renderTabs();
 
-  if(name) openFile(name, dir ?? filesDir());
+  if(name) openFile(name, dir);
   else if(tab().name) loadTab(tab());
   else applyTab();
 }

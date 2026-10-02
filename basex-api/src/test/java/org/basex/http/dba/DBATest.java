@@ -989,7 +989,7 @@ public final class DBATest extends WebappTest {
      * @return message
      */
     private static String entries(final String input, final String filter) {
-      return "{ \"type\": \"entries\", \"run\": 1, \"date\": \"1999-01-01\", \"sort\": \"\"," +
+      return "{ \"type\": \"entries\", \"run\": 1, \"dates\": [ \"1999-01-01\" ], \"sort\": \"\"," +
           " \"page\": 1, \"time\": \"\", \"ignore\": \"\", \"input\": \"" + input + "\"," +
           " \"filters\": { \"text\": \"" + filter + "\" } }";
     }
@@ -1351,8 +1351,8 @@ public final class DBATest extends WebappTest {
      * @throws Exception exception
      */
     @Test public void clear() throws Exception {
-      assertTrue(post("caches/clear", Map.of()).contains("All caches and their options cleared."),
-          "caches not cleared");
+      assertTrue(post("caches/clear", Map.of()).
+          contains("All caches and their options were cleared."), "caches not cleared");
       assertFalse(get("activity").contains(CACHE), "cache still listed");
     }
   }

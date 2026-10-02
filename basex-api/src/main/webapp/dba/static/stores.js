@@ -166,7 +166,7 @@ function descend(step) {
 
 /**
  * Returns to a level the path led through; the child that was opened stays selected.
- * @param {number} depth number of steps that are kept
+ * @param {string} depth number of steps that are kept
  */
 function truncatePath(depth) {
   const kept = Number(depth);

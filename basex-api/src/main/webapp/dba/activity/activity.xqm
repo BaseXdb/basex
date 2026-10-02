@@ -30,16 +30,13 @@ function dba:activity(
   $job       as xs:string?,
   $download  as xs:string?
 ) as element(html) {
-  let $panel := fn($contents, $options as html:panel-options) {
-    html:panel($contents, $options but with { 'divider': true() })
-  }
-  return (
-    $panel(panels:jobs($sort), { 'id': 'jobs-panel', 'label': 'Jobs' }),
+  (
+    html:panel(panels:jobs($sort), { 'id': 'jobs-panel', 'label': 'Jobs' }),
     if ($job) {
       (: a job that is done does not change any more: the client stops asking for it. The form
          is the pane: its blocks are laid out in a column, so that the query and the result
          take the height that the tables leave instead of being fixed to a few lines :)
-      $panel(
+      html:panel(
         <form method='post' autocomplete='off' id='job-details' class='pane column'
               data-done='{ panels:job-done($job) }'>{
           panels:job-details($job) otherwise (
@@ -51,14 +48,14 @@ function dba:activity(
     },
     (: what a job is doing is what the view is opened for: the reports step back to strips
        while one is shown :)
-    $panel(panels:web-sessions(),
+    html:panel(panels:web-sessions(),
       { 'id': 'web-panel', 'label': 'Web Sessions', 'collapsed': exists($job) }),
     (: rarely of interest: the panels open on demand :)
-    $panel(panels:websockets(),
+    html:panel(panels:websockets(),
       { 'id': 'ws-panel', 'label': 'WebSockets', 'collapsed': true() }),
-    $panel(panels:caches(),
+    html:panel(panels:caches(),
       { 'id': 'caches-panel', 'label': 'Caches', 'collapsed': true() }),
-    $panel(panels:db-sessions(),
+    html:panel(panels:db-sessions(),
       { 'id': 'db-panel', 'label': 'Database Sessions', 'collapsed': true() }),
     (: outside the panels: they are replaced by the refresh, the dialogs are not :)
     panels:job-dialog(),
@@ -74,6 +71,7 @@ function dba:activity(
   ) => html:wrap({
     (: no widths: the panels share the page in equal parts, and each scrolls on its own :)
     'header' : $dba:CAT,
+    'divided': true(),
     'rows'   : '1fr',
     (: the details are inserted before the reports, which moves every panel behind them: what
        is folded away while a job is shown is remembered apart from the overview :)

@@ -66,11 +66,7 @@ declare %private function dba:create(
     { 'base-uri': dba:base-uri() },
     (: a job of the DBA is bound by the same limits as its other queries; a service outlives
        the session that registers it, and must not carry its restrictions :)
-    if (not($service)) { {
-      'timeout'   : config:get($config:TIMEOUT),
-      'memory'    : config:get($config:MEMORY),
-      'permission': config:get($config:PERMISSION)
-    } },
+    config:limits()[not($service)],
     { 'service': true() }[$service],
     { 'cache': true() }[$args?cache = 'true'],
     for $name in ('id', 'start', 'interval', 'cron', 'end')

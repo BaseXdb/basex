@@ -119,6 +119,6 @@ function dba:unknown(
       <li>Page: dba/{ $path }</li>
       <li>Method: { request:method() }</li>
     </ul>
-  ), { 'divider': true(), 'pane': false() })
+  ), { 'pane': false() })
   => html:wrap()
 };

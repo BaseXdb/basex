@@ -34,12 +34,12 @@ declare function panels:databases(
       {
         let $headers := (
           (: the values of a known format get the width they need; the name takes the rest :)
-          { 'key': 'name', 'label': 'Name', 'type': 'dynamic' },
+          { 'key': 'name', 'label': 'Name' },
           { 'key': 'resources', 'label': 'Count', 'type': 'number', 'order': 'desc',
             'width': '4rem' },
           { 'key': 'size', 'label': 'Size', 'type': 'bytes', 'order': 'desc', 'width': '4.75rem' },
           { 'key': 'date', 'label': 'Date', 'type': 'dateTime', 'order': 'desc',
-            'width': '5.75rem' }
+            'width': '6.5rem' }
         )
         let $databases :=
           for $db in utils:slice(db:list-details(), $page, $sort)
@@ -58,7 +58,6 @@ declare function panels:databases(
           where $db and not($db-names = $db)
           return {
             'name': panels:select($db, $db = $name),
-            'size': (),
             (: the backups are listed with the most recent one first :)
             'date': replace(head($backup), $utils:BACKUP-REGEX, '$2T$3:$4:$5Z')
           }
@@ -103,8 +102,8 @@ declare function panels:databases(
 };
 
 (:~
- : Creates the contents of the database panel: one level of the selected database, its backups,
- : and the index configuration that its next optimization applies.
+ : Creates the contents of the database panel: one level of the selected database, and the
+ : dialogs that act on it.
  : @param  $name      selected database
  : @param  $sort      sort key of the resource list
  : @param  $page      number of shown pages of the resource list
@@ -160,11 +159,11 @@ declare %private function panels:resource-list(
     {
       let $headers := (
         (: the values of a known format get the width they need; the name takes the rest :)
-        { 'key': 'name', 'label': 'Name', 'type': 'dynamic' },
+        { 'key': 'name', 'label': 'Name' },
         { 'key': 'type', 'label': 'Type', 'width': '3.5rem' },
         { 'key': 'size', 'label': 'Size', 'type': 'number', 'order': 'desc', 'width': '4.5rem' },
         { 'key': 'date', 'label': 'Date', 'type': 'dateTime', 'order': 'desc',
-          'width': '5.75rem' }
+          'width': '6.5rem' }
       )
       (: one level of the database, directories first; a level is what a database of many
          resources is browsed by, and what its total is counted over. A filter looks past the
@@ -221,7 +220,7 @@ declare %private function panels:resource-list(
         'sort': $sort,
         'page': $page,
         (: the entries of one level are known, so the total is what they are counted by :)
-        'count': if ($sort) then () else count($level),
+        'count': count($level),
         'select': 'resource',
         (: the database and what can be done with it stay in view while its resources scroll :)
         'sticky': panels:database-heading($name, $dir)
@@ -309,8 +308,8 @@ declare %private function panels:optimize-dialog(
 };
 
 (:~
- : Creates the contents of the backups panel: the backups of the selected database, and the ones
- : of the general data.
+ : Creates the contents of the backups panel: the backups of the selected database, or the ones
+ : of the general data if none is selected.
  : @param  $name  selected database
  : @return panel contents
  :)
@@ -608,7 +607,7 @@ declare function panels:resource-value(
  : @param  $label  link label
  : @param  $name   database
  : @param  $dir    directory the link refers to
- : @return function creating the link
+ : @return link
  :)
 declare %private function panels:enter(
   $label  as xs:string,
@@ -653,8 +652,7 @@ declare %private function panels:backup-section(
           (: a backup is named after its timestamp and a size never grows beyond four digits
              and a unit: both are of a known length and take no more than they need. The
              comment is free text, and is given whatever is left :)
-          { 'key': 'backup', 'label': 'Name', 'type': 'dynamic', 'order': 'desc',
-            'width': '11.5rem' },
+          { 'key': 'backup', 'label': 'Name', 'order': 'desc', 'width': '11.5rem' },
           { 'key': 'size', 'label': 'Size', 'type': 'bytes', 'width': '4.5rem' },
           { 'key': 'comment', 'label': 'Comment' }
         )

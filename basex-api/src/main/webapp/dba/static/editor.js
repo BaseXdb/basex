@@ -7,9 +7,6 @@ let _editor_run;
 /** Called when the 'Indent' preference changes; a page registers its own. */
 let _indent_changed;
 
-/** Link to the CodeMirror editor component. */
-let _editor;
-
 /** All editors, by the id of the text area each of them replaced. The editor of record is
     among them; the others are only edited and submitted with their form. */
 const _editors = {};
@@ -84,7 +81,7 @@ function setEditorText(id, text) {
 
 /**
  * Loads the CodeMirror editor extension.
- * @param {string}  language of main editor (for syntax highlighting)
+ * @param {string} language language of the editors (for syntax highlighting)
  * @param {boolean|Array} edit text areas that become editors: true for the one called 'editor',
  *          or a list of ids. The first one that exists is the editor of record, which _editor
  *          and the page-wide helpers refer to; any further one is edited and submitted with its

@@ -102,7 +102,6 @@ declare function table:properties(
  :     * 'decimal': sorted as numbers, output with two decimal digits
  :     * 'bytes': sorted as numbers, output in a human-readable format
  :     * 'dateTime', 'time': sorted and output as dates
- :     * 'dynamic': function generating dynamic input; sorted as strings
  :     * otherwise, sorted and output as strings
  :   * 'sort': overrides the type the column is sorted by
  :   * 'order': 'desc' for descending order, otherwise ascending
@@ -117,7 +116,7 @@ declare function table:properties(
  :     the first column shows
  :   * 'presort': key of pre-sorted column; if identical to sort, entries will not be resorted
  :   * 'page': number of pages that are shown; a link below the table shows one more
- :   * 'count': maximum number of results
+ :   * 'count': total number of entries, if only a slice of them is supplied
  :   * 'filters': table row with filter fields, displayed below the header row
  :   * 'all': list all entries, ignoring the maximum number of table entries
  :   * 'sticky': content placed above the buttons. Everything above the table is then pinned to
@@ -137,11 +136,10 @@ declare function table:create(
   (: sort entries :)
   let $sort := $options?sort
   let $sorted-entries := (
-    let $key := $sort[.] otherwise head($headers)?key
-    return if (not($sort) or $key = $options?presort) then (
+    if (not($sort) or $sort = $options?presort) then (
       $entries
     ) else (
-      let $header := $headers[?key = $key]
+      let $header := $headers[?key = $sort]
       let $value := (
         let $desc := $header?order = 'desc'
         (: a cell that a function produces is ordered by the text it produces :)
@@ -162,7 +160,7 @@ declare function table:create(
         return fn($v) { $convert($atomize($v)) }
       )
       for $entry in $entries
-      order by $value($entry?$key) empty greatest collation '?lang=en'
+      order by $value($entry?$sort) empty greatest collation '?lang=en'
       return $entry
     )
   )
@@ -213,8 +211,15 @@ declare function table:create(
     let $shown-entries := $sorted-entries[position() <= $last]
     where exists($shown-entries) or exists($options?filters)
     let $fixed := some $header in $headers satisfies $header?width
+    (: columns without a width keep some room when the fixed ones exceed a narrow screen :)
+    let $free := count($headers[empty(?width)])
     let $table := element table {
       attribute class { 'fixed' }[$fixed],
+      attribute style {
+        'min-width: calc(' || string-join(
+          ($headers?width, 'var(--free-column) * ' || $free), ' + '
+        ) || ')'
+      }[$fixed and $free],
       (: the header and the filters stay in view while the entries scroll :)
       element thead {
         element tr {
@@ -230,7 +235,7 @@ declare function table:create(
             },
 
             if (empty($sort) or $name = $sort or not($label)) then (
-              (: sorted column, xml column, and a column with no label to click: only the label :)
+              (: sorting disabled, sorted column, and a column with no label to click: only the label :)
               $label
             ) else (
               (: generate sort link :)

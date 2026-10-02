@@ -18,6 +18,8 @@
   --stacked: 0;
   /* width of a scrollbar; measured by measureScrollbar, this is the common default */
   --scrollbar: 12px;
+  /* room kept for a table column without a fixed width; see table.xqm */
+  --free-column: 6rem;
 
   --bg: #fff;
   --fg: #111;
@@ -239,7 +241,6 @@ td {
 .tabs {
   display: flex;
   overflow-x: auto;
-  scrollbar-width: thin;
   gap: 2px;
   margin-bottom: 2px;
 }
@@ -265,8 +266,8 @@ td {
   font-size: 92%;
   white-space: nowrap;
 }
-/* a switch that belongs to the tabs, at their right end */
-.tabs > label {
+/* a switch or a status that belongs to the tabs, at their right end */
+.tabs > :is(label, #run-info) {
   margin-left: auto;
   align-self: center;
   font-size: 92%;
@@ -397,13 +398,13 @@ select {
 
 /* buttons, and the one of a file chooser, share the flat face of the code buttons on
    docs.basex.org; the link-like, the folding and the tab buttons bring their own */
-button:not(.link, .collapse, .tab, .close), input[type=file]::file-selector-button {
+button:not(.link, .collapse, .tab), input[type=file]::file-selector-button {
   background-color: var(--shade);
   color: var(--fg);
   font: inherit;
   cursor: pointer;
 }
-button:not(.link, .collapse, .tab, .close):hover:not(:disabled),
+button:not(.link, .collapse, .tab):hover:not(:disabled),
 input[type=file]::file-selector-button:hover {
   background-color: var(--shade-hover);
 }
@@ -634,6 +635,7 @@ header {
    push their neighbours out of the row they share, and a tab must not grow with its name */
 .ellipsis,
 #info,
+#run-info,
 .content > .panel h2,
 .tabs .tab > span:first-child {
   white-space: nowrap;
@@ -669,9 +671,6 @@ header {
 
 /* the three states of a status message: told apart by their colour, and by a glyph, so that
    the colour is not the only thing that says which one it is */
-.info, .warning, .error {
-  font-weight: bold;
-}
 .info    { color: var(--info); }
 .warning { color: var(--warning); }
 .error   { color: var(--accent); }
@@ -687,7 +686,6 @@ header {
   padding: 0 .4rem;
   border-radius: var(--radius);
   background-color: color-mix(in srgb, currentColor 12%, transparent);
-  font-weight: normal;
 }
 
 .note {
@@ -730,14 +728,8 @@ header {
 }
 /* the outcome of the last run, at the right end of the query information tabs */
 #run-info {
-  margin-left: auto;
-  align-self: center;
   min-width: 0;
-  font-size: 92%;
   color: var(--muted);
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
 }
 #run-info.failed {
   color: var(--accent);
@@ -791,12 +783,6 @@ body .cm-editor.cm-focused {
   display: flex;
   flex-basis: 100%;
   gap: inherit;
-}
-
-/* forces the following controls onto a line of their own */
-.buttons .break {
-  flex-basis: 100%;
-  height: 0;
 }
 
 /* query field above a resource editor; named with its element, or the width of a text
@@ -885,16 +871,13 @@ a.root {
 .content {
   display: grid;
   grid-template-columns: var(--columns);
-  /* a gutter on either side of the divider that sits in the middle */
-  column-gap: calc(var(--gap) * 2);
+  column-gap: var(--gap);
   /* keeps a focus ring at the panel top clear of the sticky header */
   padding-top: 2px;
 }
-
-/* with no divider to clear, a single gutter is enough (applies to the whole
-   page: so far only the editor, whose one gap is the resizer's) */
-.content:has(.no-divider) {
-  column-gap: var(--gap);
+/* a gutter on either side of the divider that sits in the middle */
+.content.divided {
+  column-gap: calc(var(--gap) * 2);
 }
 
 .content > .panel {
@@ -989,9 +972,8 @@ body:has(.content.fill) main {
   margin: .2rem 0;
 }
 
-/* divider, centered in the gap before every panel but the first of a row;
-   'no-divider' opts out where a resizer already separates the panels */
-.content > .panel ~ .panel:not(.no-divider)::before {
+/* divider, centered in the gap before every panel but the first of a row */
+.content.divided > .panel ~ .panel::before {
   content: '';
   position: absolute;
   top: 0;
@@ -1090,7 +1072,7 @@ button.collapse {
 }
 /* and moves on into the gutter where a divider follows: what the chevron keeps its distance to
    is whatever comes next, be that the scrollbar of its own panel or the line after it */
-.panel.no-scrollbar:has(+ .panel:not(.no-divider)) > button.collapse {
+.content.divided > .panel.no-scrollbar:has(+ .panel) > button.collapse {
   right: calc(.5rem - var(--gap));
 }
 button.collapse:hover {
@@ -1163,7 +1145,7 @@ button.collapse .label {
   .content.fill :is(.cm-editor, .pane) {
     min-height: 200px;
   }
-  .content > .panel ~ .panel::before {
+  .content.divided > .panel ~ .panel::before {
     display: none;
   }
   /* stacked panels collapse to a horizontal strip */

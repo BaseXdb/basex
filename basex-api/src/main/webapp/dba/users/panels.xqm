@@ -26,7 +26,7 @@ declare function panels:users(
   <form method='post' autocomplete='off' data-sort='{ $sort }'>{
     let $headers := (
       (: the values of a known format get the width they need; the name takes the rest :)
-      { 'key': 'name', 'label': 'Name', 'type': 'dynamic' },
+      { 'key': 'name', 'label': 'Name' },
       { 'key': 'permission', 'label': 'Permission', 'width': '6.5rem' },
       { 'key': 'you', 'label': 'You', 'width': '3rem' }
     )
@@ -54,7 +54,7 @@ declare function panels:users(
   form:dialog('create', 'Create User', 'users/create', false(), (
     form:field('Name:', <input type='text' name='name' autofocus='' required=''/>),
     form:field('Password:', <input type='password' name='pw' autocomplete='new-password'/>),
-    form:field('Permission:', panels:permission-select('perm', 'none', 5))
+    form:field('Permission:', form:select('perm', $config:PERMISSIONS[position() <= 5], 'none'))
   ))
 };
 
@@ -92,8 +92,8 @@ declare function panels:user(
         <div class='note'>…only changed if a new one is entered</div>
       )),
       if (not($admin)) {
-        form:field('Permission:',
-          panels:permission-select('perm', ($perm otherwise $user/@permission), 5))
+        form:field('Permission:', form:select('perm', $config:PERMISSIONS[position() <= 5],
+          $perm otherwise $user/@permission))
       },
       (: the editor is named apart from the user, and takes the height that is left :)
       <h3>User Data</h3>,
@@ -142,7 +142,7 @@ declare function panels:local-permissions(
       <input type='hidden' name='name' value='{ $name }'/>,
       form:field('Pattern:', <input type='text' name='pattern' autofocus='' required=''/>),
       (: a local permission cannot grant more than access to the data :)
-      form:field('Permission:', panels:permission-select('perm', 'write', 3))
+      form:field('Permission:', form:select('perm', $config:PERMISSIONS[position() <= 3], 'write'))
     ))
   }
 };
@@ -179,25 +179,4 @@ declare %private function panels:info-editor(
   <textarea name='info' id='{ $id }' spellcheck='false'>{
     serialize(user:info($name), { 'indent': true() })
   }</textarea>
-};
-
-(:~
- : Creates a chooser for a permission.
- : @param  $name      name of the field
- : @param  $selected  selected permission
- : @param  $count     number of permissions to offer, counted from the least privileged
- : @return chooser
- :)
-declare %private function panels:permission-select(
-  $name      as xs:string,
-  $selected  as xs:anyAtomicType?,
-  $count     as xs:integer
-) as element(select) {
-  <select name='{ $name }'>{
-    for $permission in $config:PERMISSIONS[position() <= $count]
-    return element option {
-      attribute selected { }[$permission = $selected],
-      $permission
-    }
-  }</select>
 };

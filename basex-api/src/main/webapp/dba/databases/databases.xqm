@@ -107,7 +107,7 @@ function dba:db-download(
  : Downloads the checked resources; several of them are packed into an archive.
  : @param  $name       database
  : @param  $resources  resources; a directory stands for everything below it
- : @return rest response and file content
+ : @return rest response and file content, or redirection
  :)
 declare
   %rest:POST
@@ -156,7 +156,7 @@ declare %private function dba:content(
 
 (:~
  : Downloads a backup.
- : @param  $backup  name of backup file (ignored by the server)
+ : @param  $backup  name of backup file
  : @return binary data
  :)
 declare

@@ -59,12 +59,7 @@ declare function utils:query-parse(
 declare function utils:evaluate(
   $query  as xs:string?
 ) as item()* {
-  xquery:eval($query, (), {
-    'permission': config:get($config:PERMISSION),
-    'timeout'   : config:get($config:TIMEOUT),
-    'memory'    : config:get($config:MEMORY),
-    'pass'      : true()
-  })
+  xquery:eval($query, (), { config:limits(), 'pass': true() })
 };
 
 (:~
@@ -115,17 +110,6 @@ declare function utils:editable(
     'text'    : $text,
     'note'    : `Read-only: { string-join($reasons, '; ') }.`[exists($reasons)]
   }
-};
-
-(:~
- : Serializes a value, considering the specified system limits.
- : @param  $value  value
- : @return string
- :)
-declare function utils:serialize(
-  $value  as item()*
-) as xs:string {
-  utils:preview($value, config:get($config:MAXCHARS))
 };
 
 (:~
@@ -359,13 +343,8 @@ declare function utils:job-options(
   $base-uri  as xs:string?
 ) as map(*) {
   {
-    {
-      'timeout'   : config:get($config:TIMEOUT),
-      'memory'    : config:get($config:MEMORY),
-      'permission': config:get($config:PERMISSION),
-      'cache'     : true(),
-      'id'        : utils:job-id($label)
-    },
+    config:limits(),
+    { 'cache': true(), 'id': utils:job-id($label) },
     { 'base-uri': $base-uri }[$base-uri]
   }
 };
@@ -573,7 +552,7 @@ declare function utils:count(
  : @param  $module       module (can be {@code null})
  : @param  $line         line number (can be {@code null})
  : @param  $column       column number (can be {@code null})
- : @param  $description  error description
+ : @param  $description  error description (can be {@code null})
  : @return message
  :)
 declare function utils:error-message(
@@ -606,7 +585,7 @@ declare function utils:capitalize(
 declare function utils:outcome(
   $page     as xs:string,
   $params   as map(*),
-  $message  as map(*)? := ()
+  $message  as map(*)?
 ) as element(rest:response) {
   (: every action ends in one of these, whether it is run by the dispatcher or by an endpoint
      of its own: the page it belongs to, with what it did or why it failed :)
@@ -622,7 +601,7 @@ declare function utils:outcome(
 declare %updating function utils:redirect(
   $page     as xs:string,
   $params   as map(*),
-  $message  as map(*)? := ()
+  $message  as map(*)?
 ) {
   update:output(utils:outcome($page, $params, $message))
 };
@@ -635,7 +614,6 @@ declare %updating function utils:redirect(
  :                   the request parameters and returns 'run' (the function that performs the
  :                   action, mandatory), 'params' (query parameters of the target page) and
  :                   'info' (info message)
- : @return redirection
  :)
 declare %updating function utils:dispatch(
   $page     as xs:string,

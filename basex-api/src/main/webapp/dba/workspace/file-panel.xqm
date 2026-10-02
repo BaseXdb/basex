@@ -30,11 +30,11 @@ declare function panel:files(
     <form method='post' autocomplete='off' data-sort='{ $sort }'>{
     <input type='hidden' name='dir' value='{ $dir }'/>,
     let $headers := (
-      { 'key': 'name', 'label': 'Name', 'type': 'dynamic' },
+      { 'key': 'name', 'label': 'Name' },
       (: the size never grows beyond four digits and a unit, the short date beyond 11 characters;
          the name takes the rest :)
       { 'key': 'size', 'label': 'Size', 'type': 'bytes', 'order': 'desc', 'width': '4rem' },
-      { 'key': 'date', 'label': 'Date', 'type': 'dateTime', 'order': 'desc', 'width': '5.75rem' }
+      { 'key': 'date', 'label': 'Date', 'type': 'dateTime', 'order': 'desc', 'width': '6.5rem' }
     )
     let $entries := (
       let $limit := config:get($config:MAXCHARS)
@@ -93,7 +93,7 @@ declare function panel:files(
     form:upload('workspace/upload', 'upload', true(),
       <input type='hidden' name='dir' value='{ $dir }'/>),
 
-    (: the New Dir button asks for a name and submits it :)
+    (: the New button asks for a directory name and submits it :)
     form:prompt('dir-name', 'name', 'workspace/dir-create',
       <input type='hidden' name='dir' value='{ $dir }'/>)
   )

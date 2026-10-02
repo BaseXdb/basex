@@ -14,7 +14,7 @@ declare variable $dba:CAT := 'databases';
  : Uploads backups.
  : @param  $files  map with uploaded files
  : @param  $name   database the backups are uploaded for (empty string: the general data)
- : @return form or redirection
+ : @return redirection
  :)
 (: kept out of the databases dispatcher: an upload must not wait for the database locks :)
 declare
@@ -31,24 +31,23 @@ function dba:file-upload(
   (: the panel the upload was started from decides where the backups belong :)
   let $params := { 'name': $name }
   return try {
-    (: reject backups with invalid content :)
     for key $file value $content in $files
     let $db := replace($file, $utils:BACKUP-ZIP-REGEX, '$1')
     let $entries := archive:entries($content) ! data()
-    where not(if ($db) then (
+    (: reject backups with invalid content :)
+    return if (not(if ($db) then (
       every $entry in $entries satisfies starts-with($entry, $db || '/') and
       $entries = $db || '/inf.basex'
     ) else (
       every $entry in $entries satisfies matches($entry, '\.(xml|basex)')
-    ))
-    return error((), 'Invalid backup file: ' || $file),
-    (: reject the backup of another database: it would be invisible in the panel it was uploaded
-       from. Without a selected database there is nothing to contradict, and a backup of a
-       database that no longer exists is what a recovery starts from :)
-    for key $file in $files
-    let $db := replace($file, $utils:BACKUP-ZIP-REGEX, '$1')
-    where $name and $db != $name
-    return error((), `Backup "{ $file }" does not belong to database "{ $name }".`),
+    ))) then (
+      error((), 'Invalid backup file: ' || $file)
+    ) else if ($name and $db != $name) {
+      (: reject the backup of another database: it would be invisible in the panel it was
+         uploaded from. Without a selected database there is nothing to contradict, and a
+         backup of a database that no longer exists is what a recovery starts from :)
+      error((), `Backup "{ $file }" does not belong to database "{ $name }".`)
+    },
     for key $file value $content in $files
     return file:write-binary($dir || $file, $content),
     utils:outcome($dba:CAT, $params,

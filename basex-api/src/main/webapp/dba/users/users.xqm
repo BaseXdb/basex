@@ -38,24 +38,22 @@ function dba:users(
   (: the selection is part of the address, so a link reproduces what the panels show :)
   let $user := panels:user($name, $newname, $perm)
   let $permissions := panels:local-permissions($name)
-  let $panel := fn($contents, $options as html:panel-options) {
-    html:panel($contents, $options but with { 'divider': true() })
-  }
   return (
-    $panel(panels:users($sort, $name), { 'id': 'users-panel', 'label': 'Users' }),
+    html:panel(panels:users($sort, $name), { 'id': 'users-panel', 'label': 'Users' }),
     (: the form is the pane: its editor takes the height that the fields leave. It outlives
        what it submits, which is replaced when another user is shown :)
-    $panel(
+    html:panel(
       <form method='post' action='users/update' autocomplete='off' id='user-panel'
             class='pane column'>{ $user }</form>,
       { 'label': 'User', 'pane': false(), 'hidden': empty($user) }),
-    $panel($permissions, { 'id': 'permissions-panel', 'label': 'Permissions' }),
+    html:panel($permissions, { 'id': 'permissions-panel', 'label': 'Permissions' }),
     (: the panels follow the selection: what is attached to no user in particular steps back
        once one of them is being looked at :)
-    $panel(panels:information(),
+    html:panel(panels:information(),
       { 'label': 'General User Data', 'pane': false(), 'collapsed': exists($user) })
   ) => html:wrap({
     'header' : $dba:CAT,
+    'divided': true(),
     (: the information panel is only open while no user is shown, where it is one of two
        panels: its share is what the two of them then split :)
     'columns': ('25fr', '35fr', '25fr', '25fr'),

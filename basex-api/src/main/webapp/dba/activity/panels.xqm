@@ -5,6 +5,7 @@
  :)
 module namespace panels = 'dba/lib/panels';
 
+import module namespace config = 'dba/lib/config' at '../lib/config.xqm';
 import module namespace form = 'dba/lib/form' at '../lib/form.xqm';
 import module namespace html = 'dba/lib/html' at '../lib/html.xqm';
 import module namespace table = 'dba/lib/table' at '../lib/table.xqm';
@@ -25,12 +26,12 @@ declare function panels:jobs(
     <h2>Jobs</h2>
     {
       let $headers := (
-        { 'key': 'job', 'label': 'ID', 'type': 'dynamic' },
-        { 'key': 'state', 'label': 'State', 'type': 'dynamic' },
+        { 'key': 'job', 'label': 'ID' },
+        { 'key': 'state', 'label': 'State' },
         { 'key': 'service', 'label': 'Service' },
         { 'key': 'duration', 'label': 'Dur.', 'type': 'number', 'order': 'desc' },
-        { 'key': 'user', 'label': 'User', 'type': 'dynamic' },
-        { 'key': 'session', 'label': 'Session', 'type': 'dynamic' },
+        { 'key': 'user', 'label': 'User' },
+        { 'key': 'session', 'label': 'Session' },
         { 'key': 'locks', 'label': 'Locks' },
         { 'key': 'time', 'label': 'Time', 'type': 'time', 'order': 'desc' },
         { 'key': 'start', 'label': 'Start', 'type': 'time', 'order': 'desc' }
@@ -151,10 +152,7 @@ declare function panels:job-dialog() as element(dialog) {
   (: it is not part of a panel: the panels are replaced while the view refreshes, which would
      close the dialog while it is being filled in :)
   form:dialog('job', 'New Job', 'jobs/create', false(), (
-    (: no 'required': the editor hides the text area, and a hidden field that fails validation
-       cannot be focused, which would block the submit without telling the user why :)
-    form:field('Query:',
-      <textarea name='query' id='job-query' class='wide' rows='8'/>, 'stacked'),
+    form:editor-field('Query:', 'query', 'job-query'),
     (: what the job is called and when it runs, next to how it repeats and what is kept :)
     <div class='field-columns'>{
       <div>{
@@ -198,7 +196,7 @@ declare function panels:job-details(
   let $cached := $details/@state = 'cached'
   let $output := if ($cached) {
     try {
-      utils:serialize(job:result($job, { 'keep': true() }))
+      utils:preview(job:result($job, { 'keep': true() }), config:get($config:MAXCHARS))
     } catch * {
       utils:error-message($err:module, $err:line-number, $err:column-number,
         $err:description)
@@ -320,7 +318,7 @@ declare %private function panels:attribute-panel(
       let $headers := (
         (: the columns of the holder come first: the first one carries the checkbox :)
         $columns,
-        { 'key': 'attributes', 'label': 'Attributes', 'type': 'dynamic' },
+        { 'key': 'attributes', 'label': 'Attributes' },
         (: a time is as wide as it will ever be: it is given what it needs, not a share that
            grows with the panel :)
         { 'key': 'access', 'label': 'Access', 'type': 'time', 'order': 'desc',
@@ -360,7 +358,7 @@ declare function panels:web-sessions() as element(form) {
   let $current := session:id()
   return panels:attribute-panel('session', 'sessions', 'Web Sessions',
     (
-      { 'key': 'session', 'label': 'Session', 'type': 'dynamic', 'width': '7rem' },
+      { 'key': 'session', 'label': 'Session', 'width': '7rem' },
       { 'key': 'you', 'label': 'You', 'width': '2.5rem' }
     ),
     for $session in sessions:list-details()
@@ -485,10 +483,7 @@ declare %private function panels:attribute-dialog(
     form:field('Name:',
       <input type='text' name='name' id='{ $kind }-name' class='wide' required=''
              autofocus=''/>, 'stacked'),
-    (: no 'required': the editor hides the text area, and a hidden field that fails validation
-       cannot be focused, which would block the submit without telling the user why :)
-    form:field('Value:',
-      <textarea name='value' id='{ $kind }-value' class='wide' rows='8'/>, 'stacked'),
+    form:editor-field('Value:', 'value', $kind || '-value'),
     (: what is assigned is stated below what assigns it; it is nothing to fill in, so it is
        written out, and submitted by a field of its own :)
     form:field($label, (
@@ -561,8 +556,8 @@ declare function panels:websockets() as element(form) {
   let $registered := job:list()
   return panels:attribute-panel('websocket', 'websockets', 'WebSockets',
     (
-      { 'key': 'websocket', 'label': 'Connection', 'type': 'dynamic', 'width': '9rem' },
-      { 'key': 'session', 'label': 'Session', 'type': 'dynamic', 'width': '7rem' }
+      { 'key': 'websocket', 'label': 'Connection', 'width': '9rem' },
+      { 'key': 'session', 'label': 'Session', 'width': '7rem' }
     ),
     for $ws in ws:list-details()
     let $id := string($ws/@id)

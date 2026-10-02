@@ -3,13 +3,14 @@
 /** Most recent log entry search state. */
 let _logInput;
 
-/** Whether the search covers more than one log file. */
+/** Number of log files that the search covers. */
 let _logFiles = 1;
 
 /**
  * Queries the entries of the log files that are searched: the checked ones, or the file that
  * is opened.
- * @param {string} key typed key
+ * @param {string} key typed key, or the cause of the request ('select', 'filter'); omitted
+ *   for a plain refresh
  */
 function logEntries(key) {
   const reset = key && key !== "Enter";
@@ -28,12 +29,13 @@ function logEntries(key) {
   // are sent, and the server renders them into the fields
   const typed = filters.length ?
     [ ...filters ].map(f => [ f.name, f.value.trim() ]).filter(([ , value ]) => value) :
-    JSON.parse(stored(fieldKey("filters"), "[]"));
+    storedJson(fieldKey("filters"), [], value => Array.isArray(value) && value.every(pair =>
+      Array.isArray(pair) && pair.length === 2 && pair.every(s => typeof s === "string")));
   storeField("input");
   storeField("ignore");
   store(fieldKey("filters"), typed.length ? JSON.stringify(typed) : null);
   const state = JSON.stringify([ input, ignore, dates, typed ]);
-  if(reset && _logInput === state) return false;
+  if(reset && _logInput === state) return;
   _logInput = state;
   // a new search or filter starts at the top
   if(reset) _toTop.add("output");
@@ -116,7 +118,7 @@ function initLogs() {
   document.getElementById("list").addEventListener("click", event => {
     if(event.target.matches("input[type=checkbox]")) logEntries("select");
   });
-  return logEntries();
+  logEntries();
 }
 
 /**
@@ -158,7 +160,6 @@ function selectLog(date) {
   file.value = date;
   document.getElementById("page").value = 1;
   document.getElementById("time").value = "";
-  document.querySelector(".logbar h3").textContent = date;
   mark("list", date);
   // the file is part of the address, so a reload shows what the page shows; the fragment
   // named an entry of the previous file

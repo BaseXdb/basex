@@ -88,8 +88,16 @@ declare function config:get(
 };
 
 (:~
+ : Returns the limits that a query of the DBA is run with.
+ : @return timeout, memory and permission, keyed as the options of a query or job
+ :)
+declare function config:limits() as map(*) {
+  map:build(($config:TIMEOUT, $config:MEMORY, $config:PERMISSION), value := config:get#1)
+};
+
+(:~
  : Saves options.
- : @param  $options  keys/values that have been changed
+ : @param  $options  options to save; missing ones are reset to their defaults
  :)
 declare function config:save(
   $options  as map(*)

@@ -85,7 +85,7 @@ function dba:login(
           ))
         }
       </form>,
-      { 'divider': true(), 'pane': false() })
+      { 'pane': false() })
     => html:wrap({ 'error': $error })
   )
 };
@@ -135,7 +135,7 @@ function dba:logout(
   return (
     (: write log entry, redirect to login page :)
     admin:write-log('Logout: ' || $user, 'DBA'),
-    web:redirect('/dba/login', { '_name': $user })
+    web:redirect(utils:page('login'), { '_name': $user })
   ),
   (: deletes the session key :)
   session:delete($config:SESSION-KEY)
