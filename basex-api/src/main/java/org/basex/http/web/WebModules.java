@@ -4,6 +4,8 @@ import static org.basex.http.web.WebText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.nio.file.*;
+import java.nio.file.attribute.*;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -520,29 +522,38 @@ public final class WebModules {
       final HashMap<String, WebModule> cache, final HashMap<String, WebModule> old,
       final ArrayList<IOFile> archived) throws IOException {
 
-    // check if directory is to be skipped
-    final IOFile[] files = root.children();
-    for(final IOFile file : files) {
-      if(file.name().equals(IO.IGNORESUFFIX)) return;
-    }
-
-    for(final IOFile file : files) {
-      if(file.isDir()) {
-        parse(ctx, file, cache, old, archived);
-      } else {
-        final String path = file.path();
+    // links are followed; the walker skips cyclic links
+    Files.walkFileTree(root.file().toPath(), EnumSet.of(FileVisitOption.FOLLOW_LINKS),
+        Integer.MAX_VALUE, new SimpleFileVisitor<>() {
+      @Override
+      public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) {
+        // skip directories with an ignore file
+        return Files.exists(dir.resolve(IO.IGNORESUFFIX)) ? FileVisitResult.SKIP_SUBTREE :
+          FileVisitResult.CONTINUE;
+      }
+      @Override
+      public FileVisitResult visitFile(final Path path, final BasicFileAttributes attrs)
+          throws IOException {
+        final IOFile file = new IOFile(path);
         if(file.isArchive()) {
           archived.add(file);
         } else if(file.hasSuffix(IO.XQSUFFIXES)) {
           // retrieve existing module or create new instance
-          WebModule module = old.get(path);
+          final String pth = file.path();
+          WebModule module = old.get(pth);
           if(module == null) module = new WebModule(file, null);
 
           // parse updated module, add to cache
           module.parse(ctx);
-          cache.put(path, module);
+          cache.put(pth, module);
         }
+        return FileVisitResult.CONTINUE;
       }
-    }
+      @Override
+      public FileVisitResult visitFileFailed(final Path path, final IOException ex) {
+        Util.debug(ex);
+        return FileVisitResult.CONTINUE;
+      }
+    });
   }
 }

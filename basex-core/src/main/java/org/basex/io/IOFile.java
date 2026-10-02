@@ -615,7 +615,7 @@ public final class IOFile extends IO {
    * @return result of check
    */
   public static boolean ignore(final String name) {
-    return name.equals(".ignore");
+    return name.equals(IGNORESUFFIX);
   }
 
   // STATIC METHODS ===============================================================================
