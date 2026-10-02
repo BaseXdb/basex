@@ -205,6 +205,10 @@ public final class ArrayModuleTest extends SandboxTest {
     error(func.args(" [ 1, 2 ]", 3), ARRAYBOUNDS_X_X);
     query(func.args(" [ 1, 2 ]", 3, " ()"), "");
     query(func.args(" [ 1, 2 ]", 3, " (4, 5)"), "4\n5");
+
+    // $array(POSITION) → array:get($array, POSITION)
+    check("(" + ARRAY + ")(2)", 3, root(func));
+    error("(" + ARRAY + ")(3)", ARRAYBOUNDS_X_X);
   }
 
  /** Test method. */

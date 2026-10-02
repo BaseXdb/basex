@@ -73,6 +73,18 @@ public final class LookupTest extends SandboxTest {
   }
 
   /** Test. */
+  @Test public void wildcardKey() {
+    query("{ '*': 's', 'a': 1 }?('*')", "s");
+    query("{ '*': 's', 'a': 1 }[" + wrap(1) + " = 1]?('*')", "s");
+    query("{ '*': 's', 'a': 1 }[" + wrap(1) + " = 1]?(string(" + wrap("*") + "))", "s");
+    query("({ '*': 's' }, [ 1 ])[" + wrap(1) + " = 1]?*", "s\n1");
+    query("declare %basex:inline(0) function local:f($m as item(), $b) {"
+        + " if($b) then $m?* else $m?('*') }; local:f({ '*': 's', 'a': 1 }, false())", "s");
+    query("serialize(fn($m) { $m?('*') }, { 'method': 'adaptive' })",
+        "fn($m) as item()* { $m?(\"*\") }");
+  }
+
+  /** Test. */
   @Test public void typing() {
     query("empty(array:for-each([], function($i) { string($i) })?*)", true);
     query("empty(array:for-each([], function($i) { string($i) })!?*)", true);

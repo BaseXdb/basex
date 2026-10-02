@@ -274,6 +274,14 @@ public final class MapModuleTest extends SandboxTest {
     // ... also on the key-type mismatch path
     check(func.args(" (" + MESSAGE.args("m") + ", { 1: 'a' })", "y"), "",
         root(VOID), exists(MESSAGE));
+
+    // $map(KEY) → map:get($map, KEY)
+    check("(" + _MAP_ENTRY.args(1, wrap(0)) + ")(1)", 0, root(func));
+    check(record + "local:x(" + wrap(0) + ")('x')", 0, type(ShapeGet.class, "xs:integer"));
+    // keep the call if a strict record may lack the key
+    check("(" + _MAP_ENTRY.args(" string(" + wrap("a") + ")", wrap(0)) + ")('a')", 0,
+        empty(func));
+    error(record + "local:x(" + wrap(0) + ")('y')", RECORDFIELD_X_X);
   }
 
   /** Test method. */

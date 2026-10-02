@@ -12,6 +12,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -24,8 +25,8 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class Lookup extends Arr {
-  /** Wildcard string. */
-  public static final Str WILDCARD = Str.get('*');
+  /** Indicates if the keys can be evaluated once for all input items. */
+  private boolean cacheKeys;
 
   /**
    * Constructor.
@@ -34,6 +35,21 @@ public final class Lookup extends Arr {
    */
   public Lookup(final InputInfo info, final Expr... expr) {
     super(info, Types.ITEM_ZM, expr);
+  }
+
+  /**
+   * Checks if a map of the specified type may be a strict record that lacks the requested key.
+   * @param mt map type
+   * @param key key expression
+   * @param ii input info (can be {@code null})
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  public static boolean mayLackField(final MapType mt, final Expr key, final InputInfo ii)
+      throws QueryException {
+    return mt instanceof final ShapeType sh ?
+      sh.strict() && !(key instanceof final AStr str && sh.fields().contains(str.string(ii))) :
+      mt.keyType().intersect(BasicType.STRING) != null;
   }
 
   @Override
@@ -47,6 +63,7 @@ public final class Lookup extends Arr {
     exprs[1] = exprs[1].simplifyFor(Simplify.DATA, cc);
 
     final Expr inputs = exprs[0], keys = exprs[1];
+    cacheKeys = !keys.has(Flag.NDT);
     final long is = inputs.size();
     if(is == 0) return cc.replaceWith(this, inputs);
 
@@ -65,7 +82,7 @@ public final class Lookup extends Arr {
     final SeqType kt = keys.seqType();
     final SeqType st = map ? ((MapType) tp).valueType() : ((ArrayType) tp).valueType();
     Occ occ = st.occ;
-    if(inputs.size() != 1 || keys == WILDCARD || !kt.one() || kt.mayBeWrapped()) {
+    if(is != 1 || keys == Str.WILDCARD || !kt.one() || kt.mayBeWrapped()) {
       // key is wildcard, or expressions yield no single item
       occ = occ.union(Occ.ZERO_OR_MORE);
     } else if(map) {
@@ -92,17 +109,16 @@ public final class Lookup extends Arr {
     final boolean map = it instanceof MapType, array = it instanceof ArrayType;
     if(map || array) {
       // keep the lookup if a runtime value could be a strict record that lacks a requested key
-      if(keys != WILDCARD && it instanceof final MapType mt && (mt instanceof final ShapeType sh
-          ? sh.strict() && !(ks == 1 && keys instanceof final AStr str &&
-              sh.fields().contains(str.string(info)))
-          : mt.keyType().intersect(BasicType.STRING) != null)) return this;
+      if(keys != Str.WILDCARD && it instanceof final MapType mt && mayLackField(mt, keys, info)) {
+        return this;
+      }
 
       /* REWRITE LOOKUP:
        *  MAP?*     → map:items(MAP)
        *  ARRAY?*   → array:items(MAP)
        *  MAP?KEY   → map:get(INPUT, KEY)
        *  ARRAY?KEY → array:get(INPUT, KEY) */
-      final QueryBiFunction<Expr, Expr, Expr> rewrite = (in, arg) -> keys == WILDCARD ?
+      final QueryBiFunction<Expr, Expr, Expr> rewrite = (in, arg) -> keys == Str.WILDCARD ?
         cc.function(map ? Function._MAP_ITEMS : Function._ARRAY_ITEMS, info, in) :
         cc.function(map ? Function._MAP_GET : Function._ARRAY_GET, info, in, arg);
 
@@ -134,35 +150,45 @@ public final class Lookup extends Arr {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     return new Iter() {
-      final Iter lhs = exprs[0].iter(qc);
-      Iter rhs;
+      final Iter inputs = exprs[0].iter(qc);
+      Iter results = Empty.ITER;
+      Value keys;
 
       @Override
       public Item next() throws QueryException {
         while(true) {
-          if(rhs != null) {
-            final Item item = qc.next(rhs);
-            if(item != null) return item;
-          }
-          final Item item = qc.next(lhs);
-          if(item == null) return null;
-          rhs = lookup(item);
+          final Item result = qc.next(results);
+          if(result != null) return result;
+          final Item input = qc.next(inputs);
+          if(input == null) return null;
+          if(keys == null || !cacheKeys) keys = exprs[1].atomValue(qc, info);
+          results = lookup(input, keys, qc).iter();
         }
-      }
-
-      private Iter lookup(final Item item) throws QueryException {
-        final ValueBuilder vb = new ValueBuilder(qc);
-        final Iter keyIter = exprs[1].atomIter(qc, info);
-        for(Item key; (key = keyIter.next()) != null;) {
-          final Value items = item instanceof final JNode jnode ? jnode.value.item(qc, info) : item;
-          for(final Item it : items) {
-            if(!(it instanceof final XQStruct struct)) throw LOOKUP_X.get(info, it);
-            vb.add(key == WILDCARD ? struct.items(qc) : struct.invoke(qc, info, key));
-          }
-        }
-        return vb.value().iter();
       }
     };
+  }
+
+  /**
+   * Looks up the specified keys in an input item.
+   * @param input input item
+   * @param keys keys
+   * @param qc query context
+   * @return resulting value
+   * @throws QueryException query exception
+   */
+  private Value lookup(final Item input, final Value keys, final QueryContext qc)
+      throws QueryException {
+    final long ks = keys.size();
+    if(ks == 0) return Empty.VALUE;
+    final Item item = input instanceof final JNode jnode ? jnode.value.item(qc, info) : input;
+    if(item.isEmpty()) return Empty.VALUE;
+    if(!(item instanceof final XQStruct struct)) throw LOOKUP_X.get(info, item);
+    if(exprs[1] == Str.WILDCARD) return struct.items(qc);
+    if(ks == 1) return struct.invoke(qc, info, keys.itemAt(0));
+
+    final ValueBuilder vb = new ValueBuilder(qc);
+    for(final Item key : keys) vb.add(struct.invoke(qc, info, key));
+    return vb.value(this);
   }
 
   @Override
@@ -172,7 +198,8 @@ public final class Lookup extends Arr {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof Lookup && super.equals(obj);
+    return this == obj || obj instanceof final Lookup lookup &&
+      (exprs[1] == Str.WILDCARD) == (lookup.exprs[1] == Str.WILDCARD) && super.equals(obj);
   }
 
   @Override
@@ -181,8 +208,8 @@ public final class Lookup extends Arr {
 
     final Expr keys = exprs[1];
     byte[] key = null;
-    if(keys == WILDCARD) {
-      key = WILDCARD.string();
+    if(keys == Str.WILDCARD) {
+      key = Str.WILDCARD.string();
     } else if(keys instanceof final Str str) {
       if(XMLToken.isNCName(str.string())) key = str.string();
     } else if(keys instanceof final Itr itr) {

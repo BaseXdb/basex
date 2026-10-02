@@ -2843,7 +2843,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr keySpecifier() throws QueryException {
-    if(wsConsume("*")) return Lookup.WILDCARD;
+    if(wsConsume("*")) return Str.WILDCARD;
 
     final int cp = current();
     if(cp == '(') return parenthesized();

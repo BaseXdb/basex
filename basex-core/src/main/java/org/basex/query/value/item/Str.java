@@ -22,6 +22,8 @@ import org.basex.util.hash.*;
 public final class Str extends AStr {
   /** Zero-length string. */
   public static final Str EMPTY = new Str(Token.EMPTY);
+  /** Wildcard of lookup expressions. */
+  public static final Str WILDCARD = new Str(Token.cpToken('*'));
   /** Key string. */
   public static final Str KEY = Str.get("key");
 

@@ -118,6 +118,14 @@ public final class DynFuncCall extends FuncCall {
       if(nargs == 1) arg(0, arg -> arg.simplifyFor(Simplify.DATA, cc));
       // pre-evaluation is safe as maps and arrays contain values
       if(values(false, cc)) return cc.preEval(this);
+      if(nargs == 1 && func.seqType().one()) {
+        // $array(POSITION) → array:get($array, POSITION)
+        if(ftype instanceof ArrayType) return cc.function(Function._ARRAY_GET, info, func, arg(0));
+        // $map(KEY) → map:get($map, KEY)  (unless a strict record may lack the key)
+        if(ftype instanceof final MapType mt && !Lookup.mayLackField(mt, arg(0), info)) {
+          return cc.function(Function._MAP_GET, info, func, arg(0));
+        }
+      }
     }
 
     // try to inline the function; avoid recursive inlining
