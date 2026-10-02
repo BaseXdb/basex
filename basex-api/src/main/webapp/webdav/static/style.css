@@ -6,8 +6,10 @@
   --gap: 1rem;
   /* vertical separation between blocks */
   --space: .6rem;
-  /* hairline rules and panel dividers */
+  /* every line of the interface: rules, dividers, and the borders of controls */
   --line: .7px;
+  /* the face of code, wherever it is shown */
+  --mono: SFMono-Regular, Consolas, Menlo, monospace;
   --radius: 3px;
 
   --bg: #fff;
@@ -18,7 +20,11 @@
   --strong: #333;
   --border: #AAA;
   --border-light: #DDD;
-  --pre-bg: #F8F8F8;
+  /* the face of code and buttons, and of what is pointed at */
+  --shade: #F8F8F8;
+  --shade-hover: #EEE;
+  /* the rule below a heading or a table header, as on docs.basex.org */
+  --rule: #C66;
   --info: #090;
   --warning: #999;
 }
@@ -33,9 +39,23 @@
     --strong: #ccc;
     --border: #555;
     --border-light: #444;
-    --pre-bg: #2a2a2a;
+    --shade: #2a2a2a;
+    --shade-hover: #333;
+    --rule: #844;
     --info: #6c6;
   }
+}
+
+/* a declared width is the width the box takes, padding and border included; the layout is
+   built on percentages and grid tracks, which the default box model would overflow */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* thin scrollbars in the colour of the borders keep the page calm */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
 }
 
 body {
@@ -83,7 +103,7 @@ h1 {
 
 h2 {
   font-size: 150%;
-  color: var(--accent);
+  color: var(--accent-strong);
   margin: 0 0 .2rem 0;
 }
 
@@ -96,23 +116,31 @@ h3 {
 
 table {
   table-layout: fixed;
+  /* every cell draws a bottom line only, so none of them doubles up */
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* lines between the rows, and a stronger one below the header, as on docs.basex.org */
+th, td {
+  vertical-align: top;
+  padding: 1px var(--gap) 1px 0;
+  border-bottom: var(--line) solid var(--border-light);
 }
 
 th {
-  vertical-align: top;
   text-align: left;
-  padding: 0 var(--gap) 0 0;
+  border-bottom-color: var(--rule);
+}
+
+/* the row that is pointed at */
+tr:has(> td):hover {
+  background-color: var(--shade);
 }
 
 /* right-aligned numeric table columns (was the deprecated align='right' attribute) */
 .num {
   text-align: right;
-}
-
-td {
-  vertical-align: top;
-  padding: 0 var(--gap) 0 0;
-  border: 0;
 }
 
 ol, ul, dd {
@@ -156,56 +184,102 @@ b {
   color: var(--strong);
 }
 
-code {
-  font-family: SFMono-Regular, Consolas, Menlo, monospace;
+/* code, however much of it there is */
+code, pre {
+  font-family: var(--mono);
   font-size: 90%;
-  border: 1px solid var(--border-light);
+  border: var(--line) solid var(--border-light);
   border-radius: var(--radius);
+}
+
+code {
   padding: 0 4px;
   margin: 0 2px;
 }
 
 pre {
-  font-family: SFMono-Regular, Consolas, Menlo, monospace;
-  font-size: 90%;
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius);
-  background-color: var(--pre-bg);
+  background-color: var(--shade);
   padding: .5rem;
   margin: .2rem 0 .5rem 0;
 }
 
 textarea {
-  font-family: SFMono-Regular, Consolas, Menlo, monospace;
+  font-family: var(--mono);
   width: 100%;
-  /* the border must not add to the width, or the panel scrolls sideways */
-  box-sizing: border-box;
   resize: vertical;
   background-color: var(--bg);
   color: var(--fg);
 }
 
-textarea, input[type=text], input[type=password], input[type=number],
-input[type=submit], select, button {
-  border: 1px solid var(--border);
+textarea, input[type=text], input[type=password], input[type=number], select, button {
+  border: var(--line) solid var(--border);
   border-radius: var(--radius);
   outline: none;
 }
 
+/* a button label is never broken over two lines */
+button {
+  padding: 4px 8px;
+  white-space: nowrap;
+}
+
+/* fields are written in the face of the page, as buttons are */
 input[type=text], input[type=password], input[type=number], select {
   padding: 4px;
   width: 200px;
-  /* entry fields keep themed colours; buttons stay native so disabled greys out */
   background-color: var(--bg);
   color: var(--fg);
+  font: inherit;
 }
 
-input[type=submit], button {
-  padding: 4px 8px;
+/* a selection is drawn like a field, with a chevron instead of the native arrow */
+select {
+  appearance: none;
+  padding-right: 22px;
+  background: var(--bg) right 7px center / 9px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23888' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  cursor: pointer;
 }
 
-input:focus, select:focus, button:focus {
-  outline: .5px solid var(--fg);
+/* buttons share the flat face of the code buttons on docs.basex.org; the link-like ones bring
+   their own */
+button:not(.link) {
+  background-color: var(--shade);
+  color: var(--fg);
+  font: inherit;
+  cursor: pointer;
+}
+button:not(.link):hover:not(:disabled) {
+  background-color: var(--shade-hover);
+}
+button:disabled {
+  opacity: .5;
+  cursor: default;
+}
+
+/* the focus is marked inside the border: a ring outside would be clipped by a panel that scrolls */
+:is(input, select, textarea):focus {
+  border-color: var(--rule);
+  box-shadow: inset 0 0 0 .5px var(--rule);
+}
+button:focus-visible {
+  border-color: var(--fg);
+  box-shadow: inset 0 0 0 .5px var(--fg);
+}
+/* a link is tinted instead, as a table cell clips what sticks out of it */
+a:focus-visible {
+  outline: none;
+  border-radius: 2px;
+  background-color: color-mix(in srgb, var(--accent) 15%, transparent);
+  text-decoration: underline;
+}
+/* whatever else takes the focus, such as a pane that scrolls, is ringed inside its own box */
+:focus-visible {
+  outline-offset: -2px;
+}
+
+/* what reacts to the pointer changes its shade softly */
+button, tr {
+  transition: background-color .1s, border-color .1s;
 }
 
 hr {
@@ -219,10 +293,13 @@ hr {
 .content {
   display: grid;
   grid-template-columns: var(--columns);
-  /* a gutter on either side of the divider that sits in the middle */
-  column-gap: calc(var(--gap) * 2);
+  column-gap: var(--gap);
   /* keeps a focus ring at the panel top clear of the sticky header */
   padding-top: 2px;
+}
+/* a gutter on either side of the divider that sits in the middle */
+.content.divided {
+  column-gap: calc(var(--gap) * 2);
 }
 .content > .panel {
   /* anchors the divider */
@@ -236,7 +313,7 @@ hr {
   grid-column: 1 / -1;
 }
 /* divider, centered in the gap before every panel but the first of a row */
-.content > .panel:not(.full) ~ .panel:not(.full)::before {
+.content.divided > .panel:not(.full) ~ .panel:not(.full)::before {
   content: '';
   position: absolute;
   top: 0;
@@ -245,46 +322,51 @@ hr {
   border-left: var(--line) solid var(--border);
 }
 
-.error {
-  color: var(--accent);
-  font-weight: bold;
-}
-
-.info {
-  color: var(--info);
-  font-weight: bold;
-}
-
-.warning {
-  color: var(--warning);
-  font-weight: bold;
-}
-
-.ellipsis {
+/* one line, clipped where it does not fit: a status message must not push its neighbours out
+   of the row they share */
+.ellipsis,
+#info {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
 }
 
-/* a group of fields: a form, or one column of a form that spreads its fields over columns.
-   The group is the grid, so its label column is as wide as its longest label asks for */
-form:has(> .field) {
+/* the three states of a status message: told apart by their colour, and by a glyph, so that
+   the colour is not the only thing that says which one it is */
+.info   { color: var(--info); }
+.warning { color: var(--warning); }
+.error   { color: var(--accent); }
+
+.info::before    { content: "\2713\00a0"; }
+.warning::before { content: "\21bb\00a0"; }
+.error::before   { content: "\2717\00a0"; }
+
+/* the message of the header is a badge, tinted with its own colour. It keeps the height of the
+   line, so that it does not shift the header, and the tint sets it off, so that it needs no
+   bold face */
+#info:is(.info, .warning, .error) {
+  padding: 0 .4rem;
+  border-radius: var(--radius);
+  background-color: color-mix(in srgb, currentColor 12%, transparent);
+}
+
+/* label column and control column: the group of fields — a form, or one column of a form that
+   spreads its fields over columns — is the grid whose label column is as wide as its longest
+   label asks for, and a field outside a group is its own grid */
+:has(> .field), .field {
   display: grid;
   grid-template-columns: max-content 1fr;
   column-gap: var(--gap);
+  /* a group that is stretched, e.g. next to a longer one, keeps its rows at their height */
+  align-content: start;
 }
 
 /* what is not a field spans both columns */
-form:has(> .field) > :not(.field) {
+:has(> .field) > :not(.field) {
   grid-column: 1 / -1;
 }
 
-/* labeled form field: label column, control column. A field outside a group is its own grid,
-   and its label takes the width it asks for */
 .field {
-  display: grid;
-  grid-template-columns: max-content 1fr;
-  column-gap: var(--gap);
   align-items: baseline;
   /* fields belong together, so they sit closer than blocks do; the margin separates them from
      each other and from the block above */
@@ -292,7 +374,7 @@ form:has(> .field) > :not(.field) {
 }
 
 /* a field of a group adopts the columns of its group, which lines up the controls */
-form:has(> .field) > .field:not(.stacked) {
+:has(> .field) > .field:not(.stacked) {
   grid-column: 1 / -1;
   grid-template-columns: subgrid;
 }
@@ -307,8 +389,10 @@ form:has(> .field) > .field:not(.stacked) {
   color: var(--muted);
   margin-bottom: var(--space);
 }
-.header-nav .note {
-  /* the header nav is a single row: no spacing before the rule below it */
+/* a note explaining the control above it belongs to its field: the field's own margin is what
+   separates it from what follows. The header nav is a single row, and the rule below it
+   supplies the distance in the same way */
+.field .note, .header-nav .note {
   margin-bottom: 0;
 }
 
@@ -391,9 +475,6 @@ header {
 /* a long message truncates instead of pushing the navigation out of the line */
 #info {
   min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .header-logo {
@@ -410,9 +491,28 @@ header {
   /* shorten the page title */
   .title-full { display: none; }
   .title-short { display: inline; }
+  /* the navigation wraps over several lines instead of being squeezed onto one, and the
+     status message takes the line below it */
+  .header-nav {
+    flex-wrap: wrap;
+    column-gap: var(--gap);
+  }
+  .header-nav ul {
+    flex-wrap: wrap;
+  }
+  #info {
+    flex: 1 1 100%;
+  }
+  /* stack the side-by-side content panels, drop their dividers */
+  .content {
+    grid-template-columns: 1fr;
+  }
+  .content.divided > .panel ~ .panel::before {
+    display: none;
+  }
   /* labels above their controls, so the fields keep the full width */
   .field,
-  form:has(> .field) > .field {
+  :has(> .field) > .field {
     grid-template-columns: 1fr;
   }
 }

@@ -121,7 +121,7 @@ declare %private function chat:login() as element(html) {
         ))
       }</form>
     </div>
-  , '1fr', (), ())
+  , '1fr', (), false(), ())
 };
 
 (:~
@@ -168,7 +168,7 @@ declare %private function chat:main() as element(html) {
     <div class='note'><b>MESSAGES</b><span id='conversation'/></div>
     <div id='messages' class='pane'/>
   </div>
-  ), '12rem 1fr', 'auto 1fr',
+  ), '12rem 1fr', 'auto 1fr', true(),
   <script type='text/javascript' defer='' src='chat/.static/chat.js'/>)
 };
 
@@ -178,6 +178,7 @@ declare %private function chat:main() as element(html) {
  : @param $columns  grid track widths of the panels
  : @param $rows     grid track heights; the panels then fill the viewport instead of
  :   growing with their content, and each panel scrolls on its own
+ : @param $divided  whether dividers separate the panels
  : @param $headers  extra header elements (scripts, etc.)
  : @return HTML page
  :)
@@ -185,6 +186,7 @@ declare %private function chat:wrap(
   $panels   as item()*,
   $columns  as xs:string,
   $rows     as xs:string?,
+  $divided  as xs:boolean,
   $headers  as element()*
 ) as element(html) {
   let $user := session:get($chat-util:id)
@@ -248,7 +250,7 @@ declare %private function chat:wrap(
         <a href='./' class='header-logo'><img src='chat/.static/basex.svg' alt='BaseX'/></a>
       </header>
       <main>
-        <div class='content{ ' fill'[$rows] }'
+        <div class='content{ ' fill'[$rows] }{ ' divided'[$divided] }'
              style='--columns: { $columns }{ $rows ! ('; --rows: ' || .) }'>{ $panels }</div>
       </main>
       <hr/>
