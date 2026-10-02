@@ -128,6 +128,20 @@ public final class ErrorMessageTest extends SandboxTest {
     errorMessage("1 cast as 2", TYPEINVALID_X, "found '2'");
   }
 
+  /** Coercion errors in record constructors are reported at the record declaration. */
+  @Test public void recordConstructor() {
+    errorAt("declare record local:r(x as xs:integer); local:r('a')", INVTYPE_X, 16);
+    errorAt("declare type local:r as record(x as xs:integer); local:r('a')", INVTYPE_X, 14);
+  }
+
+  /** Destructuring errors name the binding pattern. */
+  @Test public void destructuring() {
+    errorMessage("let $( $a, $b ) as xs:integer := ('x', 2) return $a", INVTYPE_X,
+        "$( $a, $b ) := ");
+    errorMessage("let $[ $a ] := 1 return $a", INVTYPE_X, "$[ $a ] := ");
+    errorMessage("let ${ $a } := 1 return $a", INVTYPE_X, "${ $a } := ");
+  }
+
   /** Unprefixed call of a user-defined function with wrong arity reports an arity mismatch. */
   @Test public void wrongArityNoNamespace() {
     error("declare function abc($j) { }; abc()", INVNARGS_X_X);

@@ -462,7 +462,7 @@ public class QueryParser extends InputParser {
       // record type: derive parameters from record fields (initializing expressions are ignored)
       final TokenObjectMap<ShapeField> fields = rt.fields();
       for(final byte[] key : fields) {
-        params.add(new QNm(key), fields.get(key).seqType(), null, null);
+        params.add(new QNm(key), fields.get(key).seqType(), null, ii);
       }
       params.seqType(rt.seqType()).finish(qc, localVars);
       final Var[] pv = params.vars();
@@ -1265,7 +1265,7 @@ public class QueryParser extends InputParser {
         throw error(PARAMOPTIONAL_X, key);
       }
       final SeqType st = rf.seqType();
-      params.add(new QNm(key), st, init, null);
+      params.add(new QNm(key), st, init, ii);
     }
     params.seqType(rt.seqType()).finish(qc, localVars);
 
@@ -1607,7 +1607,8 @@ public class QueryParser extends InputParser {
   private void letStructBinding(final InputInfo ii, final LinkedList<Clause> clauses)
       throws QueryException {
 
-    final LetStructBinding binding = switch(consume()) {
+    final int startCp = consume();
+    final LetStructBinding binding = switch(startCp) {
       case '[' -> new LetStructBinding(']', Types.ARRAY_O);
       case '{' -> new LetStructBinding('}', Types.MAP_O);
       default -> new LetStructBinding(')', Types.ITEM_ZM);
@@ -1622,7 +1623,10 @@ public class QueryParser extends InputParser {
     final SeqType asType = Objects.requireNonNullElse(optAsType(), Types.ITEM_ZM);
     final SeqType st = asType.intersect(binding.type);
     if(st == null) throw error(NOSUB_X_X, binding.type, asType);
-    final Var struct = new Var(vrs.getLast().name, st, qc, ii);
+    // name the bound value after the pattern: $( $a, $b )
+    final TokenBuilder name = new TokenBuilder().add(startCp);
+    for(final Var var : vrs) name.add(name.size() == 1 ? " " : ", ").add(var.name.varString());
+    final Var struct = new Var(new QNm(name.add(' ').add(binding.endCp).finish()), st, qc, ii);
 
     wsCheck(":=");
     clauses.add(new Let(localVars.add(struct), check(single(), NOEXPR)));
