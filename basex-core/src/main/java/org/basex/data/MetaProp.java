@@ -1,7 +1,6 @@
 package org.basex.data;
 
 import org.basex.index.resource.*;
-import org.basex.io.*;
 import org.basex.util.*;
 
 /**
@@ -34,18 +33,12 @@ public enum MetaProp {
   /** Property. */
   BINARIES(false) {
     @Override
-    public Integer value(final MetaData meta) {
-      final IOFile dir = meta.dir(ResourceType.BINARY);
-      return dir != null ? dir.descendants().size() : 0;
-    }
+    public Integer value(final MetaData meta) { return meta.resources(ResourceType.BINARY); }
   },
   /** Property. */
   VALUES(false) {
     @Override
-    public Integer value(final MetaData meta) {
-      final IOFile dir = meta.dir(ResourceType.VALUE);
-      return dir != null ? dir.descendants().size() : 0;
-    }
+    public Integer value(final MetaData meta) { return meta.resources(ResourceType.VALUE); }
   },
   /** Property. */
   TIMESTAMP(false) {

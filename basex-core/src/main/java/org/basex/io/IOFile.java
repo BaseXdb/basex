@@ -3,11 +3,14 @@ package org.basex.io;
 import java.io.*;
 import java.net.*;
 import java.nio.file.*;
+import java.nio.file.attribute.*;
 import java.util.*;
+import java.util.function.*;
 import java.util.regex.*;
 
 import javax.xml.transform.stream.*;
 
+import org.basex.core.jobs.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 import org.xml.sax.*;
@@ -271,11 +274,75 @@ public final class IOFile extends IO {
    */
   public StringList descendants(final FileFilter filter) {
     final StringList files = new StringList();
-    if(isDir()) {
-      final int offset = path().length() + (Strings.endsWith(path(), '/') ? 0 : 1);
-      addDescendants(this, files, filter, offset);
-    }
+    final Path root = file.toPath();
+    walk(filter, (path, attrs) ->
+      files.add(root.relativize(path).toString().replace(File.separatorChar, '/')));
     return files;
+  }
+
+  /**
+   * Returns the summed size of all regular descendant files.
+   * @param job job for interrupting the operation (can be {@code null})
+   * @return size
+   */
+  public long size(final Job job) {
+    final long[] size = { 0 };
+    walk(null, (path, attrs) -> {
+      if(job != null) job.checkStop();
+      if(attrs.isRegularFile()) size[0] += attrs.size();
+    });
+    return size[0];
+  }
+
+  /**
+   * Visits all children, using the attributes of the directory listing.
+   * @param visitor visitor for the name and the attributes of a file or directory
+   */
+  public void children(final BiConsumer<String, BasicFileAttributes> visitor) {
+    walk(1, null, (path, attrs) -> visitor.accept(path.getFileName().toString(), attrs));
+  }
+
+  /**
+   * Visits all non-filtered descendant files, using the attributes of the directory listing.
+   * @param filter file filter (can be {@code null})
+   * @param visitor visitor for the path and the attributes of a file
+   */
+  public void walk(final FileFilter filter, final BiConsumer<Path, BasicFileAttributes> visitor) {
+    walk(Integer.MAX_VALUE, filter, visitor);
+  }
+
+  /**
+   * Visits all non-filtered descendant files, and the directories at the maximum depth.
+   * @param depth maximum depth
+   * @param filter file filter (can be {@code null})
+   * @param visitor visitor for the path and the attributes of a file or directory
+   */
+  private void walk(final int depth, final FileFilter filter,
+      final BiConsumer<Path, BasicFileAttributes> visitor) {
+    if(!isDir()) return;
+    final Path root = file.toPath();
+    try {
+      Files.walkFileTree(root, EnumSet.of(FileVisitOption.FOLLOW_LINKS), depth,
+          new SimpleFileVisitor<>() {
+        @Override
+        public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) {
+          return dir.equals(root) || filter == null || filter.accept(dir.toFile()) ?
+            FileVisitResult.CONTINUE : FileVisitResult.SKIP_SUBTREE;
+        }
+        @Override
+        public FileVisitResult visitFile(final Path path, final BasicFileAttributes attrs) {
+          if(filter == null || filter.accept(path.toFile())) visitor.accept(path, attrs);
+          return FileVisitResult.CONTINUE;
+        }
+        @Override
+        public FileVisitResult visitFileFailed(final Path path, final IOException ex) {
+          Util.debug(ex);
+          return FileVisitResult.CONTINUE;
+        }
+      });
+    } catch(final IOException ex) {
+      Util.debug(ex);
+    }
   }
 
   /**
@@ -306,23 +373,73 @@ public final class IOFile extends IO {
   }
 
   /**
-   * Deletes the file, or the directory and its children.
+   * Deletes the file, or the directory and its descendants.
    * @return {@code true} if the file does not exist or has been deleted
    */
   public boolean delete() {
-    boolean ok = true;
-    if(file.exists()) {
-      if(isDir()) {
-        for(final IOFile ch : children()) ok &= ch.delete();
-      }
-      try {
-        Files.delete(toPath());
-      } catch(final IOException ex) {
-        Util.debug(ex);
-        return false;
-      }
+    try {
+      delete(toPath(), null);
+      return true;
+    } catch(final IOException ex) {
+      Util.debug(ex);
+      return false;
     }
-    return ok;
+  }
+
+  /**
+   * Deletes a path recursively without following symbolic links.
+   * @param path path to be deleted
+   * @param job job for interrupting the operation (can be {@code null})
+   * @throws IOException I/O exception
+   */
+  public static void delete(final Path path, final Job job) throws IOException {
+    Files.walkFileTree(path, new SimpleFileVisitor<>() {
+      @Override
+      public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs)
+          throws IOException {
+        // Windows junctions (reparse points): delete the link, not the target
+        if(!attrs.isOther()) return FileVisitResult.CONTINUE;
+        delete(dir);
+        return FileVisitResult.SKIP_SUBTREE;
+      }
+      @Override
+      public FileVisitResult visitFile(final Path child, final BasicFileAttributes attrs)
+          throws IOException {
+        if(job != null) job.checkStop();
+        delete(child);
+        return FileVisitResult.CONTINUE;
+      }
+      @Override
+      public FileVisitResult visitFileFailed(final Path child, final IOException ex)
+          throws IOException {
+        if(ex instanceof NoSuchFileException) return FileVisitResult.CONTINUE;
+        throw ex;
+      }
+      @Override
+      public FileVisitResult postVisitDirectory(final Path dir, final IOException ex)
+          throws IOException {
+        if(ex != null) throw ex;
+        delete(dir);
+        return FileVisitResult.CONTINUE;
+      }
+    });
+  }
+
+  /**
+   * Deletes a single path and removes a DOS read-only attribute that prevents the deletion.
+   * @param path path to be deleted
+   * @throws IOException I/O exception
+   */
+  public static void delete(final Path path) throws IOException {
+    try {
+      Files.delete(path);
+    } catch(final AccessDeniedException ex) {
+      final DosFileAttributeView view = Files.getFileAttributeView(path,
+          DosFileAttributeView.class, LinkOption.NOFOLLOW_LINKS);
+      if(view == null || !view.readAttributes().isReadOnly()) throw ex;
+      view.setReadOnly(false);
+      Files.delete(path);
+    }
   }
 
   /**
@@ -455,24 +572,6 @@ public final class IOFile extends IO {
       return Paths.get(pth);
     } catch(final InvalidPathException ex) {
       throw new IOException(ex);
-    }
-  }
-
-  /**
-   * Adds the relative paths of all descendant files to the specified list.
-   * @param io current file
-   * @param files file list
-   * @param filter file filter (can be {@code null})
-   * @param offset string length of root path
-   */
-  private static void addDescendants(final IOFile io, final StringList files,
-      final FileFilter filter, final int offset) {
-    if(io.isDir()) {
-      for(final IOFile child : io.children(filter)) {
-        addDescendants(child, files, filter, offset);
-      }
-    } else if(filter == null || filter.accept(io.file)) {
-      files.add(io.path().substring(offset));
     }
   }
 

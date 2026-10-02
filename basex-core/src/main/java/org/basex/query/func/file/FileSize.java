@@ -4,10 +4,10 @@ import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.*;
 
+import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -40,19 +40,7 @@ public final class FileSize extends FileFn {
    */
   private static long size(final Path path, final QueryContext qc) throws IOException {
     final BasicFileAttributes attrs = Files.readAttributes(path, BasicFileAttributes.class);
-    long s = 0;
-    if(attrs.isDirectory()) {
-      try(DirectoryStream<Path> children = Files.newDirectoryStream(path)) {
-        for(final Path child : children) {
-          qc.checkStop();
-          s += size(child, qc);
-        }
-      } catch(final IOException ex) {
-        Util.debug(ex);
-      }
-    } else if(attrs.isRegularFile()) {
-      s = attrs.size();
-    }
-    return s;
+    return attrs.isDirectory() ? new IOFile(path).size(qc) :
+      attrs.isRegularFile() ? attrs.size() : 0;
   }
 }

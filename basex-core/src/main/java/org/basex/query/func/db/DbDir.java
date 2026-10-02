@@ -50,11 +50,12 @@ public final class DbDir extends DbList {
     if(!data.inMemory()) {
       for(final ResourceType type : Resources.BINARIES) {
         final IOFile bin = data.meta.file(path, type);
-        for(final IOFile file : bin.children()) {
-          final boolean dir = file.isDir();
-          final String nm = dir ? file.name() : type.dbPath(file.name());
-          if(set.add(nm)) vb.add(elem(file.isDir(), nm, file.timeStamp(), file.length(), type));
-        }
+        bin.children((fn, attrs) -> {
+          final boolean dir = attrs.isDirectory();
+          final String nm = dir ? fn : type.dbPath(fn);
+          if(set.add(nm)) vb.add(elem(dir, nm, attrs.lastModifiedTime().toMillis(), attrs.size(),
+              type));
+        });
       }
     }
     return vb.value(this).iter();

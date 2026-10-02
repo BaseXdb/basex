@@ -72,11 +72,12 @@ public final class InfoDB extends AInfo {
     final String header = (bold ? new TokenBuilder().bold().add('%').norm().toString() : "%") + NL;
     tb.addExt(header, INFO_DB_PROPS);
     info(tb, MetaProp.NAME, meta);
-    info(tb, MetaProp.SIZE.name(), Performance.formatHuman(meta.dbSize()));
+    final MetaData.DiskStats stats = meta.diskStats();
+    info(tb, MetaProp.SIZE.name(), Performance.formatHuman(stats.size()));
     info(tb, MetaProp.NODES.name(), nodes);
     info(tb, MetaProp.DOCUMENTS, meta);
-    info(tb, MetaProp.BINARIES, meta);
-    info(tb, MetaProp.VALUES, meta);
+    info(tb, MetaProp.BINARIES.name(), stats.binaries());
+    info(tb, MetaProp.VALUES.name(), stats.values());
     info(tb, MetaProp.TIMESTAMP, meta);
     info(tb, MetaProp.UPTODATE, meta);
     if(meta.corrupt) tb.add(' ' + DB_CORRUPT + NL);

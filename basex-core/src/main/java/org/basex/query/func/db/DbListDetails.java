@@ -34,12 +34,10 @@ public final class DbListDetails extends DbList {
         final MetaData meta = new MetaData(name, ctx.options, ctx.soptions);
         try {
           meta.read();
-          // count number of binary files
-          final int binaries = meta.dir(ResourceType.BINARY).descendants().size();
-          final int values = meta.dir(ResourceType.VALUE).descendants().size();
-          database.attr(Q_RESOURCES, meta.ndocs + binaries + values);
+          final MetaData.DiskStats stats = meta.diskStats();
+          database.attr(Q_RESOURCES, meta.ndocs + stats.binaries() + stats.values());
           database.attr(Q_MODIFIED_DATE, DateTime.format(meta.dbTime()));
-          database.attr(Q_SIZE, meta.dbSize());
+          database.attr(Q_SIZE, stats.size());
           if(qc.user.has(Perm.CREATE, name)) database.attr(Q_PATH, meta.original);
         } catch(final IOException ex) {
           // invalid database will be ignored

@@ -2,6 +2,7 @@ package org.basex.query.func.file;
 
 import java.io.*;
 import java.nio.file.*;
+import java.nio.file.attribute.*;
 import java.util.*;
 import java.util.regex.*;
 
@@ -62,11 +63,28 @@ public class FileList extends FileFn {
 
     // collect directories and files first (reduces number of open directory streams)
     final ArrayList<Path> dirs = new ArrayList<>(), files = new ArrayList<>();
-    try(DirectoryStream<Path> paths = Files.newDirectoryStream(root)) {
-      for(final Path path : paths) {
-        qc.checkStop();
-        (Files.isDirectory(path) ? dirs : files).add(path);
-      }
+    final HashSet<Path> links = new HashSet<>();
+    try {
+      // depth 1: the attributes are taken from the directory listing
+      Files.walkFileTree(root, Set.of(), 1, new SimpleFileVisitor<>() {
+        @Override
+        public FileVisitResult visitFile(final Path path, final BasicFileAttributes attrs)
+            throws IOException {
+          if(path.equals(root)) throw new NotDirectoryException(path.toString());
+          qc.checkStop();
+          final boolean link = attrs.isSymbolicLink() && Files.isDirectory(path);
+          if(link) links.add(path);
+          (attrs.isDirectory() || link ? dirs : files).add(path);
+          return FileVisitResult.CONTINUE;
+        }
+        @Override
+        public FileVisitResult visitFileFailed(final Path path, final IOException ex)
+            throws IOException {
+          if(path.equals(root)) throw ex;
+          files.add(path);
+          return FileVisitResult.CONTINUE;
+        }
+      });
     } catch(final IOException ex) {
       // skip entries that cannot be accessed; throw exception only on root level
       if(top) {
@@ -79,7 +97,7 @@ public class FileList extends FileFn {
     for(final Path child : dirs) {
       final Str path = add(child, true, pattern, filter, filterArgs, index, list, qc);
       // recursive traversal: descend if the depth allows it, do not follow links
-      if(depth > 0 && !Files.isSymbolicLink(child)) {
+      if(depth > 0 && !links.contains(child)) {
         final Str p = path != null ? path : get(subPath(child, index), true);
         if(test(recurse, recurseArgs.set(0, p), qc)) {
           list(child, recurse, recurseArgs, pattern, index, filter, filterArgs,

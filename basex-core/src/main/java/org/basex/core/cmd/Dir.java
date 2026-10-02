@@ -61,11 +61,11 @@ public final class Dir extends Command {
     if(!data.inMemory()) {
       for(final ResourceType type : Resources.BINARIES) {
         final IOFile bin = data.meta.file(path, type);
-        for(final IOFile file : bin.children()) {
-          final boolean dir = file.isDir();
-          final String name = dir ? file.name() : type.dbPath(file.name());
-          if(set.add(name)) contents.add(entry(dir, name, file.length(), type));
-        }
+        bin.children((fn, attrs) -> {
+          final boolean dir = attrs.isDirectory();
+          final String name = dir ? fn : type.dbPath(fn);
+          if(set.add(name)) contents.add(entry(dir, name, attrs.size(), type));
+        });
       }
     }
     out.println(table.sort().finish());

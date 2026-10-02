@@ -83,19 +83,21 @@ public final class DirParser extends Parser {
   public void parse(final Builder build) throws IOException {
     build.meta.inputsize = 0;
     build.meta.original = original;
-    parse(build, source);
+    if(source instanceof final IOFile file && file.isDir()) {
+      for(final String path : file.descendants()) parse(build, new IOFile(file, path));
+    } else {
+      parse(build, source);
+    }
   }
 
   /**
-   * Parses the specified file or its children.
+   * Parses the specified file.
    * @param builder builder
    * @param input current input
    * @throws IOException I/O exception
    */
   private void parse(final Builder builder, final IO input) throws IOException {
-    if(input instanceof final IOFile file && file.isDir()) {
-      for(final IO f : file.children()) parse(builder, f);
-    } else if(archives && input.isArchive()) {
+    if(archives && input.isArchive()) {
       String name = input.name().toLowerCase(Locale.ENGLISH);
       final Compression compr = Compression.file(name);
       final InputStream in = input.inputStream();

@@ -78,10 +78,10 @@ public final class List extends Command {
       try {
         final MetaData meta = new MetaData(name, options, soptions);
         meta.read();
-        dbsize = meta.dbSize();
+        final MetaData.DiskStats stats = meta.diskStats();
+        dbsize = stats.size();
         file = meta.original;
-        count = meta.ndocs + meta.dir(ResourceType.BINARY).descendants().size() +
-            meta.dir(ResourceType.VALUE).descendants().size();
+        count = meta.ndocs + stats.binaries() + stats.values();
       } catch(final IOException ex) {
         Util.debug(ex);
         file = ERROR;

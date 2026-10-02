@@ -209,8 +209,8 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
       final Path target = Paths.get(dir.path(), "sandpit");
       if(source != null) {
         final Job job = new Job() { };
-        if(Files.exists(target)) FileDelete.delete(target, job);
-        FileCopy.relocate(source, target, true, new Job() { });
+        if(Files.exists(target)) IOFile.delete(target, job);
+        FileCopy.relocate(source, target, true, job);
       }
       qp.qc.resources.sandpit(target);
     } catch(final IOException ex) {

@@ -56,11 +56,11 @@ final class Binaries {
       final IOFile bin = data.meta.file(path, type);
       if(bin != null) {
         final boolean value = type == ResourceType.VALUE;
-        for(final IOFile child : bin.children()) {
-          if(dir == child.isDir()) {
-            map.put(token(value && !dir ? type.dbPath(child.name()) : child.name()), type);
+        bin.children((fn, attrs) -> {
+          if(dir == attrs.isDirectory()) {
+            map.put(token(value && !dir ? type.dbPath(fn) : fn), type);
           }
-        }
+        });
       }
     }
   }

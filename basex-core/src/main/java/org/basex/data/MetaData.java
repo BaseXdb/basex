@@ -5,6 +5,7 @@ import static org.basex.data.DataText.*;
 import static org.basex.util.Strings.*;
 
 import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 
 import org.basex.build.*;
@@ -287,21 +288,6 @@ public final class MetaData {
   }
 
   /**
-   * Calculates the database size.
-   * @param file current file
-   * @return file length
-   */
-  private static long dbSize(final IOFile file) {
-    long s = 0;
-    if(file.isDir()) {
-      for(final IOFile f : file.children()) s += dbSize(f);
-    } else {
-      s += file.length();
-    }
-    return s;
-  }
-
-  /**
    * Creates a database file.
    * @param path database path
    * @param name filename
@@ -326,8 +312,46 @@ public final class MetaData {
    * @return database size
    */
   public long dbSize() {
-    return dir != null ? dbSize(dir) : 0;
+    return dir != null ? dir.size(null) : 0;
   }
+
+  /**
+   * Returns the number of file resources of the specified type.
+   * @param type resource type
+   * @return number of resources
+   */
+  public int resources(final ResourceType type) {
+    final int[] files = { 0 };
+    if(dir != null) dir(type).walk(null, (path, attrs) -> files[0]++);
+    return files[0];
+  }
+
+  /**
+   * Returns the number of file resources and the disk size of the database in a single traversal.
+   * @return statistics
+   */
+  public DiskStats diskStats() {
+    // number of binaries, number of values, disk size
+    final long[] stats = new long[3];
+    if(dir != null) {
+      final Path binaries = dir(ResourceType.BINARY).file().toPath();
+      final Path values = dir(ResourceType.VALUE).file().toPath();
+      dir.walk(null, (path, attrs) -> {
+        if(path.startsWith(binaries)) stats[0]++;
+        else if(path.startsWith(values)) stats[1]++;
+        stats[2] += attrs.size();
+      });
+    }
+    return new DiskStats((int) stats[0], (int) stats[1], stats[2]);
+  }
+
+  /**
+   * Disk statistics of a database.
+   * @param binaries number of binary resources
+   * @param values number of value resources
+   * @param size disk size
+   */
+  public record DiskStats(int binaries, int values, long size) { }
 
   /**
    * Returns the disk timestamp of the database.

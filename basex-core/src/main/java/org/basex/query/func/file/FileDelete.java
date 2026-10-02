@@ -2,9 +2,8 @@ package org.basex.query.func.file;
 
 import java.io.*;
 import java.nio.file.*;
-import java.nio.file.attribute.*;
 
-import org.basex.core.jobs.*;
+import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
@@ -23,47 +22,11 @@ public final class FileDelete extends FileFn {
 
     if(Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
       if(recursive) {
-        delete(path, qc);
+        IOFile.delete(path, qc);
       } else {
-        delete(path);
+        IOFile.delete(path);
       }
     }
     return Empty.VALUE;
-  }
-
-  /**
-   * Deletes a path recursively.
-   * @param path path to be deleted
-   * @param job job
-   * @throws IOException I/O exception
-   */
-  public static void delete(final Path path, final Job job) throws IOException {
-    // symbolic links are deleted without descending into their target
-    if(Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
-      try(DirectoryStream<Path> children = Files.newDirectoryStream(path)) {
-        for(final Path child : children) {
-          job.checkStop();
-          delete(child, job);
-        }
-      }
-    }
-    delete(path);
-  }
-
-  /**
-   * Deletes a single path and removes a DOS read-only attribute that prevents the deletion.
-   * @param path path to be deleted
-   * @throws IOException I/O exception
-   */
-  private static void delete(final Path path) throws IOException {
-    try {
-      Files.delete(path);
-    } catch(final AccessDeniedException ex) {
-      final DosFileAttributeView view = Files.getFileAttributeView(path,
-          DosFileAttributeView.class, LinkOption.NOFOLLOW_LINKS);
-      if(view == null || !view.readAttributes().isReadOnly()) throw ex;
-      view.setReadOnly(false);
-      Files.delete(path);
-    }
   }
 }

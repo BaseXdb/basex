@@ -39,9 +39,9 @@ public final class ArchiveCreateFrom extends ArchiveCreate {
           if(!new IOFile(root, file).eq(target)) tl.add(file);
         }
       } else {
-        for(final IOFile file : root.children()) {
-          if(!file.isDir() && !file.eq(target)) tl.add(file.name());
-        }
+        root.children((name, attrs) -> {
+          if(!attrs.isDirectory() && !new IOFile(root, name).eq(target)) tl.add(name);
+        });
       }
       entries = StrSeq.get(tl);
     }
