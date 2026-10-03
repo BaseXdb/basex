@@ -210,6 +210,10 @@ public abstract class StandardFunc extends Arr {
         case CTX -> {
           if(hasCTX()) return true;
         }
+        case CNS -> {
+          if(hasCNS()) return true;
+          continue;
+        }
         case NDT -> {
           if(hasNDT()) return true;
           // check whether function arguments may contain non-deterministic code
@@ -241,6 +245,14 @@ public abstract class StandardFunc extends Arr {
    */
   public boolean hasCTX() {
     return definition.has(Flag.CTX);
+  }
+
+  /**
+   * Indicates if this function constructs nodes.
+   * @return result of check
+   */
+  public boolean hasCNS() {
+    return definition.has(Flag.CNS);
   }
 
   /**

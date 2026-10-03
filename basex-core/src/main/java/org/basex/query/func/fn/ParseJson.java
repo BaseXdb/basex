@@ -45,6 +45,11 @@ public abstract class ParseJson extends ParseFn {
   }
 
   @Override
+  public final boolean hasCNS() {
+    return super.hasCNS() && (format() != null || !format(JsonOptions.FORMAT, JsonFormat.W3));
+  }
+
+  @Override
   public final int hofOffsets() {
     return functionOption(1) ? Integer.MAX_VALUE : 0;
   }

@@ -1288,7 +1288,7 @@ public enum Function implements AFunction {
   _CRYPTO_GENERATE_SIGNATURE(CryptoGenerateSignature::new,
       "generate-signature(node, canonicalization, digest, signature, prefix, type, ext1?, ext2?)",
       params(XNODE_O, STRING_O, STRING_O, STRING_O, STRING_O, STRING_O, ITEM_ZO, XNODE_ZO),
-      DOCUMENT_O, CRYPTO_URI),
+      DOCUMENT_O, flag(CNS), CRYPTO_URI),
   /** XQuery function. */
   _CRYPTO_HMAC(CryptoHmac::new, "hmac(value, key, algorithm, encoding?)",
       params(STRING_OR_BINARY_O, STRING_OR_BINARY_O, STRING_O, STRING_ZO), STRING_O, CRYPTO_URI),
@@ -1307,7 +1307,7 @@ public enum Function implements AFunction {
       params(STRING_ZO, MAP_ZO), ITEM_ZO, flag(NDT), CSV_URI, Perm.CREATE),
   /** XQuery function. */
   _CSV_PARSE(CsvParse::new, "parse(value, options?)",
-      params(STRING_OR_BINARY_ZO, MAP_ZO), ITEM_ZO, CSV_URI),
+      params(STRING_OR_BINARY_ZO, MAP_ZO), ITEM_ZO, flag(CNS), CSV_URI),
   /** XQuery function. */
   _CSV_SERIALIZE(CsvSerialize::new, "serialize(input, options?)",
       params(ITEM_ZO, ITEM_ZO), STRING_O, CSV_URI),
@@ -1773,7 +1773,7 @@ public enum Function implements AFunction {
       params(STRING_O, MAP_ZO), ITEM_ZM, flag(NDT), JSON_URI, Perm.CREATE),
   /** XQuery function. */
   _JSON_PARSE(JsonParse::new, "parse(value, options?)",
-      params(STRING_OR_BINARY_ZO, MAP_ZO), ITEM_ZM, JSON_URI),
+      params(STRING_OR_BINARY_ZO, MAP_ZO), ITEM_ZM, flag(CNS), JSON_URI),
   /** XQuery function. */
   _JSON_SERIALIZE(JsonSerialize::new, "serialize(input, options?)",
       params(ITEM_ZO, MAP_ZO), STRING_O, JSON_URI),
@@ -2156,7 +2156,7 @@ public enum Function implements AFunction {
       params(STRING_O, MAP_ZO, STRING_ZO, INTEGER_ZO), ELEMENT_O, flag(CNS), WEB_URI),
   /** XQuery function. */
   _WEB_RESPONSE_HEADER(WebResponseHeader::new, "response-header(output?, headers?, response?)",
-      params(MAP_ZO, MAP_ZO, MAP_ZO), ELEMENT_O, WEB_URI),
+      params(MAP_ZO, MAP_ZO, MAP_ZO), ELEMENT_O, flag(CNS), WEB_URI),
 
   // XQuery Module
 

@@ -66,6 +66,12 @@ public abstract class ParseCsv extends ParseFn {
   }
 
   @Override
+  public final boolean hasCNS() {
+    return super.hasCNS() && (format() != null ||
+        !format(CsvOptions.FORMAT, CsvFormat.W3, CsvFormat.W3_ARRAYS));
+  }
+
+  @Override
   final boolean nl() {
     return true;
   }
