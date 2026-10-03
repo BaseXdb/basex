@@ -206,11 +206,9 @@ public abstract class SimpleMap extends Mapping {
       // (1, 2) ! (. + 1) → 1 ! (. + 1), 2 ! (. + 1)
       final ExprList unroll = cc.unroll(expr, false);
       if(unroll != null) {
-        final int us = unroll.size();
-        final ExprList results = new ExprList(us);
+        final ExprList results = new ExprList(unroll.size());
         for(final Expr ex : unroll) {
-          final Expr nxt = results.size() == us - 1 ? next : next.copy(cc, new IntObjectMap<>());
-          results.add(get(cc, info, ex, nxt));
+          results.add(get(cc, info, ex, next.copy(cc, new IntObjectMap<>())));
         }
         return List.get(cc, info, results.finish());
       }

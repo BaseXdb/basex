@@ -495,6 +495,12 @@ public final class FileModuleTest extends SandboxTest {
     // file with two codepoints
     query(_FILE_WRITE_BINARY.args(PATH1, " " + _BIN_ENCODE_STRING.args("a\u00e4")));
     query(func.args(PATH1), "a\u00e4");
+
+    // lazy items of different files must not be merged
+    query(_FILE_WRITE.args(PATH1, "a"));
+    query(_FILE_WRITE.args(PATH2, "b"));
+    query("(" + func.args(PATH1) + ", " + func.args(PATH2) + ") -> (. ! string())",
+        "YQ==\nYg==");
   }
 
   /** Test method. */
@@ -519,6 +525,12 @@ public final class FileModuleTest extends SandboxTest {
     // byte order mark
     query(_FILE_WRITE_BINARY.args(PATH1, " xs:hexBinary('FEFF0061')"));
     query(func.args(PATH1), "a");
+
+    // lazy items of different files must not be merged
+    query(_FILE_WRITE.args(PATH1, "a"));
+    query(_FILE_WRITE.args(PATH2, "bb"));
+    query("(" + func.args(PATH1) + ", " + func.args(PATH2) + ") -> (. ! string-length())",
+        "1\n2");
   }
 
   /** Test method. */

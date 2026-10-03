@@ -152,8 +152,8 @@ public final class StrLazy extends AStr implements Lazy {
       if(input.eq(str.input) && Objects.equals(encoding, str.encoding) && error == str.error &&
           fallback == str.fallback && normalize == str.normalize) return true;
     }
-    // items may be different, but result may be equal...
-    return super.equals(obj);
+    // items may be different, but result may be equal (contents are only compared if cached)
+    return isCached() && super.equals(obj);
   }
 
   @Override
