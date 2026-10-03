@@ -2565,4 +2565,21 @@ public final class RewritingsTest extends SandboxTest {
     check("for $x in 1 to 3 return if($x > 1) then $x else -$x", "-1\n2\n3", root(DualMap.class));
     check("(1 to 3) ! (if(random:double() < 2) then . else 0)", "1\n2\n3", root(DualMap.class));
   }
+
+  /** Rewrites of arrays: atomization may yield no or multiple items. */
+  @Test public void atomizedArrays() {
+    final String empty = "array { " + wrap(1) + "[. = 0] }", two = "[ " + wrap(1) + ", 2 ]";
+    error(two + " eq 1", INVTYPE_X);
+    query("empty(" + empty + " eq 1)", true);
+    query("concat(" + two + ")", 12);
+    query(DUPLICATE_VALUES.args(" [ " + wrap(1) + ", " + wrap(1) + " ]"), 1);
+    query("for $x in 1 group by $k := " + empty + " return empty($k)", true);
+    error("for $x in 1 group by $k := " + two + " return $k", INVTYPE_X);
+    error("data(xs:integer(" + two + "))", INVTYPE_X);
+
+    final String same = "[ " + wrap(1) + ", " + wrap(1) + " ]";
+    query("count(" + same + ") = count(distinct-values(" + same + "))", true);
+    query("count(distinct-values(" + same + ")) = count(" + same + ")", true);
+    query("count(distinct-values(" + two + ")) = 1", false);
+  }
 }

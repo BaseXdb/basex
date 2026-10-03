@@ -1,5 +1,6 @@
 package org.basex.query.func;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.*;
@@ -50,6 +51,8 @@ public final class MathModuleTest extends SandboxTest {
 
     check(func.args(" ()", 0), "", empty());
     check(func.args(" ()", 1), "", empty());
+    error(func.args(" [ " + wrap(1) + ", 2 ]", 0), INVTYPE_X);
+    query(func.args(" array { " + wrap(1) + "[. = 0] }", 0), "");
 
     // merge nested function calls
     check(func.args(func.args(wrap(-2), 3), 2), 64, count(func, 1));

@@ -27,12 +27,13 @@ public final class MathPow extends MathFn {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr base = arg(0), exp = arg(1);
-    final SeqType st = base.seqType();
+    final SeqType st = base.seqType(), est = exp.seqType();
 
     // math:pow(1, y) → 1
-    if(base instanceof final ANum num && num.dbl() == 1) return Dbl.ONE;
+    if(base instanceof final ANum num && num.dbl() == 1 && est.one() &&
+        est.type.isNumberOrUntyped()) return Dbl.ONE;
 
-    if(exp instanceof final ANum num) {
+    if(exp instanceof final ANum num && st.type.isNumberOrUntyped()) {
       final double e = num.dbl();
       if(e == 0 && st.one()) return Dbl.ONE;
       if(e == 1) return new Cast(info, base, Types.DOUBLE_ZO).optimize(cc);

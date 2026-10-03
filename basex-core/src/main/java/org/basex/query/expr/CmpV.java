@@ -83,7 +83,7 @@ public final class CmpV extends Cmp {
   private Expr toGeneral(final CompileContext cc, final boolean single) throws QueryException {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
-    final Predicate<SeqType> p = st -> single ? st.one() : st.zeroOrOne();
+    final Predicate<SeqType> p = st -> (single ? st.one() : st.zeroOrOne()) && !st.mayBeWrapped();
     return p.test(st1) && p.test(st2) ? new CmpG(info, expr1, expr2, op).optimize(cc) : this;
   }
 

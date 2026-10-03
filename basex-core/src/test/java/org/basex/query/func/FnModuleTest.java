@@ -1461,7 +1461,7 @@ public final class FnModuleTest extends SandboxTest {
     check(seq + "count(distinct-values($seq)) >  count($seq)", false, root(Bln.class));
     check(seq + "count(distinct-values($seq)) != count($seq)", true,  root(EXISTS), exists(func));
 
-    seq = "let $seq := (<_>1</_>, 2, <_>1</_>)[. = 1] return ";
+    seq = "let $seq := (<_>1</_>, <_>2</_>, <_>1</_>)[. = 1] return ";
     check(seq + "count($seq)  = count(distinct-values($seq))", false, root(EMPTY), exists(func));
     check(seq + "count($seq) <= count(distinct-values($seq))", false, root(EMPTY), exists(func));
     check(seq + "count($seq) <  count(distinct-values($seq))", false, root(Bln.class));

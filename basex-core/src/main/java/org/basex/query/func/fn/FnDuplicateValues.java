@@ -94,7 +94,8 @@ public class FnDuplicateValues extends StandardFunc {
 
       if(!defined(1)) {
         // util:duplicates(1 to 10) → ()
-        if(values instanceof RangeSeq || values instanceof Range || st.zeroOrOne())
+        if(values instanceof RangeSeq || values instanceof Range ||
+            st.zeroOrOne() && !st.mayBeWrapped())
           return cc.voidAndReturn(values, Empty.VALUE, info);
         // util:duplicates((1 to 3) ! 1) → 1
         if(values instanceof final SingletonSeq ss && !st.mayBeWrapped() && ss.singleItem()) {

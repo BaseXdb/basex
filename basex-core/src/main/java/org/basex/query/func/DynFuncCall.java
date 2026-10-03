@@ -115,10 +115,11 @@ public final class DynFuncCall extends FuncCall {
 
     if(struct) {
       // lookup key must be atomic
-      if(nargs == 1) arg(0, arg -> arg.simplifyFor(Simplify.DATA, cc));
+      arg(0, arg -> arg.simplifyFor(Simplify.DATA, cc));
       // pre-evaluation is safe as maps and arrays contain values
       if(values(false, cc)) return cc.preEval(this);
-      if(nargs == 1 && func.seqType().one()) {
+      final SeqType kt = arg(0).seqType();
+      if(kt.one() && !kt.mayBeWrapped() && func.seqType().one()) {
         // $array(POSITION) → array:get($array, POSITION)
         if(ftype instanceof ArrayType) return cc.function(Function._ARRAY_GET, info, func, arg(0));
         // $map(KEY) → map:get($map, KEY)  (unless a strict record may lack the key)

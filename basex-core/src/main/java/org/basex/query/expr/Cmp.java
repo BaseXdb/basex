@@ -299,14 +299,15 @@ public abstract class Cmp extends Arr {
     if(COUNT.is(count)) {
       final Expr carg = count.arg(0);
       // count(E) = count(distinct-values(E))
-      if(DISTINCT_VALUES.is(carg) && arg.equals(carg.arg(0)))
+      if(DISTINCT_VALUES.is(carg) && arg.equals(carg.arg(0)) && !arg.seqType().mayBeWrapped())
         return ((FnDistinctValues) carg).duplicates(op, cc);
       // count(distinct-values(E)) = count(E)
-      if(DISTINCT_VALUES.is(arg) && arg.arg(0).equals(carg))
+      if(DISTINCT_VALUES.is(arg) && arg.arg(0).equals(carg) && !carg.seqType().mayBeWrapped())
         return ((FnDistinctValues) arg).duplicates(op.swap(), cc);
     }
     // count(distinct-values(E)) = int
-    if(DISTINCT_VALUES.is(arg) && count instanceof final Itr itr) {
+    if(DISTINCT_VALUES.is(arg) && count instanceof final Itr itr &&
+        !arg.arg(0).seqType().mayBeWrapped()) {
       final long size1 = arg.arg(0).size(), size2 = itr.itr();
       if(size1 != -1 && size1 == size2) return ((FnDistinctValues) arg).duplicates(op.swap(), cc);
     }
