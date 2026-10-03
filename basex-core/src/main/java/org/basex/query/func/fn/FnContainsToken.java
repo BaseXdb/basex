@@ -29,9 +29,10 @@ public final class FnContainsToken extends StandardFunc {
     final byte[] token = trim(toToken(arg(1), qc));
     final Collation collation = toCollation(arg(2), qc);
     if(token.length != 0) {
-      final Iter value = arg(0).atomIter(qc, info);
-      for(Item item; (item = qc.next(value)) != null;) {
-        for(final byte[] distinct : distinctTokens(toToken(item))) {
+      final Expr value = arg(0);
+      final Iter iter = value.atomIter(qc, info);
+      for(Item item; (item = qc.next(iter)) != null;) {
+        for(final byte[] distinct : distinctTokens(toToken(item, value))) {
           if(eq(token, distinct, collation)) return true;
         }
       }

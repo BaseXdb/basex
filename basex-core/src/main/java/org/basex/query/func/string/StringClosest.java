@@ -46,7 +46,8 @@ public final class StringClosest extends StringFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final byte[] value = toToken(arg(0), qc);
-    final Iter candidates = arg(1).atomIter(qc, info);
+    final Expr candidates = arg(1);
+    final Iter iter = candidates.atomIter(qc, info);
     final ClosestOptions options = options(2, ClosestOptions::new, qc);
 
     final double threshold = ((ANum) options.get(ClosestOptions.THRESHOLD)).dbl();
@@ -74,9 +75,9 @@ public final class StringClosest extends StringFn {
     final boolean single = limit == 1;
     final TokenList values = new TokenList();
     final DoubleList similarities = new DoubleList();
-    for(Item item; (item = qc.next(candidates)) != null;) {
+    for(Item item; (item = qc.next(iter)) != null;) {
       // candidates can be untyped (e.g. index entries returned by ft:tokens)
-      final byte[] cand = toToken(item);
+      final byte[] cand = toToken(item, candidates);
       final int[] cps2 = cps(cand, opt);
       if(bounded) checkLength(cps2.length);
 

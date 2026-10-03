@@ -179,7 +179,8 @@ public class FnSubsequence extends StandardFunc {
    * @throws QueryException query exception
    */
   private double number(final Item item, final boolean first) throws QueryException {
-    return item instanceof final Dec dec ? dec.round(0, mode(first)).dbl(info) : toDouble(item);
+    return item instanceof final Dec dec ? dec.round(0, mode(first)).dbl(info) :
+      toDouble(item, arg(first ? 1 : 2));
   }
 
   /**

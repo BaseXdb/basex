@@ -20,10 +20,11 @@ public final class FnParseInteger extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final byte[] value = toTokenOrNull(arg(0), qc);
-    final Item radix = arg(1).atomItem(qc, info);
+    final Expr radix = arg(1);
+    final Item rad = radix.atomItem(qc, info);
     if(value == null) return Empty.VALUE;
 
-    final long rdx = radix.isEmpty() ? 10 : toLong(radix);
+    final long rdx = rad.isEmpty() ? 10 : toLong(rad, radix);
     if(rdx < 2 || rdx > 36) throw INTRADIX_X.get(info, rdx);
 
     String string = Token.string(value).replaceAll("[_\\s]", "");

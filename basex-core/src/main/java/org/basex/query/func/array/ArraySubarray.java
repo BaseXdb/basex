@@ -23,10 +23,10 @@ public final class ArraySubarray extends ArrayFn {
     final long size = array.structSize();
     if(start < 0 || start > size) throw ARRAYBOUNDS_X_X.get(info, start + 1, size + 1);
 
-    final Item length = arg(2).atomItem(qc, info);
-    if(length.isEmpty()) return array.subArray(start, size - start, qc);
+    final Long length = toLongOrNull(arg(2), qc);
+    if(length == null) return array.subArray(start, size - start, qc);
 
-    final long len = toLong(length);
+    final long len = length;
     if(len < 0) throw ARRAYNEG_X.get(info, len);
     if(len > size - start) {
       final long index = len > Long.MAX_VALUE - 1 - start ? Long.MAX_VALUE : start + 1 + len;

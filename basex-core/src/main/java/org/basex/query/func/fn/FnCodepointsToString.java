@@ -34,12 +34,12 @@ public final class FnCodepointsToString extends StandardFunc {
     // current input is single item
     final Iter iter = values.atomIter(qc, info);
     final long size = iter.size();
-    if(size == 1) return Str.get(toCodepoint(toLong(iter.next()), info));
+    if(size == 1) return Str.get(toCodepoint(toLong(iter.next(), values), info));
 
     // handle arbitrary input
     final TokenBuilder tb = new TokenBuilder(Seq.initialCapacity(size));
     for(Item item; (item = qc.next(iter)) != null;) {
-      tb.add(toCodepoint(toLong(item), info));
+      tb.add(toCodepoint(toLong(item, values), info));
     }
     return Str.get(tb.finish());
   }
@@ -47,9 +47,10 @@ public final class FnCodepointsToString extends StandardFunc {
   @Override
   protected boolean ebv(final QueryContext qc) throws QueryException {
     if(!singleInt) {
-      final Item item = arg(0).atomIter(qc, info).next();
+      final Expr values = arg(0);
+      final Item item = values.atomIter(qc, info).next();
       if(item == null) return false;
-      toLong(item);
+      toLong(item, values);
     }
     return true;
   }

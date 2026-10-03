@@ -36,11 +36,11 @@ public final class FnCodepointEqual extends StandardFunc {
    * @throws QueryException query exception
    */
   private Boolean equal(final QueryContext qc) throws QueryException {
-    final Item value1 = arg(0).atomItem(qc, info);
-    if(value1.isEmpty()) return null;
-    final Item value2 = arg(1).atomItem(qc, info);
-    if(value2.isEmpty()) return null;
-    return eq(toToken(value1), toToken(value2));
+    final byte[] value1 = toTokenOrNull(arg(0), qc);
+    if(value1 == null) return null;
+    final byte[] value2 = toTokenOrNull(arg(1), qc);
+    if(value2 == null) return null;
+    return eq(value1, value2);
   }
 
   @Override

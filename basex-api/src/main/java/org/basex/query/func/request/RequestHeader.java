@@ -1,6 +1,7 @@
 package org.basex.query.func.request;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -21,8 +22,8 @@ public final class RequestHeader extends ApiFunc {
     final TokenList list = new TokenList(1);
     for(final String value : state(qc).headers(name)) list.add(value);
     if(list.isEmpty()) {
-      final Value dflt = arg(1).atomValue(qc, info);
-      for(final Item item : dflt) list.add(toToken(item));
+      final Expr dflt = arg(1);
+      for(final Item item : dflt.atomValue(qc, info)) list.add(toToken(item, dflt));
     }
     return StrSeq.get(list);
   }

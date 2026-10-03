@@ -6,6 +6,7 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -50,10 +51,11 @@ public class FnDocAvailable extends Docs {
 
     QueryInput qi = queryInput;
     if(qi == null) {
-      final Item source = arg(0).atomItem(qc, info);
-      if(source.isEmpty()) return Empty.VALUE;
-      qi = queryInput(toToken(source));
-      if(qi == null) throw INVDOC_X.get(info, source);
+      final Expr source = arg(0);
+      final Item uri = source.atomItem(qc, info);
+      if(uri.isEmpty()) return Empty.VALUE;
+      qi = queryInput(toToken(uri, source));
+      if(qi == null) throw INVDOC_X.get(info, uri);
     }
     return qc.resources.doc(qi, options, qc.user, info, false);
   }

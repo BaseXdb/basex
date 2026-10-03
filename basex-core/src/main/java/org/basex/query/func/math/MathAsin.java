@@ -16,7 +16,7 @@ import org.basex.query.value.seq.*;
 public final class MathAsin extends MathFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item value = arg(0).atomItem(qc, info);
-    return value.isEmpty() ? Empty.VALUE : Dbl.get(asin(toDouble(value)));
+    final Double value = toDoubleOrNull(arg(0), qc);
+    return value == null ? Empty.VALUE : Dbl.get(asin(value));
   }
 }

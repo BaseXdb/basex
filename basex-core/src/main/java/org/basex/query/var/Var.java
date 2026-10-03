@@ -200,7 +200,7 @@ public final class Var extends ExprInfo {
    * @throws QueryException query exception
    */
   public Expr checked(final Expr expr, final CompileContext cc) throws QueryException {
-    return declType != null ? new TypeCheck(info, expr, declType).optimize(cc) : expr;
+    return declType != null ? new TypeCheck(info, expr, declType, name).optimize(cc) : expr;
   }
 
   /**

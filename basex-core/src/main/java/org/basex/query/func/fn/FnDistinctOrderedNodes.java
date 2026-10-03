@@ -21,20 +21,22 @@ import org.basex.query.value.type.*;
 public final class FnDistinctOrderedNodes extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Iter nodes = arg(0).iter(qc);
-    final Value value = nodes.eagerValue();
+    final Expr nodes = arg(0);
+    final Iter iter = nodes.iter(qc);
+    final Value value = iter.eagerValue();
     if(value instanceof DBNodeSeq) return value;
 
     final GNodeBuilder nb = new GNodeBuilder();
-    for(Item item; (item = qc.next(nodes)) != null;) nb.add(toGNode(item));
+    for(Item item; (item = qc.next(iter)) != null;) nb.add(toGNode(item, nodes));
     return nb.value(this);
   }
 
   @Override
   protected boolean ebv(final QueryContext qc) throws QueryException {
-    final Item item = arg(0).iter(qc).next();
+    final Expr nodes = arg(0);
+    final Item item = nodes.iter(qc).next();
     if(item == null) return false;
-    toGNode(item);
+    toGNode(item, nodes);
     return true;
   }
 

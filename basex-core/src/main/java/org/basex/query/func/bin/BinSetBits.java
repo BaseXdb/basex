@@ -3,6 +3,7 @@ package org.basex.query.func.bin;
 import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -24,9 +25,10 @@ public final class BinSetBits extends StandardFunc {
     final boolean set = toBoolean(arg(2), qc);
     final byte[] tmp = value.binary(info).clone();
     final long bits = tmp.length * 8L;
-    final Iter indices = arg(1).atomIter(qc, info);
-    for(Item item; (item = qc.next(indices)) != null;) {
-      final long index = toLong(item);
+    final Expr indices = arg(1);
+    final Iter iter = indices.atomIter(qc, info);
+    for(Item item; (item = qc.next(iter)) != null;) {
+      final long index = toLong(item, indices);
       if(index < 0 || index >= bits) throw BIN_IOOR_X_X.get(info, index, bits);
       final int i = (int) index, mask = 0x80 >>> (i & 7);
       if(set) tmp[i >>> 3] |= mask;

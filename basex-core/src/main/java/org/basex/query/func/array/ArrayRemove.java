@@ -18,24 +18,25 @@ public final class ArrayRemove extends ArrayFn {
   @Override
   public XQArray value(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
-    final Value positions = arg(1).atomValue(qc, info);
+    final Expr positions = arg(1);
+    final Value pos = positions.atomValue(qc, info);
 
     // collect and sort positions and remove duplicates
-    final LongList list = new LongList(positions.size());
-    for(final Item item : positions) list.add(toPos(array, toLong(item), false));
+    final LongList list = new LongList(pos.size());
+    for(final Item item : pos) list.add(toPos(array, toLong(item, positions), false));
     list.ddo();
 
     // delete entries backwards
     XQArray arr = array;
     for(int l = list.size() - 1; l >= 0; l--) {
-      final long pos = list.get(l), size = arr.structSize();
-      final boolean first = pos == 0, last = pos == size - 1;
+      final long p = list.get(l), size = arr.structSize();
+      final boolean first = p == 0, last = p == size - 1;
       if(first || last) {
         // remove first or last member
         arr = arr.subArray(first ? 1 : 0, size - 1, qc);
       } else {
         // remove member at supplied position
-        arr = arr.removeMember(pos, qc);
+        arr = arr.removeMember(p, qc);
       }
     }
     return arr;

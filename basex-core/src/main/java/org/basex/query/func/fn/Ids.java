@@ -8,6 +8,7 @@ import java.util.*;
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.expr.index.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
@@ -40,15 +41,16 @@ abstract class Ids extends ContextFn {
    * @throws QueryException query exception
    */
   private Value ids(final QueryContext qc) throws QueryException {
-    final Iter values = arg(0).atomIter(qc, info);
+    final Expr values = arg(0);
+    final Iter ir = values.atomIter(qc, info);
     final XNode node = toNodeOrNull(arg(1), qc);
 
     final XNode root = (node != null ? node : toNode(context(qc), qc)).root();
     if(root.kind() != Kind.DOCUMENT) throw IDDOC.get(info);
 
     final TokenSet idSet = new TokenSet();
-    for(Item ids; (ids = qc.next(values)) != null;) {
-      for(final byte[] id : distinctTokens(toToken(ids))) {
+    for(Item ids; (ids = qc.next(ir)) != null;) {
+      for(final byte[] id : distinctTokens(toToken(ids, values))) {
         if(XMLToken.isNCName(id)) idSet.put(id);
       }
     }

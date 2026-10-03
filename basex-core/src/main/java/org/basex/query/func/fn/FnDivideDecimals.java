@@ -5,6 +5,7 @@ import static org.basex.query.QueryError.*;
 import java.math.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -21,11 +22,12 @@ public final class FnDivideDecimals extends StandardFunc {
   public XQMap value(final QueryContext qc) throws QueryException {
     final BigDecimal value = checkType(arg(0), BasicType.DECIMAL, qc).dec(info);
     final BigDecimal divisor = checkType(arg(1), BasicType.DECIMAL, qc).dec(info);
-    final Item precision = arg(2).atomItem(qc, info);
+    final Expr precision = arg(2);
+    final Item prec = precision.atomItem(qc, info);
     if(divisor.signum() == 0) throw DIVZERO_X.get(info, value);
 
-    final int scale = precision.isEmpty() ? 0 : (int) Math.max(-1 << 20,
-        Math.min(1 << 20, toLong(precision)));
+    final int scale = prec.isEmpty() ? 0 : (int) Math.max(-1 << 20,
+        Math.min(1 << 20, toLong(prec, precision)));
     final BigDecimal quotient = value.divide(divisor, scale, RoundingMode.DOWN);
     final BigDecimal remainder = value.subtract(quotient.multiply(divisor));
     return XQMap.get(Records.DIVISION.get(), Dec.get(quotient), Dec.get(remainder));

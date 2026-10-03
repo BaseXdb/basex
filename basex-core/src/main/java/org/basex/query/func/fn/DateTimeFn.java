@@ -33,11 +33,12 @@ abstract class DateTimeFn extends StandardFunc {
    * @throws QueryException query exception
    */
   final Item adjust(final BasicType type, final QueryContext qc) throws QueryException {
-    final Item value = arg(0).atomItem(qc, info);
+    final Expr value = arg(0);
+    final Item item = value.atomItem(qc, info);
     final Item zone = arg(1).atomItem(qc, info);
-    if(value.isEmpty()) return Empty.VALUE;
+    if(item.isEmpty()) return Empty.VALUE;
 
-    final ADate date = toDate(value, type, qc);
+    final ADate date = toDate(item, type, value, qc);
     final boolean empty = zone.isEmpty(), undefined = defined(1) && empty;
     // without a zone argument, the implicit timezone of the query is assigned
     final DTDur dur = !empty ? (DTDur) checkType(zone, DAY_TIME_DURATION, qc) :

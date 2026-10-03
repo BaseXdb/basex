@@ -18,12 +18,12 @@ public final class FnFormatInteger extends StandardFunc {
 
   @Override
   public Str value(final QueryContext qc) throws QueryException {
-    final Item value = arg(0).atomItem(qc, info);
+    final Long value = toLongOrNull(arg(0), qc);
     final byte[] picture = toToken(arg(1), qc);
     final byte[] language = toZeroToken(arg(2), qc);
-    if(value.isEmpty()) return Str.EMPTY;
+    if(value == null) return Str.EMPTY;
 
-    final long number = toLong(value);
+    final long number = value;
     IntFormat format;
 
     synchronized(formats) {

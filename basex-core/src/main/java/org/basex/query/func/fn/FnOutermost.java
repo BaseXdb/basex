@@ -30,11 +30,12 @@ public class FnOutermost extends StandardFunc {
    * @throws QueryException query exception
    */
   final Iter iter(final boolean outer, final QueryContext qc) throws QueryException {
-    final Iter nodes = arg(0).iter(qc);
+    final Expr nodes = arg(0);
+    final Iter ir = nodes.iter(qc);
 
     final GNodeBuilder list = new GNodeBuilder();
-    for(Item item; (item = qc.next(nodes)) != null;) {
-      list.add(toGNode(item));
+    for(Item item; (item = qc.next(ir)) != null;) {
+      list.add(toGNode(item, nodes));
     }
     list.ddo();
 

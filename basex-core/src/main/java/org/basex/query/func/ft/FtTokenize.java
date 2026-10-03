@@ -37,11 +37,12 @@ public class FtTokenize extends StandardFunc {
    * @throws QueryException query exception
    */
   protected final TokenList tokens(final QueryContext qc, final boolean all) throws QueryException {
-    final Item value = arg(0).atomItem(qc, info);
+    final Expr value = arg(0);
+    final Item item = value.atomItem(qc, info);
     final FtLexerOptions options = options(1, FtLexerOptions::new, qc);
 
     final TokenList tl = new TokenList();
-    if(!value.isEmpty()) {
+    if(!item.isEmpty()) {
       final FTOpt opt = new FTOpt().assign(qc.ftOpt());
       final FTDiacritics dc = options.get(FtLexerOptions.DIACRITICS);
       if(dc != null) opt.set(DC, dc == FTDiacritics.SENSITIVE);
@@ -52,7 +53,7 @@ public class FtTokenize extends StandardFunc {
       final FTCase cs = options.get(FtLexerOptions.CASE);
       if(cs != null) opt.cs = cs;
 
-      final FTLexer lexer = new FTLexer(opt).init(toToken(value));
+      final FTLexer lexer = new FTLexer(opt).init(toToken(item, value));
       if(all) lexer.all();
       while(lexer.hasNext()) tl.add(lexer.nextToken());
     }

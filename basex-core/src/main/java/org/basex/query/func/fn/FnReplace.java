@@ -4,9 +4,11 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.util.*;
+import java.util.List;
 import java.util.regex.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.regex.*;
 import org.basex.query.value.*;
@@ -34,12 +36,14 @@ public final class FnReplace extends RegExFn {
   public Str value(final QueryContext qc) throws QueryException {
     final byte[] value = toZeroToken(arg(0), qc);
     final byte[] pattern = toToken(arg(1), qc);
-    final Item replacement = arg(2).unwrappedItem(qc, info);
+    final Expr replacement = arg(2);
+    final Item rep = replacement.unwrappedItem(qc, info);
     final byte[] flags = toZeroToken(arg(3), qc);
 
-    final boolean func = replacement instanceof FItem;
-    final FItem action = func ? toFunction(replacement, 2, qc) : null;
-    final byte[] replace = func ? null : replacement.isEmpty() ? EMPTY : toToken(replacement);
+    final boolean func = rep instanceof FItem;
+    final FItem action = func ? toFunction(rep, 2, qc) : null;
+    final byte[] replace = func ? null : rep.isEmpty() ? EMPTY :
+      toToken(rep, replacement);
 
     // shortcut for literal replacements
     if(!func) {

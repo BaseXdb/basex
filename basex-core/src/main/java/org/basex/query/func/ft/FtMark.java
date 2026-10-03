@@ -37,10 +37,10 @@ public class FtMark extends StandardFunc {
    * @throws QueryException query exception
    */
   final Iter mark(final QueryContext qc, final boolean extract) throws QueryException {
-    final Item name = arg(1).atomItem(qc, info);
+    final byte[] name = toTokenOrNull(arg(1), qc);
     final Long length = toLongOrNull(arg(2), qc);
 
-    final byte[] m = name.isEmpty() ? MARK : toToken(name);
+    final byte[] m = name != null ? name : MARK;
     if(!XMLToken.isNCName(m)) throw valueError(BasicType.NCNAME, m, info);
     final int l = length != null ? (int) Math.min(Integer.MAX_VALUE, length) :
       extract ? 150 : Integer.MAX_VALUE;

@@ -46,10 +46,11 @@ public final class FnItemsAt extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item evalItem(final QueryContext qc) throws QueryException {
-    final Item at = arg(1).atomItem(qc, info);
-    if(!at.isEmpty()) {
+    final Expr at = arg(1);
+    final Item pos = at.atomItem(qc, info);
+    if(!pos.isEmpty()) {
       // retrieve (possibly invalid) position
-      final double d = toDouble(at) - 1;
+      final double d = toDouble(pos, at) - 1;
       long l = (long) d;
       if(l >= 0 && d == l) {
         // retrieve single item
@@ -86,7 +87,8 @@ public final class FnItemsAt extends StandardFunc {
    */
   private Iter evalIter(final QueryContext qc) throws QueryException {
     final Value input = arg(0).value(qc);
-    final Iter at = arg(1).atomIter(qc, info);
+    final Expr at = arg(1);
+    final Iter iter = at.atomIter(qc, info);
     // hidden option, indicates whether the positions are sorted
     final boolean sorted = toBooleanOrFalse(arg(2), qc);
 
@@ -95,8 +97,8 @@ public final class FnItemsAt extends StandardFunc {
 
       @Override
       public Item next() throws QueryException {
-        for(Item item; (item = qc.next(at)) != null;) {
-          final double d = toDouble(item) - 1;
+        for(Item item; (item = qc.next(iter)) != null;) {
+          final double d = toDouble(item, at) - 1;
           final long l = (long) d;
           if(l < size) {
             if(l >= 0 && d == l) return input.itemAt(l);

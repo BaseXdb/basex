@@ -25,8 +25,9 @@ abstract class FormatFn extends StandardFunc {
    * @throws QueryException query exception
    */
   final Item formatDate(final BasicType tp, final QueryContext qc) throws QueryException {
-    final Item value = arg(0).atomItem(qc, info);
-    if(value.isEmpty()) return Empty.VALUE;
+    final Expr value = arg(0);
+    final Item item = value.atomItem(qc, info);
+    if(item.isEmpty()) return Empty.VALUE;
 
     final byte[] picture = toZeroToken(arg(1), qc);
     final byte[] language = toZeroToken(arg(2), qc);
@@ -34,7 +35,7 @@ abstract class FormatFn extends StandardFunc {
     if(calendar != null) calendar = trim(calendar);
     final byte[] place = toZeroToken(arg(4), qc);
 
-    final ADate date = toDate(value, tp, qc);
+    final ADate date = toDate(item, tp, value, qc);
     final Formatter form = Formatter.get(language);
     return Str.get(form.formatDate(date, language, picture, calendar, place, info));
   }

@@ -15,10 +15,8 @@ import org.basex.query.value.type.*;
 public final class FnTimezoneFromTime extends DateTimeFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item value = arg(0).atomItem(qc, info);
-    if(value.isEmpty()) return Empty.VALUE;
-
-    return zon(toDate(value, BasicType.TIME, qc));
+    final ADate value = toDateOrNull(arg(0), BasicType.TIME, qc);
+    return value == null ? Empty.VALUE : zon(value);
   }
 
   @Override

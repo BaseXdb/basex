@@ -312,7 +312,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final byte[] toToken(final Expr expr, final QueryContext qc) throws QueryException {
-    return toToken(toAtomItem(expr, qc));
+    return toToken(toAtomItem(expr, qc), expr);
   }
 
   /**
@@ -324,7 +324,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final byte[] toZeroToken(final Expr expr, final QueryContext qc) throws QueryException {
     final Item item = expr.atomItem(qc, info);
-    return item.isEmpty() ? Token.EMPTY : toToken(item);
+    return item.isEmpty() ? Token.EMPTY : toToken(item, expr);
   }
 
   /**
@@ -337,7 +337,7 @@ public abstract class ParseExpr extends Expr {
   protected final byte[] toTokenOrNull(final Expr expr, final QueryContext qc)
       throws QueryException {
     final Item item = expr.atomItem(qc, info);
-    return item.isEmpty() ? null : toToken(item);
+    return item.isEmpty() ? null : toToken(item, expr);
   }
 
   /**
@@ -347,9 +347,20 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final byte[] toToken(final Item item) throws QueryException {
+    return toToken(item, (Expr) null);
+  }
+
+  /**
+   * Converts an item to a token.
+   * @param item item to be converted
+   * @param expr expression that yielded the item (can be {@code null})
+   * @return token
+   * @throws QueryException query exception
+   */
+  protected final byte[] toToken(final Item item, final Expr expr) throws QueryException {
     final Type type = item.type;
     if(type.isStringOrUntyped()) return item.string(info);
-    throw item instanceof FItem ? FIATOMIZE_X.get(info, item) : typeError(item, STRING, info);
+    throw item instanceof FItem ? FIATOMIZE_X.get(info, item) : argTypeError(item, STRING, expr);
   }
 
   /**
@@ -375,6 +386,17 @@ public abstract class ParseExpr extends Expr {
 
   /**
    * Evaluates an expression to a string.
+   * @param item item to be converted
+   * @param expr expression that yielded the item (can be {@code null})
+   * @return string
+   * @throws QueryException query exception
+   */
+  protected final String toString(final Item item, final Expr expr) throws QueryException {
+    return Token.string(toToken(item, expr));
+  }
+
+  /**
+   * Evaluates an expression to a string.
    * @param expr expression
    * @param qc query context
    * @return string (zero-length if the expression yields an empty sequence)
@@ -383,7 +405,7 @@ public abstract class ParseExpr extends Expr {
   protected final String toZeroString(final Expr expr, final QueryContext qc)
       throws QueryException {
     final Item item = expr.atomItem(qc, info);
-    return item.isEmpty() ? "" : toString(item);
+    return item.isEmpty() ? "" : toString(item, expr);
   }
 
   /**
@@ -396,7 +418,7 @@ public abstract class ParseExpr extends Expr {
   protected final String toStringOrNull(final Expr expr, final QueryContext qc)
       throws QueryException {
     final Item item = expr.atomItem(qc, info);
-    return item.isEmpty() ? null : toString(item);
+    return item.isEmpty() ? null : toString(item, expr);
   }
 
   /**
@@ -407,7 +429,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final boolean toBoolean(final Expr expr, final QueryContext qc) throws QueryException {
-    return toBoolean(expr.atomItem(qc, info));
+    return toBoolean(expr.atomItem(qc, info), expr);
   }
 
   /**
@@ -420,7 +442,20 @@ public abstract class ParseExpr extends Expr {
   protected final boolean toBooleanOrFalse(final Expr expr, final QueryContext qc)
       throws QueryException {
     final Item item = expr.atomItem(qc, info);
-    return !item.isEmpty() && toBoolean(item);
+    return !item.isEmpty() && toBoolean(item, expr);
+  }
+
+  /**
+   * Evaluates an expression to a boolean.
+   * @param expr expression
+   * @param qc query context
+   * @return boolean, or {@code null} if the expression yields an empty sequence
+   * @throws QueryException query exception
+   */
+  protected final Boolean toBooleanOrNull(final Expr expr, final QueryContext qc)
+      throws QueryException {
+    final Item item = expr.atomItem(qc, info);
+    return item.isEmpty() ? null : toBoolean(item, expr);
   }
 
   /**
@@ -430,10 +465,21 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final boolean toBoolean(final Item item) throws QueryException {
+    return toBoolean(item, (Expr) null);
+  }
+
+  /**
+   * Converts an item to a boolean.
+   * @param item item to be converted
+   * @param expr expression that yielded the item (can be {@code null})
+   * @return boolean
+   * @throws QueryException query exception
+   */
+  protected final boolean toBoolean(final Item item, final Expr expr) throws QueryException {
     final Type type = item.type;
     if(type == BOOLEAN) return item.bool(info);
     if(type.isUntyped()) return Bln.parse(item, info);
-    throw typeError(item, BOOLEAN, info);
+    throw argTypeError(item, BOOLEAN, expr);
   }
 
   /**
@@ -444,7 +490,20 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final double toDouble(final Expr expr, final QueryContext qc) throws QueryException {
-    return toDouble(expr.atomItem(qc, info));
+    return toDouble(expr.atomItem(qc, info), expr);
+  }
+
+  /**
+   * Evaluates an expression to a double number.
+   * @param expr expression
+   * @param qc query context
+   * @return double, or {@code null} if the expression yields an empty sequence
+   * @throws QueryException query exception
+   */
+  protected final Double toDoubleOrNull(final Expr expr, final QueryContext qc)
+      throws QueryException {
+    final Item item = expr.atomItem(qc, info);
+    return item.isEmpty() ? null : toDouble(item, expr);
   }
 
   /**
@@ -454,8 +513,19 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final double toDouble(final Item item) throws QueryException {
+    return toDouble(item, (Expr) null);
+  }
+
+  /**
+   * Converts an item to a double number.
+   * @param item item
+   * @param expr expression that yielded the item (can be {@code null})
+   * @return double
+   * @throws QueryException query exception
+   */
+  protected final double toDouble(final Item item, final Expr expr) throws QueryException {
     if(item.type.isNumberOrUntyped()) return item.dbl(info);
-    throw numberError(this, item);
+    throw argTypeError(item, NUMERIC, expr);
   }
 
   /**
@@ -468,7 +538,7 @@ public abstract class ParseExpr extends Expr {
   protected final ANum toNumberOrNull(final Expr expr, final QueryContext qc)
       throws QueryException {
     final Item item = expr.atomItem(qc, info);
-    return item.isEmpty() ? null : toNumber(item);
+    return item.isEmpty() ? null : toNumber(item, expr);
   }
 
   /**
@@ -478,9 +548,20 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final ANum toNumber(final Item item) throws QueryException {
+    return toNumber(item, null);
+  }
+
+  /**
+   * Converts an item to a number.
+   * @param item item to be converted
+   * @param expr expression that yielded the item (can be {@code null})
+   * @return number
+   * @throws QueryException query exception
+   */
+  protected final ANum toNumber(final Item item, final Expr expr) throws QueryException {
     if(item.type.isUntyped()) return Dbl.get(item.dbl(info));
     if(item instanceof final ANum num) return num;
-    throw numberError(this, item);
+    throw argTypeError(item, NUMERIC, expr);
   }
 
   /**
@@ -493,7 +574,7 @@ public abstract class ParseExpr extends Expr {
   protected final float toFloat(final Expr expr, final QueryContext qc) throws QueryException {
     final Item item = expr.atomItem(qc, info);
     if(item.type.isNumberOrUntyped()) return item.flt(info);
-    throw numberError(this, item);
+    throw argTypeError(item, NUMERIC, expr);
   }
 
   /**
@@ -504,7 +585,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final long toLong(final Expr expr, final QueryContext qc) throws QueryException {
-    return toLong(expr.atomItem(qc, info));
+    return toLong(expr.atomItem(qc, info), expr);
   }
 
   /**
@@ -516,7 +597,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final Long toLongOrNull(final Expr expr, final QueryContext qc) throws QueryException {
     final Item item = expr.atomItem(qc, info);
-    return item.isEmpty() ? null : toLong(item);
+    return item.isEmpty() ? null : toLong(item, expr);
   }
 
   /**
@@ -526,13 +607,24 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final long toLong(final Item item) throws QueryException {
+    return toLong(item, (Expr) null);
+  }
+
+  /**
+   * Converts an item to a long number.
+   * @param item item to be converted
+   * @param expr expression that yielded the item (can be {@code null})
+   * @return long number
+   * @throws QueryException query exception
+   */
+  protected final long toLong(final Item item, final Expr expr) throws QueryException {
     final Type type = item.type;
     if(type.instanceOf(INTEGER) || type.isUntyped()) return item.itr(info);
     if(type == DECIMAL) {
       final long l = item.itr(info);
       if(item.dbl(info) == l) return l;
     }
-    throw typeError(item, INTEGER, info);
+    throw argTypeError(item, INTEGER, expr);
   }
 
   /**
@@ -559,7 +651,7 @@ public abstract class ParseExpr extends Expr {
   protected final GNode toGNodeOrNull(final Expr expr, final QueryContext qc)
       throws QueryException {
     final Item item = expr.item(qc, info);
-    return item.isEmpty() ? null : toGNode(item);
+    return item.isEmpty() ? null : toGNode(item, expr);
   }
 
   /**
@@ -569,8 +661,19 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final GNode toGNode(final Item item) throws QueryException {
+    return toGNode(item, null);
+  }
+
+  /**
+   * Converts an item to a GNode.
+   * @param item item to be converted
+   * @param expr expression that yielded the item (can be {@code null})
+   * @return GNode
+   * @throws QueryException query exception
+   */
+  protected final GNode toGNode(final Item item, final Expr expr) throws QueryException {
     if(item instanceof final GNode node) return node;
-    throw typeError(item, NODE, info);
+    throw argTypeError(item, NODE, expr);
   }
 
   /**
@@ -583,7 +686,7 @@ public abstract class ParseExpr extends Expr {
   protected final JNode toJNodeOrNull(final Expr expr, final QueryContext qc)
       throws QueryException {
     final Item item = expr.item(qc, info);
-    return item.isEmpty() ? null : toJNode(item);
+    return item.isEmpty() ? null : toJNode(item, expr);
   }
 
   /**
@@ -593,8 +696,19 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final JNode toJNode(final Item item) throws QueryException {
+    return toJNode(item, null);
+  }
+
+  /**
+   * Converts an item to a JNode.
+   * @param item item
+   * @param expr expression that yielded the item (can be {@code null})
+   * @return JNode
+   * @throws QueryException query exception
+   */
+  protected final JNode toJNode(final Item item, final Expr expr) throws QueryException {
     if(item instanceof final JNode node) return node;
-    throw typeError(item, JNODE, info);
+    throw argTypeError(item, JNODE, expr);
   }
 
   /**
@@ -605,7 +719,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final XNode toNode(final Expr expr, final QueryContext qc) throws QueryException {
-    return toNode(expr.unwrappedItem(qc, info));
+    return toNode(expr.unwrappedItem(qc, info), expr);
   }
 
   /**
@@ -617,7 +731,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final XNode toNodeOrNull(final Expr expr, final QueryContext qc) throws QueryException {
     final Item item = expr.unwrappedItem(qc, info);
-    return item.isEmpty() ? null : toNode(item);
+    return item.isEmpty() ? null : toNode(item, expr);
   }
 
   /**
@@ -627,8 +741,19 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final XNode toNode(final Item item) throws QueryException {
+    return toNode(item, (Expr) null);
+  }
+
+  /**
+   * Converts an item to a node.
+   * @param item item to be converted
+   * @param expr expression that yielded the item (can be {@code null})
+   * @return node
+   * @throws QueryException query exception
+   */
+  protected final XNode toNode(final Item item, final Expr expr) throws QueryException {
     if(item instanceof final XNode node) return node;
-    throw typeError(item, XNODE, info);
+    throw argTypeError(item, XNODE, expr);
   }
 
   /**
@@ -640,7 +765,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final Item toAtomItem(final Expr expr, final QueryContext qc) throws QueryException {
     final Item item = expr.atomItem(qc, info);
-    if(item == Empty.VALUE) throw typeError(item, ITEM, info);
+    if(item == Empty.VALUE) throw argTypeError(item, ITEM, expr);
     return item;
   }
 
@@ -652,7 +777,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final XNode toElem(final Expr expr, final QueryContext qc) throws QueryException {
-    return (XNode) checkType(expr.unwrappedItem(qc, info), ELEMENT);
+    return (XNode) checkType(expr.unwrappedItem(qc, info), ELEMENT, expr);
   }
 
   /**
@@ -772,7 +897,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final QNm toQNmOrNull(final Expr expr, final QueryContext qc) throws QueryException {
     final Item item = expr.atomItem(qc, info);
-    return item.isEmpty() ? null : toQNm(item);
+    return item.isEmpty() ? null : toQNm(item, expr);
   }
 
   /**
@@ -782,10 +907,21 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final QNm toQNm(final Item item) throws QueryException {
+    return toQNm(item, null);
+  }
+
+  /**
+   * Converts an item to a QName.
+   * @param item item
+   * @param expr expression that yielded the item (can be {@code null})
+   * @return QName
+   * @throws QueryException query exception
+   */
+  protected final QNm toQNm(final Item item, final Expr expr) throws QueryException {
     final Type type = item.type;
     if(type == QNAME) return (QNm) item;
     if(type.isUntyped()) throw NSSENS_X_X.get(info, type, QNAME);
-    throw typeError(item, QNAME, info);
+    throw argTypeError(item, QNAME, expr);
   }
 
   /**
@@ -796,7 +932,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final FItem toFunction(final Expr expr, final QueryContext qc) throws QueryException {
-    return (FItem) checkType(expr.unwrappedItem(qc, info), Types.FUNCTION);
+    return (FItem) checkType(expr.unwrappedItem(qc, info), Types.FUNCTION, expr);
   }
 
   /**
@@ -807,7 +943,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final XQMap toMap(final Expr expr, final QueryContext qc) throws QueryException {
-    return toMap(expr.unwrappedItem(qc, info));
+    return toMap(expr.unwrappedItem(qc, info), expr);
   }
 
   /**
@@ -817,8 +953,19 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final XQMap toMap(final Item item) throws QueryException {
+    return toMap(item, (Expr) null);
+  }
+
+  /**
+   * Converts an item to a map.
+   * @param item item to check
+   * @param expr expression that yielded the item (can be {@code null})
+   * @return map
+   * @throws QueryException query exception
+   */
+  protected final XQMap toMap(final Item item, final Expr expr) throws QueryException {
     if(item instanceof final XQMap map) return map;
-    throw typeError(item, Types.MAP, info);
+    throw argTypeError(item, Types.MAP, expr);
   }
 
   /**
@@ -857,7 +1004,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final XQArray toArray(final Expr expr, final QueryContext qc) throws QueryException {
-    return toArray(expr.unwrappedItem(qc, info));
+    return toArray(expr.unwrappedItem(qc, info), expr);
   }
 
   /**
@@ -867,8 +1014,19 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final XQArray toArray(final Item item) throws QueryException {
+    return toArray(item, (Expr) null);
+  }
+
+  /**
+   * Converts an item to an array.
+   * @param item item to check
+   * @param expr expression that yielded the item (can be {@code null})
+   * @return array
+   * @throws QueryException query exception
+   */
+  protected final XQArray toArray(final Item item, final Expr expr) throws QueryException {
     if(item instanceof final XQArray array) return array;
-    throw typeError(item, Types.ARRAY, info);
+    throw argTypeError(item, Types.ARRAY, expr);
   }
 
   /**
@@ -892,7 +1050,32 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final Item checkType(final Item item, final Type type) throws QueryException {
+    return checkType(item, type, null);
+  }
+
+  /**
+   * Returns an item if it has the specified type.
+   * @param item item
+   * @param type expected type
+   * @param expr expression that yielded the item (can be {@code null})
+   * @return item
+   * @throws QueryException query exception
+   */
+  protected final Item checkType(final Item item, final Type type, final Expr expr)
+      throws QueryException {
     if(item.type.instanceOf(type)) return item;
-    throw typeError(item, type, info);
+    throw argTypeError(item, type, expr);
+  }
+
+  /**
+   * Returns a type exception for an item that does not have the expected type.
+   * @param item item
+   * @param type expected type
+   * @param expr expression that yielded the item (can be {@code null})
+   * @return query exception
+   */
+  protected QueryException argTypeError(final Item item, final Type type,
+      @SuppressWarnings("unused") final Expr expr) {
+    return type == NUMERIC ? numberError(this, item) : typeError(item, type, info);
   }
 }

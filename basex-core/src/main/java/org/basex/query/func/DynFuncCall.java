@@ -102,8 +102,10 @@ public final class DynFuncCall extends FuncCall {
         if(nargs != arity) throw arityError(func, nargs, arity, false, info);
         // keys of maps and arrays are atomized and checked by the lookup itself
         if(!struct) {
+          final XQFunctionExpr fe = func instanceof final XQFunctionExpr xfe ? xfe : null;
           for(int a = 0; a < arity; a++) {
-            exprs[a] = new TypeCheck(info, exprs[a], ft.argTypes[a]).compile(cc);
+            final QNm name = fe != null ? fe.paramName(a) : null;
+            exprs[a] = new TypeCheck(info, exprs[a], ft.argTypes[a], name).compile(cc);
           }
         }
       }

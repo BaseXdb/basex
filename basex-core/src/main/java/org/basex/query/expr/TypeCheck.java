@@ -21,6 +21,8 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 public final class TypeCheck extends Single {
+  /** Name of the checked variable (can be {@code null}). */
+  private final QNm name;
   /** Cardinality check. */
   private boolean cardinality;
 
@@ -31,7 +33,19 @@ public final class TypeCheck extends Single {
    * @param seqType target type
    */
   public TypeCheck(final InputInfo info, final Expr expr, final SeqType seqType) {
+    this(info, expr, seqType, null);
+  }
+
+  /**
+   * Constructor.
+   * @param info input info (can be {@code null})
+   * @param expr expression to be promoted
+   * @param seqType target type
+   * @param name name of the checked variable (can be {@code null})
+   */
+  public TypeCheck(final InputInfo info, final Expr expr, final SeqType seqType, final QNm name) {
     super(info, expr, seqType);
+    this.name = name;
   }
 
   @Override
@@ -67,7 +81,7 @@ public final class TypeCheck extends Single {
           cc.info(OPTTYPE_X_X, st, expr);
           return expr;
         }
-        throw typeError(expr, st, info);
+        throw typeError(expr, st, name, info);
       }
       // refine result type:
       //   INTEGERS coerce to item() → INTEGERS coerce to xs:integer
@@ -80,7 +94,7 @@ public final class TypeCheck extends Single {
     // remove redundant type check
     if(expr instanceof final TypeCheck tc && st.instanceOf(et)) {
       // (EXPR coerce to xs:integer) coerce to xs:int → EXPR coerce to xs:int
-      return cc.replaceWith(this, new TypeCheck(info, tc.expr, st).optimize(cc));
+      return cc.replaceWith(this, new TypeCheck(info, tc.expr, st, name).optimize(cc));
     }
 
     // skip check if return type is correct
@@ -92,7 +106,7 @@ public final class TypeCheck extends Single {
 
     // function item coercion
     if(expr instanceof final FuncItem fi && type instanceof final FuncType ft) {
-      if(!st.occ.check(1)) throw typeError(fi, st, info);
+      if(!st.occ.check(1)) throw typeError(fi, st, name, info);
       return cc.replaceWith(this, fi.coerceTo(ft, cc.qc, cc, info));
     }
 
@@ -116,11 +130,11 @@ public final class TypeCheck extends Single {
 
     // only check occurrence indicator
     if(cardinality) {
-      if(!st.occ.check(value.size())) throw typeError(value, st, info);
+      if(!st.occ.check(value.size())) throw typeError(value, st, name, info);
       return value;
     }
     // ignore type of result returned by tail call function
-    return qc.tcFunc != null ? value : st.coerce(value, qc, info);
+    return qc.tcFunc != null ? value : st.coerce(value, qc, info, name, null);
   }
 
   @Override
@@ -148,7 +162,7 @@ public final class TypeCheck extends Single {
   public Expr check(final Expr ex, final SeqType st, final CompileContext cc) {
     if(ex.seqType().instanceOf(st, true)) return null;
     try {
-      return new TypeCheck(info, ex, st).optimize(cc);
+      return new TypeCheck(info, ex, st, name).optimize(cc);
     } catch(final QueryException qe) {
       // the checked expression may never be evaluated: raise the error at runtime
       return FnError.get(qe);
@@ -157,7 +171,7 @@ public final class TypeCheck extends Single {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
-    final TypeCheck ex = copyType(new TypeCheck(info, expr.copy(cc, vm), seqType()));
+    final TypeCheck ex = copyType(new TypeCheck(info, expr.copy(cc, vm), seqType(), name));
     ex.cardinality = cardinality;
     return ex;
   }

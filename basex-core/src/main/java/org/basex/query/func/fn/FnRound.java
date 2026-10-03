@@ -46,10 +46,10 @@ public class FnRound extends NumericFn {
    */
   final Item round(final QueryContext qc, final RoundMode mode) throws QueryException {
     final ANum value = toNumberOrNull(arg(0), qc);
-    final Item precision = arg(1).atomItem(qc, info);
+    final Long precision = toLongOrNull(arg(1), qc);
 
-    final int scale = precision.isEmpty() ? 0 : (int) Math.max(-1 << 20,
-        Math.min(1 << 20, toLong(precision)));
+    final int scale = precision == null ? 0 : (int) Math.max(-1 << 20,
+        Math.min(1 << 20, precision));
     return value == null ? Empty.VALUE : value.round(scale, mode);
   }
 

@@ -47,9 +47,10 @@ public class FnCollection extends Docs {
     // return default collection or parse specified collection
     QueryInput qi = queryInput;
     if(qi == null) {
-      final Item uri = arg(0).atomItem(qc, info);
+      final Expr source = arg(0);
+      final Item uri = source.atomItem(qc, info);
       if(!uri.isEmpty()) {
-        qi = queryInput(toToken(uri));
+        qi = queryInput(toToken(uri, source));
         if(qi == null) throw INVCOLL_X.get(info, uri);
       }
     }

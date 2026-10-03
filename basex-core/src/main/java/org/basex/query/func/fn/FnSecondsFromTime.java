@@ -15,9 +15,7 @@ import org.basex.query.value.type.*;
 public final class FnSecondsFromTime extends DateTimeFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item value = arg(0).atomItem(qc, info);
-    if(value.isEmpty()) return Empty.VALUE;
-
-    return Dec.get(toDate(value, BasicType.TIME, qc).seconds());
+    final ADate value = toDateOrNull(arg(0), BasicType.TIME, qc);
+    return value == null ? Empty.VALUE : Dec.get(value.seconds());
   }
 }

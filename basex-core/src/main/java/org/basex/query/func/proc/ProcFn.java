@@ -10,6 +10,7 @@ import org.basex.core.jobs.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.convert.*;
 import org.basex.query.value.*;
@@ -35,7 +36,8 @@ abstract class ProcFn extends StandardFunc {
     // arguments
     final String command = toString(arg(0), qc);
     final StringList args = new StringList().add(command);
-    for(final Item item : arg(1).atomValue(qc, info)) args.add(toString(item));
+    final Expr arguments = arg(1);
+    for(final Item item : arguments.atomValue(qc, info)) args.add(toString(item, arguments));
 
     // options
     final ProcOptions options = toOptions(arg(2), new ProcOptions(), qc);

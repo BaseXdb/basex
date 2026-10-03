@@ -95,8 +95,8 @@ public class FnSlice extends StandardFunc {
    * @throws QueryException query exception
    */
   private long longArg(final int i, final long dflt, final QueryContext qc) throws QueryException {
-    final Item item = arg(i).atomItem(qc, info);
-    return item.isEmpty() ? dflt : toLong(item);
+    final Long l = toLongOrNull(arg(i), qc);
+    return l != null ? l : dflt;
   }
 
   /** Slice properties. */

@@ -22,8 +22,8 @@ import org.basex.util.*;
 public final class FnParseIetfDate extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item value = arg(0).atomItem(qc, info);
-    return value.isEmpty() ? Empty.VALUE : new DateParser(toToken(value), info).parse();
+    final byte[] value = toTokenOrNull(arg(0), qc);
+    return value == null ? Empty.VALUE : new DateParser(value, info).parse();
   }
 
   @Override

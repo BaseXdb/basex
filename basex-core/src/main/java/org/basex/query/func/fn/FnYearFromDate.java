@@ -15,9 +15,7 @@ import org.basex.query.value.type.*;
 public final class FnYearFromDate extends DateTimeFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item value = arg(0).atomItem(qc, info);
-    if(value.isEmpty()) return Empty.VALUE;
-
-    return Itr.get(toDate(value, BasicType.DATE, qc).yea());
+    final ADate value = toDateOrNull(arg(0), BasicType.DATE, qc);
+    return value == null ? Empty.VALUE : Itr.get(value.yea());
   }
 }

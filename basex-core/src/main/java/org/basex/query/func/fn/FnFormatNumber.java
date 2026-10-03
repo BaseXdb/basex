@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.format.*;
 import org.basex.query.value.item.*;
@@ -20,15 +21,16 @@ import org.basex.util.*;
 public final class FnFormatNumber extends StandardFunc {
   @Override
   public Str value(final QueryContext qc) throws QueryException {
-    Item value = arg(0).atomItem(qc, info);
+    final Expr value = arg(0);
+    Item number = value.atomItem(qc, info);
     final byte[] picture = toToken(arg(1), qc);
     final Item options = arg(2).item(qc, info);
 
     // check input
-    final Type type = value.type;
-    if(value.isEmpty()) value = Dbl.NAN;
-    else if(type.isUntyped()) value = Dbl.get(value.dbl(info));
-    else if(!type.isNumberOrUntyped()) throw numberError(this, value);
+    final Type type = number.type;
+    if(number.isEmpty()) number = Dbl.NAN;
+    else if(type.isUntyped()) number = Dbl.get(number.dbl(info));
+    else if(!type.isNumberOrUntyped()) throw argTypeError(number, BasicType.NUMERIC, value);
 
     // find decimal-format name
     DecFormatOptions dfo = null;
@@ -58,6 +60,6 @@ public final class FnFormatNumber extends StandardFunc {
       }
     }
 
-    return Str.get(df.format((ANum) value, picture, info));
+    return Str.get(df.format((ANum) number, picture, info));
   }
 }

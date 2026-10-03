@@ -17,11 +17,12 @@ import org.basex.query.value.type.*;
 public final class ArrayOfMembers extends ArrayFn {
   @Override
   public XQArray value(final QueryContext qc) throws QueryException {
-    final Iter input = arg(0).iter(qc);
+    final Expr input = arg(0);
+    final Iter iter = input.iter(qc);
 
-    final ArrayBuilder ab = new ArrayBuilder(qc, input.size());
-    for(Item item; (item = qc.next(input)) != null;) {
-      ab.add(toJNode(item).value);
+    final ArrayBuilder ab = new ArrayBuilder(qc, iter.size());
+    for(Item item; (item = qc.next(iter)) != null;) {
+      ab.add(toJNode(item, input).value);
     }
     return ab.array(this);
   }

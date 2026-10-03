@@ -25,7 +25,7 @@ public final class ArrayJoin extends ArrayFn {
     final SeqType st = arrays.seqType();
     if(st.type instanceof ArrayType && st.zeroOrOne()) {
       final Item item = arrays.item(qc, info);
-      return item.isEmpty() ? XQArray.empty() : toArray(item);
+      return item.isEmpty() ? XQArray.empty() : toArray(item, arrays);
     }
 
     // empty array
@@ -36,7 +36,7 @@ public final class ArrayJoin extends ArrayFn {
     // iterative array building
     final ArrayBuilder ab = new ArrayBuilder(qc);
     do {
-      for(final Value value : toArray(item).members()) {
+      for(final Value value : toArray(item, arrays).members()) {
         ab.add(value);
       }
     } while((item = qc.next(iter)) != null);

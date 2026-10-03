@@ -3,6 +3,7 @@ package org.basex.query.func.fn;
 import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -16,16 +17,17 @@ import org.basex.util.*;
 public final class FnChar extends StandardFunc {
   @Override
   public Str value(final QueryContext qc) throws QueryException {
-    final Item value = arg(0).atomItem(qc, info);
+    final Expr value = arg(0);
+    final Item item = value.atomItem(qc, info);
 
-    if(value instanceof Itr) {
+    if(item instanceof Itr) {
       // codepoint integer
-      final long cp = toLong(value, 1);
+      final long cp = toLong(item, 1);
       if(cp > 0 && cp <= Integer.MAX_VALUE && XMLToken.valid11((int) cp))
         return Str.get((int) cp);
     } else {
       // codepoint string
-      final byte[] token = toToken(value);
+      final byte[] token = toToken(item, value);
       final int nl = token.length;
       if(nl == 2 && token[0] == '\\') {
         // backslash-escape sequence
@@ -42,6 +44,6 @@ public final class FnChar extends StandardFunc {
         throw CHARINV_X.get(info, similar(token, XMLToken.similarEntity(token)));
       }
     }
-    throw CHARINV_X.get(info, value);
+    throw CHARINV_X.get(info, item);
   }
 }

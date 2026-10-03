@@ -16,7 +16,7 @@ import org.basex.query.value.seq.*;
 public final class MathCos extends MathFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item radians = arg(0).atomItem(qc, info);
-    return radians.isEmpty() ? Empty.VALUE : Dbl.get(cos(toDouble(radians)));
+    final Double radians = toDoubleOrNull(arg(0), qc);
+    return radians == null ? Empty.VALUE : Dbl.get(cos(radians));
   }
 }

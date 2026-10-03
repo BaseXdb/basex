@@ -21,11 +21,12 @@ public class DbGetId extends DbAccessFn {
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
-    final Iter values = arg(1).atomIter(qc, info);
+    final Expr values = arg(1);
+    final Iter iter = values.atomIter(qc, info);
 
-    final IntList list = new IntList(Seq.initialCapacity(values.size()));
-    for(Item item; (item = qc.next(values)) != null;) {
-      final int id = (int) toLong(item), pre = pre(id, data);
+    final IntList list = new IntList(Seq.initialCapacity(iter.size()));
+    for(Item item; (item = qc.next(iter)) != null;) {
+      final int id = (int) toLong(item, values), pre = pre(id, data);
       if(pre < 0 || pre >= data.nodes()) throw DB_RANGE_X_X.get(info, data.meta.name, id);
       list.add(pre);
     }

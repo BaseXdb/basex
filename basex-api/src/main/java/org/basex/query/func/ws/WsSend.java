@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.http.ws.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -20,11 +21,12 @@ public final class WsSend extends WsFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Item message = arg(0).item(qc, info);
-    final Value ids = arg(1).atomValue(qc, info);
+    final Expr ids = arg(1);
+    final Value values = ids.atomValue(qc, info);
     if(message.isEmpty()) throw typeError(message, BasicType.ITEM, info);
 
-    final StringList list = new StringList(ids.size());
-    for(final Item item : ids) list.add(toString(item));
+    final StringList list = new StringList(values.size());
+    for(final Item item : values) list.add(toString(item, ids));
     WsPool.send(message, list.finish());
     return Empty.VALUE;
   }

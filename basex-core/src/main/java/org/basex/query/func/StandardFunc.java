@@ -410,13 +410,29 @@ public abstract class StandardFunc extends Arr {
    * Converts an item to a date of the specified type.
    * @param item item
    * @param type expected type
+   * @param expr expression that yielded the item
    * @param qc query context
    * @return date
    * @throws QueryException query exception
    */
-  protected final ADate toDate(final Item item, final BasicType type, final QueryContext qc)
-      throws QueryException {
-    return (ADate) (item.type.isUntyped() ? type.cast(item, qc, info) : checkType(item, type));
+  protected final ADate toDate(final Item item, final BasicType type, final Expr expr,
+      final QueryContext qc) throws QueryException {
+    return (ADate) (item.type.isUntyped() ? type.cast(item, qc, info) :
+      checkType(item, type, expr));
+  }
+
+  /**
+   * Evaluates an expression to a date of the specified type.
+   * @param expr expression
+   * @param type expected type
+   * @param qc query context
+   * @return date, or {@code null} if the expression yields an empty sequence
+   * @throws QueryException query exception
+   */
+  protected final ADate toDateOrNull(final Expr expr, final BasicType type,
+      final QueryContext qc) throws QueryException {
+    final Item item = expr.atomItem(qc, info);
+    return item.isEmpty() ? null : toDate(item, type, expr, qc);
   }
 
   /**
@@ -440,7 +456,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final AStr toStr(final Expr expr, final QueryContext qc) throws QueryException {
     final Item value = expr.atomItem(qc, info);
-    return value instanceof final AStr str ? str : Str.get(toToken(value));
+    return value instanceof final AStr str ? str : Str.get(toToken(value, expr));
   }
 
   /**
@@ -453,7 +469,7 @@ public abstract class StandardFunc extends Arr {
   protected final AStr toZeroStr(final Expr expr, final QueryContext qc) throws QueryException {
     final Item value = expr.atomItem(qc, info);
     return value.isEmpty() ? Str.EMPTY : value instanceof final AStr str ? str :
-      Str.get(toToken(value));
+      Str.get(toToken(value, expr));
   }
 
   /**
@@ -465,19 +481,47 @@ public abstract class StandardFunc extends Arr {
    */
   protected final XQMap toEmptyMap(final Expr expr, final QueryContext qc) throws QueryException {
     final Item item = expr.unwrappedItem(qc, info);
-    return item.isEmpty() ? XQMap.empty() : toMap(item);
+    return item.isEmpty() ? XQMap.empty() : toMap(item, expr);
   }
 
   /**
-   * Checks if the specified item is a Duration item. If it is untyped, a duration is returned.
-   * @param item item to be checked
-   * @return duration
+   * Evaluates an expression to a duration.
+   * @param expr expression
+   * @param qc query context
+   * @return duration, or {@code null} if the expression yields an empty sequence
    * @throws QueryException query exception
    */
-  protected final Dur toDur(final Item item) throws QueryException {
+  protected final Dur toDurOrNull(final Expr expr, final QueryContext qc) throws QueryException {
+    final Item item = expr.atomItem(qc, info);
+    if(item.isEmpty()) return null;
     if(item instanceof final Dur dur) return dur;
     if(item.type.isUntyped()) return new Dur(item.string(info), info);
-    throw typeError(item, BasicType.DURATION, info);
+    throw argTypeError(item, BasicType.DURATION, expr);
+  }
+
+  @Override
+  protected final QueryException argTypeError(final Item item, final Type type, final Expr expr) {
+    // find argument; if it is supplied more than once, choose the one with an incompatible type
+    final SeqType[] types = definition.types;
+    final int al = exprs.length, tl = types.length;
+    int arg = -1, found = 0;
+    boolean mismatch = false;
+    for(int a = 0; a < al; a++) {
+      if(exprs[a] != expr) continue;
+      final boolean mm = !types[Math.min(a, tl - 1)].instance(item);
+      if(found == 0 || mm && !mismatch) {
+        arg = a;
+        found = 1;
+        mismatch = mm;
+      } else if(mm == mismatch) {
+        found++;
+      }
+    }
+    if(found != 1) return super.argTypeError(item, type, expr);
+
+    final SeqType st = types[Math.min(arg, tl - 1)];
+    final QNm name = definition.paramNames(arg + 1)[arg];
+    return typeError(item, mismatch ? st : type.seqType(), name, info);
   }
 
   /**
@@ -697,7 +741,7 @@ public abstract class StandardFunc extends Arr {
       final QueryContext qc) throws QueryException {
 
     final Item item = expr.unwrappedItem(qc, info);
-    final XQArray array = item.isEmpty() ? XQArray.empty() : toArray(item);
+    final XQArray array = item.isEmpty() ? XQArray.empty() : toArray(item, expr);
     final int as = (int) array.structSize();
     final int ar = function.arity();
     if(as != ar) throw applyError(function, as, ar, true, info);
@@ -787,7 +831,7 @@ public abstract class StandardFunc extends Arr {
       item = item.atomItem(qc, info);
       if(item.isEmpty()) {
         if(empty) return null;
-        throw typeError(item, BasicType.ITEM, info);
+        throw argTypeError(item, BasicType.ITEM, expr);
       }
     }
     return item;

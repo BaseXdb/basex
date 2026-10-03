@@ -38,7 +38,8 @@ abstract class FileWriteFn extends FileFn {
       throws QueryException, IOException {
 
     final Path path = toTarget(arg(0), qc);
-    final Value value = arg(1).atomValue(qc, info);
+    final Expr input = arg(1);
+    final Value value = input.atomValue(qc, info);
     final String encoding = toEncodingOrNull(arg(2), FILE_UNKNOWN_ENCODING_X, qc);
     final Charset cs = encoding == null || encoding == Strings.UTF8 ? StandardCharsets.UTF_8 :
       Charset.forName(encoding);
@@ -49,7 +50,7 @@ abstract class FileWriteFn extends FileFn {
         final byte[] nl = cs == StandardCharsets.UTF_8 ? token(Prop.NL) : Prop.NL.getBytes(cs);
         for(final Item item : value) {
           qc.checkStop();
-          if(!item.type.isStringOrUntyped()) throw typeError(item, BasicType.STRING, info);
+          if(!item.type.isStringOrUntyped()) throw argTypeError(item, BasicType.STRING, input);
 
           final byte[] token = item.string(info);
           out.write(cs == StandardCharsets.UTF_8 ? token : string(token).getBytes(cs));
@@ -58,7 +59,7 @@ abstract class FileWriteFn extends FileFn {
       } else {
         // workaround to preserve streamable string items
         Item item = value.item(qc, info);
-        if(!(item instanceof AStr)) item = Str.get(toToken(item));
+        if(!(item instanceof AStr)) item = Str.get(toToken(item, input));
         if(cs == StandardCharsets.UTF_8) {
           try(TextInput in = item.stringInput(info)) {
             for(int cp; (cp = in.read()) != -1;) out.print(cp);
