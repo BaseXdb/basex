@@ -86,7 +86,7 @@ public final class QueryProfiler {
               Performance.nanoToMilli(sum, runs) + ", min: " +
               Performance.nanoToMilli(min) + ", max: " +
               Performance.nanoToMilli(max) + ")" :
-            Performance.formatHuman(sum / runs) + " (avg, " + runs + " runs)";
+            Performance.formatHuman((double) sum / runs) + " (avg, " + runs + " runs)";
         });
       }
     };

@@ -13,6 +13,14 @@ import java.util.*;
 public final class Performance {
   /** Method for retrieving thread allocation statistics (can be {@code null}). */
   private static final Method ALLOCATED = allocatedMethod();
+  /** Size units. */
+  private static final String[] SIZE_UNITS = { "B", "kB", "MB", "GB", "TB", "PB", "EB" };
+  /** Factors between size units. */
+  private static final int[] SIZE_FACTORS = { 1024, 1024, 1024, 1024, 1024, 1024 };
+  /** Time units. */
+  private static final String[] TIME_UNITS = { "ns", "µs", "ms", "s", "min", "h", "d" };
+  /** Factors between time units. */
+  private static final int[] TIME_FACTORS = { 1000, 1000, 1000, 60, 60, 24 };
 
   /** Performance timer, using nanoseconds. */
   private long time = System.nanoTime();
@@ -105,19 +113,47 @@ public final class Performance {
   }
 
   /**
-   * Returns a human-readable representation for the specified size value (b, kB, MB, ...).
-   * @param size value to be formatted
+   * Returns a human-readable representation for the specified size value (B, kB, MB, ...).
+   * @param size size in bytes
    * @return formatted size value
    */
-  public static String formatHuman(final long size) {
-    final String value = Long.toString(size);
-    final int vl = value.length();
-    return vl > 16 ? units(size, 1L << 40) + " PB" :
-           vl > 13 ? units(size, 1L << 40) + " TB" :
-           vl > 10 ? units(size, 1L << 30) + " GB" :
-           vl >  7 ? units(size, 1L << 20) + " MB" :
-           vl >  4 ? units(size, 1L << 10) + " kB" :
-           value + " b";
+  public static String formatHuman(final double size) {
+    return formatUnits(size, SIZE_UNITS, SIZE_FACTORS);
+  }
+
+  /**
+   * Returns a human-readable representation for the specified time (ns, µs, ms, s, ...).
+   * @param seconds time in seconds
+   * @return formatted time
+   */
+  public static String formatTime(final double seconds) {
+    return seconds == 0 ? "0 s" : formatUnits(seconds * 1e9, TIME_UNITS, TIME_FACTORS);
+  }
+
+  /**
+   * Returns a value with the largest fitting unit and at most one decimal place.
+   * @param value value in the smallest unit
+   * @param units units
+   * @param factors factors between units
+   * @return formatted value
+   */
+  private static String formatUnits(final double value, final String[] units, final int[] factors) {
+    double v = Math.abs(value);
+    int u = 0;
+    while(u < factors.length && round(v) >= factors[u]) v /= factors[u++];
+    final double r = round(v);
+    final String string = String.format(Locale.ENGLISH, "%.1f", value < 0 && r != 0 ? -r : r);
+    return (string.endsWith(".0") ? string.substring(0, string.length() - 2) : string) + ' ' +
+      units[u];
+  }
+
+  /**
+   * Rounds a non-negative value to one decimal place, with halves rounded up.
+   * @param value value
+   * @return rounded value
+   */
+  private static double round(final double value) {
+    return Math.floor(value * 10 + 0.5) / 10;
   }
 
   /**
@@ -194,16 +230,6 @@ public final class Performance {
       Util.debug(ex);
     }
     return null;
-  }
-
-  /**
-   * Returns the rounded up number of units.
-   * @param number number
-   * @param size size of unit
-   * @return units
-   */
-  private static long units(final long number, final long size) {
-    return (number + size - 1) / size;
   }
 
   @Override

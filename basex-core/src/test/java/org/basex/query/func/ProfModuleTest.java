@@ -1,10 +1,12 @@
 package org.basex.query.func;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.*;
 import org.basex.query.*;
 import org.basex.query.func.prof.ProfType.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.junit.jupiter.api.*;
 
@@ -18,11 +20,35 @@ public final class ProfModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void human() {
     final Function func = _PROF_HUMAN;
-    query(func.args(" 1"), "1 b");
-    query(func.args(" 2"), "2 b");
-    query(func.args(" 512"), "512 b");
-    query(func.args(" 32768"), "32 kB");
-    query(func.args(" 1048576"), "1024 kB");
+    query(func.args(" 1"), "1 B");
+    query(func.args(" 512"), "512 B");
+    query(func.args(" 1023"), "1023 B");
+    query(func.args(" 1024"), "1 kB");
+    query(func.args(" 1536"), "1.5 kB");
+    query(func.args(" 1048575"), "1 MB");
+    query(func.args(" 1048576"), "1 MB");
+    query(func.args(" 1125899906842624"), "1 PB");
+    query(func.args(" 2.5"), "2.5 B");
+    query(func.args(" -2048"), "-2 kB");
+    query(func.args(" -1.25"), "-1.3 B");
+    query(func.args(" -0.01"), "0 B");
+    query(func.args(" 0"), "0 B");
+    query(func.args(" 1e20"), "86.7 EB");
+    query(func.args(" xs:untypedAtomic('2048')"), "2 kB");
+    query(func.args(" xs:double('INF')"), "INF");
+
+    query(func.args(" seconds(3600)"), "1 h");
+    query(func.args(" seconds(5400)"), "1.5 h");
+    query(func.args(" seconds(59.99)"), "1 min");
+    query(func.args(" seconds(0.00085)"), "850 µs");
+    query(func.args(" seconds(0.0000000005)"), "0.5 ns");
+    query(func.args(" seconds(172800)"), "2 d");
+    query(func.args(" seconds(0)"), "0 s");
+    query(func.args(" xs:dayTimeDuration('PT1.25S')"), "1.3 s");
+
+    check(func.args(1536), "1.5 kB", root(Str.class));
+
+    error(func.args(" 'x'"), NONUMBER_X_X);
   }
 
   /** Test method. */

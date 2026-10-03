@@ -1826,7 +1826,7 @@ public enum Function implements AFunction {
       params(INTEGER_ZO), EMPTY_SEQUENCE_Z, flag(NDT), PROF_URI),
   /** XQuery function. */
   _PROF_HUMAN(ProfHuman::new, "human(value)",
-      params(INTEGER_O), STRING_O, flag(NDT), PROF_URI),
+      params(ANY_ATOMIC_TYPE_O), STRING_O, PROF_URI),
   /** XQuery function. */
   _PROF_MEMORY(ProfMemory::new, "memory(input, label?, aggregate?)",
       params(ITEM_ZM, STRING_ZO, BOOLEAN_ZO), ITEM_ZM, flag(NDT), PROF_URI),

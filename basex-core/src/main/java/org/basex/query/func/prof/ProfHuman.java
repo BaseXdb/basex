@@ -14,6 +14,12 @@ import org.basex.util.*;
 public final class ProfHuman extends StandardFunc {
   @Override
   public Str value(final QueryContext qc) throws QueryException {
-    return Str.get(Performance.formatHuman(toLong(arg(0), qc)));
+    final Item value = toAtomItem(arg(0), qc);
+    if(value instanceof final DTDur dur) {
+      return Str.get(Performance.formatTime(dur.dtd().doubleValue()));
+    }
+    final double size = toDouble(value);
+    return Str.get(Double.isFinite(size) ? Performance.formatHuman(size) :
+      Token.string(Token.token(size)));
   }
 }
