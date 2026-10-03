@@ -12,6 +12,7 @@ import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.query.up.atomic.*;
 import org.basex.query.up.primitives.node.*;
+import org.basex.util.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
@@ -1248,7 +1249,7 @@ public final class UpdateTest extends SandboxTest {
   /** Simple map, update checks. */
   @Test public void gh1978() {
     createDB(null);
-    set(MainOptions.ADDCACHE, true);
+    MemoryLimit.max(0);
     try {
       final String doc = "<_>qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq"
           + "qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqsqqquqqqqqsqqsqqq"
@@ -1322,16 +1323,21 @@ public final class UpdateTest extends SandboxTest {
       execute(new Put("x.xml", doc));
       query("string-length(_)", 4099);
     } finally {
-      set(MainOptions.ADDCACHE, false);
+      MemoryLimit.max(MemoryLimit.MAX);
     }
   }
 
-  /** Update document, ADDCACHE option. */
+  /** Update document, temporary database on disk. */
   @Test public void gh1989() {
     createDB("<a/>");
-    query(_DB_PUT.args(NAME, DOC, "Sandbox.xml", " { 'addcache': true() }"));
+    MemoryLimit.max(0);
+    try {
+      query(_DB_PUT.args(NAME, DOC, "Sandbox.xml"));
+    } finally {
+      MemoryLimit.max(MemoryLimit.MAX);
+    }
     query(_DB_EXISTS.args(NAME), true);
-    query(_DB_EXISTS.args(NAME + ".0"), false);
+    query("file:list(db:option('dbpath'))[starts-with(., '" + NAME + ".')]", "");
   }
 
   /** Update expression, context position. */

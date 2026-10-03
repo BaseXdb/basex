@@ -97,7 +97,11 @@ public final class Put extends ACreate {
         try {
           add.setInput(in);
           add.init(context, out);
-          if(!add.build()) return error(add.info());
+          try {
+            if(!pushJob(add).build()) return error(add.info());
+          } finally {
+            popJob();
+          }
 
           final DataClip clip = new DataClip(add.tmpData);
           int d = 0;

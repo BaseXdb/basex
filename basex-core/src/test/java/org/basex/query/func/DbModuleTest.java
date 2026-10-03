@@ -114,14 +114,6 @@ public final class DbModuleTest extends SandboxTest {
         " { 'parser': 'csv', 'csvparser': { 'header': true() } }"));
     query("exists(" + _DB_GET.args(NAME, "csv3.xml") + "//City)", true);
 
-    final String addcache = " { 'addcache': true() }";
-    query(func.args(NAME, " <cache/>", "C1.xml", addcache));
-    query("exists(" + _DB_GET.args(NAME, "C1.xml") + ")", true);
-    query(func.args(NAME, " <cache/>", "C2.xml", addcache));
-    query("exists(" + _DB_GET.args(NAME, "C2.xml") + ")", true);
-    query(func.args(NAME, XML, "C3.xml", addcache));
-    query("exists(" + _DB_GET.args(NAME, "C3.xml") + ")", true);
-
     error(func.args(NAME, CSV, "csv.xml",
         " { 'parser': ('csv', 'html') }"), BASEX_OPTIONS_X);
     error(func.args(NAME, CSV, "csv.xml",
@@ -1117,14 +1109,6 @@ public final class DbModuleTest extends SandboxTest {
     query("count(" + COLLECTION.args(NAME + '/' + XML) + "/R1)", 0);
     query("count(" + COLLECTION.args(NAME + '/' + XML) + "/R2)", 0);
     query("count(" + COLLECTION.args(NAME + '/' + XML) + "/html)", 1);
-
-    final String addcache = " { 'addcache': true() }";
-    query(func.args(NAME, " <cache/>", "1.xml", addcache));
-    query("exists(" + _DB_GET.args(NAME, "1.xml") + ")", true);
-    query(func.args(NAME, " <cache/>", "2.xml", addcache));
-    query("exists(" + _DB_GET.args(NAME, "2.xml") + ")", true);
-    query(func.args(NAME, XML, "3.xml", addcache));
-    query("exists(" + _DB_GET.args(NAME, "3.xml") + ")", true);
 
     // GH-1302: replace same target more than once
     error("(1 to 2) ! " + func.args(NAME, XML, "3.xml"), UPMULTDOC_X_X);

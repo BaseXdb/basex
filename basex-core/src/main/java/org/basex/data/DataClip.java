@@ -82,6 +82,7 @@ public final class DataClip {
     if(ctx != null) {
       Close.close(data, ctx);
       DropDB.drop(data, ctx.soptions);
+      ctx = null;
     }
   }
 }

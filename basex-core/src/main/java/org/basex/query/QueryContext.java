@@ -820,20 +820,24 @@ public final class QueryContext extends Job implements Closeable {
     // only perform updates if no parent context exists
     if(updates == null || parent != null) return value;
 
-    // create copies of results that will be modified by an update operation
-    final HashSet<Data> datas = updates.prepare(this);
-    final StringList dbs = updates.databases();
-
     final ValueBuilder vb = new ValueBuilder(this);
-    final QueryConsumer<Value> materialize = val -> vb.add(val.materialize(d -> d != null &&
-        (datas.contains(d) || !d.inMemory() && dbs.contains(d.meta.name)), null, this));
-    materialize.accept(value);
-    materialize.accept(updates.output(true, this));
+    try {
+      // create copies of results that will be modified by an update operation
+      final HashSet<Data> datas = updates.prepare(this);
+      final StringList dbs = updates.databases();
 
-    // invalidate current node set in context, apply updates
-    if(context.data() != null) context.invalidate();
-    updates.apply(this);
+      final QueryConsumer<Value> materialize = val -> vb.add(val.materialize(d -> d != null &&
+          (datas.contains(d) || !d.inMemory() && dbs.contains(d.meta.name)), null, this));
+      materialize.accept(value);
+      materialize.accept(updates.output(true, this));
 
+      // invalidate current node set in context, apply updates
+      if(context.data() != null) context.invalidate();
+      updates.apply(this);
+    } finally {
+      // drop remaining temporary database instances
+      updates.discard();
+    }
     return vb.value(value);
   }
 

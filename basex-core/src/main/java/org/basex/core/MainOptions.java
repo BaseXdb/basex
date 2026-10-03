@@ -79,8 +79,6 @@ public final class MainOptions extends Options {
 
   // Adding documents
 
-  /** Cache new documents before adding them to a database. */
-  public static final BooleanOption ADDCACHE = new BooleanOption("ADDCACHE", false);
   /** Replace existing documents. */
   public static final BooleanOption REPLACE = new BooleanOption("REPLACE", true);
 
@@ -213,7 +211,7 @@ public final class MainOptions extends Options {
   private static final Option<?>[] XMLPARSING = XMLPARSINGMAP.values().toArray(Option[]::new);
   /** Extended parsing options. */
   public static final Option<?>[] EXTPARSING = { CREATEFILTER, ADDARCHIVES, ARCHIVENAME,
-      SKIPCORRUPT, ADDRAW, ADDCACHE, CSVPARSER, JSONPARSER, HTMLPARSER, PARSER };
+      SKIPCORRUPT, ADDRAW, CSVPARSER, JSONPARSER, HTMLPARSER, PARSER };
   /** All parsing options. */
   public static final Option<?>[] PARSING = Stream.concat(Stream.of(XMLPARSING),
       Stream.of(EXTPARSING)).toArray(Option<?>[]::new);

@@ -186,7 +186,7 @@ public final class StaticOptions extends Options {
    * @param name name of the original database
    * @return name of random database
    */
-  public String createTempDb(final String name) {
+  public synchronized String createTempDb(final String name) {
     String db;
     int c = 0;
     while(true) {

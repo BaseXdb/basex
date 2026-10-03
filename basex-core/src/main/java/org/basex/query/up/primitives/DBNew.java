@@ -10,11 +10,11 @@ import java.util.List;
 import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
-import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.io.out.DataOutput;
+import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -37,8 +37,8 @@ public final class DBNew {
   private final InputInfo info;
   /** Main options for all inputs to be added. */
   private final List<MainOptions> options;
-  /** New database nodes (can be {@code null}). */
-  private Data data;
+  /** Data clip with the new documents (can be {@code null}). */
+  private DataClip clip;
 
   /**
    * Constructor.
@@ -79,43 +79,17 @@ public final class DBNew {
    * @throws QueryException query exception
    */
   public DataClip prepare(final String name, final boolean create) throws QueryException {
+    if(inputs.isEmpty()) return null;
     try {
-      final long is = inputs.size();
-      if(is > 0) {
-        // check if new resources will be cached on disk
-        final boolean cache = cache(create);
-        if(is == 1) {
-          // single input: create temporary database
-          data = tmpData(name, 0, cache);
-        } else {
-          // multiple input: create temporary database and insert inputs
-          final Context ctx = qc.context;
-          final MainOptions mopts = ctx.options;
-          final StaticOptions sopts = ctx.soptions;
-          final String dbName = cache ? sopts.createTempDb(name) : name;
-          data = cache ? CreateDB.create(dbName, Parser.emptyParser(mopts), ctx, mopts) :
-            new MemData(new MetaData(mopts));
-          data.startUpdate(mopts);
-          try {
-            for(int i = 0; i < is; i++) {
-              final Data tmpData = tmpData(dbName, i, cache);
-              try {
-                copy(tmpData, data, false);
-              } finally {
-                DropDB.drop(tmpData, sopts);
-              }
-            }
-          } finally {
-            data.finishUpdate(mopts);
-          }
-        }
+      // temporary instance will be dropped when the updates have been applied or have failed
+      final Data data = build(name, create);
+      clip = new DataClip(data).context(qc.context);
+      qc.updates().register(clip);
+      for(final NewInput input : inputs) {
+        if(input.type != ResourceType.XML) writeFileResource(data, input);
       }
-      return data == null ? null : new DataClip(data).context(qc.context);
-    } catch(final QueryException ex) {
-      if(data != null) new DataClip(data).context(qc.context).finish();
-      throw ex;
+      return clip;
     } catch(final IOException ex) {
-      if(data != null) new DataClip(data).context(qc.context).finish();
       throw UPDBERROR_X.get(info, ex);
     } finally {
       options.clear();
@@ -132,87 +106,68 @@ public final class DBNew {
    */
   public void addTo(final Data target, final boolean replace) throws QueryException {
     try {
-      copy(data, target, replace);
+      copy(clip.data, target, replace);
     } catch(final IOException ex) {
       throw UPDBERROR_X.get(info, ex);
     }
   }
 
   /**
-   * Checks if disk caching is requested or required for at least one document.
-   * @param create create new database
-   * @return result of check
-   */
-  private boolean cache(final boolean create) {
-    for(final NewInput input : inputs) {
-      // binary and value resources always require an on-disk temporary database
-      if(input.type == ResourceType.BINARY || input.type == ResourceType.VALUE) return true;
-    }
-    for(final MainOptions dbopts : options) {
-      Boolean b = dbopts.get(MainOptions.ADDCACHE);
-      if(b != null && b) return true;
-      if(create) {
-        if(dbopts.get(MainOptions.PARSER) == MainParser.RAW) return true;
-        b = dbopts.get(MainOptions.ADDRAW);
-        if(b != null && b) return true;
-      }
-    }
-    return false;
-  }
-
-  /**
-   * Creates a temporary database instance with the contents of the specified input.
+   * Creates a temporary database instance with the contents of all inputs.
    * @param name name of database
-   * @param i index of current input
-   * @param cache cache data to disk
+   * @param create create new database
    * @return database
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  private Data tmpData(final String name, final int i, final boolean cache)
+  private Data build(final String name, final boolean create)
       throws IOException, QueryException {
-    // free memory: clear list entries after retrieval
-    final NewInput input = inputs.get(i);
-    final MainOptions mopts = options.get(i);
-    inputs.set(i, null);
-    options.set(i, null);
+    // single node: create main-memory copy
+    final NewInput first = inputs.getFirst();
+    if(inputs.size() == 1 && first.node != null) {
+      final MemData mdata = (MemData) doc(first).copy(options.getFirst(), qc).data();
+      mdata.update(0, Data.DOC, token(first.path));
+      return mdata;
+    }
 
-    // existing node: create data clip for copied instance
-    final XNode node = input.node;
-    if(node != null) return xmlNodeData(name, input, node, mopts);
+    // binary and value resources, and raw files of new databases, require an on-disk instance
+    boolean disk = false;
+    final List<Parser> parsers = new ArrayList<>();
+    final int is = inputs.size();
+    for(int i = 0; i < is; i++) {
+      final NewInput input = inputs.get(i);
+      final MainOptions mopts = options.get(i);
+      final boolean xml = input.type == ResourceType.XML;
+      if(xml) parsers.add(input.node != null ? new NodeParser(input, mopts) :
+        new DirParser(input.io, mopts).target(input.path));
+      disk |= !xml || create && (mopts.get(MainOptions.PARSER) == MainParser.RAW ||
+          mopts.get(MainOptions.ADDRAW) == Boolean.TRUE);
+    }
 
+    final MainOptions mopts = options.getFirst();
+    final Parser parser = parsers.isEmpty() ? Parser.emptyParser(mopts) :
+      parsers.size() == 1 ? parsers.getFirst() : new MultiParser(parsers);
     final StaticOptions sopts = qc.context.soptions;
-    final String dbName = cache ? sopts.createTempDb(name) : name;
-
-    // binary or value resource: empty database, write content directly to its file area
-    final boolean file = input.type == ResourceType.BINARY || input.type == ResourceType.VALUE;
-    final Parser parser = file ? Parser.emptyParser(mopts) :
-      new DirParser(input.io, mopts).target(input.path);
-    final Builder builder = file || cache
-      ? new DiskBuilder(dbName, parser, sopts, mopts)
-      : new MemBuilder(dbName, parser);
+    final String dbName = disk ? sopts.createTempDb(name) : name;
+    final Builder builder = disk ? new DiskBuilder(dbName, parser, sopts, mopts) :
+      new SpillBuilder(name, parser, sopts);
     builder.binariesDir(sopts.dbPath(dbName));
-    final Data d = builder.build();
-    if(file) writeFileResource(d, input);
-    return d;
+    try {
+      return qc.pushJob(builder).build();
+    } finally {
+      qc.popJob();
+    }
   }
 
   /**
-   * Creates a memory-backed database instance for an XML node input.
-   * @param name name of database
+   * Returns the node of an input, or a document node that wraps it.
    * @param input new input
-   * @param node node to be stored (will be wrapped into a document if needed)
-   * @param mopts options
-   * @return memory data instance
-   * @throws QueryException query exception
+   * @return document node
    */
-  private MemData xmlNodeData(final String name, final NewInput input, final XNode node,
-      final MainOptions mopts) throws QueryException {
-    XNode src = node;
-    if(src.kind() != Kind.DOCUMENT) src = FDoc.build(token(name)).node(src).finish();
-    final MemData mdata = (MemData) src.copy(mopts, qc).data();
-    mdata.update(0, Data.DOC, token(input.path));
-    return mdata;
+  private static XNode doc(final NewInput input) {
+    final XNode node = input.node;
+    return node.kind() == Kind.DOCUMENT ? node :
+      FDoc.build(token(input.path)).node(node).finish();
   }
 
   /**
@@ -225,6 +180,7 @@ public final class DBNew {
   private void writeFileResource(final Data d, final NewInput input)
       throws IOException, QueryException {
     final IOFile file = d.meta.file(input.path, input.type);
+    if(file.exists()) throw DB_CONFLICT5_X.get(info, input.path);
     if(input.type == ResourceType.BINARY) {
       try(InputStream is = input.value instanceof final Bin bin ? bin.input(info) :
         input.io.inputStream()) {
@@ -266,6 +222,34 @@ public final class DBNew {
           srcFile.moveTo(trgFile, false);
         }
       }
+    }
+  }
+
+  /**
+   * Parser for node inputs.
+   */
+  private static final class NodeParser extends Parser {
+    /** Input. */
+    private final NewInput input;
+
+    /**
+     * Constructor.
+     * @param input new input
+     * @param mopts main options
+     */
+    NodeParser(final NewInput input, final MainOptions mopts) {
+      super((IO) null, mopts);
+      this.input = input;
+    }
+
+    @Override
+    public void parse(final Builder build) throws IOException {
+      new BuilderSerializer(build) {
+        @Override
+        protected void openDoc(final byte[] name) throws IOException {
+          super.openDoc(token(input.path));
+        }
+      }.serialize(doc(input));
     }
   }
 }

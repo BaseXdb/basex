@@ -8,6 +8,7 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.index.name.*;
+import org.basex.index.path.*;
 import org.basex.io.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.*;
@@ -56,7 +57,23 @@ public final class DiskBuilder extends Builder {
   @Override
   public DiskData build() throws IOException {
     meta.assign(parser);
+    elemNames = new Names(meta);
+    attrNames = new Names(meta);
+    try {
+      open();
+      parse();
+      return finish(elemNames, attrNames, path, nspaces);
+    } catch(final Throwable th) {
+      abort();
+      throw th;
+    }
+  }
 
+  /**
+   * Creates the database directory and opens the output streams.
+   * @throws IOException I/O exception
+   */
+  void open() throws IOException {
     // calculate optimized output buffer sizes to reduce disk fragmentation
     final long max = Math.min(1 << 22, Performance.available() / 4);
     int bs = (int) Math.min(meta.inputsize, max);
@@ -66,40 +83,69 @@ public final class DiskBuilder extends Builder {
     DropDB.drop(dbName, sopts);
     sopts.dbPath(dbName).md();
 
-    elemNames = new Names(meta);
-    attrNames = new Names(meta);
-    try {
+    tout = new DataOutput(new TableOutput(meta, DATATBL));
+    xout = new DataOutput(meta.dbFile(DATATXT), bs);
+    vout = new DataOutput(meta.dbFile(DATAATV), bs);
+    sout = new DataOutput(meta.dbFile(DATATMP), bs);
+  }
+
+  /**
+   * Closes the output streams, writes the cached size values and returns the database instance.
+   * @param elems element name index
+   * @param attrs attribute name index
+   * @param paths path index
+   * @param nsp namespaces
+   * @return database instance
+   * @throws IOException I/O exception
+   */
+  DiskData finish(final Names elems, final Names attrs, final PathIndex paths,
+      final Namespaces nsp) throws IOException {
+    closeOutputs();
+
+    // copy temporary values into database table
+    final IOFile tmpFile = meta.dbFile(DATATMP);
+    try(DataInput in = new DataInput(tmpFile)) {
+      final TableAccess ta = new TableDiskAccess(meta, size, true);
       try {
-        tout = new DataOutput(new TableOutput(meta, DATATBL));
-        xout = new DataOutput(meta.dbFile(DATATXT), bs);
-        vout = new DataOutput(meta.dbFile(DATAATV), bs);
-        sout = new DataOutput(meta.dbFile(DATATMP), bs);
-        parse();
+        for(; spos < ssize; spos++) ta.write4(in.readNum(), 8, in.readNum());
       } finally {
-        if(tout != null) tout.close();
-        if(xout != null) xout.close();
-        if(vout != null) vout.close();
-        if(sout != null) sout.close();
+        ta.close();
       }
+    }
+    tmpFile.delete();
 
-      // copy temporary values into database table
-      final IOFile tmpFile = meta.dbFile(DATATMP);
-      try(DataInput in = new DataInput(tmpFile)) {
-        final TableAccess ta = new TableDiskAccess(meta, size, true);
-        try {
-          for(; spos < ssize; spos++) ta.write4(in.readNum(), 8, in.readNum());
-        } finally {
-          ta.close();
-        }
-      }
-      tmpFile.delete();
+    // return database instance. build will be finalized when this instance is closed
+    meta.dirty = true;
+    return new DiskData(meta, elems, attrs, paths, nsp);
+  }
 
-      // return database instance. build will be finalized when this instance is closed
-      meta.dirty = true;
-      return new DiskData(meta, elemNames, attrNames, path, nspaces);
-    } catch(final Throwable th) {
-      DropDB.drop(meta.name, sopts);
-      throw th;
+  /**
+   * Closes the output streams and drops the incompletely built database.
+   */
+  void abort() {
+    try {
+      closeOutputs();
+    } catch(final IOException ex) {
+      Util.debug(ex);
+    }
+    DropDB.drop(meta.name, sopts);
+  }
+
+  /**
+   * Closes the output streams.
+   * @throws IOException I/O exception
+   */
+  private void closeOutputs() throws IOException {
+    try {
+      if(tout != null) tout.close();
+      if(xout != null) xout.close();
+      if(vout != null) vout.close();
+      if(sout != null) sout.close();
+    } finally {
+      tout = null;
+      xout = null;
+      vout = null;
+      sout = null;
     }
   }
 

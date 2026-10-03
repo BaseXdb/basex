@@ -511,7 +511,7 @@ public final class NamespaceTest extends SandboxTest {
     // added documents
     execute(new CreateDB(NAME, "<r/>"));
     error(_DB_ADD.args(NAME, " <a>{ (1 to 150)" + elems + " }</a>", "a.xml") + ", " +
-        _DB_ADD.args(NAME, " <b>{ (151 to 300)" + elems + " }</b>", "b.xml"), BASEX_LIMIT_X_X);
+        _DB_ADD.args(NAME, " <b>{ (151 to 300)" + elems + " }</b>", "b.xml"), UPDBERROR_X);
     query(_DB_GET.args(NAME) + " ! name(*)", "r");
 
     // added documents (command)

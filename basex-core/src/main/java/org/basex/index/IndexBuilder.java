@@ -27,9 +27,6 @@ public abstract class IndexBuilder extends Job {
   /** Index type. */
   protected final IndexType type;
 
-  /** Maximum estimated size of the temporary index structures. */
-  private final long maxMem = Runtime.getRuntime().maxMemory() / 2;
-
   /** Names and namespace URI of element or attributes to include. */
   protected final IndexNames includeNames;
 
@@ -76,7 +73,7 @@ public abstract class IndexBuilder extends Job {
    * @return true if structures shall be flushed to disk
    */
   protected final boolean splitRequired(final long memory) {
-    final boolean split = memory >= maxMem;
+    final boolean split = MemoryLimit.exceeded(memory);
     if(split && Prop.debug) Util.err("|");
     return split;
   }

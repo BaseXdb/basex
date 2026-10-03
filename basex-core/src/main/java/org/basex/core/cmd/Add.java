@@ -107,16 +107,16 @@ public final class Add extends ACreate {
       final String name = data.meta.name;
       final Parser parser = new DirParser(source, options).target(target);
 
-      // create random database name for disk-based creation
-      if(cache(parser)) {
-        final String tmpName = soptions.createTempDb(name);
-        builder = new DiskBuilder(tmpName, parser, soptions, options);
-      } else {
-        builder = new MemBuilder(path, parser);
-      }
+      // main memory mode: never write to disk
+      builder = options.get(MainOptions.MAINMEM) ? new MemBuilder(path, parser) :
+        new SpillBuilder(name, parser, soptions);
 
       if(!data.inMemory()) builder.binariesDir(soptions.dbPath(name));
-      tmpData = builder.build();
+      try {
+        tmpData = pushJob(builder).build();
+      } finally {
+        popJob();
+      }
 
       // check if the database limits would be exceeded
       final NameLimits limits = new NameLimits(data);
@@ -138,30 +138,6 @@ public final class Add extends ACreate {
       DropDB.drop(tmpData, soptions);
       tmpData = null;
     }
-  }
-
-  /**
-   * Decides if the input should be cached before being written to the final database.
-   * @param parser parser reference
-   * @return result of check
-   */
-  private boolean cache(final Parser parser) {
-    // main memory mode: never write to disk
-    if(options.get(MainOptions.MAINMEM)) return false;
-    // explicit caching
-    if(options.get(MainOptions.ADDCACHE)) return true;
-
-    // create disk instances for large documents
-    // (does not work for input streams and directories)
-    final IO source = parser.source();
-    final long fl = source instanceof final IOFile src && src.isDir() ? src.size() :
-      source.length();
-
-    // check free memory
-    if(fl < Performance.available() / 2) return false;
-    // if caching may be necessary, run garbage collection and try again
-    Performance.gc(2);
-    return fl > Performance.available() / 2;
   }
 
   @Override

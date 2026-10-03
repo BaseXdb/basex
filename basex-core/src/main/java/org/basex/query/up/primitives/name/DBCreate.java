@@ -1,5 +1,6 @@
 package org.basex.query.up.primitives.name;
 
+import static org.basex.core.Text.*;
 import static org.basex.query.QueryError.*;
 
 import java.io.*;
@@ -7,6 +8,7 @@ import java.io.*;
 import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -53,19 +55,35 @@ public final class DBCreate extends NameUpdate {
 
   @Override
   public void apply() throws QueryException {
+    final Context ctx = qc.context;
     Data data = null;
     try {
       // close existing database instance; raise error if it is still pinned or locked
       close();
 
-      // create new database
-      data = CreateDB.create(name, Parser.emptyParser(options), qc.context, options);
+      final boolean move = clip != null && !clip.data.inMemory();
+      if(move) {
+        // temporary database on disk: rename it, and detach it from the clip
+        if(!ctx.user().has(Perm.CREATE)) throw new BaseXException(PERM_REQUIRED_X, Perm.CREATE);
+        final String tmpName = clip.data.meta.name;
+        clip.data.close();
+        clip.context(null);
+        if(!AlterDB.alter(tmpName, name, ctx.soptions)) {
+          DropDB.drop(tmpName, ctx.soptions);
+          throw UPDBERROR_X_X.get(info, name, operation());
+        }
+        data = Open.open(name, ctx, options, true, true);
+      } else {
+        data = CreateDB.create(name, Parser.emptyParser(options), ctx, options);
+      }
 
       // add initial documents and optimize database
       if(clip != null) {
         data.startUpdate(options);
         try {
-          newDocs.addTo(data, false);
+          if(!move) newDocs.addTo(data, false);
+          // release temporary data before index structures are built
+          clip.finish();
           Optimize.optimize(data, null);
         } finally {
           data.finishUpdate(options);
@@ -75,7 +93,7 @@ public final class DBCreate extends NameUpdate {
       throw UPDBERROR_X.get(info, ex);
     } finally {
       // release the database instance, also if the creation was interrupted
-      if(data != null) Close.close(data, qc.context);
+      if(data != null) Close.close(data, ctx);
       if(clip != null) clip.finish();
     }
   }

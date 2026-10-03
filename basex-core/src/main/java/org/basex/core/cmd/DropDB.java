@@ -67,9 +67,8 @@ public final class DropDB extends ACreate {
    * @return success flag
    */
   public static synchronized boolean drop(final Data data, final StaticOptions sopts) {
-    if(data.inMemory()) return true;
     data.close();
-    return drop(data.meta.name, sopts);
+    return data.inMemory() || drop(data.meta.name, sopts);
   }
 
   /**

@@ -3,6 +3,7 @@ package org.basex.data;
 import static org.basex.core.Text.*;
 
 import java.io.*;
+import java.lang.ref.Cleaner.*;
 
 import org.basex.core.*;
 import org.basex.index.*;
@@ -26,6 +27,8 @@ public final class MemData extends Data {
   private TokenSet texts;
   /** Attribute values, created on demand (can be {@code null}). */
   private TokenSet values;
+  /** Releases reserved memory when the instance is closed (can be {@code null}). */
+  private Cleanable release;
 
   /**
    * Constructor.
@@ -121,6 +124,20 @@ public final class MemData extends Data {
 
   @Override
   public void flush(final boolean all) { }
+
+  /**
+   * Assigns an action that releases reserved memory when the instance is closed.
+   * @param cleanable cleanable action
+   */
+  public void release(final Cleanable cleanable) {
+    release = cleanable;
+  }
+
+  @Override
+  public void close() {
+    super.close();
+    if(release != null) release.clean();
+  }
 
   @Override
   public byte[] text(final int pre, final boolean text) {

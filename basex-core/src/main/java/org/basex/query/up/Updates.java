@@ -69,6 +69,8 @@ public final class Updates {
   /** Mapping between fragment IDs and the temporary data instances
    * to apply updates on the corresponding fragments. */
   private final IntObjectMap<MemData> fragmentIDs = new IntObjectMap<>();
+  /** Temporary database instances that are dropped when the updates are finished. */
+  private final List<DataClip> clips = new ArrayList<>();
 
   /**
    * Constructor.
@@ -179,6 +181,22 @@ public final class Updates {
    */
   public void apply(final QueryContext qc) throws QueryException {
     mod.apply(qc);
+  }
+
+  /**
+   * Registers a temporary database instance that is dropped when the updates are finished.
+   * @param clip data clip
+   */
+  public synchronized void register(final DataClip clip) {
+    clips.add(clip);
+  }
+
+  /**
+   * Drops the registered temporary database instances.
+   */
+  public synchronized void discard() {
+    for(final DataClip clip : clips) clip.finish();
+    clips.clear();
   }
 
   /**
