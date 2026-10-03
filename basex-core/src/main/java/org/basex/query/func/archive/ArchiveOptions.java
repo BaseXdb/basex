@@ -10,7 +10,6 @@ import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -36,7 +35,7 @@ public final class ArchiveOptions extends ArchiveFn {
         }
       } else {
         format = ZIP;
-        try(ZipFile zip = new ZipFile(new File(archive.toString()), Strings.CP437)) {
+        try(ZipFile zip = (ZipFile) archive) {
           for(final ZipEntry ze : entries(zip, null)) {
             if(ze.isDirectory()) continue;
             level = ze.getMethod();

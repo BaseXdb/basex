@@ -73,23 +73,38 @@ abstract class ArchiveFn extends StandardFunc {
    * Evaluates an expression to an archive reference.
    * @param expr expression
    * @param qc query context
-   * @return archive reference: {@link Bin} or {@link IO})
+   * @return archive reference: {@link Bin} or opened {@link ZipFile}
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
   final Object toInput(final Expr expr, final QueryContext qc) throws QueryException, IOException {
     final Item archive = expr.atomItem(qc, info);
     if(archive instanceof final Bin bin) {
-      if(bin instanceof final B64IOLazy lazy) {
-        final IO io = lazy.input();
-        if(localZip(io)) return io;
-      }
-      return bin;
+      return bin instanceof final B64IOLazy lazy ? zipFile(lazy.input(), bin) : bin;
     }
     if(!archive.type.isStringOrUntyped()) throw STRBIN_X_X.get(info, archive.seqType(), archive);
 
     final IO io = toIO(archive, qc);
-    return localZip(io) ? io : new B64IOLazy(io, FILE_IO_ERROR_X);
+    return zipFile(io, new B64IOLazy(io, FILE_IO_ERROR_X));
+  }
+
+  /**
+   * Opens a local ZIP archive for random access.
+   * @param io IO reference
+   * @param bin binary for streaming access
+   * @return opened {@link ZipFile}, or the binary if the input is no ZIP file or cannot be opened
+   * @throws IOException I/O exception
+   */
+  private static Object zipFile(final IO io, final Bin bin) throws IOException {
+    if(localZip(io)) {
+      try {
+        return new ZipFile(new File(io.path()), Strings.CP437);
+      } catch(final ZipException ex) {
+        // the streaming reader is more lenient, e.g. regarding invalid zip64 extra fields
+        Util.debug(ex);
+      }
+    }
+    return bin;
   }
 
   /**
@@ -328,7 +343,7 @@ abstract class ArchiveFn extends StandardFunc {
           return so.finish(ARCHIVE_ERROR_X);
         }
       }
-      try(ZipFile zip = new ZipFile(new File(archive.toString()), Strings.CP437)) {
+      try(ZipFile zip = (ZipFile) archive) {
         final SpillOutput so = new SpillOutput(qc.resources.index(TempFiles.class));
         try(ArchiveOut out = ArchiveOut.get(ZIP, -1, info, so)) {
           for(final ZipEntry raw : entries(zip, null)) {
@@ -478,7 +493,7 @@ abstract class ArchiveFn extends StandardFunc {
           }
         }
       } else {
-        try(ZipFile zip = new ZipFile(new File(archive.toString()), Strings.CP437)) {
+        try(ZipFile zip = (ZipFile) archive) {
           for(final ZipEntry raw : entries(zip, filter)) {
             consumer.accept(canonical(raw), () -> zip.getInputStream(raw));
           }
