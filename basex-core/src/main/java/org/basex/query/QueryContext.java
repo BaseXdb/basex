@@ -7,6 +7,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.util.*;
 import java.util.Map.*;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 import java.util.function.*;
 
@@ -111,6 +112,8 @@ public final class QueryContext extends Job implements Closeable {
 
   /** Compiled regular expression cache (shared with parent context). */
   public final TokenObjectMap<RegExpr> regex;
+  /** Memoized function results (shared with parent context). */
+  public final Map<MemoKey, Value> memo;
   /** Available collations. */
   public TokenObjectMap<Collation> collations;
   /** Profiling results. */
@@ -201,6 +204,7 @@ public final class QueryContext extends Job implements Closeable {
     ftPosData = parent != null ? parent.ftPosData : null;
     shared = parent != null ? parent.shared : new SharedData();
     regex = parent != null ? parent.regex : new TokenObjectMap<>();
+    memo = parent != null ? parent.memo : new ConcurrentHashMap<>();
     globals = parent != null ? parent.globals : new GlobalValues();
     user = context.user();
   }

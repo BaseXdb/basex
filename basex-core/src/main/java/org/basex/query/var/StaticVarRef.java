@@ -59,7 +59,9 @@ final class StaticVarRef extends ParseExpr {
 
   @Override
   public boolean has(final Flag... flags) {
-    return var != null && var.has(flags);
+    // the variable is evaluated only once: references never construct new nodes
+    final Flag[] flgs = Flag.remove(flags, Flag.CNS);
+    return flgs.length != 0 && var != null && var.has(flgs);
   }
 
   @Override

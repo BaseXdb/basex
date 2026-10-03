@@ -36,6 +36,8 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   final int min;
   /** Updating flag. */
   final boolean updating;
+  /** Memoization flag. */
+  private final boolean memo;
 
   /** Indicates if the query focus is accessed or modified. */
   private boolean simple;
@@ -58,6 +60,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     defaults = params.defaults();
     this.expr = expr;
     updating = anns.contains(Annotation.UPDATING);
+    memo = anns.contains(Annotation._BASEX_MEMO);
 
     int mn = defaults.length;
     for(final Expr dflt : defaults) {
@@ -168,7 +171,35 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   @Override
   public Value invokeInternal(final QueryContext qc, final InputInfo ii, final Value[] args)
       throws QueryException {
-    return qc.invoke(params, args, expr, simple, null);
+    if(!memo) return qc.invoke(params, args, expr, simple, null);
+
+    // coerce arguments before computing the key
+    final int pl = params.length;
+    final Value[] values = new Value[pl];
+    for(int p = 0; p < pl; p++) values[p] = params[p].checkType(args[p], qc, null);
+    final MemoKey key = new MemoKey(this, values);
+    Value value = qc.memo.get(key);
+    if(value == null) {
+      value = qc.invoke(params, values, expr, simple, null);
+      // skip placeholders of deferred tail calls
+      if(qc.tcFunc == null) qc.memo.put(key, value);
+    }
+    return value;
+  }
+
+  /**
+   * Checks if the function can be memoized.
+   * @throws QueryException query exception
+   */
+  void checkMemo() throws QueryException {
+    final Ann ann = anns.get(Annotation._BASEX_MEMO);
+    if(ann == null || expr == null) return;
+    // constructed nodes must not be returned, as cached nodes would have the same identity
+    final boolean atomic = declType != null &&
+        (declType.zero() || declType.type.instanceOf(BasicType.ANY_ATOMIC_TYPE));
+    final String reason = has(Flag.NDT) ? "Function is nondeterministic" :
+      !atomic && has(Flag.CNS) ? "Function constructs nodes, atomic return type expected" : null;
+    if(reason != null) throw BASEX_ANN2_X_X.get(ann.info, ann, reason);
   }
 
   /**
@@ -241,7 +272,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    */
   @Override
   public Expr inline(final Expr[] exprs, final CompileContext cc) throws QueryException {
-    if(!cc.inlineable(anns, expr) || has(Flag.CTX)) return null;
+    if(memo || !cc.inlineable(anns, expr) || has(Flag.CTX)) return null;
     cc.info(OPTINLINE_X, (Supplier<?>) this::funcLabel);
     return cc.inline(params, exprs, null, expr, null, info);
   }

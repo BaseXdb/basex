@@ -189,6 +189,14 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
   }
 
   /**
+   * Checks if the functions annotated with %basex:memo can be memoized.
+   * @throws QueryException query exception
+   */
+  public void checkMemo() throws QueryException {
+    for(final StaticFunc func : this) func.checkMemo();
+  }
+
+  /**
    * Compiles all functions.
    * @param cc compilation context
    */

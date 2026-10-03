@@ -419,6 +419,8 @@ public class QueryParser extends InputParser {
     qc.functions.resolve();
     // resolve variable references
     qc.vars.resolve();
+    // check memoized functions
+    qc.functions.checkMemo();
 
     if(qc.contextValue != null) {
       final Expr ctx = qc.contextValue.expr;

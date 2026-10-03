@@ -33,6 +33,8 @@ public enum Annotation {
   _BASEX_LAZY("lazy()", params(), BASEX_URI),
   /** XQuery annotation. */
   _BASEX_LOCK("lock(key)", params(STRING), BASEX_URI),
+  /** XQuery annotation. */
+  _BASEX_MEMO("memo()", params(), BASEX_URI),
 
   /** XQuery annotation. */
   _INPUT_CSV("csv(options...)", params(STRING), INPUT_URI),
