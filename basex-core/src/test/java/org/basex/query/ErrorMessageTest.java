@@ -137,9 +137,9 @@ public final class ErrorMessageTest extends SandboxTest {
   /** Destructuring errors name the binding pattern. */
   @Test public void destructuring() {
     errorMessage("let $( $a, $b ) as xs:integer := ('x', 2) return $a", INVTYPE_X,
-        "$( $a, $b ) := ");
-    errorMessage("let $[ $a ] := 1 return $a", INVTYPE_X, "$[ $a ] := ");
-    errorMessage("let ${ $a } := 1 return $a", INVTYPE_X, "${ $a } := ");
+        "$( $a, $b ): ");
+    errorMessage("let $[ $a ] := 1 return $a", INVTYPE_X, "$[ $a ]: ");
+    errorMessage("let ${ $a } := 1 return $a", INVTYPE_X, "${ $a }: ");
   }
 
   /** Unprefixed call of a user-defined function with wrong arity reports an arity mismatch. */

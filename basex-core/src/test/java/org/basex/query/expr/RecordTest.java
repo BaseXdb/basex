@@ -228,19 +228,19 @@ public final class RecordTest extends SandboxTest {
 
     // an unknown key is named, not an optional field that is absent
     query(described.apply("{ 'n': 'x', 'b': 1 }"),
-        "Item of type local:r expected, \"b\" unknown: { \"n\": \"x\", \"b\": 1 }.");
+        "local:r expected, \"b\" unknown: { \"n\": \"x\", \"b\": 1 }.");
     query(described.apply("{ 'n': 'x', 1: 2 }"),
-        "Item of type local:r expected, 1 unknown: { \"n\": \"x\", 1: 2 }.");
+        "local:r expected, 1 unknown: { \"n\": \"x\", 1: 2 }.");
     // a missing field is only reported if it does not admit the empty sequence
     query(described.apply("{ 'a': 'x' }"),
-        "Item of type local:r expected, \"n\" missing: { \"a\": \"x\" }.");
+        "local:r expected, \"n\" missing: { \"a\": \"x\" }.");
     // a field that cannot be coerced is named, also in a nested record
     query(described.apply("{ 'n': () }"),
         "Field \"n\" of local:r: One item expected (xs:string), 0 found.");
     query(described.apply("{ 'n': 1 }"),
-        "Field \"n\" of local:r: Item of type xs:string expected, xs:integer found: 1.");
+        "Field \"n\" of local:r: xs:string expected, xs:integer found: 1.");
     query(described.apply("{ 'n': 'x', 's': { 'b': 'y' } }"), "Field \"s\" of local:r: "
-        + "Field \"b\" of local:in: Item of type xs:integer expected, xs:string found: \"y\".");
+        + "Field \"b\" of local:in: xs:integer expected, xs:string found: \"y\".");
     // other errors are passed on
     error(prolog + "local:f({ 'n': 'x', 's': { 'b': xs:untypedAtomic('y') } })", FUNCCAST_X_X);
   }

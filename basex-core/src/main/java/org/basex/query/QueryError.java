@@ -1752,10 +1752,10 @@ public enum QueryError {
       final QNm name, final InputInfo info) {
 
     final TokenBuilder desc = new TokenBuilder();
+    if(name != null) desc.add(name.varString()).add(": ");
     if(ist.occ.instanceOf(est.occ)) {
       // cardinality matches, focus on type:
-      desc.add(est.occ == Occ.EXACTLY_ONE ? "Item" : "Value");
-      desc.add(" of type ").add(est).add(" expected, ");
+      desc.add(est).add(" expected, ");
       // try to find a missing or an unknown record entry:
       byte[] issue = null;
       if(est.type instanceof final ShapeType sh && !sh.any() && expr instanceof final XQMap map) {
@@ -1779,7 +1779,7 @@ public enum QueryError {
       else desc.add(ist).add(" found");
     } else {
       // add cardinality string
-      desc.add(Strings.capitalize(est.occ.desc)).add(" expected");
+      desc.add(name != null ? est.occ.desc : Strings.capitalize(est.occ.desc)).add(" expected");
       // add expected type if item type differs from input
       if(!ist.type.instanceOf(est.type)) {
         desc.add(" (").add(est).add(")");
@@ -1792,15 +1792,8 @@ public enum QueryError {
         desc.add(" found");
       }
     }
-    // add input (variable, expression)
-    if(name != null || !ist.eq(Types.EMPTY_SEQUENCE_Z)) {
-      desc.add(": ");
-      if(name != null) desc.add(name.varString());
-      if(expr != null) {
-        if(name != null) desc.add(" := ");
-        desc.add(expr.toErrorString());
-      }
-    }
+    // add input expression
+    if(expr != null && !ist.eq(Types.EMPTY_SEQUENCE_Z)) desc.add(": ").add(expr.toErrorString());
     return INVTYPE_X.get(info, desc);
   }
 
