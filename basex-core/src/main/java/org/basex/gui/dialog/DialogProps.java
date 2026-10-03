@@ -5,8 +5,6 @@ import static org.basex.gui.GUIConstants.*;
 
 import java.awt.*;
 
-import javax.swing.*;
-
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
@@ -46,8 +44,12 @@ public final class DialogProps extends BaseXDialog {
   private final BaseXBack pathsPanel;
   /** Name tab. */
   private final BaseXBack indexesPanel;
-  /** Contains the panels that are currently being updated. */
-  private final IntList updated = new IntList();
+  /** Versions for which the index infos were requested. */
+  private final int[] requested = new int[LABELS.length];
+  /** Version of the database state, incremented after updates. */
+  private int version;
+  /** Number of running index info computations. */
+  private int running;
   /** Tabbed pane. */
   private final BaseXTabs tabs;
   /** Options dialog. */
@@ -110,9 +112,7 @@ public final class DialogProps extends BaseXDialog {
       buttons[l] = new BaseXButton(this, " ");
       BaseXLayout.setHeight(panels[l], 160);
     }
-    // no full-text index in main-memory mode
     final Data data = gui.context.data();
-    buttons[IndexType.FULLTEXT.ordinal()].setEnabled(!data.inMemory());
 
     // alternative panels
     indexes[IndexType.TEXT.ordinal()] = new DialogValues(this, IndexType.TEXT);
@@ -174,7 +174,6 @@ public final class DialogProps extends BaseXDialog {
 
     optimize = new BaseXButton(this, OPTIMIZE);
     optimizeAll = new BaseXButton(this, OPTIMIZE_ALL);
-    optimizeAll.setEnabled(!gui.context.data().inMemory());
     tabsPanel.add(newButtons(optimize, optimizeAll), BorderLayout.SOUTH);
 
     set(tabsPanel, BorderLayout.CENTER);
@@ -187,7 +186,7 @@ public final class DialogProps extends BaseXDialog {
   /**
    * Updates the currently visible index panel.
    */
-  private synchronized void updateInfo() {
+  private void updateInfo() {
     final Object o = tabs.getSelectedComponent();
     final IntList il = new IntList();
     if(o == namesPanel) {
@@ -210,16 +209,46 @@ public final class DialogProps extends BaseXDialog {
     };
     final int is = il.size();
     for(int i = 0; i < is; i++) {
-      final int idx = il.get(i);
-      if(updated.contains(idx)) continue;
-      updated.add(idx);
+      final int idx = il.get(i), v = version;
+      if(requested[idx] == v) continue;
+      requested[idx] = v;
 
-      SwingUtilities.invokeLater(() -> {
-        infos[idx].setText(val[idx] ? data.info(TYPES[idx], gui.context.options) :
-          Token.token(HELP[idx]));
-        updated.removeAll(idx);
-      });
+      running++;
+      enableButtons();
+      new GUIWorker<byte[]>() {
+        @Override
+        protected byte[] doInBackground() {
+          try {
+            return val[idx] ? data.info(TYPES[idx], gui.context.options) :
+              Token.token(HELP[idx]);
+          } catch(final RuntimeException ex) {
+            Util.stack(ex);
+            return Token.token(Util.message(ex));
+          }
+        }
+
+        @Override
+        protected void done(final byte[] info) {
+          if(v == version) infos[idx].setText(info);
+          running--;
+          enableButtons();
+        }
+      }.execute();
     }
+  }
+
+  /**
+   * Enables the buttons that update the database if no index infos are being computed.
+   */
+  private void enableButtons() {
+    final Data data = gui.context.data();
+    final boolean idle = running == 0;
+    for(final BaseXButton button : buttons) {
+      if(button != null) button.setEnabled(idle);
+    }
+    buttons[IndexType.FULLTEXT.ordinal()].setEnabled(idle && !data.inMemory());
+    optimize.setEnabled(idle && !data.meta.uptodate);
+    optimizeAll.setEnabled(idle && !data.inMemory());
   }
 
   /**
@@ -286,6 +315,7 @@ public final class DialogProps extends BaseXDialog {
         if(buttons[l] != null) buttons[l].setText(exists[l] ? DROP : CREATE);
         add(l, indexes[l] == null || exists[l] ? null : indexes[l]);
       }
+      version++;
       updateInfo();
     }
 
@@ -296,8 +326,7 @@ public final class DialogProps extends BaseXDialog {
     dbInfo.setText(InfoDB.db(data, true, false));
     nsInfo.setText(data.nspaces.info());
 
-    optimize.setEnabled(outofdate);
-    optimizeAll.setEnabled(!data.inMemory());
+    enableButtons();
   }
 
   @Override

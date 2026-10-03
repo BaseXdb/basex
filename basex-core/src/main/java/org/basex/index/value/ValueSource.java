@@ -27,6 +27,15 @@ interface ValueSource {
   byte[] key(int i);
 
   /**
+   * Returns the key at the specified position without caching it.
+   * @param i position
+   * @return key
+   */
+  default byte[] scanKey(final int i) {
+    return key(i);
+  }
+
+  /**
    * Returns the position of a key.
    * @param key key
    * @return position, or {@code -(insertion point) - 1} if the key is not found

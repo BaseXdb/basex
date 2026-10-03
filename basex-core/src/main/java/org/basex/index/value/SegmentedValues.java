@@ -10,6 +10,7 @@ import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
+import org.basex.index.stats.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -282,12 +283,21 @@ public final class SegmentedValues extends SegmentedIndex {
     long l = buffer.length();
     for(final IndexSegment segment : segments) l += segment.length();
     tb.add(LI_SIZE).add(Performance.formatHuman(l)).add(NL);
-    if(!pristine) {
+    final ValueBase base = base();
+    if(pristine) {
+      // unchanged index: all references are live, keys are only derived for reported entries
+      final IndexStats stats = new IndexStats(options.get(MainOptions.MAXSTAT));
+      final int size = base.size();
+      for(int i = 0; i < size; i++) {
+        final int count = base.count(i);
+        if(stats.adding(count)) stats.add(base.scanKey(i), count);
+      }
+      stats.print(tb);
+    } else {
       segmentInfo(tb);
-      final ValueBase base = base();
       if(base != null) tb.add(LI).add("Pinned: ").addInt(base.pins()).add(NL);
+      stats(tb, options, new IndexEntries(EMPTY, true, type));
     }
-    stats(tb, options, new IndexEntries(EMPTY, true, type));
     return tb.finish();
   }
 

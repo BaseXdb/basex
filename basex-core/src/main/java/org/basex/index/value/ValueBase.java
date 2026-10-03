@@ -48,6 +48,21 @@ final class ValueBase extends ValueStore {
 
   @Override
   public byte[] key(final int i) {
+    return key(i, true);
+  }
+
+  @Override
+  public byte[] scanKey(final int i) {
+    return key(i, false);
+  }
+
+  /**
+   * Returns the key at the specified position.
+   * @param i position
+   * @param store cache a derived key
+   * @return key
+   */
+  private byte[] key(final int i, final boolean store) {
     byte[] key = pins.get(i);
     if(key != null) return key;
     key = ctext.get(i);
@@ -59,7 +74,7 @@ final class ValueBase extends ValueStore {
     if(pre == -1) throw Util.notExpected("%: key % cannot be derived.", type, i);
     final byte[] text = data.text(pre, type == IndexType.TEXT);
     key = type == IndexType.TOKEN ? distinctTokens(text)[pos] : text;
-    ctext.put(i, key);
+    if(store) ctext.put(i, key);
     return key;
   }
 

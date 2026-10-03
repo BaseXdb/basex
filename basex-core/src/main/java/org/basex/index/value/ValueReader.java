@@ -33,7 +33,7 @@ final class ValueReader implements SegmentReader {
 
   @Override
   public byte[] key() {
-    if(key == null && i < source.size()) key = source.key(i);
+    if(key == null && i < source.size()) key = source.scanKey(i);
     return key;
   }
 
