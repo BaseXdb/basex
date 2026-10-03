@@ -188,12 +188,14 @@ final class SyntaxXQuery extends SyntaxMarkup {
       final String prefixed = string(fd.name.prefixId());
       final Signature signature = Signature.get(args);
       SIGNATURES.put(prefixed, signature);
+      // deprecated functions get signature hints, but are never proposed
+      final boolean propose = !Functions.DEPRECATED.contains(fd.name);
       if(deflt) {
         final String local = string(fd.name.local());
         SIGNATURES.put(local, signature);
-        add(local, args, value, abbrs, names, false);
+        if(propose) add(local, args, value, abbrs, names, false);
       }
-      add(prefixed, args, value, prefixedAbbrs, prefixedNames, deflt);
+      if(propose) add(prefixed, args, value, prefixedAbbrs, prefixedNames, deflt);
     }
     // add annotations (annotations of the XQuery namespace are specified without prefix)
     for(final Annotation ann : Annotation.values()) {

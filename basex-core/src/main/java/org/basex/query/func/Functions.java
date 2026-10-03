@@ -34,6 +34,8 @@ import org.basex.util.similarity.*;
 public final class Functions {
   /** Definitions of built-in functions. */
   public static final QNmMap<FuncDefinition> BUILT_IN = new QNmMap<>();
+  /** Deprecated built-in functions, which are never suggested. */
+  public static final QNmSet DEPRECATED = new QNmSet();
 
   /** URIs of built-in functions. */
   private static final TokenSet URIS = new TokenSet();
@@ -58,6 +60,7 @@ public final class Functions {
       if(BUILT_IN.put(name, fd) != null) throw Util.notExpected("Function % defined twice.", name);
       URIS.add(name.uri());
     }
+    DEPRECATED.add(Function._STRING_FORMAT.definition().name);
   }
 
   /**

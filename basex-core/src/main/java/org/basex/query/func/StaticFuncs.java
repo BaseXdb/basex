@@ -341,7 +341,7 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
     final byte[] local = Token.lc(qname.local()), uri = qname.uri();
     // built-in function in the same URI (Levenshtein with prefix fallback)
     QNm similar = Levenshtein.similarOrPrefix(qname.local(), Functions.BUILT_IN.keys(),
-        o -> Token.eq(uri, o.uri()) ? o.local() : null);
+        o -> Token.eq(uri, o.uri()) && !Functions.DEPRECATED.contains(o) ? o.local() : null);
     // fall back to visible local user-defined function
     if(similar == null && info != null) {
       final QNmSet names = new QNmSet();
@@ -356,7 +356,7 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
     // fall back to identical local name in a different URI (namespace hint)
     if(similar == null) {
       for(final QNm qnm : Functions.BUILT_IN) {
-        if(Token.eq(Token.lc(qnm.local()), local)) {
+        if(Token.eq(Token.lc(qnm.local()), local) && !Functions.DEPRECATED.contains(qnm)) {
           similar = qnm;
           break;
         }
