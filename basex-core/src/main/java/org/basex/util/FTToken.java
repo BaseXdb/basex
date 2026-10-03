@@ -35,6 +35,15 @@ public final class FTToken {
   }
 
   /**
+   * Returns true if the specified codepoint can start a token (letter or digit).
+   * @param cp codepoint to be tested
+   * @return result of check
+   */
+  public static boolean start(final int cp) {
+    return isLOD(Character.getType(cp));
+  }
+
+  /**
    * Returns a token without diacritics.
    * @param token token to be normalized
    * @return resulting token

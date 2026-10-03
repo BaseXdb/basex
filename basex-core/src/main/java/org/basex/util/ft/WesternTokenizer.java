@@ -153,7 +153,8 @@ public final class WesternTokenizer extends Tokenizer {
       } else if(!pa && cp == '\n') {
         pa = true;
         ++paragraph;
-      } else if(lod(cp)) {
+      } else if(start(cp)) {
+        // combining marks can only continue a token
         // backslash (bs) followed by any character is the character itself:
         if(bs) {
           --t;
@@ -212,7 +213,7 @@ public final class WesternTokenizer extends Tokenizer {
     for(; t < txtl; t += cl(txt, t)) {
       final int cp = cp(txt, t);
       if(cp == '\n') pa = true;
-      else if(lod(cp)) break;
+      else if(start(cp)) break;
       sp = true;
     }
     para = pa;

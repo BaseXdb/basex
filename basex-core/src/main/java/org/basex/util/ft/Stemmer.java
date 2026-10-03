@@ -90,13 +90,23 @@ public abstract class Stemmer extends LanguageImpl {
   @Override
   public final FTSpan next() {
     final FTSpan s = iter.next();
-    s.text = stem(s.text);
+    s.text = nonEmpty(s.text);
     return s;
   }
 
   @Override
   public final byte[] nextToken() {
-    return stem(iter.nextToken());
+    return nonEmpty(iter.nextToken());
+  }
+
+  /**
+   * Stems a word, or returns the word itself if its stem is empty.
+   * @param word word
+   * @return stem or word
+   */
+  private byte[] nonEmpty(final byte[] word) {
+    final byte[] stem = stem(word);
+    return stem.length != 0 ? stem : word;
   }
 
   @Override

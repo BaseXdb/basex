@@ -378,6 +378,11 @@ public final class FtModuleTest extends SandboxTest {
     query("declare ft-option using stemming; " + func.args("Gifts"), "gift");
     query("count(" + func.args("") + ')', 0);
     query("count(" + func.args("a!b:c") + ')', 3);
+
+    // standalone combining marks are no tokens
+    query(func.args("a ́ b-̃̈ c"), "a\nb\nc");
+    query(func.args("a ́ b-̃̈ c", " { 'diacritics': 'sensitive' }"), "a\nb\nc");
+    query(func.args("́b ć", " { 'diacritics': 'sensitive' }"), "b\nć");
   }
 
   /** Test method. */

@@ -286,9 +286,18 @@ final class JapaneseTokenizer extends Tokenizer {
 
     while(tokens.hasNext()) {
       currToken = tokens.next();
-      if(!currToken.isMark() && !currToken.isAttachedWord()) return true;
+      if(word(currToken)) return true;
     }
     return false;
+  }
+
+  /**
+   * Checks if a morpheme is a word: no mark, no attached word, and not only combining marks.
+   * @param m morpheme
+   * @return result of check
+   */
+  private static boolean word(final Morpheme m) {
+    return !m.isMark() && !m.isAttachedWord() && noDiacritics(token(m.surface())).length != 0;
   }
 
   @Override
@@ -326,7 +335,7 @@ final class JapaneseTokenizer extends Tokenizer {
   private byte[] getSC() {
     final Morpheme m = tokens.next();
     final String n = m.surface();
-    if(m.isMark() || m.isAttachedWord()) {
+    if(!word(m)) {
       sc = true;
     } else {
       pos++;
