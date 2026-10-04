@@ -152,7 +152,7 @@ public final class CreateDB extends ACreate {
    * @return new database instance
    * @throws IOException I/O exception
    */
-  public static synchronized Data create(final String name, final Parser parser, final Context ctx,
+  public static Data create(final String name, final Parser parser, final Context ctx,
       final MainOptions options) throws IOException {
     return create(name, parser, ctx, options, options.get(MainOptions.MAINMEM));
   }
@@ -167,23 +167,30 @@ public final class CreateDB extends ACreate {
    * @return new database instance
    * @throws IOException I/O exception
    */
-  public static synchronized Data create(final String name, final Parser parser, final Context ctx,
+  public static Data create(final String name, final Parser parser, final Context ctx,
       final MainOptions options, final boolean mainmem) throws IOException {
 
     // check permissions
     if(!ctx.user().has(Perm.CREATE)) throw new BaseXException(PERM_REQUIRED_X, Perm.CREATE);
 
-    // create main-memory or disk-based database instance
-    final Data data;
-    if(mainmem) {
-      data = MemBuilder.build(name, parser);
-    } else {
+    // main-memory instances are not shared and can be created in parallel
+    if(mainmem) return index(MemBuilder.build(name, parser), ctx);
+    synchronized(CreateDB.class) {
       // database is currently locked by another job
       if(ctx.pinned(name)) throw new BaseXException(DB_PINNED_X, name);
       new DiskBuilder(name, parser, ctx.soptions, options).build().close();
-      data = Open.open(name, ctx, options, true, true);
+      return index(Open.open(name, ctx, options, true, true), ctx);
     }
+  }
 
+  /**
+   * Creates the indexes of a new database instance.
+   * @param data data reference
+   * @param ctx database context
+   * @return data reference
+   * @throws IOException I/O exception
+   */
+  private static Data index(final Data data, final Context ctx) throws IOException {
     try {
       CreateIndex.create(data, null);
     } catch(final IOException ex) {
