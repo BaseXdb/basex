@@ -276,11 +276,12 @@ public final class TokenBuilder {
     final int l = end - start;
     if(l > 0) {
       byte[] chrs = chars;
-      final int cl = chrs.length, s = size, ns = s + l;
-      if(ns > cl) chrs = Arrays.copyOf(chrs, Array.newCapacity(ns));
+      final int s = size;
+      final long ns = (long) s + l;
+      if(ns > chrs.length) chrs = Arrays.copyOf(chrs, Array.newCapacity(ns));
       Array.copy(token, start, l, chrs, s);
       chars = chrs;
-      size = ns;
+      size = (int) ns;
     }
     return this;
   }

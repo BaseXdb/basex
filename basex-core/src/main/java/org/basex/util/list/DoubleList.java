@@ -53,13 +53,14 @@ public final class DoubleList extends ElementList {
    */
   public DoubleList add(final double... elements) {
     double[] lst = list;
-    final int l = elements.length, s = size, ns = s + l;
+    final int l = elements.length, s = size;
+    final long ns = (long) s + l;
     if(ns > lst.length) {
       lst = Arrays.copyOf(lst, newCapacity(ns));
       list = lst;
     }
     Array.copyFromStart(elements, l, lst, s);
-    size = ns;
+    size = (int) ns;
     return this;
   }
 

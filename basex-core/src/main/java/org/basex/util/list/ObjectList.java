@@ -94,13 +94,14 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
   @SuppressWarnings("unchecked")
   public final L add(final E... elements) {
     E[] lst = list;
-    final int l = elements.length, s = size, ns = s + l;
+    final int l = elements.length, s = size;
+    final long ns = (long) s + l;
     if(ns > lst.length) {
       lst = Array.copy(lst, newArray(newCapacity(ns)));
       list = lst;
     }
     Array.copyFromStart(elements, l, lst, s);
-    size = ns;
+    size = (int) ns;
     return (L) this;
   }
 
@@ -123,15 +124,15 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
    */
   @SuppressWarnings("unchecked")
   public final L set(final int index, final E element) {
-    checkIndex(index);
     E[] lst = list;
-    final int s = size, ns = index + 1;
+    final int s = size;
+    final long ns = index + 1L;
     if(ns > lst.length) {
       lst = Array.copy(lst, newArray(newCapacity(ns)));
       list = lst;
     }
     lst[index] = element;
-    size = Math.max(s, ns);
+    size = (int) Math.max(s, ns);
     return (L) this;
   }
 
@@ -156,13 +157,14 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
     final int l = elements.length;
     if(l != 0) {
       E[] lst = list;
-      final int s = size, ns = s + l;
+      final int s = size;
+      final long ns = (long) s + l;
       if(ns > lst.length) {
         lst = Array.copy(lst, newArray(newCapacity(ns)));
         list = lst;
       }
       Array.insert(lst, index, l, s, elements);
-      size = ns;
+      size = (int) ns;
     }
     return (L) this;
   }

@@ -22,8 +22,7 @@ public final class BoolListTest {
   /** Test method for {@link BoolList#set(int, boolean)}: rejects a negative index. */
   @Test public void setNegative() {
     final BoolList list = new BoolList();
-    final Throwable th = assertThrows(ArrayIndexOutOfBoundsException.class,
-        () -> list.set(-1, true));
-    assertEquals("Negative index: -1.", th.getMessage());
+    assertThrows(ArrayIndexOutOfBoundsException.class, () -> list.set(-1, true));
+    assertEquals(0, list.size());
   }
 }

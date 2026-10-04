@@ -32,16 +32,8 @@ public abstract class ElementList {
    * @param min minimum size
    * @return new array size
    */
-  protected final int newCapacity(final int min) {
-    return Math.max(newCapacity(), min);
-  }
-
-  /**
-   * Raises an exception if the specified index is negative.
-   * @param index index
-   */
-  protected static void checkIndex(final int index) {
-    if(index < 0) throw new ArrayIndexOutOfBoundsException("Negative index: " + index + '.');
+  protected final int newCapacity(final long min) {
+    return Math.max(newCapacity(), Array.checkCapacity(min));
   }
 
   /**

@@ -53,13 +53,14 @@ public final class FloatList extends ElementList {
    */
   public FloatList add(final float... elements) {
     float[] lst = list;
-    final int l = elements.length, s = size, ns = s + l;
+    final int l = elements.length, s = size;
+    final long ns = (long) s + l;
     if(ns > lst.length) {
       lst = Arrays.copyOf(lst, newCapacity(ns));
       list = lst;
     }
     Array.copyFromStart(elements, l, lst, s);
-    size = ns;
+    size = (int) ns;
     return this;
   }
 

@@ -235,10 +235,10 @@ public final class Array {
    * Returns a value for a new array size, which will always be larger than the old size.
    * The returned value will not exceed the maximum allowed array size.
    * If the maximum is reached, an exception is thrown.
-   * @param size old array capacity
+   * @param size current or required size
    * @return new capacity
    */
-  public static int newCapacity(final int size) {
+  public static int newCapacity(final long size) {
     return newCapacity(size, RESIZE_FACTOR);
   }
 
@@ -246,11 +246,11 @@ public final class Array {
    * Returns a value for a new array size, which will always be larger than the old size.
    * The returned value will not exceed the maximum allowed array size.
    * If the maximum is reached, an exception is thrown.
-   * @param size old array capacity
+   * @param size current or required size
    * @param factor resize factor; must be 10 or larger
    * @return new capacity
    */
-  public static int newCapacity(final int size, final byte factor) {
+  public static int newCapacity(final long size, final byte factor) {
     return (int) Math.min(MAX_SIZE, (long) checkCapacity(size + 1) * factor / 10);
   }
 

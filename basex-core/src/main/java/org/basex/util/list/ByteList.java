@@ -66,7 +66,8 @@ public final class ByteList extends ElementList {
    */
   public ByteList add(final byte[] elements, final int start, final int end) {
     final int l = end - start;
-    if(size + l > list.length) list = Arrays.copyOf(list, newCapacity(size + l));
+    final long ns = (long) size + l;
+    if(ns > list.length) list = Arrays.copyOf(list, newCapacity(ns));
     Array.copy(elements, start, l, list, size);
     size += l;
     return this;

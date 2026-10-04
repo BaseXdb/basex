@@ -42,10 +42,8 @@ public final class ArrayOutput extends PrintOutput {
     if(free <= 0) return;
 
     byte[] bffr = buffer;
-    final int needed = Array.checkCapacity((long) s + free);
-    if(needed > bffr.length) {
-      bffr = Arrays.copyOf(bffr, Math.max(Array.newCapacity(bffr.length), needed));
-    }
+    final long needed = (long) s + free;
+    if(needed > bffr.length) bffr = Arrays.copyOf(bffr, Array.newCapacity(needed));
     System.arraycopy(b, off, bffr, s, free);
     buffer = bffr;
     size = s + free;

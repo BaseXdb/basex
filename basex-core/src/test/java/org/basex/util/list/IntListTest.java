@@ -59,7 +59,7 @@ public final class IntListTest {
   /** Test method for {@link IntList#set(int, int)}: rejects a negative index. */
   @Test public void setNegative() {
     final IntList list = new IntList();
-    final Throwable th = assertThrows(ArrayIndexOutOfBoundsException.class, () -> list.set(-1, 9));
-    assertEquals("Negative index: -1.", th.getMessage());
+    assertThrows(ArrayIndexOutOfBoundsException.class, () -> list.set(-1, 9));
+    assertEquals(0, list.size());
   }
 }

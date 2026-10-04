@@ -53,13 +53,14 @@ public final class BoolList extends ElementList {
    */
   public BoolList add(final boolean... elements) {
     boolean[] lst = list;
-    final int l = elements.length, s = size, ns = s + l;
+    final int l = elements.length, s = size;
+    final long ns = (long) s + l;
     if(ns > lst.length) {
       lst = Arrays.copyOf(lst, newCapacity(ns));
       list = lst;
     }
     Array.copyFromStart(elements, l, lst, s);
-    size = ns;
+    size = (int) ns;
     return this;
   }
 
@@ -78,16 +79,16 @@ public final class BoolList extends ElementList {
    * @param element element to be stored
    */
   public void set(final int index, final boolean element) {
-    checkIndex(index);
     boolean[] lst = list;
-    final int s = size, ns = index + 1;
+    final int s = size;
+    final long ns = index + 1L;
     if(ns > lst.length) {
       lst = Arrays.copyOf(lst, newCapacity(ns));
       list = lst;
     }
     if(index > s) Arrays.fill(lst, s, index, false);
     lst[index] = element;
-    size = Math.max(s, ns);
+    size = (int) Math.max(s, ns);
   }
 
   /**
