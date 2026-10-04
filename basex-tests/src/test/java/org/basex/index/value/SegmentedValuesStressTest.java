@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class SegmentedValuesConcurrencyTest extends SandboxTest {
+public final class SegmentedValuesStressTest extends SandboxTest {
   /** Segment threshold of the tests. */
   private static final int THRESHOLD = 10;
   /** Default segment threshold. */
@@ -58,7 +58,7 @@ public final class SegmentedValuesConcurrencyTest extends SandboxTest {
    * @throws Exception exception
    */
   @Test @Timeout(120) public void autoflush() throws Exception {
-    run(8, 9);
+    run(20, 15);
   }
 
   /**
@@ -67,7 +67,7 @@ public final class SegmentedValuesConcurrencyTest extends SandboxTest {
    */
   @Test @Timeout(120) public void noAutoflush() throws Exception {
     set(MainOptions.AUTOFLUSH, false);
-    run(8, 9);
+    run(20, 15);
   }
 
   /**

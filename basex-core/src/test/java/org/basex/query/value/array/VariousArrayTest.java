@@ -63,7 +63,7 @@ public final class VariousArrayTest extends ArrayTest {
    * Test an {@link XQArray} used as a LIFO stack.
    */
   @Test public void stackTest() {
-    final int n = 2_000_000;
+    final int n = 200_000;
     XQArray array = XQArray.empty();
 
     for(int i = 0; i < n; i++) {

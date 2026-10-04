@@ -216,7 +216,7 @@ public final class JobModuleTest extends SandboxTest {
     // run every second, and check that the job is registered and repeated
     final Function func = _JOB_EVAL;
     final String id = query(func.args("prof:sleep(400)", " ()",
-        " { 'cron': '* * * * * *', 'end': 'PT2.5S' }"));
+        " { 'cron': '* * * * * *', 'end': 'PT2S' }"));
     query(_JOB_LIST_DETAILS.args(id) + "/@cron/string()", "* * * * * *");
     Performance.sleep(1200);
     query(_JOB_LIST.args() + "='" + id + '\'', true);
@@ -252,11 +252,8 @@ public final class JobModuleTest extends SandboxTest {
     // ensure that next query is running
     Performance.sleep(200);
     query(_JOB_FINISHED.args(id), false);
-    // stop query, wait
+    // stop query, ensure that query is not run again
     query(_JOB_REMOVE.args(id));
-    Performance.sleep(400);
-    // ensure that query is not run again
-    query(_JOB_FINISHED.args(id), true);
     Performance.sleep(400);
     query(_JOB_FINISHED.args(id), true);
   }
@@ -270,8 +267,7 @@ public final class JobModuleTest extends SandboxTest {
     // ensure that query is running
     Performance.sleep(500);
     query(_JOB_LIST.args() + "='" + id + '\'', true);
-    Performance.sleep(1200);
-    query(_JOB_LIST.args() + "='" + id + '\'', false);
+    assertEquals("true", waitUntil("not(" + _JOB_LIST.args() + "='" + id + "')"));
 
     // error
     error(func.args("1", " ()",
@@ -407,7 +403,7 @@ public final class JobModuleTest extends SandboxTest {
    * Test method: a service is executed after a restart.
    */
   @Test public void evalServiceRestart() {
-    query(_JOB_EVAL.args("1", " ()", " { 'id': 'RESTART', 'start': 'PT1S', 'service': true() }"));
+    query(_JOB_EVAL.args("1", " ()", " { 'id': 'RESTART', 'start': 'PT0.5S', 'service': true() }"));
     // drop the scheduled job, keep the service
     query(_JOB_REMOVE.args("RESTART"));
     // restart: reschedule all services

@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class IndexUpdateConcurrencyTest extends SandboxTest {
+public final class IndexUpdateStressTest extends SandboxTest {
   /** Words that are indexed. */
   private static final String[] WORDS = { "alpha", "beta", "gamma", "delta", "epsilon" };
 
@@ -52,16 +52,16 @@ public final class IndexUpdateConcurrencyTest extends SandboxTest {
    * Runs the test.
    * @throws Exception exception
    */
-  @Test @Timeout(120) public void fewClients() throws Exception {
-    run(5, 6);
+  @Test @Timeout(120) public void clients10runs20() throws Exception {
+    run(10, 20);
   }
 
   /**
    * Runs the test.
    * @throws Exception exception
    */
-  @Test @Timeout(120) public void manyClients() throws Exception {
-    run(20, 2);
+  @Test @Timeout(120) public void clients50runs10() throws Exception {
+    run(50, 10);
   }
 
   /**

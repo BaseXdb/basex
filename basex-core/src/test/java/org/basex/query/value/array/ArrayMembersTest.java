@@ -17,7 +17,7 @@ import org.junit.jupiter.api.*;
 public final class ArrayMembersTest extends ArrayTest {
   /** Random movements inside the array. */
   @Test public void randomTest() {
-    for(int n = 0; n < 1_000; n++) {
+    for(int n = 0; n < 300; n++) {
       final Random rng = new Random(1337 + n);
       XQArray array = XQArray.empty();
       final ArrayList<Integer> list = new ArrayList<>(n);

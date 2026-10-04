@@ -52,7 +52,7 @@ public final class InspectionTest extends SandboxTest {
       for(final boolean updindex : new boolean[] { false, true }) {
         set(MainOptions.MAINMEM, mainmem);
         set(MainOptions.UPDINDEX, updindex);
-        execute(new CreateDB(NAME, "src/test/resources/factbook.zip"));
+        execute(new CreateDB(NAME, "src/test/resources/input.xml"));
         execute(new Add("ns.xml", "<x:a xmlns:x='urn:x' xmlns='urn:d' x:b='1'>" +
             "<c xmlns:y='urn:y' y:d='t u t'><?pi c?><!--c--></c></x:a>"));
         assertValid();

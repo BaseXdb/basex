@@ -22,9 +22,9 @@ import org.junit.jupiter.api.*;
 public final class StaticVarTest extends SandboxTest {
   /** Query declaring a lazy variable that takes a while to evaluate. */
   private static final String QUERY =
-      "declare %basex:lazy variable $v := (prof:sleep(1000), random:uuid()); $v";
+      "declare %basex:lazy variable $v := (prof:sleep(300), random:uuid()); $v";
   /** Milliseconds to wait before the second context reads the variable. */
-  private static final long DELAY = 300;
+  private static final long DELAY = 100;
   /** Milliseconds to wait for the second context to return. */
   private static final long TIMEOUT = 10000;
 

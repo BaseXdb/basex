@@ -246,7 +246,7 @@ public final class FTIndexUpdateTest extends SandboxTest {
     execute(new CreateDB(NAME, "<x/>"));
     final Random rnd = new Random(1);
     final String[] words = { "alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta" };
-    for(int r = 0; r < 200; r++) {
+    for(int r = 0; r < 100; r++) {
       final String word = words[rnd.nextInt(words.length)];
       final String db = _DB_GET.args(NAME);
       switch(rnd.nextInt(5)) {

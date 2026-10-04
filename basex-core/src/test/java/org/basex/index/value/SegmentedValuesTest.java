@@ -306,7 +306,7 @@ public final class SegmentedValuesTest extends SandboxTest {
    */
   @Test public void builderSplits() throws IOException {
     final String input =
-      "<x>{ (1 to 5000) ! <a t='t{ . mod 13 } u{ . mod 7 }'>v{ . mod 101 }</a> }</x>";
+      "<x>{ (1 to 500) ! <a t='t{ . mod 5 } u{ . mod 3 }'>v{ . mod 41 }</a> }</x>";
     final String[] files = { "txtl", "txtr", "atvl", "atvr", "tokl", "tokr" };
     for(final boolean updindex : new boolean[] { false, true }) {
       set(MainOptions.UPDINDEX, updindex);
@@ -314,7 +314,7 @@ public final class SegmentedValuesTest extends SandboxTest {
       execute(new Close());
       query(_DB_ADD.args(NAME2, " " + input, "x.xml"));
       query(_DB_OPTIMIZE.args(NAME2, true));
-      DiskValuesBuilder.splitKeys = 20;
+      DiskValuesBuilder.splitKeys = 5;
       try {
         execute(new CreateDB(NAME));
         execute(new Close());

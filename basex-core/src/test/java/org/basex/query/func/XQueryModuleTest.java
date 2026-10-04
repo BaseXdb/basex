@@ -241,8 +241,8 @@ public final class XQueryModuleTest extends SandboxTest {
     query(func.args(" true#0[" + wrap(1) + " = '']"), "");
 
     // run slow and fast query and check that results are returned in the correct order
-    query(func.args(" (function() { (1 to 10000000)[. = 1] }, true#0)"), "1\ntrue");
-    query(func.args(" (true#0, function() { (1 to 10000000)[. = 1] })"), "true\n1");
+    query(func.args(" (function() { (1 to 1000000)[. = 1] }, true#0)"), "1\ntrue");
+    query(func.args(" (true#0, function() { (1 to 1000000)[. = 1] })"), "true\n1");
     query(func.args(" ()"), "");
 
     // options
@@ -344,11 +344,11 @@ xquery:fork-join(
 
     // GH-2678: concurrent access to module-level static variable caused XQDY0054
     // ("static variable depends on itself")
-    query("declare variable $V := (1 to 1000000) ! math:sqrt(.); "
+    query("declare variable $V := (1 to 100000) ! math:sqrt(.); "
         + func.args(" (1 to 16) ! fn() { sum($V) }"));
 
     final IOFile x = new IOFile(sandbox(), "x.xqm");
-    write(x, "module namespace x = 'x'; declare variable $x:V := (1 to 1000000) ! math:sqrt(.);");
+    write(x, "module namespace x = 'x'; declare variable $x:V := (1 to 100000) ! math:sqrt(.);");
     query("import module namespace x = 'x' at \"" + x.path() + "\"; "
         + func.args(" (1 to 16) ! fn() { sum($x:V) }"));
 

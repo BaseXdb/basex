@@ -15,7 +15,7 @@ import org.junit.jupiter.api.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class LocalReadWriteTest extends SandboxTest {
+public final class LocalReadWriteStressTest extends SandboxTest {
   /**
    * Inserts uniquely-identified nodes from many writer threads while reader threads count
    * nodes concurrently, and verifies that every insert is applied exactly once (writes must
@@ -23,7 +23,7 @@ public final class LocalReadWriteTest extends SandboxTest {
    * @throws Exception exception
    */
   @Test @Timeout(60) public void readWriteIntegrity() throws Exception {
-    final int writers = 10, readers = 5, reads = 5;
+    final int writers = 50, readers = 20, reads = 20;
     query(_DB_CREATE.args(NAME, " <root/>", "doc.xml"));
     try {
       final ArrayList<Callable<?>> tasks = new ArrayList<>(writers + readers);
@@ -59,7 +59,7 @@ public final class LocalReadWriteTest extends SandboxTest {
    * @throws Exception exception
    */
   @Test @Timeout(60) public void transactionIsolation() throws Exception {
-    final int writers = 5, readers = 5, runs = 5, nodes = 10;
+    final int writers = 25, readers = 25, runs = 10, nodes = 50;
     final int total = writers * runs * nodes;
     query(_DB_CREATE.args(NAME, " <root/>", "doc.xml"));
     try {

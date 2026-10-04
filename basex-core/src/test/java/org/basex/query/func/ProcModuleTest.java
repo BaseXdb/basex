@@ -6,9 +6,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 
+import javax.tools.*;
+
 import org.basex.*;
 import org.basex.io.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -18,6 +21,35 @@ import org.junit.jupiter.api.*;
  * @author Christian Gruen
  */
 public final class ProcModuleTest extends SandboxTest {
+  /** Java programs: class names and bodies of the main methods. */
+  private static final String[][] PROGRAMS = {
+    // copies standard input to standard output
+    { "Echo", "System.in.transferTo(System.out);" },
+    // writes a file after 1.5 seconds
+    { "Sleep", "Thread.sleep(1500); " +
+      "java.nio.file.Files.writeString(java.nio.file.Path.of(args[0]), \"x\");" },
+    // copies standard input to a file
+    { "Copy", "java.nio.file.Path path = java.nio.file.Path.of(args[0]); " +
+      "java.nio.file.Path tmp = java.nio.file.Path.of(args[0] + \".tmp\"); " +
+      "java.nio.file.Files.write(tmp, System.in.readAllBytes()); " +
+      "java.nio.file.Files.move(tmp, path);" }
+  };
+
+  /**
+   * Compiles the Java programs (compiled classes start much faster than source files).
+   * @throws IOException I/O exception
+   */
+  @BeforeAll public static void compile() throws IOException {
+    final StringList args = new StringList("-d", sandbox().path());
+    for(final String[] program : PROGRAMS) {
+      final IOFile file = new IOFile(sandbox(), program[0] + ".java");
+      file.write("class " + program[0] + " { public static void main(String[] args) " +
+        "throws Exception { " + program[1] + " } }");
+      args.add(file.path());
+    }
+    assertEquals(0, ToolProvider.getSystemJavaCompiler().run(null, null, null, args.finish()));
+  }
+
   /** Test method. */
   @Test public void execute() {
     final Function func = _PROC_EXECUTE;
@@ -79,13 +111,10 @@ public final class ProcModuleTest extends SandboxTest {
     error(func.args("a b c"), PROC_ERROR_X);
   }
 
-  /**
-   * Test method.
-   * @throws IOException I/O exception
-   */
-  @Test public void options() throws IOException {
+  /** Test method. */
+  @Test public void options() {
     final Function func = _PROC_SYSTEM;
-    final String echo = echo();
+    final String echo = program("Echo");
 
     // encoding of input and output
     query(func.args("java", echo, " { 'input': 'ü' }"), "ü");
@@ -117,13 +146,10 @@ public final class ProcModuleTest extends SandboxTest {
         " { 'input': xs:hexBinary('6100FF'), 'fallback': true() }") + ")", "97\n65533\n65533");
   }
 
-  /**
-   * Test method.
-   * @throws IOException I/O exception
-   */
-  @Test public void executeOptions() throws IOException {
+  /** Test method. */
+  @Test public void executeOptions() {
     final Function func = _PROC_EXECUTE;
-    final String echo = echo();
+    final String echo = program("Echo");
 
     query(func.args("java", echo, " { 'input': 'ab' }") + "/output/string()", "ab");
     query(func.args("java", echo, " { 'input': 'ab' }") + "/code/string()", 0);
@@ -134,20 +160,14 @@ public final class ProcModuleTest extends SandboxTest {
     query("contains(" + func.args("java", "x") + "/error, 'x')", true);
   }
 
-  /**
-   * Test method.
-   * @throws IOException I/O exception
-   */
-  @Test public void timeout() throws IOException {
-    // the program writes a file after three seconds
+  /** Test method. */
+  @Test public void timeout() {
     final IOFile file = new IOFile(sandbox(), "timeout.txt");
-    final String program = program("Sleep", "Thread.sleep(3000); " +
-      "java.nio.file.Files.writeString(java.nio.file.Path.of(args[0]), \"x\");");
-    final String args = " ('" + program + "', '" + file.path() + "')";
+    final String args = program("Sleep", file.path());
 
     // the process is terminated when the timeout is exceeded
     error(_PROC_SYSTEM.args("java", args, " { 'timeout': 1 }"), PROC_TIMEOUT);
-    Performance.sleep(5000);
+    Performance.sleep(1500);
     assertFalse(file.exists());
   }
 
@@ -156,14 +176,8 @@ public final class ProcModuleTest extends SandboxTest {
    * @throws IOException I/O exception
    */
   @Test public void forkInput() throws IOException {
-    // the program copies standard input to a file
     final IOFile file = new IOFile(sandbox(), "fork.txt");
-    final String program = program("Copy",
-      "java.nio.file.Path path = java.nio.file.Path.of(args[0]); " +
-      "java.nio.file.Path tmp = java.nio.file.Path.of(args[0] + \".tmp\"); " +
-      "java.nio.file.Files.write(tmp, System.in.readAllBytes()); " +
-      "java.nio.file.Files.move(tmp, path);");
-    final String args = " ('" + program + "', '" + file.path() + "')";
+    final String args = program("Copy", file.path());
 
     query(_PROC_FORK.args("java", args, " { 'input': 'abc' }"), "");
     for(int i = 0; i < 300 && !file.exists(); i++) Performance.sleep(100);
@@ -171,25 +185,15 @@ public final class ProcModuleTest extends SandboxTest {
   }
 
   /**
-   * Creates a Java program that copies standard input to standard output.
-   * @return path to the program
-   * @throws IOException I/O exception
-   */
-  private static String echo() throws IOException {
-    return program("Echo", "System.in.transferTo(System.out);");
-  }
-
-  /**
-   * Creates a Java program.
+   * Returns the arguments for running a compiled Java program.
    * @param name class name
-   * @param body body of the main method
-   * @return path to the program
-   * @throws IOException I/O exception
+   * @param args program arguments
+   * @return arguments
    */
-  private static String program(final String name, final String body) throws IOException {
-    final IOFile file = new IOFile(sandbox(), name + ".java");
-    file.write("class " + name + " { public static void main(String[] args) throws Exception { " +
-      body + " } }");
-    return file.path();
+  private static String program(final String name, final String... args) {
+    final StringBuilder sb = new StringBuilder(" ('-cp', '" + sandbox().path() + "', '" + name +
+      "'");
+    for(final String arg : args) sb.append(", '").append(arg).append('\'');
+    return sb.append(')').toString();
   }
 }

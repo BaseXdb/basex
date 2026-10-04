@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class LockOrderTest extends SandboxTest {
+public final class LockOrderStressTest extends SandboxTest {
   /** Number of databases. */
   private static final int DBS = 5;
   /** Number of items in a database. */
@@ -46,7 +46,7 @@ public final class LockOrderTest extends SandboxTest {
    * @throws Exception exception
    */
   @Test @Timeout(120) public void staticLocks() throws Exception {
-    run(8, 5, false);
+    run(20, 20, false);
   }
 
   /**
@@ -54,7 +54,7 @@ public final class LockOrderTest extends SandboxTest {
    * @throws Exception exception
    */
   @Test @Timeout(120) public void runtimeLocks() throws Exception {
-    run(8, 5, true);
+    run(20, 20, true);
   }
 
   /**
@@ -62,7 +62,7 @@ public final class LockOrderTest extends SandboxTest {
    * @throws Exception exception
    */
   @Test @Timeout(120) public void manyClients() throws Exception {
-    run(20, 2, false);
+    run(50, 10, false);
   }
 
   /**
