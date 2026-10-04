@@ -36,6 +36,8 @@ public class QueryException extends Exception {
     "code", "description", "value", "module", "line-number",
     "column-number", "additional", "stack-trace", "map"
   };
+  /** Index of the first error value that depends on the error location. */
+  public static final int LOCATION = 4;
   /** Error types. */
   private static final SeqType[] TYPES = {
       Types.QNAME_O, Types.STRING_ZO, Types.ITEM_ZM, Types.STRING_ZO, Types.INTEGER_ZO,
@@ -117,6 +119,11 @@ public class QueryException extends Exception {
     for(final Object o : ext) {
       if(o instanceof final Throwable th) cause(th);
     }
+  }
+
+  @Override
+  public synchronized Throwable fillInStackTrace() {
+    return Prop.debug ? super.fillInStackTrace() : this;
   }
 
   /**
@@ -339,16 +346,28 @@ public class QueryException extends Exception {
    * @throws QueryException query exception
    */
   public ValueList values() throws QueryException {
-    final TokenBuilder tb = new TokenBuilder();
-    if(info != null) tb.add(location(info)).add('\n');
-    for(final InputInfo ii : stack) tb.add(location(ii)).add('\n');
-    final Str trace = Str.get(tb.finish());
+    return values(true);
+  }
 
+  /**
+   * Returns an array with values for this exception, optionally omitting the location values.
+   * @param location include the values from index {@link #LOCATION} onward
+   * @return values
+   * @throws QueryException query exception
+   */
+  public ValueList values(final boolean location) throws QueryException {
     final ValueList list = new ValueList();
     list.add(qname());
     list.add(Str.get(getLocalizedMessage()));
     list.add(value() != null ? value() : Empty.VALUE);
     list.add(path() != null ? Str.get(path()) : Empty.VALUE);
+    if(!location) return list;
+
+    final TokenBuilder tb = new TokenBuilder();
+    if(info != null) tb.add(location(info)).add('\n');
+    for(final InputInfo ii : stack) tb.add(location(ii)).add('\n');
+    final Str trace = Str.get(tb.finish());
+
     list.add(line() != 0 ? Itr.get(line()) : Empty.VALUE);
     list.add(column() != 0 ? Itr.get(column()) : Empty.VALUE);
     list.add(Empty.VALUE);

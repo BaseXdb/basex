@@ -86,14 +86,11 @@ public final class VarScope {
     });
 
     // purge all unused variables
-    final Iterator<Var> iter = vars.iterator();
-    while(iter.hasNext()) {
-      final Var var = iter.next();
-      if(!declared.get(var.id)) {
-        var.slot = -1;
-        iter.remove();
-      }
-    }
+    vars.removeIf(var -> {
+      if(declared.get(var.id)) return false;
+      var.slot = -1;
+      return true;
+    });
 
     // remove unused entries from the closure
     if(scope instanceof final Closure closure) {

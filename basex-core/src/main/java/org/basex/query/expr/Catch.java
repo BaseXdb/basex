@@ -9,6 +9,7 @@ import org.basex.query.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -27,6 +28,8 @@ public final class Catch extends Single {
   private final ArrayList<Test> tests;
   /** Error variables. */
   private final Var[] vars;
+  /** Indexes of the error variables that are referenced by the expression. */
+  private BitSet used = new BitSet();
 
   /**
    * Constructor.
@@ -41,6 +44,7 @@ public final class Catch extends Single {
     this.tests = tests;
     this.vars = vars;
     this.expr = expr;
+    used.set(0, vars.length);
   }
 
   @Override
@@ -51,6 +55,12 @@ public final class Catch extends Single {
 
   @Override
   public Catch optimize(final CompileContext cc) {
+    final BitSet bs = new BitSet();
+    final int vl = vars.length;
+    for(int v = 0; v < vl; v++) {
+      if(expr.count(vars[v]) != VarUsage.NEVER) bs.set(v);
+    }
+    used = bs;
     return (Catch) adoptType(expr);
   }
 
@@ -67,9 +77,11 @@ public final class Catch extends Single {
    * @throws QueryException query exception
    */
   Value value(final QueryContext qc, final QueryException ex) throws QueryException {
-    int v = 0;
-    for(final Value value : ex.values()) {
-      qc.set(vars[v++], value);
+    if(!used.isEmpty()) {
+      final ValueList values = values(ex);
+      for(int v = used.nextSetBit(0); v != -1; v = used.nextSetBit(v + 1)) {
+        qc.set(vars[v], values.get(v));
+      }
     }
     return expr.value(qc);
   }
@@ -104,14 +116,24 @@ public final class Catch extends Single {
    * @throws QueryException query exception
    */
   Expr inline(final QueryException ex, final CompileContext cc) throws QueryException {
-    if(expr instanceof Value) return expr;
+    if(expr instanceof Value || used.isEmpty()) return expr;
 
+    final ValueList values = values(ex);
     Expr inlined = expr;
-    int v = 0;
-    for(final Value value : ex.values()) {
-      inlined = new InlineContext(vars[v++], value, cc).inline(inlined);
+    for(int v = used.nextSetBit(0); v != -1; v = used.nextSetBit(v + 1)) {
+      inlined = new InlineContext(vars[v], values.get(v), cc).inline(inlined);
     }
     return inlined;
+  }
+
+  /**
+   * Returns the error values, including the location values only if they are referenced.
+   * @param ex caught exception
+   * @return values
+   * @throws QueryException query exception
+   */
+  private ValueList values(final QueryException ex) throws QueryException {
+    return ex.values(used.length() > QueryException.LOCATION);
   }
 
   /**
