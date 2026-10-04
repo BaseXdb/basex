@@ -40,7 +40,7 @@ public class FileCreateTempFile extends FileFn {
     final Path cd = qc.resources.currentDir;
     final Path root = dir != null ? toPath(dir, qc) : cd != null ? cd : Paths.get(Prop.TEMPDIR);
 
-    if(Files.isRegularFile(root)) throw FILE_NO_DIR_X.get(info, root);
+    if(!Files.isDirectory(root)) throw FILE_NO_DIR_X.get(info, root);
 
     // create directory or file; choose another name if the path exists
     final Random rnd = new Random();

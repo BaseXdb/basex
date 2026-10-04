@@ -80,7 +80,7 @@ public abstract class JsonSerializer extends StandardSerializer {
   }
 
   @Override
-  public void serialize(final Item item) throws IOException {
+  protected void item(final Item item) throws IOException {
     if(sep) {
       if(!lines) throw SERJSON.getIO();
       out.print('\n');
@@ -88,7 +88,7 @@ public abstract class JsonSerializer extends StandardSerializer {
     if(item == null || item instanceof final QNm qnm && qnm.eq(FN_NULL)) {
       out.print(JsonConstants.NULL);
     } else {
-      super.serialize(item);
+      super.item(item);
     }
     sep = true;
   }
@@ -101,7 +101,7 @@ public abstract class JsonSerializer extends StandardSerializer {
   private void serialize(final Value value) throws IOException {
     if(value.size() > 1) throw SERJSONSEQ.getIO();
     sep = false;
-    serialize(value.isEmpty() ? null : (Item) value);
+    item(value.isEmpty() ? null : (Item) value);
   }
 
   @Override

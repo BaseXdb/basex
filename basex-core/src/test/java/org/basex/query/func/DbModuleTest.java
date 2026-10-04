@@ -809,6 +809,8 @@ public final class DbModuleTest extends SandboxTest {
     query(func.args(NAME, " (0, 1)") + "//title/text()", "XML");
     error(func.args(NAME, -1), DB_RANGE_X_X);
     error(func.args(NAME, Integer.MAX_VALUE), DB_RANGE_X_X);
+    error(func.args(NAME, 4294967296L), DB_RANGE_X_X);
+    error(func.args(NAME, Long.MAX_VALUE), DB_RANGE_X_X);
 
     // deleted nodes
     set(MainOptions.UPDINDEX, true);
@@ -829,6 +831,8 @@ public final class DbModuleTest extends SandboxTest {
     query(func.args(NAME, " (0, 1)") + "//title/text()", "XML");
     error(func.args(NAME, -1), DB_RANGE_X_X);
     error(func.args(NAME, Integer.MAX_VALUE), DB_RANGE_X_X);
+    error(func.args(NAME, 4294967296L), DB_RANGE_X_X);
+    error(func.args(NAME, Long.MAX_VALUE), DB_RANGE_X_X);
   }
 
   /** Test method. */

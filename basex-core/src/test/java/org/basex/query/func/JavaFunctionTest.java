@@ -202,8 +202,7 @@ public final class JavaFunctionTest extends SandboxTest {
     query(mod + "n:strings(array {})", "");
     query(mod + "n:strings(array { '1' })", 1);
     query(mod + "n:longs(array { 1 })", 1);
-    query(mod + "n:chars() => codepoints-to-string()", "ab");
-  }
+    query(mod + "n:chars() => codepoints-to-string()", "ab");  }
 
   /** Character parameters. */
   @Test public void gh2018() {
@@ -270,6 +269,14 @@ public final class JavaFunctionTest extends SandboxTest {
   /** Retrieve function items as Java objects. */
   @Test public void toJava() {
     query("import module namespace Set = 'java:java.util.HashSet'; Set:add(true#0)", "true");
+
+    final String big = "Q{java:java.math.BigInteger}";
+    query(big + "new('5') => " + big + "add(3)", 8);
+    query(big + "new('5') => " + big + "add(xs:unsignedLong(3))", 8);
+    query(big + "new('5') => " + big + "add(-9223372036854775807)", -9223372036854775802L);
+    query(big + "valueOf(-5)", -5);
+    query("Q{java:java.math.BigDecimal}new(5) => string()", 5);
+    query("Q{java:java.math.BigDecimal}new(xs:unsignedLong(5)) => string()", 5);
   }
 
   /** Test method. */

@@ -79,13 +79,13 @@ public final class JsonNodeSerializer extends JsonSerializer {
   }
 
   @Override
-  public void serialize(final Item item) throws IOException {
+  protected void item(final Item item) throws IOException {
     if(mapped && level == 0 && item instanceof final XNode node &&
         (node.kind() == Kind.DOCUMENT || node.kind() == Kind.ELEMENT)) {
       final Item value = map(node);
-      super.serialize(value.isEmpty() ? null : value);
+      super.item(value.isEmpty() ? null : value);
     } else {
-      super.serialize(item);
+      super.item(item);
     }
   }
 

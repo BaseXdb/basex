@@ -185,6 +185,9 @@ public final class FileModuleTest extends SandboxTest {
     query(_FILE_IS_DIR.args(tmp), true);
     query(_FILE_IS_FILE.args(tmp), false);
     query(_FILE_DELETE.args(tmp));
+
+    // errors
+    error(func.args("", "", PATH4), FILE_NO_DIR_X);
   }
 
   /** Test method. */
@@ -196,6 +199,9 @@ public final class FileModuleTest extends SandboxTest {
     query(_FILE_IS_DIR.args(tmp), false);
     query(_FILE_IS_FILE.args(tmp), true);
     query(_FILE_DELETE.args(tmp));
+
+    // errors
+    error(func.args("", "", PATH4), FILE_NO_DIR_X);
   }
 
   /** Test method. */
@@ -486,6 +492,7 @@ public final class FileModuleTest extends SandboxTest {
     query(func.args(PATH1, 0, 0), "");
     error(func.args(PATH1, -1), FILE_OUT_OF_RANGE_X_X);
     error(func.args(PATH1, 2), FILE_OUT_OF_RANGE_X_X);
+    error(func.args(PATH1, 1, Long.MAX_VALUE), FILE_OUT_OF_RANGE_X_X);
     error(func.args(PATH1, 0, -1), FILE_OUT_OF_RANGE_X_X);
     error(func.args(PATH1, 0, 2), FILE_OUT_OF_RANGE_X_X);
     error(func.args(PATH1, 2, 1), FILE_OUT_OF_RANGE_X_X);
@@ -565,6 +572,18 @@ public final class FileModuleTest extends SandboxTest {
     final String dyn = " head((1 to 2)[. = 2])";
     check("head(" + func.args(PATH1, "UTF-8", false, dyn) + ')', "b", exists(HEAD));
     check("head(" + func.args(PATH1, "UTF-8", false, 2, dyn) + ')', "b", exists(HEAD));
+
+    // large offsets and lengths (no integer overflow)
+    query(func.args(PATH1, " ()", false, " -9223372036854775808", 1), "");
+    query(func.args(PATH1, " ()", false, 1, -2147483648), "");
+    query(func.args(PATH1, " ()", false, -2147483648, 2147483647), "");
+    query(func.args(PATH1, " ()", false, -9223372036854775805L, 9223372036854775807L), "a");
+    query(func.args(PATH1, " ()", false, 4, 9223372036854775807L), "d\ne");
+    check("head(" + func.args(PATH1, " ()", false, -9223372036854775805L,
+        9223372036854775807L) + ')', "a", root(func));
+    check(SUBSEQUENCE.args(" " + func.args(PATH1, " ()", false, 2, 9223372036854775807L), 3,
+        9223372036854775807L), "d\ne", root(func));
+    check("tail(" + func.args(PATH1, " ()", false, 9223372036854775807L) + ')', "", root(func));
   }
 
   /** Test method. */

@@ -120,7 +120,20 @@ public abstract class Serializer implements Closeable {
    * @param item item to be serialized
    * @throws IOException I/O exception
    */
-  public void serialize(final Item item) throws IOException {
+  public final void serialize(final Item item) throws IOException {
+    try {
+      item(item);
+    } catch(final ArraySizeException ex) {
+      throw new QueryIOException(sizeError(ex, null));
+    }
+  }
+
+  /**
+   * Serializes an item.
+   * @param item item to be serialized
+   * @throws IOException I/O exception
+   */
+  protected void item(final Item item) throws IOException {
     if(item instanceof final JNode node) {
       jnode(node);
     } else if(item instanceof final XNode node) {
@@ -181,7 +194,7 @@ public abstract class Serializer implements Closeable {
    * @throws IOException I/O exception
    */
   protected void jnode(final JNode jnode) throws IOException {
-    for(final Item item : jnode.value) serialize(item);
+    for(final Item item : jnode.value) item(item);
   }
 
   /**

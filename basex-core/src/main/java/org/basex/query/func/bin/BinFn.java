@@ -125,10 +125,11 @@ abstract class BinFn extends StandardFunc {
     final long oct = octet != null ? octet : 0;
     if(oct < 0 || oct > 255) throw BIN_OOR_X.get(info, octet);
 
-    final byte[] tmp = new byte[(int) (bl + size)];
+    final int sz = Array.checkCapacity(size);
+    final byte[] tmp = new byte[Array.checkCapacity((long) bl + sz)];
     if(left) {
-      Arrays.fill(tmp, 0, (int) size, (byte) oct);
-      Array.copyFromStart(bytes, bl, tmp, (int) size);
+      Arrays.fill(tmp, 0, sz, (byte) oct);
+      Array.copyFromStart(bytes, bl, tmp, sz);
     } else {
       Array.copy(bytes, bl, tmp);
       Arrays.fill(tmp, bl, tmp.length, (byte) oct);
@@ -167,8 +168,9 @@ abstract class BinFn extends StandardFunc {
     final int sz;
     if(length != null) {
       if(length < 0) throw BIN_NS_X.get(info, offset);
-      if(of + length > size || length > Integer.MAX_VALUE)
-        throw BIN_IOOR_X_X.get(info, of + length, size);
+      if(length > size - of) {
+        throw BIN_IOOR_X_X.get(info, BigInteger.valueOf(of).add(BigInteger.valueOf(length)), size);
+      }
       sz = (int) length.longValue();
     } else {
       sz = size - of;

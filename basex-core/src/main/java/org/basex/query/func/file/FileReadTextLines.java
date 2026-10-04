@@ -92,9 +92,20 @@ public final class FileReadTextLines extends FileReadFn {
     final Long length = toLongOrNull(arg(4), qc);
 
     final long off = offset != null ? offset : 1;
-    final long len = length != null ? length : Long.MAX_VALUE;
-    final long end = off + len < 0 ? Long.MAX_VALUE : off + len;
-    return new long[] { off, end };
+    return new long[] { off, add(off, length != null ? length : Long.MAX_VALUE) };
+  }
+
+  /**
+   * Adds two values, saturating at the integer limits.
+   * @param value1 first value
+   * @param value2 second value
+   * @return sum
+   */
+  private static long add(final long value1, final long value2) {
+    final long sum = value1 + value2;
+    // overflow: sum has a different sign than both operands
+    return ((value1 ^ sum) & (value2 ^ sum)) < 0 ?
+      value1 < 0 ? Long.MIN_VALUE : Long.MAX_VALUE : sum;
   }
 
   /**
@@ -120,17 +131,17 @@ public final class FileReadTextLines extends FileReadFn {
        al > 3 && !(args[3] instanceof Itr) ||
        al > 4 && !(args[4] instanceof Itr)) return func;
 
-    // old bounds
-    long s = al > 3 ? ((Itr) args[3]).itr() - 1 : 0;
-    long l = al > 4 ? ((Itr) args[4]).itr() : Long.MAX_VALUE;
+    // old bounds: first line, exclusive end line
+    final long off = al > 3 ? ((Itr) args[3]).itr() : 1;
+    final long end = add(off, al > 4 ? ((Itr) args[4]).itr() : Long.MAX_VALUE);
 
-    // merge with new bounds: increase start offset, decrease number of lines to retrieve
-    s += start;
-    if(l < Long.MAX_VALUE) l -= start;
-    if(length < l) l = length;
+    // merge with new bounds: increase first line, decrease end line
+    final long first = add(Math.max(off, 1), start);
+    final long last = Math.min(end, add(first, length));
 
     // create new function instance
-    final Expr[] newArgs = { args[0], options, fallback, Itr.get(s + 1), Itr.get(l) };
+    final Expr[] newArgs = { args[0], options, fallback, Itr.get(first),
+      Itr.get(last > first ? last - first : 0) };
     return cc.function(Function._FILE_READ_TEXT_LINES, func.info(), newArgs);
   }
 }

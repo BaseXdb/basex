@@ -25,11 +25,11 @@ final class TextSerializer extends StandardSerializer {
   }
 
   @Override
-  public void serialize(final Item item) throws IOException {
+  protected void item(final Item item) throws IOException {
     if(item instanceof final XQArray array) {
-      for(final Item it : flatten(array)) super.serialize(it);
+      for(final Item it : flatten(array)) super.item(it);
     } else {
-      super.serialize(item);
+      super.item(item);
     }
   }
 

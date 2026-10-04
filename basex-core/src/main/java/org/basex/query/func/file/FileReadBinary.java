@@ -3,6 +3,7 @@ package org.basex.query.func.file;
 import static org.basex.query.QueryError.*;
 
 import java.io.*;
+import java.math.*;
 import java.nio.file.*;
 
 import org.basex.io.*;
@@ -10,6 +11,7 @@ import org.basex.io.random.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -27,20 +29,19 @@ public final class FileReadBinary extends FileFn {
 
     // read full file
     final long off = offset != null ? offset : 0;
-    long len = length != null ? length : Long.MAX_VALUE;
-    if(off == 0 && len == Long.MAX_VALUE) {
+    if(off == 0 && length == null) {
       return new B64IOLazy(new IOFile(path), FILE_IO_ERROR_X);
     }
 
     // read chunk
     try(DataAccess da = new DataAccess(new IOFile(path))) {
-      final long dlen = da.length();
-      if(len == Long.MAX_VALUE) len = dlen - off;
-      if(off < 0 || off > dlen || len < 0 || off + len > dlen) {
-        throw FILE_OUT_OF_RANGE_X_X.get(info, off, off + len);
+      final long dlen = da.length(), len = length != null ? length : dlen - off;
+      if(off < 0 || off > dlen || len < 0 || len > dlen - off) {
+        throw FILE_OUT_OF_RANGE_X_X.get(info, off,
+            BigInteger.valueOf(off).add(BigInteger.valueOf(len)));
       }
       da.cursor(off);
-      return B64.get(da.readBytes((int) len));
+      return B64.get(da.readBytes(Array.checkCapacity(len)));
     }
   }
 }

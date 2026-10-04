@@ -68,10 +68,10 @@ public class AdaptiveSerializer extends OutputSerializer {
   }
 
   @Override
-  public final void serialize(final Item item) throws IOException {
+  protected final void item(final Item item) throws IOException {
     if(expression && !more) printChar('(');
     separate();
-    super.serialize(item);
+    super.item(item);
   }
 
   @Override
@@ -92,7 +92,7 @@ public class AdaptiveSerializer extends OutputSerializer {
     } else {
       printChars(Token.token(QueryText.JNODE));
       printChar('(');
-      super.serialize(jnode.key);
+      super.item(jnode.key);
       printChar(':');
       if(indent) printChar(' ');
     }
@@ -103,7 +103,7 @@ public class AdaptiveSerializer extends OutputSerializer {
         printChar(',');
         if(indent) printChar(' ');
       }
-      super.serialize(item);
+      super.item(item);
     }
     if(jnode.value.size() > 1) printChar(')');
     printChar(')');
@@ -227,12 +227,12 @@ public class AdaptiveSerializer extends OutputSerializer {
       if(indent) printChar(' ');
       final long vs = value.size();
       if(vs != 1) printChar('(');
-      for(int i = 0, cc = 0; i < vs; i++, cc++) {
-        if(cc > 0) {
+      for(long i = 0; i < vs; i++) {
+        if(i > 0) {
           printChar(',');
           if(indent) printChar(' ');
         }
-        super.serialize(value.itemAt(i));
+        super.item(value.itemAt(i));
       }
       if(vs != 1) printChar(')');
     }
@@ -254,7 +254,7 @@ public class AdaptiveSerializer extends OutputSerializer {
     for(final XQMap.Entry entry : map.entries()) {
       if(c++ > 0) printChar(',');
       indent();
-      super.serialize(entry.key());
+      super.item(entry.key());
       printChar(':');
       if(indent) printChar(' ');
       final Value value = entry.value();
@@ -266,7 +266,7 @@ public class AdaptiveSerializer extends OutputSerializer {
           printChar(',');
           if(indent) printChar(' ');
         }
-        super.serialize(item);
+        super.item(item);
       }
       if(par) printChar(')');
     }

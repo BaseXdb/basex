@@ -6,6 +6,7 @@ import java.nio.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -21,7 +22,7 @@ public final class BinPackInteger extends BinFn {
     final ByteOrder order = order(arg(2), qc);
     if(size < 0) throw BIN_NS_X.get(info, size);
 
-    final byte[] tmp = new byte[(int) size];
+    final byte[] tmp = new byte[Array.checkCapacity(size)];
     final int tl = tmp.length;
     if(order == ByteOrder.BIG_ENDIAN) {
       for(int t = tl - 1; t >= 0; t--) {

@@ -1028,7 +1028,9 @@ public class Options implements Iterable<Option<?>> {
       // coercion has already yielded a single boolean
       result = item.bool(info);
     } else if(option instanceof NumberOption) {
-      result = (int) item.itr(info);
+      final long l = item.itr(info);
+      if(l != (int) l) throw expected.apply(SeqType.get(BasicType.INT, Occ.EXACTLY_ONE));
+      result = (int) l;
     } else if(option instanceof StringOption) {
       result = serialize(val, info);
     } else if(option instanceof StringsOption) {
@@ -1037,7 +1039,10 @@ public class Options implements Iterable<Option<?>> {
       result = list.finish();
     } else if(option instanceof NumbersOption) {
       final IntList list = new IntList();
-      for(final Item it :  val) list.add(Strings.toInt(string(it.string(info))));
+      // values beyond the int range are clamped (e.g. column positions that cannot exist)
+      for(final Item it :  val) {
+        list.add(Math.clamp(it.itr(info), Integer.MIN_VALUE, Integer.MAX_VALUE));
+      }
       result = list.finish();
     } else if(option instanceof final EnumOption eo) {
       final String string = normalizeEnum(serialize(val, info));

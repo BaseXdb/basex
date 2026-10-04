@@ -20,9 +20,10 @@ public final class ClientConnect extends ClientFn {
     final String host = toString(arg(0), qc);
     final String username = toString(arg(2), qc);
     final String password = toString(arg(3), qc);
-    final int port = (int) toLong(arg(1), qc);
+    final long port = toLong(arg(1), qc);
+    if(port < 0 || port > 0xFFFF) throw CLIENT_CONNECT_X.get(info, "Invalid port: " + port);
     try {
-      return sessions(qc).add(new ClientSession(host, port, username, password));
+      return sessions(qc).add(new ClientSession(host, (int) port, username, password));
     } catch(final IOException ex) {
       throw CLIENT_CONNECT_X.get(info, ex);
     }

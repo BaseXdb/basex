@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 
 import java.lang.reflect.*;
 import java.lang.reflect.Array;
+import java.math.*;
 import java.util.*;
 
 import javax.xml.datatype.*;
@@ -147,6 +148,10 @@ public abstract class JavaCall extends Arr {
     // XQuery expression: value must not be converted
     if(param == Expr.class) return arg;
 
+    // integer to big integer
+    if(param == BigInteger.class && arg instanceof final Itr itr) {
+      return BigInteger.valueOf(itr.itr());
+    }
     // argument to a Java object if a mapping entry exists
     final Type type = JavaMapping.type(param, true);
     if(type != null && arg.type.instanceOf(type)) return arg.toJava();
@@ -275,7 +280,7 @@ public abstract class JavaCall extends Arr {
         if(object instanceof final char[] values) {
           final IntList list = new IntList(values.length);
           for(final int value : values) list.add(value);
-          return IntSeq.get(list.finish(), BasicType.UNSIGNED_LONG);
+          return IntSeq.get(list.finish(), BasicType.UNSIGNED_SHORT);
         }
         // integer array
         if(object instanceof final long[] values) return LongSeq.get(values);
@@ -653,6 +658,8 @@ public abstract class JavaCall extends Arr {
    * @return item type or {@code null} if no appropriate type was found
    */
   private static Type type(final Object object) {
+    // big integers may be negative
+    if(object instanceof BigInteger) return BasicType.INTEGER;
     final Type type = JavaMapping.type(object.getClass(), true);
     if(type != null) return type;
 

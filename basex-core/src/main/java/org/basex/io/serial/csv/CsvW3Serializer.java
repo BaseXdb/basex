@@ -31,7 +31,7 @@ public final class CsvW3Serializer extends CsvSerializer {
   }
 
   @Override
-  public void serialize(final Item item) throws IOException {
+  protected void item(final Item item) throws IOException {
     if(!(item instanceof final XQMap map)) throw typeError("Top-level map", item);
     if(mapped) throw SERCSV_X_X.getIO("Single top-level map expected", item);
     mapped = true;

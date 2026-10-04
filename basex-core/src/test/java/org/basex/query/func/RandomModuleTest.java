@@ -41,7 +41,8 @@ public final class RandomModuleTest extends SandboxTest {
     assertTrue(i >= 0 && i < 5);
     error(func.args(0), QueryError.RANDOM_BOUNDS_X);
     error(func.args(-1), QueryError.RANDOM_BOUNDS_X);
-    error(func.args(8000000000L), QueryError.RANDOM_BOUNDS_X);
+    query(func.args(8000000000L) + " < 8000000000", true);
+    query(func.args(Long.MAX_VALUE) + " >= 0", true);
   }
 
   /** Test method. */
@@ -66,7 +67,7 @@ public final class RandomModuleTest extends SandboxTest {
     query("count(distinct-values((1 to 100) ! " + func.args(" .", 1, 64) + ")) > 30", true);
     error(func.args(1, -1), QueryError.RANGE_NEGATIVE_X);
     error(func.args(1, 1, -1), QueryError.RANDOM_BOUNDS_X);
-    error(func.args(1, 1, 8000000000L), QueryError.RANDOM_BOUNDS_X);
+    query(func.args(s, 1, 8000000000L), new SplittableRandom(s).nextLong(8000000000L));
   }
 
   /** Test method. */

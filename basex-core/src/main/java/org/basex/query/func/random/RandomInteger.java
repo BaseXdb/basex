@@ -20,8 +20,8 @@ public final class RandomInteger extends StandardFunc {
     final Long max = toLongOrNull(arg(0), qc);
     final long next;
     if(max != null) {
-      if(max <= 0 || max > Integer.MAX_VALUE) throw RANDOM_BOUNDS_X.get(info, max);
-      next = ThreadLocalRandom.current().nextInt((int) (long) max);
+      if(max <= 0) throw RANDOM_BOUNDS_X.get(info, max);
+      next = ThreadLocalRandom.current().nextLong(max);
     } else {
       next = ThreadLocalRandom.current().nextInt();
     }

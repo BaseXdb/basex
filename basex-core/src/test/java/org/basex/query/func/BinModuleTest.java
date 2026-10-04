@@ -364,6 +364,8 @@ public final class BinModuleTest extends SandboxTest {
     // errors
     error(func.args(1, -1), BIN_NS_X);
     error(func.args(1, 1, "X"), BIN_USO_X);
+    error(func.args(1, 2147483648L), MAX_SIZE_X_X);
+    error(func.args(1, Long.MAX_VALUE), MAX_SIZE_X_X);
   }
 
   /** Test method. */
@@ -376,6 +378,11 @@ public final class BinModuleTest extends SandboxTest {
     // errors
     error(func.args(hex(""), -1),     BIN_NS_X);
     error(func.args(hex(""), 0, 256), BIN_OOR_X);
+    error(func.args(hex("01"), Integer.MAX_VALUE), MAX_SIZE_X_X);
+    error(func.args(hex("01"), Long.MAX_VALUE), MAX_SIZE_X_X);
+    // size error during pre-evaluation of an inlined closure
+    query("let $n := 4294967297 for $f in (fn() { " + func.args(" bin:hex('01')", " $n") +
+        " }, fn() { 1 }) return try { $f() } catch * { 0 }", "0\n1");
   }
 
   /** Test method. */
@@ -388,6 +395,8 @@ public final class BinModuleTest extends SandboxTest {
     // errors
     error(func.args(hex(""), -1),      BIN_NS_X);
     error(func.args(hex(""),  0, 256), BIN_OOR_X);
+    error(func.args(hex("01"), Integer.MAX_VALUE), MAX_SIZE_X_X);
+    error(func.args(hex("01"), Long.MAX_VALUE), MAX_SIZE_X_X);
   }
 
   /** Test method. */
@@ -402,6 +411,7 @@ public final class BinModuleTest extends SandboxTest {
     // errors
     error(func.args(hex("FF"), -1),    BIN_IOOR_X_X);
     error(func.args(hex("FF"), 0, -1), BIN_NS_X);
+    error(func.args(hex("FF"), 1, Long.MAX_VALUE), BIN_IOOR_X_X);
     error(func.args(hex("FF"), 2),     BIN_IOOR_X_X);
     error(func.args(hex("FF"), 0, 2),  BIN_IOOR_X_X);
   }

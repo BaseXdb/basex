@@ -71,7 +71,7 @@ public final class BaseXSerializer extends AdaptiveSerializer {
       // root nodes and items of a sequence have no container
       reset();
       for(final Item item : jnode.value) {
-        serialize(item);
+        item(item);
       }
     }
   }

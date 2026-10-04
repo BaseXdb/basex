@@ -26,7 +26,7 @@ public final class CsvW3ArraysSerializer extends CsvSerializer {
   }
 
   @Override
-  public void serialize(final Item item) throws IOException {
+  protected void item(final Item item) throws IOException {
     if(!(item instanceof final XQArray array)) throw typeError("Array", item);
     w3(array);
   }

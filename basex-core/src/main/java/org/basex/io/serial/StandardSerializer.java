@@ -76,9 +76,9 @@ public abstract class StandardSerializer extends OutputSerializer {
   }
 
   @Override
-  public void serialize(final Item item) throws IOException {
+  protected void item(final Item item) throws IOException {
     if(separate()) sep = false;
-    super.serialize(item);
+    super.item(item);
   }
 
   @Override
@@ -100,7 +100,7 @@ public abstract class StandardSerializer extends OutputSerializer {
   protected void function(final FItem item) throws IOException {
     if(!(item instanceof final XQArray array)) throw SERFUNC_X.getIO(item.seqType());
     for(final Value value : array.members()) {
-      for(final Item it : value) serialize(it);
+      for(final Item it : value) item(it);
     }
   }
 

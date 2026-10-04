@@ -55,7 +55,7 @@ public final class CsvDirectSerializer extends CsvSerializer {
   }
 
   @Override
-  public void serialize(final Item item) throws IOException {
+  protected void item(final Item item) throws IOException {
     // serialize results of fn:parse-csv and fn:csv-to-arrays
     if(mapped || others && item instanceof XQMap)
       throw SERCSV_X_X.getIO("Single map or sequence of arrays expected", item);
@@ -68,7 +68,7 @@ public final class CsvDirectSerializer extends CsvSerializer {
     } else {
       if(item instanceof FItem) throw typeError("Map or array", item);
       others = true;
-      super.serialize(item);
+      super.item(item);
     }
   }
 
