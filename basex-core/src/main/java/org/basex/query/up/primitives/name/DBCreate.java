@@ -1,6 +1,5 @@
 package org.basex.query.up.primitives.name;
 
-import static org.basex.core.Text.*;
 import static org.basex.query.QueryError.*;
 
 import java.io.*;
@@ -64,7 +63,7 @@ public final class DBCreate extends NameUpdate {
       final boolean move = clip != null && !clip.data.inMemory();
       if(move) {
         // temporary database on disk: rename it, and detach it from the clip
-        if(!ctx.user().has(Perm.CREATE)) throw new BaseXException(PERM_REQUIRED_X, Perm.CREATE);
+        qc.checkPerm(Perm.CREATE, name, name, info);
         final String tmpName = clip.data.meta.name;
         clip.data.close();
         clip.context(null);

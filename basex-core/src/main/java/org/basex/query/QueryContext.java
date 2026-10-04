@@ -96,8 +96,10 @@ public final class QueryContext extends Job implements Closeable {
   public Updates updates;
   /** User. */
   public User user;
-  /** Indicates if parsed modules may access external resources without CREATE permission. */
-  public boolean trusted;
+  /** Indicates if parsed code may access static resources without CREATE permission. */
+  public boolean parseResources;
+  /** Maximum permission of the parsed code. */
+  public Perm maxPerm = Perm.ADMIN;
 
   /** Cached full-text position data. */
   public FTPosData ftPosData;
@@ -539,6 +541,55 @@ public final class QueryContext extends Job implements Closeable {
       parent.evalInfo(string);
     } else {
       info.evalInfo(string);
+    }
+  }
+
+  /**
+   * Returns the maximum permission of the code at the specified location.
+   * @param ii input info (can be {@code null})
+   * @return permission
+   */
+  public Perm perm(final InputInfo ii) {
+    // code without static context: fall back to the permission of the query
+    return ii == null || ii.sc() == null ? maxPerm : ii.sc().maxPerm;
+  }
+
+  /**
+   * Indicates if the code at the specified location may access external resources.
+   * @param ii input info (can be {@code null})
+   * @return result of check
+   */
+  public boolean trusted(final InputInfo ii) {
+    return perm(ii).has(Perm.CREATE);
+  }
+
+  /**
+   * Checks if the current user and the code at the specified location have the given permission.
+   * @param perm permission
+   * @param db database pattern (can be {@code null})
+   * @param ii input info (can be {@code null})
+   * @return result of check
+   */
+  public boolean has(final Perm perm, final String db, final InputInfo ii) {
+    return perm(ii).has(perm) && user.has(perm, db);
+  }
+
+  /**
+   * Raises an error if the current user or the code at the specified location lacks the given
+   * permission.
+   * @param perm permission
+   * @param db database pattern (can be {@code null})
+   * @param subject subject of the check (for error messages)
+   * @param ii input info (can be {@code null})
+   * @throws QueryException query exception
+   */
+  public void checkPerm(final Perm perm, final String db, final Object subject,
+      final InputInfo ii) throws QueryException {
+    if(!user.has(perm, db)) throw BASEX_PERMISSION_X_X.get(ii, perm, subject);
+    if(!perm(ii).has(perm)) {
+      // untrusted code: no access to external resources
+      throw perm.has(Perm.CREATE) && !trusted(ii) ? EXTERNALRESOURCE_X.get(ii, subject) :
+        BASEX_PERMISSION_X_X.get(ii, perm, subject);
     }
   }
 

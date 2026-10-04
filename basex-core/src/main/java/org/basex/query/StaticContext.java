@@ -7,6 +7,7 @@ import javax.xml.transform.*;
 import javax.xml.transform.sax.*;
 
 import org.basex.core.*;
+import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
@@ -33,6 +34,8 @@ public final class StaticContext {
   public final boolean withdb;
   /** Favor the opened database when looking up documents. */
   public final boolean defaultdb;
+  /** Maximum permission of the code. */
+  public final Perm maxPerm;
 
   /** Default collation (default collection ({@link QueryText#COLLATION_URI}): {@code null}). */
   public Collation collation;
@@ -84,6 +87,7 @@ public final class StaticContext {
     final MainOptions mopts = qc.context.options;
     withdb = mopts.get(MainOptions.WITHDB);
     defaultdb = mopts.get(MainOptions.DEFAULTDB);
+    maxPerm = qc.maxPerm;
     uriResolver = mopts.resolver().uriResolver();
   }
 

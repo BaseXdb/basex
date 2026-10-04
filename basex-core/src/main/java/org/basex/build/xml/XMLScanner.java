@@ -70,7 +70,7 @@ final class XMLScanner extends Job {
   /** DTD flag. */
   private final boolean dtd;
   /** Whether external resources may be accessed. */
-  private final boolean trusted;
+  private final boolean allowExternal;
   /** Parse fragment. */
   private final boolean fragment;
 
@@ -96,7 +96,7 @@ final class XMLScanner extends Job {
    */
   XMLScanner(final IO file, final MainOptions opts, final boolean fragment) throws IOException {
     this.fragment = fragment;
-    trusted = opts.isTrusted();
+    allowExternal = opts.allowExternal();
     input = new XMLInput(file);
 
     try {
@@ -729,7 +729,7 @@ final class XMLScanner extends Job {
    */
   private byte[] external(final IO io) throws IOException {
     if(!dtd) return EMPTY;
-    if(!trusted) throw TrustedViolationException.entity(io.url(), false).wrap();
+    if(!allowExternal) throw TrustedViolationException.entity(io.url(), false).wrap();
     byte[] content;
     try {
       content = io.read();

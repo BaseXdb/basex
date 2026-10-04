@@ -25,7 +25,7 @@ public final class DbListDetails extends DbList {
   @Override
   Iter list(final QueryContext qc) {
     final Context ctx = qc.context;
-    final StringList dbs = ctx.databases.list(qc.user, null);
+    final StringList dbs = databases(qc);
     return new BasicIter<FNode>(dbs.size()) {
       @Override
       public FNode get(final long i) {
@@ -38,7 +38,7 @@ public final class DbListDetails extends DbList {
           database.attr(Q_RESOURCES, meta.ndocs + stats.binaries() + stats.values());
           database.attr(Q_MODIFIED_DATE, DateTime.format(meta.dbTime()));
           database.attr(Q_SIZE, stats.size());
-          if(qc.user.has(Perm.CREATE, name)) database.attr(Q_PATH, meta.original);
+          if(qc.has(Perm.CREATE, name, info)) database.attr(Q_PATH, meta.original);
         } catch(final IOException ex) {
           // invalid database will be ignored
           Util.debug(ex);

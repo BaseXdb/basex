@@ -160,7 +160,7 @@ public final class Client {
        opts.get(ParseXmlOptions.USE_XSI_SCHEMA_LOCATION)) {
       throw HC_REQ_X.get(info, "External resources are not permitted for response bodies");
     }
-    return new MainOptions(opts, qc.context.options).trusted(false);
+    return new MainOptions(opts, qc.context.options).allowExternal(false);
   }
 
   /**

@@ -47,7 +47,7 @@ public interface CommonOptions {
   String FALLBACK = "fallback";
   /** Option name: secondary resources. No default: absence means "use TRUSTEXTERNAL". */
   String TRUST_EXTERNAL = "trust-external";
-  /** Option name: trusted code. No default: absence means "use TRUSTEXTERNAL". */
+  /** Option name: trusted code. */
   String TRUSTED = "trusted";
 
   // Option values

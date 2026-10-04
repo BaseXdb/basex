@@ -87,6 +87,50 @@ public final class XQueryModuleTest extends SandboxTest {
     // query strings are compiled with the reduced permissions
     query(func.args("1", " ()", " { 'permission': 'none' }"), 1);
     error(func.args("admin:sessions()", " ()", " { 'permission': 'none' }"), XQUERY_PERM_X);
+    // returned function items keep the reduced permissions
+    query(func.args("fn() { admin:sessions() }") + "() => count() >= 0", true);
+    error(func.args("fn() { admin:sessions() }", " ()", " { 'permission': 'create' }") + "()",
+        BASEX_PERMISSION_X_X);
+    error(func.args("fn() { file:list('.') }", " ()", " { 'permission': 'write' }") + "()",
+        BASEX_PERMISSION_X_X);
+  }
+
+  /** Checks runtime permissions of returned function items. */
+  @Test public void evalFunctionRuntimePermission() {
+    final Function func = _XQUERY_EVAL;
+    final String none = " { 'permission': 'none' }", read = " { 'permission': 'read' }";
+
+    // function lookups: functions without permission are not available
+    query(func.args("fn($n) { function-lookup(xs:QName($n), 1) }", " ()", none)
+        + "('file:list') => empty()", true);
+    query(func.args("for $n in ('file:list', 'file:list') where random:double() >= 0 "
+        + "return function-lookup(xs:QName($n), 1)", " ()", none) + " => empty()", true);
+    query(func.args("fn($n) { function-lookup(xs:QName($n), 1) }") + "('file:list') => exists()",
+        true);
+
+    execute(new CreateDB(NAME, "<a/>"));
+    try {
+      // database access
+      final String get = "fn() { db:get('" + NAME + "') }";
+      query(func.args(get, " ()", read) + "()", "<a/>");
+      error(func.args(get, " ()", none) + "()", BASEX_PERMISSION_X_X);
+      error(func.args("fn() { doc('" + NAME + "') }", " ()", none) + "()",
+          BASEX_PERMISSION_X_X);
+      query(func.args("fn() { db:list() }", " ()", read) + "() = '" + NAME + "'", true);
+      query(func.args("fn() { db:list() }", " ()", none) + "()", "");
+      // globally opened database
+      set(MainOptions.DEFAULTDB, true);
+      try {
+        error(func.args("fn() { collection('') }", " ()", none) + "()", BASEX_PERMISSION_X_X);
+      } finally {
+        set(MainOptions.DEFAULTDB, false);
+      }
+      // database updates
+      error("let $f := " + func.args("%updating fn() { db:add('" + NAME + "', <b/>, 'b.xml') }",
+          " ()", read) + " return updating $f()", BASEX_PERMISSION_X_X);
+    } finally {
+      execute(new DropDB(NAME));
+    }
   }
 
   /** Invokes updating function items. */

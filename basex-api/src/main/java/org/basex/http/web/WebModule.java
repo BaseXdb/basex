@@ -148,11 +148,11 @@ public final class WebModule {
     final StaticContext sc = archive == null ? null :
       new StaticContext(qc).resolver((path, uri, base) -> archive.resolve(path, base));
     // modules of the web application may access external resources
-    qc.trusted = true;
+    qc.parseResources = true;
     try {
       qc.parse(content, file.path(), sc);
     } finally {
-      qc.trusted = false;
+      qc.parseResources = false;
     }
   }
 }

@@ -10,6 +10,7 @@ import java.util.*;
 import java.util.function.*;
 
 import org.basex.*;
+import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.query.expr.*;
@@ -1313,7 +1314,7 @@ public final class FnModuleTest extends SandboxTest {
         EXTERNALRESOURCE_X);
     error("xquery:eval(``[" + func.args(doc2, " { 'xsd-validation': 'strict', 'use-xsi-schema-locat"
         + "ion': true(), 'trust-external': true() }") + "]``, (), {'permission': 'write'})",
-        XQUERY_PERM_X);
+        EXTERNALRESOURCE_X);
 
     final String docWithExtDtd = write.apply("ext-dtd.xml",
         "<!DOCTYPE root SYSTEM 'validate.dtd'><root/>");
@@ -1324,7 +1325,7 @@ public final class FnModuleTest extends SandboxTest {
         EXTERNALRESOURCE_X);
     error("xquery:eval(``[" + func.args(docWithExtDtd,
         " { 'dtd-validation': true(), 'trust-external': true() }")
-        + "]``, (), {'permission': 'read'})", XQUERY_PERM_X);
+        + "]``, (), {'permission': 'read'})", EXTERNALRESOURCE_X);
 
     final String xincDoc = write.apply("xinclude.xml",
         "<?xml version='1.0'?>"
@@ -1336,7 +1337,7 @@ public final class FnModuleTest extends SandboxTest {
         EXTERNALRESOURCE_X);
     error("xquery:eval(``[exists(" + func.args(xincDoc,
         " { 'xinclude': true(), 'trust-external': true() }")
-        + "/root/root)" + "]``, (), {'permission': 'none'})", XQUERY_PERM_X);
+        + "/root/root)" + "]``, (), {'permission': 'none'})", EXTERNALRESOURCE_X);
 
     // unstable documents are parsed anew for each evaluation
     query("count(distinct-values(for $i in 1 to 2 return " +
@@ -2992,6 +2993,63 @@ return
         + "xs:integer* external; declare variable $x:x := .;', 'context-item': () }")
         + "?variables?#Q{x}x", NOCTX_X);
 
+    // trust: external resources
+    final String doc = " { 'content': 'module namespace m=\"m\"; "
+        + "declare function m:f() { doc(\"src/test/resources/input.xml\") };'%s }";
+    final String call = "?functions?#Q{m}f?0()";
+    query("exists(" + func.args("m", String.format(doc, ", 'trusted': true()")) + call + ')',
+        true);
+    error(func.args("m", String.format(doc, "")) + call, EXTERNALRESOURCE_X);
+    // trust: TRUSTEXTERNAL does not affect the trust of loaded code
+    set(MainOptions.TRUSTEXTERNAL, true);
+    try {
+      error(func.args("m", String.format(doc, "")) + call, EXTERNALRESOURCE_X);
+    } finally {
+      set(MainOptions.TRUSTEXTERNAL, false);
+    }
+    // permissions: content requires none, external locations require create
+    query("xquery:eval(``[" + func.args("m", " { 'content': 'module namespace m=\"m\"; "
+        + "declare variable $m:v := 1;' }") + "?variables?*]``, (), { 'permission': 'none' })", 1);
+    final IOFile pmod = new IOFile(sandbox(), "perm.xqm");
+    write(pmod, "module namespace p = 'p'; declare variable $p:v := 2;");
+    final String load = func.args("p", " { 'location-hints': '" + pmod.path() + "' }");
+    error("xquery:eval(``[" + load + "]``, (), { 'permission': 'read' })", XQUERY_PERM_X);
+    query("xquery:eval(``[" + load + "?variables?*]``, (), { 'permission': 'create' })", 2);
+    error(func.args("m", String.format(doc, ", 'trusted': false()")) + call, EXTERNALRESOURCE_X);
+    // trust: documents opened by trusted code are not accessible to untrusted code
+    error("doc('src/test/resources/input.xml'), " + func.args("m", String.format(doc, "")) + call,
+        EXTERNALRESOURCE_X);
+    // trust: ...not even by the name of their main-memory instance
+    final String byName = " { 'content': 'module namespace m=\"m\"; "
+        + "declare function m:f() { doc(\"input\") };'%s }";
+    query("doc('src/test/resources/input.xml') is " + func.args("m",
+        String.format(byName, ", 'trusted': true()")) + call, true);
+    error("doc('src/test/resources/input.xml'), " + func.args("m", String.format(byName, ""))
+        + call, EXTERNALRESOURCE_X);
+    // trust: ...nor as main-memory databases, which are still accessible otherwise
+    final String mainmem = " { 'content': 'module namespace m=\"m\"; "
+        + "declare function m:f() { db:get(\"%s\") };'%s }";
+    set(MainOptions.MAINMEM, true);
+    try {
+      query("doc('src/test/resources/input.xml') is " + func.args("m",
+          String.format(mainmem, "input", ", 'trusted': true()")) + call, true);
+      error("doc('src/test/resources/input.xml'), " + func.args("m",
+          String.format(mainmem, "input", "")) + call, EXTERNALRESOURCE_X);
+      execute(new CreateDB(NAME, "src/test/resources/input.xml"));
+      query("exists(" + func.args("m", String.format(mainmem, NAME, "")) + call + ')', true);
+    } finally {
+      execute(new Close());
+      set(MainOptions.MAINMEM, false);
+    }
+    // trust: databases are accessible, untrusted code cannot grant itself trust
+    query(_DB_CREATE.args(NAME, " <a/>", "a.xml"));
+    query(func.args("m", " { 'content': 'module namespace m=\"m\"; "
+        + "declare function m:f() { db:get(\"" + NAME + "\") };' }") + call, "<a/>");
+    error(func.args("m", " { 'content': 'module namespace m=\"m\"; declare function m:f() { "
+        + "parse-xml(\"<!DOCTYPE x SYSTEM \"\"x.dtd\"\"><x/>\", "
+        + "{ ''trust-external'': true() }) };' }") + call, EXTERNALRESOURCE_X);
+    query(_DB_DROP.args(NAME));
+
     // advanced and caching tests
     // run simple HTTP server for module hosting
     final int port = 62626;
@@ -3061,9 +3119,9 @@ return
           + "let $node2 := load-xquery-module('m1', $opts2)?variables?(#Q{m1}node)\n"
           + "return $node1 is $node2", false);
 
-      // load module m1 from different modules
+      // load module m1 from different modules (m2 must be trusted to load m1)
       query("let $opts1 := { 'location-hints': '" + url + "/m1.xqm' }\n"
-          + "let $opts2 := { 'location-hints': '" + url + "/m2.xqm' }\n"
+          + "let $opts2 := { 'location-hints': '" + url + "/m2.xqm', 'trusted': true() }\n"
           + "let $id1 := load-xquery-module('m1', $opts1)?functions?(QName('m1', 'id'))?0()\n"
           + "let $id2 := load-xquery-module('m2', $opts2)?functions?(QName('m2', 'id'))?0()\n"
           + "return $id1 eq $id2", true);

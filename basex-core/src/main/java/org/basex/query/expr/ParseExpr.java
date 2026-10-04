@@ -268,18 +268,36 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the current user has the given permissions. If negative, an exception is thrown.
+   * Raises an error if the current user or the code of this expression lacks the given permission.
    * @param qc query context
    * @param perm minimum permission required
    * @throws QueryException query exception
    */
   protected void checkPerm(final QueryContext qc, final Perm perm) throws QueryException {
-    if(!qc.user.has(perm)) throw BASEX_PERMISSION_X_X.get(info, perm, this);
+    qc.checkPerm(perm, null, this, info);
   }
 
   /**
-   * Checks if the current user has the given permissions for the specified database.
-   * If negative, an exception is thrown.
+   * Returns the maximum permission of the code of this expression.
+   * @param qc query context
+   * @return permission
+   */
+  protected final Perm perm(final QueryContext qc) {
+    return qc.perm(info);
+  }
+
+  /**
+   * Indicates if the code of this expression may access external resources.
+   * @param qc query context
+   * @return result of check
+   */
+  protected final boolean trusted(final QueryContext qc) {
+    return qc.trusted(info);
+  }
+
+  /**
+   * Raises an error if the current user or the code of this expression lacks the given permission
+   * for the specified database.
    * @param qc query context
    * @param perm minimum permission required
    * @param name name of database
@@ -287,7 +305,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected void checkPerm(final QueryContext qc, final Perm perm, final String name)
       throws QueryException {
-    if(!qc.user.has(perm, name)) throw BASEX_PERMISSION_X_X.get(info, perm, this);
+    qc.checkPerm(perm, name, this, info);
   }
 
   /**

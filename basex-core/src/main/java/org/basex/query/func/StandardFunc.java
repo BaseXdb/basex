@@ -75,9 +75,18 @@ public abstract class StandardFunc extends Arr {
     exprType.assign(df.seqType);
   }
 
+  /**
+   * Checks if the current user and the calling code have the permission to call this function.
+   * @param qc query context
+   * @throws QueryException query exception
+   */
+  final void checkPerm(final QueryContext qc) throws QueryException {
+    checkPerm(qc, definition.perm);
+  }
+
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
-    checkPerm(cc.qc, definition.perm);
+    checkPerm(cc.qc);
     simplifyArgs(cc);
 
     // apply custom optimizations
@@ -945,8 +954,9 @@ public abstract class StandardFunc extends Arr {
   protected final boolean trusted(final Options options, final String name,
       final QueryContext qc) {
     final Object trusted = options.get(name);
-    return trusted != null ? (Boolean) trusted :
-      qc.context.options.get(MainOptions.TRUSTEXTERNAL);
+    // untrusted code cannot grant itself access
+    return trusted(qc) && (trusted != null ? (Boolean) trusted :
+      qc.context.options.get(MainOptions.TRUSTEXTERNAL));
   }
 
   /**
@@ -1018,7 +1028,7 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected final Data toData(final String name, final QueryContext qc) throws QueryException {
-    return qc.resources.database(name, qc.user, definition.has(Flag.UPD), info);
+    return qc.resources.database(name, qc, definition.has(Flag.UPD), info);
   }
 
   /**

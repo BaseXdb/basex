@@ -144,7 +144,7 @@ public final class MainOptions extends Options {
   public static final BooleanOption DEFAULTDB = new BooleanOption("DEFAULTDB", false);
   /** Forces database creation for unknown documents. */
   public static final BooleanOption FORCECREATE = new BooleanOption("FORCECREATE", false);
-  /** Default for the 'trust-external' and 'trusted' options of XQuery functions. */
+  /** Default for the 'trust-external' option of XQuery functions. */
   public static final BooleanOption TRUSTEXTERNAL = new BooleanOption("TRUSTEXTERNAL", false);
   /** Validate string inputs. */
   public static final BooleanOption CHECKSTRINGS = new BooleanOption("CHECKSTRINGS", true);
@@ -252,7 +252,7 @@ public final class MainOptions extends Options {
   /** Options version of the resolver. */
   private int resolverVersion;
   /** Whether external resources may be accessed. */
-  private boolean trusted = true;
+  private boolean allowExternal = true;
 
   /**
    * Default constructor.
@@ -276,7 +276,7 @@ public final class MainOptions extends Options {
   public MainOptions(final MainOptions options) {
     super(options);
     resolver = options.resolver;
-    trusted = options.trusted;
+    allowExternal = options.allowExternal;
   }
 
   /**
@@ -288,7 +288,7 @@ public final class MainOptions extends Options {
     this(false);
     for(final Option<?> option : xml ? XMLPARSING : PARSING) put(option, options.get(option));
     resolver = options.resolver;
-    trusted = options.trusted;
+    allowExternal = options.allowExternal;
   }
 
   /**
@@ -309,10 +309,10 @@ public final class MainOptions extends Options {
     final Boolean t = (Boolean) options.get(CommonOptions.TRUST_EXTERNAL);
     if(parent == null) {
       resolver = null;
-      trusted = t == Boolean.TRUE;
+      allowExternal = t == Boolean.TRUE;
     } else {
       setResolver(parent);
-      trusted = t != null ? t : parent.trusted && parent.get(TRUSTEXTERNAL);
+      allowExternal = t != null ? t : parent.allowExternal && parent.get(TRUSTEXTERNAL);
     }
   }
 
@@ -354,19 +354,19 @@ public final class MainOptions extends Options {
 
   /**
    * Returns whether external resources may be accessed when parsing XML.
-   * @return trusted flag
+   * @return result of check
    */
-  public boolean isTrusted() {
-    return trusted;
+  public boolean allowExternal() {
+    return allowExternal;
   }
 
   /**
-   * Assigns the trust level.
-   * @param trust trusted flag
+   * Specifies whether external resources may be accessed when parsing XML.
+   * @param allow allow access
    * @return self reference
    */
-  public MainOptions trusted(final boolean trust) {
-    trusted = trust;
+  public MainOptions allowExternal(final boolean allow) {
+    allowExternal = allow;
     return this;
   }
 }

@@ -38,6 +38,8 @@ public final class QueryResources {
 
   /** Database context. */
   private final Context context;
+  /** Root query context (used for resources added via the Java API). */
+  private final QueryContext root;
 
   /** Module loader (can be {@code null}). */
   private ModuleLoader modules;
@@ -68,6 +70,7 @@ public final class QueryResources {
    */
   QueryResources(final QueryContext qc) {
     context = qc.context;
+    root = qc;
   }
 
   /**
@@ -184,27 +187,30 @@ public final class QueryResources {
   /**
    * Opens a new database or returns a reference to an already opened database.
    * @param name name of database
-   * @param user current user
+   * @param qc query context
    * @param updating updating access
    * @param info input info (can be {@code null})
    * @return database instance
    * @throws QueryException query exception
    */
-  public synchronized Data database(final String name, final User user, final boolean updating,
-      final InputInfo info) throws QueryException {
+  public synchronized Data database(final String name, final QueryContext qc,
+      final boolean updating, final InputInfo info) throws QueryException {
 
     final boolean mainmem = context.options.get(MainOptions.MAINMEM);
+    final Perm perm = updating ? Perm.WRITE : Perm.READ;
+    qc.checkPerm(perm, name, name, info);
 
     // check if a database with the same name has already been opened
     for(final Data data : datas) {
       // default mode: skip main-memory database instances (which may result from fn:doc calls)
       if(data.inMemory() && !mainmem) continue;
-      if(IO.equals(data.meta.name, name)) return data;
+      if(IO.equals(data.meta.name, name)) {
+        checkTrusted(data, name, qc, info);
+        return data;
+      }
     }
 
     // open and register database
-    final Perm perm = updating ? Perm.WRITE : Perm.READ;
-    if(!user.has(perm, name)) throw BASEX_PERMISSION_X_X.get(info, perm, name);
     try {
       return addData(Open.open(name, context, context.options, true, false));
     } catch(final IOException ex) {
@@ -217,14 +223,15 @@ public final class QueryResources {
    * database and node.
    * @param qi query input
    * @param docOpts options used by fn:doc or fn:collection
-   * @param user current user
+   * @param qc query context
    * @param info input info (can be {@code null})
-   * @param trusted allow access to external resources
+   * @param allowExternal allow access to external resources
    * @return document
    * @throws QueryException query exception
    */
-  public synchronized DBNode doc(final QueryInput qi, final DocOptions docOpts, final User user,
-      final InputInfo info, final boolean trusted) throws QueryException {
+  public synchronized DBNode doc(final QueryInput qi, final DocOptions docOpts,
+      final QueryContext qc, final InputInfo info, final boolean allowExternal)
+      throws QueryException {
     final MainOptions options = context.options;
     // favor default database
     if(options.get(MainOptions.WITHDB) && options.get(MainOptions.DEFAULTDB)) {
@@ -232,6 +239,7 @@ public final class QueryResources {
       if(data != null) {
         final int pre = data.resources.doc(qi.original);
         if(pre != -1) {
+          checkRead(data, qc, info);
           docOpts.checkDbAccess(info);
           return new DBNode(data, pre, Data.DOC);
         }
@@ -239,7 +247,7 @@ public final class QueryResources {
     }
 
     // access open database or create new one
-    final Data data = data(true, qi, docOpts, user, info, trusted);
+    final Data data = data(true, qi, docOpts, qc, info, allowExternal);
     // ensure that database contains a single document
     final IntList docs = data.resources.docs(qi.dbPath);
     if(docs.size() == 1) return new DBNode(data, docs.get(0), Data.DOC);
@@ -250,13 +258,13 @@ public final class QueryResources {
    * Evaluates {@code fn:collection()}: opens an existing collection,
    * or creates a new data reference.
    * @param qi query input (set to {@code null} if default collection is requested)
-   * @param user current user
+   * @param qc query context
    * @param info input info (can be {@code null})
    * @return collection
    * @throws QueryException query exception
    */
-  public synchronized Value collection(final QueryInput qi, final User user, final InputInfo info)
-      throws QueryException {
+  public synchronized Value collection(final QueryInput qi, final QueryContext qc,
+      final InputInfo info) throws QueryException {
 
     final boolean withdb = context.options.get(MainOptions.WITHDB);
 
@@ -272,6 +280,7 @@ public final class QueryResources {
       if(options.get(MainOptions.DEFAULTDB)) {
         final Data data = globalData();
         if(data != null) {
+          checkRead(data, qc, info);
           final IntList pres = data.resources.docs(qi.original);
           return DBNodeSeq.get(pres, data, true, qi.original.isEmpty());
         }
@@ -286,7 +295,7 @@ public final class QueryResources {
     }
 
     // access open database or create new one
-    final Data data = data(false, qi, DOC_OPTIONS, user, info, false);
+    final Data data = data(false, qi, DOC_OPTIONS, qc, info, false);
     final IntList docs = data.resources.docs(qi.dbPath);
     return DBNodeSeq.get(docs, data, true, qi.dbPath.isEmpty());
   }
@@ -373,7 +382,7 @@ public final class QueryResources {
   public void addDoc(final String name, final String path, final StaticContext sc)
       throws QueryException {
     final QueryInput qi = new QueryInput(path, sc);
-    final Data data = create(qi, DOC_OPTIONS, context.user(), null, true, true);
+    final Data data = create(qi, DOC_OPTIONS, root, null, true, true);
     if(name != null) data.meta.original = name;
   }
 
@@ -408,7 +417,7 @@ public final class QueryResources {
     final ItemList items = new ItemList(paths.length);
     for(final String path : paths) {
       final QueryInput qi = new QueryInput(path, sc);
-      final Data data = create(qi, DOC_OPTIONS, context.user(), null, false, true);
+      final Data data = create(qi, DOC_OPTIONS, root, null, false, true);
       items.add(new DBNode(data, 0, Data.DOC));
     }
     addCollection(items.value(NodeType.DOCUMENT), name);
@@ -448,14 +457,15 @@ public final class QueryResources {
    * @param single single document
    * @param qi query input
    * @param docOpts options used by fn:doc or fn:collection
-   * @param user current user
+   * @param qc query context
    * @param info input info (can be {@code null})
-   * @param trusted allow access to external resources
+   * @param allowExternal allow access to external resources
    * @return document
    * @throws QueryException query exception
    */
   private Data data(final boolean single, final QueryInput qi, final DocOptions docOpts,
-      final User user, final InputInfo info, final boolean trusted) throws QueryException {
+      final QueryContext qc, final InputInfo info, final boolean allowExternal)
+      throws QueryException {
 
     final boolean withdb = context.options.get(MainOptions.WITHDB);
     final String name = qi.dbName;
@@ -466,15 +476,16 @@ public final class QueryResources {
       if(withdb || mainmem) {
         // compare input path
         final String original = data.meta.original;
-        if(!original.isEmpty() &&
-            originals.computeIfAbsent(data, d -> IO.get(d.meta.original)).eq(qi.io) &&
+        if(!original.isEmpty() && original(data).eq(qi.io) &&
             docOpts.toString().equals(data.meta.docOpts)) {
+          checkTrusted(qi.io, qi.original, qc, info);
           // reset database path: indicates that database includes all files of the original path
           qi.dbPath = "";
           return data;
         }
         // compare database name; favor existing database instances
         if(IO.equals(data.meta.name, name) && (!mainmem || !context.soptions.dbExists(name))) {
+          checkRead(data, qc, info);
           docOpts.checkDbAccess(info);
           return data;
         }
@@ -483,7 +494,7 @@ public final class QueryResources {
 
     // try to open existing database
     if(withdb && name != null) {
-      if(!user.has(Perm.READ, name)) throw BASEX_PERMISSION_X_X.get(info, Perm.READ, name);
+      qc.checkPerm(Perm.READ, name, name, info);
       try {
         final Data data = Open.open(name, context, context.options, false, false);
         if(data != null) {
@@ -496,30 +507,84 @@ public final class QueryResources {
     }
 
     // otherwise, create new instance
-    final Data data = create(qi, docOpts, user, info, single, trusted);
+    final Data data = create(qi, docOpts, qc, info, single, allowExternal);
     // reset database path: indicates that all documents were parsed
     qi.dbPath = "";
     return data;
   }
 
   /**
+   * Checks if the code that accesses an instance created from an external resource is trusted.
+   * @param data data reference
+   * @param input original input (for error messages)
+   * @param qc query context
+   * @param info input info (can be {@code null})
+   * @throws QueryException query exception
+   */
+  private void checkTrusted(final Data data, final String input, final QueryContext qc,
+      final InputInfo info) throws QueryException {
+    // instances created by fn:doc and fn:collection
+    if(data.meta.docOpts != null) checkTrusted(original(data), input, qc, info);
+  }
+
+  /**
+   * Checks if the current user and the accessing code may read the specified database instance.
+   * @param data data reference
+   * @param qc query context
+   * @param info input info (can be {@code null})
+   * @throws QueryException query exception
+   */
+  private void checkRead(final Data data, final QueryContext qc, final InputInfo info)
+      throws QueryException {
+    final String name = data.meta.name;
+    qc.checkPerm(Perm.READ, name, name, info);
+    checkTrusted(data, name, qc, info);
+  }
+
+  /**
+   * Returns the original input reference of a database instance.
+   * @param data data reference
+   * @return input reference
+   */
+  private IO original(final Data data) {
+    return originals.computeIfAbsent(data, d -> IO.get(d.meta.original));
+  }
+
+  /**
+   * Checks if the code that accesses an external resource is trusted.
+   * @param io resource
+   * @param input original input (for error messages)
+   * @param qc query context
+   * @param info input info (can be {@code null})
+   * @throws QueryException query exception
+   */
+  private static void checkTrusted(final IO io, final String input, final QueryContext qc,
+      final InputInfo info) throws QueryException {
+    if(io.isExternal() && !qc.trusted(info)) {
+      throw EXTERNALRESOURCE_X.get(info, input);
+    }
+  }
+
+  /**
    * Creates a new database instance.
    * @param input query input
    * @param docOpts options used by fn:doc or fn:collection
-   * @param user current user
+   * @param qc query context
    * @param info input info (can be {@code null})
    * @param single expect single document
-   * @param trusted allow access to external resources
+   * @param allowExternal allow access to external resources
    * @return data reference
    * @throws QueryException query exception
    */
-  private Data create(final QueryInput input, final DocOptions docOpts, final User user,
-      final InputInfo info, final boolean single, final boolean trusted) throws QueryException {
+  private Data create(final QueryInput input, final DocOptions docOpts, final QueryContext qc,
+      final InputInfo info, final boolean single, final boolean allowExternal)
+      throws QueryException {
 
     // check user permissions
     final IO io = input.io;
+    checkTrusted(io, input.original, qc, info);
     final Perm perm = io.isExternal() ? Perm.CREATE : Perm.READ;
-    if(!user.has(perm)) throw BASEX_PERMISSION_X_X.get(info, perm, input.original);
+    qc.checkPerm(perm, null, input.original, info);
 
     // check if input points to a single file
     if(!io.exists()) throw WHICHRES_X.get(info, io.path());
@@ -529,12 +594,12 @@ public final class QueryResources {
     final MainOptions mopts = context.options, options;
     final boolean mainmem = !mopts.get(MainOptions.FORCECREATE);
     if(mainmem) {
-      if(!trusted && docOpts == DOC_OPTIONS && mopts.resolver().standard()
+      if(!allowExternal && docOpts == DOC_OPTIONS && mopts.resolver().standard()
         && !mopts.get(MainOptions.TRUSTEXTERNAL)) {
         options = MAIN_OPTIONS;
       } else {
         options = new MainOptions(docOpts, mopts);
-        if(trusted) options.trusted(true);
+        if(allowExternal) options.allowExternal(true);
       }
     } else {
       docOpts.checkDbAccess(info);

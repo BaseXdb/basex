@@ -118,7 +118,7 @@ public final class FnTransform extends StandardFunc {
     public static final ValueOption TEMPLATE_PARAMS =
         new ValueOption("template-params", QNAME_MAP, null);
     /** Allow access to external resources. */
-    public static final BooleanOption TRUSTED = new BooleanOption(CommonOptions.TRUSTED);
+    public static final BooleanOption TRUSTED = new BooleanOption(CommonOptions.TRUSTED, false);
     /** Values of the tunnel parameters of the initial template. */
     public static final ValueOption TUNNEL_PARAMS =
         new ValueOption("tunnel-params", QNAME_MAP, null);

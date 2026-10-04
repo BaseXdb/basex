@@ -81,9 +81,12 @@ public class FnParseXmlFragment extends Docs {
     final String encoding = value instanceof Bin ? null : Strings.UTF8;
     final IO io = new IOContent(toBytes(value), baseURI, encoding);
 
-    final MainOptions mopts = new MainOptions(options, qc.context.options);
+    final MainOptions mopts = new MainOptions(options, qc.context.options).
+        allowExternal(trusted(options, CommonOptions.TRUST_EXTERNAL, qc));
     // untrusted calls may only access catalog-mapped resources with create permissions
-    if(!mopts.isTrusted() && !qc.user.has(Perm.CREATE)) mopts.put(MainOptions.CATALOG, "");
+    if(!mopts.allowExternal() && !qc.has(Perm.CREATE, null, info)) {
+      mopts.put(MainOptions.CATALOG, "");
+    }
     try {
       final boolean ip = fragment || mopts.get(MainOptions.INTPARSE);
       return new DBNode(ip ? new XMLParser(io, mopts, fragment) : Parser.xmlParser(io, mopts));

@@ -20,6 +20,24 @@ public enum Perm {
   /** Admin permission (global). */
   ADMIN;
 
+  /**
+   * Checks if this permission includes the specified permission.
+   * @param perm permission
+   * @return result of check
+   */
+  public boolean has(final Perm perm) {
+    return ordinal() >= perm.ordinal();
+  }
+
+  /**
+   * Returns the lower of this and the specified permission.
+   * @param perm permission
+   * @return lower permission
+   */
+  public Perm min(final Perm perm) {
+    return perm.ordinal() < ordinal() ? perm : this;
+  }
+
   @Override
   public String toString() {
     return Enums.string(this);

@@ -32,7 +32,7 @@ public class XQueryEval extends StandardFunc {
   /** XQuery options. */
   public static class XQueryOptions extends Options {
     /** Permission. */
-    public static final EnumOption<Perm> PERMISSION = new EnumOption<>("permission", Perm.ADMIN);
+    public static final EnumOption<Perm> PERMISSION = new EnumOption<>("permission", Perm.class);
     /** Timeout in seconds. */
     public static final ValueOption TIMEOUT =
         new ValueOption("timeout", BasicType.DECIMAL.seqType(), Dec.ZERO);
@@ -70,10 +70,11 @@ public class XQueryEval extends StandardFunc {
     // parse options
     final XQueryOptions options = new XQueryOptions();
     final User user = qc.user;
-    options.put(XQueryOptions.PERMISSION, user.permission(""));
     toOptions(arg(2), options, qc);
 
-    final Perm perm = Enums.get(Perm.class, options.get(XQueryOptions.PERMISSION).toString());
+    // a supplied permission also limits the code, including returned function items
+    final Perm limit = options.get(XQueryOptions.PERMISSION);
+    final Perm perm = limit != null ? limit : user.permission("");
     if(!user.has(perm)) throw XQUERY_NOPERM_X.get(info, perm);
 
     // bind variables and context value, or resolve the arguments of the invoked function
@@ -83,6 +84,7 @@ public class XQueryEval extends StandardFunc {
     Timer to = null;
     try(QueryContext qctx = new QueryContext(qc, null)) {
       qctx.user = new User(user).permission(perm);
+      qctx.maxPerm = perm(qc).min(limit != null ? limit : Perm.ADMIN);
 
       // limit memory consumption
       final long mb = options.get(XQueryOptions.MEMORY);

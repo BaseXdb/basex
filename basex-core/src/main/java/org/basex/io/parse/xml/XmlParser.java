@@ -84,7 +84,7 @@ public final class XmlParser {
       f.setSchema(sf.newSchema());
     }
     final XMLReader xr = f.newSAXParser().getXMLReader();
-    if(options.isTrusted()) {
+    if(options.allowExternal()) {
       for(final String limit : LIMITS) xr.setProperty(limit, "0");
     }
     if(xsdValidation && !xsiLocation) {

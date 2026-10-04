@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.List;
 
 import org.basex.core.*;
+import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
@@ -45,26 +46,32 @@ public final class FnLoadXQueryModule extends StandardFunc {
     final XQMap options = toEmptyMap(arg(1), qc);
     final LoadXQueryModuleOptions opt = toOptions(options, new LoadXQueryModuleOptions(), qc);
     final Value hints = opt.get(LOCATION_HINTS);
+    // untrusted modules are restricted to write permissions
+    final boolean trusted = trusted(opt, CommonOptions.TRUSTED, qc);
+    final Perm perm = perm(qc).min(trusted ? Perm.ADMIN : Perm.WRITE);
 
-    // check for cached result
+    // check for cached result (callers must not bypass the location check)
     Map<String, XQMap> modCache = null;
     String cacheKey = null;
-    if(hints.size() == 1 && options.structSize() == 1) {
+    if(hints.size() == 1 && options.structSize() == 1 && qc.has(Perm.CREATE, null, info)) {
       QueryContext qcAnc = qc;
       while(qcAnc.parent != null) qcAnc = qcAnc.parent;
       modCache = qcAnc.threads.moduleCache().get();
-      cacheKey = new TokenBuilder(modUri).add('#').add(toToken(hints.itemAt(0))).toString();
+      cacheKey = new TokenBuilder(modUri).add('#').add(toToken(hints.itemAt(0))).add('#').
+          add(perm.toString()).toString();
       if(modCache.containsKey(cacheKey)) return modCache.get(cacheKey);
     }
 
     final List<IO> srcs = new ArrayList<>();
     final String cont = opt.get(CONTENT);
-    if(cont != null) {
+    if(cont != null && !cont.isEmpty()) {
       srcs.add(new IOContent(cont));
     } else {
       final StringList locs = new StringList();
       for(final Item hint : hints) locs.add(toString(hint));
-      if(locs.isEmpty()) {
+      // modules pre-declared by the caller or installed in the repository require no permissions
+      final boolean provided = locs.isEmpty();
+      if(provided) {
         final TokenList files = qc.modDeclared.get(modUri);
         if(files != null) {
           for(final byte[] file : files) locs.add(Token.string(file));
@@ -74,7 +81,11 @@ public final class FnLoadXQueryModule extends StandardFunc {
         }
       }
       if(locs.isEmpty()) throw MODULE_NOT_FOUND_X.get(info, modUri);
-      for(final String loc : locs) srcs.add(info.sc().resolve(loc, info.path()));
+      for(final String loc : locs) {
+        final IO src = info.sc().resolve(loc, info.path());
+        if(src.isExternal() && !provided) checkPerm(qc, Perm.CREATE);
+        srcs.add(src);
+      }
     }
 
     final QNmMap<Value> bindings = new QNmMap<>();
@@ -94,6 +105,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
     }
 
     final QueryContext mqc = new QueryContext(qc, null);
+    mqc.maxPerm = perm;
     for(final byte[] uri : qc.modDeclared) mqc.modDeclared.put(uri, qc.modDeclared.get(uri));
     int nParsed = 0;
     final Value ctx = contextValue(options, opt);
@@ -233,5 +245,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
     /** load-xquery-module option vendor-options. */
     public static final ValueOption VENDOR_OPTIONS = new ValueOption("vendor-options",
         Types.MAP_O, null);
+    /** load-xquery-module option trusted. */
+    public static final BooleanOption TRUSTED = new BooleanOption(CommonOptions.TRUSTED, false);
   }
 }

@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import java.util.*;
 
+import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -41,11 +42,16 @@ public final class InspectFunctions extends StandardFunc {
     final HashSet<StaticFunc> old = new HashSet<>();
     qc.functions.forEach(old::add);
 
+    // the parsed module inherits the permission of the calling code
+    final Perm perm = qc.maxPerm;
+    qc.maxPerm = perm(qc);
     try {
       qc.parse(src.toString(), src.path());
       qc.functions.compileAll(new CompileContext(qc, true));
     } catch(final QueryException ex) {
       throw INSPECT_PARSE_X.get(info, ex);
+    } finally {
+      qc.maxPerm = perm;
     }
 
     // collect new functions

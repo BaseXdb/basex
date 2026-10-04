@@ -669,6 +669,29 @@ public final class PermissionTest extends SandboxTest {
         testSession, "[xquery:permission]", "create");
   }
 
+  /** Tests permissions of dynamically loaded code. */
+  @Test public void dynamicCode() {
+    ok(new Grant("read", NAME), adminSession);
+    // modules supplied as content require no permissions, external locations require create
+    ok(new XQuery(LOAD_XQUERY_MODULE.args("m", " { 'content': "
+        + "'module namespace m = \"m\"; declare function m:f() { 1 };' }") + "?functions?*?*()"),
+        testSession);
+    final String load = LOAD_XQUERY_MODULE.args("m",
+        " { 'location-hints': '" + sandbox() + "module.xqm' }");
+    error(new XQuery(load), testSession, "[basex:permission]", "create");
+    // modules installed in the repository require no permissions
+    ok(new XQuery(LOAD_XQUERY_MODULE.args("urn:isbn:12345") + "?variables?* = '123' or error()"),
+        testSession);
+    // functions looked up at runtime are only available with sufficient permissions
+    final String lookup = "for $n in 'file:list' where random:double() >= 0 "
+        + "return function-lookup(xs:QName($n), 1)";
+    ok(new XQuery("empty(" + lookup + ") or error()"), testSession);
+
+    ok(new Grant("create", NAME), adminSession);
+    ok(new XQuery(load + "?functions?*?*()"), testSession);
+    ok(new XQuery("exists(" + lookup + ") or error()"), testSession);
+  }
+
   /** Tests the permission error raised when accessing external resources. */
   @Test public void permRequired() {
     // fn:collection bypasses the DTD-related permission check in Docs.check

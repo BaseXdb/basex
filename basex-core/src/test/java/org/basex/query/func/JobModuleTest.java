@@ -564,7 +564,7 @@ public final class JobModuleTest extends SandboxTest {
         "return " + func.args(" fn() { $f() }"), "<x>a</x>");
 
     // modules loaded at runtime are only compiled once, with databases
-    query("let $module := load-xquery-module('m', { 'content': " +
+    query("let $module := load-xquery-module('m', { 'trusted': true(), 'content': " +
         "'module namespace m = \"m\"; declare function m:f() { " +
         "let $p := string(" + _DB_GET.args(NAME) + ") " +
         "return " + func.args(" fn() { " + path + " }") + " };' }) " +

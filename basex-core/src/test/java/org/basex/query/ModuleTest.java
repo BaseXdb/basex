@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
 import org.basex.core.cmd.*;
+import org.basex.core.users.*;
 import org.basex.io.*;
 import org.junit.jupiter.api.Test;
 
@@ -163,11 +164,46 @@ public final class ModuleTest extends SandboxTest {
     write(o, "module namespace o = 'o';");
 
     // import of m works from m1, m2
-    query("fn:load-xquery-module('m',"
-        + "{ 'location-hints': ('" + m1.path() + "', '" + m2.path() + "') })?variables?*", 42);
+    query("fn:load-xquery-module('m', { 'trusted': true(), "
+        + "'location-hints': ('" + m1.path() + "', '" + m2.path() + "') })?variables?*", 42);
     // import of m fails from m1, m2, o
-    error("fn:load-xquery-module('m', { 'location-hints': ('" + m1.path() + "', '" + m2.path()
-        + "', '" + o.path() + "') })", QueryError.MODULE_FOUND_OTHER_X_X);
+    error("fn:load-xquery-module('m', { 'trusted': true(), 'location-hints': ('" + m1.path()
+        + "', '" + m2.path() + "', '" + o.path() + "') })", QueryError.MODULE_FOUND_OTHER_X_X);
+    // untrusted modules must not import other modules
+    error("fn:load-xquery-module('m', { 'location-hints': '" + m1.path() + "' })",
+        QueryError.MODULE_STATIC_ERROR_X_X);
+  }
+
+  /**
+   * Tests imports of pre-declared modules in untrusted modules.
+   * @throws Exception exception
+   */
+  @Test public void declaredImport() throws Exception {
+    final IOFile n = new IOFile(sandbox(), "n.xqm");
+    write(n, "module namespace n = 'n'; declare variable $n:v := 42;");
+    final String query = "load-xquery-module('m', { 'content': 'module namespace m = \"m\"; "
+        + "import module namespace n = \"n\"; declare variable $m:v := $n:v;' })?variables?*";
+    try(QueryProcessor qp = new QueryProcessor(query, context)) {
+      qp.module("n", n.path());
+      assertEquals("42", qp.value().serialize().toString());
+    }
+  }
+
+  /**
+   * Tests imports of pre-declared modules without create permissions.
+   * @throws Exception exception
+   */
+  @Test public void declaredImportPermissions() throws Exception {
+    final IOFile n = new IOFile(sandbox(), "n.xqm"), o = new IOFile(sandbox(), "o.xqm");
+    write(o, "module namespace o = 'o'; declare variable $o:v := 42;");
+    write(n, "module namespace n = 'n'; import module namespace o = 'o'; "
+        + "declare variable $n:v := $o:v;");
+    try(QueryProcessor qp = new QueryProcessor("load-xquery-module('n')?variables?*", context)) {
+      qp.module("n", n.path());
+      qp.module("o", o.path());
+      qp.qc.user = new User(context.user()).permission(Perm.READ);
+      assertEquals("42", qp.value().serialize().toString());
+    }
   }
 
   /** Tests variable visibility. */

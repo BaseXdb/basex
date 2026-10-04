@@ -130,7 +130,7 @@ public final class ThesAccessor {
     // database that may contain a thesaurus index
     DiskData data = null;
     if(db != null) {
-      if(qc.resources.database(db, qc.user, false, info) instanceof final DiskData dd) data = dd;
+      if(qc.resources.database(db, qc, false, info) instanceof final DiskData dd) data = dd;
     } else if(node instanceof final DBNode dbnode && node.kind() == Kind.DOCUMENT &&
         dbnode.data() instanceof final DiskData dd && dd.resources.docs().size() == 1) {
       data = dd;
@@ -164,7 +164,7 @@ public final class ThesAccessor {
           if(node != null) {
             roots = new XNode[] { node };
           } else if(db != null) {
-            final Data dt = qc.resources.database(db, qc.user, false, info);
+            final Data dt = qc.resources.database(db, qc, false, info);
             final IntList docs = dt.resources.docs();
             final int ds = docs.size();
             roots = new XNode[ds];

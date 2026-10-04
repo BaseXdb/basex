@@ -184,6 +184,8 @@ public final class Functions {
       final QNm[] names = fd.paramNames(arity);
       for(int a = 0; a < arity; a++) fb.add(names[a], ft.argTypes[a], qc);
       final StandardFunc sf = fd.get(info, fb.args());
+      // function items created at runtime are not compiled: check permissions here
+      if(runtime) sf.checkPerm(qc);
       final boolean updating = sf.hasUPD();
       if(updating) {
         fb.anns = fb.anns.attach(new Ann(info, Annotation.UPDATING, Empty.VALUE));

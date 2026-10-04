@@ -273,7 +273,7 @@ public final class User {
    * @return result of check
    */
   public synchronized boolean has(final Perm perm, final String db) {
-    return permission(db).ordinal() >= perm.ordinal();
+    return permission(db).has(perm);
   }
 
   /**

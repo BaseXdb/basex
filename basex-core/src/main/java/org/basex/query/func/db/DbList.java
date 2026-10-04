@@ -1,5 +1,6 @@
 package org.basex.query.func.db;
 
+import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.index.resource.*;
 import org.basex.query.*;
@@ -29,10 +30,20 @@ public class DbList extends DbAccessFn {
    * @return databases
    */
   Iter list(final QueryContext qc) {
-    final StringList dbs = qc.context.databases.list(qc.user, null);
+    final StringList dbs = databases(qc);
     final TokenList list = new TokenList(dbs.size());
     for(final String name : dbs) list.add(name);
     return StrSeq.get(list).iter();
+  }
+
+  /**
+   * Returns the names of all databases that may be read by the current user and code.
+   * @param qc query context
+   * @return names of databases
+   */
+  final StringList databases(final QueryContext qc) {
+    return perm(qc).has(Perm.READ) ? qc.context.databases.list(qc.user, null) :
+      new StringList();
   }
 
   /**

@@ -937,7 +937,10 @@ public class QueryParser extends InputParser {
     if(!addLocations(mi.paths)) {
       // check module files that have been pre-declared by a test API
       final TokenList pths = qc.modDeclared.get(uri);
-      if(pths != null) pths.forEach(mi.paths::add);
+      if(pths != null) {
+        pths.forEach(mi.paths::add);
+        mi.declared = true;
+      }
     }
     mi.uri = uri;
     mi.info = info();
@@ -986,7 +989,8 @@ public class QueryParser extends InputParser {
     }
     // parse supplied paths
     for(final byte[] pth : mi.paths) {
-      checkCreate(string(pth), mi.info);
+      // modules pre-declared by the caller require no permissions
+      if(!mi.declared) checkCreate(string(pth), mi.info);
       module(string(pth), string(uri), mi.info);
     }
   }
@@ -998,7 +1002,8 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void checkCreate(final String location, final InputInfo info) throws QueryException {
-    if(!qc.trusted && !qc.user.has(Perm.CREATE)) {
+    if(!sc.maxPerm.has(Perm.CREATE)) throw error(EXTERNALRESOURCE_X, info, location);
+    if(!qc.parseResources && !qc.user.has(Perm.CREATE)) {
       throw error(BASEX_PERMISSION_X_X, info, Perm.CREATE, location);
     }
   }

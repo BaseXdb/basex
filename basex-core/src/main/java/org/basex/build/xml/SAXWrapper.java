@@ -55,14 +55,14 @@ public final class SAXWrapper extends SingleParser {
       if(reader == null) {
         reader = XmlParser.reader(options);
       }
-      final boolean trusted = options.isTrusted();
+      final boolean allowExternal = options.allowExternal();
       final boolean dtd = options.get(MainOptions.DTD);
       final boolean dtdValidation = options.get(MainOptions.DTDVALIDATION);
-      if(!trusted && options.get(MainOptions.XINCLUDE))
+      if(!allowExternal && options.get(MainOptions.XINCLUDE))
         throw new TrustedViolationException("xinclude");
 
       final EntityResolver er = options.resolver().entityResolver();
-      if(!trusted && (dtd || dtdValidation)) {
+      if(!allowExternal && (dtd || dtdValidation)) {
         // block external resource access, unless the resource is mapped by a catalog
         reader.setEntityResolver((pubId, sysId) -> {
           final InputSource mapped = mapped(er, pubId, sysId);

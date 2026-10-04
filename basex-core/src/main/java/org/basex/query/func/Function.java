@@ -447,7 +447,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   LOAD_XQUERY_MODULE(FnLoadXQueryModule::new, "load-xquery-module(module-uri, options?)",
       params(STRING_O, MAP_ZO), Records.LOAD_XQUERY_MODULE.get().seqType(),
-      flag(NDT, HOF), FN_URI, Perm.ADMIN),
+      flag(NDT, HOF), FN_URI),
   /** XQuery function. */
   LOCAL_NAME(FnLocalName::new, "local-name(node?)",
       params(XNODE_ZO), STRING_O),

@@ -54,6 +54,6 @@ public class FnCollection extends Docs {
         if(qi == null) throw INVCOLL_X.get(info, uri);
       }
     }
-    return qc.resources.collection(qi, qc.user, info);
+    return qc.resources.collection(qi, qc, info);
   }
 }

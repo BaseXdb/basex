@@ -130,7 +130,7 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
   public XdmValue collection(final String name) {
     try {
       return XdmValue.get(qp.qc.resources.collection(name.isEmpty() ? null :
-        new QueryInput(name, qp.sc), qp.qc.user, null));
+        new QueryInput(name, qp.sc), qp.qc, null));
     } catch(final QueryException ex) {
       throw new XQueryException(ex);
     }
@@ -145,7 +145,7 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
   public XdmValue document(final String name) {
     try {
       return XdmItem.get(qp.qc.resources.doc(new QueryInput(name, qp.sc),
-          QueryResources.DOC_OPTIONS, qp.qc.user, null, true));
+          QueryResources.DOC_OPTIONS, qp.qc, null, true));
     } catch(final QueryException ex) {
       throw new XQueryException(ex);
     }
