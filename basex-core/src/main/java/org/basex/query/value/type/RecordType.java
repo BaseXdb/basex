@@ -94,6 +94,27 @@ public final class RecordType extends ShapeType {
     return name;
   }
 
+  /**
+   * Adds the declaration of this record to a query string.
+   * @param qs query string
+   * @return query string
+   */
+  public QueryString declaration(final QueryString qs) {
+    final TokenObjectMap<ShapeField> fields = fields();
+    final Object[] params = new Object[fields.size()];
+    int f = 0;
+    for(final byte[] key : fields) {
+      final ShapeField field = fields.get(key);
+      final QueryString param = new QueryString().token(XMLToken.isNCName(key) ? key :
+        QueryString.toQuoted(key));
+      if(!field.seqType().eq(Types.ITEM_ZM)) param.token(AS).token(field.seqType());
+      if(field.init() != null) param.token(":=").token(field.init());
+      params[f++] = param;
+    }
+    return qs.token(DECLARE).token(anns).token(RECORD).token(name.prefixId()).params(params).
+        token(';');
+  }
+
   @Override
   public String toString() {
     if(name != null) return Token.string(name.prefixString());

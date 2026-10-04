@@ -1244,7 +1244,8 @@ public class QueryParser extends InputParser {
    */
   private void declareType(final QNm qn, final SeqType st, final QNmSet refs, final AnnList anns)
       throws QueryException {
-    final TypeDecl td = new TypeDecl(qn, st, refs, declaredTypes);
+    final TypeDecl td = new TypeDecl(qn, st, refs, declaredTypes, anns);
+    qc.typeDecls.add(td);
     if(!anns.contains(Annotation.PRIVATE)) {
       if(sc.module != null && !eq(qn.uri(), sc.module.uri()))
         throw error(MODULENS_X, qn.prefixString());
