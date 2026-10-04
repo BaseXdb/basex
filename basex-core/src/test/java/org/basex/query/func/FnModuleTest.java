@@ -631,6 +631,12 @@ public final class FnModuleTest extends SandboxTest {
     query(coll, "http://www.w3.org/2013/collation/UCA?lang=de;numeric=yes");
     query(COLLATION_AVAILABLE.args(" " + coll), true);
     query(COMPARE.args("a", "b", " " + coll), -1);
+
+    // keys are passed through unchanged
+    query(func.args(" { 'caseFirst': 'upper' }"),
+        "http://www.w3.org/2013/collation/UCA?caseFirst=upper");
+    query(func.args(" { 'case-first': 'upper' }"),
+        "http://www.w3.org/2013/collation/UCA?case-first=upper");
   }
 
   /** Test method. */
