@@ -132,13 +132,14 @@ public final class StaticVar extends StaticDecl {
    * Binds an external value and casts it to the declared type (if specified).
    * @param val value to bind
    * @param qc query context
-   * @param cast cast flag, value will be coerced if false
+   * @param cast cast flag, value must be an instance of the declared type if false
    * @throws QueryException query exception
    */
   void bind(final Value val, final QueryContext qc, final boolean cast) throws QueryException {
     if(external && !compiled) {
-      value = declType == null || declType.instance(val) ? val :
-        cast ? declType.cast(val, true, qc, info) : declType.coerce(val, qc, info, name, null);
+      if(declType == null || declType.instance(val)) value = val;
+      else if(cast) value = declType.cast(val, true, qc, info);
+      else throw typeError(val, declType, name, info);
       expr = value;
     }
   }

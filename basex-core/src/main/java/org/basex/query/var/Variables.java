@@ -179,7 +179,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
    * Binds all external variables.
    * @param qc query context
    * @param bindings variable bindings
-   * @param cast cast flag, value will be coerced if false
+   * @param cast cast flag, values must be instances of the declared types if false
    * @throws QueryException query exception
    */
   public void bindExternal(final QueryContext qc, final QNmMap<Value> bindings, final boolean cast)
