@@ -389,11 +389,15 @@ public abstract class XQMap extends XQStruct {
     // record(*) is abstract: it is matched, but never constructed, by coercion
     if(rt.any()) throw typeError(this, rt, ii);
 
+    // map with the fields of the record type in the same order: access values by position
     final TokenObjectMap<ShapeField> fields = rt.fields();
-    // reject undeclared keys
-    for(final Item key : keys()) {
-      if(!key.type.isStringOrUntyped() || !fields.contains(key.string(null))) {
-        throw typeError(this, rt, ii);
+    final boolean sameOrder = this instanceof XQShapeMap && rt.sameOrder(this);
+    if(!sameOrder) {
+      // reject undeclared keys
+      for(final Item key : keys()) {
+        if(!key.type.isStringOrUntyped() || !fields.contains(key.string(null))) {
+          throw typeError(this, rt, ii);
+        }
       }
     }
 
@@ -401,18 +405,9 @@ public abstract class XQMap extends XQStruct {
     final int fs = fields.size();
     final Value[] values = new Value[fs];
     for(int f = 0; f < fs; f++) {
-      final byte[] key = fields.key(f + 1);
-      final SeqType ft = fields.value(f + 1).seqType();
-      final Value value = getOrNull(Str.get(key));
-      if(value == null && ft.occ.min > 0) throw typeError(this, rt, ii);
-      try {
-        values[f] = ft.coerce(value != null ? value : Empty.VALUE, qc, ii, null, cc);
-      } catch(final QueryException ex) {
-        if(ex.error() != INVTYPE_X) throw ex;
-        final String msg = ex.getLocalizedMessage();
-        throw INVTYPE_X.get(ex.info(), "Field " + Token.string(QueryString.toQuoted(key)) + " of " +
-          rt + ": " + (msg.endsWith(".") ? msg.substring(0, msg.length() - 1) : msg));
-      }
+      final Value value = sameOrder ? valueAt(f) : getOrNull(rt.key(f + 1));
+      if(value == null && fields.value(f + 1).seqType().occ.min > 0) throw typeError(this, rt, ii);
+      values[f] = rt.coerce(f + 1, value != null ? value : Empty.VALUE, qc, ii, cc);
     }
     return get(rt, values);
   }

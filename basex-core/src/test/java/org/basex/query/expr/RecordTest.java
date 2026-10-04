@@ -637,6 +637,37 @@ public final class RecordTest extends SandboxTest {
         "{\"a\":4,\"b\":5}", empty(ButWith.class), root(XQShapeValueMap.class));
   }
 
+  /** Coercions of maps and record updates are rewritten to record constructors. */
+  @Test public void constructorRewrites() {
+    final String prolog = "declare record xyz(x as xs:double, y as xs:integer, z as xs:string?);\n"
+        + "declare variable $i := random:integer(1) + 1;\n";
+    final UnaryOperator<String> described = query -> prolog
+        + "try { " + query + " } catch * { $err:description }";
+
+    // map constructor coerced to a record type: arguments are reordered, absent fields are empty
+    check(prolog + "let $p as xyz := { 'y': $i, 'x': $i } return $p",
+        "{\"x\":1,\"y\":1,\"z\":()}", empty(TypeCheck.class), count(ShapeConstructor.class, 1));
+    check(prolog + "declare function local:f($x) as xyz { { 'x': $x, 'y': 2 } };\n"
+        + "local:f($i)", "{\"x\":1,\"y\":2,\"z\":()}",
+        empty(TypeCheck.class), count(ShapeConstructor.class, 1));
+    // ... errors of the rewritten coercion still name the field
+    query(described.apply("let $p as xyz := { 'x': $i, 'y': string($i) } return $p"),
+        "Field \"y\" of xyz: xs:integer expected, xs:string found: \"1\".");
+    // ... missing and unknown fields are not rewritten
+    query(described.apply("let $p as xyz := { 'x': $i } return $p"),
+        "xyz expected, \"y\" missing: { \"x\": 1 }.");
+    query(described.apply("let $p as xyz := { 'x': $i, 'y': 2, 'w': 3 } return $p"),
+        "xyz expected, \"w\" unknown: { \"x\": 1, \"y\": 2, \"w\": 3 }.");
+
+    // updates of the rewritten record: values are coerced, errors name the field
+    final String p = "let $p as xyz := { 'x': $i, 'y': 2 } return $p but with ";
+    query(prolog + p + "{ 'x': $i, 'z': string($i) }", "{\"x\":1,\"y\":2,\"z\":\"1\"}");
+    query(prolog + "let $p as xyz := { 'x': $i, 'y': 2 } "
+        + "return ($p but with { 'x': $i })?x instance of xs:double", true);
+    query(described.apply(p + "{ 'y': string($i) }"),
+        "Field \"y\" of xyz: xs:integer expected, xs:string found: \"1\".");
+  }
+
   /** Tests for the compact record map implementation. */
   @Test public void recordMap() {
     String map = "{ 'a': 1, 'b': 2 }";

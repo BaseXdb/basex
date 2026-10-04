@@ -49,37 +49,13 @@ public final class ButWith extends Arr {
       if(st.one() && exprs[1] instanceof final XQMap map && map.structSize() == 0) {
         return cc.replaceWith(this, exprs[0]);
       }
-      // the update supplies every field: drop the left operand
+      // RECORD but with { 'a': 1, 'b': 2 } → { 'a': 1, 'b': 2 } coerce to RECORD
       if(covered(exprs[1], rt)) {
-        // RECORD but with local:rec(1, 2) → local:rec(1, 2): build the record type directly …
-        final Expr direct = retarget(exprs[1], rt, cc);
-        // … otherwise RECORD but with { 'a': 1, 'b': 2 } → { 'a': 1, 'b': 2 } coerce to RECORD
-        return cc.replaceWith(this, direct != null ? direct :
-          new TypeCheck(info, exprs[1], rt.seqType()).optimize(cc));
+        return cc.replaceWith(this, new TypeCheck(info, exprs[1], rt.seqType()).optimize(cc));
       }
       exprType.assign(st.with(Occ.EXACTLY_ONE));
     }
     return values(false, cc) ? cc.preEval(this) : this;
-  }
-
-  /**
-   * Builds the record type directly if the update is a constructor supplying exactly its fields.
-   * @param update update expression (right operand)
-   * @param rt record type of the left operand
-   * @param cc compilation context
-   * @return direct record constructor, or {@code null} if not applicable
-   * @throws QueryException query exception
-   */
-  private Expr retarget(final Expr update, final RecordType rt, final CompileContext cc)
-      throws QueryException {
-    if(!(update instanceof final ShapeConstructor rc) ||
-        !(update.seqType().type instanceof final ShapeType ush) ||
-        ush.fields().size() != rt.fields().size()) return null;
-    final TokenObjectMap<ShapeField> ufields = ush.fields(), fields = rt.fields();
-    final int fs = fields.size();
-    final Expr[] args = new Expr[fs];
-    for(int f = 1; f <= fs; f++) args[f - 1] = rc.arg(ufields.index(fields.key(f)) - 1);
-    return ShapeConstructor.get(info, rt, args).optimize(cc);
   }
 
   /**
@@ -160,7 +136,7 @@ public final class ButWith extends Arr {
       update.forEach((key, value) -> {
         final int i = key.type.isStringOrUntyped() ? fields.index(key.string(null)) : 0;
         if(i == 0) throw typeError(update, rt, info);
-        values[i - 1] = fields.value(i).seqType().coerce(value, qc, info, null, null);
+        values[i - 1] = rt.coerce(i, value, qc, info, null);
       });
       return XQMap.get(rt, values);
     }

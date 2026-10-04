@@ -471,7 +471,7 @@ public class ShapeType extends MapType {
    * @return result of check
    * @throws QueryException query exception
    */
-  public final boolean layout(final XQStruct map) throws QueryException {
+  public final boolean sameOrder(final XQStruct map) throws QueryException {
     final int fs = fields.size();
     if(map.structSize() != fs) return false;
     for(int f = 0; f < fs; f++) {

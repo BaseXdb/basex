@@ -75,6 +75,11 @@ public final class Let extends ForLet {
     // coerce at compile time
     if(expr instanceof final Value value) {
       expr = var.checkType(value, cc.qc, cc);
+    } else if(!scoring && var.declType != null &&
+        !expr.seqType().instanceOf(var.declType, true)) {
+      // push type check into the expression: { 'a': 1 } coerce to local:r → local:r(1)
+      final Expr checked = var.checked(expr, cc);
+      if(!(checked instanceof TypeCheck)) expr = checked;
     }
 
     // assign type to clause and variable

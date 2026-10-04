@@ -56,7 +56,7 @@ public final class ShapeGet extends Single {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(expr, qc);
-    assert type.layout(map) : "Map " + map.type + " has no layout of " + type + ": " + this;
+    assert type.sameOrder(map) : "Map " + map.type + " has no field order of " + type + ": " + this;
     return map.valueAt(index - 1);
   }
 

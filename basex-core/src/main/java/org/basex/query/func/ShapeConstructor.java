@@ -24,8 +24,6 @@ import org.basex.util.hash.*;
 public final class ShapeConstructor extends StandardFunc {
   /** Shape. */
   private ShapeType shapeType;
-  /** Field names. */
-  private final QNm[] names;
   /** Values that need no coercion. */
   private final boolean[] typed;
 
@@ -35,13 +33,7 @@ public final class ShapeConstructor extends StandardFunc {
    */
   private ShapeConstructor(final ShapeType shapeType) {
     this.shapeType = shapeType;
-    final TokenObjectMap<ShapeField> fields = shapeType.fields();
-    final int fs = fields.size();
-    names = new QNm[fs];
-    typed = new boolean[fs];
-    for(int f = 1; f <= fs; f++) {
-      names[f - 1] = new QNm(fields.key(f));
-    }
+    typed = new boolean[shapeType.fields().size()];
   }
 
   /**
@@ -62,11 +54,18 @@ public final class ShapeConstructor extends StandardFunc {
     final TokenObjectMap<ShapeField> fields = shapeType.fields();
     final int fs = fields.size(), el = exprs.length;
     final Value[] values = new Value[fs];
+    final RecordType rt = shapeType instanceof final RecordType r ? r : null;
     for(int f = 0; f < fs; f++) {
       final ShapeField rf = fields.value(f + 1);
       final Expr expr = f < el ? exprs[f] : rf.init();
       final Value value = expr != null ? expr.value(qc) : Empty.VALUE;
-      values[f] = typed[f] ? value : rf.seqType().coerce(value, qc, info, names[f], null);
+      if(typed[f]) {
+        values[f] = value;
+      } else if(rt != null) {
+        values[f] = rt.coerce(f + 1, value, qc, info, null);
+      } else {
+        values[f] = rf.seqType().coerce(value, qc, info);
+      }
     }
     return XQMap.get(shapeType, values);
   }
@@ -91,6 +90,45 @@ public final class ShapeConstructor extends StandardFunc {
       typed[f] = expr != null && expr.seqType().instanceOf(rf.seqType(), true);
     }
     return this;
+  }
+
+  @Override
+  protected Expr inlineTypeCheck(final TypeCheck tc, final CompileContext cc)
+      throws QueryException {
+    // { 'y': Y, 'x': X } coerce to local:point → local:point(X, Y, ())
+    final SeqType st = tc.seqType();
+    if(st.occ.check(1) && TypeRef.deref(st.type) instanceof final RecordType rt) {
+      final Expr[] args = args(rt);
+      if(args != null) return get(info, rt, args).optimize(cc);
+    }
+    return null;
+  }
+
+  /**
+   * Returns the arguments for a constructor function that creates the result of coercing this map
+   * to a record type.
+   * @param rt record type
+   * @return arguments, or {@code null} if coercion fails or if the shape is a record
+   */
+  private Expr[] args(final RecordType rt) {
+    final TokenObjectMap<ShapeField> fields = rt.fields(), shfields = shapeType.fields();
+    if(rt.any() || shapeType instanceof RecordType || exprs.length != shfields.size()) return null;
+    final int fs = fields.size();
+    final Expr[] args = new Expr[fs];
+    int found = 0;
+    for(int f = 1; f <= fs; f++) {
+      final int i = shfields.index(fields.key(f));
+      if(i != 0) {
+        args[f - 1] = exprs[i - 1];
+        found++;
+      } else if(fields.value(f).seqType().occ.min > 0) {
+        return null;
+      } else {
+        args[f - 1] = Empty.VALUE;
+      }
+    }
+    // reject undeclared keys
+    return found == shfields.size() ? args : null;
   }
 
   @Override
