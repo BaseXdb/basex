@@ -557,4 +557,24 @@ public final class FilterTest extends SandboxTest {
     query(func + "{ (10, 20, 30) ! .[$x] }; local:f(2)", "");
     query(func + "{ (10, 20, 30) ! .[$x] }; local:f('a')", "10\n20\n30");
   }
+
+  /** Ranges filtered by integer range comparisons. */
+  @Test public void rangeComparisons() {
+    final String range = "(1 to " + wrap(10) + ")";
+    query(range + "[. > 5]", "6\n7\n8\n9\n10");
+    query(range + "[. >= 2 and . < 5]", "2\n3\n4");
+    query(range + "[. > 4.5][. < 6]", 5);
+    query(range + "[. = 4]", 4);
+    query(range + "[. = 4.5]", "");
+    query(range + "[. > 100]", "");
+    query(REVERSE.args(" " + range) + "[. <= 3]", "3\n2\n1");
+    query(COUNT.args(" " + range + "[. > 5]"), 5);
+    query(SUM.args(" " + range + "[. > 5]"), 40);
+
+    final String one = " xs:integer(" + wrap(1) + ")";
+    query("(-9223372036854775807 to -9223372036854775806 +" + one + ")"
+        + "[. < -9223372036854775806]", "-9223372036854775807");
+    query("(9223372036854775806 -" + one + " to 9223372036854775807)"
+        + "[. > 9223372036854775806]", "9223372036854775807");
+  }
 }
