@@ -50,6 +50,8 @@ public final class QueryResources {
 
   /** Opened databases (both temporary and persistent ones). */
   private final ArrayList<Data> datas = new ArrayList<>(1);
+  /** Original input references of opened databases (created on demand). */
+  private final Map<Data, IO> originals = new IdentityHashMap<>();
   /** External resources. */
   private final Map<Class<? extends QueryResource>, QueryResource> external = new HashMap<>();
   /** Function items. */
@@ -97,6 +99,7 @@ public final class QueryResources {
   void close() {
     for(final Data data : datas) Close.close(data, context);
     datas.clear();
+    originals.clear();
     // close dynamically loaded JAR files
     if(modules != null) modules.close();
     modules = null;
@@ -310,6 +313,7 @@ public final class QueryResources {
       if(data.meta.name.equals(name) && !(data.inMemory() || mainmem)) {
         Close.close(data, context);
         datas.remove(d);
+        originals.remove(data);
         break;
       }
     }
@@ -454,7 +458,8 @@ public final class QueryResources {
       if(withdb || mainmem) {
         // compare input path
         final String original = data.meta.original;
-        if(!original.isEmpty() && IO.get(original).eq(qi.io) &&
+        if(!original.isEmpty() &&
+            originals.computeIfAbsent(data, d -> IO.get(d.meta.original)).eq(qi.io) &&
             docOpts.toString().equals(data.meta.docOpts)) {
           // reset database path: indicates that database includes all files of the original path
           qi.dbPath = "";

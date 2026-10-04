@@ -121,7 +121,10 @@ public abstract class IO {
    */
   IO(final String path, final boolean single) {
     pth = path;
-    nm = single && path.endsWith("/") ? "" : path.replaceAll("^(?:.*/)?([^/]+)/?$", "$1");
+    // last path segment, ignoring a trailing slash
+    final int l = path.length(), e = path.endsWith("/") ? l - 1 : l;
+    final int s = path.lastIndexOf('/', e - 1) + 1;
+    nm = single && e < l ? "" : s < e ? path.substring(s, e) : path;
   }
 
   /**
