@@ -378,6 +378,7 @@ public final class FnModuleTest extends SandboxTest {
 
     check(func.args(REPLICATE.args(1.0, 3)), 1, empty(func));
     check(func.args(REPLICATE.args(wrap(1), 3)), 1, type(func, "xs:double"));
+    query(func.args(SUBSEQUENCE.args(" 1 to " + wrap(10), 5)), 7.5);
 
     error(func.args(" true#0"), FIATOMIZE_X);
     error(func.args(REPLICATE.args(" true#0", 2)), FIATOMIZE_X);
@@ -5574,6 +5575,12 @@ return
     query(func.args(" (1 to 10) ! xs:untypedAtomic('10')"), 100);
     error(func.args(" (1 to 10) ! 'a'"), NUMDUR_X_X);
     error(func.args(" (1 to 1_000_000) ! 'b'"), NUMDUR_X_X);
+
+    // ranges and repeated items that are created at runtime
+    query(func.args(SUBSEQUENCE.args(" 1 to " + wrap(10), 5)), 45);
+    query(func.args(SLICE.args(" -3 to " + wrap(10), 2, -2)), 42);
+    query(func.args(REPLICATE.args(" xs:integer(" + wrap(3) + ")", 10)), 30);
+    query(func.args(" for $i in 1 to " + wrap(10) + " return 3"), 30);
 
     query("for $i in 1 to 2 return " + func.args(" ()", " $i"), "1\n2");
     query(func.args(" ()", wrap(0)), 0);
