@@ -1,5 +1,6 @@
 package org.basex.query.util;
 
+import java.text.*;
 import java.util.function.*;
 
 import org.basex.query.*;
@@ -30,6 +31,10 @@ public final class DeepEqual {
   public final Collation coll;
   /** Options. */
   public final DeepEqualOptions options;
+  /** Unicode normalization form for strings (can be {@code null}). */
+  public final Normalizer.Form normalization;
+  /** Whitespace normalization for strings. */
+  public final boolean whitespace;
 
   /** Comparison function (can be {@code null}; requires {@link #qc} to be assigned). */
   public FItem itemsEqual;
@@ -76,6 +81,9 @@ public final class DeepEqual {
     this.coll = Collation.get(coll, info);
     this.qc = qc;
     this.options = options != null ? options : DEFAULTS;
+    normalization = this.options.get(DeepEqualOptions.NORMALIZATION_FORM);
+    whitespace = this.options.get(DeepEqualOptions.WHITESPACE) ==
+        DeepEqualOptions.Whitespace.NORMALIZE;
   }
 
   /**

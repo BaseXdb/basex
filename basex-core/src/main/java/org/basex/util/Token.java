@@ -1,7 +1,5 @@
 package org.basex.util;
 
-import static org.basex.query.util.DeepEqualOptions.*;
-
 import java.math.*;
 import java.nio.charset.*;
 import java.text.*;
@@ -681,9 +679,9 @@ public final class Token {
    * @return true if the tokens are equal
    */
   public static boolean eq(final byte[] token1, final byte[] token2, final DeepEqual deep) {
-    final Normalizer.Form form = deep.options.get(NORMALIZATION_FORM);
+    final Normalizer.Form form = deep.normalization;
     byte[] t1 = normalize(token1, form), t2 = normalize(token2, form);
-    if(deep.options.get(WHITESPACE) == Whitespace.NORMALIZE) {
+    if(deep.whitespace) {
       t1 = normalize(t1);
       t2 = normalize(t2);
     }
