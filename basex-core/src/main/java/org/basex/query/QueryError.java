@@ -1789,29 +1789,29 @@ public enum QueryError {
     final TokenBuilder desc = new TokenBuilder();
     if(name != null) desc.add(name.varString()).add(": ");
     if(ist.occ.instanceOf(est.occ)) {
-      // cardinality matches, focus on type:
-      desc.add(est).add(" expected, ");
-      // try to find a missing or an unknown record entry:
+      // cardinality matches, focus on type; try to find a missing or an unknown record entry:
       byte[] issue = null;
       if(est.type instanceof final ShapeType sh && !sh.any() && expr instanceof final XQMap map) {
         final TokenObjectMap<ShapeField> fields = sh.fields();
         for(final byte[] field : fields) {
           if(map.value(Str.get(field)) == null && fields.get(field).seqType().occ.min > 0) {
-            issue = Token.concat(QueryString.toQuoted(field), " missing");
+            issue = Token.concat("Field ", QueryString.toQuoted(field), " of ", est.type,
+              " missing");
             break;
           }
         }
         if(issue == null) {
           for(final Item key : map.keys()) {
             if(key instanceof final Str str && fields.contains(str.string())) continue;
-            issue = Token.concat(key instanceof final Str str ? QueryString.toQuoted(str.string()) :
-              Token.token(key.toString()), " unknown");
+            issue = Token.concat("Field ", key instanceof final Str str ?
+              QueryString.toQuoted(str.string()) : Token.token(key.toString()), " of ", est.type,
+              " unknown");
             break;
           }
         }
       }
       if(issue != null) desc.add(issue);
-      else desc.add(ist).add(" found");
+      else desc.add(est).add(" expected, ").add(ist).add(" found");
     } else {
       // add cardinality string
       desc.add(name != null ? est.occ.desc : Strings.capitalize(est.occ.desc)).add(" expected");

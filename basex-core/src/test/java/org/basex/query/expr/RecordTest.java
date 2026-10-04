@@ -228,12 +228,12 @@ public final class RecordTest extends SandboxTest {
 
     // an unknown key is named, not an optional field that is absent
     query(described.apply("{ 'n': 'x', 'b': 1 }"),
-        "local:r expected, \"b\" unknown: { \"n\": \"x\", \"b\": 1 }.");
+        "Field \"b\" of local:r unknown: { \"n\": \"x\", \"b\": 1 }.");
     query(described.apply("{ 'n': 'x', 1: 2 }"),
-        "local:r expected, 1 unknown: { \"n\": \"x\", 1: 2 }.");
+        "Field 1 of local:r unknown: { \"n\": \"x\", 1: 2 }.");
     // a missing field is only reported if it does not admit the empty sequence
     query(described.apply("{ 'a': 'x' }"),
-        "local:r expected, \"n\" missing: { \"a\": \"x\" }.");
+        "Field \"n\" of local:r missing: { \"a\": \"x\" }.");
     // a field that cannot be coerced is named, also in a nested record
     query(described.apply("{ 'n': () }"),
         "Field \"n\" of local:r: One item expected (xs:string), 0 found.");
@@ -655,9 +655,9 @@ public final class RecordTest extends SandboxTest {
         "Field \"y\" of xyz: xs:integer expected, xs:string found: \"1\".");
     // ... missing and unknown fields are not rewritten
     query(described.apply("let $p as xyz := { 'x': $i } return $p"),
-        "xyz expected, \"y\" missing: { \"x\": 1 }.");
+        "Field \"y\" of xyz missing: { \"x\": 1 }.");
     query(described.apply("let $p as xyz := { 'x': $i, 'y': 2, 'w': 3 } return $p"),
-        "xyz expected, \"w\" unknown: { \"x\": 1, \"y\": 2, \"w\": 3 }.");
+        "Field \"w\" of xyz unknown: { \"x\": 1, \"y\": 2, \"w\": 3 }.");
 
     // updates of the rewritten record: values are coerced, errors name the field
     final String p = "let $p as xyz := { 'x': $i, 'y': 2 } return $p but with ";
