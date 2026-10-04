@@ -292,6 +292,16 @@ interface CalcOpt {
       throws QueryException {
     final BigDecimal dec1 = item1.dec(info), dec2 = item2.dec(info);
     if(dec2.signum() == 0) throw DIVZERO_X.get(info, item1);
+    return divide(dec1, dec2);
+  }
+
+  /**
+   * Divides two decimal values.
+   * @param dec1 dividend
+   * @param dec2 divisor (must not be zero)
+   * @return result
+   */
+  static Dec divide(final BigDecimal dec1, final BigDecimal dec2) {
     final int scale = Math.max(18, Math.max(dec1.scale(), dec2.scale()));
     return Dec.get(dec1.divide(dec2, scale, RoundingMode.HALF_EVEN));
   }

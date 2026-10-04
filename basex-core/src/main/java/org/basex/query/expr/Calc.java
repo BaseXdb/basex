@@ -256,13 +256,12 @@ public enum Calc {
         if(type1 == YEAR_MONTH_DURATION) {
           final BigDecimal bd = BigDecimal.valueOf(((YMDur) item2).ymd());
           if(bd.doubleValue() == 0.0) throw DIVZERO_X.get(info, item1);
-          return Dec.get(BigDecimal.valueOf(((YMDur) item1).ymd()).
-              divide(bd, MathContext.DECIMAL64));
+          return divide(BigDecimal.valueOf(((YMDur) item1).ymd()), bd);
         }
         if(type1 == DAY_TIME_DURATION) {
           final BigDecimal bd = ((DTDur) item2).dtd();
           if(bd.doubleValue() == 0.0) throw DIVZERO_X.get(info, item1);
-          return Dec.get(((DTDur) item1).dtd().divide(bd, MathContext.DECIMAL64));
+          return divide(((DTDur) item1).dtd(), bd);
         }
       }
       if(type1 == YEAR_MONTH_DURATION) {
