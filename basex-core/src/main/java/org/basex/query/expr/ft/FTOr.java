@@ -120,11 +120,6 @@ public final class FTOr extends FTExpr {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    return this == obj || obj instanceof FTOr && super.equals(obj);
-  }
-
-  @Override
   public void toString(final QueryString qs) {
     qs.tokens(exprs, ' ' + FTOR + ' ', true);
   }

@@ -125,11 +125,6 @@ public final class FTAnd extends FTExpr {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    return this == obj || obj instanceof FTAnd && super.equals(obj);
-  }
-
-  @Override
   public void toString(final QueryString qs) {
     qs.tokens(exprs, ' ' + FTAND + ' ', true);
   }

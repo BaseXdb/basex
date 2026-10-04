@@ -48,11 +48,6 @@ public final class FTOrder extends FTFilter {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    return this == obj || obj instanceof FTOrder && super.equals(obj);
-  }
-
-  @Override
   public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, ORDERED, TRUE), exprs);
   }

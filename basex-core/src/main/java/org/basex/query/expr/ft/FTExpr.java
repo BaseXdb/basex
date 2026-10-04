@@ -119,7 +119,8 @@ public abstract class FTExpr extends ParseExpr {
 
   @Override
   public boolean equals(final Object obj) {
-    return obj instanceof final FTExpr fte && Array.equals(exprs, fte.exprs);
+    return this == obj || obj != null && getClass() == obj.getClass() &&
+        Array.equals(exprs, ((FTExpr) obj).exprs);
   }
 
   @Override

@@ -110,11 +110,6 @@ public final class FTNot extends FTExpr {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    return this == obj || obj instanceof FTNot && super.equals(obj);
-  }
-
-  @Override
   public void toString(final QueryString qs) {
     qs.token(FTNOT).token(exprs[0]);
   }
