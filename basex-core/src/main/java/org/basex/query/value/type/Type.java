@@ -203,6 +203,27 @@ public interface Type {
 
   /**
    * Checks if this is one of the specified types.
+   * @param type1 first type
+   * @param type2 second type
+   * @return result of check
+   */
+  default boolean oneOf(final Type type1, final Type type2) {
+    return this == type1 || this == type2;
+  }
+
+  /**
+   * Checks if this is one of the specified types.
+   * @param type1 first type
+   * @param type2 second type
+   * @param type3 third type
+   * @return result of check
+   */
+  default boolean oneOf(final Type type1, final Type type2, final Type type3) {
+    return this == type1 || this == type2 || this == type3;
+  }
+
+  /**
+   * Checks if this is one of the specified types.
    * @param types types
    * @return result of check
    */
