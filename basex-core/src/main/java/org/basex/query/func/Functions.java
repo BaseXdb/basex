@@ -87,7 +87,7 @@ public final class Functions {
       throws QueryException {
 
     // partial function call?
-    if(fb.placeholders > 0) return dynamic(item(qnm, fb.arity, false, fb.info, qc), fb);
+    if(fb.placeholders > 0) return dynamic(item(qnm, fb.arity, false, fb.info, qc), fb, true);
 
     final QNm name = funcName(qnm, fb.arity, fb.info, qc);
 
@@ -116,6 +116,19 @@ public final class Functions {
    * @throws QueryException query exception
    */
   public static Expr dynamic(final Expr expr, final FuncBuilder fb) throws QueryException {
+    return dynamic(expr, fb, false);
+  }
+
+  /**
+   * Creates a dynamic function call or a partial function expression.
+   * @param expr function expression
+   * @param fb function arguments
+   * @param named static partial function application
+   * @return function call
+   * @throws QueryException query exception
+   */
+  private static Expr dynamic(final Expr expr, final FuncBuilder fb, final boolean named)
+      throws QueryException {
     final int ph = fb.placeholders;
     final Expr[] args;
     int[] phPerm = null;
@@ -134,7 +147,7 @@ public final class Functions {
     // no placeholders: create dynamic function call
     // otherwise, create partially applied function with optional placeholder permutation
     return ph == 0 ? new DynFuncCall(fb.info, expr, args) :
-           new PartFunc(fb.info, ExprList.concat(args, expr), ph, phPerm);
+           new PartFunc(fb.info, ExprList.concat(args, expr), ph, phPerm, named);
   }
 
   /**

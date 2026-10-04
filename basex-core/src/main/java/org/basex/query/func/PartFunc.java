@@ -28,6 +28,8 @@ public final class PartFunc extends Arr {
   private final int placeholders;
   /** Placeholder parameter permutation (can be {@code null}). */
   private final int[] placeholderPerm;
+  /** Static partial function application: the name of the function is retained. */
+  private final boolean named;
 
   /**
    * Constructor.
@@ -35,12 +37,14 @@ public final class PartFunc extends Arr {
    * @param exprs expressions (arguments with optional placeholders, followed by body)
    * @param placeholders number of placeholders
    * @param placeholderPerm placeholder parameter permutation (can be {@code null})
+   * @param named static partial function application
    */
   public PartFunc(final InputInfo info, final Expr[] exprs, final int placeholders,
-      final int[] placeholderPerm) {
+      final int[] placeholderPerm, final boolean named) {
     super(info, Types.FUNCTION_ZM, exprs);
     this.placeholders = placeholders;
     this.placeholderPerm = placeholderPerm;
+    this.named = named;
   }
 
   /**
@@ -64,7 +68,9 @@ public final class PartFunc extends Arr {
         if(nargs != arity) throw arityError(func, nargs, arity, false, info);
 
         // all arguments are placeholders in the original order: return original function
-        if(placeholders == nargs && placeholderPerm == null) return cc.replaceWith(this, func);
+        if(named && placeholders == nargs && placeholderPerm == null) {
+          return cc.replaceWith(this, func);
+        }
 
         // FUNC(?, ARG) → fn($param) { FUNC($param, ARG) }: makes the call inlineable.
         // supplied arguments must already match the parameter types: a closure would coerce them
@@ -166,7 +172,9 @@ public final class PartFunc extends Arr {
     if(nargs != arity) throw arityError(func, nargs, arity, false, info);
 
     // all arguments are placeholders in the original order: return original function
-    if(placeholders == nargs && placeholderPerm == null) return func;
+    // (dynamic application: only anonymous function items; names are dropped, maps/arrays wrapped)
+    if(placeholders == nargs && placeholderPerm == null &&
+        (named || func instanceof FuncItem && func.funcName() == null)) return func;
 
     final FuncType ft = func.funcType();
     final Expr[] args = new Expr[nargs];
@@ -185,13 +193,15 @@ public final class PartFunc extends Arr {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
-    return copyType(new PartFunc(info, copyAll(cc, vm, exprs), placeholders, placeholderPerm));
+    return copyType(new PartFunc(info, copyAll(cc, vm, exprs), placeholders, placeholderPerm,
+        named));
   }
 
   @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof final PartFunc pf && placeholders == pf.placeholders &&
-        Arrays.equals(placeholderPerm, pf.placeholderPerm) && super.equals(obj);
+        Arrays.equals(placeholderPerm, pf.placeholderPerm) && named == pf.named &&
+        super.equals(obj);
   }
 
   /**
