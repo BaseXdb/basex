@@ -233,12 +233,11 @@ public final class FElem extends FNode {
    * (copy-namespaces {@code no-preserve} mode).
    */
   public void noPreserve() {
-    final byte[] prefix = name.prefix();
     for(int n = namespaces.size() - 1; n >= 0; n--) {
       final byte[] pref = namespaces.name(n);
-      boolean used = eq(pref, prefix);
+      boolean used = name.eqPrefix(pref);
       for(int a = 0; !used && a < attributes.length; a++) {
-        used = eq(attributes[a].qname().prefix(), pref);
+        used = attributes[a].qname().eqPrefix(pref);
       }
       if(!used) namespaces.remove(n);
     }

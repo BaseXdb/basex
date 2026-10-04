@@ -74,7 +74,7 @@ public final class CAttr extends CName {
     if(!nm.hasURI() && nm.hasPrefix()) throw NOQNNAMENS_X.get(info, nmPrefix);
 
     byte[] value = atomValue(qc, true);
-    if(eq(nmPrefix, XML) && eq(nm.local(), ID)) value = normalize(value);
+    if(eq(nmPrefix, XML) && nm.eqLocal(ID)) value = normalize(value);
 
     return new FAttr(nm, qc.shared.token(value));
   }

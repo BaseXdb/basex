@@ -106,7 +106,7 @@ public final class SelectorStep extends Step {
       if(qname != null) {
         for(final Item key : keys) {
           if(key instanceof final QNm qnm ? qnm.eq(qname) :
-            key.type.isStringOrUntyped() && Token.eq(key.string(info), qname.local()))
+            key.type.isStringOrUntyped() && qname.eqLocal(key.string(info)))
             return true;
         }
       }

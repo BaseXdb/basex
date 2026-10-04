@@ -1147,7 +1147,7 @@ public class QueryParser extends InputParser {
     if(reserved(name, p)) throw error(RESERVED_X, name.local());
 
     wsCheck("(");
-    if(!anns.contains(Annotation.PRIVATE) && sc.module != null && !eq(name.uri(), sc.module.uri()))
+    if(!anns.contains(Annotation.PRIVATE) && sc.module != null && !name.eqUri(sc.module))
       throw error(MODULENS_X, name.prefixString());
 
     localVars.pushContext(false);
@@ -1247,7 +1247,7 @@ public class QueryParser extends InputParser {
     final TypeDecl td = new TypeDecl(qn, st, refs, declaredTypes, anns);
     qc.typeDecls.add(td);
     if(!anns.contains(Annotation.PRIVATE)) {
-      if(sc.module != null && !eq(qn.uri(), sc.module.uri()))
+      if(sc.module != null && !qn.eqUri(sc.module))
         throw error(MODULENS_X, qn.prefixString());
       publicTypes.put(qn, td);
       qc.namedTypes.put(qn, td);
@@ -2424,14 +2424,14 @@ public class QueryParser extends InputParser {
       }
 
       final byte[] value = token.trim().toArray();
-      if(eq(name.prefix(), DB_PREFIX)) {
+      if(name.eqPrefix(DB_PREFIX)) {
         // project-specific declaration
         final String key = string(uc(name.local()));
         final MainOptions mopts = qc.context.options;
         final Option<?> option = mopts.option(key);
         if(option == null) throw error(BASEX_OPTIONS_X, mopts.similar(key));
         el.add(new DBPragma(name, option, value));
-      } else if(eq(name.prefix(), BASEX_PREFIX)) {
+      } else if(name.eqPrefix(BASEX_PREFIX)) {
         // project-specific declaration
         el.add(new BaseXPragma(name, value));
       }

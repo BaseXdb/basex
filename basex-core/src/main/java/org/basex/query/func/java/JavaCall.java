@@ -380,7 +380,7 @@ public abstract class JavaCall extends Arr {
        * - module namespace _ = '_'; declare function _:_() { _:_() };
        * - fn:does-not-exist(), util:not-available()
        */
-      if(enforce || (info.sc().module == null || !eq(info.sc().module.uri(), qname.uri())) &&
+      if(enforce || (info.sc().module == null || !qname.eqUri(info.sc().module)) &&
           NSGlobal.prefix(qname.uri()).length == 0) {
 
         // Java constructor, function, or variable

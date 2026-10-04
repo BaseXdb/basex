@@ -87,7 +87,7 @@ public final class CsvW3XmlSerializer extends CsvSerializer {
   @Override
   protected void attribute(final byte[] name, final byte[] value, final boolean standalone)
       throws IOException {
-    if(headers == null || !eq(name, CsvW3XmlConverter.Q_COLUMN.local())) return;
+    if(headers == null || !CsvW3XmlConverter.Q_COLUMN.eqLocal(name)) return;
     if(data.size() < headers.size() && eq(value, headers.get(data.size()))) return;
     throw CSV_SERIALIZE_X_X.getIO("Unexpected column", value);
   }

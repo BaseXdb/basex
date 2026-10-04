@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import static org.basex.util.Token.normalize;
 
 import java.io.*;
+import java.util.*;
 import java.util.regex.*;
 
 import javax.xml.namespace.*;
@@ -190,7 +191,7 @@ public final class QNm extends Item {
   @Override
   public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
     return atomicEqual(item) && (!deep.options.get(DeepEqualOptions.NAMESPACE_PREFIXES) ||
-      Token.eq(prefix(), ((QNm) item).prefix()));
+      eqPrefix((QNm) item));
   }
 
   /**
@@ -200,8 +201,73 @@ public final class QNm extends Item {
    */
   public boolean eq(final QNm qnm) {
     if(qnm == this) return true;
-    return uri == null && qnm.uri == null ? Token.eq(name,
-        qnm.name) : Token.eq(uri(), qnm.uri()) && Token.eq(local(), qnm.local());
+    if(uri == null && qnm.uri == null) return Token.eq(name, qnm.name);
+    return eqLocal(qnm) && eqUri(qnm);
+  }
+
+  /**
+   * Compares the namespace URI.
+   * @param qnm name to be compared
+   * @return result of check
+   */
+  public boolean eqUri(final QNm qnm) {
+    return Token.eq(uri(), qnm.uri());
+  }
+
+  /**
+   * Compares the local name without creating substrings.
+   * @param qnm name to be compared
+   * @return result of check
+   */
+  public boolean eqLocal(final QNm qnm) {
+    return eqLocal(qnm.name, qnm.prefix + 1);
+  }
+
+  /**
+   * Compares the local name without creating a substring.
+   * @param local local name
+   * @return result of check
+   */
+  public boolean eqLocal(final byte[] local) {
+    return eqLocal(local, 0);
+  }
+
+  /**
+   * Compares the local name with the remainder of a token.
+   * @param token token
+   * @param start start of the local name in the token
+   * @return result of check
+   */
+  private boolean eqLocal(final byte[] token, final int start) {
+    return Arrays.equals(name, prefix + 1, name.length, token, start, token.length);
+  }
+
+  /**
+   * Compares the prefix without creating substrings.
+   * @param qnm name to be compared
+   * @return result of check
+   */
+  public boolean eqPrefix(final QNm qnm) {
+    return eqPrefix(qnm.name, Math.max(qnm.prefix, 0));
+  }
+
+  /**
+   * Compares the prefix without creating a substring.
+   * @param pref prefix
+   * @return result of check
+   */
+  public boolean eqPrefix(final byte[] pref) {
+    return eqPrefix(pref, pref.length);
+  }
+
+  /**
+   * Compares the prefix with the start of a token.
+   * @param token token
+   * @param end end of the prefix in the token
+   * @return result of check
+   */
+  private boolean eqPrefix(final byte[] token, final int end) {
+    return Arrays.equals(name, 0, Math.max(prefix, 0), token, 0, end);
   }
 
   @Override
@@ -336,8 +402,7 @@ public final class QNm extends Item {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof final QNm qnm && Token.eq(uri(), qnm.uri()) &&
-        Token.eq(name, qnm.name);
+    return this == obj || obj instanceof final QNm qnm && eqUri(qnm) && Token.eq(name, qnm.name);
   }
 
   @Override

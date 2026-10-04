@@ -351,7 +351,7 @@ public final class ElementToMap {
         qnm.local();
       default ->
         (element ? parent == null ? qnm.uri().length == 0 :
-          Token.eq(parent.qname().uri(), qnm.uri()) : qnm.uri().length == 0) ? qnm.local() :
+          parent.qname().eqUri(qnm) : qnm.uri().length == 0) ? qnm.local() :
         qnm.eqName();
     };
     return shared.token(!element && marker != null ? Token.concat(marker, name) : name);

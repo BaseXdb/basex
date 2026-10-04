@@ -193,9 +193,9 @@ public final class NameTest extends Test {
   public boolean matches(final QNm qName) {
     return scope == Scope.ALL || (
       // namespace wildcard: only check local name
-      name != null ? Token.eq(name, qName.local()) :
+      name != null ? qName.eqLocal(name) :
       // name wildcard: only check namespace
-      scope == Scope.URI ? Token.eq(qname.uri(), qName.uri()) :
+      scope == Scope.URI ? qname.eqUri(qName) :
       // check everything
       qname.eq(qName)
     );
@@ -224,9 +224,9 @@ public final class NameTest extends Test {
     if(test instanceof final NameTest nt) {
       return kind.instanceOf(nt.kind) && switch(nt.scope) {
         case LOCAL -> scope.oneOf(Scope.LOCAL, Scope.FLEXIBLE, Scope.FULL) &&
-          Token.eq(qname.local(), nt.qname.local());
+          qname.eqLocal(nt.qname);
         case URI -> (scope == Scope.URI || scope == Scope.FULL) &&
-          Token.eq(qname.uri(), nt.qname.uri());
+          qname.eqUri(nt.qname);
         case FLEXIBLE, FULL -> scope.oneOf(Scope.FLEXIBLE, Scope.FULL) && qname.eq(nt.qname);
         case ALL -> true;
       };

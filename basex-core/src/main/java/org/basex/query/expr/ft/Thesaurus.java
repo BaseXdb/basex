@@ -176,7 +176,7 @@ public final class Thesaurus {
   private static GNodeList elements(final GNode node, final byte[] name, final boolean desc) {
     final GNodeList list = new GNodeList();
     for(final GNode element : desc ? node.descendantIter(false) : node.childIter()) {
-      if(element.kind() == Kind.ELEMENT && eq(element.qname().local(), name))
+      if(element.kind() == Kind.ELEMENT && element.qname().eqLocal(name))
         list.add(element);
     }
     return list;

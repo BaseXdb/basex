@@ -497,7 +497,7 @@ public final class MapToElement {
 
     // reject namespace declarations disguised as attributes (xmlns, xmlns:*)
     if(!element && (eq(qnm.uri(), QueryText.XMLNS_URI) ||
-        qnm.uri().length == 0 && eq(qnm.local(), token("xmlns")))) {
+        qnm.uri().length == 0 && qnm.eqLocal(XMLNS))) {
       throw MAP_TO_ELEMENT_X.get(info, "Namespace declaration is not allowed as attribute.");
     }
 

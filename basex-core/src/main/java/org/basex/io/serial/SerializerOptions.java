@@ -334,8 +334,7 @@ public final class SerializerOptions extends Options {
     final TokenObjectMap<byte[]> map = new TokenObjectMap<>();
     for(final GNode child : elem.childIter()) {
       if(child.kind() != Kind.ELEMENT) continue;
-      final byte[] name = child.qname().local();
-      if(eq(name, CHARACTER_MAP)) {
+      if(child.qname().eqLocal(CHARACTER_MAP)) {
         byte[] key = null, val = null;
         for(final GNode attr : child.attributeIter()) {
           final byte[] att = attr.name();
@@ -386,7 +385,7 @@ public final class SerializerOptions extends Options {
       final QNm qname = child.qname();
       if(!cache.add(qname)) throw SERDUP_X.get(info, qname);
 
-      if(!eq(qname.uri(), Q_ROOT.uri())) {
+      if(!qname.eqUri(Q_ROOT)) {
         if(qname.uri().length != 0) continue;
         throw SERDOC_X.get(info, Util.info("Element has no namespace: '%'", qname));
       }

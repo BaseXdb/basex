@@ -247,7 +247,7 @@ public enum Annotation {
    */
   public static Annotation similar(final QNm name) {
     return Levenshtein.similarOrPrefix(name.local(), values(),
-        ann -> Token.eq(name.uri(), ann.name.uri()) ? ann.name.local() : null);
+        ann -> name.eqUri(ann.name) ? ann.name.local() : null);
   }
 
   /**

@@ -2,7 +2,6 @@ package org.basex.query.util.pkg;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.util.pkg.PkgText.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 
@@ -43,8 +42,8 @@ final class JarParser {
       for(final GNode next : XMLAccess.children(node)) {
         final QNm name = next.qname();
         // ignore namespace to improve compatibility
-        if(eq(E_JAR, name.local())) desc.jars.add(next.string());
-        else if(eq(E_CLASS, name.local())) desc.classes.add(next.string());
+        if(name.eqLocal(E_JAR)) desc.jars.add(next.string());
+        else if(name.eqLocal(E_CLASS)) desc.classes.add(next.string());
       }
       if(desc.jars.isEmpty()) throw REPO_PARSE_X_X.get(info, io.name(), NOJARS);
       if(desc.classes.isEmpty()) throw REPO_PARSE_X_X.get(info, io.name(), NOCLASSES);

@@ -1553,7 +1553,7 @@ public enum QueryError {
    * @return result of check
    */
   public final boolean eq(final QNm name) {
-    return Token.eq(name.uri(), uri) && Token.eq(name.local(), Token.token(code));
+    return Token.eq(name.uri(), uri) && name.eqLocal(Token.token(code));
   }
 
   /**

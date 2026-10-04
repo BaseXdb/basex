@@ -288,8 +288,8 @@ public final class DataBuilder {
     final int size = ns.size();
     for(int n = 0; n < size; n++) {
       final byte[] prefix = ns.name(n);
-      boolean use = eq(prefix, qname.prefix());
-      for(final GNode attr : node.attributeIter()) use |= eq(prefix, attr.qname().prefix());
+      boolean use = qname.eqPrefix(prefix);
+      for(final GNode attr : node.attributeIter()) use |= attr.qname().eqPrefix(prefix);
       if(use) used.add(prefix, ns.value(n));
     }
     return used;

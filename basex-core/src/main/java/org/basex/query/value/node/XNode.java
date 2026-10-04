@@ -116,7 +116,7 @@ public abstract class XNode extends GNode {
     // compare names
     final DeepEqualOptions options = deep.options;
     if(name1 != null && (!name1.eq(name2) ||
-        options.get(NAMESPACE_PREFIXES) && !Token.eq(name1.prefix(), name2.prefix())
+        options.get(NAMESPACE_PREFIXES) && !name1.eqPrefix(name2)
     )) return false;
     // compare values
     if(kind1.oneOf(TEXT, COMMENT, PROCESSING_INSTRUCTION, ATTRIBUTE) &&
@@ -143,7 +143,7 @@ public abstract class XNode extends GNode {
           if(name1.eq(name2)) {
             final Bln eq = deep.itemsEqual(attr1, attr2);
             if(eq == Bln.TRUE || eq == null &&
-                (!options.get(NAMESPACE_PREFIXES) || Token.eq(name1.prefix(), name2.prefix())) &&
+                (!options.get(NAMESPACE_PREFIXES) || name1.eqPrefix(name2)) &&
                 Token.eq(attr1.string(), attr2.string(), deep)) break;
             return false;
           }
