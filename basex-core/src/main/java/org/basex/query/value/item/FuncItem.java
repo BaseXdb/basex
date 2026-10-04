@@ -261,7 +261,9 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
     if(this == item) return true;
-    if(!(item instanceof final FuncItem func) || !Var.equalTypes(params, func.params)) return false;
+    if(!(item instanceof final FuncItem func) || !Var.equalTypes(params, func.params) ||
+        deep == null && (!Objects.equals(name, func.name) ||
+        !Objects.equals(funcType().declType, func.funcType().declType))) return false;
     // same body, and same captured focus if either body accesses the context
     final Expr body = body(), fbody = func.body();
     return bodyEqual(body, fbody, deep) && (simple && func.simple || focusEqual(func, body, deep));

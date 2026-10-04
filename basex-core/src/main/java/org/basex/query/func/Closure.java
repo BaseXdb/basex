@@ -529,9 +529,9 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   @Override
   public boolean equals(final Object obj) {
     if(this == obj) return true;
-    if(!(obj instanceof final Closure cls) || !Var.equalTypes(params, cls.params) ||
-        !Objects.equals(declType, cls.declType) || focus != cls.focus ||
-        global.size() != cls.global.size()) return false;
+    if(!(obj instanceof final Closure cls) || !Objects.equals(name, cls.name) ||
+        !Var.equalTypes(params, cls.params) || !Objects.equals(declType, cls.declType) ||
+        focus != cls.focus || global.size() != cls.global.size()) return false;
 
     // non-local variables must be bound to equal expressions
     if(!global.isEmpty()) {

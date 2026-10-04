@@ -2582,4 +2582,18 @@ public final class RewritingsTest extends SandboxTest {
     query("count(distinct-values(" + same + ")) = count(" + same + ")", true);
     query("count(distinct-values(" + two + ")) = 1", false);
   }
+
+  /** Function items with different names or return types must not be merged. */
+  @Test public void namedFunctionItems() {
+    final String func = "declare function local:f($x) { $x + 1 }; ";
+    query(func + "for $b in (true(), false()) "
+        + "let $f := if($b) then local:f#1 else fn($x) { $x + 1 } "
+        + "return exists(function-name($f))", "true\nfalse");
+    query(func + DEEP_EQUAL.args(" local:f#1", " fn($x) { $x + 1 }"), true);
+
+    query("for $b in (true(), false()) "
+        + "let $f := if($b) then fn($x) as xs:string { string($x) } "
+        + "else fn($x) as item()* { string($x) } "
+        + "return $f instance of fn(item()*) as xs:string", "true\nfalse");
+  }
 }
