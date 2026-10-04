@@ -8,6 +8,8 @@ import java.io.*;
 import java.nio.file.*;
 import java.util.*;
 import java.util.Map.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.*;
 import java.util.regex.*;
 
 import javax.xml.namespace.*;
@@ -44,8 +46,12 @@ public final class QT3TS extends Main {
   /** Sandbox for databases. */
   private static final IOFile SANDPIT = new IOFile(Prop.TEMPDIR, "qt");
 
+  /** Sandbox of this instance. */
+  private final IOFile sandpit;
   /** Path to the test suite (ignored if {@code null}). */
   private String basePath;
+  /** Number of threads for running test sets in parallel. */
+  private int threads = 4;
   /** Maximum length of result output. */
   private int maxout = 2000;
 
@@ -114,6 +120,41 @@ public final class QT3TS extends Main {
    */
   QT3TS(final String[] args) {
     super(args);
+    sandpit = SANDPIT;
+  }
+
+  /**
+   * Constructor for a worker that runs test sets in parallel.
+   * @param main main instance
+   * @param id id of the worker
+   */
+  private QT3TS(final QT3TS main, final int id) {
+    super(new String[0]);
+    sandpit = new IOFile(SANDPIT, "worker" + id);
+    basePath = main.basePath;
+    maxout = main.maxout;
+    single = main.single;
+    verbose = main.verbose;
+    errors = main.errors;
+    ignoring = main.ignoring;
+    all = main.all;
+    if(main.slow != null) slow = new TreeMap<>();
+    genvs.addAll(main.genvs);
+    setFiles.add(main.setFiles);
+    init();
+  }
+
+  /**
+   * Initializes the database context.
+   */
+  private void init() {
+    sandpit.md();
+    ctx.soptions.set(StaticOptions.DBPATH, sandpit + "data");
+    final SerializerOptions sopts = new SerializerOptions();
+    sopts.set(SerializerOptions.METHOD, SerialMethod.XML);
+    sopts.set(SerializerOptions.OMIT_XML_DECLARATION, YesNo.NO);
+    ctx.options.set(MainOptions.SERIALIZER, sopts);
+    ctx.options.set(MainOptions.DTD, true);
   }
 
   /**
@@ -121,8 +162,7 @@ public final class QT3TS extends Main {
    * @throws Exception exception
    */
   private void run() throws Exception {
-    SANDPIT.md();
-    ctx.soptions.set(StaticOptions.DBPATH, SANDPIT + "data");
+    init();
     parseArgs();
 
     // output directory of fn:put tests (results/ is reserved for test runs)
@@ -131,12 +171,6 @@ public final class QT3TS extends Main {
     results.md();
 
     final Performance perf = new Performance();
-
-    final SerializerOptions sopts = new SerializerOptions();
-    sopts.set(SerializerOptions.METHOD, SerialMethod.XML);
-    sopts.set(SerializerOptions.OMIT_XML_DECLARATION, YesNo.NO);
-    ctx.options.set(MainOptions.SERIALIZER, sopts);
-    ctx.options.set(MainOptions.DTD, true);
 
     final XdmValue doc = new XQuery("doc('" + file(false, CATALOG) + "')", ctx).value();
     final String version = asString("*:catalog/@version", doc);
@@ -149,7 +183,12 @@ public final class QT3TS extends Main {
 
     for(final XdmItem item : new XQuery("for $f in //*:test-set/@file return string($f)",
         ctx).context(doc)) setFiles.add(item.getString());
-    for(final String file : setFiles) testSet(file);
+    // the report is built in the order of the tests
+    if(threads == 1 || report != null) {
+      for(final String file : setFiles) testSet(file);
+    } else {
+      parallel();
+    }
 
     final StringBuilder result = new StringBuilder();
     result.append(" Rate    : ").append(pc(correct, tested)).append(NL);
@@ -177,7 +216,8 @@ public final class QT3TS extends Main {
 
     // save report
     if(report != null) {
-      sopts.set(SerializerOptions.OMIT_XML_DECLARATION, YesNo.YES);
+      ctx.options.get(MainOptions.SERIALIZER).set(SerializerOptions.OMIT_XML_DECLARATION,
+          YesNo.YES);
       final String file = "ReportingResults/results_" + NAME + '_' + VERSION + IO.XMLSUFFIX;
       new IOFile(file).write(report.create(ctx));
       Util.println("Creating report '" + file + "'...");
@@ -195,6 +235,50 @@ public final class QT3TS extends Main {
 
     ctx.close();
     SANDPIT.delete();
+  }
+
+  /**
+   * Runs the test sets in parallel and merges the results in the order of the catalog.
+   * @throws Exception exception
+   */
+  private void parallel() throws Exception {
+    final int sets = setFiles.size();
+    final byte[][][] logs = new byte[sets][][];
+    final AtomicInteger next = new AtomicInteger();
+    final ArrayList<Future<QT3TS>> futures = new ArrayList<>(threads);
+    final ExecutorService pool = Executors.newFixedThreadPool(threads);
+    try {
+      for(int t = 0; t < threads; t++) {
+        final QT3TS worker = new QT3TS(this, t);
+        futures.add(pool.submit(() -> {
+          for(int s; (s = next.getAndIncrement()) < sets;) {
+            worker.testSet(setFiles.get(s));
+            logs[s] = new byte[][] { worker.right.toArray(), worker.wrong.toArray(),
+              worker.ignore.toArray() };
+            worker.right.reset();
+            worker.wrong.reset();
+            worker.ignore.reset();
+          }
+          worker.ctx.close();
+          return worker;
+        }));
+      }
+      for(final Future<QT3TS> future : futures) {
+        final QT3TS worker = future.get();
+        total += worker.total;
+        tested += worker.tested;
+        correct += worker.correct;
+        ignored += worker.ignored;
+        if(slow != null) slow.putAll(worker.slow);
+      }
+    } finally {
+      pool.shutdownNow();
+    }
+    for(final byte[][] log : logs) {
+      right.add(log[0]);
+      wrong.add(log[1]);
+      ignore.add(log[2]);
+    }
   }
 
   /**
@@ -549,7 +633,7 @@ public final class QT3TS extends Main {
       // directory with test files
       if(env.sandpit) {
         final Path source = init ? Paths.get(baseURI.replaceAll("\\w+\\.xml$", "sandpit")) : null;
-        query.sandpit(source, SANDPIT);
+        query.sandpit(source, sandpit);
       }
     }
     return query;
@@ -1091,6 +1175,8 @@ public final class QT3TS extends Main {
           report = new QT3TSReport();
         } else if(c == 's') {
           slow = new TreeMap<>();
+        } else if(c == 't') {
+          threads = Math.max(1, arg.number());
         } else if(c == 'p') {
           final File f = new File(arg.string());
           if(!f.isDirectory()) throw arg.usage();
@@ -1137,6 +1223,7 @@ public final class QT3TS extends Main {
         " -p  path to the test suite" + NL +
         " -r  generate report file" + NL +
         " -s  print slow queries" + NL +
+        " -t  number of threads (default: 4)" + NL +
         " -v  verbose output";
   }
 }
