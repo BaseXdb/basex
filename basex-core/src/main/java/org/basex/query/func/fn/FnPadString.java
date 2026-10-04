@@ -55,7 +55,8 @@ public final class FnPadString extends StandardFunc {
     final int miss = (int) missing;
     final Side side = options.get(PadOptions.SIDE);
     final int start = side == Side.START ? miss : side == Side.BOTH ? miss / 2 : 0;
-    final TokenBuilder tb = new TokenBuilder();
+    // each padding character takes at least one byte: reject results that are too large
+    final TokenBuilder tb = new TokenBuilder(Array.checkCapacity((long) token.length + miss));
     pad(tb, padding, start);
     tb.add(token);
     pad(tb, padding, miss - start);

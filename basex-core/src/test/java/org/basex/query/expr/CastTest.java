@@ -348,4 +348,40 @@ public final class CastTest extends SandboxTest {
   @Test public void gh2765() {
     query("42 castable as xs:byte(:true:)", true);
   }
+
+  /** Numbers beyond the integer range. */
+  @Test public void integerRange() {
+    query("xs:integer(-9.223372036854775808E18)", Long.MIN_VALUE);
+    error("xs:integer(9.223372036854775807E18)", INTRANGE_X);
+    error("xs:integer(xs:float('9.223372E18'))", INTRANGE_X);
+    query("xs:integer(9223372036854775807.9)", Long.MAX_VALUE);
+    query("xs:integer(-9223372036854775808.9)", Long.MIN_VALUE);
+    error("xs:integer(9223372036854775808.0)", INTRANGE_X);
+    error("xs:integer(-9223372036854775809.0)", INTRANGE_X);
+    error("xs:integer(xs:unsignedLong('9223372036854775808'))", INTRANGE_X);
+    query("xs:integer(xs:unsignedLong('9223372036854775807'))", Long.MAX_VALUE);
+
+    // strings: implementation limit for unbounded types, invalid value for bounded types
+    error("xs:integer('99999999999999999999')", INTRANGE_X);
+    error("xs:integer(<a> +99999999999999999999 </a>)", INTRANGE_X);
+    error("xs:nonNegativeInteger('18446744073709551615')", INTRANGE_X);
+    error("xs:integer('9999999999999999999x')", FUNCCAST_X_X);
+    error("xs:long('9223372036854775808')", FUNCCAST_X_X);
+    error("xs:long(1e19)", FUNCCAST_X_X_X);
+    error("xs:long(99999999999999999999.0)", FUNCCAST_X_X_X);
+    error("xs:unsignedLong('18446744073709551615')", INTRANGE_X);
+    error("xs:unsignedLong('18446744073709551616')", FUNCCAST_X_X);
+    error("xs:unsignedLong(18446744073709551616.0)", FUNCCAST_X_X_X);
+    error("xs:unsignedLong(-1e19)", FUNCCAST_X_X_X);
+    error("xs:nonNegativeInteger('-99999999999999999999')", FUNCCAST_X_X);
+    error("xs:negativeInteger(1e19)", FUNCCAST_X_X_X);
+
+    // fractional parts are discarded before the facets are checked
+    query("xs:byte(127.5e0)", 127);
+    query("xs:unsignedByte(-0.5e0)", 0);
+    query("xs:unsignedByte(-0.5)", 0);
+    error("xs:positiveInteger(0.5e0)", FUNCCAST_X_X_X);
+    query("xs:unsignedLong(-0.5)", 0);
+    query("xs:unsignedLong(9223372036854775807.9)", Long.MAX_VALUE);
+  }
 }

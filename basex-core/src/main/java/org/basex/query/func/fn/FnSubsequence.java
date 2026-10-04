@@ -2,6 +2,7 @@ package org.basex.query.func.fn;
 
 import static org.basex.query.func.Function.*;
 
+import java.math.*;
 import java.util.*;
 
 import org.basex.query.*;
@@ -150,41 +151,16 @@ public class FnSubsequence extends StandardFunc {
    * @throws QueryException query exception
    */
   private SeqRange range(final QueryContext qc) throws QueryException {
-    double start = number(arg(1).atomItem(qc, info), true);
-    final Item end = arg(2).atomItem(qc, info);
-    if(Double.isNaN(start)) return EMPTY;
-
-    final long s = start(start);
-    long e = Long.MAX_VALUE;
-    if(!end.isEmpty()) {
-      start = number(end, false);
-      if(Double.isNaN(start) || s == Long.MIN_VALUE && start == Double.POSITIVE_INFINITY) {
-        return EMPTY;
-      }
-      e = end(s, start);
-    }
-    if(e == Long.MAX_VALUE && s <= 1) return ALL;
-    if(s == Long.MIN_VALUE) return EMPTY;
-
-    // return all values, no values, or the specified range
-    final SeqRange sr = new SeqRange(Math.max(0, s - 1), e);
-    return sr.length == 0 ? EMPTY : sr;
+    final ANum first = toNumber(toAtomItem(arg(1), qc), arg(1)).round(0, mode(true));
+    final Item second = arg(2).atomItem(qc, info);
+    final long s = index(first, info), e = second.isEmpty() ? Long.MAX_VALUE :
+      index(end(first, toNumber(second, arg(2)).round(0, mode(false))), info);
+    if(s == -1 || e == -1 || s >= e) return EMPTY;
+    return s == 0 && e == Long.MAX_VALUE ? ALL : new SeqRange(s, e);
   }
 
   /**
-   * Converts a position argument to a double, rounding decimals without loss of precision.
-   * @param item item
-   * @param first first position
-   * @return double value
-   * @throws QueryException query exception
-   */
-  private double number(final Item item, final boolean first) throws QueryException {
-    return item instanceof final Dec dec ? dec.round(0, mode(first)).dbl(info) :
-      toDouble(item, arg(first ? 1 : 2));
-  }
-
-  /**
-   * Returns the rounding mode for decimal positions.
+   * Returns the rounding mode for positions.
    * @param first first position
    * @return rounding mode
    */
@@ -193,24 +169,53 @@ public class FnSubsequence extends StandardFunc {
   }
 
   /**
-   * Returns the start position.
-   * @param value double value
-   * @return long value
+   * Returns the exclusive end position.
+   * @param first rounded first argument
+   * @param second rounded second argument
+   * @return end position
+   * @throws QueryException query exception
    */
-  public long start(final double value) {
-    return StrictMath.round(value);
+  protected ANum end(final ANum first, final ANum second) throws QueryException {
+    return add(first, second, info);
   }
 
   /**
-   * Computes the count of items to be returned.
-   * @param first first argument
-   * @param second second argument
-   * @return length
+   * Adds two positions, using the arithmetic of the promoted type.
+   * @param pos1 first position
+   * @param pos2 second position
+   * @param info input info
+   * @return sum
+   * @throws QueryException query exception
    */
-  public long end(final long first, final double second) {
-    final long l = StrictMath.round(second);
-    final long add = first - 1;
-    return l == Long.MAX_VALUE || add > 0 && l > Long.MAX_VALUE - add ? Long.MAX_VALUE : l + add;
+  protected static ANum add(final ANum pos1, final ANum pos2, final InputInfo info)
+      throws QueryException {
+    if(pos1 instanceof Dbl || pos2 instanceof Dbl) return Dbl.get(pos1.dbl() + pos2.dbl());
+    if(pos1 instanceof Flt || pos2 instanceof Flt) {
+      return Flt.get(pos1.flt(info) + pos2.flt(info));
+    }
+    if(pos1 instanceof final Itr itr1 && pos2 instanceof final Itr itr2) {
+      // overflow (or minimum integer): fall back to decimal arithmetic
+      final long sum = Util.add(itr1.itr(), itr2.itr());
+      if(sum != Long.MIN_VALUE) return Itr.get(sum);
+    }
+    return Dec.get(pos1.dec(info).add(pos2.dec(info)));
+  }
+
+  /**
+   * Converts a rounded one-based position to a zero-based index.
+   * @param pos position
+   * @param info input info
+   * @return index between {@code 0} and {@link Long#MAX_VALUE}, or {@code -1} for NaN
+   * @throws QueryException query exception
+   */
+  protected static long index(final ANum pos, final InputInfo info) throws QueryException {
+    if(pos instanceof final Itr itr) return Math.max(itr.itr(), 1) - 1;
+    if(pos.floating()) {
+      final double d = pos.dbl();
+      return Double.isNaN(d) ? -1 : (long) Math.max(d - 1, 0);
+    }
+    return pos.dec(info).subtract(BigDecimal.ONE).max(BigDecimal.ZERO).
+        min(Dec.BD_MAXLONG).longValue();
   }
 
   /**
@@ -261,7 +266,7 @@ public class FnSubsequence extends StandardFunc {
           cc.function(ITEMS_AT, info, input, Itr.get(sr.start + 1));
       }
       // subsequence(E, 2) → tail(E)
-      if(sr.length == Long.MAX_VALUE && sr.start == 1)
+      if(sr.end == Long.MAX_VALUE && sr.start == 1)
         return cc.function(TAIL, info, input);
       // subsequence(file:read-text-lines(E), pos, length) → file:read-text-lines(E, pos, length)
       if(_FILE_READ_TEXT_LINES.is(input))
@@ -293,8 +298,9 @@ public class FnSubsequence extends StandardFunc {
         }
       }
     } else if(first instanceof final Itr itr) {
-      final long start = itr.itr(), diff = FnItemsAt.countInputDiff(input, second) + start;
-      if(diff == (int) diff) {
+      final long start = itr.itr(), count = FnItemsAt.countInputDiff(input, second);
+      final long diff = count + start;
+      if(count != Long.MIN_VALUE && start == (int) start && diff == (int) diff) {
         if(start <= 1) {
           // subsequence(E, 1, count(E) - 1) → trunk(E)
           if(diff == 0) return cc.function(TRUNK, info, input);

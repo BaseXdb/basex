@@ -311,4 +311,32 @@ public abstract class Seq extends Value {
     if(size > Array.MAX_SIZE) throw MAX_SIZE_X_X.get(null, Array.MAX_SIZE, size);
     return Array.initialCapacity(size);
   }
+
+  /**
+   * Adds two sequence sizes.
+   * @param size1 first size ({@code -1} if unknown)
+   * @param size2 second size ({@code -1} if unknown)
+   * @param info input info (can be {@code null})
+   * @return sum, or {@code -1} if a size is unknown
+   * @throws QueryException query exception
+   */
+  public static long size(final long size1, final long size2, final InputInfo info)
+      throws QueryException {
+    final long size = size(size1, size2);
+    if(size == -1 && size1 != -1 && size2 != -1) {
+      throw sizeError(new ArraySizeException(size1, size2), info);
+    }
+    return size;
+  }
+
+  /**
+   * Adds two sequence sizes.
+   * @param size1 first size ({@code -1} if unknown)
+   * @param size2 second size ({@code -1} if unknown)
+   * @return sum, or {@code -1} if a size is unknown or if the sum exceeds the integer range
+   */
+  public static long size(final long size1, final long size2) {
+    final long size = size1 + size2;
+    return size1 == -1 || size2 == -1 || size < 0 ? -1 : size;
+  }
 }

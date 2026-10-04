@@ -17,7 +17,8 @@ public final class FnSeconds extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Item value = arg(0).atomItem(qc, info);
-    return value.isEmpty() ? value : new DTDur(checkType(value, BasicType.DECIMAL, qc).dec(info));
+    return value.isEmpty() ? value :
+      new DTDur(checkType(value, BasicType.DECIMAL, qc).dec(info), info);
   }
 
   @Override

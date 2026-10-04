@@ -536,6 +536,20 @@ public final class XQuery4Test extends SandboxTest {
     query("0b111111111111111111111111111111111111111111111111111111111111111", Long.MAX_VALUE);
     query("-0b111111111111111111111111111111111111111111111111111111111111111", -Long.MAX_VALUE);
 
+    // minimum integer: valid if negated
+    query("-9223372036854775808", Long.MIN_VALUE);
+    query("+ - 9_223_372_036_854_775_808", Long.MIN_VALUE);
+    query("-0x8000000000000000", Long.MIN_VALUE);
+    query("-(9223372036854775808)", Long.MIN_VALUE);
+    query("-9223372036854775808 + 1", Long.MIN_VALUE + 1);
+    query("declare %local:a(-9223372036854775808) function local:f() { };"
+        + "function-annotations(local:f#0)?*", Long.MIN_VALUE);
+    error("9223372036854775808", RANGE_X);
+    error("--9223372036854775808", RANGE_X);
+    error("-9223372036854775809", RANGE_X);
+    error("-9223372036854775808[1]", RANGE_X);
+    error("declare %local:a(-9223372036854775809) function local:f() { }; 1", RANGE_X);
+
     // underscores
     query("0b0_1", 1);
     query("0x2_3", 35);

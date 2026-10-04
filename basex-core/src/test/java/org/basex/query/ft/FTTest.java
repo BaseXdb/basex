@@ -219,6 +219,7 @@ public class FTTest extends SandboxTest {
     pre("//*[text() contains text 'Database' using fuzzy]", 7, 9, 11);
     pre("//*[text() contains text 'Databaze' using fuzzy]", 7, 9, 11);
     pre("//*[text() contains text 'Databasing' using fuzzy]");
+    query("'abc' contains text 'xyz' using fuzzy 4294967296 errors", true);
   }
 
   /** Any/all options. */
@@ -363,6 +364,23 @@ public class FTTest extends SandboxTest {
         + " ftand 'third' distance exactly 1 words ordered]", 3);
     query("'a b' contains text 'a' ftand ('b') distance exactly 0 words", true);
     query("'a b' contains text ('a') ftand ('b') entire content", true);
+
+    // distance within the same sentence is -1
+    query("'a b c' contains text 'a' ftand 'c' distance at most 0 sentences", true);
+    query("'a b c' contains text 'a' ftand 'c' distance exactly 0 sentences", false);
+    query("'a b c' contains text 'a' ftand 'c' distance at most 9223372036854775807 sentences",
+        true);
+    query("'a b c' contains text 'a' ftand 'c' distance at least 4294967297 words", false);
+    query("'a b c' contains text 'a' ftand 'c' distance exactly 9223372036854775807 words", false);
+
+    // filters with different ranges must not be merged
+    query("let $t := 'a b a c' for $f in (fn() { $t contains text 'a' ftand 'c' "
+        + "distance at least 5 words }, fn() { $t contains text 'a' ftand 'c' "
+        + "distance at least 1 words }) return $f()", "false\ntrue");
+    query("let $t := 'a b c' for $f in (fn() { $t contains text 'a' ftand 'c' window 2 words },"
+        + "fn() { $t contains text 'a' ftand 'c' window 3 words }) return $f()", "false\ntrue");
+    query("let $t := 'a b' for $f in (fn() { $t contains text 'b' at start },"
+        + "fn() { $t contains text 'b' at end }) return $f()", "false\ntrue");
   }
 
   /** Window. */
@@ -379,7 +397,11 @@ public class FTTest extends SandboxTest {
     query("'b a b' contains text 'a b' all words window 2 words", true);
     query("'a b a b' contains text 'a b' all words window 2 words", true);
     query("'a a b' contains text 'a b' all words window 2 words", true);
+    query("'a b' contains text 'a b' all words window 9223372036854775807 words", true);
+    query("'a b' contains text 'a b' all words window 4294967297 words", true);
     query("'a b b' contains text 'a b' all words window 1 words", false);
+    query("'a b' contains text 'a' ftand 'b' window 0 words", false);
+    query("'a b' contains text 'a' ftand 'b' window -4294967295 words", false);
     query("'a single event during the custodial history of a manuscript or other object.'"
         + " contains text 'custodial history of a manuscript' all words window 5 words", true);
   }

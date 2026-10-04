@@ -83,6 +83,14 @@ public final class IntFormat extends FormatParser {
   }
 
   /**
+   * Checks if this format generates digits.
+   * @return result of check
+   */
+  public boolean isDigitFormat() {
+    return zeroes(first) != -1;
+  }
+
+  /**
    * Returns the zero base for the specified code point, or {@code -1}.
    * @param ch character
    */

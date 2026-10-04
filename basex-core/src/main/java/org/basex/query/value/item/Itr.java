@@ -17,6 +17,8 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class Itr extends ANum {
+  /** Minimum value. */
+  public static final Itr MIN;
   /** Maximum values. */
   public static final Itr MAX;
   /** Value 0. */
@@ -34,6 +36,7 @@ public final class Itr extends ANum {
     final int nl = 128;
     INTSS = new Itr[nl];
     for(int n = 0; n < nl; n++) INTSS[n] = new Itr(n);
+    MIN = get(Long.MIN_VALUE);
     MAX = get(Long.MAX_VALUE);
     ZERO = INTSS[0];
     ONE = INTSS[1];
@@ -132,9 +135,12 @@ public final class Itr extends ANum {
   }
 
   @Override
-  public Itr round(final int prec, final RoundMode mode) {
+  public ANum round(final int prec, final RoundMode mode) {
     if(value == 0 || prec >= 0) return this;
-    final long v = Dec.round(BigDecimal.valueOf(value), prec, mode).longValue();
+    final BigDecimal bd = Dec.round(BigDecimal.valueOf(value), prec, mode);
+    // result exceeds integer range: return decimal
+    if(bd.compareTo(Dec.BD_MINLONG) < 0 || bd.compareTo(Dec.BD_MAXLONG) > 0) return Dec.get(bd);
+    final long v = bd.longValue();
     return v == value ? this : get(v);
   }
 
@@ -161,6 +167,7 @@ public final class Itr extends ANum {
       case SHORT, UNSIGNED_BYTE -> (short) value;
       case UNSIGNED_SHORT -> (char) value;
       case INT -> (int) value;
+      case UNSIGNED_LONG -> BigInteger.valueOf(value);
       default -> value;
     };
   }
@@ -180,8 +187,6 @@ public final class Itr extends ANum {
    * @throws QueryException query exception
    */
   public static long parse(final byte[] value, final InputInfo info) throws QueryException {
-    final long l = Token.toLong(value);
-    if(l != Long.MIN_VALUE || Token.eq(Token.trim(value), Token.MIN_LONG)) return l;
-    throw BasicType.INTEGER.castError(value, info);
+    return BasicType.INTEGER.parseLong(value, info);
   }
 }

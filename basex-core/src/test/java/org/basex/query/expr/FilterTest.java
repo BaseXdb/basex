@@ -549,6 +549,39 @@ public final class FilterTest extends SandboxTest {
         + "<a/>/.[true() and all-whitespace('')]", "<a/>");
   }
 
+  /** Large positions (no integer overflow). */
+  @Test public void largePositions() {
+    final String max = "9223372036854775807", e = "(1 to 3)[. > 0]";
+    query(e + "[position() > " + max + "]", "");
+    query(e + "[position() >= " + max + "]", "");
+    query(e + "[position() > 1e19]", "");
+    query(e + "[position() <= 1e19]", "1\n2\n3");
+    query(e + "[position() >= 18446744073709551616.5]", "");
+    query(e + "[position() < 18446744073709551616.5]", "1\n2\n3");
+    query(e + "[position() > -18446744073709551616.5]", "1\n2\n3");
+    query(e + "[position() > xs:double('NaN')]", "");
+    query(e + "[position() != xs:double('NaN')]", "1\n2\n3");
+    query(e + "[position() < xs:double('INF')]", "1\n2\n3");
+    query(e + "[position() >= xs:double('INF')]", "");
+    query(e + "[position() > xs:double('-INF')]", "1\n2\n3");
+    query("(1 to " + max + ")[" + max + "]", max);
+    query("(1 to " + max + ")[last()]", max);
+    query("(1 to 9223372036854775806)[last()]", 9223372036854775806L);
+    query("(1 to " + max + ")[position() >= " + max + "]", max);
+    query("(1 to " + max + ")[position() = (1, " + max + ")]", "1\n" + max);
+    query("(1 to " + max + ")[position() = 9223372036854775806.0]", 9223372036854775806L);
+    query("subsequence(1 to " + max + ", " + max + ")", max);
+    query("slice(1 to " + max + ", -1)", max);
+    query("util:range(1 to " + max + ", " + max + ", " + max + ")", max);
+    query("items-at(1 to 9223372036854775806, 9223372036854775806)", 9223372036854775806L);
+    query("items-at(1 to 9223372036854775806, 9223372036854775806.0)", 9223372036854775806L);
+
+    // dynamic range with untyped bounds
+    final String func = "declare %basex:inline(0) function local:f($n, $e) { ";
+    query(func + "$e[position() = 2 to $n] }; local:f(" + max + ", " + e + ")", "2\n3");
+    query(func + "$e[position() = $n to 2] }; local:f(-9223372036854775806, " + e + ")", "1\n2");
+  }
+
   /** Predicates with choice item types. */
   @Test public void choiceItemType() {
     final String func = "declare function local:f($x as (xs:integer | xs:string)) ";

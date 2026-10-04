@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static java.lang.Double.*;
 import static org.basex.query.QueryText.*;
 
+import java.math.*;
 import java.util.*;
 
 import org.basex.data.*;
@@ -35,22 +36,39 @@ public final class CmpR extends CmpRange {
   /** Maximum integer value that can be represented losslessly as double value. */
   private static final double MAX_INTEGER = 1L << 53;
 
-  /** Minimum. */
+  /** Minimum (superset of exact bounds, if specified). */
   final double min;
-  /** Maximum. */
+  /** Maximum (superset of exact bounds, if specified). */
   final double max;
+  /** Exact lower bound for untyped values (can be {@code null}). */
+  private final ANum lower;
+  /** Exact upper bound for untyped values (can be {@code null}). */
+  private final ANum upper;
+  /** Inclusive lower bound. */
+  private final boolean lowerInc;
+  /** Inclusive upper bound. */
+  private final boolean upperInc;
 
   /**
    * Constructor.
    * @param expr (compiled) expression
    * @param min minimum value
    * @param max maximum value
+   * @param lower exact lower bound for untyped values (can be {@code null})
+   * @param lowerInc inclusive lower bound
+   * @param upper exact upper bound for untyped values (can be {@code null})
+   * @param upperInc inclusive upper bound
    * @param info input info (can be {@code null})
    */
-  private CmpR(final Expr expr, final double min, final double max, final InputInfo info) {
+  private CmpR(final Expr expr, final double min, final double max, final ANum lower,
+      final boolean lowerInc, final ANum upper, final boolean upperInc, final InputInfo info) {
     super(expr, info);
     this.min = min;
     this.max = max;
+    this.lower = lower;
+    this.lowerInc = lowerInc;
+    this.upper = upper;
+    this.upperInc = upperInc;
   }
 
   /**
@@ -67,7 +85,32 @@ public final class CmpR extends CmpRange {
       final double min, final double max) throws QueryException {
     return min > max ? Bln.FALSE : min == NEGATIVE_INFINITY && max == POSITIVE_INFINITY ?
       cc.function(Function.EXISTS, info, expr) :
-      new CmpR(expr, min, max, info).optimize(cc);
+      new CmpR(expr, min, max, null, false, null, false, info).optimize(cc);
+  }
+
+  /**
+   * Tries to convert the specified expression into a range expression with exact bounds.
+   * @param cc compilation context
+   * @param info input info (can be {@code null})
+   * @param expr expression to be compared
+   * @param lower exact lower bound (can be {@code null})
+   * @param lowerInc inclusive lower bound
+   * @param upper exact upper bound (can be {@code null})
+   * @param upperInc inclusive upper bound
+   * @return expression
+   * @throws QueryException query exception
+   */
+  private static Expr get(final CompileContext cc, final InputInfo info, final Expr expr,
+      final ANum lower, final boolean lowerInc, final ANum upper, final boolean upperInc)
+      throws QueryException {
+    if(lower != null && upper != null) {
+      final int c = compare(lower, upper, info);
+      if(c > 0 || c == 0 && !(lowerInc && upperInc)) return Bln.FALSE;
+    }
+    // double range: superset of exact range (rounding is monotonic)
+    final double mn = lower != null ? lower.dbl() : NEGATIVE_INFINITY;
+    final double mx = upper != null ? upper.dbl() : POSITIVE_INFINITY;
+    return new CmpR(expr, mn, mx, lower, lowerInc, upper, upperInc, info).optimize(cc);
   }
 
   /**
@@ -102,6 +145,26 @@ public final class CmpR extends CmpRange {
     // integer comparisons: reject numbers that are too large to be safely compared as doubles
     if(int1 && (Math.abs(mn) >= MAX_INTEGER || Math.abs(mx) >= MAX_INTEGER)) return cmp;
 
+    // use exact bounds if untyped values are cast to decimals (comparison with integers or
+    // decimals), or if numbers are compared with values that cannot be represented as doubles
+    if(type1.isUntyped() ? !(expr2 instanceof final ANum num && num.floating()) :
+      !int1 && !exactDouble(expr2)) {
+      final ANum lower, upper;
+      if(expr2 instanceof final RangeSeq rs) {
+        lower = Itr.get(rs.min());
+        upper = Itr.get(rs.max());
+      } else {
+        lower = upper = (ANum) expr2;
+      }
+      return switch(cmp.op) {
+        case GE -> get(cc, cmp.info, expr1, lower, true, null, false);
+        case GT -> get(cc, cmp.info, expr1, lower, false, null, false);
+        case LE -> get(cc, cmp.info, expr1, null, false, upper, true);
+        case LT -> get(cc, cmp.info, expr1, null, false, upper, false);
+        default -> cmp;
+      };
+    }
+
     switch(cmp.op) {
       case GE -> mx = POSITIVE_INFINITY;
       case GT -> {
@@ -118,6 +181,31 @@ public final class CmpR extends CmpRange {
       }
     }
     return get(cc, cmp.info, expr1, mn, mx);
+  }
+
+  /**
+   * Checks if the specified numbers can be represented exactly as doubles.
+   * @param expr numbers (numeric item or range sequence)
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  private static boolean exactDouble(final Expr expr) throws QueryException {
+    if(expr instanceof final RangeSeq rs) {
+      return Math.abs((double) rs.min()) < MAX_INTEGER && Math.abs((double) rs.max()) < MAX_INTEGER;
+    }
+    final ANum num = (ANum) expr;
+    if(num.floating()) return true;
+    final BigDecimal bd = num.dec(null);
+    final double d = bd.doubleValue();
+    return Double.isFinite(d) && new BigDecimal(d).compareTo(bd) == 0;
+  }
+
+  /**
+   * Indicates if this range has exact bounds.
+   * @return result of check
+   */
+  private boolean exact() {
+    return lower != null || upper != null;
   }
 
   @Override
@@ -157,7 +245,12 @@ public final class CmpR extends CmpRange {
   @Override
   boolean inRange(final Item item) throws QueryException {
     final double value = item.dbl(info);
-    return value >= min && value <= max;
+    if(!(value >= min && value <= max)) return false;
+    // exact bounds: values that equal a bound as doubles are compared exactly
+    return (value != min || lower == null ||
+        (lowerInc ? CmpOp.LE : CmpOp.LT).eval(compare(lower, item, info))) &&
+      (value != max || upper == null ||
+        (upperInc ? CmpOp.GE : CmpOp.GT).eval(compare(upper, item, info)));
   }
 
   @Override
@@ -166,8 +259,46 @@ public final class CmpR extends CmpRange {
   }
 
   @Override
-  public Expr mergeEbv(final Expr ex, final boolean or, final CompileContext cc)
+  Expr merge(final Expr ex, final boolean or, final CompileContext cc)
       throws QueryException {
+
+    // exact bounds: create intersection with other exact range or with single value
+    if(exact()) {
+      if(or) return null;
+      ANum lw, up;
+      boolean lwInc, upInc;
+      if(ex instanceof final CmpR cmp && cmp.exact()) {
+        lw = cmp.lower;
+        lwInc = cmp.lowerInc;
+        up = cmp.upper;
+        upInc = cmp.upperInc;
+      } else {
+        // single value: $x = 5
+        final ANum value = ex instanceof final CmpG cmp && cmp.op == CmpOp.EQ &&
+          ex.arg(1) instanceof final ANum num && !num.floating() ? num :
+          ex instanceof final CmpIR cmp && cmp.min == cmp.max ? Itr.get(cmp.min) : null;
+        if(value == null) return null;
+        lw = up = value;
+        lwInc = upInc = true;
+      }
+      // choose larger lower bound and smaller upper bound
+      if(lower != null) {
+        final int c = lw == null ? 1 : compare(lower, lw, info);
+        if(c > 0 || c == 0 && !lowerInc) {
+          lw = lower;
+          lwInc = lowerInc;
+        }
+      }
+      if(upper != null) {
+        final int c = up == null ? -1 : compare(upper, up, info);
+        if(c < 0 || c == 0 && !upperInc) {
+          up = upper;
+          upInc = upperInc;
+        }
+      }
+      return get(cc, info, expr, lw, lwInc, up, upInc);
+    }
+    if(ex instanceof final CmpR cr && cr.exact()) return null;
 
     Double newMin = null, newMax = null;
     if(ex instanceof final CmpR cmp) {
@@ -178,13 +309,25 @@ public final class CmpR extends CmpRange {
       newMin = num.dbl();
       newMax = newMin;
     }
-    if(newMin == null || !expr.equals(ex.arg(0)) || or && (max < newMin || min > newMax))
-      return null;
+    if(newMin == null || or && (max < newMin || min > newMax)) return null;
 
     // determine common minimum and maximum value
     newMin = or ? Math.min(min, newMin) : Math.max(min, newMin);
     newMax = or ? Math.max(max, newMax) : Math.min(max, newMax);
     return get(cc, info, expr, newMin, newMax);
+  }
+
+  /**
+   * Compares a number with the numeric value of an item.
+   * @param num number
+   * @param item item to be compared
+   * @param info input info (can be {@code null})
+   * @return result of comparison
+   * @throws QueryException query exception
+   */
+  private static int compare(final ANum num, final Item item, final InputInfo info)
+      throws QueryException {
+    return num.compare(item, null, false, null, info);
   }
 
   @Override
@@ -197,11 +340,11 @@ public final class CmpR extends CmpRange {
     if(type == null) return false;
 
     // try the value index first: when the targeted node has integer-category statistics,
-    // the double range can be projected losslessly onto a long range and looked up exactly
-    final long lmin = (long) Math.ceil(min), lmax = (long) Math.floor(max);
-    if(lmin <= lmax) {
+    // the range can be projected losslessly onto a long range and looked up exactly
+    final long[] range = longRange();
+    if(range != null && range[0] <= range[1]) {
       final IndexCosts costs = ii.costs;
-      if(ii.create(lmin, lmax, info)) return true;
+      if(ii.create(range[0], range[1], info)) return true;
       ii.costs = costs;
     }
 
@@ -232,20 +375,52 @@ public final class CmpR extends CmpRange {
     // don't use index if min/max values are infinite
     if(Token.token((int) nr.min()).length != Token.token((int) nr.max()).length) return false;
 
+    // exact bounds: check results of range access
+    ParseExpr root = new RangeAccess(info, nr, ii.db);
+    if(exact()) {
+      final Expr filter = Filter.get(ii.cc, info, root, with(new ContextValue(info), ii.cc));
+      if(!(filter instanceof final ParseExpr pe)) return false;
+      root = pe;
+    }
     final TokenBuilder tb = new TokenBuilder();
     tb.add('[').add(min).add(',').add(max).add(']');
-    return ii.create(new RangeAccess(info, nr, ii.db), true,
-        Util.info(OPTINDEX_X_X, "range", tb), info);
+    return ii.create(root, true, Util.info(OPTINDEX_X_X, "range", tb), info);
+  }
+
+  /**
+   * Returns the range as integer bounds.
+   * @return minimum and maximum, or {@code null} if the range cannot be represented
+   * @throws QueryException query exception
+   */
+  private long[] longRange() throws QueryException {
+    if(!exact()) return new long[] { (long) Math.ceil(min), (long) Math.floor(max) };
+
+    // smallest integer above (or at) lower bound, largest integer below (or at) upper bound
+    final BigDecimal lmin = lower == null ? null : lowerInc ?
+      lower.dec(info).setScale(0, RoundingMode.CEILING) :
+      lower.dec(info).setScale(0, RoundingMode.FLOOR).add(BigDecimal.ONE);
+    final BigDecimal lmax = upper == null ? null : upperInc ?
+      upper.dec(info).setScale(0, RoundingMode.FLOOR) :
+      upper.dec(info).setScale(0, RoundingMode.CEILING).subtract(BigDecimal.ONE);
+    // bounds beyond the integer range
+    if(lmin != null && lmin.compareTo(Dec.BD_MAXLONG) > 0 ||
+       lmax != null && lmax.compareTo(Dec.BD_MINLONG) < 0) return null;
+    return new long[] {
+      lmin == null ? Long.MIN_VALUE : lmin.max(Dec.BD_MINLONG).longValue(),
+      lmax == null ? Long.MAX_VALUE : lmax.min(Dec.BD_MAXLONG).longValue()
+    };
   }
 
   @Override
   Expr with(final Expr operand, final CompileContext cc) throws QueryException {
-    return get(cc, info, operand, min, max);
+    return exact() ? get(cc, info, operand, lower, lowerInc, upper, upperInc) :
+      get(cc, info, operand, min, max);
   }
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
-    final CmpR cmp = new CmpR(expr.copy(cc, vm), min, max, info);
+    final CmpR cmp = new CmpR(expr.copy(cc, vm), min, max, lower, lowerInc, upper, upperInc,
+        info);
     cmp.single = single;
     return copyType(cmp);
   }
@@ -253,7 +428,8 @@ public final class CmpR extends CmpRange {
   @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof final CmpR cmp && min == cmp.min && max == cmp.max &&
-        super.equals(obj);
+        Objects.equals(lower, cmp.lower) && lowerInc == cmp.lowerInc &&
+        Objects.equals(upper, cmp.upper) && upperInc == cmp.upperInc && super.equals(obj);
   }
 
   @Override
@@ -263,12 +439,17 @@ public final class CmpR extends CmpRange {
 
   @Override
   public void toXml(final QueryPlan plan) {
-    plan.add(plan.create(this, MIN, min, MAX, max, SINGLE, single), expr);
+    plan.add(exact() ? plan.create(this, MIN, lower, MAX, upper, SINGLE, single) :
+      plan.create(this, MIN, min, MAX, max, SINGLE, single), expr);
   }
 
   @Override
   public void toString(final QueryString qs) {
-    if(min == max) {
+    if(exact()) {
+      if(lower != null) qs.token(expr).token(lowerInc ? ">=" : ">").token(lower);
+      if(lower != null && upper != null) qs.token(AND);
+      if(upper != null) qs.token(expr).token(upperInc ? "<=" : "<").token(upper);
+    } else if(min == max) {
       qs.token(expr).token("=").token(min);
     } else {
       if(min != NEGATIVE_INFINITY) qs.token(expr).token(">=").token(min);

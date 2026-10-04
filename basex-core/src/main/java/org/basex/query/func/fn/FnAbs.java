@@ -1,5 +1,6 @@
 package org.basex.query.func.fn;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
@@ -18,7 +19,11 @@ public final class FnAbs extends NumericFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final ANum value = toNumberOrNull(arg(0), qc);
-    return value == null ? Empty.VALUE : value.abs();
+    if(value == null) return Empty.VALUE;
+    if(value instanceof final Itr itr && itr.itr() == Long.MIN_VALUE) {
+      throw RANGE_X.get(info, value);
+    }
+    return value.abs();
   }
 
   @Override

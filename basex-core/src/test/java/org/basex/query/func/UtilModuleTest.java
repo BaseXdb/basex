@@ -225,6 +225,13 @@ public final class UtilModuleTest extends SandboxTest {
     // decimals are rounded without loss of precision
     query(func.args(" 1 to 5", " 2.0000000000000000001", 5), "3\n4\n5");
     query(func.args(" 1 to 5", 1, " 2.9999999999999999999"), "1\n2");
+
+    // large positions (no integer overflow)
+    query(func.args(" 1 to 3", " -9223372036854775808", 9223372036854775807L), "1\n2\n3");
+    query(func.args(" 1 to 3", " -1e19", " 18446744073709551616.0"), "1\n2\n3");
+    query(func.args(" 1 to 3", 2, " xs:double('INF')"), "2\n3");
+    query(func.args(" 1 to 3", " xs:double('-INF')", " xs:double('NaN')"), "");
+    query(func.args(" 1 to 3", 9223372036854775807L, 9223372036854775807L), "");
   }
 
   /** Test method. */

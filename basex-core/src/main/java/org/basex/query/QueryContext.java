@@ -416,8 +416,8 @@ public final class QueryContext extends Job implements Closeable {
         // required for fn:load-xquery-module
         vars.compileAll(cc);
       }
-    } catch(final StackOverflowError ex) {
-      throw BASEX_OVERFLOW.get(null).cause(ex);
+    } catch(final StackOverflowError | ArraySizeException ex) {
+      throw limitError(ex, null);
     } finally {
       info.runtime = true;
     }
@@ -933,8 +933,8 @@ public final class QueryContext extends Job implements Closeable {
     }
     try {
       return code.get();
-    } catch(final StackOverflowError ex) {
-      throw BASEX_OVERFLOW.get(null).cause(ex);
+    } catch(final StackOverflowError | ArraySizeException ex) {
+      throw limitError(ex, null);
     } finally {
       runtime.addAndGet(perf.nanoRuntime());
     }

@@ -76,8 +76,8 @@ public final class CElem extends CName {
     final TokenBuilder tb = new TokenBuilder();
     final ExprList list = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
-      if(expr instanceof List && Checks.all(expr.args(), arg -> text.test(arg) ||
-          arg instanceof Value && atomic.test(arg))) {
+      if(expr instanceof List && small(expr.args()) && Checks.all(expr.args(),
+          arg -> text.test(arg) || arg instanceof Value && atomic.test(arg))) {
         boolean more = false;
         for(final Expr arg : expr.args()) {
           if(text.test(arg)) {
@@ -92,7 +92,7 @@ public final class CElem extends CName {
           }
         }
         list.add(Str.get(tb.next()));
-      } else if(expr instanceof final Seq seq && atomic.test(expr)) {
+      } else if(expr instanceof final Seq seq && small(seq) && atomic.test(expr)) {
         boolean more = false;
         for(final Item item : seq) {
           if(more) tb.add(' ');
@@ -173,6 +173,17 @@ public final class CElem extends CName {
     final int size = nsContext.size(), ns = nspaces.size();
     for(int n = 0; n < ns; n++) nsContext.add(nspaces.name(n), nspaces.value(n));
     return size;
+  }
+
+  /**
+   * Checks if the space-separated items of the specified expressions fit into a single string.
+   * @param exprs expressions
+   * @return result of check
+   */
+  private static boolean small(final Expr... exprs) {
+    double size = 0;
+    for(final Expr expr : exprs) size += expr.size();
+    return size <= Array.MAX_SIZE;
   }
 
   @Override

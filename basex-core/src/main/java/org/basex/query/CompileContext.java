@@ -354,7 +354,13 @@ public final class CompileContext {
    * @throws QueryException query exception
    */
   public Value preEval(final Expr expr) throws QueryException {
-    return (Value) replaceWith(expr, expr.value(qc));
+    final Value value;
+    try {
+      value = expr.value(qc);
+    } catch(final StackOverflowError | ArraySizeException ex) {
+      throw QueryError.limitError(ex, expr.info());
+    }
+    return (Value) replaceWith(expr, value);
   }
 
   /**
@@ -427,13 +433,17 @@ public final class CompileContext {
    * @throws QueryException query exception
    */
   public Expr compileOrError(final Expr expr, final boolean error) throws QueryException {
+    final QueryException qe;
     try {
       return expr.compile(this);
     } catch(final QueryException ex) {
-      // replace original expression with error
-      if(error) throw ex;
-      return FnError.get(ex);
+      qe = ex;
+    } catch(final StackOverflowError | ArraySizeException ex) {
+      qe = QueryError.limitError(ex, expr.info());
     }
+    // replace original expression with error
+    if(error) throw qe;
+    return FnError.get(qe);
   }
 
   /**

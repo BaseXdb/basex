@@ -377,4 +377,26 @@ public final class Util {
   public static boolean inBounds(final long value1, final long value2) {
     return value2 == 0 || value1 <= Long.MAX_VALUE / value2;
   }
+
+  /**
+   * Adds two long values.
+   * @param value1 first value
+   * @param value2 second value
+   * @return sum, or {@link Long#MIN_VALUE} if it exceeds the range of long values
+   */
+  public static long add(final long value1, final long value2) {
+    final long sum = value1 + value2;
+    return ((value1 ^ sum) & (value2 ^ sum)) < 0 ? Long.MIN_VALUE : sum;
+  }
+
+  /**
+   * Multiplies two long values.
+   * @param value1 first value
+   * @param value2 second value
+   * @return product, or {@link Long#MIN_VALUE} if it exceeds the range of long values
+   */
+  public static long multiply(final long value1, final long value2) {
+    final long product = value1 * value2;
+    return Math.multiplyHigh(value1, value2) == product >> 63 ? product : Long.MIN_VALUE;
+  }
 }

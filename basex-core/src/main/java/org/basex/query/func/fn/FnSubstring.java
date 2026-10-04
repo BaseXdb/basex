@@ -1,7 +1,5 @@
 package org.basex.query.func.fn;
 
-import java.math.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -20,101 +18,82 @@ public final class FnSubstring extends StandardFunc {
   @Override
   public AStr value(final QueryContext qc) throws QueryException {
     final AStr value = toZeroStr(arg(0), qc);
+    final ANum start = start(qc), length = length(qc);
 
-    final int length = value.length(info);
-    int start = start(qc);
-    long end = length(length, qc);
-    if(length == 0 || start == Integer.MIN_VALUE) return Str.EMPTY;
-
-    if(start < 0) {
-      end += start;
-      start = 0;
-    }
-    final long e = Math.min(length, defined(2) ? start + end : Integer.MAX_VALUE);
-    return start < e ? value.substring(info, start, (int) e) : Str.EMPTY;
+    final int size = value.length(info);
+    final int s = index(start, size);
+    final int e = length == null ? size : index(FnSubsequence.add(start, length, info), size);
+    return s != -1 && s < e ? value.substring(info, s, e) : Str.EMPTY;
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     // empty argument: return empty string
-    final Expr value = arg(0);
+    final Expr value = arg(0), len = arg(2);
     if(value == Empty.VALUE || value == Str.EMPTY) return Str.EMPTY;
 
-    final int start = arg(1) instanceof Value ? start(cc.qc) : Integer.MAX_VALUE;
-    final int length = !defined(2) || arg(2) instanceof Value ?
-      length(Integer.MAX_VALUE, cc.qc) : Integer.MIN_VALUE;
+    if(arg(1) instanceof Value) {
+      // invalid start offset: return empty string
+      final double start = start(cc.qc).dbl();
+      if(Double.isNaN(start)) return Str.EMPTY;
 
-    // invalid start offset or zero length: return empty string
-    if(start == Integer.MIN_VALUE || length == 0) return Str.EMPTY;
-
-    // substring($string, $start, string-length($string)) → substring($string, $start)
-    final Expr len = arg(2);
-    if(start >= 0 && arg(1) instanceof Value && Function.STRING_LENGTH.is(len) &&
-        len.args().length > 0 && len.arg(0).equals(value) && !value.has(Flag.NDT)) {
-      return cc.function(Function.SUBSTRING, info, value, arg(1));
+      // substring($string, $start, string-length($string)) → substring($string, $start)
+      if(start >= 1 && Function.STRING_LENGTH.is(len) && len.args().length > 0 &&
+          len.arg(0).equals(value) && !value.has(Flag.NDT)) {
+        return cc.function(Function.SUBSTRING, info, value, arg(1));
+      }
+      // substring($string, 1) → string($string)
+      if(start <= 1 && !defined(2) && value.seqType().type.isStringOrUntyped()) {
+        return cc.function(Function.STRING, info, value);
+      }
     }
-
-    // return full string or original expression
-    return start <= 0 && length == Integer.MAX_VALUE && value.seqType().type.isStringOrUntyped() ?
-      cc.function(Function.STRING, info, value) : this;
+    // zero, negative or invalid length: return empty string
+    if(len instanceof Value) {
+      final ANum length = length(cc.qc);
+      if(length != null && !(length.dbl() > 0)) return Str.EMPTY;
+    }
+    return this;
   }
 
   /**
-   * Evaluates the start argument.
+   * Evaluates and rounds the start argument.
    * @param qc query context
-   * @return start offset
+   * @return start position
    * @throws QueryException query exception
    */
-  private int start(final QueryContext qc) throws QueryException {
-    final Expr start = arg(1);
-    final Item pos = toAtomItem(start, qc);
-    if(pos instanceof final Itr itr) return limit(itr.itr() - 1);
-    if(pos instanceof final Dec dec) return limit(round(dec) - 1);
-    final double dbl = toDouble(pos, start);
-    return Double.isNaN(dbl) ? Integer.MIN_VALUE : subPos(dbl);
+  private ANum start(final QueryContext qc) throws QueryException {
+    return round(toNumber(toAtomItem(arg(1), qc), arg(1)));
   }
 
   /**
-   * Evaluates the length argument.
-   * @param def default length
+   * Evaluates and rounds the length argument.
    * @param qc query context
-   * @return start offset
+   * @return length (can be {@code null})
    * @throws QueryException query exception
    */
-  private int length(final int def, final QueryContext qc) throws QueryException {
-    final Expr length = arg(2);
-    final Item len = length.atomItem(qc, info);
-    return len.isEmpty() ? def : len instanceof final Itr itr ? limit(itr.itr()) :
-      len instanceof final Dec dec ? limit(round(dec)) : subPos(toDouble(len, length) + 1);
+  private ANum length(final QueryContext qc) throws QueryException {
+    final Item length = arg(2).atomItem(qc, info);
+    return length.isEmpty() ? null : round(toNumber(length, arg(2)));
   }
 
   /**
-   * Rounds a decimal without loss of precision.
-   * @param dec decimal value
-   * @return rounded value, limited to the integer range
+   * Rounds a number to an integer.
+   * @param num number
+   * @return rounded number
    */
-  private long round(final Dec dec) {
-    final BigDecimal bd = dec.round(0, FnRound.RoundMode.HALF_TO_CEILING).dec(info);
-    return bd.max(BigDecimal.valueOf(Integer.MIN_VALUE)).
-        min(BigDecimal.valueOf(Integer.MAX_VALUE)).longValue();
+  private static ANum round(final ANum num) {
+    return num.round(0, FnRound.RoundMode.HALF_TO_CEILING);
   }
 
   /**
-   * Returns the specified substring position.
-   * @param d double value
-   * @return substring position
+   * Converts a one-based position to a string index.
+   * @param pos rounded position
+   * @param size string length
+   * @return index between {@code 0} and {@code size}, or {@code -1} for NaN
+   * @throws QueryException query exception
    */
-  private static int subPos(final double d) {
-    final int i = (int) d;
-    return limit(d == i ? i - 1 : (long) StrictMath.floor(d - 0.5));
-  }
-
-  /**
-   * Converts long to int, and ensures that the value does not exceed the integer limits.
-   * @param l long value
-   * @return integer
-   */
-  private static int limit(final long l) {
-    return Math.clamp(l, Integer.MIN_VALUE + 1, Integer.MAX_VALUE - 1);
+  private int index(final ANum pos, final int size) throws QueryException {
+    final long index = FnSubsequence.index(pos, info);
+    return index == -1 ? -1 : (int) Math.min(index, size);
   }
 }

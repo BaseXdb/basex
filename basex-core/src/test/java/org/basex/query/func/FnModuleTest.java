@@ -59,6 +59,11 @@ public final class FnModuleTest extends SandboxTest {
     // pre-evaluate argument
     check(func.args(1), 1, empty(func));
 
+    // minimum integer cannot be negated
+    query(func.args(" -9223372036854775807"), Long.MAX_VALUE);
+    error(func.args(" -9223372036854775808"), RANGE_X);
+    error(func.args(" (-9223372036854775808)[random:double() < 2]"), RANGE_X);
+
     // function is replaced by its argument (argument yields no result)
     check(func.args(" void()"), "", empty(func));
     // check adjusted type
@@ -368,6 +373,8 @@ public final class FnModuleTest extends SandboxTest {
 
     check(func.args(" (1 to 3)"), 2, empty(func));
     check(func.args(" reverse(1 to 3)"), 2, empty(func));
+    query(func.args(" 1 to 9223372036854775807"), 4611686018427387904L);
+    query(func.args(" -9223372036854775808 to -9223372036854775807"), "-9223372036854775807.5");
     check(func.args(" (1 to " + wrap(3) + ")"), 2, type(func, "xs:decimal?"));
     check(func.args(" (1 to " + wrap(0) + ")"), "", type(func, "xs:decimal?"));
     check(func.args(" (1 to 999999)"), 500000, empty(func));
@@ -688,6 +695,13 @@ public final class FnModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void count() {
     final Function func = COUNT;
+
+    // sequences that exceed the maximum size
+    error(func.args(" (1 to 9223372036854775807, 1)"), MAX_SIZE_X_X);
+    error(func.args(" (1 to 9223372036854775807, " + wrap(1) + ")"), MAX_SIZE_X_X);
+    error("let $s := replicate(1, 9223372036854775807 - " + _RANDOM_INTEGER.args(1) + ") "
+        + "let $t := ($s, 1) return (" + func.args(" $t") + ", " + func.args(" $t") + ")",
+        MAX_SIZE_X_X);
 
     // count(array:members(E)) → array:size(E)
     check(func.args(" " + _ARRAY_MEMBERS.args(" array { tokenize(" + wrap("a b") + ") }")), 2,
@@ -2117,11 +2131,28 @@ public final class FnModuleTest extends SandboxTest {
 
     // empty input, not known at compile time
     query(func.args(" let $x :=" + _RANDOM_INTEGER.args() + " return ()", "0"), "");
+
+    // minimum integer: only supported for digit patterns
+    query(func.args(" -9223372036854775808", "#,##0"), "-9,223,372,036,854,775,808");
+    query(func.args(" -9223372036854775808", "1"), "-9223372036854775808");
+    error(func.args(" -9223372036854775808", "w"), RANGE_X);
+    error(func.args(" -9223372036854775808", "i"), RANGE_X);
+    error(func.args(" -9223372036854775808", "a"), RANGE_X);
   }
 
   /** Test method. */
   @Test public void formatNumber() {
     final Function func = FORMAT_NUMBER;
+
+    // exponents beyond the double range of powers of ten
+    query(func.args(" 4.9E-324", "0.0e0"), "4.9e-324");
+    query(func.args(" 1.7976931348623157E308", "0.0e0"), "1.8e308");
+    query(func.args(" 1e-300", "0.0e0"), "1.0e-300");
+    // floats: shortest decimal representation
+    query(func.args(" xs:float('0.1')", "0.0"), "0.1");
+    query(func.args(" xs:float('34')", "0.0e0"), "3.4e1");
+    query(func.args(" xs:float('1234.5')", "0.000e0"), "1.235e3");
+    query(func.args(" xs:float('3.4028235E38')", "0.0e0"), "3.4e38");
 
     query(func.args(" 12345.67", "#.##0,00", "de"), "12.345,67");
     query(func.args(" 12345.67", "#.##0,00", " { 'decimal-separator': ',', "
@@ -2136,6 +2167,9 @@ public final class FnModuleTest extends SandboxTest {
         + "'decimal-separator': ',', 'grouping-separator': '.' }"), "12.345,67");
 
     error(func.args(" 12345.67", "#.##0,00", "de-XX"), FORMATWHICH_X);
+
+    // minimum integer
+    query(func.args(" -9223372036854775808", "#,##0"), "-9,223,372,036,854,775,808");
   }
 
   /** Test method. */
@@ -2148,6 +2182,11 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" %Q{uri}name('a', 'b') function() {}") +
         " (QName('uri', 'name'))", "a\nb");
     query(COUNT.args(func.args(" %basex:inline %basex:lazy function() {}")), 2);
+    // functions with different annotations must not be merged
+    query("(%local:x fn() { 1 }, %local:y fn() { 1 }) ! map:keys(" + func.args(" .") + ")",
+        "#local:x\n#local:y");
+    query("let $n := " + _RANDOM_INTEGER.args(1) + " return (%local:x fn() { $n }, "
+        + "%local:y fn() { $n }) ! map:keys(" + func.args(" .") + ")", "#local:x\n#local:y");
   }
 
   /** Test method. */
@@ -2504,6 +2543,15 @@ public final class FnModuleTest extends SandboxTest {
     query("count(" + func.args(" (1 to 1_000_000) ! 'x'", "x") + ")", 1000000);
 
     check(func.args(" replicate(1, 6)", 1), "1\n2\n3\n4\n5\n6", exists(RangeSeq.class));
+
+    // large ranges: position is computed
+    query(func.args(" 1 to 9223372036854775807", 9223372036854775807L), Long.MAX_VALUE);
+    query(func.args(" 1 to 9223372036854775807", " 9223372036854775806.0"),
+        9223372036854775806L);
+    query(func.args(" 1 to 9223372036854775807", " 9223372036854775806.5"), "");
+    query(func.args(" reverse(-9223372036854775806 to 0)", " -9223372036854775806"),
+        Long.MAX_VALUE);
+    query(func.args(" 1 to 9223372036854775807", " 3e0"), 3);
   }
 
   /** Test method. */
@@ -2589,6 +2637,8 @@ public final class FnModuleTest extends SandboxTest {
     query("count(" + func.args(" ()", 2, " 1 to 100_000_000") + ')', 100000000);
     query("count(" + func.args(" 1 to 100_000_000", 3, " ()") + ')', 100000000);
     query("count(" + func.args(" 1 to 100_000_000", 4, " 1 to 100_000_000") + ')', 200000000);
+    error("count(" + func.args(" 1 to 9223372036854775807", 2, 0) + ')', MAX_SIZE_X_X);
+    error("count(" + func.args(" 1 to 9223372036854775807", wrap(2), 0) + ')', MAX_SIZE_X_X);
 
     // a statically-empty (non-literal) operand is optimized away, side-effects preserved
     check(func.args(" void(<a/>)", wrap(2), " (7, 8)"), "7\n8", empty(func));
@@ -3624,6 +3674,9 @@ return
     error(func.args("abc", 6, " { 'padding': '' }"), INVALIDVALUE_X_X);
     error(func.args("abc", 6, " { 'side': 'middle' }"), INVALIDOPTIONVALUE_X);
     error(func.args("abc", Long.MAX_VALUE), RANGE_X);
+    error(func.args("abc", Integer.MAX_VALUE), MAX_SIZE_X_X);
+    error(func.args(" " + wrap("abc"), Integer.MAX_VALUE), MAX_SIZE_X_X);
+    query("try { " + func.args("abc", Integer.MAX_VALUE) + " } catch err:XPDY0130 { 'x' }", "x");
   }
 
   /** Test method. */
@@ -3664,6 +3717,9 @@ return
       + "   (: tidy up the result for display (function items cannot be properly displayed) :) \n"
       + "   map:put($result, \"get\", \"(: function :)\")\n"
       + "}\n";
+
+    // column positions beyond the integer range
+    query(func.args("a,b", " { 'select-columns': (4294967298, 1) }") + "?rows", "[\"\",\"a\"]");
 
     // Default delimiters, no column headers:
     query(display
@@ -3873,6 +3929,16 @@ return
     error(func.args("1", 100), INTRADIX_X);
     error(func.args("abc", 10), INTINVALID_X_X);
     error(func.args("012", 2), INTINVALID_X_X);
+
+    // integer limits
+    query(func.args("9223372036854775807"), Long.MAX_VALUE);
+    query(func.args("-9223372036854775808"), Long.MIN_VALUE);
+    query(func.args("-8000000000000000", 16), Long.MIN_VALUE);
+    error(func.args("9223372036854775808"), INTRANGE_X);
+    error(func.args("-9223372036854775809"), INTRANGE_X);
+    error(func.args("18446744073709551617"), INTRANGE_X);
+    error(func.args("10000000000000001", 16), INTRANGE_X);
+    error(func.args("99999999999999999999x"), INTINVALID_X_X);
   }
 
   /** Test method. */
@@ -4477,8 +4543,9 @@ return
     // single item: total size fits into the integer range
     query("count(" + func.args("A", 4611686018427387904L) + ")", 4611686018427387904L);
     // multiple items: total size exceeds the integer range (clean error, not out of memory)
-    error("count(" + func.args(" (1, 2, 3)", 4611686018427387904L) + ")", RANGE_X);
-    error("subsequence(" + func.args(" (1, 2, 3)", 4611686018427387904L) + ", 5, 2)", RANGE_X);
+    error("count(" + func.args(" (1, 2, 3)", 4611686018427387904L) + ")", MAX_SIZE_X_X);
+    error("subsequence(" + func.args(" (1, 2, 3)", 4611686018427387904L) + ", 5, 2)",
+        MAX_SIZE_X_X);
 
     query("for $i in 1 to 2 return " + func.args(1, " $i"), "1\n1\n1");
     query(func.args(" <a/>", 2), "<a/>\n<a/>");
@@ -4668,6 +4735,18 @@ return
   }
 
   /** Test method. */
+  @Test public void round() {
+    final Function func = ROUND;
+    query(func.args(" 9223372036854775807", -2), 9223372036854775800L);
+    query(func.args(" 4", -19), 0);
+    query(func.args(" 123.456", " -9223372036854775808"), 0);
+    error(func.args(" 9223372036854775807", -1), RANGE_X);
+    error(func.args(" -9223372036854775808", -1), RANGE_X);
+    error(func.args(" 9223372036854775807", -19), RANGE_X);
+    error(ROUND_HALF_TO_EVEN.args(" 9223372036854775807", -1), RANGE_X);
+  }
+
+  /** Test method. */
   @Test public void scan() {
     final Function func = SCAN;
 
@@ -4725,6 +4804,8 @@ return
     query(func.args(" ()"), "");
 
     error(func.args(" '1'"), INVTYPE_X);
+    error(func.args(" 1e300"), SECDURRANGE_X);
+    error(func.args(" -1e19"), SECDURRANGE_X);
   }
 
   /** Test method. */
@@ -4819,6 +4900,9 @@ return
     query(func.args("1", " { 'indent': () }"), 1);
     error(func.args("1", " { 'indent': 'yes' }"), INVALIDOPTION_X_X_X_X);
     error(func.args("1", " { 'indent': 1 }"), INVALIDOPTION_X_X_X_X);
+    // numeric options must not wrap around
+    query(func.args("<a/>", " { 'limit': 2147483647 }"), "&lt;a/&gt;");
+    error(func.args("<a/>", " { 'limit': 4294967298 }"), INVALIDOPTION_X_X_X_X);
 
     query(func.args("<html/>", " { 'html-version': 5 }"), "&lt;html/&gt;");
     query(func.args("<html/>", " { 'html-version': 5.0 }"), "&lt;html/&gt;");
@@ -5005,6 +5089,19 @@ return
         "", empty(func), exists(FOOT));
     check(func.args(" doc('" + DOC + "')//*", 10, 9) + " => void()",
         "", empty(func), exists(_UTIL_RANGE));
+
+    // large positions and steps (no integer overflow)
+    query(func.args(" 1 to 3", " -9223372036854775808", -3, 2), "");
+    query(func.args(" 1 to 3", " -9223372036854775808", -3, 5), 1);
+    query(func.args(" 1 to 3", -9223372036854775804L, " ()", 2), 2);
+    query(func.args(" 1 to 3", 1, 3, 9223372036854775807L), 1);
+    query(func.args(" 1 to 3", 2, 9223372036854775807L, 9223372036854775807L), 2);
+    query(func.args(" 1 to 3", " ()", " ()", " -9223372036854775808"), 3);
+    query(func.args(" 1 to 3", 9223372036854775807L, " ()", " -9223372036854775808"), "");
+    query(func.args(" ('a', 'b', 'c')", " -9223372036854775808", 9223372036854775807L, 2),
+        "b");
+    query(func.args(" ('a', 'b', 'c')", 9223372036854775807L, " -9223372036854775808", -2),
+        "c\na");
   }
 
   /** Test method. */
@@ -5152,6 +5249,13 @@ return
   /** Test method. */
   @Test public void stringJoin() {
     final Function func = STRING_JOIN;
+    // results that exceed the maximum size are rejected before they are built
+    error(func.args(REPLICATE.args("", 3000000000L), ","), MAX_SIZE_X_X);
+    error(func.args(REPLICATE.args("", " 3000000000 + " + _RANDOM_INTEGER.args(1)), ","),
+        MAX_SIZE_X_X);
+    error("string(<a>{ " + REPLICATE.args("a", 3000000000L) + " }</a>)", MAX_SIZE_X_X);
+    error("string(<a>{ " + REPLICATE.args("a", " 3000000000 + " + _RANDOM_INTEGER.args(1)) +
+        " }</a>)", MAX_SIZE_X_X);
     check(func.args(CHARACTERS.args(wrap("ABC"))), "ABC", root(STRING));
     check(func.args(" string-to-codepoints(" + wrap("ABC") + ") ! codepoints-to-string(.)"),
         "ABC", root(STRING));
@@ -5396,6 +5500,19 @@ return
     query(func.args(" 1 to 2000", 2000, 9223372036854775807L), 2000);
     query(func.args(" 1 to 5", 2, 9223372036854775807L), "2\n3\n4\n5");
     query(func.args(" 1 to 5", 3, 2147483648L), "3\n4\n5");
+    query(func.args(" 1 to 3", " -9223372036854775808"), "1\n2\n3");
+    query(func.args(" 1 to 3", " -9223372036854775808", 9223372036854775807L), "");
+    query(func.args(" 1 to 3", -9223372036854775805L, 9223372036854775807L), "1");
+    query(func.args(" (1 to 3)[. > 0]", -9223372036854775805L, 9223372036854775807L), "1");
+    query(func.args(" ('a', 'b', 'c')", -2147483646, 2147483648L), "a");
+    query(func.args(" ('a', 'b', 'c')", " -18446744073709551616.0", " 18446744073709551619.0"),
+        "a\nb");
+    query(func.args(" ('a', 'b', 'c')", " -1e19", " 18446744073709551616.0"), "a\nb\nc");
+    query(func.args(" ('a', 'b', 'c')", " -1e19", " 1e19"), "");
+    query(func.args(" ('a', 'b', 'c')", " xs:double('-INF')", " xs:double('INF')"), "");
+    query(func.args(" ('a', 'b', 'c')", 1, " xs:double('INF')"), "a\nb\nc");
+    query("let $e := (1 to 3)[. > 0] return " +
+        func.args(" $e", " -9223372036854775808", " count($e)"), "");
   }
 
   /** Test method. */
@@ -5450,6 +5567,40 @@ return
     query(func.args("hello", 2, 9223372036854775807L), "ello");
     query(func.args("hello", 3, 2147483648L), "llo");
     query(func.args("hello", -2, 9223372036854775807L), "hello");
+    query(func.args("XY", " -9223372036854775808"), "XY");
+    query(func.args("XY", 9223372036854775807L), "");
+    query(func.args("XY", " -9223372036854775808", 9223372036854775807L), "");
+    query(func.args("XY", -9223372036854775806L, 9223372036854775807L), "");
+    query(func.args("XY", -9223372036854775805L, 9223372036854775807L), "X");
+    query(func.args("XY", -9223372036854775804L, 9223372036854775807L), "XY");
+    query(func.args("XY", -2147483646, 2147483648L), "X");
+    query(func.args("XY", -2147483649L, 2147483651L), "X");
+    query(func.args("XY", -2147483648L, 9223372036854775807L), "XY");
+    query(func.args("XY", 2147483647, 2147483647), "");
+    query(func.args(wrap("XY"), wrap(-2147483646), wrap(2147483648L)), "X");
+
+    // decimals beyond the integer range
+    query(func.args("XY", " 9223372036854775808.0"), "");
+    query(func.args("XY", " -18446744073709551616.0"), "XY");
+    query(func.args("XY", " -18446744073709551616.0", " 18446744073709551618.0"), "X");
+    query(func.args("XY", " -9223372036854775806", " 9223372036854775808.0"), "X");
+    query(func.args("XY", " -9223372036854775808", " 18446744073709551616.0"), "XY");
+    query(func.args("XY", " -2147483648.5", " 2147483650"), "X");
+
+    // doubles and floats: arithmetic of the promoted type
+    query(func.args("XY", " -1e19", " 18446744073709551616.0"), "XY");
+    query(func.args("XY", " -1e19", " 1e19"), "");
+    query(func.args("XY", -9223372036854775806L, " 9.223372036854775807e18"), "");
+    query(func.args("XY", " -1e19"), "XY");
+    query(func.args("XY", " -1e300", " 1e300"), "");
+    query(func.args("XY", " xs:double('-INF')"), "XY");
+    query(func.args("XY", " xs:double('-INF')", " xs:double('INF')"), "");
+    query(func.args("XY", 1, " xs:double('INF')"), "XY");
+    query(func.args("XY", 1, " xs:double('NaN')"), "");
+    query(func.args("XY", -16777217, " xs:float('16777218')"), "X");
+    query(func.args("XY", " xs:float('-16777215')", " xs:float('16777217')"), "");
+    query(func.args("XY", " xs:float('-1e19')", " xs:float('1e19')"), "");
+    query(func.args("XY", " xs:float('-INF')", 3), "");
 
     // decimals are rounded without loss of precision
     query(func.args("abcde", " 2.4999999999999999999"), "bcde");
@@ -5568,6 +5719,9 @@ return
     query(func.args(" reverse(1 to 10)"), 55);
     query(func.args(" sort(reverse(distinct-values(1 to 4294967295)))"), 9223372034707292160L);
     error(func.args(" 1 to 10_000_000_000_000"), RANGE_X);
+    query(func.args(" -4000000000 to 0"), -8000000002000000000L);
+    query(func.args(" reverse(-4000000000 to 0)"), -8000000002000000000L);
+    query(func.args(" -4000000000 to 3999999999"), -4000000000L);
 
     query(func.args(" (1 to 10) ! 1"), 10);
     query(func.args(" (1 to 10) ! 10"), 100);

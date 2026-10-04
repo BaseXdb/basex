@@ -55,10 +55,9 @@ public final class SeqRange {
    * @param e end position
    */
   private void assign(final long s, final long e) {
-    final boolean max = e == Long.MAX_VALUE;
     start = s;
-    end = max ? Long.MAX_VALUE : Math.max(s, e);
-    length = max ? Long.MAX_VALUE : end - s;
+    end = Math.max(s, e);
+    length = end - s;
   }
 
   @Override

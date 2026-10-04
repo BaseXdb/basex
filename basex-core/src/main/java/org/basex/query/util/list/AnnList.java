@@ -169,6 +169,11 @@ public final class AnnList implements Iterable<Ann> {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof final AnnList list && Array.equals(anns, list.anns);
+  }
+
+  @Override
   public Iterator<Ann> iterator() {
     return new ArrayIterator<>(anns, anns.length);
   }

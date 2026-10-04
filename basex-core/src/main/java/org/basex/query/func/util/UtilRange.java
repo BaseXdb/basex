@@ -13,13 +13,8 @@ import org.basex.query.value.item.*;
  */
 public final class UtilRange extends FnSubsequence {
   @Override
-  public long start(final double first) {
-    return (long) Math.ceil(first);
-  }
-
-  @Override
-  public long end(final long first, final double second) {
-    return (long) Math.floor(second);
+  protected ANum end(final ANum first, final ANum second) throws QueryException {
+    return add(second, Itr.ONE, info);
   }
 
   @Override

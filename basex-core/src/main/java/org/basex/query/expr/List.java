@@ -74,8 +74,7 @@ public final class List extends Arr {
     Occ occ = Occ.ZERO;
     long size = 0;
     for(final Expr expr : exprs) {
-      final long sz = expr.size();
-      if(size != -1) size = sz == -1 ? -1 : size + sz;
+      size = Seq.size(size, expr.size());
       occ = occ.add(expr.seqType().occ);
     }
     exprType.assign(st != null ? st : Types.EMPTY_SEQUENCE_Z, occ, size).data(exprs);
@@ -190,8 +189,7 @@ public final class List extends Arr {
           for(int o = 0; o < el && size != -1; o++) {
             // cache offsets for direct access
             offsets[o] = size;
-            final long s = iter(o).size();
-            size = s == -1 || size + s < 0 ? -1 : size + s;
+            size = Seq.size(size, iter(o).size(), info);
           }
         }
         return size;

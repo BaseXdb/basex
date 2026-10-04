@@ -568,8 +568,6 @@ public final class QT3TS extends Main {
     // too much effort to support in the test suite
     "'fn-available-environment-variables-011', " +
     "'environment-variable-005', 'environment-variable-006', 'environment-variable-007', " +
-    // catalog self-checks: report gaps in the test suite, not in the implementation
-    "'Catalog011', 'Catalog014', " +
     // depend on the capabilities of the external XSLT and XSD processors
     "'fn-transform-67', 'fo-test-fn-xsd-validator-002', " +
     // XQuery Update: targets can be empty or contain multiple nodes

@@ -261,8 +261,7 @@ public final class Array {
    * @return argument as integer, or {@code 0} if the argument is negative
    */
   public static int checkCapacity(final long size) {
-    if(size > MAX_SIZE) throw new ArrayIndexOutOfBoundsException(
-        "Maximum array size exceeded (" + size + " > " + MAX_SIZE + ").");
+    if(size > MAX_SIZE) throw new ArraySizeException(size);
     return Math.max(0, (int) size);
   }
 

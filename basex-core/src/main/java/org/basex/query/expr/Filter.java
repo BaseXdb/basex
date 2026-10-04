@@ -188,8 +188,8 @@ public abstract class Filter extends Preds {
         }
       } else if(pred instanceof final MixedPos pos) {
         final Expr posExpr = pos.expr;
-        // Value instances are known to be sorted and duplicate-free (see Pos#get)
-        final boolean sorted = posExpr instanceof Value;
+        // values (see Pos#get) and ranges are known to be sorted and duplicate-free
+        final boolean sorted = posExpr instanceof Value || posExpr instanceof Range;
         // E[pos: INT1, INT2, ...] → items-at(E, INT1, INT2, ...)
         // E[pos: POSITIONS, ...] → items-at(E, sort(distinct-values((POSITIONS)))
         ex = cc.function(ITEMS_AT, info, add.apply(expr), sorted ? posExpr :

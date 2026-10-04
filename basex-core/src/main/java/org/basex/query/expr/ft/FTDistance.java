@@ -133,6 +133,12 @@ public final class FTDistance extends FTFilter {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof final FTDistance ftd && min.equals(ftd.min) &&
+        max.equals(ftd.max) && super.equals(obj);
+  }
+
+  @Override
   public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, DISTANCE, min + "-" + max + ' ' + unit), exprs);
   }

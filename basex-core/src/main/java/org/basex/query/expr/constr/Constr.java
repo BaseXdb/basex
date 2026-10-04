@@ -73,6 +73,11 @@ public final class Constr {
         more = false;
         direct = expr instanceof final CNode cnode && !cnode.computed;
         final Iter iter = expr.iter(qc);
+        // atomic items are separated by spaces: reject texts that exceed the maximum size
+        final long is = iter.size();
+        if(is > 1 && expr.seqType().type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) {
+          Array.checkCapacity(text.size() + Math.min(is - 1, Integer.MAX_VALUE));
+        }
         for(Item item; (item = qc.next(iter)) != null && add(item, qnames););
       }
       builder.text(qc.shared.token(text.toArray()));

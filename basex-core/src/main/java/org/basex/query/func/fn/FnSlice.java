@@ -30,9 +30,7 @@ public class FnSlice extends StandardFunc {
     if(slice.step == 1) return input.subsequence(slice.start - 1, slice.length, qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(long i = slice.start; i <= slice.end; i += slice.step) {
-      vb.add(input.itemAt(i - 1));
-    }
+    for(long i = 0; i < slice.length; i++) vb.add(input.itemAt(slice.start - 1 + i * slice.step));
     return vb.value();
   }
 
@@ -79,10 +77,15 @@ public class FnSlice extends StandardFunc {
    */
   protected final Slice slice(final long size, final QueryContext qc) throws QueryException {
     Slice s = new Slice(size, longArg(1, 0, qc), longArg(2, 0, qc), longArg(3, 0, qc), false);
-    if(s.step < 0) s = new Slice(size, -s.start, -s.end, -s.step, true);
-    s.start = Math.max(1, s.start);
+    if(s.step < 0) {
+      // -2^63 cannot be negated; 2^63 - 1 selects the same items
+      final long step = s.step == Long.MIN_VALUE ? Long.MAX_VALUE : -s.step;
+      s = new Slice(size, -s.start, -s.end, step, true);
+    }
+    // first position that matches the step
+    if(s.start < 1) s.start = 1 + Math.floorMod(s.start - 1, s.step);
     s.end = Math.min(size, s.end);
-    s.length = s.end < 1 || s.start > size || s.start > s.end ? 0 : s.end - s.start + 1;
+    s.length = s.start > s.end ? 0 : (s.end - s.start) / s.step + 1;
     return s;
   }
 

@@ -3,7 +3,9 @@ package org.basex.query.expr;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
+import java.math.*;
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.data.*;
 import org.basex.index.*;
@@ -187,30 +189,62 @@ public class CmpG extends Cmp {
     if(expr1 instanceof final Arith arth && expr2.seqType().instanceOf(Types.NUMERIC_O)) {
       final Expr op11 = expr1.arg(0), op12 = expr1.arg(1), op22 = expr2.arg(1);
       final double num12 = op12 instanceof final ANum num ? num.dbl() : Double.NaN;
+      // rewrites are only exact for integers and decimals (no rounding, no type promotion)
+      final Predicate<Expr> integer = e -> e.seqType().type.instanceOf(BasicType.INTEGER);
+      final Predicate<Expr> decimal = e -> e.seqType().type.instanceOf(BasicType.DECIMAL);
       if(op12.seqType().instanceOf(Types.NUMERIC_O)) {
         final Calc calc1 = arth.calc;
         if(calc1 == Calc.SUBTRACT && expr2 == Itr.ZERO) {
           // E - NUMERIC = 0 → E = NUMERIC
-          ex = new CmpG(info, op11, op12, op);
+          if(decimal.test(op11) && decimal.test(op12)) ex = new CmpG(info, op11, op12, op);
         } else if((
           POSITION.is(op11) ||
           !Double.isNaN(num12) &&
           (expr2 instanceof ANum || expr2 instanceof Arith && op22 instanceof ANum)
         ) && (
-          calc1.oneOf(Calc.ADD, Calc.SUBTRACT) ||
-          calc1.oneOf(Calc.MULTIPLY, Calc.DIVIDE) && num12 != 0 &&
+          calc1.oneOf(Calc.ADD, Calc.SUBTRACT) &&
+            decimal.test(op11) && decimal.test(op12) && decimal.test(expr2) ||
+          calc1.oneOf(Calc.MULTIPLY, Calc.DIVIDE) && num12 != 0 && Math.abs(num12) <= 1e17 &&
+            integer.test(op11) && integer.test(op12) && integer.test(expr2) &&
             (op.oneOf(CmpOp.EQ, CmpOp.NE) || num12 > 0)
         )) {
           // position() + 1 < last() → position() < last() - 1
           // count(E) div 2 = 1 → count(E) = 1 * 2
           // $a - 1 = $b + 1 → $a = $b + 2
           // $x * -1 = 1 → $x = 1 div -1  (no rewrite if RHS of */div (<,<=,>=,>) is negative)
-          final Expr arg2 = new Arith(info, expr2, op12, calc1.invert()).optimize(cc);
-          ex = new CmpG(info, op11, arg2, op);
+          if(!overflows(expr2, op12, calc1.invert())) {
+            final Expr arg2 = new Arith(info, expr2, op12, calc1.invert()).optimize(cc);
+            ex = new CmpG(info, op11, arg2, op);
+          }
         }
       }
     }
     return ex != null ? ex.optimize(cc) : this;
+  }
+
+  /**
+   * Checks if the arithmetic operation on two integers exceeds the integer range.
+   * @param expr1 first operand
+   * @param expr2 second operand
+   * @param calc operation
+   * @return result of check
+   */
+  private static boolean overflows(final Expr expr1, final Expr expr2, final Calc calc) {
+    if(expr1 instanceof final Itr itr1 && expr2 instanceof final Itr itr2) {
+      final long l1 = itr1.itr(), l2 = itr2.itr();
+      try {
+        switch(calc) {
+          case ADD -> Math.addExact(l1, l2);
+          case SUBTRACT -> Math.subtractExact(l1, l2);
+          case MULTIPLY -> Math.multiplyExact(l1, l2);
+          default -> { }
+        }
+      } catch(final ArithmeticException ex) {
+        Util.debug(ex);
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -303,6 +337,11 @@ public class CmpG extends Cmp {
    */
   boolean compare(final Iter iter1, final Iter iter2, final long size1, final long size2,
       final QueryContext qc) throws QueryException {
+    // single number and range sequence: compare with bounds
+    if(size1 == 1 && size2 > 1 && iter2.eagerValue() instanceof final RangeSeq rs &&
+        iter1.eagerValue() instanceof final ANum num) return compare(num, rs, op);
+    if(size2 == 1 && size1 > 1 && iter1.eagerValue() instanceof final RangeSeq rs &&
+        iter2.eagerValue() instanceof final ANum num) return compare(num, rs, op.swap());
     // improve cache efficiency by looping the smaller array in the outer loop
     if(size1 < size2 || size2 == -1) {
       // (1, 2) = (3, 4, 5, 6, 7) → 1 = 3, 1 = 4, ..., 2 = 3, ...
@@ -326,6 +365,45 @@ public class CmpG extends Cmp {
       }
     }
     return false;
+  }
+
+  /**
+   * Compares a number with the items of a range sequence.
+   * @param num number
+   * @param rs range sequence
+   * @param cmp comparison operator (number on the left)
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  private static boolean compare(final ANum num, final RangeSeq rs, final CmpOp cmp)
+      throws QueryException {
+    final long min = rs.min(), max = rs.max();
+    final int cmin, cmax;
+    boolean integral = true;
+    if(num instanceof final Itr itr) {
+      cmin = Long.compare(itr.itr(), min);
+      cmax = Long.compare(itr.itr(), max);
+    } else {
+      final double d = num.dbl();
+      if(Double.isNaN(d)) return cmp == CmpOp.NE;
+      if(Double.isInfinite(d)) {
+        cmin = cmax = d > 0 ? 1 : -1;
+      } else {
+        // numbers are compared without loss of precision
+        final BigDecimal bd = num.dec(null);
+        cmin = bd.compareTo(BigDecimal.valueOf(min));
+        cmax = bd.compareTo(BigDecimal.valueOf(max));
+        integral = bd.stripTrailingZeros().scale() <= 0;
+      }
+    }
+    return switch(cmp) {
+      case EQ -> cmin >= 0 && cmax <= 0 && integral;
+      case NE -> cmin != 0 || cmax != 0;
+      case LT -> cmax < 0;
+      case LE -> cmax <= 0;
+      case GT -> cmin > 0;
+      case GE -> cmin >= 0;
+    };
   }
 
   /**

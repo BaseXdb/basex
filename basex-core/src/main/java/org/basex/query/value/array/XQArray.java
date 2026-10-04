@@ -292,9 +292,8 @@ public abstract class XQArray extends XQStruct {
       }
       final long vs = value.size();
       if(vs != 1) tb.add('(');
-      int cc = 0;
-      for(int i = 0; i < vs; i++) {
-        if(cc++ > 0) {
+      for(long i = 0; i < vs; i++) {
+        if(i > 0) {
           tb.add(',');
           if(indent) tb.add(' ');
         }
@@ -468,7 +467,7 @@ public abstract class XQArray extends XQStruct {
         for(final Value value : members()) list.add((int) ((Itr) value).itr());
         return list.finish();
       }
-      if(tp.instanceOf(BasicType.INTEGER) && tp != BasicType.UNSIGNED_LONG) {
+      if(tp.instanceOf(BasicType.INTEGER)) {
         final LongList list = new LongList(sz);
         for(final Value value : members()) list.add(((Itr) value).itr());
         return list.finish();
@@ -518,7 +517,7 @@ public abstract class XQArray extends XQStruct {
         tb.add(tb.isEmpty() ? " " : ", ");
         final long vs = value.size();
         if(vs != 1) tb.add('(');
-        for(int m = 0; m < vs; m++) {
+        for(long m = 0; m < vs; m++) {
           if(!tb.moreInfo()) break;
           if(m != 0) tb.add(", ");
           final Item item = value.itemAt(m);

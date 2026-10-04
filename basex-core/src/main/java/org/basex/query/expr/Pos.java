@@ -2,6 +2,8 @@ package org.basex.query.expr;
 
 import static java.lang.Long.*;
 
+import java.math.*;
+
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.func.*;
@@ -66,12 +68,27 @@ public final class Pos extends Single {
 
     // integer tests. example: position() > 5
     if(pos instanceof final ANum num) {
-      final long p = num.itr();
-      final boolean exact = p == num.dbl();
+      final double d = num.dbl();
+      if(Double.isNaN(d)) return Bln.get(op == CmpOp.NE);
+      // floor, saturated at the long limits; exact if the number is a representable integer
+      final long p;
+      final boolean exact;
+      if(num instanceof Itr) {
+        p = num.itr();
+        exact = true;
+      } else if(Double.isInfinite(d)) {
+        p = d > 0 ? MAX_VALUE : MIN_VALUE;
+        exact = false;
+      } else {
+        final BigDecimal bd = num.dec(info);
+        p = bd.setScale(0, RoundingMode.FLOOR).max(Dec.BD_MINLONG).min(Dec.BD_MAXLONG).longValue();
+        exact = bd.compareTo(BigDecimal.valueOf(p)) == 0;
+      }
       return switch(op) {
         case EQ -> exact ? IntPos.get(p, p, info) : Bln.FALSE;
-        case GE -> IntPos.get(exact ? p : p + 1, MAX_VALUE, info);
-        case GT -> IntPos.get(p + 1, MAX_VALUE, info);
+        case GE -> exact ? IntPos.get(p, MAX_VALUE, info) :
+          p == MAX_VALUE ? Bln.FALSE : IntPos.get(p + 1, MAX_VALUE, info);
+        case GT -> p == MAX_VALUE ? Bln.FALSE : IntPos.get(p + 1, MAX_VALUE, info);
         case LE -> IntPos.get(1, p, info);
         case LT -> IntPos.get(1, exact ? p - 1 : p, info);
         case NE -> exact ? p < 2 ? IntPos.get(p + 1, MAX_VALUE, info) : null : Bln.TRUE;
@@ -135,15 +152,27 @@ public final class Pos extends Single {
     if(value instanceof RangeSeq) return value;
     final LongList list = new LongList();
     for(final Item item : value) {
-      final double d = item.dbl(null);
-      final long l = (long) d;
-      if(l > 0 && d == l) list.add(l);
+      final long l = position(ANum.decimal(item, null));
+      if(l > 0) list.add(l);
     }
     list.ddo();
 
     final ValueBuilder vb = new ValueBuilder(qc, list.size());
     for(final long l : list.finish()) vb.add(l);
     return vb.value(BasicType.INTEGER);
+  }
+
+  /**
+   * Converts a number to a position.
+   * @param num number
+   * @return position, or {@code 0} if the number is no valid position
+   * @throws QueryException query exception
+   */
+  public static long position(final ANum num) throws QueryException {
+    if(num instanceof final Itr itr) return Math.max(itr.itr(), 0);
+    final BigDecimal bd = num.integer();
+    return bd != null && bd.signum() > 0 && bd.compareTo(Dec.BD_MAXLONG) <= 0 ?
+      bd.longValue() : 0;
   }
 
   @Override

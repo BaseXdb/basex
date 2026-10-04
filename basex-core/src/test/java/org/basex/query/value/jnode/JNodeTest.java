@@ -304,7 +304,8 @@ public final class JNodeTest extends SandboxTest {
     query(JTREE_STRING + "//jnode(true())", "");
     query(JTREE_STRING + "//jnode(false())", "");
 
-    error("[ 8, 9 ]/jnode(-0x8000000000000000)", RANGE_X);
+    error("[ 8, 9 ]/jnode(-0x8000000000000001)", RANGE_X);
+    query("[ 8, 9 ]/jnode(-0x8000000000000000)", "");
     query("[ 8, 9 ]/jnode(-0x7FFFFFFFFFFFFFFF)", "");
     query("[ 8, 9 ]/jnode(-1)", "");
     query("[ 8, 9 ]/jnode(0)", "");

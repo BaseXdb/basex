@@ -1,5 +1,7 @@
 package org.basex.query.func.fn;
 
+import static org.basex.query.QueryError.*;
+
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.format.*;
@@ -33,6 +35,8 @@ public final class FnFormatInteger extends StandardFunc {
         formats.put(picture, format);
       }
     }
+    // the absolute value of the minimum integer can only be represented with digits
+    if(number == Long.MIN_VALUE && !format.isDigitFormat()) throw RANGE_X.get(info, number);
     return Str.get(Formatter.get(language).formatInt(number, format));
   }
 }

@@ -59,6 +59,8 @@ public class QueryParser extends InputParser {
       "^(xquery( version ['\"].*?['\"])?( encoding ['\"].*?['\"])? ?; ?)?module .*");
   /** QName check: skip namespace check. */
   private static final byte[] SKIPCHECK = {};
+  /** Absolute value of the minimum integer (2^63). */
+  private static final BigInteger MIN_INTEGER = BigInteger.ONE.shiftLeft(63);
   /** Reserved keywords. */
   private static final TokenSet KEYWORDS = new TokenSet(
       ATTRIBUTE, COMMENT, DOCUMENT_NODE, ELEMENT, JNODE, NAMESPACE_NODE, NODE, XNODE,
@@ -121,6 +123,8 @@ public class QueryParser extends InputParser {
   private String moduleDoc = "";
   /** Error hint for a keyword that was parsed as a name (can be {@code null}). */
   private Hint hint;
+  /** Range error for literal 2^63, which is valid if negated (can be {@code null}). */
+  private Expr minInteger;
 
   /**
    * Namespaces of an element constructor.
@@ -2335,6 +2339,7 @@ public class QueryParser extends InputParser {
       } else if(consume('+')) {
       } else {
         final Expr expr = value();
+        if(minus && expr != null && expr == minInteger) return Itr.MIN;
         return found ? new Unary(info(), check(expr, EVALUNARY), minus) : expr;
       }
       found = true;
@@ -2833,8 +2838,14 @@ public class QueryParser extends InputParser {
     if(expr == null) expr = arrayConstructor();
     if(expr == null) expr = lookup(null);
     if(expr == null) {
-      expr = literal(false, true);
-      if(expr == Dbl.NEGATIVE_ZERO) expr = FnError.get(RANGE_X.get(info(), token));
+      final Item item = literal(false, true);
+      if(item == Itr.MIN) {
+        expr = minInteger = FnError.get(RANGE_X.get(info(), token));
+      } else if(item == Dbl.NEGATIVE_ZERO) {
+        expr = FnError.get(RANGE_X.get(info(), token));
+      } else {
+        expr = item;
+      }
     }
     return expr;
   }
@@ -3016,7 +3027,7 @@ public class QueryParser extends InputParser {
    * Parses the "NumericLiteral" rule.
    * @param max maximum value for integers (if 0, parse all numeric types)
    * @param mns parse minus character
-   * @param dummy return {@link Dbl#NEGATIVE_ZERO} for an invalid range
+   * @param dummy return {@link Dbl#NEGATIVE_ZERO} for an invalid range, minimum integer for 2^63
    * @return numeric literal or {@code null}
    * @throws QueryException query exception
    */
@@ -3090,12 +3101,14 @@ public class QueryParser extends InputParser {
     // integer value
     if(token.isEmpty()) throw error(NUMBER_X, token);
     // out of range
-    if(l.compareTo(BigInteger.valueOf(max != 0 ? max : Long.MAX_VALUE)) > 0) {
-      if(dummy) return Dbl.NEGATIVE_ZERO;
+    final BigInteger value = negate ? l.negate() : l;
+    if(value.compareTo(BigInteger.valueOf(max != 0 ? max : Long.MAX_VALUE)) > 0) {
+      // 2^63: minimum integer, which is only valid if negated
+      if(dummy) return value.equals(MIN_INTEGER) ? Itr.MIN : Dbl.NEGATIVE_ZERO;
       throw RANGE_X.get(info(), token);
     }
-
-    return Itr.get(negate ? -l.longValue() : l.longValue());
+    if(value.compareTo(BigInteger.valueOf(Long.MIN_VALUE)) < 0) throw RANGE_X.get(info(), token);
+    return Itr.get(value.longValue());
   }
 
   /**
@@ -4486,7 +4499,7 @@ public class QueryParser extends InputParser {
       } else if(wsConsumeWs(WINDOW)) {
         expr = new FTWindow(info(), expr, additive(), ftUnit());
       } else if(wsConsumeWs(DISTANCE)) {
-        final Expr[] rng = ftRange(false);
+        final Expr[] rng = ftRange(false, Itr.MIN);
         if(rng == null) throw error(FTRANGE);
         expr = new FTDistance(info(), expr, rng[0], rng[1], ftUnit());
       } else if(wsConsumeWs(AT)) {
@@ -4656,7 +4669,7 @@ public class QueryParser extends InputParser {
     // FTTimes
     Expr[] occ = null;
     if(wsConsumeWs(OCCURS)) {
-      occ = ftRange(false);
+      occ = ftRange(false, Itr.ZERO);
       if(occ == null) throw error(FTRANGE);
       wsCheck(TIMES);
     }
@@ -4666,11 +4679,12 @@ public class QueryParser extends InputParser {
   /**
    * Parses the "FTRange" rule.
    * @param i accept only integers ("FTLiteralRange")
+   * @param min default minimum
    * @return query expression or {@code null}
    * @throws QueryException query exception
    */
-  private Expr[] ftRange(final boolean i) throws QueryException {
-    final Expr[] occ = { Itr.ZERO, Itr.MAX };
+  private Expr[] ftRange(final boolean i, final Itr min) throws QueryException {
+    final Expr[] occ = { min, Itr.MAX };
     if(wsConsumeWs(EXACTLY)) {
       occ[0] = ftAdditive(i);
       occ[1] = occ[0];
@@ -4814,7 +4828,7 @@ public class QueryParser extends InputParser {
         if(opt.is(WC)) throw error(FT_OPTIONS);
         opt.set(FZ, using);
         if(digit(current())) {
-          opt.errors = (int) ((ANum) ftAdditive(true)).itr();
+          opt.errors = Math.clamp(((ANum) ftAdditive(true)).itr(), 0, Integer.MAX_VALUE);
           wsCheck(ERRORS);
         }
       } else {
@@ -4841,7 +4855,7 @@ public class QueryParser extends InputParser {
     else checkCreate(location, info());
     final IO fl = qc.resources.thesaurus(location, sc);
     final byte[] rel = wsConsumeWs(RELATIONSHIP) ? stringLiteral() : EMPTY;
-    final Expr[] range = ftRange(true);
+    final Expr[] range = ftRange(true, Itr.ZERO);
     long min = 0, max = Long.MAX_VALUE;
     if(range != null) {
       wsCheck(LEVELS);

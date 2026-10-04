@@ -23,9 +23,7 @@ public final class ArraySlice extends FnSlice {
     if(slice.step == 1) return array.subArray(slice.start - 1, slice.length, qc);
 
     final ArrayBuilder ab = new ArrayBuilder(qc);
-    for(long i = slice.start; i <= slice.end; i += slice.step) {
-      ab.add(array.valueAt(i - 1));
-    }
+    for(long i = 0; i < slice.length; i++) ab.add(array.valueAt(slice.start - 1 + i * slice.step));
     return ab.array(this);
   }
 

@@ -137,21 +137,28 @@ public final class Try extends Single {
     try {
       return expr.value(qc);
     } catch(final QueryException ex) {
-      final Catch ctch = matches(ex);
-      if(ctch == null) throw ex;
-      Util.debug(ex);
-      return ctch.value(qc, ex);
-    } catch(final StackOverflowError ex) {
+      return caught(ex, qc);
+    } catch(final StackOverflowError | ArraySizeException ex) {
       // the stack has been unwound to this expression, so the catch clause has room to run
-      final QueryException qe = BASEX_OVERFLOW.get(info).cause(ex);
-      final Catch ctch = matches(qe);
-      if(ctch == null) throw qe;
-      Util.debug(qe);
-      return ctch.value(qc, qe);
+      return caught(limitError(ex, info), qc);
     } finally {
       final Value fnl = fnlly.value(qc);
       if(fnl != Empty.VALUE) throw FINALLY_X.get(info, fnl);
     }
+  }
+
+  /**
+   * Evaluates the catch clause that matches the specified error, or raises the error.
+   * @param ex query exception
+   * @param qc query context
+   * @return result of the catch clause
+   * @throws QueryException query exception
+   */
+  private Value caught(final QueryException ex, final QueryContext qc) throws QueryException {
+    final Catch ctch = matches(ex);
+    if(ctch == null) throw ex;
+    Util.debug(ex);
+    return ctch.value(qc, ex);
   }
 
   /**
@@ -186,6 +193,8 @@ public final class Try extends Single {
       inlined = expr.inline(ic);
     } catch(final QueryException ex) {
       inlined = FnError.get(ex);
+    } catch(final StackOverflowError | ArraySizeException ex) {
+      inlined = FnError.get(limitError(ex, info));
     }
     if(inlined != null) expr = inlined;
 

@@ -5,6 +5,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -47,7 +48,8 @@ public final class CmpHashG extends CmpG {
     if(size2 == 0) return false;
     // check if iterator is based on value with more than one item, check if caching is enabled
     final Value value2 = iter2.eagerValue();
-    if(value2 != null && size2 > 1 && cache.active(value2, iter2)) {
+    if(value2 != null && size2 > 1 && !(value2 instanceof RangeSeq) &&
+        cache.active(value2, iter2)) {
       return probe(iter1, cache, qc);
     }
     return super.compare(iter1, iter2, size1, size2, qc);

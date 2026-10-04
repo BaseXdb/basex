@@ -1,7 +1,9 @@
 package org.basex.query.expr;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
+import java.math.*;
 import java.util.*;
 import java.util.function.*;
 
@@ -42,7 +44,8 @@ public final class Range extends Arr {
 
     Expr expr = emptyExpr();
     if(expr == this) {
-      if(values(false, cc)) return cc.preEval(this);
+      // too large ranges are not pre-evaluated: their bounds can still be used for positional tests
+      if(values(false, cc) && !tooLarge()) return cc.preEval(this);
 
       final Expr min = exprs[0], max = exprs[1];
       if(!min.has(Flag.NDT)) {
@@ -86,9 +89,30 @@ public final class Range extends Arr {
     // min smaller than max: empty sequence
     if(mn > mx) return Empty.VALUE;
     // max smaller than min: create range
-    final long size = mx - mn + 1;
-    // too large range: assign maximum
-    return RangeSeq.get(mn, size <= 0 ? Long.MAX_VALUE : size, true);
+    if(tooLarge(mn, mx)) {
+      throw sizeError(BigInteger.valueOf(mx).subtract(BigInteger.valueOf(mn)).
+          add(BigInteger.ONE), info);
+    }
+    return RangeSeq.get(mn, mx - mn + 1, true);
+  }
+
+  /**
+   * Indicates if the range operands are integers that yield more items than can be represented.
+   * @return result of check
+   */
+  private boolean tooLarge() {
+    return exprs[0] instanceof final Itr itr1 && exprs[1] instanceof final Itr itr2 &&
+        tooLarge(itr1.itr(), itr2.itr());
+  }
+
+  /**
+   * Indicates if a range yields more items than can be represented.
+   * @param mn minimum
+   * @param mx maximum
+   * @return result of check
+   */
+  private static boolean tooLarge(final long mn, final long mx) {
+    return mn <= mx && mx - mn + 1 <= 0;
   }
 
   @Override

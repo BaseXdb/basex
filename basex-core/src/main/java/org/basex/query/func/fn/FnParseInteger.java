@@ -33,16 +33,24 @@ public final class FnParseInteger extends StandardFunc {
     if(neg != null) string = string.substring(1);
     if(string.isEmpty()) throw INTINVALID_X_X.get(info, rdx, value);
 
+    // accumulate negative value: the range of negative integers is larger
     long res = 0;
+    boolean range = true;
     for(final byte b : Token.token(string)) {
       final int num = b <= '9' ? b - 0x30 : (b & 0xDF) - 0x37;
       if(!(b >= '0' && b <= '9' || b >= 'a' && b <= 'z' || b >= 'A' && b <= 'Z') || num >= rdx)
         throw INTINVALID_X_X.get(info, rdx, value);
 
-      res = res * rdx + num;
-      if(res < 0) throw INTRANGE_X.get(info, value);
+      if(range) {
+        try {
+          res = Math.subtractExact(Math.multiplyExact(res, rdx), num);
+        } catch(final ArithmeticException ex) {
+          range = false;
+        }
+      }
     }
-    return Itr.get(neg == Boolean.TRUE ? -res : res);
+    if(!range || neg != Boolean.TRUE && res == Long.MIN_VALUE) throw INTRANGE_X.get(info, value);
+    return Itr.get(neg == Boolean.TRUE ? res : -res);
   }
 
   @Override

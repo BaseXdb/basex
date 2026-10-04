@@ -103,7 +103,7 @@ public final class FnTrunk extends StandardFunc {
       if(SUBSEQUENCE.is(input) || _UTIL_RANGE.is(input)) {
         final SeqRange r = SeqRange.get(input, cc);
         if(r != null) return cc.function(SUBSEQUENCE, info, input.arg(0),
-            Itr.get(r.start + 1), Itr.get(r.length - 1));
+            Itr.get(r.start + 1), Itr.get(size - 1));
       }
     }
     // trunk(replicate(I, count)) → replicate(I, count - 1)

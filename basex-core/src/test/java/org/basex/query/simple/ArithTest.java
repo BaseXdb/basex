@@ -171,11 +171,23 @@ public final class ArithTest extends SandboxTest {
 
   /** Simplify arithmetic expressions. */
   @Test public void simplify() {
-    check(wrap(1) + "- 1 = 0", true, empty(ArithSimple.class), count(Itr.class, 1));
-    check(wrap(1) + "- 1 = " + wrap(1) + " - 1", true,
-        empty(ArithSimple.class), empty(Itr.class), exists(Cast.class));
-    check(wrap(1) + "- 1 != " + wrap(1) + " - 2", true,
-        count(ArithSimple.class, 1), count(Itr.class, 1));
+    final String i = "xs:integer(" + wrap(1) + ")";
+    check(i + "- 1 = 0", true, empty(ArithSimple.class), count(Itr.class, 1));
+    check(i + "- 1 = " + i + " - 1", true, empty(ArithSimple.class), empty(Itr.class));
+    check(i + "- 1 != " + i + " - 2", true, count(ArithSimple.class, 1), count(Itr.class, 1));
+
+    // untyped values: no rewrite (double arithmetic, decimal comparison)
+    check(wrap(1) + "- 1 = 0", true, exists(ArithSimple.class));
+    query(wrap("1.00000000000000001") + "- 1 = 0", true);
+    query(wrap("1.00000000000000001") + "- 1 = " + wrap(1) + " - 1", true);
+
+    // mixed types: no rewrite
+    query("some $v in (1 to 20) ! (. div 10) satisfies $v = 0.1e0", false);
+    query("(1 to 20)[. div 10 = 0.1e0]", "");
+    query("(1 to 20)[. div 10 = 0.1]", 1);
+    // no rewrite if the new operand exceeds the integer range
+    query("(1 to 3)[. + 1 = -9223372036854775808]", "");
+    query("(1 to 3)[. div 2 = 9223372036854775807]", "");
   }
 
   /** Error in arithmetic calculation result comparison. */
@@ -191,8 +203,11 @@ public final class ArithTest extends SandboxTest {
     check("<x _='1'/>/@* * -2 >  2", false, exists(Arith.class));
     check("<x _='1'/>/@* * -2 <= 2", true, exists(Arith.class));
     check("<x _='1'/>/@* * -2 <  2", true, exists(Arith.class));
-    check("<x _='1'/>/@* * -2  = 2", false, empty(Arith.class));
-    check("<x _='1'/>/@* * -2 != 2", true, empty(Arith.class));
+    check("<x _='1'/>/@* * -2  = 2", false, exists(Arith.class));
+    check("<x _='1'/>/@* * -2 != 2", true, exists(Arith.class));
+    check("<x _='1'/>/@* ! xs:integer(.) * -2  = 2", false, empty(Arith.class));
+    check("<x _='1'/>/@* ! xs:integer(.) * -2 != 2", true, empty(Arith.class));
+    query("<x _='-1.00000000000000001'/>/@* * -2 = 2", true);
   }
 
   /** Unexpected exception, division by zero. */
@@ -220,6 +235,22 @@ public final class ArithTest extends SandboxTest {
     error("-9223372036854775808 idiv -1", RANGE_X);
     error("-9223372036854775807 - 1024", RANGE_X);
     error("-9223372036854775808 - 1", RANGE_X);
+
+    // unsigned long values beyond the integer range
+    error("xs:unsignedLong('18446744073709551615')", INTRANGE_X);
+    error("xs:unsignedLong('9223372036854775808')", INTRANGE_X);
+    final String u = "xs:unsignedLong('9223372036854775807')";
+    error(u + " + 1", RANGE_X);
+    query("+" + u, Long.MAX_VALUE);
+    query("-" + u, -Long.MAX_VALUE);
+    error("round(" + u + ", -1)", RANGE_X);
+
+    // integer range comparisons
+    final String e = "(9223372036854775806, 9223372036854775807, -9223372036854775808)[. != 0]";
+    query("count(" + e + "[. > 9223372036854775807])", 0);
+    query("count(" + e + "[. = 9223372036854775806])", 1);
+    query("count(" + e + "[. < -9223372036854775808])", 0);
+    query("count(" + e + "[. <= 9223372036854775807])", 3);
   }
 
   /** Arithmetics with durations. */
@@ -230,5 +261,26 @@ public final class ArithTest extends SandboxTest {
     query("string(xs:yearMonthDuration('P1Y') * <_>.5</_>)", "P6M");
     query("string(xs:yearMonthDuration('P1Y') div .5)", "P2Y");
     query("string(xs:yearMonthDuration('P1Y') div <_>.5</_>)", "P2Y");
+
+    // overflow
+    query("string(xs:dayTimeDuration('PT1S') * 1e18)", "P11574074074074DT1H46M40S");
+    error("xs:dayTimeDuration('PT1S') * 1e300", SECDURRANGE_X);
+    error("xs:dayTimeDuration('PT1S') div 1e-300", SECDURRANGE_X);
+
+    // exact limits
+    final String ym = "xs:yearMonthDuration('P9223372036854775807M')";
+    query("string(" + ym + ")", "P768614336404564650Y7M");
+    query("string(xs:yearMonthDuration('P768614336404564649Y'))", "P768614336404564649Y");
+    error("xs:yearMonthDuration('P768614336404564650Y8M')", DURRANGE_X_X);
+    query("string(" + ym + " + xs:yearMonthDuration('P0M'))", "P768614336404564650Y7M");
+    error(ym + " + xs:yearMonthDuration('P1M')", MONTHRANGE_X);
+    error("xs:yearMonthDuration('-P9223372036854775807M') - xs:yearMonthDuration('P1M')",
+        MONTHRANGE_X);
+    final String dt = "xs:dayTimeDuration('PT9223372036854775807S')";
+    query("string(" + dt + ")", "P106751991167300DT15H30M7S");
+    error("xs:dayTimeDuration('PT9223372036854775807.5S')", DURRANGE_X_X);
+    query("string(xs:dayTimeDuration('PT9223372036854775806S') + xs:dayTimeDuration('PT1S'))",
+        "P106751991167300DT15H30M7S");
+    error(dt + " + xs:dayTimeDuration('PT1S')", SECDURRANGE_X);
   }
 }

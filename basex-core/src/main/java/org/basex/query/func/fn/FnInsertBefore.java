@@ -6,6 +6,7 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 
 /**
@@ -20,7 +21,7 @@ public final class FnInsertBefore extends StandardFunc {
     return new Iter() {
       final Iter input = arg(0).iter(qc), insert = arg(2).iter(qc);
       final long osize = input.size(), isize = insert.size();
-      final long size = osize != -1 && isize != -1 ? osize + isize : -1;
+      final long size = Seq.size(osize, isize, info);
       final long ps = pos(qc), pos = osize != -1 ? Math.min(ps, osize) : ps;
       long p = pos;
       boolean last;
@@ -83,7 +84,7 @@ public final class FnInsertBefore extends StandardFunc {
       if(size != -1 && ps >= size) return List.get(cc, info, input, insert);
     }
 
-    final long sz = size != -1 && sizeInsert != -1 ? size + sizeInsert : -1;
+    final long sz = Seq.size(size, sizeInsert);
     exprType.assign(st.union(stInsert), st.occ.add(stInsert.occ), sz).data(input, insert);
 
     return this;

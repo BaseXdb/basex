@@ -40,6 +40,12 @@ public final class SubSeq extends Seq {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return this == obj || (obj instanceof final SubSeq ss ? start == ss.start &&
+        size == ss.size && sub.equals(ss.sub) : super.equals(obj));
+  }
+
+  @Override
   public Value shrink(final QueryContext qc) throws QueryException {
     return rebuild(qc);
   }

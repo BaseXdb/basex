@@ -119,13 +119,9 @@ public class Dur extends ADateDur {
       throws QueryException {
     final long y = mt.group(2) != null ? toLong(mt.group(3), true, info) : 0;
     final long m = mt.group(4) != null ? toLong(mt.group(5), true, info) : 0;
+    if(y > (Long.MAX_VALUE - m) / 12) throw DURRANGE_X_X.get(info, type, vl);
     months = y * 12 + m;
-    double v = y * 12.0d + m;
-    if(!mt.group(1).isEmpty()) {
-      months = -months;
-      v = -v;
-    }
-    if(v <= Long.MIN_VALUE || v >= Long.MAX_VALUE) throw DURRANGE_X_X.get(info, type, vl);
+    if(!mt.group(1).isEmpty()) months = -months;
   }
 
   /**
@@ -148,8 +144,7 @@ public class Dur extends ADateDur {
         add(BigDecimal.valueOf(h).multiply(BD_3600)).
         add(BigDecimal.valueOf(m).multiply(BD_60));
     if(!match.group(1).isEmpty()) seconds = seconds.negate();
-    final double v = seconds.doubleValue();
-    if(v <= Long.MIN_VALUE || v >= Long.MAX_VALUE) throw DURRANGE_X_X.get(info, type, value);
+    if(!secondsInRange()) throw DURRANGE_X_X.get(info, type, value);
   }
 
   @Override
@@ -189,6 +184,14 @@ public class Dur extends ADateDur {
    */
   final BigDecimal totalSeconds() {
     return seconds == null ? BigDecimal.ZERO : seconds;
+  }
+
+  /**
+   * Checks if the seconds component is within the supported range.
+   * @return result of check
+   */
+  final boolean secondsInRange() {
+    return seconds.abs().compareTo(BD_MAXLONG) <= 0;
   }
 
   /**

@@ -11,6 +11,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
+import org.basex.util.*;
 
 /**
  * An XQuery main module.
@@ -77,7 +78,12 @@ public class MainModule extends AModule {
       @Override
       public Item next() throws QueryException {
         if(more) {
-          final Item item = iter.next();
+          final Item item;
+          try {
+            item = iter.next();
+          } catch(final StackOverflowError | ArraySizeException ex) {
+            throw QueryError.limitError(ex, null);
+          }
           if(item != null) return item;
           more = false;
           vs.exit(fp, qc);
@@ -94,7 +100,11 @@ public class MainModule extends AModule {
       }
       @Override
       public Value value(final QueryContext q, final Expr ex) throws QueryException {
-        return iter.value(qc, ex);
+        try {
+          return iter.value(qc, ex);
+        } catch(final StackOverflowError | ArraySizeException th) {
+          throw QueryError.limitError(th, null);
+        }
       }
     };
   }

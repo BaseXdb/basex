@@ -187,6 +187,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
    */
   public final Value insert(final long pos, final Value value, final Job job) {
     final long size = size(), vsize = value.size();
+    if(Seq.size(size, vsize) == -1) throw new ArraySizeException(size, vsize);
     return size == 0 ? value :
            vsize == 0 ? this :
            pos == size && size < vsize ? value.insertValue(0, this, job) :
@@ -315,9 +316,6 @@ public abstract class Value extends Expr implements Iterable<Item> {
       throw ex;
     } catch(final IOException ex) {
       throw SERPARAM_X.getIO(ex);
-    } catch(final ArrayIndexOutOfBoundsException ex) {
-      // might occur if serialized result is too large
-      throw BASEX_ERROR_X.getIO(ex.getLocalizedMessage()).cause(ex);
     }
     return ao;
   }

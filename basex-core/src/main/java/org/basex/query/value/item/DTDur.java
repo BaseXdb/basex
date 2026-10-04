@@ -52,6 +52,17 @@ public final class DTDur extends Dur {
 
   /**
    * Constructor.
+   * @param seconds seconds
+   * @param info input info (can be {@code null})
+   * @throws QueryException query exception
+   */
+  public DTDur(final BigDecimal seconds, final InputInfo info) throws QueryException {
+    this(seconds);
+    checkSeconds(info);
+  }
+
+  /**
+   * Constructor.
    * @param value value
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
@@ -78,8 +89,7 @@ public final class DTDur extends Dur {
       throws QueryException {
     this(dur);
     seconds = plus ? seconds.add(add.seconds) : seconds.subtract(add.seconds);
-    final double d = seconds.doubleValue();
-    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw SECDURRANGE_X.get(info, d);
+    checkSeconds(info);
   }
 
   /**
@@ -95,6 +105,7 @@ public final class DTDur extends Dur {
     this(dur);
     checkFactor(factor, mult, type, info);
     seconds = scaleSeconds(seconds, factor, mult);
+    checkSeconds(info);
   }
 
   /**
@@ -111,8 +122,16 @@ public final class DTDur extends Dur {
     // resolve the implicit timezone once, and only if an operand is missing one
     final int implicit = date.hasTz() && sub.hasTz() ? 0 : ADate.implicitTz(qc);
     seconds = date.toSeconds(implicit).subtract(sub.toSeconds(implicit));
-    final double d = seconds.doubleValue();
-    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw SECRANGE_X.get(info, d);
+    if(!secondsInRange()) throw SECRANGE_X.get(info, seconds.doubleValue());
+  }
+
+  /**
+   * Checks if the seconds are within the supported range.
+   * @param info input info (can be {@code null})
+   * @throws QueryException query exception
+   */
+  private void checkSeconds(final InputInfo info) throws QueryException {
+    if(!secondsInRange()) throw SECDURRANGE_X.get(info, seconds.doubleValue());
   }
 
   @Override

@@ -50,9 +50,8 @@ public final class FnItemsAt extends StandardFunc {
     final Item pos = at.atomItem(qc, info);
     if(!pos.isEmpty()) {
       // retrieve (possibly invalid) position
-      final double d = toDouble(pos, at) - 1;
-      long l = (long) d;
-      if(l >= 0 && d == l) {
+      long l = Pos.position(toNumber(pos, at)) - 1;
+      if(l >= 0) {
         // retrieve single item
         final Expr input = arg(0);
         if(input.seqType().zeroOrOne()) {
@@ -98,10 +97,9 @@ public final class FnItemsAt extends StandardFunc {
       @Override
       public Item next() throws QueryException {
         for(Item item; (item = qc.next(iter)) != null;) {
-          final double d = toDouble(item, at) - 1;
-          final long l = (long) d;
+          final long l = Pos.position(toNumber(item, at)) - 1;
           if(l < size) {
-            if(l >= 0 && d == l) return input.itemAt(l);
+            if(l >= 0) return input.itemAt(l);
           } else if(sorted) {
             break;
           }
@@ -124,9 +122,8 @@ public final class FnItemsAt extends StandardFunc {
 
       if(at instanceof Item) {
         // check for fractional or negative number
-        final double d = toDouble(at, cc.qc) - 1;
-        final long l = (long) d;
-        if(d != l || l < 0) return Empty.VALUE;
+        final long l = Pos.position(toNumber((Item) at)) - 1;
+        if(l < 0) return Empty.VALUE;
         // single expression with static position
         if(ist.zeroOrOne()) return l == 0 ? input : Empty.VALUE;
 

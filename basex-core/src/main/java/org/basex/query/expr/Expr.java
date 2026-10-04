@@ -546,7 +546,7 @@ public abstract class Expr extends ExprInfo {
   /**
    * Tries to merge two expressions that are part of an EBV test.
    * Called by {@link And}, {@link Or}), {@link Step} and {@link Filter}.
-   * Overwritten by {@link CmpG}, {@link CmpIR}, {@link CmpR}, {@link CmpSR},
+   * Overwritten by {@link CmpG}, {@link CmpRange},
    * {@link IntPos}, {@link SimplePos} and others.
    * @param expr second expression
    * @param or union or intersection
@@ -634,8 +634,7 @@ public abstract class Expr extends ExprInfo {
    *   <li>{@link If#optimize(CompileContext)}, {@link Switch#optimize(CompileContext)},
    *     {@link Typeswitch#optimize(CompileContext)}, in order to discard identical expressions.
    *   </li>
-   *   <li>{@link CmpR#mergeEbv(Expr, boolean, CompileContext)} or
-   *     {@link CmpSR#mergeEbv(Expr, boolean, CompileContext)},
+   *   <li>{@link CmpRange#mergeEbv(Expr, boolean, CompileContext)},
    *     in order to merge expressions with identical input.
    *   </li>
    *   <li>{@link CmpG#optimize(CompileContext)} or {@link CmpV#optimize(CompileContext)},

@@ -1,11 +1,14 @@
 package org.basex.query.func.fn;
 
+import java.math.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 
 /**
@@ -21,8 +24,17 @@ public final class FnIndexOf extends StandardFunc {
     final Item search = toAtomItem(arg(1), qc);
     final Collation collation = toCollation(arg(2), qc);
 
+    // range sequence: compute position of integer
+    if(input.eagerValue() instanceof final RangeSeq rs && search instanceof final ANum num) {
+      final BigDecimal bd = num.integer();
+      if(bd == null || bd.compareTo(BigDecimal.valueOf(rs.min())) < 0 ||
+          bd.compareTo(BigDecimal.valueOf(rs.max())) > 0) return Empty.ITER;
+      final long l = bd.longValue();
+      return Itr.get(rs.ascending() ? l - rs.min() + 1 : rs.max() - l + 1).iter();
+    }
+
     return new Iter() {
-      int c;
+      long c;
 
       @Override
       public Itr next() throws QueryException {

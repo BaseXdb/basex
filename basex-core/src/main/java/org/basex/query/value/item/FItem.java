@@ -188,7 +188,8 @@ public abstract class FItem extends Item implements XQFunction {
   @Override
   public final boolean equals(final Object obj) {
     try {
-      return obj instanceof final FItem fitem && deepEqual(fitem, null);
+      return obj instanceof final FItem fitem && annotations().equals(fitem.annotations()) &&
+          deepEqual(fitem, null);
     } catch(final QueryException ex) {
       Util.debug(ex);
       return false;

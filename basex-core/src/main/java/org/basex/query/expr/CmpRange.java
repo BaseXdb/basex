@@ -86,4 +86,21 @@ public abstract class CmpRange extends Single {
    * @throws QueryException query exception
    */
   abstract Expr with(Expr operand, CompileContext cc) throws QueryException;
+
+  @Override
+  public final Expr mergeEbv(final Expr ex, final boolean or, final CompileContext cc)
+      throws QueryException {
+    // intersections of sequences: (0, 10) > 5 and (0, 10) < 3 must not yield false
+    return (or || single) && expr.equals(ex.arg(0)) ? merge(ex, or, cc) : null;
+  }
+
+  /**
+   * Merges this comparison with another expression on the same operand.
+   * @param ex second expression
+   * @param or union or intersection
+   * @param cc compilation context
+   * @return merged expression or {@code null}
+   * @throws QueryException query exception
+   */
+  abstract Expr merge(Expr ex, boolean or, CompileContext cc) throws QueryException;
 }

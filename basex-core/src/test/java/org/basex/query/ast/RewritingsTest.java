@@ -2273,7 +2273,9 @@ public final class RewritingsTest extends SandboxTest {
 
   /** Bug of operation on non-existing attribute. */
   @Test public void gh2190() {
-    check("<x/>[@a >= 0 or @a <= 0]", "", empty(Or.class), empty(EXISTS));
+    // untyped values: no merge (NaN satisfies neither comparison)
+    check("<x/>[@a >= 0 or @a <= 0]", "", empty(EXISTS));
+    query("<x a='NaN'/>[@a >= 0 or @a <= 0]", "");
     check("<x/>[xs:integer(@a) >= 0 or xs:integer(@a) <= 0]", "", empty(Or.class), exists(EXISTS));
 
     check("<x/>[position() >= 0 or position() <= 0]", "<x/>", root(CElem.class));
@@ -2581,6 +2583,18 @@ public final class RewritingsTest extends SandboxTest {
     query("count(" + same + ") = count(distinct-values(" + same + "))", true);
     query("count(distinct-values(" + same + ")) = count(" + same + ")", true);
     query("count(distinct-values(" + two + ")) = 1", false);
+  }
+
+  /** Comparing huge lazy sequences when merging list operands. */
+  @Test public void equalHugeSequences() {
+    final String half = "0x3FFFFFFFFFFFFFFF", max = "0x7FFFFFFFFFFFFFFF";
+    query("count(((1 to " + half + ") ! ('x' || .), (1 to " + half + ") ! ('y' || .)))",
+        "9223372036854775806");
+    error("count(((1 to " + max + ") ! ('x' || .), (1 to " + max + ") ! ('y' || .)))",
+        MAX_SIZE_X_X);
+
+    final String sub = SUBSEQUENCE.args(REPLICATE.args(" ('a', 'b')", " 0x1FFFFFFFFFFFFFFF"), 2);
+    query("count((" + sub + ", " + sub + "))", "9223372036854775802");
   }
 
   /** Function items with different names or return types must not be merged. */

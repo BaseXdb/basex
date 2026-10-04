@@ -3,6 +3,8 @@ package org.basex.query.expr;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
+import java.util.function.*;
+
 import org.basex.*;
 import org.basex.query.expr.constr.*;
 import org.basex.query.expr.gflwor.*;
@@ -77,12 +79,70 @@ public final class ExprTest extends SandboxTest {
     check("1[let $p := position() return $p = (-5 to -1)]", "", empty());
   }
 
+  /** General comparisons of untyped values and numbers (cast to the type of the number). */
+  @Test public void untypedNumbers() {
+    final String[] untyped = { "<a>NUMBER</a>", "(<a>NUMBER</a>)[random:double() < 2]" };
+    for(final String u : untyped) {
+      final UnaryOperator<String> a = n -> u.replace("NUMBER", n);
+      query(a.apply("1.1") + " = 1.1", true);
+      query(a.apply("0.1") + " = 0.1e0", true);
+      query(a.apply("0.1") + " = xs:float(0.1)", true);
+      query(a.apply("0.30000000000000001") + " = 0.3", false);
+      // real integer limits as range bounds
+      query(a.apply("-1e300") + " = (-9223372036854775808 to -9223372036854775800)", false);
+      query(a.apply("-1e300") + " >= -9223372036854775808", false);
+      query(a.apply("1e300") + " <= 9223372036854775807", false);
+      query(a.apply("0.30000000000000001") + " > 0.3", true);
+      query(a.apply("0.30000000000000001") + " = 0.3e0", true);
+      query(a.apply("9223372036854775807") + " > 9223372036854775806", true);
+      query(a.apply("9223372036854775807") + " = 9223372036854775806", false);
+      query(a.apply("5.0000000000000001") + " > 5", true);
+      query(a.apply("5.0000000000000001") + " <= 5", false);
+      query("5 < " + a.apply("5.0000000000000001"), true);
+      query(a.apply("5.0000000000000001") + " = (5, 6, 7)", false);
+      query(a.apply("5.0") + " = (5, 6, 7)", true);
+      query(a.apply("1e0") + " = 1", true);
+      query(a.apply("INF") + " > 5", true);
+      query(a.apply("NaN") + " != 5", true);
+      query(a.apply("NaN") + " < 5", false);
+      query(a.apply("5.0000000000000001") + "[. <= 5][. = 5]", "");
+      query(a.apply("5.0000000000000001") + "[. > 5][. < 6] => count()", 1);
+      error(a.apply("abc") + " > 5", FUNCCAST_X_X);
+    }
+  }
+
+  /** Comparisons of mixed numeric types (without loss of precision). */
+  @Test public void mixedNumbers() {
+    final String[] doubles = { "D", "(D)[random:double() < 2]" };
+    for(final String d : doubles) {
+      final UnaryOperator<String> a = n -> d.replace("D", n);
+      query(a.apply("0.1e0") + " = 0.1", false);
+      query(a.apply("0.1e0") + " > 0.1", true);
+      query(a.apply("0.5e0") + " = 0.5", true);
+      query(a.apply("xs:float(0.1)") + " = 0.1e0", false);
+      query(a.apply("xs:float(0.1)") + " > 0.1", true);
+      query(a.apply("9007199254740992e0") + " < 9007199254740993", true);
+      query(a.apply("9007199254740992e0") + " = 9007199254740993", false);
+      query(a.apply("1e0") + " >= 1.0000000000000001", false);
+      query(a.apply("0.1e0") + " = (0.1, 0.2)", false);
+    }
+    query("compare(0.1e0, 0.1)", 1);
+    query("compare(9223372036854775807, 9.223372036854775807E18)", -1);
+  }
+
   /** Checks {@link CmpR} optimizations. */
   @Test public void cmpR() {
     final Class<CmpR> cmpr = CmpR.class;
-    check("<a>5</a>[text() > 1 and text() < 9]", "<a>5</a>", count(cmpr, 1));
-    check("<a>5</a>[text() > 1 and text() < 9 and <b/>]", "<a>5</a>", count(cmpr, 1));
+    check("<a x='5'/>[@x > 1 and @x < 9]", "<a x=\"5\"/>", count(cmpr, 1));
+    check("<a x='5'/>[@x > 1 and @x < 9 and <b/>]", "<a x=\"5\"/>", count(cmpr, 1));
     check("<a>5</a>[text() > 1 and . < 9]", "<a>5</a>", count(cmpr, 2));
+    // operands with multiple items: no intersection
+    check("<a>5</a>[text() > 1 and text() < 9]", "<a>5</a>", count(cmpr, 2));
+    check("<a>0<b/>10</a>[text() > 5 and text() < 3]", "<a>0<b/>10</a>", count(cmpr, 2));
+    query("let $s := (<a>0</a>, <a>10</a>) return $s > 5 and $s < 3", true);
+    query("let $s := (<a>0</a>, <a>10</a>) return $s > 0.1 and $s = 0", true);
+    query("let $s := (0, 10)[. >= " + _RANDOM_INTEGER.args(1) + "] return $s > 5 and $s < 3",
+        true);
 
     // GH-1744
     check("<a>5</a>[text() < 5 or text() > 5]", "", count(cmpr, 2));
@@ -112,7 +172,7 @@ public final class ExprTest extends SandboxTest {
     check(wrap("1.1") + ">= 1.1", true, exists(cmpr));
     check("(0e0, 1e0)[. = 1] >= 1.0", true, exists(cmpr));
     check("(0e0, 1e0)[. = 1] >= 1.000000000000001", false, exists(cmpr));
-    check("(0e0, 1e0)[. = 1] >= 1.0000000000000001", true, exists(cmpr));
+    check("(0e0, 1e0)[. = 1] >= 1.0000000000000001", false, exists(cmpr));
 
     // do not rewrite decimal/double comparisons
     check("(0, 1)[. = 1] >= 1.0", true, empty(cmpr));
@@ -219,8 +279,12 @@ public final class ExprTest extends SandboxTest {
 
   /** Checks {@link CmpSR} optimizations. */
   @Test public void cmpSR() {
-    check("<a>5</a>[text() > '1' and text() < '9']", "<a>5</a>", count(CmpSR.class, 1));
-    check("<a>5</a>[text() > '1' and text() < '9' and <b/>]", "<a>5</a>", count(CmpSR.class, 1));
+    check("<a x='5'/>[@x > '1' and @x < '9']", "<a x=\"5\"/>", count(CmpSR.class, 1));
+    check("<a x='5'/>[@x > '1' and @x < '9' and <b/>]", "<a x=\"5\"/>", count(CmpSR.class, 1));
+    // operands with multiple items: no intersection
+    check("<a>5</a>[text() > '1' and text() < '9']", "<a>5</a>", count(CmpSR.class, 2));
+    check("<a>a<b/>z</a>[text() > 'm' and text() < 'c']", "<a>a<b/>z</a>",
+        count(CmpSR.class, 2));
     check("<a>5</a>[text() > '1' and . < '9']", "<a>5</a>", count(CmpSR.class, 2));
 
     // flatten predicate: exists(E[text() > '1']) → E/text() > '1'
@@ -316,8 +380,31 @@ public final class ExprTest extends SandboxTest {
     query("count((1 to 10) ! (. to . + 9))", 100);
     query("count((1 to 10) ! (. to . - -9))", 100);
     query("count((1 to 100_000) ! (. to . + 9_999))", 1_000_000_000);
-    query("count((-9223372036854775807 - 1) to 9223372036854775807)", Long.MAX_VALUE);
-    query("head((-9223372036854775807 - 1) to 9223372036854775807)", Long.MIN_VALUE);
+    // ranges with more than 2^63-1 items cannot be materialized
+    error("count(-9223372036854775808 to 9223372036854775807)", MAX_SIZE_X_X);
+    error("head(-9223372036854775808 to 9223372036854775807)", MAX_SIZE_X_X);
+    error("count(-9223372036854775808 to 0)", MAX_SIZE_X_X);
+    query("count(-9223372036854775808 to -2)", Long.MAX_VALUE);
+    query("count(1 to 9223372036854775807)", Long.MAX_VALUE);
+    query("(1 to 9223372036854775807)[last()]", Long.MAX_VALUE);
+    query("(-9223372036854775808 to -2)[last()]", -2);
+    // ... but their bounds can be used for positional tests
+    query("(1 to 3)[position() = -9223372036854775808 to 2]", "1\n2");
+    query("(1 to 3)[position() = -9223372036854775808 to 9223372036854775807]", "1\n2\n3");
+
+    // general comparisons with large ranges are computed from the bounds
+    final String big = "(1 to 9223372036854775807)";
+    query("9223372036854775806 = " + big, true);
+    query("9223372036854775806.5 = " + big, false);
+    query("9.223372036854775807E18 = " + big, false);
+    query("9.223372036854775807E18 > " + big, true);
+    query("9007199254740992e0 = " + big, true);
+    query(big + " < 0", false);
+    query(big + " >= 9223372036854775807", true);
+    query(big + " != 1", true);
+    query("(5 to 5) != 5.0", false);
+    query("xs:double('NaN') != " + big, true);
+    query("xs:double('NaN') = " + big, false);
 
     // operand is xs:integer? and empty at runtime, so the range is empty
     final String h = "head((1 to 10)[. > 100])";

@@ -477,24 +477,19 @@ public enum BasicType implements Type {
   /** Unsigned long type. */
   UNSIGNED_LONG("unsignedLong", NON_NEGATIVE_INTEGER, Type.ID.ULN, true, false) {
     @Override
-    public Uln cast(final Item item, final QueryContext qc, final InputInfo info)
+    public Itr cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
       return cast((Object) item, qc, info);
     }
     @Override
-    public Uln cast(final Object value, final QueryContext qc, final InputInfo info)
+    public Itr cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-
-      final Item item = checkNum(value, info);
-      final BigDecimal v = item.dec(info), i = v.setScale(0, RoundingMode.DOWN);
-      // equals() used to also test fractional digits
-      if(v.signum() < 0 || v.compareTo(Uln.MAXULN) > 0 ||
-        item.type.isStringOrUntyped() && !v.equals(i)) throw castError(item, info);
-      return new Uln(i.toBigInteger());
+      return new Itr(checkLong(value, 0, Long.MAX_VALUE, info), this);
     }
     @Override
-    public Uln read(final DataInput in, final QueryContext qc) throws IOException {
-      return new Uln(new BigInteger(string(in.readToken())));
+    public Itr read(final DataInput in, final QueryContext qc) throws IOException {
+      // incompatible with BaseX 12 and earlier, which persisted unsigned longs as string tokens
+      return Itr.get(in.readLong(), this);
     }
   },
 
@@ -1144,17 +1139,58 @@ public enum BasicType implements Type {
       throws QueryException {
 
     final Item item = checkNum(value, info);
+    final long l;
     if(item.type.oneOf(DOUBLE, FLOAT)) {
       final double d = item.dbl(info);
       if(!Double.isFinite(d)) throw valueError(this, item.string(info), info);
-      if(min != max && (d < min || d > max)) throw castError(item, info);
-      if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) throw INTRANGE_X.get(info, d);
-      return (long) d;
+      if(d < Long.MIN_VALUE || d >= 0x1p63) {
+        throw valid(new BigDecimal(d)) ? INTRANGE_X.get(info, item) : castError(item, info);
+      }
+      l = (long) d;
+    } else if(item instanceof Dec) {
+      final BigDecimal bd = item.dec(info).setScale(0, RoundingMode.DOWN);
+      if(bd.compareTo(Dec.BD_MINLONG) < 0 || bd.compareTo(Dec.BD_MAXLONG) > 0) {
+        throw valid(bd) ? INTRANGE_X.get(info, item) : castError(item, info);
+      }
+      l = bd.longValue();
+    } else if(item.type.isStringOrUntyped()) {
+      l = parseLong(item.string(info), info);
+    } else {
+      l = item.itr(info);
     }
-
-    final long l = item.itr(info);
     if(min != max && (l < min || l > max)) throw castError(item, info);
     return l;
+  }
+
+  /**
+   * Converts a string to a long value.
+   * @param token string to be converted
+   * @param info input info (can be {@code null})
+   * @return long value
+   * @throws QueryException query exception
+   */
+  public final long parseLong(final byte[] token, final InputInfo info) throws QueryException {
+    final long l = Token.toLong(token);
+    if(l != Long.MIN_VALUE) return l;
+    final byte[] trimmed = Token.trim(token);
+    if(Token.eq(trimmed, Token.MIN_LONG)) return l;
+    final BigDecimal bd = Token.contains(trimmed, '.') ? null : Dec.parse(trimmed, info, false);
+    throw bd != null && valid(bd) ? INTRANGE_X.get(info, trimmed) : castError(token, info);
+  }
+
+  /**
+   * Checks if an integer that exceeds the long range is in the value space of this type.
+   * @param value integer value
+   * @return result of check
+   */
+  private boolean valid(final BigDecimal value) {
+    return switch(this) {
+      case INTEGER -> true;
+      case NON_POSITIVE_INTEGER, NEGATIVE_INTEGER -> value.signum() < 0;
+      case NON_NEGATIVE_INTEGER, POSITIVE_INTEGER -> value.signum() > 0;
+      case UNSIGNED_LONG -> value.signum() > 0 && value.compareTo(Dec.BD_MAXULN) <= 0;
+      default -> false;
+    };
   }
 
   /**
@@ -1170,6 +1206,7 @@ public enum BasicType implements Type {
         if(val.size() != 1) throw typeError(val, this, info);
         yield (Item) val;
       }
+      case final BigInteger bi -> Dec.get(new BigDecimal(bi));
       case final Number num -> num instanceof Double || num instanceof Float ?
         Dbl.get(num.doubleValue()) : Itr.get(num.longValue());
       case final Character ch -> Itr.get(ch);

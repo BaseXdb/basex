@@ -3,6 +3,8 @@ package org.basex.query.expr;
 import static java.lang.Long.*;
 import static org.basex.query.QueryText.*;
 
+import java.math.*;
+
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.func.*;
@@ -90,11 +92,14 @@ public final class CmpIR extends CmpRange {
       return cmp;
     }
 
+    // MIN_VALUE/MAX_VALUE indicate unbounded limits: skip rewrite if they are real bounds
+    if(mn == MIN_VALUE && (cmp.op == CmpOp.EQ || cmp.op == CmpOp.GE) ||
+       mx == MAX_VALUE && (cmp.op == CmpOp.EQ || cmp.op == CmpOp.LE)) return cmp;
     switch(cmp.op) {
       case GE: mx = MAX_VALUE; break;
-      case GT: mn++; mx = MAX_VALUE; break;
+      case GT: if(mn == MAX_VALUE) return cmp; mn++; mx = MAX_VALUE; break;
       case LE: mn = MIN_VALUE; break;
-      case LT: mn = MIN_VALUE; mx--; break;
+      case LT: if(mx == MIN_VALUE) return cmp; mn = MIN_VALUE; mx--; break;
       case EQ: break;
       default: return cmp;
     }
@@ -116,8 +121,20 @@ public final class CmpIR extends CmpRange {
 
   @Override
   boolean inRange(final Item item) throws QueryException {
-    final double value = item.dbl(info);
-    return value >= min && value <= max && value == (long) value;
+    // untyped values are cast to integers or decimals (or doubles, if this fails)
+    final ANum num = ANum.decimal(item, info);
+    if(num instanceof final Itr itr) {
+      final long value = itr.itr();
+      return value >= min && value <= max;
+    }
+    // other numbers: exact comparison
+    final BigDecimal value = num.integer();
+    if(value == null) return false;
+    // values beyond the integer range: only included if bound is unbounded
+    if(value.compareTo(Dec.BD_MAXLONG) > 0) return max == MAX_VALUE;
+    if(value.compareTo(Dec.BD_MINLONG) < 0) return min == MIN_VALUE;
+    final long l = value.longValue();
+    return l >= min && l <= max;
   }
 
   @Override
@@ -126,7 +143,7 @@ public final class CmpIR extends CmpRange {
   }
 
   @Override
-  public Expr mergeEbv(final Expr ex, final boolean or, final CompileContext cc)
+  Expr merge(final Expr ex, final boolean or, final CompileContext cc)
       throws QueryException {
 
     Long newMin = null, newMax = null;
@@ -138,8 +155,7 @@ public final class CmpIR extends CmpRange {
       newMin = itr.itr();
       newMax = newMin;
     }
-    if(newMin == null || !expr.equals(ex.arg(0)) || or && (max < newMin || min > newMax))
-      return null;
+    if(newMin == null || or && (max < newMin || min > newMax)) return null;
 
     // determine common minimum and maximum value
     newMin = or ? Math.min(min, newMin) : Math.max(min, newMin);

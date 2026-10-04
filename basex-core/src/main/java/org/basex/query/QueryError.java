@@ -3,6 +3,8 @@ package org.basex.query;
 import static org.basex.query.QueryError.ErrType.*;
 import static org.basex.query.QueryText.*;
 
+import java.math.*;
+
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
@@ -1690,6 +1692,37 @@ public enum QueryError {
   public static QueryException get(final String name, final String msg, final InputInfo info) {
     final QueryError err = Enums.get(QueryError.class, name);
     return err != null ? new QueryException(info, err.qname(), msg).error(err) : null;
+  }
+
+  /**
+   * Returns an exception for an exceeded maximum array size.
+   * @param ex array size exception
+   * @param info input info (can be {@code null})
+   * @return query exception
+   */
+  public static QueryException sizeError(final ArraySizeException ex, final InputInfo info) {
+    return MAX_SIZE_X_X.get(info, ex.max, ex.size).cause(ex);
+  }
+
+  /**
+   * Returns an exception for a stack overflow or an exceeded maximum array size.
+   * @param ex stack overflow error or array size exception
+   * @param info input info (can be {@code null})
+   * @return query exception
+   */
+  public static QueryException limitError(final Throwable ex, final InputInfo info) {
+    return ex instanceof final ArraySizeException ase ? sizeError(ase, info) :
+      BASEX_OVERFLOW.get(info).cause(ex);
+  }
+
+  /**
+   * Returns an exception for a sequence size that exceeds the integer range.
+   * @param size requested size
+   * @param info input info (can be {@code null})
+   * @return query exception
+   */
+  public static QueryException sizeError(final BigInteger size, final InputInfo info) {
+    return MAX_SIZE_X_X.get(info, Long.MAX_VALUE, size);
   }
 
   /**

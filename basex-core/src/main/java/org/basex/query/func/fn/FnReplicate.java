@@ -3,6 +3,8 @@ package org.basex.query.func.fn;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
+import java.math.*;
+
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
@@ -54,7 +56,9 @@ public final class FnReplicate extends StandardFunc {
    * @throws QueryException query exception
    */
   private Value singleton(final Value value, final long count) throws QueryException {
-    if(!Util.inBounds(value.size(), count)) throw RANGE_X.get(info, value.size() + " * " + count);
+    if(!Util.inBounds(value.size(), count)) {
+      throw sizeError(BigInteger.valueOf(value.size()).multiply(BigInteger.valueOf(count)), info);
+    }
     return SingletonSeq.get(value, count);
   }
 

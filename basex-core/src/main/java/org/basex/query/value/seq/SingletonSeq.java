@@ -133,6 +133,12 @@ public final class SingletonSeq extends Seq {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return this == obj || (obj instanceof final SingletonSeq ss ? size == ss.size &&
+        value.equals(ss.value) : super.equals(obj));
+  }
+
+  @Override
   public String description() {
     return "singleton " + super.description();
   }

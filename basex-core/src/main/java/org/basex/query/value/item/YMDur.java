@@ -42,9 +42,10 @@ public final class YMDur extends Dur {
       throws QueryException {
 
     this(value);
-    final double d = (double) months + (plus ? dur.months : -dur.months);
-    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw MONTHRANGE_X.get(info, d);
-    months += plus ? dur.months : -dur.months;
+    final long add = plus ? dur.months : -dur.months, m = Util.add(months, add);
+    // overflow, or minimum value (cannot be negated)
+    if(m == Long.MIN_VALUE) throw MONTHRANGE_X.get(info, (double) months + add);
+    months = m;
   }
 
   /**

@@ -59,8 +59,7 @@ public abstract class ANum extends Item {
       if(n1 || n2) return n1 == n2;
       if(Double.isInfinite(d1) || Double.isInfinite(d2)) return d1 == d2;
       // floating-point numbers are exact double values
-      if((this instanceof Dbl || this instanceof Flt) &&
-          (item instanceof Dbl || item instanceof Flt)) return d1 == d2;
+      if(floating() && ((ANum) item).floating()) return d1 == d2;
       return dec(null).compareTo(item.dec(null)) == 0;
     }
     return false;
@@ -130,6 +129,53 @@ public abstract class ANum extends Item {
   }
 
   /**
+   * Converts an untyped value to an integer or decimal or, if this fails, to a double.
+   * @param string string
+   * @param ii input info (can be {@code null})
+   * @return number
+   * @throws QueryException query exception
+   */
+  public static ANum decimal(final byte[] string, final InputInfo ii) throws QueryException {
+    final long l = Token.toLong(string);
+    if(l != Long.MIN_VALUE) return Itr.get(l);
+    final BigDecimal bd = Dec.parse(string, ii, false);
+    return bd != null ? Dec.get(bd) : Dbl.get(Dbl.parse(string, ii));
+  }
+
+  /**
+   * Returns the numeric value of an item, converting untyped values to integers or decimals.
+   * @param item item
+   * @param ii input info (can be {@code null})
+   * @return number
+   * @throws QueryException query exception
+   */
+  public static ANum decimal(final Item item, final InputInfo ii) throws QueryException {
+    return item instanceof final ANum num ? num : decimal(item.string(ii), ii);
+  }
+
+  /**
+   * Checks if this is a floating-point number.
+   * @return result of check
+   */
+  public final boolean floating() {
+    return this instanceof Dbl || this instanceof Flt;
+  }
+
+  /**
+   * Returns the exact integer value of this number.
+   * @return integer value, or {@code null} if the number is fractional, NaN or infinite
+   * @throws QueryException query exception
+   */
+  public final BigDecimal integer() throws QueryException {
+    if(floating()) {
+      final double d = dbl();
+      if(!Double.isFinite(d) || d != Math.rint(d)) return null;
+    }
+    final BigDecimal bd = dec(null);
+    return bd.scale() <= 0 || bd.stripTrailingZeros().scale() <= 0 ? bd : null;
+  }
+
+  /**
    * Compares a number with the numeric value of an item.
    * @param item value to be compared
    * @param transitive transitive comparison
@@ -139,16 +185,16 @@ public abstract class ANum extends Item {
    */
   final int compare(final Item item, final boolean transitive, final InputInfo ii)
       throws QueryException {
-    // if possible, compare numbers as long values
+    // untyped value: cast to primitive type of this number (decimal: if possible)
     final Item num2;
     if(item.type.isUntyped()) {
       final byte[] string = item.string(ii);
-      final long l = Token.toLong(string);
-      if(l != Long.MIN_VALUE) {
-        num2 = Itr.get(l);
+      if(this instanceof Dbl) {
+        num2 = Dbl.get(Dbl.parse(string, ii));
+      } else if(this instanceof Flt) {
+        num2 = Flt.get(Flt.parse(string, ii));
       } else {
-        final BigDecimal bd = Dec.parse(string, ii, false);
-        num2 = bd != null ? Dec.get(bd) : Dbl.get(Dbl.parse(string, ii));
+        num2 = decimal(string, ii);
       }
     } else {
       num2 = item;
@@ -156,7 +202,7 @@ public abstract class ANum extends Item {
 
     if(num2 instanceof final Itr itr2) {
       if(this instanceof Itr) return Long.compare(itr(), itr2.itr());
-    } else if(num2 instanceof Dbl || num2 instanceof Flt) {
+    } else if(num2 instanceof final ANum n && n.floating()) {
       final double d = num2.dbl(ii);
       if(!Double.isFinite(d)) {
         return d == Double.NEGATIVE_INFINITY ? 1 : d == Double.POSITIVE_INFINITY ? -1 :
@@ -193,20 +239,20 @@ public abstract class ANum extends Item {
   }
 
   @Override
-  public final Expr optimizePos(final CmpOp op, final CompileContext cc) {
+  public final Expr optimizePos(final CmpOp op, final CompileContext cc) throws QueryException {
     final double d = dbl();
-    final long l = (long) d;
-    final boolean fractional = d != l;
+    // exact position, or 0 if the number is fractional or out of range
+    final long l = Pos.position(this);
     switch(op) {
-      case EQ: if(d < 1 || fractional) return Bln.FALSE; break;
-      case NE: if(d < 1 || fractional) return Bln.TRUE; break;
+      case EQ: if(l <= 0) return Bln.FALSE; break;
+      case NE: if(l <= 0) return Bln.TRUE; break;
       case LE: if(d < 1) return Bln.FALSE; break;
       case GT: if(d < 1) return Bln.TRUE; break;
       case LT: if(d < Math.nextUp(1d)) return Bln.FALSE; break;
       case GE: if(d < Math.nextUp(1d)) return Bln.TRUE; break;
     }
     // convert numbers without fractional part
-    return fractional || this instanceof Itr ? this : Itr.get(l);
+    return this instanceof Itr || l <= 0 ? this : Itr.get(l);
   }
 
   @Override

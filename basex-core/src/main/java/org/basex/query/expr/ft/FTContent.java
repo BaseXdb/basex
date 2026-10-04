@@ -72,6 +72,12 @@ public final class FTContent extends FTFilter {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof final FTContent ftc && content == ftc.content &&
+        super.equals(obj);
+  }
+
+  @Override
   public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, CONTENT, content), exprs);
   }

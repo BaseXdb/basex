@@ -22,6 +22,8 @@ public final class Dec extends ANum {
   public static final BigDecimal BD_MINLONG = BigDecimal.valueOf(Long.MIN_VALUE);
  /** Maximum long value. */
   public static final BigDecimal BD_MAXLONG = BigDecimal.valueOf(Long.MAX_VALUE);
+  /** Maximum unsigned long value. */
+  public static final BigDecimal BD_MAXULN = new BigDecimal("18446744073709551615");
   /** Decimal representing a million. */
   public static final BigDecimal BD_1000000 = BigDecimal.valueOf(1000000);
   /** Seconds per day. */

@@ -150,7 +150,7 @@ public abstract class SortFn extends StandardFunc {
   static int compare(final Value value1, final Value value2, final Collation collation,
       final QueryContext qc, final InputInfo info) throws QueryException {
     final long size1 = value1.size(), size2 = value2.size(), il = Math.min(size1, size2);
-    for(int i = 0; i < il; i++) {
+    for(long i = 0; i < il; i++) {
       final Item item1 = value1.itemAt(i), item2 = value2.itemAt(i);
       if(!item1.comparable(item2)) throw compareError(item1, item2, info);
       final int diff = item1.compare(item2, collation, true, qc, info);

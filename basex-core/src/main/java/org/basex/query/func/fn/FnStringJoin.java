@@ -31,8 +31,10 @@ public final class FnStringJoin extends StandardFunc {
     final byte[] first = item.string(info);
     if((item = values.next()) == null) return Str.get(first);
 
-    // join multiple strings
-    final TokenBuilder tb = new TokenBuilder().add(first);
+    // join multiple strings; reject results whose separators exceed the maximum size
+    final long size = values.size();
+    final TokenBuilder tb = new TokenBuilder(size == -1 ? -1 :
+      Array.checkCapacity((long) (first.length + (size - 1d) * separator.length))).add(first);
     do {
       tb.add(separator).add(item.string(info));
     } while((item = qc.next(values)) != null);

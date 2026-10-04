@@ -202,6 +202,11 @@ public final class ArrayModuleTest extends SandboxTest {
     final Function func = _ARRAY_GET;
     query(func.args(" [ 1, 2 ]", 1), 1);
 
+    // unsigned long keys
+    query("[ 1, 2 ](xs:unsignedLong('2'))", 2);
+    query("[ 1, 2 ]?(xs:unsignedLong('2'))", 2);
+    error("[ 1, 2 ](xs:unsignedLong('18446744073709551615'))", INTRANGE_X);
+
     error(func.args(" [ 1, 2 ]", 3), ARRAYBOUNDS_X_X);
     query(func.args(" [ 1, 2 ]", 3, " ()"), "");
     query(func.args(" [ 1, 2 ]", 3, " (4, 5)"), "4\n5");
@@ -266,6 +271,7 @@ public final class ArrayModuleTest extends SandboxTest {
 
     error(func.args(" [ ]", 0, 1), ARRAYBOUNDS_X_X);
     error(func.args(" [ ]", 2, 1), ARRAYBOUNDS_X_X);
+    error(func.args(" array { 1 to 9223372036854775807 }", 2, 0), MAX_SIZE_X_X);
   }
 
   /** Test method. */
@@ -487,6 +493,14 @@ public final class ArrayModuleTest extends SandboxTest {
     query(in + func.args(" array { " + wrap(1000) + " }"), "[1000]");
     query(in + func.args(" array { " + 1000 + " }", wrap(1000)), "[1000]");
     query(in + func.args(" array { " + 1000 + " }", 1000, wrap(1)), "[1000]");
+
+    // large positions and steps (no integer overflow)
+    query(func.args(" [ 'a', 'b', 'c' ]", " -9223372036854775808", -3, 2), "[]");
+    query(func.args(" [ 'a', 'b', 'c' ]", " -9223372036854775808", -3, 5), "[\"a\"]");
+    query(func.args(" [ 'a', 'b', 'c' ]", 1, 3, 9223372036854775807L), "[\"a\"]");
+    query(func.args(" [ 'a', 'b', 'c' ]", " ()", " ()", " -9223372036854775808"), "[\"c\"]");
+    query(func.args(" [ 'a', 'b', 'c' ]", 9223372036854775807L, " -9223372036854775808", -2),
+        "[\"c\",\"a\"]");
   }
 
   /** Test method. */

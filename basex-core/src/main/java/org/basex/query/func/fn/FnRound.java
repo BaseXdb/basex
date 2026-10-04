@@ -1,5 +1,7 @@
 package org.basex.query.func.fn;
 
+import static org.basex.query.QueryError.*;
+
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -50,7 +52,11 @@ public class FnRound extends NumericFn {
 
     final int scale = precision == null ? 0 : (int) Math.max(-1 << 20,
         Math.min(1 << 20, precision));
-    return value == null ? Empty.VALUE : value.round(scale, mode);
+    if(value == null) return Empty.VALUE;
+    final ANum rounded = value.round(scale, mode);
+    // integer result exceeds integer range
+    if(value instanceof Itr && rounded instanceof Dec) throw RANGE_X.get(info, rounded);
+    return rounded;
   }
 
   @Override

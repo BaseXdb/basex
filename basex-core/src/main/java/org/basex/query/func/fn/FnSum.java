@@ -120,29 +120,18 @@ public class FnSum extends NumericFn {
   private Item range(final Value value, final boolean avg) throws QueryException {
     if(value.isEmpty()) return null;
 
-    long min = value.itemAt(0).itr(info), max = value.itemAt(value.size() - 1).itr(info);
+    final long first = value.itemAt(0).itr(info), last = value.itemAt(value.size() - 1).itr(info);
     if(avg) {
-      final BigDecimal bs = BigDecimal.valueOf(min), be = BigDecimal.valueOf(max);
-      return Dec.get(bs.add(be).divide(Dec.BD_2, MathContext.DECIMAL64));
+      final BigDecimal bs = BigDecimal.valueOf(first), be = BigDecimal.valueOf(last);
+      return Dec.get(bs.add(be).divide(Dec.BD_2));
     }
 
-    // Little Gauss computation
-    // swap values if order is descending
-    if(min > max) {
-      final long t = max;
-      max = min;
-      min = t;
-    }
-
-    // range is small enough to be computed with long values
-    if(max < 3037000500L) return Itr.get((min + max) * (max - min + 1) / 2);
-    // compute larger ranges
-    final BigInteger bs = BigInteger.valueOf(min), be = BigInteger.valueOf(max);
-    final BigInteger bi = bs.add(be).multiply(be.subtract(bs).add(BigInteger.ONE)).
-        divide(BigInteger.valueOf(2));
-    final long l = bi.longValue();
-    // check if result is small enough to be represented as long value
-    if(bi.equals(BigInteger.valueOf(l))) return Itr.get(l);
+    // Little Gauss computation (the product is even)
+    final long size = value.size(), product = Util.multiply(Util.add(first, last), size);
+    if(product != Long.MIN_VALUE) return Itr.get(product / 2);
+    final BigInteger bi = BigInteger.valueOf(first).add(BigInteger.valueOf(last)).
+        multiply(BigInteger.valueOf(size)).shiftRight(1);
+    if(bi.bitLength() < 64) return Itr.get(bi.longValue());
     throw RANGE_X.get(info, bi);
   }
 

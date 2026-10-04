@@ -51,13 +51,13 @@ public final class StringRangeTest extends SandboxTest {
    * Testing greater-equal and less-equal.
    */
   @Test public void geLe() {
-    test("exists(//*[text() >= '999' and text() <= '999'])", true, ValueAccess.class);
+    test("exists(//*[text()[. >= '999' and . <= '999']])", true, ValueAccess.class);
     final Class<? extends Expr> clz = StringRangeAccess.class;
-    test("count(//*[text() >= '990' and text() <= '999'])", 10, clz);
-    test("count(//*[text() >= '900' and text() <= '999'])", 100, clz);
-    test("count(//*[text() >= '100' and text() <= '999'])", 900, clz);
-    test("count(//*[text() >= ' '   and text() <= 'a'  ])", 1800, clz);
-    test("count(//*[text() >= '@'   and text() <= 'a'  ])", 900, clz);
+    test("count(//*[text()[. >= '990' and . <= '999']])", 10, clz);
+    test("count(//*[text()[. >= '900' and . <= '999']])", 100, clz);
+    test("count(//*[text()[. >= '100' and . <= '999']])", 900, clz);
+    test("count(//*[text()[. >= ' ' and . <= 'a']])", 1800, clz);
+    test("count(//*[text()[. >= '@' and . <= 'a']])", 900, clz);
     test("count(//*[text() >= '@'])", 900);
   }
 
@@ -65,26 +65,26 @@ public final class StringRangeTest extends SandboxTest {
    * Testing less-equal and greater-equal.
    */
   @Test public void leGe() {
-    test("exists(//*[text() <= '999' and text() >= '999'])", true, ValueAccess.class);
+    test("exists(//*[text()[. <= '999' and . >= '999']])", true, ValueAccess.class);
     final Class<? extends Expr> clz = StringRangeAccess.class;
-    test("count(//*[text() <= '999' and text() >= '990'])", 10, clz);
-    test("count(//*[text() <= '999' and text() >= '900'])", 100, clz);
-    test("count(//*[text() <= '999' and text() >= '100'])", 900, clz);
-    test("count(//*[text() <= 'zzz' and text() >= ' '  ])", 1800, clz);
-    test("count(//*[text() <= 'a'   and text() >= '@'  ])", 900, clz);
+    test("count(//*[text()[. <= '999' and . >= '990']])", 10, clz);
+    test("count(//*[text()[. <= '999' and . >= '900']])", 100, clz);
+    test("count(//*[text()[. <= '999' and . >= '100']])", 900, clz);
+    test("count(//*[text()[. <= 'zzz' and . >= ' ']])", 1800, clz);
+    test("count(//*[text()[. <= 'a' and . >= '@']])", 900, clz);
   }
 
   /**
    * Testing greater-than and less-than.
    */
   @Test public void gtLt() {
-    test("exists(//*[text() > '999' and text() < '999'])", false);
+    test("exists(//*[text()[. > '999' and . < '999']])", false);
     final Class<? extends Expr> clz = StringRangeAccess.class;
-    test("count(//*[text() > '990' and text() < '999'])", 8, clz);
-    test("count(//*[text() > '900' and text() < '999'])", 98, clz);
-    test("count(//*[text() > '100' and text() < '999'])", 898, clz);
-    test("count(//*[text() > ' '   and text() < 'a'  ])", 1800, clz);
-    test("count(//*[text() > '@'   and text() < 'a'  ])", 900, clz);
+    test("count(//*[text()[. > '990' and . < '999']])", 8, clz);
+    test("count(//*[text()[. > '900' and . < '999']])", 98, clz);
+    test("count(//*[text()[. > '100' and . < '999']])", 898, clz);
+    test("count(//*[text()[. > ' ' and . < 'a']])", 1800, clz);
+    test("count(//*[text()[. > '@' and . < 'a']])", 900, clz);
     test("count(//*[text() > '@'])", 900);
   }
 

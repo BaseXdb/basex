@@ -590,6 +590,10 @@ public final class IndexOptimizeTest extends SandboxTest {
         exists(RangeAccess.class));
     // range outside the indexed values: no results
     check("//a[@n >= 10 and @n <= 20]", "", empty());
+
+    // untyped values are compared as decimals: results of range access are checked
+    execute(new CreateDB(NAME, "<x><a n='1.5'/><a n='9.0000000000000001'/><a n='9'/></x>"));
+    check("//a[@n >= 1 and @n <= 9]", "<a n=\"1.5\"/>\n<a n=\"9\"/>", exists(RangeAccess.class));
   }
 
   /** The database of an index access is supplied by a variable and inlined. */
@@ -603,12 +607,13 @@ public final class IndexOptimizeTest extends SandboxTest {
         + "local:f('" + NAME + "')", "<a n=\"1.5\"/>\n<a n=\"2.5\"/>", exists(RangeAccess.class));
 
     // string range access
-    execute(new CreateDB(NAME, "<x><a>abc</a><a>xyz</a></x>"));
-    check("declare function local:f($n) { " + _DB_GET.args(" $n") + "//a[text() > 'a' "
-        + "and text() < 'z'] }; local:f('" + NAME + "')", "<a>abc</a>\n<a>xyz</a>",
+    execute(new CreateDB(NAME, "<x><a n='abc'/><a n='xyz'/></x>"));
+    check("declare function local:f($n) { " + _DB_GET.args(" $n") + "//a[@n > 'a' "
+        + "and @n < 'z'] }; local:f('" + NAME + "')", "<a n=\"abc\"/>\n<a n=\"xyz\"/>",
         exists(StringRangeAccess.class));
 
     // value index access
+    execute(new CreateDB(NAME, "<x><a>abc</a><a>xyz</a></x>"));
     check("declare function local:f($n) { " + _DB_GET.args(" $n") + "//a[text() = 'abc'] };"
         + "local:f('" + NAME + "')", "<a>abc</a>", exists(ValueAccess.class));
   }

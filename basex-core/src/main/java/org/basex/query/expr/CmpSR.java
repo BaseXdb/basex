@@ -97,9 +97,10 @@ public final class CmpSR extends CmpRange {
   }
 
   @Override
-  public Expr mergeEbv(final Expr ex, final boolean or, final CompileContext cc)
+  Expr merge(final Expr ex, final boolean or, final CompileContext cc)
       throws QueryException {
 
+    if(or) return null;
     Collation coll = null;
     byte[] newMin = null, newMax = null;
     boolean newMni = true, newMxi = true;
@@ -116,8 +117,7 @@ public final class CmpSR extends CmpRange {
         coll = cmp.sc().collation;
       }
     }
-    if(newMin == null && newMax == null || !expr.equals(ex.arg(0)) || coll != null ||
-        sc().collation != null || or) return null;
+    if(newMin == null && newMax == null || coll != null || sc().collation != null) return null;
 
     // determine common minimum and maximum value
     if(newMin == null) {
@@ -185,7 +185,7 @@ public final class CmpSR extends CmpRange {
   @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof final CmpSR cmp && Token.eq(min, cmp.min) &&
-        mni == cmp.mni && Token.eq(max, cmp.max) && mxi && cmp.mxi && sc() == cmp.sc() &&
+        mni == cmp.mni && Token.eq(max, cmp.max) && mxi == cmp.mxi && sc() == cmp.sc() &&
         super.equals(obj);
   }
 

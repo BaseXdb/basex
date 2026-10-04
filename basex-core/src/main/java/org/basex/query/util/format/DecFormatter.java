@@ -562,16 +562,17 @@ public final class DecFormatter extends FormatUtil {
         }
         exp = scl - pic.scaling;
         if(exp != 0) {
-          final BigDecimal n = BigDecimal.TEN.pow(Math.abs(exp));
-          num = (ANum) Calc.MULTIPLY.eval(num, Dec.get(
-              exp > 0 ? BigDecimal.ONE.divide(n, MathContext.DECIMAL64) : n), info);
+          // scale decimally: powers of ten may exceed the double range (e.g. for 4.9E-324)
+          final BigDecimal sc = decimal(num).movePointLeft(exp);
+          num = num instanceof Flt ? Flt.get(sc.floatValue()) :
+            num instanceof Dbl ? Dbl.get(sc.doubleValue()) : Dec.get(sc);
         }
       }
-      num = num.round(pic.maxFrac, RoundMode.HALF_TO_EVEN).abs();
+      num = num.round(pic.maxFrac, RoundMode.HALF_TO_EVEN);
 
-      // convert positive number to string; chop leading 0
-      String s = (num instanceof Dbl || num instanceof Flt ?
-          Dec.get(BigDecimal.valueOf(num.dbl(info))) : num).toString();
+      // convert number to string; chop sign and leading 0
+      String s = Dec.get(decimal(num)).toString();
+      if(Strings.startsWith(s, '-')) s = s.substring(1);
       if(Strings.startsWith(s, '0')) s = s.substring(1);
 
       // integer/fractional separator
@@ -632,6 +633,17 @@ public final class DecFormatter extends FormatUtil {
     final TokenBuilder tb = new TokenBuilder(res.size());
     for(final int r : res.finish()) tb.add(r);
     return tb.finish();
+  }
+
+  /**
+   * Returns a decimal representation of a number (shortest one for floating-point numbers).
+   * @param num number
+   * @return decimal
+   * @throws QueryException query exception
+   */
+  private static BigDecimal decimal(final ANum num) throws QueryException {
+    return num instanceof Flt ? new BigDecimal(Float.toString(num.flt(null))) :
+      num instanceof Dbl ? BigDecimal.valueOf(num.dbl()) : num.dec(null);
   }
 
   /** Picture variables. */

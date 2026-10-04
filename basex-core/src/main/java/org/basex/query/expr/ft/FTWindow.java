@@ -56,7 +56,7 @@ public final class FTWindow extends FTFilter {
   protected boolean filter(final QueryContext qc, final FTMatch match, final FTLexer lexer)
       throws QueryException {
 
-    final int n = (int) toLong(win, qc) - 1;
+    final int n = Math.clamp(toLong(win, qc), 0, Integer.MAX_VALUE) - 1;
     // excluded matches participate in the window offset check; combinations cover includes
     final FTMatch excludes = excludes(match);
 
@@ -149,6 +149,12 @@ public final class FTWindow extends FTFilter {
     int size = 1;
     for(final FTExpr expr : exprs) size += expr.exprSize();
     return size + win.exprSize();
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof final FTWindow ftw && win.equals(ftw.win) &&
+        super.equals(obj);
   }
 
   @Override
