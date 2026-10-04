@@ -109,8 +109,10 @@ public abstract class Filter extends Preds {
 
       // rewrite independent deterministic single filter to 'if' expression:
       // example: (1 to 10)[$boolean] → if($boolean) then (1 to 10) else ()
+      // the predicate is guarded: if the root may be empty, it must not raise errors
       final Expr expr = exprs[0];
-      if(exprs.length == 1 && expr.isSimple() && !expr.seqType().mayBeNumber()) {
+      if(exprs.length == 1 && expr.isSimple() && !expr.seqType().mayBeNumber() &&
+          (root.seqType().oneOrMore() || expr instanceof Value || expr instanceof VarRef)) {
         final Expr iff = new If(info, expr, root).optimize(cc);
         return cc.replaceWith(this, iff);
       }
@@ -250,8 +252,8 @@ public abstract class Filter extends Preds {
     boolean changed = inlined != null;
     if(changed) root = inlined;
 
-    // do not inline context reference in predicates
-    changed |= ic.var != null && ic.cc.ok(root, true, () -> ic.inline(exprs));
+    // do not inline context reference in predicates; predicates are guarded by a non-empty root
+    changed |= ic.var != null && ic.cc.ok(root, true, () -> ic.inline(exprs, true));
 
     return changed ? optimize(ic.cc) : null;
   }

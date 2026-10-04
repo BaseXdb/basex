@@ -155,6 +155,27 @@ public final class FnReplicate extends StandardFunc {
   }
 
   @Override
+  public Expr inline(final InlineContext ic) throws QueryException {
+    boolean changed = false;
+    final int el = exprs.length;
+    for(int e = 0; e < el; e++) {
+      Expr inlined;
+      try {
+        inlined = exprs[e].inline(ic);
+      } catch(final QueryException ex) {
+        // the input is only evaluated if the count is positive: defer the error to evaluation
+        if(e > 0) throw ex;
+        inlined = FnError.get(ex);
+      }
+      if(inlined != null) {
+        exprs[e] = inlined;
+        changed = true;
+      }
+    }
+    return changed ? optimize(ic.cc) : null;
+  }
+
+  @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     // data(replicate(<a>1</a>, 2)) → data(replicate(xs:untypedAtomic('1'), 2))
     // distinct-values(replicate(('a', 'a'), 2)) → distinct-values('a', 2)
