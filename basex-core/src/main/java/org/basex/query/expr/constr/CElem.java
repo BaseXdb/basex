@@ -140,7 +140,7 @@ public final class CElem extends CName {
       final FBuilder elem = FElem.build(nm, sc().baseURI().string());
 
       // add child and attribute nodes
-      final Constr constr = new Constr(elem, info, qc).add(exprs);
+      final Constr constr = new Constr(elem, skipCopy, info, qc).add(exprs);
       if(constr.errAtt != null) throw NOATTALL_X.get(info, constr.errAtt);
       if(constr.errNS != null) throw NONSALL_X.get(info, constr.errNS);
       if(constr.duplAtt != null) throw CATTDUPL_X.get(info, constr.duplAtt);

@@ -130,7 +130,7 @@ abstract class CName extends CNode {
 
   @Override
   public final void toXml(final QueryPlan plan) {
-    plan.add(plan.create(this), name, exprs);
+    plan.add(plan.create(this, QueryText.SKIPCOPY, skipCopy ? true : null), name, exprs);
   }
 
   @Override

@@ -647,6 +647,12 @@ public final class FileModuleTest extends SandboxTest {
     query(_FILE_READ_TEXT.args(PATH1), "<a/>");
     query(_FILE_DELETE.args(PATH1));
 
+    // constructed nodes are only serialized: skip copies
+    check(func.args(PATH1, " <x>{ parse-xml('<a xmlns:p=\"u\"><b/></a>')/a/b }</x>"), "",
+        exists("CElem[@skipCopy]"));
+    query(_FILE_READ_TEXT.args(PATH1), "<x><b xmlns:p=\"u\"/></x>");
+    query(_FILE_DELETE.args(PATH1));
+
     // test spaces in filename
     query(func.args(PATH1 + "%20X", ""));
     query(_FILE_EXISTS.args(PATH1 + "%20X"), true);

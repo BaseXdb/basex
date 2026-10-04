@@ -524,8 +524,8 @@ public abstract class Serializer implements Closeable {
               nsPrefix = ns.name(n);
               if(nsSet.add(nsPrefix)) addNamespace(nsPrefix, ns.value(n));
             }
-            // check ancestors only on top level
-            if(level != 0) break;
+            // check ancestors only for the root of the serialized subtree
+            if(!parentStack.isEmpty()) break;
 
             p = data.parent(p, data.kind(p));
           } while(p >= 0 && data.kind(p) == Data.ELEM);

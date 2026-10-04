@@ -59,6 +59,11 @@ public final class List extends Arr {
   }
 
   @Override
+  public void skipCopy() {
+    for(final Expr expr : exprs) expr.skipCopy();
+  }
+
+  @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     flatten(cc);
     removeEmpty(cc);

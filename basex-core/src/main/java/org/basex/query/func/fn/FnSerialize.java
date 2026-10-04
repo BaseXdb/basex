@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
@@ -21,5 +22,11 @@ public final class FnSerialize extends StandardFunc {
     final SerializerOptions options = toSerializerOptions(arg(1), qc);
 
     return Str.get(serialize(input, options, SERPARAM_X, qc));
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) {
+    arg(0).skipCopy();
+    return this;
   }
 }

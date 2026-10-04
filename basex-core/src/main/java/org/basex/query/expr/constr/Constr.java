@@ -43,17 +43,22 @@ public final class Constr {
   private final TokenBuilder text = new TokenBuilder();
   /** Space separator flag. */
   private boolean more;
+  /** Skip copies of enclosed nodes. */
+  private final boolean skipCopy;
   /** Current expression is a direct constructor. */
   private boolean direct;
 
   /**
    * Creates the children of the constructor.
    * @param builder node builder
+   * @param skipCopy skip copies of enclosed nodes
    * @param info input info (can be {@code null})
    * @param qc query context
    */
-  public Constr(final FBuilder builder, final InputInfo info, final QueryContext qc) {
+  public Constr(final FBuilder builder, final boolean skipCopy, final InputInfo info,
+      final QueryContext qc) {
     this.builder = builder;
+    this.skipCopy = skipCopy;
     this.info = info;
     this.qc = qc;
   }
@@ -159,12 +164,17 @@ public final class Constr {
 
         // add text node
         builder.text(qc.shared.token(text.next()));
-        // results of nested direct constructors are fresh nodes: adopt them without copying
-        final boolean keep = direct || !qc.context.options.get(MainOptions.COPYNODE);
-        final XNode copy = node.materialize(n -> keep, info, qc);
-        // apply copy-namespaces mode to copied element nodes
-        if(!keep && copy instanceof final FElem elem) copyNamespaces(node, elem);
-        builder.node(copy);
+        // result will only be serialized: share the node, leaving its parent unchanged
+        if(skipCopy && !direct) {
+          builder.share(node);
+        } else {
+          // results of nested direct constructors are fresh nodes: adopt them without copying
+          final boolean keep = direct || !qc.context.options.get(MainOptions.COPYNODE);
+          final XNode copy = node.materialize(n -> keep, info, qc);
+          // apply copy-namespaces mode to copied element nodes
+          if(!keep && copy instanceof final FElem elem) copyNamespaces(node, elem);
+          builder.node(copy);
+        }
       }
       more = false;
     } else {

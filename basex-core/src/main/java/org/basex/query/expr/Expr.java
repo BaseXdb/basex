@@ -568,6 +568,11 @@ public abstract class Expr extends ExprInfo {
   public void markTailCalls(final CompileContext cc) { }
 
   /**
+   * Marks node constructors whose results will only be serialized.
+   */
+  public void skipCopy() { }
+
+  /**
    * Traverses this expression, notifying the visitor of declared and used variables,
    * and checking the tree for other recursive properties.
    * @param visitor visitor

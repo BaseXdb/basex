@@ -21,6 +21,8 @@ import org.basex.util.*;
 public abstract class CNode extends Arr {
   /** Computed constructor. */
   final boolean computed;
+  /** Results will only be serialized: skip copies of enclosed nodes. */
+  boolean skipCopy;
 
   /**
    * Constructor.
@@ -91,6 +93,16 @@ public abstract class CNode extends Arr {
   }
 
   @Override
+  public void skipCopy() {
+    // copy-namespaces modes are only applied to copies
+    final StaticContext sc = info != null ? sc() : null;
+    if(sc == null || sc.preserveNS && sc.inheritNS) {
+      skipCopy = true;
+      for(final Expr expr : exprs) expr.skipCopy();
+    }
+  }
+
+  @Override
   public boolean has(final Flag... flags) {
     return Flag.CNS.oneOf(flags) || super.has(flags);
   }
@@ -104,6 +116,11 @@ public abstract class CNode extends Arr {
   @Override
   public boolean equals(final Object obj) {
     return obj instanceof final CNode cnode && computed == cnode.computed && super.equals(obj);
+  }
+
+  @Override
+  public void toXml(final QueryPlan plan) {
+    plan.add(plan.create(this, SKIPCOPY, skipCopy ? true : null), exprs);
   }
 
   @Override

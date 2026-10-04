@@ -1211,6 +1211,11 @@ public final class GFLWOR extends ParseExpr {
   }
 
   @Override
+  public void skipCopy() {
+    rtrn.skipCopy();
+  }
+
+  @Override
   public int exprSize() {
     int size = 1;
     for(final Clause clause : clauses) size += clause.exprSize();

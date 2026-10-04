@@ -71,7 +71,7 @@ abstract class Update extends Arr {
    */
   final FBuilder builder(final Expr expr, final QueryContext qc) throws QueryException {
     final FBuilder builder = new FBuilder();
-    final Constr constr = new Constr(builder, info, qc).add(expr);
+    final Constr constr = new Constr(builder, false, info, qc).add(expr);
     if(constr.errAtt != null) throw UPNOATTRPER_X.get(info, constr.errAtt);
     if(constr.duplAtt != null) throw UPATTDUPL_X.get(info, constr.duplAtt);
     return builder;

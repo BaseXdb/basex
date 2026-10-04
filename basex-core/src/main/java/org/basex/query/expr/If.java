@@ -233,6 +233,11 @@ public final class If extends Arr {
   }
 
   @Override
+  public void skipCopy() {
+    for(final Expr expr : exprs) expr.skipCopy();
+  }
+
+  @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     final Expr[] ex = simplifyAll(mode, cc);
     return ex != exprs ? new If(info, cond, ex[0], ex[1]).optimize(cc) :

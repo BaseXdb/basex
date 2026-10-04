@@ -5043,6 +5043,28 @@ return
         "{\"1\":\"One\",\"</script>\":\"Browser Challenge\",\"\u0080\":\"Control\",\"\u00F6\":\"Lat"
         + "in Small Letter O With Diaeresis\",\"\u20AC\":\"Euro Sign\",\"\uD83D\uDE02\":\"Smiley\","
         + "\"\uFB33\":\"Hebrew Letter Dalet With Dagesh\"}");
+
+    // constructed nodes are only serialized: skip copies
+    final String doc = " parse-xml('<a xmlns:p=\"u\"><b/></a>')";
+    check(func.args(" <x>{" + doc + " }</x>"), "<x><a xmlns:p=\"u\"><b/></a></x>",
+        exists("CElem[@skipCopy]"));
+    check(func.args(" <x>{" + doc + "/a/b }</x>"), "<x><b xmlns:p=\"u\"/></x>",
+        exists("CElem[@skipCopy]"));
+    check(func.args(" if(random:double() < 2) then <x>{" + doc + "/a/b }</x> else ()"),
+        "<x><b xmlns:p=\"u\"/></x>", exists("CElem[@skipCopy]"));
+    check(func.args(" document { <x>{" + doc + "/a/b }</x> }"), "<x><b xmlns:p=\"u\"/></x>",
+        "count(//*[@skipCopy]) = 2");
+    check("declare copy-namespaces no-preserve, inherit;" +
+        func.args(" <x>{ <a xmlns:p='u'><b/></a>/b }</x>"), "<x><b/></x>",
+        empty("CElem[@skipCopy]"));
+    check("<x>{" + doc + "/a/b }</x>/b/.. ! name()", "x", empty("CElem[@skipCopy]"));
+    // shared nodes keep their parents
+    query("let $x := <c/> return (" + func.args(" <x>{ $x }</x>") + ", count($x/..))",
+        "<x><c/></x>\n0");
+    query("let $x := <c/> return (" + func.args(" <x>{ <b>{ $x }</b> }</x>") + ", count($x/..))",
+        "<x><b><c/></b></x>\n0");
+    query("let $x := " + doc + "/a return (" + func.args(" <x>{ $x }</x>") +
+        ", root($x) instance of document-node())", "<x><a xmlns:p=\"u\"><b/></a></x>\ntrue");
   }
 
   /** Test method. */

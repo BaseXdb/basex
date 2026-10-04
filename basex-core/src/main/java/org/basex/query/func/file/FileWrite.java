@@ -6,6 +6,7 @@ import java.nio.file.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -21,6 +22,12 @@ public class FileWrite extends FileWriteFn {
   @Override
   public Value eval(final QueryContext qc) throws IOException, QueryException {
     return write(false, qc);
+  }
+
+  @Override
+  protected final Expr opt(final CompileContext cc) {
+    arg(1).skipCopy();
+    return this;
   }
 
   /**

@@ -58,6 +58,17 @@ public final class FBuilder {
    * @return self reference
    */
   public FBuilder node(final GNode node) {
+    share(node);
+    ((XNode) node).parent(root);
+    return this;
+  }
+
+  /**
+   * Adds a node without assigning the new parent.
+   * @param node node to be added
+   * @return self reference
+   */
+  public FBuilder share(final GNode node) {
     final boolean attr = node.kind() == Kind.ATTRIBUTE;
     GNodeList nodes = attr ? attributes : children;
     if(nodes == null) {
@@ -66,7 +77,6 @@ public final class FBuilder {
       else children = nodes;
     }
     nodes.add(node);
-    ((XNode) node).parent(root);
     return this;
   }
 
