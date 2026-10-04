@@ -378,6 +378,14 @@ public final class QueryResources {
   }
 
   /**
+   * Adds opened databases. Only called from the test APIs.
+   * @param dbs databases
+   */
+  public void addDatabases(final Collection<Data> dbs) {
+    datas.addAll(dbs);
+  }
+
+  /**
    * Adds a resource with the specified path. Only called from the test APIs.
    * @param uri resource URI
    * @param strings resource strings (path, encoding)

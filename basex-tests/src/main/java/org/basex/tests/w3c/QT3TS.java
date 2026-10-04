@@ -13,6 +13,7 @@ import java.util.regex.*;
 import javax.xml.namespace.*;
 
 import org.basex.core.*;
+import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
@@ -21,6 +22,7 @@ import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.util.format.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.tests.bxapi.*;
 import org.basex.tests.bxapi.xdm.*;
@@ -87,6 +89,10 @@ public final class QT3TS extends Main {
   final Context ctx = new Context();
   /** Global environments. */
   private final ArrayList<QT3Env> genvs = new ArrayList<>();
+  /** Files of all test sets. */
+  private final StringList setFiles = new StringList();
+  /** Parsed test sets, shared by tests that bind the catalog (can be {@code null}). */
+  private ArrayList<Data> setDatas;
 
   /**
    * Main method of the test class.
@@ -142,7 +148,8 @@ public final class QT3TS extends Main {
       genvs.add(new QT3Env(ctx, ienv));
 
     for(final XdmItem item : new XQuery("for $f in //*:test-set/@file return string($f)",
-        ctx).context(doc)) testSet(item.getString());
+        ctx).context(doc)) setFiles.add(item.getString());
+    for(final String file : setFiles) testSet(file);
 
     final StringBuilder result = new StringBuilder();
     result.append(" Rate    : ").append(pc(correct, tested)).append(NL);
@@ -196,6 +203,8 @@ public final class QT3TS extends Main {
    * @throws Exception exception
    */
   private void testSet(final String name) throws Exception {
+    // release test sets shared by the previous test set
+    setDatas = null;
     final XdmValue doc = new XQuery("doc(' " + file(false, name) + "')", ctx).value();
     final XdmValue set = new XQuery("*:test-set", ctx).context(doc).value();
     final IO base = IO.get(doc.getBaseURI());
@@ -223,6 +232,21 @@ public final class QT3TS extends Main {
         }
       }
     }
+  }
+
+  /**
+   * Returns the parsed test sets.
+   * @return databases
+   */
+  private ArrayList<Data> setDatas() {
+    if(setDatas == null) {
+      setDatas = new ArrayList<>(setFiles.size());
+      for(final String name : setFiles) {
+        final XdmValue doc = new XQuery("doc('" + file(false, name) + "')", ctx).value();
+        setDatas.add(((DBNode) doc.internal()).data());
+      }
+    }
+    return setDatas;
   }
 
   /**
@@ -416,6 +440,10 @@ public final class QT3TS extends Main {
 
           final String path = file(base, file);
           locations.put(src.get(URI), new IOFile(baseDir, file));
+          // catalog checks: share the test sets instead of parsing them for each test
+          if(new IOFile(path).eq(new IOFile(file(false, CATALOG)))) {
+            query.qp().qc.resources.addDatabases(setDatas());
+          }
           query.addDocument(src.get(URI), path);
           if(role == null) continue;
 
