@@ -65,6 +65,14 @@ public final class QueryInfoTest extends SandboxTest {
     assertTrue(query.sections().sections().containsKey("query"));
   }
 
+  /** Parse error after a record declaration with an unresolved function reference. */
+  @Test public void parseErrorRecord() {
+    final XQuery query = new XQuery("declare record local:r(a := local:f()); "
+        + "declare function local:f() { 1 }; if (1) { 2 } else 3");
+    query.run(context);
+    assertTrue(query.message().contains("XPST0003"), query.message());
+  }
+
   /** The query plan is only included if it was requested. */
   @Test public void plan() {
     final XQuery query = new XQuery("1");

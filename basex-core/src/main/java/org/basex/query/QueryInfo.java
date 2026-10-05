@@ -10,6 +10,7 @@ import org.basex.core.*;
 import org.basex.core.locks.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
+import org.basex.query.scope.*;
 import org.basex.query.util.parse.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
@@ -311,9 +312,12 @@ public final class QueryInfo {
    * @return optimized query
    */
   private static String optimized(final QueryProcessor qp) {
+    // type declarations may contain unresolved references if parsing failed
+    final MainModule main = qp.qc.main;
+    if(main == null) return qp.qc.functions.toString();
     final QueryString qs = new QueryString();
     for(final TypeDecl td : qp.qc.typeDecls) td.declaration(qs).newline();
-    return qs.token(qp.qc.main == null ? qp.qc.functions : qp.qc.main).toString();
+    return qs.token(main).toString();
   }
 
   /**
