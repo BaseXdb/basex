@@ -73,6 +73,11 @@ final class BaseXCollation extends Collation {
     return rbc.getCollationKey(Token.string(string)).toByteArray();
   }
 
+  @Override
+  boolean keys() {
+    return collator instanceof RuleBasedCollator;
+  }
+
   /**
    * Determines whether one string starts with another.
    * @param string string iterator

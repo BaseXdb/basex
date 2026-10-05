@@ -10,6 +10,7 @@ import java.util.List;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
+import org.basex.query.util.collation.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -71,11 +72,21 @@ public final class OrderBy extends Clause {
       private void sort(final QueryContext qc) throws QueryException {
         // keys are stored at odd positions, values at even ones
         List<Value[]> tuples = new ArrayList<>();
+        // collation keys of strings (only created if a collation is specified)
+        boolean coll = false;
+        for(final OrderKey key : keys) coll |= key.coll != null;
+        ArrayList<byte[][]> colls = coll ? new ArrayList<>() : null;
         while(sub.next(qc)) {
           final int kl = keys.length;
           final Item[] key = new Item[kl];
-          for(int k = 0; k < kl; k++) key[k] = keys[k].expr.atomItem(qc, keys[k].info());
+          final byte[][] ck = colls != null ? new byte[kl][] : null;
+          for(int k = 0; k < kl; k++) {
+            final OrderKey ok = keys[k];
+            key[k] = ok.expr.atomItem(qc, ok.info());
+            if(ck != null) ck[k] = Collation.key(key[k], ok.coll, ok.info());
+          }
           tuples.add(key);
+          if(colls != null) colls.add(ck);
 
           final int rl = refs.length;
           final Value[] vals = new Value[rl];
@@ -85,6 +96,7 @@ public final class OrderBy extends Clause {
 
         final int len = tuples.size() / 2;
         final Item[][] ks = new Item[len][];
+        final byte[][][] cs = colls != null ? colls.toArray(byte[][][]::new) : null;
         perm = new Integer[len];
         tpls = new Value[len][];
         for(int i = 0; i < len; i++) {
@@ -94,6 +106,7 @@ public final class OrderBy extends Clause {
         }
         // be nice to the garbage collector
         tuples = null;
+        colls = null;
         try {
           Arrays.sort(perm, (x, y) -> {
             try {
@@ -110,8 +123,10 @@ public final class OrderBy extends Clause {
 
                 final int c = m == Empty.VALUE
                     ? n == Empty.VALUE ? 0             : key.least ? -1 : 1
-                    : n == Empty.VALUE ? key.least ? 1 : -1 :
-                      m.compare(n, key.coll, true, qc, key.info());
+                    : n == Empty.VALUE ? key.least ? 1 : -1
+                    : cs != null ? Collation.compare(m, cs[x][k], n, cs[y][k], key.coll, qc,
+                      key.info())
+                    : m.compare(n, key.coll, true, qc, key.info());
                 if(c != 0) return key.desc ? -c : c;
               }
               return 0;

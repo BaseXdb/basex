@@ -291,6 +291,48 @@ public abstract class Collation {
   public abstract byte[] key(byte[] string, InputInfo info) throws QueryException;
 
   /**
+   * Indicates if collation keys can be generated.
+   * @return result of check
+   */
+  boolean keys() {
+    return true;
+  }
+
+  /**
+   * Returns the collation key of an item that is compared as string.
+   * @param item item
+   * @param coll collation (can be {@code null})
+   * @param info input info (can be {@code null})
+   * @return key, or {@code null} if no collation is given, the item is no string or keys
+   *   cannot be generated
+   * @throws QueryException query exception
+   */
+  public static byte[] key(final Item item, final Collation coll, final InputInfo info)
+      throws QueryException {
+    return coll != null && coll.keys() && item.type.isStringOrUntyped() ?
+      coll.key(item.string(info), info) : null;
+  }
+
+  /**
+   * Compares two items, using their collation keys if both are available.
+   * @param item1 first item
+   * @param key1 collation key of the first item (can be {@code null})
+   * @param item2 second item
+   * @param key2 collation key of the second item (can be {@code null})
+   * @param coll collation (can be {@code null})
+   * @param qc query context
+   * @param info input info (can be {@code null})
+   * @return result of comparison (-1, 0, 1)
+   * @throws QueryException query exception
+   */
+  public static int compare(final Item item1, final byte[] key1, final Item item2,
+      final byte[] key2, final Collation coll, final QueryContext qc, final InputInfo info)
+      throws QueryException {
+    return key1 != null && key2 != null ? Token.compare(key1, key2) :
+      item1.compare(item2, coll, true, qc, info);
+  }
+
+  /**
    * Returns the start or end position of the specified substring.
    * @param string string
    * @param sub substring to be found

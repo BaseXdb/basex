@@ -104,8 +104,7 @@ public abstract class SortFn extends StandardFunc {
       throws QueryException {
 
     final int levels = keys.length, size = values.length;
-    final Value[][] cached = new Value[levels][];
-    for(int l = 0; l < levels; l++) cached[l] = new Value[size];
+    final SortKey[][] cached = new SortKey[levels][size];
     final Integer[] indexes = new Integer[size];
     for(int o = 0; o < size; o++) indexes[o] = o;
     try {
@@ -114,16 +113,20 @@ public abstract class SortFn extends StandardFunc {
         try {
           for(int l = 0; l < levels; l++) {
             final int ll = l;
-            final QueryFunction<Integer, Value> value = i -> {
-              Value val = cached[ll][i];
-              if(val == null) {
+            final QueryFunction<Integer, SortKey> value = i -> {
+              SortKey sk = cached[ll][i];
+              if(sk == null) {
                 final FItem k = keys[ll];
-                val = (k == null ? values[i] : k.invoke(qc, info, values[i])).atomValue(qc, info);
-                cached[ll][i] = val;
+                final Value val = (k == null ? values[i] : k.invoke(qc, info, values[i])).
+                    atomValue(qc, info);
+                sk = new SortKey(val, collationKeys(val, collations[ll], info));
+                cached[ll][i] = sk;
               }
-              return val;
+              return sk;
             };
-            final int diff = compare(value.apply(i1), value.apply(i2), collations[l], qc, info);
+            final SortKey sk1 = value.apply(i1), sk2 = value.apply(i2);
+            final int diff = compare(sk1.value, sk2.value, sk1.colls, sk2.colls, collations[l],
+                qc, info);
             if(diff != 0) return invert[l] ? -diff : diff;
           }
           return 0;
@@ -149,15 +152,64 @@ public abstract class SortFn extends StandardFunc {
    */
   static int compare(final Value value1, final Value value2, final Collation collation,
       final QueryContext qc, final InputInfo info) throws QueryException {
+    return compare(value1, value2, null, null, collation, qc, info);
+  }
+
+  /**
+   * Compares two values, using collation keys if available.
+   * @param value1 first value
+   * @param value2 second value
+   * @param colls1 collation keys of the first value (can be {@code null})
+   * @param colls2 collation keys of the second value (can be {@code null})
+   * @param collation collation (can be {@code null})
+   * @param qc query context
+   * @param info input info (can be {@code null})
+   * @return result of comparison (-1, 0, 1)
+   * @throws QueryException query exception
+   */
+  private static int compare(final Value value1, final Value value2, final byte[][] colls1,
+      final byte[][] colls2, final Collation collation, final QueryContext qc,
+      final InputInfo info) throws QueryException {
     final long size1 = value1.size(), size2 = value2.size(), il = Math.min(size1, size2);
     for(long i = 0; i < il; i++) {
       final Item item1 = value1.itemAt(i), item2 = value2.itemAt(i);
       if(!item1.comparable(item2)) throw compareError(item1, item2, info);
-      final int diff = item1.compare(item2, collation, true, qc, info);
+      final int diff = Collation.compare(item1, colls1 != null ? colls1[(int) i] : null,
+          item2, colls2 != null ? colls2[(int) i] : null, collation, qc, info);
       if(diff != 0) return diff;
     }
     return Long.signum(size1 - size2);
   }
+
+  /**
+   * Returns the collation keys of the strings of a value.
+   * @param value atomized value
+   * @param collation collation (can be {@code null})
+   * @param info input info (can be {@code null})
+   * @return keys (with {@code null} entries for other items), or {@code null} if none exist
+   * @throws QueryException query exception
+   */
+  private static byte[][] collationKeys(final Value value, final Collation collation,
+      final InputInfo info) throws QueryException {
+    if(collation == null) return null;
+    final int size = (int) value.size();
+    byte[][] colls = null;
+    for(int i = 0; i < size; i++) {
+      final byte[] coll = Collation.key(value.itemAt(i), collation, info);
+      if(coll != null) {
+        if(colls == null) colls = new byte[size][];
+        colls[i] = coll;
+      }
+    }
+    return colls;
+  }
+
+  /**
+   * Atomized sort key.
+   * @param value atomized value
+   * @param colls collation keys of its strings (can be {@code null})
+   */
+  private record SortKey(Value value, byte[][] colls) { }
 
   /**
    * Sorts values with user-defined comparators.

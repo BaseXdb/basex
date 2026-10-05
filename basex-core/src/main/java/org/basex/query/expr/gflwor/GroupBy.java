@@ -8,6 +8,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
+import org.basex.query.util.collation.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -134,10 +135,7 @@ public final class GroupBy extends Clause {
             final Item atom = spec.atomItem(qc, info);
             if(!spec.occluded) {
               key[p++] = atom;
-              // If the values are compared using a special collation, we let them collide
-              // here and let the comparison do all the work later.
-              // This enables other non-collation specs to avoid the collision.
-              hash = 31 * hash + (atom == Empty.VALUE || spec.coll != null ? 0 : atom.hashCode());
+              hash = 31 * hash + hash(atom, spec.coll);
             }
             qc.set(spec.var, atom);
           }
@@ -180,6 +178,21 @@ public final class GroupBy extends Clause {
 
         // we're finished, copy the array so the list can be garbage-collected
         return grps.toArray(Group[]::new);
+      }
+
+      /**
+       * Computes the hash value of a grouping key.
+       * @param atom atomized key
+       * @param coll collation (can be {@code null})
+       * @return hash value
+       * @throws QueryException query exception
+       */
+      private int hash(final Item atom, final Collation coll) throws QueryException {
+        if(atom == Empty.VALUE) return 0;
+        final byte[] key = Collation.key(atom, coll, info);
+        if(key != null) return Token.hashCode(key);
+        // strings without collation keys collide; comparison does the remaining work
+        return coll != null && atom.type.isStringOrUntyped() ? 0 : atom.hashCode();
       }
 
       /**
