@@ -515,10 +515,10 @@ public class ShapeType extends MapType {
    * @return result of check
    */
   private boolean sameOrder(final ShapeType sh) {
-    if(fields.size() != sh.fields.size()) return false;
-    final Iterator<byte[]> iter = fields.iterator(), iter2 = sh.fields.iterator();
-    for(byte[] key; (key = iter.next()) != null;) {
-      if(!Token.eq(key, iter2.next())) return false;
+    final int fs = fields.size();
+    if(fs != sh.fields.size()) return false;
+    for(int f = 1; f <= fs; f++) {
+      if(!Token.eq(fields.key(f), sh.fields.key(f))) return false;
     }
     return true;
   }
@@ -541,6 +541,8 @@ public class ShapeType extends MapType {
     if(type.instanceOf(this)) return type;
 
     if(type instanceof final ShapeType sh) {
+      // record(*) and an inferred shape: records with the fields of the shape
+      if(any() || sh.any()) return new RecordType((any() ? sh : this).fields);
       // a record has the fields of its type, and a single nominative record type
       final QNm id = name(), shid = sh.name();
       if(!sameFields(sh) || id != null && shid != null && !id.eq(shid)) return null;

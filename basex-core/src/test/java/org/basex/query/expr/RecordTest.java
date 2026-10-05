@@ -875,6 +875,12 @@ public final class RecordTest extends SandboxTest {
     query(prolog + "count(jtree([ map:merge({ 'a': 1, 'b': local:item()?b }) ])"
         + "/jnode(*, local:AB)/self::jnode(*, local:BA))", 0);
 
+    // inferred shapes in the input of record filters
+    query(prolog + "declare %basex:inline(0) function local:r($x) { "
+        + "if($x) then local:ab() else { 'a': 5, 'b': 6 } }; "
+        + "count(local:r(true())[. instance of local:AB]), "
+        + "count(local:r(true())[. instance of local:BA])", "1\n1");
+
     // nested record types are compared irrespective of the field order
     query(prolog + "declare record local:NA(r as array(local:AB)); "
         + "declare type local:MA as record(r as array(local:BA)); "
