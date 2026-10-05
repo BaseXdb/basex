@@ -72,21 +72,29 @@ public abstract class Collation {
 
     // return default collation
     if(uri == null) return info.sc().collation;
+    // return Unicode point collation or cached instance (skips URI parsing)
+    if(eq(COLLATION_URI, uri)) return null;
+
+    if(qc.collations == null) qc.collations = new TokenObjectMap<>();
+    Collation coll = qc.collations.get(uri);
+    if(coll != null) return coll;
 
     final Uri u = Uri.get(uri);
     if(!u.isValid()) throw INVURI_X.get(info, uri);
-    final byte[] url = u.isAbsolute() ? uri : Token.startsWith(uri, '?') ? concat(BASEX, uri) :
-      info.sc().baseURI().resolve(u).string();
-
-    // return Unicode point collation
-    if(eq(COLLATION_URI, url)) return null;
-
-    // create new collation or return cached instance
-    if(qc.collations == null) qc.collations = new TokenObjectMap<>();
-    Collation coll = qc.collations.get(url);
+    // URIs that do not depend on the base URI are cached by their original string
+    byte[] url = uri, key = uri;
+    if(!u.isAbsolute()) {
+      if(Token.startsWith(uri, '?')) {
+        url = concat(BASEX, uri);
+      } else {
+        url = key = info.sc().baseURI().resolve(u).string();
+        if(eq(COLLATION_URI, url)) return null;
+        coll = qc.collations.get(url);
+      }
+    }
     if(coll == null) {
       coll = get(url, info, err);
-      qc.collations.put(url, coll);
+      qc.collations.put(key, coll);
     }
     return coll;
   }
