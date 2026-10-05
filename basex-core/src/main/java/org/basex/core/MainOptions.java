@@ -142,8 +142,6 @@ public final class MainOptions extends Options {
   public static final BooleanOption WITHDB = new BooleanOption("WITHDB", true);
   /** Favor global database when opening resources. */
   public static final BooleanOption DEFAULTDB = new BooleanOption("DEFAULTDB", false);
-  /** Forces database creation for unknown documents. */
-  public static final BooleanOption FORCECREATE = new BooleanOption("FORCECREATE", false);
   /** Default for the 'trust-external' option of XQuery functions. */
   public static final BooleanOption TRUSTEXTERNAL = new BooleanOption("TRUSTEXTERNAL", false);
   /** Validate string inputs. */

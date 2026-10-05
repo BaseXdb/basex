@@ -592,23 +592,17 @@ public final class QueryResources {
 
     // create parsing options with custom values
     final MainOptions mopts = context.options, options;
-    final boolean mainmem = !mopts.get(MainOptions.FORCECREATE);
-    if(mainmem) {
-      if(!allowExternal && docOpts == DOC_OPTIONS && mopts.resolver().standard()
-        && !mopts.get(MainOptions.TRUSTEXTERNAL)) {
-        options = MAIN_OPTIONS;
-      } else {
-        options = new MainOptions(docOpts, mopts);
-        if(allowExternal) options.allowExternal(true);
-      }
+    if(!allowExternal && docOpts == DOC_OPTIONS && mopts.resolver().standard()
+      && !mopts.get(MainOptions.TRUSTEXTERNAL)) {
+      options = MAIN_OPTIONS;
     } else {
-      docOpts.checkDbAccess(info);
-      options = mopts;
+      options = new MainOptions(docOpts, mopts);
+      if(allowExternal) options.allowExternal(true);
     }
 
     try {
       final DirParser parser = new DirParser(io, options);
-      final Data data = CreateDB.create(io.dbName(), parser, context, options, mainmem);
+      final Data data = CreateDB.create(io.dbName(), parser, context, options, true);
       data.meta.docOpts = docOpts.toString();
       if(!docOpts.get(DocOptions.STABLE)) return data;
       return addData(data);
