@@ -70,7 +70,12 @@ public final class DualIterMap extends SimpleMap {
       qf.value = item1;
       try {
         final Iter iter2 = exprs[1].iter(qc);
-        for(Item item2; (item2 = qc.next(iter2)) != null;) vb.add(item2);
+        final Value value2 = iter2.eagerValue();
+        if(value2 != null) {
+          vb.add(value2);
+        } else {
+          for(Item item2; (item2 = qc.next(iter2)) != null;) vb.add(item2);
+        }
       } finally {
         qf.value = qv;
       }

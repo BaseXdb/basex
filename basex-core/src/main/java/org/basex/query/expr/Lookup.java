@@ -27,6 +27,8 @@ import org.basex.util.hash.*;
 public final class Lookup extends Arr {
   /** Indicates if the keys can be evaluated once for all input items. */
   private boolean cacheKeys;
+  /** Indicates if the input yields at most one item. */
+  private boolean single;
 
   /**
    * Constructor.
@@ -54,8 +56,8 @@ public final class Lookup extends Arr {
 
   @Override
   public boolean navigational() {
-    final Expr input = exprs[0];
-    return (input instanceof Path || input instanceof Lookup) && input.navigational();
+    final Expr inputs = exprs[0];
+    return (inputs instanceof Path || inputs instanceof Lookup) && inputs.navigational();
   }
 
   @Override
@@ -64,6 +66,7 @@ public final class Lookup extends Arr {
 
     final Expr inputs = exprs[0], keys = exprs[1];
     cacheKeys = !keys.has(Flag.NDT);
+    single = inputs.seqType().zeroOrOne();
     final long is = inputs.size();
     if(is == 0) return cc.replaceWith(this, inputs);
 
@@ -100,12 +103,12 @@ public final class Lookup extends Arr {
    * @throws QueryException query exception
    */
   private Expr opt(final CompileContext cc) throws QueryException {
-    final Expr input = exprs[0], keys = exprs[1];
-    final long is = input.size();
+    final Expr inputs = exprs[0], keys = exprs[1];
+    final long is = inputs.size();
     final long ks = keys.seqType().mayBeWrapped() || keys.has(Flag.NDT) ? -1 : keys.size();
     if(ks == 0) return keys;
 
-    final Type it = input.seqType().type;
+    final Type it = inputs.seqType().type;
     final boolean map = it instanceof MapType, array = it instanceof ArrayType;
     if(map || array) {
       // keep the lookup if a runtime value could be a strict record that lacks a requested key
@@ -125,23 +128,23 @@ public final class Lookup extends Arr {
       // single key
       if(ks == 1) {
         // single input:  INPUT?KEY → REWRITE(INPUT, KEY)
-        if(is == 1) return rewrite.apply(input, keys);
+        if(is == 1) return rewrite.apply(inputs, keys);
         // multiple inputs:  INPUTS?KEY → INPUTS ! REWRITE(., KEY)
-        return SimpleMap.get(cc, info, input,
-            cc.get(input, true, () -> rewrite.apply(ContextValue.get(cc, info), keys)));
+        return SimpleMap.get(cc, info, inputs,
+            cc.get(inputs, true, () -> rewrite.apply(ContextValue.get(cc, info), keys)));
       }
 
       // multiple deterministic keys, input can be duplicated and is focus-independent
-      if(ks != -1 && input.duplicable() && !input.has(Flag.CTX)) {
+      if(ks != -1 && inputs.duplicable() && !inputs.has(Flag.CTX)) {
         // single input:  INPUT?KEYS → KEYS ! REWRITE(INPUT, .)
         if(is == 1) return SimpleMap.get(cc, info, keys,
-            cc.get(keys, true, () -> rewrite.apply(input, ContextValue.get(cc, info))));
+            cc.get(keys, true, () -> rewrite.apply(inputs, ContextValue.get(cc, info))));
         // multiple inputs:  INPUT?KEYS → for $item in INPUT return KEYS ! REWRITE($item, .)
         final FLWORBuilder flwor = new FLWORBuilder(1, cc, info);
         final Expr next = cc.get(keys, true, () ->
           rewrite.apply(flwor.ref(flwor.item), ContextValue.get(cc, info)));
         final Expr rtrn = SimpleMap.get(cc, info, keys, next);
-        return flwor.finish(input, null, rtrn);
+        return flwor.finish(inputs, null, rtrn);
       }
     }
     return this;
@@ -149,6 +152,8 @@ public final class Lookup extends Arr {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
+    if(single) return value(qc).iter();
+
     return new Iter() {
       final Iter inputs = exprs[0].iter(qc);
       Iter results = Empty.ITER;
@@ -166,6 +171,22 @@ public final class Lookup extends Arr {
         }
       }
     };
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    if(single) {
+      final Item input = exprs[0].item(qc, info);
+      return input.isEmpty() ? Empty.VALUE : lookup(input, exprs[1].atomValue(qc, info), qc);
+    }
+    final Iter inputs = exprs[0].iter(qc);
+    final ValueBuilder vb = new ValueBuilder(qc);
+    Value keys = null;
+    for(Item input; (input = qc.next(inputs)) != null;) {
+      if(keys == null || !cacheKeys) keys = exprs[1].atomValue(qc, info);
+      vb.add(lookup(input, keys, qc));
+    }
+    return vb.value(this);
   }
 
   /**
@@ -193,7 +214,9 @@ public final class Lookup extends Arr {
 
   @Override
   public Lookup copy(final CompileContext cc, final IntObjectMap<Var> vm) {
-    return copyType(new Lookup(info, copyAll(cc, vm, exprs)));
+    final Lookup lookup = copyType(new Lookup(info, copyAll(cc, vm, exprs)));
+    lookup.single = single;
+    return lookup;
   }
 
   @Override

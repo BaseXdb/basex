@@ -92,6 +92,13 @@ public abstract class XQArray extends XQStruct {
   }
 
   @Override
+  public Value items(final QueryContext qc) {
+    final ValueBuilder vb = new ValueBuilder(qc);
+    for(final Value value : members()) vb.add(value);
+    return vb.value();
+  }
+
+  @Override
   public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final Value value : members()) vb.add(value.atomValue(qc, ii));

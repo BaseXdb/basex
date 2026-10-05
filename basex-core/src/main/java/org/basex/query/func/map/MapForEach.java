@@ -5,6 +5,7 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.update.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
@@ -50,6 +51,17 @@ public class MapForEach extends MapFn {
         return size;
       }
     };
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    final XQMap map = toMap(arg(0), qc);
+    final FItem action = toFunction(arg(1), 3, this instanceof UpdateMapForEach, qc);
+
+    final HofArgs args = new HofArgs(3, action);
+    final ValueBuilder vb = new ValueBuilder(qc);
+    map.forEach((key, value) -> vb.add(invoke(action, args.set(0, key).set(1, value).inc(), qc)));
+    return vb.value(this);
   }
 
   @Override

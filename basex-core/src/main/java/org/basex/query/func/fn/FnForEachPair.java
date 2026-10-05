@@ -5,6 +5,7 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.update.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -49,6 +50,19 @@ public class FnForEachPair extends StandardFunc {
         return size;
       }
     };
+  }
+
+  @Override
+  public final Value value(final QueryContext qc) throws QueryException {
+    final Iter input1 = arg(0).iter(qc), input2 = arg(1).iter(qc);
+    final FItem action = toFunction(arg(2), 3, this instanceof UpdateForEachPair, qc);
+
+    final HofArgs args = new HofArgs(3, action);
+    final ValueBuilder vb = new ValueBuilder(qc);
+    for(Item item1, item2; (item1 = input1.next()) != null && (item2 = input2.next()) != null;) {
+      vb.add(invoke(action, args.set(0, item1).set(1, item2).inc(), qc));
+    }
+    return vb.value(this);
   }
 
   @Override

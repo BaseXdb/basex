@@ -73,10 +73,12 @@ public abstract class XQStruct extends FItem {
    * Returns all items (sequence-concatenated values) of this structure.
    * @param qc query context
    * @return items
-   * @throws QueryException query exception
    */
-  public Value items(final QueryContext qc) throws QueryException {
-    return itemsIter().value(qc, null);
+  public Value items(final QueryContext qc) {
+    final ValueBuilder vb = new ValueBuilder(qc);
+    final long size = structSize();
+    for(long i = 0; i < size; i++) vb.add(valueAt(i));
+    return vb.value();
   }
 
   /**
