@@ -113,8 +113,11 @@ public abstract class JsonSerializer extends StandardSerializer {
 
         boolean s = false;
         final TokenSet set = nodups ? new TokenSet() : null;
-        for(final Item key : keys(map)) {
-          final byte[] name = key.string(null);
+        final int[] order = order(map);
+        final long size = map.structSize();
+        for(long p = 0; p < size; p++) {
+          final long i = order != null ? order[(int) p] : p;
+          final byte[] name = map.keyAt(i).string(null);
           if(nodups) {
             if(set.contains(name)) throw SERDUPL_X.getIO(name);
             set.put(name);
@@ -124,7 +127,7 @@ public abstract class JsonSerializer extends StandardSerializer {
           string(name);
           out.print(':');
           if(indent) out.print(' ');
-          serialize(map.get(key));
+          serialize(map.valueAt(i));
           s = true;
         }
 
@@ -156,22 +159,23 @@ public abstract class JsonSerializer extends StandardSerializer {
   }
 
   /**
-   * Returns the keys of the given map, in canonical order, if required. Per RFC8785, "property name
-   * strings to be sorted are formatted as arrays of UTF-16 [UNICODE] code units. The sorting is
-   * based on pure value comparisons, where code units are treated as unsigned integers, independent
-   * of locale settings". This is achieved here by sorting the keys as strings.
+   * Returns the entry positions of the given map in canonical order, if required. Per RFC8785,
+   * "property name strings to be sorted are formatted as arrays of UTF-16 [UNICODE] code units.
+   * The sorting is based on pure value comparisons, where code units are treated as unsigned
+   * integers, independent of locale settings". This is achieved here by sorting the keys as
+   * strings.
    * @param map map
-   * @return keys
+   * @return positions, or {@code null} if the entries are serialized in their original order
    * @throws QueryException query exception
    */
-  private Iterable<Item> keys(final XQMap map) throws QueryException {
-    final Value ks = map.keys();
-    if(!canonical || ks.size() < 2) return ks;
+  private int[] order(final XQMap map) throws QueryException {
+    final int size = (int) map.structSize();
+    if(!canonical || size < 2) return null;
 
-    record Key(String string, Item item) { }
-    final ArrayList<Key> list = new ArrayList<>();
-    for(final Item k : ks) list.add(new Key(Token.string(k.string(null)), k));
-    return list.stream().sorted(Comparator.comparing(Key::string)).map(Key::item).toList();
+    record Key(String string, int index) { }
+    final ArrayList<Key> list = new ArrayList<>(size);
+    for(int i = 0; i < size; i++) list.add(new Key(Token.string(map.keyAt(i).string(null)), i));
+    return list.stream().sorted(Comparator.comparing(Key::string)).mapToInt(Key::index).toArray();
   }
 
   @Override
