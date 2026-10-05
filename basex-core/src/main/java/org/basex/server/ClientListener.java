@@ -223,24 +223,20 @@ public final class ClientListener extends Thread implements ClientInfo {
         return false;
       }
 
-      // receive {HASH}0; an empty string requests the salted handshake
+      // receive {}0 to request the salted handshake (the MD5 hash of clients < 13.0 is rejected)
       final User user = context.users.get(name);
-      String hash = in.readString(), stored = null;
-      if(hash.isEmpty()) {
+      if(in.readString().isEmpty()) {
         // send {ALGORITHM:SALT}0; unknown users receive a pseudo-random salt
         final Algorithm algorithm = Algorithm.SALTED_SHA256;
         String salt = user != null ? user.code(algorithm, Code.SALT) : null;
         if(salt == null) salt = salt(name);
         out.print(algorithm + ":" + salt);
         send(true);
-        hash = in.readString();
-        if(user != null) stored = user.code(algorithm, Code.HASH);
-        ok = stored != null && Strings.sha256(stored + nonce).equals(hash);
-      } else {
-        if(user != null) stored = user.code(Algorithm.DIGEST, Code.HASH);
-        ok = stored != null && Strings.md5(stored + nonce).equals(hash);
+        // receive {HASH}0
+        final String hash = in.readString();
+        final String stored = user != null ? user.code(algorithm, Code.HASH) : null;
+        ok = stored != null && Strings.sha256(stored + nonce).equals(hash) && user.enabled();
       }
-      ok = ok && user.enabled();
 
       // write log information
       if(ok) {

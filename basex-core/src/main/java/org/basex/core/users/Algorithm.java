@@ -18,19 +18,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public enum Algorithm {
-  /** Digest (legacy; required for client/server and HTTP digest authentication). */
-  DIGEST(Code.HASH) {
-    @Override
-    void prepare(final EnumMap<Code, String> codes) { }
-    @Override
-    String hash(final String name, final String password, final EnumMap<Code, String> codes) {
-      return md5(name + ':' + Prop.NAME + ':' + password);
-    }
-    @Override
-    boolean current(final EnumMap<Code, String> codes) {
-      return true;
-    }
-  },
   /** Salted SHA-256. */
   SALTED_SHA256(Code.SALT, Code.HASH) {
     @Override
@@ -38,7 +25,7 @@ public enum Algorithm {
       codes.put(Code.SALT, salt());
     }
     @Override
-    String hash(final String name, final String password, final EnumMap<Code, String> codes) {
+    String hash(final String password, final EnumMap<Code, String> codes) {
       return sha256(codes.get(Code.SALT) + password);
     }
     @Override
@@ -54,7 +41,7 @@ public enum Algorithm {
       codes.put(Code.ITERATIONS, Integer.toString(PBKDF2_ITERATIONS));
     }
     @Override
-    String hash(final String name, final String password, final EnumMap<Code, String> codes) {
+    String hash(final String password, final EnumMap<Code, String> codes) {
       return pbkdf2(password, codes.get(Code.SALT), toInt(codes.get(Code.ITERATIONS)));
     }
     @Override
@@ -81,28 +68,25 @@ public enum Algorithm {
 
   /**
    * Computes the password codes for a user.
-   * @param name username
    * @param password password (plain text)
    * @return codes
    */
-  final EnumMap<Code, String> create(final String name, final String password) {
+  final EnumMap<Code, String> create(final String password) {
     final EnumMap<Code, String> codes = new EnumMap<>(Code.class);
     prepare(codes);
-    codes.put(Code.HASH, hash(name, password, codes));
+    codes.put(Code.HASH, hash(password, codes));
     return codes;
   }
 
   /**
    * Checks if a password matches the stored codes.
-   * @param name username
    * @param password password (plain text)
    * @param codes stored codes
    * @return result of check
    */
-  final boolean verify(final String name, final String password,
-      final EnumMap<Code, String> codes) {
+  final boolean verify(final String password, final EnumMap<Code, String> codes) {
     // constant-time comparison of the recomputed and the stored hash
-    return MessageDigest.isEqual(token(hash(name, password, codes)), token(codes.get(Code.HASH)));
+    return MessageDigest.isEqual(token(hash(password, codes)), token(codes.get(Code.HASH)));
   }
 
   /**
@@ -113,12 +97,11 @@ public enum Algorithm {
 
   /**
    * Computes a password hash.
-   * @param name username
    * @param password password (plain text)
    * @param codes algorithm parameters
    * @return hash (hex string)
    */
-  abstract String hash(String name, String password, EnumMap<Code, String> codes);
+  abstract String hash(String password, EnumMap<Code, String> codes);
 
   /**
    * Checks if stored codes were computed with the current algorithm parameters.

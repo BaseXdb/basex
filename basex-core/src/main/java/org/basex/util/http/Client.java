@@ -19,7 +19,6 @@ import org.basex.build.csv.*;
 import org.basex.build.html.*;
 import org.basex.build.json.*;
 import org.basex.core.*;
-import org.basex.core.StaticOptions.*;
 import org.basex.core.jobs.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
@@ -232,7 +231,7 @@ public final class Client {
     final int max = request.redirects;
     try {
       final UserInfo ui = new UserInfo(uri, request);
-      if(request.sendAuthorization && request.authMethod == AuthMethod.BASIC) {
+      if(request.sendAuthorization && request.authScheme == AuthScheme.BASIC) {
         ui.basic(rb);
         return send(client, rb.build(), handler, max);
       }
@@ -503,16 +502,6 @@ public final class Client {
       Certificates.context(request.certificates, request.verify, info) :
       request.verify ? null : IOUrl.insecure();
     return clients.add(key, context);
-  }
-
-  /**
-   * Returns the authentication headers.
-   * @param auth authorization string (can be {@code null})
-   * @return values
-   */
-  public static EnumMap<AuthParam, String> authHeaders(final String auth) {
-    final ArrayList<EnumMap<AuthParam, String>> list = challenges(auth);
-    return list.isEmpty() ? new EnumMap<>(AuthParam.class) : list.get(0);
   }
 
   /**

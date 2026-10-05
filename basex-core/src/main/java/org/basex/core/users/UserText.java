@@ -1,6 +1,7 @@
 package org.basex.core.users;
 
 import org.basex.query.value.item.*;
+import org.basex.util.*;
 
 /**
  * This class assembles texts which are used in the user management.
@@ -13,6 +14,8 @@ public interface UserText {
   String[] S_USERINFO = { "Username", "Permission" };
   /** Default user and password. */
   String ADMIN = "admin";
+  /** Name of the removed digest algorithm. */
+  byte[] DIGEST = Token.token("digest");
 
   /** QName. */
   QNm Q_USERS = new QNm("users");

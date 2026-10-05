@@ -90,8 +90,11 @@ public final class User {
       final XNode child = (XNode) gchild;
       final QNm qname = child.qname();
       if(qname.eq(Q_PASSWORD)) {
+        // skip codes of the removed digest algorithm (BaseX < 13.0)
+        final byte[] alg = attribute(child, Q_ALGORITHM, name);
+        if(eq(alg, DIGEST)) continue;
         final EnumMap<Code, String> ec = new EnumMap<>(Code.class);
-        final Algorithm algorithm = attribute(name, child, Q_ALGORITHM, Algorithm.values());
+        final Algorithm algorithm = value(name, alg, Algorithm.values());
         if(passwords.containsKey(algorithm)) throw new BaseXException(
             "%: Algorithm % supplied more than once.", name, algorithm);
         passwords.put(algorithm, ec);
@@ -192,7 +195,7 @@ public final class User {
    */
   synchronized void recode(final String password, final Algorithm[] algorithms) {
     for(final Algorithm algorithm : algorithms) {
-      passwords.put(algorithm, algorithm.create(name, password));
+      passwords.put(algorithm, algorithm.create(password));
     }
   }
 
@@ -285,7 +288,7 @@ public final class User {
   public synchronized boolean matches(final String password, final Algorithm[] algorithms) {
     for(final Algorithm algorithm : algorithms) {
       final EnumMap<Code, String> codes = passwords.get(algorithm);
-      if(codes != null && algorithm.verify(name, password, codes)) return true;
+      if(codes != null && algorithm.verify(password, codes)) return true;
     }
     return false;
   }

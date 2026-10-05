@@ -111,7 +111,6 @@ public final class StaticOptions extends Options {
   /** Authorization method. */
   public enum AuthMethod {
     /** Basic.  */ BASIC,
-    /** Digest. */ DIGEST,
     /** Custom. */ CUSTOM;
 
     @Override
@@ -152,12 +151,6 @@ public final class StaticOptions extends Options {
       Prop.setSystem("http.nonProxyHosts", nph);
     }
     if(get(IGNORECERT)) IOUrl.ignoreCertificates();
-
-    // warn if digest authentication is enabled without a matching password algorithm
-    if(get(AUTHMETHOD) == AuthMethod.DIGEST && !Enums.oneOf(Algorithm.DIGEST, authAlgorithms())) {
-      Util.errln("Warning: %='%' requires '%' in %.",
-          AUTHMETHOD.name(), AuthMethod.DIGEST, Algorithm.DIGEST, AUTHALGORITHMS.name());
-    }
   }
 
   /**

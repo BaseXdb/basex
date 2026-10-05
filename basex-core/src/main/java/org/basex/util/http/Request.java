@@ -7,7 +7,6 @@ import java.net.http.*;
 import java.time.*;
 import java.util.*;
 
-import org.basex.core.StaticOptions.AuthMethod;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.util.list.*;
@@ -51,8 +50,8 @@ public final class Request {
   public String username;
   /** Password (can be {@code null}). */
   public String password;
-  /** Authentication method. */
-  public AuthMethod authMethod = AuthMethod.BASIC;
+  /** Authentication scheme. */
+  public AuthScheme authScheme = AuthScheme.BASIC;
   /** Send credentials before a challenge is received. */
   public boolean sendAuthorization;
   /** Maximum number of redirects ({@code 0}: do not follow redirects). */
@@ -168,9 +167,9 @@ public final class Request {
    * @throws QueryException query exception
    */
   void authMethod(final String name, final InputInfo info) throws QueryException {
-    for(final AuthMethod auth : AuthMethod.values()) {
+    for(final AuthScheme auth : AuthScheme.values()) {
       if(auth.toString().equalsIgnoreCase(name)) {
-        authMethod = auth;
+        authScheme = auth;
         return;
       }
     }

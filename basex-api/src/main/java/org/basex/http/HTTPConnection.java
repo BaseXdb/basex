@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 import static org.basex.util.http.HTTPText.*;
 
 import java.io.*;
-import java.security.*;
 import java.util.*;
 import java.util.function.*;
 
@@ -331,14 +330,8 @@ public final class HTTPConnection implements ClientInfo {
     try {
       response.resetBuffer();
       if(code == SC_UNAUTHORIZED && !response.containsHeader(WWW_AUTHENTICATE)) {
-        final TokenBuilder header = new TokenBuilder().add(authMethod);
-        header.add(' ').add(AuthParam.REALM).add("=\"").add(Prop.NAME).add('"');
-        if(authMethod == AuthMethod.DIGEST) {
-          final String nonce = Strings.md5(Long.toString(System.nanoTime()));
-          header.add(",").add(AuthParam.QOP).add("=\"").add(AUTH);
-          header.add('"').add(',').add(AuthParam.NONCE).add("=\"").add(nonce).add('"');
-        }
-        response.setHeader(WWW_AUTHENTICATE, header.toString());
+        response.setHeader(WWW_AUTHENTICATE,
+            authMethod + " " + AuthParam.REALM + "=\"" + Prop.NAME + '"');
       }
 
       response.setStatus(code < 0 || code > 999 ? 500 : code);
@@ -427,7 +420,7 @@ public final class HTTPConnection implements ClientInfo {
       if(authMethod == AuthMethod.CUSTOM) {
         // custom authentication
         user = user(UserText.ADMIN);
-      } else if(authMethod == AuthMethod.BASIC) {
+      } else {
         final String details = am.length > 1 ? am[1] : "";
         final String[] creds = Strings.split(Base64.decode(details), ':', 2);
         user = user(creds[0]);
@@ -435,32 +428,6 @@ public final class HTTPConnection implements ClientInfo {
         if(creds.length < 2 || !user.matches(creds[1], algorithms))
           throw new LoginException(user.name());
         context.users.rehash(user, creds[1], algorithms);
-      } else {
-        final EnumMap<AuthParam, String> auth = Client.authHeaders(header);
-        user = user(auth.get(AuthParam.USERNAME));
-
-        final String nonce = auth.get(AuthParam.NONCE);
-        final String cnonce = auth.get(AuthParam.CNONCE);
-        String ha1 = user.code(Algorithm.DIGEST, Code.HASH);
-        // reject if no digest hash is stored for the user (digest not enabled in AUTHALGORITHMS)
-        if(ha1 == null) throw new LoginException(user.name());
-        if(Strings.eq(auth.get(AuthParam.ALGORITHM), MD5_SESS))
-          ha1 = Strings.md5(ha1 + ':' + nonce + ':' + cnonce);
-
-        final String qop = auth.get(AuthParam.QOP);
-        final String ha2 = Strings.md5(method + ':' + auth.get(AuthParam.URI));
-
-        final StringBuilder sb = new StringBuilder(ha1).append(':').append(nonce);
-        if(Strings.eq(qop, AUTH)) {
-          sb.append(':').append(auth.get(AuthParam.NC));
-          sb.append(':').append(cnonce).append(':').append(qop);
-        }
-        sb.append(':').append(ha2);
-
-        // constant-time comparison of the recomputed and the transmitted response
-        final String rsp = auth.get(AuthParam.RESPONSE);
-        if(rsp == null || !MessageDigest.isEqual(token(Strings.md5(sb.toString())), token(rsp)))
-          throw new LoginException(user.name());
       }
 
       // accept and return user

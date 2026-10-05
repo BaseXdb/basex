@@ -7,7 +7,6 @@ import java.net.*;
 import java.net.http.*;
 import java.util.*;
 
-import org.basex.core.StaticOptions.*;
 import org.basex.util.*;
 import org.basex.util.Base64;
 
@@ -78,7 +77,7 @@ public final class UserInfo {
    */
   public void basic(final HttpRequest.Builder rb) {
     if(username != null && password != null) rb.header(AUTHORIZATION,
-        AuthMethod.BASIC + " " + Base64.encode(username + ':' + password));
+        AuthScheme.BASIC + " " + Base64.encode(username + ':' + password));
   }
 
   /**
@@ -96,7 +95,7 @@ public final class UserInfo {
     final URI target = last.uri();
     if(!sameOrigin(uri, target)) return null;
 
-    final String value = request.authMethod == AuthMethod.BASIC ?
+    final String value = request.authScheme == AuthScheme.BASIC ?
       Base64.encode(username + ':' + password) : digest(response.headers(), last);
     if(value == null) return null;
 
@@ -109,7 +108,7 @@ public final class UserInfo {
     if(!last.method().equals(sent.method())) {
       rb.method(last.method(), body.orElse(HttpRequest.BodyPublishers.noBody()));
     }
-    return rb.header(AUTHORIZATION, request.authMethod + " " + value).build();
+    return rb.header(AUTHORIZATION, request.authScheme + " " + value).build();
   }
 
   /**
@@ -121,7 +120,7 @@ public final class UserInfo {
   private String digest(final HttpHeaders headers, final HttpRequest last) {
     for(final String header : headers.allValues(WWW_AUTHENTICATE)) {
       for(final EnumMap<AuthParam, String> auth : Client.challenges(header)) {
-        if(!request.authMethod.toString().equalsIgnoreCase(auth.get(SCHEME))) continue;
+        if(!request.authScheme.toString().equalsIgnoreCase(auth.get(SCHEME))) continue;
 
         // supported algorithms: MD5, SHA-256, SHA-512-256, optionally with session suffix
         final String algorithm = auth.getOrDefault(ALGORITHM, MD5);
