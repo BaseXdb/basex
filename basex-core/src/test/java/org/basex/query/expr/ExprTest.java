@@ -598,6 +598,17 @@ public final class ExprTest extends SandboxTest {
         + "default return 'ok'", "ok", root(Str.class));
   }
 
+  /** Checks switch expressions with string cases (evaluated via an index). */
+  @Test public void switchStrings() {
+    final String sw = " return switch($x) case 'a' case 'b' return 1 case 'c' return 2 "
+        + "case 'd' return 3 case 'e' case 'a' return 4 default return 0";
+    query("for $x in ('a', 'b', 'c', 'd', 'e', 'x', '')" + sw, "1\n1\n2\n3\n4\n0\n0");
+    // other string types and untyped atomics, non-string items
+    query("for $x in (xs:untypedAtomic('c'), xs:NCName('d'), xs:anyURI('e'), 1, <a>b</a>)" + sw,
+        "2\n3\n4\n0\n1");
+    query("let $x := " + wrap("a") + sw, 1);
+  }
+
   /** Checks {@link SimpleMap} simplifications. */
   @Test public void simpleMap() {
     // boolean(@id ! true()) → boolean(@id)

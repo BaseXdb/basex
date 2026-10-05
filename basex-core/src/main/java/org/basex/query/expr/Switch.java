@@ -28,6 +28,8 @@ public final class Switch extends ParseExpr {
   private Expr cond;
   /** Case groups. */
   private SwitchGroup[] groups;
+  /** Indexes of the groups of string cases (can be {@code null}). */
+  private TokenIntMap strings;
 
   /**
    * Constructor.
@@ -77,7 +79,34 @@ public final class Switch extends ParseExpr {
     // combine types of return expressions
     exprType.assign(SeqType.union(groups, true)).data(groups);
 
+    strings = index();
     return this;
+  }
+
+  /**
+   * Creates an index for the groups if all cases are strings and no collation is assigned.
+   * @return map from strings to group indexes, or {@code null}
+   */
+  private TokenIntMap index() {
+    if(info != null && sc().collation != null) return null;
+    int size = 0;
+    for(final SwitchGroup group : groups) {
+      final Expr[] exprs = group.exprs;
+      final int el = exprs.length;
+      for(int e = 1; e < el; e++) {
+        if(!(exprs[e] instanceof final Str str) || str.type != BasicType.STRING) return null;
+      }
+      size += el - 1;
+    }
+    if(size < 4) return null;
+
+    // add cases in reverse order: the first group with a given string wins
+    final TokenIntMap index = new TokenIntMap(size);
+    for(int g = groups.length - 1; g >= 0; g--) {
+      final Expr[] exprs = groups[g].exprs;
+      for(int e = exprs.length - 1; e >= 1; e--) index.put(((Str) exprs[e]).string(), g);
+    }
+    return index;
   }
 
   @Override
@@ -226,6 +255,10 @@ public final class Switch extends ParseExpr {
    */
   private Expr expr(final QueryContext qc) throws QueryException {
     final Item item = cond.atomItem(qc, info);
+    if(strings != null && item.type.isStringOrUntyped()) {
+      final int g = strings.get(item.string(info));
+      return groups[g != Integer.MIN_VALUE ? g : groups.length - 1].rtrn();
+    }
     for(final SwitchGroup group : groups) {
       if(group.match(item, qc)) return group.rtrn();
     }
