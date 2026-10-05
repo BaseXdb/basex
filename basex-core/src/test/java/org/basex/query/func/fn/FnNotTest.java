@@ -82,7 +82,7 @@ public final class FnNotTest extends SandboxTest {
 
   /** fn:not with wrong number of arguments and general cases. */
   @Test public void notMisc() {
-    error("not()", INVNARGS_X_X);
+    error("not()", PARAMMISSING_X_X);
     error("not(1, 2, 3, 4, 5, 6)", INVNARGS_X_X);
     query("not(false() and false())", true);
     query("not(not(true()))", true);

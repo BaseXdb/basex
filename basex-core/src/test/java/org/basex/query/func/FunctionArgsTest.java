@@ -62,7 +62,7 @@ public final class FunctionArgsTest extends SandboxTest {
             FUNCCAST_X_X, RESWHICH_X, DB_COMPACT_X, DB_NODE_X, NODOC_X, CLIENT_ID_X, SQL_ID1_X,
             SQL_ID2_X);
         // wrong number of arguments: XPST0017
-        else error(query, INVNARGS_X_X);
+        else error(query, al < min ? PARAMMISSING_X_X : INVNARGS_X_X);
       }
     }
   }

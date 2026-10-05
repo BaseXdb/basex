@@ -144,7 +144,7 @@ public final class ErrorMessageTest extends SandboxTest {
 
   /** Unprefixed call of a user-defined function with wrong arity reports an arity mismatch. */
   @Test public void wrongArityNoNamespace() {
-    error("declare function abc($j) { }; abc()", INVNARGS_X_X);
+    error("declare function abc($j) { }; abc()", PARAMMISSING_X_X);
   }
 
   /** Unprefixed call of a built-in must still resolve when a same-named user function exists. */
