@@ -82,29 +82,11 @@ public abstract class XQShapeMap extends XQMap {
   }
 
   @Override
-  public final void forEach(final QueryBiConsumer<Item, Value> func) throws QueryException {
-    final int fs = (int) structSize();
-    for(int f = 0; f < fs; f++) func.accept(keyAt(f), valueAt(f));
-  }
-
-  @Override
-  public final boolean test(final QueryBiPredicate<Item, Value> func) throws QueryException {
-    final int fs = (int) structSize();
-    for(int f = 0; f < fs; f++) {
-      if(!func.test(keyAt(f), valueAt(f))) return false;
-    }
-    return true;
-  }
-
-  @Override
   public final boolean refineType() {
-    final ShapeType sh = shape();
-    if(sh.name() == null) {
-      final int fs = (int) structSize();
-      final SeqType[] seqTypes = new SeqType[fs];
-      for(int f = 0; f < fs; f++) seqTypes[f] = valueAt(f).seqType();
-      type = sh.refine(seqTypes);
-    }
+    final int fs = (int) structSize();
+    final SeqType[] seqTypes = new SeqType[fs];
+    for(int f = 0; f < fs; f++) seqTypes[f] = valueAt(f).seqType();
+    type = shape().refine(seqTypes);
     return true;
   }
 

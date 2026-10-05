@@ -226,7 +226,10 @@ public abstract class XQMap extends XQStruct {
    * @param func function to apply on keys and values
    * @throws QueryException query exception
    */
-  public abstract void forEach(QueryBiConsumer<Item, Value> func) throws QueryException;
+  public final void forEach(final QueryBiConsumer<Item, Value> func) throws QueryException {
+    final long size = structSize();
+    for(long i = 0; i < size; i++) func.accept(keyAt(i), valueAt(i));
+  }
 
   /**
    * Tests all entries.
@@ -234,7 +237,13 @@ public abstract class XQMap extends XQStruct {
    * @return {@code true} if the check is successful for all entries
    * @throws QueryException query exception
    */
-  public abstract boolean test(QueryBiPredicate<Item, Value> func) throws QueryException;
+  public final boolean test(final QueryBiPredicate<Item, Value> func) throws QueryException {
+    final long size = structSize();
+    for(long i = 0; i < size; i++) {
+      if(!func.test(keyAt(i), valueAt(i))) return false;
+    }
+    return true;
+  }
 
   /**
    * Checks if the given key exists in the map.
@@ -426,20 +435,20 @@ public abstract class XQMap extends XQStruct {
     if(mt == Types.MAP) return this;
     final SeqType kt = mt.keyType().seqType(), vt = mt.valueType();
     final MapBuilder mb = new MapBuilder(structSize());
-    for(final Item key : keys()) {
+    return test((key, value) -> {
       qc.checkStop();
       final Value ck = kt.convert(key, error, qc, info);
-      if(ck == null) return null;
+      if(ck == null) return false;
       final Item k = (Item) ck;
       if(mb.contains(k)) {
         if(error) throw MAPDUPLKEY_X.get(info, k);
-        return null;
+        return false;
       }
-      final Value cv = vt.convert(get(key), error, qc, info);
-      if(cv == null) return null;
+      final Value cv = vt.convert(value, error, qc, info);
+      if(cv == null) return false;
       mb.put(k, cv);
-    }
-    return mb.map();
+      return true;
+    }) ? mb.map() : null;
   }
 
   /**

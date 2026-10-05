@@ -33,24 +33,17 @@ public final class MapGet extends MapFn {
     if(map == XQMap.empty()) return dflt ? arg(2) : Empty.VALUE;
 
     final MapTypeInfo mti = MapTypeInfo.get(map).key(key);
-    SeqType st = null;
-    boolean notFound = false;
-    if(mti.index != 0) {
-      // use optimized getter for records
-      return new ShapeGet(info, map, mti.index).optimize(cc);
-    } else if(mti.validKey) {
-      // map:get({ 'a': 1 }, 'b') → ()
-      notFound = true;
+    // use optimized getter for records
+    if(mti.index != 0) return new ShapeGet(info, map, mti.index).optimize(cc);
+    // map:get({ 'a': 1 }, 'b') → (), map:get({ 1: 1 }, 'string') → ()
+    if(mti.validKey || mti.keyMismatch) {
+      return cc.voidAndReturn(map, dflt ? arg(2) : Empty.VALUE, info);
     }
-
+    // type of result
     if(mti.mapType != null) {
-      // map:get({ 1: 1 }, 'string') → ()
-      if(mti.keyMismatch) notFound = true;
-      // type of result
-      else st = mti.mapType.valueType();
+      final SeqType st = mti.mapType.valueType();
+      exprType.assign(dflt ? st.union(arg(2).seqType()) : st.union(Occ.ZERO));
     }
-
-    if(st != null) exprType.assign(dflt ? st.union(arg(2).seqType()) : st.union(Occ.ZERO));
-    return notFound ? cc.voidAndReturn(map, dflt ? arg(2) : Empty.VALUE, info) : this;
+    return this;
   }
 }

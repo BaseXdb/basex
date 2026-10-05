@@ -33,20 +33,14 @@ public final class MapRemove extends MapFn {
     final MapTypeInfo mti = MapTypeInfo.get(map).key(key);
     if(mti.index != 0) {
       // remove the only field of a record: map:remove(RECORD, FIELD) → {}
-      if(mti.shape.fields().size() == 1) return XQMap.empty();
+      if(mti.shape.fields().size() == 1) return cc.voidAndReturn(map, XQMap.empty(), info);
       // narrow the shape: map:remove({ 'a': 1, 'b': 2 }, 'a') → map with field b
       exprType.assign(cc.qc.shared.shape(mti.shape.remove(mti.shape.fields().key(mti.index))));
       return this;
-    } else if(mti.validKey) {
-      // return input map if nothing changes: map:remove({ 'a': 1 }, 'b') → { 'a': 1 }
-      return map;
     }
-
-    if(mti.mapType != null) {
-      // map:remove({ 1: 1 }, 'string') → { 1: 1 }
-      if(mti.keyMismatch) return map;
-      exprType.assign(MapType.get(mti.mapType));
-    }
+    // return input map if nothing changes: map:remove({ 'a': 1 }, 'b') → { 'a': 1 }
+    if(mti.validKey || mti.keyMismatch) return map;
+    if(mti.mapType != null) exprType.assign(MapType.get(mti.mapType));
     return this;
   }
 }

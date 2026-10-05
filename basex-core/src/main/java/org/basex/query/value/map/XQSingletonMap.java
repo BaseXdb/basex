@@ -70,16 +70,6 @@ public final class XQSingletonMap extends XQMap {
   }
 
   @Override
-  public void forEach(final QueryBiConsumer<Item, Value> func) throws QueryException {
-    func.accept(k, v);
-  }
-
-  @Override
-  public boolean test(final QueryBiPredicate<Item, Value> func) throws QueryException {
-    return func.test(k, v);
-  }
-
-  @Override
   public Item shrink(final QueryContext qc) throws QueryException {
     v = v.shrink(qc);
     refineType();

@@ -46,12 +46,10 @@ public final class MapTypeInfo {
    * @throws QueryException query exception
    */
   public MapTypeInfo key(final Expr expr) throws QueryException {
-    if(shape != null) {
-      if(expr instanceof final Item item) {
-        final Type kt = expr.seqType().type;
-        if(kt.isStringOrUntyped()) index = shape.fields().index(item.string(null));
-        if(kt.instanceOf(BasicType.ANY_ATOMIC_TYPE)) validKey = true;
-      }
+    if(shape != null && expr instanceof final Item item) {
+      final Type kt = item.type;
+      if(kt.isStringOrUntyped()) index = shape.fields().index(item.string(null));
+      if(kt.instanceOf(BasicType.ANY_ATOMIC_TYPE)) validKey = true;
     }
     if(mapType != null) {
       final Type et = expr.seqType().type.atomic(), kt = mapType.keyType();

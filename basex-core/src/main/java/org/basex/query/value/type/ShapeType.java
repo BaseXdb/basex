@@ -1,11 +1,13 @@
 package org.basex.query.value.type;
 
 import static java.util.Collections.*;
+import static org.basex.query.QueryError.*;
 
 import java.util.*;
 import java.util.concurrent.*;
 
 import org.basex.query.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.util.*;
@@ -29,8 +31,8 @@ public class ShapeType extends MapType {
   private final TokenObjectMap<ShapeField> fields;
   /** Field names as string items (can be {@code null}). */
   private volatile Str[] keys;
-  /** Cached result of {@link #detached()} (can be {@code null}). */
-  private Boolean detached;
+  /** Indicates if the fields are free of initializing expressions. */
+  private final boolean detached;
   /** Cached shapes derived from this one (can be {@code null}). */
   private Map<Derived, ShapeType> derived;
 
@@ -41,16 +43,9 @@ public class ShapeType extends MapType {
   public ShapeType(final TokenObjectMap<ShapeField> fields) {
     super(BasicType.STRING, unionType(fields));
     this.fields = fields;
-  }
-
-  /**
-   * Creates a shape or a structural record type.
-   * @param fields field declarations
-   * @param declared declared flag
-   * @return shape
-   */
-  private static ShapeType get(final TokenObjectMap<ShapeField> fields, final boolean declared) {
-    return declared ? new RecordType(fields) : new ShapeType(fields);
+    boolean d = true;
+    for(final ShapeField rf : fields.values()) d &= rf.init() == null;
+    detached = d;
   }
 
   /**
@@ -92,8 +87,8 @@ public class ShapeType extends MapType {
       return null;
     }
     // shapes with query-scoped components must not be cached: they would be retained forever
-    if(detached() && (!(seqType != null && seqType.type instanceof final ShapeType sh) ||
-        sh.detached())) {
+    if(detached() &&
+        !(seqType != null && seqType.type instanceof final ShapeType sh && !sh.detached())) {
       if(derived == null) derived = new ConcurrentHashMap<>();
       // do not cache shapes that are derived from arbitrarily many field names
       if(derived.size() < MAX_DERIVED) {
@@ -172,7 +167,6 @@ public class ShapeType extends MapType {
     // the value type is not recomputed: only used to build recursive built-in records
     fields.put(Token.token(fieldName), new ShapeField(seqType));
     keys = null;
-    detached = null;
     return this;
   }
 
@@ -193,18 +187,38 @@ public class ShapeType extends MapType {
   }
 
   /**
+   * Coerces a value to the type of a field and names the field in error messages.
+   * @param f index of the field (starting with 1)
+   * @param value value
+   * @param qc query context
+   * @param ii input info (can be {@code null})
+   * @param cc compilation context ({@code null} during runtime)
+   * @return coerced value
+   * @throws QueryException query exception
+   */
+  public final Value coerce(final int f, final Value value, final QueryContext qc,
+      final InputInfo ii, final CompileContext cc) throws QueryException {
+    try {
+      return fields.value(f).seqType().coerce(value, qc, ii, null, cc);
+    } catch(final QueryException ex) {
+      if(ex.error() != INVTYPE_X) throw ex;
+      final String msg = ex.getLocalizedMessage();
+      throw INVTYPE_X.get(ex.info(), "Field " + Token.string(QueryString.toQuoted(
+        fields.key(f))) + " of " + this + ": " +
+        (msg.endsWith(".") ? msg.substring(0, msg.length() - 1) : msg));
+    }
+  }
+
+  /**
    * Calculate union type of field sequence types.
    * @param rfs field declarations
    * @return union type
    */
   private static SeqType unionType(final TokenObjectMap<ShapeField> rfs) {
-    if(rfs.isEmpty()) return Types.ITEM_ZM;
-    SeqType ust = null;
     final int fs = rfs.size();
-    for(int f = 1; f <= fs; f++) {
-      final SeqType st = rfs.value(f).seqType();
-      ust = ust == null ? st : ust.union(st);
-    }
+    if(fs == 0) return Types.ITEM_ZM;
+    SeqType ust = rfs.value(1).seqType();
+    for(int f = 2; f <= fs; f++) ust = ust.union(rfs.value(f).seqType());
     return ust;
   }
 
@@ -226,20 +240,12 @@ public class ShapeType extends MapType {
   }
 
   /**
-   * Returns the identity of a nominative record type.
-   * @return identity, or {@code null} for structural record types and shapes
-   */
-  QNm identity() {
-    return null;
-  }
-
-  /**
    * Checks if this type and the specified type have the same identity.
    * @param sh shape type
    * @return result of check
    */
   private boolean sameIdentity(final ShapeType sh) {
-    final QNm id = identity(), shid = sh.identity();
+    final QNm id = name(), shid = sh.name();
     return id == null ? shid == null : shid != null && id.eq(shid);
   }
 
@@ -253,12 +259,12 @@ public class ShapeType extends MapType {
   }
 
   /**
-   * Indicates if this shape enforces strict field access, i.e. it is declared and not the
-   * abstract {@code record(*)} type. Lookups of undeclared fields on such records raise an error.
+   * Indicates if lookups of undeclared fields raise an error, i.e. if this is a declared record
+   * type other than {@code record(*)}.
    * @return result of check
    */
-  public boolean strict() {
-    return false;
+  public final boolean strict() {
+    return declared() && !any();
   }
 
   /**
@@ -283,7 +289,7 @@ public class ShapeType extends MapType {
 
   @Override
   public final boolean equals(final Object obj) {
-    return this == obj || obj instanceof final ShapeType sh && eq(sh, emptySet());
+    return obj instanceof final ShapeType sh && eq(sh);
   }
 
   /**
@@ -296,7 +302,7 @@ public class ShapeType extends MapType {
     if(this == type) return true;
     if(!(type instanceof final ShapeType sh)) return false;
     // record() (empty record) and record(*) (any record) must remain distinct
-    if(this == Types.RECORD != (sh == Types.RECORD) || declared() != sh.declared() ||
+    if(any() != sh.any() || declared() != sh.declared() ||
         !sameIdentity(sh) || !sameOrder(sh)) return false;
 
     for(final byte[] key : fields) {
@@ -336,7 +342,7 @@ public class ShapeType extends MapType {
    */
   public final boolean matches(final XQMap map) throws QueryException {
     // records contain all fields of their type
-    if(!strict() || identity() != null || !(map.type instanceof final ShapeType sh) ||
+    if(!strict() || name() != null || !(map.type instanceof final ShapeType sh) ||
         !sameFields(sh)) return false;
     final int fs = fields.size();
     for(int f = 1; f <= fs; f++) {
@@ -372,7 +378,7 @@ public class ShapeType extends MapType {
       // record(*) has an unknown field set: it is only an instance of record(*)
       if(any()) return false;
       // a nominative record type is only a subtype of itself and of structural record types
-      if(sh.identity() != null && !sameIdentity(sh)) return false;
+      if(sh.name() != null && !sameIdentity(sh)) return false;
       if(ordered ? !sameOrder(sh) : !sameFields(sh)) return false;
       for(final byte[] key : sh.fields) {
         final SeqType fst = fields.get(key).seqType(), shfst = sh.fields.get(key).seqType();
@@ -392,14 +398,7 @@ public class ShapeType extends MapType {
       }
       return true;
     }
-    if(type instanceof final MapType mt) {
-      return keyType().instanceOf(mt.keyType()) && valueType().instanceOf(mt.valueType());
-    }
-    if(type instanceof final FuncType ft) {
-      return funcType().declType.instanceOf(ft.declType) && ft.argTypes.length == 1 &&
-          ft.argTypes[0].instanceOf(Types.ANY_ATOMIC_TYPE_O);
-    }
-    return false;
+    return super.instanceOf(type);
   }
 
   @Override
@@ -442,14 +441,12 @@ public class ShapeType extends MapType {
           }
           map.put(key, new ShapeField(union));
         }
-        return get(map, declared() && sh.declared());
+        return declared() && sh.declared() ? new RecordType(map) : new ShapeType(map);
       }
       // fallback (map supertype)
-      return MapType.get(keyType().union(sh.keyType()), valueType().union(sh.valueType()));
+      return union(sh.keyType(), sh.valueType());
     }
-    return type instanceof final MapType mt ? mt.union(keyType(), valueType()) :
-           type instanceof ArrayType ? Types.FUNCTION :
-           type instanceof FuncType ? type.union(this) : BasicType.ITEM;
+    return super.union(type);
   }
 
   /**
@@ -545,7 +542,7 @@ public class ShapeType extends MapType {
 
     if(type instanceof final ShapeType sh) {
       // a record has the fields of its type, and a single nominative record type
-      final QNm id = identity(), shid = sh.identity();
+      final QNm id = name(), shid = sh.name();
       if(!sameFields(sh) || id != null && shid != null && !id.eq(shid)) return null;
       final TokenObjectMap<ShapeField> map = new TokenObjectMap<>();
       for(final byte[] key : fields) {
@@ -556,7 +553,7 @@ public class ShapeType extends MapType {
       }
       // records with another field order can match both types: no shape can be assigned
       if(!sameOrder(sh)) {
-        return MapType.get(keyType().union(sh.keyType()), valueType().union(sh.valueType()));
+        return union(sh.keyType(), sh.valueType());
       }
       final ShapeType st = name() != null || !sh.declared() || sh.name() == null && declared() ?
         this : sh;
@@ -608,18 +605,7 @@ public class ShapeType extends MapType {
    * @return result of check
    */
   public final boolean detached() {
-    Boolean d = detached;
-    if(d == null) {
-      d = true;
-      for(final ShapeField rf : fields.values()) {
-        if(rf.init() != null) {
-          d = false;
-          break;
-        }
-      }
-      detached = d;
-    }
-    return d;
+    return detached;
   }
 
   /**

@@ -54,18 +54,10 @@ public final class ShapeConstructor extends StandardFunc {
     final TokenObjectMap<ShapeField> fields = shapeType.fields();
     final int fs = fields.size(), el = exprs.length;
     final Value[] values = new Value[fs];
-    final RecordType rt = shapeType instanceof final RecordType r ? r : null;
     for(int f = 0; f < fs; f++) {
-      final ShapeField rf = fields.value(f + 1);
-      final Expr expr = f < el ? exprs[f] : rf.init();
+      final Expr expr = f < el ? exprs[f] : fields.value(f + 1).init();
       final Value value = expr != null ? expr.value(qc) : Empty.VALUE;
-      if(typed[f]) {
-        values[f] = value;
-      } else if(rt != null) {
-        values[f] = rt.coerce(f + 1, value, qc, info, null);
-      } else {
-        values[f] = rf.seqType().coerce(value, qc, info);
-      }
+      values[f] = typed[f] ? value : shapeType.coerce(f + 1, value, qc, info, null);
     }
     return XQMap.get(shapeType, values);
   }

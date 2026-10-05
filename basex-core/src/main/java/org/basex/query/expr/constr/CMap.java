@@ -159,16 +159,8 @@ public final class CMap extends Arr {
       } else {
         final Iter iter = exprs[e].iter(qc);
         for(Item item; (item = qc.next(iter)) != null;) {
-          Item it;
-          if(item instanceof final JNode jnode) {
-            if(jnode.isRoot()) {
-              it = (Item) jnode.value;
-            } else {
-              it = XQMap.get(jnode.key, jnode.value);
-            }
-          } else {
-            it = item;
-          }
+          final Item it = !(item instanceof final JNode jnode) ? item :
+            jnode.isRoot() ? (Item) jnode.value : XQMap.get(jnode.key, jnode.value);
           toMap(it).forEach(add);
         }
       }

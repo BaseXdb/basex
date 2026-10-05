@@ -1,11 +1,9 @@
 package org.basex.query.value.type;
 
-import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.util.list.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -50,18 +48,8 @@ public final class RecordType extends ShapeType {
   }
 
   @Override
-  QNm identity() {
-    return name;
-  }
-
-  @Override
   public RecordType with(final TokenObjectMap<ShapeField> map) {
     return new RecordType(map, name, anns);
-  }
-
-  @Override
-  public boolean strict() {
-    return !any();
   }
 
   /**
@@ -84,29 +72,6 @@ public final class RecordType extends ShapeType {
   public ShapeType add(final String fieldName, final SeqType seqType) {
     shape = null;
     return super.add(fieldName, seqType);
-  }
-
-  /**
-   * Coerces a value to the type of a field and names the field in error messages.
-   * @param f index of the field (starting with 1)
-   * @param value value
-   * @param qc query context
-   * @param ii input info (can be {@code null})
-   * @param cc compilation context ({@code null} during runtime)
-   * @return coerced value
-   * @throws QueryException query exception
-   */
-  public Value coerce(final int f, final Value value, final QueryContext qc, final InputInfo ii,
-      final CompileContext cc) throws QueryException {
-    try {
-      return fields().value(f).seqType().coerce(value, qc, ii, null, cc);
-    } catch(final QueryException ex) {
-      if(ex.error() != INVTYPE_X) throw ex;
-      final String msg = ex.getLocalizedMessage();
-      throw INVTYPE_X.get(ex.info(), "Field " + Token.string(QueryString.toQuoted(
-        fields().key(f))) + " of " + this + ": " +
-        (msg.endsWith(".") ? msg.substring(0, msg.length() - 1) : msg));
-    }
   }
 
   @Override

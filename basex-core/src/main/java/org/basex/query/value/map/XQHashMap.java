@@ -55,21 +55,6 @@ abstract class XQHashMap extends XQMap {
     return getOrNull(key) == null ? this : trie().remove(key);
   }
 
-  @Override
-  public final void forEach(final QueryBiConsumer<Item, Value> func) throws QueryException {
-    final long is = structSize();
-    for(int i = 0; i < is; i++) func.accept(keyAt(i), valueAt(i));
-  }
-
-  @Override
-  public final boolean test(final QueryBiPredicate<Item, Value> func) throws QueryException {
-    final long is = structSize();
-    for(int i = 0; i < is; i++) {
-      if(!func.test(keyAt(i), valueAt(i))) return false;
-    }
-    return true;
-  }
-
   /**
    * Creates an empty hash map with a representation that is suited for the specified entry.
    * @param capacity initial capacity

@@ -159,9 +159,7 @@ public enum Records {
   public static final QNmMap<RecordType> BUILT_IN = new QNmMap<>();
 
   static {
-    for(final Records record : values()) {
-      BUILT_IN.put(record.get().name(), record.get());
-    }
+    for(final Records record : values()) BUILT_IN.put(record.type.name(), record.type);
 
     // definitions requiring (possibly recursive) forward references
     final ShapeType rng = RANDOM_NUMBER_GENERATOR.get();
@@ -234,20 +232,10 @@ public enum Records {
   /**
    * Returns a named record field.
    * @param name name
-   * @param field record field
-   * @return name/field pair
-   */
-  private static NamedShapeField field(final String name, final ShapeField field) {
-    return new NamedShapeField(Token.token(name), field);
-  }
-
-  /**
-   * Returns a named record field.
-   * @param name name
    * @param type type of record field
    * @return name/field pair
    */
   private static NamedShapeField field(final String name, final SeqType type) {
-    return field(name, new ShapeField(type));
+    return new NamedShapeField(Token.token(name), new ShapeField(type));
   }
 }

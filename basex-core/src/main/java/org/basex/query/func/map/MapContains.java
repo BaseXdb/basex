@@ -33,15 +33,9 @@ public final class MapContains extends MapFn {
 
     if(!map.has(Flag.NDT)) {
       final MapTypeInfo mti = MapTypeInfo.get(map).key(key);
-      if(mti.index != 0) {
-        return Bln.TRUE;
-      } else if(mti.validKey) {
-        return Bln.FALSE;
-      }
-      if(mti.mapType != null) {
-        // map:contains({ 1: 1 }, 'string') → false()
-        if(mti.keyMismatch) return Bln.FALSE;
-      }
+      if(mti.index != 0) return Bln.TRUE;
+      // map:contains({ 1: 1 }, 'string') → false()
+      if(mti.validKey || mti.keyMismatch) return Bln.FALSE;
     }
     return this;
   }

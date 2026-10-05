@@ -100,21 +100,6 @@ public final class XQSmallMap extends XQMap {
   }
 
   @Override
-  public void forEach(final QueryBiConsumer<Item, Value> func) throws QueryException {
-    final int el = entries.length;
-    for(int e = 0; e < el; e += 2) func.accept((Item) entries[e], entries[e + 1]);
-  }
-
-  @Override
-  public boolean test(final QueryBiPredicate<Item, Value> func) throws QueryException {
-    final int el = entries.length;
-    for(int e = 0; e < el; e += 2) {
-      if(!func.test((Item) entries[e], entries[e + 1])) return false;
-    }
-    return true;
-  }
-
-  @Override
   public Item shrink(final QueryContext qc) throws QueryException {
     return rebuild(qc);
   }
