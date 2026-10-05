@@ -94,10 +94,29 @@ public abstract class XQMap extends XQStruct {
    * @throws QueryException query exception
    */
   XQMap trie() throws QueryException {
-    XQMap map = empty();
-    final long is = structSize();
-    for(int i = 0; i < is; i++) map = map.put(keyAt(i), valueAt(i));
-    return map;
+    final int size = (int) structSize();
+    if(size < 2) return size == 0 ? empty() : empty().put(keyAt(0), valueAt(0));
+
+    final Item[] keys = new Item[size];
+    final Value[] values = new Value[size];
+    final int[] hashes = new int[size], indexes = new int[size];
+    MapType mt = null;
+    for(int i = 0; i < size; i++) {
+      final Item key = keyAt(i);
+      final Value value = valueAt(i);
+      keys[i] = key;
+      values[i] = value;
+      hashes[i] = key.hashCode();
+      indexes[i] = i;
+      // stop refining once the type of this map has been reached
+      if(mt != type) {
+        final SeqType st = value.seqType();
+        mt = mt == null ? MapType.get(key.type, st) : mt.union(key.type, st);
+        if(mt.eq(type)) mt = (MapType) type;
+      }
+    }
+    final TrieNode root = TrieNode.build(keys, values, hashes, indexes, new int[size], 0, size, 0);
+    return new XQTrieMap(root, new TrieOrder(keys), mt);
   }
 
   @Override
