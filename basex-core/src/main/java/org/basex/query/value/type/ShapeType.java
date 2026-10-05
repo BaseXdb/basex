@@ -321,17 +321,7 @@ public class ShapeType extends MapType {
 
   @Override
   public final boolean instanceOf(final Type type) {
-    // lookups on maps with a static shape access fields by position: the order must be the same
-    return instanceOf(TypeRef.deref(type), emptySet(), true);
-  }
-
-  /**
-   * Checks if a record of this type matches the given type, irrespective of the field order.
-   * @param type type to be checked
-   * @return result of check
-   */
-  public final boolean matches(final Type type) {
-    return instanceOf(TypeRef.deref(type), emptySet(), false);
+    return instanceOf(TypeRef.deref(type), emptySet());
   }
 
   /**
@@ -355,20 +345,19 @@ public class ShapeType extends MapType {
    * Checks if the current type is an instance of the specified type.
    * @param type type to be checked
    * @param pairs pairs of ShapeTypes that are currently being checked, or have been checked before
-   * @param ordered require the same field order
    * @return result of check
    */
-  private boolean instanceOf(final Type type, final Set<Pair> pairs, final boolean ordered) {
+  private boolean instanceOf(final Type type, final Set<Pair> pairs) {
     if(this == type || type.oneOf(Types.MAP, Types.FUNCTION, BasicType.ITEM)) {
       return true;
     }
     if(type instanceof final ChoiceItemType cit) {
       for(final Type tp : cit.types) {
-        if(instanceOf(TypeRef.deref(tp), pairs, ordered)) return true;
+        if(instanceOf(TypeRef.deref(tp), pairs)) return true;
       }
       return false;
     }
-    // record(*) is only matched by types that carry a record annotation
+    // record(*) is only matched by record types
     if(type == Types.RECORD) {
       return declared();
     }
@@ -379,7 +368,7 @@ public class ShapeType extends MapType {
       if(any()) return false;
       // a nominative record type is only a subtype of itself and of structural record types
       if(sh.name() != null && !sameIdentity(sh)) return false;
-      if(ordered ? !sameOrder(sh) : !sameFields(sh)) return false;
+      if(!sameFields(sh)) return false;
       for(final byte[] key : sh.fields) {
         final SeqType fst = fields.get(key).seqType(), shfst = sh.fields.get(key).seqType();
         if(fst != shfst) {
@@ -388,10 +377,8 @@ public class ShapeType extends MapType {
               !fst.emptyType()) {
             if(!fst.occ.instanceOf(shfst.occ)) return false;
             final Pair pair = new Pair(sh1, sh2);
-            if(!pairs.contains(pair) && !sh1.instanceOf(sh2, pair.addTo(pairs), ordered)) {
-              return false;
-            }
-          } else if(ordered ? !fst.instanceOf(shfst) : !fst.matches(shfst)) {
+            if(!pairs.contains(pair) && !sh1.instanceOf(sh2, pair.addTo(pairs))) return false;
+          } else if(!fst.instanceOf(shfst)) {
             return false;
           }
         }
@@ -425,7 +412,7 @@ public class ShapeType extends MapType {
     if(instanceOf(type)) return type;
 
     if(type instanceof final ShapeType sh) {
-      if(sameOrder(sh)) {
+      if(sameFields(sh)) {
         final TokenObjectMap<ShapeField> map = new TokenObjectMap<>();
         for(final byte[] key : fields) {
           final SeqType fst = fields.get(key).seqType(), shfst = sh.fields.get(key).seqType();
@@ -463,21 +450,17 @@ public class ShapeType extends MapType {
   }
 
   /**
-   * Checks if the entries of a map are arranged in the order of the fields of this shape.
+   * Checks if a map is a shape map with the specified field at the same position.
    * @param map map
+   * @param index field index (starting with 1)
    * @return result of check
-   * @throws QueryException query exception
    */
-  public final boolean sameOrder(final XQStruct map) throws QueryException {
-    final int fs = fields.size();
-    if(map.structSize() != fs) return false;
-    for(int f = 0; f < fs; f++) {
-      final Item key = map.keyAt(f);
-      if(!key.type.isStringOrUntyped() || !Token.eq(key.string(null), fields.key(f + 1))) {
-        return false;
-      }
-    }
-    return true;
+  public final boolean fieldAt(final XQMap map, final int index) {
+    // the keys of a shape map are supplied by its type; other maps are accessed by key
+    if(!(map instanceof XQShapeMap)) return false;
+    if(map.type == this) return true;
+    final TokenObjectMap<ShapeField> mfields = ((ShapeType) map.type).fields;
+    return index <= mfields.size() && Token.eq(mfields.key(index), fields.key(index));
   }
 
   /**
@@ -514,7 +497,8 @@ public class ShapeType extends MapType {
    * @param sh other shape
    * @return result of check
    */
-  private boolean sameOrder(final ShapeType sh) {
+  public final boolean sameOrder(final ShapeType sh) {
+    if(this == sh) return true;
     final int fs = fields.size();
     if(fs != sh.fields.size()) return false;
     for(int f = 1; f <= fs; f++) {
@@ -546,19 +530,15 @@ public class ShapeType extends MapType {
       // a record has the fields of its type, and a single nominative record type
       final QNm id = name(), shid = sh.name();
       if(!sameFields(sh) || id != null && shid != null && !id.eq(shid)) return null;
+      final ShapeType st = name() != null || !sh.declared() || sh.name() == null && declared() ?
+        this : sh;
       final TokenObjectMap<ShapeField> map = new TokenObjectMap<>();
-      for(final byte[] key : fields) {
+      for(final byte[] key : st.fields) {
         final SeqType is = intersect(fields.get(key).seqType(), sh.fields.get(key).seqType(),
             pairs);
         if(is == null) return null;
         map.put(key, new ShapeField(is));
       }
-      // records with another field order can match both types: no shape can be assigned
-      if(!sameOrder(sh)) {
-        return union(sh.keyType(), sh.valueType());
-      }
-      final ShapeType st = name() != null || !sh.declared() || sh.name() == null && declared() ?
-        this : sh;
       return st.with(map);
     }
     if(type instanceof final MapType mt) {
@@ -594,7 +574,7 @@ public class ShapeType extends MapType {
 
   /**
    * Returns the shape of this type, as produced by map operations such as
-   * {@code map:put}/{@code map:remove} that do not preserve the record annotation.
+   * {@code map:put}/{@code map:remove} that do not preserve the type annotation.
    * @return shape
    */
   public ShapeType shape() {

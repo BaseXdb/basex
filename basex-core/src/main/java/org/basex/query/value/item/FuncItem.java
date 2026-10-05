@@ -106,9 +106,8 @@ public final class FuncItem extends FItem implements Scope {
 
   @Override
   public boolean instanceOf(final Type tp, final boolean coerce) {
-    // coercion rebuilds records in the result; without coercion, their field order is irrelevant
-    return coerce ? type.instanceOf(tp) && !ShapeType.rebuilds(type, tp) :
-      type.instanceOf(tp) || type instanceof final FuncType ft && ft.matches(tp);
+    // coercion rebuilds records in the result
+    return type.instanceOf(tp) && !(coerce && ShapeType.rebuilds(type, tp));
   }
 
   @Override

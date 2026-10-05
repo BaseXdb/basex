@@ -875,6 +875,13 @@ public final class RecordTest extends SandboxTest {
     query(prolog + "count(jtree([ map:merge({ 'a': 1, 'b': local:item()?b }) ])"
         + "/jnode(*, local:AB)/self::jnode(*, local:BA))", 0);
 
+    // shapes with another field order: positional field access falls back to key lookups
+    final String mixed = "declare %basex:inline(0) function local:m($x) { "
+        + "if($x) then { 'a': 1, 'b': 2 } else { 'b': 3, 'a': 4 } }; ";
+    query(mixed + "(true(), false()) ! local:m(.)?a", "1\n4");
+    query(mixed + "(true(), false()) ! map:get(local:m(.), 'b')", "2\n3");
+    query(mixed + "(true(), false()) ! map:keys(map:put(local:m(.), 'a', 9))", "a\nb\nb\na");
+    query(mixed + "(true(), false()) ! map:put(local:m(.), 'a', 9)?a", "9\n9");
     // inferred shapes in the input of record filters
     query(prolog + "declare %basex:inline(0) function local:r($x) { "
         + "if($x) then local:ab() else { 'a': 5, 'b': 6 } }; "

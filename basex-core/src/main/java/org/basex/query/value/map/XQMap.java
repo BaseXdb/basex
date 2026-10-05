@@ -119,7 +119,7 @@ public abstract class XQMap extends XQStruct {
    * @param refined refined type
    */
   final void refineType(final Type refined) {
-    if(this != empty() && refined.instanceOf(type)) type = refined;
+    if(this != empty() && refined.instanceOf(type) && assignable(refined)) type = refined;
   }
 
   @Override
@@ -293,11 +293,11 @@ public abstract class XQMap extends XQStruct {
     if(coerce && tp instanceof FuncType && tp != Types.FUNCTION) return false;
 
     try {
-      // a map matches a record type only if it is a record, i.e. if it carries a record annotation
+      // a map matches a record type only if it is a record, i.e. if it has a type annotation
       if(tp instanceof final ShapeType sh) {
         // coercion to a record type creates a record with the field order of that type
         return type instanceof final RecordType rt &&
-            (coerce && !sh.any() ? rt.equals(sh) : rt.matches(sh) || sh.matches(this));
+            (coerce && !sh.any() ? rt.equals(sh) : rt.instanceOf(sh) || sh.matches(this));
       }
       if(type.instanceOf(tp) && !(coerce && ShapeType.rebuilds(type, tp))) return true;
 
@@ -400,7 +400,7 @@ public abstract class XQMap extends XQStruct {
 
     // map with the fields of the record type in the same order: access values by position
     final TokenObjectMap<ShapeField> fields = rt.fields();
-    final boolean sameOrder = this instanceof XQShapeMap && rt.sameOrder(this);
+    final boolean sameOrder = this instanceof XQShapeMap && rt.sameOrder((ShapeType) type);
     if(!sameOrder) {
       // reject undeclared keys
       for(final Item key : keys()) {

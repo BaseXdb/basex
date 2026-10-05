@@ -149,25 +149,6 @@ public final class FuncType extends FType {
 
   @Override
   public boolean instanceOf(final Type type) {
-    return instanceOf(type, true);
-  }
-
-  /**
-   * Checks if a function of this type matches the given type, irrespective of the field order.
-   * @param type type to be checked
-   * @return result of check
-   */
-  public boolean matches(final Type type) {
-    return instanceOf(type, false);
-  }
-
-  /**
-   * Checks if the current type is an instance of the specified type.
-   * @param type type to be checked
-   * @param ordered require the same field order for records in the result type
-   * @return result of check
-   */
-  private boolean instanceOf(final Type type, final boolean ordered) {
     if(this == type || type.oneOf(FUNCTION, BasicType.ITEM)) return true;
     if(type instanceof final ChoiceItemType cit) return cit.hasInstance(this);
     if(this == FUNCTION || !(type instanceof final FuncType ft)) return false;
@@ -175,13 +156,12 @@ public final class FuncType extends FType {
     final int arity = argTypes.length, nargs = ft.argTypes.length;
     if(arity != nargs) return false;
     for(int a = 0; a < arity; a++) {
-      // arguments are coerced by the called function: the field order of records is irrelevant
-      if(!ft.argTypes[a].matches(argTypes[a])) return false;
+      if(!ft.argTypes[a].instanceOf(argTypes[a])) return false;
     }
     for(final Ann ann : ft.anns) {
       if(!anns.contains(ann)) return false;
     }
-    return ordered ? declType.instanceOf(ft.declType) : declType.matches(ft.declType);
+    return declType.instanceOf(ft.declType);
   }
 
   @Override

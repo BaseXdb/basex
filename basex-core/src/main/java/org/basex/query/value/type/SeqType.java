@@ -707,7 +707,7 @@ public final class SeqType {
    */
   private static Type matched(final Type type) {
     final Type tp = TypeRef.deref(type);
-    // records may have another field order: no shape can be assigned
+    // matching records may have another record type: no record type can be assigned
     if(tp instanceof final ShapeType sh) return sh.declared() ? Types.RECORD : type;
     if(tp instanceof final ArrayType at) {
       final SeqType vt = at.valueType(), mvt = vt.matched();
@@ -759,48 +759,6 @@ public final class SeqType {
    */
   public boolean instanceOf(final SeqType st, final boolean coerce) {
     return instanceOf(st) && !(coerce && ShapeType.rebuilds(type, st.type));
-  }
-
-  /**
-   * Checks if values of this type match the specified type, irrespective of the field order.
-   * @param st sequence type to check
-   * @return result of check
-   */
-  public boolean matches(final SeqType st) {
-    if(instanceOf(st)) return true;
-    if(emptyType() || !occ.instanceOf(st.occ)) return false;
-    return matches(TypeRef.deref(type), TypeRef.deref(st.type));
-  }
-
-  /**
-   * Checks if items of a type match another type, irrespective of the field order.
-   * @param type type
-   * @param target type to check
-   * @return result of check
-   */
-  private static boolean matches(final Type type, final Type target) {
-    if(type instanceof final ChoiceItemType cit) {
-      for(final Type tp : cit.types) {
-        if(!matches(TypeRef.deref(tp), target)) return false;
-      }
-      return true;
-    }
-    if(target instanceof final ChoiceItemType cit) {
-      for(final Type tp : cit.types) {
-        if(matches(type, TypeRef.deref(tp))) return true;
-      }
-      return false;
-    }
-    if(type instanceof final ShapeType sh) return sh.matches(target);
-    if(type instanceof final FuncType ft) return ft.matches(target);
-    if(type instanceof final ArrayType at && target instanceof final ArrayType tat) {
-      return at.valueType().matches(tat.valueType());
-    }
-    if(type instanceof final MapType mt && target instanceof final MapType tmt &&
-        !(target instanceof ShapeType)) {
-      return mt.keyType().instanceOf(tmt.keyType()) && mt.valueType().matches(tmt.valueType());
-    }
-    return type.instanceOf(target);
   }
 
   /**

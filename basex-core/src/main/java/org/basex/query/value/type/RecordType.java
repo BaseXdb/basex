@@ -9,7 +9,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Record: a shape that is declared in a query and carries a runtime type annotation.
+ * Record type: a shape that is declared in a query and assigned to its records as type annotation.
  *
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
@@ -19,7 +19,7 @@ public final class RecordType extends ShapeType {
   private final QNm name;
   /** Annotations. */
   private final AnnList anns;
-  /** Shape without the record annotation (can be {@code null}). */
+  /** Shape without the type annotation (can be {@code null}). */
   private ShapeType shape;
 
   /**

@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
@@ -39,7 +40,7 @@ public final class ShapeSet extends Arr {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     final SeqType vt = exprs[1].seqType(), ft = type.fields().value(index).seqType();
-    // the field set is preserved (without the record annotation)
+    // the field set is preserved (without the type annotation)
     exprType.assign(cc.qc.shared.shape(vt.instanceOf(ft) ? type.shape() :
       type.put(type.fields().key(index), vt)));
     return values(false, cc) ? cc.preEval(this) : this;
@@ -64,8 +65,9 @@ public final class ShapeSet extends Arr {
   @Override
   public XQMap value(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(exprs[0], qc);
-    assert type.sameOrder(map) : "Map " + map.type + " has no field order of " + type + ": " + this;
-    return map.putAt(index - 1, exprs[1].value(qc));
+    final Value value = exprs[1].value(qc);
+    return type.fieldAt(map, index) ? map.putAt(index - 1, value) :
+      map.put(type.key(index), value);
   }
 
   @Override

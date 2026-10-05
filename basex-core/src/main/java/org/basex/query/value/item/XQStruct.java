@@ -124,7 +124,16 @@ public abstract class XQStruct extends FItem {
   @Override
   public void refineType(final Expr expr) {
     final Type tp = type.intersect(expr.seqType().type);
-    if(tp != null) type = tp;
+    if(tp != null && assignable(tp)) type = tp;
+  }
+
+  /**
+   * Checks if the specified type can be assigned to this structure.
+   * @param tp type
+   * @return result of check
+   */
+  protected boolean assignable(@SuppressWarnings("unused") final Type tp) {
+    return true;
   }
 
   @Override

@@ -61,7 +61,7 @@ public abstract class XQShapeMap extends XQMap {
 
   @Override
   public final XQMap putAt(final int index, final Value value) {
-    // the shape is preserved (without the record annotation) if the value matches the field type
+    // the shape is preserved (without the type annotation) if the value matches the field type
     final ShapeType sh = shape();
     final SeqType st = value.seqType();
     final ShapeType tp = st.instanceOf(fields().value(index + 1).seqType()) ? sh.shape() :
@@ -79,6 +79,12 @@ public abstract class XQShapeMap extends XQMap {
     if(i == 0) return this;
     if(structSize() == 1) return empty();
     return get(shape().remove(fields().key(i)), Array.remove(values(), i - 1));
+  }
+
+  @Override
+  protected final boolean assignable(final Type tp) {
+    // the keys are supplied by the shape: the field order must be preserved
+    return tp instanceof final ShapeType sh && sh.sameOrder(shape());
   }
 
   @Override
