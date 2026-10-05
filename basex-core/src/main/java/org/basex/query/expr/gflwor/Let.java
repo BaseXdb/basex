@@ -14,6 +14,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
+import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
 
@@ -41,6 +42,37 @@ public final class Let extends ForLet {
    */
   public Let(final Var var, final Expr expr, final boolean scoring) {
     super(var.info, scoring ? Types.DOUBLE_O : Types.ITEM_ZM, var, expr, scoring, var);
+  }
+
+  /**
+   * Binds the value of the expression to the variable.
+   * @param qc query context
+   * @throws QueryException query exception
+   */
+  void bind(final QueryContext qc) throws QueryException {
+    qc.set(var, scoring ? score(qc) : expr.value(qc));
+  }
+
+  /**
+   * Calculates the score of the expression.
+   * @param qc query context
+   * @return score
+   * @throws QueryException query exception
+   */
+  private Value score(final QueryContext qc) throws QueryException {
+    final boolean scrng = qc.scoring;
+    try {
+      qc.scoring = true;
+      double s = 0;
+      int c = 0;
+      final Iter iter = expr.iter(qc);
+      for(Item item; (item = qc.next(iter)) != null; c++) {
+        s += item.score();
+      }
+      return Dbl.get(Scoring.avg(s, c));
+    } finally {
+      qc.scoring = scrng;
+    }
   }
 
   @Override
@@ -131,6 +163,8 @@ public final class Let extends ForLet {
   private static final class LetEval extends Eval {
     /** Let expressions of the current block, in declaration order. */
     private Let[] lets;
+    /** Number of let expressions. */
+    private int size = 1;
     /** Sub-evaluator. */
     private final Eval sub;
 
@@ -149,41 +183,15 @@ public final class Let extends ForLet {
      * @param let let binding
      */
     void add(final Let let) {
-      final int ls = lets.length;
-      lets = Arrays.copyOf(lets, ls + 1);
-      lets[ls] = let;
+      if(size == lets.length) lets = Arrays.copyOf(lets, Array.newCapacity(size));
+      lets[size++] = let;
     }
 
     @Override
     boolean next(final QueryContext qc) throws QueryException {
       if(!sub.next(qc)) return false;
-      for(final Let let : lets) {
-        qc.set(let.var, let.scoring ? score(let.expr, qc) : let.expr.value(qc));
-      }
+      for(int l = 0; l < size; l++) lets[l].bind(qc);
       return true;
-    }
-
-    /**
-     * Calculates the score for the given expression.
-     * @param expr expression
-     * @param qc query context
-     * @return score
-     * @throws QueryException query exception
-     */
-    private static Value score(final Expr expr, final QueryContext qc) throws QueryException {
-      final boolean scoring = qc.scoring;
-      try {
-        qc.scoring = true;
-        double s = 0;
-        int c = 0;
-        final Iter iter = expr.iter(qc);
-        for(Item item; (item = qc.next(iter)) != null; c++) {
-          s += item.score();
-        }
-        return Dbl.get(Scoring.avg(s, c));
-      } finally {
-        qc.scoring = scoring;
-      }
     }
   }
 }

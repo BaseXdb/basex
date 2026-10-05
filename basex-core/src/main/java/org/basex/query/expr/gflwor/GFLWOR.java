@@ -144,6 +144,11 @@ public final class GFLWOR extends ParseExpr {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
+    // shortcut for expressions with let clauses only: bind variables, evaluate return expression
+    if(Checks.all(clauses, clause -> clause instanceof Let)) {
+      for(final Clause clause : clauses) ((Let) clause).bind(qc);
+      return rtrn.value(qc);
+    }
     final Eval eval = newEval();
     final ValueBuilder vb = new ValueBuilder(qc, size());
     while(eval.next(qc)) vb.add(rtrn.value(qc));
