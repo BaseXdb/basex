@@ -510,37 +510,48 @@ public abstract class XQMap extends XQStruct {
     if(this == item) return true;
     if(!(item instanceof final XQMap map)) return false;
 
-    // choose keys to compare
-    Iterable<Item> keys1 = null, keys2 = null;
+    // deep = null: ordered comparison at compile time
+    final Boolean order = deep == null ? null : deep.options.get(DeepEqualOptions.MAP_ORDER);
     if(deep != null && deep.options.get(DeepEqualOptions.IGNORE_EMPTY_ENTRIES)) {
       final HashItemSet set1 = new HashItemSet(Mode.DEEP, deep.info);
       forEach((k, v) -> { if(v != Empty.VALUE) set1.add(k); });
       final HashItemSet set2 = new HashItemSet(Mode.DEEP, deep.info);
       map.forEach((k, v) -> { if(v != Empty.VALUE) set2.add(k); });
-      if(set1.size() == set2.size()) {
-        keys1 = set1;
-        keys2 = set2;
-      }
-    } else if(structSize() == map.structSize()) {
-      keys1 = keys();
-      keys2 = map.keys();
-    }
-    if(keys1 == null) return false;
+      if(set1.size() != set2.size()) return false;
 
-    // deep = null: ordered comparison at compile time
-    final Boolean order = deep == null ? null : deep.options.get(DeepEqualOptions.MAP_ORDER);
-    final Iterator<Item> k2 = keys2.iterator();
-    for(final Item k1 : keys1) {
-      final Value v1 = getOrNull(k1), v2 = map.getOrNull(k1);
-      if(order == Boolean.FALSE) {
-        if(v2 == null || !deep.equal(v1, v2)) return false;
-      } else if(order == Boolean.TRUE) {
-        if(!(k2.hasNext() && k1.atomicEqual(k2.next()) && deep.equal(v1, v2))) return false;
-      } else {
-        if(!(k2.hasNext() && k1.equals(k2.next()) && v1.equals(v2))) return false;
+      final Iterator<Item> k2 = set2.iterator();
+      for(final Item k1 : set1) {
+        if(!equal(k1, getOrNull(k1), k2.next(), map.getOrNull(k1), order, deep)) return false;
+      }
+    } else {
+      final long size = structSize();
+      if(size != map.structSize()) return false;
+
+      for(long i = 0; i < size; i++) {
+        final Item k1 = keyAt(i);
+        final Value v2 = order == Boolean.FALSE ? map.getOrNull(k1) : map.valueAt(i);
+        if(!equal(k1, valueAt(i), map.keyAt(i), v2, order, deep)) return false;
       }
     }
     return true;
+  }
+
+  /**
+   * Compares two map entries.
+   * @param k1 first key
+   * @param v1 first value
+   * @param k2 second key (ignored for unordered comparisons)
+   * @param v2 second value (can be {@code null})
+   * @param order ordered comparison (can be {@code null})
+   * @param deep comparator (can be {@code null})
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  private static boolean equal(final Item k1, final Value v1, final Item k2, final Value v2,
+      final Boolean order, final DeepEqual deep) throws QueryException {
+    return order == Boolean.FALSE ? v2 != null && deep.equal(v1, v2) :
+      order == Boolean.TRUE ? k1.atomicEqual(k2) && deep.equal(v1, v2) :
+      k1.equals(k2) && v1.equals(v2);
   }
 
   @Override
