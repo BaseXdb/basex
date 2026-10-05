@@ -183,7 +183,7 @@ final class TableHeader extends BaseXPanel {
         if(c != -1) filter(c);
       }
     }
-    view.gui.cursor(cursor);
+    setCursor(cursor);
   }
 
   /**
@@ -239,7 +239,6 @@ final class TableHeader extends BaseXPanel {
   public void mouseExited(final MouseEvent e) {
     if(tdata.rows == null) return;
 
-    view.gui.cursor(CURSORARROW);
     clickCol = -1;
   }
 
@@ -266,11 +265,9 @@ final class TableHeader extends BaseXPanel {
             chooseRoot(e);
           } else {
             // sort data in current column
-            view.gui.cursor(CURSORWAIT);
             tdata.asc = tdata.sortCol != clickCol || !tdata.asc;
             tdata.sortCol = clickCol;
-            tdata.sort();
-            view.gui.cursor(CURSORARROW, true);
+            BaseXLayout.busy(this, tdata::sort);
           }
         }
       } else if(clickCol == tdata.cols.length) {

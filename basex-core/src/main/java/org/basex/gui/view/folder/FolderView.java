@@ -267,7 +267,7 @@ public final class FolderView extends View {
           final int xx = OFFX + iter.level * (lineH / 2) + lineH - 6;
           if(x > xx - fsz && x < xx) c = CURSORHAND;
         }
-        gui.cursor(c);
+        setCursor(c);
         gui.notify.focus(iter.pre, this);
         repaint();
         return true;

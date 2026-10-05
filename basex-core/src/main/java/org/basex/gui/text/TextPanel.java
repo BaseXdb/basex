@@ -116,6 +116,7 @@ public class TextPanel extends BaseXPanel {
 
     setFocusable(true);
     setFocusTraversalKeysEnabled(!editable);
+    setCursor(CURSORTEXT);
     setBackground(backColor);
     setOpaque(editable);
 
@@ -517,20 +518,10 @@ public class TextPanel extends BaseXPanel {
   // MOUSE INTERACTIONS ===========================================================================
 
   @Override
-  public final void mouseEntered(final MouseEvent e) {
-    gui.cursor(CURSORTEXT);
-  }
-
-  @Override
-  public final void mouseExited(final MouseEvent e) {
-    gui.cursor(CURSORARROW);
-  }
-
-  @Override
   public final void mouseMoved(final MouseEvent e) {
     if(linkListener == null) return;
     final TextIterator iter = rend.jump(e.getPoint());
-    gui.cursor(iter.link() != null ? CURSORHAND : CURSORARROW);
+    setCursor(iter.link() != null ? CURSORHAND : CURSORARROW);
   }
 
   @Override

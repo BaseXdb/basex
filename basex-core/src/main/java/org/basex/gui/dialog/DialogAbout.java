@@ -10,7 +10,6 @@ import javax.swing.border.*;
 import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
-import org.basex.gui.listener.*;
 
 /**
  * Dialog window for displaying information about the project.
@@ -42,12 +41,7 @@ public final class DialogAbout extends BaseXDialog {
     final BaseXBack pp = new BaseXBack(new RowLayout());
 
     pp.add(new BaseXLabel(TITLE, false, true));
-    final BaseXLabel url = new BaseXLabel("<html><u>" + PUBLIC_URL + "</u></html>");
-    url.setForeground(GUIConstants.blue);
-    url.setCursor(GUIConstants.CURSORHAND);
-    url.addMouseListener((MouseClickedListener) e -> BaseXDialog.browse(gui, PUBLIC_URL));
-
-    pp.add(url);
+    pp.add(BaseXLayout.link(PUBLIC_URL, gui));
     pp.add(Box.createVerticalStrut(7));
     pp.add(new BaseXLabel(COPYRIGHT));
     pp.add(new BaseXLabel(LICENSE));

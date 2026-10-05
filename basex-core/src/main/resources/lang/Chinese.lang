@@ -188,6 +188,7 @@ install_from_url     = 从URL安装
 int_parser           = 使用内部XML解析器
 interrupted          = 被中断
 invalid_%            = % 无效
+jobs_%               = % job(s)
 jump_to_file         = 跳转到项目文件
 jump_to_bracket      = 跳转到括号
 kill_self_%          = '%' 不能结束自己

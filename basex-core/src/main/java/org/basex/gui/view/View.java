@@ -90,11 +90,6 @@ public abstract class View extends BaseXPanel {
   }
 
   @Override
-  public void mouseExited(final MouseEvent e) {
-    if(!gui.updating) gui.cursor(GUIConstants.CURSORARROW);
-  }
-
-  @Override
   public void mousePressed(final MouseEvent e) {
     if(!gui.updating) requestFocusInWindow();
   }

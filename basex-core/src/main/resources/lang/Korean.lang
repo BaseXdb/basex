@@ -188,6 +188,7 @@ install_from_url     = URL에서 설치
 int_parser           = 내부 XML 파서 사용
 interrupted          = 중단됨
 invalid_%            = %이(가) 유효하지 않습니다.
+jobs_%               = % job(s)
 jump_to_file         = 프로젝트 파일로 이동
 jump_to_bracket      = 괄호로 이동
 kill_self_%          = '%'은(는) 자신의 세션을 종료할 수 없습니다.

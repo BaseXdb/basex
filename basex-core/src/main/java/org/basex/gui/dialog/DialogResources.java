@@ -5,6 +5,7 @@ import static org.basex.gui.GUIConstants.*;
 import static org.basex.util.Token.*;
 
 import java.awt.*;
+import java.awt.event.*;
 
 import javax.swing.*;
 import javax.swing.tree.*;
@@ -111,13 +112,18 @@ final class DialogResources extends BaseXBack {
 
     // expand the tree once the dialog is visible: the root may have many children
     tree.setCursor(CURSORWAIT);
-    SwingUtilities.invokeLater(() -> {
-      tree.expandPath(new TreePath(root.getPath()));
-      filterText.setText("/");
-      filterText.setEnabled(true);
-      tree.setCursor(CURSORARROW);
-      filter.setEnabled(true);
-      clear.setEnabled(true);
+    dialog.addWindowListener(new WindowAdapter() {
+      @Override
+      public void windowOpened(final WindowEvent e) {
+        SwingUtilities.invokeLater(() -> {
+          tree.expandPath(new TreePath(root.getPath()));
+          filterText.setText("/");
+          filterText.setEnabled(true);
+          tree.setCursor(CURSORARROW);
+          filter.setEnabled(true);
+          clear.setEnabled(true);
+        });
+      }
     });
   }
 

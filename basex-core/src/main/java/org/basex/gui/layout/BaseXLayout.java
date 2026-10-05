@@ -328,6 +328,46 @@ public final class BaseXLayout {
   }
 
   /**
+   * Makes a component clickable.
+   * @param <C> component type
+   * @param comp component
+   * @param action action to be performed on a click
+   * @return component
+   */
+  public static <C extends JComponent> C clickable(final C comp, final Runnable action) {
+    comp.setCursor(CURSORHAND);
+    comp.addMouseListener((MouseClickedListener) e -> action.run());
+    return comp;
+  }
+
+  /**
+   * Creates a label that opens the specified URL in the browser.
+   * @param url URL
+   * @param gui reference to the main window
+   * @return label
+   */
+  public static BaseXLabel link(final String url, final GUI gui) {
+    final BaseXLabel link = new BaseXLabel("<html><u>" + url + "</u></html>");
+    link.setForeground(blue);
+    return clickable(link, () -> BaseXDialog.browse(gui, url));
+  }
+
+  /**
+   * Shows a wait cursor on a component while an action is performed.
+   * @param comp component
+   * @param action action
+   */
+  public static void busy(final Component comp, final Runnable action) {
+    final Cursor cursor = comp.isCursorSet() ? comp.getCursor() : null;
+    comp.setCursor(CURSORWAIT);
+    try {
+      action.run();
+    } finally {
+      comp.setCursor(cursor);
+    }
+  }
+
+  /**
    * Returns or creates a new key listener for global shortcuts.
    * @param gui gui reference
    * @return key listener

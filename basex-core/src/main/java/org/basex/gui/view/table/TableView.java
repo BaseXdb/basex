@@ -215,12 +215,11 @@ public final class TableView extends View {
     content.repaint();
 
     final String str = content.focusedString;
-    gui.cursor(valid && str != null && str.length() <= data.meta.maxlen ? CURSORHAND : CURSORARROW);
+    setCursor(valid && str != null && str.length() <= data.meta.maxlen ? CURSORHAND : CURSORARROW);
   }
 
   @Override
   public void mouseExited(final MouseEvent e) {
-    gui.cursor(CURSORARROW);
     gui.notify.focus(-1, null);
   }
 

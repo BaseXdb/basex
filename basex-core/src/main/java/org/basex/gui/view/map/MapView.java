@@ -272,17 +272,16 @@ public final class MapView extends View {
    */
   private void calc(final MapRect rect, final DBNodes nodes, final BufferedImage map) {
     // calculate new main rectangles
-    gui.cursor(CURSORWAIT);
+    BaseXLayout.busy(this, () -> {
+      initLen();
+      layout = new MapLayout(nodes.data(), textLen, gui.gopts);
+      layout.makeMap(rect, new MapList(nodes.pres().clone()), 0, (int) nodes.size() - 1);
+      // rectangles are copied to avoid synchronization issues
+      mainRects = layout.rectangles.copy();
 
-    initLen();
-    layout = new MapLayout(nodes.data(), textLen, gui.gopts);
-    layout.makeMap(rect, new MapList(nodes.pres().clone()), 0, (int) nodes.size() - 1);
-    // rectangles are copied to avoid synchronization issues
-    mainRects = layout.rectangles.copy();
-
-    drawMap(map, mainRects);
-    focus();
-    gui.cursor(CURSORARROW, true);
+      drawMap(map, mainRects);
+      focus();
+    });
   }
 
   @Override

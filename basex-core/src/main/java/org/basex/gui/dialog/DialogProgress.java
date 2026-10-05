@@ -28,8 +28,6 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
   private BaseXLabel info;
   /** Cancel button (can be {@code null}). */
   private BaseXButton cancel;
-  /** Memory usage. */
-  private BaseXMem mem;
   /** Executed job (can be {@code null}). */
   private Job job;
   /** Progress bar (can be {@code null}). */
@@ -74,9 +72,8 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
 
     final BaseXBack s = new BaseXBack(new BorderLayout()).border(10, 0, 0, 0);
     final BaseXBack m = new BaseXBack(new ColumnLayout(5));
-    mem = new BaseXMem(this, false);
     m.add(new BaseXLabel(MEMUSED_C));
-    m.add(mem);
+    m.add(new BaseXMem(this, false));
     s.add(m, BorderLayout.WEST);
 
     if(jb.stoppable()) {
@@ -117,7 +114,6 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
     setTitle(active.shortInfo());
     final String detail = active.detailedInfo();
     info.setText(detail.isEmpty() ? " " : detail);
-    mem.repaint();
     if(bar != null) bar.setValue((int) (active.progressInfo() * MAX));
   }
 

@@ -188,6 +188,7 @@ install_from_url     = Instalar a partir de URL
 int_parser           = Usar analisador XML interno
 interrupted          = Interrompido
 invalid_%            = % é inválido.
+jobs_%               = % job(s)
 jump_to_file         = Ir para o arquivo do projeto
 jump_to_bracket      = Ir para o parêntese
 kill_self_%          = '%' não pode encerrar a própria sessão.

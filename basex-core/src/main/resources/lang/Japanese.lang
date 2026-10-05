@@ -188,6 +188,7 @@ install_from_url     = URLからインストール
 int_parser           = 内部XMLパーサーを使用
 interrupted          = 中断されました
 invalid_%            = % は不正です。
+jobs_%               = % job(s)
 jump_to_file         = プロジェクトファイルへジャンプ
 jump_to_bracket      = 一致部分に移動
 kill_self_%          = '%' 自身のセッションを切断する事は出来ません。

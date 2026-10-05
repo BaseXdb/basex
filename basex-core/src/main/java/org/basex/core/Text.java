@@ -722,6 +722,8 @@ public interface Text {
   String RESOURCES_X = lang("resources_%");
   /** Show entries. */
   String ENTRIES_X = lang("entries_%");
+  /** Number of jobs. */
+  String JOBS_X = lang("jobs_%");
   /** Permission required. */
   String PERM_REQUIRED_X = lang("perm_required_%");
   /** Invalid permissions. */

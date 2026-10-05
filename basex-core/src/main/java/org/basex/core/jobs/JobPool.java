@@ -255,6 +255,19 @@ public final class JobPool {
   }
 
   /**
+   * Returns the IDs of all scheduled and running query jobs.
+   * @return IDs
+   */
+  public HashSet<String> queryIds() {
+    // one-off jobs are removed from the tasks when they are started
+    final HashSet<String> ids = new HashSet<>(tasks.keySet());
+    active.forEach((id, job) -> {
+      if(job instanceof QueryJob) ids.add(id);
+    });
+    return ids;
+  }
+
+  /**
    * Removes a job.
    * @param id ID
    * @return return success flag

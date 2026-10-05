@@ -188,6 +188,7 @@ install_from_url     = Installer vanaf URL
 int_parser           = Gebruik interne XML parser
 interrupted          = Onderbroken
 invalid_%            = % is ongeldig.
+jobs_%               = % job(s)
 jump_to_file         = Spring naar projectbestand
 jump_to_bracket      = Naar haakje springen
 kill_self_%          = '%' kan zichzelf niet stoppen.

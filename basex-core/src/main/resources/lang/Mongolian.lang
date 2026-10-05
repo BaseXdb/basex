@@ -188,6 +188,7 @@ install_from_url     = URL-ээс суулгах
 int_parser           = Дотоод XML Parser-р хөрвүүлэх
 interrupted          = Тасалдсан
 invalid_%            = % нь хүчинтэй.
+jobs_%               = % job(s)
 jump_to_file         = Төслийн файл руу шилжих
 jump_to_bracket      = Хаалт руу шилжих
 kill_self_%          = '%' өөрийгөө устгах боломжгүй.

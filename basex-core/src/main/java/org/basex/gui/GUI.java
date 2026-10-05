@@ -205,7 +205,7 @@ public final class GUI extends JFrame implements BaseXWindow {
         new ExploreView(notify));
 
     top.add(views, BorderLayout.CENTER);
-    views.setBorder(new CompoundBorder(BaseXLayout.border(3, 1, 3, 1),
+    views.setBorder(new CompoundBorder(BaseXLayout.border(1, 1, 1, 1),
         BorderFactory.createEtchedBorder(EtchedBorder.LOWERED)));
 
     // add status bar
@@ -281,24 +281,6 @@ public final class GUI extends JFrame implements BaseXWindow {
     if(!tb.isEmpty()) tb.add(" - ");
     tb.add(TITLE);
     setTitle(tb.toString());
-  }
-
-  /**
-   * Sets a cursor.
-   * @param cursor cursor to be set
-   */
-  public void cursor(final Cursor cursor) {
-    cursor(cursor, false);
-  }
-
-  /**
-   * Sets a cursor.
-   * @param cursor cursor to be set
-   * @param enforce enforce new cursor
-   */
-  public void cursor(final Cursor cursor, final boolean enforce) {
-    final Cursor cc = getCursor();
-    if(cc != cursor && (cc != CURSORWAIT || enforce)) setCursor(cursor);
   }
 
   /**
@@ -390,9 +372,8 @@ public final class GUI extends JFrame implements BaseXWindow {
     }
 
     // indicate to the user that the command will be executed
-    cursor(CURSORWAIT);
-    input.setCursor(CURSORWAIT);
     stop.setEnabled(true);
+    status.start();
     if(editing) editor.pleaseWait(id);
 
     final Data data = context.data();
@@ -512,9 +493,8 @@ public final class GUI extends JFrame implements BaseXWindow {
    */
   public void stop() {
     if(command != null) command.stop();
-    cursor(CURSORARROW, true);
-    input.setCursor(CURSORTEXT);
     stop.setEnabled(false);
+    status.stop();
     command = null;
   }
 
@@ -559,14 +539,8 @@ public final class GUI extends JFrame implements BaseXWindow {
    * @param layout component layout
    */
   void updateControl(final JComponent comp, final boolean show, final String layout) {
-    if(comp == status) {
-      if(show) top.add(comp, layout);
-      else top.remove(comp);
-    } else if(show) {
-      control.add(comp, layout);
-    } else {
-      control.remove(comp);
-    }
+    if(show) control.add(comp, layout);
+    else control.remove(comp);
     getRootPane().validate();
     refreshControls(false);
   }
@@ -594,6 +568,7 @@ public final class GUI extends JFrame implements BaseXWindow {
     context.options.set(MainOptions.XMLPLAN, inf);
 
     final Data data = context.data();
+    status.database(data);
     mode.setEnabled(data != null);
     final int m = data == null ? 2 : gopts.get(GUIOptions.SEARCHMODE);
     if(mode.getSelectedIndex() != m) {

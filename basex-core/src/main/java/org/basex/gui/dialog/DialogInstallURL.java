@@ -4,10 +4,8 @@ import static org.basex.core.Text.*;
 
 import java.awt.*;
 
-import org.basex.gui.*;
 import org.basex.gui.GUIConstants.*;
 import org.basex.gui.layout.*;
-import org.basex.gui.listener.*;
 import org.basex.util.*;
 
 /**
@@ -34,10 +32,7 @@ final class DialogInstallURL extends BaseXDialog {
     url = new BaseXTextField(this);
     info = new BaseXLabel(" ");
 
-    final BaseXLabel link = new BaseXLabel("<html><u>" + REPO_URL + "</u></html>");
-    link.setForeground(GUIConstants.blue);
-    link.setCursor(GUIConstants.CURSORHAND);
-    link.addMouseListener((MouseClickedListener) e -> BaseXDialog.browse(gui, REPO_URL));
+    final BaseXLabel link = BaseXLayout.link(REPO_URL, gui);
 
     BaseXBack p = new BaseXBack(new BorderLayout(0, 8));
     p.add(url, BorderLayout.NORTH);

@@ -221,21 +221,20 @@ public final class TextView extends View {
     if(file == null) return;
     gui.gopts.setFile(GUIOptions.WORKPATH, file.parent());
 
-    gui.cursor(CURSORWAIT, true);
-    try(PrintOutput out = new PrintOutput(file)) {
-      final Context context = gui.context;
-      if(cachedCmd != null) {
-        cachedCmd.execute(context, out);
-      } else if(cachedNodes != null) {
-        cachedNodes.serialize(Serializer.get(out, context.options.get(MainOptions.SERIALIZER)));
-      } else {
-        out.write(text.getText());
+    BaseXLayout.busy(text, () -> {
+      try(PrintOutput out = new PrintOutput(file)) {
+        final Context context = gui.context;
+        if(cachedCmd != null) {
+          cachedCmd.execute(context, out);
+        } else if(cachedNodes != null) {
+          cachedNodes.serialize(Serializer.get(out, context.options.get(MainOptions.SERIALIZER)));
+        } else {
+          out.write(text.getText());
+        }
+      } catch(final IOException ex) {
+        Util.debug(ex);
+        BaseXDialog.error(gui, Util.info(FILE_NOT_SAVED_X, file));
       }
-    } catch(final IOException ex) {
-      Util.debug(ex);
-      BaseXDialog.error(gui, Util.info(FILE_NOT_SAVED_X, file));
-    } finally {
-      gui.cursor(CURSORARROW, true);
-    }
+    });
   }
 }

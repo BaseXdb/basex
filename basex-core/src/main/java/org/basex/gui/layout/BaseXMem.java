@@ -4,7 +4,8 @@ import static org.basex.gui.GUIConstants.*;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.*;
+
+import javax.swing.Timer;
 
 import org.basex.gui.dialog.*;
 import org.basex.util.*;
@@ -16,8 +17,19 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class BaseXMem extends BaseXPanel {
-  /** Default width of the memory status box. */
-  private static final int DWIDTH = 70;
+  /** Text sample for computing the width of the memory status box. */
+  private static final String SAMPLE = "888.8 MB   88.8 GB";
+
+  /** Timer for sampling the memory consumption. */
+  private final Timer timer;
+  /** Sampled maximum memory. */
+  private long max;
+  /** Sampled reserved memory. */
+  private long total;
+  /** Sampled used memory. */
+  private long used;
+  /** Displayed used memory. */
+  private String usedText = "";
 
   /**
    * Constructor.
@@ -26,33 +38,60 @@ public final class BaseXMem extends BaseXPanel {
    */
   public BaseXMem(final BaseXWindow win, final boolean mouse) {
     super(win);
-    BaseXLayout.setWidth(this, DWIDTH);
-    setPreferredSize(new Dimension(getPreferredSize().width, getFont().getSize() + 6));
+    // dialogs show the progress of running operations
+    timer = new Timer(win.dialog() != null ? 100 : 5000, e -> sample());
+    final FontMetrics fm = getFontMetrics(getFont());
+    setPreferredSize(new Dimension(fm.stringWidth(SAMPLE) + 16, getFont().getSize() + 8));
     if(mouse) {
       setCursor(CURSORHAND);
       addMouseListener(this);
       addMouseMotionListener(this);
     }
+  }
 
-    // regularly refresh panel
-    new Timer(true).scheduleAtFixedRate(new TimerTask() {
-      @Override
-      public void run() { repaint(); }
-    }, 0, 5000);
+  @Override
+  public void addNotify() {
+    super.addNotify();
+    sample();
+    timer.start();
+  }
+
+  @Override
+  public void removeNotify() {
+    timer.stop();
+    super.removeNotify();
+  }
+
+  /**
+   * Samples the memory consumption and repaints the panel if the display has changed.
+   */
+  private void sample() {
+    final Runtime rt = Runtime.getRuntime();
+    final long mx = rt.maxMemory(), tt = rt.totalMemory(), us = tt - rt.freeMemory();
+    final String ut = Performance.formatHuman(us);
+    max = mx;
+    total = tt;
+    used = us;
+    usedText = ut;
+    repaint();
+  }
+
+  /**
+   * Returns the width of a memory bar.
+   * @param mem memory
+   * @param mx maximum memory
+   * @return width in pixels
+   */
+  private int width(final long mem, final long mx) {
+    return mx == 0 ? 0 : (int) (mem * (getWidth() - 6) / mx);
   }
 
   @Override
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
 
-    final Runtime rt = Runtime.getRuntime();
-    final long max = rt.maxMemory();
-    final long total = rt.totalMemory();
-    final long used = total - rt.freeMemory();
-    final int ww = getWidth();
-    final int hh = getHeight();
-
     // draw memory box
+    final int ww = getWidth(), hh = getHeight();
     g.setColor(backColor);
     g.fillRect(0, 0, ww - 3, hh - 3);
     g.setColor(gray);
@@ -63,20 +102,20 @@ public final class BaseXMem extends BaseXPanel {
 
     // show total memory usage
     g.setColor(color1);
-    g.fillRect(2, 2, Math.max(1, (int) (total * (ww - 6) / max)), hh - 6);
+    g.fillRect(2, 2, Math.max(1, width(total, max)), hh - 6);
 
     // show current memory usage
     final boolean full = used * 6 / 5 > max;
     g.setColor(full ? colormark4 : color3);
-    g.fillRect(2, 2, Math.max(1, (int) (used * (ww - 6) / max)), hh - 6);
+    g.fillRect(2, 2, Math.max(1, width(used, max)), hh - 6);
 
-    // print current memory usage
+    // print current memory usage: left-aligned at 0%, right-aligned at 100%
     final FontMetrics fm = g.getFontMetrics();
-    final String mem = Performance.formatHuman(used);
-    final int fw = (ww - fm.stringWidth(mem)) / 2;
-    final int h = fm.getHeight() - 3;
+    final int space = ww - 14 - fm.stringWidth(usedText);
+    final int x = 6 + (max == 0 ? 0 : (int) (Math.max(0, space) * Math.min(used, max) / max));
+    final int h = (hh - 3 + fm.getAscent() - fm.getDescent()) / 2;
     g.setColor(full ? colormark3 : darkGray);
-    g.drawString(mem, fw, h);
+    g.drawString(usedText, x, h);
   }
 
   @Override
