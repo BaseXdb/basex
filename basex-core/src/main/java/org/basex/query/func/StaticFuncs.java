@@ -326,9 +326,34 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
       }
     }
     if(arities.isEmpty()) return similarError(name, info);
-    // single candidate: include parameter names
-    return wrongArity(candidates.size() == 1 ? candidates.get(0).paramString() :
-      name.prefixString(), arity, arities, literal, info);
+
+    final StaticFunc merged = merge(candidates);
+    if(merged == null) return wrongArity(name.prefixString(), arity, arities, literal, info);
+    // required parameters: smallest accepted arity that is not below the supplied one
+    final int i = arities.ddo().sortedIndexOf(arity), p = i >= 0 ? i : -i - 1;
+    final int min = arities.get(p < arities.size() ? p : 0);
+    final String label = XQFunctionExpr.paramString(merged, min);
+    return !literal && arity < min ?
+      PARAMMISSING_X_X.get(info, label, merged.paramName(arity).prefixString()) :
+      wrongArity(label, arity, arities, literal, info);
+  }
+
+  /**
+   * Returns the candidate with the most parameters if all candidates share its parameter names.
+   * @param candidates candidate functions with the same name
+   * @return candidate with the most parameters, or {@code null} if the candidates cannot be merged
+   */
+  private static StaticFunc merge(final ArrayList<StaticFunc> candidates) {
+    StaticFunc longest = candidates.get(0);
+    for(final StaticFunc func : candidates) {
+      if(func.arity() > longest.arity()) longest = func;
+    }
+    for(final StaticFunc func : candidates) {
+      for(int a = 0; a < func.arity(); a++) {
+        if(!func.paramName(a).eq(longest.paramName(a))) return null;
+      }
+    }
+    return longest;
   }
 
   /**

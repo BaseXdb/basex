@@ -425,6 +425,9 @@ public final class Functions {
         args[a] = Empty.UNDEFINED;
       }
     }
+    if(!literal && arity < min) {
+      throw PARAMMISSING_X_X.get(fb.info, function, names[arity].prefixString());
+    }
     final IntList arities = checkArity(arity, min, max, visible);
     if(arities != null) throw wrongArity(function, arity, arities, literal, fb.info);
     return args;
