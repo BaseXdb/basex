@@ -48,6 +48,10 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   /** Cached function properties. */
   private final FlagCache props;
+  /** Function body for which {@link #simple} was computed (can be {@code null}). */
+  private volatile Expr simpleExpr;
+  /** Indicates if the function body neither accesses nor modifies the query focus. */
+  private boolean simple;
   /** Compilation flag. */
   private boolean compiled;
   /** Indicates if code is currently being compiled or evaluated. */
@@ -409,7 +413,20 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     final Expr ex = focus && qc.current != null ? CurrentValue.get(qc.current, checked, info) :
       checked;
     return new FuncItem(info, ex, params, anns, funcType(), vs.stackSize(), name,
-        focus ? qc.focus.copy() : null);
+        focus ? qc.focus.copy() : null, simple());
+  }
+
+  /**
+   * Indicates if the function body neither accesses nor modifies the query focus.
+   * @return result of check
+   */
+  private boolean simple() {
+    final Expr ex = expr;
+    if(simpleExpr != ex) {
+      simple = !ex.has(Flag.CTX);
+      simpleExpr = ex;
+    }
+    return simple;
   }
 
   @Override

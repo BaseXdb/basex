@@ -75,6 +75,24 @@ public final class FuncItem extends FItem implements Scope {
    */
   public FuncItem(final InputInfo info, final Expr expr, final Var[] params, final AnnList anns,
       final FuncType type, final int stackSize, final QNm name, final QueryFocus focus) {
+    this(info, expr, params, anns, type, stackSize, name, focus, !expr.has(Flag.CTX));
+  }
+
+  /**
+   * Constructor.
+   * @param info input info (can be {@code null})
+   * @param expr function body
+   * @param params parameters
+   * @param anns function annotations
+   * @param type function type
+   * @param stackSize stack-frame size
+   * @param name function name (can be {@code null})
+   * @param focus query focus (can be {@code null})
+   * @param simple indicates if the query focus is neither accessed nor modified by the body
+   */
+  public FuncItem(final InputInfo info, final Expr expr, final Var[] params, final AnnList anns,
+      final FuncType type, final int stackSize, final QNm name, final QueryFocus focus,
+      final boolean simple) {
     super(type);
     this.info = info;
     this.expr = expr;
@@ -83,7 +101,7 @@ public final class FuncItem extends FItem implements Scope {
     this.stackSize = stackSize;
     this.name = name;
     this.focus = focus;
-    simple = !expr.has(Flag.CTX);
+    this.simple = simple;
   }
 
   @Override
@@ -167,7 +185,7 @@ public final class FuncItem extends FItem implements Scope {
 
     if(copy == null && qf == null) return this;
     return new FuncItem(info, copy != null ? copy : expr, params, anns, funcType(), stackSize,
-        name, qf != null ? qf : focus);
+        name, qf != null ? qf : focus, simple);
   }
 
   /**
