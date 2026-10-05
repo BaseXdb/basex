@@ -13,6 +13,7 @@ import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -135,7 +136,7 @@ public final class Try extends Single {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     try {
-      return expr.value(qc);
+      return cache(expr.value(qc));
     } catch(final QueryException ex) {
       return caught(ex, qc);
     } catch(final StackOverflowError | ArraySizeException ex) {
@@ -145,6 +146,23 @@ public final class Try extends Single {
       final Value fnl = fnlly.value(qc);
       if(fnl != Empty.VALUE) throw FINALLY_X.get(info, fnl);
     }
+  }
+
+  /**
+   * Caches lazy items of the result, so that their errors are raised inside the try clause.
+   * @param value result of the try clause
+   * @return value
+   * @throws QueryException query exception
+   */
+  private Value cache(final Value value) throws QueryException {
+    final Type type = expr.seqType().type;
+    if(type.intersect(BasicType.STRING) != null ||
+        type.intersect(BasicType.BASE64_BINARY) != null) {
+      for(final Item item : value) {
+        if(item instanceof final Lazy lazy) lazy.cache(info);
+      }
+    }
+    return value;
   }
 
   /**
