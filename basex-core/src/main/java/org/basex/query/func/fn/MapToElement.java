@@ -93,9 +93,8 @@ public final class MapToElement {
       throws QueryException, IOException {
     if(!(value instanceof final XQMap map)) throw typeError(value, Types.MAP, info);
     if(map.structSize() != 1) throw MAP_TO_ELEMENT_X.get(info, "Single-entry map expected.");
-    final Item key = map.keys().itemAt(0);
-    final QNm name = qName(key.string(info), true, null);
-    element(name, PlanFn.entry(name, plan), map.get(key), handler);
+    final QNm name = qName(map.keyAt(0).string(info), true, null);
+    element(name, PlanFn.entry(name, plan), map.valueAt(0), handler);
   }
 
   /**
@@ -154,11 +153,11 @@ public final class MapToElement {
     final Item item = single(value);
     if(item instanceof final XQMap map) {
       // object: attributes, simple content, and child elements
-      final Value keys = map.keys();
+      final long size = map.structSize();
       if(attributes != null) {
         boolean simple = false, child = false;
-        for(final Item k : keys) {
-          final Slot slot = classify(k.string(info));
+        for(long i = 0; i < size; i++) {
+          final Slot slot = classify(map.keyAt(i).string(info));
           if(slot == Slot.CONTENT_KEY) simple = true;
           else if(slot != Slot.ATTRIBUTE_KEY) child = true;
         }
@@ -166,7 +165,9 @@ public final class MapToElement {
         if(simple && child) throw MAP_TO_ELEMENT_X.get(info,
             "Simple content cannot be combined with child elements.");
       }
-      for(final Item k : keys) object(name, k.string(info), map.get(k), attributes, handler);
+      for(long i = 0; i < size; i++) {
+        object(name, map.keyAt(i).string(info), map.valueAt(i), attributes, handler);
+      }
     } else if(item instanceof final XQArray array) {
       if(list(pe)) {
         // list layout: children are named after the plan's child entry
@@ -267,9 +268,8 @@ public final class MapToElement {
       // remaining members must be single-entry maps
       if(map.structSize() != 1) throw MAP_TO_ELEMENT_X.get(info,
           "Single-entry map expected in array.");
-      final Item k = map.keys().itemAt(0);
-      final byte[] key = k.string(info);
-      final Value value = map.get(k);
+      final byte[] key = map.keyAt(0).string(info);
+      final Value value = map.valueAt(0);
       final Slot slot = classify(key);
       if(slot == Slot.COMMENT_KEY) {
         final byte[] data = string(value);

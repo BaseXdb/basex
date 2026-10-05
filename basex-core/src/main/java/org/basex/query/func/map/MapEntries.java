@@ -3,7 +3,6 @@ package org.basex.query.func.map;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
 
@@ -18,24 +17,10 @@ public final class MapEntries extends MapFn {
   public Iter iter(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(arg(0), qc);
 
-    return new Iter() {
-      final BasicIter<Item> keys = map.keys().iter();
-
+    return new BasicIter<XQMap>(map.structSize()) {
       @Override
-      public XQMap next() throws QueryException {
-        final Item key = keys.next();
-        return key != null ? XQMap.get(key, map.get(key)) : null;
-      }
-
-      @Override
-      public Item get(final long i) throws QueryException {
-        final Item key = keys.get(i);
-        return XQMap.get(key, map.get(key));
-      }
-
-      @Override
-      public long size() {
-        return map.structSize();
+      public XQMap get(final long i) {
+        return XQMap.get(map.keyAt(i), map.valueAt(i));
       }
     };
   }

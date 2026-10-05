@@ -25,25 +25,26 @@ public class MapForEach extends MapFn {
 
     return new Iter() {
       final long size = action.funcType().refinedType.one() ? map.structSize() : -1;
-      final BasicIter<Item> keys = map.keys().iter();
+      final long entries = map.structSize();
       final HofArgs args = new HofArgs(3, action);
       Iter iter = Empty.ITER;
+      long e;
 
       @Override
       public Item next() throws QueryException {
         while(true) {
           final Item item = iter.next();
           if(item != null) return item;
-          final Item key = keys.next();
-          if(key == null) return null;
-          iter = invoke(action, args.set(0, key).set(1, map.get(key)).inc(), qc).iter();
+          if(e == entries) return null;
+          final Item key = map.keyAt(e);
+          iter = invoke(action, args.set(0, key).set(1, map.valueAt(e++)).inc(), qc).iter();
         }
       }
 
       @Override
       public Item get(final long i) throws QueryException {
-        final Item key = keys.get((int) i);
-        return invoke(action, args.set(0, key).set(1, map.get(key)).pos(i + 1), qc).item(qc, info);
+        return invoke(action, args.set(0, map.keyAt(i)).set(1, map.valueAt(i)).pos(i + 1), qc).
+            item(qc, info);
       }
 
       @Override
