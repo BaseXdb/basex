@@ -21,6 +21,9 @@ public final class QueryThreads {
   /** Comparison caches. */
   private final IdentityHashMap<CmpHashG, ThreadLocal<CmpCache>> cmpCache =
       new IdentityHashMap<>();
+  /** Filter caches. */
+  private final IdentityHashMap<HashFilter, ThreadLocal<HashFilter.Cache>> filterCache =
+      new IdentityHashMap<>();
   /** Full-text tokenizers. */
   private final IdentityHashMap<FTWords, ThreadLocal<FTTokenizer>> ftCache =
       new IdentityHashMap<>();
@@ -51,6 +54,15 @@ public final class QueryThreads {
    * @param expr expression
    * @return cache
    */
+  public ThreadLocal<HashFilter.Cache> get(final HashFilter expr) {
+    return filterCache.computeIfAbsent(expr, p -> ThreadLocal.withInitial(HashFilter.Cache::new));
+  }
+
+  /**
+   * Returns local thread for the given expression.
+   * @param expr expression
+   * @return cache
+   */
   public ThreadLocal<FTTokenizer> get(final FTWords expr) {
     return ftCache.computeIfAbsent(expr, p -> new ThreadLocal<>());
   }
@@ -69,6 +81,7 @@ public final class QueryThreads {
   void close() {
     for(final ThreadLocal<PathCache> cache : pathCache.values()) cache.remove();
     for(final ThreadLocal<CmpCache> cache : cmpCache.values()) cache.remove();
+    for(final ThreadLocal<HashFilter.Cache> cache : filterCache.values()) cache.remove();
     for(final ThreadLocal<FTTokenizer> cache : ftCache.values()) cache.remove();
     moduleCache.remove();
   }

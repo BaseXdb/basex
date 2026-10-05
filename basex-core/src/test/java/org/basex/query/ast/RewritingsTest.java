@@ -2610,4 +2610,54 @@ public final class RewritingsTest extends SandboxTest {
         + "else fn($x) as item()* { string($x) } "
         + "return $f instance of fn(item()*) as xs:string", "true\nfalse");
   }
+
+  /** Hashed comparisons with types that are only known at runtime. */
+  @Test public void hashCmpRuntimeTypes() {
+    final String func = "declare function local:f($x, $list) { $x = $list }; ";
+    check(func + "for $i in 1 to 4 return local:f($i, (2, 3))", "false\ntrue\ntrue\nfalse",
+        exists(CmpHashG.class));
+    check(func + "for $s in ('a', 'b', 'c') return local:f($s, ('b', 'c'))", "false\ntrue\ntrue",
+        exists(CmpHashG.class));
+    // items of different families: sequential comparison
+    check(func + "for $s in (<a>x</a>, <a>01</a>) return local:f($s, ('x', 1))", "true\ntrue",
+        exists(CmpHashG.class));
+    check(func + "for $s in (<a>01</a>, <a>1</a>) return local:f($s, (1, 2))", "true\ntrue",
+        exists(CmpHashG.class));
+  }
+
+  /** Equality filters on reused roots are evaluated via a hash index. */
+  @Test public void hashFilter() {
+    final String cs = "let $cs := (1 to 5) ! <c id='{ . mod 3 }' n='{ . }'/> ";
+    check(cs + "for $o in ('0', '1', '2', '3') return string-join($cs[@id = $o]/@n, ',')",
+        "3\n1,4\n2,5\n", exists(HashFilter.class));
+    // several probe values: document order, no duplicates
+    check(cs + "for $i in 1 to 3 "
+        + "return string-join($cs[@id = ('2', '1', string($i mod 3))]/@n, ',')",
+        "1,2,4,5\n1,2,4,5\n1,2,3,4,5", exists(HashFilter.class));
+    // empty probe
+    check(cs + "for $o in (<o/>, <o/>) return count($cs[@id = $o/@c])", "0\n0",
+        exists(HashFilter.class));
+    // several key values per item
+    check("let $cs := (<c><k>a</k><k>b</k></c>, <c><k>b</k></c>) "
+        + "for $o in ('a', 'b', 'b', 'c') return count($cs[k = $o])", "1\n2\n2\n0",
+        exists(HashFilter.class));
+    // numeric probe values: fallback to numeric comparison
+    check("let $cs := (<c id='01'/>, <c id='1'/>) "
+        + "for $o in (1, 1, '1', '1') return count($cs[@id = $o])", "2\n2\n1\n1",
+        exists(HashFilter.class));
+    // numeric keys
+    check("let $cs := (1 to 5) ! { 'id': . mod 3 } "
+        + "for $o in (0, 1, 2, 3) return count($cs[?id = $o])", "1\n2\n2\n0",
+        exists(HashFilter.class));
+    // keys of different families: sequential evaluation
+    check("let $cs := ({ 'id': 1 }, { 'id': xs:untypedAtomic('1') }, { 'id': 2 }) "
+        + "for $o in (1, 1, 2) return count($cs[?id = $o])", "2\n2\n1",
+        exists(HashFilter.class));
+    // collation
+    check("declare default collation "
+        + "'http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive'; "
+        + "let $cs := (<c id='A'/>, <c id='a'/>) "
+        + "for $o in ('a', 'a') return count($cs[@id = $o])", "2\n2",
+        empty(HashFilter.class));
+  }
 }

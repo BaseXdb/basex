@@ -9,6 +9,7 @@ import org.basex.query.CompileContext.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.index.*;
 import org.basex.query.expr.path.*;
+import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -51,6 +52,41 @@ public abstract class Filter extends Preds {
   public static Expr get(final CompileContext cc, final InputInfo info, final Expr root,
       final Expr... preds) throws QueryException {
     return preds.length == 0 ? root : new CachedFilter(info, root, preds).optimize(cc);
+  }
+
+  /**
+   * Returns an iterator over the root items that match the predicates.
+   * @param iter iterator of the root expression
+   * @param qc query context
+   * @return iterator
+   */
+  final Iter filterIter(final Iter iter, final QueryContext qc) {
+    return new Iter() {
+      @Override
+      public Item next() throws QueryException {
+        final QueryContext q = qc;
+        final Iter ir = iter;
+        for(Item item; (item = q.next(ir)) != null;) {
+          if(test(item, q)) return item;
+        }
+        return null;
+      }
+    };
+  }
+
+  /**
+   * Returns the root items that match the predicates.
+   * @param iter iterator of the root expression
+   * @param qc query context
+   * @return matching items
+   * @throws QueryException query exception
+   */
+  final Value filterValue(final Iter iter, final QueryContext qc) throws QueryException {
+    final ValueBuilder vb = new ValueBuilder(qc);
+    for(Item item; (item = qc.next(iter)) != null;) {
+      if(test(item, qc)) vb.add(item);
+    }
+    return vb.value(this);
   }
 
   @Override
@@ -129,6 +165,11 @@ public abstract class Filter extends Preds {
         }
         return List.get(cc, info, results.finish());
       }
+
+      // equality predicate with a context-independent operand: hash filter
+      // example: for $o in $orders return $customers[@id = $o/@customer]
+      final int key = HashFilter.key(root, exprs);
+      if(key != -1) return copyType(new HashFilter(info, root, expr, key));
 
       // otherwise, return iterative filter
       return copyType(new IterFilter(info, root, exprs));

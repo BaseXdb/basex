@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import org.basex.query.iter.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.value.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -23,6 +24,8 @@ public final class CmpCache {
   Value value;
   /** Lazy iterator over the right-hand operand; {@code null} once exhausted. */
   Iter iter;
+  /** Family of the cached items ({@code null} if none). */
+  Type family;
   /** Indicates if at least one cache hit occurred since the last (re-)initialization. */
   boolean hit;
 
@@ -51,9 +54,7 @@ public final class CmpCache {
     // operand changed: dismiss only if cache was unused (no hits AND not fully built)
     if(value != val) {
       if(!hit && iter != null) {
-        set = null;
-        value = null;
-        iter = null;
+        dismiss();
         return false;
       }
       init();
@@ -65,9 +66,19 @@ public final class CmpCache {
   }
 
   /**
+   * Dismisses the cache permanently.
+   */
+  void dismiss() {
+    set = null;
+    value = null;
+    iter = null;
+  }
+
+  /**
    * Creates a fresh empty hash set.
    */
   private void init() {
     set = new HashItemSet(ItemSet.Mode.EQUAL, info);
+    family = null;
   }
 }

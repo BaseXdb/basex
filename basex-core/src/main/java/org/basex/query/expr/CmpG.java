@@ -124,11 +124,8 @@ public class CmpG extends Cmp {
       if(st1.zeroOrOne() && !st1.mayBeWrapped() && st2.zeroOrOne() && !st2.mayBeWrapped()) {
         // simple comparisons
         if(!(this instanceof CmpSimpleG)) expr = copyType(new CmpSimpleG(expr1, expr2, op, info));
-      } else if(op == CmpOp.EQ && sc().collation == null && !st2.zeroOrOne() && (
-        type1.isNumber() && type2.isNumber() ||
-        type1.isStringOrUntyped() && type2.isStringOrUntyped() ||
-        type1 == BasicType.BOOLEAN && type2 == BasicType.BOOLEAN
-      )) {
+      } else if(op == CmpOp.EQ && sc().collation == null && !st2.zeroOrOne() &&
+          CmpHashG.hashable(type1, type2)) {
         // hash-based comparisons
         if(!(this instanceof CmpHashG)) expr = copyType(new CmpHashG(expr1, expr2, op, info));
       } else if(op == CmpOp.EQ && expr2 instanceof Range && type1.isNumberOrUntyped()) {

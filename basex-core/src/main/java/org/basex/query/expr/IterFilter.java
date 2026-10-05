@@ -3,7 +3,6 @@ package org.basex.query.expr;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -30,32 +29,14 @@ public final class IterFilter extends Filter {
   public Iter iter(final QueryContext qc) throws QueryException {
     final Iter iter = root.iter(qc);
     final Value range = range(iter);
-    if(range != null) return range.iter();
-
-    return new Iter() {
-      @Override
-      public Item next() throws QueryException {
-        final QueryContext q = qc;
-        final Iter ir = iter;
-        for(Item item; (item = q.next(ir)) != null;) {
-          if(test(item, q)) return item;
-        }
-        return null;
-      }
-    };
+    return range != null ? range.iter() : filterIter(iter, qc);
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Iter iter = root.iter(qc);
     final Value range = range(iter);
-    if(range != null) return range;
-
-    final ValueBuilder vb = new ValueBuilder(qc);
-    for(Item item; (item = qc.next(iter)) != null;) {
-      if(test(item, qc)) vb.add(item);
-    }
-    return vb.value(this);
+    return range != null ? range : filterValue(iter, qc);
   }
 
   /**

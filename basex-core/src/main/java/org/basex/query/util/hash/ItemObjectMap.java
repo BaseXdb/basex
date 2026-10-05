@@ -29,7 +29,26 @@ public final class ItemObjectMap<E> extends HashItemSet {
    * @param capacity initial capacity (will be resized to a power of two)
    */
   public ItemObjectMap(final long capacity) {
-    super(Mode.ATOMIC, null, capacity);
+    this(Mode.ATOMIC, null, capacity);
+  }
+
+  /**
+   * Constructor with comparison mode.
+   * @param mode comparison mode
+   * @param info input info (can be {@code null})
+   */
+  public ItemObjectMap(final Mode mode, final InputInfo info) {
+    this(mode, info, INITIAL_CAPACITY);
+  }
+
+  /**
+   * Constructor with comparison mode and initial capacity.
+   * @param mode comparison mode
+   * @param info input info (can be {@code null})
+   * @param capacity initial capacity (will be resized to a power of two)
+   */
+  private ItemObjectMap(final Mode mode, final InputInfo info, final long capacity) {
+    super(mode, info, capacity);
     values = new Object[capacity()];
   }
 
