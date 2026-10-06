@@ -2930,6 +2930,33 @@ return
     query(func.args(dup), both);
   }
 
+  /** Test method. */
+  @Test public void jtree() {
+    final Function func = JTREE;
+
+    // value type
+    check(func.args(" array { (1 to 2) }"), "[1,2]", type(func, "jnode((), array(xs:integer))"));
+    check(func.args(" { 'a': 1 }"), "{\"a\":1}", type(func, "jnode((), map(xs:string, xs:integer))"));
+    check("for $i in (1, 'a') return " + func.args(" $i"), "1\na", type(func, "jnode((), xs:anyAtomicType)"));
+
+    // statically known value type tests
+    check(func.args(" array { (1 to 2) }") + "/self::jnode(*, array(*)) ! " + JVALUE.args(),
+        "[1,2]", empty("*[@axis = 'self']"));
+    check(func.args(" array { (1 to 2) }") + "/self::jnode(*, map(*))", "", empty());
+  }
+
+  /** Test method. */
+  @Test public void jvalue() {
+    final Function func = JVALUE;
+
+    check(func.args(JTREE.args(" (1 to 3)")), "1\n2\n3", empty(func), empty(JTREE));
+    check(func.args(JTREE.args(" ()")), "", empty());
+    check(JTREE.args(" array { (1 to 2) ! (. * <_>2</_>) }") + " ! " + func.args(),
+        "[2,4]", empty(func), empty(JTREE));
+    check(JTREE.args(" { 'a': 1 }") + "/a ! " + func.args(), 1, exists(func));
+    check(func.args(JTREE.args(" { 'a': 1 }")) + "?a", 1, empty(JTREE));
+  }
+
   /**
    * Test method.
    * @throws Exception exception
