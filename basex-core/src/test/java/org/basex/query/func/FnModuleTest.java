@@ -5716,25 +5716,6 @@ return
   }
 
   /** Test method. */
-  @Test public void subsequenceWhere() {
-    final Function func = SUBSEQUENCE_WHERE;
-
-    check(func.args(" ()", " function($x, $p) { true() }"), "", empty());
-    query(func.args(" 1 to 5", " ()", " ()"), "1\n2\n3\n4\n5");
-    query(func.args(" 1 to 5", " function($x, $p) { $x ge 3 }"), "3\n4\n5");
-    query(func.args(" 1 to 9", " function($x, $p) { $x ge 3 }", " function($x, $p) { $x ge 6 }"),
-        "3\n4\n5\n6");
-    query(func.args(" 1 to 9", " ()", " function($x, $p) { $x ge 3 }"), "1\n2\n3");
-
-    // a 'from' predicate may never match: the result can be empty for a non-empty input
-    check("empty(" + func.args(" (1, (2 to 9)[. > 0])", " function($x, $p) { $x > 100 }") + ")",
-        true, type(func, "xs:integer*"));
-    // a 'to'-only call always starts at the first item, so it preserves one-or-more
-    check(func.args(" (1, (2 to 9)[. > 0])", " ()", " function($x, $p) { $x ge 3 }"),
-        "1\n2\n3", type(func, "xs:integer+"));
-  }
-
-  /** Test method. */
   @Test public void substring() {
     final Function func = SUBSTRING;
     contains(func.args("'ab'", " [2]"), "b");

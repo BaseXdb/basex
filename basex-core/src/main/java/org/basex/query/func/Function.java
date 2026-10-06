@@ -700,10 +700,6 @@ public enum Function implements AFunction {
   SUBSEQUENCE(FnSubsequence::new, "subsequence(input, start, length?)",
       params(ITEM_ZM, NUMERIC_O, NUMERIC_ZO), ITEM_ZM),
   /** XQuery function. */
-  SUBSEQUENCE_WHERE(FnSubsequenceWhere::new, "subsequence-where(input, from?, to?)",
-      params(ITEM_ZM, PREDICATE_O.with(Occ.ZERO_OR_ONE), PREDICATE_O.with(Occ.ZERO_OR_ONE)),
-      ITEM_ZM),
-  /** XQuery function. */
   SUBSTRING(FnSubstring::new, "substring(value, start, length?)",
       params(STRING_ZO, NUMERIC_O, NUMERIC_ZO), STRING_O),
   /** XQuery function. */
