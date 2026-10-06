@@ -166,6 +166,10 @@ public abstract class SimpleMap extends Mapping {
             args[0] instanceof ContextValue)) {
           // E ! data(.) → data(E)
           return cc.function(DATA, info, expr);
+        } else if(JVALUE.is(next) && (((FnJvalue) next).contextAccess() ||
+            args[0] instanceof ContextValue)) {
+          final Expr values = jvalues(expr, cc);
+          if(values != null) return values;
         } else if(STRING_TO_CODEPOINTS.is(expr) && (CODEPOINTS_TO_STRING.is(next) ||
             CHAR.is(next)) && args[0] instanceof ContextValue) {
           // string-to-codepoints(E) ! codepoints-to-string(.) → characters(E)
@@ -260,6 +264,44 @@ public abstract class SimpleMap extends Mapping {
       return get(cc, info, Filter.get(cc, info, expr, iff.cond), iff.exprs[0]);
     }
     return null;
+  }
+
+  /**
+   * Rewrites the values of the child JNodes of a map, an array or a JNode to a map or array access.
+   * @param expr path expression
+   * @param cc compilation context
+   * @return resulting expression or {@code null}
+   * @throws QueryException query exception
+   */
+  private Expr jvalues(final Expr expr, final CompileContext cc) throws QueryException {
+    if(!(expr instanceof final Path path && path.root != null && path.root.seqType().one() &&
+        path.steps.length == 1 && path.steps[0] instanceof final Step step &&
+        step.axis == Axis.CHILD && step.exprs.length == 0 && step.selector == null)) return null;
+
+    // value of the root: map or array, or JNode with a map or array value
+    final Expr root = path.root;
+    SeqType vt = root.seqType();
+    final boolean jnode = vt.type instanceof NodeType;
+    if(jnode) {
+      if(!(((NodeType) vt.type).test instanceof final JNodeTest jt)) return null;
+      vt = jt.valueType;
+    }
+    final boolean map = vt.instanceOf(Types.MAP_O);
+    if(!map && !vt.instanceOf(Types.ARRAY_O)) return null;
+
+    final Test test = step.test;
+    final Item key = test.key();
+    final boolean all = test == NodeTest.JNODE;
+    if(!all && (!map || key == null ||
+        test instanceof final JNodeTest jt && !jt.valueType.eq(Types.ITEM_ZM))) return null;
+
+    // MAP/* ! jvalue() → map:items(MAP)
+    // ARRAY/* ! jvalue() → array:items(ARRAY)
+    // MAP/KEY ! jvalue() → map:get(MAP, KEY)
+    // JNODE/... ! jvalue() → ...(jvalue(JNODE))
+    final Expr input = jnode ? cc.function(JVALUE, info, root) : root;
+    return !all ? cc.function(_MAP_GET, info, input, key) :
+      cc.function(map ? _MAP_ITEMS : _ARRAY_ITEMS, info, input);
   }
 
   /**

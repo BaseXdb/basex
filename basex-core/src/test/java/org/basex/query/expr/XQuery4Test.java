@@ -976,11 +976,11 @@ public final class XQuery4Test extends SandboxTest {
     // equivalent to the child::{ E } selector
     query("let $m := { 'a': 1, 'b': 2 } return deep-equal($m/'b', $m/child::{ 'b' })", "true");
     // a constant atomic selector on a JNode folds to a JNodeTest step (direct key lookup) ...
-    check("let $m := { 'a': 1, 'b': 2 } return $m/'b' ! jvalue()", 2,
+    check("let $m := { 'a': 1, 'b': 2 } return $m/'b'", "{\"b\":2}",
         exists(IterStep.class), empty(SelectorStep.class));
-    check("let $a := [ 10, 20, 30 ] return $a/2 ! jvalue()", 20,
+    check("let $a := [ 10, 20, 30 ] return $a/2", "[20]",
         exists(IterStep.class), empty(SelectorStep.class));
-    check("{ 'x': 1 }/'x' ! jvalue()", 1, exists(IterStep.class), empty(SelectorStep.class));
+    check("{ 'x': 1 }/'x'", "{\"x\":1}", exists(IterStep.class), empty(SelectorStep.class));
     // ... a non-constant selector stays a SelectorStep ...
     check("declare function local:f($k) { { 'a': 1 }/child::{ $k } }; local:f('a') ! jvalue()", 1,
         exists(SelectorStep.class));

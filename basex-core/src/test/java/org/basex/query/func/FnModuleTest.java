@@ -2936,8 +2936,10 @@ return
 
     // value type
     check(func.args(" array { (1 to 2) }"), "[1,2]", type(func, "jnode((), array(xs:integer))"));
-    check(func.args(" { 'a': 1 }"), "{\"a\":1}", type(func, "jnode((), map(xs:string, xs:integer))"));
-    check("for $i in (1, 'a') return " + func.args(" $i"), "1\na", type(func, "jnode((), xs:anyAtomicType)"));
+    check(func.args(" { 'a': 1 }"), "{\"a\":1}",
+        type(func, "jnode((), map(xs:string, xs:integer))"));
+    check("for $i in (1, 'a') return " + func.args(" $i"), "1\na",
+        type(func, "jnode((), xs:anyAtomicType)"));
 
     // statically known value type tests
     check(func.args(" array { (1 to 2) }") + "/self::jnode(*, array(*)) ! " + JVALUE.args(),
@@ -2953,8 +2955,28 @@ return
     check(func.args(JTREE.args(" ()")), "", empty());
     check(JTREE.args(" array { (1 to 2) ! (. * <_>2</_>) }") + " ! " + func.args(),
         "[2,4]", empty(func), empty(JTREE));
-    check(JTREE.args(" { 'a': 1 }") + "/a ! " + func.args(), 1, exists(func));
     check(func.args(JTREE.args(" { 'a': 1 }")) + "?a", 1, empty(JTREE));
+
+    // values of child JNodes
+    final String maps = "for $m in ({ 'a': 1, 'b': (), 'c': [ 2 ] }, { 'b': 3 }) return ";
+    final String arrays = "for $a in ([ 1, (), 3 ], [ 4 ]) return ";
+    check(maps + JTREE.args(" $m") + "/* ! " + func.args(), "1\n[2]\n3",
+        empty(func), exists(_MAP_ITEMS));
+    check(arrays + JTREE.args(" $a") + "/* ! " + func.args(), "1\n3\n4",
+        empty(func), exists(_ARRAY_ITEMS));
+    check(maps + JTREE.args(" $m") + "/a ! " + func.args(), 1,
+        empty(func), exists(_MAP_GET));
+    check(maps + JTREE.args(" $m") + "/b ! " + func.args(), 3,
+        empty(func), exists(_MAP_GET));
+    check(maps + JTREE.args(" $m") + "/jnode(a, xs:string) ! " + func.args(), "",
+        exists(func));
+    check(maps + JTREE.args(" $m") + "/*[1] ! " + func.args(), "1\n3", exists(func));
+    check(arrays + JTREE.args(" $a") + "/a ! " + func.args(), "", exists(func));
+    check(maps + "$m/a ! " + func.args(), 1, empty(func), exists(_MAP_GET));
+    check(arrays + "$a/* ! " + func.args(), "1\n3\n4", empty(func), exists(_ARRAY_ITEMS));
+    check("for $j in (" + JTREE.args(" { 'a': 1 }") + ", " + JTREE.args(" { 'a': 2 }") + ") " +
+        "return $j/a ! " + func.args(), "1\n2", exists(_MAP_GET));
+    check(maps + JTREE.args(" $m") + "/c/* ! " + func.args(), 2, exists(func));
   }
 
   /**
