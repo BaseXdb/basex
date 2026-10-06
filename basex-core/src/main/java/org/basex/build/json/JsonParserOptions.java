@@ -83,7 +83,9 @@ public final class JsonParserOptions extends JsonOptions {
   public void check(final InputInfo info) throws QueryException {
     final JsonFormat format = get(FORMAT);
     final boolean w3 = format == JsonFormat.W3, maps = w3 || format == JsonFormat.W3_MAPPING;
-    if(get(VALIDATE) != null && format != JsonFormat.W3_XML) throw unknown(VALIDATE, info);
+    final Boolean validate = get(VALIDATE);
+    if(validate != null && format != JsonFormat.W3_XML) throw unknown(VALIDATE, info);
+    if(validate == Boolean.TRUE) throw VALIDATE_JSON.get(info);
     final JsonNumberFormat nf = get(NUMBER_FORMAT);
     if(nf != null && nf != JsonNumberFormat.DOUBLE && !maps) throw unknown(NUMBER_FORMAT, info);
     if(!get(NULL).isEmpty() && !w3) throw unknown(NULL, info);

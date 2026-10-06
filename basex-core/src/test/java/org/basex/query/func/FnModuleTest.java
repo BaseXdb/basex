@@ -2970,6 +2970,10 @@ return
         "<number key=\"x\">2</number></map>";
     query(func.args(dup, " { 'duplicates': 'retain' }"), both);
     query(func.args(dup), both);
+
+    // schema validation is not supported
+    contains(func.args("null", " { 'validate': false() }"), "xmlns");
+    error(func.args("null", " { 'validate': true() }"), VALIDATE_JSON);
   }
 
   /** Test method. */

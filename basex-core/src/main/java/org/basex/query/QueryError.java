@@ -713,6 +713,8 @@ public enum QueryError {
   /** Error code. */
   MERGE_DUPLICATE_X(FOJS, 3, "Key % occurs more than once."),
   /** Error code. */
+  VALIDATE_JSON(FOJS, 4, "Schema validation is not supported."),
+  /** Error code. */
   OPTION_JSON_X(FOJS, 5, "%"),
   /** Error code. */
   INVALID_JSON_X(FOJS, 6, "%"),
