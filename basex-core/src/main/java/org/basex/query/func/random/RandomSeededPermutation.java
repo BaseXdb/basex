@@ -5,10 +5,8 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
-import org.basex.query.iter.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
+import org.basex.util.Array;
 
 /**
  * Function implementation.
@@ -20,21 +18,20 @@ public final class RandomSeededPermutation extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final long seed = toLong(arg(0), qc);
-    final ItemList items = new ItemList();
+    final Value value = arg(1).value(qc);
+    final int size = Array.checkCapacity(value.size());
     final SplittableRandom r = new SplittableRandom(seed);
 
-    final Iter iter = arg(1).iter(qc);
-    for(Item item1; (item1 = qc.next(iter)) != null;) {
-      final int ls = items.size();
-      final int l = r.nextInt(ls + 1);
-      if(l < ls) {
-        final Item item2 = items.get(l);
-        items.set(l, item1);
-        item1 = item2;
-      }
-      items.add(item1);
+    // permute positions, build result with compact sequence types
+    final int[] positions = new int[size];
+    for(int p = 0; p < size; p++) {
+      final int l = r.nextInt(p + 1);
+      positions[p] = positions[l];
+      positions[l] = p;
     }
-    return items.value(this);
+    final ValueBuilder vb = new ValueBuilder(qc, size);
+    for(final int p : positions) vb.add(value.itemAt(p));
+    return vb.value(this);
   }
 
   @Override

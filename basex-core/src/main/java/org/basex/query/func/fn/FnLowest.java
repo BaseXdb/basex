@@ -9,7 +9,6 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -40,19 +39,20 @@ public class FnLowest extends StandardFunc {
     final FItem key = toFunctionOrNull(arg(2), 1, qc);
 
     final HofArgs args = key != null ? new HofArgs(1) : null;
-    final ItemList result = new ItemList();
+    ValueBuilder result = new ValueBuilder(qc);
     Value lowest = null;
     for(Item item; (item = input.next()) != null;) {
-      final ValueBuilder vb = new ValueBuilder(qc);
       final Value value = key != null ? invoke(key, args.set(0, item), qc) : item;
-      for(final Item it : value.atomValue(qc, info)) {
-        vb.add(it.type.isUntyped() ? Dbl.get(toDouble(it)) : it);
+      Value low = value.atomValue(qc, info);
+      if(BasicType.UNTYPED_ATOMIC.instanceOf(low.type)) {
+        final ValueBuilder vb = new ValueBuilder(qc);
+        for(final Item it : low) vb.add(it.type.isUntyped() ? Dbl.get(toDouble(it)) : it);
+        low = vb.value();
       }
-      final Value low = vb.value();
       int diff = SortFn.compare(lowest != null ? lowest : low, low, collation, qc, info);
       if(min) diff = -diff;
       if(diff > 0) continue;
-      if(diff < 0) result.reset();
+      if(diff < 0) result = new ValueBuilder(qc);
       result.add(item);
       lowest = low;
     }
