@@ -21,8 +21,8 @@ public enum Flag {
    */
   CTX,
   /**
-   * Reference to the focus of the caller within a global focus.
-   * Stripped by the global focus, which reports {@link #CTX} instead.
+   * Reference to the current value.
+   * Stripped by the binding of a captured current value.
    * Example: current()
    */
   CUR,

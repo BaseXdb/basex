@@ -166,8 +166,7 @@ public final class StaticFuncCall extends FuncCall {
   void assignDefaults() {
     final int arity = func.arity();
     for(int a = 0; a < arity; a++) {
-      // fn:current in a default value refers to the context value of this call
-      if(exprs[a] == Empty.UNDEFINED) exprs[a] = CurrentValue.get(func.defaults[a], info);
+      if(exprs[a] == Empty.UNDEFINED) exprs[a] = new DefaultValue(info, func, a);
     }
   }
 

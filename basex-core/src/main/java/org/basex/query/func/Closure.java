@@ -43,8 +43,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   private AnnList anns;
   /** Updating flag. */
   private boolean updating;
-  /** Indicates if the query focus is captured; implies that no variables are bound. */
-  private final boolean focus;
+  /** Indicates if the query focus is captured. */
+  private boolean focus;
 
   /** Cached function properties. */
   private final FlagCache props;
@@ -150,8 +150,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     compiled = true;
 
     checkUpdating();
-    // if the whole focus is captured, single context values need not be bound
-    if(!focus) captureContextIfNeeded(cc);
+    focus();
 
     // compile closure
     for(final Entry<Var, Expr> entry : global.entrySet()) {
@@ -169,20 +168,6 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     expr.markTailCalls(cc);
 
     return optimize(cc);
-  }
-
-  /**
-   * Captures the context value if this closure wraps a static function call whose omitted default
-   * arguments depend on the context. This can happen for partial function applications.
-   * @param cc compile context
-   * @throws QueryException query exception
-   */
-  private void captureContextIfNeeded(final CompileContext cc) throws QueryException {
-    if(!(expr instanceof final StaticFuncCall sfc)) return;
-    final Var var = new Var(new QNm("ctx"), Types.ITEM_ZM, cc.qc, info);
-    final VarRef ref = new VarRef(info, var);
-    final InlineContext ic = new InlineContext(null, ref, cc);
-    if(ic.inlineOrNull(sfc) != null) global.put(vs.add(var), new ContextValue(info));
   }
 
   @Override
@@ -203,8 +188,9 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
           // values are always inlined into the closure
           inline = var.checkType(value, cc.qc, cc);
         } else if(ex instanceof final Closure cl) {
-          // nested closures are inlined if their size and number of closed-over variables is small
-          if(!cl.has(Flag.NDT) && cl.global.size() < 5
+          // nested closures are inlined if their size and number of closed-over variables is small,
+          // and if they do not capture the focus at creation time
+          if(!cl.has(Flag.NDT) && !(cl.focus() && cl.has(Flag.CTX)) && cl.global.size() < 5
               && expr.count(var) != VarUsage.MORE_THAN_ONCE && cl.exprSize() < limit) {
             cc.info(OPTINLINE_X, entry);
             for(final Entry<Var, Expr> expr2 : cl.global.entrySet()) {
@@ -410,10 +396,22 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     }
 
     // captured focus: fn:current refers to the current value at creation time
-    final Expr ex = focus && qc.current != null ? CurrentValue.get(qc.current, checked, info) :
+    final boolean fcs = focus();
+    final Expr ex = fcs && qc.current != null ? CurrentValue.get(qc.current, checked, info) :
       checked;
     return new FuncItem(info, ex, params, anns, funcType(), vs.stackSize(), name,
-        focus ? qc.focus.copy() : null, simple());
+        fcs ? qc.focus.copy() : null, simple());
+  }
+
+  /**
+   * Indicates if the query focus is captured, and sets the flag for function references whose
+   * default values depend on the focus.
+   * @return result of check
+   */
+  private boolean focus() {
+    // function references: the default values of the called function are only known after parsing
+    if(!focus) focus = name != null && expr instanceof StaticFuncCall && expr.has(Flag.CTX);
+    return focus;
   }
 
   /**

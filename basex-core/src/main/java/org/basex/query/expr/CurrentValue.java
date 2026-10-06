@@ -10,7 +10,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Expression that supplies the context value of the caller to fn:current.
+ * Expression that binds a captured current value to fn:current.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -19,21 +19,11 @@ public final class CurrentValue extends Arr {
   /**
    * Constructor.
    * @param info input info (can be {@code null})
-   * @param current context value of the caller
+   * @param current captured current value
    * @param expr expression
    */
   private CurrentValue(final InputInfo info, final Expr current, final Expr expr) {
     super(info, Types.ITEM_ZM, current, expr);
-  }
-
-  /**
-   * Binds the context value of the caller to the fn:current calls of a default value.
-   * @param expr default value
-   * @param info input info (can be {@code null})
-   * @return expression
-   */
-  public static Expr get(final Expr expr, final InputInfo info) {
-    return expr.has(Flag.CUR) ? new CurrentValue(info, new ContextValue(info), expr) : expr;
   }
 
   /**
@@ -49,10 +39,9 @@ public final class CurrentValue extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) {
-    // current() → context value of the caller
-    final Expr expr = exprs[1] instanceof final GlobalFocus gf ? gf.expr : exprs[1];
-    if(expr instanceof FnCurrent) return cc.replaceWith(this, exprs[0]);
-    // no remaining reference to the context value of the caller
+    // current() → captured current value
+    if(exprs[1] instanceof FnCurrent) return cc.replaceWith(this, exprs[0]);
+    // no remaining reference to the current value
     if(!exprs[1].has(Flag.CUR)) return cc.replaceWith(this, exprs[1]);
     return adoptType(exprs[1]);
   }
@@ -105,7 +94,7 @@ public final class CurrentValue extends Arr {
 
   @Override
   public String description() {
-    return "context value of the caller";
+    return "captured current value";
   }
 
   @Override

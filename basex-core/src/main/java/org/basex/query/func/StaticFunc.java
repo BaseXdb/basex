@@ -20,6 +20,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * A static user-defined function.
@@ -42,6 +43,18 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   /** Indicates if the query focus is accessed or modified. */
   private boolean simple;
 
+  /** Prepared default expressions (entries can be {@code null}). */
+  private final Prepared[] dflts;
+  /** Cached properties of the default expressions (entries can be {@code null}). */
+  private final FlagCache[] dprops;
+
+  /**
+   * Default expression with a variable scope of its own.
+   * @param expr expression
+   * @param scope variable scope
+   */
+  private record Prepared(Expr expr, VarScope scope) { }
+
   /**
    * Function constructor.
    * @param name function name
@@ -62,11 +75,107 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     updating = anns.contains(Annotation.UPDATING);
     memo = anns.contains(Annotation._BASEX_MEMO);
 
-    int mn = defaults.length;
-    for(final Expr dflt : defaults) {
-      if(dflt != null) mn--;
+    final int dl = defaults.length;
+    int mn = dl;
+    dflts = new Prepared[dl];
+    dprops = new FlagCache[dl];
+    for(int d = 0; d < dl; d++) {
+      if(defaults[d] != null) {
+        final int i = d;
+        dprops[d] = new FlagCache(flag -> dflt(i).has(flag));
+        mn--;
+      }
     }
     min = mn;
+  }
+
+  /**
+   * Returns a default expression, compiled or prepared if available.
+   * @param index parameter index
+   * @return default expression
+   */
+  private Expr dflt(final int index) {
+    final Prepared prepared = dflts[index];
+    return prepared != null ? prepared.expr : defaults[index];
+  }
+
+  /**
+   * Prepares a default expression for evaluation: assigns a copy with a variable scope of its own.
+   * @param index parameter index
+   * @param cc compilation context
+   * @return {@code true} if the expression was prepared by this call
+   */
+  private synchronized boolean prepareDefault(final int index, final CompileContext cc) {
+    if(dflts[index] != null) return false;
+    final VarScope scope = new VarScope();
+    cc.pushScope(scope);
+    try {
+      dflts[index] = new Prepared(defaults[index].copy(cc, new IntObjectMap<>()), scope);
+    } finally {
+      cc.removeScope();
+    }
+    return true;
+  }
+
+  /**
+   * Compiles a default expression without knowing the focus of the caller.
+   * @param index parameter index
+   * @param cc compilation context
+   * @return compiled expression
+   * @throws QueryException query exception
+   */
+  Expr compileDefault(final int index, final CompileContext cc) throws QueryException {
+    // recursive references: the default expression is compiled at the outermost call
+    if(prepareDefault(index, cc)) {
+      final Prepared prepared = dflts[index];
+      Expr ex = prepared.expr;
+      cc.pushFocus(null, false);
+      cc.pushScope(prepared.scope);
+      try {
+        ex = ex.compile(cc);
+      } finally {
+        cc.removeScope();
+        cc.removeFocus();
+      }
+      dflts[index] = new Prepared(ex, prepared.scope);
+      dprops[index].clear();
+    }
+    return dflts[index].expr;
+  }
+
+  /**
+   * Evaluates a default expression with the focus of the caller.
+   * @param index parameter index
+   * @param qc query context
+   * @return value
+   * @throws QueryException query exception
+   */
+  Value defaultValue(final int index, final QueryContext qc) throws QueryException {
+    // defaults assigned at runtime are not compiled
+    Prepared prepared = dflts[index];
+    if(prepared == null) {
+      prepareDefault(index, new CompileContext(qc, true));
+      prepared = dflts[index];
+    }
+    final Value current = qc.current;
+    qc.current = null;
+    final int fp = prepared.scope.enter(qc);
+    try {
+      return prepared.expr.value(qc);
+    } finally {
+      prepared.scope.exit(fp, qc);
+      qc.current = current;
+    }
+  }
+
+  /**
+   * Indicates if a default expression has one of the specified compiler properties.
+   * @param index parameter index
+   * @param flags flags
+   * @return result of check
+   */
+  boolean defaultHas(final int index, final Flag... flags) {
+    return dprops[index].has(flags);
   }
 
   @Override
@@ -263,6 +372,9 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       return list;
     });
 
+    for(int d = 0; d < defaults.length; d++) {
+      if(defaults[d] != null && !dflt(d).accept(visitor)) return false;
+    }
     return visitor.declared(params) && (expr == null || expr.accept(visitor));
   }
 

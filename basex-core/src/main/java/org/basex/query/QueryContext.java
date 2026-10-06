@@ -87,7 +87,7 @@ public final class QueryContext extends Job implements Closeable {
   public final LockList locks = new LockList();
   /** Current query focus. */
   public QueryFocus focus = new QueryFocus();
-  /** Context value of the caller, referenced by fn:current (can be {@code null}). */
+  /** Captured current value, referenced by fn:current (can be {@code null}). */
   public Value current;
   /** Date/time values (can be {@code null}). */
   private QueryDateTime dateTime;

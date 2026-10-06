@@ -1312,8 +1312,7 @@ public class QueryParser extends InputParser {
       Expr expr = null;
       if(dflt && wsConsume(":=")) {
         defaults = true;
-        // defaults have no access to the focus of the caller (except via fn:current)
-        expr = new GlobalFocus(info(), single());
+        expr = single();
       } else if(defaults) {
         throw error(PARAMOPTIONAL_X, name.varString());
       }

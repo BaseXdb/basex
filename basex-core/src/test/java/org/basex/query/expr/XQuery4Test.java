@@ -248,66 +248,90 @@ public final class XQuery4Test extends SandboxTest {
     query("declare function local:f($x := 1 + 1) { $x }; local:f()", 2);
     query("declare function local:f($x := 1) { $x }; local:f(2)", 2);
 
-    // fn:current defaults to the context value of the caller
-    query("declare function local:f($n as node() := current()) { name($n) }; "
-        + "<a/>/local:f()", "a");
-    query("declare function local:f($n as node() := current()) { name($n) }; "
-        + "local:f(<b/>)", "b");
-    query("declare function local:f($x := current()) { $x }; <a/> ! local:f()", "<a/>");
-    query("declare function local:f($x := current()) { $x }; (1, 2) ! local:f()", "1\n2");
-    error("declare function local:f($x := current()) { $x }; local:f()", NOCTX_X);
+    // defaults are evaluated with the focus of the caller
+    query("declare function local:f($n as node() := .) { name($n) }; <a/>/local:f()", "a");
+    query("declare function local:f($n as node() := .) { name($n) }; local:f(<b/>)", "b");
+    query("declare function local:f($x := .) { $x }; <a/> ! local:f()", "<a/>");
+    query("declare function local:f($x := .) { $x }; (1, 2) ! local:f()", "1\n2");
+    error("declare function local:f($x := .) { $x }; local:f()", NOCTX_X);
+    query("declare context value := <global/>; "
+        + "declare function local:f($n as node() := .) { name($n) }; <a/>/local:f()", "a");
 
-    // fn:current can be used within a larger expression
-    query("declare function local:f($x as xs:string := string(current())) { $x }; "
+    // implicit references to the focus
+    query("declare function local:f($x as xs:string := string()) { $x }; "
         + "<a>1</a> ! local:f()", 1);
-    query("declare function local:f($x := current()/name()) { $x }; <a/> ! local:f()", "a");
-    query("declare function local:f($x := (current(), current())) { count($x) }; "
-        + "<a/> ! local:f()", 2);
-    // the default is bound to the context value of each single call
-    query("declare function local:f($x := 'x' || string(current())) { $x }; "
+    query("declare function local:f($x := name()) { $x }; <a/> ! local:f()", "a");
+    query("declare function local:f($x := /) { $x }; "
+        + "document { <a/> }/a ! local:f() instance of document-node()", true);
+    query("declare function local:f($x := (position(), last())) { $x }; "
+        + "(5, 6) ! local:f()", "1\n2\n2\n2");
+    query("declare function local:f($x := position()) { $x }; (4, 5, 6)[local:f() = 2]", 5);
+    // the default is bound to the focus of each single call
+    query("declare function local:f($x := 'x' || string()) { $x }; "
         + "(1 ! local:f(), 2 ! local:f#0(), 3 ! local:f())", "x1\nx2\nx3");
+    // the same default is compiled for differently typed foci
+    query("declare function local:f($x := string()) { $x }; "
+        + "('a' ! local:f(), 1 ! local:f()) ! (. instance of xs:string)", "true\ntrue");
+    query("declare function local:f($x := data()) { $x }; "
+        + "(<a>1</a> ! local:f(), 1 ! local:f()) ! (. instance of xs:integer)", "false\ntrue");
+    // defaults that refer to their own function
+    query("declare function local:f($x := (., local:f#0)) { $x }; "
+        + "(1 ! local:f()[1], 2 ! local:f()[1])", "1\n2");
+    query("declare function local:f($x := (., local:f#0)) { $x }; "
+        + "1 ! local:f()[2]()[2]()[1]", 1);
+    query("declare function local:f($x := (., local:f#0)) { $x }; "
+        + "let $f := 1 ! local:f#0 return $f()[2]()[2]()[1]", 1);
+    // record field defaults with local variables
+    query("declare record local:r(a, b := let $x := 'B' return $x || string()); "
+        + "for $i in 1 to 2 let $j := 'J' return (($i ! local:r('A'))?b, $j)", "B1\nJ\nB2\nJ");
+    query("declare function local:f($x := (., fn { local:f#0 })) { $x }; "
+        + "(1 ! local:f()[1], 2 ! local:f()[1])", "1\n2");
+    query("declare function local:f($x, $y := (name(), fn { local:f(1) })) { $y }; "
+        + "(<a/> ! local:f(0)[1], <b/> ! local:f(0)[1])", "a\nb");
+    // local variables in defaults
+    query("declare function local:f($x := let $v := . return $v + 1) { $x }; "
+        + "for $i in 1 to 2 let $j := 'j' return ($i ! local:f(), $j)", "2\nj\n3\nj");
 
-    // all other defaults are evaluated with the focus of the query prolog
-    error("declare function local:f($n as node() := .) { name($n) }; <a/>/local:f()", NOCTX_X);
-    error("declare function local:f($x := position()) { $x }; (1, 2) ! local:f()", NOCTX_X);
-    query("declare context value := <global/>; "
-        + "declare function local:f($n as node() := .) { name($n) }; <a/>/local:f()", "global");
-    query("declare context value := <global/>; "
-        + "declare function local:f($n as node() := current()) { name($n) }; <a/>/local:f()",
-        "a");
+    // defaults of called functions inherit the focus
+    query("declare function local:g($x := .) { $x }; "
+        + "declare function local:f($x := local:g()) { $x }; <a/> ! local:f()", "<a/>");
+    // variables are resolved in the context of the declaration
+    query("declare variable $v := 'global'; declare function local:f($x := $v) { $x }; "
+        + "let $v := 'local' return local:f()", "global");
+    // function bodies have no focus
+    error("declare function local:g() { . }; "
+        + "declare function local:f($x := local:g()) { $x }; <a/> ! local:f()", NOCTX_X);
+    error("declare function local:f($x := fn() { . }()) { $x }; <a/> ! local:f()", NOCTX_X);
+    error("declare %basex:inline(0) function local:g($x := .) { $x }; "
+        + "<a/> ! fn() { local:g() }()", NOCTX_X);
 
-    // outside a default, fn:current is the context value of the query prolog
+    // named function references, partial applications and function-lookup capture the focus
+    query("declare function local:f($x := name()) { $x }; "
+        + "let $f := <a/> ! local:f#0 return <b/> ! $f()", "a");
+    query("declare function local:f($x, $y := name()) { $x || $y }; "
+        + "let $f := <a/> ! local:f(?) return <b/> ! $f('-')", "-a");
+    query("declare function local:f($x, $y, $z := name()) { $x || $y || $z }; "
+        + "let $f := <a/> ! local:f(?, 'b') return <c/> ! $f('-')", "-ba");
+    query("declare function local:f($x := name()) { $x }; "
+        + "<a/> ! function-lookup(xs:QName('local:f'), 0)()", "a");
+    query("declare function local:f($x := name()) { $x }; "
+        + "let $f := <a/> ! function-lookup(xs:QName('local:f'), 0) return <b/> ! $f()", "a");
+
+    // fn:current is the context value of the query prolog, also within defaults
     query("declare context value := <global/>; <a/> ! current()", "<global/>");
     query("declare context value := <global/>; declare variable $v := current(); name($v)",
         "global");
     error("<a/> ! current()", NOCTX_X);
-    // the focus of the caller is not passed on to called functions
-    query("declare context value := <global/>; declare function local:g() { name(current()) }; "
-        + "declare function local:f($x := local:g()) { $x }; <a/> ! local:f()", "global");
     query("declare context value := <global/>; "
-        + "declare function local:f($x := fn() { name(current()) }()) { $x }; <a/> ! local:f()",
+        + "declare function local:f($n as node() := current()) { name($n) }; <a/>/local:f()",
         "global");
     query("declare context value := <global/>; "
-        + "declare function local:f($f := fn() { name(current()) }) { $f() }; <a/> ! local:f()",
-        "global");
-    // function-lookup: the context value of the lookup call is used
-    query("declare context value := <global/>; "
-        + "declare function local:f($x := name(current())) { $x }; "
-        + "<a/> ! function-lookup(xs:QName('local:f'), 0)()", "a");
-    query("declare context value := <global/>; "
-        + "declare function local:f($x := name(current())) { $x }; "
-        + "let $f := <a/> ! function-lookup(xs:QName('local:f'), 0) return <b/> ! $f()", "a");
-    // lazy variables are evaluated with the current value of the query prolog
-    query("declare context value := <global/>; "
-        + "declare %basex:lazy variable $v := name(current()); "
-        + "declare function local:f($x := ($v, name(current()))) { $x }; <a/> ! local:f()",
+        + "declare function local:f($x := (name(current()), name())) { $x }; <a/> ! local:f()",
         "global\na");
-    // function items capture the current value of the default
     query("declare context value := <global/>; "
-        + "declare function local:f($x := name(current#0())) { $x }; <a/> ! local:f()", "a");
-    query("declare context value := <global/>; declare function local:f("
-        + "$x := name(function-lookup(xs:QName('fn:current'), 0)())) { $x }; <a/> ! local:f()",
-        "a");
+        + "declare function local:f($x := name(current#0())) { $x }; <a/> ! local:f()",
+        "global");
+    error("declare function local:f($x := current()) { $x }; <a/> ! local:f()", NOCTX_X);
   }
 
   /** Generalized arrow operator. */
