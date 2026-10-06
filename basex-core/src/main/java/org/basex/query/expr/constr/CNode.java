@@ -117,8 +117,7 @@ public abstract class CNode extends Arr {
   @Override
   public void skipCopy() {
     // copy-namespaces modes are only applied to copies
-    final StaticContext sc = info != null ? sc() : null;
-    if(sc == null || sc.preserveNS && sc.inheritNS) {
+    if(preserveNS(info) && inheritNS(info)) {
       skipCopy = true;
       for(final Expr expr : exprs) expr.skipCopy();
     }
@@ -137,8 +136,29 @@ public abstract class CNode extends Arr {
 
   @Override
   public boolean equals(final Object obj) {
-    return obj instanceof final CNode cnode && computed == cnode.computed &&
-        nested == cnode.nested && super.equals(obj);
+    return this == obj || obj instanceof final CNode cnode && computed == cnode.computed &&
+        nested == cnode.nested && preserveNS(info) == preserveNS(cnode.info) &&
+        inheritNS(info) == inheritNS(cnode.info) && super.equals(obj);
+  }
+
+  /**
+   * Returns the copy-namespaces preserve mode of a static context.
+   * @param info input info (can be {@code null})
+   * @return result of check
+   */
+  static boolean preserveNS(final InputInfo info) {
+    final StaticContext sc = info != null ? info.sc() : null;
+    return sc == null || sc.preserveNS;
+  }
+
+  /**
+   * Returns the copy-namespaces inherit mode of a static context.
+   * @param info input info (can be {@code null})
+   * @return result of check
+   */
+  static boolean inheritNS(final InputInfo info) {
+    final StaticContext sc = info != null ? info.sc() : null;
+    return sc == null || sc.inheritNS;
   }
 
   @Override

@@ -192,8 +192,7 @@ public final class Constr {
    * @param copy copied element
    */
   private void copyNamespaces(final XNode orig, final FElem copy) {
-    final StaticContext sc = info != null ? info.sc() : null;
-    final boolean preserve = sc == null || sc.preserveNS, inherit = sc == null || sc.inheritNS;
+    final boolean preserve = CNode.preserveNS(info), inherit = CNode.inheritNS(info);
     if(preserve && inherit) return;
 
     // no-inherit: restore the original frozen set so the copy does not inherit its new parent

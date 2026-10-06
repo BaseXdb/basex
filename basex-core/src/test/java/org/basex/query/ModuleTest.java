@@ -127,6 +127,32 @@ public final class ModuleTest extends SandboxTest {
         + "let $v as b:p := 'b:p should not be visible' return $v", QueryError.TYPEUNKNOWN_X);
   }
 
+  /** Tests constructors of modules with different copy-namespaces modes. */
+  @Test public void copyNamespacesModes() {
+    final IOFile sandbox = sandbox();
+    final IOFile a = new IOFile(sandbox, "a.xqm");
+    write(a, "module namespace a = 'a';\n"
+        + "declare copy-namespaces no-preserve, no-inherit;\n"
+        + "declare function a:e($c) { element e { $c } };");
+    final IOFile b = new IOFile(sandbox, "b.xqm");
+    write(b, "module namespace b = 'b';\n"
+        + "declare copy-namespaces preserve, inherit;\n"
+        + "declare function b:e($c) { element e { $c } };");
+
+    final String imports = "import module namespace a = 'a' at '" + a.path() + "';\n"
+        + "import module namespace b = 'b' at '" + b.path() + "';\n"
+        + "declare option db:inlinelimit '100';\n"
+        + "let $c := element c { namespace p { 'P' } }\n"
+        + "return in-scope-prefixes(";
+    final String result = "/c) => sort() => string-join(' ')";
+    query(imports + "(switch(random:double() < 2) case true() return b:e($c) "
+        + "default return a:e($c))" + result, "p xml");
+    query(imports + "(switch(random:double() < 2) case false() return b:e($c) "
+        + "default return a:e($c))" + result, "xml");
+    query(imports + "(if(random:double() < 2) then b:e($c) else a:e($c))" + result, "p xml");
+    query(imports + "(if(random:double() < 2) then a:e($c) else b:e($c))" + result, "xml");
+  }
+
   /**
    * Tests a circular reference to a non-record type across mutually importing modules (GH-2635).
    * Module b references a:t before module a declares it, so the reference is resolved only after
