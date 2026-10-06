@@ -580,6 +580,10 @@ public final class FilterTest extends SandboxTest {
     final String func = "declare %basex:inline(0) function local:f($n, $e) { ";
     query(func + "$e[position() = 2 to $n] }; local:f(" + max + ", " + e + ")", "2\n3");
     query(func + "$e[position() = $n to 2] }; local:f(-9223372036854775806, " + e + ")", "1\n2");
+
+    // relative to the last position
+    query(e + "[position() > last() - 113667776004]", "1\n2\n3");
+    query(e + "[position() > last() - " + max + " and position() <= 1]", 1);
   }
 
   /** Predicates with choice item types. */

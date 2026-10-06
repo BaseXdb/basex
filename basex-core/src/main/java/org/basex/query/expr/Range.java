@@ -81,19 +81,30 @@ public final class Range extends Arr {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item min = exprs[0].atomItem(qc, info);
-    if(min == Empty.VALUE) return Empty.VALUE;
-    final Item max = exprs[1].atomItem(qc, info);
-    if(max == Empty.VALUE) return Empty.VALUE;
-    final long mn = toLong(min), mx = toLong(max);
-    // min smaller than max: empty sequence
+    final long[] bounds = bounds(qc);
+    if(bounds == null) return Empty.VALUE;
+    final long mn = bounds[0], mx = bounds[1];
+    // max smaller than min: empty sequence
     if(mn > mx) return Empty.VALUE;
-    // max smaller than min: create range
+    // min smaller than max: create range
     if(tooLarge(mn, mx)) {
       throw sizeError(BigInteger.valueOf(mx).subtract(BigInteger.valueOf(mn)).
           add(BigInteger.ONE), info);
     }
     return RangeSeq.get(mn, mx - mn + 1, true);
+  }
+
+  /**
+   * Returns the minimum and maximum of the range without creating it.
+   * @param qc query context
+   * @return minimum and maximum, or {@code null} if an operand yields an empty sequence
+   * @throws QueryException query exception
+   */
+  long[] bounds(final QueryContext qc) throws QueryException {
+    final Item min = exprs[0].atomItem(qc, info);
+    if(min == Empty.VALUE) return null;
+    final Item max = exprs[1].atomItem(qc, info);
+    return max == Empty.VALUE ? null : new long[] { toLong(min), toLong(max) };
   }
 
   /**

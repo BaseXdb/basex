@@ -192,10 +192,17 @@ public final class Pos extends Single {
   protected boolean ebv(final QueryContext qc) throws QueryException {
     ctxValue(qc);
 
+    final long p = qc.focus.pos;
+    // compare range bounds without creating the range: position() > last() - 1000000000000
+    if(expr instanceof final Range range) {
+      final long[] bounds = range.bounds(qc);
+      return bounds != null && p >= bounds[0] && p <= bounds[1];
+    }
+
     final Value value = expr.value(qc);
     if(value == Empty.VALUE) return false;
 
-    final long p = qc.focus.pos, vs = value.size();
+    final long vs = value.size();
     final double min = toDouble(value.itemAt(0));
     final double max = vs == 1 ? min : toDouble(value.itemAt(vs - 1));
     return p >= min && p <= max;
