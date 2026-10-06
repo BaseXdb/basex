@@ -2264,6 +2264,10 @@ public final class FnModuleTest extends SandboxTest {
         + "for $name in ('f', 'g') return 'lookup' ! "
         + func.args(" QName('http://www.w3.org/2005/xquery-local-functions', $name)", 0) + "()",
         "lookup\nlookup");
+    // declared return type of a compiled function
+    query("declare function local:f() as xs:integer { random:integer(9) }; "
+        + "local:f() < 9, " + func.args(" xs:QName('local:f')", 0)
+        + " instance of fn() as xs:integer", "true\ntrue");
 
     inline(true);
     check(func.args(" #fn:count", 1) + "((1, 2))", 2, root(Itr.class));

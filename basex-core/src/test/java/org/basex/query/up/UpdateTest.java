@@ -1435,4 +1435,11 @@ public final class UpdateTest extends SandboxTest {
     query("let $n := namespace p { 'u' } return copy $c := $n modify () return $c is $n", false);
     error("copy $c := namespace p { 'u' } modify rename node $c as 'q' return $c", UPWRTRGTYP_X);
   }
+
+  /** Vacuous calls of compiled functions. */
+  @Test public void vacuousCall() {
+    query("declare function local:f() as empty-sequence() { void(1) };"
+        + "declare %updating function local:g($f) { updating $f() };"
+        + "local:g(%updating fn() { local:f() })", "");
+  }
 }

@@ -2673,4 +2673,11 @@ public final class RewritingsTest extends SandboxTest {
         + "$X, local:g((1, 2))", "0\n4",
         empty("StaticFunc[@name = 'local:h']/Var[@as]"));
   }
+
+  /** Function calls are typed by the compiled body, not the declared return type. */
+  @Test public void refinedReturnType() {
+    check("declare %basex:inline(0) function local:f() as item()* { random:integer(9) };"
+        + "local:f() < 9", true,
+        type(StaticFuncCall.class, "xs:integer"));
+  }
 }

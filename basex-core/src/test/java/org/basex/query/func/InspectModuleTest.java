@@ -83,6 +83,12 @@ public final class InspectModuleTest extends SandboxTest {
     query(query + "/return/@type/data()", "xs:integer");
     query(query + "/return/@occurrence/data()", "");
 
+    // declared return type of a compiled function
+    query("declare function local:f($v as xs:int) as xs:integer { $v }; local:f(1), "
+        + func.args(" function-lookup(xs:QName('local:f'), 1)") + "/return/@type/data(), "
+        + _INSPECT_FUNCTIONS.args() + "[function-name(.) = xs:QName('local:f')] ! "
+        + func.args(" .") + "/return/@type/data()", "1\nxs:integer\nxs:integer");
+
     // unknown annotation
     query("declare namespace prefix = 'uri';" +
         func.args(" %prefix:x function() {()}") + "/annotation/@name/data()", "prefix:x");

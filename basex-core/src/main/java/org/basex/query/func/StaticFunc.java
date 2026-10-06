@@ -42,6 +42,8 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   /** Indicates if the query focus is accessed or modified. */
   private boolean simple;
+  /** Indicates if the function body enforces the declared return type. */
+  private boolean checked;
 
   /** Prepared default expressions (entries can be {@code null}). */
   private final Prepared[] dflts;
@@ -206,7 +208,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       try {
         cc.enter(this, () -> {
           expr = expr.compile(cc);
-          if(declType != null) expr = new TypeCheck(info, expr, declType).optimize(cc);
+          if(declType != null && !checked) expr = new TypeCheck(info, expr, declType).optimize(cc);
           return null;
         });
       } catch(final QueryException ex) {
@@ -215,6 +217,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
         cc.removeScope(this, anns);
         cc.removeFocus();
       }
+      checked = true;
       // convert all function calls in tail position to proper tail calls
       expr.markTailCalls(cc);
 
@@ -225,9 +228,13 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
           if(callTypes[p].instanceOf(param.seqType(), true)) param.declType = null;
         }
       }
-      if(!cc.dynamic) declType = null;
     }
     return null;
+  }
+
+  @Override
+  public SeqType seqType() {
+    return checked ? expr.seqType() : super.seqType();
   }
 
   /**
@@ -334,7 +341,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   @Override
   public boolean vacuousBody() {
-    return declType != null && declType.zero() && !has(Flag.UPD);
+    return declType != null && declType.zero();
   }
 
   /**
@@ -402,7 +409,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   @Override
   public void toString(final QueryString qs) {
     qs.token(DECLARE).token(anns).token(FUNCTION).token(name.prefixId()).params(params);
-    if(declType != null) qs.token(AS).token(declType);
+    if(declType != null && !checked) qs.token(AS).token(declType);
     if(expr != null) qs.brace(expr);
     else qs.token(EXTERNAL);
     qs.token(';');
