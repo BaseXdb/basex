@@ -1014,6 +1014,17 @@ public final class NamespaceTest extends SandboxTest {
   }
 
   /**
+   * Checks that copying with no-preserve removes unused namespaces after the first one.
+   */
+  @Test public void copyNoPreserve() {
+    query("declare copy-namespaces no-preserve, no-inherit;"
+        + "element o { element { QName('', 'e') } { namespace foo { 'f' } } }", "<o><e/></o>");
+    query("declare copy-namespaces no-preserve, no-inherit;"
+        + "element o { element e { namespace a { 'A' }, namespace b { 'B' },"
+        + "namespace c { 'C' } } }", "<o><e/></o>");
+  }
+
+  /**
    * Checks that enclosed direct constructors are copied and inherit namespaces.
    */
   @Test public void copyEnclosedDirect() {

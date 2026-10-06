@@ -94,7 +94,7 @@ public final class Atts extends ElementList {
   public Atts remove(final int index) {
     final byte[][] lst = list;
     final int s = size;
-    Array.remove(lst, index, 2, s);
+    Array.remove(lst, index * 2, 2, s);
     lst[s - 2] = null;
     lst[s - 1] = null;
     size = s - 2;
