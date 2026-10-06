@@ -26,8 +26,12 @@ final class QueryCompiler {
 
   /** Node stack. */
   private final IntList stack = new IntList();
-  /** Index and lowlink list. */
-  private final IntList list = new IntList();
+  /** Scopes on the node stack. */
+  private final BitSet onStack = new BitSet();
+  /** Indexes of scopes (-1: not visited yet). */
+  private final IntList index = new IntList();
+  /** Lowlinks of scopes. */
+  private final IntList lowlink = new IntList();
   /** Counter for the next free index. */
   private int next;
 
@@ -60,29 +64,30 @@ final class QueryCompiler {
    * @param result scopes
    */
   private void tarjan(final int id, final ArrayList<ArrayList<Scope>> result) {
-    final int ixv = id * 2, llv = ixv + 1, idx = next++;
-    list.set(ixv, idx);
-    list.set(llv, idx);
+    final int idx = next++;
+    index.set(id, idx);
+    lowlink.set(id, idx);
     stack.push(id);
+    onStack.set(id);
 
     for(final int w : adjacentTo(id)) {
-      final int ixw = w * 2, llw = ixw + 1;
-      if(list.size() <= ixw || list.get(ixw) < 0) {
+      if(index.get(w) < 0) {
         // successor w has not yet been visited; recurse on it
         tarjan(w, result);
-        list.set(llv, Math.min(list.get(llv), list.get(llw)));
-      } else if(stack.contains(w)) {
+        lowlink.set(id, Math.min(lowlink.get(id), lowlink.get(w)));
+      } else if(onStack.get(w)) {
         // successor w is in stack S and hence in the current SCC
-        list.set(llv, Math.min(list.get(llv), list.get(ixw)));
+        lowlink.set(id, Math.min(lowlink.get(id), index.get(w)));
       }
     }
 
     // if v is a root node, pop the stack and generate an SCC
-    if(list.get(llv) == list.get(ixv)) {
+    if(lowlink.get(id) == idx) {
       final ArrayList<Scope> out = new ArrayList<>();
       int w;
       do {
         w = stack.pop();
+        onStack.clear(w);
         out.add(scopes.get(w));
       } while(w != id);
       result.add(out);
@@ -98,6 +103,8 @@ final class QueryCompiler {
     final int id = scopes.size();
     scopes.add(scope);
     adjacent.add(null);
+    index.add(-1);
+    lowlink.add(-1);
     ids.put(scope, id);
     scope.reset();
     return id;

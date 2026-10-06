@@ -2660,4 +2660,17 @@ public final class RewritingsTest extends SandboxTest {
         + "for $o in ('a', 'a') return count($cs[@id = $o])", "2\n2",
         empty(HashFilter.class));
   }
+
+  /** Functions reached after a deeper call chain are recompiled with refined parameter types. */
+  @Test public void compileOrder() {
+    check("declare function local:d1($n) { if($n > 0) then local:d1($n - 1) else local:d2($n) };"
+        + "declare function local:d2($n) { $n };"
+        + "declare variable $X := local:d1(1);"
+        + "declare function local:g($s as xs:integer*) { local:h($s, 1) };"
+        + "declare function local:h($s as xs:integer*, $i as xs:integer) {"
+        + "  if($i > 3) then $i else local:h($s, $i + 1)"
+        + "};"
+        + "$X, local:g((1, 2))", "0\n4",
+        empty("StaticFunc[@name = 'local:h']/Var[@as]"));
+  }
 }
