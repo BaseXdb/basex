@@ -76,6 +76,15 @@ public final class FnFormatIntegerTest extends SandboxTest {
         "⑴⑵⑶⑷⑸");
     query("string-join(for $i in 1 to 5 return format-integer($i, '⒈'))",
         "⒈⒉⒊⒋⒌");
+    // numbering sequences: zero, multiple ranges, fallback to decimal digits
+    query("string-join(for $i in (0, 20, 21, 36, 50, 51) return format-integer($i, '①'), ' ')",
+        "⓪ ⑳ ㉑ ㊱ ㊿ 51");
+    query("string-join(for $i in (0, 10, 11, 20, 21) return format-integer($i, '❶'), ' ')",
+        "⓿ ❿ ⓫ ⓴ 21");
+    query("string-join(for $i in (0, 1, 10) return format-integer($i, '⓵'), ' ')", "0 ⓵ ⓾");
+    query("string-join(for $i in (1, 9, 10, 11) return format-integer($i, '𐄇'), ' ')",
+        "𐄇 𐄏 𐄐 11");
+    query("format-integer(-3, '㊀')", "-㊂");
     query("string-join(for $i in 1 to 5 return format-integer($i, 'Α'))",
         "ΑΒΓΔΕ");
     query("string-join(for $i in 1 to 5 return format-integer($i, 'α'))",

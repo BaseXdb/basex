@@ -78,7 +78,7 @@ abstract class FormatParser extends FormatUtil {
       cp == 'i' || cp == 'I' || // Roman sequences (lower/upper case)
       cp == 'w' || cp == 'W' || // Word output (lower/upper case)
       date && (cp == 'n' || cp == 'N') || // Textual output
-      cp == '\u2460' || cp == '\u2474' || cp == '\u2488' || // circled, parenthesized, full stop
+      numbering(cp) != null || // circled, parenthesized and other numbering sequences
       cp == KANJI[1] // Japanese numbering
     ) {
       return pic;

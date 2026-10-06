@@ -445,13 +445,14 @@ public abstract class Formatter extends FormatUtil {
       else japanese(tb, n, false);
     } else if(ch == 'i') {
       roman(tb, n, fp.min);
-    } else if(ch == '\u2460' || ch == '\u2474' || ch == '\u2488') {
-      // circled, parenthesized and dotted digits are limited to the range 1-20
-      if(n < 1 || n > 20) tb.addLong(n);
-      else tb.add((int) (ch + n - 1));
     } else {
+      // numbering sequences are limited to small ranges; decimal output is used as fallback
+      final int[] numbering = numbering(ch);
+      final int cp = numbering != null ? numbered(numbering, n) : -1;
       final String seq = sequence(ch);
-      if(seq != null) alpha(tb, n, seq);
+      if(cp != -1) tb.add(cp);
+      else if(numbering != null) tb.addLong(n);
+      else if(seq != null) alpha(tb, n, seq);
       else tb.add(number(n, fp, ch));
     }
 

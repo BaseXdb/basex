@@ -22,6 +22,27 @@ abstract class FormatUtil {
     0x3007, 0x4e00, 0x4e8c, 0x4e09, 0x56db, 0x4e94, 0x516d, 0x4e03, 0x516b,
     0x4e5d, 0x5341, 0x767E, 0x5343, 0x4e07, 0x5104, 0x5146 };
 
+  /** Numbering sequences: first character, zero (or -1), ranges (min, max, first character). */
+  private static final int[][] NUMBERINGS = {
+    { 0x2460, 0x24EA, 1, 20, 0x2460, 21, 35, 0x3251, 36, 50, 0x32B1 }, // circled digits
+    { 0x2474, -1, 1, 20, 0x2474 }, // parenthesized digits
+    { 0x2488, 0x1F100, 1, 20, 0x2488 }, // digits with full stop
+    { 0x1F102, 0x1F101, 1, 9, 0x1F102 }, // digits with comma
+    { 0x2776, 0x24FF, 1, 10, 0x2776, 11, 20, 0x24EB }, // dingbat negative circled digits
+    { 0x2780, 0x1F10B, 1, 10, 0x2780 }, // dingbat circled sans-serif digits
+    { 0x278A, 0x1F10C, 1, 10, 0x278A }, // dingbat negative circled sans-serif digits
+    { 0x24F5, -1, 1, 10, 0x24F5 }, // double circled digits
+    { 0x3220, -1, 1, 10, 0x3220 }, // parenthesized ideographs
+    { 0x3280, -1, 1, 10, 0x3280 }, // circled ideographs
+    { 0x10107, -1, 1, 9, 0x10107, 10, 10, 0x10110 }, // Aegean numbers
+    { 0x11052, -1, 1, 9, 0x11052, 10, 10, 0x1105B }, // Brahmi numbers
+    { 0x102E1, -1, 1, 9, 0x102E1, 10, 10, 0x102EA }, // Coptic epact digits
+    { 0x10E60, -1, 1, 9, 0x10E60, 10, 10, 0x10E69 }, // Rumi digits
+    { 0x111E1, -1, 1, 9, 0x111E1, 10, 10, 0x111EA }, // Sinhala archaic digits
+    { 0x1D360, -1, 1, 9, 0x1D360 }, // counting rod unit digits
+    { 0x1E8C7, -1, 1, 9, 0x1E8C7 } // Mende Kikakui digits
+  };
+
   /** Roman numbers (1-10). */
   static final byte[][] ROMANI =
     tokens("", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX");
@@ -96,6 +117,34 @@ abstract class FormatUtil {
       if(ch == seq.charAt(0)) return seq;
     }
     return null;
+  }
+
+  /**
+   * Returns the numbering sequence that starts with the specified character.
+   * @param ch character to be checked
+   * @return numbering sequence or {@code null}
+   */
+  static int[] numbering(final int ch) {
+    for(final int[] numbering : NUMBERINGS) {
+      if(ch == numbering[0]) return numbering;
+    }
+    return null;
+  }
+
+  /**
+   * Returns the character of a numbering sequence for the specified number.
+   * @param numbering numbering sequence
+   * @param n number
+   * @return character, or {@code -1} if the number is out of range
+   */
+  static int numbered(final int[] numbering, final long n) {
+    if(n == 0) return numbering[1];
+    for(int r = 2; r < numbering.length; r += 3) {
+      if(n >= numbering[r] && n <= numbering[r + 1]) {
+        return (int) (numbering[r + 2] + n - numbering[r]);
+      }
+    }
+    return -1;
   }
 
   /** Cases. */
