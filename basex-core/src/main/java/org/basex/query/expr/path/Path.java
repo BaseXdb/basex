@@ -539,7 +539,7 @@ public abstract class Path extends ParseExpr {
    * @param steps path steps
    * @return result of check
    */
-  private static boolean iterative(final Expr root, final Expr... steps) {
+  public static boolean iterative(final Expr root, final Expr... steps) {
     if(root == null || !root.ddo()) return false;
 
     final SeqType st = root.seqType();

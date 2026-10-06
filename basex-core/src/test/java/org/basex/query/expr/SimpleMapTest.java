@@ -5,10 +5,11 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.*;
 import org.basex.query.expr.constr.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for the simple map operator.
@@ -167,5 +168,19 @@ public final class SimpleMapTest extends SandboxTest {
         "$d as xs:string?, $e as xs:string?, $f as xs:string?) { " +
         "  ($a, $b, $c, $d, $e, $f) ! ('[' || . || ']') };" +
         "local:f('A', (), 'C', 'D', (), ())", "[A]\n[C]\n[D]");
+  }
+
+  /** Maps over nested nodes must not be merged to sorted paths. */
+  @Test public void nestedNodes() {
+    query("<a><b><c/></b><d/></a>/descendant-or-self::node() ! * ! name()", "b\nd\nc");
+    query("jtree([[1, 2], [3]])/descendant-or-self::* ! * !"
+        + "serialize(jvalue(), { 'method': 'json' })", "[1,2]\n[3]\n1\n2\n3");
+    check("<a><b/></a>/* ! *", "", root(IterPath.class));
+
+    // order is irrelevant: merge maps to paths
+    final String nested = "<a><b><c/></b><d/></a>/descendant-or-self::node()";
+    check(COUNT.args(" " + nested + " ! *"), 3, empty(SimpleMap.class));
+    check(EXISTS.args(" " + nested + " ! d"), true, empty(SimpleMap.class));
+    check(COUNT.args(" " + nested + " ! .."), 3, exists(SimpleMap.class));
   }
 }

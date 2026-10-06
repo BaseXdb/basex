@@ -333,10 +333,14 @@ public abstract sealed class SimpleMap extends Mapping
     }
     if(e == 1) return null;
 
+    // skip optimization if the merged path would need to be sorted: //node() ! *
+    final Expr[] stps = steps.finish();
+    if(!Path.iterative(root != null ? root : ContextValue.get(cc, info), stps)) return null;
+
     // all operands are steps
     //   db:get('animals') ! xml → db:get('animals')/xml
     //   a ! b ! c → /a/b/c
-    final Expr path = Path.get(cc, info, root, steps.finish());
+    final Expr path = Path.get(cc, info, root, stps);
     if(e == el) return path;
 
     // create expression with path and remaining operands
@@ -392,9 +396,12 @@ public abstract sealed class SimpleMap extends Mapping
    */
   private Expr toPath(final Simplify mode, final CompileContext cc) throws QueryException {
     final ExprList steps = new ExprList();
+    // counts: only convert the map if the path cannot yield duplicates
+    final boolean distinct = mode == Simplify.COUNT;
 
     final int el = exprs.length;
     Expr root = exprs[0];
+    if(distinct && !root.ddo()) return this;
     cc.pushFocus(root, true);
     if(root instanceof final AxisPath path) {
       root = path.root;
@@ -404,7 +411,7 @@ public abstract sealed class SimpleMap extends Mapping
       for(int e = 1; e < el; e++) {
         final Expr expr = e + 1 == el ? exprs[e].simplifyFor(mode, cc) : exprs[e];
         if(!(expr instanceof final AxisPath path)) return this;
-        if(path.root != null) return this;
+        if(path.root != null || distinct && !path.simple()) return this;
         steps.add(path.steps);
         cc.updateFocus(expr, true);
       }
@@ -427,6 +434,9 @@ public abstract sealed class SimpleMap extends Mapping
         // $node[nodes ! text()] → $node[nodes/text()]
         expr = toPath(mode, cc);
       }
+    } else if(mode.oneOf(Simplify.SET, Simplify.EXISTENCE, Simplify.COUNT)) {
+      // order is irrelevant: exists(//a ! b) → exists(//a/b), count(//a ! b) → count(//a/b)
+      expr = toPath(mode, cc);
     }
     return expr;
   }
