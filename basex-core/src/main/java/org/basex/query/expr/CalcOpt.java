@@ -302,7 +302,9 @@ interface CalcOpt {
    * @return result
    */
   static Dec divide(final BigDecimal dec1, final BigDecimal dec2) {
-    final int scale = Math.max(18, Math.max(dec1.scale(), dec2.scale()));
+    // at least 18 fractional and 18 significant digits
+    final int digits = dec1.precision() - dec1.scale() - dec2.precision() + dec2.scale();
+    final int scale = Math.max(18 - Math.min(0, digits), Math.max(dec1.scale(), dec2.scale()));
     return Dec.get(dec1.divide(dec2, scale, RoundingMode.HALF_EVEN));
   }
 

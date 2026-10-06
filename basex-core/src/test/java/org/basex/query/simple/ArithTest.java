@@ -125,6 +125,12 @@ public final class ArithTest extends SandboxTest {
 
     check("xs:decimal(" + wrap(3) + ") ! (. div .)", 1, root(Dec.class));
     check(wrap(3) + "! (. * . div .)", 3, exists(Cast.class), empty(ArithSimple.class));
+
+    // decimals: at least 18 fractional and 18 significant digits
+    query("1 div 3.0", "0.333333333333333333");
+    query("10 div 3.0", "3.333333333333333333");
+    query("6.022 div 100000000000000000000000.0", "0.00000000000000000000006022");
+    query("1 div 300000000000000000000.0", "0.00000000000000000000333333333333333333");
   }
 
   /** Test method. */
