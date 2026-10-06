@@ -70,12 +70,12 @@ public interface XQFunctionExpr {
    */
   static String paramString(final XQFunctionExpr func, final int min) {
     final QNm name = func.funcName();
+    if(name == null) return QueryText.FN;
     final TokenBuilder tb = new TokenBuilder();
-    tb.add(name != null ? name.prefixString() : QueryText.FN).add('(');
+    tb.add(name.prefixString()).add('(');
     final int arity = func.arity();
     for(int a = 0; a < arity; a++) {
       if(a > 0) tb.add(", ");
-      if(name == null) tb.add('$');
       tb.add(func.paramName(a).prefixString());
       if(a >= min) tb.add('?');
     }

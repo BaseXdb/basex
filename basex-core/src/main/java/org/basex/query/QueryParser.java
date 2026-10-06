@@ -2306,10 +2306,11 @@ public class QueryParser extends InputParser {
         final InputInfo ii = info();
         final Expr arg;
         For fr = null;
-        int s = 0;
         if(mapping) {
-          s = localVars.openScope();
+          // register the variable without making it visible to the arguments
+          final int s = localVars.openScope();
           fr = new For(localVars.add(new Var(new QNm("item"), null, qc, ii)), expr);
+          localVars.closeScope(s);
           arg = new VarRef(ii, fr.var);
         } else {
           arg = expr;
@@ -2321,10 +2322,7 @@ public class QueryParser extends InputParser {
           final QNm funcName = name;
           expr = qc.functions.newRef(() -> Functions.get(funcName, fb, qc));
         }
-        if(mapping) {
-          expr = new GFLWOR(ii, fr, expr);
-          localVars.closeScope(s);
-        }
+        if(mapping) expr = new GFLWOR(ii, fr, expr);
       }
     }
     return expr;
@@ -2961,11 +2959,12 @@ public class QueryParser extends InputParser {
           params = paramList(false);
           expr = enclosedExpr();
         } else {
-          // focus function
+          // focus function: register the parameter without making it visible to the body
           final InputInfo ii = info();
-          final QNm name = new QNm("arg");
-          params = new Params().add(name, Types.ITEM_ZM, null, ii).finish(qc, localVars);
-          expr = new Pipeline(ii, localVars.resolve(name, ii), enclosedExpr());
+          final int s = localVars.openScope();
+          params = new Params().add(new QNm("arg"), Types.ITEM_ZM, null, ii).finish(qc, localVars);
+          localVars.closeScope(s);
+          expr = new Pipeline(ii, new VarRef(ii, params.vars()[0]), enclosedExpr());
         }
         final VarScope vs = localVars.popContext();
         if(anns.contains(Annotation.PRIVATE) || anns.contains(Annotation.PUBLIC))

@@ -395,6 +395,11 @@ public final class XQuery4Test extends SandboxTest {
       + "=> string-join(' ')",
       "Happy Families Are All Alike; Every Unhappy Family Is Unhappy In Its Own Way.");
 
+    // implicit variables must not be visible
+    query("let $item := 1 return 5 =!> concat($item)", 51);
+    query("let $arg := 1 return fn { $arg }(2)", 1);
+    error("fn { $arg }(2)", VARUNDEF_X);
+
     error("2 ! 256 =!> xs:byte()", FUNCCAST_X_X_X);
     error("1 =!> if()", RESERVED_X);
     error("0 =!> unknown()", WHICHFUNC_X);
