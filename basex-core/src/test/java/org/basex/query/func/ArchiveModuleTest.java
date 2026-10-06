@@ -499,6 +499,13 @@ public final class ArchiveModuleTest extends SandboxTest {
     query(func.args(_FILE_READ_BINARY.args(ZIP)) + "?format", "zip");
     query(func.args(GZIP) + "?format", "gzip");
     query(func.args(_FILE_READ_BINARY.args(GZIP)) + "?format", "gzip");
+    // compressed zero bytes: TAR only if they form two complete end-of-archive blocks
+    final String zeros = _ARCHIVE_CREATE.args("x", _BIN_FROM_OCTETS.args(REPLICATE.args(0, 1000)),
+        " { 'format': 'gzip' }");
+    query(func.args(" " + zeros) + "?format", "gzip");
+    query(_ARCHIVE_EXTRACT_BINARY.args(" " + zeros) + " => " + _BIN_LENGTH.args(), 1000);
+    query(func.args(" " + _ARCHIVE_CREATE.args(" ()", " ()", " { 'format': 'tar' }")) +
+        "?format", "tar");
     // algorithm: DEFLATE (default for the test fixtures)
     query(func.args(ZIP) + "?algorithm", "deflate");
     query(func.args(_FILE_READ_BINARY.args(ZIP)) + "?algorithm", "deflate");

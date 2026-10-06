@@ -15,6 +15,8 @@ import org.basex.util.*;
 public final class TarEntry {
   /** Block size. */
   public static final int BLOCK = 512;
+  /** Number of bytes required to detect TAR archives. */
+  public static final int DETECT = BLOCK * 2;
   /** GNU tar entry with a long name. */
   public static final String LONGNAME = "././@LongLink";
   /** Magic and version of the ustar format. */
@@ -157,13 +159,13 @@ public final class TarEntry {
   }
 
   /**
-   * Checks if the specified block starts a TAR archive: ustar magic, or an end-of-archive block
-   * (empty archive).
-   * @param header header block (may be shorter than a full block)
+   * Checks if the specified blocks start a TAR archive (ustar magic, or two end-of-archive blocks).
+   * @param blocks first two blocks of the input (may be shorter)
    * @return result of check
    */
-  public static boolean isTar(final byte[] header) {
-    return header.length == BLOCK && (magic(header) || isEmpty(header));
+  public static boolean isTar(final byte[] blocks) {
+    return blocks.length >= BLOCK && magic(blocks) ||
+      blocks.length == DETECT && isEmpty(blocks);
   }
 
   /**

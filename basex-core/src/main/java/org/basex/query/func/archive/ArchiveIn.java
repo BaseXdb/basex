@@ -33,11 +33,11 @@ abstract class ArchiveIn extends InputStream {
       bi.reset();
       if(header.length > 0 && header[0] == 0x50) return new ZIPIn(bi);
 
-      // compressed or plain input: peek at the first block to detect TAR archives
+      // compressed or plain input: peek at the first two blocks to detect TAR archives
       final Compression compr = Compression.get(header);
       final PushbackInputStream is = new PushbackInputStream(
-        compr != null ? compr.input(bi) : bi, TarEntry.BLOCK);
-      header = is.readNBytes(TarEntry.BLOCK);
+        compr != null ? compr.input(bi) : bi, TarEntry.DETECT);
+      header = is.readNBytes(TarEntry.DETECT);
       is.unread(header);
       if(TarEntry.isTar(header)) {
         return new TarIn(is, compr != null ? compr.method : ZipEntry.STORED);
