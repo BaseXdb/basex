@@ -24,7 +24,8 @@ import org.basex.util.hash.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public abstract class SimpleMap extends Mapping {
+public abstract sealed class SimpleMap extends Mapping
+    permits CachedMap, DualIterMap, DualMap, IterMap {
   /**
    * Constructor.
    * @param info input info (can be {@code null})

@@ -121,9 +121,9 @@ public final class StringRangeTest extends SandboxTest {
       final Class<? extends Expr> expr) {
 
     execute(new CreateIndex(CmdIndex.TEXT));
-    check(query, result, exists(Util.className(expr)));
+    check(query, result, exists(expr));
     execute(new DropIndex(CmdIndex.TEXT));
-    check(query, result, empty(Util.className(expr)));
+    check(query, result, empty(expr));
   }
 
   /**

@@ -5,8 +5,10 @@ import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.stream.*;
 
 import org.basex.*;
 import org.basex.api.client.*;
@@ -21,6 +23,7 @@ import org.basex.query.func.*;
 import org.basex.query.func.prof.ProfType.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 import org.basex.util.options.*;
@@ -363,12 +366,25 @@ public abstract class Sandbox {
   }
 
   /**
+   * Returns a name test for a class in the query plan.
+   * @param clazz expression class
+   * @return name test
+   */
+  private static String planName(final Class<?> clazz) {
+    if(!Modifier.isAbstract(clazz.getModifiers())) return Util.className(clazz);
+    // query plans only contain concrete classes: expand sealed classes to their subclasses
+    if(!clazz.isSealed()) throw Util.notExpected("Abstract class is not sealed: %", clazz);
+    return Arrays.stream(clazz.getPermittedSubclasses()).map(Sandbox::planName).
+        collect(Collectors.joining("|", "(", ")"));
+  }
+
+  /**
    * Returns a test to check if the specified expression does not occur in the query plan.
    * @param clazz name of expression
    * @return test string
    */
   protected static String empty(final Class<?> clazz) {
-    return empty(Util.className(clazz));
+    return empty(planName(clazz));
   }
 
   /**
@@ -395,7 +411,7 @@ public abstract class Sandbox {
    * @return test string
    */
   protected static String exists(final Class<?> clazz) {
-    return exists(Util.className(clazz));
+    return exists(planName(clazz));
   }
 
   /**
@@ -412,7 +428,7 @@ public abstract class Sandbox {
    * @return test string
    */
   protected static String empty() {
-    return root("Empty");
+    return root(Empty.class);
   }
 
   /**
@@ -421,7 +437,7 @@ public abstract class Sandbox {
    * @return test string
    */
   protected static String root(final String expr) {
-    return "QueryPlan/* ! name() = '" + expr + "'";
+    return "exists(QueryPlan/" + expr + ')';
   }
 
   /**
@@ -439,7 +455,7 @@ public abstract class Sandbox {
    * @return test string
    */
   protected static String root(final Class<?> clazz) {
-    return root(Util.className(clazz));
+    return root(planName(clazz));
   }
 
   /**
@@ -449,7 +465,7 @@ public abstract class Sandbox {
    * @return test string
    */
   protected static String count(final Class<?> clazz, final int count) {
-    return count(Util.className(clazz), count);
+    return count(planName(clazz), count);
   }
 
   /**
@@ -489,7 +505,7 @@ public abstract class Sandbox {
    * @return test string
    */
   protected static String type(final Class<?> clazz, final String type) {
-    return type(Util.className(clazz), type);
+    return type(planName(clazz), type);
   }
 
   /**
@@ -519,7 +535,7 @@ public abstract class Sandbox {
    * @return test string
    */
   protected static String shape(final Class<?> clazz, final String shape) {
-    return shape(Util.className(clazz), shape);
+    return shape(planName(clazz), shape);
   }
 
   /**

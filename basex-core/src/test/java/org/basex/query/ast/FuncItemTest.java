@@ -129,7 +129,7 @@ public final class FuncItemTest extends SandboxTest {
         "for $i in 1 to 2 return local:f(?, $i)(1)",
         "2\n3",
         empty(PartFunc.class),
-        empty(Util.className(DynFuncCall.class))
+        empty(DynFuncCall.class)
     );
   }
 
@@ -275,7 +275,7 @@ public final class FuncItemTest extends SandboxTest {
         // all inline functions are pre-compiled
         empty(Closure.class),
         // the addition function was inlined
-        count(Util.className(DynFuncCall.class), 3),
+        count(DynFuncCall.class, 3),
         // the outer function item was inlined and removed
         "every $f in //" + Util.className(FuncItem.class) + " satisfies $f/*[1]/@name = '$go'",
         // there are only three variables left
@@ -332,7 +332,7 @@ public final class FuncItemTest extends SandboxTest {
         + "    $g := function($y) { 2 * $f($y) }"
         + "return $g($g(42))",
         "168\n672\n1512\n2688\n4200\n6048",
-        count(Util.className(Closure.class), 1)
+        count(Closure.class, 1)
     );
   }
 
