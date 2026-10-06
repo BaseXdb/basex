@@ -749,8 +749,7 @@ public final class SeqType {
     // instance, a subtype of every sequence type that permits the empty sequence
     if(emptyType()) return !st.oneOrMore();
     if(!occ.instanceOf(st.occ)) return false;
-    final Type t1 = TypeRef.deref(type), t2 = TypeRef.deref(st.type);
-    return t2 instanceof final ChoiceItemType cit ? cit.hasInstance(t1) : t1.instanceOf(t2);
+    return TypeRef.deref(type).instanceOf(TypeRef.deref(st.type));
   }
 
   /**
