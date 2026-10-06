@@ -1242,6 +1242,19 @@ public final class GFLWOR extends ParseExpr {
   }
 
   @Override
+  protected Expr mapResults(final QueryFunction<Expr, Expr> func, final boolean positional,
+      final CompileContext cc) throws QueryException {
+    // positional functions: at most one tuple must be generated
+    if(positional) {
+      final long max = calcSize(false)[1];
+      if(max == -1 || max > 1) return null;
+    }
+    // (for $x in E return R) ! F → for $x in E return R ! F
+    rtrn = func.apply(rtrn);
+    return optimize(cc);
+  }
+
+  @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof final GFLWOR gflwor && clauses.equals(gflwor.clauses) &&
         rtrn.equals(gflwor.rtrn);

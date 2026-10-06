@@ -6,6 +6,7 @@ import static org.basex.query.func.Function.*;
 import org.basex.*;
 import org.basex.core.cmd.*;
 import org.basex.query.expr.constr.*;
+import org.basex.query.expr.gflwor.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.junit.jupiter.api.*;
@@ -613,5 +614,21 @@ public final class FilterTest extends SandboxTest {
         + "[. < -9223372036854775806]", "-9223372036854775807");
     query("(9223372036854775806 -" + one + " to 9223372036854775807)"
         + "[. > 9223372036854775806]", "9223372036854775807");
+  }
+
+  /** Predicates are moved into conditional branches and return clauses. */
+  @Test public void pushDown() {
+    final String seq = "(1 to 6)[. > <_>2</_>]", cond = wrap("a") + " = 'a'";
+    final String iff = "(if(" + cond + ") then " + seq + " else ())";
+    check(iff + "[. > 4]", "5\n6", root(If.class));
+    check(iff + "[2]", 4, root(If.class));
+    check("for $a in (1, 2, 3)[. > <_>0</_>] return " + iff + "[$a = 3]", "3\n4\n5\n6",
+        root(If.class));
+    check("(if(" + cond + ") then () else " + seq + ")[2]", "", root(If.class));
+
+    final String let = "let $s := " + seq + " where count($s) > 1 return $s";
+    check("(" + let + ")[. > 4]", "5\n6", root(GFLWOR.class));
+    check("(" + let + ")[1]", 3, root(GFLWOR.class));
+    check("(for $i in 1 to <_>2</_> for $j in 1 to $i return $j)[2]", 1, root(ITEMS_AT));
   }
 }

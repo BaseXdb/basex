@@ -116,8 +116,22 @@ public abstract class Filter extends Preds {
     // no predicates: return root
     if(exprs.length == 0) return root;
 
+    // independent deterministic single filter, rewritten to 'if' expression below
+    // the predicate is guarded: if the root may be empty, it must not raise errors
+    final boolean positional = mayBePositional();
+    final Expr first = exprs[0];
+    final boolean toIf = !positional && exprs.length == 1 && first.isSimple() &&
+      (root.seqType().oneOrMore() || first instanceof Value || first instanceof VarRef);
+
+    // (let $x := E return R)[P] → let $x := E return R[P]
+    // (if(C) then A else ())[P] → if(C) then A[P] else ()
+    if(!toIf) {
+      final Expr mapped = root.mapResults(ex -> get(cc, info, ex, exprs), positional, cc);
+      if(mapped != null) return cc.replaceWith(this, mapped);
+    }
+
     // no positional access...
-    if(!mayBePositional()) {
+    if(!positional) {
       // convert to axis path: .[text()] → self::node()[text()]
       if(root instanceof ContextValue && root.seqType().type instanceof NodeType && root.ddo()) {
         return Path.get(cc, info, null, Step.self(cc, root, info, exprs));
@@ -143,13 +157,9 @@ public abstract class Filter extends Preds {
         return cc.replaceWith(this, Path.get(cc, info, root, step));
       }
 
-      // rewrite independent deterministic single filter to 'if' expression:
-      // example: (1 to 10)[$boolean] → if($boolean) then (1 to 10) else ()
-      // the predicate is guarded: if the root may be empty, it must not raise errors
-      final Expr expr = exprs[0];
-      if(exprs.length == 1 && expr.isSimple() && !expr.seqType().mayBeNumber() &&
-          (root.seqType().oneOrMore() || expr instanceof Value || expr instanceof VarRef)) {
-        final Expr iff = new If(info, expr, root).optimize(cc);
+      // (1 to 10)[$boolean] → if($boolean) then (1 to 10) else ()
+      if(toIf) {
+        final Expr iff = new If(info, first, root).optimize(cc);
         return cc.replaceWith(this, iff);
       }
 
@@ -169,7 +179,7 @@ public abstract class Filter extends Preds {
       // equality predicate with a context-independent operand: hash filter
       // example: for $o in $orders return $customers[@id = $o/@customer]
       final int key = HashFilter.key(root, exprs);
-      if(key != -1) return copyType(new HashFilter(info, root, expr, key));
+      if(key != -1) return copyType(new HashFilter(info, root, first, key));
 
       // otherwise, return iterative filter
       return copyType(new IterFilter(info, root, exprs));

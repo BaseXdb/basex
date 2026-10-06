@@ -622,6 +622,20 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
+   * Tries to apply a function to the results of this expression without duplicating it.
+   * @param func function to apply to the subexpression that yields the results
+   * @param positional indicates if the function depends on the position of the results
+   * @param cc compilation context
+   * @return resulting expression or {@code null}
+   * @throws QueryException query exception
+   */
+  @SuppressWarnings("unused")
+  protected Expr mapResults(final QueryFunction<Expr, Expr> func, final boolean positional,
+      final CompileContext cc) throws QueryException {
+    return null;
+  }
+
+  /**
    * Returns the input info of this expression, or the supplied reference as fallback.
    * @param info fallback reference
    * @return info or {@code null}

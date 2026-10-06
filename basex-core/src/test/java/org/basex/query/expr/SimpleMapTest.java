@@ -5,6 +5,7 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.*;
 import org.basex.query.expr.constr.*;
+import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -182,5 +183,30 @@ public final class SimpleMapTest extends SandboxTest {
     check(COUNT.args(" " + nested + " ! *"), 3, empty(SimpleMap.class));
     check(EXISTS.args(" " + nested + " ! d"), true, empty(SimpleMap.class));
     check(COUNT.args(" " + nested + " ! .."), 3, exists(SimpleMap.class));
+  }
+
+  /** Maps over FLWOR results are moved to the return clause. */
+  @Test public void flworReturn() {
+    final String let = "let $s := (1 to 6)[. > <_>2</_>] where count($s) > 1 return $s";
+    check("(" + let + ") ! (. * 2)", "6\n8\n10\n12", root(GFLWOR.class));
+    check("(" + let + ") ! position()", "1\n2\n3\n4", root(GFLWOR.class));
+    check("(for $i in 1 to <_>2</_> for $j in 1 to $i return $j) ! position()", "1\n2\n3",
+        root(SimpleMap.class));
+    check("(for $i in (3, 1)[. > <_>0</_>] for $j in (1, 2) order by $i return $i + $j) ! " +
+        "(. * 10)", "20\n30\n40\n50", root(GFLWOR.class));
+    check("(let $s := (1 to 6)[. > <_>2</_>] return " + JTREE.args(" $s") + ") ! " +
+        JVALUE.args(), "3\n4\n5\n6", empty(JTREE), empty(JVALUE));
+  }
+
+  /** Maps over conditional expressions with an empty branch are moved into the other branch. */
+  @Test public void ifBranch() {
+    final String seq = "(1 to 3)[. > <_>1</_>]", cond = wrap("a") + " = 'a'";
+    check("(if(" + cond + ") then " + seq + " else ()) ! (. * 2)", "4\n6", root(If.class));
+    check("(if(" + cond + ") then () else " + seq + ") ! (. * 2)", "", root(If.class));
+    check("(if(" + cond + ") then " + seq + " else ()) ! position()", "1\n2", root(If.class));
+    check("(if(" + cond + ") then " + seq + " else error()) ! (. * 2)", "4\n6", root(If.class));
+    // both branches non-empty: no rewrite
+    check("(if(" + cond + ") then " + seq + " else 0) ! (. * 2)", "4\n6",
+        root(SimpleMap.class));
   }
 }

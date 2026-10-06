@@ -2534,7 +2534,7 @@ public final class RewritingsTest extends SandboxTest {
         + "return $node/A ! position()\n"
         + "  -> (for $c at $i in $node/* where $i gt . return $c) ! (* otherwise .)\n"
         + "  -> element Y {. except head(.)}",
-        "<Y><C/></Y>", exists(DualIterMap.class));
+        "<Y><C/></Y>", empty(DualIterMap.class));
   }
 
   /** Inlining errors into unevaluated operands of otherwise expressions. */

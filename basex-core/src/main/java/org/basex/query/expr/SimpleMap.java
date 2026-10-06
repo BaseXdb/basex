@@ -264,7 +264,10 @@ public abstract sealed class SimpleMap extends Mapping
         !iff.cond.seqType().mayBeNumber()) {
       return get(cc, info, Filter.get(cc, info, expr, iff.cond), iff.exprs[0]);
     }
-    return null;
+
+    // (let $x := E return R) ! F → let $x := E return R ! F
+    // (if(C) then A else ()) ! F → if(C) then A ! F else ()
+    return expr.mapResults(ex -> get(cc, info, ex, next), next.has(Flag.POS), cc);
   }
 
   /**
