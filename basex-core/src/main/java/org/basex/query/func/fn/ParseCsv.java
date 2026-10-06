@@ -23,12 +23,9 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public abstract class ParseCsv extends ParseFn {
-  /** Options of fn:csv-to-arrays. */
-  private static final Map<String, Option<?>> W3_ARRAYS_OPTIONS = options(Map.of(),
-      CsvOptions.SEPARATOR, CsvOptions.QUOTE_CHARACTER, CsvOptions.COMMENT_MARKER,
-      CsvOptions.TRIM_WHITESPACE);
   /** Options of fn:parse-csv and fn:csv-to-xml. */
-  private static final Map<String, Option<?>> W3_OPTIONS = options(W3_ARRAYS_OPTIONS,
+  private static final Map<String, Option<?>> W3_OPTIONS = options(CsvOptions.SEPARATOR,
+      CsvOptions.QUOTE_CHARACTER, CsvOptions.COMMENT_MARKER, CsvOptions.TRIM_WHITESPACE,
       CsvOptions.HEADER, CsvOptions.SELECT_COLUMNS, CsvOptions.TRIM_ROWS);
 
   /**
@@ -45,21 +42,18 @@ public abstract class ParseCsv extends ParseFn {
 
     final CsvFormat format = format();
     if(format != null) {
-      // W3 functions: restricted options, literal single characters, strict quoting
-      final Map<String, Option<?>> allowed = format == CsvFormat.W3_ARRAYS ?
-        W3_ARRAYS_OPTIONS : W3_OPTIONS;
+      // W3 functions: restricted options, literal single characters
       for(final Item key : map.keys()) {
         if(key instanceof QNm) continue;
         final String name = Token.string(key.string(info));
-        if(!allowed.containsKey(name)) {
-          throw INVALIDOPTION_X.get(info, Options.similar(name, allowed));
+        if(!W3_OPTIONS.containsKey(name)) {
+          throw INVALIDOPTION_X.get(info, Options.similar(name, W3_OPTIONS));
         }
       }
       // header strings are column names
       final Value header = map.get(Str.get(CsvOptions.HEADER.name()));
       if(!header.isEmpty()) copts.set(CsvOptions.HEADER, header);
       copts.checkW3(info);
-      copts.set(CsvOptions.STRICT_QUOTING, true);
       copts.set(CsvOptions.FORMAT, format);
     }
     return copts;
@@ -89,13 +83,11 @@ public abstract class ParseCsv extends ParseFn {
 
   /**
    * Creates a map with the specified options.
-   * @param base options to be copied
-   * @param options options to be added
+   * @param options options
    * @return map
    */
-  private static Map<String, Option<?>> options(final Map<String, Option<?>> base,
-      final Option<?>... options) {
-    final Map<String, Option<?>> map = new HashMap<>(base);
+  private static Map<String, Option<?>> options(final Option<?>... options) {
+    final Map<String, Option<?>> map = new HashMap<>();
     for(final Option<?> option : options) map.put(option.name(), option);
     return map;
   }

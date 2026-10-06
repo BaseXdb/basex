@@ -7,8 +7,8 @@ import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 
 /**
- * This class serializes a sequence of arrays as CSV. The input must conform to the result
- * format of fn:csv-to-arrays.
+ * This class serializes a sequence of arrays as CSV. The input must conform to the rows of
+ * fn:parse-csv.
  *
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher

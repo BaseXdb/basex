@@ -231,7 +231,7 @@ public abstract class CsvSerializer extends StandardSerializer {
   }
 
   /**
-   * Serializes an array that conforms to the result format of fn:csv-to-arrays.
+   * Serializes an array that conforms to a row of fn:parse-csv.
    * @param array array
    * @throws IOException I/O exception
    */

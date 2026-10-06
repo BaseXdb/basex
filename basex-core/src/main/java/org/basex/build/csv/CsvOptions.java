@@ -40,8 +40,6 @@ public class CsvOptions extends Options {
       new StringOption("comment-marker", null, STRING_ZO);
   /** Option: trim whitespace. */
   public static final BooleanOption TRIM_WHITESPACE = new BooleanOption("trim-whitespace", false);
-  /** Option: strict quoting (implies QUOTES). */
-  public static final BooleanOption STRICT_QUOTING = new BooleanOption("strict-quoting", true);
   /** Option: trim-rows. */
   public static final BooleanOption TRIM_ROWS = new BooleanOption("trim-rows", false);
   /** Option: select-columns. */
@@ -53,7 +51,7 @@ public class CsvOptions extends Options {
     /** Default. */ DIRECT,
     /** Attributes. */ ATTRIBUTES,
     /** fn:parse-csv. */ W3,
-    /** fn:csv-to-arrays. */ W3_ARRAYS,
+    /** Rows of fn:parse-csv. */ W3_ARRAYS,
     /** fn:csv-to-xml. */ W3_XML;
 
     @Override

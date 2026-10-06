@@ -31,94 +31,72 @@ public final class CsvRoundtripTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void csvToArrays() {
-    final Function func = CSV_TO_ARRAYS;
-    roundtrip(func, "", "",
+  @Test public void w3Arrays() {
+    arrays("", "",
       "");
-    roundtrip(func, "one", "",
+    arrays("one", "",
       "[\"one\"]");
-    roundtrip(func, "one,two", "",
+    arrays("one,two", "",
       "[\"one\",\"two\"]");
-    roundtrip(func, "one,two&#xA;three,four", "",
+    arrays("one,two&#xA;three,four", "",
       "[\"one\",\"two\"]\n[\"three\",\"four\"]");
-    roundtrip(func, "one,two&#xA;three,four&#xA;", "",
+    arrays("one,two&#xA;three,four&#xA;", "",
       "[\"one\",\"two\"]\n[\"three\",\"four\"]");
-    roundtrip(func, "one,two&#xA;three,four,five", "",
+    arrays("one,two&#xA;three,four,five", "",
       "[\"one\",\"two\"]\n[\"three\",\"four\",\"five\"]");
-    roundtrip(func, "one,two&#xA;&#xA;three,four", "",
+    arrays("one,two&#xA;&#xA;three,four", "",
       "[\"one\",\"two\"]\n[]\n[\"three\",\"four\"]");
-    roundtrip(func, "one,two&#xA;\"three,four\",five", "",
+    arrays("one,two&#xA;\"three,four\",five", "",
       "[\"one\",\"two\"]\n[\"three,four\",\"five\"]");
-    roundtrip(func, "one,two&#xA;\"three,\"\"four\"\"\",five", "",
+    arrays("one,two&#xA;\"three,\"\"four\"\"\",five", "",
       "[\"one\",\"two\"]\n[\"three,\"\"four\"\"\",\"five\"]");
-    roundtrip(func, "one,&#xA;,four&#xA;,&#xA;,,,", "",
+    arrays("one,&#xA;,four&#xA;,&#xA;,,,", "",
       "[\"one\",\"\"]\n[\"\",\"four\"]\n[\"\",\"\"]\n[\"\",\"\",\"\",\"\"]");
-    roundtrip(func, "one,\"\"&#xA;\"\",\"four\"", "",
+    arrays("one,\"\"&#xA;\"\",\"four\"", "",
       "[\"one\",\"\"]\n[\"\",\"four\"]");
-    roundtrip(func, "one,\"[&#xA;]\"&#xA;\"\",\"four\"", "",
+    arrays("one,\"[&#xA;]\"&#xA;\"\",\"four\"", "",
       "[\"one\",\"[&#xA;]\"]\n[\"\",\"four\"]");
-    roundtrip(func, "one;two&#xA;three;four",
+    arrays("one;two&#xA;three;four",
       "'separator': ';'",
       "[\"one\",\"two\"]\n[\"three\",\"four\"]");
-    roundtrip(func, "one,two&#xA;three,four",
-      "",
-      "[\"one\",\"two\"]\n[\"three\",\"four\"]");
-    roundtrip(func, "one.two&#xA;three.four",
+    arrays("one.two&#xA;three.four",
       "'separator': '.'",
       "[\"one\",\"two\"]\n[\"three\",\"four\"]");
-    roundtrip(func, "one,'two,2'&#xA;three,'four,4'",
+    arrays("one,'two,2'&#xA;three,'four,4'",
       "'quote-character': ''''",
       "[\"one\",\"two,2\"]\n[\"three\",\"four,4\"]");
-    roundtrip(func, "one,'two,''2'''&#xA;three,'four,''4'''",
+    arrays("one,'two,''2'''&#xA;three,'four,''4'''",
       "'quote-character': ''''",
       "[\"one\",\"two,'2'\"]\n[\"three\",\"four,'4'\"]");
-    roundtrip(func, "one ,two &#xA; three, four",
+    arrays("one ,two &#xA; three, four",
       "",
       "[\"one \",\"two \"]\n[\" three\",\" four\"]");
-    roundtrip(func, "one ,two &#xA; three, four",
-      "'trim-whitespace': false()",
-      "[\"one \",\"two \"]\n[\" three\",\" four\"]");
-    roundtrip(func, "one ,two &#xA; three, twenty  four ",
+    arrays("one ,two &#xA; three, twenty  four ",
       "'trim-whitespace': true()",
       "[\"one\",\"two\"]\n[\"three\",\"twenty  four\"]");
-    roundtrip(func, "&#xA;", "",
+    arrays("&#xA;", "",
       "[]");
-    roundtrip(func, "&#xA; ", "",
+    arrays("&#xA; ", "",
       "[]\n[\" \"]");
-    roundtrip(func, "&#xA; ",
+    arrays("&#xA; ",
       "'trim-whitespace': true()",
       "[]");
-    roundtrip(func, "&#xA;&#xA;",
+    arrays("&#xA;&#xA;",
       "'trim-whitespace': true()",
       "[]\n[]");
-    roundtrip(func, "&#xA;&#xA;&#xA;",
+    arrays("&#xA;&#xA;&#xA;",
       "'trim-whitespace': true()",
       "[]\n[]\n[]");
-    roundtrip(func, "one,two,\"z\"", "",
+    arrays("one,two,\"z\"", "",
       "[\"one\",\"two\",\"z\"]");
-    roundtrip(func, "one,two,\"z\"&#xA;", "",
+    arrays("one,two,\"z\"&#xA;", "",
       "[\"one\",\"two\",\"z\"]");
-    roundtrip(func, "a,b,c,d,e,f&#xA;p,q,r,s,t,u",
+    arrays("a,b,c,d,e,f&#xA;p,q,r,s,t,u",
       "",
       "[\"a\",\"b\",\"c\",\"d\",\"e\",\"f\"]\n[\"p\",\"q\",\"r\",\"s\",\"t\",\"u\"]");
-    roundtrip(func, "a,b,c,d,e,f&#xA;p,q,r,s,t,u",
-      "",
-      "[\"a\",\"b\",\"c\",\"d\",\"e\",\"f\"]\n[\"p\",\"q\",\"r\",\"s\",\"t\",\"u\"]");
-    roundtrip(func, "a,b,c,d,e,f&#xA;p,q,r,s,t,u",
-      "",
-      "[\"a\",\"b\",\"c\",\"d\",\"e\",\"f\"]\n[\"p\",\"q\",\"r\",\"s\",\"t\",\"u\"]");
-    roundtrip(func, "a,b,c,d,e,f&#xA;p,q,r,s,t,u",
-      "",
-      "[\"a\",\"b\",\"c\",\"d\",\"e\",\"f\"]\n[\"p\",\"q\",\"r\",\"s\",\"t\",\"u\"]");
-    roundtrip(func, "a,b,c&#xA;p,q,r",
+    arrays("a,b,c&#xA;p,q,r",
       "",
       "[\"a\",\"b\",\"c\"]\n[\"p\",\"q\",\"r\"]");
-    roundtrip(func, "a,b,c,d,e,f&#xA;p,q,r,s,t,u",
-      "",
-      "[\"a\",\"b\",\"c\",\"d\",\"e\",\"f\"]\n[\"p\",\"q\",\"r\",\"s\",\"t\",\"u\"]");
-    roundtrip(func, "a,b,c,d,e,f&#xA;p,q,r,s,t,u",
-      "",
-      "[\"a\",\"b\",\"c\",\"d\",\"e\",\"f\"]\n[\"p\",\"q\",\"r\",\"s\",\"t\",\"u\"]");
   }
 
   /** Test method. */
@@ -556,6 +534,17 @@ public final class CsvRoundtripTest extends SandboxTest {
   }
 
   /**
+   * Runs a roundtrip test for the w3-arrays format.
+   * @param input CSV input
+   * @param options options
+   * @param expected expected result
+   */
+  private static void arrays(final String input, final String options, final String expected) {
+    roundtrip(_CSV_PARSE, input, (options.isEmpty() ? "" : options + ", ") +
+        "'format': 'w3-arrays'", expected);
+  }
+
+  /**
    * Parses CSV with the given function and verifies that the result is as expected. Then
    * serializes the result, parses the serialization, and verifies that this also returns
    * the expected result.
@@ -578,7 +567,6 @@ public final class CsvRoundtripTest extends SandboxTest {
     if(!options.contains("'format'")) {
       if(!options.isEmpty()) format.append(", ");
       format.append("'format': '").append(function == _CSV_PARSE ? CsvFormat.DIRECT :
-        function == CSV_TO_ARRAYS ? CsvFormat.W3_ARRAYS :
         function == CSV_TO_XML ? CsvFormat.W3_XML : CsvFormat.W3).append("'");
     }
     final String serializeQuery = _CSV_SERIALIZE.args(

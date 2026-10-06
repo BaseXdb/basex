@@ -816,21 +816,19 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void csvToArrays() {
-    final Function func = CSV_TO_ARRAYS;
-
+  @Test public void parseCsvRows() {
     // Handling trivial input:
-    query(func.args(" ()"), "");
-    query(func.args(""), "");
-    query(func.args(" char('\\n')"), "[]");
-    query(func.args(" ' '", " { 'trim-whitespace': true() }"), "");
-    query(func.args(" ' '", " { 'trim-whitespace': false() }"), "[\" \"]");
-    query(func.args(" ` {char('\\n')}`", " { 'trim-whitespace': true() }"), "[]");
-    query(func.args(" ` {char('\\n')}`", " { 'trim-whitespace': false() }"), "[\" \"]");
-    query(func.args(" `{char('\\n')} `", " { 'trim-whitespace': true() }"), "[]");
-    query(func.args(" `{char('\\n')} `", " { 'trim-whitespace': false() }"), "[]\n[\" \"]");
+    query(rows(" ()"), "");
+    query(rows(""), "");
+    query(rows(" char('\\n')"), "[]");
+    query(rows(" ' '", " { 'trim-whitespace': true() }"), "");
+    query(rows(" ' '", " { 'trim-whitespace': false() }"), "[\" \"]");
+    query(rows(" ` {char('\\n')}`", " { 'trim-whitespace': true() }"), "[]");
+    query(rows(" ` {char('\\n')}`", " { 'trim-whitespace': false() }"), "[\" \"]");
+    query(rows(" `{char('\\n')} `", " { 'trim-whitespace': true() }"), "[]");
+    query(rows(" `{char('\\n')} `", " { 'trim-whitespace': false() }"), "[]\n[\" \"]");
     // Using newline separators:
-    query(func.args(
+    query(rows(
         " `name,city{ char('\\n') }` ||\n"
       + " `Bob,Berlin{ char('\\n') }` ||\n"
       + " `Alice,Aachen{ char('\\n') }`"),
@@ -839,7 +837,7 @@ public final class FnModuleTest extends SandboxTest {
       + "[\"Alice\",\"Aachen\"]");
     query(
         " let $CRLF := `{ char('\\r') }{ char('\\n') }`\n"
-      + "return " + func.args(
+      + "return " + rows(
         "  `name,city{ $CRLF }` ||\n"
       + "  `Bob,Berlin{ $CRLF }` ||\n"
       + "  `Alice,Aachen{ $CRLF }`\n"),
@@ -847,7 +845,7 @@ public final class FnModuleTest extends SandboxTest {
       + "[\"Bob\",\"Berlin\"]\n"
       + "[\"Alice\",\"Aachen\"]");
     // Quote handling:
-    query(func.args(
+    query(rows(
         " string-join(\n"
       + "    (`\"name\",\"city\"`, `\"Bob\",\"Berlin\"`, `\"Alice\",\"Aachen\"`),\n"
       + "    char('\\n')\n"
@@ -855,13 +853,13 @@ public final class FnModuleTest extends SandboxTest {
         "[\"name\",\"city\"]\n"
       + "[\"Bob\",\"Berlin\"]\n"
       + "[\"Alice\",\"Aachen\"]");
-    query(func.args(
+    query(rows(
         "  `\"name\",\"city\"{ char('\\n') }` ||\n"
       + "  `\"Bob \"\"The Exemplar\"\" Mustermann\",\"Berlin\"{ char('\\n') }`"),
         "[\"name\",\"city\"]\n"
       + "[\"Bob \"\"The Exemplar\"\" Mustermann\",\"Berlin\"]");
     // Non-default field separator:
-    query(func.args(
+    query(rows(
         " string-join(\n"
       + "    (\"name;city\", \"Bob;Berlin\", \"Alice;Aachen\"),\n"
       + "    char('\\n')\n"
@@ -871,7 +869,7 @@ public final class FnModuleTest extends SandboxTest {
       + "[\"Bob\",\"Berlin\"]\n"
       + "[\"Alice\",\"Aachen\"]");
     // Non-default quote character:
-    query(func.args(
+    query(rows(
         " string-join(\n"
       + "    (\"|name|,|city|\", \"|Bob|,|Berlin|\"),\n"
       + "    char('\\n')\n"
@@ -879,7 +877,7 @@ public final class FnModuleTest extends SandboxTest {
         "[\"name\",\"city\"]\n"
       + "[\"Bob\",\"Berlin\"]");
     // Trimming whitespace in fields:
-    query(func.args(
+    query(rows(
         " string-join(\n"
       + "    (\"name  ,city    \", \"Bob   ,Berlin  \", \"Alice ,Aachen  \"),\n"
       + "    char('\\n')\n"
@@ -888,41 +886,61 @@ public final class FnModuleTest extends SandboxTest {
       + "[\"Bob\",\"Berlin\"]\n"
       + "[\"Alice\",\"Aachen\"]");
     // Quoted fields are not trimmed:
-    query(func.args(" '\" a \",b'", " { \"trim-whitespace\": true() }"), "[\" a \",\"b\"]");
+    query(rows(" '\" a \",b'", " { \"trim-whitespace\": true() }"), "[\" a \",\"b\"]");
     // An empty quoted field constitutes a non-blank row:
-    query(func.args(" '\"\"'"), "[\"\"]");
+    query(rows(" '\"\"'"), "[\"\"]");
+    // Quotes in unquoted fields are literal characters:
+    query(rows(" 'Monitor,24\" wide,Robert \"Bob\" Smith'"),
+        "[\"Monitor\",\"24\"\" wide\",\"Robert \"\"Bob\"\" Smith\"]");
+    query(rows(" 'a\"\"b,c\"'"), "[\"a\"\"\"\"b\",\"c\"\"\"]");
+    query(rows(" '\"Field 1\", \"Field 2\"'"), "[\"Field 1\",\" \"\"Field 2\"\"\"]");
+    query(rows(" '\"Field 1\", \"Field 2\"'", " { 'trim-whitespace': true() }"),
+        "[\"Field 1\",\"\"\"Field 2\"\"\"]");
+    // Broken quoted fields:
+    error(rows(" '\"Bob\" Smith,Berlin'"), CSV_QUOTING_X);
+    error(rows(" '\"Field 1\" ,\"Field 2\"'"), CSV_QUOTING_X);
+    error(rows(" '\"Field 1'"), CSV_QUOTING_X);
     // Comment rows:
     final String comments =
         " string-join(\n"
       + "    (\"# comment\", \"name,city\", \"Bob,Berlin\", \"# comment\", \"Alice,Aachen\"),\n"
       + "    char('\\n')\n"
       + "  )";
-    query(func.args(comments, " { 'comment-marker': '#' }"),
+    query(rows(comments, " { 'comment-marker': '#' }"),
         "[\"name\",\"city\"]\n"
       + "[\"Bob\",\"Berlin\"]\n"
       + "[\"Alice\",\"Aachen\"]");
-    query(func.args(comments, " { 'comment-marker': () }"),
+    query(rows(comments, " { 'comment-marker': () }"),
         "[\"# comment\"]\n"
       + "[\"name\",\"city\"]\n"
       + "[\"Bob\",\"Berlin\"]\n"
       + "[\"# comment\"]\n"
       + "[\"Alice\",\"Aachen\"]");
     // A comment row ends with the next newline, even if a quote was opened:
-    query(func.args(" `#\"a{ char('\\n') }b,c{ char('\\n') }x,y`", " { 'comment-marker': '#' }"),
+    query(rows(" `#\"a{ char('\\n') }b,c{ char('\\n') }x,y`", " { 'comment-marker': '#' }"),
         "[\"b\",\"c\"]\n[\"x\",\"y\"]");
     // Comment markers are only recognized at the start of a row:
-    query(func.args(" `a,#b{ char('\\n') }#c,d`", " { 'comment-marker': '#' }"), "[\"a\",\"#b\"]");
+    query(rows(" `a,#b{ char('\\n') }#c,d`", " { 'comment-marker': '#' }"), "[\"a\",\"#b\"]");
     // Comment rows are skipped before the header row is chosen:
     query(PARSE_CSV.args(comments, " { 'comment-marker': '#', 'header': true() }") + "?columns",
         "name\ncity");
     // Invalid options:
-    error(func.args("", " { 'separator': char('\\n') }"), CSV_NEWLINE_X);
-    error(func.args("", " { 'comment-marker': '' }"), CSV_SINGLECHAR_X_X);
-    error(func.args("", " { 'comment-marker': '##' }"), CSV_SINGLECHAR_X_X);
-    error(func.args("", " { 'comment-marker': char('\\n') }"), CSV_NEWLINE_X);
-    error(func.args("", " { 'comment-marker': ',' }"), CSV_DELIMITER_X);
-    error(func.args("", " { 'comment-marker': '\"' }"), CSV_DELIMITER_X);
-    error(func.args("", " { 'comment-marker': 1 }"), INVALIDOPTION_X_X_X_X);
+    error(rows("", " { 'separator': char('\\n') }"), CSV_NEWLINE_X);
+    error(rows("", " { 'comment-marker': '' }"), CSV_SINGLECHAR_X_X);
+    error(rows("", " { 'comment-marker': '##' }"), CSV_SINGLECHAR_X_X);
+    error(rows("", " { 'comment-marker': char('\\n') }"), CSV_NEWLINE_X);
+    error(rows("", " { 'comment-marker': ',' }"), CSV_DELIMITER_X);
+    error(rows("", " { 'comment-marker': '\"' }"), CSV_DELIMITER_X);
+    error(rows("", " { 'comment-marker': 1 }"), INVALIDOPTION_X_X_X_X);
+  }
+
+  /**
+   * Returns a query that returns the rows of a parsed CSV input.
+   * @param args arguments of fn:parse-csv
+   * @return query
+   */
+  private static String rows(final Object... args) {
+    return PARSE_CSV.args(args) + "?rows";
   }
 
   /** Test method. */
@@ -4980,7 +4998,7 @@ return
 
     // CSV output method: maps, arrays and nodes are serialized as CSV
     query(func.args(" parse-csv('a,b')", " { 'method': 'csv' }"), "a,b\n");
-    query(func.args(" csv-to-arrays('a,b' || char('\\n') || 'c,d')", " { 'method': 'csv' }"),
+    query(func.args(" parse-csv('a,b' || char('\\n') || 'c,d')?rows", " { 'method': 'csv' }"),
         "a,b\nc,d\n");
     query(func.args(" <csv><record><A>1</A></record></csv>", " { 'method': 'csv' }"), "1\n");
     // CSV output method: flat parameters
@@ -5013,7 +5031,7 @@ return
         "a\n");
     // CSV output method: invalid structures
     error(func.args(" (parse-csv('a'), parse-csv('b'))", " { 'method': 'csv' }"), SERCSV_X_X);
-    error(func.args(" (csv-to-arrays('a'), parse-csv('b'))", " { 'method': 'csv' }"), SERCSV_X_X);
+    error(func.args(" (parse-csv('a')?rows, parse-csv('b'))", " { 'method': 'csv' }"), SERCSV_X_X);
     error(func.args(" [ (1, 2) ]", " { 'method': 'csv' }"), SERCSV_X_X);
     error(func.args(" [ () ]", " { 'method': 'csv' }"), SERCSV_X_X);
     error(func.args(" [ {} ]", " { 'method': 'csv' }"), SERCSV_X_X);

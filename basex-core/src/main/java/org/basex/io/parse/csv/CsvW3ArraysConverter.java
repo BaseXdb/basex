@@ -11,7 +11,7 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * This class converts CSV data to the representation defined by fn:csv-to-arrays.
+ * This class converts CSV data to the rows defined by fn:parse-csv.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

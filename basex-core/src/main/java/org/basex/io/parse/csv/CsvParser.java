@@ -35,8 +35,6 @@ public final class CsvParser {
   private final boolean trimWhitespace;
   /** Trim rows (see {@link CsvOptions#TRIM_ROWS}). */
   private final boolean trimRows;
-  /** Disallow field content outside of quotes. */
-  private final boolean strictQuoting;
   /** Select columns. */
   private final int[] selectColumns;
 
@@ -63,7 +61,6 @@ public final class CsvParser {
     quoteCharacter = opts.quoteCharacter();
     commentMarker = opts.commentMarker();
     quotes = opts.get(CsvOptions.QUOTES);
-    strictQuoting = quotes && opts.get(CsvOptions.STRICT_QUOTING);
     backslashes = opts.get(CsvOptions.BACKSLASHES);
     trimWhitespace = opts.get(CsvOptions.TRIM_WHITESPACE);
     trimRows = opts.get(CsvOptions.TRIM_ROWS);
@@ -97,7 +94,7 @@ public final class CsvParser {
           ch = input.read();
           if(ch != quoteCharacter) {
             quoted = false;
-            if(strictQuoting && ch != separator && ch != '\n' && ch != -1)
+            if(ch != separator && ch != '\n' && ch != -1)
               throw QueryError.CSV_QUOTING_X.get(ii, new TokenBuilder().add(
                   quoteCharacter).add(entry).add(quoteCharacter).add(ch));
             continue;
@@ -107,18 +104,10 @@ public final class CsvParser {
           ch = bs();
         }
         add(entry, ch);
-      } else if(ch == quoteCharacter) {
-        if(quotes && entry.isEmpty()) {
-          // parse quote
-          quoted = true;
-          quotedField = true;
-        } else if(strictQuoting) {
-          throw QueryError.CSV_QUOTING_X.get(ii, new TokenBuilder().add(entry).add(quoteCharacter));
-        } else {
-          ch = input.read();
-          if(ch != quoteCharacter || backslashes) add(entry, quoteCharacter);
-          continue;
-        }
+      } else if(ch == quoteCharacter && quotes && entry.isEmpty()) {
+        // parse quote
+        quoted = true;
+        quotedField = true;
       } else if(ch == '\n') {
         // parse newline (takes precedence over a separator)
         record(entry, false, true);
@@ -133,7 +122,7 @@ public final class CsvParser {
       }
       ch = input.read();
     }
-    if(quoted && strictQuoting)
+    if(quoted)
       throw QueryError.CSV_QUOTING_X.get(ii, new TokenBuilder().add(quoteCharacter).add(entry));
     record(entry, true, true);
   }

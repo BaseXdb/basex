@@ -165,9 +165,6 @@ public enum Function implements AFunction {
       params(STRING_ZO, MAP_ZO), Records.PARSED_CSV_STRUCTURE.get().seqType(Occ.ZERO_OR_ONE),
       flag(NDT), FN_URI, Perm.CREATE),
   /** XQuery function. */
-  CSV_TO_ARRAYS(FnCsvToArrays::new, "csv-to-arrays(value, options?)",
-      params(STRING_ZO, MAP_ZO), STRING_O.arrayType().seqType(Occ.ZERO_OR_MORE)),
-  /** XQuery function. */
   CSV_TO_XML(FnCsvToXml::new, "csv-to-xml(value, options?)",
       params(STRING_ZO, MAP_ZO), DOCUMENT_FN_CSV_ZO, flag(CNS)),
   /** XQuery function. */

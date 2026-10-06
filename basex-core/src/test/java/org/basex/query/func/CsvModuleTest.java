@@ -67,13 +67,9 @@ public final class CsvModuleTest extends SandboxTest {
                // was: "<csv><record><entry>X</entry></record></csv>");
     parse("X\n\n", "", "<csv><record><entry>X</entry></record><record/></csv>");
 
-    parse(" ' \" X\"'", "'strict-quoting': false()",
-        "<csv><record><entry> \" X\"</entry></record></csv>");
-    parse(" '\"X \" '", "'strict-quoting': false()",
-        "<csv><record><entry>X  </entry></record></csv>");
     parse(" ' \" X\"'", "'quotes': false()", "<csv><record><entry> \" X\"</entry></record></csv>");
     parse(" '\"X \" '", "'quotes': false()", "<csv><record><entry>\"X \" </entry></record></csv>");
-    parseError(" ' \" X\"'", "");
+    parse(" ' \" X\"'", "", "<csv><record><entry> \" X\"</entry></record></csv>");
     parseError(" '\"X \" '", "");
     parseError(" '\"X'", "");
 
@@ -140,13 +136,14 @@ public final class CsvModuleTest extends SandboxTest {
     parse("X\n", "'format': 'w3'", "...\"rows\":[\"X\"]");
     parse("X\n\n", "'format': 'w3'", "...\"rows\":([\"X\"],[])");
 
-    parse(" ' \"\"'", "'strict-quoting': false(), 'format': 'w3'", "...\"rows\":[\" \"\"\"]");
-    parse(" ' \" X\"'", "'strict-quoting': false(), 'format': 'w3'",
-        "...\"rows\":[\" \"\" X\"\"\"]");
-    parse(" '\"\" '", "'strict-quoting': false(), 'format': 'w3'", "...\"rows\":[\" \"]");
-    parse(" '\"X \" '", "'strict-quoting': false(), 'format': 'w3'", "...\"rows\":[\"X  \"]");
-    parseError(" ' \"\"'", "'format': 'w3'");
+    parse(" ' \"\"'", "'format': 'w3'", "...\"rows\":[\" \"\"\"\"\"]");
     parseError(" '\"X \" '", "'format': 'w3'");
+
+    final String bs = "'format': 'w3', 'backslashes': true()";
+    parse(" '\"a\\\"b\",c'", bs, "...\"rows\":[\"a\"\"b\",\"c\"]");
+    parse(" 'a\\\"b,c\\tc'", bs, "...\"rows\":[\"a\"\"b\",\"c\tc\"]");
+    parse(" '\"a\"\"b\",c'", bs, "...\"rows\":[\"a\"\"\"\"b\",\"c\"]");
+    parseError(" '\"a\\\"b\",c'", "'format': 'w3'");
   }
 
   /** Test method. */
