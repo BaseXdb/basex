@@ -16,6 +16,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -245,7 +246,7 @@ public abstract class Step extends Preds {
       test = t;
       exprType.assign(NodeType.get(t));
     }
-    if(t == null || noMatches()) {
+    if(t == null || noMatches() || seqType().zero()) {
       cc.info(QueryText.OPTSTEP_X, this);
       return cc.emptySeq(this);
     }
@@ -268,7 +269,24 @@ public abstract class Step extends Preds {
     test = test.optimize(type.kind(), null);
 
     SeqType st = seqType(axis, test, exprs);
-    final Type ct = type.instanceOf(Types.MAP_OR_ARRAY) ? NodeType.JNODE : type;
+    final Type ct = type.instanceOf(Types.MAP_OR_ARRAY) ?
+      NodeType.get(Empty.VALUE, type.seqType()) : type;
+    if(axis == CHILD && ct instanceof final NodeType nt && nt.test instanceof final JNodeTest pt &&
+        pt.valueType.one()) {
+      // child JNodes: adopt the value type of the map or array: jtree({ 'a': 1 })/a
+      final Type pvt = pt.valueType.type;
+      final SeqType mvt = pvt instanceof final MapType mt ? mt.valueType() :
+        pvt instanceof final ArrayType at ? at.valueType() : null;
+      if(mvt != null) {
+        final Test it = test.intersect(JNodeTest.get(null, mvt));
+        if(it instanceof final JNodeTest jt) {
+          if(jt.key != Empty.VALUE) st = NodeType.get(jt).seqType(st.occ);
+        } else if(it == null && test instanceof JNodeTest) {
+          // no results: { 'a': 1 }/jnode(a, xs:string)
+          st = Types.EMPTY_SEQUENCE_Z;
+        }
+      }
+    }
     if(expr != null && axis == SELF && ct instanceof NodeType) {
       // node test: adopt type of context expression: <a/>/self::node()
       if(test == NodeTest.NODE) st = ct.seqType(st.occ);

@@ -145,7 +145,7 @@ public abstract class Path extends ParseExpr {
       rt = cc.qc.focus.value;
     }
 
-    cc.get(focus(rt), true, () -> {
+    cc.get(focus(rt, cc), true, () -> {
       final int sl = steps.length;
       for(int s = 0; s < sl; s++) {
         final Expr step = cc.compileOrError(steps[s], root == null && s == 0);
@@ -161,12 +161,14 @@ public abstract class Path extends ParseExpr {
   /**
    * Returns the focus of the first step: maps and arrays are converted to JNodes.
    * @param rt root expression (can be {@code null})
+   * @param cc compilation context
    * @return focus expression (can be {@code null})
+   * @throws QueryException query exception
    */
-  private Expr focus(final Expr rt) {
+  private Expr focus(final Expr rt, final CompileContext cc) throws QueryException {
     // function items other than maps and arrays will be rejected at runtime
     return rt != null && rt.seqType().type.instanceOf(Types.FUNCTION) ?
-      Function.JTREE.get(info, rt) : rt;
+      cc.function(Function.JTREE, info, rt) : rt;
   }
 
   @Override
@@ -249,7 +251,9 @@ public abstract class Path extends ParseExpr {
   public final Expr removePredicate(final CompileContext cc) throws QueryException {
     final ExprList list = new ExprList(steps.length).add(steps);
     final Step step = ((Step) list.pop()).removePredicate();
-    list.add(cc.get(root, true, () -> step.optimize(cc)));
+    // context of the last step: previous step or root
+    final Expr ctx = list.isEmpty() ? root : list.peek();
+    list.add(cc.get(ctx, true, () -> step.optimize(cc)));
     // the type is not adopted: the path may yield more results without the predicate
     return get(cc, info, root, list.finish());
   }
@@ -367,7 +371,8 @@ public abstract class Path extends ParseExpr {
           continue;
         }
         // $map/'X' → $map/child::{ 'X' }; skip context-dependent steps (e.g. $node/jkey())
-        if(step.seqType().instanceOf(Types.ANY_ATOMIC_TYPE_ZM) && !step.has(Flag.CTX) &&
+        if(!(step instanceof Step) && step.seqType().instanceOf(Types.ANY_ATOMIC_TYPE_ZM) &&
+            !step.has(Flag.CTX) &&
             (pt.instanceOf(NodeType.JNODE) || pt.instanceOf(Types.MAP_OR_ARRAY))) {
           step = new SelectorStep(step.info(info), CHILD, step).optimize(prev, cc);
         }
@@ -1312,7 +1317,7 @@ public abstract class Path extends ParseExpr {
     final CompileContext cc = ic.cc;
     final int sl = steps.length;
     final Expr rt = root != null ? root : cc.qc.focus.value;
-    if(changed) cc.get(focus(rt), true, () -> {
+    if(changed) cc.get(focus(rt, cc), true, () -> {
       for(int s = 0; s < sl; s++) {
         steps[s] = steps[s].optimize(cc);
         cc.updateFocus(steps[s], true);
@@ -1320,7 +1325,7 @@ public abstract class Path extends ParseExpr {
       return null;
     });
 
-    changed |= ic.var != null && cc.ok(focus(rt), true, () -> {
+    changed |= ic.var != null && cc.ok(focus(rt, cc), true, () -> {
       boolean chngd = false;
       for(int s = 0; s < sl; s++) {
         final Expr step = steps[s].inline(ic);

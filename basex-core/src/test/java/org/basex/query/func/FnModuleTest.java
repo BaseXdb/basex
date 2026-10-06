@@ -2945,6 +2945,18 @@ return
     check(func.args(" array { (1 to 2) }") + "/self::jnode(*, array(*)) ! " + JVALUE.args(),
         "[1,2]", empty("*[@axis = 'self']"));
     check(func.args(" array { (1 to 2) }") + "/self::jnode(*, map(*))", "", empty());
+
+    // value types of child JNodes
+    final String maps = "for $m in ({ 'a': [ 1, 2 ] }, { 'a': [ 3 ] }) return ";
+    check(maps + "$m/a", "{\"a\":[1,2]}\n{\"a\":[3]}",
+        type("*[@axis = 'child']", "jnode(a, array(xs:integer))*"));
+    check(maps + COUNT.args(" $m/a/*"), "2\n1", exists("*[@type = 'jnode(*, xs:integer)*']"));
+    check(maps + "$m/a/* ! " + JVALUE.args(), "1\n2\n3", type(JVALUE, "xs:integer"));
+    check(maps + JVALUE.args(" $m/a"), "[1,2]\n[3]", type(JVALUE, "array(xs:integer)?"));
+    check(maps + "$m/a/self::jnode(*, array(*)) ! " + JVALUE.args(), "[1,2]\n[3]",
+        empty("*[@axis]"));
+    check(maps + "$m/a/self::jnode(*, map(*))", "", empty());
+    check(maps + "$m/jnode(a, xs:string)", "", empty());
   }
 
   /** Test method. */
@@ -2975,7 +2987,7 @@ return
     check(maps + "$m/a ! " + func.args(), 1, empty(func), exists(_MAP_GET));
     check(arrays + "$a/* ! " + func.args(), "1\n3\n4", empty(func), exists(_ARRAY_ITEMS));
     check("for $j in (" + JTREE.args(" { 'a': 1 }") + ", " + JTREE.args(" { 'a': 2 }") + ") " +
-        "return $j/a ! " + func.args(), "1\n2", exists(_MAP_GET));
+        "return $j/a ! " + func.args(), "1\n2", empty("*[@axis]"));
     check(maps + JTREE.args(" $m") + "/c/* ! " + func.args(), 2, exists(func));
   }
 
