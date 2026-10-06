@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import static org.basex.util.XMLToken.*;
 
 import java.io.*;
+import java.text.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
@@ -200,6 +201,15 @@ abstract class XhtmlHtmlSerializer extends MarkupSerializer {
   final byte[] attributeKey(final byte[] name) {
     final byte[] local = htmlName(elem);
     return local == null ? null : concat(local, AT, lc(name));
+  }
+
+  /**
+   * Applies URI escaping to an attribute value: normalization to NFC, then percent-encoding.
+   * @param value attribute value
+   * @return escaped value
+   */
+  static byte[] escapeUri(final byte[] value) {
+    return encodeUri(normalize(value, Normalizer.Form.NFC), UriEncoder.ESCAPE);
   }
 
   /**

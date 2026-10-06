@@ -7,6 +7,7 @@ import static org.basex.util.XMLToken.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.regex.*;
 
 import org.basex.query.*;
 import org.basex.query.util.ft.*;
@@ -26,6 +27,9 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 abstract class MarkupSerializer extends StandardSerializer {
+  /** Characters of a public identifier (PubidChar). */
+  private static final Pattern PUBID = Pattern.compile("[ \r\na-zA-Z0-9\\-'()+,./:=?;!*#@$_%]*");
+
   /** System document type (can be {@code null}). */
   String docsys;
   /** Public document type. */
@@ -87,6 +91,11 @@ abstract class MarkupSerializer extends StandardSerializer {
 
     if(docsys.isEmpty()) docsys = null;
     if(docpub.isEmpty()) docpub = null;
+    // public identifier: PubidChar characters; system identifier: not both quote characters
+    if(docpub != null && !PUBID.matcher(docpub).matches())
+      throw SERPARAM_X.getIO(Util.info("Invalid public identifier: %.", docpub));
+    if(docsys != null && docsys.contains("\"") && docsys.contains("'"))
+      throw SERPARAM_X.getIO(Util.info("Invalid system identifier: %.", docsys));
 
     if(undecl && version.equals(V10)) throw SERUNDECL.getIO();
     if(xml) {
@@ -365,7 +374,10 @@ abstract class MarkupSerializer extends StandardSerializer {
     final TokenBuilder tb = new TokenBuilder().add('<').add('!').add(DOCTYPE).add(' ').add(name);
     if(pub != null || sys != null) tb.add(' ').add(pub != null ? PUBLIC : SYSTEM);
     if(pub != null) tb.add(" \"").add(pub).add('"');
-    if(sys != null) tb.add(" \"").add(sys).add('"');
+    if(sys != null) {
+      final char quote = sys.contains("\"") ? '\'' : '"';
+      tb.add(' ').add(quote).add(sys).add(quote);
+    }
     out.print(tb.finish());
     out.print(ELEM_C);
     sep = true;

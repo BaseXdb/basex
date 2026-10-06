@@ -35,7 +35,9 @@ final class TextSerializer extends StandardSerializer {
 
   @Override
   protected void text(final byte[] value, final FTPos ftp) throws IOException {
-    out.print(Token.normalize(value, form));
+    final byte[] text = Token.normalize(value, form);
+    if(cmap == null) out.print(text);
+    else printChars(text);
     sep = false;
   }
 }

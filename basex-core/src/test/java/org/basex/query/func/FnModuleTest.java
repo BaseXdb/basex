@@ -4912,6 +4912,14 @@ return
     error(func.args(" <é/>", " { 'encoding': 'US-ASCII' }"), SERENC_X_X);
     query("string-to-codepoints(" + func.args(" <x/>", " { 'byte-order-mark': true() }") + ")[1]",
         0xFEFF);
+    // character maps are applied to text nodes of the text method
+    query(func.args(" <a>x$y</a>", " { 'method': 'text', 'use-character-maps': { '$': 'A' } }"),
+        "xAy");
+    // document type identifiers: quoting, invalid characters
+    query(func.args(" <a/>", " { 'doctype-system': 'A\"B', 'doctype-public': \"A'B\" }"),
+        "<!DOCTYPE a PUBLIC \"A'B\" 'A\"B'><a/>");
+    error(func.args(" <a/>", " { 'doctype-system': 'S', 'doctype-public': '£' }"), SERPARAM_X);
+    error(func.args(" <a/>", " { 'doctype-system': 'A\"''B' }"), SERPARAM_X);
 
     // control characters: rejected by XML 1.0 and HTML below 5.0, escaped in JSON
     final String ctrl = " <x>{ codepoints-to-string(1) }</x>";

@@ -37,7 +37,7 @@ final class XHTMLSerializer extends XhtmlHtmlSerializer {
     // escape URI attributes
     final byte[] key = escape ? attributeKey(name) : null;
     final byte[] v = key != null && URIS.contains(key) ?
-        encodeUri(value, UriEncoder.ESCAPE) : value;
+        escapeUri(value) : value;
     super.attribute(name, v, standalone);
   }
 

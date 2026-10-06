@@ -68,7 +68,7 @@ final class HTMLSerializer extends XhtmlHtmlSerializer {
       // don't append value for boolean attributes
       if(BOOLEAN.contains(key) && eq(lc(name), lc(val))) return;
       // escape URI attributes
-      if(escape && URIS.contains(key)) val = encodeUri(val, UriEncoder.ESCAPE);
+      if(escape && URIS.contains(key)) val = escapeUri(val);
     }
     val = normalize(val, form);
 
