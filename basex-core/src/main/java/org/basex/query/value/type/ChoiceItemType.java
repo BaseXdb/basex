@@ -89,7 +89,10 @@ public final class ChoiceItemType implements Type {
 
   @Override
   public boolean instanceOf(final Type type) {
-    final Type norm = expand(type);
+    // shortcut: the common ancestor of all alternatives is an instance of the type
+    final Type target = TypeRef.deref(type);
+    if(!(target instanceof ChoiceItemType) && union.instanceOf(target)) return true;
+    final Type norm = expand(target);
     if(norm instanceof final ChoiceItemType ct) {
       for(final Type tp : types) {
         if(!ct.hasInstance(tp)) return false;

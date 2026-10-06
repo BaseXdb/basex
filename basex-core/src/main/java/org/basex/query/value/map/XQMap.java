@@ -153,11 +153,13 @@ public abstract class XQMap extends XQStruct {
   public final Value invokeInternal(final QueryContext qc, final InputInfo ii, final Value[] args)
       throws QueryException {
     final Item k = key(args[0], qc, ii);
+    final Value value = getOrNull(k);
+    if(value != null) return value;
     if(type instanceof final ShapeType sh && sh.strict() &&
         (!k.type.isStringOrUntyped() || !sh.fields().contains(k.string(null)))) {
       throw RECORDFIELD_X_X.get(ii, this, k);
     }
-    return get(k);
+    return Empty.VALUE;
   }
 
   /**
