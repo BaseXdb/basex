@@ -356,6 +356,14 @@ public interface Type {
   }
 
   /**
+   * Checks if this type can be assigned to a sequence as its runtime type.
+   * @return result of check
+   */
+  default boolean assignable() {
+    return true;
+  }
+
+  /**
    * Returns the given type, or the type of the specified expression if it is more specific.
    * @param expr expression (can be {@code null})
    * @return node type

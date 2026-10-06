@@ -94,7 +94,7 @@ public abstract class Seq extends Value {
   @Override
   protected Value subSeq(final long pos, final long length, final Job job) {
     job.checkStop();
-    return new SubSeq(this, pos, length);
+    return new SubSeq(this, pos, length, type);
   }
 
   @Override
@@ -128,7 +128,7 @@ public abstract class Seq extends Value {
   @Override
   public final void refineType(final Expr expr) {
     final Type tp = expr.seqType().type.intersect(type);
-    if(tp != null) type = tp;
+    if(tp != null && tp.assignable()) type = tp;
   }
 
   @Override

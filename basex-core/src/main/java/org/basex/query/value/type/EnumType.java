@@ -136,6 +136,11 @@ public final class EnumType implements Type {
   }
 
   @Override
+  public boolean assignable() {
+    return false;
+  }
+
+  @Override
   public boolean isNumber() {
     return false;
   }

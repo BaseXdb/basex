@@ -2680,4 +2680,15 @@ public final class RewritingsTest extends SandboxTest {
         + "local:f() < 9", true,
         type(StaticFuncCall.class, "xs:integer"));
   }
+
+  /** Successful type checks refine the type of a sequence. */
+  @Test public void checkedType() {
+    query("let $s := parse-xml('<x><a/><a/><a/><a/></x>')/x/* "
+        + "let $f := fn($t as element(a)*) { inspect:type($t, { 'mode': 'value' }) } "
+        + "return (inspect:type($s, { 'mode': 'value' }), $f($s), "
+        + "inspect:type(tail(tail($s)), { 'mode': 'value' }))",
+        "element()+\nelement(a)+\nelement(a)+");
+    query("inspect:type(head(('a', 'b') treat as enum('a', 'b')+), { 'mode': 'value' })",
+        "xs:string");
+  }
 }

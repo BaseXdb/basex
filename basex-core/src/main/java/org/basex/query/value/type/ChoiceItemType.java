@@ -60,6 +60,11 @@ public final class ChoiceItemType implements Type {
   }
 
   @Override
+  public boolean assignable() {
+    return false;
+  }
+
+  @Override
   public Value cast(final Item item, final QueryContext qc, final InputInfo info)
       throws QueryException {
     for(final Type tp : types) {

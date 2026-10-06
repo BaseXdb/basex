@@ -4,6 +4,7 @@ import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 
 /**
  * A sequence that defines a sub-range of another sequence.
@@ -22,9 +23,10 @@ public final class SubSeq extends Seq {
    * @param sub underlying sequence
    * @param start starting index
    * @param length length of the subsequence
+   * @param type type
    */
-  SubSeq(final Seq sub, final long start, final long length) {
-    super(length, sub.type);
+  SubSeq(final Seq sub, final long start, final long length, final Type type) {
+    super(length, type);
     this.sub = sub;
     this.start = start;
   }
@@ -36,7 +38,7 @@ public final class SubSeq extends Seq {
 
   @Override
   protected Seq subSeq(final long pos, final long length, final Job job) {
-    return new SubSeq(sub, start + pos, length);
+    return new SubSeq(sub, start + pos, length, type);
   }
 
   @Override

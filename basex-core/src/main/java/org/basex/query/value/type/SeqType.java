@@ -165,6 +165,8 @@ public final class SeqType {
     for(final Item item : value) {
       if(!instance(item, coerce)) return false;
     }
+    // remember the more specific type to skip subsequent checks
+    if(dt.assignable() && dt.instanceOf(vt)) value.type = dt;
     return true;
   }
 
@@ -378,13 +380,8 @@ public final class SeqType {
   public Value coerce(final Value value, final QueryContext qc, final InputInfo info,
       final QNm name, final CompileContext cc) throws QueryException {
 
-    final Type dt = TypeRef.deref(this.type);
     // instance check
-    if(instance(value, true)) {
-      // remember the type of a sequence whose items are left unchanged by coercion
-      if(dt instanceof FType && value.size() > 1 && dt.instanceOf(value.type)) value.type = dt;
-      return value;
-    }
+    if(instance(value, true)) return value;
 
     // coerce items if required
     final ValueBuilder vb = new ValueBuilder(qc, value.size());
@@ -394,7 +391,7 @@ public final class SeqType {
       if(val == null) throw typeError(value, this, name, info);
       vb.add(val);
     }
-    final Value val = vb.value(dt);
+    final Value val = vb.value(TypeRef.deref(type));
     if(!occ.check(val.size())) throw typeError(value, this, name, info);
     return val;
   }
