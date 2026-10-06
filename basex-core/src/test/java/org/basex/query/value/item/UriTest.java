@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
 
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.ParameterizedTest;
 
@@ -93,5 +94,29 @@ public final class UriTest {
   public void isValid(final String uri, final boolean valid,
       @SuppressWarnings("unused") final boolean absolute) {
     assertEquals(valid, Uri.get(uri).isValid(), "Uri validation failed");
+  }
+
+  /**
+   * Validates long URIs on a thread with a small stack.
+   * @throws InterruptedException interruption
+   */
+  @Test
+  public void longUris() throws InterruptedException {
+    final String chars = "a%20!:@".repeat(1500);
+    final String[] uris = {
+      "http://example.com/" + chars, "http://example.com/?" + chars,
+      "http://example.com/#" + chars, "http://" + chars.replaceAll("[:@]", "") + '/',
+      "http://" + chars.replace("@", "") + "@example.com/", chars.replace(":", ""),
+      "x:" + chars, "/" + "a/".repeat(5000)
+    };
+    final List<String> valid = new ArrayList<>();
+    final Thread thread = new Thread(null, () -> {
+      for(final String uri : uris) {
+        if(Uri.get(uri).isValid()) valid.add(uri);
+      }
+    }, "uri", 1 << 17);
+    thread.start();
+    thread.join();
+    assertEquals(List.of(uris), valid);
   }
 }

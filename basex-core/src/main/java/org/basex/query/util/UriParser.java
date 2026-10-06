@@ -20,40 +20,42 @@ public final class UriParser {
   private static final String HEXDIG = "[" + DIGIT + "A-Fa-f]";
 
   // RFC 3986 rules
+  // repetitions are possessive: java.util.regex iterates instead of recursing per character
+
   /** <pre>sub-delims = "!" / "$" / "&" / "'" / "(" / ")" / "*" / "+" / "," / ";" / "="</pre>. */
-  private static final String SUB_DELIMS = "[!$&'()*+,;=]";
+  private static final String SUB_DELIMS = "!$&'()*+,;=";
 
   /** <pre>unreserved = ALPHA / DIGIT / "-" / "." / "_" / "~"</pre>. */
-  private static final String UNRESERVED = "[" + ALPHA + DIGIT + "._~-]";
+  private static final String UNRESERVED = ALPHA + DIGIT + "._~\\-";
   /** <pre>pct-encoded = "%" HEXDIG HEXDIG</pre>. */
   private static final String PCT_ENCODED = "%" + HEXDIG + HEXDIG;
+  /** Characters of pchar, excluding pct-encoded. */
+  private static final String PCHAR_CHARS = UNRESERVED + SUB_DELIMS + ":@";
   /** <pre>pchar = unreserved / pct-encoded / sub-delims / ":" / "@"</pre>. */
-  private static final String PCHAR = "(" + UNRESERVED + "|" + PCT_ENCODED + "|" +
-      SUB_DELIMS + "|:|@)";
+  private static final String PCHAR = chars(PCHAR_CHARS);
 
   /** <pre>segment = *pchar</pre>. */
-  private static final String SEGMENT = PCHAR + "*";
+  private static final String SEGMENT = PCHAR + "*+";
   /** <pre>segment-nz = 1*pchar</pre>. */
-  private static final String SEGMENT_NZ = PCHAR + "+";
+  private static final String SEGMENT_NZ = PCHAR + "++";
   /** <pre>segment-nz-nc = 1*( unreserved / pct-encoded / sub-delims / "@" )</pre>. */
-  private static final String SEGMENT_NZ_NC = "(" + UNRESERVED + "|" + PCT_ENCODED +
-      "|" + SUB_DELIMS + "|@)+";
+  private static final String SEGMENT_NZ_NC = chars(UNRESERVED + SUB_DELIMS + "@") + "++";
+  /** <pre>*( "/" segment )</pre>. */
+  private static final String SEGMENTS = "(?:/" + SEGMENT + ")*+";
 
   /** <pre>path-abempty = *( "/" segment )</pre>. */
-  private static final String PATH_ABEMPTY = "(?<pathAbempty>(/" + SEGMENT + ")*)";
+  private static final String PATH_ABEMPTY = "(?<pathAbempty>" + SEGMENTS + ")";
   /** <pre>path-absolute = "/" [ segment-nz *( "/" segment ) ]</pre>. */
-  private static final String PATH_ABSOLUTE = "(?<pathAbsolute>/(" + SEGMENT_NZ +
-      "(/" + SEGMENT + ")*)?)";
+  private static final String PATH_ABSOLUTE = "(?<pathAbsolute>/(" + SEGMENT_NZ + SEGMENTS +
+      ")?)";
   /** <pre>path-noscheme = segment-nz-nc *( "/" segment )</pre>. */
-  private static final String PATH_NO_SCHEME = "(?<pathNoScheme>" + SEGMENT_NZ_NC +
-      "(/" + SEGMENT + ")*)";
+  private static final String PATH_NO_SCHEME = "(?<pathNoScheme>" + SEGMENT_NZ_NC + SEGMENTS +
+      ")";
   /** <pre>path-rootless = segment-nz *( "/" segment )</pre>. */
-  private static final String PATH_ROOTLESS = "(?<pathRootless>" + SEGMENT_NZ +
-      "(/" + SEGMENT + ")*)";
+  private static final String PATH_ROOTLESS = "(?<pathRootless>" + SEGMENT_NZ + SEGMENTS + ")";
 
   /** <pre>reg-name = *( unreserved / pct-encoded / sub-delims )</pre>. */
-  private static final String REG_NAME = "(" + UNRESERVED + "|" + PCT_ENCODED + "|" +
-      SUB_DELIMS + ")*";
+  private static final String REG_NAME = chars(UNRESERVED + SUB_DELIMS) + "*+";
 
   /**
    * <pre>
@@ -101,8 +103,8 @@ public final class UriParser {
               + ")";
 
   /** <pre>IPvFuture = "v" 1*HEXDIG "." 1*( unreserved / sub-delims / ":" )</pre>. */
-  private static final String IPV_FUTURE = "v" + HEXDIG + "+\\.(" + UNRESERVED + "|" +
-      SUB_DELIMS + "|:)+";
+  private static final String IPV_FUTURE = "v" + HEXDIG + "++\\.[" + UNRESERVED +
+      SUB_DELIMS + ":]++";
   /** <pre>IP-literal = "[" ( IPv6address / IPvFuture  ) "]"</pre>. */
   private static final String IP_LITERAL = "\\[(" + IPV6_ADDRESS + "|" + IPV_FUTURE + ")\\]";
 
@@ -110,20 +112,20 @@ public final class UriParser {
   private static final String HOST = "(?<host>(" + IP_LITERAL + "|" + IPV4_ADDRESS + "|" +
       REG_NAME + "))";
   /** <pre>port = *DIGIT</pre>. */
-  private static final String PORT = "(?<port>[" + DIGIT + "]*)";
+  private static final String PORT = "(?<port>[" + DIGIT + "]*+)";
   /** <pre>userinfo = *( unreserved / pct-encoded / sub-delims / ":" )</pre>. */
-  private static final String USERINFO = "(?<userinfo>(" + UNRESERVED + "|" + PCT_ENCODED + "|" +
-  SUB_DELIMS + "|:)*)";
+  private static final String USERINFO = "(?<userinfo>" + chars(UNRESERVED + SUB_DELIMS + ":") +
+      "*+)";
   /** <pre>authority = [ userinfo "@" ] host [ ":" port ]</pre>. */
   private static final String AUTHORITY = "(?<authority>(" + USERINFO + "@)?" + HOST +
       "(:" + PORT + ")?)";
   /** <pre>scheme = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )</pre>. */
-  private static final String SCHEME = "(?<scheme>[" + ALPHA + "][" + ALPHA + DIGIT + "+.-]*)";
+  private static final String SCHEME = "(?<scheme>[" + ALPHA + "][" + ALPHA + DIGIT + "+.-]*+)";
 
   /** <pre>query = *( pchar / "/" / "?" )</pre>. */
-  private static final String QUERY = "(?<query>(" + PCHAR + "|/|\\?)*)";
+  private static final String QUERY = "(?<query>" + chars(PCHAR_CHARS + "/?") + "*+)";
   /** <pre>fragment = *( pchar / "/" / "?" )</pre>. */
-  private static final String FRAGMENT = "(?<fragment>(" + PCHAR + "|/|\\?)*)";
+  private static final String FRAGMENT = "(?<fragment>" + chars(PCHAR_CHARS + "/?") + "*+)";
 
   /**
    * <pre>
@@ -176,6 +178,15 @@ public final class UriParser {
 
   /** Private constructor. */
   private UriParser() { }
+
+  /**
+   * Returns a pattern for a single character or a percent-encoded octet.
+   * @param chars characters of the character class
+   * @return pattern
+   */
+  private static String chars(final String chars) {
+    return "(?:[" + chars + "]|" + PCT_ENCODED + ")";
+  }
 
   /**
    * Resolves a URI reference against a base URI (RFC 3986, 5.2). Characters that are invalid in
@@ -252,15 +263,11 @@ public final class UriParser {
    */
   public static ParsedUri parse(final String uri) {
     final Matcher matcher = URI_REF.matcher(uri);
-    try {
-      if(uri.length() <= 2048 && matcher.matches()) {
-        final ParsedUri pu = new ParsedUri();
-        pu.absolute = matcher.group("scheme") != null;
-        pu.valid = true;
-        return pu;
-      }
-    } catch(final StackOverflowError ex) {
-      Util.debug(ex);
+    if(matcher.matches()) {
+      final ParsedUri pu = new ParsedUri();
+      pu.absolute = matcher.group("scheme") != null;
+      pu.valid = true;
+      return pu;
     }
     return ParsedUri.INVALID;
   }
