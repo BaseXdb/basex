@@ -19,8 +19,6 @@ public final class EncoderOutput extends PrintOutput {
   private final IntObjectMap<byte[]> cache = new IntObjectMap<>();
   /** Charset encoder. */
   private final CharsetEncoder encoder;
-  /** Character set. */
-  private final Charset charset;
 
   /**
    * Constructor, given an output stream.
@@ -29,12 +27,11 @@ public final class EncoderOutput extends PrintOutput {
    */
   public EncoderOutput(final OutputStream os, final Charset charset) {
     super(os);
-    this.charset = charset;
     encoder = charset.newEncoder();
   }
 
   @Override
-  public void print(final int cp, final Fallback fallback) throws IOException {
+  public void print(final int cp) throws IOException {
     try {
       byte[] bytes = cache.get(cp);
       if(bytes == null) {
@@ -43,11 +40,7 @@ public final class EncoderOutput extends PrintOutput {
       }
       write(bytes);
     } catch(final CharacterCodingException ex) {
-      if(fallback != null) {
-        fallback.print(cp);
-      } else {
-        throw SERENC_X_X.getIO(Integer.toHexString(cp), charset).cause(ex);
-      }
+      throw SERENC_X_X.getIO(Integer.toHexString(cp), encoder.charset()).cause(ex);
     }
     lineLength = cp == '\n' ? 0 : lineLength + 1;
   }

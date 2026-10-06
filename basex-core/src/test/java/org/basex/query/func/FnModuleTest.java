@@ -4878,6 +4878,13 @@ return
     contains(func.args(" <x/>"), "<x/>");
     contains(func.args(" <x/>", " {}"), "<x/>");
     contains(func.args(" <x>a</x>", " { 'method': 'text' }"), "a");
+    query(func.args(" <x>é€</x>", " { 'encoding': 'ISO-8859-1' }"), "<x>é&#x20AC;</x>");
+    // encoding phase is skipped: characters are escaped, checked, or printed as byte order mark
+    query(func.args(" ['é']", " { 'method': 'json', 'encoding': 'US-ASCII' }"), "[\"\\u00E9\"]");
+    error(func.args(" <x>é</x>", " { 'method': 'text', 'encoding': 'US-ASCII' }"), SERENC_X_X);
+    error(func.args(" <é/>", " { 'encoding': 'US-ASCII' }"), SERENC_X_X);
+    query("string-to-codepoints(" + func.args(" <x/>", " { 'byte-order-mark': true() }") + ")[1]",
+        0xFEFF);
 
     // control characters: rejected by XML 1.0 and HTML below 5.0, escaped in JSON
     final String ctrl = " <x>{ codepoints-to-string(1) }</x>";

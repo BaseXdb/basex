@@ -140,7 +140,7 @@ public final class TextView extends View {
         long size = 0;
         if(nodes != null) {
           ao.setLimit(gui.gopts.get(GUIOptions.MAXTEXT));
-          nodes.serialize(Serializer.get(ao, context.options.get(MainOptions.SERIALIZER)));
+          nodes.serialize(Serializer.unencoded(ao, context.options.get(MainOptions.SERIALIZER)));
           size = nodes.size();
         }
         setText(ao, size, null);

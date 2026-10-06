@@ -286,6 +286,26 @@ public final class WsLifecycleTest extends WsTest {
   }
 
   /**
+   * Text frames are serialized without the encoding phase: the output encoding only
+   * determines which characters are escaped.
+   * @throws Exception exception
+   */
+  @Test public void evalEncoding() throws Exception {
+    register("declare %ws:message('/enc', '{$m}') function m:msg($m) {"
+        + " void(ws:eval('<a>é€</a>', "
+        + "{}, { 'serializer': { 'encoding': 'ISO-8859-1' } })) };");
+
+    final Listener l = new Listener();
+    final java.net.http.WebSocket ws = connect("/enc", l);
+    try {
+      ws.sendText("go", true).get(5, TimeUnit.SECONDS);
+      assertEquals("<a>é&#x20AC;</a>", l.pollText());
+    } finally {
+      close(ws);
+    }
+  }
+
+  /**
    * A larger binary payload survives the byte-buffer round trip unchanged.
    * @throws Exception exception
    */

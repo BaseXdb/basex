@@ -5,7 +5,6 @@ import static org.basex.query.value.type.BasicType.*;
 
 import java.io.*;
 
-import org.basex.io.out.PrintOutput.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
@@ -205,12 +204,10 @@ public class AdaptiveSerializer extends OutputSerializer {
     }
   }
 
-  /** Fallback function. */
-  private final Fallback fallback = this::printHex;
-
   @Override
   protected void printChar(final int cp) throws IOException {
-    out.print(cp, fallback);
+    if(encodable(cp)) out.print(cp);
+    else printHex(cp);
   }
 
   /**

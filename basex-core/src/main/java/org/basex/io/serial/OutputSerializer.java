@@ -24,6 +24,8 @@ public abstract class OutputSerializer extends Serializer {
   protected final SerializerOptions sopts;
   /** Encoding. */
   protected final String encoding;
+  /** Checked output ({@code null} for Unicode encodings, which can represent all characters). */
+  private final CheckedOutput checked;
   /** Item separator. */
   protected byte[] itemsep;
 
@@ -53,15 +55,8 @@ public abstract class OutputSerializer extends Serializer {
       Arrays.fill(indentUnit, ch);
     }
 
-    encoding = Strings.normEncoding(sopts.get(ENCODING), true);
-    PrintOutput po;
-    if(encoding == Strings.UTF8) {
-      po = PrintOutput.get(os);
-    } else {
-      final String error = Strings.checkEncoding(encoding);
-      if(error != null) throw SERENCODING_X.getIO(error);
-      po = new EncoderOutput(os, Charset.forName(encoding));
-    }
+    encoding = encoding(sopts);
+    PrintOutput po = PrintOutput.get(os);
     final int limit = sopts.get(LIMIT);
     if(limit != -1) po.setLimit(limit);
 
@@ -70,18 +65,43 @@ public abstract class OutputSerializer extends Serializer {
     final String newline = le != null ? unescape(LINE_ENDING.name(), le, "\r\n|\r|\n") :
       sopts.get(NEWLINE).newline();
     if(!newline.equals("\n")) po = new NewlineOutput(po, token(newline));
-    out = po;
+
+    // Unicode encodings: print byte order mark; others: check characters before printing
+    final Charset charset = encoding == Strings.UTF8 ? StandardCharsets.UTF_8 :
+      Charset.forName(encoding);
+    if(charset.name().startsWith("UTF-")) {
+      checked = null;
+      out = po;
+      if(sopts.yes(BYTE_ORDER_MARK)) out.print(0xFEFF);
+    } else {
+      checked = new CheckedOutput(po, charset);
+      out = checked;
+    }
 
     final String is = sopts.get(ITEM_SEPARATOR);
     if(is != null) itemsep = token(is);
+  }
 
-    if(sopts.yes(BYTE_ORDER_MARK)) {
-      switch(encoding) {
-        case Strings.UTF8:    out.write(0xEF); out.write(0xBB); out.write(0xBF); break;
-        case Strings.UTF16LE: out.write(0xFF); out.write(0xFE); break;
-        case Strings.UTF16BE: out.write(0xFE); out.write(0xFF); break;
-      }
-    }
+  /**
+   * Returns the normalized output encoding.
+   * @param sopts serializer options
+   * @return encoding
+   * @throws IOException I/O exception
+   */
+  static String encoding(final SerializerOptions sopts) throws IOException {
+    final String encoding = Strings.normEncoding(sopts.get(ENCODING), true);
+    final String error = encoding == Strings.UTF8 ? null : Strings.checkEncoding(encoding);
+    if(error != null) throw SERENCODING_X.getIO(error);
+    return encoding;
+  }
+
+  /**
+   * Checks if a character can be represented in the output encoding.
+   * @param cp codepoint
+   * @return result of check
+   */
+  protected final boolean encodable(final int cp) {
+    return checked == null || checked.encodable(cp);
   }
 
   /**

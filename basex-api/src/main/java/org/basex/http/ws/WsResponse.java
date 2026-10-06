@@ -88,7 +88,7 @@ public final class WsResponse extends WebResponse {
       final boolean json = method == SerialMethod.BASEX && item instanceof XQStruct;
       sopts.set(SerializerOptions.METHOD, json ? SerialMethod.JSON : method);
       // interpret result as binary or string
-      final ArrayOutput ao = item.serialize(sopts);
+      final ArrayOutput ao = item.serializeUnencoded(sopts);
       list.add(item instanceof Bin ? ByteBuffer.wrap(ao.toArray()) : ao.toString());
     }
     return list;

@@ -26,12 +26,12 @@ public final class NewlineOutput extends PrintOutput {
   }
 
   @Override
-  public void print(final int cp, final Fallback fallback) throws IOException {
+  public void print(final int cp) throws IOException {
     if(cp == '\n') {
-      for(final byte b : newline) po.print(b, fallback);
+      for(final byte b : newline) po.print(b);
       lineLength = 0;
     } else {
-      po.print(cp, fallback);
+      po.print(cp);
       ++lineLength;
     }
   }

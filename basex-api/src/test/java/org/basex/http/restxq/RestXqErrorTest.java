@@ -151,6 +151,10 @@ public final class RestXqErrorTest extends RestXqTest {
     register("declare %R:path('') function m:a() { " +
         "web:error(400, { 'code': 42 }, { 'method': 'json' }) };");
     assertEquals("{\"code\":42}", get(400, ""));
+    // the output encoding only determines which characters are escaped
+    register("declare %R:path('') function m:a() { web:error(400, <a>é€</a>, " +
+        "{ 'method': 'xml', 'encoding': 'ISO-8859-1', 'omit-xml-declaration': true() }) };");
+    assertEquals("<a>é&#x20AC;</a>", get(400, ""));
   }
 
   /**

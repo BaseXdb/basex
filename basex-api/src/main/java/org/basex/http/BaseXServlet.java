@@ -136,7 +136,7 @@ public abstract class BaseXServlet extends HttpServlet {
         // render the error value as the response body
         String body;
         try {
-          body = qe.value().serialize(sopts).toString();
+          body = qe.value().serializeUnencoded(sopts).toString();
         } catch(final QueryIOException ex2) {
           Util.debug(ex2);
           body = qe.getLocalizedMessage();

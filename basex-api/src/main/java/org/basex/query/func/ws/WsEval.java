@@ -32,7 +32,7 @@ public final class WsEval extends WsFn {
       try {
         // the outcome of a query is one message; a failed query is reported as error
         final Value value = result.get();
-        final ArrayOutput ao = value.serialize(sopts);
+        final ArrayOutput ao = value.serializeUnencoded(sopts);
         ws.send(value instanceof Bin ? ByteBuffer.wrap(ao.toArray()) : ao.toString());
       } catch(final Exception ex) {
         ws.error(ex);

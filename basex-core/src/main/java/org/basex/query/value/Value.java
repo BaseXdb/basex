@@ -309,9 +309,32 @@ public abstract class Value extends Expr implements Iterable<Item> {
    * @throws QueryIOException query I/O exception
    */
   public final ArrayOutput serialize(final SerializerOptions options) throws QueryIOException {
+    return serialize(options, true);
+  }
+
+  /**
+   * Serializes the value without the encoding phase and returns the cached result.
+   * @param options serialization parameters (can be {@code null})
+   * @return serialized value (characters are UTF-8-encoded)
+   * @throws QueryIOException query I/O exception
+   */
+  public final ArrayOutput serializeUnencoded(final SerializerOptions options)
+      throws QueryIOException {
+    return serialize(options, false);
+  }
+
+  /**
+   * Serializes the value with the specified serialization parameters and returns the cached result.
+   * @param options serialization parameters (can be {@code null})
+   * @param encode perform the encoding phase
+   * @return serialized value
+   * @throws QueryIOException query I/O exception
+   */
+  private ArrayOutput serialize(final SerializerOptions options, final boolean encode)
+      throws QueryIOException {
     final ArrayOutput ao = new ArrayOutput();
     try {
-      serialize(Serializer.get(ao, options));
+      serialize(encode ? Serializer.get(ao, options) : Serializer.unencoded(ao, options));
     } catch(final QueryIOException ex) {
       throw ex;
     } catch(final IOException ex) {

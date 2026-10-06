@@ -5,9 +5,11 @@ import static org.basex.util.Token.*;
 import static org.basex.util.XMLToken.*;
 
 import java.io.*;
+import java.nio.charset.*;
 import java.util.*;
 
 import org.basex.data.*;
+import org.basex.io.out.*;
 import org.basex.io.serial.csv.*;
 import org.basex.io.serial.json.*;
 import org.basex.query.*;
@@ -98,9 +100,43 @@ public abstract class Serializer implements Closeable {
    */
   public static Serializer get(final OutputStream os, final SerializerOptions sopts)
       throws IOException {
+    // encoding phase: characters are encoded by the output stream
+    final SerializerOptions so = options(sopts);
+    final String encoding = OutputSerializer.encoding(so);
+    return create(so, encoding == Strings.UTF8 ? os :
+      new EncoderOutput(os, Charset.forName(encoding)));
+  }
 
-    // choose serializer
-    final SerializerOptions so = sopts == null ? SerializerMode.DEFAULT.get() : sopts.finish();
+  /**
+   * Returns a serializer that skips the encoding phase, for output that becomes a string.
+   * @param out output reference
+   * @param sopts serialization parameters (can be {@code null})
+   * @return serializer
+   * @throws IOException I/O exception
+   */
+  public static Serializer unencoded(final PrintOutput out, final SerializerOptions sopts)
+      throws IOException {
+    return create(options(sopts), out);
+  }
+
+  /**
+   * Returns the finalized serialization parameters.
+   * @param sopts serialization parameters (can be {@code null})
+   * @return serialization parameters
+   */
+  private static SerializerOptions options(final SerializerOptions sopts) {
+    return sopts == null ? SerializerMode.DEFAULT.get() : sopts.finish();
+  }
+
+  /**
+   * Returns a serializer for the chosen output method.
+   * @param so serialization parameters
+   * @param os output stream reference
+   * @return serializer
+   * @throws IOException I/O exception
+   */
+  private static Serializer create(final SerializerOptions so, final OutputStream os)
+      throws IOException {
     return switch(so.get(SerializerOptions.METHOD)) {
       case XHTML    -> new XHTMLSerializer(os, so);
       case HTML     -> new HTMLSerializer(os, so);

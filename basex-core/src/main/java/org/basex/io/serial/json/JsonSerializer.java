@@ -8,7 +8,6 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.build.json.*;
-import org.basex.io.out.PrintOutput.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
@@ -224,8 +223,12 @@ public abstract class JsonSerializer extends StandardSerializer {
     out.print('"');
   }
 
-  /** Fallback function. */
-  private final Fallback fallback = cp -> {
+  /**
+   * Prints a character as escape sequence.
+   * @param cp codepoint
+   * @throws IOException I/O exception
+   */
+  private void printEscaped(final int cp) throws IOException {
     if(Character.isBmpCodePoint(cp)) {
       out.print('\\');
       out.print('u');
@@ -238,11 +241,13 @@ public abstract class JsonSerializer extends StandardSerializer {
       out.print('u');
       out.print(hex(Character.lowSurrogate(cp), 4));
     }
-  };
+  }
 
   @Override
   protected final void print(final int cp) throws IOException {
-    if(escape) {
+    if(!encodable(cp)) {
+      printEscaped(cp);
+    } else if(escape) {
       switch(cp) {
         case '\b' -> {
           out.print('\\');
@@ -277,12 +282,12 @@ public abstract class JsonSerializer extends StandardSerializer {
           out.print('\\');
         }
         default -> {
-          if(cp < 0x20 || !canonical && cp >= 0x7F && cp <= 0x9F) fallback.print(cp);
-          else out.print(cp, fallback);
+          if(cp < 0x20 || !canonical && cp >= 0x7F && cp <= 0x9F) printEscaped(cp);
+          else out.print(cp);
         }
       }
     } else {
-      out.print(cp, fallback);
+      out.print(cp);
     }
   }
 

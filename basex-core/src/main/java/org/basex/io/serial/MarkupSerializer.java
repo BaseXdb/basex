@@ -8,7 +8,6 @@ import static org.basex.util.XMLToken.*;
 import java.io.*;
 import java.util.*;
 
-import org.basex.io.out.PrintOutput.*;
 import org.basex.query.*;
 import org.basex.query.util.ft.*;
 import org.basex.query.util.hash.*;
@@ -172,12 +171,16 @@ abstract class MarkupSerializer extends StandardSerializer {
     out.print(' ');
   }
 
-  /** Fallback function. */
-  private final Fallback fallbackCDATA = cp -> {
+  /**
+   * Prints a character reference within a CDATA section.
+   * @param cp codepoint
+   * @throws IOException I/O exception
+   */
+  private void printCDATAHex(final int cp) throws IOException {
     out.print(CDATA_C);
     printHex(cp);
     out.print(CDATA_O);
-  };
+  }
 
   @Override
   protected void text(final byte[] value, final FTPos ftp) throws IOException {
@@ -204,8 +207,8 @@ abstract class MarkupSerializer extends StandardSerializer {
             }
             c = 0;
           }
-          if(charRef(cp)) fallbackCDATA.print(cp);
-          else out.print(cp, fallbackCDATA);
+          if(charRef(cp) || !encodable(cp)) printCDATAHex(cp);
+          else out.print(cp);
         }
         out.print(CDATA_C);
       }
@@ -302,9 +305,6 @@ abstract class MarkupSerializer extends StandardSerializer {
     super.atomic(item);
   }
 
-  /** Fallback function. */
-  private final Fallback fallback = this::printHex;
-
   @Override
   protected void print(final int cp) throws IOException {
     if(charRef(cp)) {
@@ -317,8 +317,10 @@ abstract class MarkupSerializer extends StandardSerializer {
       out.print(E_GT);
     } else if(cp == '<') {
       out.print(E_LT);
+    } else if(encodable(cp)) {
+      out.print(cp);
     } else {
-      out.print(cp, fallback);
+      printHex(cp);
     }
   }
 
