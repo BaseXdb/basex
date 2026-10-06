@@ -3387,6 +3387,8 @@ return
     query(func.args("b", "^(?!(a))b\\1$"), true);
     query(func.args("ab", "^(?:(a)|b)\\1$"), false);
     query(func.args("aaaba", "^(a)*b\\1$"), true);
+    query(func.args("ki!", "(ki|ke)\\1"), false);
+    query(func.args("keke", "^(ki|ke)\\1$"), true);
 
     // lookbehind assertions: escapes matching supplementary characters
     query(func.args("𝄞b", "(?<=\\p{So})b"), true);

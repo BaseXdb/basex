@@ -105,6 +105,11 @@ public final class Group extends RegExp {
       encl.toRegEx(sb);
       sb.append(')');
       quant.toRegEx(sb);
+    } else if(marker != 0) {
+      // the marker must follow all alternatives of the enclosed expression
+      sb.append("(?:");
+      encl.toRegEx(sb);
+      sb.append(')');
     } else {
       encl.toRegEx(sb);
     }
