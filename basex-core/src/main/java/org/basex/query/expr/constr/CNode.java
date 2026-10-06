@@ -23,6 +23,8 @@ public abstract class CNode extends Arr {
   final boolean computed;
   /** Results will only be serialized: skip copies of enclosed nodes. */
   boolean skipCopy;
+  /** Nested direct constructor (results are adopted by the parent without copying). */
+  boolean nested;
 
   /**
    * Constructor.
@@ -39,6 +41,26 @@ public abstract class CNode extends Arr {
 
   @Override
   public abstract Value value(QueryContext qc) throws QueryException;
+
+  /**
+   * Marks this constructor as nested direct constructor.
+   * @return self reference
+   */
+  public final CNode nested() {
+    nested = true;
+    return this;
+  }
+
+  /**
+   * Assigns the type and the nested flag of this constructor to the specified copy.
+   * @param <T> constructor type
+   * @param copy copied constructor
+   * @return specified copy
+   */
+  final <T extends CNode> T copyNode(final T copy) {
+    copy.nested = nested;
+    return copyType(copy);
+  }
 
   /**
    * Optimizes the node value.
@@ -115,7 +137,8 @@ public abstract class CNode extends Arr {
 
   @Override
   public boolean equals(final Object obj) {
-    return obj instanceof final CNode cnode && computed == cnode.computed && super.equals(obj);
+    return obj instanceof final CNode cnode && computed == cnode.computed &&
+        nested == cnode.nested && super.equals(obj);
   }
 
   @Override

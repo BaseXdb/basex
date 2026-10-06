@@ -1014,6 +1014,21 @@ public final class NamespaceTest extends SandboxTest {
   }
 
   /**
+   * Checks that enclosed direct constructors are copied and inherit namespaces.
+   */
+  @Test public void copyEnclosedDirect() {
+    final String prolog = "declare namespace foo = 'urn:foo';";
+    query(prolog + "in-scope-prefixes(<foo:n><e/></foo:n>/*)", "xml");
+    query(prolog + "in-scope-prefixes(<foo:n>{ <e/> }</foo:n>/*) => sort()", "foo\nxml");
+    query(prolog + "in-scope-prefixes(let $e := <e/> return <foo:n>{ $e }</foo:n>/*) => sort()",
+        "foo\nxml");
+    query(prolog + "in-scope-prefixes(<foo:n>{ document { <e/> } }</foo:n>/*) => sort()",
+        "foo\nxml");
+    query("declare copy-namespaces preserve, no-inherit;" + prolog
+        + "in-scope-prefixes(<foo:n>{ <e/> }</foo:n>/*)", "xml");
+  }
+
+  /**
    * Checks if a query uses the outer default namespace.
    */
   @Test public void defaultNS() {

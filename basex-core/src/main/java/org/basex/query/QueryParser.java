@@ -3346,7 +3346,7 @@ public class QueryParser extends InputParser {
     final int p = pos;
     check('<');
     final Expr expr = consume('!') ? dirComment() : consume('?') ? dirPI() : dirElement(root);
-    if(expr != null) return expr;
+    if(expr != null) return root ? expr : ((CNode) expr).nested();
     pos = p;
     return null;
   }

@@ -159,7 +159,7 @@ public final class CElem extends CName {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
-    return copyType(new CElem(info, computed, name.copy(cc, vm), new Atts(nspaces),
+    return copyNode(new CElem(info, computed, name.copy(cc, vm), new Atts(nspaces),
         new Atts(nsInherited), copyAll(cc, vm, exprs)));
   }
 
@@ -208,7 +208,7 @@ public final class CElem extends CName {
           qs.token('>');
           boolean constr = false;
           for(int f = e; f < el && !constr; f++) {
-            constr = exprs[f] instanceof final CNode cnode ? cnode.computed :
+            constr = exprs[f] instanceof final CNode cnode ? !cnode.nested :
               !(exprs[f] instanceof Str);
           }
           if(constr) {

@@ -45,7 +45,7 @@ public final class Constr {
   private boolean more;
   /** Skip copies of enclosed nodes. */
   private final boolean skipCopy;
-  /** Current expression is a direct constructor. */
+  /** Current expression is a nested direct constructor. */
   private boolean direct;
 
   /**
@@ -76,7 +76,7 @@ public final class Constr {
       final QNmSet qnames = new QNmSet();
       for(final Expr expr : exprs) {
         more = false;
-        direct = expr instanceof final CNode cnode && !cnode.computed;
+        direct = expr instanceof final CNode cnode && cnode.nested;
         final Iter iter = expr.iter(qc);
         // atomic items are separated by spaces: reject texts that exceed the maximum size
         final long is = iter.size();

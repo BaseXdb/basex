@@ -62,7 +62,7 @@ public final class CPI extends CName {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
-    return copyType(new CPI(info, computed, name.copy(cc, vm), exprs[0].copy(cc, vm)));
+    return copyNode(new CPI(info, computed, name.copy(cc, vm), exprs[0].copy(cc, vm)));
   }
 
   @Override
