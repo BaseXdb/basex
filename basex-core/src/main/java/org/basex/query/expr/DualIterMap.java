@@ -26,6 +26,7 @@ public final class DualIterMap extends SimpleMap {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
+    if(eager()) return value(qc).iter();
     return new Iter() {
       final Expr expr1 = exprs[0], expr2 = exprs[1];
       final Iter iter1 = expr1.iter(qc);
@@ -64,6 +65,17 @@ public final class DualIterMap extends SimpleMap {
   public Value value(final QueryContext qc) throws QueryException {
     final QueryFocus qf = qc.focus;
     final Value qv = qf.value;
+    // single context item: return the value of the right operand
+    if(exprs[0].seqType().zeroOrOne()) {
+      final Item item = exprs[0].item(qc, info);
+      if(item.isEmpty()) return item;
+      qf.value = item;
+      try {
+        return exprs[1].value(qc);
+      } finally {
+        qf.value = qv;
+      }
+    }
     final ValueBuilder vb = new ValueBuilder(qc, size());
     final Iter iter1 = exprs[0].iter(qc);
     for(Item item1; (item1 = qc.next(iter1)) != null;) {
@@ -81,6 +93,11 @@ public final class DualIterMap extends SimpleMap {
       }
     }
     return vb.value(this);
+  }
+
+  @Override
+  public boolean eager() {
+    return exprs[0].seqType().zeroOrOne() && exprs[1].eager();
   }
 
   @Override

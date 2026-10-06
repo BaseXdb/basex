@@ -209,4 +209,14 @@ public final class SimpleMapTest extends SandboxTest {
     check("(if(" + cond + ") then " + seq + " else 0) ! (. * 2)", "4\n6",
         root(SimpleMap.class));
   }
+
+  /** Single context item: the value of the right operand is accessed directly. */
+  @Test public void singleItem() {
+    final String query = "let $n := <_>10</_> let $r := " +
+        "({ 'a': (1 to $n) ! (. * 2) }, { 'a': (1 to $n) ! (. * 3) }) for $c in 1 to 3 return ";
+    final String plan = exists(DualIterMap.class);
+    check(query + "$r[$c]?a[5]", "10\n15", plan);
+    check(query + "count($r[$c]?a)", "10\n10\n0", plan);
+    check(query + FOOT.args(" $r[$c]?a"), "20\n30", plan);
+  }
 }
