@@ -2,6 +2,7 @@ package org.basex.query.value.map;
 
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -39,10 +40,11 @@ final class TrieOrder {
 
   /**
    * Returns all keys.
+   * @param type key type
    * @return keys
    */
-  Value keys() {
-    return resolved().keys();
+  Value keys(final Type type) {
+    return resolved().keys(type);
   }
 
   /**

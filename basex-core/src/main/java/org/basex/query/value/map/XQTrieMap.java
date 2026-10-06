@@ -39,7 +39,8 @@ public final class XQTrieMap extends XQMap {
 
   @Override
   public Value keys() {
-    return order != null ? order.keys() : structSize() == 1 ? ((TrieLeaf) root).key : Empty.VALUE;
+    return order != null ? order.keys(((MapType) type).keyType()) :
+      structSize() == 1 ? ((TrieLeaf) root).key : Empty.VALUE;
   }
 
   @Override

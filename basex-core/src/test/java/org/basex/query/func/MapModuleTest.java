@@ -304,6 +304,13 @@ public final class MapModuleTest extends SandboxTest {
         _MAP_ENTRY.args(" $i", " $i + 1")) +
         "for $k in " + func.args(" $map") + " order by $k return " +
         _MAP_GET.args(" $map", " $k"), "2\n3\n4");
+
+    // keys of maps built with map:put are typed
+    final String map = "fold-left(1 to 5, {}, fn($m, $i) { " +
+        _MAP_PUT.args(" $m", " $i", true) + " })";
+    query(_INSPECT_TYPE.args(" " + func.args(" " + map)), "xs:integer+");
+    query(_INSPECT_TYPE.args(" " + func.args(" " + _MAP_PUT.args(" " + map, "a", 1))),
+        "xs:anyAtomicType+");
   }
 
   /** Test method. */

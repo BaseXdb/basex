@@ -7,6 +7,7 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -70,10 +71,11 @@ final class TrieKeys implements Iterable<Item> {
 
   /**
    * Returns all keys.
+   * @param type key type
    * @return keys
    */
-  Value keys() {
-    return ItemSeq.get(keys, size, null);
+  Value keys(final Type type) {
+    return ItemSeq.get(keys, size, type);
   }
 
   /**
