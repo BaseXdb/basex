@@ -83,7 +83,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
         for(int p = 0; p < pl; p++) {
           final Var param = params[p];
           final SeqType cst = callTypes[p], pst = param.seqType();
-          if(!cst.eq(pst) && cst.instanceOf(pst, true)) {
+          if(!cst.eq(pst) && cst.instanceOf(pst, true) && !wraps(pst) && !wraps(cst)) {
             param.declType = cst;
             refined = true;
           }
@@ -113,12 +113,24 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       if(callTypes != null) {
         for(int p = 0; p < pl; p++) {
           final Var param = params[p];
-          if(callTypes[p].instanceOf(param.seqType(), true)) param.declType = null;
+          final SeqType pst = param.seqType();
+          if(callTypes[p].instanceOf(pst, true) && !wraps(pst)) param.declType = null;
         }
       }
       if(!cc.dynamic) declType = null;
     }
     return null;
+  }
+
+  /**
+   * Checks if coercion to the specified type may wrap function items.
+   * @param st parameter type
+   * @return result of check
+   */
+  private static boolean wraps(final SeqType st) {
+    final Type type = TypeRef.deref(st.type);
+    return (type instanceof FType || type instanceof ChoiceItemType) &&
+      !type.eq(Types.FUNCTION) && !type.eq(Types.MAP) && !type.eq(Types.ARRAY);
   }
 
   /**

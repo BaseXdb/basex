@@ -608,4 +608,17 @@ public final class FuncItemTest extends SandboxTest {
         + " $a, if($n > 0) { m:f((), $n - 1) } };\" })"
         + "?functions(QName('m', 'f'))?2('x', 1)", "x");
   }
+
+  /** Dynamic calls: parameter types of a supertype must not be applied to the arguments. */
+  @Test public void dynCallParamTypes() {
+    final String funcs = "declare function local:many($ts as item()*) { count($ts) };"
+        + "declare function local:one($t as item()) { $t };"
+        + "declare function local:dbl($d as xs:double) { $d instance of xs:double };"
+        + "declare function local:any($d) { $d instance of xs:double };";
+    query(funcs + "(local:many#1, local:one#1)[xs:integer(<_>1</_>)]((1, 2))", 2);
+    query(funcs + "for $i in 1 to 2 return (local:dbl#1, local:any#1)[$i](1)", "true\nfalse");
+    query(funcs + "declare function local:apply($f, $x) { $f($x) };"
+        + "local:apply(local:many#1, (1, 2)), local:apply(local:one#1, 3)", "2\n3");
+    error(funcs + "(local:one#1, local:many#1)[xs:integer(<_>1</_>)]((1, 2))", INVTYPE_X);
+  }
 }
