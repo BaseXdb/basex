@@ -1,0 +1,49 @@
+package org.basex.query.func.fn;
+
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.func.*;
+import org.basex.query.iter.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
+
+/**
+ * Function implementation.
+ *
+ * @author BaseX Team, BSD License
+ * @author Christian Gruen
+ */
+public final class FnDropWhile extends StandardFunc {
+  @Override
+  public Iter iter(final QueryContext qc) throws QueryException {
+    final Iter input = arg(0).iter(qc);
+    final FItem predicate = toFunction(arg(1), 2, qc);
+
+    return new Iter() {
+      HofArgs args = new HofArgs(2, predicate);
+
+      @Override
+      public Item next() throws QueryException {
+        while(args != null) {
+          final Item item = qc.next(input);
+          if(item == null || !test(predicate, args.set(0, item).inc(), qc)) {
+            args = null;
+            return item;
+          }
+        }
+        return qc.next(input);
+      }
+    };
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    final Expr input = arg(0);
+    final SeqType st = input.seqType();
+    if(st.zero()) return input;
+
+    arg(1, arg -> arg.refineFunc(cc, st.with(Occ.EXACTLY_ONE), Types.INTEGER_O));
+    exprType.assign(st.union(Occ.ZERO)).data(input);
+    return this;
+  }
+}

@@ -232,6 +232,9 @@ public enum Function implements AFunction {
       params(ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, INTEGER_O).seqType(), PREDICATE_ZM),
       ITEM_ZM),
   /** XQuery function. */
+  DROP_WHILE(FnDropWhile::new, "drop-while(input, predicate)",
+      params(ITEM_ZM, PREDICATE_O), ITEM_ZM),
+  /** XQuery function. */
   DUPLICATE_VALUES(FnDuplicateValues::new, "duplicate-values(values, collation?)",
       params(ANY_ATOMIC_TYPE_ZM, STRING_ZO), ANY_ATOMIC_TYPE_ZM),
   /** XQuery function. */

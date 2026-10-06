@@ -1462,6 +1462,26 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void dropWhile() {
+    final Function func = DROP_WHILE;
+
+    query(func.args(" 1 to 6", " fn($x) { $x < 4 }"), "4\n5\n6");
+    query(func.args(" (1, 5, 2, 6)", " fn($x) { $x < 4 }"), "5\n2\n6");
+    query(func.args(" 1 to 6", " fn($x, $p) { $p <= 2 }"), "3\n4\n5\n6");
+    query(func.args(" 1 to 6", " true#0"), "");
+    query(func.args(" 1 to 6", " false#0"), "1\n2\n3\n4\n5\n6");
+    query(func.args(" <x><a/><a/><c/><a/></x>/*", " fn($n) { boolean($n/self::a) }"),
+        "<c/>\n<a/>");
+    query(func.args(" ()", " fn($x) { error() }"), "");
+    query(func.args(" (1, 2)", " fn($x) { () }"), "1\n2");
+
+    // lazy evaluation
+    query("head(" + func.args(" 1 to 1000000000", " fn($x) { $x < 3 }") + ")", 3);
+
+    error(func.args(" 1 to 6", " fn($x) { $x }"), INVTYPE_X);
+  }
+
+  /** Test method. */
   @Test public void duplicateValues() {
     final Function func = DUPLICATE_VALUES;
 
