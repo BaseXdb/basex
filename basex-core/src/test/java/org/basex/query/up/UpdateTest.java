@@ -1427,4 +1427,12 @@ public final class UpdateTest extends SandboxTest {
     query("<x>{ 'a' }</x> update { replace value of node . with '' }", "<x/>");
     query("<x>{ 'a' }</x> update { replace value of node . with 'A' }", "<x>A</x>");
   }
+
+  /** Copy namespace nodes. */
+  @Test public void copyNamespace() {
+    query("copy $c := namespace p { 'u' } modify () return string($c)", "u");
+    query("(namespace p { 'u' } update { }) ! name()", "p");
+    query("let $n := namespace p { 'u' } return copy $c := $n modify () return $c is $n", false);
+    error("copy $c := namespace p { 'u' } modify rename node $c as 'q' return $c", UPWRTRGTYP_X);
+  }
 }

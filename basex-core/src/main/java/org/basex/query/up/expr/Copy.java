@@ -49,7 +49,8 @@ abstract class Copy extends Arr {
    * @return copy
    * @throws QueryException query exception
    */
-  final DBNode copy(final XNode node, final QueryContext qc) throws QueryException {
+  final XNode copy(final XNode node, final QueryContext qc) throws QueryException {
+    if(node.kind() == Kind.NAMESPACE) return new FNSpace(node.name(), node.string());
     final StaticContext sc = info != null ? info.sc() : null;
     if(sc == null || sc.preserveNS) return node.copy(qc);
     final MemData data = new MemData(qc.context.sharedMeta());

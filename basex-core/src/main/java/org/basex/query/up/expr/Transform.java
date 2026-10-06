@@ -88,7 +88,7 @@ public final class Transform extends Copy {
         item = copy((XNode) item, qc);
         // add resulting node to variable
         qc.set(copy.var, item);
-        updates.addData(item.data());
+        if(item.data() != null) updates.addData(item.data());
       }
 
       if(!arg(update()).value(qc).isEmpty()) throw UPMODIFY.get(info);
