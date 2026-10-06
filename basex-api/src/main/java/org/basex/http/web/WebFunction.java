@@ -73,7 +73,32 @@ public abstract class WebFunction implements Comparable<WebFunction> {
    * @param ext error extension
    * @return exception
    */
-  protected abstract QueryException error(String msg, Object... ext);
+  public final QueryException error(final String msg, final Object... ext) {
+    return error(function.info, msg, ext);
+  }
+
+  /**
+   * Creates an exception with the specified input info and message.
+   * @param info input info
+   * @param msg message
+   * @param ext error extension
+   * @return exception
+   */
+  protected abstract QueryException error(InputInfo info, String msg, Object... ext);
+
+  /**
+   * Assigns the serialization parameter of an {@code %output} annotation.
+   * @param ann annotation
+   * @throws QueryException query exception
+   */
+  protected final void output(final Ann ann) throws QueryException {
+    final QNm name = ann.definition.name;
+    try {
+      sopts.assign(Token.string(name.local()), toString(ann.value().itemAt(0)));
+    } catch(final BaseXException ex) {
+      throw error(ann.info, UNKNOWN_PARAMETER_X, ex);
+    }
+  }
 
   /**
    * Checks the specified template and adds a variable.

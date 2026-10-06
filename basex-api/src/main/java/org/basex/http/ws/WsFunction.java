@@ -60,7 +60,10 @@ public final class WsFunction extends WebFunction {
 
     for(final Ann ann : function.anns) {
       final Annotation def = ann.definition;
-      if(def == null || !eq(def.name.uri(), QueryText.WS_URI)) continue;
+      if(def == null) continue;
+      // serialization parameters for the results of connect and message functions
+      if(eq(def.name.uri(), QueryText.OUTPUT_URI)) output(ann);
+      if(!eq(def.name.uri(), QueryText.WS_URI)) continue;
 
       found = true;
       final Value value = ann.value();
@@ -134,15 +137,9 @@ public final class WsFunction extends WebFunction {
     return func instanceof final WsFunction ws ? path.compareTo(ws.path) : 1;
   }
 
-  /**
-   * Creates an exception with the specified message.
-   * @param msg message
-   * @param ext error extension
-   * @return exception
-   */
   @Override
-  public QueryException error(final String msg, final Object... ext) {
-    return error(function.info, msg, ext);
+  protected QueryException error(final InputInfo info, final String msg, final Object... ext) {
+    return BASEX_WS_X.get(info, Util.info(msg, ext));
   }
 
   // PRIVATE METHODS ==============================================================================
@@ -178,16 +175,5 @@ public final class WsFunction extends WebFunction {
     }
     for(final QNm name : pth.varNames()) checkVariable(name, declared);
     return pth;
-  }
-
-  /**
-   * Creates an exception with the specific message.
-   * @param info input info (can be {@code null})
-   * @param msg error message
-   * @param ext error extension
-   * @return exception
-   */
-  private static QueryException error(final InputInfo info, final String msg, final Object... ext) {
-    return BASEX_WS_X.get(info, Util.info(msg, ext));
   }
 }

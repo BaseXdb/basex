@@ -286,6 +286,24 @@ public final class WsLifecycleTest extends WsTest {
   }
 
   /**
+   * Serialization parameters of a message function are applied to its results.
+   * @throws Exception exception
+   */
+  @Test public void messageOutput() throws Exception {
+    register("declare %ws:message('/out', '{$m}') %output:encoding('ISO-8859-1') "
+        + "%output:method('xml') function m:msg($m) { <a>é€</a> };");
+
+    final Listener l = new Listener();
+    final java.net.http.WebSocket ws = connect("/out", l);
+    try {
+      ws.sendText("go", true).get(5, TimeUnit.SECONDS);
+      assertEquals("<a>é&#x20AC;</a>", l.pollText());
+    } finally {
+      close(ws);
+    }
+  }
+
+  /**
    * Text frames are serialized without the encoding phase: the output encoding only
    * determines which characters are escaped.
    * @throws Exception exception

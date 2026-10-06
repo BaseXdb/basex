@@ -172,13 +172,7 @@ public final class RestXqFunction extends WebFunction {
         final Item body = value.isEmpty() ? null : value.itemAt(0);
         addMethod(string(def.name.local()), body, declared, ann.info);
       } else if(eq(def.name.uri(), QueryText.OUTPUT_URI)) {
-        // serialization parameters
-        final String name = string(def.name.local()), val = toString(value.itemAt(0));
-        try {
-          sopts.assign(name, val);
-        } catch(final BaseXException ex) {
-          throw error(ann.info, UNKNOWN_PARAMETER_X, ex);
-        }
+        output(ann);
       } else if(def == _PERM_ALLOW) {
         for(final Item arg : value) allows.add(toString(arg));
       } else if(def == _PERM_CHECK) {
@@ -385,11 +379,6 @@ public final class RestXqFunction extends WebFunction {
   }
 
   @Override
-  public QueryException error(final String msg, final Object... ext) {
-    return error(function.info, msg, ext);
-  }
-
-  @Override
   protected QueryException bindError(final String input, final SeqType st, final Value value) {
     return badRequest(value.isEmpty() ? Util.info(ARG_MISSING_X_X, input, st) :
       Util.info(ARG_TYPE_X_X_X, input, st, value));
@@ -406,14 +395,8 @@ public final class RestXqFunction extends WebFunction {
     return new QueryException(function.info, qname, message);
   }
 
-  /**
-   * Creates an exception with the specified message.
-   * @param info input info (can be {@code null})
-   * @param msg error message
-   * @param ext error extension
-   * @return query exception
-   */
-  static QueryException error(final InputInfo info, final String msg, final Object... ext) {
+  @Override
+  protected QueryException error(final InputInfo info, final String msg, final Object... ext) {
     return BASEX_RESTXQ_X.get(info, Util.info(msg, ext));
   }
 
