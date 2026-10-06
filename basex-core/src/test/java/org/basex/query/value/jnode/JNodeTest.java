@@ -539,8 +539,9 @@ public final class JNodeTest extends SandboxTest {
     query("declare context item := [ [ 1, 2 ] ]; //jnode(*, xs:integer) => count()", 2);
 
     // type error if the context item is neither node, map, nor array
-    error("declare context item := 123; /a", NODOC_X);
-    error("declare context item := 123; //a", NODOC_X);
+    error("declare context item := 123; /a", PATHNODE_X_X_X);
+    error("declare context item := 123; //a", PATHNODE_X_X_X);
+    error("declare context item := <a/>; /a", NODOC_X);
   }
 
   /** Nested path expressions: only navigational steps navigate, others select by key. */

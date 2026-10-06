@@ -34,9 +34,7 @@ public final class UtilRoot extends StandardFunc {
 
     final GNodeBuilder list = new GNodeBuilder();
     for(final Item item : nodes) {
-      final GNode root = root(item);
-      if(root == null) throw NODOC_X.get(info, nodes);
-      list.add(root);
+      list.add(root(item));
     }
     return list.value(this);
   }
@@ -62,18 +60,19 @@ public final class UtilRoot extends StandardFunc {
   }
 
   /**
-   * Returns the root of the specified node.
-   * @param item node item
-   * @return root or {@code null}
+   * Returns the root of the specified item.
+   * @param item item
+   * @return root
+   * @throws QueryException query exception
    */
-  private GNode root(final Item item) {
+  private GNode root(final Item item) throws QueryException {
     if(item instanceof final GNode gnode) {
       final GNode root = gnode.root();
       if(root.kind().oneOf(Kind.DOCUMENT, Kind.JNODE)) return root;
-    } else if(item instanceof XQStruct) {
-      return new JNode(item);
+      throw NODOC_X.get(info, item);
     }
-    return null;
+    if(item instanceof XQStruct) return new JNode(item);
+    throw PATHNODE_X_X_X.get(info, "/", item.seqType(), item);
   }
 
   /**
