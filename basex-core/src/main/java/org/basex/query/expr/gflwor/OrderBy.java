@@ -115,9 +115,7 @@ public final class OrderBy extends Clause {
               final int kl = keys.length;
               for(int k = 0; k < kl; k++) {
                 final OrderKey key = keys[k];
-                Item m = a[k], n = b[k];
-                if(m == Dbl.NAN || m == Flt.NAN) m = Empty.VALUE;
-                if(n == Dbl.NAN || n == Flt.NAN) n = Empty.VALUE;
+                final Item m = a[k], n = b[k];
                 if(m != Empty.VALUE && n != Empty.VALUE && !m.comparable(n))
                   throw typeError(n, m.type, key.info());
 
