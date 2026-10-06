@@ -19,6 +19,7 @@ import org.basex.query.expr.path.NameTest.*;
 import org.basex.query.func.Function;
 import org.basex.query.func.fn.*;
 import org.basex.query.func.util.*;
+import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.index.*;
 import org.basex.query.util.list.*;
@@ -207,8 +208,14 @@ public abstract class Path extends ParseExpr {
     if(expr != this) return expr;
 
     // choose the best path implementation (dummy will be used for type checking)
-    final Expr path = copyType(get(info, root == null && rt instanceof Dummy ? rt : root, steps));
-    if(path instanceof final AxisPath ap) ap.optimize();
+    final Expr input = root == null && rt instanceof Dummy ? rt : root;
+    final Expr path = copyType(get(info, input, steps));
+    if(path instanceof final AxisPath ap) {
+      ap.optimize();
+    } else if(path instanceof final MixedPath mp) {
+      // a/(if (@x) then * else .): not checked when parsed, as steps may be incomplete
+      mp.iterative = iterative(input, mp.steps);
+    }
     return path;
   }
 
@@ -542,12 +549,13 @@ public abstract class Path extends ParseExpr {
     final Data data = root.data();
     ArrayList<PathNode> nodes = rootNodes(root, data, false);
 
-    for(final Expr expr : steps) {
-      final Step step = (Step) expr;
-      if(nodes != null) nodes = step.nodes(nodes, false);
+    for(final Expr step : steps) {
+      final Axis axis = axis(step);
+      if(axis == null) return false;
+      if(nodes != null) nodes = step instanceof final Step stp ? stp.nodes(nodes, false) : null;
       // results on the same level are non-overlapping and in document order
       final boolean level = nodes != null && sameLevel(nodes);
-      switch(step.axis) {
+      switch(axis) {
         case ATTRIBUTE, SELF -> {
           // nothing changes
         }
@@ -586,6 +594,74 @@ public abstract class Path extends ParseExpr {
       }
     }
     return true;
+  }
+
+  /**
+   * Returns an iterator that evaluates the steps lazily.
+   * @param qc query context
+   * @return iterator
+   */
+  final Iter lazyIter(final QueryContext qc) {
+    return new Iter() {
+      final int offset = root != null ? 1 : 0;
+      final int sz = steps.length - 1 + offset;
+      final Iter[] iter = new Iter[sz + 1];
+      int pos;
+
+      @Override
+      public Item next() throws QueryException {
+        if(iter[0] == null) iter[0] = (root != null ? root : steps[0]).iter(qc);
+
+        final QueryFocus qf = qc.focus;
+        final Value qv = qf.value;
+        try {
+          while(true) {
+            final Item item = qc.next(iter[pos]);
+            if(item == null) {
+              if(--pos == -1) return null;
+            } else if(pos < sz) {
+              qf.value = item;
+              pos++;
+              iter[pos] = steps[pos - offset].iter(qc);
+            } else {
+              return item;
+            }
+          }
+        } finally {
+          qf.value = qv;
+        }
+      }
+    };
+  }
+
+  /**
+   * Returns the axis of a step, or the combined axis of a conditional step whose branches are
+   * self, child and attribute steps.
+   * @param step step
+   * @return axis or {@code null}
+   */
+  private static Axis axis(final Expr step) {
+    if(step instanceof final Step stp) return stp.axis;
+    final Expr[] branches = switch(step) {
+      case final If iff -> iff.exprs;
+      case final Otherwise otherwise -> otherwise.exprs;
+      case final Switch swtch -> swtch.branches();
+      case final Typeswitch typeswitch -> typeswitch.branches();
+      default -> null;
+    };
+    if(branches == null || step.has(Flag.POS)) return null;
+
+    // examples: (if (@x) then * else .), (@x otherwise @y), (switch (@t) case 'a' return * ...)
+    Axis axis = SELF;
+    for(final Expr branch : branches) {
+      if(branch == Empty.VALUE || branch instanceof ContextValue) continue;
+      final Expr br = branch instanceof final Path path && path.root == null &&
+        path.steps.length == 1 ? path.steps[0] : branch;
+      final Axis ax = axis(br);
+      if(ax == null || !ax.oneOf(SELF, CHILD, ATTRIBUTE)) return null;
+      if(ax != SELF) axis = axis == SELF || axis == ax ? ax : CHILD;
+    }
+    return axis;
   }
 
   /**
@@ -1287,7 +1363,7 @@ public abstract class Path extends ParseExpr {
   }
 
   @Override
-  public final void toXml(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this), root, steps);
   }
 

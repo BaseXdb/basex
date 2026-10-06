@@ -932,4 +932,35 @@ public final class PathTest extends SandboxTest {
     check("<a/>/*[1]/*[1]", "", type(IterPath.class, "element()?"));
     check("(1 to 10000000) ! tail(<a/>/*[1])", "", empty());
   }
+
+  /** Conditional steps with self, child and attribute branches. */
+  @Test public void conditionalSteps() {
+    final String iterative = "exists(//MixedPath[@iterative = 'true'])";
+    final String cached = "empty(//MixedPath[@iterative = 'true'])";
+    check("<a><b x=''><c/><d/></b><b/></a>/b/(if (@x) then * else .) ! name()", "c\nd\nb",
+        iterative);
+    check("<a><b x='1'/><b y='2'/></a>/b/(if (@x) then @x else @y) ! string()", "1\n2",
+        iterative);
+    check("jtree({ 'A': [ { 'B': 1 }, { 'B': 2 } ], 'C': { 'B': 3 } })/*"
+        + "/(if (self::jnode(*, array(*))) then * else .)/B ! jvalue()", "1\n2\n3", iterative);
+    check("head(<a>{ (1 to 100000) ! <b/> }</a>/(if (b) then b else .)) ! name()", "b",
+        iterative);
+    check("<a><b t='x'><c/></b><b t='y' z=''/><b/></a>/b/(switch (@t) case 'x' return * "
+        + "case 'y' return @z default return .) ! name()", "c\nz\nb", iterative);
+    check("<a><b><c/></b><d z=''/><e/></a>/*/(typeswitch (.) case element(b) return * "
+        + "case element(d) return @z default return .) ! name()", "c\nz\ne", iterative);
+
+    // results must be sorted: nested contexts, parent axis, multiple steps
+    check("<x><a n='1'><a n='2'><b n='3'/></a><b n='4'/></a></x>//a/(if (*) then * else .)"
+        + " ! string(@n)", "2\n3\n4", cached);
+    check("<a><b/><b/></a>/b/(if (@x) then .. else .) ! name()", "b\nb", cached);
+    check("<a><c/><b/></a>/(if (*) then (b, c) else .) ! name()", "c\nb", cached);
+    check("<a><b x='1'/><b><c y='2'/></b></a>/b/(if (@x) then @x else c/@y) ! string()",
+        "1\n2", cached);
+    check("<a><b><c/></b><d/></a>/*/(typeswitch (.) case $b as element(b) return $b/* "
+        + "case element(d) return @z default return .) ! name()", "c", cached);
+    // positional access
+    check("<a><b n='1'/><b n='2'/></a>/b/(if (position() = 1) then . else ()) ! string(@n)",
+        "1", cached);
+  }
 }

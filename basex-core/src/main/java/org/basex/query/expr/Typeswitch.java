@@ -46,13 +46,21 @@ public final class Typeswitch extends ParseExpr {
     return true;
   }
 
+  /**
+   * Returns the return expressions of all groups.
+   * @return expressions
+   */
+  public Expr[] branches() {
+    final int gl = groups.length;
+    final Expr[] branches = new Expr[gl];
+    for(int g = 0; g < gl; g++) branches[g] = groups[g].expr;
+    return branches;
+  }
+
   @Override
   public void checkUp() throws QueryException {
     checkNoUp(cond);
-    final int gl = groups.length;
-    final Expr[] tmp = new Expr[gl];
-    for(int g = 0; g < gl; g++) tmp[g] = groups[g].expr;
-    checkAllUp(tmp);
+    checkAllUp(branches());
   }
 
   @Override

@@ -51,14 +51,23 @@ public final class Switch extends ParseExpr {
     return true;
   }
 
+  /**
+   * Returns the return expressions of all groups.
+   * @return expressions
+   */
+  public Expr[] branches() {
+    final int gl = groups.length;
+    final Expr[] branches = new Expr[gl];
+    for(int g = 0; g < gl; g++) branches[g] = groups[g].rtrn();
+    return branches;
+  }
+
   @Override
   public void checkUp() throws QueryException {
     checkNoUp(cond);
     for(final SwitchGroup group : groups) group.checkUp();
     // check if none or all return expressions are updating
-    final ExprList rtrns = new ExprList(groups.length);
-    for(final SwitchGroup group : groups) rtrns.add(group.rtrn());
-    checkAllUp(rtrns.finish());
+    checkAllUp(branches());
   }
 
   @Override

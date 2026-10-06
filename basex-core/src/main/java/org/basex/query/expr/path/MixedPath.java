@@ -22,6 +22,9 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class MixedPath extends Path {
+  /** Indicates if the results are in distinct document order without sorting. */
+  boolean iterative;
+
   /**
    * Constructor.
    * @param info input info (can be {@code null})
@@ -34,6 +37,16 @@ public final class MixedPath extends Path {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
+    return iterative ? lazyIter(qc) : cached(qc);
+  }
+
+  /**
+   * Returns an iterator for the cached results of each step.
+   * @param qc query context
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  private Iter cached(final QueryContext qc) throws QueryException {
     final Value rt = root != null ? root.value(qc) : ctxValue(qc);
     Iter iter = rt.iter(qc);
     long size = iter.size();
@@ -94,8 +107,15 @@ public final class MixedPath extends Path {
   }
 
   @Override
+  public void toXml(final QueryPlan plan) {
+    plan.add(plan.create(this, QueryText.ITERATIVE, iterative), root, steps);
+  }
+
+  @Override
   public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
-    return copyType(new MixedPath(info, root == null ? null : root.copy(cc, vm),
-        Arr.copyAll(cc, vm, steps)));
+    final MixedPath mp = new MixedPath(info, root == null ? null : root.copy(cc, vm),
+        Arr.copyAll(cc, vm, steps));
+    mp.iterative = iterative;
+    return copyType(mp);
   }
 }

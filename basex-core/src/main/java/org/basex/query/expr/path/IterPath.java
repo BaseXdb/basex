@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -28,36 +27,7 @@ public final class IterPath extends AxisPath {
 
   @Override
   protected Iter iterator(final QueryContext qc) {
-    return new Iter() {
-      final int offset = root != null ? 1 : 0;
-      final int sz = steps.length - 1 + offset;
-      final Iter[] iter = new Iter[sz + 1];
-      int pos;
-
-      @Override
-      public Item next() throws QueryException {
-        if(iter[0] == null) iter[0] = (root != null ? root : steps[0]).iter(qc);
-
-        final QueryFocus qf = qc.focus;
-        final Value qv = qf.value;
-        try {
-          while(true) {
-            final Item item = qc.next(iter[pos]);
-            if(item == null) {
-              if(--pos == -1) return null;
-            } else if(pos < sz) {
-              qf.value = item;
-              pos++;
-              iter[pos] = steps[pos - offset].iter(qc);
-            } else {
-              return item;
-            }
-          }
-        } finally {
-          qf.value = qv;
-        }
-      }
-    };
+    return lazyIter(qc);
   }
 
   @Override
