@@ -157,11 +157,9 @@ public final class SeqType {
     if(size == 0) return true;
 
     // try shortcut (type of value may be specific enough)
-    if(coerce && dt instanceof FType || dt instanceof ChoiceItemType) {
-      if(eq(value.seqType())) return true;
-    } else if(value.type.instanceOf(dt)) {
-      return true;
-    }
+    final Type vt = TypeRef.deref(value.type);
+    if(dt instanceof ChoiceItemType ? vt.eq(dt) :
+      coerce && dt instanceof FType ? unchanged(vt, dt) : vt.instanceOf(dt)) return true;
     // check single item
     if(size == 1) return instance((Item) value, coerce);
     // check each item
@@ -169,6 +167,20 @@ public final class SeqType {
       if(!instance(item, coerce)) return false;
     }
     return true;
+  }
+
+  /**
+   * Checks if items of the specified type are instances of the target type that are not
+   * changed by coercion.
+   * @param type type of the items
+   * @param target target type
+   * @return result of check
+   */
+  private static boolean unchanged(final Type type, final Type target) {
+    // function coercion and record coercion may create new items
+    return type.eq(target) || (target instanceof ArrayType ||
+      target instanceof MapType && !(target instanceof ShapeType)) &&
+      type.seqType().instanceOf(target.seqType(), true);
   }
 
   /**
@@ -384,8 +396,11 @@ public final class SeqType {
     final Type dt = TypeRef.deref(this.type);
     // instance check
     final SeqType[] at = dt instanceof final FuncType ft ? ft.argTypes : null;
-    if((at == null || Checks.all(at, st -> st.eq(Types.ITEM_ZM))) &&
-        instance(value, true)) return value;
+    if((at == null || Checks.all(at, st -> st.eq(Types.ITEM_ZM))) && instance(value, true)) {
+      // remember the type of a sequence whose items are left unchanged by coercion
+      if(dt instanceof FType && value.size() > 1 && dt.instanceOf(value.type)) value.type = dt;
+      return value;
+    }
 
     // coerce items if required
     final ValueBuilder vb = new ValueBuilder(qc, value.size());

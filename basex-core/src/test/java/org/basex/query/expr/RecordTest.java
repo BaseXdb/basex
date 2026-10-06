@@ -258,6 +258,28 @@ public final class RecordTest extends SandboxTest {
     query(prolog + "fn($r as record(*)) { map:get($r, 1) }(local:r(1))", "");
   }
 
+  /** Coercion of sequences of records and maps. */
+  @Test public void sequenceCoercion() {
+    final String prolog = "declare record local:r(a); declare record local:s(a); "
+        + "declare function local:apply($f, $v) { $f($v) }; "
+        + "let $rs := ((1 to 5) ! (if (. = 3) then 'x' else local:r(.)))[. instance of map(*)] ";
+
+    // records are passed on unchanged, and remain records
+    query(prolog + "return local:apply(fn($v as local:r*) { sum($v?a) }, $rs)", 12);
+    query(prolog + "return (1 to 3) ! local:apply(fn($v as local:r*) { count($v) }, $rs)",
+        "4\n4\n4");
+    query(prolog + "return local:apply(fn($v as map(*)*) { $v instance of local:r+ }, $rs)", true);
+    query(prolog + "return local:apply(fn($v as array(map(*))*) { count($v) }, "
+        + "$rs ! array { . })", 4);
+
+    // maps and records of other types are coerced
+    query(prolog + "return local:apply(fn($v as local:r*) { $v instance of local:r+ }, "
+        + "(1 to 5) ! { 'a': . })", true);
+    query(prolog + "return local:apply(fn($v as local:r*) { $v instance of local:r+ }, "
+        + "(1 to 5) ! local:s(.))", true);
+    error(prolog + "return local:apply(fn($v as local:r*) { $v }, ($rs, 'x'))", INVTYPE_X);
+  }
+
   /** Recursive records. */
   @Test public void recRec() {
     query("declare variable $v as list := "
