@@ -341,7 +341,10 @@ public class DBNode extends XNode {
           ++curr;
         } else {
           if(curr == -1) {
-            curr = pre + data.size(pre, dbKind());
+            // attribute: continue after the attributes of the parent element
+            final int kind = dbKind(), par = data.parent(pre, kind);
+            curr = kind == Data.ATTR && par != -1 ? par + data.attSize(par, Data.ELEM) :
+              pre + data.size(pre, kind);
             if(data.meta.ndocs > 1) {
               int p = pre;
               for(final GNode nd : ancestorIter(false)) p = ((DBNode) nd).pre;

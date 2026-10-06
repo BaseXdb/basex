@@ -57,6 +57,10 @@ public final class PathTest extends SandboxTest {
     execute(new Add(NAME, FILE));
     query("(//ul)[1]/following::ul", "");
     query("//li/following::li", LI2 + '\n' + LI2);
+
+    // attributes are never on the following axis
+    query("parse-xml('<a><b x=\"1\" y=\"2\"><c/></b><d/></a>')//@x/following::node() ! name()",
+        "c\nd");
   }
 
   /** Preceding axis with multiple documents. */
