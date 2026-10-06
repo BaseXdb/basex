@@ -621,4 +621,83 @@ public final class FuncItemTest extends SandboxTest {
         + "local:apply(local:many#1, (1, 2)), local:apply(local:one#1, 3)", "2\n3");
     error(funcs + "(local:one#1, local:many#1)[xs:integer(<_>1</_>)]((1, 2))", INVTYPE_X);
   }
+
+  /** Function coercion wraps functions with typed parameters, even if they match. */
+  @Test public void coerceWrap() {
+    final String type = "fn(xs:int) as item()*";
+    error("(identity#1 treat as item()) ! (. coerce to " + type + ")('a')", INVTYPE_X);
+    error("(identity#1 coerce to (" + type + ")?)('a')", INVTYPE_X);
+    error("(array { identity#1 } coerce to array(" + type + "))(1)('a')", INVTYPE_X);
+    error("({ 0: identity#1 } coerce to map(xs:anyAtomicType, " + type + "))(0)('a')", INVTYPE_X);
+    query("(identity#1 coerce to fn(item()*) as item()*)('a')", "a");
+    query("(identity#1 coerce to " + type + ")(1)", 1);
+
+    // choice: coerce to the first matching alternative
+    final String choice = "(fn(xs:string) as xs:boolean | fn(xs:integer) as xs:boolean)";
+    query("let $f as " + choice + "* := fn($x as xs:decimal) as xs:boolean { $x gt 3 } "
+        + "return $f(12)", true);
+    query("(fn($x as xs:decimal) as xs:boolean { $x gt 3 } treat as item()) ! "
+        + "(. coerce to " + choice + ")(12)", true);
+  }
+
+  /** Function coercion: static function types are upper bounds. */
+  @Test public void coerceMergedType() {
+    final String funcs = "declare function local:many($ts as item()*) { count($ts) };"
+        + "declare function local:one($t as item()) { $t };";
+    error(funcs + "declare function local:apply($f as fn(item()) as item()*) { $f((1, 2)) };"
+        + "let $fs := (local:many#1, local:one#1) return local:apply($fs[1])", INVTYPE_X);
+    error(funcs + "((local:many#1, local:one#1) coerce to (fn(item()) as item()*)+)[1]((1, 2))",
+        INVTYPE_X);
+    error(funcs + "([local:many#1, local:one#1] coerce to array(fn(item()) as item()*))(1)((1, 2))",
+        INVTYPE_X);
+    error(funcs + "(map:merge(for $f at $p in (local:many#1, local:one#1) return { $p: $f }) "
+        + "coerce to map(xs:integer, fn(item()) as item()*))(1)((1, 2))", INVTYPE_X);
+    error("let $f := (identity#1, 1)[random:integer(1) + 1] treat as fn(xs:int) as item()* "
+        + "return ($f coerce to fn(xs:int) as item()*)('a')", INVTYPE_X);
+
+    // returned functions, nested coercions
+    error("let $g := fn() { fn($x as item()*) { count($x) } } "
+        + "return ($g coerce to fn() as fn(xs:int) as item()*)()(('a', 'b'))", INVTYPE_X);
+    error("declare function local:f($f) { (($f coerce to fn(xs:byte) as item()*) "
+        + "coerce to fn(xs:integer) as item()*)(1000) };"
+        + "local:f((identity#1, abs#1)[random:integer(2) + 1])", INVTYPE_X);
+
+    // coercion in variable declarations
+    final String e = "let $e := (fn($a) { $a }, 1)[random:integer(2) >= 0][1] return ";
+    query(e + "let $x as fn(xs:anyAtomicType) as item()* := "
+        + "($e coerce to fn(xs:double) as item()*) return $x(1) instance of xs:double", true);
+    query(e + "let $x as fn(xs:double) as item()* := "
+        + "($e coerce to fn(xs:anyAtomicType) as item()*) return $x(1) instance of xs:double",
+        true);
+    error(e + "let $x as fn(xs:anyAtomicType) as item()* := "
+        + "($e coerce to fn(xs:string) as item()*) return $x(1)", INVTYPE_X);
+
+    // inferred function types must not be enforced
+    final String f = funcs + "declare function local:apply($f) { $f((1, 2)) };"
+        + "let $f := (local:many#1, local:one#1)[1] return ";
+    query(f + "(%basex:inline(0) fn($g) { $g((1, 2)) })($f)", 2);
+    query(f + "(fn($g) { $g((1, 2)) })($f)", 2);
+    query(f + "local:apply($f)", 2);
+    query(f + "for-each($f, fn($g) { $g((1, 2)) })", 2);
+    query(f + "array:build($f, fn($g) { $g((1, 2)) })?*", 2);
+    query(f + "fold-left($f, 0, fn($a, $g) { $a + $g((1, 2)) })", 2);
+    query(f + "let $h as item() := $f return $h((1, 2))", 2);
+  }
+
+  /** Function coercion: external values and Java objects. */
+  @Test public void coerceExternal() {
+    final String f = "let $f := (fn($a) { $a }, 1)[random:integer(2) >= 0][1] return ";
+    error(f + "xquery:eval('declare variable $f as fn(xs:integer) as item()* external; "
+        + "$f(\"x\")', { 'f': $f })", INVTYPE_X);
+    query(f + "xquery:eval('declare variable $f as fn(xs:string) as item()* external; "
+        + "$f(\"x\")', { 'f': $f })", "x");
+    error(f + "load-xquery-module('x', { 'content': \"module namespace x='x';"
+        + "declare variable $x:f as fn(xs:integer) as item()* external;"
+        + "declare function x:g() { $x:f('s') };\", 'variables': { QName('x', 'f'): $f } })"
+        + "?functions(QName('x', 'g'))?0()", INVTYPE_X);
+
+    final String java = "let $j := Q{java:java.util.ArrayList}new() return ";
+    query(java + "let $f as fn() as xs:string* := $j return count($f())", 0);
+    error(java + "let $f as fn() as xs:integer := $j return $f()", INVTYPE_X);
+  }
 }

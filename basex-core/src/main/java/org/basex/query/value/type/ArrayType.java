@@ -48,6 +48,16 @@ public final class ArrayType extends FType {
   }
 
   @Override
+  public boolean coercive() {
+    return valueType.type.coercive();
+  }
+
+  @Override
+  public boolean wraps() {
+    return valueType.type.wraps();
+  }
+
+  @Override
   public XQArray cast(final Item item, final QueryContext qc, final InputInfo info)
       throws QueryException {
     if(item instanceof final XQArray array && array.instanceOf(this, false)) return array;

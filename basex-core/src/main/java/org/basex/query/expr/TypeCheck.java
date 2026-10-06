@@ -85,14 +85,14 @@ public final class TypeCheck extends Single {
       }
       // refine result type:
       //   INTEGERS coerce to item() → INTEGERS coerce to xs:integer
-      if(cardinality) st = nst;
+      if(nst.refines(st)) st = nst;
       // adopt result size and data reference from input expression
       final Expr dataExpr = type.instanceOf(NodeType.XNODE) ? expr : null;
       exprType.assign(st, nocc, et.occ == st.occ ? expr.size() : -1).data(dataExpr);
     }
 
     // remove redundant type check
-    if(expr instanceof final TypeCheck tc && st.instanceOf(et)) {
+    if(expr instanceof final TypeCheck tc && st.instanceOf(et, true)) {
       // (EXPR coerce to xs:integer) coerce to xs:int → EXPR coerce to xs:int
       return cc.replaceWith(this, new TypeCheck(info, tc.expr, st, name).optimize(cc));
     }

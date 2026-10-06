@@ -70,6 +70,16 @@ public class MapType extends FType {
   }
 
   @Override
+  public boolean coercive() {
+    return valueType.type.coercive();
+  }
+
+  @Override
+  public boolean wraps() {
+    return valueType.type.wraps();
+  }
+
+  @Override
   public final XQMap cast(final Item item, final QueryContext qc, final InputInfo info)
       throws QueryException {
     if(item instanceof final XQMap map && map.instanceOf(this, false)) return map;

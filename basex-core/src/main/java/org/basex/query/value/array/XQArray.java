@@ -338,14 +338,13 @@ public abstract class XQArray extends XQStruct {
 
   @Override
   public final boolean instanceOf(final Type tp, final boolean coerce) {
-    // typed function types enforce function coercion
-    if(coerce && tp instanceof FuncType && tp != Types.FUNCTION) return type == tp;
-    if(type.instanceOf(tp) && !(coerce && ShapeType.rebuilds(type, tp))) return true;
+    if(SeqType.instanceOf(type, tp, coerce)) return true;
 
     final SeqType mt;
     if(tp instanceof final ArrayType at) {
       mt = at.valueType();
-    } else if(tp instanceof final FuncType ft) {
+    } else if(!coerce && tp instanceof final FuncType ft) {
+      // without coercion: arrays are functions; with coercion, they are wrapped
       if(ft.argTypes.length != 1 || !ft.argTypes[0].instanceOf(Types.INTEGER_O)) return false;
       mt = ft.declType;
     } else {

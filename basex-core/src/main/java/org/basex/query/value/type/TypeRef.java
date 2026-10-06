@@ -88,6 +88,16 @@ public final class TypeRef implements Type {
   }
 
   @Override
+  public boolean coercive() {
+    return deref().coercive();
+  }
+
+  @Override
+  public boolean wraps() {
+    return deref().wraps();
+  }
+
+  @Override
   public Value cast(final Item item, final QueryContext qc, final InputInfo ii)
       throws QueryException {
     return deref().cast(item, qc, ii);

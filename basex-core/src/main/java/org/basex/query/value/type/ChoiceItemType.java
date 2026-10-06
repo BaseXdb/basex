@@ -50,6 +50,16 @@ public final class ChoiceItemType implements Type {
   }
 
   @Override
+  public boolean coercive() {
+    return Checks.any(types, Type::coercive);
+  }
+
+  @Override
+  public boolean wraps() {
+    return Checks.any(types, Type::wraps);
+  }
+
+  @Override
   public Value cast(final Item item, final QueryContext qc, final InputInfo info)
       throws QueryException {
     for(final Type tp : types) {

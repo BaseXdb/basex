@@ -48,6 +48,17 @@ public final class RecordType extends ShapeType {
   }
 
   @Override
+  public boolean coercive() {
+    return strict();
+  }
+
+  @Override
+  public boolean wraps() {
+    // the fields of records are coerced when the records are constructed
+    return false;
+  }
+
+  @Override
   public RecordType with(final TokenObjectMap<ShapeField> map) {
     return new RecordType(map, name, anns);
   }

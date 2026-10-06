@@ -106,8 +106,8 @@ public final class FuncItem extends FItem implements Scope {
 
   @Override
   public boolean instanceOf(final Type tp, final boolean coerce) {
-    // coercion rebuilds records in the result
-    return type.instanceOf(tp) && !(coerce && ShapeType.rebuilds(type, tp));
+    // the type of a function item is exact: functions of the same type are kept
+    return SeqType.kept(type, tp, coerce);
   }
 
   @Override
@@ -198,7 +198,7 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public void refineType(final Expr exp) {
     final Type tp = funcType().intersect(exp.seqType().type);
-    if(tp != null) type = tp;
+    if(tp instanceof FuncType) type = tp;
   }
 
   @Override
@@ -474,12 +474,11 @@ public final class FuncItem extends FItem implements Scope {
       final SeqType[] oldArgTypes = oldType.argTypes, newArgTypes = new SeqType[arity];
       for(int a = 0; a < arity; a++) {
         final SeqType at = argTypes[a], oat = oldArgTypes[a];
-        newArgTypes[a] = at.instanceOf(oat) ? at : oat;
+        newArgTypes[a] = at.refines(oat) ? at : oat;
       }
       final FuncType newType = FuncType.get(oldType.declType, newArgTypes);
       // coerce to refined function type
-      final FuncItem fitem = newType.eq(oldType) ? this :
-        (FuncItem) coerceTo(newType, cc.qc, cc, info);
+      final FuncItem fitem = (FuncItem) coerceTo(newType, cc.qc, cc, info);
 
       // drop redundant type checks, adopt the refined types
       final Var[] vars = fitem.params;

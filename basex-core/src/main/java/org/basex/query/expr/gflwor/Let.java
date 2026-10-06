@@ -98,7 +98,7 @@ public final class Let extends ForLet {
   public Let optimize(final CompileContext cc) throws QueryException {
     // skip redundant type check
     if(!scoring && expr instanceof final TypeCheck tc) {
-      if(var.declType != null && var.declType.instanceOf(expr.seqType()) ||
+      if(var.declType != null && var.declType.instanceOf(expr.seqType(), true) ||
           var.adoptCheck(expr.seqType())) {
         cc.info(OPTTYPE_X, this);
         expr = tc.expr;

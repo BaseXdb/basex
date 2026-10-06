@@ -340,6 +340,22 @@ public interface Type {
   }
 
   /**
+   * Checks if coercion to this type may rebuild records or wrap functions.
+   * @return result of check
+   */
+  default boolean coercive() {
+    return false;
+  }
+
+  /**
+   * Checks if coercion to this type may wrap functions.
+   * @return result of check
+   */
+  default boolean wraps() {
+    return false;
+  }
+
+  /**
    * Returns the given type, or the type of the specified expression if it is more specific.
    * @param expr expression (can be {@code null})
    * @return node type

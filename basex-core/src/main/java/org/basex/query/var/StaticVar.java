@@ -137,7 +137,9 @@ public final class StaticVar extends StaticDecl {
    */
   void bind(final Value val, final QueryContext qc, final boolean cast) throws QueryException {
     if(external && !compiled) {
-      if(declType == null || declType.instance(val)) value = val;
+      if(declType == null || declType.instance(val, true)) value = val;
+      // conforming values: wrap functions, rebuild records
+      else if(declType.instance(val)) value = declType.coerce(val, qc, info, name, null);
       else if(cast) value = declType.cast(val, true, qc, info);
       else throw typeError(val, declType, name, info);
       expr = value;

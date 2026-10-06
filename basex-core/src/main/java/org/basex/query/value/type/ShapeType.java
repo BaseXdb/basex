@@ -267,6 +267,16 @@ public class ShapeType extends MapType {
     return declared() && !any();
   }
 
+  @Override
+  public boolean coercive() {
+    return Checks.any(fields.values(), f -> f.seqType().type.coercive());
+  }
+
+  @Override
+  public boolean wraps() {
+    return Checks.any(fields.values(), f -> f.seqType().type.wraps());
+  }
+
   /**
    * Return the minimum number of fields that must be supplied to the constructor function.
    * @return minimum number of fields
@@ -461,35 +471,6 @@ public class ShapeType extends MapType {
     if(map.type == this) return true;
     final TokenObjectMap<ShapeField> mfields = ((ShapeType) map.type).fields;
     return index <= mfields.size() && Token.eq(mfields.key(index), fields.key(index));
-  }
-
-  /**
-   * Checks if coercion to the target type rebuilds records of the given type.
-   * @param type type
-   * @param target target type
-   * @return result of check
-   */
-  public static boolean rebuilds(final Type type, final Type target) {
-    return records(target) && !TypeRef.deref(type).eq(TypeRef.deref(target));
-  }
-
-  /**
-   * Checks if the specified type contains a record type.
-   * @param type type
-   * @return result of check
-   */
-  private static boolean records(final Type type) {
-    final Type tp = TypeRef.deref(type);
-    if(tp instanceof final ShapeType sh) return sh.declared() && !sh.any();
-    if(tp instanceof final ArrayType at) return records(at.valueType().type);
-    if(tp instanceof final MapType mt) return records(mt.valueType().type);
-    if(tp instanceof final FuncType ft) return ft.declType != null && records(ft.declType.type);
-    if(tp instanceof final ChoiceItemType cit) {
-      for(final Type t : cit.types) {
-        if(records(t)) return true;
-      }
-    }
-    return false;
   }
 
   /**

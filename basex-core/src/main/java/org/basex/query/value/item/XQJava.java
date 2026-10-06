@@ -1,6 +1,5 @@
 package org.basex.query.value.item;
 
-import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
@@ -89,13 +88,6 @@ public final class XQJava extends FItem {
   @Override
   boolean updating() {
     return false;
-  }
-
-  @Override
-  public FItem coerceTo(final FuncType ft, final QueryContext qc, final CompileContext cc,
-      final InputInfo ii) throws QueryException {
-    if(type.instanceOf(ft)) return this;
-    throw typeError(this, ft, ii);
   }
 
   @Override

@@ -227,6 +227,24 @@ public final class FuncType extends FType {
     return new FuncType(an, dt, rf, arg);
   }
 
+  @Override
+  public boolean coercive() {
+    return typedArgs() || declType.type.coercive();
+  }
+
+  @Override
+  public boolean wraps() {
+    return typedArgs() || declType.type.wraps();
+  }
+
+  /**
+   * Checks if one of the parameters is typed.
+   * @return result of check
+   */
+  private boolean typedArgs() {
+    return argTypes != null && Checks.any(argTypes, st -> !st.eq(ITEM_ZM));
+  }
+
   /**
    * Return function type with fewer arguments.
    * @param arity arity of target type

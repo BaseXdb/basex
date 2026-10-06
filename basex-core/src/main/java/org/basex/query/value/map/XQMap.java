@@ -310,8 +310,6 @@ public abstract class XQMap extends XQStruct {
   @Override
   public final boolean instanceOf(final Type tp, final boolean coerce) {
     if(type == tp) return true;
-    // typed function types enforce function coercion
-    if(coerce && tp instanceof FuncType && tp != Types.FUNCTION) return false;
 
     try {
       // a map matches a record type only if it is a record, i.e. if it has a type annotation
@@ -320,14 +318,15 @@ public abstract class XQMap extends XQStruct {
         return type instanceof final RecordType rt &&
             (coerce && !sh.any() ? rt.equals(sh) : rt.instanceOf(sh) || sh.matches(this));
       }
-      if(type.instanceOf(tp) && !(coerce && ShapeType.rebuilds(type, tp))) return true;
+      if(SeqType.instanceOf(type, tp, coerce)) return true;
 
       final Type kt;
       final SeqType vt;
       if(tp instanceof final MapType mt) {
         kt = mt.keyType() == BasicType.ANY_ATOMIC_TYPE ? null : mt.keyType();
         vt = mt.valueType().eq(Types.ITEM_ZM) ? null : mt.valueType();
-      } else if(tp instanceof final FuncType ft) {
+      } else if(!coerce && tp instanceof final FuncType ft) {
+        // without coercion: maps are functions; with coercion, they are wrapped
         if(ft.declType.occ.min != 0 || ft.argTypes.length != 1 ||
             !ft.argTypes[0].instanceOf(Types.ANY_ATOMIC_TYPE_O)) return false;
         kt = null;

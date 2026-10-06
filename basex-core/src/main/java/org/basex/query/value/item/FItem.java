@@ -88,8 +88,8 @@ public abstract class FItem extends Item implements XQFunction {
     final int arity = arity(), nargs = argTypes.length;
     if(nargs < arity) throw arityError(this, arity, nargs, true, info);
 
-    // optimize: skip coercion if current type equals new type
-    if(type.eq(ft)) return this;
+    // skip coercion if the function is kept
+    if(instanceOf(ft, true)) return this;
 
     // create new compilation context and variable scope
     final VarScope vs = new VarScope();
@@ -131,7 +131,7 @@ public abstract class FItem extends Item implements XQFunction {
       if(cc != null) body = body.optimize(cc);
 
       // add type check if return types differ
-      if(declType != null && !body.seqType().instanceOf(declType)) {
+      if(declType != null && !body.seqType().instanceOf(declType, true)) {
         body = new TypeCheck(ii, body, declType);
         if(cc != null) body = body.optimize(cc);
       }

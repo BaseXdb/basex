@@ -158,8 +158,7 @@ public final class SeqType {
 
     // try shortcut (type of value may be specific enough)
     final Type vt = TypeRef.deref(value.type);
-    if(dt instanceof ChoiceItemType ? vt.eq(dt) :
-      coerce && dt instanceof FType ? unchanged(vt, dt) : vt.instanceOf(dt)) return true;
+    if(dt instanceof ChoiceItemType ? vt.eq(dt) : instanceOf(vt, dt, coerce)) return true;
     // check single item
     if(size == 1) return instance((Item) value, coerce);
     // check each item
@@ -167,20 +166,6 @@ public final class SeqType {
       if(!instance(item, coerce)) return false;
     }
     return true;
-  }
-
-  /**
-   * Checks if items of the specified type are instances of the target type that are not
-   * changed by coercion.
-   * @param type type of the items
-   * @param target target type
-   * @return result of check
-   */
-  private static boolean unchanged(final Type type, final Type target) {
-    // function coercion and record coercion may create new items
-    return type.eq(target) || (target instanceof ArrayType ||
-      target instanceof MapType && !(target instanceof ShapeType)) &&
-      type.seqType().instanceOf(target.seqType(), true);
   }
 
   /**
@@ -395,8 +380,7 @@ public final class SeqType {
 
     final Type dt = TypeRef.deref(this.type);
     // instance check
-    final SeqType[] at = dt instanceof final FuncType ft ? ft.argTypes : null;
-    if((at == null || Checks.all(at, st -> st.eq(Types.ITEM_ZM))) && instance(value, true)) {
+    if(instance(value, true)) {
       // remember the type of a sequence whose items are left unchanged by coercion
       if(dt instanceof FType && value.size() > 1 && dt.instanceOf(value.type)) value.type = dt;
       return value;
@@ -430,6 +414,11 @@ public final class SeqType {
 
     final Type dt = TypeRef.deref(this.type);
     if(dt instanceof final ChoiceItemType cit) {
+      // coerce to the first matching alternative
+      for(final Type tp : cit.types) {
+        final SeqType st = tp.seqType();
+        if(st.instance(item, false)) return st.coerce(item, name, qc, cc, info);
+      }
       for(final Type tp : cit.types) {
         try {
           final Value value = tp.seqType().coerce(item, name, qc, cc, info);
@@ -460,9 +449,7 @@ public final class SeqType {
         if(dt instanceof final RecordType rt) return map.coerceTo(rt, qc, info, cc);
         if(dt instanceof final MapType mt) return map.coerceTo(mt, qc, info, cc);
       }
-      if(dt instanceof final FuncType ft) {
-        return fitem.coerceTo(dt == Types.FUNCTION ? fitem.funcType() : ft, qc, cc, info);
-      }
+      if(dt instanceof final FuncType ft) return fitem.coerceTo(ft, qc, cc, info);
     } else if(item instanceof final JNode jnode) {
       return coerce(jnode.value.unwrappedItem(qc, info), name, qc, cc, info);
     }
@@ -769,11 +756,55 @@ public final class SeqType {
   /**
    * Checks if values of this type can be supplied without coercion to the specified type.
    * @param st sequence type to check
-   * @param coerce coercion (records are only kept if they have exactly the required type)
+   * @param coerce coercion (identical records are kept, typed functions are always wrapped)
    * @return result of check
    */
   public boolean instanceOf(final SeqType st, final boolean coerce) {
-    return instanceOf(st) && !(coerce && ShapeType.rebuilds(type, st.type));
+    return instanceOf(st) && !(coerce && rebuilds(type, st.type));
+  }
+
+  /**
+   * Checks if this inferred type can replace the specified declared type.
+   * @param st declared type
+   * @return result of check
+   */
+  public boolean refines(final SeqType st) {
+    // inferred function types are upper bounds and must not be enforced
+    return instanceOf(st, true) && !type.wraps();
+  }
+
+  /**
+   * Checks if coercion to the target type rebuilds records or wraps functions of the given type.
+   * @param type type
+   * @param target target type
+   * @return result of check
+   */
+  public static boolean rebuilds(final Type type, final Type target) {
+    return target.coercive() && !instanceOf(type, target, true);
+  }
+
+  /**
+   * Checks if items of the given static type are instances of the target type that are kept.
+   * @param type static type
+   * @param target target type
+   * @param coerce coercion
+   * @return result of check
+   */
+  public static boolean instanceOf(final Type type, final Type target, final boolean coerce) {
+    // static function types are upper bounds: functions of the same type may still be wrapped
+    return !(coerce && target.wraps()) && kept(type, target, coerce);
+  }
+
+  /**
+   * Checks if items of the given exact type are instances of the target type that are kept.
+   * @param type exact type
+   * @param target target type
+   * @param coerce coercion
+   * @return result of check
+   */
+  public static boolean kept(final Type type, final Type target, final boolean coerce) {
+    return coerce && target.coercive() ?
+      type == target || TypeRef.deref(type).eq(TypeRef.deref(target)) : type.instanceOf(target);
   }
 
   /**
