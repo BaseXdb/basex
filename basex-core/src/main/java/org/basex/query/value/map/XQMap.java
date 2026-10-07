@@ -11,7 +11,6 @@ import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.out.DataOutput;
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.hash.*;
@@ -126,19 +125,6 @@ public abstract class XQMap extends XQStruct {
       Stores.write(out, entry.key());
       Stores.write(out, entry.value());
     }
-  }
-
-  @Override
-  public final void refineType(final Expr expr) {
-    if(this != empty()) super.refineType(expr);
-  }
-
-  /**
-   * Adopts the supplied type if it is more specific than the current one.
-   * @param refined refined type
-   */
-  final void refineType(final Type refined) {
-    if(this != empty() && refined.instanceOf(type) && assignable(refined)) type = refined;
   }
 
   @Override
@@ -334,9 +320,13 @@ public abstract class XQMap extends XQStruct {
       } else {
         return false;
       }
-      return kt == null && vt == null || test((key, value) ->
-        (kt == null || kt.seqType().instance(key, coerce)) &&
-        (vt == null || vt.instance(value, coerce)));
+      if(kt == null && vt == null) return true;
+      if(!test((key, value) -> (kt == null || kt.seqType().instance(key, coerce)) &&
+          (vt == null || vt.instance(value, coerce)))) return false;
+      // remember the more specific type to skip subsequent checks
+      if(tp instanceof MapType && (kt == null || TypeRef.deref(kt).assignable()) &&
+          (vt == null || TypeRef.deref(vt.type).assignable())) refineType(tp);
+      return true;
     } catch(final QueryException ex) {
       throw Util.notExpected(ex);
     }
@@ -516,7 +506,7 @@ public abstract class XQMap extends XQStruct {
       refined = refined == null ? mt : refined.union(mt);
       if(refined.eq(type)) return true;
     }
-    type = refined;
+    if(refined != null) refineType(refined);
     return true;
   }
 

@@ -39,6 +39,13 @@ public final class ArrayTest extends SandboxTest {
     query("array { 1, 'a', 2.5e0, true(), { 'k': 1 }, [ 1 ], () } => array:size()", 6);
   }
 
+  /** Successful instance checks must not narrow the type of the shared empty array. */
+  @Test public void emptyArrayType() {
+    query("[] instance of array(xs:string)", true);
+    query("[] instance of array(fn(xs:numeric) as xs:numeric)", true);
+    query("[] instance of array(xs:integer)", true);
+  }
+
   /** Constructor. */
   @Test public void squareConstructor() {
     query("[]", "[]");

@@ -355,6 +355,8 @@ public abstract class XQArray extends XQStruct {
       for(final Value value : members()) {
         if(!mt.instance(value, coerce)) return false;
       }
+      // remember the more specific type to skip subsequent checks
+      if(tp instanceof ArrayType && TypeRef.deref(mt.type).assignable()) refineType(tp);
     }
     return true;
   }
@@ -406,7 +408,7 @@ public abstract class XQArray extends XQStruct {
       refined = refined == null ? at : refined.union(at);
       if(refined.eq(type)) return true;
     }
-    type = refined;
+    if(refined != null) refineType(refined);
     return true;
   }
 

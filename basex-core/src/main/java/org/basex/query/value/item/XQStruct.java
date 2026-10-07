@@ -122,9 +122,17 @@ public abstract class XQStruct extends FItem {
   }
 
   @Override
-  public void refineType(final Expr expr) {
-    final Type tp = type.intersect(expr.seqType().type);
-    if(tp != null && assignable(tp)) type = tp;
+  public final void refineType(final Expr expr) {
+    refineType(expr.seqType().type);
+  }
+
+  /**
+   * Narrows the type to its intersection with a type that this structure is an instance of.
+   * @param tp type
+   */
+  public final void refineType(final Type tp) {
+    final Type refined = type.intersect(tp);
+    if(refined != null && assignable(refined)) type = refined;
   }
 
   /**

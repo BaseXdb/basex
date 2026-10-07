@@ -219,6 +219,9 @@ public final class InspectModuleTest extends SandboxTest {
     query(func.args(" { 'a': 'b' }"), "map(xs:string, xs:string)");
     query(func.args(" array { 1, <a/> }"), "array(item())");
     query(func.args(" array { 1, 2 }"), "array(xs:integer)");
+    // shared empty instances must keep their type
+    query(func.args(" {}") + ", {} instance of map(*)", "map(*)\ntrue");
+    query(func.args(" []") + ", [] instance of array(*)", "array(*)\ntrue");
     query(func.args(" function() { 1 }"), "fn() as item()*");
     query(func.args(" fn() { 1 }"), "fn() as item()*");
 

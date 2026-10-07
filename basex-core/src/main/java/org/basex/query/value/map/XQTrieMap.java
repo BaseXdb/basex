@@ -33,6 +33,11 @@ public final class XQTrieMap extends XQMap {
   }
 
   @Override
+  protected boolean assignable(final Type tp) {
+    return this != EMPTY;
+  }
+
+  @Override
   public Value getOrNull(final Item key) throws QueryException {
     return root.get(key.hashCode(), key, 0);
   }
