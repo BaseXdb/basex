@@ -7,7 +7,6 @@ import java.io.*;
 import java.net.*;
 import java.nio.file.*;
 import java.util.Map.*;
-import java.util.function.*;
 
 import org.basex.core.*;
 import org.basex.http.*;
@@ -101,29 +100,29 @@ public final class BaseXHTTP extends CLI {
     else port = sc.getPort();
 
     // info strings
-    final Function<Boolean, String> msg1 = start -> start ? SRV_STARTED_PORT_X : SRV_STOPPED_PORT_X;
-    final Function<Boolean, String> msg2 = start -> Util.info(HTTP + ' ' + msg1.apply(start), port);
-    // output user info, keep message visible for a while
-    final Consumer<Boolean> info = start -> {
-      Util.println(msg2.apply(start));
-      if(!soptions.get(StaticOptions.HTTPLOCAL)) {
-        final int serverPort = soptions.get(StaticOptions.SERVERPORT);
-        Util.println(msg1.apply(start), serverPort);
-      }
-      Performance.sleep(1000);
-    };
+    final String started = Util.info(HTTP + ' ' + SRV_STARTED_PORT_X, port);
+    final String stopped = Util.info(HTTP + ' ' + SRV_STOPPED_PORT_X, port);
 
     // stop web server
     if(stop) {
       stop();
-      if(!quiet) info.accept(false);
+      // the HTTP port of the stopped instance is unknown: report the stop port
+      if(!quiet) Util.println(HTTP + " STOP " + SRV_STOPPED_PORT_X,
+          soptions.get(StaticOptions.STOPPORT));
       return;
     }
 
     // start web server in a new Java process
     if(service) {
       start(args);
-      if(!quiet) info.accept(true);
+      if(!quiet) {
+        // output user info, keep message visible for a while
+        Util.println(started);
+        if(!soptions.get(StaticOptions.HTTPLOCAL)) {
+          Util.println(SRV_STARTED_PORT_X, soptions.get(StaticOptions.SERVERPORT));
+        }
+        Performance.sleep(1000);
+      }
       return;
     }
 
@@ -149,17 +148,16 @@ public final class BaseXHTTP extends CLI {
     // show info when HTTP server is aborted. needs to be called in constructor:
     // otherwise, it may only be called if the JVM process is already shut down
     Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-      final String message = msg2.apply(false);
-      if(!quiet) Util.println(message);
-      context.log.writeServer(LogType.OK, message);
+      if(!quiet) Util.println(stopped);
+      context.log.writeServer(LogType.OK, stopped);
       context.close();
     }));
 
     // show start message
-    if(!quiet) Util.println(msg2.apply(true));
+    if(!quiet) Util.println(started);
 
     // log server start at very end (logging flag could have been updated by web.xml)
-    context.log.writeServer(LogType.OK, msg2.apply(true));
+    context.log.writeServer(LogType.OK, started);
 
     // execute initial command-line arguments
     for(final Entry<String, String> command : commands) {
