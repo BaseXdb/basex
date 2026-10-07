@@ -3,7 +3,6 @@ package org.basex.query.func.xquery;
 import java.util.*;
 import java.util.concurrent.*;
 
-import org.basex.core.jobs.Job.*;
 import org.basex.query.*;
 import org.basex.query.func.xquery.TaskContext.*;
 import org.basex.query.value.*;
@@ -71,8 +70,9 @@ final class XQueryTask extends RecursiveTask<Value> {
     if(size == 1) {
       // perform the work in an isolated query context
       final Call call = calls.get(start);
-      try(QueryContext qc = tc.context(); Binding bound = qc.bind()) {
-        final Value value = call.function().invoke(qc, tc.info, call.args());
+      try {
+        final Value value = tc.branch(bqc -> call.function().invoke(bqc, tc.info, call.args()),
+          tc.results || tc.report);
         return tc.report ? tc.result(value) : tc.results ? value : Empty.VALUE;
       } catch(final QueryException ex) {
         if(tc.report) return tc.error(ex);

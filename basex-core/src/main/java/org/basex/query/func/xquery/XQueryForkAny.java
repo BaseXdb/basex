@@ -1,7 +1,6 @@
 package org.basex.query.func.xquery;
 
 import java.util.*;
-import java.util.concurrent.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -31,16 +30,7 @@ public final class XQueryForkAny extends StandardFunc {
       list.add(checkUp(toFunction(function, 0, qc), false));
     }
 
-    final TaskContext tc = new TaskContext(options, qc, info);
-    final ArrayList<Callable<Value>> tasks = new ArrayList<>(list.size());
-    for(final FItem function : list) {
-      tasks.add(() -> {
-        try(QueryContext cqc = tc.context()) {
-          return function.invoke(cqc, tc.info);
-        }
-      });
-    }
-    return tc.invokeAny(tasks);
+    return new TaskContext(options, qc, info).invokeAny(list);
   }
 
   @Override

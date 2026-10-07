@@ -20,6 +20,8 @@ import org.junit.jupiter.api.*;
 public final class XQueryModuleTest extends SandboxTest {
   /** Path to test file. */
   private static final String PATH = "src/test/resources/input.xml";
+  /** Function that raises an error with a cause (FORG0010, caused by FORG0001). */
+  private static final String IETF = "fn() { parse-ietf-date('Wed, 00 Aug 2014 19:36:01 GMT') }";
 
   /** Invokes function items instead of query strings. */
   @Test public void evalFunction() {
@@ -356,6 +358,9 @@ xquery:fork-join(
     error(func.args(" (123, 123)"), INVTYPE_X);
     error(func.args(" error#0"), FUNERR1);
     error(func.args(" replicate(error#0, 100)"), FUNERR1);
+    // raised error, not its cause
+    error(func.args(" " + IETF), IETF_INV_X);
+    error(func.args(" " + IETF, " { 'timeout': 10 }"), IETF_INV_X);
   }
 
   /** Test method. */
@@ -391,6 +396,27 @@ xquery:fork-join(
     query(func.args(" (fn() { 1 }, fn() { 2 })", " { 'timeout': 60 }") + " => count()", 2);
     // a non-positive timeout is treated as "no timeout"
     query(func.args(" (fn() { 1 }, fn() { 2 })", " { 'timeout': -1 }") + " => count()", 2);
+  }
+
+  /** Test method. */
+  @Test @Timeout(60) public void forkJoinNested() {
+    final Function func = _XQUERY_FORK_JOIN;
+    final String thread = "Q{java:java.lang.Thread}currentThread() "
+        + "=> Q{java:java.lang.Thread}getName()";
+
+    // nested calls stay in the pool of the caller
+    query(func.args(" (1 to 50) ! fn() { " + func.args(" fn() { " + thread + " }",
+        " { 'timeout': 10 }") + " }", " { 'parallel': 2 }") + "[contains(., 'commonPool')]", "");
+    query(func.args(" (1 to 20) ! fn() { " + _XQUERY_FORK_ANY.args(" (fn() { 1 }, fn() { 2 })") +
+        " }", " { 'parallel': 1 }") + " => count()", 20);
+    query(func.args(" (1 to 20) ! fn() { " + func.args(" (fn() { 1 }, fn() { 2 })") + " }",
+        " { 'parallel': 1 }") + " => count()", 40);
+
+    // nested calls with their own pool: waiting branches do not start further branches
+    final String inner = func.args(" (1 to 2) ! fn() { prof:sleep(10) }", " { 'parallel': 2 }");
+    query("let $spans := " + func.args(" (1 to 20) ! fn() { let $s := prof:current-ns() return (" +
+        inner + ", [ $s, prof:current-ns() ]) }", " { 'parallel': 2 }") +
+        " return max(for $s in $spans return count($spans[?1 <= $s?1 and ?2 > $s?1])) <= 2", true);
   }
 
   /** Test method. */
@@ -499,6 +525,8 @@ return count($errors[local-name-from-QName(.) = 'XQDY0054'])
     query(func.args(" (error#0, fn() { () })"), "");
     // all branches fail: an error is raised
     error(func.args(" (error#0, error#0)"), FUNERR1);
+    // raised error, not its cause
+    error(func.args(" (" + IETF + ", " + IETF + ')'), IETF_INV_X);
     // long-running branches are canceled once the timeout is exceeded
     error(func.args(" (1 to 4) ! fn() { prof:sleep(30000) }", " { 'timeout': 0.1 }"),
         XQUERY_TIMEOUT);

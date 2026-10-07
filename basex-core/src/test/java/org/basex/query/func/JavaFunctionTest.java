@@ -59,6 +59,8 @@ public final class JavaFunctionTest extends SandboxTest {
     query("Q{java.lang.Math}sqrt(xs:double(9.0))", 3);
     query("Q{java.lang.Math}sqrt\u00b7double(xs:double(9.0))", 3);
     error("Q{java:org.basex.query.func.JavaFunctionExample}error()", JAVAEXEC_X_X_X);
+    // raised error, not its cause
+    error("Q{java:org.basex.query.func.JavaFunctionExample}queryError()", IETF_INV_X);
 
     // sequence types
     query("Q{java:org.basex.util.Strings}eqic('1', (('1', '2')))", true);

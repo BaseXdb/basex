@@ -143,7 +143,7 @@ public final class Uri extends AStr {
     try {
       return new URI(Token.string(value));
     } catch(final URISyntaxException ex) {
-      throw new QueryException(ex);
+      throw QueryError.BASEX_ERROR_X.get(null, ex);
     }
   }
 

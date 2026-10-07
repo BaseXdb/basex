@@ -24,7 +24,7 @@ public final class XQueryException extends RuntimeException {
    * @param ex exception
    */
   public XQueryException(final Exception ex) {
-    super(new QueryException(ex));
+    super(QueryError.BASEX_ERROR_X.get(null, ex));
   }
 
   /**

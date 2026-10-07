@@ -126,17 +126,14 @@ public final class Util {
   }
 
   /**
-   * Returns the root query exception.
+   * Returns the outermost query exception in the cause chain, or the root exception.
    * @param throwable throwable
-   * @return root exception
+   * @return query exception or root exception
    */
   public static Throwable rootException(final Throwable throwable) {
     Throwable th = throwable;
-    while(true) {
-      final Throwable ca = th.getCause();
-      if(ca == null || th instanceof QueryException && !(ca instanceof QueryException)) return th;
-      th = ca;
-    }
+    while(!(th instanceof QueryException) && th.getCause() != null) th = th.getCause();
+    return th;
   }
 
   /**

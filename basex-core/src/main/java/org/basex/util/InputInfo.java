@@ -13,11 +13,8 @@ import org.basex.query.value.type.*;
  * @author Christian Gruen
  */
 public final class InputInfo {
-  /**
-   * Indicates if a raised error will only be handled internally.
-   * If this flag is activated, only light-weight errors will be created.
-   */
-  private boolean internal;
+  /** Indicates if raised errors are only handled internally (light-weight errors). */
+  private final boolean internal;
   /** Input path. */
   private final String path;
   /** Enclosing declaration (can be {@code null}). */
@@ -51,6 +48,7 @@ public final class InputInfo {
     column = parser.pos;
     this.sc = sc;
     this.decl = decl;
+    internal = false;
   }
 
   /**
@@ -75,6 +73,22 @@ public final class InputInfo {
     this.line = line;
     column = col;
     this.decl = decl;
+    internal = false;
+  }
+
+  /**
+   * Constructor for a copy with light-weight error handling.
+   * @param info input info to copy
+   */
+  private InputInfo(final InputInfo info) {
+    // no lock: positions of light-weight errors are never reported
+    path = info.path;
+    decl = info.decl;
+    sc = info.sc;
+    input = info.input;
+    line = info.line;
+    column = info.column;
+    internal = true;
   }
 
   /**
@@ -122,7 +136,7 @@ public final class InputInfo {
   /**
    * Calculates the column and line number in a string.
    */
-  public void init() {
+  public synchronized void init() {
     // positions have already been calculated
     if(line != 0) return;
 
@@ -145,12 +159,12 @@ public final class InputInfo {
   }
 
   /**
-   * Activates light-weight error handling (invoked e.g. by {@link SeqType#cast(
+   * Returns a copy with light-weight error handling (invoked e.g. by {@link SeqType#cast(
    * org.basex.query.value.Value, boolean, QueryContext, InputInfo)}).
-   * @param value value to set
+   * @return input info
    */
-  public void internal(final boolean value) {
-    internal = value;
+  public InputInfo internalCopy() {
+    return new InputInfo(this);
   }
 
   @Override

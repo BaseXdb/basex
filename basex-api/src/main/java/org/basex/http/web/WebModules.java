@@ -104,7 +104,7 @@ public final class WebModules {
     try {
       return new RestXqWadl(request).create(cache(ctx));
     } catch(final IOException ex) {
-      throw new QueryException(ex);
+      throw QueryError.BASEX_ERROR_X.get(null, ex);
     }
   }
 

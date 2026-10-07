@@ -4,6 +4,7 @@ import java.util.*;
 
 import javax.xml.parsers.*;
 
+import org.basex.query.*;
 import org.basex.util.list.*;
 import org.w3c.dom.*;
 
@@ -151,6 +152,14 @@ public final class JavaFunctionExample {
    */
   public static void error() {
     throw new RuntimeException("ERROR");
+  }
+
+  /**
+   * Throws a query exception that was caused by another query exception.
+   * @throws QueryException query exception
+   */
+  public static void queryError() throws QueryException {
+    throw QueryError.IETF_INV_X.get(null, "x").cause(QueryError.FUNERR1.get(null));
   }
 
   /**

@@ -73,15 +73,7 @@ public class QueryException extends Exception {
   /** Marks if this exception is catchable by a {@code try/catch} expression. */
   private boolean catchable = true;
 
-  /**
-   * Constructor, specifying an exception or error. {@link QueryError#BASEX_ERROR_X} will be set
-   * as error code.
-   * @param cause exception or error
-   */
-  public QueryException(final Throwable cause) {
-    this(Util.message(cause));
-    cause(cause);
-  }
+  // no public constructor with a single Throwable: ForkJoinTask would use it to wrap thrown errors
 
   /**
    * Constructor, specifying a simple error message. {@link QueryError#BASEX_ERROR_X} will be set

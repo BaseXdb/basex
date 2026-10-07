@@ -5,8 +5,10 @@ import static org.basex.query.QueryError.*;
 import java.math.*;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.*;
 
 import org.basex.core.jobs.*;
+import org.basex.core.jobs.Job.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -77,12 +79,20 @@ final class TaskContext {
   }
 
   /**
-   * Creates a query context for a single parallel branch. The context inherits the dynamic
-   * namespaces of the original query and is grouped under {@link #group}.
-   * @return query context
+   * Evaluates a function in a parallel branch.
+   * @param fn function to evaluate
+   * @param cache materialize lazy items of the result (which may raise errors)
+   * @return result
+   * @throws QueryException query exception
    */
-  QueryContext context() {
-    return new QueryContext(group, qc.ns);
+  Value branch(final QueryFunction<QueryContext, Value> fn, final boolean cache)
+      throws QueryException {
+    // grouped under the job of all branches, with the dynamic namespaces of the original query
+    try(QueryContext bqc = new QueryContext(group, qc.ns); Binding bound = bqc.bind()) {
+      final Value value = fn.apply(bqc);
+      if(cache) value.cache(false, info);
+      return value;
+    }
   }
 
   /**
@@ -104,16 +114,28 @@ final class TaskContext {
   }
 
   /**
-   * Invokes a set of tasks in parallel and returns the result of the first one that finishes
-   * successfully. Remaining branches are canceled.
-   * @param tasks tasks to invoke
+   * Invokes functions in parallel, returns the first successful result and cancels the others.
+   * @param functions functions to invoke
    * @return result
    * @throws QueryException query exception
    */
-  Value invokeAny(final Collection<Callable<Value>> tasks) throws QueryException {
+  Value invokeAny(final List<FItem> functions) throws QueryException {
     return execute(pool -> {
+      // no ForkJoinPool.invokeAny: its cancellation interrupts threads that may have moved on
+      final CompletableFuture<Value> first = new CompletableFuture<>();
+      final AtomicInteger open = new AtomicInteger(functions.size());
+      for(final FItem function : functions) {
+        pool.execute(() -> {
+          if(first.isDone()) return;
+          try {
+            first.complete(branch(bqc -> function.invoke(bqc, info), true));
+          } catch(final Throwable th) {
+            if(open.decrementAndGet() == 0) first.completeExceptionally(th);
+          }
+        });
+      }
       try {
-        return pool.invokeAny(tasks);
+        return first.get();
       } finally {
         // cancel the losing branches, unless cancellation is already in progress (e.g. a timeout),
         // whose job state must be preserved
@@ -149,11 +171,14 @@ final class TaskContext {
    * @throws QueryException query exception
    */
   private Value execute(final PoolFn fn) throws QueryException {
+    // nested calls reuse the pool of the caller instead of waiting for another pool
     final boolean dedicated = parallel != 0;
-    final ForkJoinPool pool = dedicated ? new ForkJoinPool(parallel) : ForkJoinPool.commonPool();
+    final ForkJoinPool caller = ForkJoinTask.getPool();
+    final ForkJoinPool pool = dedicated ? new ForkJoinPool(parallel) :
+      Objects.requireNonNullElse(caller, ForkJoinPool.commonPool());
     final Timer timer = scheduleTimeout();
     try {
-      return fn.apply(pool);
+      return dedicated && caller != null ? await(pool, fn) : fn.apply(pool);
     } catch(final Exception ex) {
       // timeout: discard branch errors and report the timeout
       if(group.state == JobState.TIMEOUT) throw XQUERY_TIMEOUT.get(info);
@@ -169,6 +194,22 @@ final class TaskContext {
       if(dedicated) pool.shutdown();
       group.close();
     }
+  }
+
+  /**
+   * Runs an operation on a thread of the specified pool and waits for the result.
+   * @param pool fork/join pool
+   * @param fn operation
+   * @return result
+   * @throws InterruptedException interrupted exception
+   * @throws ExecutionException execution exception
+   */
+  private static Value await(final ForkJoinPool pool, final PoolFn fn)
+      throws InterruptedException, ExecutionException {
+    // plain blocking: a joining worker of another pool would run unrelated tasks meanwhile
+    final FutureTask<Value> task = new FutureTask<>(() -> fn.apply(pool));
+    pool.execute(task);
+    return task.get();
   }
 
   /**

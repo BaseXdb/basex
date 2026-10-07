@@ -938,7 +938,7 @@ public final class QueryContext extends Job implements Closeable {
         final TextInput ti = new TextInput(new IOContent(object.toString()));
         return JsonConverter.get(jp).convert(ti, "", null, this);
       } catch(final IOException ex) {
-        throw new QueryException(ex);
+        throw BASEX_ERROR_X.get(null, ex);
       }
     }
 

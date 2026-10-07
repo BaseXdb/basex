@@ -342,15 +342,13 @@ public final class SeqType {
     final Type dt = TypeRef.deref(this.type);
     if(item.type.eq(dt)) return item;
 
-    // enable light-weight error handling
-    if(!error && info != null) info.internal(true);
+    // enable light-weight error handling (copy: the original may be used by other threads)
+    final InputInfo ii = error || info == null ? info : info.internalCopy();
     try {
-      return dt.cast(item, qc, info);
+      return dt.cast(item, qc, ii);
     } catch(final QueryException ex) {
       if(error) throw ex;
       return null;
-    } finally {
-      if(!error && info != null) info.internal(false);
     }
   }
 
