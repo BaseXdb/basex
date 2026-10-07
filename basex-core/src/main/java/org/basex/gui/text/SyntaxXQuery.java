@@ -71,12 +71,16 @@ final class SyntaxXQuery extends SyntaxMarkup {
   private static final int CLAUSE = 1;
   /** Line type: last clause of a FLWOR expression ({@code return}). */
   private static final int FINAL = 2;
+  /** Line type: branch of a switch expression whose result starts in the next line. */
+  private static final int BRANCH = 3;
   /** Operators that are followed by an expression (no asterisk: '/*', 'xs:string*'). */
   private static final String OPERATORS = "=+-<>|!/";
+  /** Operators that may start a line (no '<', '-', '/': constructors, numbers, paths). */
+  private static final String LEADING = "=+|!";
   /** Operator keywords that follow an operand. */
   private static final HashSet<String> INFIX = new HashSet<>(Arrays.asList(
     AND, BUT, CAST, CASTABLE, DIV, EXCEPT, IDIV, INSTANCE, INTERSECT, MOD, OR, OTHERWISE, TO, TREAT,
-    UNION));
+    UNION, UPDATE));
   /** Keywords that are followed by an expression. */
   private static final HashSet<String> DANGLING = new HashSet<>(Arrays.asList(
     AS, CASE, DEFAULT, ELSE, IN, OF, RETURN, SATISFIES, THEN, WHERE, WITH));
@@ -820,58 +824,188 @@ final class SyntaxXQuery extends SyntaxMarkup {
   }
 
   @Override
-  Indent indent(final byte[] text, final int pos, final int last, final int mode,
-      final int newlines, final Indent previous) {
+  Indent indent(final byte[] text, final int pos, final int last, final int start,
+      final int mode, final int newlines, final Indent previous) {
     // the attributes of a tag are indented, as in XML
-    if(tag()) return super.indent(text, pos, last, mode, newlines, previous);
+    if(tag()) return super.indent(text, pos, last, start, mode, newlines, previous);
 
     final boolean code = mode == CODE;
-    final int type = clause(text, pos), ref = previous.reference();
+    final String name = startName(text, pos);
+    final int type = RETURN.equals(name) ? FINAL : clause(text, pos, name) ? CLAUSE : NONE;
+    final int ref = previous.reference(), branches = previous.branches();
     // the commas of a clause separate its own operands, not the operands of an enclosing list
     final boolean separates = type != CLAUSE;
+    // the branches of a switch expression are indented alike, their results by one more level
+    if(Strings.eq(name, CASE, DEFAULT)) {
+      final int header = header(text, last, previous);
+      final int level = header != -1 ? header : branches;
+      if(level != -1) {
+        final boolean result = lineKeywords(text, pos).contains(RETURN);
+        return new Indent(level, level, result ? NONE : BRANCH, true, level);
+      }
+    }
+    if(type == FINAL && previous.type() == BRANCH)
+      return indent(branches + 1, branches + 1, FINAL, true, previous);
+    // a conditional branch is aligned with a preceding branch or condition that starts a line
+    // (or closes its operand); otherwise, it continues the preceding line, unless that line
+    // continues a branch
+    if(newlines == 1 && Strings.eq(name, THEN, ELSE)) {
+      final String first = startName(text, start);
+      final boolean aligned = IF.equals(first) && ELSE.equals(name) ||
+        Strings.eq(first, THEN, ELSE) || CLOSING.indexOf(cp(text, start)) != -1;
+      final int extra = previous.extra();
+      return indent(aligned ? extra : extra > ref ? ref : ref + 1, ref, previous.type(), separates,
+        previous);
+    }
+    // the operands of a logical expression that starts in the first line of a bracket are aligned
+    if(code && newlines == 1 && start != -1 && previous.extra() <= ref &&
+        Strings.eq(endName(text, last), AND, OR)) {
+      final int before = skipWsBack(text, start);
+      if(OPENING.indexOf(cp(text, before)) != -1 ||
+          Strings.eq(endName(text, before + 1), AND, OR))
+        return indent(previous.extra(), ref, previous.type(), separates, previous);
+    }
     // a clause continuation opens a new baseline; a non-clause continuation is transparent and
     // preserves the clause context, so that a following clause stays aligned with the continued one
-    if(continued(text, pos, last, code, newlines)) return type != NONE ?
-      new Indent(1, 1, type, separates) : new Indent(1, ref, previous.type(), separates);
+    if(continued(text, pos, name, last, start, code, newlines)) return type != NONE ?
+      indent(ref + 1, ref + 1, type, separates, previous) :
+      indent(ref + 1, ref, previous.type(), separates, previous);
     // consecutive clauses are indented alike
-    if(type != NONE && previous.type() == CLAUSE) return new Indent(ref, ref, type, separates);
+    if(type != NONE && previous.type() == CLAUSE)
+      return indent(ref, ref, type, separates, previous);
     // further operands of a clause are indented; the clause remains the reference
     if(code && prev(text, last) == ',' && previous.type() == CLAUSE)
-      return new Indent(ref + 1, ref, CLAUSE, false);
-    return new Indent(0, 0, type, separates);
+      return indent(ref + 1, ref, CLAUSE, false, previous);
+    return indent(0, 0, type, separates, previous);
+  }
+
+  /**
+   * Checks if a line starts with a clause that is followed by further clauses.
+   * @param text text
+   * @param pos start of the line
+   * @param name name at the start of the line
+   * @return result of check
+   */
+  private boolean clause(final byte[] text, final int pos, final String name) {
+    if(!CLAUSES.contains(name)) return false;
+    // names of record fields, functions, steps and map keys
+    final int p = skipWs(text, pos + name.length()), ch = cp(text, p);
+    if(":,)=/[?".indexOf(ch) != -1 || ch == '(' && !WHERE.equals(name) ||
+        AS.equals(startName(text, p))) return false;
+    // a FLWOR expression that ends in the same line (each 'for' and 'let' has its 'return')
+    if(!Strings.eq(name, FOR, LET)) return true;
+    int open = 0;
+    for(final String keyword : lineKeywords(text, pos)) {
+      if(Strings.eq(keyword, FOR, LET)) open++;
+      else if(RETURN.equals(keyword)) open--;
+    }
+    return open > 0;
+  }
+
+  /**
+   * Creates an indentation; the branches of a switch expression end with a lower indentation.
+   * @param extra additional levels this line is indented by
+   * @param reference additional levels of the expression this line belongs to
+   * @param type type of the line
+   * @param separates separators of the line separate the operands of the enclosing list
+   * @param previous indentation of the previous line
+   * @return indentation
+   */
+  private static Indent indent(final int extra, final int reference, final int type,
+      final boolean separates, final Indent previous) {
+    final int branches = previous.branches();
+    return new Indent(extra, reference, type, separates, extra > branches ? branches : -1);
   }
 
   /**
    * Checks if a line continues the expression of the previous one.
    * @param text text
    * @param pos start of the line
+   * @param name name at the start of the line
    * @param last position after the last character of the previous line
+   * @param start position of the first character of the previous line
    * @param code indicates if the previous line ends with code
    * @param newlines number of line breaks between the two lines
    * @return result of check
    */
-  private boolean continued(final byte[] text, final int pos, final int last, final boolean code,
-      final int newlines) {
+  private boolean continued(final byte[] text, final int pos, final String name, final int last,
+      final int start, final boolean code, final int newlines) {
     // annotations continue a declaration
     if(cp(text, pos) == '%') return true;
     if(newlines != 1 || !code) return false;
-    // an operator keyword at the start of the line continues the preceding expression
-    if(INFIX.contains(startName(text, pos))) return true;
-    final int p = skipWsBack(text, last), ch = cp(text, p);
-    if(OPERATORS.indexOf(ch) != -1) return true;
-    return XMLToken.isNCChar(ch) && name(text, p) &&
-      DANGLING.contains(string(text, nameStart, nameEnd - nameStart));
+    // an operator at the start of the line continues the preceding expression
+    if(INFIX.contains(name) || LEADING.indexOf(cp(text, pos)) != -1) return true;
+    // a predicate continues the preceding operand
+    if(cp(text, pos) == '[' && operand(text, pos)) return true;
+    // the conditions of a window clause continue the clause
+    if(Strings.eq(name, START, END, ONLY)) {
+      final int p = skipWs(text, pos + name.length());
+      if(cp(text, p) == '$' || Strings.eq(startName(text, p), AT, WHEN, PREVIOUS, NEXT, END))
+        return true;
+    }
+    if(OPERATORS.indexOf(cp(text, skipWsBack(text, last))) != -1) return true;
+    final String keyword = endName(text, last);
+    // a conditional expression that ends with 'else' is a guard: the alternative is not indented
+    if(ELSE.equals(keyword) && IF.equals(startName(text, start))) return false;
+    return DANGLING.contains(keyword);
   }
 
   /**
-   * Returns the type of the FLWOR clause that starts at the specified position.
+   * Returns the indentation of the branches if the line that ends at the specified position is
+   * the header of a switch expression.
    * @param text text
-   * @param pos start of the line
-   * @return {@link #NONE}, {@link #CLAUSE} or {@link #FINAL}
+   * @param last position after the last character of the line
+   * @param previous indentation of the line
+   * @return additional levels of the branches ({@code -1}: no header)
    */
-  private int clause(final byte[] text, final int pos) {
-    final String name = startName(text, pos);
-    return RETURN.equals(name) ? FINAL : CLAUSES.contains(name) ? CLAUSE : NONE;
+  private int header(final byte[] text, final int last, final Indent previous) {
+    int p = skipWsBack(text, last);
+    final boolean braces = cp(text, p) == '{';
+    if(braces) p = skipWsBack(text, p);
+    if(cp(text, p) != ')') return -1;
+    // skip the operand
+    for(int depth = 0; p >= 0; p = back(text, p)) {
+      final int ch = cp(text, p);
+      if(ch == ')') depth++;
+      else if(ch == '(' && --depth == 0) break;
+    }
+    // the name may have a prefix (function call)
+    p = skipWsBack(text, p);
+    if(p < 0 || !XMLToken.isNCChar(cp(text, p)) || !name(text, p) ||
+        !Strings.eq(string(text, nameStart, nameEnd - nameStart), SWITCH, TYPESWITCH)) return -1;
+    // braces indent the branches by themselves
+    return braces ? 0 : previous.extra() + 1;
+  }
+
+  /**
+   * Returns the keywords and other names of the rest of a line.
+   * @param text text
+   * @param pos position
+   * @return names
+   */
+  private static ArrayList<String> lineKeywords(final byte[] text, final int pos) {
+    // strings, comments and variable names are skipped
+    final ArrayList<String> list = new ArrayList<>();
+    final int nl = indexOf(text, '\n', pos), end = nl == -1 ? text.length : nl;
+    for(int p = pos; p < end;) {
+      final int ch = cp(text, p);
+      if(ch == '\'' || ch == '"' || ch == '`') {
+        p++;
+        while(p < end && text[p] != ch) p++;
+        p++;
+      } else if(ch == '(' && cp(text, p + 1) == ':') {
+        p += 2;
+        while(p < end && !(text[p] == ':' && cp(text, p + 1) == ')')) p++;
+        p += 2;
+      } else if(XMLToken.isNCStartChar(ch)) {
+        final int s = p;
+        p = end(text, p);
+        if(prev(text, s) != '$') list.add(string(text, s, p - s));
+      } else {
+        p += cl(text, p);
+      }
+    }
+    return list;
   }
 
   /**
@@ -894,6 +1028,22 @@ final class SyntaxXQuery extends SyntaxMarkup {
   String lists() {
     // curly braces enclose no lists: their commas may separate let clauses or map entries
     return "([";
+  }
+
+  @Override
+  String padded() {
+    // array constructors (square brackets that follow no operand)
+    return "[";
+  }
+
+  @Override
+  boolean wrappable(final byte[] text, final int pos, final boolean spans) {
+    // conditions keep their lines, unless they start in a new line
+    final String name = endName(text, pos);
+    if(Strings.eq(name, IF, SWITCH, TYPESWITCH, WHILE)) return spans && newline(text, pos + 1);
+    // the parameters of inline functions are only wrapped if they span lines (the bodies are)
+    return spans || !Strings.eq(name, FN, FUNCTION) ||
+      prev(text, skipWsBack(text, pos) + 1 - name.length()) == ':';
   }
 
   @Override

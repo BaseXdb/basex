@@ -29,10 +29,12 @@ abstract class Syntax {
    * @param reference additional levels of the expression this line belongs to
    * @param type syntax-specific type of the line (XQuery: type of its FLWOR clause)
    * @param separates separators of the line separate the operands of the enclosing list
+   * @param branches additional levels of the branches of an enclosing expression
+   *   ({@code -1}: none)
    */
-  record Indent(int extra, int reference, int type, boolean separates) {
+  record Indent(int extra, int reference, int type, boolean separates, int branches) {
     /** Line that is not indented. */
-    static final Indent NONE = new Indent(0, 0, 0, true);
+    static final Indent NONE = new Indent(0, 0, 0, true, -1);
   }
 
   /** State index: current mode. */
@@ -408,15 +410,28 @@ abstract class Syntax {
    * @param text text
    * @param pos start of the line (first character that is no whitespace)
    * @param last position after the last character of the previous line ({@code -1}: none)
+   * @param start position of the first character of the previous line ({@code -1}: none)
    * @param mode mode of that character ({@code -1}: none)
    * @param newlines number of line breaks between the two lines
    * @param previous indentation of the previous line
    * @return indentation
    */
   @SuppressWarnings("unused")
-  Indent indent(final byte[] text, final int pos, final int last, final int mode,
-      final int newlines, final Indent previous) {
+  Indent indent(final byte[] text, final int pos, final int last, final int start,
+      final int mode, final int newlines, final Indent previous) {
     return Indent.NONE;
+  }
+
+  /**
+   * Indicates if an expression may be wrapped.
+   * @param text text
+   * @param pos position of the opening bracket
+   * @param spans the operands of the expression span lines (otherwise, it exceeds the margin)
+   * @return result of check
+   */
+  @SuppressWarnings("unused")
+  boolean wrappable(final byte[] text, final int pos, final boolean spans) {
+    return true;
   }
 
   /**
@@ -491,6 +506,14 @@ abstract class Syntax {
   }
 
   /**
+   * Returns the opening brackets of constructors whose non-empty content is enclosed in spaces.
+   * @return brackets
+   */
+  String padded() {
+    return "";
+  }
+
+  /**
    * Returns the start of a comment.
    * @return comment start
    */
@@ -514,7 +537,15 @@ abstract class Syntax {
    * @return formatted text
    */
   public final byte[] format(final byte[] text, final byte[] spaces, final int margin) {
-    return formatted() ? new Formatter(this, spaces, margin).format(text) : text;
+    if(!formatted()) return text;
+    // lines are measured before spaces are added: the result is formatted until it is stable
+    byte[] input = text;
+    for(int i = 0; i < 3; i++) {
+      final byte[] output = new Formatter(this, spaces, margin).format(input);
+      if(Token.eq(output, input)) break;
+      input = output;
+    }
+    return input;
   }
 
   // OPERANDS =====================================================================================
@@ -558,6 +589,20 @@ abstract class Syntax {
   }
 
   // CHARACTERS ===================================================================================
+
+  /**
+   * Checks if a line break follows the specified position, preceded by whitespace only.
+   * @param text text
+   * @param pos position
+   * @return result of check
+   */
+  static boolean newline(final byte[] text, final int pos) {
+    final int tl = text.length;
+    for(int p = pos; p < tl && ws(text[p]); p++) {
+      if(text[p] == '\n') return true;
+    }
+    return false;
+  }
 
   /**
    * Returns the position of the first non-whitespace character at or after the specified position.

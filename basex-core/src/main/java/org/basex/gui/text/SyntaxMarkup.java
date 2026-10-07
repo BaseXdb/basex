@@ -61,10 +61,10 @@ abstract class SyntaxMarkup extends Syntax {
   }
 
   @Override
-  Indent indent(final byte[] text, final int pos, final int last, final int mode,
-      final int newlines, final Indent previous) {
+  Indent indent(final byte[] text, final int pos, final int last, final int start,
+      final int mode, final int newlines, final Indent previous) {
     // the attributes of a tag are indented
-    return tag() ? new Indent(1, 1, 0, true) : Indent.NONE;
+    return tag() ? new Indent(1, 1, 0, true, -1) : Indent.NONE;
   }
 
   @Override
@@ -340,7 +340,7 @@ abstract class SyntaxMarkup extends Syntax {
    * @param pos position inside the sequence
    * @return end position
    */
-  private static int end(final byte[] text, final int pos) {
+  static int end(final byte[] text, final int pos) {
     int end = pos;
     final int tl = text.length;
     while(end < tl && XMLToken.isNCChar(cp(text, end))) end += cl(text, end);

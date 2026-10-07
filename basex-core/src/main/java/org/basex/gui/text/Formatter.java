@@ -25,15 +25,19 @@ final class Formatter {
    * @param broken expression is placed on several lines
    * @param separated all operands of the expression are placed on separate lines
    * @param indent indentation of the line with the opening bracket
+   * @param padded non-empty content is enclosed in spaces
+   * @param inline expression is enclosed in a string or an attribute value
    */
-  private record Bracket(boolean broken, boolean separated, Syntax.Indent indent) { }
+  private record Bracket(boolean broken, boolean separated, Syntax.Indent indent,
+      boolean padded, boolean inline) { }
 
   /**
    * State of an element that is currently open.
    * @param mixed content of the element contains text
    * @param level nesting depth of the enclosing content
+   * @param indent indentation of the line with the start tag
    */
-  private record Element(boolean mixed, int level) { }
+  private record Element(boolean mixed, int level, Syntax.Indent indent) { }
 
   /** Syntax highlighter: supplies the modes of the formatted text. */
   private final Syntax syntax;
@@ -41,6 +45,8 @@ final class Formatter {
   private final String separators;
   /** Brackets of lists: if a list is broken, all its operands are placed on separate lines. */
   private final String lists;
+  /** Brackets of constructors whose content is enclosed in spaces. */
+  private final String padded;
   /** Indentation of a single level. */
   private final byte[] spaces;
   /** Line margin ({@code 0}: expressions will not be wrapped). */
@@ -52,10 +58,20 @@ final class Formatter {
   private byte[] base = EMPTY;
   /** Start of the current line in the formatted text. */
   private int line;
+  /** Position of the first character of the current line in the text ({@code -1}: none). */
+  private int first = -1;
   /** Nesting depth of the brackets. */
   private int level;
   /** Indicates if a line break must be inserted before the next character. */
   private boolean wrap;
+  /** Indicates if the last character opened a constructor whose content is enclosed in spaces. */
+  private boolean pad;
+  /** Indicates if the current line contains comments only. */
+  private boolean comment;
+  /** Position after the last line of code that precedes a line with comments. */
+  private int commentLast;
+  /** Mode at the end of that line. */
+  private int commentMode;
   /** Start of the whitespace that precedes the current character ({@code -1}: none). */
   private int wsStart = -1;
   /** Number of line breaks in that whitespace. */
@@ -91,6 +107,7 @@ final class Formatter {
     this.margin = margin;
     separators = syntax.separators();
     lists = syntax.lists();
+    padded = syntax.padded();
   }
 
   /**
@@ -100,7 +117,8 @@ final class Formatter {
    */
   byte[] format(final byte[] text) {
     final BoolList direct = new BoolList();
-    final IntList lengths = lengths(text, direct);
+    final IntList segments = new IntList();
+    final IntList lengths = lengths(text, direct, segments);
     base = base(text);
     boundary = syntax.boundarySpace(text);
     final BoolList mixed = mixed(text);
@@ -108,7 +126,7 @@ final class Formatter {
 
     final ArrayDeque<Bracket> brackets = new ArrayDeque<>();
     final ArrayDeque<Element> elements = new ArrayDeque<>();
-    elements.push(new Element(mixed.get(0), 0));
+    elements.push(new Element(mixed.get(0), 0, Syntax.Indent.NONE));
     final int tl = text.length;
     int index = 0, element = 0;
     for(int p = 0; p < tl;) {
@@ -129,19 +147,25 @@ final class Formatter {
       }
 
       // closing bracket or end tag: leave the current level
-      boolean brk = false;
+      boolean brk = false, padding = pad;
       Syntax.Indent close = null;
       if(closing(ch) && !brackets.isEmpty()) {
         // the closing bracket is indented like the line that contains the opening one
         final Bracket bracket = brackets.pop();
         brk = bracket.broken();
         close = bracket.indent();
+        padding = bracket.padded();
         if(brk) level = Math.max(0, level - 1 - close.extra());
       } else if(boundary && syntax.elementClose() && elements.size() > 1) {
         // the end tag and the rest of the enclosing content are indented like the start tag
-        level = elements.pop().level();
+        final Element elem = elements.pop();
+        level = elem.level();
+        close = elem.indent();
       }
+      // the content of a padded constructor is enclosed in spaces
+      if(padding && wsStart == -1 && !empty(ch)) wsStart = p;
       whitespace(text, p, brk, close, ch);
+      pad = false;
 
       // the expression continues after the closing bracket: restore the state of its first line
       if(close != null) lastIndent = close;
@@ -150,13 +174,18 @@ final class Formatter {
       final int column = tb.size() - line;
       add(text, p, p + cl);
       if(opening(ch)) {
-        // an expression is broken if its own operands span several lines, or if it is too long
-        final boolean known = index < lengths.size();
+        // an expression is broken if its own operands span several lines, or if its line is too
+        // long; expressions in strings and attribute values and short expressions are not wrapped
+        final boolean known = index < lengths.size(), spans = known && direct.get(index);
         final int length = known ? lengths.get(index) : 0;
-        wrap = known && direct.get(index) ||
-          margin > 0 && length > 0 && column + length > margin;
+        final boolean inline = !brackets.isEmpty() && brackets.peek().inline() ||
+          !syntax.codeBefore() && !syntax.content(syntax.modeBefore());
+        wrap = (spans || margin > 0 && length != 0 && !inline &&
+          (length == MULTILINE || length >= margin / 4) && column + segments.get(index) > margin) &&
+          syntax.wrappable(text, p, spans);
         index++;
-        brackets.push(new Bracket(wrap, wrap && lists.indexOf(ch) != -1, lastIndent));
+        pad = padded.indexOf(ch) != -1 && !syntax.operand(text, p);
+        brackets.push(new Bracket(wrap, wrap && lists.indexOf(ch) != -1, lastIndent, pad, inline));
         // the indentation of the line with the opening bracket is adopted by the enclosed lines
         if(wrap) {
           level += 1 + lastIndent.extra();
@@ -167,8 +196,11 @@ final class Formatter {
         wrap = true;
       } else if(boundary && syntax.elementOpen(text, p)) {
         // the content of an element is only indented if it starts in the next line
-        elements.push(new Element(mixed.get(++element), level));
-        if(newline(text, p + cl)) level++;
+        elements.push(new Element(mixed.get(++element), level, lastIndent));
+        if(Syntax.newline(text, p + cl)) {
+          level += 1 + lastIndent.extra();
+          lastIndent = Syntax.Indent.NONE;
+        }
       }
       lastChar = ch;
       last = p + cl;
@@ -187,20 +219,35 @@ final class Formatter {
    * Returns the lengths of all bracketed expressions, in the order of their opening brackets.
    * @param text text
    * @param direct assigns for every expression if its own operands are followed by a line break
+   * @param segments assigns for every expression the length of the rest of its line, which ends
+   *   with a line break, the enclosing expression or an operand separator
    * @return lengths ({@link #MULTILINE}, or {@code 0} if the bracket has no counterpart)
    */
-  private IntList lengths(final byte[] text, final BoolList direct) {
+  private IntList lengths(final byte[] text, final BoolList direct, final IntList segments) {
     syntax.reset();
 
     // stack: indexes of the lengths, and positions of the opening brackets
     final IntList lengths = new IntList(), indexes = new IntList(), positions = new IntList();
+    // expressions whose line has not ended yet: indexes, nesting depths, positions
+    final IntList open = new IntList(), depths = new IntList(), starts = new IntList();
     final int tl = text.length;
     int pending = -1;
     for(int p = 0; p < tl;) {
       final int cl = cl(text, p), ch = cp(text, p);
       syntax.color(text, p, p + cl);
-      final boolean closes = closing(ch) && !indexes.isEmpty();
-      if(ch == '\n' && syntax.code()) {
+      final boolean closes = closing(ch) && !indexes.isEmpty(), code = syntax.code();
+      // end of a line: the lines of the expressions at the same or a deeper nesting depth end
+      final int depth = indexes.size();
+      if(ch == '\n' || code && (closes || separators.indexOf(ch) != -1 && depth > 0 &&
+          lists.indexOf(text[positions.peek()]) != -1)) {
+        // the nesting depths of the stack never decrease
+        while(!open.isEmpty() && (ch == '\n' || depths.peek() >= depth)) {
+          depths.pop();
+          final int index = open.pop(), start = starts.pop();
+          segments.set(index, p - start);
+        }
+      }
+      if(ch == '\n' && code) {
         for(int i = indexes.size() - 1; i >= 0; i--) lengths.set(indexes.get(i), MULTILINE);
         // a line break in a tag is nested in a constructor: it breaks no enclosing expression
         if(!indexes.isEmpty() && !syntax.tag()) pending = indexes.peek();
@@ -211,13 +258,17 @@ final class Formatter {
           pending = -1;
         }
         if(opening(ch)) {
+          open.add(lengths.size());
+          depths.add(depth);
+          starts.add(p);
+          segments.add(tl - p);
           indexes.add(lengths.size());
           positions.add(p);
           lengths.add(0);
           direct.add(false);
         } else if(closes) {
-          final int index = indexes.pop(), start = positions.pop();
-          if(lengths.get(index) != MULTILINE) lengths.set(index, p - start);
+          final int index = indexes.pop(), pos = positions.pop();
+          if(lengths.get(index) != MULTILINE) lengths.set(index, p - pos);
         }
       }
       p += cl;
@@ -276,17 +327,18 @@ final class Formatter {
    * @param text text
    * @param end end of the whitespace
    * @param brk enforce a line break (the character closes a wrapped expression)
-   * @param close indentation of the opening bracket if the character closes an expression
-   *   ({@code null} if it does not)
+   * @param close indentation of the line with the opening bracket or start tag if the character
+   *   closes an expression or element ({@code null} if it does not)
    * @param ch character that follows the whitespace
    */
   private void whitespace(final byte[] text, final int end, final boolean brk,
       final Syntax.Indent close, final int ch) {
+    final int ln = line;
     if(wsContent) {
       // boundary whitespace is indented if it spans lines; other text is adopted unchanged
       if(boundary && !wsMixed && wsLines > 0 && lastContent && syntax.contentEnd()) {
         lineBreaks(wsLines);
-        indent(0);
+        indent(close != null ? close.extra() : 0);
         lastIndent = Syntax.Indent.NONE;
       } else if(wsStart != -1) {
         add(text, wsStart, end);
@@ -296,11 +348,23 @@ final class Formatter {
     } else if(wsLines > 0) {
       // the indentation rules of the syntax are only applied if the line opens no expression
       lineBreaks(wsLines);
+      // a line with comments is transparent: it is indented like the next line of code, which
+      // refers to the line before
+      if(comment) {
+        last = commentLast;
+        lastMode = commentMode;
+      }
+      final int next = close == null ? comment(text, end) : -1;
+      comment = next != -1;
+      if(comment) {
+        commentLast = last;
+        commentMode = lastMode;
+      }
       final Syntax.Indent ind = close != null ? close :
-        syntax.indent(text, end, last, lastMode, wsLines, lastIndent);
+        syntax.indent(text, comment ? next : end, last, first, lastMode, wsLines, lastIndent);
       indent(ind.extra());
       // the attributes of a tag are indented, but the line with the tag name stays the reference
-      if(!syntax.tag()) lastIndent = ind;
+      if(!syntax.tag() && !comment) lastIndent = ind;
     } else if(wrap || brk) {
       // line breaks are only inserted if the character is not the first one of a line
       if(tb.size() > line) {
@@ -310,17 +374,37 @@ final class Formatter {
     } else if(tb.size() == line) {
       // indentation of the first line: it is retained, but it may start a clause
       if(wsStart != -1) add(text, wsStart, end);
-      lastIndent = syntax.indent(text, end, -1, -1, 0, Syntax.Indent.NONE);
+      lastIndent = syntax.indent(text, end, -1, -1, -1, 0, Syntax.Indent.NONE);
+      first = end;
     } else if(!empty(ch) && separators.indexOf(ch) == -1 && (wsStart != -1 ||
         lastCode && separators.indexOf(lastChar) != -1)) {
       // whitespace is collapsed, and a single space is added after a separator
       add(' ');
     }
+    if(line != ln && !comment) first = end;
     wrap = false;
     wsStart = -1;
     wsLines = 0;
     wsContent = false;
     wsMixed = false;
+  }
+
+  /**
+   * Checks if a line contains comments only.
+   * @param text text
+   * @param pos start of the line
+   * @return position of the next code ({@code -1}: the line contains code)
+   */
+  private int comment(final byte[] text, final int pos) {
+    // skip whitespace and comments
+    final byte[] open = syntax.commentOpen(), close = syntax.commentEnd();
+    int p = pos;
+    while(open.length > 0 && startsWith(text, open, p)) {
+      final int e = indexOf(text, close, p + open.length);
+      p = e == -1 ? text.length : Syntax.skipWs(text, e + close.length);
+    }
+    final int nl = indexOf(text, '\n', pos);
+    return p != pos && (nl != -1 && nl < p || p == text.length) ? p : -1;
   }
 
   /**
@@ -361,20 +445,6 @@ final class Formatter {
     int s = end;
     while(s > start && text[s - 1] != '\n') s--;
     return (end - s) / spaces.length;
-  }
-
-  /**
-   * Checks if a line break follows the specified position, preceded by whitespace only.
-   * @param text text
-   * @param pos position
-   * @return result of check
-   */
-  private static boolean newline(final byte[] text, final int pos) {
-    final int tl = text.length;
-    for(int p = pos; p < tl && ws(text[p]); p++) {
-      if(text[p] == '\n') return true;
-    }
-    return false;
   }
 
   /**
