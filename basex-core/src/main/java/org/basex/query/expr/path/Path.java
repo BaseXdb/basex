@@ -238,7 +238,29 @@ public abstract class Path extends ParseExpr {
         }
       }
     }
+    if(expr == this && this instanceof CachedPath && mode.oneOf(Simplify.EBV, Simplify.PREDICATE,
+        Simplify.SET, Simplify.COUNT, Simplify.EXISTENCE) && unordered(cc)) {
+      // skip sorting. example: count(preceding-sibling::a) → unordered path
+      final UnorderedPath path = copyType(new UnorderedPath(info, root, steps));
+      path.optimize();
+      expr = path;
+    }
     return cc.simplify(this, expr, mode);
+  }
+
+  /**
+   * Checks if the path yields distinct nodes when evaluated in axis order.
+   * @param cc compilation context
+   * @return result of check
+   */
+  private boolean unordered(final CompileContext cc) {
+    final Expr rt = root != null ? root : cc.qc.focus.value;
+    if(rt == null || !rt.seqType().zeroOrOne()) return false;
+    final int sl = steps.length;
+    for(int s = 1; s < sl; s++) {
+      if(!((Step) steps[s]).axis.oneOf(CHILD, ATTRIBUTE, SELF)) return false;
+    }
+    return true;
   }
 
   /**

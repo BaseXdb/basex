@@ -145,7 +145,7 @@ public abstract class AxisPath extends Path {
   }
 
   @Override
-  public final boolean ddo() {
+  public boolean ddo() {
     return true;
   }
 }

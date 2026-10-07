@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class IterPath extends AxisPath {
+public class IterPath extends AxisPath {
   /**
    * Constructor.
    * @param info input info (can be {@code null})
@@ -26,12 +26,12 @@ public final class IterPath extends AxisPath {
   }
 
   @Override
-  protected Iter iterator(final QueryContext qc) {
+  protected final Iter iterator(final QueryContext qc) {
     return lazyIter(qc);
   }
 
   @Override
-  protected Value nodes(final QueryContext qc) throws QueryException {
+  protected final Value nodes(final QueryContext qc) throws QueryException {
     return iterator(qc).value(qc, this);
   }
 

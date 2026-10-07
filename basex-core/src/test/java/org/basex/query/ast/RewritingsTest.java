@@ -2691,4 +2691,22 @@ public final class RewritingsTest extends SandboxTest {
     query("inspect:type(head(('a', 'b') treat as enum('a', 'b')+), { 'mode': 'value' })",
         "xs:string");
   }
+
+  /** Paths whose order is irrelevant are evaluated without sorting. */
+  @Test public void unorderedPath() {
+    final String doc = "document { <r>{ (1 to 6) ! <a c='{ . mod 3 }'/> }</r> }";
+    check(doc + "/r/a ! count(preceding-sibling::a)", "0\n1\n2\n3\n4\n5",
+        exists(UnorderedPath.class));
+    check(doc + "/r/a[not(@c = preceding-sibling::a/@c)] ! string(@c)", "1\n2\n0",
+        exists(UnorderedPath.class));
+    check(doc + "/r/a[preceding::a] => count()", 5, exists(UnorderedPath.class));
+    check(doc + "/r/a[last()] ! exists(ancestor::*)", true, exists(UnorderedPath.class));
+
+    // order or duplicates are relevant
+    check(doc + "/r/a[last()]/preceding-sibling::a[1] ! string(@c)", 2,
+        empty(UnorderedPath.class));
+    check(doc + "/r/a ! count(preceding-sibling::a/..)", "0\n1\n1\n1\n1\n1",
+        empty(UnorderedPath.class));
+    check("count(" + doc + "/r/a/preceding-sibling::a)", 5, empty(UnorderedPath.class));
+  }
 }
