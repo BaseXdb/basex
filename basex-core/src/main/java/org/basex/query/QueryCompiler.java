@@ -34,6 +34,17 @@ final class QueryCompiler {
   private final IntList lowlink = new IntList();
   /** Counter for the next free index. */
   private int next;
+  /** Static functions and variables of the query (others belong to bound function items). */
+  private final Set<Scope> declared = Collections.newSetFromMap(new IdentityHashMap<>());
+
+  /**
+   * Constructor.
+   * @param qc query context
+   */
+  private QueryCompiler(final QueryContext qc) {
+    for(final StaticFunc func : qc.functions) declared.add(func);
+    for(final StaticVar var : qc.vars) declared.add(var);
+  }
 
   /**
    * Compiles the main module.
@@ -41,7 +52,7 @@ final class QueryCompiler {
    * @throws QueryException query exception
    */
   static void compile(final CompileContext cc) throws QueryException {
-    for(final ArrayList<Scope> scps : new QueryCompiler().scopes(cc.qc.main)) {
+    for(final ArrayList<Scope> scps : new QueryCompiler(cc.qc).scopes(cc.qc.main)) {
       scps.getFirst().compile(cc);
     }
   }
@@ -134,18 +145,19 @@ final class QueryCompiler {
     curr.visit(new ASTVisitor() {
       @Override
       public boolean staticVar(final StaticVar var) {
-        return var != curr && add(var);
+        return var != curr && (!declared.contains(var) || add(var));
       }
 
       @Override
       public boolean staticFuncCall(final StaticFuncCall call) {
         final StaticFunc func = call.func();
-        return func == null || add(func);
+        return func == null || !declared.contains(func) || add(func);
       }
 
       @Override
       public boolean subScope(final Scope scope) {
-        scope.reset();
+        // bodies of function items are not recompiled (and may belong to other queries)
+        if(!(curr instanceof FuncItem)) scope.reset();
         return scope.visit(this);
       }
 

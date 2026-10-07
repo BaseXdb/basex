@@ -690,11 +690,17 @@ public abstract class StandardFunc extends Arr {
       throws QueryException {
 
     final Item item = query.unwrappedItem(qc, info);
-    final FuncItem function = toInvocable(item, qc);
+    final FuncItem function = toInvocable(item);
     if(function != null) {
       // a service is written to disk, and a scheduled job outlives the query that created it
       if(service || QueryJobSpec.scheduled(options)) throw JOBS_FUNCTION.get(info);
-      return new QueryJobSpec(options, function, toArguments(args, function, qc));
+      // the job must not depend on the query that created it: copy persistent database nodes
+      final Value[] values = toArguments(args, function, qc);
+      for(int v = 0; v < values.length; v++) {
+        values[v] = values[v].materialize(TransferVisitor.SHAREABLE, true, info, qc);
+      }
+      return new QueryJobSpec(options,
+          function.materialize(TransferVisitor.SHAREABLE, true, info, qc), values);
     }
 
     final IOContent content = toContent(item, qc);
@@ -733,18 +739,13 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Evaluates an expression to a function that can be invoked in another query context.
+   * Returns a function item that can be invoked as query.
    * @param item item
-   * @param qc query context
    * @return function item, or {@code null} if the item is no function
    * @throws QueryException query exception
    */
-  protected final FuncItem toInvocable(final Item item, final QueryContext qc)
-      throws QueryException {
-    if(item instanceof final FuncItem function) {
-      // the invoked function must not depend on the query that created it
-      return function.materialize(TransferVisitor.SHAREABLE, true, info, qc);
-    }
+  protected final FuncItem toInvocable(final Item item) throws QueryException {
+    if(item instanceof final FuncItem function) return function;
     // maps and arrays are function items, but they are no queries either
     if(item instanceof FItem) throw typeError(item, Types.QUERY_SPEC_O, info);
     return null;
@@ -767,12 +768,9 @@ public abstract class StandardFunc extends Arr {
     final int ar = function.arity();
     if(as != ar) throw applyError(function, as, ar, true, info);
 
-    // copy persistent database nodes, share everything else with the invoked function
     final Value[] args = new Value[as];
     int a = 0;
-    for(final Value member : array.members()) {
-      args[a++] = member.materialize(TransferVisitor.SHAREABLE, true, info, qc);
-    }
+    for(final Value member : array.members()) args[a++] = member;
     return args;
   }
 

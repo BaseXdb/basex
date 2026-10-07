@@ -49,11 +49,13 @@ public final class XQueryModuleTest extends SandboxTest {
     // maps and arrays are neither queries nor invocable functions
     error(func.args(" { 'a': 1 }"), INVTYPE_X);
     error(func.args(" [ 1 ]"), INVTYPE_X);
-    // dependencies on the calling query
-    error(func.args(" fn() { . }"), BASEX_EVAL_X_X);
-    error("declare variable $v := Q{java:java.lang.Math}abs(-1); " + func.args(" fn() { $v }"),
-        BASEX_EVAL_X_X);
-    error(func.args(" fn() { Q{java:java.lang.Math}abs(-1) }"), BASEX_EVAL_X_X);
+    // errors are raised while the function is evaluated
+    error(func.args(" fn() { . }"), NOCTX_X);
+    query("declare variable $v := Q{java:java.lang.Math}abs(-1); " + func.args(" fn() { $v }"),
+        1);
+    query(func.args(" fn() { Q{java:java.lang.Math}abs(-1) }"), 1);
+    error(func.args(" fn() { Q{java:java.lang.Math}abs(-1) }", " ()",
+        " { 'permission': 'none' }"), XQUERY_PERM_X);
     // updating functions
     error(func.args(" %updating fn() { delete node <a/> }"), XQUERY_NOUPDATES);
   }
@@ -64,13 +66,22 @@ public final class XQueryModuleTest extends SandboxTest {
     final String let = "let $n := db:get('" + NAME + "')/* return ";
     execute(new CreateDB(NAME, "<a><b/><c/></a>"));
     try {
-      // the captured node is copied
       query(let + func.args(" fn() { name($n) }"), "a");
       query(let + func.args(" fn($s) { $n/name() || $s }", " [ '!' ]"), "a!");
-      // the copy has its own identity
-      query(let + func.args(" fn() { $n }") + " is $n", false);
-      // the captured query focus is copied as well
+      // the child context shares the databases of the query: the node is not copied
+      query(let + func.args(" fn() { $n }") + " is $n", true);
+      query(let + func.args(" fn($a) { $a }", " [ $n ]") + " is $n", true);
       query("db:get('" + NAME + "')/*/* ! " + func.args(" name#0"), "b\nc");
+
+      // function bodies may access the database
+      final String i = "let $i := random:integer(1) + 1 ";
+      final String f = " fn() { count(db:get('" + NAME + "')//b) + $i }";
+      query(i + "let $f :=" + f + " return $f() + " + func.args(" $f"), 4);
+      query(i + "return " + func.args(f), 2);
+      query("declare %basex:inline(0) function local:f() { db:get('" + NAME + "')//c }; " +
+          func.args(" fn() { name(local:f()) }"), "c");
+      query("declare variable $v := db:get('" + NAME + "')//b; " +
+          func.args(" fn() { name($v) }"), "b");
     } finally {
       execute(new DropDB(NAME));
     }
