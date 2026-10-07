@@ -16,6 +16,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
@@ -204,6 +205,13 @@ public final class FnReplicate extends StandardFunc {
   protected boolean values(final boolean limit, final CompileContext cc) {
     return super.values(false, cc) && arg(1) instanceof final Itr itr &&
         Util.inBounds(arg(0).size(), itr.itr());
+  }
+
+  @Override
+  public VarUsage count(final Var var) {
+    // multiple evaluations: references in the input are evaluated repeatedly
+    final VarUsage uses = super.count(var);
+    return singleEval(true) ? uses : uses.plus(arg(0).count(var));
   }
 
   /**

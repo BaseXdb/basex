@@ -4753,6 +4753,10 @@ return
         "1\n1\n1\n1", empty(func));
     check("(1, 1) ! " + func.args(" .", 2),
         "1\n1\n1\n1", empty(func));
+
+    // repeated evaluations: do not inline variables
+    query("let $a := <a/> let $r := " + func.args(" ($a, 1)[random:integer(1) + 1]", 2, true) +
+        " return $r[1] is $r[2]", true);
   }
 
   /** Test method. */
