@@ -40,6 +40,8 @@ public class CmpG extends Cmp {
   CmpOp op;
   /** Indicates if input is known to be comparable. */
   boolean comparable;
+  /** Indicates if both operands are evaluated eagerly. */
+  private boolean eager;
 
   /**
    * Constructor.
@@ -119,6 +121,7 @@ public class CmpG extends Cmp {
           || type1.instanceOf(BasicType.DURATION) && type2.instanceOf(BasicType.DURATION)) {
         comparable = true;
       }
+      eager = expr1.eager() && expr2.eager();
 
       // choose best implementation
       if(st1.zeroOrOne() && !st1.mayBeWrapped() && st2.zeroOrOne() && !st2.mayBeWrapped()) {
@@ -314,6 +317,19 @@ public class CmpG extends Cmp {
 
   @Override
   protected boolean ebv(final QueryContext qc) throws QueryException {
+    if(eager) {
+      // single atomic items: compare without iterators
+      final Value value1 = exprs[0].value(qc);
+      if(value1.isEmpty()) return false;
+      final Value value2 = exprs[1].value(qc);
+      if(value2.isEmpty()) return false;
+      if(value1 instanceof final Item item1 && item1.type.instanceOf(BasicType.ANY_ATOMIC_TYPE) &&
+          value2 instanceof final Item item2 && item2.type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) {
+        return eval(item1, item2, qc);
+      }
+      final Iter iter1 = value1.atomIter(qc, info), iter2 = value2.atomIter(qc, info);
+      return compare(iter1, iter2, iter1.size(), iter2.size(), qc);
+    }
     final Iter iter1 = exprs[0].atomIter(qc, info);
     final long size1 = iter1.size();
     if(size1 == 0) return false;
@@ -340,26 +356,34 @@ public class CmpG extends Cmp {
     if(size2 == 1 && size1 > 1 && iter1.eagerValue() instanceof final RangeSeq rs &&
         iter2.eagerValue() instanceof final ANum num) return compare(num, rs, op.swap());
     // improve cache efficiency by looping the smaller array in the outer loop
-    if(size1 < size2 || size2 == -1) {
-      // (1, 2) = (3, 4, 5, 6, 7) → 1 = 3, 1 = 4, ..., 2 = 3, ...
-      Iter ir2 = iter2;
-      for(Item item1; (item1 = iter1.next()) != null;) {
-        if(ir2 == null) ir2 = exprs[1].atomIter(qc, info);
-        for(Item item2; (item2 = qc.next(ir2)) != null;) {
-          if(eval(item1, item2, qc)) return true;
-        }
-        ir2 = null;
+    // (1, 2) = (3, 4, 5, 6, 7) → 1 = 3, 1 = 4, ..., 2 = 3, ...
+    // (1, 2, 3, 4, 5) = (6, 7) → 1 = 6, 2 = 6, ..., 1 = 7, ...
+    return size1 < size2 || size2 == -1 ? compare(iter1, iter2, false, qc) :
+      compare(iter2, iter1, true, qc);
+  }
+
+  /**
+   * Compares all items of the outer iterator with the items of the inner iterator.
+   * @param outer outer iterator
+   * @param inner inner iterator (its items are cached in the first pass unless it is value-based)
+   * @param swap swap the items of the outer and inner iterator in the comparison
+   * @param qc query context
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  private boolean compare(final Iter outer, final Iter inner, final boolean swap,
+      final QueryContext qc) throws QueryException {
+    Iter iter = inner;
+    Value value = inner.eagerValue();
+    for(Item item1; (item1 = outer.next()) != null;) {
+      if(iter == null) iter = value.iter();
+      final ValueBuilder vb = value == null && outer.size() != 1 ? new ValueBuilder(qc) : null;
+      for(Item item2; (item2 = qc.next(iter)) != null;) {
+        if(swap ? eval(item2, item1, qc) : eval(item1, item2, qc)) return true;
+        if(vb != null) vb.add(item2);
       }
-    } else {
-      // (1, 2, 3, 4, 5) = (6, 7) → 1 = 6, 2 = 6, ..., 1 = 7, ...
-      Iter ir1 = iter1;
-      for(Item item2; (item2 = iter2.next()) != null;) {
-        if(ir1 == null) ir1 = exprs[0].atomIter(qc, info);
-        for(Item item1; (item1 = qc.next(ir1)) != null;) {
-          if(eval(item1, item2, qc)) return true;
-        }
-        ir1 = null;
-      }
+      if(vb != null) value = vb.value();
+      iter = null;
     }
     return false;
   }
@@ -595,6 +619,7 @@ public class CmpG extends Cmp {
    */
   final CmpG copyType(final CmpG cmp) {
     cmp.comparable = comparable;
+    cmp.eager = eager;
     return super.copyType(cmp);
   }
 

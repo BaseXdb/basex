@@ -53,6 +53,15 @@ public final class TraceTest extends SandboxTest {
     assertEquals(List.of("1"), TRACES);
   }
 
+  /** General comparisons: each operand is evaluated once. */
+  @Test public void generalComparison() {
+    query("declare function local:f($n) { message('f'), (1, 2, 3)[. > $n] };\n"
+        + "declare function local:g($n) { message('g'), (5, 6, 7)[. > $n] };\n"
+        + "local:f(" + _RANDOM_INTEGER.args(1) + ") = local:g(" + _RANDOM_INTEGER.args(1) + ')',
+        false);
+    assertEquals(List.of("f", "g"), TRACES);
+  }
+
   /** Test method. */
   @Test public void permission() {
     query(_XQUERY_EVAL.args(" 'trace(1)'"), 1);
