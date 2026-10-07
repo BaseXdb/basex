@@ -117,18 +117,24 @@ public final class GlobalValues {
   }
 
   /**
-   * Checks if waiting for a variable would introduce a circular dependency, that is, if the chain
-   * of blocked evaluations leads back to the current context or one of its ancestors.
+   * Checks if waiting for a variable would introduce a circular dependency, that is, if the
+   * blocked evaluations lead back to the current context or one of its ancestors.
    * @param var static variable
    * @param qc current query context
    * @return result of check
    */
   private boolean circular(final StaticVar var, final QueryContext qc) {
-    for(StaticVar sv = var; sv != null;) {
-      final QueryContext context = evaluating(sv);
-      if(context == null) return false;
+    final ArrayDeque<StaticVar> todo = new ArrayDeque<>();
+    final Set<QueryContext> visited = Collections.newSetFromMap(new IdentityHashMap<>());
+    todo.add(var);
+    while(!todo.isEmpty()) {
+      final QueryContext context = evaluating(todo.poll());
+      if(context == null || !visited.add(context)) continue;
       if(nested(qc, context)) return true;
-      sv = waitingFor(context);
+      // follow all contexts that are nested in the evaluating context and waiting for a variable
+      for(final Map.Entry<QueryContext, StaticVar> entry : waiting.entrySet()) {
+        if(nested(entry.getKey(), context)) todo.add(entry.getValue());
+      }
     }
     return false;
   }
@@ -140,18 +146,6 @@ public final class GlobalValues {
    */
   private QueryContext evaluating(final StaticVar var) {
     return globals.getOrDefault(var, FREE).context;
-  }
-
-  /**
-   * Returns the variable that a context, or a context nested in it, is waiting for.
-   * @param qc query context
-   * @return variable, or {@code null} if no context is waiting
-   */
-  private StaticVar waitingFor(final QueryContext qc) {
-    for(final Map.Entry<QueryContext, StaticVar> entry : waiting.entrySet()) {
-      if(nested(entry.getKey(), qc)) return entry.getValue();
-    }
-    return null;
   }
 
   /**
