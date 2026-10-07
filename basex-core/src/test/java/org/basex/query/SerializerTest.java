@@ -341,7 +341,9 @@ public final class SerializerTest extends SandboxTest {
         "<a href=\"z\">Z</a>");
     query("serialize(<a href='z'>z</a>, { 'method': 'html', 'escape-uri-attributes': false(), "
         + "'use-character-maps': { 'z': 'Z' } })", "<a href=\"Z\">Z</a>");
-    // JSON method
+    // adaptive and JSON methods
+    query("serialize(('x', { 'a': 'x' }), { 'method': 'adaptive', "
+        + "'use-character-maps': { 'x': 'X' } })", "\"X\"\n{\"a\":\"X\"}");
     query("serialize('x', { 'method': 'json', 'use-character-maps': { 'x': 'X' } })", "\"X\"");
     query("serialize(<json type='object'><ax>x\"</ax></json>, { 'method': 'json', "
         + "'json': { 'format': 'direct' }, 'use-character-maps': { 'x': 'X' } })",
@@ -490,9 +492,9 @@ public final class SerializerTest extends SandboxTest {
     query(option + "xs:double('-0')", "-0");
     query(option + "xs:byte(1)", 1);
     query(option + "false()", "false()");
-    query(option + "'A'", "A");
-    query(option + "xs:anyURI('A')", "A");
-    query(option + "xs:untypedAtomic('A')", "A");
+    query(option + "'A'", "\"A\"");
+    query(option + "xs:anyURI('A')", "\"A\"");
+    query(option + "xs:untypedAtomic('A')", "\"A\"");
     query(option + "xs:QName('xml:a')", "#xml:a");
     query(option + "xs:QName('fn:a')", "#fn:a");
     query(option + "xs:dayTimeDuration('P1D')", "xs:duration(\"P1D\")");

@@ -162,20 +162,11 @@ public class AdaptiveSerializer extends OutputSerializer {
           }
         }
       } else {
+        // the resulting string is serialized with the Text output method
         final Type tp = constructor(type);
-        if(tp == null && depth == 0 && !expression) {
-          // top-level string: omit the enclosing quotes (Text output method)
-          printChars(item.string(null));
-        } else {
-          if(tp != null) {
-            printChars(Token.token(tp));
-            printChar('(');
-          }
-          printChars(value(item.string(null), true, false, false));
-          if(tp != null) {
-            printChar(')');
-          }
-        }
+        final byte[] string = value(item.string(null), true, false, false);
+        expand(tp != null ? Token.concat(Token.token(tp), "(", string, ")") : string,
+          this::printChars);
       }
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
