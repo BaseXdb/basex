@@ -152,16 +152,12 @@ public abstract class CsvSerializer extends StandardSerializer {
     byte[] txt = value != null ? value : Token.EMPTY;
     if(cmap != null) {
       final TokenBuilder tb = new TokenBuilder(txt.length);
-      final TokenParser tp = new TokenParser(txt);
-      while(tp.more()) {
-        final int cp = tp.next();
-        final byte[] mapped = cmap.get(cp);
-        if(mapped != null) tb.add(mapped);
-        else tb.add(cp);
-      }
+      expand(txt, tb::add, tb::add);
       txt = tb.finish();
+    } else {
+      // no character map: avoid copying the field
+      txt = normalize(txt, form);
     }
-    if(form != null) txt = normalize(txt, form);
     final boolean delim = contains(txt, separator) || contains(txt, '\n') ||
         !backslashes && contains(txt, '\r');
     final boolean special = contains(txt, '\r') || contains(txt, quoteCharacter)

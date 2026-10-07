@@ -130,41 +130,83 @@ abstract class MarkupSerializer extends StandardSerializer {
   // PROTECTED METHODS ============================================================================
 
   @Override
-  protected boolean separate() throws IOException {
-    if(!more || itemsep == null) return false;
-    // separators are inserted as text nodes: characters are mapped and escaped
-    printChars(itemsep);
-    return true;
-  }
-
-  @Override
   protected void namespace(final byte[] prefix, final byte[] uri, final boolean standalone)
       throws IOException {
     if(undecl || prefix.length == 0 || uri.length != 0) super.namespace(prefix, uri, standalone);
   }
 
   @Override
+  protected void namespaceAttribute(final byte[] name, final byte[] uri, final boolean standalone)
+      throws IOException {
+    // namespace nodes are no text or attribute nodes: no character expansion
+    attribute(name, uri, standalone, false);
+  }
+
+  @Override
   protected void attribute(final byte[] name, final byte[] value, final boolean standalone)
       throws IOException {
+    attribute(name, value, standalone, true);
+  }
+
+  /**
+   * Serializes an attribute.
+   * @param name name
+   * @param value value
+   * @param standalone standalone flag
+   * @param expand apply character mapping and normalization
+   * @throws IOException I/O exception
+   */
+  protected final void attribute(final byte[] name, final byte[] value, final boolean standalone,
+      final boolean expand) throws IOException {
 
     if(!standalone) delimitAttribute();
     out.print(name);
+    attributeValue(value, expand);
+  }
+
+  /**
+   * Serializes an attribute value.
+   * @param value value
+   * @param expand apply character mapping and normalization
+   * @throws IOException I/O exception
+   */
+  protected final void attributeValue(final byte[] value, final boolean expand)
+      throws IOException {
     out.print(ATT1);
-    final byte[] val = normalize(value, form);
-    final int vl = val.length;
-    for(int v = 0; v < vl; v += cl(val, v)) {
-      final int cp = cp(val, v);
-      if(cp == '"') {
+    if(expand) expand(value, this::attributeChars);
+    else attributeChars(value);
+    out.print(ATT2);
+  }
+
+  /**
+   * Prints the characters of an attribute value.
+   * @param value characters
+   * @throws IOException I/O exception
+   */
+  private void attributeChars(final byte[] value) throws IOException {
+    final int vl = value.length;
+    for(int v = 0; v < vl; v += cl(value, v)) {
+      final int cp = cp(value, v);
+      if(unescaped(value, v)) {
+        out.print(cp);
+      } else if(cp == '"') {
         out.print(E_QUOT);
       } else if(cp == 0x9 || cp == 0xA) {
         printHex(cp);
-      } else if(canonical && cp == '>') {
-        out.print(cp);
       } else {
-        printChar(cp);
+        print(cp);
       }
     }
-    out.print(ATT2);
+  }
+
+  /**
+   * Checks if a character of an attribute value is printed without escaping.
+   * @param value attribute value
+   * @param v offset of the character
+   * @return result of check
+   */
+  boolean unescaped(final byte[] value, final int v) {
+    return canonical && value[v] == '>';
   }
 
   /**
@@ -194,15 +236,14 @@ abstract class MarkupSerializer extends StandardSerializer {
   @Override
   protected void text(final byte[] value, final FTPos ftp) throws IOException {
     if(opened.isEmpty()) checkRoot(null);
-    final byte[] val = normalize(value, form);
     if(ftp == null) {
       final QNmSet qnames = cdata();
-      final int vl = val.length;
       if(qnames.isEmpty() || opened.isEmpty() || !qnames.contains(opened.peek())) {
-        for(int v = 0; v < vl; v += cl(val, v)) {
-          printChar(cp(val, v));
-        }
+        expand(value, this::printUnmapped);
       } else {
+        // CDATA sections: normalization, but no character mapping
+        final byte[] val = normalize(value, form);
+        final int vl = val.length;
         out.print(CDATA_O);
         int c = 0;
         for(int v = 0; v < vl; v += cl(val, v)) {
@@ -222,13 +263,11 @@ abstract class MarkupSerializer extends StandardSerializer {
         out.print(CDATA_C);
       }
     } else {
-      final FTLexer lexer = new FTLexer().original().init(val);
+      final FTLexer lexer = new FTLexer().original().init(value);
       while(lexer.hasNext()) {
         final FTSpan span = lexer.next();
         if(!span.del && ftp.contains(span.pos)) out.print(TokenBuilder.MARK);
-        final byte[] text = span.text;
-        final int tl = text.length;
-        for(int t = 0; t < tl; t += cl(text, t)) printChar(cp(text, t));
+        expand(span.text, this::printUnmapped);
       }
     }
     sep = false;

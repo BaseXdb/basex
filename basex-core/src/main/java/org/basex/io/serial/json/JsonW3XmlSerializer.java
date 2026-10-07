@@ -82,10 +82,7 @@ public final class JsonW3XmlSerializer extends JsonSerializer {
 
       if(printKey) {
         if(key == null) throw error("Element '%' has no key.", local);
-        key = escape(key, escapedKey, true);
-        out.print('"');
-        out.print(normalize(key, form));
-        out.print('"');
+        quoted(key, escapedKey, true);
         out.print(':');
       }
 
@@ -100,12 +97,10 @@ public final class JsonW3XmlSerializer extends JsonSerializer {
         if(value == null) throw error("Element '%' has no value.", local);
         final Boolean b = Bln.parse(value);
         if(b == null) throw error("Element '%' has invalid value: '%'.", local, value);
-        out.print(normalize(token(b), form));
+        out.print(token(b));
       } else if(eq(local, STRING)) {
         final byte[] value = value(iter, local);
-        out.print('"');
-        if(value != null) out.print(normalize(escape(value, escaped, false), form));
-        out.print('"');
+        quoted(value != null ? value : EMPTY, escaped, false);
       } else if(eq(local, NUMBER)) {
         final byte[] value = value(iter, local);
         if(value == null) throw error("Element '%' has no value.", local);
@@ -249,20 +244,32 @@ public final class JsonW3XmlSerializer extends JsonSerializer {
   }
 
   /**
-   * Returns a possibly escaped value.
-   * @param value value to escape
+   * Prints a quoted string with escaping, character mapping and normalization.
+   * @param value value
    * @param escaped indicates if value is already escaped
    * @param key key
-   * @return escaped value
-   * @throws QueryIOException query I/O exception
+   * @throws IOException I/O exception
    */
-  private byte[] escape(final byte[] value, final boolean escaped, final boolean key)
-      throws QueryIOException {
-
-    // parse escaped strings, check for errors
+  private void quoted(final byte[] value, final boolean escaped, final boolean key)
+      throws IOException {
+    // parse escaped strings, check for errors and duplicate keys
     final byte[] unescaped = escaped && contains(value, '\\') ? unescape(value) : value;
     if(key && !printedKeys.add(unescaped)) throw error("Duplicate key: %.", value);
 
+    out.print('"');
+    // escaped strings are output as given; otherwise, characters are mapped before escaping
+    if(escaped) out.print(normalize(escape(value, true), form));
+    else expand(value, run -> out.print(escape(run, false)));
+    out.print('"');
+  }
+
+  /**
+   * Returns a possibly escaped value.
+   * @param value value to escape
+   * @param escaped indicates if value is already escaped
+   * @return escaped value
+   */
+  private byte[] escape(final byte[] value, final boolean escaped) {
     // create result, based on escaped string (contains Unicode sequences)
     final TokenBuilder tb = new TokenBuilder();
     boolean bs = false;

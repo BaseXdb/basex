@@ -62,31 +62,18 @@ final class HTMLSerializer extends XhtmlHtmlSerializer {
     if(!standalone) delimitAttribute();
     out.print(name);
 
-    byte[] val = value;
     final byte[] key = attributeKey(name);
-    if(key != null) {
-      // don't append value for boolean attributes
-      if(BOOLEAN.contains(key) && eq(lc(name), lc(val))) return;
-      // escape URI attributes
-      if(escape && URIS.contains(key)) val = escapeUri(val);
-    }
-    val = normalize(val, form);
+    // don't append value for boolean attributes
+    if(key != null && BOOLEAN.contains(key) && eq(lc(name), lc(value))) return;
+    // escaped URIs are neither mapped nor normalized
+    final boolean uri = key != null && escape && URIS.contains(key);
+    attributeValue(uri ? escapeUri(value) : value, !uri);
+  }
 
-    out.print(ATT1);
-    final int vl = val.length;
-    for(int v = 0; v < vl; v += cl(val, v)) {
-      final int ch = cp(val, v);
-      if(ch == '<' || ch == '&' && val[Math.min(v + 1, vl - 1)] == '{') {
-        out.print(ch);
-      } else if(ch == '"') {
-        out.print(E_QUOT);
-      } else if(ch == 0x9 || ch == 0xA) {
-        printHex(ch);
-      } else {
-        printChar(ch);
-      }
-    }
-    out.print(ATT2);
+  @Override
+  boolean unescaped(final byte[] value, final int v) {
+    final byte b = value[v];
+    return b == '<' || b == '&' && value[Math.min(v + 1, value.length - 1)] == '{';
   }
 
   @Override

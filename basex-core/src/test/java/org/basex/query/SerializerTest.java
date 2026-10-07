@@ -323,6 +323,38 @@ public final class SerializerTest extends SandboxTest {
     query(option + USE_CHARACTER_MAPS.arg("%=PC") + "'1%2'", "1PC2");
   }
 
+  /** Test: character expansion (character mapping, Unicode normalization, URI escaping). */
+  @Test public void characterExpansion() {
+    // characters are mapped first; only the remaining ones are normalized
+    query("serialize(<a>c&#xe7;</a>, { 'use-character-maps': { 'c': '&#xe7;' }, "
+        + "'normalization-form': 'NFD' }) => string-to-codepoints()",
+        "60\n97\n62\n231\n99\n807\n60\n47\n97\n62");
+    query("serialize(<a b='c&#xe7;'/>, { 'use-character-maps': { 'c': '&#xe7;' }, "
+        + "'normalization-form': 'NFD' }) => string-to-codepoints()",
+        "60\n97\n32\n98\n61\n34\n231\n99\n807\n34\n47\n62");
+    // namespace declarations are not mapped
+    query("serialize(<a xmlns='x'/>, { 'use-character-maps': { 'x': 'X' } })", "<a xmlns=\"x\"/>");
+    // escaped URI attributes are not mapped
+    query("serialize(<a href='z'>z</a>, { 'method': 'html', 'use-character-maps': { 'z': 'Z' } })",
+        "<a href=\"z\">Z</a>");
+    query("serialize(<a href='z'>z</a>, { 'method': 'xhtml', 'use-character-maps': { 'z': 'Z' } })",
+        "<a href=\"z\">Z</a>");
+    query("serialize(<a href='z'>z</a>, { 'method': 'html', 'escape-uri-attributes': false(), "
+        + "'use-character-maps': { 'z': 'Z' } })", "<a href=\"Z\">Z</a>");
+    // JSON method
+    query("serialize('x', { 'method': 'json', 'use-character-maps': { 'x': 'X' } })", "\"X\"");
+    query("serialize(<json type='object'><ax>x\"</ax></json>, { 'method': 'json', "
+        + "'json': { 'format': 'direct' }, 'use-character-maps': { 'x': 'X' } })",
+        "{\"aX\":\"X\\\"\"}");
+    query("serialize(<map xmlns='http://www.w3.org/2005/xpath-functions'><string key='x\"'>x"
+        + "</string></map>, { 'method': 'json', 'json': { 'format': 'w3-xml' }, "
+        + "'use-character-maps': { 'x': 'X' } })", "{\"X\\\"\":\"X\"}");
+    // CSV: fields are mapped and normalized before quoting
+    query("serialize(['x\"&#xe7;'], { 'method': 'csv', 'csv': { 'format': 'w3-arrays' }, "
+        + "'use-character-maps': { 'x': 'X' }, 'normalization-form': 'NFD' }) "
+        + "=> string-to-codepoints()", "34\n88\n34\n34\n99\n807\n34\n10");
+  }
+
   /** Test: item-separator. */
   @Test public void itemSeparator() {
     query(ITEM_SEPARATOR.arg("-") + "1, 2", "1-2");

@@ -34,11 +34,10 @@ final class XHTMLSerializer extends XhtmlHtmlSerializer {
   protected void attribute(final byte[] name, final byte[] value, final boolean standalone)
       throws IOException {
 
-    // escape URI attributes
     final byte[] key = escape ? attributeKey(name) : null;
-    final byte[] v = key != null && URIS.contains(key) ?
-        escapeUri(value) : value;
-    super.attribute(name, v, standalone);
+    // escaped URIs are neither mapped nor normalized
+    if(key != null && URIS.contains(key)) attribute(name, escapeUri(value), standalone, false);
+    else super.attribute(name, value, standalone);
   }
 
   @Override

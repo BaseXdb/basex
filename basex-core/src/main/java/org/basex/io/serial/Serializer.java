@@ -306,9 +306,22 @@ public abstract class Serializer implements Closeable {
     final byte[] ancUri = nsUri(prefix);
     if(ancUri == null || !eq(ancUri, uri)) {
       if(canonical && uri.length > 0 && !Uri.get(uri).isAbsolute()) throw SERCANONURI_X.getIO(uri);
-      attribute(prefix.length == 0 ? XMLNS : concat(XMLNS_COLON, prefix), uri, standalone);
+      namespaceAttribute(prefix.length == 0 ? XMLNS : concat(XMLNS_COLON, prefix), uri,
+          standalone);
       nspaces.add(prefix, uri);
     }
+  }
+
+  /**
+   * Serializes a namespace declaration as attribute.
+   * @param name attribute name
+   * @param uri namespace URI
+   * @param standalone standalone flag
+   * @throws IOException I/O exception
+   */
+  protected void namespaceAttribute(final byte[] name, final byte[] uri, final boolean standalone)
+      throws IOException {
+    attribute(name, uri, standalone);
   }
 
   /**

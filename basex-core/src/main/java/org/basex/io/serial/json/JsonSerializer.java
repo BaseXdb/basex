@@ -2,7 +2,6 @@ package org.basex.io.serial.json;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
-import static org.basex.util.Token.normalize;
 
 import java.io.*;
 import java.util.*;
@@ -219,7 +218,7 @@ public abstract class JsonSerializer extends StandardSerializer {
    */
   protected final void string(final byte[] string) throws IOException {
     out.print('"');
-    printChars(normalize(string, form));
+    expand(string, this::printUnmapped);
     out.print('"');
   }
 

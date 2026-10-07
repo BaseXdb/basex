@@ -6,10 +6,13 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.nio.charset.*;
+import java.text.Normalizer.*;
 import java.util.*;
 
 import org.basex.io.out.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
+import org.basex.util.options.*;
 
 /**
  * This class serializes items to an output stream.
@@ -28,6 +31,10 @@ public abstract class OutputSerializer extends Serializer {
   private final CheckedOutput checked;
   /** Item separator. */
   protected byte[] itemsep;
+  /** Normalization form (can be {@code null}). */
+  protected final Form form;
+  /** Character map (can be {@code null}). */
+  protected final IntObjectMap<byte[]> cmap;
 
   /** Indentation unit (whitespace string emitted per nesting level). */
   private final byte[] indentUnit;
@@ -80,6 +87,80 @@ public abstract class OutputSerializer extends Serializer {
 
     final String is = sopts.get(ITEM_SEPARATOR);
     if(is != null) itemsep = token(is);
+
+    final String norm = sopts.get(NORMALIZATION_FORM);
+    if(norm.equals(NORMALIZATION_FORM.value())) {
+      form = null;
+    } else {
+      try {
+        form = Form.valueOf(norm);
+      } catch(final IllegalArgumentException ex) {
+        throw SERNORM_X.getIO(norm).cause(ex);
+      }
+    }
+
+    final String maps = sopts.get(USE_CHARACTER_MAPS);
+    if(maps.isEmpty()) {
+      cmap = null;
+    } else {
+      cmap = new IntObjectMap<>();
+      final Map<String, String> map = Options.toMap(maps, new LinkedHashMap<>(), Options::unescape);
+      for(final Map.Entry<String, String> entry : map.entrySet()) {
+        final String key = entry.getKey();
+        if(key.codePoints().count() != 1) throw SERPARAM_X.getIO(
+            Util.info("Key in character map is not a single character: %.", key));
+        cmap.put(key.codePointAt(0), token(entry.getValue()));
+      }
+    }
+  }
+
+  /**
+   * Applies character mapping, and Unicode normalization to the characters that were not mapped.
+   * @param value value
+   * @param printer printer for normalized runs of characters that were not mapped
+   * @throws IOException I/O exception
+   */
+  protected final void expand(final byte[] value, final TextPrinter printer) throws IOException {
+    expand(value, printer, out::print);
+  }
+
+  /**
+   * Applies character mapping, and Unicode normalization to the characters that were not mapped.
+   * @param value value
+   * @param printer printer for normalized runs of characters that were not mapped
+   * @param mapped printer for the strings of mapped characters
+   * @throws IOException I/O exception
+   */
+  protected final void expand(final byte[] value, final TextPrinter printer,
+      final TextPrinter mapped) throws IOException {
+    final int vl = value.length;
+    int s = 0;
+    if(cmap != null) {
+      for(int v = 0; v < vl;) {
+        final int l = cl(value, v);
+        final byte[] string = cmap.get(cp(value, v));
+        if(string != null) {
+          if(s < v) printer.print(normalize(substring(value, s, v), form));
+          mapped.print(string);
+          s = v + l;
+        }
+        v += l;
+      }
+    }
+    if(s < vl) printer.print(normalize(substring(value, s, vl), form));
+  }
+
+  /**
+   * Printer for characters.
+   */
+  @FunctionalInterface
+  protected interface TextPrinter {
+    /**
+     * Prints characters.
+     * @param text characters
+     * @throws IOException I/O exception
+     */
+    void print(byte[] text) throws IOException;
   }
 
   /**

@@ -1,12 +1,9 @@
 package org.basex.io.serial;
 
-import static org.basex.io.serial.SerializerOptions.*;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.text.Normalizer.*;
-import java.util.*;
 
 import org.basex.io.in.*;
 import org.basex.query.*;
@@ -16,9 +13,6 @@ import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
-import org.basex.util.hash.*;
-import org.basex.util.options.*;
 
 /**
  * This class serializes items to an output stream.
@@ -27,11 +21,6 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public abstract class StandardSerializer extends OutputSerializer {
-  /** Normalization form (can be {@code null}). */
-  protected final Form form;
-  /** Character map (can be {@code null}). */
-  protected final IntObjectMap<byte[]> cmap;
-
   /** Include separator. */
   protected boolean sep;
   /** Atomic flag. */
@@ -45,34 +34,15 @@ public abstract class StandardSerializer extends OutputSerializer {
    */
   protected StandardSerializer(final OutputStream os, final SerializerOptions sopts)
       throws IOException {
-
     super(os, sopts);
+  }
 
-    final String norm = sopts.get(NORMALIZATION_FORM);
-    if(norm.equals(NORMALIZATION_FORM.value())) {
-      form = null;
-    } else {
-      try {
-        form = Form.valueOf(norm);
-      } catch(final IllegalArgumentException ex) {
-        throw SERNORM_X.getIO(norm).cause(ex);
-      }
-    }
-    if(itemsep != null) itemsep = normalize(itemsep, form);
-
-    final String maps = sopts.get(USE_CHARACTER_MAPS);
-    if(maps.isEmpty()) {
-      cmap = null;
-    } else {
-      cmap = new IntObjectMap<>();
-      final Map<String, String> map = Options.toMap(maps, new LinkedHashMap<>(), Options::unescape);
-      for(final Map.Entry<String, String> entry : map.entrySet()) {
-        final String key = entry.getKey();
-        if(key.codePoints().count() != 1) throw SERPARAM_X.getIO(
-            Util.info("Key in character map is not a single character: %.", key));
-        cmap.put(key.codePointAt(0), token(entry.getValue()));
-      }
-    }
+  @Override
+  protected boolean separate() throws IOException {
+    if(!more || itemsep == null) return false;
+    // separators are inserted as text nodes: characters are mapped, normalized and escaped
+    expand(itemsep, this::printUnmapped);
+    return true;
   }
 
   @Override
@@ -113,7 +83,7 @@ public abstract class StandardSerializer extends OutputSerializer {
           for(int cp; (cp = ti.read()) != -1;) printChar(cp);
         }
       } else {
-        printChars(normalize(item.string(null), form));
+        expand(item.string(null), this::printUnmapped);
       }
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
@@ -136,6 +106,16 @@ public abstract class StandardSerializer extends OutputSerializer {
    */
   protected void print(final int cp) throws IOException {
     out.print(cp);
+  }
+
+  /**
+   * Prints characters that were not mapped.
+   * @param text characters
+   * @throws IOException I/O exception
+   */
+  protected final void printUnmapped(final byte[] text) throws IOException {
+    final int tl = text.length;
+    for(int t = 0; t < tl; t += cl(text, t)) print(cp(text, t));
   }
 
   /**

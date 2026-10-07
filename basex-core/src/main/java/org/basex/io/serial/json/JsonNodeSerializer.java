@@ -177,9 +177,7 @@ public final class JsonNodeSerializer extends JsonSerializer {
         if(key == null) throw error("<%> has no name attribute", elem);
         final byte[] name = atts ? key : XMLToken.decode(key, lax);
         if(name == null) throw error("Name of element <%> is invalid", key);
-        out.print('"');
-        out.print(normalize(name, form));
-        out.print('"');
+        string(name);
         out.print(':');
         if(indent) out.print(' ');
       } else if(eq(ptype, ARRAY)) {
