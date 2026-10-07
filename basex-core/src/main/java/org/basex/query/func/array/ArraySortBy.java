@@ -53,6 +53,7 @@ public class ArraySortBy extends SortFn {
     final Expr array = arg(0);
     if(array == XQArray.empty()) return array;
 
+    coerceKeys(cc);
     if(array.seqType().type instanceof final ArrayType at) exprType.assign(at);
     return this;
   }

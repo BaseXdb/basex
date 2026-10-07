@@ -104,14 +104,10 @@ public final class TypeCheck extends Single {
       return expr;
     }
 
-    // function item coercion
-    if(expr instanceof final FuncItem fi && type instanceof final FuncType ft) {
-      if(!st.occ.check(1)) throw typeError(fi, st, name, info);
-      return cc.replaceWith(this, fi.coerceTo(ft, cc.qc, cc, info));
+    // pre-evaluate; embedded function items are coerced with the compilation context
+    if(cc.values(true, expr)) {
+      return cc.replaceWith(this, st.coerce((Value) expr, cc.qc, info, name, cc));
     }
-
-    // pre-evaluate
-    if(cc.values(true, expr)) return cc.preEval(this);
 
     // push type check inside expression
     final Expr checked = expr.inlineTypeCheck(this, cc);

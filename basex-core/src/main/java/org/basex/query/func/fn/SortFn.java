@@ -5,6 +5,7 @@ import static org.basex.query.QueryError.*;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
@@ -45,6 +46,17 @@ public abstract class SortFn extends StandardFunc {
    */
   protected RecordType keyRecord() {
     return Records.SORT_KEY.get();
+  }
+
+  /**
+   * Coerces static key records at compile time to avoid function wrappers at runtime.
+   * @param cc compilation context
+   * @throws QueryException query exception
+   */
+  protected final void coerceKeys(final CompileContext cc) throws QueryException {
+    if(arg(1) instanceof Value) {
+      arg(1, arg -> new TypeCheck(info, arg, definition.types[1]).optimize(cc));
+    }
   }
 
   /**

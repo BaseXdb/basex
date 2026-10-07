@@ -23,7 +23,9 @@ public class FnSortBy extends SortFn {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0);
-    return input.seqType().zero() ? input : adoptType(input);
+    if(input.seqType().zero()) return input;
+    coerceKeys(cc);
+    return adoptType(input);
   }
 
   @Override
