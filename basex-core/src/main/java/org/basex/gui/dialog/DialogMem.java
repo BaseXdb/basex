@@ -25,6 +25,8 @@ public final class DialogMem extends BaseXDialog {
   private final TextPanel text;
   /** GC Button. */
   private final BaseXButton gc;
+  /** Timer for updating the display of memory consumption. */
+  private final Timer timer;
 
   /**
    * Default constructor.
@@ -41,7 +43,9 @@ public final class DialogMem extends BaseXDialog {
     gc = new BaseXButton(this, "GC");
     final BaseXBack buttons = newButtons(gc);
     set(buttons, BorderLayout.SOUTH);
-    addTimer();
+    timer = new Timer(500, e -> {
+      if(!text.selected()) text.setText(info());
+    });
     finish();
   }
 
@@ -81,12 +85,15 @@ public final class DialogMem extends BaseXDialog {
         + TOTAL_MEM_C + Performance.formatHuman(max) + NL + NL + H_USED_MEM;
   }
 
-  /**
-   * Add timer for updating display of memory consumption.
-   */
-  private void addTimer() {
-    new Timer(500, e -> {
-      if(isVisible() && !text.selected()) text.setText(info());
-    }).start();
+  @Override
+  public void addNotify() {
+    super.addNotify();
+    timer.start();
+  }
+
+  @Override
+  public void removeNotify() {
+    timer.stop();
+    super.removeNotify();
   }
 }

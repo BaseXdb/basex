@@ -84,6 +84,8 @@ public final class EditorView extends View {
   private final BaseXTabs tabs;
   /** Context. */
   private final BaseXLabel context;
+  /** Timer for reloading files that have been changed on disk. */
+  private final Timer reload;
 
   /** Query file that has last been evaluated (can be {@code null}). */
   private IOFile execFile;
@@ -189,10 +191,10 @@ public final class EditorView extends View {
     refreshLayout();
 
     // reload the visible editor if its file has been changed on disk
-    new Timer(1000, e -> {
+    reload = new Timer(1000, e -> {
       final EditorArea edit = getEditor();
       if(edit != null) edit.refresh();
-    }).start();
+    });
 
     // add listeners
     saveB.addActionListener(e -> {
@@ -272,6 +274,18 @@ public final class EditorView extends View {
   @Override
   protected boolean db() {
     return false;
+  }
+
+  @Override
+  public void addNotify() {
+    super.addNotify();
+    reload.start();
+  }
+
+  @Override
+  public void removeNotify() {
+    reload.stop();
+    super.removeNotify();
   }
 
   /**

@@ -187,6 +187,12 @@ public class TextPanel extends BaseXPanel {
     caretTimer = new Timer(500, e -> rend.blink());
   }
 
+  @Override
+  public void removeNotify() {
+    caretTimer.stop();
+    super.removeNotify();
+  }
+
   /**
    * Sets the output text.
    * @param t output text
