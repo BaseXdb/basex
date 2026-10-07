@@ -260,8 +260,8 @@ public final class Payload {
     }
 
     if(mode == BodyMode.PARSE) {
-      final byte[] contents =
-        new TextInput(new IOContent(bl.finish()), charsetOf(part.type)).content();
+      // raw bytes: text is decoded by the media type of the part, binary data is kept
+      final byte[] contents = bl.finish();
       part.value = parse(new IOContent(base64 ? Base64.decode(contents) : contents), part.type);
     }
     return true;

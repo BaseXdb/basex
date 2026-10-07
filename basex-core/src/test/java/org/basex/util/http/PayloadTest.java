@@ -124,6 +124,19 @@ public final class PayloadTest extends SandboxTest {
   }
 
   /**
+   * Binary parts of a multipart body are not decoded with the charset of the outer type.
+   * @throws Exception exception
+   */
+  @Test public void multipartBinaryPart() throws Exception {
+    final byte[] bin = { (byte) 0x89, 'P', 'N', 'G', (byte) 0xFF, 0, (byte) 0xC3 };
+    final byte[] body = Token.concat(Token.token("--bnd\r\nContent-Type: image/png\r\n\r\n"), bin,
+        Token.token("\r\n--bnd--\r\n"));
+    final MediaType type = new MediaType("multipart/related; boundary=bnd; charset=UTF-8");
+    final Value value = Payload.value(new IOContent(body), type, OPTIONS);
+    assertArrayEquals(bin, ((B64) value).binary(null));
+  }
+
+  /**
    * Parameter values that are no tokens are quoted, and the parameter order is preserved.
    */
   @Test public void mediaTypeString() {
