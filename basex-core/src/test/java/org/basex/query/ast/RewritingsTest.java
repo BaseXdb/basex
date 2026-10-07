@@ -2561,6 +2561,9 @@ public final class RewritingsTest extends SandboxTest {
         "2\n4\n6", root(If.class));
     check("let $c := " + c + " return for $x at $p in 4 to 6 return if($c) then $p else -$x",
         "1\n2\n3", root(If.class));
+    // the rewritten first branch must not leak into the second
+    query("let $c := not(" + c + ") return (if(" + c + ") then 1) ! (if($c) then . + 1 else . + 2)",
+        3);
 
     // context-dependent or nondeterministic conditions
     check("(1 to 3) ! (if(. > 1) then . else -.)", "-1\n2\n3", root(DualMap.class));

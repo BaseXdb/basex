@@ -255,8 +255,10 @@ public abstract sealed class SimpleMap extends Mapping
     if(next instanceof final If iff && !iff.cond.has(Flag.CTX, Flag.POS, Flag.NDT) &&
         !expr.has(Flag.NDT)) {
       cc.info(OPTUNSWITCH_X, iff.cond);
+      // copy first: the rewritten first branch may modify the original expression
+      final Expr copy = expr.copy(cc, new IntObjectMap<>());
       return new If(iff.info(), iff.cond, get(cc, info, expr, iff.exprs[0]),
-        get(cc, info, expr.copy(cc, new IntObjectMap<>()), iff.exprs[1])).optimize(cc);
+        get(cc, info, copy, iff.exprs[1])).optimize(cc);
     }
 
     // A ! (if(B) then C else () → A[B] ! C
