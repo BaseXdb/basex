@@ -517,6 +517,16 @@ public final class MixedTest extends SandboxTest {
         new TypeInfo(ItemArray.class, "array(xs:integer)", 3));
   }
 
+  /** Character references are checked against XML 1.1. */
+  @Test public void charRefs() {
+    query("'&#12;&#x1;&#x7F;' => string-to-codepoints()", "12\n1\n127");
+    query("<a b='&#xC;'>&#12;</a> ! (@b, .) ! string-to-codepoints(.)", "12\n12");
+    error("'&#0;'", INVCHARREF_X);
+    error("'&#xFFFE;'", INVCHARREF_X);
+    error("'&#xD800;'", INVCHARREF_X);
+    error("'&#x110000;'", INVCHARREF_X);
+  }
+
   /**
    * Tests the data structure of an expression before and after shrinking it.
    * @param query query

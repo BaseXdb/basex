@@ -5152,7 +5152,7 @@ public class QueryParser extends InputParser {
           if(!m) n += 9;
         } while(!consume(';'));
         if(!ok) entityError(p, INVCHARREF_X);
-        if(!XMLToken.valid10(n)) entityError(p, INVCHARREF_X);
+        if(!XMLToken.valid11(n)) entityError(p, INVCHARREF_X);
         tb.add(n);
       } else {
         if(consume("lt")) {

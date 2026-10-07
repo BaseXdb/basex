@@ -1365,7 +1365,7 @@ public enum QueryError {
   /** Error code. */
   DUPLVAR_X(XQST, 89, "Duplicate declaration of %."),
   /** Error code. */
-  INVCHARREF_X(XQST, 90, "Invalid XML 1.0 character: %."),
+  INVCHARREF_X(XQST, 90, "Invalid XML character: %."),
   /** Error code. */
   CIRCPKG_X(XQST, 93, "Package depends on itself: %."),
   /** Error code. */
