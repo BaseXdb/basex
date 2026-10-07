@@ -409,8 +409,7 @@ public final class Payload {
    * @return result of check
    */
   public static boolean binary(final MediaType type) {
-    return !(type.isJSON() || type.isCSV() || type.is(MediaType.TEXT_HTML) || type.isXml() ||
-        type.isText() || type.is(MediaType.APPLICATION_X_WWW_FORM_URLENCODED) ||
+    return !(type.isTextual() || type.is(MediaType.APPLICATION_X_WWW_FORM_URLENCODED) ||
         type.isMultipart());
   }
 
@@ -462,7 +461,7 @@ public final class Payload {
       // remote input: parse as untrusted
       return new DBNode(Parser.xmlParser(io, xmlOptions != null ? xmlOptions :
         new MainOptions().allowExternal(false)));
-    } else if(type.isText()) {
+    } else if(type.isText() || type.isXQuery()) {
       return Str.get(io.read());
     } else if(type.is(MediaType.APPLICATION_X_WWW_FORM_URLENCODED)) {
       try {
@@ -496,7 +495,7 @@ public final class Payload {
    */
   private static IO prepare(final IO body, final MediaType type, final String charset)
       throws IOException {
-    final boolean xml = type.isXml(), text = type.isText();
+    final boolean xml = type.isXml(), text = type.isText() || type.isXQuery();
     if(!(xml || text)) return body;
 
     // convert text to UTF8; skip redundant XML declaration

@@ -76,6 +76,18 @@ public final class PayloadTest extends SandboxTest {
   }
 
   /**
+   * XQuery input is returned as a string.
+   * @throws Exception exception
+   */
+  @Test public void xquery() throws Exception {
+    final MediaType type = new MediaType("application/xquery; charset=ISO-8859-1");
+    assertFalse(Payload.binary(type));
+    final Value value = Payload.value(new IOContent(new byte[] { '"', (byte) 0xE4, '"' }), type,
+        OPTIONS);
+    assertEquals("\"ä\"", ((Str) value).toJava());
+  }
+
+  /**
    * A small multipart file part is bound as an in-memory item.
    * @throws Exception exception
    */
