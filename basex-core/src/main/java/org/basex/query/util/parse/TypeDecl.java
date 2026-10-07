@@ -49,7 +49,8 @@ public final class TypeDecl {
    * @return query string
    */
   public QueryString declaration(final QueryString qs) {
-    if(seqType.type instanceof final RecordType rt && name.eq(rt.name())) {
+    if(seqType.type instanceof final RecordType rt && rt.name() != null &&
+        name.eq(rt.name())) {
       return rt.declaration(qs);
     }
     return qs.token(DECLARE).token(anns).token(TYPE).token(name.prefixId()).token(AS).

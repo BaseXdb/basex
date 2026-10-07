@@ -73,6 +73,15 @@ public final class QueryInfoTest extends SandboxTest {
     assertTrue(query.message().contains("XPST0003"), query.message());
   }
 
+  /** Optimized query with an alias for a record type. */
+  @Test public void recordAlias() {
+    final XQuery query = new XQuery("declare type local:p as record(x); "
+        + "{ 'x': 1 } instance of local:p");
+    execute(query);
+    final String optimized = value(query.sections().sections(), "optimized-query");
+    assertTrue(optimized.contains("declare type local:p as record(x"), optimized);
+  }
+
   /** The query plan is only included if it was requested. */
   @Test public void plan() {
     final XQuery query = new XQuery("1");
