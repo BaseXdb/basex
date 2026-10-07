@@ -147,10 +147,10 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
     if(compiled) return this;
+    focus();
     compiled = true;
 
     checkUpdating();
-    focus();
 
     // compile closure
     for(final Entry<Var, Expr> entry : global.entrySet()) {
@@ -410,7 +410,9 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
    */
   private boolean focus() {
     // function references: the default values of the called function are only known after parsing
-    if(!focus) focus = name != null && expr instanceof StaticFuncCall && expr.has(Flag.CTX);
+    if(!focus && !compiled) {
+      focus = name != null && expr instanceof StaticFuncCall && expr.has(Flag.CTX);
+    }
     return focus;
   }
 

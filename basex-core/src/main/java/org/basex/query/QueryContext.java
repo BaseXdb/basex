@@ -738,24 +738,28 @@ public final class QueryContext extends Job implements Closeable {
    * @throws QueryException query exception
    */
   public void set(final Var var, final Value value) throws QueryException {
-    stack.set(var, value, this);
+    stack.set(var, var.checkType(value, this, null));
   }
 
   /**
    * Binds the arguments of a function call to the function parameters and evaluates the body.
    * @param params function parameters
    * @param args arguments
+   * @param coerce coerce arguments to the parameter types
    * @param body function body
    * @param simple indicates if the query focus is neither accessed nor modified
    * @param qf captured query focus (can be {@code null})
    * @return result
    * @throws QueryException query exception
    */
-  public Value invoke(final Var[] params, final Value[] args, final Expr body,
-      final boolean simple, final QueryFocus qf) throws QueryException {
+  public Value invoke(final Var[] params, final Value[] args, final boolean coerce,
+      final Expr body, final boolean simple, final QueryFocus qf) throws QueryException {
 
     final int pl = params.length;
-    for(int p = 0; p < pl; p++) set(params[p], args[p]);
+    for(int p = 0; p < pl; p++) {
+      if(coerce) set(params[p], args[p]);
+      else stack.set(params[p], args[p]);
+    }
 
     // use shortcut if focus is not accessed
     if(simple) return body.value(this);

@@ -70,6 +70,21 @@ public final class TypeRef implements Type {
   }
 
   /**
+   * Checks if the specified type, its chained references or its choice alternatives contain a
+   * still-unresolved reference.
+   * @param type type
+   * @return result of check
+   */
+  public static boolean incomplete(final Type type) {
+    Type tp = type;
+    while(tp instanceof final TypeRef ref) {
+      if(!ref.resolved()) return true;
+      tp = ref.type;
+    }
+    return tp instanceof final ChoiceItemType cit && Checks.any(cit.types, TypeRef::incomplete);
+  }
+
+  /**
    * Returns the input info of an unresolved reference.
    * @return input info, or {@code null} if resolved
    */

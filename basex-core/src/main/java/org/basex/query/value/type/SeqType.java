@@ -45,6 +45,8 @@ public final class SeqType {
   private ArrayType arrayType;
   /** Map types (can be {@code null}; lazy instantiation). */
   private Map<Type, MapType> mapTypes;
+  /** Map types with basic key types, indexed by ordinal (can be {@code null}). */
+  private MapType[] basicMapTypes;
   /** Cached checks: lower bits flag evaluated checks, upper bits their results. */
   private int checks;
 
@@ -112,8 +114,18 @@ public final class SeqType {
    * @return map type
    */
   public MapType mapType(final Type keyType) {
+    // shortcut for basic key types: the array caches the canonical instances of the hash map
+    final int i = keyType instanceof final BasicType bt ? bt.ordinal() : -1;
+    MapType[] mts = basicMapTypes;
+    if(i != -1 && mts != null && mts[i] != null) return mts[i];
+
     if(mapTypes == null) mapTypes = new ConcurrentHashMap<>();
-    return mapTypes.computeIfAbsent(keyType, k -> new MapType(k, this));
+    final MapType mt = mapTypes.computeIfAbsent(keyType, k -> new MapType(k, this));
+    if(i != -1) {
+      if(mts == null) basicMapTypes = mts = new MapType[BasicType.values().length];
+      mts[i] = mt;
+    }
+    return mt;
   }
 
   /**
@@ -656,9 +668,7 @@ public final class SeqType {
     if((checks & eval) != 0) return (checks & value) != 0;
 
     final boolean result = compute(check);
-    if(!(type instanceof TypeRef || type instanceof ChoiceItemType)) {
-      checks |= eval | (result ? value : 0);
-    }
+    if(!TypeRef.incomplete(type)) checks |= eval | (result ? value : 0);
     return result;
   }
 

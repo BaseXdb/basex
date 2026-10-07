@@ -323,8 +323,9 @@ public abstract class XQMap extends XQStruct {
       if(kt == null && vt == null) return true;
       if(!test((key, value) -> (kt == null || kt.seqType().instance(key, coerce)) &&
           (vt == null || vt.instance(value, coerce)))) return false;
-      // remember the more specific type to skip subsequent checks
-      if(tp instanceof MapType && (kt == null || TypeRef.deref(kt).assignable()) &&
+      // remember the more specific type to skip subsequent checks (records keep their type)
+      if(tp instanceof MapType && !(type instanceof ShapeType) &&
+          (kt == null || TypeRef.deref(kt).assignable()) &&
           (vt == null || TypeRef.deref(vt.type).assignable())) refineType(tp);
       return true;
     } catch(final QueryException ex) {

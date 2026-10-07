@@ -44,8 +44,10 @@ public final class FuncItem extends FItem implements Scope {
   private final QNm name;
   /** Query focus (can be {@code null}). */
   private final QueryFocus focus;
-  /** Indicates if the query focus is accessed or modified. */
+  /** Indicates if the query focus is neither accessed nor modified. */
   private final boolean simple;
+  /** Updating flag, computed on demand (0: unknown, 1: no, 2: yes). */
+  private byte updating;
 
   /**
    * Constructor.
@@ -204,7 +206,7 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public Value invokeInternal(final QueryContext qc, final InputInfo ii, final Value[] args)
       throws QueryException {
-    return qc.invoke(params, args, expr, simple, focus);
+    return qc.invoke(params, args, true, expr, simple, focus);
   }
 
   @Override
@@ -214,7 +216,10 @@ public final class FuncItem extends FItem implements Scope {
 
   @Override
   boolean updating() {
-    return anns.contains(Annotation.UPDATING) || expr.has(Flag.UPD);
+    if(updating == 0) {
+      updating = (byte) (anns.contains(Annotation.UPDATING) || expr.has(Flag.UPD) ? 2 : 1);
+    }
+    return updating == 2;
   }
 
   /**

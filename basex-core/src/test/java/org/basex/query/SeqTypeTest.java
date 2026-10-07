@@ -1112,7 +1112,8 @@ public final class SeqTypeTest {
   /** Checks that in-place resolution of forward references is not cached away. */
   @Test public void forwardReferences() {
     // a direct reference denotes item() while unresolved
-    final TypeRef ref = new TypeRef(new QNm("r"), null);
+    final InputInfo ii = new InputInfo(getClass().getName(), 1, 1);
+    final TypeRef ref = new TypeRef(new QNm("r"), ii);
     final SeqType st = ref.seqType();
     assertTrue(st.mayBeJNode());
     assertTrue(st.mayBeNumber());
@@ -1121,7 +1122,7 @@ public final class SeqTypeTest {
     assertFalse(st.mayBeNumber());
 
     // a reference in a choice item type is not dereferenced while unresolved
-    final TypeRef ref2 = new TypeRef(new QNm("s"), null);
+    final TypeRef ref2 = new TypeRef(new QNm("s"), ii);
     final SeqType choice = ChoiceItemType.get(ref2, STRING).seqType();
     assertFalse(choice.mayBeJNode());
     ref2.resolve(JNODE);

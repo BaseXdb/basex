@@ -145,7 +145,16 @@ public abstract class XQShapeMap extends XQMap {
    * @throws QueryException query exception
    */
   private int field(final Item key) throws QueryException {
-    return key.type.isStringOrUntyped() ? fields().index(key.string(null)) : 0;
+    if(!key.type.isStringOrUntyped()) return 0;
+    final byte[] name = key.string(null);
+    final TokenObjectMap<ShapeField> fields = fields();
+    final int fs = fields.size();
+    if(fs > 8) return fields.index(name);
+    // few fields: comparing the names is cheaper than hashing the key
+    for(int f = 1; f <= fs; f++) {
+      if(Token.eq(name, fields.key(f))) return f;
+    }
+    return 0;
   }
 
   /**

@@ -287,7 +287,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   @Override
   public Value invokeInternal(final QueryContext qc, final InputInfo ii, final Value[] args)
       throws QueryException {
-    if(!memo) return qc.invoke(params, args, expr, simple, null);
+    if(!memo) return qc.invoke(params, args, true, expr, simple, null);
 
     // coerce arguments before computing the key
     final int pl = params.length;
@@ -296,7 +296,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     final MemoKey key = new MemoKey(this, values);
     Value value = qc.memo.get(key);
     if(value == null) {
-      value = qc.invoke(params, values, expr, simple, null);
+      value = qc.invoke(params, values, false, expr, simple, null);
       // skip placeholders of deferred tail calls
       if(qc.tcFunc == null) qc.memo.put(key, value);
     }

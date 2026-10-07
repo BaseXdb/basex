@@ -107,7 +107,8 @@ public abstract class FItem extends Item implements XQFunction {
 
     // advertise the target type; keep the body type as refined return type for result typing
     final FuncType tp = cc != null ? ft.withRefinedType(body.seqType()) : ft;
-    return new FuncItem(info, body, vars, annotations(), tp, vs.stackSize(), funcName());
+    return new FuncItem(info, body, vars, annotations(), tp, vs.stackSize(), funcName(), null,
+        simple(body, cc));
   }
 
   /**
@@ -176,7 +177,18 @@ public abstract class FItem extends Item implements XQFunction {
     final AnnList anns = annotations();
     final Expr body = funcBody(vs, args, null, cc, ii);
     final FuncType tp = FuncType.get(anns, ft.declType, params).withRefinedType(ft.refinedType);
-    return new FuncItem(ii, body, params, anns, tp, vs.stackSize(), null);
+    return new FuncItem(ii, body, params, anns, tp, vs.stackSize(), null, null, simple(body, cc));
+  }
+
+  /**
+   * Indicates if the body of a new function item neither accesses nor modifies the query focus.
+   * @param body function body
+   * @param cc compilation context ({@code null} during runtime)
+   * @return result of check
+   */
+  private static boolean simple(final Expr body, final CompileContext cc) {
+    // unoptimized bodies only reference parameters and values
+    return cc == null || !body.has(Flag.CTX);
   }
 
   /**

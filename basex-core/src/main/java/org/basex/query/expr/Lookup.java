@@ -216,6 +216,7 @@ public final class Lookup extends Arr {
   public Lookup copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     final Lookup lookup = copyType(new Lookup(info, copyAll(cc, vm, exprs)));
     lookup.single = single;
+    lookup.cacheKeys = cacheKeys;
     return lookup;
   }
 

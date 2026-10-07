@@ -199,7 +199,7 @@ public abstract class Expr extends ExprInfo {
    * @return item
    * @throws QueryException query exception
    */
-  public final Item unwrappedItem(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Item unwrappedItem(final QueryContext qc, final InputInfo ii) throws QueryException {
     return seqType().mayBeJNode() ? unwrappedValue(qc).item(qc, info(ii)) : item(qc, info(ii));
   }
 

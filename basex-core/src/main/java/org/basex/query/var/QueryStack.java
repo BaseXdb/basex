@@ -2,7 +2,6 @@ package org.basex.query.var;
 
 import java.util.*;
 
-import org.basex.query.*;
 import org.basex.query.func.prof.*;
 import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
@@ -112,11 +111,9 @@ public final class QueryStack {
    * Sets the value of the given variable in the current stack frame.
    * @param var variable to bind the value to
    * @param value value to bind
-   * @param qc query context
-   * @throws QueryException query exception
    */
-  public void set(final Var var, final Value value, final QueryContext qc) throws QueryException {
-    values[start + var.slot] = var.checkType(value, qc, null);
+  public void set(final Var var, final Value value) {
+    values[start + var.slot] = value;
   }
 
   @Override

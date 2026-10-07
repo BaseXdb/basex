@@ -85,6 +85,12 @@ public abstract class Item extends Value {
   }
 
   @Override
+  public final Item unwrappedItem(final QueryContext qc, final InputInfo ii)
+      throws QueryException {
+    return unwrappedValue(qc).item(qc, ii);
+  }
+
+  @Override
   public boolean ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
     return bool(ii);
   }
