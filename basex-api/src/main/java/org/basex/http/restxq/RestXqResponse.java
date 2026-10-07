@@ -37,6 +37,8 @@ public final class RestXqResponse extends WebResponse {
   private RestXqFunction func;
   /** Status code (can be {@code null}). */
   private Integer status;
+  /** Explicitly assigned content type (can be {@code null}). */
+  private String contentType;
 
   /**
    * Constructor.
@@ -103,7 +105,9 @@ public final class RestXqResponse extends WebResponse {
 
       // initialize serializer
       conn.sopts(so);
-      conn.initResponse();
+      // an explicitly assigned content type is sent unchanged
+      if(contentType != null) conn.response.setContentType(contentType);
+      else conn.initResponse();
       if(cache == null) conn.timing(qc.info);
 
       if(status != null) {
@@ -177,7 +181,6 @@ public final class RestXqResponse extends WebResponse {
 
     // parse response and serialization parameters
     final SerializerOptions sopts = func.sopts;
-    String cType = null;
     for(final GNode node : response.childIter()) {
       // process http:response element
       if(T_HTTP_RESPONSE.matches(node)) {
@@ -206,7 +209,7 @@ public final class RestXqResponse extends WebResponse {
             if(name != null && value != null) {
               final String n = string(name), v = string(value);
               if(n.equalsIgnoreCase(HTTPText.CONTENT_TYPE)) {
-                cType = v;
+                contentType = v;
               } else {
                 final String hv = n.equalsIgnoreCase(HTTPText.LOCATION) ? conn.resolve(v) : v;
                 // multiple Set-Cookie headers must be added one by one
@@ -232,7 +235,7 @@ public final class RestXqResponse extends WebResponse {
     if(status == null) status = SC_OK;
 
     // set content type and serialize data
-    if(cType != null) sopts.set(SerializerOptions.MEDIA_TYPE, cType);
+    if(contentType != null) sopts.set(SerializerOptions.MEDIA_TYPE, contentType);
     return sopts;
   }
 }

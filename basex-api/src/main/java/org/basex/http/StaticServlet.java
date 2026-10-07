@@ -8,6 +8,7 @@ import java.nio.file.attribute.*;
 
 import org.basex.core.*;
 import org.basex.io.*;
+import org.basex.util.*;
 import org.basex.util.http.*;
 
 import jakarta.servlet.*;
@@ -58,7 +59,7 @@ public final class StaticServlet extends BaseXServlet {
       return;
     }
 
-    conn.response.setContentType(MediaType.get(file.path()).toString());
+    conn.contentType(MediaType.get(file.path()), Strings.UTF8);
     conn.response.setContentLengthLong(attrs.size());
     conn.response.setDateHeader(HTTPText.LAST_MODIFIED, modified);
     conn.response.getOutputStream().write(file.read());

@@ -124,6 +124,16 @@ public final class PayloadTest extends SandboxTest {
   }
 
   /**
+   * Parameter values that are no tokens are quoted, and the parameter order is preserved.
+   */
+  @Test public void mediaTypeString() {
+    final String string = "multipart/related; boundary=\"=-=-=\"; type=text/xml; start=a";
+    assertEquals("multipart/related; boundary=\"=-=-=\"; type=\"text/xml\"; start=a",
+        new MediaType(string).toString());
+    assertEquals("text/plain; x=\"a\\\"b\"", new MediaType("text/plain; x=\"a\\\"b\"").toString());
+  }
+
+  /**
    * Parses a multipart form body and returns the map with its file parts.
    * @param body multipart form body
    * @param qc query context

@@ -75,8 +75,6 @@ public final class HTTPConnection implements ClientInfo {
     method = request.getMethod();
     requestCtx = new RequestContext(request);
 
-    // set UTF8 as default encoding (can be overwritten)
-    response.setCharacterEncoding(Strings.UTF8);
     path = normalize(pth != null ? pth : request.getPathInfo());
 
     // capture client address, as the request may be recycled when the value is requested
@@ -127,10 +125,17 @@ public final class HTTPConnection implements ClientInfo {
    */
   public void initResponse() {
     final SerializerOptions sopts = sopts();
-    final MediaType mt = sopts.mediaType();
-    response.setContentType((mt.parameter(CHARSET) == null ?
-      new MediaType(mt + ";" + CHARSET + "=" + sopts.get(SerializerOptions.ENCODING)) :
-      mt).toString());
+    contentType(sopts.mediaType(), sopts.get(SerializerOptions.ENCODING));
+  }
+
+  /**
+   * Assigns a content-type, adding a charset to textual media types without one.
+   * @param type media type
+   * @param encoding character encoding
+   */
+  public void contentType(final MediaType type, final String encoding) {
+    response.setContentType(type.isTextual() && type.parameter(CHARSET) == null ?
+      type + "; " + CHARSET + '=' + encoding : type.toString());
   }
 
   /**
@@ -336,9 +341,7 @@ public final class HTTPConnection implements ClientInfo {
 
       response.setStatus(code < 0 || code > 999 ? 500 : code);
       if(body != null) {
-        final MediaType mt = type != null ? type : MediaType.TEXT_PLAIN;
-        response.setContentType(mt.parameter(CHARSET) != null ? mt.toString() :
-          mt + "; " + CHARSET + '=' + Strings.UTF8);
+        contentType(type != null ? type : MediaType.TEXT_PLAIN, Strings.UTF8);
         response.getOutputStream().write(new TokenBuilder(token(body)).normalize().finish());
       }
     } catch(final IllegalStateException | IllegalArgumentException ex) {

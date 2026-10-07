@@ -78,7 +78,7 @@ public final class MediaType implements Comparable<MediaType> {
   /** Subtype. */
   private final String sub;
   /** Parameters. */
-  private final HashMap<String, String> parameters = new HashMap<>();
+  private final LinkedHashMap<String, String> parameters = new LinkedHashMap<>();
 
   /**
    * Constructor.
@@ -194,6 +194,14 @@ public final class MediaType implements Comparable<MediaType> {
   }
 
   /**
+   * Checks if this is a textual type that is encoded with a charset.
+   * @return result of check
+   */
+  public boolean isTextual() {
+    return isText() || isXml() || isJSON() || isCSV() || isXQuery();
+  }
+
+  /**
    * Checks if this is an XQuery type.
    * @return result of check
    */
@@ -266,8 +274,23 @@ public final class MediaType implements Comparable<MediaType> {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(type());
-    parameters.forEach((key, value) -> sb.append("; ").append(key).append('=').append(value));
+    parameters.forEach((key, value) -> sb.append("; ").append(key).append('=').
+        append(token(value) ? value : Client.quote(value)));
     return sb.toString();
+  }
+
+  /**
+   * Checks if the specified string is an RFC 2045 token.
+   * @param string string
+   * @return result of check
+   */
+  private static boolean token(final String string) {
+    final int sl = string.length();
+    for(int s = 0; s < sl; s++) {
+      final char c = string.charAt(s);
+      if(c <= ' ' || c >= 0x7F || "()<>@,;:\\\"/[]?=".indexOf(c) != -1) return false;
+    }
+    return sl != 0;
   }
 
   /**
