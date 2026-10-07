@@ -181,6 +181,15 @@ public final class ErrorMessageTest extends SandboxTest {
     unknownName("'a' cast as xs:integ", TYPEUNKNOWN_X, "xs:integer");
   }
 
+  /** Java call with an object of the wrong class: report the class of the value. */
+  @Test public void javaInstance() {
+    errorMessage("let $l := Q{java:java.util.ArrayList}new() return Q{String}length($l)",
+        JAVANOINSTANCE_X_X, "ArrayList found");
+    errorMessage("Q{String}toString(123)", JAVANOINSTANCE_X_X, "xs:integer found");
+    errorMessage("let $m := { 'a': 1 } return Q{java:java.lang.Integer}new($m)",
+        JAVANONE_X_X_X, "(map(xs:string, xs:integer))");
+  }
+
   /**
    * Checks that the error message includes a similar-name hint.
    * @param query query that should fail

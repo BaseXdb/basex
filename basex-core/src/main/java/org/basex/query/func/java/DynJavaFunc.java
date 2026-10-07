@@ -95,11 +95,12 @@ final class DynJavaFunc extends DynJavaCall {
    * @throws QueryException query exception
    */
   private Object[] field(final QueryContext qc) throws QueryException {
-    final Object instance = instance(values(qc), isStatic(field));
+    final Value[] values = values(qc);
+    final Object instance = instance(values, isStatic(field));
     try {
       return new Object[] { field.get(instance), instance };
     } catch(final IllegalArgumentException ex) {
-      throw instanceExpected(ex);
+      throw instanceExpected(values[0], ex);
     } catch(final Throwable th) {
       throw executionError(th);
     }
@@ -124,7 +125,7 @@ final class DynJavaFunc extends DynJavaCall {
       }
     }
     final JavaCandidate jc = bestCandidate(candidates);
-    if(jc == null) throw noCandidate(candidates, methods.toArray(Executable[]::new));
+    if(jc == null) throw noCandidate(candidates, methods.toArray(Executable[]::new), values);
 
     // assign query context if module is inheriting the {@link QueryModule} interface
     final Method method = (Method) jc.executable;
@@ -138,7 +139,7 @@ final class DynJavaFunc extends DynJavaCall {
     try {
       return new Object[] { method.invoke(instance, jc.arguments), instance };
     } catch(final IllegalArgumentException ex) {
-      throw instanceExpected(ex);
+      throw instanceExpected(values[0], ex);
     } catch(final Throwable th) {
       throw executionError(th, jc.arguments);
     }

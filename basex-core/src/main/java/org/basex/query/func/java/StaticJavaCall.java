@@ -62,9 +62,10 @@ public final class StaticJavaCall extends JavaCall {
   @Override
   protected Value eval(final QueryContext qc, final WrapOptions wrap) throws QueryException {
     // arguments could not be matched: raise error
-    final JavaCandidate jc = candidate(values(qc), params, true);
+    final Value[] values = values(qc);
+    final JavaCandidate jc = candidate(values, params, true);
     if(jc == null) throw JAVAARGS_X_X_X.get(info, name(),
-        JavaCall.paramTypes(method, true), argTypes(exprs));
+        JavaCall.paramTypes(method, true), argTypes(values));
 
     // assign query context if module is inheriting the {@link QueryModule} interface
     if(module instanceof final QueryModule qm) {

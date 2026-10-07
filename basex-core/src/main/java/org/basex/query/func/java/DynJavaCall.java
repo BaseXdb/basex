@@ -9,7 +9,6 @@ import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -50,7 +49,7 @@ abstract class DynJavaCall extends JavaCall {
   final Object instance(final Value[] args, final boolean stat) throws QueryException {
     if(stat) return null;
     final Object object = args[0].toJava();
-    if(object == null) throw instanceExpected(null);
+    if(object == null) throw instanceExpected(args[0], null);
     return object;
   }
 
@@ -58,10 +57,11 @@ abstract class DynJavaCall extends JavaCall {
    * Returns an error for the specified execution candidates.
    * @param candidates candidates
    * @param execs executables (constructors, methods)
+   * @param values argument values
    * @return exception
    */
   final QueryException noCandidate(final ArrayList<JavaCandidate> candidates,
-      final Executable[] execs) {
+      final Executable[] execs, final Value[] values) {
 
     final int cl = candidates.size();
     if(cl > 1) {
@@ -71,24 +71,22 @@ abstract class DynJavaCall extends JavaCall {
     }
 
     final Executable single = execs.length == 1 ? execs[0] : null;
-    final int al = args().length;
-    final ExprList list = new ExprList(al);
-    int a = single != null && !isStatic(single) || al > 0 &&
-        (arg(0) instanceof XQJava || arg(0) instanceof JavaCall) ? 0 : -1;
-    while(++a < al) list.add(arg(a));
-
-    final String args = argTypes(list.finish());
+    final int al = values.length;
+    final int a = single != null && !isStatic(single) || al > 0 &&
+        values[0] instanceof XQJava ? 1 : 0;
+    final String args = argTypes(Arrays.copyOfRange(values, a, al));
     return single != null ? JAVAARGS_X_X_X.get(info, name(), paramTypes(single, true), args) :
       JAVANONE_X_X_X.get(info, name(), args, paramTypes(execs, true));
   }
 
   /**
    * Returns an error for field/method invocations in which first argument is no class instance.
+   * @param value value of the first argument
    * @param ex exception (can be {@code null})
    * @return exception
    */
-  final QueryException instanceExpected(final Exception ex) {
-    return JAVANOINSTANCE_X_X.get(info, className(clazz), JavaCall.argType(arg(0))).cause(ex);
+  final QueryException instanceExpected(final Value value, final Exception ex) {
+    return JAVANOINSTANCE_X_X.get(info, className(clazz), argType(value)).cause(ex);
   }
 
   @Override
