@@ -384,6 +384,14 @@ public abstract class XNode extends GNode {
   }
 
   /**
+   * Returns the document URI of the node.
+   * @return document URI
+   */
+  public byte[] documentURI() {
+    return Token.EMPTY;
+  }
+
+  /**
    * Returns the static base URI of a node.
    * @param base static base URI
    * @param empty return empty URI if a node has no base URI, or {@code null} otherwise

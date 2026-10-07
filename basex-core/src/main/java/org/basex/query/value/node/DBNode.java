@@ -198,6 +198,12 @@ public class DBNode extends XNode {
   }
 
   @Override
+  public final byte[] documentURI() {
+    // documents without a database (e.g. created via fn:parse-xml) have no document URI
+    return kind() != Kind.DOCUMENT || data.meta.name.isEmpty() ? Token.EMPTY : baseURI();
+  }
+
+  @Override
   public final boolean is(final GNode node) {
     return this == node || data == node.data() && pre == ((DBNode) node).pre;
   }

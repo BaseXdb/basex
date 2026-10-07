@@ -25,25 +25,39 @@ import org.w3c.dom.*;
 public final class FDoc extends FNode {
   /** Base URI. */
   private final byte[] uri;
+  /** Indicates if the base URI is also the document URI. */
+  private final boolean docUri;
   /** Children. */
   private GNode[] children;
 
   /**
    * Constructor.
    * @param uri base URI
+   * @param docUri base URI is also the document URI
    */
-  private FDoc(final byte[] uri) {
+  private FDoc(final byte[] uri, final boolean docUri) {
     super(NodeType.DOCUMENT);
     this.uri = uri;
+    this.docUri = docUri;
+  }
+
+  /**
+   * Creates a document builder with identical base and document URI.
+   * @param uri base and document URI
+   * @return document builder
+   */
+  public static FBuilder build(final byte[] uri) {
+    return build(uri, true);
   }
 
   /**
    * Creates a document builder.
    * @param uri base URI
+   * @param docUri base URI is also the document URI
    * @return document builder
    */
-  public static FBuilder build(final byte[] uri) {
-    return new FBuilder(new FDoc(uri));
+  public static FBuilder build(final byte[] uri, final boolean docUri) {
+    return new FBuilder(new FDoc(uri, docUri));
   }
 
   /**
@@ -98,12 +112,17 @@ public final class FDoc extends FNode {
   }
 
   @Override
+  public byte[] documentURI() {
+    return docUri ? uri : Token.EMPTY;
+  }
+
+  @Override
   public FNode materialize(final Predicate<Data> test, final boolean funcs, final InputInfo ii,
       final QueryContext qc) throws QueryException {
 
     if(materialized(test, funcs, ii)) return this;
 
-    final FBuilder doc = build(uri);
+    final FBuilder doc = build(uri, docUri);
     for(final GNode child : children) doc.node((GNode) child.materialize(test, funcs, ii, qc));
     return doc.finish();
   }
@@ -116,7 +135,7 @@ public final class FDoc extends FNode {
   @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof final FDoc f && Arrays.equals(children, f.children) &&
-        Token.eq(uri, f.uri) && super.equals(obj);
+        Token.eq(uri, f.uri) && docUri == f.docUri && super.equals(obj);
   }
 
   @Override

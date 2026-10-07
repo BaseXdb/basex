@@ -31,7 +31,7 @@ public final class CDoc extends CNode {
 
   @Override
   public FNode value(final QueryContext qc) throws QueryException {
-    final FBuilder doc = FDoc.build();
+    final FBuilder doc = FDoc.build(sc().baseURI().string(), false);
 
     final Constr constr = new Constr(doc, skipCopy, info, qc).add(exprs);
     if(constr.errAtt != null) throw DOCATTS_X.get(info, constr.errAtt);

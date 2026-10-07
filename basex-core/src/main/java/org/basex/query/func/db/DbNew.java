@@ -85,7 +85,7 @@ abstract class DbNew extends DbAccessFn {
       String name = path;
       if(name.isEmpty()) {
         // adopt name from document node
-        name = string(node.baseURI());
+        name = string(node.kind() == Kind.DOCUMENT ? node.documentURI() : node.baseURI());
         final Data data = node.data();
         // adopt path if node is part of disk database. otherwise, only adopt file name
         final int i = data == null || data.inMemory() ? name.lastIndexOf('/') : name.indexOf('/');

@@ -409,6 +409,9 @@ public final class FnModuleTest extends SandboxTest {
         "^file:/(?!/)", "file:///");
     query(func.args(" parse-xml('<x/>')"), cd);
     query(func.args(" document{<x/>}"), cd);
+    query("declare base-uri 'http://x/'; " + func.args(" document{<x/>}"), "http://x/");
+    query("let $d := xquery:eval('document{<x/>}', {}, { 'base-uri': 'http://x/' }) "
+        + "return " + func.args(" $d"), "http://x/");
     query(func.args(" doc('src/test/resources/test.xml')"), cd + "src/test/resources/test.xml");
     query("collection('src/test/resources/dir')!" + func.args(" .")
         + "[ends-with(., '/test.xml')]", cd + "src/test/resources/dir/test.xml");
@@ -1403,6 +1406,8 @@ public final class FnModuleTest extends SandboxTest {
         "^file:/(?!/)", "file:///");
     query(func.args(" parse-xml('<x/>')"), "");
     query(func.args(" document{<x/>}"), "");
+    query("declare base-uri 'http://x/'; " + func.args(" document{<x/>}"), "");
+    query(func.args(" <x/>"), "");
     query(func.args(" doc('src/test/resources/test.xml')"), cd + "src/test/resources/test.xml");
     query("collection('src/test/resources/dir')!" + func.args(" .")
         + "[ends-with(., '/test.xml')]", cd + "src/test/resources/dir/test.xml");

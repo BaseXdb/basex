@@ -125,6 +125,8 @@ public final class DbModuleTest extends SandboxTest {
         " { 'parser': 'csv', 'csvparser': 'headr=true' }"), BASEX_OPTIONS_X);
 
     error(func.args(NAME, " <a/>"), DB_PATH_X);
+    error("declare base-uri 'http://x/y.xml'; " + func.args(NAME, " document { <a/> }"),
+        DB_PATH_X);
     error(func.args(NAME, " <a/>", " ()"), DB_PATH_X);
     error(func.args(NAME, " <a/>", ""), DB_PATH_X);
     error(func.args(NAME, " <a/>", "/"), DB_PATH_X);
