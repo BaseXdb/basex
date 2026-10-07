@@ -66,7 +66,7 @@ public class MapMerge extends MapFn {
     // single input: return single map
     XQMap mp = toMap(first);
     Item current = qc.next(maps);
-    if(current == null) return mp;
+    if(current == null) return mp.unannotated();
 
     // update first map if 2 maps are supplied, use map builder otherwise
     Item next = qc.next(maps);
@@ -86,7 +86,7 @@ public class MapMerge extends MapFn {
       current = next;
       next = current != null ? qc.next(maps) : null;
     }
-    return mb != null ? mb.map(this) : mp;
+    return mb != null ? mb.map(this) : mp.unannotated();
   }
 
   @Override
@@ -103,10 +103,17 @@ public class MapMerge extends MapFn {
         }
         arg(0, arg -> List.get(cc, info, list.finish()));
       }
-      // return simple arguments: map:merge($map) → $map
+      // return simple arguments: map:merge({ 1: 2 }) → { 1: 2 }
       final SeqType st = arg(0).seqType();
-      if(st.one()) return arg(0);
-
+      if(st.one()) {
+        if(noRecords(arg(0))) return arg(0);
+        // drop the record annotation, keep the shape
+        final ShapeType sh = MapTypeInfo.get(arg(0)).shape;
+        if(sh != null) {
+          exprType.assign(cc.qc.shared.shape(sh.shape()));
+          return this;
+        }
+      }
       final MapType mt = (MapType) st.type;
       assignType(mt.keyType(), mt.valueType());
     }

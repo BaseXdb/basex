@@ -2,6 +2,7 @@ package org.basex.query.func.map;
 
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
 
 /**
@@ -18,6 +19,16 @@ abstract class MapFn extends StandardFunc {
    */
   final long mapSize(final Expr expr) {
     return expr.seqType().instanceOf(Types.MAP_O) ? expr.structSize() : -1;
+  }
+
+  /**
+   * Checks if the specified expression yields no records.
+   * @param expr expression
+   * @return result of check
+   */
+  static boolean noRecords(final Expr expr) {
+    if(expr instanceof final XQMap map) return !(map.type instanceof RecordType);
+    return expr.seqType().type.intersect(Types.RECORD) == null;
   }
 
   @Override

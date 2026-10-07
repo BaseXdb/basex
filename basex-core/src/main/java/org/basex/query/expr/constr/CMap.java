@@ -62,8 +62,10 @@ public final class CMap extends Arr {
     if(el == 2) {
       // { $a: $b } → map:entry($a, $b)
       if(!nested(0)) return cc.function(_MAP_ENTRY, info, exprs);
-      // { { 'a': <a/> } } → { 'a': <a/> }
-      if(exprs[0].seqType().instanceOf(Types.MAP_O)) return exprs[0];
+      // { $map } → map:merge($map)
+      if(exprs[0].seqType().instanceOf(Types.MAP_O)) {
+        return cc.function(_MAP_MERGE, info, exprs[0]);
+      }
     }
 
     // not too large, only strings as keys? replace with record constructor

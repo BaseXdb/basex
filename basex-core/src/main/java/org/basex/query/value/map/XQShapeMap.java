@@ -82,6 +82,12 @@ public abstract class XQShapeMap extends XQMap {
   }
 
   @Override
+  public final XQMap unannotated() {
+    final ShapeType sh = shape().shape();
+    return sh == type ? this : get(sh, values());
+  }
+
+  @Override
   protected final boolean assignable(final Type tp) {
     // the keys are supplied by the shape: the field order must be preserved
     return tp instanceof final ShapeType sh && sh.sameOrder(shape());

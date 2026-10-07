@@ -370,6 +370,18 @@ public final class MapModuleTest extends SandboxTest {
     check(func.args(" ({ 1: <a/> }, {})") + "?1", "<a/>", empty(func));
     check(func.args(" ({ 1: <a/> }, {})") + "?*", "<a/>", empty(func));
 
+    // the result is no record
+    final String record = "declare record local:x(x); ";
+    query(record + func.args(" local:x(1)") + " instance of local:x", false);
+    query(record + func.args(" local:x(" + wrap(1) + ")") + " instance of local:x", false);
+    query(record + func.args(" (local:x(" + wrap(1) + "), { 'x': 2 })") +
+        " instance of record(*)", false);
+    query("let $r as record(x) := { 'x': " + wrap(1) + " } return " + func.args(" $r") +
+        "?y", "");
+    // the fields of a record are preserved
+    check(record + func.args(" local:x(" + wrap(1) + ")") + "?x", 1, root(ShapeGet.class));
+    check(record + func.args(" local:x(" + wrap(1) + ")") + " => map:size()", 1, root(Itr.class));
+
     // GH-1954
     query(func.args(" if (<a/>/text()) then {} else ()") + " ! map:keys(.)", "");
 
@@ -534,19 +546,24 @@ public final class MapModuleTest extends SandboxTest {
     check(record + func.args(" local:x(" + wrap(0) + ")", "x"), "{}",
         root(XQTrieMap.class));
     check(record + func.args(" local:x(" + wrap(0) + ")", "y"), "{\"x\":0}",
-        empty(func));
+        root(func));
 
     record = "declare record local:x(x as xs:integer?);";
     check(record + func.args(" local:x(" + wrap(0) + ")", "x"), "{}",
         empty(func));
     check(record + func.args(" local:x(" + wrap(0) + ")", "y"), "{\"x\":0}",
-        empty(func));
+        root(func));
 
     record = "declare record local:x(x as xs:integer);";
     check(record + func.args(" local:x(" + wrap(0) + ")", "x"), "{}",
         empty(func));
     check(record + func.args(" local:x(" + wrap(0) + ")", "y"), "{\"x\":0}",
-        empty(func));
+        root(func));
+
+    // the result is no record, even if nothing is removed
+    query(record + func.args(" local:x(1)", "y") + " instance of local:x", false);
+    query(record + func.args(" local:x(1)", " ('y', 'z')[" + wrap(0) + " = 1]") +
+        " instance of record(*)", false);
 
     // GH-2438
     query("let $f := fn($map) { fold-left(map:keys($map), $map, map:remove#2) } " +

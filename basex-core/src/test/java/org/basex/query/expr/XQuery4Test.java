@@ -860,6 +860,8 @@ public final class XQuery4Test extends SandboxTest {
     check("{ { 1: 2 }[?1 = 2] }", "{1:2}", root(XQSingletonMap.class));
     check("{ { 1: 2 }[?1 = 0] }", "{}", root(XQTrieMap.class));
     check("{ (), { 1: 2 }[?1 = 0] }", "{}", root(XQTrieMap.class));
+    // the result is no record
+    query("declare record local:x(x); { local:x(1) } instance of local:x", false);
 
     check("{ map:build((1 to 6) ! xs:int()) }", "{1:1,2:2,3:3,4:4,5:5,6:6}",
         root(MapBuild.class));

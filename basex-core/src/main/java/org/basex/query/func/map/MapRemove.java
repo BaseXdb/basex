@@ -22,7 +22,7 @@ public final class MapRemove extends MapFn {
     for(Item item; (item = qc.next(keys)) != null;) {
       map = map.remove(toAtomItem(item, qc));
     }
-    return map;
+    return map.unannotated();
   }
 
   @Override
@@ -38,8 +38,15 @@ public final class MapRemove extends MapFn {
       exprType.assign(cc.qc.shared.shape(mti.shape.remove(mti.shape.fields().key(mti.index))));
       return this;
     }
-    // return input map if nothing changes: map:remove({ 'a': 1 }, 'b') → { 'a': 1 }
-    if(mti.validKey || mti.keyMismatch) return map;
+    // return input map if nothing changes: map:remove({ 1: 2 }, 'a') → { 1: 2 }
+    if(mti.validKey || mti.keyMismatch) {
+      if(noRecords(map)) return map;
+      // drop the record annotation, keep the shape
+      if(mti.shape != null) {
+        exprType.assign(cc.qc.shared.shape(mti.shape.shape()));
+        return this;
+      }
+    }
     if(mti.mapType != null) exprType.assign(MapType.get(mti.mapType));
     return this;
   }

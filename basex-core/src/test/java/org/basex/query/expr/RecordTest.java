@@ -475,11 +475,11 @@ public final class RecordTest extends SandboxTest {
     check("declare record local:x(x); local:x(1) => map:remove(<_>x</_>)", "{}",
         root(XQTrieMap.class));
     check("declare record local:x(x); local:x(1) => map:remove('y')", "{\"x\":1}",
-        empty(func));
+        root(func));
     check("declare record local:x(x); local:x(1) => map:remove(<_>y</_>)", "{\"x\":1}",
-        empty(func));
+        root(func));
     check("declare record local:x(x); local:x(1) => map:remove(1)", "{\"x\":1}",
-        empty(func));
+        root(func));
 
     check("declare record local:x(x, y := ()); local:x(1) => map:remove('x')", "{\"y\":()}",
         type(func, "map(xs:string, item()*)"), shape(func, "y"));
@@ -495,9 +495,9 @@ public final class RecordTest extends SandboxTest {
     check("declare record local:x(x, y); local:x(1, 2) => map:remove('x') => map:get('y')", 2,
         root(ShapeGet.class));
     check("declare record local:x(x, y := ()); local:x(1) => map:remove('z')", "{\"x\":1,\"y\":()}",
-        empty(func), type(StaticFuncCall.class, "local:x"));
+        root(func), shape(func, "x, y"));
     check("declare record local:x(x, y := ()); local:x(1) => map:remove(1)", "{\"x\":1,\"y\":()}",
-        empty(func));
+        root(func), shape(func, "x, y"));
   }
 
   /** Type propagation when inserting entries. */

@@ -229,6 +229,14 @@ public abstract class XQMap extends XQStruct {
   public abstract XQMap remove(Item key) throws QueryException;
 
   /**
+   * Returns this map without a record type annotation.
+   * @return map without annotation, or {@code this} if the map is no record
+   */
+  public XQMap unannotated() {
+    return this;
+  }
+
+  /**
    * Applies a function on all entries.
    * @param func function to apply on keys and values
    * @throws QueryException query exception
