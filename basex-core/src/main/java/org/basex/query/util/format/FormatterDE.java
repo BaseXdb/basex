@@ -77,7 +77,6 @@ final class FormatterDE extends Formatter {
     final byte[] suffix = modifier == null || modifier[0] == '%' ? null : delete(modifier, '-');
     final TokenBuilder tb = new TokenBuilder();
     word(tb, n, numType, suffix);
-    if(!tb.isEmpty()) tb.set(0, (byte) uc(tb.get(0)));
     return tb.finish();
   }
 
@@ -87,19 +86,13 @@ final class FormatterDE extends Formatter {
   }
 
   @Override
-  public byte[] month(final int n, final int min, final int max) {
-    return format(MONTHS[n], min, max);
+  public byte[] month(final int n) {
+    return MONTHS[n];
   }
 
   @Override
-  public byte[] day(final int n, final int min, final int max) {
-    final TokenBuilder tb = new TokenBuilder();
-    final byte[][] formats = DAYS[n];
-    int f = formats.length;
-    while(--f > 0 && max < formats[f].length);
-    tb.add(formats[f]);
-    while(tb.size() < min) tb.add(' ');
-    return tb.finish();
+  public byte[][] day(final int n) {
+    return DAYS[n];
   }
 
   @Override

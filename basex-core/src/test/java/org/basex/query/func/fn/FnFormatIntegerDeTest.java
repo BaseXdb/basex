@@ -172,4 +172,12 @@ public final class FnFormatIntegerDeTest extends SandboxTest {
     query("format-integer(100000, 'w;o', 'de')", "einhunderttausendste");
     query("format-integer(1000000, 'w;o', 'de')", "eine millionste");
   }
+
+  /** fn:format-integer, German title case. */
+  @Test public void titleCase() {
+    query("format-integer(21, 'Ww', 'de')", "Einundzwanzig");
+    query("format-integer(2134816, 'Ww', 'de')",
+        "Zwei Millionen Einhundertvierunddreißigtausendachthundertsechzehn");
+    query("format-integer(10, 'Ww;o(-er)', 'de')", "Zehnter");
+  }
 }

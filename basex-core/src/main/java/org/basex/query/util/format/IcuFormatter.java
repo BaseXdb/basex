@@ -140,14 +140,10 @@ public final class IcuFormatter extends Formatter {
     final String formatted = spelloutFormat.format(n, ruleSet(numType, modifier));
     // remove soft hyphen; clone token, as single ASCII characters are cached
     final byte[] result = token(formatted.replace("\u00ad", "")).clone();
-    // establish title case
-    if(!eq(token(spelloutFormat.getLocale(ULocale.ACTUAL_LOCALE).getLanguage()), EN)) {
-      result[0] = (byte) uc(result[0]);
-    } else {
-      for(int i = 0; i < result.length; i++) {
-        if(i == 0 || result[i - 1] == ' ' || result[i - 1] == '-') {
-          result[i] = (byte) uc(result[i]);
-        }
+    // English: hyphenated words are capitalized as well (other words: see formatInt)
+    if(eq(token(spelloutFormat.getLocale(ULocale.ACTUAL_LOCALE).getLanguage()), EN)) {
+      for(int i = 1; i < result.length; i++) {
+        if(result[i - 1] == '-') result[i] = (byte) uc(result[i]);
       }
     }
     return result;
@@ -168,14 +164,14 @@ public final class IcuFormatter extends Formatter {
   }
 
   @Override
-  protected byte[] month(final int n, final int min, final int max) {
-    return format(months[n], min, max);
+  protected byte[] month(final int n) {
+    return months[n];
   }
 
   @Override
-  protected byte[] day(final int n, final int min, final int max) {
-    if(internal != null) return internal.day(n, min, max);
-    return format(days[n], min, max);
+  protected byte[][] day(final int n) {
+    if(internal != null) return internal.day(n);
+    return new byte[][] { days[n] };
   }
 
   @Override

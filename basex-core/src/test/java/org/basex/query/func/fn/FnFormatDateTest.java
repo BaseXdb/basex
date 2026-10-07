@@ -41,6 +41,11 @@ public final class FnFormatDateTest extends SandboxTest {
         "15:58:45 GMT+02:00");
     query("format-time(xs:time('15:58:45.762+02:00'), '[H01]:[m01] Uhr [z0]', 'de', (), ())",
         "15:58 Uhr GMT+2");
+    // names: title case, abbreviated to the maximum width, padded to the minimum width
+    query("format-time(xs:time('15:58:45'), '[PNn]', 'en', (), ())", "Pm");
+    query("format-time(xs:time('15:58:45'), '[PNn,1-1]', 'en', (), ())", "P");
+    query("format-time(xs:time('15:58:45'), '[PNn,3-3]', 'en', (), ())", "Pm ");
+    query("format-date(xs:date('2002-12-31'), '[MNn,1-1]/[FNn,2-2]', 'en', (), ())", "D/Tu");
     query("format-time(xs:time('12:12:12'), '[ZZ]')", "J");
     query("format-time(xs:time('12:12:12'), '[zZ]')", "");
     query("format-time(xs:time('12:12:12'), '[Zz]')", "");

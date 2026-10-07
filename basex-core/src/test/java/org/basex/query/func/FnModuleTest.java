@@ -2145,11 +2145,11 @@ public final class FnModuleTest extends SandboxTest {
     if(ExternalLib.ICU.available()) {
       query(func.args(" xs:date('2023-12-11')", "[FNn], [MNn] [D], [Y]", "cy"),
           "Dydd Llun, Rhagfyr 11, 2023");
-      query(func.args(" xs:date('2023-09-01')", "[MNn]", "es"), "septiembre");
+      query(func.args(" xs:date('2023-09-01')", "[MNn]", "es"), "Septiembre");
       // different wording for country
-      query(func.args(" xs:date('2023-09-01')", "[MNn]", "es-PE"), "setiembre");
+      query(func.args(" xs:date('2023-09-01')", "[MNn]", "es-PE"), "Setiembre");
       // fallback to base language
-      query(func.args(" xs:date('2023-09-01')", "[MNn]", "es-CZ"), "septiembre");
+      query(func.args(" xs:date('2023-09-01')", "[MNn]", "es-CZ"), "Septiembre");
       // fallback to default language
       query(func.args(" xs:date('2023-09-01')", "[MNn]", "zu-DE"), "[Language: en]September");
     }

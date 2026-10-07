@@ -111,20 +111,16 @@ public abstract class Formatter extends FormatUtil {
   /**
    * Returns the specified month (0-11).
    * @param n number to be formatted
-   * @param min minimum length
-   * @param max maximum length
    * @return month
    */
-  protected abstract byte[] month(int n, int min, int max);
+  protected abstract byte[] month(int n);
 
   /**
-   * Returns the specified day of the week (0-6, Sunday-Saturday).
+   * Returns the names of the specified day of the week (0-6, Sunday-Saturday).
    * @param n number to be formatted
-   * @param min minimum length
-   * @param max maximum length
-   * @return day of week
+   * @return names, ordered by length
    */
-  protected abstract byte[] day(int n, int min, int max);
+  protected abstract byte[][] day(int n);
 
   /**
    * Returns the am/pm marker.
@@ -284,8 +280,8 @@ public abstract class Formatter extends FormatUtil {
     if(fp.first == 'n') {
       // output name representation
       byte[] name = switch(comp) {
-        case 'M' -> month((int) num - 1, fp.min, fp.max);
-        case 'F' -> day((int) num - 1, fp.min, fp.max);
+        case 'M' -> month((int) num - 1);
+        case 'F' -> abbreviation(day((int) num - 1), fp.max);
         case 'P' -> ampm(num == 0);
         case 'C' -> calendar();
         case 'E' -> era((int) num);
@@ -294,7 +290,9 @@ public abstract class Formatter extends FormatUtil {
       if(name != null) {
         if(fp.cs == Case.LOWER) name = lc(name);
         else if(fp.cs == Case.UPPER) name = uc(name);
-        return name;
+        else name = tc(name);
+        // names are abbreviated to the maximum width and padded to the minimum width
+        return format(name, fp.min, fp.max);
       }
       // fallback representation
       fp.first = '0';
@@ -460,7 +458,25 @@ public abstract class Formatter extends FormatUtil {
     byte[] in = tb.finish();
     if(fp.cs == Case.LOWER) in = lc(in);
     else if(fp.cs == Case.UPPER) in = uc(in);
+    else if(ch == 'w') in = capitalize(in);
     return sign ? concat(cpToken('-'), in) : in;
+  }
+
+  /**
+   * Capitalizes the first letter of each word (title case of format token {@code Ww}).
+   * @param words words
+   * @return resulting words
+   */
+  private static byte[] capitalize(final byte[] words) {
+    final int wl = words.length;
+    final TokenBuilder tb = new TokenBuilder(wl);
+    boolean start = true;
+    for(int w = 0; w < wl; w += cl(words, w)) {
+      final int cp = cp(words, w);
+      tb.add(start ? uc(cp) : cp);
+      start = ws(cp);
+    }
+    return tb.finish();
   }
 
   /**
@@ -718,20 +734,31 @@ public abstract class Formatter extends FormatUtil {
   }
 
   /**
+   * Returns the longest abbreviation of a name that fits into the maximum size.
+   * @param forms forms of the name, ordered by length
+   * @param max maximum size
+   * @return form
+   */
+  private static byte[] abbreviation(final byte[][] forms, final int max) {
+    int f = forms.length;
+    while(--f > 0 && max < forms[f].length);
+    return forms[f];
+  }
+
+  /**
    * Formats a token.
    * @param token token
    * @param min minimum size
    * @param max maximum size
    * @return resulting token
    */
-  static byte[] format(final byte[] token, final int min, final int max) {
+  private static byte[] format(final byte[] token, final int min, final int max) {
     if(min == 0 && max == Integer.MAX_VALUE) return token;
 
-    final int mx = Math.max(3, max);
-    final TokenBuilder tb = new TokenBuilder(mx);
+    final TokenBuilder tb = new TokenBuilder();
     final TokenParser tp = new TokenParser(token);
     int p = -1;
-    while(++p < mx && tp.more()) tb.add(tp.next());
+    while(++p < max && tp.more()) tb.add(tp.next());
     while(p++ < min) tb.add(' ');
     return tb.finish();
   }

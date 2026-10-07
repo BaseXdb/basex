@@ -47,11 +47,6 @@ final class FormatterFR extends Formatter {
     final byte[] suffix = modifier == null || modifier[0] == '%' ? null : delete(modifier, '-');
     final TokenBuilder tb = new TokenBuilder();
     word(tb, n, numType, suffix, true);
-    // create title case
-    final TokenParser tp = new TokenParser(tb.next());
-    for(boolean u = true; tp.more(); u = false) {
-      tb.add(u ? uc(tp.next()) : lc(tp.next()));
-    }
     return tb.finish();
   }
 
@@ -61,13 +56,13 @@ final class FormatterFR extends Formatter {
   }
 
   @Override
-  public byte[] month(final int n, final int min, final int max) {
-    return format(MONTHS[n], min, max);
+  public byte[] month(final int n) {
+    return MONTHS[n];
   }
 
   @Override
-  public byte[] day(final int n, final int min, final int max) {
-    return format(DAYS[n], min, max);
+  public byte[][] day(final int n) {
+    return new byte[][] { DAYS[n] };
   }
 
   @Override
