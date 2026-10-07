@@ -10,15 +10,11 @@ import org.basex.util.options.*;
 
 /**
  * This class defines options which are used all around the project.
- * The initial keys and values are also stored in the project's home directory.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class StaticOptions extends Options {
-  /** Comment: written to the options file. */
-  public static final Comment C_GENERAL = new Comment("General Options");
-
   /** Debug mode. */
   public static final BooleanOption DEBUG = new BooleanOption("DEBUG", false);
   /** Database path. */
@@ -37,9 +33,6 @@ public final class StaticOptions extends Options {
   public static final NumberOption CACHEMAX = new NumberOption("CACHEMAX", 65536);
   /** Lifetime (seconds) of cache entries. */
   public static final NumberOption CACHETTL = new NumberOption("CACHETTL", 86400);
-
-  /** Comment: written to the options file. */
-  public static final Comment C_CLIENT = new Comment("Client/Server Architecture");
 
   /** Server: host, used for connecting new clients. */
   public static final StringOption HOST = new StringOption("HOST", Text.S_LOCALHOST);
@@ -80,9 +73,6 @@ public final class StaticOptions extends Options {
   public static final BooleanOption LOGTRACE = new BooleanOption("LOGTRACE", true);
   /** Mask IP address in the logs. */
   public static final BooleanOption LOGMASKIP = new BooleanOption("LOGMASKIP", false);
-
-  /** Comment: written to the options file. */
-  public static final Comment C_HTTP = new Comment("HTTP Services");
 
   /** Web path (cannot be specified in web.xml). */
   public static final StringOption WEBPATH = new StringOption("WEBPATH", Prop.HOMEDIR + "webapp");
@@ -130,7 +120,7 @@ public final class StaticOptions extends Options {
   }
 
   @Override
-  public void setSystem() {
+  public synchronized void setSystem() {
     super.setSystem();
 
     // assigns static variables and system properties
@@ -151,6 +141,23 @@ public final class StaticOptions extends Options {
       Prop.setSystem("http.nonProxyHosts", nph);
     }
     if(get(IGNORECERT)) IOUrl.ignoreCertificates();
+  }
+
+  @Override
+  protected String[] fileHeader() {
+    return new String[] {
+      "# " + Prop.NAME + " configuration: " + Text.DOCS_URL + "/main/Options",
+      "# Run SHOW OPTIONS to list all options and their current values."
+    };
+  }
+
+  @Override
+  protected boolean assignOther(final String name, final String value) {
+    // cache local options as global options
+    final Option<?> option = new MainOptions(false).option(name);
+    if(option == null) return false;
+    Prop.put(option, value);
+    return true;
   }
 
   /**

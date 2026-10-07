@@ -18,17 +18,11 @@ import org.basex.util.options.*;
 public final class GUIOptions extends Options {
   // DATABASE & PROGRAM PATHS =====================================================================
 
-  /** Comment: written to the options file. */
-  public static final Comment C_VERSION = new Comment("Version");
-
   /** Latest released version. */
   public static final StringOption UPDATEVERSION = new StringOption("UPDATEVERSION",
     VERSION.replaceAll(" .*", ""));
   /** Check for updates. */
   public static final BooleanOption CHECKUPDATES = new BooleanOption("CHECKUPDATES", false);
-
-  /** Comment: written to the options file. */
-  public static final Comment C_PATHS = new Comment("Paths");
 
   /** Current path to database input. */
   public static final StringOption INPUTPATH = new StringOption("INPUTPATH", HOMEDIR);
@@ -38,9 +32,6 @@ public final class GUIOptions extends Options {
   public static final StringOption WORKPATH = new StringOption("WORKPATH", HOMEDIR);
   /** Current path to database project. */
   public static final StringOption PROJECTPATH = new StringOption("PROJECTPATH", "");
-
-  /** Comment: written to the options file. */
-  public static final Comment C_LAYOUT = new Comment("Layout");
 
   /** Default GUI Font. */
   public static final StringOption FONT = new StringOption("FONT", Font.SANS_SERIF);
@@ -59,9 +50,6 @@ public final class GUIOptions extends Options {
   public static final NumberOption COLORGREEN = new NumberOption("COLORGREEN", 14);
   /** Blue GUI color factor. */
   public static final NumberOption COLORBLUE = new NumberOption("COLORBLUE", 7);
-
-  /** Comment: written to the options file. */
-  public static final Comment C_WINDOWS = new Comment("Windows");
 
   /** GUI layout. */
   public static final StringOption LAYOUT = new StringOption("LAYOUT", GUIConstants.VIEWS);
@@ -187,9 +175,6 @@ public final class GUIOptions extends Options {
   /** Last insertion type. */
   public static final NumberOption LASTINSERT = new NumberOption("LASTINSERT", 1);
 
-  /** Comment: written to the options file. */
-  public static final Comment C_VISUALIZATIONS = new Comment("Visualizations");
-
   /** Show attributes in treemap. */
   public static final BooleanOption MAPATTS = new BooleanOption("MAPATTS", false);
   /** Treemap Offsets. */
@@ -216,9 +201,6 @@ public final class GUIOptions extends Options {
   /** Maximum number of items to be displayed. */
   public static final NumberOption MAXRESULTS = new NumberOption("MAXRESULTS", 500000);
 
-  /** Comment: written to the options file. */
-  public static final Comment C_SEARCH = new Comment("Search");
-
   /** Last searched strings. */
   public static final StringsOption SEARCHED = new StringsOption("SEARCHED");
   /** Last replaced strings. */
@@ -232,18 +214,12 @@ public final class GUIOptions extends Options {
   /** Search mode: dot matches all. */
   public static final BooleanOption DOTALL = new BooleanOption("DOTALL", false);
 
-  /** Comment: written to the options file. */
-  public static final Comment C_HISTORY = new Comment("History");
-
   /** Last command inputs. */
   public static final StringsOption COMMANDS = new StringsOption("COMMANDS");
   /** Last keyword inputs. */
   public static final StringsOption SEARCH = new StringsOption("SEARCH");
   /** Last XQuery inputs. */
   public static final StringsOption XQUERY = new StringsOption("XQUERY");
-
-  /** Comment: files. */
-  public static final Comment C_FILES = new Comment("Files");
 
   /** History of editor files. */
   public static final StringsOption EDITOR = new StringsOption("EDITOR");
@@ -276,6 +252,11 @@ public final class GUIOptions extends Options {
       setFile(path, new IOFile(get(path)));
     for(final StringsOption input : new StringsOption[] { EDITOR, OPEN, PROJECTS })
       setFiles(input, get(input));
+  }
+
+  @Override
+  protected boolean rewrite() {
+    return true;
   }
 
   /**

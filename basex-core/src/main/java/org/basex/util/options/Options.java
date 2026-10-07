@@ -57,36 +57,27 @@ public class Options implements Iterable<Option<?>> {
     }
   }
 
-  /** Comment in configuration file. */
-  private static final String PROPUSER = "# Local Options";
-
   /**
    * Cached option metadata (identical for all instances of a subclass).
-   * @param all all options in declaration order (with comments)
    * @param definitions option names to definitions
    * @param offset index of the first option (subtracted from option indexes)
    * @param values default values (cloned per instance)
    */
-  private record Meta(Option<?>[] all, SortedMap<String, Option<?>> definitions, int offset,
-      Object[] values) { }
+  private record Meta(SortedMap<String, Option<?>> definitions, int offset, Object[] values) { }
 
   /** Metadata cache, computed once per subclass. */
   private static final ClassValue<Meta> META = new ClassValue<>() {
     @Override
     protected Meta computeValue(final Class<?> clz) {
-      final ArrayList<Option<?>> all = new ArrayList<>();
       final TreeMap<String, Option<?>> definitions = new TreeMap<>();
       int min = Integer.MAX_VALUE, max = -1;
       try {
         for(final Field f : clz.getFields()) {
           if(!Modifier.isStatic(f.getModifiers())) continue;
           if(f.get(null) instanceof final Option opt) {
-            all.add(opt);
-            if(!(opt instanceof Comment)) {
-              definitions.put(opt.name(), opt);
-              min = Math.min(min, opt.index());
-              max = Math.max(max, opt.index());
-            }
+            definitions.put(opt.name(), opt);
+            min = Math.min(min, opt.index());
+            max = Math.max(max, opt.index());
           }
         }
       } catch(final IllegalAccessException ex) {
@@ -98,8 +89,7 @@ public class Options implements Iterable<Option<?>> {
       for(final Option<?> option : definitions.values()) {
         values[option.index() - offset] = option.value();
       }
-      return new Meta(all.toArray(Option[]::new),
-          Collections.unmodifiableSortedMap(definitions), offset, values);
+      return new Meta(Collections.unmodifiableSortedMap(definitions), offset, values);
     }
   };
 
@@ -112,8 +102,8 @@ public class Options implements Iterable<Option<?>> {
   /** Number of assignments. */
   private volatile int version;
 
-  /** Options, cached from an input file. */
-  private final StringList user = new StringList();
+  /** Values from the options file or system properties, by index (can be {@code null}). */
+  private Object[] persisted;
   /** Options file. */
   private IOFile file;
   /** Indicates that the options must not be modified anymore. */
@@ -146,56 +136,132 @@ public class Options implements Iterable<Option<?>> {
     meta = opts.meta;
     values = opts.values.clone();
     free = (HashMap<String, String>) opts.free.clone();
-    user.add(opts.user);
-    file = opts.file;
   }
 
   /**
    * Writes the options to disk.
    */
   public final synchronized void write() {
+    if(persisted == null) return;
+    final List<Option<?>> changed = meta.definitions.values().stream().filter(option ->
+      !Objects.deepEquals(get(option), persisted[index(option)])).toList();
+    if(changed.isEmpty() && file.exists()) return;
+
+    // without changes, the file is missing
+    final boolean exists = !changed.isEmpty() && file.exists();
     final StringList lines = new StringList();
     try {
-      for(final Option<?> option : meta.all) {
-        final String name = option.name();
-        if(option instanceof Comment) {
-          if(!lines.isEmpty()) lines.add("");
-          lines.add("# " + name);
-        } else if(option instanceof final NumbersOption no) {
-          final int[] ints = get(no);
-          final int is = ints == null ? 0 : ints.length;
-          for(int i = 0; i < is; i++) lines.add(name + i + " = " + ints[i]);
-        } else if(option instanceof final StringsOption so) {
-          final String[] strings = get(so);
-          final int ss = strings == null ? 0 : strings.length;
-          lines.add(name + " = " + ss);
-          for(int s = 0; s < ss; s++) lines.add(name + (s + 1) + " = " + strings[s]);
+      if(rewrite()) {
+        // write non-default options, sorted by name
+        for(final Option<?> option : meta.definitions.values()) {
+          if(!Objects.deepEquals(get(option), option.value())) lines.add(assignments(option));
+        }
+      } else {
+        if(exists) {
+          try(NewlineInput nli = new NewlineInput(file)) {
+            for(String line; (line = nli.readLine()) != null;) lines.add(line);
+          }
         } else {
-          lines.add(name + " = " + get(option));
+          lines.add(fileHeader());
+        }
+        for(final Option<?> option : changed) {
+          patch(lines, option.name(), assignments(option));
         }
       }
-      lines.add("").add(PROPUSER).add(user);
-
-      // only write file if contents have changed
       final TokenBuilder tb = new TokenBuilder();
       for(final String line : lines) tb.add(line).add(NL);
-      final byte[] contents = tb.finish();
-
-      boolean skip = file.exists();
-      if(skip) {
-        final TokenBuilder tmp = new TokenBuilder(contents.length);
-        try(NewlineInput nli = new NewlineInput(file)) {
-          for(String line; (line = nli.readLine()) != null;) tmp.add(line).add(NL);
-        }
-        skip = eq(contents, tmp.finish());
-      }
-      if(!skip) {
-        file.write(contents);
-      }
+      file.write(tb.finish());
+      for(final Option<?> option : changed) persisted[index(option)] = get(option);
     } catch(final Exception ex) {
       Util.errln("% could not be written.", file);
       Util.debug(ex);
     }
+  }
+
+  /**
+   * Returns the assignments of an option in the options file.
+   * @param option option
+   * @return assignments
+   */
+  private StringList assignments(final Option<?> option) {
+    final String name = option.name();
+    final Object value = get(option);
+    final StringList lines = new StringList();
+    if(option instanceof NumbersOption) {
+      final int[] ints = (int[]) value;
+      final int is = ints == null ? 0 : ints.length;
+      for(int i = 0; i < is; i++) lines.add(name + i + " = " + ints[i]);
+    } else if(option instanceof StringsOption) {
+      final String[] strings = (String[]) value;
+      final int ss = strings == null ? 0 : strings.length;
+      lines.add(name + " = " + ss);
+      for(int s = 0; s < ss; s++) lines.add(name + (s + 1) + " = " + strings[s]);
+    } else {
+      lines.add(name + " = " + value);
+    }
+    return lines;
+  }
+
+  /**
+   * Replaces the assignments of an option in the lines of an options file.
+   * @param lines lines
+   * @param name name of the option
+   * @param assignments new assignments
+   */
+  private static void patch(final StringList lines, final String name,
+      final StringList assignments) {
+    int pos = -1;
+    for(int l = 0; l < lines.size(); l++) {
+      if(name.equals(name(lines.get(l).trim()))) {
+        if(pos == -1) pos = l;
+        lines.remove(l--);
+      }
+    }
+    // insert at the old position or at the end
+    lines.insert(pos != -1 ? pos : lines.size(), assignments.finish());
+  }
+
+  /**
+   * Indicates if the options file is rewritten instead of being patched.
+   * @return result of check
+   */
+  protected boolean rewrite() {
+    return false;
+  }
+
+  /**
+   * Returns the lines of a new options file.
+   * @return lines
+   */
+  protected String[] fileHeader() {
+    return new String[0];
+  }
+
+  /**
+   * Assigns an option of the options file that is not defined by this class.
+   * @param name name of the option
+   * @param value value
+   * @return success flag
+   */
+  @SuppressWarnings("unused")
+  protected boolean assignOther(final String name, final String value) {
+    return false;
+  }
+
+  /**
+   * Returns the option name of an assignment in the options file.
+   * @param line line
+   * @return name without numeric suffix, or {@code null} if the line is no assignment
+   */
+  private static String name(final String line) {
+    final int d = line.indexOf('=');
+    if(d == -1) return null;
+    final String name = line.substring(0, d).trim();
+    final int ns = name.length();
+    for(int n = 0; n < ns; n++) {
+      if(Character.isDigit(name.charAt(n))) return name.substring(0, n);
+    }
+    return name;
   }
 
   /**
@@ -213,7 +279,7 @@ public class Options implements Iterable<Option<?>> {
    * @return value (can be {@code null})
    */
   public final Object get(final Option<?> option) {
-    final int index = option.index() - meta.offset;
+    final int index = index(option);
     return index >= 0 && index < values.length ? values[index] : null;
   }
 
@@ -234,8 +300,17 @@ public class Options implements Iterable<Option<?>> {
    */
   public final synchronized void put(final Option<?> option, final Object value) {
     checkSealed(option.name());
-    values[option.index() - meta.offset] = option.normalize(value);
+    values[index(option)] = option.normalize(value);
     version++;
+  }
+
+  /**
+   * Returns the index of an option in the value arrays.
+   * @param option option
+   * @return index
+   */
+  private int index(final Option<?> option) {
+    return option.index() - meta.offset;
   }
 
   /**
@@ -667,7 +742,7 @@ public class Options implements Iterable<Option<?>> {
    * Overwrites the options with global options and system properties.
    * All properties starting with {@code org.basex.} will be assigned as options.
    */
-  public void setSystem() {
+  public synchronized void setSystem() {
     // assign global options
     for(final Entry<String, String> entry : entries()) {
       String name = entry.getKey();
@@ -675,7 +750,14 @@ public class Options implements Iterable<Option<?>> {
       if(name.startsWith(DBPREFIX)) {
         name = name.substring(DBPREFIX.length()).toUpperCase(Locale.ENGLISH);
         try {
-          if(assign(name, value, -1, false)) Util.debugln(name + Text.COLS + value);
+          if(assign(name, value, -1, false)) {
+            Util.debugln(name + Text.COLS + value);
+            // overwritten options will not be written to the options file
+            if(persisted != null) {
+              final Option<?> option = meta.definitions.get(name);
+              persisted[index(option)] = get(option);
+            }
+          }
         } catch(final BaseXException ex) {
           Util.errln(ex);
         }
@@ -912,73 +994,42 @@ public class Options implements Iterable<Option<?>> {
    */
   private synchronized void read(final IOFile io) {
     file = io;
-    final StringList read = new StringList(), errs = new StringList();
     final boolean exists = file.exists();
     if(exists) {
       try(NewlineInput ni = new NewlineInput(io)) {
-        boolean local = false;
         for(String line; (line = ni.readLine()) != null;) {
           line = line.trim();
-
-          // start of local options
-          if(line.equals(PROPUSER)) {
-            local = true;
-            continue;
-          }
-          if(local) user.add(line);
-
           if(line.isEmpty() || line.charAt(0) == '#') continue;
-          final int d = line.indexOf('=');
-          if(d < 0) {
-            errs.add("line \"" + line + "\" ignored.");
+          final String name = name(line);
+          if(name == null) {
+            Util.errln(file + ": line \"" + line + "\" ignored.");
             continue;
           }
+          final int d = line.indexOf('=');
+          final String key = line.substring(0, d).trim(), val = line.substring(d + 1).trim();
+          final String suffix = key.substring(name.length());
+          final int num = suffix.isEmpty() ? 0 : Strings.toInt(suffix);
 
-          final String val = line.substring(d + 1).trim();
-          String name = line.substring(0, d).trim();
-
-          // extract numeric value in key
-          int num = 0;
-          final int ss = name.length();
-          for(int s = 0; s < ss; s++) {
-            if(Character.isDigit(name.charAt(s))) {
-              num = Strings.toInt(name.substring(s));
-              name = name.substring(0, s);
-              break;
-            }
-          }
-
-          if(local) {
-            // cache local options as global options
-            Prop.put(DBPREFIX + name.toLowerCase(Locale.ENGLISH), val);
-          } else {
+          if(meta.definitions.containsKey(name)) {
             try {
               assign(name, val, num, true);
-              read.add(name);
             } catch(final BaseXException ex) {
-              errs.add(ex.getMessage());
+              Util.errln(file + ": " + ex.getMessage());
             }
+          } else if(!assignOther(name, val)) {
+            final String similar = Levenshtein.similar(token(name),
+                meta.definitions.keySet().toArray(String[]::new));
+            Util.errln(file + ": " + (similar != null ?
+              Util.info(Text.UNKNOWN_OPT_SIMILAR_X_X, name, similar) : unknown(name)));
           }
         }
       } catch(final IOException ex) {
-        errs.add("file could not be parsed.");
+        Util.errln(file + ": file could not be parsed.");
         Util.errln(ex);
       }
     }
-
-    // check if all mandatory files have been read
-    boolean ok = true;
-    if(errs.isEmpty()) {
-      for(final Option<?> opt : meta.all) {
-        if(ok && !(opt instanceof Comment)) ok = read.contains(opt.name());
-      }
-    }
-
-    if(!ok || !exists || !errs.isEmpty()) {
-      write();
-      errs.add("writing new configuration file.");
-      for(final String s : errs) Util.errln(file + ": " + s);
-    }
+    persisted = values.clone();
+    if(!exists) write();
   }
 
   /**
