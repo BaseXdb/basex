@@ -641,6 +641,16 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void compare() {
+    final Function func = COMPARE;
+
+    query(func.args("a", "b"), -1);
+    query(func.args(" <a/>/text()", " <b>x</b>/text()"), "");
+    query(func.args(" <b>x</b>/text()", " <a/>/text()"), "");
+    query(func.args(" <a>x</a>/text()", " <b>x</b>/text()"), 0);
+  }
+
+  /** Test method. */
   @Test public void concat() {
     final Function func = CONCAT;
 
