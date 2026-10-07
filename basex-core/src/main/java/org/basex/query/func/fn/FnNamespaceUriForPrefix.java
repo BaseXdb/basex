@@ -20,7 +20,8 @@ import org.basex.util.*;
 public final class FnNamespaceUriForPrefix extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final byte[] value = toZeroToken(arg(0), qc);
+    final Value prefix = definition.types[0].coerce(arg(0).value(qc), qc, info);
+    final byte[] value = prefix.isEmpty() ? EMPTY : ((Item) prefix).string(info);
     final XNode element = toElem(arg(1), qc);
 
     if(eq(value, XML)) return Uri.get(XML_URI, false);

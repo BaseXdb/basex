@@ -3642,6 +3642,11 @@ return
   @Test public void namespaceUriForPrefix() {
     final Function func = NAMESPACE_URI_FOR_PREFIX;
     query("sort(<e xmlns:p='u'>{" + func.args("p", " <e/>") + "}</e>/text()/tokenize(.))", "u");
+    query("<e xmlns:p='u'>{" + func.args(" xs:untypedAtomic(' p ')", " <e/>") + "}</e>/text()",
+        "u");
+
+    error(func.args("p ", " <e/>"), INVTYPE_X);
+    error(func.args("p:q", " <e/>"), INVTYPE_X);
   }
 
   /** Test method. */

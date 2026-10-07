@@ -509,7 +509,8 @@ public enum Function implements AFunction {
       params(XNODE_ZO), ANY_URI_O),
   /** XQuery function. */
   NAMESPACE_URI_FOR_PREFIX(FnNamespaceUriForPrefix::new, "namespace-uri-for-prefix(value, element)",
-      params(STRING_ZO, ELEMENT_O), ANY_URI_ZO),
+      params(ChoiceItemType.get(BasicType.NCNAME, EnumType.get("")).seqType(Occ.ZERO_OR_ONE),
+      ELEMENT_O), ANY_URI_ZO),
   /** XQuery function. */
   NAMESPACE_URI_FROM_QNAME(FnNamespaceUriFromQName::new, "namespace-uri-from-QName(value)",
       params(QNAME_ZO), ANY_URI_ZO),
