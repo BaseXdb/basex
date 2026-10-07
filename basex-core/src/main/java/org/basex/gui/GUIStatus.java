@@ -12,6 +12,7 @@ import org.basex.core.cmd.*;
 import org.basex.core.jobs.*;
 import org.basex.data.*;
 import org.basex.gui.layout.*;
+import org.basex.io.*;
 import org.basex.util.*;
 
 /**
@@ -36,6 +37,8 @@ public final class GUIStatus extends BaseXPanel {
   private final Timer jobsTimer;
   /** Start time of the running command. */
   private volatile long start;
+  /** Prefix of the runtime display. */
+  private volatile String prefix = "";
 
   /**
    * Constructor.
@@ -109,8 +112,11 @@ public final class GUIStatus extends BaseXPanel {
 
   /**
    * Starts the runtime display of a command.
+   * @param path path to the file of the command (can be {@code null})
    */
-  void start() {
+  void start(final String path) {
+    final IOFile file = path != null ? new IOFile(path) : null;
+    prefix = file != null && file.exists() ? file.name() + COLS : "";
     start = System.nanoTime();
     SwingUtilities.invokeLater(timer::restart);
   }
@@ -130,7 +136,7 @@ public final class GUIStatus extends BaseXPanel {
    * @return runtime
    */
   private String elapsed() {
-    return Performance.formatTime((System.nanoTime() - start) / 1_000_000_000);
+    return prefix + Performance.formatTime((System.nanoTime() - start) / 1_000_000_000);
   }
 
   /**

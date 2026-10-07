@@ -612,7 +612,7 @@ public final class EditorView extends View {
 
     if(action == Action.TEST) {
       // test query
-      if(xquery) gui.execute(true, new Test(file.path()));
+      if(xquery) gui.execute(true, new Test(file.path()).baseURI(file.path()));
     } else if(action == Action.EXECUTE && script) {
       // execute script
       gui.execute(true, new Execute(string(text)).baseURI(file.path()));

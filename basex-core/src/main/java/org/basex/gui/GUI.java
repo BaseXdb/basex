@@ -373,7 +373,7 @@ public final class GUI extends JFrame implements BaseXWindow {
 
     // indicate to the user that the command will be executed
     stop.setEnabled(true);
-    status.start();
+    status.start(cmd.baseURI());
     if(editing) editor.pleaseWait(id);
 
     final Data data = context.data();
