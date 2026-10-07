@@ -746,6 +746,15 @@ public final class PathTest extends SandboxTest {
     check("document {}[ancestor-or-self::element()]", "", empty());
   }
 
+  /** Sibling axes of database attributes. */
+  @Test public void attributeSiblings() {
+    final String atts = "parse-xml('<a b=\"\" c=\"\">t<d/></a>')//@* ! "
+        + "(if(random:double() < 2) then . else 'x')";
+    query("(" + atts + ")/following-sibling::node()", "");
+    query("(" + atts + ")/preceding-sibling::node()", "");
+    query("(" + atts + ")/following-sibling-or-self::node() ! name()", "b\nc");
+  }
+
   /** Checks if iterative evaluation is used if no duplicates occur. */
   @Test public void iterativePath() {
     execute(new CreateDB(NAME, "<a id='0' x:id='' x='' xmlns:x='x'><b id='1'/><c id='2'/>"

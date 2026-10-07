@@ -366,9 +366,9 @@ public class DBNode extends XNode {
 
   @Override
   public final BasicNodeIter followingSiblingIter(final boolean self) {
-    final int parent = data.parent(pre, dbKind());
-    if(parent == -1) return root != null ? super.followingSiblingIter(self) :
-      self ? selfIter() : BasicNodeIter.EMPTY;
+    final int kind = dbKind(), parent = data.parent(pre, kind);
+    if(parent == -1 && root != null) return super.followingSiblingIter(self);
+    if(parent == -1 || kind == Data.ATTR) return self ? selfIter() : BasicNodeIter.EMPTY;
 
     return new DBNodeIter(data) {
       final int last = parent + data.size(parent, data.kind(parent));
