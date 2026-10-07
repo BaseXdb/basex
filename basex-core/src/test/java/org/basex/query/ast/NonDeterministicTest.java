@@ -588,6 +588,20 @@ public final class NonDeterministicTest extends SandboxTest {
   }
 
   /**
+   * Checks that calls of mutually recursive functions are detected as nondeterministic.
+   * <p>
+   * Requires {@link FlagCache} to discard results that rely on an enclosing computation.
+   * @throws IOException I/O exception
+   */
+  @Test public void recursiveFuncNdt() throws IOException {
+    final String funcs = "declare function local:f($n) { if($n > 0) then local:g($n - 1) else " +
+        fileAppend() + " }; declare function local:g($n) { local:f($n) }; ";
+    query(funcs + "(1 to 2) ! local:f(1), (1 to 2) ! local:g(1)", "", "xxxx");
+    log.write("");
+    query(funcs + "(1 to 2) ! local:g(1), (1 to 2) ! local:f(1)", "", "xxxx");
+  }
+
+  /**
    * Checks that operands of a list that are not requested are dropped.
    * <p>
    * Documents why {@link FnHead#opt}, {@link FnFoot#opt}, {@link FnItemsAt#opt} and

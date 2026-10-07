@@ -12,6 +12,9 @@ import org.basex.query.expr.*;
  * @author Christian Gruen
  */
 public final class FlagCache {
+  /** Invalidations of false properties that were computed within an enclosing computation. */
+  private static final ThreadLocal<ArrayList<Runnable>> NESTED = new ThreadLocal<>();
+
   /** Cached properties. */
   private final EnumMap<Flag, Boolean> props = new EnumMap<>(Flag.class);
   /** Computes a property. */
@@ -40,18 +43,39 @@ public final class FlagCache {
     }
     if(!missing) return false;
 
-    // handle recursive references: properties that are currently computed are assumed to be false
-    final ArrayList<Flag> list = new ArrayList<>(flags.length);
     for(final Flag flag : flags) {
-      if(props.putIfAbsent(flag, Boolean.FALSE) == null) list.add(flag);
+      if(has(flag)) return true;
     }
-    boolean has = false;
-    for(final Flag flag : list) {
-      final boolean prop = compute.test(flag);
-      props.put(flag, prop);
-      has |= prop;
+    return false;
+  }
+
+  /**
+   * Checks if the specified property applies, and computes it if it is missing.
+   * @param flag flag
+   * @return result of check
+   */
+  private boolean has(final Flag flag) {
+    // recursive references: properties that are currently computed are assumed to be false
+    final Boolean cached = props.putIfAbsent(flag, Boolean.FALSE);
+    if(cached != null) return cached;
+
+    ArrayList<Runnable> nested = NESTED.get();
+    final boolean outermost = nested == null;
+    if(outermost) NESTED.set(nested = new ArrayList<>());
+    final boolean prop;
+    try {
+      prop = compute.test(flag);
+    } finally {
+      if(outermost) NESTED.remove();
     }
-    return has;
+    props.put(flag, prop);
+    if(outermost) {
+      // nested results may rely on assumptions that turned out to be wrong
+      if(prop) nested.forEach(Runnable::run);
+    } else if(!prop) {
+      nested.add(() -> props.remove(flag));
+    }
+    return prop;
   }
 
   /**
