@@ -1116,6 +1116,8 @@ public final class FnModuleTest extends SandboxTest {
     query("let $a := reverse((<a/>, <b/>)) return " + func.args(" $a/.", " $a/."), true);
     query("deep-equal(1 to 1_000_000_000, 1 to 1_000_000_000)", true);
     query("deep-equal(1 to 1_000_000_000, 1 to 1_000_000_001)", false);
+    // options supplied as JNode
+    query(func.args(1, 1, " jtree({ 'o': { 'debug': false() } })/o"), true);
 
     // function items are compared for equivalence
     query(func.args(" true#0", " true#0"), true);
@@ -2198,6 +2200,9 @@ public final class FnModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void formatNumber() {
     final Function func = FORMAT_NUMBER;
+
+    // options supplied as JNode
+    query(func.args(1, "#", " jtree({ 'o': {} })/o"), 1);
 
     // exponents beyond the double range of powers of ten
     query(func.args(" 4.9E-324", "0.0e0"), "4.9e-324");
@@ -6297,6 +6302,8 @@ return
     contains(func.args(DOC, "US-ASCII"), "<html");
     contains(func.args(DOC, " { 'encoding': () }"), "<html");
     error(func.args(DOC, "xyz"), RESENCODING_X);
+    // options supplied at runtime
+    contains("apply(unparsed-text#2, ['" + DOC + "', { 'encoding': 'US-ASCII' }])", "<html");
 
     // permitted characters (XML 1.1 repertoire)
     final IOFile file = new IOFile(sandbox(), "controls.txt");

@@ -24,7 +24,7 @@ public final class FnFormatNumber extends StandardFunc {
     final Expr value = arg(0);
     Item number = value.atomItem(qc, info);
     final byte[] picture = toToken(arg(1), qc);
-    final Item options = arg(2).item(qc, info);
+    final Item options = arg(2).unwrappedItem(qc, info);
 
     // check input
     final Type type = number.type;

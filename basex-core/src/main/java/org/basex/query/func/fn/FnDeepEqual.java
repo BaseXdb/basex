@@ -52,7 +52,7 @@ public final class FnDeepEqual extends StandardFunc {
    * @throws QueryException query exception
    */
   private DeepEqualOptions options(final QueryContext qc) throws QueryException {
-    final Item item = arg(2).item(qc, info);
+    final Item item = arg(2).unwrappedItem(qc, info);
     final DeepEqualOptions opts = new DeepEqualOptions();
     if(item instanceof XQMap) {
       toOptions(item, opts, qc);
