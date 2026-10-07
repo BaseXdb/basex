@@ -29,6 +29,8 @@ public final class FLWORBuilder {
   public final Var item;
   /** Pos variable. */
   public final Var pos;
+  /** Let clause for the coerced function (can be {@code null}). */
+  private Let action;
 
   /**
    * Constructor.
@@ -74,7 +76,13 @@ public final class FLWORBuilder {
    */
   public Expr function(final StandardFunc sf, final int i, final boolean updating)
       throws QueryException {
-    final Expr func = sf.coerceFunc(i, cc, Math.min(2, arity));
+    Expr func = sf.coerceFunc(i, cc, Math.min(2, arity));
+    // coerce function once, not in each iteration
+    if(!func.duplicable()) {
+      final Var var = cc.vs().addNew(new QNm("action"), null, cc.qc, info);
+      action = new Let(var, func).optimize(cc);
+      func = ref(var);
+    }
     return new DynFuncCall(info, updating, false, func, refs()).optimize(cc);
   }
 
@@ -102,6 +110,7 @@ public final class FLWORBuilder {
   public Expr finish(final Expr input, final Expr cond, final boolean whl, final Expr rtrn)
       throws QueryException {
     final LinkedList<Clause> clauses = new LinkedList<>();
+    if(action != null) clauses.add(action);
     clauses.add(new For(item, pos, null, input, false).optimize(cc));
     if(cond != null) {
       clauses.add((whl ? new While(cond, info) : new Where(cond, info)).optimize(cc));
