@@ -55,9 +55,10 @@ public final class WebModule {
     if(content != null && Checks.all(files.entrySet(),
         entry -> new IOFile(entry.getKey()).timeStamp() == entry.getValue())) return;
 
-    files.clear();
-    if(archive == null) files.put(file.path(), file.timeStamp());
+    // files modified from now on may have been read before the modification was complete
+    final long start = System.currentTimeMillis();
     content = file.readString();
+    files.clear();
 
     functions.clear();
     wsFunctions.clear();
@@ -92,15 +93,24 @@ public final class WebModule {
       error = ex;
       ctx.log.writeServer(LogType.ERROR, Util.message(ex));
     } finally {
-      // record imported modules, even if parsing failed
+      // record module and imported modules, even if parsing failed
       if(archive == null) {
+        record(file, start);
         for(final byte[] path : qc.modParsed) {
-          if(IO.get(Token.string(path)) instanceof final IOFile io) {
-            files.putIfAbsent(io.path(), io.timeStamp());
-          }
+          if(IO.get(Token.string(path)) instanceof final IOFile io) record(io, start);
         }
       }
     }
+  }
+
+  /**
+   * Records the timestamp of a file, or an invalid timestamp if it was modified while parsing.
+   * @param io file
+   * @param start start time of parsing
+   */
+  private void record(final IO io, final long start) {
+    final long ts = io.timeStamp();
+    files.putIfAbsent(io.path(), ts < start ? ts : -1);
   }
 
   /**

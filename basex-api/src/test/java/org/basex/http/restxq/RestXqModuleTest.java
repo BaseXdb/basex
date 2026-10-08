@@ -47,6 +47,26 @@ public final class RestXqModuleTest extends RestXqTest {
   }
 
   /**
+   * Modules are parsed again if an imported module was modified while being parsed.
+   * @throws Exception exception
+   */
+  @Test public void modifiedWhileParsing() throws Exception {
+    register("import module namespace lib = 'lib' at 'lib.xqm';" +
+      "declare %R:path('imported') function m:f() { lib:f() };");
+    final IOFile lib = new IOFile(context.soptions.get(StaticOptions.WEBPATH), "lib.xqm");
+    final long ts = System.currentTimeMillis() + 60000;
+    lib.write("module namespace lib = 'lib'; declare function lib:f() { lib:g() };");
+    assertTrue(lib.file().setLastModified(ts));
+    assertContains(get(500, "imported"), "lib:g");
+
+    // fixed module has the timestamp of the broken one
+    lib.write("module namespace lib = 'lib'; declare function lib:f() { 'x' };");
+    assertTrue(lib.file().setLastModified(ts));
+    WebModules.get(context).init(true);
+    assertEquals("x", get(200, "imported"));
+  }
+
+  /**
    * Directories with an ignore file are skipped.
    * @throws Exception exception
    */
