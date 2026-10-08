@@ -84,6 +84,6 @@ public final class CachedPath extends AxisPath {
   @Override
   public AxisPath copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     final Expr rt = root == null ? null : root.copy(cc, vm);
-    return copyType(new CachedPath(info, rt, Arr.copyAll(cc, vm, steps)));
+    return copyCache(new CachedPath(info, rt, Arr.copyAll(cc, vm, steps)));
   }
 }

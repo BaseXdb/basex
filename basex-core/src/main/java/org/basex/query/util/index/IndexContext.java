@@ -64,7 +64,7 @@ class IndexContext extends IndexPred {
 
     // attribute index request: add attribute step
     final Expr step = Step.self(info.cc, root, st.info(), st.test);
-    return Path.get(root.info(), root, step);
+    return Path.get(info.cc, root.info(), root, step);
   }
 
   @Override

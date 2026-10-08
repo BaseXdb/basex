@@ -238,12 +238,10 @@ public abstract class Path extends ParseExpr {
         }
       }
     }
-    if(expr == this && this instanceof CachedPath && mode.oneOf(Simplify.EBV, Simplify.PREDICATE,
-        Simplify.SET, Simplify.COUNT, Simplify.EXISTENCE) && unordered(cc)) {
+    if(expr == this && this instanceof final CachedPath cp && mode.oneOf(Simplify.EBV,
+        Simplify.PREDICATE, Simplify.SET, Simplify.COUNT, Simplify.EXISTENCE) && unordered(cc)) {
       // skip sorting. example: count(preceding-sibling::a) → unordered path
-      final UnorderedPath path = copyType(new UnorderedPath(info, root, steps));
-      path.optimize();
-      expr = path;
+      expr = cp.copyCache(new UnorderedPath(info, root, steps));
     }
     return cc.simplify(this, expr, mode);
   }

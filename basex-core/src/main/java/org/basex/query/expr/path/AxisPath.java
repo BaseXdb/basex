@@ -40,6 +40,18 @@ public abstract class AxisPath extends Path {
     staticRoot = root != null && !root.has(Flag.CTX);
   }
 
+  /**
+   * Assigns the properties that control the caching of results to a copy of this path.
+   * @param <T> path type
+   * @param path copied path
+   * @return specified path
+   */
+  final <T extends AxisPath> T copyCache(final T path) {
+    path.cacheable = cacheable;
+    path.staticRoot = staticRoot;
+    return copyType(path);
+  }
+
   @Override
   public final Iter iter(final QueryContext qc) throws QueryException {
     final Value cached = cache(qc);

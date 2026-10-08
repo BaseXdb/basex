@@ -38,6 +38,6 @@ public class IterPath extends AxisPath {
   @Override
   public IterPath copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     final Expr rt = root == null ? null : root.copy(cc, vm);
-    return copyType(new IterPath(info, rt, Arr.copyAll(cc, vm, steps)));
+    return copyCache(new IterPath(info, rt, Arr.copyAll(cc, vm, steps)));
   }
 }

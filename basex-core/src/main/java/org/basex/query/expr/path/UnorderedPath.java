@@ -31,6 +31,6 @@ public final class UnorderedPath extends IterPath {
   @Override
   public UnorderedPath copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     final Expr rt = root == null ? null : root.copy(cc, vm);
-    return copyType(new UnorderedPath(info, rt, Arr.copyAll(cc, vm, steps)));
+    return copyCache(new UnorderedPath(info, rt, Arr.copyAll(cc, vm, steps)));
   }
 }
