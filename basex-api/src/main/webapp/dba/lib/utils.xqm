@@ -607,24 +607,20 @@ declare %updating function utils:redirect(
 };
 
 (:~
- : Runs the requested action and redirects to the page it belongs to.
- : @param  $page     page the actions belong to
- : @param  $action   name of action
- : @param  $actions  actions of the category: each entry assigns a name to a function that takes
- :                   the request parameters and returns 'run' (the function that performs the
- :                   action, mandatory), 'params' (query parameters of the target page) and
- :                   'info' (info message)
+ : Runs an action and redirects to the page it belongs to.
+ : @param  $page    page the action belongs to
+ : @param  $action  function that takes the request parameters and returns the action
  :)
 declare %updating function utils:dispatch(
-  $page     as xs:string,
-  $action   as xs:string,
-  $actions  as map(xs:string, fn(map(*)) as utils:action)
+  $page    as xs:string,
+  $action  as fn(map(*)) as utils:action
 ) {
-  let $entry := $actions?$action otherwise web:error(404, 'Unknown action: ' || $action)
+  (: a single action is passed: the locks of a request are derived from all code it can reach,
+     so a request that touches no database must not reach the actions of others :)
   (: an action can fail before it runs: a parameter that is evaluated is reported like the
      update it was meant for, not as a server error :)
   let $target := try {
-    $entry(request:parameter-map())
+    $action(request:parameter-map())
   } catch * {
     $err:description
   }

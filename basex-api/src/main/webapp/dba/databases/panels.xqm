@@ -689,6 +689,6 @@ declare %private function panels:backup-section(
 
   (: the file chooser is opened by the Upload button and submits what it collects. An upload
      lands in the database directory, so the server checks that it belongs where it is put :)
-  form:upload('backup-upload', 'upload-backups', true(),
+  form:upload('databases/backup-upload', 'upload-backups', true(),
     <input type='hidden' name='name' value='{ $name }'/>)
 };

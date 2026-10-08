@@ -67,84 +67,134 @@ function dba:users(
 };
 
 (:~
- : Runs a user action.
- : @param  $action  name of action
+ : Creates a user.
  : @return redirection
  :)
 declare
   %updating
   %rest:POST
-  %rest:path('/dba/users/{$action}')
-function dba:action(
-  $action  as xs:string
-) {
-  utils:dispatch($dba:CAT, $action, {
-    'create': fn($args) { {
-      'params': { 'name': $args?name },
-      'info'  : utils:info($args?name, 'user', 'created'),
+  %rest:path('/dba/users/create')
+function dba:create() {
+  utils:dispatch($dba:CAT, fn($args) { {
+    'params': { 'name': $args?name },
+    'info'  : utils:info($args?name, 'user', 'created'),
+    'run'   : %updating fn() {
+      if (user:exists($args?name)) then (
+        error((), 'User already exists.')
+      ) else (
+        user:create($args?name, $args?pw, $args?perm)
+      )
+    }
+  } })
+};
+
+(:~
+ : Drops users.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/users/drop')
+function dba:drop() {
+  utils:dispatch($dba:CAT, fn($args) { {
+    'info': utils:info($args?name, 'user', 'dropped'),
+    'run' : %updating fn() { $args?name ! user:drop(.) }
+  } })
+};
+
+(:~
+ : Updates a user.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/users/update')
+function dba:update() {
+  utils:dispatch($dba:CAT, fn($args) {
+    let $name := string($args?name)
+    let $newname := string($args?newname)
+    (: a name that is taken is the one error that can be foreseen; it leaves the user where
+       it was, so the panel keeps showing the one that was being edited :)
+    let $taken := $newname != $name and user:exists($newname)
+    return {
+      (: the password is deliberately not carried back: it would end up in the address bar,
+         in the browser history and in the log :)
+      'params': {
+        'name': if ($taken) then $name else $newname,
+        'newname': $newname,
+        'perm': $args?perm
+      },
+      'info'  : utils:info($newname, 'user', 'updated'),
       'run'   : %updating fn() {
-        if (user:exists($args?name)) then (
+        if ($taken) then (
           error((), 'User already exists.')
-        ) else (
-          user:create($args?name, $args?pw, $args?perm)
-        )
-      }
-    } },
-    'drop': fn($args) { {
-      'info': utils:info($args?name, 'user', 'dropped'),
-      'run' : %updating fn() { $args?name ! user:drop(.) }
-    } },
-    'update': fn($args) {
-      let $name := string($args?name)
-      let $newname := string($args?newname)
-      (: a name that is taken is the one error that can be foreseen; it leaves the user where
-         it was, so the panel keeps showing the one that was being edited :)
-      let $taken := $newname != $name and user:exists($newname)
-      return {
-        (: the password is deliberately not carried back: it would end up in the address bar,
-           in the browser history and in the log :)
-        'params': {
-          'name': if ($taken) then $name else $newname,
-          'newname': $newname,
-          'perm': $args?perm
+        ) else if ($name != $newname) {
+          user:alter($name, $newname)
         },
-        'info'  : utils:info($newname, 'user', 'updated'),
-        'run'   : %updating fn() {
-          if ($taken) then (
-            error((), 'User already exists.')
-          ) else if ($name != $newname) {
-            user:alter($name, $newname)
-          },
-          (: an empty field leaves the password as it is :)
-          if ($args?pw) { user:password($name, $args?pw) },
-          if ($args?perm != user:list-details($name)/@permission) {
-            user:grant($name, $args?perm)
-          },
-          let $xml := user-info:parse($args?info)
-          where not(deep-equal(user:info($name), $xml))
-          return user:update-info($xml, $name)
-        }
-      }
-    },
-    'info': fn($args) { {
-      'info': 'User information was updated.',
-      'run' : %updating fn() {
+        (: an empty field leaves the password as it is :)
+        if ($args?pw) { user:password($name, $args?pw) },
+        if ($args?perm != user:list-details($name)/@permission) {
+          user:grant($name, $args?perm)
+        },
         let $xml := user-info:parse($args?info)
-        where not(deep-equal(user:info(), $xml))
-        return user:update-info($xml)
+        where not(deep-equal(user:info($name), $xml))
+        return user:update-info($xml, $name)
       }
-    } },
-    'pattern-add': fn($args) { {
-      'params': { 'name': $args?name },
-      'info'  : utils:info($args?pattern, 'pattern', 'created'),
-      'run'   : %updating fn() {
-        user:grant($args?name, $args?perm, $args?pattern)
-      }
-    } },
-    'pattern-drop': fn($args) { {
-      'params': { 'name': $args?name },
-      'info'  : utils:info($args?pattern, 'pattern', 'dropped'),
-      'run'   : %updating fn() { $args?pattern ! user:drop($args?name, .) }
-    } }
+    }
   })
+};
+
+(:~
+ : Updates the user information.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/users/info')
+function dba:info() {
+  utils:dispatch($dba:CAT, fn($args) { {
+    'info': 'User information was updated.',
+    'run' : %updating fn() {
+      let $xml := user-info:parse($args?info)
+      where not(deep-equal(user:info(), $xml))
+      return user:update-info($xml)
+    }
+  } })
+};
+
+(:~
+ : Adds a database pattern of a user.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/users/pattern-add')
+function dba:pattern-add() {
+  utils:dispatch($dba:CAT, fn($args) { {
+    'params': { 'name': $args?name },
+    'info'  : utils:info($args?pattern, 'pattern', 'created'),
+    'run'   : %updating fn() {
+      user:grant($args?name, $args?perm, $args?pattern)
+    }
+  } })
+};
+
+(:~
+ : Drops database patterns of a user.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/users/pattern-drop')
+function dba:pattern-drop() {
+  utils:dispatch($dba:CAT, fn($args) { {
+    'params': { 'name': $args?name },
+    'info'  : utils:info($args?pattern, 'pattern', 'dropped'),
+    'run'   : %updating fn() { $args?pattern ! user:drop($args?name, .) }
+  } })
 };

@@ -120,47 +120,64 @@ function dba:files-download(
 };
 
 (:~
- : Runs a file action.
- : @param  $action  name of action
+ : Creates a directory.
  : @return redirection
  :)
 declare
   %updating
   %rest:POST
-  %rest:path('/dba/workspace/{$action}')
-function dba:action(
-  $action  as xs:string
-) {
-  utils:dispatch($dba:CAT, $action, {
-    'dir-create': fn($args) { {
-      'info': utils:info($args?name, 'directory', 'created'),
-      'run' : %updating fn() {
-        file:create-dir(utils:file-path($args?dir, $args?name))
-      }
-    } },
-    'delete': fn($args) { {
-      'info': utils:info($args?name, 'file', 'deleted'),
-      'run' : %updating fn() {
-        (: delete all files, ignore reference to parent directory :)
-        let $dir := config:files-dir($args?dir)
-        return $args?name[. != '..'] ! file:delete(utils:safe-path($dir, .))
-      }
-    } },
-    'upload': fn($args) {
+  %rest:path('/dba/workspace/dir-create')
+function dba:dir-create() {
+  utils:dispatch($dba:CAT, fn($args) { {
+    'info': utils:info($args?name, 'directory', 'created'),
+    'run' : %updating fn() {
+      file:create-dir(utils:file-path($args?dir, $args?name))
+    }
+  } })
+};
+
+(:~
+ : Deletes files.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/workspace/delete')
+function dba:delete() {
+  utils:dispatch($dba:CAT, fn($args) { {
+    'info': utils:info($args?name, 'file', 'deleted'),
+    'run' : %updating fn() {
+      (: delete all files, ignore reference to parent directory :)
       let $dir := config:files-dir($args?dir)
-      let $files := utils:files($args?files)
-      return {
-        'info': if (map:size($files)) { utils:info(map:keys($files), 'file', 'uploaded') },
-        'run' : %updating fn() {
-          (: parse all XQuery files; reject files that cannot be parsed :)
-          void(
-            for key $name value $content in $files
-            where matches($name, $utils:XQUERY-REGEX, 'i')
-            return utils:query-parse(bin:decode-string($content), $dir || $name)
-          ),
+      return $args?name[. != '..'] ! file:delete(utils:safe-path($dir, .))
+    }
+  } })
+};
+
+(:~
+ : Uploads files.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/workspace/upload')
+function dba:upload() {
+  utils:dispatch($dba:CAT, fn($args) {
+    let $dir := config:files-dir($args?dir)
+    let $files := utils:files($args?files)
+    return {
+      'info': if (map:size($files)) { utils:info(map:keys($files), 'file', 'uploaded') },
+      'run' : %updating fn() {
+        (: parse all XQuery files; reject files that cannot be parsed :)
+        void(
           for key $name value $content in $files
-          return file:write-binary(utils:safe-path($dir, $name), $content)
-        }
+          where matches($name, $utils:XQUERY-REGEX, 'i')
+          return utils:query-parse(bin:decode-string($content), $dir || $name)
+        ),
+        for key $name value $content in $files
+        return file:write-binary(utils:safe-path($dir, $name), $content)
       }
     }
   })

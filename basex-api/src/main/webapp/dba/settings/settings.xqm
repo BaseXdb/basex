@@ -86,25 +86,31 @@ function dba:settings() as element(html) {
 };
 
 (:~
- : Runs a settings action.
- : @param  $action  name of action
+ : Saves the settings.
  : @return redirection
  :)
 declare
   %updating
   %rest:POST
-  %rest:path('/dba/settings/{$action}')
-function dba:action(
-  $action  as xs:string
-) {
-  utils:dispatch($dba:CAT, $action, {
-    'save': fn($args) { {
-      'info': 'Settings were saved.',
-      'run' : %updating fn() { config:save(html:parameters()) }
-    } },
-    'gc': fn($args) { {
-      'info': 'Garbage collection was triggered.',
-      'run' : %updating fn() { prof:gc() }
-    } }
-  })
+  %rest:path('/dba/settings/save')
+function dba:save() {
+  utils:dispatch($dba:CAT, fn($args) { {
+    'info': 'Settings were saved.',
+    'run' : %updating fn() { config:save(html:parameters()) }
+  } })
+};
+
+(:~
+ : Triggers garbage collection.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/settings/gc')
+function dba:gc() {
+  utils:dispatch($dba:CAT, fn($args) { {
+    'info': 'Garbage collection was triggered.',
+    'run' : %updating fn() { prof:gc() }
+  } })
 };

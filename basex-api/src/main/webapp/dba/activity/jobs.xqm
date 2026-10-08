@@ -12,51 +12,86 @@ import module namespace utils = 'dba/lib/utils' at '../lib/utils.xqm';
 declare variable $dba:CAT := 'activity';
 
 (:~
- : Runs a job action.
- : @param  $action  name of action
+ : Starts a job.
  : @return redirection
  :)
 declare
   %updating
   %rest:POST
-  %rest:path('/dba/jobs/{$action}')
-function dba:action(
-  $action  as xs:string
-) {
-  utils:dispatch($dba:CAT, $action, {
-    'create': fn($args) { {
-      (: a supplied id selects the new job; a generated one is not known before it is started :)
-      'params': { 'job': $args?id }[$args?id],
-      'info'  : 'Job was started.',
-      'run'   : %updating fn() { dba:create($args) }
-    } },
-    'download': fn($args) { {
-      (: the file is fetched by the page this leads to: reading a result closes the job, so the
-         view must not keep showing it :)
-      'params': { 'download': $args?id },
-      'run'   : %updating fn() { () }
-    } },
-    'replace': fn($args) { {
-      'params': { 'job': $args?id },
-      'info'  : utils:info($args?id, 'service', 'replaced'),
-      'run'   : %updating fn() { dba:replace($args?id, $args?query) }
-    } },
-    'remove': fn($args) { {
-      'info': utils:info($args?id, 'job', 'removed'),
-      'run' : %updating fn() { $args?id ! job:remove(.) }
-    } },
-    'unregister': fn($args) { {
-      'info': utils:info($args?id, 'service', 'unregistered'),
-      'run' : %updating fn() { $args?id ! job:remove(., { 'service': true() }) }
-    } }
-  })
+  %rest:path('/dba/jobs/create')
+function dba:create() {
+  utils:dispatch($dba:CAT, fn($args) { {
+    (: a supplied id selects the new job; a generated one is not known before it is started :)
+    'params': { 'job': $args?id }[$args?id],
+    'info'  : 'Job was started.',
+    'run'   : %updating fn() { dba:start-job($args) }
+  } })
+};
+
+(:~
+ : Downloads the result of a job.
+ : @return redirection
+ :)
+declare
+  %rest:POST
+  %rest:path('/dba/jobs/download')
+function dba:download() as element(rest:response) {
+  (: the file is fetched by the page this leads to: reading a result closes the job, so the
+     view must not keep showing it :)
+  utils:outcome($dba:CAT, { 'download': request:parameter('id') }, ())
+};
+
+(:~
+ : Replaces the query of a service.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/jobs/replace')
+function dba:replace() {
+  utils:dispatch($dba:CAT, fn($args) { {
+    'params': { 'job': $args?id },
+    'info'  : utils:info($args?id, 'service', 'replaced'),
+    'run'   : %updating fn() { dba:replace-service($args?id, $args?query) }
+  } })
+};
+
+(:~
+ : Removes jobs.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/jobs/remove')
+function dba:remove() {
+  utils:dispatch($dba:CAT, fn($args) { {
+    'info': utils:info($args?id, 'job', 'removed'),
+    'run' : %updating fn() { $args?id ! job:remove(.) }
+  } })
+};
+
+(:~
+ : Unregisters services.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/jobs/unregister')
+function dba:unregister() {
+  utils:dispatch($dba:CAT, fn($args) { {
+    'info': utils:info($args?id, 'service', 'unregistered'),
+    'run' : %updating fn() { $args?id ! job:remove(., { 'service': true() }) }
+  } })
 };
 
 (:~
  : Starts a job for the query of the dialog.
  : @param  $args  request parameters
  :)
-declare %private function dba:create(
+declare %private function dba:start-job(
   $args  as map(*)
 ) as empty-sequence() {
   (: the scheduling options are only supplied if they were filled in: an empty string is no
@@ -93,7 +128,7 @@ declare %private function dba:base-uri() as xs:anyURI {
  : @param  $id     job id
  : @param  $query  new query
  :)
-declare %private function dba:replace(
+declare %private function dba:replace-service(
   $id     as xs:string,
   $query  as xs:string
 ) as empty-sequence() {

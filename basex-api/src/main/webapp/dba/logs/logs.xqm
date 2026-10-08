@@ -350,21 +350,16 @@ function dba:logs-jump(
 };
 
 (:~
- : Runs a log action.
- : @param  $action  name of action
+ : Deletes log files.
  : @return redirection
  :)
 declare
   %updating
   %rest:POST
-  %rest:path('/dba/logs/{$action}')
-function dba:action(
-  $action  as xs:string
-) {
-  utils:dispatch($dba:CAT, $action, {
-    'delete': fn($args) { {
-      'info': utils:info($args?name, 'log', 'deleted'),
-      'run' : %updating fn() { $args?name ! admin:delete-logs(.) }
-    } }
-  })
+  %rest:path('/dba/logs/delete')
+function dba:delete() {
+  utils:dispatch($dba:CAT, fn($args) { {
+    'info': utils:info($args?name, 'log', 'deleted'),
+    'run' : %updating fn() { $args?name ! admin:delete-logs(.) }
+  } })
 };

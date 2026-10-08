@@ -165,7 +165,7 @@ declare
 function dba:backup-download(
   $backup  as xs:string
 ) as item()+ {
-  let $path := `{ db:option('dbpath') }/{ $backup }`
+  let $path := utils:safe-path(db:option('dbpath') || '/', $backup)
   return (
     web:response-header(
       { 'media-type': 'application/octet-stream' },
@@ -204,171 +204,382 @@ function dba:db-save(
 };
 
 (:~
- : Runs a database action.
- : @param  $action  name of action
+ : Creates a database.
  : @return redirection
  :)
 declare
   %updating
   %rest:POST
-  %rest:path('/dba/databases/{$action}')
-function dba:action(
-  $action  as xs:string
-) {
-  utils:dispatch($dba:CAT, $action, {
-    'create': fn($args) { {
-      'params': { 'name': $args?name },
-      'info'  : utils:info($args?name, 'database', 'created'),
+  %rest:path('/dba/databases/create')
+function dba:create() {
+  utils:dispatch($dba:CAT, fn($args) { {
+    'params': { 'name': $args?name },
+    'info'  : utils:info($args?name, 'database', 'created'),
+    'run'   : %updating fn() {
+      if (db:exists($args?name)) then (
+        error((), 'Database already exists.')
+      ) else (
+        (: without an input, an empty database is created :)
+        db:create($args?name, $args?input[.], (), {
+          form:index-map($args?opts, $args?lang, $args?ftinclude, true()),
+          form:parsing-map($args?opts, $args?filter, $args?parser)
+        })
+      )
+    }
+  } })
+};
+
+(:~
+ : Drops databases.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/databases/drop')
+function dba:drop() {
+  utils:dispatch($dba:CAT, fn($args) { {
+    'info': utils:info($args?name, 'database', 'dropped'),
+    'run' : %updating fn() { $args?name ! db:drop(.) }
+  } })
+};
+
+(:~
+ : Optimizes databases.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/databases/optimize')
+function dba:optimize() {
+  utils:dispatch($dba:CAT, fn($args) { {
+    'info': utils:info($args?name, 'database', 'optimized'),
+    'run' : %updating fn() { $args?name ! db:optimize(.) }
+  } })
+};
+
+(:~
+ : Optimizes a database with new options.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/databases/optimize-db')
+function dba:optimize-db() {
+  utils:dispatch($dba:CAT, fn($args) { {
+    'params': { 'name': $args?name },
+    'info'  : utils:info($args?name, 'database', 'optimized'),
+    'run'   : %updating fn() {
+      db:optimize($args?name, boolean($args?all),
+        form:index-map($args?opts, $args?lang, $args?ftinclude, false()))
+    }
+  } })
+};
+
+(:~
+ : Renames a database.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/databases/rename')
+function dba:rename() {
+  utils:dispatch($dba:CAT, dba:rename-database(?, 'renamed', db:alter#2))
+};
+
+(:~
+ : Copies a database.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/databases/copy')
+function dba:copy() {
+  utils:dispatch($dba:CAT, dba:rename-database(?, 'copied', db:copy#2))
+};
+
+(:~
+ : Creates backups of databases.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/databases/backups-create')
+function dba:backups-create() {
+  utils:dispatch($dba:CAT, fn($args) { {
+    'info': utils:info($args?name, 'database', 'backed up'),
+    'run' : %updating fn() { $args?name ! db:create-backup(.) }
+  } })
+};
+
+(:~
+ : Restores the latest backups of databases.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/databases/backups-restore')
+function dba:backups-restore() {
+  utils:dispatch($dba:CAT, fn($args) { {
+    'info': utils:info($args?name, 'backup', 'restored'),
+    'run' : %updating fn() { $args?name ! db:restore(.) }
+  } })
+};
+
+(:~
+ : Creates a backup of a database.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/databases/backup-create')
+function dba:backup-create() {
+  utils:dispatch($dba:CAT, fn($args) {
+    let $name := string($args?name)
+    return {
+      'params': { 'name': $name },
+      'info'  : utils:info($name, 'database', 'backed up'),
       'run'   : %updating fn() {
-        if (db:exists($args?name)) then (
-          error((), 'Database already exists.')
+        db:create-backup($name, {
+          'comment': $args?comment, 'compress': boolean($args?compress)
+        })
+      }
+    }
+  })
+};
+
+(:~
+ : Drops backups of a database.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/databases/backup-drop')
+function dba:backup-drop() {
+  utils:dispatch($dba:CAT, fn($args) {
+    let $name := string($args?name)
+    return {
+      'params': { 'name': $name },
+      'info'  : utils:info($args?backup, 'backup', 'dropped'),
+      'run'   : %updating fn() { $args?backup ! db:drop-backup(`{ $name }-{ . }`) }
+    }
+  })
+};
+
+(:~
+ : Restores a backup of a database.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/databases/backup-restore')
+function dba:backup-restore() {
+  utils:dispatch($dba:CAT, fn($args) {
+    let $name := string($args?name)
+    (: only the first backup will be restored :)
+    let $backup := head($args?backup)
+    return {
+      'params': { 'name': $name },
+      'info'  : utils:info($backup, 'backup', 'restored'),
+      'run'   : %updating fn() { db:restore(`{ $name }-{ $backup }`) }
+    }
+  })
+};
+
+(:~
+ : Uploads backups.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/databases/backup-upload')
+function dba:backup-upload() {
+  utils:dispatch($dba:CAT, fn($args) {
+    (: the panel the upload was started from decides where the backups belong; an empty name
+       stands for the general data :)
+    let $name := string($args?name)
+    let $files := utils:files($args?files)
+    return {
+      'params': { 'name': $name },
+      'info'  : utils:info(map:keys($files), 'backup', 'uploaded'),
+      'run'   : %updating fn() {
+        for key $file value $content in $files
+        let $db := replace($file, $utils:BACKUP-ZIP-REGEX, '$1')
+        let $entries := archive:entries($content) ! data()
+        (: reject backups with invalid content :)
+        let $valid := if ($db) then (
+          $entries = $db || '/inf.basex' and
+          (every $entry in $entries satisfies starts-with($entry, $db || '/'))
         ) else (
-          (: without an input, an empty database is created :)
-          db:create($args?name, $args?input[.], (), {
-            form:index-map($args?opts, $args?lang, $args?ftinclude, true()),
-            form:parsing-map($args?opts, $args?filter, $args?parser)
-          })
+          every $entry in $entries satisfies matches($entry, '\.(xml|basex)')
+        )
+        return if (not($valid)) then (
+          error((), 'Invalid backup file: ' || $file)
+        ) else if ($name and $db != $name) {
+          (: reject the backup of another database: it would be invisible in the panel it was
+             uploaded from. Without a selected database there is nothing to contradict, and a
+             backup of a database that no longer exists is what a recovery starts from :)
+          error((), `Backup "{ $file }" does not belong to database "{ $name }".`)
+        },
+        let $dir := db:option('dbpath') || '/'
+        for key $file value $content in $files
+        return file:write-binary(utils:safe-path($dir, $file), $content)
+      }
+    }
+  })
+};
+
+(:~
+ : Adds resources to a database.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/databases/put')
+function dba:put() {
+  utils:dispatch($dba:CAT, fn($args) {
+    let $files := utils:files($args?files)
+    let $input := $args?input[.]
+    let $target := $args?target[.]
+    return {
+      'params': { 'name': $args?name },
+      (: an input may stand for a single file or for the contents of a directory :)
+      'info'  : utils:info((map:keys($files), $input), 'resource', 'added'),
+      'run'   : %updating fn() {
+        if (map:size($files) = 0 and empty($input)) then (
+          error((), 'No input specified.')
+        ) else if ($input and empty($target)) then (
+          (: an empty target addresses the database as a whole: what the input does not
+             supply would be deleted :)
+          error((), 'Target path is required.')
+        ) else (
+          let $options := form:parsing-map($args?opts, $args?filter, $args?parser)
+          return (
+            if ($args?binary) then (
+              for key $path value $content in $files
+              return db:put-binary($args?name, $content, $path)
+            ) else (
+              (: the input is parsed here, so that a broken document is reported as an error
+                 instead of failing when the pending updates are applied :)
+              for key $path value $content in $files
+              return db:put($args?name, fetch:binary-doc($content), $path, $options)
+            ),
+            (: a directory or an archive is expanded, and the paths it contains are kept
+               below the target; what is stored there already is replaced :)
+            $input ! db:put($args?name, ., $target, $options)
+          )
         )
       }
-    } },
-    'drop': fn($args) { {
-      'info': utils:info($args?name, 'database', 'dropped'),
-      'run' : %updating fn() { $args?name ! db:drop(.) }
-    } },
-    'optimize': fn($args) { {
-      'info': utils:info($args?name, 'database', 'optimized'),
-      'run' : %updating fn() { $args?name ! db:optimize(.) }
-    } },
-    'optimize-db': fn($args) { {
-      'params': { 'name': $args?name },
-      'info'  : utils:info($args?name, 'database', 'optimized'),
-      'run'   : %updating fn() {
-        db:optimize($args?name, boolean($args?all),
-          form:index-map($args?opts, $args?lang, $args?ftinclude, false()))
-      }
-    } },
-    'rename': fn($args) {
-      dba:rename-database($args, 'renamed', %updating fn($from, $to) { db:alter($from, $to) })
-    },
-    'copy': fn($args) {
-      dba:rename-database($args, 'copied', %updating fn($from, $to) { db:copy($from, $to) })
-    },
-    'backups-create': fn($args) { {
-      'info': utils:info($args?name, 'database', 'backed up'),
-      'run' : %updating fn() { $args?name ! db:create-backup(.) }
-    } },
-    'backups-restore': fn($args) { {
-      'info': utils:info($args?name, 'backup', 'restored'),
-      'run' : %updating fn() { $args?name ! db:restore(.) }
-    } },
-    'backup-create': fn($args) {
-      let $name := string($args?name)
-      return {
-        'params': { 'name': $name },
-        'info'  : utils:info($name, 'database', 'backed up'),
-        'run'   : %updating fn() {
-          db:create-backup($name, {
-            'comment': $args?comment, 'compress': boolean($args?compress)
-          })
-        }
-      }
-    },
-    'backup-drop': fn($args) {
-      let $name := string($args?name)
-      return {
-        'params': { 'name': $name },
-        'info'  : utils:info($args?backup, 'backup', 'dropped'),
-        'run'   : %updating fn() { $args?backup ! db:drop-backup(`{ $name }-{ . }`) }
-      }
-    },
-    'backup-restore': fn($args) {
-      let $name := string($args?name)
-      (: only the first backup will be restored :)
-      let $backup := head($args?backup)
-      return {
-        'params': { 'name': $name },
-        'info'  : utils:info($backup, 'backup', 'restored'),
-        'run'   : %updating fn() { db:restore(`{ $name }-{ $backup }`) }
-      }
-    },
-    'put': fn($args) {
-      let $files := utils:files($args?files)
-      let $input := $args?input[.]
-      let $target := $args?target[.]
-      return {
-        'params': { 'name': $args?name },
-        (: an input may stand for a single file or for the contents of a directory :)
-        'info'  : utils:info((map:keys($files), $input), 'resource', 'added'),
-        'run'   : %updating fn() {
-          if (map:size($files) = 0 and empty($input)) then (
-            error((), 'No input specified.')
-          ) else if ($input and empty($target)) then (
-            (: an empty target addresses the database as a whole: what the input does not
-               supply would be deleted :)
-            error((), 'Target path is required.')
-          ) else (
-            let $options := form:parsing-map($args?opts, $args?filter, $args?parser)
-            return (
-              if ($args?binary) then (
-                for key $path value $content in $files
-                return db:put-binary($args?name, $content, $path)
-              ) else (
-                (: the input is parsed here, so that a broken document is reported as an error
-                   instead of failing when the pending updates are applied :)
-                for key $path value $content in $files
-                return db:put($args?name, fetch:binary-doc($content), $path, $options)
-              ),
-              (: a directory or an archive is expanded, and the paths it contains are kept
-                 below the target; what is stored there already is replaced :)
-              $input ! db:put($args?name, ., $target, $options)
-            )
-          )
-        }
-      }
-    },
-    'replace': fn($args) {
-      let $files := utils:files($args?files)
-      let $content := head(map:items($files))
-      return {
-        'params': { 'name': $args?name, 'resource': $args?resource },
-        'info'  : utils:info($args?resource, 'resource', 'replaced'),
-        'run'   : %updating fn() {
-          if (empty($content)) then (
-            error((), 'No input specified.')
-          ) else if (db:type($args?name, $args?resource) = 'xml') then (
-            db:put($args?name, fetch:binary-doc($content), $args?resource)
-          ) else (
-            db:put-binary($args?name, $content, $args?resource)
-          )
-        }
-      }
-    },
-    'resource-delete': fn($args) { {
-      'params': { 'name': $args?name },
-      'info'  : utils:info($args?resource, 'resource', 'deleted'),
-      'run'   : %updating fn() { $args?resource ! db:delete($args?name, .) }
-    } },
-    'resource-rename': fn($args) {
-      let $exists := db:exists($args?name, $args?target)
-      return {
-        (: a rename that fails leaves the resource where it is, and selected :)
-        'params': {
-          'name': $args?name,
-          'resource': if ($exists) then $args?resource else $args?target
-        },
-        'info'  : utils:info($args?resource, 'resource', 'renamed'),
-        'run'   : %updating fn() {
-          if ($exists) then (
-            error((), 'Resource already exists.')
-          ) else (
-            db:rename($args?name, $args?resource, $args?target)
-          )
-        }
-      }
-    },
-    'index-create': fn($args) { dba:index($args, true()) },
-    'index-drop': fn($args) { dba:index($args, false()) }
+    }
   })
+};
+
+(:~
+ : Replaces a resource.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/databases/replace')
+function dba:replace() {
+  utils:dispatch($dba:CAT, fn($args) {
+    let $files := utils:files($args?files)
+    let $content := head(map:items($files))
+    return {
+      'params': { 'name': $args?name, 'resource': $args?resource },
+      'info'  : utils:info($args?resource, 'resource', 'replaced'),
+      'run'   : %updating fn() {
+        if (empty($content)) then (
+          error((), 'No input specified.')
+        ) else if (db:type($args?name, $args?resource) = 'xml') then (
+          db:put($args?name, fetch:binary-doc($content), $args?resource)
+        ) else (
+          db:put-binary($args?name, $content, $args?resource)
+        )
+      }
+    }
+  })
+};
+
+(:~
+ : Deletes resources.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/databases/resource-delete')
+function dba:resource-delete() {
+  utils:dispatch($dba:CAT, fn($args) { {
+    'params': { 'name': $args?name },
+    'info'  : utils:info($args?resource, 'resource', 'deleted'),
+    'run'   : %updating fn() { $args?resource ! db:delete($args?name, .) }
+  } })
+};
+
+(:~
+ : Renames a resource.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/databases/resource-rename')
+function dba:resource-rename() {
+  utils:dispatch($dba:CAT, fn($args) {
+    let $exists := db:exists($args?name, $args?target)
+    return {
+      (: a rename that fails leaves the resource where it is, and selected :)
+      'params': {
+        'name': $args?name,
+        'resource': if ($exists) then $args?resource else $args?target
+      },
+      'info'  : utils:info($args?resource, 'resource', 'renamed'),
+      'run'   : %updating fn() {
+        if ($exists) then (
+          error((), 'Resource already exists.')
+        ) else (
+          db:rename($args?name, $args?resource, $args?target)
+        )
+      }
+    }
+  })
+};
+
+(:~
+ : Creates an index.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/databases/index-create')
+function dba:index-create() {
+  utils:dispatch($dba:CAT, dba:index(?, true()))
+};
+
+(:~
+ : Drops an index.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/databases/index-drop')
+function dba:index-drop() {
+  utils:dispatch($dba:CAT, dba:index(?, false()))
 };
 
 (:~

@@ -84,83 +84,144 @@ function dba:store-save(
 };
 
 (:~
- : Runs a store action.
- : @param  $action  name of action
+ : Adds an entry to a store.
  : @return redirection
  :)
 declare
   %updating
   %rest:POST
-  %rest:path('/dba/stores/{$action}')
-function dba:action(
-  $action  as xs:string
-) {
-  utils:dispatch($dba:CAT, $action, {
-    'add': fn($args) {
-      (: the path names what is written: its first step is the key of the entry, the rest
-         leads into its value. The dialog of a level supplies the step it adds :)
-      let $steps := panels:steps($args?path)
-      let $path := (
-        $steps,
-        if ($args?index = 'true') then (
-          xs:integer($args?step)
-        ) else (
-          dba:key($args?step, empty($steps))
-        )
+  %rest:path('/dba/stores/add')
+function dba:add() {
+  utils:dispatch($dba:CAT, fn($args) {
+    (: the path names what is written: its first step is the key of the entry, the rest
+       leads into its value. The dialog of a level supplies the step it adds :)
+    let $steps := panels:steps($args?path)
+    let $path := (
+      $steps,
+      if ($args?index = 'true') then (
+        xs:integer($args?step)
+      ) else (
+        dba:key($args?step, empty($steps))
       )
-      return {
-        'params': dba:selection($args, head($path)),
-        'info'  : utils:info($path[last()], 'entry', 'added'),
-        (: the value is any XQuery value: it is supplied as the expression that yields it :)
-        'run'   : %updating fn() { dba:add($args?name, $path, utils:evaluate($args?value)) }
-      }
-    },
-    'remove': fn($args) {
-      (: the checked children are removed from the level the path leads to; the entries of a
-         store are removed from the store itself :)
-      let $path := panels:steps($args?path)
-      let $steps := $args?step ! panels:steps(.)
-      let $key := head($path)
-      return {
-        (: the entries that were removed are gone; the level they belonged to is not :)
-        'params': dba:selection($args, ()),
-        'info'  : utils:info($steps, 'entry', 'removed'),
-        'run'   : %updating fn() {
-          if (empty($path)) then (
-            $steps ! store:remove(string(.), $args?name)
-          ) else (
-            let $value := store:get($key, $args?name)
-            let $level := panels:remove(panels:resolve($value, tail($path)), $steps)
-            return store:put($key, panels:replace($value, tail($path), $level), $args?name)
-          )
-        }
-      }
-    },
-    'write': fn($args) { {
-      'params': { 'name': $args?name },
-      'info'  : utils:info($args?name, 'store', 'written to disk'),
-      'run'   : %updating fn() { store:write($args?name) }
-    } },
-    'read': fn($args) { {
-      'params': { 'name': $args?name },
-      'info'  : utils:info($args?name, 'store', 'read from disk'),
-      'run'   : %updating fn() { store:read($args?name) }
-    } },
-    'close': fn($args) { {
-      'params': { 'name': $args?name },
-      'info'  : utils:info($args?name, 'store', 'closed'),
-      'run'   : %updating fn() { store:close($args?name) }
-    } },
-    'delete': fn($args) { {
-      'info': utils:info($args?name, 'store', 'deleted'),
-      (: the selection is not passed on: the store it named is gone :)
-      'run' : %updating fn() { $args?name ! store:delete(.) }
-    } },
-    'clear': fn($args) { {
-      'info': 'All stores were cleared.',
-      'run' : %updating fn() { store:clear() }
-    } }
+    )
+    return {
+      'params': dba:selection($args, head($path)),
+      'info'  : utils:info($path[last()], 'entry', 'added'),
+      (: the value is any XQuery value: it is supplied as the expression that yields it :)
+      'run'   : %updating fn() { dba:add-entry($args?name, $path, utils:evaluate($args?value)) }
+    }
   })
+};
+
+(:~
+ : Removes entries from a store.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/stores/remove')
+function dba:remove() {
+  utils:dispatch($dba:CAT, fn($args) {
+    (: the checked children are removed from the level the path leads to; the entries of a
+       store are removed from the store itself :)
+    let $path := panels:steps($args?path)
+    let $steps := $args?step ! panels:steps(.)
+    let $key := head($path)
+    return {
+      (: the entries that were removed are gone; the level they belonged to is not :)
+      'params': dba:selection($args, ()),
+      'info'  : utils:info($steps, 'entry', 'removed'),
+      'run'   : %updating fn() {
+        if (empty($path)) then (
+          $steps ! store:remove(string(.), $args?name)
+        ) else (
+          let $value := store:get($key, $args?name)
+          let $level := panels:remove(panels:resolve($value, tail($path)), $steps)
+          return store:put($key, panels:replace($value, tail($path), $level), $args?name)
+        )
+      }
+    }
+  })
+};
+
+(:~
+ : Writes a store to disk.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/stores/write')
+function dba:write() {
+  utils:dispatch($dba:CAT, fn($args) { {
+    'params': { 'name': $args?name },
+    'info'  : utils:info($args?name, 'store', 'written to disk'),
+    'run'   : %updating fn() { store:write($args?name) }
+  } })
+};
+
+(:~
+ : Reads a store from disk.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/stores/read')
+function dba:read() {
+  utils:dispatch($dba:CAT, fn($args) { {
+    'params': { 'name': $args?name },
+    'info'  : utils:info($args?name, 'store', 'read from disk'),
+    'run'   : %updating fn() { store:read($args?name) }
+  } })
+};
+
+(:~
+ : Closes a store.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/stores/close')
+function dba:close() {
+  utils:dispatch($dba:CAT, fn($args) { {
+    'params': { 'name': $args?name },
+    'info'  : utils:info($args?name, 'store', 'closed'),
+    'run'   : %updating fn() { store:close($args?name) }
+  } })
+};
+
+(:~
+ : Deletes stores.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/stores/delete')
+function dba:delete() {
+  utils:dispatch($dba:CAT, fn($args) { {
+    'info': utils:info($args?name, 'store', 'deleted'),
+    (: the selection is not passed on: the store it named is gone :)
+    'run' : %updating fn() { $args?name ! store:delete(.) }
+  } })
+};
+
+(:~
+ : Clears all stores.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/stores/clear')
+function dba:clear() {
+  utils:dispatch($dba:CAT, fn($args) { {
+    'info': 'All stores were cleared.',
+    'run' : %updating fn() { store:clear() }
+  } })
 };
 
 (:~
@@ -186,7 +247,7 @@ declare %private function dba:selection(
  : @param  $path   path of the value
  : @param  $value  new value
  :)
-declare %private function dba:add(
+declare %private function dba:add-entry(
   $name   as xs:string?,
   $path   as item()*,
   $value  as item()*

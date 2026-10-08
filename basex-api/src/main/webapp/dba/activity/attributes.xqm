@@ -67,69 +67,130 @@ declare %private function dba:value(
 };
 
 (:~
- : Runs a session action.
- : @param  $action  name of action
+ : Assigns a session attribute.
  : @return redirection
  :)
 declare
   %updating
   %rest:POST
-  %rest:path('/dba/sessions/{$action}')
-function dba:session-action(
-  $action  as xs:string
-) {
-  utils:dispatch($dba:CAT, $action, dba:actions('session',
-    sessions:set#3, sessions:delete#2, sessions:close#1))
+  %rest:path('/dba/sessions/set')
+function dba:session-set() {
+  utils:dispatch($dba:CAT, dba:set(?, sessions:set#3))
 };
 
 (:~
- : Runs a WebSocket action.
- : @param  $action  name of action
+ : Deletes a session attribute.
  : @return redirection
  :)
 declare
   %updating
   %rest:POST
-  %rest:path('/dba/websockets/{$action}')
-function dba:websocket-action(
-  $action  as xs:string
-) {
+  %rest:path('/dba/sessions/delete')
+function dba:session-delete() {
+  utils:dispatch($dba:CAT, dba:delete(?, sessions:delete#2))
+};
+
+(:~
+ : Closes sessions.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/sessions/close')
+function dba:session-close() {
+  utils:dispatch($dba:CAT, dba:close(?, 'session', sessions:close#1))
+};
+
+(:~
+ : Assigns a WebSocket attribute.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/websockets/set')
+function dba:websocket-set() {
+  utils:dispatch($dba:CAT, dba:set(?, ws:set#3))
+};
+
+(:~
+ : Deletes a WebSocket attribute.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/websockets/delete')
+function dba:websocket-delete() {
+  utils:dispatch($dba:CAT, dba:delete(?, ws:delete#2))
+};
+
+(:~
+ : Closes WebSocket connections.
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/websockets/close')
+function dba:websocket-close() {
   (: the client of a closed connection opens a new one with its next request :)
-  utils:dispatch($dba:CAT, $action, dba:actions('connection',
-    ws:set#3, ws:delete#2, ws:close#1))
+  utils:dispatch($dba:CAT, dba:close(?, 'connection', ws:close#1))
+};
+
+(: the functions below void their calls: what a dynamic call returns is not known to be empty,
+   and an updating function admits nothing else :)
+
+(:~
+ : Returns the action that assigns an attribute.
+ : @param  $args  request parameters
+ : @param  $set   assigns an attribute
+ : @return action
+ :)
+declare %private function dba:set(
+  $args  as map(*),
+  $set   as fn(xs:string, xs:string, item()*) as empty-sequence()
+) as utils:action {
+  (: an attribute holds any XQuery value: it is supplied as the expression that yields it :)
+  {
+    'info': utils:info($args?name, 'attribute', 'assigned'),
+    'run' : %updating fn() {
+      void($set($args?id, $args?name, utils:evaluate($args?value)))
+    }
+  }
 };
 
 (:~
- : Returns the actions that assign, delete and close what holds attributes.
- : @param  $noun    name of the holder (singular form)
- : @param  $set     assigns an attribute
+ : Returns the action that deletes an attribute.
+ : @param  $args    request parameters
  : @param  $delete  deletes an attribute
- : @param  $close   closes a holder
- : @return actions
+ : @return action
  :)
-declare %private function dba:actions(
-  $noun    as xs:string,
-  $set     as fn(xs:string, xs:string, item()*) as empty-sequence(),
-  $delete  as fn(xs:string, xs:string) as empty-sequence(),
-  $close   as fn(xs:string) as empty-sequence()
-) as map(*) {
-  (: the calls are voided: what a dynamic call returns is not known to be empty, and an
-     updating function admits nothing else :)
+declare %private function dba:delete(
+  $args    as map(*),
+  $delete  as fn(xs:string, xs:string) as empty-sequence()
+) as utils:action {
   {
-    (: an attribute holds any XQuery value: it is supplied as the expression that yields it :)
-    'set': fn($args) { {
-      'info': utils:info($args?name, 'attribute', 'assigned'),
-      'run' : %updating fn() {
-        void($set($args?id, $args?name, utils:evaluate($args?value)))
-      }
-    } },
-    'delete': fn($args) { {
-      'info': utils:info($args?name, 'attribute', 'deleted'),
-      'run' : %updating fn() { void($delete($args?id, $args?name)) }
-    } },
-    'close': fn($args) { {
-      'info': utils:info($args?id, $noun, 'closed'),
-      'run' : %updating fn() { void($args?id ! $close(.)) }
-    } }
+    'info': utils:info($args?name, 'attribute', 'deleted'),
+    'run' : %updating fn() { void($delete($args?id, $args?name)) }
+  }
+};
+
+(:~
+ : Returns the action that closes what holds attributes.
+ : @param  $args   request parameters
+ : @param  $noun   name of the holder (singular form)
+ : @param  $close  closes a holder
+ : @return action
+ :)
+declare %private function dba:close(
+  $args   as map(*),
+  $noun   as xs:string,
+  $close  as fn(xs:string) as empty-sequence()
+) as utils:action {
+  {
+    'info': utils:info($args?id, $noun, 'closed'),
+    'run' : %updating fn() { void($args?id ! $close(.)) }
   }
 };
