@@ -6449,6 +6449,13 @@ return
     query(validator + invalid + "?typed-node", "");
     query(validator + invalid + "?error-details", "");
 
+    // resolve relative schema locations against the base URI of the schema node
+    query(func.args(" { 'schema': <_ xml:base='{ "
+        + _FILE_PATH_TO_URI.args("src/test/resources/") + " }'>"
+        + "<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'>"
+        + "<xs:include schemaLocation='validate.xsd'/></xs:schema></_>/*,"
+        + " 'trust-external': true() }") + "(<root/>)?is-valid", true);
+
     // details on invalidities
     final String details = func.args(
         " { 'schema': " + xsd + ", 'return-error-details': true() }");

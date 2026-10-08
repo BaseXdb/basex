@@ -144,7 +144,7 @@ abstract class ValidateFn extends StandardFunc {
     if(item instanceof final XNode node) {
       // return node as main-memory string
       final IOContent io = new IOContent(item.serialize(sopts).finish());
-      io.name(string(node.baseURI()));
+      io.name(string(node.baseURI(sc().baseURI(), true, info).string()));
       return io;
     }
 

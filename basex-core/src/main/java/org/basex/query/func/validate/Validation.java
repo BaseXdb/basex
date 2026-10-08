@@ -43,13 +43,22 @@ abstract class Validation extends DefaultHandler {
    * @throws IOException I/O exception
    */
   final IO prepare(final IO in) throws IOException {
-    if(in instanceof IOContent || in instanceof IOStream) {
+    if(content(in)) {
       // cache main-memory content or stream to file
       schema = new IOFile(File.createTempFile(Prop.NAME + '-', IO.TMPSUFFIX));
       schema.write(in.read());
       return schema;
     }
     return in;
+  }
+
+  /**
+   * Checks if the specified input is main-memory content or a stream.
+   * @param io input (can be {@code null})
+   * @return result of check
+   */
+  static boolean content(final IO io) {
+    return io instanceof IOContent || io instanceof IOStream;
   }
 
   /**

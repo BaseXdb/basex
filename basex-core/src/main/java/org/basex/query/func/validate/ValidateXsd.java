@@ -11,6 +11,7 @@ import javax.xml.validation.*;
 
 import org.basex.core.*;
 import org.basex.io.*;
+import org.basex.io.parse.xml.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -85,6 +86,7 @@ public class ValidateXsd extends ValidateFn {
       // Saxon: use version 1.1
       if(SAXON) sf.setProperty(SAXON_VERSION_URI, version());
     }
+    XmlParser.english(sf::setProperty);
     final LSResourceResolver ls = options.resolver().lsResourceResolver();
     if(ls != null) sf.setResourceResolver(ls);
     return sf;
@@ -95,8 +97,8 @@ public class ValidateXsd extends ValidateFn {
    * @param factory schema factory
    */
   public static void restrict(final SchemaFactory factory) {
-    property(factory::setProperty, XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-    property(factory::setProperty, XMLConstants.ACCESS_EXTERNAL_DTD, "");
+    XmlParser.property(factory::setProperty, XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+    XmlParser.property(factory::setProperty, XMLConstants.ACCESS_EXTERNAL_DTD, "");
   }
 
   /**
@@ -104,37 +106,9 @@ public class ValidateXsd extends ValidateFn {
    * @param handler validating handler
    */
   public static void restrict(final ValidatorHandler handler) {
-    property(handler::setProperty, XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+    XmlParser.property(handler::setProperty, XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
     // Saxon rejects the JAXP property and supplies its own switch
-    property(handler::setProperty, SAXON_XSI_URI, Boolean.FALSE);
-  }
-
-  /**
-   * Assigns a property. Properties that are rejected by the processor are ignored: the
-   * implementations differ in which of them they support.
-   * @param setter property setter
-   * @param name property name
-   * @param value property value
-   */
-  private static void property(final PropertySetter setter, final String name,
-      final Object value) {
-    try {
-      setter.set(name, value);
-    } catch(final SAXException ex) {
-      Util.debug(ex);
-    }
-  }
-
-  /** Setter for a JAXP property. */
-  @FunctionalInterface
-  private interface PropertySetter {
-    /**
-     * Assigns a property.
-     * @param name property name
-     * @param value property value
-     * @throws SAXException SAX exception
-     */
-    void set(String name, Object value) throws SAXException;
+    XmlParser.property(handler::setProperty, SAXON_XSI_URI, Boolean.FALSE);
   }
 
   /**
@@ -171,9 +145,11 @@ public class ValidateXsd extends ValidateFn {
         final Item schema = toNodeOrAtomItem(arg(1), true, qc);
         final HashMap<String, String> options = toOptions(arg(2), qc);
 
-        final String url = schema == null ? "" : prepare(read(schema, null)).url();
+        final IO io = schema == null ? null : read(schema, null);
+        final boolean content = content(io);
+        final String url = io == null ? "" : io.url();
         final String caching = options.remove("cache");
-        final boolean cache = Strings.isTrue(caching);
+        final boolean cache = Strings.isTrue(caching) && !content;
 
         Schema s = cache ? MAP.get(url) : null;
         if(s == null) {
@@ -184,14 +160,22 @@ public class ValidateXsd extends ValidateFn {
           for(final Entry<String, String> entry : options.entrySet()) {
             sf.setFeature(entry.getKey(), Strings.isTrue(entry.getValue()));
           }
-          // schema declaration is included in document, or specified as string
-          s = url.isEmpty() ? sf.newSchema() : sf.newSchema(IOUrl.url(url));
+          if(io == null) {
+            // schema declaration is included in document
+            s = sf.newSchema();
+          } else if(content) {
+            // schema content: relative locations are resolved against its base URI
+            s = sf.newSchema(io.streamSource());
+          } else {
+            s = sf.newSchema(IOUrl.url(url));
+          }
           if(cache) MAP.put(url, s);
         }
 
         final Validator v = s.newValidator();
+        XmlParser.english(v::setProperty);
         v.setErrorHandler(this);
-        v.validate(input instanceof IOContent || input instanceof IOStream ?
+        v.validate(content(input) ?
             new StreamSource(input.inputStream()) : new StreamSource(input.url()));
       }
     });

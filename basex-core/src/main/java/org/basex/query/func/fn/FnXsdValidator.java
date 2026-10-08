@@ -22,6 +22,7 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.validate.*;
 import org.basex.query.func.validate.ErrorInfo.*;
+import org.basex.query.func.xslt.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -140,7 +141,7 @@ public final class FnXsdValidator extends StandardFunc {
     try {
       // schema documents supplied as nodes
       for(final Item item : options.get(XsdValidatorOptions.SCHEMA)) {
-        sources.add(source((XNode) item).streamSource());
+        sources.add(source((XNode) item, info).streamSource());
       }
       // schema documents supplied as locations
       for(final Item location : options.get(XsdValidatorOptions.SCHEMA_LOCATION)) {
@@ -152,8 +153,6 @@ public final class FnXsdValidator extends StandardFunc {
       // indirectly referenced schema documents are only retrieved in trusted mode
       if(!trusted) ValidateXsd.restrict(sf);
       return sources.isEmpty() ? sf.newSchema() : sf.newSchema(sources.toArray(Source[]::new));
-    } catch(final QueryIOException ex) {
-      throw ex.getCause();
     } catch(final IOException | SAXException ex) {
       throw SCHEMAASSEMBLY_X.get(info, ex);
     }
@@ -162,11 +161,12 @@ public final class FnXsdValidator extends StandardFunc {
   /**
    * Returns the serialized node.
    * @param node node
+   * @param info input info
    * @return input
-   * @throws QueryIOException query I/O exception
+   * @throws QueryException query exception
    */
-  private static IOContent source(final XNode node) throws QueryIOException {
-    return new IOContent(node.serialize().finish(), Token.string(node.baseURI()));
+  private static IO source(final XNode node, final InputInfo info) throws QueryException {
+    return Xslt.io(node, node.baseURI(info.sc().baseURI(), true, info), info);
   }
 
   /**
@@ -214,7 +214,7 @@ public final class FnXsdValidator extends StandardFunc {
       final ArrayList<ErrorInfo> errors = new ArrayList<>();
       Value typed = Empty.VALUE;
       try {
-        final IOContent input = source(node);
+        final IO input = source(node, info);
         final XMLReader reader = reader();
         final ValidatorHandler handler = handler(errors);
         reader.setContentHandler(handler);
@@ -227,8 +227,6 @@ public final class FnXsdValidator extends StandardFunc {
           reader.setProperty(LEXICAL_HANDLER, null);
           reader.parse(input.inputSource());
         }
-      } catch(final QueryIOException ex) {
-        throw ex.getCause();
       } catch(final IOException | SAXException | ParserConfigurationException ex) {
         // the validation is aborted as soon as an invalidity is found
         if(errors.isEmpty()) throw XSDVALIDATIONERR_X.get(info, ex);
@@ -263,6 +261,7 @@ public final class FnXsdValidator extends StandardFunc {
      */
     private ValidatorHandler handler(final ArrayList<ErrorInfo> errors) {
       final ValidatorHandler handler = schema.newValidatorHandler();
+      XmlParser.english(handler::setProperty);
       handler.setErrorHandler(new ErrorHandler() {
         @Override
         public void warning(final SAXParseException ex) { }

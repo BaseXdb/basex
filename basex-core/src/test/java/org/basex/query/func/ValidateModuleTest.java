@@ -140,6 +140,10 @@ public final class ValidateModuleTest extends SandboxTest {
       "<xs:element name='root'/> " +
       "</xs:schema> " +
       "return validate:xsd($doc, $schema)", "");
+    // resolve relative schema locations against the base URI of the schema node
+    query(func.args(FILE, " <_ xml:base='{ " + _FILE_PATH_TO_URI.args(DIR) + " }'>"
+        + "<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'>"
+        + "<xs:include schemaLocation='validate.xsd'/></xs:schema></_>/*"), "");
 
     // caching
     query(func.args(FILE, XSD, " { 'cache': true() }"), "");

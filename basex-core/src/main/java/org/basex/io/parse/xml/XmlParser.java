@@ -1,12 +1,14 @@
 package org.basex.io.parse.xml;
 
 import java.io.*;
+import java.util.*;
 
 import javax.xml.*;
 import javax.xml.parsers.*;
 import javax.xml.validation.*;
 
 import org.basex.core.*;
+import org.basex.util.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
 
@@ -27,6 +29,9 @@ public final class XmlParser {
     "jdk.xml.maxParameterEntitySizeLimit", "jdk.xml.elementAttributeLimit",
     "jdk.xml.maxElementDepth"
   };
+
+  /** Xerces locale property. */
+  private static final String LOCALE = "http://apache.org/xml/properties/locale";
 
   /** Reader. */
   private final XMLReader reader;
@@ -80,10 +85,12 @@ public final class XmlParser {
     f.setXIncludeAware(xinclude);
     if(xsdValidation) {
       final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+      english(sf::setProperty);
       sf.setResourceResolver(options.resolver().lsResourceResolver());
       f.setSchema(sf.newSchema());
     }
     final XMLReader xr = f.newSAXParser().getXMLReader();
+    english(xr::setProperty);
     if(options.allowExternal()) {
       for(final String limit : LIMITS) xr.setProperty(limit, "0");
     }
@@ -93,6 +100,42 @@ public final class XmlParser {
       });
     }
     return xr;
+  }
+
+  /**
+   * Requests messages from the base resource bundle of Xerces, which are English.
+   * @param setter property setter
+   */
+  public static void english(final PropertySetter setter) {
+    property(setter, LOCALE, Locale.ROOT);
+  }
+
+  /**
+   * Assigns a property. Properties that are rejected by the processor are ignored: the
+   * implementations differ in which of them they support.
+   * @param setter property setter
+   * @param name property name
+   * @param value property value
+   */
+  public static void property(final PropertySetter setter, final String name,
+      final Object value) {
+    try {
+      setter.set(name, value);
+    } catch(final SAXException ex) {
+      Util.debug(ex);
+    }
+  }
+
+  /** Setter for a JAXP property. */
+  @FunctionalInterface
+  public interface PropertySetter {
+    /**
+     * Assigns a property.
+     * @param name property name
+     * @param value property value
+     * @throws SAXException SAX exception
+     */
+    void set(String name, Object value) throws SAXException;
   }
 
   /** Error handler (causing no STDERR output). */

@@ -6,6 +6,7 @@ import java.util.*;
 import javax.xml.parsers.*;
 
 import org.basex.io.*;
+import org.basex.io.parse.xml.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
@@ -45,7 +46,9 @@ public class ValidateDtd extends ValidateFn {
         final IO in = read(input, sopts);
         final SAXParserFactory sf = SAXParserFactory.newInstance();
         sf.setValidating(true);
-        sf.newSAXParser().parse(in.inputSource(), this);
+        final SAXParser sp = sf.newSAXParser();
+        XmlParser.english(sp::setProperty);
+        sp.parse(in.inputSource(), this);
       }
     });
   }
