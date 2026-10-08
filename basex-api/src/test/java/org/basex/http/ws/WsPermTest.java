@@ -97,4 +97,14 @@ public final class WsPermTest extends WsTest {
     assertThrows(ExecutionException.class, () -> connect("/app", new Listener()));
     awaitCache("checked", "yes");
   }
+
+  /**
+   * Requests without upgrade headers are rejected.
+   * @throws Exception exception
+   */
+  @Test public void noUpgrade() throws Exception {
+    register(
+      "declare %ws:message('/app', '{$message}') function m:message($message) { $message };");
+    get(400, "ws/app");
+  }
 }

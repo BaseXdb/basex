@@ -64,6 +64,9 @@ public final class WsServlet extends HttpServlet {
 
     final WebSocket ws;
     try {
+      if(!"websocket".equalsIgnoreCase(request.getHeader("Upgrade"))) {
+        throw HTTPStatus.BAD_REQUEST_X.get("WebSocket upgrade request expected.");
+      }
       conn.authenticate(username);
 
       // run permission checks if the path addresses a WebSocket function
