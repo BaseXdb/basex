@@ -148,6 +148,7 @@ public final class NamespaceTest extends SandboxTest {
     error("namespace xmlns { 'u' }", CNINV_X);
 
     error("declare copy-namespaces no-preserve no-inherit; 1", WRONGCHAR_X_X);
+    error("declare namespace = 'x'; 1", NONAME_X);
   }
 
   /** Duplicate namespaces. */
@@ -1313,6 +1314,16 @@ public final class NamespaceTest extends SandboxTest {
     assertTrue(file.exists(), "compressed namespaces expected");
     query("count(" + _DB_GET.args(NAME) + "//b[namespace-uri-for-prefix('p', .) = 'U'])",
         count + 10);
+  }
+
+  /**
+   * Checks that copied attributes without prefix do not override the default element namespace.
+   */
+  @Test public void copiedAttributeDefaultNS() {
+    query("declare default element namespace 'U';"
+        + "let $name := ('a', 'b')[" + _RANDOM_INTEGER.args(1) + " + 1] "
+        + "return <x>{ parse-xml('<y c=\"1\"/>')/*/@*, element { $name } { } }</x>"
+        + "/* ! namespace-uri()", "U");
   }
 
   /**

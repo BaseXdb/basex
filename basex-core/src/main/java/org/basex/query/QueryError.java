@@ -1004,6 +1004,8 @@ public enum QueryError {
   /** Error code. */
   NOVARNAME_X(XPST, 3, "Expecting variable name%."),
   /** Error code. */
+  NONAME_X(XPST, 3, "Expecting name%."),
+  /** Error code. */
   NOFTSELECT_X(XPST, 3, "Expecting quote or opening curly brace%."),
   /** Error code. */
   FUNCARG_X(XPST, 3, "Expecting function argument%."),
@@ -1155,8 +1157,6 @@ public enum QueryError {
   /** Error code. */
   JAVAARGS_X_X(XPTY, 4, "% cannot be called with %."),
 
-  /** Error code. */
-  NONAME_X(XPTY, 4, "Expecting name%."),
   /** Error code. */
   NONUMBER_X_X(XPTY, 4, "Number expected, % found: %."),
   /** Error code. */

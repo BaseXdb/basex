@@ -134,7 +134,7 @@ public final class Constr {
         // add attribute
         builder.attr(name, qc.shared.token(node.string()));
         // add new namespace
-        if(name.hasURI()) qc.ns.add(name.prefix(), name.uri());
+        if(name.hasPrefix()) qc.ns.add(name.prefix(), name.uri());
       } else if(kind == Kind.NAMESPACE) {
         // type: namespace node
 
