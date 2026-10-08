@@ -39,6 +39,8 @@ public final class RequestContext implements RequestScope {
   private XQMap headers;
   /** Content body (can be {@code null}). */
   private IO body;
+  /** Temporary files of the spilled body and form parameters. */
+  private final TempFiles temp = new TempFiles();
 
   /**
    * Constructor for HTTP connections.
@@ -128,12 +130,11 @@ public final class RequestContext implements RequestScope {
   /**
    * Returns the form parameters.
    * @param options main options
-   * @param qc query context
    * @return parameters
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  public XQMap formValues(final MainOptions options, final QueryContext qc)
+  public XQMap formValues(final MainOptions options)
       throws QueryException, IOException {
     if(form == null) {
       // no live request (WebSocket connection, detached job): no form body
@@ -141,8 +142,7 @@ public final class RequestContext implements RequestScope {
       if(mt != null && mt.is(MediaType.MULTIPART_FORM_DATA)) {
         // convert multipart parameters encoded in a form
         try(InputStream is = body().inputStream()) {
-          form = new Payload(is, BodyMode.PARSE, null, options).multiForm(mt,
-              qc.resources.index(TempFiles.class));
+          form = new Payload(is, BodyMode.PARSE, null, options).multiForm(mt, temp);
         }
       } else if(mt != null && mt.is(MediaType.APPLICATION_X_WWW_FORM_URLENCODED)) {
         // convert URL-encoded parameters
@@ -166,17 +166,17 @@ public final class RequestContext implements RequestScope {
       final InputStream is = request.getInputStream();
       // binary and multipart bodies are consumed as streams: spill large ones to disk
       final MediaType mt = state.mediaType();
-      body = Payload.binary(mt) || mt.isMultipart() ? SpillOutput.read(is, null) :
+      body = Payload.binary(mt) || mt.isMultipart() ? SpillOutput.read(is, temp) :
         new IOContent(BufferInput.get(is).content());
     }
     return body;
   }
 
   /**
-   * Discards the temporary file that the body was spilled to.
+   * Discards the temporary files of the body and the form parameters.
    */
   public void close() {
-    if(body instanceof final IOFile file) file.delete();
+    temp.close();
   }
 
   // PRIVATE FUNCTIONS ============================================================================

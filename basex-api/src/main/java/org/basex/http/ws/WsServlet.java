@@ -81,6 +81,8 @@ public final class WsServlet extends HttpServlet {
     } catch(final Exception ex) {
       BaseXServlet.error(conn, ex);
       return;
+    } finally {
+      conn.requestCtx.close();
     }
 
     // upgrade the connection: the container will request the WebSocket instance from the
