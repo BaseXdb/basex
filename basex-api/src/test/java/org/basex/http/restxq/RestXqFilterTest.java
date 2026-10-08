@@ -19,9 +19,9 @@ public final class RestXqFilterTest extends RestXqTest {
    * @throws Exception exception
    */
   @Test public void consumes() throws Exception {
-    get(404, "declare %R:path('') %R:consumes('text/plain') function m:f() { 1 };", "");
+    get(415, "declare %R:path('') %R:consumes('text/plain') function m:f() { 1 };", "");
     get("1", "declare %R:path('') %R:consumes('*/*') function m:f() { 1 };", "");
-    get(404, "declare %R:path('') %R:consumes('text/plain;bla=blu') function m:f() { 1 };", "");
+    get(415, "declare %R:path('') %R:consumes('text/plain;bla=blu') function m:f() { 1 };", "");
   }
 
   /**
@@ -41,7 +41,7 @@ public final class RestXqFilterTest extends RestXqTest {
    * @throws Exception exception
    */
   @Test public void consumesError() throws Exception {
-    get(404, "declare %R:path('') %R:consumes('X') function m:f() { 1 };", "");
+    get(415, "declare %R:path('') %R:consumes('X') function m:f() { 1 };", "");
   }
 
   /**
@@ -52,6 +52,8 @@ public final class RestXqFilterTest extends RestXqTest {
     register("declare %R:POST %R:path('') %R:consumes('application/xml') function m:f() { 1 };");
     assertEquals("Unsupported content type: text/plain. Supported: application/xml.",
         post(415, "x", MediaType.TEXT_PLAIN, ""));
+    assertEquals("Missing content type. Supported: application/xml.",
+        send(415, "POST", null, null, ""));
     assertEquals("1", post("<x/>", MediaType.APPLICATION_XML, ""));
   }
 

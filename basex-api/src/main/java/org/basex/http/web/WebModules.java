@@ -165,12 +165,12 @@ public final class WebModules {
       final ArrayList<RestXqFunction> byType = new ArrayList<>(byMethod);
       byType.removeIf(func -> !func.matchesConsumes(conn));
       if(byType.isEmpty()) {
-        // requests without content type are rejected as before
         final MediaType type = conn.mediaType();
-        if(!type.is(MediaType.ALL_ALL)) {
-          return HTTPStatus.UNSUPPORTED_TYPE_X_X.get(type.type(), types(byMethod, true));
-        }
-      } else if(!Checks.any(byType, func -> func.matchesProduces(conn))) {
+        final String supported = types(byMethod, true);
+        return type.is(MediaType.ALL_ALL) ? HTTPStatus.MISSING_TYPE_X.get(supported) :
+          HTTPStatus.UNSUPPORTED_TYPE_X_X.get(type.type(), supported);
+      }
+      if(!Checks.any(byType, func -> func.matchesProduces(conn))) {
         return HTTPStatus.NOT_ACCEPTABLE_X.get(types(byType, false));
       }
     }

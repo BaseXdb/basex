@@ -36,6 +36,8 @@ public enum HTTPStatus {
   NOT_ACCEPTABLE_X(SC_NOT_ACCEPTABLE, "No acceptable media type. Supported: %."),
   /** Error: 415, "Unsupported content type". */
   UNSUPPORTED_TYPE_X_X(SC_UNSUPPORTED_MEDIA_TYPE, "Unsupported content type: %. Supported: %."),
+  /** Error: 415, "Missing content type". */
+  MISSING_TYPE_X(SC_UNSUPPORTED_MEDIA_TYPE, "Missing content type. Supported: %."),
 
   /** Error: 500, "RESTXQ path cannot be resolved.". */
   NO_RESTXQ_DIRECTORY(SC_INTERNAL_SERVER_ERROR, "RESTXQ directory does not exist."),
