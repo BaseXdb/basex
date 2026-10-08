@@ -62,6 +62,11 @@ public final class DBOptimize extends DBUpdate {
     dbopts.assignIfAbsent(MainOptions.TOKENINCLUDE, meta.tokeninclude);
     dbopts.assignIfAbsent(MainOptions.FTINCLUDE, meta.ftinclude);
     dbopts.assignIfAbsent(MainOptions.FTMIXED, meta.ftmixed);
+    dbopts.assignIfAbsent(MainOptions.STEMMING, meta.stemming);
+    dbopts.assignIfAbsent(MainOptions.CASESENS, meta.casesens);
+    dbopts.assignIfAbsent(MainOptions.DIACRITICS, meta.diacritics);
+    dbopts.assignIfAbsent(MainOptions.LANGUAGE, meta.language().toString());
+    dbopts.assignIfAbsent(MainOptions.STOPWORDS, meta.stopwords);
     dbopts.assignIfAbsent(MainOptions.UPDINDEX, meta.updindex);
     dbopts.assignIfAbsent(MainOptions.AUTOOPTIMIZE, meta.autooptimize);
     dbopts.assignIfAbsent(MainOptions.MAXCATS, meta.maxcats);

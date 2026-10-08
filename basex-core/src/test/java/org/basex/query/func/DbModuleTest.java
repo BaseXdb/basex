@@ -1050,6 +1050,26 @@ public final class DbModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void optimizeFullText() {
+    final Function func = _DB_OPTIMIZE;
+    execute(new Close());
+    query(_DB_CREATE.args(NAME, " <x>Häuser Hause</x>", "x.xml", " { 'ftindex': true(), "
+        + "'stemming': true(), 'casesens': true(), 'diacritics': true(), 'language': 'de' }"));
+    final String info = _DB_INFO.args(NAME) + "//indexes/";
+
+    // original full-text options are preserved
+    for(final boolean all : new boolean[] { false, true }) {
+      query(func.args(NAME, all));
+      query(info + "(stemming, casesens, diacritics) ! string()", "true\ntrue\ntrue");
+      query(info + "language/string()", "German");
+    }
+    // options specified in the map are adopted
+    query(func.args(NAME, false, " { 'casesens': false(), 'language': 'en' }"));
+    query(info + "(stemming, casesens, diacritics) ! string()", "true\nfalse\ntrue");
+    query(info + "language/string()", "English");
+  }
+
+  /** Test method. */
   @Test public void option() {
     final Function func = _DB_OPTION;
     query(func.args("addraw"), false);
