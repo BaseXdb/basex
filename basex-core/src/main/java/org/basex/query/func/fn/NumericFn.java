@@ -14,23 +14,11 @@ import org.basex.query.value.type.*;
 public abstract class NumericFn extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    // ceiling(floor(E)) → floor(E), round(round(E)) → round(E)
-    final Expr input = arg(0);
-    if(integral() && input instanceof final NumericFn fn && fn.integral()) return input;
-
     final Expr expr = optFirst();
     if(expr != this) return expr;
-    final SeqType st = optType(input);
+    final SeqType st = optType(arg(0));
     if(st != null) exprType.assign(st);
     return this;
-  }
-
-  /**
-   * Indicates if the function result is an integral number.
-   * @return result of check
-   */
-  boolean integral() {
-    return false;
   }
 
   /**

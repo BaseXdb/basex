@@ -395,15 +395,9 @@ public final class ArrayModuleTest extends SandboxTest {
     query(func.args(" array { 1 }"), 1);
     query(func.args(" array { 1, 2 }"), 2);
     query(func.args(" array { 1 to 3 }"), 3);
-
-    // array:size(array:reverse($array)) → array:size($array)
-    check(func.args(_ARRAY_REVERSE.args(ARRAY)), 2, empty(_ARRAY_REVERSE));
-    check(func.args(_ARRAY_SORT.args(ARRAY)), 2, empty(_ARRAY_SORT));
-    check(func.args(_ARRAY_SORT_BY.args(ARRAY, " { 'key': data#1 }")), 2, empty(_ARRAY_SORT_BY));
-    check(func.args(_ARRAY_SORT_WITH.args(ARRAY, " fn($a, $b) { $a - $b }")), 2,
-        empty(_ARRAY_SORT_WITH));
-    // array:size(array:append($array, $member)) → array:size($array) + 1
-    check(func.args(_ARRAY_APPEND.args(ARRAY, 9)), 3, empty(_ARRAY_APPEND));
+    query(func.args(_ARRAY_REVERSE.args(ARRAY)), 2);
+    query(func.args(_ARRAY_SORT.args(ARRAY)), 2);
+    query(func.args(_ARRAY_APPEND.args(ARRAY, 9)), 3);
   }
 
   /** Test method. */

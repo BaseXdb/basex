@@ -256,13 +256,6 @@ public final class GFLWOR extends ParseExpr {
         clauses.set(0, new For(spec.var, expr).optimize(cc));
         return optimize(cc);
       }
-      final LinkedList<Clause> constant = group.constant(
-          new LinkedList<>(clauses.subList(0, g)), info, cc);
-      if(constant != null) {
-        clauses.subList(0, g + 1).clear();
-        clauses.addAll(0, constant);
-        return optimize(cc);
-      }
     }
 
     // rewrite single group
@@ -279,15 +272,13 @@ public final class GFLWOR extends ParseExpr {
 
     // checks if clauses have side effects
     final Checks<Clause> ndt = clause -> clause.has(Flag.NDT);
-    // checks if an expression references the variable of a clause
-    final BiPredicate<Expr, Clause> refs = (expr, clause) -> {
+    // checks if the return expression references the variable of a clause
+    final Checks<Clause> varrefs = clause -> {
       for(final Var var : clause.vars()) {
-        if(expr.count(var) != VarUsage.NEVER) return true;
+        if(rtrn.count(var) != VarUsage.NEVER) return true;
       }
       return false;
     };
-    // checks if the return expression references the variable of a clause
-    final Checks<Clause> varrefs = clause -> refs.test(rtrn, clause);
 
     // calculate exact number of iterated items
     final long[] minMax = calcSize(false);
@@ -306,22 +297,7 @@ public final class GFLWOR extends ParseExpr {
     }
 
     // for $_ in 1 to 2 return () → ()
-    if(rtrn == Empty.VALUE && !Checks.any(clauses, ndt)) return rtrn;
-
-    // unswitch loop-invariant condition
-    //   for $f in F return if(C) then A else B
-    //  → if(C) then (for $f in F return A) else (for $f in F return B)
-    if(rtrn instanceof final If iff && !iff.cond.has(Flag.NDT) && !Checks.any(clauses, ndt) &&
-        !Checks.any(clauses, clause -> refs.test(iff.cond, clause))) {
-      cc.info(QueryText.OPTUNSWITCH_X, iff.cond);
-      final IntObjectMap<Var> vm = new IntObjectMap<>();
-      final LinkedList<Clause> cls = new LinkedList<>();
-      for(final Clause clause : clauses) cls.add(clause.copy(cc, vm));
-      final Expr els = new GFLWOR(info, cls, iff.exprs[1].copy(cc, vm)).optimize(cc);
-      rtrn = iff.exprs[0];
-      return new If(iff.info(), iff.cond, optimize(cc), els).optimize(cc);
-    }
-    return null;
+    return rtrn == Empty.VALUE && !Checks.any(clauses, ndt) ? rtrn : null;
   }
 
   /**

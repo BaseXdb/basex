@@ -588,10 +588,10 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(wrap("AB")) + " ! string-to-codepoints(.)", "65\n66",
         root(STRING_TO_CODEPOINTS));
 
-    check(func.args(wrap("AB")) + " = 'B'", true, root(CONTAINS));
-    check(func.args(wrap("A€")) + " = '€'", true, root(CONTAINS));
-    check(func.args(wrap("AB")) + " = 'AB'", false, exists(func));
-    check(func.args(wrap("AB")) + " = ''", false, exists(func));
+    query(func.args(wrap("AB")) + " = 'B'", true);
+    query(func.args(wrap("A€")) + " = '€'", true);
+    query(func.args(wrap("AB")) + " = 'AB'", false);
+    query(func.args(wrap("AB")) + " = ''", false);
   }
 
   /** Test method. */
@@ -1895,6 +1895,9 @@ public final class FnModuleTest extends SandboxTest {
         " fn($r, $v) { $r except head($r) }"), "");
     query(func.args(" 1 to 1_000_000_000", " <_><a/><b/></_>/*",
         " fn($r, $v) { if(exists($r)) { $r intersect tail($r) } }"), "");
+    // narrowing intersection: exit once the result is empty
+    query(func.args(" 1 to 1_000_000_000", " <_><a/><b/></_>/*",
+        " fn($r, $v) { $r intersect $r[$v] }"), "");
     query(func.args(" (1 to 5) ! 1", " 1 to 10", " fn($r, $v) { $r[. > $v] }"),
         "2\n3\n4\n5\n6\n7\n8\n9\n10");
 
@@ -2561,33 +2564,18 @@ public final class FnModuleTest extends SandboxTest {
     error(func.args("a2", " <a/>"), IDDOC);
   }
 
-  /** Tests the rewritings of nested calls of idempotent functions. */
+  /** Tests nested calls of idempotent functions. */
   @Test public void idempotentCalls() {
     final String number = wrap(3.5);
-    check(ABS.args(ABS.args(number)), 3.5, "count(//FnAbs) = 1");
-    check(FLOOR.args(FLOOR.args(number)), 3, "count(//FnFloor) = 1");
-    check(CEILING.args(CEILING.args(number)), 4, "count(//FnCeiling) = 1");
-    check(ROUND.args(ROUND.args(number)), 4, "count(//FnRound) = 1");
-    check(CEILING.args(FLOOR.args(number)), 3, root(FLOOR), empty(CEILING));
-    check(FLOOR.args(ROUND.args(number)), 4, root(ROUND), empty(FLOOR));
-    check(ROUND.args(CEILING.args(number)), 4, root(CEILING), empty(ROUND));
-    check(ROUND_HALF_TO_EVEN.args(ROUND.args(number)), 4, root(ROUND),
-        empty(ROUND_HALF_TO_EVEN));
-
-    // a precision argument yields non-integral results
-    check(ROUND.args(ROUND.args(number, 2)), 4, "count(//FnRound) = 2");
-    check(ROUND.args(ROUND.args(number), 2), 4, "count(//FnRound) = 2");
-    // fn:abs does not yield integral results
-    check(ABS.args(FLOOR.args(number)), 3, root(ABS), exists(FLOOR));
+    query(ABS.args(ABS.args(number)), 3.5);
+    query(CEILING.args(FLOOR.args(number)), 3);
+    query(ROUND.args(ROUND.args(number, 2)), 4);
+    query(ABS.args(FLOOR.args(number)), 3);
 
     final String string = wrap(" a B c ");
-    check(UPPER_CASE.args(UPPER_CASE.args(string)), " A B C ", "count(//FnUpperCase) = 1");
-    check(LOWER_CASE.args(LOWER_CASE.args(string)), " a b c ", "count(//FnLowerCase) = 1");
+    query(LOWER_CASE.args(LOWER_CASE.args(string)), " a b c ");
     check(NORMALIZE_SPACE.args(NORMALIZE_SPACE.args(string)), "a B c",
         "count(//FnNormalizeSpace) = 1");
-    // case conversions are not interchangeable
-    check(UPPER_CASE.args(LOWER_CASE.args(string)), " A B C ", root(UPPER_CASE),
-        exists(LOWER_CASE));
   }
 
   /** Test method. */
@@ -5583,8 +5571,8 @@ return
     query("subsequence(" + func.args(wrap("aaa")) + ", 3)", 97);
     query("subsequence(" + func.args(wrap("äaaa")) + ", 3)", "97\n97");
 
-    check(func.args(wrap("ab")) + " = 98", true, root(CONTAINS));
-    check(func.args(wrap("ab")) + " = 0xD800", false, exists(func));
+    query(func.args(wrap("ab")) + " = 98", true);
+    query(func.args(wrap("ab")) + " = 0xD800", false);
   }
 
   /** Test method. */

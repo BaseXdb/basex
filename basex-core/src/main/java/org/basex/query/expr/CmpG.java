@@ -102,7 +102,6 @@ public class CmpG extends Cmp {
     if(expr == this && noMatches(null, expr1.data())) return cc.replaceWith(this, Bln.FALSE);
 
     // optimizations that rely on the semantics of general comparisons
-    if(expr == this) expr = optContains(cc);
     if(expr == this) expr = optArith(cc);
     if(expr == this) expr = CmpIR.get(cc, this, false);
     if(expr == this) expr = CmpR.get(cc, this);
@@ -146,34 +145,6 @@ public class CmpG extends Cmp {
 
     // return optimized, pre-evaluated or original expression
     return expr instanceof CmpG ? expr : cc.replaceWith(this, expr);
-  }
-
-  /**
-   * Tries to rewrite a character comparison to a substring check.
-   * @param cc compilation context
-   * @return optimized or original expression
-   * @throws QueryException query exception
-   */
-  private Expr optContains(final CompileContext cc) throws QueryException {
-    // characters(E) = 'a' → contains(E, 'a')
-    // string-to-codepoints(E) = 97 → contains(E, 'a')
-    final Expr expr1 = exprs[0], expr2 = exprs[1];
-    if(!byCodepoint(CmpOp.EQ)) return this;
-
-    Str str = null;
-    if(CHARACTERS.is(expr1) && expr2 instanceof final Str s) {
-      str = s;
-    } else if(STRING_TO_CODEPOINTS.is(expr1) && expr2 instanceof final Itr itr) {
-      final long cp = itr.itr();
-      if(cp > 0 && cp <= Integer.MAX_VALUE && XMLToken.valid11((int) cp))
-        str = Str.get((int) cp);
-    }
-    if(str == null) return this;
-
-    // reject other strings: they can never be equal to a single character
-    final byte[] token = str.string();
-    return token.length > 0 && Token.cl(token, 0) == token.length ?
-      cc.function(CONTAINS, info, expr1.arg(0), str) : this;
   }
 
   /**

@@ -491,12 +491,9 @@ public final class GFLWORTest extends SandboxTest {
         "5\n5", exists(GroupBy.class));
 
     // constant keys
-    check("for $x in " + seq + " group by $k := 1 return ($k, count($x))", "1\n10",
-        empty(GroupBy.class));
-    check("for $x in " + seq + " where $x > 10 group by $k := 1 return count($x)", "",
-        empty(GroupBy.class));
-    check("for $x in " + seq + " let $y := () group by $k := 1 return count($y)", 0,
-        exists(GroupBy.class));
+    query("for $x in " + seq + " group by $k := 1 return ($k, count($x))", "1\n10");
+    query("for $x in " + seq + " where $x > 10 group by $k := 1 return count($x)", "");
+    query("for $x in " + seq + " let $y := () group by $k := 1 return count($y)", 0);
   }
 
   /** Unused count clauses. */

@@ -58,9 +58,4 @@ public class FnRound extends NumericFn {
     if(value instanceof Itr && rounded instanceof Dec) throw RANGE_X.get(info, rounded);
     return rounded;
   }
-
-  @Override
-  final boolean integral() {
-    return !defined(1);
-  }
 }

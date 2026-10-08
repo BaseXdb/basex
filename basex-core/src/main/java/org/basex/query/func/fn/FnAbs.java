@@ -1,10 +1,8 @@
 package org.basex.query.func.fn;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -24,11 +22,5 @@ public final class FnAbs extends NumericFn {
       throw RANGE_X.get(info, value);
     }
     return value.abs();
-  }
-
-  @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
-    // abs(abs(E)) → abs(E)
-    return ABS.is(arg(0)) ? arg(0) : super.opt(cc);
   }
 }

@@ -2554,25 +2554,6 @@ public final class RewritingsTest extends SandboxTest {
     query("count(" + doc + "[i[not(@x)][@x][1]])", 0);
   }
 
-  /** Loop unswitching. */
-  @Test public void unswitch() {
-    final String c = "boolean(" + wrap(1) + ")";
-    check("let $c := " + c + " return (1 to 3) ! (if($c) then . + 1 else . * 2)",
-        "2\n3\n4", root(If.class), exists(RangeSeq.class));
-    check("let $c := not(" + c + ") return (1 to 3) ! (if($c) then . + 1 else . * 2)",
-        "2\n4\n6", root(If.class));
-    check("let $c := " + c + " return for $x at $p in 4 to 6 return if($c) then $p else -$x",
-        "1\n2\n3", root(If.class));
-    // the rewritten first branch must not leak into the second
-    query("let $c := not(" + c + ") return (if(" + c + ") then 1) ! (if($c) then . + 1 else . + 2)",
-        3);
-
-    // context-dependent or nondeterministic conditions
-    check("(1 to 3) ! (if(. > 1) then . else -.)", "-1\n2\n3", root(DualMap.class));
-    check("for $x in 1 to 3 return if($x > 1) then $x else -$x", "-1\n2\n3", root(DualMap.class));
-    check("(1 to 3) ! (if(random:double() < 2) then . else 0)", "1\n2\n3", root(DualMap.class));
-  }
-
   /** Rewrites of arrays: atomization may yield no or multiple items. */
   @Test public void atomizedArrays() {
     final String empty = "array { " + wrap(1) + "[. = 0] }", two = "[ " + wrap(1) + ", 2 ]";

@@ -80,8 +80,12 @@ public class FnSum extends NumericFn {
     final Expr values = arg(0);
     if(values instanceof final RangeSeq rs) {
       return range(rs, avg);
-    } else if(values instanceof final SingletonSeq ss) {
-      return singleton(ss, avg);
+    } else if(values instanceof final SingletonSeq ss && ss.singleItem()) {
+      Item item = ss.itemAt(0);
+      if(item.type.isUntyped()) item = Dbl.get(item.dbl(info));
+      if(item.type.isNumber()) {
+        return avg ? item : Calc.MULTIPLY.eval(item, Itr.get(ss.size()), info);
+      }
     } else if(values instanceof final Path path) {
       final ArrayList<Stats> list = path.pathStats();
       if(list != null) {
@@ -136,21 +140,6 @@ public class FnSum extends NumericFn {
   }
 
   /**
-   * Computes the result from a sequence with a repeated item.
-   * @param ss singleton sequence
-   * @param avg calculate average
-   * @return result, or {@code null} if the item is not numeric
-   * @throws QueryException query exception
-   */
-  private Item singleton(final SingletonSeq ss, final boolean avg) throws QueryException {
-    if(!ss.singleItem()) return null;
-    Item item = ss.itemAt(0);
-    if(item.type.isUntyped()) item = Dbl.get(item.dbl(info));
-    if(!item.type.isNumber()) return null;
-    return avg ? item : Calc.MULTIPLY.eval(item, Itr.get(ss.size()), info);
-  }
-
-  /**
    * Sums up the specified item(s).
    * @param avg calculate average
    * @param qc query context
@@ -162,13 +151,6 @@ public class FnSum extends NumericFn {
     if(values instanceof Range) return range(values.value(qc), avg);
 
     final Iter iter = values.atomIter(qc, info);
-    final Value value = iter.eagerValue();
-    if(value instanceof RangeSeq) return range(value, avg);
-    if(value instanceof final SingletonSeq ss) {
-      final Item item = singleton(ss, avg);
-      if(item != null) return item;
-    }
-
     final Item item = iter.next();
     if(item == null) return null;
 
