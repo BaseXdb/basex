@@ -1,6 +1,7 @@
 package org.basex.query.util;
 
 import org.basex.data.*;
+import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.java.*;
@@ -108,6 +109,30 @@ public abstract class ASTVisitor implements LockCollector {
    * @return if more expressions should be visited ({@code true} by default)
    */
   public boolean value(final Value value) {
+    return true;
+  }
+
+  /**
+   * Visits the function items in a sequence, map or array, which are invisible to the tree walk.
+   * @param value value
+   * @return {@code false} if the value is too large to be traversed or the walk was stopped
+   */
+  protected final boolean funcItems(final Value value) {
+    if(value.seqType().mayBeFunction()) {
+      if(value.size() > CompileContext.MAX_PREEVAL) return false;
+      for(final Item item : value) {
+        if(item instanceof final FuncItem func) {
+          if(!funcItem(func)) return false;
+        } else if(item instanceof final XQStruct struct &&
+            struct.funcType().declType.mayBeFunction()) {
+          final long size = struct.structSize();
+          if(size > CompileContext.MAX_PREEVAL) return false;
+          for(long s = 0; s < size; s++) {
+            if(!funcItems(struct.valueAt(s))) return false;
+          }
+        }
+      }
+    }
     return true;
   }
 

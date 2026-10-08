@@ -82,6 +82,18 @@ public final class QueryInfoTest extends SandboxTest {
     assertTrue(optimized.contains("declare type local:p as record(x"), optimized);
   }
 
+  /** Functions that are only referenced by function items in maps are optimized. */
+  @Test public void funcItemInMap() {
+    execute(new CreateDB(NAME, "<x/>"));
+    final XQuery query = new XQuery(
+      "declare %basex:inline(0) function local:f($x) { db:get('" + NAME + "')[$x] }; "
+      + "sort-by((1, 2)[random:double() < 2], { 'key': fn($x) { local:f($x) } })");
+    execute(query);
+    final String info = String.join("\n", QueryInfo.lines(query.sections().sections().
+        get("optimization")));
+    assertTrue(info.contains("db:get-pre"), info);
+  }
+
   /** The query plan is only included if it was requested. */
   @Test public void plan() {
     final XQuery query = new XQuery("1");

@@ -5,6 +5,7 @@ import java.util.*;
 import org.basex.query.func.*;
 import org.basex.query.scope.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.basex.util.list.*;
@@ -164,6 +165,13 @@ final class QueryCompiler {
       @Override
       public boolean funcItem(final FuncItem func) {
         return add(func);
+      }
+
+      @Override
+      public boolean value(final Value value) {
+        // function items in sequences, maps and arrays may reference functions of the query
+        funcItems(value);
+        return true;
       }
 
       /**

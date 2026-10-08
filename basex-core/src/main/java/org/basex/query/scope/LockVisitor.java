@@ -4,7 +4,6 @@ import java.util.*;
 import java.util.function.*;
 
 import org.basex.core.locks.*;
-import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
@@ -123,24 +122,8 @@ public final class LockVisitor extends ASTVisitor {
 
   @Override
   public boolean value(final Value value) {
-    // function items in a sequence, map or array are invisible to the tree walk
-    if(value.seqType().mayBeFunction()) {
-      // large structures are not traversed; all databases are locked instead
-      if(value.size() > CompileContext.MAX_PREEVAL) return false;
-      for(final Item item : value) {
-        if(item instanceof final FuncItem func) {
-          if(!funcItem(func)) return false;
-        } else if(item instanceof final XQStruct struct &&
-            struct.funcType().declType.mayBeFunction()) {
-          final long size = struct.structSize();
-          if(size > CompileContext.MAX_PREEVAL) return false;
-          for(long s = 0; s < size; s++) {
-            if(!value(struct.valueAt(s))) return false;
-          }
-        }
-      }
-    }
-    return true;
+    // large structures are not traversed; all databases are locked instead
+    return funcItems(value);
   }
 
   @Override

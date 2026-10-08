@@ -16,9 +16,7 @@ import org.basex.query.scope.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
-import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -71,9 +69,9 @@ public final class DynFuncCall extends FuncCall {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     final Expr func = body();
-    // the call is nondeterministic if the invoked function is (a function item is a value and so
-    // carries no flag of its own, hence the explicit check)
-    if(func.has(Flag.NDT) || func instanceof final Value value && mayBeNdt(value)) {
+    // the call is nondeterministic if the invoked function is (values carry no flags of their own:
+    // their function items are checked explicitly)
+    if(func.has(Flag.NDT) || func instanceof Value && containsNdtFunction(func)) {
       ndt = true;
     }
 
@@ -162,7 +160,7 @@ public final class DynFuncCall extends FuncCall {
    * @return result of check
    */
   public static boolean containsNdtFunction(final Expr expr) {
-    return expr instanceof final Value value ? mayBeNdt(value) : !expr.accept(new ASTVisitor() {
+    return !expr.accept(new ASTVisitor() {
       @Override
       public boolean funcItem(final FuncItem func) {
         return !func.ndt();
@@ -171,40 +169,12 @@ public final class DynFuncCall extends FuncCall {
       public boolean subScope(final Scope scope) {
         return !(scope instanceof final Closure cl && cl.has(Flag.NDT));
       }
-    });
-  }
-
-  /**
-   * Checks if a value may contain a nondeterministic function item or closure.
-   * @param value value
-   * @return result of check (large values are not traversed and yield {@code true})
-   */
-  private static boolean mayBeNdt(final Value value) {
-    if(!atomic(value.seqType())) {
-      if(value.size() > CompileContext.MAX_PREEVAL) return true;
-      for(final Item item : value) {
-        if(item instanceof final FuncItem fi) {
-          if(fi.ndt()) return true;
-        } else if(item instanceof final XQStruct struct && !atomic(struct.funcType().declType)) {
-          if(struct.structSize() > CompileContext.MAX_PREEVAL) return true;
-          if(item instanceof final XQArray array) {
-            if(Checks.any(array.members(), DynFuncCall::mayBeNdt)) return true;
-          } else if(item instanceof final XQMap map) {
-            if(Checks.any(map.entries(), e -> mayBeNdt(e.value()))) return true;
-          }
-        }
+      @Override
+      public boolean value(final Value value) {
+        // large values are not traversed and may contain nondeterministic functions
+        return funcItems(value);
       }
-    }
-    return false;
-  }
-
-  /**
-   * Checks if a sequence type is atomic, i.e., if it cannot contain function items.
-   * @param st sequence type
-   * @return result of check
-   */
-  private static boolean atomic(final SeqType st) {
-    return st.type.instanceOf(BasicType.ANY_ATOMIC_TYPE);
+    });
   }
 
   @Override
