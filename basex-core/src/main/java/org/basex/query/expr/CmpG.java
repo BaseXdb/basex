@@ -260,12 +260,20 @@ public class CmpG extends Cmp {
     if(!(exprs[0] instanceof final Union union) || union.has(Flag.NDT) ||
         expr2.has(Flag.CTX, Flag.POS, Flag.NDT)) return this;
 
+    // a non-value operand is evaluated for each comparison: rejected if no index is used
+    final boolean value = expr2 instanceof Value;
+    if(!value && Checks.all(union.exprs, expr -> expr.data() == null)) return this;
     final ExprList list = new ExprList(union.exprs.length);
+    boolean applied = value;
     for(final Expr operand : union.exprs) {
-      final Expr ex = expr2.copy(cc, new IntObjectMap<>());
-      list.add(new CmpG(info, operand, ex, op).optimize(cc));
+      // operands are copied as long as the rewrite may be discarded
+      final IntObjectMap<Var> vm = new IntObjectMap<>();
+      final Expr cmp = new CmpG(info, applied ? operand : operand.copy(cc, vm),
+          expr2.copy(cc, vm), op).optimize(cc);
+      if(!applied) applied = IndexAccess.applied(cmp);
+      list.add(cmp);
     }
-    return new Or(info, list.finish()).optimize(cc);
+    return applied ? new Or(info, list.finish()).optimize(cc) : this;
   }
 
   /**

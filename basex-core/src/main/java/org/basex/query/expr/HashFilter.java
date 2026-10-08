@@ -48,7 +48,7 @@ public final class HashFilter extends Filter {
       final Expr kx = cmp.arg(k), px = cmp.arg(1 - k);
       if(kx.has(Flag.CTX) && !kx.has(Flag.POS, Flag.NDT) && !(px instanceof Value) &&
           !px.has(Flag.CTX, Flag.POS, Flag.NDT) &&
-          CmpHashG.hashable(kx.seqType().type, px.seqType().type)) return k;
+          CmpHashG.hashable(kx.seqType().type, px.seqType().type) && !kx.hasFreeVars()) return k;
     }
     return -1;
   }

@@ -3,6 +3,7 @@ package org.basex.query.expr.index;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
+import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -38,7 +39,8 @@ public abstract class IndexAccess extends Simple {
   public static boolean applied(final Expr expr) {
     return expr instanceof IndexAccess ||
         expr instanceof final Path path && applied(path.root) ||
-        expr instanceof final Filter filter && applied(filter.root);
+        expr instanceof final Filter filter && applied(filter.root) ||
+        Function.EXISTS.is(expr) && applied(expr.arg(0));
   }
 
   @Override

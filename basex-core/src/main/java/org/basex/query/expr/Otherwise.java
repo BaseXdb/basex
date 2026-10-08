@@ -138,10 +138,14 @@ public final class Otherwise extends Arr {
   @Override
   public Expr inlineTypeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
     // (A otherwise B) coerce to T → (A coerce to T?) otherwise (B coerce to T)
-    // leading operands may be empty without being selected, so their cardinality is widened
     final SeqType st = tc.seqType(), lst = st.union(Occ.ZERO);
-    boolean changed = false;
     final int el = exprs.length;
+    if(st.type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) {
+      for(int e = 0; e < el - 1; e++) {
+        if(exprs[e].seqType().mayBeWrapped()) return null;
+      }
+    }
+    boolean changed = false;
     for(int e = 0; e < el; e++) {
       final Expr expr = tc.check(exprs[e], e < el - 1 ? lst : st, cc);
       if(expr != null) {

@@ -18,13 +18,7 @@ import org.basex.util.ft.*;
  */
 public final class FtThesaurus extends StandardFunc {
   /** Most recently used thesaurus accessor (can be {@code null}). */
-  private ThesAccessor accessor;
-  /** Most recently supplied root node (can be {@code null}). */
-  private XNode nd;
-  /** Most recently requested relation (can be {@code null}). */
-  private byte[] rel;
-  /** Most recently requested maximum level. */
-  private long lvl;
+  private volatile ThesAccessor recent;
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
@@ -34,11 +28,10 @@ public final class FtThesaurus extends StandardFunc {
     final byte[] relation = Token.token(options.get(FtThesaurusOptions.RELATIONSHIP));
     final long levels = options.get(FtThesaurusOptions.LEVELS);
 
-    if(nd == null || !nd.is(node) || !Token.eq(rel, relation) || lvl != levels) {
+    ThesAccessor accessor = recent;
+    if(accessor == null || !accessor.matches(node, relation, levels)) {
       accessor = new ThesAccessor(node, relation, levels, info);
-      nd = node;
-      rel = relation;
-      lvl = levels;
+      recent = accessor;
     }
     return StrSeq.get(accessor.find(term, new FTOpt().assign(qc.ftOpt()), qc));
   }

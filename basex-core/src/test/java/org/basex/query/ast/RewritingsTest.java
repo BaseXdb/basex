@@ -1240,6 +1240,8 @@ public final class RewritingsTest extends SandboxTest {
     check("(" + wrap(1) + "[. = 2] otherwise" + wrap(3) + ") coerce to xs:integer", 3,
         root(Otherwise.class), exists("Otherwise/TypeCheck[@to = 'xs:integer?']"),
         exists("Otherwise/TypeCheck[@to = 'xs:integer']"));
+    // otherwise: arrays may be atomized to empty sequences
+    error("(([], 1)[random:integer(1) + 1] otherwise 5) coerce to xs:integer", INVTYPE_X);
     // FLWOR with let clauses: any cardinality
     check("(let $a :=" + wrap(1) + " let $b :=" + wrap(2)
         + " return if($a = $b) then $a else $b) coerce to xs:integer", 2,
@@ -2662,6 +2664,14 @@ public final class RewritingsTest extends SandboxTest {
         + "let $cs := (<c id='A'/>, <c id='a'/>) "
         + "for $o in ('a', 'a') return count($cs[@id = $o])", "2\n2",
         empty(HashFilter.class));
+    // key depends on a variable that changes between evaluations
+    check(cs + "for $i in 1 to 4 return string-join($cs[number(@n) + $i = 5]/@n, ',')",
+        "4\n3\n2\n1", empty(HashFilter.class));
+  }
+
+  /** Comparisons with unions are only distributed if the other operand is a value. */
+  @Test public void unionComparison() {
+    check("(<a>1</a> | <b>2</b>) = (" + wrap(2) + ", " + wrap(3) + ')', true, empty(Or.class));
   }
 
   /** Functions reached after a deeper call chain are recompiled with refined parameter types. */

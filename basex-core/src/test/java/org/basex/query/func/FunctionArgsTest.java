@@ -1,11 +1,17 @@
 package org.basex.query.func;
 
 import static org.basex.query.QueryError.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.lang.reflect.*;
+import java.util.*;
 
 import org.basex.*;
 import org.basex.build.*;
 import org.basex.io.*;
+import org.basex.query.*;
 import org.basex.query.value.type.*;
+import org.basex.util.hash.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -22,6 +28,31 @@ public final class FunctionArgsTest extends SandboxTest {
   @Test public void signatures() throws Exception {
     context.openDB(MemBuilder.build(new IOContent("<a/>")));
     for(final FuncDefinition fd : Functions.BUILT_IN.values()) run(fd);
+  }
+
+  /** Checks if functions with mutable fields override the copy method. */
+  @Test public void copy() {
+    // runtime caches that are rebuilt on demand
+    final Set<String> caches = Set.of("Docs.queryInput", "FnInvisibleXml.generator",
+        "FtThesaurus.recent", "ParseFn.input");
+    final TreeSet<String> missing = new TreeSet<>();
+    for(final FuncDefinition fd : Functions.BUILT_IN.values()) {
+      for(Class<?> c = fd.get(null).getClass(); c != StandardFunc.class; c = c.getSuperclass()) {
+        try {
+          c.getDeclaredMethod("copy", CompileContext.class, IntObjectMap.class);
+          continue;
+        } catch(final NoSuchMethodException ex) {
+          // check fields
+        }
+        for(final Field field : c.getDeclaredFields()) {
+          final int mod = field.getModifiers();
+          final String name = c.getSimpleName() + '.' + field.getName();
+          if(!Modifier.isStatic(mod) && !Modifier.isFinal(mod) && !field.isSynthetic() &&
+              !caches.contains(name)) missing.add(name);
+        }
+      }
+    }
+    assertTrue(missing.isEmpty(), "State is not copied: " + missing);
   }
 
   /**

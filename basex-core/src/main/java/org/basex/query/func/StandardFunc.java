@@ -136,7 +136,10 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public StandardFunc copy(final CompileContext cc, final IntObjectMap<Var> vm) {
-    return copyType(definition.get(info, copyAll(cc, vm, args())));
+    final StandardFunc sf = definition.get(info, copyAll(cc, vm, args()));
+    sf.staticOptions = staticOptions;
+    sf.staticArg = staticArg;
+    return copyType(sf);
   }
 
   /**

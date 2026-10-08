@@ -364,6 +364,8 @@ public final class IndexOptimizeTest extends SandboxTest {
     // predicates are attached to the operands of a union
     indexCheck("(//a | //c/d)[. = 'A'] ! name()", "a\nd");
     indexCheck("(//a, //c/d)[. = 'A'] ! name()", "a\nd");
+    // comparisons with non-values are only distributed if the index is used
+    indexCheck("(//a | //c/d) = string(db:get('" + NAME + "')//b)", true);
   }
 
   /** Bug on contains-token() with token index. */

@@ -95,6 +95,17 @@ public final class ThesAccessor {
   }
 
   /**
+   * Checks if this accessor was created for the specified thesaurus node and options.
+   * @param nd thesaurus root node
+   * @param rel requested relation
+   * @param mx requested maximum level
+   * @return result of check
+   */
+  public boolean matches(final XNode nd, final byte[] rel, final long mx) {
+    return node != null && node.is(nd) && eq(relation, rel) && max == mx;
+  }
+
+  /**
    * Finds synonyms for the specified term.
    * @param term token
    * @param opt full-text options
