@@ -9,6 +9,7 @@ import org.basex.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * Global HTTP context information.
@@ -19,6 +20,8 @@ import org.basex.util.*;
 public final class HTTPContext {
   /** Static options (can be {@code null}). */
   private StaticOptions soptions;
+  /** Options assigned on the command line. */
+  private Map<Option<?>, String> cli = Map.of();
   /** Database context (can be {@code null}). */
   private Context context;
   /** Initialization failure (can be {@code null}). */
@@ -52,9 +55,11 @@ public final class HTTPContext {
   /**
    * Initializes the HTTP context with static options.
    * @param sopts static options
+   * @param options options assigned on the command line
    */
-  public void init(final StaticOptions sopts) {
+  public void init(final StaticOptions sopts, final Map<Option<?>, String> options) {
     soptions = sopts;
+    cli = options;
   }
 
   /**
@@ -86,6 +91,8 @@ public final class HTTPContext {
       }
       Prop.put(name, value);
     }
+    // command-line options take precedence
+    cli.forEach(Prop::put);
 
     // create context
     if(soptions == null) {

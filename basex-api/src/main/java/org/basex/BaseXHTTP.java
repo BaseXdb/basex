@@ -5,6 +5,7 @@ import static org.basex.util.http.HTTPText.*;
 
 import java.io.*;
 import java.net.*;
+import java.util.*;
 import java.util.Map.*;
 
 import org.basex.core.*;
@@ -14,6 +15,7 @@ import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.util.*;
 import org.basex.util.log.*;
+import org.basex.util.options.*;
 import org.eclipse.jetty.compression.gzip.*;
 import org.eclipse.jetty.compression.server.*;
 import org.eclipse.jetty.ee10.webapp.*;
@@ -43,6 +45,8 @@ public final class BaseXHTTP extends CLI {
   private boolean quiet;
   /** Stop flag. */
   private boolean stop;
+  /** Options assigned on the command line. */
+  private HashMap<Option<?>, String> options;
 
   /**
    * Main method, launching the HTTP services.
@@ -77,11 +81,13 @@ public final class BaseXHTTP extends CLI {
     locate(WEBCONF, webapp);
 
     hc = HTTPContext.get();
-    hc.init(soptions);
+    hc.init(soptions, options);
 
     // create jetty instance
-    final int port = soptions.get(StaticOptions.HTTPPORT);
-    jetty = jetty(new IOFile(webapp, JETTYCONF), port);
+    final ServerConnector sc = connector(new IOFile(webapp, JETTYCONF),
+        soptions.get(StaticOptions.HTTPPORT), options.containsKey(StaticOptions.HTTPPORT));
+    final int port = sc.getPort();
+    jetty = sc.getServer();
     jetty.setHandler(soptions.get(StaticOptions.GZIP) ? gzip(wac) : wac);
     JakartaWebSocketServletContainerInitializer.configure(wac, null);
 
@@ -201,13 +207,15 @@ public final class BaseXHTTP extends CLI {
   }
 
   /**
-   * Creates the Jetty server, configured by the specified file if it exists.
+   * Creates the Jetty server (configured by the file if it exists) and returns its connector.
    * @param jettyXml Jetty configuration file
    * @param port HTTP port
-   * @return server
+   * @param force enforce the port if the configuration file assigns its own port
+   * @return server connector
    * @throws Exception exception
    */
-  private static Server jetty(final IOFile jettyXml, final int port) throws Exception {
+  private static ServerConnector connector(final IOFile jettyXml, final int port,
+      final boolean force) throws Exception {
     if(jettyXml.exists()) {
       final Resource resource = new PathResourceFactory().newResource(jettyXml.file().toPath());
       final XmlConfiguration xc = new XmlConfiguration(resource);
@@ -218,15 +226,15 @@ public final class BaseXHTTP extends CLI {
         if(conn instanceof final ServerConnector s) sc = s;
       }
       if(sc == null) throw new BaseXException("No Jetty connector defined in " + JETTYCONF + '.');
-      sc.setPort(port);
-      return server;
+      if(force || sc.getPort() == 0) sc.setPort(port);
+      return sc;
     }
     final Server server = new Server();
     final ServerConnector sc = new ServerConnector(server);
     sc.setIdleTimeout(60000);
     sc.setPort(port);
     server.addConnector(sc);
-    return server;
+    return sc;
   }
 
   /**
@@ -245,8 +253,8 @@ public final class BaseXHTTP extends CLI {
 
   @Override
   protected void parseArgs() throws IOException {
-    /* command-line properties will be stored in system properties;
-     * this way, they will not be overwritten by the settings specified in web.xml. */
+    // invoked by the super constructor: field initializers have not been run yet
+    options = new HashMap<>();
     final MainParser arg = new MainParser(this);
     boolean daemon = true;
 
@@ -260,48 +268,48 @@ public final class BaseXHTTP extends CLI {
             commands.add(script(arg.string()));
             break;
           case 'd': // activate debug mode
-            Prop.put(StaticOptions.DEBUG, Boolean.toString(true));
+            option(StaticOptions.DEBUG, Boolean.toString(true));
             Prop.debug = true;
             break;
           case 'D': // hidden flag: daemon mode
             daemon = false;
             break;
           case 'g': // enable GZIP compression
-            Prop.put(StaticOptions.GZIP, Boolean.toString(true));
+            option(StaticOptions.GZIP, Boolean.toString(true));
             break;
           case 'h': // parse HTTP port
-            Prop.put(StaticOptions.HTTPPORT, Integer.toString(arg.number()));
+            option(StaticOptions.HTTPPORT, Integer.toString(arg.number()));
             break;
           case 'l': // use local mode
-            Prop.put(StaticOptions.HTTPLOCAL, Boolean.toString(true));
+            option(StaticOptions.HTTPLOCAL, Boolean.toString(true));
             break;
           case 'L': // start database server in addition
-            Prop.put(StaticOptions.HTTPLOCAL, Boolean.toString(false));
+            option(StaticOptions.HTTPLOCAL, Boolean.toString(false));
             break;
           case 'n': // parse host name
             final String n = arg.string();
-            Prop.put(StaticOptions.HOST, n);
-            Prop.put(StaticOptions.SERVERHOST, n);
+            option(StaticOptions.HOST, n);
+            option(StaticOptions.SERVERHOST, n);
             break;
           case 'p': // parse server port
             final int p = arg.number();
-            Prop.put(StaticOptions.PORT, Integer.toString(p));
-            Prop.put(StaticOptions.SERVERPORT, Integer.toString(p));
+            option(StaticOptions.PORT, Integer.toString(p));
+            option(StaticOptions.SERVERPORT, Integer.toString(p));
             break;
           case 'q': // quiet flag (hidden)
             quiet = true;
             break;
           case 's': // parse stop port
-            Prop.put(StaticOptions.STOPPORT, Integer.toString(arg.number()));
+            option(StaticOptions.STOPPORT, Integer.toString(arg.number()));
             break;
           case 'S': // set service flag
             service = daemon;
             break;
           case 'U': // specify username
-            Prop.put(StaticOptions.USER, arg.string());
+            option(StaticOptions.USER, arg.string());
             break;
           case 'z': // suppress logging
-            Prop.put(StaticOptions.LOG, "");
+            option(StaticOptions.LOG, "");
             break;
           default:
             throw arg.usage();
@@ -313,6 +321,16 @@ public final class BaseXHTTP extends CLI {
     }
     // do not evaluate command if additional service will be started
     if(service) commands.clear();
+  }
+
+  /**
+   * Assigns a command-line option as global option.
+   * @param option option
+   * @param value value
+   */
+  private void option(final Option<?> option, final String value) {
+    Prop.put(option, value);
+    options.put(option, value);
   }
 
   // STATIC METHODS ===============================================================================
