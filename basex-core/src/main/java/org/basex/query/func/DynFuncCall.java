@@ -69,9 +69,10 @@ public final class DynFuncCall extends FuncCall {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     final Expr func = body();
-    // the call is nondeterministic if the invoked function is (values carry no flags of their own:
-    // their function items are checked explicitly)
-    if(func.has(Flag.NDT) || func instanceof Value && containsNdtFunction(func)) {
+    final Type ftype = func.seqType().type;
+    final boolean struct = lookup(ftype);
+    // nondeterministic if the invoked function is; values: check contained function items
+    if(func.has(Flag.NDT) || func instanceof Value && !struct && containsNdtFunction(func)) {
       ndt = true;
     }
 
@@ -91,8 +92,6 @@ public final class DynFuncCall extends FuncCall {
 
     // assign function type
     final int nargs = exprs.length - 1;
-    final Type ftype = func.seqType().type;
-    final boolean struct = ftype instanceof MapType || ftype instanceof ArrayType;
     final FuncType ft = func.funcType();
     if(ft != null) {
       if(ft.argTypes != null) {
@@ -145,13 +144,20 @@ public final class DynFuncCall extends FuncCall {
    * @return result of check
    */
   private static boolean unknown(final Expr func) {
-    // lookups in maps and arrays have no side effects
-    final Type type = func.seqType().type;
-    if(type instanceof MapType || type instanceof ArrayType) return false;
+    if(lookup(func.seqType().type)) return false;
     // coercion adopts the properties of the coerced function
     if(func instanceof final TypeCheck check) return unknown(check.arg(0));
     // values and inline functions expose the properties of the invoked function
     return !(func instanceof Value || func instanceof XQFunctionExpr);
+  }
+
+  /**
+   * Checks if a function type denotes maps or arrays, which are looked up without side effects.
+   * @param type function type
+   * @return result of check
+   */
+  private static boolean lookup(final Type type) {
+    return type instanceof MapType || type instanceof ArrayType;
   }
 
   /**

@@ -172,6 +172,12 @@ public class MainModule extends AModule {
         if(visited.add(func)) func.visit(this);
         return true;
       }
+
+      @Override
+      public boolean value(final Value value) {
+        funcItems(value);
+        return true;
+      }
     });
     return decls;
   }

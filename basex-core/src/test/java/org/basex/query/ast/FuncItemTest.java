@@ -684,6 +684,20 @@ public final class FuncItemTest extends SandboxTest {
     query(f + "let $h as item() := $f return $h((1, 2))", 2);
   }
 
+  /** Functions that are only referenced by function items in maps are part of the plan. */
+  @Test public void funcItemInMap() {
+    check("declare %basex:inline(0) function local:f($x) { $x * 2 }; "
+        + "sort-by((2, 1)[random:double() < 2], { 'key': fn($x) { local:f($x) } })",
+        "1\n2", exists(StaticFunc.class));
+  }
+
+  /** Lookups in maps with nondeterministic functions. */
+  @Test public void ndtFuncItemInMap() {
+    final String m = "let $m := { 'f': random:double#0 } return ";
+    query(m + "count(distinct-values((1 to 2) ! $m('f')()))", 2);
+    query(m + "count(distinct-values((1 to 2) ! $m(<_>f</_>)()))", 2);
+  }
+
   /** Function coercion: external values and Java objects. */
   @Test public void coerceExternal() {
     final String f = "let $f := (fn($a) { $a }, 1)[random:integer(2) >= 0][1] return ";
