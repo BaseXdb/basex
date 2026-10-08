@@ -105,7 +105,12 @@ abstract class RESTCmd extends Command {
       final String info = cmd.info();
       error(info);
       if(!ok) {
-        if(cmd instanceof Open) status = HTTPStatus.NOT_FOUND_X;
+        if(cmd instanceof Open) {
+          status = HTTPStatus.NOT_FOUND_X;
+        } else if(cmd.exception instanceof final QueryException qe &&
+            qe.error() == QueryError.BASEX_PERMISSION_X_X) {
+          status = HTTPStatus.FORBIDDEN_X;
+        }
         throw HTTPStatus.BAD_REQUEST_X.get(info);
       }
     } finally {

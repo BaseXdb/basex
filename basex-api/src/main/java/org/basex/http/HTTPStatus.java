@@ -23,6 +23,9 @@ public enum HTTPStatus {
   /** Error 400, "Multiple contexts supplied.". */
   MULTIPLE_CONTEXTS(SC_BAD_REQUEST, "Multiple contexts supplied."),
 
+  /** Error: 403 (forbidden). */
+  FORBIDDEN_X(SC_FORBIDDEN, "%"),
+
   /** Error: 404 (not found). */
   NOT_FOUND_X(SC_NOT_FOUND, "%"),
   /** Error: 404, "No path specified". */

@@ -75,11 +75,20 @@ public abstract class AuthTest extends HTTPTest {
    * @param url URL
    */
   protected static void responseFail(final String url) {
+    responseFail(url, "401");
+  }
+
+  /**
+   * Calls the specified URL and checks the status code of the error message.
+   * @param url URL
+   * @param status expected status code
+   */
+  protected static void responseFail(final String url, final String status) {
     try {
       final HttpResponse<InputStream> response = new IOUrl(url).response();
       fail("Error expected:\n" + response);
     } catch(final IOException ex) {
-      assertEquals("401", ex.getMessage().replaceAll(":.*", ""));
+      assertEquals(status, ex.getMessage().replaceAll(":.*", ""));
     }
   }
 
