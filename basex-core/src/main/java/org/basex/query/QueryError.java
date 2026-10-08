@@ -88,6 +88,8 @@ public enum QueryError {
   /** Error code. */
   ARCHIVE_NAME(ARCHIVE, "descriptor", "Name of archive entry must not be empty."),
   /** Error code. */
+  ARCHIVE_DUPL_X(ARCHIVE, "descriptor", "Duplicate entry name: '%'."),
+  /** Error code. */
   ARCHIVE_LEVEL_X(ARCHIVE, "descriptor", "Invalid compression level: '%'."),
   /** Error code. */
   ARCHIVE_TIMESTAMP_X(ARCHIVE, "descriptor", "xs:dateTime value is invalid : '%'."),

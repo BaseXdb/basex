@@ -129,7 +129,10 @@ abstract class ArchiveFn extends StandardFunc {
         if(e != c) throw ARCHIVE_NUMBER_X_X.get(info, e, c);
         break;
       }
-      files.put(toString(entry, qc), new SimpleEntry<>(entry, content));
+      final String name = toString(entry, qc);
+      if(files.put(name, new SimpleEntry<>(entry, content)) != null) {
+        throw ARCHIVE_DUPL_X.get(info, name);
+      }
       e++;
       c++;
     }

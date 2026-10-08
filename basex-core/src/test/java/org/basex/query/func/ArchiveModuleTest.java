@@ -77,6 +77,8 @@ public final class ArchiveModuleTest extends SandboxTest {
     error(func.args("X", " ()"), ARCHIVE_NUMBER_X_X);
     // name must not be empty
     error(func.args(" <archive:entry/>", ""), ARCHIVE_NAME);
+    // duplicate entry names
+    error(func.args(" ('a', 'b', 'a')", " ('1', '2', '3')"), ARCHIVE_DUPL_X);
     // invalid compression level
     error(func.args(" <archive:entry compression-level='x'>X</archive:entry>", ""),
         ARCHIVE_LEVEL_X);
@@ -613,6 +615,7 @@ public final class ArchiveModuleTest extends SandboxTest {
     // shared validation pipeline with archive:create (sanity checks on routing)
     error(func.args(tmp, " ('a', 'b')", "X"), ARCHIVE_NUMBER_X_X);
     error(func.args(tmp, " <archive:entry/>", ""), ARCHIVE_NAME);
+    error(func.args(tmp, " ('a', 'a')", " ('1', '2')"), ARCHIVE_DUPL_X);
 
     query(_FILE_DELETE.args(tmp));
   }
