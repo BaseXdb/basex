@@ -15,6 +15,7 @@ import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -325,6 +326,12 @@ final class Unit {
         if(qc.state != JobState.TIMEOUT) throw ex;
         Thread.interrupted();
         throw UNIT_TIMEOUT_X.get(func.info, timeout / 1000.0);
+      } catch(final QueryException ex) {
+        // copy database nodes before the opened databases are closed
+        if(ex instanceof final UnitException ue) ue.materialize(qc);
+        final Value value = ex.value();
+        if(value != null) ex.value(value.materialize(TransferVisitor.SHAREABLE, null, qc));
+        throw ex;
       }
     } finally {
       if(timer != null) timer.cancel();

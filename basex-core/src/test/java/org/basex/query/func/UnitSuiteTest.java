@@ -3,6 +3,8 @@ package org.basex.query.func;
 import java.io.*;
 
 import org.basex.*;
+import org.basex.core.cmd.Close;
+import org.basex.core.cmd.CreateDB;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.junit.jupiter.api.*;
@@ -83,6 +85,19 @@ public final class UnitSuiteTest extends SandboxTest {
     query(doc + "//testsuite/@errors/data()", 1);
     query(doc + "//testinit/@name/data()", "init");
     query(doc + "//testinit/error/@type/data()", "FORG0001");
+  }
+
+  /** Reports database nodes after the database has been closed. */
+  @Test public void dbNodes() {
+    execute(new CreateDB(NAME, "<x><a>A</a><b>B</b></x>"));
+    execute(new Close());
+    final String db = "db:get('" + NAME + "')";
+    final String doc = run("dbnodes",
+        "declare %unit:test function _:equals() { unit:assert-equals(" + db + "//a, ()) };"
+      + "declare %unit:test function _:fail() { unit:fail(" + db + "//b) };");
+
+    query(doc + "//testcase[@name = 'equals']/failure/returned/a/data()", "A");
+    query(doc + "//testcase[@name = 'fail']/failure/info/b/data()", "B");
   }
 
   /**
