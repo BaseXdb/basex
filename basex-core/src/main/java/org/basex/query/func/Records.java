@@ -98,6 +98,13 @@ public enum Records {
     field("issues", INSPECTION_ISSUE.get().seqType(Occ.ZERO_OR_MORE))
   ),
   /** Record definition. */
+  LANGUAGE(FT_URI, "language",
+    field("code", Types.STRING_O),
+    field("name", Types.STRING_O),
+    field("stemmer", Types.BOOLEAN_O),
+    field("tokenizer", Types.BOOLEAN_O)
+  ),
+  /** Record definition. */
   LOAD_XQUERY_MODULE(FN_URI, "load-xquery-module",
     field("variables", MapType.get(BasicType.QNAME, Types.ITEM_ZM).seqType()),
     field("functions", MapType.get(BasicType.QNAME,

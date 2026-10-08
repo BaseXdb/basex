@@ -154,6 +154,19 @@ public final class FtModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void languages() {
+    final Function func = _FT_LANGUAGES;
+
+    query(func.args() + "[?code = 'de'] ! (?name, ?stemmer, ?tokenizer)", "German\ntrue\ntrue");
+    query(func.args() + "[?code = 'en'] ! (?name, ?stemmer, ?tokenizer)", "English\ntrue\ntrue");
+    query(func.args() + "[?code = 'ja']?name", "Japanese");
+    query(func.args() + "[?code = 'xx']", "");
+    query("every $l in " + func.args() + " satisfies $l?code != ''", true);
+    query("let $c := " + func.args() + "?code return deep-equal($c, sort($c))", true);
+    query("count(" + func.args() + ") > 100", true);
+  }
+
+  /** Test method. */
   @Test public void mark() {
     final Function func = _FT_MARK;
     query(func.args(" //*[text() contains text '1']"),

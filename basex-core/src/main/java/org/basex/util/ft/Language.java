@@ -76,6 +76,14 @@ public final class Language implements Comparable<Language> {
   }
 
   /**
+   * Returns all available languages, sorted by their code.
+   * @return languages
+   */
+  public static List<Language> all() {
+    return ALL.values().stream().filter(ln -> !ln.code().isEmpty()).sorted().toList();
+  }
+
+  /**
    * Returns the language code (ISO 639).
    * @return code
    */

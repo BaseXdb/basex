@@ -1601,6 +1601,9 @@ public enum Function implements AFunction {
   _FT_EXTRACT(FtExtract::new, "extract(nodes, name?, length?)",
       params(XNODE_ZM, STRING_ZO, INTEGER_ZO), XNODE_ZM, flag(CNS), FT_URI),
   /** XQuery function. */
+  _FT_LANGUAGES(FtLanguages::new, "languages()",
+      params(), Records.LANGUAGE.get().seqType(Occ.ZERO_OR_MORE), FT_URI),
+  /** XQuery function. */
   _FT_MARK(FtMark::new, "mark(nodes, name?)",
       params(XNODE_ZM, STRING_ZO), XNODE_ZM, flag(CNS), FT_URI),
   /** XQuery function. */
