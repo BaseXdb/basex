@@ -46,6 +46,8 @@ const _live_actions = {};
 const _panel_focus = {};
 /** Called once a panel has been filled, by panel id; a page registers its own. */
 const _panel_filled = {};
+/** Called with a folded panel that has been opened; a page registers its own (can be null). */
+let _panel_opened = null;
 /** Pending filter requests, by the id of the field that was typed into. */
 const _filters = {};
 
@@ -240,11 +242,10 @@ function isRecord(value) {
 /**
  * Returns what was typed into a field, without the spaces around it.
  * @param {string} id id of the field
- * @param {string} fallback value to use if the field is not on the page
  * @returns {string} value
  */
-function fieldValue(id, fallback = "") {
-  return document.getElementById(id)?.value.trim() ?? fallback;
+function fieldValue(id) {
+  return document.getElementById(id)?.value.trim() ?? "";
 }
 
 /**
@@ -429,8 +430,11 @@ function setText(message, type) {
 /**
  * Indicates that the files of a form are being uploaded.
  * @param {HTMLFormElement} form submitted form
+ * @param {SubmitEvent} event submit event
  */
-function uploading(form) {
+function uploading(form, event) {
+  // a button that closes a dialog submits its form as well, but nothing is sent
+  if(event.submitter?.formMethod === "dialog") return;
   setText("Files are being uploaded…", "warning");
   // disable buttons after dispatch, so the clicked button's 'formaction' is still evaluated
   setTimeout(() => {
@@ -576,6 +580,15 @@ function endRequest() {
 }
 
 /**
+ * Returns the block of a panel that states the order of its list.
+ * @param {string} id id of the panel
+ * @returns {HTMLElement} block (can be null)
+ */
+function sortedList(id) {
+  return document.querySelector(`#${id} [data-sort]`);
+}
+
+/**
  * Asks the server for a panel. A folded panel is requested as well: opening it must show what
  * is there now, not what was there when it was folded away. The order it shows is kept unless
  * another one is requested.
@@ -588,7 +601,7 @@ function endRequest() {
 function requestPanel(path, id, message, sort, page) {
   // the panel is marked until it arrives; style.css fades it if that takes a while
   document.getElementById(id)?.classList.add("loading");
-  const shown = document.querySelector(`#${id} [data-sort]`);
+  const shown = sortedList(id);
   sendMessage(path, Object.assign(message, {
     sort: sort ?? shown?.dataset.sort ?? "",
     page: page ?? 1
@@ -1072,6 +1085,15 @@ async function confirmDialog(message) {
 }
 
 /**
+ * Announces a change to screen readers, without showing it.
+ * @param {string} text text to be announced
+ */
+function announce(text) {
+  const region = document.getElementById("announce");
+  if(region) region.textContent = text;
+}
+
+/**
  * Asks for a text value.
  * @param {string} message question to be answered
  * @param {string} value value to start from
@@ -1116,19 +1138,6 @@ function chooseUpload(id) {
 function setDisabled(id, disabled) {
   const el = document.getElementById(id);
   if(el) el.disabled = disabled;
-}
-
-/**
- * Copies text to the clipboard and confirms via the message area.
- * @param {string} text text to copy
- */
-async function copy(text) {
-  try {
-    await navigator.clipboard.writeText(text);
-    setText("Copied to clipboard.", "info");
-  } catch {
-    setText("Copy failed.", "error");
-  }
 }
 
 /**
@@ -1235,8 +1244,8 @@ function shortcuts(event) {
 }
 
 /** Views that 'g' and a key go to. */
-const GO_VIEWS = { w: "workspace", d: "databases", s: "stores", u: "users", l: "logs",
-  a: "activity", x: "settings" };
+const GO_VIEWS = { l: "logs", a: "activity", d: "databases", s: "stores", u: "users",
+  w: "workspace", x: "settings" };
 
 /** Time in which the key that follows 'g' is expected, in milliseconds. */
 const GO_DELAY = 1000;
@@ -1383,7 +1392,7 @@ function moveTable(step) {
 
 /** Shortcuts of the page, as [ key, description ] pairs. */
 const PAGE_SHORTCUTS = [
-  [ "G W/D/S/U/L/A/X", "Go to a view (X: Settings)" ],
+  [ "G L/A/D/S/U/W/X", "Go to a view (X: Settings)" ],
   [ "/", "Search or filter" ],
   [ "Enter", "Open the chosen row" ],
   [ "Space", "Tick the chosen row" ],
@@ -1515,6 +1524,7 @@ function togglePanel(panel) {
   store(panelsKey(), JSON.stringify(state));
 
   remeasure();
+  if(!collapse) _panel_opened?.(panel);
 }
 
 /**
@@ -1538,7 +1548,10 @@ function showPanel(panel, collapse) {
     label.textContent = `${title} `;
     button.append(label);
   }
-  button.title = `${collapse ? "Expand" : "Collapse"} ${title}`;
+  // a folded panel states what it holds, as its contents are not in view
+  const description = collapse && panel.dataset.description;
+  button.title = `${collapse ? "Expand" : "Collapse"} ${title}` +
+    (description ? `: ${description}` : "");
   button.setAttribute("aria-expanded", !collapse);
 }
 

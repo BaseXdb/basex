@@ -5,7 +5,7 @@
   /* page gutter: margins, cell padding, and the gap between panels */
   --gap: 1rem;
   /* vertical separation between blocks */
-  --space: .6rem;
+  --space: .8rem;
   /* every line of the interface: rules, dividers, and the borders of controls */
   --line: .7px;
   /* the face of code, wherever it is shown */
@@ -120,14 +120,14 @@ h1 {
 h2 {
   font-size: 150%;
   color: var(--accent-strong);
-  margin: 0 0 .2rem 0;
+  margin: 0 0 .3rem 0;
 }
 
 h3 {
   font-size: 120%;
   color: var(--muted);
   /* the top margin also separates a heading from the block above it */
-  margin: var(--space) 0 .2rem 0;
+  margin: var(--space) 0 .3rem 0;
 }
 
 table {
@@ -150,7 +150,7 @@ thead {
 /* lines between the rows, and a stronger one below the header, as on docs.basex.org */
 th, td {
   vertical-align: top;
-  padding: 1px var(--gap) 1px 0;
+  padding: .25rem var(--gap) .25rem 0;
   border-bottom: var(--line) solid var(--border-light);
 }
 
@@ -163,11 +163,22 @@ th {
 tr:has(> td):not(:has(input.filter)):hover {
   background-color: var(--shade);
 }
-/* the rows that belong to the web session that is pointed at, in all panels */
-tr.related {
-  background-color: var(--shade-hover);
+/* clients: a web session heads the connections and jobs that were opened in it */
+table.clients tr.group > :is(td, th) {
+  border-top: 1px solid var(--rule);
 }
-tr:has(> td input[type=checkbox]:checked) {
+/* the session heads its group for screen readers; it looks like the cells beside it */
+table.clients tbody th {
+  font-weight: inherit;
+  border-bottom-color: var(--border-light);
+}
+table.clients tr.child > td:first-child {
+  padding-left: 1.5rem;
+}
+table.clients :is(td, th):first-child {
+  white-space: nowrap;
+}
+tbody tr:has(> :is(td, th) input[type=checkbox]:checked) {
   background-color: var(--row-selected);
 }
 
@@ -175,13 +186,13 @@ tr:has(> td input[type=checkbox]:checked) {
    the accent and carries a white tick */
 input[type=checkbox] {
   appearance: none;
-  width: 13px;
-  height: 13px;
-  margin: 0 5px 0 0;
-  vertical-align: -1px;
+  width: 14px;
+  height: 14px;
+  margin: 0 6px 0 0;
+  vertical-align: -2px;
   border: var(--line) solid var(--border);
   border-radius: var(--radius);
-  background: var(--bg) center / 9px no-repeat;
+  background: var(--bg) center / 10px no-repeat;
   cursor: pointer;
   /* the focus is marked inside the box: a ring outside would be clipped by a panel that scrolls */
   outline: none;
@@ -196,7 +207,7 @@ input[type=checkbox] {
 }
 /* outside the rows of a table, a list of options gets some air between its lines */
 label:has(> input[type=checkbox]) {
-  line-height: 1.4;
+  line-height: 1.6;
 }
 
 /* a checkbox and the value beside it belong on one line: a column that is sized by its content
@@ -255,7 +266,7 @@ td {
   flex: none;
   max-width: 14rem;
   margin: 0;
-  padding: .15rem .5rem;
+  padding: .25rem .65rem;
   border: var(--line) solid var(--border-light);
   border-bottom: none;
   border-radius: var(--radius) var(--radius) 0 0;
@@ -381,30 +392,31 @@ button, input[type=file]::file-selector-button {
 
 /* fields are written in the face of the page, as buttons are */
 input[type=text], input[type=password], input[type=number], select {
-  padding: 4px;
+  padding: 4px 8px;
   width: 200px;
   background-color: var(--bg);
   color: var(--fg);
   font: inherit;
 }
 
-/* a selection is drawn like a field, with a chevron instead of the native arrow */
-select {
+/* a selection is drawn like a field, with a chevron instead of the native arrow; a list box
+   opens nothing */
+select:not([multiple], [size]) {
   appearance: none;
-  padding-right: 22px;
-  background: var(--bg) right 7px center / 9px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23888' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  padding-right: 26px;
+  background: var(--bg) right 9px center / 9px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23888' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   cursor: pointer;
 }
 
 /* buttons, and the one of a file chooser, share the flat face of the code buttons on
    docs.basex.org; the link-like, the folding and the tab buttons bring their own */
-button:not(.link, .collapse, .tab), input[type=file]::file-selector-button {
+button:not(.link, .collapse, .dismiss, .tab), input[type=file]::file-selector-button {
   background-color: var(--shade);
   color: var(--fg);
   font: inherit;
   cursor: pointer;
 }
-button:not(.link, .collapse, .tab):hover:not(:disabled),
+button:not(.link, .collapse, .dismiss, .tab):hover:not(:disabled),
 input[type=file]::file-selector-button:hover {
   background-color: var(--shade-hover);
 }
@@ -515,6 +527,15 @@ tr.added > td {
 @keyframes added {
   from { background-color: var(--row-added); }
 }
+/* text for screen readers only: the word a symbol stands for, and what a refresh changed */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
 /* identifiers: a line may otherwise break after a hyphen, a space or an ellipsis */
 .nowrap {
   white-space: nowrap;
@@ -583,7 +604,7 @@ header {
 
 .header-nav ul {
   display: flex;
-  column-gap: .25rem;
+  column-gap: .4rem;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -592,7 +613,7 @@ header {
 /* the separator belongs to the line, not to the entries: it is neither read out nor clickable */
 .header-nav li + li::before {
   content: '\B7';
-  margin-right: .25rem;
+  margin-right: .4rem;
   color: var(--muted);
 }
 
@@ -714,17 +735,17 @@ header {
 .buttons {
   display: flex;
   flex-wrap: wrap;
-  gap: .3rem;
+  gap: .4rem;
   margin-bottom: var(--space);
 }
 /* toolbar of the Workspace view: groups of buttons, further apart than the buttons in them */
 .toolbar, .toolbar > div {
   display: flex;
   align-items: center;
-  gap: .3rem;
+  gap: .4rem;
 }
 .toolbar {
-  gap: .9rem;
+  gap: 1rem;
 }
 /* the outcome of the last run, at the right end of the query information tabs */
 #run-info {
@@ -787,10 +808,14 @@ body .cm-editor.cm-focused {
 
 /* query field above a resource editor; named with its element, or the width of a text
    field would be the more specific rule */
-input.query {
-  /* the note above supplies the distance; an input does not collapse its margins */
-  margin: 0 0 var(--space) 0;
-  width: 100%;
+/* a query field with the button that stops its query */
+.query-row {
+  display: flex;
+  gap: .4rem;
+  margin-bottom: var(--space);
+  > input.query {
+    flex: 1;
+  }
 }
 
 /* head of a scrolling list: the heading, the actions and the summary stay in reach while
@@ -806,7 +831,7 @@ input.query {
    of it, the rows below use the full width. The search line of the logs is a single row.
    A panel without a chevron keeps the full width */
 .panel:has(> button.collapse) :is(.sticky:not(.logbar) > :first-child, .logbar) {
-  padding-right: calc(var(--scrollbar) + 1rem);
+  padding-right: calc(var(--scrollbar) + 1rem + var(--beside, 0px));
 }
 /* the spacing below the head is the panel's, not the last block's inside it */
 .sticky > :last-child {
@@ -950,15 +975,52 @@ body:has(.content.fill) main {
   border-radius: var(--radius);
 }
 
-/* the details of a job: the result, the query information and the query string share the height
-   that the headings and tables leave, which keep the height they need */
-#job-details > * {
+/* the details of a job are opened over the panels, and take most of the page */
+#details-dialog[open] {
+  width: min(90vw, 72rem);
+  max-width: none;
+  height: 85vh;
+  display: flex;
+  flex-direction: column;
+}
+/* the heading and the buttons keep their place; the columns between them take the rest */
+#job-details {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+/* what is known about the job on the left, the result and the query on the right */
+.job-columns {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  column-gap: calc(var(--gap) * 2);
+}
+/* the facts scroll on their own; the texts are laid out in a column, so that the result and the
+   query share the height that their headings leave */
+.job-facts {
+  overflow: auto;
+}
+.job-texts {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.job-texts > * {
   flex-shrink: 0;
 }
-/* none of the three blocks is squeezed away by a long table or by a small window: the pane
-   scrolls once they no longer fit */
-#job-details > :is(.cm-editor, textarea, .pane) {
+.job-texts > :is(.cm-editor, textarea) {
+  flex: 1;
   min-height: 6rem;
+}
+.job-columns h3:first-child {
+  margin-top: 0;
+}
+/* the dialog is opened by the page, not by the keyboard: nothing in it is outlined as focused */
+#details-dialog :focus:not(:focus-visible), #details-dialog .job-facts:focus {
+  outline: none;
 }
 /* the entries sit below their heading; the bullets bring the only indentation */
 .query-info dd {
@@ -1011,9 +1073,9 @@ body:has(.content.fill) main {
   grid-template-columns: subgrid;
 }
 
-/* a checkbox that is the control of a field brings its own break, which the row it is placed
-   in already provides */
-:has(> .field) > br, .field br {
+/* a checkbox among fields brings its own break, which the grid row it is placed in already
+   provides */
+:has(> .field) > br {
   display: none;
 }
 
@@ -1026,13 +1088,43 @@ body:has(.content.fill) main {
 /* fields side by side, for a form with more options than one column holds */
 .field-columns {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* a column per group, all of the same width, whatever their content */
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
   column-gap: var(--gap);
+}
+
+/* only the editor gives up height in a short panel: the heading would otherwise be squeezed away,
+   as it clips its overflow; the pane scrolls once the editor has reached its minimum */
+#user-panel > :not(.cm-editor) {
+  flex-shrink: 0;
+}
+#user-panel > .cm-editor {
+  min-height: 6rem;
+}
+
+/* the fields of a user sit side by side as long as the panel has the room, and below each other
+   once it has not; a control shrinks rather than running into the column next to it */
+#user-panel .field-columns {
+  grid-auto-flow: row;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+}
+/* the labels of both columns take the same room, so the controls line up once they are stacked */
+#user-panel .field-columns > div {
+  grid-template-columns: 6.5rem minmax(0, 1fr);
+}
+#user-panel .field-columns :is(input, select) {
+  width: 100%;
+  max-width: 200px;
 }
 
 /* a dialog that spreads its fields over columns needs the room for them */
 dialog:has(.field-columns) {
   max-width: min(90vw, 48rem);
+}
+/* and the more so if there are three of them */
+dialog:has(.field-columns > :nth-child(3)) {
+  max-width: min(90vw, 72rem);
 }
 /* the shortcuts are described in a line each, and their keys can be long */
 #shortcuts {
@@ -1048,12 +1140,13 @@ dialog:has(textarea) {
 
 /* collapsible content panels: a chevron folds a panel to a labeled strip. It sits just inside
    the scrollbar of the list or editor below it: over the content, so it costs no width, but
-   never on the scrollbar itself. The offset is measured by measureScrollbar */
-button.collapse {
+   never on the scrollbar itself. The offset is measured by measureScrollbar. A panel that shows
+   a selection is closed by a cross in the corner, which moves the chevron beside it */
+button:is(.collapse, .dismiss) {
   position: absolute;
   top: 0;
   /* clear of the scrollbar, plus a little air */
-  right: calc(var(--scrollbar) + .5rem);
+  right: calc(var(--scrollbar) + .5rem + var(--beside, 0px));
   /* the pinned head of a list is raised, and would otherwise be painted over the button */
   z-index: 2;
   padding: 0 .2rem .1rem;
@@ -1066,16 +1159,22 @@ button.collapse {
   line-height: 1;
   cursor: pointer;
 }
+.panel:has(> button.dismiss) {
+  --beside: 1.6rem;
+  > button.dismiss {
+    --beside: 0px;
+  }
+}
 /* nothing scrolls behind it: the chevron takes the room the scrollbar would have needed */
-.panel.no-scrollbar > button.collapse {
-  right: .5rem;
+.panel.no-scrollbar > button:is(.collapse, .dismiss) {
+  right: calc(.5rem + var(--beside, 0px));
 }
 /* and moves on into the gutter where a divider follows: what the chevron keeps its distance to
    is whatever comes next, be that the scrollbar of its own panel or the line after it */
-.content.divided > .panel.no-scrollbar:has(+ .panel) > button.collapse {
-  right: calc(.5rem - var(--gap));
+.content.divided > .panel.no-scrollbar:has(+ .panel) > button:is(.collapse, .dismiss) {
+  right: calc(.5rem - var(--gap) + var(--beside, 0px));
 }
-button.collapse:hover {
+button:is(.collapse, .dismiss):hover {
   color: var(--accent);
   background-color: var(--shade-hover);
 }
@@ -1162,10 +1261,10 @@ button.collapse .label {
   }
   /* one column of fields: a narrow screen has no room for two */
   .field-columns {
-    grid-template-columns: 1fr;
+    grid-auto-flow: row;
   }
   /* keep the logs search + ignore fields on one line, letting them shrink to fit */
-  .logbar h3 { white-space: nowrap; }
+  .logbar h2 { white-space: nowrap; }
   .logbar #input,
   .logbar .ignore {
     flex: 1;

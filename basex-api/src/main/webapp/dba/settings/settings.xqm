@@ -52,7 +52,7 @@ function dba:settings() as element(html) {
   return (
     html:panel(
       <form method='post' autocomplete='off'>{
-        html:heading('Global Options', form:button('settings/gc', 'GC')),
+        html:heading('Global Options', form:button('settings/gc', 'GC', title := 'Run the Java garbage collector')),
         table:pairs($local/preceding-sibling::tr[not(th)])
       }</form>,
       { 'label': 'Global Options' }),
@@ -70,7 +70,7 @@ function dba:settings() as element(html) {
     ), { 'label': 'System Properties' }),
     html:panel(
       <form method='post' autocomplete='off'>{
-        html:heading('Settings', form:button('settings/save', 'Save')),
+        html:heading('Settings', form:button('settings/save', 'Save', title := 'Save the settings')),
         <h3>Queries</h3>,
         $number($config:TIMEOUT, 'Timeout, in seconds (0 = disabled)', ()),
         $number($config:MEMORY, 'Memory limit, in MB (0 = disabled)', ()),

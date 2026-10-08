@@ -45,8 +45,8 @@ function logEntries(key) {
   const live = document.getElementById("live");
   if(live) live.disabled = _logFiles > 1;
   // what is searched is stated where the date of a single file is
-  const heading = document.querySelector(".logbar h3");
-  if(heading) heading.textContent = _logFiles > 1 ? `${_logFiles} files` : dates[0];
+  const heading = document.querySelector(".logbar h2");
+  if(heading) heading.textContent = _logFiles > 1 ? `Logs: ${_logFiles} files` : `Log: ${dates[0]}`;
 
   const message = {
     type: "entries",

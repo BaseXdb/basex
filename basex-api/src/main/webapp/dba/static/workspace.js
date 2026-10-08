@@ -55,12 +55,13 @@ function tab() {
 
 /**
  * Creates a document.
- * @param {string} dir directory
+ * @param {string} dir directory; ignored for an unnamed document, which has none yet
  * @param {string} name file name; empty for an unnamed document
  * @returns {object} tab
  */
 function newTab(dir, name) {
-  return { dir: dir, name: name, id: _nextId++, saved: "", edited: false, state: undefined };
+  return { dir: name ? dir : "", name: name, id: _nextId++, saved: "", edited: false,
+    state: undefined };
 }
 
 /**
@@ -68,7 +69,7 @@ function newTab(dir, name) {
  */
 function newFile() {
   captureTab();
-  _tabs.push(newTab(filesDir(), ""));
+  _tabs.push(newTab("", ""));
   _tab = _tabs.length - 1;
   applyTab();
   storeTabs();
@@ -252,7 +253,7 @@ async function closeTab(index) {
   if(active) captureTab();
   _tabs.splice(index, 1);
   // there is always a document: the last one that closes leaves an unnamed one
-  if(!_tabs.length) _tabs.push(newTab(filesDir(), ""));
+  if(!_tabs.length) _tabs.push(newTab("", ""));
   if(index < _tab) _tab--;
   if(_tab >= _tabs.length) _tab = _tabs.length - 1;
   if(active) applyTab();
@@ -554,7 +555,7 @@ function writing(fill) {
 
 /**
  * Saves the active document. An unnamed one is named first; it is stored in the directory
- * the file panel shows, as it has none of its own.
+ * the file panel shows, as is a document that is saved under another name.
  * @param {boolean} saveAs ask for a name, whether or not the document has one
  * @returns {Promise} promise, resolved with true if the document was saved
  */
@@ -569,7 +570,7 @@ async function saveFile(saveAs) {
     // append file suffix
     if(!name.includes(".")) name += ".xq";
   }
-  const dir = tabDir();
+  const dir = saveAs ? filesDir() : tabDir();
   const text = editorValue();
   // the document is renamed below: its draft is dropped under both keys
   const key = draftKey(t);
@@ -741,13 +742,13 @@ function initWorkspace() {
 
   // the strip is restored as a whole; only the active document is read, the others when they
   // are selected. The file panel and the editor stay independent: a document is read from its
-  // own directory, whichever one the panel is asked to show
+  // own directory, whichever one the panel is asked to show; an unnamed one has none yet
   _tabs = storedJson(TABS_KEY, [], Array.isArray)
     .filter(t => isRecord(t) && typeof t.dir === "string" && typeof t.name === "string")
     .map(t => Object.assign(newTab(t.dir, t.name), { id: Number.isInteger(t.id) ? t.id : 0 }));
   // numbers are handed out after the restored ones, so no draft of theirs is overwritten
   _nextId = Math.max(0, ..._tabs.map(t => t.id)) + 1;
-  if(!_tabs.length) _tabs.push(newTab(filesDir(), ""));
+  if(!_tabs.length) _tabs.push(newTab("", ""));
   _tab = Math.min(Math.max(0, Number(stored(TAB_KEY)) || 0), _tabs.length - 1);
   renderTabs();
 

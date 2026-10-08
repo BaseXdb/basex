@@ -28,7 +28,7 @@ function dba:session-value(
   $name  as xs:string
 ) as map(*) {
   (: an attribute that is gone by now is supplied afresh: the dialog opens empty :)
-  dba:value(try { sessions:get($id, $name) } catch sessions:not-found { })
+  utils:value(try { sessions:get($id, $name) } catch sessions:not-found { })
 };
 
 (:~
@@ -47,23 +47,7 @@ function dba:websocket-value(
   $name  as xs:string
 ) as map(*) {
   (: an attribute of a connection that is gone by now is supplied afresh :)
-  dba:value(try { ws:get($id, $name) } catch ws:not-found { })
-};
-
-(:~
- : Returns an attribute value as the expression that yields it again.
- : @param  $value  value of the attribute
- : @return expression, and the reason why it cannot be edited
- :)
-declare %private function dba:value(
-  $value  as item()*
-) as map(*) {
-  let $expression := utils:expression($value)
-  return if ($expression?truncated) then (
-    { 'text': '', 'note': 'The value is too large to be shown; supply a new one.' }
-  ) else (
-    { 'text': $expression?text, 'note': '' }
-  )
+  utils:value(try { ws:get($id, $name) } catch ws:not-found { })
 };
 
 (:~
@@ -91,15 +75,23 @@ function dba:session-delete() {
 };
 
 (:~
- : Closes sessions.
+ : Closes sessions and WebSocket connections.
  : @return redirection
  :)
 declare
   %updating
   %rest:POST
-  %rest:path('/dba/sessions/close')
-function dba:session-close() {
-  utils:dispatch($dba:CAT, dba:close(?, 'session', sessions:close#1))
+  %rest:path('/dba/clients/close')
+function dba:clients-close() {
+  (: the client of a closed connection opens a new one with its next request :)
+  utils:dispatch($dba:CAT, fn($args) {
+    {
+      'info': utils:info(($args?session, $args?websocket), 'client', 'closed'),
+      'run' : %updating fn() {
+        void(($args?websocket ! ws:close(.), $args?session ! sessions:close(.)))
+      }
+    }
+  })
 };
 
 (:~
@@ -126,19 +118,6 @@ function dba:websocket-delete() {
   utils:dispatch($dba:CAT, dba:delete(?, ws:delete#2))
 };
 
-(:~
- : Closes WebSocket connections.
- : @return redirection
- :)
-declare
-  %updating
-  %rest:POST
-  %rest:path('/dba/websockets/close')
-function dba:websocket-close() {
-  (: the client of a closed connection opens a new one with its next request :)
-  utils:dispatch($dba:CAT, dba:close(?, 'connection', ws:close#1))
-};
-
 (: the functions below void their calls: what a dynamic call returns is not known to be empty,
    and an updating function admits nothing else :)
 
@@ -154,7 +133,7 @@ declare %private function dba:set(
 ) as utils:action {
   (: an attribute holds any XQuery value: it is supplied as the expression that yields it :)
   {
-    'info': utils:info($args?name, 'attribute', 'assigned'),
+    'info': utils:info($args?name, 'attribute', 'saved'),
     'run' : %updating fn() {
       void($set($args?id, $args?name, utils:evaluate($args?value)))
     }
@@ -174,23 +153,5 @@ declare %private function dba:delete(
   {
     'info': utils:info($args?name, 'attribute', 'deleted'),
     'run' : %updating fn() { void($delete($args?id, $args?name)) }
-  }
-};
-
-(:~
- : Returns the action that closes what holds attributes.
- : @param  $args   request parameters
- : @param  $noun   name of the holder (singular form)
- : @param  $close  closes a holder
- : @return action
- :)
-declare %private function dba:close(
-  $args   as map(*),
-  $noun   as xs:string,
-  $close  as fn(xs:string) as empty-sequence()
-) as utils:action {
-  {
-    'info': utils:info($args?id, $noun, 'closed'),
-    'run' : %updating fn() { void($args?id ! $close(.)) }
   }
 };

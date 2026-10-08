@@ -61,16 +61,19 @@ function dba:logs(
     html:panel(
       if ($date) {
         <div class='sticky logbar'>{
-          <h3>{ $date }</h3>,
+          <h2>{ 'Log: ' || $date }</h2>,
           <input type='text' id='input' name='input' value='{ $input }' autocomplete='off'
-                 placeholder='Search, e.g. admin' title='Regular expression of entries to show'
+                 placeholder='Search, e.g. admin'
+                 title='{ 'Words that the user, type or text of an entry must contain, ' ||
+                   'or a regular expression' }'
                  autofocus='' onkeyup='filterLogs(event.key);'/>,
-          <label title='Reload the entries every second'>{
+          <label title='Reload the entries at the interval chosen in the settings'>{
             <input type='checkbox' id='live' data-live='logs' onchange='liveChanged()'/>, ' Live'
           }</label>,
           <span class='ignore'>{
             <input type='text' id='ignore' class='smallinput' autocomplete='off'
-                   placeholder='Ignore, e.g. /dba' title='Regular expression of entries to hide'
+                   placeholder='Ignore, e.g. /dba'
+                   title='Regular expression: entries whose text matches it are hidden'
                    onkeyup='filterLogs(event.key);'/>
           }</span>
         }</div>,
@@ -89,10 +92,12 @@ function dba:logs(
         <div id='list'>{
           (: the filter is a control of the list, and shares the row of its buttons :)
           let $buttons := (
-            form:button('logs-download', 'Download', 'CHECK'),
-            form:button('logs/delete', 'Delete', ('CHECK', 'CONFIRM')),
+            form:button('logs-download', 'Download', 'CHECK',
+              title := 'Download the selected log files'),
+            form:button('logs/delete', 'Delete', ('CHECK', 'CONFIRM'),
+              title := 'Delete the selected log files'),
             <input type='text' id='log-filter' maxlength='10'
-                   onkeyup='logFilter();' class='smallinput' placeholder='Date'
+                   onkeyup='logFilter();' class='smallinput' placeholder='Date, e.g. 2026-09'
                    title='Show the log files whose date starts with the input, e.g. 2026-09'/>
           )
           let $headers := (
@@ -111,7 +116,8 @@ function dba:logs(
           (: the head is pinned, so the actions stay in reach while the files scroll.
              The files of a server are few, and the filter looks through all of them :)
           return table:create($headers, $entries, $buttons, {},
-            { 'sticky': <h2>Logs</h2>, 'all': true() })
+            { 'sticky': <h2>Logs</h2>, 'all': true(), 'noun': 'file',
+              'empty': 'There are no log files yet.' })
         }</div>
       </form>,
       { 'label': 'Logs' }
@@ -301,13 +307,16 @@ declare function dba:entries(
       attribute class { 'num' }[$column?type = $table:NUMBER],
       <input type='text' class='filter' name='{ $name }' value='{ $filters?($column?key) }'
              placeholder='{ $column?label }' autocomplete='off'
-             title='Filter: { $column?label }' onkeyup='filterLogs(event.key);'/>
+             title='Regular expression of the { lower-case($column?label) } values to show'
+             onkeyup='filterLogs(event.key);'/>
     }
   }
   let $options := {
     'sort': $sort, 'presort': 'time', 'page': $page, 'filters': $filter-row,
     (: the number of entries stays in view below the search line :)
-    'pinned': true()
+    'pinned': true(),
+    'empty': if ($input or $ignore or map:size($filters) > 0) then 'No entries match the search.'
+      else 'The log is empty.'
   }
   return (
     (: a search that stopped at the limit reports as much: what it did not reach is not

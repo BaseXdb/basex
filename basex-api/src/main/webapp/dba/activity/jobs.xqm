@@ -52,7 +52,7 @@ declare
 function dba:replace() {
   utils:dispatch($dba:CAT, fn($args) { {
     'params': { 'job': $args?id },
-    'info'  : utils:info($args?id, 'service', 'replaced'),
+    'info'  : utils:info($args?id, 'service', 'saved'),
     'run'   : %updating fn() { dba:replace-service($args?id, $args?query) }
   } })
 };

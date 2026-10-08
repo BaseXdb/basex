@@ -13,9 +13,6 @@ import module namespace utils = 'dba/lib/utils' at '../lib/utils.xqm';
 (:~ Page the deep links of the panels refer to. :)
 declare %private variable $panels:CAT := 'stores';
 
-(:~ Label of the store that is addressed if no name is supplied. :)
-declare %private variable $panels:DEFAULT := '(default)';
-
 (:~ Maximum length of the value that is shown in a table cell. :)
 declare %private variable $panels:PREVIEW := 100;
 
@@ -52,7 +49,7 @@ declare function panels:stores(
         let $info := store:info($store)
         return {
           'name': $store,
-          'label': html:select($store[.] otherwise $panels:DEFAULT, $panels:CAT,
+          'label': html:select(utils:label($store), $panels:CAT,
             { 'name': $store }, $store = $name, 'name', 'selectStore'),
           'entries': $info?entries,
           'size': $info?size,
@@ -60,9 +57,11 @@ declare function panels:stores(
           'modified': $info?modified
         }
       let $buttons := (
-        <button type='button' onclick='newStore()'>New…</button>,
-        form:button('stores/delete', 'Delete', ('CHECK', 'CONFIRM')),
-        form:button('stores/clear', 'Clear All', 'CONFIRM')
+        <button type='button' onclick='newStore()' title='Create a new store'>New…</button>,
+        form:button('stores/delete', 'Delete', ('CHECK', 'CONFIRM'),
+          title := 'Delete the selected stores, in memory and on disk'),
+        form:button('stores/clear', 'Delete All', 'CONFIRM',
+          title := 'Delete all stores, in memory and on disk')
       )
       let $options := {
         'sort': $sort,
@@ -72,8 +71,9 @@ declare function panels:stores(
         (: the checkbox submits the name: the label of the default store is not what
            addresses it :)
         'select': 'name',
-        (: nothing but the buttons above the list, and they stay in reach :)
-        'pinned': true()
+        (: the heading and the buttons stay in reach while the list scrolls :)
+        'sticky': <h2>Stores</h2>,
+        'noun': 'store'
       }
       return table:create($headers, $entries, $buttons, {}, $options)
     }
@@ -158,8 +158,10 @@ declare function panels:entries(
           'select': 'step',
           (: what can be done with the level stays in view while its children scroll; the path
              that leads to it is stated below what acts on it :)
-          'pinned': true(),
-          'below': panels:breadcrumb($root, $steps)
+          'sticky': <h2>{ 'Store: ' || utils:label($name) }</h2>,
+          'below': panels:breadcrumb($root, $steps),
+          'empty': if (exists($steps)) then 'This level is empty.'
+            else 'The store is empty. Add an entry with Add…'
         }
         return table:create($headers, $entries, $buttons, { 'name': $name }, $options)
       }
@@ -200,14 +202,18 @@ declare %private function panels:buttons(
   $editable  as xs:boolean,
   $store     as xs:boolean
 ) as element()+ {
-  <button type='button' onclick='showDialog("add")'>{
+  <button type='button' onclick='showDialog("add")' title='Add an entry'>{
     attribute disabled { }[not($editable)], 'Add…'
   }</button>,
-  form:button('stores/remove', 'Remove', ('CHECK', 'CONFIRM'))[$editable],
+  form:button('stores/remove', 'Remove', ('CHECK', 'CONFIRM'),
+    title := 'Remove the selected entries')[$editable],
   if ($store) {
-    form:button('stores/write', 'Write'),
-    form:button('stores/read', 'Read', 'CONFIRM'),
-    form:button('stores/close', 'Close')
+    form:button('stores/write', 'Write',
+          title := 'Save the store to disk now, rather than at shutdown'),
+    form:button('stores/read', 'Read', 'CONFIRM',
+          title := 'Discard the changes in memory, and read the store from disk'),
+    form:button('stores/close', 'Close',
+          title := 'Save the store to disk if it was changed, and remove it from memory')
   }
 };
 
@@ -271,16 +277,26 @@ declare function panels:value(
 (:~
  : Creates the contents of the value panel; the value itself is held by the editor.
  : @param  $value  value properties, as returned by panels:value
+ : @param  $name   selected store
+ : @param  $path   path of the value
  : @return panel contents; empty if the path leads to no value
  :)
 declare function panels:value-panel(
-  $value  as utils:editor
+  $value  as utils:editor,
+  $name   as xs:string?,
+  $path   as item()*
 ) as element()* {
   (: nothing is shown: the panel is not shown either, so it needs no placeholder :)
   if ($value?exists) {
+    (: the value is named by the last step of its path, as the list of its level names it :)
+    <h2>{
+      'Value: ' || (if (count($path) = 1) then string($path) else
+        panels:label(store:get(head($path), $name), tail($path)))
+    }</h2>,
     <div class='buttons'>{
       (: enabled by the client once it knows that the value can be edited :)
-      <button type='button' id='save-value' onclick='saveValue()' disabled=''>Replace</button>
+      <button type='button' id='save-value' onclick='saveValue()' disabled=''
+              title='Save the edited value'>Save</button>
     }</div>,
     <div class='note warn'>{ $value?note }</div>[$value?note]
   }

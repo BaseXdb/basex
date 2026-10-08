@@ -30,13 +30,15 @@ declare record html:action-options(
 
 (:~ Options of a content panel; see html:panel. :)
 declare record html:panel-options(
-  id         as xs:string?,
-  pane       as xs:boolean?,
-  label      as xs:string?,
-  collapsed  as xs:boolean?,
-  hidden     as xs:boolean?,
-  fold       as xs:string?,
-  extra      as node()*
+  id           as xs:string?,
+  pane         as xs:boolean?,
+  label        as xs:string?,
+  collapsed    as xs:boolean?,
+  hidden       as xs:boolean?,
+  fold         as xs:string?,
+  close        as xs:string?,
+  extra        as node()*,
+  description  as xs:string?
 );
 
 (:~
@@ -108,6 +110,12 @@ declare function html:wrap(
                   <b>{ $user }</b> · <form method='post' action='logout'>
                     <button type='submit' class='link'>logout</button>
                   </form>
+                  {
+                    (: every view is described in a section of its own :)
+                    $view[. = $config:VIEWS] ! (' · ', <a target='_blank' rel='noopener'
+                      href='https://docs.basex.org/main/DBA#{ . }'
+                      title='{ 'Documentation of the ' || utils:capitalize(.) || ' view' }'>?</a>)
+                  }
                 </div>
               }
             }
@@ -162,6 +170,11 @@ declare function html:wrap(
       <hr/>
       <footer><sup>BaseX Team, BSD License</sup></footer>
       {
+        (: what changes while a view refreshes itself is announced to screen readers; it is
+           not shown, as the panels show it already :)
+        <div id='announce' class='sr-only' aria-live='polite'/>
+      }
+      {
         (: the dialogs that replace the browser's confirm and prompt: every page has them,
            and 'method=dialog' hands the clicked button's value back as the answer :)
         (: the answers are supplied by the question, so the row is filled by askQuestion :)
@@ -203,7 +216,10 @@ declare function html:wrap(
  :   * collapsed: whether the panel opens folded away
  :   * hidden: whether the panel is left out; by default, one with nothing to show is
  :   * fold: 'right' if the panel folds towards the right edge
+ :   * close: client call that clears the selection the panel shows; a cross in its corner
+ :     makes it
  :   * extra: content beside the block, which a pushed panel does not replace
+ :   * description: what the panel holds, stated by the strip it folds to
  : @return panel
  :)
 declare function html:panel(
@@ -218,6 +234,7 @@ declare function html:panel(
     'hidden'[$options?hidden otherwise empty($contents)]
   ), ' ') }'>{
     $options?label ! attribute data-label { . },
+    $options?description ! attribute data-description { . },
     $options?fold ! attribute data-fold { . },
     (: the contents get a block of their own if they scroll or are replaced :)
     if ($pane or $id) then (
@@ -229,8 +246,24 @@ declare function html:panel(
     ) else (
       $contents
     ),
-    $options?extra
+    $options?extra,
+    (: beside the block, so that it is not replaced with it; a folded panel hides it :)
+    $options?close ! <button type='button' class='dismiss' onclick='{ . }'
+      title='{ 'Close ' || $options?label }'>×</button>
   }</div>
+};
+
+(:~
+ : Creates a symbol that a screen reader reads as a word.
+ : @param  $symbol  symbol that is shown
+ : @param  $text    text that is read instead
+ : @return symbol
+ :)
+declare function html:symbol(
+  $symbol  as xs:string,
+  $text    as xs:string
+) as element(span) {
+  <span><span aria-hidden='true'>{ $symbol }</span><span class='sr-only'>{ $text }</span></span>
 };
 
 (:~

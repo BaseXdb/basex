@@ -56,7 +56,7 @@ function showLevel() {
  * @returns {Promise} promise
  */
 async function newStore() {
-  const name = await promptDialog("Name of the store:");
+  const name = await promptDialog("Name of the new store:");
   if(!name) return;
   if(name === _store) {
     showDialog("add");
@@ -135,7 +135,7 @@ function showValue(json) {
 function saveValue() {
   // the level lists the value that has just changed
   return saveEditor("store-save", { name: _store, path: pathToString(selectionPath()) },
-    "Value was stored.", refreshEntries);
+    "Value was saved.", refreshEntries);
 }
 
 /**

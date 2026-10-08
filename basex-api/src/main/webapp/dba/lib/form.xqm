@@ -28,15 +28,18 @@ declare function form:option(
  : @param  $value    value
  : @param  $checked  checked state
  : @param  $label    label
+ : @param  $title    tooltip
  : @return checkbox
  :)
 declare function form:checkbox(
   $name     as xs:string,
   $value    as xs:string,
   $checked  as xs:boolean,
-  $label    as xs:string
+  $label    as xs:string,
+  $title    as xs:string? := ()
 ) as node()+ {
   element label {
+    $title ! attribute title { . },
     element input {
       attribute type { 'checkbox' },
       attribute name { $name },
@@ -71,15 +74,18 @@ declare function form:select(
  : @param  $action   button action
  : @param  $label    label
  : @param  $options  options: 'CONFIRM' (ask before the action is run), 'CHECK' (consider checkboxes)
+ : @param  $title    tooltip
  : @return button
  :)
 declare function form:button(
   $action   as xs:string,
   $label    as xs:string,
-  $options  as enum('CONFIRM', 'CHECK')* := ()
+  $options  as enum('CONFIRM', 'CHECK')* := (),
+  $title    as xs:string? := ()
 ) as element(button) {
   <button>{
     attribute formaction { $action },
+    $title ! attribute title { . },
     attribute onclick { `return confirmAction(this, "{ $label }");` }[$options = 'CONFIRM'],
     attribute data-check { 'check' }[$options = 'CHECK'],
     $label
@@ -91,15 +97,17 @@ declare function form:button(
  : @param  $label    field label
  : @param  $control  input control and supplementary content
  : @param  $class    additional class, e.g. 'stacked' for labels above their control
+ : @param  $title    tooltip of the label
  : @return field
  :)
 declare function form:field(
   $label    as xs:string,
   $control  as item()*,
-  $class    as xs:string? := ()
+  $class    as xs:string? := (),
+  $title    as xs:string? := ()
 ) as element(div) {
   <div class='field{ $class ! (' ' || .) }'>{
-    <span>{ $label }</span>,
+    <span>{ $title ! attribute title { . }, $label }</span>,
     <div>{ $control }</div>
   }</div>
 };
@@ -144,7 +152,7 @@ declare function form:dialog(
   <dialog id='{ $id }-dialog'>
     <form method='post' action='{ $action }' autocomplete='off'>{
       attribute enctype { 'multipart/form-data' }[$upload],
-      attribute onsubmit { 'uploading(this);' }[$upload],
+      attribute onsubmit { 'uploading(this, event);' }[$upload],
       <h2>{ $title }</h2>,
       $fields,
       <div class='buttons'>{
@@ -174,7 +182,7 @@ declare function form:upload(
 ) as element(form) {
   (: the upload is announced, as it may take a while :)
   <form method='post' action='{ $action }' enctype='multipart/form-data' autocomplete='off'
-        onsubmit='uploading(this);'>{
+        onsubmit='uploading(this, event);'>{
     $fields,
     <input type='file' name='files' id='{ $id }' hidden=''
            onchange='this.form.requestSubmit();'>{
@@ -206,14 +214,14 @@ declare function form:prompt(
 };
 
 (:~ Index options that can be assigned when a database is created and optimized. :)
-(: an option that names an index of its own is set apart by a heading; 'create' marks the ones
-   that are reserved for new databases :)
+(: the full-text index heads the options that refine it; 'create' marks the ones that are
+   reserved for new databases :)
 declare %private variable $form:INDEX-OPTIONS := (
-  { 'name': 'textindex', 'label': 'Text Index', 'index': true() },
-  { 'name': 'attrindex', 'label': 'Attribute Index', 'index': true() },
-  { 'name': 'tokenindex', 'label': 'Token Index', 'index': true() },
+  { 'name': 'textindex', 'label': 'Text Index' },
+  { 'name': 'attrindex', 'label': 'Attribute Index' },
+  { 'name': 'tokenindex', 'label': 'Token Index' },
   { 'name': 'updindex', 'label': 'Incremental Indexing', 'create': true() },
-  { 'name': 'ftindex', 'label': 'Fulltext Index', 'index': true() },
+  { 'name': 'ftindex', 'label': 'Full-Text', 'heading': true() },
   { 'name': 'ftmixed', 'label': 'Mixed Content' },
   { 'name': 'stemming', 'label': 'Stemming' },
   { 'name': 'casesens', 'label': 'Case Sensitivity' },
@@ -221,31 +229,38 @@ declare %private variable $form:INDEX-OPTIONS := (
 );
 
 (:~
- : Returns the index options that a dialog offers.
- : @param  $create  include the options that are reserved for new databases
- : @return options
- :)
-declare %private function form:index-list(
-  $create  as xs:boolean
-) as map(*)+ {
-  $form:INDEX-OPTIONS[$create or empty(?create)]
-};
-
-(:~
  : Creates the index options of a database dialog.
  : @param  $opts    checked options
- : @param  $create  include the options that are reserved for new databases
+ : @param  $create  show the options that are reserved for new databases, instead of the others
  : @return form fields
  :)
 declare function form:index-options(
   $opts    as xs:string*,
-  $create  as xs:boolean
+  $create  as xs:boolean := false()
 ) as node()+ {
   (: kept next to form:index-map, which turns the same options into the arguments of the
      database operation :)
-  for $option in form:index-list($create)
+  for $option in $form:INDEX-OPTIONS[$create = exists(?create)]
   let $checkbox := form:option($option?name, $option?label, $opts)
-  return if ($option?index) then <h3>{ $checkbox }</h3> else $checkbox
+  return if ($option?heading) then <h3>{ $checkbox }</h3> else $checkbox
+};
+
+(:~
+ : Creates the index fields of a database dialog: the options, and the full-text settings.
+ : @param  $opts     checked options
+ : @param  $lang     language
+ : @param  $include  element names of the full-text index
+ : @return form fields
+ :)
+declare function form:index-fields(
+  $opts     as xs:string*,
+  $lang     as xs:string?,
+  $include  as xs:string? := ()
+) as node()+ {
+  form:index-options($opts),
+  (: the full-text settings follow the full-text options they refine :)
+  form:language-field($lang),
+  form:ftinclude-field($include)
 };
 
 (:~
@@ -257,8 +272,36 @@ declare function form:language-field(
   $lang  as xs:string?
 ) as element(div) {
   (: the field is labeled, so it belongs to the fields of a dialog, not to the flags of the
-     index options :)
-  form:field('Language:', <input type='text' name='lang' value='{ $lang }'/>)
+     index options. The languages are suggested by form:languages :)
+  form:field('Language:', <input type='text' name='lang' value='{ $lang }' list='languages'/>)
+};
+
+(:~
+ : Creates the list of languages that the language fields of a page suggest.
+ : @return list
+ :)
+declare function form:languages() as element(datalist) {
+  (: once per page, outside the panels that are pushed again. The languages are suggested by
+     name, which is how the database reports its own; a code can be typed as well :)
+  <datalist id='languages'>{
+    for $language in ft:languages()
+    order by $language?stemmer descending, $language?name
+    return <option value='{ $language?name }'>{
+      $language?code || ' · stemmer'[$language?stemmer]
+    }</option>
+  }</datalist>
+};
+
+(:~
+ : Checks whether a language is recognized, as a code with an optional region, or by its name.
+ : @param  $lang  language
+ : @return result of check
+ :)
+declare %private function form:language(
+  $lang  as xs:string
+) as xs:boolean {
+  let $code := lower-case(substring-before($lang || '-', '-'))
+  return exists(ft:languages()[?code = $code or ?name = $lang])
 };
 
 (:~
@@ -272,7 +315,8 @@ declare function form:ftinclude-field(
   (: the names are what Mixed Content refers to: string values are indexed for these
      elements, so the option is rejected if no name is supplied :)
   form:field('Full-text names:', <input type='text' name='ftinclude' value='{ $names }'
-    placeholder='name, *:name, Q{{uri}}name'/>)
+    placeholder='name, *:name, Q{{uri}}name'/>,
+    title := 'Elements whose texts are indexed; with Mixed Content, their whole string values')
 };
 
 (:~
@@ -290,9 +334,13 @@ declare function form:index-map(
   $create   as xs:boolean
 ) as map(*) {
   {
-    for $option in form:index-list($create)
+    for $option in $form:INDEX-OPTIONS[$create or empty(?create)]
     return { $option?name: $opts = $option?name },
-    $lang ! { 'language': . },
+    (: an unknown language would be ignored by the full-text index without notice :)
+    $lang[.] ! (
+      if (form:language(.)) then { 'language': . }
+      else error((), `Unknown language: "{ . }".`)
+    ),
     $include ! { 'ftinclude': . }
   }
 };

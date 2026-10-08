@@ -51,23 +51,31 @@ function dba:databases(
   return (
     html:panel(panels:databases('', 1, $name),
       { 'id': 'databases-panel', 'label': 'Databases', 'collapsed': $fold }),
-    html:panel($database, { 'id': 'database-panel', 'label': 'Database' }),
+    html:panel($database,
+      { 'id': 'database-panel', 'label': 'Database', 'close': 'selectDatabase("")' }),
     (: the editor is created once and outlives the panel above it, which is redrawn :)
     html:panel(panels:resource($name, $resource, $document), {
       'id'   : 'resource-panel',
       'label': 'Resource',
+      'close': 'selectResource("")',
       'pane' : false(),
       'extra': <textarea id='editor' spellcheck='false'>{ $document?text }</textarea>
     }),
-    (: both sit at the right edge, so both fold that way; only the last one does so by default.
-       The backups are shown on the top level, and step back once a database is chosen :)
+    (: the last three sit at the right edge, so all fold that way; only the last one does so by
+       default. The backups are shown on the top level, and step back once a database is chosen :)
     html:panel(panels:backups($name), {
-      'id': 'backups-panel', 'label': 'Backups', 'collapsed': boolean($name), 'fold': 'right'
+      'id': 'backups-panel', 'label': 'Backups', 'collapsed': boolean($name), 'fold': 'right',
+      'description': 'the backups of the database, or of the users, services and stores'
     }),
     (: reports, not steps of the work: they are opened when they are asked for :)
-    html:panel($index, { 'id': 'index-panel', 'label': 'Indexes', 'collapsed': true() }),
+    html:panel($index,
+      { 'id': 'index-panel', 'label': 'Indexes', 'collapsed': true(), 'fold': 'right',
+        'description': 'the entries of the indexes of the database' }),
     html:panel($information,
-      { 'id': 'information-panel', 'label': 'Information', 'collapsed': true() })
+      { 'id': 'information-panel', 'label': 'Information', 'collapsed': true(),
+        'description': 'the properties and options of the database' }),
+    (: what the language fields of the dialogs suggest :)
+    form:languages()
   ) => html:wrap({
     'header' : $dba:CAT,
     'columns': ('20fr', '25fr', '35fr', '20fr', '20fr', '20fr'),
@@ -212,21 +220,33 @@ declare
   %rest:POST
   %rest:path('/dba/databases/create')
 function dba:create() {
-  utils:dispatch($dba:CAT, fn($args) { {
-    'params': { 'name': $args?name },
-    'info'  : utils:info($args?name, 'database', 'created'),
-    'run'   : %updating fn() {
-      if (db:exists($args?name)) then (
-        error((), 'Database already exists.')
-      ) else (
-        (: without an input, an empty database is created :)
-        db:create($args?name, $args?input[.], (), {
-          form:index-map($args?opts, $args?lang, $args?ftinclude, true()),
-          form:parsing-map($args?opts, $args?filter, $args?parser)
-        })
-      )
+  utils:dispatch($dba:CAT, fn($args) {
+    let $files := utils:files($args?files)
+    let $input := $args?input[.]
+    return {
+      'params': { 'name': $args?name },
+      'info'  : utils:info($args?name, 'database', 'created'),
+      'run'   : %updating fn() {
+        if (db:exists($args?name)) then (
+          error((), 'Database already exists.')
+        ) else (
+          (: without an input, an empty database is created. Uploaded files are stored under
+             their names, as binaries if requested; an input on the server is expanded below
+             the root :)
+          db:create($args?name,
+            (
+              for value $content in $files
+              return if ($args?binary) then $content else fetch:binary-doc($content),
+              $input
+            ),
+            (map:keys($files), $input ! ''), {
+              form:index-map($args?opts, $args?lang, $args?ftinclude, true()),
+              form:parsing-map($args?opts, $args?filter, $args?parser)
+            })
+        )
+      }
     }
-  } })
+  })
 };
 
 (:~
@@ -287,7 +307,7 @@ declare
   %rest:POST
   %rest:path('/dba/databases/rename')
 function dba:rename() {
-  utils:dispatch($dba:CAT, dba:rename-database(?, 'renamed', db:alter#2))
+  utils:dispatch($dba:CAT, dba:rename-database(?, 'renamed', db:alter#2, true()))
 };
 
 (:~
@@ -299,7 +319,7 @@ declare
   %rest:POST
   %rest:path('/dba/databases/copy')
 function dba:copy() {
-  utils:dispatch($dba:CAT, dba:rename-database(?, 'copied', db:copy#2))
+  utils:dispatch($dba:CAT, dba:rename-database(?, 'copied', db:copy#2, false()))
 };
 
 (:~
@@ -345,10 +365,12 @@ function dba:backup-create() {
     let $name := string($args?name)
     return {
       'params': { 'name': $name },
-      'info'  : utils:info($name, 'database', 'backed up'),
+      (: an empty name addresses the data that belongs to no database :)
+      'info'  : if ($name) then utils:info($name, 'database', 'backed up')
+                else 'Users, services, and stores were backed up.',
       'run'   : %updating fn() {
         db:create-backup($name, {
-          'comment': $args?comment, 'compress': boolean($args?compress)
+          'comment': string($args?comment), 'compress': boolean($args?compress)
         })
       }
     }
@@ -587,20 +609,22 @@ function dba:index-drop() {
  : @param  $args    request parameters
  : @param  $action  action label (past tense)
  : @param  $update  database operation
+ : @param  $select  select the new database afterwards
  : @return action
  :)
 declare %private function dba:rename-database(
   $args    as map(*),
   $action  as xs:string,
-  $update  as %updating fn(*)
+  $update  as %updating fn(*),
+  $select  as xs:boolean
 ) as utils:action {
   (: both take a new name and reject one that is assigned already :)
   (: the name that was offered for editing is the current one: keeping it is no conflict :)
   let $exists := $args?newname != $args?name and db:exists($args?newname)
   return {
     (: an operation that fails leaves the database it was started from selected :)
-    'params': { 'name': if ($exists) then $args?name else $args?newname },
-    'info'  : utils:info($args?name, 'database', $action),
+    'params': { 'name': if ($select and not($exists)) then $args?newname else $args?name },
+    'info'  : `Database "{ $args?name }" was { $action } to "{ $args?newname }".`,
     'run'   : %updating fn() {
       if ($exists) then (
         error((), 'Database already exists.')

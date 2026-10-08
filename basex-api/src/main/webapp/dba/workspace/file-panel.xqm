@@ -23,7 +23,8 @@ declare function panel:files(
   $sort  as xs:string,
   $dir   as xs:string?
 ) as element()+ {
-  let $dir := config:files-dir($dir)
+  (: a remembered directory that is gone falls back to the default; the client adopts it :)
+  let $dir := try { config:files-dir($dir) } catch file:* { config:files-dir(()) }
   (: the parent directory is reached via a button, not via a table row :)
   let $parent := file:parent($dir)
   return (
@@ -72,10 +73,13 @@ declare function panel:files(
         <button type='button' onclick='enterDir("..")' title='Go to the parent directory'>{
           attribute disabled { }[not($parent)], '..'
         }</button>,
-        <button type='button' onclick='createDir()'>New…</button>,
-        form:button('workspace/delete', 'Delete', ('CHECK', 'CONFIRM')),
-        form:button('files-download', 'Download', 'CHECK'),
-        <button type='button' onclick='chooseUpload("upload")'>Upload…</button>
+        <button type='button' onclick='createDir()' title='Create a new directory'>New…</button>,
+        form:button('workspace/delete', 'Delete', ('CHECK', 'CONFIRM'),
+          title := 'Delete the selected files and empty directories'),
+        form:button('files-download', 'Download', 'CHECK',
+          title := 'Download the selected files'),
+        <button type='button' onclick='chooseUpload("upload")'
+                title='Upload files to this directory'>Upload…</button>
       }</div>
     )
     (: the entries are sorted before they are truncated, so the order covers every file :)
@@ -84,7 +88,8 @@ declare function panel:files(
       (: a directory is listed as a whole; its files are not spread over pages :)
       'all': true(),
       (: the panel scrolls as a whole, so its actions are pinned to the top of it :)
-      'pinned': true()
+      'pinned': true(),
+      'empty': 'The directory is empty.'
     }
     return table:create($headers, $entries, $buttons, {}, $options)
     }</form>,

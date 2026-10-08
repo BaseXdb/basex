@@ -36,7 +36,8 @@ function dba:stores(
      entry that is looked at is chosen, and the first one if the address names none :)
   let $level := panels:steps($path)
   let $selected := if (empty($level)) { $key[.] otherwise panels:first-key($name) }
-  let $value := panels:value($name, ($level, $selected))
+  let $value-path := ($level, $selected)
+  let $value := panels:value($name, $value-path)
   (: a panel is labelled in the markup, not by its heading: it keeps its name while it is
      folded away, and while it has nothing to show and is hidden :)
   return (
@@ -45,7 +46,7 @@ function dba:stores(
       { 'id': 'entries-panel', 'label': 'Entries' }),
     (: the editor is created once and outlives the panel above it, which is redrawn. The block
        above it is no pane: a pane claims its share of the height, which the editor needs :)
-    html:panel(panels:value-panel($value), {
+    html:panel(panels:value-panel($value, $name, $value-path), {
       'id'   : 'value-panel',
       'label': 'Value',
       'pane' : false(),
@@ -156,7 +157,7 @@ declare
 function dba:write() {
   utils:dispatch($dba:CAT, fn($args) { {
     'params': { 'name': $args?name },
-    'info'  : utils:info($args?name, 'store', 'written to disk'),
+    'info'  : utils:info($args?name ! utils:label(.), 'store', 'written to disk'),
     'run'   : %updating fn() { store:write($args?name) }
   } })
 };
@@ -172,7 +173,7 @@ declare
 function dba:read() {
   utils:dispatch($dba:CAT, fn($args) { {
     'params': { 'name': $args?name },
-    'info'  : utils:info($args?name, 'store', 'read from disk'),
+    'info'  : utils:info($args?name ! utils:label(.), 'store', 'read from disk'),
     'run'   : %updating fn() { store:read($args?name) }
   } })
 };
@@ -188,7 +189,7 @@ declare
 function dba:close() {
   utils:dispatch($dba:CAT, fn($args) { {
     'params': { 'name': $args?name },
-    'info'  : utils:info($args?name, 'store', 'closed'),
+    'info'  : utils:info($args?name ! utils:label(.), 'store', 'closed'),
     'run'   : %updating fn() { store:close($args?name) }
   } })
 };
@@ -203,7 +204,7 @@ declare
   %rest:path('/dba/stores/delete')
 function dba:delete() {
   utils:dispatch($dba:CAT, fn($args) { {
-    'info': utils:info($args?name, 'store', 'deleted'),
+    'info': utils:info($args?name ! utils:label(.), 'store', 'deleted'),
     (: the selection is not passed on: the store it named is gone :)
     'run' : %updating fn() { $args?name ! store:delete(.) }
   } })
@@ -219,7 +220,7 @@ declare
   %rest:path('/dba/stores/clear')
 function dba:clear() {
   utils:dispatch($dba:CAT, fn($args) { {
-    'info': 'All stores were cleared.',
+    'info': 'All stores were deleted.',
     'run' : %updating fn() { store:clear() }
   } })
 };

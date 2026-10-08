@@ -23,19 +23,27 @@ function dba:ws-message(
   let $json := parse-json($message)
   (: the shown job; the client stops asking for its details once they are done :)
   let $job := $json?job[.]
+  (: the sort key of a list, by the block it is filled into :)
+  let $sort := fn($id) { string($json?sorts?($id)) }
+  (: the queries of the DBA itself are only listed on demand :)
+  let $dba := $json?dba = true()
+  (: every panel is named by the block it is filled into :)
+  let $panels := {
+    'jobs-panel'   : fn() { panels:jobs($sort('jobs-panel'), $dba) },
+    (: the connection of this view is pointed out in the list of clients :)
+    'clients-panel': fn() { panels:clients(ws:id(), $json?idle = true(), $dba) },
+    'db-panel'     : fn() { panels:db-sessions($sort('db-panel')) },
+    'caches-panel' : fn() { panels:caches($sort('caches-panel')) }
+  }
+  (: a folded panel is not rendered: it is asked for once it is opened :)
+  let $open := if (map:contains($json, 'open')) then $json?open?* else map:keys($panels)
   return utils:ws-send({
     'type': 'panels',
-    (: every panel is named by the block it is filled into :)
-    'panels': {
-      'jobs-panel'  : utils:html(panels:jobs($json?sort)),
-      'web-panel'   : utils:html(panels:web-sessions()),
-      'db-panel'    : utils:html(panels:db-sessions()),
-      'ws-panel'    : utils:html(panels:websockets()),
-      'caches-panel': utils:html(panels:caches())
-    },
-    (: the details of a job are not a panel of their own: they are inserted before the
-       reports, and are left alone once they are final :)
-    'job' : utils:html(panels:job-details($job)),
+    'panels': map:build($open[map:contains($panels, .)],
+      value := fn($id) { utils:html($panels($id)()) }),
+    (: the details of a job are not a panel: they are shown in a dialog, and are left alone
+       once they are final :)
+    'job' : utils:html(panels:job-view($job)),
     'done': panels:job-done($job)
   })
 };

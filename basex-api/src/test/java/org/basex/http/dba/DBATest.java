@@ -744,8 +744,6 @@ public final class DBATest extends WebappTest {
       final String page = get("users");
       assertTrue(page.contains("class=\"panel hidden\" data-label=\"User\""),
           "user panel not hidden");
-      assertTrue(page.contains("class=\"panel hidden\" data-label=\"Permissions\""),
-          "permissions panel not hidden");
     }
 
     /**
@@ -754,7 +752,7 @@ public final class DBATest extends WebappTest {
      */
     @Test public void update() throws IOException {
       create("read");
-      assertTrue(update(USER, OTHER, "write").contains("was updated"), "user not updated");
+      assertTrue(update(USER, OTHER, "write").contains("was saved"), "user not updated");
       final String page = get("users?name=" + OTHER);
       assertTrue(page.contains("User: " + OTHER), "renamed user not shown");
       assertTrue(page.contains("<option selected=\"\">write</option>"), "permission not changed");
@@ -790,11 +788,13 @@ public final class DBATest extends WebappTest {
     @Test public void patterns() throws IOException {
       create("read");
       assertTrue(post("users/pattern-add",
-          Map.of("name", USER, "pattern", "unit*", "perm", "write")).contains("was created"),
+          Map.of("name", USER, "pattern", "unit*", "perm", "write")).contains("was added"),
           "pattern not added");
-      assertTrue(get("users?name=" + USER).contains("unit*"), "pattern not listed");
+      final String page = get("users?name=" + USER);
+      assertTrue(page.contains("<code>unit*</code>"), "pattern not listed in the user form");
+      assertTrue(page.contains("read +1"), "pattern not counted in the user list");
       assertTrue(post("users/pattern-drop", Map.of("name", USER, "pattern", "unit*")).
-          contains("was dropped"), "pattern not dropped");
+          contains("was deleted"), "pattern not dropped");
     }
 
     /**
@@ -802,7 +802,7 @@ public final class DBATest extends WebappTest {
      * @throws IOException I/O exception
      */
     @Test public void adminHasNoPatterns() throws IOException {
-      assertFalse(get("users?name=admin").contains("Local Permissions"), "panel shown for admin");
+      assertFalse(get("users?name=admin").contains("Per database:"), "field shown for admin");
     }
 
     /**
@@ -811,7 +811,7 @@ public final class DBATest extends WebappTest {
      */
     @Test public void globalInformation() throws IOException {
       assertTrue(post("users/info", Map.of("info", "<info><junit/></info>")).
-          contains("User information was updated."), "information not updated");
+          contains("General user data was saved."), "information not updated");
       assertTrue(get("users").contains("junit"), "information not shown");
       post("users/info", Map.of("info", ""));
     }
@@ -1197,13 +1197,13 @@ public final class DBATest extends WebappTest {
   }
 
   /**
-   * Tests for the web sessions panel of the Activity view.
+   * Tests for the web sessions of the clients panel of the Activity view.
    */
   @Nested final class Sessions {
     /** Test attribute. */
     private static final String ATTRIBUTE = "dba-junit-attribute";
-    /** Pattern that isolates the id of a session from its label. */
-    private static final Pattern SESSION = Pattern.compile("data-session=\"(.*?)\"");
+    /** Pattern that isolates the id of a session from its checkbox. */
+    private static final Pattern SESSION = Pattern.compile("name=\"session\" value=\"(.*?)\"");
 
     /**
      * Removes the test attribute from all sessions after each test.
@@ -1229,7 +1229,7 @@ public final class DBATest extends WebappTest {
     @Test public void assign() throws Exception {
       final String id = session();
       assertTrue(post("sessions/set", Map.of("id", id, "name", ATTRIBUTE, "value", "1 + 1")).
-          contains("Attribute \"" + ATTRIBUTE + "\" was assigned."), "attribute not assigned");
+          contains("Attribute \"" + ATTRIBUTE + "\" was saved."), "attribute not assigned");
       assertTrue(get("activity").contains(ATTRIBUTE), "attribute missing from the panel");
 
       assertTrue(post("sessions/delete", Map.of("id", id, "name", ATTRIBUTE)).
@@ -1262,7 +1262,7 @@ public final class DBATest extends WebappTest {
     }
 
     /**
-     * A session that holds no attribute is listed, and can be closed.
+     * A session that holds no attribute is listed while it is in use, and can be closed.
      * @throws Exception exception
      */
     @Test public void empty() throws Exception {
@@ -1272,10 +1272,13 @@ public final class DBATest extends WebappTest {
       assertFalse(post("login", Map.of("_name", "admin", "_pass", NAME)).contains("_pass"),
           "second login failed");
       execute("sessions:delete('" + id + "', 'dba')");
-      assertTrue(get("activity").contains("value=\"" + id + "\""),
+      // it was accessed just now, so it is not idle
+      final String page = get("activity");
+      assertTrue(page.contains("value=\"" + id + "\""),
           "session that holds no attribute is not listed");
-      assertTrue(post("sessions/close", Map.of("id", id)).
-          contains("Session \"" + id + "\" was closed."), "session not closed");
+      assertTrue(page.contains("Show idle (0)"), "session in use is counted as idle");
+      assertTrue(post("clients/close", Map.of("session", id)).
+          contains("Client \"" + id + "\" was closed."), "session not closed");
       assertFalse(sessions().contains(id), "closed session still listed");
     }
 
@@ -1337,6 +1340,30 @@ public final class DBATest extends WebappTest {
     }
 
     /**
+     * The keys and values of a cache are shown.
+     * @throws Exception exception
+     */
+    @Test public void entries() throws Exception {
+      assertTrue(get("cache-keys?name=" + CACHE).contains("\"key\""), "key missing");
+      assertTrue(get("cache-value?name=" + CACHE + "&key=key").contains("value"),
+          "value missing");
+    }
+
+    /**
+     * An entry is assigned, and several entries are removed at once.
+     * @throws Exception exception
+     */
+    @Test public void putRemove() throws Exception {
+      assertTrue(post("caches/put", Map.of("name", CACHE, "key", "k2", "value", "1 to 3")).
+          contains("Entry \"k2\" was saved."), "entry not saved");
+      assertTrue(get("cache-value?name=" + CACHE + "&key=k2").contains("(1, 2, 3)"),
+          "value not assigned");
+      assertEquals("2 entries were removed.",
+          post("cache-remove?name=" + CACHE + "&key=key&key=k2", ""));
+      assertTrue(get("cache-keys?name=" + CACHE).contains("\"count\":0"), "entries still listed");
+    }
+
+    /**
      * A cache is deleted.
      * @throws Exception exception
      */
@@ -1352,7 +1379,7 @@ public final class DBATest extends WebappTest {
      */
     @Test public void clear() throws Exception {
       assertTrue(post("caches/clear", Map.of()).
-          contains("All caches and their options were cleared."), "caches not cleared");
+          contains("All caches and their options were deleted."), "caches not cleared");
       assertFalse(get("activity").contains(CACHE), "cache still listed");
     }
   }
@@ -1420,9 +1447,9 @@ public final class DBATest extends WebappTest {
     /**
      * A map key is stored as a string: a key of another type could only be addressed by its
      * position, which would make its value read-only.
-     * @throws IOException I/O exception
+     * @throws Exception exception
      */
-    @Test public void stringKey() throws IOException {
+    @Test public void stringKey() throws Exception {
       add("", false, "'map'", "{ 'a': 1 }");
       assertTrue(add("map", false, "'abcde'", "'text'").contains("Entry \"abcde\" was added."),
           "child not added");
@@ -1431,8 +1458,8 @@ public final class DBATest extends WebappTest {
       assertTrue(level.contains("data-select=\"abcde\""), "key not addressed by itself");
       assertFalse(level.contains("{&quot;pos&quot;"), "key addressed by its position");
 
-      final String value = get("stores?name=" + STORE + "&path=map.abcde");
-      assertTrue(value.contains(">\"text\"</textarea>"), "value not shown in the editor");
+      final String value = value("map.abcde");
+      assertTrue(value.contains("\\\"text\\\""), "value not shown in the editor");
       assertFalse(value.contains("Read-only"), "value reported as read-only");
     }
 
@@ -1467,7 +1494,7 @@ public final class DBATest extends WebappTest {
     }
 
     /**
-     * The store opens on the entry that its first row shows, which is sorted ignoring case.
+     * The entries are sorted ignoring case, and the first one is looked at if none is chosen.
      * @throws IOException I/O exception
      */
     @Test public void firstEntry() throws IOException {
@@ -1477,11 +1504,9 @@ public final class DBATest extends WebappTest {
       final String page = get("stores?name=" + STORE);
       assertTrue(page.indexOf("data-select=\"apple\"") < page.indexOf("data-select=\"Zoo\""),
           "entries not sorted, ignoring case");
-      // the store list marks the chosen store in the same way, and comes first: the entry
-      // that is looked at is the one that its own panel points out
+      // the store list marks the chosen store in the same way, and comes first
       final Matcher matcher = SELECTED.matcher(page.substring(page.indexOf(ENTRIES)));
-      assertTrue(matcher.find(), "no entry is looked at");
-      assertEquals("apple", matcher.group(1), "entry of the first row is not the one looked at");
+      assertTrue(matcher.find() && matcher.group(1).equals("apple"), "first entry not shown");
     }
 
     /**
@@ -1511,14 +1536,13 @@ public final class DBATest extends WebappTest {
 
     /**
      * A key is an expression: what it yields is the key, with its type.
-     * @throws IOException I/O exception
+     * @throws Exception exception
      */
-    @Test public void typedKey() throws IOException {
+    @Test public void typedKey() throws Exception {
       add("", false, "'map'", "{}");
       assertTrue(add("map", false, "1", "'int'").contains("Entry \"1\" was added."),
           "child not added");
-      assertTrue(get("stores?name=" + STORE + "&path=map.1").contains(">\"int\"</textarea>"),
-          "integer key not addressed by its value");
+      assertTrue(value("map.1").contains("\\\"int\\\""), "integer key not addressed by its value");
 
       assertTrue(add("map", false, "'1'", "'string'").contains("was added"),
           "string key rejected as the integer one");
@@ -1551,6 +1575,18 @@ public final class DBATest extends WebappTest {
         final String value) throws IOException {
       return post("stores/add", Map.of("name", STORE, "path", path, "index",
           String.valueOf(index), "step", step, "value", value));
+    }
+
+    /**
+     * Requests the value that a path of the test store leads to.
+     * @param path path
+     * @return message with the panel, the value and its edit state
+     * @throws Exception exception
+     */
+    private static String value(final String path) throws Exception {
+      connect("/stores");
+      return StoresSocket.panel("{ \"type\": \"value\", \"name\": \"" + STORE +
+          "\", \"path\": \"" + path + "\" }", "editor", "value-panel");
     }
   }
 
@@ -1706,22 +1742,22 @@ public final class DBATest extends WebappTest {
     }
 
     /**
-     * The admin has no local permissions to overwrite, so its panel stays empty.
+     * The admin has no local permissions to overwrite, so its panel offers none.
      * @throws Exception exception
      */
     @Test public void adminPermissions() throws Exception {
-      assertEquals("{\"type\":\"panel\",\"id\":\"permissions-panel\",\"html\":\"\"}",
-          panel("{ \"type\": \"permissions\", \"name\": \"admin\" }", "permissions-panel"));
+      final String message = panel("{ \"type\": \"user\", \"name\": \"admin\" }", "user-panel");
+      assertFalse(message.contains("Per database:"), "local permissions offered: " + message);
     }
 
     /**
-     * A local permission is listed in the permissions panel.
+     * A local permission is listed in the user panel.
      * @throws Exception exception
      */
     @Test public void permissionsPanel() throws Exception {
       execute("user:grant('" + USER + "', 'write', 'dba-junit-*')");
-      final String message = panel("{ \"type\": \"permissions\", \"name\": \"" + USER +
-          "\" }", "permissions-panel");
+      final String message = panel("{ \"type\": \"user\", \"name\": \"" + USER + "\" }",
+          "user-panel");
       assertTrue(message.contains("dba-junit-*"), "pattern missing from the panel: " + message);
     }
 

@@ -13,8 +13,6 @@ declare variable $utils:JOB := 'dba-job';
 (:~ Regular expression for XQuery files; matches the suffixes of IO.XQSUFFIXES. :)
 declare variable $utils:XQUERY-REGEX := '\.(xq|xqm|xqy|xql|xqu|xquery|xpath)$';
 
-(:~ Regular expression for backup names. :)
-declare variable $utils:BACKUP-REGEX := '^(.*)-(\d{4}-\d\d-\d\d)-(\d\d)-(\d\d)-(\d\d)$';
 (:~ Regular expression for the file names of backups. :)
 declare variable $utils:BACKUP-ZIP-REGEX := '^(.*)-(\d{4}-\d\d-\d\d)-(\d\d)-(\d\d)-(\d\d)\.zip$';
 
@@ -90,6 +88,22 @@ declare function utils:expression(
     'text': if ($truncated) then substring($text, 1, $max) else $text,
     'truncated': $truncated
   }
+};
+
+(:~
+ : Returns a value as the expression that yields it again.
+ : @param  $value  value
+ : @return expression, and the reason why it cannot be edited
+ :)
+declare function utils:value(
+  $value  as item()*
+) as map(*) {
+  let $expression := utils:expression($value)
+  return if ($expression?truncated) then (
+    { 'text': '', 'note': 'The value is too large to be shown; supply a new one.' }
+  ) else (
+    { 'text': $expression?text, 'note': '' }
+  )
 };
 
 (:~
@@ -498,6 +512,17 @@ declare function utils:page(
   (: the context path is not included: web:redirect resolves absolute locations against the
      request URI, and thus adds it already :)
   '/dba/' || $page
+};
+
+(:~
+ : Returns the label of a store or a cache, whose default one is named by the empty string.
+ : @param  $name  name
+ : @return label
+ :)
+declare function utils:label(
+  $name  as xs:string
+) as xs:string {
+  $name[.] otherwise '(default)'
 };
 
 (:~

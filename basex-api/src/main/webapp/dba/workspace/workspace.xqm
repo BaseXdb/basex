@@ -38,9 +38,9 @@ function dba:workspace() as element(html) {
         </div>
         <div>
           <button id='run' onclick='runQuery()' title='Run the query (Alt+Enter, Ctrl+Enter)'>Run</button>
-          <button id='stop' onclick='stopQuery()' disabled=''>Stop</button>
+          <button id='stop' onclick='stopQuery()' disabled='' title='Stop the running query'>Stop</button>
           <button type='button' id='job' onclick='openJob(event)' disabled=''
-                  title='Show the running query in the job view (Ctrl: new tab)'>Job</button>
+                  title='Show the running query in the Activity view (Ctrl: new tab)'>Job</button>
         </div>
         <label><input type='checkbox' id='indent' onchange='indentChanged()'/> Indent</label>
       </form>

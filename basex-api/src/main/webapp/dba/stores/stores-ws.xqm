@@ -41,7 +41,7 @@ declare %private function dba:ws-value(
   $path  as item()*
 ) as empty-sequence() {
   let $value := panels:value($name, $path)
-  return utils:ws-editor('value-panel', panels:value-panel($value), $value)
+  return utils:ws-editor('value-panel', panels:value-panel($value, $name, $path), $value)
 };
 
 (:~

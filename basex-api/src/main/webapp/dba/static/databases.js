@@ -18,6 +18,8 @@ let _note;
 
 /** Cached raw document; undefined if it must be requested again. */
 let _saved;
+/** Text the editor showed the document with; Save is enabled once it differs. */
+let _shown;
 
 /** Query and indent preference of the pending document request. */
 let _request;
@@ -25,11 +27,11 @@ let _request;
 /**
  * Shows another database. Its resources replace the ones that were listed before, and the
  * document of the previous database is closed with it.
- * @param {string} name database
+ * @param {string} name database; the selected one, or an empty string, closes it
  */
 function selectDatabase(name) {
-  if(name === _db) return;
-  _db = name;
+  // without a database, the page shows the general backups again
+  _db = name === _db ? "" : name;
   _resource = "";
   _dir = "";
   pushSelection();
@@ -37,12 +39,12 @@ function selectDatabase(name) {
 }
 
 /**
- * Shows another resource of the selected database; an empty name closes the document.
+ * Shows another resource of the selected database; an empty name, or the open one, closes the
+ * document.
  * @param {string} resource resource
  */
 function selectResource(resource) {
-  if(resource === _resource) return;
-  _resource = resource;
+  _resource = resource === _resource ? "" : resource;
   pushSelection();
   mark("database-panel", _resource);
   refreshResource();
@@ -90,9 +92,17 @@ function showDatabase() {
   mark("databases-panel", _db);
   refreshDatabase();
   refreshResource();
-  requestPanel(DB_WS, "backups-panel", { type: "backups", name: _db });
+  refreshBackups();
   requestPanel(DB_WS, "information-panel", { type: "information", name: _db });
   refreshIndex();
+}
+
+/**
+ * Requests the backups panel: the backups of the selected database, or the general ones.
+ * @param {string} sort sort key; if omitted, the shown order is kept
+ */
+function refreshBackups(sort) {
+  requestPanel(DB_WS, "backups-panel", { type: "backups", name: _db }, sort);
 }
 
 /**
@@ -101,9 +111,28 @@ function showDatabase() {
  * @param {number} page page; if omitted, the first one
  */
 function refreshIndex(sort, page) {
+  // the index that was chosen for the database, as the prefix, outlives the page
   requestPanel(DB_WS, "index-panel", { type: "index", name: _db,
-    index: fieldValue("index-select", "element-name"),
+    index: storedField("index-select", _db) || fieldValue("index-select") || "element-name",
     prefix: storedField("index-prefix", _db) }, sort, page);
+}
+
+/**
+ * Shows another index of the selected database, which is remembered for it.
+ */
+function selectIndex() {
+  storeField("index-select", _db);
+  clearPrefix();
+  refreshIndex();
+}
+
+/**
+ * Empties the prefix of the index list: it belongs to the index it was typed for.
+ */
+function clearPrefix() {
+  const prefix = document.getElementById("index-prefix");
+  if(prefix) prefix.value = "";
+  storeField("index-prefix", _db);
 }
 
 /**
@@ -209,6 +238,7 @@ function initDocument(editable, text) {
     queryResource(true, true);
   } else {
     setEditable("save-resource", editable);
+    markShown();
   }
 }
 
@@ -273,6 +303,7 @@ function showResourceResult(text) {
 function showDocument(text) {
   _editor.setValue(text);
   setEditable("save-resource", _editable);
+  markShown();
   showResourceNote(_editable && indentOn() ?
     "Whitespace may be stripped when the document is saved." : undefined);
 }
@@ -283,13 +314,6 @@ function showDocument(text) {
  */
 function showResourceNote(message) {
   showNote("note", message, _note);
-}
-
-/**
- * Copies the shown document to the clipboard.
- */
-function copyResource() {
-  copy(editorValue());
 }
 
 /**
@@ -304,8 +328,22 @@ async function saveResource() {
   if(await saveEditor("db-save", params, "Resource was saved.", refreshDatabase)) {
     // the raw document has changed: request it again
     _saved = indent ? undefined : content;
+    markShown();
   }
 }
+
+/**
+ * Takes the text of the editor as the one the document was shown with, which is nothing to save.
+ */
+function markShown() {
+  _shown = editorValue();
+  setDisabled("save-resource", true);
+}
+
+/** A document can be saved once it was edited; a query result cannot be saved at all. */
+_editor_changed = () => {
+  setDisabled("save-resource", !_editable || Boolean(_request?.input) || editorValue() === _shown);
+};
 
 /**
  * Asks for a new name for the selected database and renames it.
@@ -352,7 +390,7 @@ _indent_changed = () => queryResource(true);
 
 /** The sort and page links of the list panels are followed in place. */
 followPanelLinks({ "databases-panel": refreshDatabases, "database-panel": refreshDatabase,
-  "index-panel": refreshIndex });
+  "backups-panel": refreshBackups, "index-panel": refreshIndex });
 
 /** The controls of the list panels keep the focus and the caret while their panel is replaced. */
 _panel_focus["database-panel"] = [ "#resource-filter" ];
@@ -379,5 +417,8 @@ function initDatabases(editable) {
   initDocument(editable);
   // the lists are rendered unfiltered: what was typed for the database is asked for again
   if(restoreField("resource-filter", _db)) refreshDatabase();
-  if(restoreField("index-prefix", _db)) refreshIndex();
+  const index = storedField("index-select", _db);
+  if(restoreField("index-prefix", _db) || index && index !== fieldValue("index-select")) {
+    refreshIndex();
+  }
 }

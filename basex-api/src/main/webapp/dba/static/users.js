@@ -33,7 +33,14 @@ function adoptSelection() {
 function showUser() {
   mark("users-panel", _user);
   requestPanel(USERS_WS, "user-panel", { type: "user", name: _user });
-  requestPanel(USERS_WS, "permissions-panel", { type: "permissions", name: _user });
+}
+
+/**
+ * Opens the dialog that adds a local permission to the selected user.
+ */
+function addPattern() {
+  document.getElementById("pattern-user").value = _user;
+  showDialog("pattern");
 }
 
 /**

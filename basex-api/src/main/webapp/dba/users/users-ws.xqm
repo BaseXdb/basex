@@ -25,8 +25,6 @@ function dba:ws-message(
     (: what is pushed are the contents of the form that submits them; the form itself is the
        panel, and stays where it is :)
     case 'user'        return utils:ws-panel('user-panel', panels:user($name, (), ()))
-    case 'permissions' return utils:ws-panel('permissions-panel',
-      panels:local-permissions($name))
     default            return error((), 'Unknown message type: ' || $json?type)
   }
 };

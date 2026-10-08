@@ -30,8 +30,13 @@ declare record table:options(
   all      as xs:boolean?,
   pinned   as xs:boolean?,
   sticky   as node()*,
-  below    as node()*
+  below    as node()*,
+  noun     as xs:string?,
+  empty    as xs:string?
 );
+
+(:~ Placeholder of a missing value. :)
+declare variable $table:NONE := html:symbol('–', 'none');
 
 (:~ What a column type is ordered by, and what it is shown as. :)
 (: a type that is not listed is ordered and shown as the string it is; a column without a
@@ -40,10 +45,12 @@ declare %private variable $table:TYPES := {
   'number'  : { 'order': 'number' },
   'decimal' : { 'order': 'number',
                 'format': fn($v) { format-number(number($v otherwise 0), '0.00') } },
+  'percent' : { 'order': 'number',
+                'format': fn($v) { ($v ! format-number(number(.), '0%')) otherwise $table:NONE } },
   'bytes'   : { 'order': 'number',
                 'format': fn($v) { prof:human(xs:integer($v) otherwise 0) } },
   'dateTime': { 'order': 'date',
-                'format': fn($v) { ($v ! html:short-date(xs:dateTime(.))) otherwise '–' } },
+                'format': fn($v) { ($v ! html:short-date(xs:dateTime(.))) otherwise $table:NONE } },
   'time'    : { 'order': 'date', 'format': fn($v) { $v ! html:time(xs:dateTime(.)) } }
 };
 
@@ -85,7 +92,8 @@ declare function table:properties(
       return <tr>
         <td><b>{ upper-case($option/name()) }</b></td>
         <td>{
-          '✓'[$value = 'true'] otherwise '–'[$value = 'false'] otherwise $value
+          html:symbol('✓', 'yes')[$value = 'true'] otherwise
+          html:symbol('–', 'no')[$value = 'false'] otherwise $value
         }</td>
       </tr>
     )
@@ -124,6 +132,9 @@ declare function table:properties(
  :     underneath
  :   * 'pinned': pins the buttons alone, without content above them
  :   * 'below': content placed below the buttons, above the result summary
+ :   * 'noun': what the entries are called in the result summary (singular form; default: entry)
+ :   * 'empty': note that is shown if there are no entries; by default, it states that there are
+ :     none
  : @return table
  :)
 declare function table:create(
@@ -180,6 +191,7 @@ declare function table:create(
   (: the entries of the shown pages, but not more than a table is meant to hold :)
   let $last := min(($page * $max-option, $entries, $config:MAX-SHOWN[not($options?all)]))
 
+  let $noun := $options?noun otherwise 'entry'
   (: everything above the table :)
   let $head := (
     $options?sticky,
@@ -191,10 +203,10 @@ declare function table:create(
        stated, so that a filter that hides rows in the client can restate the summary for the
        ones it leaves instead of writing the words again; see logFilter :)
     element h3 {
-      attribute data-singular { utils:capitalize(utils:plural(1, 'entry')) },
-      attribute data-plural { utils:capitalize(utils:plural(2, 'entry')) },
+      attribute data-singular { utils:capitalize(utils:plural(1, $noun)) },
+      attribute data-plural { utils:capitalize(utils:plural(2, $noun)) },
       $entries,
-      utils:capitalize(utils:plural($entries, 'entry')),
+      utils:capitalize(utils:plural($entries, $noun)),
 
       <span class='range'>{ $last } shown</span>[$last < $entries]
     }
@@ -206,6 +218,13 @@ declare function table:create(
     ) else (
       $head
     ),
+
+    (: an empty table says why it is empty, or what is missing :)
+    if ($last = 0) {
+      <p class='note'>{
+        $options?empty otherwise ``[There are no `{ utils:plural(2, $noun) }`.]``
+      }</p>
+    },
 
     (: list of results :)
     let $shown-entries := $sorted-entries[position() <= $last]
@@ -231,7 +250,7 @@ declare function table:create(
             attribute style { 'width: ' || $header?width }[$header?width],
 
             if ($pos = 1 and $buttons) {
-              <input type='checkbox' onclick='toggle(this)'/>, ' '
+              <input type='checkbox' onclick='toggle(this)' aria-label='Select all'/>, ' '
             },
 
             if (empty($sort) or $name = $sort or not($label)) then (
@@ -272,8 +291,11 @@ declare function table:create(
           return element td {
             attribute class { 'num' }[$type = $table:NUMBER],
             if ($pos = 1 and $buttons) {
+              (: a screen reader names the entry that is selected, not only the box :)
               <input type='checkbox' name='{ $select otherwise $name }'
                 value='{ if ($select) then $entry?$select else data($value) }'
+                aria-label='{ 'Select ' || $noun || ' ' ||
+                  normalize-space(string-join($value ! string())) }'
                 onclick='buttons(this)'/>,
               ' '
             },

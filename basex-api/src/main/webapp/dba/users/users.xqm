@@ -37,7 +37,6 @@ function dba:users(
 ) as element(html) {
   (: the selection is part of the address, so a link reproduces what the panels show :)
   let $user := panels:user($name, $newname, $perm)
-  let $permissions := panels:local-permissions($name)
   return (
     html:panel(panels:users($sort, $name), { 'id': 'users-panel', 'label': 'Users' }),
     (: the form is the pane: its editor takes the height that the fields leave. It outlives
@@ -46,17 +45,19 @@ function dba:users(
       <form method='post' action='users/update' autocomplete='off' id='user-panel'
             class='pane column'>{ $user }</form>,
       { 'label': 'User', 'pane': false(), 'hidden': empty($user) }),
-    html:panel($permissions, { 'id': 'permissions-panel', 'label': 'Permissions' }),
     (: the panels follow the selection: what is attached to no user in particular steps back
        once one of them is being looked at :)
     html:panel(panels:information(),
-      { 'label': 'General User Data', 'pane': false(), 'collapsed': exists($user) })
+      { 'label': 'General User Data', 'pane': false(), 'collapsed': exists($user),
+        'description': 'custom data that belongs to no user in particular' }),
+    (: outside the panels: the user panel is a form, and is replaced when another user is shown :)
+    panels:pattern-dialog()
   ) => html:wrap({
     'header' : $dba:CAT,
     'divided': true(),
     (: the information panel is only open while no user is shown, where it is one of two
        panels: its share is what the two of them then split :)
-    'columns': ('25fr', '35fr', '25fr', '25fr'),
+    'columns': ('25fr', '50fr', '25fr'),
     'rows'   : '1fr',
     (: a view of its own: what is folded away while a user is shown is not what is folded away
        while the list is :)
@@ -126,7 +127,7 @@ function dba:update() {
         'newname': $newname,
         'perm': $args?perm
       },
-      'info'  : utils:info($newname, 'user', 'updated'),
+      'info'  : utils:info($newname, 'user', 'saved'),
       'run'   : %updating fn() {
         if ($taken) then (
           error((), 'User already exists.')
@@ -156,7 +157,7 @@ declare
   %rest:path('/dba/users/info')
 function dba:info() {
   utils:dispatch($dba:CAT, fn($args) { {
-    'info': 'User information was updated.',
+    'info': 'General user data was saved.',
     'run' : %updating fn() {
       let $xml := user-info:parse($args?info)
       where not(deep-equal(user:info(), $xml))
@@ -176,7 +177,7 @@ declare
 function dba:pattern-add() {
   utils:dispatch($dba:CAT, fn($args) { {
     'params': { 'name': $args?name },
-    'info'  : utils:info($args?pattern, 'pattern', 'created'),
+    'info'  : utils:info($args?pattern, 'database permission', 'added'),
     'run'   : %updating fn() {
       user:grant($args?name, $args?perm, $args?pattern)
     }
@@ -194,7 +195,7 @@ declare
 function dba:pattern-drop() {
   utils:dispatch($dba:CAT, fn($args) { {
     'params': { 'name': $args?name },
-    'info'  : utils:info($args?pattern, 'pattern', 'dropped'),
+    'info'  : utils:info($args?pattern, 'database permission', 'deleted'),
     'run'   : %updating fn() { $args?pattern ! user:drop($args?name, .) }
   } })
 };
