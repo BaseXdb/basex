@@ -134,7 +134,6 @@
         <artifactId>jetty-ee10-maven-plugin</artifactId>
         <version>${jettyVersion}</version>
         <configuration>
-          <jettyXmls>${basedir}/src/main/webapp/WEB-INF/jetty.xml</jettyXmls>
           <stopKey>keyToStopJetty</stopKey>
           <stopPort>8081</stopPort>
           <supportedPackagings>

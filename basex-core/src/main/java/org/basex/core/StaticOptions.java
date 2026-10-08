@@ -89,6 +89,8 @@ public final class StaticOptions extends Options {
   public static final BooleanOption RESTXQERRORS = new BooleanOption("RESTXQERRORS", true);
   /** Local (embedded) mode. */
   public static final BooleanOption HTTPLOCAL = new BooleanOption("HTTPLOCAL", true);
+  /** Port of the web server (cannot be specified in web.xml). */
+  public static final NumberOption HTTPPORT = new NumberOption("HTTPPORT", 8080);
   /** Port for stopping the web server. */
   public static final NumberOption STOPPORT = new NumberOption("STOPPORT", 8081);
   /** Default authentication method. */

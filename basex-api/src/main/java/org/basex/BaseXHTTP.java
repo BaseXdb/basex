@@ -5,7 +5,6 @@ import static org.basex.util.http.HTTPText.*;
 
 import java.io.*;
 import java.net.*;
-import java.nio.file.*;
 import java.util.Map.*;
 
 import org.basex.core.*;
@@ -44,8 +43,6 @@ public final class BaseXHTTP extends CLI {
   private boolean quiet;
   /** Stop flag. */
   private boolean stop;
-  /** HTTP port. */
-  private int port;
 
   /**
    * Main method, launching the HTTP services.
@@ -78,26 +75,15 @@ public final class BaseXHTTP extends CLI {
     final String webapp = soptions.get(StaticOptions.WEBPATH);
     final WebAppContext wac = new WebAppContext(webapp, "/");
     locate(WEBCONF, webapp);
-    final IOFile jettyXml = locate(JETTYCONF, webapp);
 
     hc = HTTPContext.get();
     hc.init(soptions);
 
     // create jetty instance
-    final URI jettyUri = Paths.get(jettyXml.toString()).toUri();
-    final Resource resource = new PathResourceFactory().newResource(jettyUri);
-    jetty = (Server) new XmlConfiguration(resource).configure();
-
+    final int port = soptions.get(StaticOptions.HTTPPORT);
+    jetty = jetty(new IOFile(webapp, JETTYCONF), port);
     jetty.setHandler(soptions.get(StaticOptions.GZIP) ? gzip(wac) : wac);
     JakartaWebSocketServletContainerInitializer.configure(wac, null);
-
-    ServerConnector sc = null;
-    for(final Connector conn : jetty.getConnectors()) {
-      if(conn instanceof final ServerConnector s) sc = s;
-    }
-    if(sc == null) throw new BaseXException("No Jetty connector defined in " + JETTYCONF + '.');
-    if(port != 0) sc.setPort(port);
-    else port = sc.getPort();
 
     // info strings
     final String started = Util.info(HTTP + ' ' + SRV_STARTED_PORT_X, port);
@@ -179,16 +165,12 @@ public final class BaseXHTTP extends CLI {
    * Locates the specified configuration file.
    * @param file file to be copied
    * @param root target root directory
-   * @return reference to created file
    * @throws IOException I/O exception
    */
-  private static IOFile locate(final String file, final String root) throws IOException {
-    final IOFile target = new IOFile(root, file);
-    final boolean create = !target.exists();
-
+  private static void locate(final String file, final String root) throws IOException {
     // try to locate file from development branch
     final IO io = new IOFile("src/main/webapp", file);
-    final byte[] data;
+    byte[] data = null;
     if(io.exists()) {
       data = io.read();
       // check if resource path exists
@@ -201,22 +183,50 @@ public final class BaseXHTTP extends CLI {
           dir.write(data);
         }
       }
-    } else if(create) {
+    }
+
+    final IOFile target = new IOFile(root, file);
+    if(target.exists()) return;
+
+    if(data == null) {
       // try to locate file from resource path
       try(InputStream is = BaseXHTTP.class.getResourceAsStream('/' + file)) {
         if(is == null) throw new BaseXException(io + " not found.");
         data = new IOStream(is).read();
       }
-    } else {
-      return target;
     }
+    // create configuration file
+    Util.errln("Creating " +  target);
+    target.write(data);
+  }
 
-    if(create) {
-      // create configuration file
-      Util.errln("Creating " +  target);
-      target.write(data);
+  /**
+   * Creates the Jetty server, configured by the specified file if it exists.
+   * @param jettyXml Jetty configuration file
+   * @param port HTTP port
+   * @return server
+   * @throws Exception exception
+   */
+  private static Server jetty(final IOFile jettyXml, final int port) throws Exception {
+    if(jettyXml.exists()) {
+      final Resource resource = new PathResourceFactory().newResource(jettyXml.file().toPath());
+      final XmlConfiguration xc = new XmlConfiguration(resource);
+      xc.getProperties().put("jetty.http.port", Integer.toString(port));
+      final Server server = (Server) xc.configure();
+      ServerConnector sc = null;
+      for(final Connector conn : server.getConnectors()) {
+        if(conn instanceof final ServerConnector s) sc = s;
+      }
+      if(sc == null) throw new BaseXException("No Jetty connector defined in " + JETTYCONF + '.');
+      sc.setPort(port);
+      return server;
     }
-    return target;
+    final Server server = new Server();
+    final ServerConnector sc = new ServerConnector(server);
+    sc.setIdleTimeout(60000);
+    sc.setPort(port);
+    server.addConnector(sc);
+    return server;
   }
 
   /**
@@ -260,7 +270,7 @@ public final class BaseXHTTP extends CLI {
             Prop.put(StaticOptions.GZIP, Boolean.toString(true));
             break;
           case 'h': // parse HTTP port
-            port = arg.number();
+            Prop.put(StaticOptions.HTTPPORT, Integer.toString(arg.number()));
             break;
           case 'l': // use local mode
             Prop.put(StaticOptions.HTTPLOCAL, Boolean.toString(true));
