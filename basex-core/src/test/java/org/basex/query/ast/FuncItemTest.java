@@ -691,6 +691,13 @@ public final class FuncItemTest extends SandboxTest {
         "1\n2", exists(StaticFunc.class));
   }
 
+  /** Parameter types are refined to the arguments of calls that remain after inlining. */
+  @Test public void refineInlinedCalls() {
+    final String f = "declare %basex:inline(0) function f($x) { $x instance of xs:integer }; ";
+    check(f + "for-each((1, 2), fn($x) { f($x) })", "true\ntrue", empty(Instance.class));
+    check(f + "for-each((1, 'a'), fn($x) { f($x) })", "true\nfalse", exists(Instance.class));
+  }
+
   /** Lookups in maps with nondeterministic functions. */
   @Test public void ndtFuncItemInMap() {
     final String m = "let $m := { 'f': random:double#0 } return ";

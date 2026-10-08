@@ -45,9 +45,7 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
   private final ArrayList<FuncRef> unresolvedRefs = new ArrayList<>();
   /** Function calls with unassigned default values. */
   private final ArrayList<StaticFuncCall> unassignedCalls = new ArrayList<>();
-  /** Function calls by function. */
-  private final Map<StaticFunc, ArrayList<StaticFuncCall>> callsMap = new IdentityHashMap<>();
-  /** Indicates if functions may be invoked without registered function calls. */
+  /** Indicates if functions may be invoked by calls outside the query tree. */
   private boolean exposed;
 
   /**
@@ -103,7 +101,7 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
     final StaticFunc func = get(info.sc(), name, arity, dynamic);
     if(func != null) {
       if(func.expr == null) throw FUNCNOIMPL_X.get(func.info, func.name.prefixString());
-      setFunc(call, func);
+      call.setFunc(func);
       // default values can only be assigned once all function calls have been resolved
       if(arity < func.arity()) {
         if(dynamic) call.assignDefaults();
@@ -116,17 +114,6 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
       call.setExternal(java);
       if(java.updating) qc.updating();
     }
-  }
-
-  /**
-   * Assigns a function to a static function call and registers the call.
-   * @param call function call
-   * @param func function
-   * @throws QueryException query exception
-   */
-  public void setFunc(final StaticFuncCall call, final StaticFunc func) throws QueryException {
-    call.setFunc(func);
-    callsMap.computeIfAbsent(func, k -> new ArrayList<>(1)).add(call);
   }
 
   /**
@@ -272,10 +259,11 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
   /**
    * Returns the unions of the sequences types for function calls of the specified function.
    * @param func function
+   * @param cc compilation context
    * @return sequence types, or {@code null} if not all calls of the function are known
    */
-  SeqType[] seqTypes(final StaticFunc func) {
-    final ArrayList<StaticFuncCall> calls = callsMap.get(func);
+  SeqType[] seqTypes(final StaticFunc func, final CompileContext cc) {
+    final ArrayList<StaticFuncCall> calls = cc.calls(func);
     final int sl = func.arity();
     if(exposed || calls == null || sl == 0) return null;
 

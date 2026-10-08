@@ -147,6 +147,8 @@ public final class CompileContext {
   private final ArrayDeque<XQFunctionExpr> entered = new ArrayDeque<>();
   /** Number of function bodies for evaluation in other queries that are currently compiled. */
   private int evals;
+  /** Function calls in the query tree, grouped by function (can be {@code null}). */
+  Map<StaticFunc, ArrayList<StaticFuncCall>> calls;
 
   /** Variable scope list. */
   private final ArrayDeque<VarScope> scopes = new ArrayDeque<>();
@@ -161,6 +163,15 @@ public final class CompileContext {
   public CompileContext(final QueryContext qc, final boolean dynamic) {
     this.qc = qc;
     this.dynamic = dynamic;
+  }
+
+  /**
+   * Returns the calls of a function in the query tree.
+   * @param func function
+   * @return calls, or {@code null} if they are unknown
+   */
+  public ArrayList<StaticFuncCall> calls(final StaticFunc func) {
+    return calls != null ? calls.get(func) : null;
   }
 
   /**

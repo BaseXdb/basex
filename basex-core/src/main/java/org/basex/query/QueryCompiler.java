@@ -37,6 +37,10 @@ final class QueryCompiler {
   private int next;
   /** Static functions and variables of the query (others belong to bound function items). */
   private final Set<Scope> declared = Collections.newSetFromMap(new IdentityHashMap<>());
+  /** Calls of static functions, grouped by function. */
+  private final Map<StaticFunc, ArrayList<StaticFuncCall>> calls = new IdentityHashMap<>();
+  /** Indicates if all function calls were found. */
+  private boolean complete = true;
 
   /**
    * Constructor.
@@ -53,9 +57,10 @@ final class QueryCompiler {
    * @throws QueryException query exception
    */
   static void compile(final CompileContext cc) throws QueryException {
-    for(final ArrayList<Scope> scps : new QueryCompiler(cc.qc).scopes(cc.qc.main)) {
-      scps.getFirst().compile(cc);
-    }
+    final QueryCompiler qcomp = new QueryCompiler(cc.qc);
+    final ArrayList<ArrayList<Scope>> scopes = qcomp.scopes(cc.qc.main);
+    if(qcomp.complete) cc.calls = qcomp.calls;
+    for(final ArrayList<Scope> scps : scopes) scps.getFirst().compile(cc);
   }
 
   /**
@@ -152,7 +157,9 @@ final class QueryCompiler {
       @Override
       public boolean staticFuncCall(final StaticFuncCall call) {
         final StaticFunc func = call.func();
-        return func == null || !declared.contains(func) || add(func);
+        if(func == null || !declared.contains(func)) return true;
+        calls.computeIfAbsent(func, k -> new ArrayList<>(1)).add(call);
+        return add(func);
       }
 
       @Override
@@ -170,7 +177,7 @@ final class QueryCompiler {
       @Override
       public boolean value(final Value value) {
         // function items in sequences, maps and arrays may reference functions of the query
-        funcItems(value);
+        if(!funcItems(value)) complete = false;
         return true;
       }
 
