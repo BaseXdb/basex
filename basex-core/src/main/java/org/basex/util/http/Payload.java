@@ -50,7 +50,7 @@ public final class Payload {
   /** Options for parsing XML payloads (can be {@code null}). */
   private MainOptions xmlOptions;
   /** Input stream. */
-  private InputStream input;
+  private BufferInput input;
   /** Input info (can be {@code null}). */
   private final InputInfo info;
   /** Database options. */
@@ -80,7 +80,7 @@ public final class Payload {
   public Payload(final InputStream input, final BodyMode mode, final String charset,
       final InputInfo info, final MainOptions options) {
 
-    this.input = input;
+    this.input = BufferInput.get(input);
     this.mode = mode;
     this.charset = charset;
     this.info = info;
@@ -119,7 +119,7 @@ public final class Payload {
       throws IOException, QueryException {
 
     // decompress before parsing (applies to multipart and single-part alike)
-    input = decode(input, coding);
+    input = BufferInput.get(decode(input, coding));
 
     final ResponseBody result = new ResponseBody();
     result.type = type;

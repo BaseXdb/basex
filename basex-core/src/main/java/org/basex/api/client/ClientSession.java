@@ -171,7 +171,8 @@ public class ClientSession extends Session {
    */
   private void send(final InputStream input) throws IOException {
     final ServerOutput so = new ServerOutput(sout);
-    for(int b; (b = input.read()) != -1;) so.write(b);
+    final BufferInput bi = BufferInput.get(input);
+    for(int b; (b = bi.read()) != -1;) so.write(b);
     sout.write(0);
     sout.flush();
     receive(null);

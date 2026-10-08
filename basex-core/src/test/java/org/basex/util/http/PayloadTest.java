@@ -3,11 +3,13 @@ package org.basex.util.http;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
+import java.time.*;
 
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
+import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -93,7 +95,7 @@ public final class PayloadTest extends SandboxTest {
    */
   @Test public void multipartInMemory() throws Exception {
     try(QueryContext qc = new QueryContext(context)) {
-      final B64 contents = (B64) files(FILE, qc, 1024).get(Str.get("a.bin"));
+      final B64 contents = (B64) files(new ArrayInput(FILE), qc, 1024).get(Str.get("a.bin"));
       assertFalse(contents instanceof B64Lazy, "expected in-memory item");
       assertArrayEquals(DATA, contents.binary(null));
     }
@@ -107,7 +109,7 @@ public final class PayloadTest extends SandboxTest {
     final File tmp = new File(Prop.TEMPDIR);
     final int before = countTempFiles(tmp);
     try(QueryContext qc = new QueryContext(context)) {
-      final B64 contents = (B64) files(FILE, qc, 3).get(Str.get("a.bin"));
+      final B64 contents = (B64) files(new ArrayInput(FILE), qc, 3).get(Str.get("a.bin"));
       assertTrue(contents instanceof B64Lazy, "expected lazy (spilled) item");
       assertArrayEquals(DATA, contents.binary(null));
       assertEquals(before + 1, countTempFiles(tmp), "temp file should exist while qc is open");
@@ -127,7 +129,7 @@ public final class PayloadTest extends SandboxTest {
         "--bnd \t\r\nContent-Disposition: form-data; name=\"files\"; filename=\"b.bin\"\r\n\r\n" +
         "second\r\n--bnd--  \r\n");
     try(QueryContext qc = new QueryContext(context)) {
-      final XQMap files = files(body, qc, 1024);
+      final XQMap files = files(new ArrayInput(body), qc, 1024);
       assertEquals(2, files.structSize());
       assertArrayEquals(Token.token("--bnd-not-a-delimiter"),
           ((B64) files.get(Str.get("a.bin"))).binary(null));
@@ -159,6 +161,28 @@ public final class PayloadTest extends SandboxTest {
   }
 
   /**
+   * A large multipart form body is parsed quickly from an unbuffered file stream.
+   * @throws Exception exception
+   */
+  @Test public void multipartLargeFile() throws Exception {
+    final String lines = ("x".repeat(998) + "\r\n").repeat(1 << 14);
+    final IOFile file = new IOFile(File.createTempFile("basex-test-", IO.TMPSUFFIX));
+    try {
+      file.write("--bnd\r\nContent-Disposition: form-data; name=\"files\"; " +
+          "filename=\"a.bin\"\r\n\r\n" + lines + "--bnd--\r\n");
+      try(QueryContext qc = new QueryContext(context);
+          InputStream is = file.inputStream()) {
+        final XQMap files = assertTimeout(Duration.ofSeconds(5),
+            () -> files(is, qc, SpillOutput.THRESHOLD));
+        final B64 contents = (B64) files.get(Str.get("a.bin"));
+        assertEquals(lines.length() - 2, contents.binary(null).length);
+      }
+    } finally {
+      assertTrue(file.delete());
+    }
+  }
+
+  /**
    * Parses a multipart form body and returns the map with its file parts.
    * @param body multipart form body
    * @param qc query context
@@ -166,9 +190,9 @@ public final class PayloadTest extends SandboxTest {
    * @return file names and contents
    * @throws Exception exception
    */
-  private static XQMap files(final byte[] body, final QueryContext qc, final int threshold)
+  private static XQMap files(final InputStream body, final QueryContext qc, final int threshold)
       throws Exception {
-    final Payload payload = new Payload(new ArrayInput(body), BodyMode.PARSE, null, OPTIONS);
+    final Payload payload = new Payload(body, BodyMode.PARSE, null, OPTIONS);
     final MediaType type = new MediaType("multipart/form-data; boundary=bnd");
     final TempFiles temp = qc.resources.index(TempFiles.class);
     return (XQMap) payload.multiForm(type, temp, threshold).get(Str.get("files"));
