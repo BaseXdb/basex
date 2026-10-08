@@ -106,14 +106,14 @@ public final class RestXqMethodTest extends RestXqTest {
   @Test public void methodNotAllowed() throws Exception {
     // the path is addressed by another method
     register("declare %R:GET %R:path('') function m:f() { 'x' };");
-    assertEquals("Method not allowed: POST. Supported: GET, HEAD.",
+    assertEquals("Method not allowed: POST. Supported: GET, HEAD, OPTIONS.",
         post(405, "", MediaType.TEXT_PLAIN, ""));
-    assertEquals("GET, HEAD", header("Allow"));
+    assertEquals("GET, HEAD, OPTIONS", header("Allow"));
     send(405, "RETRIEVE", null, null, "");
     // HEAD requests are answered by GET functions
     register("declare %R:POST %R:path('') function m:f() { 'x' };");
     head(405, "");
-    assertEquals("POST", header("Allow"));
+    assertEquals("OPTIONS, POST", header("Allow"));
     // a method-agnostic function accepts all methods
     register("declare %R:path('') function m:f() { 'x' };");
     assertEquals("x", send(200, "RETRIEVE", null, null, ""));
@@ -138,6 +138,12 @@ public final class RestXqMethodTest extends RestXqTest {
     // correct return type
     head("declare %R:GET %R:path('') function m:f() { () };");
     head("declare %R:GET %R:path('') function m:f() { 1 to 5 };");
+
+    // GET function is preferred to method-agnostic function
+    register("declare %R:GET %R:path('a') function m:f() { 'x' }; "
+        + "declare %R:path('{$p=.+}') function m:g($p) { "
+        + "  <R:response><http:response status='404'/></R:response> };");
+    head(200, "a");
   }
 
   /**
@@ -149,10 +155,17 @@ public final class RestXqMethodTest extends RestXqTest {
     options("declare %R:OPTIONS %R:path('') function m:f() { 1 };", "1");
 
     options("declare %R:GET %R:path('') function m:f() { <R:response/> };", "");
-    options("declare %R:GET %R:path('sdfdfs') function m:f() { <R:response/> };", "");
 
     // method-agnostic functions must not be triggered by OPTIONS requests (preflight, admin)
     options("declare %R:path('') function m:f() { 'secret' };", "");
+
+    // supported methods of the requested path
+    register("declare %R:GET %R:path('a') function m:f() { 'x' }; "
+        + "declare %R:POST %R:path('a') function m:g() { 'x' };");
+    options("a");
+    assertEquals("GET, HEAD, OPTIONS, POST", header("Allow"));
+    // unknown path is not found
+    send(404, "OPTIONS", null, null, "b");
   }
 
   /**

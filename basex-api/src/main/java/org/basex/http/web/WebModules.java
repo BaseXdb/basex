@@ -157,11 +157,7 @@ public final class WebModules {
       final ArrayList<RestXqFunction> byMethod = new ArrayList<>(funcs);
       byMethod.removeIf(func -> !func.matchesMethod(conn));
       if(byMethod.isEmpty()) {
-        final TreeSet<String> allowed = new TreeSet<>();
-        for(final RestXqFunction func : funcs) allowed.addAll(func.methods);
-        // GET functions also serve HEAD requests
-        if(allowed.contains(Method.GET.name())) allowed.add(Method.HEAD.name());
-        final String supported = String.join(", ", allowed);
+        final String supported = allowed(funcs);
         conn.response.setHeader(HTTPText.ALLOW, supported);
         return HTTPStatus.METHOD_NOT_ALLOWED_X_X.get(conn.method, supported);
       }
@@ -187,6 +183,37 @@ public final class WebModules {
       }
     }
     return HTTPStatus.SERVICE_NOT_FOUND.get();
+  }
+
+  /**
+   * Returns the methods that are supported by the requested path.
+   * @param conn HTTP connection
+   * @return methods, or {@code null} if the path is unknown
+   * @throws IOException I/O exception
+   */
+  public String allowed(final HTTPConnection conn) throws IOException {
+    final ArrayList<RestXqFunction> funcs = collect(conn, func -> func.matchesPath(conn));
+    return funcs.isEmpty() ? null : allowed(funcs);
+  }
+
+  /**
+   * Returns the methods that are supported by the specified functions.
+   * @param funcs functions
+   * @return methods
+   */
+  private static String allowed(final ArrayList<RestXqFunction> funcs) {
+    final TreeSet<String> methods = new TreeSet<>();
+    for(final RestXqFunction func : funcs) {
+      if(func.methods.isEmpty()) {
+        for(final Method method : Method.values()) methods.add(method.name());
+      } else {
+        methods.addAll(func.methods);
+      }
+    }
+    // GET functions also serve HEAD requests; OPTIONS requests are answered by the server
+    if(methods.contains(Method.GET.name())) methods.add(Method.HEAD.name());
+    methods.add(Method.OPTIONS.name());
+    return String.join(", ", methods);
   }
 
   /**

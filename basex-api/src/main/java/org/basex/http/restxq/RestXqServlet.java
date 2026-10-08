@@ -2,8 +2,6 @@ package org.basex.http.restxq;
 
 import static jakarta.servlet.http.HttpServletResponse.*;
 
-import java.util.stream.*;
-
 import org.basex.http.*;
 import org.basex.http.web.*;
 import org.basex.http.web.WebResponse.Response;
@@ -44,23 +42,27 @@ public class RestXqServlet extends BaseXServlet {
     RestXqFunction func = modules.restxq(conn, null);
     boolean body = true;
 
-    // no function found? check alternatives
-    if(func == null) {
-      // OPTIONS: no custom response required
-      if(conn.method.equals(Method.OPTIONS.name())) {
-        conn.response.setHeader(HTTPText.ALLOW, Stream.of(Method.values()).map(Enum::name).
-            collect(Collectors.joining(", ")));
-        return;
-      }
-      // HEAD: evaluate GET, discard body
-      if(conn.method.equals(Method.HEAD.name())) {
-        conn.method = Method.GET.name();
-        func = modules.restxq(conn, null);
+    // HEAD: evaluate GET and discard body, unless a function is declared for HEAD
+    if(conn.method.equals(Method.HEAD.name()) &&
+        (func == null || !func.methods.contains(Method.HEAD.name()))) {
+      conn.method = Method.GET.name();
+      final RestXqFunction get = modules.restxq(conn, null);
+      if(get != null) {
+        func = get;
         body = false;
+      } else {
         // restore the original method to report it in the error message
-        if(func == null) conn.method = Method.HEAD.name();
+        conn.method = Method.HEAD.name();
       }
-      if(func == null) throw modules.noMatch(conn);
+    }
+
+    // no function found: answer OPTIONS requests for known paths, reject other requests
+    if(func == null) {
+      final String allowed = conn.method.equals(Method.OPTIONS.name()) ?
+        modules.allowed(conn) : null;
+      if(allowed == null) throw modules.noMatch(conn);
+      conn.response.setHeader(HTTPText.ALLOW, allowed);
+      return;
     }
 
     try {
