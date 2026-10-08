@@ -210,11 +210,47 @@ public final class StaticOptions extends Options {
   }
 
   /**
+   * Returns the path to the package repository.
+   * @return repository path
+   */
+  public IOFile repoPath() {
+    return new IOFile(get(REPOPATH));
+  }
+
+  /**
    * Returns the path to the directory that contains all RESTXQ applications.
    * @return RESTXQ path
    */
   public IOFile restxqPath() {
-    return new IOFile(get(WEBPATH)).resolve(get(RESTXQPATH));
+    return resolve(WEBPATH, RESTXQPATH);
+  }
+
+  /**
+   * Returns the path to the directory that contains all REST files.
+   * @return REST path
+   */
+  public IOFile restPath() {
+    return resolve(WEBPATH, RESTPATH);
+  }
+
+  /**
+   * Returns the path to the directory that contains all log files.
+   * @return log path
+   */
+  public IOFile logPath() {
+    return resolve(DBPATH, LOGPATH);
+  }
+
+  /**
+   * Resolves a path against a directory, which need not exist yet.
+   * @param dir option with the directory
+   * @param path option with the absolute or relative path
+   * @return resolved path
+   */
+  private IOFile resolve(final StringOption dir, final StringOption path) {
+    final String pth = get(path);
+    final IOFile file = new IOFile(pth);
+    return file.isAbsolute() ? file : new IOFile(get(dir), pth);
   }
 
   /**

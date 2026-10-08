@@ -79,7 +79,7 @@ public final class Log implements QueryTracer {
    */
   public LogFile file(final String name) {
     LogFile lf = file;
-    if(lf == null || !lf.valid(name)) lf = new LogFile(name, dir());
+    if(lf == null || !lf.valid(name)) lf = new LogFile(name, sopts.logPath());
     return lf.exists() ? lf : null;
   }
 
@@ -249,7 +249,7 @@ public final class Log implements QueryTracer {
    */
   public Map<String, Long> files() {
     final TreeMap<String, Long> files = new TreeMap<>(Comparator.reverseOrder());
-    dir().children((name, attrs) -> {
+    sopts.logPath().children((name, attrs) -> {
       if(name.endsWith(IO.LOGSUFFIX)) files.put(name.replace(IO.LOGSUFFIX, ""), attrs.size());
     });
     return files;
@@ -263,16 +263,8 @@ public final class Log implements QueryTracer {
   public void write(final LogEntry entry) throws IOException {
     final String name = DateTime.DATE.format(entry.date);
     if(file != null && !file.valid(name)) close();
-    if(file == null) file = LogFile.create(name, dir());
+    if(file == null) file = LogFile.create(name, sopts.logPath());
     file.write(Token.token(entry + Prop.NL));
-  }
-
-  /**
-   * Returns a reference to the log directory.
-   * @return log directory
-   */
-  private IOFile dir() {
-    return sopts.dbPath(".").resolve(sopts.get(StaticOptions.LOGPATH));
   }
 
   @Override

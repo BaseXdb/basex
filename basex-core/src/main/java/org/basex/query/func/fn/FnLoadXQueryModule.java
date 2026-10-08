@@ -214,9 +214,9 @@ public final class FnLoadXQueryModule extends StandardFunc {
    */
   private static String repoFilePath(final byte[] modUri, final Context context) {
     final String path = Strings.uri2path(Token.string(modUri));
-    final String repoPath = context.soptions.get(StaticOptions.REPOPATH);
+    final IOFile repo = context.soptions.repoPath();
     for(final String suffix : IO.XQSUFFIXES) {
-      final IOFile file = new IOFile(repoPath, path + suffix);
+      final IOFile file = new IOFile(repo, path + suffix);
       if(file.exists()) return file.path();
     }
     return null;

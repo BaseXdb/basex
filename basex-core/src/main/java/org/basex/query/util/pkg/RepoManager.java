@@ -326,7 +326,7 @@ public final class RepoManager {
    * @return repository directory
    */
   private IOFile repo() {
-    return new IOFile(context.soptions.get(StaticOptions.REPOPATH));
+    return context.soptions.repoPath();
   }
 
   /**

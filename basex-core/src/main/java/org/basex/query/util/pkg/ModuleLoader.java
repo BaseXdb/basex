@@ -103,10 +103,10 @@ public final class ModuleLoader {
         }
       }
       // check XQuery modules
-      final String repoPath = context.soptions.get(StaticOptions.REPOPATH);
+      final IOFile repo = context.soptions.repoPath();
       final String path = Strings.uri2path(uri);
       for(final String suffix : IO.XQSUFFIXES) {
-        final IOFile file = new IOFile(repoPath, path + suffix);
+        final IOFile file = new IOFile(repo, path + suffix);
         if(file.exists()) {
           qp.module(file.path(), uri, info);
           return true;
@@ -204,8 +204,8 @@ public final class ModuleLoader {
    */
   static List<String> jarUrls(final Context context, final String className) {
     final ArrayList<String> urls = new ArrayList<>();
-    final String repoPath = context.soptions.get(StaticOptions.REPOPATH);
-    final IOFile jar = new IOFile(repoPath, Strings.uri2path(className) + IO.JARSUFFIX);
+    final IOFile jar = new IOFile(context.soptions.repoPath(),
+        Strings.uri2path(className) + IO.JARSUFFIX);
     if(jar.exists()) addURL(urls, jar);
     return urls;
   }

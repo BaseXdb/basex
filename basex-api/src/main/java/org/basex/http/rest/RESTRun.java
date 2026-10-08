@@ -43,9 +43,7 @@ final class RESTRun extends RESTQuery {
 
     // get root directory for files
     final Context context = session.conn.context;
-    final String webpath = context.soptions.get(StaticOptions.WEBPATH);
-    final String rpath = context.soptions.get(StaticOptions.RESTPATH);
-    final IOFile root = new IOFile(webpath).resolve(rpath);
+    final IOFile root = context.soptions.restPath();
 
     // check if file is not found, is a folder or points to parent folder
     IOFile file = new IOFile(root, path);
