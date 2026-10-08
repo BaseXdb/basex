@@ -107,7 +107,7 @@ public final class Databases {
     final StringList backups = new StringList();
     for(final IOFile file : soptions.dbPath().children()) {
       final String name = file.name();
-      if(name.endsWith(IO.ZIPSUFFIX)) backups.add(name.substring(0, name.lastIndexOf('.')));
+      if(ZIPPATTERN.matcher(name).find()) backups.add(name.substring(0, name.lastIndexOf('.')));
     }
     return backups.sort(Prop.CASE, false);
   }
