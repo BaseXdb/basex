@@ -25,6 +25,8 @@ public final class StaticVar extends StaticDecl {
   public volatile Value value;
   /** Flag for lazy evaluation. */
   private final boolean lazy;
+  /** Indicates if this variable belongs to a record field. */
+  public final boolean field;
 
   /**
    * Constructor for a variable declared in a query.
@@ -34,12 +36,14 @@ public final class StaticVar extends StaticDecl {
    * @param external external flag
    * @param vs variable scope
    * @param doc xqdoc string
+   * @param field record field flag
    */
   StaticVar(final Var var, final Expr expr, final AnnList anns, final boolean external,
-      final VarScope vs, final String doc) {
+      final VarScope vs, final String doc, final boolean field) {
     super(var.name, var.declType, anns, vs, var.info, doc);
     this.expr = expr;
     this.external = external;
+    this.field = field;
     lazy = anns.contains(Annotation._BASEX_LAZY);
   }
 
@@ -50,7 +54,7 @@ public final class StaticVar extends StaticDecl {
       compiled = true;
 
       final QueryFocus focus = cc.qc.focus;
-      cc.qc.focus = cc.qc.globalFocus(sc);
+      cc.qc.focus = focus(cc.qc);
       cc.pushScope(vs);
       try {
         expr = expr.compile(cc);
@@ -60,7 +64,8 @@ public final class StaticVar extends StaticDecl {
       }
 
       // dynamic compilation, eager evaluation: pre-evaluate deterministic expressions
-      if(expr instanceof Value || cc.dynamic && !lazy && !expr.has(Flag.NDT)) {
+      // (record fields: only if used)
+      if(!field && (expr instanceof Value || cc.dynamic && !lazy && !expr.has(Flag.NDT))) {
         try {
           if(value == null) value = compute(cc.qc);
           cc.replaceWith(expr, value);
@@ -94,7 +99,7 @@ public final class StaticVar extends StaticDecl {
   Value compute(final QueryContext qc) throws QueryException {
     final QueryFocus focus = qc.focus;
     final Value current = qc.current;
-    qc.focus = qc.globalFocus(sc);
+    qc.focus = focus(qc);
     qc.current = null;
     final int fp = vs.enter(qc);
     try {
@@ -107,6 +112,15 @@ public final class StaticVar extends StaticDecl {
       qc.focus = focus;
       qc.current = current;
     }
+  }
+
+  /**
+   * Returns the focus for evaluating the expression (record fields have no focus).
+   * @param qc query context
+   * @return focus
+   */
+  private QueryFocus focus(final QueryContext qc) {
+    return field ? new QueryFocus() : qc.globalFocus(sc);
   }
 
   /**
@@ -148,7 +162,7 @@ public final class StaticVar extends StaticDecl {
 
   @Override
   public boolean visit(final ASTVisitor visitor) {
-    return expr == null || expr.accept(visitor);
+    return visitor.declared(declType) && (expr == null || expr.accept(visitor));
   }
 
   /**

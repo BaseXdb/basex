@@ -7,6 +7,7 @@ import static org.basex.query.func.Function.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.func.fn.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -163,6 +164,11 @@ public final class TypeCheck extends Single {
       // the checked expression may never be evaluated: raise the error at runtime
       return FnError.get(qe);
     }
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return super.accept(visitor) && visitor.declared(seqType());
   }
 
   @Override

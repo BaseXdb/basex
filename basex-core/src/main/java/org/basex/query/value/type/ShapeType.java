@@ -518,7 +518,7 @@ public class ShapeType extends MapType {
         final SeqType is = intersect(fields.get(key).seqType(), sh.fields.get(key).seqType(),
             pairs);
         if(is == null) return null;
-        map.put(key, new ShapeField(is));
+        map.put(key, st.fields.get(key).with(is));
       }
       return st.with(map);
     }
@@ -526,9 +526,10 @@ public class ShapeType extends MapType {
       if(mt.keyType().intersect(BasicType.STRING) == null) return null;
       final TokenObjectMap<ShapeField> map = new TokenObjectMap<>();
       for(final byte[] key : fields) {
-        final SeqType is = intersect(fields.get(key).seqType(), mt.valueType(), pairs);
+        final ShapeField rf = fields.get(key);
+        final SeqType is = intersect(rf.seqType(), mt.valueType(), pairs);
         if(is == null) return null;
-        map.put(key, new ShapeField(is));
+        map.put(key, rf.with(is));
       }
       return with(map);
     }
@@ -585,7 +586,7 @@ public class ShapeType extends MapType {
    */
   final TokenObjectMap<ShapeField> detachedFields() {
     final TokenObjectMap<ShapeField> map = new TokenObjectMap<>(fields.size());
-    for(final byte[] key : fields) map.put(key, new ShapeField(fields.get(key).seqType()));
+    for(final byte[] key : fields) map.put(key, fields.get(key).detach());
     return map;
   }
 

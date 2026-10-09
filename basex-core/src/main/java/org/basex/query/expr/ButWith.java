@@ -59,7 +59,7 @@ public final class ButWith extends Arr {
   }
 
   /**
-   * Checks whether the update supplies every field of the record type.
+   * Checks whether the update supplies every non-static field of the record type.
    * @param update update expression (right operand)
    * @param rt record type of the left operand
    * @return result of check
@@ -70,7 +70,7 @@ public final class ButWith extends Arr {
     final TokenObjectMap<ShapeField> ufields = ush.fields(), fields = rt.fields();
     final int fs = fields.size();
     for(int f = 1; f <= fs; f++) {
-      if(!ufields.contains(fields.key(f))) return false;
+      if(!fields.value(f).isStatic() && !ufields.contains(fields.key(f))) return false;
     }
     return true;
   }
@@ -127,25 +127,21 @@ public final class ButWith extends Arr {
     final XQMap update = toMap(exprs[1], qc);
     if(update.structSize() == 0) return record;
 
-    // compact record layout
-    if(record instanceof final XQShapeMap rec) {
-      final TokenObjectMap<ShapeField> fields = rt.fields();
-      final int fs = fields.size();
-      final Value[] values = new Value[fs];
-      for(int f = 0; f < fs; f++) values[f] = rec.valueAt(f);
-      update.forEach((key, value) -> {
-        final int i = key.type.isStringOrUntyped() ? fields.index(key.string(null)) : 0;
-        if(i == 0) throw typeError(update, rt, info);
-        values[i - 1] = rt.coerce(i, value, qc, info, null);
-      });
-      return XQMap.get(rt, values);
+    // compact record layout: access values by position, otherwise by key
+    final TokenObjectMap<ShapeField> fields = rt.fields();
+    final int fs = fields.size();
+    final Value[] values = new Value[fs];
+    final boolean sameOrder = record instanceof XQShapeMap;
+    for(int f = 0; f < fs; f++) {
+      values[f] = sameOrder ? record.valueAt(f) : record.getOrNull(rt.key(f + 1));
     }
-
-    // fallback
-    final MapBuilder mb = new MapBuilder();
-    record.forEach(mb::put);
-    update.forEach(mb::put);
-    return mb.map().coerceTo(rt, qc, info, null);
+    update.forEach((key, value) -> {
+      final int i = key.type.isStringOrUntyped() ? fields.index(key.string(null)) : 0;
+      // static fields cannot be updated
+      if(i == 0 || fields.value(i).isStatic()) throw typeError(update, rt, info);
+      values[i - 1] = rt.coerce(i, value, qc, info, null);
+    });
+    return XQMap.get(rt, values);
   }
 
   @Override

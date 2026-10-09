@@ -420,6 +420,8 @@ public final class QueryContext extends Job implements Closeable {
         // required for fn:load-xquery-module
         vars.compileAll(cc);
       }
+      // initializing expressions of record fields may be evaluated by coercions
+      vars.compileFields(cc);
     } catch(final StackOverflowError | ArraySizeException ex) {
       throw limitError(ex, null);
     } finally {

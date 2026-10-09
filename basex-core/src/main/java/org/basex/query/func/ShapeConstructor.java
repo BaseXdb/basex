@@ -90,7 +90,7 @@ public final class ShapeConstructor extends StandardFunc {
     // { 'y': Y, 'x': X } coerce to local:point → local:point(X, Y, ())
     final SeqType st = tc.seqType();
     if(st.occ.check(1) && TypeRef.deref(st.type) instanceof final RecordType rt) {
-      final Expr[] args = args(rt);
+      final Expr[] args = args(rt, cc);
       if(args != null) return get(info, rt, args).optimize(cc);
     }
     return null;
@@ -100,20 +100,26 @@ public final class ShapeConstructor extends StandardFunc {
    * Returns the arguments for a constructor function that creates the result of coercing this map
    * to a record type.
    * @param rt record type
+   * @param cc compilation context
    * @return arguments, or {@code null} if coercion fails or if the shape is a record
    */
-  private Expr[] args(final RecordType rt) {
+  private Expr[] args(final RecordType rt, final CompileContext cc) {
     final TokenObjectMap<ShapeField> fields = rt.fields(), shfields = shapeType.fields();
     if(rt.any() || shapeType instanceof RecordType || exprs.length != shfields.size()) return null;
     final int fs = fields.size();
     final Expr[] args = new Expr[fs];
     int found = 0;
     for(int f = 1; f <= fs; f++) {
+      final ShapeField rf = fields.value(f);
       final int i = shfields.index(fields.key(f));
       if(i != 0) {
+        // static fields must not be supplied
+        if(rf.isStatic()) return null;
         args[f - 1] = exprs[i - 1];
         found++;
-      } else if(fields.value(f).seqType().occ.min > 0) {
+      } else if(rf.init() != null) {
+        args[f - 1] = rf.init().copy(cc, new IntObjectMap<>());
+      } else if(rf.seqType().occ.min > 0) {
         return null;
       } else {
         args[f - 1] = Empty.VALUE;

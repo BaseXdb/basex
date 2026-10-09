@@ -923,7 +923,7 @@ public final class RecordTest extends SandboxTest {
     // a structural record type is no subtype of a nominative one
     query(prolog + func + "local:f() instance of fn(local:BA) as item()*", false);
     query(prolog + func + "let $f as fn(local:BA) as item()* := local:f() "
-        + "return $f(local:BA(2, 1))", 1);
+        + "return $f(({ 'b': 2, 'a': 1 } coerce to local:BA))", 1);
     // the result of a function is coerced if the function is coerced
     final String result = "declare %basex:inline(0) function local:g() as item() { "
         + "fn() as local:AB { local:ab() } }; ";
@@ -931,7 +931,8 @@ public final class RecordTest extends SandboxTest {
     query(prolog + result + "let $g as fn() as local:BA := local:g() "
         + "return ($g()?a, map:keys($g()))", "1\nb\na");
     query(prolog + "for $i in 1 to 2 "
-        + "return (if($i = 1) then local:ab() else local:BA(2, 1))?a", "1\n1");
+        + "return (if($i = 1) then local:ab() else "
+        + "({ 'b': 2, 'a': 1 } coerce to local:BA))?a", "1\n1");
   }
 
   /** Records whose type lacks fields that admit the empty sequence. */
@@ -1019,5 +1020,31 @@ public final class RecordTest extends SandboxTest {
     }
     error("fn:division-record(1, 2)", WHICHFUNC_X);
     error("fn:division-record#2", WHICHFUNC_X);
+  }
+
+  /** Static fields, initializers in coercions, constructor annotation. */
+  @Test public void staticFields() {
+    final String prolog = "declare %constructor record local:r(a as xs:integer, b := 1 + 2, "
+        + "%static c as fn(local:r) as xs:integer := fn($r) { $r?a * 10 }); ";
+    query(prolog + "let $r := local:r(1, 2) return $r?c($r)", 10);
+    query(prolog + "local:r#2 => function-arity()", 2);
+    query(prolog + "({ 'a': 2 } coerce to local:r)?b", 3);
+    query(prolog + "let $r := { 'a': 3 } coerce to local:r return $r?c($r)", 30);
+    query(prolog + "(local:r(1) but with { 'a': 5 })?a", 5);
+    error(prolog + "{ 'a': 1, 'c': 0 } coerce to local:r", INVTYPE_X);
+    error(prolog + "local:r(1) but with { 'c': 0 }", INVTYPE_X);
+    error(prolog + "local:r(1, 2, 3)", INVNARGS_X_X);
+
+    // initializers are evaluated once, without focus
+    query("declare record local:s(a := random-number-generator()?number); "
+        + "local:s()?a = local:s()?a", true);
+    error("declare record local:s(a := .); 1 ! local:s()", NOCTX_X);
+    error("declare record local:s(a := local:s()); local:s()", CIRCVAR_X);
+
+    // syntax
+    error("declare record local:s(%static a); 1", WRONGCHAR_X_X);
+    error("declare record local:s(a := 1, b); 1", PARAMOPTIONAL_X);
+    error("declare record local:s('a'); 1", NONCNAME_X);
+    error("declare type local:s as record(a); local:s(1)", WHICHFUNC_X);
   }
 }

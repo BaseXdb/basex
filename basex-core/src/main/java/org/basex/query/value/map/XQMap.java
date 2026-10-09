@@ -433,9 +433,17 @@ public abstract class XQMap extends XQStruct {
     final int fs = fields.size();
     final Value[] values = new Value[fs];
     for(int f = 0; f < fs; f++) {
+      final ShapeField rf = fields.value(f + 1);
       final Value value = sameOrder ? valueAt(f) : getOrNull(rt.key(f + 1));
-      if(value == null && fields.value(f + 1).seqType().occ.min > 0) throw typeError(this, rt, ii);
-      values[f] = rt.coerce(f + 1, value != null ? value : Empty.VALUE, qc, ii, cc);
+      if(value != null) {
+        // static fields must not be supplied
+        if(rf.isStatic()) throw typeError(this, rt, ii);
+        values[f] = rt.coerce(f + 1, value, qc, ii, cc);
+      } else if(rf.init() == null && rf.seqType().occ.min > 0) {
+        throw typeError(this, rt, ii);
+      } else {
+        values[f] = rf.init(qc);
+      }
     }
     return get(rt, values);
   }
@@ -472,7 +480,8 @@ public abstract class XQMap extends XQStruct {
 
   /**
    * Casts this map to the given record type (see {@link SeqType#cast}). Undeclared entries are
-   * discarded; a missing field yields the empty sequence if that is a valid field value.
+   * discarded; a missing field yields its default value, or the empty sequence if that is a valid
+   * field value.
    * @param rt record type
    * @param error raise error (return {@code null} otherwise)
    * @param qc query context
@@ -489,11 +498,18 @@ public abstract class XQMap extends XQStruct {
     final Value[] values = new Value[fs];
     for(int f = 0; f < fs; f++) {
       qc.checkStop();
-      final SeqType ft = fields.value(f + 1).seqType();
-      final Value value = getOrNull(Str.get(fields.key(f + 1)));
+      final ShapeField rf = fields.value(f + 1);
+      final SeqType ft = rf.seqType();
+      final Value value = getOrNull(rt.key(f + 1));
       final Value cast;
       if(value != null) {
-        cast = ft.convert(value, error, qc, info);
+        if(!rf.isStatic()) cast = ft.convert(value, error, qc, info);
+        // static fields can only be supplied by records of the target type
+        else if(instanceOf(rt, false)) cast = value;
+        else if(error) throw typeError(this, rt, info);
+        else cast = null;
+      } else if(rf.init() != null) {
+        cast = rf.init(qc);
       } else if(ft.instance(Empty.VALUE)) {
         cast = Empty.VALUE;
       } else {

@@ -146,7 +146,8 @@ public class MainModule extends AModule {
       public boolean staticVar(final StaticVar var) {
         if(visited.add(var)) {
           var.visit(this);
-          decls.add(var);
+          // initializing expressions of record fields are part of the record declarations
+          if(!var.field) decls.add(var);
         }
         return true;
       }

@@ -531,7 +531,7 @@ public abstract class Expr extends ExprInfo {
     final BitSet declared = new BitSet();
     return !accept(new ASTVisitor() {
       @Override
-      public boolean declared(final Var var) {
+      public boolean variable(final Var var) {
         declared.set(var.id);
         return true;
       }

@@ -33,6 +33,8 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   private final ArrayList<UnresolvedRef> unresolvedRefs = new ArrayList<>();
   /** The variables by declaring module. */
   private final TokenObjectMap<QNmMap<StaticVar>> varsByModule = new TokenObjectMap<>();
+  /** Variables with the initializing expressions of record fields. */
+  private final ArrayList<StaticVar> fields = new ArrayList<>();
 
   /**
    * Declares a new static variable in a given module.
@@ -67,9 +69,24 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
     final QNmMap<StaticVar> vars = varsByModule.computeIfAbsent(modUri, QNmMap::new);
     if(vars.contains(var.name)) throw VARDUPL_X.get(var.info, var.name.string());
 
-    final StaticVar sv = new StaticVar(var, expr, anns, external, vs, doc);
+    final StaticVar sv = new StaticVar(var, expr, anns, external, vs, doc, false);
     vars.put(var.name, sv);
     return sv;
+  }
+
+  /**
+   * Declares a variable for the initializing expression of a record field.
+   * @param var variable
+   * @param expr initializing expression
+   * @param vs variable scope
+   * @return reference to the variable
+   */
+  public Expr declareField(final Var var, final Expr expr, final VarScope vs) {
+    final StaticVar sv = new StaticVar(var, expr, AnnList.EMPTY, false, vs, "", true);
+    fields.add(sv);
+    final StaticVarRef ref = new StaticVarRef(var.info, var.name);
+    ref.init(sv);
+    return ref;
   }
 
   /**
@@ -78,6 +95,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
    */
   public void checkUp() throws QueryException {
     for(final StaticVar var : this) var.checkUp();
+    for(final StaticVar var : fields) var.checkUp();
   }
 
   /**
@@ -118,6 +136,15 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
    */
   public void compileAll(final CompileContext cc) throws QueryException {
     for(final StaticVar var : this) var.compile(cc);
+  }
+
+  /**
+   * Compiles the variables of record fields.
+   * @param cc compilation context
+   * @throws QueryException query exception
+   */
+  public void compileFields(final CompileContext cc) throws QueryException {
+    for(final StaticVar var : fields) var.compile(cc);
   }
 
   /**

@@ -8,6 +8,7 @@ import org.basex.query.func.java.*;
 import org.basex.query.scope.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 
 /**
@@ -20,11 +21,35 @@ import org.basex.query.var.*;
 @SuppressWarnings("unused")
 public abstract class ASTVisitor implements LockCollector {
   /**
+   * Notifies the visitor of a variable declaration and visits its declared type.
+   * @param var declared variable
+   * @return if more expressions should be visited
+   */
+  public final boolean declared(final Var var) {
+    return declared(var.declType) && variable(var);
+  }
+
+  /**
+   * Visits the initializing expressions of record fields that may be evaluated by coercions and
+   * casts to a declared type.
+   * @param st declared type (can be {@code null})
+   * @return if more expressions should be visited
+   */
+  public final boolean declared(final SeqType st) {
+    if(st != null) {
+      for(final Expr init : RecordType.inits(st.type)) {
+        if(!init.accept(this)) return false;
+      }
+    }
+    return true;
+  }
+
+  /**
    * Notifies the visitor of a variable declaration.
    * @param var declared variable
    * @return if more expressions should be visited ({@code true} by default)
    */
-  public boolean declared(final Var var) {
+  public boolean variable(final Var var) {
     return true;
   }
 

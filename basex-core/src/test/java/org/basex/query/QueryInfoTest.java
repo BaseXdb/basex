@@ -82,6 +82,16 @@ public final class QueryInfoTest extends SandboxTest {
     assertTrue(optimized.contains("declare type local:p as record(x"), optimized);
   }
 
+  /** Optimized query with initializing expressions of record fields. */
+  @Test public void recordInits() {
+    final XQuery query = new XQuery("declare record local:r(a := 1, %static b := 2); "
+        + "local:r()");
+    execute(query);
+    final String optimized = value(query.sections().sections(), "optimized-query");
+    assertTrue(optimized.contains("%static b := 2"), optimized);
+    assertFalse(optimized.contains("declare variable"), optimized);
+  }
+
   /** Functions that are only referenced by function items in maps are optimized. */
   @Test public void funcItemInMap() {
     execute(new CreateDB(NAME, "<x/>"));

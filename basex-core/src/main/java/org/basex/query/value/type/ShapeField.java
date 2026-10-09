@@ -6,6 +6,8 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.value.*;
+import org.basex.query.value.seq.*;
 
 /**
  * Field definition of a shape.
@@ -18,23 +20,44 @@ public final class ShapeField {
   private final SeqType seqType;
   /** Initializing expression (can be {@code null}). */
   private final Expr init;
+  /** Static flag. */
+  private final boolean statik;
 
   /**
    * Constructor for a field without initializer.
    * @param seqType field type (can be {@code null})
    */
   public ShapeField(final SeqType seqType) {
-    this(seqType, null);
+    this(seqType, null, false);
   }
 
   /**
    * Constructor.
    * @param seqType field type (can be {@code null})
    * @param init initializing expression (can be {@code null})
+   * @param statik static flag
    */
-  public ShapeField(final SeqType seqType, final Expr init) {
+  public ShapeField(final SeqType seqType, final Expr init, final boolean statik) {
     this.seqType = seqType == null ? Types.ITEM_ZM : seqType;
     this.init = init;
+    this.statik = statik;
+  }
+
+  /**
+   * Returns a field with the initializing expression and static flag of this field.
+   * @param st field type
+   * @return field
+   */
+  public ShapeField with(final SeqType st) {
+    return new ShapeField(st, init, statik);
+  }
+
+  /**
+   * Returns a field without initializing expression.
+   * @return field
+   */
+  public ShapeField detach() {
+    return init == null ? this : new ShapeField(seqType, null, statik);
   }
 
   /**
@@ -43,6 +66,24 @@ public final class ShapeField {
    */
   public Expr init() {
     return init;
+  }
+
+  /**
+   * Returns the value of the initializing expression.
+   * @param qc query context
+   * @return value (empty sequence if there is no initializing expression)
+   * @throws QueryException query exception
+   */
+  public Value init(final QueryContext qc) throws QueryException {
+    return init != null ? init.value(qc) : Empty.VALUE;
+  }
+
+  /**
+   * Indicates if this field is static.
+   * @return result of check
+   */
+  public boolean isStatic() {
+    return statik;
   }
 
   /**
@@ -56,7 +97,7 @@ public final class ShapeField {
   @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof final ShapeField rf &&
-        seqType.eq(rf.seqType) && Objects.equals(init, rf.init);
+        seqType.eq(rf.seqType) && Objects.equals(init, rf.init) && statik == rf.statik;
   }
 
   @Override

@@ -131,7 +131,6 @@ public final class ErrorMessageTest extends SandboxTest {
   /** Coercion errors in record constructors are reported at the record declaration. */
   @Test public void recordConstructor() {
     errorAt("declare record local:r(x as xs:integer); local:r('a')", INVTYPE_X, 16);
-    errorAt("declare type local:r as record(x as xs:integer); local:r('a')", INVTYPE_X, 14);
   }
 
   /** Destructuring errors name the binding pattern. */

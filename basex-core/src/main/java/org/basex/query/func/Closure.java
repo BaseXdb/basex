@@ -452,7 +452,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     for(final Entry<Var, Expr> entry : global.entrySet()) {
       if(!(entry.getValue().accept(visitor) && visitor.declared(entry.getKey()))) return false;
     }
-    return visitor.declared(params) && expr.accept(visitor);
+    return visitor.declared(params) && visitor.declared(declType) && expr.accept(visitor);
   }
 
   @Override

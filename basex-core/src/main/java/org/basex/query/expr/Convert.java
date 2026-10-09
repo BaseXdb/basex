@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.func.fn.*;
+import org.basex.query.util.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -38,6 +39,11 @@ abstract class Convert extends Single {
       expr = expr.simplifyFor(Simplify.STRING, cc);
     }
     return this;
+  }
+
+  @Override
+  public final boolean accept(final ASTVisitor visitor) {
+    return super.accept(visitor) && visitor.declared(seqType);
   }
 
   /**

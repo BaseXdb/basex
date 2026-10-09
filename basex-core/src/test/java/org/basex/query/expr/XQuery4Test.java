@@ -282,8 +282,9 @@ public final class XQuery4Test extends SandboxTest {
     query("declare function local:f($x := (., local:f#0)) { $x }; "
         + "let $f := 1 ! local:f#0 return $f()[2]()[2]()[1]", 1);
     // record field defaults with local variables
-    query("declare record local:r(a, b := let $x := 'B' return $x || string()); "
-        + "for $i in 1 to 2 let $j := 'J' return (($i ! local:r('A'))?b, $j)", "B1\nJ\nB2\nJ");
+    query("declare record local:r(a, b := let $x := 'B' return $x || 'C'); "
+        + "for $i in 1 to 2 let $j := 'J' return (($i ! local:r('A'))?b, $j)", "BC\nJ\nBC\nJ");
+    error("declare record local:r(a, b := string()); 1 ! local:r('A')", NOCTX_X);
     query("declare function local:f($x := (., fn { local:f#0 })) { $x }; "
         + "(1 ! local:f()[1], 2 ! local:f()[1])", "1\n2");
     query("declare function local:f($x, $y := (name(), fn { local:f(1) })) { $y }; "

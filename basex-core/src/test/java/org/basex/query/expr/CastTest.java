@@ -284,9 +284,10 @@ public final class CastTest extends SandboxTest {
     query("{ 'a': ('1', '2') } cast as record(a as xs:integer+)", "{\"a\":(1,2)}");
     error("{ 'a': ('1', '2') } cast as record(a as xs:integer)", INVTYPE_X);
 
-    // a field initializer is ignored by a cast: a missing field yields (), not the initializer
+    // a missing field yields the value of its initializer
     query("declare record local:r(a as xs:integer := 5); local:r()?a", 5);
-    error("declare record local:r(a as xs:integer := 5); {} cast as local:r", INVCONVERT_X_X);
+    query("declare record local:r(a as xs:integer := 5); ({} cast as local:r)?a", 5);
+    error("declare record local:r(%static a := 5); { 'a': 1 } cast as local:r", INVTYPE_X);
     query("declare record local:r(a as xs:integer := 5); ({ 'a': '1' } cast as local:r)?a", 1);
   }
 

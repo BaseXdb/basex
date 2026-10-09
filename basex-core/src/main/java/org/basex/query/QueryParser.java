@@ -448,7 +448,6 @@ public class QueryParser extends InputParser {
    */
   private static boolean cnstrType(final Type type) {
     final Type tp = TypeRef.deref(type);
-    if(tp instanceof ShapeType) return tp != Types.RECORD;
     return tp.instanceOf(BasicType.ANY_ATOMIC_TYPE) &&
         !tp.oneOf(BasicType.ANY_ATOMIC_TYPE, BasicType.NOTATION);
   }
@@ -462,28 +461,11 @@ public class QueryParser extends InputParser {
     final InputInfo ii = tc.info();
     localVars.pushContext(false);
     final Params params = new Params();
-    final Expr expr;
-    final Type tp = TypeRef.deref(tc.seqType().type);
-    if(tp instanceof final RecordType rt) {
-      // record type: derive parameters from record fields (initializing expressions are ignored)
-      final TokenObjectMap<ShapeField> fields = rt.fields();
-      for(final byte[] key : fields) {
-        params.add(new QNm(key), fields.get(key).seqType(), null, ii);
-      }
-      params.seqType(rt.seqType()).finish(qc, localVars);
-      final Var[] pv = params.vars();
-      final Expr[] args = new Expr[pv.length];
-      for(int i = 0; i < pv.length; i++) {
-        args[i] = new VarRef(null, pv[i]);
-      }
-      expr = ShapeConstructor.get(ii, rt, args);
-    } else {
-      // generalized atomic type: cast the supplied argument to the declared type
-      final SeqType st = tc.seqType().type.seqType(Occ.ZERO_OR_ONE);
-      params.add(new QNm(VALUEE), Types.ANY_ATOMIC_TYPE_ZO, new ContextValue(ii), ii);
-      params.seqType(st).finish(qc, localVars);
-      expr = new Cast(ii, new VarRef(null, params.vars()[0]), st);
-    }
+    // generalized atomic type: cast the supplied argument to the declared type
+    final SeqType st = tc.seqType().type.seqType(Occ.ZERO_OR_ONE);
+    params.add(new QNm(VALUEE), Types.ANY_ATOMIC_TYPE_ZO, new ContextValue(ii), ii);
+    params.seqType(st).finish(qc, localVars);
+    final Expr expr = new Cast(ii, new VarRef(null, params.vars()[0]), st);
     final VarScope vs = localVars.popContext();
     final StaticFunc func = qc.functions.declare(tc.sc(), tc.name(), params, expr, tc.anns(),
         tc.doc(), vs, ii);
@@ -1209,22 +1191,29 @@ public class QueryParser extends InputParser {
     wsCheck("(");
     final TokenObjectMap<ShapeField> fields = new TokenObjectMap<>();
     if(!wsConsume(")")) {
-      boolean exprRequired = false;
+      boolean defaults = false;
       do {
-        skipWs();
-        final byte[] name = quote(current()) ? stringLiteral() : ncName(NOSTRNCN_X, false);
+        final boolean statik = wsConsume("%");
+        if(statik && !wsConsumeWs("static")) throw error(WRONGCHAR_X_X, "static", found());
+        final InputInfo fi = info();
+        final byte[] name = ncName(NONCNAME_X, false);
         final SeqType seqType = wsConsume(AS) ? sequenceType() : null;
         if(fields.contains(name)) throw error(DUPFIELD_X, name);
-        skipWs();
-        Expr expr = null;
-        if(exprRequired || current() == ':') {
-          consume(":=");
+        Expr init = null;
+        if(wsConsume(":=")) {
+          // the initializing expression is evaluated like the one of a global variable
           localVars.pushContext(false);
-          expr = check(single(), NOEXPR);
-          localVars.popContext();
-          exprRequired = true;
+          final Expr expr = check(single(), NOEXPR);
+          final VarScope vs = localVars.popContext();
+          final QNm vn = new QNm(concat(qn.string(), cpToken('?'), name), qn.uri());
+          init = qc.vars.declareField(new Var(vn, seqType, qc, fi), expr, vs);
+          defaults = true;
+        } else if(statik) {
+          wsCheck(":=");
+        } else if(defaults) {
+          throw error(PARAMOPTIONAL_X, name);
         }
-        fields.put(name, new ShapeField(seqType, expr));
+        fields.put(name, new ShapeField(seqType, init, statik));
       } while(wsConsume(","));
       wsCheck(")");
     }
@@ -1264,32 +1253,33 @@ public class QueryParser extends InputParser {
   private void declareShapeConstructor(final RecordType rt, final InputInfo ii)
       throws QueryException {
 
+    // static fields are no parameters
     final TokenObjectMap<ShapeField> fields = rt.fields();
     localVars.pushContext(false);
     final Params params = new Params();
-    boolean defaults = false;
     for(final byte[] key : fields) {
       final ShapeField rf = fields.get(key);
-      final Expr init = rf.init();
-      if(init != null) {
-        defaults = true;
-      } else if(defaults) {
-        throw error(PARAMOPTIONAL_X, key);
-      }
-      final SeqType st = rf.seqType();
-      params.add(new QNm(key), st, init, ii);
+      if(!rf.isStatic()) params.add(new QNm(key), rf.seqType(), rf.init(), ii);
     }
     params.seqType(rt.seqType()).finish(qc, localVars);
 
+    // static fields are assigned the values of their initializing expressions
     final Var[] pv = params.vars();
-    final Expr[] args = new Expr[pv.length];
-    for(int i = 0; i < pv.length; i++) {
-      args[i] = new VarRef(null, pv[i]);
+    final Expr[] args = new Expr[fields.size()];
+    int a = 0, p = 0;
+    for(final ShapeField rf : fields.values()) {
+      args[a++] = rf.isStatic() ? rf.init() : new VarRef(null, pv[p++]);
     }
     final Expr expr = ShapeConstructor.get(ii, rt, args);
     final String doc = docBuilder.toString();
     final VarScope vs = localVars.popContext();
-    final StaticFunc func = qc.functions.declare(sc, rt.name(), params, expr, rt.anns(), doc, vs,
+
+    // the constructor annotation is not assigned to the function
+    AnnList anns = AnnList.EMPTY;
+    for(final Ann ann : rt.anns()) {
+      if(ann.definition != Annotation.CONSTRUCTOR) anns = anns.attach(ann);
+    }
+    final StaticFunc func = qc.functions.declare(sc, rt.name(), params, expr, anns, doc, vs,
         info());
     funcs.add(func);
   }

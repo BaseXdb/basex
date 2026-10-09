@@ -643,6 +643,28 @@ public final class JobModuleTest extends SandboxTest {
     }
   }
 
+  /** Computes database locks for record initializers that are evaluated by function jobs. */
+  @Test public void evalFunctionRecordLocks() {
+    query(_DB_CREATE.args("db"));
+    try {
+      final String record = "declare record local:r(a := db:get('db')); ";
+      final String reads = _JOB_LIST_DETAILS.args(" job:current()") + "/@reads/string()";
+      // the map is coerced or cast at runtime
+      for(final String coerce : new String[] {
+        "$m[random:double() >= 0] coerce to local:r",
+        "$m[random:double() >= 0] cast as local:r",
+        "let $r as local:r := $m[random:double() >= 0] return $r",
+        "fn($r as local:r) { $r }($m[random:double() >= 0])",
+        "[ $m[random:double() >= 0] ] coerce to array(local:r)"
+      }) {
+        query(record + _JOB_EXECUTE.args(" fn($m) { " + reads + ", count(" + coerce + ") }",
+            " [ {} ]"), "db\n1");
+      }
+    } finally {
+      query(_DB_DROP.args("db"));
+    }
+  }
+
   /** Rejects jobs whose execution would deadlock the calling query. */
   @Test public void deadlock() {
     final Function func = _JOB_EXECUTE;

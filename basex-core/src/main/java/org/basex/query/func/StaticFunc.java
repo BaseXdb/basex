@@ -382,7 +382,8 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     for(int d = 0; d < defaults.length; d++) {
       if(defaults[d] != null && !dflt(d).accept(visitor)) return false;
     }
-    return visitor.declared(params) && (expr == null || expr.accept(visitor));
+    return visitor.declared(params) && visitor.declared(declType) &&
+        (expr == null || expr.accept(visitor));
   }
 
   /**

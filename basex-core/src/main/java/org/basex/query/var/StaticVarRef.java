@@ -113,11 +113,15 @@ final class StaticVarRef extends ParseExpr {
 
   @Override
   public void toXml(final QueryPlan plan) {
-    plan.add(plan.create(this, QueryText.VAR, name));
+    // initializing expressions of record fields are inlined
+    if(var != null && var.field) var.expr.toXml(plan);
+    else plan.add(plan.create(this, QueryText.VAR, name));
   }
 
   @Override
   public void toString(final QueryString qs) {
-    qs.concat("$", name.string());
+    // initializing expressions of record fields are inlined
+    if(var != null && var.field) qs.token(var.expr);
+    else qs.concat("$", name.string());
   }
 }

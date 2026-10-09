@@ -19,6 +19,8 @@ import org.basex.util.similarity.*;
  */
 public enum Annotation {
   /** XQuery annotation. */
+  CONSTRUCTOR("constructor()", params(), XQ_URI, false),
+  /** XQuery annotation. */
   PRIVATE("private()", params(), XQ_URI, false),
   /** XQuery annotation. */
   PUBLIC("public()", params(), XQ_URI, false),
