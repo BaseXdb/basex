@@ -47,7 +47,8 @@ public class JobEval extends StandardFunc {
 
     // synchronous jobs share the caller's context
     final boolean sync = synchronous();
-    final Locks held = sync ? qc.context.locking.held() : null;
+    final Locks locks = qc.jc().locks;
+    final Locks held = sync && qc.context.locking.holds(locks) ? locks : null;
     final QueryJob job = new QueryJob(spec, sync ? qc.context : qc.context.detach(), info, null,
         held);
 

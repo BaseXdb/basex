@@ -649,28 +649,66 @@ public final class JobModuleTest extends SandboxTest {
     query(_DB_CREATE.args("db"));
     query(_DB_CREATE.args("db2"));
     try {
-      // caller read-locks a database, job would write-lock the same one: deadlock
-      error(_DB_GET.args("db") + ", " + func.args("db:optimize('db')"), JOBS_DEADLOCK_X);
-      // job resolves a constructed constant name to a specific lock: still conflicts, deadlock
-      error(_DB_GET.args("db") + ", " + func.args("db:optimize(string(<a>db</a>))"),
-          JOBS_DEADLOCK_X);
-      // job acquires a global write lock (dynamic name), conflicting with the caller: deadlock
-      error(_DB_GET.args("db") + ", " + func.args("db:optimize(db:list()[1])"),
-          JOBS_DEADLOCK_X);
-      // caller and job share a read lock: no conflict
-      query(_DB_GET.args("db") + ", " + func.args("db:get('db')"));
-      // caller and job touch different databases: no conflict
-      query(_DB_GET.args("db") + ", " + func.args("db:optimize('db2')"));
       // caller holds no locks: job may lock freely
       query(func.args("db:optimize('db')"), "");
+      // job only reads what the caller reads: no deadlock
+      query(_DB_GET.args("db") + ", " + func.args("count(db:get('db'))"));
+      query(_DB_GET.args("db") + ", " + func.args("count(db:get(string(<a>db</a>)))"));
+      // caller holds a global read lock: job may read any database
+      query(_DB_GET.args(" db:list()[1]") + ", " + func.args("count(db:get('db2'))"));
+      // job writes: deadlock
+      error(_DB_GET.args("db") + ", " + func.args("db:optimize('db')"), JOBS_DEADLOCK_X);
+      error(_DB_GET.args("db") + ", " + func.args("db:optimize('db2')"), JOBS_DEADLOCK_X);
+      error(_DB_GET.args("db") + ", " + func.args("db:optimize(db:list()[1])"),
+          JOBS_DEADLOCK_X);
+      error(_DB_GET.args("db") + ", " + func.args(
+          "declare variable $d external; db:optimize($d)", " { 'd': 'db2' }"), JOBS_DEADLOCK_X);
+      // job reads a database that is not read-locked by the caller: deadlock
+      error(_DB_GET.args("db") + ", " + func.args("count(db:get('db2'))"), JOBS_DEADLOCK_X);
+      error(_DB_GET.args("db") + ", " + func.args("count(db:get(db:list()[1]))"),
+          JOBS_DEADLOCK_X);
       // job:eval does not wait for the result and is therefore not guarded
       query(_DB_GET.args("db") + ", " + VOID.args(_JOB_EVAL.args("db:optimize('db')")));
-      // a variable-bound database name resolves after compilation: different database, no deadlock
-      query(_DB_GET.args("db") + ", " + func.args(
-          "declare variable $d external; db:optimize($d)", " { 'd': 'db2' }"));
+      // the read locks of all blocked callers are considered
+      query(_DB_GET.args("db") + ", " + func.args("job:execute(\"count(db:get('db'))\")"));
+      error(_DB_GET.args("db") + ", " + func.args("job:execute(\"count(db:get('db2'))\")"),
+          JOBS_DEADLOCK_X);
+      // job is called from a parallel branch
+      query(_DB_GET.args("db") + ", " + _XQUERY_FORK_JOIN.args(
+          " fn() { " + func.args("count(db:get('db'))") + " }"));
+      error(_DB_GET.args("db") + ", " + _XQUERY_FORK_JOIN.args(
+          " fn() { " + func.args("db:optimize('db')") + " }"), JOBS_DEADLOCK_X);
     } finally {
       query(_DB_DROP.args("db"));
       query(_DB_DROP.args("db2"));
+    }
+  }
+
+  /**
+   * Shares the read locks of a blocked caller with its job, even if a writer is queued.
+   * @throws InterruptedException interrupted exception
+   */
+  @Test public void deadlockQueuedWriter() throws InterruptedException {
+    query(_DB_CREATE.args("db"));
+    try {
+      // local and global write lock
+      for(final String writer : new String[] { "db:add('db', <a/>, 'a.xml')",
+          "db:optimize(db:list()[. = 'db'])" }) {
+        final Thread thread = new Thread(() -> query(
+            _JOB_EVAL.args(writer, " ()", " { 'start': 'PT0.2S' }") + ", " +
+            _DB_GET.args("db") + ", " + _PROF_SLEEP.args(600) + ", " +
+            _JOB_EXECUTE.args("count(db:get('db'))")));
+        thread.setDaemon(true);
+        thread.start();
+        thread.join(10000);
+        final boolean alive = thread.isAlive();
+        // remove blocked jobs before asserting: clean() would wait forever
+        if(alive) query(_JOB_LIST.args() + "[. != " + _JOB_CURRENT.args() + "] ! " +
+            _JOB_REMOVE.args(" ."));
+        assertFalse(alive, "Job of blocked caller waits for queued writer: " + writer);
+      }
+    } finally {
+      query(_DB_DROP.args("db"));
     }
   }
 

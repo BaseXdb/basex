@@ -339,7 +339,7 @@ public enum QueryError {
   // Jobs Module
 
   /** Error code. */
-  JOBS_DEADLOCK_X(JOB, "deadlock", "New job would deadlock (%)."),
+  JOBS_DEADLOCK_X(JOB, "deadlock", "Job may only read databases locked by caller (%)."),
   /** Error code. */
   JOBS_ID_EXISTS_X(JOB, "id", "Job id already exists: %."),
   /** Error code. */

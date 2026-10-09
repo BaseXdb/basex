@@ -34,8 +34,6 @@ public final class QueryJob extends Job implements Runnable {
   private final QueryJobSpec job;
   /** Notify function (can be {@code null}). */
   private final Consumer<QueryJobResult> notify;
-  /** Locks held by a caller that waits for this job; {@code null} if not applicable. */
-  private final Locks callerLocks;
   /** Input info of the calling expression (for error reporting). */
   private final InputInfo info;
 
@@ -63,9 +61,9 @@ public final class QueryJob extends Job implements Runnable {
 
     this.job = job;
     this.notify = notify;
-    this.callerLocks = callerLocks;
     this.info = info;
     jc().context = context;
+    jc().locks.caller(callerLocks);
 
     // permissions must not be escalated
     final JobOptions opts = job.options;
@@ -287,11 +285,11 @@ public final class QueryJob extends Job implements Runnable {
         qp.compile();
         result.time = perf.nanoRuntime();
 
-        // fail instead of blocking if a caller waiting for this job holds conflicting locks
-        if(callerLocks != null && callerLocks.locking()) {
+        // fail if the job needs locks that are not read-locked by the callers waiting for it
+        if(jc().locks.inherited()) {
           qp.addLocks();
           final Locks required = qp.jc().locks.finish(ctx);
-          if(callerLocks.conflicts(required)) throw JOBS_DEADLOCK_X.get(info, required);
+          if(jc().locks.deadlocks(required)) throw JOBS_DEADLOCK_X.get(info, required);
         }
 
         // register job
@@ -387,11 +385,6 @@ public final class QueryJob extends Job implements Runnable {
     } finally {
       running.set(false);
     }
-  }
-
-  @Override
-  public boolean inheritsSlot() {
-    return callerLocks != null && callerLocks.locking();
   }
 
   @Override

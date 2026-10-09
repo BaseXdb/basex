@@ -82,7 +82,7 @@ public final class Locking {
     job.addLocks();
     // prepare lock strings and acquire locks
     try {
-      acquire(job.jc().locks.finish(ctx), !job.inheritsSlot());
+      acquire(job.jc().locks.finish(ctx));
     } catch(final InterruptedException ex) {
       throw Util.notExpected("Thread was interrupted: %", ex);
     }
@@ -95,17 +95,6 @@ public final class Locking {
    * @throws InterruptedException interrupted exception
    */
   void acquire(final Locks locks) throws InterruptedException {
-    acquire(locks, true);
-  }
-
-  /**
-   * Puts read and write locks for the specified lock lists.
-   * The lists must have been prepared for locking (see {@link Locks#finish(Context)}).
-   * @param locks locks
-   * @param slot occupy a run slot in the lock queue
-   * @throws InterruptedException interrupted exception
-   */
-  private void acquire(final Locks locks, final boolean slot) throws InterruptedException {
     // one thread can only hold a single lock
     final Long id = Thread.currentThread().threadId();
     if(locked.containsKey(id)) throw new IllegalMonitorStateException("Thread holds locks: " + id);
@@ -114,17 +103,19 @@ public final class Locking {
     // queue job if the job limit has been reached (only locking jobs count towards the limit)
     final LockList reads = locks.reads, writes = locks.writes;
     final boolean write = writes.locking(), read = reads.locking(), lock = read || write;
+    final boolean inherited = locks.inherited();
     boolean global = false;
     locks.slot = false;
     try {
-      // a job that inherits the run slot of a blocked caller must not occupy a second one
-      if(lock && slot) {
-        queue.acquire(id, read, write);
-        locks.slot = true;
-      }
       if(lock) {
+        // a job that inherits the run slot of a blocked caller must not occupy a second one
+        if(!inherited) {
+          queue.acquire(id, read, write);
+          locks.slot = true;
+        }
         // apply exclusive lock (global write), or shared lock otherwise
-        (writes.global() ? globalLocks.writeLock() : globalLocks.readLock()).lock();
+        if(writes.global()) globalLocks.writeLock().lock();
+        else shared(globalLocks.readLock(), inherited);
         global = true;
       }
 
@@ -163,9 +154,19 @@ public final class Locking {
       if(w < ws && (r == rs || writes.get(w).compareTo(reads.get(r)) <= 0)) {
         pin(writes.get(w++)).writeLock().lock();
       } else {
-        pin(reads.get(r++)).readLock().lock();
+        shared(pin(reads.get(r++)).readLock(), inherited);
       }
     }
+  }
+
+  /**
+   * Acquires a read lock.
+   * @param lock read lock
+   * @param held indicates if the lock is also held by a blocked caller
+   */
+  private static void shared(final ReentrantReadWriteLock.ReadLock lock, final boolean held) {
+    // barge in: waiting for a queued writer would deadlock, as the writer waits for the caller
+    if(!held || !lock.tryLock()) lock.lock();
   }
 
   /**
@@ -207,6 +208,15 @@ public final class Locking {
    */
   public Locks held() {
     return locked.get(Thread.currentThread().threadId());
+  }
+
+  /**
+   * Checks if the specified locks are currently held by a job.
+   * @param locks locks
+   * @return result of check
+   */
+  public boolean holds(final Locks locks) {
+    return locked.containsValue(locks);
   }
 
   /**

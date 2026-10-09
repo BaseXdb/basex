@@ -108,16 +108,6 @@ public final class LockList implements Iterable<String> {
   }
 
   /**
-   * Checks if this list and the specified list share at least one lock.
-   * @param locks lock list
-   * @return result of check
-   */
-  public boolean intersects(final LockList locks) {
-    for(final String lock : list) if(locks.list.contains(lock)) return true;
-    return false;
-  }
-
-  /**
    * Returns the number of local locks.
    * @return number of local locks
    */

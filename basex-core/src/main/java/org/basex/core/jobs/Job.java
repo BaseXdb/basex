@@ -243,14 +243,6 @@ public abstract class Job {
   }
 
   /**
-   * Indicates if the job inherits the run slot of a caller that is blocked until it has finished.
-   * @return result of check
-   */
-  public boolean inheritsSlot() {
-    return false;
-  }
-
-  /**
    * Collects lock strings (databases, special identifiers) when registering a query.
    */
   public void addLocks() {

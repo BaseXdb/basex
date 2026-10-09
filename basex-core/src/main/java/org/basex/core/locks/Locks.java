@@ -14,6 +14,8 @@ public final class Locks {
   public final LockList reads = new LockList();
   /** Write locks. */
   public final LockList writes = new LockList();
+  /** Locks of the nearest blocked caller that holds locks (can be {@code null}). */
+  private Locks caller;
   /** Indicates that the job occupies a run slot in the lock queue. */
   boolean slot;
 
@@ -47,20 +49,38 @@ public final class Locks {
   }
 
   /**
-   * Checks if these locks and the specified locks cannot be held by two jobs at the same time.
-   * Both lock sets must have been finished (see {@link #finish(Context)}).
-   * @param locks locks to compare with
+   * Assigns the locks of a blocked caller that waits for the job.
+   * @param locks locks of the caller (can be {@code null})
+   */
+  public void caller(final Locks locks) {
+    // a caller with locking callers only reads what they read: its own locks add nothing
+    if(locks != null) caller = locks.inherited() ? locks.caller : locks.locking() ? locks : null;
+  }
+
+  /**
+   * Indicates if a blocked caller of the job holds locks.
    * @return result of check
    */
-  public boolean conflicts(final Locks locks) {
-    // a global write lock is exclusive and clashes with any lock held by the other job
-    if(writes.global() && locks.locking() || locks.writes.global() && locking()) return true;
-    // a global read lock clashes with the other job's local write locks
-    if(reads.global() && locks.writes.local() || locks.reads.global() && writes.local())
-      return true;
-    // a write lock clashes with any equally-named lock held by the other job
-    return writes.intersects(locks.writes) || writes.intersects(locks.reads) ||
-        locks.writes.intersects(reads);
+  public boolean inherited() {
+    return caller != null;
+  }
+
+  /**
+   * Checks if the specified locks are not covered by the read locks of a blocked caller.
+   * @param locks locks to check
+   * @return result of check
+   */
+  public boolean deadlocks(final Locks locks) {
+    // the job must never wait for a lock: it may only read what its blocked caller reads
+    if(!inherited() || !locks.locking()) return false;
+    if(locks.writes.locking()) return true;
+    final LockList held = caller.reads;
+    if(held.global()) return false;
+    if(locks.reads.global()) return true;
+    for(final String lock : locks.reads) {
+      if(!held.contains(lock)) return true;
+    }
+    return false;
   }
 
   @Override
